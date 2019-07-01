@@ -2,94 +2,80 @@ Return-Path: <SRS0=a9ZG=U6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89C2BC0650E
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 15:04:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22A9CC0650E
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 15:07:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4A8AD206E0
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 15:04:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9C4A320659
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 15:07:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OeN6imAy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A8AD206E0
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UfUdIVfr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C4A320659
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59766 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59820 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hhxqd-0004N5-DX
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 11:04:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34352)
+	id 1hhxuM-0006aZ-Rg
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 11:07:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58620)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hhxnA-0001hC-RJ
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 11:00:30 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hhxXY-0005mt-5J
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 10:44:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hhxn5-0007vO-Ne
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 11:00:28 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:55919)
+ (envelope-from <peter.maydell@linaro.org>) id 1hhxXW-0001di-WE
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 10:44:20 -0400
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:44519)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hhxn1-0007n2-2x
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 11:00:20 -0400
-Received: by mail-wm1-x343.google.com with SMTP id a15so16219958wmj.5
- for <qemu-devel@nongnu.org>; Mon, 01 Jul 2019 08:00:12 -0700 (PDT)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hhxXW-0001cM-Hu
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 10:44:18 -0400
+Received: by mail-oi1-x243.google.com with SMTP id e189so10108663oib.11
+ for <qemu-devel@nongnu.org>; Mon, 01 Jul 2019 07:44:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=qO0tw6/4CuHIqVaBgS7s0KxmHhX6bEPZ4Cj7kOvH6NU=;
- b=OeN6imAykCxxAy8fjgas5PEvvvM4wSO5ffrXLtHqaTmZCGzEB13KzX0DV/BS9jhArr
- M+oNwSPsyDOqRpsVvD35Jw1inbotJ+z2+LcDAwryCn2EZGuTWqspOmyF+Ub8f/n2HhDe
- KUl7JU5T8lajKgFMGMcPTMOrAPLwzqwtWl0V2g2nOuqyZ/HzGA8aejFxz/P1+FwzR5RN
- z685yj94eZQFABkFlykaxpvLvZmKk06wlqcdcPuGMBbKpMHMrFBRAEZfY3FZ5zcB48tk
- mbfa0ur/6pcMnSMkpPCkA4j45ubbJovVpTUpT2l21L8h2o/u9XVJAYUFdFtL/TSUsfBl
- PKMQ==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=v8mWmOTDXUBtlhUdnimPF0goXk8Uy165smt3zk5fOYA=;
+ b=UfUdIVfrWj+XlxguyyRxkjPeK2B/tJ/NL4J6mdENeFvfST1kZsS2iKmFaYtPcx2hWs
+ 1PwKEBWQYrT74A4NUMSQtRx2y6asC2tqHy0ePXAbf6TLUXeyCww32xH/amU6LtR+OoJw
+ dCqxGPG8qEmChsRvHDqA1/e2dYj6c6wEVFnC+wyyfPmttsppY+pTRmaabb9WuyG36n7+
+ 6V+Ja5gweoEbbQeNxH9NsHCYLoCTY1M/CGPheQ4QK34kiYgpOAIt/AAcc3srLDW6dg0R
+ crTV9J2wjvhVIRl8v5wvrM+U/Ez+wqVuiS3MVsddTXOhK08diEA/KbhFpwYkqsqJHxeE
+ zKAA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=qO0tw6/4CuHIqVaBgS7s0KxmHhX6bEPZ4Cj7kOvH6NU=;
- b=B0+hr1jLN/OVZK2jBMyJgbKC5cNkUienBWzF8BuKNR7ufSA+rSDT3GfHVbEFFS4uYz
- g7inFYeWr0X9fOfOUbuKwtjIHBkhi0ZnB5+hCGvEhdDtd2CX6/AuPTVmNYcKKuHFOJMD
- HVU5Kfvc0iBl8BBK2Tu0SNX0ip8HWCJTweJaeCpZHrbllt4kiesO2K8Zv8/td008OPXR
- rl56H+sxnZC//czmn9QyIuj388Wzs1nHQhAPBURx12HFwKpJoDQ8DtR/EAP3BCJO1g5B
- AXYrAYlDHFPJn0blb6jTiYOOFTqPGdse9KbZ1HYvl/cS4ebREjBWVdR0P9g44DTG2mC9
- lFyw==
-X-Gm-Message-State: APjAAAX7mbRvFYdBePxzzROvGUjwJ+mQstbD/kbA0Rm0FtbnBHe1Bs9f
- O0hRTAIDm/7m7DoCZ8/Oib35XA==
-X-Google-Smtp-Source: APXvYqxCSqBb7SU7xa9eMOHXu8+wHPVEoyvssAag/98UtHH6KaQoGhThl+R8IAzr75RTsWQwSMv6TQ==
-X-Received: by 2002:a1c:7a15:: with SMTP id v21mr17329286wmc.176.1561993210932; 
- Mon, 01 Jul 2019 08:00:10 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id z25sm17874772wmf.38.2019.07.01.08.00.09
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Mon, 01 Jul 2019 08:00:10 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id BBC091FF87;
- Mon,  1 Jul 2019 16:00:08 +0100 (BST)
-References: <20190614171200.21078-1-alex.bennee@linaro.org>
- <20190614171200.21078-20-alex.bennee@linaro.org>
- <20190628153044.GB26345@quinoa.localdomain>
- <87mui1ab4j.fsf@zen.linaroharston>
- <20190628175756.GC26345@quinoa.localdomain>
- <87lfxla0vs.fsf@zen.linaroharston> <20190701144009.GA5002@quinoa.localdomain>
-User-agent: mu4e 1.3.2; emacs 26.1
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Aaron Lindsay OS <aaron@os.amperecomputing.com>
-In-reply-to: <20190701144009.GA5002@quinoa.localdomain>
-Date: Mon, 01 Jul 2019 16:00:08 +0100
-Message-ID: <877e91ssuf.fsf@zen.linaroharston>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=v8mWmOTDXUBtlhUdnimPF0goXk8Uy165smt3zk5fOYA=;
+ b=kmWvW2vwoqb521yH0kL1X/CiUXMhclVvodqlmfSHdPMAK2qsJbloBHZWW2lz/3I9P1
+ wJMlgjIMO1pu7JZrHhJqX3kymvjHJMSlc2m6qCbr/RhdwMoQqKxo9YU2lXMZOF9Va+Wl
+ bGqd8EEsywkfVax1AB0d5LNYoWKWcpbpZzf54y7wjhFJoNwUzKrfT2WMQym93R1e8mDN
+ rZJ6a+nf100XaBYSr5NHZBQUca4SD8K8C8OdrC8i12AUy65SrcB6gCE+1mdtUkvX7vyt
+ T5R8XgIrI7wHvxUAr+MTR1P6fmy0QRtJYSkn7x7XrMZJgjL0RXA/382SJIvTW8abVDsO
+ m0xA==
+X-Gm-Message-State: APjAAAX5PKnkhXNmOIFsBskXamKU93uqut3/xROuU+VahuoGrOSpEuqO
+ DkaeznM9zjpspVt/UedPm1Ef939dCUoH83tQSdc4Sg==
+X-Google-Smtp-Source: APXvYqzLzUsClGTb4POACSnjAt0ZKTiA5DXJvRNw+S2oJqsbVPBKRN+zgGhU72plREBgQYzKAFdtdYViLMokA4F55yw=
+X-Received: by 2002:aca:6185:: with SMTP id v127mr7240404oib.163.1561992257364; 
+ Mon, 01 Jul 2019 07:44:17 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+References: <1561890034-15921-1-git-send-email-hongbo.zhang@linaro.org>
+ <1561890034-15921-2-git-send-email-hongbo.zhang@linaro.org>
+In-Reply-To: <1561890034-15921-2-git-send-email-hongbo.zhang@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 1 Jul 2019 15:44:06 +0100
+Message-ID: <CAFEAcA8Dxyz9tkhmmV0ACjCDw+r9q73-AY6vhK0cRE9AVLhrLA@mail.gmail.com>
+To: Hongbo Zhang <hongbo.zhang@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::343
-Subject: Re: [Qemu-devel] [PATCH v3 19/50] tcg: let plugins instrument
- memory accesses
+X-Received-From: 2607:f8b0:4864:20::243
+Subject: Re: [Qemu-devel] [PATCH v9 1/2] hw/arm: Add arm SBSA reference
+ machine, skeleton part
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,139 +87,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, "Emilio G. Cota" <cota@braap.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Richard Henderson <rth@twiddle.net>
+Cc: qemu-arm <qemu-arm@nongnu.org>,
+ Radoslaw Biernacki <radoslaw.biernacki@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Leif Lindholm <leif.lindholm@linaro.org>,
+ Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-Aaron Lindsay OS <aaron@os.amperecomputing.com> writes:
-
-> On Jun 28 21:52, Alex Benn=C3=A9e wrote:
->> Aaron Lindsay OS <aaron@os.amperecomputing.com> writes:
->> > To make sure I understand - you're implying that one such query will
->> > return the PA from the guest's perspective, right?
->>
->> Yes - although it will be two queries:
->>
->>   struct qemu_plugin_hwaddr *hw =3D qemu_plugin_get_hwaddr(info, vaddr);
->>
->> This does the actual lookup and stores enough information for the
->> further queries.
->>
->>   uint64_t pa =3D qemu_plugin_hwaddr_to_raddr(hw);
->>
->> will return the physical address (assuming it's a RAM reference and not
->> some IO location).
+On Sun, 30 Jun 2019 at 11:21, Hongbo Zhang <hongbo.zhang@linaro.org> wrote:
 >
-> Sounds good, as long as we have a good way to either prevent or cleanly
-> detect the failure mode for the IO accesses.
+> For the Aarch64, there is one machine 'virt', it is primarily meant to
+> run on KVM and execute virtualization workloads, but we need an
+> environment as faithful as possible to physical hardware, for supporting
+> firmware and OS development for pysical Aarch64 machines.
 >
->> > In terms of our use case - we use QEMU to drive studies to help us
->> > design the next generation of processors. As you can imagine, having t=
-he
->> > right physical addresses is important for some aspects of that. We're
->> > currently using a version of Pavel Dovgalyuk's earlier plugin patchset
->> > with some of our own patches/fixes on top, but it would obviously make
->> > our lives easier to work together to get this sort of infrastructure
->> > upstream!
->>
->> Was this:
->>
->>  Date: Tue, 05 Jun 2018 13:39:15 +0300
->>  Message-ID: <152819515565.30857.16834004920507717324.stgit@pasha-ThinkP=
-ad-T60>
->>  Subject: [Qemu-devel] [RFC PATCH v2 0/7] QEMU binary instrumentation pr=
-ototype
+> This patch introduces new machine type 'sbsa-ref' with main features:
+>  - Based on 'virt' machine type.
+>  - A new memory map.
+>  - CPU type cortex-a57.
+>  - EL2 and EL3 are enabled.
+>  - GIC version 3.
+>  - System bus AHCI controller.
+>  - System bus EHCI controller.
+>  - CDROM and hard disc on AHCI bus.
+>  - E1000E ethernet card on PCIE bus.
+>  - VGA display adaptor on PCIE bus.
+>  - No virtio deivces.
+>  - No fw_cfg device.
+>  - No ACPI table supplied.
+>  - Only minimal device tree nodes.
 >
-> Yes, that looks like the one.
+> Arm Trusted Firmware and UEFI porting to this are done accordingly, and
+> it should supply ACPI tables to load OS, the minimal device tree nodes
+> supplied from this platform are only to pass the dynamic info reflecting
+> command line input to firmware, not for loading OS.
 >
->> What patches did you add on top?
+> To make the review easier, this task is split into two patches, the
+> fundamental sceleton part and the peripheral devices part, this patch is
+> the first part.
 >
-> We added:
-> - plugin support for linux-user mode (I sent that one upstream, I think)
-> - memory tracing support and a VA->PA conversion helper
+> Signed-off-by: Hongbo Zhang <hongbo.zhang@linaro.org>
 
-check
+> +static const TypeInfo sbsa_ref_info = {
+> +    .name          = TYPE_SBSA_MACHINE,
+> +    .parent        = TYPE_MACHINE,
+> +    .class_init    = sbsa_ref_class_init,
 
-> - a way for a plugin to request getting a callback just before QEMU
->   exits to clean up any internal state
+You need here to also have
 
-check - qemu_plugin_register_atexit_cb
+    .instance_size = sizeof(SBSAMachineState),
 
-> - a way for a plugin to reset any instrumentation decisions made in the
->   past (essentially calls `tb_flush(cpu);` under the covers). We found
->   this critical for plugins which undergo state changes during the
->   course of their execution (i.e. watch for event X, then go into a more
->   detailed profiling mode until you see event Y)
+> +};
 
-check:
+Otherwise we won't allocate enough memory for the size of
+the struct, and will run off the end of the allocation.
+You can see this if you do a build with just patch 1 and
+try 'make check' on it with a clang-sanitizer build
+(ie passing configure  '--cc=clang-7' '--cxx=clang++-7'
+'--extra-cflags=-fsanitize=undefined -fno-sanitize=shift-base -Werror')
+as it will catch reads off the end of the memory.
 
-/**
- * qemu_plugin_reset() - Reset a plugin
- * @id: this plugin's opaque ID
- * @cb: callback to be called once the plugin has been reset
- *
- * Unregisters all callbacks for the plugin given by @id.
- *
- * Do NOT assume that the plugin has been reset once this function returns.
- * Plugins are reset asynchronously, and therefore the given plugin receives
- * callbacks until @cb is called.
- */
-void qemu_plugin_reset(qemu_plugin_id_t id, qemu_plugin_simple_cb_t cb);
-
-
-> - instrumentation at the TB granularity (in addition to the existing
->   instruction-level support)
-
-check
-
-/**
- * qemu_plugin_register_vcpu_tb_trans_cb() - register a translate cb
- * @id: plugin ID
- * @cb: callback function
- *
- * The @cb function is called every time a translation occurs. The @cb
- * function is passed an opaque qemu_plugin_type which it can query
- * for additional information including the list of translated
- * instructions. At this point the plugin can register further
- * callbacks to be triggered when the block or individual instruction
- * executes.
- */
-
-and then you can have instruction or TB level callbacks:
-
-/**
- * qemu_plugin_register_vcpu_tb_trans_exec_cb() - register execution callba=
-ck
- * @tb: the opaque qemu_plugin_tb handle for the translation
- * @cb: callback function
- * @flags: does the plugin read or write the CPU's registers?
- * @userdata: any plugin data to pass to the @cb?
- *
- * The @cb function is called every time a translated unit executes.
- */
-void qemu_plugin_register_vcpu_tb_exec_cb(struct qemu_plugin_tb *tb,
-                                          qemu_plugin_vcpu_udata_cb_t cb,
-                                          enum qemu_plugin_cb_flags flags,
-                                          void *userdata);
-
-Or the inline equivalent.
-
-
-> - the ability for a plugin to trigger a checkpoint to be taken
-
-We don't have this at the moment. Pranith also mentioned it in his
-review comments. I can see its use but I suspect it won't make the
-initial implementation given the broader requirements of QEMU to do
-checkpointing and how to cleanly expose that to plugins.
-
->
-> -Aaron
-
-
---
-Alex Benn=C3=A9e
+thanks
+-- PMM
 
