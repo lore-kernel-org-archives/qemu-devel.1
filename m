@@ -6,58 +6,58 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA627C0650E
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 13:19:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78C3CC0650E
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 13:22:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BBB74208E4
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 13:19:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BBB74208E4
+	by mail.kernel.org (Postfix) with ESMTPS id 4DB7C214AE
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 13:22:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4DB7C214AE
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58666 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58694 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hhwDn-0003oR-2B
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 09:19:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36814)
+	id 1hhwGM-0005TA-Kx
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 09:22:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36960)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <imammedo@redhat.com>) id 1hhw21-0002lA-Rn
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 09:07:43 -0400
+ (envelope-from <imammedo@redhat.com>) id 1hhw2T-0003fZ-RS
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 09:08:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1hhw1v-00085b-0U
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 09:07:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52656)
+ (envelope-from <imammedo@redhat.com>) id 1hhw2O-0000Jq-Ru
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 09:08:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36248)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hhw1u-00081J-MW
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 09:07:34 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hhw2O-0000Ih-Ip
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 09:08:04 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 4D91D308FF23
- for <qemu-devel@nongnu.org>; Mon,  1 Jul 2019 13:07:26 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id D8347308792B
+ for <qemu-devel@nongnu.org>; Mon,  1 Jul 2019 13:08:03 +0000 (UTC)
 Received: from localhost (unknown [10.43.2.182])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A29FB4EE0B;
- Mon,  1 Jul 2019 13:07:25 +0000 (UTC)
-Date: Mon, 1 Jul 2019 15:07:24 +0200
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 342046B8D7;
+ Mon,  1 Jul 2019 13:07:59 +0000 (UTC)
+Date: Mon, 1 Jul 2019 15:07:58 +0200
 From: Igor Mammedov <imammedo@redhat.com>
 To: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190701150724.1fb1099c@redhat.com>
-In-Reply-To: <20190621064615.20099-3-mst@redhat.com>
+Message-ID: <20190701150758.00b0ce56@redhat.com>
+In-Reply-To: <20190701093232.28575-1-mst@redhat.com>
 References: <20190621064615.20099-1-mst@redhat.com>
- <20190621064615.20099-3-mst@redhat.com>
+ <20190701093232.28575-1-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Mon, 01 Jul 2019 13:07:26 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.45]); Mon, 01 Jul 2019 13:08:03 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 2/3] pcie: check that slt ctrl changed
- before deleting
+Subject: Re: [Qemu-devel] [PATCH 4/3] pcie: minor cleanups for slot
+ control/status
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,123 +74,82 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 21 Jun 2019 02:46:48 -0400
+On Mon, 1 Jul 2019 05:34:54 -0400
 "Michael S. Tsirkin" <mst@redhat.com> wrote:
 
-> During boot, linux would sometimes overwrites control of a powered off
-> slot before powering it on. Unfortunately QEMU interprets that as a
-> power off request and ejects the device.
+> Rename function arguments to make intent clearer.
+> Better documentation for slot control logic.
 > 
-> For example:
-> 
-> /x86_64-softmmu/qemu-system-x86_64 -enable-kvm -S -machine q35  \
->     -device pcie-root-port,id=pcie_root_port_0,slot=2,chassis=2,addr=0x2,bus=pcie.0 \
->     -monitor stdio disk.qcow2
-> (qemu)device_add virtio-balloon-pci,id=balloon,bus=pcie_root_port_0
-> (qemu)cont
-> 
-> Balloon is deleted during guest boot.
-> 
-> To fix, save control beforehand and check that power
-> or led state actually change before ejecting.
-> 
-> Note: this is more a hack than a solution, ideally we'd
-> find a better way to detect ejects, or move away
-> from ejects completely and instead monitor whether
-> it's safe to delete device due to e.g. its power state.
-> 
+> Suggested-by: Igor Mammedov <imammedo@redhat.com>
 > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 
 Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-Tested-by: Igor Mammedov <imammedo@redhat.com>
+
 
 > ---
->  include/hw/pci/pcie.h              |  3 ++-
->  hw/pci-bridge/pcie_root_port.c     |  5 ++++-
->  hw/pci-bridge/xio3130_downstream.c |  5 ++++-
->  hw/pci/pcie.c                      | 14 ++++++++++++--
->  4 files changed, 22 insertions(+), 5 deletions(-)
+> 
+> 
+>  include/hw/pci/pcie.h |  3 ++-
+>  hw/pci/pcie.c         | 17 +++++++++++------
+>  2 files changed, 13 insertions(+), 7 deletions(-)
 > 
 > diff --git a/include/hw/pci/pcie.h b/include/hw/pci/pcie.h
-> index e30334d74d..8d90c0e193 100644
+> index 8d90c0e193..34f277735c 100644
 > --- a/include/hw/pci/pcie.h
 > +++ b/include/hw/pci/pcie.h
-> @@ -107,7 +107,8 @@ void pcie_cap_lnkctl_reset(PCIDevice *dev);
->  
+> @@ -108,7 +108,8 @@ void pcie_cap_lnkctl_reset(PCIDevice *dev);
 >  void pcie_cap_slot_init(PCIDevice *dev, uint16_t slot);
 >  void pcie_cap_slot_reset(PCIDevice *dev);
-> -void pcie_cap_slot_write_config(PCIDevice *dev,
-> +void pcie_cap_slot_get(PCIDevice *dev, uint16_t *slot_ctl, uint16_t *slt_sta);
-> +void pcie_cap_slot_write_config(PCIDevice *dev, uint16_t slot_ctl, uint16_t slt_sta,
+>  void pcie_cap_slot_get(PCIDevice *dev, uint16_t *slot_ctl, uint16_t *slt_sta);
+> -void pcie_cap_slot_write_config(PCIDevice *dev, uint16_t slot_ctl, uint16_t slt_sta,
+> +void pcie_cap_slot_write_config(PCIDevice *dev,
+> +                                uint16_t old_slot_ctl, uint16_t old_slt_sta,
 >                                  uint32_t addr, uint32_t val, int len);
 >  int pcie_cap_slot_post_load(void *opaque, int version_id);
 >  void pcie_cap_slot_push_attention_button(PCIDevice *dev);
-> diff --git a/hw/pci-bridge/pcie_root_port.c b/hw/pci-bridge/pcie_root_port.c
-> index 92f253c924..09019ca05d 100644
-> --- a/hw/pci-bridge/pcie_root_port.c
-> +++ b/hw/pci-bridge/pcie_root_port.c
-> @@ -31,10 +31,13 @@ static void rp_write_config(PCIDevice *d, uint32_t address,
->  {
->      uint32_t root_cmd =
->          pci_get_long(d->config + d->exp.aer_cap + PCI_ERR_ROOT_COMMAND);
-> +    uint16_t slt_ctl, slt_sta;
-> +
-> +    pcie_cap_slot_get(d, &slt_ctl, &slt_sta);
->  
->      pci_bridge_write_config(d, address, val, len);
->      rp_aer_vector_update(d);
-> -    pcie_cap_slot_write_config(d, address, val, len);
-> +    pcie_cap_slot_write_config(d, slt_ctl, slt_sta, address, val, len);
->      pcie_aer_write_config(d, address, val, len);
->      pcie_aer_root_write_config(d, address, val, len, root_cmd);
->  }
-> diff --git a/hw/pci-bridge/xio3130_downstream.c b/hw/pci-bridge/xio3130_downstream.c
-> index 264e37d6a6..899b0fd6c9 100644
-> --- a/hw/pci-bridge/xio3130_downstream.c
-> +++ b/hw/pci-bridge/xio3130_downstream.c
-> @@ -41,9 +41,12 @@
->  static void xio3130_downstream_write_config(PCIDevice *d, uint32_t address,
->                                           uint32_t val, int len)
->  {
-> +    uint16_t slt_ctl, slt_sta;
-> +
-> +    pcie_cap_slot_get(d, &slt_sta, &slt_ctl);
->      pci_bridge_write_config(d, address, val, len);
->      pcie_cap_flr_write_config(d, address, val, len);
-> -    pcie_cap_slot_write_config(d, address, val, len);
-> +    pcie_cap_slot_write_config(d, slt_ctl, slt_sta, address, val, len);
->      pcie_aer_write_config(d, address, val, len);
->  }
->  
 > diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
-> index b22527000d..f8490a00de 100644
+> index c605d32dd4..a6beb567bd 100644
 > --- a/hw/pci/pcie.c
 > +++ b/hw/pci/pcie.c
-> @@ -594,7 +594,15 @@ void pcie_cap_slot_reset(PCIDevice *dev)
->      hotplug_event_update_event_status(dev);
+> @@ -602,7 +602,8 @@ void pcie_cap_slot_get(PCIDevice *dev, uint16_t *slt_ctl, uint16_t *slt_sta)
+>      *slt_sta = pci_get_word(exp_cap + PCI_EXP_SLTSTA);
 >  }
 >  
-> -void pcie_cap_slot_write_config(PCIDevice *dev,
-> +void pcie_cap_slot_get(PCIDevice *dev, uint16_t *slt_ctl, uint16_t *slt_sta)
-> +{
-> +    uint32_t pos = dev->exp.exp_cap;
-> +    uint8_t *exp_cap = dev->config + pos;
-> +    *slt_ctl = pci_get_word(exp_cap + PCI_EXP_SLTCTL);
-> +    *slt_sta = pci_get_word(exp_cap + PCI_EXP_SLTSTA);
-> +}
-> +
-> +void pcie_cap_slot_write_config(PCIDevice *dev, uint16_t slt_ctl, uint16_t slt_sta,
+> -void pcie_cap_slot_write_config(PCIDevice *dev, uint16_t slt_ctl, uint16_t slt_sta,
+> +void pcie_cap_slot_write_config(PCIDevice *dev,
+> +                                uint16_t old_slt_ctl, uint16_t old_slt_sta,
 >                                  uint32_t addr, uint32_t val, int len)
 >  {
 >      uint32_t pos = dev->exp.exp_cap;
-> @@ -623,7 +631,9 @@ void pcie_cap_slot_write_config(PCIDevice *dev,
+> @@ -625,8 +626,8 @@ void pcie_cap_slot_write_config(PCIDevice *dev, uint16_t slt_ctl, uint16_t slt_s
+>                            PCI_EXP_SLTSTA_MRLSC | PCI_EXP_SLTSTA_PDC | \
+>                            PCI_EXP_SLTSTA_CC)
+>  
+> -        if (val & ~slt_sta & PCIE_SLOT_EVENTS) {
+> -            sltsta = (sltsta & ~PCIE_SLOT_EVENTS) | (slt_sta & PCIE_SLOT_EVENTS);
+> +        if (val & ~old_slt_sta & PCIE_SLOT_EVENTS) {
+> +            sltsta = (sltsta & ~PCIE_SLOT_EVENTS) | (old_slt_sta & PCIE_SLOT_EVENTS);
+>              pci_set_word(exp_cap + PCI_EXP_SLTSTA, sltsta);
+>          }
+>          hotplug_event_clear(dev);
+> @@ -646,13 +647,17 @@ void pcie_cap_slot_write_config(PCIDevice *dev, uint16_t slt_ctl, uint16_t slt_s
+>      }
+>  
+>      /*
+> -     * If the slot is polulated, power indicator is off and power
+> +     * If the slot is populated, power indicator is off and power
 >       * controller is off, it is safe to detach the devices.
+> +     *
+> +     * Note: don't detach if condition was already true:
+> +     * this is a work around for guests that overwrite
+> +     * control of powered off slots before powering them on.
 >       */
 >      if ((sltsta & PCI_EXP_SLTSTA_PDS) && (val & PCI_EXP_SLTCTL_PCC) &&
-> -        ((val & PCI_EXP_SLTCTL_PIC_OFF) == PCI_EXP_SLTCTL_PIC_OFF)) {
-> +        (val & PCI_EXP_SLTCTL_PIC_OFF) == PCI_EXP_SLTCTL_PIC_OFF &&
-> +        (!(slt_ctl & PCI_EXP_SLTCTL_PCC) ||
-> +        (slt_ctl & PCI_EXP_SLTCTL_PIC_OFF) != PCI_EXP_SLTCTL_PIC_OFF)) {
+>          (val & PCI_EXP_SLTCTL_PIC_OFF) == PCI_EXP_SLTCTL_PIC_OFF &&
+> -        (!(slt_ctl & PCI_EXP_SLTCTL_PCC) ||
+> -        (slt_ctl & PCI_EXP_SLTCTL_PIC_OFF) != PCI_EXP_SLTCTL_PIC_OFF)) {
+> +        (!(old_slt_ctl & PCI_EXP_SLTCTL_PCC) ||
+> +        (old_slt_ctl & PCI_EXP_SLTCTL_PIC_OFF) != PCI_EXP_SLTCTL_PIC_OFF)) {
 >          PCIBus *sec_bus = pci_bridge_get_sec_bus(PCI_BRIDGE(dev));
 >          pci_for_each_device(sec_bus, pci_bus_num(sec_bus),
 >                              pcie_unplug_device, NULL);
