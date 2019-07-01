@@ -2,67 +2,65 @@ Return-Path: <SRS0=a9ZG=U6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59639C0650E
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 10:09:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F469C0650E
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 10:11:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 297672089F
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 10:09:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 297672089F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id EF602214AE
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 10:11:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF602214AE
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56740 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56768 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hhtFi-0003FV-6h
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 06:09:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57608)
+	id 1hhtHa-0004UM-8i
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 06:11:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58152)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <no-reply@patchew.org>) id 1hhtF0-0002mN-Ug
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 06:08:56 -0400
+ (envelope-from <eric.auger@redhat.com>) id 1hhtGq-00043A-Jo
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 06:10:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1hhtEz-0001tF-1a
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 06:08:54 -0400
-Resent-Date: Mon, 01 Jul 2019 06:08:54 -0400
-Resent-Message-Id: <E1hhtEz-0001tF-1a@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21409)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1hhtEy-0001cO-Mh
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 06:08:52 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1561975705; cv=none; d=zoho.com; s=zohoarc; 
- b=aEvcSQlpMKjbGfn8qLzTWV8QFktGfgDENQTV9jg7lnrjp0ocQUbiiLmpJalqPQ7pWSOTdLfYI1nFNs3ADH0LPDB/1Qd/59iSmlR04dmFju0Q/XG6Xz+975vStZehHX2SukghgkSbJpgyRdwyrE5MEgVJIx6kSbO4EUNj0itcXwI=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1561975705;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
- bh=itIcdlylMFCSJShkJmZeLpT4Eam6K2Uph901FJAFArE=; 
- b=j8v3fjJU+GkJC8ZpzKwSgKQPFnaRVDubhfbOgzM+/0pMLtTlcnWppACzBjUGHjF+b8LxRXqBoWQbi7GSM98u2HNhfkaUfuvTThpO7WyB1Mqh3cILBRLv7iVDDGCNjMTqjEtHvDpexzGm7WpxT42zkXk8/6ES4mc9/nV7+nf3ZMA=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 156197570339565.26656602874345;
- Mon, 1 Jul 2019 03:08:23 -0700 (PDT)
-Message-ID: <156197570218.9862.1776294422639028545@c4a48874b076>
-In-Reply-To: <20190701090904.31312-1-ppandit@redhat.com>
+ (envelope-from <eric.auger@redhat.com>) id 1hhtGp-0004I4-GI
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 06:10:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38982)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+ id 1hhtGp-0004HR-7u
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 06:10:47 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 20E0C59449;
+ Mon,  1 Jul 2019 10:10:38 +0000 (UTC)
+Received: from [10.36.116.89] (ovpn-116-89.ams2.redhat.com [10.36.116.89])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id CAE531001E64;
+ Mon,  1 Jul 2019 10:10:34 +0000 (UTC)
+To: Yan Zhao <yan.y.zhao@intel.com>, pbonzini@redhat.com
+References: <1561760389-31325-1-git-send-email-yan.y.zhao@intel.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <42713cac-27fb-f4a9-1b06-bfee409690a5@redhat.com>
+Date: Mon, 1 Jul 2019 12:10:33 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: ppandit@redhat.com
-Date: Mon, 1 Jul 2019 03:08:23 -0700 (PDT)
-X-ZohoMailClient: External
+In-Reply-To: <1561760389-31325-1-git-send-email-yan.y.zhao@intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.39]); Mon, 01 Jul 2019 10:10:42 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 135.84.80.217
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] restrict bridge interface name to
- IFNAMSIZ
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v5] memory: do not notify for non inclusive
+ overlap entry
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,53 +72,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: rschiron@redhat.com, berrange@redhat.com, pjp@fedoraproject.org,
- jasowang@redhat.com, liq3ea@gmail.com, qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org, Peter Xu <peterx@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDcwMTA5MDkwNC4zMTMx
-Mi0xLXBwYW5kaXRAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZl
-IHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGlu
-Zm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAxOTA3MDEwOTA5MDQuMzEzMTItMS1wcGFuZGl0QHJl
-ZGhhdC5jb20KU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2MiAwLzNdIHJlc3RyaWN0IGJy
-aWRnZSBpbnRlcmZhY2UgbmFtZSB0byBJRk5BTVNJWgpUeXBlOiBzZXJpZXMKCj09PSBURVNUIFND
-UklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxs
-IHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25m
-aWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdv
-cml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4u
-Cj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQx
-ZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVj
-dC9xZW11CiAtIFt0YWcgdXBkYXRlXSAgICAgIHBhdGNoZXcvMjAxOTA2MjEwNjQ2MTUuMjAwOTkt
-MS1tc3RAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTkwNjIxMDY0NjE1LjIwMDk5LTEtbXN0QHJl
-ZGhhdC5jb20KIC0gW3RhZyB1cGRhdGVdICAgICAgcGF0Y2hldy8yMDE5MDcwMTA5MDkwNC4zMTMx
-Mi0xLXBwYW5kaXRAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTkwNzAxMDkwOTA0LjMxMzEyLTEt
-cHBhbmRpdEByZWRoYXQuY29tCiAtIFt0YWcgdXBkYXRlXSAgICAgIHBhdGNoZXcvMjAxOTA3MDEw
-OTMwMzQuMTg4NzMtMS1lcmljLmF1Z2VyQHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDE5MDcwMTA5
-MzAzNC4xODg3My0xLWVyaWMuYXVnZXJAcmVkaGF0LmNvbQogLSBbdGFnIHVwZGF0ZV0gICAgICBw
-YXRjaGV3L2ZjNTQwNGY3LTRkMWQtYzI4Zi02ZTQ4LWQ4Nzk5YzgyYWNjMEB3ZWIuZGUgLT4gcGF0
-Y2hldy9mYzU0MDRmNy00ZDFkLWMyOGYtNmU0OC1kODc5OWM4MmFjYzBAd2ViLmRlClN3aXRjaGVk
-IHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKYmIyOTgyNyBuZXQ6IHRhcDogcmVzdHJpY3QgYnJpZGdl
-IG5hbWUgdG8gSUZOQU1TSVoKZDdiNGU5NCBxZW11LWJyaWRnZS1oZWxwZXI6IG1vdmUgcmVwZWF0
-aW5nIGNvZGUgaW4gcGFyc2VfYWNsX2ZpbGUKY2NlZDgyMSBxZW11LWJyaWRnZS1oZWxwZXI6IHJl
-c3RyaWN0IGludGVyZmFjZSBuYW1lIHRvIElGTkFNU0laCgo9PT0gT1VUUFVUIEJFR0lOID09PQox
-LzMgQ2hlY2tpbmcgY29tbWl0IGNjZWQ4MjEwNDE0MCAocWVtdS1icmlkZ2UtaGVscGVyOiByZXN0
-cmljdCBpbnRlcmZhY2UgbmFtZSB0byBJRk5BTVNJWikKMi8zIENoZWNraW5nIGNvbW1pdCBkN2I0
-ZTk0ODBiYmUgKHFlbXUtYnJpZGdlLWhlbHBlcjogbW92ZSByZXBlYXRpbmcgY29kZSBpbiBwYXJz
-ZV9hY2xfZmlsZSkKMy8zIENoZWNraW5nIGNvbW1pdCBiYjI5ODI3OGY2ODAgKG5ldDogdGFwOiBy
-ZXN0cmljdCBicmlkZ2UgbmFtZSB0byBJRk5BTVNJWikKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBh
-cm91bmQgdGhhdCAnKycgKGN0eDpWeFYpCiMyNzogRklMRTogbmV0L3RhcC5jOjUwMjoKKyAgICAg
-ICAgY2hhciBicl9idWZbNStJRk5BTVNJWl0gPSB7MH07CiAgICAgICAgICAgICAgICAgICAgICBe
-Cgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDggbGluZXMgY2hlY2tlZAoKUGF0Y2ggMy8z
-IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJv
-cnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2Vl
-CkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29t
-bWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApo
-dHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MDcwMTA5MDkwNC4zMTMxMi0xLXBwYW5kaXRAcmVk
-aGF0LmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVy
-YXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxl
-YXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+Hi Yan,
 
+On 6/29/19 12:19 AM, Yan Zhao wrote:
+> if an entry has non inclusive overlap with the notifier, print warning
+> message and do not do notification for it.
+> 
+> Out of scope mapping/unmapping would cause problem, as in below case:
+> 
+> 1. initially there are two notifiers with ranges
+> 0-0xfedfffff, 0xfef00000-0xffffffffffffffff,
+> IOVAs from 0x3c000000 - 0x3c1fffff is in shadow page table.
+> 
+> 2. in vfio, memory_region_register_iommu_notifier() is followed by
+> memory_region_iommu_replay(), which will first call address space
+> unmap,
+> and walk and add back all entries in vtd shadow page table. e.g.
+> (1) for notifier 0-0xfedfffff,
+>     IOVAs from 0 - 0xffffffff get unmapped,
+>     and IOVAs from 0x3c000000 - 0x3c1fffff get mapped
+> (2) for notifier 0xfef00000-0xffffffffffffffff
+>     IOVAs from 0 - 0x7fffffffff get unmapped,
+>     but IOVAs from 0x3c000000 - 0x3c1fffff cannot get mapped back.
+> 
+> Cc: Eric Auger <eric.auger@redhat.com>
+> Cc: Peter Xu <peterx@redhat.com>
+> Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+
+Thanks
+
+Eric
+
+> 
+> ---
+> v5:
+> 1. still using warn_report instead of "assert"
+> 2. returning at the end to refuse notification for entry which has non
+> inclusive overlap with the notifier.
+> 3. updated commit title and warning message.
+> 
+> v4:
+> 1. modified commit title
+> 2. using "assert" instead of printing warning message
+> 
+> v3:
+> refined code style and message format
+> 
+> v2:
+> 1. added a local variable entry_end (Eric Auger)
+> 2. using PRIx64 as format for address range in warning message
+> (Eric Auger)
+> ---
+>  memory.c | 16 ++++++++++++++--
+>  1 file changed, 14 insertions(+), 2 deletions(-)
+> 
+> diff --git a/memory.c b/memory.c
+> index 0a089a7..fe0d08d 100644
+> --- a/memory.c
+> +++ b/memory.c
+> @@ -1937,13 +1937,13 @@ void memory_region_notify_one(IOMMUNotifier *notifier,
+>                                IOMMUTLBEntry *entry)
+>  {
+>      IOMMUNotifierFlag request_flags;
+> +    hwaddr entry_end = entry->iova + entry->addr_mask;
+>  
+>      /*
+>       * Skip the notification if the notification does not overlap
+>       * with registered range.
+>       */
+> -    if (notifier->start > entry->iova + entry->addr_mask ||
+> -        notifier->end < entry->iova) {
+> +    if (notifier->start > entry_end || notifier->end < entry->iova) {
+>          return;
+>      }
+>  
+> @@ -1953,6 +1953,18 @@ void memory_region_notify_one(IOMMUNotifier *notifier,
+>          request_flags = IOMMU_NOTIFIER_UNMAP;
+>      }
+>  
+> +    if (entry->iova < notifier->start || entry_end > notifier->end) {
+> +        warn_report("IOMMUTLBEntry 0x%" PRIx64 " - 0x%" PRIx64
+> +                " has non inclusive overlap with notifier 0x%" PRIx64
+> +                " - 0x%" PRIx64 ". %s is not allowed."
+> +                " Try to divide it into smaller sections.",
+> +                entry->iova, entry_end,
+> +                notifier->start, notifier->end,
+> +                (request_flags == IOMMU_NOTIFIER_MAP) ?
+> +                "Mapping" : "Unmapping");
+> +        return;
+> +    }
+> +
+>      if (notifier->notifier_flags & request_flags) {
+>          notifier->notify(notifier, entry);
+>      }
+> 
 
