@@ -2,81 +2,62 @@ Return-Path: <SRS0=a9ZG=U6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B53DCC0650E
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 13:19:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA627C0650E
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 13:19:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 825CA208E4
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 13:19:24 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dCStNmCP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 825CA208E4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id BBB74208E4
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 13:19:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BBB74208E4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58646 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58666 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hhwDL-0002pI-LE
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 09:19:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36756)
+	id 1hhwDn-0003oR-2B
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 09:19:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36814)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hhw1r-0002j6-Oh
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 09:07:38 -0400
+ (envelope-from <imammedo@redhat.com>) id 1hhw21-0002lA-Rn
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 09:07:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hhw1n-0007xH-UI
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 09:07:29 -0400
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:40415)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hhw1n-0007J8-Oe
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 09:07:27 -0400
-Received: by mail-oi1-x242.google.com with SMTP id w196so9872543oie.7
- for <qemu-devel@nongnu.org>; Mon, 01 Jul 2019 06:06:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=GFpVemuNL7UhbLtjtR7O0P9wazBxTV9UABGaJgXIshY=;
- b=dCStNmCPt9WreNdovNC0xder7dlBrJLvhhkZWT1qlkbg4dEiQbVJB3ZbzBGNofHaJl
- FdyLODZlX5wuBaaQjzrsBf5KNT6WqFQN3Ic3lxvAxailNNP4JBrxfpVQE0dqc+jlP5V4
- y6cLwJ7TG4Z1hLR8v02XTRhZgCp6CpJ47hmnvZLTLioFGv8C0N+OByjGnj71F3UzXNaw
- 1mtn3Ig4tnqxTIoYmKuvwEnvmMVroXAVbyiaiRyb6CwK8zKAY6PyNE2k5cq5hPmNKIIX
- fMKNg/r6sksMRIRK+6U9rEoyp8Q4W1Zt1k9mRUKF7lW9W15sjyfYxlCw5VNlDPlILwNk
- BMWQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=GFpVemuNL7UhbLtjtR7O0P9wazBxTV9UABGaJgXIshY=;
- b=BoO3b4KRIFwhHEwwOFucuyM+onTJMuSTETsOQQNtwIYfX2//bJS0u41ix9YDJstyB2
- ty6pzWIYLPeUUnI5K1ZLxh2MEM2MI+PiLDw/LIuR3rwHaO0ydXpSuBPfw5/lhNxxzz8Q
- wMzW7Uc1Ii1pRzIGO3ltCLDGqgcvhhFI0Z4mnrrp65FqJd4wL8mAGvv/wJTPjvdRwnkg
- piySFZ6GqWCrIWPG87bQ+L4eY0F5dVjMG+NNyqGqceRfA+ul8VL9m4YimYilhrfh/Q7W
- Nhz8wM4h/YKu3Go0kRb1okHfEQ3evIoY0wEDtlQ0Xj/rKpdSJOvBVZP6ibQN+VUHOBZa
- l8rA==
-X-Gm-Message-State: APjAAAXdpKkZzmFF4wopGcmo0E345nyrqq0RZYLUdtTKBdLPz+1c/dqY
- Z/v5lxZ4HVjvciFz2DFwsA6U+UhAw+x8jLlGYFVIrg==
-X-Google-Smtp-Source: APXvYqwvba2MQMyS7jLMKDl454jZLaiXhButHVexL7HSy/SUqsJ6RAdi7pyD/yDQVq2pi+l9JeCmOjzaQB1rxa+Y8lo=
-X-Received: by 2002:aca:ac48:: with SMTP id v69mr6542560oie.48.1561986407265; 
- Mon, 01 Jul 2019 06:06:47 -0700 (PDT)
+ (envelope-from <imammedo@redhat.com>) id 1hhw1v-00085b-0U
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 09:07:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52656)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hhw1u-00081J-MW
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 09:07:34 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 4D91D308FF23
+ for <qemu-devel@nongnu.org>; Mon,  1 Jul 2019 13:07:26 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.182])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A29FB4EE0B;
+ Mon,  1 Jul 2019 13:07:25 +0000 (UTC)
+Date: Mon, 1 Jul 2019 15:07:24 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190701150724.1fb1099c@redhat.com>
+In-Reply-To: <20190621064615.20099-3-mst@redhat.com>
+References: <20190621064615.20099-1-mst@redhat.com>
+ <20190621064615.20099-3-mst@redhat.com>
 MIME-Version: 1.0
-References: <20190618165311.27066-1-clg@kaod.org>
- <20190618165311.27066-16-clg@kaod.org>
-In-Reply-To: <20190618165311.27066-16-clg@kaod.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 1 Jul 2019 14:06:36 +0100
-Message-ID: <CAFEAcA-J+bS2-EtX6pTFYJ1XMaNLx0roYEoQMxV_=-mwMSPDgg@mail.gmail.com>
-To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::242
-Subject: Re: [Qemu-devel] [PATCH v2 15/21] aspeed/smc: add support for DMAs
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.49]); Mon, 01 Jul 2019 13:07:26 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 2/3] pcie: check that slt ctrl changed
+ before deleting
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,131 +69,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrew Jeffery <andrew@aj.id.au>, qemu-arm <qemu-arm@nongnu.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Joel Stanley <joel@jms.id.au>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 18 Jun 2019 at 17:55, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
->
-> The FMC controller on the Aspeed SoCs support DMA to access the flash
-> modules. It can operate in a normal mode, to copy to or from the flash
-> module mapping window, or in a checksum calculation mode, to evaluate
-> the best clock settings for reads.
->
-> The model introduces two custom address spaces for DMAs: one for the
-> AHB window of the FMC flash devices and one for the DRAM. The latter
-> is populated using a "dram" link set from the machine with the RAM
-> container region.
->
-> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-> Acked-by: Joel Stanley <joel@jms.id.au>
-> +/*
-> + * Accumulate the result of the reads to provide a checksum that will
-> + * be used to validate the read timing settings.
-> + */
-> +static void aspeed_smc_dma_checksum(AspeedSMCState *s)
+On Fri, 21 Jun 2019 02:46:48 -0400
+"Michael S. Tsirkin" <mst@redhat.com> wrote:
+
+> During boot, linux would sometimes overwrites control of a powered off
+> slot before powering it on. Unfortunately QEMU interprets that as a
+> power off request and ejects the device.
+> 
+> For example:
+> 
+> /x86_64-softmmu/qemu-system-x86_64 -enable-kvm -S -machine q35  \
+>     -device pcie-root-port,id=pcie_root_port_0,slot=2,chassis=2,addr=0x2,bus=pcie.0 \
+>     -monitor stdio disk.qcow2
+> (qemu)device_add virtio-balloon-pci,id=balloon,bus=pcie_root_port_0
+> (qemu)cont
+> 
+> Balloon is deleted during guest boot.
+> 
+> To fix, save control beforehand and check that power
+> or led state actually change before ejecting.
+> 
+> Note: this is more a hack than a solution, ideally we'd
+> find a better way to detect ejects, or move away
+> from ejects completely and instead monitor whether
+> it's safe to delete device due to e.g. its power state.
+> 
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Tested-by: Igor Mammedov <imammedo@redhat.com>
+
+> ---
+>  include/hw/pci/pcie.h              |  3 ++-
+>  hw/pci-bridge/pcie_root_port.c     |  5 ++++-
+>  hw/pci-bridge/xio3130_downstream.c |  5 ++++-
+>  hw/pci/pcie.c                      | 14 ++++++++++++--
+>  4 files changed, 22 insertions(+), 5 deletions(-)
+> 
+> diff --git a/include/hw/pci/pcie.h b/include/hw/pci/pcie.h
+> index e30334d74d..8d90c0e193 100644
+> --- a/include/hw/pci/pcie.h
+> +++ b/include/hw/pci/pcie.h
+> @@ -107,7 +107,8 @@ void pcie_cap_lnkctl_reset(PCIDevice *dev);
+>  
+>  void pcie_cap_slot_init(PCIDevice *dev, uint16_t slot);
+>  void pcie_cap_slot_reset(PCIDevice *dev);
+> -void pcie_cap_slot_write_config(PCIDevice *dev,
+> +void pcie_cap_slot_get(PCIDevice *dev, uint16_t *slot_ctl, uint16_t *slt_sta);
+> +void pcie_cap_slot_write_config(PCIDevice *dev, uint16_t slot_ctl, uint16_t slt_sta,
+>                                  uint32_t addr, uint32_t val, int len);
+>  int pcie_cap_slot_post_load(void *opaque, int version_id);
+>  void pcie_cap_slot_push_attention_button(PCIDevice *dev);
+> diff --git a/hw/pci-bridge/pcie_root_port.c b/hw/pci-bridge/pcie_root_port.c
+> index 92f253c924..09019ca05d 100644
+> --- a/hw/pci-bridge/pcie_root_port.c
+> +++ b/hw/pci-bridge/pcie_root_port.c
+> @@ -31,10 +31,13 @@ static void rp_write_config(PCIDevice *d, uint32_t address,
+>  {
+>      uint32_t root_cmd =
+>          pci_get_long(d->config + d->exp.aer_cap + PCI_ERR_ROOT_COMMAND);
+> +    uint16_t slt_ctl, slt_sta;
+> +
+> +    pcie_cap_slot_get(d, &slt_ctl, &slt_sta);
+>  
+>      pci_bridge_write_config(d, address, val, len);
+>      rp_aer_vector_update(d);
+> -    pcie_cap_slot_write_config(d, address, val, len);
+> +    pcie_cap_slot_write_config(d, slt_ctl, slt_sta, address, val, len);
+>      pcie_aer_write_config(d, address, val, len);
+>      pcie_aer_root_write_config(d, address, val, len, root_cmd);
+>  }
+> diff --git a/hw/pci-bridge/xio3130_downstream.c b/hw/pci-bridge/xio3130_downstream.c
+> index 264e37d6a6..899b0fd6c9 100644
+> --- a/hw/pci-bridge/xio3130_downstream.c
+> +++ b/hw/pci-bridge/xio3130_downstream.c
+> @@ -41,9 +41,12 @@
+>  static void xio3130_downstream_write_config(PCIDevice *d, uint32_t address,
+>                                           uint32_t val, int len)
+>  {
+> +    uint16_t slt_ctl, slt_sta;
+> +
+> +    pcie_cap_slot_get(d, &slt_sta, &slt_ctl);
+>      pci_bridge_write_config(d, address, val, len);
+>      pcie_cap_flr_write_config(d, address, val, len);
+> -    pcie_cap_slot_write_config(d, address, val, len);
+> +    pcie_cap_slot_write_config(d, slt_ctl, slt_sta, address, val, len);
+>      pcie_aer_write_config(d, address, val, len);
+>  }
+>  
+> diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
+> index b22527000d..f8490a00de 100644
+> --- a/hw/pci/pcie.c
+> +++ b/hw/pci/pcie.c
+> @@ -594,7 +594,15 @@ void pcie_cap_slot_reset(PCIDevice *dev)
+>      hotplug_event_update_event_status(dev);
+>  }
+>  
+> -void pcie_cap_slot_write_config(PCIDevice *dev,
+> +void pcie_cap_slot_get(PCIDevice *dev, uint16_t *slt_ctl, uint16_t *slt_sta)
 > +{
-> +    MemTxResult result;
-> +    uint32_t data;
-> +
-> +    if (s->regs[R_DMA_CTRL] & DMA_CTRL_WRITE) {
-> +        qemu_log_mask(LOG_GUEST_ERROR,
-> +                      "%s: invalid direction for DMA checksum\n",  __fun=
-c__);
-> +        return;
-> +    }
-> +
-> +    while (s->regs[R_DMA_LEN]) {
-> +        result =3D address_space_read(&s->flash_as, s->regs[R_DMA_FLASH_=
-ADDR],
-> +                                    MEMTXATTRS_UNSPECIFIED,
-> +                                    (uint8_t *)&data, 4);
-
-This does a byte-by-byte read into a local uint32_t...
-
-> +        if (result !=3D MEMTX_OK) {
-> +            qemu_log_mask(LOG_GUEST_ERROR, "%s: Flash read failed @%08x\=
-n",
-> +                          __func__, s->regs[R_DMA_FLASH_ADDR]);
-> +            return;
-> +        }
-> +
-> +        /*
-> +         * When the DMA is on-going, the DMA registers are updated
-> +         * with the current working addresses and length.
-> +         */
-> +        s->regs[R_DMA_CHECKSUM] +=3D data;
-
-...which we then use as a (host-endian) 32-bit value.
-
-This will behave differently on big endian and little endian hosts.
-If the h/w behaviour is to to load a 32-bit data type you probably
-want address_space_ldl_le() (or _be() if it's doing a big-endian load).
-
-> +        s->regs[R_DMA_FLASH_ADDR] +=3D 4;
-> +        s->regs[R_DMA_LEN] -=3D 4;
-> +    }
+> +    uint32_t pos = dev->exp.exp_cap;
+> +    uint8_t *exp_cap = dev->config + pos;
+> +    *slt_ctl = pci_get_word(exp_cap + PCI_EXP_SLTCTL);
+> +    *slt_sta = pci_get_word(exp_cap + PCI_EXP_SLTSTA);
 > +}
 > +
-> +static void aspeed_smc_dma_rw(AspeedSMCState *s)
-> +{
-> +    MemTxResult result;
-> +    uint32_t data;
-> +
-> +    while (s->regs[R_DMA_LEN]) {
-> +        if (s->regs[R_DMA_CTRL] & DMA_CTRL_WRITE) {
-> +            result =3D address_space_read(&s->dram_as, s->regs[R_DMA_DRA=
-M_ADDR],
-> +                                        MEMTXATTRS_UNSPECIFIED,
-> +                                        (uint8_t *)&data, 4);
-> +            if (result !=3D MEMTX_OK) {
-> +                qemu_log_mask(LOG_GUEST_ERROR, "%s: DRAM read failed @%0=
-8x\n",
-> +                              __func__, s->regs[R_DMA_DRAM_ADDR]);
-> +                return;
-> +            }
-> +
-> +            result =3D address_space_write(&s->flash_as,
-> +                                         s->regs[R_DMA_FLASH_ADDR],
-> +                                         MEMTXATTRS_UNSPECIFIED,
-> +                                         (uint8_t *)&data, 4);
-> +            if (result !=3D MEMTX_OK) {
-> +                qemu_log_mask(LOG_GUEST_ERROR, "%s: Flash write failed @=
-%08x\n",
-> +                              __func__, s->regs[R_DMA_FLASH_ADDR]);
-> +                return;
-> +            }
-> +        } else {
-> +            result =3D address_space_read(&s->flash_as, s->regs[R_DMA_FL=
-ASH_ADDR],
-> +                                        MEMTXATTRS_UNSPECIFIED,
-> +                                        (uint8_t *)&data, 4);
-> +            if (result !=3D MEMTX_OK) {
-> +                qemu_log_mask(LOG_GUEST_ERROR, "%s: Flash read failed @%=
-08x\n",
-> +                              __func__, s->regs[R_DMA_FLASH_ADDR]);
-> +                return;
-> +            }
-> +
-> +            result =3D address_space_write(&s->dram_as, s->regs[R_DMA_DR=
-AM_ADDR],
-> +                                         MEMTXATTRS_UNSPECIFIED,
-> +                                         (uint8_t *)&data, 4);
-> +            if (result !=3D MEMTX_OK) {
-> +                qemu_log_mask(LOG_GUEST_ERROR, "%s: DRAM write failed @%=
-08x\n",
-> +                              __func__, s->regs[R_DMA_DRAM_ADDR]);
-> +                return;
-> +            }
-> +        }
+> +void pcie_cap_slot_write_config(PCIDevice *dev, uint16_t slt_ctl, uint16_t slt_sta,
+>                                  uint32_t addr, uint32_t val, int len)
+>  {
+>      uint32_t pos = dev->exp.exp_cap;
+> @@ -623,7 +631,9 @@ void pcie_cap_slot_write_config(PCIDevice *dev,
+>       * controller is off, it is safe to detach the devices.
+>       */
+>      if ((sltsta & PCI_EXP_SLTSTA_PDS) && (val & PCI_EXP_SLTCTL_PCC) &&
+> -        ((val & PCI_EXP_SLTCTL_PIC_OFF) == PCI_EXP_SLTCTL_PIC_OFF)) {
+> +        (val & PCI_EXP_SLTCTL_PIC_OFF) == PCI_EXP_SLTCTL_PIC_OFF &&
+> +        (!(slt_ctl & PCI_EXP_SLTCTL_PCC) ||
+> +        (slt_ctl & PCI_EXP_SLTCTL_PIC_OFF) != PCI_EXP_SLTCTL_PIC_OFF)) {
+>          PCIBus *sec_bus = pci_bridge_get_sec_bus(PCI_BRIDGE(dev));
+>          pci_for_each_device(sec_bus, pci_bus_num(sec_bus),
+>                              pcie_unplug_device, NULL);
 
-Since the code here doesn't do anything with the data the
-address_space_read/write here aren't wrong, but you might
-prefer to use the ldl and stl functions to avoid the casts
-to uint8_t* and need to specify the length.
-
-thanks
--- PMM
 
