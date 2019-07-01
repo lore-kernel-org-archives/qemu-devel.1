@@ -2,87 +2,64 @@ Return-Path: <SRS0=9yXi=U7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BF89C5B578
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 02:40:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50363C5B578
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 02:41:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 555A221473
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 02:40:33 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XXsFSncZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 555A221473
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 26E8421721
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 02:41:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 26E8421721
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47436 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47440 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hi8ie-0004hg-Jo
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 22:40:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34206)
+	id 1hi8jI-0005aZ-F0
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 22:41:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47190)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hi4pm-0005VG-5o
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 18:32:35 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1hi5rk-0000Xu-Sb
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 19:37:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hi4pa-0000Z3-Gt
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 18:31:32 -0400
-Received: from mail-wm1-f48.google.com ([209.85.128.48]:35322)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hi4pN-0000Rm-2w
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 18:31:19 -0400
-Received: by mail-wm1-f48.google.com with SMTP id c6so1160659wml.0
- for <qemu-devel@nongnu.org>; Mon, 01 Jul 2019 15:31:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:in-reply-to:references:mime-version
- :content-transfer-encoding;
- bh=jCabYHM40d2+5uj/C4fh8Q0u8TCASTWJ9SXGpNj41KI=;
- b=XXsFSncZWydLgSkofGymPCmNeXpPb+XzojABwfhJM4s3nP8u796rxY33Ax/z+gC2YC
- +OtokLgh0WJBZtpDOmx/itDw+leHGTqQU3wyfztKVImLlFQ4/aQe5u7oV7L54kNGVJ0w
- neqCuU4QTMAWXRpj0zraPoy3nNsZVsa6vTzpLniehytLiNuf33AGk5z084fM5Y/YwPIw
- 7Qap1Id3u9UJMMnWPAJQ9FzaCiDGy0yVCpph3tOGifMgS5F8nMZoEfM4HDFYVG+dQ0Ek
- LKnNxctda6jF2KJpKJ/iqFDHGoyiVyPmZHy6nXKZ0/bZk50pwd13KuQA5FAZ7YRFHcqA
- a/3Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=jCabYHM40d2+5uj/C4fh8Q0u8TCASTWJ9SXGpNj41KI=;
- b=GaY9ZTk5sySvzx9F3nt8wuwWPDkqcSBIKMq5oyiQAuZG2Z4QcNuZOWam1Y1TwW0c51
- 4Mjg+yc1PXUe8lAlZz6pLyAn0jenGGjh1313MDPV/qzfmBy2CIldt9WiKmn5xP+h4zyu
- vyfeRvF+7KLcgYZqZEpIGP3rR1BcTX0tdJXMIOkQUDMSYqn0is/IR25cBrgmeb9iA6tm
- waUTmFOuNFo5Ke4PVgUnsckez51FIWrbuvOnO3B2nfozrW90in2JqMSkc82lPMBROvTI
- ir9JqckhboHPEm9smozzlF4hFGtTH3NX4DvzVDe2K8hKVNNOXdgQs8An/WHzLTIKE6hK
- c8aQ==
-X-Gm-Message-State: APjAAAW10RLkXkjebMe/9vLgYpSqTtYbKWiT64ErlOeJ4t19iKStpEMd
- 8B96ek4ok3mHJPbuV72ZC3YWtD+rz4BFkA==
-X-Google-Smtp-Source: APXvYqyPKBj4F1RrnDKe5X9nBlRcEUF+wdx8NZ8XaCHNez70k2oT9rOTBfGAuDMvsSYwiPfwZiij6g==
-X-Received: by 2002:a1c:700b:: with SMTP id l11mr133605wmc.106.1561999218880; 
- Mon, 01 Jul 2019 09:40:18 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id o6sm26573508wra.27.2019.07.01.09.40.18
- for <qemu-devel@nongnu.org>
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Mon, 01 Jul 2019 09:40:18 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-Date: Mon,  1 Jul 2019 17:39:28 +0100
-Message-Id: <20190701163943.22313-32-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190701163943.22313-1-peter.maydell@linaro.org>
-References: <20190701163943.22313-1-peter.maydell@linaro.org>
+ (envelope-from <ehabkost@redhat.com>) id 1hi5ri-0002p2-Vw
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 19:37:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47656)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>)
+ id 1hi5r2-0002V6-Te; Mon, 01 Jul 2019 19:37:04 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 175547FDCD;
+ Mon,  1 Jul 2019 23:36:31 +0000 (UTC)
+Received: from localhost (ovpn-116-30.gru2.redhat.com [10.97.116.30])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 60C811001B01;
+ Mon,  1 Jul 2019 23:36:25 +0000 (UTC)
+Date: Mon, 1 Jul 2019 20:36:24 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: John Snow <jsnow@redhat.com>
+Message-ID: <20190701233624.GL5198@habkost.net>
+References: <20190627212816.27298-1-jsnow@redhat.com>
+ <002c8b04-250e-0f33-b623-7e3fd14e7b80@redhat.com>
+ <20190701212725.GH5198@habkost.net>
+ <7bbbb0fd-2aff-d1bf-bc59-abe62b0a6a04@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7bbbb0fd-2aff-d1bf-bc59-abe62b0a6a04@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.27]); Mon, 01 Jul 2019 23:36:31 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.128.48
-Subject: [Qemu-devel] [PULL 31/46] target/arm: Makefile cleanup (softmmu)
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [RFC PATCH v2 0/3] python: refactor
+ qemu/__init__.py
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,48 +71,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ qemu-block@nongnu.org,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>,
+ Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
+On Mon, Jul 01, 2019 at 07:17:39PM -0400, John Snow wrote:
+> 
+> 
+> On 7/1/19 5:27 PM, Eduardo Habkost wrote:
+> > On Thu, Jun 27, 2019 at 05:32:17PM -0400, John Snow wrote:
+> >> I didn't actually mean to retain the RFC tag, but oh well.
+> > 
+> > I'm queueing patch 1-2 for QEMU 4.1.
+> > 
+> > Patch 3 will require more careful review.  If you can demonstrate
+> > it fixes a problem in some use cases, we can call it a bug fix
+> > and include it after soft freeze.  ;)
+> > 
+> 
+> Right.
+> 
+> Mostly, it's that it ignores things like ctrl^c -- it ignores ANY
+> failure. I don't think that it should.
 
-Group SOFTMMU objects together.
-Since PSCI is TCG specific, keep it separate.
+Agreed.
 
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-id: 20190701132516.26392-5-philmd@redhat.com
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- target/arm/Makefile.objs | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+> 
+> In cases where QEMU crashes, the caller will now get an exception -- but
+> the cleanup will still faithfully execute. There are some exceptions we
+> may genuinely wish to suppress here, but it's hard to enumerate which
+> ones without going too broadly.
+> 
+> It's fine to exclude this for now, but I think it's still something we
+> want eventually.
 
-diff --git a/target/arm/Makefile.objs b/target/arm/Makefile.objs
-index 7a933eebc75..3fcda66132a 100644
---- a/target/arm/Makefile.objs
-+++ b/target/arm/Makefile.objs
-@@ -1,8 +1,9 @@
- obj-y += arm-semi.o
--obj-$(CONFIG_SOFTMMU) += machine.o psci.o arch_dump.o monitor.o
- obj-y += helper.o vfp_helper.o
- obj-y += cpu.o gdbstub.o
- obj-$(TARGET_AARCH64) += cpu64.o gdbstub64.o
-+
-+obj-$(CONFIG_SOFTMMU) += machine.o arch_dump.o monitor.o
- obj-$(CONFIG_SOFTMMU) += arm-powerctl.o
- 
- obj-$(CONFIG_KVM) += kvm.o
-@@ -35,6 +36,8 @@ obj-y += translate.o op_helper.o
- obj-y += crypto_helper.o
- obj-y += iwmmxt_helper.o vec_helper.o neon_helper.o
- 
-+obj-$(CONFIG_SOFTMMU) += psci.o
-+
- obj-$(TARGET_AARCH64) += translate-a64.o helper-a64.o
- obj-$(TARGET_AARCH64) += translate-sve.o sve_helper.o
- obj-$(TARGET_AARCH64) += pauth_helper.o
+We just need to ensure all callers of shutdown() are ready for
+this change.  I know that scripts/device-crash-test expects
+shutdown() to not raise an exception if QEMU crashed, inside
+checkOneTestCase().  Maybe that's the only caller that needs to
+change.
+
 -- 
-2.20.1
-
+Eduardo
 
