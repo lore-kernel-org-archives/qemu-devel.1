@@ -2,67 +2,81 @@ Return-Path: <SRS0=a9ZG=U6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A666DC06510
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 21:20:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12EF4C5B578
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 21:22:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B44912173E
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 21:20:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B44912173E
+	by mail.kernel.org (Postfix) with ESMTPS id 563D521479
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 21:22:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 563D521479
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45180 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60240 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hi2zO-0003qe-US
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 16:33:26 -0400
-Received: from [2001:470:142:3::10] (port=54094 helo=eggs.gnu.org)
+	id 1hhyU8-0005f4-MR
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 11:44:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42857)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <eric.auger@redhat.com>) id 1hi2x5-0002dK-WA
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 16:31:12 -0400
+ (envelope-from <philmd@redhat.com>) id 1hhyOC-00020A-F0
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 11:38:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1hi2ws-00023B-FT
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 16:30:58 -0400
-Received: from [209.132.183.28] (port=40552 helo=mx1.redhat.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1hi2wP-0001y0-St; Mon, 01 Jul 2019 16:30:22 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 9CF37308622E;
- Mon,  1 Jul 2019 19:12:56 +0000 (UTC)
-Received: from [10.36.116.95] (ovpn-116-95.ams2.redhat.com [10.36.116.95])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 760EA5F90E;
- Mon,  1 Jul 2019 19:12:49 +0000 (UTC)
-From: Auger Eric <eric.auger@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>,
- Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-References: <20190625121421.22280-1-shameerali.kolothum.thodi@huawei.com>
- <CAFEAcA-w1AijFogZxX_9gz2+oDGH-=e2QAOdyCRdji_6k87d-A@mail.gmail.com>
- <41f46a4b-5796-169a-1193-996ac94022c4@redhat.com>
-Message-ID: <453c5edf-0e42-4e07-9d17-7a69085aa231@redhat.com>
-Date: Mon, 1 Jul 2019 21:12:47 +0200
+ (envelope-from <philmd@redhat.com>) id 1hhyOB-0006PE-EG
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 11:38:44 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:53204)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hhyOB-0006Nz-7I
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 11:38:43 -0400
+Received: by mail-wm1-f65.google.com with SMTP id s3so1047217wms.2
+ for <qemu-devel@nongnu.org>; Mon, 01 Jul 2019 08:38:42 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=629NRyPUhZNuewwFSbDPwgl565ExKqQtzj/ELWQY6AM=;
+ b=JLvf62ALC822EPHikmAg6hvWguoS9P+tyPQQFOfHuDrd9Q1kGpy18t/W46u6EnLeXb
+ 5ZR+1mu1E7RHoVoHaueeExJkoW9JyBlaD8hLQukA6TVMUQFiMcQdJ6Avqa47uc6PKO74
+ xBQFJSSSil8FDu/6llLjP5iHNVSG9OvoP2YxWWszSYZKrbfTZ0yYfxrUO6W8/NMhOWE0
+ c7EtRRHQhyrVliFzWhN1Z5M7etgaKwwdq2Q9iWpdc8+ggqfmExAsWz+44DUPVmRlClKt
+ 9uZ9GYK0A+CQbzhqodG9SVT+g0TKcDGPor56Ke42kW6NIdHKL+X9T3aaLN0YU3J4Kvu9
+ +GxQ==
+X-Gm-Message-State: APjAAAWjKxkhLNbFC7ABO5Y7W+T7quJq9h8ZW8EGb6Bpy7nVgbCcnsKc
+ OQHFDckgyQj8v8cGkHfm1K6Liw==
+X-Google-Smtp-Source: APXvYqxA1IVwLGQghZhgm8oEIkJHfc7NFPxcNk2lOqh1ggwyybs4DBe3i/FcZ5cczg+xwfxrNvlwow==
+X-Received: by 2002:a1c:eb16:: with SMTP id j22mr17086380wmh.140.1561995521740; 
+ Mon, 01 Jul 2019 08:38:41 -0700 (PDT)
+Received: from [192.168.1.38] (183.red-88-21-202.staticip.rima-tde.net.
+ [88.21.202.183])
+ by smtp.gmail.com with ESMTPSA id q1sm8226051wmq.25.2019.07.01.08.38.40
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Mon, 01 Jul 2019 08:38:41 -0700 (PDT)
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20190701132516.26392-1-philmd@redhat.com>
+ <20190701132516.26392-19-philmd@redhat.com>
+ <CAFEAcA_XGuB5x+m5zmdBSE3bQP=jBdfWDzj_v0iBeqWmrETsng@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <c1d7b9cf-5a31-3c58-0284-97b4249660d7@redhat.com>
+Date: Mon, 1 Jul 2019 17:38:40 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <41f46a4b-5796-169a-1193-996ac94022c4@redhat.com>
+In-Reply-To: <CAFEAcA_XGuB5x+m5zmdBSE3bQP=jBdfWDzj_v0iBeqWmrETsng@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.42]); Mon, 01 Jul 2019 19:13:10 +0000 (UTC)
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v6 0/8] ARM virt: ACPI memory hotplug
- support
+ [fuzzy]
+X-Received-From: 209.85.128.65
+Subject: Re: [Qemu-devel] [PATCH v3 18/27] target/arm: Restrict semi-hosting
+ to TCG
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,101 +88,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Samuel Ortiz <sameo@linux.intel.com>,
- Ard Biesheuvel <ard.biesheuvel@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Xu Wei <xuwei5@hisilicon.com>,
- Linuxarm <linuxarm@huawei.com>, Shannon Zhao <shannon.zhaosl@gmail.com>,
- qemu-arm <qemu-arm@nongnu.org>, Igor Mammedov <imammedo@redhat.com>,
- sebastien.boeuf@intel.com, Laszlo Ersek <lersek@redhat.com>
+Cc: Yang Zhong <yang.zhong@intel.com>, Andrew Jones <drjones@redhat.com>,
+ Samuel Ortiz <sameo@linux.intel.com>, Rob Bradford <robert.bradford@intel.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Peter,
-
-On 7/1/19 5:55 PM, Auger Eric wrote:
-> Hi Peter,
-> 
-> On 7/1/19 3:52 PM, Peter Maydell wrote:
->> On Tue, 25 Jun 2019 at 13:15, Shameer Kolothum
->> <shameerali.kolothum.thodi@huawei.com> wrote:
->>>
->>> This series is an attempt to provide device memory hotplug support
->>> on ARM virt platform. This is based on Eric's recent works here[1]
->>> and carries some of the pc-dimm related patches dropped from his
->>> series.
->>>
->>> The kernel support for arm64 memory hot add was added recently by
->>> Robin and hence the guest kernel should be => 5.0-rc1.
->>>
->>> NVDIM support is not included currently as we still have an unresolved
->>> issue while hot adding NVDIMM[2]. However NVDIMM cold plug patches
->>> can be included, but not done for now, for keeping it simple.
->>>
->>> This makes use of GED device to sent hotplug ACPI events to the
->>> Guest. GED code is based on Nemu. Thanks to the efforts of Samuel and
->>> Sebastien to add the hardware-reduced support to Nemu using GED
->>> device[3]. (Please shout if I got the author/signed-off wrong for
->>> those patches or missed any names).
->>>
->>> This is sanity tested on a HiSilicon ARM64 platform and appreciate
->>> any further testing.
+On 7/1/19 5:25 PM, Peter Maydell wrote:
+> On Mon, 1 Jul 2019 at 14:26, Philippe Mathieu-Daudé <philmd@redhat.com> wrote:
 >>
->> Hi; this seems to fail 'make check' (on an x86 host):
+>> Per Peter Maydell:
 >>
->> acpi-test: Warning! DSDT binary file mismatch. Actual
->> [aml:/tmp/aml-01P83Z], Expected [aml:tests/data/acpi/virt/DSDT].
->> acpi-test: Warning! DSDT mismatch. Actual [asl:/tmp/asl-4ZP83Z.dsl,
->> aml:/tmp/aml-01P83Z], Expected [asl:/tmp/asl-H7UE4Z.dsl,
->> aml:tests/data/acpi/virt/DSDT].
->> **
->> ERROR:/home/petmay01/linaro/qemu-from-laptop/qemu/tests/bios-tables-test.c:434:test_acpi_asl:
->> assertion failed: (all_tables_match)
-> I fail to reproduce on my laptop:
-> 
-> make check-qtest-x86_64 executes
-> 
->   TEST    check-qtest-x86_64: tests/bios-tables-test
-> 
-> and it does not seem to complain. But maybe I misunderstand the framework.
-> 
-> If I were able to reproduce I understand this is a matter to regenerate
-> the files we compare with by using
-> tests/data/acpi/rebuild-expected-aml.sh, right?
-
-I reproduced the failure with a TCG aarch64 target on x86.
-I sent a separate
-"[PATCH] tests: Update DSDT ACPI table for arm/virt board with PCDIMM
-related changes" patch that should fix the issue.
-
-checkpatch complains with an "ERROR: Does not appear to be a
-unified-diff format patch" but I checked similar patches like d2a1b1d602
-("tests: update acpi expected files") produce the same so I hope it's fine.
-
-Thanks
-
-Eric
-
-Thanks
-
-Eric
-> 
-> Thanks
-> 
-> Eric
-> 
-> 
->> ERROR - Bail out!
->> ERROR:/home/petmay01/linaro/qemu-from-laptop/qemu/tests/bios-tables-test.c:434:test_acpi_asl:
->> assertion failed: (all_tables_match)
->> Aborted (core dumped)
->> /home/petmay01/linaro/qemu-from-laptop/qemu/tests/Makefile.include:894:
->> recipe for target 'check-qtest-aarch64' failed
+>>   Semihosting hooks either SVC or HLT instructions, and inside KVM
+>>   both of those go to EL1, ie to the guest, and can't be trapped to
+>>   KVM.
 >>
->> Is there a need to update the reference DSDT used by the test?
+>> Let check_for_semihosting() return False when not running on TCG.
 >>
->> thanks
->> -- PMM
->>
+>> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+>> ---
+>> v3: inline call to g_assert_not_reached if !TCG
+>> ---
+>>  target/arm/Makefile.objs | 2 +-
+>>  target/arm/cpu.h         | 7 +++++++
+>>  target/arm/helper.c      | 4 +++-
+>>  3 files changed, 11 insertions(+), 2 deletions(-)
 > 
+>> diff --git a/target/arm/helper.c b/target/arm/helper.c
+>> index 49a0f05cd1..1b4da7aa45 100644
+>> --- a/target/arm/helper.c
+>> +++ b/target/arm/helper.c
+>> @@ -20,7 +20,6 @@
+>>  #include "qemu/qemu-print.h"
+>>  #include "exec/exec-all.h"
+>>  #include "exec/cpu_ldst.h"
+>> -#include "arm_ldst.h"
+>>  #include <zlib.h> /* For crc32 */
+>>  #include "hw/semihosting/semihost.h"
+>>  #include "sysemu/cpus.h"
+>> @@ -29,6 +28,9 @@
+>>  #include "qapi/qapi-commands-target.h"
+>>  #include "qapi/error.h"
+>>  #include "qemu/guest-random.h"
+>> +#ifdef CONFIG_TCG
+>> +#include "arm_ldst.h"
+>> +#endif
+> 
+> Should this ifdeffing of the arm_ldst.h include have gone in
+> another patch? It doesn't seem related to the change described
+> in the commit message.
+
+Surely patch 22 "Move M profile routines to m_helper.c"
 
