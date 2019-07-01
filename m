@@ -2,85 +2,88 @@ Return-Path: <SRS0=a9ZG=U6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DATE_IN_PAST_03_06,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6AF8C5B578
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 23:13:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7130DC5B578
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 23:23:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2432420B7C
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 23:13:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2938021479
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 23:23:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z3Mrfp2j"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2432420B7C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IDgsHCKR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2938021479
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46200 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46250 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hi5Tl-0000mO-RT
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 19:12:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53689)
+	id 1hi5eG-0004X1-Af
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 19:23:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36626)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alistair23@gmail.com>) id 1hi3VH-00065M-1Y
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 17:06:24 -0400
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1hi3gk-0006Jo-K0
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 17:18:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1hi3VF-0004ws-Oj
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 17:06:22 -0400
-Received: from mail-lj1-f195.google.com ([209.85.208.195]:39389)
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1hi3ge-0003De-1h
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 17:18:10 -0400
+Received: from mail-oi1-f194.google.com ([209.85.167.194]:35875)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1hi3VC-0004sH-JP; Mon, 01 Jul 2019 17:06:18 -0400
-Received: by mail-lj1-f195.google.com with SMTP id v18so14657167ljh.6;
- Mon, 01 Jul 2019 14:06:16 -0700 (PDT)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1hi3gd-0003D0-Qs
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 17:18:07 -0400
+Received: by mail-oi1-f194.google.com with SMTP id w7so11181350oic.3
+ for <qemu-devel@nongnu.org>; Mon, 01 Jul 2019 14:18:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=CiQddWFCGIJ0zGgct0o78x4tAwZKPanPdL187jV3a1o=;
- b=Z3Mrfp2jyaXqOFVpgYFMVQrj0y8JCxTLRN1Nv+9fjFOrq1/9aD+kg/L7vexn5ofbzD
- WTDjVuIufH8/idNYio9sibkSh3fU79NtFyLVtzZmX0sWO+zTsur8JlsknfE4gVr1EiHC
- TWTB392XmZu/Thq9fO8uDbZXaFc05gw1TOwReoaY2DygkPVNufpf2FMaLxmdfieeePqO
- sUnSznJG5owPtLTUq7l5/AuGnJeNs95FwKG/ty1Hjf3qJ3rhGLgo5842srpiiqMOBNo9
- sugEtc2/cgXoP0uoiwVuqsjJhVX6twTCZiCgOT/l9qrttIrO7+VJcm24WggODS0SOTdy
- b//g==
+ h=mime-version:in-reply-to:references:from:date:message-id:subject:to
+ :cc; bh=Kw48ScaWuU9s3mp6kMG3+Y6kpLvawE+2GHH9HizGFxI=;
+ b=IDgsHCKRAxyM6JOBnj+AWY6fFpBDPDgrRhvgMdjPY9UgkUhMlatNOsEVI4z1byj+R8
+ QQ35Ea0TNA80qAZ1E6103K3u2jK60rsngHlQaghuu/bG6ZHXsiazBL/pGbmQKQvLOXkh
+ 8kYcSlfIA9NTL/99W2frdFQjO7B1Y/+9p2iEHmgv4QEiPR6Y0j7mlHEbambuvsqP6W/e
+ M7uLN+y7CT0YSo4cFYqFfjlMaqoc3aqyJOOzrk9nicCzFgFfAMsHRv6BYgh0G/32Ta5k
+ zhPeBSAtAR2QLe9NC+Hui9n0bjEADX+T6ltuOEe/LX8+N/0igzUDVMwC54boJ7NvD85R
+ BFbw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ h=x-gm-message-state:mime-version:in-reply-to:references:from:date
  :message-id:subject:to:cc;
- bh=CiQddWFCGIJ0zGgct0o78x4tAwZKPanPdL187jV3a1o=;
- b=PbtEd8FFKBuz9P8eVKyGHw/d4fa1mxs/Fubio3ECaSRURXDclgIp5fenQwYAM5XUBE
- DrTu9n5ZaigOJJzJymM96FXArqAW5G6gD86OndjJ13W+XUT/cHaqMGHV0wSizi8SeWB+
- 0+kUGWeuiOwSZs96imJovLzJjOHwDx8lcqxEbYaWkuNcntWcTiQUvGDzoizrIRz1ET5A
- LeS09pivxzt8F21Ttuwo/NZct37Y85tfFlSBiEsnGoF6RWFHx6NmHarc0KlTe43oySoh
- hxc+m3st5Umf8DtHJ7ES0JU91cJRGNSaSgBqsDU1c8omEALeyjBJe9pvRs+8f2x7aHPz
- woOg==
-X-Gm-Message-State: APjAAAWK1mQj8C1++fDjB3kRVMAnrW3UIUbzsynJtcuVCNTOm15E/KOC
- lB7tVcVpRm/bjMHvY55UJtg9X/DhIoc/zb/PPt1AKW1J
-X-Google-Smtp-Source: APXvYqzf5tSQUl2CAsaQ08aD4OLB15/XDuQ+qxM4ZgM/CW3I6jZJ6LteZ+5lLbWzRK2M+gks95vk/sBXuCkwK+WDjKw=
-X-Received: by 2002:a2e:5d5a:: with SMTP id r87mr14641276ljb.196.1561999329481; 
- Mon, 01 Jul 2019 09:42:09 -0700 (PDT)
+ bh=Kw48ScaWuU9s3mp6kMG3+Y6kpLvawE+2GHH9HizGFxI=;
+ b=FOUvmMyUZmu+GQs8ZlPxDVB91SI1S5ZnqCjKjKQisFTxC2uZ2AwpvdRCgfiX5oM1Xb
+ XGTqBxbCVnu44o32d00UwMR2VokJ+BMWQVb/T66FLR4pwimiOpJk7koDp7lRsMt0hL6V
+ whGtsh3YyPtjih+iBCx6gxl35ZzhfRgAEjNK6+NCGu8hMU901XTIfGCKL0WXV+wdb0B8
+ lDQX168PJLMiA+3788iUEDFBtyOOvMppHN5kuew+/mcNGgI+qSUjzYJPRscUf1gJTxY3
+ KFJuX3Ravr2v6RBcc3Oy1gibNgtlIo0yerUbIjhy5LFPF1yZTNQQNd9o7cFAwIjw/e37
+ aw0w==
+X-Gm-Message-State: APjAAAWpwFsuT85oPH/qVjm6OkQ+Zh0S+hEON6grUiomWnUMjovsBeQo
+ DnjQVIZC3Uo3TGQ9wovYaLTMQw8kyE2OWWmGIzD/Hw==
+X-Google-Smtp-Source: APXvYqyYKPThMOFPvNDErLWmsRLquDx+ljTN/z8HDEdniU3bzB4Jptn/5ZcfDidxPRhy23L1gLh8Brk9+9aybTKEUIE=
+X-Received: by 2002:aca:4083:: with SMTP id n125mr446582oia.106.1562006351521; 
+ Mon, 01 Jul 2019 11:39:11 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190627152011.18686-1-palmer@sifive.com>
- <20190627152011.18686-34-palmer@sifive.com>
- <20190628104605.000062c4@huawei.com>
- <CAKmqyKP1c5GHKaDuOvu11UtCwnrUosxTtoDAeW7GOS=s+h27aw@mail.gmail.com>
- <20190701134029.00004b97@huawei.com>
- <CAAhSdy1c47+MaD4GixWB+u-+1Rb9ULAj0NweSzyzy+VdCXns0Q@mail.gmail.com>
-In-Reply-To: <CAAhSdy1c47+MaD4GixWB+u-+1Rb9ULAj0NweSzyzy+VdCXns0Q@mail.gmail.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 1 Jul 2019 09:39:07 -0700
-Message-ID: <CAKmqyKN4-ec9DYRvUK4vOUiE_yer48xXghTdkmYWeLAzezE+LA@mail.gmail.com>
-To: Anup Patel <anup@brainfault.org>
-Content-Type: text/plain; charset="UTF-8"
+Received: by 2002:a9d:4798:0:0:0:0:0 with HTTP;
+ Mon, 1 Jul 2019 11:39:10 -0700 (PDT)
+Received: by 2002:a9d:4798:0:0:0:0:0 with HTTP;
+ Mon, 1 Jul 2019 11:39:10 -0700 (PDT)
+In-Reply-To: <8ad999d7-fec4-079f-dbed-454afe127899@amsat.org>
+References: <20190624222844.26584-1-f4bug@amsat.org>
+ <CAL1e-=iLAKe+FunE2p9L3Ds8fPS2a8nf3hc=ga7CX6E2bjw0Uw@mail.gmail.com>
+ <8ad999d7-fec4-079f-dbed-454afe127899@amsat.org>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Mon, 1 Jul 2019 20:39:10 +0200
+Message-ID: <CAL1e-=h1=rNGC5quvmaOuNohXO60b=tiFEznMr11a3Asj9zgMg@mail.gmail.com>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.208.195
-Subject: Re: [Qemu-devel] [Qemu-riscv] [PULL 33/34] roms: Add OpenSBI
- version 0.3
+X-Received-From: 209.85.167.194
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] [PATCH 00/10] hw/pci-host: Clean the GT64120 north
+ bridge
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,100 +95,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- "open list:RISC-V" <qemu-riscv@nongnu.org>, Palmer Dabbelt <palmer@sifive.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Alistair Francis <alistair.francis@wdc.com>,
- Jonathan Cameron <jonathan.cameron@huawei.com>, Bin Meng <bmeng.cn@gmail.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ Aleksandar Rikalo <arikalo@wavecomp.com>, qemu-devel@nongnu.org,
+ =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
+ Artyom Tarasenko <atar4qemu@gmail.com>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Jul 1, 2019 at 6:23 AM Anup Patel <anup@brainfault.org> wrote:
+On Jul 1, 2019 7:46 PM, "Philippe Mathieu-Daud=C3=A9" <f4bug@amsat.org> wro=
+te:
 >
-> On Mon, Jul 1, 2019 at 6:12 PM Jonathan Cameron
-> <jonathan.cameron@huawei.com> wrote:
-> >
-> > On Fri, 28 Jun 2019 09:12:45 -0700
-> > Alistair Francis <alistair23@gmail.com> wrote:
-> >
-> > > On Fri, Jun 28, 2019 at 2:47 AM Jonathan Cameron
-> > > <jonathan.cameron@huawei.com> wrote:
-> > > >
-> > > > On Thu, 27 Jun 2019 08:20:10 -0700
-> > > > Palmer Dabbelt <palmer@sifive.com> wrote:
-> > > >
-> > > > > From: Alistair Francis <alistair.francis@wdc.com>
-> > > > >
-> > > > > Add OpenSBI version 0.3 as a git submodule and as a prebult binary.
-> > > > >
-> > > > > Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-> > > > > Reviewed-by: Bin Meng <bmeng.cn@gmail.com>
-> > > > > Tested-by: Bin Meng <bmeng.cn@gmail.com>
-> > > > > Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
-> > > >
-> > > > I sent a late bug report on this one.. Hence posting here as well
-> > > > to make sure it doesn't fall through the cracks!
-> > > >
-> > > > Right now you can't actually build the opensbi64-virt firmware
-> > > > due to cut and paste error in the Makefile.
-> > >
-> > > Ah, thanks for the bug report.
-> > >
-> > > @Palmer Dabbelt I'm just going to send you a fixup commit. Can you
-> > > apply it to your tree and send a PRv2?
-> > >
-> > > >
-> > > > As a side note, I hit this because OpenSBI 0.3 is resulting in a login
-> > > > loop on a debian test image and the current upstream isn't.  I haven't
-> > > > debugged yet, but someone else may hit that problem.
-> > >
-> > > Unfortunately OpenSBI 0.3 is a little old now, in saying that I didn't
-> > > know there are bugs in it? Which kernel are you using?
-> >
-> > Mainline 5.2.0-rc5.
-> >
-> > Just in case I also checked 5.2.0-rc7
-> >
-> > I tried doing an odd git bisect with good and bad reversed to figure out
-> > what fixed the problem, but boot wedged at "Run /sbin/init as init process."
-> >
-> > The wedge was bisected to:
-> >
-> > 4e2cd47820 ("lib: Flush everything when remote TLB flush range is too large")
-> >
-> > Which the patch correctly identifies as a problem introduced this kernel cycle.
-> > 5.2-rc1.
-> >
-> > So on that basis alone I'd suggest we want to move to a more recent openSBI
-> > asap, after all the 5.2 kernel will be out in a week or so.
-> >
-> > I'm a bit short on time (flight to catch), so haven't pushed that fix that
-> > far back in the tree yet in order to figure what is causing the login loop.
-> > Won't have access to relevant build machines until Wednesday.
-> >
-> > That patch cherry-picked on lib: Optimize TLB flush IPIs
-> > seems fine, so it is before that point...
-> >
-> > Passing that point would require real effort though as the two patches
-> > are changing the same code.
-> >
-> > So I had a go from the other end (0.3) to see if it was fixed quickly.
-> > Ran out of time, but at
-> > "firmware: Reset all registers and flush the icache" it superficially all
-> > seems to be working with no TLB related hang, or login loop.
+> Hi Aleksandar,
 >
-> We plan to release OpenSBI 0.4 in couple of days. It would be best
-> to pick-up OpenSBI 0.4 FW_JUMP binaries.
-
-Great! When the 0.4 release comes out I'll send a patch to update the
-QEMU binaries and submodules. If this PR is merged before then we can
-just update on top of this (as 5.1 and earlier kernels will work with
-0.3) and it not it can be squashed into this PR.
-
-Alistair
-
+> On 7/1/19 7:16 PM, Aleksandar Markovic wrote:
+> >
+> > On Jun 25, 2019 12:31 AM, "Philippe Mathieu-Daud=C3=A9" <f4bug@amsat.or=
+g
+> > <mailto:f4bug@amsat.org>> wrote:
+> >>
+> >> Hi,
+> >>
+> >> This series clean the gt64120 device.
+> >> It is no more target-dependent, and tracing is improved.
+> >>
+> >
+> > If nobody objects, I am going to select majority of the patches for mip=
+s
+> > queue scheduled tomorrow. Those that remain will be those that Philippe
+> > still didn't make his mind.
 >
-> Regards,
-> Anup
+> Which ones remain?
+>
+> For "pci-host/gt64120: Clean the decoded address space", I'd like a
+> review from someone comfortable with MEMTXATTRS and address spaces.
+> I'll ping on the patch.
+>
 
+Don't worry, the addres space one was left for later.
+
+Sorry for confusion, but these patches are already in main tree (this is
+from today):
+
+Philippe Mathieu-Daud=C3=A9 (7):
+
+hw/mips/gt64xxx_pci: Fix multiline comment syntax
+
+hw/mips/gt64xxx_pci: Fix 'tabs' coding style issues
+
+hw/mips/gt64xxx_pci: Fix 'braces' coding style issues
+
+hw/mips/gt64xxx_pci: Fix 'spaces' coding style issues
+
+hw/mips/gt64xxx_pci: Use qemu_log_mask() instead of debug printf()
+
+hw/mips/gt64xxx_pci: Convert debug printf()s to trace events
+
+hw/mips/gt64xxx_pci: Align the pci0-mem size
+
+Let me know if you want more for tomorrow, otherwise I won't do anything.
+
+Amicalement,
+Aleksandar
+
+> > Thanks thousand times, Philippe!
+> >
+> > Aleksandar
+> >
+> >> Regards,
+> >>
+> >> Phil.
+> >>
+> >> Based-on: 20190624220056.25861-1-f4bug@amsat.org
+> > <mailto:20190624220056.25861-1-f4bug@amsat.org>
+> >> https://lists.gnu.org/archive/html/qemu-devel/2019-06/msg05304.html
+> >>
+> >> Philippe Mathieu-Daud=C3=A9 (10):
+> >>   hw/mips/gt64xxx_pci: Fix multiline comment syntax
+> >>   hw/mips/gt64xxx_pci: Fix 'tabs' coding style issues
+> >>   hw/mips/gt64xxx_pci: Fix 'braces' coding style issues
+> >>   hw/mips/gt64xxx_pci: Fix 'spaces' coding style issues
+> >>   hw/mips/gt64xxx_pci: Use qemu_log_mask() instead of debug printf()
+> >>   hw/mips/gt64xxx_pci: Convert debug printf()s to trace events
+> >>   hw/mips/gt64xxx_pci: Align the pci0-mem size
+> >>   hw/mips/gt64xxx_pci: Add a 'cpu_big_endian' qdev property
+> >>   hw/mips/gt64xxx_pci: Move it to hw/pci-host/
+> >>   hw/pci-host/gt64120: Clean the decoded address space
+> >>
+> >>  Makefile.objs                                 |   1 +
+> >>  include/hw/mips/mips.h                        |   2 +-
+> >>  hw/mips/mips_malta.c                          |   8 +-
+> >>  hw/{mips/gt64xxx_pci.c =3D> pci-host/gt64120.c} | 542 ++++++++++-----=
+---
+> >>  MAINTAINERS                                   |   2 +-
+> >>  hw/mips/Makefile.objs                         |   2 +-
+> >>  hw/mips/trace-events                          |   0
+> >>  hw/pci-host/Makefile.objs                     |   2 +-
+> >>  hw/pci-host/trace-events                      |   5 +
+> >>  9 files changed, 307 insertions(+), 257 deletions(-)
+> >>  rename hw/{mips/gt64xxx_pci.c =3D> pci-host/gt64120.c} (68%)
+> >>  create mode 100644 hw/mips/trace-events
+> >>
+> >> --
+> >> 2.19.1
+> >>
+> >>
+> >
