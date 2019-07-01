@@ -2,79 +2,96 @@ Return-Path: <SRS0=a9ZG=U6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 415CEC0650E
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 10:18:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 153A9C0650E
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 10:19:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1651920652
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 10:18:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1651920652
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E02492133D
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 10:19:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E02492133D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56804 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56816 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hhtNt-00076K-Eb
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 06:18:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59670)
+	id 1hhtPY-00089p-8F
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 06:19:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60055)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hhtMl-0006Dm-OU
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 06:16:56 -0400
+ (envelope-from <pasic@linux.ibm.com>) id 1hhtOP-0007dL-L9
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 06:18:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hhtMk-0000Ys-Er
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 06:16:55 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:40339)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hhtMk-0000Pv-3F
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 06:16:54 -0400
-Received: by mail-wm1-f66.google.com with SMTP id v19so15249627wmj.5
- for <qemu-devel@nongnu.org>; Mon, 01 Jul 2019 03:16:48 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to;
- bh=/Bh0ZE3ySP65zEP+1jY5wYg+ao0IFv/nT9ofGj0rZz0=;
- b=ICm1JuC1FhfAyc/fsIw6e70S4SO4ShUAvklwxBOxoQCS4dzbtwaaS30c+8W7171LF9
- vg59mU2K6vxmC/gQxBzFjRuZq8pUoImHe7iiYeuWJrXNiEHXaaSLBHGSrg9rQm1QkUH7
- P2jMylDbm8Qd3FjXU7e/MiH4ICYXjRXn92bFVQuYKGcRujYLaMKw8nOAzuoD5hk4RSFm
- X9j4P4Pa1O2onrM4pUOWjgjzNLe/SxjbPXFCdSjJGQ9wZDJPGlcBkWqx7ZrjsI9OdZbh
- 57YzuuxUjeh+m0W8bfdwBmIJ9ntQ01ssI5R/zFi5F6UIy11GD1nrD+36w0wiTXDUzHaw
- WGMA==
-X-Gm-Message-State: APjAAAUeiRvruL/anpbNzJpks1dR1ts8QCce+VBnFRdhtleMnVqIcfWQ
- EsAIpWd0jE+2yEAb4OAaMW2M/Q==
-X-Google-Smtp-Source: APXvYqxiKHgRlLluxa2dAmo3pYDclqfXlXPC8pQIFBMYUYYKfbWSJmtWUoNidaGjsSL3W83sQ72b8Q==
-X-Received: by 2002:a1c:407:: with SMTP id 7mr17700236wme.113.1561976207235;
- Mon, 01 Jul 2019 03:16:47 -0700 (PDT)
-Received: from [192.168.1.38] (183.red-88-21-202.staticip.rima-tde.net.
- [88.21.202.183])
- by smtp.gmail.com with ESMTPSA id c65sm10436708wma.44.2019.07.01.03.16.45
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Mon, 01 Jul 2019 03:16:46 -0700 (PDT)
-To: Stefan Hajnoczi <stefanha@gmail.com>,
- Damien Hedde <damien.hedde@greensocs.com>
-References: <20190628124534.10679-1-damien.hedde@greensocs.com>
- <20190701083710.GA18173@stefanha-x1.localdomain>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <94a3da17-c1c5-b9ce-8e92-4d346ed98782@redhat.com>
-Date: Mon, 1 Jul 2019 12:16:44 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ (envelope-from <pasic@linux.ibm.com>) id 1hhtON-0001uv-3d
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 06:18:37 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:31198)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <pasic@linux.ibm.com>) id 1hhtOJ-0001sN-DM
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 06:18:33 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ x61ADbmM034074
+ for <qemu-devel@nongnu.org>; Mon, 1 Jul 2019 06:18:26 -0400
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2tfe87pyxm-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Mon, 01 Jul 2019 06:18:25 -0400
+Received: from localhost
+ by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <pasic@linux.ibm.com>;
+ Mon, 1 Jul 2019 11:17:45 +0100
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
+ by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Mon, 1 Jul 2019 11:17:43 +0100
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
+ [9.149.105.62])
+ by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ x61AHgwl51577040
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 1 Jul 2019 10:17:42 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 9269DAE051;
+ Mon,  1 Jul 2019 10:17:42 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 62278AE053;
+ Mon,  1 Jul 2019 10:17:42 +0000 (GMT)
+Received: from oc2783563651 (unknown [9.152.224.119])
+ by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Mon,  1 Jul 2019 10:17:42 +0000 (GMT)
+Date: Mon, 1 Jul 2019 12:17:41 +0200
+From: Halil Pasic <pasic@linux.ibm.com>
+To: Cornelia Huck <cohuck@redhat.com>
+In-Reply-To: <20190626130820.12290-1-cohuck@redhat.com>
+References: <20190626130820.12290-1-cohuck@redhat.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <20190701083710.GA18173@stefanha-x1.localdomain>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="YfGVBmusw7n6pIy6jM2PcEydhRnNiSQKd"
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.128.66
-Subject: Re: [Qemu-devel] [RFC PATCH 0/5] FAULT INJECTION FRAMEWORK
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 19070110-0028-0000-0000-0000037F4984
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19070110-0029-0000-0000-0000243F7E87
+Message-Id: <20190701121741.65b58a54.pasic@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+ definitions=2019-07-01_08:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1907010127
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.156.1
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH] s390x: add cpu feature/model
+ files to KVM section
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,96 +103,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, sakisp@xilinx.com, mark.burton@greensocs.com,
- qemu-devel@nongnu.org, armbru@redhat.com, edgari@xilinx.com, crosa@redhat.com,
- pbonzini@redhat.com, luc.michel@greensocs.com, rth@twiddle.net
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---YfGVBmusw7n6pIy6jM2PcEydhRnNiSQKd
-Content-Type: multipart/mixed; boundary="LlcdVuBcZzboLB3UiZE5FaRbP37nDnYJM";
- protected-headers="v1"
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-To: Stefan Hajnoczi <stefanha@gmail.com>,
- Damien Hedde <damien.hedde@greensocs.com>
-Cc: ehabkost@redhat.com, sakisp@xilinx.com, mark.burton@greensocs.com,
- armbru@redhat.com, qemu-devel@nongnu.org, edgari@xilinx.com,
- crosa@redhat.com, pbonzini@redhat.com, luc.michel@greensocs.com,
- rth@twiddle.net
-Message-ID: <94a3da17-c1c5-b9ce-8e92-4d346ed98782@redhat.com>
-Subject: Re: [Qemu-devel] [RFC PATCH 0/5] FAULT INJECTION FRAMEWORK
-References: <20190628124534.10679-1-damien.hedde@greensocs.com>
- <20190701083710.GA18173@stefanha-x1.localdomain>
-In-Reply-To: <20190701083710.GA18173@stefanha-x1.localdomain>
+On Wed, 26 Jun 2019 15:08:20 +0200
+Cornelia Huck <cohuck@redhat.com> wrote:
 
---LlcdVuBcZzboLB3UiZE5FaRbP37nDnYJM
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+> The cpu features/models are not only relevant for TCG, but
+> also for KVM. Make sure that the KVM maintainers are cc:ed
+> on patches as well.
+> 
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 
-On 7/1/19 10:37 AM, Stefan Hajnoczi wrote:
-> On Fri, Jun 28, 2019 at 02:45:29PM +0200, Damien Hedde wrote:
->> This series adds a python framework aiming to provide some ways to do =
-fault
->> injection in a running vm. In its current state, it allows to easily i=
-nteract
->> with memory, change gpios and qom properties.
->>
->> The framework consists in a python script based on the qmp existing mo=
-dule
->> which allows to interact with the vm.
->=20
-> How does this compare to qtest?  There seems to be a lot of overlap
-> between them.
->=20
-> Why is it called "fault injection"?  The commands seem to be
-> general-purpose device testing functions (like qtest and libqos), not
-> functions for testing error code paths as would be expected from a faul=
-t
-> injection framework.
+Acked-by: Halil Pasic <pasic@linux.ibm.com>
 
-I understand qtest is to test QEMU, while this framework/command is to
-test how the guest react to an hardware faults.
+> ---
+>  MAINTAINERS | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index cad58b948791..d9b6c129076a 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -383,6 +383,8 @@ F: target/s390x/kvm-stub.c
+>  F: target/s390x/ioinst.[ch]
+>  F: target/s390x/machine.c
+>  F: target/s390x/sigp.c
+> +F: target/s390x/cpu_features*.[ch]
+> +F: target/s390x/cpu_models.[ch]
+>  F: hw/intc/s390_flic.c
+>  F: hw/intc/s390_flic_kvm.c
+>  F: include/hw/s390x/s390_flic.h
 
-To use the qtest_mem commands you need to run QEMU with the qtest
-chardev backend, while this series expose a QMP interface.
-
-To avoid the overlap, a cleaner follow up might be to have qtest wrap
-these QMP commands (mostly like HMP commands do).
-
-Another note while looking at a glance, qtest uses the 1st cpu address
-space view, this series allow to select a specific cpu.
-
-It makes sense to me to be able to select address spaces by name (more
-generic, not restricted to a cpu view, since one might want to inject
-fault in a device ram not always mapped to a cpu: dma, emac desc).
-
-
---LlcdVuBcZzboLB3UiZE5FaRbP37nDnYJM--
-
---YfGVBmusw7n6pIy6jM2PcEydhRnNiSQKd
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEicHnj2Ae6GyGdJXLoqP9bt6twN4FAl0Z3Y0ACgkQoqP9bt6t
-wN59bQ//eTBrj3KkZh2wr8M3Y4lTq6tHWTAS8zuRnofQBiw3wCARYxYEiNmAYBAR
-LCXfFWZ6xMlLRYtX2N4UMDf8xFihSFwFlOF9oF5PotslEHX12diMtfQBX7oNKaBD
-tZZy35EpaCgY9C9fa93t0k3q21dPU1wZmwD06R+mKQtvch/fg1xCy3p8f8XpzxJX
-pp1/7aHNazPej9lhhsq6G4wXdQrqdn65b+YcAIw585WCghHpESr1JXBecrqQLGHX
-v3zsVqWTrM5GiKc888nmg4x+89TV0bNwj8MyUVpgYEpuygVeHcLSuVnrwL1FF++U
-nqySFdqBZJF1MJz0DvXiwhxWTzmcyCDN7ZMWyUCdvEHCGu8xf7771cEoIT1Oy+kS
-T2CAUOAxob2g9lAVSsZ3x0ZeCNrWU3TPGIq2FxDioK/L+mKr1N61XNlnnsXxR4e4
-TKPtU4rtyEkyZfyHfsFYKkN74AAOYt3CHfRfr1GGwxIYSOkG++Zxik0/kxgRmgCp
-WhvHeRa89JUd92WQabmkKNilpkPCnQGfJLeXLDtk9I+csru3H205hJWuEJu66w+9
-tSkqcPE/pPS8jD8VJCNOPVaEosGX+NQGMx3tkynfEPv4UgL3DGUQDgwr7aYmA32b
-fgeftlicLgLmrVI+w7VnClchQj0eqfpnY9XNocdHN5UkFbYWte0=
-=Czfx
------END PGP SIGNATURE-----
-
---YfGVBmusw7n6pIy6jM2PcEydhRnNiSQKd--
 
