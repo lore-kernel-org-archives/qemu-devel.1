@@ -2,91 +2,66 @@ Return-Path: <SRS0=a9ZG=U6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.5 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC5DCC0650E
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 15:38:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D590C5B578
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 20:52:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9AF1620B7C
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 15:38:42 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qDA1jQSu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9AF1620B7C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
-Authentication-Results: mail.kernel.org; spf=fail smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60208 helo=lists1p.gnu.org)
+	by mail.kernel.org (Postfix) with ESMTPS id EB76E2089C
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 20:52:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB76E2089C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
+Received: from localhost ([::1]:45182 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hhyO9-0001av-UL
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 11:38:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41186)
+	id 1hi2zb-00049B-Hn
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 16:33:39 -0400
+Received: from [2001:470:142:3::10] (port=54153 helo=eggs.gnu.org)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1hhyKS-0000Qy-LI
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 11:34:56 -0400
+ (envelope-from <crosa@redhat.com>) id 1hi2xk-0002te-U0
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 16:31:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1hhyKL-0003YX-Me
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 11:34:47 -0400
-Received: from mail-wm1-x32c.google.com ([2a00:1450:4864:20::32c]:33413)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1hhyKJ-0003Wk-Rh
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 11:34:43 -0400
-Received: by mail-wm1-x32c.google.com with SMTP id h19so314047wme.0
- for <qemu-devel@nongnu.org>; Mon, 01 Jul 2019 08:34:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=cxCjEB5zKdWfSZxX3+j2v2ItnSTW3coA+RW/5hRm9LQ=;
- b=qDA1jQSuCgcMlqiAvOoPnUFwvoKCAD4oPTXzpCqT63Rhkix/iEuHCP/Fpy4DgHPDPs
- DNzXKO8LXbUoBoMFz/psKzLQUANRqW8k8w+zFMThPxavUmwiqNqPOGdp7IpCza2WDnN7
- bgYjxCSUtQd50ev2brEo+QQ1FGclh63MNYTlVhChhAP4qmMUMWNGu+WLMvvRVJrfFIYL
- H7VBRx6N+c+8q9UqE4NBH2vz0shJxeZLNXK6nBHaCSO/lq9bIbUGw3LMlEFhqwvKQF0W
- l/JRvHoknpTX7ssXltPFTCw1VMnNotTO5bdddU/WRTV8BcQkXTsRWki0g4+TLyOggVDC
- djCQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=cxCjEB5zKdWfSZxX3+j2v2ItnSTW3coA+RW/5hRm9LQ=;
- b=KCQUOiNWB0YuJswPEOAlUQ48igika9Y1KU5L/s1NOU4HaXF11q3f69MYV3HWBPD/Xm
- f8tCs2RpDT3m+Ia5jJ2lnsTDnlPrIXUya6P25rm4on/74BgbmjIv2FnkQ+3gnO1TwoJs
- oHaIMV02/XQRA/sjb/dvhWjG4dqm4zmLPXKGuIQRtub2jwsISx0xvECoxOgg0fbhf9Ck
- dQWlhJWD2HDMPOK8tlyxG6s1/R3K1bTmtLo1aGQFwUOgF+6zPl3LH+vBAPOL+eEg88pc
- WD/YgWknYbedt4OzdfSFQWu/UEw4XqOocGsikB22Gguo+eKARkPA8wBQaDoiO69RMfyX
- fMGg==
-X-Gm-Message-State: APjAAAUlGixKsM1VpkizkXnJMNu0zgCJeETkvK/ZM+JJcgN25Vdm+yht
- RZJ9H5uSrIGRby5KAUnlMccgV/dr
-X-Google-Smtp-Source: APXvYqyAQY3CiwKUCIfgWGScUWWHOJzMjSok2hbZPbgBb8+kayPRtsdNrekXQUm7vq/cLT+r3aZ7jg==
-X-Received: by 2002:a1c:448b:: with SMTP id
- r133mr18259488wma.114.1561995282370; 
- Mon, 01 Jul 2019 08:34:42 -0700 (PDT)
-Received: from x1.local (183.red-88-21-202.staticip.rima-tde.net.
- [88.21.202.183])
- by smtp.gmail.com with ESMTPSA id w24sm8922341wmc.30.2019.07.01.08.34.40
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Mon, 01 Jul 2019 08:34:41 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org
-Date: Mon,  1 Jul 2019 17:34:36 +0200
-Message-Id: <20190701153436.16579-3-f4bug@amsat.org>
-X-Mailer: git-send-email 2.19.1
-In-Reply-To: <20190701153436.16579-1-f4bug@amsat.org>
+ (envelope-from <crosa@redhat.com>) id 1hi2xY-00029Q-C9
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 16:31:39 -0400
+Received: from [209.132.183.28] (port=42510 helo=mx1.redhat.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1hi2xY-00029I-3A
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 16:31:32 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id F222D307D91E;
+ Mon,  1 Jul 2019 20:09:18 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-124-195.rdu2.redhat.com
+ [10.10.124.195])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id EF5A410018F9;
+ Mon,  1 Jul 2019 20:09:10 +0000 (UTC)
+Date: Mon, 1 Jul 2019 16:09:09 -0400
+From: Cleber Rosa <crosa@redhat.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Message-ID: <20190701200856.GA9225@localhost.localdomain>
 References: <20190701153436.16579-1-f4bug@amsat.org>
+ <20190701153436.16579-2-f4bug@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::32c
-Subject: [Qemu-devel] [PATCH v2 2/2] .travis.yml: Let the avocado job run
- the NeXTcube tests
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20190701153436.16579-2-f4bug@amsat.org>
+User-Agent: Mutt/1.12.0 (2019-05-25)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.48]); Mon, 01 Jul 2019 20:09:19 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] tests/acceptance: Add test of
+ NeXTcube framebuffer using OCR
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,51 +75,249 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>,
  Thomas Huth <huth@tuxfamily.org>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
  Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Cleber Rosa <crosa@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+ Gerd Hoffmann <kraxel@redhat.com>,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
-v2:
-- install tesseract English package (Thomas)
-- install PIL
----
- .travis.yml | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+On Mon, Jul 01, 2019 at 05:34:35PM +0200, Philippe Mathieu-Daud=C3=A9 wro=
+te:
+> Add a test of the NeXTcube framebuffer using the Tesseract OCR
+> engine on a screenshot of the framebuffer device.
+>=20
+> The test is very quick:
+>=20
+>   $ avocado --show=3Dapp,ocr run tests/acceptance/machine_m68k_nextcube=
+.py
 
-diff --git a/.travis.yml b/.travis.yml
-index aeb9b211cd..0980f65ec5 100644
---- a/.travis.yml
-+++ b/.travis.yml
-@@ -231,15 +231,20 @@ matrix:
- 
-     # Acceptance (Functional) tests
-     - env:
--        - CONFIG="--python=/usr/bin/python3 --target-list=x86_64-softmmu,mips-softmmu,mips64el-softmmu,aarch64-softmmu,arm-softmmu,s390x-softmmu,alpha-softmmu"
-+        - CONFIG="--python=/usr/bin/python3 --target-list=x86_64-softmmu,mips-softmmu,mips64el-softmmu,aarch64-softmmu,arm-softmmu,s390x-softmmu,alpha-softmmu,m68k-softmmu"
-         - TEST_CMD="make check-acceptance"
-       after_failure:
-         - cat tests/results/latest/job.log
-       addons:
-         apt:
-           packages:
-+            - python3-pil
-             - python3-pip
-             - python3.5-venv
-+            - tesseract-ocr
-+            - tesseract-ocr-eng
-+
-+
-     # Using newer GCC with sanitizers
-     - addons:
-         apt:
--- 
-2.19.1
+Shouldn't we stick to "console" here?  I understand we're resorting to oc=
+r
+but the content, for what it's worth, should be the same as in the consol=
+e
+for other tests.  This allows a common expectation across tests too.
 
+>   JOB ID     : f7d3c27976047036dc568183baf64c04863d9985
+>   JOB LOG    : ~/avocado/job-results/job-2019-06-29T16.18-f7d3c27/job.l=
+og
+>   (1/1) tests/acceptance/machine_m68k_nextcube.py:NextCubeMachine.test_=
+bootrom_framebuffer: |ocr:
+>   ue r pun Honl'=EF=AC=82x ; 5=E2=80=98 55=E2=80=98
+>   avg ncaaaaa 25 MHZ, memary jag m
+>   Backplane slat =C2=ABa
+>   Ethernet address a a r a r3 2
+>   Memgry sackets aea canflqured far 16MB Darlly page made stMs but have=
+ 16MB page made stMs )nstalled
+>   Memgry sackets a and 1 canflqured far 16MB Darlly page made stMs but =
+have 16MB page made stMs )nstalled
+>   [...]
+>   Yestlnq the rpu, 5::
+>   system test raneg Errar egge 51
+>   Egg: cammand
+>   Default pggc devlce nut fauna
+>   NEXY>I
+>   PASS (3.59 s)
+>   RESULTS    : PASS 1 | ERROR 0 | FAIL 0 | SKIP 0 | WARN 0 | INTERRUPT =
+0 | CANCEL 0
+>   JOB TIME   : 3.97 s
+>=20
+> Documentation on how to install tesseract:
+>   https://github.com/tesseract-ocr/tesseract/wiki#installation
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+> v2:
+> - test fb sizes
+> - handle 2 versions of teseract
+> ---
+>  tests/acceptance/machine_m68k_nextcube.py | 102 ++++++++++++++++++++++
+>  1 file changed, 102 insertions(+)
+>  create mode 100644 tests/acceptance/machine_m68k_nextcube.py
+>=20
+> diff --git a/tests/acceptance/machine_m68k_nextcube.py b/tests/acceptan=
+ce/machine_m68k_nextcube.py
+> new file mode 100644
+> index 0000000000..f8e514a058
+> --- /dev/null
+> +++ b/tests/acceptance/machine_m68k_nextcube.py
+> @@ -0,0 +1,102 @@
+> +# Functional test that boots a VM and run OCR on the framebuffer
+> +#
+> +# Copyright (c) Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> +#
+> +# This work is licensed under the terms of the GNU GPL, version 2 or
+> +# later.  See the COPYING file in the top-level directory.
+> +
+> +import logging
+> +import time
+> +import distutils.spawn
+> +
+> +from avocado import skipUnless
+> +from avocado_qemu import Test
+> +from avocado.utils import process
+
+Style nitpick:
+
+from avocado_qemu import Test
+from avocado import skipUnless
+from avocado.utils import process
+
+> +
+> +try:
+> +    from PIL import Image
+> +    pil_available =3D True
+
+Another style nitpick, but very minor issue is the use of ALL_CAPS
+variables if they are at the module level.  So that would become
+
+PIL_AVAILABLE =3D True
+
+> +except ImportError:
+> +    pil_available =3D False
+> +
+> +
+> +def tesseract_available(expected_version):
+> +    if not distutils.spawn.find_executable('tesseract'):
+
+Just though of pointing out that there's a similar function in
+avocado.utils.path, called find_command:
+
+https://avocado-framework.readthedocs.io/en/68.0/api/utils/avocado.utils.=
+html#avocado.utils.path.find_command
+
+Feel free to pick your poison! :)
+
+> +        return False
+> +    res =3D process.run('tesseract --version')
+> +    try:
+> +        version =3D res.stdout_text.split()[1]
+> +    except IndexError:
+> +        version =3D res.stderr_text.split()[1]
+
+Do some versions write this to stdout and others to stderr?
+
+> +    return int(version.split('.')[0]) =3D=3D expected_version
+
+This can raise an exception if some other sort of output is
+produced.  How about:
+
+   import re
+
+   match =3D re.match(r'tesseract\s(\d)', res)
+   if match is not None:
+      # now this is guaranteed to be a digit
+      if int(match.groups()[0]) =3D=3D expected_version:
+         return True
+   return False
+
+> +
+> +
+> +class NextCubeMachine(Test):
+> +
+> +    timeout =3D 15
+> +
+> +    def check_bootrom_framebuffer(self, screenshot_path):
+> +        rom_url =3D ('http://www.nextcomputers.org/NeXTfiles/Software/=
+ROM_Files/'
+> +                   '68040_Non-Turbo_Chipset/Rev_2.5_v66.BIN')
+> +        rom_hash =3D 'b3534796abae238a0111299fc406a9349f7fee24'
+> +        rom_path =3D self.fetch_asset(rom_url, asset_hash=3Drom_hash)
+> +
+> +        self.vm.set_machine('next-cube')
+> +        self.vm.add_args('-bios', rom_path)
+> +        self.vm.launch()
+> +
+> +        self.log.info('VM launched, waiting for display')
+> +        # FIXME how to catch the 'displaysurface_create 1120x832' trac=
+e-event?
+> +        time.sleep(2)
+
+There's avocado.utils.wait.wait_for() to *help* with waiting, but I'm
+not sure about the trace-events.
+
+> +
+> +        self.vm.command('human-monitor-command',
+> +                        command_line=3D'screendump %s' % screenshot_pa=
+th)
+> +
+> +    @skipUnless(pil_available, 'Python PIL not installed')
+> +    def test_bootrom_framebuffer_size(self):
+> +        """
+> +        :avocado: tags=3Darch:m68k
+> +        :avocado: tags=3Dmachine:next-cube
+
+Here we hit the syntax limitation of the Avocado tags regex again:
+
+https://avocado-framework.readthedocs.io/en/68.0/api/core/avocado.core.ht=
+ml#avocado.core.safeloader.DOCSTRING_DIRECTIVE_RE_RAW
+
+I'll look into raising that limitation on the next release, but,
+for the time being, this will need to be:
+
+    :avocado: tags=3Dmachine:next_cube
+
+The same applies to the other tests, of course.
+
+> +        :avocado: tags=3Ddevice:framebuffer
+> +        """
+> +        screenshot_path =3D self.workdir + "dump"
+
+Best practice is to use os.path.join() instead.
+
+> +        self.check_bootrom_framebuffer(screenshot_path)
+> +
+> +        width, height =3D Image.open(screenshot_path).size
+> +        self.assertEqual(width, 1120)
+> +        self.assertEqual(height, 832)
+> +
+> +    @skipUnless(tesseract_available(3), 'tesseract v3 OCR tool not ava=
+ilable')
+> +    def test_bootrom_framebuffer_ocr_with_tesseract_v3(self):
+> +        """
+> +        :avocado: tags=3Darch:m68k
+> +        :avocado: tags=3Dmachine:next-cube
+> +        :avocado: tags=3Ddevice:framebuffer
+> +        """
+> +        screenshot_path =3D self.workdir + "dump"
+> +        self.check_bootrom_framebuffer(screenshot_path)
+> +
+> +        console_logger =3D logging.getLogger('ocr')
+> +        text =3D process.run("tesseract %s stdout" % screenshot_path).=
+stdout_text
+> +        console_logger.debug(text)
+> +        self.assertIn('Backplane', text)
+> +        self.assertIn('Ethernet address', text)
+
+I haven't tried v3, but I'm curious... is this about the change in
+command line syntax only?  Or do v3 and v4 are able to recognize
+different characters?
+
+- Cleber.
+
+> +
+> +    @skipUnless(tesseract_available(4), 'tesseract v4 OCR tool not ava=
+ilable')
+> +    def test_bootrom_framebuffer_ocr_with_tesseract_v4(self):
+> +        """
+> +        :avocado: tags=3Darch:m68k
+> +        :avocado: tags=3Dmachine:next-cube
+> +        :avocado: tags=3Ddevice:framebuffer
+> +        """
+> +        screenshot_path =3D self.workdir + "dump"
+> +        self.check_bootrom_framebuffer(screenshot_path)
+> +
+> +        console_logger =3D logging.getLogger('ocr')
+> +        proc =3D process.run("tesseract --oem 1 %s stdout" % screensho=
+t_path)
+> +        text =3D proc.stdout_text
+> +        console_logger.debug(text)
+> +        self.assertIn('Testing the FPU, SCC', text)
+> +        self.assertIn('System test failed. Error code 51', text)
+> +        self.assertIn('Boot command', text)
+> +        self.assertIn('Next>', text)
+> --=20
+> 2.19.1
+>=20
 
