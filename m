@@ -2,89 +2,85 @@ Return-Path: <SRS0=a9ZG=U6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no
-	version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90A4BC5B578
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 04:24:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED5A5C5B578
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 04:37:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5EC4E206A3
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 04:24:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B9839208C4
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 04:37:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Gr76AMl1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5EC4E206A3
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oYM/DIXJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9839208C4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47598 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47652 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hhnrk-0002cd-J9
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 00:24:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55251)
+	id 1hho4Q-0006NN-Sa
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 00:37:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56599)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <sjitindarsingh@gmail.com>) id 1hhnqo-0001qV-Tw
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 00:23:37 -0400
+ (envelope-from <jan.bobek@gmail.com>) id 1hho2m-0004t8-ES
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 00:35:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <sjitindarsingh@gmail.com>) id 1hhnqn-0006rs-Pv
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 00:23:34 -0400
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:33466)
+ (envelope-from <jan.bobek@gmail.com>) id 1hho2l-0004TD-AQ
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 00:35:56 -0400
+Received: from mail-yw1-xc44.google.com ([2607:f8b0:4864:20::c44]:42724)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <sjitindarsingh@gmail.com>)
- id 1hhnqi-0006oK-Ug; Mon, 01 Jul 2019 00:23:29 -0400
-Received: by mail-pf1-x444.google.com with SMTP id x15so5884684pfq.0;
- Sun, 30 Jun 2019 21:23:27 -0700 (PDT)
+ (Exim 4.71) (envelope-from <jan.bobek@gmail.com>) id 1hho2l-0004St-4U
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 00:35:55 -0400
+Received: by mail-yw1-xc44.google.com with SMTP id n127so4723042ywd.9
+ for <qemu-devel@nongnu.org>; Sun, 30 Jun 2019 21:35:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=message-id:subject:from:to:cc:date:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=O91hD0CTKKdfv92y1KQoXhH2x/V2Gz3Rr3hVJ5Kk0LE=;
- b=Gr76AMl1bwp7PzYhfOC86kiC5zXCBdwB+uM9g44WfugZI90sqY1ROcvLndtJoYXdMh
- uVt1xoxjEYebznDjwNEW9voFIlDd+Qi2FqfXuKyk2fFWwJrweaVgTvE7bDZbynnyKLWU
- CvSW2uMM3xWx4DIJ2PoTl0v69Tr/O5yLV/25T54czMqFS86sKYme2JHDaS8JNWA81DcC
- DczXxIFj47rYht0nkHAfz1guwOuYTGIlGEZ34b/IBFANrkP2PlxGfVioNXqxsOILAlxQ
- eh/LuP1VBXFO6G1RjaaVFXqPvfTyPbBJa9arI1h4hbTwOmc0pqTABLZsyXPSHR4y3UgK
- 4vuw==
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=62n94QOWDrXpNL8BzKpDSz1zbBlW0NpsHbWOoqaeItE=;
+ b=oYM/DIXJf/4O/AedIEIBEjZFI2RfvWRhWoyFfl5mwxbX0jkrpx7z5Nd+WZpN/G2tfU
+ F1DiojwIBRunjXqqqrY3FVNAp1wVKUR2FGXBANHIXwtzXlL0khhy60leG5tyC2Ely5pq
+ ZkBKohpAwtuGJKDqA45MVstuuhCUVpoyosSTN1LjPj+mf5oDSVEm/CquJbl4TbaFx+48
+ nFPc77TMmzSsG62a1KDLL9mpU+Px1nBN9ymZUcY5KAZfySN5IQZD7RlC2TZx6aCMZ3Y7
+ 2SKkrec3WGFZ3/20s9xEVyqkpyBRCi5t71qPXLhPGrWZLYkmZTiYJ/tezuM+3MYFqzy0
+ tFNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=O91hD0CTKKdfv92y1KQoXhH2x/V2Gz3Rr3hVJ5Kk0LE=;
- b=b3yKBH5wIe5O0zy915Q2zcy+0IAakaTM+gWVnuu6jYJrCv6vv8fLYL9bqNrkKmHmBT
- Ozeem54Y05OoyFQMrYvz6wwAatZLoyEnlq3xuVMExvJBaujDIcy0NLvqkhzfPijcWGwy
- 1MAOgiG2JuDvkBe80Y3kMWTw7Ska0ZutumkHlmJ173OnpEUz0IrJOJKYw7JbXnUCQDJ2
- X+YfoihQtSN5u5lkrFJDcbzRRzvWVnYzoY6vTnbC9I2wO3XlXEyT1Pr6HWggsr+wG/2y
- PJDspg8LFo1p8dHIACMsRhfekF2Qsq0fQKoaUwFAdJWfSh7betZyqdYgUecWaHBIwKwq
- L9pw==
-X-Gm-Message-State: APjAAAW2H/XgzD+M3USx4EvvgdyPqTnSMMXWTP1pDCU8FRe8OVxL5VVR
- q6teU4eryCORdsKK/K5GMeJCXNvr
-X-Google-Smtp-Source: APXvYqwsxDcCDH68NlqOGgXdz+ajxwwqa6RiaXF1aP60B5MqCKvW36fJeBurFYOvvrqM1PQXw2QuTA==
-X-Received: by 2002:a17:90a:730b:: with SMTP id
- m11mr28306987pjk.89.1561955006272; 
- Sun, 30 Jun 2019 21:23:26 -0700 (PDT)
-Received: from surajjs2.ozlabs.ibm.com ([122.99.82.10])
- by smtp.googlemail.com with ESMTPSA id r27sm17658930pgn.25.2019.06.30.21.23.24
- (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
- Sun, 30 Jun 2019 21:23:25 -0700 (PDT)
-Message-ID: <1561955001.10832.2.camel@gmail.com>
-From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-To: David Gibson <david@gibson.dropbear.id.au>
-Date: Mon, 01 Jul 2019 14:23:21 +1000
-In-Reply-To: <20190628092952.GB29462@umbus.fritz.box>
-References: <20190624055812.3906-1-sjitindarsingh@gmail.com>
- <20190628092952.GB29462@umbus.fritz.box>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.24.6 (3.24.6-1.fc26) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=62n94QOWDrXpNL8BzKpDSz1zbBlW0NpsHbWOoqaeItE=;
+ b=WUYGe2bEaa8sDhE5JdndZ6RVQZkgnj/PM+5yQz8chubdjKJHtrJad9Jo6uh4Hds7MD
+ jgvs6X012mG9atjiksugtpCl57ymXlWzwv6sWRIj14iYq8fJViFDu7gKDjmCo1pVKrCK
+ IDUK8+YayoMN/SLKSS9xaxe6iKJbjgVzreC9BAiKQasB3bfK8fRNo/UpRJQSHv1PZhwc
+ wvH73c7/Zl9n7zj/9CP5ljDZevBJVZC2O05kyyS3vCmUeIHRlztiK33tTlK2bmJNZYeV
+ nSo30YDmmRkZzxJKZ3DNoMvfNMseRo55RU0OIunitmZlVL+IsUnWaAfyGHEOBmCRTNI7
+ AZBg==
+X-Gm-Message-State: APjAAAXJV83LjneBf+RQZ+kJ7BaIQI+ag2uP8D/ZEaZnrBar48dPycoE
+ ZYSEkg2tptleZ7ZRoA3uSK8Tp9jA
+X-Google-Smtp-Source: APXvYqy8n9Zh6vKmkTVZThrw+eb/YDm+x3ZSh2ID1lU/F8fIG176qmKuUNG/IrNc7Ts7pUudp6QlYw==
+X-Received: by 2002:a0d:eec3:: with SMTP id
+ x186mr14339257ywe.510.1561955753583; 
+ Sun, 30 Jun 2019 21:35:53 -0700 (PDT)
+Received: from dionysus.attlocal.net
+ (69-222-133-165.lightspeed.tukrga.sbcglobal.net. [69.222.133.165])
+ by smtp.gmail.com with ESMTPSA id k126sm1108564ywf.36.2019.06.30.21.35.52
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Sun, 30 Jun 2019 21:35:52 -0700 (PDT)
+From: Jan Bobek <jan.bobek@gmail.com>
+To: qemu-devel@nongnu.org
+Date: Mon,  1 Jul 2019 00:35:22 -0400
+Message-Id: <20190701043536.26019-1-jan.bobek@gmail.com>
+X-Mailer: git-send-email 2.20.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::444
-Subject: Re: [Qemu-devel] [QEMU-PPC] [PATCH 1/2] ppc/spapr: Add
- implementation of hcall H_PURR
+X-Received-From: 2607:f8b0:4864:20::c44
+Subject: [Qemu-devel] [RISU RFC PATCH v2 00/14] Support for generating x86
+ MMX/SSE/AVX test images
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,100 +92,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Cc: Jan Bobek <jan.bobek@gmail.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Richard Henderson <richard.henderson@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 2019-06-28 at 19:29 +1000, David Gibson wrote:
-> On Mon, Jun 24, 2019 at 03:58:11PM +1000, Suraj Jitindar Singh wrote:
-> > The hcall H_PURR is used by a guest to read the PURR (processor
-> > utilisation of resources register). A guest expects that this
-> > register
-> > will count at a rate of timebase scaled by the number of guest
-> > vcpus
-> > present in the vcore. That is the per vcpu purr will count at a
-> > rate of
-> > timebase / # vcpus per vcore.
-> > 
-> > Implement a handler for the H_PURR hcall and return the purr value
-> > divided by smp_threads so that the sum of the purr deltas across
-> > the
-> > vcpus of a vcore equals the timebase delta
-> > 
-> > Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-> 
-> Does this need something new advertised in the hypertas DT entry?
+This is a v2 of the patch series first posted in [1]. This version also
+implements the VEX prefix, hence all SIMD extensions up to AVX2 are
+supported. Notable exceptions are LDMXCSR (cannot constrain memory
+contents yet) and all forms of VGATHER (VSIB not implemented).
 
-Hi David,
+Note that this is still not the final version; I am planning to
+implement randomization of VSIB to test VGATHER, and improve the way
+registers are randomized (as discussed in e.g. [2]).
 
-There doesn't seem to be a concensus on what the return value from the
-H_PURR hcall should be, whether it just returns the hardware value or
-does some adjusting of the value based on guest smt mode as I've
-implemented in the patch below.
+Changes since v1:
+  - risugen_common: rewrote insnv to make it clearer, added a comment
+    to randint_constr;
+  - risugen_x86_asm: fixed a typo in rex_encode;
+  - risugen_x86: use more than one opcode in write_mov_reg_imm to
+    optimize space usage;
+  - x86.risu: added all SIMD extensnions up to AVX2.
 
-As such please drop this patch series.
+References:
+  1. https://lists.nongnu.org/archive/html/qemu-devel/2019-06/msg04123.html
+  2. https://lists.nongnu.org/archive/html/qemu-devel/2019-06/msg06489.html
 
-The guest can just read the purr register directly anyway and then
-interpret the values as it pleases.
+Jan Bobek (14):
+  risugen_common: add insnv, randint_constr, rand_fill
+  risugen_x86_asm: add module
+  risugen_x86_emit: add module
+  risugen_x86: add module
+  risugen: allow all byte-aligned instructions
+  x86.risu: add MMX instructions
+  x86.risu: add SSE instructions
+  x86.risu: add SSE2 instructions
+  x86.risu: add SSE3 instructions
+  x86.risu: add SSSE3 instructions
+  x86.risu: add SSE4.1 and SSE4.2 instructions
+  x86.risu: add AES and PCLMULQDQ instructions
+  x86.risu: add AVX instructions
+  x86.risu: add AVX2 instructions
 
-Kind Regards,
-Suraj
+ risugen             |   15 +-
+ risugen_common.pm   |  107 ++++-
+ risugen_x86.pm      |  498 +++++++++++++++++++++
+ risugen_x86_asm.pm  |  252 +++++++++++
+ risugen_x86_emit.pm |   91 ++++
+ x86.risu            | 1026 +++++++++++++++++++++++++++++++++++++++++++
+ 6 files changed, 1977 insertions(+), 12 deletions(-)
+ create mode 100644 risugen_x86.pm
+ create mode 100644 risugen_x86_asm.pm
+ create mode 100644 risugen_x86_emit.pm
+ create mode 100644 x86.risu
 
-> 
-> > ---
-> >  hw/ppc/spapr_hcall.c | 24 ++++++++++++++++++++++++
-> >  1 file changed, 24 insertions(+)
-> > 
-> > diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-> > index aae9fd2b3e..88b3343f04 100644
-> > --- a/hw/ppc/spapr_hcall.c
-> > +++ b/hw/ppc/spapr_hcall.c
-> > @@ -1819,6 +1819,27 @@ static target_ulong h_update_dt(PowerPCCPU
-> > *cpu, SpaprMachineState *spapr,
-> >      return H_SUCCESS;
-> >  }
-> >  
-> > +static target_ulong h_purr(PowerPCCPU *cpu, SpaprMachineState
-> > *spapr,
-> > +                           target_ulong opcode, target_ulong
-> > *args)
-> > +{
-> > +    CPUPPCState *env = &cpu->env;
-> > +    target_ulong purr;
-> > +
-> > +    if (kvm_enabled()) {
-> > +        cpu_synchronize_state(CPU(cpu));
-> > +        /*
-> > +         * Divide by smp_threads so that the sum of the purr
-> > deltas across the
-> > +         * vcpus of a vcore equal the timebase delta.
-> > +         */
-> > +        purr = env->spr[SPR_PURR] / smp_threads;
-> > +    } else {
-> > +        purr = cpu_ppc_load_purr(env);
-> > +    }
-> > +    args[0] = purr;
-> > +
-> > +    return H_SUCCESS;
-> > +}
-> > +
-> >  static spapr_hcall_fn papr_hypercall_table[(MAX_HCALL_OPCODE / 4)
-> > + 1];
-> >  static spapr_hcall_fn kvmppc_hypercall_table[KVMPPC_HCALL_MAX -
-> > KVMPPC_HCALL_BASE + 1];
-> >  
-> > @@ -1915,6 +1936,9 @@ static void hypercall_register_types(void)
-> >      spapr_register_hypercall(H_LOGICAL_DCBF, h_logical_dcbf);
-> >      spapr_register_hypercall(KVMPPC_H_LOGICAL_MEMOP,
-> > h_logical_memop);
-> >  
-> > +    /* hcall-purr */
-> > +    spapr_register_hypercall(H_PURR, h_purr);
-> > +
-> >      /* qemu/KVM-PPC specific hcalls */
-> >      spapr_register_hypercall(KVMPPC_H_RTAS, h_rtas);
-> >  
-> 
-> 
+-- 
+2.20.1
+
 
