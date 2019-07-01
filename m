@@ -2,85 +2,80 @@ Return-Path: <SRS0=a9ZG=U6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CABBC0650E
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 11:42:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AD60C0650E
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 11:57:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 573E72089C
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 11:42:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C989A208CA
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 11:57:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="udBMBXSc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 573E72089C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="c8XZ50Vq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C989A208CA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57460 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57560 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hhuhr-00026H-5F
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 07:42:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48339)
+	id 1hhuvf-0005LE-Tz
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 07:57:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50759)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1hhugg-0001Rt-GJ
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 07:41:35 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hhuuv-0004jo-T8
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 07:56:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1hhuge-0001QJ-Nh
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 07:41:34 -0400
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:38689)
+ (envelope-from <peter.maydell@linaro.org>) id 1hhuuu-0003Wp-RQ
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 07:56:17 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:34283)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1hhuge-0001PY-Ik
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 07:41:32 -0400
-Received: by mail-oi1-x241.google.com with SMTP id v186so9680759oie.5
- for <qemu-devel@nongnu.org>; Mon, 01 Jul 2019 04:41:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hhuuu-0003Vf-Km
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 07:56:16 -0400
+Received: by mail-ot1-x344.google.com with SMTP id n5so13200239otk.1
+ for <qemu-devel@nongnu.org>; Mon, 01 Jul 2019 04:56:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=kW1B7Lmz5RxF1lCoBPinTk9h2AVo14zSE6ptZ0lxOZg=;
- b=udBMBXScKI6WS2TDX85Nohec7/YzTLzTKQlKlyM5iLzqeJhpKl4s0RvmF55M9bIeEt
- OjfRUDCnHFRajtypk8LbGA0+5HphMQ6mLPyKBYUz6+EC0JhAMmMQ8WdcPNRfKiSb9LzB
- /JA5/QeSX34XbygBVILA+8/Iut+zdy3teVZA8D6dcbOfxjLHcnafYdmLfSUCR39+/3q1
- tZNpvYkNQRNUDhTMTJpiEUqrkZWGBkJ4Do9YpFnF9VJe7dhpqskN1CF/W6tlZeFvj3Av
- uerC5re8XnTDkymxtjR4+TiZT2Ywibbsd/0WZlbCHb9hd6BYxLdtFkj8L/IbRMA6A0Ql
- Ix4g==
+ :cc; bh=D5nEZI+hxb+H44y17IXUNqKuOh3W4xbgrH7vKYCJ5qs=;
+ b=c8XZ50VqDWVZ5XOskKo3UJkr0SIUt+zFAj7uQBVRamDXZkXIN5dzsFPxeVTox9wBkG
+ kjMM/dSrh7ih071+uzrB6IqBTDXOTeMQr+odGUVgudX6vEYd/lWdhVoh/BKq3Cv7o+CI
+ YnHmRxWBMO5YW8/pKmruNmKoFfjg5hRCfADhfKZXJrPMbtkwyMyJIrY1bUHny/j8nw9s
+ HNsHR8g2JR1iJCkvQ+nRA4mjcEyWlemqDVi6lFGwn3NL3mqHXqBiqTOxcGMZyqwBZEIF
+ Qb6LJECD5l3aIaRbMjx1LHFMQu4vzW7HSqk2540ViputxGnZsqQ4rc284zV0NvgS3UBE
+ m7Nw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=kW1B7Lmz5RxF1lCoBPinTk9h2AVo14zSE6ptZ0lxOZg=;
- b=e+otRNAKkdKfMpHdfobORLSS6GGRStOleuiZ+HQox11rPPmeBL1Dq5WXxr47q3229z
- 4WQmf+o46rzVxI4f55Ma30P+UWEByGMQTeddo0iNo2HPIoygB3E29ETm5K4ufzbJM5CA
- DThIafQX4MAB2KJXoW41PH+5C6RRV9Km8Ayup8eMRpwP+HoaL2kECjKqNoPjbtxrICmn
- UFRvEIaViLuLQkWsoodb4YMtseL6sQ+WsA05rEasi1BL247TBuIJxd3oiwBBiBs0we51
- uKr4oHdwLYyoortX7c6t9YZsjLF0Fc28jdWFwgiBD+LKE6lovX/A0Nv9RNQhc3TKhbhi
- qA3w==
-X-Gm-Message-State: APjAAAXe1z9GnWHAsJZpTKcDlk3FtIEt+B+xGQn188AC59ACqF+7N5qo
- Y0+KbAhNskAIkKEiMccE3jNfKR7sOYAT4JMgtBw=
-X-Google-Smtp-Source: APXvYqzMIpNbv4zxxxt+tS0f/TvTHFnEEHXZwAQbFZWtgKTQjdeJbd/kDYEmYprkpDbNPStBsnMKS2264r5xgKU9Uw0=
-X-Received: by 2002:aca:4588:: with SMTP id s130mr6155144oia.79.1561981290826; 
- Mon, 01 Jul 2019 04:41:30 -0700 (PDT)
+ bh=D5nEZI+hxb+H44y17IXUNqKuOh3W4xbgrH7vKYCJ5qs=;
+ b=e9INaf7iRKIYrTGyiOsx0tbp4pJZc9LaxGiPqOsS+CeaA+xIgnUfQsH66bopAIXU+7
+ MqQclbvLoddinyVKyVe34hZGz1NaM6NZ8wz3goBtuu8pXiLBlztM6QMbhPRutO0XijOP
+ CjDc4ENBIgGDrJ/djsYFU086n1Pyrqx4XjTPqn75gHrrQmY2poaW/OGAEqD7sOv2yuXL
+ m6F8MbHEb7b6A3NKbWUuMMQkRRM25NKcV/8oAFqLQN6ENBDmpggxh7NdNSXDlRsO9ngj
+ dX4fublci84UWAWGtiPcBAw17xShjjngEdl47bdISg7K3QL8S7/XZUSNZLtL1+0ByVHL
+ Jz2Q==
+X-Gm-Message-State: APjAAAWX6xVjlRbAdS6naHIR83vUpDKzigU1o/QwcDsDIbkfVUlXvdpc
+ EMURQhxRQW3Df/lRQjveyVLtlyH53ksIE+cNDvZiNA==
+X-Google-Smtp-Source: APXvYqx7kmXUpfXmk+jkd3J3hXZ4cXElfV/6Swtewouur+Wu/brJ4GB1cT7KFDjHi/+SIdN+1I2u7cbuKoJfPTiuXeg=
+X-Received: by 2002:a9d:5f1a:: with SMTP id f26mr19975476oti.91.1561982175236; 
+ Mon, 01 Jul 2019 04:56:15 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190629130017.2973-1-richard.henderson@linaro.org>
- <20190629130017.2973-16-richard.henderson@linaro.org>
- <CAL1e-=ghMjUtEyqKX+s15RcyQp6uQO_hJ_u4RTSJ5ZyPvFnymw@mail.gmail.com>
- <b376dc86-6879-2a72-3261-7fdf06172456@linaro.org>
- <CAL1e-=hS_nQQYY39j-mx1QBFw+Xe3V5NgFW7ifrkMZRxFbB=OA@mail.gmail.com>
- <38326483-d804-02c6-42bc-9633fc4d5028@linaro.org>
-In-Reply-To: <38326483-d804-02c6-42bc-9633fc4d5028@linaro.org>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Mon, 1 Jul 2019 13:41:16 +0200
-Message-ID: <CAL1e-=gWBkA+tWZJ9E7JNk1X_gwnhKbRfT_CtNr+o5uy+e-oDw@mail.gmail.com>
-To: Richard Henderson <richard.henderson@linaro.org>
+References: <20190416013902.4941-1-andrew.smirnov@gmail.com>
+ <20190416013902.4941-4-andrew.smirnov@gmail.com>
+In-Reply-To: <20190416013902.4941-4-andrew.smirnov@gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 1 Jul 2019 12:56:04 +0100
+Message-ID: <CAFEAcA_=HpkXDriPRvnKRA=XKaK0Vpi8isZH5B8eETVVAr6=mw@mail.gmail.com>
+To: Andrey Smirnov <andrew.smirnov@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::241
-Subject: Re: [Qemu-devel] [PATCH v6 15/16] tcg/ppc: Update vector support to
- v2.07
+X-Received-From: 2607:f8b0:4864:20::344
+Subject: Re: [Qemu-devel] [PATCH 3/5] pci: designware: Update MSI mapping
+ unconditionally
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,61 +87,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Howard Spoelstra <hsp.cat7@gmail.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>,
+ "Michael S . Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Jul 1, 2019 at 12:29 PM Richard Henderson
-<richard.henderson@linaro.org> wrote:
+On Tue, 16 Apr 2019 at 02:39, Andrey Smirnov <andrew.smirnov@gmail.com> wrote:
 >
-> On 7/1/19 5:57 AM, Aleksandar Markovic wrote:
-> >
-> > On Jun 30, 2019 5:12 PM, "Richard Henderson" <richard.henderson@linaro.org
-> > <mailto:richard.henderson@linaro.org>> wrote:
-> >>
-> >> On 6/30/19 3:37 PM, Aleksandar Markovic wrote:
-> >> >>  bool have_isa_2_06;
-> >> >>  bool have_isa_2_06_vsx;
-> >> >> +bool have_isa_2_07_vsx;
-> >> >
-> >> > Does this flag indicate support for PowerISA 2.07 or VSX?
-> >>
-> >> VSX & 2.07,
-> >>
-> >> >> +    if (hwcap2 & PPC_FEATURE2_ARCH_2_07) {
-> >> >> +        if (hwcap & PPC_FEATURE_HAS_VSX) {
-> >> >> +            have_isa_2_07_vsx = true;
-> >> >> +        }
-> >> >> +    }
-> >>
-> >> Like so.
-> >>
-> >> While it would have been possible to have one single have_isa_vsx, we would
-> >> then also have to check a second flag to see which revision.  Therefore I
-> >> created these composite flags so that we only have to check one.
-> >>
-> >
-> > Yes, but, in this patch, for example, among other things, the support for
-> > doubleword integer max/min vector operation is implemented. Why is the
-> > existence of that support dependant on VSX (PPC_FEATURE_HAS_VSX)?
+> Expression to calculate update_msi_mapping in code handling writes to
+> DESIGNWARE_PCIE_MSI_INTR0_ENABLE is missing an ! operator and should
+> be:
 >
-> Because otherwise the instruction doesn't exist?
+>     !!root->msi.intr[0].enable ^ !!val;
 >
+> so that MSI mapping is updated when enabled transitions from either
+> "none" -> "any" or "any" -> "none". Since that register shouldn't be
+> written to very often, change the code to update MSI mapping
+> unconditionally instead of trying to fix the update_msi_mapping logic.
+>
+> Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Cc: Michael S. Tsirkin <mst@redhat.com>
+> Cc: qemu-devel@nongnu.org
+> Cc: qemu-arm@nongnu.org
+> ---
 
-If we go back to my example, it appears to me that doubleword
-integer max/min Altivec instruction do not depend on VSX in any
-way, or, at least, I did not find anything in Altivec docs that
-mentions it (I could be wrong). The same concern for majority
-of Altivec instructions used in this patch. What is your reason
-for considering all of them needing VSX?
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-Regards,
-Aleksandar
-
->
-> r~
+thanks
+-- PMM
 
