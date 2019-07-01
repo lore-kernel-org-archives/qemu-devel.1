@@ -2,79 +2,60 @@ Return-Path: <SRS0=a9ZG=U6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92744C0650E
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 15:01:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6966AC0650E
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 15:03:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 674472064B
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 15:01:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 674472064B
+	by mail.kernel.org (Postfix) with ESMTPS id 3ABC9206E0
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 15:03:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3ABC9206E0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59748 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59764 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hhxo6-0001qs-9H
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 11:01:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58163)
+	id 1hhxqT-0003kf-DL
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 11:03:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59576)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hhxVV-0003ml-2B
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 10:42:14 -0400
+ (envelope-from <slp@redhat.com>) id 1hhxat-0000y9-TE
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 10:47:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hhxVT-0008Iz-7J
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 10:42:13 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:45915)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hhxVS-0008Hj-VL
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 10:42:11 -0400
-Received: by mail-wr1-f67.google.com with SMTP id f9so14132954wre.12
- for <qemu-devel@nongnu.org>; Mon, 01 Jul 2019 07:42:10 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=HpgxwG0XEloh+oBaD9aK8rEN+btHP+Bocwr7Jye9cbk=;
- b=fKJAqBOc/4Zrd6I+hO47DoKbyAQJd+o+FSetCUyUdhiHca20VZbeCygijM/Hbtil+y
- og6yiD6bq0qItveaWUJqLtRDwsgOTQoWu058AuQmIIxh8ZNLBVEwmJ3zRWfCeWGLSnm7
- T+mlZ0eZSfmMPNovRsJb2N0foe7ZTo7qztBYTtlR1LL5ov7WFcWctVfbmlTVbOABkj6j
- DTwTMSm3xznnZURZlWha1EuoLh5HKKQzlj8dfo5Xug/SDr2W+WlcbkHmZW0RyGPQVVUA
- uHTCJm7LqlIJcgsDR09tBEZZiLpHweAFuN7kVqJD/dbKSzXzZWrVIxpDafbcDtEKTAd3
- 5s8A==
-X-Gm-Message-State: APjAAAVa3+zSU/IqQQXUdZN1KBo2J2OCVGJ32PcLfENyO4kPXOKTR11x
- X5aYG0tnR8SXeDgk7dD8MQoQDg==
-X-Google-Smtp-Source: APXvYqzLpOEmPuJ2KP9h4ojXRsbfMjUJLXJMB3TwxzDr52rLSoxboUhSSepziEKNfitTOgQSdXHSxg==
-X-Received: by 2002:a5d:6144:: with SMTP id y4mr20130740wrt.84.1561992129386; 
- Mon, 01 Jul 2019 07:42:09 -0700 (PDT)
-Received: from [192.168.1.38] (183.red-88-21-202.staticip.rima-tde.net.
- [88.21.202.183])
- by smtp.gmail.com with ESMTPSA id r79sm10678882wme.2.2019.07.01.07.42.07
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Mon, 01 Jul 2019 07:42:08 -0700 (PDT)
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-References: <20181206215026.7716-1-pbonzini@redhat.com>
- <20181206215026.7716-3-pbonzini@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <34baad42-1ab8-ec81-467d-f62937656bc8@redhat.com>
-Date: Mon, 1 Jul 2019 16:42:07 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ (envelope-from <slp@redhat.com>) id 1hhxar-00063t-SD
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 10:47:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:27338)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <slp@redhat.com>) id 1hhxap-0005t0-LH
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 10:47:45 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id E6F3F308621F;
+ Mon,  1 Jul 2019 14:47:37 +0000 (UTC)
+Received: from dritchie.redhat.com (unknown [10.33.36.165])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 726CB7DF69;
+ Mon,  1 Jul 2019 14:47:26 +0000 (UTC)
+From: Sergio Lopez <slp@redhat.com>
+To: mst@redhat.com, marcel.apfelbaum@gmail.com, pbonzini@redhat.com,
+ rth@twiddle.net, ehabkost@redhat.com, maran.wilson@oracle.com
+Date: Mon,  1 Jul 2019 16:47:04 +0200
+Message-Id: <20190701144705.102615-4-slp@redhat.com>
+In-Reply-To: <20190701144705.102615-1-slp@redhat.com>
+References: <20190701144705.102615-1-slp@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20181206215026.7716-3-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.42]); Mon, 01 Jul 2019 14:47:38 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.221.67
-Subject: Re: [Qemu-devel] [PATCH 2/2] test: replace gtester with a TAP driver
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH v2 3/4] hw/i386: Factorize PVH related functions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,238 +67,338 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Auger Eric <eric.auger@redhat.com>, thuth@redhat.com
+Cc: qemu-devel@nongnu.org, Sergio Lopez <slp@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Paolo,
+Extract PVH related functions from pc.c, and put them in pvh.c, so
+they can be shared with other components.
 
-On 12/6/18 10:50 PM, Paolo Bonzini wrote:
-> gtester is deprecated by upstream glib (see for example the announcement
-> at https://blog.gtk.org/2018/07/11/news-from-glib-2-58/) and it does
-> not support tests that call g_test_skip in some glib stable releases.
-> 
-> glib suggests instead using Automake's TAP support, which gtest itself
-> supports since version 2.38 (QEMU's minimum requirement is 2.40).
-> We do not support Automake, but we can use Automake's code to beautify
-> the TAP output.  I chose to use the Perl copy rather than the shell/awk
-> one, with some changes so that it can accept TAP through stdin, in order
-> to reuse Perl's TAP parsing package.  This also avoids duplicating the
-> parser between tap-driver.pl and tap-merge.pl.
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
-> v1->v2: show failures even in non-verbose mode
->         show executable name next to PASS/FAIL
->         tweak colored output
->         improved support for "make -k check"
->         switch license blurb to https
->         support TAP version line
->         removed Eamcs epilogs
-> 
-[...]
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index fb0b449c02..1dda5e2596 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -799,41 +799,53 @@ tests/test-qga$(EXESUF): qemu-ga$(EXESUF)
->  tests/test-qga$(EXESUF): tests/test-qga.o $(qtest-obj-y)
->  
->  SPEED = quick
-> -GTESTER_OPTIONS = -k $(if $(V),--verbose,-q)
-> -GCOV_OPTIONS = -n $(if $(V),-f,)
->  
->  # gtester tests, possibly with verbose output
-> +# do_test_tap runs all tests, even if some of them fail, while do_test_human
-> +# stops at the first failure unless -k is given on the command line
-> +
-> +do_test_human = \
-> +	$(call quiet-command, rc=0; \
-> +	  { $(foreach COMMAND, $1, \
-> +	    MALLOC_PERTURB_=$${MALLOC_PERTURB_:-$$(( $${RANDOM:-0} % 255 + 1))} \
-> +	      $2 $(COMMAND) -m=$(SPEED) -k --tap \
-> +	      | ./scripts/tap-driver.pl --test-name="$(notdir $(COMMAND))" --color=always $(if $(V),, --show-failures-only) \
-> +	      || $(if $(findstring k, $(MAKEFLAGS)), rc=$$?, exit $$?); ) }; exit $$rc, \
-> +	  "TEST", "$*")
-> +
-> +do_test_tap = \
-> +	$(call quiet-command, \
-> +	  { $(foreach COMMAND, $1, \
-> +	    MALLOC_PERTURB_=$${MALLOC_PERTURB_:-$$(( $${RANDOM:-0} % 255 + 1))} \
-> +	      $2 $(COMMAND) -m=$(SPEED) -k --tap | sed "s/^[a-z][a-z]* [0-9]* /&$(notdir $(COMMAND)) /" || true; ) } \
-> +	      | ./scripts/tap-merge.pl | tee "$@" \
-> +	      | ./scripts/tap-driver.pl --color=always $(if $(V),, --show-failures-only), \
-> +	  "TAP","$@")
->  
->  .PHONY: $(patsubst %, check-qtest-%, $(QTEST_TARGETS))
->  $(patsubst %, check-qtest-%, $(QTEST_TARGETS)): check-qtest-%: subdir-%-softmmu $(check-qtest-y)
-> -	$(call quiet-command,QTEST_QEMU_BINARY=$*-softmmu/qemu-system-$* \
-> -		QTEST_QEMU_IMG=qemu-img$(EXESUF) \
-> -		MALLOC_PERTURB_=$${MALLOC_PERTURB_:-$$(( $${RANDOM:-0} % 255 + 1))} \
-> -		gtester $(GTESTER_OPTIONS) -m=$(SPEED) $(check-qtest-$*-y) $(check-qtest-generic-y),"GTESTER","$@")
-> +	$(call do_test_human,$(check-qtest-$*-y) $(check-qtest-generic-y), \
-> +	  QTEST_QEMU_BINARY=$*-softmmu/qemu-system-$* \
-> +	  QTEST_QEMU_IMG=qemu-img$(EXESUF))
+Signed-off-by: Sergio Lopez <slp@redhat.com>
+---
+ hw/i386/Makefile.objs |   1 +
+ hw/i386/pc.c          | 120 +++++-------------------------------------
+ hw/i386/pvh.c         | 113 +++++++++++++++++++++++++++++++++++++++
+ hw/i386/pvh.h         |  10 ++++
+ 4 files changed, 136 insertions(+), 108 deletions(-)
+ create mode 100644 hw/i386/pvh.c
+ create mode 100644 hw/i386/pvh.h
 
-I was used to gtester filter/skip 'testpath' param:
+diff --git a/hw/i386/Makefile.objs b/hw/i386/Makefile.objs
+index 5d9c9efd5f..c5f20bbd72 100644
+--- a/hw/i386/Makefile.objs
++++ b/hw/i386/Makefile.objs
+@@ -1,5 +1,6 @@
+ obj-$(CONFIG_KVM) +=3D kvm/
+ obj-y +=3D multiboot.o
++obj-y +=3D pvh.o
+ obj-y +=3D pc.o
+ obj-$(CONFIG_I440FX) +=3D pc_piix.o
+ obj-$(CONFIG_Q35) +=3D pc_q35.o
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 3983621f1c..325ec2c1c8 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -42,6 +42,7 @@
+ #include "hw/loader.h"
+ #include "elf.h"
+ #include "multiboot.h"
++#include "pvh.h"
+ #include "hw/timer/mc146818rtc.h"
+ #include "hw/dma/i8257.h"
+ #include "hw/timer/i8254.h"
+@@ -108,9 +109,6 @@ static struct e820_entry *e820_table;
+ static unsigned e820_entries;
+ struct hpet_fw_config hpet_cfg =3D {.count =3D UINT8_MAX};
+=20
+-/* Physical Address of PVH entry point read from kernel ELF NOTE */
+-static size_t pvh_start_addr;
+-
+ GlobalProperty pc_compat_4_0[] =3D {};
+ const size_t pc_compat_4_0_len =3D G_N_ELEMENTS(pc_compat_4_0);
+=20
+@@ -1061,109 +1059,6 @@ struct setup_data {
+     uint8_t data[0];
+ } __attribute__((packed));
+=20
+-
+-/*
+- * The entry point into the kernel for PVH boot is different from
+- * the native entry point.  The PVH entry is defined by the x86/HVM
+- * direct boot ABI and is available in an ELFNOTE in the kernel binary.
+- *
+- * This function is passed to load_elf() when it is called from
+- * load_elfboot() which then additionally checks for an ELF Note of
+- * type XEN_ELFNOTE_PHYS32_ENTRY and passes it to this function to
+- * parse the PVH entry address from the ELF Note.
+- *
+- * Due to trickery in elf_opts.h, load_elf() is actually available as
+- * load_elf32() or load_elf64() and this routine needs to be able
+- * to deal with being called as 32 or 64 bit.
+- *
+- * The address of the PVH entry point is saved to the 'pvh_start_addr'
+- * global variable.  (although the entry point is 32-bit, the kernel
+- * binary can be either 32-bit or 64-bit).
+- */
+-static uint64_t read_pvh_start_addr(void *arg1, void *arg2, bool is64)
+-{
+-    size_t *elf_note_data_addr;
+-
+-    /* Check if ELF Note header passed in is valid */
+-    if (arg1 =3D=3D NULL) {
+-        return 0;
+-    }
+-
+-    if (is64) {
+-        struct elf64_note *nhdr64 =3D (struct elf64_note *)arg1;
+-        uint64_t nhdr_size64 =3D sizeof(struct elf64_note);
+-        uint64_t phdr_align =3D *(uint64_t *)arg2;
+-        uint64_t nhdr_namesz =3D nhdr64->n_namesz;
+-
+-        elf_note_data_addr =3D
+-            ((void *)nhdr64) + nhdr_size64 +
+-            QEMU_ALIGN_UP(nhdr_namesz, phdr_align);
+-    } else {
+-        struct elf32_note *nhdr32 =3D (struct elf32_note *)arg1;
+-        uint32_t nhdr_size32 =3D sizeof(struct elf32_note);
+-        uint32_t phdr_align =3D *(uint32_t *)arg2;
+-        uint32_t nhdr_namesz =3D nhdr32->n_namesz;
+-
+-        elf_note_data_addr =3D
+-            ((void *)nhdr32) + nhdr_size32 +
+-            QEMU_ALIGN_UP(nhdr_namesz, phdr_align);
+-    }
+-
+-    pvh_start_addr =3D *elf_note_data_addr;
+-
+-    return pvh_start_addr;
+-}
+-
+-static bool load_elfboot(const char *kernel_filename,
+-                   int kernel_file_size,
+-                   uint8_t *header,
+-                   size_t pvh_xen_start_addr,
+-                   FWCfgState *fw_cfg)
+-{
+-    uint32_t flags =3D 0;
+-    uint32_t mh_load_addr =3D 0;
+-    uint32_t elf_kernel_size =3D 0;
+-    uint64_t elf_entry;
+-    uint64_t elf_low, elf_high;
+-    int kernel_size;
+-
+-    if (ldl_p(header) !=3D 0x464c457f) {
+-        return false; /* no elfboot */
+-    }
+-
+-    bool elf_is64 =3D header[EI_CLASS] =3D=3D ELFCLASS64;
+-    flags =3D elf_is64 ?
+-        ((Elf64_Ehdr *)header)->e_flags : ((Elf32_Ehdr *)header)->e_flag=
+s;
+-
+-    if (flags & 0x00010004) { /* LOAD_ELF_HEADER_HAS_ADDR */
+-        error_report("elfboot unsupported flags =3D %x", flags);
+-        exit(1);
+-    }
+-
+-    uint64_t elf_note_type =3D XEN_ELFNOTE_PHYS32_ENTRY;
+-    kernel_size =3D load_elf(kernel_filename, read_pvh_start_addr,
+-                           NULL, &elf_note_type, &elf_entry,
+-                           &elf_low, &elf_high, 0, I386_ELF_MACHINE,
+-                           0, 0);
+-
+-    if (kernel_size < 0) {
+-        error_report("Error while loading elf kernel");
+-        exit(1);
+-    }
+-    mh_load_addr =3D elf_low;
+-    elf_kernel_size =3D elf_high - elf_low;
+-
+-    if (pvh_start_addr =3D=3D 0) {
+-        error_report("Error loading uncompressed kernel without PVH ELF =
+Note");
+-        exit(1);
+-    }
+-    fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_ENTRY, pvh_start_addr);
+-    fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_ADDR, mh_load_addr);
+-    fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_SIZE, elf_kernel_size);
+-
+-    return true;
+-}
+-
+ static void load_linux(PCMachineState *pcms,
+                        FWCfgState *fw_cfg)
+ {
+@@ -1203,6 +1098,9 @@ static void load_linux(PCMachineState *pcms,
+     if (ldl_p(header+0x202) =3D=3D 0x53726448) {
+         protocol =3D lduw_p(header+0x206);
+     } else {
++        size_t pvh_start_addr;
++        uint32_t mh_load_addr =3D 0;
++        uint32_t elf_kernel_size =3D 0;
+         /*
+          * This could be a multiboot kernel. If it is, let's stop treati=
+ng it
+          * like a Linux kernel.
+@@ -1220,10 +1118,16 @@ static void load_linux(PCMachineState *pcms,
+          * If load_elfboot() is successful, populate the fw_cfg info.
+          */
+         if (pcmc->pvh_enabled &&
+-            load_elfboot(kernel_filename, kernel_size,
+-                         header, pvh_start_addr, fw_cfg)) {
++            pvh_load_elfboot(kernel_filename,
++                             &mh_load_addr, &elf_kernel_size)) {
+             fclose(f);
+=20
++            pvh_start_addr =3D pvh_get_start_addr();
++
++            fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_ENTRY, pvh_start_addr);
++            fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_ADDR, mh_load_addr);
++            fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_SIZE, elf_kernel_size);
++
+             fw_cfg_add_i32(fw_cfg, FW_CFG_CMDLINE_SIZE,
+                 strlen(kernel_cmdline) + 1);
+             fw_cfg_add_string(fw_cfg, FW_CFG_CMDLINE_DATA, kernel_cmdlin=
+e);
+diff --git a/hw/i386/pvh.c b/hw/i386/pvh.c
+new file mode 100644
+index 0000000000..61623b4533
+--- /dev/null
++++ b/hw/i386/pvh.c
+@@ -0,0 +1,113 @@
++/*
++ * PVH Boot Helper
++ *
++ * Copyright (C) 2019 Oracle
++ * Copyright (C) 2019 Red Hat, Inc
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
++ * See the COPYING file in the top-level directory.
++ *
++ */
++
++#include "qemu/osdep.h"
++#include "qemu/units.h"
++#include "qemu/error-report.h"
++#include "hw/loader.h"
++#include "cpu.h"
++#include "elf.h"
++#include "pvh.h"
++
++static size_t pvh_start_addr =3D 0;
++
++size_t pvh_get_start_addr(void)
++{
++    return pvh_start_addr;
++}
++
++/*
++ * The entry point into the kernel for PVH boot is different from
++ * the native entry point.  The PVH entry is defined by the x86/HVM
++ * direct boot ABI and is available in an ELFNOTE in the kernel binary.
++ *
++ * This function is passed to load_elf() when it is called from
++ * load_elfboot() which then additionally checks for an ELF Note of
++ * type XEN_ELFNOTE_PHYS32_ENTRY and passes it to this function to
++ * parse the PVH entry address from the ELF Note.
++ *
++ * Due to trickery in elf_opts.h, load_elf() is actually available as
++ * load_elf32() or load_elf64() and this routine needs to be able
++ * to deal with being called as 32 or 64 bit.
++ *
++ * The address of the PVH entry point is saved to the 'pvh_start_addr'
++ * global variable.  (although the entry point is 32-bit, the kernel
++ * binary can be either 32-bit or 64-bit).
++ */
++
++static uint64_t read_pvh_start_addr(void *arg1, void *arg2, bool is64)
++{
++    size_t *elf_note_data_addr;
++
++    /* Check if ELF Note header passed in is valid */
++    if (arg1 =3D=3D NULL) {
++        return 0;
++    }
++
++    if (is64) {
++        struct elf64_note *nhdr64 =3D (struct elf64_note *)arg1;
++        uint64_t nhdr_size64 =3D sizeof(struct elf64_note);
++        uint64_t phdr_align =3D *(uint64_t *)arg2;
++        uint64_t nhdr_namesz =3D nhdr64->n_namesz;
++
++        elf_note_data_addr =3D
++            ((void *)nhdr64) + nhdr_size64 +
++            QEMU_ALIGN_UP(nhdr_namesz, phdr_align);
++    } else {
++        struct elf32_note *nhdr32 =3D (struct elf32_note *)arg1;
++        uint32_t nhdr_size32 =3D sizeof(struct elf32_note);
++        uint32_t phdr_align =3D *(uint32_t *)arg2;
++        uint32_t nhdr_namesz =3D nhdr32->n_namesz;
++
++        elf_note_data_addr =3D
++            ((void *)nhdr32) + nhdr_size32 +
++            QEMU_ALIGN_UP(nhdr_namesz, phdr_align);
++    }
++
++    pvh_start_addr =3D *elf_note_data_addr;
++
++    return pvh_start_addr;
++}
++
++bool pvh_load_elfboot(const char *kernel_filename,
++                      uint32_t *mh_load_addr,
++                      uint32_t *elf_kernel_size)
++{
++    uint64_t elf_entry;
++    uint64_t elf_low, elf_high;
++    int kernel_size;
++    uint64_t elf_note_type =3D XEN_ELFNOTE_PHYS32_ENTRY;
++
++    kernel_size =3D load_elf(kernel_filename, read_pvh_start_addr,
++                           NULL, &elf_note_type, &elf_entry,
++                           &elf_low, &elf_high, 0, I386_ELF_MACHINE,
++                           0, 0);
++
++    if (kernel_size < 0) {
++        error_report("Error while loading elf kernel");
++        return false;
++    }
++
++    if (pvh_start_addr =3D=3D 0) {
++        error_report("Error loading uncompressed kernel without PVH ELF =
+Note");
++        return false;
++    }
++
++    if (mh_load_addr) {
++        *mh_load_addr =3D elf_low;
++    }
++
++    if (elf_kernel_size) {
++        *elf_kernel_size =3D elf_high - elf_low;
++    }
++
++    return true;
++}
+diff --git a/hw/i386/pvh.h b/hw/i386/pvh.h
+new file mode 100644
+index 0000000000..ada67ff6e8
+--- /dev/null
++++ b/hw/i386/pvh.h
+@@ -0,0 +1,10 @@
++#ifndef HW_I386_PVH_H
++#define HW_I386_PVH_H
++
++size_t pvh_get_start_addr(void);
++
++bool pvh_load_elfboot(const char *kernel_filename,
++                      uint32_t *mh_load_addr,
++                      uint32_t *elf_kernel_size);
++
++#endif
+--=20
+2.21.0
 
-$ gtester -h
-[...]
-Utility Options:
-  -k, --keep-going              Continue running after tests failed
-  -l                            List paths of available test cases
-  -m {perf|slow|thorough|quick} Run test cases according to mode
-  -m {undefined|no-undefined}   Run test cases according to mode
-  -p=TESTPATH                   Only start test cases matching TESTPATH
-  -s=TESTPATH                   Skip test cases matching TESTPATH
-
-Using:
-
-$ make check-qtest-x86_64 GTESTER_OPTIONS="-p /x86_64/acpi"
-
-But this commit removed the use of $GTESTER_OPTIONS, however it is
-still documented:
-
-$ make check-help
-[...]
-The variable SPEED can be set to control the gtester speed setting.
-Default options are -k and (for make V=1) --verbose; they can be
-changed with variable GTESTER_OPTIONS.
-
-Is it possible to filter the tests to run with the TAP driver?
-
->  .PHONY: $(patsubst %, check-%, $(check-unit-y) $(check-speed-y))
->  $(patsubst %, check-%, $(check-unit-y) $(check-speed-y)): check-%: %
-> -	$(call quiet-command, \
-> -		MALLOC_PERTURB_=$${MALLOC_PERTURB_:-$$(( $${RANDOM:-0} % 255 + 1))} \
-> -		gtester $(GTESTER_OPTIONS) -m=$(SPEED) $*,"GTESTER","$*")
-> +	$(call do_test_human, $*)
->  
-> -# gtester tests with XML output
-> +# gtester tests with TAP output
->  
-> -$(patsubst %, check-report-qtest-%.xml, $(QTEST_TARGETS)): check-report-qtest-%.xml: $(check-qtest-y)
-> -	$(call quiet-command,QTEST_QEMU_BINARY=$*-softmmu/qemu-system-$* \
-> -		QTEST_QEMU_IMG=qemu-img$(EXESUF) \
-> -	  gtester -q $(GTESTER_OPTIONS) -o $@ -m=$(SPEED) $(check-qtest-$*-y) $(check-qtest-generic-y),"GTESTER","$@")
-> +$(patsubst %, check-report-qtest-%.tap, $(QTEST_TARGETS)): check-report-qtest-%.tap: $(check-qtest-y)
-> +	$(call do_test_tap, $(check-qtest-$*-y) $(check-qtest-generic-y), \
-> +	  QTEST_QEMU_BINARY=$*-softmmu/qemu-system-$* \
-> +	  QTEST_QEMU_IMG=qemu-img$(EXESUF))
->  
-> -check-report-unit.xml: $(check-unit-y)
-> -	$(call quiet-command,gtester -q $(GTESTER_OPTIONS) -o $@ -m=$(SPEED) $^,"GTESTER","$@")
-> +check-report-unit.tap: $(check-unit-y)
-> +	$(call do_test_tap,$^)
->  
->  # Reports and overall runs
->  
-> -check-report.xml: $(patsubst %,check-report-qtest-%.xml, $(QTEST_TARGETS)) check-report-unit.xml
-> -	$(call quiet-command,$(SRC_PATH)/scripts/gtester-cat $^ > $@,"GEN","$@")
-> -
-> -check-report.html: check-report.xml
-> -	$(call quiet-command,gtester-report $< > $@,"GEN","$@")
-> +check-report.tap: $(patsubst %,check-report-qtest-%.tap, $(QTEST_TARGETS)) check-report-unit.tap
-> +	$(call quiet-command,./scripts/tap-merge.py $^ > $@,"GEN","$@")
->  
->  # Per guest TCG tests
->  
-> diff --git a/tests/docker/dockerfiles/centos7.docker b/tests/docker/dockerfiles/centos7.docker
-> index 0a04bfbed8..e0f18f5a41 100644
-> --- a/tests/docker/dockerfiles/centos7.docker
-> +++ b/tests/docker/dockerfiles/centos7.docker
-> @@ -22,6 +22,7 @@ ENV PACKAGES \
->      mesa-libEGL-devel \
->      mesa-libgbm-devel \
->      nettle-devel \
-> +    perl-Test-Harness \
->      pixman-devel \
->      SDL-devel \
->      spice-glib-devel \
-> diff --git a/tests/docker/dockerfiles/debian-amd64.docker b/tests/docker/dockerfiles/debian-amd64.docker
-> index 24b113b76f..c66e341e5f 100644
-> --- a/tests/docker/dockerfiles/debian-amd64.docker
-> +++ b/tests/docker/dockerfiles/debian-amd64.docker
-> @@ -16,6 +16,7 @@ RUN DEBIAN_FRONTEND=noninteractive eatmydata \
->          liblzo2-dev \
->          librdmacm-dev \
->          libsnappy-dev \
-> +        libtest-harness-perl \
->          libvte-dev
->  
->  # virgl
-> diff --git a/tests/docker/dockerfiles/debian-ports.docker b/tests/docker/dockerfiles/debian-ports.docker
-> index e05a9a9802..514ab53b80 100644
-> --- a/tests/docker/dockerfiles/debian-ports.docker
-> +++ b/tests/docker/dockerfiles/debian-ports.docker
-> @@ -29,6 +29,7 @@ RUN DEBIAN_FRONTEND=noninteractive eatmydata \
->          flex \
->          gettext \
->          git \
-> +        libtest-harness-perl \
->          pkg-config \
->          psmisc \
->          python \
-> diff --git a/tests/docker/dockerfiles/debian-sid.docker b/tests/docker/dockerfiles/debian-sid.docker
-> index 9a3d168705..b30cbe7fc0 100644
-> --- a/tests/docker/dockerfiles/debian-sid.docker
-> +++ b/tests/docker/dockerfiles/debian-sid.docker
-> @@ -26,6 +26,7 @@ RUN DEBIAN_FRONTEND=noninteractive eatmydata \
->          ca-certificates \
->          flex \
->          git \
-> +        libtest-harness-perl \
->          pkg-config \
->          psmisc \
->          python \
-> diff --git a/tests/docker/dockerfiles/debian8.docker b/tests/docker/dockerfiles/debian8.docker
-> index 52945631cd..cdc3f11e06 100644
-> --- a/tests/docker/dockerfiles/debian8.docker
-> +++ b/tests/docker/dockerfiles/debian8.docker
-> @@ -29,6 +29,7 @@ RUN DEBIAN_FRONTEND=noninteractive eatmydata \
->          gettext \
->          git \
->          gnupg \
-> +        libtest-harness-perl \
->          pkg-config \
->          python-minimal
->  
-> diff --git a/tests/docker/dockerfiles/debian9.docker b/tests/docker/dockerfiles/debian9.docker
-> index 154ae2a455..9561d4f225 100644
-> --- a/tests/docker/dockerfiles/debian9.docker
-> +++ b/tests/docker/dockerfiles/debian9.docker
-> @@ -24,6 +24,7 @@ RUN DEBIAN_FRONTEND=noninteractive eatmydata \
->          flex \
->          gettext \
->          git \
-> +        libtest-harness-perl \
->          pkg-config \
->          psmisc \
->          python \
-> diff --git a/tests/docker/dockerfiles/fedora.docker b/tests/docker/dockerfiles/fedora.docker
-> index 0c4eb9e49c..1d0e3dc4ec 100644
-> --- a/tests/docker/dockerfiles/fedora.docker
-> +++ b/tests/docker/dockerfiles/fedora.docker
-> @@ -70,6 +70,7 @@ ENV PACKAGES \
->      nss-devel \
->      numactl-devel \
->      perl \
-> +    perl-Test-Harness \
->      pixman-devel \
->      python3 \
->      PyYAML \
-> diff --git a/tests/docker/dockerfiles/ubuntu.docker b/tests/docker/dockerfiles/ubuntu.docker
-> index 36e2b17de5..229add533c 100644
-> --- a/tests/docker/dockerfiles/ubuntu.docker
-> +++ b/tests/docker/dockerfiles/ubuntu.docker
-> @@ -45,6 +45,7 @@ ENV PACKAGES flex bison \
->      libspice-protocol-dev \
->      libspice-server-dev \
->      libssh2-1-dev \
-> +    libtest-harness-perl \
->      libusb-1.0-0-dev \
->      libusbredirhost-dev \
->      libvdeplug-dev \
-> 
 
