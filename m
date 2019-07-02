@@ -2,90 +2,81 @@ Return-Path: <SRS0=9yXi=U7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D49BC06510
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 09:25:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DC57C06510
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 09:26:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 36BD520659
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 09:25:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 36BD520659
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id CF72320659
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 09:26:24 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mxtyvy9h"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF72320659
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51002 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51004 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hiF2z-0003Nr-DO
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 05:25:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35584)
+	id 1hiF3Q-0003fx-03
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 05:26:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35737)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hiEzh-00022Q-2f
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 05:22:34 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hiF0h-0002a6-3r
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 05:23:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hiEzf-00075R-IK
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 05:22:32 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:52953)
+ (envelope-from <peter.maydell@linaro.org>) id 1hiF0f-0007eq-JN
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 05:23:34 -0400
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:41297)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hiEzf-000755-6s
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 05:22:31 -0400
-Received: by mail-wm1-f65.google.com with SMTP id s3so127630wms.2
- for <qemu-devel@nongnu.org>; Tue, 02 Jul 2019 02:22:31 -0700 (PDT)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hiF0d-0007Zs-O0
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 05:23:32 -0400
+Received: by mail-oi1-x244.google.com with SMTP id g7so12468969oia.8
+ for <qemu-devel@nongnu.org>; Tue, 02 Jul 2019 02:23:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=HJp8Y3IivklWEU/GlPUXnnihWF/59LLGbSOdRuk95RU=;
+ b=mxtyvy9hWNVCM5XEYgTpaC0Vy3f00l0OihddldLcVAghD2i5PAb6LcVGe0NUMLDgta
+ 93OdO7gsvg6s9P8OxYO7qEs7tAXCe8u4fX2xTDvwJdVPOBFWbIVxKkvx0Z6ZeA5SKH1k
+ X9N62eo/ZuF7jF2Vcei4mrFkem3AW/2ElkbXoA5V28ZuDaO3E8VrvtnoA6+LIUdiSPCg
+ NHXYvBD+tqUOdHY5Ll0immQuMX8r6h/f0S1E9b3SouPOuJ4NaN3W7VzjD+ibVx9i3Pau
+ PP9SdkGmbTUgcUtqwWtVQu3f4yXTlmZ0Iq1s3n+IoZnOf0QbE3hNlh3u1YtqO2QYN9p2
+ SFLg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=LgEfZmYclaGR85QoHeWz2opfzu6XiqtjIAUMM0rV+Nw=;
- b=hjY8q5W0fIaubAs8P4MJ0csHiRLba2sQ5lhxPqc/P9Ivhxkoznt4UQPJIwKve8/tgv
- iq/rVC0gzZyySgI5b5ZIGboG64b7iZ9V50+XnWFSV5/gtFVf2CdMinXDtqlgkJXClyrS
- 0c0aCA8CCFk2Tod0VIml9EanBcUhVJ7fnUJnaKgbZorl0iTinBx/I20c2Gt1W+4EPahg
- kBFPmOWv3+SQMWJpeUdHNPZcgxA2j+qp/qN7T1D7p3PuBtKqHYB8O6c2mFWK1QI/cTUu
- xydw9V+d/7yakBfA4hSJDFOCDS4iV/e1mrqPtO7Y5Y66kwS6o1JD1GYue6mcHXDzHRZA
- A3Aw==
-X-Gm-Message-State: APjAAAU74P628zWzvE1b2F+n88BI1mXJRXutQ4xB5odHxu3vbIFvFsut
- duf+a++/zX5XCkENdeaWArBc3Q==
-X-Google-Smtp-Source: APXvYqx/09vn2SkXSQQ1gM8MdW1rNbxaHoW8jZmCsUKMF8tp1Lm+rUKepANRvfR9DeuB2YWHSvUtKA==
-X-Received: by 2002:a7b:cae9:: with SMTP id t9mr2728054wml.126.1562059350097; 
- Tue, 02 Jul 2019 02:22:30 -0700 (PDT)
-Received: from [192.168.1.38] (56.red-88-18-140.staticip.rima-tde.net.
- [88.18.140.56])
- by smtp.gmail.com with ESMTPSA id r5sm26067970wrg.10.2019.07.02.02.22.29
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Tue, 02 Jul 2019 02:22:29 -0700 (PDT)
-To: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
- David Gibson <david@gibson.dropbear.id.au>, lvivier@redhat.com
-References: <20190310082703.1245-1-david@gibson.dropbear.id.au>
- <20190310082703.1245-58-david@gibson.dropbear.id.au>
- <20190312150115.6zuaid43gr7hklt5@unused>
- <58de43c6-31d5-a0a3-b443-54a33f11d75a@kaod.org>
- <20190312191409.vxnpscrephtk6otv@dhcp-17-165.bos.redhat.com>
- <1746025955.7399905.1552419034356.JavaMail.zimbra@redhat.com>
- <154364d7-fe5b-4f40-b976-b85ff9060ee0@kaod.org>
- <dc6578eb-569b-477e-9a74-2925de8ac204@redhat.com>
- <20190701050426.GI2138@umbus.fritz.box>
- <28cf8405-b049-6874-2cf3-e5f45615714c@redhat.com>
- <20190702001422.GF6779@umbus.fritz.box>
- <be89dd63-d9ac-0f9c-cbb4-85edc9a65975@kaod.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <e1278979-4bba-1788-6d60-b7b6ee251f30@redhat.com>
-Date: Tue, 2 Jul 2019 11:22:28 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=HJp8Y3IivklWEU/GlPUXnnihWF/59LLGbSOdRuk95RU=;
+ b=VQrY/DAYR7z4c3Pan2KgO1boQxiKWEdx6YajhCjero+eYU3AxfNZFirV0BPhk3DGen
+ 9Fpve8kDJxbGQ4K14EI8dVMfQK3dfYW+BAnfTzceA1J2h6tNFNinnrjsGNmqJc8MeRHc
+ CkZyz2K07hoBa2Ovw734qKH6HsW3zMRL/0FSvJWSgTKqmRWtPVgLz/FS/dPYecHqq6JO
+ A7SRnK+V4yA2ePPooDdyRTt5CurX8QWWSnoDtPCKfH58AiFhsz10QPdG+7IL7tqq47z8
+ 0vzPOz2woPOPq4q8T11c5y/NRY7Yg7aLSJ4UxK0nPklGyLryfqOHIy3gTMl1eiIt+L2y
+ uOiA==
+X-Gm-Message-State: APjAAAVs4yOvh+uNX39VncTFPpt9AoFqiVeuzE0kxH48ja5E89yu64RJ
+ 2KzTTJRLXWyk5tdjHsrzekhYE2nk41Xs43Y6ISnKCw==
+X-Google-Smtp-Source: APXvYqyTM0fBOGp/708ohExZKyWab+1S+q3+ssOYp+kRD7V9nLB+b/74b3YRAYIZMSbhw9mIpbcv540IPa/K3Y+PW7Y=
+X-Received: by 2002:aca:ac48:: with SMTP id v69mr2304932oie.48.1562059397642; 
+ Tue, 02 Jul 2019 02:23:17 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <be89dd63-d9ac-0f9c-cbb4-85edc9a65975@kaod.org>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.128.65
-Subject: Re: [Qemu-devel] [PULL 57/60] target/ppc: add HV support for POWER9
+References: <20190702001301.4768-1-philmd@redhat.com>
+ <20190702001301.4768-6-philmd@redhat.com>
+ <5163b3e4-f68e-dc6b-3fcc-e7927ebc58e7@redhat.com>
+In-Reply-To: <5163b3e4-f68e-dc6b-3fcc-e7927ebc58e7@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 2 Jul 2019 10:23:06 +0100
+Message-ID: <CAFEAcA_n3BpZuBPFS8y90XaOwzAo-tuKpO24_apz+9yzpxUxHQ@mail.gmail.com>
+To: John Snow <jsnow@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::244
+Subject: Re: [Qemu-devel] [PATCH v2 5/9] hw/block/pflash_cfi01: Add the
+ DeviceReset() handler
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,129 +88,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter maydell <peter.maydell@linaro.org>, groug@kaod.org,
- qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Cleber Rosa <crosa@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Max Filippov <jcmvbkbc@gmail.com>,
+ Gerd Hoffmann <kraxel@redhat.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Qemu-block <qemu-block@nongnu.org>, Aleksandar Rikalo <arikalo@wavecomp.com>,
+ Markus Armbruster <armbru@redhat.com>, Laszlo Ersek <lersek@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-arm <qemu-arm@nongnu.org>,
+ Alistair Francis <alistair23@gmail.com>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ Richard Henderson <rth@twiddle.net>, Kevin Wolf <kwolf@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, Michael Walle <michael@walle.cc>,
+ qemu-ppc <qemu-ppc@nongnu.org>, Wei Yang <richardw.yang@linux.intel.com>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/2/19 8:13 AM, Cédric Le Goater wrote:
-> On 02/07/2019 02:14, David Gibson wrote:
->> On Mon, Jul 01, 2019 at 11:45:23AM +0200, Philippe Mathieu-Daudé wrote:
->>> On 7/1/19 7:04 AM, David Gibson wrote:
->>>> On Fri, Jun 28, 2019 at 03:20:32PM +0200, Philippe Mathieu-Daudé wrote:
->>>>> Hi,
->>>>>
->>>>> On 3/12/19 8:58 PM, Cédric Le Goater wrote:
->>>>>> On 3/12/19 8:30 PM, Cleber Rosa wrote:
->>>>>>>> From: "Cleber Rosa" <crosa@redhat.com>
->>>>>>>> Sent: Tuesday, March 12, 2019 3:14:09 PM
->>>>>>>> Subject: Re: [Qemu-devel] [PULL 57/60] target/ppc: add HV support for POWER9
->>>>>>>>
->>>>>>>> On Tue, Mar 12, 2019 at 07:34:04PM +0100, Cédric Le Goater wrote:
->>>>>>>>> On 3/12/19 4:01 PM, Cleber Rosa wrote:
->>>>>>>>>> On Sun, Mar 10, 2019 at 07:27:00PM +1100, David Gibson wrote:
->>>>>>>>>>> From: Cédric Le Goater <clg@kaod.org>
->>>>>>>>>>>
->>>>>>>>>>> We now have enough support to boot a PowerNV machine with a POWER9
->>>>>>>>>>> processor. Allow HV mode on POWER9.
->>>>>>>>>>>
->>>>>>>>>>> Signed-off-by: Cédric Le Goater <clg@kaod.org>
->>>>>>>>>>> Message-Id: <20190307223548.20516-16-clg@kaod.org>
->>>>>>>>>>> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
->>>>>>>>>>> ---
->>>>>>>>>>>  target/ppc/translate_init.inc.c | 3 ++-
->>>>>>>>>>>  1 file changed, 2 insertions(+), 1 deletion(-)
->>>>>>>>>>>
->>>>>>>>>>> diff --git a/target/ppc/translate_init.inc.c
->>>>>>>>>>> b/target/ppc/translate_init.inc.c
->>>>>>>>>>> index af70a3b78c..0bd555eb19 100644
->>>>>>>>>>> --- a/target/ppc/translate_init.inc.c
->>>>>>>>>>> +++ b/target/ppc/translate_init.inc.c
->>>>>>>>>>> @@ -8895,7 +8895,7 @@ POWERPC_FAMILY(POWER9)(ObjectClass *oc, void
->>>>>>>>>>> *data)
->>>>>>>>>>>                         PPC_CACHE | PPC_CACHE_ICBI | PPC_CACHE_DCBZ |
->>>>>>>>>>>                         PPC_MEM_SYNC | PPC_MEM_EIEIO |
->>>>>>>>>>>                         PPC_MEM_TLBSYNC |
->>>>>>>>>>> -                       PPC_64B | PPC_64BX | PPC_ALTIVEC |
->>>>>>>>>>> +                       PPC_64B | PPC_64H | PPC_64BX | PPC_ALTIVEC |
->>>>>>>>>>>                         PPC_SEGMENT_64B | PPC_SLBI |
->>>>>>>>>>>                         PPC_POPCNTB | PPC_POPCNTWD |
->>>>>>>>>>>                         PPC_CILDST;
->>>>>>>>>>> @@ -8907,6 +8907,7 @@ POWERPC_FAMILY(POWER9)(ObjectClass *oc, void
->>>>>>>>>>> *data)
->>>>>>>>>>>                          PPC2_ISA205 | PPC2_ISA207S | PPC2_FP_CVT_S64 |
->>>>>>>>>>>                          PPC2_TM | PPC2_ISA300 | PPC2_PRCNTL;
->>>>>>>>>>>      pcc->msr_mask = (1ull << MSR_SF) |
->>>>>>>>>>> +                    (1ull << MSR_SHV) |
->>>>>>>>>>>                      (1ull << MSR_TM) |
->>>>>>>>>>>                      (1ull << MSR_VR) |
->>>>>>>>>>>                      (1ull << MSR_VSX) |
->>>>>>>>>>>
->>>>>>>>>>>
->>>>>>>>>>
->>>>>>>>>> This change prevents a Fedora 29 kernel[1] from booting... is this
->>>>>>>>>> intended or a known limitation of the Fedora 29 kernel?
->>>>>>>>>
->>>>>>>>> The default CPU is still power8_v2.0. This is curious.
->>>>>>>>>
->>>>>>>>
->>>>>>>> Are you sure?  I'm getting:
->>>>>>>>
->>>>>>>>  $ git rev-parse HEAD
->>>>>>>>  cfc3fef6b4e493bf1a7ee16790ad584e20dfbbd1
->>>>>>>>  $ ./ppc64-softmmu/qemu-system-ppc64 -qmp unix:/tmp/qmp-sock,server
->>>>>>>>  $ ./scripts/qmp/qom-get -s /tmp/qmp-sock /machine/unattached/device[0].type
->>>>>>>>  power9_v2.0-spapr-cpu-core
->>>>>>
->>>>>> That's a pseries machine, not a powernv machine. pseries should use P9
->>>>>> processor by default but the patch above should not impact f29 on pseries. 
->>>>>> If it does, then we have a bug. 
->>>>>>  
->>>>>>> Looks like the overall default is "power9_v2.0", and then on pseries-3.1 and
->>>>>>> lower, it's "power8_v2.0", as per 34a6b015a98.
->>>>>>
->>>>>> I was looking at pnv_machine_class_init() which sets the default CPU :
->>>>>>
->>>>>>     mc->default_cpu_type = POWERPC_CPU_TYPE_NAME("power8_v2.0");
->>>>>
->>>>> I found this thread while trying auto-bisection for LP#1834613:
->>>>> https://bugs.launchpad.net/bugs/1834613
->>>>>
->>>>> When trying the options suggested by Laurent here:
->>>>> https://lists.gnu.org/archive/html/qemu-devel/2019-06/msg06209.html
->>>>>
->>>>> this one hangs:
->>>>>
->>>>> $ qemu-system-ppc64 \
->>>>>  -kernel vmlinuz-vanilla \
->>>>>  -nographic -append "console=hvc0" \
->>>>>  -M cap-cfpc=broken,cap-sbbc=broken,cap-ibs=broken
->>>>>
->>>>> but this one works:
->>>>>
->>>>> $ qemu-system-ppc64 \
->>>>>  -kernel vmlinuz-vanilla \
->>>>>  -nographic -append "console=hvc0" \
->>>>>  -M pseries-3.1
->>>>
->>>> Sorry, I missed most of this thread while on holidays.  What's the
->>>> actual bug here?
->>>
->>> I don't think there is a bug, this seems the result of adding a new feature.
->>> The commit message is not obvious that old kernels won't work on the
->>> default machine type, and we have to add the extra '-M pseries-3.1'
->>> command line option to run such images.
->>
->> Hm, except apparently turning off the Spectre options doesn't change
->> that, so I wonder what change in the newer machine type is causing the
->> breakage.
+On Tue, 2 Jul 2019 at 04:16, John Snow <jsnow@redhat.com> wrote:
+> Does reset always get called as part of realize, really?
+>
+> Or are we just trusting that the device is probably going to get reset
+> by the guest during bringup?
 
-Can this be an effect of the u-boot update?
+Reset is not called "as part of realize", but it is guaranteed
+to be called after realize and before we try to run the guest,
+as long as the device is in the qbus tree. Things are in the
+qbus tree if either:
+ * they're plugged into something already in the tree (eg
+   pci devices, scsi disks)
+ * they're a sysbus device (which is automatically plugged into
+   the 'main system bus' which is effectively the root of the
+   qbus tree)
 
-> 
-> I don't see such an issue on David's ppc-for-4.1 branch.
-> 
-> C.
-> 
+In this case TYPE_PFLASH_CFI01 is a subclass of TYPE_SYS_BUS_DEVICE,
+so it will always be reset as part of system reset.
+
+(the main things which don't get automatically reset are direct
+subclasses of TYPE_DEVICE, notably CPU objects.)
+
+thanks
+-- PMM
 
