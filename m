@@ -4,81 +4,82 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EA1CC06510
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 15:13:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE3D5C06511
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 15:19:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2DD182146F
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 15:13:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A0A542146F
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 15:19:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b9ldxjFV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2DD182146F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cyHnVafp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A0A542146F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54376 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54412 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hiKTV-00041f-FT
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 11:13:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57083)
+	id 1hiKYq-0008Ol-ME
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 11:19:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58030)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <paolo.bonzini@gmail.com>) id 1hiKIS-0001ms-2i
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 11:02:17 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1hiKLz-0004wB-Bs
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 11:06:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1hiKIP-0004sx-Tj
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 11:02:15 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:36775)
+ (envelope-from <richard.henderson@linaro.org>) id 1hiKLr-0007Xp-MQ
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 11:05:53 -0400
+Received: from mail-wr1-x42c.google.com ([2a00:1450:4864:20::42c]:42664)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1hiKIC-0004Tk-9l
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 11:02:02 -0400
-Received: by mail-wr1-x443.google.com with SMTP id n4so18251414wrs.3
- for <qemu-devel@nongnu.org>; Tue, 02 Jul 2019 08:01:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=wOuMJApxDA9WcfQrsT3Xap/eF0wAVuDrPdCETgZJjl4=;
- b=b9ldxjFVGG30XlPUvOdbU5qIq8qSmhD111Vb2ye2gBF9uaJOAaPx9Gm3/G7GryaBNY
- 2NYJt24C2gvuLIZcc68QBqVpKqC8HLgsoOqFeB5N/JeXSexUfWM99b9D7h37n42Z/AOe
- qwiZ22byvibvHkL3bAc4E93mPfXAQuxSWNBaKfAhyab760P5jst9TqsndY9Q4Q4spsF9
- +9HUvGuZ3xKolSI4XlkWldC5XCWid8y2YaqlrFo5NdmG6ZTSruE04ZL5c6mc+8lV8utG
- 5kkFQqiaSv8L5/FUxH75gX7uC90bhobsgOH+H9u4nEDYjLyNvV8ooyhJtXhM1W+x/795
- V48g==
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1hiKLr-0007X3-Dm
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 11:05:47 -0400
+Received: by mail-wr1-x42c.google.com with SMTP id x17so18224556wrl.9
+ for <qemu-devel@nongnu.org>; Tue, 02 Jul 2019 08:05:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=PqJ1ISuGV2u+IdiY8ngyBhS17daHeZo+xRM6Jaz465M=;
+ b=cyHnVafp2KqZO+wsTt4EM2ocniQhrz86PrE+Mkf2vqPDmU3Ns3yPx+HxBt74+G5RNA
+ EOfIVsuvHlkmtooFPe1+7ejYstyqgLQOaYCnzUFcWX9uAcBMqiaTMqzNn6rEmi1UeJ2p
+ b7yhN1zwL0NjnZ1bzleqPVhVtoKKbXZF7PtEFcyJm0Gn88b2Zu/htSshirB2+6Z8ac7J
+ QWjn3aS0exNZS5DRYJz7ZFkBbM2ZDlugU9cjlu6jb9qzyYf7Fo3VSF2BPA42O+J99jR8
+ HdLtlSQkoTTAqbns9uWBXkXAFnpaywvVxLOM/NrhkQ1vIUauQ2het9mokNoA15pezIjb
+ xhrQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references;
- bh=wOuMJApxDA9WcfQrsT3Xap/eF0wAVuDrPdCETgZJjl4=;
- b=QlSbBdYPH6a1jf9kYy1F4sVk3IDW55Y09+917BzDQo2JPfrGHyb4BRyoyqyZvC9WYL
- uvkC8vfd8FzQK8/AWRIHkrvLPxWUeSg3GeIZTH++HtrF48f81v+9yXWnd+JXP/gcm8zr
- L9K4XxPjIzoRIqgG4cxrPdFx19NeZSIRIbM9wdsB8ACraUCsuWEOb5b0lIDnOZjboXUL
- TlScR5w5EtL6rsrKHuIm7W9J+i0d7EQ5C3o19e8ZUmDUlxg0hHmbr1STG27uXi3OxMym
- flGoEH/7nG2wJ0Bxj+57YxfOT6nHxS2PEhAMsb5ybZktb923MJaP9NMG89R1Zp370m02
- IgMQ==
-X-Gm-Message-State: APjAAAWXPeH7ZHfv4rS3pFti1F1jAi19L0G0vujvK8s96fYHaD8xgUIN
- HrZtHk7vquqRwIFfTZ724uOZ3tjl/KY=
-X-Google-Smtp-Source: APXvYqwCFDtv9wDTFLZGuX40Xnum0JzAHGBBzldyyo6z/sgbFYslZm8WIajiwjaPEjCXtiOx7IfBcw==
-X-Received: by 2002:a5d:4949:: with SMTP id r9mr23124832wrs.289.1562079692906; 
- Tue, 02 Jul 2019 08:01:32 -0700 (PDT)
-Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id m24sm3006262wmi.39.2019.07.02.08.01.31
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 02 Jul 2019 08:01:31 -0700 (PDT)
-From: Paolo Bonzini <pbonzini@redhat.com>
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references;
+ bh=PqJ1ISuGV2u+IdiY8ngyBhS17daHeZo+xRM6Jaz465M=;
+ b=YD7pOtz8xxgxt7zBsuR1EdiZ82WFMUcCh5N9XV2HF0G0Ciiiezv+JWygtabPBrKEDt
+ dH+qTk1Sbk1IjlFnX6EKoft7+ZEbfwDNjSc6bj/pzT304gMri2vQztta4SA7mAxT/2p5
+ iyN3JzLvo6aNag4Xc2o4L/7FEzdE7JCYYFiVNXnRvt7UeRCu3zGsPo2Ufk2TWQKtJDZz
+ K8fB6sVb1Ok7d29C6zBmWHCDiAgQUigFi/uloMp5HGHrTSbwBhrp8o+oUvVCqMWsNsDA
+ nnvEeEihOL7o5YQDCu8XnCwQPOquZM7NVHLq87EH3Z6JgZuM+PJFajQS6yNQzfwPdbwn
+ eW8A==
+X-Gm-Message-State: APjAAAUywUaQvl02iLHCe9XHS7SSVOWe25tmY0x1Y3af6pwUNery1y1L
+ ZqIZcdtQ9m/4UiSLfl5WTeoCKrUW3p5tkQ==
+X-Google-Smtp-Source: APXvYqx8+K6f3z1BdtukNzJJDbJKCeuEkZ4A8IWl5lPPWAI6R5CsfadO51ZHzmtuM1/+EteYzsWxiA==
+X-Received: by 2002:adf:e50c:: with SMTP id j12mr25556851wrm.117.1562079945518; 
+ Tue, 02 Jul 2019 08:05:45 -0700 (PDT)
+Received: from localhost.localdomain (93-34-153-63.ip50.fastwebnet.it.
+ [93.34.153.63])
+ by smtp.gmail.com with ESMTPSA id w10sm12975657wru.76.2019.07.02.08.05.44
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Tue, 02 Jul 2019 08:05:44 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Tue,  2 Jul 2019 17:01:21 +0200
-Message-Id: <1562079681-19204-8-git-send-email-pbonzini@redhat.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1562079681-19204-1-git-send-email-pbonzini@redhat.com>
-References: <1562079681-19204-1-git-send-email-pbonzini@redhat.com>
+Date: Tue,  2 Jul 2019 17:05:40 +0200
+Message-Id: <20190702150542.12008-2-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190702150542.12008-1-richard.henderson@linaro.org>
+References: <20190702150542.12008-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::443
-Subject: [Qemu-devel] [PATCH 7/7] target/i386: work around KVM_GET_MSRS bug
- for secondary execution controls
+X-Received-From: 2a00:1450:4864:20::42c
+Subject: [Qemu-devel] [PULL 1/3] tcg: Fix mmap lock assert on translation
+ failure
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,52 +91,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Liran Alon <liran.alon@oracle.com>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Some secondary controls are automatically enabled/disabled based on the CPUID
-values that are set for the guest.  However, they are still available at a
-global level and therefore should be present when KVM_GET_MSRS is sent to
-/dev/kvm.
+Check page flags before letting an invalid pc cause a SIGSEGV.
 
-Unfortunately KVM forgot to include those, so fix that.
+Prepare for eventially validating PROT_EXEC.  The current wrinkle being
+that we have a problem with our implementation of signals.  We should
+be using a vdso like the kernel, but we instead put the trampoline on
+the stack.  In the meantime, let PROT_READ match PROT_EXEC.
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Fixes: https://bugs.launchpad.net/qemu/+bug/1832353
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/i386/kvm.c | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+ include/exec/cpu-all.h                    |  1 +
+ include/exec/cpu_ldst_useronly_template.h |  8 +++++--
+ accel/tcg/translate-all.c                 | 29 +++++++++++++++++++++++
+ 3 files changed, 36 insertions(+), 2 deletions(-)
 
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index e35489c..84b42a5 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -469,6 +469,23 @@ uint64_t kvm_arch_get_supported_msr_feature(KVMState *s, uint32_t index)
-     value = msr_data.entries[0].data;
-     switch (index) {
-     case MSR_IA32_VMX_PROCBASED_CTLS2:
-+        /* KVM forgot to add these bits for some time, do this ourselves.  */
-+        if (kvm_arch_get_supported_cpuid(s, 0xD, 1, R_ECX) & CPUID_XSAVE_XSAVES) {
-+            value |= (uint64_t)VMX_SECONDARY_EXEC_XSAVES << 32;
+diff --git a/include/exec/cpu-all.h b/include/exec/cpu-all.h
+index 536ea58f81..58b8915617 100644
+--- a/include/exec/cpu-all.h
++++ b/include/exec/cpu-all.h
+@@ -259,6 +259,7 @@ int walk_memory_regions(void *, walk_memory_regions_fn);
+ int page_get_flags(target_ulong address);
+ void page_set_flags(target_ulong start, target_ulong end, int flags);
+ int page_check_range(target_ulong start, target_ulong len, int flags);
++void validate_exec_access(CPUArchState *env, target_ulong s, target_ulong l);
+ #endif
+ 
+ CPUArchState *cpu_copy(CPUArchState *env);
+diff --git a/include/exec/cpu_ldst_useronly_template.h b/include/exec/cpu_ldst_useronly_template.h
+index bc45e2b8d4..f095415149 100644
+--- a/include/exec/cpu_ldst_useronly_template.h
++++ b/include/exec/cpu_ldst_useronly_template.h
+@@ -64,7 +64,9 @@
+ static inline RES_TYPE
+ glue(glue(cpu_ld, USUFFIX), MEMSUFFIX)(CPUArchState *env, abi_ptr ptr)
+ {
+-#if !defined(CODE_ACCESS)
++#ifdef CODE_ACCESS
++    validate_exec_access(env, ptr, DATA_SIZE);
++#else
+     trace_guest_mem_before_exec(
+         env_cpu(env), ptr,
+         trace_mem_build_info(SHIFT, false, MO_TE, false));
+@@ -88,7 +90,9 @@ glue(glue(glue(cpu_ld, USUFFIX), MEMSUFFIX), _ra)(CPUArchState *env,
+ static inline int
+ glue(glue(cpu_lds, SUFFIX), MEMSUFFIX)(CPUArchState *env, abi_ptr ptr)
+ {
+-#if !defined(CODE_ACCESS)
++#ifdef CODE_ACCESS
++    validate_exec_access(env, ptr, DATA_SIZE);
++#else
+     trace_guest_mem_before_exec(
+         env_cpu(env), ptr,
+         trace_mem_build_info(SHIFT, true, MO_TE, false));
+diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
+index 5d1e08b169..1d4a8a260f 100644
+--- a/accel/tcg/translate-all.c
++++ b/accel/tcg/translate-all.c
+@@ -2600,10 +2600,39 @@ int page_check_range(target_ulong start, target_ulong len, int flags)
+                 }
+             }
+         }
++        /*
++         * FIXME: We place the signal trampoline on the stack,
++         * even when the guest expects that to be in the vdso.
++         * Until we fix that, allow execute on any readable page.
++         */
++        if ((flags & PAGE_EXEC) && !(p->flags & (PAGE_EXEC | PAGE_READ))) {
++            return -1;
 +        }
-+        if (kvm_arch_get_supported_cpuid(s, 1, 0, R_ECX) & CPUID_EXT_RDRAND) {
-+            value |= (uint64_t)VMX_SECONDARY_EXEC_RDRAND_EXITING << 32;
-+        }
-+        if (kvm_arch_get_supported_cpuid(s, 7, 0, R_EBX) & CPUID_7_0_EBX_INVPCID) {
-+            value |= (uint64_t)VMX_SECONDARY_EXEC_ENABLE_INVPCID << 32;
-+        }
-+        if (kvm_arch_get_supported_cpuid(s, 7, 0, R_EBX) & CPUID_7_0_EBX_RDSEED) {
-+            value |= (uint64_t)VMX_SECONDARY_EXEC_RDSEED_EXITING << 32;
-+        }
-+        if (kvm_arch_get_supported_cpuid(s, 0x80000001, 0, R_EDX) & CPUID_EXT2_RDTSCP) {
-+            value |= (uint64_t)VMX_SECONDARY_EXEC_RDTSCP << 32;
-+        }
-+        /* fall through */
-     case MSR_IA32_VMX_TRUE_PINBASED_CTLS:
-     case MSR_IA32_VMX_TRUE_PROCBASED_CTLS:
-     case MSR_IA32_VMX_TRUE_ENTRY_CTLS:
+     }
+     return 0;
+ }
+ 
++/*
++ * Called for each code read, longjmp out to issue SIGSEGV if the page(s)
++ * do not have execute access.
++ */
++void validate_exec_access(CPUArchState *env,
++                          target_ulong ptr, target_ulong len)
++{
++    if (page_check_range(ptr, len, PAGE_EXEC) < 0) {
++        CPUState *cs = env_cpu(env);
++        CPUClass *cc = CPU_GET_CLASS(cs);
++
++        /* Like tb_gen_code, release the memory lock before cpu_loop_exit.  */
++        assert_memory_lock();
++        mmap_unlock();
++
++        /* This is user-only.  The target must raise an exception.  */
++        cc->tlb_fill(cs, ptr, 0, MMU_INST_FETCH, MMU_USER_IDX, false, 0);
++        g_assert_not_reached();
++    }
++}
++
+ /* called from signal handler: invalidate the code and unprotect the
+  * page. Return 0 if the fault was not handled, 1 if it was handled,
+  * and 2 if it was handled but the caller must cause the TB to be
 -- 
-1.8.3.1
+2.17.1
 
 
