@@ -7,60 +7,60 @@ X-Spam-Status: No, score=-5.5 required=3.0 tests=FROM_EXCESS_BASE64,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78129C06510
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 09:41:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59014C06510
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 09:42:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 544AA21721
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 09:41:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 544AA21721
+	by mail.kernel.org (Postfix) with ESMTPS id 3067121721
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 09:42:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3067121721
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51102 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51118 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hiFHn-0004jp-MT
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 05:41:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38365)
+	id 1hiFIh-00061V-FL
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 05:42:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38540)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <berrange@redhat.com>) id 1hiFGk-0004DG-VP
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 05:40:13 -0400
+ (envelope-from <berrange@redhat.com>) id 1hiFHo-00054E-0y
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 05:41:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1hiFGj-0005Ql-Ar
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 05:40:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33728)
+ (envelope-from <berrange@redhat.com>) id 1hiFHn-0005ig-2J
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 05:41:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60356)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hiFGj-0005QN-4J
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 05:40:09 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hiFHm-0005iO-SN
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 05:41:14 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 09B4D356CD
- for <qemu-devel@nongnu.org>; Tue,  2 Jul 2019 09:40:08 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 8BADF30C319C
+ for <qemu-devel@nongnu.org>; Tue,  2 Jul 2019 09:41:13 +0000 (UTC)
 Received: from redhat.com (ovpn-112-16.ams2.redhat.com [10.36.112.16])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 68A404251;
- Tue,  2 Jul 2019 09:40:04 +0000 (UTC)
-Date: Tue, 2 Jul 2019 10:40:00 +0100
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 67BBE1001B14;
+ Tue,  2 Jul 2019 09:41:11 +0000 (UTC)
+Date: Tue, 2 Jul 2019 10:41:08 +0100
 From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 To: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20190702094000.GL21569@redhat.com>
+Message-ID: <20190702094108.GM21569@redhat.com>
 References: <20190628002844.24894-1-ehabkost@redhat.com>
- <20190628002844.24894-6-ehabkost@redhat.com>
+ <20190628002844.24894-7-ehabkost@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20190628002844.24894-6-ehabkost@redhat.com>
+In-Reply-To: <20190628002844.24894-7-ehabkost@redhat.com>
 User-Agent: Mutt/1.12.0 (2019-05-25)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.30]); Tue, 02 Jul 2019 09:40:08 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.40]); Tue, 02 Jul 2019 09:41:13 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 5/9] i386: Define -IBRS, -noTSX,
- -IBRS versions of CPU models
+Subject: Re: [Qemu-devel] [PATCH v2 6/9] i386: Replace -noTSX, -IBRS,
+ -IBPB CPU models with aliases
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -79,22 +79,18 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jun 27, 2019 at 09:28:40PM -0300, Eduardo Habkost wrote:
-> Add versions of CPU models that are equivalent to their -IBRS,
-> -noTSX and -IBRS variants.
->=20
-> The separate variants will eventually be removed and become
-> aliases for these CPU versions.
+On Thu, Jun 27, 2019 at 09:28:41PM -0300, Eduardo Habkost wrote:
+> The old CPU models will be just aliases for specific versions of
+> the original CPU models.
 >=20
 > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 > ---
 > (New patch, added to series in v2)
 > ---
->  target/i386/cpu.c | 186 ++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 186 insertions(+)
+>  target/i386/cpu.c | 601 ++--------------------------------------------
+>  1 file changed, 21 insertions(+), 580 deletions(-)
 
 Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-
 
 
 Regards,
