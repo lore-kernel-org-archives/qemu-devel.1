@@ -3,60 +3,63 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C196C06510
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 17:01:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4ADFDC06510
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 17:04:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1547120B1F
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 17:01:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1547120B1F
+	by mail.kernel.org (Postfix) with ESMTPS id 219F420B1F
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 17:04:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 219F420B1F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55348 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55362 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hiM9b-0004I5-B4
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 13:01:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37924)
+	id 1hiMD8-0005AL-Cd
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 13:04:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38156)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <ehabkost@redhat.com>) id 1hiKq4-00007a-0v
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 11:37:01 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1hiKqa-0000xe-Rv
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 11:37:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1hiKq2-0006e1-Ig
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 11:36:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44094)
+ (envelope-from <ehabkost@redhat.com>) id 1hiKqY-00072v-LJ
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 11:37:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41604)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hiKq2-0006dJ-Aa
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 11:36:58 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hiKqY-00070r-EU
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 11:37:30 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 8E4437F7B5;
- Tue,  2 Jul 2019 15:36:49 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id BF99546202;
+ Tue,  2 Jul 2019 15:37:28 +0000 (UTC)
 Received: from localhost (ovpn-116-30.gru2.redhat.com [10.97.116.30])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1B5B22C8F0;
- Tue,  2 Jul 2019 15:36:48 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4D3426F94E;
+ Tue,  2 Jul 2019 15:37:28 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>,
  Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
  Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
  Richard Henderson <rth@twiddle.net>
-Date: Tue,  2 Jul 2019 12:35:22 -0300
-Message-Id: <20190702153535.9851-30-ehabkost@redhat.com>
+Date: Tue,  2 Jul 2019 12:35:32 -0300
+Message-Id: <20190702153535.9851-40-ehabkost@redhat.com>
 In-Reply-To: <20190702153535.9851-1-ehabkost@redhat.com>
 References: <20190702153535.9851-1-ehabkost@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.28]); Tue, 02 Jul 2019 15:36:49 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.29]); Tue, 02 Jul 2019 15:37:28 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL v3 29/42] vl.c: Add -smp,
- dies=* command line support and update doc
+Subject: [Qemu-devel] [PULL v3 39/42] docs: Deprecate CPU model runnability
+ guarantees
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,165 +71,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Like Xu <like.xu@linux.intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Like Xu <like.xu@linux.intel.com>
+Document that CPU model runnability guarantees won't apply to
+unversioned CPU models anymore.
 
-For PC target, users could configure the number of dies per one package
-via command line with this patch, such as "-smp dies=2,cores=4".
-
-The parsing rules of new cpu-topology model obey the same restrictions/logic
-as the legacy socket/core/thread model especially on missing values computing.
-
-Signed-off-by: Like Xu <like.xu@linux.intel.com>
-Message-Id: <20190620054525.37188-4-like.xu@linux.intel.com>
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+Message-Id: <20190628002844.24894-9-ehabkost@redhat.com>
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- hw/i386/pc.c    | 30 +++++++++++++++++-------------
- vl.c            |  3 +++
- qemu-options.hx | 17 +++++++++--------
- 3 files changed, 29 insertions(+), 21 deletions(-)
+ qemu-deprecated.texi | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
 
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index b9c25bed35..3f0f221a5b 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -1545,9 +1545,12 @@ static void pc_new_cpu(PCMachineState *pcms, int64_t apic_id, Error **errp)
-  */
- void pc_smp_parse(MachineState *ms, QemuOpts *opts)
- {
-+    PCMachineState *pcms = PC_MACHINE(ms);
+diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
+index 9cba82d5ec..18f85f70e1 100644
+--- a/qemu-deprecated.texi
++++ b/qemu-deprecated.texi
+@@ -276,3 +276,22 @@ Note that if you are exposing the export via /dev/nb=
+d0, it is easier
+ to just export the entire image and then mount only /dev/nbd0p1 than
+ it is to reinvoke @command{qemu-nbd -c /dev/nbd0} limited to just a
+ subset of the image.
 +
-     if (opts) {
-         unsigned cpus    = qemu_opt_get_number(opts, "cpus", 0);
-         unsigned sockets = qemu_opt_get_number(opts, "sockets", 0);
-+        unsigned dies = qemu_opt_get_number(opts, "dies", 1);
-         unsigned cores   = qemu_opt_get_number(opts, "cores", 0);
-         unsigned threads = qemu_opt_get_number(opts, "threads", 0);
- 
-@@ -1557,24 +1560,24 @@ void pc_smp_parse(MachineState *ms, QemuOpts *opts)
-             threads = threads > 0 ? threads : 1;
-             if (cpus == 0) {
-                 sockets = sockets > 0 ? sockets : 1;
--                cpus = cores * threads * sockets;
-+                cpus = cores * threads * dies * sockets;
-             } else {
-                 ms->smp.max_cpus =
-                         qemu_opt_get_number(opts, "maxcpus", cpus);
--                sockets = ms->smp.max_cpus / (cores * threads);
-+                sockets = ms->smp.max_cpus / (cores * threads * dies);
-             }
-         } else if (cores == 0) {
-             threads = threads > 0 ? threads : 1;
--            cores = cpus / (sockets * threads);
-+            cores = cpus / (sockets * dies * threads);
-             cores = cores > 0 ? cores : 1;
-         } else if (threads == 0) {
--            threads = cpus / (cores * sockets);
-+            threads = cpus / (cores * dies * sockets);
-             threads = threads > 0 ? threads : 1;
--        } else if (sockets * cores * threads < cpus) {
-+        } else if (sockets * dies * cores * threads < cpus) {
-             error_report("cpu topology: "
--                         "sockets (%u) * cores (%u) * threads (%u) < "
-+                         "sockets (%u) * dies (%u) * cores (%u) * threads (%u) < "
-                          "smp_cpus (%u)",
--                         sockets, cores, threads, cpus);
-+                         sockets, dies, cores, threads, cpus);
-             exit(1);
-         }
- 
-@@ -1586,26 +1589,27 @@ void pc_smp_parse(MachineState *ms, QemuOpts *opts)
-             exit(1);
-         }
- 
--        if (sockets * cores * threads > ms->smp.max_cpus) {
-+        if (sockets * dies * cores * threads > ms->smp.max_cpus) {
-             error_report("cpu topology: "
--                         "sockets (%u) * cores (%u) * threads (%u) > "
-+                         "sockets (%u) * dies (%u) * cores (%u) * threads (%u) > "
-                          "maxcpus (%u)",
--                         sockets, cores, threads,
-+                         sockets, dies, cores, threads,
-                          ms->smp.max_cpus);
-             exit(1);
-         }
- 
--        if (sockets * cores * threads != ms->smp.max_cpus) {
-+        if (sockets * dies * cores * threads != ms->smp.max_cpus) {
-             warn_report("Invalid CPU topology deprecated: "
--                        "sockets (%u) * cores (%u) * threads (%u) "
-+                        "sockets (%u) * dies (%u) * cores (%u) * threads (%u) "
-                         "!= maxcpus (%u)",
--                        sockets, cores, threads,
-+                        sockets, dies, cores, threads,
-                         ms->smp.max_cpus);
-         }
- 
-         ms->smp.cpus = cpus;
-         ms->smp.cores = cores;
-         ms->smp.threads = threads;
-+        pcms->smp_dies = dies;
-     }
- 
-     if (ms->smp.cpus > 1) {
-diff --git a/vl.c b/vl.c
-index f6e591b80c..23fe3e753b 100644
---- a/vl.c
-+++ b/vl.c
-@@ -1233,6 +1233,9 @@ static QemuOptsList qemu_smp_opts = {
-         }, {
-             .name = "sockets",
-             .type = QEMU_OPT_NUMBER,
-+        }, {
-+            .name = "dies",
-+            .type = QEMU_OPT_NUMBER,
-         }, {
-             .name = "cores",
-             .type = QEMU_OPT_NUMBER,
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 0d8beb4afd..a5b314a448 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -138,25 +138,26 @@ no incompatible TCG features have been enabled (e.g. icount/replay).
- ETEXI
- 
- DEF("smp", HAS_ARG, QEMU_OPTION_smp,
--    "-smp [cpus=]n[,maxcpus=cpus][,cores=cores][,threads=threads][,sockets=sockets]\n"
-+    "-smp [cpus=]n[,maxcpus=cpus][,cores=cores][,threads=threads][,dies=dies][,sockets=sockets]\n"
-     "                set the number of CPUs to 'n' [default=1]\n"
-     "                maxcpus= maximum number of total cpus, including\n"
-     "                offline CPUs for hotplug, etc\n"
--    "                cores= number of CPU cores on one socket\n"
-+    "                cores= number of CPU cores on one socket (for PC, it's on one die)\n"
-     "                threads= number of threads on one CPU core\n"
-+    "                dies= number of CPU dies on one socket (for PC only)\n"
-     "                sockets= number of discrete sockets in the system\n",
-         QEMU_ARCH_ALL)
- STEXI
--@item -smp [cpus=]@var{n}[,cores=@var{cores}][,threads=@var{threads}][,sockets=@var{sockets}][,maxcpus=@var{maxcpus}]
-+@item -smp [cpus=]@var{n}[,cores=@var{cores}][,threads=@var{threads}][,dies=dies][,sockets=@var{sockets}][,maxcpus=@var{maxcpus}]
- @findex -smp
- Simulate an SMP system with @var{n} CPUs. On the PC target, up to 255
- CPUs are supported. On Sparc32 target, Linux limits the number of usable CPUs
- to 4.
--For the PC target, the number of @var{cores} per socket, the number
--of @var{threads} per cores and the total number of @var{sockets} can be
--specified. Missing values will be computed. If any on the three values is
--given, the total number of CPUs @var{n} can be omitted. @var{maxcpus}
--specifies the maximum number of hotpluggable CPUs.
-+For the PC target, the number of @var{cores} per die, the number of @var{threads}
-+per cores, the number of @var{dies} per packages and the total number of
-+@var{sockets} can be specified. Missing values will be computed.
-+If any on the three values is given, the total number of CPUs @var{n} can be omitted.
-+@var{maxcpus} specifies the maximum number of hotpluggable CPUs.
- ETEXI
- 
- DEF("numa", HAS_ARG, QEMU_OPTION_numa,
--- 
++@section Backwards compatibility
++
++@subsection Runnability guarantee of CPU models (since 4.1.0)
++
++Previous versions of QEMU never changed existing CPU models in
++ways that introduced additional host software or hardware
++requirements to the VM.  This allowed management software to
++safely change the machine type of an existing VM without
++introducing new requirements ("runnability guarantee").  This
++prevented CPU models from being updated to include CPU
++vulnerability mitigations, leaving guests vulnerable in the
++default configuration.
++
++The CPU model runnability guarantee won't apply anymore to
++existing CPU models.  Management software that needs runnability
++guarantees must resolve the CPU model aliases using te
++``alias-of'' field returned by the ``query-cpu-definitions'' QMP
++command.
+--=20
 2.18.0.rc1.1.g3f1ff2140
 
 
