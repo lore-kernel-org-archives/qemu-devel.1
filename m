@@ -7,57 +7,57 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA886C5B57D
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 06:20:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CDBDC5B57D
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 06:21:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 838602146F
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 06:20:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 673CB216C8
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 06:21:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="oB2v3oqt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 838602146F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="L2yOvScR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 673CB216C8
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49426 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49434 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hiC9f-0005aE-RQ
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 02:20:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58383)
+	id 1hiCAf-0006sV-NW
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 02:21:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58216)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgibson@ozlabs.org>) id 1hiByj-0004w1-MR
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 02:09:22 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1hiByf-0004lG-0k
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 02:09:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1hiByi-0002uF-As
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 02:09:21 -0400
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:51465 helo=ozlabs.org)
+ (envelope-from <dgibson@ozlabs.org>) id 1hiByd-0002p5-VA
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 02:09:16 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:35329 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1hiByh-0002pT-Js; Tue, 02 Jul 2019 02:09:20 -0400
+ id 1hiByd-0002nO-Jk; Tue, 02 Jul 2019 02:09:15 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 45dDMh6Mv9z9sPZ; Tue,  2 Jul 2019 16:09:03 +1000 (AEST)
+ id 45dDMg4HwQz9sP7; Tue,  2 Jul 2019 16:09:03 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1562047744;
- bh=GxG5T4mAzmDQk9JNvDaF99IBjK7p6c67pWLzMujSZMw=;
+ d=gibson.dropbear.id.au; s=201602; t=1562047743;
+ bh=b75CAUYLIbQe1Qpo7nfZqxRFQUGmzusldu8XhS1oYo4=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=oB2v3oqtRK2X5T+RwGJ6e2VOB2p6owaKm7v3HVAGGWgYLrL4odFjtHP/H216ocgyk
- Vkrb1jO4Ee/uMnXnqkr6R4m3Q8ZxORYOjpIQj8BBO4L82clVKXjwKTmDoFXLEHXwRd
- cpEo+QMCawZ5NIe0Ykn8JHR4UgwZMy+s/Rw+Akx4=
+ b=L2yOvScRBCCWn8ecQRjOA0iUSFkWYEVpggYG9w6Zng6KJpBAJ9WiaGmxyBfidZynY
+ yXz1h0m56l7J07CtdyFGjcdkv0end/iFRG0mzoip9GJBzaoT2NdiBuCM3w4HroNC1K
+ WQKb53SCy23ShIMuuhTqBI4UhutBU4fMLE5LWlaw=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Date: Tue,  2 Jul 2019 16:08:21 +1000
-Message-Id: <20190702060857.3926-14-david@gibson.dropbear.id.au>
+Date: Tue,  2 Jul 2019 16:08:18 +1000
+Message-Id: <20190702060857.3926-11-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190702060857.3926-1-david@gibson.dropbear.id.au>
 References: <20190702060857.3926-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2401:3900:2:1::2
-Subject: [Qemu-devel] [PULL 13/49] target/ppc: remove getVSR()/putVSR() from
- mem_helper.c
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 203.11.71.1
+Subject: [Qemu-devel] [PULL 10/49] target/ppc: fix compile error in
+ kvmppc_define_rtas_kernel_token()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,128 +69,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, aik@ozlabs.ru,
- Richard Henderson <richard.henderson@linaro.org>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
- groug@kaod.org, qemu-ppc@nongnu.org, clg@kaod.org,
- David Gibson <david@gibson.dropbear.id.au>, rth@twiddle.net
+Cc: lvivier@redhat.com, aik@ozlabs.ru, qemu-devel@nongnu.org, groug@kaod.org,
+ qemu-ppc@nongnu.org, clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>,
+ rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-Since commit 8a14d31b00 "target/ppc: switch fpr/vsrl registers so all VSX
-registers are in host endian order" functions getVSR() and putVSR() which=
- used
-to convert the VSR registers into host endian order are no longer require=
-d.
+gcc9 reports :
 
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-Id: <20190616123751.781-3-mark.cave-ayland@ilande.co.uk>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+In file included from /usr/include/string.h:494,
+                 from ./include/qemu/osdep.h:101,
+                 from ./target/ppc/kvm.c:17:
+In function =E2=80=98strncpy=E2=80=99,
+    inlined from =E2=80=98kvmppc_define_rtas_kernel_token=E2=80=99 at ./t=
+arget/ppc/kvm.c:2648:5:
+/usr/include/bits/string_fortified.h:106:10: error: =E2=80=98__builtin_st=
+rncpy=E2=80=99 specified bound 120 equals destination size [-Werror=3Dstr=
+ingop-truncation]
+  106 |   return __builtin___strncpy_chk (__dest, __src, __len, __bos (__=
+dest));
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=
+~~~~~~
+
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Message-Id: <20190615081252.28602-1-clg@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/mem_helper.c | 23 ++++++++++++-----------
- 1 file changed, 12 insertions(+), 11 deletions(-)
+ target/ppc/kvm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/target/ppc/mem_helper.c b/target/ppc/mem_helper.c
-index 5b0f9ee50d..87632ccf53 100644
---- a/target/ppc/mem_helper.c
-+++ b/target/ppc/mem_helper.c
-@@ -417,26 +417,27 @@ STVE(stvewx, cpu_stl_data_ra, bswap32, u32)
- void helper_##name(CPUPPCState *env, target_ulong addr,                 =
-\
-                    target_ulong xt_num, target_ulong rb)                =
-\
- {                                                                       =
-\
--    int i;                                                              =
-\
--    ppc_vsr_t xt;                                                       =
-\
-+    ppc_vsr_t *xt =3D &env->vsr[xt_num];                                =
-  \
-+    ppc_vsr_t t;                                                        =
-\
-     uint64_t nb =3D GET_NB(rb);                                         =
-  \
-+    int i;                                                              =
-\
-                                                                         =
-\
--    xt.s128 =3D int128_zero();                                          =
-  \
-+    t.s128 =3D int128_zero();                                           =
-  \
-     if (nb) {                                                           =
-\
-         nb =3D (nb >=3D 16) ? 16 : nb;                                  =
-    \
-         if (msr_le && !lj) {                                            =
-\
-             for (i =3D 16; i > 16 - nb; i--) {                          =
-  \
--                xt.VsrB(i - 1) =3D cpu_ldub_data_ra(env, addr, GETPC());=
-  \
-+                t.VsrB(i - 1) =3D cpu_ldub_data_ra(env, addr, GETPC()); =
-  \
-                 addr =3D addr_add(env, addr, 1);                        =
-  \
-             }                                                           =
-\
-         } else {                                                        =
-\
-             for (i =3D 0; i < nb; i++) {                                =
-  \
--                xt.VsrB(i) =3D cpu_ldub_data_ra(env, addr, GETPC());    =
-  \
-+                t.VsrB(i) =3D cpu_ldub_data_ra(env, addr, GETPC());     =
-  \
-                 addr =3D addr_add(env, addr, 1);                        =
-  \
-             }                                                           =
-\
-         }                                                               =
-\
-     }                                                                   =
-\
--    putVSR(xt_num, &xt, env);                                           =
-\
-+    *xt =3D t;                                                          =
-  \
- }
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index 4b4989c0af..9014ed029f 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -2650,7 +2650,7 @@ int kvmppc_define_rtas_kernel_token(uint32_t token,=
+ const char *function)
+         return -ENOENT;
+     }
 =20
- VSX_LXVL(lxvl, 0)
-@@ -447,23 +448,23 @@ VSX_LXVL(lxvll, 1)
- void helper_##name(CPUPPCState *env, target_ulong addr,           \
-                    target_ulong xt_num, target_ulong rb)          \
- {                                                                 \
--    int i;                                                        \
--    ppc_vsr_t xt;                                                 \
-+    ppc_vsr_t *xt =3D &env->vsr[xt_num];                            \
-     target_ulong nb =3D GET_NB(rb);                                 \
-+    int i;                                                        \
-                                                                   \
-     if (!nb) {                                                    \
-         return;                                                   \
-     }                                                             \
--    getVSR(xt_num, &xt, env);                                     \
-+                                                                  \
-     nb =3D (nb >=3D 16) ? 16 : nb;                                    \
-     if (msr_le && !lj) {                                          \
-         for (i =3D 16; i > 16 - nb; i--) {                          \
--            cpu_stb_data_ra(env, addr, xt.VsrB(i - 1), GETPC());  \
-+            cpu_stb_data_ra(env, addr, xt->VsrB(i - 1), GETPC()); \
-             addr =3D addr_add(env, addr, 1);                        \
-         }                                                         \
-     } else {                                                      \
-         for (i =3D 0; i < nb; i++) {                                \
--            cpu_stb_data_ra(env, addr, xt.VsrB(i), GETPC());      \
-+            cpu_stb_data_ra(env, addr, xt->VsrB(i), GETPC());     \
-             addr =3D addr_add(env, addr, 1);                        \
-         }                                                         \
-     }                                                             \
+-    strncpy(args.name, function, sizeof(args.name));
++    strncpy(args.name, function, sizeof(args.name) - 1);
+=20
+     return kvm_vm_ioctl(kvm_state, KVM_PPC_RTAS_DEFINE_TOKEN, &args);
+ }
 --=20
 2.21.0
 
