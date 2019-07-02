@@ -2,83 +2,64 @@ Return-Path: <SRS0=9yXi=U7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49D3EC06510
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 17:09:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 093B3C06510
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 17:10:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 155332082F
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 17:09:44 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NJbGtTtC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 155332082F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id D55382082F
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 17:10:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D55382082F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55474 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55478 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hiMHn-0002ej-DA
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 13:09:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46551)
+	id 1hiMIy-0003gx-69
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 13:10:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38184)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alistair23@gmail.com>) id 1hiLS6-0002Pr-BR
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 12:16:19 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1hiKqc-00012Z-Cg
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 11:37:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1hiLS3-0008Fk-GR
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 12:16:18 -0400
-Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:33835)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1hiLS0-00087t-8x; Tue, 02 Jul 2019 12:16:14 -0400
-Received: by mail-lj1-x242.google.com with SMTP id p17so17533517ljg.1;
- Tue, 02 Jul 2019 09:16:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=ZU0Kd/Xv5iJ3yRbbDVHYD4jeks6wD0BoPdNMIKus+J4=;
- b=NJbGtTtChlO7GHAppX76MKo/9sMK5K3I46wK+atNH+dHz42OisOs+d8aifhy9L/9Gf
- 7HpYfEsIgAFcIW8hth4mo7BjQZ219fPk/eTNFcj5wmydcLSzNPhCNaP3tnBUgYBIQek7
- ULZ/jAeWqTTWzcL8HlY0W99NI95soTo/REY+4mNlPcHh6QozNqu+etO1HWwYD8vivnPy
- fL3RTAlq2rnjD+azB9+1lf+gVltAcZR+4KdC8gCudyqFA1nwY2LjleyrD/grAUaOLtss
- +g4RbA+ENB3eT0JwnoEqxApFllcltNxMGtnfZ4y1YKmzk+2VAU3AoyNVG6TKCXnf/N/y
- gtGw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=ZU0Kd/Xv5iJ3yRbbDVHYD4jeks6wD0BoPdNMIKus+J4=;
- b=AnfHDXy2auNt8MaG3pO/P93+kLxHqUz1tIEnO4kTv9vLpvWGkyWAuy6YS4jjonk2Tj
- aUUyOFRBWjgBS1fSJVqZIL1yLeMcu9z8M1NShiLTDB/+U7Le9+PdfEzKiUvLVT8bZPa4
- +HazFSAK1FhQKxtX6n73nxqF87O+hOJlCIQRAWayxUZgCVfT8Knphro0qbnkiik6ISDV
- 9sZTduO5dn6EOqNqG0N1YDHkkoHvrlrzW/y4Vz0+8RwN0MDqvkRnMLfuVCYCfz0COtn4
- R7QHPPCO8iCbRFipM2CpG7UBLzGTWXnHJPvu1DQEdNa42/Pvi1I6m085Ef/PLR9Ab6YJ
- N23Q==
-X-Gm-Message-State: APjAAAWrK935rgHBgP+L8czFPTN0PPcV98wm9U5YSYh0uyGm2jy/Hn88
- xcj4NOw139fcDq5rh4szkHJ/3ghxih6DyUuArPM=
-X-Google-Smtp-Source: APXvYqy0bLL480Vi/3s18ciD+c9iZAIrKERSXLQdtsAc5ThV3H7A/0ztRVqBwvZVerXDB/o1dco7qQGKaK5YU8sI4rA=
-X-Received: by 2002:a2e:9188:: with SMTP id f8mr12415938ljg.33.1562084165709; 
- Tue, 02 Jul 2019 09:16:05 -0700 (PDT)
+ (envelope-from <ehabkost@redhat.com>) id 1hiKqa-00075N-9e
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 11:37:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49803)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hiKqa-000749-01
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 11:37:32 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 24B1A2E95B0;
+ Tue,  2 Jul 2019 15:37:31 +0000 (UTC)
+Received: from localhost (ovpn-116-30.gru2.redhat.com [10.97.116.30])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 47C92702D0;
+ Tue,  2 Jul 2019 15:37:30 +0000 (UTC)
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
+ Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+ Richard Henderson <rth@twiddle.net>
+Date: Tue,  2 Jul 2019 12:35:33 -0300
+Message-Id: <20190702153535.9851-41-ehabkost@redhat.com>
+In-Reply-To: <20190702153535.9851-1-ehabkost@redhat.com>
+References: <20190702153535.9851-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-References: <20190702001301.4768-1-philmd@redhat.com>
- <20190702001301.4768-8-philmd@redhat.com>
-In-Reply-To: <20190702001301.4768-8-philmd@redhat.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Tue, 2 Jul 2019 09:13:02 -0700
-Message-ID: <CAKmqyKM3=yF_1ngt9dHXyYPOMoKs5gsZtVLWT6ovf--bSMk_ig@mail.gmail.com>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.29]); Tue, 02 Jul 2019 15:37:31 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::242
-Subject: Re: [Qemu-devel] [PATCH v2 7/9] hw/block/pflash_cfi01: Improve
- command comments
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PULL v3 40/42] i386: Add Cascadelake-Server-v2 CPU
+ model
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,98 +71,167 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Max Filippov <jcmvbkbc@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Qemu-block <qemu-block@nongnu.org>, Aleksandar Rikalo <arikalo@wavecomp.com>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- Markus Armbruster <armbru@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-arm <qemu-arm@nongnu.org>,
- John Snow <jsnow@redhat.com>, Richard Henderson <rth@twiddle.net>,
- Kevin Wolf <kwolf@redhat.com>, Laszlo Ersek <lersek@redhat.com>,
- Max Reitz <mreitz@redhat.com>, Michael Walle <michael@walle.cc>,
- "open list:New World" <qemu-ppc@nongnu.org>,
- Wei Yang <richardw.yang@linux.intel.com>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Jul 1, 2019 at 5:15 PM Philippe Mathieu-Daud=C3=A9 <philmd@redhat.c=
-om> wrote:
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Add new version of Cascadelake-Server CPU model, setting
+stepping=3D5 and enabling the IA32_ARCH_CAPABILITIES MSR
+with some flags.
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+The new feature will introduce a new host software requirement,
+breaking our CPU model runnability promises.  This means we can't
+enable the new CPU model version by default in QEMU 4.1, because
+management software isn't ready yet to resolve CPU model aliases.
+This is why "pc-*-4.1" will keep returning Cascadelake-Server-v1
+if "-cpu Cascadelake-Server" is specified.
 
-Alistair
+Includes a test case to ensure the right combinations of
+machine-type + CPU model + command-line feature flags will work
+as expected.
 
-> ---
->  hw/block/pflash_cfi01.c | 16 ++++++++--------
->  1 file changed, 8 insertions(+), 8 deletions(-)
->
-> diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
-> index c1b02219b2..f50d0a9d37 100644
-> --- a/hw/block/pflash_cfi01.c
-> +++ b/hw/block/pflash_cfi01.c
-> @@ -208,11 +208,11 @@ static uint32_t pflash_devid_query(PFlashCFI01 *pfl=
-, hwaddr offset)
->       * Offsets 2/3 are block lock status, is not emulated.
->       */
->      switch (boff & 0xFF) {
-> -    case 0:
-> +    case 0: /* Manufacturer ID */
->          resp =3D pfl->ident0;
->          trace_pflash_manufacturer_id(resp);
->          break;
-> -    case 1:
-> +    case 1: /* Device ID */
->          resp =3D pfl->ident1;
->          trace_pflash_device_id(resp);
->          break;
-> @@ -456,11 +456,11 @@ static void pflash_write(PFlashCFI01 *pfl, hwaddr o=
-ffset,
->      case 0:
->          /* read mode */
->          switch (cmd) {
-> -        case 0x10: /* Single Byte Program */
-> -        case 0x40: /* Single Byte Program */
-> +        case 0x10: /* Single Byte Program (setup) */
-> +        case 0x40: /* Single Byte Program (setup) [Intel] */
->              DPRINTF("%s: Single Byte Program\n", __func__);
->              break;
-> -        case 0x20: /* Block erase */
-> +        case 0x20: /* Block erase (setup) */
->              p =3D pfl->storage;
->              offset &=3D ~(pfl->sector_len - 1);
->
-> @@ -516,8 +516,8 @@ static void pflash_write(PFlashCFI01 *pfl, hwaddr off=
-set,
->          break;
->      case 1:
->          switch (pfl->cmd) {
-> -        case 0x10: /* Single Byte Program */
-> -        case 0x40: /* Single Byte Program */
-> +        case 0x10: /* Single Byte Program (confirm) */
-> +        case 0x40: /* Single Byte Program (confirm) [Intel] */
->              DPRINTF("%s: Single Byte Program\n", __func__);
->              if (!pfl->ro) {
->                  pflash_data_write(pfl, offset, value, width, be);
-> @@ -528,7 +528,7 @@ static void pflash_write(PFlashCFI01 *pfl, hwaddr off=
-set,
->              pfl->status |=3D 0x80; /* Ready! */
->              pfl->wcycle =3D 0;
->          break;
-> -        case 0x20: /* Block erase */
-> +        case 0x20: /* Block erase (confirm) */
->          case 0x28:
->              if (cmd =3D=3D 0xd0) { /* confirm */
->                  pfl->wcycle =3D 0;
-> --
-> 2.20.1
->
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+Message-Id: <20190628002844.24894-10-ehabkost@redhat.com>
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+---
+ target/i386/cpu.c                          | 14 +++++
+ tests/acceptance/x86_cpu_model_versions.py | 73 ++++++++++++++++++++++
+ 2 files changed, 87 insertions(+)
+
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 9b16cffb22..0298396a91 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -2343,6 +2343,20 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
+             CPUID_6_EAX_ARAT,
+         .xlevel =3D 0x80000008,
+         .model_id =3D "Intel Xeon Processor (Cascadelake)",
++        .versions =3D (X86CPUVersionDefinition[]) {
++            { .version =3D 1 },
++            { .version =3D 2,
++              .props =3D (PropValue[]) {
++                  { "stepping", "5" },
++                  { "arch-capabilities", "on" },
++                  { "rdctl-no", "on" },
++                  { "ibrs-all", "on" },
++                  { "skip-l1dfl-vmentry", "on" },
++                  { /* end of list */ }
++              },
++            },
++            { /* end of list */ }
++        }
+     },
+     {
+         .name =3D "Icelake-Client",
+diff --git a/tests/acceptance/x86_cpu_model_versions.py b/tests/acceptanc=
+e/x86_cpu_model_versions.py
+index 165c0c7601..1c9fd6a56e 100644
+--- a/tests/acceptance/x86_cpu_model_versions.py
++++ b/tests/acceptance/x86_cpu_model_versions.py
+@@ -25,6 +25,10 @@
+ import avocado_qemu
+ import re
+=20
++def get_cpu_prop(vm, prop):
++    cpu_path =3D vm.command('query-cpus')[0].get('qom_path')
++    return vm.command('qom-get', path=3Dcpu_path, property=3Dprop)
++
+ class X86CPUModelAliases(avocado_qemu.Test):
+     """
+     Validation of PC CPU model versions and CPU model aliases
+@@ -229,3 +233,72 @@ class X86CPUModelAliases(avocado_qemu.Test):
+                          'qemu64-v1 must not be an alias')
+=20
+         self.validate_aliases(cpus)
++
++    def test_Cascadelake_arch_capabilities_result(self):
++        # machine-type only:
++        vm =3D self.get_vm()
++        vm.add_args('-S')
++        vm.set_machine('pc-i440fx-4.1')
++        vm.add_args('-cpu', 'Cascadelake-Server,x-force-features=3Don,ch=
+eck=3Doff,enforce=3Doff')
++        vm.launch()
++        self.assertFalse(get_cpu_prop(vm, 'arch-capabilities'),
++                         'pc-i440fx-4.1 + Cascadelake-Server should not =
+have arch-capabilities')
++
++        vm =3D self.get_vm()
++        vm.add_args('-S')
++        vm.set_machine('pc-i440fx-4.0')
++        vm.add_args('-cpu', 'Cascadelake-Server,x-force-features=3Don,ch=
+eck=3Doff,enforce=3Doff')
++        vm.launch()
++        self.assertFalse(get_cpu_prop(vm, 'arch-capabilities'),
++                         'pc-i440fx-4.0 + Cascadelake-Server should not =
+have arch-capabilities')
++
++        # command line must override machine-type if CPU model is not ve=
+rsioned:
++        vm =3D self.get_vm()
++        vm.add_args('-S')
++        vm.set_machine('pc-i440fx-4.0')
++        vm.add_args('-cpu', 'Cascadelake-Server,x-force-features=3Don,ch=
+eck=3Doff,enforce=3Doff,+arch-capabilities')
++        vm.launch()
++        self.assertTrue(get_cpu_prop(vm, 'arch-capabilities'),
++                        'pc-i440fx-4.0 + Cascadelake-Server,+arch-capabi=
+lities should have arch-capabilities')
++
++        vm =3D self.get_vm()
++        vm.add_args('-S')
++        vm.set_machine('pc-i440fx-4.1')
++        vm.add_args('-cpu', 'Cascadelake-Server,x-force-features=3Don,ch=
+eck=3Doff,enforce=3Doff,-arch-capabilities')
++        vm.launch()
++        self.assertFalse(get_cpu_prop(vm, 'arch-capabilities'),
++                         'pc-i440fx-4.1 + Cascadelake-Server,-arch-capab=
+ilities should not have arch-capabilities')
++
++        # versioned CPU model overrides machine-type:
++        vm =3D self.get_vm()
++        vm.add_args('-S')
++        vm.set_machine('pc-i440fx-4.0')
++        vm.add_args('-cpu', 'Cascadelake-Server-v1,x-force-features=3Don=
+,check=3Doff,enforce=3Doff')
++        vm.launch()
++        self.assertFalse(get_cpu_prop(vm, 'arch-capabilities'),
++                         'pc-i440fx-4.1 + Cascadelake-Server-v1 should n=
+ot have arch-capabilities')
++
++        vm =3D self.get_vm()
++        vm.add_args('-S')
++        vm.set_machine('pc-i440fx-4.0')
++        vm.add_args('-cpu', 'Cascadelake-Server-v2,x-force-features=3Don=
+,check=3Doff,enforce=3Doff')
++        vm.launch()
++        self.assertTrue(get_cpu_prop(vm, 'arch-capabilities'),
++                         'pc-i440fx-4.1 + Cascadelake-Server-v1 should h=
+ave arch-capabilities')
++
++        # command line must override machine-type and versioned CPU mode=
+l:
++        vm =3D self.get_vm()
++        vm.add_args('-S')
++        vm.set_machine('pc-i440fx-4.0')
++        vm.add_args('-cpu', 'Cascadelake-Server,x-force-features=3Don,ch=
+eck=3Doff,enforce=3Doff,+arch-capabilities')
++        vm.launch()
++        self.assertTrue(get_cpu_prop(vm, 'arch-capabilities'),
++                         'pc-i440fx-4.0 + Cascadelake-Server-v1,+arch-ca=
+pabilities should have arch-capabilities')
++
++        vm =3D self.get_vm()
++        vm.add_args('-S')
++        vm.set_machine('pc-i440fx-4.1')
++        vm.add_args('-cpu', 'Cascadelake-Server-v2,x-force-features=3Don=
+,check=3Doff,enforce=3Doff,-arch-capabilities')
++        vm.launch()
++        self.assertFalse(get_cpu_prop(vm, 'arch-capabilities'),
++                         'pc-i440fx-4.1 + Cascadelake-Server-v2,-arch-ca=
+pabilities should not have arch-capabilities')
+--=20
+2.18.0.rc1.1.g3f1ff2140
+
 
