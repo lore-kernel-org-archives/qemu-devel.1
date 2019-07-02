@@ -2,64 +2,79 @@ Return-Path: <SRS0=9yXi=U7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 701BEC06510
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 12:58:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ABC31C06513
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 13:09:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 46CC5208C4
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 12:58:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46CC5208C4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7F4BB2089C
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 13:09:03 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yfSxUuIt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F4BB2089C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53398 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53514 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hiIN2-0000t6-6R
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 08:58:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53525)
+	id 1hiIWs-00035s-Fn
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 09:09:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56161)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <yan.y.zhao@intel.com>) id 1hiILy-0000Q2-Jk
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 08:57:47 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hiIVo-0002e5-Ux
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 09:07:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yan.y.zhao@intel.com>) id 1hiILx-00034U-Ae
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 08:57:46 -0400
-Received: from mga14.intel.com ([192.55.52.115]:25439)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yan.y.zhao@intel.com>)
- id 1hiILx-0002ou-1J
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 08:57:45 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
- by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 02 Jul 2019 05:57:36 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.63,443,1557212400"; d="scan'208";a="157635648"
-Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
- ([10.239.13.9])
- by orsmga008.jf.intel.com with ESMTP; 02 Jul 2019 05:57:34 -0700
-Date: Tue, 2 Jul 2019 08:51:38 -0400
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: Auger Eric <eric.auger@redhat.com>
-Message-ID: <20190702125138.GA9176@joy-OptiPlex-7040>
-References: <1561760389-31325-1-git-send-email-yan.y.zhao@intel.com>
- <42713cac-27fb-f4a9-1b06-bfee409690a5@redhat.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1hiIVn-0004pO-NG
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 09:07:56 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:46607)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hiIVn-0004nm-HY
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 09:07:55 -0400
+Received: by mail-ot1-x341.google.com with SMTP id z23so17043988ote.13
+ for <qemu-devel@nongnu.org>; Tue, 02 Jul 2019 06:07:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
+ bh=EYKgqgSVGr/Wixu1DV2qjIh/StvL+G4ZP7yiSLnpA3k=;
+ b=yfSxUuIt6rFgM4iRMiWSM6u65y4x4wYg/DayH1zyMiyKKoeX8SyeDm35QqHWRPEa2q
+ Me46fZMRbe0XPC7y8gu+iduoVTcNVxJrUwS+crR5F3zvruT4yZ4cDapq0fRWTsYV7Rq5
+ XlnB3ZupEMkflY6g1KXVWC14qRC3Kz118xU5U8B6SAWCBoQRm0h6kfUkmG6a3stL65m5
+ 5c+eDicsX+TG9uRN/3SFX5RikNtTWFKaKvvPi0SB6HO7tF74wOUDG70m1EW6i44ML0V4
+ q7SGfVdTlCU2WmQ6/5UQnxW51kwNSdiJfl2TxSPjsiBnaI6vn3VyUQhXk9axy5qF6KzI
+ 1HSQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to;
+ bh=EYKgqgSVGr/Wixu1DV2qjIh/StvL+G4ZP7yiSLnpA3k=;
+ b=TJgbBpPdcJjeO3+SryWzO8QQqtPlwG8mEjtwe4u7om8+bHSIK5NQmHO+Lt4z3XGtIz
+ Ju4AwwEmfrpvHE+Ozj0WGzUFWvbw0UXoA57PSKVzlYdeWi5CyOZX2JA8CKkIg0uAyHxS
+ WiBDPyyvP3N8MkfwnKvOpMC/FB/c76iqY9vIKEEvqU0HmlAWoqrwm34FtbQNv2yXnG2w
+ jzhYT5LOMgS47MaQDw8PPX+Z99a2GlUwRApmKpSOZeCq4nx5tmczZw23gIGDOiN66g6a
+ sDeMC2RjX8OCKwCRtW2jRhXbQDd+qTQ/MGtEv2gaDKiVZR22gMk/NQqOy8bj7BCZClHh
+ 1Iaw==
+X-Gm-Message-State: APjAAAXCshXBx6PmzIPCz/ZbzqMZ23zVbRMQyXEgrIkvin/BOV47xkJw
+ 4st/7DuUEgaO5Pj433yFNonYg5LS6+zrDjxJrxisHf1bRnI=
+X-Google-Smtp-Source: APXvYqyPVMpJYdzjeoTwVmXF9NDXutvFhraeZ/YtIlibk7THgPwv5pINjTynJbVfmLHhSTRwqDQGDSx1GcqD4bdUxUA=
+X-Received: by 2002:a9d:5f1a:: with SMTP id f26mr24561780oti.91.1562072872996; 
+ Tue, 02 Jul 2019 06:07:52 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <42713cac-27fb-f4a9-1b06-bfee409690a5@redhat.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+References: <20190701163943.22313-1-peter.maydell@linaro.org>
+In-Reply-To: <20190701163943.22313-1-peter.maydell@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 2 Jul 2019 14:07:42 +0100
+Message-ID: <CAFEAcA88-rJdGsSJZGptABXtJbFq_MNCUVs--S_8CAdWjZJk3Q@mail.gmail.com>
+To: QEMU Developers <qemu-devel@nongnu.org>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 192.55.52.115
-Subject: Re: [Qemu-devel] [PATCH v5] memory: do not notify for non inclusive
- overlap entry
+X-Received-From: 2607:f8b0:4864:20::341
+Subject: Re: [Qemu-devel] [PULL 00/46] target-arm queue
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,110 +86,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Peter Xu <peterx@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Jul 01, 2019 at 06:10:33PM +0800, Auger Eric wrote:
-> Hi Yan,
-> 
-> On 6/29/19 12:19 AM, Yan Zhao wrote:
-> > if an entry has non inclusive overlap with the notifier, print warning
-> > message and do not do notification for it.
-> > 
-> > Out of scope mapping/unmapping would cause problem, as in below case:
-> > 
-> > 1. initially there are two notifiers with ranges
-> > 0-0xfedfffff, 0xfef00000-0xffffffffffffffff,
-> > IOVAs from 0x3c000000 - 0x3c1fffff is in shadow page table.
-> > 
-> > 2. in vfio, memory_region_register_iommu_notifier() is followed by
-> > memory_region_iommu_replay(), which will first call address space
-> > unmap,
-> > and walk and add back all entries in vtd shadow page table. e.g.
-> > (1) for notifier 0-0xfedfffff,
-> >     IOVAs from 0 - 0xffffffff get unmapped,
-> >     and IOVAs from 0x3c000000 - 0x3c1fffff get mapped
-> > (2) for notifier 0xfef00000-0xffffffffffffffff
-> >     IOVAs from 0 - 0x7fffffffff get unmapped,
-> >     but IOVAs from 0x3c000000 - 0x3c1fffff cannot get mapped back.
-> > 
-> > Cc: Eric Auger <eric.auger@redhat.com>
-> > Cc: Peter Xu <peterx@redhat.com>
-> > Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
-> Reviewed-by: Eric Auger <eric.auger@redhat.com>
-> 
-> Thanks
-> 
-> Eric
+On Mon, 1 Jul 2019 at 17:39, Peter Maydell <peter.maydell@linaro.org> wrote:
+>
+> target-arm queue for softfreeze: this is quite big as I
+> was on holiday last week, so this is all just sneaking in
+> under the wire. I particularly wanted to get Philippe's
+> patches in before freeze as that sort of code-movement
+> patchset is painful to have to rebase.
+>
+> thanks
+> -- PMM
+>
+> The following changes since commit ae9108f8f0746ce64d02afb1a216153a50926132:
+>
+>   Merge remote-tracking branch 'remotes/vivier2/tags/linux-user-for-4.1-pull-request' into staging (2019-07-01 15:55:40 +0100)
+>
+> are available in the Git repository at:
+>
+>   https://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20190701
+>
+> for you to fetch changes up to 787a7e76c2e93a48c47b324fea592c9910a70483:
+>
+>   target/arm: Declare some M-profile functions publicly (2019-07-01 17:29:01 +0100)
+>
+> ----------------------------------------------------------------
+> target-arm queue:
+>  * hw/arm/boot: fix direct kernel boot with initrd
+>  * hw/arm/msf2-som: Exit when the cpu is not the expected one
+>  * i.mx7: fix bugs in PCI controller needed to boot recent kernels
+>  * aspeed: add RTC device
+>  * aspeed: fix some timer device bugs
+>  * aspeed: add swift-bmc board
+>  * aspeed: vic: Add support for legacy register interface
+>  * aspeed: add aspeed-xdma device
+>  * Add new sbsa-ref board for aarch64
+>  * target/arm: code refactoring in preparation for support of
+>    compilation with TCG disabled
 
-Thank you, Eric :)
 
-Yan
-> > 
-> > ---
-> > v5:
-> > 1. still using warn_report instead of "assert"
-> > 2. returning at the end to refuse notification for entry which has non
-> > inclusive overlap with the notifier.
-> > 3. updated commit title and warning message.
-> > 
-> > v4:
-> > 1. modified commit title
-> > 2. using "assert" instead of printing warning message
-> > 
-> > v3:
-> > refined code style and message format
-> > 
-> > v2:
-> > 1. added a local variable entry_end (Eric Auger)
-> > 2. using PRIx64 as format for address range in warning message
-> > (Eric Auger)
-> > ---
-> >  memory.c | 16 ++++++++++++++--
-> >  1 file changed, 14 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/memory.c b/memory.c
-> > index 0a089a7..fe0d08d 100644
-> > --- a/memory.c
-> > +++ b/memory.c
-> > @@ -1937,13 +1937,13 @@ void memory_region_notify_one(IOMMUNotifier *notifier,
-> >                                IOMMUTLBEntry *entry)
-> >  {
-> >      IOMMUNotifierFlag request_flags;
-> > +    hwaddr entry_end = entry->iova + entry->addr_mask;
-> >  
-> >      /*
-> >       * Skip the notification if the notification does not overlap
-> >       * with registered range.
-> >       */
-> > -    if (notifier->start > entry->iova + entry->addr_mask ||
-> > -        notifier->end < entry->iova) {
-> > +    if (notifier->start > entry_end || notifier->end < entry->iova) {
-> >          return;
-> >      }
-> >  
-> > @@ -1953,6 +1953,18 @@ void memory_region_notify_one(IOMMUNotifier *notifier,
-> >          request_flags = IOMMU_NOTIFIER_UNMAP;
-> >      }
-> >  
-> > +    if (entry->iova < notifier->start || entry_end > notifier->end) {
-> > +        warn_report("IOMMUTLBEntry 0x%" PRIx64 " - 0x%" PRIx64
-> > +                " has non inclusive overlap with notifier 0x%" PRIx64
-> > +                " - 0x%" PRIx64 ". %s is not allowed."
-> > +                " Try to divide it into smaller sections.",
-> > +                entry->iova, entry_end,
-> > +                notifier->start, notifier->end,
-> > +                (request_flags == IOMMU_NOTIFIER_MAP) ?
-> > +                "Mapping" : "Unmapping");
-> > +        return;
-> > +    }
-> > +
-> >      if (notifier->notifier_flags & request_flags) {
-> >          notifier->notify(notifier, entry);
-> >      }
-> > 
+Applied, thanks.
+
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.1
+for any user-visible changes.
+
+-- PMM
 
