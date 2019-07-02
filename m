@@ -2,72 +2,107 @@ Return-Path: <SRS0=9yXi=U7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0D30C06510
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 16:04:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7035C06510
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 16:10:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B757B2082F
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 16:04:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B757B2082F
+	by mail.kernel.org (Postfix) with ESMTPS id BA18B206A3
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 16:10:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA18B206A3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54818 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54878 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hiLGG-0001gz-U2
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 12:04:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59077)
+	id 1hiLM9-00053A-Ds
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 12:10:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33507)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jdillama@redhat.com>) id 1hiKPf-0000km-JP
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 11:09:45 -0400
+ (envelope-from <lvivier@redhat.com>) id 1hiKa9-00021r-JW
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 11:20:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jdillama@redhat.com>) id 1hiKPe-0002F9-3l
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 11:09:43 -0400
-Received: from mail-ed1-f68.google.com ([209.85.208.68]:38753)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <jdillama@redhat.com>) id 1hiKPd-00020H-R0
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 11:09:42 -0400
-Received: by mail-ed1-f68.google.com with SMTP id r12so27628443edo.5
- for <qemu-devel@nongnu.org>; Tue, 02 Jul 2019 08:09:27 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
- :from:date:message-id:subject:to:cc;
- bh=ktZIO6i7Ml0hpuePWgirhQQP8KMD520T4ZnQxy2eZBA=;
- b=nUWboz6S0CLTyeH+IyiQLiJUT51pcvg79kzm+n6WAW2RSSuTawRx2xgWFedgNWSe53
- RPRPC/2Ezlrq1KyRNrj+rgDBVxHOrBK6ixQW+QzYjSVdPtaycoDJNpR6MKZ6pW+gciqt
- yBhuriWACSOpyznFD85BIulljnGixaPOWHq7AtsNvJndY2gbn1yCg8j+v+q4uM+F9QnJ
- Q7xGih6xECh4IAMby96c3ou43+QrXT/cM/RlCf+BTnN1kU0yXWng9pfQdYjipA+tqPr0
- k4JUpxKlGgt1Xpkc+f+vVsb455ZXZCb+CuwK0PYdvNRpds9KdLqthQee5LZJIHoS2Phd
- MhAg==
-X-Gm-Message-State: APjAAAVtkjfoVfTHnoe4Pr87DfH3E+PG8JR+80YLAZNP9/UvDhgyjaTu
- fvgMj7wu6oqXoviuCI3ZkYA8oJLhKgoBoTVc0y+prg==
-X-Google-Smtp-Source: APXvYqxTZ9lC1HCpBk+Dnk2NmMgLUOzn9DGgHv5wocD7TRJIPmb/TYiUyqCOLVwRd3rNReCvi6dgctOC5luOwoO5ClE=
-X-Received: by 2002:a50:9832:: with SMTP id g47mr35254830edb.282.1562080166458; 
- Tue, 02 Jul 2019 08:09:26 -0700 (PDT)
+ (envelope-from <lvivier@redhat.com>) id 1hiKa8-0006HQ-3X
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 11:20:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39074)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1hiKa0-0005An-8k
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 11:20:27 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 1C755309265A;
+ Tue,  2 Jul 2019 15:19:47 +0000 (UTC)
+Received: from [10.36.116.109] (ovpn-116-109.ams2.redhat.com [10.36.116.109])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id DAC5A5C29A;
+ Tue,  2 Jul 2019 15:19:44 +0000 (UTC)
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+References: <20190702150311.20467-1-peter.maydell@linaro.org>
+From: Laurent Vivier <lvivier@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <b0ee3bea-9871-7b98-4956-b5c8d51ca7a8@redhat.com>
+Date: Tue, 2 Jul 2019 17:19:43 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-References: <20190510153346.238366-1-sgarzare@redhat.com>
- <96429d33-6514-33b5-3fe8-7bdf2eccc8d9@redhat.com>
- <20190627084816.u6fj556uen3iqa3r@steredhat.homenet.telecomitalia.it>
- <b7aaa681-12ae-e256-e295-06e953dc51ff@redhat.com>
- <CA+aFP1Btm6O5R0fiNZmBjHOO8t9ZDvvVgH0i1vFHsrQq85d+bA@mail.gmail.com>
- <20190628085901.rnzcfu6rgkvrg46n@steredhat>
-In-Reply-To: <20190628085901.rnzcfu6rgkvrg46n@steredhat>
-From: Jason Dillaman <jdillama@redhat.com>
-Date: Tue, 2 Jul 2019 11:09:14 -0400
-Message-ID: <CA+aFP1C828MUouu+3P2HKn3zHc3STKZ1mcEY8S4HWRNcFoiO9w@mail.gmail.com>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20190702150311.20467-1-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.43]); Tue, 02 Jul 2019 15:19:47 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.208.68
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2] block/rbd: implement
- .bdrv_get_allocated_file_size callback
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH for-4.1] tests/migration-test: Fix read off
+ end of aarch64_kernel array
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -79,172 +114,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: dillaman@redhat.com
-Cc: Kevin Wolf <kwolf@redhat.com>, Josh Durgin <jdurgin@redhat.com>,
- qemu-block <qemu-block@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>,
- Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Juan Quintela <quintela@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jun 28, 2019 at 4:59 AM Stefano Garzarella <sgarzare@redhat.com> wrote:
->
-> On Thu, Jun 27, 2019 at 03:43:04PM -0400, Jason Dillaman wrote:
-> > On Thu, Jun 27, 2019 at 1:24 PM John Snow <jsnow@redhat.com> wrote:
-> > > On 6/27/19 4:48 AM, Stefano Garzarella wrote:
-> > > > On Wed, Jun 26, 2019 at 05:04:25PM -0400, John Snow wrote:
-> > > >> It looks like this has hit a 30 day expiration without any reviews or
-> > > >> being merged; do we still want this? If so, can you please resend?
-> > > >
-> > > > Yes, I think we still want :)
-> > > >
-> > > > Is it okay if I send a v3 following your comments?
-> > > >
-> > >
-> > > Yes, but I don't know who is responsible for final approval; I guess
-> > > that's Josh Durgin?
-> >
-> > I'm the new (for the past several years) upstream PTL for RBD, so feel
-> > free to tag me.
-> >
-> > > >>
-> > > >> On 5/10/19 11:33 AM, Stefano Garzarella wrote:
-> > > >>> This patch allows 'qemu-img info' to show the 'disk size' for
-> > > >>> the RBD images that have the fast-diff feature enabled.
-> > > >>>
-> > > >>> If this feature is enabled, we use the rbd_diff_iterate2() API
-> > > >>> to calculate the allocated size for the image.
-> > > >>>
-> > > >>> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-> > > >>> ---
-> > > >>> v2:
-> > > >>>   - calculate the actual usage only if the fast-diff feature is
-> > > >>>     enabled [Jason]
-> > > >>> ---
-> > > >>>  block/rbd.c | 54 +++++++++++++++++++++++++++++++++++++++++++++++++++++
-> > > >>>  1 file changed, 54 insertions(+)
-> > > >>>
-> > > >>> diff --git a/block/rbd.c b/block/rbd.c
-> > > >>> index 0c549c9935..f1bc76ab80 100644
-> > > >>> --- a/block/rbd.c
-> > > >>> +++ b/block/rbd.c
-> > > >>> @@ -1046,6 +1046,59 @@ static int64_t qemu_rbd_getlength(BlockDriverState *bs)
-> > > >>>      return info.size;
-> > > >>>  }
-> > > >>>
-> > > >>> +static int rbd_allocated_size_cb(uint64_t offset, size_t len, int exists,
-> > > >>> +                                 void *arg)
-> > > >>> +{
-> > > >>> +    int64_t *alloc_size = (int64_t *) arg;
-> > > >>> +
-> > > >>> +    if (exists) {
-> > > >>> +        (*alloc_size) += len;
-> > > >>> +    }
-> > > >>> +
-> > > >>> +    return 0;
-> > > >>> +}
-> > > >>> +
-> > > >>> +static int64_t qemu_rbd_get_allocated_file_size(BlockDriverState *bs)
-> > > >>> +{
-> > > >>> +    BDRVRBDState *s = bs->opaque;
-> > > >>> +    uint64_t flags, features;
-> > > >>> +    int64_t alloc_size = 0;
-> > > >>> +    int r;
-> > > >>> +
-> > > >>> +    r = rbd_get_flags(s->image, &flags);
-> > > >>> +    if (r < 0) {
-> > > >>> +        return r;
-> > > >>> +    }
-> > > >>> +
-> > > >>
-> > > >> Do you know where rbd_get_flags is documented? I can't seem to quickly
-> > > >> find a reference that tells me what to expect from calling it. It
-> > > >> returns an int, I guess an error code, but how can I confirm this?
-> > > >>
-> > > >> *clones the ceph repository*
-> > > >>
-> > > >> src/librbd/internal.cc get_flags convinces me it probably works like I
-> > > >> think, but is there not a reference here?
-> > > >>
-> > > >
-> > > > Good question!
-> > > > I didn't find any docs, but looking in the ceph tests test/librbd/fsx.cc,
-> > > > they print an error message if the return value is less than 0.
-> > > >
-> > > > A 'get_flags' implemented in cls/rbd/cls_rbd.cc for example returns 0 at the
-> > > > end and -EINVAL in a try/catch. It also uses 'read_key()' that in some cases
-> > > > returns -EIO, so I hope that the error returned by rbd_get_flags() is one of
-> > > > the errors defined in errno.h
-> > > >
-> > > >>> +    r = rbd_get_features(s->image, &features);
-> > > >>> +    if (r < 0) {
-> > > >>> +        return r;
-> > > >>> +    }
-> > > >>> +
-> > > >>> +    /*
-> > > >>> +     * We use rbd_diff_iterate2() only if the RBD image have fast-diff
-> > > >>> +     * feature enabled. If it is disabled, rbd_diff_iterate2() could be
-> > > >>> +     * very slow on a big image.
-> > > >>> +     */
-> > > >>> +    if (!(features & RBD_FEATURE_FAST_DIFF) ||
-> > > >>> +        (flags & RBD_FLAG_FAST_DIFF_INVALID)) {
-> > > >>> +        return -1;
-> > > >>> +    }
-> > > >>> +
-> > > >>
-> > > >> (Is there a reference for the list of flags to make sure there aren't
-> > > >> other cases we might want to skip this?)
-> > > >
-> > > > Unfortunately no :(
-> > > > As Jason suggested, I followed what libvirt did in the
-> > > > volStorageBackendRBDUseFastDiff() [src/storage/storage_backend_rbd.c]
-> >
-> > These are the only ones.
->
-> Thanks for the clarification!
->
-> >
-> > > >>
-> > > >> It looks reasonable at a glance, but maybe let's return -ENOTSUP instead
-> > > >> of -1, based on the idea that bdrv_get_allocated_file_size returns
-> > > >> -ENOMEDIUM in a prominent error case -- let's match that error convention.
-> > > >
-> > > > Sure, -ENOTSUP is absolutely better!
-> > > >
-> > > >>
-> > > >> (Well, I wonder what the librbd calls are returning and if THOSE mean
-> > > >> anything.)
-> > > >
-> > > > I hope they return an errno.h errors, but I'm not sure if the meaning
-> > > > make sense for us.
-> > > >
-> > > > Do you think is better to return -ENOTSUP or -EIO when librbd calls
-> > > > fail?
-> > > >
-> > >
-> > > I'll be honest, I have no idea because I don't know what failure of
-> > > these calls means _at all_, so I don't know if it should be something
-> > > severe like EIO or something more mundane.
-> > >
-> > > I guess just leave them alone in absence of better information, honestly.
-> >
-> > It looks like QEMU treats any negative error code like the actual size
-> > isn't available. However, for clarity I would vote for -ENOTSUPP since
-> > that's what would be returned if the driver doesn't support it.
-> >
->
-> Do you mean to return -ENOTSUP even when there's a runtime error in
-> rbd_get_features() or rbd_get_flags() or rbd_diff_iterate2?
+On 02/07/2019 17:03, Peter Maydell wrote:
+> The test aarch64 kernel is in an array defined with
+>  unsigned char aarch64_kernel[] = { [...] }
+> 
+> which means it could be any size; currently it's quite small.
+> However we write it to a file using init_bootfile(), which
+> writes exactly 512 bytes to the file. This will break if
+> we ever end up with a kernel larger than that, and will
+> read garbage off the end of the array in the current setup
+> where the kernel is smaller.
+> 
+> Make init_bootfile() take an argument giving the length of
+> the data to write. This allows us to use it for all architectures
+> (previously s390 had a special-purpose init_bootfile_s390x
+> which hardcoded the file to write so it could write the
+> correct length). We assert that the x86 bootfile really is
+> exactly 512 bytes as it should be (and as we were previously
+> just assuming it was).
+> 
+> This was detected by the clang-7 asan:
+> ==15607==ERROR: AddressSanitizer: global-buffer-overflow on address 0x55a796f51d20 at pc 0x55a796b89c2f bp 0x7ffc58e89160 sp 0x7ffc58e88908
+> READ of size 512 at 0x55a796f51d20 thread T0
+>     #0 0x55a796b89c2e in fwrite (/home/petmay01/linaro/qemu-from-laptop/qemu/build/sanitizers/tests/migration-test+0xb0c2e)
+>     #1 0x55a796c46492 in init_bootfile /home/petmay01/linaro/qemu-from-laptop/qemu/tests/migration-test.c:99:5
+>     #2 0x55a796c46492 in test_migrate_start /home/petmay01/linaro/qemu-from-laptop/qemu/tests/migration-test.c:593
+>     #3 0x55a796c44101 in test_baddest /home/petmay01/linaro/qemu-from-laptop/qemu/tests/migration-test.c:854:9
+>     #4 0x7f906ffd3cc9  (/usr/lib/x86_64-linux-gnu/libglib-2.0.so.0+0x72cc9)
+>     #5 0x7f906ffd3bfa  (/usr/lib/x86_64-linux-gnu/libglib-2.0.so.0+0x72bfa)
+>     #6 0x7f906ffd3bfa  (/usr/lib/x86_64-linux-gnu/libglib-2.0.so.0+0x72bfa)
+>     #7 0x7f906ffd3ea1 in g_test_run_suite (/usr/lib/x86_64-linux-gnu/libglib-2.0.so.0+0x72ea1)
+>     #8 0x7f906ffd3ec0 in g_test_run (/usr/lib/x86_64-linux-gnu/libglib-2.0.so.0+0x72ec0)
+>     #9 0x55a796c43707 in main /home/petmay01/linaro/qemu-from-laptop/qemu/tests/migration-test.c:1187:11
+>     #10 0x7f906e9abb96 in __libc_start_main /build/glibc-OTsEL5/glibc-2.27/csu/../csu/libc-start.c:310
+>     #11 0x55a796b6c2d9 in _start (/home/petmay01/linaro/qemu-from-laptop/qemu/build/sanitizers/tests/migration-test+0x932d9)
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+> patchew's asan build doesn't spot this, so it's presumably
+> using an older version of the sanitizers...
+> 
+> 
+>  tests/migration-test.c | 22 +++++++---------------
+>  1 file changed, 7 insertions(+), 15 deletions(-)
+> 
+> diff --git a/tests/migration-test.c b/tests/migration-test.c
+> index 0cd014dbe51..b6434628e1c 100644
+> --- a/tests/migration-test.c
+> +++ b/tests/migration-test.c
+> @@ -91,23 +91,13 @@ static const char *tmpfs;
+>   */
+>  #include "tests/migration/i386/a-b-bootblock.h"
+>  #include "tests/migration/aarch64/a-b-kernel.h"
+> -
+> -static void init_bootfile(const char *bootpath, void *content)
+> -{
+> -    FILE *bootfile = fopen(bootpath, "wb");
+> -
+> -    g_assert_cmpint(fwrite(content, 512, 1, bootfile), ==, 1);
+> -    fclose(bootfile);
+> -}
+> -
+>  #include "tests/migration/s390x/a-b-bios.h"
+>  
+> -static void init_bootfile_s390x(const char *bootpath)
+> +static void init_bootfile(const char *bootpath, void *content, size_t len)
+>  {
+>      FILE *bootfile = fopen(bootpath, "wb");
+> -    size_t len = sizeof(s390x_elf);
+>  
+> -    g_assert_cmpint(fwrite(s390x_elf, len, 1, bootfile), ==, 1);
+> +    g_assert_cmpint(fwrite(content, len, 1, bootfile), ==, 1);
+>      fclose(bootfile);
+>  }
+>  
+> @@ -537,7 +527,9 @@ static int test_migrate_start(QTestState **from, QTestState **to,
+>      got_stop = false;
+>      bootpath = g_strdup_printf("%s/bootsect", tmpfs);
+>      if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
+> -        init_bootfile(bootpath, x86_bootsect);
+> +        /* the assembled x86 boot sector should be exactly one sector large */
+> +        assert(sizeof(x86_bootsect) == 512);
+> +        init_bootfile(bootpath, x86_bootsect, sizeof(x86_bootsect));
+>          extra_opts = use_shmem ? get_shmem_opts("150M", shmem_path) : NULL;
+>          cmd_src = g_strdup_printf("-machine accel=%s -m 150M"
+>                                    " -name source,debug-threads=on"
+> @@ -555,7 +547,7 @@ static int test_migrate_start(QTestState **from, QTestState **to,
+>          start_address = X86_TEST_MEM_START;
+>          end_address = X86_TEST_MEM_END;
+>      } else if (g_str_equal(arch, "s390x")) {
+> -        init_bootfile_s390x(bootpath);
+> +        init_bootfile(bootpath, s390x_elf, sizeof(s390x_elf));
+>          extra_opts = use_shmem ? get_shmem_opts("128M", shmem_path) : NULL;
+>          cmd_src = g_strdup_printf("-machine accel=%s -m 128M"
+>                                    " -name source,debug-threads=on"
+> @@ -590,7 +582,7 @@ static int test_migrate_start(QTestState **from, QTestState **to,
+>          start_address = PPC_TEST_MEM_START;
+>          end_address = PPC_TEST_MEM_END;
+>      } else if (strcmp(arch, "aarch64") == 0) {
+> -        init_bootfile(bootpath, aarch64_kernel);
+> +        init_bootfile(bootpath, aarch64_kernel, sizeof(aarch64_kernel));
+>          extra_opts = use_shmem ? get_shmem_opts("150M", shmem_path) : NULL;
+>          cmd_src = g_strdup_printf("-machine virt,accel=%s,gic-version=max "
+>                                    "-name vmsource,debug-threads=on -cpu max "
+> 
 
-I was advocating for only returning -ENOTSUP in the case where
-fast-diff isn't enabled or is flagged as invalid (instead of the
-hard-coded -1). If one of the librbd APIs returns an error for some
-reason, it seems like you can just pass it along like the current
-patch does since any negative result is handled.
-
-> Thanks,
-> Stefano
-
---
-Jason
+Reviewed-by: Laurent Vivier <lvivier@redhat.com>
 
