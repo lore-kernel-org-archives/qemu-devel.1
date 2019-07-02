@@ -6,57 +6,57 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D75D0C5B578
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 03:24:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0F65C5B578
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 03:26:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AD43821479
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 03:24:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD43821479
+	by mail.kernel.org (Postfix) with ESMTPS id 93C9621479
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 03:26:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 93C9621479
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47962 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47968 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hi9PV-0005r8-OI
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 23:24:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35449)
+	id 1hi9RC-0007TG-Sy
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 23:26:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34978)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hi7DJ-0003bY-7i
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 21:04:07 -0400
+ (envelope-from <philmd@redhat.com>) id 1hi7Bd-0003BS-Cw
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 21:02:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hi7DA-00044y-Rh
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 21:04:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46282)
+ (envelope-from <philmd@redhat.com>) id 1hi7Bb-0002K5-J6
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 21:02:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46434)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <philmd@redhat.com>)
- id 1hi7Cq-0001WR-0g; Mon, 01 Jul 2019 21:03:39 -0400
+ id 1hi7BM-0001l5-Tc; Mon, 01 Jul 2019 21:02:05 -0400
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 18E1130C1328;
- Tue,  2 Jul 2019 01:00:15 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id E060A30C133C;
+ Tue,  2 Jul 2019 01:00:43 +0000 (UTC)
 Received: from x1w.redhat.com (ovpn-204-21.brq.redhat.com [10.40.204.21])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 6946B1001B33;
- Tue,  2 Jul 2019 01:00:00 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 865A11001B2D;
+ Tue,  2 Jul 2019 01:00:40 +0000 (UTC)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Mon,  1 Jul 2019 21:58:54 -0300
-Message-Id: <20190702005912.15905-10-philmd@redhat.com>
+Date: Mon,  1 Jul 2019 21:59:00 -0300
+Message-Id: <20190702005912.15905-16-philmd@redhat.com>
 In-Reply-To: <20190702005912.15905-1-philmd@redhat.com>
 References: <20190702005912.15905-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Tue, 02 Jul 2019 01:00:15 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.45]); Tue, 02 Jul 2019 01:00:43 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 09/27] hw/block/pflash_cfi02: Use the ldst API
- in pflash_read()
+Subject: [Qemu-devel] [PULL 15/27] hw/block/pflash_cfi02: Document the
+ current CFI values
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -78,63 +78,66 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The load/store API eases code review.
-
 Signed-off-by: Stephen Checkoway <stephen.checkoway@oberlin.edu>
-Message-Id: <20190426162624.55977-3-stephen.checkoway@oberlin.edu>
+Message-Id: <20190426162624.55977-6-stephen.checkoway@oberlin.edu>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-[PMD: Extracted from bigger patch, simplified tracing]
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+[PMD: Extracted from bigger patch]
+Acked-by: Alistair Francis <alistair.francis@wdc.com>
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- hw/block/pflash_cfi02.c | 32 +++++---------------------------
- 1 file changed, 5 insertions(+), 27 deletions(-)
+ hw/block/pflash_cfi02.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
 diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
-index ae38ed0bae..49afecb921 100644
+index 1a794fa83c..f1bac480f5 100644
 --- a/hw/block/pflash_cfi02.c
 +++ b/hw/block/pflash_cfi02.c
-@@ -196,33 +196,11 @@ static uint32_t pflash_read(PFlashCFI02 *pfl, hwadd=
-r offset,
-     case 0x00:
-     flash_read:
-         /* Flash area read */
--        p =3D pfl->storage;
--        switch (width) {
--        case 1:
--            ret =3D p[offset];
--            break;
--        case 2:
--            if (be) {
--                ret =3D p[offset] << 8;
--                ret |=3D p[offset + 1];
--            } else {
--                ret =3D p[offset];
--                ret |=3D p[offset + 1] << 8;
--            }
--            break;
--        case 4:
--            if (be) {
--                ret =3D p[offset] << 24;
--                ret |=3D p[offset + 1] << 16;
--                ret |=3D p[offset + 2] << 8;
--                ret |=3D p[offset + 3];
--            } else {
--                ret =3D p[offset];
--                ret |=3D p[offset + 1] << 8;
--                ret |=3D p[offset + 2] << 16;
--                ret |=3D p[offset + 3] << 24;
--            }
--            break;
-+        p =3D (uint8_t *)pfl->storage + offset;
-+        if (pfl->be) {
-+            ret =3D ldn_be_p(p, width);
-+        } else {
-+            ret =3D ldn_le_p(p, width);
-         }
-         trace_pflash_data_read(offset, width << 1, ret);
-         break;
+@@ -550,6 +550,7 @@ static void pflash_cfi02_realize(DeviceState *dev, Er=
+ror **errp)
+     pfl->wcycle =3D 0;
+     pfl->cmd =3D 0;
+     pfl->status =3D 0;
++
+     /* Hardcoded CFI table (mostly from SG29 Spansion flash) */
+     /* Standard "QRY" string */
+     pfl->cfi_table[0x10] =3D 'Q';
+@@ -575,7 +576,7 @@ static void pflash_cfi02_realize(DeviceState *dev, Er=
+ror **errp)
+     pfl->cfi_table[0x1D] =3D 0x00;
+     /* Vpp max (no Vpp pin) */
+     pfl->cfi_table[0x1E] =3D 0x00;
+-    /* Reserved */
++    /* Timeout per single byte/word write (128 ms) */
+     pfl->cfi_table[0x1F] =3D 0x07;
+     /* Timeout for min size buffer write (NA) */
+     pfl->cfi_table[0x20] =3D 0x00;
+@@ -614,17 +615,25 @@ static void pflash_cfi02_realize(DeviceState *dev, =
+Error **errp)
+     pfl->cfi_table[0x32] =3D 'R';
+     pfl->cfi_table[0x33] =3D 'I';
+=20
++    /* Extended version 1.0 */
+     pfl->cfi_table[0x34] =3D '1';
+     pfl->cfi_table[0x35] =3D '0';
+=20
++    /* Address sensitive unlock required. */
+     pfl->cfi_table[0x36] =3D 0x00;
++    /* Erase suspend not supported. */
+     pfl->cfi_table[0x37] =3D 0x00;
++    /* Sector protect not supported. */
+     pfl->cfi_table[0x38] =3D 0x00;
++    /* Temporary sector unprotect not supported. */
+     pfl->cfi_table[0x39] =3D 0x00;
+=20
++    /* Sector protect/unprotect scheme. */
+     pfl->cfi_table[0x3a] =3D 0x00;
+=20
++    /* Simultaneous operation not supported. */
+     pfl->cfi_table[0x3b] =3D 0x00;
++    /* Burst mode not supported. */
+     pfl->cfi_table[0x3c] =3D 0x00;
+ }
+=20
 --=20
 2.20.1
 
