@@ -6,60 +6,59 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F282DC06510
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 11:01:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73685C06510
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 11:07:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BAEA420659
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 11:01:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BAEA420659
+	by mail.kernel.org (Postfix) with ESMTPS id 3ADF420836
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 11:07:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3ADF420836
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51618 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51654 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hiGXU-0002Sm-SW
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 07:01:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51024)
+	id 1hiGcz-0006Ot-Pc
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 07:07:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50984)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <armbru@redhat.com>) id 1hiGJw-0005pr-Kc
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 06:47:40 -0400
+ (envelope-from <armbru@redhat.com>) id 1hiGJt-0005p3-3y
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 06:47:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1hiGJq-0007pR-Rr
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 06:47:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60758)
+ (envelope-from <armbru@redhat.com>) id 1hiGJo-0007ku-8U
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 06:47:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60014)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hiGJo-0007gD-Li
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 06:47:25 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hiGJn-0007g6-NZ
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 06:47:24 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 7F9DE30821BE;
- Tue,  2 Jul 2019 10:47:21 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 38B7D30C0DFE
+ for <qemu-devel@nongnu.org>; Tue,  2 Jul 2019 10:47:21 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-102.ams2.redhat.com
  [10.36.116.102])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id CCC34196BF;
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A60CC37D6;
  Tue,  2 Jul 2019 10:47:20 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id D4D4B11328A5; Tue,  2 Jul 2019 12:47:16 +0200 (CEST)
+ id B8D1F1132989; Tue,  2 Jul 2019 12:47:16 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Tue,  2 Jul 2019 12:47:09 +0200
-Message-Id: <20190702104716.9140-12-armbru@redhat.com>
+Date: Tue,  2 Jul 2019 12:47:04 +0200
+Message-Id: <20190702104716.9140-7-armbru@redhat.com>
 In-Reply-To: <20190702104716.9140-1-armbru@redhat.com>
 References: <20190702104716.9140-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Tue, 02 Jul 2019 10:47:21 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.45]); Tue, 02 Jul 2019 10:47:21 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 11/18] hw/core: Collect QMP command handlers in
- hw/core/
+Subject: [Qemu-devel] [PULL 06/18] qom: Move QMP command handlers to qom/
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,870 +70,746 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ "Daniel P. Berrange" <berrange@redhat.com>,
  Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The handlers for qapi/machine.json's QMP commands are spread over
-cpus.c, hw/core/numa.c, monitor/misc.c, monitor/qmp-cmds.c, and vl.c.
-Move them all to new hw/core/machine-qmp-cmds.c, where they are
-covered by MAINTAINERS section "Machine core", just like
-qapi/machine.json.
+The handlers for qapi/qom.json's QMP commands are in
+monitor/qmp-cmds.c.  Move them to new qom/qom-qmp-cmds.c, where they
+are covered by MAINTAINERS section QOM, just like qapi/qom.json.
 
+Move along qmp_device_list_properties() even though it's specified in
+qapi/qdev.json, because it's so similar to qmp_qom_list_properties().
+
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>
 Cc: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <20190619201050.19040-11-armbru@redhat.com>
+Message-Id: <20190619201050.19040-6-armbru@redhat.com>
 Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 ---
- MAINTAINERS                |   1 +
- cpus.c                     | 188 ---------------------
- hw/core/Makefile.objs      |   1 +
- hw/core/machine-qmp-cmds.c | 328 +++++++++++++++++++++++++++++++++++++
- hw/core/numa.c             |  62 -------
- include/sysemu/numa.h      |   2 +
- monitor/misc.c             |  13 --
- monitor/qmp-cmds.c         |  12 --
- vl.c                       |  45 -----
- 9 files changed, 332 insertions(+), 320 deletions(-)
- create mode 100644 hw/core/machine-qmp-cmds.c
+ monitor/qmp-cmds.c | 303 ------------------------------------------
+ qom/Makefile.objs  |   1 +
+ qom/qom-qmp-cmds.c | 323 +++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 324 insertions(+), 303 deletions(-)
+ create mode 100644 qom/qom-qmp-cmds.c
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 96eaa1e124..bf6742d59f 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1264,6 +1264,7 @@ Machine core
- M: Eduardo Habkost <ehabkost@redhat.com>
- M: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
- S: Supported
-+F: hw/core/machine-qmp-cmds.c
- F: hw/core/machine.c
- F: hw/core/null-machine.c
- F: hw/core/numa.c
-diff --git a/cpus.c b/cpus.c
-index 100ce47fef..eef7b007ae 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -25,16 +25,13 @@
- #include "qemu/osdep.h"
- #include "qemu-common.h"
- #include "qemu/config-file.h"
--#include "cpu.h"
- #include "monitor/monitor.h"
- #include "qapi/error.h"
--#include "qapi/qapi-commands-machine.h"
- #include "qapi/qapi-commands-misc.h"
- #include "qapi/qapi-events-run-state.h"
- #include "qapi/qmp/qerror.h"
- #include "qemu/error-report.h"
- #include "qemu/qemu-print.h"
--#include "sysemu/sysemu.h"
- #include "sysemu/tcg.h"
+diff --git a/monitor/qmp-cmds.c b/monitor/qmp-cmds.c
+index 33f32ad72a..6c06733c31 100644
+--- a/monitor/qmp-cmds.c
++++ b/monitor/qmp-cmds.c
+@@ -27,20 +27,14 @@
+ #include "ui/vnc.h"
+ #include "sysemu/kvm.h"
+ #include "sysemu/arch_init.h"
+-#include "hw/qdev.h"
+ #include "sysemu/blockdev.h"
  #include "sysemu/block-backend.h"
- #include "exec/gdbstub.h"
-@@ -57,7 +54,6 @@
- #include "tcg.h"
- #include "hw/nmi.h"
- #include "sysemu/replay.h"
--#include "hw/boards.h"
-=20
- #ifdef CONFIG_LINUX
-=20
-@@ -2201,190 +2197,6 @@ void list_cpus(const char *optarg)
- #endif
- }
-=20
--CpuInfoList *qmp_query_cpus(Error **errp)
--{
--    MachineState *ms =3D MACHINE(qdev_get_machine());
--    MachineClass *mc =3D MACHINE_GET_CLASS(ms);
--    CpuInfoList *head =3D NULL, *cur_item =3D NULL;
--    CPUState *cpu;
--
--    CPU_FOREACH(cpu) {
--        CpuInfoList *info;
--#if defined(TARGET_I386)
--        X86CPU *x86_cpu =3D X86_CPU(cpu);
--        CPUX86State *env =3D &x86_cpu->env;
--#elif defined(TARGET_PPC)
--        PowerPCCPU *ppc_cpu =3D POWERPC_CPU(cpu);
--        CPUPPCState *env =3D &ppc_cpu->env;
--#elif defined(TARGET_SPARC)
--        SPARCCPU *sparc_cpu =3D SPARC_CPU(cpu);
--        CPUSPARCState *env =3D &sparc_cpu->env;
--#elif defined(TARGET_RISCV)
--        RISCVCPU *riscv_cpu =3D RISCV_CPU(cpu);
--        CPURISCVState *env =3D &riscv_cpu->env;
--#elif defined(TARGET_MIPS)
--        MIPSCPU *mips_cpu =3D MIPS_CPU(cpu);
--        CPUMIPSState *env =3D &mips_cpu->env;
--#elif defined(TARGET_TRICORE)
--        TriCoreCPU *tricore_cpu =3D TRICORE_CPU(cpu);
--        CPUTriCoreState *env =3D &tricore_cpu->env;
--#elif defined(TARGET_S390X)
--        S390CPU *s390_cpu =3D S390_CPU(cpu);
--        CPUS390XState *env =3D &s390_cpu->env;
--#endif
--
--        cpu_synchronize_state(cpu);
--
--        info =3D g_malloc0(sizeof(*info));
--        info->value =3D g_malloc0(sizeof(*info->value));
--        info->value->CPU =3D cpu->cpu_index;
--        info->value->current =3D (cpu =3D=3D first_cpu);
--        info->value->halted =3D cpu->halted;
--        info->value->qom_path =3D object_get_canonical_path(OBJECT(cpu))=
-;
--        info->value->thread_id =3D cpu->thread_id;
--#if defined(TARGET_I386)
--        info->value->arch =3D CPU_INFO_ARCH_X86;
--        info->value->u.x86.pc =3D env->eip + env->segs[R_CS].base;
--#elif defined(TARGET_PPC)
--        info->value->arch =3D CPU_INFO_ARCH_PPC;
--        info->value->u.ppc.nip =3D env->nip;
--#elif defined(TARGET_SPARC)
--        info->value->arch =3D CPU_INFO_ARCH_SPARC;
--        info->value->u.q_sparc.pc =3D env->pc;
--        info->value->u.q_sparc.npc =3D env->npc;
--#elif defined(TARGET_MIPS)
--        info->value->arch =3D CPU_INFO_ARCH_MIPS;
--        info->value->u.q_mips.PC =3D env->active_tc.PC;
--#elif defined(TARGET_TRICORE)
--        info->value->arch =3D CPU_INFO_ARCH_TRICORE;
--        info->value->u.tricore.PC =3D env->PC;
--#elif defined(TARGET_S390X)
--        info->value->arch =3D CPU_INFO_ARCH_S390;
--        info->value->u.s390.cpu_state =3D env->cpu_state;
--#elif defined(TARGET_RISCV)
--        info->value->arch =3D CPU_INFO_ARCH_RISCV;
--        info->value->u.riscv.pc =3D env->pc;
--#else
--        info->value->arch =3D CPU_INFO_ARCH_OTHER;
--#endif
--        info->value->has_props =3D !!mc->cpu_index_to_instance_props;
--        if (info->value->has_props) {
--            CpuInstanceProperties *props;
--            props =3D g_malloc0(sizeof(*props));
--            *props =3D mc->cpu_index_to_instance_props(ms, cpu->cpu_inde=
-x);
--            info->value->props =3D props;
--        }
--
--        /* XXX: waiting for the qapi to support GSList */
--        if (!cur_item) {
--            head =3D cur_item =3D info;
--        } else {
--            cur_item->next =3D info;
--            cur_item =3D info;
--        }
--    }
--
--    return head;
--}
--
--static CpuInfoArch sysemu_target_to_cpuinfo_arch(SysEmuTarget target)
--{
--    /*
--     * The @SysEmuTarget -> @CpuInfoArch mapping below is based on the
--     * TARGET_ARCH -> TARGET_BASE_ARCH mapping in the "configure" script=
-.
--     */
--    switch (target) {
--    case SYS_EMU_TARGET_I386:
--    case SYS_EMU_TARGET_X86_64:
--        return CPU_INFO_ARCH_X86;
--
--    case SYS_EMU_TARGET_PPC:
--    case SYS_EMU_TARGET_PPC64:
--        return CPU_INFO_ARCH_PPC;
--
--    case SYS_EMU_TARGET_SPARC:
--    case SYS_EMU_TARGET_SPARC64:
--        return CPU_INFO_ARCH_SPARC;
--
--    case SYS_EMU_TARGET_MIPS:
--    case SYS_EMU_TARGET_MIPSEL:
--    case SYS_EMU_TARGET_MIPS64:
--    case SYS_EMU_TARGET_MIPS64EL:
--        return CPU_INFO_ARCH_MIPS;
--
--    case SYS_EMU_TARGET_TRICORE:
--        return CPU_INFO_ARCH_TRICORE;
--
--    case SYS_EMU_TARGET_S390X:
--        return CPU_INFO_ARCH_S390;
--
--    case SYS_EMU_TARGET_RISCV32:
--    case SYS_EMU_TARGET_RISCV64:
--        return CPU_INFO_ARCH_RISCV;
--
--    default:
--        return CPU_INFO_ARCH_OTHER;
--    }
--}
--
--static void cpustate_to_cpuinfo_s390(CpuInfoS390 *info, const CPUState *=
-cpu)
--{
--#ifdef TARGET_S390X
--    S390CPU *s390_cpu =3D S390_CPU(cpu);
--    CPUS390XState *env =3D &s390_cpu->env;
--
--    info->cpu_state =3D env->cpu_state;
--#else
--    abort();
--#endif
--}
--
--/*
-- * fast means: we NEVER interrupt vCPU threads to retrieve
-- * information from KVM.
-- */
--CpuInfoFastList *qmp_query_cpus_fast(Error **errp)
--{
--    MachineState *ms =3D MACHINE(qdev_get_machine());
--    MachineClass *mc =3D MACHINE_GET_CLASS(ms);
--    CpuInfoFastList *head =3D NULL, *cur_item =3D NULL;
--    SysEmuTarget target =3D qapi_enum_parse(&SysEmuTarget_lookup, TARGET=
-_NAME,
--                                          -1, &error_abort);
--    CPUState *cpu;
--
--    CPU_FOREACH(cpu) {
--        CpuInfoFastList *info =3D g_malloc0(sizeof(*info));
--        info->value =3D g_malloc0(sizeof(*info->value));
--
--        info->value->cpu_index =3D cpu->cpu_index;
--        info->value->qom_path =3D object_get_canonical_path(OBJECT(cpu))=
-;
--        info->value->thread_id =3D cpu->thread_id;
--
--        info->value->has_props =3D !!mc->cpu_index_to_instance_props;
--        if (info->value->has_props) {
--            CpuInstanceProperties *props;
--            props =3D g_malloc0(sizeof(*props));
--            *props =3D mc->cpu_index_to_instance_props(ms, cpu->cpu_inde=
-x);
--            info->value->props =3D props;
--        }
--
--        info->value->arch =3D sysemu_target_to_cpuinfo_arch(target);
--        info->value->target =3D target;
--        if (target =3D=3D SYS_EMU_TARGET_S390X) {
--            cpustate_to_cpuinfo_s390(&info->value->u.s390x, cpu);
--        }
--
--        if (!cur_item) {
--            head =3D cur_item =3D info;
--        } else {
--            cur_item->next =3D info;
--            cur_item =3D info;
--        }
--    }
--
--    return head;
--}
--
- void qmp_memsave(int64_t addr, int64_t size, const char *filename,
-                  bool has_cpu, int64_t cpu_index, Error **errp)
- {
-diff --git a/hw/core/Makefile.objs b/hw/core/Makefile.objs
-index e3a8307be6..99e7abe982 100644
---- a/hw/core/Makefile.objs
-+++ b/hw/core/Makefile.objs
-@@ -23,4 +23,5 @@ common-obj-$(CONFIG_PLATFORM_BUS) +=3D platform-bus.o
- common-obj-$(CONFIG_SOFTMMU) +=3D generic-loader.o
- common-obj-$(CONFIG_SOFTMMU) +=3D null-machine.o
-=20
-+obj-$(CONFIG_SOFTMMU) +=3D machine-qmp-cmds.o
- obj-$(CONFIG_SOFTMMU) +=3D numa.o
-diff --git a/hw/core/machine-qmp-cmds.c b/hw/core/machine-qmp-cmds.c
-new file mode 100644
-index 0000000000..1e08252af7
---- /dev/null
-+++ b/hw/core/machine-qmp-cmds.c
-@@ -0,0 +1,328 @@
-+/*
-+ * QMP commands related to machines and CPUs
-+ *
-+ * Copyright (C) 2014 Red Hat Inc
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "cpu.h"
-+#include "hw/boards.h"
-+#include "qapi/error.h"
-+#include "qapi/qapi-commands-machine.h"
-+#include "qapi/qmp/qerror.h"
-+#include "sysemu/hostmem.h"
-+#include "sysemu/hw_accel.h"
-+#include "sysemu/numa.h"
-+#include "sysemu/sysemu.h"
-+
-+CpuInfoList *qmp_query_cpus(Error **errp)
-+{
-+    MachineState *ms =3D MACHINE(qdev_get_machine());
-+    MachineClass *mc =3D MACHINE_GET_CLASS(ms);
-+    CpuInfoList *head =3D NULL, *cur_item =3D NULL;
-+    CPUState *cpu;
-+
-+    CPU_FOREACH(cpu) {
-+        CpuInfoList *info;
-+#if defined(TARGET_I386)
-+        X86CPU *x86_cpu =3D X86_CPU(cpu);
-+        CPUX86State *env =3D &x86_cpu->env;
-+#elif defined(TARGET_PPC)
-+        PowerPCCPU *ppc_cpu =3D POWERPC_CPU(cpu);
-+        CPUPPCState *env =3D &ppc_cpu->env;
-+#elif defined(TARGET_SPARC)
-+        SPARCCPU *sparc_cpu =3D SPARC_CPU(cpu);
-+        CPUSPARCState *env =3D &sparc_cpu->env;
-+#elif defined(TARGET_RISCV)
-+        RISCVCPU *riscv_cpu =3D RISCV_CPU(cpu);
-+        CPURISCVState *env =3D &riscv_cpu->env;
-+#elif defined(TARGET_MIPS)
-+        MIPSCPU *mips_cpu =3D MIPS_CPU(cpu);
-+        CPUMIPSState *env =3D &mips_cpu->env;
-+#elif defined(TARGET_TRICORE)
-+        TriCoreCPU *tricore_cpu =3D TRICORE_CPU(cpu);
-+        CPUTriCoreState *env =3D &tricore_cpu->env;
-+#elif defined(TARGET_S390X)
-+        S390CPU *s390_cpu =3D S390_CPU(cpu);
-+        CPUS390XState *env =3D &s390_cpu->env;
-+#endif
-+
-+        cpu_synchronize_state(cpu);
-+
-+        info =3D g_malloc0(sizeof(*info));
-+        info->value =3D g_malloc0(sizeof(*info->value));
-+        info->value->CPU =3D cpu->cpu_index;
-+        info->value->current =3D (cpu =3D=3D first_cpu);
-+        info->value->halted =3D cpu->halted;
-+        info->value->qom_path =3D object_get_canonical_path(OBJECT(cpu))=
-;
-+        info->value->thread_id =3D cpu->thread_id;
-+#if defined(TARGET_I386)
-+        info->value->arch =3D CPU_INFO_ARCH_X86;
-+        info->value->u.x86.pc =3D env->eip + env->segs[R_CS].base;
-+#elif defined(TARGET_PPC)
-+        info->value->arch =3D CPU_INFO_ARCH_PPC;
-+        info->value->u.ppc.nip =3D env->nip;
-+#elif defined(TARGET_SPARC)
-+        info->value->arch =3D CPU_INFO_ARCH_SPARC;
-+        info->value->u.q_sparc.pc =3D env->pc;
-+        info->value->u.q_sparc.npc =3D env->npc;
-+#elif defined(TARGET_MIPS)
-+        info->value->arch =3D CPU_INFO_ARCH_MIPS;
-+        info->value->u.q_mips.PC =3D env->active_tc.PC;
-+#elif defined(TARGET_TRICORE)
-+        info->value->arch =3D CPU_INFO_ARCH_TRICORE;
-+        info->value->u.tricore.PC =3D env->PC;
-+#elif defined(TARGET_S390X)
-+        info->value->arch =3D CPU_INFO_ARCH_S390;
-+        info->value->u.s390.cpu_state =3D env->cpu_state;
-+#elif defined(TARGET_RISCV)
-+        info->value->arch =3D CPU_INFO_ARCH_RISCV;
-+        info->value->u.riscv.pc =3D env->pc;
-+#else
-+        info->value->arch =3D CPU_INFO_ARCH_OTHER;
-+#endif
-+        info->value->has_props =3D !!mc->cpu_index_to_instance_props;
-+        if (info->value->has_props) {
-+            CpuInstanceProperties *props;
-+            props =3D g_malloc0(sizeof(*props));
-+            *props =3D mc->cpu_index_to_instance_props(ms, cpu->cpu_inde=
-x);
-+            info->value->props =3D props;
-+        }
-+
-+        /* XXX: waiting for the qapi to support GSList */
-+        if (!cur_item) {
-+            head =3D cur_item =3D info;
-+        } else {
-+            cur_item->next =3D info;
-+            cur_item =3D info;
-+        }
-+    }
-+
-+    return head;
-+}
-+
-+static CpuInfoArch sysemu_target_to_cpuinfo_arch(SysEmuTarget target)
-+{
-+    /*
-+     * The @SysEmuTarget -> @CpuInfoArch mapping below is based on the
-+     * TARGET_ARCH -> TARGET_BASE_ARCH mapping in the "configure" script=
-.
-+     */
-+    switch (target) {
-+    case SYS_EMU_TARGET_I386:
-+    case SYS_EMU_TARGET_X86_64:
-+        return CPU_INFO_ARCH_X86;
-+
-+    case SYS_EMU_TARGET_PPC:
-+    case SYS_EMU_TARGET_PPC64:
-+        return CPU_INFO_ARCH_PPC;
-+
-+    case SYS_EMU_TARGET_SPARC:
-+    case SYS_EMU_TARGET_SPARC64:
-+        return CPU_INFO_ARCH_SPARC;
-+
-+    case SYS_EMU_TARGET_MIPS:
-+    case SYS_EMU_TARGET_MIPSEL:
-+    case SYS_EMU_TARGET_MIPS64:
-+    case SYS_EMU_TARGET_MIPS64EL:
-+        return CPU_INFO_ARCH_MIPS;
-+
-+    case SYS_EMU_TARGET_TRICORE:
-+        return CPU_INFO_ARCH_TRICORE;
-+
-+    case SYS_EMU_TARGET_S390X:
-+        return CPU_INFO_ARCH_S390;
-+
-+    case SYS_EMU_TARGET_RISCV32:
-+    case SYS_EMU_TARGET_RISCV64:
-+        return CPU_INFO_ARCH_RISCV;
-+
-+    default:
-+        return CPU_INFO_ARCH_OTHER;
-+    }
-+}
-+
-+static void cpustate_to_cpuinfo_s390(CpuInfoS390 *info, const CPUState *=
-cpu)
-+{
-+#ifdef TARGET_S390X
-+    S390CPU *s390_cpu =3D S390_CPU(cpu);
-+    CPUS390XState *env =3D &s390_cpu->env;
-+
-+    info->cpu_state =3D env->cpu_state;
-+#else
-+    abort();
-+#endif
-+}
-+
-+/*
-+ * fast means: we NEVER interrupt vCPU threads to retrieve
-+ * information from KVM.
-+ */
-+CpuInfoFastList *qmp_query_cpus_fast(Error **errp)
-+{
-+    MachineState *ms =3D MACHINE(qdev_get_machine());
-+    MachineClass *mc =3D MACHINE_GET_CLASS(ms);
-+    CpuInfoFastList *head =3D NULL, *cur_item =3D NULL;
-+    SysEmuTarget target =3D qapi_enum_parse(&SysEmuTarget_lookup, TARGET=
-_NAME,
-+                                          -1, &error_abort);
-+    CPUState *cpu;
-+
-+    CPU_FOREACH(cpu) {
-+        CpuInfoFastList *info =3D g_malloc0(sizeof(*info));
-+        info->value =3D g_malloc0(sizeof(*info->value));
-+
-+        info->value->cpu_index =3D cpu->cpu_index;
-+        info->value->qom_path =3D object_get_canonical_path(OBJECT(cpu))=
-;
-+        info->value->thread_id =3D cpu->thread_id;
-+
-+        info->value->has_props =3D !!mc->cpu_index_to_instance_props;
-+        if (info->value->has_props) {
-+            CpuInstanceProperties *props;
-+            props =3D g_malloc0(sizeof(*props));
-+            *props =3D mc->cpu_index_to_instance_props(ms, cpu->cpu_inde=
-x);
-+            info->value->props =3D props;
-+        }
-+
-+        info->value->arch =3D sysemu_target_to_cpuinfo_arch(target);
-+        info->value->target =3D target;
-+        if (target =3D=3D SYS_EMU_TARGET_S390X) {
-+            cpustate_to_cpuinfo_s390(&info->value->u.s390x, cpu);
-+        }
-+
-+        if (!cur_item) {
-+            head =3D cur_item =3D info;
-+        } else {
-+            cur_item->next =3D info;
-+            cur_item =3D info;
-+        }
-+    }
-+
-+    return head;
-+}
-+
-+MachineInfoList *qmp_query_machines(Error **errp)
-+{
-+    GSList *el, *machines =3D object_class_get_list(TYPE_MACHINE, false)=
-;
-+    MachineInfoList *mach_list =3D NULL;
-+
-+    for (el =3D machines; el; el =3D el->next) {
-+        MachineClass *mc =3D el->data;
-+        MachineInfoList *entry;
-+        MachineInfo *info;
-+
-+        info =3D g_malloc0(sizeof(*info));
-+        if (mc->is_default) {
-+            info->has_is_default =3D true;
-+            info->is_default =3D true;
-+        }
-+
-+        if (mc->alias) {
-+            info->has_alias =3D true;
-+            info->alias =3D g_strdup(mc->alias);
-+        }
-+
-+        info->name =3D g_strdup(mc->name);
-+        info->cpu_max =3D !mc->max_cpus ? 1 : mc->max_cpus;
-+        info->hotpluggable_cpus =3D mc->has_hotpluggable_cpus;
-+
-+        entry =3D g_malloc0(sizeof(*entry));
-+        entry->value =3D info;
-+        entry->next =3D mach_list;
-+        mach_list =3D entry;
-+    }
-+
-+    g_slist_free(machines);
-+    return mach_list;
-+}
-+
-+CurrentMachineParams *qmp_query_current_machine(Error **errp)
-+{
-+    CurrentMachineParams *params =3D g_malloc0(sizeof(*params));
-+    params->wakeup_suspend_support =3D qemu_wakeup_suspend_enabled();
-+
-+    return params;
-+}
-+
-+HotpluggableCPUList *qmp_query_hotpluggable_cpus(Error **errp)
-+{
-+    MachineState *ms =3D MACHINE(qdev_get_machine());
-+    MachineClass *mc =3D MACHINE_GET_CLASS(ms);
-+
-+    if (!mc->has_hotpluggable_cpus) {
-+        error_setg(errp, QERR_FEATURE_DISABLED, "query-hotpluggable-cpus=
-");
-+        return NULL;
-+    }
-+
-+    return machine_query_hotpluggable_cpus(ms);
-+}
-+
-+void qmp_cpu_add(int64_t id, Error **errp)
-+{
-+    MachineClass *mc;
-+
-+    mc =3D MACHINE_GET_CLASS(current_machine);
-+    if (mc->hot_add_cpu) {
-+        mc->hot_add_cpu(id, errp);
-+    } else {
-+        error_setg(errp, "Not supported");
-+    }
-+}
-+
-+void qmp_set_numa_node(NumaOptions *cmd, Error **errp)
-+{
-+    if (!runstate_check(RUN_STATE_PRECONFIG)) {
-+        error_setg(errp, "The command is permitted only in '%s' state",
-+                   RunState_str(RUN_STATE_PRECONFIG));
-+         return;
-+    }
-+
-+    set_numa_options(MACHINE(qdev_get_machine()), cmd, errp);
-+}
-+
-+static int query_memdev(Object *obj, void *opaque)
-+{
-+    MemdevList **list =3D opaque;
-+    MemdevList *m =3D NULL;
-+
-+    if (object_dynamic_cast(obj, TYPE_MEMORY_BACKEND)) {
-+        m =3D g_malloc0(sizeof(*m));
-+
-+        m->value =3D g_malloc0(sizeof(*m->value));
-+
-+        m->value->id =3D object_get_canonical_path_component(obj);
-+        m->value->has_id =3D !!m->value->id;
-+
-+        m->value->size =3D object_property_get_uint(obj, "size",
-+                                                  &error_abort);
-+        m->value->merge =3D object_property_get_bool(obj, "merge",
-+                                                   &error_abort);
-+        m->value->dump =3D object_property_get_bool(obj, "dump",
-+                                                  &error_abort);
-+        m->value->prealloc =3D object_property_get_bool(obj,
-+                                                      "prealloc",
-+                                                      &error_abort);
-+        m->value->policy =3D object_property_get_enum(obj,
-+                                                    "policy",
-+                                                    "HostMemPolicy",
-+                                                    &error_abort);
-+        object_property_get_uint16List(obj, "host-nodes",
-+                                       &m->value->host_nodes,
-+                                       &error_abort);
-+
-+        m->next =3D *list;
-+        *list =3D m;
-+    }
-+
-+    return 0;
-+}
-+
-+MemdevList *qmp_query_memdev(Error **errp)
-+{
-+    Object *obj =3D object_get_objects_root();
-+    MemdevList *list =3D NULL;
-+
-+    object_child_foreach(obj, query_memdev, &list);
-+    return list;
-+}
-diff --git a/hw/core/numa.c b/hw/core/numa.c
-index 6f85407c46..76c447f90a 100644
---- a/hw/core/numa.c
-+++ b/hw/core/numa.c
-@@ -27,14 +27,10 @@
- #include "exec/cpu-common.h"
- #include "exec/ramlist.h"
- #include "qemu/bitmap.h"
--#include "qom/cpu.h"
- #include "qemu/error-report.h"
+-#include "qom/qom-qobject.h"
  #include "qapi/error.h"
- #include "qapi/opts-visitor.h"
--#include "qapi/qapi-commands-machine.h"
- #include "qapi/qapi-visit-machine.h"
--#include "hw/boards.h"
--#include "sysemu/hostmem.h"
- #include "hw/mem/pc-dimm.h"
+ #include "qapi/qapi-commands-block-core.h"
+ #include "qapi/qapi-commands-misc.h"
+-#include "qapi/qapi-commands-qdev.h"
+ #include "qapi/qapi-commands-ui.h"
+-#include "qapi/qmp/qdict.h"
+ #include "qapi/qmp/qerror.h"
+-#include "qapi/qobject-input-visitor.h"
+ #include "hw/boards.h"
+-#include "qom/object_interfaces.h"
  #include "hw/mem/memory-device.h"
- #include "qemu/option.h"
-@@ -174,7 +170,6 @@ static void parse_numa_distance(NumaDistOptions *dist=
-, Error **errp)
-     have_numa_distance =3D true;
+ #include "hw/acpi/acpi_dev_interface.h"
+=20
+@@ -202,69 +196,6 @@ void qmp_system_wakeup(Error **errp)
+     qemu_system_wakeup_request(QEMU_WAKEUP_REASON_OTHER, errp);
  }
 =20
--static
- void set_numa_options(MachineState *ms, NumaOptions *object, Error **err=
-p)
- {
-     Error *err =3D NULL;
-@@ -447,17 +442,6 @@ void parse_numa_opts(MachineState *ms)
-     qemu_opts_foreach(qemu_find_opts("numa"), parse_numa, ms, &error_fat=
-al);
- }
-=20
--void qmp_set_numa_node(NumaOptions *cmd, Error **errp)
+-ObjectPropertyInfoList *qmp_qom_list(const char *path, Error **errp)
 -{
--    if (!runstate_check(RUN_STATE_PRECONFIG)) {
--        error_setg(errp, "The command is permitted only in '%s' state",
--                   RunState_str(RUN_STATE_PRECONFIG));
--         return;
--    }
+-    Object *obj;
+-    bool ambiguous =3D false;
+-    ObjectPropertyInfoList *props =3D NULL;
+-    ObjectProperty *prop;
+-    ObjectPropertyIterator iter;
 -
--    set_numa_options(MACHINE(qdev_get_machine()), cmd, errp);
--}
--
- void numa_cpu_pre_plug(const CPUArchId *slot, DeviceState *dev, Error **=
-errp)
- {
-     int node_id =3D object_property_get_int(OBJECT(dev), "node-id", &err=
-or_abort);
-@@ -592,52 +576,6 @@ void query_numa_node_mem(NumaNodeMem node_mem[])
-     }
- }
-=20
--static int query_memdev(Object *obj, void *opaque)
--{
--    MemdevList **list =3D opaque;
--    MemdevList *m =3D NULL;
--
--    if (object_dynamic_cast(obj, TYPE_MEMORY_BACKEND)) {
--        m =3D g_malloc0(sizeof(*m));
--
--        m->value =3D g_malloc0(sizeof(*m->value));
--
--        m->value->id =3D object_get_canonical_path_component(obj);
--        m->value->has_id =3D !!m->value->id;
--
--        m->value->size =3D object_property_get_uint(obj, "size",
--                                                  &error_abort);
--        m->value->merge =3D object_property_get_bool(obj, "merge",
--                                                   &error_abort);
--        m->value->dump =3D object_property_get_bool(obj, "dump",
--                                                  &error_abort);
--        m->value->prealloc =3D object_property_get_bool(obj,
--                                                      "prealloc",
--                                                      &error_abort);
--        m->value->policy =3D object_property_get_enum(obj,
--                                                    "policy",
--                                                    "HostMemPolicy",
--                                                    &error_abort);
--        object_property_get_uint16List(obj, "host-nodes",
--                                       &m->value->host_nodes,
--                                       &error_abort);
--
--        m->next =3D *list;
--        *list =3D m;
--    }
--
--    return 0;
--}
--
--MemdevList *qmp_query_memdev(Error **errp)
--{
--    Object *obj =3D object_get_objects_root();
--    MemdevList *list =3D NULL;
--
--    object_child_foreach(obj, query_memdev, &list);
--    return list;
--}
--
- void ram_block_notifier_add(RAMBlockNotifier *n)
- {
-     QLIST_INSERT_HEAD(&ram_list.ramblock_notifiers, n, next);
-diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
-index b6ac7de43e..01a263eba2 100644
---- a/include/sysemu/numa.h
-+++ b/include/sysemu/numa.h
-@@ -22,6 +22,8 @@ struct NumaNodeMem {
- };
-=20
- extern NodeInfo numa_info[MAX_NODES];
-+
-+void set_numa_options(MachineState *ms, NumaOptions *object, Error **err=
-p);
- void parse_numa_opts(MachineState *ms);
- void numa_complete_configuration(MachineState *ms);
- void query_numa_node_mem(NumaNodeMem node_mem[]);
-diff --git a/monitor/misc.c b/monitor/misc.c
-index 2fb6896e84..45f3f55a4d 100644
---- a/monitor/misc.c
-+++ b/monitor/misc.c
-@@ -2338,16 +2338,3 @@ void monitor_init_globals(void)
-     sortcmdlist();
-     qemu_mutex_init(&mon_fdsets_lock);
- }
--
--HotpluggableCPUList *qmp_query_hotpluggable_cpus(Error **errp)
--{
--    MachineState *ms =3D MACHINE(qdev_get_machine());
--    MachineClass *mc =3D MACHINE_GET_CLASS(ms);
--
--    if (!mc->has_hotpluggable_cpus) {
--        error_setg(errp, QERR_FEATURE_DISABLED, "query-hotpluggable-cpus=
-");
+-    obj =3D object_resolve_path(path, &ambiguous);
+-    if (obj =3D=3D NULL) {
+-        if (ambiguous) {
+-            error_setg(errp, "Path '%s' is ambiguous", path);
+-        } else {
+-            error_set(errp, ERROR_CLASS_DEVICE_NOT_FOUND,
+-                      "Device '%s' not found", path);
+-        }
 -        return NULL;
 -    }
 -
--    return machine_query_hotpluggable_cpus(ms);
--}
-diff --git a/monitor/qmp-cmds.c b/monitor/qmp-cmds.c
-index 5788db5c59..b9ae40eec7 100644
---- a/monitor/qmp-cmds.c
-+++ b/monitor/qmp-cmds.c
-@@ -114,18 +114,6 @@ void qmp_system_powerdown(Error **erp)
-     qemu_system_powerdown_request();
- }
-=20
--void qmp_cpu_add(int64_t id, Error **errp)
--{
--    MachineClass *mc;
+-    object_property_iter_init(&iter, obj);
+-    while ((prop =3D object_property_iter_next(&iter))) {
+-        ObjectPropertyInfoList *entry =3D g_malloc0(sizeof(*entry));
 -
--    mc =3D MACHINE_GET_CLASS(current_machine);
--    if (mc->hot_add_cpu) {
--        mc->hot_add_cpu(id, errp);
--    } else {
--        error_setg(errp, "Not supported");
+-        entry->value =3D g_malloc0(sizeof(ObjectPropertyInfo));
+-        entry->next =3D props;
+-        props =3D entry;
+-
+-        entry->value->name =3D g_strdup(prop->name);
+-        entry->value->type =3D g_strdup(prop->type);
 -    }
+-
+-    return props;
 -}
 -
- void qmp_x_exit_preconfig(Error **errp)
+-void qmp_qom_set(const char *path, const char *property, QObject *value,
+-                 Error **errp)
+-{
+-    Object *obj;
+-
+-    obj =3D object_resolve_path(path, NULL);
+-    if (!obj) {
+-        error_set(errp, ERROR_CLASS_DEVICE_NOT_FOUND,
+-                  "Device '%s' not found", path);
+-        return;
+-    }
+-
+-    object_property_set_qobject(obj, value, property, errp);
+-}
+-
+-QObject *qmp_qom_get(const char *path, const char *property, Error **err=
+p)
+-{
+-    Object *obj;
+-
+-    obj =3D object_resolve_path(path, NULL);
+-    if (!obj) {
+-        error_set(errp, ERROR_CLASS_DEVICE_NOT_FOUND,
+-                  "Device '%s' not found", path);
+-        return NULL;
+-    }
+-
+-    return object_property_get_qobject(obj, property, errp);
+-}
+-
+ void qmp_set_password(const char *protocol, const char *password,
+                       bool has_connected, const char *connected, Error *=
+*errp)
  {
-     if (!runstate_check(RUN_STATE_PRECONFIG)) {
-diff --git a/vl.c b/vl.c
-index 0eb9b2c8bd..ddefa75c1d 100644
---- a/vl.c
-+++ b/vl.c
-@@ -55,7 +55,6 @@ int main(int argc, char **argv)
- #include "qemu/error-report.h"
- #include "qemu/sockets.h"
- #include "hw/hw.h"
--#include "hw/boards.h"
- #include "sysemu/accel.h"
- #include "hw/usb.h"
- #include "hw/isa/isa.h"
-@@ -125,7 +124,6 @@ int main(int argc, char **argv)
- #include "qapi/qapi-visit-block-core.h"
- #include "qapi/qapi-visit-ui.h"
- #include "qapi/qapi-commands-block-core.h"
--#include "qapi/qapi-commands-machine.h"
- #include "qapi/qapi-commands-run-state.h"
- #include "qapi/qapi-commands-ui.h"
- #include "qapi/qmp/qerror.h"
-@@ -1406,41 +1404,6 @@ static MachineClass *find_default_machine(GSList *=
-machines)
-     return NULL;
+@@ -413,208 +344,6 @@ void qmp_change(const char *device, const char *tar=
+get,
+     }
  }
 =20
--MachineInfoList *qmp_query_machines(Error **errp)
+-static void qom_list_types_tramp(ObjectClass *klass, void *data)
 -{
--    GSList *el, *machines =3D object_class_get_list(TYPE_MACHINE, false)=
-;
--    MachineInfoList *mach_list =3D NULL;
+-    ObjectTypeInfoList *e, **pret =3D data;
+-    ObjectTypeInfo *info;
+-    ObjectClass *parent =3D object_class_get_parent(klass);
 -
--    for (el =3D machines; el; el =3D el->next) {
--        MachineClass *mc =3D el->data;
--        MachineInfoList *entry;
--        MachineInfo *info;
+-    info =3D g_malloc0(sizeof(*info));
+-    info->name =3D g_strdup(object_class_get_name(klass));
+-    info->has_abstract =3D info->abstract =3D object_class_is_abstract(k=
+lass);
+-    if (parent) {
+-        info->has_parent =3D true;
+-        info->parent =3D g_strdup(object_class_get_name(parent));
+-    }
 -
--        info =3D g_malloc0(sizeof(*info));
--        if (mc->is_default) {
--            info->has_is_default =3D true;
--            info->is_default =3D true;
+-    e =3D g_malloc0(sizeof(*e));
+-    e->value =3D info;
+-    e->next =3D *pret;
+-    *pret =3D e;
+-}
+-
+-ObjectTypeInfoList *qmp_qom_list_types(bool has_implements,
+-                                       const char *implements,
+-                                       bool has_abstract,
+-                                       bool abstract,
+-                                       Error **errp)
+-{
+-    ObjectTypeInfoList *ret =3D NULL;
+-
+-    object_class_foreach(qom_list_types_tramp, implements, abstract, &re=
+t);
+-
+-    return ret;
+-}
+-
+-/* Return a DevicePropertyInfo for a qdev property.
+- *
+- * If a qdev property with the given name does not exist, use the given =
+default
+- * type.  If the qdev property info should not be shown, return NULL.
+- *
+- * The caller must free the return value.
+- */
+-static ObjectPropertyInfo *make_device_property_info(ObjectClass *klass,
+-                                                  const char *name,
+-                                                  const char *default_ty=
+pe,
+-                                                  const char *descriptio=
+n)
+-{
+-    ObjectPropertyInfo *info;
+-    Property *prop;
+-
+-    do {
+-        for (prop =3D DEVICE_CLASS(klass)->props; prop && prop->name; pr=
+op++) {
+-            if (strcmp(name, prop->name) !=3D 0) {
+-                continue;
+-            }
+-
+-            /*
+-             * TODO Properties without a parser are just for dirty hacks=
+.
+-             * qdev_prop_ptr is the only such PropertyInfo.  It's marked
+-             * for removal.  This conditional should be removed along wi=
+th
+-             * it.
+-             */
+-            if (!prop->info->set && !prop->info->create) {
+-                return NULL;           /* no way to set it, don't show *=
+/
+-            }
+-
+-            info =3D g_malloc0(sizeof(*info));
+-            info->name =3D g_strdup(prop->name);
+-            info->type =3D default_type ? g_strdup(default_type)
+-                                      : g_strdup(prop->info->name);
+-            info->has_description =3D !!prop->info->description;
+-            info->description =3D g_strdup(prop->info->description);
+-            return info;
+-        }
+-        klass =3D object_class_get_parent(klass);
+-    } while (klass !=3D object_class_by_name(TYPE_DEVICE));
+-
+-    /* Not a qdev property, use the default type */
+-    info =3D g_malloc0(sizeof(*info));
+-    info->name =3D g_strdup(name);
+-    info->type =3D g_strdup(default_type);
+-    info->has_description =3D !!description;
+-    info->description =3D g_strdup(description);
+-
+-    return info;
+-}
+-
+-ObjectPropertyInfoList *qmp_device_list_properties(const char *typename,
+-                                                Error **errp)
+-{
+-    ObjectClass *klass;
+-    Object *obj;
+-    ObjectProperty *prop;
+-    ObjectPropertyIterator iter;
+-    ObjectPropertyInfoList *prop_list =3D NULL;
+-
+-    klass =3D object_class_by_name(typename);
+-    if (klass =3D=3D NULL) {
+-        error_set(errp, ERROR_CLASS_DEVICE_NOT_FOUND,
+-                  "Device '%s' not found", typename);
+-        return NULL;
+-    }
+-
+-    klass =3D object_class_dynamic_cast(klass, TYPE_DEVICE);
+-    if (klass =3D=3D NULL) {
+-        error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "typename", TYPE_=
+DEVICE);
+-        return NULL;
+-    }
+-
+-    if (object_class_is_abstract(klass)) {
+-        error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "typename",
+-                   "non-abstract device type");
+-        return NULL;
+-    }
+-
+-    obj =3D object_new(typename);
+-
+-    object_property_iter_init(&iter, obj);
+-    while ((prop =3D object_property_iter_next(&iter))) {
+-        ObjectPropertyInfo *info;
+-        ObjectPropertyInfoList *entry;
+-
+-        /* Skip Object and DeviceState properties */
+-        if (strcmp(prop->name, "type") =3D=3D 0 ||
+-            strcmp(prop->name, "realized") =3D=3D 0 ||
+-            strcmp(prop->name, "hotpluggable") =3D=3D 0 ||
+-            strcmp(prop->name, "hotplugged") =3D=3D 0 ||
+-            strcmp(prop->name, "parent_bus") =3D=3D 0) {
+-            continue;
 -        }
 -
--        if (mc->alias) {
--            info->has_alias =3D true;
--            info->alias =3D g_strdup(mc->alias);
+-        /* Skip legacy properties since they are just string versions of
+-         * properties that we already list.
+-         */
+-        if (strstart(prop->name, "legacy-", NULL)) {
+-            continue;
 -        }
 -
--        info->name =3D g_strdup(mc->name);
--        info->cpu_max =3D !mc->max_cpus ? 1 : mc->max_cpus;
--        info->hotpluggable_cpus =3D mc->has_hotpluggable_cpus;
+-        info =3D make_device_property_info(klass, prop->name, prop->type=
+,
+-                                         prop->description);
+-        if (!info) {
+-            continue;
+-        }
 -
 -        entry =3D g_malloc0(sizeof(*entry));
 -        entry->value =3D info;
--        entry->next =3D mach_list;
--        mach_list =3D entry;
+-        entry->next =3D prop_list;
+-        prop_list =3D entry;
 -    }
 -
--    g_slist_free(machines);
--    return mach_list;
+-    object_unref(obj);
+-
+-    return prop_list;
 -}
 -
- static int machine_help_func(QemuOpts *opts, MachineState *machine)
- {
-     ObjectProperty *prop;
-@@ -1739,14 +1702,6 @@ bool qemu_wakeup_suspend_enabled(void)
-     return wakeup_suspend_enabled;
+-ObjectPropertyInfoList *qmp_qom_list_properties(const char *typename,
+-                                             Error **errp)
+-{
+-    ObjectClass *klass;
+-    Object *obj =3D NULL;
+-    ObjectProperty *prop;
+-    ObjectPropertyIterator iter;
+-    ObjectPropertyInfoList *prop_list =3D NULL;
+-
+-    klass =3D object_class_by_name(typename);
+-    if (klass =3D=3D NULL) {
+-        error_set(errp, ERROR_CLASS_DEVICE_NOT_FOUND,
+-                  "Class '%s' not found", typename);
+-        return NULL;
+-    }
+-
+-    klass =3D object_class_dynamic_cast(klass, TYPE_OBJECT);
+-    if (klass =3D=3D NULL) {
+-        error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "typename", TYPE_=
+OBJECT);
+-        return NULL;
+-    }
+-
+-    if (object_class_is_abstract(klass)) {
+-        object_class_property_iter_init(&iter, klass);
+-    } else {
+-        obj =3D object_new(typename);
+-        object_property_iter_init(&iter, obj);
+-    }
+-    while ((prop =3D object_property_iter_next(&iter))) {
+-        ObjectPropertyInfo *info;
+-        ObjectPropertyInfoList *entry;
+-
+-        info =3D g_malloc0(sizeof(*info));
+-        info->name =3D g_strdup(prop->name);
+-        info->type =3D g_strdup(prop->type);
+-        info->has_description =3D !!prop->description;
+-        info->description =3D g_strdup(prop->description);
+-
+-        entry =3D g_malloc0(sizeof(*entry));
+-        entry->value =3D info;
+-        entry->next =3D prop_list;
+-        prop_list =3D entry;
+-    }
+-
+-    object_unref(obj);
+-
+-    return prop_list;
+-}
+-
+ void qmp_add_client(const char *protocol, const char *fdname,
+                     bool has_skipauth, bool skipauth, bool has_tls, bool=
+ tls,
+                     Error **errp)
+@@ -659,38 +388,6 @@ void qmp_add_client(const char *protocol, const char=
+ *fdname,
  }
 =20
--CurrentMachineParams *qmp_query_current_machine(Error **errp)
+=20
+-void qmp_object_add(const char *type, const char *id,
+-                    bool has_props, QObject *props, Error **errp)
 -{
--    CurrentMachineParams *params =3D g_malloc0(sizeof(*params));
--    params->wakeup_suspend_support =3D qemu_wakeup_suspend_enabled();
+-    QDict *pdict;
+-    Visitor *v;
+-    Object *obj;
 -
--    return params;
+-    if (props) {
+-        pdict =3D qobject_to(QDict, props);
+-        if (!pdict) {
+-            error_setg(errp, QERR_INVALID_PARAMETER_TYPE, "props", "dict=
+");
+-            return;
+-        }
+-        qobject_ref(pdict);
+-    } else {
+-        pdict =3D qdict_new();
+-    }
+-
+-    v =3D qobject_input_visitor_new(QOBJECT(pdict));
+-    obj =3D user_creatable_add_type(type, id, pdict, v, errp);
+-    visit_free(v);
+-    if (obj) {
+-        object_unref(obj);
+-    }
+-    qobject_unref(pdict);
 -}
 -
- void qemu_system_killed(int signal, pid_t pid)
+-void qmp_object_del(const char *id, Error **errp)
+-{
+-    user_creatable_del(id, errp);
+-}
+-
+ MemoryDeviceInfoList *qmp_query_memory_devices(Error **errp)
  {
-     shutdown_signal =3D signal;
+     return qmp_memory_device_list();
+diff --git a/qom/Makefile.objs b/qom/Makefile.objs
+index 516349eec3..5fb43b842c 100644
+--- a/qom/Makefile.objs
++++ b/qom/Makefile.objs
+@@ -2,3 +2,4 @@ qom-obj-y =3D object.o container.o qom-qobject.o
+ qom-obj-y +=3D object_interfaces.o
+=20
+ common-obj-y =3D cpu.o
++common-obj-$(CONFIG_SOFTMMU) +=3D qom-qmp-cmds.o
+diff --git a/qom/qom-qmp-cmds.c b/qom/qom-qmp-cmds.c
+new file mode 100644
+index 0000000000..e046a0f190
+--- /dev/null
++++ b/qom/qom-qmp-cmds.c
+@@ -0,0 +1,323 @@
++/*
++ * QMP commands related to QOM
++ *
++ * Copyright IBM, Corp. 2011
++ *
++ * Authors:
++ *  Anthony Liguori   <aliguori@us.ibm.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2.  See
++ * the COPYING file in the top-level directory.
++ *
++ * Contributions after 2012-01-13 are licensed under the terms of the
++ * GNU GPL, version 2 or (at your option) any later version.
++ */
++
++#include "qemu/osdep.h"
++#include "hw/qdev.h"
++#include "qapi/error.h"
++#include "qapi/qapi-commands-qdev.h"
++#include "qapi/qapi-commands-qom.h"
++#include "qapi/qmp/qdict.h"
++#include "qapi/qmp/qerror.h"
++#include "qapi/qobject-input-visitor.h"
++#include "qemu/cutils.h"
++#include "qom/object_interfaces.h"
++#include "qom/qom-qobject.h"
++
++ObjectPropertyInfoList *qmp_qom_list(const char *path, Error **errp)
++{
++    Object *obj;
++    bool ambiguous =3D false;
++    ObjectPropertyInfoList *props =3D NULL;
++    ObjectProperty *prop;
++    ObjectPropertyIterator iter;
++
++    obj =3D object_resolve_path(path, &ambiguous);
++    if (obj =3D=3D NULL) {
++        if (ambiguous) {
++            error_setg(errp, "Path '%s' is ambiguous", path);
++        } else {
++            error_set(errp, ERROR_CLASS_DEVICE_NOT_FOUND,
++                      "Device '%s' not found", path);
++        }
++        return NULL;
++    }
++
++    object_property_iter_init(&iter, obj);
++    while ((prop =3D object_property_iter_next(&iter))) {
++        ObjectPropertyInfoList *entry =3D g_malloc0(sizeof(*entry));
++
++        entry->value =3D g_malloc0(sizeof(ObjectPropertyInfo));
++        entry->next =3D props;
++        props =3D entry;
++
++        entry->value->name =3D g_strdup(prop->name);
++        entry->value->type =3D g_strdup(prop->type);
++    }
++
++    return props;
++}
++
++void qmp_qom_set(const char *path, const char *property, QObject *value,
++                 Error **errp)
++{
++    Object *obj;
++
++    obj =3D object_resolve_path(path, NULL);
++    if (!obj) {
++        error_set(errp, ERROR_CLASS_DEVICE_NOT_FOUND,
++                  "Device '%s' not found", path);
++        return;
++    }
++
++    object_property_set_qobject(obj, value, property, errp);
++}
++
++QObject *qmp_qom_get(const char *path, const char *property, Error **err=
+p)
++{
++    Object *obj;
++
++    obj =3D object_resolve_path(path, NULL);
++    if (!obj) {
++        error_set(errp, ERROR_CLASS_DEVICE_NOT_FOUND,
++                  "Device '%s' not found", path);
++        return NULL;
++    }
++
++    return object_property_get_qobject(obj, property, errp);
++}
++
++static void qom_list_types_tramp(ObjectClass *klass, void *data)
++{
++    ObjectTypeInfoList *e, **pret =3D data;
++    ObjectTypeInfo *info;
++    ObjectClass *parent =3D object_class_get_parent(klass);
++
++    info =3D g_malloc0(sizeof(*info));
++    info->name =3D g_strdup(object_class_get_name(klass));
++    info->has_abstract =3D info->abstract =3D object_class_is_abstract(k=
+lass);
++    if (parent) {
++        info->has_parent =3D true;
++        info->parent =3D g_strdup(object_class_get_name(parent));
++    }
++
++    e =3D g_malloc0(sizeof(*e));
++    e->value =3D info;
++    e->next =3D *pret;
++    *pret =3D e;
++}
++
++ObjectTypeInfoList *qmp_qom_list_types(bool has_implements,
++                                       const char *implements,
++                                       bool has_abstract,
++                                       bool abstract,
++                                       Error **errp)
++{
++    ObjectTypeInfoList *ret =3D NULL;
++
++    object_class_foreach(qom_list_types_tramp, implements, abstract, &re=
+t);
++
++    return ret;
++}
++
++/* Return a DevicePropertyInfo for a qdev property.
++ *
++ * If a qdev property with the given name does not exist, use the given =
+default
++ * type.  If the qdev property info should not be shown, return NULL.
++ *
++ * The caller must free the return value.
++ */
++static ObjectPropertyInfo *make_device_property_info(ObjectClass *klass,
++                                                  const char *name,
++                                                  const char *default_ty=
+pe,
++                                                  const char *descriptio=
+n)
++{
++    ObjectPropertyInfo *info;
++    Property *prop;
++
++    do {
++        for (prop =3D DEVICE_CLASS(klass)->props; prop && prop->name; pr=
+op++) {
++            if (strcmp(name, prop->name) !=3D 0) {
++                continue;
++            }
++
++            /*
++             * TODO Properties without a parser are just for dirty hacks=
+.
++             * qdev_prop_ptr is the only such PropertyInfo.  It's marked
++             * for removal.  This conditional should be removed along wi=
+th
++             * it.
++             */
++            if (!prop->info->set && !prop->info->create) {
++                return NULL;           /* no way to set it, don't show *=
+/
++            }
++
++            info =3D g_malloc0(sizeof(*info));
++            info->name =3D g_strdup(prop->name);
++            info->type =3D default_type ? g_strdup(default_type)
++                                      : g_strdup(prop->info->name);
++            info->has_description =3D !!prop->info->description;
++            info->description =3D g_strdup(prop->info->description);
++            return info;
++        }
++        klass =3D object_class_get_parent(klass);
++    } while (klass !=3D object_class_by_name(TYPE_DEVICE));
++
++    /* Not a qdev property, use the default type */
++    info =3D g_malloc0(sizeof(*info));
++    info->name =3D g_strdup(name);
++    info->type =3D g_strdup(default_type);
++    info->has_description =3D !!description;
++    info->description =3D g_strdup(description);
++
++    return info;
++}
++
++ObjectPropertyInfoList *qmp_device_list_properties(const char *typename,
++                                                Error **errp)
++{
++    ObjectClass *klass;
++    Object *obj;
++    ObjectProperty *prop;
++    ObjectPropertyIterator iter;
++    ObjectPropertyInfoList *prop_list =3D NULL;
++
++    klass =3D object_class_by_name(typename);
++    if (klass =3D=3D NULL) {
++        error_set(errp, ERROR_CLASS_DEVICE_NOT_FOUND,
++                  "Device '%s' not found", typename);
++        return NULL;
++    }
++
++    klass =3D object_class_dynamic_cast(klass, TYPE_DEVICE);
++    if (klass =3D=3D NULL) {
++        error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "typename", TYPE_=
+DEVICE);
++        return NULL;
++    }
++
++    if (object_class_is_abstract(klass)) {
++        error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "typename",
++                   "non-abstract device type");
++        return NULL;
++    }
++
++    obj =3D object_new(typename);
++
++    object_property_iter_init(&iter, obj);
++    while ((prop =3D object_property_iter_next(&iter))) {
++        ObjectPropertyInfo *info;
++        ObjectPropertyInfoList *entry;
++
++        /* Skip Object and DeviceState properties */
++        if (strcmp(prop->name, "type") =3D=3D 0 ||
++            strcmp(prop->name, "realized") =3D=3D 0 ||
++            strcmp(prop->name, "hotpluggable") =3D=3D 0 ||
++            strcmp(prop->name, "hotplugged") =3D=3D 0 ||
++            strcmp(prop->name, "parent_bus") =3D=3D 0) {
++            continue;
++        }
++
++        /* Skip legacy properties since they are just string versions of
++         * properties that we already list.
++         */
++        if (strstart(prop->name, "legacy-", NULL)) {
++            continue;
++        }
++
++        info =3D make_device_property_info(klass, prop->name, prop->type=
+,
++                                         prop->description);
++        if (!info) {
++            continue;
++        }
++
++        entry =3D g_malloc0(sizeof(*entry));
++        entry->value =3D info;
++        entry->next =3D prop_list;
++        prop_list =3D entry;
++    }
++
++    object_unref(obj);
++
++    return prop_list;
++}
++
++ObjectPropertyInfoList *qmp_qom_list_properties(const char *typename,
++                                             Error **errp)
++{
++    ObjectClass *klass;
++    Object *obj =3D NULL;
++    ObjectProperty *prop;
++    ObjectPropertyIterator iter;
++    ObjectPropertyInfoList *prop_list =3D NULL;
++
++    klass =3D object_class_by_name(typename);
++    if (klass =3D=3D NULL) {
++        error_set(errp, ERROR_CLASS_DEVICE_NOT_FOUND,
++                  "Class '%s' not found", typename);
++        return NULL;
++    }
++
++    klass =3D object_class_dynamic_cast(klass, TYPE_OBJECT);
++    if (klass =3D=3D NULL) {
++        error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "typename", TYPE_=
+OBJECT);
++        return NULL;
++    }
++
++    if (object_class_is_abstract(klass)) {
++        object_class_property_iter_init(&iter, klass);
++    } else {
++        obj =3D object_new(typename);
++        object_property_iter_init(&iter, obj);
++    }
++    while ((prop =3D object_property_iter_next(&iter))) {
++        ObjectPropertyInfo *info;
++        ObjectPropertyInfoList *entry;
++
++        info =3D g_malloc0(sizeof(*info));
++        info->name =3D g_strdup(prop->name);
++        info->type =3D g_strdup(prop->type);
++        info->has_description =3D !!prop->description;
++        info->description =3D g_strdup(prop->description);
++
++        entry =3D g_malloc0(sizeof(*entry));
++        entry->value =3D info;
++        entry->next =3D prop_list;
++        prop_list =3D entry;
++    }
++
++    object_unref(obj);
++
++    return prop_list;
++}
++
++void qmp_object_add(const char *type, const char *id,
++                    bool has_props, QObject *props, Error **errp)
++{
++    QDict *pdict;
++    Visitor *v;
++    Object *obj;
++
++    if (props) {
++        pdict =3D qobject_to(QDict, props);
++        if (!pdict) {
++            error_setg(errp, QERR_INVALID_PARAMETER_TYPE, "props", "dict=
+");
++            return;
++        }
++        qobject_ref(pdict);
++    } else {
++        pdict =3D qdict_new();
++    }
++
++    v =3D qobject_input_visitor_new(QOBJECT(pdict));
++    obj =3D user_creatable_add_type(type, id, pdict, v, errp);
++    visit_free(v);
++    if (obj) {
++        object_unref(obj);
++    }
++    qobject_unref(pdict);
++}
++
++void qmp_object_del(const char *id, Error **errp)
++{
++    user_creatable_del(id, errp);
++}
 --=20
 2.21.0
 
