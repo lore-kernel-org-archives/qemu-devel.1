@@ -2,108 +2,64 @@ Return-Path: <SRS0=9yXi=U7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E66DC06510
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 12:51:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 701BEC06510
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 12:58:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2C206206E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 12:51:06 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="WUnE8TBS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C206206E0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 46CC5208C4
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 12:58:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46CC5208C4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53380 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53398 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hiIFV-0006xS-GG
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 08:51:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51844)
+	id 1hiIN2-0000t6-6R
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 08:58:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53525)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dplotnikov@virtuozzo.com>) id 1hiIE1-0006Oj-B6
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 08:49:35 -0400
+ (envelope-from <yan.y.zhao@intel.com>) id 1hiILy-0000Q2-Jk
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 08:57:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dplotnikov@virtuozzo.com>) id 1hiIDz-0001Dv-Jm
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 08:49:33 -0400
-Received: from mail-he1eur02on0728.outbound.protection.outlook.com
- ([2a01:111:f400:fe05::728]:2469
- helo=EUR02-HE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
- id 1hiIDz-0001As-7e; Tue, 02 Jul 2019 08:49:31 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+9glaDVhwucZCI9to2ALawvVqhCN8KCnQ9wtg5SANAw=;
- b=WUnE8TBS6S7usZnASGY7algUolTmIzeZc0XFGq/7zVVaD7CbY1KdQ8Xi5YT4RAncuRvICy/GDJU1GcflEEuqjPpdEMjzFFF62vHp7GdNKFF8If9tVzZZ0/G+fC3FZGXLPPPg25w59mHLDraQ+YlhoW2vtuaDYPIImui9tq2jxJ8=
-Received: from AM0PR08MB3745.eurprd08.prod.outlook.com (20.178.22.27) by
- AM0PR08MB5138.eurprd08.prod.outlook.com (10.255.30.207) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2032.20; Tue, 2 Jul 2019 12:49:27 +0000
-Received: from AM0PR08MB3745.eurprd08.prod.outlook.com
- ([fe80::44eb:4518:e1f2:144c]) by AM0PR08MB3745.eurprd08.prod.outlook.com
- ([fe80::44eb:4518:e1f2:144c%7]) with mapi id 15.20.2032.019; Tue, 2 Jul 2019
- 12:49:26 +0000
-From: Denis Plotnikov <dplotnikov@virtuozzo.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Thread-Topic: [PATCH v0 3/3] qcow2: add zstd cluster compression
-Thread-Index: AQHVLaioai27iNioI0K2r5xEI7flD6a3TdUA
-Date: Tue, 2 Jul 2019 12:49:26 +0000
-Message-ID: <5a970b37-ef08-3d53-3d53-3abb9c3e97e0@virtuozzo.com>
-References: <20190528143727.10529-1-dplotnikov@virtuozzo.com>
- <20190528143727.10529-4-dplotnikov@virtuozzo.com>
- <20190628115720.GH5179@dhcp-200-226.str.redhat.com>
-In-Reply-To: <20190628115720.GH5179@dhcp-200-226.str.redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR1001CA0023.EURPRD10.PROD.OUTLOOK.COM
- (2603:10a6:3:f7::33) To AM0PR08MB3745.eurprd08.prod.outlook.com
- (2603:10a6:208:ff::27)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=dplotnikov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 0a067b77-1394-4c55-7b40-08d6feebb73c
-x-microsoft-antispam: BCL:0; PCL:0;
- RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);
- SRVR:AM0PR08MB5138; 
-x-ms-traffictypediagnostic: AM0PR08MB5138:
-x-microsoft-antispam-prvs: <AM0PR08MB513863C579CCB257C995C1B1CFF80@AM0PR08MB5138.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:3968;
-x-forefront-prvs: 008663486A
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(346002)(39850400004)(396003)(376002)(366004)(136003)(199004)(189003)(8676002)(3846002)(102836004)(53936002)(76176011)(6512007)(99286004)(478600001)(6916009)(54906003)(81166006)(53546011)(316002)(107886003)(71190400001)(6246003)(26005)(52116002)(186003)(8936002)(81156014)(6116002)(229853002)(305945005)(14454004)(386003)(6436002)(71200400001)(6486002)(5660300002)(25786009)(6506007)(4326008)(446003)(66066001)(256004)(11346002)(476003)(36756003)(31686004)(2616005)(31696002)(86362001)(66946007)(66446008)(66556008)(2906002)(68736007)(7736002)(73956011)(486006)(64756008)(66476007);
- DIR:OUT; SFP:1102; SCL:1; SRVR:AM0PR08MB5138;
- H:AM0PR08MB3745.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: eV0LBXqzrlmmKtdJE/0znLxJai1OsyXtIA/aOrNPqLTG1ZugOWijb8mCYIn7qLDXl0uG3LV4pRuqN3VZv11cPXnq35xqoOMGK+33TFX0WudVmhgvXX6wdBytT7MHMLomz0dxr0ntLew8afAdfLq+9EumfX8EALHE8eXI+Ix27OaKmV8GsBBIR06hQuFFcj7vVMGO7QPt5enJ0w/JE0XsWCjB68a3wR55PD7tKCbzhUZsyN2qcOSXcvnZ1L0whrKOK0sTZkWU7vVF6pj+cVqw8tL8OL9wiEzRA4cphubcc0SpQlW1gW1AGGUQc3SS2OuCn39nzeXsDGjCeeQwjq3apTb5bN0/d/HnHxBH+o9EAkWgqO3Sxa62uFn5/salYreEq/5Ou2PGOeQT/ZyEj7O53LwaBxcbrb5kGlZo+3pj5Ho=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <8347348450617247A9F9A56A86DDE275@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ (envelope-from <yan.y.zhao@intel.com>) id 1hiILx-00034U-Ae
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 08:57:46 -0400
+Received: from mga14.intel.com ([192.55.52.115]:25439)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <yan.y.zhao@intel.com>)
+ id 1hiILx-0002ou-1J
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 08:57:45 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+ by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 02 Jul 2019 05:57:36 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.63,443,1557212400"; d="scan'208";a="157635648"
+Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
+ ([10.239.13.9])
+ by orsmga008.jf.intel.com with ESMTP; 02 Jul 2019 05:57:34 -0700
+Date: Tue, 2 Jul 2019 08:51:38 -0400
+From: Yan Zhao <yan.y.zhao@intel.com>
+To: Auger Eric <eric.auger@redhat.com>
+Message-ID: <20190702125138.GA9176@joy-OptiPlex-7040>
+References: <1561760389-31325-1-git-send-email-yan.y.zhao@intel.com>
+ <42713cac-27fb-f4a9-1b06-bfee409690a5@redhat.com>
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0a067b77-1394-4c55-7b40-08d6feebb73c
-X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Jul 2019 12:49:26.7566 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: dplotnikov@virtuozzo.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR08MB5138
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 2a01:111:f400:fe05::728
-Subject: Re: [Qemu-devel] [PATCH v0 3/3] qcow2: add zstd cluster compression
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <42713cac-27fb-f4a9-1b06-bfee409690a5@redhat.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 192.55.52.115
+Subject: Re: [Qemu-devel] [PATCH v5] memory: do not notify for non inclusive
+ overlap entry
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -115,185 +71,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Denis Lunev <den@virtuozzo.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "armbru@redhat.com" <armbru@redhat.com>,
- "mreitz@redhat.com" <mreitz@redhat.com>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Peter Xu <peterx@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-DQoNCk9uIDI4LjA2LjIwMTkgMTQ6NTcsIEtldmluIFdvbGYgd3JvdGU6DQo+IEFtIDI4LjA1LjIw
-MTkgdW0gMTY6MzcgaGF0IERlbmlzIFBsb3RuaWtvdiBnZXNjaHJpZWJlbjoNCj4+IHpzdGQgc2ln
-bmlmaWNhbnRseSByZWR1Y2VzIGNsdXN0ZXIgY29tcHJlc3Npb24gdGltZS4NCj4+IEl0IHByb3Zp
-ZGVzIGJldHRlciBjb21wcmVzc2lvbiBwZXJmb3JtYW5jZSBtYWludGFpbmluZw0KPj4gdGhlIHNh
-bWUgbGV2ZWwgb2YgY29tcHJlc3Npb24gcmF0aW8gaW4gY29tcGFyaXNvbiB3aXRoDQo+PiB6bGli
-LCB3aGljaCwgYnkgdGhlIG1vbWVudCwgaGFzIGJlZW4gdGhlIG9ubHkgY29tcHJlc3Npb24NCj4+
-IG1ldGhvZCBhdmFpbGFibGUuDQo+Pg0KPj4gVGhlIHBlcmZvcm1hbmNlIHRlc3QgcmVzdWx0czoN
-Cj4+IFRlc3QgY29tcHJlc3NlcyBhbmQgZGVjb21wcmVzc2VzIHFlbXUgcWNvdzIgaW1hZ2Ugd2l0
-aCBqdXN0DQo+PiBpbnN0YWxsZWQgcmhlbC03LjYgZ3Vlc3QuDQo+PiBJbWFnZSBjbHVzdGVyIHNp
-emU6IDY0Sy4gSW1hZ2Ugb24gZGlzayBzaXplOiAyLjJHDQo+Pg0KPj4gVGhlIHRlc3Qgd2FzIGNv
-bmR1Y3RlZCB3aXRoIGJyZCBkaXNrIHRvIHJlZHVjZSB0aGUgaW5mbHVlbmNlDQo+PiBvZiBkaXNr
-IHN1YnN5c3RlbSB0byB0aGUgdGVzdCByZXN1bHRzLg0KPj4gVGhlIHJlc3VsdHMgaXMgZ2l2ZW4g
-aW4gc2Vjb25kcy4NCj4+DQo+PiBjb21wcmVzcyBjbWQ6DQo+PiAgICB0aW1lIC4vcWVtdS1pbWcg
-Y29udmVydCAtTyBxY293MiAtYyAtbyBjb21wcmVzc2lvbl90eXBlPVt6bGlifHpzdGRdDQo+PiAg
-ICAgICAgICAgICAgICAgICAgc3JjLmltZyBbemxpYnx6c3RkXV9jb21wcmVzc2VkLmltZw0KPj4g
-ZGVjb21wcmVzcyBjbWQNCj4+ICAgIHRpbWUgLi9xZW11LWltZyBjb252ZXJ0IC1PIHFjb3cyDQo+
-PiAgICAgICAgICAgICAgICAgICAgW3psaWJ8enN0ZF1fY29tcHJlc3NlZC5pbWcgdW5jb21wcmVz
-c2VkLmltZw0KPj4NCj4+ICAgICAgICAgICAgIGNvbXByZXNzaW9uICAgICAgICAgICAgICAgZGVj
-b21wcmVzc2lvbg0KPj4gICAgICAgICAgIHpsaWIgICAgICAgenN0ZCAgICAgICAgICAgemxpYiAg
-ICAgICAgIHpzdGQNCj4+IC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLQ0KPj4gcmVhbCAgICAgNjUuNSAgICAgICAxNi4zICgtNzUgJSkg
-ICAgMS45ICAgICAgICAgIDEuNiAoLTE2ICUpDQo+PiB1c2VyICAgICA2NS4wICAgICAgIDE1Ljgg
-ICAgICAgICAgICA1LjMgICAgICAgICAgMi41DQo+PiBzeXMgICAgICAgMy4zICAgICAgICAwLjIg
-ICAgICAgICAgICAyLjAgICAgICAgICAgMi4wDQo+Pg0KPj4gQm90aCBaTElCIGFuZCBaU1REIGdh
-dmUgdGhlIHNhbWUgY29tcHJlc3Npb24gcmF0aW86IDEuNTcNCj4+IGNvbXByZXNzZWQgaW1hZ2Ug
-c2l6ZSBpbiBib3RoIGNhc2VzOiAxLjRHDQo+Pg0KPj4gU2lnbmVkLW9mZi1ieTogRGVuaXMgUGxv
-dG5pa292IDxkcGxvdG5pa292QHZpcnR1b3p6by5jb20+DQo+PiAtLS0NCj4+ICAgYmxvY2svcWNv
-dzIuYyB8IDgyICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
-KysrKw0KPj4gICBjb25maWd1cmUgICAgIHwgMjYgKysrKysrKysrKysrKysrKw0KPj4gICAyIGZp
-bGVzIGNoYW5nZWQsIDEwOCBpbnNlcnRpb25zKCspDQo+Pg0KPj4gZGlmZiAtLWdpdCBhL2Jsb2Nr
-L3Fjb3cyLmMgYi9ibG9jay9xY293Mi5jDQo+PiBpbmRleCA5MGYxNWNjM2M5Li41ODkwMWY5Zjc5
-IDEwMDY0NA0KPj4gLS0tIGEvYmxvY2svcWNvdzIuYw0KPj4gKysrIGIvYmxvY2svcWNvdzIuYw0K
-Pj4gQEAgLTI2LDYgKzI2LDcgQEANCj4+ICAgDQo+PiAgICNkZWZpbmUgWkxJQl9DT05TVA0KPj4g
-ICAjaW5jbHVkZSA8emxpYi5oPg0KPj4gKyNpbmNsdWRlIDx6c3RkLmg+DQo+PiAgIA0KPj4gICAj
-aW5jbHVkZSAiYmxvY2svYmxvY2tfaW50LmgiDQo+PiAgICNpbmNsdWRlICJibG9jay9xZGljdC5o
-Ig0KPj4gQEAgLTE1NTMsNiArMTU1NCw5IEBAIHN0YXRpYyBpbnQgY29yb3V0aW5lX2ZuIHFjb3cy
-X2RvX29wZW4oQmxvY2tEcml2ZXJTdGF0ZSAqYnMsIFFEaWN0ICpvcHRpb25zLA0KPj4gICAgICAg
-Y2FzZSBRQ09XMl9DT01QUkVTU0lPTl9UWVBFX1pMSUI6DQo+PiAgICAgICAgICAgYnJlYWs7DQo+
-PiAgIA0KPj4gKyAgICBjYXNlIFFDT1cyX0NPTVBSRVNTSU9OX1RZUEVfWlNURDoNCj4+ICsgICAg
-ICAgIGJyZWFrOw0KPiANCj4gSWYgd2UgZG9uJ3QgaW50ZW5kIHRvIGFkZCBhbnkgY29kZSBoZXJl
-LCB3aHkgbm90IGp1c3QgYWRkIGFub3RoZXIgY2FzZQ0KPiBsYWJlbCB0byB0aGUgZXhpc3Rpbmcg
-YnJlYWs/DQo+IA0KPj4gICAgICAgZGVmYXVsdDoNCj4+ICAgICAgICAgICBlcnJvcl9zZXRnKGVy
-cnAsICJVbmtub3duIGNvbXByZXNzaW9uIHR5cGUiKTsNCj4+ICAgICAgICAgICByZXQgPSAtRUlO
-VkFMOw0KPj4gQEAgLTMyODYsNiArMzI5MCw5IEBAIHFjb3cyX2NvX2NyZWF0ZShCbG9ja2RldkNy
-ZWF0ZU9wdGlvbnMgKmNyZWF0ZV9vcHRpb25zLCBFcnJvciAqKmVycnApDQo+PiAgICAgICAgICAg
-ICogIFpMSUIgc2hvdWxkbid0IGJlIGhlcmUgc2luY2UgaXQncyB0aGUgZGVmYXVsdA0KPj4gICAg
-ICAgICAgICAqLw0KPj4gICAgICAgICAgIHN3aXRjaCAocWNvdzJfb3B0cy0+Y29tcHJlc3Npb25f
-dHlwZSkgew0KPj4gKyAgICAgICAgY2FzZSBRQ09XMl9DT01QUkVTU0lPTl9UWVBFX1pTVEQ6DQo+
-PiArICAgICAgICAgICAgYnJlYWs7DQo+PiArDQo+PiAgICAgICAgICAgZGVmYXVsdDoNCj4+ICAg
-ICAgICAgICAgICAgZXJyb3Jfc2V0Z19lcnJubyhlcnJwLCAtRUlOVkFMLCAiVW5rbm93biBjb21w
-cmVzc2lvbiB0eXBlIik7DQo+PiAgICAgICAgICAgICAgIGdvdG8gb3V0Ow0KPj4gQEAgLTQxMTMs
-NiArNDEyMCw3MyBAQCBzdGF0aWMgc3NpemVfdCB6bGliX2RlY29tcHJlc3Modm9pZCAqZGVzdCwg
-c2l6ZV90IGRlc3Rfc2l6ZSwNCj4+ICAgICAgIHJldHVybiByZXQ7DQo+PiAgIH0NCj4+ICAgDQo+
-PiArLyoNCj4+ICsgKiB6c3RkX2NvbXByZXNzKCkNCj4+ICsgKg0KPj4gKyAqIEBkZXN0IC0gZGVz
-dGluYXRpb24gYnVmZmVyLCBAZGVzdF9zaXplIGJ5dGVzDQo+PiArICogQHNyYyAtIHNvdXJjZSBi
-dWZmZXIsIEBzcmNfc2l6ZSBieXRlcw0KPj4gKyAqDQo+PiArICogUmV0dXJuczogY29tcHJlc3Nl
-ZCBzaXplIG9uIHN1Y2Nlc3MNCj4+ICsgKiAgICAgICAgICAtMSBvbiBhbnkgZXJyb3INCj4+ICsg
-Ki8NCj4+ICsNCj4+ICtzdGF0aWMgc3NpemVfdCB6c3RkX2NvbXByZXNzKHZvaWQgKmRlc3QsIHNp
-emVfdCBkZXN0X3NpemUsDQo+PiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICBjb25zdCB2
-b2lkICpzcmMsIHNpemVfdCBzcmNfc2l6ZSkNCj4+ICt7DQo+PiArICAgIC8qIHN0ZWFsIHNvbWUg
-Ynl0ZXMgdG8gc3RvcmUgY29tcHJlc3NlZCBjaHVuayBzaXplICovDQo+PiArICAgIHNpemVfdCBy
-ZXQ7DQo+IA0KPiBUaGlzIGVuZHMgdXAgaW4gYSBmaWxlLCBzbyB0aGlzIG5lZWRzIHRvIGJlIGEg
-Zml4ZWQgbnVtYmVyIG9mIGJ5dGVzLg0KPiBzaXplX3QgdmFyaWVzIGJldHdlZW4gZGlmZmVyZW50
-IHBsYXRmb3Jtcywgc28gaXQgaXMgbm90IGFjY2VwdGFibGUuDQo+IA0KPiBJZiBJIHVuZGVyc3Rh
-bmQgY29ycmVjdGx5LCB0aGUgbWF4aW11bSBmb3IgdGhpcyBpcyB0aGUgY2x1c3RlciBzaXplLCBz
-bw0KPiB1aW50MzJfdCBzaG91bGQgYmUgcmlnaHQuDQo+IA0KPiBUaGlzIGlzbid0IHBsYWluIHRo
-ZSB6c3RkIGNvbXByZXNzaW9uIGZvcm1hdCBhbnkgbW9yZSwgc28gaXQgbmVlZHMgdG8gYmUNCj4g
-ZGVzY3JpYmVkIGluIHRoZSBxY293MiBzcGVjLg0KPiANCj4+ICsgICAgc2l6ZV90ICpjX3NpemUg
-PSBkZXN0Ow0KPj4gKyAgICBjaGFyICpkX2J1ZiA9IGRlc3Q7DQo+PiArICAgIGRfYnVmICs9IHNp
-emVvZihyZXQpOw0KPiANCj4gY2hhciAqZF9idWcgPSBkZXN0ICsgc2l6ZW9mKHJldCk7DQo+IA0K
-Pj4gKyAgICBkZXN0X3NpemUgLT0gc2l6ZW9mKHJldCk7DQo+IA0KPiBXZSBkb24ndCB3YW50IHRv
-IGVuZCB1cCB3aXRoIGFuIGludGVnZXIgb3ZlcmZsb3csIHNvIGJlZm9yZSB0aGlzOg0KPiANCj4g
-ICAgICBpZiAoZGVzdF9zaXplIDwgc2l6ZW9mKHJldCkpIHsNCj4gICAgICAgICAgcmV0dXJuIC1F
-Tk9NRU07DQo+ICAgICAgfQ0KPiANCj4+ICsgICAgcmV0ID0gWlNURF9jb21wcmVzcyhkX2J1Ziwg
-ZGVzdF9zaXplLCBzcmMsIHNyY19zaXplLCA1KTsNCj4+ICsNCj4+ICsgICAgaWYgKFpTVERfaXNF
-cnJvcihyZXQpKSB7DQo+PiArICAgICAgICByZXR1cm4gLTE7DQo+PiArICAgIH0NCj4gDQo+IE5l
-ZWQgYW4gZXJyb3IgY29kZSBoZXJlLCBub3QganVzdCAtMS4gSW4gcGFydGljdWxhciwgd2UgbmVl
-ZCB0bw0KPiBkaXN0aW5ndWlzaCBjYXNlcyB3aGVyZSB0aGUgYnVmZmVyIHdhcyB0b28gc21hbGwg
-YW5kIHVuY29tcHJlc3NlZCBkYXRhDQo+IHNob3VsZCBiZSB3cml0dGVuIGluc3RlYWQgKEVOT01F
-TSkgZnJvbSByZWFsIGVycm9ycyB0aGF0IHNob3VsZCBiZQ0KPiByZXR1cm5lZCB0byB0aGUgY2Fs
-bGVyIChFSU8pLg0KPiANCj4+ICsNCj4+ICsgICAgLyogc3RvcmUgdGhlIGNvbXByZXNzZWQgY2h1
-bmsgc2l6ZSBpbiB0aGUgdmVyeSBiZWdpbm5pbmcgb2YgdGhlIGJ1ZmZlciAqLw0KPj4gKyAgICAq
-Y19zaXplID0gcmV0Ow0KPj4gKw0KPj4gKyAgICByZXR1cm4gcmV0ICsgc2l6ZW9mKHJldCk7DQo+
-PiArfQ0KPj4gKw0KPj4gKy8qDQo+PiArICogenN0ZF9kZWNvbXByZXNzKCkNCj4+ICsgKg0KPj4g
-KyAqIERlY29tcHJlc3Mgc29tZSBkYXRhIChub3QgbW9yZSB0aGFuIEBzcmNfc2l6ZSBieXRlcykg
-dG8gcHJvZHVjZSBleGFjdGx5DQo+PiArICogQGRlc3Rfc2l6ZSBieXRlcy4NCj4+ICsgKg0KPj4g
-KyAqIEBkZXN0IC0gZGVzdGluYXRpb24gYnVmZmVyLCBAZGVzdF9zaXplIGJ5dGVzDQo+PiArICog
-QHNyYyAtIHNvdXJjZSBidWZmZXIsIEBzcmNfc2l6ZSBieXRlcw0KPj4gKyAqDQo+PiArICogUmV0
-dXJuczogMCBvbiBzdWNjZXNzDQo+PiArICogICAgICAgICAgLTEgb24gZmFpbA0KPj4gKyAqLw0K
-Pj4gKw0KPj4gK3N0YXRpYyBzc2l6ZV90IHpzdGRfZGVjb21wcmVzcyh2b2lkICpkZXN0LCBzaXpl
-X3QgZGVzdF9zaXplLA0KPj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgY29uc3Qgdm9p
-ZCAqc3JjLCBzaXplX3Qgc3JjX3NpemUpDQo+IA0KPiBJbmRlbnRhdGlvbiBpcyBvZmYuDQo+IA0K
-Pj4gK3sNCj4+ICsgICAgc2l6ZV90IHJldDsNCj4+ICsgICAgLyoNCj4+ICsgICAgICogenN0ZCBk
-ZWNvbXByZXNzIHdhbnRzIHRvIGtub3cgdGhlIGV4YWN0IGxlbmdodCBvZiB0aGUgZGF0YQ0KPj4g
-KyAgICAgKiBmb3IgdGhhdCBwdXJwb3NlLCB6c3RkX2NvbXByZXNzIHN0b3JlcyB0aGUgbGVuZ3Ro
-IGluIHRoZQ0KPj4gKyAgICAgKiB2ZXJ5IGJlZ2lubmluZyBvZiB0aGUgY29tcHJlc3NlZCBidWZm
-ZXINCj4+ICsgICAgICovDQo+PiArICAgIGNvbnN0IHNpemVfdCAqc19zaXplID0gc3JjOw0KPj4g
-KyAgICBjb25zdCBjaGFyICpzX2J1ZiA9IHNyYzsNCj4+ICsgICAgc19idWYgKz0gc2l6ZW9mKHNp
-emVfdCk7DQo+IA0KPiBTaW5nbGUgbGluZTogY29uc3QgY2hhciAqc19idWYgPSBzcmMgKyBzaXpl
-b2Yoc2l6ZV90KTsNCj4gDQo+IE9mIGNvdXJzZSwgc2l6ZV90IGlzIHdyb25nIGhlcmUsIHRvby4g
-QW5kIGFib3ZlIHlvdSB1c2VkIHNpemVvZigpIG9uIGENCj4gdmFyaWFibGUgYW5kIGhlcmUgaXQn
-cyBvbiB0aGUgdHlwZS4gSSB0aGluayB3ZSBzaG91bGQgc3RheSBjb25zaXN0ZW50Lg0KPiANCj4g
-WW91J3JlIGxhY2tpbmcgYSBjaGVjayBhZ2FpbnN0IHNyY19zaXplLiBBIG1hbGljaW91cyBpbWFn
-ZSBjb3VsZCBtYWtlDQo+IHVzZSByZWFkIGJleW9uZCB0aGUgZW5kIG9mIHRoZSBidWZmZXIuIChB
-bHNvIGNvbnNpZGVyIHRoYXQgc3JjX3NpemUNCj4gY291bGQgYmUgc21hbGxlciB0aGFuIHNpemVv
-ZihzaXplX3QpLikNCj4gDQo+PiArICAgIHJldCA9IFpTVERfZGVjb21wcmVzcyhkZXN0LCBkZXN0
-X3NpemUsIHNfYnVmLCAqc19zaXplKTsNCj4+ICsNCj4+ICsgICAgaWYgKFpTVERfaXNFcnJvcihy
-ZXQpKSB7DQo+PiArICAgICAgICByZXR1cm4gLTE7DQo+PiArICAgIH0NCj4+ICsNCj4+ICsgICAg
-cmV0dXJuIDA7DQo+PiArfQ0KPj4gKw0KPj4gICAjZGVmaW5lIE1BWF9DT01QUkVTU19USFJFQURT
-IDQNCj4+ICAgDQo+PiAgIHR5cGVkZWYgc3NpemVfdCAoKlFjb3cyQ29tcHJlc3NGdW5jKSh2b2lk
-ICpkZXN0LCBzaXplX3QgZGVzdF9zaXplLA0KPj4gQEAgLTQxODksNiArNDI2MywxMCBAQCBxY293
-Ml9jb19jb21wcmVzcyhCbG9ja0RyaXZlclN0YXRlICpicywgdm9pZCAqZGVzdCwgc2l6ZV90IGRl
-c3Rfc2l6ZSwNCj4+ICAgICAgICAgICBmbiA9IHpsaWJfY29tcHJlc3M7DQo+PiAgICAgICAgICAg
-YnJlYWs7DQo+PiAgIA0KPj4gKyAgICBjYXNlIFFDT1cyX0NPTVBSRVNTSU9OX1RZUEVfWlNURDoN
-Cj4+ICsgICAgICAgIGZuID0genN0ZF9jb21wcmVzczsNCj4+ICsgICAgICAgIGJyZWFrOw0KPj4g
-Kw0KPj4gICAgICAgZGVmYXVsdDoNCj4+ICAgICAgICAgICByZXR1cm4gLUVOT1RTVVA7DQo+PiAg
-ICAgICB9DQo+PiBAQCAtNDIwOCw2ICs0Mjg2LDEwIEBAIHFjb3cyX2NvX2RlY29tcHJlc3MoQmxv
-Y2tEcml2ZXJTdGF0ZSAqYnMsIHZvaWQgKmRlc3QsIHNpemVfdCBkZXN0X3NpemUsDQo+PiAgICAg
-ICAgICAgZm4gPSB6bGliX2RlY29tcHJlc3M7DQo+PiAgICAgICAgICAgYnJlYWs7DQo+PiAgIA0K
-Pj4gKyAgICBjYXNlIFFDT1cyX0NPTVBSRVNTSU9OX1RZUEVfWlNURDoNCj4+ICsgICAgICAgIGZu
-ID0genN0ZF9kZWNvbXByZXNzOw0KPj4gKyAgICAgICAgYnJlYWs7DQo+PiArDQo+PiAgICAgICBk
-ZWZhdWx0Og0KPj4gICAgICAgICAgIHJldHVybiAtRU5PVFNVUDsNCj4+ICAgICAgIH0NCj4+IGRp
-ZmYgLS1naXQgYS9jb25maWd1cmUgYi9jb25maWd1cmUNCj4+IGluZGV4IDFjNTYzYTcwMjcuLmM5
-MDcxNjE4OWMgMTAwNzU1DQo+PiAtLS0gYS9jb25maWd1cmUNCj4+ICsrKyBiL2NvbmZpZ3VyZQ0K
-Pj4gQEAgLTQzMyw2ICs0MzMsNyBAQCBvcGVuZ2xfZG1hYnVmPSJubyINCj4+ICAgY3B1aWRfaD0i
-bm8iDQo+PiAgIGF2eDJfb3B0PSIiDQo+PiAgIHpsaWI9InllcyINCj4+ICt6c3RkPSJ5ZXMiDQo+
-IA0KPiBUaGlzIHNob3VsZCBiZSB6c3RkPSIiIHNvIHRoYXQgYSBtaXNzaW5nIGxpYnJhcnkgd2ls
-bCBhdXRvbWF0aWNhbGx5DQo+IGRpc2FibGUgaXQgaW5zdGVhZCBvZiBwcm9kdWNpbmcgYW4gZXJy
-b3IuIChCdWlsZGluZyBRRU1VIHdpdGhvdXQgemxpYiBpcw0KPiBpbXBvc3NpYmxlLCBidXQgYnVp
-bGRpbmcgaXQgd2l0aG91dCBaU1REIHNob3VsZCB3b3JrLikNCkJ1dCBpZiB3ZSBhZGQgenN0ZCBm
-b3IgY2x1c3RlcnMgY29tcHJlc3Npb24gd2UgaGF2ZSB0byBidWlsZCB3aXRoIHpzdGQgDQplYWNo
-IHRpbWUuIElmIHdlIHdhbnQgdG8gY2hvc2Ugd2hldGhlciB3ZSB3YW50IHRvIGJ1aWxkIHpzdGQg
-d2UgbmVlZCB0bw0KZW5jbG9zZSBhbGwgenN0ZCByZWxhdGVkIGNvZGUgd2l0aCAiaWZkZWYiLXMu
-DQpJIGRvbid0IHRoaW5rIGl0J3MgZ29vZCBiZWNhdXNlIHdlIGNhbiBlbmQgdXAgd2l0aCBtZXNz
-IG9mIHZlcnNpb24gDQpzdXBwb3J0aW5nIGFuZCBub3Qgc3VwcG9ydGluZyB6c3RkIGNvbXByZXNz
-aW9uLg0KDQpBbm90aGVyIHBvaW50IGlzIHdoYXQgdGhlIGJlbmVmaXQgb2YgYnVpbGRpbmcgcWVt
-dSB3aXRob3V0IHpzdGQgc3VwcG9ydCANCmlzIHNpbmNlIGl0J3MgYXZhaWxhYmxlIGFuZCBwcm92
-aWRlcyBiZXR0ZXIgcGVyZm9ybWFuY2UgdGhhbiB6bGliIChpLmUuIA0KdGhlIHJlcGxhY2VtZW50
-IGZvciB6bGliKSA/DQoNCkRlbmlzDQo+IA0KPj4gICBjYXBzdG9uZT0iIg0KPj4gICBsem89IiIN
-Cj4+ICAgc25hcHB5PSIiDQo+PiBAQCAtMTMxNyw2ICsxMzE4LDggQEAgZm9yIG9wdCBkbw0KPj4g
-ICAgIDs7DQo+PiAgICAgLS1kaXNhYmxlLXpsaWItdGVzdCkgemxpYj0ibm8iDQo+PiAgICAgOzsN
-Cj4+ICsgIC0tZGlzYWJsZS16c3RkLXRlc3QpIHpzdGQ9Im5vIg0KPj4gKyAgOzsNCj4gDQo+IElu
-c3RlYWQgb2YgdGhpcyBvbmUsIGFmdGVyIG1ha2luZyB0aGUgYWJvdmUgY2hhbmdlLCBvcHRpb25z
-DQo+IC0tZGlzYWJsZS16c3RkIGFuZCAtLWVuYWJsZS16c3RkIHNob3VsZCBiZSBpbnRyb2R1Y2Vk
-IHRoYXQgc2V0DQo+IHpzdGQ9InllcyIgKHRoYXQgYWN0dWFsbHkgZG9lcyBwcm9kdWNlIGFuIGVy
-cm9yIGlmIGl0J3Mgbm90IGF2YWlsYWJsZSkNCj4gb3IgenN0ZD0ibm8iLg0KPiANCj4+ICAgICAt
-LWRpc2FibGUtbHpvKSBsem89Im5vIg0KPj4gICAgIDs7DQo+PiAgICAgLS1lbmFibGUtbHpvKSBs
-em89InllcyINCj4+IEBAIC0zNzAyLDYgKzM3MDUsMjkgQEAgRU9GDQo+PiAgICAgICBmaQ0KPj4g
-ICBmaQ0KPj4gICANCj4+ICsjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
-Iw0KPj4gKyMgenN0ZCBjaGVjaw0KPj4gKw0KPj4gK2lmIHRlc3QgIiR6c3RkIiAhPSAibm8iIDsg
-dGhlbg0KPj4gKyAgICBpZiAkcGtnX2NvbmZpZyAtLWV4aXN0cyBsaWJ6c3RkOyB0aGVuDQo+PiAr
-ICAgICAgICB6c3RkX2NmbGFncz0kKCRwa2dfY29uZmlnIC0tY2ZsYWdzIGxpYnpzdGQpDQo+PiAr
-ICAgICAgICB6c3RkX2xpYnM9JCgkcGtnX2NvbmZpZyAtLWxpYnMgbGlienN0ZCkNCj4+ICsgICAg
-ICAgIFFFTVVfQ0ZMQUdTPSIkenN0ZF9jZmxhZ3MgJFFFTVVfQ0ZMQUdTIg0KPj4gKyAgICAgICAg
-TElCUz0iJHpzdGRfbGlicyAkTElCUyINCj4+ICsgICAgZWxzZQ0KPj4gKyAgICAgICAgY2F0ID4g
-JFRNUEMgPDwgRU9GDQo+PiArI2luY2x1ZGUgPHpzdGQuaD4NCj4+ICtpbnQgbWFpbih2b2lkKSB7
-IFpTVERfdmVyc2lvbk51bWJlcigpOyByZXR1cm4gMDsgfQ0KPj4gK0VPRg0KPj4gKyAgICAgICAg
-aWYgY29tcGlsZV9wcm9nICIiICItbHpzdGQiIDsgdGhlbg0KPj4gKyAgICAgICAgICAgIExJQlM9
-IiRMSUJTIC1senN0ZCINCj4+ICsgICAgICAgIGVsc2UNCj4+ICsgICAgICAgICAgICBlcnJvcl9l
-eGl0ICJ6c3RkIGNoZWNrIGZhaWxlZCIgXA0KPj4gKyAgICAgICAgICAgICAgICAiTWFrZSBzdXJl
-IHRvIGhhdmUgdGhlIHpzdGQgbGlicyBhbmQgaGVhZGVycyBpbnN0YWxsZWQuIg0KPj4gKyAgICAg
-ICAgZmkNCj4gDQo+IFRoaXMgbmVlZHMgdG8gYmUgY2hhbmdlZCwgdG9vLCB0byBnZXQgdGhlIGRl
-c2lyZWQgYmVoYXZpb3VyLiBNb2RlbCBpdA0KPiBhZnRlciBiemlwMiBvciBsem8gc3VwcG9ydCBj
-aGVja3M6DQo+IA0KPiAgICAgIGlmIGNvbXBpbGVfcHJvZyAiIiAiLWxiejIiIDsgdGhlbg0KPiAg
-ICAgICAgICBiemlwMj0ieWVzIg0KPiAgICAgIGVsc2UNCj4gICAgICAgICAgaWYgdGVzdCAiJGJ6
-aXAyIiA9ICJ5ZXMiOyB0aGVuDQo+ICAgICAgICAgICAgICBmZWF0dXJlX25vdF9mb3VuZCAibGli
-YnppcDIiICJJbnN0YWxsIGxpYmJ6aXAyIGRldmVsIg0KPiAgICAgICAgICBmaQ0KPiAgICAgICAg
-ICBiemlwMj0ibm8iDQo+ICAgICAgZmkNCj4gDQo+PiArICAgIGZpDQo+PiArZmkNCj4+ICsNCj4+
-ICAgIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjDQo+PiAgICMgU0hB
-IGNvbW1hbmQgcHJvYmUgZm9yIG1vZHVsZXMNCj4+ICAgaWYgdGVzdCAiJG1vZHVsZXMiID0geWVz
-OyB0aGVuDQo+IA0KPiBLZXZpbg0KPiANCg0KLS0gDQpCZXN0LA0KRGVuaXMNCg==
+On Mon, Jul 01, 2019 at 06:10:33PM +0800, Auger Eric wrote:
+> Hi Yan,
+> 
+> On 6/29/19 12:19 AM, Yan Zhao wrote:
+> > if an entry has non inclusive overlap with the notifier, print warning
+> > message and do not do notification for it.
+> > 
+> > Out of scope mapping/unmapping would cause problem, as in below case:
+> > 
+> > 1. initially there are two notifiers with ranges
+> > 0-0xfedfffff, 0xfef00000-0xffffffffffffffff,
+> > IOVAs from 0x3c000000 - 0x3c1fffff is in shadow page table.
+> > 
+> > 2. in vfio, memory_region_register_iommu_notifier() is followed by
+> > memory_region_iommu_replay(), which will first call address space
+> > unmap,
+> > and walk and add back all entries in vtd shadow page table. e.g.
+> > (1) for notifier 0-0xfedfffff,
+> >     IOVAs from 0 - 0xffffffff get unmapped,
+> >     and IOVAs from 0x3c000000 - 0x3c1fffff get mapped
+> > (2) for notifier 0xfef00000-0xffffffffffffffff
+> >     IOVAs from 0 - 0x7fffffffff get unmapped,
+> >     but IOVAs from 0x3c000000 - 0x3c1fffff cannot get mapped back.
+> > 
+> > Cc: Eric Auger <eric.auger@redhat.com>
+> > Cc: Peter Xu <peterx@redhat.com>
+> > Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
+> Reviewed-by: Eric Auger <eric.auger@redhat.com>
+> 
+> Thanks
+> 
+> Eric
+
+Thank you, Eric :)
+
+Yan
+> > 
+> > ---
+> > v5:
+> > 1. still using warn_report instead of "assert"
+> > 2. returning at the end to refuse notification for entry which has non
+> > inclusive overlap with the notifier.
+> > 3. updated commit title and warning message.
+> > 
+> > v4:
+> > 1. modified commit title
+> > 2. using "assert" instead of printing warning message
+> > 
+> > v3:
+> > refined code style and message format
+> > 
+> > v2:
+> > 1. added a local variable entry_end (Eric Auger)
+> > 2. using PRIx64 as format for address range in warning message
+> > (Eric Auger)
+> > ---
+> >  memory.c | 16 ++++++++++++++--
+> >  1 file changed, 14 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/memory.c b/memory.c
+> > index 0a089a7..fe0d08d 100644
+> > --- a/memory.c
+> > +++ b/memory.c
+> > @@ -1937,13 +1937,13 @@ void memory_region_notify_one(IOMMUNotifier *notifier,
+> >                                IOMMUTLBEntry *entry)
+> >  {
+> >      IOMMUNotifierFlag request_flags;
+> > +    hwaddr entry_end = entry->iova + entry->addr_mask;
+> >  
+> >      /*
+> >       * Skip the notification if the notification does not overlap
+> >       * with registered range.
+> >       */
+> > -    if (notifier->start > entry->iova + entry->addr_mask ||
+> > -        notifier->end < entry->iova) {
+> > +    if (notifier->start > entry_end || notifier->end < entry->iova) {
+> >          return;
+> >      }
+> >  
+> > @@ -1953,6 +1953,18 @@ void memory_region_notify_one(IOMMUNotifier *notifier,
+> >          request_flags = IOMMU_NOTIFIER_UNMAP;
+> >      }
+> >  
+> > +    if (entry->iova < notifier->start || entry_end > notifier->end) {
+> > +        warn_report("IOMMUTLBEntry 0x%" PRIx64 " - 0x%" PRIx64
+> > +                " has non inclusive overlap with notifier 0x%" PRIx64
+> > +                " - 0x%" PRIx64 ". %s is not allowed."
+> > +                " Try to divide it into smaller sections.",
+> > +                entry->iova, entry_end,
+> > +                notifier->start, notifier->end,
+> > +                (request_flags == IOMMU_NOTIFIER_MAP) ?
+> > +                "Mapping" : "Unmapping");
+> > +        return;
+> > +    }
+> > +
+> >      if (notifier->notifier_flags & request_flags) {
+> >          notifier->notify(notifier, entry);
+> >      }
+> > 
 
