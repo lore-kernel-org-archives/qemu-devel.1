@@ -2,77 +2,67 @@ Return-Path: <SRS0=9yXi=U7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4262C06511
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 16:30:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 309D7C06510
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 16:33:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8004D2082F
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 16:30:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8004D2082F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 0897E2082F
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 16:33:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0897E2082F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55036 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55056 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hiLfW-0006AS-Ku
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 12:30:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36069)
+	id 1hiLiV-0008Au-Og
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 12:33:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38169)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bounces@canonical.com>) id 1hiKkW-00059f-T2
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 11:31:18 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1hiKqb-0000zm-Ii
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 11:37:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1hiKkV-0001Ir-9Q
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 11:31:16 -0400
-Received: from indium.canonical.com ([91.189.90.7]:52688)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1hiKkU-0001EW-F1
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 11:31:14 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1hiKkO-0006ac-Oq
- for <qemu-devel@nongnu.org>; Tue, 02 Jul 2019 15:31:08 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id B3B892E80CF
- for <qemu-devel@nongnu.org>; Tue,  2 Jul 2019 15:31:08 +0000 (UTC)
+ (envelope-from <ehabkost@redhat.com>) id 1hiKqY-00072n-Je
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 11:37:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54098)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hiKqY-0006v1-7s
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 11:37:30 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 42D253082B6D;
+ Tue,  2 Jul 2019 15:37:22 +0000 (UTC)
+Received: from localhost (ovpn-116-30.gru2.redhat.com [10.97.116.30])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C848D1001B3A;
+ Tue,  2 Jul 2019 15:37:21 +0000 (UTC)
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
+ Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+ Richard Henderson <rth@twiddle.net>
+Date: Tue,  2 Jul 2019 12:35:29 -0300
+Message-Id: <20190702153535.9851-37-ehabkost@redhat.com>
+In-Reply-To: <20190702153535.9851-1-ehabkost@redhat.com>
+References: <20190702153535.9851-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.45]); Tue, 02 Jul 2019 15:37:22 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 02 Jul 2019 15:20:39 -0000
-From: Avi Eis <1834113@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug: distribution=ubuntu; sourcepackage=libvirt; component=main;
- status=New; importance=Undecided; assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
- status=Incomplete; importance=Undecided; assignee=None; 
-X-Launchpad-Bug-Tags: amd64 apport-bug disco
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: bryce ikes73 paelzer
-X-Launchpad-Bug-Reporter: Avi Eis (ikes73)
-X-Launchpad-Bug-Modifier: Avi Eis (ikes73)
-References: <156142437029.30985.13623507391124028236.malonedeb@soybean.canonical.com>
-Message-Id: <156208083995.18147.4248633848724305469.malone@gac.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="18991";
- Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 2d448762008b832b2f51fbd0ea5a470cdeeb3c2f
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1834113] Re: QEMU touchpad input erratic after
- wakeup from sleep
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PULL v3 36/42] i386: Define -IBRS, -noTSX,
+ -IBRS versions of CPU models
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -81,90 +71,283 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1834113 <1834113@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The issue replicated on the older libvirt, so it wasn't that. Only thing
-left to try is intel-microcode now
+Add versions of CPU models that are equivalent to their -IBRS,
+-noTSX and -IBRS variants.
 
--- =
+The separate variants will eventually be removed and become
+aliases for these CPU versions.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1834113
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+Message-Id: <20190628002844.24894-6-ehabkost@redhat.com>
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+---
+ target/i386/cpu.c | 186 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 186 insertions(+)
 
-Title:
-  QEMU touchpad input erratic after wakeup from sleep
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index a611c6eae2..99ab6104f4 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -1851,6 +1851,20 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
+             CPUID_EXT3_LAHF_LM,
+         .xlevel =3D 0x80000008,
+         .model_id =3D "Intel Core i7 9xx (Nehalem Class Core i7)",
++        .versions =3D (X86CPUVersionDefinition[]) {
++            { .version =3D 1 },
++            {
++                .version =3D 2,
++                /* Equivalent to Nehalem-IBRS */
++                .props =3D (PropValue[]) {
++                    { "spec-ctrl", "on" },
++                    { "model-id",
++                      "Intel Core i7 9xx (Nehalem Core i7, IBRS update)"=
+ },
++                    { /* end of list */ }
++                }
++            },
++            { /* end of list */ }
++        }
+     },
+     {
+         .name =3D "Nehalem-IBRS",
+@@ -1907,6 +1921,20 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
+             CPUID_6_EAX_ARAT,
+         .xlevel =3D 0x80000008,
+         .model_id =3D "Westmere E56xx/L56xx/X56xx (Nehalem-C)",
++        .versions =3D (X86CPUVersionDefinition[]) {
++            { .version =3D 1 },
++            {
++                .version =3D 2,
++                /* Equivalent to Westmere-IBRS */
++                .props =3D (PropValue[]) {
++                    { "spec-ctrl", "on" },
++                    { "model-id",
++                      "Westmere E56xx/L56xx/X56xx (IBRS update)" },
++                    { /* end of list */ }
++                }
++            },
++            { /* end of list */ }
++        }
+     },
+     {
+         .name =3D "Westmere-IBRS",
+@@ -1971,6 +1999,20 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
+             CPUID_6_EAX_ARAT,
+         .xlevel =3D 0x80000008,
+         .model_id =3D "Intel Xeon E312xx (Sandy Bridge)",
++        .versions =3D (X86CPUVersionDefinition[]) {
++            { .version =3D 1 },
++            {
++                .version =3D 2,
++                /* Equivalent to SandyBridge-IBRS */
++                .props =3D (PropValue[]) {
++                    { "spec-ctrl", "on" },
++                    { "model-id",
++                      "Intel Xeon E312xx (Sandy Bridge, IBRS update)" },
++                    { /* end of list */ }
++                }
++            },
++            { /* end of list */ }
++        }
+     },
+     {
+         .name =3D "SandyBridge-IBRS",
+@@ -2043,6 +2085,20 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
+             CPUID_6_EAX_ARAT,
+         .xlevel =3D 0x80000008,
+         .model_id =3D "Intel Xeon E3-12xx v2 (Ivy Bridge)",
++        .versions =3D (X86CPUVersionDefinition[]) {
++            { .version =3D 1 },
++            {
++                .version =3D 2,
++                /* Equivalent to IvyBridge-IBRS */
++                .props =3D (PropValue[]) {
++                    { "spec-ctrl", "on" },
++                    { "model-id",
++                      "Intel Xeon E3-12xx v2 (Ivy Bridge, IBRS)" },
++                    { /* end of list */ }
++                }
++            },
++            { /* end of list */ }
++        }
+     },
+     {
+         .name =3D "IvyBridge-IBRS",
+@@ -2205,6 +2261,52 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
+             CPUID_6_EAX_ARAT,
+         .xlevel =3D 0x80000008,
+         .model_id =3D "Intel Core Processor (Haswell)",
++        .versions =3D (X86CPUVersionDefinition[]) {
++            { .version =3D 1 },
++            {
++                .version =3D 2,
++                /* Equivalent to Haswell-noTSX */
++                .props =3D (PropValue[]) {
++                    { "hle", "off" },
++                    { "rtm", "off" },
++                    { "stepping", "1" },
++                    { "model-id", "Intel Core Processor (Haswell, no TSX=
+)", },
++                    { /* end of list */ }
++                },
++            },
++            {
++                .version =3D 3,
++                /* Equivalent to Haswell-IBRS */
++                .props =3D (PropValue[]) {
++                    /* Restore TSX features removed by -v2 above */
++                    { "hle", "on" },
++                    { "rtm", "on" },
++                    /*
++                     * Haswell and Haswell-IBRS had stepping=3D4 in
++                     * QEMU 4.0 and older
++                     */
++                    { "stepping", "4" },
++                    { "spec-ctrl", "on" },
++                    { "model-id",
++                      "Intel Core Processor (Haswell, IBRS)" },
++                    { /* end of list */ }
++                }
++            },
++            {
++                .version =3D 4,
++                /* Equivalent to Haswell-noTSX-IBRS */
++                .props =3D (PropValue[]) {
++                    { "hle", "off" },
++                    { "rtm", "off" },
++                    /* spec-ctrl was already enabled by -v3 above */
++                    { "stepping", "1" },
++                    { "model-id",
++                      "Intel Core Processor (Haswell, no TSX, IBRS)" },
++                    { /* end of list */ }
++                }
++            },
++            { /* end of list */ }
++        }
+     },
+     {
+         .name =3D "Haswell-IBRS",
+@@ -2375,6 +2477,45 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
+             CPUID_6_EAX_ARAT,
+         .xlevel =3D 0x80000008,
+         .model_id =3D "Intel Core Processor (Broadwell)",
++        .versions =3D (X86CPUVersionDefinition[]) {
++            { .version =3D 1 },
++            {
++                .version =3D 2,
++                /* Equivalent to Broadwell-noTSX */
++                .props =3D (PropValue[]) {
++                    { "hle", "off" },
++                    { "rtm", "off" },
++                    { "model-id", "Intel Core Processor (Broadwell, no T=
+SX)", },
++                    { /* end of list */ }
++                },
++            },
++            {
++                .version =3D 3,
++                /* Equivalent to Broadwell-IBRS */
++                .props =3D (PropValue[]) {
++                    /* Restore TSX features removed by -v2 above */
++                    { "hle", "on" },
++                    { "rtm", "on" },
++                    { "spec-ctrl", "on" },
++                    { "model-id",
++                      "Intel Core Processor (Broadwell, IBRS)" },
++                    { /* end of list */ }
++                }
++            },
++            {
++                .version =3D 4,
++                /* Equivalent to Broadwell-noTSX-IBRS */
++                .props =3D (PropValue[]) {
++                    { "hle", "off" },
++                    { "rtm", "off" },
++                    /* spec-ctrl was already enabled by -v3 above */
++                    { "model-id",
++                      "Intel Core Processor (Broadwell, no TSX, IBRS)" }=
+,
++                    { /* end of list */ }
++                }
++            },
++            { /* end of list */ }
++        }
+     },
+     {
+         .name =3D "Broadwell-IBRS",
+@@ -2465,6 +2606,20 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
+             CPUID_6_EAX_ARAT,
+         .xlevel =3D 0x80000008,
+         .model_id =3D "Intel Core Processor (Skylake)",
++        .versions =3D (X86CPUVersionDefinition[]) {
++            { .version =3D 1 },
++            {
++                .version =3D 2,
++                /* Equivalent to Skylake-Client-IBRS */
++                .props =3D (PropValue[]) {
++                    { "spec-ctrl", "on" },
++                    { "model-id",
++                      "Intel Core Processor (Skylake, IBRS)" },
++                    { /* end of list */ }
++                }
++            },
++            { /* end of list */ }
++        }
+     },
+     {
+         .name =3D "Skylake-Client-IBRS",
+@@ -2567,6 +2722,23 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
+             CPUID_6_EAX_ARAT,
+         .xlevel =3D 0x80000008,
+         .model_id =3D "Intel Xeon Processor (Skylake)",
++        .versions =3D (X86CPUVersionDefinition[]) {
++            { .version =3D 1 },
++            {
++                .version =3D 2,
++                /* Equivalent to Skylake-Server-IBRS */
++                .props =3D (PropValue[]) {
++                    /* clflushopt was not added to Skylake-Server-IBRS *=
+/
++                    /* TODO: add -v3 including clflushopt */
++                    { "clflushopt", "off" },
++                    { "spec-ctrl", "on" },
++                    { "model-id",
++                      "Intel Xeon Processor (Skylake, IBRS)" },
++                    { /* end of list */ }
++                }
++            },
++            { /* end of list */ }
++        }
+     },
+     {
+         .name =3D "Skylake-Server-IBRS",
+@@ -3082,6 +3254,20 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
+         .xlevel =3D 0x8000001E,
+         .model_id =3D "AMD EPYC Processor",
+         .cache_info =3D &epyc_cache_info,
++        .versions =3D (X86CPUVersionDefinition[]) {
++            { .version =3D 1 },
++            {
++                .version =3D 2,
++                /* Equivalent to EPYC-IBPB */
++                .props =3D (PropValue[]) {
++                    { "ibpb", "on" },
++                    { "model-id",
++                      "AMD EPYC Processor (with IBPB)" },
++                    { /* end of list */ }
++                }
++            },
++            { /* end of list */ }
++        }
+     },
+     {
+         .name =3D "EPYC-IBPB",
+--=20
+2.18.0.rc1.1.g3f1ff2140
 
-Status in QEMU:
-  New
-Status in libvirt package in Ubuntu:
-  New
-Status in qemu package in Ubuntu:
-  Incomplete
-
-Bug description:
-  Using Ubuntu host and guest. Normally the touchpad works great. Within
-  the last few days, suddenly, apparently after a wake from sleep, the
-  touchpad will behave erratically. For example, it will take two clicks
-  to select something, and when moving the cursor it will act as though
-  it is dragging even with the button not clicked.
-
-  A reboot fixes the issue temporarily.
-
-  ProblemType: Bug
-  DistroRelease: Ubuntu 19.04
-  Package: qemu 1:3.1+dfsg-2ubuntu3.1
-  Uname: Linux 5.1.14-050114-generic x86_64
-  ApportVersion: 2.20.10-0ubuntu27
-  Architecture: amd64
-  CurrentDesktop: ubuntu:GNOME
-  Date: Mon Jun 24 20:55:44 2019
-  Dependencies:
-   =
-
-  EcryptfsInUse: Yes
-  InstallationDate: Installed on 2019-02-20 (124 days ago)
-  InstallationMedia: Ubuntu 18.04 "Bionic" - Build amd64 LIVE Binary 201806=
-08-09:38
-  Lsusb:
-   Bus 002 Device 001: ID 1d6b:0003 Linux Foundation 3.0 root hub
-   Bus 001 Device 002: ID 8087:0025 Intel Corp. =
-
-   Bus 001 Device 003: ID 0c45:671d Microdia =
-
-   Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
-  MachineType: Dell Inc. Precision 5530
-  ProcEnviron:
-   TERM=3Dxterm-256color
-   PATH=3D(custom, no user)
-   XDG_RUNTIME_DIR=3D<set>
-   LANG=3Den_US.UTF-8
-   SHELL=3D/bin/bash
-  ProcKernelCmdLine: BOOT_IMAGE=3D/boot/vmlinuz-5.1.14-050114-generic root=
-=3DUUID=3D18e8777c-1764-41e4-a19f-62476055de23 ro mem_sleep_default=3Ddeep =
-mem_sleep_default=3Ddeep acpi_rev_override=3D1 scsi_mod.use_blk_mq=3D1 nouv=
-eau.modeset=3D0 nouveau.runpm=3D0 nouveau.blacklist=3D1 acpi_backlight=3Dno=
-ne acpi_osi=3DLinux acpi_osi=3D!
-  SourcePackage: qemu
-  UpgradeStatus: No upgrade log present (probably fresh install)
-  dmi.bios.date: 04/26/2019
-  dmi.bios.vendor: Dell Inc.
-  dmi.bios.version: 1.10.1
-  dmi.board.name: 0FP2W2
-  dmi.board.vendor: Dell Inc.
-  dmi.board.version: A00
-  dmi.chassis.type: 10
-  dmi.chassis.vendor: Dell Inc.
-  dmi.modalias: dmi:bvnDellInc.:bvr1.10.1:bd04/26/2019:svnDellInc.:pnPrecis=
-ion5530:pvr:rvnDellInc.:rn0FP2W2:rvrA00:cvnDellInc.:ct10:cvr:
-  dmi.product.family: Precision
-  dmi.product.name: Precision 5530
-  dmi.product.sku: 087D
-  dmi.sys.vendor: Dell Inc.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1834113/+subscriptions
 
