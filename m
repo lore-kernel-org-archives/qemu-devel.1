@@ -2,62 +2,70 @@ Return-Path: <SRS0=9yXi=U7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=0.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MSGID_MULTIPLE_AT,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D462FC06510
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 11:48:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02C2FC4646D
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 11:51:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ADE9921473
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 11:48:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ADE9921473
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id D385421721
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 11:51:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D385421721
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=ispras.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51926 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51940 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hiHGy-0006Fk-Uy
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 07:48:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34475)
+	id 1hiHJM-0008Pm-EV
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 07:51:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34306)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <imammedo@redhat.com>) id 1hiHDW-0004ZE-1M
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 07:44:59 -0400
+ (envelope-from <Natalia.Fursova@ispras.ru>) id 1hiHCk-0004BU-GM
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 07:44:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1hiHDT-0007F3-I1
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 07:44:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49550)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hiHDT-0007E8-Bl
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 07:44:55 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id AC2283082B6B;
- Tue,  2 Jul 2019 11:44:54 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.182])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8E63B1001DD1;
- Tue,  2 Jul 2019 11:44:53 +0000 (UTC)
-Date: Tue, 2 Jul 2019 13:44:49 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Message-ID: <20190702134449.2b190981@redhat.com>
-In-Reply-To: <CAFEAcA8Jnh=tu8s08Fu6n0sSmJJuVOx7YxyTR_ni5yW3DdMFkQ@mail.gmail.com>
-References: <20190628184742.5961-1-ehabkost@redhat.com>
- <CAFEAcA8Jnh=tu8s08Fu6n0sSmJJuVOx7YxyTR_ni5yW3DdMFkQ@mail.gmail.com>
+ (envelope-from <Natalia.Fursova@ispras.ru>) id 1hiHCi-0006Ml-Hc
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 07:44:10 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:44348)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <Natalia.Fursova@ispras.ru>) id 1hiHCg-0006Gc-PJ
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 07:44:08 -0400
+Received: from NATALIAFURSOVA (unknown [85.142.117.226])
+ by mail.ispras.ru (Postfix) with ESMTPSA id B195C540081;
+ Tue,  2 Jul 2019 14:44:02 +0300 (MSK)
+From: "Natalia Fursova" <Natalia.Fursova@ispras.ru>
+To: "'Paolo Bonzini'" <pbonzini@redhat.com>,
+ "'Markus Armbruster'" <armbru@redhat.com>
+References: <5cf62de9.1c69fb81.66fc.8f4fSMTPIN_ADDED_BROKEN@mx.google.com>
+ <1e9e4edd-f4ad-d8d6-95a2-e0aeab89510d@redhat.com>
+ <5cf7b6e6.1c69fb81.1cdca.e260SMTPIN_ADDED_BROKEN@mx.google.com>
+ <ec5033a4-5c68-91b7-ca9e-a1f38c990221@redhat.com>
+ <003b01d51f72$5e6f4160$1b4dc420$@Fursova@ispras.ru>
+ <67806828-f666-0c9c-00fc-b520f15013d9@suse.de>
+ <e4fe4dc0-f3c4-a051-d39d-afd7bfdc680d@redhat.com>
+ <98826c5f-4a74-5364-2aef-28a10db12c20@suse.de>
+ <39250506-f38f-c440-5728-7b970d32ab41@redhat.com>
+ <79b821a4-7cc0-2461-7ca4-d71c3e5ee4ef@suse.de>
+ <c49abf01-c209-b206-edee-507c31269011@redhat.com>
+ <87o934sdot.fsf@dusky.pond.sub.org>
+ <8d391b41-bf6d-b83b-7b22-25fefa18c518@redhat.com>
+ <87ftogp7f5.fsf@dusky.pond.sub.org>
+ <4ed45e59-6d7d-a9ea-9af3-7ec336c7ec3d@redhat.com>
+In-Reply-To: <4ed45e59-6d7d-a9ea-9af3-7ec336c7ec3d@redhat.com>
+Date: Tue, 2 Jul 2019 14:44:05 +0300
+Message-ID: <014c01d530cb$73ff1950$5bfd4bf0$@Fursova@ispras.ru>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Tue, 02 Jul 2019 11:44:54 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PULL v2 00/29] Machine and x86 queue, 2019-06-28
+Content-Type: text/plain;
+	charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Mailer: Microsoft Office Outlook 12.0
+Thread-Index: AdUgW9l5XmsGj7jwR1SPV3cjsX4VzQQbuK7w
+Content-Language: ru
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 83.149.199.45
+Subject: Re: [Qemu-devel] qgraph
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,69 +77,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
- Eduardo Habkost <ehabkost@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: =?utf-8?Q?'Andreas_F=C3=A4rber'?= <afaerber@suse.de>,
+ =?utf-8?B?J9Cf0LDRiNCwJw==?= <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 2 Jul 2019 11:48:01 +0100
-Peter Maydell <peter.maydell@linaro.org> wrote:
+Hi there again!
+Thank you for your answers, I have new question.
+=20
+I want to identify PCI devices (e.g. network cards) and observed one =
+strange thing. I use qmp command "qom-list-type" and build tree from it =
+output. Some items don't have parent and don't give information about =
+themselves. E. g. "e1000-base". It has three children and it belongs to =
+PCI devices, but I can't know it, cuz command "qom-list-properties" =
+returns empty message.
 
-> On Fri, 28 Jun 2019 at 19:47, Eduardo Habkost <ehabkost@redhat.com> wrote:
-> >
-> > Changes v1 -> v2:
-> > * Fix s390x build failure
-> >
-> > The following changes since commit 474f3938d79ab36b9231c9ad3b5a9314c2aeacde:
-> >
-> >   Merge remote-tracking branch 'remotes/amarkovic/tags/mips-queue-jun-21-2019' into staging (2019-06-21 15:40:50 +0100)
-> >
-> > are available in the Git repository at:
-> >
-> >   git://github.com/ehabkost/qemu.git tags/machine-next-pull-request
-> >
-> > for you to fetch changes up to b701bfd0634f24551449856cdc56fd13f35bd1f6:
-> >
-> >   vl.c: Add -smp, dies=* command line support and update doc (2019-06-28 15:34:12 -0300)
-> >
-> > ----------------------------------------------------------------
-> > Machine and x86 queue, 2019-06-28
-> >
-> > * CPU die topology support (Like Xu)
-> > * Deprecation of features (Igor Mammedov):
-> >   * 'mem' parameter of '-numa node' option
-> >   * implict memory distribution between NUMA nodes
-> >   * deprecate -mem-path fallback to anonymous RAM
-> > * Other i386 fixes  
-> 
-> Hi. This fills my build logs with warnings during 'make check':
-> 
-> qemu-system-i386: warning: Default splitting of RAM between nodes is
-> deprecated, Use '-numa node,memdev' to explictly define RAM allocation
-> per node
-> qemu-system-i386: warning: Default splitting of RAM between nodes is
-> deprecated, Use '-numa node,memdev' to explictly define RAM allocation
-> per node
-> qemu-system-i386: -numa node,mem=128: warning: Parameter -numa
-> node,mem is deprecated, use -numa node,memdev instead
-> qemu-system-i386: -numa node,mem=32M,nodeid=0: warning: Parameter
-> -numa node,mem is deprecated, use -numa node,memdev instead
-> qemu-system-i386: -numa node,mem=32M,nodeid=1: warning: Parameter
-> -numa node,mem is deprecated, use -numa node,memdev instead
-> qemu-system-i386: -numa node,mem=32M,nodeid=2: warning: Parameter
-> -numa node,mem is deprecated, use -numa node,memdev instead
-> qemu-system-i386: -numa node,mem=32M,nodeid=3: warning: Parameter
-> -numa node,mem is deprecated, use -numa node,memdev instead
-> [etc etc for hundreds of instances]
-> 
-> Can you either fix the tests not to warn or arrange for the warnings
-> to be suppressed, please?
-My bad,
- I'll prepare a patch to fix tests shortly
+There is no information about "e1000-base" in "qom-list-type" output. It =
+is referenced only as a parent for network cards.
+Is it ok? Maybe is there other way for get information about all PCI =
+devices?
 
-> 
-> thanks
-> -- PMM
+
+
+Best regards,
+Natalia
+
+
+-----Original Message-----
+From: Paolo Bonzini [mailto:pbonzini@redhat.com]=20
+Sent: Tuesday, June 11, 2019 4:45 PM
+To: Markus Armbruster
+Cc: Natalia Fursova; Andreas F=C3=A4rber; '=D0=9F=D0=B0=D1=88=D0=B0'; =
+qemu-devel@nongnu.org
+Subject: Re: [Qemu-devel] qgraph
+
+On 11/06/19 15:39, Markus Armbruster wrote:
+>> Right, and we should move more towards class-based properties so that
+>> the dynamic nature of QOM is only used for the bare minimum needed =
+(e.g.
+>> memory regions).
+> What are we doing to make new code conform to that?
+>=20
+> What are we doing to update existing code?
+
+Almost nothing and completely nothing. :(
+
+Paolo
 
 
