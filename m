@@ -2,70 +2,80 @@ Return-Path: <SRS0=9yXi=U7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=0.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MSGID_MULTIPLE_AT,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02C2FC4646D
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 11:51:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BA44C06510
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 11:51:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D385421721
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 11:51:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D385421721
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=ispras.ru
+	by mail.kernel.org (Postfix) with ESMTPS id 4FDDB21473
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 11:51:46 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UsqarQr0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4FDDB21473
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51940 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51942 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hiHJM-0008Pm-EV
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 07:51:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34306)
+	id 1hiHK5-0000Hs-HQ
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 07:51:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34825)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <Natalia.Fursova@ispras.ru>) id 1hiHCk-0004BU-GM
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 07:44:12 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hiHFi-0005yT-Uq
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 07:47:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <Natalia.Fursova@ispras.ru>) id 1hiHCi-0006Ml-Hc
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 07:44:10 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:44348)
- by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <Natalia.Fursova@ispras.ru>) id 1hiHCg-0006Gc-PJ
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 07:44:08 -0400
-Received: from NATALIAFURSOVA (unknown [85.142.117.226])
- by mail.ispras.ru (Postfix) with ESMTPSA id B195C540081;
- Tue,  2 Jul 2019 14:44:02 +0300 (MSK)
-From: "Natalia Fursova" <Natalia.Fursova@ispras.ru>
-To: "'Paolo Bonzini'" <pbonzini@redhat.com>,
- "'Markus Armbruster'" <armbru@redhat.com>
-References: <5cf62de9.1c69fb81.66fc.8f4fSMTPIN_ADDED_BROKEN@mx.google.com>
- <1e9e4edd-f4ad-d8d6-95a2-e0aeab89510d@redhat.com>
- <5cf7b6e6.1c69fb81.1cdca.e260SMTPIN_ADDED_BROKEN@mx.google.com>
- <ec5033a4-5c68-91b7-ca9e-a1f38c990221@redhat.com>
- <003b01d51f72$5e6f4160$1b4dc420$@Fursova@ispras.ru>
- <67806828-f666-0c9c-00fc-b520f15013d9@suse.de>
- <e4fe4dc0-f3c4-a051-d39d-afd7bfdc680d@redhat.com>
- <98826c5f-4a74-5364-2aef-28a10db12c20@suse.de>
- <39250506-f38f-c440-5728-7b970d32ab41@redhat.com>
- <79b821a4-7cc0-2461-7ca4-d71c3e5ee4ef@suse.de>
- <c49abf01-c209-b206-edee-507c31269011@redhat.com>
- <87o934sdot.fsf@dusky.pond.sub.org>
- <8d391b41-bf6d-b83b-7b22-25fefa18c518@redhat.com>
- <87ftogp7f5.fsf@dusky.pond.sub.org>
- <4ed45e59-6d7d-a9ea-9af3-7ec336c7ec3d@redhat.com>
-In-Reply-To: <4ed45e59-6d7d-a9ea-9af3-7ec336c7ec3d@redhat.com>
-Date: Tue, 2 Jul 2019 14:44:05 +0300
-Message-ID: <014c01d530cb$73ff1950$5bfd4bf0$@Fursova@ispras.ru>
+ (envelope-from <peter.maydell@linaro.org>) id 1hiHFh-00014J-Hg
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 07:47:14 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:39829)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hiHFc-0000xH-H8
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 07:47:10 -0400
+Received: by mail-ot1-x342.google.com with SMTP id r21so16176725otq.6
+ for <qemu-devel@nongnu.org>; Tue, 02 Jul 2019 04:47:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=dSRxAHcDzhVFRmaf5h2eXJkPlzIFYCiYsZli86wZ5ls=;
+ b=UsqarQr0YXlZxF+nMkyGoj5J15hUK9LpbuuEJ2KPmdnNpO1LgY630cyTaZoI35uuK6
+ DUAvl2nw24uK95MEcdiywj4HJBnf/jY0NQGqYPzrWMdssmZnhio0mqs0stEzzpEcVSkb
+ mYLzZZX/UaQ6l17XZZ7bZLDaEra/ariU2jOvl3UuWMRlr41Bjt/RnO8XS+C5G14X6cRW
+ 0GUwYrxH29JIFS5nRXVT2z6gqPMJZmaZ/4R0Z5N4NuM3m0iXbL+XK0CZKNi8BPYHOpPE
+ NKMeuMBECB9TuWT87FeUb+tSVhyem2ZsYTd085A/dUb5RPv+5vdcI+1nGMK1zfT+KNvl
+ Ga6g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=dSRxAHcDzhVFRmaf5h2eXJkPlzIFYCiYsZli86wZ5ls=;
+ b=cYGvItwmA/xxPgcOjNdXL+GlHjrwl1wwl72RLdbu/PQcJgdGradgEkNKSEXgJZdAAt
+ U9DTB5Gvr/3a160raOISKqPENoKCx1qjsn5fum+FG/YdpoIXHyjWESIwmzg1S8XvJIPX
+ ePycpxhbQAYgO3EkgMDGjAVT+84MkII6A1nOctoUfs+g4l0MeeWmgk68tKsi+ix/SbCd
+ jLkWiLtAMTrb0hPWE3J4ssV7a2Hkwn15vKA5ZHW14u448pUw+o2pnbMtZRyAgxiq4hrH
+ nmWY4cRT9GiyPnIVN4a77P1RgknUyR5VTkk3USsfkbl4ZkxU0RU0tPHqLIPdfu1hdrqJ
+ vxUg==
+X-Gm-Message-State: APjAAAUbn0OuMDvP9RxBX/3ggO9b7WkGC6yNeAFHTuxq/0XWPU72tFHT
+ Gw15FrdMfxIu5XlMYZ19I7Ebaw0gZtDxo0uuG5nijQ==
+X-Google-Smtp-Source: APXvYqxKm5914TLnqudVNCijsVtzHK4mz3CSR/Hhe5Niun4eeMsSybWqIZ2MujTcA3Pf8MaE6osfoxd2a7Kh0j79NeE=
+X-Received: by 2002:a9d:6a0f:: with SMTP id g15mr24633658otn.135.1562068026545; 
+ Tue, 02 Jul 2019 04:47:06 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Mailer: Microsoft Office Outlook 12.0
-Thread-Index: AdUgW9l5XmsGj7jwR1SPV3cjsX4VzQQbuK7w
-Content-Language: ru
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 83.149.199.45
-Subject: Re: [Qemu-devel] qgraph
+References: <20190625121421.22280-1-shameerali.kolothum.thodi@huawei.com>
+ <20190702130703.0e74cbe6@redhat.com>
+In-Reply-To: <20190702130703.0e74cbe6@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 2 Jul 2019 12:46:55 +0100
+Message-ID: <CAFEAcA8PDNTQXD3cD3XG9wkc_QOLXUcw62-8AUjSC0g7qjti7g@mail.gmail.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::342
+Subject: Re: [Qemu-devel] [PATCH v6 0/8] ARM virt: ACPI memory hotplug
+ support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,52 +87,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?utf-8?Q?'Andreas_F=C3=A4rber'?= <afaerber@suse.de>,
- =?utf-8?B?J9Cf0LDRiNCwJw==?= <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org
+Cc: Samuel Ortiz <sameo@linux.intel.com>,
+ Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+ Shannon Zhao <shannon.zhaosl@gmail.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+ Linuxarm <linuxarm@huawei.com>, Eric Auger <eric.auger@redhat.com>,
+ qemu-arm <qemu-arm@nongnu.org>, Xu Wei <xuwei5@hisilicon.com>,
+ sebastien.boeuf@intel.com, Laszlo Ersek <lersek@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi there again!
-Thank you for your answers, I have new question.
-=20
-I want to identify PCI devices (e.g. network cards) and observed one =
-strange thing. I use qmp command "qom-list-type" and build tree from it =
-output. Some items don't have parent and don't give information about =
-themselves. E. g. "e1000-base". It has three children and it belongs to =
-PCI devices, but I can't know it, cuz command "qom-list-properties" =
-returns empty message.
+On Tue, 2 Jul 2019 at 12:07, Igor Mammedov <imammedo@redhat.com> wrote:
+>
+> On Tue, 25 Jun 2019 13:14:13 +0100
+> Shameer Kolothum <shameerali.kolothum.thodi@huawei.com> wrote:
+>
+> > This series is an attempt to provide device memory hotplug support
+> > on ARM virt platform. This is based on Eric's recent works here[1]
+> > and carries some of the pc-dimm related patches dropped from his
+> > series.
+> >
+> > The kernel support for arm64 memory hot add was added recently by
+> > Robin and hence the guest kernel should be => 5.0-rc1.
+> >
+> > NVDIM support is not included currently as we still have an unresolved
+> > issue while hot adding NVDIMM[2]. However NVDIMM cold plug patches
+> > can be included, but not done for now, for keeping it simple.
+> >
+> > This makes use of GED device to sent hotplug ACPI events to the
+> > Guest. GED code is based on Nemu. Thanks to the efforts of Samuel and
+> > Sebastien to add the hardware-reduced support to Nemu using GED
+> > device[3]. (Please shout if I got the author/signed-off wrong for
+> > those patches or missed any names).
+> >
+> > This is sanity tested on a HiSilicon ARM64 platform and appreciate
+> > any further testing.
+>
+> There are several things I'd fix/amend but it's nothing that couldn't
+> be done on top as bugfixes (I'll comment later on specific issues).
+>
+> However as a whole from ACPI and memory hotplug POV series looks more
+> or less ready for merging.
+>
+> I've asked Eric to test migration (I'm quite not sure about that part),
+> (CCed David)so on condition it works:
+>
+>   Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
-There is no information about "e1000-base" in "qom-list-type" output. It =
-is referenced only as a parent for network cards.
-Is it ok? Maybe is there other way for get information about all PCI =
-devices?
+If we want to get this into 4.1 I'll need somebody to do a respin
+with all the relevant fixes pretty soon (ie within a day or two,
+and that is pushing it because really it's missed the freeze
+deadline already). It might be easier just to let it go into 4.2
+instead...
 
-
-
-Best regards,
-Natalia
-
-
------Original Message-----
-From: Paolo Bonzini [mailto:pbonzini@redhat.com]=20
-Sent: Tuesday, June 11, 2019 4:45 PM
-To: Markus Armbruster
-Cc: Natalia Fursova; Andreas F=C3=A4rber; '=D0=9F=D0=B0=D1=88=D0=B0'; =
-qemu-devel@nongnu.org
-Subject: Re: [Qemu-devel] qgraph
-
-On 11/06/19 15:39, Markus Armbruster wrote:
->> Right, and we should move more towards class-based properties so that
->> the dynamic nature of QOM is only used for the bare minimum needed =
-(e.g.
->> memory regions).
-> What are we doing to make new code conform to that?
->=20
-> What are we doing to update existing code?
-
-Almost nothing and completely nothing. :(
-
-Paolo
-
+thanks
+-- PMM
 
