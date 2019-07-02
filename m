@@ -2,113 +2,98 @@ Return-Path: <SRS0=9yXi=U7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BCB8C5B57D
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 22:10:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB829C5B57D
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 22:14:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 572A1218DA
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 22:10:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 68EA9218FF
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 22:14:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="gIXRC44Q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 572A1218DA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nutanix.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UwK38P9r"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 68EA9218FF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57922 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57934 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hiQyy-0003u9-HG
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 18:10:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36884)
+	id 1hiR2R-0005ee-4I
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 18:14:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40298)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <raphael.norwitz@nutanix.com>) id 1hiQxf-0003SN-52
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 18:09:16 -0400
+ (envelope-from <chmeeedalf@gmail.com>) id 1hiR0J-0004dH-UG
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 18:12:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <raphael.norwitz@nutanix.com>) id 1hiQxd-0006ho-Hp
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 18:09:15 -0400
-Received: from mx0a-002c1b01.pphosted.com ([148.163.151.68]:9572)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <raphael.norwitz@nutanix.com>)
- id 1hiQxd-0006Uw-0b
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 18:09:13 -0400
-Received: from pps.filterd (m0127839.ppops.net [127.0.0.1])
- by mx0a-002c1b01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x62M6TfX028911; Tue, 2 Jul 2019 15:08:57 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com;
- h=from : to : cc :
- subject : date : message-id : content-type : mime-version;
- s=proofpoint20171006; bh=VmdmaaGNZAmhSXk/W0Lr/dCjOqFj5WUm8oKiVHu02vQ=;
- b=gIXRC44QqkJoo4MdKh2ezhpW7lYK3X4NKigTvhYystTb7kysMo24BOKaj56zTgghWtTb
- e2w39imyp5KolxOAYLkHeyiXzB3a1o92XMryynWKghUkShuvw6R6LBtHjQqdZXSJevB0
- s4xlxLE2QkaqWt/YXflLJFxchXy4+xqXx4gk7sr5tt1UI/nEKNAuNIFp0vg6/xIK0ldJ
- KY2wRIihBR8iZzZEhNZ/OUuMRP/TdEnBBuIaapjwcTowjU65L/30cv/1qT0NzpBEzNjY
- mBr5whfaFEDQSk0CncAWHWTk8aVRk/VGtcJMPJx1xo6FyNtxR7tFl3Ni40aOdBAvMKlz fA== 
-Received: from nam01-sn1-obe.outbound.protection.outlook.com
- (mail-sn1nam01lp2055.outbound.protection.outlook.com [104.47.32.55])
- by mx0a-002c1b01.pphosted.com with ESMTP id 2tg8728wqy-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
- Tue, 02 Jul 2019 15:08:57 -0700
-Received: from BYAPR02MB4566.namprd02.prod.outlook.com (52.135.239.205) by
- BYAPR02MB4181.namprd02.prod.outlook.com (20.176.249.143) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2032.18; Tue, 2 Jul 2019 22:08:55 +0000
-Received: from BYAPR02MB4566.namprd02.prod.outlook.com
- ([fe80::38e0:8f7:9fd4:eb1c]) by BYAPR02MB4566.namprd02.prod.outlook.com
- ([fe80::38e0:8f7:9fd4:eb1c%6]) with mapi id 15.20.2032.019; Tue, 2 Jul 2019
- 22:08:55 +0000
-From: Raphael Norwitz <raphael.norwitz@nutanix.com>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Thread-Topic: Should memory hotplug work with vhost-user backends?
-Thread-Index: AQHVMSK9HbtiS4IGUUSSY9wOBJ3M0A==
-Date: Tue, 2 Jul 2019 22:08:54 +0000
-Message-ID: <6EF9E5BE-2FBF-4CC4-BA1F-AE55ADD82A6E@nutanix.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [192.146.154.3]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 4f5867c2-b00a-4514-f482-08d6ff39dfba
-x-microsoft-antispam: BCL:0; PCL:0;
- RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);
- SRVR:BYAPR02MB4181; 
-x-ms-traffictypediagnostic: BYAPR02MB4181:
-x-ms-exchange-purlcount: 4
-x-microsoft-antispam-prvs: <BYAPR02MB41813F0D961F51147DE224F6EAF80@BYAPR02MB4181.namprd02.prod.outlook.com>
-x-proofpoint-crosstenant: true
-x-ms-oob-tlc-oobclassifiers: OLM:9508;
-x-forefront-prvs: 008663486A
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(39860400002)(376002)(366004)(136003)(396003)(346002)(199004)(189003)(478600001)(2501003)(2351001)(86362001)(5640700003)(54896002)(8676002)(6916009)(8936002)(25786009)(6306002)(81166006)(14444005)(71190400001)(81156014)(6512007)(6436002)(256004)(6486002)(71200400001)(53936002)(68736007)(6506007)(102836004)(14454004)(2616005)(316002)(476003)(107886003)(33656002)(26005)(186003)(99286004)(486006)(44832011)(966005)(36756003)(5660300002)(54906003)(73956011)(91956017)(66066001)(76116006)(66476007)(66446008)(64756008)(66946007)(2906002)(4326008)(3846002)(6116002)(7736002)(66556008)(64030200001);
- DIR:OUT; SFP:1102; SCL:1; SRVR:BYAPR02MB4181;
- H:BYAPR02MB4566.namprd02.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
-received-spf: None (protection.outlook.com: nutanix.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: u6thdeBlVKGbKwOiEHtj6kTGv8rxjlja8KqKZ6WJkk0QN8UdAnrXXe4+/aYxteUNDwh0xmu9xSGF05Q0oZhLvzGJdT0CXXQrLhBQ0ILiGZC1eeJdvr0onPJyivW+l47inKlbBzJooeLIc7rxoSJ5V3Y0ws8iSuyQBYITCFkBPeHMx5A1M/sZllAWIegs68XTxpDJIMmnTehioSdCW97OkvqAkUFjo0LFkSLTlyJVXqoiP5z84s1DP8TqF4RPxsjJp5JAXoG8LifjrecZDLzF9GAOpufC20Ll5uVoLPVGE68rbrAsaaE8XCl0+Pz6j+dbBfAFTlYUcJ6EreOtZuefN2QUIciZoj4vQQSn+ZWZ94WdLqRIBKW9CeQbQS05xzTe+b6u5gwafeaaqTZ/l1DhceR08k0u7/j6VqbBUss2KTA=
+ (envelope-from <chmeeedalf@gmail.com>) id 1hiR0G-0002XM-0M
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 18:11:59 -0400
+Received: from mail-io1-xd44.google.com ([2607:f8b0:4864:20::d44]:42117)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <chmeeedalf@gmail.com>)
+ id 1hiR0B-0002JB-SW; Tue, 02 Jul 2019 18:11:52 -0400
+Received: by mail-io1-xd44.google.com with SMTP id u19so1124ior.9;
+ Tue, 02 Jul 2019 15:11:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=6/3+JIM0dJfYGGhXrslEMCOhxScIW9BNjGWdfOLEOhM=;
+ b=UwK38P9rHUXXFsgTipfJ0w4KSCtqtddOgdaAkN6n/scds/WeYPpGGvfgtAWhpvqdNY
+ phq+OGumMVrr0SNbG8RjDO4hyWnCmw0XjVfZ1C3Svym/kkfaTrry+5Equ697X3QlvXD5
+ KbnOOw3BwCQhnzBnQCagdQGnazg4/a6tcy/0MY/10FruRQTEnnjt+1aqWKFDFyGjvZI5
+ hQsBGSzVJiY/hgIZEnnoe4XPdlvcfQ6OPzdXeyoWY55XodBp+s627hvZDTzPf1zpXFhJ
+ nIAqeHkFRvY+9DIbJWDV5IKGD0Vzz97pTWI3ASlkrpoaSBv/wU2tKLUc+EzRsnTKc/QR
+ 4a5w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=6/3+JIM0dJfYGGhXrslEMCOhxScIW9BNjGWdfOLEOhM=;
+ b=ZSuZUl1ufBSyw6bdYVPzUXMNE/YEokrnRJgQzGnvJJ9ySvzhiMixjFiQH7/HrVGCFk
+ gBd4sSlPBuGoPxfVn1OMOASRstgXFVTsxDIJogeqWCVQLdfDCfLwwdDG4I6ou+3ty15E
+ E/Miaw1L2M3yBctNOtai9uTUVEGM74MxhBRolWrNsCdCP7mbswHqq/BeuczfewUCz4KD
+ 2sPxO8AUL8MN7+aVYmEyga4rD2T8X5ucr+QyMqt6RjkNhfbZgEWoIOXINjMh76xzONs1
+ n6NqnTPo4WdejreSz6z1TFS7IRDjt6hDVM++RAfK6BltzBWS0DwpZ3qPmmqqCfjILmX+
+ sBsg==
+X-Gm-Message-State: APjAAAXuVhSxBj8FrnTFGB9qITiUrkRJ4Jm6Gj9+4zLTsB9PCI7/AvRT
+ 5B4uo9iS8DFYZTiOFQfD6pUPdSrj
+X-Google-Smtp-Source: APXvYqx6YIREpKPI5Ym/qL6XXaD8xltQ9qLFgqDzoi8gwzhYy4Gr+IcsEYytsTK9/TEeTtp/Qaajnw==
+X-Received: by 2002:a6b:6012:: with SMTP id r18mr17487801iog.241.1562105508775; 
+ Tue, 02 Jul 2019 15:11:48 -0700 (PDT)
+Received: from titan.knownspace (173-25-245-129.client.mchsi.com.
+ [173.25.245.129])
+ by smtp.gmail.com with ESMTPSA id b20sm180895ios.44.2019.07.02.15.11.47
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Tue, 02 Jul 2019 15:11:48 -0700 (PDT)
+Date: Tue, 2 Jul 2019 17:11:43 -0500
+From: Justin Hibbits <chmeeedalf@gmail.com>
+To: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <20190702171143.60d7f047@titan.knownspace>
+In-Reply-To: <669c6835-20a6-2a60-f130-ff09b19175a8@vivier.eu>
+References: <20190607135653.6ece685d@titan.knownspace>
+ <8676232e-917d-44e2-1149-b25f26698a73@vivier.eu>
+ <92053c9c-e7bf-76cb-9399-987f4ab31bfb@vivier.eu>
+ <20190626113742.6bcd8a26@titan.knownspace>
+ <d60f142d-27ef-bfe5-1eb6-cefb22640625@vivier.eu>
+ <20190626130414.08940342@titan.knownspace>
+ <CAHSQbTCxP09J9NtFiN4UpdXHJZHtTw_F66hfdAS2sM4=E5GHyQ@mail.gmail.com>
+ <477ebe22-eddb-41ba-5811-4a70e639a89a@vivier.eu>
+ <CAHSQbTCUzR5WiykWGZOH1bvBPWx15_ZA-=7b17c6AnRK4kn3yA@mail.gmail.com>
+ <cd0a35ce-1f8c-6718-13d9-7a481e1eeb31@vivier.eu>
+ <CAHSQbTDMWXX978oWBvYhh1Uz7CeA1KQGz6+11rqwYv+ZOWyVOw@mail.gmail.com>
+ <669c6835-20a6-2a60-f130-ff09b19175a8@vivier.eu>
+X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; powerpc64-portbld-freebsd13.0)
 MIME-Version: 1.0
-X-OriginatorOrg: nutanix.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4f5867c2-b00a-4514-f482-08d6ff39dfba
-X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Jul 2019 22:08:54.9295 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: bb047546-786f-4de1-bd75-24e5b6f79043
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: raphael.norwitz@nutanix.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR02MB4181
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
- definitions=2019-07-02_11:, , signatures=0
-X-Proofpoint-Spam-Reason: safe
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.151.68
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: [Qemu-devel] Should memory hotplug work with vhost-user backends?
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::d44
+Subject: Re: [Qemu-devel] [Qemu-trivial] Fix cacheline size retrieval on
+ FreeBSD/PowerPC(64)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -120,46 +105,279 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Mike Cui <cui@nutanix.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Malcolm Crossley <malcolm@nutanix.com>,
- "stefanha@redhat.com" <stefanha@redhat.com>,
- Felipe Franciosi <felipe@nutanix.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "changchun.ouyang@intel.com" <changchun.ouyang@intel.com>
+Cc: qemu-trivial@nongnu.org, "Emilio G. Cota" <cota@braap.org>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Rm9yIGJhY2tncm91bmQgSSBhbSB0cnlpbmcgdG8gd29yayBhcm91bmQgYSByYW0gc2xvdCBsaW1p
-dCBpbXBvc2VkIGJ5IHRoZSB2aG9zdC11c2VyIHByb3RvY29sLiBXZSBhcmUgaGF2aW5nIHRyb3Vi
-bGUgcmVjb25jaWxpbmcgdGhlIGNvbW1lbnQgaGVyZTogaHR0cHM6Ly9naXRodWIuY29tL3FlbXUv
-cWVtdS9ibG9iL21hc3Rlci9ody92aXJ0aW8vdmhvc3QtdXNlci5jI0wzMzMgIHRoYXQg4oCcRm9y
-IG5vbi12cmluZyBzcGVjaWZpYyByZXF1ZXN0cywgbGlrZSBWSE9TVF9VU0VSX1NFVF9NRU1fVEFC
-TEUuLCB3ZSBqdXN0IG5lZWQgdG8gc2VuZCBpdCBvbmNlIHRoZSBmaXJzdCB0aW1l4oCdIGFuZCB0
-aGUgaGlnaCBsZXZlbCBpbXBsZW1lbnRhdGlvbiBvZiBtZW1vcnkgaG90LWFkZCwgd2hpY2ggY2Fs
-bHMgc2V0X21lbV90YWJsZSBldmVyeSB0aW1lIGEgVk0gaG90IGFkZHMgbWVtb3J5Lg0KDQpBIGZl
-dyBxdWVzdGlvbnM6DQoxLg0KV2hhdCBleGFjdGx5IGlzIHRoZSBjaGVjayBgaWYgKHZob3N0X3Vz
-ZXJfb25lX3RpbWVfcmVxdWVzdChtc2ctPmhkci5yZXF1ZXN0KSAmJiBkZXYtPnZxX2luZGV4ICE9
-IDApYCBmb3I/IEluIHRoZSBtZXNzYWdlIGZvciBjb21taXQgYjkzMWJmYmYwNDI5ODNmMzExYjNi
-MDk4OTRkODAzMGIyNzU1YTYzOCwgd2hpY2ggaW50cm9kdWNlZCB0aGUgY2hlY2ssIEkgc2VlIGl0
-IHNheXMg4oCcbm9uLXZyaW5nIHNwZWNpZmljIG1lc3NhZ2VzWywgd2hpY2ggc2hvdWxkXSBiZSBz
-ZW50IG9ubHkgb25jZeKAnSBhbmQgZ2l2ZXMgVkhPU1RfVVNFUl9TRVRfTUVNX1RBQkxFIGFzIGFu
-IGV4YW1wbGUgb25lIHN1Y2ggbWVzc2FnZS4gVGhlIGB2aG9zdF91c2VyX29uZV90aW1lX3JlcXVl
-c3QoKWAgY2FsbCBjbGVhcmx5IGNoZWNrcyB3aGV0aGVyIHRoaXMgdHlwZSBvZiBtZXNzYWdlIGlz
-IHRoZSBraW5kIG9mIG1lc3NhZ2UgaXMgc3VwcG9zZWQgdG8gYmUgc2VudCBvbmNlIG9mIHdoaWNo
-IFZIT1NUX1VTRVJfU0VUX01FTV9UQUJMRSBpcyBvbmUuIFdoeSwgdGhlbiwgZG9lcyB0aGlzIGNv
-bW1pdCBhZGQgdGhlIGNoZWNrIGlmIGBkZXYtPnZxX2luZGV4ICE9IDBgPyBJdCBzZWVtcyBsaWtl
-IHRoZXJlIGlzIGEgbGF0ZW50IGFzc3VtcHRpb24gdGhhdCBhZnRlciB0aGUgZmlyc3QgY2FsbCBk
-ZXYtPnZxX2luZGV4IHNob3VsZCBiZSBzZXQgdG8gc29tZSB2YWx1ZSBncmVhdGVyIHRoYW4gb25l
-LCBob3dldmVyIGZvciBtYW55IGNhc2VzIHN1Y2ggYXMgdmhvc3QtdXNlci1zY3NpIGRldmljZXMg
-d2UgY2FuIHNlZSB0aGlzIGlzIGNsZWFybHkgbm90IHRoZSBjYXNlIGh0dHBzOi8vZ2l0aHViLmNv
-bS9xZW11L3FlbXUvYmxvYi9tYXN0ZXIvaHcvc2NzaS92aG9zdC11c2VyLXNjc2kuYyNMOTUuIElz
-IHRoaXMgY2hlY2sgdGhlbiDigJhicm9rZW7igJkgZm9yIHN1Y2ggZGV2aWNlcz8NCg0KMi4NCklm
-IHRoaXMgY2hlY2sgaXMgaW5kZWVkIGJyb2tlbiBmb3Igc3VjaCBkZXZpY2VzLCBhbmQgc2V0X21l
-bV90YWJsZSBjYWxsIGlzIG9ubHkgc3VwcG9zZWQgdG8gYmUgcnVuIG9uY2UgZm9yIHN1Y2ggZGV2
-aWNlcywgaXMgdGhlIGFiaWxpdHkgdG8gY2FsbCBpdCBtdWx0aXBsZSB0aW1lcyB0ZWNobmljYWxs
-eSBhIGJ1ZyBmb3IgZGV2aWNlcyBzdWNoIGFzIHZob3N0LXVzZXItc2NzY2kgZGV2aWNlcz8gSWYg
-c28sIHRoaXMgd291bGQgaW1wbHkgdGhhdCB0aGUgZXhpc3RpbmcgYWJpbGl0eSB0byBob3QgYWRk
-IG1lbW9yeSB0byB2aG9zdC11c2VyLXNjc2kgZGV2aWNlcyBpcyBieSBleHRlbnNpb24gdGVjaG5p
-Y2FsbHkgYSBidWcvdW5pbnRlbmRlZCBiZWhhdmlvci4gSXMgdGhpcyB0aGUgY2FzZT8NCg0KVGhh
-bmtzLA0KUmFwaGFlbA0K
+On Mon, 1 Jul 2019 15:17:06 +0200
+Laurent Vivier <laurent@vivier.eu> wrote:
+
+> Le 01/07/2019 =C3=A0 15:02, Justin Hibbits a =C3=A9crit=C2=A0:
+> >=20
+> >=20
+> > On Mon, Jul 1, 2019, 03:54 Laurent Vivier <laurent@vivier.eu
+> > <mailto:laurent@vivier.eu>> wrote:
+> >=20
+> >     Le 27/06/2019 =C3=A0 02:15, Justin Hibbits a =C3=A9crit=C2=A0: =20
+> >     >
+> >     >
+> >     > On Wed, Jun 26, 2019, 19:08 Laurent Vivier
+> >     > <laurent@vivier.eu =20
+> >     <mailto:laurent@vivier.eu> =20
+> >     > <mailto:laurent@vivier.eu <mailto:laurent@vivier.eu>>> wrote:
+> >     >
+> >     >=C2=A0 =C2=A0 =C2=A0Le 27/06/2019 =C3=A0 02:02, Justin Hibbits a =
+=C3=A9crit=C2=A0:
+> >     >=C2=A0 =C2=A0 =C2=A0>
+> >     >=C2=A0 =C2=A0 =C2=A0>
+> >     >=C2=A0 =C2=A0 =C2=A0> On Wed, Jun 26, 2019, 13:04 Justin Hibbits =
+=20
+> >     <chmeeedalf@gmail.com <mailto:chmeeedalf@gmail.com> =20
+> >     >=C2=A0 =C2=A0 =C2=A0<mailto:chmeeedalf@gmail.com
+> >     ><mailto:chmeeedalf@gmail.com>> > <mailto:chmeeedalf@gmail.com
+> >     ><mailto:chmeeedalf@gmail.com> =20
+> >     <mailto:chmeeedalf@gmail.com <mailto:chmeeedalf@gmail.com>>>>
+> > wrote: =20
+> >     >=C2=A0 =C2=A0 =C2=A0>
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0On Wed, 26 Jun 2019 18:47=
+:42 +0200
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0Laurent Vivier <laurent@v=
+ivier.eu =20
+> >     <mailto:laurent@vivier.eu> <mailto:laurent@vivier.eu
+> >     <mailto:laurent@vivier.eu>> =20
+> >     >=C2=A0 =C2=A0 =C2=A0<mailto:laurent@vivier.eu <mailto:laurent@vivi=
+er.eu> =20
+> >     <mailto:laurent@vivier.eu <mailto:laurent@vivier.eu>>>> wrote: =20
+> >     >=C2=A0 =C2=A0 =C2=A0>
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0> Le 26/06/2019 =C3=A0 18=
+:37, Justin Hibbits a =C3=A9crit=C2=A0:
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0> > On Wed, 26 Jun 2019 1=
+8:16:36 +0200
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0> > Laurent Vivier <laure=
+nt@vivier.eu =20
+> >     <mailto:laurent@vivier.eu> =20
+> >     >=C2=A0 =C2=A0 =C2=A0<mailto:laurent@vivier.eu <mailto:laurent@vivi=
+er.eu>> =20
+> >     <mailto:laurent@vivier.eu <mailto:laurent@vivier.eu> =20
+> >     >=C2=A0 =C2=A0 =C2=A0<mailto:laurent@vivier.eu <mailto:laurent@vivi=
+er.eu>>>>
+> >     >wrote: >=C2=A0 =C2=A0 =C2=A0> >=C2=A0 =C2=A0
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0> >> Le 26/06/2019 =C3=A0=
+ 18:14, Laurent Vivier a
+> >     >=C3=A9crit=C2=A0: >=C2=A0 =C2=A0 =C2=A0> >>> Le 07/06/2019 =C3=A0 =
+20:56, Justin Hibbits a
+> >     >=C3=A9crit=C2=A0: >=C2=A0 =C2=A0 =C2=A0> >>>> The attached very tr=
+ivial patch fixes a
+> >     >startup bug that prevents
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0> >>>> at least Qemu 3.1 =
+and later from working on
+> >     >=C2=A0 =C2=A0 =C2=A0FreeBSD/powerpc64.
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0> >>>>
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0> >>>> - Justin
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0> >>>>=C2=A0 =C2=A0
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0> >>>
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0> >>> Please don't send a=
+ patch in attachment but
+> >     >inlined in the message
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0> >>> (you may use "git s=
+end-email" for that).
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0> >>>
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0> >>> This patch fixes "u=
+til: add cacheinfo" that
+> >     >has =20
+> >     changed =20
+> >     >=C2=A0 =C2=A0 =C2=A0the type
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0> >>> from unsigned to lo=
+ng.
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0> >>>
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0> >>> You can add the fol=
+lowing line in the commit
+> >     >message: >=C2=A0 =C2=A0 =C2=A0> >>>
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0> >>> Fixes: b255b2c8a548=
+ ("util: add cacheinfo")
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0> >>>
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0> >>> Reviewed-by: Lauren=
+t Vivier
+> >     ><laurent@vivier.eu =20
+> >     <mailto:laurent@vivier.eu> =20
+> >     >=C2=A0 =C2=A0 =C2=A0<mailto:laurent@vivier.eu <mailto:laurent@vivi=
+er.eu>>
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0<mailto:laurent@vivier.eu
+> >     ><mailto:laurent@vivier.eu> =20
+> >     <mailto:laurent@vivier.eu <mailto:laurent@vivier.eu>>>> =20
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0> >>>=C2=A0 =C2=A0 =C2=A0
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0> >>
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0> >> CC: author of b255b2=
+c8a548 ("util: add
+> >     >cacheinfo") >=C2=A0 =C2=A0 =C2=A0> >>
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0> >> Thanks,
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0> >> Laurent=C2=A0
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0> >
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0> > Hi Laurent,
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0> >
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0> > Sorry.=C2=A0 I had ne=
+ver used git send-email before,
+> >     >so =20
+> >     wasn't =20
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0> > comfortable with it.=
+=C2=A0 I just updated the commit
+> >     >message with your
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0> > feedback and used git=
+ send-email to submit the =20
+> >     patch.=C2=A0 I hope =20
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0> > everything went well.=
+=C2=A0
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0>
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0> It seems not. I didn't =
+receive it.
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0>
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0> Did you configure the S=
+MTP server. See
+> >     >git-send-email(1): >=C2=A0 =C2=A0 =C2=A0>
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 Use gmail =
+as the smtp server
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0>
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 To use git send-email to send your patches
+> >     >through the GMail
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0> SMTP server, edit ~/.gi=
+tconfig to specify your
+> >     >account =20
+> >     settings: =20
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0>
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 [sendemail]
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 smtpEncryption =3D tls
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 smtpServer =3D smtp.gmail.com=
+ =20
+> >     <http://smtp.gmail.com> =20
+> >     >=C2=A0 =C2=A0 =C2=A0<http://smtp.gmail.com> <http://smtp.gmail.com>
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 smtpUser =3D yourname@gmail.c=
+om =20
+> >     <mailto:yourname@gmail.com> =20
+> >     >=C2=A0 =C2=A0 =C2=A0<mailto:yourname@gmail.com <mailto:yourname@gm=
+ail.com>>
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0<mailto:yourname@gmail.com
+> >     ><mailto:yourname@gmail.com> =20
+> >     <mailto:yourname@gmail.com <mailto:yourname@gmail.com>>> =20
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 smtpServerPort =3D 587
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0>
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 If you have multifactor authentication
+> >     >setup on =20
+> >     your =20
+> >     >=C2=A0 =C2=A0 =C2=A0gmail
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0> account, you will need =
+to generate an
+> >     >app-specific =20
+> >     password =20
+> >     >=C2=A0 =C2=A0 =C2=A0for use
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0> with git send-email. Vi=
+sit
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0 =C2=
+=A0
+> >     >=C2=A0 =C2=A0 =C2=A0https://security.google.com/settings/security/=
+apppasswords
+> >     >to >=C2=A0 =C2=A0 =C2=A0> create it.
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0>
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 Once your commits are ready to be sent to
+> >     >the =20
+> >     mailing =20
+> >     >=C2=A0 =C2=A0 =C2=A0list,
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0> run the following comma=
+nds:
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0>
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 $ git format-patch --cover-letter -M =20
+> >     origin/master -o =20
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0> outgoing/ $ edit outgoi=
+ng/0000-*
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 $ git send-email outgoing/*
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0>
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 The first time you run it, you will be
+> >     >prompted =20
+> >     for your =20
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0> credentials. Enter the =
+app-specific or your
+> >     >regular =20
+> >     password as =20
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0> appropriate. If you hav=
+e credential helper
+> >     >configured (see >=C2=A0 =C2=A0 =C2=A0> git-credential(1)), the pas=
+sword will
+> >     >be saved in the =20
+> >     credential =20
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0> store so you won=E2=80=
+=99t have to type it the next time.
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0>
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 Note: the following perl modules are
+> >     >required Net::SMTP::SSL,
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 MIME::Base64 and Authen::SASL
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0>
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0> Thanks,
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0> Laurent
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0>
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0>=C2=A0
+> >     >=C2=A0 =C2=A0 =C2=A0>
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0Hm, you're right.=C2=A0 E=
+ven after making the config
+> >     >changes and installing
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0the necessary packages, I=
+ still have no luck with
+> >     >git send-email.=C2=A0 Might
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0take a bit to debug this.
+> >     >=C2=A0 =C2=A0 =C2=A0>
+> >     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0- Justin
+> >     >=C2=A0 =C2=A0 =C2=A0>
+> >     >=C2=A0 =C2=A0 =C2=A0>
+> >     >=C2=A0 =C2=A0 =C2=A0> Sorry for the multiplicity, looks like Gmail=
+ forwarded
+> >     >it =20
+> >     eventually, =20
+> >     >=C2=A0 =C2=A0 =C2=A0> but not until I tried several times debuggin=
+g it.
+> >     >
+> >     >=C2=A0 =C2=A0 =C2=A0Not sure, I didn't receive any of them.
+> >     >
+> >     >=C2=A0 =C2=A0 =C2=A0Thanks,
+> >     >=C2=A0 =C2=A0 =C2=A0Laurent
+> >     >
+> >     >
+> >     > Sigh, 4 copies ended up in my Gmail spam folder, so I thought
+> >     > it =20
+> >     made it =20
+> >     > through.
+> >     > =20
+> >=20
+> >     Any news? Freeze is coming.
+> >=20
+> >     Thanks,
+> >     Laurent
+> >=20
+> >=20
+> > I'll manually do it when I get home tomorrow.=C2=A0 Fixing git send-ema=
+il
+> > will have to wait. =20
+>=20
+> Don't bother: if you have problems with "git send-email" I can apply
+> the attachment.
+>=20
+> Thanks,
+> Laurent
+
+Thanks.  Sorry for the troubles.  I'll have to spend some time trying
+to fix git send-email, for the future.
+
+- Justin
+
