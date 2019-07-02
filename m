@@ -2,54 +2,82 @@ Return-Path: <SRS0=9yXi=U7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9CA9C06510
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 10:33:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A0D9C06510
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 10:34:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 51BAE20836
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 10:33:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51BAE20836
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com
+	by mail.kernel.org (Postfix) with ESMTPS id 711A320836
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 10:34:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 711A320836
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51476 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51488 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hiG6Z-0007k6-Ex
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 06:33:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48431)
+	id 1hiG7h-0000Hl-QG
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 06:34:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48583)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <w.bumiller@proxmox.com>) id 1hiG4p-0006dU-Ne
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 06:31:58 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1hiG5c-0007A5-ER
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 06:32:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <w.bumiller@proxmox.com>) id 1hiG4n-00069e-CM
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 06:31:55 -0400
-Received: from proxmox-new.maurer-it.com ([212.186.127.180]:46837)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <w.bumiller@proxmox.com>)
- id 1hiG4k-0005Ya-Vw
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 06:31:52 -0400
-Received: from proxmox-new.maurer-it.com (localhost.localdomain [127.0.0.1])
- by proxmox-new.maurer-it.com (Proxmox) with ESMTP id E5161448BB;
- Tue,  2 Jul 2019 12:21:09 +0200 (CEST)
-Date: Tue, 2 Jul 2019 12:21:08 +0200
-From: Wolfgang Bumiller <w.bumiller@proxmox.com>
-To: qemu-devel@nongnu.org
-Message-ID: <20190702102108.GA29267@olga.proxmox.com>
-References: <20190627131252.GA14795@olga.proxmox.com>
+ (envelope-from <pbonzini@redhat.com>) id 1hiG5X-00070r-DU
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 06:32:42 -0400
+Received: from mail-wm1-f52.google.com ([209.85.128.52]:54262)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hiG5T-0006su-NG
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 06:32:37 -0400
+Received: by mail-wm1-f52.google.com with SMTP id x15so333045wmj.3
+ for <qemu-devel@nongnu.org>; Tue, 02 Jul 2019 03:32:29 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=Yjn5fIAjsuTiAkzRM9YhZGZLVS1yAVdOnuz6kuPBWQY=;
+ b=SFDA8x4LPVho6f4kRY12+N7mt55xyJ3M8R55UzOd8c0KxjZb19SeGs9L4eezXsS1BT
+ QdYdtl6NOHphGD7rdbbIJg0FR+iDX058dmqlkE8sh/NWAmXw/HsupHhUjsypoFkJIop4
+ YuqHxVuMonVo9hx/cCZ2RbfCfwuFyQiCjndYqxg8DFSr1BOZjUYSKM8MPAnOfMHDOnZT
+ NYTdMBOlDg0DI9YW6DhMntWgBGv20NBJhqa9sud501m5M4TX8emORpZ08vWL9fmUgsiZ
+ S2DYQY4xki9Oc5pZNb/fIUcVUWOhmZmTupoPK5PkAjlrK+um6OrWJxPqCD0pT0dB6+Gy
+ vFSQ==
+X-Gm-Message-State: APjAAAXLnaFPVhosk3kIm1XN9PE7oIF+8aHTEP0UM57lG3wyKoeJc9oP
+ pKjIDqt3mTltKP3l35mt6J12/A==
+X-Google-Smtp-Source: APXvYqyoS2q3CVHOHTcU/rAU+Q+Kx2F55SmRYS2gFUNQT467SuoCzplNSG7CukYyAai/E1WFDQFBFg==
+X-Received: by 2002:a7b:cbcb:: with SMTP id n11mr2921393wmi.146.1562063548849; 
+ Tue, 02 Jul 2019 03:32:28 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:68f6:70ea:5bb4:f73?
+ ([2001:b07:6468:f312:68f6:70ea:5bb4:f73])
+ by smtp.gmail.com with ESMTPSA id x8sm2484773wmc.5.2019.07.02.03.32.27
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Tue, 02 Jul 2019 03:32:28 -0700 (PDT)
+To: Markus Armbruster <armbru@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>
+References: <20190627152011.18686-1-palmer@sifive.com>
+ <20190627152011.18686-34-palmer@sifive.com>
+ <CAFEAcA8sscJQ2GCwL1gM+EcRtfHQb1v0BwORt6ncH54x51TCVg@mail.gmail.com>
+ <5896113812cd914308e5b617377f8e8205224cfe.camel@wdc.com>
+ <CAFEAcA_-h6b_f1fuWh7NkGo+FT0xSyCDXgd3b4pwEvNDN8HcJw@mail.gmail.com>
+ <87a7dxqdl5.fsf@dusky.pond.sub.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <d5fb05ba-e313-b9db-9cfa-2c6f7c1b90f8@redhat.com>
+Date: Tue, 2 Jul 2019 12:32:28 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190627131252.GA14795@olga.proxmox.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <87a7dxqdl5.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.186.127.180
-Subject: Re: [Qemu-devel] balloon config change seems to break live
- migration from 3.0.1 to 4.0
+ [fuzzy]
+X-Received-From: 209.85.128.52
+Subject: Re: [Qemu-devel] [PULL 33/34] roms: Add OpenSBI version 0.3
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -61,201 +89,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>,
+ Jeff Cody <codyprime@gmail.com>, "palmer@sifive.com" <palmer@sifive.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ "bmeng.cn@gmail.com" <bmeng.cn@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jun 27, 2019 at 03:12:52PM +0200, Wolfgang Bumiller wrote:
-> While testing with 4.0 we've run into issues with live migration from
-> 3.0.1 to 4.0 when a balloon device was involved.
+On 02/07/19 06:12, Markus Armbruster wrote:
+>> Yeah, if we're not building the apache-2.0 parts then I think
+>> we're OK, and as you say there's the question of whether QEMU's
+>> GPL affects what we ship as mere bios blobs to run as guest
+>> code anyway. But it's sufficiently not a "really obviously ok"
+>> that I'd like a second opinion; cc'd some people who might have
+>> second opinions.
 > 
-> We'd see the following error on the destination:
->   qemu-system-x86_64: get_pci_config_device: Bad config data: i=0x10 read: a1 device: 1 cmask: ff wmask: c0 w1cmask:0 
->   qemu-system-x86_64: Failed to load PCIDevice:config 
->   qemu-system-x86_64: Failed to load virtio-balloon:virtio 
->   qemu-system-x86_64: error while loading state for instance 0x0 of device '0000:00:03.0/virtio-balloon' 
->   qemu-system-x86_64: load of migration failed: Invalid argument
+> You need an expert opinion.
+> 
+> My non-expert opinion: we can't distribute anything that's not
+> compatible with GPLv2
 
-So if I'm not mistaken this seems to cover the BAR containing the mapped
-address, which now has a stricter alignment requirement (since the
-config space crossed the 32 byte boundary and now is now 64 bytes and
-therefor requires a 64 byte alignment).
-(This in turn means that it only affects guests where the balloon's
-mapping isn't already 64 byte aligned.)
+Guest code is not part of QEMU.  We don't say that SeaBIOS, SLOF, etc. 
+are part of QEMU; it constitutes mere aggregation with the GPLv2 QEMU 
+sources, so it _is_ possible to distribute APSL2 guest code with QEMU.  
+IANAL, but I'm fairly sure about this.
 
-I tested with the changes below meant to use the old configuration size
-for machines depending on their machine version... This seems to fix the
-problem for me here.
+However I agree that LICENSE needs to be updated, something like this:
 
-With this changing compatibility options I'm not sure if this is a
-desired upstream change since 4.0 is already released?
-
----8<---
-From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
-From: Wolfgang Bumiller <w.bumiller@proxmox.com>
-Date: Tue, 2 Jul 2019 09:23:43 +0200
-Subject: [PATCH] virtio-balloon: use smaller config on older guests
-
-The increased config size changes its alignment requirements
-preventing guests from migrating from old qemu versions if
-their balloon mapping isn't stricter aligned.
-So base the default config size on the machine version.
-
-Signed-off-by: Wolfgang Bumiller <w.bumiller@proxmox.com>
----
- hw/i386/pc.c                       |  2 ++
- hw/virtio/virtio-balloon.c         | 52 +++++++++++++++++++++++++++---
- include/hw/virtio/virtio-balloon.h |  1 +
- 3 files changed, 51 insertions(+), 4 deletions(-)
-
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 652eb72b2b..3676187a19 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -77,6 +77,7 @@
- #include "hw/i386/intel_iommu.h"
- #include "hw/net/ne2000-isa.h"
- #include "standard-headers/asm-x86/bootparam.h"
-+#include "hw/virtio/virtio-balloon.h"
+diff --git a/LICENSE b/LICENSE
+index 0e0b4b9553..81b9b3572d 100644
+--- a/LICENSE
++++ b/LICENSE
+@@ -1,13 +1,18 @@
+-The following points clarify the QEMU license:
++The QEMU distribution includes both the QEMU emulator and
++various firmware files.  These are separate programs that are
++distributed together for our users' convenience, and they have
++separate license.
  
- /* debug PC/ISA interrupts */
- //#define DEBUG_IRQ
-@@ -137,6 +138,7 @@ GlobalProperty pc_compat_3_1[] = {
-     { "Icelake-Server" "-" TYPE_X86_CPU,      "mpx", "on" },
-     { "Cascadelake-Server" "-" TYPE_X86_CPU, "stepping", "5" },
-     { TYPE_X86_CPU, "x-intel-pt-auto-level", "off" },
-+    { TYPE_VIRTIO_BALLOON, "x-use-large-balloon-config", "off" },
- };
- const size_t pc_compat_3_1_len = G_N_ELEMENTS(pc_compat_3_1);
+-1) QEMU as a whole is released under the GNU General Public License,
+-version 2.
++The following points clarify the license of the QEMU emulator:
  
-diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
-index d96e4aa96f..cd0f124fbb 100644
---- a/hw/virtio/virtio-balloon.c
-+++ b/hw/virtio/virtio-balloon.c
-@@ -328,6 +328,28 @@ static void balloon_stats_set_poll_interval(Object *obj, Visitor *v,
-     balloon_stats_change_timer(s, 0);
- }
- 
-+static void balloon_get_large_config(Object *obj, Visitor *v,
-+                                     const char *name, void *opaque,
-+                                     Error **errp)
-+{
-+    VirtIOBalloon *s = opaque;
-+    visit_type_bool(v, name, &s->use_large_config, errp);
-+}
+-2) Parts of QEMU have specific licenses which are compatible with the
+-GNU General Public License, version 2. Hence each source file contains
+-its own licensing information.  Source files with no licensing information
+-are released under the GNU General Public License, version 2 or (at your
+-option) any later version.
++1) The QEMU emulator as a whole is released under the GNU General
++Public License, version 2.
 +
-+static void balloon_set_large_config(Object *obj, Visitor *v,
-+                                     const char *name, void *opaque,
-+                                     Error **errp)
-+{
-+    VirtIOBalloon *s = opaque;
-+    DeviceState *dev = DEVICE(s);
-+
-+    if (dev->realized) {
-+        error_setg(errp, "balloon config size cannot be changed at runtime");
-+    } else {
-+        visit_type_bool(v, name, &s->use_large_config, errp);
-+    }
-+}
-+
- static void virtio_balloon_handle_output(VirtIODevice *vdev, VirtQueue *vq)
- {
-     VirtIOBalloon *s = VIRTIO_BALLOON(vdev);
-@@ -526,6 +548,17 @@ static bool virtio_balloon_free_page_support(void *opaque)
-     return virtio_vdev_has_feature(vdev, VIRTIO_BALLOON_F_FREE_PAGE_HINT);
- }
++2) Parts of the QEMU emulator have specific licenses which are compatible
++with the GNU General Public License, version 2. Hence each source file
++contains its own licensing information.  Source files with no licensing
++information are released under the GNU General Public License, version
++2 or (at your option) any later version.
  
-+static size_t virtio_balloon_config_size(void *opaque)
-+{
-+    VirtIOBalloon *s = opaque;
-+
-+    if (s->use_large_config) {
-+        return sizeof(struct virtio_balloon_config);
-+    } else {
-+        return offsetof(struct virtio_balloon_config, free_page_report_cmd_id);
-+    }
-+}
-+
- static void virtio_balloon_free_page_start(VirtIOBalloon *s)
- {
-     VirtIODevice *vdev = VIRTIO_DEVICE(s);
-@@ -635,7 +668,7 @@ static void virtio_balloon_get_config(VirtIODevice *vdev, uint8_t *config_data)
-     }
- 
-     trace_virtio_balloon_get_config(config.num_pages, config.actual);
--    memcpy(config_data, &config, sizeof(struct virtio_balloon_config));
-+    memcpy(config_data, &config, virtio_balloon_config_size(dev));
- }
- 
- static int build_dimm_list(Object *obj, void *opaque)
-@@ -679,7 +712,7 @@ static void virtio_balloon_set_config(VirtIODevice *vdev,
-     uint32_t oldactual = dev->actual;
-     ram_addr_t vm_ram_size = get_current_ram_size();
- 
--    memcpy(&config, config_data, sizeof(struct virtio_balloon_config));
-+    memcpy(&config, config_data, virtio_balloon_config_size(dev));
-     dev->actual = le32_to_cpu(config.actual);
-     if (dev->actual != oldactual) {
-         qapi_event_send_balloon_change(vm_ram_size -
-@@ -795,7 +828,7 @@ static void virtio_balloon_device_realize(DeviceState *dev, Error **errp)
-     int ret;
- 
-     virtio_init(vdev, "virtio-balloon", VIRTIO_ID_BALLOON,
--                sizeof(struct virtio_balloon_config));
-+                virtio_balloon_config_size(s));
- 
-     ret = qemu_add_balloon_handler(virtio_balloon_to_target,
-                                    virtio_balloon_stat, s);
-@@ -820,7 +853,7 @@ static void virtio_balloon_device_realize(DeviceState *dev, Error **errp)
-         s->free_page_report_notify.notify =
-                                        virtio_balloon_free_page_report_notify;
-         precopy_add_notifier(&s->free_page_report_notify);
--        if (s->iothread) {
-+        if (s->iothread && s->use_large_config) {
-             object_ref(OBJECT(s->iothread));
-             s->free_page_bh = aio_bh_new(iothread_get_aio_context(s->iothread),
-                                        virtio_ballloon_get_free_page_hints, s);
-@@ -833,6 +866,11 @@ static void virtio_balloon_device_realize(DeviceState *dev, Error **errp)
-             virtio_error(vdev, "iothread is missing");
-         }
-     }
-+
-+    if (!s->use_large_config) {
-+        s->host_features &= ~(1 << VIRTIO_BALLOON_F_PAGE_POISON);
-+    }
-+
-     reset_stats(s);
- }
- 
-@@ -909,6 +947,12 @@ static void virtio_balloon_instance_init(Object *obj)
-                         balloon_stats_get_poll_interval,
-                         balloon_stats_set_poll_interval,
-                         NULL, s, NULL);
-+
-+    s->use_large_config = true;
-+    object_property_add(obj, "x-use-large-balloon-config", "bool",
-+                        balloon_get_large_config,
-+                        balloon_set_large_config,
-+                        NULL, s, NULL);
- }
- 
- static const VMStateDescription vmstate_virtio_balloon = {
-diff --git a/include/hw/virtio/virtio-balloon.h b/include/hw/virtio/virtio-balloon.h
-index 1afafb12f6..f212c08bd7 100644
---- a/include/hw/virtio/virtio-balloon.h
-+++ b/include/hw/virtio/virtio-balloon.h
-@@ -45,6 +45,7 @@ enum virtio_balloon_free_page_report_status {
- typedef struct VirtIOBalloon {
-     VirtIODevice parent_obj;
-     VirtQueue *ivq, *dvq, *svq, *free_page_vq;
-+    bool use_large_config;
-     uint32_t free_page_report_status;
-     uint32_t num_pages;
-     uint32_t actual;
--- 
-2.20.1
+ As of July 2013, contributions under version 2 of the GNU General Public
+ License (and no later version) are only accepted for the following files
 
-
+Paolo
 
