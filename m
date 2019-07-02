@@ -7,64 +7,66 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E77EC5B57D
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 04:37:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85DBBC5B57D
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 04:44:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 67361206E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 04:37:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5343B208C4
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 04:44:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="fNZk0Ne/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 67361206E0
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=reactos.org header.i=@reactos.org header.b="XdPgz9K3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5343B208C4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=reactos.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48926 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49104 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hiAYD-0007z2-MK
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 00:37:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41757)
+	id 1hiAeh-0005BE-I4
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 00:44:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46757)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgibson@ozlabs.org>) id 1hiAAE-0008GJ-Kq
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 00:13:08 -0400
+ (envelope-from <hpoussin@reactos.org>) id 1hiAdk-0004Hw-Sz
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 00:43:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1hiAAC-0005Qd-KY
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 00:13:06 -0400
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:50385 helo=ozlabs.org)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1hiAAB-0005GF-Tz; Tue, 02 Jul 2019 00:13:04 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 45d9nX56DKz9sBp; Tue,  2 Jul 2019 14:12:48 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1562040768;
- bh=c0Dq0KUllXCCayf72BwIYzkyxR+YWNmggVRhhMjGeec=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=fNZk0Ne/Pv0CRTeknzFu6/21JtfRniPRMFGRED/Tex5fYflrfhgxECu8aYVqlA/gx
- LuB6FbOZ+LowBaNe+LT5R4Gn8BUr91/mjKcacn7JEnmxigskFoEDqgbIZe7SA98jnu
- 4bYfR5GsqGiIVG+XmtAnX7BZQwvcoj30NjpOPaKA=
-Date: Tue, 2 Jul 2019 14:12:36 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
-Message-ID: <20190702041236.GK6779@umbus.fritz.box>
-References: <156033104292.26635.15759339817253067370.stgit@aravinda>
- <156033129836.26635.3348706829139659071.stgit@aravinda>
- <20190624162935.02d08837@bahia.lan>
- <658ed3c3-9722-e23a-b65c-89df6025461e@linux.vnet.ibm.com>
- <20190625090023.10c26982@bahia.lan>
- <29912bc9-4241-90f2-5cf6-57e6ed8f420b@linux.vnet.ibm.com>
+ (envelope-from <hpoussin@reactos.org>) id 1hiAdi-000422-QS
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 00:43:36 -0400
+Received: from iserv.reactos.org ([2a01:4f8:1c17:5ae1::1]:49964)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <hpoussin@reactos.org>)
+ id 1hiAdi-000413-1Y
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 00:43:34 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=reactos.org
+ ; s=25047;
+ h=Content-Transfer-Encoding:Content-Type:In-Reply-To:MIME-Version:
+ Date:Message-ID:From:References:Cc:To:Subject:Sender:Reply-To:Content-ID:
+ Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+ :Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+ List-Post:List-Owner:List-Archive;
+ bh=Xtuo3AdguYdWbzNHOptkhXRqgMT+LyOCoIvA/xadDSo=; b=XdPgz9K3o7Mnj9MouKAME9WkfY
+ LtZwkiHeJtQx+GcJVoiR97Cu9BmyftcAwFdz8nR7OvRKm8Yhjo0whz9cyOMTJ0D3WfuSco2r7O4ur
+ jE+TMlFUWA1bKkb6mnPHkW9EAch2Ba7xLzU09Kf87v52kDN4kTC4B7BZa5NYlEwXoPdM=;
+Received: from [2a01:e35:2e3e:3c40:3d64:a34f:19ef:bcc5]
+ by iserv.reactos.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.89) (envelope-from <hpoussin@reactos.org>)
+ id 1hiAde-00025J-Qf; Tue, 02 Jul 2019 04:43:30 +0000
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
+References: <1561472838-32272-1-git-send-email-aleksandar.markovic@rt-rk.com>
+ <1561472838-32272-3-git-send-email-aleksandar.markovic@rt-rk.com>
+From: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
+Message-ID: <3b3a712d-4a96-ce42-4ac5-ae485b77890b@reactos.org>
+Date: Tue, 2 Jul 2019 06:43:27 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.1
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="AYsPlKobQGgtCvjI"
-Content-Disposition: inline
-In-Reply-To: <29912bc9-4241-90f2-5cf6-57e6ed8f420b@linux.vnet.ibm.com>
-User-Agent: Mutt/1.12.0 (2019-05-25)
+In-Reply-To: <1561472838-32272-3-git-send-email-aleksandar.markovic@rt-rk.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2401:3900:2:1::2
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v10 6/6] ppc: spapr: Handle "ibm,
- nmi-register" and "ibm, nmi-interlock" RTAS calls
+X-Received-From: 2a01:4f8:1c17:5ae1::1
+Subject: Re: [Qemu-devel] [PATCH 2/2] dma/rc4030: Minor code style cleanup
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,177 +78,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: aik@au1.ibm.com, Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org,
- paulus@ozlabs.org, qemu-ppc@nongnu.org
+Cc: arikalo@wavecomp.com, f4bug@amsat.org, amarkovic@wavecomp.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Le 25/06/2019 à 16:27, Aleksandar Markovic a écrit :
+> From: Aleksandar Markovic <amarkovic@wavecomp.com>
+> 
+> Fix some simple checkpatch.pl warnings in rc4030.c.
+> 
+> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 
---AYsPlKobQGgtCvjI
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Reviewed-by: Hervé Poussineau <hpoussin@reactos.org>
 
-On Wed, Jun 26, 2019 at 10:43:33AM +0530, Aravinda Prasad wrote:
->=20
->=20
-> On Tuesday 25 June 2019 12:30 PM, Greg Kurz wrote:
-> > On Tue, 25 Jun 2019 11:46:06 +0530
-> > Aravinda Prasad <aravinda@linux.vnet.ibm.com> wrote:
-> >=20
-> >> On Monday 24 June 2019 07:59 PM, Greg Kurz wrote:
-> >>> On Wed, 12 Jun 2019 14:51:38 +0530
-> >>> Aravinda Prasad <aravinda@linux.vnet.ibm.com> wrote:
-> >>>  =20
-> >>>> This patch adds support in QEMU to handle "ibm,nmi-register"
-> >>>> and "ibm,nmi-interlock" RTAS calls and sets the default
-> >>>> value of SPAPR_CAP_FWNMI_MCE to SPAPR_CAP_ON for machine
-> >>>> type 4.0.
-> >>>> =20
-> >>>
-> >>> Next machine type is 4.1. =20
-> >>
-> >> ok.
-> >>
-> >>>  =20
-> >>>> The machine check notification address is saved when the
-> >>>> OS issues "ibm,nmi-register" RTAS call.
-> >>>>
-> >>>> This patch also handles the case when multiple processors
-> >>>> experience machine check at or about the same time by
-> >>>> handling "ibm,nmi-interlock" call. In such cases, as per
-> >>>> PAPR, subsequent processors serialize waiting for the first
-> >>>> processor to issue the "ibm,nmi-interlock" call. The second
-> >>>> processor that also received a machine check error waits
-> >>>> till the first processor is done reading the error log.
-> >>>> The first processor issues "ibm,nmi-interlock" call
-> >>>> when the error log is consumed.
-> >>>>
-> >>>> Signed-off-by: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
-> >>>> ---
-> >>>>  hw/ppc/spapr.c         |    6 ++++-
-> >>>>  hw/ppc/spapr_rtas.c    |   63 +++++++++++++++++++++++++++++++++++++=
-+++++++++++
-> >>>>  include/hw/ppc/spapr.h |    5 +++-
-> >>>>  3 files changed, 72 insertions(+), 2 deletions(-)
-> >>>>
-> >>>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> >>>> index 3d6d139..213d493 100644
-> >>>> --- a/hw/ppc/spapr.c
-> >>>> +++ b/hw/ppc/spapr.c
-> >>>> @@ -2946,6 +2946,9 @@ static void spapr_machine_init(MachineState *m=
-achine)
-> >>>>          /* Create the error string for live migration blocker */
-> >>>>          error_setg(&spapr->fwnmi_migration_blocker,
-> >>>>                  "Live migration not supported during machine check =
-handling");
-> >>>> +
-> >>>> +        /* Register ibm,nmi-register and ibm,nmi-interlock RTAS cal=
-ls */
-> >>>> +        spapr_fwnmi_register(); =20
-> >>>
-> >>> IIRC this was supposed to depend on SPAPR_CAP_FWNMI_MCE being ON. =20
-> >>
-> >> Yes this is inside SPAPR_CAP_FWNMI_MCE check:
-> >>
-> >> if (spapr_get_cap(spapr, SPAPR_CAP_FWNMI_MCE) =3D=3D SPAPR_CAP_ON) {
-> >>     /*
-> >>      * Ensure that the rtas image size is less than RTAS_ERROR_LOG_OFF=
-SET
-> >>      * or else the rtas image will be overwritten with the rtas error =
-log
-> >>      * when a machine check exception is encountered.
-> >>      */
-> >>     g_assert(spapr->rtas_size < RTAS_ERROR_LOG_OFFSET);
-> >>
-> >>     /* Resize rtas blob to accommodate error log */
-> >>     spapr->rtas_size =3D RTAS_ERROR_LOG_MAX;
-> >>
-> >>     /* Create the error string for live migration blocker */
-> >>     error_setg(&spapr->fwnmi_migration_blocker,
-> >>             "Live migration not supported during machine check handlin=
-g");
-> >>
-> >>     /* Register ibm,nmi-register and ibm,nmi-interlock RTAS calls */
-> >>     spapr_fwnmi_register();
-> >> }
-> >>
-> >=20
-> > Oops my bad... sorry for the noise.
-> >=20
-> >>
-> >>>  =20
-> >>>>      }
-> >>>> =20
-> >>>>      spapr->rtas_blob =3D g_malloc(spapr->rtas_size);
-> >>>> @@ -4408,7 +4411,7 @@ static void spapr_machine_class_init(ObjectCla=
-ss *oc, void *data)
-> >>>>      smc->default_caps.caps[SPAPR_CAP_NESTED_KVM_HV] =3D SPAPR_CAP_O=
-FF;
-> >>>>      smc->default_caps.caps[SPAPR_CAP_LARGE_DECREMENTER] =3D SPAPR_C=
-AP_ON;
-> >>>>      smc->default_caps.caps[SPAPR_CAP_CCF_ASSIST] =3D SPAPR_CAP_OFF;
-> >>>> -    smc->default_caps.caps[SPAPR_CAP_FWNMI_MCE] =3D SPAPR_CAP_OFF;
-> >>>> +    smc->default_caps.caps[SPAPR_CAP_FWNMI_MCE] =3D SPAPR_CAP_ON;
-> >>>>      spapr_caps_add_properties(smc, &error_abort);
-> >>>>      smc->irq =3D &spapr_irq_dual;
-> >>>>      smc->dr_phb_enabled =3D true;
-> >>>> @@ -4512,6 +4515,7 @@ static void spapr_machine_3_1_class_options(Ma=
-chineClass *mc)
-> >>>>      smc->default_caps.caps[SPAPR_CAP_SBBC] =3D SPAPR_CAP_BROKEN;
-> >>>>      smc->default_caps.caps[SPAPR_CAP_IBS] =3D SPAPR_CAP_BROKEN;
-> >>>>      smc->default_caps.caps[SPAPR_CAP_LARGE_DECREMENTER] =3D SPAPR_C=
-AP_OFF;
-> >>>> +    smc->default_caps.caps[SPAPR_CAP_FWNMI_MCE] =3D SPAPR_CAP_OFF; =
-=20
-> >>>
-> >>> This should have been put into spapr_machine_4_0_class_options(). =20
-> >>
-> >> ok. I will change it.
-> >>
-> >>>
-> >>> But unless you manage to get this merged before soft-freeze (2019-07-=
-02),
-> >>> I'm afraid this will be a 4.2 feature. =20
-> >>
-> >> If there are no other comments, can this be merged to 4.1? I will send=
- a
-> >> revised version with the above changes.
-> >>
-> >=20
-> > This is David's call.
->=20
-> David, can you let me know if this can be merged to 4.1 with the above
-> minor changes?
+> ---
+>   hw/dma/rc4030.c | 18 +++++++++++-------
+>   1 file changed, 11 insertions(+), 7 deletions(-)
+> 
+> diff --git a/hw/dma/rc4030.c b/hw/dma/rc4030.c
+> index 88ff271..155af9b 100644
+> --- a/hw/dma/rc4030.c
+> +++ b/hw/dma/rc4030.c
+> @@ -58,8 +58,8 @@ typedef struct dma_pagetable_entry {
+>   
+>   #define TYPE_RC4030_IOMMU_MEMORY_REGION "rc4030-iommu-memory-region"
+>   
+> -typedef struct rc4030State
+> -{
+> +typedef struct rc4030State {
+> +
+>       SysBusDevice parent;
+>   
+>       uint32_t config; /* 0x0000: RC4030 config register */
+> @@ -152,8 +152,9 @@ static uint64_t rc4030_read(void *opaque, hwaddr addr, unsigned int size)
+>       case 0x0058:
+>           val = s->cache_bmask;
+>           /* HACK */
+> -        if (s->cache_bmask == (uint32_t)-1)
+> +        if (s->cache_bmask == (uint32_t)-1) {
+>               s->cache_bmask = 0;
+> +        }
+>           break;
+>       /* Remote Speed Registers */
+>       case 0x0070:
+> @@ -538,8 +539,9 @@ static void rc4030_reset(DeviceState *dev)
+>   
+>       s->memory_refresh_rate = 0x18186;
+>       s->nvram_protect = 7;
+> -    for (i = 0; i < 15; i++)
+> +    for (i = 0; i < 15; i++) {
+>           s->rem_speed[i] = 7;
+> +    }
+>       s->imr_jazz = 0x10; /* XXX: required by firmware, but why? */
+>       s->isr_jazz = 0;
+>   
+> @@ -551,7 +553,7 @@ static void rc4030_reset(DeviceState *dev)
+>   
+>   static int rc4030_post_load(void *opaque, int version_id)
+>   {
+> -    rc4030State* s = opaque;
+> +    rc4030State *s = opaque;
+>   
+>       set_next_tick(s);
+>       update_jazz_irq(s);
+> @@ -591,7 +593,8 @@ static void rc4030_do_dma(void *opaque, int n, uint8_t *buf, int len, int is_wri
+>       hwaddr dma_addr;
+>       int dev_to_mem;
+>   
+> -    s->dma_regs[n][DMA_REG_ENABLE] &= ~(DMA_FLAG_TC_INTR | DMA_FLAG_MEM_INTR | DMA_FLAG_ADDR_INTR);
+> +    s->dma_regs[n][DMA_REG_ENABLE] &=
+> +           ~(DMA_FLAG_TC_INTR | DMA_FLAG_MEM_INTR | DMA_FLAG_ADDR_INTR);
+>   
+>       /* Check DMA channel consistency */
+>       dev_to_mem = (s->dma_regs[n][DMA_REG_ENABLE] & DMA_FLAG_MEM_TO_DEV) ? 0 : 1;
+> @@ -603,8 +606,9 @@ static void rc4030_do_dma(void *opaque, int n, uint8_t *buf, int len, int is_wri
+>       }
+>   
+>       /* Get start address and len */
+> -    if (len > s->dma_regs[n][DMA_REG_COUNT])
+> +    if (len > s->dma_regs[n][DMA_REG_COUNT]) {
+>           len = s->dma_regs[n][DMA_REG_COUNT];
+> +    }
+>       dma_addr = s->dma_regs[n][DMA_REG_ADDRESS];
+>   
+>       /* Read/write data at right place */
+> 
 
-Nope, sorry.  I've been away, but also this still needs more polish.
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---AYsPlKobQGgtCvjI
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl0a2bQACgkQbDjKyiDZ
-s5JddQ//Qo7UsuTWrmVMk1DKcyycMzbGt2FIkyyVrUOXFk55F9jXrxdb0XkaCbbX
-oBu+h+wPIMVC4+x6XstGiF2Hbyfx2yW9Cw0mPX9Ww6VxzJsBK0C58bzMeIklUeBu
-PZ2lEuSHUWQ/CaUt00ug8JP46+92K6z2jqf6zzPVx1fl+c8B91ONx8QRCyFH5Xpa
-jnyoyFgzA55GmJmGnhqb5gmVPO77NoKZYx/fK3v2hTRPA6qreFyJDvLLNKIAfEB4
-LS8y8NRkgkR6LXwGkLyJlhCXxC1GMTKoJBUxIdJgpMSdFcZx34oECQ3rEOoaQLh1
-VC0himTo2kFzXSkR2YNk32taYLSuJDH50xiuEnL6lNtwfD8dZftzQ6T82wNJ83pE
-mhf1O8A+c1dJXXbSX3ahGWSGufogSgbuUXTolRqH7V9TWF1Q74DITfmFj6dRsRjY
-sg0YNpbl72A7FAsTdz1D3IhxR8W1gQ1pSjhHihBOAmCT8w9dFBh39cWCpV1/9sUm
-JdSXrJw+jMe07HgaQfrceOeMRVHSKbrlDaV7xyJs8aQVu5J6GfZvEiLsZii6uTXb
-TddNVCr/g5DoegbY1bTC/2SC8lz4KfEdyCCnCHAGzykELiyOVEPcfodAKrw25eGf
-4aiggfzoqKH1EhCnD1cwJfSDhHmDNMA/d4Ds5x87F0VcmOQy1mk=
-=/olb
------END PGP SIGNATURE-----
-
---AYsPlKobQGgtCvjI--
 
