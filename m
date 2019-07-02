@@ -7,58 +7,56 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3710C5B57D
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 06:45:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DB99C5B57D
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 06:47:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9C6B221479
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 06:45:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0C07E21479
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 06:47:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="B0/GHdap"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C6B221479
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="LqfMBsLS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C07E21479
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49612 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49624 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hiCXp-00022n-Ng
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 02:45:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58464)
+	id 1hiCZm-0002sA-Ps
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 02:47:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58982)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgibson@ozlabs.org>) id 1hiByl-00051Z-NB
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 02:09:25 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1hiBzh-0005iT-Gi
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 02:10:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1hiByk-0002wM-82
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 02:09:23 -0400
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:33785 helo=ozlabs.org)
+ (envelope-from <dgibson@ozlabs.org>) id 1hiBze-0003Q0-Bo
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 02:10:20 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:49233 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1hiByj-0002tX-HP; Tue, 02 Jul 2019 02:09:22 -0400
+ id 1hiBzc-0003Ea-33; Tue, 02 Jul 2019 02:10:17 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 45dDMk0svbz9sPY; Tue,  2 Jul 2019 16:09:05 +1000 (AEST)
+ id 45dDMm4Hz1z9sQt; Tue,  2 Jul 2019 16:09:06 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1562047746;
- bh=2nJOrSX7TAIqpWh5QCL4SMs7wiJ5bhkcxATACsAlos0=;
+ d=gibson.dropbear.id.au; s=201602; t=1562047748;
+ bh=3BpbH90W3luMeP+IvsOTmWCX6bwXDkEpvBUYrisI9OY=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=B0/GHdapugIt/h87WkS/wnlPj/mdip7fOlIsTtLUoxDYmoNf76AcAzdKE1/BmS81g
- KHeFO6CiyHvcN3Nfs3yF0dNRYbDRo0+2x+qu/vcn3eVfB2FXuFt4Vjs6nhDe8h5FkR
- iHkgVu/FZfdE9DhyvI6G7u5HdcRrcPaNVqwydq8E=
+ b=LqfMBsLSk+ZhDz1oeToKWjAcnX+DFsR8ydyac7Fsxfrjw5n1FP2deGfDIgKSxCXzP
+ mZh6ZKoCsiXfZcf/E3FYXH2oaDUXqOuuGTik56srCOWg+Kv3ZEf34mVvcaGTWvjqZ5
+ iwPbL3tnQjbw3aV3HgGcjMMPYkj0FPqXHw/BLYoU=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Date: Tue,  2 Jul 2019 16:08:33 +1000
-Message-Id: <20190702060857.3926-26-david@gibson.dropbear.id.au>
+Date: Tue,  2 Jul 2019 16:08:42 +1000
+Message-Id: <20190702060857.3926-35-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190702060857.3926-1-david@gibson.dropbear.id.au>
 References: <20190702060857.3926-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2401:3900:2:1::2
-Subject: [Qemu-devel] [PULL 25/49] xics/kvm: Add error propagation to
- ic*_set_kvm_state() functions
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 203.11.71.1
+Subject: [Qemu-devel] [PULL 34/49] target/ppc: introduce
+ GEN_VSX_HELPER_X2_AB macro to fpu_helper.c
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,235 +68,232 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, aik@ozlabs.ru, qemu-devel@nongnu.org, groug@kaod.org,
- qemu-ppc@nongnu.org, clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>,
- rth@twiddle.net
+Cc: lvivier@redhat.com, aik@ozlabs.ru,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
+ groug@kaod.org, qemu-ppc@nongnu.org, clg@kaod.org,
+ David Gibson <david@gibson.dropbear.id.au>, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Greg Kurz <groug@kaod.org>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-This allows errors happening there to be propagated up to spapr_irq,
-just like XIVE already does.
+Rather than perform the VSR register decoding within the helper itself,
+introduce a new GEN_VSX_HELPER_X2_AB macro which performs the decode base=
+d
+upon xA and xB at translation time.
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
-Message-Id: <156077921763.433243.4614327010172954196.stgit@bahia.lan>
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20190616123751.781-9-mark.cave-ayland@ilande.co.uk>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/intc/xics.c        | 39 ++++++++++++++++++++++++++++++++++-----
- hw/intc/xics_kvm.c    | 37 ++++++++++++++++++++++---------------
- include/hw/ppc/xics.h |  6 +++---
- 3 files changed, 59 insertions(+), 23 deletions(-)
+ target/ppc/fpu_helper.c             | 15 ++++++---------
+ target/ppc/helper.h                 | 12 ++++++------
+ target/ppc/translate/vsx-impl.inc.c | 30 +++++++++++++++++++++++------
+ 3 files changed, 36 insertions(+), 21 deletions(-)
 
-diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-index 978d7f0886..faa976e2f8 100644
---- a/hw/intc/xics.c
-+++ b/hw/intc/xics.c
-@@ -267,7 +267,14 @@ static int icp_post_load(void *opaque, int version_i=
-d)
-     ICPState *icp =3D opaque;
+diff --git a/target/ppc/fpu_helper.c b/target/ppc/fpu_helper.c
+index 44dff1b459..902d63b139 100644
+--- a/target/ppc/fpu_helper.c
++++ b/target/ppc/fpu_helper.c
+@@ -2179,10 +2179,9 @@ VSX_RSQRTE(xvrsqrtesp, 4, float32, VsrW(i), 0, 0)
+  *   nbits - number of fraction bits
+  */
+ #define VSX_TDIV(op, nels, tp, fld, emin, emax, nbits)                  =
+\
+-void helper_##op(CPUPPCState *env, uint32_t opcode)                     =
+\
++void helper_##op(CPUPPCState *env, uint32_t opcode,                     =
+\
++                 ppc_vsr_t *xa, ppc_vsr_t *xb)                          =
+\
+ {                                                                       =
+\
+-    ppc_vsr_t *xa =3D &env->vsr[xA(opcode)];                            =
+  \
+-    ppc_vsr_t *xb =3D &env->vsr[xB(opcode)];                            =
+  \
+     int i;                                                              =
+\
+     int fe_flag =3D 0;                                                  =
+  \
+     int fg_flag =3D 0;                                                  =
+  \
+@@ -2431,10 +2430,9 @@ VSX_SCALAR_CMP_DP(xscmpgedp, le, 1, 1)
+ VSX_SCALAR_CMP_DP(xscmpgtdp, lt, 1, 1)
+ VSX_SCALAR_CMP_DP(xscmpnedp, eq, 0, 0)
 =20
-     if (kvm_irqchip_in_kernel()) {
--        return icp_set_kvm_state(icp);
-+        Error *local_err =3D NULL;
-+        int ret;
-+
-+        ret =3D icp_set_kvm_state(icp, &local_err);
-+        if (ret < 0) {
-+            error_report_err(local_err);
-+            return ret;
-+        }
-     }
-=20
-     return 0;
-@@ -300,7 +307,12 @@ static void icp_reset_handler(void *dev)
-     qemu_set_irq(icp->output, 0);
-=20
-     if (kvm_irqchip_in_kernel()) {
--        icp_set_kvm_state(ICP(dev));
-+        Error *local_err =3D NULL;
-+
-+        icp_set_kvm_state(ICP(dev), &local_err);
-+        if (local_err) {
-+            error_report_err(local_err);
-+        }
-     }
- }
-=20
-@@ -564,7 +576,12 @@ static void ics_simple_reset(DeviceState *dev)
-     icsc->parent_reset(dev);
-=20
-     if (kvm_irqchip_in_kernel()) {
--        ics_set_kvm_state(ICS_BASE(dev));
-+        Error *local_err =3D NULL;
-+
-+        ics_set_kvm_state(ICS_BASE(dev), &local_err);
-+        if (local_err) {
-+            error_report_err(local_err);
-+        }
-     }
- }
-=20
-@@ -680,7 +697,14 @@ static int ics_base_post_load(void *opaque, int vers=
-ion_id)
-     ICSState *ics =3D opaque;
-=20
-     if (kvm_irqchip_in_kernel()) {
--        return ics_set_kvm_state(ics);
-+        Error *local_err =3D NULL;
-+        int ret;
-+
-+        ret =3D ics_set_kvm_state(ics, &local_err);
-+        if (ret < 0) {
-+            error_report_err(local_err);
-+            return ret;
-+        }
-     }
-=20
-     return 0;
-@@ -766,8 +790,13 @@ void ics_set_irq_type(ICSState *ics, int srcno, bool=
- lsi)
-         lsi ? XICS_FLAGS_IRQ_LSI : XICS_FLAGS_IRQ_MSI;
-=20
-     if (kvm_irqchip_in_kernel()) {
-+        Error *local_err =3D NULL;
-+
-         ics_reset_irq(ics->irqs + srcno);
--        ics_set_kvm_state_one(ics, srcno);
-+        ics_set_kvm_state_one(ics, srcno, &local_err);
-+        if (local_err) {
-+            error_report_err(local_err);
-+        }
-     }
- }
-=20
-diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
-index c9e25fb051..4bfbe1a840 100644
---- a/hw/intc/xics_kvm.c
-+++ b/hw/intc/xics_kvm.c
-@@ -106,7 +106,7 @@ void icp_synchronize_state(ICPState *icp)
-     }
- }
-=20
--int icp_set_kvm_state(ICPState *icp)
-+int icp_set_kvm_state(ICPState *icp, Error **errp)
+-void helper_xscmpexpdp(CPUPPCState *env, uint32_t opcode)
++void helper_xscmpexpdp(CPUPPCState *env, uint32_t opcode,
++                       ppc_vsr_t *xa, ppc_vsr_t *xb)
  {
-     uint64_t state;
-     int ret;
-@@ -126,10 +126,11 @@ int icp_set_kvm_state(ICPState *icp)
-         | ((uint64_t)icp->pending_priority << KVM_REG_PPC_ICP_PPRI_SHIFT=
-);
+-    ppc_vsr_t *xa =3D &env->vsr[xA(opcode)];
+-    ppc_vsr_t *xb =3D &env->vsr[xB(opcode)];
+     int64_t exp_a, exp_b;
+     uint32_t cc;
 =20
-     ret =3D kvm_set_one_reg(icp->cs, KVM_REG_PPC_ICP_STATE, &state);
--    if (ret !=3D 0) {
--        error_report("Unable to restore KVM interrupt controller state (=
-0x%"
--                PRIx64 ") for CPU %ld: %s", state, kvm_arch_vcpu_id(icp-=
->cs),
--                strerror(errno));
-+    if (ret < 0) {
-+        error_setg_errno(errp, -ret,
-+                         "Unable to restore KVM interrupt controller sta=
-te (0x%"
-+                         PRIx64 ") for CPU %ld", state,
-+                         kvm_arch_vcpu_id(icp->cs));
-         return ret;
-     }
-=20
-@@ -240,10 +241,9 @@ void ics_synchronize_state(ICSState *ics)
-     ics_get_kvm_state(ics);
+@@ -2492,10 +2490,9 @@ void helper_xscmpexpqp(CPUPPCState *env, uint32_t =
+opcode)
  }
 =20
--int ics_set_kvm_state_one(ICSState *ics, int srcno)
-+int ics_set_kvm_state_one(ICSState *ics, int srcno, Error **errp)
- {
-     uint64_t state;
--    Error *local_err =3D NULL;
-     ICSIRQState *irq =3D &ics->irqs[srcno];
-     int ret;
-=20
-@@ -278,16 +278,15 @@ int ics_set_kvm_state_one(ICSState *ics, int srcno)
-     }
-=20
-     ret =3D kvm_device_access(kernel_xics_fd, KVM_DEV_XICS_GRP_SOURCES,
--                            srcno + ics->offset, &state, true, &local_er=
-r);
--    if (local_err) {
--        error_report_err(local_err);
-+                            srcno + ics->offset, &state, true, errp);
-+    if (ret < 0) {
-         return ret;
-     }
-=20
-     return 0;
+ #define VSX_SCALAR_CMP(op, ordered)                                     =
+ \
+-void helper_##op(CPUPPCState *env, uint32_t opcode)                     =
+ \
++void helper_##op(CPUPPCState *env, uint32_t opcode,                     =
+ \
++                 ppc_vsr_t *xa, ppc_vsr_t *xb)                          =
+ \
+ {                                                                       =
+ \
+-    ppc_vsr_t *xa =3D &env->vsr[xA(opcode)];                            =
+   \
+-    ppc_vsr_t *xb =3D &env->vsr[xB(opcode)];                            =
+   \
+     uint32_t cc =3D 0;                                                  =
+   \
+     bool vxsnan_flag =3D false, vxvc_flag =3D false;                    =
+     \
+                                                                         =
+ \
+diff --git a/target/ppc/helper.h b/target/ppc/helper.h
+index f56476ec41..0ab1ef2aee 100644
+--- a/target/ppc/helper.h
++++ b/target/ppc/helper.h
+@@ -375,7 +375,7 @@ DEF_HELPER_2(xsdivqp, void, env, i32)
+ DEF_HELPER_3(xsredp, void, env, vsr, vsr)
+ DEF_HELPER_3(xssqrtdp, void, env, vsr, vsr)
+ DEF_HELPER_3(xsrsqrtedp, void, env, vsr, vsr)
+-DEF_HELPER_2(xstdivdp, void, env, i32)
++DEF_HELPER_4(xstdivdp, void, env, i32, vsr, vsr)
+ DEF_HELPER_2(xstsqrtdp, void, env, i32)
+ DEF_HELPER_4(xsmaddadp, void, env, vsr, vsr, vsr)
+ DEF_HELPER_4(xsmaddmdp, void, env, vsr, vsr, vsr)
+@@ -389,10 +389,10 @@ DEF_HELPER_4(xscmpeqdp, void, env, vsr, vsr, vsr)
+ DEF_HELPER_4(xscmpgtdp, void, env, vsr, vsr, vsr)
+ DEF_HELPER_4(xscmpgedp, void, env, vsr, vsr, vsr)
+ DEF_HELPER_4(xscmpnedp, void, env, vsr, vsr, vsr)
+-DEF_HELPER_2(xscmpexpdp, void, env, i32)
++DEF_HELPER_4(xscmpexpdp, void, env, i32, vsr, vsr)
+ DEF_HELPER_2(xscmpexpqp, void, env, i32)
+-DEF_HELPER_2(xscmpodp, void, env, i32)
+-DEF_HELPER_2(xscmpudp, void, env, i32)
++DEF_HELPER_4(xscmpodp, void, env, i32, vsr, vsr)
++DEF_HELPER_4(xscmpudp, void, env, i32, vsr, vsr)
+ DEF_HELPER_2(xscmpoqp, void, env, i32)
+ DEF_HELPER_2(xscmpuqp, void, env, i32)
+ DEF_HELPER_4(xsmaxdp, void, env, vsr, vsr, vsr)
+@@ -460,7 +460,7 @@ DEF_HELPER_4(xvdivdp, void, env, vsr, vsr, vsr)
+ DEF_HELPER_3(xvredp, void, env, vsr, vsr)
+ DEF_HELPER_3(xvsqrtdp, void, env, vsr, vsr)
+ DEF_HELPER_3(xvrsqrtedp, void, env, vsr, vsr)
+-DEF_HELPER_2(xvtdivdp, void, env, i32)
++DEF_HELPER_4(xvtdivdp, void, env, i32, vsr, vsr)
+ DEF_HELPER_2(xvtsqrtdp, void, env, i32)
+ DEF_HELPER_4(xvmaddadp, void, env, vsr, vsr, vsr)
+ DEF_HELPER_4(xvmaddmdp, void, env, vsr, vsr, vsr)
+@@ -498,7 +498,7 @@ DEF_HELPER_4(xvdivsp, void, env, vsr, vsr, vsr)
+ DEF_HELPER_3(xvresp, void, env, vsr, vsr)
+ DEF_HELPER_3(xvsqrtsp, void, env, vsr, vsr)
+ DEF_HELPER_3(xvrsqrtesp, void, env, vsr, vsr)
+-DEF_HELPER_2(xvtdivsp, void, env, i32)
++DEF_HELPER_4(xvtdivsp, void, env, i32, vsr, vsr)
+ DEF_HELPER_2(xvtsqrtsp, void, env, i32)
+ DEF_HELPER_4(xvmaddasp, void, env, vsr, vsr, vsr)
+ DEF_HELPER_4(xvmaddmsp, void, env, vsr, vsr, vsr)
+diff --git a/target/ppc/translate/vsx-impl.inc.c b/target/ppc/translate/v=
+sx-impl.inc.c
+index 36fb740f6a..9b4603ac33 100644
+--- a/target/ppc/translate/vsx-impl.inc.c
++++ b/target/ppc/translate/vsx-impl.inc.c
+@@ -1061,6 +1061,24 @@ static void gen_##name(DisasContext *ctx)         =
+                            \
+     tcg_temp_free_ptr(xb);                                              =
+      \
  }
 =20
--int ics_set_kvm_state(ICSState *ics)
-+int ics_set_kvm_state(ICSState *ics, Error **errp)
- {
-     int i;
-=20
-@@ -297,10 +296,12 @@ int ics_set_kvm_state(ICSState *ics)
-     }
-=20
-     for (i =3D 0; i < ics->nr_irqs; i++) {
-+        Error *local_err =3D NULL;
-         int ret;
-=20
--        ret =3D ics_set_kvm_state_one(ics, i);
--        if (ret) {
-+        ret =3D ics_set_kvm_state_one(ics, i, &local_err);
-+        if (ret < 0) {
-+            error_propagate(errp, local_err);
-             return ret;
-         }
-     }
-@@ -402,12 +403,18 @@ int xics_kvm_connect(SpaprMachineState *spapr, Erro=
-r **errp)
-     }
-=20
-     /* Update the KVM sources */
--    ics_set_kvm_state(spapr->ics);
-+    ics_set_kvm_state(spapr->ics, &local_err);
-+    if (local_err) {
-+        goto fail;
-+    }
-=20
-     /* Connect the presenters to the initial VCPUs of the machine */
-     CPU_FOREACH(cs) {
-         PowerPCCPU *cpu =3D POWERPC_CPU(cs);
--        icp_set_kvm_state(spapr_cpu_state(cpu)->icp);
-+        icp_set_kvm_state(spapr_cpu_state(cpu)->icp, &local_err);
-+        if (local_err) {
-+            goto fail;
-+        }
-     }
-=20
-     return 0;
-diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-index eb65ad7e43..1eb7b5cd68 100644
---- a/include/hw/ppc/xics.h
-+++ b/include/hw/ppc/xics.h
-@@ -190,13 +190,13 @@ Object *icp_create(Object *cpu, const char *type, X=
-ICSFabric *xi,
-=20
- /* KVM */
- void icp_get_kvm_state(ICPState *icp);
--int icp_set_kvm_state(ICPState *icp);
-+int icp_set_kvm_state(ICPState *icp, Error **errp);
- void icp_synchronize_state(ICPState *icp);
- void icp_kvm_realize(DeviceState *dev, Error **errp);
-=20
- void ics_get_kvm_state(ICSState *ics);
--int ics_set_kvm_state_one(ICSState *ics, int srcno);
--int ics_set_kvm_state(ICSState *ics);
-+int ics_set_kvm_state_one(ICSState *ics, int srcno, Error **errp);
-+int ics_set_kvm_state(ICSState *ics, Error **errp);
- void ics_synchronize_state(ICSState *ics);
- void ics_kvm_set_irq(ICSState *ics, int srcno, int val);
-=20
++#define GEN_VSX_HELPER_X2_AB(name, op1, op2, inval, type)               =
+      \
++static void gen_##name(DisasContext *ctx)                               =
+      \
++{                                                                       =
+      \
++    TCGv_i32 opc;                                                       =
+      \
++    TCGv_ptr xa, xb;                                                    =
+      \
++    if (unlikely(!ctx->vsx_enabled)) {                                  =
+      \
++        gen_exception(ctx, POWERPC_EXCP_VSXU);                          =
+      \
++        return;                                                         =
+      \
++    }                                                                   =
+      \
++    opc =3D tcg_const_i32(ctx->opcode);                                 =
+        \
++    xa =3D gen_vsr_ptr(xA(ctx->opcode));                                =
+        \
++    xb =3D gen_vsr_ptr(xB(ctx->opcode));                                =
+        \
++    gen_helper_##name(cpu_env, opc, xa, xb);                            =
+      \
++    tcg_temp_free_i32(opc);                                             =
+      \
++    tcg_temp_free_ptr(xa);                                              =
+      \
++    tcg_temp_free_ptr(xb);                                              =
+      \
++}
++
+ #define GEN_VSX_HELPER_XT_XB_ENV(name, op1, op2, inval, type) \
+ static void gen_##name(DisasContext *ctx)                     \
+ {                                                             \
+@@ -1089,7 +1107,7 @@ GEN_VSX_HELPER_2(xsdivqp, 0x04, 0x11, 0, PPC2_ISA30=
+0)
+ GEN_VSX_HELPER_X2(xsredp, 0x14, 0x05, 0, PPC2_VSX)
+ GEN_VSX_HELPER_X2(xssqrtdp, 0x16, 0x04, 0, PPC2_VSX)
+ GEN_VSX_HELPER_X2(xsrsqrtedp, 0x14, 0x04, 0, PPC2_VSX)
+-GEN_VSX_HELPER_2(xstdivdp, 0x14, 0x07, 0, PPC2_VSX)
++GEN_VSX_HELPER_X2_AB(xstdivdp, 0x14, 0x07, 0, PPC2_VSX)
+ GEN_VSX_HELPER_2(xstsqrtdp, 0x14, 0x06, 0, PPC2_VSX)
+ GEN_VSX_HELPER_X3(xsmaddadp, 0x04, 0x04, 0, PPC2_VSX)
+ GEN_VSX_HELPER_X3(xsmaddmdp, 0x04, 0x05, 0, PPC2_VSX)
+@@ -1103,10 +1121,10 @@ GEN_VSX_HELPER_X3(xscmpeqdp, 0x0C, 0x00, 0, PPC2_=
+ISA300)
+ GEN_VSX_HELPER_X3(xscmpgtdp, 0x0C, 0x01, 0, PPC2_ISA300)
+ GEN_VSX_HELPER_X3(xscmpgedp, 0x0C, 0x02, 0, PPC2_ISA300)
+ GEN_VSX_HELPER_X3(xscmpnedp, 0x0C, 0x03, 0, PPC2_ISA300)
+-GEN_VSX_HELPER_2(xscmpexpdp, 0x0C, 0x07, 0, PPC2_ISA300)
++GEN_VSX_HELPER_X2_AB(xscmpexpdp, 0x0C, 0x07, 0, PPC2_ISA300)
+ GEN_VSX_HELPER_2(xscmpexpqp, 0x04, 0x05, 0, PPC2_ISA300)
+-GEN_VSX_HELPER_2(xscmpodp, 0x0C, 0x05, 0, PPC2_VSX)
+-GEN_VSX_HELPER_2(xscmpudp, 0x0C, 0x04, 0, PPC2_VSX)
++GEN_VSX_HELPER_X2_AB(xscmpodp, 0x0C, 0x05, 0, PPC2_VSX)
++GEN_VSX_HELPER_X2_AB(xscmpudp, 0x0C, 0x04, 0, PPC2_VSX)
+ GEN_VSX_HELPER_2(xscmpoqp, 0x04, 0x04, 0, PPC2_VSX)
+ GEN_VSX_HELPER_2(xscmpuqp, 0x04, 0x14, 0, PPC2_VSX)
+ GEN_VSX_HELPER_X3(xsmaxdp, 0x00, 0x14, 0, PPC2_VSX)
+@@ -1174,7 +1192,7 @@ GEN_VSX_HELPER_X3(xvdivdp, 0x00, 0x0F, 0, PPC2_VSX)
+ GEN_VSX_HELPER_X2(xvredp, 0x14, 0x0D, 0, PPC2_VSX)
+ GEN_VSX_HELPER_X2(xvsqrtdp, 0x16, 0x0C, 0, PPC2_VSX)
+ GEN_VSX_HELPER_X2(xvrsqrtedp, 0x14, 0x0C, 0, PPC2_VSX)
+-GEN_VSX_HELPER_2(xvtdivdp, 0x14, 0x0F, 0, PPC2_VSX)
++GEN_VSX_HELPER_X2_AB(xvtdivdp, 0x14, 0x0F, 0, PPC2_VSX)
+ GEN_VSX_HELPER_2(xvtsqrtdp, 0x14, 0x0E, 0, PPC2_VSX)
+ GEN_VSX_HELPER_X3(xvmaddadp, 0x04, 0x0C, 0, PPC2_VSX)
+ GEN_VSX_HELPER_X3(xvmaddmdp, 0x04, 0x0D, 0, PPC2_VSX)
+@@ -1208,7 +1226,7 @@ GEN_VSX_HELPER_X3(xvdivsp, 0x00, 0x0B, 0, PPC2_VSX)
+ GEN_VSX_HELPER_X2(xvresp, 0x14, 0x09, 0, PPC2_VSX)
+ GEN_VSX_HELPER_X2(xvsqrtsp, 0x16, 0x08, 0, PPC2_VSX)
+ GEN_VSX_HELPER_X2(xvrsqrtesp, 0x14, 0x08, 0, PPC2_VSX)
+-GEN_VSX_HELPER_2(xvtdivsp, 0x14, 0x0B, 0, PPC2_VSX)
++GEN_VSX_HELPER_X2_AB(xvtdivsp, 0x14, 0x0B, 0, PPC2_VSX)
+ GEN_VSX_HELPER_2(xvtsqrtsp, 0x14, 0x0A, 0, PPC2_VSX)
+ GEN_VSX_HELPER_X3(xvmaddasp, 0x04, 0x08, 0, PPC2_VSX)
+ GEN_VSX_HELPER_X3(xvmaddmsp, 0x04, 0x09, 0, PPC2_VSX)
 --=20
 2.21.0
 
