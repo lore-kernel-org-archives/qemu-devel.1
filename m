@@ -2,62 +2,62 @@ Return-Path: <SRS0=9yXi=U7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50BA6C06510
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 15:50:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 806C2C06510
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 15:51:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 28CBB2082F
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 15:50:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28CBB2082F
+	by mail.kernel.org (Postfix) with ESMTPS id 5C5892082F
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 15:51:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C5892082F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54666 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54684 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hiL2l-0006Iv-AQ
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 11:50:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58637)
+	id 1hiL3m-0007PL-Qo
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 11:51:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59406)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mst@redhat.com>) id 1hiKNv-000709-GO
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 11:07:56 -0400
+ (envelope-from <mst@redhat.com>) id 1hiKRB-0001zZ-2e
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 11:11:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1hiKNu-0000lw-CR
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 11:07:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39776)
+ (envelope-from <mst@redhat.com>) id 1hiKR2-0003PS-F1
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 11:11:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35388)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>)
- id 1hiKNu-0000lL-3x; Tue, 02 Jul 2019 11:07:54 -0400
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1hiKR0-0003LV-Qx
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 11:11:07 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 5791130832D8;
- Tue,  2 Jul 2019 15:07:53 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 049CB308427D;
+ Tue,  2 Jul 2019 15:10:53 +0000 (UTC)
 Received: from redhat.com (ovpn-124-209.rdu2.redhat.com [10.10.124.209])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C9B305C28D;
- Tue,  2 Jul 2019 15:07:48 +0000 (UTC)
-Date: Tue, 2 Jul 2019 11:07:47 -0400
+ by smtp.corp.redhat.com (Postfix) with SMTP id CF3E35C28D;
+ Tue,  2 Jul 2019 15:10:32 +0000 (UTC)
+Date: Tue, 2 Jul 2019 11:10:31 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
-To: qemu-devel@nongnu.org
-Message-ID: <20190625232333.30752-1-marcandre.lureau@redhat.com>
-References: <20190702150606.24851-1-mst@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190702100657-mutt-send-email-mst@kernel.org>
+References: <20190619094907.10131-1-pagupta@redhat.com>
+ <20190619094907.10131-4-pagupta@redhat.com>
+ <20190702135030.6159266b.cohuck@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190702150606.24851-1-mst@redhat.com>
-X-Mutt-Fcc: =sent
+In-Reply-To: <20190702135030.6159266b.cohuck@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.44]); Tue, 02 Jul 2019 15:07:53 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ (mx1.redhat.com [10.5.110.40]); Tue, 02 Jul 2019 15:11:03 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 12/22] virtio-pci: fix missing device properties
+Subject: Re: [Qemu-devel] [PATCH v2 3/7] virtio-pmem: sync linux headers
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,111 +69,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-stable@nongnu.org,
- =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: kwolf@redhat.com, Pankaj Gupta <pagupta@redhat.com>,
+ xiaoguangrong.eric@gmail.com, riel@surriel.com, armbru@redhat.com,
+ david@redhat.com, qemu-devel@nongnu.org, ehabkost@redhat.com,
+ lcapitulino@redhat.com, aarcange@redhat.com, stefanha@redhat.com,
+ pbonzini@redhat.com, imammedo@redhat.com, dan.j.williams@intel.com,
+ nilal@redhat.com, dgilbert@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190702150747.a6AU0jeM4VY3xh1o8JpUyTrviYp4nxksXW10fI0Id38@z>
 
-From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+On Tue, Jul 02, 2019 at 01:50:30PM +0200, Cornelia Huck wrote:
+> On Wed, 19 Jun 2019 15:19:03 +0530
+> Pankaj Gupta <pagupta@redhat.com> wrote:
+> 
+> > Sync linux headers for virtio pmem.
+> > 
+> > Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
+> > ---
+> >  include/standard-headers/linux/virtio_ids.h  |  1 +
+> >  include/standard-headers/linux/virtio_pmem.h | 35 ++++++++++++++++++++++++++++
+> >  2 files changed, 36 insertions(+)
+> >  create mode 100644 include/standard-headers/linux/virtio_pmem.h
+> 
+> That's not yet upstream, right?
+> 
+> If so, I fear this feature won't make 4.1, as the merge window for
+> Linux only opens in one or two weeks :(
 
-Since commit a4ee4c8baa37154 ("virtio: Helper for registering virtio
-device types"), virtio-gpu-pci, virtio-vga, and virtio-crypto-pci lost
-some properties: "ioeventfd" and "vectors". This may cause various
-issues, such as failing migration or invalid properties.
+I think it's ok from that POV, I put the driver in my tree
+to break the deadlock for now.
 
-Since those VirtioPCI devices do not have a base name, their class are
-initialized with virtio_pci_generic_base_class_init(). However, if the
-VirtioPCIDeviceTypeInfo provided a class_init which sets dc->props,
-the properties were overwritten by virtio_pci_generic_class_init().
-
-Instead, introduce an intermediary base-type to register the generic
-properties.
-
-Fixes: a4ee4c8baa37154f42b4dc6a13fee79268d15238
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Message-Id: <20190625232333.30752-1-marcandre.lureau@redhat.com>
----
- hw/virtio/virtio-pci.c | 28 ++++++++++++++--------------
- 1 file changed, 14 insertions(+), 14 deletions(-)
-
-diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
-index 62e78e98f5..ce928f2429 100644
---- a/hw/virtio/virtio-pci.c
-+++ b/hw/virtio/virtio-pci.c
-@@ -1913,13 +1913,6 @@ static void virtio_pci_generic_class_init(ObjectCl=
-ass *klass, void *data)
-     dc->props =3D virtio_pci_generic_properties;
- }
-=20
--/* Used when the generic type and the base type is the same */
--static void virtio_pci_generic_base_class_init(ObjectClass *klass, void =
-*data)
--{
--    virtio_pci_base_class_init(klass, data);
--    virtio_pci_generic_class_init(klass, NULL);
--}
--
- static void virtio_pci_transitional_instance_init(Object *obj)
- {
-     VirtIOPCIProxy *proxy =3D VIRTIO_PCI(obj);
-@@ -1938,14 +1931,13 @@ static void virtio_pci_non_transitional_instance_=
-init(Object *obj)
-=20
- void virtio_pci_types_register(const VirtioPCIDeviceTypeInfo *t)
- {
-+    char *base_name =3D NULL;
-     TypeInfo base_type_info =3D {
-         .name          =3D t->base_name,
-         .parent        =3D t->parent ? t->parent : TYPE_VIRTIO_PCI,
-         .instance_size =3D t->instance_size,
-         .instance_init =3D t->instance_init,
-         .class_size    =3D t->class_size,
--        .class_init    =3D virtio_pci_base_class_init,
--        .class_data    =3D (void *)t,
-         .abstract      =3D true,
-         .interfaces    =3D t->interfaces,
-     };
-@@ -1962,13 +1954,20 @@ void virtio_pci_types_register(const VirtioPCIDev=
-iceTypeInfo *t)
-=20
-     if (!base_type_info.name) {
-         /* No base type -> register a single generic device type */
--        base_type_info.name =3D t->generic_name;
--        base_type_info.class_init =3D virtio_pci_generic_base_class_init=
-;
--        base_type_info.interfaces =3D generic_type_info.interfaces;
--        base_type_info.abstract =3D false;
--        generic_type_info.name =3D NULL;
-+        /* use intermediate %s-base-type to add generic device props */
-+        base_name =3D g_strdup_printf("%s-base-type", t->generic_name);
-+        base_type_info.name =3D base_name;
-+        base_type_info.class_init =3D virtio_pci_generic_class_init;
-+
-+        generic_type_info.parent =3D base_name;
-+        generic_type_info.class_init =3D virtio_pci_base_class_init;
-+        generic_type_info.class_data =3D (void *)t;
-+
-         assert(!t->non_transitional_name);
-         assert(!t->transitional_name);
-+    } else {
-+        base_type_info.class_init =3D virtio_pci_base_class_init;
-+        base_type_info.class_data =3D (void *)t;
-     }
-=20
-     type_register(&base_type_info);
-@@ -2006,6 +2005,7 @@ void virtio_pci_types_register(const VirtioPCIDevic=
-eTypeInfo *t)
-         };
-         type_register(&transitional_type_info);
-     }
-+    g_free(base_name);
- }
-=20
- /* virtio-pci-bus */
---=20
+-- 
 MST
-
 
