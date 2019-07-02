@@ -2,82 +2,74 @@ Return-Path: <SRS0=9yXi=U7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56B7BC06510
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 19:36:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BFBBEC06510
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 19:39:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 269DB2184B
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 19:36:52 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Akd1uaka"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 269DB2184B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 94DB621850
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 19:39:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 94DB621850
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56642 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56688 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hiOaB-00029F-5D
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 15:36:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54491)
+	id 1hiOch-0004RE-I5
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 15:39:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37090)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hiOJq-0008Eh-PE
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 15:20:00 -0400
+ (envelope-from <slp@redhat.com>) id 1hiMg4-0002G5-SG
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 13:34:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hiOJo-0005F3-FU
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 15:19:57 -0400
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:44891)
+ (envelope-from <slp@redhat.com>) id 1hiMg0-0007Xa-Gi
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 13:34:46 -0400
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:55886)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hiOJo-00050w-6O
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 15:19:56 -0400
-Received: by mail-oi1-x244.google.com with SMTP id e189so13996649oib.11
- for <qemu-devel@nongnu.org>; Tue, 02 Jul 2019 12:19:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=4TNElfhzeICSO8M8DhomXXEqirMo3CY4yJhxUTN0qV4=;
- b=Akd1uakagSbKtHTyT4zbYY5vrjFN3fZ0yeqY3LxRD1yqOqHWyaZ+xVBZvTssPpiHfF
- UNS0ojpta2E4KSUV5yF47rgCTPRXM91MsJtOcf784uUgtV0McfYMxxlBLC9Z26Y+M2Xt
- fK80++e++GEm3zm6tfigjgX20KMMfVHxRgVcqOsWes3gQxpRzatsjGxEIDqBmB3GVLst
- 1yb66/uvfLL+fMtUodBv/hbEixQdJ1oIw/v879cIu3UXf1YxVXNkrfUnqS8SgDveKGRA
- PETlaVVMU91agoHDiQDaQg9AZuDcUE3w4gWQbCwM+m/HEMYigAXuTDuN8c+bJWXmk8FY
- wPww==
+ (Exim 4.71) (envelope-from <slp@redhat.com>) id 1hiMfz-0007Nw-UL
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 13:34:44 -0400
+Received: by mail-wm1-f66.google.com with SMTP id a15so1649477wmj.5
+ for <qemu-devel@nongnu.org>; Tue, 02 Jul 2019 10:34:35 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=4TNElfhzeICSO8M8DhomXXEqirMo3CY4yJhxUTN0qV4=;
- b=md6INpSSaVpgh3jt8DiEC2XOVQoe7mkQ3TVqhHMx+XFFrY5Sd2+xhdOxcV6FkaecUk
- fHvji3osCR10eW8Lm2Yw9LvNuA3pysYVP9Q+bf5I/zNVVQdJu1pl+oVbu2RquokcSzYL
- XJClkWor65Lrle1uS2d4UCKkS4FiLEQSL3kP2CpdwIXEimw9LZVOqncYYqBOfow8ek85
- ZF3Be/I4lOUq6W6/4v1+ToGfvBfqvZpw9Z1dbUqkOsPv2K5VLakcAYk8Z2BzU+CpByFe
- OOxSjI4C4AvMi1GpyrQqCxxpdSi30+S1M0H6O24l71h1lp5XgedbBfIQMyNfg7/xywLB
- qLQw==
-X-Gm-Message-State: APjAAAWMOdDHihTIpSFThbCAhD7umxyVBVDPRhLT/iE94wMR1q8NJR0D
- c0YpLhNInoSo/4xFBPHLpIdsy1DAcDl+R2WrhL02/g==
-X-Google-Smtp-Source: APXvYqwKAzLfTjEA/vcNNC57QwGNqalNsX5J+F9E1lhwSw0frHgFKRTy9+qefM+lf/DD7a1JHWAwtlzX/bxCTAk9TFI=
-X-Received: by 2002:a05:6808:d4:: with SMTP id
- t20mr4245883oic.170.1562095181872; 
- Tue, 02 Jul 2019 12:19:41 -0700 (PDT)
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version;
+ bh=dnzxj1IkEQS5+Ji3niIKm++yqjlRY68EvWHVomKWYJc=;
+ b=Jypopi23Cql0uou5bNPSZadXNQW0/fmKczJiNehwq28yBCbHU1Qd3XeQGtkKcDIKNf
+ xMq/KUvL+obaI9gRsvjSIvmZoX7NcTLGtLV7ELft2bKd0e8UbiPJCf98/9hrn0bVm683
+ P8PbabZ7ouAhBpEu1XkvREj3WKoooh4Bu2d+qvkzl5keQGRhSu+31IRmHprHF6XhVh6M
+ IeR7gi3ZFP3ExmwS0OXqGYbhZM1Ct7xe9LrWMWWNqXBGDhWEYtwyIX5dys1cCFbGOUhY
+ yZcmi+fNlFnNH+fz4Areo8/n+Bkl/IDYuhqejjkBKTbTDRJkza8UkxU/jWCGNGccNNZd
+ EFhw==
+X-Gm-Message-State: APjAAAWD95W//IVv+YH8NpVH3Gyn+MnnVxQ4WBmcYk1wpyef11yJ7WSN
+ uZX5IhZ0qvFR5JUSeWP3Z16g0rowEVQHDA==
+X-Google-Smtp-Source: APXvYqyrfqVPGpvFPbJFCfOizBpfdOTh+7MTufC9fXR1o5/m61ya+sxAmkuvpy+n+YCgXR5MEG0Zsg==
+X-Received: by 2002:a1c:2d8b:: with SMTP id t133mr4144929wmt.57.1562088874028; 
+ Tue, 02 Jul 2019 10:34:34 -0700 (PDT)
+Received: from dritchie.redhat.com (18.red-83-35-20.dynamicip.rima-tde.net.
+ [83.35.20.18])
+ by smtp.gmail.com with ESMTPSA id s188sm2176721wmf.40.2019.07.02.10.34.32
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Tue, 02 Jul 2019 10:34:33 -0700 (PDT)
+References: <20190702121106.28374-1-slp@redhat.com>
+ <CAFEAcA-k76t9_TJnYSF_kocgba9dYMyf=Q6OBY2VVuhiWsbqrw@mail.gmail.com>
+User-agent: mu4e 1.2.0; emacs 26.2
+From: Sergio Lopez <slp@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+In-reply-to: <CAFEAcA-k76t9_TJnYSF_kocgba9dYMyf=Q6OBY2VVuhiWsbqrw@mail.gmail.com>
+Date: Tue, 02 Jul 2019 19:34:20 +0200
+Message-ID: <87a7dwnxwj.fsf@redhat.com>
 MIME-Version: 1.0
-References: <20190618165311.27066-1-clg@kaod.org>
- <20190618165311.27066-4-clg@kaod.org>
-In-Reply-To: <20190618165311.27066-4-clg@kaod.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 2 Jul 2019 20:19:31 +0100
-Message-ID: <CAFEAcA_wCFE0BL_LjF+04MBPa2XnVgCKk4SP4nPrBjrcjmNVVQ@mail.gmail.com>
-To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::244
-Subject: Re: [Qemu-devel] [PATCH v2 03/21] hw: timer: Add ASPEED RTC device
+Content-Type: multipart/signed; boundary="=-=-=";
+ micalg=pgp-sha256; protocol="application/pgp-signature"
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.85.128.66
+Subject: Re: [Qemu-devel] [PATCH v3 0/4] Introduce the microvm machine type
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,58 +81,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrew Jeffery <andrew@aj.id.au>, qemu-arm <qemu-arm@nongnu.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Joel Stanley <joel@jms.id.au>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, maran.wilson@oracle.com,
+ "Michael S. Tsirkin" <mst@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Stefano Garzarella <sgarzare@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 18 Jun 2019 at 17:53, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
->
-> From: Joel Stanley <joel@jms.id.au>
->
-> The RTC is modeled to provide time and date functionality. It is
-> initialised at zero to match the hardware.
->
-> There is no modelling of the alarm functionality, which includes the IRQ
-> line. As there is no guest code to exercise this function that is
-> acceptable for now.
->
-> Signed-off-by: Joel Stanley <joel@jms.id.au>
-> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+--=-=-=
+Content-Type: text/plain
 
-Hi; Coverity complains about this function (CID 1402782):
 
-> +static void aspeed_rtc_calc_offset(AspeedRtcState *rtc)
-> +{
-> +    struct tm tm;
-> +    uint32_t year, cent;
-> +    uint32_t reg1 =3D rtc->reg[COUNTER1];
-> +    uint32_t reg2 =3D rtc->reg[COUNTER2];
-> +
-> +    tm.tm_mday =3D (reg1 >> 24) & 0x1f;
-> +    tm.tm_hour =3D (reg1 >> 16) & 0x1f;
-> +    tm.tm_min =3D (reg1 >> 8) & 0x3f;
-> +    tm.tm_sec =3D (reg1 >> 0) & 0x3f;
-> +
-> +    cent =3D (reg2 >> 16) & 0x1f;
-> +    year =3D (reg2 >> 8) & 0x7f;
-> +    tm.tm_mon =3D ((reg2 >>  0) & 0x0f) - 1;
-> +    tm.tm_year =3D year + (cent * 100) - 1900;
-> +
-> +    rtc->offset =3D qemu_timedate_diff(&tm);
-> +}
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-because the tm_wday field of 'struct tm tm' is not initialized
-before we call qemu_timedate_diff(). This is a false
-positive because the "read" of this field is just the place
-in qemu_timedate_diff() that does "struct tm tmp =3D *tm;"
-before calling mktime(), and mktime() ignores tm_wday.
-We could make Coverity happy by using a struct initializer
-on 'tm' here; on the other hand we don't do that anywhere else
-which calls qemu_timedate_diff(), so maybe I should just mark
-this a false positive?
+> On Tue, 2 Jul 2019 at 13:14, Sergio Lopez <slp@redhat.com> wrote:
+>>
+>> Microvm is a machine type inspired by both NEMU and Firecracker, and
+>> constructed after the machine model implemented by the latter.
+>>
+>> It's main purpose is providing users a KVM-only machine type with fast
+>> boot times, minimal attack surface (measured as the number of IO ports
+>> and MMIO regions exposed to the Guest) and small footprint (specially
+>> when combined with the ongoing QEMU modularization effort).
+>>
+>> Normally, other than the device support provided by KVM itself,
+>> microvm only supports virtio-mmio devices. Microvm also includes a
+>> legacy mode, which adds an ISA bus with a 16550A serial port, useful
+>> for being able to see the early boot kernel messages.
+>
+> Could we use virtio-pci instead of virtio-mmio? virtio-mmio is
+> a bit deprecated and tends not to support all the features that
+> virtio-pci does. It was introduced mostly as a stopgap while we
+> didn't have pci support in the aarch64 virt machine, and remains
+> for legacy "we don't like to break existing working setups" rather
+> than as a recommended config for new systems.
 
-thanks
--- PMM
+Using virtio-pci implies keeping PCI and ACPI support, defeating a
+significant part of microvm's purpose.
+
+What are the issues with the current state of virtio-mmio? Is there a
+way I can help to improve the situation?
+
+Sergio.
+
+
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEvtX891EthoCRQuii9GknjS8MAjUFAl0blZwACgkQ9GknjS8M
+AjXaYxAAtABbPa3VQU4zYsUMyKT6FGtUrPXe2oPg51ZR+/pasmBp4zwfkmhLxILY
+yleJZMWk6KJc2eKDEwWNY8II/lszUexUQIYVuj3AH9TUw53NQcwiKcyy59m9QHe+
+hCQ+defFEfcK85zDbxHleW/zgkfSR61n+IEdJ5UzdEedZiVOcS/7BWqnXvNv18WV
+4U3VqYMLAiqAoDfVxNKfcBN84DqHzeLWOVeZPeeNKHfPqTGXKtx01pyLrCz6N9Ud
+Ddi2l+g8JhSVyG+n1IzczzpuGTFH6bN6sSrUjxV4bNR2sgAir3f+H1ofqXQSaI9P
+Zmr2lpwCLl8QYTcUPMq7Xg/WB1+hIhMdqAgctC2j0CMl3dC6NKFZkPYu0DVhjFCx
+dGivq0OWUckkxUyQph7IRUTzJkfQ2r6Z9Azb9S0G+dH01qG2R1pUN1GZNz9Jm3UE
+grCJYGt0WbB7rPt59a5W6mFxnCPRcx1BzMmnuFif/9Y2IQ+RY48Jv/XSbkvI8e8z
+PQTMVZgwoyVKc1n4v/uBAN8aDAKG4+ZRUXdOIXgH+IOCj+ruGWYB1UZ+lsBptcm0
+aB0VGLNmkj+/rQNDRlCkSkVNIFaZSA2mhFPAYLqiMKr7whzWGB440MZnnGtzDUOO
+ax0O/KfqPZUXTEDQLOcCQ7kjuu+nWjldfJfBpyIoQZNaQgEFHDw=
+=lAaz
+-----END PGP SIGNATURE-----
+--=-=-=--
 
