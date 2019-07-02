@@ -2,83 +2,80 @@ Return-Path: <SRS0=9yXi=U7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CABE3C06510
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 17:18:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B548FC06510
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 17:18:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 933032082F
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 17:18:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 84F9E2082F
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 17:18:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="p239fiOv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 933032082F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NlPfKOKD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 84F9E2082F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55516 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55518 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hiMQU-0007o5-8w
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 13:18:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46985)
+	id 1hiMQd-0007vF-RJ
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 13:18:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42124)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alistair23@gmail.com>) id 1hiLTy-0003sM-Ap
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 12:18:15 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hiL8k-0004dB-Kv
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 11:56:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1hiLTx-000131-9K
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 12:18:14 -0400
-Received: from mail-lf1-x143.google.com ([2a00:1450:4864:20::143]:33725)
+ (envelope-from <peter.maydell@linaro.org>) id 1hiL8j-0004Qb-OJ
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 11:56:18 -0400
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:45040)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1hiLTx-00011v-13; Tue, 02 Jul 2019 12:18:13 -0400
-Received: by mail-lf1-x143.google.com with SMTP id y17so11850172lfe.0;
- Tue, 02 Jul 2019 09:18:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hiL8j-0004Q7-Gz
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 11:56:17 -0400
+Received: by mail-oi1-x242.google.com with SMTP id e189so13410818oib.11
+ for <qemu-devel@nongnu.org>; Tue, 02 Jul 2019 08:56:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=/MBg1zX8WAYF9zMp578Nj6qoQ2mH4XRdogrHDNzRxH8=;
- b=p239fiOv339O2ABHfp65iiXtc0jFVwosmq+0/RVutIJ1FW8TrlEK0m0GvvyS8tZO95
- km9WxM0FqzHM9cRgIstj4yVndzbBC/IhSspsOyCxKcKL6mdjUslTkWmBAAYYCuj9ekdk
- pj/ADNqxMc1gSs0z0lEZRUnjHpxYuKCnRnaQFniZJqJ1+EoMbhzGiVzUFQVAtB4gi8vm
- C5wsZ9T/9rRRU9vNr6ErXdekoIiuawpw4Bh4wy8MqWpzUJYVL2esuqAz/9YXVkgY4eGa
- TVpqcUZGFzEDhj2RLU6oOs7Gq893pWCVzb+hAsxcOoHjg+jTa/j+BZuQ8XcIf/InCsTj
- mqmA==
+ :cc; bh=EclnfeMCC4Vy2ZH4pD0IeuHhx63jHxsyQhxDc8MAMr4=;
+ b=NlPfKOKDQEbHhmGQz4Dcw4HwRJ2tO24I+dRUmLRNNIdiuHjg1sX6NMZwTuiQn3XNE7
+ n5cLOew12fuRIYxR+xx4qdr+GnHP55GAO7Ez5Vvv1KQ4uEzibWXQY83D5RjAa/kEnMRv
+ R0IwNX8nBOsRi8l+OaBK4V7m1SGLMoqnKnwkF21UfuBxMlDQhdGeW6lcRJFDA3mVV+J3
+ a4IG5AovaKPPRpoOU5vBNRLT/moPFXAhzuYQNFJCQFzqHqd5gdohdHPg8LQu9ok3JLPQ
+ dbcySCKiDNzxN0FB9pTA46DAml6DoWwpWE/PbzU0FZ6zJY4Vfv5clLMvV1KmtXseJFIp
+ nGRA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=/MBg1zX8WAYF9zMp578Nj6qoQ2mH4XRdogrHDNzRxH8=;
- b=ZkE6WUMtncuQ759kgUQPqSPZLM53XZXxgilWQI8ikMST8+/DfnntPzn1t7J4PG6HKR
- W3+Y5g0hH4eR/bDhz/HkaH4GVTbRGwsKzDDxYmnzyb6QMJ56Unr1RX0dcu/YiXx3LX2T
- 4TT1pIW+057psL4nUKp+Wnq/hSxKpw/oP3Q6Z7ThT2ocE+duM9J/ifHoG5DCjvg1/an0
- HOUpto85glCJN+PpXtyNcWoYT8jJ1sO3xwcLk8b6P29s1khhqp0t++WHsvkcMdqZtH3w
- 4fWR5d58OMxtcy50ivM4mINZ8muhlJFjdhKO2ra8KzXlKQVSyhRaY2J2/EiPF4R9eIwA
- bu7A==
-X-Gm-Message-State: APjAAAX0jeqE4oSaETwOV5i+Wl5Tg+2WAyk/x5S1UZHs8mmlr5b6A6Ta
- eB7c1UxGuFFyLqcXRpVjM9p5e0Wu3iae9SVa64w=
-X-Google-Smtp-Source: APXvYqzisf0aezxqwOJlaLCnHvkhxG3cLzmSo2ipcO3X+b71dzXG/JhYiVEF3ynFU7MVdgrw1I2MzZYeRis6TyG91x4=
-X-Received: by 2002:ac2:5324:: with SMTP id f4mr15308676lfh.156.1562084290697; 
- Tue, 02 Jul 2019 09:18:10 -0700 (PDT)
+ :message-id:subject:to:cc;
+ bh=EclnfeMCC4Vy2ZH4pD0IeuHhx63jHxsyQhxDc8MAMr4=;
+ b=QtUDY1mb/JBwob5Jdd2nB/HHWcFT9UWoz5VC277gIy3s8XBeYBNonOATvPgXaFfiEY
+ ONwV/AkzmEnFtiBr+bd9sgplwnJr5t6wkvh8K88RWXKYC8BDQhX5KpnPPDTt8lNqADwU
+ z5Ym4sRXYXsMo6vyWlKmfAJqgktf2MN8nEepUHSZOyO75PgeSRz4E6isAGP8DNFOlu6Z
+ xRmcocCtsplza/WB2yf1Y7t8q3hIXOl7lcOjP1qp3QMVPmLuJX5amnSnBOiLDjzfAQyY
+ 2hDt603n8ye3WNTydv2TgB9sAow0IH2+fpKarUK+/a9YMUBp0pbDWj+JlZiI0eBohapO
+ queg==
+X-Gm-Message-State: APjAAAXiUVbo/enj3EullOwP7VjNV+o1kVXzKNur4sej8p1GB7FEfAdG
+ PnyESmWjSaKekBhZ1wIcjiPmxGWsXOL30dxMmqskNg==
+X-Google-Smtp-Source: APXvYqxYeDskdNOntWzSE7MYn2WT8GNOn1BBe44hn0v/lAnqo2bB33wL8ncLxf0X4M6aCQQN6KUkE0Teso4nnOg10Wo=
+X-Received: by 2002:aca:6185:: with SMTP id v127mr3603699oib.163.1562082976071; 
+ Tue, 02 Jul 2019 08:56:16 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190702001301.4768-1-philmd@redhat.com>
- <20190702001301.4768-9-philmd@redhat.com>
-In-Reply-To: <20190702001301.4768-9-philmd@redhat.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Tue, 2 Jul 2019 09:15:07 -0700
-Message-ID: <CAKmqyKMZhZMy2cG_Ub8oL4hrpTHzk5fCCmsKV7Ypzkp9huqm+A@mail.gmail.com>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+References: <20190702150606.24851-1-mst@redhat.com>
+In-Reply-To: <20190702150606.24851-1-mst@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 2 Jul 2019 16:56:05 +0100
+Message-ID: <CAFEAcA-Qcq1ZmfDO_dkh_H9-aeQVU83ceLKU1NXM3VpW8g5sPQ@mail.gmail.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::143
-Subject: Re: [Qemu-devel] [PATCH v2 8/9] hw/block/pflash_cfi01: Replace
- DPRINTF by qemu_log_mask(GUEST_ERROR)
+X-Received-From: 2607:f8b0:4864:20::242
+Subject: Re: [Qemu-devel] [PULL 00/22] virtio, pc, pci: features, fixes,
+ cleanups
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,70 +87,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Max Filippov <jcmvbkbc@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Qemu-block <qemu-block@nongnu.org>, Aleksandar Rikalo <arikalo@wavecomp.com>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- Markus Armbruster <armbru@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-arm <qemu-arm@nongnu.org>,
- John Snow <jsnow@redhat.com>, Richard Henderson <rth@twiddle.net>,
- Kevin Wolf <kwolf@redhat.com>, Laszlo Ersek <lersek@redhat.com>,
- Max Reitz <mreitz@redhat.com>, Michael Walle <michael@walle.cc>,
- "open list:New World" <qemu-ppc@nongnu.org>,
- Wei Yang <richardw.yang@linux.intel.com>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Jul 1, 2019 at 5:16 PM Philippe Mathieu-Daud=C3=A9 <philmd@redhat.c=
-om> wrote:
+On Tue, 2 Jul 2019 at 16:06, Michael S. Tsirkin <mst@redhat.com> wrote:
 >
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-
-Alistair
-
-> ---
->  hw/block/pflash_cfi01.c | 8 ++++++--
->  1 file changed, 6 insertions(+), 2 deletions(-)
+> The following changes since commit 7fec76a02267598a4e437ddfdaeaeb6de09b92f3:
 >
-> diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
-> index f50d0a9d37..e891112b67 100644
-> --- a/hw/block/pflash_cfi01.c
-> +++ b/hw/block/pflash_cfi01.c
-> @@ -286,7 +286,9 @@ static uint32_t pflash_read(PFlashCFI01 *pfl, hwaddr =
-offset,
->      switch (pfl->cmd) {
->      default:
->          /* This should never happen : reset state & treat it as a read *=
-/
-> -        DPRINTF("%s: unknown command state: %x\n", __func__, pfl->cmd);
-> +        qemu_log_mask(LOG_GUEST_ERROR, "%s: Invalid state, "
-> +                      "wcycle %d cmd 0x02%x\n",
-> +                      __func__, pfl->wcycle, pfl->cmd);
->          pfl->wcycle =3D 0;
->          pfl->cmd =3D 0xff;
->          /* fall through to read code */
-> @@ -631,7 +633,9 @@ static void pflash_write(PFlashCFI01 *pfl, hwaddr off=
-set,
->          break;
->      default:
->          /* Should never happen */
-> -        DPRINTF("%s: invalid write state\n",  __func__);
-> +        qemu_log_mask(LOG_GUEST_ERROR, "%s: Invalid state, "
-> +                      "wcycle %d cmd (0x02%x -> value 0x02%x)\n",
-> +                      __func__, pfl->wcycle, pfl->cmd, value);
->          goto mode_read_array;
->      }
->      return;
-> --
-> 2.20.1
+>   Merge remote-tracking branch 'remotes/maxreitz/tags/pull-block-2019-06-24' into staging (2019-07-01 11:28:28 +0100)
 >
+> are available in the Git repository at:
+>
+>   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
+>
+> for you to fetch changes up to a360cd11de5ae59db55e128fd209290c777eb177:
+>
+>   docs: avoid vhost-user-net specifics in multiqueue section (2019-07-01 10:39:35 -0400)
+>
+> ----------------------------------------------------------------
+> virtio, pc, pci: features, fixes, cleanups
+>
+> virtio-pmem support.
+> libvhost user mq support.
+> A bunch of fixes all over the place.
+>
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+>
+
+> Pankaj Gupta (3):
+>       virtio-pmem: sync linux headers
+
+Hi. This header sync doesn't look like it was a proper
+sync made with the update-headers script against some
+upstream kernel -- at least the commit message doesn't
+say what the sync was against and the fact that it only
+changes the virtio-pmem headers looks suspicious.
+
+Can you respin with a proper header sync against upstream
+mainline, please?
+
+thanks
+-- PMM
 
