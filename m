@@ -2,85 +2,87 @@ Return-Path: <SRS0=9yXi=U7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-13.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91756C06510
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 10:23:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED9ECC06510
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 10:26:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 69F012082F
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 10:23:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69F012082F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id BB8BC2082F
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 10:26:46 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DtuFjMWD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB8BC2082F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51400 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51420 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hiFwx-0002nl-M0
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 06:23:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46543)
+	id 1hiFzq-0003xu-0L
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 06:26:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46859)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <pbonzini@redhat.com>) id 1hiFwB-0002HH-Iv
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 06:23:00 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hiFyM-0003Mp-RS
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 06:25:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1hiFwA-0006Zr-IT
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 06:22:59 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:44012)
+ (envelope-from <alex.bennee@linaro.org>) id 1hiFyI-0008JY-SD
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 06:25:14 -0400
+Received: from mail-wr1-x429.google.com ([2a00:1450:4864:20::429]:40749)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hiFwA-0006Z8-BK
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 06:22:58 -0400
-Received: by mail-wr1-f67.google.com with SMTP id p13so17110625wru.10
- for <qemu-devel@nongnu.org>; Tue, 02 Jul 2019 03:22:58 -0700 (PDT)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1hiFyI-0008GP-He
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 06:25:10 -0400
+Received: by mail-wr1-x429.google.com with SMTP id p11so17154712wre.7
+ for <qemu-devel@nongnu.org>; Tue, 02 Jul 2019 03:25:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=YZd/z68KOnLf211ZAuhnwfM2ktRG6laDbBCdwMHgYkQ=;
+ b=DtuFjMWD+uHtB6CObLbG8maXn3eEg/nkpza2gnuc4tBYA64BJgOd9wl3gk1xy7qKtz
+ fwz2hKVns0b4fQSBo8J/gcBrQBKt1D+a/hQTwbimc25Ccs7OnK6ex+HE470CFNPACciS
+ tF4yKhFHclLjZpUTgCINuXWlXfBV1K4mVdut7cLZOeZ1DHr4mtCs0fe2XaVSwk5UAhBW
+ 1Wg7GQzh9qymywQB77088AR0mfYFEqsr8s+XgLOriFDCLk7XyBWiu95az/F3AHhwJuIV
+ DENlWMBJnnXrG7IRhyBVW2ihrNDvwFT8BcHlsQPfQ0kte7MF7IdaS89Gb9mTQHrQ7V44
+ dsKQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
  :content-transfer-encoding;
- bh=DeL9ECSolqSxFTXdCm212DxoxGMYV1GoHAve77Ot5Ns=;
- b=R5Xmm795DzkRjvMA5mpS6rSCH4ZskMe4U86KrW2Cx+78BKKkC8P3uPmpXLxIy0aClq
- 6TbcrevoCAmCT4ZxOcrddbB8LH5eRhNWnDRk2mmMDNtNJzJVfdtVC+P+lS8YHyv4hm9o
- YHRTugUBHMZhCjLIlKRolKkW0LLkdv1ryeP72VwnHaLh+EC5ffgYIU00EwZ5ukQJLu8M
- wJtJapDPDUv7ypjRvgk4PuhPbc+erEBalxvosLtqzK0/d5Y+/yzw0lMpE4GICdhOE7Lc
- td8jRZXJhXCqT1/6+vTcUJ7TrAss2DujAQVD9CanDEc0qhqpriqFO47EfQNoNtQYrIcs
- u4Bg==
-X-Gm-Message-State: APjAAAWczxUKieYbNJ9zq/dwNEaq4RygOQsKetAa2BvL8DqnFFZopNOt
- 8TJFJF2yqVHK4HHJWdQTpwY+4A==
-X-Google-Smtp-Source: APXvYqxckCk9IEPdn5L7RDe/dvPvBhWQ/OOsxEUWOWF/0HPnrKlYWxhZDHy+DhtYuA7UkZBuTzJbwg==
-X-Received: by 2002:adf:cc92:: with SMTP id p18mr19063641wrj.260.1562062976953; 
- Tue, 02 Jul 2019 03:22:56 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:68f6:70ea:5bb4:f73?
- ([2001:b07:6468:f312:68f6:70ea:5bb4:f73])
- by smtp.gmail.com with ESMTPSA id q20sm18978437wra.36.2019.07.02.03.22.55
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Tue, 02 Jul 2019 03:22:56 -0700 (PDT)
-To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
- Alistair Francis <alistair23@gmail.com>
-References: <97104495f5c945d25315aff1bd618e1a7bacf34c.1561589072.git.alistair.francis@wdc.com>
- <1bd3ffcd-3f91-ecb9-2315-da7125f1dcdd@redhat.com>
- <CAKmqyKPeo4XXVy3onoM4W14N5Nj7CFWX=JpDT-JQQRUPw5CQ3Q@mail.gmail.com>
- <4428dc80-9ace-3bb0-a497-e3d416199bfd@redhat.com>
- <CAKmqyKMRSJTMxZ5c-yyuownYF8vJLYrzr92cE4rkiTdP7tmUzg@mail.gmail.com>
- <CY1PR04MB22682B84C1ABA7FB10752465EDF90@CY1PR04MB2268.namprd04.prod.outlook.com>
- <79c9e21f-06b1-6255-97af-95c08b354c8a@redhat.com>
- <CY1PR04MB22683409CB203BF5042697FBEDF80@CY1PR04MB2268.namprd04.prod.outlook.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <5a741004-fc88-f31a-2abf-70f4a9b0d5a9@redhat.com>
-Date: Tue, 2 Jul 2019 12:22:55 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+ bh=YZd/z68KOnLf211ZAuhnwfM2ktRG6laDbBCdwMHgYkQ=;
+ b=XqFtnti93uxZUCqriBfr2J1XBP5tbHoldBgbogijTpY9ncb85DipnzhnRReJb4Gzwk
+ PNdCW1ULNpRYe/b+hDjgDONJ1MsJoTtJ+xlsHdtnlZOnZyTr87mR/qq9YdVuNOcrKwgg
+ A0gebXromAtZXb6FbruBh+wZT3n0R5xUM2gESp2bT6HJ+W+vnh5bphVGHEX1GUvuxkQ9
+ 2mdrGbbx4OnRDVmkPQKG1QM5Szc1grZp7sM+socJFRzownQu5O3ZGAmyDMJzPrE1S3I7
+ 3GNO43gqC3bCXXGTehhK9Zqw9FBFDlq/1z4djzDyKt0zWIDH35Sl5gNJbDJXrcrMM2L9
+ SYCA==
+X-Gm-Message-State: APjAAAXRuLpc6lbaCVYcHpaoDqzWtA2niyd3D3uu3rWsEtAUK+DNMnrj
+ ab6ycASbt+P9ga2Fj4yGHJZ8KQ==
+X-Google-Smtp-Source: APXvYqwMAaMy5m7Cp394V/TEhUofww240R3QZ5VT2zDYx4BY6neuWwTwx8x50xjY+MWc1nQN2arL6g==
+X-Received: by 2002:adf:e705:: with SMTP id c5mr23968770wrm.270.1562063106722; 
+ Tue, 02 Jul 2019 03:25:06 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+ by smtp.gmail.com with ESMTPSA id x17sm9173378wrq.64.2019.07.02.03.25.06
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Tue, 02 Jul 2019 03:25:06 -0700 (PDT)
+Received: from zen.linaroharston. (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id D194B1FF87;
+ Tue,  2 Jul 2019 11:25:05 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: peter.maydell@linaro.org
+Date: Tue,  2 Jul 2019 11:25:05 +0100
+Message-Id: <20190702102505.32044-1-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <CY1PR04MB22683409CB203BF5042697FBEDF80@CY1PR04MB2268.namprd04.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.221.67
-Subject: Re: [Qemu-devel] [PATCH v1 1/1] hw/scsi: Report errors and sense to
- guests through scsi-block
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::429
+Subject: [Qemu-devel] [PULL v2 00/20] testing/next for 4.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,54 +94,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "fam@euphon.net" <fam@euphon.net>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 02/07/19 08:44, Shinichiro Kawasaki wrote:
-> On 7/1/19 8:56 PM, Paolo Bonzini wrote:
->> On 01/07/19 12:14, Shinichiro Kawasaki wrote:
->>> I observe four of them listed below in sense data,
->>> when I ran basic operations to the zoned storage from the guest via scsi-block.
->>>
->>>       21h 04h: UNALIGNED WRITE COMMAND
->>>       21h 05h: WRITE BOUNDARY VIOLATION
->>>       21h 06h: ATTEMPT TO READ INVALID DATA
->>>       55h 0Eh: INSUFFICIENT ZONE RESOURCES
->>>
->>> These ASCs can be reported for write or read commands due to unexpected zone
->>> status or write pointer status. Reporting these ASCs to the guest, the user
->>> applications can handle them to manage zone/write pointer status, or help the
->>> user application developers to understand the failure reason and fix bugs.
->>>
->>> I took a look in scsi_sense_to_errno() and learned that ASCs are grouped in
->>> errnos. To report the ASCs above to the guest, is it good to add them in EINVAL
->>> group defined in scsi_sense_to_errno()? The ASCs are reported with sense key
->>> ILLEGAL_REQUEST or DATA_PROTECT, then I think it fits in the function.
->>
->> The grouping by errno is historical and pretty much broken.  It should
->> be possible to change it to return just a bool.
-> 
-> The errno grouping of scsi_sense_to_errno() is used not only by scsi-disk but 
-> also by block/iscsi for error reporting. Can we avoid errno grouping for iscsi also?
+The following changes since commit 7d0e02405fc02a181319b1ab8681d2f72246b7c6:
 
-No, but we can do something like
+  Merge remote-tracking branch 'remotes/vivier2/tags/trivial-patches-pull-request' into staging (2019-07-01 17:40:32 +0100)
 
-    if (scsi_sense_buf_is_guest_recoverable(r->req.sense,
-sizeof(r->req.sense))) {
-        /* These errors are handled by guest. */
-        sdc->update_sense(&r->req);
-        scsi_req_complete(&r->req, *r->status);
-        return true;
-    }
-    error = scsi_sense_buf_to_errno(r->req.sense, sizeof(r->req.sense));
+are available in the Git repository at:
 
-This way there's generally no need to shoehorn ASC codes into errno.  I
-still have to test my changes, but I hope to send something within a
-couple of days.
+  https://github.com/stsquad/qemu.git tags/pull-testing-next-020719-2
 
-Paolo
+for you to fetch changes up to 83fb8fd71de2f80afd4ec83761357d5f0dacd9c9:
+
+  migration: move port_attr inside CONFIG_LINUX (2019-07-02 07:52:35 +0100)
+
+----------------------------------------------------------------
+Various testing fixes:
+
+   - tests/vm updates and clean-ups
+   - tests/vm serial autobuild on host
+   - ensure MacOS builds do "brew update"
+   - ensure we test --static user builds
+   - fix hyperv compile failure
+   - fix missing var warning for OpenBSD (v2)
+
+This brings my testing back to green on all CI services. Please note
+the BSD installs will throw out some warnings during the setup phase.
+They shouldn't re-occur once the images are built.
+
+----------------------------------------------------------------
+Alex Bennée (4):
+      .travis.yml: default the --disable-system build to --static
+      .travis.yml: force a brew update for MacOS builds
+      target/i386: fix feature check in hyperv-stub.c
+      migration: move port_attr inside CONFIG_LINUX
+
+Cleber Rosa (4):
+      tests/vm: avoid extra compressed image copy
+      tests/vm: avoid image presence check and removal
+      tests/vm: pin ubuntu.i386 image
+      tests/vm: add source repos on ubuntu.i386
+
+Gerd Hoffmann (11):
+      tests/vm: send proxy environment variables over ssh
+      tests/vm: use ssh with pty unconditionally
+      tests/vm: run test builds on snapshot
+      tests/vm: proper guest shutdown
+      tests/vm: add vm-boot-{ssh,serial}-<guest> targets
+      tests/vm: serial console support helpers
+      tests/vm: openbsd autoinstall, using serial console
+      tests/vm: freebsd autoinstall, using serial console
+      tests/vm: netbsd autoinstall, using serial console
+      tests/vm: fedora autoinstall, using serial console
+      tests/vm: ubuntu.i386: apt proxy setup
+
+Philippe Mathieu-Daudé (1):
+      Makefile: Rename the 'vm-test' target as 'vm-help'
+
+ .travis.yml               |   3 +-
+ Makefile                  |   4 +-
+ docs/devel/testing.rst    |   4 +-
+ migration/rdma.c          |   3 +-
+ target/i386/hyperv-stub.c |   2 +-
+ tests/vm/Makefile.include |  28 ++++++-
+ tests/vm/basevm.py        | 135 ++++++++++++++++++++++++++++-----
+ tests/vm/centos           |   6 +-
+ tests/vm/fedora           | 189 ++++++++++++++++++++++++++++++++++++++++++++++
+ tests/vm/freebsd          | 180 ++++++++++++++++++++++++++++++++++++++++---
+ tests/vm/netbsd           | 187 ++++++++++++++++++++++++++++++++++++++++++---
+ tests/vm/openbsd          | 159 ++++++++++++++++++++++++++++++++++----
+ tests/vm/ubuntu.i386      |  11 ++-
+ 13 files changed, 842 insertions(+), 69 deletions(-)
+ create mode 100755 tests/vm/fedora
+
+-- 
+2.20.1
+
 
