@@ -6,63 +6,62 @@ X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66069C06510
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 12:06:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F96FC06510
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 12:09:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 38E8D2146F
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 12:06:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38E8D2146F
+	by mail.kernel.org (Postfix) with ESMTPS id 6FB8B2146F
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 12:09:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6FB8B2146F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52124 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52214 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hiHYg-0005Nm-Gg
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 08:06:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38239)
+	id 1hiHb0-0007eC-Lc
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 08:09:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36475)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <eric.auger@redhat.com>) id 1hiHTQ-0008Tm-D4
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 08:01:25 -0400
+ (envelope-from <lersek@redhat.com>) id 1hiHLy-0002c8-Og
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 07:53:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1hiHTN-0005rP-Nk
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 08:01:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37950)
+ (envelope-from <lersek@redhat.com>) id 1hiHLv-0001AN-7O
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 07:53:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42604)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1hiHT9-0005Mb-PM; Tue, 02 Jul 2019 08:01:08 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ (Exim 4.71) (envelope-from <lersek@redhat.com>)
+ id 1hiHLc-0000HJ-Pm; Tue, 02 Jul 2019 07:53:22 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A0A9B81106;
- Tue,  2 Jul 2019 12:00:52 +0000 (UTC)
-Received: from [10.36.116.95] (ovpn-116-95.ams2.redhat.com [10.36.116.95])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4CAC118A49;
- Tue,  2 Jul 2019 12:00:41 +0000 (UTC)
-To: Peter Maydell <peter.maydell@linaro.org>,
- Igor Mammedov <imammedo@redhat.com>
-References: <20190625121421.22280-1-shameerali.kolothum.thodi@huawei.com>
- <20190702130703.0e74cbe6@redhat.com>
- <CAFEAcA8PDNTQXD3cD3XG9wkc_QOLXUcw62-8AUjSC0g7qjti7g@mail.gmail.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <0bcc011c-17ff-8bfd-1f0e-65c303272664@redhat.com>
-Date: Tue, 2 Jul 2019 14:00:28 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ by mx1.redhat.com (Postfix) with ESMTPS id A9B9D307D854;
+ Tue,  2 Jul 2019 11:52:39 +0000 (UTC)
+Received: from lacos-laptop-7.usersys.redhat.com (ovpn-117-172.ams2.redhat.com
+ [10.36.117.172])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8FC7E60C67;
+ Tue,  2 Jul 2019 11:52:15 +0000 (UTC)
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20190702001301.4768-1-philmd@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <0f46b807-1fcc-d5d6-9d62-601cc8dfa692@redhat.com>
+Date: Tue, 2 Jul 2019 13:52:14 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.9.1
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8PDNTQXD3cD3XG9wkc_QOLXUcw62-8AUjSC0g7qjti7g@mail.gmail.com>
+In-Reply-To: <20190702001301.4768-1-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.28]); Tue, 02 Jul 2019 12:01:02 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.48]); Tue, 02 Jul 2019 11:53:00 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v6 0/8] ARM virt: ACPI memory hotplug
- support
+Subject: Re: [Qemu-devel] [PATCH v2 0/9] hw/block/pflash_cfi01: Add
+ DeviceReset() handler
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,86 +73,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Samuel Ortiz <sameo@linux.intel.com>,
- Ard Biesheuvel <ard.biesheuvel@linaro.org>, Linuxarm <linuxarm@huawei.com>,
- Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
- Xu Wei <xuwei5@hisilicon.com>, sebastien.boeuf@intel.com,
- Laszlo Ersek <lersek@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Max Filippov <jcmvbkbc@gmail.com>,
+ Gerd Hoffmann <kraxel@redhat.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, qemu-block@nongnu.org,
+ Aleksandar Rikalo <arikalo@wavecomp.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Markus Armbruster <armbru@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-arm@nongnu.org,
+ Alistair Francis <alistair23@gmail.com>, John Snow <jsnow@redhat.com>,
+ Richard Henderson <rth@twiddle.net>, Kevin Wolf <kwolf@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, Michael Walle <michael@walle.cc>,
+ qemu-ppc@nongnu.org, Wei Yang <richardw.yang@linux.intel.com>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Peter,
+Hi Phil,
 
-On 7/2/19 1:46 PM, Peter Maydell wrote:
-> On Tue, 2 Jul 2019 at 12:07, Igor Mammedov <imammedo@redhat.com> wrote:
->>
->> On Tue, 25 Jun 2019 13:14:13 +0100
->> Shameer Kolothum <shameerali.kolothum.thodi@huawei.com> wrote:
->>
->>> This series is an attempt to provide device memory hotplug support
->>> on ARM virt platform. This is based on Eric's recent works here[1]
->>> and carries some of the pc-dimm related patches dropped from his
->>> series.
->>>
->>> The kernel support for arm64 memory hot add was added recently by
->>> Robin and hence the guest kernel should be => 5.0-rc1.
->>>
->>> NVDIM support is not included currently as we still have an unresolved
->>> issue while hot adding NVDIMM[2]. However NVDIMM cold plug patches
->>> can be included, but not done for now, for keeping it simple.
->>>
->>> This makes use of GED device to sent hotplug ACPI events to the
->>> Guest. GED code is based on Nemu. Thanks to the efforts of Samuel and
->>> Sebastien to add the hardware-reduced support to Nemu using GED
->>> device[3]. (Please shout if I got the author/signed-off wrong for
->>> those patches or missed any names).
->>>
->>> This is sanity tested on a HiSilicon ARM64 platform and appreciate
->>> any further testing.
->>
->> There are several things I'd fix/amend but it's nothing that couldn't
->> be done on top as bugfixes (I'll comment later on specific issues).
->>
->> However as a whole from ACPI and memory hotplug POV series looks more
->> or less ready for merging.
->>
->> I've asked Eric to test migration (I'm quite not sure about that part),
->> (CCed David)so on condition it works:
->>
->>   Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-> 
-> If we want to get this into 4.1 I'll need somebody to do a respin
-> with all the relevant fixes pretty soon (ie within a day or two,
-> and that is pushing it because really it's missed the freeze
-> deadline already). It might be easier just to let it go into 4.2
-> instead...
+On 07/02/19 02:12, Philippe Mathieu-Daud=C3=A9 wrote:
+> The pflash device lacks a reset() function.
+> When a machine is resetted, the flash might be in an
+> inconsistent state, leading to unexpected behavior:
+> https://bugzilla.redhat.com/show_bug.cgi?id=3D1678713
+> Resolve this issue by adding a DeviceReset() handler.
+>=20
+> Fix also two minor issues, and clean a bit the codebase.
+>=20
+> Since v1: https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg0096=
+2.html
+> - addressed Laszlo review comments
+>=20
+> Maintainers spam list from:
+> ./scripts/get_maintainer.pl -f $(git grep -El '(pflash_cfi01_register|T=
+YPE_PFLASH_CFI01)')
+>=20
+> Regards,
+>=20
+> Phil.
+>=20
+> Philippe Mathieu-Daud=C3=A9 (9):
+>   hw/block/pflash_cfi01: Removed an unused timer
+>   hw/block/pflash_cfi01: Use the correct READ_ARRAY value
+>   hw/block/pflash_cfi01: Extract pflash_mode_read_array()
+>   hw/block/pflash_cfi01: Start state machine as READY to accept command=
+s
+>   hw/block/pflash_cfi01: Add the DeviceReset() handler
+>   hw/block/pflash_cfi01: Simplify CFI_QUERY processing
+>   hw/block/pflash_cfi01: Improve command comments
+>   hw/block/pflash_cfi01: Replace DPRINTF by qemu_log_mask(GUEST_ERROR)
+>   hw/block/pflash_cfi01: Hold the PRI table offset in a variable
+>=20
+>  hw/block/pflash_cfi01.c | 140 +++++++++++++++++++++-------------------
+>  hw/block/trace-events   |   1 +
+>  2 files changed, 74 insertions(+), 67 deletions(-)
+>=20
 
-OK so after those late attempts to get it in, I agree with you. If it
-missed the deadline already then let's stick to the process and try to
-get this just after 4.1.
+I'll do some regression-tests with this, using OVMF and ArmVirtQemu.
 
-I have just checked migration and it fails between a qemu 4.1 and qemu
-4.0 with
+I don't think I can usefully review the patches without getting lost in
+the related spec(s), and I don't have capacity for that.
 
-"qemu-system-aarch64: Unknown savevm section or instance 'acpi-ged' 0.
-Make sure that your current VM setup matches your saved VM setup,
-including any hotplugged devices
-qemu-system-aarch64: load of migration failed: Invalid argument"
+Until I have regression test results, one question: are the changes to
+the device model transparent with regard to migration? (You are not
+introducing any compat properties.)
 
-so we would need to have a no_acpi_dev class field to avoid using the
-GED device < 4.1 I think.
-
-+ troubles with the DSDT ref files / bios-tables-test.c to be fixed.
-
-Thanks
-
-Eric
-> 
-> thanks
-> -- PMM
-> 
+Thanks!
+Laszlo
 
