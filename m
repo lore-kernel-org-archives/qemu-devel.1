@@ -2,81 +2,79 @@ Return-Path: <SRS0=9yXi=U7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A08E1C5B57D
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 23:09:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89966C5B57D
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 23:19:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 64EA321BD5
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 23:09:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4F6AB21BE2
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 23:19:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zz9HGeRS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 64EA321BD5
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aLQogZ5h"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F6AB21BE2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58190 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58234 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hiRu7-0004xw-Ks
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 19:09:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52292)
+	id 1hiS3F-000769-TH
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 19:19:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60386)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hiRq4-0002kk-CV
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 19:05:29 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hiRzT-0006Z3-AO
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 19:15:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hiRq2-00087q-R7
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 19:05:27 -0400
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:40706)
+ (envelope-from <peter.maydell@linaro.org>) id 1hiRzR-0003xr-Q8
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 19:15:11 -0400
+Received: from mail-ot1-x330.google.com ([2607:f8b0:4864:20::330]:33767)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hiRq2-0007lu-9m
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 19:05:26 -0400
-Received: by mail-oi1-x244.google.com with SMTP id w196so409307oie.7
- for <qemu-devel@nongnu.org>; Tue, 02 Jul 2019 16:05:12 -0700 (PDT)
+ id 1hiRzR-0003wP-G1
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 19:15:09 -0400
+Received: by mail-ot1-x330.google.com with SMTP id q20so342100otl.0
+ for <qemu-devel@nongnu.org>; Tue, 02 Jul 2019 16:15:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=JShmE6ZCUMD+tnZIgyoQE7WPpcBn6aFht58oW5tN1UA=;
- b=zz9HGeRSvM7Q3+DuDpPilIl7Er4HO6lHnBlRFo55aCThCUWnH8Wzw8+lQpbrs/2Xmw
- vTxwJw/DQV1qOf8WqoOZWg3wia0iPwiM3oAIz7puRL9Oleetkw06PGoFx78eFvw71DYX
- 8o3Dth/xqe1/HYx3bW2qzvTYI3/XSUac8rACAWLTKgxCbWP6WjfbjA2c1phav/jHXmeQ
- gblopQgym4wf+mjVa1zoPkKiCsDu26CUT070HNNbXYBgwxOUGRgdMo71sMn4mixMbD/2
- Q226Szvz8/IIMKUBvsOqhHTrtJ/yZ1K1tKNirUfESXvRBcibM4XvcWw1wjVqnXo476k2
- zbkA==
+ :cc; bh=HfE7ifOD43i2Us6uxSjIoXRy6I///5MCkk7ImzWZXd4=;
+ b=aLQogZ5ht7cYuMPZfYOlsdWS7nFZPuzxvSEuTWi5pn2Deg7vPE9EefpdGK4QxymSh8
+ +ETsWUM9W1jqG36AOa1IcaZmRKKuA6/NgI4ei2ajurV/eaU2yofh0PYm51tvM5FDN1SG
+ X5o9zgyoG1NYK0sHlqY5sG/9zr2Ip8EurzjFPNbuSqN1cjysz9WyQ+TjzLvf+Vxqf8I2
+ rPNiPJC08PNvv7lEGo2q7pEQIDhSnG0LXbIio7Pl726wQW4OtS7c3Tf28ACtxDIwd/j1
+ 6OAQer57Ogq4dEU0JlujJD92mN+fr7T047v6mtlm7NMipwW/FkhOeDJaYICDmXVsydPa
+ 4FWA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=JShmE6ZCUMD+tnZIgyoQE7WPpcBn6aFht58oW5tN1UA=;
- b=obntDHJVBn1CGwXW/GkdP+e3ojo/O7Ddv5bt7bNeEVL1bApDyDOvSffSnA7JO6OIKo
- S1WwC/RFr1PrKx+rbAK+C/R+GOPPWl7hCUR1d/m5bX9wEXxsd1QsXa6xrx9o/RWo6JB0
- zf7raylIDvpJRTmcAGfQ/wxXZNzKBbO+Eyml5tb1YDS91+pcEAE5EE9smSPrSHYlu77q
- 1r5NKaNimcF8gf8GBayrV8tKKSItup0E2A7+oe/O/wDEAw6TgtdZdHcusfzXAwIDmFFo
- i/u9inAJ8ttedJ8J/RrvIdv9u9KJZg57cWKRitSl4mikBj04Y49FEb7u5kgLY7s5nPEI
- R+mg==
-X-Gm-Message-State: APjAAAXhuB7JKdk+TzxWQJc2wGF3Wf17fTs0V6X+xhgMm5mrHDg1iapq
- EbORD47e569izvnkAB5Klg3sgYw4c/73nDIX9NdZPQ==
-X-Google-Smtp-Source: APXvYqyun1LqXt6dBIPHCrtLzYLxmavJoKpLuUCa/wxsg+tN/Ux05v18TL04qXpBRE4X/d5UzQ8b7wPSqmeJrT/dWWQ=
-X-Received: by 2002:aca:ac48:: with SMTP id v69mr4557315oie.48.1562108711951; 
- Tue, 02 Jul 2019 16:05:11 -0700 (PDT)
+ bh=HfE7ifOD43i2Us6uxSjIoXRy6I///5MCkk7ImzWZXd4=;
+ b=sNBPxW3TDGIJVIEjamoqYCRMUIw1WpC/fW3xgfaW9mtKdiDbtQbsgCmUM1wBvqoEuc
+ UfM9wQ63vV9q+iAm4zHueK9JSxkCUVRGCFxdzbwV5nhunYT1KySovgSbjsK4OqubbACX
+ eMamORY93mpT/7D3ExAQ8JnLeEUTmUrHSrCnWSWxQndBzEZe5LJSQsyCitE97VF0BZOJ
+ EQnUiM7UVPFZGLnxQGZbpX2BdSOOX1eBfUO45yROq+VU7JRtBJDZRDnq3v72HRdF71k/
+ a+Jrbpmerd9cjyBpa7gzKbk1uoeYpwfa4rjI4Hcb8ICW0b13WdJ/WSq8ZwuIWP3eca/1
+ LpMA==
+X-Gm-Message-State: APjAAAVwnBdPPNf4cTBU2HSEStkQRBCZT95vtqvbRQjMkHQAvi6LOA9v
+ DDGpwWk3wlqDlAdLbl5B+agHFdINI3dg0NREmSIZVA==
+X-Google-Smtp-Source: APXvYqw5DRVBBPojQtDhJ6xzHLlh6rnch8lD3+9yuPfeLUWNxIYFURTIOXkwGy0IPpXZs1jdRTfZAKHR/pmq9AKKyQA=
+X-Received: by 2002:a9d:5f1a:: with SMTP id f26mr26860537oti.91.1562109308441; 
+ Tue, 02 Jul 2019 16:15:08 -0700 (PDT)
 MIME-Version: 1.0
-References: <1562079681-19204-1-git-send-email-pbonzini@redhat.com>
- <156210201797.16064.1193142357173483033@c4a48874b076>
- <20190702213824.GS5198@habkost.net>
-In-Reply-To: <20190702213824.GS5198@habkost.net>
+References: <20190702113414.6896-1-armbru@redhat.com>
+In-Reply-To: <20190702113414.6896-1-armbru@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 3 Jul 2019 00:05:00 +0100
-Message-ID: <CAFEAcA-SgwO28MqYxcW8YRLGbv=wRUgRqZ70+q5SyL0bFrpvJw@mail.gmail.com>
-To: Eduardo Habkost <ehabkost@redhat.com>
+Date: Wed, 3 Jul 2019 00:14:57 +0100
+Message-ID: <CAFEAcA9oPS2FbBgm+SQYqMbwzg+Dwmm0W9U8Vc-2LX7TmzAADg@mail.gmail.com>
+To: Markus Armbruster <armbru@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::244
-Subject: Re: [Qemu-devel] No symbols in LeakSanitizer output (was Re: [RFC
- PATCH 0/7] target/i386: support VMX features in "-cpu")
+X-Received-From: 2607:f8b0:4864:20::330
+Subject: Re: [Qemu-devel] [PULL 0/4] Build system patches for 2019-07-02
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,23 +86,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: patchew-devel@redhat.com, Paolo Bonzini <pbonzini@redhat.com>,
- liran.alon@oracle.com, QEMU Developers <qemu-devel@nongnu.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 2 Jul 2019 at 22:40, Eduardo Habkost <ehabkost@redhat.com> wrote:
+On Tue, 2 Jul 2019 at 12:38, Markus Armbruster <armbru@redhat.com> wrote:
 >
-> Can the asan build test in Patchew be updated to include
-> symbolize=1?
+> The following changes since commit ab200dafc0e8a9925bb0ad0be478621f5f117c95:
 >
-> For reference, below is the full stack trace of the leak.  It
-> looks like it existed for a long time.
+>   Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request' into staging (2019-07-02 10:17:54 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://repo.or.cz/qemu/armbru.git tags/pull-build-2019-07-02
+>
+> for you to fetch changes up to b7f9b1b7fc9a00ab6e5f46555e87166533292576:
+>
+>   Makefile: Reuse all's recursion machinery for clean and install (2019-07-02 12:48:40 +0200)
+>
+> ----------------------------------------------------------------
+> Build system patches for 2019-07-02
 
-Yeah. What's new is that now we build that device for
-the x86-64 config that patchew runs the asan tests against.
-(I sent a patch with a suggested fix earlier today.)
+This seems to break the incremental builds (most hosts):
+
+make: Entering directory '/home/petmay01/qemu-for-merges/build/w64'
+make: *** No rule to make target 'subdir-slirp', needed by
+'config-host.h'.  Stop.
+make: *** Waiting for unfinished jobs....
+config-host.mak is out-of-date, running configure
+Install prefix    c:/Program Files/QEMU
+[rest of configure output snipped; no other output]
 
 thanks
 -- PMM
