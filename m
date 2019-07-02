@@ -7,57 +7,56 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71BD0C5B57D
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 06:50:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C2CEC5B57D
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 06:53:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3ED09206A2
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 06:50:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3A5592064A
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 06:53:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="MkxvYtQR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3ED09206A2
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="OJfzxeV+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A5592064A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49632 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49646 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hiCcw-0004Yl-HA
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 02:50:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58815)
+	id 1hiCfV-0006bV-Gl
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 02:53:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58561)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgibson@ozlabs.org>) id 1hiBzK-0005Nb-EL
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 02:10:00 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1hiByn-00056r-QO
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 02:09:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1hiBzI-0003GI-KU
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 02:09:58 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:43821 helo=ozlabs.org)
+ (envelope-from <dgibson@ozlabs.org>) id 1hiBym-0002yn-4t
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 02:09:25 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:40081 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1hiBzH-0002wU-Cu; Tue, 02 Jul 2019 02:09:55 -0400
+ id 1hiByl-0002ul-G4; Tue, 02 Jul 2019 02:09:24 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 45dDMk7296z9sPl; Tue,  2 Jul 2019 16:09:04 +1000 (AEST)
+ id 45dDMk3nxbz9sPq; Tue,  2 Jul 2019 16:09:06 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1562047746;
- bh=2eYaeiU17YguOqoaVrcEi5nyyJwpXaox9TnRyZ/YpBE=;
+ bh=u8LjWJnfOy8kTg3+UAQuQQu7l/+b+yYblJTltUYGq94=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=MkxvYtQR8iMNqtO+e0bgXDI2FvqQ/J/Ceb1vOpOvaVcniHr+6YTRePXFYZCriioio
- V1rLZrFUpCZcRtqlw1hXA250fig7Xhw41BFuL/xyufYJi3p+ve0qaQ5SZqJ4f2/BjD
- UpcetP/2Kb3GbjyuQ/Md+GGJfRQmX0zGS9lycUd0=
+ b=OJfzxeV+mG9fB5YR3L1sbO/PcEExeMQalIk7e2j0yNLRTlDxvOiFX/wUTdQulfLZW
+ 4XBYOjgcdAQtOFntGqb1J7A493g7c3sTp1df5aSLIZItnnadk0C0V0QuQ42atOiJNG
+ z4uqiPeK0uymbON1U/Koyd1yZElV46BIvQqmy2Kg=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Date: Tue,  2 Jul 2019 16:08:29 +1000
-Message-Id: <20190702060857.3926-22-david@gibson.dropbear.id.au>
+Date: Tue,  2 Jul 2019 16:08:37 +1000
+Message-Id: <20190702060857.3926-30-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190702060857.3926-1-david@gibson.dropbear.id.au>
 References: <20190702060857.3926-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 203.11.71.1
-Subject: [Qemu-devel] [PULL 21/49] xics/spapr: Drop unused function
- declaration
+Subject: [Qemu-devel] [PULL 29/49] target/ppc: remove getVSR()/putVSR() from
+ int_helper.c
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,40 +68,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, aik@ozlabs.ru, qemu-devel@nongnu.org, groug@kaod.org,
- qemu-ppc@nongnu.org, clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>,
- rth@twiddle.net
+Cc: lvivier@redhat.com, aik@ozlabs.ru,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
+ groug@kaod.org, qemu-ppc@nongnu.org, clg@kaod.org,
+ David Gibson <david@gibson.dropbear.id.au>, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Greg Kurz <groug@kaod.org>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-Commit 9fb6eb7ca50c added the declaration of xics_spapr_connect(), which
-has no implementation and no users.
+Since commit 8a14d31b00 "target/ppc: switch fpr/vsrl registers so all VSX
+registers are in host endian order" functions getVSR() and putVSR() which=
+ used
+to convert the VSR registers into host endian order are no longer require=
+d.
 
-This is a leftover from a previous iteration of this patch. Drop it.
+Now that there are now no more users of getVSR()/putVSR() these functions=
+ can
+be completely removed.
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
-Message-Id: <156077919546.433243.8748677531446035746.stgit@bahia.lan>
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20190616123751.781-4-mark.cave-ayland@ilande.co.uk>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- include/hw/ppc/xics_spapr.h | 1 -
- 1 file changed, 1 deletion(-)
+ target/ppc/int_helper.c | 22 ++++++++++------------
+ target/ppc/internal.h   | 12 ------------
+ 2 files changed, 10 insertions(+), 24 deletions(-)
 
-diff --git a/include/hw/ppc/xics_spapr.h b/include/hw/ppc/xics_spapr.h
-index d968f2499c..3304481262 100644
---- a/include/hw/ppc/xics_spapr.h
-+++ b/include/hw/ppc/xics_spapr.h
-@@ -37,6 +37,5 @@ int xics_kvm_init(SpaprMachineState *spapr, Error **err=
-p);
- void xics_kvm_disconnect(SpaprMachineState *spapr, Error **errp);
- bool xics_kvm_has_broken_disconnect(SpaprMachineState *spapr);
- void xics_spapr_init(SpaprMachineState *spapr);
--void xics_spapr_connect(SpaprMachineState *spapr);
+diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
+index 8ce89f2ad9..3b8939edcc 100644
+--- a/target/ppc/int_helper.c
++++ b/target/ppc/int_helper.c
+@@ -1902,38 +1902,36 @@ VEXTRACT(d, u64)
+ void helper_xxextractuw(CPUPPCState *env, target_ulong xtn,
+                         target_ulong xbn, uint32_t index)
+ {
+-    ppc_vsr_t xt, xb;
++    ppc_vsr_t *xt =3D &env->vsr[xtn];
++    ppc_vsr_t *xb =3D &env->vsr[xbn];
++    ppc_vsr_t t =3D { };
+     size_t es =3D sizeof(uint32_t);
+     uint32_t ext_index;
+     int i;
 =20
- #endif /* XICS_SPAPR_H */
+-    getVSR(xbn, &xb, env);
+-    memset(&xt, 0, sizeof(xt));
+-
+     ext_index =3D index;
+     for (i =3D 0; i < es; i++, ext_index++) {
+-        xt.VsrB(8 - es + i) =3D xb.VsrB(ext_index % 16);
++        t.VsrB(8 - es + i) =3D xb->VsrB(ext_index % 16);
+     }
+=20
+-    putVSR(xtn, &xt, env);
++    *xt =3D t;
+ }
+=20
+ void helper_xxinsertw(CPUPPCState *env, target_ulong xtn,
+                       target_ulong xbn, uint32_t index)
+ {
+-    ppc_vsr_t xt, xb;
++    ppc_vsr_t *xt =3D &env->vsr[xtn];
++    ppc_vsr_t *xb =3D &env->vsr[xbn];
++    ppc_vsr_t t =3D *xt;
+     size_t es =3D sizeof(uint32_t);
+     int ins_index, i =3D 0;
+=20
+-    getVSR(xbn, &xb, env);
+-    getVSR(xtn, &xt, env);
+-
+     ins_index =3D index;
+     for (i =3D 0; i < es && ins_index < 16; i++, ins_index++) {
+-        xt.VsrB(ins_index) =3D xb.VsrB(8 - es + i);
++        t.VsrB(ins_index) =3D xb->VsrB(8 - es + i);
+     }
+=20
+-    putVSR(xtn, &xt, env);
++    *xt =3D t;
+ }
+=20
+ #define VEXT_SIGNED(name, element, cast)                            \
+diff --git a/target/ppc/internal.h b/target/ppc/internal.h
+index fb6f64ed1e..d3d327e548 100644
+--- a/target/ppc/internal.h
++++ b/target/ppc/internal.h
+@@ -204,18 +204,6 @@ EXTRACT_HELPER(IMM8, 11, 8);
+ EXTRACT_HELPER(DCMX, 16, 7);
+ EXTRACT_HELPER_SPLIT_3(DCMX_XV, 5, 16, 0, 1, 2, 5, 1, 6, 6);
+=20
+-static inline void getVSR(int n, ppc_vsr_t *vsr, CPUPPCState *env)
+-{
+-    vsr->VsrD(0) =3D env->vsr[n].VsrD(0);
+-    vsr->VsrD(1) =3D env->vsr[n].VsrD(1);
+-}
+-
+-static inline void putVSR(int n, ppc_vsr_t *vsr, CPUPPCState *env)
+-{
+-    env->vsr[n].VsrD(0) =3D vsr->VsrD(0);
+-    env->vsr[n].VsrD(1) =3D vsr->VsrD(1);
+-}
+-
+ void helper_compute_fprf_float16(CPUPPCState *env, float16 arg);
+ void helper_compute_fprf_float32(CPUPPCState *env, float32 arg);
+ void helper_compute_fprf_float128(CPUPPCState *env, float128 arg);
 --=20
 2.21.0
 
