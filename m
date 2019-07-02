@@ -2,60 +2,65 @@ Return-Path: <SRS0=9yXi=U7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2985AC5B57D
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 03:58:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57C23C5B57D
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 03:58:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EB88F21473
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 03:58:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB88F21473
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1E70B21473
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 03:58:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E70B21473
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48305 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48310 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hi9vd-00007e-6b
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 23:58:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51610)
+	id 1hi9vw-0000mP-DC
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 23:58:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37794)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hi8hR-00047x-0P
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 22:39:18 -0400
+ (envelope-from <tao3.xu@intel.com>) id 1hi7Nl-0007T8-7k
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 21:14:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hi8hN-00070T-H7
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 22:39:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46468)
+ (envelope-from <tao3.xu@intel.com>) id 1hi7Ne-0007M4-9k
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 21:14:51 -0400
+Received: from mga17.intel.com ([192.55.52.151]:39967)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hi8hK-0006wI-L7; Mon, 01 Jul 2019 22:39:10 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id D5E6430872F3;
- Tue,  2 Jul 2019 02:39:09 +0000 (UTC)
-Received: from localhost (ovpn-204-243.brq.redhat.com [10.40.204.243])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 6B6237E668;
- Tue,  2 Jul 2019 02:39:09 +0000 (UTC)
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Date: Tue,  2 Jul 2019 04:39:02 +0200
-Message-Id: <20190702023905.32470-2-mreitz@redhat.com>
-In-Reply-To: <20190702023905.32470-1-mreitz@redhat.com>
-References: <20190702023905.32470-1-mreitz@redhat.com>
+ (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1hi7Nd-0007KP-Ez
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 21:14:45 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+ by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 01 Jul 2019 18:14:42 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.63,441,1557212400"; d="scan'208";a="362449579"
+Received: from txu2-mobl.ccr.corp.intel.com (HELO [10.239.196.241])
+ ([10.239.196.241])
+ by fmsmga006.fm.intel.com with ESMTP; 01 Jul 2019 18:14:41 -0700
+To: Igor Mammedov <imammedo@redhat.com>
+References: <20190614155626.27932-1-tao3.xu@intel.com>
+ <20190614155626.27932-7-tao3.xu@intel.com>
+ <20190701132532.2699a98a@redhat.com>
+From: Tao Xu <tao3.xu@intel.com>
+Message-ID: <b00889ae-aac0-5821-6b39-adb2bcda4ab7@intel.com>
+Date: Tue, 2 Jul 2019 09:14:40 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Tue, 02 Jul 2019 02:39:09 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 1/4] block/rbd: increase dynamically the image
- size
+In-Reply-To: <20190701132532.2699a98a@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 192.55.52.151
+Subject: Re: [Qemu-devel] [PATCH v5 6/8] hmat acpi: Build Memory Subsystem
+ Address Range Structure(s) in ACPI HMAT
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,129 +72,387 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: jingqi.liu@intel.com, fan.du@intel.com, ehabkost@redhat.com,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Stefano Garzarella <sgarzare@redhat.com>
+On 7/1/2019 7:25 PM, Igor Mammedov wrote:
+> On Fri, 14 Jun 2019 23:56:24 +0800
+> Tao Xu <tao3.xu@intel.com> wrote:
+> 
+>> From: Liu Jingqi <jingqi.liu@intel.com>
+>>
+>> HMAT is defined in ACPI 6.2: 5.2.27 Heterogeneous Memory Attribute Table (HMAT).
+>> The specification references below link:
+>> http://www.uefi.org/sites/default/files/resources/ACPI_6_2.pdf
+>>
+>> It describes the memory attributes, such as memory side cache
+>> attributes and bandwidth and latency details, related to the
+>> System Physical Address (SPA) Memory Ranges. The software is
+>> expected to use this information as hint for optimization.
+>>
+>> This structure describes the System Physical Address(SPA) range
+>> occupied by memory subsystem and its associativity with processor
+>> proximity domain as well as hint for memory usage.
+>>
+>> Signed-off-by: Liu Jingqi <jingqi.liu@intel.com>
+>> Signed-off-by: Tao Xu <tao3.xu@intel.com>
+>> ---
+>>
+>> Changes in v5 -> v4:
+>>      - Add more descriptions from ACPI spec (Igor)
+>>      - Remove all the dependcy on PCMachineState (Igor)
+>> ---
+>>   hw/acpi/Kconfig       |   5 ++
+>>   hw/acpi/Makefile.objs |   1 +
+>>   hw/acpi/hmat.c        | 153 ++++++++++++++++++++++++++++++++++++++++++
+>>   hw/acpi/hmat.h        |  43 ++++++++++++
+>>   hw/core/machine.c     |   2 +
+>>   hw/i386/acpi-build.c  |   3 +
+>>   include/sysemu/numa.h |   2 +
+>>   numa.c                |   6 ++
+>>   8 files changed, 215 insertions(+)
+>>   create mode 100644 hw/acpi/hmat.c
+>>   create mode 100644 hw/acpi/hmat.h
+>>
+>> diff --git a/hw/acpi/Kconfig b/hw/acpi/Kconfig
+>> index 7c59cf900b..039bb99efa 100644
+>> --- a/hw/acpi/Kconfig
+>> +++ b/hw/acpi/Kconfig
+>> @@ -7,6 +7,7 @@ config ACPI_X86
+>>       select ACPI_NVDIMM
+>>       select ACPI_CPU_HOTPLUG
+>>       select ACPI_MEMORY_HOTPLUG
+>> +    select ACPI_HMAT
+>>   
+>>   config ACPI_X86_ICH
+>>       bool
+>> @@ -31,3 +32,7 @@ config ACPI_VMGENID
+>>       bool
+>>       default y
+>>       depends on PC
+>> +
+>> +config ACPI_HMAT
+>> +    bool
+>> +    depends on ACPI
+>> diff --git a/hw/acpi/Makefile.objs b/hw/acpi/Makefile.objs
+>> index 661a9b8c2f..20cc2fb124 100644
+>> --- a/hw/acpi/Makefile.objs
+>> +++ b/hw/acpi/Makefile.objs
+>> @@ -6,6 +6,7 @@ common-obj-$(CONFIG_ACPI_MEMORY_HOTPLUG) += memory_hotplug.o
+>>   common-obj-$(CONFIG_ACPI_CPU_HOTPLUG) += cpu.o
+>>   common-obj-$(CONFIG_ACPI_NVDIMM) += nvdimm.o
+>>   common-obj-$(CONFIG_ACPI_VMGENID) += vmgenid.o
+>> +common-obj-$(CONFIG_ACPI_HMAT) += hmat.o
+>>   common-obj-$(call lnot,$(CONFIG_ACPI_X86)) += acpi-stub.o
+>>   
+>>   common-obj-y += acpi_interface.o
+>> diff --git a/hw/acpi/hmat.c b/hw/acpi/hmat.c
+>> new file mode 100644
+>> index 0000000000..6fd434c4d9
+>> --- /dev/null
+>> +++ b/hw/acpi/hmat.c
+>> @@ -0,0 +1,153 @@
+>> +/*
+>> + * HMAT ACPI Implementation
+>> + *
+>> + * Copyright(C) 2019 Intel Corporation.
+>> + *
+>> + * Author:
+>> + *  Liu jingqi <jingqi.liu@linux.intel.com>
+>> + *  Tao Xu <tao3.xu@intel.com>
+>> + *
+>> + * HMAT is defined in ACPI 6.2: 5.2.27 Heterogeneous Memory Attribute Table
+>> + * (HMAT)
+>> + *
+>> + * This library is free software; you can redistribute it and/or
+>> + * modify it under the terms of the GNU Lesser General Public
+>> + * License as published by the Free Software Foundation; either
+>> + * version 2 of the License, or (at your option) any later version.
+>> + *
+>> + * This library is distributed in the hope that it will be useful,
+>> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+>> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+>> + * Lesser General Public License for more details.
+>> + *
+>> + * You should have received a copy of the GNU Lesser General Public
+>> + * License along with this library; if not, see <http://www.gnu.org/licenses/>
+>> + */
+>> +
+>> +#include "qemu/osdep.h"
+>> +#include "sysemu/numa.h"
+>> +#include "hw/acpi/hmat.h"
+>> +#include "hw/mem/pc-dimm.h"
+>> +
+>> +/* ACPI 6.2: 5.2.27.3 Memory Subsystem Address Range Structure: Table 5-141 */
+>> +static void build_hmat_spa(GArray *table_data, uint16_t flags,
+>> +                           uint64_t base, uint64_t length, int node)
+>> +{
+>> +
+>> +    /* Memory Subsystem Address Range Structure */
+>> +    /* Type */
+>> +    build_append_int_noprefix(table_data, 0, 2);
+>> +    /* Reserved */
+>> +    build_append_int_noprefix(table_data, 0, 2);
+>> +    /* Length */
+>> +    build_append_int_noprefix(table_data, 40, 4);
+>> +    /* Flags */
+>> +    build_append_int_noprefix(table_data, flags, 2);
+>> +    /* Reserved */
+>> +    build_append_int_noprefix(table_data, 0, 2);
+>> +    /* Process Proximity Domain */
+>> +    build_append_int_noprefix(table_data, node, 4);
+>> +    /* Memory Proximity Domain */
+>> +    build_append_int_noprefix(table_data, node, 4);
+>> +    /* Reserved */
+>> +    build_append_int_noprefix(table_data, 0, 4);
+>> +    /* System Physical Address Range Base */
+>> +    build_append_int_noprefix(table_data, base, 8);
+>> +    /* System Physical Address Range Length */
+>> +    build_append_int_noprefix(table_data, length, 8);
+>> +}
+>> +
+>> +static int pc_dimm_device_list(Object *obj, void *opaque)
+>> +{
+>> +    GSList **list = opaque;
+>> +
+>> +    if (object_dynamic_cast(obj, TYPE_PC_DIMM)) {
+>> +        DeviceState *dev = DEVICE(obj);
+>> +        if (dev->realized) { /* only realized memory devices matter */
+>> +            *list = g_slist_append(*list, DEVICE(obj));
+>> +        }
+>> +    }
+>> +
+>> +    object_child_foreach(obj, pc_dimm_device_list, opaque);
+>> +    return 0;
+>> +}
+>> +
+>> +/* Build HMAT sub table structures */
+>> +static void hmat_build_table_structs(GArray *table_data, MachineState *ms)
+>> +{
+>> +    GSList *device_list = NULL;
+>> +    uint16_t flags;
+>> +    uint64_t mem_base, mem_len;
+>> +    int i;
+>> +    NumaState *nstat = ms->numa_state;
+>> +    NumaMemRange *mem_range;
+>> +
+>> +    Object *obj = object_resolve_path_type("", TYPE_ACPI_DEVICE_IF, NULL);
+>> +    AcpiDeviceIfClass *adevc = ACPI_DEVICE_IF_GET_CLASS(obj);
+>> +    AcpiDeviceIf *adev = ACPI_DEVICE_IF(obj);
+>> +
+>> +    /*
+>> +     * ACPI 6.2: 5.2.27.3 Memory Subsystem Address Range Structure:
+>> +     * Table 5-141. The Proximity Domain of System Physical Address
+>> +     * ranges defined in the HMAT, NFIT and SRAT tables shall match
+>> +     * each other.
+>> +     */
+>> +    if (nstat->num_nodes && !nstat->mem_ranges_num) {
+>> +        nstat->mem_ranges = g_array_new(false, true /* clear */,
+>> +                                        sizeof *mem_range);
+>> +        adevc->build_mem_ranges(adev, ms);
+> another place you are tying to initialize nstat->mem_ranges
+> make initialization in generic numa init code
+> 
+>> +    }
+>> +
+>> +    for (i = 0; i < nstat->mem_ranges_num; i++) {
+>> +        mem_range = &g_array_index(nstat->mem_ranges, NumaMemRange, i);
+>> +        flags = 0;
+>> +
+>> +        if (nstat->nodes[mem_range->node].is_initiator) {
+>> +            flags |= HMAT_SPA_PROC_VALID;
+>> +        }
+>> +        if (nstat->nodes[mem_range->node].is_target) {
+>> +            flags |= HMAT_SPA_MEM_VALID;
+>> +        }
+>> +
+>> +        build_hmat_spa(table_data, flags, mem_range->base,
+>> +                       mem_range->length,
+>> +                       mem_range->node);
+>> +    }
+>> +
+>> +    /* Build HMAT SPA structures for PC-DIMM devices. */
+>> +    object_child_foreach(OBJECT(ms), pc_dimm_device_list, &device_list);
+>> +
+>> +    for (; device_list; device_list = device_list->next) {
+>> +        PCDIMMDevice *dimm = device_list->data;
+>> +        mem_base = object_property_get_uint(OBJECT(dimm), PC_DIMM_ADDR_PROP,
+>> +                                            NULL);
+>> +        mem_len = object_property_get_uint(OBJECT(dimm), PC_DIMM_SIZE_PROP,
+>> +                                           NULL);
+>> +        i = object_property_get_uint(OBJECT(dimm), PC_DIMM_NODE_PROP, NULL);
+>> +        flags = 0;
+>> +
+>> +        if (nstat->nodes[i].is_initiator) {
+>> +            flags |= HMAT_SPA_PROC_VALID;
+>> +        }
+>> +        if (nstat->nodes[i].is_target) {
+>> +            flags |= HMAT_SPA_MEM_VALID;
+>> +        }
+>> +        build_hmat_spa(table_data, flags, mem_base, mem_len, i);
+>> +    }
+> Don't you need to free device_list at this point?
+> 
 
-RBD APIs don't allow us to write more than the size set with
-rbd_create() or rbd_resize().
-In order to support growing images (eg. qcow2), we resize the
-image before write operations that exceed the current size.
-
-Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-Message-id: 20190509145927.293369-1-sgarzare@redhat.com
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
- block/rbd.c | 42 +++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 39 insertions(+), 3 deletions(-)
-
-diff --git a/block/rbd.c b/block/rbd.c
-index f2ac2c06f4..59757b3120 100644
---- a/block/rbd.c
-+++ b/block/rbd.c
-@@ -103,6 +103,7 @@ typedef struct BDRVRBDState {
-     rbd_image_t image;
-     char *image_name;
-     char *snap;
-+    uint64_t image_size;
- } BDRVRBDState;
-=20
- static int qemu_rbd_connect(rados_t *cluster, rados_ioctx_t *io_ctx,
-@@ -778,6 +779,14 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict=
- *options, int flags,
-         goto failed_open;
-     }
-=20
-+    r =3D rbd_get_size(s->image, &s->image_size);
-+    if (r < 0) {
-+        error_setg_errno(errp, -r, "error getting image size from %s",
-+                         s->image_name);
-+        rbd_close(s->image);
-+        goto failed_open;
-+    }
-+
-     /* If we are using an rbd snapshot, we must be r/o, otherwise
-      * leave as-is */
-     if (s->snap !=3D NULL) {
-@@ -834,6 +843,22 @@ static void qemu_rbd_close(BlockDriverState *bs)
-     rados_shutdown(s->cluster);
- }
-=20
-+/* Resize the RBD image and update the 'image_size' with the current siz=
-e */
-+static int qemu_rbd_resize(BlockDriverState *bs, uint64_t size)
-+{
-+    BDRVRBDState *s =3D bs->opaque;
-+    int r;
-+
-+    r =3D rbd_resize(s->image, size);
-+    if (r < 0) {
-+        return r;
-+    }
-+
-+    s->image_size =3D size;
-+
-+    return 0;
-+}
-+
- static const AIOCBInfo rbd_aiocb_info =3D {
-     .aiocb_size =3D sizeof(RBDAIOCB),
- };
-@@ -935,13 +960,25 @@ static BlockAIOCB *rbd_start_aio(BlockDriverState *=
-bs,
-     }
-=20
-     switch (cmd) {
--    case RBD_AIO_WRITE:
-+    case RBD_AIO_WRITE: {
-+        /*
-+         * RBD APIs don't allow us to write more than actual size, so in=
- order
-+         * to support growing images, we resize the image before write
-+         * operations that exceed the current size.
-+         */
-+        if (off + size > s->image_size) {
-+            r =3D qemu_rbd_resize(bs, off + size);
-+            if (r < 0) {
-+                goto failed_completion;
-+            }
-+        }
- #ifdef LIBRBD_SUPPORTS_IOVEC
-             r =3D rbd_aio_writev(s->image, qiov->iov, qiov->niov, off, c=
-);
- #else
-             r =3D rbd_aio_write(s->image, off, size, rcb->buf, c);
- #endif
-         break;
-+    }
-     case RBD_AIO_READ:
- #ifdef LIBRBD_SUPPORTS_IOVEC
-             r =3D rbd_aio_readv(s->image, qiov->iov, qiov->niov, off, c)=
-;
-@@ -1052,7 +1089,6 @@ static int coroutine_fn qemu_rbd_co_truncate(BlockD=
-riverState *bs,
-                                              PreallocMode prealloc,
-                                              Error **errp)
- {
--    BDRVRBDState *s =3D bs->opaque;
-     int r;
-=20
-     if (prealloc !=3D PREALLOC_MODE_OFF) {
-@@ -1061,7 +1097,7 @@ static int coroutine_fn qemu_rbd_co_truncate(BlockD=
-riverState *bs,
-         return -ENOTSUP;
-     }
-=20
--    r =3D rbd_resize(s->image, offset);
-+    r =3D qemu_rbd_resize(bs, offset);
-     if (r < 0) {
-         error_setg_errno(errp, -r, "Failed to resize file");
-         return r;
---=20
-2.21.0
+Thank you for your suggestion, I will correct it.
+>> +}
+>> +
+>> +void build_hmat(GArray *table_data, BIOSLinker *linker, MachineState *ms)
+>> +{
+>> +    uint64_t hmat_start;
+>> +
+>> +    hmat_start = table_data->len;
+>> +
+>> +    /* reserve space for HMAT header  */
+>> +    acpi_data_push(table_data, 40);
+>> +
+>> +    hmat_build_table_structs(table_data, ms);
+>> +
+>> +    build_header(linker, table_data,
+>> +                 (void *)(table_data->data + hmat_start),
+>> +                 "HMAT", table_data->len - hmat_start, 1, NULL, NULL);
+>> +}
+>> diff --git a/hw/acpi/hmat.h b/hw/acpi/hmat.h
+>> new file mode 100644
+>> index 0000000000..e24b673fad
+>> --- /dev/null
+>> +++ b/hw/acpi/hmat.h
+>> @@ -0,0 +1,43 @@
+>> +/*
+>> + * HMAT ACPI Implementation Header
+>> + *
+>> + * Copyright(C) 2019 Intel Corporation.
+>> + *
+>> + * Author:
+>> + *  Liu jingqi <jingqi.liu@linux.intel.com>
+>> + *  Tao Xu <tao3.xu@intel.com>
+>> + *
+>> + * HMAT is defined in ACPI 6.2.
+>> + *
+>> + * This library is free software; you can redistribute it and/or
+>> + * modify it under the terms of the GNU Lesser General Public
+>> + * License as published by the Free Software Foundation; either
+>> + * version 2 of the License, or (at your option) any later version.
+>> + *
+>> + * This library is distributed in the hope that it will be useful,
+>> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+>> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+>> + * Lesser General Public License for more details.
+>> + *
+>> + * You should have received a copy of the GNU Lesser General Public
+>> + * License along with this library; if not, see <http://www.gnu.org/licenses/>
+>> + */
+>> +
+>> +#ifndef HMAT_H
+>> +#define HMAT_H
+>> +
+>> +#include "hw/acpi/acpi-defs.h"
+>> +#include "hw/acpi/acpi.h"
+>> +#include "hw/acpi/bios-linker-loader.h"
+>> +#include "hw/acpi/aml-build.h"
+>> +
+>> +/* the values of AcpiHmatSpaRange flag */
+>> +enum {
+>> +    HMAT_SPA_PROC_VALID       = 0x1,
+>> +    HMAT_SPA_MEM_VALID        = 0x2,
+>> +    HMAT_SPA_RESERVATION_HINT = 0x4,
+>> +};
+>> +
+>> +void build_hmat(GArray *table_data, BIOSLinker *linker, MachineState *ms);
+>> +
+>> +#endif
+>> diff --git a/hw/core/machine.c b/hw/core/machine.c
+>> index 14b29de0a9..2ad09ec23e 100644
+>> --- a/hw/core/machine.c
+>> +++ b/hw/core/machine.c
+>> @@ -646,6 +646,7 @@ void machine_set_cpu_numa_node(MachineState *machine,
+>>                                  const CpuInstanceProperties *props, Error **errp)
+>>   {
+>>       MachineClass *mc = MACHINE_GET_CLASS(machine);
+>> +    NodeInfo *numa_info = machine->numa_state->nodes;
+>>       bool match = false;
+>>       int i;
+>>   
+>> @@ -706,6 +707,7 @@ void machine_set_cpu_numa_node(MachineState *machine,
+>>           match = true;
+>>           slot->props.node_id = props->node_id;
+>>           slot->props.has_node_id = props->has_node_id;
+>> +        numa_info[props->node_id].is_initiator = true;
+>>       }
+>>   
+>>       if (!match) {
+>> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+>> index 44dd447fa5..6584eac76e 100644
+>> --- a/hw/i386/acpi-build.c
+>> +++ b/hw/i386/acpi-build.c
+>> @@ -66,6 +66,7 @@
+>>   #include "hw/i386/intel_iommu.h"
+>>   
+>>   #include "hw/acpi/ipmi.h"
+>> +#include "hw/acpi/hmat.h"
+>>   
+>>   /* These are used to size the ACPI tables for -M pc-i440fx-1.7 and
+>>    * -M pc-i440fx-2.0.  Even if the actual amount of AML generated grows
+>> @@ -2710,6 +2711,8 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
+>>               acpi_add_table(table_offsets, tables_blob);
+>>               build_slit(tables_blob, tables->linker, machine);
+>>           }
+>> +        acpi_add_table(table_offsets, tables_blob);
+>> +        build_hmat(tables_blob, tables->linker, machine);
+> I'm not sure if we should add it unconditionally.
+> Is this table used in any meaningful manner by guest when
+> it's incomplete (i.e. populated only with SPA records)?
+> 
+>>       }
+>>       if (acpi_get_mcfg(&mcfg)) {
+>>           acpi_add_table(table_offsets, tables_blob);
+>> diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
+>> index e3c85b77bc..13cff59112 100644
+>> --- a/include/sysemu/numa.h
+>> +++ b/include/sysemu/numa.h
+>> @@ -10,6 +10,8 @@ struct NodeInfo {
+>>       uint64_t node_mem;
+>>       struct HostMemoryBackend *node_memdev;
+>>       bool present;
+>> +    bool is_initiator;
+>> +    bool is_target;
+>>       uint8_t distance[MAX_NODES];
+>>   };
+>>   
+>> diff --git a/numa.c b/numa.c
+>> index d23e130bce..5556d118c3 100644
+>> --- a/numa.c
+>> +++ b/numa.c
+>> @@ -102,6 +102,10 @@ static void parse_numa_node(MachineState *ms, NumaNodeOptions *node,
+>>           }
+>>       }
+>>   
+>> +    if (node->cpus) {
+>> +        numa_info[nodenr].is_initiator = true;
+>> +    }
+>> +
+>>       if (node->has_mem && node->has_memdev) {
+>>           error_setg(errp, "cannot specify both mem= and memdev=");
+>>           return;
+>> @@ -118,6 +122,7 @@ static void parse_numa_node(MachineState *ms, NumaNodeOptions *node,
+>>   
+>>       if (node->has_mem) {
+>>           numa_info[nodenr].node_mem = node->mem;
+>> +        numa_info[nodenr].is_target = true;
+>>       }
+>>       if (node->has_memdev) {
+>>           Object *o;
+>> @@ -130,6 +135,7 @@ static void parse_numa_node(MachineState *ms, NumaNodeOptions *node,
+>>           object_ref(o);
+>>           numa_info[nodenr].node_mem = object_property_get_uint(o, "size", NULL);
+>>           numa_info[nodenr].node_memdev = MEMORY_BACKEND(o);
+>> +        numa_info[nodenr].is_target = true;
+>>       }
+>>       numa_info[nodenr].present = true;
+>>       max_numa_nodeid = MAX(max_numa_nodeid, nodenr + 1);
+> 
 
 
