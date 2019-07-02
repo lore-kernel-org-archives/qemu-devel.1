@@ -2,91 +2,61 @@ Return-Path: <SRS0=9yXi=U7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24031C06510
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E7C5C46478
 	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 16:25:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C39E62082F
+	by mail.kernel.org (Postfix) with ESMTPS id EF11B21479
 	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 16:25:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C39E62082F
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF11B21479
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55008 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55010 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hiLbB-00025A-Vf
+	id 1hiLbC-00026D-7T
 	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 12:25:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35705)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37274)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hiKiT-00046p-1R
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 11:29:10 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1hiKpA-0007VE-B8
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 11:36:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hiKiR-0007ut-T3
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 11:29:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39352)
+ (envelope-from <ehabkost@redhat.com>) id 1hiKp8-0005iF-KH
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 11:36:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43142)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hiKiP-0007qp-AC; Tue, 02 Jul 2019 11:29:05 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hiKp8-0005eo-77
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 11:36:02 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 945B3A96F1;
- Tue,  2 Jul 2019 15:29:00 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-204-120.brq.redhat.com
- [10.40.204.120])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 297E72E043;
- Tue,  2 Jul 2019 15:28:39 +0000 (UTC)
-To: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org
-References: <20190627223255.3789-1-mreitz@redhat.com>
- <20190627223255.3789-2-mreitz@redhat.com>
- <w51v9wk5ybk.fsf@maestria.local.igalia.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <07be76c5-fea9-96b7-e50b-eddc04a38e42@redhat.com>
-Date: Tue, 2 Jul 2019 17:28:37 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
-MIME-Version: 1.0
-In-Reply-To: <w51v9wk5ybk.fsf@maestria.local.igalia.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="SiKOJDYftHuyiaw2HU36MQDLkGiujRTDf"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+ by mx1.redhat.com (Postfix) with ESMTPS id 0AC988830B;
+ Tue,  2 Jul 2019 15:36:00 +0000 (UTC)
+Received: from localhost (ovpn-116-30.gru2.redhat.com [10.97.116.30])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8C4635D6A9;
+ Tue,  2 Jul 2019 15:35:59 +0000 (UTC)
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
+ Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+ Richard Henderson <rth@twiddle.net>
+Date: Tue,  2 Jul 2019 12:35:04 -0300
+Message-Id: <20190702153535.9851-12-ehabkost@redhat.com>
+In-Reply-To: <20190702153535.9851-1-ehabkost@redhat.com>
+References: <20190702153535.9851-1-ehabkost@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.38]); Tue, 02 Jul 2019 15:29:00 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.28]); Tue, 02 Jul 2019 15:36:00 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 1/5] block: Add BDS.never_freeze
+Subject: [Qemu-devel] [PULL v3 11/42] i386: Add die-level cpu topology to
+ x86CPU on PCMachine
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,82 +68,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
- John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
+Cc: Like Xu <like.xu@linux.intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---SiKOJDYftHuyiaw2HU36MQDLkGiujRTDf
-Content-Type: multipart/mixed; boundary="8hBmlz7ywDQEFoWWzKPzczD5o8rcEYv2d";
- protected-headers="v1"
-From: Max Reitz <mreitz@redhat.com>
-To: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Andrey Shinkevich
- <andrey.shinkevich@virtuozzo.com>, John Snow <jsnow@redhat.com>,
- Kevin Wolf <kwolf@redhat.com>
-Message-ID: <07be76c5-fea9-96b7-e50b-eddc04a38e42@redhat.com>
-Subject: Re: [PATCH 1/5] block: Add BDS.never_freeze
-References: <20190627223255.3789-1-mreitz@redhat.com>
- <20190627223255.3789-2-mreitz@redhat.com>
- <w51v9wk5ybk.fsf@maestria.local.igalia.com>
-In-Reply-To: <w51v9wk5ybk.fsf@maestria.local.igalia.com>
+From: Like Xu <like.xu@linux.intel.com>
 
---8hBmlz7ywDQEFoWWzKPzczD5o8rcEYv2d
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+The die-level as the first PC-specific cpu topology is added to the leagcy
+cpu topology model, which has one die per package implicitly and only the
+numbers of sockets/cores/threads are configurable.
 
-On 02.07.19 16:02, Alberto Garcia wrote:
-> On Fri 28 Jun 2019 12:32:51 AM CEST, Max Reitz wrote:
->> @@ -4416,6 +4416,14 @@ int bdrv_freeze_backing_chain(BlockDriverState =
-*bs, BlockDriverState *base,
->>          return -EPERM;
->>      }
->> =20
->> +    for (i =3D bs; i !=3D base; i =3D backing_bs(i)) {
->> +        if (i->backing && backing_bs(i)->never_freeze) {
->> +            error_setg(errp, "Cannot freeze '%s' link to '%s'",
->> +                       i->backing->name, backing_bs(i)->node_name);
->> +            return -EPERM;
->> +        }
->> +    }
->=20
-> How about adding this to bdrv_is_backing_chain_frozen() instead?
+In the new model with die-level support, the total number of logical
+processors (including offline) on board will be calculated as:
 
-But that=E2=80=99s the wrong place.  For example, that function is called=
- by
-bdrv_set_backing_hd() to check whether the backing BDS can be changed.
-But the point of never_freeze is to ensure that links to the BDS can be
-changed.
+     #cpus = #sockets * #dies * #cores * #threads
 
-never_freeze only becomes relevant when trying to freeze the backing
-chain, in that it should prevent it.  So I think putting the check here
-is correct.
+and considering compatibility, the default value for #dies would be
+initialized to one in x86_cpu_initfn() and pc_machine_initfn().
 
-Max
+Signed-off-by: Like Xu <like.xu@linux.intel.com>
+Message-Id: <20190612084104.34984-2-like.xu@linux.intel.com>
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+---
+ include/hw/i386/pc.h | 2 ++
+ target/i386/cpu.h    | 2 ++
+ hw/i386/pc.c         | 9 +++++++--
+ target/i386/cpu.c    | 1 +
+ 4 files changed, 12 insertions(+), 2 deletions(-)
 
+diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+index 884e35b9b2..764996e6b4 100644
+--- a/include/hw/i386/pc.h
++++ b/include/hw/i386/pc.h
+@@ -24,6 +24,7 @@
+  * PCMachineState:
+  * @acpi_dev: link to ACPI PM device that performs ACPI hotplug handling
+  * @boot_cpus: number of present VCPUs
++ * @smp_dies: number of dies per one package
+  */
+ struct PCMachineState {
+     /*< private >*/
+@@ -59,6 +60,7 @@ struct PCMachineState {
+     bool apic_xrupt_override;
+     unsigned apic_id_limit;
+     uint16_t boot_cpus;
++    unsigned smp_dies;
+ 
+     /* NUMA information: */
+     uint64_t numa_nodes;
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 93345792f4..14c19e61b1 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -1385,6 +1385,8 @@ typedef struct CPUX86State {
+     uint64_t xss;
+ 
+     TPRAccess tpr_access_type;
++
++    unsigned nr_dies;
+ } CPUX86State;
+ 
+ struct kvm_msrs;
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 73de30cc20..e18b1bade2 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -2306,9 +2306,13 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
+         return;
+     }
+ 
+-    /* if APIC ID is not set, set it based on socket/core/thread properties */
++    /*
++     * If APIC ID is not set,
++     * set it based on socket/die/core/thread properties.
++     */
+     if (cpu->apic_id == UNASSIGNED_APIC_ID) {
+-        int max_socket = (ms->smp.max_cpus - 1) / smp_threads / smp_cores;
++        int max_socket = (ms->smp.max_cpus - 1) /
++                                smp_threads / smp_cores / pcms->smp_dies;
+ 
+         if (cpu->socket_id < 0) {
+             error_setg(errp, "CPU socket-id is not set");
+@@ -2619,6 +2623,7 @@ static void pc_machine_initfn(Object *obj)
+     pcms->smbus_enabled = true;
+     pcms->sata_enabled = true;
+     pcms->pit_enabled = true;
++    pcms->smp_dies = 1;
+ 
+     pc_system_flash_create(pcms);
+ }
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 78830d403a..fac3cc028e 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -5639,6 +5639,7 @@ static void x86_cpu_initfn(Object *obj)
+     CPUX86State *env = &cpu->env;
+     FeatureWord w;
+ 
++    env->nr_dies = 1;
+     cpu_set_cpustate_pointers(cpu);
+ 
+     object_property_add(obj, "family", "int",
+-- 
+2.18.0.rc1.1.g3f1ff2140
 
---8hBmlz7ywDQEFoWWzKPzczD5o8rcEYv2d--
-
---SiKOJDYftHuyiaw2HU36MQDLkGiujRTDf
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0beCYACgkQ9AfbAGHV
-z0Du3Af/XG1iUmRdIDRs9OpDSfVfg7ow8iMyMwDrkMcxEjKwPpJhjExgMhh419gW
-ur0tL4wgnPvrKj8JlZm/8z8PsEFP3edXESWSGpYXGTGeNbn1WhhyKrAeCQTRbVP5
-wLq7p5wjX4eLJyShDbmZQ3nma7daboaMtvAy3Y9aUk6o+xvOwdIjIlgn7YLPPTmt
-/xwDX+vXO3Gsa+xlV5M0/fPqk6ffJjGcBJlRz4jfndg3BvTKxYK7DCu9qcxHAYDb
-QXuuc6q00fH7OBNF2cB2LOSSgmNhhtp2xsjUC7KAc4FsswG/y2EzIURDKQR9uVJv
-KP0WQa265d1DhJrTzFM3SqVDNVW9ww==
-=AW1P
------END PGP SIGNATURE-----
-
---SiKOJDYftHuyiaw2HU36MQDLkGiujRTDf--
 
