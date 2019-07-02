@@ -7,56 +7,56 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BDF21C5B57D
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 07:06:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65B21C5B57D
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 07:07:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 856232146F
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 07:06:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 32094216C8
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 07:07:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="huHV2b0k"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 856232146F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Wn9f2A94"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32094216C8
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49764 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49772 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hiCsR-0002Qm-Iy
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 03:06:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59282)
+	id 1hiCt5-0002xE-FX
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 03:07:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58817)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgibson@ozlabs.org>) id 1hiC07-0006Eu-Ug
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 02:10:49 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1hiBzK-0005Nd-Es
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 02:10:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1hiC06-0003gC-Iz
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 02:10:47 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:37983 helo=ozlabs.org)
+ (envelope-from <dgibson@ozlabs.org>) id 1hiBzI-0003Fr-HU
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 02:09:58 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:52781 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1hiC05-0003Rk-Vd; Tue, 02 Jul 2019 02:10:46 -0400
+ id 1hiBzG-0002wQ-9d; Tue, 02 Jul 2019 02:09:54 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 45dDMp39hWz9sQr; Tue,  2 Jul 2019 16:09:07 +1000 (AEST)
+ id 45dDMk64Vyz9sQn; Tue,  2 Jul 2019 16:09:04 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1562047750;
- bh=FbysbQgbStZWf/v2s3Sj+D/Di4SHoaN3wcJOzUpaWgg=;
+ d=gibson.dropbear.id.au; s=201602; t=1562047746;
+ bh=4OfOKU12GkM2X1JZIDT5t+MpQT4M03VMpgCTQx5cXzE=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=huHV2b0kWwMvsJewxFMMzsi6MKpLUU5dqF2/3Z2i81tpofLGC5wUAprD4vP4F8uBh
- LxcoRwGy4AhqAr/pKftkdbmWKZmD0GSECesxNZosrBvBwyowY8z7r1pQD7P31MRGCC
- /eU0ZXxgtME8kWQ4BzknZgX5WC9VwgCQrX8k++YY=
+ b=Wn9f2A94Nx3wy/Rz/BcS0pTSaX6r6HIwRyzSJdZNqS2tcjr4qsyZxQBuxBaPETZwS
+ hlGT6/YHJ+58UlamazVIVlfgUAnWDfziHFVT8YRDF9CXuM3CFGV5gY36zyayh5Ad/W
+ Axco4Ppqk2YOjmq3Uy5B+aS0Kn8gk63s4weWfAjE=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Date: Tue,  2 Jul 2019 16:08:54 +1000
-Message-Id: <20190702060857.3926-47-david@gibson.dropbear.id.au>
+Date: Tue,  2 Jul 2019 16:08:27 +1000
+Message-Id: <20190702060857.3926-20-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190702060857.3926-1-david@gibson.dropbear.id.au>
 References: <20190702060857.3926-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 203.11.71.1
-Subject: [Qemu-devel] [PULL 46/49] ppc/xive: Make the PIPR register readonly
+Subject: [Qemu-devel] [PULL 19/49] hw/ppc/prep: Drop useless CONFIG_KVM
+ ifdefery
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,107 +75,40 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: C=C3=A9dric Le Goater <clg@kaod.org>
+From: Greg Kurz <groug@kaod.org>
 
-When the hypervisor (KVM) dispatches a vCPU on a HW thread, it restores
-its thread interrupt context. The Pending Interrupt Priority Register
-(PIPR) is computed from the Interrupt Pending Buffer (IPB) and stores
-should not be allowed to change its value.
+kvm_enabled() expands to (0) when CONFIG_KVM is not defined. It is
+likely that the compiler will optimize the code out. And even if
+it doesn't, we have a stub for kvmppc_get_hypercall().
 
-Fixes: 207d9fe98510 ("ppc/xive: introduce the XIVE interrupt thread conte=
-xt")
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Message-Id: <20190630204601.30574-3-clg@kaod.org>
+Signed-off-by: Greg Kurz <groug@kaod.org>
+Message-Id: <156051054630.224162.6140707722034383410.stgit@bahia.lan>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/intc/xive.c | 32 ++++++++++++++++----------------
- 1 file changed, 16 insertions(+), 16 deletions(-)
+ hw/ppc/prep.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-index 3b1f9520ae..534f56f86b 100644
---- a/hw/intc/xive.c
-+++ b/hw/intc/xive.c
-@@ -182,31 +182,31 @@ static uint64_t xive_tm_vt_poll(XiveTCTX *tctx, hwa=
-ddr offset, unsigned size)
-  */
+diff --git a/hw/ppc/prep.c b/hw/ppc/prep.c
+index 2a8009e20b..a248ce480d 100644
+--- a/hw/ppc/prep.c
++++ b/hw/ppc/prep.c
+@@ -780,7 +780,6 @@ static void ibm_40p_init(MachineState *machine)
 =20
- static const uint8_t xive_tm_hw_view[] =3D {
--    /* QW-0 User */   3, 0, 0, 0,   0, 0, 0, 0,   3, 3, 3, 3,   0, 0, 0,=
- 0,
--    /* QW-1 OS   */   3, 3, 3, 3,   3, 3, 0, 3,   3, 3, 3, 3,   0, 0, 0,=
- 0,
--    /* QW-2 POOL */   0, 0, 3, 3,   0, 0, 0, 0,   3, 3, 3, 3,   0, 0, 0,=
- 0,
--    /* QW-3 PHYS */   3, 3, 3, 3,   0, 3, 0, 3,   3, 0, 0, 3,   3, 3, 3,=
- 0,
-+    3, 0, 0, 0,   0, 0, 0, 0,   3, 3, 3, 3,   0, 0, 0, 0, /* QW-0 User *=
-/
-+    3, 3, 3, 3,   3, 3, 0, 2,   3, 3, 3, 3,   0, 0, 0, 0, /* QW-1 OS   *=
-/
-+    0, 0, 3, 3,   0, 0, 0, 0,   3, 3, 3, 3,   0, 0, 0, 0, /* QW-2 POOL *=
-/
-+    3, 3, 3, 3,   0, 3, 0, 2,   3, 0, 0, 3,   3, 3, 3, 0, /* QW-3 PHYS *=
-/
- };
+     fw_cfg_add_i32(fw_cfg, FW_CFG_PPC_IS_KVM, kvm_enabled());
+     if (kvm_enabled()) {
+-#ifdef CONFIG_KVM
+         uint8_t *hypercall;
 =20
- static const uint8_t xive_tm_hv_view[] =3D {
--    /* QW-0 User */   3, 0, 0, 0,   0, 0, 0, 0,   3, 3, 3, 3,   0, 0, 0,=
- 0,
--    /* QW-1 OS   */   3, 3, 3, 3,   3, 3, 0, 3,   3, 3, 3, 3,   0, 0, 0,=
- 0,
--    /* QW-2 POOL */   0, 0, 3, 3,   0, 0, 0, 0,   0, 3, 3, 3,   0, 0, 0,=
- 0,
--    /* QW-3 PHYS */   3, 3, 3, 3,   0, 3, 0, 3,   3, 0, 0, 3,   0, 0, 0,=
- 0,
-+    3, 0, 0, 0,   0, 0, 0, 0,   3, 3, 3, 3,   0, 0, 0, 0, /* QW-0 User *=
-/
-+    3, 3, 3, 3,   3, 3, 0, 2,   3, 3, 3, 3,   0, 0, 0, 0, /* QW-1 OS   *=
-/
-+    0, 0, 3, 3,   0, 0, 0, 0,   0, 3, 3, 3,   0, 0, 0, 0, /* QW-2 POOL *=
-/
-+    3, 3, 3, 3,   0, 3, 0, 2,   3, 0, 0, 3,   0, 0, 0, 0, /* QW-3 PHYS *=
-/
- };
-=20
- static const uint8_t xive_tm_os_view[] =3D {
--    /* QW-0 User */   3, 0, 0, 0,   0, 0, 0, 0,   3, 3, 3, 3,   0, 0, 0,=
- 0,
--    /* QW-1 OS   */   2, 3, 2, 2,   2, 2, 0, 2,   0, 0, 0, 0,   0, 0, 0,=
- 0,
--    /* QW-2 POOL */   0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0,=
- 0,
--    /* QW-3 PHYS */   0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0,=
- 0,
-+    3, 0, 0, 0,   0, 0, 0, 0,   3, 3, 3, 3,   0, 0, 0, 0, /* QW-0 User *=
-/
-+    2, 3, 2, 2,   2, 2, 0, 2,   0, 0, 0, 0,   0, 0, 0, 0, /* QW-1 OS   *=
-/
-+    0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0, /* QW-2 POOL *=
-/
-+    0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0, /* QW-3 PHYS *=
-/
- };
-=20
- static const uint8_t xive_tm_user_view[] =3D {
--    /* QW-0 User */   3, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0,=
- 0,
--    /* QW-1 OS   */   0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0,=
- 0,
--    /* QW-2 POOL */   0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0,=
- 0,
--    /* QW-3 PHYS */   0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0,=
- 0,
-+    3, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0, /* QW-0 User *=
-/
-+    0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0, /* QW-1 OS   *=
-/
-+    0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0, /* QW-2 POOL *=
-/
-+    0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0, /* QW-3 PHYS *=
-/
- };
-=20
- /*
+         fw_cfg_add_i32(fw_cfg, FW_CFG_PPC_TBFREQ, kvmppc_get_tbfreq());
+@@ -788,7 +787,6 @@ static void ibm_40p_init(MachineState *machine)
+         kvmppc_get_hypercall(env, hypercall, 16);
+         fw_cfg_add_bytes(fw_cfg, FW_CFG_PPC_KVM_HC, hypercall, 16);
+         fw_cfg_add_i32(fw_cfg, FW_CFG_PPC_KVM_PID, getpid());
+-#endif
+     } else {
+         fw_cfg_add_i32(fw_cfg, FW_CFG_PPC_TBFREQ, NANOSECONDS_PER_SECOND=
+);
+     }
 --=20
 2.21.0
 
