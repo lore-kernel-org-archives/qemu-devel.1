@@ -2,114 +2,64 @@ Return-Path: <SRS0=9yXi=U7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.8 required=3.0 tests=FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,URIBL_SBL,URIBL_SBL_A,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA037C06510
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 09:57:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4849BC06510
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 09:57:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8F7B620665
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 09:57:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F7B620665
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 23C3120665
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 09:57:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 23C3120665
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51252 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51254 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hiFX6-0000nG-PB
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 05:57:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41186)
+	id 1hiFXA-0000re-8z
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 05:57:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41345)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <laurent@vivier.eu>) id 1hiFUD-0005vo-EX
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 05:54:08 -0400
+ (envelope-from <berrange@redhat.com>) id 1hiFV9-0007DP-CQ
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 05:55:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1hiFUB-0001b8-CW
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 05:54:05 -0400
-Received: from mout.kundenserver.de ([212.227.126.133]:45953)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hiFU9-0001ak-GL
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 05:54:03 -0400
-Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue010 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1MXGak-1i2eAi42Ag-00Ylyu; Tue, 02 Jul 2019 11:53:59 +0200
-To: Lucien Murray-Pitts <lucienmp.qemu@gmail.com>, qemu-devel@nongnu.org
-References: <20190616142300.GA71207@localhost.localdomain>
-From: Laurent Vivier <laurent@vivier.eu>
-Openpgp: preference=signencrypt
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <5f7da60a-959a-4d8c-2c8f-300e32c7be4a@vivier.eu>
-Date: Tue, 2 Jul 2019 11:53:57 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ (envelope-from <berrange@redhat.com>) id 1hiFV7-0001nv-UL
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 05:55:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48178)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hiFV7-0001nZ-LK
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 05:55:01 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id C1007C0586C1;
+ Tue,  2 Jul 2019 09:55:00 +0000 (UTC)
+Received: from redhat.com (ovpn-112-16.ams2.redhat.com [10.36.112.16])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 200D819730;
+ Tue,  2 Jul 2019 09:54:57 +0000 (UTC)
+Date: Tue, 2 Jul 2019 10:54:54 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: P J P <ppandit@redhat.com>
+Message-ID: <20190701175010.GN3573@redhat.com>
+References: <20190701123558.30512-1-ppandit@redhat.com>
+ <20190701123558.30512-4-ppandit@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190616142300.GA71207@localhost.localdomain>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:QuZljtiyJiiv18JPmzLore/VWoHfckqVgq8pF5t55YRzaiZYRXo
- qld8yFuDiUEAEUD58+rPaah5eJvF7MGUxZaAz97o9GOz8al2cOvl1w1BfPxW4tfBg/cD6LN
- TaHewRfPd3OyELH6DFnC4ji8pxQ5YHbUlX3+vtrO9p0PCvqPSv7CaCQJCrj/ATSChNZiHFT
- 3WkW05nhINeJwdCHFxEwA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:myEnNz0XFcU=:tNBlSqH7ja671yQxWedCYZ
- nmey8jjRxPbwajxEZD59oXhFjvXLIhNFfg15LVcT6TSitbBz5+RtmENEn4wBGu2wS6KOcNFVw
- Bp9TU+kdMMd4cpvymr8+/Rg084R5oPWdLWoozNGCbrXywNdTgFloxUoiMlAQq8Sv5p5m9etW9
- 6KREijbCM1WMFq/nSKjXF9QFPGkAJjrC+9TDviy33PsJR0nGaDyyX5KvmYFRAGZTXB9TYlPrV
- 8Q8LqCvIJiakyXiV1EtoGR533l2gr6PQ139MNNxsGkJPGBWDPbWef9sl57lg3v3ljonx2ii+m
- 9RFGtAY9ajRZ0cD26GjftxiyxeIeAtWu7URLrOI8A+Lw0GAEVcszyM9ZRFdJlc08EK1XvUd7f
- XCxFK9PT8N8u3QcAHeJVXV7+Yf8MYQwCfDHHgUxfKeLpWebe1iwtZ9fnvdrASJPE/hDuM/drI
- L6Jk/bediLutv4yTodCgVwdGVT8oaRNGmTqs2RfPTu901J+jgJV32+AKwPzz1tDLeZRNGatz3
- 2zKM9WeRjUAmo9NUpCpFaczeA2ricQYTRbfn/fzmDfjadBickbsLPmA4o5TSogFAoS7f2newa
- ThBTcxfOpB1EsE/arcxAM63r1ztFIuqg68Vu9nOPlgrhZyf5tHk71XgjSPihgdSRrnMgj36Ug
- 0J2X5D7ph7QXB7G7iS3lswsR7YsUlk4Zd1nU+GJbtoGSqCHB8fGSh4MxBKCjeq6nrHhe1mu24
- Igf0Ow86F76Vmkewp9AbvVraUCuksxzn/lIdR6KBrjyMYLIcjcXuTCKTqNc=
+Content-Disposition: inline
+In-Reply-To: <20190701123558.30512-4-ppandit@redhat.com>
+User-Agent: Mutt/1.12.0 (2019-05-25)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.31]); Tue, 02 Jul 2019 09:55:00 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.133
-Subject: Re: [Qemu-devel] [PATCH 4/6] Add missing BUSCR/PCR CR defines,
- and BUSCR/PCR/CAAR CR to m68k_move_to/from
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v3 3/3] net: tap: refactor
+ net_bridge_run_helper routine
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -121,77 +71,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Riccardo Schirone <rschiron@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Li Qiang <liq3ea@gmail.com>, Qemu Developers <qemu-devel@nongnu.org>,
+ Prasad J Pandit <pjp@fedoraproject.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 16/06/2019 à 16:23, Lucien Murray-Pitts a écrit :
-> The BUSCR/PCR CR defines were missing for 68060, and the move_to/from helper
-> functions were also missing a decode for the 68060 M68K_CR_CAAR CR register.
+On Mon, Jul 01, 2019 at 06:05:58PM +0530, P J P wrote:
+> From: Prasad J Pandit <pjp@fedoraproject.org>
 > 
-> Added missing defines, and respective decodes for all three CR registers to
-> the helpers.
+> Refactor 'net_bridge_run_helper' routine to avoid buffer
+> formatting to prepare 'helper_cmd' and using shell to invoke
+> helper command. Instead directly execute helper program with
+> due arguments.
 > 
-> Although this patch defines them, the implementation is empty in this patch
-> and these registers will result in a cpu abort - which is the default prior
-> to this patch.
-> 
-> This patch aims to reach full coverage of all CR registers within the helpers.
-> 
-> Signed-off-by: Lucien Murray-Pitts <lucienmp.qemu@gmail.com>
+> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
 > ---
->  target/m68k/cpu.h    |  4 ++++
->  target/m68k/helper.c | 14 ++++++++++++++
->  2 files changed, 18 insertions(+)
+>  net/tap.c | 43 +++++++++----------------------------------
+>  1 file changed, 9 insertions(+), 34 deletions(-)
 > 
-> diff --git a/target/m68k/cpu.h b/target/m68k/cpu.h
-> index b5b3db01c9..2386419c42 100644
-> --- a/target/m68k/cpu.h
-> +++ b/target/m68k/cpu.h
-> @@ -411,6 +411,10 @@ typedef enum {
->  #define M68K_CR_DACR0    0x006
->  #define M68K_CR_DACR1    0x007
+> Update v3: remove buffer formatting and use of shell to invoke helper
+>   -> https://lists.gnu.org/archive/html/qemu-devel/2019-07/msg00071.html
+> 
+> diff --git a/net/tap.c b/net/tap.c
+> index e8aadd8d4b..bc9b3407a6 100644
+> --- a/net/tap.c
+> +++ b/net/tap.c
+> @@ -478,7 +478,6 @@ static int net_bridge_run_helper(const char *helper, const char *bridge,
+>      sigset_t oldmask, mask;
+>      int pid, status;
+>      char *args[5];
+> -    char **parg;
+>      int sv[2];
 >  
-> +/* MC68060 */
-> +#define M68K_CR_BUSCR    0x008
-> +#define M68K_CR_PCR      0x808
-> +
->  #define M68K_FPIAR_SHIFT  0
->  #define M68K_FPIAR        (1 << M68K_FPIAR_SHIFT)
->  #define M68K_FPSR_SHIFT   1
-> diff --git a/target/m68k/helper.c b/target/m68k/helper.c
-> index 5483ce9837..47b352c9c9 100644
-> --- a/target/m68k/helper.c
-> +++ b/target/m68k/helper.c
-> @@ -257,6 +257,14 @@ void HELPER(m68k_movec_to)(CPUM68KState *env, uint32_t reg, uint32_t val)
->      case M68K_CR_DTT1:
->          env->mmu.ttr[M68K_DTTR1] = val;
->          return;
-> +    /* Unimplemented Registers */
-> +    case M68K_CR_CAAR:
-> +    case M68K_CR_PCR:
-> +    case M68K_CR_BUSCR:
-> +        cpu_abort(CPU(cpu),
-> +                  "Unimplemented control register write 0x%x = 0x%x\n",
-> +                  reg, val);
-> +        return;
+>      sigemptyset(&mask);
+> @@ -498,9 +497,6 @@ static int net_bridge_run_helper(const char *helper, const char *bridge,
 >      }
->      cpu_abort(CPU(cpu), "Unimplemented control register write 0x%x = 0x%x\n",
->                reg, val);
-> @@ -312,6 +320,12 @@ uint32_t HELPER(m68k_movec_from)(CPUM68KState *env, uint32_t reg)
->      /* MC68040/MC68LC040 */
->      case M68K_CR_DTT1: /* MC68EC040 only: M68K_CR_DACR1 */
->          return env->mmu.ttr[M68K_DTTR1];
-> +    /* Unimplemented Registers */
-> +    case M68K_CR_CAAR:
-> +    case M68K_CR_PCR:
-> +    case M68K_CR_BUSCR:
-> +        cpu_abort(CPU(cpu), "Unimplemented control register read 0x%x\n",
-> +                  reg);
->      }
->      cpu_abort(CPU(cpu), "Unimplemented control register read 0x%x\n",
->                reg);
-> 
+>      if (pid == 0) {
+>          int open_max = sysconf(_SC_OPEN_MAX), i;
+> -        char fd_buf[6+10];
+> -        char br_buf[6+IFNAMSIZ] = {0};
+> -        char helper_cmd[PATH_MAX + sizeof(fd_buf) + sizeof(br_buf) + 15];
+>  
+>          for (i = 3; i < open_max; i++) {
+>              if (i != sv[1]) {
+> @@ -508,39 +504,18 @@ static int net_bridge_run_helper(const char *helper, const char *bridge,
+>              }
+>          }
+>  
+> -        snprintf(fd_buf, sizeof(fd_buf), "%s%d", "--fd=", sv[1]);
+> +        args[0] = (char *)helper;
+> +        args[1] = (char *)"--use-vnet";
+> +        args[2] = g_strdup_printf("%s%d", "--fd=", sv[1]);
+> +        args[3] = g_strdup_printf("%s%s", "--br=", bridge);
+> +        args[4] = NULL;
+>  
+> -        if (strrchr(helper, ' ') || strrchr(helper, '\t')) {
+> -            /* assume helper is a command */
+> +        execv(helper, args);
+>  
+> -            if (strstr(helper, "--br=") == NULL) {
+> -                snprintf(br_buf, sizeof(br_buf), "%s%s", "--br=", bridge);
+> -            }
+> +        g_free(args[2]);
+> +        g_free(args[3]);
+> +        fprintf(stderr, "failed to execute helper: %s\n", helper);
+>  
+> -            snprintf(helper_cmd, sizeof(helper_cmd), "%s %s %s %s",
+> -                     helper, "--use-vnet", fd_buf, br_buf);
+> -
+> -            parg = args;
+> -            *parg++ = (char *)"sh";
+> -            *parg++ = (char *)"-c";
+> -            *parg++ = helper_cmd;
+> -            *parg++ = NULL;
+> -
+> -            execv("/bin/sh", args);
+> -        } else {
+> -            /* assume helper is just the executable path name */
+> -
+> -            snprintf(br_buf, sizeof(br_buf), "%s%s", "--br=", bridge);
+> -
+> -            parg = args;
+> -            *parg++ = (char *)helper;
+> -            *parg++ = (char *)"--use-vnet";
+> -            *parg++ = fd_buf;
+> -            *parg++ = br_buf;
+> -            *parg++ = NULL;
+> -
+> -            execv(helper, args);
+> -        }
 
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+Hmm, it seems I was probaly a bit too optimistic in my suggestion to
+drop use of shell entirely.
+
+The original code was passing through to the shell to handle the case
+where the user requested
+
+   -netdev bridge,helper="/path/to/helper myarg otherarg"
+
+In theory any parts could contain shell meta characters, but even if
+they don't we'll have slightly broken compat with this change.
+
+The QEMU man page has never documented that you can pass a command
+and args, which get sent via the shell though. It only ever documented
+the helper arg as being a plain qualified binary path.
+
+So the question is how strictly we need to consider compatiblity.
+
+The "if it isn't documented it never existed" option is to use your
+patch here.
+
+The moderately aggressive option is to just use g_shell_parse_argv()
+to split the "helper" into a set of argv we can exec directly, and
+declare that we don't support shell meta characters in helper.
+
+The safest option is to put in a place a deprecation saying we'll
+drop use of shell in future, only implementing the agressive
+option in a later release.
+
+Perhaps from your POV, the easy thing is to avoid this entire
+question - just leave the code calling shell, but switch to
+g_strdup_printf instead of snprintf.
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
