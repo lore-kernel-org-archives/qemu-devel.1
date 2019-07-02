@@ -2,74 +2,62 @@ Return-Path: <SRS0=9yXi=U7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BFBBEC06510
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 19:39:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ABE11C06510
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 19:40:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 94DB621850
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 19:39:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 94DB621850
+	by mail.kernel.org (Postfix) with ESMTPS id 70C8421852
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 19:40:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 70C8421852
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56688 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56692 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hiOch-0004RE-I5
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 15:39:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37090)
+	id 1hiOdg-0005Mx-EW
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 15:40:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57627)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <slp@redhat.com>) id 1hiMg4-0002G5-SG
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 13:34:50 -0400
+ (envelope-from <mst@redhat.com>) id 1hiMHi-0003AT-9E
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 13:09:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <slp@redhat.com>) id 1hiMg0-0007Xa-Gi
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 13:34:46 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:55886)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <slp@redhat.com>) id 1hiMfz-0007Nw-UL
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 13:34:44 -0400
-Received: by mail-wm1-f66.google.com with SMTP id a15so1649477wmj.5
- for <qemu-devel@nongnu.org>; Tue, 02 Jul 2019 10:34:35 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version;
- bh=dnzxj1IkEQS5+Ji3niIKm++yqjlRY68EvWHVomKWYJc=;
- b=Jypopi23Cql0uou5bNPSZadXNQW0/fmKczJiNehwq28yBCbHU1Qd3XeQGtkKcDIKNf
- xMq/KUvL+obaI9gRsvjSIvmZoX7NcTLGtLV7ELft2bKd0e8UbiPJCf98/9hrn0bVm683
- P8PbabZ7ouAhBpEu1XkvREj3WKoooh4Bu2d+qvkzl5keQGRhSu+31IRmHprHF6XhVh6M
- IeR7gi3ZFP3ExmwS0OXqGYbhZM1Ct7xe9LrWMWWNqXBGDhWEYtwyIX5dys1cCFbGOUhY
- yZcmi+fNlFnNH+fz4Areo8/n+Bkl/IDYuhqejjkBKTbTDRJkza8UkxU/jWCGNGccNNZd
- EFhw==
-X-Gm-Message-State: APjAAAWD95W//IVv+YH8NpVH3Gyn+MnnVxQ4WBmcYk1wpyef11yJ7WSN
- uZX5IhZ0qvFR5JUSeWP3Z16g0rowEVQHDA==
-X-Google-Smtp-Source: APXvYqyrfqVPGpvFPbJFCfOizBpfdOTh+7MTufC9fXR1o5/m61ya+sxAmkuvpy+n+YCgXR5MEG0Zsg==
-X-Received: by 2002:a1c:2d8b:: with SMTP id t133mr4144929wmt.57.1562088874028; 
- Tue, 02 Jul 2019 10:34:34 -0700 (PDT)
-Received: from dritchie.redhat.com (18.red-83-35-20.dynamicip.rima-tde.net.
- [83.35.20.18])
- by smtp.gmail.com with ESMTPSA id s188sm2176721wmf.40.2019.07.02.10.34.32
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Tue, 02 Jul 2019 10:34:33 -0700 (PDT)
-References: <20190702121106.28374-1-slp@redhat.com>
- <CAFEAcA-k76t9_TJnYSF_kocgba9dYMyf=Q6OBY2VVuhiWsbqrw@mail.gmail.com>
-User-agent: mu4e 1.2.0; emacs 26.2
-From: Sergio Lopez <slp@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-In-reply-to: <CAFEAcA-k76t9_TJnYSF_kocgba9dYMyf=Q6OBY2VVuhiWsbqrw@mail.gmail.com>
-Date: Tue, 02 Jul 2019 19:34:20 +0200
-Message-ID: <87a7dwnxwj.fsf@redhat.com>
+ (envelope-from <mst@redhat.com>) id 1hiMHg-0004T3-5w
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 13:09:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33766)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1hiMHf-0004RG-WF
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 13:09:36 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id ACCC4309174E;
+ Tue,  2 Jul 2019 17:09:33 +0000 (UTC)
+Received: from redhat.com (ovpn-124-209.rdu2.redhat.com [10.10.124.209])
+ by smtp.corp.redhat.com (Postfix) with SMTP id 7CED21001B1B;
+ Tue,  2 Jul 2019 17:09:23 +0000 (UTC)
+Date: Tue, 2 Jul 2019 13:09:22 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190702130653-mutt-send-email-mst@kernel.org>
+References: <20190619094907.10131-1-pagupta@redhat.com>
+ <20190619094907.10131-5-pagupta@redhat.com>
+ <20190702135519.46a9e3f2.cohuck@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
- micalg=pgp-sha256; protocol="application/pgp-signature"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190702135519.46a9e3f2.cohuck@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.41]); Tue, 02 Jul 2019 17:09:33 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.128.66
-Subject: Re: [Qemu-devel] [PATCH v3 0/4] Introduce the microvm machine type
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2 4/7] virtio-pci: Proxy for virtio-pmem
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -81,70 +69,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, maran.wilson@oracle.com,
- "Michael S. Tsirkin" <mst@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Stefano Garzarella <sgarzare@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: kwolf@redhat.com, Pankaj Gupta <pagupta@redhat.com>,
+ xiaoguangrong.eric@gmail.com, riel@surriel.com, armbru@redhat.com,
+ david@redhat.com, qemu-devel@nongnu.org, ehabkost@redhat.com,
+ lcapitulino@redhat.com, aarcange@redhat.com, stefanha@redhat.com,
+ pbonzini@redhat.com, imammedo@redhat.com, dan.j.williams@intel.com,
+ nilal@redhat.com, dgilbert@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---=-=-=
-Content-Type: text/plain
+On Tue, Jul 02, 2019 at 01:55:19PM +0200, Cornelia Huck wrote:
+> On Wed, 19 Jun 2019 15:19:04 +0530
+> Pankaj Gupta <pagupta@redhat.com> wrote:
+> 
+> > We need a proxy device for virtio-pmem, and this device has to be the
+> > actual memory device so we can cleanly hotplug it.
+> > 
+> > Forward memory device class functions either to the actual device or use
+> > properties of the virtio-pmem device to implement these in the proxy.
+> > 
+> > virtio-pmem will only be compiled for selected, supported architectures
+> > (that can deal with virtio/pci devices being memory devices). An
+> > architecture that is prepared for that can simply enable
+> > CONFIG_VIRTIO_PMEM to make it work.
+> > 
+> > As not all architectures support memory devices (and CONFIG_VIRTIO_PMEM
+> > will be enabled per supported architecture), we have to move the PCI proxy
+> > to a separate file.
+> > 
+> > Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
+> > [ split up patches, memory-device changes, move pci proxy]
+> > Signed-off-by: David Hildenbrand <david@redhat.com>
+> > ---
+> >  hw/virtio/Makefile.objs     |   1 +
+> >  hw/virtio/virtio-pmem-pci.c | 131 ++++++++++++++++++++++++++++++++++++++++++++
+> >  hw/virtio/virtio-pmem-pci.h |  34 ++++++++++++
+> >  include/hw/pci/pci.h        |   1 +
+> >  4 files changed, 167 insertions(+)
+> >  create mode 100644 hw/virtio/virtio-pmem-pci.c
+> >  create mode 100644 hw/virtio/virtio-pmem-pci.h
+> 
+> (...)
+> 
+> > +static const VirtioPCIDeviceTypeInfo virtio_pmem_pci_info = {
+> > +    .base_name             = TYPE_VIRTIO_PMEM_PCI,
+> > +    .generic_name          = "virtio-pmem-pci",
+> > +    .transitional_name     = "virtio-pmem-pci-transitional",
+> 
+> Do we even have a transitional device for this? I.e., do we have a
+> legacy version? I don't think that makes sense for new devices.
 
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+I agree - I applied so pls send a patch on top.
+Or if you end up having to respin pls include this.
 
-> On Tue, 2 Jul 2019 at 13:14, Sergio Lopez <slp@redhat.com> wrote:
->>
->> Microvm is a machine type inspired by both NEMU and Firecracker, and
->> constructed after the machine model implemented by the latter.
->>
->> It's main purpose is providing users a KVM-only machine type with fast
->> boot times, minimal attack surface (measured as the number of IO ports
->> and MMIO regions exposed to the Guest) and small footprint (specially
->> when combined with the ongoing QEMU modularization effort).
->>
->> Normally, other than the device support provided by KVM itself,
->> microvm only supports virtio-mmio devices. Microvm also includes a
->> legacy mode, which adds an ISA bus with a 16550A serial port, useful
->> for being able to see the early boot kernel messages.
->
-> Could we use virtio-pci instead of virtio-mmio? virtio-mmio is
-> a bit deprecated and tends not to support all the features that
-> virtio-pci does. It was introduced mostly as a stopgap while we
-> didn't have pci support in the aarch64 virt machine, and remains
-> for legacy "we don't like to break existing working setups" rather
-> than as a recommended config for new systems.
+> > +    .non_transitional_name = "virtio-pmem-pci-non-transitional",
 
-Using virtio-pci implies keeping PCI and ACPI support, defeating a
-significant part of microvm's purpose.
+Neither do we need a non transitional name.
 
-What are the issues with the current state of virtio-mmio? Is there a
-way I can help to improve the situation?
-
-Sergio.
-
-
-
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEvtX891EthoCRQuii9GknjS8MAjUFAl0blZwACgkQ9GknjS8M
-AjXaYxAAtABbPa3VQU4zYsUMyKT6FGtUrPXe2oPg51ZR+/pasmBp4zwfkmhLxILY
-yleJZMWk6KJc2eKDEwWNY8II/lszUexUQIYVuj3AH9TUw53NQcwiKcyy59m9QHe+
-hCQ+defFEfcK85zDbxHleW/zgkfSR61n+IEdJ5UzdEedZiVOcS/7BWqnXvNv18WV
-4U3VqYMLAiqAoDfVxNKfcBN84DqHzeLWOVeZPeeNKHfPqTGXKtx01pyLrCz6N9Ud
-Ddi2l+g8JhSVyG+n1IzczzpuGTFH6bN6sSrUjxV4bNR2sgAir3f+H1ofqXQSaI9P
-Zmr2lpwCLl8QYTcUPMq7Xg/WB1+hIhMdqAgctC2j0CMl3dC6NKFZkPYu0DVhjFCx
-dGivq0OWUckkxUyQph7IRUTzJkfQ2r6Z9Azb9S0G+dH01qG2R1pUN1GZNz9Jm3UE
-grCJYGt0WbB7rPt59a5W6mFxnCPRcx1BzMmnuFif/9Y2IQ+RY48Jv/XSbkvI8e8z
-PQTMVZgwoyVKc1n4v/uBAN8aDAKG4+ZRUXdOIXgH+IOCj+ruGWYB1UZ+lsBptcm0
-aB0VGLNmkj+/rQNDRlCkSkVNIFaZSA2mhFPAYLqiMKr7whzWGB440MZnnGtzDUOO
-ax0O/KfqPZUXTEDQLOcCQ7kjuu+nWjldfJfBpyIoQZNaQgEFHDw=
-=lAaz
------END PGP SIGNATURE-----
---=-=-=--
+> > +    .instance_size = sizeof(VirtIOPMEMPCI),
+> > +    .instance_init = virtio_pmem_pci_instance_init,
+> > +    .class_init    = virtio_pmem_pci_class_init,
+> > +    .interfaces = (InterfaceInfo[]) {
+> > +        { TYPE_MEMORY_DEVICE },
+> > +        { }
+> > +    },
+> > +};
+> 
+> (...)
 
