@@ -3,79 +3,57 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56274C06510
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 14:43:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 895B9C06510
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 14:45:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DF534206A3
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 14:43:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF534206A3
+	by mail.kernel.org (Postfix) with ESMTPS id 62B4D21721
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 14:45:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 62B4D21721
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54108 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54152 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hiK0S-0000qi-V0
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 10:43:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52278)
+	id 1hiK2g-0002a3-MG
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 10:45:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52603)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <slp@redhat.com>) id 1hiJzF-0008KK-4O
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 10:42:29 -0400
+ (envelope-from <philmd@redhat.com>) id 1hiK0c-0001S2-2n
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 10:43:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <slp@redhat.com>) id 1hiJzB-00073S-Uk
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 10:42:23 -0400
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:37613)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <slp@redhat.com>) id 1hiJz7-0006ws-HF
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 10:42:19 -0400
-Received: by mail-wm1-f67.google.com with SMTP id f17so1330693wme.2
- for <qemu-devel@nongnu.org>; Tue, 02 Jul 2019 07:42:16 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version;
- bh=3KybRH5yyjsHZjBHnS5qiKk8KQ7FFVDodzlAobZqW/E=;
- b=E3YxmBqFlfhyLQhakACkAmnzXMVBgz2+EPEBQ0w5WZ7698SpImuCp4jequjwZLMBn7
- 1koAVQ5fwk/CqycMpcfCJN0AU3Xqx9Nbd6AWUsy4kmMqjLJK9lJumqjV6IBcv5VCVFsc
- tc4N0dv5zUQONv9zxnkvA6h7/9iV2IgqL81b55KQ3NOjTxlDQk56kFIzGf8vo4je2djb
- SS+lWDcjxYmaJ+zKqDXoIM8YmKFQvp5AainoV+BxKfFT9hVBTcbjEiXKE6zthl8qqfV5
- So6vVRAHvY8C/JqQ4ONC3wIEIzjZkKhjiiPGidsbKfJNiKT2ed1LLWYAxoYcrWuwIzXl
- mBgw==
-X-Gm-Message-State: APjAAAVMhwULSa4hbjAPKxlPOakVZAEasXQ6PUGQGICj3m2K0+dRFEw0
- 0alXl2CAoUfZkYuGleyfNdxT3t/QkJkVpw==
-X-Google-Smtp-Source: APXvYqxsXInDKQq4Yk0BqDe+117nIERUOFUNFi6PYit2oWu3T83n7CRw9qXIiWMOU2xop3xA0zdKwQ==
-X-Received: by 2002:a05:600c:2311:: with SMTP id
- 17mr3609904wmo.18.1562078534989; 
- Tue, 02 Jul 2019 07:42:14 -0700 (PDT)
-Received: from dritchie.redhat.com (18.red-83-35-20.dynamicip.rima-tde.net.
- [83.35.20.18])
- by smtp.gmail.com with ESMTPSA id r16sm26909832wrr.42.2019.07.02.07.42.13
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Tue, 02 Jul 2019 07:42:14 -0700 (PDT)
-References: <20190701144705.102615-1-slp@redhat.com>
- <20190701144705.102615-5-slp@redhat.com>
- <20190702081733.ff6cboiddln5wmti@sirius.home.kraxel.org>
- <878stgygiu.fsf@redhat.com>
- <20190702101625.trsg5dnnf2a4woqs@sirius.home.kraxel.org>
- <875zokyahg.fsf@redhat.com> <8c3b4619-f779-fb0c-7a53-b67150036a07@redhat.com>
-User-agent: mu4e 1.2.0; emacs 26.2
-From: Sergio Lopez <slp@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-In-reply-to: <8c3b4619-f779-fb0c-7a53-b67150036a07@redhat.com>
-Date: Tue, 02 Jul 2019 16:41:51 +0200
-Message-ID: <8736joxzv4.fsf@redhat.com>
+ (envelope-from <philmd@redhat.com>) id 1hiK0a-0008TX-Tw
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 10:43:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49332)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>)
+ id 1hiK0Y-0008QE-7q; Tue, 02 Jul 2019 10:43:46 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 6E4D481DE0;
+ Tue,  2 Jul 2019 14:43:45 +0000 (UTC)
+Received: from x1w.redhat.com (ovpn-204-140.brq.redhat.com [10.40.204.140])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7AEBA67142;
+ Tue,  2 Jul 2019 14:43:39 +0000 (UTC)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Tue,  2 Jul 2019 16:43:34 +0200
+Message-Id: <20190702144335.10717-1-philmd@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
- micalg=pgp-sha256; protocol="application/pgp-signature"
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.25]); Tue, 02 Jul 2019 14:43:45 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.128.67
-Subject: Re: [Qemu-devel] [PATCH v2 4/4] hw/i386: Introduce the microvm
- machine type
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH v5 0/1] Support disabling TCG on ARM
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,66 +65,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, maran.wilson@oracle.com, mst@redhat.com,
- qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, rth@twiddle.net
+Cc: Yang Zhong <yang.zhong@intel.com>, Peter Maydell <peter.maydell@linaro.org>,
+ Samuel Ortiz <sameo@linux.intel.com>, Rob Bradford <robert.bradford@intel.com>,
+ qemu-arm@nongnu.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---=-=-=
-Content-Type: text/plain
+v1 cover from Samuel [1]:
 
+  This patchset allows for building and running ARM targets with TCG
+  disabled. It splits the target/arm/helper.c file into logical TCG and
+  non TCG dependent files so that one can build and run QEMU binaries wit=
+h
+  or without TCG enabled.
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+  The rationale behind this work comes from the NEMU project where we're
+  trying to only support x86 and ARM 64-bit architectures, without
+  including the TCG code base. We can only do so if we can build and run
+  ARM binaries with TCG disabled.
 
-> On 02/07/19 12:52, Sergio Lopez wrote:
->> As I said, I'm also in favor of microvm supporting booting from
->> firmware in the future, as long we keep the simple mode too.
->
-> The simple mode adds code to QEMU's x86 target that only exists to
-> support microvm.  It should be motivated by a clear win in boot times.
+v2: https://lists.gnu.org/archive/html/qemu-devel/2019-06/msg03271.html
+v3: https://lists.gnu.org/archive/html/qemu-devel/2019-07/msg00162.html
+v4: https://lists.gnu.org/archive/html/qemu-devel/2019-07/msg00312.html
+- patches 1-12, 14-17, 19-21 accepted, rebased on target-arm.next
+- addressed Peter's comment (described in each patch).
+v5:
+- patches 1-2 accepted, rebased on target-arm.next
+- addressed Peter's comment (broken v4 rebase, patch not building...)
 
-OK. When I'm back from my PTO, I'll work on adding the firmware
-support to microvm. I'll run and share some numbers to see whether the
-simple mode makes sense or we can just rely on qboot for lower boot
-times plus SeaBIOS for compatibility.
+Based-on: target-arm.next
+$ git backport-diff -u v3 -r target-arm.next..v5
+Key:
+[----] : patches are identical
+[####] : number of functional differences between upstream/downstream pat=
+ch
+[down] : patch is downstream-only
+The flags [FC] indicate (F)unctional and (C)ontextual differences, respec=
+tively
 
-Cheers,
-Sergio.
+001/1:[0025] [FC] 'target/arm/helper: Move M profile routines to m_helper=
+.c'
 
->> My main concern about supporting SeaBIOS, in addition to boot times, is
->> having to support ACPI, which due to its complexity and size, is a clear
->> candidate to be stripped out from a minimalistic QEMU build.
->
-> SeaBIOS doesn't need ACPI.  I agree that ACPI should be optional in microvm.
->
->> AFAIK, qboot can't boot a guest without both ACPI and PCI.
->
-> It currently needs PCI, but that's a one-line change to avoid panicking.
->  ACPI is optional, on the other hand qboot doesn't support mptable so
-> that can be a problem when ACPI is disabled.
->
-> Paolo
+Thanks a lot to Alex and Peter for their review time, and Samuel for
+the original effort.
 
+This single patch is not a 'bugfix', simply code movement.
+If it doesn't fit for 4.1-rc0, I'm still glad Peter merged all the
+patches from the previous series :_
 
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
+Regards,
 
------BEGIN PGP SIGNATURE-----
+Phil.
 
-iQIzBAEBCAAdFiEEvtX891EthoCRQuii9GknjS8MAjUFAl0bbS8ACgkQ9GknjS8M
-AjUWEA/+NnJdIeIwIqLJkPEdykh28ubeJymdqLSAwRfoGyxtC4HrdQAFnV2Gjcwo
-HVKnQzrj/hcZu93P7ZeOF7wiXRU+UWdCOWXOrET7RUI8N+ygwTYE6VMnrP9eEwnG
-Vzsc9OsOc3HoHvXql1fmMisbMzFICdLbyW82cTI3nWbz5hy7KVRItQjPrfbrRQ2E
-IxmDdfIHwvk7zpYsbcdvIpyZQMir8Grz7IZ/OVZdGLzryTkyGwkpKOYkd1gG0tAS
-lJwZHYPeAIHe9Ph9JXnCYIMnx81hWB89vMCOnY9BdwDD1njg+6wfj7QmVVSko9VW
-wmkLhJlQ0Gpwe+jMeQ/nYerdHfQOx+hvJYssI6REKBnR8Z12Lbrf16hx/wN2ytAs
-c3oqdRhqrioAexG8/QB77Rxb5YcZ5v/eKvjDeq/Bmm8I6t62sCI34Bd5HAw4UYSI
-mWi9egHi4jVaxAhpuA8176JiNQM1Ho8XGpumZ4tyk5y9XhOZLtDTD/2pVrtIJCDb
-iaKd5SlkXzVAvwa0BpSlMnPkMxSUrweErA9a3cdaTFDShOwuyyrXgq8gc2AyK3ZA
-nwkH3IGlMDpcoUonj7xX8lpMa29KSyGMXh5b4PzE+huMloYfxRQHeTS17DeoYySv
-fRT6osefLE1dlPQYV4hxZDYbgdN7yaU6PdLY3m+r75ddK4TyLMA=
-=vd0U
------END PGP SIGNATURE-----
---=-=-=--
+[1]: https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg02451.html
+
+Philippe Mathieu-Daud=C3=A9 (1):
+  target/arm/helper: Move M profile routines to m_helper.c
+
+ target/arm/Makefile.objs |    1 +
+ target/arm/helper.c      | 2638 +------------------------------------
+ target/arm/m_helper.c    | 2676 ++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 2681 insertions(+), 2634 deletions(-)
+ create mode 100644 target/arm/m_helper.c
+
+--=20
+2.20.1
+
 
