@@ -2,70 +2,77 @@ Return-Path: <SRS0=9yXi=U7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B45B5C06510
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 12:39:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7C87C06510
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 12:39:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 909A4205F4
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 12:39:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 909A4205F4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id BF6342054F
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 12:39:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF6342054F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53176 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53178 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hiI3z-0005fq-Ro
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 08:39:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48712)
+	id 1hiI4i-00061p-LY
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 08:39:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48096)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <laurent@vivier.eu>) id 1hiI2D-0003uf-Jb
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 08:37:22 -0400
+ (envelope-from <bounces@canonical.com>) id 1hiI0b-0002Pu-4c
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 08:35:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1hiI2C-0000ZW-NZ
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 08:37:21 -0400
-Received: from mout.kundenserver.de ([212.227.126.131]:59395)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1hiI2C-0000XR-C6; Tue, 02 Jul 2019 08:37:20 -0400
-Received: from localhost.localdomain ([78.238.229.36]) by
- mrelayeu.kundenserver.de (mreue009 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1Macaw-1iErd03xqU-00c6SQ; Tue, 02 Jul 2019 14:37:17 +0200
-From: Laurent Vivier <laurent@vivier.eu>
-To: qemu-devel@nongnu.org
-Date: Tue,  2 Jul 2019 14:37:10 +0200
-Message-Id: <20190702123713.14396-1-laurent@vivier.eu>
-X-Mailer: git-send-email 2.21.0
+ (envelope-from <bounces@canonical.com>) id 1hiI0W-0006od-QY
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 08:35:39 -0400
+Received: from indium.canonical.com ([91.189.90.7]:46294)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1hiI0U-0006kk-Dp
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 08:35:35 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1hiI0S-0007rx-2E
+ for <qemu-devel@nongnu.org>; Tue, 02 Jul 2019 12:35:32 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 0DA662E80C9
+ for <qemu-devel@nongnu.org>; Tue,  2 Jul 2019 12:35:32 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:rWVCyKkBuYTSSJprfohFkj8FG89hgMcnmXadjVMUTFvUQ8TN5zt
- n3NVrrwkzbroVIiRrXzh6//TdRv4ZDLxyVZGQMtVYYqxhHGCRAsw6N8a8Fz5PSh5VNDL23u
- C8minrkn8/cx+SEJOmpUyyZhcyW53PTJuW41SVgdo46Sx75QQdZiQ2etD30mbr1AMEI/tt3
- e8V1x8b4PxizCNcaFiVWw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:S5ws0Kipkmg=:8p+qFk0t7kKS1k4oDVAzm8
- 5XFAAF/e5ZeBrEYZITHaRmvQ16bxyH1L+aVLAvQDqcTnqRJHIA6fvgXep2MKTYMH87XyJpVbv
- hLEbOuIsdH7Js+zDvLrP0h7zKAxKvDVF90ImqUntS3k/sG3J5hg4ui5+P6+Mqgng3s02Lvnh4
- sDbW6u2LpY+UpqxIjFcxUSY0TsvP3PIZcuIsm9EbcinAQQIq66V1mwb4InFgeDdjs8YppHYky
- iKwpFm6vNESPHjaN7fp+BgflFBCRre6ge9ddWCAL6uMmmCM6Ob44x5wfYMQ6GG6PoymwMCfUW
- xkmJ5D6IcxjwveFxxKk8fQPwlr45h67s57j76TpN6qDO7BAsLx6pANSD4eBAHpyA7rTBEGvuf
- eCwBqJOhPaUVDmAOXCN0CAILusqMlEYCX2K6HpcJ531k9GImAXkJwtXjPOJ7sSFcJ0W/AwuKw
- E0WC4fLtHEp2Mf6QY21085x1HYSpukpjY+/F389m197SPR5FwHd7YXEgEkVOnzdvwtlQVMUXf
- CwuY2BGGdyd8TiLdnOfntZwLDGkmiVwzAjbFu7uq0pWmfoMTliSqr4h0rqsLevaPiuYtwOUZ9
- qQ5eOjtjbWTTszjR/pnPAX7HS9gj4/FojpP8Ujq8WuU/DZRv/0QDZecUM+oSAX6nLDpslL/pa
- /vbg4Y8CU0+4YIZNpUqX3NFn18u+K6pQauFp08O6Dfh2BYRiQZRQX7ijVHoiMdeJRGj8Ze4DY
- 7xdU1sLxw/S9QVYnNg2RvHa/MYWaXd94g9zmoMspueIpB2X/DhF4rngZUJU=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 02 Jul 2019 12:28:25 -0000
+From: Avi Eis <1834113@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug: distribution=ubuntu; sourcepackage=libvirt; component=main;
+ status=New; importance=Undecided; assignee=None; 
+X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
+ status=Incomplete; importance=Undecided; assignee=None; 
+X-Launchpad-Bug-Tags: amd64 apport-bug disco
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: bryce ikes73 paelzer
+X-Launchpad-Bug-Reporter: Avi Eis (ikes73)
+X-Launchpad-Bug-Modifier: Avi Eis (ikes73)
+References: <156142437029.30985.13623507391124028236.malonedeb@soybean.canonical.com>
+Message-Id: <156207050532.2449.12979627321275009664.malone@soybean.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="18991";
+ Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: 90f733380d2ed1165f86d365d8c92ec7ff4a19cc
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.131
-Subject: [Qemu-devel] [PULL 0/3] Trivial branch patches
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1834113] Re: QEMU touchpad input erratic after
+ wakeup from sleep
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -74,46 +81,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>,
- Laurent Vivier <laurent@vivier.eu>, Amit Shah <amit@kernel.org>
+Reply-To: Bug 1834113 <1834113@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit 7d0e02405fc02a181319b1ab8681d2f72246b7c6:
+I'll try a few full boot-sleep-resume cycles on both versions and see
+how often it replicates
 
-  Merge remote-tracking branch 'remotes/vivier2/tags/trivial-patches-pull-request' into staging (2019-07-01 17:40:32 +0100)
+-- =
 
-are available in the Git repository at:
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1834113
 
-  git://github.com/vivier/qemu.git tags/trivial-branch-pull-request
+Title:
+  QEMU touchpad input erratic after wakeup from sleep
 
-for you to fetch changes up to 7c955080d40ccc7952a0479bc160f2b048c0af53:
+Status in QEMU:
+  New
+Status in libvirt package in Ubuntu:
+  New
+Status in qemu package in Ubuntu:
+  Incomplete
 
-  docs/devel/testing: Fix typo in dockerfile path (2019-07-02 10:12:32 +0200)
+Bug description:
+  Using Ubuntu host and guest. Normally the touchpad works great. Within
+  the last few days, suddenly, apparently after a wake from sleep, the
+  touchpad will behave erratically. For example, it will take two clicks
+  to select something, and when moving the cursor it will act as though
+  it is dragging even with the button not clicked.
 
-----------------------------------------------------------------
-Fix typo, fix sys_cache_info() on FreeBSD/powerpc,
-change virtio-rng default to urandom
+  A reboot fixes the issue temporarily.
 
-----------------------------------------------------------------
+  ProblemType: Bug
+  DistroRelease: Ubuntu 19.04
+  Package: qemu 1:3.1+dfsg-2ubuntu3.1
+  Uname: Linux 5.1.14-050114-generic x86_64
+  ApportVersion: 2.20.10-0ubuntu27
+  Architecture: amd64
+  CurrentDesktop: ubuntu:GNOME
+  Date: Mon Jun 24 20:55:44 2019
+  Dependencies:
+   =
 
-Justin Hibbits (1):
-  Fix cacheline detection on FreeBSD/powerpc.
+  EcryptfsInUse: Yes
+  InstallationDate: Installed on 2019-02-20 (124 days ago)
+  InstallationMedia: Ubuntu 18.04 "Bionic" - Build amd64 LIVE Binary 201806=
+08-09:38
+  Lsusb:
+   Bus 002 Device 001: ID 1d6b:0003 Linux Foundation 3.0 root hub
+   Bus 001 Device 002: ID 8087:0025 Intel Corp. =
 
-Kashyap Chamarthy (1):
-  VirtIO-RNG: Update default entropy source to `/dev/urandom`
+   Bus 001 Device 003: ID 0c45:671d Microdia =
 
-Liam Merwick (1):
-  docs/devel/testing: Fix typo in dockerfile path
+   Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+  MachineType: Dell Inc. Precision 5530
+  ProcEnviron:
+   TERM=3Dxterm-256color
+   PATH=3D(custom, no user)
+   XDG_RUNTIME_DIR=3D<set>
+   LANG=3Den_US.UTF-8
+   SHELL=3D/bin/bash
+  ProcKernelCmdLine: BOOT_IMAGE=3D/boot/vmlinuz-5.1.14-050114-generic root=
+=3DUUID=3D18e8777c-1764-41e4-a19f-62476055de23 ro mem_sleep_default=3Ddeep =
+mem_sleep_default=3Ddeep acpi_rev_override=3D1 scsi_mod.use_blk_mq=3D1 nouv=
+eau.modeset=3D0 nouveau.runpm=3D0 nouveau.blacklist=3D1 acpi_backlight=3Dno=
+ne acpi_osi=3DLinux acpi_osi=3D!
+  SourcePackage: qemu
+  UpgradeStatus: No upgrade log present (probably fresh install)
+  dmi.bios.date: 04/26/2019
+  dmi.bios.vendor: Dell Inc.
+  dmi.bios.version: 1.10.1
+  dmi.board.name: 0FP2W2
+  dmi.board.vendor: Dell Inc.
+  dmi.board.version: A00
+  dmi.chassis.type: 10
+  dmi.chassis.vendor: Dell Inc.
+  dmi.modalias: dmi:bvnDellInc.:bvr1.10.1:bd04/26/2019:svnDellInc.:pnPrecis=
+ion5530:pvr:rvnDellInc.:rn0FP2W2:rvrA00:cvnDellInc.:ct10:cvr:
+  dmi.product.family: Precision
+  dmi.product.name: Precision 5530
+  dmi.product.sku: 087D
+  dmi.sys.vendor: Dell Inc.
 
- backends/rng-random.c  | 2 +-
- docs/devel/testing.rst | 2 +-
- qemu-options.hx        | 2 +-
- util/cacheinfo.c       | 2 +-
- 4 files changed, 4 insertions(+), 4 deletions(-)
-
--- 
-2.21.0
-
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1834113/+subscriptions
 
