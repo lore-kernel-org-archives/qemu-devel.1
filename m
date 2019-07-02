@@ -2,91 +2,61 @@ Return-Path: <SRS0=9yXi=U7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B04E7C06510
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 16:41:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0222C06510
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 16:43:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8940D20989
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 16:41:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8940D20989
+	by mail.kernel.org (Postfix) with ESMTPS id 99ADA20989
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 16:43:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 99ADA20989
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55122 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55128 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hiLqd-0008KZ-GQ
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 12:41:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38442)
+	id 1hiLrv-000144-PY
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 12:42:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37876)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hiKrO-0001n9-DX
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 11:38:24 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1hiKpz-0008Nk-El
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 11:36:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hiKrM-0007pg-RH
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 11:38:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46188)
+ (envelope-from <ehabkost@redhat.com>) id 1hiKpy-0006ZY-1K
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 11:36:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44204)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hiKrK-0007mc-H0; Tue, 02 Jul 2019 11:38:18 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hiKpx-0006W9-O5
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 11:36:53 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id EAAB681F0C;
- Tue,  2 Jul 2019 15:38:16 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-204-120.brq.redhat.com
- [10.40.204.120])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5DA785D6A9;
- Tue,  2 Jul 2019 15:38:13 +0000 (UTC)
-To: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org
-References: <20190627223255.3789-1-mreitz@redhat.com>
- <20190627223255.3789-2-mreitz@redhat.com>
- <w51k1d05tzo.fsf@maestria.local.igalia.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <237a01ec-a5a7-f410-ae7b-b65e24822376@redhat.com>
-Date: Tue, 2 Jul 2019 17:38:11 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
-MIME-Version: 1.0
-In-Reply-To: <w51k1d05tzo.fsf@maestria.local.igalia.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="eH0pnGh0KmzOx9OAUesKRYTh7rsNCxjFo"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+ by mx1.redhat.com (Postfix) with ESMTPS id 644337FD45;
+ Tue,  2 Jul 2019 15:36:43 +0000 (UTC)
+Received: from localhost (ovpn-116-30.gru2.redhat.com [10.97.116.30])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D87F319732;
+ Tue,  2 Jul 2019 15:36:40 +0000 (UTC)
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
+ Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+ Richard Henderson <rth@twiddle.net>
+Date: Tue,  2 Jul 2019 12:35:20 -0300
+Message-Id: <20190702153535.9851-28-ehabkost@redhat.com>
+In-Reply-To: <20190702153535.9851-1-ehabkost@redhat.com>
+References: <20190702153535.9851-1-ehabkost@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.27]); Tue, 02 Jul 2019 15:38:17 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.27]); Tue, 02 Jul 2019 15:36:51 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 1/5] block: Add BDS.never_freeze
+Subject: [Qemu-devel] [PULL v3 27/42] target/i386: Add CPUID.1F generation
+ support for multi-dies PCMachine
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,69 +68,141 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
- John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
+Cc: Like Xu <like.xu@linux.intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---eH0pnGh0KmzOx9OAUesKRYTh7rsNCxjFo
-Content-Type: multipart/mixed; boundary="YSfvGmcRPe8MxNzSwgLZwmvFxziFrTdyu";
- protected-headers="v1"
-From: Max Reitz <mreitz@redhat.com>
-To: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Andrey Shinkevich
- <andrey.shinkevich@virtuozzo.com>, John Snow <jsnow@redhat.com>,
- Kevin Wolf <kwolf@redhat.com>
-Message-ID: <237a01ec-a5a7-f410-ae7b-b65e24822376@redhat.com>
-Subject: Re: [PATCH 1/5] block: Add BDS.never_freeze
-References: <20190627223255.3789-1-mreitz@redhat.com>
- <20190627223255.3789-2-mreitz@redhat.com>
- <w51k1d05tzo.fsf@maestria.local.igalia.com>
-In-Reply-To: <w51k1d05tzo.fsf@maestria.local.igalia.com>
+From: Like Xu <like.xu@linux.intel.com>
 
---YSfvGmcRPe8MxNzSwgLZwmvFxziFrTdyu
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+The CPUID.1F as Intel V2 Extended Topology Enumeration Leaf would be
+exposed if guests want to emulate multiple software-visible die within
+each package. Per Intel's SDM, the 0x1f is a superset of 0xb, thus they
+can be generated by almost same code as 0xb except die_offset setting.
 
-On 02.07.19 17:36, Alberto Garcia wrote:
-> On Fri 28 Jun 2019 12:32:51 AM CEST, Max Reitz wrote:
->> The commit and the mirror block job must be able to drop their filter
->> node at any point.  However, this will not be possible if any of the
->> BdrvChild links to them is frozen.  Therefore, we need to prevent them=
+If the number of dies per package is greater than 1, the cpuid_min_level
+would be adjusted to 0x1f regardless of whether the host supports CPUID.1F.
+Likewise, the CPUID.1F wouldn't be exposed if env->nr_dies < 2.
 
->> from ever becoming frozen.
->>
->> Signed-off-by: Max Reitz <mreitz@redhat.com>
->=20
-> Reviewed-by: Alberto Garcia <berto@igalia.com>
+Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
+Signed-off-by: Like Xu <like.xu@linux.intel.com>
+Message-Id: <20190620054525.37188-2-like.xu@linux.intel.com>
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+---
+ target/i386/cpu.h |  1 +
+ target/i386/cpu.c | 41 +++++++++++++++++++++++++++++++++++++++++
+ target/i386/kvm.c | 12 ++++++++++++
+ 3 files changed, 54 insertions(+)
 
-Thanks! :-)
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 85319f4ae1..0a96c78669 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -736,6 +736,7 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
+ #define CPUID_TOPOLOGY_LEVEL_INVALID  (0U << 8)
+ #define CPUID_TOPOLOGY_LEVEL_SMT      (1U << 8)
+ #define CPUID_TOPOLOGY_LEVEL_CORE     (2U << 8)
++#define CPUID_TOPOLOGY_LEVEL_DIE      (5U << 8)
+ 
+ /* MSR Feature Bits */
+ #define MSR_ARCH_CAP_RDCL_NO    (1U << 0)
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 35ecb4113c..ea52db0600 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -4413,6 +4413,42 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+             *ecx |= CPUID_TOPOLOGY_LEVEL_INVALID;
+         }
+ 
++        assert(!(*eax & ~0x1f));
++        *ebx &= 0xffff; /* The count doesn't need to be reliable. */
++        break;
++    case 0x1F:
++        /* V2 Extended Topology Enumeration Leaf */
++        if (env->nr_dies < 2) {
++            *eax = *ebx = *ecx = *edx = 0;
++            break;
++        }
++
++        *ecx = count & 0xff;
++        *edx = cpu->apic_id;
++        switch (count) {
++        case 0:
++            *eax = apicid_core_offset(env->nr_dies, cs->nr_cores,
++                                                    cs->nr_threads);
++            *ebx = cs->nr_threads;
++            *ecx |= CPUID_TOPOLOGY_LEVEL_SMT;
++            break;
++        case 1:
++            *eax = apicid_die_offset(env->nr_dies, cs->nr_cores,
++                                                   cs->nr_threads);
++            *ebx = cs->nr_cores * cs->nr_threads;
++            *ecx |= CPUID_TOPOLOGY_LEVEL_CORE;
++            break;
++        case 2:
++            *eax = apicid_pkg_offset(env->nr_dies, cs->nr_cores,
++                                                   cs->nr_threads);
++            *ebx = env->nr_dies * cs->nr_cores * cs->nr_threads;
++            *ecx |= CPUID_TOPOLOGY_LEVEL_DIE;
++            break;
++        default:
++            *eax = 0;
++            *ebx = 0;
++            *ecx |= CPUID_TOPOLOGY_LEVEL_INVALID;
++        }
+         assert(!(*eax & ~0x1f));
+         *ebx &= 0xffff; /* The count doesn't need to be reliable. */
+         break;
+@@ -5094,6 +5130,11 @@ static void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
+             x86_cpu_adjust_level(cpu, &cpu->env.cpuid_min_level, 0x14);
+         }
+ 
++        /* CPU topology with multi-dies support requires CPUID[0x1F] */
++        if (env->nr_dies > 1) {
++            x86_cpu_adjust_level(cpu, &env->cpuid_min_level, 0x1F);
++        }
++
+         /* SVM requires CPUID[0x8000000A] */
+         if (env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_SVM) {
+             x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel, 0x8000000A);
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index e4b4f5756a..473a17e9a5 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -1451,6 +1451,10 @@ int kvm_arch_init_vcpu(CPUState *cs)
+             }
+             break;
+         }
++        case 0x1f:
++            if (env->nr_dies < 2) {
++                break;
++            }
+         case 4:
+         case 0xb:
+         case 0xd:
+@@ -1458,6 +1462,11 @@ int kvm_arch_init_vcpu(CPUState *cs)
+                 if (i == 0xd && j == 64) {
+                     break;
+                 }
++
++                if (i == 0x1f && j == 64) {
++                    break;
++                }
++
+                 c->function = i;
+                 c->flags = KVM_CPUID_FLAG_SIGNIFCANT_INDEX;
+                 c->index = j;
+@@ -1469,6 +1478,9 @@ int kvm_arch_init_vcpu(CPUState *cs)
+                 if (i == 0xb && !(c->ecx & 0xff00)) {
+                     break;
+                 }
++                if (i == 0x1f && !(c->ecx & 0xff00)) {
++                    break;
++                }
+                 if (i == 0xd && c->eax == 0) {
+                     continue;
+                 }
+-- 
+2.18.0.rc1.1.g3f1ff2140
 
-Max
-
-
---YSfvGmcRPe8MxNzSwgLZwmvFxziFrTdyu--
-
---eH0pnGh0KmzOx9OAUesKRYTh7rsNCxjFo
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0bemMACgkQ9AfbAGHV
-z0DwKQgAjx+7arsf7Gx5DiHrF9DtJpfAMv8uyEi7TBxVXcJ1rhG+NeQHTstuVGuv
-WpEcgNxGOh/7GRZwhR8HKvicYKnCnXxdtFe7AqpPyJi+0Xs05JzPN/BOyPmcAghF
-LCCiZHjfVc1nMOdwY9kb/uEt5GZ+VNlg5ZJQNEPOBzCxtOzI/s4N37m1AI+P6fAh
-eTrN7/lNIWroeXhsBxiQi3ljh6nHwLctq2kMWNekBJNHT4Czvem0w6hxjTj93Bbc
-kN2XgmjwGmoi9OKRGBMLKJWOEHibCUsSLeH20QclbTTMxozVtUFPxx8jy76U1aa9
-Omn73OKwVthvok+IGXI8+OoQ4LyRTg==
-=bkrS
------END PGP SIGNATURE-----
-
---eH0pnGh0KmzOx9OAUesKRYTh7rsNCxjFo--
 
