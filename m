@@ -2,80 +2,67 @@ Return-Path: <SRS0=9yXi=U7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.5 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2344C06510
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 19:15:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B3AEC06510
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 19:16:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A75F921852
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 19:15:32 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="I+J/XUNe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A75F921852
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 0A8FC2184C
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 19:16:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A8FC2184C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56448 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56450 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hiOFX-0005bd-3s
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 15:15:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49597)
+	id 1hiOG2-00060t-9G
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 15:16:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52890)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hiN9Q-0003ei-3U
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 14:05:09 -0400
+ (envelope-from <kraxel@redhat.com>) id 1hiLxf-0008P2-6X
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 12:48:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hiN9C-0006dc-Bs
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 14:04:59 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:46850)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hiN91-0006JH-JL
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 14:04:44 -0400
-Received: by mail-ot1-x342.google.com with SMTP id z23so18105290ote.13
- for <qemu-devel@nongnu.org>; Tue, 02 Jul 2019 11:04:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=Bi09lEVeDAFQsaQvsCrjgXi9neIu4EZJKKOLKhdRyS4=;
- b=I+J/XUNekxMJrx1/01qxBgbfbR4kuwtyl8aTFl4yzCvT/mpXoyoGPEbyfWlTIjIDJf
- huPilD1OBUqFTdRs9qy6nD8yuQrd/xq3vOG3uKjzx/Dl8p0kbFp8gbM8xfY4ifUuPgMI
- uRFBgHfwXJ0WGzPqcJkzRfEERQsXOuAGOWozQqYELwailVDQYcq65PEQYXUPdbClEcgf
- u+PswKLFqFEwP+yozaPFUBrYSOoapu041wCsV4vDRQg9hVfEFX8+EUAKcxjbgLB4eQfg
- Kmg8eEZU6gv6oeueCxAfSLVSeNxYNmOKDVqxADY6Ew5tTjU33bOGmGFOqS+CaFyd2GsS
- p+2Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=Bi09lEVeDAFQsaQvsCrjgXi9neIu4EZJKKOLKhdRyS4=;
- b=My+thi0gUw/E/hmGu+tuL5/OGzi1cg3iUra0zujG/QTl7YvCo+JrlAEzqw1kgvD67Z
- OMVJ0rJKxOYRG6anNkhi2R2y82bLBR5nJznxgL9NE08RV5JgHc1/gIdan9OrqzIKVarb
- FZIc6sRnFF2C21yNi8YhcZD6Xt1SBwWWigstTAG9A7aPWYVmaBO6pKrd/rn/vKWn7fKy
- roLJOhVFT0IV8ic9vbRh/Khg0W+ROdDoSpiiLF6ithcmdWNDiVSppFCG1QGF31Bve1Cz
- n0Jb8YLJKSWP8sQwhS8KEHyFQqJW6Pi8Xe4BAIcD4s76f/DIuNcIkQkikhpIxPS/ht5E
- 6biQ==
-X-Gm-Message-State: APjAAAW304IuH/0ApezmsO7kUJvGaxzYNoCpvfXYPS31s+2+P+4ikTiN
- ySX170A/BHzR3mTb6g+m1gWa8hYU0SREzNEMU1CL8A==
-X-Google-Smtp-Source: APXvYqzUsl3Xj6NP/jZ/fJM3pG82gD44cANhHyb+tGfohqjp0PSJVjvtXnkhhWwImj3OZPJ271WVwh+y6r/2OgEh330=
-X-Received: by 2002:a9d:5f1a:: with SMTP id f26mr25721860oti.91.1562090666280; 
- Tue, 02 Jul 2019 11:04:26 -0700 (PDT)
+ (envelope-from <kraxel@redhat.com>) id 1hiLxc-0005s5-Np
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 12:48:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38445)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kraxel@redhat.com>)
+ id 1hiLxW-0005as-Im; Tue, 02 Jul 2019 12:48:46 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id E704E307D84D;
+ Tue,  2 Jul 2019 16:48:41 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-116-96.ams2.redhat.com
+ [10.36.116.96])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 641D71001B20;
+ Tue,  2 Jul 2019 16:48:36 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id 0227C11AB8; Tue,  2 Jul 2019 18:48:35 +0200 (CEST)
+Date: Tue, 2 Jul 2019 18:48:35 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Message-ID: <20190702164835.3lnefzrbimltb2h6@sirius.home.kraxel.org>
+References: <20190628103957.9504-1-kraxel@redhat.com>
+ <CAFEAcA9Dh2EaPkcDmErEdJN+BknuRHvZKe5veOcY_7hMVEXiVQ@mail.gmail.com>
+ <CAFEAcA8W6OkDa8cY-YWq7dFeFoZENFiEPNfB3Hy3XQPe6GN2rw@mail.gmail.com>
 MIME-Version: 1.0
-References: <20190702121106.28374-1-slp@redhat.com>
- <CAFEAcA-k76t9_TJnYSF_kocgba9dYMyf=Q6OBY2VVuhiWsbqrw@mail.gmail.com>
- <87a7dwnxwj.fsf@redhat.com>
-In-Reply-To: <87a7dwnxwj.fsf@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 2 Jul 2019 19:04:15 +0100
-Message-ID: <CAFEAcA_XfRS1b-4ANmR5WLL=19Md6Dp7+M_FAK8pQAJn2MaCOA@mail.gmail.com>
-To: Sergio Lopez <slp@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::342
-Subject: Re: [Qemu-devel] [PATCH v3 0/4] Introduce the microvm machine type
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA8W6OkDa8cY-YWq7dFeFoZENFiEPNfB3Hy3XQPe6GN2rw@mail.gmail.com>
+User-Agent: NeoMutt/20180716
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.48]); Tue, 02 Jul 2019 16:48:44 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PULL 0/6] Vga 20190628 patches
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,44 +74,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, maran.wilson@oracle.com,
- "Michael S. Tsirkin" <mst@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Stefano Garzarella <sgarzare@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: Corey Minyard <cminyard@mvista.com>, qemu-arm <qemu-arm@nongnu.org>,
+ qemu-ppc <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 2 Jul 2019 at 18:34, Sergio Lopez <slp@redhat.com> wrote:
-> Peter Maydell <peter.maydell@linaro.org> writes:
-> > Could we use virtio-pci instead of virtio-mmio? virtio-mmio is
-> > a bit deprecated and tends not to support all the features that
-> > virtio-pci does. It was introduced mostly as a stopgap while we
-> > didn't have pci support in the aarch64 virt machine, and remains
-> > for legacy "we don't like to break existing working setups" rather
-> > than as a recommended config for new systems.
->
-> Using virtio-pci implies keeping PCI and ACPI support, defeating a
-> significant part of microvm's purpose.
->
-> What are the issues with the current state of virtio-mmio? Is there a
-> way I can help to improve the situation?
+On Tue, Jul 02, 2019 at 02:47:12PM +0100, Peter Maydell wrote:
+> On Tue, 2 Jul 2019 at 10:17, Peter Maydell <peter.maydell@linaro.org> wrote:
+> >
+> > On Fri, 28 Jun 2019 at 11:40, Gerd Hoffmann <kraxel@redhat.com> wrote:
+> > >
+> > > The following changes since commit 474f3938d79ab36b9231c9ad3b5a9314c2aeacde:
+> > >
+> > >   Merge remote-tracking branch 'remotes/amarkovic/tags/mips-queue-jun-21-2019' into staging (2019-06-21 15:40:50 +0100)
+> > >
+> > > are available in the Git repository at:
+> > >
+> > >   git://git.kraxel.org/qemu tags/vga-20190628-pull-request
+> > >
+> > > for you to fetch changes up to 263807f4e85e94f2d4e988d61d2fc0319b1dd36b:
+> > >
+> > >   ati-vga: switch to vgabios-ati.bin (2019-06-28 10:49:36 +0200)
+> > >
+> > > ----------------------------------------------------------------
+> > > vga: ati fixes, add ati vgabios.
+> > >
+> > > ----------------------------------------------------------------
+> > >
+> > > BALATON Zoltan (3):
+> > >   i2c: Move bitbang_i2c.h to include/hw/i2c/
+> > >   ati-vga: Implement DDC and EDID info from monitor
+> > >   ati-vga: Fixes to offset and pitch registers
+> > >
+> > > Gerd Hoffmann (3):
+> > >   seabios: add config for ati vgabios
+> > >   seabios: add ati vgabios binary
+> > >   ati-vga: switch to vgabios-ati.bin
+> > >
+> >
+> > Applied, thanks.
+> >
+> > Please update the changelog at https://wiki.qemu.org/ChangeLog/4.1
+> > for any user-visible changes.
+> 
+> Hmm, the bitbang-i2c changes in this pull seem to have broken
+> patchew's asan build:
+> https://patchew.org/logs/20190628103957.9504-1-kraxel@redhat.com/testing.asan/?type=message
+> 
+> (probably because now we're using and testing the buggy
+> code in a way we weren't before)
 
-Off the top of my head:
- * limitations on numbers of devices
- * no hotplug support
- * unlike PCI, it's not probeable, so you have to tell the
-   guest where all the transports are using device tree or
-   some similar mechanism
- * you need one IRQ line per transport, which restricts how
-   many you can have
- * it's only virtio-0.9, it doesn't support any of the new
-   virtio-1.0 functionality
- * it is broadly not really maintained in QEMU (and I think
-   not really in the kernel either? not sure), because we'd
-   rather not have to maintain two mechanisms for doing virtio
-   when virtio-pci is clearly better than virtio-mmio
+Hmm.  Yes, gpio_i2c_init() allocates memory (in inlined
+bitbang_i2c_init).  There is no exit() function so the
+memory is never freed indeed.  On the other hand i2c
+devices are not really hotpluggable, so maybe we only
+need to tag it that way?
 
-thanks
--- PMM
+cheers,
+  Gerd
+
 
