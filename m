@@ -2,66 +2,85 @@ Return-Path: <SRS0=9yXi=U7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06C1AC06510
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 11:17:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A520FC06510
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 11:19:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CBBEE21479
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 11:17:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CBBEE21479
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 71A5A21479
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 11:19:07 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XGibDmxU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71A5A21479
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51738 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51758 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hiGmd-0008JR-Lh
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 07:17:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52264)
+	id 1hiGoU-0001Os-L8
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 07:19:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51625)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <ppandit@redhat.com>) id 1hiGRy-0006Ld-4x
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 06:55:51 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hiGNj-0000op-3R
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 06:51:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ppandit@redhat.com>) id 1hiGRx-0003cR-1H
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 06:55:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49454)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1hiGRw-0003CA-Qy
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 06:55:48 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 03A4B8A004;
- Tue,  2 Jul 2019 10:55:30 +0000 (UTC)
-Received: from kaapi (ovpn-116-87.phx2.redhat.com [10.3.116.87])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id BF200608BA;
- Tue,  2 Jul 2019 10:55:23 +0000 (UTC)
-Date: Tue, 2 Jul 2019 16:25:18 +0530 (IST)
-From: P J P <ppandit@redhat.com>
-X-X-Sender: pjp@kaapi
-To: =?ISO-8859-15?Q?Daniel_P=2E_Berrang=E9?= <berrange@redhat.com>
-In-Reply-To: <20190701175010.GN3573@redhat.com>
-Message-ID: <nycvar.YSQ.7.76.1907021539350.23656@xnncv>
-References: <20190701123558.30512-1-ppandit@redhat.com>
- <20190701123558.30512-4-ppandit@redhat.com>
- <20190701175010.GN3573@redhat.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1hiGNf-00057t-0M
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 06:51:25 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:35841)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hiGNd-00050p-J3
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 06:51:22 -0400
+Received: by mail-wm1-x341.google.com with SMTP id u8so475524wmm.1
+ for <qemu-devel@nongnu.org>; Tue, 02 Jul 2019 03:51:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=YeHRPGYbA8ZhQrAnDrwK7ooN6IkOvQIyHvP1gjf9j24=;
+ b=XGibDmxUDYjPiY8630ypUeh1Crjc7UzuBDzvEKoKarSVnT3IAtcUkUHxSd9Od+mgtB
+ pgFAJTfbO5ZkErOkyp8CBKFk9FTjYVUSh//kvs1yfqH6Wa4X/plg2xI+s7TzC6AKtbKB
+ 0+wn/h81QKma2XTRKwbHrKknQ6y2d+qnvGim+wwVKUp5NsjB0dX0ps6f1dkR24f2ypw/
+ +GB1N/2Xxf0xOZkonrgOxya4ZkInOULEq7hPQmmcg/rNd4WxZ++AQek1ygJqe16hdXeU
+ Xu33olZV2/h84RQUz9oapdyWnbwcbMge+7OZcimc4IsOBYl5yOlVC7uSEufq/hmGonrC
+ Ie0g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=YeHRPGYbA8ZhQrAnDrwK7ooN6IkOvQIyHvP1gjf9j24=;
+ b=UQCP2PzSqhcg4tDHZX0zLITC74WCxqkCcPU8yMLmXzEGkU1QekcJqs7HfaOa5YLDN2
+ 6AL8fMzLvPdTkm27aX0vs+nBkaoON3c7rP0XartCMOv7qakM+IE3Hk+s6oYUOQGBb+D+
+ 0/+D26djuq9fYo00qVlu0IKty3WjxpuOc2DdN1wZ5cz4VYGFDX4m9VNxW4QwzcYxUnyJ
+ JKBj2umBF55nUf9hCiOzCiJM4Ywc/qeXPUf0uJsPz7oKEbBvNH0+2PvvNMfNtsGFf5JH
+ Pl3EggNZd/9LSAUxR11CP3m48QpwLkMmZ0h7TB/0liUF9sPiALYjdWmojY4vabPR3rS5
+ AtLg==
+X-Gm-Message-State: APjAAAUWrTLtakUichyz5LyTHRQs1I65WUPwqaV6qe8HlwhcfpAZBk+a
+ kk1cul8pel/deiKCCt7QIwUvzg==
+X-Google-Smtp-Source: APXvYqzpZ4Avo86PZIZjJLNygWa0F8atpP1UqT+Y3Ok2r5mWSpOQDIOL4sbSgtX8P2tJFFZfGF63fg==
+X-Received: by 2002:a1c:dc45:: with SMTP id t66mr3193545wmg.63.1562064677072; 
+ Tue, 02 Jul 2019 03:51:17 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id y133sm3219710wmg.5.2019.07.02.03.51.16
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Tue, 02 Jul 2019 03:51:16 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-arm@nongnu.org,
+	qemu-devel@nongnu.org
+Date: Tue,  2 Jul 2019 11:51:15 +0100
+Message-Id: <20190702105115.9465-1-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-ID: <nycvar.YSQ.7.76.1907021550090.23656@xnncv>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.26]); Tue, 02 Jul 2019 10:55:30 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Content-Type: text/plain; CHARSET=ISO-8859-15
-Content-Transfer-Encoding: quoted-printable
-X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: Re: [Qemu-devel] [PATCH v3 3/3] net: tap: refactor
- net_bridge_run_helper routine
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::341
+Subject: [Qemu-devel] [PATCH for-4.1] target/arm: Correct VMOV_imm_dp
+ handling of short vectors
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,72 +92,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riccardo Schirone <rschiron@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Li Qiang <liq3ea@gmail.com>, Qemu Developers <qemu-devel@nongnu.org>
+Cc: Richard Henderson <richard.henderson@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-  Hello Dan,
+Coverity points out (CID 1402195) that the loop in trans_VMOV_imm_dp()
+that iterates over the destination registers in a short-vector VMOV
+accidentally throws away the returned updated register number
+from vfp_advance_dreg(). Add the missing assignment. (We got this
+correct in trans_VMOV_imm_sp().)
 
-+-- On Tue, 2 Jul 2019, Daniel P. Berrang=E9 wrote --+
-| The original code was passing through to the shell to handle the case
-| where the user requested
-|=20
-|    -netdev bridge,helper=3D"/path/to/helper myarg otherarg"
-|=20
-| In theory any parts could contain shell meta characters, but even if
-| they don't we'll have slightly broken compat with this change.
+Fixes: 18cf951af9a27ae573a
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ target/arm/translate-vfp.inc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-I wonder if anybody uses it like that. Because of the 3 arguments that=20
-qemu-bridge-helper takes
-
-  --use-vnet --fd=3Dsv[1] --br=3Dbridge
-
-only bridge name is supplied by user; Which is anyway comming without 'he=
-lper'=20
-having to include '--br=3Dbridge' argument, as is looked for before shell=
-=20
-invocation
-
-  if (strstr(helper, "--br=3D") =3D=3D NULL) {
-      snprintf(br_buf, sizeof(br_buf), "%s%s", "--br=3D", bridge);
-  }
-
-'--br=3Dbridge' has limited scope to use shell meta characters, ie. other=
- than=20
-space(' ') and tab('\t').
+diff --git a/target/arm/translate-vfp.inc.c b/target/arm/translate-vfp.inc.c
+index deaddb04421..092eb5ec53d 100644
+--- a/target/arm/translate-vfp.inc.c
++++ b/target/arm/translate-vfp.inc.c
+@@ -1971,7 +1971,7 @@ static bool trans_VMOV_imm_dp(DisasContext *s, arg_VMOV_imm_dp *a)
+ 
+         /* Set up the operands for the next iteration */
+         veclen--;
+-        vfp_advance_dreg(vd, delta_d);
++        vd = vfp_advance_dreg(vd, delta_d);
+     }
+ 
+     tcg_temp_free_i64(fd);
+-- 
+2.20.1
 
 
-| The QEMU man page has never documented that you can pass a command
-| and args, which get sent via the shell though. It only ever documented
-| the helper arg as being a plain qualified binary path.
-|=20
-| So the question is how strictly we need to consider compatibility.
-|=20
-| The "if it isn't documented it never existed" option is to use your
-| patch here.
-
-We don't know if "/path/to/helper arg1 arg2" usage exists in practice. An=
-d=20
-considering user would still be able to supply 'bridge' argument, I wonde=
-r if=20
-we are breaking compatibility.
-
-| The safest option is to put in a place a deprecation saying we'll
-| drop use of shell in future, only implementing the aggressive
-| option in a later release.
-
-ie. for Qemu > v4.0.0? How do we do this?
-
-| Perhaps from your POV, the easy thing is to avoid this entire
-| question - just leave the code calling shell, but switch to
-| g_strdup_printf instead of snprintf.
-
-Okay, this will be for Qemu <=3D v4.0.0?
-
-
-Thank you.
---
-Prasad J Pandit / Red Hat Product Security Team
-47AF CE69 3A90 54AA 9045 1053 DD13 3D32 FE5B 041F
