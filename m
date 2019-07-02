@@ -6,62 +6,65 @@ X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EE91C5B57D
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 08:19:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65D51C5B57D
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 08:20:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0599620645
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 08:19:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0599620645
+	by mail.kernel.org (Postfix) with ESMTPS id 39D0020645
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 08:20:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 39D0020645
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50554 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50568 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hiE0o-00075l-8R
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 04:19:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52265)
+	id 1hiE1p-0000CM-Hr
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 04:20:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52641)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <kraxel@redhat.com>) id 1hiDzA-0006Li-8e
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 04:17:58 -0400
+ (envelope-from <kraxel@redhat.com>) id 1hiE0h-0007VF-Ok
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 04:19:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kraxel@redhat.com>) id 1hiDz2-0004WB-L4
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 04:17:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34228)
+ (envelope-from <kraxel@redhat.com>) id 1hiE0f-00051G-RF
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 04:19:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55458)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hiDz0-0004Tx-Aq
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 04:17:46 -0400
+ (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hiE0f-0004zB-Ku
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 04:19:29 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id B52E1C050003;
- Tue,  2 Jul 2019 08:17:39 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 91C793DE0E;
+ Tue,  2 Jul 2019 08:19:20 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-116-96.ams2.redhat.com
  [10.36.116.96])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D748017537;
- Tue,  2 Jul 2019 08:17:34 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id ED3445C296;
+ Tue,  2 Jul 2019 08:19:15 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 0744B16E05; Tue,  2 Jul 2019 10:17:34 +0200 (CEST)
-Date: Tue, 2 Jul 2019 10:17:33 +0200
+ id 2915E16E05; Tue,  2 Jul 2019 10:19:10 +0200 (CEST)
+Date: Tue, 2 Jul 2019 10:19:10 +0200
 From: Gerd Hoffmann <kraxel@redhat.com>
-To: Sergio Lopez <slp@redhat.com>
-Message-ID: <20190702081733.ff6cboiddln5wmti@sirius.home.kraxel.org>
-References: <20190701144705.102615-1-slp@redhat.com>
- <20190701144705.102615-5-slp@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190702081910.e35g4aawxp3ofhy6@sirius.home.kraxel.org>
+References: <20190628115349.60293-1-slp@redhat.com>
+ <20190628115349.60293-3-slp@redhat.com>
+ <20190628100145-mutt-send-email-mst@kernel.org>
+ <87r27dwi1k.fsf@redhat.com>
+ <20190630173354-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190701144705.102615-5-slp@redhat.com>
+In-Reply-To: <20190630173354-mutt-send-email-mst@kernel.org>
 User-Agent: NeoMutt/20180716
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Tue, 02 Jul 2019 08:17:39 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.29]); Tue, 02 Jul 2019 08:19:20 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 4/4] hw/i386: Introduce the microvm
- machine type
+Subject: Re: [Qemu-devel] [PATCH 2/4] hw/virtio: Factorize virtio-mmio
+ headers
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,31 +76,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, maran.wilson@oracle.com, mst@redhat.com,
- qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net
+Cc: pbonzini@redhat.com, rth@twiddle.net, qemu-devel@nongnu.org,
+ Sergio Lopez <slp@redhat.com>, ehabkost@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-  Hi,
+> > > I am not sure we want a new machine with 0.X mmio devices.
+> > > Especially considering that virtio-mmio does not have support for
+> > > transitional devices.
+> > 
+> > What are the practical implications of that?
+> 
+> On the plus side, this means we don't need to maintain a bunch of hacks
+> for old guests with quirky drivers.
 
-> Microvm only supports booting PVH-enabled Linux ELF images. Booting
-> other PVH-enabled kernels may be possible, but due to the lack of ACPI
-> and firmware, we're relying on the command line for specifying the
-> location of the virtio-mmio transports. If there's an interest on
-> using this machine type with other kernels, we'll try to find some
-> kind of middle ground solution.
-
-Can we get rid of the kernel command line hacking please?
-The virtio-mmio devices should be discoverable somehow.
-
-Device tree (as suggested by paolo) would work.
-Custom acpi device (simliar to fw_cfg) is another option.
-I'd tend to pick acpi, I wouldn't be surprised if we'll
-need acpi anyway at some point.
-
-Maybe even do both, then switch at runtime depending on -no-acpi
-(simliar to arm/aarch64).
+Also note that some newer virtio devices require virtio 1.0.
 
 cheers,
   Gerd
