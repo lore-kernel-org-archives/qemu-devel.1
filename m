@@ -2,76 +2,80 @@ Return-Path: <SRS0=9yXi=U7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E229EC06510
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 08:43:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B074C06510
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 08:44:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B968820659
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 08:43:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B968820659
+	by mail.kernel.org (Postfix) with ESMTPS id 529CB20659
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 08:44:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 529CB20659
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50680 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50694 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hiENk-0007w5-0C
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 04:43:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56355)
+	id 1hiEP4-0000ba-LR
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 04:44:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56534)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <slp@redhat.com>) id 1hiEMc-0007TX-1V
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 04:42:11 -0400
+ (envelope-from <philmd@redhat.com>) id 1hiENx-0008M7-CL
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 04:43:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <slp@redhat.com>) id 1hiEMb-0004jB-22
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 04:42:09 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:52600)
+ (envelope-from <philmd@redhat.com>) id 1hiENv-00054o-I2
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 04:43:33 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:40172)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <slp@redhat.com>) id 1hiEMZ-0004i3-2n
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 04:42:07 -0400
-Received: by mail-wm1-f68.google.com with SMTP id s3so33820wms.2
- for <qemu-devel@nongnu.org>; Tue, 02 Jul 2019 01:42:05 -0700 (PDT)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hiENv-00054X-00
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 04:43:31 -0400
+Received: by mail-wm1-f65.google.com with SMTP id v19so26026wmj.5
+ for <qemu-devel@nongnu.org>; Tue, 02 Jul 2019 01:43:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version;
- bh=Af3HYoD4PgG/fswU2CPrFNNuGk3lT8KbnvPToBvwmbs=;
- b=iAoJUOJ6nmFkIjO8UrW8dHO+vIzyEdPXlWt/Nft6mhXYwtLo/E2iU9+xFwPCLHN/dG
- aNzusM47r3/iw7k75LK4Xk7hUidqry3q9cUMWwPpyT9z4xmwpasGueDHlyHxOaDhK03H
- 9/jSOgSp55jNwjIvCm6AlrfjpDwaChJ/+KftMQY+/mkM+ia2qbVYbNK94ub8avhQWlnL
- ZgqQnaK1gC20SdEs8lurlY4j91o5sCrsmhJtQLpEBdzftJC725YvmDSZ6FqoTLGJ0fZZ
- ePq5zRoffPhTyB2i1SCH8+NOtR+3vAx5hrkS20ClsathYn1njtu11AKHLAxbzBH8riiu
- 4F8A==
-X-Gm-Message-State: APjAAAUkfqKG+X/DZY6bUA7r9Juyp8e3gzOZ4IRs+kCIPrJphTWstVo4
- cFffXm37Z5bGdg66V60gjvzuZpuyPXPdTg==
-X-Google-Smtp-Source: APXvYqzP9IZs39nrcE4txMb0deKCET3T68nbejtNhbOukedxh4JAhKrNVHyVN+AG0YC5btuxqCRWgQ==
-X-Received: by 2002:a1c:7503:: with SMTP id o3mr2541721wmc.170.1562056923925; 
- Tue, 02 Jul 2019 01:42:03 -0700 (PDT)
-Received: from dritchie.redhat.com (18.red-83-35-20.dynamicip.rima-tde.net.
- [83.35.20.18])
- by smtp.gmail.com with ESMTPSA id y1sm1746144wma.32.2019.07.02.01.42.02
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Tue, 02 Jul 2019 01:42:03 -0700 (PDT)
-References: <20190701144705.102615-1-slp@redhat.com>
- <20190701144705.102615-5-slp@redhat.com>
- <20190702081733.ff6cboiddln5wmti@sirius.home.kraxel.org>
-User-agent: mu4e 1.2.0; emacs 26.2
-From: Sergio Lopez <slp@redhat.com>
-To: Gerd Hoffmann <kraxel@redhat.com>
-In-reply-to: <20190702081733.ff6cboiddln5wmti@sirius.home.kraxel.org>
-Date: Tue, 02 Jul 2019 10:42:01 +0200
-Message-ID: <878stgygiu.fsf@redhat.com>
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=Izz6eqaHJF82dk24wgCSU7rWS+VPQ9x7Z3J8SM/xK24=;
+ b=nZuOLSqcF0VnkNs476Sj0gpEPOU7Oc8l64201KuQsuQaFEiAbKCkvfhwNIuvMenXQo
+ M0N690tvCkpR6FFZ2XFNJl3qI0wbM0X72HGT9Mvg2z8XXxXJPXLPwCMuILNt/XMqHP+v
+ MniKIQ1Jg3vNhlXsS+u5Kh/x0au0DEbpC4U5wPzugvmAHKK3hWwfhxv+70N073sYlD2j
+ wEt8Xi13fyiN8cBcvT/f83iih/UjswgANlWkJi9KR0VRovd5juuERNg4CNFjkDI/SFXn
+ RwdDs2SMbqsXivXQ2R6XkwYFyLqn74wlQEOFHTu4tfRNFMjdGTyak4m4T/RfTSfjRVO6
+ nvrA==
+X-Gm-Message-State: APjAAAUQFtYbmatNQF04MOk9TWW+yKWROHPmIAnPhiOeM0waIC73IexC
+ tlcS6M977ur5Nm/iGCqdZ1I8ng==
+X-Google-Smtp-Source: APXvYqw4y5OU02W8KuAnZgZ0ghzQvEqAtKErfWJ3y64c4GPfUafhBkWY8b6PlCo6mZrzOQJbF+imDg==
+X-Received: by 2002:a1c:c706:: with SMTP id x6mr2521064wmf.162.1562057010062; 
+ Tue, 02 Jul 2019 01:43:30 -0700 (PDT)
+Received: from [192.168.1.38] (56.red-88-18-140.staticip.rima-tde.net.
+ [88.18.140.56])
+ by smtp.gmail.com with ESMTPSA id s63sm1574448wme.17.2019.07.02.01.43.29
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Tue, 02 Jul 2019 01:43:29 -0700 (PDT)
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ peter.maydell@linaro.org
+References: <20190701164732.30518-1-alex.bennee@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <7740d279-d0f7-803b-8d52-660742385313@redhat.com>
+Date: Tue, 2 Jul 2019 10:43:28 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
- micalg=pgp-sha256; protocol="application/pgp-signature"
+In-Reply-To: <20190701164732.30518-1-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.128.68
-Subject: Re: [Qemu-devel] [PATCH v2 4/4] hw/i386: Introduce the microvm
- machine type
+X-Received-From: 209.85.128.65
+Subject: Re: [Qemu-devel] [PATCH] migration: move port_attr inside
+ CONFIG_LINUX
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -83,65 +87,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, maran.wilson@oracle.com, mst@redhat.com,
- qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net
+Cc: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---=-=-=
-Content-Type: text/plain
+On 7/1/19 6:47 PM, Alex Bennée wrote:
+> Otherwise the FreeBSD compiler complains about an unused variable.
+> 
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> ---
+>  migration/rdma.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> diff --git a/migration/rdma.c b/migration/rdma.c
+> index 74cb2aa9f9..3036221ee8 100644
+> --- a/migration/rdma.c
+> +++ b/migration/rdma.c
+> @@ -839,10 +839,9 @@ static void qemu_rdma_dump_gid(const char *who, struct rdma_cm_id *id)
+>   */
+>  static int qemu_rdma_broken_ipv6_kernel(struct ibv_context *verbs, Error **errp)
+>  {
+> -    struct ibv_port_attr port_attr;
+> -
+>      /* This bug only exists in linux, to our knowledge. */
+>  #ifdef CONFIG_LINUX
+> +    struct ibv_port_attr port_attr;
+>  
+>      /*
+>       * Verbs are only NULL if management has bound to '[::]'.
+> 
 
-
-Gerd Hoffmann <kraxel@redhat.com> writes:
-
->   Hi,
->
->> Microvm only supports booting PVH-enabled Linux ELF images. Booting
->> other PVH-enabled kernels may be possible, but due to the lack of ACPI
->> and firmware, we're relying on the command line for specifying the
->> location of the virtio-mmio transports. If there's an interest on
->> using this machine type with other kernels, we'll try to find some
->> kind of middle ground solution.
->
-> Can we get rid of the kernel command line hacking please?
-> The virtio-mmio devices should be discoverable somehow.
->
-> Device tree (as suggested by paolo) would work.
-> Custom acpi device (simliar to fw_cfg) is another option.
-> I'd tend to pick acpi, I wouldn't be surprised if we'll
-> need acpi anyway at some point.
->
-> Maybe even do both, then switch at runtime depending on -no-acpi
-> (simliar to arm/aarch64).
-
-Microvm tries to do things in the cheapest possible way. As I said the
-other email, I'm not opposed to support qboot (which will probably imply
-ACPI and/or device tree), as long it's optional, and the "cheap" way is
-still present.
-
-Otherwise, let's just drop microvm and stick with Q35 + qboot.
-
-Sergio.
-
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEvtX891EthoCRQuii9GknjS8MAjUFAl0bGNkACgkQ9GknjS8M
-AjXBWRAAnj0IQeL7dmb4J2YbyEKiFvI6U0ZMmZZZBQdue9rtNDfQTJOLGiZDt6Pa
-mZvxf3NRjBt9/YRPOyrLVeqo5jqjS7kWQfxg2M6WaFGPsdQeWMyanjKghKRPZrDV
-DORviSkgIy63/aTkkuljZ4/9D7nMOFhFutgJJeJ93xz5g3w2wvFaPjdRRyTNp4HG
-Wx2MQyYYS9o6cjZyUDBDViDcsHVvu5WL1jPUPTXp+daX39ytHY30LxZ6WIRUIwEi
-IiODfQ/TV9G0epm5a8pQsz2DKbaJsWR2uHK5MxptsDaGLZTU2/79UEMaEEecREy0
-Fh/f3lbW2ONNZwEz8N+wkhe9fwb1v80gp4EDEcKLR6cSXfongYNR7eojUWONv36T
-0EYrOlYIDunnyDV+dqQASLSl/9hARlB03wD8KexZO5XAOvgtQXqQdXZ9+emtzBwb
-otAsC3DjDdRfEH9fMF9DLDhBnwLFaaive22rcgxJU0Zle1KRV5fnlFFNpIC1u1A1
-k4JaxncQXlpcNV5LaX7R5By2qfyY+3Zqq0w/NR4i5KSEFnJmxj0A7QthxO0e5g3T
-b/kdvpSY7QRQCB1x2JCckwCteqLvbLajXVWOCG8bUzgRquLrCN5yWAXC4olX8MBF
-aYvxHbblNMqfPJTo/1Ds3sVWZp3Pb0S4oXQCFjqXpiraUJaBzYI=
-=pr7L
------END PGP SIGNATURE-----
---=-=-=--
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
