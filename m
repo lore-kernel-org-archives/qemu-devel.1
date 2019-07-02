@@ -6,59 +6,57 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48FE8C06510
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 15:57:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0126C06510
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 15:58:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1EE362082F
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 15:57:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1EE362082F
+	by mail.kernel.org (Postfix) with ESMTPS id 8F0492082F
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 15:58:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F0492082F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54766 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54776 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hiL9Q-00048s-AN
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 11:57:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58897)
+	id 1hiLB6-0005DP-Sc
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 11:58:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37191)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mst@redhat.com>) id 1hiKP3-0008At-QD
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 11:09:06 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1hiKp7-0007OB-Jb
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 11:36:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1hiKP2-0001bz-O8
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 11:09:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56866)
+ (envelope-from <ehabkost@redhat.com>) id 1hiKp5-0005dS-HP
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 11:36:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49304)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1hiKP2-0001b2-HY
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 11:09:04 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hiKp5-0005Tw-7W
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 11:35:59 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id BDCBEC18B2EE;
- Tue,  2 Jul 2019 15:08:58 +0000 (UTC)
-Received: from redhat.com (ovpn-124-209.rdu2.redhat.com [10.10.124.209])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 35DA017537;
- Tue,  2 Jul 2019 15:08:46 +0000 (UTC)
-Date: Tue, 2 Jul 2019 11:08:42 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: qemu-devel@nongnu.org
-Message-ID: <20190626074815.19994-4-stefanha@redhat.com>
-References: <20190702150606.24851-1-mst@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Disposition: inline
-In-Reply-To: <20190702150606.24851-1-mst@redhat.com>
-X-Mutt-Fcc: =sent
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+ by mx1.redhat.com (Postfix) with ESMTPS id 0F4653092647;
+ Tue,  2 Jul 2019 15:35:50 +0000 (UTC)
+Received: from localhost (ovpn-116-30.gru2.redhat.com [10.97.116.30])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8FEE55D9D6;
+ Tue,  2 Jul 2019 15:35:49 +0000 (UTC)
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
+ Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+ Richard Henderson <rth@twiddle.net>
+Date: Tue,  2 Jul 2019 12:34:59 -0300
+Message-Id: <20190702153535.9851-7-ehabkost@redhat.com>
+In-Reply-To: <20190702153535.9851-1-ehabkost@redhat.com>
+References: <20190702153535.9851-1-ehabkost@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Tue, 02 Jul 2019 15:09:03 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ (mx1.redhat.com [10.5.110.43]); Tue, 02 Jul 2019 15:35:50 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 21/22] libvhost-user: implement
- VHOST_USER_PROTOCOL_F_MQ
+Subject: [Qemu-devel] [PULL v3 06/42] hw/s390x: Replace global smp variables
+ with machine smp properties
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,74 +68,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Zhang Yu <zhangyu31@baidu.com>,
- Sebastien Boeuf <sebastien.boeuf@intel.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: Like Xu <like.xu@linux.intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190702150842.Am-LurmjA_1r66XZOiz3NXGSwMBY7U7rhHQPV44n0Qo@z>
 
-From: Stefan Hajnoczi <stefanha@redhat.com>
+From: Like Xu <like.xu@linux.intel.com>
 
-Existing vhost-user device backends, including vhost-user-scsi and
-vhost-user-blk, support multiqueue but libvhost-user currently does not
-advertise this.
+The global smp variables in s390x are replaced with smp machine properties.
 
-VHOST_USER_PROTOCOL_F_MQ enables the VHOST_USER_GET_QUEUE_NUM request
-needed for a vhost-user master to query the number of queues.  For
-example, QEMU's vhost-user-net master depends on
-VHOST_USER_PROTOCOL_F_MQ for multiqueue.
+A local variable of the same name would be introduced in the declaration
+phase if it's used widely in the context OR replace it on the spot if it's
+only used once. No semantic changes.
 
-If you're wondering how any device backend with more than one virtqueue
-functions today, it's because device types with a fixed number of
-virtqueues do not require querying the number of queues.  Therefore the
-vhost-user master for vhost-user-input with 2 virtqueues, for example,
-doesn't actually depend on VHOST_USER_PROTOCOL_F_MQ.  It just enables
-virtqueues 0 and 1 without asking.
+Signed-off-by: Like Xu <like.xu@linux.intel.com>
+Message-Id: <20190518205428.90532-7-like.xu@linux.intel.com>
+Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+[ehabkost: fix build failure at VCPU_IRQ_BUF_SIZE]
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 
-Let there be multiqueue!
+fixup! hw/s390x: Replace global smp variables with machine smp properties
 
-Suggested-by: Sebastien Boeuf <sebastien.boeuf@intel.com>
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Message-Id: <20190626074815.19994-4-stefanha@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- contrib/libvhost-user/libvhost-user.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+ hw/s390x/s390-virtio-ccw.c |  3 ++-
+ hw/s390x/sclp.c            |  2 +-
+ target/s390x/cpu.c         |  3 +++
+ target/s390x/excp_helper.c |  5 +++++
+ target/s390x/kvm.c         | 10 ++++++----
+ 5 files changed, 17 insertions(+), 6 deletions(-)
 
-diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-use=
-r/libvhost-user.c
-index 90bea856dd..4b36e35a82 100644
---- a/contrib/libvhost-user/libvhost-user.c
-+++ b/contrib/libvhost-user/libvhost-user.c
-@@ -1160,7 +1160,8 @@ vu_set_vring_err_exec(VuDev *dev, VhostUserMsg *vms=
-g)
- static bool
- vu_get_protocol_features_exec(VuDev *dev, VhostUserMsg *vmsg)
- {
--    uint64_t features =3D 1ULL << VHOST_USER_PROTOCOL_F_LOG_SHMFD |
-+    uint64_t features =3D 1ULL << VHOST_USER_PROTOCOL_F_MQ |
-+                        1ULL << VHOST_USER_PROTOCOL_F_LOG_SHMFD |
-                         1ULL << VHOST_USER_PROTOCOL_F_SLAVE_REQ |
-                         1ULL << VHOST_USER_PROTOCOL_F_HOST_NOTIFIER |
-                         1ULL << VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD;
-@@ -1200,8 +1201,8 @@ vu_set_protocol_features_exec(VuDev *dev, VhostUser=
-Msg *vmsg)
- static bool
- vu_get_queue_num_exec(VuDev *dev, VhostUserMsg *vmsg)
- {
--    DPRINT("Function %s() not implemented yet.\n", __func__);
--    return false;
-+    vmsg_set_reply_u64(vmsg, dev->max_queues);
-+    return true;
+diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+index e09bf8f1b6..5b6a9a4e55 100644
+--- a/hw/s390x/s390-virtio-ccw.c
++++ b/hw/s390x/s390-virtio-ccw.c
+@@ -84,7 +84,7 @@ static void s390_init_cpus(MachineState *machine)
+     /* initialize possible_cpus */
+     mc->possible_cpu_arch_ids(machine);
+ 
+-    for (i = 0; i < smp_cpus; i++) {
++    for (i = 0; i < machine->smp.cpus; i++) {
+         s390x_new_cpu(machine->cpu_type, i, &error_fatal);
+     }
  }
-=20
- static bool
---=20
-MST
+@@ -411,6 +411,7 @@ static CpuInstanceProperties s390_cpu_index_to_props(MachineState *ms,
+ static const CPUArchIdList *s390_possible_cpu_arch_ids(MachineState *ms)
+ {
+     int i;
++    unsigned int max_cpus = ms->smp.max_cpus;
+ 
+     if (ms->possible_cpus) {
+         g_assert(ms->possible_cpus && ms->possible_cpus->len == max_cpus);
+diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
+index 4510a800cb..fac7c3bb6c 100644
+--- a/hw/s390x/sclp.c
++++ b/hw/s390x/sclp.c
+@@ -64,7 +64,7 @@ static void read_SCP_info(SCLPDevice *sclp, SCCB *sccb)
+     prepare_cpu_entries(sclp, read_info->entries, &cpu_count);
+     read_info->entries_cpu = cpu_to_be16(cpu_count);
+     read_info->offset_cpu = cpu_to_be16(offsetof(ReadInfo, entries));
+-    read_info->highest_cpu = cpu_to_be16(max_cpus - 1);
++    read_info->highest_cpu = cpu_to_be16(machine->smp.max_cpus - 1);
+ 
+     read_info->ibc_val = cpu_to_be32(s390_get_ibc_val());
+ 
+diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
+index f2d93644d5..cafb8fe3f0 100644
+--- a/target/s390x/cpu.c
++++ b/target/s390x/cpu.c
+@@ -37,6 +37,7 @@
+ #include "hw/qdev-properties.h"
+ #ifndef CONFIG_USER_ONLY
+ #include "hw/hw.h"
++#include "hw/boards.h"
+ #include "sysemu/arch_init.h"
+ #include "sysemu/sysemu.h"
+ #include "sysemu/tcg.h"
+@@ -197,6 +198,8 @@ static void s390_cpu_realizefn(DeviceState *dev, Error **errp)
+     }
+ 
+ #if !defined(CONFIG_USER_ONLY)
++    MachineState *ms = MACHINE(qdev_get_machine());
++    unsigned int max_cpus = ms->smp.max_cpus;
+     if (cpu->env.core_id >= max_cpus) {
+         error_setg(&err, "Unable to add CPU with core-id: %" PRIu32
+                    ", maximum core-id: %d", cpu->env.core_id,
+diff --git a/target/s390x/excp_helper.c b/target/s390x/excp_helper.c
+index 202456cdc5..892f659d5a 100644
+--- a/target/s390x/excp_helper.c
++++ b/target/s390x/excp_helper.c
+@@ -31,6 +31,7 @@
+ #ifndef CONFIG_USER_ONLY
+ #include "sysemu/sysemu.h"
+ #include "hw/s390x/s390_flic.h"
++#include "hw/boards.h"
+ #endif
+ 
+ void QEMU_NORETURN tcg_s390_program_interrupt(CPUS390XState *env, uint32_t code,
+@@ -315,6 +316,10 @@ static void do_ext_interrupt(CPUS390XState *env)
+         g_assert(cpu_addr < S390_MAX_CPUS);
+         lowcore->cpu_addr = cpu_to_be16(cpu_addr);
+         clear_bit(cpu_addr, env->emergency_signals);
++#ifndef CONFIG_USER_ONLY
++        MachineState *ms = MACHINE(qdev_get_machine());
++        unsigned int max_cpus = ms->smp.max_cpus;
++#endif
+         if (bitmap_empty(env->emergency_signals, max_cpus)) {
+             env->pending_int &= ~INTERRUPT_EMERGENCY_SIGNAL;
+         }
+diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+index 0267c6c2f6..6e814c230b 100644
+--- a/target/s390x/kvm.c
++++ b/target/s390x/kvm.c
+@@ -119,8 +119,8 @@
+  * Needs to be big enough to contain max_cpus emergency signals
+  * and in addition NR_LOCAL_IRQS interrupts
+  */
+-#define VCPU_IRQ_BUF_SIZE (sizeof(struct kvm_s390_irq) * \
+-                           (max_cpus + NR_LOCAL_IRQS))
++#define VCPU_IRQ_BUF_SIZE(max_cpus) (sizeof(struct kvm_s390_irq) * \
++                                     (max_cpus + NR_LOCAL_IRQS))
+ 
+ static CPUWatchpoint hw_watchpoint;
+ /*
+@@ -362,9 +362,10 @@ unsigned long kvm_arch_vcpu_id(CPUState *cpu)
+ 
+ int kvm_arch_init_vcpu(CPUState *cs)
+ {
++    unsigned int max_cpus = MACHINE(qdev_get_machine())->smp.max_cpus;
+     S390CPU *cpu = S390_CPU(cs);
+     kvm_s390_set_cpu_state(cpu, cpu->env.cpu_state);
+-    cpu->irqstate = g_malloc0(VCPU_IRQ_BUF_SIZE);
++    cpu->irqstate = g_malloc0(VCPU_IRQ_BUF_SIZE(max_cpus));
+     return 0;
+ }
+ 
+@@ -1950,9 +1951,10 @@ int kvm_s390_set_cpu_state(S390CPU *cpu, uint8_t cpu_state)
+ 
+ void kvm_s390_vcpu_interrupt_pre_save(S390CPU *cpu)
+ {
++    unsigned int max_cpus = MACHINE(qdev_get_machine())->smp.max_cpus;
+     struct kvm_s390_irq_state irq_state = {
+         .buf = (uint64_t) cpu->irqstate,
+-        .len = VCPU_IRQ_BUF_SIZE,
++        .len = VCPU_IRQ_BUF_SIZE(max_cpus),
+     };
+     CPUState *cs = CPU(cpu);
+     int32_t bytes;
+-- 
+2.18.0.rc1.1.g3f1ff2140
 
 
