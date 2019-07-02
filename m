@@ -2,80 +2,62 @@ Return-Path: <SRS0=9yXi=U7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BA44C06510
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 11:51:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 395EEC06510
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 11:52:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4FDDB21473
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 11:51:46 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UsqarQr0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4FDDB21473
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 1197021479
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 11:52:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1197021479
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51942 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51944 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hiHK5-0000Hs-HQ
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 07:51:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34825)
+	id 1hiHKn-00015O-Bk
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 07:52:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34868)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hiHFi-0005yT-Uq
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 07:47:16 -0400
+ (envelope-from <cohuck@redhat.com>) id 1hiHFq-00067y-NB
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 07:47:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hiHFh-00014J-Hg
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 07:47:14 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:39829)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hiHFc-0000xH-H8
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 07:47:10 -0400
-Received: by mail-ot1-x342.google.com with SMTP id r21so16176725otq.6
- for <qemu-devel@nongnu.org>; Tue, 02 Jul 2019 04:47:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=dSRxAHcDzhVFRmaf5h2eXJkPlzIFYCiYsZli86wZ5ls=;
- b=UsqarQr0YXlZxF+nMkyGoj5J15hUK9LpbuuEJ2KPmdnNpO1LgY630cyTaZoI35uuK6
- DUAvl2nw24uK95MEcdiywj4HJBnf/jY0NQGqYPzrWMdssmZnhio0mqs0stEzzpEcVSkb
- mYLzZZX/UaQ6l17XZZ7bZLDaEra/ariU2jOvl3UuWMRlr41Bjt/RnO8XS+C5G14X6cRW
- 0GUwYrxH29JIFS5nRXVT2z6gqPMJZmaZ/4R0Z5N4NuM3m0iXbL+XK0CZKNi8BPYHOpPE
- NKMeuMBECB9TuWT87FeUb+tSVhyem2ZsYTd085A/dUb5RPv+5vdcI+1nGMK1zfT+KNvl
- Ga6g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=dSRxAHcDzhVFRmaf5h2eXJkPlzIFYCiYsZli86wZ5ls=;
- b=cYGvItwmA/xxPgcOjNdXL+GlHjrwl1wwl72RLdbu/PQcJgdGradgEkNKSEXgJZdAAt
- U9DTB5Gvr/3a160raOISKqPENoKCx1qjsn5fum+FG/YdpoIXHyjWESIwmzg1S8XvJIPX
- ePycpxhbQAYgO3EkgMDGjAVT+84MkII6A1nOctoUfs+g4l0MeeWmgk68tKsi+ix/SbCd
- jLkWiLtAMTrb0hPWE3J4ssV7a2Hkwn15vKA5ZHW14u448pUw+o2pnbMtZRyAgxiq4hrH
- nmWY4cRT9GiyPnIVN4a77P1RgknUyR5VTkk3USsfkbl4ZkxU0RU0tPHqLIPdfu1hdrqJ
- vxUg==
-X-Gm-Message-State: APjAAAUbn0OuMDvP9RxBX/3ggO9b7WkGC6yNeAFHTuxq/0XWPU72tFHT
- Gw15FrdMfxIu5XlMYZ19I7Ebaw0gZtDxo0uuG5nijQ==
-X-Google-Smtp-Source: APXvYqxKm5914TLnqudVNCijsVtzHK4mz3CSR/Hhe5Niun4eeMsSybWqIZ2MujTcA3Pf8MaE6osfoxd2a7Kh0j79NeE=
-X-Received: by 2002:a9d:6a0f:: with SMTP id g15mr24633658otn.135.1562068026545; 
- Tue, 02 Jul 2019 04:47:06 -0700 (PDT)
+ (envelope-from <cohuck@redhat.com>) id 1hiHFm-0001A2-Oc
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 07:47:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38508)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1hiHFi-000123-Ty
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 07:47:15 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 82F6D307D96F;
+ Tue,  2 Jul 2019 11:47:11 +0000 (UTC)
+Received: from gondolin (dhcp-192-192.str.redhat.com [10.33.192.192])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 067355D9C3;
+ Tue,  2 Jul 2019 11:46:55 +0000 (UTC)
+Date: Tue, 2 Jul 2019 13:46:53 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: Pankaj Gupta <pagupta@redhat.com>
+Message-ID: <20190702134653.1a529826.cohuck@redhat.com>
+In-Reply-To: <20190619094907.10131-2-pagupta@redhat.com>
+References: <20190619094907.10131-1-pagupta@redhat.com>
+ <20190619094907.10131-2-pagupta@redhat.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-References: <20190625121421.22280-1-shameerali.kolothum.thodi@huawei.com>
- <20190702130703.0e74cbe6@redhat.com>
-In-Reply-To: <20190702130703.0e74cbe6@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 2 Jul 2019 12:46:55 +0100
-Message-ID: <CAFEAcA8PDNTQXD3cD3XG9wkc_QOLXUcw62-8AUjSC0g7qjti7g@mail.gmail.com>
-To: Igor Mammedov <imammedo@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::342
-Subject: Re: [Qemu-devel] [PATCH v6 0/8] ARM virt: ACPI memory hotplug
- support
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.48]); Tue, 02 Jul 2019 11:47:11 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2 1/7] virtio-pmem: add virtio device
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,62 +69,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Samuel Ortiz <sameo@linux.intel.com>,
- Ard Biesheuvel <ard.biesheuvel@linaro.org>,
- Shannon Zhao <shannon.zhaosl@gmail.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
- Linuxarm <linuxarm@huawei.com>, Eric Auger <eric.auger@redhat.com>,
- qemu-arm <qemu-arm@nongnu.org>, Xu Wei <xuwei5@hisilicon.com>,
- sebastien.boeuf@intel.com, Laszlo Ersek <lersek@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: kwolf@redhat.com, aarcange@redhat.com, xiaoguangrong.eric@gmail.com,
+ mst@redhat.com, armbru@redhat.com, riel@surriel.com, david@redhat.com,
+ qemu-devel@nongnu.org, ehabkost@redhat.com, lcapitulino@redhat.com,
+ stefanha@redhat.com, pbonzini@redhat.com, imammedo@redhat.com,
+ dan.j.williams@intel.com, nilal@redhat.com, dgilbert@redhat.com,
+ rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 2 Jul 2019 at 12:07, Igor Mammedov <imammedo@redhat.com> wrote:
->
-> On Tue, 25 Jun 2019 13:14:13 +0100
-> Shameer Kolothum <shameerali.kolothum.thodi@huawei.com> wrote:
->
-> > This series is an attempt to provide device memory hotplug support
-> > on ARM virt platform. This is based on Eric's recent works here[1]
-> > and carries some of the pc-dimm related patches dropped from his
-> > series.
-> >
-> > The kernel support for arm64 memory hot add was added recently by
-> > Robin and hence the guest kernel should be => 5.0-rc1.
-> >
-> > NVDIM support is not included currently as we still have an unresolved
-> > issue while hot adding NVDIMM[2]. However NVDIMM cold plug patches
-> > can be included, but not done for now, for keeping it simple.
-> >
-> > This makes use of GED device to sent hotplug ACPI events to the
-> > Guest. GED code is based on Nemu. Thanks to the efforts of Samuel and
-> > Sebastien to add the hardware-reduced support to Nemu using GED
-> > device[3]. (Please shout if I got the author/signed-off wrong for
-> > those patches or missed any names).
-> >
-> > This is sanity tested on a HiSilicon ARM64 platform and appreciate
-> > any further testing.
->
-> There are several things I'd fix/amend but it's nothing that couldn't
-> be done on top as bugfixes (I'll comment later on specific issues).
->
-> However as a whole from ACPI and memory hotplug POV series looks more
-> or less ready for merging.
->
-> I've asked Eric to test migration (I'm quite not sure about that part),
-> (CCed David)so on condition it works:
->
->   Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+On Wed, 19 Jun 2019 15:19:01 +0530
+Pankaj Gupta <pagupta@redhat.com> wrote:
 
-If we want to get this into 4.1 I'll need somebody to do a respin
-with all the relevant fixes pretty soon (ie within a day or two,
-and that is pushing it because really it's missed the freeze
-deadline already). It might be easier just to let it go into 4.2
-instead...
+> This is the implementation of virtio-pmem device. Support will require
+> machine changes for the architectures that will support it, so it will
+> not yet be compiled. It can be unlocked with VIRTIO_PMEM_SUPPORTED per
+> machine and disabled globally via VIRTIO_PMEM.
+> 
+> We cannot use the "addr" property as that is already used e.g. for
+> virtio-pci/pci devices. And we will have e.g. virtio-pmem-pci as a proxy.
+> So we have to choose a different one (unfortunately). "memaddr" it is.
+> That name should ideally be used by all other virtio-* based memory
+> devices in the future.
+>     -device virtio-pmem-pci,id=p0,bus=bux0,addr=0x01,memaddr=0x1000000...
+> 
+> Acked-by: Markus Armbruster <armbru@redhat.com>
+> [ QAPI bits ]
+> Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
+> [ MemoryDevice/MemoryRegion changes, cleanups, addr property "memaddr",
+>   split up patches, unplug handler ]
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  hw/virtio/Kconfig               |  10 +++
+>  hw/virtio/Makefile.objs         |   1 +
+>  hw/virtio/virtio-pmem.c         | 189 ++++++++++++++++++++++++++++++++++++++++
+>  include/hw/virtio/virtio-pmem.h |  49 +++++++++++
+>  qapi/misc.json                  |  28 +++++-
+>  5 files changed, 276 insertions(+), 1 deletion(-)
+>  create mode 100644 hw/virtio/virtio-pmem.c
+>  create mode 100644 include/hw/virtio/virtio-pmem.h
+> 
 
-thanks
--- PMM
+> diff --git a/qapi/misc.json b/qapi/misc.json
+> index dc4cf9da20..6f1bff10e4 100644
+> --- a/qapi/misc.json
+> +++ b/qapi/misc.json
+> @@ -2738,16 +2738,42 @@
+>            }
+>  }
+>  
+> +##
+> +# @VirtioPMEMDeviceInfo:
+> +#
+> +# VirtioPMEM state information
+> +#
+> +# @id: device's ID
+> +#
+> +# @memaddr: physical address in memory, where device is mapped
+> +#
+> +# @size: size of memory that the device provides
+> +#
+> +# @memdev: memory backend linked with device
+> +#
+> +# Since: 4.1
+
+Not sure if this can still make it...
+
+> +##
+> +{ 'struct': 'VirtioPMEMDeviceInfo',
+> +  'data': { '*id': 'str',
+> +            'memaddr': 'size',
+> +            'size': 'size',
+> +            'memdev': 'str'
+> +          }
+> +}
+> +
+>  ##
+>  # @MemoryDeviceInfo:
+>  #
+>  # Union containing information about a memory device
+>  #
+> +# nvdimm is included since 2.12. virtio-pmem is included since 4.1.
+> +#
+>  # Since: 2.1
+>  ##
+>  { 'union': 'MemoryDeviceInfo',
+>    'data': { 'dimm': 'PCDIMMDeviceInfo',
+> -            'nvdimm': 'PCDIMMDeviceInfo'
+> +            'nvdimm': 'PCDIMMDeviceInfo',
+> +            'virtio-pmem': 'VirtioPMEMDeviceInfo'
+>            }
+>  }
+>  
+
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 
