@@ -2,66 +2,58 @@ Return-Path: <SRS0=9yXi=U7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BA7FC5B57D
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 21:55:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1B27C5B57D
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 21:58:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 28D12218BE
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 21:55:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28D12218BE
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 96423218EA
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 21:58:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96423218EA
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57840 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57848 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hiQjw-0005Pw-Ba
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 17:55:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53896)
+	id 1hiQn5-000776-3r
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 17:58:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54035)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <no-reply@patchew.org>) id 1hiQi8-0004jI-U9
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 17:53:14 -0400
+ (envelope-from <balaton@eik.bme.hu>) id 1hiQiI-0004lv-Gg
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 17:53:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1hiQi5-0006CO-TA
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 17:53:12 -0400
-Resent-Date: Tue, 02 Jul 2019 17:53:12 -0400
-Resent-Message-Id: <E1hiQi5-0006CO-TA@eggs.gnu.org>
-Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21588)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1hiQi5-00069V-8h
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 17:53:09 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1562104348; cv=none; d=zoho.com; s=zohoarc; 
- b=e1GqrBPXj5YWO7GcjmoPkbF44xKGpoHyoV6eemzQJkcvkceIbbkElbIl0cbNdcWP1BPtmbUwpwDxujI1lmj3ZRhnR8cO7ujUe7KDmJbSZi1ZLPkGix+ufq+VzBsyi56u3IoyCLGAN2AlHxAeyNNzqcRzOs4BjyID4fZ29ri2jHc=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1562104348;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
- bh=/1Fxcx/5yGcn/5D15AH+HxrwwtTWLGuKq4hckisE0X0=; 
- b=Q+ckQGR8pmUg4tU0mbks+8nYv1sOgs6XT5JISZRl5t7Ihm+rwLM4Rqq/6isctW4MLrdEMIjb63hKuhworFGlgv323D2thCDkjqMazPWdPrP5XUTEabAnfomcnBuvCrOk/kGMQl7WFgWOitgYxb9ix8ndHtHUYMDEdMSQ2uY8LeU=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1562104347192572.1834036474929;
- Tue, 2 Jul 2019 14:52:27 -0700 (PDT)
-Message-ID: <156210434600.16064.7264890899532630488@c4a48874b076>
-In-Reply-To: <20190702150545.1872-1-laurent@vivier.eu>
+ (envelope-from <balaton@eik.bme.hu>) id 1hiQiG-0006LY-PR
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 17:53:22 -0400
+Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:14065)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <balaton@eik.bme.hu>)
+ id 1hiQi8-00063e-F7; Tue, 02 Jul 2019 17:53:12 -0400
+Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
+ by localhost (Postfix) with SMTP id 2A5337456B8;
+ Tue,  2 Jul 2019 23:52:53 +0200 (CEST)
+Received: by zero.eik.bme.hu (Postfix, from userid 432)
+ id EDA597456B7; Tue,  2 Jul 2019 23:52:52 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+ by zero.eik.bme.hu (Postfix) with ESMTP id E247274569A;
+ Tue,  2 Jul 2019 23:52:52 +0200 (CEST)
+Date: Tue, 2 Jul 2019 23:52:52 +0200 (CEST)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+To: Peter Maydell <peter.maydell@linaro.org>
+In-Reply-To: <20190702163844.20458-1-peter.maydell@linaro.org>
+Message-ID: <alpine.BSF.2.21.9999.1907022343160.68337@zero.eik.bme.hu>
+References: <20190702163844.20458-1-peter.maydell@linaro.org>
+User-Agent: Alpine 2.21.9999 (BSF 287 2018-06-16)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: laurent@vivier.eu
-Date: Tue, 2 Jul 2019 14:52:27 -0700 (PDT)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 136.143.188.55
-Subject: Re: [Qemu-devel] [PULL 0/6] Linux user for 4.1 patches
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2001:738:2001:2001::2001
+Subject: Re: [Qemu-devel] [PATCH for-4.1] hw/i2c/bitbang_i2c: Use in-place
+ rather than malloc'd bitbang_i2c_interface struct
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,65 +65,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: arikalo@wavecomp.com, riku.voipio@iki.fi, qemu-devel@nongnu.org,
- laurent@vivier.eu, amarkovic@wavecomp.com, aurelien@aurel32.net
+Cc: Gerd Hoffmann <kraxel@redhat.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org,
+ qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDcwMjE1MDU0NS4xODcy
-LTEtbGF1cmVudEB2aXZpZXIuZXUvCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2ZSBz
-b21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBpbmZv
-cm1hdGlvbjoKClR5cGU6IHNlcmllcwpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BVTEwgMC82XSBM
-aW51eCB1c2VyIGZvciA0LjEgcGF0Y2hlcwpNZXNzYWdlLWlkOiAyMDE5MDcwMjE1MDU0NS4xODcy
-LTEtbGF1cmVudEB2aXZpZXIuZXUKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jh
-c2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0t
-bG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMg
-VHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0
-cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09
-CgpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjk0NGQ1NWMgbGludXgtdXNlcjogbW92
-ZSBRRU1VX0lGTEFfQlJfTVVMVElfQk9PTE9QVCB0byB0aGUgZ29vZCBmdW5jdGlvbgpmNDdlMDZl
-IGxpbnV4LXVzZXI6IEhhbmRsZSBFWENQX0ZQRSBwcm9wZXJseSBmb3IgTUlQUwo2ZjA4ZDAyIGxp
-bnV4LXVzZXI6IEludHJvZHVjZSBUQVJHRVRfSEFWRV9BUkNIX1NUUlVDVF9GTE9DSwpkMGRjZDhl
-IGxpbnV4LXVzZXI6IEZpeCB0YXJnZXRfZmxvY2sgc3RydWN0dXJlIGZvciBNSVBTIE82NCBBQkkK
-YWE3ZDY0ZSBsaW51eC11c2VyOiBBZGQgc3VwcG9ydCBmb3Igc3RyYWNlIGZvciBzdGF0eCgpIHN5
-c2NhbGwKOTM5YjUyNiBsaW51eC11c2VyOiBBZGQgc3VwcG9ydCBmb3IgdHJhbnNsYXRpb24gb2Yg
-c3RhdHgoKSBzeXNjYWxsCgo9PT0gT1VUUFVUIEJFR0lOID09PQoxLzYgQ2hlY2tpbmcgY29tbWl0
-IDkzOWI1MjZhMTI0YiAobGludXgtdXNlcjogQWRkIHN1cHBvcnQgZm9yIHRyYW5zbGF0aW9uIG9m
-IHN0YXR4KCkgc3lzY2FsbCkKV0FSTklORzogYXJjaGl0ZWN0dXJlIHNwZWNpZmljIGRlZmluZXMg
-c2hvdWxkIGJlIGF2b2lkZWQKIzYzOiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGwuYzozMjM6Cisj
-aWYgZGVmaW5lZChUQVJHRVRfTlJfc3RhdHgpICYmIGRlZmluZWQoX19OUl9zdGF0eCkKCldBUk5J
-Tkc6IGFyY2hpdGVjdHVyZSBzcGVjaWZpYyBkZWZpbmVzIHNob3VsZCBiZSBhdm9pZGVkCiM3NTog
-RklMRTogbGludXgtdXNlci9zeXNjYWxsLmM6NjUyODoKKyNpZiBkZWZpbmVkKFRBUkdFVF9OUl9z
-dGF0eCkgJiYgZGVmaW5lZChfX05SX3N0YXR4KQoKV0FSTklORzogYXJjaGl0ZWN0dXJlIHNwZWNp
-ZmljIGRlZmluZXMgc2hvdWxkIGJlIGF2b2lkZWQKIzE0NTogRklMRTogbGludXgtdXNlci9zeXNj
-YWxsLmM6MTAyMzg6CisjaWYgZGVmaW5lZChfX05SX3N0YXR4KQoKdG90YWw6IDAgZXJyb3JzLCAz
-IHdhcm5pbmdzLCAxODYgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMS82IGhhcyBzdHlsZSBwcm9ibGVt
-cywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0
-aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJ
-TlRBSU5FUlMuCjIvNiBDaGVja2luZyBjb21taXQgYWE3ZDY0ZTEzNjE5IChsaW51eC11c2VyOiBB
-ZGQgc3VwcG9ydCBmb3Igc3RyYWNlIGZvciBzdGF0eCgpIHN5c2NhbGwpCkVSUk9SOiBzdG9yYWdl
-IGNsYXNzIHNob3VsZCBiZSBhdCB0aGUgYmVnaW5uaW5nIG9mIHRoZSBkZWNsYXJhdGlvbgojMjk6
-IEZJTEU6IGxpbnV4LXVzZXIvc3RyYWNlLmM6OTc5OgorVU5VU0VEIHN0YXRpYyBzdHJ1Y3QgZmxh
-Z3Mgc3RhdHhfZmxhZ3NbXSA9IHsKCkVSUk9SOiBzdG9yYWdlIGNsYXNzIHNob3VsZCBiZSBhdCB0
-aGUgYmVnaW5uaW5nIG9mIHRoZSBkZWNsYXJhdGlvbgojNTE6IEZJTEU6IGxpbnV4LXVzZXIvc3Ry
-YWNlLmM6MTAwMToKK1VOVVNFRCBzdGF0aWMgc3RydWN0IGZsYWdzIHN0YXR4X21hc2tbXSA9IHsK
-CnRvdGFsOiAyIGVycm9ycywgMCB3YXJuaW5ncywgMTA0IGxpbmVzIGNoZWNrZWQKClBhdGNoIDIv
-NiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJy
-b3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNl
-ZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKMy82IENoZWNraW5nIGNvbW1pdCBkMGRjZDhl
-MjEzNWYgKGxpbnV4LXVzZXI6IEZpeCB0YXJnZXRfZmxvY2sgc3RydWN0dXJlIGZvciBNSVBTIE82
-NCBBQkkpCjQvNiBDaGVja2luZyBjb21taXQgNmYwOGQwMjIxNDhlIChsaW51eC11c2VyOiBJbnRy
-b2R1Y2UgVEFSR0VUX0hBVkVfQVJDSF9TVFJVQ1RfRkxPQ0spCjUvNiBDaGVja2luZyBjb21taXQg
-ZjQ3ZTA2ZTc5ODJiIChsaW51eC11c2VyOiBIYW5kbGUgRVhDUF9GUEUgcHJvcGVybHkgZm9yIE1J
-UFMpCjYvNiBDaGVja2luZyBjb21taXQgOTQ0ZDU1Y2FlYmNiIChsaW51eC11c2VyOiBtb3ZlIFFF
-TVVfSUZMQV9CUl9NVUxUSV9CT09MT1BUIHRvIHRoZSBnb29kIGZ1bmN0aW9uKQo9PT0gT1VUUFVU
-IEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9n
-IGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MDcwMjE1MDU0NS4x
-ODcyLTEtbGF1cmVudEB2aXZpZXIuZXUvdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2Uu
-Ci0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3Bh
-dGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBy
-ZWRoYXQuY29t
+On Tue, 2 Jul 2019, Peter Maydell wrote:
+> Currently the bitbang_i2c_init() function allocates a
+> bitbang_i2c_interface struct which it returns.  This is unfortunate
+> because it means that if the function is used from a DeviceState
+> init method then the memory will be leaked by an "init then delete"
+> cycle, as used by the qmp/hmp commands that list device properties.
+>
+> Since three out of four of the uses of this function are in
+> device init methods, switch the function to do an in-place
+> initialization of a struct that can be embedded in the
+> device state struct of the caller.
+>
+> This fixes LeakSanitizer leak warnings that have appeared in the
+> patchew configuration (which only tries to run the sanitizers
+> for the x86_64-softmmu target) now that we use the bitbang-i2c
+> code in an x86-64 config.
+>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+> This isn't the only problem with this code : it is also
+> missing reset and migration handling and generally looks like
+> it needs proper conversion to QOM somehow. But this will shut
+> the patchew complaints up and seems ok for 4.1.
+>
+> Disclaimer: checked only that the leak-sanitizer is now happy
+> and with a 'make check'.
 
+I've tested the ppc4xx and ati-vga parts with AROS and MorphOS and these 
+can still access i2c devices so I think it works.
+
+> ---
+> hw/display/ati_int.h         |  2 +-
+> include/hw/i2c/bitbang_i2c.h | 38 ++++++++++++++++++++++++++++-
+> include/hw/i2c/ppc4xx_i2c.h  |  2 +-
+> hw/display/ati.c             |  7 +++---
+> hw/i2c/bitbang_i2c.c         | 47 +++---------------------------------
+> hw/i2c/ppc4xx_i2c.c          |  6 ++---
+> hw/i2c/versatile_i2c.c       |  8 +++---
+> 7 files changed, 53 insertions(+), 57 deletions(-)
+>
+> diff --git a/hw/display/ati_int.h b/hw/display/ati_int.h
+> index 9b67d0022ad..31a1927b3ec 100644
+> --- a/hw/display/ati_int.h
+> +++ b/hw/display/ati_int.h
+> @@ -88,7 +88,7 @@ typedef struct ATIVGAState {
+>     uint16_t cursor_size;
+>     uint32_t cursor_offset;
+>     QEMUCursor *cursor;
+> -    bitbang_i2c_interface *bbi2c;
+> +    bitbang_i2c_interface bbi2c;
+>     MemoryRegion io;
+>     MemoryRegion mm;
+>     ATIVGARegs regs;
+> diff --git a/include/hw/i2c/bitbang_i2c.h b/include/hw/i2c/bitbang_i2c.h
+> index 3a7126d5dee..92334e9016a 100644
+> --- a/include/hw/i2c/bitbang_i2c.h
+> +++ b/include/hw/i2c/bitbang_i2c.h
+> @@ -8,7 +8,43 @@ typedef struct bitbang_i2c_interface bitbang_i2c_interface;
+
+Maybe this typedef ^^^ can now be moved to the struct below instead of 
+coming first (or even written in the same line as
+typedef struct { } bitbang_i2c_interface;
+as there is no need to have both struct bitbang_i2c_interface and the 
+typedeffed name available). But I don't really mind, so
+
+Reviewed-by: BALATON Zoltan <balaton@eik.bme.hu>
+
+Thanks for fixing this.
+
+Regards,
+BALATON Zoltan
+
+> #define BITBANG_I2C_SDA 0
+> #define BITBANG_I2C_SCL 1
+>
+> -bitbang_i2c_interface *bitbang_i2c_init(I2CBus *bus);
+> +typedef enum bitbang_i2c_state {
+> +    STOPPED = 0,
+> +    SENDING_BIT7,
+> +    SENDING_BIT6,
+> +    SENDING_BIT5,
+> +    SENDING_BIT4,
+> +    SENDING_BIT3,
+> +    SENDING_BIT2,
+> +    SENDING_BIT1,
+> +    SENDING_BIT0,
+> +    WAITING_FOR_ACK,
+> +    RECEIVING_BIT7,
+> +    RECEIVING_BIT6,
+> +    RECEIVING_BIT5,
+> +    RECEIVING_BIT4,
+> +    RECEIVING_BIT3,
+> +    RECEIVING_BIT2,
+> +    RECEIVING_BIT1,
+> +    RECEIVING_BIT0,
+> +    SENDING_ACK,
+> +    SENT_NACK
+> +} bitbang_i2c_state;
+> +
+> +struct bitbang_i2c_interface {
+> +    I2CBus *bus;
+> +    bitbang_i2c_state state;
+> +    int last_data;
+> +    int last_clock;
+> +    int device_out;
+> +    uint8_t buffer;
+> +    int current_addr;
+> +};
+> +
+> +/**
+> + * bitbang_i2c_init: in-place initialize the bitbang_i2c_interface struct
+> + */
+> +void bitbang_i2c_init(bitbang_i2c_interface *s, I2CBus *bus);
+> int bitbang_i2c_set(bitbang_i2c_interface *i2c, int line, int level);
+>
+> #endif
 
