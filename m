@@ -6,57 +6,60 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FB2DC06510
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 16:54:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62019C06510
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 16:54:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2828B206A3
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 16:54:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2828B206A3
+	by mail.kernel.org (Postfix) with ESMTPS id 3A3F7206A3
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 16:54:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A3F7206A3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55274 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55276 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hiM2r-0004i2-60
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 12:54:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37505)
+	id 1hiM34-0004qQ-FC
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 12:54:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38109)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <ehabkost@redhat.com>) id 1hiKpM-0007se-Ij
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 11:36:17 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1hiKqZ-0000ud-HA
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 11:37:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1hiKpK-0005xT-5O
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 11:36:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39594)
+ (envelope-from <ehabkost@redhat.com>) id 1hiKqY-00071f-70
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 11:37:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50586)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hiKpJ-0005wt-Un
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 11:36:14 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hiKqW-0006tG-2z
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 11:37:28 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 33E2918DF7A;
- Tue,  2 Jul 2019 15:36:08 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 0F5CF30C62DD;
+ Tue,  2 Jul 2019 15:37:15 +0000 (UTC)
 Received: from localhost (ovpn-116-30.gru2.redhat.com [10.97.116.30])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B5F655D9D3;
- Tue,  2 Jul 2019 15:36:07 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B4A5319C6F;
+ Tue,  2 Jul 2019 15:37:09 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>,
  Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
  Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
  Richard Henderson <rth@twiddle.net>
-Date: Tue,  2 Jul 2019 12:35:08 -0300
-Message-Id: <20190702153535.9851-16-ehabkost@redhat.com>
+Date: Tue,  2 Jul 2019 12:35:26 -0300
+Message-Id: <20190702153535.9851-34-ehabkost@redhat.com>
 In-Reply-To: <20190702153535.9851-1-ehabkost@redhat.com>
 References: <20190702153535.9851-1-ehabkost@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.29]); Tue, 02 Jul 2019 15:36:08 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.43]); Tue, 02 Jul 2019 15:37:19 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL v3 15/42] pc: fix possible NULL pointer
- dereference in pc_machine_get_device_memory_region_size()
+Subject: [Qemu-devel] [PULL v3 33/42] i386: Add x-force-features option for
+ testing
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,47 +71,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Igor Mammedov <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Igor Mammedov <imammedo@redhat.com>
+Add a new option that can be used to disable feature flag
+filtering.  This will allow CPU model compatibility test cases to
+work without host hardware dependencies.
 
-QEMU will crash when device-memory-region-size property is read if ms->device_memory
-wasn't initialized yet.
-
-Crash can be reproduced with:
- $QEMU -preconfig -qmp unix:qmp_socket,server,nowait &
- ./scripts/qmp/qom-get -s qmp_socket /machine.device-memory-region-size
-
-Instead of crashing return 0 if ms->device_memory hasn't been initialized.
-
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Message-Id: <20190624090200.5383-1-imammedo@redhat.com>
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+Message-Id: <20190628002844.24894-3-ehabkost@redhat.com>
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- hw/i386/pc.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ target/i386/cpu.h | 6 ++++++
+ target/i386/cpu.c | 8 ++++++--
+ 2 files changed, 12 insertions(+), 2 deletions(-)
 
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 9921ce4f5e..9b953eeeea 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -2489,7 +2489,11 @@ pc_machine_get_device_memory_region_size(Object *obj, Visitor *v,
-                                          Error **errp)
- {
-     MachineState *ms = MACHINE(obj);
--    int64_t value = memory_region_size(&ms->device_memory->mr);
-+    int64_t value = 0;
-+
-+    if (ms->device_memory) {
-+        value = memory_region_size(&ms->device_memory->mr);
-+    }
- 
-     visit_type_int(v, name, &value, errp);
- }
--- 
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 0a96c78669..4727226a6a 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -1417,6 +1417,12 @@ struct X86CPU {
+=20
+     bool check_cpuid;
+     bool enforce_cpuid;
++    /*
++     * Force features to be enabled even if the host doesn't support the=
+m.
++     * This is dangerous and should be done only for testing CPUID
++     * compatibility.
++     */
++    bool force_features;
+     bool expose_kvm;
+     bool expose_tcg;
+     bool migratable;
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 6c04a258ed..9059121273 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -5250,8 +5250,11 @@ static int x86_cpu_filter_features(X86CPU *cpu)
+         uint32_t host_feat =3D
+             x86_cpu_get_supported_feature_word(w, false);
+         uint32_t requested_features =3D env->features[w];
+-        env->features[w] &=3D host_feat;
+-        cpu->filtered_features[w] =3D requested_features & ~env->feature=
+s[w];
++        uint32_t available_features =3D requested_features & host_feat;
++        if (!cpu->force_features) {
++            env->features[w] =3D available_features;
++        }
++        cpu->filtered_features[w] =3D requested_features & ~available_fe=
+atures;
+         if (cpu->filtered_features[w]) {
+             rv =3D 1;
+         }
+@@ -5980,6 +5983,7 @@ static Property x86_cpu_properties[] =3D {
+=20
+     DEFINE_PROP_BOOL("check", X86CPU, check_cpuid, true),
+     DEFINE_PROP_BOOL("enforce", X86CPU, enforce_cpuid, false),
++    DEFINE_PROP_BOOL("x-force-features", X86CPU, force_features, false),
+     DEFINE_PROP_BOOL("kvm", X86CPU, expose_kvm, true),
+     DEFINE_PROP_UINT32("phys-bits", X86CPU, phys_bits, 0),
+     DEFINE_PROP_BOOL("host-phys-bits", X86CPU, host_phys_bits, false),
+--=20
 2.18.0.rc1.1.g3f1ff2140
 
 
