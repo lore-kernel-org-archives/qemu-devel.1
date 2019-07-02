@@ -3,59 +3,60 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B34CC06510
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 16:51:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FB2DC06510
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 16:54:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E8420206A3
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 16:51:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8420206A3
+	by mail.kernel.org (Postfix) with ESMTPS id 2828B206A3
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 16:54:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2828B206A3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55212 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55274 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hiM0B-0001xz-7r
-	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 12:51:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38058)
+	id 1hiM2r-0004i2-60
+	for qemu-devel@archiver.kernel.org; Tue, 02 Jul 2019 12:54:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37505)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <ehabkost@redhat.com>) id 1hiKqY-0000qC-7k
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 11:37:31 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1hiKpM-0007se-Ij
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 11:36:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1hiKqW-0006zs-4I
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 11:37:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48355)
+ (envelope-from <ehabkost@redhat.com>) id 1hiKpK-0005xT-5O
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 11:36:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39594)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hiKqU-0006s3-13
- for qemu-devel@nongnu.org; Tue, 02 Jul 2019 11:37:27 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hiKpJ-0005wt-Un
+ for qemu-devel@nongnu.org; Tue, 02 Jul 2019 11:36:14 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 4CED430872EE;
- Tue,  2 Jul 2019 15:37:06 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 33E2918DF7A;
+ Tue,  2 Jul 2019 15:36:08 +0000 (UTC)
 Received: from localhost (ovpn-116-30.gru2.redhat.com [10.97.116.30])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1EC4E78375;
- Tue,  2 Jul 2019 15:36:54 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B5F655D9D3;
+ Tue,  2 Jul 2019 15:36:07 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>,
  Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
  Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
  Richard Henderson <rth@twiddle.net>
-Date: Tue,  2 Jul 2019 12:35:24 -0300
-Message-Id: <20190702153535.9851-32-ehabkost@redhat.com>
+Date: Tue,  2 Jul 2019 12:35:08 -0300
+Message-Id: <20190702153535.9851-16-ehabkost@redhat.com>
 In-Reply-To: <20190702153535.9851-1-ehabkost@redhat.com>
 References: <20190702153535.9851-1-ehabkost@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Tue, 02 Jul 2019 15:37:13 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.29]); Tue, 02 Jul 2019 15:36:08 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL v3 31/42] i386: Introduce SnowRidge CPU model
+Subject: [Qemu-devel] [PULL v3 15/42] pc: fix possible NULL pointer
+ dereference in pc_machine_get_device_memory_region_size()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,115 +68,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paul Lai <paul.c.lai@intel.com>
+Cc: Igor Mammedov <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Paul Lai <paul.c.lai@intel.com>
+From: Igor Mammedov <imammedo@redhat.com>
 
-SnowRidge CPU supports Accelerator Infrastrcture Architecture (MOVDIRI,
-MOVDIR64B), CLDEMOTE and SPLIT_LOCK_DISABLE.
+QEMU will crash when device-memory-region-size property is read if ms->device_memory
+wasn't initialized yet.
 
-MOVDIRI, MOVDIR64B, and CLDEMOTE are found via CPUID.
-The availability of SPLIT_LOCK_DISABLE is check via msr access
+Crash can be reproduced with:
+ $QEMU -preconfig -qmp unix:qmp_socket,server,nowait &
+ ./scripts/qmp/qom-get -s qmp_socket /machine.device-memory-region-size
 
-References can be found in either:
- https://software.intel.com/en-us/articles/intel-sdm
- https://software.intel.com/en-us/download/intel-architecture-instruction-set-extensions-and-future-features-programming-reference
+Instead of crashing return 0 if ms->device_memory hasn't been initialized.
 
-Signed-off-by: Paul Lai <paul.c.lai@intel.com>
-Tested-by: Tao3 Xu <tao3.xu@intel.com>
-Message-Id: <20190626162129.25345-1-paul.c.lai@intel.com>
-[ehabkost: squashed SPLIT_LOCK_DETECT patch]
-Message-Id: <20190626163232.25711-1-paul.c.lai@intel.com>
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Message-Id: <20190624090200.5383-1-imammedo@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- target/i386/cpu.c | 71 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 71 insertions(+)
+ hw/i386/pc.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index ea52db0600..6c04a258ed 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -2688,6 +2688,77 @@ static X86CPUDefinition builtin_x86_defs[] = {
-         .xlevel = 0x80000008,
-         .model_id = "Intel Xeon Processor (Icelake)",
-     },
-+    {
-+        .name = "SnowRidge-Server",
-+        .level = 27,
-+        .vendor = CPUID_VENDOR_INTEL,
-+        .family = 6,
-+        .model = 134,
-+        .stepping = 1,
-+        .features[FEAT_1_EDX] =
-+            /* missing: CPUID_PN CPUID_IA64 */
-+            /* missing: CPUID_DTS, CPUID_HT, CPUID_TM, CPUID_PBE */
-+            CPUID_FP87 | CPUID_VME | CPUID_DE | CPUID_PSE |
-+            CPUID_TSC | CPUID_MSR | CPUID_PAE | CPUID_MCE |
-+            CPUID_CX8 | CPUID_APIC | CPUID_SEP |
-+            CPUID_MTRR | CPUID_PGE | CPUID_MCA | CPUID_CMOV |
-+            CPUID_PAT | CPUID_PSE36 | CPUID_CLFLUSH |
-+            CPUID_MMX |
-+            CPUID_FXSR | CPUID_SSE | CPUID_SSE2,
-+        .features[FEAT_1_ECX] =
-+            CPUID_EXT_SSE3 | CPUID_EXT_PCLMULQDQ | CPUID_EXT_MONITOR |
-+            CPUID_EXT_VMX |
-+            CPUID_EXT_SSSE3 |
-+            CPUID_EXT_CX16 |
-+            CPUID_EXT_SSE41 |
-+            CPUID_EXT_SSE42 | CPUID_EXT_X2APIC | CPUID_EXT_MOVBE |
-+            CPUID_EXT_POPCNT |
-+            CPUID_EXT_TSC_DEADLINE_TIMER | CPUID_EXT_AES | CPUID_EXT_XSAVE |
-+            CPUID_EXT_RDRAND,
-+        .features[FEAT_8000_0001_EDX] =
-+            CPUID_EXT2_SYSCALL |
-+            CPUID_EXT2_NX |
-+            CPUID_EXT2_PDPE1GB | CPUID_EXT2_RDTSCP |
-+            CPUID_EXT2_LM,
-+        .features[FEAT_8000_0001_ECX] =
-+            CPUID_EXT3_LAHF_LM |
-+            CPUID_EXT3_3DNOWPREFETCH,
-+        .features[FEAT_7_0_EBX] =
-+            CPUID_7_0_EBX_FSGSBASE |
-+            CPUID_7_0_EBX_SMEP |
-+            CPUID_7_0_EBX_ERMS |
-+            CPUID_7_0_EBX_MPX |  /* missing bits 13, 15 */
-+            CPUID_7_0_EBX_RDSEED |
-+            CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_CLFLUSHOPT |
-+            CPUID_7_0_EBX_CLWB |
-+            CPUID_7_0_EBX_SHA_NI,
-+        .features[FEAT_7_0_ECX] =
-+            CPUID_7_0_ECX_UMIP |
-+            /* missing bit 5 */
-+            CPUID_7_0_ECX_GFNI |
-+            CPUID_7_0_ECX_MOVDIRI | CPUID_7_0_ECX_CLDEMOTE |
-+            CPUID_7_0_ECX_MOVDIR64B,
-+        .features[FEAT_7_0_EDX] =
-+            CPUID_7_0_EDX_SPEC_CTRL |
-+            CPUID_7_0_EDX_ARCH_CAPABILITIES | CPUID_7_0_EDX_SPEC_CTRL_SSBD |
-+            CPUID_7_0_EDX_CORE_CAPABILITY,
-+        .features[FEAT_CORE_CAPABILITY] =
-+            MSR_CORE_CAP_SPLIT_LOCK_DETECT,
-+        /*
-+         * Missing: XSAVES (not supported by some Linux versions,
-+         * including v4.1 to v4.12).
-+         * KVM doesn't yet expose any XSAVES state save component,
-+         * and the only one defined in Skylake (processor tracing)
-+         * probably will block migration anyway.
-+         */
-+        .features[FEAT_XSAVE] =
-+            CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XSAVEC |
-+            CPUID_XSAVE_XGETBV1,
-+        .features[FEAT_6_EAX] =
-+            CPUID_6_EAX_ARAT,
-+        .xlevel = 0x80000008,
-+        .model_id = "Intel Atom Processor (SnowRidge)",
-+    },
-     {
-         .name = "KnightsMill",
-         .level = 0xd,
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 9921ce4f5e..9b953eeeea 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -2489,7 +2489,11 @@ pc_machine_get_device_memory_region_size(Object *obj, Visitor *v,
+                                          Error **errp)
+ {
+     MachineState *ms = MACHINE(obj);
+-    int64_t value = memory_region_size(&ms->device_memory->mr);
++    int64_t value = 0;
++
++    if (ms->device_memory) {
++        value = memory_region_size(&ms->device_memory->mr);
++    }
+ 
+     visit_type_int(v, name, &value, errp);
+ }
 -- 
 2.18.0.rc1.1.g3f1ff2140
 
