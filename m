@@ -6,57 +6,57 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82A8BC5B578
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 03:07:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BCB5FC5B578
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 03:09:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5A1C5206A2
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 03:07:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A1C5206A2
+	by mail.kernel.org (Postfix) with ESMTPS id 95B33206A2
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 03:09:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95B33206A2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47792 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47804 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hi98z-0006PB-Ke
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 23:07:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34206)
+	id 1hi9AL-0007dm-RD
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 23:09:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34313)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hi78w-0002gB-VY
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 20:59:37 -0400
+ (envelope-from <philmd@redhat.com>) id 1hi791-0002pl-MI
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 20:59:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hi78t-0000xA-Hg
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 20:59:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37700)
+ (envelope-from <philmd@redhat.com>) id 1hi78z-00016o-SD
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 20:59:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37726)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <philmd@redhat.com>)
- id 1hi78n-0000pX-Bv; Mon, 01 Jul 2019 20:59:25 -0400
+ id 1hi78u-0000wc-Fi; Mon, 01 Jul 2019 20:59:32 -0400
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 72DD8FA8CC;
- Tue,  2 Jul 2019 00:59:24 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 047FFF9E76;
+ Tue,  2 Jul 2019 00:59:31 +0000 (UTC)
 Received: from x1w.redhat.com (ovpn-204-21.brq.redhat.com [10.40.204.21])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 422861001B33;
- Tue,  2 Jul 2019 00:59:19 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 071AC1001B33;
+ Tue,  2 Jul 2019 00:59:24 +0000 (UTC)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Mon,  1 Jul 2019 21:58:46 -0300
-Message-Id: <20190702005912.15905-2-philmd@redhat.com>
+Date: Mon,  1 Jul 2019 21:58:47 -0300
+Message-Id: <20190702005912.15905-3-philmd@redhat.com>
 In-Reply-To: <20190702005912.15905-1-philmd@redhat.com>
 References: <20190702005912.15905-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.38]); Tue, 02 Jul 2019 00:59:24 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.38]); Tue, 02 Jul 2019 00:59:31 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 01/27] tests/pflash-cfi02: Add test for
- supported CFI commands
+Subject: [Qemu-devel] [PULL 02/27] hw/block/pflash: Simplify
+ trace_pflash_io_read/write()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,303 +71,135 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Cc: Kevin Wolf <kwolf@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
  Thomas Huth <thuth@redhat.com>,
  Stephen Checkoway <stephen.checkoway@oberlin.edu>, qemu-block@nongnu.org,
- Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, Alistair Francis <alistair.francis@wdc.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Stephen Checkoway <stephen.checkoway@oberlin.edu>
+Call the read() trace function after the value is set, so we can
+log the returned value.
+Rename the I/O trace functions with '_io_' in their name.
 
-Test the AMD command set for parallel flash chips. This test uses an
-ARM musicpal board with a pflash drive to test the following list of
-currently-supported commands.
-- Autoselect
-- CFI
-- Sector erase
-- Chip erase
-- Program
-- Unlock bypass
-- Reset
-
-Signed-off-by: Stephen Checkoway <stephen.checkoway@oberlin.edu>
-Message-Id: <20190426162624.55977-2-stephen.checkoway@oberlin.edu>
-Acked-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-[PMD: reworded the patch subject, g_assert_cmpint -> cmphex]
+Reviewed-by: Stephen Checkoway <stephen.checkoway@oberlin.edu>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Message-Id: <20190627202719.17739-3-philmd@redhat.com>
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- tests/Makefile.include    |   2 +
- tests/pflash-cfi02-test.c | 225 ++++++++++++++++++++++++++++++++++++++
- 2 files changed, 227 insertions(+)
- create mode 100644 tests/pflash-cfi02-test.c
+ hw/block/pflash_cfi01.c | 5 +++--
+ hw/block/pflash_cfi02.c | 6 ++----
+ hw/block/trace-events   | 4 ++--
+ 3 files changed, 7 insertions(+), 8 deletions(-)
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index db750dd6d0..d02132fb94 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -260,6 +260,7 @@ check-qtest-arm-y +=3D tests/m25p80-test$(EXESUF)
- check-qtest-arm-y +=3D tests/test-arm-mptimer$(EXESUF)
- check-qtest-arm-y +=3D tests/boot-serial-test$(EXESUF)
- check-qtest-arm-y +=3D tests/hexloader-test$(EXESUF)
-+check-qtest-arm-$(CONFIG_PFLASH_CFI02) +=3D tests/pflash-cfi02-test$(EXE=
-SUF)
+diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
+index 35080d915f..74fc1bc2da 100644
+--- a/hw/block/pflash_cfi01.c
++++ b/hw/block/pflash_cfi01.c
+@@ -288,7 +288,6 @@ static uint32_t pflash_read(PFlashCFI01 *pfl, hwaddr =
+offset,
+     uint32_t ret;
 =20
- check-qtest-aarch64-y =3D tests/numa-test$(EXESUF)
- check-qtest-aarch64-y +=3D tests/boot-serial-test$(EXESUF)
-@@ -767,6 +768,7 @@ tests/device-introspect-test$(EXESUF): tests/device-i=
-ntrospect-test.o
- tests/rtc-test$(EXESUF): tests/rtc-test.o
- tests/m48t59-test$(EXESUF): tests/m48t59-test.o
- tests/hexloader-test$(EXESUF): tests/hexloader-test.o
-+tests/pflash-cfi02$(EXESUF): tests/pflash-cfi02-test.o
- tests/endianness-test$(EXESUF): tests/endianness-test.o
- tests/prom-env-test$(EXESUF): tests/prom-env-test.o $(libqos-obj-y)
- tests/rtas-test$(EXESUF): tests/rtas-test.o $(libqos-spapr-obj-y)
-diff --git a/tests/pflash-cfi02-test.c b/tests/pflash-cfi02-test.c
-new file mode 100644
-index 0000000000..e7e16a8dd8
---- /dev/null
-+++ b/tests/pflash-cfi02-test.c
-@@ -0,0 +1,225 @@
-+/*
-+ * QTest testcase for parallel flash with AMD command set
-+ *
-+ * Copyright (c) 2019 Stephen Checkoway
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "libqtest.h"
-+
-+/*
-+ * To test the pflash_cfi02 device, we run QEMU with the musicpal machin=
-e with
-+ * a pflash drive. This enables us to test some flash configurations, bu=
-t not
-+ * all. In particular, we're limited to a 16-bit wide flash device.
-+ */
-+
-+#define MP_FLASH_SIZE_MAX (32 * 1024 * 1024)
-+#define BASE_ADDR (0x100000000ULL - MP_FLASH_SIZE_MAX)
-+
-+#define FLASH_WIDTH 2
-+#define CFI_ADDR (FLASH_WIDTH * 0x55)
-+#define UNLOCK0_ADDR (FLASH_WIDTH * 0x5555)
-+#define UNLOCK1_ADDR (FLASH_WIDTH * 0x2AAA)
-+
-+#define CFI_CMD 0x98
-+#define UNLOCK0_CMD 0xAA
-+#define UNLOCK1_CMD 0x55
-+#define AUTOSELECT_CMD 0x90
-+#define RESET_CMD 0xF0
-+#define PROGRAM_CMD 0xA0
-+#define SECTOR_ERASE_CMD 0x30
-+#define CHIP_ERASE_CMD 0x10
-+#define UNLOCK_BYPASS_CMD 0x20
-+#define UNLOCK_BYPASS_RESET_CMD 0x00
-+
-+static char image_path[] =3D "/tmp/qtest.XXXXXX";
-+
-+static inline void flash_write(uint64_t byte_addr, uint16_t data)
-+{
-+    qtest_writew(global_qtest, BASE_ADDR + byte_addr, data);
-+}
-+
-+static inline uint16_t flash_read(uint64_t byte_addr)
-+{
-+    return qtest_readw(global_qtest, BASE_ADDR + byte_addr);
-+}
-+
-+static void unlock(void)
-+{
-+    flash_write(UNLOCK0_ADDR, UNLOCK0_CMD);
-+    flash_write(UNLOCK1_ADDR, UNLOCK1_CMD);
-+}
-+
-+static void reset(void)
-+{
-+    flash_write(0, RESET_CMD);
-+}
-+
-+static void sector_erase(uint64_t byte_addr)
-+{
-+    unlock();
-+    flash_write(UNLOCK0_ADDR, 0x80);
-+    unlock();
-+    flash_write(byte_addr, SECTOR_ERASE_CMD);
-+}
-+
-+static void wait_for_completion(uint64_t byte_addr)
-+{
-+    /* If DQ6 is toggling, step the clock and ensure the toggle stops. *=
+     ret =3D -1;
+-    trace_pflash_read(offset, pfl->cmd, width, pfl->wcycle);
+     switch (pfl->cmd) {
+     default:
+         /* This should never happen : reset state & treat it as a read *=
 /
-+    if ((flash_read(byte_addr) & 0x40) ^ (flash_read(byte_addr) & 0x40))=
- {
-+        /* Wait for erase or program to finish. */
-+        clock_step_next();
-+        /* Ensure that DQ6 has stopped toggling. */
-+        g_assert_cmphex(flash_read(byte_addr), =3D=3D, flash_read(byte_a=
-ddr));
-+    }
-+}
+@@ -391,6 +390,8 @@ static uint32_t pflash_read(PFlashCFI01 *pfl, hwaddr =
+offset,
+=20
+         break;
+     }
++    trace_pflash_io_read(offset, width, width << 1, ret, pfl->cmd, pfl->=
+wcycle);
 +
-+static void bypass_program(uint64_t byte_addr, uint16_t data)
-+{
-+    flash_write(UNLOCK0_ADDR, PROGRAM_CMD);
-+    flash_write(byte_addr, data);
-+    /*
-+     * Data isn't valid until DQ6 stops toggling. We don't model this as
-+     * writes are immediate, but if this changes in the future, we can w=
-ait
-+     * until the program is complete.
-+     */
-+    wait_for_completion(byte_addr);
-+}
-+
-+static void program(uint64_t byte_addr, uint16_t data)
-+{
-+    unlock();
-+    bypass_program(byte_addr, data);
-+}
-+
-+static void chip_erase(void)
-+{
-+    unlock();
-+    flash_write(UNLOCK0_ADDR, 0x80);
-+    unlock();
-+    flash_write(UNLOCK0_ADDR, SECTOR_ERASE_CMD);
-+}
-+
-+static void test_flash(void)
-+{
-+    global_qtest =3D qtest_initf("-M musicpal,accel=3Dqtest "
-+                               "-drive if=3Dpflash,file=3D%s,format=3Dra=
-w,copy-on-read",
-+                               image_path);
-+    /* Check the IDs. */
-+    unlock();
-+    flash_write(UNLOCK0_ADDR, AUTOSELECT_CMD);
-+    g_assert_cmphex(flash_read(FLASH_WIDTH * 0x0000), =3D=3D, 0x00BF);
-+    g_assert_cmphex(flash_read(FLASH_WIDTH * 0x0001), =3D=3D, 0x236D);
-+    reset();
-+
-+    /* Check the erase blocks. */
-+    flash_write(CFI_ADDR, CFI_CMD);
-+    g_assert_cmphex(flash_read(FLASH_WIDTH * 0x10), =3D=3D, 'Q');
-+    g_assert_cmphex(flash_read(FLASH_WIDTH * 0x11), =3D=3D, 'R');
-+    g_assert_cmphex(flash_read(FLASH_WIDTH * 0x12), =3D=3D, 'Y');
-+    /* Num erase regions. */
-+    g_assert_cmphex(flash_read(FLASH_WIDTH * 0x2C), >=3D, 1);
-+    uint32_t nb_sectors =3D flash_read(FLASH_WIDTH * 0x2D) +
-+                          (flash_read(FLASH_WIDTH * 0x2E) << 8) + 1;
-+    uint32_t sector_len =3D (flash_read(FLASH_WIDTH * 0x2F) << 8) +
-+                          (flash_read(FLASH_WIDTH * 0x30) << 16);
-+    reset();
-+
-+    /* Erase and program sector. */
-+    for (uint32_t i =3D 0; i < nb_sectors; ++i) {
-+        uint64_t byte_addr =3D i * sector_len;
-+        sector_erase(byte_addr);
-+        /* Read toggle. */
-+        uint16_t status0 =3D flash_read(byte_addr);
-+        /* DQ7 is 0 during an erase. */
-+        g_assert_cmphex(status0 & 0x80, =3D=3D, 0);
-+        uint16_t status1 =3D flash_read(byte_addr);
-+        /* DQ6 toggles during an erase. */
-+        g_assert_cmphex(status0 & 0x40, !=3D, status1 & 0x40);
-+        /* Wait for erase to complete. */
-+        clock_step_next();
-+        /* Ensure DQ6 has stopped toggling. */
-+        g_assert_cmphex(flash_read(byte_addr), =3D=3D, flash_read(byte_a=
-ddr));
-+        /* Now the data should be valid. */
-+        g_assert_cmphex(flash_read(byte_addr), =3D=3D, 0xFFFF);
-+
-+        /* Program a bit pattern. */
-+        program(byte_addr, 0x5555);
-+        g_assert_cmphex(flash_read(byte_addr), =3D=3D, 0x5555);
-+        program(byte_addr, 0xAA55);
-+        g_assert_cmphex(flash_read(byte_addr), =3D=3D, 0x0055);
-+    }
-+
-+    /* Erase the chip. */
-+    chip_erase();
-+    /* Read toggle. */
-+    uint16_t status0 =3D flash_read(0);
-+    /* DQ7 is 0 during an erase. */
-+    g_assert_cmphex(status0 & 0x80, =3D=3D, 0);
-+    uint16_t status1 =3D flash_read(0);
-+    /* DQ6 toggles during an erase. */
-+    g_assert_cmphex(status0 & 0x40, !=3D, status1 & 0x40);
-+    /* Wait for erase to complete. */
-+    clock_step_next();
-+    /* Ensure DQ6 has stopped toggling. */
-+    g_assert_cmphex(flash_read(0), =3D=3D, flash_read(0));
-+    /* Now the data should be valid. */
-+    g_assert_cmphex(flash_read(0), =3D=3D, 0xFFFF);
-+
-+    /* Unlock bypass */
-+    unlock();
-+    flash_write(UNLOCK0_ADDR, UNLOCK_BYPASS_CMD);
-+    bypass_program(0, 0x0123);
-+    bypass_program(2, 0x4567);
-+    bypass_program(4, 0x89AB);
-+    /*
-+     * Test that bypass programming, unlike normal programming can use a=
-ny
-+     * address for the PROGRAM_CMD.
-+     */
-+    flash_write(6, PROGRAM_CMD);
-+    flash_write(6, 0xCDEF);
-+    wait_for_completion(6);
-+    flash_write(0, UNLOCK_BYPASS_RESET_CMD);
-+    bypass_program(8, 0x55AA); /* Should fail. */
-+    g_assert_cmphex(flash_read(0), =3D=3D, 0x0123);
-+    g_assert_cmphex(flash_read(2), =3D=3D, 0x4567);
-+    g_assert_cmphex(flash_read(4), =3D=3D, 0x89AB);
-+    g_assert_cmphex(flash_read(6), =3D=3D, 0xCDEF);
-+    g_assert_cmphex(flash_read(8), =3D=3D, 0xFFFF);
-+
-+    qtest_quit(global_qtest);
-+}
-+
-+static void cleanup(void *opaque)
-+{
-+    unlink(image_path);
-+}
-+
-+int main(int argc, char **argv)
-+{
-+    int fd =3D mkstemp(image_path);
-+    if (fd =3D=3D -1) {
-+        g_printerr("Failed to create temporary file %s: %s\n", image_pat=
-h,
-+                   strerror(errno));
-+        exit(EXIT_FAILURE);
-+    }
-+    if (ftruncate(fd, 8 * 1024 * 1024) < 0) {
-+        int error_code =3D errno;
-+        close(fd);
-+        unlink(image_path);
-+        g_printerr("Failed to truncate file %s to 8 MB: %s\n", image_pat=
-h,
-+                   strerror(error_code));
-+        exit(EXIT_FAILURE);
-+    }
-+    close(fd);
-+
-+    qtest_add_abrt_handler(cleanup, NULL);
-+    g_test_init(&argc, &argv, NULL);
-+    qtest_add_func("pflash-cfi02", test_flash);
-+    int result =3D g_test_run();
-+    cleanup(NULL);
-+    return result;
-+}
+     return ret;
+ }
+=20
+@@ -453,7 +454,7 @@ static void pflash_write(PFlashCFI01 *pfl, hwaddr off=
+set,
+=20
+     cmd =3D value;
+=20
+-    trace_pflash_write(offset, value, width, pfl->wcycle);
++    trace_pflash_io_write(offset, width, width << 1, value, pfl->wcycle)=
+;
+     if (!pfl->wcycle) {
+         /* Set the device in I/O access mode */
+         memory_region_rom_device_set_romd(&pfl->mem, false);
+diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
+index eb106f4996..f05cd507b3 100644
+--- a/hw/block/pflash_cfi02.c
++++ b/hw/block/pflash_cfi02.c
+@@ -145,7 +145,6 @@ static uint32_t pflash_read(PFlashCFI02 *pfl, hwaddr =
+offset,
+     uint8_t *p;
+=20
+     ret =3D -1;
+-    trace_pflash_read(offset, pfl->cmd, width, pfl->wcycle);
+     /* Lazy reset to ROMD mode after a certain amount of read accesses *=
+/
+     if (!pfl->rom_mode && pfl->wcycle =3D=3D 0 &&
+         ++pfl->read_counter > PFLASH_LAZY_ROMD_THRESHOLD) {
+@@ -241,6 +240,7 @@ static uint32_t pflash_read(PFlashCFI02 *pfl, hwaddr =
+offset,
+         }
+         break;
+     }
++    trace_pflash_io_read(offset, width, width << 1, ret, pfl->cmd, pfl->=
+wcycle);
+=20
+     return ret;
+ }
+@@ -267,6 +267,7 @@ static void pflash_write(PFlashCFI02 *pfl, hwaddr off=
+set,
+     uint8_t *p;
+     uint8_t cmd;
+=20
++    trace_pflash_io_write(offset, width, width << 1, value, pfl->wcycle)=
+;
+     cmd =3D value;
+     if (pfl->cmd !=3D 0xA0 && cmd =3D=3D 0xF0) {
+ #if 0
+@@ -275,11 +276,8 @@ static void pflash_write(PFlashCFI02 *pfl, hwaddr of=
+fset,
+ #endif
+         goto reset_flash;
+     }
+-    trace_pflash_write(offset, value, width, pfl->wcycle);
+     offset &=3D pfl->chip_len - 1;
+=20
+-    DPRINTF("%s: offset " TARGET_FMT_plx " %08x %d\n", __func__,
+-            offset, value, width);
+     boff =3D offset & (pfl->sector_len - 1);
+     if (pfl->width =3D=3D 2)
+         boff =3D boff >> 1;
+diff --git a/hw/block/trace-events b/hw/block/trace-events
+index 97a17838ed..f637fe918e 100644
+--- a/hw/block/trace-events
++++ b/hw/block/trace-events
+@@ -7,9 +7,9 @@ fdc_ioport_write(uint8_t reg, uint8_t value) "write reg 0=
+x%02x val 0x%02x"
+ # pflash_cfi02.c
+ # pflash_cfi01.c
+ pflash_reset(void) "reset"
+-pflash_read(uint64_t offset, uint8_t cmd, int width, uint8_t wcycle) "of=
+fset:0x%04"PRIx64" cmd:0x%02x width:%d wcycle:%u"
+-pflash_write(uint64_t offset, uint32_t value, int width, uint8_t wcycle)=
+ "offset:0x%04"PRIx64" value:0x%03x width:%d wcycle:%u"
+ pflash_timer_expired(uint8_t cmd) "command 0x%02x done"
++pflash_io_read(uint64_t offset, int width, int fmt_width, uint32_t value=
+, uint8_t cmd, uint8_t wcycle) "offset:0x%04"PRIx64" width:%d value:0x%0*=
+x cmd:0x%02x wcycle:%u"
++pflash_io_write(uint64_t offset, int width, int fmt_width, uint32_t valu=
+e, uint8_t wcycle) "offset:0x%04"PRIx64" width:%d value:0x%0*x wcycle:%u"
+ pflash_data_read8(uint64_t offset, uint32_t value) "data offset:0x%04"PR=
+Ix64" value:0x%02x"
+ pflash_data_read16(uint64_t offset, uint32_t value) "data offset:0x%04"P=
+RIx64" value:0x%04x"
+ pflash_data_read32(uint64_t offset, uint32_t value) "data offset:0x%04"P=
+RIx64" value:0x%08x"
 --=20
 2.20.1
 
