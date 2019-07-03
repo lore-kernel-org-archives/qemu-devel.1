@@ -2,64 +2,81 @@ Return-Path: <SRS0=mdN/=VA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C80E8C06513
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1023C4646D
 	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 11:51:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A49A9218A5
+	by mail.kernel.org (Postfix) with ESMTPS id ADAFD218AD
 	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 11:51:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A49A9218A5
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ADAFD218AD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35084 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35082 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hidnk-0000kj-Rb
+	id 1hidnk-0000ka-Ro
 	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 07:51:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43540)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44092)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <armbru@redhat.com>) id 1hidjy-0005Jf-VU
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 07:48:05 -0400
+ (envelope-from <philmd@redhat.com>) id 1hidlG-0006n4-6f
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 07:49:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1hidjv-0007je-U9
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 07:47:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38440)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hidjv-00075f-IK
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 07:47:55 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 24E1585545;
- Wed,  3 Jul 2019 11:47:19 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-136.ams2.redhat.com
- [10.36.116.136])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id BD0E416A20;
- Wed,  3 Jul 2019 11:47:15 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 45F981132A05; Wed,  3 Jul 2019 13:47:14 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Wed,  3 Jul 2019 13:47:12 +0200
-Message-Id: <20190703114714.4234-3-armbru@redhat.com>
-In-Reply-To: <20190703114714.4234-1-armbru@redhat.com>
-References: <20190703114714.4234-1-armbru@redhat.com>
+ (envelope-from <philmd@redhat.com>) id 1hidlF-0000sf-04
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 07:49:18 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:46066)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hidlC-0000hj-Lw
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 07:49:16 -0400
+Received: by mail-wr1-f66.google.com with SMTP id f9so2420835wre.12
+ for <qemu-devel@nongnu.org>; Wed, 03 Jul 2019 04:49:06 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=wS73TaJtl0+rzEbhXLWXW/ez1DXckwVei2RBCU9vSS8=;
+ b=ECoGUOndRV/Zlk2lUjHWPO/sqFAkRBrzDc2TDcr7uBPZ8ChAZamKJGxjUG/vuXRj3j
+ 8DTl8YiOvlaI6oC4SLHEA8TdrRISSxwYS8yNkcMA/k0g5I7AVIX4e1jUsULZpVZFA9hh
+ 7YC0jkfb51yQ0INEMUhP1RIyoiiZGOen15NVeAnxHB4gdkC3natIZ8VVqwMnvif+n9+6
+ /5z6xZAEjpZl4LQc0Y8Z6cDVlu7IDVxY4q457dHZxsQoDD5CUyIDCxHMh/rSMTfEW8SB
+ Fj78KH+Aarpg4fCbD72wKduecBNFOEzM9vXahVcH1K4jmIC7eUVnX4k3L9AuV2LEcj4C
+ adsw==
+X-Gm-Message-State: APjAAAVi7nC9Ae3krLPI2aXxw0AeL3L1/ZC6nrVhyxdp798eANK+aRkN
+ JEfoV6s6gsi8ooynMJkB3oNyGw==
+X-Google-Smtp-Source: APXvYqyPvyYkaU4QwxSrC/8MiSGS/N+IoU54l3qyx55P/mmfL4Qz2m1R8obt7CvGEwG/AVAI8ek4/w==
+X-Received: by 2002:a5d:56c1:: with SMTP id m1mr30923658wrw.26.1562154545436; 
+ Wed, 03 Jul 2019 04:49:05 -0700 (PDT)
+Received: from [192.168.1.38] (56.red-88-18-140.staticip.rima-tde.net.
+ [88.18.140.56])
+ by smtp.gmail.com with ESMTPSA id 60sm4088176wrc.68.2019.07.03.04.49.04
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Wed, 03 Jul 2019 04:49:04 -0700 (PDT)
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+References: <20190528082308.22032-1-armbru@redhat.com>
+ <20190528082308.22032-4-armbru@redhat.com>
+ <87muhvwecf.fsf@dusky.pond.sub.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <8b47584b-734e-3423-521d-0ffe3ab501b8@redhat.com>
+Date: Wed, 3 Jul 2019 13:49:03 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.28]); Wed, 03 Jul 2019 11:47:19 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <87muhvwecf.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL v2 2/4] Makefile: Drop bogus cleaning of
- $(ALL_SUBDIRS)/qemu-options.def
+ [fuzzy]
+X-Received-From: 209.85.221.66
+Subject: Re: [Qemu-devel] [PATCH 3/4] Makefile: Rename targets for make
+ recursion
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,39 +88,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>
+Cc: pbonzini@redhat.com, richard.henderson@linaro.org,
+ Peter Maydell <peter.maydell@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When commit df2943ba3c7 moved "rm -f qemu-options.def" from distclean
-to clean, it also added "rm -f $$d/qemu-options.def" to the for d in
-$(ALL_SUBDIRS) loop.  That file doesn't exist.  Remove the mistaken
-rm.
+On 7/3/19 1:24 PM, Markus Armbruster wrote:
+> Peter pointed out that this makes an incremental build without -k fail
+> once.  By "once", I mean it works fine when you retry.  Squashing in the
+> appended patch to avoid this inconvenience.
+> 
+> 
+> diff --git a/Makefile b/Makefile
+> index e68982bd99..34bbcfc590 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -500,6 +500,12 @@ capstone/all: .git-submodule-status
+>  slirp/all: .git-submodule-status
+>  	$(call quiet-command,$(MAKE) -C $(SRC_PATH)/slirp BUILD_DIR="$(BUILD_DIR)/slirp" CC="$(CC)" AR="$(AR)" LD="$(LD)" RANLIB="$(RANLIB)" CFLAGS="$(QEMU_CFLAGS) $(CFLAGS)" LDFLAGS="$(LDFLAGS)")
+>  
+> +# Compatibility gunk to keep make working across the rename of targets
+> +# for recursion, to be removed some time after 4.1.
+> +subdir-dtc: dtc/all
+> +subdir-capstone: capstone/all
+> +subdir-slirp: slirp/all
+> +
+>  $(SUBDIR_RULES): libqemuutil.a $(common-obj-y) \
+>  	$(qom-obj-y) $(crypto-user-obj-$(CONFIG_USER_ONLY))
+>  
 
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Message-Id: <20190528082308.22032-3-armbru@redhat.com>
----
- Makefile | 1 -
- 1 file changed, 1 deletion(-)
-
-diff --git a/Makefile b/Makefile
-index 0f2cb271a2..cf4f34e45b 100644
---- a/Makefile
-+++ b/Makefile
-@@ -678,7 +678,6 @@ clean:
- 	rm -rf qga/qapi-generated
- 	for d in $(ALL_SUBDIRS); do \
- 	if test -d $$d; then $(MAKE) -C $$d $@ || exit 1; fi; \
--	rm -f $$d/qemu-options.def; \
-         done
- 	rm -f config-all-devices.mak
-=20
---=20
-2.21.0
-
+Both tags stand:
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+(on top of previous patch)
 
