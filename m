@@ -2,65 +2,91 @@ Return-Path: <SRS0=mdN/=VA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B59FC0650E
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 14:06:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EDCABC0650E
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 14:15:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1446F218A3
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 14:06:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1446F218A3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id B65D4218A4
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 14:15:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B65D4218A4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36252 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36298 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hifuT-0003KZ-7r
-	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 10:06:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49318)
+	id 1hig38-0006yU-G5
+	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 10:15:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52137)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <no-reply@patchew.org>) id 1hifrq-0002ca-Uk
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 10:04:16 -0400
+ (envelope-from <eblake@redhat.com>) id 1hig2U-000694-Hx
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 10:15:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1hifro-0007LZ-Qw
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 10:04:14 -0400
-Resent-Date: Wed, 03 Jul 2019 10:04:14 -0400
-Resent-Message-Id: <E1hifro-0007LZ-Qw@eggs.gnu.org>
-Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21591)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1hifrn-0007Hk-DJ; Wed, 03 Jul 2019 10:04:12 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1562162583; cv=none; d=zoho.com; s=zohoarc; 
- b=etk1yBo5TOVmE559DubQqvFZAkSkH2UIsyaBL2dBJQBcBQgdBd6b2qQVrOmIzg//mI9Ddwn4sf2E3E7mffgTg99EBoOOYVbl/zlJXGXCgu9/0N3bytr2QRgpzQzmBGeLA4/J4GfVk3B0N1SjgM2aT9VjHkkcJTOpUEJnhWK3Hes=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1562162583;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
- bh=AGSiUWQ0MMKVnwem1X6SHUgRqmAQ4M+kWjP9mu5xK58=; 
- b=VODTVb5q9/l3eGa2mWbxyDVH4THHpMBoANjJuE7Jc+rFehXAoLYWMylhTLa10n8KzQUpIGzO4XEJca7/jOF3Db0O1wiv43fqtBMHc/6XGq5ObL0ovVtBjFNHlxlCxiDPLR1bMgceySrW4BdB1CINRQlADkKIYwXF2HmSkurA4M4=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1562162580703371.2201661198236;
- Wed, 3 Jul 2019 07:03:00 -0700 (PDT)
-Message-ID: <156216257907.21218.11615786042228081851@c4a48874b076>
-In-Reply-To: <20190701194942.10092-1-philmd@redhat.com>
+ (envelope-from <eblake@redhat.com>) id 1hig2S-000664-HE
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 10:15:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55228)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eblake@redhat.com>)
+ id 1hig2O-0005gu-8k; Wed, 03 Jul 2019 10:15:08 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 6DFEB3162912;
+ Wed,  3 Jul 2019 14:14:37 +0000 (UTC)
+Received: from [10.3.116.152] (ovpn-116-152.phx2.redhat.com [10.3.116.152])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7D9E46013C;
+ Wed,  3 Jul 2019 14:14:33 +0000 (UTC)
+To: Denis Plotnikov <dplotnikov@virtuozzo.com>, kwolf@redhat.com,
+ mreitz@redhat.com, armbru@redhat.com
+References: <20190703110044.25610-1-dplotnikov@virtuozzo.com>
+ <20190703110044.25610-2-dplotnikov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=eblake@redhat.com; keydata=
+ xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
+ xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
+ TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
+ GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
+ sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
+ AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
+ CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
+ RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
+ wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
+ Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
+ gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
+ pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
+ zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
+ pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
+ 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
+ NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
+ cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
+ SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
+ I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
+ mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
+ Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
+ 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
+Organization: Red Hat, Inc.
+Message-ID: <f41f5552-a625-3306-ba3b-50d60dbefe22@redhat.com>
+Date: Wed, 3 Jul 2019 09:14:32 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: philmd@redhat.com
-Date: Wed, 3 Jul 2019 07:03:00 -0700 (PDT)
-X-ZohoMailClient: External
+In-Reply-To: <20190703110044.25610-2-dplotnikov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="E36TJSXbIcuQgizgqmebpI09Z80uI8kpN"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.41]); Wed, 03 Jul 2019 14:14:42 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 136.143.188.55
-Subject: Re: [Qemu-devel] [PATCH v4 0/8] Support disabling TCG on ARM
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v1 1/3] qcow2: introduce compression type
+ feature
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,200 +98,399 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: yang.zhong@intel.com, peter.maydell@linaro.org, drjones@redhat.com,
- sameo@linux.intel.com, robert.bradford@intel.com, alex.bennee@linaro.org,
- qemu-devel@nongnu.org, qemu-arm@nongnu.org, thuth@redhat.com,
- pbonzini@redhat.com, philmd@redhat.com
+Cc: vsementsov@virtuozzo.com, den@virtuozzo.com, qemu-block@nongnu.org,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDcwMTE5NDk0Mi4xMDA5
-Mi0xLXBoaWxtZEByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCBidWlsZCB0
-ZXN0IG9uIHMzOTB4IGhvc3QuIFBsZWFzZSBmaW5kIHRoZSBkZXRhaWxzIGJlbG93LgoKPT09IFRF
-U1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAojIFRlc3Rpbmcgc2NyaXB0IHdpbGwgYmUg
-aW52b2tlZCB1bmRlciB0aGUgZ2l0IGNoZWNrb3V0IHdpdGgKIyBIRUFEIHBvaW50aW5nIHRvIGEg
-Y29tbWl0IHRoYXQgaGFzIHRoZSBwYXRjaGVzIGFwcGxpZWQgb24gdG9wIG9mICJiYXNlIgojIGJy
-YW5jaApzZXQgLWUKCmVjaG8KZWNobyAiPT09IEVOViA9PT0iCmVudgoKZWNobwplY2hvICI9PT0g
-UEFDS0FHRVMgPT09IgpycG0gLXFhCgplY2hvCmVjaG8gIj09PSBVTkFNRSA9PT0iCnVuYW1lIC1h
-CgpDQz0kSE9NRS9iaW4vY2MKSU5TVEFMTD0kUFdEL2luc3RhbGwKQlVJTEQ9JFBXRC9idWlsZApt
-a2RpciAtcCAkQlVJTEQgJElOU1RBTEwKU1JDPSRQV0QKY2QgJEJVSUxECiRTUkMvY29uZmlndXJl
-IC0tY2M9JENDIC0tcHJlZml4PSRJTlNUQUxMCm1ha2UgLWo0CiMgWFhYOiB3ZSBuZWVkIHJlbGlh
-YmxlIGNsZWFuIHVwCiMgbWFrZSBjaGVjayAtajQgVj0xCm1ha2UgaW5zdGFsbAo9PT0gVEVTVCBT
-Q1JJUFQgRU5EID09PQoKICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9hY2NlbC90Y2cvdGNnLXJ1
-bnRpbWUtZ3ZlYy5vCkluIGZpbGUgaW5jbHVkZWQgZnJvbSAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rl
-ci10bXAtMWRfbWtidXovc3JjL2luY2x1ZGUvaHcvaW50Yy9hcm12N21fbnZpYy5oOjEzLAogICAg
-ICAgICAgICAgICAgIGZyb20gL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLTFkX21rYnV6L3Ny
-Yy9ody9pbnRjL2FybXY3bV9udmljLmM6MTg6Ci92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC0x
-ZF9ta2J1ei9zcmMvdGFyZ2V0L2FybS9jcHUuaDozNTogZXJyb3I6ICJFWENQX0lSUSIgcmVkZWZp
-bmVkIFstV2Vycm9yXQogICAzNSB8ICNkZWZpbmUgRVhDUF9JUlEgICAgICAgICAgICAgNQogICAg
-ICB8IApJbiBmaWxlIGluY2x1ZGVkIGZyb20gL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLTFk
-X21rYnV6L3NyYy9ody9pbnRjL2FybXY3bV9udmljLmM6MTU6Ci0tLQogICAgICB8IApJbiBmaWxl
-IGluY2x1ZGVkIGZyb20gL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLTFkX21rYnV6L3NyYy9p
-bmNsdWRlL2h3L2ludGMvYXJtdjdtX252aWMuaDoxMywKICAgICAgICAgICAgICAgICBmcm9tIC92
-YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC0xZF9ta2J1ei9zcmMvaHcvaW50Yy9hcm12N21fbnZp
-Yy5jOjE4OgovdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtMWRfbWtidXovc3JjL3RhcmdldC9h
-cm0vY3B1Lmg6Mjc0NDogZXJyb3I6ICJDUFVfUkVTT0xWSU5HX1RZUEUiIHJlZGVmaW5lZCBbLVdl
-cnJvcl0KIDI3NDQgfCAjZGVmaW5lIENQVV9SRVNPTFZJTkdfVFlQRSBUWVBFX0FSTV9DUFUKICAg
-ICAgfCAKSW4gZmlsZSBpbmNsdWRlZCBmcm9tIC92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC0x
-ZF9ta2J1ei9zcmMvaHcvaW50Yy9hcm12N21fbnZpYy5jOjE1OgotLS0KICAgICAgfCAKSW4gZmls
-ZSBpbmNsdWRlZCBmcm9tIC92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC0xZF9ta2J1ei9zcmMv
-aW5jbHVkZS9ody9pbnRjL2FybXY3bV9udmljLmg6MTMsCiAgICAgICAgICAgICAgICAgZnJvbSAv
-dmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtMWRfbWtidXovc3JjL2h3L2ludGMvYXJtdjdtX252
-aWMuYzoxODoKL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLTFkX21rYnV6L3NyYy90YXJnZXQv
-YXJtL2NwdS5oOjI3NDY6IGVycm9yOiAiY3B1X3NpZ25hbF9oYW5kbGVyIiByZWRlZmluZWQgWy1X
-ZXJyb3JdCiAyNzQ2IHwgI2RlZmluZSBjcHVfc2lnbmFsX2hhbmRsZXIgY3B1X2FybV9zaWduYWxf
-aGFuZGxlcgogICAgICB8IApJbiBmaWxlIGluY2x1ZGVkIGZyb20gL3Zhci90bXAvcGF0Y2hldy10
-ZXN0ZXItdG1wLTFkX21rYnV6L3NyYy9ody9pbnRjL2FybXY3bV9udmljLmM6MTU6Ci0tLQogICAg
-ICB8IApJbiBmaWxlIGluY2x1ZGVkIGZyb20gL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLTFk
-X21rYnV6L3NyYy9pbmNsdWRlL2h3L2ludGMvYXJtdjdtX252aWMuaDoxMywKICAgICAgICAgICAg
-ICAgICBmcm9tIC92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC0xZF9ta2J1ei9zcmMvaHcvaW50
-Yy9hcm12N21fbnZpYy5jOjE4OgovdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtMWRfbWtidXov
-c3JjL3RhcmdldC9hcm0vY3B1Lmg6Mjc0NzogZXJyb3I6ICJjcHVfbGlzdCIgcmVkZWZpbmVkIFst
-V2Vycm9yXQogMjc0NyB8ICNkZWZpbmUgY3B1X2xpc3QgYXJtX2NwdV9saXN0CiAgICAgIHwgCklu
-IGZpbGUgaW5jbHVkZWQgZnJvbSAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtMWRfbWtidXov
-c3JjL2h3L2ludGMvYXJtdjdtX252aWMuYzoxNToKLS0tCiAgICAgIHwgCkluIGZpbGUgaW5jbHVk
-ZWQgZnJvbSAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtMWRfbWtidXovc3JjL2luY2x1ZGUv
-aHcvaW50Yy9hcm12N21fbnZpYy5oOjEzLAogICAgICAgICAgICAgICAgIGZyb20gL3Zhci90bXAv
-cGF0Y2hldy10ZXN0ZXItdG1wLTFkX21rYnV6L3NyYy9ody9pbnRjL2FybXY3bV9udmljLmM6MTg6
-Ci92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC0xZF9ta2J1ei9zcmMvdGFyZ2V0L2FybS9jcHUu
-aDoyODg0OiBlcnJvcjogIk1NVV9VU0VSX0lEWCIgcmVkZWZpbmVkIFstV2Vycm9yXQogMjg4NCB8
-ICNkZWZpbmUgTU1VX1VTRVJfSURYIDAKICAgICAgfCAKSW4gZmlsZSBpbmNsdWRlZCBmcm9tIC92
-YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC0xZF9ta2J1ei9zcmMvaHcvaW50Yy9hcm12N21fbnZp
-Yy5jOjE1OgotLS0KICAgICAgfCAKSW4gZmlsZSBpbmNsdWRlZCBmcm9tIC92YXIvdG1wL3BhdGNo
-ZXctdGVzdGVyLXRtcC0xZF9ta2J1ei9zcmMvaW5jbHVkZS9ody9pbnRjL2FybXY3bV9udmljLmg6
-MTMsCiAgICAgICAgICAgICAgICAgZnJvbSAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtMWRf
-bWtidXovc3JjL2h3L2ludGMvYXJtdjdtX252aWMuYzoxODoKL3Zhci90bXAvcGF0Y2hldy10ZXN0
-ZXItdG1wLTFkX21rYnV6L3NyYy90YXJnZXQvYXJtL2NwdS5oOjI5Mzc6NTogZXJyb3I6IGNvbmZs
-aWN0aW5nIHR5cGVzIGZvciDigJhjcHVfbW11X2luZGV44oCZCiAyOTM3IHwgaW50IGNwdV9tbXVf
-aW5kZXgoQ1BVQVJNU3RhdGUgKmVudiwgYm9vbCBpZmV0Y2gpOwogICAgICB8ICAgICBefn5+fn5+
-fn5+fn5+CkluIGZpbGUgaW5jbHVkZWQgZnJvbSAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAt
-MWRfbWtidXovc3JjL2h3L2ludGMvYXJtdjdtX252aWMuYzoxNToKLS0tCiAgICAgIHwgICAgICAg
-ICAgICAgICAgICAgXn5+fn5+fn5+fn5+fgpJbiBmaWxlIGluY2x1ZGVkIGZyb20gL3Zhci90bXAv
-cGF0Y2hldy10ZXN0ZXItdG1wLTFkX21rYnV6L3NyYy9pbmNsdWRlL2h3L2ludGMvYXJtdjdtX252
-aWMuaDoxMywKICAgICAgICAgICAgICAgICBmcm9tIC92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRt
-cC0xZF9ta2J1ei9zcmMvaHcvaW50Yy9hcm12N21fbnZpYy5jOjE4OgovdmFyL3RtcC9wYXRjaGV3
-LXRlc3Rlci10bXAtMWRfbWtidXovc3JjL3RhcmdldC9hcm0vY3B1Lmg6MzEyODoyMTogZXJyb3I6
-IGNvbmZsaWN0aW5nIHR5cGVzIGZvciDigJhDUFVBcmNoU3RhdGXigJkKIDMxMjggfCB0eXBlZGVm
-IENQVUFSTVN0YXRlIENQVUFyY2hTdGF0ZTsKICAgICAgfCAgICAgICAgICAgICAgICAgICAgIF5+
-fn5+fn5+fn5+fgpJbiBmaWxlIGluY2x1ZGVkIGZyb20gL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXIt
-dG1wLTFkX21rYnV6L3NyYy9ody9pbnRjL2FybXY3bV9udmljLmM6MTU6Ci0tLQogICAgICB8ICAg
-ICAgICAgICAgICAgICAgICAgIF5+fn5+fn5+fn5+fgpJbiBmaWxlIGluY2x1ZGVkIGZyb20gL3Zh
-ci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLTFkX21rYnV6L3NyYy9pbmNsdWRlL2h3L2ludGMvYXJt
-djdtX252aWMuaDoxMywKICAgICAgICAgICAgICAgICBmcm9tIC92YXIvdG1wL3BhdGNoZXctdGVz
-dGVyLXRtcC0xZF9ta2J1ei9zcmMvaHcvaW50Yy9hcm12N21fbnZpYy5jOjE4OgovdmFyL3RtcC9w
-YXRjaGV3LXRlc3Rlci10bXAtMWRfbWtidXovc3JjL3RhcmdldC9hcm0vY3B1Lmg6MzEyOToxNjog
-ZXJyb3I6IGNvbmZsaWN0aW5nIHR5cGVzIGZvciDigJhBcmNoQ1BV4oCZCiAzMTI5IHwgdHlwZWRl
-ZiBBUk1DUFUgQXJjaENQVTsKICAgICAgfCAgICAgICAgICAgICAgICBefn5+fn5+CkluIGZpbGUg
-aW5jbHVkZWQgZnJvbSAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtMWRfbWtidXovc3JjL2h3
-L2ludGMvYXJtdjdtX252aWMuYzoxNToKLS0tCiAgICAgIHwgICAgICAgICAgICAgICAgIF5+fn5+
-fn4KSW4gZmlsZSBpbmNsdWRlZCBmcm9tIC92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC0xZF9t
-a2J1ei9zcmMvaW5jbHVkZS9ody9pbnRjL2FybXY3bV9udmljLmg6MTMsCiAgICAgICAgICAgICAg
-ICAgZnJvbSAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtMWRfbWtidXovc3JjL2h3L2ludGMv
-YXJtdjdtX252aWMuYzoxODoKL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLTFkX21rYnV6L3Ny
-Yy90YXJnZXQvYXJtL2NwdS5oOjMyMTY6NjogZXJyb3I6IGNvbmZsaWN0aW5nIHR5cGVzIGZvciDi
-gJhjcHVfZ2V0X3RiX2NwdV9zdGF0ZeKAmQogMzIxNiB8IHZvaWQgY3B1X2dldF90Yl9jcHVfc3Rh
-dGUoQ1BVQVJNU3RhdGUgKmVudiwgdGFyZ2V0X3Vsb25nICpwYywKICAgICAgfCAgICAgIF5+fn5+
-fn5+fn5+fn5+fn5+fn5+CkluIGZpbGUgaW5jbHVkZWQgZnJvbSAvdmFyL3RtcC9wYXRjaGV3LXRl
-c3Rlci10bXAtMWRfbWtidXovc3JjL2h3L2ludGMvYXJtdjdtX252aWMuYzoxNToKLS0tCiAgQ0Mg
-ICAgICBhcm0tc29mdG1tdS9ody9taXNjL2JjbTI4MzVfbWJveC5vCkluIGZpbGUgaW5jbHVkZWQg
-ZnJvbSAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtMWRfbWtidXovc3JjL2luY2x1ZGUvaHcv
-aW50Yy9hcm12N21fbnZpYy5oOjEzLAogICAgICAgICAgICAgICAgIGZyb20gL3Zhci90bXAvcGF0
-Y2hldy10ZXN0ZXItdG1wLTFkX21rYnV6L3NyYy9ody9pbnRjL2FybXY3bV9udmljLmM6MTg6Ci92
-YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC0xZF9ta2J1ei9zcmMvdGFyZ2V0L2FybS9jcHUuaDox
-NDE2OiBlcnJvcjogIkZQQ1JfRFpFIiByZWRlZmluZWQgWy1XZXJyb3JdCiAxNDE2IHwgI2RlZmlu
-ZSBGUENSX0RaRSAgICAoMSA8PCA5KSAgICAvKiBEaXZpZGUgYnkgWmVybyBleGNlcHRpb24gdHJh
-cCBlbmFibGUgKi8KICAgICAgfCAKSW4gZmlsZSBpbmNsdWRlZCBmcm9tIC92YXIvdG1wL3BhdGNo
-ZXctdGVzdGVyLXRtcC0xZF9ta2J1ei9zcmMvaHcvaW50Yy9hcm12N21fbnZpYy5jOjE1OgotLS0K
-ICAgICAgfCAKSW4gZmlsZSBpbmNsdWRlZCBmcm9tIC92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRt
-cC0xZF9ta2J1ei9zcmMvaW5jbHVkZS9ody9pbnRjL2FybXY3bV9udmljLmg6MTMsCiAgICAgICAg
-ICAgICAgICAgZnJvbSAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtMWRfbWtidXovc3JjL2h3
-L2ludGMvYXJtdjdtX252aWMuYzoxODoKL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLTFkX21r
-YnV6L3NyYy90YXJnZXQvYXJtL2NwdS5oOjI3NDQ6IGVycm9yOiAiQ1BVX1JFU09MVklOR19UWVBF
-IiByZWRlZmluZWQgWy1XZXJyb3JdCiAyNzQ0IHwgI2RlZmluZSBDUFVfUkVTT0xWSU5HX1RZUEUg
-VFlQRV9BUk1fQ1BVCiAgICAgIHwgCkluIGZpbGUgaW5jbHVkZWQgZnJvbSAvdmFyL3RtcC9wYXRj
-aGV3LXRlc3Rlci10bXAtMWRfbWtidXovc3JjL2h3L2ludGMvYXJtdjdtX252aWMuYzoxNToKLS0t
-CiAgICAgIHwgCkluIGZpbGUgaW5jbHVkZWQgZnJvbSAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10
-bXAtMWRfbWtidXovc3JjL2luY2x1ZGUvaHcvaW50Yy9hcm12N21fbnZpYy5oOjEzLAogICAgICAg
-ICAgICAgICAgIGZyb20gL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLTFkX21rYnV6L3NyYy9o
-dy9pbnRjL2FybXY3bV9udmljLmM6MTg6Ci92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC0xZF9t
-a2J1ei9zcmMvdGFyZ2V0L2FybS9jcHUuaDoyNzQ2OiBlcnJvcjogImNwdV9zaWduYWxfaGFuZGxl
-ciIgcmVkZWZpbmVkIFstV2Vycm9yXQogMjc0NiB8ICNkZWZpbmUgY3B1X3NpZ25hbF9oYW5kbGVy
-IGNwdV9hcm1fc2lnbmFsX2hhbmRsZXIKICAgICAgfCAKSW4gZmlsZSBpbmNsdWRlZCBmcm9tIC92
-YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC0xZF9ta2J1ei9zcmMvaHcvaW50Yy9hcm12N21fbnZp
-Yy5jOjE1OgotLS0KICAgICAgfCAKSW4gZmlsZSBpbmNsdWRlZCBmcm9tIC92YXIvdG1wL3BhdGNo
-ZXctdGVzdGVyLXRtcC0xZF9ta2J1ei9zcmMvaW5jbHVkZS9ody9pbnRjL2FybXY3bV9udmljLmg6
-MTMsCiAgICAgICAgICAgICAgICAgZnJvbSAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtMWRf
-bWtidXovc3JjL2h3L2ludGMvYXJtdjdtX252aWMuYzoxODoKL3Zhci90bXAvcGF0Y2hldy10ZXN0
-ZXItdG1wLTFkX21rYnV6L3NyYy90YXJnZXQvYXJtL2NwdS5oOjI3NDc6IGVycm9yOiAiY3B1X2xp
-c3QiIHJlZGVmaW5lZCBbLVdlcnJvcl0KIDI3NDcgfCAjZGVmaW5lIGNwdV9saXN0IGFybV9jcHVf
-bGlzdAogICAgICB8IApJbiBmaWxlIGluY2x1ZGVkIGZyb20gL3Zhci90bXAvcGF0Y2hldy10ZXN0
-ZXItdG1wLTFkX21rYnV6L3NyYy9ody9pbnRjL2FybXY3bV9udmljLmM6MTU6Ci0tLQogICAgICB8
-IApJbiBmaWxlIGluY2x1ZGVkIGZyb20gL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLTFkX21r
-YnV6L3NyYy9pbmNsdWRlL2h3L2ludGMvYXJtdjdtX252aWMuaDoxMywKICAgICAgICAgICAgICAg
-ICBmcm9tIC92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC0xZF9ta2J1ei9zcmMvaHcvaW50Yy9h
-cm12N21fbnZpYy5jOjE4OgovdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtMWRfbWtidXovc3Jj
-L3RhcmdldC9hcm0vY3B1Lmg6Mjg4NDogZXJyb3I6ICJNTVVfVVNFUl9JRFgiIHJlZGVmaW5lZCBb
-LVdlcnJvcl0KIDI4ODQgfCAjZGVmaW5lIE1NVV9VU0VSX0lEWCAwCiAgICAgIHwgCkluIGZpbGUg
-aW5jbHVkZWQgZnJvbSAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtMWRfbWtidXovc3JjL2h3
-L2ludGMvYXJtdjdtX252aWMuYzoxNToKLS0tCiAgICAgIHwgCkluIGZpbGUgaW5jbHVkZWQgZnJv
-bSAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtMWRfbWtidXovc3JjL2luY2x1ZGUvaHcvaW50
-Yy9hcm12N21fbnZpYy5oOjEzLAogICAgICAgICAgICAgICAgIGZyb20gL3Zhci90bXAvcGF0Y2hl
-dy10ZXN0ZXItdG1wLTFkX21rYnV6L3NyYy9ody9pbnRjL2FybXY3bV9udmljLmM6MTg6Ci92YXIv
-dG1wL3BhdGNoZXctdGVzdGVyLXRtcC0xZF9ta2J1ei9zcmMvdGFyZ2V0L2FybS9jcHUuaDoyOTM3
-OjU6IGVycm9yOiBjb25mbGljdGluZyB0eXBlcyBmb3Ig4oCYY3B1X21tdV9pbmRleOKAmQogMjkz
-NyB8IGludCBjcHVfbW11X2luZGV4KENQVUFSTVN0YXRlICplbnYsIGJvb2wgaWZldGNoKTsKICAg
-ICAgfCAgICAgXn5+fn5+fn5+fn5+fgpJbiBmaWxlIGluY2x1ZGVkIGZyb20gL3Zhci90bXAvcGF0
-Y2hldy10ZXN0ZXItdG1wLTFkX21rYnV6L3NyYy9ody9pbnRjL2FybXY3bV9udmljLmM6MTU6Ci0t
-LQogICAgICB8ICAgICAgICAgICAgICAgICAgIF5+fn5+fn5+fn5+fn4KSW4gZmlsZSBpbmNsdWRl
-ZCBmcm9tIC92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC0xZF9ta2J1ei9zcmMvaW5jbHVkZS9o
-dy9pbnRjL2FybXY3bV9udmljLmg6MTMsCiAgICAgICAgICAgICAgICAgZnJvbSAvdmFyL3RtcC9w
-YXRjaGV3LXRlc3Rlci10bXAtMWRfbWtidXovc3JjL2h3L2ludGMvYXJtdjdtX252aWMuYzoxODoK
-L3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLTFkX21rYnV6L3NyYy90YXJnZXQvYXJtL2NwdS5o
-OjMxMjg6MjE6IGVycm9yOiBjb25mbGljdGluZyB0eXBlcyBmb3Ig4oCYQ1BVQXJjaFN0YXRl4oCZ
-CiAzMTI4IHwgdHlwZWRlZiBDUFVBUk1TdGF0ZSBDUFVBcmNoU3RhdGU7CiAgICAgIHwgICAgICAg
-ICAgICAgICAgICAgICBefn5+fn5+fn5+fn4KSW4gZmlsZSBpbmNsdWRlZCBmcm9tIC92YXIvdG1w
-L3BhdGNoZXctdGVzdGVyLXRtcC0xZF9ta2J1ei9zcmMvaHcvaW50Yy9hcm12N21fbnZpYy5jOjE1
-OgotLS0KICAgICAgfCAgICAgICAgICAgICAgICAgICAgICAgXn5+fn5+fn5+fn5+CkluIGZpbGUg
-aW5jbHVkZWQgZnJvbSAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtMWRfbWtidXovc3JjL2lu
-Y2x1ZGUvaHcvaW50Yy9hcm12N21fbnZpYy5oOjEzLAogICAgICAgICAgICAgICAgIGZyb20gL3Zh
-ci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLTFkX21rYnV6L3NyYy9ody9pbnRjL2FybXY3bV9udmlj
-LmM6MTg6Ci92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC0xZF9ta2J1ei9zcmMvdGFyZ2V0L2Fy
-bS9jcHUuaDozMTI5OjE2OiBlcnJvcjogY29uZmxpY3RpbmcgdHlwZXMgZm9yIOKAmEFyY2hDUFXi
-gJkKIDMxMjkgfCB0eXBlZGVmIEFSTUNQVSBBcmNoQ1BVOwogICAgICB8ICAgICAgICAgICAgICAg
-IF5+fn5+fn4KSW4gZmlsZSBpbmNsdWRlZCBmcm9tIC92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRt
-cC0xZF9ta2J1ei9zcmMvaHcvaW50Yy9hcm12N21fbnZpYy5jOjE1OgotLS0KICAgICAgfCAgICAg
-ICAgICAgICAgICAgIF5+fn5+fn4KSW4gZmlsZSBpbmNsdWRlZCBmcm9tIC92YXIvdG1wL3BhdGNo
-ZXctdGVzdGVyLXRtcC0xZF9ta2J1ei9zcmMvaW5jbHVkZS9ody9pbnRjL2FybXY3bV9udmljLmg6
-MTMsCiAgICAgICAgICAgICAgICAgZnJvbSAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtMWRf
-bWtidXovc3JjL2h3L2ludGMvYXJtdjdtX252aWMuYzoxODoKL3Zhci90bXAvcGF0Y2hldy10ZXN0
-ZXItdG1wLTFkX21rYnV6L3NyYy90YXJnZXQvYXJtL2NwdS5oOjMyMTY6NjogZXJyb3I6IGNvbmZs
-aWN0aW5nIHR5cGVzIGZvciDigJhjcHVfZ2V0X3RiX2NwdV9zdGF0ZeKAmQogMzIxNiB8IHZvaWQg
-Y3B1X2dldF90Yl9jcHVfc3RhdGUoQ1BVQVJNU3RhdGUgKmVudiwgdGFyZ2V0X3Vsb25nICpwYywK
-ICAgICAgfCAgICAgIF5+fn5+fn5+fn5+fn5+fn5+fn5+CkluIGZpbGUgaW5jbHVkZWQgZnJvbSAv
-dmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtMWRfbWtidXovc3JjL2h3L2ludGMvYXJtdjdtX252
-aWMuYzoxNToKLS0tCi92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC0xZF9ta2J1ei9zcmMvdGFy
-Z2V0L2FybS9oZWxwZXIuaDo2NzogdW5kZWZpbmVkIHJlZmVyZW5jZSB0byBgaGVscGVyX3Y3bV9i
-eG5zJwovdXNyL2Jpbi9sZDogdGFyZ2V0L2FybS90cmFuc2xhdGUubzogaW4gZnVuY3Rpb24gYGdl
-bl9oZWxwZXJfdjdtX3Zsc3RtJzoKL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLTFkX21rYnV6
-L3NyYy90YXJnZXQvYXJtL2hlbHBlci5oOjc0OiB1bmRlZmluZWQgcmVmZXJlbmNlIHRvIGBoZWxw
-ZXJfdjdtX3Zsc3RtJwpjb2xsZWN0MjogZXJyb3I6IGxkIHJldHVybmVkIDEgZXhpdCBzdGF0dXMK
-bWFrZVsxXTogKioqIFtNYWtlZmlsZToyMDU6IHFlbXUtc3lzdGVtLWFybV0gRXJyb3IgMQptYWtl
-OiAqKiogW01ha2VmaWxlOjQ3Njogc3ViZGlyLWFybS1zb2Z0bW11XSBFcnJvciAyCiAgR0VOICAg
-ICBhYXJjaDY0LXNvZnRtbXUvdGFyZ2V0L2FybS9kZWNvZGUtc3ZlLmluYy5jCi0tLQovdmFyL3Rt
-cC9wYXRjaGV3LXRlc3Rlci10bXAtMWRfbWtidXovc3JjL3RhcmdldC9hcm0vaGVscGVyLmg6Njc6
-IHVuZGVmaW5lZCByZWZlcmVuY2UgdG8gYGhlbHBlcl92N21fYnhucycKL3Vzci9iaW4vbGQ6IHRh
-cmdldC9hcm0vdHJhbnNsYXRlLm86IGluIGZ1bmN0aW9uIGBnZW5faGVscGVyX3Y3bV92bHN0bSc6
-Ci92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC0xZF9ta2J1ei9zcmMvdGFyZ2V0L2FybS9oZWxw
-ZXIuaDo3NDogdW5kZWZpbmVkIHJlZmVyZW5jZSB0byBgaGVscGVyX3Y3bV92bHN0bScKY29sbGVj
-dDI6IGVycm9yOiBsZCByZXR1cm5lZCAxIGV4aXQgc3RhdHVzCm1ha2VbMV06ICoqKiBbTWFrZWZp
-bGU6MjA1OiBxZW11LXN5c3RlbS1hYXJjaDY0XSBFcnJvciAxCm1ha2U6ICoqKiBbTWFrZWZpbGU6
-NDc2OiBzdWJkaXItYWFyY2g2NC1zb2Z0bW11XSBFcnJvciAyCj09PSBPVVRQVVQgRU5EID09PQoK
-ClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAx
-OTA3MDExOTQ5NDIuMTAwOTItMS1waGlsbWRAcmVkaGF0LmNvbS90ZXN0aW5nLnMzOTB4Lz90eXBl
-PW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFto
-dHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hl
-dy1kZXZlbEByZWRoYXQuY29t
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--E36TJSXbIcuQgizgqmebpI09Z80uI8kpN
+Content-Type: multipart/mixed; boundary="VMvCG9CKiurKsz3tSkjiw0wlAAGBP8BHd";
+ protected-headers="v1"
+From: Eric Blake <eblake@redhat.com>
+To: Denis Plotnikov <dplotnikov@virtuozzo.com>, kwolf@redhat.com,
+ mreitz@redhat.com, armbru@redhat.com
+Cc: den@virtuozzo.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org,
+ qemu-devel@nongnu.org
+Message-ID: <f41f5552-a625-3306-ba3b-50d60dbefe22@redhat.com>
+Subject: Re: [PATCH v1 1/3] qcow2: introduce compression type feature
+References: <20190703110044.25610-1-dplotnikov@virtuozzo.com>
+ <20190703110044.25610-2-dplotnikov@virtuozzo.com>
+In-Reply-To: <20190703110044.25610-2-dplotnikov@virtuozzo.com>
 
+--VMvCG9CKiurKsz3tSkjiw0wlAAGBP8BHd
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 7/3/19 6:00 AM, Denis Plotnikov wrote:
+> The patch adds some preparation parts for incompatible compression type=
+
+> feature to QCOW2 header that indicates that *all* compressed clusters
+> must be (de)compressed using a certain compression type.
+>=20
+> It is implied that the compression type is set on the image creation an=
+d
+> can be changed only later by image conversion, thus compression type
+> defines the only compression algorithm used for the image.
+>=20
+> The goal of the feature is to add support of other compression algorith=
+ms
+> to qcow2. For example, ZSTD which is more effective on compression than=
+ ZLIB.
+> It works roughly x2 faster than ZLIB providing a comparable compression=
+ ratio
+
+2x
+
+> and therefore provide a performance advantage in backup scenarios.
+>=20
+> The default compression is ZLIB. Images created with ZLIB compression t=
+ype
+> is backward compatible with older qemu versions.
+
+s/is/are/
+
+>=20
+> Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
+> ---
+>  block/qcow2.c             | 94 +++++++++++++++++++++++++++++++++++++++=
+
+>  block/qcow2.h             | 26 ++++++++---
+>  docs/interop/qcow2.txt    | 22 ++++++++-
+>  include/block/block_int.h |  1 +
+>  qapi/block-core.json      | 22 ++++++++-
+>  5 files changed, 155 insertions(+), 10 deletions(-)
+>=20
+> diff --git a/block/qcow2.c b/block/qcow2.c
+> index 3ace3b2209..921eb67b80 100644
+> --- a/block/qcow2.c
+> +++ b/block/qcow2.c
+> @@ -1202,6 +1202,47 @@ static int qcow2_update_options(BlockDriverState=
+ *bs, QDict *options,
+>      return ret;
+>  }
+> =20
+> +static int check_compression_type(BDRVQcow2State *s, Error **errp)
+> +{
+> +    bool is_set;
+> +    int ret =3D 0;
+> +
+> +    switch (s->compression_type) {
+> +    case QCOW2_COMPRESSION_TYPE_ZLIB:
+> +        break;
+> +
+> +    default:
+> +        if (errp) {
+
+Useless check for errp being non-NULL.  What's worse, if the caller
+passes in NULL because they don't care about the error, then your code
+behaves differently.  Just call error_setg() and return -ENOTSUP
+unconditionally.
+
+> +            error_setg(errp, "qcow2: unknown compression type: %u",
+> +                       s->compression_type);
+> +            return -ENOTSUP;
+> +        }
+> +    }
+> +
+> +    /*
+> +     * with QCOW2_COMPRESSION_TYPE_ZLIB the corresponding incompatible=
+
+> +     * feature flag must be absent, with other compression types the
+> +     * incompatible feature flag must be set
+
+Is there a strong reason for forbid the incompatible feature flag with
+ZLIB?  Sure, it makes the image impossible to open with older qemu, but
+it doesn't get in the way of newer qemu opening it. I'll have to see how
+your spec changes documented this, to see if you could instead word it
+as 'for ZLIB, the incompatible feature flag may be absent'.
+
+> +     */
+> +    is_set =3D s->incompatible_features & QCOW2_INCOMPAT_COMPRESSION_T=
+YPE;
+> +
+> +    if (s->compression_type =3D=3D QCOW2_COMPRESSION_TYPE_ZLIB) {
+> +        if (is_set) {
+> +            ret =3D -EINVAL;
+> +        }
+> +    } else {
+> +        if (!is_set) {
+> +            ret =3D -EINVAL;
+> +        }
+> +    }
+
+More compact as:
+
+if ((s->compression_type =3D=3D QCOW2_COMPRESSION_TYPE_ZLIB) =3D=3D is_se=
+t)
+
+> +
+> +    if (ret && errp) {
+> +        error_setg(errp, "qcow2: Illegal compression type setting");
+
+s/Illegal/Invalid/ (the user isn't breaking a law)
+
+Also, don't check whether errp is non-NULL.  Just blindly call
+error_setg() if ret is non-zero.
+
+> +    }
+> +
+> +    return ret;
+
+Or even shorter (psuedocode):
+
+if ((compression =3D=3D ZLIB) !=3D is_set) {
+    error_setg();
+    return -EINVAL;
+}
+return 0;
+
+> +}
+> +
+>  /* Called with s->lock held.  */
+>  static int coroutine_fn qcow2_do_open(BlockDriverState *bs, QDict *opt=
+ions,
+>                                        int flags, Error **errp)
+> @@ -1318,6 +1359,24 @@ static int coroutine_fn qcow2_do_open(BlockDrive=
+rState *bs, QDict *options,
+>      s->compatible_features      =3D header.compatible_features;
+>      s->autoclear_features       =3D header.autoclear_features;
+> =20
+> +    /* Handle compression type */
+> +    if (header.header_length > 104) {
+
+Magic number. Please spell this as header.header_length > offsetof (xxx,
+compression_type) for the appropriate xxx type.  Also, do you need to
+sanity check for an image using a length of 105-107 (invalid) vs. an
+image of 108 or larger?
+
+> +        header.compression_type =3D be32_to_cpu(header.compression_typ=
+e);
+> +        s->compression_type =3D header.compression_type;
+> +    } else {
+> +        /*
+> +         * older qcow2 images don't contain the compression type heade=
+r
+> +         * field, distinguish them by the header length and use
+> +         * the only valid compression type in that case
+> +         */
+> +        s->compression_type =3D QCOW2_COMPRESSION_TYPE_ZLIB;
+> +    }
+> +
+> +    ret =3D check_compression_type(s, errp);
+> +    if (ret) {
+> +        goto fail;
+> +    }
+> +
+>      if (s->incompatible_features & ~QCOW2_INCOMPAT_MASK) {
+>          void *feature_table =3D NULL;
+>          qcow2_read_extensions(bs, header.header_length, ext_end,
+> @@ -2434,6 +2493,13 @@ int qcow2_update_header(BlockDriverState *bs)
+>      total_size =3D bs->total_sectors * BDRV_SECTOR_SIZE;
+>      refcount_table_clusters =3D s->refcount_table_size >> (s->cluster_=
+bits - 3);
+> =20
+> +    ret =3D check_compression_type(s, NULL);
+
+Why are you ignoring the error here?
+
+
+> @@ -5239,6 +5327,12 @@ static QemuOptsList qcow2_create_opts =3D {
+>              .help =3D "Width of a reference count entry in bits",
+>              .def_value_str =3D "16"
+>          },
+> +        {
+> +            .name =3D BLOCK_OPT_COMPRESSION_TYPE,
+> +            .type =3D QEMU_OPT_STRING,
+> +            .help =3D "Compression method used for image clusters comp=
+ression",
+> +            .def_value_str =3D "0"
+
+Eww. Why are we exposing an integer rather than an enum value as the
+default value?  This should probably be "zlib".
+
+
+> +++ b/docs/interop/qcow2.txt
+> @@ -109,7 +109,12 @@ in the description of a field.
+>                                  An External Data File Name header exte=
+nsion may
+>                                  be present if this bit is set.
+> =20
+> -                    Bits 3-63:  Reserved (set to 0)
+> +                    Bit 3:      Compression type bit. The bit must be =
+set if
+> +                                the compression type differs from defa=
+ult: zlib.
+
+Maybe: "differs from the default of zlib".
+
+Up to here is okay.
+
+> +                                If the compression type is default the=
+ bit must
+> +                                be unset.
+
+Is this restriction necessary?
+
+> +
+> +                    Bits 4-63:  Reserved (set to 0)
+> =20
+>           80 -  87:  compatible_features
+>                      Bitmask of compatible features. An implementation =
+can
+> @@ -165,6 +170,21 @@ in the description of a field.
+>                      Length of the header structure in bytes. For versi=
+on 2
+>                      images, the length is always assumed to be 72 byte=
+s.
+> =20
+> +        104 - 107:  compression_type
+> +                    Defines the compression method used for compressed=
+ clusters.
+> +                    A single compression type is applied to all compre=
+ssed image
+> +                    clusters.
+> +                    The compression type is set on image creation only=
+=2E
+> +                    The default compression type is zlib.
+
+Where is the documentation that a value of 0 corresponds to zlib?
+
+> +                    When the deafult compression type is used the comp=
+ression
+
+default
+
+> +                    type bit (incompatible feature bit 3) must be unse=
+t.
+
+Is this restriction necessary?
+
+> +                    When any other compression type is used the compre=
+ssion
+> +                    type bit must be set.
+> +                    Qemu versions older than 4.1 can use images create=
+d with
+> +                    the default compression type without any additiona=
+l
+> +                    preparations and cannot use images created with an=
+y other
+> +                    compression type.
+> +
+>  Directly after the image header, optional sections called header exten=
+sions can
+>  be stored. Each extension has a structure like the following:
+> =20
+> diff --git a/include/block/block_int.h b/include/block/block_int.h
+> index 01e855a066..814917baec 100644
+> --- a/include/block/block_int.h
+> +++ b/include/block/block_int.h
+> @@ -58,6 +58,7 @@
+>  #define BLOCK_OPT_REFCOUNT_BITS     "refcount_bits"
+>  #define BLOCK_OPT_DATA_FILE         "data_file"
+>  #define BLOCK_OPT_DATA_FILE_RAW     "data_file_raw"
+> +#define BLOCK_OPT_COMPRESSION_TYPE  "compression_type"
+> =20
+>  #define BLOCK_PROBE_BUF_SIZE        512
+> =20
+> diff --git a/qapi/block-core.json b/qapi/block-core.json
+> index 7ccbfff9d0..6aa8b99993 100644
+> --- a/qapi/block-core.json
+> +++ b/qapi/block-core.json
+> @@ -78,6 +78,8 @@
+>  #
+>  # @bitmaps: A list of qcow2 bitmap details (since 4.0)
+>  #
+> +# @compression-type: the image cluster compression method (since 4.1)
+> +#
+>  # Since: 1.7
+>  ##
+>  { 'struct': 'ImageInfoSpecificQCow2',
+> @@ -89,7 +91,8 @@
+>        '*corrupt': 'bool',
+>        'refcount-bits': 'int',
+>        '*encrypt': 'ImageInfoSpecificQCow2Encryption',
+> -      '*bitmaps': ['Qcow2BitmapInfo']
+> +      '*bitmaps': ['Qcow2BitmapInfo'],
+> +      '*compression-type': 'Qcow2CompressionType'
+
+Why is this field optional? Can't we always populate it, even for older
+images?
+
+>    } }
+> =20
+>  ##
+> @@ -4206,6 +4209,18 @@
+>    'data': [ 'v2', 'v3' ] }
+> =20
+> =20
+> +##
+> +# @Qcow2CompressionType:
+> +#
+> +# Compression type used in qcow2 image file
+> +#
+> +# @zlib:  zlib compression, see <http://zlib.net/>
+> +#
+> +# Since: 4.1
+> +##
+> +{ 'enum': 'Qcow2CompressionType',
+> +  'data': [ 'zlib' ] }
+> +
+>  ##
+>  # @BlockdevCreateOptionsQcow2:
+>  #
+> @@ -4228,6 +4243,8 @@
+>  # @preallocation    Preallocation mode for the new image (default: off=
+)
+>  # @lazy-refcounts   True if refcounts may be updated lazily (default: =
+off)
+>  # @refcount-bits    Width of reference counts in bits (default: 16)
+> +# @compression-type The image cluster compression method
+> +#                   (default: zlib, since 4.1)
+>  #
+>  # Since: 2.12
+>  ##
+> @@ -4243,7 +4260,8 @@
+>              '*cluster-size':    'size',
+>              '*preallocation':   'PreallocMode',
+>              '*lazy-refcounts':  'bool',
+> -            '*refcount-bits':   'int' } }
+> +            '*refcount-bits':   'int',
+> +            '*compression-type': 'Qcow2CompressionType' } }
+
+But this one must indeed be optional.
+
+> =20
+>  ##
+>  # @BlockdevCreateOptionsQed:
+>=20
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--VMvCG9CKiurKsz3tSkjiw0wlAAGBP8BHd--
+
+--E36TJSXbIcuQgizgqmebpI09Z80uI8kpN
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl0cuEgACgkQp6FrSiUn
+Q2q+lwgAruSwCVeK8HZQnZ5AIh/hVOOA9ierW2J1GTGtYRQLk8uwE27xzE26dZVu
+gTty6EY3NbQy0JNoP3a3A5MqaXAvCM/yhqCPab3ilRHJmIZKsXoVH1t8lPD/NeE6
+8hUayaYb9hU+AFgitxsVs6BCikzJI9OodsBLcJ/YtxyeCSrlnXqKt1W3b35QgGjy
+T+ddWVa80LvWhzAG53GLGk7W6tMD9C2z9oxSdVKXcUmkK8r2qaKq+GzAi7NAvJw1
+NBaXrueUfp/VwgZNpuxyVPvxJqlB3L3qQ9k4hxLumksXjMlsJFYMTOQfhu6eRjs5
+ymPmZJqlHqXQUsrrzoW+BfA/DRY2Lg==
+=TpDc
+-----END PGP SIGNATURE-----
+
+--E36TJSXbIcuQgizgqmebpI09Z80uI8kpN--
 
