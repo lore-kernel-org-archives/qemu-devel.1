@@ -2,90 +2,79 @@ Return-Path: <SRS0=mdN/=VA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF70DC0650E
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 14:41:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CCEFC0650E
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 14:47:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 988D621871
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 14:41:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 988D621871
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5A9A921871
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 14:47:04 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rIXhx5WA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A9A921871
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36448 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36480 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1higSG-0002Sb-VV
-	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 10:41:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58663)
+	id 1higXH-0004TG-HA
+	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 10:47:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59520)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <eblake@redhat.com>) id 1higRa-0001gR-LL
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 10:41:11 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1higVn-0003pm-CM
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 10:45:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1higRZ-0005cl-O6
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 10:41:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52460)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1higRZ-0005c5-FV
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 10:41:09 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id BA5C386671;
- Wed,  3 Jul 2019 14:41:08 +0000 (UTC)
-Received: from [10.3.116.152] (ovpn-116-152.phx2.redhat.com [10.3.116.152])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id F351A7C5C8;
- Wed,  3 Jul 2019 14:41:07 +0000 (UTC)
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- qemu-devel@nongnu.org
-References: <20190703135411.28436-1-berrange@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
- xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
- xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
- TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
- GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
- sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
- AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
- CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
- RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
- wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
- Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
- gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
- pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
- zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
- pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
- 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
- NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
- cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
- SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
- I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
- mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
- Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
- 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <8e520489-0cf2-f377-0e14-f8f02a59aae1@redhat.com>
-Date: Wed, 3 Jul 2019 09:41:07 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ (envelope-from <peter.maydell@linaro.org>) id 1higVm-0000Mo-9C
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 10:45:31 -0400
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:43657)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1higVh-0000AL-7e
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 10:45:28 -0400
+Received: by mail-oi1-x243.google.com with SMTP id w79so2268614oif.10
+ for <qemu-devel@nongnu.org>; Wed, 03 Jul 2019 07:45:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=2/XGZvCPj7K96o7rOY0bGH9oK+Uknf6IZgXh3Qfk9WY=;
+ b=rIXhx5WA7MHcPT4hY5+mg5HspTF775At5sD88jIfIwcFIXsqgl8eLxhSS5Plw7HTH6
+ /1sHRJYJRyf+BtKbY0xMtDEfbUBQRPhAIg9NnYUV18CK/+Ol9APAWSW/TaRRbhfd+UEj
+ sWkHvMuVAFMG28NX++8UrhDEiJNNl9VsQixgaoomvWVO88F+Oyimn36pwH3CURqtsLFV
+ ZweDmuhDOhQvPBu56QF0j51GbuD6QfGUybCpcAvFZgnxZDU8o1LdyNVb75m1nmltfy5k
+ iRUHEd338J/o21MAT2u7qt9vXsD7ptgcm0fAjR/ka/q4xGw+SqGJf3ljYRIiofzl2ElM
+ K0Zw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=2/XGZvCPj7K96o7rOY0bGH9oK+Uknf6IZgXh3Qfk9WY=;
+ b=TXSMT0IOFAFz7wcHrX3oATphG06Ovcah34aALi7cyjdLW0f5aEZ6CGrjrhalEMVvPi
+ c+vhIiTtqSKdByYO25QqC05rLHGpWr5tiMbtQT8sm1Ei8B1PjEihfPbat9Y1Fk6pO6Uv
+ tryAWs1PMG3TUKlLojizvv8+/zny7NVDsfgQHooNAm4vXCYFhsGkACzGdwuXQj51dXqY
+ xkLR4y0jCGDim6jug8Fq3bmdDG0alNLXPK82vP7ONXP6FXEzn2X6w6EyEAd/+NDL4/gi
+ ugqVKbLVHQYfR5HctDl2ToeEYpOmLjMgiOO8sVrBgZfrTZb8+QUmzIZAun+rkgQvkgBG
+ 4v7g==
+X-Gm-Message-State: APjAAAWihpEJcpCt+tuL1uqu3Q725GhrO0cGmpN8NmCOGvdOFUerEcDV
+ TWQmOcJmL0dvjaUigAQWvnhDPVjfCo9eabK6rsW40aHK0YWpfA==
+X-Google-Smtp-Source: APXvYqx//7rzWKljqJKbLEEs7YbT5pI9JtaLHniKm3GTLwqT/w1X2wZWeCF9dQhtNBV3s74OCMBPf54MlEahUg3Dxd0=
+X-Received: by 2002:aca:ac48:: with SMTP id v69mr6874606oie.48.1562165117371; 
+ Wed, 03 Jul 2019 07:45:17 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190703135411.28436-1-berrange@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="AJHohnBV99x5Q4BST2dJcxff1wTRxivN6"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.26]); Wed, 03 Jul 2019 14:41:08 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] doc: document that the monitor console is
- a privileged control interface
+References: <20190702123713.14396-1-laurent@vivier.eu>
+In-Reply-To: <20190702123713.14396-1-laurent@vivier.eu>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 3 Jul 2019 15:45:06 +0100
+Message-ID: <CAFEAcA_Zu0X1zLfKtBkQdi25KCkjf_PNu8zKWE5Dx7uzzLEzBA@mail.gmail.com>
+To: Laurent Vivier <laurent@vivier.eu>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::243
+Subject: Re: [Qemu-devel] [PULL 0/3] Trivial branch patches
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,73 +86,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, P J P <ppandit@redhat.com>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- Markus Armbruster <armbru@redhat.com>
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>, Michael Tokarev <mjt@tls.msk.ru>,
+ QEMU Developers <qemu-devel@nongnu.org>, Amit Shah <amit@kernel.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---AJHohnBV99x5Q4BST2dJcxff1wTRxivN6
-Content-Type: multipart/mixed; boundary="N0PApPtRXyrKm1SDripRWRBW9JFGOMQhv";
- protected-headers="v1"
-From: Eric Blake <eblake@redhat.com>
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- qemu-devel@nongnu.org
-Cc: Stefan Hajnoczi <stefanha@gmail.com>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, P J P <ppandit@redhat.com>
-Message-ID: <8e520489-0cf2-f377-0e14-f8f02a59aae1@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] doc: document that the monitor console is a
- privileged control interface
-References: <20190703135411.28436-1-berrange@redhat.com>
-In-Reply-To: <20190703135411.28436-1-berrange@redhat.com>
+On Tue, 2 Jul 2019 at 13:39, Laurent Vivier <laurent@vivier.eu> wrote:
+>
+> The following changes since commit 7d0e02405fc02a181319b1ab8681d2f72246b7c6:
+>
+>   Merge remote-tracking branch 'remotes/vivier2/tags/trivial-patches-pull-request' into staging (2019-07-01 17:40:32 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/vivier/qemu.git tags/trivial-branch-pull-request
+>
+> for you to fetch changes up to 7c955080d40ccc7952a0479bc160f2b048c0af53:
+>
+>   docs/devel/testing: Fix typo in dockerfile path (2019-07-02 10:12:32 +0200)
+>
+> ----------------------------------------------------------------
+> Fix typo, fix sys_cache_info() on FreeBSD/powerpc,
+> change virtio-rng default to urandom
+>
+> ----------------------------------------------------------------
 
---N0PApPtRXyrKm1SDripRWRBW9JFGOMQhv
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Hi; this makes 'make check' fail on OSX:
 
-On 7/3/19 8:54 AM, Daniel P. Berrang=C3=A9 wrote:
-> A supposed exploit of QEMU was recently announced as CVE-2019-12928
-> claiming that the monitor console was insecure because the "migrate"
-> comand enabled arbitrary command execution for a remote attacker.
+MALLOC_PERTURB_=${MALLOC_PERTURB_:-$(( ${RANDOM:-0} % 255 + 1))}
+tests/test-char -m=quick -k --tap < /dev/null |
+./scripts/tap-driver.pl --test-name="test-char"
+Assertion failed: ((isize & (isize - 1)) == 0), function
+init_cache_info, file
+/Users/pm215/src/qemu-for-merges/util/cacheinfo.c, line 179.
 
-command
+I guess this is the sys_cache_info change.
 
->=20
-> For this to be a flaw the user launching QEMU must have configured
-> the monitor in a way that allows for other userrs to access it. The
-
-users
-
-> exploit report quoted use of the "tcp" character device backend for
-> QMP.
-> --=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---N0PApPtRXyrKm1SDripRWRBW9JFGOMQhv--
-
---AJHohnBV99x5Q4BST2dJcxff1wTRxivN6
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl0cvoMACgkQp6FrSiUn
-Q2qTkQf/RJCKd3I/fKwQwCUBMj5dI/Oqrhn4vO13j4Zb44MNBg3/vqJxTHi2fTPN
-nBa260EX0yKKWam5f4HpPerrR5z6caBC83Y0E0NTiUX/giGxD2l/kJnBWZiuYeHL
-z7cXuVw1VAarpA8trs+/DMl7I4yxXOyaGbDyZL1m6R3saJOXHMLPe+lmN4Y0DVWX
-7hpx74rUtBZnF/oSzQ2E7kk+2D1nHr1wA5gUnBcPZzTfu2mPj/SJN8/Z66rNqdky
-3zDpuE1S1DAfNEzWcmlAQzWISYsBx3K7keOoe4Iv4pWVreUOe5P6r8m68V20bk3q
-Yr1DP9DY1eW1heRxiwxNedvEQBE9Fg==
-=92Dr
------END PGP SIGNATURE-----
-
---AJHohnBV99x5Q4BST2dJcxff1wTRxivN6--
+thanks
+-- PMM
 
