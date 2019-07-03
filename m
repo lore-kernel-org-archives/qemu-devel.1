@@ -2,59 +2,65 @@ Return-Path: <SRS0=mdN/=VA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 414CBC0650E
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 13:55:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B59FC0650E
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 14:06:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 18FC8218A3
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 13:55:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 18FC8218A3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1446F218A3
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 14:06:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1446F218A3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36202 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36252 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hifjU-000887-9f
-	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 09:55:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46916)
+	id 1hifuT-0003KZ-7r
+	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 10:06:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49318)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <berrange@redhat.com>) id 1hifiV-0007Qo-Sp
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 09:54:37 -0400
+ (envelope-from <no-reply@patchew.org>) id 1hifrq-0002ca-Uk
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 10:04:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1hifiT-0004LI-V6
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 09:54:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59416)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hifiS-0004DH-13
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 09:54:33 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 0D26EC05168F;
- Wed,  3 Jul 2019 13:54:15 +0000 (UTC)
-Received: from dhcp-17-95.lcy.redhat.com (unknown [10.42.17.95])
- by smtp.corp.redhat.com (Postfix) with ESMTP id ECDAB5C29A;
- Wed,  3 Jul 2019 13:54:12 +0000 (UTC)
-From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Wed,  3 Jul 2019 14:54:11 +0100
-Message-Id: <20190703135411.28436-1-berrange@redhat.com>
+ (envelope-from <no-reply@patchew.org>) id 1hifro-0007LZ-Qw
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 10:04:14 -0400
+Resent-Date: Wed, 03 Jul 2019 10:04:14 -0400
+Resent-Message-Id: <E1hifro-0007LZ-Qw@eggs.gnu.org>
+Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21591)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1hifrn-0007Hk-DJ; Wed, 03 Jul 2019 10:04:12 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1562162583; cv=none; d=zoho.com; s=zohoarc; 
+ b=etk1yBo5TOVmE559DubQqvFZAkSkH2UIsyaBL2dBJQBcBQgdBd6b2qQVrOmIzg//mI9Ddwn4sf2E3E7mffgTg99EBoOOYVbl/zlJXGXCgu9/0N3bytr2QRgpzQzmBGeLA4/J4GfVk3B0N1SjgM2aT9VjHkkcJTOpUEJnhWK3Hes=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1562162583;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+ bh=AGSiUWQ0MMKVnwem1X6SHUgRqmAQ4M+kWjP9mu5xK58=; 
+ b=VODTVb5q9/l3eGa2mWbxyDVH4THHpMBoANjJuE7Jc+rFehXAoLYWMylhTLa10n8KzQUpIGzO4XEJca7/jOF3Db0O1wiv43fqtBMHc/6XGq5ObL0ovVtBjFNHlxlCxiDPLR1bMgceySrW4BdB1CINRQlADkKIYwXF2HmSkurA4M4=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1562162580703371.2201661198236;
+ Wed, 3 Jul 2019 07:03:00 -0700 (PDT)
+Message-ID: <156216257907.21218.11615786042228081851@c4a48874b076>
+In-Reply-To: <20190701194942.10092-1-philmd@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Wed, 03 Jul 2019 13:54:15 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: philmd@redhat.com
+Date: Wed, 3 Jul 2019 07:03:00 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH] doc: document that the monitor console is a
- privileged control interface
+X-Received-From: 136.143.188.55
+Subject: Re: [Qemu-devel] [PATCH v4 0/8] Support disabling TCG on ARM
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,109 +72,200 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, P J P <ppandit@redhat.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: yang.zhong@intel.com, peter.maydell@linaro.org, drjones@redhat.com,
+ sameo@linux.intel.com, robert.bradford@intel.com, alex.bennee@linaro.org,
+ qemu-devel@nongnu.org, qemu-arm@nongnu.org, thuth@redhat.com,
+ pbonzini@redhat.com, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-A supposed exploit of QEMU was recently announced as CVE-2019-12928
-claiming that the monitor console was insecure because the "migrate"
-comand enabled arbitrary command execution for a remote attacker.
-
-For this to be a flaw the user launching QEMU must have configured
-the monitor in a way that allows for other userrs to access it. The
-exploit report quoted use of the "tcp" character device backend for
-QMP.
-
-This would indeed allow any network user to connect to QEMU and
-execute arbitrary comamnds, however, this is not a flaw in QEMU.
-It is the normal expected behaviour of the monitor console and the
-commands it supports. Given a monitor connection, there are many
-ways to access host filesystem content besides the migrate command.
-
-The reality is that the monitor console (whether QMP or HMP) is
-considered a privileged interface to QEMU and as such must only
-be made available to trusted users. IOW, making it available with
-no authentication over TCP is simply a, very serious, user
-configuration error not a security flaw in QEMU itself.
-
-The one thing this bogus security report highlights though is that
-we have not clearly documented the security implications around the
-use of the monitor. Add a few paragraphs of text to the security
-docs explaining why the monitor is a privileged interface and making
-a recommendation to only use the UNIX socket character device backend.
-
-Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
----
- docs/security.texi | 36 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 36 insertions(+)
-
-diff --git a/docs/security.texi b/docs/security.texi
-index 927764f1e6..5bff01449d 100644
---- a/docs/security.texi
-+++ b/docs/security.texi
-@@ -129,3 +129,39 @@ those resources that were granted to it.
- system calls that are not needed by QEMU, thereby reducing the host kern=
-el
- attack surface.
- @end itemize
-+
-+@section Sensitive configurations
-+
-+There are aspects of QEMU that can have non-obvious security implication=
-s
-+which users & management applications must be aware of.
-+
-+@subsection Monitor console (QMP and HMP)
-+
-+The monitor console (whether used with QMP or HMP) provides an RPC inter=
-face
-+to dynamically control many aspects of QEMU's runtime operation. Many of=
- the
-+commands exposed will instruct QEMU to access content on the host filesy=
-system
-+and/or trigger spawning of external processes.
-+
-+For example, the @code{migrate} command allows for the spawning of arbit=
-rary
-+processes for the purpose of tunnelling the migration data stream. The
-+@code{blockdev-add} command instructs QEMU to open arbitrary files, expo=
-sing
-+their content to the guest as a virtual disk.
-+
-+Unless QEMU is otherwise confined using technologies such as SELinux, Ap=
-pArmor,
-+or Linux namespaces, the monitor console should be considered to have pr=
-ivileges
-+equivalent to those of the user account QEMU is running under.
-+
-+It is further important to consider the security of the character device=
- backend
-+over which the monitor console is exposed. It needs to have protection a=
-gainst
-+malicious third parties which might try to make unauthorized connections=
-, or
-+perform man-in-the-middle attacks. Many of the character device backends=
- do not
-+satisfy this requirement and so must not be used for the monitor console=
-.
-+
-+The general recommendation is that the monitor console should be exposed=
- over
-+a UNIX domain socket backend to the local host only. Use of the TCP base=
-d
-+character device backend is inappropriate unless configured to use both =
-TLS
-+encryption and authorization control policy on client connections.
-+
-+In summary the monitor console is considered a privileged control interf=
-ace to
-+QEMU and as such should only be made accessible to a trusted management
-+application or user.
---=20
-2.21.0
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDcwMTE5NDk0Mi4xMDA5
+Mi0xLXBoaWxtZEByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCBidWlsZCB0
+ZXN0IG9uIHMzOTB4IGhvc3QuIFBsZWFzZSBmaW5kIHRoZSBkZXRhaWxzIGJlbG93LgoKPT09IFRF
+U1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAojIFRlc3Rpbmcgc2NyaXB0IHdpbGwgYmUg
+aW52b2tlZCB1bmRlciB0aGUgZ2l0IGNoZWNrb3V0IHdpdGgKIyBIRUFEIHBvaW50aW5nIHRvIGEg
+Y29tbWl0IHRoYXQgaGFzIHRoZSBwYXRjaGVzIGFwcGxpZWQgb24gdG9wIG9mICJiYXNlIgojIGJy
+YW5jaApzZXQgLWUKCmVjaG8KZWNobyAiPT09IEVOViA9PT0iCmVudgoKZWNobwplY2hvICI9PT0g
+UEFDS0FHRVMgPT09IgpycG0gLXFhCgplY2hvCmVjaG8gIj09PSBVTkFNRSA9PT0iCnVuYW1lIC1h
+CgpDQz0kSE9NRS9iaW4vY2MKSU5TVEFMTD0kUFdEL2luc3RhbGwKQlVJTEQ9JFBXRC9idWlsZApt
+a2RpciAtcCAkQlVJTEQgJElOU1RBTEwKU1JDPSRQV0QKY2QgJEJVSUxECiRTUkMvY29uZmlndXJl
+IC0tY2M9JENDIC0tcHJlZml4PSRJTlNUQUxMCm1ha2UgLWo0CiMgWFhYOiB3ZSBuZWVkIHJlbGlh
+YmxlIGNsZWFuIHVwCiMgbWFrZSBjaGVjayAtajQgVj0xCm1ha2UgaW5zdGFsbAo9PT0gVEVTVCBT
+Q1JJUFQgRU5EID09PQoKICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9hY2NlbC90Y2cvdGNnLXJ1
+bnRpbWUtZ3ZlYy5vCkluIGZpbGUgaW5jbHVkZWQgZnJvbSAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rl
+ci10bXAtMWRfbWtidXovc3JjL2luY2x1ZGUvaHcvaW50Yy9hcm12N21fbnZpYy5oOjEzLAogICAg
+ICAgICAgICAgICAgIGZyb20gL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLTFkX21rYnV6L3Ny
+Yy9ody9pbnRjL2FybXY3bV9udmljLmM6MTg6Ci92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC0x
+ZF9ta2J1ei9zcmMvdGFyZ2V0L2FybS9jcHUuaDozNTogZXJyb3I6ICJFWENQX0lSUSIgcmVkZWZp
+bmVkIFstV2Vycm9yXQogICAzNSB8ICNkZWZpbmUgRVhDUF9JUlEgICAgICAgICAgICAgNQogICAg
+ICB8IApJbiBmaWxlIGluY2x1ZGVkIGZyb20gL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLTFk
+X21rYnV6L3NyYy9ody9pbnRjL2FybXY3bV9udmljLmM6MTU6Ci0tLQogICAgICB8IApJbiBmaWxl
+IGluY2x1ZGVkIGZyb20gL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLTFkX21rYnV6L3NyYy9p
+bmNsdWRlL2h3L2ludGMvYXJtdjdtX252aWMuaDoxMywKICAgICAgICAgICAgICAgICBmcm9tIC92
+YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC0xZF9ta2J1ei9zcmMvaHcvaW50Yy9hcm12N21fbnZp
+Yy5jOjE4OgovdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtMWRfbWtidXovc3JjL3RhcmdldC9h
+cm0vY3B1Lmg6Mjc0NDogZXJyb3I6ICJDUFVfUkVTT0xWSU5HX1RZUEUiIHJlZGVmaW5lZCBbLVdl
+cnJvcl0KIDI3NDQgfCAjZGVmaW5lIENQVV9SRVNPTFZJTkdfVFlQRSBUWVBFX0FSTV9DUFUKICAg
+ICAgfCAKSW4gZmlsZSBpbmNsdWRlZCBmcm9tIC92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC0x
+ZF9ta2J1ei9zcmMvaHcvaW50Yy9hcm12N21fbnZpYy5jOjE1OgotLS0KICAgICAgfCAKSW4gZmls
+ZSBpbmNsdWRlZCBmcm9tIC92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC0xZF9ta2J1ei9zcmMv
+aW5jbHVkZS9ody9pbnRjL2FybXY3bV9udmljLmg6MTMsCiAgICAgICAgICAgICAgICAgZnJvbSAv
+dmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtMWRfbWtidXovc3JjL2h3L2ludGMvYXJtdjdtX252
+aWMuYzoxODoKL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLTFkX21rYnV6L3NyYy90YXJnZXQv
+YXJtL2NwdS5oOjI3NDY6IGVycm9yOiAiY3B1X3NpZ25hbF9oYW5kbGVyIiByZWRlZmluZWQgWy1X
+ZXJyb3JdCiAyNzQ2IHwgI2RlZmluZSBjcHVfc2lnbmFsX2hhbmRsZXIgY3B1X2FybV9zaWduYWxf
+aGFuZGxlcgogICAgICB8IApJbiBmaWxlIGluY2x1ZGVkIGZyb20gL3Zhci90bXAvcGF0Y2hldy10
+ZXN0ZXItdG1wLTFkX21rYnV6L3NyYy9ody9pbnRjL2FybXY3bV9udmljLmM6MTU6Ci0tLQogICAg
+ICB8IApJbiBmaWxlIGluY2x1ZGVkIGZyb20gL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLTFk
+X21rYnV6L3NyYy9pbmNsdWRlL2h3L2ludGMvYXJtdjdtX252aWMuaDoxMywKICAgICAgICAgICAg
+ICAgICBmcm9tIC92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC0xZF9ta2J1ei9zcmMvaHcvaW50
+Yy9hcm12N21fbnZpYy5jOjE4OgovdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtMWRfbWtidXov
+c3JjL3RhcmdldC9hcm0vY3B1Lmg6Mjc0NzogZXJyb3I6ICJjcHVfbGlzdCIgcmVkZWZpbmVkIFst
+V2Vycm9yXQogMjc0NyB8ICNkZWZpbmUgY3B1X2xpc3QgYXJtX2NwdV9saXN0CiAgICAgIHwgCklu
+IGZpbGUgaW5jbHVkZWQgZnJvbSAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtMWRfbWtidXov
+c3JjL2h3L2ludGMvYXJtdjdtX252aWMuYzoxNToKLS0tCiAgICAgIHwgCkluIGZpbGUgaW5jbHVk
+ZWQgZnJvbSAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtMWRfbWtidXovc3JjL2luY2x1ZGUv
+aHcvaW50Yy9hcm12N21fbnZpYy5oOjEzLAogICAgICAgICAgICAgICAgIGZyb20gL3Zhci90bXAv
+cGF0Y2hldy10ZXN0ZXItdG1wLTFkX21rYnV6L3NyYy9ody9pbnRjL2FybXY3bV9udmljLmM6MTg6
+Ci92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC0xZF9ta2J1ei9zcmMvdGFyZ2V0L2FybS9jcHUu
+aDoyODg0OiBlcnJvcjogIk1NVV9VU0VSX0lEWCIgcmVkZWZpbmVkIFstV2Vycm9yXQogMjg4NCB8
+ICNkZWZpbmUgTU1VX1VTRVJfSURYIDAKICAgICAgfCAKSW4gZmlsZSBpbmNsdWRlZCBmcm9tIC92
+YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC0xZF9ta2J1ei9zcmMvaHcvaW50Yy9hcm12N21fbnZp
+Yy5jOjE1OgotLS0KICAgICAgfCAKSW4gZmlsZSBpbmNsdWRlZCBmcm9tIC92YXIvdG1wL3BhdGNo
+ZXctdGVzdGVyLXRtcC0xZF9ta2J1ei9zcmMvaW5jbHVkZS9ody9pbnRjL2FybXY3bV9udmljLmg6
+MTMsCiAgICAgICAgICAgICAgICAgZnJvbSAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtMWRf
+bWtidXovc3JjL2h3L2ludGMvYXJtdjdtX252aWMuYzoxODoKL3Zhci90bXAvcGF0Y2hldy10ZXN0
+ZXItdG1wLTFkX21rYnV6L3NyYy90YXJnZXQvYXJtL2NwdS5oOjI5Mzc6NTogZXJyb3I6IGNvbmZs
+aWN0aW5nIHR5cGVzIGZvciDigJhjcHVfbW11X2luZGV44oCZCiAyOTM3IHwgaW50IGNwdV9tbXVf
+aW5kZXgoQ1BVQVJNU3RhdGUgKmVudiwgYm9vbCBpZmV0Y2gpOwogICAgICB8ICAgICBefn5+fn5+
+fn5+fn5+CkluIGZpbGUgaW5jbHVkZWQgZnJvbSAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAt
+MWRfbWtidXovc3JjL2h3L2ludGMvYXJtdjdtX252aWMuYzoxNToKLS0tCiAgICAgIHwgICAgICAg
+ICAgICAgICAgICAgXn5+fn5+fn5+fn5+fgpJbiBmaWxlIGluY2x1ZGVkIGZyb20gL3Zhci90bXAv
+cGF0Y2hldy10ZXN0ZXItdG1wLTFkX21rYnV6L3NyYy9pbmNsdWRlL2h3L2ludGMvYXJtdjdtX252
+aWMuaDoxMywKICAgICAgICAgICAgICAgICBmcm9tIC92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRt
+cC0xZF9ta2J1ei9zcmMvaHcvaW50Yy9hcm12N21fbnZpYy5jOjE4OgovdmFyL3RtcC9wYXRjaGV3
+LXRlc3Rlci10bXAtMWRfbWtidXovc3JjL3RhcmdldC9hcm0vY3B1Lmg6MzEyODoyMTogZXJyb3I6
+IGNvbmZsaWN0aW5nIHR5cGVzIGZvciDigJhDUFVBcmNoU3RhdGXigJkKIDMxMjggfCB0eXBlZGVm
+IENQVUFSTVN0YXRlIENQVUFyY2hTdGF0ZTsKICAgICAgfCAgICAgICAgICAgICAgICAgICAgIF5+
+fn5+fn5+fn5+fgpJbiBmaWxlIGluY2x1ZGVkIGZyb20gL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXIt
+dG1wLTFkX21rYnV6L3NyYy9ody9pbnRjL2FybXY3bV9udmljLmM6MTU6Ci0tLQogICAgICB8ICAg
+ICAgICAgICAgICAgICAgICAgIF5+fn5+fn5+fn5+fgpJbiBmaWxlIGluY2x1ZGVkIGZyb20gL3Zh
+ci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLTFkX21rYnV6L3NyYy9pbmNsdWRlL2h3L2ludGMvYXJt
+djdtX252aWMuaDoxMywKICAgICAgICAgICAgICAgICBmcm9tIC92YXIvdG1wL3BhdGNoZXctdGVz
+dGVyLXRtcC0xZF9ta2J1ei9zcmMvaHcvaW50Yy9hcm12N21fbnZpYy5jOjE4OgovdmFyL3RtcC9w
+YXRjaGV3LXRlc3Rlci10bXAtMWRfbWtidXovc3JjL3RhcmdldC9hcm0vY3B1Lmg6MzEyOToxNjog
+ZXJyb3I6IGNvbmZsaWN0aW5nIHR5cGVzIGZvciDigJhBcmNoQ1BV4oCZCiAzMTI5IHwgdHlwZWRl
+ZiBBUk1DUFUgQXJjaENQVTsKICAgICAgfCAgICAgICAgICAgICAgICBefn5+fn5+CkluIGZpbGUg
+aW5jbHVkZWQgZnJvbSAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtMWRfbWtidXovc3JjL2h3
+L2ludGMvYXJtdjdtX252aWMuYzoxNToKLS0tCiAgICAgIHwgICAgICAgICAgICAgICAgIF5+fn5+
+fn4KSW4gZmlsZSBpbmNsdWRlZCBmcm9tIC92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC0xZF9t
+a2J1ei9zcmMvaW5jbHVkZS9ody9pbnRjL2FybXY3bV9udmljLmg6MTMsCiAgICAgICAgICAgICAg
+ICAgZnJvbSAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtMWRfbWtidXovc3JjL2h3L2ludGMv
+YXJtdjdtX252aWMuYzoxODoKL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLTFkX21rYnV6L3Ny
+Yy90YXJnZXQvYXJtL2NwdS5oOjMyMTY6NjogZXJyb3I6IGNvbmZsaWN0aW5nIHR5cGVzIGZvciDi
+gJhjcHVfZ2V0X3RiX2NwdV9zdGF0ZeKAmQogMzIxNiB8IHZvaWQgY3B1X2dldF90Yl9jcHVfc3Rh
+dGUoQ1BVQVJNU3RhdGUgKmVudiwgdGFyZ2V0X3Vsb25nICpwYywKICAgICAgfCAgICAgIF5+fn5+
+fn5+fn5+fn5+fn5+fn5+CkluIGZpbGUgaW5jbHVkZWQgZnJvbSAvdmFyL3RtcC9wYXRjaGV3LXRl
+c3Rlci10bXAtMWRfbWtidXovc3JjL2h3L2ludGMvYXJtdjdtX252aWMuYzoxNToKLS0tCiAgQ0Mg
+ICAgICBhcm0tc29mdG1tdS9ody9taXNjL2JjbTI4MzVfbWJveC5vCkluIGZpbGUgaW5jbHVkZWQg
+ZnJvbSAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtMWRfbWtidXovc3JjL2luY2x1ZGUvaHcv
+aW50Yy9hcm12N21fbnZpYy5oOjEzLAogICAgICAgICAgICAgICAgIGZyb20gL3Zhci90bXAvcGF0
+Y2hldy10ZXN0ZXItdG1wLTFkX21rYnV6L3NyYy9ody9pbnRjL2FybXY3bV9udmljLmM6MTg6Ci92
+YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC0xZF9ta2J1ei9zcmMvdGFyZ2V0L2FybS9jcHUuaDox
+NDE2OiBlcnJvcjogIkZQQ1JfRFpFIiByZWRlZmluZWQgWy1XZXJyb3JdCiAxNDE2IHwgI2RlZmlu
+ZSBGUENSX0RaRSAgICAoMSA8PCA5KSAgICAvKiBEaXZpZGUgYnkgWmVybyBleGNlcHRpb24gdHJh
+cCBlbmFibGUgKi8KICAgICAgfCAKSW4gZmlsZSBpbmNsdWRlZCBmcm9tIC92YXIvdG1wL3BhdGNo
+ZXctdGVzdGVyLXRtcC0xZF9ta2J1ei9zcmMvaHcvaW50Yy9hcm12N21fbnZpYy5jOjE1OgotLS0K
+ICAgICAgfCAKSW4gZmlsZSBpbmNsdWRlZCBmcm9tIC92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRt
+cC0xZF9ta2J1ei9zcmMvaW5jbHVkZS9ody9pbnRjL2FybXY3bV9udmljLmg6MTMsCiAgICAgICAg
+ICAgICAgICAgZnJvbSAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtMWRfbWtidXovc3JjL2h3
+L2ludGMvYXJtdjdtX252aWMuYzoxODoKL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLTFkX21r
+YnV6L3NyYy90YXJnZXQvYXJtL2NwdS5oOjI3NDQ6IGVycm9yOiAiQ1BVX1JFU09MVklOR19UWVBF
+IiByZWRlZmluZWQgWy1XZXJyb3JdCiAyNzQ0IHwgI2RlZmluZSBDUFVfUkVTT0xWSU5HX1RZUEUg
+VFlQRV9BUk1fQ1BVCiAgICAgIHwgCkluIGZpbGUgaW5jbHVkZWQgZnJvbSAvdmFyL3RtcC9wYXRj
+aGV3LXRlc3Rlci10bXAtMWRfbWtidXovc3JjL2h3L2ludGMvYXJtdjdtX252aWMuYzoxNToKLS0t
+CiAgICAgIHwgCkluIGZpbGUgaW5jbHVkZWQgZnJvbSAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10
+bXAtMWRfbWtidXovc3JjL2luY2x1ZGUvaHcvaW50Yy9hcm12N21fbnZpYy5oOjEzLAogICAgICAg
+ICAgICAgICAgIGZyb20gL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLTFkX21rYnV6L3NyYy9o
+dy9pbnRjL2FybXY3bV9udmljLmM6MTg6Ci92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC0xZF9t
+a2J1ei9zcmMvdGFyZ2V0L2FybS9jcHUuaDoyNzQ2OiBlcnJvcjogImNwdV9zaWduYWxfaGFuZGxl
+ciIgcmVkZWZpbmVkIFstV2Vycm9yXQogMjc0NiB8ICNkZWZpbmUgY3B1X3NpZ25hbF9oYW5kbGVy
+IGNwdV9hcm1fc2lnbmFsX2hhbmRsZXIKICAgICAgfCAKSW4gZmlsZSBpbmNsdWRlZCBmcm9tIC92
+YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC0xZF9ta2J1ei9zcmMvaHcvaW50Yy9hcm12N21fbnZp
+Yy5jOjE1OgotLS0KICAgICAgfCAKSW4gZmlsZSBpbmNsdWRlZCBmcm9tIC92YXIvdG1wL3BhdGNo
+ZXctdGVzdGVyLXRtcC0xZF9ta2J1ei9zcmMvaW5jbHVkZS9ody9pbnRjL2FybXY3bV9udmljLmg6
+MTMsCiAgICAgICAgICAgICAgICAgZnJvbSAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtMWRf
+bWtidXovc3JjL2h3L2ludGMvYXJtdjdtX252aWMuYzoxODoKL3Zhci90bXAvcGF0Y2hldy10ZXN0
+ZXItdG1wLTFkX21rYnV6L3NyYy90YXJnZXQvYXJtL2NwdS5oOjI3NDc6IGVycm9yOiAiY3B1X2xp
+c3QiIHJlZGVmaW5lZCBbLVdlcnJvcl0KIDI3NDcgfCAjZGVmaW5lIGNwdV9saXN0IGFybV9jcHVf
+bGlzdAogICAgICB8IApJbiBmaWxlIGluY2x1ZGVkIGZyb20gL3Zhci90bXAvcGF0Y2hldy10ZXN0
+ZXItdG1wLTFkX21rYnV6L3NyYy9ody9pbnRjL2FybXY3bV9udmljLmM6MTU6Ci0tLQogICAgICB8
+IApJbiBmaWxlIGluY2x1ZGVkIGZyb20gL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLTFkX21r
+YnV6L3NyYy9pbmNsdWRlL2h3L2ludGMvYXJtdjdtX252aWMuaDoxMywKICAgICAgICAgICAgICAg
+ICBmcm9tIC92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC0xZF9ta2J1ei9zcmMvaHcvaW50Yy9h
+cm12N21fbnZpYy5jOjE4OgovdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtMWRfbWtidXovc3Jj
+L3RhcmdldC9hcm0vY3B1Lmg6Mjg4NDogZXJyb3I6ICJNTVVfVVNFUl9JRFgiIHJlZGVmaW5lZCBb
+LVdlcnJvcl0KIDI4ODQgfCAjZGVmaW5lIE1NVV9VU0VSX0lEWCAwCiAgICAgIHwgCkluIGZpbGUg
+aW5jbHVkZWQgZnJvbSAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtMWRfbWtidXovc3JjL2h3
+L2ludGMvYXJtdjdtX252aWMuYzoxNToKLS0tCiAgICAgIHwgCkluIGZpbGUgaW5jbHVkZWQgZnJv
+bSAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtMWRfbWtidXovc3JjL2luY2x1ZGUvaHcvaW50
+Yy9hcm12N21fbnZpYy5oOjEzLAogICAgICAgICAgICAgICAgIGZyb20gL3Zhci90bXAvcGF0Y2hl
+dy10ZXN0ZXItdG1wLTFkX21rYnV6L3NyYy9ody9pbnRjL2FybXY3bV9udmljLmM6MTg6Ci92YXIv
+dG1wL3BhdGNoZXctdGVzdGVyLXRtcC0xZF9ta2J1ei9zcmMvdGFyZ2V0L2FybS9jcHUuaDoyOTM3
+OjU6IGVycm9yOiBjb25mbGljdGluZyB0eXBlcyBmb3Ig4oCYY3B1X21tdV9pbmRleOKAmQogMjkz
+NyB8IGludCBjcHVfbW11X2luZGV4KENQVUFSTVN0YXRlICplbnYsIGJvb2wgaWZldGNoKTsKICAg
+ICAgfCAgICAgXn5+fn5+fn5+fn5+fgpJbiBmaWxlIGluY2x1ZGVkIGZyb20gL3Zhci90bXAvcGF0
+Y2hldy10ZXN0ZXItdG1wLTFkX21rYnV6L3NyYy9ody9pbnRjL2FybXY3bV9udmljLmM6MTU6Ci0t
+LQogICAgICB8ICAgICAgICAgICAgICAgICAgIF5+fn5+fn5+fn5+fn4KSW4gZmlsZSBpbmNsdWRl
+ZCBmcm9tIC92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC0xZF9ta2J1ei9zcmMvaW5jbHVkZS9o
+dy9pbnRjL2FybXY3bV9udmljLmg6MTMsCiAgICAgICAgICAgICAgICAgZnJvbSAvdmFyL3RtcC9w
+YXRjaGV3LXRlc3Rlci10bXAtMWRfbWtidXovc3JjL2h3L2ludGMvYXJtdjdtX252aWMuYzoxODoK
+L3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLTFkX21rYnV6L3NyYy90YXJnZXQvYXJtL2NwdS5o
+OjMxMjg6MjE6IGVycm9yOiBjb25mbGljdGluZyB0eXBlcyBmb3Ig4oCYQ1BVQXJjaFN0YXRl4oCZ
+CiAzMTI4IHwgdHlwZWRlZiBDUFVBUk1TdGF0ZSBDUFVBcmNoU3RhdGU7CiAgICAgIHwgICAgICAg
+ICAgICAgICAgICAgICBefn5+fn5+fn5+fn4KSW4gZmlsZSBpbmNsdWRlZCBmcm9tIC92YXIvdG1w
+L3BhdGNoZXctdGVzdGVyLXRtcC0xZF9ta2J1ei9zcmMvaHcvaW50Yy9hcm12N21fbnZpYy5jOjE1
+OgotLS0KICAgICAgfCAgICAgICAgICAgICAgICAgICAgICAgXn5+fn5+fn5+fn5+CkluIGZpbGUg
+aW5jbHVkZWQgZnJvbSAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtMWRfbWtidXovc3JjL2lu
+Y2x1ZGUvaHcvaW50Yy9hcm12N21fbnZpYy5oOjEzLAogICAgICAgICAgICAgICAgIGZyb20gL3Zh
+ci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLTFkX21rYnV6L3NyYy9ody9pbnRjL2FybXY3bV9udmlj
+LmM6MTg6Ci92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC0xZF9ta2J1ei9zcmMvdGFyZ2V0L2Fy
+bS9jcHUuaDozMTI5OjE2OiBlcnJvcjogY29uZmxpY3RpbmcgdHlwZXMgZm9yIOKAmEFyY2hDUFXi
+gJkKIDMxMjkgfCB0eXBlZGVmIEFSTUNQVSBBcmNoQ1BVOwogICAgICB8ICAgICAgICAgICAgICAg
+IF5+fn5+fn4KSW4gZmlsZSBpbmNsdWRlZCBmcm9tIC92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRt
+cC0xZF9ta2J1ei9zcmMvaHcvaW50Yy9hcm12N21fbnZpYy5jOjE1OgotLS0KICAgICAgfCAgICAg
+ICAgICAgICAgICAgIF5+fn5+fn4KSW4gZmlsZSBpbmNsdWRlZCBmcm9tIC92YXIvdG1wL3BhdGNo
+ZXctdGVzdGVyLXRtcC0xZF9ta2J1ei9zcmMvaW5jbHVkZS9ody9pbnRjL2FybXY3bV9udmljLmg6
+MTMsCiAgICAgICAgICAgICAgICAgZnJvbSAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtMWRf
+bWtidXovc3JjL2h3L2ludGMvYXJtdjdtX252aWMuYzoxODoKL3Zhci90bXAvcGF0Y2hldy10ZXN0
+ZXItdG1wLTFkX21rYnV6L3NyYy90YXJnZXQvYXJtL2NwdS5oOjMyMTY6NjogZXJyb3I6IGNvbmZs
+aWN0aW5nIHR5cGVzIGZvciDigJhjcHVfZ2V0X3RiX2NwdV9zdGF0ZeKAmQogMzIxNiB8IHZvaWQg
+Y3B1X2dldF90Yl9jcHVfc3RhdGUoQ1BVQVJNU3RhdGUgKmVudiwgdGFyZ2V0X3Vsb25nICpwYywK
+ICAgICAgfCAgICAgIF5+fn5+fn5+fn5+fn5+fn5+fn5+CkluIGZpbGUgaW5jbHVkZWQgZnJvbSAv
+dmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtMWRfbWtidXovc3JjL2h3L2ludGMvYXJtdjdtX252
+aWMuYzoxNToKLS0tCi92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC0xZF9ta2J1ei9zcmMvdGFy
+Z2V0L2FybS9oZWxwZXIuaDo2NzogdW5kZWZpbmVkIHJlZmVyZW5jZSB0byBgaGVscGVyX3Y3bV9i
+eG5zJwovdXNyL2Jpbi9sZDogdGFyZ2V0L2FybS90cmFuc2xhdGUubzogaW4gZnVuY3Rpb24gYGdl
+bl9oZWxwZXJfdjdtX3Zsc3RtJzoKL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLTFkX21rYnV6
+L3NyYy90YXJnZXQvYXJtL2hlbHBlci5oOjc0OiB1bmRlZmluZWQgcmVmZXJlbmNlIHRvIGBoZWxw
+ZXJfdjdtX3Zsc3RtJwpjb2xsZWN0MjogZXJyb3I6IGxkIHJldHVybmVkIDEgZXhpdCBzdGF0dXMK
+bWFrZVsxXTogKioqIFtNYWtlZmlsZToyMDU6IHFlbXUtc3lzdGVtLWFybV0gRXJyb3IgMQptYWtl
+OiAqKiogW01ha2VmaWxlOjQ3Njogc3ViZGlyLWFybS1zb2Z0bW11XSBFcnJvciAyCiAgR0VOICAg
+ICBhYXJjaDY0LXNvZnRtbXUvdGFyZ2V0L2FybS9kZWNvZGUtc3ZlLmluYy5jCi0tLQovdmFyL3Rt
+cC9wYXRjaGV3LXRlc3Rlci10bXAtMWRfbWtidXovc3JjL3RhcmdldC9hcm0vaGVscGVyLmg6Njc6
+IHVuZGVmaW5lZCByZWZlcmVuY2UgdG8gYGhlbHBlcl92N21fYnhucycKL3Vzci9iaW4vbGQ6IHRh
+cmdldC9hcm0vdHJhbnNsYXRlLm86IGluIGZ1bmN0aW9uIGBnZW5faGVscGVyX3Y3bV92bHN0bSc6
+Ci92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC0xZF9ta2J1ei9zcmMvdGFyZ2V0L2FybS9oZWxw
+ZXIuaDo3NDogdW5kZWZpbmVkIHJlZmVyZW5jZSB0byBgaGVscGVyX3Y3bV92bHN0bScKY29sbGVj
+dDI6IGVycm9yOiBsZCByZXR1cm5lZCAxIGV4aXQgc3RhdHVzCm1ha2VbMV06ICoqKiBbTWFrZWZp
+bGU6MjA1OiBxZW11LXN5c3RlbS1hYXJjaDY0XSBFcnJvciAxCm1ha2U6ICoqKiBbTWFrZWZpbGU6
+NDc2OiBzdWJkaXItYWFyY2g2NC1zb2Z0bW11XSBFcnJvciAyCj09PSBPVVRQVVQgRU5EID09PQoK
+ClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAx
+OTA3MDExOTQ5NDIuMTAwOTItMS1waGlsbWRAcmVkaGF0LmNvbS90ZXN0aW5nLnMzOTB4Lz90eXBl
+PW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFto
+dHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hl
+dy1kZXZlbEByZWRoYXQuY29t
 
 
