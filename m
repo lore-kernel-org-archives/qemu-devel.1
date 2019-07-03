@@ -2,65 +2,72 @@ Return-Path: <SRS0=mdN/=VA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE123C0650E
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 09:14:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 304FFC0650E
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 09:14:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 758232189E
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 09:14:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 758232189E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 09AA42189E
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 09:14:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09AA42189E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33984 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33988 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hibLX-0005VN-GT
-	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 05:14:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54820)
+	id 1hibLq-0005uY-7Z
+	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 05:14:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51630)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <clg@kaod.org>) id 1hib1f-00022P-Be
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 04:54:04 -0400
+ (envelope-from <palmer@dabbelt.com>) id 1hiaq7-0006Kx-3Q
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 04:42:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1hib1e-0002ED-16
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 04:54:03 -0400
-Received: from 4.mo178.mail-out.ovh.net ([46.105.49.171]:42745)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1hib1d-0001NQ-Rl
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 04:54:01 -0400
-Received: from player772.ha.ovh.net (unknown [10.108.54.59])
- by mo178.mail-out.ovh.net (Postfix) with ESMTP id ADD8766C06
- for <qemu-devel@nongnu.org>; Wed,  3 Jul 2019 10:53:36 +0200 (CEST)
-Received: from kaod.org (lfbn-1-2240-157.w90-76.abo.wanadoo.fr [90.76.60.157])
- (Authenticated sender: clg@kaod.org)
- by player772.ha.ovh.net (Postfix) with ESMTPSA id A610C77E3311;
- Wed,  3 Jul 2019 08:53:29 +0000 (UTC)
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20190618165311.27066-1-clg@kaod.org>
- <20190618165311.27066-11-clg@kaod.org>
- <CAFEAcA_4E7b6qpHEaZaQRQO3TB5BJCLCRJ7jROAr7CeQsJ5wcw@mail.gmail.com>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <b88cc8cf-6cf0-6611-28a9-64372eccbeef@kaod.org>
-Date: Wed, 3 Jul 2019 10:53:27 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+ (envelope-from <palmer@dabbelt.com>) id 1hiaq5-0008DK-Jb
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 04:42:06 -0400
+Received: from mail-lf1-f67.google.com ([209.85.167.67]:45471)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1hiaq5-0007sF-9M
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 04:42:05 -0400
+Received: by mail-lf1-f67.google.com with SMTP id u10so1136560lfm.12
+ for <qemu-devel@nongnu.org>; Wed, 03 Jul 2019 01:41:58 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding:cc:from:to;
+ bh=jNAXnuen/EqceGboq9jqUh/HLce5kvK8361K7LpbToc=;
+ b=jBG6YboXUDPFnJHfgzd2lAAH8uI8Kr7LmwHZA7SUOA4F6+tZKnVzMh6qfHAEL2Ejo4
+ GehXZA8YPKzsv36Kges0NeZzmR771qVexvbAAR8UDwKSxux88GVHF3CK7wH4o9ZUxJrd
+ EQfRG6WHYtJFuCZ5s6pJnh2YjqZgp8CwcanZK/9/OC3hHtJZ4ie2oHdATiNWofEp0z6e
+ yA0gyDK9IojwoS7+WrGASN4LngJ0/Jjwd0uDDZhHmxgoec6lzQNnOz+PkxHqjjGF4F5f
+ 5ZGq8fdJKBzd7bqJoR3ttNPsqy2QOXvzrNQ3vX3pqANoCBIrZ+KvgEaFF/YMG6aCl7bW
+ p0Yw==
+X-Gm-Message-State: APjAAAWlWgrkFwO5QFHTkSJbBvYPMqTnquwHBYjzdc9dC1V4mGeUhaUl
+ ZkbxIbBciE7UJXxDGxXfHgtMvVfE9LAYqw==
+X-Google-Smtp-Source: APXvYqw0177dRk8t6+GqkUBQqdB02q7H755r2HjoQgikU9Vobzver7vtSZb6cxvP5oBSZvfHRvyJ5w==
+X-Received: by 2002:a19:491d:: with SMTP id w29mr14152929lfa.149.1562143317411; 
+ Wed, 03 Jul 2019 01:41:57 -0700 (PDT)
+Received: from localhost ([134.17.27.127])
+ by smtp.gmail.com with ESMTPSA id z23sm291802lfq.77.2019.07.03.01.41.56
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Wed, 03 Jul 2019 01:41:56 -0700 (PDT)
+Date: Wed,  3 Jul 2019 01:40:43 -0700
+Message-Id: <20190703084048.6980-28-palmer@sifive.com>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20190703084048.6980-1-palmer@sifive.com>
+References: <20190703084048.6980-1-palmer@sifive.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_4E7b6qpHEaZaQRQO3TB5BJCLCRJ7jROAr7CeQsJ5wcw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Ovh-Tracer-Id: 7858781350846237611
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduvddrfedtgddtlecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+From: Palmer Dabbelt <palmer@sifive.com>
+To: Peter Maydell <peter.maydell@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.105.49.171
-Subject: Re: [Qemu-devel] [PATCH v2 10/21] aspeed/timer: Provide
- back-pressure information for short periods
+ [fuzzy]
+X-Received-From: 209.85.167.67
+Subject: [Qemu-devel] [PULL 27/32] disas/riscv: Fix `rdinstreth` constraint
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,73 +79,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrew Jeffery <andrew@aj.id.au>, qemu-arm <qemu-arm@nongnu.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Joel Stanley <joel@jms.id.au>
+Cc: "Wladimir J. van der Laan" <laanwj@gmail.com>,
+ Palmer Dabbelt <palmer@sifive.com>, qemu-devel@nongnu.org,
+ Michael Clark <mjc@sifive.com>, Alistair Francis <alistair.francis@wdc.com>,
+ qemu-riscv@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 01/07/2019 14:59, Peter Maydell wrote:
-> On Tue, 18 Jun 2019 at 17:54, C=C3=A9dric Le Goater <clg@kaod.org> wrot=
-e:
->>
->> From: Andrew Jeffery <andrew@aj.id.au>
->>
->> First up: This is not the way the hardware behaves.
->>
->> However, it helps resolve real-world problems with short periods being
->> used under Linux. Commit 4451d3f59f2a ("clocksource/drivers/fttmr010:
->> Fix set_next_event handler") in Linux fixed the timer driver to
->> correctly schedule the next event for the Aspeed controller, and in
->> combination with 5daa8212c08e ("ARM: dts: aspeed: Describe random numb=
-er
->> device") Linux will now set a timer with a period as low as 1us.
->>
->> Configuring a qemu timer with such a short period results in spending
->> time handling the interrupt in the model rather than executing guest
->> code, leading to noticeable "sticky" behaviour in the guest.
->>
->> The behaviour of Linux is correct with respect to the hardware, so we
->> need to improve our handling under emulation. The approach chosen is t=
-o
->> provide back-pressure information by calculating an acceptable minimum
->> number of ticks to be set on the model. Under Linux an additional read
->> is added in the timer configuration path to detect back-pressure, whic=
-h
->> will never occur on hardware. However if back-pressure is observed, th=
-e
->> driver alerts the clock event subsystem, which then performs its own
->> next event dilation via a config option - d1748302f70b ("clockevents:
->> Make minimum delay adjustments configurable")
->>
->> A minimum period of 5us was experimentally determined on a Lenovo
->> T480s, which I've increased to 20us for "safety".
->>
->> Signed-off-by: Andrew Jeffery <andrew@aj.id.au>
->> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
->=20
->> --- a/hw/misc/aspeed_scu.c
->> +++ b/hw/misc/aspeed_scu.c
->> @@ -423,6 +423,12 @@ static void aspeed_scu_realize(DeviceState *dev, =
-Error **errp)
->>                            TYPE_ASPEED_SCU, SCU_IO_REGION_SIZE);
->>
->>      sysbus_init_mmio(sbd, &s->iomem);
->> +
->> +    /*
->> +     * Reset on realize to ensure the APB clock value is calculated i=
-n time for
->> +     * use by the timer model, which is reset before the SCU.
->> +     */
->> +    aspeed_scu_reset(dev);
->=20
-> This looks wrong. QEMU should always be resetting devices
-> after realize and before actually running anything.
+From: "Wladimir J. van der Laan" <laanwj@gmail.com>
 
-We have something better for this patch (getting rid of the reset=20
-ordering issue). Can we still send you the fix this week ?
+The constraint for `rdinstreth` was comparing the csr number to 0xc80,
+which is `cycleh` instead. Fix this.
 
-Thanks,
+Signed-off-by: Wladimir J. van der Laan <laanwj@gmail.com>
+Signed-off-by: Michael Clark <mjc@sifive.com>
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+Reviewed-by: Palmer Dabbelt <palmer@sifive.com>
+Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
+---
+ disas/riscv.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-C.
+diff --git a/disas/riscv.c b/disas/riscv.c
+index d37312705516..278d9be9247e 100644
+--- a/disas/riscv.c
++++ b/disas/riscv.c
+@@ -614,7 +614,8 @@ static const rvc_constraint rvcc_rdtime[] = { rvc_rs1_eq_x0, rvc_csr_eq_0xc01, r
+ static const rvc_constraint rvcc_rdinstret[] = { rvc_rs1_eq_x0, rvc_csr_eq_0xc02, rvc_end };
+ static const rvc_constraint rvcc_rdcycleh[] = { rvc_rs1_eq_x0, rvc_csr_eq_0xc80, rvc_end };
+ static const rvc_constraint rvcc_rdtimeh[] = { rvc_rs1_eq_x0, rvc_csr_eq_0xc81, rvc_end };
+-static const rvc_constraint rvcc_rdinstreth[] = { rvc_rs1_eq_x0, rvc_csr_eq_0xc80, rvc_end };
++static const rvc_constraint rvcc_rdinstreth[] = { rvc_rs1_eq_x0,
++                                                  rvc_csr_eq_0xc82, rvc_end };
+ static const rvc_constraint rvcc_frcsr[] = { rvc_rs1_eq_x0, rvc_csr_eq_0x003, rvc_end };
+ static const rvc_constraint rvcc_frrm[] = { rvc_rs1_eq_x0, rvc_csr_eq_0x002, rvc_end };
+ static const rvc_constraint rvcc_frflags[] = { rvc_rs1_eq_x0, rvc_csr_eq_0x001, rvc_end };
+@@ -1038,7 +1039,7 @@ const rv_opcode_data opcode_data[] = {
+     { "c.srai", rv_codec_cb_sh6, rv_fmt_rd_rs1_imm, NULL, rv_op_srai,
+       rv_op_srai, rv_op_srai, rvcd_imm_nz },
+     { "c.andi", rv_codec_cb_imm, rv_fmt_rd_rs1_imm, NULL, rv_op_andi,
+-      rv_op_andi, rv_op_andi, rvcd_imm_nz },
++      rv_op_andi, rv_op_andi },
+     { "c.sub", rv_codec_cs, rv_fmt_rd_rs1_rs2, NULL, rv_op_sub, rv_op_sub, rv_op_sub },
+     { "c.xor", rv_codec_cs, rv_fmt_rd_rs1_rs2, NULL, rv_op_xor, rv_op_xor, rv_op_xor },
+     { "c.or", rv_codec_cs, rv_fmt_rd_rs1_rs2, NULL, rv_op_or, rv_op_or, rv_op_or },
+-- 
+2.21.0
+
 
