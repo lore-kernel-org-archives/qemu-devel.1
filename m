@@ -6,57 +6,57 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53A70C06511
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 18:18:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CCA4C0650E
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 18:22:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2F8CD2053B
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 18:18:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F8CD2053B
+	by mail.kernel.org (Postfix) with ESMTPS id 35B2B2080C
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 18:22:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35B2B2080C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38340 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38360 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hijpT-0005M3-EZ
-	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 14:18:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56660)
+	id 1hijtO-0001C1-Vm
+	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 14:22:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56450)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <ehabkost@redhat.com>) id 1hijgI-0004kn-K2
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 14:08:35 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1hijfo-0004Mw-GX
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 14:08:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1hijgD-0000fz-Cp
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 14:08:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45662)
+ (envelope-from <ehabkost@redhat.com>) id 1hijfl-0000Ly-2K
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 14:08:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43066)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hijgB-0000dR-Dn
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 14:08:28 -0400
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hijfh-0000Hz-4k
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 14:07:59 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E02EF88307;
- Wed,  3 Jul 2019 18:08:24 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 45C23C05167B;
+ Wed,  3 Jul 2019 18:07:53 +0000 (UTC)
 Received: from localhost (ovpn-116-30.gru2.redhat.com [10.97.116.30])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 71B448351A;
- Wed,  3 Jul 2019 18:08:24 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C50478351A;
+ Wed,  3 Jul 2019 18:07:52 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>,
  Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
  Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
  Richard Henderson <rth@twiddle.net>
-Date: Wed,  3 Jul 2019 15:07:07 -0300
-Message-Id: <20190703180726.31267-25-ehabkost@redhat.com>
+Date: Wed,  3 Jul 2019 15:06:52 -0300
+Message-Id: <20190703180726.31267-10-ehabkost@redhat.com>
 In-Reply-To: <20190703180726.31267-1-ehabkost@redhat.com>
 References: <20190703180726.31267-1-ehabkost@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.28]); Wed, 03 Jul 2019 18:08:24 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.31]); Wed, 03 Jul 2019 18:07:53 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL v4 24/43] i386: make 'hv-spinlocks' a regular
- uint32 property
+Subject: [Qemu-devel] [PULL v4 09/43] hw: Replace global smp variables with
+ MachineState for all remaining archs
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,100 +68,159 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Roman Kagan <rkagan@virtuozzo.com>
+Cc: Like Xu <like.xu@linux.intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Roman Kagan <rkagan@virtuozzo.com>
+From: Like Xu <like.xu@linux.intel.com>
 
-X86CPU.hv-spinlocks is a uint32 property that has a special setter
-validating the value to be no less than 0xFFF and no bigger than
-UINT_MAX.  The latter check is redundant; as for the former, there
-appears to be no reason to prohibit the user from setting it to a lower
-value.
+The global smp variables in alpha/hppa/mips/openrisc/sparc*/xtensa codes
+are replaced with smp properties from MachineState.
 
-So nuke the dedicated getter/setter pair and convert 'hv-spinlocks' to a
-regular uint32 property.
+A local variable of the same name would be introduced in the declaration
+phase if it's used widely in the context OR replace it on the spot if it's
+only used once. No semantic changes.
 
-Signed-off-by: Roman Kagan <rkagan@virtuozzo.com>
-Message-Id: <20190618110659.14744-1-rkagan@virtuozzo.com>
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+Signed-off-by: Like Xu <like.xu@linux.intel.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Message-Id: <20190518205428.90532-10-like.xu@linux.intel.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- target/i386/cpu.c | 45 ++-------------------------------------------
- 1 file changed, 2 insertions(+), 43 deletions(-)
+ hw/alpha/dp264.c           | 1 +
+ hw/hppa/machine.c          | 2 ++
+ hw/mips/boston.c           | 2 +-
+ hw/mips/mips_malta.c       | 2 ++
+ hw/openrisc/openrisc_sim.c | 1 +
+ hw/sparc/sun4m.c           | 2 ++
+ hw/sparc64/sun4u.c         | 4 ++--
+ hw/xtensa/sim.c            | 2 +-
+ hw/xtensa/xtfpga.c         | 1 +
+ 9 files changed, 13 insertions(+), 4 deletions(-)
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 390f47adc5..8d5d34849c 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -3518,46 +3518,6 @@ static void x86_cpu_get_feature_words(Object *obj, Visitor *v,
-     visit_type_X86CPUFeatureWordInfoList(v, "feature-words", &list, errp);
- }
+diff --git a/hw/alpha/dp264.c b/hw/alpha/dp264.c
+index 0347eb897c..9dfb835013 100644
+--- a/hw/alpha/dp264.c
++++ b/hw/alpha/dp264.c
+@@ -63,6 +63,7 @@ static void clipper_init(MachineState *machine)
+     char *palcode_filename;
+     uint64_t palcode_entry, palcode_low, palcode_high;
+     uint64_t kernel_entry, kernel_low, kernel_high;
++    unsigned int smp_cpus = machine->smp.cpus;
  
--static void x86_get_hv_spinlocks(Object *obj, Visitor *v, const char *name,
--                                 void *opaque, Error **errp)
--{
--    X86CPU *cpu = X86_CPU(obj);
--    int64_t value = cpu->hyperv_spinlock_attempts;
--
--    visit_type_int(v, name, &value, errp);
--}
--
--static void x86_set_hv_spinlocks(Object *obj, Visitor *v, const char *name,
--                                 void *opaque, Error **errp)
--{
--    const int64_t min = 0xFFF;
--    const int64_t max = UINT_MAX;
--    X86CPU *cpu = X86_CPU(obj);
--    Error *err = NULL;
--    int64_t value;
--
--    visit_type_int(v, name, &value, &err);
--    if (err) {
--        error_propagate(errp, err);
--        return;
--    }
--
--    if (value < min || value > max) {
--        error_setg(errp, "Property %s.%s doesn't take value %" PRId64
--                   " (minimum: %" PRId64 ", maximum: %" PRId64 ")",
--                   object_get_typename(obj), name ? name : "null",
--                   value, min, max);
--        return;
--    }
--    cpu->hyperv_spinlock_attempts = value;
--}
--
--static const PropertyInfo qdev_prop_spinlocks = {
--    .name  = "int",
--    .get   = x86_get_hv_spinlocks,
--    .set   = x86_set_hv_spinlocks,
--};
--
- /* Convert all '_' in a feature string option name to '-', to make feature
-  * name conform to QOM property naming rule, which uses '-' instead of '_'.
-  */
-@@ -5682,8 +5642,6 @@ static void x86_cpu_initfn(Object *obj)
-     object_property_add(obj, "crash-information", "GuestPanicInformation",
-                         x86_cpu_get_crash_info_qom, NULL, NULL, NULL, NULL);
+     /* Create up to 4 cpus.  */
+     memset(cpus, 0, sizeof(cpus));
+diff --git a/hw/hppa/machine.c b/hw/hppa/machine.c
+index 416e67bab1..662838d83b 100644
+--- a/hw/hppa/machine.c
++++ b/hw/hppa/machine.c
+@@ -72,6 +72,7 @@ static void machine_hppa_init(MachineState *machine)
+     MemoryRegion *ram_region;
+     MemoryRegion *cpu_region;
+     long i;
++    unsigned int smp_cpus = machine->smp.cpus;
  
--    cpu->hyperv_spinlock_attempts = HYPERV_SPINLOCK_NEVER_RETRY;
--
-     for (w = 0; w < FEATURE_WORDS; w++) {
-         int bitnr;
+     ram_size = machine->ram_size;
  
-@@ -5880,7 +5838,8 @@ static Property x86_cpu_properties[] = {
-     DEFINE_PROP_INT32("node-id", X86CPU, node_id, CPU_UNSET_NUMA_NODE_ID),
-     DEFINE_PROP_BOOL("pmu", X86CPU, enable_pmu, false),
+@@ -242,6 +243,7 @@ static void machine_hppa_init(MachineState *machine)
  
--    { .name  = "hv-spinlocks", .info  = &qdev_prop_spinlocks },
-+    DEFINE_PROP_UINT32("hv-spinlocks", X86CPU, hyperv_spinlock_attempts,
-+                       HYPERV_SPINLOCK_NEVER_RETRY),
-     DEFINE_PROP_BIT64("hv-relaxed", X86CPU, hyperv_features,
-                       HYPERV_FEAT_RELAXED, 0),
-     DEFINE_PROP_BIT64("hv-vapic", X86CPU, hyperv_features,
+ static void hppa_machine_reset(MachineState *ms)
+ {
++    unsigned int smp_cpus = ms->smp.cpus;
+     int i;
+ 
+     qemu_devices_reset();
+diff --git a/hw/mips/boston.c b/hw/mips/boston.c
+index 749582e5aa..9eeccbea9a 100644
+--- a/hw/mips/boston.c
++++ b/hw/mips/boston.c
+@@ -458,7 +458,7 @@ static void boston_mach_init(MachineState *machine)
+                           sizeof(s->cps), TYPE_MIPS_CPS);
+     object_property_set_str(OBJECT(&s->cps), machine->cpu_type, "cpu-type",
+                             &err);
+-    object_property_set_int(OBJECT(&s->cps), smp_cpus, "num-vp", &err);
++    object_property_set_int(OBJECT(&s->cps), machine->smp.cpus, "num-vp", &err);
+     object_property_set_bool(OBJECT(&s->cps), true, "realized", &err);
+ 
+     if (err != NULL) {
+diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
+index 132127882d..20e019bf66 100644
+--- a/hw/mips/mips_malta.c
++++ b/hw/mips/mips_malta.c
+@@ -1095,6 +1095,8 @@ static int64_t load_kernel (void)
+ 
+ static void malta_mips_config(MIPSCPU *cpu)
+ {
++    MachineState *ms = MACHINE(qdev_get_machine());
++    unsigned int smp_cpus = ms->smp.cpus;
+     CPUMIPSState *env = &cpu->env;
+     CPUState *cs = CPU(cpu);
+ 
+diff --git a/hw/openrisc/openrisc_sim.c b/hw/openrisc/openrisc_sim.c
+index 87b9feaa96..b85f0df323 100644
+--- a/hw/openrisc/openrisc_sim.c
++++ b/hw/openrisc/openrisc_sim.c
+@@ -130,6 +130,7 @@ static void openrisc_sim_init(MachineState *machine)
+     qemu_irq *cpu_irqs[2];
+     qemu_irq serial_irq;
+     int n;
++    unsigned int smp_cpus = machine->smp.cpus;
+ 
+     for (n = 0; n < smp_cpus; n++) {
+         cpu = OPENRISC_CPU(cpu_create(machine->cpu_type));
+diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
+index 7e4f61fc3e..a8004a5fe3 100644
+--- a/hw/sparc/sun4m.c
++++ b/hw/sparc/sun4m.c
+@@ -871,6 +871,8 @@ static void sun4m_hw_init(const struct sun4m_hwdef *hwdef,
+     FWCfgState *fw_cfg;
+     DeviceState *dev;
+     SysBusDevice *s;
++    unsigned int smp_cpus = machine->smp.cpus;
++    unsigned int max_cpus = machine->smp.max_cpus;
+ 
+     /* init CPUs */
+     for(i = 0; i < smp_cpus; i++) {
+diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
+index 4230b17b87..5d87be811d 100644
+--- a/hw/sparc64/sun4u.c
++++ b/hw/sparc64/sun4u.c
+@@ -697,8 +697,8 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
+                                 &FW_CFG_IO(dev)->comb_iomem);
+ 
+     fw_cfg = FW_CFG(dev);
+-    fw_cfg_add_i16(fw_cfg, FW_CFG_NB_CPUS, (uint16_t)smp_cpus);
+-    fw_cfg_add_i16(fw_cfg, FW_CFG_MAX_CPUS, (uint16_t)max_cpus);
++    fw_cfg_add_i16(fw_cfg, FW_CFG_NB_CPUS, (uint16_t)machine->smp.cpus);
++    fw_cfg_add_i16(fw_cfg, FW_CFG_MAX_CPUS, (uint16_t)machine->smp.max_cpus);
+     fw_cfg_add_i64(fw_cfg, FW_CFG_RAM_SIZE, (uint64_t)ram_size);
+     fw_cfg_add_i16(fw_cfg, FW_CFG_MACHINE_ID, hwdef->machine_id);
+     fw_cfg_add_i64(fw_cfg, FW_CFG_KERNEL_ADDR, kernel_entry);
+diff --git a/hw/xtensa/sim.c b/hw/xtensa/sim.c
+index b6922c39d5..09165b6f4d 100644
+--- a/hw/xtensa/sim.c
++++ b/hw/xtensa/sim.c
+@@ -59,7 +59,7 @@ static void xtensa_sim_init(MachineState *machine)
+     const char *kernel_filename = machine->kernel_filename;
+     int n;
+ 
+-    for (n = 0; n < smp_cpus; n++) {
++    for (n = 0; n < machine->smp.cpus; n++) {
+         cpu = XTENSA_CPU(cpu_create(machine->cpu_type));
+         env = &cpu->env;
+ 
+diff --git a/hw/xtensa/xtfpga.c b/hw/xtensa/xtfpga.c
+index e05ef75a75..f7f3e11e93 100644
+--- a/hw/xtensa/xtfpga.c
++++ b/hw/xtensa/xtfpga.c
+@@ -238,6 +238,7 @@ static void xtfpga_init(const XtfpgaBoardDesc *board, MachineState *machine)
+     const unsigned system_io_size = 224 * MiB;
+     uint32_t freq = 10000000;
+     int n;
++    unsigned int smp_cpus = machine->smp.cpus;
+ 
+     if (smp_cpus > 1) {
+         mx_pic = xtensa_mx_pic_init(31);
 -- 
 2.18.0.rc1.1.g3f1ff2140
 
