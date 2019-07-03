@@ -2,59 +2,84 @@ Return-Path: <SRS0=mdN/=VA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.5 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CC4FC0650E
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 16:56:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E32B8C0650E
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 16:59:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 40D8221882
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 16:56:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 40D8221882
+	by mail.kernel.org (Postfix) with ESMTPS id C08F121882
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 16:59:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C08F121882
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37712 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37726 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hiiYA-0004qw-Jo
-	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 12:56:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36736)
+	id 1hiibR-0006Lc-TQ
+	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 12:59:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37094)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <berrange@redhat.com>) id 1hiiEd-0002yU-Cs
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 12:35:57 -0400
+ (envelope-from <philmd@redhat.com>) id 1hiiFg-0004HP-Iv
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 12:37:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1hiiEb-0007r0-Vr
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 12:35:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49432)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hiiEZ-0007oe-U9
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 12:35:52 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id EAA0A3082E5F;
- Wed,  3 Jul 2019 16:35:45 +0000 (UTC)
-Received: from dhcp-17-95.lcy.redhat.com (unknown [10.42.17.95])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 52091832B6;
- Wed,  3 Jul 2019 16:35:42 +0000 (UTC)
-From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Wed,  3 Jul 2019 17:35:41 +0100
-Message-Id: <20190703163541.19520-1-berrange@redhat.com>
+ (envelope-from <philmd@redhat.com>) id 1hiiFf-00005U-Ap
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 12:37:00 -0400
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:40137)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hiiFf-0008Vn-3g
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 12:36:59 -0400
+Received: by mail-wm1-f66.google.com with SMTP id v19so3092859wmj.5
+ for <qemu-devel@nongnu.org>; Wed, 03 Jul 2019 09:36:58 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=IJCRh2qzv9+keZ1crvSwDlqd84ocRYO15RyWnFmzArQ=;
+ b=I6+Hc7mbbAKcubc/t9cYhWRLtIF5l54L//fZodETqFkeM3G5EFapY/dQBLHjxxEJOf
+ 8P1ZIWXbwEj7h3N3k7nwYpcW5VPCRaHstW5XvGNWRNGHK1nlyCA9/1uEirXK73S7d3Il
+ 7cXKDTn3yZG/ff8y2FMz8cGR0o/HM90VbEEftrc91BtsrhYklyGukJOpZa31VKFYLkp7
+ K4LP0c1NSsSQbbsHW1/h8LyuonjC9rejPCJHZpZCOFn0H94yV5yyS0rTtz78Rx101Ozp
+ gwdA49hx11LmZphWR+LCL4ftnv2eqp57VB6Lmq8EpZKZP9Jl3U24aAfDswUNZ8BDfVmw
+ JUaQ==
+X-Gm-Message-State: APjAAAW3GE+EVeQ801cpPayin/v9QVXRkD1FJB2Q+wTFwJaC3SY66Uo7
+ 2zNF6nv966Qmc3otegSjK16mEg==
+X-Google-Smtp-Source: APXvYqzmQWiGSMjJP2p0ykdX57SLIRCmHfD/BuCfizGoRtbaYyam9my/49N171XXBItye3VSXKjvrw==
+X-Received: by 2002:a7b:c106:: with SMTP id w6mr9301206wmi.80.1562171817232;
+ Wed, 03 Jul 2019 09:36:57 -0700 (PDT)
+Received: from [192.168.1.38] (56.red-88-18-140.staticip.rima-tde.net.
+ [88.18.140.56])
+ by smtp.gmail.com with ESMTPSA id 15sm1817102wmk.34.2019.07.03.09.36.56
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Wed, 03 Jul 2019 09:36:56 -0700 (PDT)
+To: Stephen Checkoway <stephen.checkoway@oberlin.edu>
+References: <20190702005912.15905-1-philmd@redhat.com>
+ <20190702005912.15905-28-philmd@redhat.com>
+ <C6F80CB3-2D5D-4EE0-A085-DDA8AA334279@oberlin.edu>
+ <05be219a-4af9-f939-3abe-6137f5a7deba@redhat.com>
+ <3D8F6CD2-6C74-469C-83C1-3DF0A458B757@oberlin.edu>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <e8d65586-63b0-0c43-a043-efd4a59b3834@redhat.com>
+Date: Wed, 3 Jul 2019 18:36:55 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Wed, 03 Jul 2019 16:35:45 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <3D8F6CD2-6C74-469C-83C1-3DF0A458B757@oberlin.edu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2] doc: document that the monitor console is a
- privileged control interface
+ [fuzzy]
+X-Received-From: 209.85.128.66
+Subject: Re: [Qemu-devel] [PULL 27/27] hw/block/pflash_cfi02: Reduce I/O
+ accesses to 16-bit
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,116 +91,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Stefan Hajnoczi <stefanha@gmail.com>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, P J P <ppandit@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
+ Thomas Huth <thuth@redhat.com>,
+ "open list:Block layer core" <qemu-block@nongnu.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
+ Alistair Francis <alistair.francis@wdc.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-A supposed exploit of QEMU was recently announced as CVE-2019-12928
-claiming that the monitor console was insecure because the "migrate"
-command enabled arbitrary command execution for a remote attacker.
+On 7/3/19 6:20 PM, Stephen Checkoway wrote:
+>> On Jul 3, 2019, at 12:02, Philippe Mathieu-Daudé <philmd@redhat.com> wrote:
+>> On 7/3/19 5:52 PM, Stephen Checkoway wrote:
+>>>
+>>>
+>>>> On Jul 1, 2019, at 20:59, Philippe Mathieu-Daudé <philmd@redhat.com> wrote:
+>>>>
+>>>> Parallel NOR flashes are limited to 16-bit bus accesses.
+>>>
+>>> I don't think this is correct. The CFI spec defines an x32 interface for parallel NOR. CFI addresses 0x28 and 0x29 specify the interface and value 3 is x32 and value 5 is x16/x32.
+>>>
+>>> Here's an example of an x32 device <https://www.mouser.com/datasheet/2/100/002-00948_29CD032J_S29CD016J_S29CL032J_S29CL016J_3-1316792.pdf>.
+>>
+>> OK, I was not aware of these.
+>>
+>> QEMU never CFI-announced itself as x32 capable:
+>>
+>>    /* Flash device interface (8 & 16 bits) */
+>>    pfl->cfi_table[0x28] = 0x02;
+>>    pfl->cfi_table[0x29] = 0x00;
+>>
+>> So while the commit description is incorrect, the code is safe with the
+>> current device model.
+>>
+>> I am not comfortable keeping untested 32-bit mode.
+>> Were you using it?
+> 
+> I'm not using it. I did have some code to set these CFI values based on the parameters used to control the interleaving <https://github.com/stevecheckoway/qemu/commit/f9a79a6e18b2c7c5a05e344ff554a7d980a56042#diff-d33881bd0ef099e2f46ebd4797c653bcR599>.
+> 
+> In general, a better testing harness would be nice though.
 
-To be a security risk the user launching QEMU must have configured
-the monitor in a way that allows for other users to access it. The
-exploit report quoted use of the "tcp" character device backend for
-QMP.
+We can revert it if it helps you.
 
-This would indeed allow any network user to connect to QEMU and
-execute arbitrary commands, however, this is not a flaw in QEMU.
-It is the normal expected behaviour of the monitor console and the
-commands it supports. Given a monitor connection, there are many
-ways to access host filesystem content besides the migrate command.
+I plan to merge the rest of your work (interleaving) during the next
+release, if tested we can revert it there too.
 
-The reality is that the monitor console (whether QMP or HMP) is
-considered a privileged interface to QEMU and as such must only
-be made available to trusted users. IOW, making it available with
-no authentication over TCP is simply a, very serious, user
-configuration error not a security flaw in QEMU itself.
+My goal with the pflash devices is to have a white list of real devices
+with proper CFI table, and boards/machines can only use a whitelisted
+correctly behaving device.
 
-The one thing this bogus security report highlights though is that
-we have not clearly documented the security implications around the
-use of the monitor. Add a few paragraphs of text to the security
-docs explaining why the monitor is a privileged interface and making
-a recommendation to only use the UNIX socket character device backend.
+This way we won't have to deal with broken configurations.
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
----
-
-Changed in v2:
-
- - Addressed misc typos (Eric / Philippe)
-
- docs/security.texi | 36 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 36 insertions(+)
-
-diff --git a/docs/security.texi b/docs/security.texi
-index 927764f1e6..3f5d5e7adc 100644
---- a/docs/security.texi
-+++ b/docs/security.texi
-@@ -129,3 +129,39 @@ those resources that were granted to it.
- system calls that are not needed by QEMU, thereby reducing the host kern=
-el
- attack surface.
- @end itemize
-+
-+@section Sensitive configurations
-+
-+There are aspects of QEMU that can have non-obvious security implication=
-s
-+which users & management applications must be aware of.
-+
-+@subsection Monitor console (QMP and HMP)
-+
-+The monitor console (whether used with QMP or HMP) provides an RPC inter=
-face
-+to dynamically control many aspects of QEMU's runtime operation. Many of=
- the
-+commands exposed will instruct QEMU to access content on the host filesy=
-system
-+and/or trigger spawning of external processes.
-+
-+For example, the @code{migrate} command allows for the spawning of arbit=
-rary
-+processes for the purpose of tunnelling the migration data stream. The
-+@code{blockdev-add} command instructs QEMU to open arbitrary files, expo=
-sing
-+their content to the guest as a virtual disk.
-+
-+Unless QEMU is otherwise confined using technologies such as SELinux, Ap=
-pArmor,
-+or Linux namespaces, the monitor console should be considered to have pr=
-ivileges
-+equivalent to those of the user account QEMU is running under.
-+
-+It is further important to consider the security of the character device=
- backend
-+over which the monitor console is exposed. It needs to have protection a=
-gainst
-+malicious third parties which might try to make unauthorized connections=
-, or
-+perform man-in-the-middle attacks. Many of the character device backends=
- do not
-+satisfy this requirement and so must not be used for the monitor console=
-.
-+
-+The general recommendation is that the monitor console should be exposed=
- over
-+a UNIX domain socket backend to the local host only. Use of the TCP base=
-d
-+character device backend is inappropriate unless configured to use both =
-TLS
-+encryption and authorization control policy on client connections.
-+
-+In summary, the monitor console is considered a privileged control inter=
-face to
-+QEMU and as such should only be made accessible to a trusted management
-+application or user.
---=20
-2.21.0
-
+>>>> Remove the 32-bit dead code.
+>>>>
+>>>> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+>>>> Message-Id: <20190627202719.17739-29-philmd@redhat.com>
+>>>> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+>>>> ---
+>>>> hw/block/pflash_cfi02.c | 5 +----
+>>>> 1 file changed, 1 insertion(+), 4 deletions(-)
+>>>>
+>>>> diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
+>>>> index 83084b9d72..5392290c72 100644
+>>>> --- a/hw/block/pflash_cfi02.c
+>>>> +++ b/hw/block/pflash_cfi02.c
+>>>> @@ -317,8 +317,6 @@ static uint64_t pflash_read(void *opaque, hwaddr offset, unsigned int width)
+>>>>    boff = offset & 0xFF;
+>>>>    if (pfl->width == 2) {
+>>>>        boff = boff >> 1;
+>>>> -    } else if (pfl->width == 4) {
+>>>> -        boff = boff >> 2;
+>>>>    }
+>>>>    switch (pfl->cmd) {
+>>>>    default:
+>>>> @@ -449,8 +447,6 @@ static void pflash_write(void *opaque, hwaddr offset, uint64_t value,
+>>>>    boff = offset;
+>>>>    if (pfl->width == 2) {
+>>>>        boff = boff >> 1;
+>>>> -    } else if (pfl->width == 4) {
+>>>> -        boff = boff >> 2;
+>>>>    }
+>>>>    /* Only the least-significant 11 bits are used in most cases. */
+>>>>    boff &= 0x7FF;
+>>>> @@ -710,6 +706,7 @@ static void pflash_write(void *opaque, hwaddr offset, uint64_t value,
+>>>> static const MemoryRegionOps pflash_cfi02_ops = {
+>>>>    .read = pflash_read,
+>>>>    .write = pflash_write,
+>>>> +    .impl.max_access_size = 2,
+>>>>    .valid.min_access_size = 1,
+>>>>    .valid.max_access_size = 4,
+>>>>    .endianness = DEVICE_NATIVE_ENDIAN,
+>>>> -- 
+>>>> 2.20.1
+> 
 
