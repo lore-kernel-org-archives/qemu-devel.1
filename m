@@ -2,93 +2,59 @@ Return-Path: <SRS0=mdN/=VA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABE4EC0650E
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 16:30:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CE1BC06513
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 16:30:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 77DA82187F
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 16:30:31 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="T6eIJ125"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 77DA82187F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 08E4F218A6
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 16:30:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08E4F218A6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37438 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37440 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hii9O-0006SS-L7
-	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 12:30:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34247)
+	id 1hii9R-0006YI-9p
+	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 12:30:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55166)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1hii7E-0004e2-GU
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 12:28:17 -0400
+ (envelope-from <mlevitsk@redhat.com>) id 1hihgR-0007fy-9U
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 12:00:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1hii7D-0003Fk-Ju
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 12:28:16 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:35120)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1hii7D-0003FQ-Ap
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 12:28:15 -0400
-Received: by mail-wr1-x441.google.com with SMTP id c27so3564462wrb.2
- for <qemu-devel@nongnu.org>; Wed, 03 Jul 2019 09:28:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=NMSVpAVvmecmbttQ3iXVWbkVTXIlxDa/eRG3CDeCvs0=;
- b=T6eIJ1252fD2W0N6r1d3uLftqkJyWFxDeIFCENZCpbgjOH8XYE4S8FN9W7MIvckDBa
- gL0kOHaCDeV+rpY/rsS/A996bLK6tvZohyolC1CE7GHrmtxYUS3w8CaFG3vg3vbN5Dht
- frSeMSYHl/u7qljafdeWjWyufOdHjIsZ3MSoeXkCTnZcf6j+fFqQ5+HcEG3Vst6OU+vR
- 42AXwCfGmYtxHm0F8zF8b7luamj8Ph+J1+CMlK5dorZSnEC02goNKJN4Rwnk5FlEeB5L
- qwJML7N4lCty43Dva+SGA3FmFVM/r27HHWhkKYPVM3+IrxSg9CedvFVpw4xKGFgM7NtJ
- Jx+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=NMSVpAVvmecmbttQ3iXVWbkVTXIlxDa/eRG3CDeCvs0=;
- b=lzzjq7ys+gQcEi0aYJr424+tsm/RaooZ8EX5/o1XnvSmMXVpbWROfNKKjhKWZ+0Qaw
- l32o8hrkLYc7HEHRxXzaYEiqEtAVn+egZV3rURDNkzfj2k0gPrj7erWZfifaZXiP1TfK
- m6sL1c9Q2BORr8t+oa/D5CfdKtnfq/UXrAqLXj8PYP3A213jDHzyLlidrWNSSCmmMChZ
- QCjPNtESPoY3u1KaDH6ib7FwykrzD0qfE8MGZMxila9h4Gd3Bii2fadrV4QPsy0OJ/0Q
- NREFBveW5STi3o5GLeNuRS9P0Dmzj8JXD4j2XNtWMCNNMpuKM6+ua00C5n4gnSb+NuM5
- AA3w==
-X-Gm-Message-State: APjAAAVgbsfyvyijP6o25YnqjGebnnr/vQS3xKcr3bXh1uRGGM3QYbUD
- I1BybzyetsOasIkcE6Fy0ph/GA==
-X-Google-Smtp-Source: APXvYqwLuYNFj/5+ZL+cGbt1JR1uregIQbOuvEUmGSDoW1xn/cJDTS8oyJu5jv2ufkGEvQ67LhTgEA==
-X-Received: by 2002:adf:ce03:: with SMTP id p3mr29945317wrn.94.1562171293901; 
- Wed, 03 Jul 2019 09:28:13 -0700 (PDT)
-Received: from [192.168.3.43] (93-34-153-63.ip50.fastwebnet.it. [93.34.153.63])
- by smtp.gmail.com with ESMTPSA id x6sm3624372wru.0.2019.07.03.09.28.13
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 03 Jul 2019 09:28:13 -0700 (PDT)
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org
-References: <20190703155244.28166-1-alex.bennee@linaro.org>
- <20190703155244.28166-3-alex.bennee@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <0f413085-d9b1-e77b-53a1-bed5ed10de33@linaro.org>
-Date: Wed, 3 Jul 2019 18:28:11 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.1
-MIME-Version: 1.0
-In-Reply-To: <20190703155244.28166-3-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::441
-Subject: Re: [Qemu-devel] [PATCH v1 2/4] target/arm: handle A-profile T32
- semihosting at translate time
+ (envelope-from <mlevitsk@redhat.com>) id 1hihgP-0002Xd-Va
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 12:00:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35848)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mlevitsk@redhat.com>)
+ id 1hihgM-0002UG-Ff; Wed, 03 Jul 2019 12:00:30 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 6141C81DF1;
+ Wed,  3 Jul 2019 16:00:29 +0000 (UTC)
+Received: from maximlenovopc.usersys.redhat.com (dhcp-4-67.tlv.redhat.com
+ [10.35.4.67])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D5DB73781;
+ Wed,  3 Jul 2019 16:00:21 +0000 (UTC)
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Wed,  3 Jul 2019 18:59:41 +0300
+Message-Id: <20190703155944.9637-4-mlevitsk@redhat.com>
+In-Reply-To: <20190703155944.9637-1-mlevitsk@redhat.com>
+References: <20190703155944.9637-1-mlevitsk@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.25]); Wed, 03 Jul 2019 16:00:29 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH v3 3/6] block/nvme: support larger that 512
+ bytes sector devices
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,23 +66,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Maxim Levitsky <mlevitsk@redhat.com>,
+ John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/3/19 5:52 PM, Alex Bennée wrote:
-> As for the other semihosting calls we can resolve this at translate
-> time.
-> 
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> ---
->  target/arm/translate.c | 24 ++++++++++++++++++++----
->  1 file changed, 20 insertions(+), 4 deletions(-)
+Currently the driver hardcodes the sector size to 512,
+and doesn't check the underlying device. Fix that.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Also fail if underlying nvme device is formatted with metadata
+as this needs special support.
 
+Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+---
+ block/nvme.c | 45 ++++++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 40 insertions(+), 5 deletions(-)
 
-r~
+diff --git a/block/nvme.c b/block/nvme.c
+index 52798081b2..1f0d09349f 100644
+--- a/block/nvme.c
++++ b/block/nvme.c
+@@ -102,8 +102,11 @@ typedef struct {
+     size_t doorbell_scale;
+     bool write_cache_supported;
+     EventNotifier irq_notifier;
++
+     uint64_t nsze; /* Namespace size reported by identify command */
+     int nsid;      /* The namespace id to read/write data. */
++    size_t blkshift;
++
+     uint64_t max_transfer;
+     bool plugged;
+ 
+@@ -415,8 +418,9 @@ static void nvme_identify(BlockDriverState *bs, int namespace, Error **errp)
+     BDRVNVMeState *s = bs->opaque;
+     NvmeIdCtrl *idctrl;
+     NvmeIdNs *idns;
++    NvmeLBAF *lbaf;
+     uint8_t *resp;
+-    int r;
++    int r, hwsect_size;
+     uint64_t iova;
+     NvmeCmd cmd = {
+         .opcode = NVME_ADM_CMD_IDENTIFY,
+@@ -463,7 +467,22 @@ static void nvme_identify(BlockDriverState *bs, int namespace, Error **errp)
+     }
+ 
+     s->nsze = le64_to_cpu(idns->nsze);
++    lbaf = &idns->lbaf[NVME_ID_NS_FLBAS_INDEX(idns->flbas)];
++
++    if (lbaf->ms) {
++        error_setg(errp, "Namespaces with metadata are not yet supported");
++        goto out;
++    }
++
++    hwsect_size = 1 << lbaf->ds;
++
++    if (hwsect_size < BDRV_SECTOR_BITS || hwsect_size > s->page_size) {
++        error_setg(errp, "Namespace has unsupported block size (%d)",
++                hwsect_size);
++        goto out;
++    }
+ 
++    s->blkshift = lbaf->ds;
+ out:
+     qemu_vfio_dma_unmap(s->vfio, resp);
+     qemu_vfree(resp);
+@@ -782,8 +801,22 @@ fail:
+ static int64_t nvme_getlength(BlockDriverState *bs)
+ {
+     BDRVNVMeState *s = bs->opaque;
++    return s->nsze << s->blkshift;
++}
+ 
+-    return s->nsze << BDRV_SECTOR_BITS;
++static int64_t nvme_get_blocksize(BlockDriverState *bs)
++{
++    BDRVNVMeState *s = bs->opaque;
++    assert(s->blkshift >= 9);
++    return 1 << s->blkshift;
++}
++
++static int nvme_probe_blocksizes(BlockDriverState *bs, BlockSizes *bsz)
++{
++    int64_t blocksize = nvme_get_blocksize(bs);
++    bsz->phys = blocksize;
++    bsz->log = blocksize;
++    return 0;
+ }
+ 
+ /* Called with s->dma_map_lock */
+@@ -914,13 +947,14 @@ static coroutine_fn int nvme_co_prw_aligned(BlockDriverState *bs,
+     BDRVNVMeState *s = bs->opaque;
+     NVMeQueuePair *ioq = s->queues[1];
+     NVMeRequest *req;
+-    uint32_t cdw12 = (((bytes >> BDRV_SECTOR_BITS) - 1) & 0xFFFF) |
++
++    uint32_t cdw12 = (((bytes >> s->blkshift) - 1) & 0xFFFF) |
+                        (flags & BDRV_REQ_FUA ? 1 << 30 : 0);
+     NvmeCmd cmd = {
+         .opcode = is_write ? NVME_CMD_WRITE : NVME_CMD_READ,
+         .nsid = cpu_to_le32(s->nsid),
+-        .cdw10 = cpu_to_le32((offset >> BDRV_SECTOR_BITS) & 0xFFFFFFFF),
+-        .cdw11 = cpu_to_le32(((offset >> BDRV_SECTOR_BITS) >> 32) & 0xFFFFFFFF),
++        .cdw10 = cpu_to_le32((offset >> s->blkshift) & 0xFFFFFFFF),
++        .cdw11 = cpu_to_le32(((offset >> s->blkshift) >> 32) & 0xFFFFFFFF),
+         .cdw12 = cpu_to_le32(cdw12),
+     };
+     NVMeCoData data = {
+@@ -1151,6 +1185,7 @@ static BlockDriver bdrv_nvme = {
+     .bdrv_file_open           = nvme_file_open,
+     .bdrv_close               = nvme_close,
+     .bdrv_getlength           = nvme_getlength,
++    .bdrv_probe_blocksizes    = nvme_probe_blocksizes,
+ 
+     .bdrv_co_preadv           = nvme_co_preadv,
+     .bdrv_co_pwritev          = nvme_co_pwritev,
+-- 
+2.17.2
 
 
