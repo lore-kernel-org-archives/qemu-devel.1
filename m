@@ -2,59 +2,79 @@ Return-Path: <SRS0=mdN/=VA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D43E1C0650E
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 16:37:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44AD7C0650E
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 16:38:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AE1DE2189E
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 16:37:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE1DE2189E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 100F42189E
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 16:38:33 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="X7drvBON"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 100F42189E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37540 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37562 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hiiG1-0004gH-Jv
-	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 12:37:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55222)
+	id 1hiiHA-0005jE-BS
+	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 12:38:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60721)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mlevitsk@redhat.com>) id 1hihgb-0007rc-IF
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 12:00:47 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hii16-0006XF-3h
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 12:21:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlevitsk@redhat.com>) id 1hihgZ-0002bA-JA
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 12:00:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42324)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mlevitsk@redhat.com>)
- id 1hihgT-0002Z6-CA; Wed, 03 Jul 2019 12:00:37 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A97BB21BAA;
- Wed,  3 Jul 2019 16:00:31 +0000 (UTC)
-Received: from maximlenovopc.usersys.redhat.com (dhcp-4-67.tlv.redhat.com
- [10.35.4.67])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B59BB183B2;
- Wed,  3 Jul 2019 16:00:29 +0000 (UTC)
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Wed,  3 Jul 2019 18:59:42 +0300
-Message-Id: <20190703155944.9637-5-mlevitsk@redhat.com>
-In-Reply-To: <20190703155944.9637-1-mlevitsk@redhat.com>
-References: <20190703155944.9637-1-mlevitsk@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.30]); Wed, 03 Jul 2019 16:00:31 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v3 4/6] block/nvme: add support for image
- creation
+ (envelope-from <peter.maydell@linaro.org>) id 1hii0w-0008Kz-Km
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 12:21:50 -0400
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:43187)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hii0r-0008GL-AO
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 12:21:43 -0400
+Received: by mail-oi1-x241.google.com with SMTP id w79so2555032oif.10
+ for <qemu-devel@nongnu.org>; Wed, 03 Jul 2019 09:21:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=JTkMCE+1bIWB/0Z/U0bRa72NBPQAxVasXUCfH3PLeXY=;
+ b=X7drvBONTUTucuka9XX3VamKPHYyERqofusUtejXNYYBxM84HP9/QZyczm7KZ6sOJ7
+ JicJaZltRXiWRh0L1HrzrKRokweS6oSgQI4V8OEnxDhLjn8MNP1kZGAMUyAicuDm0ZFF
+ 0PEQrlOf9Kbs3xqSPDJnkYaAQZvcpFU/V5wt+zlU1/BPoD4Ij3O6nKBVwMJ1djSSofcZ
+ eEbeeqgfcyI80INYIgsFhrtau3Cb/HK+Vj96Q0emRtNxhPMHNLrj+Rp/v1M68X/DullW
+ 6e37lu/7QqhapI99nr7yz4bXHI4Cdm2qQggUfPxKSWtJpWyFfdiRyyTAf08XvSbZT0qY
+ XP9g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=JTkMCE+1bIWB/0Z/U0bRa72NBPQAxVasXUCfH3PLeXY=;
+ b=tAXJgfUbsGWEGAlqGJHMCqqdoHS8aQ49RGqbfv3WcV0V6aqqnpeyU+KXHsvU2JrBeS
+ X0gTB7L/NFJ1enqrQhp01OojHtFvT2Qz5S567R881ZMXifbXEYh5GJuC5i7hlkFZ3r4l
+ 1x2+cWvrfVfXaAyo8hgpWp4gDX1TdD4CrVUoAF39xsfJe+LATjghKB7urg48CVRVU2D/
+ 2rTzZ7RaKIpQLuXO2aLl9G8hTI25ai96VZPEheI6G2dZd9YojYhOXrOQJTjtcFQjE5Yi
+ TpwH0u9pi1BqdPdcq1A+QZuJbv9897r8pNRqEBQb4IzlEwSFxPU5x1m+mm3dLxgJIyjk
+ mwEA==
+X-Gm-Message-State: APjAAAUOr6UynLBrvXnUkawghU08Py+O2/PjVyF3rpTQK14IY/uF1Kex
+ YViGeQ26qymBNP7yYAXyZwmkiLAClcc4yIuqAZrbeg==
+X-Google-Smtp-Source: APXvYqxdtpmn06eG98u0Ll2aGq5N5AmhKyDxk9mW9OX5/7E2YcMEA9zHfIvu/qoGFdiByn88ticc2X/CuDzZabINWG0=
+X-Received: by 2002:aca:5cd7:: with SMTP id q206mr6787428oib.146.1562170895186; 
+ Wed, 03 Jul 2019 09:21:35 -0700 (PDT)
+MIME-Version: 1.0
+References: <20190702150542.12008-1-richard.henderson@linaro.org>
+In-Reply-To: <20190702150542.12008-1-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 3 Jul 2019 17:21:24 +0100
+Message-ID: <CAFEAcA8SH6OfWQ=3okD23pdpvp0LuG4H=2P0xR3b19UcZoHfpQ@mail.gmail.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::241
+Subject: Re: [Qemu-devel] [PULL 0/3] tcg patch queue
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,170 +86,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Maxim Levitsky <mlevitsk@redhat.com>,
- John Snow <jsnow@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Tesed on a nvme device like that:
+On Tue, 2 Jul 2019 at 16:05, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> The following changes since commit c4e42a9c2b714de5cddabffe46c7789fcff49c30:
+>
+>   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20190701' into staging (2019-07-02 12:58:32 +0100)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/rth7680/qemu.git tags/pull-tcg-20190702
+>
+> for you to fetch changes up to 0c3c385c62759e1427f88c5fc5b0d9741a456807:
+>
+>   tcg: Fix expansion of INDEX_op_not_vec (2019-07-02 15:59:42 +0200)
+>
+> ----------------------------------------------------------------
+> Queued tcg bug fixes
+>
+> ----------------------------------------------------------------
+> Alistair Francis (1):
+>       tcg/riscv: Fix RISC-VH host build failure
+>
+> Richard Henderson (2):
+>       tcg: Fix mmap lock assert on translation failure
+>       tcg: Fix expansion of INDEX_op_not_vec
 
-# create preallocated qcow2 image
-$ qemu-img create -f qcow2 nvme://0000:06:00.0/1 10G -o preallocation=metadata
-Formatting 'nvme://0000:06:00.0/1', fmt=qcow2 size=10737418240 cluster_size=65536 preallocation=metadata lazy_refcounts=off refcount_bits=16
+Hi. This seems to cause an assertion failure running an
+x86-64 linux-user guest:
 
-# create an empty qcow2 image
-$ qemu-img create -f qcow2 nvme://0000:06:00.0/1 10G -o preallocation=off
-Formatting 'nvme://0000:06:00.0/1', fmt=qcow2 size=10737418240 cluster_size=65536 preallocation=off lazy_refcounts=off refcount_bits=16
+/home/petmay01/linaro/qemu-for-merges/build/all-linux-static/x86_64-linux-user/qemu-x86_64
+-L ./gnemul/qemu-x86_64 x86_64/ls -l dummyfile
+qemu-x86_64: /home/petmay01/linaro/qemu-for-merges/accel/tcg/translate-all.c:2562:
+page_check_range: Assertion `start < ((target_ulong)1 <<
+L1_MAP_ADDR_SPACE_BITS)' failed.
+qemu-x86_64: /home/petmay01/linaro/qemu-for-merges/accel/tcg/cpu-exec.c:703:
+cpu_exec: Assertion `!have_mmap_lock()' failed.
+Makefile:6: recipe for target 'test' failed
 
-Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
----
- block/nvme.c | 108 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 108 insertions(+)
-
-diff --git a/block/nvme.c b/block/nvme.c
-index 1f0d09349f..152d27b07f 100644
---- a/block/nvme.c
-+++ b/block/nvme.c
-@@ -1148,6 +1148,90 @@ static void nvme_aio_unplug(BlockDriverState *bs)
-     }
- }
- 
-+static int coroutine_fn nvme_co_create_opts(const char *filename,
-+        QemuOpts *opts, Error **errp)
-+{
-+
-+    int64_t total_size = 0;
-+    char *buf = NULL;
-+    BlockDriverState *bs;
-+    QEMUIOVector local_qiov;
-+    int ret = 0;
-+    int64_t blocksize;
-+    QDict *options;
-+    Error *local_err = NULL;
-+    PreallocMode prealloc;
-+
-+    total_size = ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0),
-+                              BDRV_SECTOR_SIZE);
-+
-+    buf = qemu_opt_get_del(opts, BLOCK_OPT_PREALLOC);
-+    prealloc = qapi_enum_parse(&PreallocMode_lookup, buf,
-+                                  PREALLOC_MODE_OFF, &local_err);
-+    g_free(buf);
-+
-+    if (prealloc != PREALLOC_MODE_OFF) {
-+        error_setg(errp, "Only prealloc=off is supported");
-+        return -EINVAL;
-+    }
-+
-+    options = qdict_new();
-+    qdict_put_str(options, "driver", "nvme");
-+    nvme_parse_filename(filename, options, &local_err);
-+
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        qobject_unref(options);
-+        return -EINVAL;
-+    }
-+
-+    bs = bdrv_open(NULL, NULL, options,
-+                       BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_PROTOCOL, errp);
-+    if (bs == NULL) {
-+        return -EIO;
-+    }
-+
-+    if (nvme_getlength(bs) < total_size) {
-+        error_setg(errp, "Device is too small");
-+        bdrv_unref(bs);
-+        qobject_unref(options);
-+        return -ENOSPC;
-+    }
-+
-+    blocksize = nvme_get_blocksize(bs);
-+    buf = qemu_try_blockalign0(bs, blocksize);
-+    qemu_iovec_init(&local_qiov, 1);
-+    qemu_iovec_add(&local_qiov, buf, blocksize);
-+
-+    ret = nvme_co_prw_aligned(bs, 0, blocksize,
-+            &local_qiov, true, BDRV_REQ_FUA);
-+    if (ret) {
-+        error_setg(errp, "Write error to sector 0");
-+    }
-+
-+    qemu_vfree(buf);
-+    bdrv_unref(bs);
-+    return ret;
-+}
-+
-+
-+static int coroutine_fn nvme_co_truncate(BlockDriverState *bs, int64_t offset,
-+                                        PreallocMode prealloc, Error **errp)
-+{
-+    if (prealloc != PREALLOC_MODE_OFF) {
-+        error_setg(errp, "Preallocation mode '%s' unsupported nvme devices",
-+                PreallocMode_str(prealloc));
-+        return -ENOTSUP;
-+    }
-+
-+    if (offset > nvme_getlength(bs)) {
-+        error_setg(errp, "Cannot grow nvme devices");
-+        return -EINVAL;
-+    }
-+
-+    return 0;
-+}
-+
- static void nvme_register_buf(BlockDriverState *bs, void *host, size_t size)
- {
-     int ret;
-@@ -1169,6 +1253,7 @@ static void nvme_unregister_buf(BlockDriverState *bs, void *host)
-     qemu_vfio_dma_unmap(s->vfio, host);
- }
- 
-+
- static const char *const nvme_strong_runtime_opts[] = {
-     NVME_BLOCK_OPT_DEVICE,
-     NVME_BLOCK_OPT_NAMESPACE,
-@@ -1176,6 +1261,25 @@ static const char *const nvme_strong_runtime_opts[] = {
-     NULL
- };
- 
-+
-+static QemuOptsList nvme_create_opts = {
-+    .name = "nvme-create-opts",
-+    .head = QTAILQ_HEAD_INITIALIZER(nvme_create_opts.head),
-+    .desc = {
-+        {
-+            .name = BLOCK_OPT_SIZE,
-+            .type = QEMU_OPT_SIZE,
-+            .help = "Virtual disk size"
-+        },
-+        {
-+            .name = BLOCK_OPT_PREALLOC,
-+            .type = QEMU_OPT_STRING,
-+            .help = "Preallocation mode (allowed values: off)",
-+        },
-+        { /* end of list */ }
-+    }
-+};
-+
- static BlockDriver bdrv_nvme = {
-     .format_name              = "nvme",
-     .protocol_name            = "nvme",
-@@ -1187,6 +1291,10 @@ static BlockDriver bdrv_nvme = {
-     .bdrv_getlength           = nvme_getlength,
-     .bdrv_probe_blocksizes    = nvme_probe_blocksizes,
- 
-+    .bdrv_co_create_opts      = nvme_co_create_opts,
-+    .bdrv_co_truncate         = nvme_co_truncate,
-+    .create_opts              = &nvme_create_opts,
-+
-     .bdrv_co_preadv           = nvme_co_preadv,
-     .bdrv_co_pwritev          = nvme_co_pwritev,
-     .bdrv_co_flush_to_disk    = nvme_co_flush,
--- 
-2.17.2
-
+thanks
+-- PMM
 
