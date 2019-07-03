@@ -2,81 +2,64 @@ Return-Path: <SRS0=mdN/=VA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 734D1C0650E
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 18:05:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1B49C0650E
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 18:07:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 452CA20659
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 18:05:50 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=fintelia.io header.i=@fintelia.io header.b="7PV+YFqS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 452CA20659
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=fintelia.io
+	by mail.kernel.org (Postfix) with ESMTPS id A3A2F2184C
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 18:07:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A3A2F2184C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38246 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38264 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hijdd-00028f-Ay
-	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 14:05:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55447)
+	id 1hijeu-0003b8-RV
+	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 14:07:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55981)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bounce+cf442f.9b4e76-qemu-devel=nongnu.org@fintelia.io>)
- id 1hijbW-0001Fo-PS
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 14:03:40 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1hije2-0002mx-JI
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 14:06:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounce+cf442f.9b4e76-qemu-devel=nongnu.org@fintelia.io>)
- id 1hijbV-0005pb-8H
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 14:03:38 -0400
-Received: from rs224.mailgun.us ([209.61.151.224]:61941)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71)
- (envelope-from <bounce+cf442f.9b4e76-qemu-devel=nongnu.org@fintelia.io>)
- id 1hijbT-0005lz-Cs
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 14:03:36 -0400
-DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=fintelia.io; q=dns/txt;
- s=pic; 
- t=1562177012; h=Content-Type: Cc: To: Subject: Message-ID: Date: From:
- In-Reply-To: References: MIME-Version: Sender;
- bh=cFsveXpt62Kbr2tJ04ztChy5Zigq6AHRo8hGSNeg8p4=;
- b=7PV+YFqSdg0FnA5FdHFZyGlU8IApcFNK+DFFQyvgPY3SfQtvqjN+KQmVij+bHpRtZyspb8DD
- +ujE8G1HO9BVAW62/5Z7iWpZlFFgc3UbGEud8jd5lakgDLECUxJANIqHzFEC/bkc73TvSCHO
- 0xQBh0gaLS48mARhM6/oH7azSAlV94lYJWbsXe6qjRXCEHbcxdCHZCqBoEOzs2hR2YTAi2Kn
- kwjhRoz2cP8Q7/SFIeTOgjBwXvFpdqfNYe6IHEXHEytZU1TzTKlIsULLiA8poZ5Tv4ZYWETM
- R+Y3QAZSbaJndSTB4nKWrpWHZr2L/tc6hZSb19gCFhZLr+vddwvwfA==
-X-Mailgun-Sending-Ip: 209.61.151.224
-X-Mailgun-Sid: WyJlMGM5NSIsICJxZW11LWRldmVsQG5vbmdudS5vcmciLCAiOWI0ZTc2Il0=
-Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com
- [209.85.167.50])
- by mxa.mailgun.org with ESMTP id 5d1cedf3.7fc2f111b030-smtp-out-n02;
- Wed, 03 Jul 2019 18:03:31 -0000 (UTC)
-Received: by mail-lf1-f50.google.com with SMTP id z15so2392517lfh.13;
- Wed, 03 Jul 2019 11:03:31 -0700 (PDT)
-X-Gm-Message-State: APjAAAUNo8WnduhiZa61H6vJ65JHFWDaNauAJurHs0s/9EJajyQkmGt7
- 4r1rqJQGun0DKs4xQaaf5nmgFODwzqXShxBbC0A=
-X-Google-Smtp-Source: APXvYqyfkgQCPmcR1HsXdOf3vkEZa5etH7twRV+o969RC9jqcMtEoMisHD18e7OZIoxF79/wPFUY0d7yrmPLsnxsQcM=
-X-Received: by 2002:ac2:518d:: with SMTP id u13mr18744065lfi.40.1562177010158; 
- Wed, 03 Jul 2019 11:03:30 -0700 (PDT)
+ (envelope-from <ehabkost@redhat.com>) id 1hije0-0007dS-VR
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 14:06:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47746)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hije0-0007bm-N8
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 14:06:12 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id EA3D881F0E;
+ Wed,  3 Jul 2019 18:06:09 +0000 (UTC)
+Received: from localhost (ovpn-116-30.gru2.redhat.com [10.97.116.30])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6815B8E641;
+ Wed,  3 Jul 2019 18:06:09 +0000 (UTC)
+Date: Wed, 3 Jul 2019 15:06:07 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Xiaoyao Li <xiaoyao.li@intel.com>
+Message-ID: <20190703180607.GW5198@habkost.net>
+References: <20190702153535.9851-1-ehabkost@redhat.com>
+ <20190702153535.9851-41-ehabkost@redhat.com>
+ <3ac827c6-6a54-2755-3189-156cae3d4a89@intel.com>
 MIME-Version: 1.0
-References: <20190701154617.22908-1-jonathan@fintelia.io>
- <CAKmqyKOsMO7SvvDfiqhywxb=oaqo=NDjw==reVpU9sLh+3dGuw@mail.gmail.com>
- <CAEUhbmXBnu_Fet99AjQj6XZ10m045N8kY7d8VNy28ktmFBsrQQ@mail.gmail.com>
-In-Reply-To: <CAEUhbmXBnu_Fet99AjQj6XZ10m045N8kY7d8VNy28ktmFBsrQQ@mail.gmail.com>
-From: Jonathan Behrens <jonathan@fintelia.io>
-Date: Wed, 3 Jul 2019 14:02:56 -0400
-X-Gmail-Original-Message-ID: <CANnJOVGXcTkH2_2cRqAv0CnZx4xHQ_npEjW-au-FPxe_cU0=5Q@mail.gmail.com>
-Message-ID: <CANnJOVGXcTkH2_2cRqAv0CnZx4xHQ_npEjW-au-FPxe_cU0=5Q@mail.gmail.com>
-To: Bin Meng <bmeng.cn@gmail.com>
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <3ac827c6-6a54-2755-3189-156cae3d4a89@intel.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.27]); Wed, 03 Jul 2019 18:06:10 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.61.151.224
-Content-Type: text/plain; charset="UTF-8"
-X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: Re: [Qemu-devel] [PATCH v2] target/riscv: Hardwire mcounter.TM and
- upper bits of [m|s]counteren
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PULL v3 40/42] i386: Add Cascadelake-Server-v2
+ CPU model
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,47 +71,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Palmer Dabbelt <palmer@sifive.com>,
- "open list:All patches CC here" <qemu-devel@nongnu.org>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- Alistair Francis <alistair23@gmail.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Bin, that proposal proved to be somewhat more controversial than I was
-expecting, since it was different than how currently available hardware
-worked. This option seemed much more likely to be accepted in the short
-term.
+On Wed, Jul 03, 2019 at 09:16:57AM +0800, Xiaoyao Li wrote:
+> Hi, Eduardo
+>=20
+> On 7/2/2019 11:35 PM, Eduardo Habkost wrote:
+> > Add new version of Cascadelake-Server CPU model, setting
+> > stepping=3D5 and enabling the IA32_ARCH_CAPABILITIES MSR
+> > with some flags.
+> >=20
+> > The new feature will introduce a new host software requirement,
+> > breaking our CPU model runnability promises.  This means we can't
+> > enable the new CPU model version by default in QEMU 4.1, because
+> > management software isn't ready yet to resolve CPU model aliases.
+> > This is why "pc-*-4.1" will keep returning Cascadelake-Server-v1
+> > if "-cpu Cascadelake-Server" is specified.
+> >=20
+> > Includes a test case to ensure the right combinations of
+> > machine-type + CPU model + command-line feature flags will work
+> > as expected.
+> >=20
+> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> > Message-Id: <20190628002844.24894-10-ehabkost@redhat.com>
+> > Reviewed-by: Daniel P. Berrang=E9 <berrange@redhat.com>
+> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> > ---
+> >   target/i386/cpu.c                          | 14 +++++
+> >   tests/acceptance/x86_cpu_model_versions.py | 73 +++++++++++++++++++=
++++
+> >   2 files changed, 87 insertions(+)
+> >=20
+> > diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> > index 9b16cffb22..0298396a91 100644
+> > --- a/target/i386/cpu.c
+> > +++ b/target/i386/cpu.c
+> > @@ -2343,6 +2343,20 @@ static X86CPUDefinition builtin_x86_defs[] =3D=
+ {
+> >               CPUID_6_EAX_ARAT,
+> >           .xlevel =3D 0x80000008,
+> >           .model_id =3D "Intel Xeon Processor (Cascadelake)",
+> > +        .versions =3D (X86CPUVersionDefinition[]) {
+> > +            { .version =3D 1 },
+> > +            { .version =3D 2,
+> > +              .props =3D (PropValue[]) {
+> > +                  { "stepping", "5" },
+> > +                  { "arch-capabilities", "on" },
+> > +                  { "rdctl-no", "on" },
+> > +                  { "ibrs-all", "on" },
+> > +                  { "skip-l1dfl-vmentry", "on" },
+> > +                  { /* end of list */ }
+> > +              },
+> > +            },
+> > +            { /* end of list */ }
+> > +        }
+>=20
+> seems you forgot to fix the stepping and add feature "mds-no".
 
-Jonathan
+I plan to fix it in a follow up patch to avoid holding the
+current pull request for another day.
 
-On Mon, Jul 1, 2019 at 9:26 PM Bin Meng <bmeng.cn@gmail.com> wrote:
+--=20
+Eduardo
 
-> On Tue, Jul 2, 2019 at 8:20 AM Alistair Francis <alistair23@gmail.com>
-> wrote:
-> >
-> > On Mon, Jul 1, 2019 at 8:56 AM <jonathan@fintelia.io> wrote:
-> > >
-> > > From: Jonathan Behrens <jonathan@fintelia.io>
-> > >
-> > > QEMU currently always triggers an illegal instruction exception when
-> > > code attempts to read the time CSR. This is valid behavor, but only if
-> > > the TM bit in mcounteren is hardwired to zero. This change also
-> > > corrects mcounteren and scounteren CSRs to be 32-bits on both 32-bit
-> > > and 64-bit targets.
-> > >
-> > > Signed-off-by: Jonathan Behrens <jonathan@fintelia.io>
-> >
-> > Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-> >
->
-> I am a little bit lost here. I think we agreed to allow directly read
-> to time CSR when mcounteren.TM is set, no?
->
-> Regards,
-> Bin
->
