@@ -2,91 +2,115 @@ Return-Path: <SRS0=mdN/=VA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.5 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A63BC4646D
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 15:26:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5F9DC0650E
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 15:26:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 097D2218A6
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 15:26:11 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ewJtjr9W"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 097D2218A6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id AF7DD2184C
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 15:26:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF7DD2184C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36840 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36844 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hih99-0000Nk-5z
-	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 11:26:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39210)
+	id 1hih9i-00012w-RN
+	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 11:26:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39323)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1hih6d-0005yW-1W
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 11:23:37 -0400
+ (envelope-from <laurent@vivier.eu>) id 1hih6g-00066U-7u
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 11:23:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1hih6b-0006LR-MC
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 11:23:34 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:33858)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1hih6b-000698-9B
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 11:23:33 -0400
-Received: by mail-wm1-x343.google.com with SMTP id w9so3176559wmd.1
- for <qemu-devel@nongnu.org>; Wed, 03 Jul 2019 08:23:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=EOZgi02Wum0KCa8+L/d68Sd4QzvsgI777S87nkuIcy8=;
- b=ewJtjr9WW9ghpoQiNnIYInXuR8yLNET/6aXGFU1bcqP3iquBGV1kBSE1pQmKDnLlAW
- aPy1tv5XIAJgd7VAYDXEF2kCI7e5T3VoRRMZRxLAu1g+MXuJe8WCSymjb3ZNtIK8SN4O
- 48wtlXC+34pU28bMD3iEll9wc0y0xJEKmdmNok7OTNbzNZLTijRg2XE4vJ7Pn9rm9kvk
- 8t8/pP+qQLGhyR3tkB9CVdIcQjN4x0j/6bvkem4+Cr2P5SqQwkAP/FIff22YfQedmgrK
- 0VwVOQH86jXvNTRh7a8DwlUXCwqs6u80tHFMJIJxnOoaUyOUzCpTRulqzIGV+R2lqf0R
- u2QA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=EOZgi02Wum0KCa8+L/d68Sd4QzvsgI777S87nkuIcy8=;
- b=IFm5/FLZBusMByrCNfptpDV5ZO2lfuapoWeEhmHvaLke9VeKb+/pciL8Mpt+v7PavV
- kDq8xtg6NijIcIShBzuE/xcJ1pGc+ICiCygmJi1+K8HyWQf3IZ/eBwrgBzH82ogF4Iz0
- Ma0J4/jBiHbjazUoHtur9vrg1qdCMVgFuzMlAWV2sHddgRGyVF6ZBNKici5QVm8jLIPK
- QdZbNFzQYCKMy5EfILt4iwTl2xqvVmczJ6RWMJqLhuqLM/oWAZGj099y3F+KbGV87FjS
- lPmmGW1nWT9IchayTFz8+pIC7SzJkWuhn2zdsG6G4hGJFJg16WvfwiJbknye70vgL0oj
- mS8A==
-X-Gm-Message-State: APjAAAV/hfpy0VNurHsPyRUfTX1K/4OowRnLz3BQ1368bLtVbG4RIyx7
- byLJVb1JDqnuQqL1aV6HYmZhzg==
-X-Google-Smtp-Source: APXvYqwJAz7uiNGZmf33qLJ71sLkKOi6kfWTwyrfzyCF5dWy0ksCHrt25luNjyCt1gSWIrfZymkhCA==
-X-Received: by 2002:a1c:7d56:: with SMTP id y83mr8803547wmc.77.1562167381759; 
- Wed, 03 Jul 2019 08:23:01 -0700 (PDT)
-Received: from [192.168.3.43] (93-34-153-63.ip50.fastwebnet.it. [93.34.153.63])
- by smtp.gmail.com with ESMTPSA id y133sm3494254wmg.5.2019.07.03.08.23.00
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 03 Jul 2019 08:23:01 -0700 (PDT)
-To: Jan Bobek <jan.bobek@gmail.com>, qemu-devel@nongnu.org
-References: <20190701043536.26019-1-jan.bobek@gmail.com>
- <20190701043536.26019-2-jan.bobek@gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
+ (envelope-from <laurent@vivier.eu>) id 1hih6d-0006P6-F2
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 11:23:38 -0400
+Received: from mout.kundenserver.de ([212.227.126.187]:38655)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>)
+ id 1hih6c-0005wW-U6; Wed, 03 Jul 2019 11:23:35 -0400
+Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
+ (mreue010 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1M89bP-1hf8iT0n5P-005FNq; Wed, 03 Jul 2019 17:22:38 +0200
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20190702123713.14396-1-laurent@vivier.eu>
+ <CAFEAcA_Zu0X1zLfKtBkQdi25KCkjf_PNu8zKWE5Dx7uzzLEzBA@mail.gmail.com>
+From: Laurent Vivier <laurent@vivier.eu>
 Openpgp: preference=signencrypt
-Message-ID: <8e5e96dd-ed35-895c-1fd3-d6b60ccba44b@linaro.org>
-Date: Wed, 3 Jul 2019 17:22:59 +0200
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <5d7fa8ef-c56c-1f90-d5d6-b230d1e3f363@vivier.eu>
+Date: Wed, 3 Jul 2019 17:22:36 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.1
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190701043536.26019-2-jan.bobek@gmail.com>
+In-Reply-To: <CAFEAcA_Zu0X1zLfKtBkQdi25KCkjf_PNu8zKWE5Dx7uzzLEzBA@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::343
-Subject: Re: [Qemu-devel] [RISU RFC PATCH v2 01/14] risugen_common: add
- insnv, randint_constr, rand_fill
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:pDkQ4CsWU5PML5YJMrHqwjNbt5HOFJeDdYbyvNEe6otD86D59Xs
+ ZNbFoD5kJ7N8RAoytaBvFcT8B2ioX2OuZTAdQC0ZX5F7zYhh6KFD0pB+Rg2HzCnDDXAJHKd
+ 42CSg8KaSjVs/iFguaabIzcR3yzCoI9IpRlL4FtdTusMbQS9NGvlSM8CqkreiQUHwMiBdZg
+ SywC4BZbmco6haSCMDNKg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:7M0DV8hM5qU=:Pj5eaSTPW3Nc2MjeWNHTkw
+ 7IgZL2eS2z5Ay092Y6fPmeSzC2k23ah6V+YpxYVJ7zsUIyPBBOLbYMDlXG48m38Ov8dnuBX0b
+ hVIicBFi8aI/uoUArY+h1RFZpg7PndMrsab23c0+EEOw0jHMMNXxsodFMNFFAtNjQyEbeooE6
+ Nd1d7MJmjqD31CvaxWafrC7MKaTNoHWmaYAdrw1F9XkzOpKmiEpyeodLYpEqWZ/EUay19pB1m
+ fuU9iUu0tyfmJtfhDIyP4vz6DXvCwyJPp/7Atw7bKFvqpf99kluibe7OHiIMrz/5Fu98u3z2w
+ 4iLcPz36orl/l2Os4n24jKnBFqcoj4B8GSb3N3vf6sPvYH5uK+1nOeuk6bC9iKDjDvYvkzBKc
+ i+nUO9VHiRccHjEDJQV+Af+/DfxZ0BjBnLJlVF5P/TNVbyrE+Uohli3P7fONL8f85u+oioH6/
+ KzQ7mNjRDMNk+Propj5yUPg+hHMNqmfnKw9sDVPIVqpTZaL7tbjDxwV2Z5O1iRJDZO2ggG7n+
+ SNzcW0qkoC/O10gJBNDU0B4XaycxFrObYz/jt9aM3V40eRpKT6iXJV+rdAPzWi6nonmr9R2cs
+ BdaLBbY2YIfZewjXGbXsipObKYEpDGILDGRlrjWEsTY/Ot3HocH9KOfCKVzv2Rttt/gp40V4m
+ 9MhTC39SVYqnnKnVbHju3ggXAXXoTKMWOxDmgIRo1guWQ2Fcv5uPbKN7mthrPAHScqmFzMYU+
+ YvKh1pQYKoXD4pLuI7LZgF5DAaHyAvAV9eLoyh6f2JWmRxmTciQ6pYmiC14=
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 212.227.126.187
+Subject: Re: [Qemu-devel] [PULL 0/3] Trivial branch patches
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,39 +122,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>, Michael Tokarev <mjt@tls.msk.ru>,
+ QEMU Developers <qemu-devel@nongnu.org>, Justin Hibbits <chmeeedalf@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/1/19 6:35 AM, Jan Bobek wrote:
-> +    while ($bitcur < $bitend) {
-> +        my $format;
-> +        my $bitlen;
-> +
-> +        if ($bitcur + 64 <= $bitend) {
-> +            $format = "Q";
-> +            $bitlen = 64;
-> +        } elsif ($bitcur + 32 <= $bitend) {
-> +            $format = "L";
-> +            $bitlen = 32;
-> +        } elsif ($bitcur + 16 <= $bitend) {
-> +            $format = "S";
-> +            $bitlen = 16;
-> +        } else {
-> +            $format = "C";
-> +            $bitlen = 8;
-> +        }
-> +
-> +        $format .= ($args{bigendian} ? ">" : "<") if $bitlen > 8;
+Le 03/07/2019 à 16:45, Peter Maydell a écrit :
+> On Tue, 2 Jul 2019 at 13:39, Laurent Vivier <laurent@vivier.eu> wrote:
+>>
+>> The following changes since commit 7d0e02405fc02a181319b1ab8681d2f72246b7c6:
+>>
+>>   Merge remote-tracking branch 'remotes/vivier2/tags/trivial-patches-pull-request' into staging (2019-07-01 17:40:32 +0100)
+>>
+>> are available in the Git repository at:
+>>
+>>   git://github.com/vivier/qemu.git tags/trivial-branch-pull-request
+>>
+>> for you to fetch changes up to 7c955080d40ccc7952a0479bc160f2b048c0af53:
+>>
+>>   docs/devel/testing: Fix typo in dockerfile path (2019-07-02 10:12:32 +0200)
+>>
+>> ----------------------------------------------------------------
+>> Fix typo, fix sys_cache_info() on FreeBSD/powerpc,
+>> change virtio-rng default to urandom
+>>
+>> ----------------------------------------------------------------
+> 
+> Hi; this makes 'make check' fail on OSX:
+> 
+> MALLOC_PERTURB_=${MALLOC_PERTURB_:-$(( ${RANDOM:-0} % 255 + 1))}
+> tests/test-char -m=quick -k --tap < /dev/null |
+> ./scripts/tap-driver.pl --test-name="test-char"
+> Assertion failed: ((isize & (isize - 1)) == 0), function
+> init_cache_info, file
+> /Users/pm215/src/qemu-for-merges/util/cacheinfo.c, line 179.
+> 
+> I guess this is the sys_cache_info change.
 
-It now occurs to me to wonder if it's worth simplifying this function to always
-emit bytes, and thus take care of all of the endianness ourselves, since we're
-doing it anyway for larger/odd-sized hunks.
+OK, I will try to reproduce the problem.
 
-Otherwise,
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+I think before this patch (regarding the kind of change we have
+introduced) isize and dsize were always set to 0 and then changed to 16
+in fallback_cache_info()... or perhaps MacOS X sysctlbyname() needs a long.
 
+Is there a HOWTO explaining how to build QEMU on MacOS X?
 
-r~
+I'm going to resend the PR without this patch.
+
+Thank you,
+Laurent
 
