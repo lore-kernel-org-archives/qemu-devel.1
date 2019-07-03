@@ -2,78 +2,62 @@ Return-Path: <SRS0=mdN/=VA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.0 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0893C0650E
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 09:39:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36E2FC0650E
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 09:41:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 85A8321882
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 09:39:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85A8321882
+	by mail.kernel.org (Postfix) with ESMTPS id 0E61421882
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 09:41:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E61421882
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34334 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34354 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hibjc-0000mf-SZ
-	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 05:39:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52794)
+	id 1hiblq-00038s-SQ
+	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 05:41:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55161)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hiat1-0002FV-Oe
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 04:45:08 -0400
+ (envelope-from <kraxel@redhat.com>) id 1hib2S-0004Cl-JF
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 04:54:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hiat0-0007CM-R4
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 04:45:07 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:34986)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hiat0-0007AX-Kz
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 04:45:06 -0400
-Received: by mail-wr1-f67.google.com with SMTP id c27so1790684wrb.2
- for <qemu-devel@nongnu.org>; Wed, 03 Jul 2019 01:45:06 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=WInNSCjqC7qkEv3gjxExZW1ipgoTKOlaseoZa9uT2cw=;
- b=jvcuI4Wz78JNjGLzUIEOL/ZFnoZV05YJYJkhZWb8oguEJSc/FC3I6nNAPCsstURIZK
- uOOoX6R3cEMViQfcloQkkfdHfdhdzKkdHHsJyqkpiXlp2iNrf2k0905r3lQBsI5ZcfwB
- pthinvCQYIAmmQWZdLEEqLMQWw+lYB5K/YRe5mhfqfulhGbMdwQPcbLetmyDCML3c+Ws
- w7wYTEhcyqziLDOmokwRJ6Ks/ChZ3XV7WLsyU9ZaH5CXi6NyZjIRnIbT5GCFrdelkXPY
- 6yu/Rr6awTF2nT8uuTdbXn5lYjA1C81o271hOkcvYxUJTjIAvGIbrBrpkB+FYYGkm33p
- Fftg==
-X-Gm-Message-State: APjAAAWZLCQ76JLQjUZ+5dtTzvIzm2FBBnkt4T6OQtJZGKEGe/q6C1HV
- 2bjIItr6rypcqpS+KhJMGWXadyO8OjY=
-X-Google-Smtp-Source: APXvYqzlfprKCorae/+JB6jDtB7aWJS6Hm0T9w0gXO8uXVyYjROt97USomSzhQMazCi614teLpa8cA==
-X-Received: by 2002:adf:e442:: with SMTP id t2mr28943874wrm.286.1562143505596; 
- Wed, 03 Jul 2019 01:45:05 -0700 (PDT)
-Received: from [192.168.1.38] (56.red-88-18-140.staticip.rima-tde.net.
- [88.18.140.56])
- by smtp.gmail.com with ESMTPSA id c1sm2324175wrh.1.2019.07.03.01.45.04
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Wed, 03 Jul 2019 01:45:05 -0700 (PDT)
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
-References: <20190703045212.31039-1-kraxel@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <230938b3-e2dc-23ad-82a0-af56f27836e9@redhat.com>
-Date: Wed, 3 Jul 2019 10:45:04 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ (envelope-from <kraxel@redhat.com>) id 1hib2R-0003xe-KE
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 04:54:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53236)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kraxel@redhat.com>)
+ id 1hib2P-00030Z-0c; Wed, 03 Jul 2019 04:54:49 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id C59BD30C0DDA;
+ Wed,  3 Jul 2019 08:54:24 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-116-96.ams2.redhat.com
+ [10.36.116.96])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7973E5945E;
+ Wed,  3 Jul 2019 08:54:17 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id 5E9AC16E18; Wed,  3 Jul 2019 10:54:16 +0200 (CEST)
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Wed,  3 Jul 2019 10:54:12 +0200
+Message-Id: <20190703085416.21837-1-kraxel@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190703045212.31039-1-kraxel@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.45]); Wed, 03 Jul 2019 08:54:24 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.221.67
-Subject: Re: [Qemu-devel] [PATCH] Add ati vgabios to INSTALL_BLOBS.
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PULL 0/4] Vga 20190703 patches
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,33 +69,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: BROGERS@suse.com
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>, qemu-arm@nongnu.org,
+ qemu-ppc@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/3/19 6:52 AM, Gerd Hoffmann wrote:
-> Fixes: 0cca7e7bfd6c81cc3c29ec2b3a0a98954c4ba71a
-> Reported-by: Bruce Rogers <BROGERS@suse.com>
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
->  Makefile | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/Makefile b/Makefile
-> index cfb18f152544..452f63dc8429 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -746,7 +746,7 @@ bepo    cz
->  ifdef INSTALL_BLOBS
->  BLOBS=bios.bin bios-256k.bin sgabios.bin vgabios.bin vgabios-cirrus.bin \
->  vgabios-stdvga.bin vgabios-vmware.bin vgabios-qxl.bin vgabios-virtio.bin \
-> -vgabios-ramfb.bin vgabios-bochs-display.bin \
-> +vgabios-ramfb.bin vgabios-bochs-display.bin vgabios-ati.bin \
->  ppc_rom.bin openbios-sparc32 openbios-sparc64 openbios-ppc QEMU,tcx.bin QEMU,cgthree.bin \
->  pxe-e1000.rom pxe-eepro100.rom pxe-ne2k_pci.rom \
->  pxe-pcnet.rom pxe-rtl8139.rom pxe-virtio.rom \
-> 
+The following changes since commit 506179e42112be77bfd071f050b15762d3b2cd=
+43:
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+  Merge remote-tracking branch 'remotes/dgibson/tags/ppc-for-4.1-20190702=
+' into staging (2019-07-02 18:56:44 +0100)
+
+are available in the Git repository at:
+
+  git://git.kraxel.org/qemu tags/vga-20190703-pull-request
+
+for you to fetch changes up to 0a87fd693d4e955a6877a2166b65bb7b7192aaaa:
+
+  Add ati vgabios to INSTALL_BLOBS. (2019-07-03 10:52:15 +0200)
+
+----------------------------------------------------------------
+vga: virtio fixes, bitbang i2c asan fix, install ati vgabios.
+
+----------------------------------------------------------------
+
+Gerd Hoffmann (2):
+  virtio-gpu: fix unmap in error path
+  Add ati vgabios to INSTALL_BLOBS.
+
+Li Qiang (1):
+  virtio-gpu: check if the resource already exists in virtio_gpu_load()
+
+Peter Maydell (1):
+  hw/i2c/bitbang_i2c: Use in-place rather than malloc'd
+    bitbang_i2c_interface struct
+
+ Makefile                     |  2 +-
+ hw/display/ati_int.h         |  2 +-
+ include/hw/i2c/bitbang_i2c.h | 38 ++++++++++++++++++++++++++++-
+ include/hw/i2c/ppc4xx_i2c.h  |  2 +-
+ hw/display/ati.c             |  7 +++---
+ hw/display/virtio-gpu.c      |  9 +++++--
+ hw/i2c/bitbang_i2c.c         | 47 +++---------------------------------
+ hw/i2c/ppc4xx_i2c.c          |  6 ++---
+ hw/i2c/versatile_i2c.c       |  8 +++---
+ 9 files changed, 61 insertions(+), 60 deletions(-)
+
+--=20
+2.18.1
+
 
