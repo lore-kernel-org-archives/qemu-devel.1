@@ -2,64 +2,65 @@ Return-Path: <SRS0=mdN/=VA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.2 required=3.0 tests=DATE_IN_PAST_06_12,
+X-Spam-Status: No, score=-6.2 required=3.0 tests=DATE_IN_PAST_06_12,
 	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13D71C0650E
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 13:26:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14BDEC0650E
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 13:28:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DB01D218A4
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 13:26:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D4B8021881
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 13:28:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="gzT45RSW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB01D218A4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="GAt4Wrgu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D4B8021881
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36004 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36028 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hifHl-00081t-70
-	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 09:26:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39637)
+	id 1hifJO-0002FE-6k
+	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 09:28:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39684)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgibson@ozlabs.org>) id 1hifGP-0006XD-2q
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 09:25:35 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1hifGQ-0006XP-TA
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 09:25:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1hifGN-0002ih-9f
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 09:25:32 -0400
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:42939 helo=ozlabs.org)
+ (envelope-from <dgibson@ozlabs.org>) id 1hifGP-0002jf-33
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 09:25:34 -0400
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:52945 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1hifGK-0002dC-Qx; Wed, 03 Jul 2019 09:25:31 -0400
+ id 1hifGN-0002dc-4J; Wed, 03 Jul 2019 09:25:32 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 45f20j1VJjz9sR2; Wed,  3 Jul 2019 23:25:24 +1000 (AEST)
+ id 45f20j48KMz9sR3; Wed,  3 Jul 2019 23:25:25 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1562160325;
- bh=rzxuufNC/sZdNpeCZJczHcnTG8JQFq28B/bjmK2MFuc=;
+ bh=ntHHvOac8zM+soDalpzNvakAvvxLBH20fTgAZJj961Q=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=gzT45RSWY5abQBFQm2suAozGfzonuOCOEhUlwmMleDLRWrFzR1lfVCYyz5Zlogx68
- 9IBQlhf1uJ2XziTV/gZXkTIzdabNRdUNiZZjKZG5AfyBqwoJWOlB4n608p+XkPT/+r
- 0koQVYSFqt2w4TOKHcTclADcjmO+QJ3N/XVxiC4g=
-Date: Wed, 3 Jul 2019 16:49:05 +1000
+ b=GAt4Wrgu7e/bIswbw16V9jD6vMBtTjNggRGXTKAeV3JNakjUwcRGO9iT08gTYa7Yi
+ bitLea1Iuj6YsqnXtut7VgR6AMkmDx+xkr9DQegfpX1ZjzLm1d3Ls6kiKQyclfwZVG
+ Jlh2jiEoBSGU3SdE6yrwiWYWww9RNYlvWyY/qYsE=
+Date: Wed, 3 Jul 2019 16:53:02 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-To: Michael Roth <mdroth@linux.vnet.ibm.com>
-Message-ID: <20190703064905.GN9442@umbus.fritz.box>
+To: Andrea Bolognani <abologna@redhat.com>
+Message-ID: <20190703065302.GO9442@umbus.fritz.box>
 References: <20190327204102.20925-1-maxiwell@linux.ibm.com>
  <20190328142151.7b0e00dd@bahia.lab.toulouse-stg.fr.ibm.com>
  <20190328183923.lcd3p6fpy4qvvxoo@maxibm>
  <20190329132951.451d4ef0@bahia.lan>
- <20190408042149.GH16627@umbus.fritz.box>
- <20190408183156.1f71c21d@bahia.lan>
- <155476288881.5793.5351161802797300445@sif>
+ <20190401145858.lw7v3xt7fqanp6nc@maxibm>
+ <20190402122807.1a141e37@bahia.lan>
+ <20190408042747.GI16627@umbus.fritz.box>
+ <fb1fe659eb80b99b9696ff4b128cd070c4e0dabc.camel@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="A2x6GFCQWVc4i5ud"
+ protocol="application/pgp-signature"; boundary="IpgPcFyQO6wM49Um"
 Content-Disposition: inline
-In-Reply-To: <155476288881.5793.5351161802797300445@sif>
+In-Reply-To: <fb1fe659eb80b99b9696ff4b128cd070c4e0dabc.camel@redhat.com>
 User-Agent: Mutt/1.12.0 (2019-05-25)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
@@ -84,125 +85,102 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---A2x6GFCQWVc4i5ud
+--IpgPcFyQO6wM49Um
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Apr 08, 2019 at 05:34:48PM -0500, Michael Roth wrote:
-> Quoting Greg Kurz (2019-04-08 11:31:56)
-> > On Mon, 8 Apr 2019 14:21:50 +1000
-> > David Gibson <david@gibson.dropbear.id.au> wrote:
-> >=20
-> > > On Fri, Mar 29, 2019 at 01:29:51PM +0100, Greg Kurz wrote:
-> > > > On Thu, 28 Mar 2019 15:39:45 -0300
-> > > > "Maxiwell S. Garcia" <maxiwell@linux.ibm.com> wrote:
-> > > >  =20
-> > > > > Hi,
-> > > > >=20
-> > > > > On Thu, Mar 28, 2019 at 02:21:51PM +0100, Greg Kurz wrote: =20
-> > > > > > On Wed, 27 Mar 2019 17:41:00 -0300
-> > > > > > "Maxiwell S. Garcia" <maxiwell@linux.ibm.com> wrote:
-> > > > > >    =20
-> > > > > > > Here are two patches to add a handler for ibm,get-vpd RTAS ca=
-lls.
-> > > > > > > This RTAS exposes host information in case of set QEMU options
-> > > > > > > 'host-serial' and 'host-model' as 'passthrough'.
-> > > > > > >=20
-> > > > > > > The patch 1 creates helper functions to get valid 'host-seria=
-l'
-> > > > > > > and 'host-model' parameters, guided by QEMU command line. The=
-se
-> > > > > > > parameters are useful to build the guest device tree and to r=
-eturn
-> > > > > > > get-vpd RTAS calls. The patch 2 adds the ibm,get-vpd itself.
-> > > > > > >=20
-> > > > > > > Update v7:
-> > > > > > > * rtas_get_vpd_fields as a static array in spapr machine state
-> > > > > > >=20
-> > > > > > > Maxiwell S. Garcia (2):
-> > > > > > >   spapr: helper functions to get valid host fields
-> > > > > > >   spapr-rtas: add ibm,get-vpd RTAS interface
-> > > > > > >=20
-> > > > > > >  hw/ppc/spapr.c         | 48 +++++++++++----------
-> > > > > > >  hw/ppc/spapr_rtas.c    | 96 ++++++++++++++++++++++++++++++++=
-++++++++++
-> > > > > > >  include/hw/ppc/spapr.h | 14 +++++-
-> > > > > > >  3 files changed, 135 insertions(+), 23 deletions(-)
-> > > > > > >    =20
-> > > > > >=20
-> > > > > > Hi Maxiwell,
-> > > > > >=20
-> > > > > > David sent a patch to rework how the host data is exposed to th=
-e guest.
-> > > > > > Especially, the special casing of the "none" and "passthrough" =
-strings
-> > > > > > is no more... I'm afraid you'll have to rework your patches acc=
-ordingly:
-> > > > > > code+changelog in patch 1 and at least changelog in patch 2.
-> > > > > >=20
-> > > > > > Cheers,   =20
-> > > > >=20
-> > > > > IIUC, the 'ibm,get-vpd' RTAS should return information about the
-> > > > > platform/cabinet. Thus, it's not necessary to add new nodes in th=
-e guest
-> > > > > device tree to export information like that. =20
-> > > >=20
-> > > > I agree that these "host-model" and "host-serial" props, which aren=
-'t
-> > > > described anywhere and not used by either the linux kernel or the
-> > > > powerpc-utils, look like a QEMU-specific poor man's version of VPD.
-> > > >=20
-> > > > Not quite sure why they were even created since this is the purpose
-> > > > of "system-id" and "model" as explained in PAPR, and supposedly
-> > > > exposed in /proc/ppc64/lparcfg according to the LPARCFG(5) manual
-> > > > page: =20
-> > >=20
-> > > Yeah, I'm not sure why they were created either.  I rather suspect
-> > > nothing much is using them, and I'd kind of like to just kill them.
-> > > But Daniel Berrange (and maybe others) are paranoid about this
-> > > breaking things.
-> > >=20
-> >=20
-> > Speaking of that. The "host-model"/"host-serial" fix is associated to a
-> > CVE which affects QEMU versions currently shipped by downstream vendors.
-> > Isn't a good enough reason to break things in existing unsecure setups ?
-> > Should we add this patch to Mike's patch round-up for stable 3.0.1 (and
-> > therefore break something that used to _work_ with 3.0.0) ?
+On Tue, Apr 09, 2019 at 06:24:07PM +0200, Andrea Bolognani wrote:
+> Apologies for taking this long to respond.
 >=20
-> Just for confirm: is the suggestion to backport 27461d69a? IIUC the fix
-> would involve utilizing new command-line options to override the default
-> "passthrough" mode for host-model/host-serial.
+> On Mon, 2019-04-08 at 14:27 +1000, David Gibson wrote:
+> > On Tue, Apr 02, 2019 at 12:28:07PM +0200, Greg Kurz wrote:
+> > > The recent fixes around "host-serial" and "host-model" simply moved
+> > > the decision to expose host data to the upper layer, ie. libvirt
+> > > which should be involved in this discussion.
+> >=20
+> > Right, that's deliberate.  Note that roughly-equivalent information on
+> > x86 is currently supplied via the SMBIOS.  OpenStack Nova sets that,
+> > rather than qemu, and I'd like to move towards a common configuration
+> > model with x86, though it's a fairly long path to there.
+> >=20
+> > OpenStack had an equivalent security problem to our one, which it
+> > addressed by taking the host serial from /etc/machine-id if present
+> > rather than the real host info.
 >=20
-> If so, I think an argument could be made, but I generally try to avoid
-> anything relying on new command-line options since they're unlikely to be
-> utilized unless the distro/vendor are likely to have specific plans to use
-> them
+> IIUC the situation is a bit different between x86 and ppc64, because
+> while for the latter SPAPR defines a way for the guest to access
+> information about the host it's running on, that's not the case for
+> the former, at least to the best of my knowledge.
 
+Well, guests are getting this information in smbios somehow.  I don't
+know what specifies that what bit of info in the smbios is host info,
+but I guess it must at least be a de facto convention?
 
-Yeah :/
+> What OpenStack is doing is reading the machine-id (if explicitly
+> configured to do so: the default is to use the guest's own UUID[1])
+> and exposing that as the *guest* serial, not as the *host* serial.
 
-> and implement the appropriate changes elsewhere in their stack to do
-> so (e.g.  stuff like Spectre mitigations). And, worst case, downstreams
-> would still have the option of backporting the QEMU fixes as part of the
-> overall CVE fix, so I'd probably opt to leave this one to the downstreams
-> to consider.
+Uh.. I'm not sure about that.  I think the default is just to pass
+nothing here.  The confusion is increased because this host info was
+always handled at the above-libvirt (openstack) level on x86, using
+explicit smbios configuration options down to libvirt and qemu.
 
-So, in this case Openstack already does something similar for x86 - it
-passes /etc/machine-id through the smbios information.  Unfortunately
-the way it passes that down to qemu is via an explicit -smbios option.
+On power we handled it in qemu, because that seemed the obvious way,
+but it makes recombining them a pain.
 
-It would be nice to have a common "host-id" or whatever option to qemu
-which will work for both x86 via smbios and power via device tree
-and/or get-vpd.  I had a look at that, and implementing it is fiddlier
-than you'd think, because all the fallback logic and multiple pieces
-to change (e.g. qemu would need to populate with explicit smbios info
-first, then fall back to machine options, then libvirt would need a
-common way to pass it through, then openstack would need to change to
-use the common way, .... ugh).
+> >From libvirt's point of view, the entire mechanism is entirely
+> optional, so unless the management layer explicitly asks it to set
+> a certain value for the serial, libvirt will simply pass no
+> information down to QEMU.
+>=20
+> The relevant XML elements[2] are clearly modeled after x86, so I
+> wonder if Nova is setting them also on ppc64 and if so, what the
+> guest will ultimately see...
+>=20
+> > > Cc'ing Andrea for expertise. Problem exposed below.
+> > >=20
+> > > The pseries machine used to expose the content of the host's
+> > > /proc/device-tree/system-id and /proc/device-tree/model in the guest
+> > > DT. This led to a CVE and QEMU doesn't do that anymore for new machine
+> > > types. Instead, two new properties where added to the pseries machine:
+> > >=20
+> > > pseries-4.0.host-serial=3Dstring (Host serial number to advertise in =
+guest device tree)
+> > > pseries-4.0.host-model=3Dstring (Host model to advertise in guest dev=
+ice tree)
+> > >=20
+> > > It is up to the caller to pass something... which may be anything,
+> > > including something like $(cat /proc/device-tree/system-id) or
+> > > randomly generated.
+>=20
+> What happens if the caller doesn't provide any value? Will QEMU come
+> up with something itself?
 
-At the moment this is in my "makes-my-brain-hurt-to-contemplate"
-pile.  I'm open to suggestions.
+Currently, no, it will just omit the properties.
+
+> Adding a few extra knobs in the vein as the existing ones sounds like
+> a fairly reasonable idea. It will still be up to the management layer
+> to actually provide the values.
+>=20
+> > > Is there a chance libvirt can be taught to pass a different string
+> > > to the target QEMU in case of migration ?
+>=20
+> libvirt already supports providing a different XML to the target
+> host, so changing a couple values should be no big deal.
+>=20
+>=20
+> As a final note, unless I've gotten it wrong and x86 actually *does*
+> provide a way for the guest to figure out its host's serial, then any
+> software relying on the attributes defined by SPAPR is ultimately not
+> portable to non-ppc64 hardware and should probably be rearchitected
+> to go through the management layer, as Daniel was also suggesting
+> earlier in the thread.
+>=20
+>=20
+> [1] https://github.com/openstack/nova/blob/master/nova/virt/libvirt/drive=
+r.py#L364-L372
+> [2] https://libvirt.org/formatdomain.html#elementsSysinfo
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -210,25 +188,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---A2x6GFCQWVc4i5ud
+--IpgPcFyQO6wM49Um
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl0cT+EACgkQbDjKyiDZ
-s5KN4hAApzJYJ9Eh8pv+NPEdJJUIJH18TIK2/aOumWeEM+dcEpLz7f+oZihriS/D
-cpHYL57QZZ6X+73heTUnuf8lsGmJhO2IJM4t2KK322z5MBDJcBAGu5maUEdY/DEd
-qmFlLDHS2dl8AtFU+WJzSC46qCryTqN3fo1ty6724jeQC+pNse3VhgjjLW3yjnes
-n0SZ8GZMf0w6OIVydNrPiY4RDmOt9QM2FR+aXmGFI3oivYr6B2U6rZaOLHy9eq6m
-Ph4YAred+8B+J9W3aahf3EM2mMGX0pCAmrcf0a1NIX6fw8kTE0UXBdFAlsfB76C/
-DNLRc1vMEj7qJUOPab8trwHNI9U3pkAoRVjT1D8+fyvH41WQCfMyXwHiNfEOTdgF
-vCweAy9xswyDbZCkardTxvd4G92S3rVw4BQJVz7zAUGmD8BiZtYPGd7Hj4tthc0Q
-mEH3q1aA2xbJI+udYzpB9jNkhitpWb4n6TWopuC5gBpWPOdCkCZthtZYbcfbKcb0
-7F+RvDVLt5qc1MZ994fOZ++YmxJcd2MP0rWbIGJSKAt81/6xhjqIVcfB68DADm01
-gD6fAMG3pnZou0qUAOPRni4SI0vxa7c7jvbtzCHslTD4+0cxiSDLrB8UnoFTxRbq
-HPgE7PXbCvFgGil53YBrc3JhXvmWUEd8wYSVB1lXUvzpWDmRak4=
-=k/Z3
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl0cUM4ACgkQbDjKyiDZ
+s5K4xBAAz54cyRjHHqpniJ9BEI5R2C0jRplSIxZBoaPTuX44hoviQ5nQMSG5VG0F
+UVHiS1sUTW5WMDcPGCz/SYw2ar1ou15UpqbB5UlSwV4VC5ZE8pZbVmsF2qmmMboz
+lMAfuAtfiQm50PaM28nk36XfUDvh85SATq8zLfOeEgaLgEdLWgr4nhF86IwPOmfi
+TJ3B0jV1jaMK7FdYMNDACCxEbkrXKdK/OZxtC77FVyikELetxTvh3lRo30ccYt8m
+v84HlvwRqOHcXGPZ9NjyxqaUsOTqXoqPtx9GC8P7CYmqIa5szOBZoMIbZd0Tzqx+
+ysGlmjJveKRKPKbgVjEg9eOI0WWeoMQNxMlZhbfjr2murfWbTsW5NQRMbZ0UXVVY
++HaJYP2WZqvog3yUk3mhVoZBTzWGtiRF5BRXqAbPCyGFGy95t7eHuOwkZGIJsRR3
+Hjhbk2hSQV4AOmuwIB+ULqet4FoijR+vOSzHvXVc22xu1FEZ3khBH+bj2RB+XZhF
+GpizLg/Mh3oDcdrmDBuDQoKine6t6YYqSEfsBoLMCMxX2JPIn6gE21JZuo0y3gbd
+b1Ittzkb2fQ88YLpPAJoMuXTY3ZsJd2if54KeyHTOq4wg+09DE0g0RFNr9WT7rUU
+UA/o/Uo5BzaDyquIa6lBPk5cyMmaGmRJCpTZBdIceNincSL2xXQ=
+=KcTs
 -----END PGP SIGNATURE-----
 
---A2x6GFCQWVc4i5ud--
+--IpgPcFyQO6wM49Um--
 
