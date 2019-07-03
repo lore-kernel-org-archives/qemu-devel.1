@@ -3,63 +3,59 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA505C0650E
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 18:40:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AFEDC0650E
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 18:43:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 87EC921852
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 18:40:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87EC921852
+	by mail.kernel.org (Postfix) with ESMTPS id 5B83A21852
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 18:43:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B83A21852
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38496 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38512 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hikAx-0000o5-D1
-	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 14:40:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56814)
+	id 1hikDb-00039T-K5
+	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 14:42:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56787)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <ehabkost@redhat.com>) id 1hijgY-0004uB-31
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 14:08:51 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1hijgW-0004t8-3b
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 14:08:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1hijgW-0000sv-8d
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 14:08:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54878)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hijgW-0000qL-2R
+ (envelope-from <ehabkost@redhat.com>) id 1hijgS-0000q3-OK
  for qemu-devel@nongnu.org; Wed, 03 Jul 2019 14:08:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45756)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hijgQ-0000md-Me
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 14:08:44 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E50EF30860A2;
- Wed,  3 Jul 2019 18:08:44 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id A12F985538;
+ Wed,  3 Jul 2019 18:08:40 +0000 (UTC)
 Received: from localhost (ovpn-116-30.gru2.redhat.com [10.97.116.30])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7B47817DD0;
- Wed,  3 Jul 2019 18:08:44 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 31ABC18248;
+ Wed,  3 Jul 2019 18:08:40 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>,
  Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
  Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
  Richard Henderson <rth@twiddle.net>
-Date: Wed,  3 Jul 2019 15:07:16 -0300
-Message-Id: <20190703180726.31267-34-ehabkost@redhat.com>
+Date: Wed,  3 Jul 2019 15:07:14 -0300
+Message-Id: <20190703180726.31267-32-ehabkost@redhat.com>
 In-Reply-To: <20190703180726.31267-1-ehabkost@redhat.com>
 References: <20190703180726.31267-1-ehabkost@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.44]); Wed, 03 Jul 2019 18:08:44 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ (mx1.redhat.com [10.5.110.28]); Wed, 03 Jul 2019 18:08:40 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL v4 33/43] i386: Add x-force-features option for
- testing
+Subject: [Qemu-devel] [PULL v4 31/43] i386: Introduce SnowRidge CPU model
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,70 +67,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Paul Lai <paul.c.lai@intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add a new option that can be used to disable feature flag
-filtering.  This will allow CPU model compatibility test cases to
-work without host hardware dependencies.
+From: Paul Lai <paul.c.lai@intel.com>
 
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-Message-Id: <20190628002844.24894-3-ehabkost@redhat.com>
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+SnowRidge CPU supports Accelerator Infrastrcture Architecture (MOVDIRI,
+MOVDIR64B), CLDEMOTE and SPLIT_LOCK_DISABLE.
+
+MOVDIRI, MOVDIR64B, and CLDEMOTE are found via CPUID.
+The availability of SPLIT_LOCK_DISABLE is check via msr access
+
+References can be found in either:
+ https://software.intel.com/en-us/articles/intel-sdm
+ https://software.intel.com/en-us/download/intel-architecture-instruction-set-extensions-and-future-features-programming-reference
+
+Signed-off-by: Paul Lai <paul.c.lai@intel.com>
+Tested-by: Tao3 Xu <tao3.xu@intel.com>
+Message-Id: <20190626162129.25345-1-paul.c.lai@intel.com>
+[ehabkost: squashed SPLIT_LOCK_DETECT patch]
+Message-Id: <20190626163232.25711-1-paul.c.lai@intel.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- target/i386/cpu.h | 6 ++++++
- target/i386/cpu.c | 8 ++++++--
- 2 files changed, 12 insertions(+), 2 deletions(-)
+ target/i386/cpu.c | 71 +++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 71 insertions(+)
 
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 0a96c78669..4727226a6a 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -1417,6 +1417,12 @@ struct X86CPU {
-=20
-     bool check_cpuid;
-     bool enforce_cpuid;
-+    /*
-+     * Force features to be enabled even if the host doesn't support the=
-m.
-+     * This is dangerous and should be done only for testing CPUID
-+     * compatibility.
-+     */
-+    bool force_features;
-     bool expose_kvm;
-     bool expose_tcg;
-     bool migratable;
 diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 6c04a258ed..9059121273 100644
+index ea52db0600..6c04a258ed 100644
 --- a/target/i386/cpu.c
 +++ b/target/i386/cpu.c
-@@ -5250,8 +5250,11 @@ static int x86_cpu_filter_features(X86CPU *cpu)
-         uint32_t host_feat =3D
-             x86_cpu_get_supported_feature_word(w, false);
-         uint32_t requested_features =3D env->features[w];
--        env->features[w] &=3D host_feat;
--        cpu->filtered_features[w] =3D requested_features & ~env->feature=
-s[w];
-+        uint32_t available_features =3D requested_features & host_feat;
-+        if (!cpu->force_features) {
-+            env->features[w] =3D available_features;
-+        }
-+        cpu->filtered_features[w] =3D requested_features & ~available_fe=
-atures;
-         if (cpu->filtered_features[w]) {
-             rv =3D 1;
-         }
-@@ -5980,6 +5983,7 @@ static Property x86_cpu_properties[] =3D {
-=20
-     DEFINE_PROP_BOOL("check", X86CPU, check_cpuid, true),
-     DEFINE_PROP_BOOL("enforce", X86CPU, enforce_cpuid, false),
-+    DEFINE_PROP_BOOL("x-force-features", X86CPU, force_features, false),
-     DEFINE_PROP_BOOL("kvm", X86CPU, expose_kvm, true),
-     DEFINE_PROP_UINT32("phys-bits", X86CPU, phys_bits, 0),
-     DEFINE_PROP_BOOL("host-phys-bits", X86CPU, host_phys_bits, false),
---=20
+@@ -2688,6 +2688,77 @@ static X86CPUDefinition builtin_x86_defs[] = {
+         .xlevel = 0x80000008,
+         .model_id = "Intel Xeon Processor (Icelake)",
+     },
++    {
++        .name = "SnowRidge-Server",
++        .level = 27,
++        .vendor = CPUID_VENDOR_INTEL,
++        .family = 6,
++        .model = 134,
++        .stepping = 1,
++        .features[FEAT_1_EDX] =
++            /* missing: CPUID_PN CPUID_IA64 */
++            /* missing: CPUID_DTS, CPUID_HT, CPUID_TM, CPUID_PBE */
++            CPUID_FP87 | CPUID_VME | CPUID_DE | CPUID_PSE |
++            CPUID_TSC | CPUID_MSR | CPUID_PAE | CPUID_MCE |
++            CPUID_CX8 | CPUID_APIC | CPUID_SEP |
++            CPUID_MTRR | CPUID_PGE | CPUID_MCA | CPUID_CMOV |
++            CPUID_PAT | CPUID_PSE36 | CPUID_CLFLUSH |
++            CPUID_MMX |
++            CPUID_FXSR | CPUID_SSE | CPUID_SSE2,
++        .features[FEAT_1_ECX] =
++            CPUID_EXT_SSE3 | CPUID_EXT_PCLMULQDQ | CPUID_EXT_MONITOR |
++            CPUID_EXT_VMX |
++            CPUID_EXT_SSSE3 |
++            CPUID_EXT_CX16 |
++            CPUID_EXT_SSE41 |
++            CPUID_EXT_SSE42 | CPUID_EXT_X2APIC | CPUID_EXT_MOVBE |
++            CPUID_EXT_POPCNT |
++            CPUID_EXT_TSC_DEADLINE_TIMER | CPUID_EXT_AES | CPUID_EXT_XSAVE |
++            CPUID_EXT_RDRAND,
++        .features[FEAT_8000_0001_EDX] =
++            CPUID_EXT2_SYSCALL |
++            CPUID_EXT2_NX |
++            CPUID_EXT2_PDPE1GB | CPUID_EXT2_RDTSCP |
++            CPUID_EXT2_LM,
++        .features[FEAT_8000_0001_ECX] =
++            CPUID_EXT3_LAHF_LM |
++            CPUID_EXT3_3DNOWPREFETCH,
++        .features[FEAT_7_0_EBX] =
++            CPUID_7_0_EBX_FSGSBASE |
++            CPUID_7_0_EBX_SMEP |
++            CPUID_7_0_EBX_ERMS |
++            CPUID_7_0_EBX_MPX |  /* missing bits 13, 15 */
++            CPUID_7_0_EBX_RDSEED |
++            CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_CLFLUSHOPT |
++            CPUID_7_0_EBX_CLWB |
++            CPUID_7_0_EBX_SHA_NI,
++        .features[FEAT_7_0_ECX] =
++            CPUID_7_0_ECX_UMIP |
++            /* missing bit 5 */
++            CPUID_7_0_ECX_GFNI |
++            CPUID_7_0_ECX_MOVDIRI | CPUID_7_0_ECX_CLDEMOTE |
++            CPUID_7_0_ECX_MOVDIR64B,
++        .features[FEAT_7_0_EDX] =
++            CPUID_7_0_EDX_SPEC_CTRL |
++            CPUID_7_0_EDX_ARCH_CAPABILITIES | CPUID_7_0_EDX_SPEC_CTRL_SSBD |
++            CPUID_7_0_EDX_CORE_CAPABILITY,
++        .features[FEAT_CORE_CAPABILITY] =
++            MSR_CORE_CAP_SPLIT_LOCK_DETECT,
++        /*
++         * Missing: XSAVES (not supported by some Linux versions,
++         * including v4.1 to v4.12).
++         * KVM doesn't yet expose any XSAVES state save component,
++         * and the only one defined in Skylake (processor tracing)
++         * probably will block migration anyway.
++         */
++        .features[FEAT_XSAVE] =
++            CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XSAVEC |
++            CPUID_XSAVE_XGETBV1,
++        .features[FEAT_6_EAX] =
++            CPUID_6_EAX_ARAT,
++        .xlevel = 0x80000008,
++        .model_id = "Intel Atom Processor (SnowRidge)",
++    },
+     {
+         .name = "KnightsMill",
+         .level = 0xd,
+-- 
 2.18.0.rc1.1.g3f1ff2140
 
 
