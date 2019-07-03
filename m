@@ -6,57 +6,57 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A070C5B578
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 21:21:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A5EAC5B578
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 21:21:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E3CE4218A0
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 21:21:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3CE4218A0
+	by mail.kernel.org (Postfix) with ESMTPS id D42EA218A0
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 21:21:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D42EA218A0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40738 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40742 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1himgX-0007jG-0b
-	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 17:21:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37973)
+	id 1himgr-00085E-Im
+	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 17:21:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38027)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <ehabkost@redhat.com>) id 1himUp-00064T-Vr
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 17:08:57 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1himV0-00066x-SG
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 17:09:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1himUo-0006jf-Ej
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 17:08:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48960)
+ (envelope-from <ehabkost@redhat.com>) id 1himUw-0006nf-Ay
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 17:09:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53424)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1himUo-0006j4-7c
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 17:08:54 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1himUu-0006mO-II
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 17:09:01 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 64EFD30B46F1;
- Wed,  3 Jul 2019 21:08:53 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 7AF93308FC4E;
+ Wed,  3 Jul 2019 21:08:59 +0000 (UTC)
 Received: from localhost (ovpn-116-30.gru2.redhat.com [10.97.116.30])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E90C510018F9;
- Wed,  3 Jul 2019 21:08:52 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 04E0A5D704;
+ Wed,  3 Jul 2019 21:08:58 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>,
  Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
  Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
  Richard Henderson <rth@twiddle.net>
-Date: Wed,  3 Jul 2019 18:07:47 -0300
-Message-Id: <20190703210821.27550-10-ehabkost@redhat.com>
+Date: Wed,  3 Jul 2019 18:07:50 -0300
+Message-Id: <20190703210821.27550-13-ehabkost@redhat.com>
 In-Reply-To: <20190703210821.27550-1-ehabkost@redhat.com>
 References: <20190703210821.27550-1-ehabkost@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Wed, 03 Jul 2019 21:08:53 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.43]); Wed, 03 Jul 2019 21:08:59 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL v5 09/43] hw: Replace global smp variables with
- MachineState for all remaining archs
+Subject: [Qemu-devel] [PULL v5 12/43] hw/i386: Adjust nr_dies with
+ configured smp_dies for PCMachine
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,152 +75,79 @@ Sender: "Qemu-devel"
 
 From: Like Xu <like.xu@linux.intel.com>
 
-The global smp variables in alpha/hppa/mips/openrisc/sparc*/xtensa codes
-are replaced with smp properties from MachineState.
+To support multiple dies configuration on PCMachine, the best place to
+set CPUX86State->nr_dies with requested PCMachineState->smp_dies is in
+pc_new_cpu() and pc_cpu_pre_plug(). Refactoring pc_new_cpu() is applied
+and redundant parameter "const char *typename" would be removed.
 
-A local variable of the same name would be introduced in the declaration
-phase if it's used widely in the context OR replace it on the spot if it's
-only used once. No semantic changes.
-
+Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
 Signed-off-by: Like Xu <like.xu@linux.intel.com>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Message-Id: <20190518205428.90532-10-like.xu@linux.intel.com>
+Message-Id: <20190612084104.34984-3-like.xu@linux.intel.com>
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- hw/alpha/dp264.c           | 1 +
- hw/hppa/machine.c          | 2 ++
- hw/mips/boston.c           | 2 +-
- hw/mips/mips_malta.c       | 2 ++
- hw/openrisc/openrisc_sim.c | 1 +
- hw/sparc/sun4m.c           | 2 ++
- hw/sparc64/sun4u.c         | 4 ++--
- hw/xtensa/sim.c            | 2 +-
- hw/xtensa/xtfpga.c         | 1 +
- 9 files changed, 13 insertions(+), 4 deletions(-)
+ hw/i386/pc.c | 16 +++++++++++-----
+ 1 file changed, 11 insertions(+), 5 deletions(-)
 
-diff --git a/hw/alpha/dp264.c b/hw/alpha/dp264.c
-index 0347eb897c..9dfb835013 100644
---- a/hw/alpha/dp264.c
-+++ b/hw/alpha/dp264.c
-@@ -63,6 +63,7 @@ static void clipper_init(MachineState *machine)
-     char *palcode_filename;
-     uint64_t palcode_entry, palcode_low, palcode_high;
-     uint64_t kernel_entry, kernel_low, kernel_high;
-+    unsigned int smp_cpus = machine->smp.cpus;
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index e18b1bade2..211015324a 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -1518,12 +1518,16 @@ void pc_acpi_smi_interrupt(void *opaque, int irq, int level)
+     }
+ }
  
-     /* Create up to 4 cpus.  */
-     memset(cpus, 0, sizeof(cpus));
-diff --git a/hw/hppa/machine.c b/hw/hppa/machine.c
-index 416e67bab1..662838d83b 100644
---- a/hw/hppa/machine.c
-+++ b/hw/hppa/machine.c
-@@ -72,6 +72,7 @@ static void machine_hppa_init(MachineState *machine)
-     MemoryRegion *ram_region;
-     MemoryRegion *cpu_region;
-     long i;
-+    unsigned int smp_cpus = machine->smp.cpus;
- 
-     ram_size = machine->ram_size;
- 
-@@ -242,6 +243,7 @@ static void machine_hppa_init(MachineState *machine)
- 
- static void hppa_machine_reset(MachineState *ms)
+-static void pc_new_cpu(const char *typename, int64_t apic_id, Error **errp)
++static void pc_new_cpu(PCMachineState *pcms, int64_t apic_id, Error **errp)
  {
-+    unsigned int smp_cpus = ms->smp.cpus;
-     int i;
+     Object *cpu = NULL;
+     Error *local_err = NULL;
++    CPUX86State *env = NULL;
  
-     qemu_devices_reset();
-diff --git a/hw/mips/boston.c b/hw/mips/boston.c
-index 749582e5aa..9eeccbea9a 100644
---- a/hw/mips/boston.c
-+++ b/hw/mips/boston.c
-@@ -458,7 +458,7 @@ static void boston_mach_init(MachineState *machine)
-                           sizeof(s->cps), TYPE_MIPS_CPS);
-     object_property_set_str(OBJECT(&s->cps), machine->cpu_type, "cpu-type",
-                             &err);
--    object_property_set_int(OBJECT(&s->cps), smp_cpus, "num-vp", &err);
-+    object_property_set_int(OBJECT(&s->cps), machine->smp.cpus, "num-vp", &err);
-     object_property_set_bool(OBJECT(&s->cps), true, "realized", &err);
+-    cpu = object_new(typename);
++    cpu = object_new(MACHINE(pcms)->cpu_type);
++
++    env = &X86_CPU(cpu)->env;
++    env->nr_dies = pcms->smp_dies;
  
-     if (err != NULL) {
-diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
-index 132127882d..20e019bf66 100644
---- a/hw/mips/mips_malta.c
-+++ b/hw/mips/mips_malta.c
-@@ -1095,6 +1095,8 @@ static int64_t load_kernel (void)
+     object_property_set_uint(cpu, apic_id, "apic-id", &local_err);
+     object_property_set_bool(cpu, true, "realized", &local_err);
+@@ -1549,7 +1553,7 @@ void pc_hot_add_cpu(MachineState *ms, const int64_t id, Error **errp)
+         return;
+     }
  
- static void malta_mips_config(MIPSCPU *cpu)
- {
-+    MachineState *ms = MACHINE(qdev_get_machine());
-+    unsigned int smp_cpus = ms->smp.cpus;
-     CPUMIPSState *env = &cpu->env;
-     CPUState *cs = CPU(cpu);
+-    pc_new_cpu(ms->cpu_type, apic_id, &local_err);
++    pc_new_cpu(PC_MACHINE(ms), apic_id, &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+         return;
+@@ -1574,8 +1578,7 @@ void pc_cpus_init(PCMachineState *pcms)
+                                                      ms->smp.max_cpus - 1) + 1;
+     possible_cpus = mc->possible_cpu_arch_ids(ms);
+     for (i = 0; i < ms->smp.cpus; i++) {
+-        pc_new_cpu(possible_cpus->cpus[i].type, possible_cpus->cpus[i].arch_id,
+-                   &error_fatal);
++        pc_new_cpu(pcms, possible_cpus->cpus[i].arch_id, &error_fatal);
+     }
+ }
  
-diff --git a/hw/openrisc/openrisc_sim.c b/hw/openrisc/openrisc_sim.c
-index 87b9feaa96..b85f0df323 100644
---- a/hw/openrisc/openrisc_sim.c
-+++ b/hw/openrisc/openrisc_sim.c
-@@ -130,6 +130,7 @@ static void openrisc_sim_init(MachineState *machine)
-     qemu_irq *cpu_irqs[2];
-     qemu_irq serial_irq;
-     int n;
-+    unsigned int smp_cpus = machine->smp.cpus;
+@@ -2295,6 +2298,7 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
+     CPUArchId *cpu_slot;
+     X86CPUTopoInfo topo;
+     X86CPU *cpu = X86_CPU(dev);
++    CPUX86State *env = &cpu->env;
+     MachineState *ms = MACHINE(hotplug_dev);
+     PCMachineState *pcms = PC_MACHINE(hotplug_dev);
+     unsigned int smp_cores = ms->smp.cores;
+@@ -2306,6 +2310,8 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
+         return;
+     }
  
-     for (n = 0; n < smp_cpus; n++) {
-         cpu = OPENRISC_CPU(cpu_create(machine->cpu_type));
-diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
-index 7e4f61fc3e..a8004a5fe3 100644
---- a/hw/sparc/sun4m.c
-+++ b/hw/sparc/sun4m.c
-@@ -871,6 +871,8 @@ static void sun4m_hw_init(const struct sun4m_hwdef *hwdef,
-     FWCfgState *fw_cfg;
-     DeviceState *dev;
-     SysBusDevice *s;
-+    unsigned int smp_cpus = machine->smp.cpus;
-+    unsigned int max_cpus = machine->smp.max_cpus;
- 
-     /* init CPUs */
-     for(i = 0; i < smp_cpus; i++) {
-diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
-index 4230b17b87..5d87be811d 100644
---- a/hw/sparc64/sun4u.c
-+++ b/hw/sparc64/sun4u.c
-@@ -697,8 +697,8 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
-                                 &FW_CFG_IO(dev)->comb_iomem);
- 
-     fw_cfg = FW_CFG(dev);
--    fw_cfg_add_i16(fw_cfg, FW_CFG_NB_CPUS, (uint16_t)smp_cpus);
--    fw_cfg_add_i16(fw_cfg, FW_CFG_MAX_CPUS, (uint16_t)max_cpus);
-+    fw_cfg_add_i16(fw_cfg, FW_CFG_NB_CPUS, (uint16_t)machine->smp.cpus);
-+    fw_cfg_add_i16(fw_cfg, FW_CFG_MAX_CPUS, (uint16_t)machine->smp.max_cpus);
-     fw_cfg_add_i64(fw_cfg, FW_CFG_RAM_SIZE, (uint64_t)ram_size);
-     fw_cfg_add_i16(fw_cfg, FW_CFG_MACHINE_ID, hwdef->machine_id);
-     fw_cfg_add_i64(fw_cfg, FW_CFG_KERNEL_ADDR, kernel_entry);
-diff --git a/hw/xtensa/sim.c b/hw/xtensa/sim.c
-index b6922c39d5..09165b6f4d 100644
---- a/hw/xtensa/sim.c
-+++ b/hw/xtensa/sim.c
-@@ -59,7 +59,7 @@ static void xtensa_sim_init(MachineState *machine)
-     const char *kernel_filename = machine->kernel_filename;
-     int n;
- 
--    for (n = 0; n < smp_cpus; n++) {
-+    for (n = 0; n < machine->smp.cpus; n++) {
-         cpu = XTENSA_CPU(cpu_create(machine->cpu_type));
-         env = &cpu->env;
- 
-diff --git a/hw/xtensa/xtfpga.c b/hw/xtensa/xtfpga.c
-index e05ef75a75..f7f3e11e93 100644
---- a/hw/xtensa/xtfpga.c
-+++ b/hw/xtensa/xtfpga.c
-@@ -238,6 +238,7 @@ static void xtfpga_init(const XtfpgaBoardDesc *board, MachineState *machine)
-     const unsigned system_io_size = 224 * MiB;
-     uint32_t freq = 10000000;
-     int n;
-+    unsigned int smp_cpus = machine->smp.cpus;
- 
-     if (smp_cpus > 1) {
-         mx_pic = xtensa_mx_pic_init(31);
++    env->nr_dies = pcms->smp_dies;
++
+     /*
+      * If APIC ID is not set,
+      * set it based on socket/die/core/thread properties.
 -- 
 2.18.0.rc1.1.g3f1ff2140
 
