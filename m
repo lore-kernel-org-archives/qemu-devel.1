@@ -6,57 +6,60 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DEB2C5B578
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 21:28:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89CC3C5B578
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 21:29:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B70DE21882
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 21:28:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B70DE21882
+	by mail.kernel.org (Postfix) with ESMTPS id 5C01121882
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 21:29:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C01121882
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40798 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40816 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1himnR-0000Vv-UU
-	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 17:28:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38115)
+	id 1himp4-0002Tb-M3
+	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 17:29:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38171)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <ehabkost@redhat.com>) id 1himVG-000682-QD
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 17:09:24 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1himVI-00068H-G0
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 17:09:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1himVF-0006yW-Gn
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 17:09:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51492)
+ (envelope-from <ehabkost@redhat.com>) id 1himVG-0006zf-Qw
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 17:09:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55712)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1himVF-0006sL-6G
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 17:09:21 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1himVG-0006x5-4r
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 17:09:22 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id DDFF030842AC;
- Wed,  3 Jul 2019 21:09:11 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id F3179308222F;
+ Wed,  3 Jul 2019 21:09:18 +0000 (UTC)
 Received: from localhost (ovpn-116-30.gru2.redhat.com [10.97.116.30])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6E70452737;
- Wed,  3 Jul 2019 21:09:11 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 86AB81001925;
+ Wed,  3 Jul 2019 21:09:18 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>,
  Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
  Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
  Richard Henderson <rth@twiddle.net>
-Date: Wed,  3 Jul 2019 18:07:56 -0300
-Message-Id: <20190703210821.27550-19-ehabkost@redhat.com>
+Date: Wed,  3 Jul 2019 18:07:59 -0300
+Message-Id: <20190703210821.27550-22-ehabkost@redhat.com>
 In-Reply-To: <20190703210821.27550-1-ehabkost@redhat.com>
 References: <20190703210821.27550-1-ehabkost@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Wed, 03 Jul 2019 21:09:11 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.47]); Wed, 03 Jul 2019 21:09:19 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL v5 18/43] numa: deprecate implict memory
- distribution between nodes
+Subject: [Qemu-devel] [PULL v5 21/43] deprecate -mem-path fallback to
+ anonymous RAM
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,57 +78,70 @@ Sender: "Qemu-devel"
 
 From: Igor Mammedov <imammedo@redhat.com>
 
-Implicit RAM distribution between nodes has exactly the same issues as:
-  "numa: deprecate 'mem' parameter of '-numa node' option"
-only with QEMU being the user that's 'adding' 'mem' parameter.
+Fallback might affect guest or worse whole host performance
+or functionality if backing file were used to share guest RAM
+with another process.
 
-Deprecate it, to get it out of the way so that we could consolidate
-guest RAM allocation using memory backends making it consistent and
-possibly later on transition to using memory devices instead of
-adhoc memory mapping for the initial RAM.
+Patch deprecates fallback so that we could remove it in future
+and ensure that QEMU will provide expected behavior and fail if
+it can't use user provided backing file.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Message-Id: <1559205199-233510-4-git-send-email-imammedo@redhat.com>
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Message-Id: <20190626074228.11558-1-imammedo@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- hw/core/numa.c       | 3 +++
- qemu-deprecated.texi | 8 ++++++++
- 2 files changed, 11 insertions(+)
+ hw/core/numa.c       | 6 ++++--
+ qemu-deprecated.texi | 9 +++++++++
+ 2 files changed, 13 insertions(+), 2 deletions(-)
 
 diff --git a/hw/core/numa.c b/hw/core/numa.c
-index b15fbdf79a..b74262b743 100644
+index b74262b743..7faec75a07 100644
 --- a/hw/core/numa.c
 +++ b/hw/core/numa.c
-@@ -405,6 +405,9 @@ void numa_complete_configuration(MachineState *ms)
-         if (i == nb_numa_nodes) {
-             assert(mc->numa_auto_assign_ram);
-             mc->numa_auto_assign_ram(mc, numa_info, nb_numa_nodes, ram_size);
-+            warn_report("Default splitting of RAM between nodes is deprecated,"
-+                        " Use '-numa node,memdev' to explictly define RAM"
-+                        " allocation per node");
-         }
- 
-         numa_total = 0;
+@@ -479,8 +479,10 @@ static void allocate_system_memory_nonnuma(MemoryReg=
+ion *mr, Object *owner,
+             if (mem_prealloc) {
+                 exit(1);
+             }
+-            error_report("falling back to regular RAM allocation.");
+-
++            warn_report("falling back to regular RAM allocation");
++            error_printf("This is deprecated. Make sure that -mem-path "
++                         " specified path has sufficient resources to al=
+locate"
++                         " -m specified RAM amount");
+             /* Legacy behavior: if allocation failed, fall back to
+              * regular RAM allocation.
+              */
 diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-index 44c9a95966..2fe9b72121 100644
+index 2fe9b72121..9cba82d5ec 100644
 --- a/qemu-deprecated.texi
 +++ b/qemu-deprecated.texi
-@@ -104,6 +104,14 @@ In future new machine versions will not accept the option but it will still
- work with old machine types. User can check QAPI schema to see if the legacy
- option is supported by looking at MachineInfo::numa-mem-supported property.
- 
-+@subsection -numa node (without memory specified) (since 4.1)
-+
-+Splitting RAM by default between NUMA nodes has the same issues as @option{mem}
-+parameter described above with the difference that the role of the user plays
-+QEMU using implicit generic or board specific splitting rule.
-+Use @option{memdev} with @var{memory-backend-ram} backend or @option{mem} (if
-+it's supported by used machine type) to define mapping explictly instead.
+@@ -112,6 +112,15 @@ QEMU using implicit generic or board specific splitt=
+ing rule.
+ Use @option{memdev} with @var{memory-backend-ram} backend or @option{mem=
+} (if
+ it's supported by used machine type) to define mapping explictly instead=
+.
+=20
++@subsection -mem-path fallback to RAM (since 4.1)
++Currently if guest RAM allocation from file pointed by @option{mem-path}
++fails, QEMU falls back to allocating from RAM, which might result
++in unpredictable behavior since the backing file specified by the user
++is ignored. In the future, users will be responsible for making sure
++the backing storage specified with @option{-mem-path} can actually provi=
+de
++the guest RAM configured with @option{-m} and QEMU will fail to start up=
+ if
++RAM allocation is unsuccessful.
 +
  @section QEMU Machine Protocol (QMP) commands
- 
+=20
  @subsection block-dirty-bitmap-add "autoload" parameter (since 2.12.0)
--- 
+--=20
 2.18.0.rc1.1.g3f1ff2140
 
 
