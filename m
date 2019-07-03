@@ -7,82 +7,81 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47D93C0650E
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 09:54:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39077C0650E
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 09:59:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1749B21881
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 09:54:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F2988218A0
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 09:59:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mKMQ2ygE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1749B21881
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FpDJXztM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F2988218A0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34508 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34542 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hibyR-0001KG-BU
-	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 05:54:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42176)
+	id 1hic2m-0002sK-B8
+	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 05:59:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43622)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <stefanha@gmail.com>) id 1hibw6-00089r-Mu
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 05:52:25 -0400
+ (envelope-from <stefanha@gmail.com>) id 1hic21-00029c-TH
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 05:58:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@gmail.com>) id 1hibw4-0000sj-W5
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 05:52:22 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:37747)
+ (envelope-from <stefanha@gmail.com>) id 1hic20-0004Fe-Mx
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 05:58:29 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:55615)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <stefanha@gmail.com>)
- id 1hibw4-0000o1-K3; Wed, 03 Jul 2019 05:52:20 -0400
-Received: by mail-wr1-x443.google.com with SMTP id v14so2036699wrr.4;
- Wed, 03 Jul 2019 02:52:20 -0700 (PDT)
+ (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1hic20-0004Cq-Bi
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 05:58:28 -0400
+Received: by mail-wm1-x344.google.com with SMTP id a15so1527289wmj.5
+ for <qemu-devel@nongnu.org>; Wed, 03 Jul 2019 02:58:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=date:from:to:cc:subject:message-id:references:mime-version
  :content-disposition:in-reply-to:user-agent;
- bh=vNdc1UazxJPms3a1nRSpLi5/uIu7xUN2PgwKFw3rDKo=;
- b=mKMQ2ygErx/t5rRbUCLQh7u8Oh4FiZd6GFB/dE65DQjjTtIPpLnwO+N29dDtullg+U
- vllkUej3U6ZiCwSZbiVf9D9W4teQHbvoReDisH0IVboMKNJY7nNU299cItmRLIGV2/+y
- LbTT9MTyPG87FR6a3rKiGWEm+UwckIPWqLFmXNRT3rh5yTe82GoWJg3qKbKPwmK66u6U
- x1O08uoRYtj2JalHJN8D/TOqebaHuorsfy0CglcBhquFThaAQqBFzkXfbnd+kpN33enj
- tEWcIA+apT/OTSaU/MeVtRTTmPIMYNXc/6bKPrbTel9NxEdzfxPf31GEKH+mdea4Kngy
- NG0g==
+ bh=rW/fXSq7CHcBwrXrXRxa0JI9zQXBjJuLom0DVCSM5aU=;
+ b=FpDJXztMr+rIR19Vbo7b7W5dkA97iH4mDU9MCQWZMy0osEHPQUlIlUQId5DbnfeIAN
+ LNEUQXJrxoroC4f/8qMFeJWlQa8owegSTqo03wRWb/2aqTxFQlNYNo/ZPCGgeD90edMy
+ N1CZ1B4hSmcSIdRlUfUFZJd14/Xdk6OwSDdlTjfF9LnaNq1lqTEZuGUMzyr5LyXZs7GT
+ TrDTLSIcUlPTVCcAoZWCNAiJm++CZnfnDdghTMCQrxMVQaslMGQITP/tdBXXLCjgqEUp
+ C+5TVpoettv65cXycatn9cRqkEeSFGFvOeI+SmZ5k6GvmKHxhj4hGIVxJIUy4ykLr2Oa
+ 7zcA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to:user-agent;
- bh=vNdc1UazxJPms3a1nRSpLi5/uIu7xUN2PgwKFw3rDKo=;
- b=kImAaLFdTqDUa7DX4/LK0JCMasaQBuOnHcD6J/v1n4e8uSbaztcuqoxJvOHhVQCP4R
- B8kVrRibKbSXrH7+COHQKxzo/mAe7B8x8t0GH2AloTzvZ1fRFLIMglo+Wn1mjA5feI9I
- FJxtyU7GYWTwEHJP0jcI4CGevnfqP1oix9IKzFgHd3AzOBfSVKAKuiB7LF7JtEtPuLJ9
- oTjDtjSBCpnLznZ31GWSSEwnrSTxjRrryyJChv/v0ApipcNydsz3beO0DOEShgUSbdjn
- YtbLFPwa5NRh64IJUm32eIicmjckwa4TRBr2c0zOYO/oWPI4dGLWtTpTQ342MFLHDVnu
- 6HgQ==
-X-Gm-Message-State: APjAAAXC/Cu2qRPBOrYWiGQbH76JLEsamXUZzpNEQqWxtbxECsq9u3kY
- xl3v5RtePZdRRwRXmeXm6/E=
-X-Google-Smtp-Source: APXvYqxpJIKd1vzhK6tvzgD87D01q3pNRZiDiXN4ckazAeep8UhvPtc4BW/Quun0Kqs8QH8iw0VlAw==
-X-Received: by 2002:adf:e691:: with SMTP id r17mr28832357wrm.67.1562147539316; 
- Wed, 03 Jul 2019 02:52:19 -0700 (PDT)
+ bh=rW/fXSq7CHcBwrXrXRxa0JI9zQXBjJuLom0DVCSM5aU=;
+ b=D0yU+TAB9j/RdbWhm6Srjn4sxlvn1A8sOdELXqMS3HUNjtzr2HBLZoMJGu8Vk+O6Kj
+ I2x965YtH75WV8AGkR2qH3Owz1PyvBVeHVgCkKO9PhR2iR2ynt1qwFPg0GQKoEV+8Zgv
+ O3whrbvbXAs4VI9rDhNWtr1lO5IAxsE/7+0Pv7XxYQsklLecutHfjqZJCkCJej95qjCJ
+ h7Q8eWGs5bvGgqiE4ldJP94PB7cJ2bL6crw1DHpje7aBobRPhvWsjBIhEBSSOKu92KFg
+ QJcopLiiTlzqLVAaZhmW0Y98hkjgV4+AU1AFb4FjG3I5bcJbBKruVgW1aWKwxWPGkJE3
+ zbQw==
+X-Gm-Message-State: APjAAAWoj9gJwIoDOSAxni6irr2acSpwHndAMRE3NagK0AbTOiVQsP38
+ eSL0YRX0h4C7m1Sl4g7B7mQ=
+X-Google-Smtp-Source: APXvYqyA8fnEElEl+zOVSRFUh6ER751931GwrXW3NVZ/aw7xEbXU6+5bcmkaOze65bFmAPwrcQFYIQ==
+X-Received: by 2002:a1c:6a0e:: with SMTP id f14mr7939236wmc.154.1562147907171; 
+ Wed, 03 Jul 2019 02:58:27 -0700 (PDT)
 Received: from localhost ([51.15.41.238])
- by smtp.gmail.com with ESMTPSA id x16sm1250878wmj.4.2019.07.03.02.52.18
+ by smtp.gmail.com with ESMTPSA id x6sm2139913wru.0.2019.07.03.02.58.25
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Wed, 03 Jul 2019 02:52:18 -0700 (PDT)
-Date: Wed, 3 Jul 2019 10:52:17 +0100
+ Wed, 03 Jul 2019 02:58:26 -0700 (PDT)
+Date: Wed, 3 Jul 2019 10:58:25 +0100
 From: Stefan Hajnoczi <stefanha@gmail.com>
-To: Maxim Levitsky <mlevitsk@redhat.com>
-Message-ID: <20190703095217.GD11844@stefanha-x1.localdomain>
-References: <20190630150855.1016-1-mlevitsk@redhat.com>
+To: Sergio Lopez <slp@redhat.com>
+Message-ID: <20190703095825.GE11844@stefanha-x1.localdomain>
+References: <20190702121106.28374-1-slp@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="HWvPVVuAAfuRc6SZ"
+ protocol="application/pgp-signature"; boundary="WBsA/oQW3eTA3LlM"
 Content-Disposition: inline
-In-Reply-To: <20190630150855.1016-1-mlevitsk@redhat.com>
+In-Reply-To: <20190702121106.28374-1-slp@redhat.com>
 User-Agent: Mutt/1.12.0 (2019-05-25)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::443
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 0/1] RFC: don't obey the block
- device max transfer len / max segments for block devices
+X-Received-From: 2a00:1450:4864:20::344
+Subject: Re: [Qemu-devel] [PATCH v3 0/4] Introduce the microvm machine type
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,142 +93,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
- John Ferlan <jferlan@redhat.com>
+Cc: ehabkost@redhat.com, maran.wilson@oracle.com, mst@redhat.com,
+ qemu-devel@nongnu.org, kraxel@redhat.com, pbonzini@redhat.com,
+ sgarzare@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---HWvPVVuAAfuRc6SZ
+--WBsA/oQW3eTA3LlM
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Sun, Jun 30, 2019 at 06:08:54PM +0300, Maxim Levitsky wrote:
-> It looks like Linux block devices, even in O_DIRECT mode don't have any u=
-ser visible
-> limit on transfer size / number of segments, which underlying block devic=
-e can have.
-> The block layer takes care of enforcing these limits by splitting the bio=
-s.
+On Tue, Jul 02, 2019 at 02:11:02PM +0200, Sergio Lopez wrote:
+> Microvm is a machine type inspired by both NEMU and Firecracker, and
+> constructed after the machine model implemented by the latter.
 >=20
-> By limiting the transfer sizes, we  force qemu to do the splitting itself=
- which
-> introduces various overheads.
-> It is especially visible in nbd server, where the low max transfer size o=
-f the
-> underlying device forces us to advertise this over NBD, thus increasing t=
-he traffic overhead in case of
-> image conversion which benefits from large blocks.
+> It's main purpose is providing users a KVM-only machine type with fast
+> boot times, minimal attack surface (measured as the number of IO ports
+> and MMIO regions exposed to the Guest) and small footprint (specially
+> when combined with the ongoing QEMU modularization effort).
 >=20
-> More information can be found here:
-> https://bugzilla.redhat.com/show_bug.cgi?id=3D1647104
+> Normally, other than the device support provided by KVM itself,
+> microvm only supports virtio-mmio devices. Microvm also includes a
+> legacy mode, which adds an ISA bus with a 16550A serial port, useful
+> for being able to see the early boot kernel messages.
 >=20
-> Tested this with qemu-img convert over nbd and natively and to my surpris=
-e, even native IO performance improved a bit.
-> (The device on which it was tested is Intel Optane DC P4800X, which has 1=
-28k max transfer size)
+> Microvm only supports booting PVH-enabled Linux ELF images. Booting
+> other PVH-enabled kernels may be possible, but due to the lack of ACPI
+> and firmware, we're relying on the command line for specifying the
+> location of the virtio-mmio transports. If there's an interest on
+> using this machine type with other kernels, we'll try to find some
+> kind of middle ground solution.
 >=20
-> The benchmark:
+> This is the list of the exposed IO ports and MMIO regions when running
+> in non-legacy mode:
 >=20
-> Images were created using:
+> address-space: memory
+>     00000000d0000000-00000000d00001ff (prio 0, i/o): virtio-mmio
+>     00000000d0000200-00000000d00003ff (prio 0, i/o): virtio-mmio
+>     00000000d0000400-00000000d00005ff (prio 0, i/o): virtio-mmio
+>     00000000d0000600-00000000d00007ff (prio 0, i/o): virtio-mmio
+>     00000000d0000800-00000000d00009ff (prio 0, i/o): virtio-mmio
+>     00000000d0000a00-00000000d0000bff (prio 0, i/o): virtio-mmio
+>     00000000d0000c00-00000000d0000dff (prio 0, i/o): virtio-mmio
+>     00000000d0000e00-00000000d0000fff (prio 0, i/o): virtio-mmio
+>     00000000fee00000-00000000feefffff (prio 4096, i/o): kvm-apic-msi
 >=20
-> Sparse image:  qemu-img create -f qcow2 /dev/nvme0n1p3 1G / 10G / 100G
-> Allocated image: qemu-img create -f qcow2 /dev/nvme0n1p3 -o preallocation=
-=3Dmetadata  1G / 10G / 100G
+> address-space: I/O
+>   0000000000000000-000000000000ffff (prio 0, i/o): io
+>     0000000000000020-0000000000000021 (prio 0, i/o): kvm-pic
+>     0000000000000040-0000000000000043 (prio 0, i/o): kvm-pit
+>     000000000000007e-000000000000007f (prio 0, i/o): kvmvapic
+>     00000000000000a0-00000000000000a1 (prio 0, i/o): kvm-pic
+>     00000000000004d0-00000000000004d0 (prio 0, i/o): kvm-elcr
+>     00000000000004d1-00000000000004d1 (prio 0, i/o): kvm-elcr
 >=20
-> The test was:
+> A QEMU instance with the microvm machine type can be invoked this way:
 >=20
->  echo "convert native:"
->  rm -rf /dev/shm/disk.img
->  time qemu-img convert -p -f qcow2 -O raw -T none $FILE /dev/shm/disk.img=
- > /dev/zero
+>  - Normal mode:
 >=20
->  echo "convert via nbd:"
->  qemu-nbd -k /tmp/nbd.sock -v  -f qcow2 $FILE -x export --cache=3Dnone --=
-aio=3Dnative --fork
->  rm -rf /dev/shm/disk.img
->  time qemu-img convert -p -f raw -O raw nbd:unix:/tmp/nbd.sock:exportname=
-=3Dexport /dev/shm/disk.img > /dev/zero
+> qemu-system-x86_64 -M microvm -m 512m -smp 2 \
+>  -kernel vmlinux -append "console=3Dhvc0 root=3D/dev/vda" \
+>  -nodefaults -no-user-config \
+>  -chardev pty,id=3Dvirtiocon0,server \
+>  -device virtio-serial-device \
+>  -device virtconsole,chardev=3Dvirtiocon0 \
+>  -drive id=3Dtest,file=3Dtest.img,format=3Draw,if=3Dnone \
+>  -device virtio-blk-device,drive=3Dtest \
+>  -netdev tap,id=3Dtap0,script=3Dno,downscript=3Dno \
+>  -device virtio-net-device,netdev=3Dtap0
 >=20
-> The results:
+>  - Legacy mode:
 >=20
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> 1G sparse image:
->  native:
-> 	before: 0.027s
-> 	after: 0.027s
->  nbd:
-> 	before: 0.287s
-> 	after: 0.035s
->=20
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> 100G sparse image:
->  native:
-> 	before: 0.028s
-> 	after: 0.028s
->  nbd:
-> 	before: 23.796s
-> 	after: 0.109s
->=20
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> 1G preallocated image:
->  native:
->        before: 0.454s
->        after: 0.427s
->  nbd:
->        before: 0.649s
->        after: 0.546s
->=20
-> The block limits of max transfer size/max segment size are retained
-> for the SCSI passthrough because in this case the kernel passes the users=
-pace request
-> directly to the kernel scsi driver, bypassing the block layer, and thus t=
-here is no code to split
-> such requests.
->=20
-> What do you think?
->=20
-> Fam, since you was the original author of the code that added
-> these limits, could you share your opinion on that?
-> What was the reason besides SCSI passthrough?
->=20
-> Best regards,
-> 	Maxim Levitsky
->=20
-> Maxim Levitsky (1):
->   raw-posix.c - use max transfer length / max segemnt count only for
->     SCSI passthrough
->=20
->  block/file-posix.c | 16 +++++++---------
->  1 file changed, 7 insertions(+), 9 deletions(-)
+> qemu-system-x86_64 -M microvm,legacy -m 512m -smp 2 \
+>  -kernel vmlinux -append "console=3DttyS0 root=3D/dev/vda" \
+>  -nodefaults -no-user-config \
+>  -drive id=3Dtest,file=3Dtest.img,format=3Draw,if=3Dnone \
+>  -device virtio-blk-device,drive=3Dtest \
+>  -netdev tap,id=3Dtap0,script=3Dno,downscript=3Dno \
+>  -device virtio-net-device,netdev=3Dtap0 \
+>  -serial stdio
 
-Adding Eric Blake, who implemented the generic request splitting in the
-block layer and may know if there were any other reasons aside from SCSI
-passthrough why file-posix.c enforces the host block device's maximum
-transfer size.
+Please post metrics that compare this against a minimal Q35.
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+With qboot it was later found that SeaBIOS can achieve comparable boot
+times, so it wasn't worth maintaining qboot.
 
---HWvPVVuAAfuRc6SZ
+Data is needed to show that microvm is really a significant improvement
+over a minimal Q35.
+
+Stefan
+
+--WBsA/oQW3eTA3LlM
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl0cetEACgkQnKSrs4Gr
-c8g16gf/Qraf3b27yoXz46+BV1RmyKr4Q/gUEVlVWKz/SUotAvEQfdzBfW6+eRMw
-028Ypu7Rf0Ho58O61sqh2URzgU9RairZaoN/8SEUe62R6ESSxZJh++NlQ9M58PKs
-sIdyJMEHMMQKCIpUOrbhfJQ0w3d0oCv+X+fAP8vwZYEWBEmwqwCxPkw7+vF/4a6j
-dkA2AemkcVQ8/JUCPPq7EZjtuOkaf4NT2ABtEntkNWI95/t0A9WtW2BnIiaRDH6+
-T8FXgONEaGJJw9EWZ81his9tQnf/JpmQT5xkfZ39tnX5aHuiL0SzsgC1OHeB68I9
-Way691qPSyHwxMzh9j8bWdpgKKtwxA==
-=22HD
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl0cfEEACgkQnKSrs4Gr
+c8hZWwf/a+/b3RJvDJq3tae3jFbA5YsmnFoHQe3nJLMwF/Gv4RqPsx+HOm3qh8aj
+jYRywd4ZeMAlQIsrBcYwDLpcs2u6EjQVFNuACcx/j+emAkcivmBWGjv9INpfzf0H
+0W02V92C/sfNlh+aBdiQbJX5crEjRPTePxO8U/Eg7UsY5yPTTljh03zPd4heVVQ0
++4poMEPF/4ab7YxxB9Yjs4pwU/6aT+r4N0faP36X5N4MAEe6QGvZULmSwS91THFR
+T0Nduoyz5Dt/stdTz3qe5yhcOdbBOsjCLpcZrhRiGPnVPxp+ZmLuBF4j4Qp11hmh
+OiiafnaLCSBaG09I/znFmhqOS7lWBw==
+=ANBz
 -----END PGP SIGNATURE-----
 
---HWvPVVuAAfuRc6SZ--
+--WBsA/oQW3eTA3LlM--
 
