@@ -2,80 +2,61 @@ Return-Path: <SRS0=mdN/=VA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA99EC5B578
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 21:34:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A82CAC5B578
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 21:34:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A5BF221882
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 21:34:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A5BF221882
+	by mail.kernel.org (Postfix) with ESMTPS id 7B87E21882
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 21:34:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B87E21882
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40854 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40856 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1himt9-000745-VL
-	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 17:34:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38336)
+	id 1himtg-0007iJ-Pp
+	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 17:34:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38149)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <pbonzini@redhat.com>) id 1himVU-0006Gi-Nk
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 17:09:38 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1himVH-000684-PP
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 17:09:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1himVT-0007AA-IY
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 17:09:36 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:43800)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1himVT-00078o-90
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 17:09:35 -0400
-Received: by mail-wr1-f68.google.com with SMTP id p13so4303268wru.10
- for <qemu-devel@nongnu.org>; Wed, 03 Jul 2019 14:09:35 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=D26PSec2/xWEYy7NkXWaAuAXncdIOhjnPwacv4ApJtA=;
- b=Jlve8ZmGQCbnvVdeBuyrvnVdpyFF28fURs4h9CSogwh3zX/R+6q6ugmYCV7DQeraoQ
- Km5xkT1FCmdF/KMaX5Lw6lT8cCHvH08nIOktz99+g7Ui4W0tdJBpfZRV1TL+JAzqKatD
- F0JrO7GRFbH8LyM/t4iCQqdExPa8hzxvuNqR1RiY/2LmcTjUyE4W+tfh+uKQYlW/OwUh
- 9y70k0di7WfUou9PHp+our4QU4cW5weRBfDIFS9QO8Iuox8hTos/wFldpuRALxKaIqkU
- km1LUuab/4AjFx5oN7cIHNdgI9AMIeazZsv2+/gBXAJKoPkKcq1kBXh4Sng4jQXk7lYB
- /U4A==
-X-Gm-Message-State: APjAAAWU4SLx6Bi5yKM45x8o55Lkk2G7763x2/PYjOwETVJu7c+ExCmj
- pQjbyPKIITZ5jKJ5DufcShifzg==
-X-Google-Smtp-Source: APXvYqz4CoNOE6rgf6MZk/Snb2Jxb1aajy8xDz6X16DQcB53/OKtJZ7RUjwg85eUjJYhj5S4L5P0aw==
-X-Received: by 2002:a5d:4647:: with SMTP id j7mr32477019wrs.334.1562188173996; 
- Wed, 03 Jul 2019 14:09:33 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:e5b7:d6bb:ed2d:4d20?
- ([2001:b07:6468:f312:e5b7:d6bb:ed2d:4d20])
- by smtp.gmail.com with ESMTPSA id z25sm3282317wmf.38.2019.07.03.14.09.33
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Wed, 03 Jul 2019 14:09:33 -0700 (PDT)
-To: "Montes, Julio" <julio.montes@intel.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-References: <20190703154958.29004-1-julio.montes@intel.com>
- <366f287a-7f83-235c-5141-331117f50bb4@redhat.com>
- <69cb55e2b337cd24f195305683a070cda8b0befd.camel@intel.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <be6aa304-a8e4-d64a-432f-24d52e42c097@redhat.com>
-Date: Wed, 3 Jul 2019 23:09:30 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
-MIME-Version: 1.0
-In-Reply-To: <69cb55e2b337cd24f195305683a070cda8b0befd.camel@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+ (envelope-from <ehabkost@redhat.com>) id 1himVG-0006z3-5g
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 17:09:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49002)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1himVF-0006qJ-GO
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 17:09:22 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id A3BD930C084B;
+ Wed,  3 Jul 2019 21:09:07 +0000 (UTC)
+Received: from localhost (ovpn-116-30.gru2.redhat.com [10.97.116.30])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3118E83788;
+ Wed,  3 Jul 2019 21:09:07 +0000 (UTC)
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
+ Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+ Richard Henderson <rth@twiddle.net>
+Date: Wed,  3 Jul 2019 18:07:54 -0300
+Message-Id: <20190703210821.27550-17-ehabkost@redhat.com>
+In-Reply-To: <20190703210821.27550-1-ehabkost@redhat.com>
+References: <20190703210821.27550-1-ehabkost@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.46]); Wed, 03 Jul 2019 21:09:07 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.221.68
-Subject: Re: [Qemu-devel] [PATCH] hw/i386: Fix linker error when ISAPC is
- disabled
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PULL v5 16/43] machine: show if CLI option '-numa
+ node, mem' is supported in QAPI schema
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,87 +68,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "mst@redhat.com" <mst@redhat.com>,
- "sgarzare@redhat.com" <sgarzare@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 03/07/19 18:40, Montes, Julio wrote:
-> On Wed, 2019-07-03 at 18:21 +0200, Paolo Bonzini wrote:
->> On 03/07/19 17:49, Julio Montes wrote:
->>> In pc_init1(), ISA IDE is initialized without checking if ISAPC or
->>> IDE_ISA
->>> configs are enabled. This results in a link error when
->>> CONFIG_ISAPC is set to 'n' in the file default-configs/i386-
->>> softmmu.mak:
->>>
->>> hw/i386/pc_piix.o: In function `pc_init1':
->>> hw/i386/pc_piix.c:261: undefined reference to `isa_ide_init'
->>> hw/i386/pc_piix.c:261: undefined reference to `isa_ide_init'
->>>
->>> Place ide_isa code under #ifdef CONFIG_IDE_ISA to fix linker errors
->>
->> But there is nothing that defines CONFIG_IDE_ISA, right?
-> 
-> yes I think you're right, do I need to use #ifdef CONFIG_ISAPC instead?
-> or how I can define CONFIG_IDE_ISA at build time?
+From: Igor Mammedov <imammedo@redhat.com>
 
-No, Kconfig symbols do not end up in any header.  We could have one that
-is only included in obj-y files though, since hw/i386/pc_piix.c is obj-y
-rather than common-obj-y.
+Legacy '-numa node,mem' option has a number of issues and mgmt often
+defaults to it. Unfortunately it's no possible to replace it with
+an alternative '-numa memdev' without breaking migration compatibility.
+What's possible though is to deprecate it, keeping option working with
+old machine types only.
 
-Paolo
+In order to help users to find out if being deprecated CLI option
+'-numa node,mem' is still supported by particular machine type, add new
+"numa-mem-supported" property to output of query-machines.
 
->>
->> Paolo
->>
->>> Signed-off-by: Julio Montes <julio.montes@intel.com>
->>> ---
->>>  hw/i386/pc_piix.c | 11 ++++++++---
->>>  1 file changed, 8 insertions(+), 3 deletions(-)
->>>
->>> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
->>> index c07c4a5b38..b93f9327be 100644
->>> --- a/hw/i386/pc_piix.c
->>> +++ b/hw/i386/pc_piix.c
->>> @@ -61,9 +61,11 @@
->>>  
->>>  #define MAX_IDE_BUS 2
->>>  
->>> +#ifdef CONFIG_IDE_ISA
->>>  static const int ide_iobase[MAX_IDE_BUS] = { 0x1f0, 0x170 };
->>>  static const int ide_iobase2[MAX_IDE_BUS] = { 0x3f6, 0x376 };
->>>  static const int ide_irq[MAX_IDE_BUS] = { 14, 15 };
->>> +#endif
->>>  
->>>  /* PC hardware initialisation */
->>>  static void pc_init1(MachineState *machine,
->>> @@ -254,7 +256,10 @@ static void pc_init1(MachineState *machine,
->>>          }
->>>          idebus[0] = qdev_get_child_bus(&dev->qdev, "ide.0");
->>>          idebus[1] = qdev_get_child_bus(&dev->qdev, "ide.1");
->>> -    } else {
->>> +        pc_cmos_init(pcms, idebus[0], idebus[1], rtc_state);
->>> +    }
->>> +#ifdef CONFIG_IDE_ISA
->>> +else {
->>>          for(i = 0; i < MAX_IDE_BUS; i++) {
->>>              ISADevice *dev;
->>>              char busname[] = "ide.0";
->>> @@ -268,9 +273,9 @@ static void pc_init1(MachineState *machine,
->>>              busname[4] = '0' + i;
->>>              idebus[i] = qdev_get_child_bus(DEVICE(dev), busname);
->>>          }
->>> +        pc_cmos_init(pcms, idebus[0], idebus[1], rtc_state);
->>>      }
->>> -
->>> -    pc_cmos_init(pcms, idebus[0], idebus[1], rtc_state);
->>> +#endif
->>>  
->>>      if (pcmc->pci_enabled && machine_usb(machine)) {
->>>          pci_create_simple(pci_bus, piix3_devfn + 2, "piix3-usb-
->>> uhci");
->>>
+"numa-mem-supported" is set to 'true' for machines that currently support
+NUMA, but it will be flipped to 'false' later on, once deprecation period
+expires and kept 'true' only for old machine types that used to support
+the legacy option so it won't break existing configuration that are using
+it.
+
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Message-Id: <1560172207-378962-1-git-send-email-imammedo@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+---
+ qapi/machine.json          | 5 ++++-
+ include/hw/boards.h        | 3 +++
+ hw/arm/virt.c              | 1 +
+ hw/core/machine-qmp-cmds.c | 1 +
+ hw/i386/pc.c               | 1 +
+ hw/ppc/spapr.c             | 1 +
+ 6 files changed, 11 insertions(+), 1 deletion(-)
+
+diff --git a/qapi/machine.json b/qapi/machine.json
+index 979bc41e49..78d34ef717 100644
+--- a/qapi/machine.json
++++ b/qapi/machine.json
+@@ -318,12 +318,15 @@
+ #
+ # @hotpluggable-cpus: cpu hotplug via -device is supported (since 2.7.0)
+ #
++# @numa-mem-supported: true if '-numa node,mem' option is supported by
++#                      the machine type and false otherwise (since 4.1)
++#
+ # Since: 1.2.0
+ ##
+ { 'struct': 'MachineInfo',
+   'data': { 'name': 'str', '*alias': 'str',
+             '*is-default': 'bool', 'cpu-max': 'int',
+-            'hotpluggable-cpus': 'bool'} }
++            'hotpluggable-cpus': 'bool', 'numa-mem-supported': 'bool'} }
+ 
+ ##
+ # @query-machines:
+diff --git a/include/hw/boards.h b/include/hw/boards.h
+index d84f48c4af..ae7a542511 100644
+--- a/include/hw/boards.h
++++ b/include/hw/boards.h
+@@ -160,6 +160,8 @@ typedef struct {
+  * @kvm_type:
+  *    Return the type of KVM corresponding to the kvm-type string option or
+  *    computed based on other criteria such as the host kernel capabilities.
++ * @numa_mem_supported:
++ *    true if '--numa node.mem' option is supported and false otherwise
+  */
+ struct MachineClass {
+     /*< private >*/
+@@ -212,6 +214,7 @@ struct MachineClass {
+     bool ignore_boot_device_suffixes;
+     bool smbus_no_migration_support;
+     bool nvdimm_supported;
++    bool numa_mem_supported;
+ 
+     HotplugHandler *(*get_hotplug_handler)(MachineState *machine,
+                                            DeviceState *dev);
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index 20f191bc93..0b5138cb22 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -1952,6 +1952,7 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
+     assert(!mc->get_hotplug_handler);
+     mc->get_hotplug_handler = virt_machine_get_hotplug_handler;
+     hc->plug = virt_machine_device_plug_cb;
++    mc->numa_mem_supported = true;
+ }
+ 
+ static void virt_instance_init(Object *obj)
+diff --git a/hw/core/machine-qmp-cmds.c b/hw/core/machine-qmp-cmds.c
+index 14dbad1d6e..754ce77664 100644
+--- a/hw/core/machine-qmp-cmds.c
++++ b/hw/core/machine-qmp-cmds.c
+@@ -226,6 +226,7 @@ MachineInfoList *qmp_query_machines(Error **errp)
+         info->name = g_strdup(mc->name);
+         info->cpu_max = !mc->max_cpus ? 1 : mc->max_cpus;
+         info->hotpluggable_cpus = mc->has_hotpluggable_cpus;
++        info->numa_mem_supported = mc->numa_mem_supported;
+ 
+         entry = g_malloc0(sizeof(*entry));
+         entry->value = info;
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 9b953eeeea..114fd5f8d4 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -2792,6 +2792,7 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
+     nc->nmi_monitor_handler = x86_nmi;
+     mc->default_cpu_type = TARGET_DEFAULT_CPU_TYPE;
+     mc->nvdimm_supported = true;
++    mc->numa_mem_supported = true;
+ 
+     object_class_property_add(oc, PC_MACHINE_DEVMEM_REGION_SIZE, "int",
+         pc_machine_get_device_memory_region_size, NULL,
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 51256ac9ca..821f0d4a49 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -4367,6 +4367,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
+      * in which LMBs are represented and hot-added
+      */
+     mc->numa_mem_align_shift = 28;
++    mc->numa_mem_supported = true;
+ 
+     smc->default_caps.caps[SPAPR_CAP_HTM] = SPAPR_CAP_OFF;
+     smc->default_caps.caps[SPAPR_CAP_VSX] = SPAPR_CAP_ON;
+-- 
+2.18.0.rc1.1.g3f1ff2140
 
 
