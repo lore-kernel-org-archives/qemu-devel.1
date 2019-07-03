@@ -6,57 +6,57 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 100D9C5B578
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 21:23:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DCD21C5B578
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 21:23:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C62B721882
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 21:23:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C62B721882
+	by mail.kernel.org (Postfix) with ESMTPS id B570D21882
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 21:23:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B570D21882
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40768 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40770 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1himj0-0002qX-03
-	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 17:23:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37966)
+	id 1himj5-00032y-V6
+	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 17:23:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38045)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <ehabkost@redhat.com>) id 1himUp-00063N-8V
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 17:08:57 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1himV5-00067F-Qo
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 17:09:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1himUm-0006ij-Md
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 17:08:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51412)
+ (envelope-from <ehabkost@redhat.com>) id 1himV0-0006pg-Rt
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 17:09:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58850)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1himUm-0006iB-AR
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 17:08:52 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1himUw-0006nO-HI
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 17:09:03 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 6AE6330842D1;
- Wed,  3 Jul 2019 21:08:51 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 8AD4285541;
+ Wed,  3 Jul 2019 21:09:01 +0000 (UTC)
 Received: from localhost (ovpn-116-30.gru2.redhat.com [10.97.116.30])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 718491001925;
- Wed,  3 Jul 2019 21:08:48 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 19BD26013C;
+ Wed,  3 Jul 2019 21:09:00 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>,
  Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
  Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
  Richard Henderson <rth@twiddle.net>
-Date: Wed,  3 Jul 2019 18:07:46 -0300
-Message-Id: <20190703210821.27550-9-ehabkost@redhat.com>
+Date: Wed,  3 Jul 2019 18:07:51 -0300
+Message-Id: <20190703210821.27550-14-ehabkost@redhat.com>
 In-Reply-To: <20190703210821.27550-1-ehabkost@redhat.com>
 References: <20190703210821.27550-1-ehabkost@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Wed, 03 Jul 2019 21:08:51 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.28]); Wed, 03 Jul 2019 21:09:01 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL v5 08/43] hw/arm: Replace global smp variables
- with machine smp properties
+Subject: [Qemu-devel] [PULL v5 13/43] i386/cpu: Consolidate die-id validity
+ in smp context
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,498 +75,199 @@ Sender: "Qemu-devel"
 
 From: Like Xu <like.xu@linux.intel.com>
 
-The global smp variables in arm are replaced with smp machine properties.
-The init_cpus() and *_create_rpu() are refactored to pass MachineState.
+The field die_id (default as 0) and has_die_id are introduced to X86CPU.
+Following the legacy smp check rules, the die_id validity is added to
+the same contexts as leagcy smp variables such as hmp_hotpluggable_cpus(),
+machine_set_cpu_numa_node(), cpu_slot_to_string() and pc_cpu_pre_plug().
 
-A local variable of the same name would be introduced in the declaration
-phase if it's used widely in the context OR replace it on the spot if it's
-only used once. No semantic changes.
-
+Acked-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Signed-off-by: Like Xu <like.xu@linux.intel.com>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Message-Id: <20190518205428.90532-9-like.xu@linux.intel.com>
-[ehabkost: Fix hw/arm/sbsa-ref.c and hw/arm/aspeed.c]
+Message-Id: <20190612084104.34984-4-like.xu@linux.intel.com>
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- hw/arm/aspeed.c        |  2 +-
- hw/arm/fsl-imx6.c      |  6 +++++-
- hw/arm/fsl-imx6ul.c    |  6 +++++-
- hw/arm/fsl-imx7.c      |  7 +++++--
- hw/arm/highbank.c      |  1 +
- hw/arm/mcimx6ul-evk.c  |  2 +-
- hw/arm/mcimx7d-sabre.c |  2 +-
- hw/arm/raspi.c         |  4 ++--
- hw/arm/realview.c      |  1 +
- hw/arm/sabrelite.c     |  2 +-
- hw/arm/sbsa-ref.c      |  4 ++++
- hw/arm/vexpress.c      | 16 ++++++++++------
- hw/arm/virt.c          |  8 +++++++-
- hw/arm/xlnx-zynqmp.c   | 16 ++++++++++------
- target/arm/cpu.c       |  8 +++++++-
- 15 files changed, 61 insertions(+), 24 deletions(-)
+ qapi/machine.json          |  7 ++++---
+ include/hw/i386/topology.h |  2 ++
+ target/i386/cpu.h          |  1 +
+ hw/core/machine-hmp-cmds.c |  3 +++
+ hw/core/machine.c          | 12 ++++++++++++
+ hw/i386/pc.c               | 14 ++++++++++++++
+ target/i386/cpu.c          |  2 ++
+ 7 files changed, 38 insertions(+), 3 deletions(-)
 
-diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
-index 8b6d304247..843b708247 100644
---- a/hw/arm/aspeed.c
-+++ b/hw/arm/aspeed.c
-@@ -187,7 +187,7 @@ static void aspeed_board_init(MachineState *machine,
-                             &error_abort);
-     object_property_set_int(OBJECT(&bmc->soc), cfg->num_cs, "num-cs",
-                             &error_abort);
--    object_property_set_int(OBJECT(&bmc->soc), smp_cpus, "num-cpus",
-+    object_property_set_int(OBJECT(&bmc->soc), machine->smp.cpus, "num-cpus",
-                             &error_abort);
-     if (machine->kernel_filename) {
-         /*
-diff --git a/hw/arm/fsl-imx6.c b/hw/arm/fsl-imx6.c
-index 7129517378..de45833097 100644
---- a/hw/arm/fsl-imx6.c
-+++ b/hw/arm/fsl-imx6.c
-@@ -22,6 +22,7 @@
- #include "qemu/osdep.h"
- #include "qapi/error.h"
- #include "hw/arm/fsl-imx6.h"
-+#include "hw/boards.h"
- #include "sysemu/sysemu.h"
- #include "chardev/char.h"
- #include "qemu/error-report.h"
-@@ -33,11 +34,12 @@
+diff --git a/qapi/machine.json b/qapi/machine.json
+index 81849acb3a..979bc41e49 100644
+--- a/qapi/machine.json
++++ b/qapi/machine.json
+@@ -588,10 +588,10 @@
+ #
+ # @node-id: NUMA node ID the CPU belongs to
+ # @socket-id: socket number within node/board the CPU belongs to
+-# @core-id: core number within socket the CPU belongs to
+-# @thread-id: thread number within core the CPU belongs to
++# @die-id: die number within node/board the CPU belongs to (Since 4.1)
++# @core-id: core number within die the CPU belongs to# @thread-id: thread number within core the CPU belongs to
+ #
+-# Note: currently there are 4 properties that could be present
++# Note: currently there are 5 properties that could be present
+ # but management should be prepared to pass through other
+ # properties with device_add command to allow for future
+ # interface extension. This also requires the filed names to be kept in
+@@ -602,6 +602,7 @@
+ { 'struct': 'CpuInstanceProperties',
+   'data': { '*node-id': 'int',
+             '*socket-id': 'int',
++            '*die-id': 'int',
+             '*core-id': 'int',
+             '*thread-id': 'int'
+   }
+diff --git a/include/hw/i386/topology.h b/include/hw/i386/topology.h
+index 1ebaee0f76..c9fb41588e 100644
+--- a/include/hw/i386/topology.h
++++ b/include/hw/i386/topology.h
+@@ -47,6 +47,7 @@ typedef uint32_t apic_id_t;
  
- static void fsl_imx6_init(Object *obj)
- {
-+    MachineState *ms = MACHINE(qdev_get_machine());
-     FslIMX6State *s = FSL_IMX6(obj);
-     char name[NAME_SIZE];
-     int i;
- 
--    for (i = 0; i < MIN(smp_cpus, FSL_IMX6_NUM_CPUS); i++) {
-+    for (i = 0; i < MIN(ms->smp.cpus, FSL_IMX6_NUM_CPUS); i++) {
-         snprintf(name, NAME_SIZE, "cpu%d", i);
-         object_initialize_child(obj, name, &s->cpu[i], sizeof(s->cpu[i]),
-                                 "cortex-a9-" TYPE_ARM_CPU, &error_abort, NULL);
-@@ -93,9 +95,11 @@ static void fsl_imx6_init(Object *obj)
- 
- static void fsl_imx6_realize(DeviceState *dev, Error **errp)
- {
-+    MachineState *ms = MACHINE(qdev_get_machine());
-     FslIMX6State *s = FSL_IMX6(dev);
-     uint16_t i;
-     Error *err = NULL;
-+    unsigned int smp_cpus = ms->smp.cpus;
- 
-     if (smp_cpus > FSL_IMX6_NUM_CPUS) {
-         error_setg(errp, "%s: Only %d CPUs are supported (%d requested)",
-diff --git a/hw/arm/fsl-imx6ul.c b/hw/arm/fsl-imx6ul.c
-index 05505bac56..f860165438 100644
---- a/hw/arm/fsl-imx6ul.c
-+++ b/hw/arm/fsl-imx6ul.c
-@@ -20,6 +20,7 @@
- #include "qapi/error.h"
- #include "hw/arm/fsl-imx6ul.h"
- #include "hw/misc/unimp.h"
-+#include "hw/boards.h"
- #include "sysemu/sysemu.h"
- #include "qemu/error-report.h"
- #include "qemu/module.h"
-@@ -28,11 +29,12 @@
- 
- static void fsl_imx6ul_init(Object *obj)
- {
-+    MachineState *ms = MACHINE(qdev_get_machine());
-     FslIMX6ULState *s = FSL_IMX6UL(obj);
-     char name[NAME_SIZE];
-     int i;
- 
--    for (i = 0; i < MIN(smp_cpus, FSL_IMX6UL_NUM_CPUS); i++) {
-+    for (i = 0; i < MIN(ms->smp.cpus, FSL_IMX6UL_NUM_CPUS); i++) {
-         snprintf(name, NAME_SIZE, "cpu%d", i);
-         object_initialize_child(obj, name, &s->cpu[i], sizeof(s->cpu[i]),
-                                 "cortex-a7-" TYPE_ARM_CPU, &error_abort, NULL);
-@@ -156,10 +158,12 @@ static void fsl_imx6ul_init(Object *obj)
- 
- static void fsl_imx6ul_realize(DeviceState *dev, Error **errp)
- {
-+    MachineState *ms = MACHINE(qdev_get_machine());
-     FslIMX6ULState *s = FSL_IMX6UL(dev);
-     int i;
-     qemu_irq irq;
-     char name[NAME_SIZE];
-+    unsigned int smp_cpus = ms->smp.cpus;
- 
-     if (smp_cpus > FSL_IMX6UL_NUM_CPUS) {
-         error_setg(errp, "%s: Only %d CPUs are supported (%d requested)",
-diff --git a/hw/arm/fsl-imx7.c b/hw/arm/fsl-imx7.c
-index 2eddf3f25c..119b281a50 100644
---- a/hw/arm/fsl-imx7.c
-+++ b/hw/arm/fsl-imx7.c
-@@ -22,6 +22,7 @@
- #include "qapi/error.h"
- #include "hw/arm/fsl-imx7.h"
- #include "hw/misc/unimp.h"
-+#include "hw/boards.h"
- #include "sysemu/sysemu.h"
- #include "qemu/error-report.h"
- #include "qemu/module.h"
-@@ -30,12 +31,12 @@
- 
- static void fsl_imx7_init(Object *obj)
- {
-+    MachineState *ms = MACHINE(qdev_get_machine());
-     FslIMX7State *s = FSL_IMX7(obj);
-     char name[NAME_SIZE];
-     int i;
- 
--
--    for (i = 0; i < MIN(smp_cpus, FSL_IMX7_NUM_CPUS); i++) {
-+    for (i = 0; i < MIN(ms->smp.cpus, FSL_IMX7_NUM_CPUS); i++) {
-         snprintf(name, NAME_SIZE, "cpu%d", i);
-         object_initialize_child(obj, name, &s->cpu[i], sizeof(s->cpu[i]),
-                                 ARM_CPU_TYPE_NAME("cortex-a7"), &error_abort,
-@@ -155,11 +156,13 @@ static void fsl_imx7_init(Object *obj)
- 
- static void fsl_imx7_realize(DeviceState *dev, Error **errp)
- {
-+    MachineState *ms = MACHINE(qdev_get_machine());
-     FslIMX7State *s = FSL_IMX7(dev);
-     Object *o;
-     int i;
-     qemu_irq irq;
-     char name[NAME_SIZE];
-+    unsigned int smp_cpus = ms->smp.cpus;
- 
-     if (smp_cpus > FSL_IMX7_NUM_CPUS) {
-         error_setg(errp, "%s: Only %d CPUs are supported (%d requested)",
-diff --git a/hw/arm/highbank.c b/hw/arm/highbank.c
-index 72ca78108a..def0f1ce6a 100644
---- a/hw/arm/highbank.c
-+++ b/hw/arm/highbank.c
-@@ -241,6 +241,7 @@ static void calxeda_init(MachineState *machine, enum cxmachines machine_id)
-     SysBusDevice *busdev;
-     qemu_irq pic[128];
-     int n;
-+    unsigned int smp_cpus = machine->smp.cpus;
-     qemu_irq cpu_irq[4];
-     qemu_irq cpu_fiq[4];
-     qemu_irq cpu_virq[4];
-diff --git a/hw/arm/mcimx6ul-evk.c b/hw/arm/mcimx6ul-evk.c
-index 31511059e4..bbffb11c2a 100644
---- a/hw/arm/mcimx6ul-evk.c
-+++ b/hw/arm/mcimx6ul-evk.c
-@@ -42,7 +42,7 @@ static void mcimx6ul_evk_init(MachineState *machine)
-         .kernel_filename = machine->kernel_filename,
-         .kernel_cmdline = machine->kernel_cmdline,
-         .initrd_filename = machine->initrd_filename,
--        .nb_cpus = smp_cpus,
-+        .nb_cpus = machine->smp.cpus,
-     };
- 
-     object_initialize_child(OBJECT(machine), "soc", &s->soc,  sizeof(s->soc),
-diff --git a/hw/arm/mcimx7d-sabre.c b/hw/arm/mcimx7d-sabre.c
-index d6b190d85d..72eab03a0c 100644
---- a/hw/arm/mcimx7d-sabre.c
-+++ b/hw/arm/mcimx7d-sabre.c
-@@ -45,7 +45,7 @@ static void mcimx7d_sabre_init(MachineState *machine)
-         .kernel_filename = machine->kernel_filename,
-         .kernel_cmdline = machine->kernel_cmdline,
-         .initrd_filename = machine->initrd_filename,
--        .nb_cpus = smp_cpus,
-+        .nb_cpus = machine->smp.cpus,
-     };
- 
-     object_initialize(&s->soc, sizeof(s->soc), TYPE_FSL_IMX7);
-diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
-index cb23330940..5b2620acb4 100644
---- a/hw/arm/raspi.c
-+++ b/hw/arm/raspi.c
-@@ -116,7 +116,7 @@ static void setup_boot(MachineState *machine, int version, size_t ram_size)
- 
-     binfo.board_id = raspi_boardid[version];
-     binfo.ram_size = ram_size;
--    binfo.nb_cpus = smp_cpus;
-+    binfo.nb_cpus = machine->smp.cpus;
- 
-     if (version <= 2) {
-         /* The rpi1 and 2 require some custom setup code to run in Secure
-@@ -194,7 +194,7 @@ static void raspi_init(MachineState *machine, int version)
-     /* Setup the SOC */
-     object_property_add_const_link(OBJECT(&s->soc), "ram", OBJECT(&s->ram),
-                                    &error_abort);
--    object_property_set_int(OBJECT(&s->soc), smp_cpus, "enabled-cpus",
-+    object_property_set_int(OBJECT(&s->soc), machine->smp.cpus, "enabled-cpus",
-                             &error_abort);
-     int board_rev = version == 3 ? 0xa02082 : 0xa21041;
-     object_property_set_int(OBJECT(&s->soc), board_rev, "board-rev",
-diff --git a/hw/arm/realview.c b/hw/arm/realview.c
-index 12d6e93a35..7c56c8d2ed 100644
---- a/hw/arm/realview.c
-+++ b/hw/arm/realview.c
-@@ -69,6 +69,7 @@ static void realview_init(MachineState *machine,
-     NICInfo *nd;
-     I2CBus *i2c;
-     int n;
-+    unsigned int smp_cpus = machine->smp.cpus;
-     int done_nic = 0;
-     qemu_irq cpu_irq[4];
-     int is_mpcore = 0;
-diff --git a/hw/arm/sabrelite.c b/hw/arm/sabrelite.c
-index 97230ac827..934f4c9261 100644
---- a/hw/arm/sabrelite.c
-+++ b/hw/arm/sabrelite.c
-@@ -105,7 +105,7 @@ static void sabrelite_init(MachineState *machine)
-     sabrelite_binfo.kernel_filename = machine->kernel_filename;
-     sabrelite_binfo.kernel_cmdline = machine->kernel_cmdline;
-     sabrelite_binfo.initrd_filename = machine->initrd_filename;
--    sabrelite_binfo.nb_cpus = smp_cpus;
-+    sabrelite_binfo.nb_cpus = machine->smp.cpus;
-     sabrelite_binfo.secure_boot = true;
-     sabrelite_binfo.write_secondary_boot = sabrelite_write_secondary;
-     sabrelite_binfo.secondary_cpu_reset_hook = sabrelite_reset_secondary;
-diff --git a/hw/arm/sbsa-ref.c b/hw/arm/sbsa-ref.c
-index ee53f0ff60..e8c65e31c7 100644
---- a/hw/arm/sbsa-ref.c
-+++ b/hw/arm/sbsa-ref.c
-@@ -328,6 +328,7 @@ static void create_secure_ram(SBSAMachineState *sms,
- 
- static void create_gic(SBSAMachineState *sms, qemu_irq *pic)
- {
-+    unsigned int smp_cpus = MACHINE(sms)->smp.cpus;
-     DeviceState *gicdev;
-     SysBusDevice *gicbusdev;
-     const char *gictype;
-@@ -585,6 +586,8 @@ static void *sbsa_ref_dtb(const struct arm_boot_info *binfo, int *fdt_size)
- 
- static void sbsa_ref_init(MachineState *machine)
- {
-+    unsigned int smp_cpus = machine->smp.cpus;
-+    unsigned int max_cpus = machine->smp.max_cpus;
-     SBSAMachineState *sms = SBSA_MACHINE(machine);
-     MachineClass *mc = MACHINE_GET_CLASS(machine);
-     MemoryRegion *sysmem = get_system_memory();
-@@ -727,6 +730,7 @@ static uint64_t sbsa_ref_cpu_mp_affinity(SBSAMachineState *sms, int idx)
- 
- static const CPUArchIdList *sbsa_ref_possible_cpu_arch_ids(MachineState *ms)
- {
-+    unsigned int max_cpus = ms->smp.max_cpus;
-     SBSAMachineState *sms = SBSA_MACHINE(ms);
-     int n;
- 
-diff --git a/hw/arm/vexpress.c b/hw/arm/vexpress.c
-index 2b3b0c2334..5d932c27c0 100644
---- a/hw/arm/vexpress.c
-+++ b/hw/arm/vexpress.c
-@@ -203,12 +203,14 @@ struct VEDBoardInfo {
-     DBoardInitFn *init;
- };
- 
--static void init_cpus(const char *cpu_type, const char *privdev,
--                      hwaddr periphbase, qemu_irq *pic, bool secure, bool virt)
-+static void init_cpus(MachineState *ms, const char *cpu_type,
-+                      const char *privdev, hwaddr periphbase,
-+                      qemu_irq *pic, bool secure, bool virt)
- {
-     DeviceState *dev;
-     SysBusDevice *busdev;
-     int n;
-+    unsigned int smp_cpus = ms->smp.cpus;
- 
-     /* Create the actual CPUs */
-     for (n = 0; n < smp_cpus; n++) {
-@@ -269,6 +271,7 @@ static void a9_daughterboard_init(const VexpressMachineState *vms,
-                                   const char *cpu_type,
-                                   qemu_irq *pic)
- {
-+    MachineState *machine = MACHINE(vms);
-     MemoryRegion *sysmem = get_system_memory();
-     MemoryRegion *ram = g_new(MemoryRegion, 1);
-     MemoryRegion *lowram = g_new(MemoryRegion, 1);
-@@ -295,7 +298,7 @@ static void a9_daughterboard_init(const VexpressMachineState *vms,
-     memory_region_add_subregion(sysmem, 0x60000000, ram);
- 
-     /* 0x1e000000 A9MPCore (SCU) private memory region */
--    init_cpus(cpu_type, TYPE_A9MPCORE_PRIV, 0x1e000000, pic,
-+    init_cpus(machine, cpu_type, TYPE_A9MPCORE_PRIV, 0x1e000000, pic,
-               vms->secure, vms->virt);
- 
-     /* Daughterboard peripherals : 0x10020000 .. 0x20000000 */
-@@ -355,6 +358,7 @@ static void a15_daughterboard_init(const VexpressMachineState *vms,
-                                    const char *cpu_type,
-                                    qemu_irq *pic)
- {
-+    MachineState *machine = MACHINE(vms);
-     MemoryRegion *sysmem = get_system_memory();
-     MemoryRegion *ram = g_new(MemoryRegion, 1);
-     MemoryRegion *sram = g_new(MemoryRegion, 1);
-@@ -377,8 +381,8 @@ static void a15_daughterboard_init(const VexpressMachineState *vms,
-     memory_region_add_subregion(sysmem, 0x80000000, ram);
- 
-     /* 0x2c000000 A15MPCore private memory region (GIC) */
--    init_cpus(cpu_type, TYPE_A15MPCORE_PRIV, 0x2c000000, pic, vms->secure,
--              vms->virt);
-+    init_cpus(machine, cpu_type, TYPE_A15MPCORE_PRIV,
-+              0x2c000000, pic, vms->secure, vms->virt);
- 
-     /* A15 daughterboard peripherals: */
- 
-@@ -706,7 +710,7 @@ static void vexpress_common_init(MachineState *machine)
-     daughterboard->bootinfo.kernel_filename = machine->kernel_filename;
-     daughterboard->bootinfo.kernel_cmdline = machine->kernel_cmdline;
-     daughterboard->bootinfo.initrd_filename = machine->initrd_filename;
--    daughterboard->bootinfo.nb_cpus = smp_cpus;
-+    daughterboard->bootinfo.nb_cpus = machine->smp.cpus;
-     daughterboard->bootinfo.board_id = VEXPRESS_BOARD_ID;
-     daughterboard->bootinfo.loader_start = daughterboard->loader_start;
-     daughterboard->bootinfo.smp_loader_start = map[VE_SRAM];
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 7b63a924a3..20f191bc93 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -559,11 +559,13 @@ static void create_v2m(VirtMachineState *vms, qemu_irq *pic)
- 
- static void create_gic(VirtMachineState *vms, qemu_irq *pic)
- {
-+    MachineState *ms = MACHINE(vms);
-     /* We create a standalone GIC */
-     DeviceState *gicdev;
-     SysBusDevice *gicbusdev;
-     const char *gictype;
-     int type = vms->gic_version, i;
-+    unsigned int smp_cpus = ms->smp.cpus;
-     uint32_t nb_redist_regions = 0;
- 
-     gictype = (type == 3) ? gicv3_class_name() : gic_class_name();
-@@ -1039,13 +1041,14 @@ static bool virt_firmware_init(VirtMachineState *vms,
- 
- static FWCfgState *create_fw_cfg(const VirtMachineState *vms, AddressSpace *as)
- {
-+    MachineState *ms = MACHINE(vms);
-     hwaddr base = vms->memmap[VIRT_FW_CFG].base;
-     hwaddr size = vms->memmap[VIRT_FW_CFG].size;
-     FWCfgState *fw_cfg;
-     char *nodename;
- 
-     fw_cfg = fw_cfg_init_mem_wide(base + 8, base, 8, base + 16, as);
--    fw_cfg_add_i16(fw_cfg, FW_CFG_NB_CPUS, (uint16_t)smp_cpus);
-+    fw_cfg_add_i16(fw_cfg, FW_CFG_NB_CPUS, (uint16_t)ms->smp.cpus);
- 
-     nodename = g_strdup_printf("/fw-cfg@%" PRIx64, base);
-     qemu_fdt_add_subnode(vms->fdt, nodename);
-@@ -1478,6 +1481,8 @@ static void machvirt_init(MachineState *machine)
-     MemoryRegion *ram = g_new(MemoryRegion, 1);
-     bool firmware_loaded;
-     bool aarch64 = true;
-+    unsigned int smp_cpus = machine->smp.cpus;
-+    unsigned int max_cpus = machine->smp.max_cpus;
- 
-     /*
-      * In accelerated mode, the memory map is computed earlier in kvm_type()
-@@ -1845,6 +1850,7 @@ static int64_t virt_get_default_cpu_node_id(const MachineState *ms, int idx)
- static const CPUArchIdList *virt_possible_cpu_arch_ids(MachineState *ms)
- {
-     int n;
-+    unsigned int max_cpus = ms->smp.max_cpus;
-     VirtMachineState *vms = VIRT_MACHINE(ms);
- 
-     if (ms->possible_cpus) {
-diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
-index a1ca9b5adf..a60830d37a 100644
---- a/hw/arm/xlnx-zynqmp.c
-+++ b/hw/arm/xlnx-zynqmp.c
-@@ -21,6 +21,7 @@
- #include "cpu.h"
- #include "hw/arm/xlnx-zynqmp.h"
- #include "hw/intc/arm_gic_common.h"
-+#include "hw/boards.h"
- #include "exec/address-spaces.h"
- #include "sysemu/kvm.h"
- #include "kvm_arm.h"
-@@ -171,12 +172,13 @@ static inline int arm_gic_ppi_index(int cpu_nr, int ppi_index)
-     return GIC_NUM_SPI_INTR + cpu_nr * GIC_INTERNAL + ppi_index;
+ typedef struct X86CPUTopoInfo {
+     unsigned pkg_id;
++    unsigned die_id;
+     unsigned core_id;
+     unsigned smt_id;
+ } X86CPUTopoInfo;
+@@ -130,6 +131,7 @@ static inline void x86_topo_ids_from_apicid(apic_id_t apicid,
+     topo->core_id = (apicid >> apicid_core_offset(nr_cores, nr_threads)) &
+                    ~(0xFFFFFFFFUL << apicid_core_width(nr_cores, nr_threads));
+     topo->pkg_id = apicid >> apicid_pkg_offset(nr_cores, nr_threads);
++    topo->die_id = 0;
  }
  
--static void xlnx_zynqmp_create_rpu(XlnxZynqMPState *s, const char *boot_cpu,
--                                   Error **errp)
-+static void xlnx_zynqmp_create_rpu(MachineState *ms, XlnxZynqMPState *s,
-+                                   const char *boot_cpu, Error **errp)
- {
-     Error *err = NULL;
-     int i;
--    int num_rpus = MIN(smp_cpus - XLNX_ZYNQMP_NUM_APU_CPUS, XLNX_ZYNQMP_NUM_RPU_CPUS);
-+    int num_rpus = MIN(ms->smp.cpus - XLNX_ZYNQMP_NUM_APU_CPUS,
-+                       XLNX_ZYNQMP_NUM_RPU_CPUS);
+ /* Make APIC ID for the CPU 'cpu_index'
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 14c19e61b1..4d2ae2384e 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -1500,6 +1500,7 @@ struct X86CPU {
  
-     if (num_rpus <= 0) {
-         /* Don't create rpu-cluster object if there's nothing to put in it */
-@@ -221,9 +223,10 @@ static void xlnx_zynqmp_create_rpu(XlnxZynqMPState *s, const char *boot_cpu,
+     int32_t node_id; /* NUMA node this CPU belongs to */
+     int32_t socket_id;
++    int32_t die_id;
+     int32_t core_id;
+     int32_t thread_id;
  
- static void xlnx_zynqmp_init(Object *obj)
- {
-+    MachineState *ms = MACHINE(qdev_get_machine());
-     XlnxZynqMPState *s = XLNX_ZYNQMP(obj);
-     int i;
--    int num_apus = MIN(smp_cpus, XLNX_ZYNQMP_NUM_APU_CPUS);
-+    int num_apus = MIN(ms->smp.cpus, XLNX_ZYNQMP_NUM_APU_CPUS);
+diff --git a/hw/core/machine-hmp-cmds.c b/hw/core/machine-hmp-cmds.c
+index 7fa6075f1e..1f66bda346 100644
+--- a/hw/core/machine-hmp-cmds.c
++++ b/hw/core/machine-hmp-cmds.c
+@@ -86,6 +86,9 @@ void hmp_hotpluggable_cpus(Monitor *mon, const QDict *qdict)
+         if (c->has_socket_id) {
+             monitor_printf(mon, "    socket-id: \"%" PRIu64 "\"\n", c->socket_id);
+         }
++        if (c->has_die_id) {
++            monitor_printf(mon, "    die-id: \"%" PRIu64 "\"\n", c->die_id);
++        }
+         if (c->has_core_id) {
+             monitor_printf(mon, "    core-id: \"%" PRIu64 "\"\n", c->core_id);
+         }
+diff --git a/hw/core/machine.c b/hw/core/machine.c
+index ea5a01aa49..7a44adab39 100644
+--- a/hw/core/machine.c
++++ b/hw/core/machine.c
+@@ -682,6 +682,11 @@ void machine_set_cpu_numa_node(MachineState *machine,
+             return;
+         }
  
-     object_initialize_child(obj, "apu-cluster", &s->apu_cluster,
-                             sizeof(s->apu_cluster), TYPE_CPU_CLUSTER,
-@@ -290,11 +293,12 @@ static void xlnx_zynqmp_init(Object *obj)
++        if (props->has_die_id && !slot->props.has_die_id) {
++            error_setg(errp, "die-id is not supported");
++            return;
++        }
++
+         /* skip slots with explicit mismatch */
+         if (props->has_thread_id && props->thread_id != slot->props.thread_id) {
+                 continue;
+@@ -691,6 +696,10 @@ void machine_set_cpu_numa_node(MachineState *machine,
+                 continue;
+         }
  
- static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
- {
-+    MachineState *ms = MACHINE(qdev_get_machine());
-     XlnxZynqMPState *s = XLNX_ZYNQMP(dev);
-     MemoryRegion *system_memory = get_system_memory();
-     uint8_t i;
-     uint64_t ram_size;
--    int num_apus = MIN(smp_cpus, XLNX_ZYNQMP_NUM_APU_CPUS);
-+    int num_apus = MIN(ms->smp.cpus, XLNX_ZYNQMP_NUM_APU_CPUS);
-     const char *boot_cpu = s->boot_cpu ? s->boot_cpu : "apu-cpu[0]";
-     ram_addr_t ddr_low_size, ddr_high_size;
-     qemu_irq gic_spi[GIC_NUM_SPI_INTR];
-@@ -456,7 +460,7 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
-                     "RPUs just use -smp 6.");
++        if (props->has_die_id && props->die_id != slot->props.die_id) {
++                continue;
++        }
++
+         if (props->has_socket_id && props->socket_id != slot->props.socket_id) {
+                 continue;
+         }
+@@ -948,6 +957,9 @@ static char *cpu_slot_to_string(const CPUArchId *cpu)
+     if (cpu->props.has_socket_id) {
+         g_string_append_printf(s, "socket-id: %"PRId64, cpu->props.socket_id);
      }
++    if (cpu->props.has_die_id) {
++        g_string_append_printf(s, "die-id: %"PRId64, cpu->props.die_id);
++    }
+     if (cpu->props.has_core_id) {
+         if (s->len) {
+             g_string_append_printf(s, ", ");
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 211015324a..98a314dcf0 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -2327,6 +2327,10 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
+             error_setg(errp, "Invalid CPU socket-id: %u must be in range 0:%u",
+                        cpu->socket_id, max_socket);
+             return;
++        } else if (cpu->die_id > pcms->smp_dies - 1) {
++            error_setg(errp, "Invalid CPU die-id: %u must be in range 0:%u",
++                       cpu->die_id, max_socket);
++            return;
+         }
+         if (cpu->core_id < 0) {
+             error_setg(errp, "CPU core-id is not set");
+@@ -2346,6 +2350,7 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
+         }
  
--    xlnx_zynqmp_create_rpu(s, boot_cpu, &err);
-+    xlnx_zynqmp_create_rpu(ms, s, boot_cpu, &err);
-     if (err) {
-         error_propagate(errp, err);
-         return;
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index f21261c8ff..147e771ea1 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -31,6 +31,7 @@
- #include "hw/qdev-properties.h"
- #if !defined(CONFIG_USER_ONLY)
- #include "hw/loader.h"
-+#include "hw/boards.h"
- #endif
- #include "sysemu/sysemu.h"
- #include "sysemu/tcg.h"
-@@ -1587,6 +1588,9 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
-     init_cpreg_list(cpu);
+         topo.pkg_id = cpu->socket_id;
++        topo.die_id = cpu->die_id;
+         topo.core_id = cpu->core_id;
+         topo.smt_id = cpu->thread_id;
+         cpu->apic_id = apicid_from_topo_ids(smp_cores, smp_threads, &topo);
+@@ -2383,6 +2388,13 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
+     }
+     cpu->socket_id = topo.pkg_id;
  
- #ifndef CONFIG_USER_ONLY
-+    MachineState *ms = MACHINE(qdev_get_machine());
-+    unsigned int smp_cpus = ms->smp.cpus;
++    if (cpu->die_id != -1 && cpu->die_id != topo.die_id) {
++        error_setg(errp, "property die-id: %u doesn't match set apic-id:"
++            " 0x%x (die-id: %u)", cpu->die_id, cpu->apic_id, topo.die_id);
++        return;
++    }
++    cpu->die_id = topo.die_id;
 +
-     if (cpu->has_el3 || arm_feature(env, ARM_FEATURE_M_SECURITY)) {
-         cs->num_ases = 2;
- 
-@@ -2127,10 +2131,12 @@ static void cortex_a9_initfn(Object *obj)
- #ifndef CONFIG_USER_ONLY
- static uint64_t a15_l2ctlr_read(CPUARMState *env, const ARMCPRegInfo *ri)
- {
-+    MachineState *ms = MACHINE(qdev_get_machine());
-+
-     /* Linux wants the number of processors from here.
-      * Might as well set the interrupt-controller bit too.
-      */
--    return ((smp_cpus - 1) << 24) | (1 << 23);
-+    return ((ms->smp.cpus - 1) << 24) | (1 << 23);
- }
+     if (cpu->core_id != -1 && cpu->core_id != topo.core_id) {
+         error_setg(errp, "property core-id: %u doesn't match set apic-id:"
+             " 0x%x (core-id: %u)", cpu->core_id, cpu->apic_id, topo.core_id);
+@@ -2700,6 +2712,8 @@ static const CPUArchIdList *pc_possible_cpu_arch_ids(MachineState *ms)
+                                  ms->smp.cores, ms->smp.threads, &topo);
+         ms->possible_cpus->cpus[i].props.has_socket_id = true;
+         ms->possible_cpus->cpus[i].props.socket_id = topo.pkg_id;
++        ms->possible_cpus->cpus[i].props.has_die_id = true;
++        ms->possible_cpus->cpus[i].props.die_id = topo.die_id;
+         ms->possible_cpus->cpus[i].props.has_core_id = true;
+         ms->possible_cpus->cpus[i].props.core_id = topo.core_id;
+         ms->possible_cpus->cpus[i].props.has_thread_id = true;
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 8ef3063140..6b3d0035e0 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -5865,11 +5865,13 @@ static Property x86_cpu_properties[] = {
+     DEFINE_PROP_UINT32("apic-id", X86CPU, apic_id, 0),
+     DEFINE_PROP_INT32("thread-id", X86CPU, thread_id, 0),
+     DEFINE_PROP_INT32("core-id", X86CPU, core_id, 0),
++    DEFINE_PROP_INT32("die-id", X86CPU, die_id, 0),
+     DEFINE_PROP_INT32("socket-id", X86CPU, socket_id, 0),
+ #else
+     DEFINE_PROP_UINT32("apic-id", X86CPU, apic_id, UNASSIGNED_APIC_ID),
+     DEFINE_PROP_INT32("thread-id", X86CPU, thread_id, -1),
+     DEFINE_PROP_INT32("core-id", X86CPU, core_id, -1),
++    DEFINE_PROP_INT32("die-id", X86CPU, die_id, -1),
+     DEFINE_PROP_INT32("socket-id", X86CPU, socket_id, -1),
  #endif
- 
+     DEFINE_PROP_INT32("node-id", X86CPU, node_id, CPU_UNSET_NUMA_NODE_ID),
 -- 
 2.18.0.rc1.1.g3f1ff2140
 
