@@ -2,66 +2,59 @@ Return-Path: <SRS0=mdN/=VA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B54FFC0650E
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 15:49:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 446BAC0650E
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 15:52:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8D5A52187F
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 15:49:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D5A52187F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 1BFBF2189E
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 15:52:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BFBF2189E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37028 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37040 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hihWA-0008PH-PE
-	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 11:49:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51673)
+	id 1hihYR-0001WH-7O
+	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 11:52:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51705)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <no-reply@patchew.org>) id 1hihTp-0006OQ-BO
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 11:47:35 -0400
+ (envelope-from <imammedo@redhat.com>) id 1hihTt-0006Uy-KY
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 11:47:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1hihTl-0003pN-0Q
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 11:47:32 -0400
-Resent-Date: Wed, 03 Jul 2019 11:47:32 -0400
-Resent-Message-Id: <E1hihTl-0003pN-0Q@eggs.gnu.org>
-Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21536)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1hihTk-0003oj-Qq
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 11:47:28 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1562168785; cv=none; d=zoho.com; s=zohoarc; 
- b=CGF7exlJzZ7dvRdVsdPQQJIJcjb5tyBGIweC4tQ1ifJDd7G+fLgwdF3MJg1ZBJfzhYoSU6uOOWXRjdFugilFRDZwxgFkMYhox+EZrtpb24UTfKxqJwiA4JLNgvw7qMBJk//jDZxrq6T2wiI9q/6FNfDHESWHxll6ldd3SMlabjY=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1562168785;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
- bh=R6yrKMi5Jx4pGPSu76PKd1DI7KaZP+Hx7WK0TmVuhkg=; 
- b=RUoCpj5WxDZ1w11qweJ+ngDrDmZ2Xd4GhYuQ0uxhNOSE04KjijmoCxSODsur2tjI4kiXm32FwITBvTMXL5NXXZh3e/CjYDdhXGC1LRnCImF1tlNhvboUDUfS8tphmmo5V7BBsDH+tWCK26W+/pdTJQsk7QmIW/QpHA/1z8JWU+A=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1562168784125640.045112365293;
- Wed, 3 Jul 2019 08:46:24 -0700 (PDT)
-Message-ID: <156216878305.21218.2324370881009367445@c4a48874b076>
-In-Reply-To: <cover.1562154272.git.qemu_oss@crudebyte.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
+ (envelope-from <imammedo@redhat.com>) id 1hihTp-0003rP-Pl
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 11:47:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38334)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hihTp-0003r6-Fl
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 11:47:33 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id C02F53087931
+ for <qemu-devel@nongnu.org>; Wed,  3 Jul 2019 15:47:27 +0000 (UTC)
+Received: from dell-r430-03.lab.eng.brq.redhat.com
+ (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1FA528CBBF;
+ Wed,  3 Jul 2019 15:47:26 +0000 (UTC)
+From: Igor Mammedov <imammedo@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Wed, 3 Jul 2019 08:46:24 -0700 (PDT)
-X-ZohoMailClient: External
+Date: Wed,  3 Jul 2019 11:47:23 -0400
+Message-Id: <20190703154723.7327-1-imammedo@redhat.com>
+In-Reply-To: <20190702215726.23661-1-ehabkost@redhat.com>
+References: <20190702215726.23661-1-ehabkost@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.45]); Wed, 03 Jul 2019 15:47:27 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 136.143.188.55
-Subject: Re: [Qemu-devel] [PATCH v5 0/5] 9p: Fix file ID collisions
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH v2] tests: numa-test: use -numa memdev option
+ instead of legacy 'mem' option
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,121 +66,206 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: berrange@redhat.com, qemu-devel@nongnu.org, antonios.motakis@huawei.com,
- groug@kaod.org
+Cc: ehabkost@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS9jb3Zlci4xNTYyMTU0MjcyLmdp
-dC5xZW11X29zc0BjcnVkZWJ5dGUuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhh
-dmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUg
-aW5mb3JtYXRpb246CgpUeXBlOiBzZXJpZXMKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2
-NSAwLzVdIDlwOiBGaXggZmlsZSBJRCBjb2xsaXNpb25zCk1lc3NhZ2UtaWQ6IGNvdmVyLjE1NjIx
-NTQyNzIuZ2l0LnFlbXVfb3NzQGNydWRlYnl0ZS5jb20KCj09PSBURVNUIFNDUklQVCBCRUdJTiA9
-PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4aXQgMApn
-aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBk
-aWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9n
-cmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFND
-UklQVCBFTkQgPT09CgpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjA4OTQzOTIgOXA6
-IFVzZSB2YXJpYWJsZSBsZW5ndGggc3VmZml4ZXMgZm9yIGlub2RlIHJlbWFwcGluZwo4NWJkM2Nm
-IDlwOiBzdGF0X3RvX3FpZDogaW1wbGVtZW50IHNsb3cgcGF0aAo1NWVhNjNkIDlwOiBBZGRlZCB2
-aXJ0ZnMgb3B0aW9uICdyZW1hcF9pbm9kZXMnCjg2Y2JmMjEgOXA6IFRyZWF0IG11bHRpcGxlIGRl
-dmljZXMgb24gb25lIGV4cG9ydCBhcyBhbiBlcnJvcgpkODY0YjVhIDlwOiB1bnNpZ25lZCB0eXBl
-IGZvciB0eXBlLCB2ZXJzaW9uLCBwYXRoCgo9PT0gT1VUUFVUIEJFR0lOID09PQoxLzUgQ2hlY2tp
-bmcgY29tbWl0IGQ4NjRiNWFkMTlmZiAoOXA6IHVuc2lnbmVkIHR5cGUgZm9yIHR5cGUsIHZlcnNp
-b24sIHBhdGgpCkVSUk9SOiBBdXRob3IgZW1haWwgYWRkcmVzcyBpcyBtYW5nbGVkIGJ5IHRoZSBt
-YWlsaW5nIGxpc3QKIzI6IApBdXRob3I6IENocmlzdGlhbiBTY2hvZW5lYmVjayB2aWEgUWVtdS1k
-ZXZlbCA8cWVtdS1kZXZlbEBub25nbnUub3JnPgoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdz
-LCA2OCBsaW5lcyBjaGVja2VkCgpQYXRjaCAxLzUgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2Ug
-cmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9y
-dCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4K
-CjIvNSBDaGVja2luZyBjb21taXQgODZjYmYyMTQzMmVhICg5cDogVHJlYXQgbXVsdGlwbGUgZGV2
-aWNlcyBvbiBvbmUgZXhwb3J0IGFzIGFuIGVycm9yKQpFUlJPUjogQXV0aG9yIGVtYWlsIGFkZHJl
-c3MgaXMgbWFuZ2xlZCBieSB0aGUgbWFpbGluZyBsaXN0CiMyOiAKQXV0aG9yOiBDaHJpc3RpYW4g
-U2Nob2VuZWJlY2sgdmlhIFFlbXUtZGV2ZWwgPHFlbXUtZGV2ZWxAbm9uZ251Lm9yZz4KCnRvdGFs
-OiAxIGVycm9ycywgMCB3YXJuaW5ncywgMTc1IGxpbmVzIGNoZWNrZWQKClBhdGNoIDIvNSBoYXMg
-c3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFy
-ZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVD
-S1BBVENIIGluIE1BSU5UQUlORVJTLgoKMy81IENoZWNraW5nIGNvbW1pdCA1NWVhNjNkYmFmYzIg
-KDlwOiBBZGRlZCB2aXJ0ZnMgb3B0aW9uICdyZW1hcF9pbm9kZXMnKQpFUlJPUjogQXV0aG9yIGVt
-YWlsIGFkZHJlc3MgaXMgbWFuZ2xlZCBieSB0aGUgbWFpbGluZyBsaXN0CiMyOiAKQXV0aG9yOiBD
-aHJpc3RpYW4gU2Nob2VuZWJlY2sgdmlhIFFlbXUtZGV2ZWwgPHFlbXUtZGV2ZWxAbm9uZ251Lm9y
-Zz4KCldBUk5JTkc6IEJsb2NrIGNvbW1lbnRzIHVzZSBhIGxlYWRpbmcgLyogb24gYSBzZXBhcmF0
-ZSBsaW5lCiMxNDQ6IEZJTEU6IGh3LzlwZnMvOXAuYzo1OTk6CisvKiBzdGF0X3RvX3FpZCBuZWVk
-cyB0byBtYXAgaW5vZGUgbnVtYmVyICg2NCBiaXRzKSBhbmQgZGV2aWNlIGlkICgzMiBiaXRzKQoK
-dG90YWw6IDEgZXJyb3JzLCAxIHdhcm5pbmdzLCAzODIgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMy81
-IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJv
-cnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2Vl
-CkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo0LzUgQ2hlY2tpbmcgY29tbWl0IDg1YmQzY2Yx
-ZjUxZiAoOXA6IHN0YXRfdG9fcWlkOiBpbXBsZW1lbnQgc2xvdyBwYXRoKQpFUlJPUjogQXV0aG9y
-IGVtYWlsIGFkZHJlc3MgaXMgbWFuZ2xlZCBieSB0aGUgbWFpbGluZyBsaXN0CiMyOiAKQXV0aG9y
-OiBDaHJpc3RpYW4gU2Nob2VuZWJlY2sgdmlhIFFlbXUtZGV2ZWwgPHFlbXUtZGV2ZWxAbm9uZ251
-Lm9yZz4KCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM3ODogRklMRTogaHcvOXBm
-cy85cC5jOjYyMToKKyAgICAgICAgcWh0X2luaXQoJnBkdS0+cy0+cXBmX3RhYmxlLCBxcGZfbG9v
-a3VwX2Z1bmMsIDEgPDwgMTYsIFFIVF9NT0RFX0FVVE9fUkVTSVpFKTsKCnRvdGFsOiAxIGVycm9y
-cywgMSB3YXJuaW5ncywgMTQyIGxpbmVzIGNoZWNrZWQKClBhdGNoIDQvNSBoYXMgc3R5bGUgcHJv
-YmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBw
-b3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGlu
-IE1BSU5UQUlORVJTLgoKNS81IENoZWNraW5nIGNvbW1pdCAwODk0MzkyOTg5MjIgKDlwOiBVc2Ug
-dmFyaWFibGUgbGVuZ3RoIHN1ZmZpeGVzIGZvciBpbm9kZSByZW1hcHBpbmcpCkVSUk9SOiBBdXRo
-b3IgZW1haWwgYWRkcmVzcyBpcyBtYW5nbGVkIGJ5IHRoZSBtYWlsaW5nIGxpc3QKIzI6IApBdXRo
-b3I6IENocmlzdGlhbiBTY2hvZW5lYmVjayB2aWEgUWVtdS1kZXZlbCA8cWVtdS1kZXZlbEBub25n
-bnUub3JnPgoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYWZ0ZXIgdGhhdCBvcGVuIHBhcmVudGhl
-c2lzICcoJwojOTI6IEZJTEU6IGh3LzlwZnMvOXAuYzo1ODU6CisgICAgcmV0dXJuICgodWludDY0
-X3QpbWlycm9yOGJpdCggdmFsdWUgICAgICAgICYgMHhmZikgPDwgNTYpIHwKCkVSUk9SOiBzcGFj
-ZSBwcm9oaWJpdGVkIGJlZm9yZSB0aGF0IGNsb3NlIHBhcmVudGhlc2lzICcpJwojOTg6IEZJTEU6
-IGh3LzlwZnMvOXAuYzo1OTE6CisgICAgICAgICAgICgodWludDY0X3QpbWlycm9yOGJpdCgodmFs
-dWUgPj4gNDgpICYgMHhmZikgPDwgOCApIHwKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJlZm9y
-ZSB0aGF0IGNsb3NlIHBhcmVudGhlc2lzICcpJwojOTk6IEZJTEU6IGh3LzlwZnMvOXAuYzo1OTI6
-CisgICAgICAgICAgICgodWludDY0X3QpbWlycm9yOGJpdCgodmFsdWUgPj4gNTYpICYgMHhmZikg
-ICAgICApIDsKCldBUk5JTkc6IEJsb2NrIGNvbW1lbnRzIHVzZSBhIGxlYWRpbmcgLyogb24gYSBz
-ZXBhcmF0ZSBsaW5lCiMxMDI6IEZJTEU6IGh3LzlwZnMvOXAuYzo1OTU6CisvKiogQGJyaWVmIFBh
-cmFtZXRlciBrIGZvciB0aGUgRXhwb25lbnRpYWwgR29sb21iIGFsZ29yaWhtIHRvIGJlIHVzZWQu
-CgpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUg
-bGluZQojMTIxOiBGSUxFOiBody85cGZzLzlwLmM6NjE0OgorLyoqIEBicmllZiBFeHBvbmVudGlh
-bCBHb2xvbWIgYWxnb3JpdGhtIGZvciBhcmJpdHJhcnkgayAoaW5jbHVkaW5nIGs9MCkuCgpXQVJO
-SU5HOiBCbG9jayBjb21tZW50cyB1c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQoj
-MTQ4OiBGSUxFOiBody85cGZzLzlwLmM6NjQxOgorLyoqIEBicmllZiBDb252ZXJ0cyBhIHN1ZmZp
-eCBpbnRvIGEgcHJlZml4LCBvciBhIHByZWZpeCBpbnRvIGEgc3VmZml4LgoKRVJST1I6ICJmb28q
-IGJhciIgc2hvdWxkIGJlICJmb28gKmJhciIKIzE1ODogRklMRTogaHcvOXBmcy85cC5jOjY1MToK
-K3N0YXRpYyBWYXJpTGVuQWZmaXggaW52ZXJ0QWZmaXgoY29uc3QgVmFyaUxlbkFmZml4KiBhZmZp
-eCkKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMxNjE6IEZJTEU6IGh3LzlwZnMv
-OXAuYzo2NTQ6CisgICAgICAgIC50eXBlID0gKGFmZml4LT50eXBlID09IEFmZml4VHlwZV9TdWZm
-aXgpID8gQWZmaXhUeXBlX1ByZWZpeCA6IEFmZml4VHlwZV9TdWZmaXgsCgpXQVJOSU5HOiBsaW5l
-IG92ZXIgODAgY2hhcmFjdGVycwojMTYyOiBGSUxFOiBody85cGZzLzlwLmM6NjU1OgorICAgICAg
-ICAudmFsdWUgPSAgbWlycm9yNjRiaXQoYWZmaXgtPnZhbHVlKSA+PiAoKHNpemVvZihhZmZpeC0+
-dmFsdWUpICogOCkgLSBhZmZpeC0+Yml0cyksCgpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2Ug
-YSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQojMTY3OiBGSUxFOiBody85cGZzLzlwLmM6
-NjYwOgorLyoqIEBicmllZiBHZW5lcmF0ZXMgc3VmZml4IG51bWJlcnMgd2l0aCAic3VmZml4LWZy
-ZWUiIHByb3BlcnR5LgoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBv
-biBhIHNlcGFyYXRlIGxpbmUKIzI0NjogRklMRTogaHcvOXBmcy85cC5jOjc1MToKKy8qKiBAYnJp
-ZWYgU2xvdyAvIGZ1bGwgbWFwcGluZyBob3N0IGlub2RlIG5yIC0+IGd1ZXN0IGlub2RlIG5yLgoK
-V0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBvbiBhIHNlcGFyYXRlIGxp
-bmUKIzMwMDogRklMRTogaHcvOXBmcy85cC5jOjgwNDoKKy8qKiBAYnJpZWYgUXVpY2sgbWFwcGlu
-ZyBob3N0IGlub2RlIG5yIC0+IGd1ZXN0IGlub2RlIG5yLgoKRVJST1I6IHNwYWNlcyByZXF1aXJl
-ZCBhcm91bmQgdGhhdCAnLScgKGN0eDpWeFYpCiMzNDg6IEZJTEU6IGh3LzlwZnMvOXAuYzo4NDg6
-CisgICAgICAgIC5pbm9fcHJlZml4ID0gKHVpbnQxNl90KSAoc3RidWYtPnN0X2lubyA+PiAoNjQt
-aW5vX2hhc2hfYml0cykpCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICBeCgpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2UgYSBsZWFkaW5nIC8q
-IG9uIGEgc2VwYXJhdGUgbGluZQojNDI5OiBGSUxFOiBody85cGZzLzlwLmg6MjQ0OgorLyoqIEBi
-cmllZiBVbmlxdWUgYWZmaXggb2YgdmFyaWFibGUgbGVuZ3RoLgoKRVJST1I6IGxpbmUgb3ZlciA5
-MCBjaGFyYWN0ZXJzCiM0NDI6IEZJTEU6IGh3LzlwZnMvOXAuaDoyNTc6CisgICAgaW50IGJpdHM7
-IC8qIExlbmdodCBvZiB0aGUgYWZmaXgsIHRoYXQgaXMgaG93IG1hbnkgKG9mIHRoZSBsb3dlc3Qp
-IGJpdHMgb2YgQGMgdmFsdWUgbXVzdCBiZSB1c2VkIGZvciBhcHBlbmRpbmcvcHJlcGVuZGluZyB0
-aGlzIGFmZml4IHRvIGl0cyBmaW5hbCByZXN1bHRpbmcsIHVuaXF1ZSBudW1iZXIuICovCgpFUlJP
-UjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzQ0ODogRklMRTogaHcvOXBmcy85cC5oOjI2MzoK
-KyAgICBpbnQgcHJlZml4X2JpdHM7IC8qIEhvdyBtYW55IChoaWdoKSBiaXRzIG9mIHRoZSBvcmln
-aW5hbCBpbm9kZSBudW1iZXIgc2hhbGwgYmUgdXNlZCBmb3IgaGFzaGluZy4gKi8KCnRvdGFsOiA4
-IGVycm9ycywgOSB3YXJuaW5ncywgMzg2IGxpbmVzIGNoZWNrZWQKClBhdGNoIDUvNSBoYXMgc3R5
-bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBm
-YWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BB
-VENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhp
-dGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3Bh
-dGNoZXcub3JnL2xvZ3MvY292ZXIuMTU2MjE1NDI3Mi5naXQucWVtdV9vc3NAY3J1ZGVieXRlLmNv
-bS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBh
-dXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNl
-bmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+it drops testing of deprecated 'mem' option and will test preferred memdev
+option instead.
+
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+---
+v2:
+  - make backend size depend on initial RAM size and a number of backends
+    fixes test faulure with spapr machine (Eduardo Habkost <ehabkost@redhat.com>)
+
+ tests/numa-test.c | 85 +++++++++++++++++++++++++++++------------------
+ 1 file changed, 52 insertions(+), 33 deletions(-)
+
+diff --git a/tests/numa-test.c b/tests/numa-test.c
+index 8de8581231..e102b3b70f 100644
+--- a/tests/numa-test.c
++++ b/tests/numa-test.c
+@@ -14,9 +14,28 @@
+ #include "qapi/qmp/qdict.h"
+ #include "qapi/qmp/qlist.h"
+ 
+-static char *make_cli(const char *generic_cli, const char *test_cli)
++typedef struct {
++    const char *args;
++    int ram_size; /* size in MB */
++} TestData;
++
++static char *make_cli(const TestData *data, int memdev_count,
++                      const char *test_cli)
+ {
+-    return g_strdup_printf("%s %s", generic_cli ? generic_cli : "", test_cli);
++    int i;
++    char *tmp = NULL;
++    char *cli = g_strdup_printf("%s -m %d", data->args ? : "", data->ram_size);
++
++    for (i = 0; memdev_count && (i < memdev_count); i++) {
++        tmp = g_strdup_printf("%s -object memory-backend-ram,id=r%d,size=%dM",
++                              cli, i, data->ram_size / memdev_count);
++        g_free(cli);
++        cli = tmp;
++    }
++    tmp = g_strdup_printf("%s %s", cli, test_cli);
++    g_free(cli);
++    cli = tmp;
++    return cli;
+ }
+ 
+ static void test_mon_explicit(const void *data)
+@@ -25,9 +44,8 @@ static void test_mon_explicit(const void *data)
+     char *cli;
+     QTestState *qts;
+ 
+-    cli = make_cli(data, "-smp 8 "
+-                   "-numa node,nodeid=0,cpus=0-3 "
+-                   "-numa node,nodeid=1,cpus=4-7 ");
++    cli = make_cli(data, 2, "-smp 8 -numa node,nodeid=0,cpus=0-3,memdev=r0 "
++                   "-numa node,nodeid=1,cpus=4-7,memdev=r1 ");
+     qts = qtest_init(cli);
+ 
+     s = qtest_hmp(qts, "info numa");
+@@ -45,7 +63,7 @@ static void test_mon_default(const void *data)
+     char *cli;
+     QTestState *qts;
+ 
+-    cli = make_cli(data, "-smp 8 -numa node -numa node");
++    cli = make_cli(data, 2, "-smp 8 -numa node,memdev=r0 -numa node,memdev=r1");
+     qts = qtest_init(cli);
+ 
+     s = qtest_hmp(qts, "info numa");
+@@ -63,9 +81,8 @@ static void test_mon_partial(const void *data)
+     char *cli;
+     QTestState *qts;
+ 
+-    cli = make_cli(data, "-smp 8 "
+-                   "-numa node,nodeid=0,cpus=0-1 "
+-                   "-numa node,nodeid=1,cpus=4-5 ");
++    cli = make_cli(data, 2, "-smp 8 -numa node,nodeid=0,cpus=0-1,memdev=r0 "
++                   "-numa node,nodeid=1,cpus=4-5,memdev=r1");
+     qts = qtest_init(cli);
+ 
+     s = qtest_hmp(qts, "info numa");
+@@ -93,7 +110,8 @@ static void test_query_cpus(const void *data)
+     QObject *e;
+     QTestState *qts;
+ 
+-    cli = make_cli(data, "-smp 8 -numa node,cpus=0-3 -numa node,cpus=4-7");
++    cli = make_cli(data, 2, "-smp 8 -numa node,cpus=0-3,memdev=r0 "
++                   "-numa node,cpus=4-7,memdev=r1");
+     qts = qtest_init(cli);
+     cpus = get_cpus(qts, &resp);
+     g_assert(cpus);
+@@ -131,8 +149,8 @@ static void pc_numa_cpu(const void *data)
+     QObject *e;
+     QTestState *qts;
+ 
+-    cli = make_cli(data, "-cpu pentium -smp 8,sockets=2,cores=2,threads=2 "
+-        "-numa node,nodeid=0 -numa node,nodeid=1 "
++    cli = make_cli(data, 2, "-cpu pentium -smp 8,sockets=2,cores=2,threads=2 "
++        "-numa node,nodeid=0,memdev=r0 -numa node,nodeid=1,memdev=r1 "
+         "-numa cpu,node-id=1,socket-id=0 "
+         "-numa cpu,node-id=0,socket-id=1,core-id=0 "
+         "-numa cpu,node-id=0,socket-id=1,core-id=1,thread-id=0 "
+@@ -185,8 +203,8 @@ static void spapr_numa_cpu(const void *data)
+     QObject *e;
+     QTestState *qts;
+ 
+-    cli = make_cli(data, "-smp 4,cores=4 "
+-        "-numa node,nodeid=0 -numa node,nodeid=1 "
++    cli = make_cli(data, 2, "-smp 4,cores=4 "
++        "-numa node,nodeid=0,memdev=r0 -numa node,nodeid=1,memdev=r1 "
+         "-numa cpu,node-id=0,core-id=0 "
+         "-numa cpu,node-id=0,core-id=1 "
+         "-numa cpu,node-id=0,core-id=2 "
+@@ -231,8 +249,8 @@ static void aarch64_numa_cpu(const void *data)
+     QObject *e;
+     QTestState *qts;
+ 
+-    cli = make_cli(data, "-smp 2 "
+-        "-numa node,nodeid=0 -numa node,nodeid=1 "
++    cli = make_cli(data, 2, "-smp 2 "
++        "-numa node,nodeid=0,memdev=r0 -numa node,nodeid=1,memdev=r1 "
+         "-numa cpu,node-id=1,thread-id=0 "
+         "-numa cpu,node-id=0,thread-id=1");
+     qts = qtest_init(cli);
+@@ -272,16 +290,14 @@ static void pc_dynamic_cpu_cfg(const void *data)
+     QObject *e;
+     QDict *resp;
+     QList *cpus;
+-    QTestState *qs;
+-
+-    qs = qtest_initf("%s -nodefaults --preconfig -smp 2",
+-                     data ? (char *)data : "");
++    char *cli = make_cli(data, 2, "-nodefaults --preconfig -smp 2");
++    QTestState *qs = qtest_init(cli);
+ 
+     /* create 2 numa nodes */
+     g_assert(!qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'set-numa-node',"
+-        " 'arguments': { 'type': 'node', 'nodeid': 0 } }")));
++        " 'arguments': { 'type': 'node', 'nodeid': 0, 'memdev': 'r0' } }")));
+     g_assert(!qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'set-numa-node',"
+-        " 'arguments': { 'type': 'node', 'nodeid': 1 } }")));
++        " 'arguments': { 'type': 'node', 'nodeid': 1, 'memdev': 'r1' } }")));
+ 
+     /* map 2 cpus in non default reverse order
+      * i.e socket1->node0, socket0->node1
+@@ -325,35 +341,38 @@ static void pc_dynamic_cpu_cfg(const void *data)
+     qobject_unref(resp);
+ 
+     qtest_quit(qs);
++    g_free(cli);
+ }
+ 
+ int main(int argc, char **argv)
+ {
+-    const char *args = NULL;
+     const char *arch = qtest_get_arch();
++    TestData data = { .ram_size = 128 };
+ 
+-    if (strcmp(arch, "aarch64") == 0) {
+-        args = "-machine virt";
++    if (!strcmp(arch, "aarch64")) {
++        data.args = "-machine virt";
++    } else if (!strcmp(arch, "ppc64")) {
++        data.ram_size = 512;
+     }
+ 
+     g_test_init(&argc, &argv, NULL);
+ 
+-    qtest_add_data_func("/numa/mon/default", args, test_mon_default);
+-    qtest_add_data_func("/numa/mon/cpus/explicit", args, test_mon_explicit);
+-    qtest_add_data_func("/numa/mon/cpus/partial", args, test_mon_partial);
+-    qtest_add_data_func("/numa/qmp/cpus/query-cpus", args, test_query_cpus);
++    qtest_add_data_func("/numa/mon/default", &data, test_mon_default);
++    qtest_add_data_func("/numa/mon/cpus/explicit", &data, test_mon_explicit);
++    qtest_add_data_func("/numa/mon/cpus/partial", &data, test_mon_partial);
++    qtest_add_data_func("/numa/qmp/cpus/query-cpus", &data, test_query_cpus);
+ 
+     if (!strcmp(arch, "i386") || !strcmp(arch, "x86_64")) {
+-        qtest_add_data_func("/numa/pc/cpu/explicit", args, pc_numa_cpu);
+-        qtest_add_data_func("/numa/pc/dynamic/cpu", args, pc_dynamic_cpu_cfg);
++        qtest_add_data_func("/numa/pc/cpu/explicit", &data, pc_numa_cpu);
++        qtest_add_data_func("/numa/pc/dynamic/cpu", &data, pc_dynamic_cpu_cfg);
+     }
+ 
+     if (!strcmp(arch, "ppc64")) {
+-        qtest_add_data_func("/numa/spapr/cpu/explicit", args, spapr_numa_cpu);
++        qtest_add_data_func("/numa/spapr/cpu/explicit", &data, spapr_numa_cpu);
+     }
+ 
+     if (!strcmp(arch, "aarch64")) {
+-        qtest_add_data_func("/numa/aarch64/cpu/explicit", args,
++        qtest_add_data_func("/numa/aarch64/cpu/explicit", &data,
+                             aarch64_numa_cpu);
+     }
+ 
+-- 
+2.18.1
 
 
