@@ -2,71 +2,60 @@ Return-Path: <SRS0=mdN/=VA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.2 required=3.0 tests=DATE_IN_PAST_06_12,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14BDEC0650E
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 13:28:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B882CC0650E
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 13:42:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D4B8021881
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 13:28:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8180A218A4
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 13:42:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="GAt4Wrgu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D4B8021881
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="c0+Yv/VT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8180A218A4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36028 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36138 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hifJO-0002FE-6k
-	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 09:28:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39684)
+	id 1hifWR-0008Er-6j
+	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 09:42:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43990)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgibson@ozlabs.org>) id 1hifGQ-0006XP-TA
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 09:25:36 -0400
+ (envelope-from <cf19fce96353c8215111eba71751775d135cbdb4@lizzy.crudebyte.com>)
+ id 1hifVY-0007kc-FU
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 09:41:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1hifGP-0002jf-33
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 09:25:34 -0400
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:52945 helo=ozlabs.org)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1hifGN-0002dc-4J; Wed, 03 Jul 2019 09:25:32 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 45f20j48KMz9sR3; Wed,  3 Jul 2019 23:25:25 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1562160325;
- bh=ntHHvOac8zM+soDalpzNvakAvvxLBH20fTgAZJj961Q=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=GAt4Wrgu7e/bIswbw16V9jD6vMBtTjNggRGXTKAeV3JNakjUwcRGO9iT08gTYa7Yi
- bitLea1Iuj6YsqnXtut7VgR6AMkmDx+xkr9DQegfpX1ZjzLm1d3Ls6kiKQyclfwZVG
- Jlh2jiEoBSGU3SdE6yrwiWYWww9RNYlvWyY/qYsE=
-Date: Wed, 3 Jul 2019 16:53:02 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Andrea Bolognani <abologna@redhat.com>
-Message-ID: <20190703065302.GO9442@umbus.fritz.box>
-References: <20190327204102.20925-1-maxiwell@linux.ibm.com>
- <20190328142151.7b0e00dd@bahia.lab.toulouse-stg.fr.ibm.com>
- <20190328183923.lcd3p6fpy4qvvxoo@maxibm>
- <20190329132951.451d4ef0@bahia.lan>
- <20190401145858.lw7v3xt7fqanp6nc@maxibm>
- <20190402122807.1a141e37@bahia.lan>
- <20190408042747.GI16627@umbus.fritz.box>
- <fb1fe659eb80b99b9696ff4b128cd070c4e0dabc.camel@redhat.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="IpgPcFyQO6wM49Um"
-Content-Disposition: inline
-In-Reply-To: <fb1fe659eb80b99b9696ff4b128cd070c4e0dabc.camel@redhat.com>
-User-Agent: Mutt/1.12.0 (2019-05-25)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2401:3900:2:1::2
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v7 0/2] spapr-rtas: add ibm,
- get-vpd RTAS interface
+ (envelope-from <cf19fce96353c8215111eba71751775d135cbdb4@lizzy.crudebyte.com>)
+ id 1hifVX-0003dS-CG
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 09:41:12 -0400
+Received: from lizzy.crudebyte.com ([91.194.90.13]:47575)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71)
+ (envelope-from <cf19fce96353c8215111eba71751775d135cbdb4@lizzy.crudebyte.com>)
+ id 1hifVW-000319-Qe
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 09:41:11 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ d=crudebyte.com; s=lizzy; h=Subject:Date:Cc:To:From:Message-Id:Sender:
+ Reply-To:MIME-Version:Content-Type:Content-Transfer-Encoding:Content-ID:
+ Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+ :Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
+ List-Subscribe:List-Post:List-Owner:List-Archive;
+ bh=DRjjk94BM7fXzEJR1Qbu5HLK7dXcFI1n43aYgj2CyFY=; b=c0+Yv/VTYbMH0EIRKZDepZKZzK
+ 9uEVkbt5sPN5gniHGuyh++5jD2m+9B+eWBbhZ9mxbsLoqmO0vlTVP2O7JUYpV2EprRXQYgyAJrmK8
+ 1+JBK+PHfMWnoaCRlkt9T+LzrxKjIDXp1ITu5sui+YGu5UG56X34vn58MqGOGvK4NUcbh0k/kaOVf
+ Oq+Q360bcDW5RxmVRg0sYigeMBO7M6ImW3ZjdPYM99SiBXONOmVbWo+kBusqPEx+5zUVzY+dtaGWP
+ HfH4tu2OV0nbr9VeMnx/vWUzy6n+wwD5FL1bbjMVOCvCypDIVVOg3i0HHE5p3TOdGw5f6TdlJz4t1
+ ZWqMgZHQ==;
+Message-Id: <cover.1562154272.git.qemu_oss@crudebyte.com>
+To: qemu-devel@nongnu.org
+Date: Wed, 3 Jul 2019 13:44:32 +0200
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.194.90.13
+Subject: [Qemu-devel] [PATCH v5 0/5] 9p: Fix file ID collisions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -78,135 +67,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>,
- "Maxiwell S. Garcia" <maxiwell@linux.ibm.com>, qemu-devel@nongnu.org
+From: Christian Schoenebeck via Qemu-devel <qemu-devel@nongnu.org>
+Reply-To: Christian Schoenebeck <qemu_oss@crudebyte.com>
+Cc: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
+ Greg Kurz <groug@kaod.org>, Antonios Motakis <antonios.motakis@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This is v5 of a proposed patch set for fixing file ID collisions with 9pfs.
 
---IpgPcFyQO6wM49Um
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+v4->v5:
 
-On Tue, Apr 09, 2019 at 06:24:07PM +0200, Andrea Bolognani wrote:
-> Apologies for taking this long to respond.
->=20
-> On Mon, 2019-04-08 at 14:27 +1000, David Gibson wrote:
-> > On Tue, Apr 02, 2019 at 12:28:07PM +0200, Greg Kurz wrote:
-> > > The recent fixes around "host-serial" and "host-model" simply moved
-> > > the decision to expose host data to the upper layer, ie. libvirt
-> > > which should be involved in this discussion.
-> >=20
-> > Right, that's deliberate.  Note that roughly-equivalent information on
-> > x86 is currently supplied via the SMBIOS.  OpenStack Nova sets that,
-> > rather than qemu, and I'd like to move towards a common configuration
-> > model with x86, though it's a fairly long path to there.
-> >=20
-> > OpenStack had an equivalent security problem to our one, which it
-> > addressed by taking the host serial from /etc/machine-id if present
-> > rather than the real host info.
->=20
-> IIUC the situation is a bit different between x86 and ppc64, because
-> while for the latter SPAPR defines a way for the guest to access
-> information about the host it's running on, that's not the case for
-> the former, at least to the best of my knowledge.
+  All Patches:
 
-Well, guests are getting this information in smbios somehow.  I don't
-know what specifies that what bit of info in the smbios is host info,
-but I guess it must at least be a de facto convention?
+  * Added details to individual commit logs of what has been changed
+    exactly by me on top of Antonios' original 4 patches.
 
-> What OpenStack is doing is reading the machine-id (if explicitly
-> configured to do so: the default is to use the guest's own UUID[1])
-> and exposing that as the *guest* serial, not as the *host* serial.
+  Patch 1:
 
-Uh.. I'm not sure about that.  I think the default is just to pass
-nothing here.  The confusion is increased because this host info was
-always handled at the above-libvirt (openstack) level on x86, using
-explicit smbios configuration options down to libvirt and qemu.
+  * Fixed format specifiers in hw/9pfs/trace-events.
 
-On power we handled it in qemu, because that seemed the obvious way,
-but it makes recombining them a pain.
+  Patch 2:
 
-> >From libvirt's point of view, the entire mechanism is entirely
-> optional, so unless the management layer explicitly asks it to set
-> a certain value for the serial, libvirt will simply pass no
-> information down to QEMU.
->=20
-> The relevant XML elements[2] are clearly modeled after x86, so I
-> wonder if Nova is setting them also on ppc64 and if so, what the
-> guest will ultimately see...
->=20
-> > > Cc'ing Andrea for expertise. Problem exposed below.
-> > >=20
-> > > The pseries machine used to expose the content of the host's
-> > > /proc/device-tree/system-id and /proc/device-tree/model in the guest
-> > > DT. This led to a CVE and QEMU doesn't do that anymore for new machine
-> > > types. Instead, two new properties where added to the pseries machine:
-> > >=20
-> > > pseries-4.0.host-serial=3Dstring (Host serial number to advertise in =
-guest device tree)
-> > > pseries-4.0.host-model=3Dstring (Host model to advertise in guest dev=
-ice tree)
-> > >=20
-> > > It is up to the caller to pass something... which may be anything,
-> > > including something like $(cat /proc/device-tree/system-id) or
-> > > randomly generated.
->=20
-> What happens if the caller doesn't provide any value? Will QEMU come
-> up with something itself?
+  * Fixed typo in commit log.
 
-Currently, no, it will just omit the properties.
+  * Assign dev_id to export root's device already in
+    v9fs_device_realize_common(), not postponed in stat_to_qid().
 
-> Adding a few extra knobs in the vein as the existing ones sounds like
-> a fairly reasonable idea. It will still be up to the management layer
-> to actually provide the values.
->=20
-> > > Is there a chance libvirt can be taught to pass a different string
-> > > to the target QEMU in case of migration ?
->=20
-> libvirt already supports providing a different XML to the target
-> host, so changing a couple values should be no big deal.
->=20
->=20
-> As a final note, unless I've gotten it wrong and x86 actually *does*
-> provide a way for the guest to figure out its host's serial, then any
-> software relying on the attributes defined by SPAPR is ultimately not
-> portable to non-ppc64 hardware and should probably be rearchitected
-> to go through the management layer, as Daniel was also suggesting
-> earlier in the thread.
->=20
->=20
-> [1] https://github.com/openstack/nova/blob/master/nova/virt/libvirt/drive=
-r.py#L364-L372
-> [2] https://libvirt.org/formatdomain.html#elementsSysinfo
+  * Return -ENODEV instead of -ENOSYS in stat_to_qid().
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+  Patch 3:
 
---IpgPcFyQO6wM49Um
-Content-Type: application/pgp-signature; name="signature.asc"
+  * Added missing manual parts for new virtfs option 'remap_inodes' in
+    qemu-options.hx.
 
------BEGIN PGP SIGNATURE-----
+  * Capture root_ino in v9fs_device_realize_common() as well, not just the
+    device id.
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl0cUM4ACgkQbDjKyiDZ
-s5K4xBAAz54cyRjHHqpniJ9BEI5R2C0jRplSIxZBoaPTuX44hoviQ5nQMSG5VG0F
-UVHiS1sUTW5WMDcPGCz/SYw2ar1ou15UpqbB5UlSwV4VC5ZE8pZbVmsF2qmmMboz
-lMAfuAtfiQm50PaM28nk36XfUDvh85SATq8zLfOeEgaLgEdLWgr4nhF86IwPOmfi
-TJ3B0jV1jaMK7FdYMNDACCxEbkrXKdK/OZxtC77FVyikELetxTvh3lRo30ccYt8m
-v84HlvwRqOHcXGPZ9NjyxqaUsOTqXoqPtx9GC8P7CYmqIa5szOBZoMIbZd0Tzqx+
-ysGlmjJveKRKPKbgVjEg9eOI0WWeoMQNxMlZhbfjr2murfWbTsW5NQRMbZ0UXVVY
-+HaJYP2WZqvog3yUk3mhVoZBTzWGtiRF5BRXqAbPCyGFGy95t7eHuOwkZGIJsRR3
-Hjhbk2hSQV4AOmuwIB+ULqet4FoijR+vOSzHvXVc22xu1FEZ3khBH+bj2RB+XZhF
-GpizLg/Mh3oDcdrmDBuDQoKine6t6YYqSEfsBoLMCMxX2JPIn6gE21JZuo0y3gbd
-b1Ittzkb2fQ88YLpPAJoMuXTY3ZsJd2if54KeyHTOq4wg+09DE0g0RFNr9WT7rUU
-UA/o/Uo5BzaDyquIa6lBPk5cyMmaGmRJCpTZBdIceNincSL2xXQ=
-=KcTs
------END PGP SIGNATURE-----
+  * Added function dirent_to_qid().
 
---IpgPcFyQO6wM49Um--
+  * Fixed v9fs_do_readdir() having exposed info outside export root with
+    '..' entry (no matter if inode remapping was on or not).
+
+  * Fixed v9fs_do_readdir() not having remapped inodes.
+
+  * Fixed definition of QPATH_INO_MASK.
+
+  * Log error message when running out of prefixes in qid_path_prefixmap().
+
+  * Adjusted changes in stat_to_qid() to qemu code style guidelines.
+
+  Patch 4:
+
+  * Log error message when running out of prefixes in qid_path_fullmap().
+
+  * Log error message about potential degraded performance in
+    qid_path_prefixmap() (that is when qid_path_fullmap() will start to
+    kick in next).
+
+  * Fixed typo in code comment.
+
+  Patch 5:
+
+  * Dropped fixed (16 bit) size prefix code and hence removed usage of
+    P9_VARI_LENGTH_INODE_SUFFIXES macro checks all over the place.
+
+  * Dropped function expGolombEncodeK0(uint64_t n) which was optimized for
+    the expected default value of k=0; instead always use the generalized
+    function expGolombEncode(uint64_t n, int k) instead now.
+
+  * Adjusted changes in hw/9pfs/9p.c to qemu code style guidelines.
+
+  * Adjusted functions' API comments in hw/9pfs/9p.c.
+
+v3->v4:
+
+  * Rebased to latest git master head.
+
+  * Splitted Antonios' patch set to its original 4 individual patches.
+    (was merged previously as only 1 patch).
+
+  * Addressed discussed issues directly on Antonios' patches
+    (was a separate patch before).
+
+  * Added virtfs command line option "remap_inodes": Unless this option
+    is not enabled, no inode remapping is performed at all, the user
+    just gets an error message when trying to use more than 1 device
+    per export.
+
+  * Dropped persistency feature of QIDs beyond reboots.
+
+  * Dropped disputed "vii" feature.
+
+Christian Schoenebeck (5):
+  9p: unsigned type for type, version, path
+  9p: Treat multiple devices on one export as an error
+  9p: Added virtfs option 'remap_inodes'
+  9p: stat_to_qid: implement slow path
+  9p: Use variable length suffixes for inode remapping
+
+ fsdev/9p-marshal.h      |   6 +-
+ fsdev/file-op-9p.h      |   1 +
+ fsdev/qemu-fsdev-opts.c |   7 +-
+ fsdev/qemu-fsdev.c      |   6 +
+ hw/9pfs/9p.c            | 508 +++++++++++++++++++++++++++++++++++++++++++++---
+ hw/9pfs/9p.h            |  51 +++++
+ hw/9pfs/trace-events    |  14 +-
+ qemu-options.hx         |  25 ++-
+ vl.c                    |   3 +
+ 9 files changed, 573 insertions(+), 48 deletions(-)
+
+-- 
+2.11.0
+
 
