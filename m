@@ -2,107 +2,73 @@ Return-Path: <SRS0=mdN/=VA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4578C0650E
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 09:23:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 015EBC0650E
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 09:25:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9128C21882
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 09:23:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9128C21882
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id CB27B21882
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 09:25:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB27B21882
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34118 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34150 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hibUW-00014P-SD
-	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 05:23:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57012)
+	id 1hibW6-0002kE-4b
+	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 05:25:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51815)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <aravinda@linux.vnet.ibm.com>) id 1hibA9-0001So-Dr
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 05:02:56 -0400
+ (envelope-from <palmer@dabbelt.com>) id 1hiaqB-0006Zv-Ty
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 04:42:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aravinda@linux.vnet.ibm.com>) id 1hibA2-0003Bi-KR
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 05:02:45 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:16050
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <aravinda@linux.vnet.ibm.com>)
- id 1hibA2-0007eY-Au
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 05:02:42 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x638vWwG092410
- for <qemu-devel@nongnu.org>; Wed, 3 Jul 2019 05:00:40 -0400
-Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2tgrdrte0n-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Wed, 03 Jul 2019 05:00:40 -0400
-Received: from localhost
- by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <aravinda@linux.vnet.ibm.com>;
- Wed, 3 Jul 2019 10:00:37 +0100
-Received: from b03cxnp07029.gho.boulder.ibm.com (9.17.130.16)
- by e35.co.us.ibm.com (192.168.1.135) with IBM ESMTP SMTP Gateway: Authorized
- Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Wed, 3 Jul 2019 10:00:35 +0100
-Received: from b03ledav006.gho.boulder.ibm.com
- (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
- by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- x6390YpS37945830
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 3 Jul 2019 09:00:35 GMT
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id D7FBDC605B;
- Wed,  3 Jul 2019 09:00:34 +0000 (GMT)
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id AFC09C6063;
- Wed,  3 Jul 2019 09:00:32 +0000 (GMT)
-Received: from [9.124.31.179] (unknown [9.124.31.179])
- by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTP;
- Wed,  3 Jul 2019 09:00:32 +0000 (GMT)
-To: David Gibson <david@gibson.dropbear.id.au>
-References: <156033104292.26635.15759339817253067370.stgit@aravinda>
- <156033129836.26635.3348706829139659071.stgit@aravinda>
- <20190702041129.GJ6779@umbus.fritz.box>
- <89a68bbd-801e-876c-3105-877790a3189b@linux.vnet.ibm.com>
- <20190703032027.GI9442@umbus.fritz.box>
-From: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
-Date: Wed, 3 Jul 2019 14:30:31 +0530
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.6.0
+ (envelope-from <palmer@dabbelt.com>) id 1hiaq6-0008IS-RG
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 04:42:11 -0400
+Received: from mail-lj1-f193.google.com ([209.85.208.193]:37455)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1hiaq6-0007cb-Du
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 04:42:06 -0400
+Received: by mail-lj1-f193.google.com with SMTP id 131so1492986ljf.4
+ for <qemu-devel@nongnu.org>; Wed, 03 Jul 2019 01:41:51 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding:cc:from:to;
+ bh=/utRw/o8PW3YQm+ZhJWNBeL8gDnPNYLiS6dXiDJvvqI=;
+ b=aydO5qRv0MZHJasIJt9coTntx6OSPCBF+C4K63z1ofKpT2HaUEwWe7ElCwtB9RLBHU
+ a4aMY/jK0W49FY2ygJpq2EzwJjyhcPRSs4hwZFFe2rPDVTIQITCQjgQR8AZ2hLI1hpxY
+ Tq75oaY+/mN7dxAECltE5TO44ZtLP1QO90KnvXiKWxEGy3ruoqr6NaeWum5VEqbeAt5U
+ sLu+9ycfys4G0echA/ruYLBQ8+6Uwsb2R1RLQCr6EF6uftZKH+bPIUpDAKoMRu8xT6fd
+ yLfnn1YeTLoQat1org18wJjkOtmywxsjJ3zh6L25CZRuwo/Y+NTUqhbd62IwVfCZWJcK
+ 6Rww==
+X-Gm-Message-State: APjAAAX3E769J5lLW9e2tM74/pyYeB8VPlxqQUqy5a0fr8h+SxBZ5co1
+ 0WHam5/DqsK0pTeMv211E0KiGphLb+AHjA==
+X-Google-Smtp-Source: APXvYqwGpBWt6Yx/6IWdhDu+RLCVxAo7bxHLoVhzx6fS4509MFLkLUkGWQEljy2TjaFY7EVf0lk+Cg==
+X-Received: by 2002:a2e:980e:: with SMTP id a14mr20931995ljj.60.1562143310149; 
+ Wed, 03 Jul 2019 01:41:50 -0700 (PDT)
+Received: from localhost ([134.17.27.127])
+ by smtp.gmail.com with ESMTPSA id z6sm319879lfa.45.2019.07.03.01.41.49
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Wed, 03 Jul 2019 01:41:49 -0700 (PDT)
+Date: Wed,  3 Jul 2019 01:40:39 -0700
+Message-Id: <20190703084048.6980-24-palmer@sifive.com>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20190703084048.6980-1-palmer@sifive.com>
+References: <20190703084048.6980-1-palmer@sifive.com>
 MIME-Version: 1.0
-In-Reply-To: <20190703032027.GI9442@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19070309-0012-0000-0000-0000174BC7D9
-X-IBM-SpamModules-Scores: 
-X-IBM-SpamModules-Versions: BY=3.00011370; HX=3.00000242; KW=3.00000007;
- PH=3.00000004; SC=3.00000286; SDB=6.01226765; UDB=6.00645867; IPR=6.01007992; 
- MB=3.00027566; MTD=3.00000008; XFM=3.00000015; UTC=2019-07-03 09:00:37
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19070309-0013-0000-0000-000057ECD3BC
-Message-Id: <c8f78a4c-d4a0-10e9-e0c9-0e37e3415b5c@linux.vnet.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
- definitions=2019-07-03_03:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1907030108
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
-Subject: Re: [Qemu-devel] [PATCH v10 6/6] ppc: spapr: Handle "ibm,
- nmi-register" and "ibm, nmi-interlock" RTAS calls
+Content-Transfer-Encoding: 8bit
+From: Palmer Dabbelt <palmer@sifive.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.85.208.193
+Subject: [Qemu-devel] [PULL 23/32] RISC-V: Clear load reservations on
+ context switch and SC
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -114,212 +80,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: aik@au1.ibm.com, qemu-devel@nongnu.org, groug@kaod.org, paulus@ozlabs.org,
- qemu-ppc@nongnu.org
+Cc: Richard Henderson <richard.henderson@linaro.org>,
+ Joel Sing <joel@sing.id.au>, qemu-riscv@nongnu.org, qemu-devel@nongnu.org,
+ Palmer Dabbelt <palmer@sifive.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+From: Joel Sing <joel@sing.id.au>
 
+This prevents a load reservation from being placed in one context/process,
+then being used in another, resulting in an SC succeeding incorrectly and
+breaking atomics.
 
-On Wednesday 03 July 2019 08:50 AM, David Gibson wrote:
-> On Tue, Jul 02, 2019 at 04:10:08PM +0530, Aravinda Prasad wrote:
->>
->>
->> On Tuesday 02 July 2019 09:41 AM, David Gibson wrote:
->>> On Wed, Jun 12, 2019 at 02:51:38PM +0530, Aravinda Prasad wrote:
->>>> This patch adds support in QEMU to handle "ibm,nmi-register"
->>>> and "ibm,nmi-interlock" RTAS calls and sets the default
->>>> value of SPAPR_CAP_FWNMI_MCE to SPAPR_CAP_ON for machine
->>>> type 4.0.
->>>>
->>>> The machine check notification address is saved when the
->>>> OS issues "ibm,nmi-register" RTAS call.
->>>>
->>>> This patch also handles the case when multiple processors
->>>> experience machine check at or about the same time by
->>>> handling "ibm,nmi-interlock" call. In such cases, as per
->>>> PAPR, subsequent processors serialize waiting for the first
->>>> processor to issue the "ibm,nmi-interlock" call. The second
->>>> processor that also received a machine check error waits
->>>> till the first processor is done reading the error log.
->>>> The first processor issues "ibm,nmi-interlock" call
->>>> when the error log is consumed.
->>>>
->>>> Signed-off-by: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
->>>> ---
->>>>  hw/ppc/spapr.c         |    6 ++++-
->>>>  hw/ppc/spapr_rtas.c    |   63 ++++++++++++++++++++++++++++++++++++++++++++++++
->>>>  include/hw/ppc/spapr.h |    5 +++-
->>>>  3 files changed, 72 insertions(+), 2 deletions(-)
->>>>
->>>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
->>>> index 3d6d139..213d493 100644
->>>> --- a/hw/ppc/spapr.c
->>>> +++ b/hw/ppc/spapr.c
->>>> @@ -2946,6 +2946,9 @@ static void spapr_machine_init(MachineState *machine)
->>>>          /* Create the error string for live migration blocker */
->>>>          error_setg(&spapr->fwnmi_migration_blocker,
->>>>                  "Live migration not supported during machine check handling");
->>>> +
->>>> +        /* Register ibm,nmi-register and ibm,nmi-interlock RTAS calls */
->>>> +        spapr_fwnmi_register();
->>>>      }
->>>>  
->>>>      spapr->rtas_blob = g_malloc(spapr->rtas_size);
->>>> @@ -4408,7 +4411,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
->>>>      smc->default_caps.caps[SPAPR_CAP_NESTED_KVM_HV] = SPAPR_CAP_OFF;
->>>>      smc->default_caps.caps[SPAPR_CAP_LARGE_DECREMENTER] = SPAPR_CAP_ON;
->>>>      smc->default_caps.caps[SPAPR_CAP_CCF_ASSIST] = SPAPR_CAP_OFF;
->>>> -    smc->default_caps.caps[SPAPR_CAP_FWNMI_MCE] = SPAPR_CAP_OFF;
->>>> +    smc->default_caps.caps[SPAPR_CAP_FWNMI_MCE] = SPAPR_CAP_ON;
->>>
->>> Turning this on by default really isn't ok if it stops you running TCG
->>> guests at all.
->>
->> If so this can be "off" by default until TCG is supported.
->>
->>>
->>>>      spapr_caps_add_properties(smc, &error_abort);
->>>>      smc->irq = &spapr_irq_dual;
->>>>      smc->dr_phb_enabled = true;
->>>> @@ -4512,6 +4515,7 @@ static void spapr_machine_3_1_class_options(MachineClass *mc)
->>>>      smc->default_caps.caps[SPAPR_CAP_SBBC] = SPAPR_CAP_BROKEN;
->>>>      smc->default_caps.caps[SPAPR_CAP_IBS] = SPAPR_CAP_BROKEN;
->>>>      smc->default_caps.caps[SPAPR_CAP_LARGE_DECREMENTER] = SPAPR_CAP_OFF;
->>>> +    smc->default_caps.caps[SPAPR_CAP_FWNMI_MCE] = SPAPR_CAP_OFF;
->>>
->>> We're now well past 4.0, and in fact we're about to go into soft
->>> freeze for 4.1, so we're going to miss that too.  So 4.1 and earlier
->>> will need to retain the old default.
->>
->> ok.
->>
->>>
->>>>  }
->>>>  
->>>>  DEFINE_SPAPR_MACHINE(3_1, "3.1", false);
->>>> diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
->>>> index a015a80..e010cb2 100644
->>>> --- a/hw/ppc/spapr_rtas.c
->>>> +++ b/hw/ppc/spapr_rtas.c
->>>> @@ -49,6 +49,7 @@
->>>>  #include "hw/ppc/fdt.h"
->>>>  #include "target/ppc/mmu-hash64.h"
->>>>  #include "target/ppc/mmu-book3s-v3.h"
->>>> +#include "migration/blocker.h"
->>>>  
->>>>  static void rtas_display_character(PowerPCCPU *cpu, SpaprMachineState *spapr,
->>>>                                     uint32_t token, uint32_t nargs,
->>>> @@ -352,6 +353,60 @@ static void rtas_get_power_level(PowerPCCPU *cpu, SpaprMachineState *spapr,
->>>>      rtas_st(rets, 1, 100);
->>>>  }
->>>>  
->>>> +static void rtas_ibm_nmi_register(PowerPCCPU *cpu,
->>>> +                                  SpaprMachineState *spapr,
->>>> +                                  uint32_t token, uint32_t nargs,
->>>> +                                  target_ulong args,
->>>> +                                  uint32_t nret, target_ulong rets)
->>>> +{
->>>> +    int ret;
->>>> +    hwaddr rtas_addr = spapr_get_rtas_addr();
->>>> +
->>>> +    if (!rtas_addr) {
->>>> +        rtas_st(rets, 0, RTAS_OUT_NOT_SUPPORTED);
->>>> +        return;
->>>> +    }
->>>> +
->>>> +    if (spapr_get_cap(spapr, SPAPR_CAP_FWNMI_MCE) == SPAPR_CAP_OFF) {
->>>> +        rtas_st(rets, 0, RTAS_OUT_NOT_SUPPORTED);
->>>> +        return;
->>>> +    }
->>>> +
->>>> +    ret = kvmppc_fwnmi_enable(cpu);
->>>> +    if (ret == 1) {
->>>> +        rtas_st(rets, 0, RTAS_OUT_NOT_SUPPORTED);
->>>
->>> I don't understand this case separate from the others.  We've already
->>> set the cap, so fwnmi support should be checked and available.
->>
->> But we have not enabled fwnmi in KVM. kvmppc_fwnmi_enable() returns 1 if
->> cap_ppc_fwnmi is not available in KVM.
-> 
-> But you've checked for the presence of the extension, yes?  So a
-> failure to enable the cap would be unexpected.  In which case how does
-> this case differ from.. 
+Signed-off-by: Joel Sing <joel@sing.id.au>
+Reviewed-by: Palmer Dabbelt <palmer@sifive.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
+---
+ target/riscv/cpu.c                      |  1 +
+ target/riscv/cpu_helper.c               | 10 ++++++++++
+ target/riscv/insn_trans/trans_rva.inc.c |  8 +++++++-
+ 3 files changed, 18 insertions(+), 1 deletion(-)
 
-No, this is the function where I check for the presence of the
-extension. In kvm_arch_init() we just set cap_ppc_fwnmi to 1 if KVM
-support is available, but don't take any action if unavailable.
-
-So this case is when we are running an old version of KVM with no
-cap_ppc_fwnmi support.
-
-> 
->>
->>>
->>>> +        return;
->>>> +    } else if (ret < 0) {
->>>> +        error_report("Couldn't enable KVM FWNMI capability");
->>>> +        rtas_st(rets, 0, RTAS_OUT_HW_ERROR);
->>>> +        return;
-> 
-> ..this case.
-
-And this is when we have the KVM support but due to some problem with
-either KVM or QEMU we are unable to enable cap_ppc_fwnmi.
-
-> 
->>>> +    }
->>>> +
->>>> +    spapr->guest_machine_check_addr = rtas_ld(args, 1);
->>>> +    rtas_st(rets, 0, RTAS_OUT_SUCCESS);
->>>> +}
->>>> +
->>>> +static void rtas_ibm_nmi_interlock(PowerPCCPU *cpu,
->>>> +                                   SpaprMachineState *spapr,
->>>> +                                   uint32_t token, uint32_t nargs,
->>>> +                                   target_ulong args,
->>>> +                                   uint32_t nret, target_ulong rets)
->>>> +{
->>>> +    if (spapr->guest_machine_check_addr == -1) {
->>>> +        /* NMI register not called */
->>>> +        rtas_st(rets, 0, RTAS_OUT_PARAM_ERROR);
->>>> +    } else {
->>>> +        /*
->>>> +         * vCPU issuing "ibm,nmi-interlock" is done with NMI handling,
->>>> +         * hence unset mc_status.
->>>> +         */
->>>> +        spapr->mc_status = -1;
->>>> +        qemu_cond_signal(&spapr->mc_delivery_cond);
->>>> +        migrate_del_blocker(spapr->fwnmi_migration_blocker);
->>>
->>> Hrm.  We add the blocker at the mce request point.  First, that's in
->>> another patch, which isn't great.  Second, does that mean we could add
->>> multiple times if we get an MCE on multiple CPUs?  Will that work and
->>> correctly match adds and removes properly?
->>
->> If it is fine to move the migration patch as the last patch in the
->> sequence, then we will have add and del blocker in the same patch.
->>
->> And yes we could add multiple times if we get MCE on multiple CPUs and
->> as all those cpus call interlock there should be matching number of
->> delete blockers.
-> 
-> Ok, and I think adding the same pointer to the list multiple times
-> will work ok.
-
-I think so
-
-> 
-> Btw, add_blocker() can fail - have you handled failure conditions?
-
-yes, I am handling it.
-
-> 
-
+diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+index 915b9e77df33..f8d07bd20ad7 100644
+--- a/target/riscv/cpu.c
++++ b/target/riscv/cpu.c
+@@ -297,6 +297,7 @@ static void riscv_cpu_reset(CPUState *cs)
+     env->pc = env->resetvec;
+ #endif
+     cs->exception_index = EXCP_NONE;
++    env->load_res = -1;
+     set_default_nan_mode(1, &env->fp_status);
+ }
+ 
+diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
+index e1b079e69c60..e32b6126af05 100644
+--- a/target/riscv/cpu_helper.c
++++ b/target/riscv/cpu_helper.c
+@@ -132,6 +132,16 @@ void riscv_cpu_set_mode(CPURISCVState *env, target_ulong newpriv)
+     }
+     /* tlb_flush is unnecessary as mode is contained in mmu_idx */
+     env->priv = newpriv;
++
++    /*
++     * Clear the load reservation - otherwise a reservation placed in one
++     * context/process can be used by another, resulting in an SC succeeding
++     * incorrectly. Version 2.2 of the ISA specification explicitly requires
++     * this behaviour, while later revisions say that the kernel "should" use
++     * an SC instruction to force the yielding of a load reservation on a
++     * preemptive context switch. As a result, do both.
++     */
++    env->load_res = -1;
+ }
+ 
+ /* get_physical_address - get the physical address for this virtual address
+diff --git a/target/riscv/insn_trans/trans_rva.inc.c b/target/riscv/insn_trans/trans_rva.inc.c
+index f6dbbc065e15..fadd88849e2b 100644
+--- a/target/riscv/insn_trans/trans_rva.inc.c
++++ b/target/riscv/insn_trans/trans_rva.inc.c
+@@ -61,7 +61,7 @@ static inline bool gen_sc(DisasContext *ctx, arg_atomic *a, TCGMemOp mop)
+ 
+     gen_set_label(l1);
+     /*
+-     * Address comparion failure.  However, we still need to
++     * Address comparison failure.  However, we still need to
+      * provide the memory barrier implied by AQ/RL.
+      */
+     tcg_gen_mb(TCG_MO_ALL + a->aq * TCG_BAR_LDAQ + a->rl * TCG_BAR_STRL);
+@@ -69,6 +69,12 @@ static inline bool gen_sc(DisasContext *ctx, arg_atomic *a, TCGMemOp mop)
+     gen_set_gpr(a->rd, dat);
+ 
+     gen_set_label(l2);
++    /*
++     * Clear the load reservation, since an SC must fail if there is
++     * an SC to any address, in between an LR and SC pair.
++     */
++    tcg_gen_movi_tl(load_res, -1);
++
+     tcg_temp_free(dat);
+     tcg_temp_free(src1);
+     tcg_temp_free(src2);
 -- 
-Regards,
-Aravinda
+2.21.0
 
 
