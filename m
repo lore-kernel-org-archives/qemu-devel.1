@@ -2,90 +2,87 @@ Return-Path: <SRS0=mdN/=VA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5C9AC0650E
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 15:58:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8363AC0650E
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 16:06:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B3ADB2080C
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 15:58:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 526DD2189E
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 16:06:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="amRPd7cN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3ADB2080C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="qazKv1F9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 526DD2189E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37066 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37106 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hiheR-0005jM-VY
-	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 11:58:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53155)
+	id 1hihls-0000wd-He
+	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 12:06:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51830)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hihZI-0002hn-Tk
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 11:53:15 -0400
+ (envelope-from <damien.hedde@greensocs.com>) id 1hihUB-0006nD-Fd
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 11:47:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hihZF-00078s-HL
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 11:53:12 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:39524)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hihZ8-0006vo-T4
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 11:53:04 -0400
-Received: by mail-wm1-x342.google.com with SMTP id z23so2960627wma.4
- for <qemu-devel@nongnu.org>; Wed, 03 Jul 2019 08:52:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=m+82LmGiTUR8ft7yGco+ML19JHV1vi8nCqyq/raGSyc=;
- b=amRPd7cNQqjH1DB4/gfYLm89jy4FPHMN4SDAOTlYl49UMvlwIzlxX3i6kWzHPXmiSc
- DjKL/i1ujAS4CCsnKlOMTPnLlTnQHXVoF8BDVBJPFQFoUMEgaPfiDrun/2Na4t5itmvD
- v/6bacFZ8tKCvqrXcua92SnsoRUlVwktfxet3QTAZ4GWlLn9WLAA8oGxuU+J79DSkb7D
- Jt1KbOXQt2I4bI6ow2MGaVttzfG6pRVbr4cj18WVXKpeYjbk4ZkHCh56kzbaZIktY8yl
- M3rKxqPT6yGXUgFJfEwRsP7h0HolWwfR0eI27elV5CciYyJFvmd/mezmV9LOrVJzlYM6
- eXSg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=m+82LmGiTUR8ft7yGco+ML19JHV1vi8nCqyq/raGSyc=;
- b=ocmQfh2MlBKcOfp1jdRHlUa9RIa2mq+EXhwS/9I/LG0ZcR8H+LGKh4jkM/nQB+oPph
- 7OWQxnmhURCHY61bPN0PJwoq1ix3DlEtU/kmGiXo1XwX49MbJsRzpwxx/Uqhmekgydw0
- cI7k3cVGeA7Vt3SDrygHbLmZt95KRIYdY7XNrBzDKsfIT2aNP2l1MkPgIWtxwj9eoVN5
- wIf6qwDIUVdLu4xxMOcqIAgAQ1lq0OLzBf1j+0Wn38gH1wPN8IQuJ0/+7qxP+LdZRPpd
- 04rZcc+ylOhw2QICDgdi2WYSg74iWUgJBKtG6sGEiESBD3HaqlBH1BeXK4UuZQwJ6OHS
- xDwA==
-X-Gm-Message-State: APjAAAXIBfCH9j+V/AHMwatsBlF70tGogiwAHkMvvx5zfi6FdSZPaln5
- L6vrWEH/XQadI+aJg7K+wOKj7g==
-X-Google-Smtp-Source: APXvYqx5Hv2/M7GDadMZ561cW2Uzx73M+YYvMv9RY9olcnOsqdViISjtm8sENHnHp+oz9CtJmvdqow==
-X-Received: by 2002:a1c:7d56:: with SMTP id y83mr8879731wmc.77.1562169166227; 
- Wed, 03 Jul 2019 08:52:46 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id z17sm2708049wrr.13.2019.07.03.08.52.44
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Wed, 03 Jul 2019 08:52:45 -0700 (PDT)
-Received: from zen.linaroharston. (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 8E6791FF90;
- Wed,  3 Jul 2019 16:52:44 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Date: Wed,  3 Jul 2019 16:52:43 +0100
-Message-Id: <20190703155244.28166-4-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190703155244.28166-1-alex.bennee@linaro.org>
-References: <20190703155244.28166-1-alex.bennee@linaro.org>
+ (envelope-from <damien.hedde@greensocs.com>) id 1hihUA-00042l-9s
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 11:47:55 -0400
+Received: from beetle.greensocs.com ([5.135.226.135]:33600)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
+ id 1hihU9-00040T-CY
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 11:47:54 -0400
+Received: from [172.16.11.117] (unknown [172.16.11.117])
+ by beetle.greensocs.com (Postfix) with ESMTPSA id 0283796F56;
+ Wed,  3 Jul 2019 15:47:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
+ s=mail; t=1562168869;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=hdUxgjlyj6iP1cvFB8DvLmro9uPaEQgHOndAn0lPjgc=;
+ b=qazKv1F9b4aoe/iKPo0agaRRlnnUq+rluamlUfIQGmZTByYgNhJwWESwd9SJh+B1RvuqTl
+ ShsvtHXlXX3o6mxS8QdBnbzO3tdcV/I6bwM0VmnNeUqbdq8V5tQJ9RvvqOA5OgCLz+qdbx
+ /wk6klbQG5nishDezTscjTqwnj5KEHE=
+To: Stefan Hajnoczi <stefanha@gmail.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+References: <20190628124534.10679-1-damien.hedde@greensocs.com>
+ <20190701083710.GA18173@stefanha-x1.localdomain>
+ <94a3da17-c1c5-b9ce-8e92-4d346ed98782@redhat.com>
+ <20190703092946.GC11844@stefanha-x1.localdomain>
+From: Damien Hedde <damien.hedde@greensocs.com>
+Message-ID: <601ba4fe-136d-05fb-1823-6b0f13156fe6@greensocs.com>
+Date: Wed, 3 Jul 2019 17:47:47 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::342
-Subject: [Qemu-devel] [PATCH v1 3/4] target/arm: handle A-profile A32
- semihosting at translate time
+In-Reply-To: <20190703092946.GC11844@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US-large
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
+ s=mail; t=1562168869;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=hdUxgjlyj6iP1cvFB8DvLmro9uPaEQgHOndAn0lPjgc=;
+ b=6KZgBC1KEBfBc9bjqeMwpQhRUB7HbrPVAb9vB2CvVh/HaiYFTvbAxy9Mb/XDXzjzTsMz7Q
+ I0WeCaC7j9TOYySo2L89E70JmEBjYm9lezRpoF+k56OOcczY1fXZcR2ZMkaaQekH8fGwQa
+ 2OtAayHuNupItIEfVOpxhmtxrFe+WYE=
+ARC-Seal: i=1; s=mail; d=greensocs.com; t=1562168869; a=rsa-sha256; cv=none;
+ b=sJwssy+ZYZPjtNePuI8DSNxp9TLjVs4vMMJKJt0V2HqKTY0Dp7+SY6TUqmukHtyCK8ay4k
+ pI4eI3ZJey+Dpz3e20jOoWm8tAGkD3hRlsG8S6Tr4tc0cKSF2mWR+7RetU9i7Xr8aDZyCv
+ Zv431SlMB9x78039kLdgATrVGDPWgSw=
+ARC-Authentication-Results: i=1; ORIGINATING;
+ auth=pass smtp.auth=damien smtp.mailfrom=damien.hedde@greensocs.com
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 5.135.226.135
+Subject: Re: [Qemu-devel] [RFC PATCH 0/5] FAULT INJECTION FRAMEWORK
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,59 +94,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: ehabkost@redhat.com, sakisp@xilinx.com, mark.burton@greensocs.com,
+ qemu-devel@nongnu.org, armbru@redhat.com, edgari@xilinx.com, crosa@redhat.com,
+ pbonzini@redhat.com, luc.michel@greensocs.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-As for the other semihosting calls we can resolve this at translate
-time.
+On 7/3/19 11:29 AM, Stefan Hajnoczi wrote:
+> On Mon, Jul 01, 2019 at 12:16:44PM +0200, Philippe Mathieu-Daud=E9 wrot=
+e:
+>> On 7/1/19 10:37 AM, Stefan Hajnoczi wrote:
+>>> On Fri, Jun 28, 2019 at 02:45:29PM +0200, Damien Hedde wrote:
+>>>> This series adds a python framework aiming to provide some ways to d=
+o fault
+>>>> injection in a running vm. In its current state, it allows to easily=
+ interact
+>>>> with memory, change gpios and qom properties.
+>>>>
+>>>> The framework consists in a python script based on the qmp existing =
+module
+>>>> which allows to interact with the vm.
+>>>
+>>> How does this compare to qtest?  There seems to be a lot of overlap
+>>> between them.
+>>>
+>>> Why is it called "fault injection"?  The commands seem to be
+>>> general-purpose device testing functions (like qtest and libqos), not
+>>> functions for testing error code paths as would be expected from a fa=
+ult
+>>> injection framework.
+>>
+>> I understand qtest is to test QEMU, while this framework/command is to
+>> test how the guest react to an hardware faults.
+>=20
+> The commands seems to be equivalent to qtest commands, just implemented
+> as QMP commands.
+>=20
+> Damien: Can you explain the use case more and show some example test
+> cases?
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- target/arm/translate.c | 20 +++++++++++++++++---
- 1 file changed, 17 insertions(+), 3 deletions(-)
+The goal is to test and validate the software running on the vp. We want
+to generate some fault to test if the software behave correctly. We
+target corner cases that do not happen otherwise on the vp. Basically we
+would like, using some scripts, to run some specific scenarios and check
+that the expected behavior happens.
 
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 8e2e955cbe..139b2f6765 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -7699,6 +7699,22 @@ static void arm_skip_unless(DisasContext *s, uint32_t cond)
-     arm_gen_test_cc(cond ^ 1, s->condlabel);
- }
- 
-+static inline void gen_arm_swi(DisasContext *s, int imm24)
-+{
-+    if (semihosting_enabled() &&
-+#ifndef CONFIG_USER_ONLY
-+        s->current_el != 0 &&
-+#endif
-+        (imm24 == 0x123456)) {
-+        gen_exception_internal_insn(s, 0, EXCP_SEMIHOST);
-+        return;
-+    }
-+
-+    gen_set_pc_im(s, s->pc);
-+    s->svc_imm = imm24;
-+    s->base.is_jmp = DISAS_SWI;
-+}
-+
- static void disas_arm_insn(DisasContext *s, unsigned int insn)
- {
-     unsigned int cond, val, op1, i, shift, rm, rs, rn, rd, sh;
-@@ -9249,9 +9265,7 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
-             break;
-         case 0xf:
-             /* swi */
--            gen_set_pc_im(s, s->pc);
--            s->svc_imm = extract32(insn, 0, 24);
--            s->base.is_jmp = DISAS_SWI;
-+            gen_arm_swi(s, extract32(insn, 0, 24));
-             break;
-         default:
-         illegal_op:
--- 
-2.20.1
+Regarding qtest, I was not aware that it provided such commands. I'm
+sorry I've missed that. Just checked after reading your feedback,
+commands seem indeed equivalent. I don't know if running the vp with
+qtest enabled has some hidden drawbacks. But if that's not the case, we
+can work to extend the existing qtest commands (or switch some of them
+to QMP like Philippe proposed, I don't know what's best).
 
+>=20
+>> To use the qtest_mem commands you need to run QEMU with the qtest
+>> chardev backend, while this series expose a QMP interface.
+>>
+>> To avoid the overlap, a cleaner follow up might be to have qtest wrap
+>> these QMP commands (mostly like HMP commands do).
+>>
+>> Another note while looking at a glance, qtest uses the 1st cpu address
+>> space view, this series allow to select a specific cpu.
+>>
+>> It makes sense to me to be able to select address spaces by name (more
+>> generic, not restricted to a cpu view, since one might want to inject
+>> fault in a device ram not always mapped to a cpu: dma, emac desc).
+
+Good point.
+
+>=20
+> The naming issue still stands: none of the commands actually perform
+> fault injection.  They can be used for other types of testing or even
+> non-testing purposes.
+>=20
+> Fault injection commands would be "make the next watchdog expiry fail",
+> "return error code X on the next DMA request", "report an AHCI link
+> failure", etc.
+>=20
+> These commands are lower-level.  Therefore, I think "fault injection
+> framework" is a misnomer and will age poorly if this API is extended in
+> the future.
+
+The only fault injection naming was for the python module. I suppose
+that if we just extend qtest, there is no need for a new module or
+documentation file.
+
+Thanks,
+
+Damien
 
