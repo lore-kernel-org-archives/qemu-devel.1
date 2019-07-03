@@ -3,60 +3,63 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47CF9C5B578
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 21:36:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DCAF6C5B578
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 21:36:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1AB9A21882
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 21:36:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1AB9A21882
+	by mail.kernel.org (Postfix) with ESMTPS id B44E621882
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 21:36:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B44E621882
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40874 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40876 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1himvY-0001N7-BC
-	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 17:36:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38350)
+	id 1himve-0001pZ-V7
+	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 17:36:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38418)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <ehabkost@redhat.com>) id 1himVX-0006Jk-QC
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 17:09:41 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1himVt-0006V9-Iw
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 17:10:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1himVV-0007Ba-Qa
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 17:09:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39094)
+ (envelope-from <ehabkost@redhat.com>) id 1himVn-0007In-0h
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 17:09:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35230)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1himVU-0007Ad-Sx
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 17:09:37 -0400
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1himVi-0007Fm-9L
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 17:09:51 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E7FAF3082A8F;
- Wed,  3 Jul 2019 21:09:35 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 3A50866971;
+ Wed,  3 Jul 2019 21:09:46 +0000 (UTC)
 Received: from localhost (ovpn-116-30.gru2.redhat.com [10.97.116.30])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 74E398378F;
- Wed,  3 Jul 2019 21:09:35 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B79A984262;
+ Wed,  3 Jul 2019 21:09:45 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>,
  Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
  Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
  Richard Henderson <rth@twiddle.net>
-Date: Wed,  3 Jul 2019 18:08:05 -0300
-Message-Id: <20190703210821.27550-28-ehabkost@redhat.com>
+Date: Wed,  3 Jul 2019 18:08:10 -0300
+Message-Id: <20190703210821.27550-33-ehabkost@redhat.com>
 In-Reply-To: <20190703210821.27550-1-ehabkost@redhat.com>
 References: <20190703210821.27550-1-ehabkost@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Wed, 03 Jul 2019 21:09:36 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.38]); Wed, 03 Jul 2019 21:09:46 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL v5 27/43] target/i386: Add CPUID.1F generation
- support for multi-dies PCMachine
+Subject: [Qemu-devel] [PULL v5 32/43] qmp: Add "alias-of" field to
+ query-cpu-definitions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,141 +71,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Like Xu <like.xu@linux.intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Like Xu <like.xu@linux.intel.com>
+Management software will be expected to resolve CPU model name
+aliases using the new field.
 
-The CPUID.1F as Intel V2 Extended Topology Enumeration Leaf would be
-exposed if guests want to emulate multiple software-visible die within
-each package. Per Intel's SDM, the 0x1f is a superset of 0xb, thus they
-can be generated by almost same code as 0xb except die_offset setting.
-
-If the number of dies per package is greater than 1, the cpuid_min_level
-would be adjusted to 0x1f regardless of whether the host supports CPUID.1F.
-Likewise, the CPUID.1F wouldn't be exposed if env->nr_dies < 2.
-
-Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
-Signed-off-by: Like Xu <like.xu@linux.intel.com>
-Message-Id: <20190620054525.37188-2-like.xu@linux.intel.com>
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+Message-Id: <20190628002844.24894-2-ehabkost@redhat.com>
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- target/i386/cpu.h |  1 +
- target/i386/cpu.c | 41 +++++++++++++++++++++++++++++++++++++++++
- target/i386/kvm.c | 12 ++++++++++++
- 3 files changed, 54 insertions(+)
+ qapi/machine-target.json | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 85319f4ae1..0a96c78669 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -736,6 +736,7 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
- #define CPUID_TOPOLOGY_LEVEL_INVALID  (0U << 8)
- #define CPUID_TOPOLOGY_LEVEL_SMT      (1U << 8)
- #define CPUID_TOPOLOGY_LEVEL_CORE     (2U << 8)
-+#define CPUID_TOPOLOGY_LEVEL_DIE      (5U << 8)
- 
- /* MSR Feature Bits */
- #define MSR_ARCH_CAP_RDCL_NO    (1U << 0)
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index b9d6f32945..296ef6c918 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -4413,6 +4413,42 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
-             *ecx |= CPUID_TOPOLOGY_LEVEL_INVALID;
-         }
- 
-+        assert(!(*eax & ~0x1f));
-+        *ebx &= 0xffff; /* The count doesn't need to be reliable. */
-+        break;
-+    case 0x1F:
-+        /* V2 Extended Topology Enumeration Leaf */
-+        if (env->nr_dies < 2) {
-+            *eax = *ebx = *ecx = *edx = 0;
-+            break;
-+        }
-+
-+        *ecx = count & 0xff;
-+        *edx = cpu->apic_id;
-+        switch (count) {
-+        case 0:
-+            *eax = apicid_core_offset(env->nr_dies, cs->nr_cores,
-+                                                    cs->nr_threads);
-+            *ebx = cs->nr_threads;
-+            *ecx |= CPUID_TOPOLOGY_LEVEL_SMT;
-+            break;
-+        case 1:
-+            *eax = apicid_die_offset(env->nr_dies, cs->nr_cores,
-+                                                   cs->nr_threads);
-+            *ebx = cs->nr_cores * cs->nr_threads;
-+            *ecx |= CPUID_TOPOLOGY_LEVEL_CORE;
-+            break;
-+        case 2:
-+            *eax = apicid_pkg_offset(env->nr_dies, cs->nr_cores,
-+                                                   cs->nr_threads);
-+            *ebx = env->nr_dies * cs->nr_cores * cs->nr_threads;
-+            *ecx |= CPUID_TOPOLOGY_LEVEL_DIE;
-+            break;
-+        default:
-+            *eax = 0;
-+            *ebx = 0;
-+            *ecx |= CPUID_TOPOLOGY_LEVEL_INVALID;
-+        }
-         assert(!(*eax & ~0x1f));
-         *ebx &= 0xffff; /* The count doesn't need to be reliable. */
-         break;
-@@ -5094,6 +5130,11 @@ static void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
-             x86_cpu_adjust_level(cpu, &cpu->env.cpuid_min_level, 0x14);
-         }
- 
-+        /* CPU topology with multi-dies support requires CPUID[0x1F] */
-+        if (env->nr_dies > 1) {
-+            x86_cpu_adjust_level(cpu, &env->cpuid_min_level, 0x1F);
-+        }
-+
-         /* SVM requires CPUID[0x8000000A] */
-         if (env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_SVM) {
-             x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel, 0x8000000A);
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index e4b4f5756a..473a17e9a5 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -1451,6 +1451,10 @@ int kvm_arch_init_vcpu(CPUState *cs)
-             }
-             break;
-         }
-+        case 0x1f:
-+            if (env->nr_dies < 2) {
-+                break;
-+            }
-         case 4:
-         case 0xb:
-         case 0xd:
-@@ -1458,6 +1462,11 @@ int kvm_arch_init_vcpu(CPUState *cs)
-                 if (i == 0xd && j == 64) {
-                     break;
-                 }
-+
-+                if (i == 0x1f && j == 64) {
-+                    break;
-+                }
-+
-                 c->function = i;
-                 c->flags = KVM_CPUID_FLAG_SIGNIFCANT_INDEX;
-                 c->index = j;
-@@ -1469,6 +1478,9 @@ int kvm_arch_init_vcpu(CPUState *cs)
-                 if (i == 0xb && !(c->ecx & 0xff00)) {
-                     break;
-                 }
-+                if (i == 0x1f && !(c->ecx & 0xff00)) {
-+                    break;
-+                }
-                 if (i == 0xd && c->eax == 0) {
-                     continue;
-                 }
--- 
+diff --git a/qapi/machine-target.json b/qapi/machine-target.json
+index 5d7480f6ab..55310a6aa2 100644
+--- a/qapi/machine-target.json
++++ b/qapi/machine-target.json
+@@ -279,6 +279,12 @@
+ #            to introspect properties configurable using -cpu or -global=
+.
+ #            (since 2.9)
+ #
++# @alias-of: Name of CPU model this model is an alias for.  The target o=
+f the
++#            CPU model alias may change depending on the machine type.
++#            Management software is supposed to translate CPU model alia=
+ses
++#            in the VM configuration, because aliases may stop being
++#            migration-safe in the future (since 4.1)
++#
+ # @unavailable-features is a list of QOM property names that
+ # represent CPU model attributes that prevent the CPU from running.
+ # If the QOM property is read-only, that means there's no known
+@@ -302,7 +308,8 @@
+             '*migration-safe': 'bool',
+             'static': 'bool',
+             '*unavailable-features': [ 'str' ],
+-            'typename': 'str' },
++            'typename': 'str',
++            '*alias-of' : 'str' },
+   'if': 'defined(TARGET_PPC) || defined(TARGET_ARM) || defined(TARGET_I3=
+86) || defined(TARGET_S390X) || defined(TARGET_MIPS)' }
+=20
+ ##
+--=20
 2.18.0.rc1.1.g3f1ff2140
 
 
