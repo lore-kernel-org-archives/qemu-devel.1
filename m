@@ -2,73 +2,87 @@ Return-Path: <SRS0=mdN/=VA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4036EC0650E
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 09:28:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60859C0650E
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 09:29:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 16E0221882
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 09:28:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 16E0221882
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2BD7C21882
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 09:29:07 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="vTtS1v/C"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2BD7C21882
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34176 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34216 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hibYZ-0006GC-B6
-	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 05:28:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51845)
+	id 1hibZb-0007E4-8O
+	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 05:29:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33847)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <palmer@dabbelt.com>) id 1hiaqC-0006bm-Ir
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 04:42:15 -0400
+ (envelope-from <stefanha@gmail.com>) id 1hibR6-0004sY-Ql
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 05:20:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <palmer@dabbelt.com>) id 1hiaq7-0008Kb-9p
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 04:42:12 -0400
-Received: from mail-lj1-f194.google.com ([209.85.208.194]:34999)
+ (envelope-from <stefanha@gmail.com>) id 1hibR4-0000qK-Qh
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 05:20:20 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:37083)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1hiaq6-0008FJ-W0
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 04:42:07 -0400
-Received: by mail-lj1-f194.google.com with SMTP id x25so1500586ljh.2
- for <qemu-devel@nongnu.org>; Wed, 03 Jul 2019 01:42:06 -0700 (PDT)
+ (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1hibR2-0000YC-0Y
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 05:20:18 -0400
+Received: by mail-wr1-x442.google.com with SMTP id v14so1915463wrr.4
+ for <qemu-devel@nongnu.org>; Wed, 03 Jul 2019 02:20:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to:user-agent;
+ bh=zokmhDVmugjm2Rx+36oRWee1JIvw+fpMCLAae7Xo4xE=;
+ b=vTtS1v/Cc6DcqzdjeJ1QphnsgQ0HkoOwTY5rBs0t/CbvoWMg/nkyryfnlvsmDerj8H
+ wkeZwaufSIinAZ1qAYcf7Z2M0gHhSJJWDbima9rEq9TUUlQiXHSona8pHjZKVgMXrFaA
+ kfozJnyBZtaIvKbGwxDpFcSxC+/eJoXwkivIC5wKh9K41t+gfAYgqOBK/QXJIp8sY4CS
+ fcfkRP/RH2u4IKRF7DVlvFLf5a+QShI5KP/CXVLmAtUSpK97CHwTr3VWyZH1nUT/TEv7
+ XwHFCDrQTEZYIz+byZhzYU6WJydi4VreD2DGCKiGR2ZR6UYKbrSqsUC9YBWDOJk6xvxF
+ 4Rvg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding:cc:from:to;
- bh=e4LpAArqCMZjxsWg9gz2sRwwsdArZOrpMF0nx0rvwxQ=;
- b=FlohhaY96oapfiSTuVfhH2jkSq7B0OMBsMH5COhrZDA/ccwRfAH+jahFP6M9oyidah
- G8BtirVnMvSUuCAXCBdJdWsIIq/2Hn2SyO6pm8ZS3swarH13gQzgW99xrGbIRmDjbH4h
- ohL+AvJs6s5D4iIQWbHIHCSWG9JGJNfYCs3yAeQ4I6IuXIYFwNoAz8Wup3Wm/l7mQHaU
- 3VuUrdnsp/nG/y3TIK6F73wx+hc0L5dV23qEhbV1x2AO8PkKwWgRlsQ9KyZhSp8W8AxI
- xAwEvPBacXCExfI24+c2EfqOnohaVJLgyJkepakMZvKEW6gasmrN+zNdSa9IfRgmYt/8
- 96CQ==
-X-Gm-Message-State: APjAAAUGyBgwrm68hOwLW25z3NuCwEQCSOZj/gWq4FMf8WJUmPSkUzTa
- uaUnIjiFRwQdZuYH06ZEa2eXctoCLPvcxg==
-X-Google-Smtp-Source: APXvYqzPwccajxJHrxV0Iu/+X1aKN2pWD9Cg+Xp+ynhPy4gOdBjUExQ4tZ1nSbLT4uI6h6pooaOTzg==
-X-Received: by 2002:a2e:4e12:: with SMTP id c18mr20446442ljb.211.1562143325123; 
- Wed, 03 Jul 2019 01:42:05 -0700 (PDT)
-Received: from localhost ([134.17.27.127])
- by smtp.gmail.com with ESMTPSA id t15sm285203lff.94.2019.07.03.01.42.03
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to:user-agent;
+ bh=zokmhDVmugjm2Rx+36oRWee1JIvw+fpMCLAae7Xo4xE=;
+ b=Uj51WZ+06lm7VWMrvGafZj9u4Jg7/gICcjewVG5raPGWPOja5zh+ZbKWMyyvw8Eu5U
+ wu9QGjvWBK31chJDkMGlMHQujiYd86Zib4MLbIp43Cj8/jSSDZgaIFuSDrtKYrMZuBBa
+ kdzpxsGx668sAv45C5pFt90aliSEByfLHAGvjpGYaDdd9JgLhWgDNspJ92CcGNeLnzu1
+ AM8mytOIvtUmNPXDXxFoCimMwXuKbSqW3M+NWaOC4MmNXOU6LL7jJKAUCfUi0SIRR1i/
+ Wk1mwFB1Y0dlc/hn1gfEQmX2xZK7bUSYCpFaOIlWykXERXOEV5e5er2rL9cAGrJDAo0Q
+ ha+w==
+X-Gm-Message-State: APjAAAVhJHxatdOWp5hEHaojDFwdGqtT5DNskkw4l3V/ZpItceuEH47h
+ pPZUO2z7UNSgm97TQA0GDzA=
+X-Google-Smtp-Source: APXvYqxXdrVI4HWisZ+ZrDTV042WSMHjXg2zaUwnfavu+aVPxALihBJBG4587km5WtoICEMienRGKQ==
+X-Received: by 2002:adf:f042:: with SMTP id t2mr14646328wro.299.1562145608880; 
+ Wed, 03 Jul 2019 02:20:08 -0700 (PDT)
+Received: from localhost ([51.15.41.238])
+ by smtp.gmail.com with ESMTPSA id f190sm2081893wmg.13.2019.07.03.02.20.07
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Wed, 03 Jul 2019 01:42:04 -0700 (PDT)
-Date: Wed,  3 Jul 2019 01:40:47 -0700
-Message-Id: <20190703084048.6980-32-palmer@sifive.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190703084048.6980-1-palmer@sifive.com>
-References: <20190703084048.6980-1-palmer@sifive.com>
+ Wed, 03 Jul 2019 02:20:08 -0700 (PDT)
+Date: Wed, 3 Jul 2019 10:20:07 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190703092007.GB11844@stefanha-x1.localdomain>
+References: <20190621094005.4134-1-stefanha@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-From: Palmer Dabbelt <palmer@sifive.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.208.194
-Subject: [Qemu-devel] [PULL 31/32] hw/riscv: Add support for loading a
- firmware
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="wzJLGUyc3ArbnUjN"
+Content-Disposition: inline
+In-Reply-To: <20190621094005.4134-1-stefanha@redhat.com>
+User-Agent: Mutt/1.12.0 (2019-05-25)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::442
+Subject: Re: [Qemu-devel] [PATCH 0/4] libvhost-user:
+ VHOST_USER_PROTOCOL_F_MQ support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -80,114 +94,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alistair Francis <alistair.francis@wdc.com>, Bin Meng <bmeng.cn@gmail.com>,
- qemu-riscv@nongnu.org, qemu-devel@nongnu.org,
- Palmer Dabbelt <palmer@sifive.com>
+Cc: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
+ Sebastien Boeuf <sebastien.boeuf@intel.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Alistair Francis <alistair.francis@wdc.com>
 
-Add support for loading a firmware file for the virt machine and the
-SiFive U. This can be run with the following command:
+--wzJLGUyc3ArbnUjN
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-    qemu-system-riscv64 -machine virt -bios fw_jump.bin -kernel vmlinux
+On Fri, Jun 21, 2019 at 10:40:01AM +0100, Stefan Hajnoczi wrote:
+> Sebastien Boeuf <sebastien.boeuf@intel.com> pointed out that libvhost-user
+> doesn't advertise VHOST_USER_PROTOCOL_F_MQ.  Today this prevents vhost-us=
+er-net
+> multiqueue from working.
+>=20
+> In virtio-fs we also want to support multiqueue so I'm sending patches to=
+ add
+> this.  It's free to advertise VHOST_USER_PROTOCOL_F_MQ for all devices so=
+ we
+> can do it unconditionally in libvhost-user.
+>=20
+> Several related improvements are included:
+> Patch 1 - clean up duplicated and risky VhostUserMsg reply building code
+> Patch 2 - remove hardcoded 8 virtqueue limit in libvhost-user
+> Patch 4 - clarify vhost-user multiqueue specification
+>=20
+> Stefan Hajnoczi (4):
+>   libvhost-user: add vmsg_set_reply_u64() helper
+>   libvhost-user: support many virtqueues
+>   libvhost-user: implement VHOST_USER_PROTOCOL_F_MQ
+>   docs: avoid vhost-user-net specifics in multiqueue section
+>=20
+>  contrib/libvhost-user/libvhost-user-glib.h |  2 +-
+>  contrib/libvhost-user/libvhost-user.h      | 10 +++-
+>  contrib/libvhost-user/libvhost-user-glib.c | 12 +++-
+>  contrib/libvhost-user/libvhost-user.c      | 65 +++++++++++++---------
+>  contrib/vhost-user-blk/vhost-user-blk.c    | 16 +++---
+>  contrib/vhost-user-gpu/main.c              |  9 ++-
+>  contrib/vhost-user-input/main.c            | 11 +++-
+>  contrib/vhost-user-scsi/vhost-user-scsi.c  | 21 +++----
+>  tests/vhost-user-bridge.c                  | 42 +++++++++-----
+>  docs/interop/vhost-user.rst                | 21 +++----
+>  10 files changed, 132 insertions(+), 77 deletions(-)
+>=20
+> --=20
+> 2.21.0
 
-Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Bin Meng <bmeng.cn@gmail.com>
-Tested-by: Bin Meng <bmeng.cn@gmail.com>
-Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
----
- hw/riscv/boot.c         | 26 ++++++++++++++++++++++++++
- hw/riscv/sifive_u.c     |  4 ++++
- hw/riscv/virt.c         |  4 ++++
- include/hw/riscv/boot.h |  2 ++
- 4 files changed, 36 insertions(+)
+Ping?
 
-diff --git a/hw/riscv/boot.c b/hw/riscv/boot.c
-index 0c8e72e455d7..883df49a0c65 100644
---- a/hw/riscv/boot.c
-+++ b/hw/riscv/boot.c
-@@ -23,8 +23,34 @@
- #include "exec/cpu-defs.h"
- #include "hw/loader.h"
- #include "hw/riscv/boot.h"
-+#include "hw/boards.h"
- #include "elf.h"
- 
-+#if defined(TARGET_RISCV32)
-+# define KERNEL_BOOT_ADDRESS 0x80400000
-+#else
-+# define KERNEL_BOOT_ADDRESS 0x80200000
-+#endif
-+
-+target_ulong riscv_load_firmware(const char *firmware_filename,
-+                                 hwaddr firmware_load_addr)
-+{
-+    uint64_t firmware_entry, firmware_start, firmware_end;
-+
-+    if (load_elf(firmware_filename, NULL, NULL, NULL, &firmware_entry,
-+                 &firmware_start, &firmware_end, 0, EM_RISCV, 1, 0) > 0) {
-+        return firmware_entry;
-+    }
-+
-+    if (load_image_targphys_as(firmware_filename, firmware_load_addr,
-+                               ram_size, NULL) > 0) {
-+        return firmware_load_addr;
-+    }
-+
-+    error_report("could not load firmware '%s'", firmware_filename);
-+    exit(1);
-+}
-+
- target_ulong riscv_load_kernel(const char *kernel_filename)
- {
-     uint64_t kernel_entry, kernel_high;
-diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-index f6b9c12e6094..420867155293 100644
---- a/hw/riscv/sifive_u.c
-+++ b/hw/riscv/sifive_u.c
-@@ -269,6 +269,10 @@ static void riscv_sifive_u_init(MachineState *machine)
-     /* create device tree */
-     create_fdt(s, memmap, machine->ram_size, machine->kernel_cmdline);
- 
-+    if (machine->firmware) {
-+        riscv_load_firmware(machine->firmware, memmap[SIFIVE_U_DRAM].base);
-+    }
-+
-     if (machine->kernel_filename) {
-         riscv_load_kernel(machine->kernel_filename);
-     }
-diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
-index 485aefa99523..d8181a4ff18a 100644
---- a/hw/riscv/virt.c
-+++ b/hw/riscv/virt.c
-@@ -398,6 +398,10 @@ static void riscv_virt_board_init(MachineState *machine)
-     memory_region_add_subregion(system_memory, memmap[VIRT_MROM].base,
-                                 mask_rom);
- 
-+    if (machine->firmware) {
-+        riscv_load_firmware(machine->firmware, memmap[VIRT_DRAM].base);
-+    }
-+
-     if (machine->kernel_filename) {
-         uint64_t kernel_entry = riscv_load_kernel(machine->kernel_filename);
- 
-diff --git a/include/hw/riscv/boot.h b/include/hw/riscv/boot.h
-index f84fd6c2df5e..daa179b600f4 100644
---- a/include/hw/riscv/boot.h
-+++ b/include/hw/riscv/boot.h
-@@ -20,6 +20,8 @@
- #ifndef RISCV_BOOT_H
- #define RISCV_BOOT_H
- 
-+target_ulong riscv_load_firmware(const char *firmware_filename,
-+                                 hwaddr firmware_load_addr);
- target_ulong riscv_load_kernel(const char *kernel_filename);
- hwaddr riscv_load_initrd(const char *filename, uint64_t mem_size,
-                          uint64_t kernel_entry, hwaddr *start);
--- 
-2.21.0
+--wzJLGUyc3ArbnUjN
+Content-Type: application/pgp-signature; name="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl0cc0cACgkQnKSrs4Gr
+c8gLQwgAtUWD6kO/PdTgVUPWbNvYVT+QZmr8m4TsskNQhYoAAuGyqYN20fCppNt7
+8Dx7CvwMErz2MEIxul+UdgR3MOYaFgGr/k7vU3uJPu5zt6a89fCf/82Jw5aGOn5k
+k1FFwTQf8ceQsiaAKw1B+vrvwwOA1Av0KuA5M03gXtVT8ZpEsaKf4q1SX8iRP0h7
+irdL7xelCzEqrXTXjJsu7rEaM8R9/gx7neYNLv0o3cGRmTea4svt6KUuBwVTFR2b
+jy7N+5o9EfZIdt/Rxc6wtpSqXebalNhnZcECKOEpXi5+bQd8lkPRnT5sIogqE1Ch
+oIMN8ffZi6VZK2jUPPRjzdY5p0SMrA==
+=8K9l
+-----END PGP SIGNATURE-----
+
+--wzJLGUyc3ArbnUjN--
 
