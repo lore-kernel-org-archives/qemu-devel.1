@@ -2,61 +2,80 @@ Return-Path: <SRS0=mdN/=VA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CBA0C5B578
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 22:21:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 938FBC5B578
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 22:22:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 72B6520645
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 22:21:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 72B6520645
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6016C20645
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 22:22:01 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DkcnH20r"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6016C20645
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41456 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41458 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hindR-0002Bf-MX
-	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 18:21:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46388)
+	id 1hindY-0002Om-Ls
+	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 18:22:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47499)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jsnow@redhat.com>) id 1hinFJ-000683-Oo
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 17:56:58 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hinK6-0003q4-Kd
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 18:01:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hinFI-0004Pg-GG
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 17:56:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48408)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1hinFE-0004H9-0i; Wed, 03 Jul 2019 17:56:53 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 26D234E938;
- Wed,  3 Jul 2019 21:56:47 +0000 (UTC)
-Received: from probe.redhat.com (ovpn-123-117.rdu2.redhat.com [10.10.123.117])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0DC1A5235E;
- Wed,  3 Jul 2019 21:56:39 +0000 (UTC)
-From: John Snow <jsnow@redhat.com>
-To: qemu-block@nongnu.org,
-	qemu-devel@nongnu.org
-Date: Wed,  3 Jul 2019 17:55:37 -0400
-Message-Id: <20190703215542.16123-14-jsnow@redhat.com>
-In-Reply-To: <20190703215542.16123-1-jsnow@redhat.com>
-References: <20190703215542.16123-1-jsnow@redhat.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1hinK4-0001n4-MT
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 18:01:54 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:45190)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hinK3-0001gL-QE
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 18:01:52 -0400
+Received: by mail-ot1-x344.google.com with SMTP id x21so3955662otq.12
+ for <qemu-devel@nongnu.org>; Wed, 03 Jul 2019 15:01:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=3J0be21DAQXd0O5N4+4qUpeRAOAtNdGJd9Hd1SsvNoE=;
+ b=DkcnH20rnxeHil++e+O0Ik+giSAaXlGWNHWKnLHzpG1Lb33bqNUiwpS4hVdDwDBG72
+ b3L2l7M7+9oeLRGwC5/hNu7YvA9rWwwyweYrL2DEbl4YcjHfB0Y30xROzbEhkqGgaToH
+ ybeGws+IhsQzY1TMCsJpjixRIQ+WQJ1BWrBeed1xwAsNGfGcZkO8EkBgUEjgnP6nUuhf
+ t/cWgCaVEV7c9oWs3Tum+DVJqGefucxe8UzD2pLUXBcMoQycgNte+XO1Y0Q9qz77liQi
+ BltomorjsIv7Mb+nhHspBe3zWI6aYxSekIPmIr+eqyHda1Ow9XXcEXyJhQG0MEUJvj/H
+ srGA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=3J0be21DAQXd0O5N4+4qUpeRAOAtNdGJd9Hd1SsvNoE=;
+ b=RGHwp0XE8Mwy6VDGY4VIgrYD+4iVDaxqhPL5NMaE2WViO2iZHTwnN0pk+cmr3fPPj5
+ jIFrXfdCcdwRHfVtPIukPOgjJdR4Kp55P8zxZx6T+WfjieKhTFCrqKKoZUCROnshcrpZ
+ aZCsLNELIAGazlwvBVqnSBoFdrqgO7UER8ZiVF3ys5byn7xMkHIPsHsSELVdqXAxWhBe
+ Mt8TsJysHOVLNg45Ftr8BfLKNbte8sk8pwjI6wUCK7HuWA47GJMVLTt6yfbLLj8IDChs
+ //qne0I/z0OMKHUlMM01VDY8obzFRX68waFZADh5N1Zop8qo2tmKVkVLEj4Uw4wbbvk2
+ DT1Q==
+X-Gm-Message-State: APjAAAWU7K0Fv7Ue7ncxh+esnKMfFc8WU1e9uksPrBBfNbx0mepJpU8L
+ 9jCjqrYkcA33PJbP1nSVmtlK/UANwPaiI7/mpcFK1A==
+X-Google-Smtp-Source: APXvYqyQqOqt2eRP9pfY2wfuT1f6Xx2421OlEXKXB686SG5DvKwKyHwCi6b8dDRDk7UOl4CaAkql+fTdcHJV0hLqTvA=
+X-Received: by 2002:a9d:6a0f:: with SMTP id g15mr32189174otn.135.1562191303867; 
+ Wed, 03 Jul 2019 15:01:43 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.38]); Wed, 03 Jul 2019 21:56:47 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 13/18] iotests: add testing shim for
- script-style python tests
+References: <20190701043536.26019-1-jan.bobek@gmail.com>
+ <20190701043536.26019-7-jan.bobek@gmail.com>
+In-Reply-To: <20190701043536.26019-7-jan.bobek@gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 3 Jul 2019 23:01:32 +0100
+Message-ID: <CAFEAcA9cqbD0HjLmTOzF_fGHGOXeBhnJ0uRoQe2kQqeNYgTdXA@mail.gmail.com>
+To: Jan Bobek <jan.bobek@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::344
+Subject: Re: [Qemu-devel] [RISU RFC PATCH v2 06/14] x86.risu: add MMX
+ instructions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,110 +87,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- vsementsov@virtuozzo.com, Juan Quintela <quintela@redhat.com>,
- John Snow <jsnow@redhat.com>, Xie Changlong <xiechanglong.d@gmail.com>,
- Markus Armbruster <armbru@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Wen Congyang <wencongyang2@huawei.com>,
- Max Reitz <mreitz@redhat.com>
+Cc: Richard Henderson <richard.henderson@linaro.org>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Because the new-style python tests don't use the iotests.main() test
-launcher, we don't turn on the debugger logging for these scripts
-when invoked via ./check -d.
+On Mon, 1 Jul 2019 at 05:43, Jan Bobek <jan.bobek@gmail.com> wrote:
+>
+> Add an x86 configuration file with all MMX instructions.
+>
+> Signed-off-by: Jan Bobek <jan.bobek@gmail.com>
 
-Refactor the launcher shim into new and old style shims so that they
-share environmental configuration.
+> --- /dev/null
+> +++ b/x86.risu
+> @@ -0,0 +1,96 @@
+> +###############################################################################
+> +# Copyright (c) 2019 Linaro Limited
 
-Two cleanup notes: debug was not actually used as a global, and there
-was no reason to create a class in an inner scope just to achieve
-default variables; we can simply create an instance of the runner with
-the values we want instead.
+I'm guessing from your email address that this copyright line probably
+isn't right :-)
 
-Signed-off-by: John Snow <jsnow@redhat.com>
----
- tests/qemu-iotests/iotests.py | 40 +++++++++++++++++++++++------------
- 1 file changed, 26 insertions(+), 14 deletions(-)
-
-diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.p=
-y
-index 3ecef5bc90..fcad957d63 100644
---- a/tests/qemu-iotests/iotests.py
-+++ b/tests/qemu-iotests/iotests.py
-@@ -61,7 +61,6 @@ cachemode =3D os.environ.get('CACHEMODE')
- qemu_default_machine =3D os.environ.get('QEMU_DEFAULT_MACHINE')
-=20
- socket_scm_helper =3D os.environ.get('SOCKET_SCM_HELPER', 'socket_scm_he=
-lper')
--debug =3D False
-=20
- luks_default_secret_object =3D 'secret,id=3Dkeysec0,data=3D' + \
-                              os.environ.get('IMGKEYSECRET', '')
-@@ -834,11 +833,22 @@ def skip_if_unsupported(required_formats=3D[], read=
-_only=3DFalse):
-         return func_wrapper
-     return skip_test_decorator
-=20
--def main(supported_fmts=3D[], supported_oses=3D['linux'], supported_cach=
-e_modes=3D[],
--         unsupported_fmts=3D[]):
--    '''Run tests'''
-+def execute_unittest(output, verbosity, debug):
-+    runner =3D unittest.TextTestRunner(stream=3Doutput, descriptions=3DT=
-rue,
-+                                     verbosity=3Dverbosity)
-+    try:
-+        # unittest.main() will use sys.exit(); so expect a SystemExit
-+        # exception
-+        unittest.main(testRunner=3Drunner)
-+    finally:
-+        if not debug:
-+            sys.stderr.write(re.sub(r'Ran (\d+) tests? in [\d.]+s',
-+                                    r'Ran \1 tests', output.getvalue()))
-=20
--    global debug
-+def execute_test(test_function=3DNone,
-+                 supported_fmts=3D[], supported_oses=3D['linux'],
-+                 supported_cache_modes=3D[], unsupported_fmts=3D[]):
-+    """Run either unittest or script-style tests."""
-=20
-     # We are using TEST_DIR and QEMU_DEFAULT_MACHINE as proxies to
-     # indicate that we're not being run via "check". There may be
-@@ -870,13 +880,15 @@ def main(supported_fmts=3D[], supported_oses=3D['li=
-nux'], supported_cache_modes=3D[],
-=20
-     logging.basicConfig(level=3D(logging.DEBUG if debug else logging.WAR=
-N))
-=20
--    class MyTestRunner(unittest.TextTestRunner):
--        def __init__(self, stream=3Doutput, descriptions=3DTrue, verbosi=
-ty=3Dverbosity):
--            unittest.TextTestRunner.__init__(self, stream, descriptions,=
- verbosity)
-+    if not test_function:
-+        execute_unittest(output, verbosity, debug)
-+    else:
-+        test_function()
-=20
--    # unittest.main() will use sys.exit() so expect a SystemExit excepti=
-on
--    try:
--        unittest.main(testRunner=3DMyTestRunner)
--    finally:
--        if not debug:
--            sys.stderr.write(re.sub(r'Ran (\d+) tests? in [\d.]+s', r'Ra=
-n \1 tests', output.getvalue()))
-+def script_main(test_function, *args, **kwargs):
-+    """Run script-style tests outside of the unittest framework"""
-+    execute_test(test_function, *args, **kwargs)
-+
-+def main(*args, **kwargs):
-+    """Run tests using the unittest framework"""
-+    execute_test(None, *args, **kwargs)
---=20
-2.21.0
-
+thanks
+-- PMM
 
