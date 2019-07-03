@@ -2,81 +2,58 @@ Return-Path: <SRS0=mdN/=VA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D5DBC0650E
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 16:31:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 925DAC0650E
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 16:34:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 25C9E2187F
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 16:31:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 25C9E2187F
+	by mail.kernel.org (Postfix) with ESMTPS id 6AD1A218A0
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 16:34:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6AD1A218A0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37448 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37502 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hiiA4-0007Ak-Ck
-	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 12:31:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55821)
+	id 1hiiDB-0001gO-K6
+	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 12:34:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55210)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hihi6-0008Mx-Tf
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 12:02:20 -0400
+ (envelope-from <mlevitsk@redhat.com>) id 1hihgX-0007qa-O0
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 12:00:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hihi5-0003r9-KF
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 12:02:18 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:40501)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hihi5-0003pe-Ar
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 12:02:17 -0400
-Received: by mail-wr1-f68.google.com with SMTP id p11so3424826wre.7
- for <qemu-devel@nongnu.org>; Wed, 03 Jul 2019 09:02:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=qwlaYGY3fi9ObD+lnSV+ki+VwZuJoaFr5rgILXtQaeQ=;
- b=dCc9cRvcxoYN3nkNUXhwDWQuc+ijApSzDtCpL79++qUxSN4amcWDRklQiTCKs+jegJ
- BcVTfKYROLlY/kK2ujXmKGRf1f/FVsVCvDbrFrtXNRl2EJSzPBASKr9nh+6Uw+odaZiL
- rJmzjv8gzfsPmu/jp+LQqmsOcKWeiTPhnl09dk/nWzykIlAj/b0C1kMsufdvcX4xlK1k
- KKweR9NMQaZkd7wmxJUrxINFvtguSXc7EtgX0+NbEQeTrl02XlufZETdxcLnaGRtBemW
- Up7/OHdQSnMrivhLHpiBHfFEA6SLHvNq38YpgcRj1haM/NKKsGMNMWVVmZCTm/mmtuQX
- SZXw==
-X-Gm-Message-State: APjAAAWYjW+dYbmRPl72mtn951J5NN1bcH+taWpkAAb7aIDxr4Fr1xKI
- IU2XVxv/qhxEoJsX1DTOpPG1dw==
-X-Google-Smtp-Source: APXvYqxa55V2wNGNmYwzwAhw9omFxaUVZ+1XBjKq/wUPOqm6ZK1BICEDMpPpcgbw4XsyDNFe07WgxA==
-X-Received: by 2002:adf:f84a:: with SMTP id d10mr22380261wrq.319.1562169733747; 
- Wed, 03 Jul 2019 09:02:13 -0700 (PDT)
-Received: from [192.168.1.38] (56.red-88-18-140.staticip.rima-tde.net.
- [88.18.140.56])
- by smtp.gmail.com with ESMTPSA id z25sm2658455wmf.38.2019.07.03.09.02.12
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Wed, 03 Jul 2019 09:02:13 -0700 (PDT)
-To: Stephen Checkoway <stephen.checkoway@oberlin.edu>
-References: <20190702005912.15905-1-philmd@redhat.com>
- <20190702005912.15905-28-philmd@redhat.com>
- <C6F80CB3-2D5D-4EE0-A085-DDA8AA334279@oberlin.edu>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <05be219a-4af9-f939-3abe-6137f5a7deba@redhat.com>
-Date: Wed, 3 Jul 2019 18:02:11 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
-MIME-Version: 1.0
-In-Reply-To: <C6F80CB3-2D5D-4EE0-A085-DDA8AA334279@oberlin.edu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+ (envelope-from <mlevitsk@redhat.com>) id 1hihgV-0002Zu-9S
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 12:00:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41054)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mlevitsk@redhat.com>)
+ id 1hihgR-0002YP-L2; Wed, 03 Jul 2019 12:00:35 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id E56A031628E7;
+ Wed,  3 Jul 2019 16:00:34 +0000 (UTC)
+Received: from maximlenovopc.usersys.redhat.com (dhcp-4-67.tlv.redhat.com
+ [10.35.4.67])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 047FE503EA;
+ Wed,  3 Jul 2019 16:00:31 +0000 (UTC)
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Wed,  3 Jul 2019 18:59:43 +0300
+Message-Id: <20190703155944.9637-6-mlevitsk@redhat.com>
+In-Reply-To: <20190703155944.9637-1-mlevitsk@redhat.com>
+References: <20190703155944.9637-1-mlevitsk@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.41]); Wed, 03 Jul 2019 16:00:35 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.221.68
-Subject: Re: [Qemu-devel] [PULL 27/27] hw/block/pflash_cfi02: Reduce I/O
- accesses to 16-bit
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH v3 5/6] block/nvme: add support for write zeros
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,90 +65,191 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
- Thomas Huth <thuth@redhat.com>,
- "open list:Block layer core" <qemu-block@nongnu.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
- Alistair Francis <alistair.francis@wdc.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Maxim Levitsky <mlevitsk@redhat.com>,
+ John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/3/19 5:52 PM, Stephen Checkoway wrote:
-> 
-> 
->> On Jul 1, 2019, at 20:59, Philippe Mathieu-Daudé <philmd@redhat.com> wrote:
->>
->> Parallel NOR flashes are limited to 16-bit bus accesses.
-> 
-> I don't think this is correct. The CFI spec defines an x32 interface for parallel NOR. CFI addresses 0x28 and 0x29 specify the interface and value 3 is x32 and value 5 is x16/x32.
->
-> Here's an example of an x32 device <https://www.mouser.com/datasheet/2/100/002-00948_29CD032J_S29CD016J_S29CL032J_S29CL016J_3-1316792.pdf>.
+Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+---
+ block/nvme.c         | 69 +++++++++++++++++++++++++++++++++++++++++++-
+ block/trace-events   |  1 +
+ include/block/nvme.h | 19 +++++++++++-
+ 3 files changed, 87 insertions(+), 2 deletions(-)
 
-OK, I was not aware of these.
+diff --git a/block/nvme.c b/block/nvme.c
+index 152d27b07f..02e0846643 100644
+--- a/block/nvme.c
++++ b/block/nvme.c
+@@ -110,6 +110,8 @@ typedef struct {
+     uint64_t max_transfer;
+     bool plugged;
+ 
++    bool supports_write_zeros;
++
+     CoMutex dma_map_lock;
+     CoQueue dma_flush_queue;
+ 
+@@ -457,6 +459,8 @@ static void nvme_identify(BlockDriverState *bs, int namespace, Error **errp)
+     s->max_transfer = MIN_NON_ZERO(s->max_transfer,
+                           s->page_size / sizeof(uint64_t) * s->page_size);
+ 
++    s->supports_write_zeros = (idctrl->oncs & NVME_ONCS_WRITE_ZEROS) != 0;
++
+     memset(resp, 0, 4096);
+ 
+     cmd.cdw10 = 0;
+@@ -469,6 +473,11 @@ static void nvme_identify(BlockDriverState *bs, int namespace, Error **errp)
+     s->nsze = le64_to_cpu(idns->nsze);
+     lbaf = &idns->lbaf[NVME_ID_NS_FLBAS_INDEX(idns->flbas)];
+ 
++    if (NVME_ID_NS_DLFEAT_WRITE_ZEROS(idns->dlfeat) &&
++            NVME_ID_NS_DLFEAT_READ_BEHAVIOR(idns->dlfeat) ==
++                    NVME_ID_NS_DLFEAT_READ_BEHAVIOR_ZEROS)
++        bs->supported_write_flags |= BDRV_REQ_MAY_UNMAP;
++
+     if (lbaf->ms) {
+         error_setg(errp, "Namespaces with metadata are not yet supported");
+         goto out;
+@@ -763,6 +772,8 @@ static int nvme_file_open(BlockDriverState *bs, QDict *options, int flags,
+     int ret;
+     BDRVNVMeState *s = bs->opaque;
+ 
++    bs->supported_write_flags = BDRV_REQ_FUA;
++
+     opts = qemu_opts_create(&runtime_opts, NULL, 0, &error_abort);
+     qemu_opts_absorb_qdict(opts, options, &error_abort);
+     device = qemu_opt_get(opts, NVME_BLOCK_OPT_DEVICE);
+@@ -791,7 +802,6 @@ static int nvme_file_open(BlockDriverState *bs, QDict *options, int flags,
+             goto fail;
+         }
+     }
+-    bs->supported_write_flags = BDRV_REQ_FUA;
+     return 0;
+ fail:
+     nvme_close(bs);
+@@ -1085,6 +1095,60 @@ static coroutine_fn int nvme_co_flush(BlockDriverState *bs)
+ }
+ 
+ 
++static coroutine_fn int nvme_co_pwrite_zeroes(BlockDriverState *bs,
++                                              int64_t offset,
++                                              int bytes,
++                                              BdrvRequestFlags flags)
++{
++    BDRVNVMeState *s = bs->opaque;
++    NVMeQueuePair *ioq = s->queues[1];
++    NVMeRequest *req;
++
++    if (!s->supports_write_zeros) {
++        return -ENOTSUP;
++    }
++
++    uint32_t cdw12 = ((bytes >> s->blkshift) - 1) & 0xFFFF;
++
++    NvmeCmd cmd = {
++        .opcode = NVME_CMD_WRITE_ZEROS,
++        .nsid = cpu_to_le32(s->nsid),
++        .cdw10 = cpu_to_le32((offset >> s->blkshift) & 0xFFFFFFFF),
++        .cdw11 = cpu_to_le32(((offset >> s->blkshift) >> 32) & 0xFFFFFFFF),
++    };
++
++    NVMeCoData data = {
++        .ctx = bdrv_get_aio_context(bs),
++        .ret = -EINPROGRESS,
++    };
++
++    if (flags & BDRV_REQ_MAY_UNMAP) {
++        cdw12 |= (1 << 25);
++    }
++
++    if (flags & BDRV_REQ_FUA) {
++        cdw12 |= (1 << 30);
++    }
++
++    cmd.cdw12 = cpu_to_le32(cdw12);
++
++    trace_nvme_write_zeros(s, offset, bytes, flags);
++    assert(s->nr_queues > 1);
++    req = nvme_get_free_req(ioq);
++    assert(req);
++
++    nvme_submit_command(s, ioq, req, &cmd, nvme_rw_cb, &data);
++
++    data.co = qemu_coroutine_self();
++    while (data.ret == -EINPROGRESS) {
++        qemu_coroutine_yield();
++    }
++
++    trace_nvme_rw_done(s, true, offset, bytes, data.ret);
++    return data.ret;
++}
++
++
+ static int nvme_reopen_prepare(BDRVReopenState *reopen_state,
+                                BlockReopenQueue *queue, Error **errp)
+ {
+@@ -1297,6 +1361,9 @@ static BlockDriver bdrv_nvme = {
+ 
+     .bdrv_co_preadv           = nvme_co_preadv,
+     .bdrv_co_pwritev          = nvme_co_pwritev,
++
++    .bdrv_co_pwrite_zeroes    = nvme_co_pwrite_zeroes,
++
+     .bdrv_co_flush_to_disk    = nvme_co_flush,
+     .bdrv_reopen_prepare      = nvme_reopen_prepare,
+ 
+diff --git a/block/trace-events b/block/trace-events
+index 9ccea755da..12f363bb44 100644
+--- a/block/trace-events
++++ b/block/trace-events
+@@ -148,6 +148,7 @@ nvme_submit_command_raw(int c0, int c1, int c2, int c3, int c4, int c5, int c6,
+ nvme_handle_event(void *s) "s %p"
+ nvme_poll_cb(void *s) "s %p"
+ nvme_prw_aligned(void *s, int is_write, uint64_t offset, uint64_t bytes, int flags, int niov) "s %p is_write %d offset %"PRId64" bytes %"PRId64" flags %d niov %d"
++nvme_write_zeros(void *s, uint64_t offset, uint64_t bytes, int flags) "s %p offset %"PRId64" bytes %"PRId64" flags %d"
+ nvme_qiov_unaligned(const void *qiov, int n, void *base, size_t size, int align) "qiov %p n %d base %p size 0x%zx align 0x%x"
+ nvme_prw_buffered(void *s, uint64_t offset, uint64_t bytes, int niov, int is_write) "s %p offset %"PRId64" bytes %"PRId64" niov %d is_write %d"
+ nvme_rw_done(void *s, int is_write, uint64_t offset, uint64_t bytes, int ret) "s %p is_write %d offset %"PRId64" bytes %"PRId64" ret %d"
+diff --git a/include/block/nvme.h b/include/block/nvme.h
+index 3ec8efcc43..65eb65c740 100644
+--- a/include/block/nvme.h
++++ b/include/block/nvme.h
+@@ -653,12 +653,29 @@ typedef struct NvmeIdNs {
+     uint8_t     mc;
+     uint8_t     dpc;
+     uint8_t     dps;
+-    uint8_t     res30[98];
++
++    uint8_t     nmic;
++    uint8_t     rescap;
++    uint8_t     fpi;
++    uint8_t     dlfeat;
++
++    uint8_t     res30[94];
+     NvmeLBAF    lbaf[16];
+     uint8_t     res192[192];
+     uint8_t     vs[3712];
+ } NvmeIdNs;
+ 
++
++/*Deallocate Logical Block Features*/
++#define NVME_ID_NS_DLFEAT_GUARD_CRC(dlfeat)       ((dlfeat) & 0x10)
++#define NVME_ID_NS_DLFEAT_WRITE_ZEROS(dlfeat)     ((dlfeat) & 0x04)
++
++#define NVME_ID_NS_DLFEAT_READ_BEHAVIOR(dlfeat)     ((dlfeat) & 0x3)
++#define NVME_ID_NS_DLFEAT_READ_BEHAVIOR_UNDEFINED   0
++#define NVME_ID_NS_DLFEAT_READ_BEHAVIOR_ZEROS       1
++#define NVME_ID_NS_DLFEAT_READ_BEHAVIOR_ONES        2
++
++
+ #define NVME_ID_NS_NSFEAT_THIN(nsfeat)      ((nsfeat & 0x1))
+ #define NVME_ID_NS_FLBAS_EXTENDED(flbas)    ((flbas >> 4) & 0x1)
+ #define NVME_ID_NS_FLBAS_INDEX(flbas)       ((flbas & 0xf))
+-- 
+2.17.2
 
-QEMU never CFI-announced itself as x32 capable:
-
-    /* Flash device interface (8 & 16 bits) */
-    pfl->cfi_table[0x28] = 0x02;
-    pfl->cfi_table[0x29] = 0x00;
-
-So while the commit description is incorrect, the code is safe with the
-current device model.
-
-I am not comfortable keeping untested 32-bit mode.
-Were you using it?
-
-Regards,
-
-Phil.
-
-> Cheers,
-> 
-> Steve
-> 
->> Remove the 32-bit dead code.
->>
->> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
->> Message-Id: <20190627202719.17739-29-philmd@redhat.com>
->> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
->> ---
->> hw/block/pflash_cfi02.c | 5 +----
->> 1 file changed, 1 insertion(+), 4 deletions(-)
->>
->> diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
->> index 83084b9d72..5392290c72 100644
->> --- a/hw/block/pflash_cfi02.c
->> +++ b/hw/block/pflash_cfi02.c
->> @@ -317,8 +317,6 @@ static uint64_t pflash_read(void *opaque, hwaddr offset, unsigned int width)
->>     boff = offset & 0xFF;
->>     if (pfl->width == 2) {
->>         boff = boff >> 1;
->> -    } else if (pfl->width == 4) {
->> -        boff = boff >> 2;
->>     }
->>     switch (pfl->cmd) {
->>     default:
->> @@ -449,8 +447,6 @@ static void pflash_write(void *opaque, hwaddr offset, uint64_t value,
->>     boff = offset;
->>     if (pfl->width == 2) {
->>         boff = boff >> 1;
->> -    } else if (pfl->width == 4) {
->> -        boff = boff >> 2;
->>     }
->>     /* Only the least-significant 11 bits are used in most cases. */
->>     boff &= 0x7FF;
->> @@ -710,6 +706,7 @@ static void pflash_write(void *opaque, hwaddr offset, uint64_t value,
->> static const MemoryRegionOps pflash_cfi02_ops = {
->>     .read = pflash_read,
->>     .write = pflash_write,
->> +    .impl.max_access_size = 2,
->>     .valid.min_access_size = 1,
->>     .valid.max_access_size = 4,
->>     .endianness = DEVICE_NATIVE_ENDIAN,
->> -- 
->> 2.20.1
->>
-> 
 
