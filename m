@@ -6,57 +6,57 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A464BC5B578
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 21:37:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ABFD0C5B578
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 21:39:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7B2B521852
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 21:37:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B2B521852
+	by mail.kernel.org (Postfix) with ESMTPS id 820F321852
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 21:39:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 820F321852
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40880 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40900 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1himwL-0003AO-Qe
-	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 17:37:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38229)
+	id 1himyK-0005AS-Ow
+	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 17:39:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38369)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <ehabkost@redhat.com>) id 1himVL-0006AJ-Bm
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 17:09:30 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1himVa-0006Kr-Ji
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 17:09:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1himVK-000737-4T
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 17:09:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35152)
+ (envelope-from <ehabkost@redhat.com>) id 1himVZ-0007DB-BA
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 17:09:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49110)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1himVJ-000720-Nc
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 17:09:26 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1himVZ-0007Cn-3A
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 17:09:41 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id C82C42F8BDA;
- Wed,  3 Jul 2019 21:09:24 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 30C5F30705FE;
+ Wed,  3 Jul 2019 21:09:40 +0000 (UTC)
 Received: from localhost (ovpn-116-30.gru2.redhat.com [10.97.116.30])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 581DB6013C;
- Wed,  3 Jul 2019 21:09:24 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id AC17E17995;
+ Wed,  3 Jul 2019 21:09:39 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>,
  Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
  Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
  Richard Henderson <rth@twiddle.net>
-Date: Wed,  3 Jul 2019 18:08:02 -0300
-Message-Id: <20190703210821.27550-25-ehabkost@redhat.com>
+Date: Wed,  3 Jul 2019 18:08:07 -0300
+Message-Id: <20190703210821.27550-30-ehabkost@redhat.com>
 In-Reply-To: <20190703210821.27550-1-ehabkost@redhat.com>
 References: <20190703210821.27550-1-ehabkost@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.38]); Wed, 03 Jul 2019 21:09:24 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.46]); Wed, 03 Jul 2019 21:09:40 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL v5 24/43] i386: make 'hv-spinlocks' a regular
- uint32 property
+Subject: [Qemu-devel] [PULL v5 29/43] vl.c: Add -smp,
+ dies=* command line support and update doc
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,100 +68,164 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Roman Kagan <rkagan@virtuozzo.com>
+Cc: Like Xu <like.xu@linux.intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Roman Kagan <rkagan@virtuozzo.com>
+From: Like Xu <like.xu@linux.intel.com>
 
-X86CPU.hv-spinlocks is a uint32 property that has a special setter
-validating the value to be no less than 0xFFF and no bigger than
-UINT_MAX.  The latter check is redundant; as for the former, there
-appears to be no reason to prohibit the user from setting it to a lower
-value.
+For PC target, users could configure the number of dies per one package
+via command line with this patch, such as "-smp dies=2,cores=4".
 
-So nuke the dedicated getter/setter pair and convert 'hv-spinlocks' to a
-regular uint32 property.
+The parsing rules of new cpu-topology model obey the same restrictions/logic
+as the legacy socket/core/thread model especially on missing values computing.
 
-Signed-off-by: Roman Kagan <rkagan@virtuozzo.com>
-Message-Id: <20190618110659.14744-1-rkagan@virtuozzo.com>
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+Signed-off-by: Like Xu <like.xu@linux.intel.com>
+Message-Id: <20190620054525.37188-4-like.xu@linux.intel.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- target/i386/cpu.c | 45 ++-------------------------------------------
- 1 file changed, 2 insertions(+), 43 deletions(-)
+ hw/i386/pc.c    | 30 +++++++++++++++++-------------
+ vl.c            |  3 +++
+ qemu-options.hx | 17 +++++++++--------
+ 3 files changed, 29 insertions(+), 21 deletions(-)
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index f538b54150..6787da4209 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -3518,46 +3518,6 @@ static void x86_cpu_get_feature_words(Object *obj, Visitor *v,
-     visit_type_X86CPUFeatureWordInfoList(v, "feature-words", &list, errp);
- }
- 
--static void x86_get_hv_spinlocks(Object *obj, Visitor *v, const char *name,
--                                 void *opaque, Error **errp)
--{
--    X86CPU *cpu = X86_CPU(obj);
--    int64_t value = cpu->hyperv_spinlock_attempts;
--
--    visit_type_int(v, name, &value, errp);
--}
--
--static void x86_set_hv_spinlocks(Object *obj, Visitor *v, const char *name,
--                                 void *opaque, Error **errp)
--{
--    const int64_t min = 0xFFF;
--    const int64_t max = UINT_MAX;
--    X86CPU *cpu = X86_CPU(obj);
--    Error *err = NULL;
--    int64_t value;
--
--    visit_type_int(v, name, &value, &err);
--    if (err) {
--        error_propagate(errp, err);
--        return;
--    }
--
--    if (value < min || value > max) {
--        error_setg(errp, "Property %s.%s doesn't take value %" PRId64
--                   " (minimum: %" PRId64 ", maximum: %" PRId64 ")",
--                   object_get_typename(obj), name ? name : "null",
--                   value, min, max);
--        return;
--    }
--    cpu->hyperv_spinlock_attempts = value;
--}
--
--static const PropertyInfo qdev_prop_spinlocks = {
--    .name  = "int",
--    .get   = x86_get_hv_spinlocks,
--    .set   = x86_set_hv_spinlocks,
--};
--
- /* Convert all '_' in a feature string option name to '-', to make feature
-  * name conform to QOM property naming rule, which uses '-' instead of '_'.
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index b9c25bed35..3f0f221a5b 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -1545,9 +1545,12 @@ static void pc_new_cpu(PCMachineState *pcms, int64_t apic_id, Error **errp)
   */
-@@ -5682,8 +5642,6 @@ static void x86_cpu_initfn(Object *obj)
-     object_property_add(obj, "crash-information", "GuestPanicInformation",
-                         x86_cpu_get_crash_info_qom, NULL, NULL, NULL, NULL);
+ void pc_smp_parse(MachineState *ms, QemuOpts *opts)
+ {
++    PCMachineState *pcms = PC_MACHINE(ms);
++
+     if (opts) {
+         unsigned cpus    = qemu_opt_get_number(opts, "cpus", 0);
+         unsigned sockets = qemu_opt_get_number(opts, "sockets", 0);
++        unsigned dies = qemu_opt_get_number(opts, "dies", 1);
+         unsigned cores   = qemu_opt_get_number(opts, "cores", 0);
+         unsigned threads = qemu_opt_get_number(opts, "threads", 0);
  
--    cpu->hyperv_spinlock_attempts = HYPERV_SPINLOCK_NEVER_RETRY;
--
-     for (w = 0; w < FEATURE_WORDS; w++) {
-         int bitnr;
+@@ -1557,24 +1560,24 @@ void pc_smp_parse(MachineState *ms, QemuOpts *opts)
+             threads = threads > 0 ? threads : 1;
+             if (cpus == 0) {
+                 sockets = sockets > 0 ? sockets : 1;
+-                cpus = cores * threads * sockets;
++                cpus = cores * threads * dies * sockets;
+             } else {
+                 ms->smp.max_cpus =
+                         qemu_opt_get_number(opts, "maxcpus", cpus);
+-                sockets = ms->smp.max_cpus / (cores * threads);
++                sockets = ms->smp.max_cpus / (cores * threads * dies);
+             }
+         } else if (cores == 0) {
+             threads = threads > 0 ? threads : 1;
+-            cores = cpus / (sockets * threads);
++            cores = cpus / (sockets * dies * threads);
+             cores = cores > 0 ? cores : 1;
+         } else if (threads == 0) {
+-            threads = cpus / (cores * sockets);
++            threads = cpus / (cores * dies * sockets);
+             threads = threads > 0 ? threads : 1;
+-        } else if (sockets * cores * threads < cpus) {
++        } else if (sockets * dies * cores * threads < cpus) {
+             error_report("cpu topology: "
+-                         "sockets (%u) * cores (%u) * threads (%u) < "
++                         "sockets (%u) * dies (%u) * cores (%u) * threads (%u) < "
+                          "smp_cpus (%u)",
+-                         sockets, cores, threads, cpus);
++                         sockets, dies, cores, threads, cpus);
+             exit(1);
+         }
  
-@@ -5880,7 +5838,8 @@ static Property x86_cpu_properties[] = {
-     DEFINE_PROP_INT32("node-id", X86CPU, node_id, CPU_UNSET_NUMA_NODE_ID),
-     DEFINE_PROP_BOOL("pmu", X86CPU, enable_pmu, false),
+@@ -1586,26 +1589,27 @@ void pc_smp_parse(MachineState *ms, QemuOpts *opts)
+             exit(1);
+         }
  
--    { .name  = "hv-spinlocks", .info  = &qdev_prop_spinlocks },
-+    DEFINE_PROP_UINT32("hv-spinlocks", X86CPU, hyperv_spinlock_attempts,
-+                       HYPERV_SPINLOCK_NEVER_RETRY),
-     DEFINE_PROP_BIT64("hv-relaxed", X86CPU, hyperv_features,
-                       HYPERV_FEAT_RELAXED, 0),
-     DEFINE_PROP_BIT64("hv-vapic", X86CPU, hyperv_features,
+-        if (sockets * cores * threads > ms->smp.max_cpus) {
++        if (sockets * dies * cores * threads > ms->smp.max_cpus) {
+             error_report("cpu topology: "
+-                         "sockets (%u) * cores (%u) * threads (%u) > "
++                         "sockets (%u) * dies (%u) * cores (%u) * threads (%u) > "
+                          "maxcpus (%u)",
+-                         sockets, cores, threads,
++                         sockets, dies, cores, threads,
+                          ms->smp.max_cpus);
+             exit(1);
+         }
+ 
+-        if (sockets * cores * threads != ms->smp.max_cpus) {
++        if (sockets * dies * cores * threads != ms->smp.max_cpus) {
+             warn_report("Invalid CPU topology deprecated: "
+-                        "sockets (%u) * cores (%u) * threads (%u) "
++                        "sockets (%u) * dies (%u) * cores (%u) * threads (%u) "
+                         "!= maxcpus (%u)",
+-                        sockets, cores, threads,
++                        sockets, dies, cores, threads,
+                         ms->smp.max_cpus);
+         }
+ 
+         ms->smp.cpus = cpus;
+         ms->smp.cores = cores;
+         ms->smp.threads = threads;
++        pcms->smp_dies = dies;
+     }
+ 
+     if (ms->smp.cpus > 1) {
+diff --git a/vl.c b/vl.c
+index 96d2456f70..280e709e2c 100644
+--- a/vl.c
++++ b/vl.c
+@@ -1231,6 +1231,9 @@ static QemuOptsList qemu_smp_opts = {
+         }, {
+             .name = "sockets",
+             .type = QEMU_OPT_NUMBER,
++        }, {
++            .name = "dies",
++            .type = QEMU_OPT_NUMBER,
+         }, {
+             .name = "cores",
+             .type = QEMU_OPT_NUMBER,
+diff --git a/qemu-options.hx b/qemu-options.hx
+index c18b79099a..e6d85d5fbd 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -138,25 +138,26 @@ no incompatible TCG features have been enabled (e.g. icount/replay).
+ ETEXI
+ 
+ DEF("smp", HAS_ARG, QEMU_OPTION_smp,
+-    "-smp [cpus=]n[,maxcpus=cpus][,cores=cores][,threads=threads][,sockets=sockets]\n"
++    "-smp [cpus=]n[,maxcpus=cpus][,cores=cores][,threads=threads][,dies=dies][,sockets=sockets]\n"
+     "                set the number of CPUs to 'n' [default=1]\n"
+     "                maxcpus= maximum number of total cpus, including\n"
+     "                offline CPUs for hotplug, etc\n"
+-    "                cores= number of CPU cores on one socket\n"
++    "                cores= number of CPU cores on one socket (for PC, it's on one die)\n"
+     "                threads= number of threads on one CPU core\n"
++    "                dies= number of CPU dies on one socket (for PC only)\n"
+     "                sockets= number of discrete sockets in the system\n",
+         QEMU_ARCH_ALL)
+ STEXI
+-@item -smp [cpus=]@var{n}[,cores=@var{cores}][,threads=@var{threads}][,sockets=@var{sockets}][,maxcpus=@var{maxcpus}]
++@item -smp [cpus=]@var{n}[,cores=@var{cores}][,threads=@var{threads}][,dies=dies][,sockets=@var{sockets}][,maxcpus=@var{maxcpus}]
+ @findex -smp
+ Simulate an SMP system with @var{n} CPUs. On the PC target, up to 255
+ CPUs are supported. On Sparc32 target, Linux limits the number of usable CPUs
+ to 4.
+-For the PC target, the number of @var{cores} per socket, the number
+-of @var{threads} per cores and the total number of @var{sockets} can be
+-specified. Missing values will be computed. If any on the three values is
+-given, the total number of CPUs @var{n} can be omitted. @var{maxcpus}
+-specifies the maximum number of hotpluggable CPUs.
++For the PC target, the number of @var{cores} per die, the number of @var{threads}
++per cores, the number of @var{dies} per packages and the total number of
++@var{sockets} can be specified. Missing values will be computed.
++If any on the three values is given, the total number of CPUs @var{n} can be omitted.
++@var{maxcpus} specifies the maximum number of hotpluggable CPUs.
+ ETEXI
+ 
+ DEF("numa", HAS_ARG, QEMU_OPTION_numa,
 -- 
 2.18.0.rc1.1.g3f1ff2140
 
