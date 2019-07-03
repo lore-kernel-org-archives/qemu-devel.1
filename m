@@ -2,50 +2,48 @@ Return-Path: <SRS0=mdN/=VA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.5 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D698AC0650E
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 14:38:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF70DC0650E
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 14:41:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AE75E218A4
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 14:38:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE75E218A4
+	by mail.kernel.org (Postfix) with ESMTPS id 988D621871
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 14:41:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 988D621871
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36424 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36448 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1higOg-0008St-HK
-	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 10:38:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57729)
+	id 1higSG-0002Sb-VV
+	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 10:41:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58663)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <eblake@redhat.com>) id 1higNj-0007x4-37
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 10:37:13 -0400
+ (envelope-from <eblake@redhat.com>) id 1higRa-0001gR-LL
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 10:41:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1higNh-0001sw-5z
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 10:37:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60452)
+ (envelope-from <eblake@redhat.com>) id 1higRZ-0005cl-O6
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 10:41:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52460)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1higNd-0001qH-9m; Wed, 03 Jul 2019 10:37:05 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1higRZ-0005c5-FV
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 10:41:09 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 7A75B81DE9;
- Wed,  3 Jul 2019 14:37:00 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id BA5C386671;
+ Wed,  3 Jul 2019 14:41:08 +0000 (UTC)
 Received: from [10.3.116.152] (ovpn-116-152.phx2.redhat.com [10.3.116.152])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 871BD83CD7;
- Wed,  3 Jul 2019 14:36:59 +0000 (UTC)
-To: Denis Plotnikov <dplotnikov@virtuozzo.com>, kwolf@redhat.com,
- mreitz@redhat.com, armbru@redhat.com
-References: <20190703110044.25610-1-dplotnikov@virtuozzo.com>
- <20190703110044.25610-4-dplotnikov@virtuozzo.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id F351A7C5C8;
+ Wed,  3 Jul 2019 14:41:07 +0000 (UTC)
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20190703135411.28436-1-berrange@redhat.com>
 From: Eric Blake <eblake@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=eblake@redhat.com; keydata=
@@ -72,21 +70,22 @@ Autocrypt: addr=eblake@redhat.com; keydata=
  Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
  2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
 Organization: Red Hat, Inc.
-Message-ID: <e61d7afc-09ce-d52d-3987-df1d5ba6977f@redhat.com>
-Date: Wed, 3 Jul 2019 09:36:58 -0500
+Message-ID: <8e520489-0cf2-f377-0e14-f8f02a59aae1@redhat.com>
+Date: Wed, 3 Jul 2019 09:41:07 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190703110044.25610-4-dplotnikov@virtuozzo.com>
+In-Reply-To: <20190703135411.28436-1-berrange@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="QRfbkSJ38ffMTwMEw08Ct1oRb7TaqIpId"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+ boundary="AJHohnBV99x5Q4BST2dJcxff1wTRxivN6"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.25]); Wed, 03 Jul 2019 14:37:00 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.26]); Wed, 03 Jul 2019 14:41:08 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v1 3/3] qcow2: add zstd cluster compression
+Subject: Re: [Qemu-devel] [PATCH] doc: document that the monitor console is
+ a privileged control interface
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,131 +97,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: vsementsov@virtuozzo.com, den@virtuozzo.com, qemu-block@nongnu.org,
- qemu-devel@nongnu.org
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, P J P <ppandit@redhat.com>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---QRfbkSJ38ffMTwMEw08Ct1oRb7TaqIpId
-Content-Type: multipart/mixed; boundary="5Q4kO8FZMj6EvQisrxv3Jg0drzueLmK3X";
+--AJHohnBV99x5Q4BST2dJcxff1wTRxivN6
+Content-Type: multipart/mixed; boundary="N0PApPtRXyrKm1SDripRWRBW9JFGOMQhv";
  protected-headers="v1"
 From: Eric Blake <eblake@redhat.com>
-To: Denis Plotnikov <dplotnikov@virtuozzo.com>, kwolf@redhat.com,
- mreitz@redhat.com, armbru@redhat.com
-Cc: den@virtuozzo.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org,
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
  qemu-devel@nongnu.org
-Message-ID: <e61d7afc-09ce-d52d-3987-df1d5ba6977f@redhat.com>
-Subject: Re: [PATCH v1 3/3] qcow2: add zstd cluster compression
-References: <20190703110044.25610-1-dplotnikov@virtuozzo.com>
- <20190703110044.25610-4-dplotnikov@virtuozzo.com>
-In-Reply-To: <20190703110044.25610-4-dplotnikov@virtuozzo.com>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, P J P <ppandit@redhat.com>
+Message-ID: <8e520489-0cf2-f377-0e14-f8f02a59aae1@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] doc: document that the monitor console is a
+ privileged control interface
+References: <20190703135411.28436-1-berrange@redhat.com>
+In-Reply-To: <20190703135411.28436-1-berrange@redhat.com>
 
---5Q4kO8FZMj6EvQisrxv3Jg0drzueLmK3X
+--N0PApPtRXyrKm1SDripRWRBW9JFGOMQhv
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 7/3/19 6:00 AM, Denis Plotnikov wrote:
-> zstd significantly reduces cluster compression time.
-> It provides better compression performance maintaining
-> the same level of compression ratio in comparison with
-> zlib, which, by the moment, has been the only compression
-> method available.
->=20
+On 7/3/19 8:54 AM, Daniel P. Berrang=C3=A9 wrote:
+> A supposed exploit of QEMU was recently announced as CVE-2019-12928
+> claiming that the monitor console was insecure because the "migrate"
+> comand enabled arbitrary command execution for a remote attacker.
 
-> ---
->  block/qcow2.c        | 96 ++++++++++++++++++++++++++++++++++++++++++++=
-
->  configure            | 32 +++++++++++++++
->  qapi/block-core.json |  3 +-
->  3 files changed, 130 insertions(+), 1 deletion(-)
-
-Where is the change to docs/interop/qcow2.txt to describe this new
-compression format?
+command
 
 >=20
-> diff --git a/block/qcow2.c b/block/qcow2.c
-> index 37a563a671..caa04b0beb 100644
-> --- a/block/qcow2.c
-> +++ b/block/qcow2.c
-> @@ -27,6 +27,11 @@
->  #define ZLIB_CONST
->  #include <zlib.h>
-> =20
+> For this to be a flaw the user launching QEMU must have configured
+> the monitor in a way that allows for other userrs to access it. The
 
-> +static ssize_t qcow2_zstd_compress(void *dest, size_t dest_size,
-> +                                   const void *src, size_t src_size)
-> +{
-> +    ssize_t ret;
-> +    uint32_t *c_size =3D dest;
-> +    /* steal some bytes to store compressed chunk size */
-> +    char *d_buf =3D ((char *) dest) + sizeof(*c_size);
-> +
+users
 
-Do you always want exactly 4 bytes for the compressed size? Or is it
-worth some sort of variable-length encoding, since we're already dealing
-with non-cacheline-aligned data? You can represent all sizes up to 4M
-using a maximum of 3 bytes (set the high bit if the integer continues,
-then sizes 0-127 take 1 byte [7 bits], 128-32767 take 2 bytes [15 bits],
-and 32768-4194303 take 3 bytes [22 bits]).
-
-> +    if (dest_size < sizeof(*c_size)) {
-> +        return -ENOMEM;
-> +    }
-> +
-> +    dest_size -=3D sizeof(*c_size);
-> +
-> +    ret =3D ZSTD_compress(d_buf, dest_size, src, src_size, 5);
-
-The fact that you are storing the size separate from the data passed to
-zstd MUST be documented in the qcow2 spec, for the next person to
-produce/consume the same data.
-
-
-> +++ b/qapi/block-core.json
-> @@ -4215,11 +4215,12 @@
->  # Compression type used in qcow2 image file
->  #
->  # @zlib:  zlib compression, see <http://zlib.net/>
-> +# @zstd:  zstd compression, see <http://github.com/facebook/zstd>
->  #
->  # Since: 4.1
->  ##
->  { 'enum': 'Qcow2CompressionType',
-> -  'data': [ 'zlib' ] }
-> +  'data': [ 'zlib', 'zstd' ] }
-
-Since you patched configure so that linking against zstd is optional,
-this should use { 'name':'zstd', 'if':'CONDITIONAL' } so that during
-introspection, the enum only advertises zstd on a build that linked
-against the library.
-
---=20
+> exploit report quoted use of the "tcp" character device backend for
+> QMP.
+> --=20
 Eric Blake, Principal Software Engineer
 Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
 
 
---5Q4kO8FZMj6EvQisrxv3Jg0drzueLmK3X--
+--N0PApPtRXyrKm1SDripRWRBW9JFGOMQhv--
 
---QRfbkSJ38ffMTwMEw08Ct1oRb7TaqIpId
+--AJHohnBV99x5Q4BST2dJcxff1wTRxivN6
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl0cvYoACgkQp6FrSiUn
-Q2rwNggAie163WXrpqMGxZ/Fh/UIuiv/vYyeajcjfjYB2qnB88YebpMPyPQahjMf
-fSNzTPYfiGRGFax8a+WmCAX8TsscUpVXHupjZzyUb7mpXbh5Qd2DM4gHrgZAhTSl
-soVBdBFs3ShP6/jpG+O0MUKPxos/bIFByxIAS10OLxZfndYaYORrP/ihoZetRsz8
-qRS+tTGLspdK3Oqko4dhObAvpgQeyjzTYPrh6p1tbsPe9x6oZP0uFdbIMHIHpCiM
-gIOEhmHiyeNcxBBbdXZ691sniMIeAEv5XtJRqgUp6uVTI1LhuGODSacqQ9rKxVkt
-lYZQErglQNDUkwT+le/FYSO/jApqTQ==
-=mxXm
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl0cvoMACgkQp6FrSiUn
+Q2qTkQf/RJCKd3I/fKwQwCUBMj5dI/Oqrhn4vO13j4Zb44MNBg3/vqJxTHi2fTPN
+nBa260EX0yKKWam5f4HpPerrR5z6caBC83Y0E0NTiUX/giGxD2l/kJnBWZiuYeHL
+z7cXuVw1VAarpA8trs+/DMl7I4yxXOyaGbDyZL1m6R3saJOXHMLPe+lmN4Y0DVWX
+7hpx74rUtBZnF/oSzQ2E7kk+2D1nHr1wA5gUnBcPZzTfu2mPj/SJN8/Z66rNqdky
+3zDpuE1S1DAfNEzWcmlAQzWISYsBx3K7keOoe4Iv4pWVreUOe5P6r8m68V20bk3q
+Yr1DP9DY1eW1heRxiwxNedvEQBE9Fg==
+=92Dr
 -----END PGP SIGNATURE-----
 
---QRfbkSJ38ffMTwMEw08Ct1oRb7TaqIpId--
+--AJHohnBV99x5Q4BST2dJcxff1wTRxivN6--
 
