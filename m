@@ -2,48 +2,48 @@ Return-Path: <SRS0=mdN/=VA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FB4DC0650E
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 14:49:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 487B6C0650E
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 14:52:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 54E8821882
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 14:49:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54E8821882
+	by mail.kernel.org (Postfix) with ESMTPS id 219EE21881
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 14:52:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 219EE21881
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36524 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36570 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1higZd-0005qZ-Hw
-	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 10:49:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59948)
+	id 1higcS-0000RJ-Bq
+	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 10:52:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60879)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <eblake@redhat.com>) id 1higX3-0004VO-EW
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 10:46:51 -0400
+ (envelope-from <eblake@redhat.com>) id 1higb9-0007Ms-Re
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 10:51:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1higX1-0001WL-GN
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 10:46:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44082)
+ (envelope-from <eblake@redhat.com>) id 1higb7-0004d0-Sn
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 10:51:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47422)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1higWw-0001R9-RO; Wed, 03 Jul 2019 10:46:43 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ id 1higb2-0004Yy-Lk; Wed, 03 Jul 2019 10:50:57 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A5168307E04A;
- Wed,  3 Jul 2019 14:46:37 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 9BB5031628E6;
+ Wed,  3 Jul 2019 14:50:55 +0000 (UTC)
 Received: from [10.3.116.152] (ovpn-116-152.phx2.redhat.com [10.3.116.152])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id AEC3B59441;
- Wed,  3 Jul 2019 14:46:36 +0000 (UTC)
-To: Stefan Hajnoczi <stefanha@gmail.com>, Maxim Levitsky <mlevitsk@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C3AB17C635;
+ Wed,  3 Jul 2019 14:50:52 +0000 (UTC)
+To: Maxim Levitsky <mlevitsk@redhat.com>, qemu-devel@nongnu.org
 References: <20190630150855.1016-1-mlevitsk@redhat.com>
- <20190703095217.GD11844@stefanha-x1.localdomain>
+ <20190630150855.1016-2-mlevitsk@redhat.com>
 From: Eric Blake <eblake@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=eblake@redhat.com; keydata=
@@ -70,22 +70,22 @@ Autocrypt: addr=eblake@redhat.com; keydata=
  Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
  2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
 Organization: Red Hat, Inc.
-Message-ID: <727d4d5c-944a-c43a-a1c3-d4750ae12000@redhat.com>
-Date: Wed, 3 Jul 2019 09:46:35 -0500
+Message-ID: <70330e00-ebe9-ce2a-5155-6f7e032e0aae@redhat.com>
+Date: Wed, 3 Jul 2019 09:50:51 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190703095217.GD11844@stefanha-x1.localdomain>
+In-Reply-To: <20190630150855.1016-2-mlevitsk@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="HwJaLjrLiylxH9IZ1SCzvQAEqKe9AkZkj"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+ boundary="BSNUoYfn4nUJg7mOeoHxJ6GsSQLqVT7b2"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.42]); Wed, 03 Jul 2019 14:46:41 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.41]); Wed, 03 Jul 2019 14:50:55 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 0/1] RFC: don't obey the block
- device max transfer len / max segments for block devices
+Subject: Re: [Qemu-devel] [PATCH 1/1] raw-posix.c - use max transfer length
+ / max segemnt count only for SCSI passthrough
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,115 +98,115 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org,
  John Ferlan <jferlan@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---HwJaLjrLiylxH9IZ1SCzvQAEqKe9AkZkj
-Content-Type: multipart/mixed; boundary="SNqo7ewYntSAxD7WSdHeTU00sahsc0Z1u";
+--BSNUoYfn4nUJg7mOeoHxJ6GsSQLqVT7b2
+Content-Type: multipart/mixed; boundary="s2C8lxX3XGWnK5uUPhAEgRFqdj9BEnAkz";
  protected-headers="v1"
 From: Eric Blake <eblake@redhat.com>
-To: Stefan Hajnoczi <stefanha@gmail.com>, Maxim Levitsky <mlevitsk@redhat.com>
-Cc: qemu-devel@nongnu.org, Fam Zheng <fam@euphon.net>,
- Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
- John Ferlan <jferlan@redhat.com>, Max Reitz <mreitz@redhat.com>
-Message-ID: <727d4d5c-944a-c43a-a1c3-d4750ae12000@redhat.com>
-Subject: Re: [Qemu-block] [PATCH 0/1] RFC: don't obey the block device max
- transfer len / max segments for block devices
+To: Maxim Levitsky <mlevitsk@redhat.com>, qemu-devel@nongnu.org
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ qemu-block@nongnu.org, John Ferlan <jferlan@redhat.com>,
+ Max Reitz <mreitz@redhat.com>
+Message-ID: <70330e00-ebe9-ce2a-5155-6f7e032e0aae@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/1] raw-posix.c - use max transfer length /
+ max segemnt count only for SCSI passthrough
 References: <20190630150855.1016-1-mlevitsk@redhat.com>
- <20190703095217.GD11844@stefanha-x1.localdomain>
-In-Reply-To: <20190703095217.GD11844@stefanha-x1.localdomain>
+ <20190630150855.1016-2-mlevitsk@redhat.com>
+In-Reply-To: <20190630150855.1016-2-mlevitsk@redhat.com>
 
---SNqo7ewYntSAxD7WSdHeTU00sahsc0Z1u
-Content-Type: text/plain; charset=windows-1252
+--s2C8lxX3XGWnK5uUPhAEgRFqdj9BEnAkz
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 7/3/19 4:52 AM, Stefan Hajnoczi wrote:
-> On Sun, Jun 30, 2019 at 06:08:54PM +0300, Maxim Levitsky wrote:
->> It looks like Linux block devices, even in O_DIRECT mode don't have an=
-y user visible
->> limit on transfer size / number of segments, which underlying block de=
-vice can have.
->> The block layer takes care of enforcing these limits by splitting the =
-bios.
+On 6/30/19 10:08 AM, Maxim Levitsky wrote:
+> Regular block devices (/dev/sda*, /dev/nvme*, etc) interface is not lim=
+ited
 
-s/The block layer/The kernel block layer/
+The regular block device interface is
 
->>
->> By limiting the transfer sizes, we  force qemu to do the splitting its=
-elf which
+or
 
-double space
+Regular block devices interfaces are
 
->> introduces various overheads.
->> It is especially visible in nbd server, where the low max transfer siz=
-e of the
->> underlying device forces us to advertise this over NBD, thus increasin=
-g the traffic overhead in case of
-
-Long line for a commit message.
-
->> image conversion which benefits from large blocks.
->>
->> More information can be found here:
->> https://bugzilla.redhat.com/show_bug.cgi?id=3D1647104
->>
->> Tested this with qemu-img convert over nbd and natively and to my surp=
-rise, even native IO performance improved a bit.
->> (The device on which it was tested is Intel Optane DC P4800X, which ha=
-s 128k max transfer size)
->>
->> The benchmark:
->>
-
-I'm sorry I didn't see this before softfreeze, but as a performance
-improvement, I think it still classes as a bug fix and is safe for
-inclusion in rc0.
-
->> The block limits of max transfer size/max segment size are retained
->> for the SCSI passthrough because in this case the kernel passes the us=
-erspace request
->> directly to the kernel scsi driver, bypassing the block layer, and thu=
-s there is no code to split
->> such requests.
->>
->> What do you think?
-
-Seems like a reasonable explanation.
-
->>
->> Fam, since you was the original author of the code that added
->> these limits, could you share your opinion on that?
->> What was the reason besides SCSI passthrough?
->>
->> Best regards,
->> 	Maxim Levitsky
->>
->> Maxim Levitsky (1):
->>   raw-posix.c - use max transfer length / max segemnt count only for
->>     SCSI passthrough
->>
->>  block/file-posix.c | 16 +++++++---------
->>  1 file changed, 7 insertions(+), 9 deletions(-)
+> by the underlying storage limits, but rather the kernel block layer
+> takes care to split the requests that are too large/fragmented.
 >=20
-> Adding Eric Blake, who implemented the generic request splitting in the=
-
-> block layer and may know if there were any other reasons aside from SCS=
-I
-> passthrough why file-posix.c enforces the host block device's maximum
-> transfer size.
-
-No, I don't have any strong reasons for why file I/O must be capped to a
-specific limit other than size_t (since the kernel does just fine at
-splitting things up).
-
+> Doing so allows us to have less overhead in qemu.
 >=20
-> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> ---
+>  block/file-posix.c | 16 +++++++---------
+>  1 file changed, 7 insertions(+), 9 deletions(-)
 >=20
+> diff --git a/block/file-posix.c b/block/file-posix.c
+> index ab05b51a66..66dad34f8a 100644
+> --- a/block/file-posix.c
+> +++ b/block/file-posix.c
+> @@ -1038,15 +1038,13 @@ static void raw_reopen_abort(BDRVReopenState *s=
+tate)
+>      s->reopen_state =3D NULL;
+>  }
+> =20
+> -static int hdev_get_max_transfer_length(BlockDriverState *bs, int fd)
+> +static int sg_get_max_transfer_length(BlockDriverState *bs, int fd)
+>  {
+>  #ifdef BLKSECTGET
+>      int max_bytes =3D 0;
+> -    short max_sectors =3D 0;
+> -    if (bs->sg && ioctl(fd, BLKSECTGET, &max_bytes) =3D=3D 0) {
+> +
+> +    if (ioctl(fd, BLKSECTGET, &max_bytes) =3D=3D 0) {
+>          return max_bytes;
+> -    } else if (!bs->sg && ioctl(fd, BLKSECTGET, &max_sectors) =3D=3D 0=
+) {
+> -        return max_sectors << BDRV_SECTOR_BITS;
+>      } else {
+>          return -errno;
+>      }
+> @@ -1055,7 +1053,7 @@ static int hdev_get_max_transfer_length(BlockDriv=
+erState *bs, int fd)
+>  #endif
+>  }
+> =20
+> -static int hdev_get_max_segments(const struct stat *st)
+> +static int sg_get_max_segments(const struct stat *st)
+>  {
+>  #ifdef CONFIG_LINUX
+>      char buf[32];
+> @@ -1106,12 +1104,12 @@ static void raw_refresh_limits(BlockDriverState=
+ *bs, Error **errp)
+>      struct stat st;
+> =20
+>      if (!fstat(s->fd, &st)) {
+> -        if (S_ISBLK(st.st_mode) || S_ISCHR(st.st_mode)) {
+> -            int ret =3D hdev_get_max_transfer_length(bs, s->fd);
+
+Is it worth delaying the fstat()...
+
+> +        if (bs->sg) {
+> +            int ret =3D sg_get_max_transfer_length(bs, s->fd);
+>              if (ret > 0 && ret <=3D BDRV_REQUEST_MAX_BYTES) {
+>                  bs->bl.max_transfer =3D pow2floor(ret);
+>              }
+> -            ret =3D hdev_get_max_segments(&st);
+> +            ret =3D sg_get_max_segments(&st);
+
+=2E..until inside the if (bs->sg) condition, to avoid wasted work for
+other scenarios?
+
+>              if (ret > 0) {
+>                  bs->bl.max_transfer =3D MIN(bs->bl.max_transfer,
+>                                            ret * getpagesize());
+>=20
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -214,24 +214,24 @@ Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
 
 
---SNqo7ewYntSAxD7WSdHeTU00sahsc0Z1u--
+--s2C8lxX3XGWnK5uUPhAEgRFqdj9BEnAkz--
 
---HwJaLjrLiylxH9IZ1SCzvQAEqKe9AkZkj
+--BSNUoYfn4nUJg7mOeoHxJ6GsSQLqVT7b2
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl0cv8sACgkQp6FrSiUn
-Q2puKwf/TTwfiiFR7Bhrg9NaBe5hbE77PEkMgQW3C9oEJyslwKGOZWJz6GKZR7t8
-czXVSZ7G2NWi8LpCvyS8OmYqsZ4sNTkJklipn6MDrYJbCH6z1gHaHTxSP7dockJd
-dyg6IW6qYAX0xRvRDqUviCmdYTDTb140F3Sh+IsmgHRzSrY073QwlmGxTXQXriXw
-qQ1q8R9TEXYxWWYIM/VJD6NROY05L28269B3lQuZZjEwtAe5P0B6lEUEqtkEhhI2
-w2ri/6cDQQtZTozT2hF5v9Q3DCyaY16Dxiir/8djYDrJGih1YDEUc7Sw5FNf88cN
-1Qgn2IlriN9sEI/Gfos2U8bXulUJyQ==
-=2tu5
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl0cwMsACgkQp6FrSiUn
+Q2qN8AgAnOr7AIX+CYBiWaV9LSuiEzVHnW7ZbaGKEh1/+GCiBeydxOzwHxIWQjJx
+OrueXJOMQSFKYOwxKalggQmvlpWzUEWIJma4SRCmZ0WqhKsdHX2K9X2FQnp8bbkr
+XgQ/FMQIFkYPkfBMgWd8OacRufNBxJtMrKdbDCJ1vvOwrtA+2VozL7RaR0UAYZsu
+LYyVGaM4Vg4Di6pqSVFTs1I0m6k7MPbUwFxSh7iVCIA1RN6yG97ny24f0wWPeFJD
+BvSCh2F/L3OlMmG0JaNHNOWCNdnXGHbW+eUabOceRVwkiZKfwZDkH00d9Zx2tgGu
+JnvjSCG6R9SPxj7EmKDFB8ziqWErvA==
+=OVZt
 -----END PGP SIGNATURE-----
 
---HwJaLjrLiylxH9IZ1SCzvQAEqKe9AkZkj--
+--BSNUoYfn4nUJg7mOeoHxJ6GsSQLqVT7b2--
 
