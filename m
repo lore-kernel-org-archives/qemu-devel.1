@@ -2,61 +2,65 @@ Return-Path: <SRS0=mdN/=VA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C0CFC0650E
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 18:55:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 664C6C0650E
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 18:55:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 345A42080C
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 18:55:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 345A42080C
+	by mail.kernel.org (Postfix) with ESMTPS id 415E72080C
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 18:55:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 415E72080C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38602 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38604 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hikPR-0007Nu-H5
-	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 14:55:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56719)
+	id 1hikPu-0007gJ-I2
+	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 14:55:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59106)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <ehabkost@redhat.com>) id 1hijgQ-0004pz-MP
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 14:08:44 -0400
+ (envelope-from <armbru@redhat.com>) id 1hijsl-0001Bm-0c
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 14:21:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1hijgO-0000mU-Qa
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 14:08:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47154)
+ (envelope-from <armbru@redhat.com>) id 1hijse-00089j-VE
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 14:21:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53058)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hijgO-0000lK-K5
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 14:08:40 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ (Exim 4.71) (envelope-from <armbru@redhat.com>)
+ id 1hijsU-0007yb-GR; Wed, 03 Jul 2019 14:21:12 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A030130821FA;
- Wed,  3 Jul 2019 18:08:38 +0000 (UTC)
-Received: from localhost (ovpn-116-30.gru2.redhat.com [10.97.116.30])
- by smtp.corp.redhat.com (Postfix) with ESMTP id BC4B383789;
- Wed,  3 Jul 2019 18:08:36 +0000 (UTC)
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>,
- Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
- Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
- Richard Henderson <rth@twiddle.net>
-Date: Wed,  3 Jul 2019 15:07:13 -0300
-Message-Id: <20190703180726.31267-31-ehabkost@redhat.com>
-In-Reply-To: <20190703180726.31267-1-ehabkost@redhat.com>
-References: <20190703180726.31267-1-ehabkost@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+ by mx1.redhat.com (Postfix) with ESMTPS id C72472F8BEB;
+ Wed,  3 Jul 2019 18:21:05 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-111.ams2.redhat.com
+ [10.36.116.111])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 94D831001B3E;
+ Wed,  3 Jul 2019 18:21:04 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 0687A1132ABF; Wed,  3 Jul 2019 20:21:03 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: <tony.nguyen@bt.com>
+References: <dce313b46d294ada8826d34609a3447e@tpw09926dag18e.domain1.systemhost.net>
+Date: Wed, 03 Jul 2019 20:21:02 +0200
+In-Reply-To: <dce313b46d294ada8826d34609a3447e@tpw09926dag18e.domain1.systemhost.net>
+ (tony nguyen's message of "Sat, 8 Jun 2019 05:25:52 +0000")
+Message-ID: <875zojvv1t.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+MIME-Version: 1.0
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Wed, 03 Jul 2019 18:08:38 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.38]); Wed, 03 Jul 2019 18:21:05 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL v4 30/43] qmp: Add deprecation information to
- query-machines
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH v2] test: Use g_strndup
+ instead of plain strndup
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,59 +72,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Export machine type deprecation status through the query-machines
-QMP command.  With this, libvirt and management software will be
-able to show this information to users and/or suggest changes to
-VM configuration to avoid deprecated machines.
+<tony.nguyen@bt.com> writes:
 
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-Message-Id: <20190608233447.27970-2-ehabkost@redhat.com>
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
- qapi/misc.json | 7 ++++++-
- vl.c           | 1 +
- 2 files changed, 7 insertions(+), 1 deletion(-)
+> Due to memory management rules. See HACKING.
+>     
+> Signed-off-by: Tony Nguyen <tony.nguyen@bt.com>
 
-diff --git a/qapi/misc.json b/qapi/misc.json
-index ccd56c9191..733ffefa40 100644
---- a/qapi/misc.json
-+++ b/qapi/misc.json
-@@ -2017,12 +2017,17 @@
- # @numa-mem-supported: true if '-numa node,mem' option is supported by
- #                      the machine type and false otherwise (since 4.1)
- #
-+# @deprecated: if true, the machine type is deprecated and may be removed
-+#              in future versions of QEMU according to the QEMU deprecation
-+#              policy (since 4.1.0)
-+#
- # Since: 1.2.0
- ##
- { 'struct': 'MachineInfo',
-   'data': { 'name': 'str', '*alias': 'str',
-             '*is-default': 'bool', 'cpu-max': 'int',
--            'hotpluggable-cpus': 'bool', 'numa-mem-supported': 'bool'} }
-+            'hotpluggable-cpus': 'bool',  'numa-mem-supported': 'bool',
-+            'deprecated': 'bool' } }
- 
- ##
- # @query-machines:
-diff --git a/vl.c b/vl.c
-index 23fe3e753b..28cc6c4c93 100644
---- a/vl.c
-+++ b/vl.c
-@@ -1362,6 +1362,7 @@ MachineInfoList *qmp_query_machines(Error **errp)
-         info->cpu_max = !mc->max_cpus ? 1 : mc->max_cpus;
-         info->hotpluggable_cpus = mc->has_hotpluggable_cpus;
-         info->numa_mem_supported = mc->numa_mem_supported;
-+        info->deprecated = !!mc->deprecation_reason;
- 
-         entry = g_malloc0(sizeof(*entry));
-         entry->value = info;
--- 
-2.18.0.rc1.1.g3f1ff2140
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
 
+I apologize for the delay.
 
