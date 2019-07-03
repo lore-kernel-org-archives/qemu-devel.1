@@ -2,96 +2,109 @@ Return-Path: <SRS0=mdN/=VA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BA86C5B578
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 07:18:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C60FC5B578
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 07:19:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5CC0B21882
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 07:18:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5CC0B21882
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id DF8632187F
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 07:19:44 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="ZnOQBja4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF8632187F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33282 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33294 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hiZXR-0003LL-2h
-	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 03:18:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59119)
+	id 1hiZYO-0004WL-8T
+	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 03:19:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59330)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <aravinda@linux.vnet.ibm.com>) id 1hiZVy-0002nW-UA
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 03:17:16 -0400
+ (envelope-from <den@virtuozzo.com>) id 1hiZXS-0003au-Qf
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 03:18:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aravinda@linux.vnet.ibm.com>) id 1hiZVw-00077P-K9
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 03:17:14 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:58930)
+ (envelope-from <den@virtuozzo.com>) id 1hiZXQ-0008IU-PR
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 03:18:46 -0400
+Received: from mail-ve1eur03on0713.outbound.protection.outlook.com
+ ([2a01:111:f400:fe09::713]:23262
+ helo=EUR03-VE1-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <aravinda@linux.vnet.ibm.com>)
- id 1hiZVp-0006qM-6f; Wed, 03 Jul 2019 03:17:06 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x637FAl4118584; Wed, 3 Jul 2019 03:16:28 -0400
-Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com
- [169.55.85.253])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2tgpa23bf5-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 03 Jul 2019 03:16:28 -0400
-Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
- by ppma01wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x637Ejvo029157;
- Wed, 3 Jul 2019 07:16:27 GMT
-Received: from b03cxnp08028.gho.boulder.ibm.com
- (b03cxnp08028.gho.boulder.ibm.com [9.17.130.20])
- by ppma01wdc.us.ibm.com with ESMTP id 2tdym6uwtg-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 03 Jul 2019 07:16:27 +0000
-Received: from b03ledav006.gho.boulder.ibm.com
- (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
- by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- x637GQV046989716
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 3 Jul 2019 07:16:26 GMT
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 30EEBC6057;
- Wed,  3 Jul 2019 07:16:26 +0000 (GMT)
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 2AB76C6055;
- Wed,  3 Jul 2019 07:16:24 +0000 (GMT)
-Received: from [9.124.31.179] (unknown [9.124.31.179])
- by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTP;
- Wed,  3 Jul 2019 07:16:23 +0000 (GMT)
-To: David Gibson <david@gibson.dropbear.id.au>
-References: <156033104292.26635.15759339817253067370.stgit@aravinda>
- <156033128111.26635.16279854031001093005.stgit@aravinda>
- <20190702040307.GI6779@umbus.fritz.box>
- <80028d4d-88a7-4f90-f26d-52559857c66d@linux.vnet.ibm.com>
- <20190703030700.GH9442@umbus.fritz.box>
-From: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
-Message-ID: <b2804eaa-b18b-cd32-e8c3-d0d0a023ee5f@linux.vnet.ibm.com>
-Date: Wed, 3 Jul 2019 12:46:22 +0530
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.6.0
-MIME-Version: 1.0
-In-Reply-To: <20190703030700.GH9442@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
+ (Exim 4.71) (envelope-from <den@virtuozzo.com>) id 1hiZXQ-0008HO-5f
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 03:18:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Lz87AbNKYpWJSwDkKEL1+jTbNTBv4JghPNjzmt/AX/M=;
+ b=ZnOQBja4d6pYD3xFK4zZOre17yxTmU+9FrLKlsTgMqBv3ezQlDxqn7ajHhwtXSLsIFT8s1kqALUn3253mdzMpiuvHQy3hqKE0WfWcQgEcsqE3HGzYH2iMF7j3JfdmjR5J/Q1H3c+j7l4kZuwEEs5+KvPu0U67VqRWXJKFsBbQgI=
+Received: from DBBPR08MB4250.eurprd08.prod.outlook.com (20.179.40.149) by
+ DBBPR08MB4726.eurprd08.prod.outlook.com (10.255.79.139) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2052.16; Wed, 3 Jul 2019 07:18:39 +0000
+Received: from DBBPR08MB4250.eurprd08.prod.outlook.com
+ ([fe80::1d8b:7420:f966:e881]) by DBBPR08MB4250.eurprd08.prod.outlook.com
+ ([fe80::1d8b:7420:f966:e881%3]) with mapi id 15.20.2032.019; Wed, 3 Jul 2019
+ 07:18:39 +0000
+From: Denis Lunev <den@virtuozzo.com>
+To: Markus Armbruster <armbru@redhat.com>, Denis Plotnikov
+ <dplotnikov@virtuozzo.com>
+Thread-Topic: [Qemu-devel] [PATCH] monitor: increase amount of data for
+ monitor to read
+Thread-Index: AQHVH3uTjLyZHmMxuEusn1LAsIaP+6a4lHlPgAALn4A=
+Date: Wed, 3 Jul 2019 07:18:39 +0000
+Message-ID: <e2e644d0-0cb3-3c11-2e43-9e9b1c3a17ef@virtuozzo.com>
+References: <20190610105906.28524-1-dplotnikov@virtuozzo.com>
+ <87lfxfy67u.fsf@dusky.pond.sub.org>
+In-Reply-To: <87lfxfy67u.fsf@dusky.pond.sub.org>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
- definitions=2019-07-03_02:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1907030086
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
-Subject: Re: [Qemu-devel] [PATCH v10 4/6] target/ppc: Build rtas error log
- upon an MCE
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1PR0501CA0005.eurprd05.prod.outlook.com
+ (2603:10a6:3:1a::15) To DBBPR08MB4250.eurprd08.prod.outlook.com
+ (2603:10a6:10:c2::21)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=den@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 1bbebff9-a22d-45f8-144a-08d6ff86ab93
+x-microsoft-antispam: BCL:0; PCL:0;
+ RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);
+ SRVR:DBBPR08MB4726; 
+x-ms-traffictypediagnostic: DBBPR08MB4726:
+x-microsoft-antispam-prvs: <DBBPR08MB47260F05692384325E011A85B6FB0@DBBPR08MB4726.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:6430;
+x-forefront-prvs: 00872B689F
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(376002)(396003)(136003)(39850400004)(346002)(366004)(199004)(189003)(3846002)(6116002)(6436002)(6246003)(99286004)(102836004)(26005)(6486002)(53546011)(6506007)(386003)(8676002)(305945005)(186003)(7736002)(229853002)(8936002)(54906003)(6512007)(52116002)(53936002)(81156014)(81166006)(316002)(76176011)(110136005)(36756003)(31686004)(14454004)(66066001)(6636002)(446003)(2906002)(256004)(478600001)(68736007)(476003)(4326008)(2616005)(4744005)(11346002)(86362001)(66946007)(486006)(25786009)(5660300002)(73956011)(31696002)(71190400001)(66446008)(71200400001)(66556008)(66476007)(64756008);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:DBBPR08MB4726;
+ H:DBBPR08MB4250.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: hlf609zgfZYBGUO4y4dlyBSpBMghqKykr87roT11nfgCJp/vPDUo9Fb4rDlUBH+nlfeRKGGEgAvAb5pnKfRo4LA9aema6AjhpSdKo5gNT1Ezeb9zCMbEOG9y936SxGsr6Ft/cjj3Of8hWM+sHAvFBirWkkiV36TWlqLpz6PW4bcdy1ZVA++OFOTSviQVKNo81yrKdbpbfYiH/b+aKxyF5/MMBtmHKNexTo6NfWARRp9d+255zByt57KExBGqt7hDUvx77ZwCDv7TruD4aS5lFH6QgEXtRxxIWLIW9HPhLSyTCxG9RxdrYW39Oyr6G9uhZ0wWqDV9USiznSD2WCwFg5wP9HrjdfSrYhFabpmLtHWre8jXL6t8bDwlHjUYI5WBaqm9+gaxFgAS9YB67kL1zwbGwqBoGI7WIqQzxeufq3s=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <CAE471D38DC4854BB62048CBBE456C55@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1bbebff9-a22d-45f8-144a-08d6ff86ab93
+X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Jul 2019 07:18:39.1535 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: den@virtuozzo.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBBPR08MB4726
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 2a01:111:f400:fe09::713
+Subject: Re: [Qemu-devel] [PATCH] monitor: increase amount of data for
+ monitor to read
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,292 +116,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: aik@au1.ibm.com, qemu-devel@nongnu.org, groug@kaod.org, paulus@ozlabs.org,
- qemu-ppc@nongnu.org
+Cc: "dgilbert@redhat.com" <dgilbert@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-
-On Wednesday 03 July 2019 08:37 AM, David Gibson wrote:
-> On Tue, Jul 02, 2019 at 03:19:24PM +0530, Aravinda Prasad wrote:
->>
->>
->> On Tuesday 02 July 2019 09:33 AM, David Gibson wrote:
->>> On Wed, Jun 12, 2019 at 02:51:21PM +0530, Aravinda Prasad wrote:
->>>> Upon a machine check exception (MCE) in a guest address space,
->>>> KVM causes a guest exit to enable QEMU to build and pass the
->>>> error to the guest in the PAPR defined rtas error log format.
->>>>
->>>> This patch builds the rtas error log, copies it to the rtas_addr
->>>> and then invokes the guest registered machine check handler. The
->>>> handler in the guest takes suitable action(s) depending on the type
->>>> and criticality of the error. For example, if an error is
->>>> unrecoverable memory corruption in an application inside the
->>>> guest, then the guest kernel sends a SIGBUS to the application.
->>>> For recoverable errors, the guest performs recovery actions and
->>>> logs the error.
->>>>
->>>> Signed-off-by: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
->>>> ---
->>>>  hw/ppc/spapr.c         |   13 +++
->>>>  hw/ppc/spapr_events.c  |  238 ++++++++++++++++++++++++++++++++++++++++++++++++
->>>>  hw/ppc/spapr_rtas.c    |   26 +++++
->>>>  include/hw/ppc/spapr.h |    6 +
->>>>  target/ppc/kvm.c       |    4 +
->>>>  5 files changed, 284 insertions(+), 3 deletions(-)
->>>>
->>>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
->>>> index 6cc2c3b..d61905b 100644
->>>> --- a/hw/ppc/spapr.c
->>>> +++ b/hw/ppc/spapr.c
->>>> @@ -2908,6 +2908,19 @@ static void spapr_machine_init(MachineState *machine)
->>>>          error_report("Could not get size of LPAR rtas '%s'", filename);
->>>>          exit(1);
->>>>      }
->>>> +
->>>> +    if (spapr_get_cap(spapr, SPAPR_CAP_FWNMI_MCE) == SPAPR_CAP_ON) {
->>>> +        /*
->>>> +         * Ensure that the rtas image size is less than RTAS_ERROR_LOG_OFFSET
->>>> +         * or else the rtas image will be overwritten with the rtas error log
->>>> +         * when a machine check exception is encountered.
->>>> +         */
->>>> +        g_assert(spapr->rtas_size < RTAS_ERROR_LOG_OFFSET);
->>>> +
->>>> +        /* Resize rtas blob to accommodate error log */
->>>> +        spapr->rtas_size = RTAS_ERROR_LOG_MAX;
->>>> +    }
->>>> +
->>>>      spapr->rtas_blob = g_malloc(spapr->rtas_size);
->>>>      if (load_image_size(filename, spapr->rtas_blob, spapr->rtas_size) < 0) {
->>>>          error_report("Could not load LPAR rtas '%s'", filename);
->>>> diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
->>>> index a0c66d7..51c052e 100644
->>>> --- a/hw/ppc/spapr_events.c
->>>> +++ b/hw/ppc/spapr_events.c
->>>> @@ -212,6 +212,106 @@ struct hp_extended_log {
->>>>      struct rtas_event_log_v6_hp hp;
->>>>  } QEMU_PACKED;
->>>>  
->>>> +struct rtas_event_log_v6_mc {
->>>> +#define RTAS_LOG_V6_SECTION_ID_MC                   0x4D43 /* MC */
->>>> +    struct rtas_event_log_v6_section_header hdr;
->>>> +    uint32_t fru_id;
->>>> +    uint32_t proc_id;
->>>> +    uint8_t error_type;
->>>> +#define RTAS_LOG_V6_MC_TYPE_UE                           0
->>>> +#define RTAS_LOG_V6_MC_TYPE_SLB                          1
->>>> +#define RTAS_LOG_V6_MC_TYPE_ERAT                         2
->>>> +#define RTAS_LOG_V6_MC_TYPE_TLB                          4
->>>> +#define RTAS_LOG_V6_MC_TYPE_D_CACHE                      5
->>>> +#define RTAS_LOG_V6_MC_TYPE_I_CACHE                      7
->>>> +    uint8_t sub_err_type;
->>>> +#define RTAS_LOG_V6_MC_UE_INDETERMINATE                  0
->>>> +#define RTAS_LOG_V6_MC_UE_IFETCH                         1
->>>> +#define RTAS_LOG_V6_MC_UE_PAGE_TABLE_WALK_IFETCH         2
->>>> +#define RTAS_LOG_V6_MC_UE_LOAD_STORE                     3
->>>> +#define RTAS_LOG_V6_MC_UE_PAGE_TABLE_WALK_LOAD_STORE     4
->>>> +#define RTAS_LOG_V6_MC_SLB_PARITY                        0
->>>> +#define RTAS_LOG_V6_MC_SLB_MULTIHIT                      1
->>>> +#define RTAS_LOG_V6_MC_SLB_INDETERMINATE                 2
->>>> +#define RTAS_LOG_V6_MC_ERAT_PARITY                       1
->>>> +#define RTAS_LOG_V6_MC_ERAT_MULTIHIT                     2
->>>> +#define RTAS_LOG_V6_MC_ERAT_INDETERMINATE                3
->>>> +#define RTAS_LOG_V6_MC_TLB_PARITY                        1
->>>> +#define RTAS_LOG_V6_MC_TLB_MULTIHIT                      2
->>>> +#define RTAS_LOG_V6_MC_TLB_INDETERMINATE                 3
->>>> +    uint8_t reserved_1[6];
->>>> +    uint64_t effective_address;
->>>> +    uint64_t logical_address;
->>>> +} QEMU_PACKED;
->>>> +
->>>> +struct mc_extended_log {
->>>> +    struct rtas_event_log_v6 v6hdr;
->>>> +    struct rtas_event_log_v6_mc mc;
->>>> +} QEMU_PACKED;
->>>> +
->>>> +struct MC_ierror_table {
->>>> +    unsigned long srr1_mask;
->>>> +    unsigned long srr1_value;
->>>> +    bool nip_valid; /* nip is a valid indicator of faulting address */
->>>> +    uint8_t error_type;
->>>> +    uint8_t error_subtype;
->>>> +    unsigned int initiator;
->>>> +    unsigned int severity;
->>>> +};
->>>> +
->>>> +static const struct MC_ierror_table mc_ierror_table[] = {
->>>> +{ 0x00000000081c0000, 0x0000000000040000, true,
->>>> +  RTAS_LOG_V6_MC_TYPE_UE, RTAS_LOG_V6_MC_UE_IFETCH,
->>>> +  RTAS_LOG_INITIATOR_CPU, RTAS_LOG_SEVERITY_ERROR_SYNC, },
->>>> +{ 0x00000000081c0000, 0x0000000000080000, true,
->>>> +  RTAS_LOG_V6_MC_TYPE_SLB, RTAS_LOG_V6_MC_SLB_PARITY,
->>>> +  RTAS_LOG_INITIATOR_CPU, RTAS_LOG_SEVERITY_ERROR_SYNC, },
->>>> +{ 0x00000000081c0000, 0x00000000000c0000, true,
->>>> +  RTAS_LOG_V6_MC_TYPE_SLB, RTAS_LOG_V6_MC_SLB_MULTIHIT,
->>>> +  RTAS_LOG_INITIATOR_CPU, RTAS_LOG_SEVERITY_ERROR_SYNC, },
->>>> +{ 0x00000000081c0000, 0x0000000000100000, true,
->>>> +  RTAS_LOG_V6_MC_TYPE_ERAT, RTAS_LOG_V6_MC_ERAT_MULTIHIT,
->>>> +  RTAS_LOG_INITIATOR_CPU, RTAS_LOG_SEVERITY_ERROR_SYNC, },
->>>> +{ 0x00000000081c0000, 0x0000000000140000, true,
->>>> +  RTAS_LOG_V6_MC_TYPE_TLB, RTAS_LOG_V6_MC_TLB_MULTIHIT,
->>>> +  RTAS_LOG_INITIATOR_CPU, RTAS_LOG_SEVERITY_ERROR_SYNC, },
->>>> +{ 0x00000000081c0000, 0x0000000000180000, true,
->>>> +  RTAS_LOG_V6_MC_TYPE_UE, RTAS_LOG_V6_MC_UE_PAGE_TABLE_WALK_IFETCH,
->>>> +  RTAS_LOG_INITIATOR_CPU, RTAS_LOG_SEVERITY_ERROR_SYNC, },
->>>> +{ 0, 0, 0, 0, 0, 0 } };
->>>> +
->>>> +struct MC_derror_table {
->>>> +    unsigned long dsisr_value;
->>>> +    bool dar_valid; /* dar is a valid indicator of faulting address */
->>>> +    uint8_t error_type;
->>>> +    uint8_t error_subtype;
->>>> +    unsigned int initiator;
->>>> +    unsigned int severity;
->>>> +};
->>>> +
->>>> +static const struct MC_derror_table mc_derror_table[] = {
->>>> +{ 0x00008000, false,
->>>> +  RTAS_LOG_V6_MC_TYPE_UE, RTAS_LOG_V6_MC_UE_LOAD_STORE,
->>>> +  RTAS_LOG_INITIATOR_CPU, RTAS_LOG_SEVERITY_ERROR_SYNC, },
->>>> +{ 0x00004000, true,
->>>> +  RTAS_LOG_V6_MC_TYPE_UE, RTAS_LOG_V6_MC_UE_PAGE_TABLE_WALK_LOAD_STORE,
->>>> +  RTAS_LOG_INITIATOR_CPU, RTAS_LOG_SEVERITY_ERROR_SYNC, },
->>>> +{ 0x00000800, true,
->>>> +  RTAS_LOG_V6_MC_TYPE_ERAT, RTAS_LOG_V6_MC_ERAT_MULTIHIT,
->>>> +  RTAS_LOG_INITIATOR_CPU, RTAS_LOG_SEVERITY_ERROR_SYNC, },
->>>> +{ 0x00000400, true,
->>>> +  RTAS_LOG_V6_MC_TYPE_TLB, RTAS_LOG_V6_MC_TLB_MULTIHIT,
->>>> +  RTAS_LOG_INITIATOR_CPU, RTAS_LOG_SEVERITY_ERROR_SYNC, },
->>>> +{ 0x00000080, true,
->>>> +  RTAS_LOG_V6_MC_TYPE_SLB, RTAS_LOG_V6_MC_SLB_MULTIHIT,  /* Before PARITY */
->>>> +  RTAS_LOG_INITIATOR_CPU, RTAS_LOG_SEVERITY_ERROR_SYNC, },
->>>> +{ 0x00000100, true,
->>>> +  RTAS_LOG_V6_MC_TYPE_SLB, RTAS_LOG_V6_MC_SLB_PARITY,
->>>> +  RTAS_LOG_INITIATOR_CPU, RTAS_LOG_SEVERITY_ERROR_SYNC, },
->>>> +{ 0, false, 0, 0, 0, 0 } };
->>>> +
->>>> +#define SRR1_MC_LOADSTORE(srr1) ((srr1) & PPC_BIT(42))
->>>> +
->>>>  typedef enum EventClass {
->>>>      EVENT_CLASS_INTERNAL_ERRORS     = 0,
->>>>      EVENT_CLASS_EPOW                = 1,
->>>> @@ -620,7 +720,141 @@ void spapr_hotplug_req_remove_by_count_indexed(SpaprDrcType drc_type,
->>>>                              RTAS_LOG_V6_HP_ACTION_REMOVE, drc_type, &drc_id);
->>>>  }
->>>>  
->>>> -void spapr_mce_req_event(PowerPCCPU *cpu)
->>>> +static uint32_t spapr_mce_get_elog_type(PowerPCCPU *cpu, bool recovered,
->>>> +                                        struct mc_extended_log *ext_elog)
->>>> +{
->>>> +    int i;
->>>> +    CPUPPCState *env = &cpu->env;
->>>> +    uint32_t summary;
->>>> +    uint64_t dsisr = env->spr[SPR_DSISR];
->>>> +
->>>> +    summary = RTAS_LOG_VERSION_6 | RTAS_LOG_OPTIONAL_PART_PRESENT;
->>>> +    if (recovered) {
->>>> +        summary |= RTAS_LOG_DISPOSITION_FULLY_RECOVERED;
->>>> +    } else {
->>>> +        summary |= RTAS_LOG_DISPOSITION_NOT_RECOVERED;
->>>> +    }
->>>> +
->>>> +    if (SRR1_MC_LOADSTORE(env->spr[SPR_SRR1])) {
->>>> +        for (i = 0; mc_derror_table[i].dsisr_value; i++) {
->>>> +            if (!(dsisr & mc_derror_table[i].dsisr_value)) {
->>>> +                continue;
->>>> +            }
->>>> +
->>>> +            ext_elog->mc.error_type = mc_derror_table[i].error_type;
->>>> +            ext_elog->mc.sub_err_type = mc_derror_table[i].error_subtype;
->>>> +            if (mc_derror_table[i].dar_valid) {
->>>> +                ext_elog->mc.effective_address = cpu_to_be64(env->spr[SPR_DAR]);
->>>> +            }
->>>> +
->>>> +            summary |= mc_derror_table[i].initiator
->>>> +                        | mc_derror_table[i].severity;
->>>> +
->>>> +            return summary;
->>>> +        }
->>>> +    } else {
->>>> +        for (i = 0; mc_ierror_table[i].srr1_mask; i++) {
->>>> +            if ((env->spr[SPR_SRR1] & mc_ierror_table[i].srr1_mask) !=
->>>> +                    mc_ierror_table[i].srr1_value) {
->>>> +                continue;
->>>> +            }
->>>> +
->>>> +            ext_elog->mc.error_type = mc_ierror_table[i].error_type;
->>>> +            ext_elog->mc.sub_err_type = mc_ierror_table[i].error_subtype;
->>>> +            if (mc_ierror_table[i].nip_valid) {
->>>> +                ext_elog->mc.effective_address = cpu_to_be64(env->nip);
->>>> +            }
->>>> +
->>>> +            summary |= mc_ierror_table[i].initiator
->>>> +                        | mc_ierror_table[i].severity;
->>>> +
->>>> +            return summary;
->>>> +        }
->>>> +    }
->>>> +
->>>> +    summary |= RTAS_LOG_INITIATOR_CPU;
->>>> +    return summary;
->>>> +}
->>>> +
->>>> +static void spapr_mce_dispatch_elog(PowerPCCPU *cpu, bool recovered)
->>>> +{
->>>> +    SpaprMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
->>>> +    CPUState *cs = CPU(cpu);
->>>> +    uint64_t rtas_addr;
->>>> +    CPUPPCState *env = &cpu->env;
->>>> +    PowerPCCPUClass *pcc = POWERPC_CPU_GET_CLASS(cpu);
->>>> +    target_ulong r3, msr = 0;
->>>> +    struct rtas_error_log log;
->>>> +    struct mc_extended_log *ext_elog;
->>>> +    uint32_t summary;
->>>> +
->>>> +    /*
->>>> +     * Properly set bits in MSR before we invoke the handler.
->>>> +     * SRR0/1, DAR and DSISR are properly set by KVM
->>>> +     */
->>>> +    if (!(*pcc->interrupts_big_endian)(cpu)) {
->>>> +        msr |= (1ULL << MSR_LE);
->>>> +    }
->>>> +
->>>> +    if (env->msr & (1ULL << MSR_SF)) {
->>>> +        msr |= (1ULL << MSR_SF);
->>>> +    }
->>>> +
->>>> +    msr |= (1ULL << MSR_ME);
->>>> +
->>>> +    if (spapr->guest_machine_check_addr == -1) {
->>>> +        /*
->>>> +         * This implies that we have hit a machine check between system
->>>> +         * reset and "ibm,nmi-register". Fall back to the old machine
->>>> +         * check behavior in such cases.
->>>> +         */
->>>> +        env->spr[SPR_SRR0] = env->nip;
->>>> +        env->spr[SPR_SRR1] = env->msr;
->>>> +        env->msr = msr;
->>>> +        env->nip = 0x200;
->>>> +        return;
->>>
->>> Hm, does this differ from what ppc_cpu_do_system_reset() will do?
->>
->> Not much, but we branch to 0x200 instead of 0x100. But I think calling
->>
->> powerpc_excp(cpu, env->excp_model, POWERPC_EXCP_MCHECK)
->>
->> should also work. Let me if you prefer using powerpc_excp().
-> 
-> Yes, I'd prefer to share code with existing exception paths where
-> possible.
-
-sure.
-
-> 
-
--- 
-Regards,
-Aravinda
+T24gNy8zLzE5IDk6MzYgQU0sIE1hcmt1cyBBcm1icnVzdGVyIHdyb3RlOg0KPiBEaWQgdGhpcyBm
+YWxsIHRocm91Z2ggdGhlIGNyYWNrcz8NCj4NCj4gRGVuaXMgUGxvdG5pa292IDxkcGxvdG5pa292
+QHZpcnR1b3p6by5jb20+IHdyaXRlczoNCj4NCj4+IFJpZ2h0IG5vdyBRTVAgYW5kIEhNUCBtb25p
+dG9ycyByZWFkIDEgYnl0ZSBhdCBhIHRpbWUgZnJvbSB0aGUgc29ja2V0LCB3aGljaA0KPj4gaXMg
+dmVyeSBpbmVmZmljaWVudC4gV2l0aCAxMDArIFZNcyBvbiB0aGUgaG9zdCB0aGlzIGVhc2lseSBy
+ZWFzdWx0cyBpbg0KPj4gYSBsb3Qgb2YgdW5uZWNlc3Nhcnkgc3lzdGVtIGNhbGxzIGFuZCBDUFUg
+dXNhZ2UgaW4gdGhlIHN5c3RlbS4NCj4gWWVzLCByZWFkaW5nIG9uZSBieXRlIGF0IGEgdGltZSBp
+cyBhd2Z1bC4gIEJ1dCBRTVAgaXMgY29udHJvbCBwbGFuZTsgSQ0KPiBkaWRuJ3QgZXhwZWN0IGl0
+IHRvIGltcGFjdCBzeXN0ZW0gcGVyZm9ybWFuY2UuICBIb3cgYXJlIHlvdSB1c2luZyBRTVA/DQo+
+IEp1c3QgY3VyaW91cywgbm90IGFjdHVhbGx5IG9wcG9zZWQgdG8gaW1wcm92aW5nIFFNUCBlZmZp
+Y2llbmN5Lg0KNTAwIFZNcyBvbiBhIGhvc3QsIGVhY2ggMzAgc2Vjb25kcyBsaWJ2aXJ0cyBleGVj
+dXRlcyBBRkFJUiAzLTUgY29tbWFuZHMNCndpdGggZGVmYXVsdCBzZXR0aW5ncy4gVGhpcyByZXN1
+bHRzIGluIGF0IGxlYXN0IHNvbWUgbG9hZC4gSXQgaXMgbm90IHZlcnkNCnNpZ25pZmljYW50LCBi
+dXQgaXQgaXMgbm90aWNlYWJsZS4NCg0KVGhpcyByZWR1Y2VzIGlkbGUgQ1BVIGNvbnN1bXB0aW9u
+IGFyb3VuZCAxLTIlIG9ic2VydmFibGUgdmlhIHRvcCwgd2hpY2ggaXMNCm5vdCB0aGF0IHNtYWxs
+IGFtb3VudC4NCg0KRGVuDQo=
 
