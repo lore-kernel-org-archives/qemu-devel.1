@@ -3,63 +3,60 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1629FC0650E
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 18:49:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 368FCC0650E
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 18:53:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E361D21852
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 18:49:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E361D21852
+	by mail.kernel.org (Postfix) with ESMTPS id 0EE1F2080C
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 18:53:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0EE1F2080C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38548 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38570 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hikJZ-0001Vh-8e
-	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 14:49:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56932)
+	id 1hikNa-0004oU-BH
+	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 14:53:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56659)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <ehabkost@redhat.com>) id 1hijgl-0005Pu-FI
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 14:09:04 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1hijgI-0004km-Jz
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 14:08:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1hijgk-00015L-Eg
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 14:09:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45880)
+ (envelope-from <ehabkost@redhat.com>) id 1hijgD-0000gM-Gc
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 14:08:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:4278)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hijgk-00014g-9c
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 14:09:02 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hijgD-0000eS-AZ
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 14:08:29 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 9475B8553A;
- Wed,  3 Jul 2019 18:09:01 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 06A3481127;
+ Wed,  3 Jul 2019 18:08:27 +0000 (UTC)
 Received: from localhost (ovpn-116-30.gru2.redhat.com [10.97.116.30])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5070E457C7;
- Wed,  3 Jul 2019 18:08:59 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8A5DE832B6;
+ Wed,  3 Jul 2019 18:08:26 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>,
  Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
  Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
  Richard Henderson <rth@twiddle.net>
-Date: Wed,  3 Jul 2019 15:07:22 -0300
-Message-Id: <20190703180726.31267-40-ehabkost@redhat.com>
+Date: Wed,  3 Jul 2019 15:07:08 -0300
+Message-Id: <20190703180726.31267-26-ehabkost@redhat.com>
 In-Reply-To: <20190703180726.31267-1-ehabkost@redhat.com>
 References: <20190703180726.31267-1-ehabkost@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.28]); Wed, 03 Jul 2019 18:09:01 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ (mx1.redhat.com [10.5.110.27]); Wed, 03 Jul 2019 18:08:27 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL v4 39/43] docs: Deprecate CPU model runnability
- guarantees
+Subject: [Qemu-devel] [PULL v4 25/43] x86/cpu: use FeatureWordArray to
+ define filtered_features
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,50 +68,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Wei Yang <richardw.yang@linux.intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Document that CPU model runnability guarantees won't apply to
-unversioned CPU models anymore.
+From: Wei Yang <richardw.yang@linux.intel.com>
 
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-Message-Id: <20190628002844.24894-9-ehabkost@redhat.com>
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Use the same definition as features/user_features in CPUX86State.
+
+Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+Message-Id: <20190620023746.9869-1-richardw.yang@linux.intel.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- qemu-deprecated.texi | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
+ target/i386/cpu.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-index 9cba82d5ec..18f85f70e1 100644
---- a/qemu-deprecated.texi
-+++ b/qemu-deprecated.texi
-@@ -276,3 +276,22 @@ Note that if you are exposing the export via /dev/nb=
-d0, it is easier
- to just export the entire image and then mount only /dev/nbd0p1 than
- it is to reinvoke @command{qemu-nbd -c /dev/nbd0} limited to just a
- subset of the image.
-+
-+@section Backwards compatibility
-+
-+@subsection Runnability guarantee of CPU models (since 4.1.0)
-+
-+Previous versions of QEMU never changed existing CPU models in
-+ways that introduced additional host software or hardware
-+requirements to the VM.  This allowed management software to
-+safely change the machine type of an existing VM without
-+introducing new requirements ("runnability guarantee").  This
-+prevented CPU models from being updated to include CPU
-+vulnerability mitigations, leaving guests vulnerable in the
-+default configuration.
-+
-+The CPU model runnability guarantee won't apply anymore to
-+existing CPU models.  Management software that needs runnability
-+guarantees must resolve the CPU model aliases using te
-+``alias-of'' field returned by the ``query-cpu-definitions'' QMP
-+command.
---=20
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index ff26351538..85319f4ae1 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -1440,7 +1440,7 @@ struct X86CPU {
+     } mwait;
+ 
+     /* Features that were filtered out because of missing host capabilities */
+-    uint32_t filtered_features[FEATURE_WORDS];
++    FeatureWordArray filtered_features;
+ 
+     /* Enable PMU CPUID bits. This can't be enabled by default yet because
+      * it doesn't have ABI stability guarantees, as it passes all PMU CPUID
+-- 
 2.18.0.rc1.1.g3f1ff2140
 
 
