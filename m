@@ -2,86 +2,88 @@ Return-Path: <SRS0=mdN/=VA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-7.2 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39077C0650E
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 09:59:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C42D8C0650E
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 10:06:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F2988218A0
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 09:59:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 91CBA218A3
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 10:06:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FpDJXztM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F2988218A0
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EnfIehs4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 91CBA218A3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34542 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34612 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hic2m-0002sK-B8
-	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 05:59:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43622)
+	id 1hic9f-0006Q1-Jd
+	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 06:06:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45143)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <stefanha@gmail.com>) id 1hic21-00029c-TH
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 05:58:31 -0400
+ (envelope-from <stefanha@gmail.com>) id 1hic7v-0005pf-Tb
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 06:04:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@gmail.com>) id 1hic20-0004Fe-Mx
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 05:58:29 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:55615)
+ (envelope-from <stefanha@gmail.com>) id 1hic7u-0006oU-Nb
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 06:04:35 -0400
+Received: from mail-wr1-x42a.google.com ([2a00:1450:4864:20::42a]:45599)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1hic20-0004Cq-Bi
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 05:58:28 -0400
-Received: by mail-wm1-x344.google.com with SMTP id a15so1527289wmj.5
- for <qemu-devel@nongnu.org>; Wed, 03 Jul 2019 02:58:28 -0700 (PDT)
+ (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1hic7u-0006lb-9K
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 06:04:34 -0400
+Received: by mail-wr1-x42a.google.com with SMTP id f9so2044673wre.12
+ for <qemu-devel@nongnu.org>; Wed, 03 Jul 2019 03:04:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=date:from:to:cc:subject:message-id:references:mime-version
  :content-disposition:in-reply-to:user-agent;
- bh=rW/fXSq7CHcBwrXrXRxa0JI9zQXBjJuLom0DVCSM5aU=;
- b=FpDJXztMr+rIR19Vbo7b7W5dkA97iH4mDU9MCQWZMy0osEHPQUlIlUQId5DbnfeIAN
- LNEUQXJrxoroC4f/8qMFeJWlQa8owegSTqo03wRWb/2aqTxFQlNYNo/ZPCGgeD90edMy
- N1CZ1B4hSmcSIdRlUfUFZJd14/Xdk6OwSDdlTjfF9LnaNq1lqTEZuGUMzyr5LyXZs7GT
- TrDTLSIcUlPTVCcAoZWCNAiJm++CZnfnDdghTMCQrxMVQaslMGQITP/tdBXXLCjgqEUp
- C+5TVpoettv65cXycatn9cRqkEeSFGFvOeI+SmZ5k6GvmKHxhj4hGIVxJIUy4ykLr2Oa
- 7zcA==
+ bh=rpmW2YAQ/4TIZg9D3uQ+O3vyfIRCKS5c8d5Qfeu61jM=;
+ b=EnfIehs4SACVOOTPLYiIQ0LvYQ1UBWa7EfWew/3lNSRE2ZKk6a046F7wde1uI0KK1y
+ NP7irEx+fkTPpS9e1k1FxxXhPiq2MwmetazJe6OmVqMO9g0ngTyDS34N5Si6bKMtC3j4
+ grr4kD3OqN+uqOT5b8D6i7jfDR49n4rD4WfzkFdL99prhDiG1xuclTp7ok/GbxGmhQp9
+ O9QmWsxPjH7I/NK5dXUk3f4W3jnHJrSS8aWKPY55WaqkajP4MxO1O4sOyGnfF9CzFX6H
+ QD0Oa3o8EIEQmpuC/mBQ1Ylm+KV5ivy05xqi+xuumxE/nLp2vRzpMGq8q5Qe05cXQLfK
+ 1hog==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to:user-agent;
- bh=rW/fXSq7CHcBwrXrXRxa0JI9zQXBjJuLom0DVCSM5aU=;
- b=D0yU+TAB9j/RdbWhm6Srjn4sxlvn1A8sOdELXqMS3HUNjtzr2HBLZoMJGu8Vk+O6Kj
- I2x965YtH75WV8AGkR2qH3Owz1PyvBVeHVgCkKO9PhR2iR2ynt1qwFPg0GQKoEV+8Zgv
- O3whrbvbXAs4VI9rDhNWtr1lO5IAxsE/7+0Pv7XxYQsklLecutHfjqZJCkCJej95qjCJ
- h7Q8eWGs5bvGgqiE4ldJP94PB7cJ2bL6crw1DHpje7aBobRPhvWsjBIhEBSSOKu92KFg
- QJcopLiiTlzqLVAaZhmW0Y98hkjgV4+AU1AFb4FjG3I5bcJbBKruVgW1aWKwxWPGkJE3
- zbQw==
-X-Gm-Message-State: APjAAAWoj9gJwIoDOSAxni6irr2acSpwHndAMRE3NagK0AbTOiVQsP38
- eSL0YRX0h4C7m1Sl4g7B7mQ=
-X-Google-Smtp-Source: APXvYqyA8fnEElEl+zOVSRFUh6ER751931GwrXW3NVZ/aw7xEbXU6+5bcmkaOze65bFmAPwrcQFYIQ==
-X-Received: by 2002:a1c:6a0e:: with SMTP id f14mr7939236wmc.154.1562147907171; 
- Wed, 03 Jul 2019 02:58:27 -0700 (PDT)
+ bh=rpmW2YAQ/4TIZg9D3uQ+O3vyfIRCKS5c8d5Qfeu61jM=;
+ b=ivK1H9qpXUK49cWOVGW+SSD4pRHIuF1VM6oktSvCF+p7yagYxzQXUR67EtAL3PLnTT
+ kYtcg3+MjvMj4esxzWxWUVram9LdxpDYMp83OWfiyC+uwBILoMqX5gWh2E8a/BLXnPhX
+ iceoQnfjwnjZMvKwZv5MmFwU0dC34p+IYFHGpQXYTDgrFxMOa+KquCOmGFSFqGo610nR
+ pKCZE5sC7+qqg5p/03x0jC3xsYxpYG5hcoTsfK4fCPkHZagtGEet2IjFAIJQuEmEIGN/
+ MKC7HOL2j4/af5Qmu62Vo00mU8RGOy5CDvfFXek/r7H2P2rjmwYN58p9HpmSxTjvNYy7
+ nNgQ==
+X-Gm-Message-State: APjAAAXDSHODPLNb1tEEgei8xLbJR3DoKHHVJwUMIpG+SK2rmiskuOK0
+ OJ7bP99mRf/uC0p8YoZFDIg=
+X-Google-Smtp-Source: APXvYqxzUPx47I2bOfGXkacGdRLBxju7YVdNLqaLvELZcS3mdpubTbLpTVZ/lECjB4vNqgEN/GetGw==
+X-Received: by 2002:a5d:6709:: with SMTP id o9mr28548818wru.301.1562148273039; 
+ Wed, 03 Jul 2019 03:04:33 -0700 (PDT)
 Received: from localhost ([51.15.41.238])
- by smtp.gmail.com with ESMTPSA id x6sm2139913wru.0.2019.07.03.02.58.25
+ by smtp.gmail.com with ESMTPSA id o24sm5007541wmh.2.2019.07.03.03.04.31
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Wed, 03 Jul 2019 02:58:26 -0700 (PDT)
-Date: Wed, 3 Jul 2019 10:58:25 +0100
+ Wed, 03 Jul 2019 03:04:31 -0700 (PDT)
+Date: Wed, 3 Jul 2019 11:04:31 +0100
 From: Stefan Hajnoczi <stefanha@gmail.com>
-To: Sergio Lopez <slp@redhat.com>
-Message-ID: <20190703095825.GE11844@stefanha-x1.localdomain>
-References: <20190702121106.28374-1-slp@redhat.com>
+To: Raphael Norwitz <raphael.norwitz@nutanix.com>
+Message-ID: <20190703100431.GA17523@stefanha-x1.localdomain>
+References: <6EF9E5BE-2FBF-4CC4-BA1F-AE55ADD82A6E@nutanix.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="WBsA/oQW3eTA3LlM"
+ protocol="application/pgp-signature"; boundary="oyUTqETQ0mS9luUI"
 Content-Disposition: inline
-In-Reply-To: <20190702121106.28374-1-slp@redhat.com>
+In-Reply-To: <6EF9E5BE-2FBF-4CC4-BA1F-AE55ADD82A6E@nutanix.com>
 User-Agent: Mutt/1.12.0 (2019-05-25)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::344
-Subject: Re: [Qemu-devel] [PATCH v3 0/4] Introduce the microvm machine type
+X-Received-From: 2a00:1450:4864:20::42a
+Subject: Re: [Qemu-devel] Should memory hotplug work with vhost-user
+ backends?
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,113 +95,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, maran.wilson@oracle.com, mst@redhat.com,
- qemu-devel@nongnu.org, kraxel@redhat.com, pbonzini@redhat.com,
- sgarzare@redhat.com, rth@twiddle.net
+Cc: Mike Cui <cui@nutanix.com>, dilbert@stefanha-x1.localdomain,
+ "Michael S. Tsirkin" <mst@redhat.com>, Malcolm Crossley <malcolm@nutanix.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
+ "stefanha@redhat.com" <stefanha@redhat.com>,
+ Felipe Franciosi <felipe@nutanix.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "changchun.ouyang@intel.com" <changchun.ouyang@intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---WBsA/oQW3eTA3LlM
-Content-Type: text/plain; charset=us-ascii
+--oyUTqETQ0mS9luUI
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jul 02, 2019 at 02:11:02PM +0200, Sergio Lopez wrote:
-> Microvm is a machine type inspired by both NEMU and Firecracker, and
-> constructed after the machine model implemented by the latter.
+On Tue, Jul 02, 2019 at 10:08:54PM +0000, Raphael Norwitz wrote:
+> For background I am trying to work around a ram slot limit imposed by the=
+ vhost-user protocol. We are having trouble reconciling the comment here: h=
+ttps://github.com/qemu/qemu/blob/master/hw/virtio/vhost-user.c#L333  that =
+=E2=80=9CFor non-vring specific requests, like VHOST_USER_SET_MEM_TABLE., w=
+e just need to send it once the first time=E2=80=9D and the high level impl=
+ementation of memory hot-add, which calls set_mem_table every time a VM hot=
+ adds memory.
 >=20
-> It's main purpose is providing users a KVM-only machine type with fast
-> boot times, minimal attack surface (measured as the number of IO ports
-> and MMIO regions exposed to the Guest) and small footprint (specially
-> when combined with the ongoing QEMU modularization effort).
+> A few questions:
+> 1.
+> What exactly is the check `if (vhost_user_one_time_request(msg->hdr.reque=
+st) && dev->vq_index !=3D 0)` for? In the message for commit b931bfbf042983=
+f311b3b09894d8030b2755a638, which introduced the check, I see it says =E2=
+=80=9Cnon-vring specific messages[, which should] be sent only once=E2=80=
+=9D and gives VHOST_USER_SET_MEM_TABLE as an example one such message. The =
+`vhost_user_one_time_request()` call clearly checks whether this type of me=
+ssage is the kind of message is supposed to be sent once of which VHOST_USE=
+R_SET_MEM_TABLE is one. Why, then, does this commit add the check if `dev->=
+vq_index !=3D 0`? It seems like there is a latent assumption that after the=
+ first call dev->vq_index should be set to some value greater than one, how=
+ever for many cases such as vhost-user-scsi devices we can see this is clea=
+rly not the case https://github.com/qemu/qemu/blob/master/hw/scsi/vhost-use=
+r-scsi.c#L95. Is this check then =E2=80=98broken=E2=80=99 for such devices?
 >=20
-> Normally, other than the device support provided by KVM itself,
-> microvm only supports virtio-mmio devices. Microvm also includes a
-> legacy mode, which adds an ISA bus with a 16550A serial port, useful
-> for being able to see the early boot kernel messages.
->=20
-> Microvm only supports booting PVH-enabled Linux ELF images. Booting
-> other PVH-enabled kernels may be possible, but due to the lack of ACPI
-> and firmware, we're relying on the command line for specifying the
-> location of the virtio-mmio transports. If there's an interest on
-> using this machine type with other kernels, we'll try to find some
-> kind of middle ground solution.
->=20
-> This is the list of the exposed IO ports and MMIO regions when running
-> in non-legacy mode:
->=20
-> address-space: memory
->     00000000d0000000-00000000d00001ff (prio 0, i/o): virtio-mmio
->     00000000d0000200-00000000d00003ff (prio 0, i/o): virtio-mmio
->     00000000d0000400-00000000d00005ff (prio 0, i/o): virtio-mmio
->     00000000d0000600-00000000d00007ff (prio 0, i/o): virtio-mmio
->     00000000d0000800-00000000d00009ff (prio 0, i/o): virtio-mmio
->     00000000d0000a00-00000000d0000bff (prio 0, i/o): virtio-mmio
->     00000000d0000c00-00000000d0000dff (prio 0, i/o): virtio-mmio
->     00000000d0000e00-00000000d0000fff (prio 0, i/o): virtio-mmio
->     00000000fee00000-00000000feefffff (prio 4096, i/o): kvm-apic-msi
->=20
-> address-space: I/O
->   0000000000000000-000000000000ffff (prio 0, i/o): io
->     0000000000000020-0000000000000021 (prio 0, i/o): kvm-pic
->     0000000000000040-0000000000000043 (prio 0, i/o): kvm-pit
->     000000000000007e-000000000000007f (prio 0, i/o): kvmvapic
->     00000000000000a0-00000000000000a1 (prio 0, i/o): kvm-pic
->     00000000000004d0-00000000000004d0 (prio 0, i/o): kvm-elcr
->     00000000000004d1-00000000000004d1 (prio 0, i/o): kvm-elcr
->=20
-> A QEMU instance with the microvm machine type can be invoked this way:
->=20
->  - Normal mode:
->=20
-> qemu-system-x86_64 -M microvm -m 512m -smp 2 \
->  -kernel vmlinux -append "console=3Dhvc0 root=3D/dev/vda" \
->  -nodefaults -no-user-config \
->  -chardev pty,id=3Dvirtiocon0,server \
->  -device virtio-serial-device \
->  -device virtconsole,chardev=3Dvirtiocon0 \
->  -drive id=3Dtest,file=3Dtest.img,format=3Draw,if=3Dnone \
->  -device virtio-blk-device,drive=3Dtest \
->  -netdev tap,id=3Dtap0,script=3Dno,downscript=3Dno \
->  -device virtio-net-device,netdev=3Dtap0
->=20
->  - Legacy mode:
->=20
-> qemu-system-x86_64 -M microvm,legacy -m 512m -smp 2 \
->  -kernel vmlinux -append "console=3DttyS0 root=3D/dev/vda" \
->  -nodefaults -no-user-config \
->  -drive id=3Dtest,file=3Dtest.img,format=3Draw,if=3Dnone \
->  -device virtio-blk-device,drive=3Dtest \
->  -netdev tap,id=3Dtap0,script=3Dno,downscript=3Dno \
->  -device virtio-net-device,netdev=3Dtap0 \
->  -serial stdio
+> 2.
+> If this check is indeed broken for such devices, and set_mem_table call i=
+s only supposed to be run once for such devices, is the ability to call it =
+multiple times technically a bug for devices such as vhost-user-scsci devic=
+es? If so, this would imply that the existing ability to hot add memory to =
+vhost-user-scsi devices is by extension technically a bug/unintended behavi=
+or. Is this the case?
 
-Please post metrics that compare this against a minimal Q35.
+Hi Raphael,
+David Gilbert and I recently came to the conclusion that memory hotplug
+is not safe in vhost-user device backends built using libvhost-user.
 
-With qboot it was later found that SeaBIOS can achieve comparable boot
-times, so it wasn't worth maintaining qboot.
+It's likely that memory hotplug hasn't been fully thought through at the
+protocol specification and QEMU vhost-user master implementation levels
+either.
 
-Data is needed to show that microvm is really a significant improvement
-over a minimal Q35.
+We didn't investigate deeper for the time being, but I'm not surprised
+that you've found inconsistencies.  The ability to hotplug memory is a
+valuable feature.  It will be necessary to get it working sooner or
+later.
+
+Are you going to work on it?
 
 Stefan
 
---WBsA/oQW3eTA3LlM
+--oyUTqETQ0mS9luUI
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl0cfEEACgkQnKSrs4Gr
-c8hZWwf/a+/b3RJvDJq3tae3jFbA5YsmnFoHQe3nJLMwF/Gv4RqPsx+HOm3qh8aj
-jYRywd4ZeMAlQIsrBcYwDLpcs2u6EjQVFNuACcx/j+emAkcivmBWGjv9INpfzf0H
-0W02V92C/sfNlh+aBdiQbJX5crEjRPTePxO8U/Eg7UsY5yPTTljh03zPd4heVVQ0
-+4poMEPF/4ab7YxxB9Yjs4pwU/6aT+r4N0faP36X5N4MAEe6QGvZULmSwS91THFR
-T0Nduoyz5Dt/stdTz3qe5yhcOdbBOsjCLpcZrhRiGPnVPxp+ZmLuBF4j4Qp11hmh
-OiiafnaLCSBaG09I/znFmhqOS7lWBw==
-=ANBz
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl0cfa4ACgkQnKSrs4Gr
+c8ga1wgAmva3Qc55mEoXcDaqVs6KdktECFwlsbttk+jJ0+sd5TDoJNxaaghbayw1
+xFZN6/dvTjVE5y69GPaSdR1e0+BV+toLvdJwkf7TAjITBSa8OgQAbCwykttdHc6J
+nyd/xpeekni3qkVUz9+y/WHCyxAT1b3wUveTaEeeqdrxZViR0Tslcw3hhpiTwBZI
+JNj9CPsIjCIDSI8//cueqWeyy0LjrkYt6YbaTQdxXsNHeWm/czemWQkejNML+ZnY
+Ub4VCqrvA2xo/CL//Eff+Hn1FKAvEjDCJ1jGOMFqO65lhpdcE6XazK/3HFm6gTsz
+ditCEQfveCw7HPxL3m04XXWgjkFO5g==
+=Dev0
 -----END PGP SIGNATURE-----
 
---WBsA/oQW3eTA3LlM--
+--oyUTqETQ0mS9luUI--
 
