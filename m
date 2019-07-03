@@ -2,65 +2,66 @@ Return-Path: <SRS0=mdN/=VA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23A33C0650E
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 15:49:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B54FFC0650E
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 15:49:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EEC352187F
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 15:49:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EEC352187F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8D5A52187F
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 15:49:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D5A52187F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37026 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37028 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hihVy-00083J-Jz
-	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 11:49:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51629)
+	id 1hihWA-0008PH-PE
+	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 11:49:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51673)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <kwolf@redhat.com>) id 1hihTi-0006C3-F3
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 11:47:27 -0400
+ (envelope-from <no-reply@patchew.org>) id 1hihTp-0006OQ-BO
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 11:47:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1hihTg-0003kM-FN
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 11:47:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54856)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>)
- id 1hihTU-0003aq-L0; Wed, 03 Jul 2019 11:47:14 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 1674330821A3;
- Wed,  3 Jul 2019 15:46:56 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-116-252.ams2.redhat.com [10.36.116.252])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 74C854A4;
- Wed,  3 Jul 2019 15:46:51 +0000 (UTC)
-Date: Wed, 3 Jul 2019 17:46:49 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Denis Plotnikov <dplotnikov@virtuozzo.com>
-Message-ID: <20190703154649.GA7764@linux.fritz.box>
-References: <20190703110044.25610-1-dplotnikov@virtuozzo.com>
- <20190703110044.25610-2-dplotnikov@virtuozzo.com>
- <f41f5552-a625-3306-ba3b-50d60dbefe22@redhat.com>
- <030cb268-263d-580b-bd75-ec3bc973799b@virtuozzo.com>
+ (envelope-from <no-reply@patchew.org>) id 1hihTl-0003pN-0Q
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 11:47:32 -0400
+Resent-Date: Wed, 03 Jul 2019 11:47:32 -0400
+Resent-Message-Id: <E1hihTl-0003pN-0Q@eggs.gnu.org>
+Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21536)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1hihTk-0003oj-Qq
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 11:47:28 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1562168785; cv=none; d=zoho.com; s=zohoarc; 
+ b=CGF7exlJzZ7dvRdVsdPQQJIJcjb5tyBGIweC4tQ1ifJDd7G+fLgwdF3MJg1ZBJfzhYoSU6uOOWXRjdFugilFRDZwxgFkMYhox+EZrtpb24UTfKxqJwiA4JLNgvw7qMBJk//jDZxrq6T2wiI9q/6FNfDHESWHxll6ldd3SMlabjY=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1562168785;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+ bh=R6yrKMi5Jx4pGPSu76PKd1DI7KaZP+Hx7WK0TmVuhkg=; 
+ b=RUoCpj5WxDZ1w11qweJ+ngDrDmZ2Xd4GhYuQ0uxhNOSE04KjijmoCxSODsur2tjI4kiXm32FwITBvTMXL5NXXZh3e/CjYDdhXGC1LRnCImF1tlNhvboUDUfS8tphmmo5V7BBsDH+tWCK26W+/pdTJQsk7QmIW/QpHA/1z8JWU+A=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1562168784125640.045112365293;
+ Wed, 3 Jul 2019 08:46:24 -0700 (PDT)
+Message-ID: <156216878305.21218.2324370881009367445@c4a48874b076>
+In-Reply-To: <cover.1562154272.git.qemu_oss@crudebyte.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <030cb268-263d-580b-bd75-ec3bc973799b@virtuozzo.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Wed, 03 Jul 2019 15:47:02 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: qemu-devel@nongnu.org
+Date: Wed, 3 Jul 2019 08:46:24 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v1 1/3] qcow2: introduce compression type
- feature
+X-Received-From: 136.143.188.55
+Subject: Re: [Qemu-devel] [PATCH v5 0/5] 9p: Fix file ID collisions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,108 +73,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Denis Lunev <den@virtuozzo.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "armbru@redhat.com" <armbru@redhat.com>,
- "mreitz@redhat.com" <mreitz@redhat.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: berrange@redhat.com, qemu-devel@nongnu.org, antonios.motakis@huawei.com,
+ groug@kaod.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 03.07.2019 um 17:01 hat Denis Plotnikov geschrieben:
-> On 03.07.2019 17:14, Eric Blake wrote:
-> > On 7/3/19 6:00 AM, Denis Plotnikov wrote:
-> >> diff --git a/block/qcow2.c b/block/qcow2.c
-> >> index 3ace3b2209..921eb67b80 100644
-> >> --- a/block/qcow2.c
-> >> +++ b/block/qcow2.c
-> >> @@ -1202,6 +1202,47 @@ static int qcow2_update_options(BlockDriverState *bs, QDict *options,
-> >>       return ret;
-> >>   }
-> >>   
-> >> +static int check_compression_type(BDRVQcow2State *s, Error **errp)
-> >> +{
-> >> +    bool is_set;
-> >> +    int ret = 0;
-> >> +
-> >> +    switch (s->compression_type) {
-> >> +    case QCOW2_COMPRESSION_TYPE_ZLIB:
-> >> +        break;
-> >> +
-> >> +    default:
-> >> +        if (errp) {
-> > Useless check for errp being non-NULL.  What's worse, if the caller
-> > passes in NULL because they don't care about the error, then your code
-> > behaves differently.  Just call error_setg() and return -ENOTSUP
-> > unconditionally.
-> ok
-> > 
-> >> +            error_setg(errp, "qcow2: unknown compression type: %u",
-> >> +                       s->compression_type);
-> >> +            return -ENOTSUP;
-> >> +        }
-> >> +    }
-> >> +
-> >> +    /*
-> >> +     * with QCOW2_COMPRESSION_TYPE_ZLIB the corresponding incompatible
-> >> +     * feature flag must be absent, with other compression types the
-> >> +     * incompatible feature flag must be set
-> > Is there a strong reason for forbid the incompatible feature flag with
-> > ZLIB?
-> The main reason is to guarantee image opening for older qemu if 
-> compression type is zlib.
-> > Sure, it makes the image impossible to open with older qemu, but
-> > it doesn't get in the way of newer qemu opening it. I'll have to see how
-> > your spec changes documented this, to see if you could instead word it
-> > as 'for ZLIB, the incompatible feature flag may be absent'.
-> I just can't imagine when and why we would want to set incompatible 
-> feature flag with zlib. Suppose we have zlib with the flag set, then
-> older qemu can't open the image although it is able to work with the 
-> zlib compression type. For now, I don't understand why we should make 
-> such an artificial restriction.
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS9jb3Zlci4xNTYyMTU0MjcyLmdp
+dC5xZW11X29zc0BjcnVkZWJ5dGUuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhh
+dmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUg
+aW5mb3JtYXRpb246CgpUeXBlOiBzZXJpZXMKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2
+NSAwLzVdIDlwOiBGaXggZmlsZSBJRCBjb2xsaXNpb25zCk1lc3NhZ2UtaWQ6IGNvdmVyLjE1NjIx
+NTQyNzIuZ2l0LnFlbXVfb3NzQGNydWRlYnl0ZS5jb20KCj09PSBURVNUIFNDUklQVCBCRUdJTiA9
+PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4aXQgMApn
+aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBk
+aWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9n
+cmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFND
+UklQVCBFTkQgPT09CgpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjA4OTQzOTIgOXA6
+IFVzZSB2YXJpYWJsZSBsZW5ndGggc3VmZml4ZXMgZm9yIGlub2RlIHJlbWFwcGluZwo4NWJkM2Nm
+IDlwOiBzdGF0X3RvX3FpZDogaW1wbGVtZW50IHNsb3cgcGF0aAo1NWVhNjNkIDlwOiBBZGRlZCB2
+aXJ0ZnMgb3B0aW9uICdyZW1hcF9pbm9kZXMnCjg2Y2JmMjEgOXA6IFRyZWF0IG11bHRpcGxlIGRl
+dmljZXMgb24gb25lIGV4cG9ydCBhcyBhbiBlcnJvcgpkODY0YjVhIDlwOiB1bnNpZ25lZCB0eXBl
+IGZvciB0eXBlLCB2ZXJzaW9uLCBwYXRoCgo9PT0gT1VUUFVUIEJFR0lOID09PQoxLzUgQ2hlY2tp
+bmcgY29tbWl0IGQ4NjRiNWFkMTlmZiAoOXA6IHVuc2lnbmVkIHR5cGUgZm9yIHR5cGUsIHZlcnNp
+b24sIHBhdGgpCkVSUk9SOiBBdXRob3IgZW1haWwgYWRkcmVzcyBpcyBtYW5nbGVkIGJ5IHRoZSBt
+YWlsaW5nIGxpc3QKIzI6IApBdXRob3I6IENocmlzdGlhbiBTY2hvZW5lYmVjayB2aWEgUWVtdS1k
+ZXZlbCA8cWVtdS1kZXZlbEBub25nbnUub3JnPgoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdz
+LCA2OCBsaW5lcyBjaGVja2VkCgpQYXRjaCAxLzUgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2Ug
+cmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9y
+dCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4K
+CjIvNSBDaGVja2luZyBjb21taXQgODZjYmYyMTQzMmVhICg5cDogVHJlYXQgbXVsdGlwbGUgZGV2
+aWNlcyBvbiBvbmUgZXhwb3J0IGFzIGFuIGVycm9yKQpFUlJPUjogQXV0aG9yIGVtYWlsIGFkZHJl
+c3MgaXMgbWFuZ2xlZCBieSB0aGUgbWFpbGluZyBsaXN0CiMyOiAKQXV0aG9yOiBDaHJpc3RpYW4g
+U2Nob2VuZWJlY2sgdmlhIFFlbXUtZGV2ZWwgPHFlbXUtZGV2ZWxAbm9uZ251Lm9yZz4KCnRvdGFs
+OiAxIGVycm9ycywgMCB3YXJuaW5ncywgMTc1IGxpbmVzIGNoZWNrZWQKClBhdGNoIDIvNSBoYXMg
+c3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFy
+ZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVD
+S1BBVENIIGluIE1BSU5UQUlORVJTLgoKMy81IENoZWNraW5nIGNvbW1pdCA1NWVhNjNkYmFmYzIg
+KDlwOiBBZGRlZCB2aXJ0ZnMgb3B0aW9uICdyZW1hcF9pbm9kZXMnKQpFUlJPUjogQXV0aG9yIGVt
+YWlsIGFkZHJlc3MgaXMgbWFuZ2xlZCBieSB0aGUgbWFpbGluZyBsaXN0CiMyOiAKQXV0aG9yOiBD
+aHJpc3RpYW4gU2Nob2VuZWJlY2sgdmlhIFFlbXUtZGV2ZWwgPHFlbXUtZGV2ZWxAbm9uZ251Lm9y
+Zz4KCldBUk5JTkc6IEJsb2NrIGNvbW1lbnRzIHVzZSBhIGxlYWRpbmcgLyogb24gYSBzZXBhcmF0
+ZSBsaW5lCiMxNDQ6IEZJTEU6IGh3LzlwZnMvOXAuYzo1OTk6CisvKiBzdGF0X3RvX3FpZCBuZWVk
+cyB0byBtYXAgaW5vZGUgbnVtYmVyICg2NCBiaXRzKSBhbmQgZGV2aWNlIGlkICgzMiBiaXRzKQoK
+dG90YWw6IDEgZXJyb3JzLCAxIHdhcm5pbmdzLCAzODIgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMy81
+IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJv
+cnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2Vl
+CkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo0LzUgQ2hlY2tpbmcgY29tbWl0IDg1YmQzY2Yx
+ZjUxZiAoOXA6IHN0YXRfdG9fcWlkOiBpbXBsZW1lbnQgc2xvdyBwYXRoKQpFUlJPUjogQXV0aG9y
+IGVtYWlsIGFkZHJlc3MgaXMgbWFuZ2xlZCBieSB0aGUgbWFpbGluZyBsaXN0CiMyOiAKQXV0aG9y
+OiBDaHJpc3RpYW4gU2Nob2VuZWJlY2sgdmlhIFFlbXUtZGV2ZWwgPHFlbXUtZGV2ZWxAbm9uZ251
+Lm9yZz4KCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM3ODogRklMRTogaHcvOXBm
+cy85cC5jOjYyMToKKyAgICAgICAgcWh0X2luaXQoJnBkdS0+cy0+cXBmX3RhYmxlLCBxcGZfbG9v
+a3VwX2Z1bmMsIDEgPDwgMTYsIFFIVF9NT0RFX0FVVE9fUkVTSVpFKTsKCnRvdGFsOiAxIGVycm9y
+cywgMSB3YXJuaW5ncywgMTQyIGxpbmVzIGNoZWNrZWQKClBhdGNoIDQvNSBoYXMgc3R5bGUgcHJv
+YmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBw
+b3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGlu
+IE1BSU5UQUlORVJTLgoKNS81IENoZWNraW5nIGNvbW1pdCAwODk0MzkyOTg5MjIgKDlwOiBVc2Ug
+dmFyaWFibGUgbGVuZ3RoIHN1ZmZpeGVzIGZvciBpbm9kZSByZW1hcHBpbmcpCkVSUk9SOiBBdXRo
+b3IgZW1haWwgYWRkcmVzcyBpcyBtYW5nbGVkIGJ5IHRoZSBtYWlsaW5nIGxpc3QKIzI6IApBdXRo
+b3I6IENocmlzdGlhbiBTY2hvZW5lYmVjayB2aWEgUWVtdS1kZXZlbCA8cWVtdS1kZXZlbEBub25n
+bnUub3JnPgoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYWZ0ZXIgdGhhdCBvcGVuIHBhcmVudGhl
+c2lzICcoJwojOTI6IEZJTEU6IGh3LzlwZnMvOXAuYzo1ODU6CisgICAgcmV0dXJuICgodWludDY0
+X3QpbWlycm9yOGJpdCggdmFsdWUgICAgICAgICYgMHhmZikgPDwgNTYpIHwKCkVSUk9SOiBzcGFj
+ZSBwcm9oaWJpdGVkIGJlZm9yZSB0aGF0IGNsb3NlIHBhcmVudGhlc2lzICcpJwojOTg6IEZJTEU6
+IGh3LzlwZnMvOXAuYzo1OTE6CisgICAgICAgICAgICgodWludDY0X3QpbWlycm9yOGJpdCgodmFs
+dWUgPj4gNDgpICYgMHhmZikgPDwgOCApIHwKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJlZm9y
+ZSB0aGF0IGNsb3NlIHBhcmVudGhlc2lzICcpJwojOTk6IEZJTEU6IGh3LzlwZnMvOXAuYzo1OTI6
+CisgICAgICAgICAgICgodWludDY0X3QpbWlycm9yOGJpdCgodmFsdWUgPj4gNTYpICYgMHhmZikg
+ICAgICApIDsKCldBUk5JTkc6IEJsb2NrIGNvbW1lbnRzIHVzZSBhIGxlYWRpbmcgLyogb24gYSBz
+ZXBhcmF0ZSBsaW5lCiMxMDI6IEZJTEU6IGh3LzlwZnMvOXAuYzo1OTU6CisvKiogQGJyaWVmIFBh
+cmFtZXRlciBrIGZvciB0aGUgRXhwb25lbnRpYWwgR29sb21iIGFsZ29yaWhtIHRvIGJlIHVzZWQu
+CgpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUg
+bGluZQojMTIxOiBGSUxFOiBody85cGZzLzlwLmM6NjE0OgorLyoqIEBicmllZiBFeHBvbmVudGlh
+bCBHb2xvbWIgYWxnb3JpdGhtIGZvciBhcmJpdHJhcnkgayAoaW5jbHVkaW5nIGs9MCkuCgpXQVJO
+SU5HOiBCbG9jayBjb21tZW50cyB1c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQoj
+MTQ4OiBGSUxFOiBody85cGZzLzlwLmM6NjQxOgorLyoqIEBicmllZiBDb252ZXJ0cyBhIHN1ZmZp
+eCBpbnRvIGEgcHJlZml4LCBvciBhIHByZWZpeCBpbnRvIGEgc3VmZml4LgoKRVJST1I6ICJmb28q
+IGJhciIgc2hvdWxkIGJlICJmb28gKmJhciIKIzE1ODogRklMRTogaHcvOXBmcy85cC5jOjY1MToK
+K3N0YXRpYyBWYXJpTGVuQWZmaXggaW52ZXJ0QWZmaXgoY29uc3QgVmFyaUxlbkFmZml4KiBhZmZp
+eCkKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMxNjE6IEZJTEU6IGh3LzlwZnMv
+OXAuYzo2NTQ6CisgICAgICAgIC50eXBlID0gKGFmZml4LT50eXBlID09IEFmZml4VHlwZV9TdWZm
+aXgpID8gQWZmaXhUeXBlX1ByZWZpeCA6IEFmZml4VHlwZV9TdWZmaXgsCgpXQVJOSU5HOiBsaW5l
+IG92ZXIgODAgY2hhcmFjdGVycwojMTYyOiBGSUxFOiBody85cGZzLzlwLmM6NjU1OgorICAgICAg
+ICAudmFsdWUgPSAgbWlycm9yNjRiaXQoYWZmaXgtPnZhbHVlKSA+PiAoKHNpemVvZihhZmZpeC0+
+dmFsdWUpICogOCkgLSBhZmZpeC0+Yml0cyksCgpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2Ug
+YSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQojMTY3OiBGSUxFOiBody85cGZzLzlwLmM6
+NjYwOgorLyoqIEBicmllZiBHZW5lcmF0ZXMgc3VmZml4IG51bWJlcnMgd2l0aCAic3VmZml4LWZy
+ZWUiIHByb3BlcnR5LgoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBv
+biBhIHNlcGFyYXRlIGxpbmUKIzI0NjogRklMRTogaHcvOXBmcy85cC5jOjc1MToKKy8qKiBAYnJp
+ZWYgU2xvdyAvIGZ1bGwgbWFwcGluZyBob3N0IGlub2RlIG5yIC0+IGd1ZXN0IGlub2RlIG5yLgoK
+V0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBvbiBhIHNlcGFyYXRlIGxp
+bmUKIzMwMDogRklMRTogaHcvOXBmcy85cC5jOjgwNDoKKy8qKiBAYnJpZWYgUXVpY2sgbWFwcGlu
+ZyBob3N0IGlub2RlIG5yIC0+IGd1ZXN0IGlub2RlIG5yLgoKRVJST1I6IHNwYWNlcyByZXF1aXJl
+ZCBhcm91bmQgdGhhdCAnLScgKGN0eDpWeFYpCiMzNDg6IEZJTEU6IGh3LzlwZnMvOXAuYzo4NDg6
+CisgICAgICAgIC5pbm9fcHJlZml4ID0gKHVpbnQxNl90KSAoc3RidWYtPnN0X2lubyA+PiAoNjQt
+aW5vX2hhc2hfYml0cykpCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICBeCgpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2UgYSBsZWFkaW5nIC8q
+IG9uIGEgc2VwYXJhdGUgbGluZQojNDI5OiBGSUxFOiBody85cGZzLzlwLmg6MjQ0OgorLyoqIEBi
+cmllZiBVbmlxdWUgYWZmaXggb2YgdmFyaWFibGUgbGVuZ3RoLgoKRVJST1I6IGxpbmUgb3ZlciA5
+MCBjaGFyYWN0ZXJzCiM0NDI6IEZJTEU6IGh3LzlwZnMvOXAuaDoyNTc6CisgICAgaW50IGJpdHM7
+IC8qIExlbmdodCBvZiB0aGUgYWZmaXgsIHRoYXQgaXMgaG93IG1hbnkgKG9mIHRoZSBsb3dlc3Qp
+IGJpdHMgb2YgQGMgdmFsdWUgbXVzdCBiZSB1c2VkIGZvciBhcHBlbmRpbmcvcHJlcGVuZGluZyB0
+aGlzIGFmZml4IHRvIGl0cyBmaW5hbCByZXN1bHRpbmcsIHVuaXF1ZSBudW1iZXIuICovCgpFUlJP
+UjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzQ0ODogRklMRTogaHcvOXBmcy85cC5oOjI2MzoK
+KyAgICBpbnQgcHJlZml4X2JpdHM7IC8qIEhvdyBtYW55IChoaWdoKSBiaXRzIG9mIHRoZSBvcmln
+aW5hbCBpbm9kZSBudW1iZXIgc2hhbGwgYmUgdXNlZCBmb3IgaGFzaGluZy4gKi8KCnRvdGFsOiA4
+IGVycm9ycywgOSB3YXJuaW5ncywgMzg2IGxpbmVzIGNoZWNrZWQKClBhdGNoIDUvNSBoYXMgc3R5
+bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBm
+YWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BB
+VENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhp
+dGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3Bh
+dGNoZXcub3JnL2xvZ3MvY292ZXIuMTU2MjE1NDI3Mi5naXQucWVtdV9vc3NAY3J1ZGVieXRlLmNv
+bS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBh
+dXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNl
+bmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
 
-We don't want to create such images, but we want to keep our code as
-simple as possible.
-
-As your patch shows, forbidding the case is more work than just allowing
-it. So if external software can create such images, and it would just
-automatically work in QEMU, then why do the extra work to articifially
-forbid this?
-
-(Actually, it's likely that on the first header update, QEMU would just
-end up dropping the useless flag, so we even "fix" such images.)
-
-> >> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> >> index 7ccbfff9d0..6aa8b99993 100644
-> >> --- a/qapi/block-core.json
-> >> +++ b/qapi/block-core.json
-> >> @@ -78,6 +78,8 @@
-> >>   #
-> >>   # @bitmaps: A list of qcow2 bitmap details (since 4.0)
-> >>   #
-> >> +# @compression-type: the image cluster compression method (since 4.1)
-> >> +#
-> >>   # Since: 1.7
-> >>   ##
-> >>   { 'struct': 'ImageInfoSpecificQCow2',
-> >> @@ -89,7 +91,8 @@
-> >>         '*corrupt': 'bool',
-> >>         'refcount-bits': 'int',
-> >>         '*encrypt': 'ImageInfoSpecificQCow2Encryption',
-> >> -      '*bitmaps': ['Qcow2BitmapInfo']
-> >> +      '*bitmaps': ['Qcow2BitmapInfo'],
-> >> +      '*compression-type': 'Qcow2CompressionType'
-> > Why is this field optional? Can't we always populate it, even for older
-> > images?
-> Why we should if we don't care ?
-
-I was trying too check what the condition is under which the field will
-be present in the output, but I couldn't find any code for it.
-
-So it looks like this patch never makes use of the field and it's dead
-code?
-
-Kevin
 
