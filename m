@@ -6,60 +6,57 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A03E1C0650E
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 18:27:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 963E8C0650E
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 18:27:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7D4E121881
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 18:27:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D4E121881
+	by mail.kernel.org (Postfix) with ESMTPS id 744DF21881
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 18:27:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 744DF21881
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38394 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38396 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hijyI-0005bs-Qu
-	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 14:27:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56855)
+	id 1hijz3-0006Ju-Pj
+	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 14:27:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56476)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <ehabkost@redhat.com>) id 1hijgd-00054g-A4
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 14:08:56 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1hijfq-0004OF-G9
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 14:08:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1hijgb-0000wO-Tn
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 14:08:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43594)
+ (envelope-from <ehabkost@redhat.com>) id 1hijfn-0000OC-S1
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 14:08:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37478)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hijgb-0000vz-MD
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 14:08:53 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hijfl-0000K4-1I
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 14:08:02 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 007B0C04FFF6;
- Wed,  3 Jul 2019 18:08:53 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 262738762E;
+ Wed,  3 Jul 2019 18:07:57 +0000 (UTC)
 Received: from localhost (ovpn-116-30.gru2.redhat.com [10.97.116.30])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B7B555C5BB;
- Wed,  3 Jul 2019 18:08:50 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id AC6A9BA9E;
+ Wed,  3 Jul 2019 18:07:56 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>,
  Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
  Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
  Richard Henderson <rth@twiddle.net>
-Date: Wed,  3 Jul 2019 15:07:19 -0300
-Message-Id: <20190703180726.31267-37-ehabkost@redhat.com>
+Date: Wed,  3 Jul 2019 15:06:54 -0300
+Message-Id: <20190703180726.31267-12-ehabkost@redhat.com>
 In-Reply-To: <20190703180726.31267-1-ehabkost@redhat.com>
 References: <20190703180726.31267-1-ehabkost@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Wed, 03 Jul 2019 18:08:53 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ (mx1.redhat.com [10.5.110.26]); Wed, 03 Jul 2019 18:07:57 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL v4 36/43] i386: Define -IBRS, -noTSX,
- -IBRS versions of CPU models
+Subject: [Qemu-devel] [PULL v4 11/43] i386: Add die-level cpu topology to
+ x86CPU on PCMachine
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,283 +68,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Like Xu <like.xu@linux.intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add versions of CPU models that are equivalent to their -IBRS,
--noTSX and -IBRS variants.
+From: Like Xu <like.xu@linux.intel.com>
 
-The separate variants will eventually be removed and become
-aliases for these CPU versions.
+The die-level as the first PC-specific cpu topology is added to the leagcy
+cpu topology model, which has one die per package implicitly and only the
+numbers of sockets/cores/threads are configurable.
 
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-Message-Id: <20190628002844.24894-6-ehabkost@redhat.com>
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+In the new model with die-level support, the total number of logical
+processors (including offline) on board will be calculated as:
+
+     #cpus = #sockets * #dies * #cores * #threads
+
+and considering compatibility, the default value for #dies would be
+initialized to one in x86_cpu_initfn() and pc_machine_initfn().
+
+Signed-off-by: Like Xu <like.xu@linux.intel.com>
+Message-Id: <20190612084104.34984-2-like.xu@linux.intel.com>
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- target/i386/cpu.c | 186 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 186 insertions(+)
+ include/hw/i386/pc.h | 2 ++
+ target/i386/cpu.h    | 2 ++
+ hw/i386/pc.c         | 9 +++++++--
+ target/i386/cpu.c    | 1 +
+ 4 files changed, 12 insertions(+), 2 deletions(-)
 
+diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+index 884e35b9b2..764996e6b4 100644
+--- a/include/hw/i386/pc.h
++++ b/include/hw/i386/pc.h
+@@ -24,6 +24,7 @@
+  * PCMachineState:
+  * @acpi_dev: link to ACPI PM device that performs ACPI hotplug handling
+  * @boot_cpus: number of present VCPUs
++ * @smp_dies: number of dies per one package
+  */
+ struct PCMachineState {
+     /*< private >*/
+@@ -59,6 +60,7 @@ struct PCMachineState {
+     bool apic_xrupt_override;
+     unsigned apic_id_limit;
+     uint16_t boot_cpus;
++    unsigned smp_dies;
+ 
+     /* NUMA information: */
+     uint64_t numa_nodes;
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 93345792f4..14c19e61b1 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -1385,6 +1385,8 @@ typedef struct CPUX86State {
+     uint64_t xss;
+ 
+     TPRAccess tpr_access_type;
++
++    unsigned nr_dies;
+ } CPUX86State;
+ 
+ struct kvm_msrs;
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 73de30cc20..e18b1bade2 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -2306,9 +2306,13 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
+         return;
+     }
+ 
+-    /* if APIC ID is not set, set it based on socket/core/thread properties */
++    /*
++     * If APIC ID is not set,
++     * set it based on socket/die/core/thread properties.
++     */
+     if (cpu->apic_id == UNASSIGNED_APIC_ID) {
+-        int max_socket = (ms->smp.max_cpus - 1) / smp_threads / smp_cores;
++        int max_socket = (ms->smp.max_cpus - 1) /
++                                smp_threads / smp_cores / pcms->smp_dies;
+ 
+         if (cpu->socket_id < 0) {
+             error_setg(errp, "CPU socket-id is not set");
+@@ -2619,6 +2623,7 @@ static void pc_machine_initfn(Object *obj)
+     pcms->smbus_enabled = true;
+     pcms->sata_enabled = true;
+     pcms->pit_enabled = true;
++    pcms->smp_dies = 1;
+ 
+     pc_system_flash_create(pcms);
+ }
 diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index a611c6eae2..99ab6104f4 100644
+index 78830d403a..fac3cc028e 100644
 --- a/target/i386/cpu.c
 +++ b/target/i386/cpu.c
-@@ -1851,6 +1851,20 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
-             CPUID_EXT3_LAHF_LM,
-         .xlevel =3D 0x80000008,
-         .model_id =3D "Intel Core i7 9xx (Nehalem Class Core i7)",
-+        .versions =3D (X86CPUVersionDefinition[]) {
-+            { .version =3D 1 },
-+            {
-+                .version =3D 2,
-+                /* Equivalent to Nehalem-IBRS */
-+                .props =3D (PropValue[]) {
-+                    { "spec-ctrl", "on" },
-+                    { "model-id",
-+                      "Intel Core i7 9xx (Nehalem Core i7, IBRS update)"=
- },
-+                    { /* end of list */ }
-+                }
-+            },
-+            { /* end of list */ }
-+        }
-     },
-     {
-         .name =3D "Nehalem-IBRS",
-@@ -1907,6 +1921,20 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
-             CPUID_6_EAX_ARAT,
-         .xlevel =3D 0x80000008,
-         .model_id =3D "Westmere E56xx/L56xx/X56xx (Nehalem-C)",
-+        .versions =3D (X86CPUVersionDefinition[]) {
-+            { .version =3D 1 },
-+            {
-+                .version =3D 2,
-+                /* Equivalent to Westmere-IBRS */
-+                .props =3D (PropValue[]) {
-+                    { "spec-ctrl", "on" },
-+                    { "model-id",
-+                      "Westmere E56xx/L56xx/X56xx (IBRS update)" },
-+                    { /* end of list */ }
-+                }
-+            },
-+            { /* end of list */ }
-+        }
-     },
-     {
-         .name =3D "Westmere-IBRS",
-@@ -1971,6 +1999,20 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
-             CPUID_6_EAX_ARAT,
-         .xlevel =3D 0x80000008,
-         .model_id =3D "Intel Xeon E312xx (Sandy Bridge)",
-+        .versions =3D (X86CPUVersionDefinition[]) {
-+            { .version =3D 1 },
-+            {
-+                .version =3D 2,
-+                /* Equivalent to SandyBridge-IBRS */
-+                .props =3D (PropValue[]) {
-+                    { "spec-ctrl", "on" },
-+                    { "model-id",
-+                      "Intel Xeon E312xx (Sandy Bridge, IBRS update)" },
-+                    { /* end of list */ }
-+                }
-+            },
-+            { /* end of list */ }
-+        }
-     },
-     {
-         .name =3D "SandyBridge-IBRS",
-@@ -2043,6 +2085,20 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
-             CPUID_6_EAX_ARAT,
-         .xlevel =3D 0x80000008,
-         .model_id =3D "Intel Xeon E3-12xx v2 (Ivy Bridge)",
-+        .versions =3D (X86CPUVersionDefinition[]) {
-+            { .version =3D 1 },
-+            {
-+                .version =3D 2,
-+                /* Equivalent to IvyBridge-IBRS */
-+                .props =3D (PropValue[]) {
-+                    { "spec-ctrl", "on" },
-+                    { "model-id",
-+                      "Intel Xeon E3-12xx v2 (Ivy Bridge, IBRS)" },
-+                    { /* end of list */ }
-+                }
-+            },
-+            { /* end of list */ }
-+        }
-     },
-     {
-         .name =3D "IvyBridge-IBRS",
-@@ -2205,6 +2261,52 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
-             CPUID_6_EAX_ARAT,
-         .xlevel =3D 0x80000008,
-         .model_id =3D "Intel Core Processor (Haswell)",
-+        .versions =3D (X86CPUVersionDefinition[]) {
-+            { .version =3D 1 },
-+            {
-+                .version =3D 2,
-+                /* Equivalent to Haswell-noTSX */
-+                .props =3D (PropValue[]) {
-+                    { "hle", "off" },
-+                    { "rtm", "off" },
-+                    { "stepping", "1" },
-+                    { "model-id", "Intel Core Processor (Haswell, no TSX=
-)", },
-+                    { /* end of list */ }
-+                },
-+            },
-+            {
-+                .version =3D 3,
-+                /* Equivalent to Haswell-IBRS */
-+                .props =3D (PropValue[]) {
-+                    /* Restore TSX features removed by -v2 above */
-+                    { "hle", "on" },
-+                    { "rtm", "on" },
-+                    /*
-+                     * Haswell and Haswell-IBRS had stepping=3D4 in
-+                     * QEMU 4.0 and older
-+                     */
-+                    { "stepping", "4" },
-+                    { "spec-ctrl", "on" },
-+                    { "model-id",
-+                      "Intel Core Processor (Haswell, IBRS)" },
-+                    { /* end of list */ }
-+                }
-+            },
-+            {
-+                .version =3D 4,
-+                /* Equivalent to Haswell-noTSX-IBRS */
-+                .props =3D (PropValue[]) {
-+                    { "hle", "off" },
-+                    { "rtm", "off" },
-+                    /* spec-ctrl was already enabled by -v3 above */
-+                    { "stepping", "1" },
-+                    { "model-id",
-+                      "Intel Core Processor (Haswell, no TSX, IBRS)" },
-+                    { /* end of list */ }
-+                }
-+            },
-+            { /* end of list */ }
-+        }
-     },
-     {
-         .name =3D "Haswell-IBRS",
-@@ -2375,6 +2477,45 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
-             CPUID_6_EAX_ARAT,
-         .xlevel =3D 0x80000008,
-         .model_id =3D "Intel Core Processor (Broadwell)",
-+        .versions =3D (X86CPUVersionDefinition[]) {
-+            { .version =3D 1 },
-+            {
-+                .version =3D 2,
-+                /* Equivalent to Broadwell-noTSX */
-+                .props =3D (PropValue[]) {
-+                    { "hle", "off" },
-+                    { "rtm", "off" },
-+                    { "model-id", "Intel Core Processor (Broadwell, no T=
-SX)", },
-+                    { /* end of list */ }
-+                },
-+            },
-+            {
-+                .version =3D 3,
-+                /* Equivalent to Broadwell-IBRS */
-+                .props =3D (PropValue[]) {
-+                    /* Restore TSX features removed by -v2 above */
-+                    { "hle", "on" },
-+                    { "rtm", "on" },
-+                    { "spec-ctrl", "on" },
-+                    { "model-id",
-+                      "Intel Core Processor (Broadwell, IBRS)" },
-+                    { /* end of list */ }
-+                }
-+            },
-+            {
-+                .version =3D 4,
-+                /* Equivalent to Broadwell-noTSX-IBRS */
-+                .props =3D (PropValue[]) {
-+                    { "hle", "off" },
-+                    { "rtm", "off" },
-+                    /* spec-ctrl was already enabled by -v3 above */
-+                    { "model-id",
-+                      "Intel Core Processor (Broadwell, no TSX, IBRS)" }=
-,
-+                    { /* end of list */ }
-+                }
-+            },
-+            { /* end of list */ }
-+        }
-     },
-     {
-         .name =3D "Broadwell-IBRS",
-@@ -2465,6 +2606,20 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
-             CPUID_6_EAX_ARAT,
-         .xlevel =3D 0x80000008,
-         .model_id =3D "Intel Core Processor (Skylake)",
-+        .versions =3D (X86CPUVersionDefinition[]) {
-+            { .version =3D 1 },
-+            {
-+                .version =3D 2,
-+                /* Equivalent to Skylake-Client-IBRS */
-+                .props =3D (PropValue[]) {
-+                    { "spec-ctrl", "on" },
-+                    { "model-id",
-+                      "Intel Core Processor (Skylake, IBRS)" },
-+                    { /* end of list */ }
-+                }
-+            },
-+            { /* end of list */ }
-+        }
-     },
-     {
-         .name =3D "Skylake-Client-IBRS",
-@@ -2567,6 +2722,23 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
-             CPUID_6_EAX_ARAT,
-         .xlevel =3D 0x80000008,
-         .model_id =3D "Intel Xeon Processor (Skylake)",
-+        .versions =3D (X86CPUVersionDefinition[]) {
-+            { .version =3D 1 },
-+            {
-+                .version =3D 2,
-+                /* Equivalent to Skylake-Server-IBRS */
-+                .props =3D (PropValue[]) {
-+                    /* clflushopt was not added to Skylake-Server-IBRS *=
-/
-+                    /* TODO: add -v3 including clflushopt */
-+                    { "clflushopt", "off" },
-+                    { "spec-ctrl", "on" },
-+                    { "model-id",
-+                      "Intel Xeon Processor (Skylake, IBRS)" },
-+                    { /* end of list */ }
-+                }
-+            },
-+            { /* end of list */ }
-+        }
-     },
-     {
-         .name =3D "Skylake-Server-IBRS",
-@@ -3082,6 +3254,20 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
-         .xlevel =3D 0x8000001E,
-         .model_id =3D "AMD EPYC Processor",
-         .cache_info =3D &epyc_cache_info,
-+        .versions =3D (X86CPUVersionDefinition[]) {
-+            { .version =3D 1 },
-+            {
-+                .version =3D 2,
-+                /* Equivalent to EPYC-IBPB */
-+                .props =3D (PropValue[]) {
-+                    { "ibpb", "on" },
-+                    { "model-id",
-+                      "AMD EPYC Processor (with IBPB)" },
-+                    { /* end of list */ }
-+                }
-+            },
-+            { /* end of list */ }
-+        }
-     },
-     {
-         .name =3D "EPYC-IBPB",
---=20
+@@ -5639,6 +5639,7 @@ static void x86_cpu_initfn(Object *obj)
+     CPUX86State *env = &cpu->env;
+     FeatureWord w;
+ 
++    env->nr_dies = 1;
+     cpu_set_cpustate_pointers(cpu);
+ 
+     object_property_add(obj, "family", "int",
+-- 
 2.18.0.rc1.1.g3f1ff2140
 
 
