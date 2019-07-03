@@ -2,80 +2,64 @@ Return-Path: <SRS0=mdN/=VA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45153C0650E
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 14:25:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4139C06511
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 14:28:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1CB37218A4
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 14:25:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CB37218A4
+	by mail.kernel.org (Postfix) with ESMTPS id 900C0218A4
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 14:28:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 900C0218A4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36330 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36352 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1higCa-0001ke-4M
-	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 10:25:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54262)
+	id 1higF4-0003t9-Rd
+	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 10:28:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54849)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1higBT-0001D7-L0
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 10:24:32 -0400
+ (envelope-from <berrange@redhat.com>) id 1higDj-0002j3-Jn
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 10:26:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1higBS-0002qE-Cp
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 10:24:31 -0400
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:36583)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1higBR-0002os-MP
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 10:24:30 -0400
-Received: by mail-wm1-f67.google.com with SMTP id u8so2630272wmm.1
- for <qemu-devel@nongnu.org>; Wed, 03 Jul 2019 07:24:29 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=xtpsoeQfhYH2pNurTU4rwf4TjUPQfDEg467BhYq/Pd0=;
- b=nMRCmx0Bf94zeppBIPjsivapgRz6Vyf4WLrLarIfhKfzLdAJeRFbvnCK3g4AN1DmYu
- jMjnwcXREOP0+fZYAsEdW0JwLRrsrDFa1Jf1T2uMFXSS/+BgpvX17MDRP9SLiBj886TK
- ICW4ILEcHJ9EUmxbGAcA6LU7n2we6i9vLni4q8qS4G3nwQPx8frUss3L2z9cGC/wwb8J
- m8NTnpZG3vSF9Edr30DbY9USi5bhou3HE6pGwz9J1NHEU7C2UXu1r0LZdCU5+8XpOMd/
- Evhdk94mgSKj9E+xBqTBIOVtIgU69OWFRBMpPaMfPMOXi28e+FAi+0Dpvrv0+f5a2onI
- 9saQ==
-X-Gm-Message-State: APjAAAXCbNR6A4pGrx+vX11yXT499EEaLlgbrkQwf5PsJkPAz75n8dXZ
- 0lkn/0JPiCQcg0zD8o9w6Iiyrg==
-X-Google-Smtp-Source: APXvYqxDk0pBWexRk3I3iE1OhD3d8wrKS4sKVYdNFtBd0eFceWmcJygG5eS7KMUsd1AWbwgJmjkJ1Q==
-X-Received: by 2002:a7b:cc93:: with SMTP id p19mr8205188wma.12.1562163868593; 
- Wed, 03 Jul 2019 07:24:28 -0700 (PDT)
-Received: from [192.168.1.38] (56.red-88-18-140.staticip.rima-tde.net.
- [88.18.140.56])
- by smtp.gmail.com with ESMTPSA id a6sm16469wmj.15.2019.07.03.07.24.27
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Wed, 03 Jul 2019 07:24:27 -0700 (PDT)
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- qemu-devel@nongnu.org
-References: <20190703135411.28436-1-berrange@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <43fe3646-1ee5-238e-3f0b-dc0b2e976b6e@redhat.com>
-Date: Wed, 3 Jul 2019 16:24:26 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ (envelope-from <berrange@redhat.com>) id 1higDb-00046W-Ov
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 10:26:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53850)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1higDZ-00045J-Qx
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 10:26:43 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 8D9B785363;
+ Wed,  3 Jul 2019 14:26:35 +0000 (UTC)
+Received: from redhat.com (unknown [10.42.17.95])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 98A8387502;
+ Wed,  3 Jul 2019 14:26:27 +0000 (UTC)
+Date: Wed, 3 Jul 2019 15:26:25 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: minyard@acm.org
+Message-ID: <20190703142625.GD23082@redhat.com>
+References: <20190701183100.7849-1-minyard@acm.org>
+ <20190701183100.7849-3-minyard@acm.org>
 MIME-Version: 1.0
-In-Reply-To: <20190703135411.28436-1-berrange@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Disposition: inline
+In-Reply-To: <20190701183100.7849-3-minyard@acm.org>
+User-Agent: Mutt/1.12.0 (2019-05-25)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.25]); Wed, 03 Jul 2019 14:26:40 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.128.67
-Subject: Re: [Qemu-devel] [PATCH] doc: document that the monitor console is
- a privileged control interface
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] ipmi: Add a UUID device property
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,100 +71,175 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, P J P <ppandit@redhat.com>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- Markus Armbruster <armbru@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Corey Minyard <cminyard@mvista.com>, "Michael S . Tsirkin" <mst@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ =?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/3/19 3:54 PM, Daniel P. Berrangé wrote:
-> A supposed exploit of QEMU was recently announced as CVE-2019-12928
-> claiming that the monitor console was insecure because the "migrate"
-> comand enabled arbitrary command execution for a remote attacker.
-> 
-> For this to be a flaw the user launching QEMU must have configured
-> the monitor in a way that allows for other userrs to access it. The
-> exploit report quoted use of the "tcp" character device backend for
-> QMP.
-> 
-> This would indeed allow any network user to connect to QEMU and
-> execute arbitrary comamnds, however, this is not a flaw in QEMU.
+On Mon, Jul 01, 2019 at 01:31:00PM -0500, minyard@acm.org wrote:
+> From: Corey Minyard <cminyard@mvista.com>
+>=20
+> Using the UUID that qemu generates probably isn't the best thing
+> to do, allow it to be passed in via properties, and use QemuUUID
+> for the type.
 
-comamnds -> commands
+AFAICT, QEMU isn't generating a UUID in the current code.
 
-> It is the normal expected behaviour of the monitor console and the
-> commands it supports. Given a monitor connection, there are many
-> ways to access host filesystem content besides the migrate command.
-> 
-> The reality is that the monitor console (whether QMP or HMP) is
-> considered a privileged interface to QEMU and as such must only
-> be made available to trusted users. IOW, making it available with
-> no authentication over TCP is simply a, very serious, user
-> configuration error not a security flaw in QEMU itself.
-> 
-> The one thing this bogus security report highlights though is that
-> we have not clearly documented the security implications around the
-> use of the monitor. Add a few paragraphs of text to the security
-> docs explaining why the monitor is a privileged interface and making
-> a recommendation to only use the UNIX socket character device backend.
-> 
-> Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+The device is taking the UUID that the user has set
+explicitly via the --uuid argument to QEMU. If --uuid
+is not set, then it is leaving it all zeros.
+
+Defaulting to the UUID from --uuid looks quite reasonable
+to me & I don't think we should break that current usage.
+
+I can see justification for being able to further override
+that default with a device level property though.
+
+
+> If the UUID is not set, return an unsupported command error.  This
+> way we are not providing an all-zero (or randomly generated) GUID
+> to the IPMI user.  This lets the host fall back to the other
+> method of using the get device id command to determind the BMC
+> being accessed.
+
+Reporting an error would be a guest ABI regression from current QEMU
+behaviour for anyone who is using the IPMI device right now, without
+--uuid.
+
+I'm not sure how much we care about guest ABI preservation for
+the IPIMI device right now though ? Does it support migration
+at all ?
+
+>=20
+> Signed-off-by: Corey Minyard <cminyard@mvista.com>
+> Cc: C=C3=A9dric Le Goater <clg@kaod.org>
+> Cc: David Gibson <david@gibson.dropbear.id.au>
+> Cc: Michael S. Tsirkin <mst@redhat.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
 > ---
->  docs/security.texi | 36 ++++++++++++++++++++++++++++++++++++
->  1 file changed, 36 insertions(+)
-> 
-> diff --git a/docs/security.texi b/docs/security.texi
-> index 927764f1e6..5bff01449d 100644
-> --- a/docs/security.texi
-> +++ b/docs/security.texi
-> @@ -129,3 +129,39 @@ those resources that were granted to it.
->  system calls that are not needed by QEMU, thereby reducing the host kernel
->  attack surface.
->  @end itemize
+>  hw/ipmi/ipmi_bmc_sim.c | 22 ++++++++++++++--------
+>  qemu-options.hx        | 10 +++++++---
+>  2 files changed, 21 insertions(+), 11 deletions(-)
+>=20
+> diff --git a/hw/ipmi/ipmi_bmc_sim.c b/hw/ipmi/ipmi_bmc_sim.c
+> index 1980536517..007e2c6588 100644
+> --- a/hw/ipmi/ipmi_bmc_sim.c
+> +++ b/hw/ipmi/ipmi_bmc_sim.c
+> @@ -221,7 +221,7 @@ struct IPMIBmcSim {
+>      uint8_t restart_cause;
+> =20
+>      uint8_t acpi_power_state[2];
+> -    uint8_t uuid[16];
+> +    QemuUUID uuid;
+> =20
+>      IPMISel sel;
+>      IPMISdr sdr;
+> @@ -937,8 +937,19 @@ static void get_device_guid(IPMIBmcSim *ibs,
+>  {
+>      unsigned int i;
+> =20
+> +    /* An uninitialized uuid is all zeros, use that to know if it is s=
+et. */
+>      for (i =3D 0; i < 16; i++) {
+> -        rsp_buffer_push(rsp, ibs->uuid[i]);
+> +        if (ibs->uuid.data[i]) {
+> +            goto uuid_set;
+> +        }
+> +    }
+> +    /* No uuid is set, return an error. */
+> +    rsp_buffer_set_error(rsp, IPMI_CC_INVALID_CMD);
+> +    return;
 > +
-> +@section Sensitive configurations
-> +
-> +There are aspects of QEMU that can have non-obvious security implications
-> +which users & management applications must be aware of.
-> +
-> +@subsection Monitor console (QMP and HMP)
-> +
-> +The monitor console (whether used with QMP or HMP) provides an RPC interface
-> +to dynamically control many aspects of QEMU's runtime operation. Many of the
-> +commands exposed will instruct QEMU to access content on the host filesysystem
-> +and/or trigger spawning of external processes.
-> +
-> +For example, the @code{migrate} command allows for the spawning of arbitrary
-> +processes for the purpose of tunnelling the migration data stream. The
-> +@code{blockdev-add} command instructs QEMU to open arbitrary files, exposing
-> +their content to the guest as a virtual disk.
-> +
-> +Unless QEMU is otherwise confined using technologies such as SELinux, AppArmor,
-> +or Linux namespaces, the monitor console should be considered to have privileges
-> +equivalent to those of the user account QEMU is running under.
-> +
-> +It is further important to consider the security of the character device backend
-> +over which the monitor console is exposed. It needs to have protection against
-> +malicious third parties which might try to make unauthorized connections, or
-> +perform man-in-the-middle attacks. Many of the character device backends do not
-> +satisfy this requirement and so must not be used for the monitor console.
-> +
-> +The general recommendation is that the monitor console should be exposed over
-> +a UNIX domain socket backend to the local host only. Use of the TCP based
-> +character device backend is inappropriate unless configured to use both TLS
-> +encryption and authorization control policy on client connections.
-> +
-> +In summary the monitor console is considered a privileged control interface to
+> + uuid_set:
+> +    for (i =3D 0; i < 16; i++) {
+> +        rsp_buffer_push(rsp, ibs->uuid.data[i]);
+>      }
+>  }
+> =20
+> @@ -1980,12 +1991,6 @@ static void ipmi_sim_realize(DeviceState *dev, E=
+rror **errp)
+>      ibs->acpi_power_state[0] =3D 0;
+>      ibs->acpi_power_state[1] =3D 0;
+> =20
+> -    if (qemu_uuid_set) {
+> -        memcpy(&ibs->uuid, &qemu_uuid, 16);
+> -    } else {
+> -        memset(&ibs->uuid, 0, 16);
+> -    }
+> -
+>      ipmi_init_sensors_from_sdrs(ibs);
+>      register_cmds(ibs);
+> =20
+> @@ -2005,6 +2010,7 @@ static Property ipmi_sim_properties[] =3D {
+>      DEFINE_PROP_UINT8("fwrev2", IPMIBmcSim, fwrev2, 0),
+>      DEFINE_PROP_UINT32("mfg_id", IPMIBmcSim, mfg_id, 0),
+>      DEFINE_PROP_UINT16("product_id", IPMIBmcSim, product_id, 0),
+> +    DEFINE_PROP_UUID_NODEFAULT("guid", IPMIBmcSim, uuid),
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+> =20
+> diff --git a/qemu-options.hx b/qemu-options.hx
+> index 0d8beb4afd..ec56ab8f6f 100644
+> --- a/qemu-options.hx
+> +++ b/qemu-options.hx
+> @@ -700,7 +700,7 @@ possible drivers and properties, use @code{-device =
+help} and
+>  @code{-device @var{driver},help}.
+> =20
+>  Some drivers are:
+> -@item -device ipmi-bmc-sim,id=3D@var{id}[,slave_addr=3D@var{val}][,sdr=
+file=3D@var{file}][,furareasize=3D@var{val}][,furdatafile=3D@var{file}]
+> +@item -device ipmi-bmc-sim,id=3D@var{id}[,slave_addr=3D@var{val}][,sdr=
+file=3D@var{file}][,furareasize=3D@var{val}][,furdatafile=3D@var{file}][,=
+guid=3D@var{uuid}]
+> =20
+>  Add an IPMI BMC.  This is a simulation of a hardware management
+>  interface processor that normally sits on a system.  It provides
+> @@ -713,8 +713,8 @@ controllers.  If you don't know what this means, it=
+ is safe to ignore
+>  it.
+> =20
+>  @table @option
+> -@item bmc=3D@var{id}
+> -The BMC to connect to, one of ipmi-bmc-sim or ipmi-bmc-extern above.
+> +@item id=3D@var{id}
+> +The BMC id for interfaces to use this device.
+>  @item slave_addr=3D@var{val}
+>  Define slave address to use for the BMC.  The default is 0x20.
+>  @item sdrfile=3D@var{file}
+> @@ -723,6 +723,10 @@ file containing raw Sensor Data Records (SDR) data=
+. The default is none.
+>  size of a Field Replaceable Unit (FRU) area.  The default is 1024.
+>  @item frudatafile=3D@var{file}
+>  file containing raw Field Replaceable Unit (FRU) inventory data. The d=
+efault is none.
+> +@item guid=3D@var{uuid}
+> +value for the GUID for the BMC, in standard UUID format.  If this is s=
+et,
+> +get "Get GUID" command to the BMC will return it.  Otherwise "Get GUID=
+"
+> +will return an error.
+>  @end table
+> =20
+>  @item -device ipmi-bmc-extern,id=3D@var{id},chardev=3D@var{id}[,slave_=
+addr=3D@var{val}]
+> --=20
+> 2.17.1
+>=20
+>=20
 
-I'd have written "In summary, " or "In summary: " but I'm not sure this
-is correct/better ;)
-
-> +QEMU and as such should only be made accessible to a trusted management
-> +application or user.
-> 
-
-Thanks for writing this down.
-
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
 
