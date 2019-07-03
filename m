@@ -7,56 +7,56 @@ X-Spam-Status: No, score=-10.0 required=3.0
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30A52C0650E
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 09:07:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 051F3C4646D
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 09:08:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 090312189E
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 09:07:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 090312189E
+	by mail.kernel.org (Postfix) with ESMTPS id CD6A5218A3
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 09:08:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD6A5218A3
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33910 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33913 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hibEn-0005ZL-3M
-	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 05:07:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51790)
+	id 1hibFB-0006ma-3W
+	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 05:08:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51494)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <palmer@dabbelt.com>) id 1hiaqB-0006Y9-7l
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 04:42:15 -0400
+ (envelope-from <palmer@dabbelt.com>) id 1hiapn-0006CX-E9
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 04:41:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <palmer@dabbelt.com>) id 1hiaq6-0008IZ-Tg
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 04:42:11 -0400
-Received: from mail-lf1-f53.google.com ([209.85.167.53]:38083)
+ (envelope-from <palmer@dabbelt.com>) id 1hiapi-0007IC-RV
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 04:41:47 -0400
+Received: from mail-lj1-f176.google.com ([209.85.208.176]:44249)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1hiaq6-0007YK-GO
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 04:42:06 -0400
-Received: by mail-lf1-f53.google.com with SMTP id b11so1160687lfa.5
- for <qemu-devel@nongnu.org>; Wed, 03 Jul 2019 01:41:49 -0700 (PDT)
+ (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1hiaph-00079x-Rt
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 04:41:42 -0400
+Received: by mail-lj1-f176.google.com with SMTP id k18so1450895ljc.11
+ for <qemu-devel@nongnu.org>; Wed, 03 Jul 2019 01:41:40 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding:cc:from:to;
- bh=/3ducq0eP8I5aPrZO6qPfK+y5RApmcrkJq95TSYVf1E=;
- b=Vl7R8tjtKEeqfAB3TifOlVw/cu7aIgTEjTi7n6R6TPx6FhudKp4Jp4kkDR/PHEbZEG
- FRsGc69BzrMFT/Yx5t6E/GkPXBLyLmxiGM1Yz/i9wOr7jvzpH/TRtJUTqYQXG7EC9uNq
- rqNdpxKKs7q5VxWS4yeXp9uiq8kedlVmhdIqFJDIW5i/Sanzi/jlTT1LbD6ucL5yjbDK
- GjBqBf4dr/DmXnqNEdLsGbUQnQ/jQGSi9qAQyQhuLDTslNJXZQnH2cx4Vzz3L6uHB6Gy
- wdbw8WBqmjWquz95mUk9kz1Z+XjLBncX3ThElynd3fAQ9/vWhzKBIf6xC8NiwJqydlXd
- OjBw==
-X-Gm-Message-State: APjAAAWtPkKa5Oc7vG46V4cZ96mefQRWatlvPvx5eK6YAZz+tXnmQelR
- LB5mTcYCkWwqXMD3HZkNsCKUjYknSadI5g==
-X-Google-Smtp-Source: APXvYqxoAgq0YYa89zjoETfM2w/HxYniRuVbFU5pIzg4h3H1o/EhwOJdT5JApCUV6GHLMklwaLSPLQ==
-X-Received: by 2002:a19:4a50:: with SMTP id x77mr3730778lfa.91.1562143308293; 
- Wed, 03 Jul 2019 01:41:48 -0700 (PDT)
+ bh=CCTUA83WsmaGam2XV7hw8vEWvHgX2YXg8c48BvbdAho=;
+ b=GJKs9P738fHDrI+6IJCKcAw4k4bC1v8JtMQz4bYmr2OxafwI9Q7LtCBw2/i1rMZqsS
+ aLEOl7HvDxBqLMf8wMnzJ8+H9oT7wZhpbNtuPqYFaepzJk82sXVnqYdiM7tCQurJYkRk
+ KPwbJf6IeIGRjFKNdlbyGRzveem2sKmFPd6YSDZG6OLFptCb7FEQqub8zc38QxkeqCND
+ P63oGw3/KLo1bSR3Rp480wS1SQyClnAUVpEpq8jNRmDGleZ681MfSHJStjKDF7fiCS54
+ fcLEFqcmFSOLMTyo+n2ZDeQc1AuBN+d/moLwR7wr9RhjvAhLSRwIt4FxJkjoNQiZR7p6
+ LVVA==
+X-Gm-Message-State: APjAAAV8dgW0QmyaH93p4mydmzMJllk01BT5nwdb1fOTDxG3vggYmj9G
+ RhKLYZ+W1HTlTXNULUdfAtOIt4Zae7rlPg==
+X-Google-Smtp-Source: APXvYqxGJt5wVKU0cwAAl9cE8Cx+R3FTZ4xPgJuQDOa8Oo554v/Gj4878RpUVq7nN1j5ceZqq0jHLg==
+X-Received: by 2002:a2e:870f:: with SMTP id m15mr20205143lji.223.1562143298179; 
+ Wed, 03 Jul 2019 01:41:38 -0700 (PDT)
 Received: from localhost ([134.17.27.127])
- by smtp.gmail.com with ESMTPSA id u13sm291020lfi.4.2019.07.03.01.41.47
+ by smtp.gmail.com with ESMTPSA id v21sm347593lje.10.2019.07.03.01.41.37
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Wed, 03 Jul 2019 01:41:47 -0700 (PDT)
-Date: Wed,  3 Jul 2019 01:40:38 -0700
-Message-Id: <20190703084048.6980-23-palmer@sifive.com>
+ Wed, 03 Jul 2019 01:41:37 -0700 (PDT)
+Date: Wed,  3 Jul 2019 01:40:32 -0700
+Message-Id: <20190703084048.6980-17-palmer@sifive.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190703084048.6980-1-palmer@sifive.com>
 References: <20190703084048.6980-1-palmer@sifive.com>
@@ -66,9 +66,9 @@ From: Palmer Dabbelt <palmer@sifive.com>
 To: Peter Maydell <peter.maydell@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.167.53
-Subject: [Qemu-devel] [PULL 22/32] RISC-V: Add support for the Zicsr
- extension
+X-Received-From: 209.85.208.176
+Subject: [Qemu-devel] [PULL 16/32] target/riscv: Set privledge spec 1.11.0
+ as default
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,66 +87,51 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The various CSR instructions have been split out of the base ISA as part
-of the ratification process.  This patch adds a Zicsr argument, which
-disables all the CSR instructions.
+From: Alistair Francis <alistair.francis@wdc.com>
 
+Set the priv spec version 1.11.0 as the default and allow selecting it
+via the command line.
+
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+Reviewed-by: Palmer Dabbelt <palmer@sifive.com>
 Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- target/riscv/cpu.c | 1 +
- target/riscv/cpu.h | 1 +
- target/riscv/csr.c | 6 ++++++
- 3 files changed, 8 insertions(+)
+ target/riscv/cpu.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
 diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
-index bbad39a337b3..915b9e77df33 100644
+index 17467c3d8705..ba1325f43533 100644
 --- a/target/riscv/cpu.c
 +++ b/target/riscv/cpu.c
-@@ -442,6 +442,7 @@ static Property riscv_cpu_properties[] = {
-     DEFINE_PROP_BOOL("u", RISCVCPU, cfg.ext_u, true),
-     DEFINE_PROP_BOOL("Counters", RISCVCPU, cfg.ext_counters, true),
-     DEFINE_PROP_BOOL("Zifencei", RISCVCPU, cfg.ext_ifencei, true),
-+    DEFINE_PROP_BOOL("Zicsr", RISCVCPU, cfg.ext_icsr, true),
-     DEFINE_PROP_STRING("priv_spec", RISCVCPU, cfg.priv_spec),
-     DEFINE_PROP_BOOL("mmu", RISCVCPU, cfg.mmu, true),
-     DEFINE_PROP_BOOL("pmp", RISCVCPU, cfg.pmp, true),
-diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-index ba551cd3082c..0adb307f3298 100644
---- a/target/riscv/cpu.h
-+++ b/target/riscv/cpu.h
-@@ -224,6 +224,7 @@ typedef struct RISCVCPU {
-         bool ext_u;
-         bool ext_counters;
-         bool ext_ifencei;
-+        bool ext_icsr;
- 
-         char *priv_spec;
-         char *user_spec;
-diff --git a/target/riscv/csr.c b/target/riscv/csr.c
-index de67741f3648..e0d45867607a 100644
---- a/target/riscv/csr.c
-+++ b/target/riscv/csr.c
-@@ -793,6 +793,7 @@ int riscv_csrrw(CPURISCVState *env, int csrno, target_ulong *ret_value,
+@@ -111,7 +111,7 @@ static void riscv_any_cpu_init(Object *obj)
  {
-     int ret;
-     target_ulong old_value;
-+    RISCVCPU *cpu = env_archcpu(env);
+     CPURISCVState *env = &RISCV_CPU(obj)->env;
+     set_misa(env, RVXLEN | RVI | RVM | RVA | RVF | RVD | RVC | RVU);
+-    set_versions(env, USER_VERSION_2_02_0, PRIV_VERSION_1_10_0);
++    set_versions(env, USER_VERSION_2_02_0, PRIV_VERSION_1_11_0);
+     set_resetvec(env, DEFAULT_RSTVEC);
+ }
  
-     /* check privileges and return -1 if check fails */
- #if !defined(CONFIG_USER_ONLY)
-@@ -803,6 +804,11 @@ int riscv_csrrw(CPURISCVState *env, int csrno, target_ulong *ret_value,
+@@ -316,7 +316,7 @@ static void riscv_cpu_realize(DeviceState *dev, Error **errp)
+     RISCVCPU *cpu = RISCV_CPU(dev);
+     CPURISCVState *env = &cpu->env;
+     RISCVCPUClass *mcc = RISCV_CPU_GET_CLASS(dev);
+-    int priv_version = PRIV_VERSION_1_10_0;
++    int priv_version = PRIV_VERSION_1_11_0;
+     int user_version = USER_VERSION_2_02_0;
+     target_ulong target_misa = 0;
+     Error *local_err = NULL;
+@@ -328,7 +328,9 @@ static void riscv_cpu_realize(DeviceState *dev, Error **errp)
      }
- #endif
  
-+    /* ensure the CSR extension is enabled. */
-+    if (!cpu->cfg.ext_icsr) {
-+        return -1;
-+    }
-+
-     /* check predicate */
-     if (!csr_ops[csrno].predicate || csr_ops[csrno].predicate(env, csrno) < 0) {
-         return -1;
+     if (cpu->cfg.priv_spec) {
+-        if (!g_strcmp0(cpu->cfg.priv_spec, "v1.10.0")) {
++        if (!g_strcmp0(cpu->cfg.priv_spec, "v1.11.0")) {
++            priv_version = PRIV_VERSION_1_11_0;
++        } else if (!g_strcmp0(cpu->cfg.priv_spec, "v1.10.0")) {
+             priv_version = PRIV_VERSION_1_10_0;
+         } else if (!g_strcmp0(cpu->cfg.priv_spec, "v1.9.1")) {
+             priv_version = PRIV_VERSION_1_09_1;
 -- 
 2.21.0
 
