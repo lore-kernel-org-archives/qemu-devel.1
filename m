@@ -6,57 +6,60 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42E21C0650E
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 18:39:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA505C0650E
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 18:40:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 21C4321852
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 18:39:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21C4321852
+	by mail.kernel.org (Postfix) with ESMTPS id 87EC921852
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 18:40:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87EC921852
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38492 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38496 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hikAG-0000Mb-ES
-	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 14:39:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56574)
+	id 1hikAx-0000o5-D1
+	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 14:40:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56814)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <ehabkost@redhat.com>) id 1hijg2-0004YG-0R
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 14:08:19 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1hijgY-0004uB-31
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 14:08:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1hijfx-0000Wz-SA
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 14:08:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52868)
+ (envelope-from <ehabkost@redhat.com>) id 1hijgW-0000sv-8d
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 14:08:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54878)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hijfx-0000WV-IA
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 14:08:13 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hijgW-0000qL-2R
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 14:08:48 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id D1C5A356CD;
- Wed,  3 Jul 2019 18:08:12 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id E50EF30860A2;
+ Wed,  3 Jul 2019 18:08:44 +0000 (UTC)
 Received: from localhost (ovpn-116-30.gru2.redhat.com [10.97.116.30])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 63BA9173B9;
- Wed,  3 Jul 2019 18:08:12 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7B47817DD0;
+ Wed,  3 Jul 2019 18:08:44 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>,
  Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
  Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
  Richard Henderson <rth@twiddle.net>
-Date: Wed,  3 Jul 2019 15:07:01 -0300
-Message-Id: <20190703180726.31267-19-ehabkost@redhat.com>
+Date: Wed,  3 Jul 2019 15:07:16 -0300
+Message-Id: <20190703180726.31267-34-ehabkost@redhat.com>
 In-Reply-To: <20190703180726.31267-1-ehabkost@redhat.com>
 References: <20190703180726.31267-1-ehabkost@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.30]); Wed, 03 Jul 2019 18:08:12 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.44]); Wed, 03 Jul 2019 18:08:44 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL v4 18/43] numa: deprecate implict memory
- distribution between nodes
+Subject: [Qemu-devel] [PULL v4 33/43] i386: Add x-force-features option for
+ testing
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,64 +71,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Igor Mammedov <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Igor Mammedov <imammedo@redhat.com>
+Add a new option that can be used to disable feature flag
+filtering.  This will allow CPU model compatibility test cases to
+work without host hardware dependencies.
 
-Implicit RAM distribution between nodes has exactly the same issues as:
-  "numa: deprecate 'mem' parameter of '-numa node' option"
-only with QEMU being the user that's 'adding' 'mem' parameter.
-
-Deprecate it, to get it out of the way so that we could consolidate
-guest RAM allocation using memory backends making it consistent and
-possibly later on transition to using memory devices instead of
-adhoc memory mapping for the initial RAM.
-
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Message-Id: <1559205199-233510-4-git-send-email-imammedo@redhat.com>
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+Message-Id: <20190628002844.24894-3-ehabkost@redhat.com>
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- numa.c               | 3 +++
- qemu-deprecated.texi | 8 ++++++++
- 2 files changed, 11 insertions(+)
+ target/i386/cpu.h | 6 ++++++
+ target/i386/cpu.c | 8 ++++++--
+ 2 files changed, 12 insertions(+), 2 deletions(-)
 
-diff --git a/numa.c b/numa.c
-index 7d449c7e95..c1f5e84fa5 100644
---- a/numa.c
-+++ b/numa.c
-@@ -410,6 +410,9 @@ void numa_complete_configuration(MachineState *ms)
-         if (i == nb_numa_nodes) {
-             assert(mc->numa_auto_assign_ram);
-             mc->numa_auto_assign_ram(mc, numa_info, nb_numa_nodes, ram_size);
-+            warn_report("Default splitting of RAM between nodes is deprecated,"
-+                        " Use '-numa node,memdev' to explictly define RAM"
-+                        " allocation per node");
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 0a96c78669..4727226a6a 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -1417,6 +1417,12 @@ struct X86CPU {
+=20
+     bool check_cpuid;
+     bool enforce_cpuid;
++    /*
++     * Force features to be enabled even if the host doesn't support the=
+m.
++     * This is dangerous and should be done only for testing CPUID
++     * compatibility.
++     */
++    bool force_features;
+     bool expose_kvm;
+     bool expose_tcg;
+     bool migratable;
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 6c04a258ed..9059121273 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -5250,8 +5250,11 @@ static int x86_cpu_filter_features(X86CPU *cpu)
+         uint32_t host_feat =3D
+             x86_cpu_get_supported_feature_word(w, false);
+         uint32_t requested_features =3D env->features[w];
+-        env->features[w] &=3D host_feat;
+-        cpu->filtered_features[w] =3D requested_features & ~env->feature=
+s[w];
++        uint32_t available_features =3D requested_features & host_feat;
++        if (!cpu->force_features) {
++            env->features[w] =3D available_features;
++        }
++        cpu->filtered_features[w] =3D requested_features & ~available_fe=
+atures;
+         if (cpu->filtered_features[w]) {
+             rv =3D 1;
          }
- 
-         numa_total = 0;
-diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-index 44c9a95966..2fe9b72121 100644
---- a/qemu-deprecated.texi
-+++ b/qemu-deprecated.texi
-@@ -104,6 +104,14 @@ In future new machine versions will not accept the option but it will still
- work with old machine types. User can check QAPI schema to see if the legacy
- option is supported by looking at MachineInfo::numa-mem-supported property.
- 
-+@subsection -numa node (without memory specified) (since 4.1)
-+
-+Splitting RAM by default between NUMA nodes has the same issues as @option{mem}
-+parameter described above with the difference that the role of the user plays
-+QEMU using implicit generic or board specific splitting rule.
-+Use @option{memdev} with @var{memory-backend-ram} backend or @option{mem} (if
-+it's supported by used machine type) to define mapping explictly instead.
-+
- @section QEMU Machine Protocol (QMP) commands
- 
- @subsection block-dirty-bitmap-add "autoload" parameter (since 2.12.0)
--- 
+@@ -5980,6 +5983,7 @@ static Property x86_cpu_properties[] =3D {
+=20
+     DEFINE_PROP_BOOL("check", X86CPU, check_cpuid, true),
+     DEFINE_PROP_BOOL("enforce", X86CPU, enforce_cpuid, false),
++    DEFINE_PROP_BOOL("x-force-features", X86CPU, force_features, false),
+     DEFINE_PROP_BOOL("kvm", X86CPU, expose_kvm, true),
+     DEFINE_PROP_UINT32("phys-bits", X86CPU, phys_bits, 0),
+     DEFINE_PROP_BOOL("host-phys-bits", X86CPU, host_phys_bits, false),
+--=20
 2.18.0.rc1.1.g3f1ff2140
 
 
