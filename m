@@ -3,59 +3,58 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 160E4C0650E
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 17:30:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3856C06511
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 17:30:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E13FB21882
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 17:30:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E13FB21882
+	by mail.kernel.org (Postfix) with ESMTPS id C19E821882
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 17:30:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C19E821882
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38002 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38004 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hij5c-0000z6-27
-	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 13:30:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48821)
+	id 1hij5e-0001BP-1b
+	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 13:30:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48820)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hij3o-0007SA-VR
+ (envelope-from <mreitz@redhat.com>) id 1hij3o-0007S4-V6
  for qemu-devel@nongnu.org; Wed, 03 Jul 2019 13:28:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hij3n-0008JI-UA
+ (envelope-from <mreitz@redhat.com>) id 1hij3n-0008Ik-NI
  for qemu-devel@nongnu.org; Wed, 03 Jul 2019 13:28:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49794)
+Received: from mx1.redhat.com ([209.132.183.28]:58946)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hij3g-0007ut-Ma; Wed, 03 Jul 2019 13:28:41 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ id 1hij3i-0007of-Qt; Wed, 03 Jul 2019 13:28:43 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id CFE0286671;
- Wed,  3 Jul 2019 17:28:24 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id D9141882F5;
+ Wed,  3 Jul 2019 17:28:17 +0000 (UTC)
 Received: from localhost (ovpn-204-65.brq.redhat.com [10.40.204.65])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 69E6D19698;
- Wed,  3 Jul 2019 17:28:24 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 712776090E;
+ Wed,  3 Jul 2019 17:28:17 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Date: Wed,  3 Jul 2019 19:28:05 +0200
-Message-Id: <20190703172813.6868-5-mreitz@redhat.com>
+Date: Wed,  3 Jul 2019 19:28:02 +0200
+Message-Id: <20190703172813.6868-2-mreitz@redhat.com>
 In-Reply-To: <20190703172813.6868-1-mreitz@redhat.com>
 References: <20190703172813.6868-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.26]); Wed, 03 Jul 2019 17:28:24 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.28]); Wed, 03 Jul 2019 17:28:17 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 04/12] block: Keep subtree drained in
- drop_intermediate
+Subject: [Qemu-devel] [PATCH v2 01/12] block: Add BDS.never_freeze
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,41 +72,87 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-bdrv_drop_intermediate() calls BdrvChildRole.update_filename().  That
-may poll, thus changing the graph, which potentially breaks the
-QLIST_FOREACH_SAFE() loop.
-
-Just keep the whole subtree drained.  This is probably the right thing
-to do anyway (dropping nodes while the subtree is not drained seems
-wrong).
+The commit and the mirror block job must be able to drop their filter
+node at any point.  However, this will not be possible if any of the
+BdrvChild links to them is frozen.  Therefore, we need to prevent them
+from ever becoming frozen.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Reviewed-by: Alberto Garcia <berto@igalia.com>
 ---
- block.c | 2 ++
- 1 file changed, 2 insertions(+)
+ include/block/block_int.h | 3 +++
+ block.c                   | 8 ++++++++
+ block/commit.c            | 4 ++++
+ block/mirror.c            | 4 ++++
+ 4 files changed, 19 insertions(+)
 
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index fce9a9e7ee..bc378a49dc 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -908,6 +908,9 @@ struct BlockDriverState {
+=20
+     /* Only read/written by whoever has set active_flush_req to true.  *=
+/
+     unsigned int flushed_gen;             /* Flushed write generation */
++
++    /* BdrvChild links to this node may never be frozen */
++    bool never_freeze;
+ };
+=20
+ struct BlockBackendRootState {
 diff --git a/block.c b/block.c
-index a06f07347f..96b3dc7d53 100644
+index 1652f3d29b..a06f07347f 100644
 --- a/block.c
 +++ b/block.c
-@@ -4493,6 +4493,7 @@ int bdrv_drop_intermediate(BlockDriverState *top, B=
-lockDriverState *base,
-     int ret =3D -EIO;
+@@ -4420,6 +4420,14 @@ int bdrv_freeze_backing_chain(BlockDriverState *bs=
+, BlockDriverState *base,
+         return -EPERM;
+     }
 =20
-     bdrv_ref(top);
-+    bdrv_subtree_drained_begin(top);
++    for (i =3D bs; i !=3D base; i =3D backing_bs(i)) {
++        if (i->backing && backing_bs(i)->never_freeze) {
++            error_setg(errp, "Cannot freeze '%s' link to '%s'",
++                       i->backing->name, backing_bs(i)->node_name);
++            return -EPERM;
++        }
++    }
++
+     for (i =3D bs; i !=3D base; i =3D backing_bs(i)) {
+         if (i->backing) {
+             i->backing->frozen =3D true;
+diff --git a/block/commit.c b/block/commit.c
+index ca7e408b26..2c5a6d4ebc 100644
+--- a/block/commit.c
++++ b/block/commit.c
+@@ -298,6 +298,10 @@ void commit_start(const char *job_id, BlockDriverSta=
+te *bs,
+     if (!filter_node_name) {
+         commit_top_bs->implicit =3D true;
+     }
++
++    /* So that we can always drop this node */
++    commit_top_bs->never_freeze =3D true;
++
+     commit_top_bs->total_sectors =3D top->total_sectors;
 =20
-     if (!top->drv || !base->drv) {
-         goto exit;
-@@ -4564,6 +4565,7 @@ int bdrv_drop_intermediate(BlockDriverState *top, B=
-lockDriverState *base,
-=20
-     ret =3D 0;
- exit:
-+    bdrv_subtree_drained_end(top);
-     bdrv_unref(top);
-     return ret;
- }
+     bdrv_append(commit_top_bs, top, &local_err);
+diff --git a/block/mirror.c b/block/mirror.c
+index 2fcec70e35..8cb75fb409 100644
+--- a/block/mirror.c
++++ b/block/mirror.c
+@@ -1551,6 +1551,10 @@ static BlockJob *mirror_start_job(
+     if (!filter_node_name) {
+         mirror_top_bs->implicit =3D true;
+     }
++
++    /* So that we can always drop this node */
++    mirror_top_bs->never_freeze =3D true;
++
+     mirror_top_bs->total_sectors =3D bs->total_sectors;
+     mirror_top_bs->supported_write_flags =3D BDRV_REQ_WRITE_UNCHANGED;
+     mirror_top_bs->supported_zero_flags =3D BDRV_REQ_WRITE_UNCHANGED |
 --=20
 2.21.0
 
