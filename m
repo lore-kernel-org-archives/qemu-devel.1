@@ -2,99 +2,141 @@ Return-Path: <SRS0=mdN/=VA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B102C0650E
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 19:49:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5981DC0650E
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 19:57:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 500BA2085A
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 19:49:17 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=wavesemi.onmicrosoft.com header.i=@wavesemi.onmicrosoft.com header.b="aH9HWr8F"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 500BA2085A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=wavecomp.com
+	by mail.kernel.org (Postfix) with ESMTPS id 320CB21882
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 19:57:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 320CB21882
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39812 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39870 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hilFk-0004Tz-BR
-	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 15:49:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50663)
+	id 1hilNr-00080U-7F
+	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 15:57:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52387)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <amarkovic@wavecomp.com>) id 1hilDL-0003o4-RQ
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 15:46:48 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hilNB-0007JO-Dg
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 15:56:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <amarkovic@wavecomp.com>) id 1hilDK-00020s-RY
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 15:46:47 -0400
-Received: from mail-eopbgr700136.outbound.protection.outlook.com
- ([40.107.70.136]:62816 helo=NAM04-SN1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
- id 1hilDK-0001zp-DJ
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 15:46:46 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=wavesemi.onmicrosoft.com; s=selector1-wavesemi-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=A1NwcNmiC2/yMVxWnk+yV2YyJgH10AdQuaOVOXgqtpc=;
- b=aH9HWr8F3Php6NRNSnULpS5LmmR0aaCqv4iwevHk1SRi6MPQaaw8Qjr4QkBaivTTEyBalflPzpWsMBec+rVSLN8SNObaO23kSbZ8lOX6KEMp4hS4fGRc7JgHWhU2wMPwWFtyOBLjLUcdc6HEdIEYPa7tO0hizNodBRJnpGFPVBY=
-Received: from BN6PR2201MB1251.namprd22.prod.outlook.com (10.174.81.139) by
- BN6PR2201MB1234.namprd22.prod.outlook.com (10.174.81.23) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2052.17; Wed, 3 Jul 2019 19:46:42 +0000
-Received: from BN6PR2201MB1251.namprd22.prod.outlook.com
- ([fe80::c4a7:ebf7:ad07:f5f7]) by BN6PR2201MB1251.namprd22.prod.outlook.com
- ([fe80::c4a7:ebf7:ad07:f5f7%10]) with mapi id 15.20.2032.019; Wed, 3 Jul 2019
- 19:46:42 +0000
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-To: Laurent Vivier <laurent@vivier.eu>, Peter Maydell
- <peter.maydell@linaro.org>
-Thread-Topic: [BUG] Inappropriate size of target_sigset_t
-Thread-Index: AQHVMdW9rYddusddyUKgOhYBGFbH+g==
-Date: Wed, 3 Jul 2019 19:46:42 +0000
-Message-ID: <BN6PR2201MB12513A40434D1750AAF40020C6FB0@BN6PR2201MB1251.namprd22.prod.outlook.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=amarkovic@wavecomp.com; 
-x-originating-ip: [82.117.201.26]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 4cf941ba-81c1-416a-89a8-08d6ffef2c2f
-x-microsoft-antispam: BCL:0; PCL:0;
- RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(7168020)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);
- SRVR:BN6PR2201MB1234; 
-x-ms-traffictypediagnostic: BN6PR2201MB1234:
-x-microsoft-antispam-prvs: <BN6PR2201MB123472ED8F0CEA6133679982C6FB0@BN6PR2201MB1234.namprd22.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:9508;
-x-forefront-prvs: 00872B689F
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(136003)(366004)(396003)(346002)(376002)(39840400004)(199004)(189003)(186003)(256004)(476003)(102836004)(486006)(55236004)(6506007)(7696005)(26005)(71200400001)(52536014)(110136005)(66066001)(478600001)(4326008)(71190400001)(25786009)(81166006)(81156014)(8676002)(316002)(99286004)(8936002)(86362001)(6436002)(5660300002)(33656002)(3846002)(6116002)(2906002)(53936002)(66446008)(64756008)(66556008)(66476007)(9686003)(55016002)(73956011)(14454004)(305945005)(66946007)(76116006)(91956017)(7736002)(74316002)(68736007);
- DIR:OUT; SFP:1102; SCL:1; SRVR:BN6PR2201MB1234;
- H:BN6PR2201MB1251.namprd22.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
-received-spf: None (protection.outlook.com: wavecomp.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: ej7CjligqCVZYz794cspko8MYdpr1Q5PmwA979AqT69ZycCE9kOLZRsQ9oJ9ogLaCPEJALH6XTS1MZLrikaXPbT80Se2mH4ZxmLS48PLgKd8n7TziByxWxgF3rgGh3dj9pMlBfrIoAGh7NNP+vt9Bgs59a6890Te4aCFGS1GUrw6Ltlwny31m7p1bVqt+eoJUbj9z4ZbNC0mSiF6ZIeCSmzn3Vs1AxPuUtP9f0nHOb6ZauRyezjRqcru1MV+24PYdOZS9guP/jbrBf7RUwxUO9TFpzRv10/3UBYuvsJGbbr/UTQX6eERS4rVfC4kBKJ/5y3OPO88Hci0Oaqyg4Vh0CsmXttY+HCocGM5pEeMXu99J3wwnuYzdGO1qjUBEJI4MkZDLvZ7fy/TWF2KxG+SmC2xXPGdZc1cK8+1ijzugjU=
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+ (envelope-from <jsnow@redhat.com>) id 1hilNA-0007sN-9K
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 15:56:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45606)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>)
+ id 1hilN4-0007p7-Fd; Wed, 03 Jul 2019 15:56:50 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id BD61613A4D;
+ Wed,  3 Jul 2019 19:56:43 +0000 (UTC)
+Received: from [10.10.123.117] (ovpn-123-117.rdu2.redhat.com [10.10.123.117])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2660F194AE;
+ Wed,  3 Jul 2019 19:56:33 +0000 (UTC)
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+References: <20190701201330.29718-1-jsnow@redhat.com>
+ <20190701201330.29718-3-jsnow@redhat.com>
+ <0bd996a0-877f-6658-c120-09512bdacd1b@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <83d8bc86-fb59-aecf-273a-efd87c8502ef@redhat.com>
+Date: Wed, 3 Jul 2019 15:56:32 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-X-OriginatorOrg: wavecomp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4cf941ba-81c1-416a-89a8-08d6ffef2c2f
-X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Jul 2019 19:46:42.0411 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 463607d3-1db3-40a0-8a29-970c56230104
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: amarkovic@wavecomp.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN6PR2201MB1234
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.70.136
-Subject: [Qemu-devel] [BUG] Inappropriate size of target_sigset_t
+In-Reply-To: <0bd996a0-877f-6658-c120-09512bdacd1b@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.29]); Wed, 03 Jul 2019 19:56:49 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2 2/3] qapi: implement
+ block-dirty-bitmap-remove transaction action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,45 +148,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ vsementsov@virtuozzo.com, Juan Quintela <quintela@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hello, Peter, Laurent,=0A=
-=0A=
-While working on another problem yesterday, I think I discovered a long-sta=
-nding bug in QEMU Linux user mode: our target_sigset_t structure is eight t=
-imes smaller as it should be!=0A=
-=0A=
-In this code segment from syscalls_def.h:=0A=
-=0A=
-#ifdef TARGET_MIPS=0A=
-#define TARGET_NSIG	   128=0A=
-#else=0A=
-#define TARGET_NSIG	   64=0A=
-#endif=0A=
-#define TARGET_NSIG_BPW	   TARGET_ABI_BITS=0A=
-#define TARGET_NSIG_WORDS  (TARGET_NSIG / TARGET_NSIG_BPW)=0A=
-=0A=
-typedef struct {=0A=
-    abi_ulong sig[TARGET_NSIG_WORDS];=0A=
-} target_sigset_t;=0A=
-=0A=
-... TARGET_ABI_BITS should be replaced by eight times smaller constant (in =
-fact, semantically, we need TARGET_ABI_BYTES, but it is not defined) (what =
-is needed is actually "a byte per signal" in target_sigset_t, and we allow =
-"a bit per signal").=0A=
-=0A=
-All this probably sounds to you like something impossible, since this code =
-is in QEMU "since forever", but I checked everything, and the bug seems rea=
-l. I wish you can prove me wrong.=0A=
-=0A=
-I just wanted to let you know about this, given the sensitive timing of cur=
-rent softfreeze, and the fact that I won't be able to do more investigation=
- on this in coming weeks, since I am busy with other tasks, but perhaps you=
- can analyze and do something which you consider appropriate.=0A=
-=0A=
-Yours,=0A=
-Aleksandar=
+
+
+On 7/3/19 3:30 PM, Max Reitz wrote:
+> On 01.07.19 22:13, John Snow wrote:
+>> It is used to do transactional movement of the bitmap (which is
+>> possible in conjunction with merge command). Transactional bitmap
+>> movement is needed in scenarios with external snapshot, when we don't
+>> want to leave copy of the bitmap in the base image.
+>>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> Signed-off-by: John Snow <jsnow@redhat.com>
+>> ---
+>>  qapi/transaction.json          |  2 +
+>>  include/block/dirty-bitmap.h   |  3 +-
+>>  block.c                        |  2 +-
+>>  block/dirty-bitmap.c           | 16 +++----
+>>  blockdev.c                     | 79 +++++++++++++++++++++++++++++++--=
+-
+>>  migration/block-dirty-bitmap.c |  2 +-
+>>  6 files changed, 87 insertions(+), 17 deletions(-)
+>=20
+> [...]
+>=20
+>> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+>> index 95a9c2a5d8..8551f8219e 100644
+>> --- a/block/dirty-bitmap.c
+>> +++ b/block/dirty-bitmap.c
+>> @@ -48,10 +48,9 @@ struct BdrvDirtyBitmap {
+>>      bool inconsistent;          /* bitmap is persistent, but inconsis=
+tent.
+>>                                     It cannot be used at all in any wa=
+y, except
+>>                                     a QMP user can remove it. */
+>> -    bool migration;             /* Bitmap is selected for migration, =
+it should
+>> -                                   not be stored on the next inactiva=
+tion
+>> -                                   (persistent flag doesn't matter un=
+til next
+>> -                                   invalidation).*/
+>> +    bool squelch_persistence;   /* We are either migrating or deletin=
+g this
+>> +                                 * bitmap; it should not be stored on=
+ the next
+>> +                                 * inactivation. */
+>=20
+> I like the English lessons you give me, but why not just dont_store?  O=
+r
+> skip_storing?
+>=20
+
+I have to give you something to look forward to in my patches, don't I?
+
+I also like "suppress_persistence" but I'll settle for "skip_store".
+
+>>      QLIST_ENTRY(BdrvDirtyBitmap) list;
+>>  };
+>> =20
+>=20
+> [...]
+>=20
+>> diff --git a/blockdev.c b/blockdev.c
+>> index 01248252ca..4143ab7bbb 100644
+>> --- a/blockdev.c
+>> +++ b/blockdev.c
+>=20
+> [...]
+>=20
+>> +static void block_dirty_bitmap_remove_abort(BlkActionState *common)
+>> +{
+>> +    BlockDirtyBitmapState *state =3D DO_UPCAST(BlockDirtyBitmapState,
+>> +                                             common, common);
+>> +
+>> +    if (state->bitmap) {
+>> +        bdrv_dirty_bitmap_squelch_persistence(state->bitmap, false);
+>> +        bdrv_dirty_bitmap_set_busy(state->bitmap, false);
+>=20
+> Don=E2=80=99t you need to undo the removal?  Like, re-add it to state->=
+bs, and
+> re-store it?
+>=20
+> [...]
+>=20
+
+Not right away, anyway; undoing the suppression will allow it to flush
+out the next time that happens.
+
+Why not flush it RIGHT NOW? Well, we actually never flush bitmaps until
+final close right now. There has been some contention about how it's
+pointless to do so as we'd have to re-open the bitmap immediately
+anyway, and any results you'd get from querying the bitmap outside of
+QEMU would be meaningless.
+
+It does feel risky, though, and seems to frequently violate the
+principal of least surprise.
+
+>> @@ -2892,13 +2944,28 @@ void qmp_block_dirty_bitmap_remove(const char =
+*node, const char *name,
+>>          aio_context_acquire(aio_context);
+>>          bdrv_remove_persistent_dirty_bitmap(bs, name, &local_err);
+>>          aio_context_release(aio_context);
+>> +
+>>          if (local_err !=3D NULL) {
+>>              error_propagate(errp, local_err);
+>> -            return;
+>> +            return NULL;
+>>          }
+>>      }
+>> =20
+>> -    bdrv_release_dirty_bitmap(bs, bitmap);
+>> +    if (release) {
+>> +        bdrv_release_dirty_bitmap(bs, bitmap);
+>> +    }
+>> +
+>> +    if (bitmap_bs) {
+>> +        *bitmap_bs =3D bs;
+>> +    }
+>> +
+>> +    return bitmap;
+>=20
+> I=E2=80=99d prefer =E2=80=9Crelease ? NULL : bitmap=E2=80=9D.
+>=20
+> Max
+>=20
+
+Sure.
+
+>> +}
+>> +
+>> +void qmp_block_dirty_bitmap_remove(const char *node, const char *name=
+,
+>> +                                   Error **errp)
+>> +{
+>> +    do_block_dirty_bitmap_remove(node, name, true, NULL, errp);
+>>  }
+>> =20
+>>  /**
+>=20
+
 
