@@ -2,62 +2,61 @@ Return-Path: <SRS0=mdN/=VA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F5FAC0650E
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 09:05:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A7EFC0650E
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 09:05:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 77EA4218A3
-	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 09:05:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 77EA4218A3
+	by mail.kernel.org (Postfix) with ESMTPS id E81DA218A3
+	for <qemu-devel@archiver.kernel.org>; Wed,  3 Jul 2019 09:05:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E81DA218A3
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33884 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33886 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hibCe-0002qS-Pi
-	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 05:05:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51446)
+	id 1hibCj-00031y-8G
+	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 05:05:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51646)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <palmer@dabbelt.com>) id 1hiapi-0006AI-Jy
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 04:41:44 -0400
+ (envelope-from <palmer@dabbelt.com>) id 1hiaq7-0006Ne-Px
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 04:42:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <palmer@dabbelt.com>) id 1hiapg-0007DV-Qh
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 04:41:41 -0400
-Received: from mail-lf1-f54.google.com ([209.85.167.54]:38065)
+ (envelope-from <palmer@dabbelt.com>) id 1hiaq5-0008Dg-M2
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 04:42:07 -0400
+Received: from mail-lj1-f169.google.com ([209.85.208.169]:45901)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1hiapg-00075K-Hc
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 04:41:40 -0400
-Received: by mail-lf1-f54.google.com with SMTP id b11so1160247lfa.5
- for <qemu-devel@nongnu.org>; Wed, 03 Jul 2019 01:41:38 -0700 (PDT)
+ (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1hiaq5-0007Ub-BE
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 04:42:05 -0400
+Received: by mail-lj1-f169.google.com with SMTP id m23so1441845lje.12
+ for <qemu-devel@nongnu.org>; Wed, 03 Jul 2019 01:41:48 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding:cc:from:to;
- bh=dUa00V6qaWWvVsCSIWO0c3PzQTzV7TrVR8O4HvR6bag=;
- b=Z45H62Yb1RPy+NPcdF+OJ0WRaXgj4tIptXYjJN70t8XJuW18Tqek2a7ucPgcADyZh5
- 7xSfNaBw6cN8Q7+MLukiW3btTy30e6cuNJxO3CRs9CWKOXZPKXc1MfiJhs3ObqflwkXq
- 9NDQaMMglaeYVQW7TMWs1434qSowYm2C92c96iWusu/0Oprg01Ud6ojO/GZqiG6HnfIt
- Rc3lERGg2cXdaRSsRFQ9oLMrpZ6WAAGOl0mqtwUfLlB37+AIj/lgMoSxWvFg6ZOADAfs
- OuKi8W5ZyZS0GR7G2fNhkwQJ3iZgr+IWsjs1EaQu/5O2xUOqFKdeIZ3coXnJSagU+JZZ
- x01w==
-X-Gm-Message-State: APjAAAXY8StRpTJA9TrjswWd7nL1BmcKWusL5sMFzNCRIwfHS6L5SpO+
- fi+14c+4STLmyT2avltszOzSUTCJv5HbHQ==
-X-Google-Smtp-Source: APXvYqxQscEjCH6gBZmYF2Axq6GbeSFGszP49M8AhAxDdT92Q7Ijg8lIrjKT5r3hKIdRQdFom79myA==
-X-Received: by 2002:a05:6512:24a:: with SMTP id
- b10mr17740340lfo.37.1562143296176; 
- Wed, 03 Jul 2019 01:41:36 -0700 (PDT)
+ bh=NIyWvQXIInPHkbPMAYxhV18GTR99MjAgFa+NcGYzhSA=;
+ b=pxPctwCwJNXuSgb3S61OQQCOhKS8Zyd8UsCXrqNYFpn+7gRy+GGDqLMaGGMlIILU3b
+ Wgo63xUDNZ7iIwPybiYiuX55yl31yVx4LiOWokmP+f4+f3hMQuGvlUWig0ngsXWUl19k
+ bjvnpUjEOIQ92V0HDOUj0WhNNHgkOlqh8bYbtO2oBE8Bes0cp0zlk2Azs8hqoHALFZda
+ X5pQGntQhEWO6vWDtYsL3zUdjyXUQyQRGGd7EqQYfBJq7MYUfTrRXoacVXI4/bplDrBA
+ AEKr+7qfoKVumArYyZHrDHK8drtKWRyImkh1pq2u7zrBi8hrPGF+/lI7VfFIfYME0zyo
+ XrYQ==
+X-Gm-Message-State: APjAAAWtBuD/bFXKaVPLw4EE29Fte87kokx7CPpo6peqi5p9dmLxzD+b
+ DReo17vpkh7/Nl0EsOOgkLNJ0RNu4pUwJA==
+X-Google-Smtp-Source: APXvYqxMDGgINtI+spwh9sC7J1MM+5xr0t1R2SipoUHXZjD41tEulPGQ4NpVyMuKTnQN5d9zlYr11g==
+X-Received: by 2002:a2e:5c88:: with SMTP id q130mr6282150ljb.176.1562143306550; 
+ Wed, 03 Jul 2019 01:41:46 -0700 (PDT)
 Received: from localhost ([134.17.27.127])
- by smtp.gmail.com with ESMTPSA id s19sm340157lji.38.2019.07.03.01.41.35
+ by smtp.gmail.com with ESMTPSA id 2sm336790lju.52.2019.07.03.01.41.45
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Wed, 03 Jul 2019 01:41:35 -0700 (PDT)
-Date: Wed,  3 Jul 2019 01:40:31 -0700
-Message-Id: <20190703084048.6980-16-palmer@sifive.com>
+ Wed, 03 Jul 2019 01:41:45 -0700 (PDT)
+Date: Wed,  3 Jul 2019 01:40:37 -0700
+Message-Id: <20190703084048.6980-22-palmer@sifive.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190703084048.6980-1-palmer@sifive.com>
 References: <20190703084048.6980-1-palmer@sifive.com>
@@ -67,8 +66,9 @@ From: Palmer Dabbelt <palmer@sifive.com>
 To: Peter Maydell <peter.maydell@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.167.54
-Subject: [Qemu-devel] [PULL 15/32] target/riscv: Add the mcountinhibit CSR
+X-Received-From: 209.85.208.169
+Subject: [Qemu-devel] [PULL 21/32] RISC-V: Add support for the Zifencei
+ extension
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,80 +87,86 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Alistair Francis <alistair.francis@wdc.com>
+fence.i has been split out of the base ISA as part of the ratification
+process.  This patch adds a Zifencei argument, which disables the
+fence.i instruction.
 
-1.11 defines mcountinhibit, which has the same numeric CSR value as
-mucounteren from 1.09.1 but has different semantics.  This patch enables
-the CSR for 1.11-based targets, which is trivial to implement because
-the counters in QEMU never tick (legal according to the spec).
-
-Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-[Palmer: Fix counter access semantics, change commit message to indicate
-the behavior is fully emulated.]
-Reviewed-by: Palmer Dabbelt <palmer@sifive.com>
 Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- target/riscv/cpu_bits.h |  1 +
- target/riscv/csr.c      | 17 +++++++++++++++--
- 2 files changed, 16 insertions(+), 2 deletions(-)
+ target/riscv/cpu.c                      | 1 +
+ target/riscv/cpu.h                      | 1 +
+ target/riscv/insn_trans/trans_rvi.inc.c | 4 ++++
+ target/riscv/translate.c                | 3 +++
+ 4 files changed, 9 insertions(+)
 
-diff --git a/target/riscv/cpu_bits.h b/target/riscv/cpu_bits.h
-index 47450a3cdb75..11f971ad5df0 100644
---- a/target/riscv/cpu_bits.h
-+++ b/target/riscv/cpu_bits.h
-@@ -136,6 +136,7 @@
- #define CSR_MCOUNTEREN      0x306
+diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+index be90fa7d0808..bbad39a337b3 100644
+--- a/target/riscv/cpu.c
++++ b/target/riscv/cpu.c
+@@ -441,6 +441,7 @@ static Property riscv_cpu_properties[] = {
+     DEFINE_PROP_BOOL("s", RISCVCPU, cfg.ext_s, true),
+     DEFINE_PROP_BOOL("u", RISCVCPU, cfg.ext_u, true),
+     DEFINE_PROP_BOOL("Counters", RISCVCPU, cfg.ext_counters, true),
++    DEFINE_PROP_BOOL("Zifencei", RISCVCPU, cfg.ext_ifencei, true),
+     DEFINE_PROP_STRING("priv_spec", RISCVCPU, cfg.priv_spec),
+     DEFINE_PROP_BOOL("mmu", RISCVCPU, cfg.mmu, true),
+     DEFINE_PROP_BOOL("pmp", RISCVCPU, cfg.pmp, true),
+diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+index 4d4e0f89e206..ba551cd3082c 100644
+--- a/target/riscv/cpu.h
++++ b/target/riscv/cpu.h
+@@ -223,6 +223,7 @@ typedef struct RISCVCPU {
+         bool ext_s;
+         bool ext_u;
+         bool ext_counters;
++        bool ext_ifencei;
  
- /* Legacy Counter Setup (priv v1.9.1) */
-+/* Update to #define CSR_MCOUNTINHIBIT 0x320 for 1.11.0 */
- #define CSR_MUCOUNTEREN     0x320
- #define CSR_MSCOUNTEREN     0x321
- #define CSR_MHCOUNTEREN     0x322
-diff --git a/target/riscv/csr.c b/target/riscv/csr.c
-index c67d29e20618..448162e484a3 100644
---- a/target/riscv/csr.c
-+++ b/target/riscv/csr.c
-@@ -56,6 +56,15 @@ static int fs(CPURISCVState *env, int csrno)
- static int ctr(CPURISCVState *env, int csrno)
+         char *priv_spec;
+         char *user_spec;
+diff --git a/target/riscv/insn_trans/trans_rvi.inc.c b/target/riscv/insn_trans/trans_rvi.inc.c
+index 6cda078ed6ba..ea6473111ce8 100644
+--- a/target/riscv/insn_trans/trans_rvi.inc.c
++++ b/target/riscv/insn_trans/trans_rvi.inc.c
+@@ -484,6 +484,10 @@ static bool trans_fence(DisasContext *ctx, arg_fence *a)
+ 
+ static bool trans_fence_i(DisasContext *ctx, arg_fence_i *a)
  {
- #if !defined(CONFIG_USER_ONLY)
-+    /*
-+     * The counters are always enabled on newer priv specs, as the CSR has
-+     * changed from controlling that the counters can be read to controlling
-+     * that the counters increment.
-+     */
-+    if (env->priv_ver > PRIV_VERSION_1_09_1) {
-+        return 0;
++    if (!ctx->ext_ifencei) {
++        return false;
 +    }
 +
-     uint32_t ctr_en = ~0u;
+     /*
+      * FENCE_I is a no-op in QEMU,
+      * however we need to end the translation block
+diff --git a/target/riscv/translate.c b/target/riscv/translate.c
+index 313c27b70073..8d6ab732588d 100644
+--- a/target/riscv/translate.c
++++ b/target/riscv/translate.c
+@@ -54,6 +54,7 @@ typedef struct DisasContext {
+        to any system register, which includes CSR_FRM, so we do not have
+        to reset this known value.  */
+     int frm;
++    bool ext_ifencei;
+ } DisasContext;
  
-     if (env->priv < PRV_M) {
-@@ -461,18 +470,22 @@ static int write_mcounteren(CPURISCVState *env, int csrno, target_ulong val)
-     return 0;
+ #ifdef TARGET_RISCV64
+@@ -752,6 +753,7 @@ static void riscv_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
+ {
+     DisasContext *ctx = container_of(dcbase, DisasContext, base);
+     CPURISCVState *env = cs->env_ptr;
++    RISCVCPU *cpu = RISCV_CPU(cs);
+ 
+     ctx->pc_succ_insn = ctx->base.pc_first;
+     ctx->mem_idx = ctx->base.tb->flags & TB_FLAGS_MMU_MASK;
+@@ -759,6 +761,7 @@ static void riscv_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
+     ctx->priv_ver = env->priv_ver;
+     ctx->misa = env->misa;
+     ctx->frm = -1;  /* unknown rounding mode */
++    ctx->ext_ifencei = cpu->cfg.ext_ifencei;
  }
  
-+/* This regiser is replaced with CSR_MCOUNTINHIBIT in 1.11.0 */
- static int read_mscounteren(CPURISCVState *env, int csrno, target_ulong *val)
- {
--    if (env->priv_ver > PRIV_VERSION_1_09_1) {
-+    if (env->priv_ver > PRIV_VERSION_1_09_1
-+        && env->priv_ver < PRIV_VERSION_1_11_0) {
-         return -1;
-     }
-     *val = env->mcounteren;
-     return 0;
- }
- 
-+/* This regiser is replaced with CSR_MCOUNTINHIBIT in 1.11.0 */
- static int write_mscounteren(CPURISCVState *env, int csrno, target_ulong val)
- {
--    if (env->priv_ver > PRIV_VERSION_1_09_1) {
-+    if (env->priv_ver > PRIV_VERSION_1_09_1
-+        && env->priv_ver < PRIV_VERSION_1_11_0) {
-         return -1;
-     }
-     env->mcounteren = val;
+ static void riscv_tr_tb_start(DisasContextBase *db, CPUState *cpu)
 -- 
 2.21.0
 
