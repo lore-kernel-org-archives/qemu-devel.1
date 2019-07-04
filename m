@@ -6,45 +6,45 @@ X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AD6AC0651F
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 17:48:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D951BC0651F
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 17:50:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 53F052147A
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 17:48:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53F052147A
+	by mail.kernel.org (Postfix) with ESMTPS id AA5A821670
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 17:50:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA5A821670
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47972 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47982 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hj5qe-000135-5Q
-	for qemu-devel@archiver.kernel.org; Thu, 04 Jul 2019 13:48:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57008)
+	id 1hj5sU-0002G5-1L
+	for qemu-devel@archiver.kernel.org; Thu, 04 Jul 2019 13:50:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57198)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hj5pP-0000BW-Lm
- for qemu-devel@nongnu.org; Thu, 04 Jul 2019 13:47:34 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hj5qU-00013z-EP
+ for qemu-devel@nongnu.org; Thu, 04 Jul 2019 13:48:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hj5pO-0001K3-7u
- for qemu-devel@nongnu.org; Thu, 04 Jul 2019 13:47:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34646)
+ (envelope-from <mreitz@redhat.com>) id 1hj5qT-0002AU-CN
+ for qemu-devel@nongnu.org; Thu, 04 Jul 2019 13:48:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50526)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hj5pM-0001Gt-4L; Thu, 04 Jul 2019 13:47:24 -0400
+ id 1hj5qR-00028v-94; Thu, 04 Jul 2019 13:48:31 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 54A13368E3;
- Thu,  4 Jul 2019 17:47:23 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 9559183F3B;
+ Thu,  4 Jul 2019 17:48:30 +0000 (UTC)
 Received: from dresden.str.redhat.com (ovpn-204-93.brq.redhat.com
  [10.40.204.93])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D35A1842AE;
- Thu,  4 Jul 2019 17:47:15 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 59E4C5D71B;
+ Thu,  4 Jul 2019 17:48:23 +0000 (UTC)
 To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
 References: <20190703215542.16123-1-jsnow@redhat.com>
- <20190703215542.16123-14-jsnow@redhat.com>
+ <20190703215542.16123-15-jsnow@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
@@ -71,22 +71,22 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <912b8db9-d31b-a4f6-5ce7-2da368f27619@redhat.com>
-Date: Thu, 4 Jul 2019 19:47:14 +0200
+Message-ID: <d818a81d-64c2-aa0c-f85a-15030a198e49@redhat.com>
+Date: Thu, 4 Jul 2019 19:48:21 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190703215542.16123-14-jsnow@redhat.com>
+In-Reply-To: <20190703215542.16123-15-jsnow@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="Zub2SOUox8VxK3YWJZgVeuAxNIPisJLN3"
+ boundary="7P27sTFyKtBtds9TrX6Kd17vNK2PI055v"
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.30]); Thu, 04 Jul 2019 17:47:23 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.27]); Thu, 04 Jul 2019 17:48:30 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 13/18] iotests: add testing shim for
- script-style python tests
+Subject: Re: [Qemu-devel] [PATCH v2 14/18] iotests: teach run_job to cancel
+ pending jobs
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -110,8 +110,8 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Zub2SOUox8VxK3YWJZgVeuAxNIPisJLN3
-Content-Type: multipart/mixed; boundary="rUsclLpgBRT2LfstbnBdJcmxzHvVzymTw";
+--7P27sTFyKtBtds9TrX6Kd17vNK2PI055v
+Content-Type: multipart/mixed; boundary="LiLkQ1zVBZbqATxBte4VCotEBMK4rACTG";
  protected-headers="v1"
 From: Max Reitz <mreitz@redhat.com>
 To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
@@ -121,58 +121,48 @@ Cc: Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
  "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
  Wen Congyang <wencongyang2@huawei.com>, vsementsov@virtuozzo.com,
  Xie Changlong <xiechanglong.d@gmail.com>
-Message-ID: <912b8db9-d31b-a4f6-5ce7-2da368f27619@redhat.com>
-Subject: Re: [PATCH v2 13/18] iotests: add testing shim for script-style
- python tests
+Message-ID: <d818a81d-64c2-aa0c-f85a-15030a198e49@redhat.com>
+Subject: Re: [PATCH v2 14/18] iotests: teach run_job to cancel pending jobs
 References: <20190703215542.16123-1-jsnow@redhat.com>
- <20190703215542.16123-14-jsnow@redhat.com>
-In-Reply-To: <20190703215542.16123-14-jsnow@redhat.com>
+ <20190703215542.16123-15-jsnow@redhat.com>
+In-Reply-To: <20190703215542.16123-15-jsnow@redhat.com>
 
---rUsclLpgBRT2LfstbnBdJcmxzHvVzymTw
+--LiLkQ1zVBZbqATxBte4VCotEBMK4rACTG
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
 On 03.07.19 23:55, John Snow wrote:
-> Because the new-style python tests don't use the iotests.main() test
-> launcher, we don't turn on the debugger logging for these scripts
-> when invoked via ./check -d.
->=20
-> Refactor the launcher shim into new and old style shims so that they
-> share environmental configuration.
->=20
-> Two cleanup notes: debug was not actually used as a global, and there
-> was no reason to create a class in an inner scope just to achieve
-> default variables; we can simply create an instance of the runner with
-> the values we want instead.
+> run_job can cancel pending jobs to simulate failure. This lets us use
+> the pending callback to issue test commands while the job is open, but
+> then still have the job fail in the end.
 >=20
 > Signed-off-by: John Snow <jsnow@redhat.com>
 > ---
->  tests/qemu-iotests/iotests.py | 40 +++++++++++++++++++++++------------=
-
->  1 file changed, 26 insertions(+), 14 deletions(-)
+>  tests/qemu-iotests/iotests.py | 22 ++++++++++++++++++++--
+>  1 file changed, 20 insertions(+), 2 deletions(-)
 
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 
---rUsclLpgBRT2LfstbnBdJcmxzHvVzymTw--
+--LiLkQ1zVBZbqATxBte4VCotEBMK4rACTG--
 
---Zub2SOUox8VxK3YWJZgVeuAxNIPisJLN3
+--7P27sTFyKtBtds9TrX6Kd17vNK2PI055v
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0eO6IACgkQ9AfbAGHV
-z0CtDwf9ECCKwMGZs/GK59nHuD6oJuPps0F6Rh/tMpyc54TjgY/Z08IVqMALMpQO
-LQSiCi+WHGON3r8pJhu1jmchPYuBlbSbms6lcN7TeYewPoKlsmm3d5gNf7Om5Oot
-O9QuU9gsMLjenFaa62N1BH5+F5Y2282xIUPR4Nhang2j6XwiznELt1GT2J41S4fA
-8LUNjFwItIVu5/3TRs7v2G5VmG+v1ErdAF2TlJG+rc3r7fSaKQUiqEGPNFikTaF8
-y182cAA3nThnzUyrjbE6/TehYIZUj8yxFN2M+o0r9INQD3Akwyfd9izK7o5U2ybs
-vdbGSk6CifdJXQbmk75nZKioXT2RXA==
-=gt5D
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0eO+UACgkQ9AfbAGHV
+z0D6qAf+MWgsef9jbU2j7QnN8YrAbZpJ15G3EsdzjQizs7L1fPsTIiGcGtjBxKXj
+kjG0JhzIl2VR0MeoZE7+C4sKXH5fg+WCtMrI4itSzf3rZaUkOeXCs2v7SoKkviHJ
+rqo/T/beQ/ZRWsKsEV/3fiGFkUABDVsmkE12rt4CIxjtn0IKS8M92VORp4uDGEks
+VWJnmUtiFB8jkdvgG3kPbNn+uVBlCYRvHvSniiqyWaxy/hxHZg8F2Pc4/MtHJCxb
+YqkQeR2XL0SVD+L6/OEyxkH5Efou5sZrRRKnSuwuZavPDf3WADnLrJ9gmB+fYN8L
+KNWgSe54huU05pqH8lp8WUjJKJX9Ig==
+=16my
 -----END PGP SIGNATURE-----
 
---Zub2SOUox8VxK3YWJZgVeuAxNIPisJLN3--
+--7P27sTFyKtBtds9TrX6Kd17vNK2PI055v--
 
