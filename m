@@ -6,60 +6,72 @@ X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3A69C0651F
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 13:57:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16BE1C0651F
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 14:05:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7F2702085A
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 13:57:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F2702085A
+	by mail.kernel.org (Postfix) with ESMTPS id CEF742085A
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 14:05:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CEF742085A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46312 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46364 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hj2Eg-0002z9-Q7
-	for qemu-devel@archiver.kernel.org; Thu, 04 Jul 2019 09:57:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53804)
+	id 1hj2Me-00066n-GX
+	for qemu-devel@archiver.kernel.org; Thu, 04 Jul 2019 10:05:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55093)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <kraxel@redhat.com>) id 1hj2DW-0002Hu-LA
- for qemu-devel@nongnu.org; Thu, 04 Jul 2019 09:56:07 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1hj2Lk-0005Vh-K2
+ for qemu-devel@nongnu.org; Thu, 04 Jul 2019 10:04:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kraxel@redhat.com>) id 1hj2DV-0004xf-PO
- for qemu-devel@nongnu.org; Thu, 04 Jul 2019 09:56:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55330)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hj2DV-0004sb-KC
- for qemu-devel@nongnu.org; Thu, 04 Jul 2019 09:56:05 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A853C30ADC79;
- Thu,  4 Jul 2019 13:55:54 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-116-222.ams2.redhat.com
- [10.36.116.222])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 74A24968C2;
- Thu,  4 Jul 2019 13:55:51 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id AE26611AA3; Thu,  4 Jul 2019 15:55:50 +0200 (CEST)
-Date: Thu, 4 Jul 2019 15:55:50 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Message-ID: <20190704135550.x75fdmzezl3be5xk@sirius.home.kraxel.org>
+ (envelope-from <pbonzini@redhat.com>) id 1hj2Lj-0001mE-Lj
+ for qemu-devel@nongnu.org; Thu, 04 Jul 2019 10:04:36 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:34007)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hj2Lj-0001li-GD
+ for qemu-devel@nongnu.org; Thu, 04 Jul 2019 10:04:35 -0400
+Received: by mail-wr1-f65.google.com with SMTP id u18so6805248wru.1
+ for <qemu-devel@nongnu.org>; Thu, 04 Jul 2019 07:04:35 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=LWRY2c2Ebwp1DWQNoCI/IhdNoK09xtQDnLOORpqUBvo=;
+ b=QotDIxYl5/CvkNducCamJCLqb0/UDAKmxB9LFeP3WPsLOOFOrQUuoEdvJSeDX5ivZL
+ Oea1G3shBbwIUw8QjulQbjCkUqFPD8us8jvNjlnWBZIuTvPuY5ijU5g8g57rK0XSFn71
+ utq1rRVkZeouIivON+XnWVs0VT8ajIGCdhCEDEMhwwZ4UNDsLLsve51XPba7mKpGuvDp
+ a31aI9TlhKDMxsRVgM43C/KZ/+WZkPgbdEuRtVA6TeW1JcegyDgWYlKsoIkLIcolmgOw
+ 6qlRn2V7Qmf9up7GKifaB2TorlZX7q+Z3m6VEWdp8X2tKXcZfCPU8DQRbygjRND1adMq
+ DsGg==
+X-Gm-Message-State: APjAAAXMw0ibHFxrF1TlvFjeziawzhB5UlT8pLYmwREf73WTXWsrgNWG
+ 5hfxij6K/qihFyqH7y1k/n6/Ow==
+X-Google-Smtp-Source: APXvYqxuJh1pVYF9AnGCW0HYEIXGBcSMrusEqNZXWIxGvhT4h/ouQW/HVFjnX6t3UElMfpg0/TxJNw==
+X-Received: by 2002:adf:dfc1:: with SMTP id q1mr18184107wrn.52.1562249074477; 
+ Thu, 04 Jul 2019 07:04:34 -0700 (PDT)
+Received: from [10.201.49.68] (nat-pool-mxp-u.redhat.com. [149.6.153.187])
+ by smtp.gmail.com with ESMTPSA id s2sm3682553wmj.33.2019.07.04.07.04.33
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Thu, 04 Jul 2019 07:04:33 -0700 (PDT)
+To: Gerd Hoffmann <kraxel@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 References: <41536801-f8ac-b3c6-a74a-4a7ead43695f@redhat.com>
+ <20190704135550.x75fdmzezl3be5xk@sirius.home.kraxel.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <fb96921e-f751-a6e4-6e2f-5aaefa38ba6a@redhat.com>
+Date: Thu, 4 Jul 2019 16:04:32 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <41536801-f8ac-b3c6-a74a-4a7ead43695f@redhat.com>
-User-Agent: NeoMutt/20180716
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Thu, 04 Jul 2019 13:55:54 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20190704135550.x75fdmzezl3be5xk@sirius.home.kraxel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
+ [fuzzy]
+X-Received-From: 209.85.221.65
 Subject: Re: [Qemu-devel] hw/display/vga: Why architecture specific code?
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -72,32 +84,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
+Cc: QEMU Developers <qemu-devel@nongnu.org>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jul 04, 2019 at 03:27:25PM +0200, Philippe Mathieu-Daud=E9 wrote:
-> Hi Gerd,
->=20
-> I'm looking at:
->=20
-> static const MemoryRegionPortio vbe_portio_list[] =3D {
->     { 0, 1, 2, .read =3D vbe_ioport_read_index, .write =3D
-> vbe_ioport_write_index },
-> # ifdef TARGET_I386
->     { 1, 1, 2, .read =3D vbe_ioport_read_data, .write =3D
-> vbe_ioport_write_data },
-> # endif
->     { 2, 1, 2, .read =3D vbe_ioport_read_data, .write =3D
-> vbe_ioport_write_data },
->     PORTIO_END_OF_LIST(),
-> };
+On 04/07/19 15:55, Gerd Hoffmann wrote:
+> On Thu, Jul 04, 2019 at 03:27:25PM +0200, Philippe Mathieu-Daudé wrote:
+>> Hi Gerd,
+>>
+>> I'm looking at:
+>>
+>> static const MemoryRegionPortio vbe_portio_list[] = {
+>>     { 0, 1, 2, .read = vbe_ioport_read_index, .write =
+>> vbe_ioport_write_index },
+>> # ifdef TARGET_I386
+>>     { 1, 1, 2, .read = vbe_ioport_read_data, .write =
+>> vbe_ioport_write_data },
+>> # endif
+>>     { 2, 1, 2, .read = vbe_ioport_read_data, .write =
+>> vbe_ioport_write_data },
+>>     PORTIO_END_OF_LIST(),
+>> };
+> 
+> Unaligned 16bit ioport access works on x86 only.
 
-Unaligned 16bit ioport access works on x86 only.
+But I'm not sure that it needs to be target-dependent now.  Worst case
+you'd have a dead MemoryRegion.
 
-cheers,
-  Gerd
-
+Paolo
 
