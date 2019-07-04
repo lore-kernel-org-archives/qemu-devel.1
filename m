@@ -4,76 +4,89 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59A62C0651F
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 15:30:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A3ABC0651F
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 15:34:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 307E62184B
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 15:30:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 307E62184B
+	by mail.kernel.org (Postfix) with ESMTPS id D60D22184B
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 15:34:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D60D22184B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46962 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47000 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hj3gV-0002ft-Ab
-	for qemu-devel@archiver.kernel.org; Thu, 04 Jul 2019 11:30:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38913)
+	id 1hj3kl-0005LM-Fh
+	for qemu-devel@archiver.kernel.org; Thu, 04 Jul 2019 11:34:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39158)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <pbonzini@redhat.com>) id 1hj3fV-0001vV-TB
- for qemu-devel@nongnu.org; Thu, 04 Jul 2019 11:29:06 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hj3hP-0003cl-6U
+ for qemu-devel@nongnu.org; Thu, 04 Jul 2019 11:31:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1hj3fU-0000ab-OI
- for qemu-devel@nongnu.org; Thu, 04 Jul 2019 11:29:05 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:42254)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hj3fU-0000a4-ID
- for qemu-devel@nongnu.org; Thu, 04 Jul 2019 11:29:04 -0400
-Received: by mail-wr1-f65.google.com with SMTP id a10so5956857wrp.9
- for <qemu-devel@nongnu.org>; Thu, 04 Jul 2019 08:29:04 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=uTber9tnQqfaXZRYxYBLuoOHIoCFmIICAtxbv0BddWo=;
- b=lKYSkA+poNmIl3HGo9CuAGrvrDhuEgV7HxvesK8sHLr+qaEUuYaFPZ8DEP4Hak0MPA
- PDJJhVKsKofDBqRyozhq423ryoi0OkwXkSwmwbUuRbG2Zvxv74nNIUZjPxY53vEwrbJl
- dXbR8JDqMVa+mvzrND4Pb9g5TblfoDvfJQz4lhy9Ayk4Y2XeIUHcFn47ngHfZ96dyB5n
- 9uKY275IcNCvsOmJf0mmrBlC69tR4bIOZkaJO/DLE+soujAJ1uTaT9JDvCpruxByihpn
- ksIBO3cInoX4U6zrrUjj1WITFo/1Gt+c/O38JZkT2GuI0B9oYz5IHJK9jdgwP0W1qz2v
- xcIA==
-X-Gm-Message-State: APjAAAUwlYH5nWKhv09LA5l1l7QIfRqc+/pEtDfTS8n1u+xQUCXpAej4
- VfsyCc55xWBpvvdz0DEMDsSALQ==
-X-Google-Smtp-Source: APXvYqw7wS0O7kIcDJO3t+HWyknb2q6xvP7eHD0RP4+CDaSX6mc7pSid9kytNhWqXR1Upc348yXh2A==
-X-Received: by 2002:a5d:5448:: with SMTP id w8mr34173359wrv.180.1562254143384; 
- Thu, 04 Jul 2019 08:29:03 -0700 (PDT)
-Received: from [10.201.49.68] (nat-pool-mxp-u.redhat.com. [149.6.153.187])
- by smtp.gmail.com with ESMTPSA id e20sm10190235wrc.9.2019.07.04.08.29.02
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Thu, 04 Jul 2019 08:29:02 -0700 (PDT)
-To: Liran Alon <liran.alon@oracle.com>
-References: <20190624230514.53326-1-liran.alon@oracle.com>
- <6499083f-c159-1c3e-0339-87aa5b13c2c0@redhat.com>
- <432511A2-C6B4-4B03-87A5-176D886C0BF2@oracle.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <c5e7fd4d-3554-4df9-1e92-49e4ec02d653@redhat.com>
-Date: Thu, 4 Jul 2019 17:29:01 +0200
+ (envelope-from <mreitz@redhat.com>) id 1hj3hO-0001qQ-3X
+ for qemu-devel@nongnu.org; Thu, 04 Jul 2019 11:31:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48684)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1hj3hI-0001l6-BZ; Thu, 04 Jul 2019 11:30:57 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 7A5513082A8D;
+ Thu,  4 Jul 2019 15:30:51 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-204-93.brq.redhat.com
+ [10.40.204.93])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A78CC17DFC;
+ Thu,  4 Jul 2019 15:30:41 +0000 (UTC)
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+References: <20190703215542.16123-1-jsnow@redhat.com>
+ <20190703215542.16123-6-jsnow@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <a9b44438-06ce-54b2-82cb-ee4e196152f6@redhat.com>
+Date: Thu, 4 Jul 2019 17:30:40 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <432511A2-C6B4-4B03-87A5-176D886C0BF2@oracle.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190703215542.16123-6-jsnow@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="SEoXs3EzXcDWA0T8Mc5dQdUzz3a9qLu1Z"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.45]); Thu, 04 Jul 2019 15:30:51 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.221.65
-Subject: Re: [Qemu-devel] [PATCH] target/i386: kvm: Fix when nested state is
- needed for migration
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2 05/18] block/backup: Add mirror sync
+ mode 'bitmap'
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,88 +98,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org,
- Karl Heubaum <karl.heubaum@oracle.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ vsementsov@virtuozzo.com, Juan Quintela <quintela@redhat.com>,
+ Wen Congyang <wencongyang2@huawei.com>,
+ Xie Changlong <xiechanglong.d@gmail.com>,
+ Markus Armbruster <armbru@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 04/07/19 16:31, Liran Alon wrote:
-> 
-> 
->> On 2 Jul 2019, at 19:39, Paolo Bonzini <pbonzini@redhat.com> wrote:
->>
->> On 25/06/19 01:05, Liran Alon wrote:
->>> When vCPU is in VMX operation and enters SMM mode,
->>> it temporarily exits VMX operation but KVM maintained nested-state
->>> still stores the VMXON region physical address, i.e. even when the
->>> vCPU is in SMM mode then (nested_state->hdr.vmx.vmxon_pa != -1ull).
->>>
->>> Therefore, there is no need to explicitly check for
->>> KVM_STATE_NESTED_SMM_VMXON to determine if it is necessary
->>> to save nested-state as part of migration stream.
->>>
->>> In addition, destination must enable eVMCS if it is enabled on
->>> source as specified by the KVM_STATE_NESTED_EVMCS flag, even if
->>> the VMXON region is not set. Thus, change the code to require saving
->>> nested-state as part of migration stream in case it is set.
->>>
->>> Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
->>> Signed-off-by: Liran Alon <liran.alon@oracle.com>
->>> ---
->>> target/i386/machine.c | 2 +-
->>> 1 file changed, 1 insertion(+), 1 deletion(-)
->>>
->>> diff --git a/target/i386/machine.c b/target/i386/machine.c
->>> index 851b249d1a39..e7d72faf9e24 100644
->>> --- a/target/i386/machine.c
->>> +++ b/target/i386/machine.c
->>> @@ -999,7 +999,7 @@ static bool vmx_nested_state_needed(void *opaque)
->>>
->>>     return ((nested_state->format == KVM_STATE_NESTED_FORMAT_VMX) &&
->>>             ((nested_state->hdr.vmx.vmxon_pa != -1ull) ||
->>> -             (nested_state->hdr.vmx.smm.flags & KVM_STATE_NESTED_SMM_VMXON)));
->>> +             (nested_state->flags & KVM_STATE_NESTED_EVMCS)));
->>> }
->>>
->>> static const VMStateDescription vmstate_vmx_nested_state = {
->>>
->>
->> Queued, thanks.
->>
->> Paolo
-> 
-> Actually Paolo after I have created KVM patch
-> ("KVM: nVMX: Change KVM_STATE_NESTED_EVMCS to signal vmcs12 is copied from eVMCS”)
-> I think I realised that KVM_STATE_NESTED_EVMCS is actually not a requirement for nested-state to be sent.
-> I suggest to replace this commit with another one that just change vmx_nested_state_needed() to return true
-> In case format is FORMAT_VMX and vmxon_pa != -1ull and that’s it.
-> 
-> As anyway, QEMU provisioned on destination side is going to enable the relevant eVMCS capability.
-> I’m going to send another series that refines QEMU nested-migration a bit more so I will do it along the way.
-> But I think this patch should be un-queued. Sorry for realizing this later but at least it’s before it was merged to master :)
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--SEoXs3EzXcDWA0T8Mc5dQdUzz3a9qLu1Z
+Content-Type: multipart/mixed; boundary="9pa2bXJy38vBpzMIj2r6cvQhwvS3iYBIz";
+ protected-headers="v1"
+From: Max Reitz <mreitz@redhat.com>
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
+ Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Fam Zheng <fam@euphon.net>, Juan Quintela <quintela@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Wen Congyang <wencongyang2@huawei.com>, vsementsov@virtuozzo.com,
+ Xie Changlong <xiechanglong.d@gmail.com>
+Message-ID: <a9b44438-06ce-54b2-82cb-ee4e196152f6@redhat.com>
+Subject: Re: [PATCH v2 05/18] block/backup: Add mirror sync mode 'bitmap'
+References: <20190703215542.16123-1-jsnow@redhat.com>
+ <20190703215542.16123-6-jsnow@redhat.com>
+In-Reply-To: <20190703215542.16123-6-jsnow@redhat.com>
 
-Replaced with
+--9pa2bXJy38vBpzMIj2r6cvQhwvS3iYBIz
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/target/i386/machine.c b/target/i386/machine.c
-index 851b249d1a..704ba6de46 100644
---- a/target/i386/machine.c
-+++ b/target/i386/machine.c
-@@ -997,9 +997,8 @@ static bool vmx_nested_state_needed(void *opaque)
- {
-     struct kvm_nested_state *nested_state = opaque;
- 
--    return ((nested_state->format == KVM_STATE_NESTED_FORMAT_VMX) &&
--            ((nested_state->hdr.vmx.vmxon_pa != -1ull) ||
--             (nested_state->hdr.vmx.smm.flags & KVM_STATE_NESTED_SMM_VMXON)));
-+    return (nested_state->format == KVM_STATE_NESTED_FORMAT_VMX &&
-+            nested_state->hdr.vmx.vmxon_pa != -1ull);
- }
- 
- static const VMStateDescription vmstate_vmx_nested_state = {
+On 03.07.19 23:55, John Snow wrote:
+> We don't need or want a new sync mode for simple differences in
+> semantics.  Create a new mode simply named "BITMAP" that is designed to=
 
-and dropped the last paragraph of the commit message.
+> make use of the new Bitmap Sync Mode field.
+>=20
+> Because the only bitmap mode is 'conditional', this adds no new
+> functionality to the backup job (yet). The old incremental backup mode
+> is maintained as a syntactic sugar for sync=3Dbitmap, mode=3Dconditiona=
+l.
+>=20
+> Add all of the plumbing necessary to support this new instruction.
+>=20
+> Signed-off-by: John Snow <jsnow@redhat.com>
+> ---
+>  block/backup.c            | 20 ++++++++++++--------
+>  block/mirror.c            |  6 ++++--
+>  block/replication.c       |  2 +-
+>  blockdev.c                | 19 +++++++++++++++++--
+>  include/block/block_int.h |  4 +++-
+>  qapi/block-core.json      | 20 ++++++++++++++------
+>  6 files changed, 51 insertions(+), 20 deletions(-)
 
-Paolo
+[...]
 
+> diff --git a/blockdev.c b/blockdev.c
+> index cad300d526..d5b089a446 100644
+> --- a/blockdev.c
+> +++ b/blockdev.c
+> @@ -3473,6 +3473,19 @@ static BlockJob *do_backup_common(BackupCommon *=
+backup,
+>          goto out;
+>      }
+> =20
+> +    if (backup->sync =3D=3D MIRROR_SYNC_MODE_INCREMENTAL) {
+> +        if (backup->has_bitmap_mode &&
+> +            backup->bitmap_mode !=3D BITMAP_SYNC_MODE_CONDITIONAL) {
+> +            error_setg(errp, "Bitmap sync mode must be 'conditional' "=
+
+> +                       "when using sync mode '%s'",
+> +                       MirrorSyncMode_str(backup->sync));
+> +            goto out;
+> +        }
+> +        backup->has_bitmap_mode =3D true;
+> +        backup->sync =3D MIRROR_SYNC_MODE_BITMAP;
+> +        backup->bitmap_mode =3D BITMAP_SYNC_MODE_CONDITIONAL;
+> +    }
+> +
+
+A check for
+
+  backup->sync =3D=3D MIRROR_SYNC_MODE_BITMAP && !backup->has_bitmap_mode=
+
+
+or maybe even better
+
+  backup->has_bitmap && !backup->has_bitmap_mode
+
+is missing here.
+
+Max
+
+>      if (backup->has_bitmap) {
+>          bmap =3D bdrv_find_dirty_bitmap(bs, backup->bitmap);
+>          if (!bmap) {
+
+
+--9pa2bXJy38vBpzMIj2r6cvQhwvS3iYBIz--
+
+--SEoXs3EzXcDWA0T8Mc5dQdUzz3a9qLu1Z
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0eG6AACgkQ9AfbAGHV
+z0AWNgf+PDaaT0tpQbbwweVy8CogZ169Hnee7k4HWIJSSJPa1IeNGAGD8NrslXlu
+eZoghs2RVsZOevANsWsGrStMekCmdSEIvYnbCrky1HFR8AfrmGZKsxDeUvisaRO1
+rW5UjeZDeNrZizmlUFHSISGs6YxP/YGhNBk1KMph9GW5lX1aWblGRd5BPQa8z3Dp
+Z8+2Qzxrf3ZF1lbgvbi04yGAQlHBrDZzjvfDhn4+uvDKr6l/km02Nww+GLxqXtvT
+wwdYtMejok6CmS56N2r/xesYRY/dNEMDYDLIctW04eOS5bqpVCwM8y9XpO4rmVaz
+84XYC7Z6k7r28LersvclJyHVn+dt1Q==
+=l5ID
+-----END PGP SIGNATURE-----
+
+--SEoXs3EzXcDWA0T8Mc5dQdUzz3a9qLu1Z--
 
