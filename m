@@ -7,72 +7,72 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60D62C0651F
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 16:21:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED645C0651F
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 16:21:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2252D218A3
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 16:21:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BC957218A4
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 16:21:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="T232z+Hh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2252D218A3
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dTf84enz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC957218A4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47520 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47522 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hj4Tx-0003bE-Cy
-	for qemu-devel@archiver.kernel.org; Thu, 04 Jul 2019 12:21:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44173)
+	id 1hj4U0-0003j9-0w
+	for qemu-devel@archiver.kernel.org; Thu, 04 Jul 2019 12:21:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44219)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hj4HU-000800-93
- for qemu-devel@nongnu.org; Thu, 04 Jul 2019 12:08:22 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hj4He-00084J-6X
+ for qemu-devel@nongnu.org; Thu, 04 Jul 2019 12:08:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hj4HS-0002Ah-Be
- for qemu-devel@nongnu.org; Thu, 04 Jul 2019 12:08:20 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:45491)
+ (envelope-from <peter.maydell@linaro.org>) id 1hj4Hb-0002JO-VZ
+ for qemu-devel@nongnu.org; Thu, 04 Jul 2019 12:08:29 -0400
+Received: from mail-wr1-x433.google.com ([2a00:1450:4864:20::433]:38354)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hj4HQ-00028x-Dp
- for qemu-devel@nongnu.org; Thu, 04 Jul 2019 12:08:16 -0400
-Received: by mail-wr1-x443.google.com with SMTP id f9so7149309wre.12
- for <qemu-devel@nongnu.org>; Thu, 04 Jul 2019 09:08:16 -0700 (PDT)
+ id 1hj4HU-0002AT-99
+ for qemu-devel@nongnu.org; Thu, 04 Jul 2019 12:08:22 -0400
+Received: by mail-wr1-x433.google.com with SMTP id p11so1674609wro.5
+ for <qemu-devel@nongnu.org>; Thu, 04 Jul 2019 09:08:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=JEKrypWivlM4LroK8QYHrkEvHc8PX/KQovIQmzmw7AE=;
- b=T232z+HhaMbCzO+VCVswfH74Spkj4eUkZvD9NYpMj7oZy0awDOjwROJyamA5k/Q0gG
- cEN4GCWyomZW9JFOCYseP7D49g3nDSQO/HWX3Mxcl7iOxFz8kFIJ4oGP+2IYie3nFclb
- fpTFgtDu6fF7G2bHp5QQYEZ6Id4/Gg230b2AEkoO91QC45q9HoHlVRtI7FRLEqPBbuTA
- hoFRr01UEYIfR4roEQByQfalQBU7MkEVnuMY4HWmhs4M58h1B1JNhjcdXB+CIRNPBRhC
- ZuGoQwBLKpqmGUOFK2SE34kOyhmkyBIj2qcujKckxQs9CX+a5sDfbhUmALllK/0J3OnU
- rISw==
+ bh=Fw40v64gwndWG5ZTpcv6OGPGniw0mg+4+kLx37gJbPc=;
+ b=dTf84enzxEGbbHLJlNjJx0ux0knDfC7GnEcWwI9MObcb/+zOtSF3K0hqeZpPy8pUOP
+ MBNTjKxUpjzeCYA/vnK7z5R4ngqL9jpLEefbSxRqbWU9fcOtG1XN+ZCayspheymYLxk2
+ 8jix/7o1bDY0XUdM2x7A8oHwnmvVC31SP8to4+PnHpZKyOhMYr8tba04//FBsqzaKmX7
+ mPYAADmyw4HlNNENTyk5fDKzyE7rED7nolQApYwEPHtCVFvQyfGnXZ7RXZleOsiTS1o9
+ reGqZZ+7cT+sMT1eMA+4sXxf9+/wqr/xb3Ce7mwXpIp5owlRDQYezqqsc3S/7I9frr4a
+ VVNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=JEKrypWivlM4LroK8QYHrkEvHc8PX/KQovIQmzmw7AE=;
- b=OsOnz43ZF+PIMwuZg62uIrbMZtM8NeO6fCDRvS1H4XHnfP82lzR5M/tlcEEeHy7jde
- O1Q9SChVONBgjRfKxazgWaIbbrc1CA06cUgu/WF1cpR9V25Nm+Ok57aABPSqa1Id+d+V
- g+lIKjY3YRs1IWx521zj6n5P28WwwPmslLB4yZzSC6OawThbu5pAwciJ0tN3Ofy4S3cf
- RS6PchPTHdmgeDPgofx/svNYUc3EgpxsR2f/Zw29iJrnKsb2JsmZ7GANWVdEKFbYoXSZ
- hF4FNPdMPmNfrQ3fzNtYbWNGE8zRviXX+K0R4pag3MjYbNPCUw9WuJ1Rq+39/JNNV+sB
- GIVA==
-X-Gm-Message-State: APjAAAVHWpfFcJXRmA2u2e/AUur0Xi1FyF5aettFEym2q7HVMtxGhKSD
- 6S3RdldjvlflwebYga/5tgshf+t37UwjWA==
-X-Google-Smtp-Source: APXvYqwYAOGBmuaEjTe92vOKMT+u9G2sjLCS7YvY2BT22bofCR9zDqtFoejgzjWhZRqQELfVyHzZTA==
-X-Received: by 2002:adf:db4f:: with SMTP id f15mr8592292wrj.188.1562256494977; 
- Thu, 04 Jul 2019 09:08:14 -0700 (PDT)
+ bh=Fw40v64gwndWG5ZTpcv6OGPGniw0mg+4+kLx37gJbPc=;
+ b=WxsissNXbsvTUNFGTU5dm6UnCtP/EfMp8LRY+FKWUNh8C08c1/+mzdT1JV4WsxunuA
+ GGcGnizHSWsduhBPtNMOqVgkeHp4Csv99pTWhAAQoihAsrTETyb4Q620R0HVz3TIOJ2H
+ dtE/GWacpWHoxn4TsN96oLf3zBCeIfexzx8AONeRxA4aGE/GX4SklLvJ8RfiKn8swq/W
+ 1KSOxYtj95k2GfTdxF8+LnfiNjOLW9Eeh3dMq36l5Q4S/2aiTnEn0iteq4QsgH3PNyQP
+ pt/jOSY/ulaoPf7a74tzTe8ACjytvgPey7IXoNinV7+bTbfW/ZIFMcYP7FvaJyeTHwGY
+ vR7A==
+X-Gm-Message-State: APjAAAW/1QptnS9qKYfd8hdFNUOjj7OpahDS4R0WqDNBCDwRkQqXDR/o
+ ooCw7LDjcbZCMmqv3lSskGy3/IjC5Gwi9Q==
+X-Google-Smtp-Source: APXvYqzPwNfZzzg/bCwrawXMW/8qx7DknDMEQaGe5JK/lJFoUAQwRMQwko71w9tBERnxnJ0NTgbEMQ==
+X-Received: by 2002:a5d:5302:: with SMTP id e2mr33618128wrv.347.1562256497574; 
+ Thu, 04 Jul 2019 09:08:17 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id s2sm3849690wmj.33.2019.07.04.09.08.13
+ by smtp.gmail.com with ESMTPSA id s2sm3849690wmj.33.2019.07.04.09.08.16
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Thu, 04 Jul 2019 09:08:14 -0700 (PDT)
+ Thu, 04 Jul 2019 09:08:17 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Thu,  4 Jul 2019 17:07:59 +0100
-Message-Id: <20190704160802.12419-7-peter.maydell@linaro.org>
+Date: Thu,  4 Jul 2019 17:08:02 +0100
+Message-Id: <20190704160802.12419-10-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190704160802.12419-1-peter.maydell@linaro.org>
 References: <20190704160802.12419-1-peter.maydell@linaro.org>
@@ -80,9 +80,9 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::443
-Subject: [Qemu-devel] [PULL 6/9] target/arm: Use _ra versions of
- cpu_stl_data() in v7M helpers
+X-Received-From: 2a00:1450:4864:20::433
+Subject: [Qemu-devel] [PULL 9/9] target/arm: Correct VMOV_imm_dp handling of
+ short vectors
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,91 +98,33 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-In the various helper functions for v7M/v8M instructions, use
-the _ra versions of cpu_stl_data() and friends. Otherwise we
-may get wrong behaviour or an assert() due to not being able
-to locate the TB if there is an exception on the memory access
-or if it performs an IO operation when in icount mode.
+Coverity points out (CID 1402195) that the loop in trans_VMOV_imm_dp()
+that iterates over the destination registers in a short-vector VMOV
+accidentally throws away the returned updated register number
+from vfp_advance_dreg(). Add the missing assignment. (We got this
+correct in trans_VMOV_imm_sp().)
 
+Fixes: 18cf951af9a27ae573a
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20190617175317.27557-5-peter.maydell@linaro.org
+Message-id: 20190702105115.9465-1-peter.maydell@linaro.org
 ---
- target/arm/m_helper.c | 21 ++++++++++++---------
- 1 file changed, 12 insertions(+), 9 deletions(-)
+ target/arm/translate-vfp.inc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/target/arm/m_helper.c b/target/arm/m_helper.c
-index 1b0ad95a05f..dc6dbd8b961 100644
---- a/target/arm/m_helper.c
-+++ b/target/arm/m_helper.c
-@@ -537,8 +537,8 @@ void HELPER(v7m_blxns)(CPUARMState *env, uint32_t dest)
+diff --git a/target/arm/translate-vfp.inc.c b/target/arm/translate-vfp.inc.c
+index deaddb04421..092eb5ec53d 100644
+--- a/target/arm/translate-vfp.inc.c
++++ b/target/arm/translate-vfp.inc.c
+@@ -1971,7 +1971,7 @@ static bool trans_VMOV_imm_dp(DisasContext *s, arg_VMOV_imm_dp *a)
+ 
+         /* Set up the operands for the next iteration */
+         veclen--;
+-        vfp_advance_dreg(vd, delta_d);
++        vd = vfp_advance_dreg(vd, delta_d);
      }
  
-     /* Note that these stores can throw exceptions on MPU faults */
--    cpu_stl_data(env, sp, nextinst);
--    cpu_stl_data(env, sp + 4, saved_psr);
-+    cpu_stl_data_ra(env, sp, nextinst, GETPC());
-+    cpu_stl_data_ra(env, sp + 4, saved_psr, GETPC());
- 
-     env->regs[13] = sp;
-     env->regs[14] = 0xfeffffff;
-@@ -953,6 +953,7 @@ void HELPER(v7m_vlstm)(CPUARMState *env, uint32_t fptr)
-     /* fptr is the value of Rn, the frame pointer we store the FP regs to */
-     bool s = env->v7m.fpccr[M_REG_S] & R_V7M_FPCCR_S_MASK;
-     bool lspact = env->v7m.fpccr[s] & R_V7M_FPCCR_LSPACT_MASK;
-+    uintptr_t ra = GETPC();
- 
-     assert(env->v7m.secure);
- 
-@@ -978,7 +979,7 @@ void HELPER(v7m_vlstm)(CPUARMState *env, uint32_t fptr)
-      * Note that we do not use v7m_stack_write() here, because the
-      * accesses should not set the FSR bits for stacking errors if they
-      * fail. (In pseudocode terms, they are AccType_NORMAL, not AccType_STACK
--     * or AccType_LAZYFP). Faults in cpu_stl_data() will throw exceptions
-+     * or AccType_LAZYFP). Faults in cpu_stl_data_ra() will throw exceptions
-      * and longjmp out.
-      */
-     if (!(env->v7m.fpccr[M_REG_S] & R_V7M_FPCCR_LSPEN_MASK)) {
-@@ -994,10 +995,10 @@ void HELPER(v7m_vlstm)(CPUARMState *env, uint32_t fptr)
-             if (i >= 16) {
-                 faddr += 8; /* skip the slot for the FPSCR */
-             }
--            cpu_stl_data(env, faddr, slo);
--            cpu_stl_data(env, faddr + 4, shi);
-+            cpu_stl_data_ra(env, faddr, slo, ra);
-+            cpu_stl_data_ra(env, faddr + 4, shi, ra);
-         }
--        cpu_stl_data(env, fptr + 0x40, vfp_get_fpscr(env));
-+        cpu_stl_data_ra(env, fptr + 0x40, vfp_get_fpscr(env), ra);
- 
-         /*
-          * If TS is 0 then s0 to s15 and FPSCR are UNKNOWN; we choose to
-@@ -1018,6 +1019,8 @@ void HELPER(v7m_vlstm)(CPUARMState *env, uint32_t fptr)
- 
- void HELPER(v7m_vlldm)(CPUARMState *env, uint32_t fptr)
- {
-+    uintptr_t ra = GETPC();
-+
-     /* fptr is the value of Rn, the frame pointer we load the FP regs from */
-     assert(env->v7m.secure);
- 
-@@ -1051,13 +1054,13 @@ void HELPER(v7m_vlldm)(CPUARMState *env, uint32_t fptr)
-                 faddr += 8; /* skip the slot for the FPSCR */
-             }
- 
--            slo = cpu_ldl_data(env, faddr);
--            shi = cpu_ldl_data(env, faddr + 4);
-+            slo = cpu_ldl_data_ra(env, faddr, ra);
-+            shi = cpu_ldl_data_ra(env, faddr + 4, ra);
- 
-             dn = (uint64_t) shi << 32 | slo;
-             *aa32_vfp_dreg(env, i / 2) = dn;
-         }
--        fpscr = cpu_ldl_data(env, fptr + 0x40);
-+        fpscr = cpu_ldl_data_ra(env, fptr + 0x40, ra);
-         vfp_set_fpscr(env, fpscr);
-     }
- 
+     tcg_temp_free_i64(fd);
 -- 
 2.20.1
 
