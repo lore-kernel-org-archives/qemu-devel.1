@@ -2,91 +2,75 @@ Return-Path: <SRS0=blGQ=VB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D145EC0651F
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 15:44:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E545C0651F
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 16:10:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A57E9218A0
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 15:44:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A57E9218A0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3DE5D2083B
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 16:10:54 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GEEgULEJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3DE5D2083B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47112 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47396 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hj3un-0006Ul-Un
-	for qemu-devel@archiver.kernel.org; Thu, 04 Jul 2019 11:44:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40372)
+	id 1hj4Jx-0002Og-BR
+	for qemu-devel@archiver.kernel.org; Thu, 04 Jul 2019 12:10:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43193)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hj3r8-0003Uw-Nl
- for qemu-devel@nongnu.org; Thu, 04 Jul 2019 11:41:07 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hj4Bw-0005eR-CE
+ for qemu-devel@nongnu.org; Thu, 04 Jul 2019 12:02:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hj3r7-000838-Ty
- for qemu-devel@nongnu.org; Thu, 04 Jul 2019 11:41:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35528)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hj3r5-0007w5-GI; Thu, 04 Jul 2019 11:41:03 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 12477756;
- Thu,  4 Jul 2019 15:40:52 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-204-93.brq.redhat.com
- [10.40.204.93])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id F03978E5F7;
- Thu,  4 Jul 2019 15:40:44 +0000 (UTC)
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-References: <20190703215542.16123-1-jsnow@redhat.com>
- <20190703215542.16123-9-jsnow@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <275816f1-82e1-f766-0b77-2c4dfe08b7eb@redhat.com>
-Date: Thu, 4 Jul 2019 17:40:43 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ (envelope-from <peter.maydell@linaro.org>) id 1hj4Bv-00079h-Do
+ for qemu-devel@nongnu.org; Thu, 04 Jul 2019 12:02:36 -0400
+Received: from mail-ot1-x32f.google.com ([2607:f8b0:4864:20::32f]:38553)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hj4Bu-000761-VS
+ for qemu-devel@nongnu.org; Thu, 04 Jul 2019 12:02:35 -0400
+Received: by mail-ot1-x32f.google.com with SMTP id d17so6414081oth.5
+ for <qemu-devel@nongnu.org>; Thu, 04 Jul 2019 09:02:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:from:date:message-id:subject:to:cc;
+ bh=aUaGRFqGwaGwOvo0cSAoDNVu3YjQ9jD7eDEAqJfnWgU=;
+ b=GEEgULEJ1p8GSRUrsvfrFI89LlyaJlR5mzn+L9JVUUt2ojMP6weEOBM168NTVJufll
+ tb7bzharOu5aogs3/nj6YcjKYVFpSU96xYA6fzVyqfgZp7paGhro/VfxuOO6SHj7O0bT
+ +fqCuySD25ttPfsgR5/Jf+hSHjxJoDupmszWoGtdiCxrK4XDQe+KzRH8q3Pn0yh+pa/L
+ htMqZk/S0O1HrI9EM5DJM7pw9ASLhnn6Xb7A/jgRKsQO4r+2U+Oz/3nVe/ZfAjO8dziF
+ IrZFVObKlwNT9pf/P1d0WzpEbTNdq/sfdOb9RRYV+EXeWWDIdpDLuyG673R4veHzPfYw
+ r0oA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+ bh=aUaGRFqGwaGwOvo0cSAoDNVu3YjQ9jD7eDEAqJfnWgU=;
+ b=DAdKGQfzIouD8wsYKcn4qn3tTC3xKqi6G994nfuqlkIY+CUv6SbZ6AGv8wBoW3fEe+
+ o2BLnWm0RY0elN3JbZYG2r5+/0X2zY6XA9/wyLGOvWpaB2dnOLwF3CzG4QW1rVL5EXrP
+ Z3AtxxEpVvGyT5bGHHh4GoANZ+ugHq/qBTcwouES0/3JMKv9Q+FzDo7HWrAl/asG9j1u
+ F+w2yMKLSq5d7ncpKg5GNGP9yf76jwi05OCCh6PEA3vrnykQi6pRwT5eeaeziTjs6m5a
+ 6QxZ29ilE92LNO3HtHicT/VK42l/9JPme/TXAihvuk8jG1JdNyUn7waQVRWz6G9oFCbI
+ 9XAA==
+X-Gm-Message-State: APjAAAWNfAoo0/3zHXC6zn4BRR9X+28MQkf79uZnikxO513tvhvAgjE0
+ EliVEw6Eabf3sypAl6NKnCMqhzUzydPu1E0lnOFxmhqVeKU=
+X-Google-Smtp-Source: APXvYqzMcfOyoEQZwVmms6740aQ/sFUNcnEKXJYGPRmTrsfGuYCviAbOUzsFM6e2D3f3YWXGv+Jrao1HJk2mD+M5Qco=
+X-Received: by 2002:a9d:5f1a:: with SMTP id f26mr1872302oti.91.1562256147975; 
+ Thu, 04 Jul 2019 09:02:27 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190703215542.16123-9-jsnow@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="s6I1OXPdDxSX3RL2zCFWTYT0X56Bdo0LF"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.29]); Thu, 04 Jul 2019 15:40:57 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 08/18] hbitmap: enable merging across
- granularities
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 4 Jul 2019 17:02:17 +0100
+Message-ID: <CAFEAcA-yzWhwYPzC9px0H-=x3XEPVBjZOhk402is49YpbmJX9g@mail.gmail.com>
+To: QEMU Developers <qemu-devel@nongnu.org>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::32f
+Subject: [Qemu-devel] pl031 time across vm save/reload
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,67 +82,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- vsementsov@virtuozzo.com, Juan Quintela <quintela@redhat.com>,
- Wen Congyang <wencongyang2@huawei.com>,
- Xie Changlong <xiechanglong.d@gmail.com>,
- Markus Armbruster <armbru@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---s6I1OXPdDxSX3RL2zCFWTYT0X56Bdo0LF
-Content-Type: multipart/mixed; boundary="mEkPbRNId9kS3M7nCg3eYeHDevftmQHky";
- protected-headers="v1"
-From: Max Reitz <mreitz@redhat.com>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
- Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Fam Zheng <fam@euphon.net>, Juan Quintela <quintela@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Wen Congyang <wencongyang2@huawei.com>, vsementsov@virtuozzo.com,
- Xie Changlong <xiechanglong.d@gmail.com>
-Message-ID: <275816f1-82e1-f766-0b77-2c4dfe08b7eb@redhat.com>
-Subject: Re: [PATCH v2 08/18] hbitmap: enable merging across granularities
-References: <20190703215542.16123-1-jsnow@redhat.com>
- <20190703215542.16123-9-jsnow@redhat.com>
-In-Reply-To: <20190703215542.16123-9-jsnow@redhat.com>
+I've had a report that the way the PL031 model handles time
+across a vm save/reload fails to correctly advance the guest
+RTC when the host RTC has advanced between the save and reload.
+I looked at the code and my correspondent's analysis (which
+I quote below, lightly edited) looks correct to me, but I'm not
+entirely sure how our RTC stuff is supposed to work. Paolo,
+you wrote this (way back in commit b0f26631bc5179006) -- any opinions?
 
---mEkPbRNId9kS3M7nCg3eYeHDevftmQHky
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+In the pl031 RTC device. the current time is given by:
 
-On 03.07.19 23:55, John Snow wrote:
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> ---
->  util/hbitmap.c | 36 +++++++++++++++++++++++++++++++++++-
->  1 file changed, 35 insertions(+), 1 deletion(-)
+    int64_t now = qemu_clock_get_ns(rtc_clock);
+    return s->tick_offset + now / NANOSECONDS_PER_SECOND;
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+On save we do:
 
+    /* tick_offset is base_time - rtc_clock base time.  Instead, we want to
+     * store the base time relative to the QEMU_CLOCK_VIRTUAL for
+backwards-compatibility.  */
+    int64_t delta = qemu_clock_get_ns(rtc_clock) -
+qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+    s->tick_offset_vmstate = s->tick_offset + delta / NANOSECONDS_PER_SECOND;
 
---mEkPbRNId9kS3M7nCg3eYeHDevftmQHky--
+On restore:
 
---s6I1OXPdDxSX3RL2zCFWTYT0X56Bdo0LF
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+    int64_t delta = qemu_clock_get_ns(rtc_clock) -
+qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+    s->tick_offset = s->tick_offset_vmstate - delta / NANOSECONDS_PER_SECOND;
 
------BEGIN PGP SIGNATURE-----
+So, no matter what is requested, if "qemu_clock_get_ns(rtc_clock)"
+increases (eg, because host time increased), then tick_offset
+reduces, which makes time follow QEMU_CLOCK_VIRTUAL no matter what
+was requested on qemu's command line.
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0eHfsACgkQ9AfbAGHV
-z0CjTggAtoE8NJpOwI9lcpAMGD5jJoYISlCusm3gTMAAID9vR27V8flKDyd5mNlA
-2juqzSgkQS4DKzmvr57IzNA+YemaGuJow5nWzc3Xv98e8UtRLvtaXQVfIKEcyF/h
-V4GwEW1DoDkTcQUHrWdT6AbGG6muwUcHIVqGC/QVOuev479Jo2kKgibRGDkVFqlI
-MRYCozHJ9TPEYw89EN+SFLnzQZQmOh3lga9xJFBlalR8yhhg1dc8bVdHwJOC5GrZ
-otaICTREDfb25dviT/E9dS4bNMVImk7R0f596DYPRMlWxWfNH5LYBx7xj3ywWsLR
-bGRZJDG+456pZx82c6K3SlhnwPBN6Q==
-=5V6c
------END PGP SIGNATURE-----
+(That is, because we migrate "offset relative to CLOCK_VIRTUAL"
+and CLOCK_VIRTUAL does not advance when the VM is stopped,
+we don't get the right behaviour of "offset is relative to
+the new CLOCK_RTC, which might have advanced".).
 
---s6I1OXPdDxSX3RL2zCFWTYT0X56Bdo0LF--
+thanks
+-- PMM
 
