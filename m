@@ -2,91 +2,91 @@ Return-Path: <SRS0=blGQ=VB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B081BC0651F
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 16:45:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69A8AC0651F
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 16:51:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7784121721
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 16:45:36 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iPzLPUeP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7784121721
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 343C421721
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 16:51:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 343C421721
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47688 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47700 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hj4rX-0002ga-KQ
-	for qemu-devel@archiver.kernel.org; Thu, 04 Jul 2019 12:45:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48979)
+	id 1hj4wn-0004K8-8z
+	for qemu-devel@archiver.kernel.org; Thu, 04 Jul 2019 12:51:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49731)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hj4pH-00019O-0i
- for qemu-devel@nongnu.org; Thu, 04 Jul 2019 12:43:16 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hj4vL-0003cE-NU
+ for qemu-devel@nongnu.org; Thu, 04 Jul 2019 12:49:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hj4pF-0008K5-LM
- for qemu-devel@nongnu.org; Thu, 04 Jul 2019 12:43:14 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:37830)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hj4pF-0008JH-Cd
- for qemu-devel@nongnu.org; Thu, 04 Jul 2019 12:43:13 -0400
-Received: by mail-wm1-x342.google.com with SMTP id f17so6779838wme.2
- for <qemu-devel@nongnu.org>; Thu, 04 Jul 2019 09:43:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=Tp4Wu5LiPCdRor0HI3gefVRjXcDxalH8b04z47vPtbI=;
- b=iPzLPUePF7Pr5wL+XFrMB9NdO3BiVG0pokTxbBApMnB3bo9vR+REZx3Ru962UdqWHl
- h924A+zSYkKHsZm3+XmypskK4ZmyrEwcagDKH5QAxN97NUH7kyZ8xkx4noAPHJo8wliq
- 0ebBqyd/G0bc/wN8oY5tBEszw1hUiVweg0j8tMn3TEDabda99DOesV7Foi8TfbP5ArMO
- X9cAbjHWyoVgYnfz8VIKFNA/btdk6CGe+Rr90ZmR0dB5ulkA0BgmVqxBg6994kVfxnUg
- LMNoQCSLj+rdFCYF5CRK46iXKeFEveQs03MM+LbOb8gq5AhfozBMVRRZyiUngAcQjbzg
- jmOg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=Tp4Wu5LiPCdRor0HI3gefVRjXcDxalH8b04z47vPtbI=;
- b=mvisrGTo/Qy0w9RMd/IILQaJn4fiPLJOTJbAYf0tFjlBJcbb1eQPliukumoPJgdWXu
- NkPBBMjHzuMS9m4cNrvK+lBR4kZsBJG0f6Oi7fF57k9667RMOLXrJugf6L+AteeEBwhS
- h78a88dLt8+qYAZf6jpVu3zSa+PgqrPieja2YeTuoO3ixz+oUUqLPAa24753qTSLHQad
- 6GlT89f+Zndk+vV8sjJ1ytPnZsAK2+fGw7rARwy8nJL3EVryvtNyMcsMoYYpfA8OzyZu
- xMA/N8pSo9qXDaNfcs5vcCuzDZ7OHXI4fNh6MnEIeLfk0Q4Ee0Xf4eMWZQZBs0EE3p1G
- +pEA==
-X-Gm-Message-State: APjAAAWpQg1p5orlgwH7FBMZU4tYSV3rLhsgD/Pw9PXflMkwSuPEvFvU
- hV3UVIkxzjf1iwyn9GTNnhhYzA==
-X-Google-Smtp-Source: APXvYqxCdXyACMavFWZIGVH5+uExNviHM1UG/NyaTO+wraTHt71R2P4Z40wKTBca5FzqgO7Y60htuw==
-X-Received: by 2002:a1c:9813:: with SMTP id a19mr286297wme.11.1562258591348;
- Thu, 04 Jul 2019 09:43:11 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id i18sm3549234wrp.91.2019.07.04.09.43.10
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Thu, 04 Jul 2019 09:43:10 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 6FA2F1FF87;
- Thu,  4 Jul 2019 17:43:10 +0100 (BST)
-References: <20190702210017.4275-1-vandersonmr2@gmail.com>
- <20190702210017.4275-6-vandersonmr2@gmail.com>
-User-agent: mu4e 1.3.2; emacs 26.1
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-In-reply-to: <20190702210017.4275-6-vandersonmr2@gmail.com>
-Date: Thu, 04 Jul 2019 17:43:10 +0100
-Message-ID: <871rz5wy1t.fsf@zen.linaroharston>
+ (envelope-from <mreitz@redhat.com>) id 1hj4vK-0003Ox-J9
+ for qemu-devel@nongnu.org; Thu, 04 Jul 2019 12:49:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37621)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1hj4vH-0003Lv-JB; Thu, 04 Jul 2019 12:49:27 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 580CB30C585B;
+ Thu,  4 Jul 2019 16:49:20 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-204-93.brq.redhat.com
+ [10.40.204.93])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 08FAD1FC;
+ Thu,  4 Jul 2019 16:49:10 +0000 (UTC)
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+References: <20190703215542.16123-1-jsnow@redhat.com>
+ <20190703215542.16123-10-jsnow@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <b73e23a0-5454-c7d4-f1b3-da99e07b1edb@redhat.com>
+Date: Thu, 4 Jul 2019 18:49:09 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::342
-Subject: Re: [Qemu-devel] [PATCH v3 6/6] monitor: adding start_stats to
- monitor
+In-Reply-To: <20190703215542.16123-10-jsnow@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="aQyEr6J4DWjYS8406gbcx2MbqOmweOHhd"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.46]); Thu, 04 Jul 2019 16:49:26 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2 09/18] block/dirty-bitmap: add
+ bdrv_dirty_bitmap_merge_internal
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,93 +98,154 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: vandersonmr <vandersonmr2@gmail.com>,
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ vsementsov@virtuozzo.com, Juan Quintela <quintela@redhat.com>,
+ Wen Congyang <wencongyang2@huawei.com>,
+ Xie Changlong <xiechanglong.d@gmail.com>,
+ Markus Armbruster <armbru@redhat.com>,
  "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Markus Armbruster <armbru@redhat.com>
+ Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--aQyEr6J4DWjYS8406gbcx2MbqOmweOHhd
+Content-Type: multipart/mixed; boundary="rSYEPRvc2JSQ2tOwyDBf7LxEqjPfACsAX";
+ protected-headers="v1"
+From: Max Reitz <mreitz@redhat.com>
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
+ Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Fam Zheng <fam@euphon.net>, Juan Quintela <quintela@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Wen Congyang <wencongyang2@huawei.com>, vsementsov@virtuozzo.com,
+ Xie Changlong <xiechanglong.d@gmail.com>
+Message-ID: <b73e23a0-5454-c7d4-f1b3-da99e07b1edb@redhat.com>
+Subject: Re: [PATCH v2 09/18] block/dirty-bitmap: add
+ bdrv_dirty_bitmap_merge_internal
+References: <20190703215542.16123-1-jsnow@redhat.com>
+ <20190703215542.16123-10-jsnow@redhat.com>
+In-Reply-To: <20190703215542.16123-10-jsnow@redhat.com>
 
-vandersonmr <vandersonmr2@gmail.com> writes:
+--rSYEPRvc2JSQ2tOwyDBf7LxEqjPfACsAX
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-> adding the option to start collecting the tb
-> statistics later using the start_stats command.
->
-> Signed-off-by: vandersonmr <vandersonmr2@gmail.com>
+On 03.07.19 23:55, John Snow wrote:
+> I'm surprised it didn't come up sooner, but sometimes we have a +busy
+> bitmap as a source. This is dangerous from the QMP API, but if we are
+> the owner that marked the bitmap busy, it's safe to merge it using it a=
+s
+> a read only source.
+>=20
+> It is not safe in the general case to allow users to read from in-use
+> bitmaps, so create an internal variant that foregoes the safety
+> checking.
+>=20
+> Signed-off-by: John Snow <jsnow@redhat.com>
 > ---
->  hmp-commands.hx | 15 +++++++++++++++
->  monitor/misc.c  | 15 +++++++++++++++
->  2 files changed, 30 insertions(+)
->
-> diff --git a/hmp-commands.hx b/hmp-commands.hx
-> index bfa5681dd2..616b9f7388 100644
-> --- a/hmp-commands.hx
-> +++ b/hmp-commands.hx
-> @@ -1885,6 +1885,21 @@ STEXI
->  @findex qemu-io
->  Executes a qemu-io command on the given block device.
->
-> +ETEXI
-> +
-> +    {
-> +        .name       =3D "start_stats",
+>  block/dirty-bitmap.c      | 51 +++++++++++++++++++++++++++++++++------=
 
-Maybe tb_stats? with an inferred "start" or a "reset" option? And then
-an extensible set of options to expand what we record.
-
-> +        .args_type  =3D "",
-> +        .params     =3D "",
-> +        .help       =3D "(re)start recording tb statistics",
-> +        .cmd        =3D hmp_tbstats_start,
-> +    },
-> +
-> +STEXI
-> +@item start_stats
-> +@findex
-> +(Re)start recording tb statistics
-> +
->  ETEXI
->
->      {
-> diff --git a/monitor/misc.c b/monitor/misc.c
-> index 1fb4d75871..d39a048fd7 100644
-> --- a/monitor/misc.c
-> +++ b/monitor/misc.c
-> @@ -469,6 +469,21 @@ static void hmp_info_jit(Monitor *mon, const QDict *=
-qdict)
->      dump_drift_info();
+>  include/block/block_int.h |  3 +++
+>  2 files changed, 47 insertions(+), 7 deletions(-)
+>=20
+> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+> index 95a9c2a5d8..b0f76826b3 100644
+> --- a/block/dirty-bitmap.c
+> +++ b/block/dirty-bitmap.c
+> @@ -810,11 +810,15 @@ bool bdrv_dirty_bitmap_next_dirty_area(BdrvDirtyB=
+itmap *bitmap,
+>      return hbitmap_next_dirty_area(bitmap->bitmap, offset, bytes);
 >  }
->
-> +static void hmp_tbstats_start(Monitor *mon, const QDict *qdict)
-> +{
-> +    if (!tcg_enabled()) {
-> +        error_report("TB information is only available with accel=3Dtcg"=
-);
-> +        return;
+> =20
+> +/**
+> + * bdrv_merge_dirty_bitmap: merge src into dest.
+> + * Ensures permissions on bitmaps are reasonable; use for public API.
+> + *
+> + * @backup: If provided, make a copy of dest here prior to merge.
+> + */
+>  void bdrv_merge_dirty_bitmap(BdrvDirtyBitmap *dest, const BdrvDirtyBit=
+map *src,
+>                               HBitmap **backup, Error **errp)
+>  {
+> -    bool ret;
+> -
+>      qemu_mutex_lock(dest->mutex);
+>      if (src->mutex !=3D dest->mutex) {
+>          qemu_mutex_lock(src->mutex);
+> @@ -833,6 +837,37 @@ void bdrv_merge_dirty_bitmap(BdrvDirtyBitmap *dest=
+, const BdrvDirtyBitmap *src,
+>          goto out;
+>      }
+> =20
+> +    assert(bdrv_dirty_bitmap_merge_internal(dest, src, backup, false))=
+;
+
+Please keep the explicit @ret.  We never define NDEBUG, but doing things
+with side effects inside of assert() is bad style nonetheless.
+
+> +
+> +out:
+> +    qemu_mutex_unlock(dest->mutex);
+> +    if (src->mutex !=3D dest->mutex) {
+> +        qemu_mutex_unlock(src->mutex);
 > +    }
-> +    if (qemu_loglevel_mask(CPU_LOG_HOT_TBS)) {
-> +        error_report("TB information already being recorded");
-> +        return;
-> +    }
-
-As mentioned before lets have an internal flags for this.
-
-> +    qht_init(&tb_ctx.tb_stats, tb_stats_cmp, CODE_GEN_HTABLE_SIZE,
-> +                QHT_MODE_AUTO_RESIZE);
-> +    qemu_set_log(qemu_loglevel | CPU_LOG_HOT_TBS);
-
-I suspect we want to safe work this so we can a) flush existing tb stats
-for a reset and b) ensure we do a tb_flush() when we enable stats
-(otherwise we won't collect anything).
-
 > +}
 > +
->  static void hmp_info_tbs(Monitor *mon, const QDict *qdict)
->  {
->      int n;
+> +/**
+> + * bdrv_dirty_bitmap_merge_internal: merge src into dest.
+> + * Does NOT check bitmap permissions; not suitable for use as public A=
+PI.
+> + *
+> + * @backup: If provided, make a copy of dest here prior to merge.
+> + * @lock: If true, lock and unlock bitmaps on the way in/out.
+> + * returns true if the merge succeeded; false if unattempted.
+> + */
+> +bool bdrv_dirty_bitmap_merge_internal(BdrvDirtyBitmap *dest,
+> +                                      const BdrvDirtyBitmap *src,
+> +                                      HBitmap **backup,
+> +                                      bool lock)
+> +{
+> +    bool ret;
+> +
+> +    if (lock) {
+> +        qemu_mutex_lock(dest->mutex);
+> +        if (src->mutex !=3D dest->mutex) {
+> +            qemu_mutex_lock(src->mutex);
+> +        }
+> +    }
+> +
+
+Why not check for INCONSISTENT and RO still?
+
+Max
+
+>      if (backup) {
+>          *backup =3D dest->bitmap;
+>          dest->bitmap =3D hbitmap_alloc(dest->size, hbitmap_granularity=
+(*backup));
 
 
---
-Alex Benn=C3=A9e
+--rSYEPRvc2JSQ2tOwyDBf7LxEqjPfACsAX--
+
+--aQyEr6J4DWjYS8406gbcx2MbqOmweOHhd
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0eLgUACgkQ9AfbAGHV
+z0ATIwf/ZB3jIuzP7aJqaJwgC0A8yPULXrX6uS0NhqiLq16gTH7EwQHFQpDlNvXj
+fF/VzcRdvAh79wThtPIWxGQb2UA5OX8iYOQnrUb2HNH3HzSKz+RQIMbC4EN10YnN
+u05ezBcIO3nBGoWCHrxBQ7FV+ella5gDI+iPJvpd9NVHlm/ZZ1HK09JsHDWJk3E6
+x3x73rEfBw2MfFQcOcfmatrYb6xOun3JPHDbQV6k+49V44ULW7a7uSiHpaVB+E/g
+rqOOrDPpwRGOxA5PFfQLtcqAXZHE0pLRNmz5Ii+HuAM89+M2kQoqmaNlotqNWNAL
+vtI/qcg/YbUsEHLk0ZoQTXXe+tGv+g==
+=fbbI
+-----END PGP SIGNATURE-----
+
+--aQyEr6J4DWjYS8406gbcx2MbqOmweOHhd--
 
