@@ -2,91 +2,114 @@ Return-Path: <SRS0=blGQ=VB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BEA2C0651F
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 16:37:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 258FEC0651F
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 16:40:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1468A2085A
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 16:37:41 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DVk0M60O"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1468A2085A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id EBF3821721
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 16:40:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EBF3821721
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47658 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47668 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hj4js-0006RP-6k
-	for qemu-devel@archiver.kernel.org; Thu, 04 Jul 2019 12:37:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48196)
+	id 1hj4mY-0007Wx-KR
+	for qemu-devel@archiver.kernel.org; Thu, 04 Jul 2019 12:40:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48520)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hj4io-00062K-7i
- for qemu-devel@nongnu.org; Thu, 04 Jul 2019 12:36:35 -0400
+ (envelope-from <laurent@vivier.eu>) id 1hj4lh-00070t-7Y
+ for qemu-devel@nongnu.org; Thu, 04 Jul 2019 12:39:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hj4in-0004aP-3u
- for qemu-devel@nongnu.org; Thu, 04 Jul 2019 12:36:34 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:36933)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hj4im-0004ZI-SZ
- for qemu-devel@nongnu.org; Thu, 04 Jul 2019 12:36:33 -0400
-Received: by mail-wr1-x444.google.com with SMTP id v14so7258121wrr.4
- for <qemu-devel@nongnu.org>; Thu, 04 Jul 2019 09:36:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=cjiN2/LB7kWpvIHN57PFsMm6pOj+0hDcXNe726dQf1M=;
- b=DVk0M60O031xHoF4uNSrtnDf5phKSLnf/wXlqZYaBtL4TPcvFg9Bh80n9WbFOKaKU+
- fxTVW1V/iZ6/FFducdA4m/qJpYokc5x5eps8ZzQfObOTmH2bOAE4auA7EScA5Bsm4dl8
- X8RKFZPhGo8P8wJ8yDqvxo+6L3E5k+qqTeNX+UoTvZTMmGE0PU4Mdk3JOFShyEtfRfNy
- l6SQo8P7/30Rruxj5ZREpKgDC6F+fMfJsD+cHL+ZBMnQx7Ib/oGtUavLZJuk8VWGcLs7
- rLsXLKhUh7AbOrVXwvxlOTDOxZpUMkh0v+sJ4xOg9WI4IQyLj/VDykfL3hcbHRSXID3f
- wFvw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=cjiN2/LB7kWpvIHN57PFsMm6pOj+0hDcXNe726dQf1M=;
- b=MQIS+hLSghsSfNyMgGNTR6LX3KdNj74/2F3gnx3FPwIQib4jV/oTFg2j1FxaR1ZMWR
- yCDsqrGxnebkyN8PHFz4Xd+3QdLkHg5bj6aKYeMuvpWvQI+oJ6/wuWr41r2sZRrJIsG5
- w/BN8tVyLrdfSADHoPitiTLKDyPEeO6LHy8XtsKjOxRK0LaryPdB4vPmikPJQMDgRsip
- plT1vYJYWnvhMHLGsNaJYuwzMDnB6U4faxH0H+CiiclLyTU4OwEboGu55irAHFPCGiwm
- b06csJ3GSYIbwMdSAFSBJdDlmxeTDmiaALV9F6t0MHH7Zm5atcaZJu1LcKQWMtAdZ+0o
- nuFg==
-X-Gm-Message-State: APjAAAXXOhR4H0V3Hk5XDPphGNVruK6T7HE8DsbM1Lnoik1/huL3nyjZ
- hvYvKYE8IOPQXzrylMlTbYdbQQ==
-X-Google-Smtp-Source: APXvYqyQgTjbSIYqtBs4DPbG4zknD6BwhrQIarYdgnaHy3dL2jr4aWID4S1Or/ZxlPZBJZFcx49jPQ==
-X-Received: by 2002:a5d:4602:: with SMTP id t2mr9160741wrq.38.1562258191107;
- Thu, 04 Jul 2019 09:36:31 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id d1sm215057wrs.94.2019.07.04.09.36.30
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Thu, 04 Jul 2019 09:36:30 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 3730C1FF87;
- Thu,  4 Jul 2019 17:36:30 +0100 (BST)
-References: <20190702210017.4275-1-vandersonmr2@gmail.com>
- <20190702210017.4275-5-vandersonmr2@gmail.com>
-User-agent: mu4e 1.3.2; emacs 26.1
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-In-reply-to: <20190702210017.4275-5-vandersonmr2@gmail.com>
-Date: Thu, 04 Jul 2019 17:36:30 +0100
-Message-ID: <8736jlwycx.fsf@zen.linaroharston>
+ (envelope-from <laurent@vivier.eu>) id 1hj4lf-0006Jn-Av
+ for qemu-devel@nongnu.org; Thu, 04 Jul 2019 12:39:33 -0400
+Received: from mout.kundenserver.de ([217.72.192.74]:52561)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hj4ld-0006FE-N5
+ for qemu-devel@nongnu.org; Thu, 04 Jul 2019 12:39:31 -0400
+Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
+ (mreue106 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1M6EKU-1hcU7f13s0-006cQS; Thu, 04 Jul 2019 18:39:07 +0200
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
+References: <1562251966-19318-1-git-send-email-aleksandar.markovic@rt-rk.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Openpgp: preference=signencrypt
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <486ba742-e1ab-d473-430c-56b24c291d64@vivier.eu>
+Date: Thu, 4 Jul 2019 18:39:06 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
+In-Reply-To: <1562251966-19318-1-git-send-email-aleksandar.markovic@rt-rk.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::444
-Subject: Re: [Qemu-devel] [PATCH v3 5/6] monitor: adding info tb and tbs to
- monitor
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:cxwmX6ZoqqJnhwXTtRPtbPaIf7HanLoBY9mLzcUzWC/ap+ktApT
+ Ge2ehfk8LT32iJFJn+ovwB8vfvh4hTGXaA+MOuAqrg7hhVABQKcCZDq3h8WIup6dCFeZzvF
+ QYNCk3oQ+8gx0SFy1qi6h4fDak0TOFegfhy2LN0chsx2sROud0ILJHQwQxHfxWrzD7wG25h
+ +Qj4ezZz9kKEQTYAa3ptg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:/dM04zn/HGQ=:JGZ9VHCyF3Sum7bLVc23m1
+ cV9XK/kz19N/oKrpMCGXJ1m8qkPeV0NJ39cdQ3DpheNfafbelIGJOioiKdxR7YyQkK6zvftZo
+ 23WLadBMI8hBrwpja2mHZS9+ULwVE31kXWig1i8Lvomyz+knQ+Ej65tU20jCIfs6MZZQY52x0
+ 6TCnspqTT9rOAbTHKkv6aAHbddaaU8+mfOSIA82PcQKnkppOyq4vngtRpCxCTVScHhvJ3uRBK
+ w449tmhTHkngrOEkm4narL4CWPL9wYpgS/8feGRCbH1ecvXB6rkuvDafnPdF3cDvKzFiS+4R0
+ kVucOOdxJmzf3t4eaBvULR3mF4IgTEsEwELbR+2+d8Zx6oq804OKHQEjA+lysTo2s17GTORQ3
+ 9/YOntnw1RMEM1LZPS6ZOHhv9iiRe4r+f2fsgTe9m6XZY4SwWm/N8MHYqSEzgjr2/dqXY4wM3
+ HbRV4iozcJjG5YqraCa25edup03eCiyA9OqULOuKiZ+UhuewEXh8jwDRzNtZ8kkem5S9IMP/K
+ BqWiL4jx9G06tFOVgbJL4ornIUkiGcCwA5IGVH1CD+wpRthFJtYk5iGydI+Vpc2CtxXDMPmNT
+ Hiy+COi7ms/wr1aO+tjVvljBfzjZJNzx0pKYMEY5plDMDpgWyYIofBGEDfiyhfBqGaN04DPKX
+ 5TjwlDFcXZoZcVfsUk2lbExCgPwUxx1NFd1ACvqQNSvYx2ZBP+6c873xcA2h1cBaa1kYfOK//
+ 8F/61pF0WCvk7B0KMasVIGiMIuOd2iQmJvfV3DjsjLozDQlymASPab3T3MY=
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 217.72.192.74
+Subject: Re: [Qemu-devel] [PATCH for 4.1] linux-user: Fix structure
+ target_ucontext for MIPS
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,153 +121,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: vandersonmr <vandersonmr2@gmail.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Markus Armbruster <armbru@redhat.com>
+Cc: Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Dragan Mladjenovic <dmladjenovic@wavecomp.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-vandersonmr <vandersonmr2@gmail.com> writes:
-
-> adding options to list tbs by some metric and
-> investigate their code.
->
-> Signed-off-by: Vanderson M. do Rosario <vandersonmr2@gmail.com>
+Le 04/07/2019 à 16:52, Aleksandar Markovic a écrit :
+> From: Aleksandar Markovic <amarkovic@wavecomp.com>
+> 
+> Structure ucontext for MIPS is defined in the following way in
+> Linux kernel:
+> 
+> (arch/mips/include/uapi/asm/ucontext.h, lines 54-64)
+> 
+> struct ucontext {
+>     /* Historic fields matching asm-generic */
+>     unsigned long       uc_flags;
+>     struct ucontext     *uc_link;
+>     stack_t             uc_stack;
+>     struct sigcontext   uc_mcontext;
+>     sigset_t            uc_sigmask;
+> 
+>     /* Extended context structures may follow ucontext */
+>     unsigned long long	uc_extcontext[0];
+> };
+> 
+> Fix the structure target_sigset_t for MIPS to reflect the definition
+> above, except the correction for field uc_extcontext, which will
+> follow at some later time.
+> 
+> Fixes: 94c5495d
+> 
+> Reported-by: Dragan Mladjenovic <dmladjenovic@wavecomp.com>
+> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 > ---
->  hmp-commands-info.hx | 22 ++++++++++++++
->  monitor/misc.c       | 69 ++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 91 insertions(+)
->
-> diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
-> index c59444c461..0b8c0de95d 100644
-> --- a/hmp-commands-info.hx
-> +++ b/hmp-commands-info.hx
-> @@ -288,6 +288,28 @@ ETEXI
->          .params     =3D "",
->          .help       =3D "show dynamic compiler info",
->          .cmd        =3D hmp_info_jit,
-> +    {
+>  linux-user/mips/signal.c | 5 ++---
+>  1 file changed, 2 insertions(+), 3 deletions(-)
+> 
+> diff --git a/linux-user/mips/signal.c b/linux-user/mips/signal.c
+> index 6aa303e..455a8a2 100644
+> --- a/linux-user/mips/signal.c
+> +++ b/linux-user/mips/signal.c
+> @@ -71,10 +71,9 @@ struct sigframe {
+>  };
+>  
+>  struct target_ucontext {
+> -    target_ulong tuc_flags;
+> -    target_ulong tuc_link;
+> +    abi_ulong tuc_flags;
+> +    abi_ulong tuc_link;
+>      target_stack_t tuc_stack;
+> -    target_ulong pad0;
+>      struct target_sigcontext tuc_mcontext;
+>      target_sigset_t tuc_sigmask;
+>  };
+> 
 
-Ahh this is the breakage:
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 
-},
-{
+I think the padding is not needed anymore because the ABI types are now
+aligned using the target ABI rules.
 
-> +        .name       =3D "tbs",
-> +        .args_type  =3D "number:i?,sortedby:s?",
-> +        .params     =3D "[number sortedby]",
-> +        .help       =3D "show a [number] translated blocks sorted by [so=
-rtedby]"
-> +                      "sortedby opts: hotness hg",
-> +        .cmd        =3D hmp_info_tbs,
-> +    },
-> +    {
-> +        .name       =3D "tb",
-> +        .args_type  =3D "id:i,flags:s?",
-> +        .params     =3D "id [log1[,...] flags]",
-> +        .help       =3D "show information about one translated block by =
-id",
-> +        .cmd        =3D hmp_info_tb,
-> +    },
-> +    {
-> +        .name       =3D "coverset",
-> +        .args_type  =3D "number:i?",
-> +        .params     =3D "[number]",
-> +        .help       =3D "show hottest translated blocks neccesary to cov=
-er"
-> +                      "[number]% of the execution count",
-> +        .cmd        =3D hmp_info_coverset,
->      },
->  #endif
->
-> diff --git a/monitor/misc.c b/monitor/misc.c
-> index bf9faceb86..1fb4d75871 100644
-> --- a/monitor/misc.c
-> +++ b/monitor/misc.c
-> @@ -469,6 +469,75 @@ static void hmp_info_jit(Monitor *mon, const QDict *=
-qdict)
->      dump_drift_info();
->  }
->
-> +static void hmp_info_tbs(Monitor *mon, const QDict *qdict)
-> +{
-> +    int n;
-> +    const char *s =3D NULL;
-> +    if (!tcg_enabled()) {
-> +        error_report("TB information is only available with accel=3Dtcg"=
-);
-> +        return;
-> +    }
-> +    if (!tb_ctx.tb_stats.map) {
-> +        error_report("no TB information recorded");
-> +        return;
-> +    }
-> +
-> +    n =3D qdict_get_try_int(qdict, "number", 10);
-> +    s =3D qdict_get_try_str(qdict, "sortedby");
-> +
-> +    int sortedby =3D 0;
-> +    if (s =3D=3D NULL || strcmp(s, "hotness") =3D=3D 0) {
-> +        sortedby =3D SORT_BY_HOTNESS;
-> +    } else if (strcmp(s, "hg") =3D=3D 0) {
-> +        sortedby =3D SORT_BY_HG;
-> +    }
-> +
-> +    dump_tbs_info(n, sortedby, true);
-> +}
-> +
-> +static void hmp_info_tb(Monitor *mon, const QDict *qdict)
-> +{
-> +    const int id =3D qdict_get_int(qdict, "id");
-> +    const char *flags =3D qdict_get_try_str(qdict, "flags");
-> +    int mask;
-> +
-> +    if (!tcg_enabled()) {
-> +        error_report("TB information is only available with accel=3Dtcg"=
-);
-> +        return;
-> +    }
-> +
-> +    mask =3D flags ? qemu_str_to_log_mask(flags) : CPU_LOG_TB_IN_ASM;
-> +
-> +    if (!mask) {
-> +        help_cmd(mon, "log");
-> +        return;
-> +    }
-> +
-> +    dump_tb_info(id, mask, true);
-> +}
-> +
-> +static void hmp_info_coverset(Monitor *mon, const QDict *qdict)
-> +{
-> +    int n;
-> +    if (!tcg_enabled()) {
-> +        error_report("TB information is only available with accel=3Dtcg"=
-);
-> +        return;
-> +    }
-> +    if (!qemu_loglevel_mask(CPU_LOG_HOT_TBS)) {
-> +        error_report("TB information not being recorded");
-> +        return;
-> +    }
-> +
-> +    n =3D qdict_get_try_int(qdict, "number", 90);
-> +
-> +    if (n < 0 || n > 100) {
-> +        error_report("Coverset percentage should be between 0 and 100");
-> +        return;
-> +    }
-> +
-> +    dump_coverset_info(n, true);
-> +}
-> +
->  static void hmp_info_opcount(Monitor *mon, const QDict *qdict)
->  {
->      dump_opcount_info();
-
-
---
-Alex Benn=C3=A9e
+Thanks,
+Laurent
 
