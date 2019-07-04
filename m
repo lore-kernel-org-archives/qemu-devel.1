@@ -2,91 +2,66 @@ Return-Path: <SRS0=blGQ=VB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77E4BC0651F
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 15:08:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40C80C0651F
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 15:10:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4F391218B8
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 15:08:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F391218B8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 155D620659
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 15:10:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 155D620659
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46714 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46746 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hj3LE-00073E-CT
-	for qemu-devel@archiver.kernel.org; Thu, 04 Jul 2019 11:08:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35545)
+	id 1hj3NV-00006V-DF
+	for qemu-devel@archiver.kernel.org; Thu, 04 Jul 2019 11:10:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36046)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hj3KJ-0006TZ-To
- for qemu-devel@nongnu.org; Thu, 04 Jul 2019 11:07:12 -0400
+ (envelope-from <no-reply@patchew.org>) id 1hj3Ls-0007YS-9m
+ for qemu-devel@nongnu.org; Thu, 04 Jul 2019 11:08:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hj3KH-0005kC-Vp
- for qemu-devel@nongnu.org; Thu, 04 Jul 2019 11:07:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50680)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hj3KF-0005eA-0o; Thu, 04 Jul 2019 11:07:07 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id F28F7356E4;
- Thu,  4 Jul 2019 15:06:55 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-204-93.brq.redhat.com
- [10.40.204.93])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 286A7177F0;
- Thu,  4 Jul 2019 15:06:46 +0000 (UTC)
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-References: <20190703215542.16123-1-jsnow@redhat.com>
- <20190703215542.16123-3-jsnow@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <04397b94-63d6-7d2c-77ad-964abe0e0310@redhat.com>
-Date: Thu, 4 Jul 2019 17:06:45 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ (envelope-from <no-reply@patchew.org>) id 1hj3Lq-000733-CJ
+ for qemu-devel@nongnu.org; Thu, 04 Jul 2019 11:08:48 -0400
+Resent-Date: Thu, 04 Jul 2019 11:08:47 -0400
+Resent-Message-Id: <E1hj3Lq-000733-CJ@eggs.gnu.org>
+Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21527)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1hj3Lk-0006wo-HS; Thu, 04 Jul 2019 11:08:42 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1562252870; cv=none; d=zoho.com; s=zohoarc; 
+ b=JOLfbSobPpFc0XWGMjA2MnCsZVYaP8UfzcLJ2AAOxkLSkJxXJRTDhGOG9HcHARLdXOn7WO7EmpD0A0tFdJbSzAnoTSK+HMEZmnzPQcLsEFHNd+QTqTotxgXLK3WyK2rGbfD0OH6FeuON/4SHm1MfTjnWqJ3nCd/zjc6SNl4q9oc=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1562252870;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+ bh=xoa0hBw2981YM23B0if6Qhx8QuXb8Oga5RAebjzTDv4=; 
+ b=Ut8SzITHkMvrecuApYrE+A5HDRK48kHw7MadqTEhNsWpFnCZv6pbIpoGaMgA6Br4qSGt7/zmo3iSRgdqIo4IaDnIt/mstKuZn65EtVlsiCFUdmh2k4pVGIb+rC1pqXIAw9pn3GO0eosoFAycCapsspY0/sFVfhpnE2odY3KmZmU=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1562252867134329.5839835625219;
+ Thu, 4 Jul 2019 08:07:47 -0700 (PDT)
+Message-ID: <156225286547.29792.17749804109015498726@c4a48874b076>
+In-Reply-To: <20190703215542.16123-1-jsnow@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190703215542.16123-3-jsnow@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="uSfIrnRTPwrBgIbiTIrrX9FgDMub166eO"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.30]); Thu, 04 Jul 2019 15:07:01 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: jsnow@redhat.com
+Date: Thu, 4 Jul 2019 08:07:47 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 02/18] drive-backup: create
- do_backup_common
+X-Received-From: 136.143.188.55
+Subject: Re: [Qemu-devel] [PATCH v2 00/18] bitmaps: introduce 'bitmap' sync
+ mode
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,118 +73,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- vsementsov@virtuozzo.com, Juan Quintela <quintela@redhat.com>,
- Wen Congyang <wencongyang2@huawei.com>,
- Xie Changlong <xiechanglong.d@gmail.com>,
- Markus Armbruster <armbru@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, fam@euphon.net, vsementsov@virtuozzo.com,
+ qemu-block@nongnu.org, quintela@redhat.com, wencongyang2@huawei.com,
+ xiechanglong.d@gmail.com, qemu-devel@nongnu.org, armbru@redhat.com,
+ stefanha@redhat.com, mreitz@redhat.com, jsnow@redhat.com, dgilbert@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---uSfIrnRTPwrBgIbiTIrrX9FgDMub166eO
-Content-Type: multipart/mixed; boundary="CFChXodEQWBuQdezWSztihfVZeuB728Sa";
- protected-headers="v1"
-From: Max Reitz <mreitz@redhat.com>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
- Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Fam Zheng <fam@euphon.net>, Juan Quintela <quintela@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Wen Congyang <wencongyang2@huawei.com>, vsementsov@virtuozzo.com,
- Xie Changlong <xiechanglong.d@gmail.com>
-Message-ID: <04397b94-63d6-7d2c-77ad-964abe0e0310@redhat.com>
-Subject: Re: [PATCH v2 02/18] drive-backup: create do_backup_common
-References: <20190703215542.16123-1-jsnow@redhat.com>
- <20190703215542.16123-3-jsnow@redhat.com>
-In-Reply-To: <20190703215542.16123-3-jsnow@redhat.com>
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDcwMzIxNTU0Mi4xNjEy
+My0xLWpzbm93QHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2ZSBz
+b21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBpbmZv
+cm1hdGlvbjoKClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjIgMDAvMThdIGJpdG1hcHM6
+IGludHJvZHVjZSAnYml0bWFwJyBzeW5jIG1vZGUKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIw
+MTkwNzAzMjE1NTQyLjE2MTIzLTEtanNub3dAcmVkaGF0LmNvbQoKPT09IFRFU1QgU0NSSVBUIEJF
+R0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJhc2UgPiAvZGV2L251bGwgfHwgZXhp
+dCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxv
+Y2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBo
+aXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4KPT09IFRF
+U1QgU0NSSVBUIEVORCA9PT0KCkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVj
+dC9xZW11CiAtIFt0YWcgdXBkYXRlXSAgICAgIHBhdGNoZXcvMjAxOTA3MDMyMTU1NDIuMTYxMjMt
+MS1qc25vd0ByZWRoYXQuY29tIC0+IHBhdGNoZXcvMjAxOTA3MDMyMTU1NDIuMTYxMjMtMS1qc25v
+d0ByZWRoYXQuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKMjZlNjQ3OSBibG9j
+ay9iYWNrdXA6IGxvb3NlbiByZXN0cmljdGlvbiBvbiByZWFkb25seSBiaXRtYXBzCjc1NWUxYjEg
+aW90ZXN0czogYWRkIHRlc3QgMjU3IGZvciBiaXRtYXAtbW9kZSBiYWNrdXBzCmQ0OGM5ZWUgaW90
+ZXN0czogQWRkIHZpcnRpby1zY3NpIGRldmljZSBoZWxwZXIKYjZlNDIyNiBpb3Rlc3RzOiB0ZWFj
+aCBGaWxlUGF0aCB0byBwcm9kdWNlIG11bHRpcGxlIHBhdGhzCjliN2RkYjMgaW90ZXN0czogdGVh
+Y2ggcnVuX2pvYiB0byBjYW5jZWwgcGVuZGluZyBqb2JzCjc4ZWQ1MjkgaW90ZXN0czogYWRkIHRl
+c3Rpbmcgc2hpbSBmb3Igc2NyaXB0LXN0eWxlIHB5dGhvbiB0ZXN0cwo3OGE0ZmEzIGJsb2NrL2Jh
+Y2t1cDogYWRkICdhbHdheXMnIGJpdG1hcCBzeW5jIHBvbGljeQplZGNiMmY5IGJsb2NrL2JhY2t1
+cDogdXBncmFkZSBjb3B5X2JpdG1hcCB0byBCZHJ2RGlydHlCaXRtYXAKNTY5MWIzZSBibG9jay9k
+aXJ0eS1iaXRtYXA6IGFkZCBiZHJ2X2RpcnR5X2JpdG1hcF9nZXQKM2RlY2RmMyBibG9jay9kaXJ0
+eS1iaXRtYXA6IGFkZCBiZHJ2X2RpcnR5X2JpdG1hcF9tZXJnZV9pbnRlcm5hbAoxZWUzZmZlIGhi
+aXRtYXA6IGVuYWJsZSBtZXJnaW5nIGFjcm9zcyBncmFudWxhcml0aWVzCjBkMTg3ZTYgaGJpdG1h
+cDogRml4IG1lcmdlIHdoZW4gYiBpcyBlbXB0eSwgYW5kIHJlc3VsdCBpcyBub3QgYW4gYWxpYXMg
+b2YgYQo5ZmI3YjgwIGJsb2NrL2JhY2t1cDogYWRkICduZXZlcicgcG9saWN5IHRvIGJpdG1hcCBz
+eW5jIG1vZGUKMzAyNWFiYiBibG9jay9iYWNrdXA6IEFkZCBtaXJyb3Igc3luYyBtb2RlICdiaXRt
+YXAnCjc4MTczZGEgcWFwaTogYWRkIEJpdG1hcFN5bmNNb2RlIGVudW0KOGQ2ZWZmYyBibG9ja2Rl
+di1iYWNrdXA6IHV0aWxpemUgZG9fYmFja3VwX2NvbW1vbgoxODlhNTU3IGRyaXZlLWJhY2t1cDog
+Y3JlYXRlIGRvX2JhY2t1cF9jb21tb24KMWFhMjIwMiBxYXBpL2Jsb2NrLWNvcmU6IEludHJvZHVj
+ZSBCYWNrdXBDb21tb24KCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvMTggQ2hlY2tpbmcgY29tbWl0
+IDFhYTIyMDJhOTFjYiAocWFwaS9ibG9jay1jb3JlOiBJbnRyb2R1Y2UgQmFja3VwQ29tbW9uKQoy
+LzE4IENoZWNraW5nIGNvbW1pdCAxODlhNTU3ZDMyZTkgKGRyaXZlLWJhY2t1cDogY3JlYXRlIGRv
+X2JhY2t1cF9jb21tb24pCjMvMTggQ2hlY2tpbmcgY29tbWl0IDhkNmVmZmNhNTQ0YSAoYmxvY2tk
+ZXYtYmFja3VwOiB1dGlsaXplIGRvX2JhY2t1cF9jb21tb24pCjQvMTggQ2hlY2tpbmcgY29tbWl0
+IDc4MTczZGFhYzY3YiAocWFwaTogYWRkIEJpdG1hcFN5bmNNb2RlIGVudW0pCjUvMTggQ2hlY2tp
+bmcgY29tbWl0IDMwMjVhYmI3OTg0NyAoYmxvY2svYmFja3VwOiBBZGQgbWlycm9yIHN5bmMgbW9k
+ZSAnYml0bWFwJykKNi8xOCBDaGVja2luZyBjb21taXQgOWZiN2I4MDRjYWE4IChibG9jay9iYWNr
+dXA6IGFkZCAnbmV2ZXInIHBvbGljeSB0byBiaXRtYXAgc3luYyBtb2RlKQpXQVJOSU5HOiBCbG9j
+ayBjb21tZW50cyB1c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQojMjY6IEZJTEU6
+IGJsb2NrL2JhY2t1cC5jOjI2OToKKyAgICAgICAgLyogRmFpbHVyZSwgb3Igd2UgZG9uJ3Qgd2Fu
+dCB0byBzeW5jaHJvbml6ZSB0aGUgYml0bWFwLgoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNl
+IGEgdHJhaWxpbmcgKi8gb24gYSBzZXBhcmF0ZSBsaW5lCiMyNzogRklMRTogYmxvY2svYmFja3Vw
+LmM6MjcwOgorICAgICAgICAgKiBNZXJnZSB0aGUgc3VjY2Vzc29yIGJhY2sgaW50byB0aGUgcGFy
+ZW50LCBkZWxldGUgbm90aGluZy4gKi8KCnRvdGFsOiAwIGVycm9ycywgMiB3YXJuaW5ncywgMjUg
+bGluZXMgY2hlY2tlZAoKUGF0Y2ggNi8xOCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZp
+ZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRo
+ZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo3LzE4
+IENoZWNraW5nIGNvbW1pdCAwZDE4N2U2OTAxMmUgKGhiaXRtYXA6IEZpeCBtZXJnZSB3aGVuIGIg
+aXMgZW1wdHksIGFuZCByZXN1bHQgaXMgbm90IGFuIGFsaWFzIG9mIGEpCjgvMTggQ2hlY2tpbmcg
+Y29tbWl0IDFlZTNmZmU3MDZkNCAoaGJpdG1hcDogZW5hYmxlIG1lcmdpbmcgYWNyb3NzIGdyYW51
+bGFyaXRpZXMpCjkvMTggQ2hlY2tpbmcgY29tbWl0IDNkZWNkZjM1OGJiNyAoYmxvY2svZGlydHkt
+Yml0bWFwOiBhZGQgYmRydl9kaXJ0eV9iaXRtYXBfbWVyZ2VfaW50ZXJuYWwpCjEwLzE4IENoZWNr
+aW5nIGNvbW1pdCA1NjkxYjNlMDZlNzMgKGJsb2NrL2RpcnR5LWJpdG1hcDogYWRkIGJkcnZfZGly
+dHlfYml0bWFwX2dldCkKRVJST1I6IG9wZW4gYnJhY2UgJ3snIGZvbGxvd2luZyBmdW5jdGlvbiBk
+ZWNsYXJhdGlvbnMgZ28gb24gdGhlIG5leHQgbGluZQojMzY6IEZJTEU6IGJsb2NrL2RpcnR5LWJp
+dG1hcC5jOjUxNzoKK2Jvb2wgYmRydl9kaXJ0eV9iaXRtYXBfZ2V0KEJkcnZEaXJ0eUJpdG1hcCAq
+Yml0bWFwLCBpbnQ2NF90IG9mZnNldCkgewoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCA3
+MiBsaW5lcyBjaGVja2VkCgpQYXRjaCAxMC8xOCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSBy
+ZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0
+IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoK
+MTEvMTggQ2hlY2tpbmcgY29tbWl0IGVkY2IyZjlkNTI2ZSAoYmxvY2svYmFja3VwOiB1cGdyYWRl
+IGNvcHlfYml0bWFwIHRvIEJkcnZEaXJ0eUJpdG1hcCkKV0FSTklORzogbGluZSBvdmVyIDgwIGNo
+YXJhY3RlcnMKIzYwOiBGSUxFOiBibG9jay9iYWNrdXAuYzoxNzQ6CisgICAgYmRydl9yZXNldF9k
+aXJ0eV9iaXRtYXAoam9iLT5jb3B5X2JpdG1hcCwgc3RhcnQsIGpvYi0+Y2x1c3Rlcl9zaXplICog
+bnJfY2x1c3RlcnMpOwoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzY2OiBGSUxF
+OiBibG9jay9iYWNrdXAuYzoxNzk6CisgICAgICAgIGJkcnZfc2V0X2RpcnR5X2JpdG1hcChqb2It
+PmNvcHlfYml0bWFwLCBzdGFydCwgam9iLT5jbHVzdGVyX3NpemUgKiBucl9jbHVzdGVycyk7Cgp0
+b3RhbDogMCBlcnJvcnMsIDIgd2FybmluZ3MsIDE5MiBsaW5lcyBjaGVja2VkCgpQYXRjaCAxMS8x
+OCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJy
+b3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNl
+ZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoxMi8xOCBDaGVja2luZyBjb21taXQgNzhhNGZh
+MzA0YzMzIChibG9jay9iYWNrdXA6IGFkZCAnYWx3YXlzJyBiaXRtYXAgc3luYyBwb2xpY3kpCldB
+Uk5JTkc6IEJsb2NrIGNvbW1lbnRzIHVzZSBhIGxlYWRpbmcgLyogb24gYSBzZXBhcmF0ZSBsaW5l
+CiM0MTogRklMRTogYmxvY2svYmFja3VwLmM6MjczOgorICAgICAgICAvKiBXZSBzdWNjZWVkZWQs
+IG9yIHdlIGFsd2F5cyBpbnRlbmRlZCB0byBzeW5jIHRoZSBiaXRtYXAuCgpXQVJOSU5HOiBCbG9j
+ayBjb21tZW50cyB1c2UgYSB0cmFpbGluZyAqLyBvbiBhIHNlcGFyYXRlIGxpbmUKIzQyOiBGSUxF
+OiBibG9jay9iYWNrdXAuYzoyNzQ6CisgICAgICAgICAqIERlbGV0ZSB0aGlzIGJpdG1hcCBhbmQg
+aW5zdGFsbCB0aGUgY2hpbGQuICovCgpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2UgYSBsZWFk
+aW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQojNDY6IEZJTEU6IGJsb2NrL2JhY2t1cC5jOjI3NzoK
+KyAgICAgICAgLyogV2UgZmFpbGVkLCBvciB3ZSBuZXZlciBpbnRlbmRlZCB0byBzeW5jIHRoZSBi
+aXRtYXAgYW55d2F5LgoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgdHJhaWxpbmcgKi8g
+b24gYSBzZXBhcmF0ZSBsaW5lCiM0NzogRklMRTogYmxvY2svYmFja3VwLmM6Mjc4OgorICAgICAg
+ICAgKiBNZXJnZSB0aGUgc3VjY2Vzc29yIGJhY2sgaW50byB0aGUgcGFyZW50LCBrZWVwaW5nIGFs
+bCBkYXRhLiAqLwoKdG90YWw6IDAgZXJyb3JzLCA0IHdhcm5pbmdzLCA0NyBsaW5lcyBjaGVja2Vk
+CgpQYXRjaCAxMi8xOCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkg
+b2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1h
+aW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoxMy8xOCBDaGVja2luZyBj
+b21taXQgNzhlZDUyOTdjNzM5IChpb3Rlc3RzOiBhZGQgdGVzdGluZyBzaGltIGZvciBzY3JpcHQt
+c3R5bGUgcHl0aG9uIHRlc3RzKQoxNC8xOCBDaGVja2luZyBjb21taXQgOWI3ZGRiMzkwMzYwIChp
+b3Rlc3RzOiB0ZWFjaCBydW5fam9iIHRvIGNhbmNlbCBwZW5kaW5nIGpvYnMpCjE1LzE4IENoZWNr
+aW5nIGNvbW1pdCBiNmU0MjI2N2Q0YmMgKGlvdGVzdHM6IHRlYWNoIEZpbGVQYXRoIHRvIHByb2R1
+Y2UgbXVsdGlwbGUgcGF0aHMpCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM2Mzog
+RklMRTogdGVzdHMvcWVtdS1pb3Rlc3RzL2lvdGVzdHMucHk6MzkyOgorICAgICIiIkZpbGVQYXRo
+IGlzIGEgc3BlY2lhbGl6YXRpb24gb2YgRmlsZVBhdGhzIHRoYXQgdGFrZXMgYSBzaW5nbGUgZmls
+ZW5hbWUuIiIiCgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDY3IGxpbmVzIGNoZWNrZWQK
+ClBhdGNoIDE1LzE4IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBv
+ZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFp
+bnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjE2LzE4IENoZWNraW5nIGNv
+bW1pdCBkNDhjOWVlMGJlYzkgKGlvdGVzdHM6IEFkZCB2aXJ0aW8tc2NzaSBkZXZpY2UgaGVscGVy
+KQoxNy8xOCBDaGVja2luZyBjb21taXQgNzU1ZTFiMTE0NzhjIChpb3Rlc3RzOiBhZGQgdGVzdCAy
+NTcgZm9yIGJpdG1hcC1tb2RlIGJhY2t1cHMpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxl
+dGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzExOiAKbmV3IGZp
+bGUgbW9kZSAxMDA3NTUKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMjYxMiBsaW5lcyBj
+aGVja2VkCgpQYXRjaCAxNy8xOCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJ
+ZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8g
+dGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoxOC8xOCBDaGVj
+a2luZyBjb21taXQgMjZlNjQ3OTNmYzcxIChibG9jay9iYWNrdXA6IGxvb3NlbiByZXN0cmljdGlv
+biBvbiByZWFkb25seSBiaXRtYXBzKQo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBl
+eGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8v
+cGF0Y2hldy5vcmcvbG9ncy8yMDE5MDcwMzIxNTU0Mi4xNjEyMy0xLWpzbm93QHJlZGhhdC5jb20v
+dGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0
+b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5k
+IHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
 
---CFChXodEQWBuQdezWSztihfVZeuB728Sa
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 03.07.19 23:55, John Snow wrote:
-> Create a common core that comprises the actual meat of what the backup =
-API
-> boundary needs to do, and then switch drive-backup to use it.
->=20
-> Questions:
->  - do_drive_backup now acquires and releases the aio_context in additio=
-n
->    to do_backup_common doing the same. Can I drop this from drive_backu=
-p?
-
-I wonder why you don=E2=80=99t just make it a requirement that
-do_backup_common() is called with the context acquired?
-
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> ---
->  blockdev.c | 138 ++++++++++++++++++++++++++++++++---------------------=
-
->  1 file changed, 83 insertions(+), 55 deletions(-)
->=20
-> diff --git a/blockdev.c b/blockdev.c
-> index 4d141e9a1f..5fd663a7e5 100644
-> --- a/blockdev.c
-> +++ b/blockdev.c
-> @@ -3425,6 +3425,86 @@ out:
->      aio_context_release(aio_context);
->  }
-> =20
-> +static BlockJob *do_backup_common(BackupCommon *backup,
-> +                                  BlockDriverState *target_bs,
-> +                                  JobTxn *txn, Error **errp)
-> +{
-
-[...]
-
-> +    job =3D backup_job_create(backup->job_id, bs, target_bs, backup->s=
-peed,
-> +                            backup->sync, bmap, backup->compress,
-> +                            backup->on_source_error, backup->on_target=
-_error,
-> +                            job_flags, NULL, NULL, txn, &local_err);
-> +    if (local_err !=3D NULL) {
-> +        error_propagate(errp, local_err);
-> +        goto out;
-> +    }
-
-Below, you change do_drive_backup() to just pass errp instead of
-local_err and not do error handling.  Why not do the same here?
-
-Other than that:
-
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-
-> +
-> +out:
-> +    aio_context_release(aio_context);
-> +    return job;
-> +}
-
-
---CFChXodEQWBuQdezWSztihfVZeuB728Sa--
-
---uSfIrnRTPwrBgIbiTIrrX9FgDMub166eO
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0eFgUACgkQ9AfbAGHV
-z0DvnAf7BGJjnUFZSTFT5yLfaI5U81diCA5Gz7z6/rotik3huwQO49dvuIYY+m79
-duvnRIbwqy1ogFQa3bIYSKT6U8mgxtHL+0YV+Uvs95DB5hv1hRllClH/cdGfFsF4
-ASSAm2DJW0xg0S7EP8kBHV8ic8PI6O7Nd9RaZ9p7mQeTiofsBX97/xF/B4f8g59u
-l8UX+hidrIiPqEI31ULHadVwvtgB83LV/tdaa680G2jCfeZtiPBLFaXwrQGTZZS+
-zidiAD3rXOF8c83VQt95DZI11dyHf4YWa0Cut/PmOmCbvdwdFXz0v2hMBm6rcZpK
-qgfjTkxvf4sfEHNBoyCQpvpmAZLZ6Q==
-=sB+6
------END PGP SIGNATURE-----
-
---uSfIrnRTPwrBgIbiTIrrX9FgDMub166eO--
 
