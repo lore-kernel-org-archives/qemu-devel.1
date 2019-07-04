@@ -2,53 +2,62 @@ Return-Path: <SRS0=blGQ=VB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB623C0650E
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 08:08:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0CAEC0650E
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 08:13:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 91995218A3
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 08:08:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 91995218A3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
+	by mail.kernel.org (Postfix) with ESMTPS id C3445218A3
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 08:13:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3445218A3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43436 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43456 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hiwnO-0004HV-Rk
-	for qemu-devel@archiver.kernel.org; Thu, 04 Jul 2019 04:08:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51559)
+	id 1hiwrs-0006ua-2k
+	for qemu-devel@archiver.kernel.org; Thu, 04 Jul 2019 04:13:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52249)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <balaton@eik.bme.hu>) id 1hiwl2-0002cP-V3
- for qemu-devel@nongnu.org; Thu, 04 Jul 2019 04:06:22 -0400
+ (envelope-from <groug@kaod.org>) id 1hiwqn-00068P-CO
+ for qemu-devel@nongnu.org; Thu, 04 Jul 2019 04:12:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <balaton@eik.bme.hu>) id 1hiwl1-0007oK-Ln
- for qemu-devel@nongnu.org; Thu, 04 Jul 2019 04:06:20 -0400
-Received: from zero.eik.bme.hu ([152.66.115.2]:57181)
+ (envelope-from <groug@kaod.org>) id 1hiwqm-0001oB-6M
+ for qemu-devel@nongnu.org; Thu, 04 Jul 2019 04:12:17 -0400
+Received: from 8.mo1.mail-out.ovh.net ([178.33.110.239]:42314)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1hiwl1-0007iP-BX
- for qemu-devel@nongnu.org; Thu, 04 Jul 2019 04:06:19 -0400
-Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id 17F3474569A;
- Thu,  4 Jul 2019 10:06:04 +0200 (CEST)
-Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id DEB9F7462AA; Thu,  4 Jul 2019 10:06:03 +0200 (CEST)
-Message-Id: <e21855faaeb30d7b1771f084f283f6a30bedb1a3.1562227303.git.balaton@eik.bme.hu>
-In-Reply-To: <cover.1562227303.git.balaton@eik.bme.hu>
-References: <cover.1562227303.git.balaton@eik.bme.hu>
-From: BALATON Zoltan <balaton@eik.bme.hu>
-Date: Thu, 04 Jul 2019 10:01:43 +0200
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1hiwql-0001mb-VS
+ for qemu-devel@nongnu.org; Thu, 04 Jul 2019 04:12:16 -0400
+Received: from player693.ha.ovh.net (unknown [10.109.143.216])
+ by mo1.mail-out.ovh.net (Postfix) with ESMTP id A30F5183930
+ for <qemu-devel@nongnu.org>; Thu,  4 Jul 2019 10:12:11 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player693.ha.ovh.net (Postfix) with ESMTPSA id CC19F788DE9F;
+ Thu,  4 Jul 2019 08:12:07 +0000 (UTC)
+Date: Thu, 4 Jul 2019 10:12:04 +0200
+From: Greg Kurz <groug@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20190704101204.4968e0a1@bahia.lan>
+In-Reply-To: <20190704002357.GR9442@umbus.fritz.box>
+References: <156217621200.562209.8968691631915806468.stgit@bahia.lan>
+ <20190704002357.GR9442@umbus.fritz.box>
+X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-To: qemu-devel@nongnu.org
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 152.66.115.2
-Subject: [Qemu-devel] [PATCH v2 1/1] ati-vga: Fix reverse bit blts
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 13032009949517814246
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduvddrfedvgddtvdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 178.33.110.239
+Subject: Re: [Qemu-devel] [PATCH for-4.2] xics/kvm: Convert assert() to
+ error_setg()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -60,155 +69,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-ppc@nongnu.org, =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The pixman library only supports blts with left to right, top to
-bottom order but the ATI VGA engine can also do different directions.
-Fix support for these via a temporary buffer for now. This fixes
-rendering issues related to such blts (such as moving windows) but
-some other glitches still remain.
+On Thu, 4 Jul 2019 10:23:57 +1000
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
----
-v2: Only allocate needed amount of memory for tmp,
-rest of the series is unchanged
+> On Wed, Jul 03, 2019 at 07:50:12PM +0200, Greg Kurz wrote:
+> > ics_set_kvm_state_one() is called either during reset, in which case
+> > both 'saved priority' and 'current priority' are equal to 0xff, or
+> > during migration. In the latter case, 'saved priority' may differ
+> > from 'current priority' only if the interrupt had been masked with
+> > the ibm,int-off RTAS call. Instead of aborting QEMU, print out an
+> > error and exit.
+> 
+> What's the rationale for this?  Doesn't hitting this indicate an error
+> in the qemu code, for which an abort is the usual response?
+> 
 
- hw/display/ati_2d.c | 55 ++++++++++++++++++++++++++++++++++++++---------=
-------
- 1 file changed, 40 insertions(+), 15 deletions(-)
+This error can be hit by the destination during migration if the
+incoming stream is corrupted. Aborting in this case would mislead
+the user into suspecting a bug in the destination QEMU, which isn't
+the case.
 
-diff --git a/hw/display/ati_2d.c b/hw/display/ati_2d.c
-index b09753320a..42e82311eb 100644
---- a/hw/display/ati_2d.c
-+++ b/hw/display/ati_2d.c
-@@ -53,6 +53,10 @@ void ati_2d_blt(ATIVGAState *s)
-             s->vga.vbe_start_addr, surface_data(ds), surface_stride(ds),
-             surface_bits_per_pixel(ds),
-             (s->regs.dp_mix & GMC_ROP3_MASK) >> 16);
-+    int dst_x =3D (s->regs.dp_cntl & DST_X_LEFT_TO_RIGHT ?
-+                 s->regs.dst_x : s->regs.dst_x + 1 - s->regs.dst_width);
-+    int dst_y =3D (s->regs.dp_cntl & DST_Y_TOP_TO_BOTTOM ?
-+                 s->regs.dst_y : s->regs.dst_y + 1 - s->regs.dst_height)=
-;
-     int bpp =3D ati_bpp_from_datatype(s);
-     int dst_stride =3D DEFAULT_CNTL ? s->regs.dst_pitch : s->regs.defaul=
-t_pitch;
-     uint8_t *dst_bits =3D s->vga.vram_ptr + (DEFAULT_CNTL ?
-@@ -63,20 +67,25 @@ void ati_2d_blt(ATIVGAState *s)
-         dst_stride *=3D bpp;
-     }
-     uint8_t *end =3D s->vga.vram_ptr + s->vga.vram_size;
--    if (dst_bits >=3D end ||
--        dst_bits + s->regs.dst_x + (s->regs.dst_y + s->regs.dst_height) =
-*
-+    if (dst_bits >=3D end || dst_bits + dst_x + (dst_y + s->regs.dst_hei=
-ght) *
-         dst_stride >=3D end) {
-         qemu_log_mask(LOG_UNIMP, "blt outside vram not implemented\n");
-         return;
-     }
--    DPRINTF("%d %d %d, %d %d %d, (%d,%d) -> (%d,%d) %dx%d\n",
-+    DPRINTF("%d %d %d, %d %d %d, (%d,%d) -> (%d,%d) %dx%d %c %c\n",
-             s->regs.src_offset, s->regs.dst_offset, s->regs.default_offs=
-et,
-             s->regs.src_pitch, s->regs.dst_pitch, s->regs.default_pitch,
-             s->regs.src_x, s->regs.src_y, s->regs.dst_x, s->regs.dst_y,
--            s->regs.dst_width, s->regs.dst_height);
-+            s->regs.dst_width, s->regs.dst_height,
-+            (s->regs.dp_cntl & DST_X_LEFT_TO_RIGHT ? '>' : '<'),
-+            (s->regs.dp_cntl & DST_Y_TOP_TO_BOTTOM ? 'v' : '^'));
-     switch (s->regs.dp_mix & GMC_ROP3_MASK) {
-     case ROP3_SRCCOPY:
-     {
-+        int src_x =3D (s->regs.dp_cntl & DST_X_LEFT_TO_RIGHT ?
-+                     s->regs.src_x : s->regs.src_x + 1 - s->regs.dst_wid=
-th);
-+        int src_y =3D (s->regs.dp_cntl & DST_Y_TOP_TO_BOTTOM ?
-+                     s->regs.src_y : s->regs.src_y + 1 - s->regs.dst_hei=
-ght);
-         int src_stride =3D DEFAULT_CNTL ?
-                          s->regs.src_pitch : s->regs.default_pitch;
-         uint8_t *src_bits =3D s->vga.vram_ptr + (DEFAULT_CNTL ?
-@@ -86,9 +95,8 @@ void ati_2d_blt(ATIVGAState *s)
-             src_bits +=3D s->regs.crtc_offset & 0x07ffffff;
-             src_stride *=3D bpp;
-         }
--        if (src_bits >=3D end ||
--            src_bits + s->regs.src_x + (s->regs.src_y + s->regs.dst_heig=
-ht) *
--            src_stride >=3D end) {
-+        if (src_bits >=3D end || src_bits + src_x +
-+            (src_y + s->regs.dst_height) * src_stride >=3D end) {
-             qemu_log_mask(LOG_UNIMP, "blt outside vram not implemented\n=
-");
-             return;
-         }
-@@ -97,19 +105,36 @@ void ati_2d_blt(ATIVGAState *s)
-         dst_stride /=3D sizeof(uint32_t);
-         DPRINTF("pixman_blt(%p, %p, %d, %d, %d, %d, %d, %d, %d, %d, %d, =
-%d)\n",
-                 src_bits, dst_bits, src_stride, dst_stride, bpp, bpp,
--                s->regs.src_x, s->regs.src_y, s->regs.dst_x, s->regs.dst=
-_y,
-+                src_x, src_y, dst_x, dst_y,
-                 s->regs.dst_width, s->regs.dst_height);
--        pixman_blt((uint32_t *)src_bits, (uint32_t *)dst_bits,
--                   src_stride, dst_stride, bpp, bpp,
--                   s->regs.src_x, s->regs.src_y,
--                   s->regs.dst_x, s->regs.dst_y,
--                   s->regs.dst_width, s->regs.dst_height);
-+        if (s->regs.dp_cntl & DST_X_LEFT_TO_RIGHT &&
-+            s->regs.dp_cntl & DST_Y_TOP_TO_BOTTOM) {
-+            pixman_blt((uint32_t *)src_bits, (uint32_t *)dst_bits,
-+                       src_stride, dst_stride, bpp, bpp,
-+                       src_x, src_y, dst_x, dst_y,
-+                       s->regs.dst_width, s->regs.dst_height);
-+        } else {
-+            /* FIXME: We only really need a temporary if src and dst ove=
-rlap */
-+            int llb =3D s->regs.dst_width * (bpp / 8);
-+            int tmp_stride =3D DIV_ROUND_UP(llb, sizeof(uint32_t));
-+            uint32_t *tmp =3D g_malloc(tmp_stride * sizeof(uint32_t) *
-+                                     s->regs.dst_height);
-+            pixman_blt((uint32_t *)src_bits, tmp,
-+                       src_stride, tmp_stride, bpp, bpp,
-+                       src_x, src_y, 0, 0,
-+                       s->regs.dst_width, s->regs.dst_height);
-+            pixman_blt(tmp, (uint32_t *)dst_bits,
-+                       tmp_stride, dst_stride, bpp, bpp,
-+                       0, 0, dst_x, dst_y,
-+                       s->regs.dst_width, s->regs.dst_height);
-+            g_free(tmp);
-+        }
-         if (dst_bits >=3D s->vga.vram_ptr + s->vga.vbe_start_addr &&
-             dst_bits < s->vga.vram_ptr + s->vga.vbe_start_addr +
-             s->vga.vbe_regs[VBE_DISPI_INDEX_YRES] * s->vga.vbe_line_offs=
-et) {
-             memory_region_set_dirty(&s->vga.vram, s->vga.vbe_start_addr =
-+
-                                     s->regs.dst_offset +
--                                    s->regs.dst_y * surface_stride(ds),
-+                                    dst_y * surface_stride(ds),
-                                     s->regs.dst_height * surface_stride(=
-ds));
-         }
-         s->regs.dst_x +=3D s->regs.dst_width;
-@@ -151,7 +176,7 @@ void ati_2d_blt(ATIVGAState *s)
-             s->vga.vbe_regs[VBE_DISPI_INDEX_YRES] * s->vga.vbe_line_offs=
-et) {
-             memory_region_set_dirty(&s->vga.vram, s->vga.vbe_start_addr =
-+
-                                     s->regs.dst_offset +
--                                    s->regs.dst_y * surface_stride(ds),
-+                                    dst_y * surface_stride(ds),
-                                     s->regs.dst_height * surface_stride(=
-ds));
-         }
-         s->regs.dst_y +=3D s->regs.dst_height;
---=20
-2.13.7
+Appart from that, when the in-kernel XICS is in use, only two functions
+manipulate the ICS state: ics_set_kvm_state_one() and ics_get_kvm_state().
+The code is trivial enough that I don't see a great value in the assert
+in the first place... BTW, it comes from the commit:
+
+commit 11ad93f68195f68cc94d988f2aa50b4d190ee52a
+Author: David Gibson <david@gibson.dropbear.id.au>
+Date:   Thu Sep 26 16:18:44 2013 +1000
+
+    xics-kvm: Support for in-kernel XICS interrupt controller
+
+Maybe you remember some context that justified the assert at the time ?
+
+> > 
+> > Based-on: <156217454083.559957.7359208229523652842.stgit@bahia.lan>
+> > Signed-off-by: Greg Kurz <groug@kaod.org>
+> > ---
+> > 
+> > This isn't a bugfix, hence targetting 4.2, but it depends on an actual
+> > fix for 4.1, as mentionned in the Based-on tag.
+> > ---
+> >  hw/intc/xics_kvm.c |   17 +++++++++++++++--
+> >  1 file changed, 15 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
+> > index 2df1f3e92c7e..f8758b928250 100644
+> > --- a/hw/intc/xics_kvm.c
+> > +++ b/hw/intc/xics_kvm.c
+> > @@ -255,8 +255,21 @@ int ics_set_kvm_state_one(ICSState *ics, int srcno, Error **errp)
+> >      state = irq->server;
+> >      state |= (uint64_t)(irq->saved_priority & KVM_XICS_PRIORITY_MASK)
+> >          << KVM_XICS_PRIORITY_SHIFT;
+> > -    if (irq->priority != irq->saved_priority) {
+> > -        assert(irq->priority == 0xff);
+> > +
+> > +    /*
+> > +     * An interrupt can be masked either because the ICS is resetting, in
+> > +     * which case we expect 'current priority' and 'saved priority' to be
+> > +     * equal to 0xff, or because the guest has called the ibm,int-off RTAS
+> > +     * call, in which case we we have recorded the priority the interrupt
+> > +     * had before it was masked in 'saved priority'. If the interrupt isn't
+> > +     * masked, 'saved priority' and 'current priority' are equal (see
+> > +     * ics_get_kvm_state()). Make sure we restore a sane state, otherwise
+> > +     * fail migration.
+> > +     */
+> > +    if (irq->priority != irq->saved_priority && irq->priority != 0xff) {
+> > +        error_setg(errp, "Corrupted state detected for interrupt source %d",
+> > +                   srcno);
+> > +        return -EINVAL;
+> >      }
+> >  
+> >      if (irq->priority == 0xff) {
+> > 
+> 
 
 
