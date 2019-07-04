@@ -2,49 +2,49 @@ Return-Path: <SRS0=blGQ=VB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9021FC0651F
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 17:45:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AD6AC0651F
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 17:48:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 68DE2218A3
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 17:45:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 68DE2218A3
+	by mail.kernel.org (Postfix) with ESMTPS id 53F052147A
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 17:48:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53F052147A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47950 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47972 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hj5nT-0007Qp-CU
-	for qemu-devel@archiver.kernel.org; Thu, 04 Jul 2019 13:45:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56630)
+	id 1hj5qe-000135-5Q
+	for qemu-devel@archiver.kernel.org; Thu, 04 Jul 2019 13:48:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57008)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hj5mC-0006un-Sc
- for qemu-devel@nongnu.org; Thu, 04 Jul 2019 13:44:09 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hj5pP-0000BW-Lm
+ for qemu-devel@nongnu.org; Thu, 04 Jul 2019 13:47:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hj5mB-0007ZC-PB
- for qemu-devel@nongnu.org; Thu, 04 Jul 2019 13:44:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60534)
+ (envelope-from <mreitz@redhat.com>) id 1hj5pO-0001K3-7u
+ for qemu-devel@nongnu.org; Thu, 04 Jul 2019 13:47:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34646)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hj5m9-0007XH-6x; Thu, 04 Jul 2019 13:44:05 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ id 1hj5pM-0001Gt-4L; Thu, 04 Jul 2019 13:47:24 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 21E5481F01;
- Thu,  4 Jul 2019 17:43:58 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 54A13368E3;
+ Thu,  4 Jul 2019 17:47:23 +0000 (UTC)
 Received: from dresden.str.redhat.com (ovpn-204-93.brq.redhat.com
  [10.40.204.93])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D089C4D2;
- Thu,  4 Jul 2019 17:43:47 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D35A1842AE;
+ Thu,  4 Jul 2019 17:47:15 +0000 (UTC)
 To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
 References: <20190703215542.16123-1-jsnow@redhat.com>
- <20190703215542.16123-13-jsnow@redhat.com>
+ <20190703215542.16123-14-jsnow@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
@@ -71,22 +71,22 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <ee65fb7c-1f19-17f8-ea32-7aa3cc2a1b3d@redhat.com>
-Date: Thu, 4 Jul 2019 19:43:46 +0200
+Message-ID: <912b8db9-d31b-a4f6-5ce7-2da368f27619@redhat.com>
+Date: Thu, 4 Jul 2019 19:47:14 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190703215542.16123-13-jsnow@redhat.com>
+In-Reply-To: <20190703215542.16123-14-jsnow@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="wgwfzhQbbgmchWHJ8aQaGS4EwV3ppU121"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+ boundary="Zub2SOUox8VxK3YWJZgVeuAxNIPisJLN3"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.25]); Thu, 04 Jul 2019 17:43:58 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.30]); Thu, 04 Jul 2019 17:47:23 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 12/18] block/backup: add 'always' bitmap
- sync policy
+Subject: Re: [Qemu-devel] [PATCH v2 13/18] iotests: add testing shim for
+ script-style python tests
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -110,8 +110,8 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---wgwfzhQbbgmchWHJ8aQaGS4EwV3ppU121
-Content-Type: multipart/mixed; boundary="BSYcZ9pKHgj5hA4enARb8lC3nULXM6U1Y";
+--Zub2SOUox8VxK3YWJZgVeuAxNIPisJLN3
+Content-Type: multipart/mixed; boundary="rUsclLpgBRT2LfstbnBdJcmxzHvVzymTw";
  protected-headers="v1"
 From: Max Reitz <mreitz@redhat.com>
 To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
@@ -121,120 +121,58 @@ Cc: Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
  "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
  Wen Congyang <wencongyang2@huawei.com>, vsementsov@virtuozzo.com,
  Xie Changlong <xiechanglong.d@gmail.com>
-Message-ID: <ee65fb7c-1f19-17f8-ea32-7aa3cc2a1b3d@redhat.com>
-Subject: Re: [PATCH v2 12/18] block/backup: add 'always' bitmap sync policy
+Message-ID: <912b8db9-d31b-a4f6-5ce7-2da368f27619@redhat.com>
+Subject: Re: [PATCH v2 13/18] iotests: add testing shim for script-style
+ python tests
 References: <20190703215542.16123-1-jsnow@redhat.com>
- <20190703215542.16123-13-jsnow@redhat.com>
-In-Reply-To: <20190703215542.16123-13-jsnow@redhat.com>
+ <20190703215542.16123-14-jsnow@redhat.com>
+In-Reply-To: <20190703215542.16123-14-jsnow@redhat.com>
 
---BSYcZ9pKHgj5hA4enARb8lC3nULXM6U1Y
+--rUsclLpgBRT2LfstbnBdJcmxzHvVzymTw
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
 On 03.07.19 23:55, John Snow wrote:
-> This adds an "always" policy for bitmap synchronization. Regardless of =
-if
-> the job succeeds or fails, the bitmap is *always* synchronized. This me=
-ans
-> that for backups that fail part-way through, the bitmap retains a recor=
-d of
-> which sectors need to be copied out to accomplish a new backup using th=
-e
-> old, partial result.
+> Because the new-style python tests don't use the iotests.main() test
+> launcher, we don't turn on the debugger logging for these scripts
+> when invoked via ./check -d.
 >=20
-> In effect, this allows us to "resume" a failed backup; however the new =
-backup
-> will be from the new point in time, so it isn't a "resume" as much as i=
-t is
-> an "incremental retry." This can be useful in the case of extremely lar=
-ge
-> backups that fail considerably through the operation and we'd like to n=
-ot waste
-> the work that was already performed.
+> Refactor the launcher shim into new and old style shims so that they
+> share environmental configuration.
+>=20
+> Two cleanup notes: debug was not actually used as a global, and there
+> was no reason to create a class in an inner scope just to achieve
+> default variables; we can simply create an instance of the runner with
+> the values we want instead.
 >=20
 > Signed-off-by: John Snow <jsnow@redhat.com>
 > ---
->  block/backup.c       | 25 +++++++++++++++++--------
->  qapi/block-core.json |  5 ++++-
->  2 files changed, 21 insertions(+), 9 deletions(-)
->=20
-> diff --git a/block/backup.c b/block/backup.c
-> index 9cc5a7f6ca..495d8f71aa 100644
-> --- a/block/backup.c
-> +++ b/block/backup.c
-> @@ -266,16 +266,25 @@ static void backup_cleanup_sync_bitmap(BackupBloc=
-kJob *job, int ret)
->  {
->      BdrvDirtyBitmap *bm;
->      BlockDriverState *bs =3D blk_bs(job->common.blk);
-> +    bool sync =3D (((ret =3D=3D 0) || (job->bitmap_mode =3D=3D BITMAP_=
-SYNC_MODE_ALWAYS)) \
-> +                 && (job->bitmap_mode !=3D BITMAP_SYNC_MODE_NEVER));
-> =20
-> -    if (ret < 0 || job->bitmap_mode =3D=3D BITMAP_SYNC_MODE_NEVER) {
-> -        /* Failure, or we don't want to synchronize the bitmap.
-> -         * Merge the successor back into the parent, delete nothing. *=
-/
-> -        bm =3D bdrv_reclaim_dirty_bitmap(bs, job->sync_bitmap, NULL);
-> -        assert(bm);
-> -    } else {
-> -        /* Everything is fine, delete this bitmap and install the back=
-up. */
-> +    if (sync) {
-> +        /* We succeeded, or we always intended to sync the bitmap.
-> +         * Delete this bitmap and install the child. */
->          bm =3D bdrv_dirty_bitmap_abdicate(bs, job->sync_bitmap, NULL);=
+>  tests/qemu-iotests/iotests.py | 40 +++++++++++++++++++++++------------=
 
-> -        assert(bm);
-> +    } else {
-> +        /* We failed, or we never intended to sync the bitmap anyway.
-> +         * Merge the successor back into the parent, keeping all data.=
- */
-> +        bm =3D bdrv_reclaim_dirty_bitmap(bs, job->sync_bitmap, NULL);
-> +    }
-> +
-> +    assert(bm);
-> +
-> +    if (ret < 0 && job->bitmap_mode =3D=3D BITMAP_SYNC_MODE_ALWAYS) {
-
-=E2=80=9Cret < 0 && sync=E2=80=9D would be simpler =E2=80=93 your choice.=
-
-
-> +        /* If we failed and synced, merge in the bits we didn't copy: =
-*/
-> +        bdrv_dirty_bitmap_merge_internal(bm, job->copy_bitmap,
-> +                                         NULL, true);
-
-I presume this is for sync=3Dfull?
-
-If so:
+>  1 file changed, 26 insertions(+), 14 deletions(-)
 
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 
->      }
->  }
-> =20
 
+--rUsclLpgBRT2LfstbnBdJcmxzHvVzymTw--
 
---BSYcZ9pKHgj5hA4enARb8lC3nULXM6U1Y--
-
---wgwfzhQbbgmchWHJ8aQaGS4EwV3ppU121
+--Zub2SOUox8VxK3YWJZgVeuAxNIPisJLN3
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0eOtIACgkQ9AfbAGHV
-z0ACsQf+NpC99HuW4UngkvJK80fvIMl02x1MMxAf+LCSjjOcbD5VvDDH2pqz0ajW
-29qW70WjJbSu+iHhlfIHdNgGyCv7U8yaaEDuOWcr3WUJhr1LZrh/369SiMb+4F/r
-7wT9p+pSq3i540ltylhBb/2KSbftGLH93j4pZhyZ/j38+ZFCZDymEJEOu3iheMOo
-1lHOxiQYfS6yfBMiwG50I051cPVr9RnkKD4tUhWxBlo+1R27L16GbOTZlYghWoXI
-O1LMDta7chd9GLb+zUnFXGd65azWug9usHmi6rQzU/7ekdDDCCxS1XY/qWNdoaov
-Yb7YBkn/UTiITBsyfBG37tHHzD+itQ==
-=4HUp
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0eO6IACgkQ9AfbAGHV
+z0CtDwf9ECCKwMGZs/GK59nHuD6oJuPps0F6Rh/tMpyc54TjgY/Z08IVqMALMpQO
+LQSiCi+WHGON3r8pJhu1jmchPYuBlbSbms6lcN7TeYewPoKlsmm3d5gNf7Om5Oot
+O9QuU9gsMLjenFaa62N1BH5+F5Y2282xIUPR4Nhang2j6XwiznELt1GT2J41S4fA
+8LUNjFwItIVu5/3TRs7v2G5VmG+v1ErdAF2TlJG+rc3r7fSaKQUiqEGPNFikTaF8
+y182cAA3nThnzUyrjbE6/TehYIZUj8yxFN2M+o0r9INQD3Akwyfd9izK7o5U2ybs
+vdbGSk6CifdJXQbmk75nZKioXT2RXA==
+=gt5D
 -----END PGP SIGNATURE-----
 
---wgwfzhQbbgmchWHJ8aQaGS4EwV3ppU121--
+--Zub2SOUox8VxK3YWJZgVeuAxNIPisJLN3--
 
