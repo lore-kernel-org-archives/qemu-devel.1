@@ -6,58 +6,55 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D7AAC06513
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 12:42:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2281C06513
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 12:44:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 197AA2082E
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 12:42:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 197AA2082E
+	by mail.kernel.org (Postfix) with ESMTPS id A91B5218A3
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 12:44:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A91B5218A3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45322 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45340 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hj13p-0003tK-BT
-	for qemu-devel@archiver.kernel.org; Thu, 04 Jul 2019 08:42:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41944)
+	id 1hj16e-0005Ui-MV
+	for qemu-devel@archiver.kernel.org; Thu, 04 Jul 2019 08:44:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42306)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <imammedo@redhat.com>) id 1hj12I-0002xj-Gd
- for qemu-devel@nongnu.org; Thu, 04 Jul 2019 08:40:27 -0400
+ (envelope-from <mlevitsk@redhat.com>) id 1hj15l-0004dd-WE
+ for qemu-devel@nongnu.org; Thu, 04 Jul 2019 08:44:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1hj12H-00014l-HI
- for qemu-devel@nongnu.org; Thu, 04 Jul 2019 08:40:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57584)
+ (envelope-from <mlevitsk@redhat.com>) id 1hj15k-0002fr-Mw
+ for qemu-devel@nongnu.org; Thu, 04 Jul 2019 08:44:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44852)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hj12H-00014X-BL
- for qemu-devel@nongnu.org; Thu, 04 Jul 2019 08:40:25 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ (Exim 4.71) (envelope-from <mlevitsk@redhat.com>)
+ id 1hj15h-0002bJ-T4; Thu, 04 Jul 2019 08:43:58 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id AAE4C3082132
- for <qemu-devel@nongnu.org>; Thu,  4 Jul 2019 12:40:14 +0000 (UTC)
-Received: from dell-r430-03.lab.eng.brq.redhat.com
- (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 771B617C3F;
- Thu,  4 Jul 2019 12:40:11 +0000 (UTC)
-From: Igor Mammedov <imammedo@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 9298B2F8BFE;
+ Thu,  4 Jul 2019 12:43:51 +0000 (UTC)
+Received: from maximlenovopc.usersys.redhat.com (dhcp-4-67.tlv.redhat.com
+ [10.35.4.67])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D2FBA6B8CC;
+ Thu,  4 Jul 2019 12:43:49 +0000 (UTC)
+From: Maxim Levitsky <mlevitsk@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Thu,  4 Jul 2019 08:40:06 -0400
-Message-Id: <20190704124006.27706-1-imammedo@redhat.com>
-In-Reply-To: <20190704082736.25258-3-imammedo@redhat.com>
-References: <20190704082736.25258-3-imammedo@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Date: Thu,  4 Jul 2019 15:43:42 +0300
+Message-Id: <20190704124342.7753-2-mlevitsk@redhat.com>
+In-Reply-To: <20190704124342.7753-1-mlevitsk@redhat.com>
+References: <20190704124342.7753-1-mlevitsk@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.42]); Thu, 04 Jul 2019 12:40:14 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ (mx1.redhat.com [10.5.110.38]); Thu, 04 Jul 2019 12:43:51 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 2/2] tests: acpi: do not skip tests when
- IASL is not installed
+Subject: [Qemu-devel] [PATCH v2 1/1] raw-posix.c - use max transfer length /
+ max segement count only for SCSI passthrough
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,71 +66,148 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: mst@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ qemu-block@nongnu.org, Maxim Levitsky <mlevitsk@redhat.com>,
+ John Ferlan <jferlan@redhat.com>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-tests do binary comparision so we can check tables without
-IASL. Move IASL condition right before decompilation step
-and skip it if IASL is not installed.
+Regular kernel block devices (/dev/sda*, /dev/nvme*, etc) don't have
+max segment size/max segment count hardware requirements exposed
+to the userspace, but rather the kernel block layer
+takes care to split the incoming requests that
+violate these requirements.
 
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Allowing the kernel to do the splitting allows qemu to avoid
+various overheads that arise otherwise from this.
+
+This is especially visible in nbd server,
+exposing as a raw file, a mostly empty qcow2 image over the net.
+In this case most of the reads by the remote user
+won't even hit the underlying kernel block device,
+and therefore most of the  overhead will be in the
+nbd traffic which increases significantly with lower max transfer size.
+
+In addition to that even for local block device
+access the peformance improves a bit due to less
+traffic between qemu and the kernel when large
+transfer sizes are used (e.g for image conversion)
+
+More info can be found at:
+https://bugzilla.redhat.com/show_bug.cgi?id=1647104
+
+Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
-v2:
- - fix typo in commit message
-     Eric Auger <eric.auger@redhat.com>
+ block/file-posix.c | 54 ++++++++++++++++++++++++----------------------
+ 1 file changed, 28 insertions(+), 26 deletions(-)
 
- tests/bios-tables-test.c | 15 ++++++++++++++-
- 1 file changed, 14 insertions(+), 1 deletion(-)
-
-diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
-index 13bd166b81..a356ac3489 100644
---- a/tests/bios-tables-test.c
-+++ b/tests/bios-tables-test.c
-@@ -389,6 +389,14 @@ static void test_acpi_asl(test_data *data)
-         all_tables_match =3D all_tables_match &&
-             test_acpi_find_diff_allowed(exp_sdt);
-=20
-+        /*
-+         *  don't try to decompile if IASL isn't present, in this case u=
-ser
-+         * will just 'get binary file mismatch' warnings and test failur=
-e
-+         */
-+        if (!iasl) {
-+            continue;
+diff --git a/block/file-posix.c b/block/file-posix.c
+index ab05b51a66..4479cc7ab4 100644
+--- a/block/file-posix.c
++++ b/block/file-posix.c
+@@ -1038,15 +1038,13 @@ static void raw_reopen_abort(BDRVReopenState *state)
+     s->reopen_state = NULL;
+ }
+ 
+-static int hdev_get_max_transfer_length(BlockDriverState *bs, int fd)
++static int sg_get_max_transfer_length(int fd)
+ {
+ #ifdef BLKSECTGET
+     int max_bytes = 0;
+-    short max_sectors = 0;
+-    if (bs->sg && ioctl(fd, BLKSECTGET, &max_bytes) == 0) {
++
++    if (ioctl(fd, BLKSECTGET, &max_bytes) == 0) {
+         return max_bytes;
+-    } else if (!bs->sg && ioctl(fd, BLKSECTGET, &max_sectors) == 0) {
+-        return max_sectors << BDRV_SECTOR_BITS;
+     } else {
+         return -errno;
+     }
+@@ -1055,25 +1053,31 @@ static int hdev_get_max_transfer_length(BlockDriverState *bs, int fd)
+ #endif
+ }
+ 
+-static int hdev_get_max_segments(const struct stat *st)
++static int sg_get_max_segments(int fd)
+ {
+ #ifdef CONFIG_LINUX
+     char buf[32];
+     const char *end;
+-    char *sysfspath;
++    char *sysfspath = NULL;
+     int ret;
+-    int fd = -1;
++    int sysfd = -1;
+     long max_segments;
++    struct stat st;
++
++    if (fstat(fd, &st)) {
++        ret = -errno;
++        goto out;
++    }
+ 
+     sysfspath = g_strdup_printf("/sys/dev/block/%u:%u/queue/max_segments",
+-                                major(st->st_rdev), minor(st->st_rdev));
+-    fd = open(sysfspath, O_RDONLY);
+-    if (fd == -1) {
++                                major(st.st_rdev), minor(st.st_rdev));
++    sysfd = open(sysfspath, O_RDONLY);
++    if (sysfd == -1) {
+         ret = -errno;
+         goto out;
+     }
+     do {
+-        ret = read(fd, buf, sizeof(buf) - 1);
++        ret = read(sysfd, buf, sizeof(buf) - 1);
+     } while (ret == -1 && errno == EINTR);
+     if (ret < 0) {
+         ret = -errno;
+@@ -1090,8 +1094,8 @@ static int hdev_get_max_segments(const struct stat *st)
+     }
+ 
+ out:
+-    if (fd != -1) {
+-        close(fd);
++    if (sysfd != -1) {
++        close(sysfd);
+     }
+     g_free(sysfspath);
+     return ret;
+@@ -1103,19 +1107,17 @@ out:
+ static void raw_refresh_limits(BlockDriverState *bs, Error **errp)
+ {
+     BDRVRawState *s = bs->opaque;
+-    struct stat st;
+ 
+-    if (!fstat(s->fd, &st)) {
+-        if (S_ISBLK(st.st_mode) || S_ISCHR(st.st_mode)) {
+-            int ret = hdev_get_max_transfer_length(bs, s->fd);
+-            if (ret > 0 && ret <= BDRV_REQUEST_MAX_BYTES) {
+-                bs->bl.max_transfer = pow2floor(ret);
+-            }
+-            ret = hdev_get_max_segments(&st);
+-            if (ret > 0) {
+-                bs->bl.max_transfer = MIN(bs->bl.max_transfer,
+-                                          ret * getpagesize());
+-            }
++    if (bs->sg) {
++        int ret = sg_get_max_transfer_length(s->fd);
++
++        if (ret > 0 && ret <= BDRV_REQUEST_MAX_BYTES) {
++            bs->bl.max_transfer = pow2floor(ret);
 +        }
 +
-         err =3D load_asl(data->tables, sdt);
-         asl =3D normalize_asl(sdt->asl);
-=20
-@@ -431,6 +439,11 @@ static void test_acpi_asl(test_data *data)
-         g_string_free(asl, true);
-         g_string_free(exp_asl, true);
++        ret = sg_get_max_segments(s->fd);
++        if (ret > 0) {
++            bs->bl.max_transfer = MIN(bs->bl.max_transfer, ret * getpagesize());
+         }
      }
-+    if (!iasl && !all_tables_match) {
-+        fprintf(stderr, "to see ASL diff between mismatched files instal=
-l IASL,"
-+                " rebuild QEMU from scratch and re-run tests with V=3D1"
-+                " environment variable set");
-+    }
-     g_assert(all_tables_match);
-=20
-     free_test_data(&exp_data);
-@@ -599,7 +612,7 @@ static void test_acpi_one(const char *params, test_da=
-ta *data)
-=20
-     if (getenv(ACPI_REBUILD_EXPECTED_AML)) {
-         dump_aml_files(data, true);
--    } else if (iasl) {
-+    } else {
-         test_acpi_asl(data);
-     }
-=20
---=20
-2.18.1
+ 
+-- 
+2.17.2
 
 
