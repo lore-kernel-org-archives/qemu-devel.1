@@ -2,62 +2,65 @@ Return-Path: <SRS0=blGQ=VB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0CAEC0650E
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 08:13:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA483C0650E
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 08:18:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C3445218A3
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 08:13:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3445218A3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id BF971218A3
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 08:18:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF971218A3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43456 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43472 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hiwrs-0006ua-2k
-	for qemu-devel@archiver.kernel.org; Thu, 04 Jul 2019 04:13:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52249)
+	id 1hiwxE-0000mS-0X
+	for qemu-devel@archiver.kernel.org; Thu, 04 Jul 2019 04:18:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52961)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <groug@kaod.org>) id 1hiwqn-00068P-CO
- for qemu-devel@nongnu.org; Thu, 04 Jul 2019 04:12:19 -0400
+ (envelope-from <peterx@redhat.com>) id 1hiwwR-0000Kw-N5
+ for qemu-devel@nongnu.org; Thu, 04 Jul 2019 04:18:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1hiwqm-0001oB-6M
- for qemu-devel@nongnu.org; Thu, 04 Jul 2019 04:12:17 -0400
-Received: from 8.mo1.mail-out.ovh.net ([178.33.110.239]:42314)
+ (envelope-from <peterx@redhat.com>) id 1hiwwQ-0005No-FE
+ for qemu-devel@nongnu.org; Thu, 04 Jul 2019 04:18:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49748)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1hiwql-0001mb-VS
- for qemu-devel@nongnu.org; Thu, 04 Jul 2019 04:12:16 -0400
-Received: from player693.ha.ovh.net (unknown [10.109.143.216])
- by mo1.mail-out.ovh.net (Postfix) with ESMTP id A30F5183930
- for <qemu-devel@nongnu.org>; Thu,  4 Jul 2019 10:12:11 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player693.ha.ovh.net (Postfix) with ESMTPSA id CC19F788DE9F;
- Thu,  4 Jul 2019 08:12:07 +0000 (UTC)
-Date: Thu, 4 Jul 2019 10:12:04 +0200
-From: Greg Kurz <groug@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190704101204.4968e0a1@bahia.lan>
-In-Reply-To: <20190704002357.GR9442@umbus.fritz.box>
-References: <156217621200.562209.8968691631915806468.stgit@bahia.lan>
- <20190704002357.GR9442@umbus.fritz.box>
-X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1hiwwQ-0005J1-A9
+ for qemu-devel@nongnu.org; Thu, 04 Jul 2019 04:18:06 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id C8C063086211;
+ Thu,  4 Jul 2019 08:17:57 +0000 (UTC)
+Received: from xz-x1 (unknown [10.66.61.6])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 197214DA30;
+ Thu,  4 Jul 2019 08:17:50 +0000 (UTC)
+Date: Thu, 4 Jul 2019 16:17:48 +0800
+From: Peter Xu <peterx@redhat.com>
+To: Jason Wang <jasowang@redhat.com>
+Message-ID: <20190704081748.GF3796@xz-x1>
+References: <20190624091811.30412-1-peterx@redhat.com>
+ <20190624091811.30412-3-peterx@redhat.com>
+ <e8d78a5e-3c9a-30de-78a8-f8fdb2589bec@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 13032009949517814246
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduvddrfedvgddtvdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <e8d78a5e-3c9a-30de-78a8-f8fdb2589bec@redhat.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.42]); Thu, 04 Jul 2019 08:17:59 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 178.33.110.239
-Subject: Re: [Qemu-devel] [PATCH for-4.2] xics/kvm: Convert assert() to
- error_setg()
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] intel_iommu: Fix unexpected unmaps
+ during global unmap
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,85 +72,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>,
- qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Yan Zhao <yan.y.zhao@intel.com>,
+ qemu-devel@nongnu.org, Auger Eric <eric.auger@redhat.com>,
+ "Michael S . Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 4 Jul 2019 10:23:57 +1000
-David Gibson <david@gibson.dropbear.id.au> wrote:
+On Thu, Jul 04, 2019 at 01:45:41PM +0800, Jason Wang wrote:
+>=20
+> On 2019/6/24 =E4=B8=8B=E5=8D=885:18, Peter Xu wrote:
+> > This is an replacement work of Yan Zhao's patch:
+> >=20
+> > https://www.mail-archive.com/qemu-devel@nongnu.org/msg625340.html
+> >=20
+> > vtd_address_space_unmap() will do proper page mask alignment to make
+> > sure each IOTLB message will have correct masks for notification
+> > messages (2^N-1), but sometimes it can be expanded to even supercede
+> > the registered range.
+>=20
+>=20
+> I wonder under what circumstance that could we meet this?
 
-> On Wed, Jul 03, 2019 at 07:50:12PM +0200, Greg Kurz wrote:
-> > ics_set_kvm_state_one() is called either during reset, in which case
-> > both 'saved priority' and 'current priority' are equal to 0xff, or
-> > during migration. In the latter case, 'saved priority' may differ
-> > from 'current priority' only if the interrupt had been masked with
-> > the ibm,int-off RTAS call. Instead of aborting QEMU, print out an
-> > error and exit.
-> 
-> What's the rationale for this?  Doesn't hitting this indicate an error
-> in the qemu code, for which an abort is the usual response?
-> 
+Sorry I forgot to reply-all just now...
 
-This error can be hit by the destination during migration if the
-incoming stream is corrupted. Aborting in this case would mislead
-the user into suspecting a bug in the destination QEMU, which isn't
-the case.
+I've asked a similar question, and Yan's answer is here:
 
-Appart from that, when the in-kernel XICS is in use, only two functions
-manipulate the ICS state: ics_set_kvm_state_one() and ics_get_kvm_state().
-The code is trivial enough that I don't see a great value in the assert
-in the first place... BTW, it comes from the commit:
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg625597.html
 
-commit 11ad93f68195f68cc94d988f2aa50b4d190ee52a
-Author: David Gibson <david@gibson.dropbear.id.au>
-Date:   Thu Sep 26 16:18:44 2013 +1000
+Regards,
 
-    xics-kvm: Support for in-kernel XICS interrupt controller
-
-Maybe you remember some context that justified the assert at the time ?
-
-> > 
-> > Based-on: <156217454083.559957.7359208229523652842.stgit@bahia.lan>
-> > Signed-off-by: Greg Kurz <groug@kaod.org>
-> > ---
-> > 
-> > This isn't a bugfix, hence targetting 4.2, but it depends on an actual
-> > fix for 4.1, as mentionned in the Based-on tag.
-> > ---
-> >  hw/intc/xics_kvm.c |   17 +++++++++++++++--
-> >  1 file changed, 15 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
-> > index 2df1f3e92c7e..f8758b928250 100644
-> > --- a/hw/intc/xics_kvm.c
-> > +++ b/hw/intc/xics_kvm.c
-> > @@ -255,8 +255,21 @@ int ics_set_kvm_state_one(ICSState *ics, int srcno, Error **errp)
-> >      state = irq->server;
-> >      state |= (uint64_t)(irq->saved_priority & KVM_XICS_PRIORITY_MASK)
-> >          << KVM_XICS_PRIORITY_SHIFT;
-> > -    if (irq->priority != irq->saved_priority) {
-> > -        assert(irq->priority == 0xff);
-> > +
-> > +    /*
-> > +     * An interrupt can be masked either because the ICS is resetting, in
-> > +     * which case we expect 'current priority' and 'saved priority' to be
-> > +     * equal to 0xff, or because the guest has called the ibm,int-off RTAS
-> > +     * call, in which case we we have recorded the priority the interrupt
-> > +     * had before it was masked in 'saved priority'. If the interrupt isn't
-> > +     * masked, 'saved priority' and 'current priority' are equal (see
-> > +     * ics_get_kvm_state()). Make sure we restore a sane state, otherwise
-> > +     * fail migration.
-> > +     */
-> > +    if (irq->priority != irq->saved_priority && irq->priority != 0xff) {
-> > +        error_setg(errp, "Corrupted state detected for interrupt source %d",
-> > +                   srcno);
-> > +        return -EINVAL;
-> >      }
-> >  
-> >      if (irq->priority == 0xff) {
-> > 
-> 
-
+--=20
+Peter Xu
 
