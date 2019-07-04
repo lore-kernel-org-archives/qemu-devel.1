@@ -2,79 +2,91 @@ Return-Path: <SRS0=blGQ=VB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F219EC0651F
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 15:44:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D145EC0651F
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 15:44:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BF11E218A0
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 15:44:19 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IcE7IxBA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF11E218A0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id A57E9218A0
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 15:44:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A57E9218A0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47110 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47112 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hj3uF-0005v0-2X
-	for qemu-devel@archiver.kernel.org; Thu, 04 Jul 2019 11:44:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40642)
+	id 1hj3un-0006Ul-Un
+	for qemu-devel@archiver.kernel.org; Thu, 04 Jul 2019 11:44:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40372)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hj3tG-0004yL-BA
- for qemu-devel@nongnu.org; Thu, 04 Jul 2019 11:43:20 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hj3r8-0003Uw-Nl
+ for qemu-devel@nongnu.org; Thu, 04 Jul 2019 11:41:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hj3tE-0003Kn-AL
- for qemu-devel@nongnu.org; Thu, 04 Jul 2019 11:43:18 -0400
-Received: from mail-oi1-x22a.google.com ([2607:f8b0:4864:20::22a]:43067)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hj3tC-0003I5-Dp
- for qemu-devel@nongnu.org; Thu, 04 Jul 2019 11:43:14 -0400
-Received: by mail-oi1-x22a.google.com with SMTP id w79so5203091oif.10
- for <qemu-devel@nongnu.org>; Thu, 04 Jul 2019 08:43:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=nI/PXMmkLI7kWolI9ni1FJmQc/Tup1BwET3qaAmtqRw=;
- b=IcE7IxBAkUw2U8CDNwtLq+ou2/32JBPwZn5AmRX8XC5mOSaUt6QmlVyBGcBt3hnEcV
- UVMk5NqbroSAkBlwVztUSKEFd8PuS8qb0GLNv4ai9TUs9aSHAjoKbC01woUah6lvIO8a
- QIqU69JLw/U3VvPOhiBPkdE2ukbgjmx4SDIMKoSUb25VQPY13HGxqiUutpRyjur1YRGT
- nearkly5eRbzWYQIyLjHATQhIfUHIMgF98u278dEiSeUHLHnvAu9wjfbrnCiE9xkD8/I
- tg36oAo///7QwzQTZBOpbKcsIx4w287WqR+ncXk+PHe0XiI1V1kSqE7JmX8GgPKMQc5m
- 0Rdg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=nI/PXMmkLI7kWolI9ni1FJmQc/Tup1BwET3qaAmtqRw=;
- b=TIzld58z8z593CArjylw66yp2EKvuhLAG7gPoMTxYo6Q6vNhaNTs5CPX4LihZ/5fAo
- HKHLJ2l3IW9WxYjdVohOOqBr22rMsBLRkDLgVRabJY5RWR3CvLs3xKKXoKtnTX6mxnhp
- im1q4ept9/CHNlFGlEV8FlzawYBYnQB9hR2J69RABamvLTuiPci2zkqjMDbWVpc/ePcR
- 7Q29jFXAUrLANrcZMgIqtLDdno/2dl9ann7UDlMCEhB8sa4lN/Pp4QBnbII0ThTKCi0r
- 1K4iia2Vaaq4RhlwOTdnLxR9VXM+GsKjDOtA/YTzi1OHJ0Q9YbFD9sPQz+UDqdGWZYYd
- lKlQ==
-X-Gm-Message-State: APjAAAXXwefZ2shFqbWMS+qbuERqJiZBwosYfGC1ASM94Am7ZARIN4wc
- 0C7R0kc9ayGQVwM/5YhKH0xuTx/i9RJHFdtb+iPu6w==
-X-Google-Smtp-Source: APXvYqwn+KB54uH96B/evqsISHyofZIDhMIvabEZ/dnOnL8wQJU4gPLnACX9p8ZLErJEDRQg1KsztFEgukJUT5cOKKU=
-X-Received: by 2002:aca:5cd7:: with SMTP id q206mr120054oib.146.1562254993192; 
- Thu, 04 Jul 2019 08:43:13 -0700 (PDT)
+ (envelope-from <mreitz@redhat.com>) id 1hj3r7-000838-Ty
+ for qemu-devel@nongnu.org; Thu, 04 Jul 2019 11:41:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35528)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1hj3r5-0007w5-GI; Thu, 04 Jul 2019 11:41:03 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 12477756;
+ Thu,  4 Jul 2019 15:40:52 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-204-93.brq.redhat.com
+ [10.40.204.93])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id F03978E5F7;
+ Thu,  4 Jul 2019 15:40:44 +0000 (UTC)
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+References: <20190703215542.16123-1-jsnow@redhat.com>
+ <20190703215542.16123-9-jsnow@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <275816f1-82e1-f766-0b77-2c4dfe08b7eb@redhat.com>
+Date: Thu, 4 Jul 2019 17:40:43 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-References: <20190703114714.4234-1-armbru@redhat.com>
-In-Reply-To: <20190703114714.4234-1-armbru@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 4 Jul 2019 16:43:01 +0100
-Message-ID: <CAFEAcA-A+MfKHyM44=TnzuOqHOrJB2Jenb_8TnAG4WT2NQfm6A@mail.gmail.com>
-To: Markus Armbruster <armbru@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::22a
-Subject: Re: [Qemu-devel] [PULL v2 0/4] Build system patches for 2019-07-02
+In-Reply-To: <20190703215542.16123-9-jsnow@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="s6I1OXPdDxSX3RL2zCFWTYT0X56Bdo0LF"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.29]); Thu, 04 Jul 2019 15:40:57 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2 08/18] hbitmap: enable merging across
+ granularities
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,43 +98,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ vsementsov@virtuozzo.com, Juan Quintela <quintela@redhat.com>,
+ Wen Congyang <wencongyang2@huawei.com>,
+ Xie Changlong <xiechanglong.d@gmail.com>,
+ Markus Armbruster <armbru@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 3 Jul 2019 at 12:49, Markus Armbruster <armbru@redhat.com> wrote:
->
-> The following changes since commit ab200dafc0e8a9925bb0ad0be478621f5f117c95:
->
->   Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request' into staging (2019-07-02 10:17:54 +0100)
->
-> are available in the Git repository at:
->
->   git://repo.or.cz/qemu/armbru.git tags/pull-build-2019-07-02-v2
->
-> for you to fetch changes up to 1338a4b72659ce08eacb9de0205fe16202a22d9c:
->
->   Makefile: Reuse all's recursion machinery for clean and install (2019-07-03 13:19:19 +0200)
->
-> ----------------------------------------------------------------
-> Build system patches for 2019-07-02
->
-> v2:
-> * PATCH 3: Add compatibility gunk to keep make working across the rename
->
-> ----------------------------------------------------------------
-> Markus Armbruster (4):
->       Makefile: Remove code to smooth transition to config.status
->       Makefile: Drop bogus cleaning of $(ALL_SUBDIRS)/qemu-options.def
->       Makefile: Rename targets for make recursion
->       Makefile: Reuse all's recursion machinery for clean and install
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--s6I1OXPdDxSX3RL2zCFWTYT0X56Bdo0LF
+Content-Type: multipart/mixed; boundary="mEkPbRNId9kS3M7nCg3eYeHDevftmQHky";
+ protected-headers="v1"
+From: Max Reitz <mreitz@redhat.com>
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
+ Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Fam Zheng <fam@euphon.net>, Juan Quintela <quintela@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Wen Congyang <wencongyang2@huawei.com>, vsementsov@virtuozzo.com,
+ Xie Changlong <xiechanglong.d@gmail.com>
+Message-ID: <275816f1-82e1-f766-0b77-2c4dfe08b7eb@redhat.com>
+Subject: Re: [PATCH v2 08/18] hbitmap: enable merging across granularities
+References: <20190703215542.16123-1-jsnow@redhat.com>
+ <20190703215542.16123-9-jsnow@redhat.com>
+In-Reply-To: <20190703215542.16123-9-jsnow@redhat.com>
+
+--mEkPbRNId9kS3M7nCg3eYeHDevftmQHky
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 03.07.19 23:55, John Snow wrote:
+> Signed-off-by: John Snow <jsnow@redhat.com>
+> ---
+>  util/hbitmap.c | 36 +++++++++++++++++++++++++++++++++++-
+>  1 file changed, 35 insertions(+), 1 deletion(-)
+
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 
-Applied, thanks.
+--mEkPbRNId9kS3M7nCg3eYeHDevftmQHky--
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.1
-for any user-visible changes.
+--s6I1OXPdDxSX3RL2zCFWTYT0X56Bdo0LF
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
--- PMM
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0eHfsACgkQ9AfbAGHV
+z0CjTggAtoE8NJpOwI9lcpAMGD5jJoYISlCusm3gTMAAID9vR27V8flKDyd5mNlA
+2juqzSgkQS4DKzmvr57IzNA+YemaGuJow5nWzc3Xv98e8UtRLvtaXQVfIKEcyF/h
+V4GwEW1DoDkTcQUHrWdT6AbGG6muwUcHIVqGC/QVOuev479Jo2kKgibRGDkVFqlI
+MRYCozHJ9TPEYw89EN+SFLnzQZQmOh3lga9xJFBlalR8yhhg1dc8bVdHwJOC5GrZ
+otaICTREDfb25dviT/E9dS4bNMVImk7R0f596DYPRMlWxWfNH5LYBx7xj3ywWsLR
+bGRZJDG+456pZx82c6K3SlhnwPBN6Q==
+=5V6c
+-----END PGP SIGNATURE-----
+
+--s6I1OXPdDxSX3RL2zCFWTYT0X56Bdo0LF--
 
