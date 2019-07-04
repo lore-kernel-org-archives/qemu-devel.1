@@ -2,59 +2,92 @@ Return-Path: <SRS0=blGQ=VB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99F8DC0651F
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 18:06:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17599C0651F
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 18:07:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 753AA2189E
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 18:06:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 753AA2189E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id E31FF21738
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 18:07:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E31FF21738
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48086 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48098 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hj67L-0002eO-NQ
-	for qemu-devel@archiver.kernel.org; Thu, 04 Jul 2019 14:05:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58867)
+	id 1hj68Z-0004OT-8D
+	for qemu-devel@archiver.kernel.org; Thu, 04 Jul 2019 14:07:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59056)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <julio.montes@intel.com>) id 1hj65V-00029D-T9
- for qemu-devel@nongnu.org; Thu, 04 Jul 2019 14:04:06 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hj67E-000311-P7
+ for qemu-devel@nongnu.org; Thu, 04 Jul 2019 14:05:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <julio.montes@intel.com>) id 1hj65U-0003SL-Qi
- for qemu-devel@nongnu.org; Thu, 04 Jul 2019 14:04:05 -0400
-Received: from mga03.intel.com ([134.134.136.65]:59779)
+ (envelope-from <mreitz@redhat.com>) id 1hj67C-0004Xw-QD
+ for qemu-devel@nongnu.org; Thu, 04 Jul 2019 14:05:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37642)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <julio.montes@intel.com>)
- id 1hj65U-0003OE-Hv
- for qemu-devel@nongnu.org; Thu, 04 Jul 2019 14:04:04 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
- by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 04 Jul 2019 11:03:56 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.63,451,1557212400"; d="scan'208";a="315909630"
-Received: from unknown (HELO fedora.zpn.intel.com.) ([10.219.4.39])
- by orsmga004.jf.intel.com with ESMTP; 04 Jul 2019 11:03:55 -0700
-From: Julio Montes <julio.montes@intel.com>
-To: pbonzini@redhat.com,
-	qemu-devel@nongnu.org
-Date: Thu,  4 Jul 2019 18:03:50 +0000
-Message-Id: <20190704180350.2086-1-julio.montes@intel.com>
-X-Mailer: git-send-email 2.17.2
-In-Reply-To: <be6aa304-a8e4-d64a-432f-24d52e42c097@redhat.com>
-References: <be6aa304-a8e4-d64a-432f-24d52e42c097@redhat.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 134.134.136.65
-Subject: [Qemu-devel] [PATCH] hw/i386: Fix linker error when ISAPC is
- disabled
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1hj670-0004Mk-Qr; Thu, 04 Jul 2019 14:05:40 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 7A652356E4;
+ Thu,  4 Jul 2019 18:05:36 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-204-93.brq.redhat.com
+ [10.40.204.93])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A9F9A96AA8;
+ Thu,  4 Jul 2019 18:05:28 +0000 (UTC)
+From: Max Reitz <mreitz@redhat.com>
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+References: <20190703215542.16123-1-jsnow@redhat.com>
+ <20190703215542.16123-13-jsnow@redhat.com>
+ <ee65fb7c-1f19-17f8-ea32-7aa3cc2a1b3d@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <63fe8c7b-69ad-d043-d629-664370a2acc5@redhat.com>
+Date: Thu, 4 Jul 2019 20:05:26 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
+MIME-Version: 1.0
+In-Reply-To: <ee65fb7c-1f19-17f8-ea32-7aa3cc2a1b3d@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="q03T3SyoCdlRperdfrf4pkZ4Rv820WaVK"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.30]); Thu, 04 Jul 2019 18:05:36 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2 12/18] block/backup: add 'always' bitmap
+ sync policy
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,108 +99,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Julio Montes <julio.montes@intel.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ vsementsov@virtuozzo.com, Juan Quintela <quintela@redhat.com>,
+ Wen Congyang <wencongyang2@huawei.com>,
+ Xie Changlong <xiechanglong.d@gmail.com>,
+ Markus Armbruster <armbru@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-How about a new header file with all devices? (see below patch)
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--q03T3SyoCdlRperdfrf4pkZ4Rv820WaVK
+Content-Type: multipart/mixed; boundary="Rr0LIld86fZjUkQSxwmHk0cfPpFEaLchI";
+ protected-headers="v1"
+From: Max Reitz <mreitz@redhat.com>
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
+ Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Fam Zheng <fam@euphon.net>, Juan Quintela <quintela@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Wen Congyang <wencongyang2@huawei.com>, vsementsov@virtuozzo.com,
+ Xie Changlong <xiechanglong.d@gmail.com>
+Message-ID: <63fe8c7b-69ad-d043-d629-664370a2acc5@redhat.com>
+Subject: Re: [PATCH v2 12/18] block/backup: add 'always' bitmap sync policy
+References: <20190703215542.16123-1-jsnow@redhat.com>
+ <20190703215542.16123-13-jsnow@redhat.com>
+ <ee65fb7c-1f19-17f8-ea32-7aa3cc2a1b3d@redhat.com>
+In-Reply-To: <ee65fb7c-1f19-17f8-ea32-7aa3cc2a1b3d@redhat.com>
 
----
- Makefile.target       |  5 +++++
- hw/i386/pc_piix.c     | 11 ++++++++---
- include/qemu/osdep.h  |  1 +
- scripts/create_config |  2 ++
- 4 files changed, 16 insertions(+), 3 deletions(-)
+--Rr0LIld86fZjUkQSxwmHk0cfPpFEaLchI
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/Makefile.target b/Makefile.target
-index a6919e0caf..65eda0994d 100644
---- a/Makefile.target
-+++ b/Makefile.target
-@@ -45,6 +45,9 @@ include $(SRC_PATH)/tests/tcg/Makefile.include
- config-target.h: config-target.h-timestamp
- config-target.h-timestamp: config-target.mak
+On 04.07.19 19:43, Max Reitz wrote:
+> On 03.07.19 23:55, John Snow wrote:
+>> This adds an "always" policy for bitmap synchronization. Regardless of=
+ if
+>> the job succeeds or fails, the bitmap is *always* synchronized. This m=
+eans
+>> that for backups that fail part-way through, the bitmap retains a reco=
+rd of
+>> which sectors need to be copied out to accomplish a new backup using t=
+he
+>> old, partial result.
+>>
+>> In effect, this allows us to "resume" a failed backup; however the new=
+ backup
+>> will be from the new point in time, so it isn't a "resume" as much as =
+it is
+>> an "incremental retry." This can be useful in the case of extremely la=
+rge
+>> backups that fail considerably through the operation and we'd like to =
+not waste
+>> the work that was already performed.
+>>
+>> Signed-off-by: John Snow <jsnow@redhat.com>
+>> ---
+>>  block/backup.c       | 25 +++++++++++++++++--------
+>>  qapi/block-core.json |  5 ++++-
+>>  2 files changed, 21 insertions(+), 9 deletions(-)
+>>
+>> diff --git a/block/backup.c b/block/backup.c
+>> index 9cc5a7f6ca..495d8f71aa 100644
+>> --- a/block/backup.c
+>> +++ b/block/backup.c
+>> @@ -266,16 +266,25 @@ static void backup_cleanup_sync_bitmap(BackupBlo=
+ckJob *job, int ret)
 
-+config-devices.h: config-devices.h-timestamp
-+config-devices.h-timestamp: config-devices.mak
-+
- ifdef CONFIG_TRACE_SYSTEMTAP
- stap: $(QEMU_PROG).stp-installed $(QEMU_PROG).stp $(QEMU_PROG)-simpletrace.stp $(QEMU_PROG)-log.stp
+[...]
 
-@@ -170,6 +173,8 @@ generated-files-y += hmp-commands.h hmp-commands-info.h
+>> +        /* If we failed and synced, merge in the bits we didn't copy:=
+ */
+>> +        bdrv_dirty_bitmap_merge_internal(bm, job->copy_bitmap,
+>> +                                         NULL, true);
+>=20
+> I presume this is for sync=3Dfull?
 
- endif # CONFIG_SOFTMMU
+Ah, no.  This is necessary because the original sync bitmap was
+discarded by bdrv_dirty_bitmap_abdicate().  So yep, these bits need to
+go back into the sync bitmap then.
 
-+generated-files-y += config-devices.h
-+
- dummy := $(call unnest-vars,,obj-y)
- all-obj-y := $(obj-y)
+Max
 
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index c07c4a5b38..b93f9327be 100644
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -61,9 +61,11 @@
 
- #define MAX_IDE_BUS 2
+--Rr0LIld86fZjUkQSxwmHk0cfPpFEaLchI--
 
-+#ifdef CONFIG_IDE_ISA
- static const int ide_iobase[MAX_IDE_BUS] = { 0x1f0, 0x170 };
- static const int ide_iobase2[MAX_IDE_BUS] = { 0x3f6, 0x376 };
- static const int ide_irq[MAX_IDE_BUS] = { 14, 15 };
-+#endif
+--q03T3SyoCdlRperdfrf4pkZ4Rv820WaVK
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
- /* PC hardware initialisation */
- static void pc_init1(MachineState *machine,
-@@ -254,7 +256,10 @@ static void pc_init1(MachineState *machine,
-         }
-         idebus[0] = qdev_get_child_bus(&dev->qdev, "ide.0");
-         idebus[1] = qdev_get_child_bus(&dev->qdev, "ide.1");
--    } else {
-+        pc_cmos_init(pcms, idebus[0], idebus[1], rtc_state);
-+    }
-+#ifdef CONFIG_IDE_ISA
-+else {
-         for(i = 0; i < MAX_IDE_BUS; i++) {
-             ISADevice *dev;
-             char busname[] = "ide.0";
-@@ -268,9 +273,9 @@ static void pc_init1(MachineState *machine,
-             busname[4] = '0' + i;
-             idebus[i] = qdev_get_child_bus(DEVICE(dev), busname);
-         }
-+        pc_cmos_init(pcms, idebus[0], idebus[1], rtc_state);
-     }
--
--    pc_cmos_init(pcms, idebus[0], idebus[1], rtc_state);
-+#endif
+-----BEGIN PGP SIGNATURE-----
 
-     if (pcmc->pci_enabled && machine_usb(machine)) {
-         pci_create_simple(pci_bus, piix3_devfn + 2, "piix3-usb-uhci");
-diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
-index af2b91f0b8..83b49a1e63 100644
---- a/include/qemu/osdep.h
-+++ b/include/qemu/osdep.h
-@@ -30,6 +30,7 @@
- #include "config-host.h"
- #ifdef NEED_CPU_H
- #include "config-target.h"
-+#include "config-devices.h"
- #else
- #include "exec/poison.h"
- #endif
-diff --git a/scripts/create_config b/scripts/create_config
-index d727e5e36e..00e86c82b0 100755
---- a/scripts/create_config
-+++ b/scripts/create_config
-@@ -58,6 +58,8 @@ case $line in
-     name=${line%=*}
-     echo "#define $name 1"
-     ;;
-+ CONFIG_*=n) # configuration
-+    ;;
-  CONFIG_*=*) # configuration
-     name=${line%=*}
-     value=${line#*=}
---
-2.17.2
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0eP+cACgkQ9AfbAGHV
+z0CwuAgAvCpuIVPxZwe3hrRJZyruulbgLZXaR9TfgZve9Pn9VfuDMP6xADpC/zCU
+HZdXKczInroe0+Nx6o+ARReBJxs+32XJJ3F/LnACRL06u3UrWTQPr/0QiLbuuqWO
+Ew32Ar7J+ZTYYdi2eMJNJRpKoh/h9w71+gLmnD4TZ9dBMKsKPbOegs49HMyv54l0
+WWSr0+eBSZQs2pBoWPEZSvmCoSKBUTSplAugeobVBIRGm5RWTEkKK38aL+MZvgaK
+CoBP4NexZjNL155bVjkmqU5+opdytTd34D6sDaem/gXNzj3BtO/56Uli3apuSKRH
+MC5o3jTRjza8JeCbiM9zASWdJhznwg==
+=LsaI
+-----END PGP SIGNATURE-----
+
+--q03T3SyoCdlRperdfrf4pkZ4Rv820WaVK--
 
