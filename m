@@ -2,49 +2,49 @@ Return-Path: <SRS0=blGQ=VB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D951BC0651F
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 17:50:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C47E9C0651F
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 17:52:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AA5A821670
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 17:50:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA5A821670
+	by mail.kernel.org (Postfix) with ESMTPS id 9CF8721670
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 17:52:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9CF8721670
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47982 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47996 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hj5sU-0002G5-1L
-	for qemu-devel@archiver.kernel.org; Thu, 04 Jul 2019 13:50:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57198)
+	id 1hj5ts-0003rt-VA
+	for qemu-devel@archiver.kernel.org; Thu, 04 Jul 2019 13:52:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57546)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hj5qU-00013z-EP
- for qemu-devel@nongnu.org; Thu, 04 Jul 2019 13:48:35 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hj5sr-0002rI-MF
+ for qemu-devel@nongnu.org; Thu, 04 Jul 2019 13:51:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hj5qT-0002AU-CN
- for qemu-devel@nongnu.org; Thu, 04 Jul 2019 13:48:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50526)
+ (envelope-from <mreitz@redhat.com>) id 1hj5sq-00043x-Pe
+ for qemu-devel@nongnu.org; Thu, 04 Jul 2019 13:51:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51562)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hj5qR-00028v-94; Thu, 04 Jul 2019 13:48:31 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ id 1hj5so-00042o-I0; Thu, 04 Jul 2019 13:50:58 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 9559183F3B;
- Thu,  4 Jul 2019 17:48:30 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id CFF648667B;
+ Thu,  4 Jul 2019 17:50:57 +0000 (UTC)
 Received: from dresden.str.redhat.com (ovpn-204-93.brq.redhat.com
  [10.40.204.93])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 59E4C5D71B;
- Thu,  4 Jul 2019 17:48:23 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 517381823A;
+ Thu,  4 Jul 2019 17:50:49 +0000 (UTC)
 To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
 References: <20190703215542.16123-1-jsnow@redhat.com>
- <20190703215542.16123-15-jsnow@redhat.com>
+ <20190703215542.16123-16-jsnow@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
@@ -71,22 +71,22 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <d818a81d-64c2-aa0c-f85a-15030a198e49@redhat.com>
-Date: Thu, 4 Jul 2019 19:48:21 +0200
+Message-ID: <5953a569-d5b5-93e9-a480-8bae131703ca@redhat.com>
+Date: Thu, 4 Jul 2019 19:50:47 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190703215542.16123-15-jsnow@redhat.com>
+In-Reply-To: <20190703215542.16123-16-jsnow@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="7P27sTFyKtBtds9TrX6Kd17vNK2PI055v"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+ boundary="CTSOC7aFvJNsqEoIRh87S8PiHhvO7lSuv"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.27]); Thu, 04 Jul 2019 17:48:30 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.26]); Thu, 04 Jul 2019 17:50:57 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 14/18] iotests: teach run_job to cancel
- pending jobs
+Subject: Re: [Qemu-devel] [PATCH v2 15/18] iotests: teach FilePath to
+ produce multiple paths
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -110,8 +110,8 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---7P27sTFyKtBtds9TrX6Kd17vNK2PI055v
-Content-Type: multipart/mixed; boundary="LiLkQ1zVBZbqATxBte4VCotEBMK4rACTG";
+--CTSOC7aFvJNsqEoIRh87S8PiHhvO7lSuv
+Content-Type: multipart/mixed; boundary="XBlv7frPXludE7Y4EAb5wDYXoySQQMaUB";
  protected-headers="v1"
 From: Max Reitz <mreitz@redhat.com>
 To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
@@ -121,48 +121,70 @@ Cc: Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
  "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
  Wen Congyang <wencongyang2@huawei.com>, vsementsov@virtuozzo.com,
  Xie Changlong <xiechanglong.d@gmail.com>
-Message-ID: <d818a81d-64c2-aa0c-f85a-15030a198e49@redhat.com>
-Subject: Re: [PATCH v2 14/18] iotests: teach run_job to cancel pending jobs
+Message-ID: <5953a569-d5b5-93e9-a480-8bae131703ca@redhat.com>
+Subject: Re: [PATCH v2 15/18] iotests: teach FilePath to produce multiple
+ paths
 References: <20190703215542.16123-1-jsnow@redhat.com>
- <20190703215542.16123-15-jsnow@redhat.com>
-In-Reply-To: <20190703215542.16123-15-jsnow@redhat.com>
+ <20190703215542.16123-16-jsnow@redhat.com>
+In-Reply-To: <20190703215542.16123-16-jsnow@redhat.com>
 
---LiLkQ1zVBZbqATxBte4VCotEBMK4rACTG
+--XBlv7frPXludE7Y4EAb5wDYXoySQQMaUB
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
 On 03.07.19 23:55, John Snow wrote:
-> run_job can cancel pending jobs to simulate failure. This lets us use
-> the pending callback to issue test commands while the job is open, but
-> then still have the job fail in the end.
+> Use "FilePaths" instead of "FilePath" to request multiple files be
+> cleaned up after we leave that object's scope.
+>=20
+> This is not crucial; but it saves a little typing.
 >=20
 > Signed-off-by: John Snow <jsnow@redhat.com>
 > ---
->  tests/qemu-iotests/iotests.py | 22 ++++++++++++++++++++--
->  1 file changed, 20 insertions(+), 2 deletions(-)
+>  tests/qemu-iotests/iotests.py | 33 ++++++++++++++++++++++-----------
+>  1 file changed, 22 insertions(+), 11 deletions(-)
+>=20
+> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests=
+=2Epy
+> index c544659ecb..db00fd2adf 100644
+> --- a/tests/qemu-iotests/iotests.py
+> +++ b/tests/qemu-iotests/iotests.py
+
+[...]
+
+> @@ -391,7 +403,6 @@ def file_path_remover():
+>          except OSError:
+>              pass
+> =20
+> -
+>  def file_path(*names):
+>      ''' Another way to get auto-generated filename that cleans itself =
+up.
+> =20
+
+Not sure about this hunk, but OK.
 
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 
---LiLkQ1zVBZbqATxBte4VCotEBMK4rACTG--
+--XBlv7frPXludE7Y4EAb5wDYXoySQQMaUB--
 
---7P27sTFyKtBtds9TrX6Kd17vNK2PI055v
+--CTSOC7aFvJNsqEoIRh87S8PiHhvO7lSuv
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0eO+UACgkQ9AfbAGHV
-z0D6qAf+MWgsef9jbU2j7QnN8YrAbZpJ15G3EsdzjQizs7L1fPsTIiGcGtjBxKXj
-kjG0JhzIl2VR0MeoZE7+C4sKXH5fg+WCtMrI4itSzf3rZaUkOeXCs2v7SoKkviHJ
-rqo/T/beQ/ZRWsKsEV/3fiGFkUABDVsmkE12rt4CIxjtn0IKS8M92VORp4uDGEks
-VWJnmUtiFB8jkdvgG3kPbNn+uVBlCYRvHvSniiqyWaxy/hxHZg8F2Pc4/MtHJCxb
-YqkQeR2XL0SVD+L6/OEyxkH5Efou5sZrRRKnSuwuZavPDf3WADnLrJ9gmB+fYN8L
-KNWgSe54huU05pqH8lp8WUjJKJX9Ig==
-=16my
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0ePHcACgkQ9AfbAGHV
+z0BX/wf+M9iwznlBuzHifpkN0DjAtbw6lwpy9LEpCQ5yjsk2KsYMNE4lUv6RfCU4
+Ui9cioNsj7iHNHwSSe14UQw6V0zLxVrrU9t5Q2DjWl0OZen8NKQuCwVCSHKaLCCb
+/F67I0Aq6PWb5laLhvnXC2pEs1CCXjgVNCj+UFDYw3G/3sWU+W0nt+Q2jrH9mKft
+4GghYDy59Rdg4kj6df7UIdEdvMLz0OyeSeZh23+BUHVRDa1uZ897azyt1NOsncev
+TNvwSmIO/kgayy/luhiLWVtKw1xO1rpjsDtxqF9R8N5QoeCkbn61cPK5xYJ4n4uX
+tQiGpScGnpnMn6/e4z3RBnncgUhTMg==
+=EMPE
 -----END PGP SIGNATURE-----
 
---7P27sTFyKtBtds9TrX6Kd17vNK2PI055v--
+--CTSOC7aFvJNsqEoIRh87S8PiHhvO7lSuv--
 
