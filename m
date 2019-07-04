@@ -3,48 +3,48 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E660C0651F
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 17:53:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A115C0651F
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 17:58:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E63F82189E
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 17:53:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E63F82189E
+	by mail.kernel.org (Postfix) with ESMTPS id 55EC52189E
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 17:58:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 55EC52189E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48004 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48020 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hj5vK-00053V-9X
-	for qemu-devel@archiver.kernel.org; Thu, 04 Jul 2019 13:53:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57641)
+	id 1hj5zs-0007Z6-Vg
+	for qemu-devel@archiver.kernel.org; Thu, 04 Jul 2019 13:58:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58033)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hj5u6-0004RW-Ac
- for qemu-devel@nongnu.org; Thu, 04 Jul 2019 13:52:20 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hj5yh-00072G-GN
+ for qemu-devel@nongnu.org; Thu, 04 Jul 2019 13:57:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hj5u4-0004rb-F2
- for qemu-devel@nongnu.org; Thu, 04 Jul 2019 13:52:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53946)
+ (envelope-from <mreitz@redhat.com>) id 1hj5yg-0000Sv-Gb
+ for qemu-devel@nongnu.org; Thu, 04 Jul 2019 13:57:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34142)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hj5u1-0004pv-HB; Thu, 04 Jul 2019 13:52:13 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ id 1hj5ye-0000Rd-79; Thu, 04 Jul 2019 13:57:00 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id CC8053082A8D;
- Thu,  4 Jul 2019 17:52:12 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id C3C7885363;
+ Thu,  4 Jul 2019 17:56:51 +0000 (UTC)
 Received: from dresden.str.redhat.com (ovpn-204-93.brq.redhat.com
  [10.40.204.93])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5E8DD18BB5;
- Thu,  4 Jul 2019 17:52:05 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id BB848842AD;
+ Thu,  4 Jul 2019 17:56:41 +0000 (UTC)
 To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
 References: <20190703215542.16123-1-jsnow@redhat.com>
- <20190703215542.16123-17-jsnow@redhat.com>
+ <20190703215542.16123-18-jsnow@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
@@ -71,22 +71,22 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <aa7977c8-79fe-844d-edac-e04ab53d4556@redhat.com>
-Date: Thu, 4 Jul 2019 19:52:03 +0200
+Message-ID: <b625578f-d48d-60e9-d017-112b94d35755@redhat.com>
+Date: Thu, 4 Jul 2019 19:56:39 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190703215542.16123-17-jsnow@redhat.com>
+In-Reply-To: <20190703215542.16123-18-jsnow@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="9rF6FZPgz0LTr25VArKrvOxK3C1Argj3z"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+ boundary="a6fqiQDCaWRAAFNPcMaovEzpQodDUXPXg"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Thu, 04 Jul 2019 17:52:12 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.25]); Thu, 04 Jul 2019 17:56:51 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 16/18] iotests: Add virtio-scsi device
- helper
+Subject: Re: [Qemu-devel] [PATCH v2 17/18] iotests: add test 257 for
+ bitmap-mode backups
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -110,8 +110,8 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---9rF6FZPgz0LTr25VArKrvOxK3C1Argj3z
-Content-Type: multipart/mixed; boundary="BeqnSvQk0USLOlkXI8GjlWcL4IQdNM54r";
+--a6fqiQDCaWRAAFNPcMaovEzpQodDUXPXg
+Content-Type: multipart/mixed; boundary="i3sSRUdzC04Y8Sg7hZP0BBCBDn7fjdgEq";
  protected-headers="v1"
 From: Max Reitz <mreitz@redhat.com>
 To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
@@ -121,50 +121,49 @@ Cc: Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
  "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
  Wen Congyang <wencongyang2@huawei.com>, vsementsov@virtuozzo.com,
  Xie Changlong <xiechanglong.d@gmail.com>
-Message-ID: <aa7977c8-79fe-844d-edac-e04ab53d4556@redhat.com>
-Subject: Re: [PATCH v2 16/18] iotests: Add virtio-scsi device helper
+Message-ID: <b625578f-d48d-60e9-d017-112b94d35755@redhat.com>
+Subject: Re: [PATCH v2 17/18] iotests: add test 257 for bitmap-mode backups
 References: <20190703215542.16123-1-jsnow@redhat.com>
- <20190703215542.16123-17-jsnow@redhat.com>
-In-Reply-To: <20190703215542.16123-17-jsnow@redhat.com>
+ <20190703215542.16123-18-jsnow@redhat.com>
+In-Reply-To: <20190703215542.16123-18-jsnow@redhat.com>
 
---BeqnSvQk0USLOlkXI8GjlWcL4IQdNM54r
+--i3sSRUdzC04Y8Sg7hZP0BBCBDn7fjdgEq
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
 On 03.07.19 23:55, John Snow wrote:
-> Seems that it comes up enough.
->=20
 > Signed-off-by: John Snow <jsnow@redhat.com>
 > ---
->  tests/qemu-iotests/040        | 6 +-----
->  tests/qemu-iotests/093        | 6 ++----
->  tests/qemu-iotests/139        | 7 ++-----
->  tests/qemu-iotests/238        | 5 +----
->  tests/qemu-iotests/iotests.py | 4 ++++
->  5 files changed, 10 insertions(+), 18 deletions(-)
+>  tests/qemu-iotests/257     |  409 +++++++
+>  tests/qemu-iotests/257.out | 2199 ++++++++++++++++++++++++++++++++++++=
+
+>  tests/qemu-iotests/group   |    1 +
+>  3 files changed, 2609 insertions(+)
+>  create mode 100755 tests/qemu-iotests/257
+>  create mode 100644 tests/qemu-iotests/257.out
 
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 
---BeqnSvQk0USLOlkXI8GjlWcL4IQdNM54r--
+--i3sSRUdzC04Y8Sg7hZP0BBCBDn7fjdgEq--
 
---9rF6FZPgz0LTr25VArKrvOxK3C1Argj3z
+--a6fqiQDCaWRAAFNPcMaovEzpQodDUXPXg
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0ePMMACgkQ9AfbAGHV
-z0CZrQgAuwgUWasxYyp1fxDfWILJ770Ii0eIUQT2sQxLlWuZF9oJppm5Qvx5lIZN
-ACeQeCkDPpbrOucAZYVYqQixNs3AJ7POpkxWbq6ooPZ4hidZqm8O9tqhWTiHUzmb
-22y/oSpwf5fmobWaeY2g8UlVq1SbvVUeAcV0A+Md359syfxgH9KfxtelgczjTdFa
-MQjSpo8Oiilw5zFtQCzJIz/wRE4gdrZSYTqqa7AGufVDg75DcxGCPwK2PH4wxg/6
-7ZoJyaARdEF2yelFGOxShwD5BlpWme01MjSaIGdZiaTXMR6yFnV5QBr7Q7rxF3DS
-xtyXzfa2HMIq81RacnLXuf8ecRG4HQ==
-=Vsaa
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0ePdgACgkQ9AfbAGHV
+z0A38AgApd/pkHRx19QzHjjgylxUoSQHz3O03nDhMsJ6XfTYMD26IVTDbBjE4cSf
+OttsFGk+ocZpVqoEYSKbcEcdc36M1QonqLYWJUzgfXaPgfZhCLf9/ye9aISHmF7/
+tbG4YIT0OqPhDbXrmjWqh9QSvMz7qeBDrYySXGXgUnubO6cFUUwBE9mi7pujuwNz
+q7tsjslx7WswdJmQz4iqEUeQZkhyHVhyUoT/Fj5YJ4fh9RRolh/yCVQm3TavC8b3
+ugnoFfPi07ZzHe3x642WUA1Fe5a3MdyYAxqfCu/1Jd2UO3PU6fUexyRgquo+OVeh
+boHSiYMy1eC7Z4CO4J/+pZBjURGt8Q==
+=BoGR
 -----END PGP SIGNATURE-----
 
---9rF6FZPgz0LTr25VArKrvOxK3C1Argj3z--
+--a6fqiQDCaWRAAFNPcMaovEzpQodDUXPXg--
 
