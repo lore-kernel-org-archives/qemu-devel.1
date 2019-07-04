@@ -2,60 +2,53 @@ Return-Path: <SRS0=blGQ=VB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93998C0651F
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 21:30:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F0DDC0650E
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 21:47:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 26B8621852
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 21:30:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 26B8621852
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 655A02184B
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 21:47:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 655A02184B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48912 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48958 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hj9JF-0000Jt-Tx
-	for qemu-devel@archiver.kernel.org; Thu, 04 Jul 2019 17:30:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56030)
+	id 1hj9Zt-0006w0-2Z
+	for qemu-devel@archiver.kernel.org; Thu, 04 Jul 2019 17:47:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57288)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <SRS0=jKHg=VB=redhat.com=mst@kernel.org>)
- id 1hj9IV-0008Iz-2Q
- for qemu-devel@nongnu.org; Thu, 04 Jul 2019 17:29:43 -0400
+ (envelope-from <balaton@eik.bme.hu>) id 1hj9Y1-0005El-UT
+ for qemu-devel@nongnu.org; Thu, 04 Jul 2019 17:45:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <SRS0=jKHg=VB=redhat.com=mst@kernel.org>)
- id 1hj9IT-0004y9-EY
- for qemu-devel@nongnu.org; Thu, 04 Jul 2019 17:29:43 -0400
-Received: from mail.kernel.org ([198.145.29.99]:50552)
+ (envelope-from <balaton@eik.bme.hu>) id 1hj9Y0-0007sK-PV
+ for qemu-devel@nongnu.org; Thu, 04 Jul 2019 17:45:45 -0400
+Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:23052)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <SRS0=jKHg=VB=redhat.com=mst@kernel.org>)
- id 1hj9IT-0004xS-97
- for qemu-devel@nongnu.org; Thu, 04 Jul 2019 17:29:41 -0400
-Received: from redhat.com (bzq-79-182-9-81.red.bezeqint.net [79.182.9.81])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id BA4EF21852;
- Thu,  4 Jul 2019 21:29:38 +0000 (UTC)
-Date: Thu, 4 Jul 2019 17:29:34 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Message-ID: <20190704172822-mutt-send-email-mst@kernel.org>
-References: <20190702150606.24851-1-mst@redhat.com>
- <CAFEAcA8ZAHK4bMMUqNU++9h3AN3arOLMcZgUStd5OP_JCEzObQ@mail.gmail.com>
+ (Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1hj9Xy-0007oC-4a
+ for qemu-devel@nongnu.org; Thu, 04 Jul 2019 17:45:42 -0400
+Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
+ by localhost (Postfix) with SMTP id C9E927461AE;
+ Thu,  4 Jul 2019 23:45:37 +0200 (CEST)
+Received: by zero.eik.bme.hu (Postfix, from userid 432)
+ id AB8E57461AA; Thu,  4 Jul 2019 23:45:37 +0200 (CEST)
+Message-Id: <da33261a841755691f698db8190c868df0c0d3ae.1562276605.git.balaton@eik.bme.hu>
+From: BALATON Zoltan <balaton@eik.bme.hu>
+Date: Thu, 04 Jul 2019 23:43:25 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA8ZAHK4bMMUqNU++9h3AN3arOLMcZgUStd5OP_JCEzObQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+To: qemu-devel@nongnu.org
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 198.145.29.99
-Subject: Re: [Qemu-devel] [PULL 00/22] virtio, pc, pci: features, fixes,
- cleanups
+X-Received-From: 2001:738:2001:2001::2001
+Subject: [Qemu-devel] [PATCH] ati-vga: Fix setting offset together with
+ pitch for r128pro
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,50 +60,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jul 04, 2019 at 10:25:48AM +0100, Peter Maydell wrote:
-> On Tue, 2 Jul 2019 at 16:06, Michael S. Tsirkin <mst@redhat.com> wrote:
-> >
-> > The following changes since commit 7fec76a02267598a4e437ddfdaeaeb6de09b92f3:
-> >
-> >   Merge remote-tracking branch 'remotes/maxreitz/tags/pull-block-2019-06-24' into staging (2019-07-01 11:28:28 +0100)
-> >
-> > are available in the Git repository at:
-> >
-> >   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
-> >
-> > for you to fetch changes up to a360cd11de5ae59db55e128fd209290c777eb177:
-> >
-> >   docs: avoid vhost-user-net specifics in multiqueue section (2019-07-01 10:39:35 -0400)
-> >
-> > ----------------------------------------------------------------
-> > virtio, pc, pci: features, fixes, cleanups
-> >
-> > virtio-pmem support.
-> > libvhost user mq support.
-> > A bunch of fixes all over the place.
-> >
-> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> >
-> 
-> This fails to build on all the non-Linux platforms:
-> 
-> In file included from
-> /Users/pm215/src/qemu-for-merges/hw/virtio/virtio-pmem.c:21:
-> /Users/pm215/src/qemu-for-merges/include/standard-headers/linux/virtio_pmem.h:13:10:
-> fatal error: 'linux/types.h' file not found
-> #include <linux/types.h>
->          ^~~~~~~~~~~~~~~
-> 
-> thanks
-> -- PMM
+Turns out my last fix to this broke one case for Rage 128 Pro so
+revert that part of previous patch. This now fixes the remaining
+rendering problems for MorphOS which now can produce picture with
+-device ati-vga (although it may not be optimised yet and video
+overlay emulation is still known to be missing).
 
-Amended and re-pushed. Pls try again, sorry about that.
+Fixes: 866ad5f5ff620078f88183aa254f7b02727e6aa3
+Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+---
+ hw/display/ati.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
--- 
-MST
+diff --git a/hw/display/ati.c b/hw/display/ati.c
+index 590362ea56..a747c4cc98 100644
+--- a/hw/display/ati.c
++++ b/hw/display/ati.c
+@@ -689,7 +689,7 @@ static void ati_mm_write(void *opaque, hwaddr addr,
+         break;
+     case SRC_PITCH_OFFSET:
+         if (s->dev_id =3D=3D PCI_DEVICE_ID_ATI_RAGE128_PF) {
+-            s->regs.src_offset =3D (data & 0x1fffff) << 4;
++            s->regs.src_offset =3D (data & 0x1fffff) << 5;
+             s->regs.src_pitch =3D (data & 0x7fe00000) >> 21;
+             s->regs.src_tile =3D data >> 31;
+         } else {
+@@ -700,7 +700,7 @@ static void ati_mm_write(void *opaque, hwaddr addr,
+         break;
+     case DST_PITCH_OFFSET:
+         if (s->dev_id =3D=3D PCI_DEVICE_ID_ATI_RAGE128_PF) {
+-            s->regs.dst_offset =3D (data & 0x1fffff) << 4;
++            s->regs.dst_offset =3D (data & 0x1fffff) << 5;
+             s->regs.dst_pitch =3D (data & 0x7fe00000) >> 21;
+             s->regs.dst_tile =3D data >> 31;
+         } else {
+--=20
+2.13.7
+
 
