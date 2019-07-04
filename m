@@ -2,91 +2,78 @@ Return-Path: <SRS0=blGQ=VB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75DEBC0651F
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 15:23:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59A62C0651F
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 15:30:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 431BD2083B
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 15:23:06 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MwEgRnDP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 431BD2083B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 307E62184B
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 15:30:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 307E62184B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46900 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46962 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hj3Zh-0006Er-6q
-	for qemu-devel@archiver.kernel.org; Thu, 04 Jul 2019 11:23:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37831)
+	id 1hj3gV-0002ft-Ab
+	for qemu-devel@archiver.kernel.org; Thu, 04 Jul 2019 11:30:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38913)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hj3ZE-0005hz-3C
- for qemu-devel@nongnu.org; Thu, 04 Jul 2019 11:22:37 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1hj3fV-0001vV-TB
+ for qemu-devel@nongnu.org; Thu, 04 Jul 2019 11:29:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hj3ZC-00056j-UQ
- for qemu-devel@nongnu.org; Thu, 04 Jul 2019 11:22:36 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:52531)
+ (envelope-from <pbonzini@redhat.com>) id 1hj3fU-0000ab-OI
+ for qemu-devel@nongnu.org; Thu, 04 Jul 2019 11:29:05 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:42254)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hj3ZC-00056N-KW
- for qemu-devel@nongnu.org; Thu, 04 Jul 2019 11:22:34 -0400
-Received: by mail-wm1-x341.google.com with SMTP id s3so6107143wms.2
- for <qemu-devel@nongnu.org>; Thu, 04 Jul 2019 08:22:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=RWy1HrnzggJ6ITpUopTZ0QRnXVP0aQetgKt0IeZ9I+s=;
- b=MwEgRnDPCzGUu4L8WlyTm0yeoRAyRsY3IembGD3ycF1ihtBG2D3pllQSZPLiagu67I
- ghA8hq3bCp1Q5ZiyR2DMWsauzH9Ei+vmx5otF8a4vryMrSBegGvtdHIeU928G+eqGS+7
- pXjV/P4CuGwN4tOe1KUhdGIhifTuGN035acFIAEz6UFzkcpo8sFnS8+gDmpF1HPpqtGI
- 0BEHt4V9jgaepNrzq+x3FPifdNPA0rI3UuwsD0BT3rkZb1YQn9gxPwgEL3CjnbmVGfTj
- Jj0uBQO1+9aN8S12EZMcZ9sF7JyL1qzMsjRvUapHx/IR3MFCR2bio4BLweGR+kgUi6nN
- TFMQ==
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hj3fU-0000a4-ID
+ for qemu-devel@nongnu.org; Thu, 04 Jul 2019 11:29:04 -0400
+Received: by mail-wr1-f65.google.com with SMTP id a10so5956857wrp.9
+ for <qemu-devel@nongnu.org>; Thu, 04 Jul 2019 08:29:04 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=RWy1HrnzggJ6ITpUopTZ0QRnXVP0aQetgKt0IeZ9I+s=;
- b=NjKDj07oxogv44vd5UQ5tOclWqY/nHQqVnm1megWAsRRx6hZX4IIukQ1RsNG+Fd/vw
- cwTrWqTEjfERoz2udYDKC0F6IJR1X2zeKJeccKN6fh3UDVUu3cO8beTsUrjunuCBvava
- NNTDZredmQaDTWPG8xe8WX5B4GCEMX0MEF/f6lZ0Gcv/367yft3HYDEJmY5QIdy4RJ1H
- eOHE7Pjot+a3kfaO4Up2o1zaIiyO2hVhB4e0/f02VkUYdIOncy0OHJ/k3IMwIJ/0vxMd
- GUJOSrPivLfKxiAi0Y6lSaNpBhuLe+iDLrdEQRn/yALu58EW75GDXDUqflmBrrvhuJ5N
- medQ==
-X-Gm-Message-State: APjAAAUM4EA+1CzytiRl6Z2J5SW/wJ8ErPXYeFwVOpKRXYPQ4f0CEh0w
- IwyoRsWt+dCHpcH684/VjO3wbg==
-X-Google-Smtp-Source: APXvYqz+wA+LoJRBdWdR4HJPUdmr57gUJrY/kXRFIYCBGcR+ANtICUgk5SYAJBy49loDE5eHHPyVrQ==
-X-Received: by 2002:a1c:7ec7:: with SMTP id z190mr81049wmc.17.1562253752542;
- Thu, 04 Jul 2019 08:22:32 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id 5sm3714111wmg.42.2019.07.04.08.22.31
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Thu, 04 Jul 2019 08:22:31 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 96C981FF87;
- Thu,  4 Jul 2019 16:22:31 +0100 (BST)
-References: <20190702210017.4275-1-vandersonmr2@gmail.com>
- <20190702210017.4275-2-vandersonmr2@gmail.com>
-User-agent: mu4e 1.3.2; emacs 26.1
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-In-reply-to: <20190702210017.4275-2-vandersonmr2@gmail.com>
-Date: Thu, 04 Jul 2019 16:22:31 +0100
-Message-ID: <878stdx1s8.fsf@zen.linaroharston>
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=uTber9tnQqfaXZRYxYBLuoOHIoCFmIICAtxbv0BddWo=;
+ b=lKYSkA+poNmIl3HGo9CuAGrvrDhuEgV7HxvesK8sHLr+qaEUuYaFPZ8DEP4Hak0MPA
+ PDJJhVKsKofDBqRyozhq423ryoi0OkwXkSwmwbUuRbG2Zvxv74nNIUZjPxY53vEwrbJl
+ dXbR8JDqMVa+mvzrND4Pb9g5TblfoDvfJQz4lhy9Ayk4Y2XeIUHcFn47ngHfZ96dyB5n
+ 9uKY275IcNCvsOmJf0mmrBlC69tR4bIOZkaJO/DLE+soujAJ1uTaT9JDvCpruxByihpn
+ ksIBO3cInoX4U6zrrUjj1WITFo/1Gt+c/O38JZkT2GuI0B9oYz5IHJK9jdgwP0W1qz2v
+ xcIA==
+X-Gm-Message-State: APjAAAUwlYH5nWKhv09LA5l1l7QIfRqc+/pEtDfTS8n1u+xQUCXpAej4
+ VfsyCc55xWBpvvdz0DEMDsSALQ==
+X-Google-Smtp-Source: APXvYqw7wS0O7kIcDJO3t+HWyknb2q6xvP7eHD0RP4+CDaSX6mc7pSid9kytNhWqXR1Upc348yXh2A==
+X-Received: by 2002:a5d:5448:: with SMTP id w8mr34173359wrv.180.1562254143384; 
+ Thu, 04 Jul 2019 08:29:03 -0700 (PDT)
+Received: from [10.201.49.68] (nat-pool-mxp-u.redhat.com. [149.6.153.187])
+ by smtp.gmail.com with ESMTPSA id e20sm10190235wrc.9.2019.07.04.08.29.02
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Thu, 04 Jul 2019 08:29:02 -0700 (PDT)
+To: Liran Alon <liran.alon@oracle.com>
+References: <20190624230514.53326-1-liran.alon@oracle.com>
+ <6499083f-c159-1c3e-0339-87aa5b13c2c0@redhat.com>
+ <432511A2-C6B4-4B03-87A5-176D886C0BF2@oracle.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <c5e7fd4d-3554-4df9-1e92-49e4ec02d653@redhat.com>
+Date: Thu, 4 Jul 2019 17:29:01 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
+In-Reply-To: <432511A2-C6B4-4B03-87A5-176D886C0BF2@oracle.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::341
-Subject: Re: [Qemu-devel] [PATCH v3 2/6] accel/tcg: Adding an optional tb
- execution counter
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.85.221.65
+Subject: Re: [Qemu-devel] [PATCH] target/i386: kvm: Fix when nested state is
+ needed for migration
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,102 +85,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, vandersonmr <vandersonmr2@gmail.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org,
+ Karl Heubaum <karl.heubaum@oracle.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 04/07/19 16:31, Liran Alon wrote:
+> 
+> 
+>> On 2 Jul 2019, at 19:39, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>>
+>> On 25/06/19 01:05, Liran Alon wrote:
+>>> When vCPU is in VMX operation and enters SMM mode,
+>>> it temporarily exits VMX operation but KVM maintained nested-state
+>>> still stores the VMXON region physical address, i.e. even when the
+>>> vCPU is in SMM mode then (nested_state->hdr.vmx.vmxon_pa != -1ull).
+>>>
+>>> Therefore, there is no need to explicitly check for
+>>> KVM_STATE_NESTED_SMM_VMXON to determine if it is necessary
+>>> to save nested-state as part of migration stream.
+>>>
+>>> In addition, destination must enable eVMCS if it is enabled on
+>>> source as specified by the KVM_STATE_NESTED_EVMCS flag, even if
+>>> the VMXON region is not set. Thus, change the code to require saving
+>>> nested-state as part of migration stream in case it is set.
+>>>
+>>> Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
+>>> Signed-off-by: Liran Alon <liran.alon@oracle.com>
+>>> ---
+>>> target/i386/machine.c | 2 +-
+>>> 1 file changed, 1 insertion(+), 1 deletion(-)
+>>>
+>>> diff --git a/target/i386/machine.c b/target/i386/machine.c
+>>> index 851b249d1a39..e7d72faf9e24 100644
+>>> --- a/target/i386/machine.c
+>>> +++ b/target/i386/machine.c
+>>> @@ -999,7 +999,7 @@ static bool vmx_nested_state_needed(void *opaque)
+>>>
+>>>     return ((nested_state->format == KVM_STATE_NESTED_FORMAT_VMX) &&
+>>>             ((nested_state->hdr.vmx.vmxon_pa != -1ull) ||
+>>> -             (nested_state->hdr.vmx.smm.flags & KVM_STATE_NESTED_SMM_VMXON)));
+>>> +             (nested_state->flags & KVM_STATE_NESTED_EVMCS)));
+>>> }
+>>>
+>>> static const VMStateDescription vmstate_vmx_nested_state = {
+>>>
+>>
+>> Queued, thanks.
+>>
+>> Paolo
+> 
+> Actually Paolo after I have created KVM patch
+> ("KVM: nVMX: Change KVM_STATE_NESTED_EVMCS to signal vmcs12 is copied from eVMCS”)
+> I think I realised that KVM_STATE_NESTED_EVMCS is actually not a requirement for nested-state to be sent.
+> I suggest to replace this commit with another one that just change vmx_nested_state_needed() to return true
+> In case format is FORMAT_VMX and vmxon_pa != -1ull and that’s it.
+> 
+> As anyway, QEMU provisioned on destination side is going to enable the relevant eVMCS capability.
+> I’m going to send another series that refines QEMU nested-migration a bit more so I will do it along the way.
+> But I think this patch should be un-queued. Sorry for realizing this later but at least it’s before it was merged to master :)
 
-vandersonmr <vandersonmr2@gmail.com> writes:
+Replaced with
 
-> We add the option to instrument each TB to
-> count the number of times it is executed and
-> store this in the its TBStatistics struct.
->
-> Signed-off-by: Vanderson M. do Rosario <vandersonmr2@gmail.com>
-> ---
->  accel/tcg/tcg-runtime.c   | 7 +++++++
->  accel/tcg/tcg-runtime.h   | 2 ++
->  accel/tcg/translator.c    | 1 +
->  include/exec/gen-icount.h | 9 +++++++++
->  4 files changed, 19 insertions(+)
->
-> diff --git a/accel/tcg/tcg-runtime.c b/accel/tcg/tcg-runtime.c
-> index 8a1e408e31..f332eae334 100644
-> --- a/accel/tcg/tcg-runtime.c
-> +++ b/accel/tcg/tcg-runtime.c
-> @@ -167,3 +167,10 @@ void HELPER(exit_atomic)(CPUArchState *env)
->  {
->      cpu_loop_exit_atomic(env_cpu(env), GETPC());
->  }
-> +
-> +void HELPER(inc_exec_freq)(void *ptr)
-> +{
-> +    TBStatistics *stats =3D (TBStatistics *) ptr;
-> +    g_assert(stats);
-> +    atomic_inc(&stats->executions.total);
-> +}
-> diff --git a/accel/tcg/tcg-runtime.h b/accel/tcg/tcg-runtime.h
-> index 4fa61b49b4..bf0b75dbe8 100644
-> --- a/accel/tcg/tcg-runtime.h
-> +++ b/accel/tcg/tcg-runtime.h
-> @@ -28,6 +28,8 @@ DEF_HELPER_FLAGS_1(lookup_tb_ptr, TCG_CALL_NO_WG_SE, pt=
-r, env)
->
->  DEF_HELPER_FLAGS_1(exit_atomic, TCG_CALL_NO_WG, noreturn, env)
->
-> +DEF_HELPER_FLAGS_1(inc_exec_freq, TCG_CALL_NO_RWG, void, ptr)
-> +
->  #ifdef CONFIG_SOFTMMU
->
->  DEF_HELPER_FLAGS_5(atomic_cmpxchgb, TCG_CALL_NO_WG,
-> diff --git a/accel/tcg/translator.c b/accel/tcg/translator.c
-> index 9226a348a3..cc06070e7e 100644
-> --- a/accel/tcg/translator.c
-> +++ b/accel/tcg/translator.c
-> @@ -54,6 +54,7 @@ void translator_loop(const TranslatorOps *ops, DisasCon=
-textBase *db,
->      gen_tb_start(db->tb);
->      ops->tb_start(db, cpu);
->      tcg_debug_assert(db->is_jmp =3D=3D DISAS_NEXT);  /* no early exit */
-> +    gen_tb_exec_count(tb);
->
->      while (true) {
->          db->num_insns++;
-> diff --git a/include/exec/gen-icount.h b/include/exec/gen-icount.h
-> index f7669b6841..6701ab70c0 100644
-> --- a/include/exec/gen-icount.h
-> +++ b/include/exec/gen-icount.h
-> @@ -7,6 +7,15 @@
->
->  static TCGOp *icount_start_insn;
->
-> +static inline void gen_tb_exec_count(TranslationBlock *tb)
-> +{
-> +    if (qemu_loglevel_mask(CPU_LOG_HOT_TBS) && tb->tb_stats) {
-
-so with the changes suggested in 1/6 it would become:
-
- if (tb->tb_stats && tb->tb_stats.stats_enabled & TB_EXEC_STATS) {
-
+diff --git a/target/i386/machine.c b/target/i386/machine.c
+index 851b249d1a..704ba6de46 100644
+--- a/target/i386/machine.c
++++ b/target/i386/machine.c
+@@ -997,9 +997,8 @@ static bool vmx_nested_state_needed(void *opaque)
+ {
+     struct kvm_nested_state *nested_state = opaque;
+ 
+-    return ((nested_state->format == KVM_STATE_NESTED_FORMAT_VMX) &&
+-            ((nested_state->hdr.vmx.vmxon_pa != -1ull) ||
+-             (nested_state->hdr.vmx.smm.flags & KVM_STATE_NESTED_SMM_VMXON)));
++    return (nested_state->format == KVM_STATE_NESTED_FORMAT_VMX &&
++            nested_state->hdr.vmx.vmxon_pa != -1ull);
  }
+ 
+ static const VMStateDescription vmstate_vmx_nested_state = {
 
-which would eventually make the granularity controllable on a per-TB
-basis. You could even hide the above check in a inline helper in the
-headers (tb-stats.h?).
+and dropped the last paragraph of the commit message.
 
-> +        TCGv_ptr ptr =3D tcg_const_ptr(tb->tb_stats);
-> +        gen_helper_inc_exec_freq(ptr);
-> +        tcg_temp_free_ptr(ptr);
-> +    }
-> +}
-> +
->  static inline void gen_tb_start(TranslationBlock *tb)
->  {
->      TCGv_i32 count, imm;
+Paolo
 
-
---
-Alex Benn=C3=A9e
 
