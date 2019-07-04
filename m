@@ -2,86 +2,52 @@ Return-Path: <SRS0=blGQ=VB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89EB9C0651F
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 13:11:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF9A3C0651F
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 13:12:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6178521852
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 13:11:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6178521852
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 96F7D21852
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 13:12:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96F7D21852
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45678 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45688 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hj1Vv-0005Y6-LJ
-	for qemu-devel@archiver.kernel.org; Thu, 04 Jul 2019 09:11:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45968)
+	id 1hj1X5-0006xU-Hl
+	for qemu-devel@archiver.kernel.org; Thu, 04 Jul 2019 09:12:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46104)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hj1Ub-0003vs-MI
- for qemu-devel@nongnu.org; Thu, 04 Jul 2019 09:09:42 -0400
+ (envelope-from <dplotnikov@virtuozzo.com>) id 1hj1V8-0004Y4-Oj
+ for qemu-devel@nongnu.org; Thu, 04 Jul 2019 09:10:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hj1Ua-000874-Dt
- for qemu-devel@nongnu.org; Thu, 04 Jul 2019 09:09:41 -0400
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:53362)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hj1UY-00084x-4j
- for qemu-devel@nongnu.org; Thu, 04 Jul 2019 09:09:39 -0400
-Received: by mail-wm1-f67.google.com with SMTP id x15so5702746wmj.3
- for <qemu-devel@nongnu.org>; Thu, 04 Jul 2019 06:09:35 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=b132ckLAFzTygZc6K/YJHNlB74aRxhffSzRchlj64Jw=;
- b=NzQNTdccu+CXH5BpPxJecm5+WLvqSWZZkMo+/CBoSz4qnvcPwhouNr0aHdAxFApYJJ
- W3HlQ9elENyTBtSH+Veb00RyHmXvbzwiaS6xmvfwRWQ4Ecg2CXImwELpmsW2AnPqY8tG
- ZbO5XANdyVlxLJZ6AscEr3y9uySzNCwKgNyHqeCW6d2bJ55c26jDLjzJLHiceKUs2h01
- gGs7cmmovdfoDABPgdFzy9aD76BS0wDO2ered1cKNE9PnMXjjP7Htz7y1sH4LDDsrNJh
- KGBI43wbK/1hsM61qr+Fm/hgU2CljSxz96ppcoXYjq04m76c8hW9e9I3wvhDcOJbPaYC
- 0vyw==
-X-Gm-Message-State: APjAAAUjR2J6/PVlTnMU98DRcqxKoWK1aI5tmKTcOn6gaWk2ig/6d1hg
- vYHTrBaq2H5MXrkjLZx3PEgP0aDP/w4=
-X-Google-Smtp-Source: APXvYqxVHeN1MYzJEKpnVY61NyQeZopdQSnBPMC7eS5TLb0bTyQRh2GQ/eK9c/Dqo9CPJzJanzhYxQ==
-X-Received: by 2002:a1c:ca14:: with SMTP id a20mr12148147wmg.71.1562245773989; 
- Thu, 04 Jul 2019 06:09:33 -0700 (PDT)
-Received: from [192.168.1.38] (56.red-88-18-140.staticip.rima-tde.net.
- [88.18.140.56])
- by smtp.gmail.com with ESMTPSA id v204sm6890353wma.20.2019.07.04.06.09.33
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Thu, 04 Jul 2019 06:09:33 -0700 (PDT)
-To: Laurent Vivier <laurent@vivier.eu>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Laurent Vivier <lvivier@redhat.com>
-References: <1557953433-19663-1-git-send-email-pbonzini@redhat.com>
- <1557953433-19663-19-git-send-email-pbonzini@redhat.com>
- <20190521115259.GK25835@redhat.com>
- <f0d7e267-5f21-927a-ee38-2330fde5a419@redhat.com>
- <20190521125408.GL25835@redhat.com>
- <9d0def85-3e5c-71ca-0e25-e07fbc7d90c2@vivier.eu>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <856e6edf-2b2e-9ab9-c422-519d16bc64f0@redhat.com>
-Date: Thu, 4 Jul 2019 15:09:32 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
-MIME-Version: 1.0
-In-Reply-To: <9d0def85-3e5c-71ca-0e25-e07fbc7d90c2@vivier.eu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.128.67
-Subject: Re: [Qemu-devel] [PULL 18/21] build: don't build hardware objects
- with linux-user
+ (envelope-from <dplotnikov@virtuozzo.com>) id 1hj1V5-0008N2-DJ
+ for qemu-devel@nongnu.org; Thu, 04 Jul 2019 09:10:13 -0400
+Received: from relay.sw.ru ([185.231.240.75]:54572)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
+ id 1hj1Uw-0008Gw-0W; Thu, 04 Jul 2019 09:10:02 -0400
+Received: from [10.94.4.71] (helo=dptest2.qa.sw.ru)
+ by relay.sw.ru with esmtp (Exim 4.92)
+ (envelope-from <dplotnikov@virtuozzo.com>)
+ id 1hj1Uq-000226-4J; Thu, 04 Jul 2019 16:09:56 +0300
+From: Denis Plotnikov <dplotnikov@virtuozzo.com>
+To: kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, armbru@redhat.com
+Date: Thu,  4 Jul 2019 16:09:48 +0300
+Message-Id: <20190704130949.14017-3-dplotnikov@virtuozzo.com>
+X-Mailer: git-send-email 2.17.0
+In-Reply-To: <20190704130949.14017-1-dplotnikov@virtuozzo.com>
+References: <20190704130949.14017-1-dplotnikov@virtuozzo.com>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 185.231.240.75
+Subject: [Qemu-devel] [PATCH v2 2/3] qcow2: rework the cluster compression
+ routine
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,79 +59,215 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: vsementsov@virtuozzo.com, den@virtuozzo.com, qemu-block@nongnu.org,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/21/19 10:16 PM, Laurent Vivier wrote:
-> On 21/05/2019 14:54, Daniel P. Berrangé wrote:
->> On Tue, May 21, 2019 at 02:52:42PM +0200, Laurent Vivier wrote:
->>> On 21/05/2019 13:52, Daniel P. Berrangé wrote:
->>>> On Wed, May 15, 2019 at 10:50:30PM +0200, Paolo Bonzini wrote:
->>>>> From: Laurent Vivier <lvivier@redhat.com>
->>>>>
->>>>> Some objects are only needed for system emulation and tools.
->>>>> We can ignore them for the user mode case
->>>>>
->>>>> Update tests to run accordingly: conditionally build some tests
->>>>> on CONFIG_BLOCK.
->>>>>
->>>>> Some tests use components that are only built when softmmu or
->>>>> block tools are enabled, not for linux-user. So, if these components
->>>>> are not available, disable the tests.
->>>>>
->>>>> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
->>>>> Message-Id: <20190401141222.30034-6-lvivier@redhat.com>
->>>>> ---
->>>>>    Makefile               |  4 +++
->>>>>    Makefile.objs          | 14 +++++---
->>>>>    tests/Makefile.include | 90
->>>>> +++++++++++++++++++++++++-------------------------
->>>>>    3 files changed, 58 insertions(+), 50 deletions(-)
->>>>>
->>>>> diff --git a/Makefile b/Makefile
->>>>> index 1851f8c..155f066 100644
->>>>> --- a/Makefile
->>>>> +++ b/Makefile
->>>>> @@ -87,6 +87,10 @@ endif
->>>>>    include $(SRC_PATH)/rules.mak
->>>>> +# notempy and lor are defined in rules.mak
->>>>> +CONFIG_TOOLS := $(call notempty,$(TOOLS))
->>>>> +CONFIG_BLOCK := $(call lor,$(CONFIG_SOFTMMU),$(CONFIG_TOOLS))
->>>>
->>>> IMHO calling this CONFIG_BLOCK is a really poor choice, as
->>>> the decision is completely unrelated to block modules. It
->>>> made really confused when trying to understand why all the
->>>> crypto or auth code had been made conditional on the block
->>>> drivers.  The block code is just one part of QEMU that
->>>> is used in tools & softmmu.
->>>>
->>>> It would be better as CONFIG_SOFTMMU_TOOLS, or
->>>> CONFIG_NOT_USER, or something else.
->>>
->>> Do you think it's worth a patch to change the name?
->>
->> Personally I'd like to see a patch to give it a better name.
-> 
-> I'm wondering which name to use.
-> 
-> CONFIG_NOT_USER is not correct because the flag can be 'y' with
-> CONFIG_USER_ONLY set.
-> CONFIG_SOFTMMU_TOOLS is too fuzzy.
-> 
-> CONFIG_HW ?
-> CONFIG_IO ?
-> CONFIG_DEVICE ?
+The patch allow to process image compression type defined
+in the image header and choose an appropriate method for
+image clusters (de)compression.
 
-CONFIG_MACHINE_HW?
-CONFIG_MACHINE_IO_HELPERS?
-CONFIG_AIO?
+Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
+---
+ block/qcow2.c | 93 ++++++++++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 73 insertions(+), 20 deletions(-)
 
-BTW looking at util/Makefile.objs there is various think you can skip
-for linux-user IMO.
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 8fa932a349..a107f76e98 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -4005,8 +4005,11 @@ fail:
+ }
+ 
+ /*
+- * qcow2_compress()
++ * qcow2_zlib_compress()
+  *
++ * Compress @src_size bytes of data using zlib compression method
++ *
++ * @dest_size bytes.
+  * @dest - destination buffer, @dest_size bytes
+  * @src - source buffer, @src_size bytes
+  *
+@@ -4014,8 +4017,8 @@ fail:
+  *          -1 destination buffer is not enough to store compressed data
+  *          -2 on any other error
+  */
+-static ssize_t qcow2_compress(void *dest, size_t dest_size,
+-                              const void *src, size_t src_size)
++static ssize_t qcow2_zlib_compress(void *dest, size_t dest_size,
++                                   const void *src, size_t src_size)
+ {
+     ssize_t ret;
+     z_stream strm;
+@@ -4025,7 +4028,7 @@ static ssize_t qcow2_compress(void *dest, size_t dest_size,
+     ret = deflateInit2(&strm, Z_DEFAULT_COMPRESSION, Z_DEFLATED,
+                        -12, 9, Z_DEFAULT_STRATEGY);
+     if (ret != Z_OK) {
+-        return -2;
++        return -EIO;
+     }
+ 
+     /* strm.next_in is not const in old zlib versions, such as those used on
+@@ -4039,7 +4042,7 @@ static ssize_t qcow2_compress(void *dest, size_t dest_size,
+     if (ret == Z_STREAM_END) {
+         ret = dest_size - strm.avail_out;
+     } else {
+-        ret = (ret == Z_OK ? -1 : -2);
++        ret = (ret == Z_OK ? -ENOMEM : -EIO);
+     }
+ 
+     deflateEnd(&strm);
+@@ -4048,10 +4051,10 @@ static ssize_t qcow2_compress(void *dest, size_t dest_size,
+ }
+ 
+ /*
+- * qcow2_decompress()
++ * qcow2_zlib_decompress()
+  *
+  * Decompress some data (not more than @src_size bytes) to produce exactly
+- * @dest_size bytes.
++ * @dest_size bytes using zlib compression method
+  *
+  * @dest - destination buffer, @dest_size bytes
+  * @src - source buffer, @src_size bytes
+@@ -4059,8 +4062,8 @@ static ssize_t qcow2_compress(void *dest, size_t dest_size,
+  * Returns: 0 on success
+  *          -1 on fail
+  */
+-static ssize_t qcow2_decompress(void *dest, size_t dest_size,
+-                                const void *src, size_t src_size)
++static ssize_t qcow2_zlib_decompress(void *dest, size_t dest_size,
++                                     const void *src, size_t src_size)
+ {
+     int ret = 0;
+     z_stream strm;
+@@ -4073,7 +4076,7 @@ static ssize_t qcow2_decompress(void *dest, size_t dest_size,
+ 
+     ret = inflateInit2(&strm, -12);
+     if (ret != Z_OK) {
+-        return -1;
++        return -EIO;
+     }
+ 
+     ret = inflate(&strm, Z_FINISH);
+@@ -4081,7 +4084,7 @@ static ssize_t qcow2_decompress(void *dest, size_t dest_size,
+         /* We approve Z_BUF_ERROR because we need @dest buffer to be filled, but
+          * @src buffer may be processed partly (because in qcow2 we know size of
+          * compressed data with precision of one sector) */
+-        ret = -1;
++        ret = -EIO;
+     }
+ 
+     inflateEnd(&strm);
+@@ -4153,20 +4156,67 @@ qcow2_co_do_compress(BlockDriverState *bs, void *dest, size_t dest_size,
+     return arg.ret;
+ }
+ 
++/*
++ * qcow2_co_compress()
++ *
++ * Compress @src_size bytes of data using the compression
++ * method defined by the image compression type
++ *
++ * @dest - destination buffer, @dest_size bytes
++ * @src - source buffer, @src_size bytes
++ *
++ * Returns: 0 on success
++ *          a negative error code on fail
++ */
+ static ssize_t coroutine_fn
+ qcow2_co_compress(BlockDriverState *bs, void *dest, size_t dest_size,
+                   const void *src, size_t src_size)
+ {
+-    return qcow2_co_do_compress(bs, dest, dest_size, src, src_size,
+-                                qcow2_compress);
++    BDRVQcow2State *s = bs->opaque;
++    Qcow2CompressFunc fn;
++
++    switch (s->compression_type) {
++    case QCOW2_COMPRESSION_TYPE_ZLIB:
++        fn = qcow2_zlib_compress;
++        break;
++
++    default:
++        return -ENOTSUP;
++    }
++
++    return qcow2_co_do_compress(bs, dest, dest_size, src, src_size, fn);
+ }
+ 
++/*
++ * qcow2_co_decompress()
++ *
++ * Decompress some data (not more than @src_size bytes) to produce exactly
++ * @dest_size bytes using the compression method defined by the image
++ * compression type
++ *
++ * @dest - destination buffer, @dest_size bytes
++ * @src - source buffer, @src_size bytes
++ *
++ * Returns: 0 on success
++ *          a negative error code on fail
++ */
+ static ssize_t coroutine_fn
+ qcow2_co_decompress(BlockDriverState *bs, void *dest, size_t dest_size,
+                     const void *src, size_t src_size)
+ {
+-    return qcow2_co_do_compress(bs, dest, dest_size, src, src_size,
+-                                qcow2_decompress);
++    BDRVQcow2State *s = bs->opaque;
++    Qcow2CompressFunc fn;
++
++    switch (s->compression_type) {
++    case QCOW2_COMPRESSION_TYPE_ZLIB:
++        fn = qcow2_zlib_decompress;
++        break;
++
++    default:
++        return -ENOTSUP;
++    }
++
++    return qcow2_co_do_compress(bs, dest, dest_size, src, src_size, fn);
+ }
+ 
+ /* XXX: put compressed sectors first, then all the cluster aligned
+@@ -4178,7 +4228,7 @@ qcow2_co_pwritev_compressed(BlockDriverState *bs, uint64_t offset,
+     BDRVQcow2State *s = bs->opaque;
+     QEMUIOVector hd_qiov;
+     int ret;
+-    size_t out_len;
++    ssize_t out_len;
+     uint8_t *buf, *out_buf;
+     uint64_t cluster_offset;
+ 
+@@ -4217,16 +4267,19 @@ qcow2_co_pwritev_compressed(BlockDriverState *bs, uint64_t offset,
+ 
+     out_len = qcow2_co_compress(bs, out_buf, s->cluster_size - 1,
+                                 buf, s->cluster_size);
+-    if (out_len == -2) {
+-        ret = -EINVAL;
+-        goto fail;
+-    } else if (out_len == -1) {
++    if (out_len == -ENOMEM) {
+         /* could not compress: write normal cluster */
+         ret = qcow2_co_pwritev(bs, offset, bytes, qiov, 0);
+         if (ret < 0) {
+             goto fail;
+         }
+         goto success;
++    } else if (out_len < 0) {
++        /*
++         * encounter other compression issues propagate error to the upper level
++         */
++        ret = out_len;
++        goto fail;
+     }
+ 
+     qemu_co_mutex_lock(&s->lock);
+-- 
+2.17.0
 
-Regards,
-
-Phil.
 
