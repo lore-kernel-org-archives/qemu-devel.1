@@ -2,80 +2,82 @@ Return-Path: <SRS0=blGQ=VB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66DE3C06513
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 10:41:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28A0DC06517
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 10:44:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3460A218A3
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 10:41:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ECFF6218A6
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 10:44:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HJRqSLBW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3460A218A3
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vlsg7fjR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECFF6218A6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44452 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44476 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hizB1-00058z-7W
-	for qemu-devel@archiver.kernel.org; Thu, 04 Jul 2019 06:41:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49942)
+	id 1hizEA-00085b-NH
+	for qemu-devel@archiver.kernel.org; Thu, 04 Jul 2019 06:44:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50383)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hizAN-0004aF-5D
- for qemu-devel@nongnu.org; Thu, 04 Jul 2019 06:40:40 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hizCm-0006ij-QY
+ for qemu-devel@nongnu.org; Thu, 04 Jul 2019 06:43:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hizAM-00020s-2x
- for qemu-devel@nongnu.org; Thu, 04 Jul 2019 06:40:39 -0400
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:43029)
+ (envelope-from <peter.maydell@linaro.org>) id 1hizCk-0004AB-RW
+ for qemu-devel@nongnu.org; Thu, 04 Jul 2019 06:43:08 -0400
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:39774)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hizAL-0001z9-Pk
- for qemu-devel@nongnu.org; Thu, 04 Jul 2019 06:40:37 -0400
-Received: by mail-oi1-x244.google.com with SMTP id w79so4587750oif.10
- for <qemu-devel@nongnu.org>; Thu, 04 Jul 2019 03:40:36 -0700 (PDT)
+ id 1hizCk-000494-LF
+ for qemu-devel@nongnu.org; Thu, 04 Jul 2019 06:43:06 -0400
+Received: by mail-oi1-x244.google.com with SMTP id m202so4601764oig.6
+ for <qemu-devel@nongnu.org>; Thu, 04 Jul 2019 03:43:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=y9CAyTJXaq+MpCvQ1USfwRHoo0rx3PObrCX2gXwIu1g=;
- b=HJRqSLBW2Xv+H0iWQ6gj26MGLsI+QoKf6xdx8uCcyVDBD/BrnkAIjOr34Cr1eOkvMl
- jNIcN27ZwdcdCaqCG7TFrtOXhIDoVaMc+UlBNlnFE+NpInhpq4uTQ1nPAWzigg39Cy0D
- g8q+GMEkXjIsp7zIVcQlxTe5OQAHtmE5VM5gGWjsWTy9rWbl8esNtybjZz3QTnIrjKCS
- m1sOTTOwbluWYogD7kyQVPFL7u0ubRWpYIP4i66g40pReKhjYjPoGqms/nCJ6Dg+9K06
- jMRUpVoCIsvWf3AGXxpgkbbd1nIVydqwd8CnRcCmIjZXlGtRNJFLG1SBmHO09hBVi7n7
- Le6w==
+ :cc:content-transfer-encoding;
+ bh=aTD4kYXTKhIbspsnLWc3FKHoQnDn0j8oDEKhaY7HNSM=;
+ b=vlsg7fjRufkcg2NVfOZYzIXcVgcvSUtOwFwBI1Ju/H8FhJVYmEfsM0wYr+9+aV/AML
+ yxVJVBDO3tjsRRcDeG9YWc2j+xs7Sb0zmCXJFqixu0rfRp2j2i/sNIu3hOt/m5DdB802
+ JnZqYB6Ei2AryM2kce6mvavaz9DiX2+gpkQ8sviQWRDn6wK5K8zYieFG01VGtozr2ec3
+ BmCd0CbPrxe0u358x4bYiFY/p5Jh3OBVP7fJpENwsGvb/c+CRofnVgM/uxhCsA5lwa3n
+ vhMHTzX0uqDNsKO+9JizIDxK3Q7bOnd5nH8HbknMFmZgNll2URPyxH713uXbfML5ibkI
+ P06A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=y9CAyTJXaq+MpCvQ1USfwRHoo0rx3PObrCX2gXwIu1g=;
- b=n+SOTkLLzFjcQKvKmIIb7Y/5dMM2HNOe6catnaDBgXecl/GvCYlXWw4Z6MVfSw+wGB
- 8qG+RP9d3EobzlBjTyJLNnP6fPZ5RHy0sQz40MaK1+L4ltknJSf7NTWDzuQMDJ1rC5MR
- pn2DtgWG0JZTlESedG02SPPEroHdyiKUSGWmXX1mGni8fkj+L071a9eBc4y9d3oAhv47
- /1Q18jMx3r/JVZEyrP9nIwpk4im2igp8w1+4dk7SakGaWrfl3z9jrUHN2c4HiWq5Y3gq
- AEm4Lh6ddMOHlqudU+ujED87naMsW7IvJ/99zzkc2ThbiiTMe0zydp7ylUjVYOKcZT6a
- zU3w==
-X-Gm-Message-State: APjAAAVJvd53LMZxHV73J8fwlOcG3LR6w295qyids+Z5rJuOUQII/3gJ
- AE1AWBwOdRoOMPCeMYs+WcmAVHzsCBfnYA1DR8Img8485Jk=
-X-Google-Smtp-Source: APXvYqx4E34zK/8BmbG/RxSDpm17G53Rsk3c96Dw5LSVKrkAnyn3P/zqqqwKWDkQHJb8sgNVzAK50goTuo6TUU+cs6k=
-X-Received: by 2002:aca:6185:: with SMTP id v127mr1538981oib.163.1562236835991; 
- Thu, 04 Jul 2019 03:40:35 -0700 (PDT)
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=aTD4kYXTKhIbspsnLWc3FKHoQnDn0j8oDEKhaY7HNSM=;
+ b=mJEkp9Yg6EL8wqTgmYsLHubCWkaBjQUmTeuWM8J2tAd7PIFr8U0QM2mO23ZcOtSnRH
+ Y9vlE5f9nyExjf+jMQyBmzSp3bFG4vXSu2p6anH+JGIczeKpOXWHzdUmlCqOg3N3pj0C
+ rnAusJqWbeUhfRSRE9fb34WMYWEqMM9As1lwWnf2cBDyAtgKvL/mjtNVDxmENvndEGXC
+ g8191/oFpATHTRBoCnk5mGxmUCsbI3XLkN6Cn/xly9V+HWcDNCxXRLQ45RBmWJeDorqk
+ t10587e28qtuyTYsFg8E3lcY2P83RMbT2NgIBDXkxsUbzcuyZSYUghfulS9YS+jF0DXJ
+ Yd8A==
+X-Gm-Message-State: APjAAAVk/seAvjnN0Yg1aHh90n6t9xPunPDhhqZYTPlZMOEtZurTEYX2
+ +5OIdE9iHRT6GSUYB/Ol09H7PR8KgDS6fgefPMeuhg==
+X-Google-Smtp-Source: APXvYqxMQ8FvAe82OAJ75fKemYmYYbsiO0WGZyA7jJx1d7c7zFM5NdE3v3Ukx4t2pfwMtkNZuTCqxEKdbHXSIRhkL1c=
+X-Received: by 2002:aca:ac48:: with SMTP id v69mr1402704oie.48.1562236985537; 
+ Thu, 04 Jul 2019 03:43:05 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190703084048.6980-1-palmer@sifive.com>
-In-Reply-To: <20190703084048.6980-1-palmer@sifive.com>
+References: <20190703190615.31436-1-ppandit@redhat.com>
+ <59f87427-3d1d-928b-ac87-0a0a4049c4f5@redhat.com>
+In-Reply-To: <59f87427-3d1d-928b-ac87-0a0a4049c4f5@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 4 Jul 2019 11:40:25 +0100
-Message-ID: <CAFEAcA8tN1pUPWUyZbbo2UsaUmOHMLiipW2qEODYPJ9ZB5n+XA@mail.gmail.com>
-To: Palmer Dabbelt <palmer@sifive.com>
+Date: Thu, 4 Jul 2019 11:42:54 +0100
+Message-ID: <CAFEAcA86=RDpZEzWF_5QL_ix8Bghqxvn7ykXUBkAzTWp7KUVcw@mail.gmail.com>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
 X-Received-From: 2607:f8b0:4864:20::244
-Subject: Re: [Qemu-devel] [PULL] RISC-V Patches for the 4.1 Soft Freeze,
- Part 2 v3
+Subject: Re: [Qemu-devel] [PATCH] hw/ssi/xilinx_spips: add lqspi_write
+ routine
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,61 +89,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: Prasad J Pandit <pjp@fedoraproject.org>,
+ Francisco Iglesias <frasse.iglesias@gmail.com>,
+ Alistair Francis <alistair@alistair23.me>,
+ Qemu Developers <qemu-devel@nongnu.org>, P J P <ppandit@redhat.com>,
+ Sai Pavan Boddu <saipava@xilinx.com>, Lei Sun <slei.casper@gmail.com>,
+ qemu-arm <qemu-arm@nongnu.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 3 Jul 2019 at 09:41, Palmer Dabbelt <palmer@sifive.com> wrote:
+On Thu, 4 Jul 2019 at 11:11, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com=
+> wrote:
+> However, looking at the datasheet 'UG1085 (v1.0) November 24, 2015',
+> Chapter 22: Quad-SPI Controller, I understand this region is only
+> accessible by the CPU in READ mode, as an AXI slave.
 >
-> merged tag 'mips-queue-jun-21-2019'
-> The following changes since commit 474f3938d79ab36b9231c9ad3b5a9314c2aeacde:
->
->   Merge remote-tracking branch 'remotes/amarkovic/tags/mips-queue-jun-21-2019' into staging (2019-06-21 15:40:50 +0100)
->
-> are available in the Git repository at:
->
->   git://github.com/palmer-dabbelt/qemu.git tags/riscv-for-master-4.1-sf1-v3
->
-> for you to fetch changes up to 395fd69582a00b76a89c12d9c074055a9d207997:
->
->   hw/riscv: Extend the kernel loading support (2019-06-27 02:47:06 -0700)
->
-> ----------------------------------------------------------------
-> RISC-V Patches for the 4.1 Soft Freeze, Part 2 v3
->
-> This pull request contains a handful of patches that I'd like to target
-> for the 4.1 soft freeze.  There are a handful of new features:
->
-> * Support for the 1.11.0, the latest privileged specification.
-> * Support for reading and writing the PRCI registers.
-> * Better control over the ISA of the target machine.
-> * Support for the cpu-topology device tree node.
->
-> Additionally, there are a handful of bug fixes including:
->
-> * Load reservations are now broken by both store conditional and by
->   scheduling, which fixes issues with parallel applications.
-> * Various fixes to the PMP implementation.
-> * Fixes to the 32-bit linux-user syscall ABI.
-> * Various fixes for instruction decodeing.
-> * A fix to the PCI device tree "bus-range" property.
->
-> This boots 32-bit and 64-bit OpenEmbedded.
->
-> Changes since v2 [riscv-for-master-4.1-sf1-v2]:
->
-> * Dropped OpenSBI.
->
-> Changes since v1 [riscv-for-master-4.1-sf1]:
->
-> * Contains a fix to the sifive_u OpenSBI integration.
+> So, if we model this, even logging LOG_GUEST_ERROR is incorrect, we
+> should trap some AXI bus access error.
 
-Applied, thanks.
+Well, that depends on what the decode and the device really do --
+often datasheets are pretty sloppy and just describe what
+software "should" do, not what the h/w does if software does
+odd things...
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.1
-for any user-visible changes.
-
+thanks
 -- PMM
 
