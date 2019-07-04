@@ -2,80 +2,79 @@ Return-Path: <SRS0=blGQ=VB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3A0FC06513
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 10:00:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A705C06513
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 10:09:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8B9EA21882
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 10:00:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8B9EA21882
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2E0A12189E
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 10:09:36 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lBXu88yS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E0A12189E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43982 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44012 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hiyXB-0004FJ-9u
-	for qemu-devel@archiver.kernel.org; Thu, 04 Jul 2019 06:00:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40934)
+	id 1hiygJ-0007Ak-DH
+	for qemu-devel@archiver.kernel.org; Thu, 04 Jul 2019 06:09:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42337)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <pbonzini@redhat.com>) id 1hiyWP-0003q9-Ok
- for qemu-devel@nongnu.org; Thu, 04 Jul 2019 05:59:22 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hiyfq-0006ji-Hz
+ for qemu-devel@nongnu.org; Thu, 04 Jul 2019 06:09:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1hiyWO-0001nY-H9
- for qemu-devel@nongnu.org; Thu, 04 Jul 2019 05:59:21 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:37354)
+ (envelope-from <peter.maydell@linaro.org>) id 1hiyfp-0001xQ-FC
+ for qemu-devel@nongnu.org; Thu, 04 Jul 2019 06:09:06 -0400
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:45498)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hiyWO-0001nB-BK
- for qemu-devel@nongnu.org; Thu, 04 Jul 2019 05:59:20 -0400
-Received: by mail-wm1-f66.google.com with SMTP id f17so5445867wme.2
- for <qemu-devel@nongnu.org>; Thu, 04 Jul 2019 02:59:20 -0700 (PDT)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hiyfp-0001wu-5u
+ for qemu-devel@nongnu.org; Thu, 04 Jul 2019 06:09:05 -0400
+Received: by mail-oi1-x243.google.com with SMTP id m206so4506228oib.12
+ for <qemu-devel@nongnu.org>; Thu, 04 Jul 2019 03:09:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=2rYDimOw4p51/b8kXoRbETMXd0phChYu1mfYM0XSgdk=;
+ b=lBXu88ySEZzhz8iJQohIB5qBX5WbL1Cb1pZTxS1d/EZPfmkH0e/Zrs+wfWqC9p+6tp
+ oY/W1TEQ+CUt9x2pxhNLEPv0coL0YjyC4Dm/Q8WRjwKQrHk7UQAoLlBMznS6baXzKV+y
+ bALWlkjwXO0zMwAus3va+GBQX1tLOH+9q7TlxOdNtvQgQxQQcFU4rjVqpVCDi4jKbjXJ
+ 18kV5+0F+lmp2/kB/KA4d9I7YXwXnOYkoQt6obZAyeb2Vey3tsk6J+NBh5UeWCHX4xq5
+ G2EsbBYeaNIi9saz0S0TE94UViZ1lKTklyn/636NRql66tF7hSnrk/5n0yoft402dE4B
+ vMkA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=ViFFkLn9HJ+2jcHiZ2/PsMU96iM3GlbhZ0Iy4+d3pBQ=;
- b=MupGaF/bpso+WtVPfjUbgmi4RCMWwNT1Of1nZ26IfRXlh19IwsStgh3cCGFPZFiGnY
- pYISkyH+7pfiVP7vKjnttSX+JtM4Z0tXNknLH9L0lLOzNWktV70TbyXRbBjObtNPs7yC
- GKppRXVf2DOgziyfLTqHEYR5iuPFQefBcN5ChKsc7G8mYzx1rd01BludymTVvm34fcTl
- QMGmS9cBVayscU7I8m3yLXAAWQLAna7bKo2JfeA43ZuQQSlMqDsWK2ekU+dOP8omoJXb
- KcD5aKu9EBd8lb8Jlv8MxUMrxQ2qU4EdOUZyjtXp3p1Bne3mkMo+5O1wexZ0HH5bYPe6
- h4/Q==
-X-Gm-Message-State: APjAAAUioeIsRTkNeTV977z6F5xWmZPeb4Elp/LmDtT/xQ0FMAhAo7zQ
- Gn4X98FAUu1fxK+g2HA42Q7T4Ivb2RqQJg==
-X-Google-Smtp-Source: APXvYqwv6X2vyl5fNYwHLZJKCI4OVQYGGvUqZNNKeWEyiYa/CYmLb7z/QWx1uy+BH9V68mIMusXU2w==
-X-Received: by 2002:a1c:1d83:: with SMTP id d125mr11807477wmd.63.1562234359095; 
- Thu, 04 Jul 2019 02:59:19 -0700 (PDT)
-Received: from [10.201.49.68] (nat-pool-mxp-u.redhat.com. [149.6.153.187])
- by smtp.gmail.com with ESMTPSA id x129sm4626392wmg.44.2019.07.04.02.59.18
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Thu, 04 Jul 2019 02:59:18 -0700 (PDT)
-To: Max Reitz <mreitz@redhat.com>, =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?=
- <berrange@redhat.com>, Alberto Garcia <berto@igalia.com>
-References: <cover.1550842915.git.berto@igalia.com>
- <20190423165501.GA27867@redhat.com>
- <b5fe7ed7-c11c-4f36-4973-c86031cbe046@redhat.com>
- <9a76848c-f499-6355-70ca-1d638dad3e8e@redhat.com>
- <1c1c3302-a87c-6e3e-d1d7-c805972a7384@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <f1d226f3-f80e-f764-01a7-c18fa79d2248@redhat.com>
-Date: Thu, 4 Jul 2019 11:59:17 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=2rYDimOw4p51/b8kXoRbETMXd0phChYu1mfYM0XSgdk=;
+ b=CvzbVrlVnSMkahDNFcPG5MW3GxXUXj1iuJdnKAvWudVL9GiHXXcxn3O0VedZK+3nIs
+ XcsB3xBAu8e0SA/eZXiLrembYqNRKOf52MLOpA4IMUCt+twIjD+J4wlIrr3HAy9s7CEQ
+ oS79vIqlIB1NfwTxjwARGxuMpqc5Uy7se7kr442xXgq7KfujXRXKutEhEI3pUgZYRf25
+ 830N+84B01XXbuP/OxYj0N74dsoBqaJat3bvSE+uTjnvNBUU96Uyx7Z9Dbf+pY8OP0wP
+ TY5RLa3WeoMMHyP6nP0HDbZ9ZX/1xoHl8S7QEJhaATWSmx+no2nvMi+XgZU6Nh0fjbq+
+ IO6g==
+X-Gm-Message-State: APjAAAWjWn8jsz6a7GfFtWN0Xoai9G3Q6Imo9HmPfDvXficnB8oUTGHA
+ K/ZvFWIGCuQDzuQfS5Bx7m6ujJRNlQ/0TmOxuYxnRQ/+8PE=
+X-Google-Smtp-Source: APXvYqzaXRhOWYbX0zOhaEqZHnVgJdNaRcTGfunTpxI4jCUKaI8jXj1PQ4p6/+fAJJ4Dmk6HzHeRLxLrSowS5I1IuN0=
+X-Received: by 2002:aca:5cd7:: with SMTP id q206mr1299738oib.146.1562234943980; 
+ Thu, 04 Jul 2019 03:09:03 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1c1c3302-a87c-6e3e-d1d7-c805972a7384@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.128.66
-Subject: Re: [Qemu-devel] [PATCH v3 0/3] char-socket: Fix race condition
+References: <20190702221606.21600-1-mark.cave-ayland@ilande.co.uk>
+In-Reply-To: <20190702221606.21600-1-mark.cave-ayland@ilande.co.uk>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 4 Jul 2019 11:08:53 +0100
+Message-ID: <CAFEAcA9b0KTMEcTL0gBE+e3DxF7TJHYaM2nT7NXvTF0SViXoyQ@mail.gmail.com>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::243
+Subject: Re: [Qemu-devel] [PULL 0/6] qemu-sparc queue 20190702
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,25 +86,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- qemu-devel@nongnu.org
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 03/07/19 19:51, Max Reitz wrote:
-> On 05.06.19 21:36, Max Reitz wrote:
->> On 26.04.19 09:51, Paolo Bonzini wrote:
->>> On 23/04/19 18:55, Daniel P. Berrangé wrote:
->>>> ping - paolo/marc-andré - unless I'm missing something, it looks like
->>>> this chardev series slipped through the cracks and missed 4.0
->>>
->>> Yeah, it had a bug unfortunately.  I'm looking at it RSN.
->>
->> I’ll just leave another ping here
+On Tue, 2 Jul 2019 at 23:18, Mark Cave-Ayland
+<mark.cave-ayland@ilande.co.uk> wrote:
+>
+> The following changes since commit 506179e42112be77bfd071f050b15762d3b2cd43:
+>
+>   Merge remote-tracking branch 'remotes/dgibson/tags/ppc-for-4.1-20190702' into staging (2019-07-02 18:56:44 +0100)
+>
+> are available in the git repository at:
+>
+>   git://github.com/mcayland/qemu.git tags/qemu-sparc-20190702
+>
+> for you to fetch changes up to 09340f497e96a62d076b2f223e7b16a7358cfecb:
+>
+>   sunhme: ensure that RX descriptor ring overflow is indicated to client driver (2019-07-02 22:49:08 +0100)
+>
+> ----------------------------------------------------------------
+> qemu-sparc queue
+>
+> ----------------------------------------------------------------
+> Mark Cave-Ayland (6):
+>       sun4m: set default display type to TCX
+>       sunhme: add trace event for logging PCI IRQ
+>       sunhme: fix incorrect constant in sunhme_can_receive()
+>       sunhme: flush any queued packets when HME_MAC_RXCFG_ENABLE bit is raised
+>       sunhme: fix return values from sunhme_receive() during receive packet processing
+>       sunhme: ensure that RX descriptor ring overflow is indicated to client driver
 
-I haven't forgotten. :(
 
-Paolo
+Applied, thanks.
 
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.1
+for any user-visible changes.
+
+-- PMM
 
