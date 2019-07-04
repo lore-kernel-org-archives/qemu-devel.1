@@ -2,79 +2,88 @@ Return-Path: <SRS0=blGQ=VB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CC6AC0651F
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 16:23:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 629B1C0651F
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 16:24:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 397C3218A0
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 16:23:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E0AF1218A0
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 16:24:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fn9nW2gj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 397C3218A0
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tSXv39r1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0AF1218A0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47542 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47548 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hj4Vl-00061u-H0
-	for qemu-devel@archiver.kernel.org; Thu, 04 Jul 2019 12:23:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46294)
+	id 1hj4XM-0007NB-UQ
+	for qemu-devel@archiver.kernel.org; Thu, 04 Jul 2019 12:24:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44221)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hj4Ti-0004Fm-C0
- for qemu-devel@nongnu.org; Thu, 04 Jul 2019 12:21:04 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hj4Hd-00084K-W0
+ for qemu-devel@nongnu.org; Thu, 04 Jul 2019 12:08:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hj4Tg-0002RE-LD
- for qemu-devel@nongnu.org; Thu, 04 Jul 2019 12:20:58 -0400
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:40483)
+ (envelope-from <peter.maydell@linaro.org>) id 1hj4Hb-0002JM-Ve
+ for qemu-devel@nongnu.org; Thu, 04 Jul 2019 12:08:29 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:50648)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hj4Tg-0002Qd-GI
- for qemu-devel@nongnu.org; Thu, 04 Jul 2019 12:20:56 -0400
-Received: by mail-oi1-x242.google.com with SMTP id w196so5267937oie.7
- for <qemu-devel@nongnu.org>; Thu, 04 Jul 2019 09:20:55 -0700 (PDT)
+ id 1hj4HU-00029z-9v
+ for qemu-devel@nongnu.org; Thu, 04 Jul 2019 12:08:22 -0400
+Received: by mail-wm1-x342.google.com with SMTP id n9so6260236wmi.0
+ for <qemu-devel@nongnu.org>; Thu, 04 Jul 2019 09:08:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
- bh=BwhG8KcrMXQjto6vQ6OI3DjRwTyFjLxyzB45zGSdUNA=;
- b=fn9nW2gjxe2cY68rjztEf+Sx0MxX5Od+cKiaEz/YKN27MAWc8Ukdlh6DbG+GS+zLgm
- zB9CmvF41WLSjvOybQ0uIiiuWsh9VTVrkrOmEUY52O9XY0HjRRPRDid895kgCkQQNDY6
- krjrOzJak60UxH6cnp/I13y0fbY0lJ0EoxinJSWVzpYsR2AknSvy/vm/uVeE6sDIp7JE
- h/D2mvlAG+EwR1jMez4Sos7RqsCUUjo2MEgOWUVNIfuHkkLXT047gqDKeNA9XgeFe31o
- 61Bky0hMQFb3AZdkjqAwfHSO/d7n6JgEbN+PEACJVBl+Cctt5tw+3C6H82UlScagkdD+
- 2mBg==
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+ :content-transfer-encoding;
+ bh=jcWZDKHnpMlELavBPABwOL/us8df3sdUAODi66ZZKI0=;
+ b=tSXv39r13iwNG0UMBVZxL5JOUyLSsMKDQbaRCGhSqkt1FWsOdMal/CvCbXCi2nLdxA
+ idWGRwgkXZmjDwg/rLVNlcPxDj3HV69/HtdTYd36IouEMcclmRmJuta31v476WlV2xf6
+ noepUSQ7aq3jgHqUQiwG8qhl2bdvigoPnlKygNMdHaFRh6obu3sbs5TkmBAle5fIM1cC
+ sqsJT0x3uWYmECCQwU69yHhauh8uudmSDzL0xQNXZDUaDpG3zMzFFupG+NK1PNyNToMD
+ 6DuMUiOEKum2CB6NXGxsFsIJcLnAO0yugMs0my9qB7bpaDhcdlSkNrxtIXHbHna8DTjp
+ /F1A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to;
- bh=BwhG8KcrMXQjto6vQ6OI3DjRwTyFjLxyzB45zGSdUNA=;
- b=W6xBQxioEoIUZHvFth40QyZPsWzgsGqDBjElG2qaD6HBj1IXydGTl0gZGq1onZR4gP
- yAxCBTLhhxXtPUlMbmSk0NIQ16zFEhL/aIUYsaBrvvecJkEw8r/by9g1yAXc1hBL4oO9
- lBOpHM0XZkUBalwM/gAztNEUn3xcR+y8NaIwRn6+xVU74EYYllRTLDfef98NXAFTstDS
- dh/u0JY2sHZQK2pCXo8PV6d7mZ/juuFXvAZZthPf5pHuKffU3tR1/B6mx6uHhDI/rJz1
- y8kcpYoZYrBxuq8UIvn3hMKUOHBv10nFsh5omlp5YRbI44KNHu5AM/15AVjYMN/U0Zbn
- 36oA==
-X-Gm-Message-State: APjAAAUxnKMi83MAYfxCnX77yQBd+tTCciVB8ZBWEjtcU4R4U+vAEiXc
- xaGmoL1BIXXg2vHywl5VD1BEV2j6qFbLCXVuB8eIiffBDTA=
-X-Google-Smtp-Source: APXvYqwW5Tb3QfFzC+xyAqbfkDg7kg40s3UmpO9j9cmYKYneE1KhFextptZewnHd8LKeOx0u9bjZGzK8qA1M6GFg2Vs=
-X-Received: by 2002:aca:ac48:: with SMTP id v69mr226853oie.48.1562257254740;
- Thu, 04 Jul 2019 09:20:54 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190704160802.12419-1-peter.maydell@linaro.org>
-In-Reply-To: <20190704160802.12419-1-peter.maydell@linaro.org>
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=jcWZDKHnpMlELavBPABwOL/us8df3sdUAODi66ZZKI0=;
+ b=hK1sMVyGX4KZ17v6oHpoLtRXuRH1ygM4Kurt0lZDol64Psw7usia7MpvRIfKraTWbp
+ EUxqeGe+OLF2Va/GUAATmeVnwUuJBe7jsB+ElFiqDh4AVLVUcumGFHDp4sZ5sah1xgJA
+ CoRa12o8u3NCTW81szeefNBAD6Q+UOibhx/mgXwg+wjwDiIeZxq3ELf/AeRMgsifEfOu
+ vmM6xKGNpHOsLbwk2arL+KfADxFLBYOJdqgFwMtPsXogYPpbyPcz+40NxReGjhWL0qSW
+ GVEkDuD5YVOcRdf5OBevs8zo7eP+dulBpIDVHJppOKaes+zcsczkgfl4B+STp1QNM04E
+ BeUQ==
+X-Gm-Message-State: APjAAAUdOm6sSXEAdLp7amh9wctMXnALrm6ExqCdvHVUVKCJ+QSX9aYt
+ D+7/cuWxQsCpTgRnqSsR/nLRVHyCg/NnAQ==
+X-Google-Smtp-Source: APXvYqzBX+EHenXYqytwBzWzz1kyfQkeD/L8LEBMOOgUEIk+aZ55TMN9OaUV0FRdIHrnlBnXaV/+EA==
+X-Received: by 2002:a05:600c:2189:: with SMTP id
+ e9mr209600wme.56.1562256496744; 
+ Thu, 04 Jul 2019 09:08:16 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id s2sm3849690wmj.33.2019.07.04.09.08.15
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Thu, 04 Jul 2019 09:08:16 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 4 Jul 2019 17:20:44 +0100
-Message-ID: <CAFEAcA9jg78fK07i13Cicqm+g5vfw5VX2LsSO-jQu97Uavggzw@mail.gmail.com>
-To: QEMU Developers <qemu-devel@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
+To: qemu-devel@nongnu.org
+Date: Thu,  4 Jul 2019 17:08:01 +0100
+Message-Id: <20190704160802.12419-9-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190704160802.12419-1-peter.maydell@linaro.org>
+References: <20190704160802.12419-1-peter.maydell@linaro.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::242
-Subject: Re: [Qemu-devel] [PULL 0/9] target-arm queue
+X-Received-From: 2a00:1450:4864:20::342
+Subject: [Qemu-devel] [PULL 8/9] target/arm: Execute Thumb instructions when
+ their condbits are 0xf
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,44 +99,63 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 4 Jul 2019 at 17:08, Peter Maydell <peter.maydell@linaro.org> wrote:
->
-> A last collection of patches to squeeze in before rc0.
-> The patches from me are all bugfixes. Philippe's are just
-> code-movement, but I wanted to get these into 4.1 because
-> that kind of patch is so painful to have to rebase.
-> (The diffstat is huge but it's just code moving from file to file.)
->
-> thanks
-> -- PMM
->
-> The following changes since commit 234e256511e588680300600ce087c5185d68cf2a:
->
->   Merge remote-tracking branch 'remotes/armbru/tags/pull-build-2019-07-02-v2' into staging (2019-07-04 15:58:46 +0100)
->
-> are available in the Git repository at:
->
->   https://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20190704
->
-> for you to fetch changes up to b75f3735802b5b33f10e4bfe374d4b17bb86d29a:
->
->   target/arm: Correct VMOV_imm_dp handling of short vectors (2019-07-04 16:52:05 +0100)
->
-> ----------------------------------------------------------------
-> target-arm queue:
->  * more code-movement to separate TCG-only functions into their own files
->  * Correct VMOV_imm_dp handling of short vectors
->  * Execute Thumb instructions when their condbits are 0xf
->  * armv7m_systick: Forbid non-privileged accesses
->  * Use _ra versions of cpu_stl_data() in v7M helpers
->  * v8M: Check state of exception being returned from
->  * v8M: Forcibly clear negative-priority exceptions on deactivate
->
+Thumb instructions in an IT block are set up to be conditionally
+executed depending on a set of condition bits encoded into the IT
+bits of the CPSR/XPSR.  The architecture specifies that if the
+condition bits are 0b1111 this means "always execute" (like 0b1110),
+not "never execute"; we were treating it as "never execute".  (See
+the ConditionHolds() pseudocode in both the A-profile and M-profile
+Arm ARM.)
 
-Oops, this crossed in the post with the qapi header reorg, and
-the move to m_profile.c doesn't build from clean (incremental
-was fine because the old header was still lying around in the
-build tree). v2 coming up shortly.
+This is a bit of an obscure corner case, because the only legal
+way to get to an 0b1111 set of condbits is to do an exception
+return which sets the XPSR/CPSR up that way. An IT instruction
+which encodes a condition sequence that would include an 0b1111 is
+UNPREDICTABLE, and for v8A the CONSTRAINED UNPREDICTABLE choices
+for such an IT insn are to NOP, UNDEF, or treat 0b1111 like 0b1110.
+Add a comment noting that we take the latter option.
 
--- PMM
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 20190617175317.27557-7-peter.maydell@linaro.org
+---
+ target/arm/translate.c | 15 +++++++++++++--
+ 1 file changed, 13 insertions(+), 2 deletions(-)
+
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index a5d77234232..7853462b21b 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -11594,7 +11594,14 @@ static void disas_thumb_insn(DisasContext *s, uint32_t insn)
+                 gen_nop_hint(s, (insn >> 4) & 0xf);
+                 break;
+             }
+-            /* If Then.  */
++            /*
++             * IT (If-Then)
++             *
++             * Combinations of firstcond and mask which set up an 0b1111
++             * condition are UNPREDICTABLE; we take the CONSTRAINED
++             * UNPREDICTABLE choice to treat 0b1111 the same as 0b1110,
++             * i.e. both meaning "execute always".
++             */
+             s->condexec_cond = (insn >> 4) & 0xe;
+             s->condexec_mask = insn & 0x1f;
+             /* No actual code generated for this insn, just setup state.  */
+@@ -12128,7 +12135,11 @@ static void thumb_tr_translate_insn(DisasContextBase *dcbase, CPUState *cpu)
+     if (dc->condexec_mask && !thumb_insn_is_unconditional(dc, insn)) {
+         uint32_t cond = dc->condexec_cond;
+ 
+-        if (cond != 0x0e) {     /* Skip conditional when condition is AL. */
++        /*
++         * Conditionally skip the insn. Note that both 0xe and 0xf mean
++         * "always"; 0xf is not "never".
++         */
++        if (cond < 0x0e) {
+             arm_skip_unless(dc, cond);
+         }
+     }
+-- 
+2.20.1
+
 
