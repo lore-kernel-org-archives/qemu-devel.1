@@ -2,89 +2,83 @@ Return-Path: <SRS0=blGQ=VB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24135C06510
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 03:43:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 569A5C06510
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 03:44:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EA1912189E
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 03:43:13 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CHV0LUW9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA1912189E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2BBA62189E
+	for <qemu-devel@archiver.kernel.org>; Thu,  4 Jul 2019 03:44:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2BBA62189E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42688 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42696 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hiseP-000482-41
-	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 23:43:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53983)
+	id 1hisg2-0006BK-HF
+	for qemu-devel@archiver.kernel.org; Wed, 03 Jul 2019 23:44:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54170)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <sjitindarsingh@gmail.com>) id 1hisdT-0003CU-CN
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 23:42:16 -0400
+ (envelope-from <chen.zhang@intel.com>) id 1hisfY-0005mX-P4
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 23:44:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <sjitindarsingh@gmail.com>) id 1hisdR-00031A-Ok
- for qemu-devel@nongnu.org; Wed, 03 Jul 2019 23:42:15 -0400
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:45360)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <sjitindarsingh@gmail.com>)
- id 1hisdK-0002xh-GI; Wed, 03 Jul 2019 23:42:08 -0400
-Received: by mail-pl1-x641.google.com with SMTP id bi6so2306605plb.12;
- Wed, 03 Jul 2019 20:42:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=message-id:subject:from:to:cc:date:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=NLK06uopJD4zWU8A5SxehJuDnNZy1u5lZAk3dkb1XeM=;
- b=CHV0LUW9B+g6ykf7cVc9ZOXMPXAEAwmrlrRrj4UJfEWTyC+cRIbi58HxcKcs3HtPC2
- AK/saCPZRQ3UCKGsERB8ts6VSau+s3kx4mFEX1ykkmQXYwL0PDMZ7SzR9wzhyde0PNlm
- 6cqHaDWnibL0SKfoP/pTyeV/ZFjseoiIVEbs8UMF3WbGRm77RDjDKFfgrm9eHtq8ecr6
- /pQ28JIhUE9ZBgelaF2nXoVse6jR+0m+9kv9YDNunZI/F7NuJM2/ZFP0XPS+fg5XrxLe
- mRUF7gkcKVgWUaOFiRCljiYdAFL3+YqWaMf1CQ9Ytr4xa7UV6cvK/yIrGzaRMwcsZ+KU
- wYoA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=NLK06uopJD4zWU8A5SxehJuDnNZy1u5lZAk3dkb1XeM=;
- b=OxH6LAHe9uPl7XZgiqzBJH3SSmnHi8Tp1RdkX3KWNfSeOjDailc4sVWIC0F4QdxSAt
- EefVHb0tD6gf3RNI1eoG2EuPCRBcNeSW/LCG7f++jcxdz+4+onRvZq2SC8Duq/XvKZuM
- Cxzan8PHCb3ChyVyY3hLa5vJK9KOAvP44rt4/490kdz3aTu7bi8YGbt6Y87STqt1SP79
- fcPSIaeJzk7PXNJcfrKC+/39f2XhuuyDkePKvEtHh4MTiMkbThf1XYfZCM73/kY49o/r
- 1YLABO9SJwMh12b2KbEJLYZ8g6NumgHr2pB46JRGbvB4P5+3sbBVyAzC8Z7GxCCNx4Xp
- GLiQ==
-X-Gm-Message-State: APjAAAW6Ow2qPAwffpIsUMx4LXJkAI6VJ2IV0mlB3HN9sDFova6tGZdW
- qBtGQw96zKOGBiMFHRv+dv4=
-X-Google-Smtp-Source: APXvYqxMO0SEhjaBK3V94HC/GKOkSYDicpkb5Iw3TF2oPVWw0A7+7GM23eU9RnXcOOr4BV4hcFoOgg==
-X-Received: by 2002:a17:902:e40f:: with SMTP id
- ci15mr46611795plb.103.1562211724647; 
- Wed, 03 Jul 2019 20:42:04 -0700 (PDT)
-Received: from surajjs2.ozlabs.ibm.com ([122.99.82.10])
- by smtp.googlemail.com with ESMTPSA id b6sm3525897pgd.5.2019.07.03.20.42.01
- (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
- Wed, 03 Jul 2019 20:42:03 -0700 (PDT)
-Message-ID: <1562211719.10832.15.camel@gmail.com>
-From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-To: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu, 04 Jul 2019 13:41:59 +1000
-In-Reply-To: <20190703061239.GK9442@umbus.fritz.box>
-References: <20190701061946.32636-1-sjitindarsingh@gmail.com>
- <20190703061239.GK9442@umbus.fritz.box>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.24.6 (3.24.6-1.fc26) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+ (envelope-from <chen.zhang@intel.com>) id 1hisfX-000483-Fv
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 23:44:24 -0400
+Received: from mga12.intel.com ([192.55.52.136]:31130)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <chen.zhang@intel.com>)
+ id 1hisfX-00043w-7r
+ for qemu-devel@nongnu.org; Wed, 03 Jul 2019 23:44:23 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+ by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 03 Jul 2019 20:44:14 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.63,449,1557212400"; d="scan'208";a="362834933"
+Received: from fmsmsx108.amr.corp.intel.com ([10.18.124.206])
+ by fmsmga005.fm.intel.com with ESMTP; 03 Jul 2019 20:44:14 -0700
+Received: from shsmsx154.ccr.corp.intel.com (10.239.6.54) by
+ FMSMSX108.amr.corp.intel.com (10.18.124.206) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Wed, 3 Jul 2019 20:44:12 -0700
+Received: from shsmsx102.ccr.corp.intel.com ([169.254.2.3]) by
+ SHSMSX154.ccr.corp.intel.com ([169.254.7.240]) with mapi id 14.03.0439.000;
+ Thu, 4 Jul 2019 11:44:12 +0800
+From: "Zhang, Chen" <chen.zhang@intel.com>
+To: =?utf-8?B?UGhpbGlwcGUgTWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>, "Li
+ Zhijian" <lizhijian@cn.fujitsu.com>, Peter Maydell
+ <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>, qemu-dev
+ <qemu-devel@nongnu.org>
+Thread-Topic: [Qemu-devel] [PATCH] net/colo-compare.c: Fix memory leak and
+ code style issue.
+Thread-Index: AQHVMUCopfg6F+XrzUC+6h46ZejGq6a4EbMAgAHBIbA=
+Date: Thu, 4 Jul 2019 03:44:11 +0000
+Message-ID: <9CFF81C0F6B98A43A459C9EDAD400D78061B8149@shsmsx102.ccr.corp.intel.com>
+References: <20190703013805.2722-1-chen.zhang@intel.com>
+ <bab54e27-0e4f-3701-1562-92b062f37415@redhat.com>
+In-Reply-To: <bab54e27-0e4f-3701-1562-92b062f37415@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.0.600.7
+dlp-reaction: no-action
+x-ctpclassification: CTP_NT
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiZTMzNWM2NjEtZDFlYS00NmNmLWI0NmQtYWQ2YmQyMWE5ZWJjIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiYjgrajhiMEtSM1RibDNha2J2S0pINGViVm52RlFieGJhOWVkYXpvWXlcLzlsazd0ekFMOWk4ZzFqRHJ5R2c2bFkifQ==
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::641
-Subject: Re: [Qemu-devel] [QEMU-PPC] [PATCH v3] powerpc/spapr: Add host
- threads parameter to ibm, get_system_parameter
+X-Received-From: 192.55.52.136
+Subject: Re: [Qemu-devel] [PATCH] net/colo-compare.c: Fix memory leak and
+ code style issue.
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,193 +90,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, groug@kaod.org
+Cc: Zhang Chen <zhangckid@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 2019-07-03 at 16:12 +1000, David Gibson wrote:
-> On Mon, Jul 01, 2019 at 04:19:46PM +1000, Suraj Jitindar Singh wrote:
-> > The ibm,get_system_parameter rtas call is used by the guest to
-> > retrieve
-> > data relating to certain parameters of the system. The SPLPAR
-> > characteristics option (token 20) is used to determin
-> > characteristics of
-> > the environment in which the lpar will run.
-> > 
-> > It may be useful for a guest to know the number of physical host
-> > threads
-> > present on the underlying system where it is being run. Add the
-> > characteristic "HostThrs" to the SPLPAR Characteristics
-> > ibm,get_system_parameter rtas call to expose this information to a
-> > guest and provide an implementation which determines this
-> > information
-> > based on the number of interrupt servers present in the device
-> > tree.
-> > 
-> > Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-> 
-> Hrm, as I said on our call, I have some misgivings about this.
-> 
-> Starting with the most general: this again publishes host information
-> to the guest without filtering, which has caused us problems before
-> (e.g. security issues with publishing the host serial and model
-> information).  Now, I can't immediately see what harm a guest could
-> do
-> with the host # threads (especially since it could in theory deduce
-> it
-> from the PVR, I think) but it still makes me uneasy.
-
-Correct, a guest could pretty reliably determine this information
-anyway based on the PVR. It can't account for a POWER8 operating in
-split core mode, but I don't know any harm that could be done by
-introducing this information.
-
-Additionally it doesn't really tell you anything about how you're going
-to be scheduled (at least on POWER9) since vcpus are scheduled on a per
-thread, not per core basis.
-
-> 
-> Secondly, the "HostThrs" tag doesn't seem to be documented in PAPR as
-> something that this system-parameter will include.  I don't much like
-> the idea of adding ad-hoc bits of information here without some
-> thought going into designing and specifying it first.
-
-This isn't documented in papr, it has been decided that this is how the
-information will be communicated to a guest. This is the most
-appropriate place to put this information and the HostThrs name is
-consistent with the naming of other information in this property.
-
-We have other non-papr information in qemu, for example hcall numbers,
-so this isn't exactly a precedent.
-
-> 
-> > 
-> > ---
-> > 
-> > V1 -> V2:
-> > - Take into account that the core may be operating in split core
-> > mode
-> >   meaning a single core may be split into multiple subcores.
-> > V2 -> V3:
-> > - Add curly braces for single line if statements
-> > ---
-> >  hw/ppc/spapr_rtas.c | 62
-> > +++++++++++++++++++++++++++++++++++++++++++++++++++++
-> >  1 file changed, 62 insertions(+)
-> > 
-> > diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
-> > index 5bc1a93271..1bab71c90c 100644
-> > --- a/hw/ppc/spapr_rtas.c
-> > +++ b/hw/ppc/spapr_rtas.c
-> > @@ -229,6 +229,58 @@ static inline int sysparm_st(target_ulong
-> > addr, target_ulong len,
-> >      return RTAS_OUT_SUCCESS;
-> >  }
-> >  
-> > +#define CPUS_PATH       "/proc/device-tree/cpus/"
-> > +#define
-> > SUBCORE_PATH    "/sys/devices/system/cpu/subcores_per_core"
-> > +
-> > +static int rtas_get_num_host_threads(void)
-> > +{
-> > +    int num_threads = -1;
-> > +    unsigned long len;
-> > +    const char *entry;
-> > +    char *buf;
-> > +    GDir *dir;
-> > +
-> > +    if (!kvm_enabled()) {
-> > +        return 1;
-> > +    }
-> > +
-> > +    /* Read interrupt servers to determine number of threads per
-> > core */
-> > +    dir = g_dir_open(CPUS_PATH, 0, NULL);
-> > +    if (!dir) {
-> > +        return -1;
-> > +    }
-> > +
-> > +    while ((entry = g_dir_read_name(dir))) {
-> > +        if (!strncmp(entry, "PowerPC,POWER",
-> > strlen("PowerPC,POWER"))) {
-> > +            char *path;
-> > +
-> > +            path = g_strconcat(CPUS_PATH, entry, "/ibm,ppc-
-> > interrupt-server#s",
-> > +                               NULL);
-> > +            if (g_file_get_contents(path, &buf, &len, NULL)) {
-> > +                num_threads = len / sizeof(int);
-> > +                g_free(buf);
-> > +            }
-> > +
-> > +            g_free(path);
-> > +            break;
-> > +        }
-> > +    }
-> > +
-> > +    g_dir_close(dir);
-> > +
-> > +    /* Check if split core mode in use */
-> > +    if (g_file_get_contents(SUBCORE_PATH, &buf, &len, NULL)) {
-> > +        int subcores = g_ascii_strtoll(buf, NULL, 10);
-> > +
-> > +        if (subcores) {
-> > +            num_threads /= subcores;
-> > +        }
-> > +        g_free(buf);
-> > +    }
-> 
-> Finally, all the logic above is built on the assumption of a ppc host
-> - and not just that but an IBM POWER host...
-
-RTAS services are defined as being provided by a papr platform, and the
-existence of the ibm,ppc-interrupt-server#s device tree property is a
-requirement of a papr platform. So I don't see this being an issue.
-
-> 
-> > +    return num_threads;
-> > +}
-> > +
-> >  static void rtas_ibm_get_system_parameter(PowerPCCPU *cpu,
-> >                                            SpaprMachineState
-> > *spapr,
-> >                                            uint32_t token, uint32_t
-> > nargs,
-> > @@ -250,6 +302,16 @@ static void
-> > rtas_ibm_get_system_parameter(PowerPCCPU *cpu,
-> >                                            current_machine-
-> > >ram_size / MiB,
-> >                                            smp_cpus,
-> >                                            max_cpus);
-> > +        int num_host_threads = rtas_get_num_host_threads();
-> > +
-> > +        if (num_host_threads > 0) {
-> 
-> ... this sort of implements a fallback in other cases (KVM PR with a
-> non-IBM host, TCG, but the boundary conditions are not really well
-> defined.
-
-This is essentially catching the error case of
-rtas_get_num_host_threads() returning a negative number or not finding
-the required properties (which as mentioned above are required). The
-KVM-PR case will work the same as the KVM-HV case where the host device
-tree will be queried. For TCG we just default to 1 since this
-information shouldn't be relevant to a TCG guest.
-
-> 
-> > +            char *hostthr_val, *old = param_val;
-> > +
-> > +            hostthr_val = g_strdup_printf(",HostThrs=%d",
-> > num_host_threads);
-> > +            param_val = g_strconcat(param_val, hostthr_val, NULL);
-> > +            g_free(hostthr_val);
-> > +            g_free(old);
-> > +        }
-> >          ret = sysparm_st(buffer, length, param_val,
-> > strlen(param_val) + 1);
-> >          g_free(param_val);
-> >          break;
-> 
-> 
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogUGhpbGlwcGUgTWF0aGll
+dS1EYXVkw6kgW21haWx0bzpwaGlsbWRAcmVkaGF0LmNvbV0NCj4gU2VudDogV2VkbmVzZGF5LCBK
+dWx5IDMsIDIwMTkgNDo1NiBQTQ0KPiBUbzogWmhhbmcsIENoZW4gPGNoZW4uemhhbmdAaW50ZWwu
+Y29tPjsgTGkgWmhpamlhbiA8bGl6aGlqaWFuQGNuLmZ1aml0c3UuY29tPjsNCj4gUGV0ZXIgTWF5
+ZGVsbCA8cGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnPjsgSmFzb24gV2FuZw0KPiA8amFzb3dhbmdA
+cmVkaGF0LmNvbT47IHFlbXUtZGV2IDxxZW11LWRldmVsQG5vbmdudS5vcmc+DQo+IENjOiBaaGFu
+ZyBDaGVuIDx6aGFuZ2NraWRAZ21haWwuY29tPg0KPiBTdWJqZWN0OiBSZTogW1FlbXUtZGV2ZWxd
+IFtQQVRDSF0gbmV0L2NvbG8tY29tcGFyZS5jOiBGaXggbWVtb3J5IGxlYWsgYW5kDQo+IGNvZGUg
+c3R5bGUgaXNzdWUuDQo+IA0KPiBPbiA3LzMvMTkgMzozOCBBTSwgWmhhbmcgQ2hlbiB3cm90ZToN
+Cj4gPiBGcm9tOiBaaGFuZyBDaGVuIDxjaGVuLnpoYW5nQGludGVsLmNvbT4NCj4gPg0KPiA+IEFk
+ZHJlc3MgUGV0ZXIncyBjb21tZW50cyBpbiBwYXRjaCAiQ09MTy1jb21wYXJlOkFkZCBjb2xvLWNv
+bXBhcmUNCj4gPiByZW1vdGUgbm90aWZ5IHN1cHBvcnQiLg0KPiANCj4gVGhpcyBjb21tZW50IGlz
+IG5vdCB1c2VmdWwgaW4gdGhlIGdpdCBoaXN0b3J5IChubyByZWZlcmVuY2UpLg0KPiANCj4gWW91
+IG1pZ2h0IHJld29yZCBoaW0sIHVzZSBmdWxsIGNvbWVudCwgb3Igc2ltcGx5Og0KPiANCj4gUmVw
+b3J0ZWQtYnk6IENvdmVyaXR5IChDSUQgMTQwMjc4NSkNCg0KT0ssIEkgd2lsbCBmaXggaXQgaW4g
+bmV4dCB2ZXJzaW9uLg0KDQpUaGFua3MNClpoYW5nIENoZW4NCg0KPiANCj4gPiBTaWduZWQtb2Zm
+LWJ5OiBaaGFuZyBDaGVuIDxjaGVuLnpoYW5nQGludGVsLmNvbT4NCj4gPiAtLS0NCj4gPiAgbmV0
+L2NvbG8tY29tcGFyZS5jIHwgMTMgKysrKysrLS0tLS0tLQ0KPiA+ICAxIGZpbGUgY2hhbmdlZCwg
+NiBpbnNlcnRpb25zKCspLCA3IGRlbGV0aW9ucygtKQ0KPiA+DQo+ID4gZGlmZiAtLWdpdCBhL25l
+dC9jb2xvLWNvbXBhcmUuYyBiL25ldC9jb2xvLWNvbXBhcmUuYyBpbmRleA0KPiA+IDkwOWRkNmM2
+ZWIuLjM2M2IxZWRkMTEgMTAwNjQ0DQo+ID4gLS0tIGEvbmV0L2NvbG8tY29tcGFyZS5jDQo+ID4g
+KysrIGIvbmV0L2NvbG8tY29tcGFyZS5jDQo+ID4gQEAgLTEwMDgsMjEgKzEwMDgsMjAgQEAgc3Rh
+dGljIHZvaWQNCj4gPiBjb21wYXJlX25vdGlmeV9yc19maW5hbGl6ZShTb2NrZXRSZWFkU3RhdGUg
+Km5vdGlmeV9ycykgIHsNCj4gPiAgICAgIENvbXBhcmVTdGF0ZSAqcyA9IGNvbnRhaW5lcl9vZihu
+b3RpZnlfcnMsIENvbXBhcmVTdGF0ZSwNCj4gPiBub3RpZnlfcnMpOw0KPiA+DQo+ID4gLSAgICAv
+KiBHZXQgWGVuIGNvbG8tZnJhbWUncyBub3RpZnkgYW5kIGhhbmRsZSB0aGUgbWVzc2FnZSAqLw0K
+PiA+IC0gICAgY2hhciAqZGF0YSA9IGdfbWVtZHVwKG5vdGlmeV9ycy0+YnVmLCBub3RpZnlfcnMt
+PnBhY2tldF9sZW4pOw0KPiA+IC0gICAgY2hhciBtc2dbXSA9ICJDT0xPX0NPTVBBUkVfR0VUX1hF
+Tl9JTklUIjsNCj4gPiArICAgIGNvbnN0IGNoYXIgbXNnW10gPSAiQ09MT19DT01QQVJFX0dFVF9Y
+RU5fSU5JVCI7DQo+ID4gICAgICBpbnQgcmV0Ow0KPiA+DQo+ID4gLSAgICBpZiAoIXN0cmNtcChk
+YXRhLCAiQ09MT19VU0VSU1BBQ0VfUFJPWFlfSU5JVCIpKSB7DQo+ID4gKyAgICBpZiAoIXN0cmNt
+cCgoY2hhciAqKW5vdGlmeV9ycy0+YnVmLCAiQ09MT19VU0VSU1BBQ0VfUFJPWFlfSU5JVCIpKQ0K
+PiA+ICsgew0KPiA+ICAgICAgICAgIHJldCA9IGNvbXBhcmVfY2hyX3NlbmQocywgKHVpbnQ4X3Qg
+Kiltc2csIHN0cmxlbihtc2cpLCAwLCB0cnVlKTsNCj4gPiAgICAgICAgICBpZiAocmV0IDwgMCkg
+ew0KPiA+ICAgICAgICAgICAgICBlcnJvcl9yZXBvcnQoIk5vdGlmeSBYZW4gQ09MTy1mcmFtZSBJ
+TklUIGZhaWxlZCIpOw0KPiA+ICAgICAgICAgIH0NCj4gPiAtICAgIH0NCj4gPiAtDQo+ID4gLSAg
+ICBpZiAoIXN0cmNtcChkYXRhLCAiQ09MT19DSEVDS1BPSU5UIikpIHsNCj4gPiArICAgIH0gZWxz
+ZSBpZiAoIXN0cmNtcCgoY2hhciAqKW5vdGlmeV9ycy0+YnVmLCAiQ09MT19DSEVDS1BPSU5UIikp
+IHsNCj4gPiAgICAgICAgICAvKiBjb2xvLWNvbXBhcmUgZG8gY2hlY2twb2ludCwgZmx1c2ggcHJp
+IHBhY2tldCBhbmQgcmVtb3ZlIHNlYyBwYWNrZXQNCj4gKi8NCj4gPiAgICAgICAgICBnX3F1ZXVl
+X2ZvcmVhY2goJnMtPmNvbm5fbGlzdCwgY29sb19mbHVzaF9wYWNrZXRzLCBzKTsNCj4gPiArICAg
+IH0gZWxzZSB7DQo+ID4gKyAgICAgICAgZXJyb3JfcmVwb3J0KCJDT0xPIGNvbXBhcmUgZ290IHVu
+c3VwcG9ydGVkIGluc3RydWN0aW9uICclcyciLA0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAo
+Y2hhciAqKW5vdGlmeV9ycy0+YnVmKTsNCj4gPiAgICAgIH0NCj4gPiAgfQ0KPiA+DQo+ID4NCg==
 
