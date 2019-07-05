@@ -2,59 +2,78 @@ Return-Path: <SRS0=wUMn=VC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.5 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACC81C4649B
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 10:44:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F38BC4649B
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 10:45:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 79F892133F
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 10:44:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 79F892133F
+	by mail.kernel.org (Postfix) with ESMTPS id 0B2E92133F
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 10:45:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B2E92133F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51502 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51504 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hjLhe-0007ro-Js
-	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 06:44:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58044)
+	id 1hjLiE-00082Z-7b
+	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 06:45:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58099)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hjLgP-0006Qd-9j
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 06:43:15 -0400
+ (envelope-from <sgarzare@redhat.com>) id 1hjLga-0006fv-Br
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 06:43:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hjLgN-0005G1-U1
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 06:43:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56892)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>)
- id 1hjLgJ-0004vG-Uj; Fri, 05 Jul 2019 06:43:08 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 4D120301E11B;
- Fri,  5 Jul 2019 10:43:03 +0000 (UTC)
-Received: from x1w.redhat.com (ovpn-204-45.brq.redhat.com [10.40.204.45])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A01EA100164A;
- Fri,  5 Jul 2019 10:42:57 +0000 (UTC)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Fri,  5 Jul 2019 12:42:55 +0200
-Message-Id: <20190705104255.24027-1-philmd@redhat.com>
+ (envelope-from <sgarzare@redhat.com>) id 1hjLgZ-0005gJ-14
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 06:43:24 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:46740)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1hjLgY-0005e4-P2
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 06:43:22 -0400
+Received: by mail-wr1-f68.google.com with SMTP id z1so4794539wru.13
+ for <qemu-devel@nongnu.org>; Fri, 05 Jul 2019 03:43:22 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to:user-agent;
+ bh=uUX8H1e+XL3KDdnpYS4qjFFDhuP6GaNmKAvjKyAJy78=;
+ b=cR/HnZniZSbSf5GH3x5sJU/2g3pLRxelxmWzaAAzIBAt0yRiZxZEa7/1t+MA+8dz3G
+ AsO6EP5rE6EVAR4XT+4iRjotpacvE+7qrPPm1yeC1oHL5WZ6aleRSkeTQP4Fzj4zP8XO
+ /4RM/qCrkpnNEvqKVM0xMsuOmYb86jpTKYVQLszYnhrwLRZwKNvAyJFAr1CeRq7RcyYM
+ 0S9ylFQuqSnKfP/FY5SQaZyvFZj4+OdEkpVdsDQO+DTHsn6deA+bju3+hqsIu+llmtHG
+ QipDCjqV3VWhquO54A+Ele+ntE4oq9asJr3xbzYiOdS684XmP3fhNouAM8ocK5yTvJOc
+ Yq2Q==
+X-Gm-Message-State: APjAAAX1Jla4piDdd//9GfUS2llCARfSBzXiZZ0pvvpLhAVyeXCfkDmn
+ B56FBmxjLV0FViTGrYSNsEli3Q==
+X-Google-Smtp-Source: APXvYqzAcV3z5cNa9XJsvxjrcR+3+48zyEhV5JfHYvpPnG6g7s61z2jq76UxOSFLS0CZGZmu8YIh3Q==
+X-Received: by 2002:a5d:6182:: with SMTP id j2mr3337036wru.275.1562323401503; 
+ Fri, 05 Jul 2019 03:43:21 -0700 (PDT)
+Received: from steredhat (host21-207-dynamic.52-79-r.retail.telecomitalia.it.
+ [79.52.207.21])
+ by smtp.gmail.com with ESMTPSA id 72sm8468936wrk.22.2019.07.05.03.43.20
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Fri, 05 Jul 2019 03:43:21 -0700 (PDT)
+Date: Fri, 5 Jul 2019 12:43:18 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, Jason Dillaman <jdillama@redhat.com>
+Message-ID: <20190705104318.dngmmu3lpuvbe2nh@steredhat>
+References: <20190705093258.47856-1-sgarzare@redhat.com>
+ <dcc9f3dc-78b4-4216-2791-b7e90f6d79ff@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.41]); Fri, 05 Jul 2019 10:43:03 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <dcc9f3dc-78b4-4216-2791-b7e90f6d79ff@redhat.com>
+User-Agent: NeoMutt/20180716
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH-for-4.1 v2] hw/ssi/xilinx_spips: Avoid AXI
- writes to the LQSPI linear memory
+ [fuzzy]
+X-Received-From: 209.85.221.68
+Subject: Re: [Qemu-devel] [PATCH v3] block/rbd: implement
+ .bdrv_get_allocated_file_size callback
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,69 +85,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Francisco Iglesias <frasse.iglesias@gmail.com>,
- Alistair Francis <alistair@alistair23.me>,
- Prasad J Pandit <ppandit@redhat.com>, Lei Sun <slei.casper@gmail.com>,
- qemu-arm@nongnu.org, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Josh Durgin <jdurgin@redhat.com>,
+ John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Lei Sun found while auditing the code than a CPU write would
-trigger a NULL pointer deference.
+On Fri, Jul 05, 2019 at 11:58:43AM +0200, Max Reitz wrote:
+> On 05.07.19 11:32, Stefano Garzarella wrote:
+> > This patch allows 'qemu-img info' to show the 'disk size' for
+> > the RBD images that have the fast-diff feature enabled.
+> > 
+> > If this feature is enabled, we use the rbd_diff_iterate2() API
+> > to calculate the allocated size for the image.
+> > 
+> > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> > ---
+> > v3:
+> >   - return -ENOTSUP instead of -1 when fast-diff is not available
+> >     [John, Jason]
+> > v2:
+> >   - calculate the actual usage only if the fast-diff feature is
+> >     enabled [Jason]
+> > ---
+> >  block/rbd.c | 54 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+> >  1 file changed, 54 insertions(+)
+> 
+> Well, the librbd documentation is non-existing as always, but while
+> googling, I at least found that libvirt has exactly the same code.  So I
+> suppose it must be quite correct, then.
+> 
 
-From UG1085 datasheet [*] AXI writes in this region are ignored
-and generates an External Slave Error (SLVERR).
+While I wrote this code I took a look at libvirt implementation and also
+at the "rbd" tool in the ceph repository: compute_image_disk_usage() in
+src/tools/rbd/action/DiskUsage.cc
 
-Fix by checking the access is a READ before calling the region
-callback.
+> > diff --git a/block/rbd.c b/block/rbd.c
+> > index 59757b3120..b6bed683e5 100644
+> > --- a/block/rbd.c
+> > +++ b/block/rbd.c
+> > @@ -1084,6 +1084,59 @@ static int64_t qemu_rbd_getlength(BlockDriverState *bs)
+> >      return info.size;
+> >  }
+> >  
+> > +static int rbd_allocated_size_cb(uint64_t offset, size_t len, int exists,
+> > +                                 void *arg)
+> > +{
+> > +    int64_t *alloc_size = (int64_t *) arg;
+> > +
+> > +    if (exists) {
+> > +        (*alloc_size) += len;
+> > +    }
+> > +
+> > +    return 0;
+> > +}
+> > +
+> > +static int64_t qemu_rbd_get_allocated_file_size(BlockDriverState *bs)
+> > +{
+> > +    BDRVRBDState *s = bs->opaque;
+> > +    uint64_t flags, features;
+> > +    int64_t alloc_size = 0;
+> > +    int r;
+> > +
+> > +    r = rbd_get_flags(s->image, &flags);
+> > +    if (r < 0) {
+> > +        return r;
+> > +    }
+> > +
+> > +    r = rbd_get_features(s->image, &features);
+> > +    if (r < 0) {
+> > +        return r;
+> > +    }
+> > +
+> > +    /*
+> > +     * We use rbd_diff_iterate2() only if the RBD image have fast-diff
+> > +     * feature enabled. If it is disabled, rbd_diff_iterate2() could be
+> > +     * very slow on a big image.
+> > +     */
+> > +    if (!(features & RBD_FEATURE_FAST_DIFF) ||
+> > +        (flags & RBD_FLAG_FAST_DIFF_INVALID)) {
+> > +        return -ENOTSUP;
+> > +    }
+> > +
+> > +    /*
+> > +     * rbd_diff_iterate2(), if the source snapshot name is NULL, invokes
+> > +     * the callback on all allocated regions of the image.
+> > +     */
+> > +    r = rbd_diff_iterate2(s->image, NULL, 0,
+> > +                          bs->total_sectors * BDRV_SECTOR_SIZE, 0, 1,
+> > +                          &rbd_allocated_size_cb, &alloc_size);
+> 
+> But I have a question.  This is basically block_status, right?  So it
+> gives us information on which areas are allocated and which are not.
+> The result thus gives us a lower bound on the allocation size, but is it
+> really exactly the allocation size?
+> 
+> There are two things I’m concerned about:
+> 
+> 1. What about metadata?
 
-[*] https://www.xilinx.com/support/documentation/user_guides/ug1085-zynq-=
-ultrascale-trm.pdf
+Good question, I don't think it includes the size used by metadata and I
+don't know if there is a way to know it. I'll check better.
 
-Reported-by: Lei Sun <slei.casper@gmail.com>
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
-v1: https://lists.gnu.org/archive/html/qemu-devel/2019-07/msg01238.html
----
- hw/ssi/xilinx_spips.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+> 
+> 2. If you have multiple snapshots, this will only report the overall
+> allocation information, right?  So say there is something like this:
+> 
+> (“A” means an allocated MB, “-” is an unallocated MB)
+> 
+> Snapshot 1: AAAA---
+> Snapshot 2: --AAAAA
+> Snapshot 3: -AAAA--
+> 
+> I think the allocated data size is the number of As in total (13 MB).
+> But I suppose this API will just return 7 MB, because it looks on
+> everything an it sees the whole image range (7 MB) to be allocated.  It
+> doesn’t report in how many snapshots some region is allocated.
 
-diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
-index 8115bb6d46..0c9ccd12bf 100644
---- a/hw/ssi/xilinx_spips.c
-+++ b/hw/ssi/xilinx_spips.c
-@@ -1202,6 +1202,18 @@ static void lqspi_load_cache(void *opaque, hwaddr =
-addr)
-     }
- }
-=20
-+static bool lqspi_accepts(void *opaque, hwaddr addr,
-+                          unsigned size, bool is_write,
-+                          MemTxAttrs attrs)
-+{
-+    /*
-+     * From UG1085, Chapter 24 (Quad-SPI controllers):
-+     * - Writes are ignored
-+     * - AXI writes generate an external AXI slave error (SLVERR)
-+     */
-+    return !is_write;
-+}
-+
- static uint64_t
- lqspi_read(void *opaque, hwaddr addr, unsigned int size)
- {
-@@ -1225,6 +1237,7 @@ static const MemoryRegionOps lqspi_ops =3D {
-     .read =3D lqspi_read,
-     .endianness =3D DEVICE_NATIVE_ENDIAN,
-     .valid =3D {
-+        .accepts =3D lqspi_accepts,
-         .min_access_size =3D 1,
-         .max_access_size =3D 4
-     }
---=20
-2.20.1
+Looking at the documentation of rbd_diff_iterate2() [1] they says:
 
+ *                        If the source snapshot name is NULL, we
+ * interpret that as the beginning of time and return all allocated
+ * regions of the image.
+
+But I don't know the answer of your question (maybe Jason can help
+here).
+I should check better the implementation to understand if I can cycle
+on all snapshot to get the exact allocated data size.
+
+https://github.com/ceph/ceph/blob/master/src/include/rbd/librbd.h#L925
+
+I'll back when I have more details on the rbd implementation to better
+answer your questions.
+
+Thanks,
+Stefano
 
