@@ -7,54 +7,54 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DATE_IN_PAST_24_48,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF830C48BD5
-	for <qemu-devel@archiver.kernel.org>; Sat,  6 Jul 2019 11:25:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 502FAC0650E
+	for <qemu-devel@archiver.kernel.org>; Sat,  6 Jul 2019 11:29:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BCFFD20989
-	for <qemu-devel@archiver.kernel.org>; Sat,  6 Jul 2019 11:25:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BCFFD20989
+	by mail.kernel.org (Postfix) with ESMTPS id 069FA20989
+	for <qemu-devel@archiver.kernel.org>; Sat,  6 Jul 2019 11:29:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 069FA20989
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58784 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58806 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hjiom-0008OU-Uz
-	for qemu-devel@archiver.kernel.org; Sat, 06 Jul 2019 07:25:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52345)
+	id 1hjisJ-0003h9-26
+	for qemu-devel@archiver.kernel.org; Sat, 06 Jul 2019 07:29:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52399)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <yi.l.liu@intel.com>) id 1hjiie-0002pA-B2
- for qemu-devel@nongnu.org; Sat, 06 Jul 2019 07:19:06 -0400
+ (envelope-from <yi.l.liu@intel.com>) id 1hjiil-00031Q-E9
+ for qemu-devel@nongnu.org; Sat, 06 Jul 2019 07:19:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yi.l.liu@intel.com>) id 1hjiic-0005qY-AU
- for qemu-devel@nongnu.org; Sat, 06 Jul 2019 07:19:04 -0400
-Received: from mga14.intel.com ([192.55.52.115]:2963)
+ (envelope-from <yi.l.liu@intel.com>) id 1hjiii-0005uM-OJ
+ for qemu-devel@nongnu.org; Sat, 06 Jul 2019 07:19:11 -0400
+Received: from mga14.intel.com ([192.55.52.115]:2961)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1hjiib-0005jy-Ul
- for qemu-devel@nongnu.org; Sat, 06 Jul 2019 07:19:02 -0400
+ (Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1hjiii-0005e0-Bg
+ for qemu-devel@nongnu.org; Sat, 06 Jul 2019 07:19:08 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga005.fm.intel.com ([10.253.24.32])
  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 06 Jul 2019 04:18:53 -0700
+ 06 Jul 2019 04:19:07 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.63,458,1557212400"; d="scan'208";a="363354911"
+X-IronPort-AV: E=Sophos;i="5.63,458,1557212400"; d="scan'208";a="363354999"
 Received: from yiliu-dev.bj.intel.com ([10.238.156.139])
- by fmsmga005.fm.intel.com with ESMTP; 06 Jul 2019 04:18:51 -0700
+ by fmsmga005.fm.intel.com with ESMTP; 06 Jul 2019 04:19:05 -0700
 From: Liu Yi L <yi.l.liu@intel.com>
 To: qemu-devel@nongnu.org, mst@redhat.com, pbonzini@redhat.com,
  alex.williamson@redhat.com, peterx@redhat.com
-Date: Fri,  5 Jul 2019 19:01:34 +0800
-Message-Id: <1562324511-2910-2-git-send-email-yi.l.liu@intel.com>
+Date: Fri,  5 Jul 2019 19:01:39 +0800
+Message-Id: <1562324511-2910-7-git-send-email-yi.l.liu@intel.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1562324511-2910-1-git-send-email-yi.l.liu@intel.com>
 References: <1562324511-2910-1-git-send-email-yi.l.liu@intel.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
 X-Received-From: 192.55.52.115
-Subject: [Qemu-devel] [RFC v1 01/18] linux-headers: import iommu.h from
- kernel
+Subject: [Qemu-devel] [RFC v1 06/18] intel_iommu: support virtual command
+ emulation and pasid request
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,367 +74,303 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch imports the vIOMMU related definitions from kernel
-uapi/iommu.h. e.g. iommu fault report, pasid allocation, guest
-pasid bind and guest iommu cache flush.
+This patch adds virtual command support to Intel vIOMMU per Intel VT-d 3.1
+spec. This patch adds two virtual commands: alloc_pasid and free_pasid.
 
 Cc: Kevin Tian <kevin.tian@intel.com>
 Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
 Cc: Peter Xu <peterx@redhat.com>
-Cc: Eric Auger <eric.auger@redhat.com>
 Cc: Yi Sun <yi.y.sun@linux.intel.com>
 Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
-Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
 Signed-off-by: Yi Sun <yi.y.sun@linux.intel.com>
 ---
- linux-headers/linux/iommu.h | 338 ++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 338 insertions(+)
- create mode 100644 linux-headers/linux/iommu.h
+ hw/i386/intel_iommu.c          | 139 ++++++++++++++++++++++++++++++++++++++++-
+ hw/i386/intel_iommu_internal.h |  30 +++++++++
+ hw/i386/trace-events           |   1 +
+ include/hw/i386/intel_iommu.h  |   6 +-
+ 4 files changed, 174 insertions(+), 2 deletions(-)
 
-diff --git a/linux-headers/linux/iommu.h b/linux-headers/linux/iommu.h
-new file mode 100644
-index 0000000..a9cdc63
---- /dev/null
-+++ b/linux-headers/linux/iommu.h
-@@ -0,0 +1,338 @@
-+/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
-+/*
-+ * IOMMU user API definitions
-+ */
+diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+index 3160a05..3cf250d 100644
+--- a/hw/i386/intel_iommu.c
++++ b/hw/i386/intel_iommu.c
+@@ -932,11 +932,19 @@ static VTDBus *vtd_find_as_from_bus_num(IntelIOMMUState *s, uint8_t bus_num)
+                 s->vtd_as_by_bus_num[bus_num] = vtd_bus;
+                 return vtd_bus;
+             }
++            vtd_bus = NULL;
+         }
+     }
+     return vtd_bus;
+ }
+ 
++static PCIBus *vtd_find_pci_bus_from_bus_num(IntelIOMMUState *s,
++                                             uint8_t bus_num)
++{
++    VTDBus *vtd_bus = vtd_find_as_from_bus_num(s, bus_num);
++    return vtd_bus ? vtd_bus->bus : NULL;
++}
 +
-+#ifndef _UAPI_IOMMU_H
-+#define _UAPI_IOMMU_H
+ /* Given the @iova, get relevant @slptep. @slpte_level will be the last level
+  * of the translation, can be used for deciding the size of large page.
+  */
+@@ -2579,6 +2587,103 @@ static void vtd_handle_iectl_write(IntelIOMMUState *s)
+     }
+ }
+ 
++static int vtd_request_pasid_alloc(IntelIOMMUState *s)
++{
++    PCIBus *bus;
++    int bus_n, devfn;
 +
-+#include <linux/types.h>
++    for (bus_n = 0; bus_n < PCI_BUS_MAX; bus_n++) {
++        bus = vtd_find_pci_bus_from_bus_num(s, bus_n);
++        if (!bus) {
++            continue;
++        }
++        for (devfn = 0; devfn < PCI_DEVFN_MAX; devfn++) {
++            if (pci_device_is_ops_set(bus, devfn)) {
++                return pci_device_request_pasid_alloc(bus, devfn,
++                                                      VTD_MIN_HPASID,
++                                                      VTD_MAX_HPASID);
++            }
++        }
++    }
++    return -1;
++}
 +
-+#define IOMMU_FAULT_PERM_READ	(1 << 0) /* read */
-+#define IOMMU_FAULT_PERM_WRITE	(1 << 1) /* write */
-+#define IOMMU_FAULT_PERM_EXEC	(1 << 2) /* exec */
-+#define IOMMU_FAULT_PERM_PRIV	(1 << 3) /* privileged */
++static int vtd_request_pasid_free(IntelIOMMUState *s, uint32_t pasid)
++{
++    PCIBus *bus;
++    int bus_n, devfn;
 +
-+/* Generic fault types, can be expanded IRQ remapping fault */
-+enum iommu_fault_type {
-+	IOMMU_FAULT_DMA_UNRECOV = 1,	/* unrecoverable fault */
-+	IOMMU_FAULT_PAGE_REQ,		/* page request fault */
++    for (bus_n = 0; bus_n < PCI_BUS_MAX; bus_n++) {
++        bus = vtd_find_pci_bus_from_bus_num(s, bus_n);
++        if (!bus) {
++            continue;
++        }
++        for (devfn = 0; devfn < PCI_DEVFN_MAX; devfn++) {
++            if (pci_device_is_ops_set(bus, devfn)) {
++                return pci_device_request_pasid_free(bus, devfn, pasid);
++            }
++        }
++    }
++    return -1;
++}
++
++/* Handle write to Virtual Command Register */
++static void vtd_handle_vcmd_write(IntelIOMMUState *s)
++{
++    uint32_t status = vtd_get_long_raw(s, DMAR_VCRSP_REG);
++    uint32_t val = vtd_get_long_raw(s, DMAR_VCMD_REG);
++    uint32_t pasid;
++    int ret = -1;
++
++    trace_vtd_reg_write_vcmd(status, val);
++
++    switch (val & VTD_VCMD_CMD_MASK) {
++    case VTD_VCMD_ALLOC_PASID:
++        if (!(s->vccap & VTD_VCCAP_PAS) ||
++             (s->vcrsp & 1)) {
++            break;
++        }
++        s->vcrsp = 1;
++        vtd_set_quad_raw(s, DMAR_VCRSP_REG,
++                         ((uint64_t) s->vcrsp));
++        ret = vtd_request_pasid_alloc(s);
++        if (ret < 0) {
++            s->vcrsp |= VTD_VCRSP_SC(VTD_VCMD_NO_AVAILABLE_PASID);
++        } else {
++            s->vcrsp |= VTD_VCRSP_RSLT(ret);
++        }
++        s->vcrsp &= (~((uint64_t)(0x1)));
++        vtd_set_quad_raw(s, DMAR_VCRSP_REG,
++                         ((uint64_t) s->vcrsp));
++        break;
++
++    case VTD_VCMD_FREE_PASID:
++        if (!(s->vccap & VTD_VCCAP_PAS) ||
++             (s->vcrsp & 1)) {
++            break;
++        }
++        s->vcrsp &= 1;
++        vtd_set_quad_raw(s, DMAR_VCRSP_REG,
++                         ((uint64_t) s->vcrsp));
++        pasid = VTD_VCMD_PASID_VALUE(val);
++        ret = vtd_request_pasid_free(s, pasid);
++        if (ret < 0) {
++            s->vcrsp |= VTD_VCRSP_SC(VTD_VCMD_FREE_INVALID_PASID);
++        }
++        s->vcrsp &= (~((uint64_t)(0x1)));
++        vtd_set_quad_raw(s, DMAR_VCRSP_REG,
++                         ((uint64_t) s->vcrsp));
++        break;
++
++    default:
++        s->vcrsp |= VTD_VCRSP_SC(VTD_VCMD_UNDEFINED_CMD);
++        vtd_set_quad_raw(s, DMAR_VCRSP_REG,
++                         ((uint64_t) s->vcrsp));
++        printf("Virtual Command: unsupported command!!!\n");
++        break;
++    }
++}
++
+ static uint64_t vtd_mem_read(void *opaque, hwaddr addr, unsigned size)
+ {
+     IntelIOMMUState *s = opaque;
+@@ -2620,6 +2725,15 @@ static uint64_t vtd_mem_read(void *opaque, hwaddr addr, unsigned size)
+         val = s->iq >> 32;
+         break;
+ 
++    case DMAR_VCRSP_REG:
++        val = s->vcrsp;
++        break;
++
++    case DMAR_VCRSP_REG_HI:
++        assert(size == 4);
++        val = s->vcrsp >> 32;
++        break;
++
+     default:
+         if (size == 4) {
+             val = vtd_get_long(s, addr);
+@@ -2868,6 +2982,21 @@ static void vtd_mem_write(void *opaque, hwaddr addr,
+         vtd_set_long(s, addr, val);
+         break;
+ 
++    case DMAR_VCMD_REG:
++        if (size == 4) {
++            vtd_set_long(s, addr, val);
++        } else {
++            vtd_set_quad(s, addr, val);
++        }
++        vtd_handle_vcmd_write(s);
++        break;
++
++    case DMAR_VCMD_REG_HI:
++        assert(size == 4);
++        vtd_set_long(s, addr, val);
++        vtd_handle_vcmd_write(s);
++        break;
++
+     default:
+         if (size == 4) {
+             vtd_set_long(s, addr, val);
+@@ -3579,7 +3708,8 @@ static void vtd_init(IntelIOMMUState *s)
+             s->ecap |= VTD_ECAP_SMTS | VTD_ECAP_SRS | VTD_ECAP_SLTS;
+         } else if (!strcmp(s->sm_model, "scalable")) {
+             s->ecap |= VTD_ECAP_SMTS | VTD_ECAP_SRS | VTD_ECAP_PASID
+-                       | VTD_ECAP_FLTS;
++                       | VTD_ECAP_FLTS | VTD_ECAP_VCS;
++            s->vccap |= VTD_VCCAP_PAS;
+         } else {
+             printf("\n!!!!! Invalid sm_model config !!!!!\n"
+                 "Please config sm_model=[\"legacy\"|\"scalable\"]\n"
+@@ -3641,6 +3771,13 @@ static void vtd_init(IntelIOMMUState *s)
+      * Interrupt remapping registers.
+      */
+     vtd_define_quad(s, DMAR_IRTA_REG, 0, 0xfffffffffffff80fULL, 0);
++
++    /*
++     * Virtual Command Definitions
++     */
++    vtd_define_quad(s, DMAR_VCCAP_REG, s->vccap, 0, 0);
++    vtd_define_quad(s, DMAR_VCMD_REG, 0, 0xffffffffffffffffULL, 0);
++    vtd_define_quad(s, DMAR_VCRSP_REG, 0, 0, 0);
+ }
+ 
+ /* Should not reset address_spaces when reset because devices will still use
+diff --git a/hw/i386/intel_iommu_internal.h b/hw/i386/intel_iommu_internal.h
+index adae198..f5a2f0d 100644
+--- a/hw/i386/intel_iommu_internal.h
++++ b/hw/i386/intel_iommu_internal.h
+@@ -85,6 +85,12 @@
+ #define DMAR_MTRRCAP_REG_HI     0x104
+ #define DMAR_MTRRDEF_REG        0x108 /* MTRR default type */
+ #define DMAR_MTRRDEF_REG_HI     0x10c
++#define DMAR_VCCAP_REG          0xE00 /* Virtual Command Capability Register */
++#define DMAR_VCCAP_REG_HI       0xE04
++#define DMAR_VCMD_REG           0xE10 /* Virtual Command Register */
++#define DMAR_VCMD_REG_HI        0xE14
++#define DMAR_VCRSP_REG          0xE20 /* Virtual Command Reponse Register */
++#define DMAR_VCRSP_REG_HI       0xE24
+ 
+ /* IOTLB registers */
+ #define DMAR_IOTLB_REG_OFFSET   0xf0 /* Offset to the IOTLB registers */
+@@ -192,6 +198,7 @@
+ #define VTD_ECAP_SRS                (1ULL << 31)
+ #define VTD_ECAP_PASID              (1ULL << 40)
+ #define VTD_ECAP_SMTS               (1ULL << 43)
++#define VTD_ECAP_VCS                (1ULL << 44)
+ #define VTD_ECAP_SLTS               (1ULL << 46)
+ #define VTD_ECAP_FLTS               (1ULL << 47)
+ 
+@@ -314,6 +321,29 @@ typedef enum VTDFaultReason {
+ 
+ #define VTD_CONTEXT_CACHE_GEN_MAX       0xffffffffUL
+ 
++/* VCCAP_REG */
++#define VTD_VCCAP_PAS               (1UL << 0)
++#define VTD_MIN_HPASID              200
++#define VTD_MAX_HPASID              0xFFFFF
++
++/* Virtual Command Register */
++enum {
++     VTD_VCMD_NULL_CMD = 0,
++     VTD_VCMD_ALLOC_PASID,
++     VTD_VCMD_FREE_PASID,
++     VTD_VCMD_CMD_NUM,
 +};
 +
-+enum iommu_fault_reason {
-+	IOMMU_FAULT_REASON_UNKNOWN = 0,
++#define VTD_VCMD_CMD_MASK           0xffUL
++#define VTD_VCMD_PASID_VALUE(val)   (((val) >> 8) & 0xfffff)
 +
-+	/* Could not access the PASID table (fetch caused external abort) */
-+	IOMMU_FAULT_REASON_PASID_FETCH,
++#define VTD_VCRSP_RSLT(val)         ((val) << 8)
++#define VTD_VCRSP_SC(val)           (((val) & 0x3) << 1)
 +
-+	/* PASID entry is invalid or has configuration errors */
-+	IOMMU_FAULT_REASON_BAD_PASID_ENTRY,
++#define VTD_VCMD_UNDEFINED_CMD         1ULL
++#define VTD_VCMD_NO_AVAILABLE_PASID    2ULL
++#define VTD_VCMD_FREE_INVALID_PASID    2ULL
 +
-+	/*
-+	 * PASID is out of range (e.g. exceeds the maximum PASID
-+	 * supported by the IOMMU) or disabled.
-+	 */
-+	IOMMU_FAULT_REASON_PASID_INVALID,
+ /* Interrupt Entry Cache Invalidation Descriptor: VT-d 6.5.2.7. */
+ struct VTDInvDescIEC {
+     uint32_t type:4;            /* Should always be 0x4 */
+diff --git a/hw/i386/trace-events b/hw/i386/trace-events
+index c8bc464..43c0314 100644
+--- a/hw/i386/trace-events
++++ b/hw/i386/trace-events
+@@ -51,6 +51,7 @@ vtd_reg_write_gcmd(uint32_t status, uint32_t val) "status 0x%"PRIx32" value 0x%"
+ vtd_reg_write_fectl(uint32_t value) "value 0x%"PRIx32
+ vtd_reg_write_iectl(uint32_t value) "value 0x%"PRIx32
+ vtd_reg_ics_clear_ip(void) ""
++vtd_reg_write_vcmd(uint32_t status, uint32_t val) "status 0x%"PRIx32" value 0x%"PRIx32
+ vtd_dmar_translate(uint8_t bus, uint8_t slot, uint8_t func, uint64_t iova, uint64_t gpa, uint64_t mask) "dev %02x:%02x.%02x iova 0x%"PRIx64" -> gpa 0x%"PRIx64" mask 0x%"PRIx64
+ vtd_dmar_enable(bool en) "enable %d"
+ vtd_dmar_fault(uint16_t sid, int fault, uint64_t addr, bool is_write) "sid 0x%"PRIx16" fault %d addr 0x%"PRIx64" write %d"
+diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.h
+index b51cc9f..4b74f3d 100644
+--- a/include/hw/i386/intel_iommu.h
++++ b/include/hw/i386/intel_iommu.h
+@@ -46,7 +46,7 @@
+ #define VTD_SID_TO_BUS(sid)         (((sid) >> 8) & 0xff)
+ #define VTD_SID_TO_DEVFN(sid)       ((sid) & 0xff)
+ 
+-#define DMAR_REG_SIZE               0x230
++#define DMAR_REG_SIZE               0xF00
+ #define VTD_HOST_AW_39BIT           39
+ #define VTD_HOST_AW_48BIT           48
+ #define VTD_HOST_ADDRESS_WIDTH      VTD_HOST_AW_39BIT
+@@ -272,6 +272,10 @@ struct IntelIOMMUState {
+     bool dma_drain;                 /* Whether DMA r/w draining enabled */
+     char *sm_model;          /* identify actual scalable mode iommu model*/
+ 
++    /* Virtual Command Register */
++    uint64_t vccap;                 /* The value of vcmd capability reg */
++    uint64_t vcrsp;                 /* Current value of VCMD RSP REG */
 +
-+	/*
-+	 * An external abort occurred fetching (or updating) a translation
-+	 * table descriptor
-+	 */
-+	IOMMU_FAULT_REASON_WALK_EABT,
-+
-+	/*
-+	 * Could not access the page table entry (Bad address),
-+	 * actual translation fault
-+	 */
-+	IOMMU_FAULT_REASON_PTE_FETCH,
-+
-+	/* Protection flag check failed */
-+	IOMMU_FAULT_REASON_PERMISSION,
-+
-+	/* access flag check failed */
-+	IOMMU_FAULT_REASON_ACCESS,
-+
-+	/* Output address of a translation stage caused Address Size fault */
-+	IOMMU_FAULT_REASON_OOR_ADDRESS,
-+};
-+
-+/**
-+ * struct iommu_fault_unrecoverable - Unrecoverable fault data
-+ * @reason: reason of the fault, from &enum iommu_fault_reason
-+ * @flags: parameters of this fault (IOMMU_FAULT_UNRECOV_* values)
-+ * @pasid: Process Address Space ID
-+ * @perm: Requested permission access using by the incoming transaction
-+ *        (IOMMU_FAULT_PERM_* values)
-+ * @addr: offending page address
-+ * @fetch_addr: address that caused a fetch abort, if any
-+ */
-+struct iommu_fault_unrecoverable {
-+	__u32	reason;
-+#define IOMMU_FAULT_UNRECOV_PASID_VALID		(1 << 0)
-+#define IOMMU_FAULT_UNRECOV_ADDR_VALID		(1 << 1)
-+#define IOMMU_FAULT_UNRECOV_FETCH_ADDR_VALID	(1 << 2)
-+	__u32	flags;
-+	__u32	pasid;
-+	__u32	perm;
-+	__u64	addr;
-+	__u64	fetch_addr;
-+};
-+
-+/**
-+ * struct iommu_fault_page_request - Page Request data
-+ * @flags: encodes whether the corresponding fields are valid and whether this
-+ *         is the last page in group (IOMMU_FAULT_PAGE_REQUEST_* values)
-+ * @pasid: Process Address Space ID
-+ * @grpid: Page Request Group Index
-+ * @perm: requested page permissions (IOMMU_FAULT_PERM_* values)
-+ * @addr: page address
-+ * @private_data: device-specific private information
-+ */
-+struct iommu_fault_page_request {
-+#define IOMMU_FAULT_PAGE_REQUEST_PASID_VALID	(1 << 0)
-+#define IOMMU_FAULT_PAGE_REQUEST_LAST_PAGE	(1 << 1)
-+#define IOMMU_FAULT_PAGE_REQUEST_PRIV_DATA	(1 << 2)
-+	__u32	flags;
-+	__u32	pasid;
-+	__u32	grpid;
-+	__u32	perm;
-+	__u64	addr;
-+	__u64	private_data[2];
-+};
-+
-+/**
-+ * struct iommu_fault - Generic fault data
-+ * @type: fault type from &enum iommu_fault_type
-+ * @padding: reserved for future use (should be zero)
-+ * @event: Fault event, when @type is %IOMMU_FAULT_DMA_UNRECOV
-+ * @prm: Page Request message, when @type is %IOMMU_FAULT_PAGE_REQ
-+ */
-+struct iommu_fault {
-+	__u32	type;
-+	__u32	padding;
-+	union {
-+		struct iommu_fault_unrecoverable event;
-+		struct iommu_fault_page_request prm;
-+	};
-+};
-+
-+/**
-+ * struct iommu_pasid_smmuv3 - ARM SMMUv3 Stream Table Entry stage 1 related
-+ *     information
-+ * @version: API version of this structure
-+ * @s1fmt: STE s1fmt (format of the CD table: single CD, linear table
-+ *         or 2-level table)
-+ * @s1dss: STE s1dss (specifies the behavior when @pasid_bits != 0
-+ *         and no PASID is passed along with the incoming transaction)
-+ * @padding: reserved for future use (should be zero)
-+ *
-+ * The PASID table is referred to as the Context Descriptor (CD) table on ARM
-+ * SMMUv3. Please refer to the ARM SMMU 3.x spec (ARM IHI 0070A) for full
-+ * details.
-+ */
-+struct iommu_pasid_smmuv3 {
-+#define PASID_TABLE_SMMUV3_CFG_VERSION_1 1
-+	__u32	version;
-+	__u8	s1fmt;
-+	__u8	s1dss;
-+	__u8	padding[2];
-+};
-+
-+/**
-+ * struct iommu_pasid_table_config - PASID table data used to bind guest PASID
-+ *     table to the host IOMMU
-+ * @version: API version to prepare for future extensions
-+ * @format: format of the PASID table
-+ * @base_ptr: guest physical address of the PASID table
-+ * @pasid_bits: number of PASID bits used in the PASID table
-+ * @config: indicates whether the guest translation stage must
-+ *          be translated, bypassed or aborted.
-+ * @padding: reserved for future use (should be zero)
-+ * @smmuv3: table information when @format is %IOMMU_PASID_FORMAT_SMMUV3
-+ */
-+struct iommu_pasid_table_config {
-+#define PASID_TABLE_CFG_VERSION_1 1
-+	__u32	version;
-+#define IOMMU_PASID_FORMAT_SMMUV3	1
-+	__u32	format;
-+	__u64	base_ptr;
-+	__u8	pasid_bits;
-+#define IOMMU_PASID_CONFIG_TRANSLATE	1
-+#define IOMMU_PASID_CONFIG_BYPASS	2
-+#define IOMMU_PASID_CONFIG_ABORT	3
-+	__u8	config;
-+	__u8    padding[6];
-+	union {
-+		struct iommu_pasid_smmuv3 smmuv3;
-+	};
-+};
-+
-+/* defines the granularity of the invalidation */
-+enum iommu_inv_granularity {
-+	IOMMU_INV_GRANU_DOMAIN,	/* domain-selective invalidation */
-+	IOMMU_INV_GRANU_PASID,	/* PASID-selective invalidation */
-+	IOMMU_INV_GRANU_ADDR,	/* page-selective invalidation */
-+	IOMMU_INV_GRANU_NR,	/* number of invalidation granularities */
-+};
-+
-+/**
-+ * struct iommu_inv_addr_info - Address Selective Invalidation Structure
-+ *
-+ * @flags: indicates the granularity of the address-selective invalidation
-+ * - If the PASID bit is set, the @pasid field is populated and the invalidation
-+ *   relates to cache entries tagged with this PASID and matching the address
-+ *   range.
-+ * - If ARCHID bit is set, @archid is populated and the invalidation relates
-+ *   to cache entries tagged with this architecture specific ID and matching
-+ *   the address range.
-+ * - Both PASID and ARCHID can be set as they may tag different caches.
-+ * - If neither PASID or ARCHID is set, global addr invalidation applies.
-+ * - The LEAF flag indicates whether only the leaf PTE caching needs to be
-+ *   invalidated and other paging structure caches can be preserved.
-+ * @pasid: process address space ID
-+ * @archid: architecture-specific ID
-+ * @addr: first stage/level input address
-+ * @granule_size: page/block size of the mapping in bytes
-+ * @nb_granules: number of contiguous granules to be invalidated
-+ */
-+struct iommu_inv_addr_info {
-+#define IOMMU_INV_ADDR_FLAGS_PASID	(1 << 0)
-+#define IOMMU_INV_ADDR_FLAGS_ARCHID	(1 << 1)
-+#define IOMMU_INV_ADDR_FLAGS_LEAF	(1 << 2)
-+	__u32	flags;
-+	__u32	archid;
-+	__u64	pasid;
-+	__u64	addr;
-+	__u64	granule_size;
-+	__u64	nb_granules;
-+};
-+
-+/**
-+ * struct iommu_inv_pasid_info - PASID Selective Invalidation Structure
-+ *
-+ * @flags: indicates the granularity of the PASID-selective invalidation
-+ * - If the PASID bit is set, the @pasid field is populated and the invalidation
-+ *   relates to cache entries tagged with this PASID and matching the address
-+ *   range.
-+ * - If the ARCHID bit is set, the @archid is populated and the invalidation
-+ *   relates to cache entries tagged with this architecture specific ID and
-+ *   matching the address range.
-+ * - Both PASID and ARCHID can be set as they may tag different caches.
-+ * - At least one of PASID or ARCHID must be set.
-+ * @pasid: process address space ID
-+ * @archid: architecture-specific ID
-+ */
-+struct iommu_inv_pasid_info {
-+#define IOMMU_INV_PASID_FLAGS_PASID	(1 << 0)
-+#define IOMMU_INV_PASID_FLAGS_ARCHID	(1 << 1)
-+	__u32	flags;
-+	__u32	archid;
-+	__u64	pasid;
-+};
-+
-+/**
-+ * struct iommu_cache_invalidate_info - First level/stage invalidation
-+ *     information
-+ * @version: API version of this structure
-+ * @cache: bitfield that allows to select which caches to invalidate
-+ * @granularity: defines the lowest granularity used for the invalidation:
-+ *     domain > PASID > addr
-+ * @padding: reserved for future use (should be zero)
-+ * @pasid_info: invalidation data when @granularity is %IOMMU_INV_GRANU_PASID
-+ * @addr_info: invalidation data when @granularity is %IOMMU_INV_GRANU_ADDR
-+ *
-+ * Not all the combinations of cache/granularity are valid:
-+ *
-+ * +--------------+---------------+---------------+---------------+
-+ * | type /       |   DEV_IOTLB   |     IOTLB     |      PASID    |
-+ * | granularity  |               |               |      cache    |
-+ * +==============+===============+===============+===============+
-+ * | DOMAIN       |       N/A     |       Y       |       Y       |
-+ * +--------------+---------------+---------------+---------------+
-+ * | PASID        |       Y       |       Y       |       Y       |
-+ * +--------------+---------------+---------------+---------------+
-+ * | ADDR         |       Y       |       Y       |       N/A     |
-+ * +--------------+---------------+---------------+---------------+
-+ *
-+ * Invalidations by %IOMMU_INV_GRANU_DOMAIN don't take any argument other than
-+ * @version and @cache.
-+ *
-+ * If multiple cache types are invalidated simultaneously, they all
-+ * must support the used granularity.
-+ */
-+struct iommu_cache_invalidate_info {
-+#define IOMMU_CACHE_INVALIDATE_INFO_VERSION_1 1
-+	__u32	version;
-+/* IOMMU paging structure cache */
-+#define IOMMU_CACHE_INV_TYPE_IOTLB	(1 << 0) /* IOMMU IOTLB */
-+#define IOMMU_CACHE_INV_TYPE_DEV_IOTLB	(1 << 1) /* Device IOTLB */
-+#define IOMMU_CACHE_INV_TYPE_PASID	(1 << 2) /* PASID cache */
-+#define IOMMU_CACHE_INV_TYPE_NR		(3)
-+	__u8	cache;
-+	__u8	granularity;
-+	__u8	padding[2];
-+	union {
-+		struct iommu_inv_pasid_info pasid_info;
-+		struct iommu_inv_addr_info addr_info;
-+	};
-+};
-+
-+/**
-+ * struct gpasid_bind_data_vtd - Intel VT-d specific data on device and guest
-+ * SVA binding.
-+ *
-+ * @flags:	VT-d PASID table entry attributes
-+ * @pat:	Page attribute table data to compute effective memory type
-+ * @emt:	Extended memory type
-+ *
-+ * Only guest vIOMMU selectable and effective options are passed down to
-+ * the host IOMMU.
-+ */
-+struct gpasid_bind_data_vtd {
-+#define IOMMU_SVA_VTD_GPASID_SRE	(1 << 0) /* supervisor request */
-+#define IOMMU_SVA_VTD_GPASID_EAFE	(1 << 1) /* extended access enable */
-+#define IOMMU_SVA_VTD_GPASID_PCD	(1 << 2) /* page-level cache disable */
-+#define IOMMU_SVA_VTD_GPASID_PWT	(1 << 3) /* page-level write through */
-+#define IOMMU_SVA_VTD_GPASID_EMTE	(1 << 4) /* extended mem type enable */
-+#define IOMMU_SVA_VTD_GPASID_CD		(1 << 5) /* PASID-level cache disable */
-+	__u64 flags;
-+	__u32 pat;
-+	__u32 emt;
-+};
-+
-+/**
-+ * struct gpasid_bind_data - Information about device and guest PASID binding
-+ * @version:	Version of this data structure
-+ * @format:	PASID table entry format
-+ * @flags:	Additional information on guest bind request
-+ * @gpgd:	Guest page directory base of the guest mm to bind
-+ * @hpasid:	Process address space ID used for the guest mm in host IOMMU
-+ * @gpasid:	Process address space ID used for the guest mm in guest IOMMU
-+ * @addr_width:	Guest virtual address width
-+ * @vtd:	Intel VT-d specific data
-+ *
-+ * Guest to host PASID mapping can be an identity or non-identity, where guest
-+ * has its own PASID space. For non-identify mapping, guest to host PASID lookup
-+ * is needed when VM programs guest PASID into an assigned device. VMM may
-+ * trap such PASID programming then request host IOMMU driver to convert guest
-+ * PASID to host PASID based on this bind data.
-+ */
-+struct gpasid_bind_data {
-+#define IOMMU_GPASID_BIND_VERSION_1	1
-+	__u32 version;
-+#define IOMMU_PASID_FORMAT_INTEL_VTD	1
-+	__u32 format;
-+#define IOMMU_SVA_GPASID_VAL	(1 << 0) /* guest PASID valid */
-+	__u64 flags;
-+	__u64 gpgd;
-+	__u64 hpasid;
-+	__u64 gpasid;
-+	__u32 addr_width;
-+	__u8  padding[4];
-+	/* Vendor specific data */
-+	union {
-+		struct gpasid_bind_data_vtd vtd;
-+	};
-+};
-+
-+#endif /* _UAPI_IOMMU_H */
+     /*
+      * Protects IOMMU states in general.  Currently it protects the
+      * per-IOMMU IOTLB cache, and context entry cache in VTDAddressSpace.
 -- 
 2.7.4
 
