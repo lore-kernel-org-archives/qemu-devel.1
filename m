@@ -6,60 +6,60 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A357C5B57D
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 22:46:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F09F4C5B57D
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 22:47:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F228A2147A
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 22:46:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F228A2147A
+	by mail.kernel.org (Postfix) with ESMTPS id C826A2147A
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 22:47:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C826A2147A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56724 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56728 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hjWym-0005ly-8s
-	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 18:46:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55067)
+	id 1hjWyr-00068J-Tm
+	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 18:47:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55373)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <ehabkost@redhat.com>) id 1hjWUr-0007u8-1T
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 18:16:05 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1hjWVt-0008Md-C2
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 18:17:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1hjWUq-0003ay-0T
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 18:16:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59986)
+ (envelope-from <ehabkost@redhat.com>) id 1hjWVq-00041w-Ny
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 18:17:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43980)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hjWUp-0003aj-PX
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 18:15:59 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hjWVo-0003v1-VK
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 18:17:01 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 215383082E06;
- Fri,  5 Jul 2019 22:15:59 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 3EB4B8535D;
+ Fri,  5 Jul 2019 22:16:38 +0000 (UTC)
 Received: from localhost (ovpn-116-30.gru2.redhat.com [10.97.116.30])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A6DF19D90A;
- Fri,  5 Jul 2019 22:15:58 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C3CA44C7;
+ Fri,  5 Jul 2019 22:16:37 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>,
  Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
  Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
  Richard Henderson <rth@twiddle.net>
-Date: Fri,  5 Jul 2019 19:14:42 -0300
-Message-Id: <20190705221504.25166-21-ehabkost@redhat.com>
+Date: Fri,  5 Jul 2019 19:15:00 -0300
+Message-Id: <20190705221504.25166-39-ehabkost@redhat.com>
 In-Reply-To: <20190705221504.25166-1-ehabkost@redhat.com>
 References: <20190705221504.25166-1-ehabkost@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Fri, 05 Jul 2019 22:15:59 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.25]); Fri, 05 Jul 2019 22:16:38 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL v6 20/42] deprecate -mem-path fallback to
- anonymous RAM
+Subject: [Qemu-devel] [PULL v6 38/42] docs: Deprecate CPU model runnability
+ guarantees
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,76 +71,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Igor Mammedov <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Igor Mammedov <imammedo@redhat.com>
+Document that CPU model runnability guarantees won't apply to
+unversioned CPU models anymore.
 
-Fallback might affect guest or worse whole host performance
-or functionality if backing file were used to share guest RAM
-with another process.
-
-Patch deprecates fallback so that we could remove it in future
-and ensure that QEMU will provide expected behavior and fail if
-it can't use user provided backing file.
-
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+Message-Id: <20190628002844.24894-9-ehabkost@redhat.com>
 Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <20190626074228.11558-1-imammedo@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- hw/core/numa.c       | 6 ++++--
- qemu-deprecated.texi | 9 +++++++++
- 2 files changed, 13 insertions(+), 2 deletions(-)
+ qemu-deprecated.texi | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
 
-diff --git a/hw/core/numa.c b/hw/core/numa.c
-index cb5fdbcb1e..dd5c6e2334 100644
---- a/hw/core/numa.c
-+++ b/hw/core/numa.c
-@@ -479,8 +479,10 @@ static void allocate_system_memory_nonnuma(MemoryReg=
-ion *mr, Object *owner,
-             if (mem_prealloc) {
-                 exit(1);
-             }
--            error_report("falling back to regular RAM allocation.");
--
-+            warn_report("falling back to regular RAM allocation");
-+            error_printf("This is deprecated. Make sure that -mem-path "
-+                         " specified path has sufficient resources to al=
-locate"
-+                         " -m specified RAM amount");
-             /* Legacy behavior: if allocation failed, fall back to
-              * regular RAM allocation.
-              */
 diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-index 4a626f535d..e6891c3a93 100644
+index e6891c3a93..c90b08d553 100644
 --- a/qemu-deprecated.texi
 +++ b/qemu-deprecated.texi
-@@ -112,6 +112,15 @@ QEMU using implicit generic or board specific splitt=
-ing rule.
- Use @option{memdev} with @var{memory-backend-ram} backend or @option{mem=
-} (if
- it's supported by used machine type) to define mapping explictly instead=
-.
-=20
-+@subsection -mem-path fallback to RAM (since 4.1)
-+Currently if guest RAM allocation from file pointed by @option{mem-path}
-+fails, QEMU falls back to allocating from RAM, which might result
-+in unpredictable behavior since the backing file specified by the user
-+is ignored. In the future, users will be responsible for making sure
-+the backing storage specified with @option{-mem-path} can actually provi=
-de
-+the guest RAM configured with @option{-m} and QEMU will fail to start up=
- if
-+RAM allocation is unsuccessful.
+@@ -292,3 +292,22 @@ subset of the image.
+ In the future, QEMU will require Python 3 to be available at
+ build time.  Support for Python 2 in scripts shipped with QEMU
+ is deprecated.
 +
- @section QEMU Machine Protocol (QMP) commands
-=20
- @subsection block-dirty-bitmap-add "autoload" parameter (since 2.12.0)
++@section Backwards compatibility
++
++@subsection Runnability guarantee of CPU models (since 4.1.0)
++
++Previous versions of QEMU never changed existing CPU models in
++ways that introduced additional host software or hardware
++requirements to the VM.  This allowed management software to
++safely change the machine type of an existing VM without
++introducing new requirements ("runnability guarantee").  This
++prevented CPU models from being updated to include CPU
++vulnerability mitigations, leaving guests vulnerable in the
++default configuration.
++
++The CPU model runnability guarantee won't apply anymore to
++existing CPU models.  Management software that needs runnability
++guarantees must resolve the CPU model aliases using te
++``alias-of'' field returned by the ``query-cpu-definitions'' QMP
++command.
 --=20
 2.18.0.rc1.1.g3f1ff2140
 
