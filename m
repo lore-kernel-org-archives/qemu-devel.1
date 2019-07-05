@@ -2,59 +2,91 @@ Return-Path: <SRS0=wUMn=VC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C62DCC4649E
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 16:21:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 696FCC46499
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 16:22:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9F12E216FD
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 16:21:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F12E216FD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 34F29216E3
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 16:22:56 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d+uCwv11"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 34F29216E3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54748 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54782 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hjQxQ-0001gy-QA
-	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 12:21:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42291)
+	id 1hjQz9-0003qN-CY
+	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 12:22:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41905)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hjQoi-0002hH-Ae
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 12:12:10 -0400
+ (envelope-from <frasse.iglesias@gmail.com>) id 1hjQnT-0001Yg-BF
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 12:10:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hjQog-0008Mz-9T
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 12:12:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57748)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>)
- id 1hjQoW-0007p5-T0; Fri, 05 Jul 2019 12:11:58 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id C963EC057EC6;
- Fri,  5 Jul 2019 16:11:52 +0000 (UTC)
-Received: from x1w.redhat.com (ovpn-204-45.brq.redhat.com [10.40.204.45])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id CC5FD80A33;
- Fri,  5 Jul 2019 16:11:46 +0000 (UTC)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Fri,  5 Jul 2019 18:11:44 +0200
-Message-Id: <20190705161144.18533-1-philmd@redhat.com>
+ (envelope-from <frasse.iglesias@gmail.com>) id 1hjQnQ-0004zO-Tp
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 12:10:50 -0400
+Received: from mail-lf1-x142.google.com ([2a00:1450:4864:20::142]:34239)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <frasse.iglesias@gmail.com>)
+ id 1hjQnQ-0004vB-LO; Fri, 05 Jul 2019 12:10:48 -0400
+Received: by mail-lf1-x142.google.com with SMTP id b29so6699497lfq.1;
+ Fri, 05 Jul 2019 09:10:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:content-transfer-encoding:in-reply-to
+ :user-agent; bh=awTb69l5hLwdxql4WcINY2RSzlnobwbnmh6DKscJkCs=;
+ b=d+uCwv11FOleIZ1FDQN4UBLkz7KfUeu7ZadYGhd1UBl8s6G+pS6muGOobED/NAViia
+ 8a9SmQrGK35Yug2tAR4dz7OaW3eOEYVl6OmdL4mAJXDj4Jh0HDktML7cLnK8s4WZmiu5
+ onyspJ9Eeji+5vsCAVaCpGbGVoNc90SniwfICpS5LumhcnQ70t53kPC5GTFRd//KCsEN
+ wiDzzyMG6AUUbkLB2PqvvhaSTKKJxPFrkHxBiFyrVxMDUluu88JPEyxpgbRFA+bSV1zd
+ 1XcOY59GWxMBJn+rReemJ7LXju4Zgo6R8XITrTjESWugceM/9YY0ZsMOoEaneiQdbaW5
+ C6/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to:user-agent;
+ bh=awTb69l5hLwdxql4WcINY2RSzlnobwbnmh6DKscJkCs=;
+ b=I/qof5VBKVVzgj20NBNqw3xe3D8vxYuKaflZ56b4wWb0BfhAUHVzhrkBQoiMTNi0pZ
+ iePaxYoyLaWvjJUbdVjquX2SXMfTfscrXoyVNpdeRc/zZiXeV3j1hfmU9WgSHvlHn4qn
+ xxx6+pd0EYypFJCb0VjhLqP1CWPNlb8HJzjuhvXQ5PY3r37HfwP6UlDtAbQqP+apVBFr
+ pIjhse/xKyzmrXhQ8lcdfk/UJdqsgHnPmMH8IlaqKM9l0EdKfz2Tn2kHUHXrzmX0TsVI
+ dxBojaZqmKj35Mh9b4iSzCJlAi2CZVc7jJo9IV7oocoeT/mt3u+eJrjsRvXQzh1AMaF/
+ PVUQ==
+X-Gm-Message-State: APjAAAURkvrZtnv8g7mGcGyOKa7LzoFO4BxQPXCcaVdrH1kksBcLWuqE
+ E/a9tgRRjFhUoOTq//c6fw4=
+X-Google-Smtp-Source: APXvYqy+/0D2BiTouDsLNur5euF4Pr0AUC9wlmA/oKzp1uxAwIScv+JjRb1Wl4SC7F8tcRFVuMo0+g==
+X-Received: by 2002:ac2:44b1:: with SMTP id c17mr2348205lfm.87.1562343046995; 
+ Fri, 05 Jul 2019 09:10:46 -0700 (PDT)
+Received: from fralle-msi (31-208-27-151.cust.bredband2.com. [31.208.27.151])
+ by smtp.gmail.com with ESMTPSA id
+ 137sm1845140ljj.46.2019.07.05.09.10.46
+ (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+ Fri, 05 Jul 2019 09:10:46 -0700 (PDT)
+Date: Fri, 5 Jul 2019 18:10:44 +0200
+From: Francisco Iglesias <frasse.iglesias@gmail.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Message-ID: <20190705161044.pyfkofyz6llg4ztn@fralle-msi>
+References: <20190705150850.4967-1-philmd@redhat.com>
+ <20190705150850.4967-3-philmd@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.32]); Fri, 05 Jul 2019 16:11:54 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH-for-4.1] Revert "hw/block/pflash_cfi02: Reduce
- I/O accesses to 16-bit"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190705150850.4967-3-philmd@redhat.com>
+User-Agent: NeoMutt/20170113 (1.7.2)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::142
+Subject: Re: [Qemu-devel] [PATCH v3 2/2] hw/ssi/xilinx_spips: Avoid AXI
+ writes to the LQSPI linear memory
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,94 +98,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Stephen Checkoway <stephen.checkoway@oberlin.edu>, qemu-block@nongnu.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Alistair Francis <alistair.francis@wdc.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Alistair Francis <alistair@alistair23.me>, qemu-devel@nongnu.org,
+ Prasad J Pandit <ppandit@redhat.com>, Lei Sun <slei.casper@gmail.com>,
+ qemu-arm@nongnu.org, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Stephen Checkoway noticed commit 3ae0343db69 is incorrect.
-This commit state all parallel flashes are limited to 16-bit
-accesses, however the x32 configuration exists in some models,
-such the Cypress S29CL032J, which CFI Device Geometry Definition
-announces:
+Hi Philippe,
 
-  CFI ADDR     DATA
-  0x28,0x29 =3D 0x0003 (x32-only asynchronous interface)
+On [2019 Jul 05] Fri 17:08:50, Philippe Mathieu-Daudé wrote:
+> Lei Sun found while auditing the code than a CPU write would
 
-Guests should not be affected by the previous change, because
-QEMU does not announce itself as x32 capable:
+s/than/that/
 
-    /* Flash device interface (8 & 16 bits) */
-    pfl->cfi_table[0x28] =3D 0x02;
-    pfl->cfi_table[0x29] =3D 0x00;
+> trigger a NULL pointer deference.
 
-Commit 3ae0343db69 does not restrict the bus to 16-bit accesses,
-but restrict the implementation as 16-bit access max, so a guest
-32-bit access will result in 2x 16-bit calls.
+s/deference/dereference/
 
-Now, we have 2 boards that register the flash device in 32-bit
-access:
+> 
+> From UG1085 datasheet [*] AXI writes in this region are ignored
+> and generates an External Slave Error (SLVERR).
 
-- PPC: taihu_405ep
+s/External/AXI/
 
-  The CFI id matches the S29AL008J that is a 1MB in x16, while
-  the code QEMU forces it to be 2MB, and checking Linux it expects
-  a 4MB flash.
+> 
+> Fix by implementing the write_with_attrs() handler.
+> Return MEMTX_ERROR  when the region is accessed  (this error maps
 
-- ARM: Digic4
+There is an extra whitespace after 'MEMTX_ERROR' and also after
+'accessed'.
 
-  While the comment says "Samsung K8P3215UQB 64M Bit (4Mx16)",
-  this flash is 32Mb (2MB). Also note the CFI id does not match
-  the comment.
+Sorry for not mentioning above before, after correcting this cosmetica:
 
-To avoid unexpected side effect, we revert commit 3ae0343db69,
-and will clean the board code later.
+Reviewed-by: Francisco Iglesias <frasse.iglesias@gmail.com>
 
-Reported-by: Stephen Checkoway <stephen.checkoway@oberlin.edu>
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- hw/block/pflash_cfi02.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+Best regards,
+Francisco Iglesias
 
-diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
-index 5392290c72..83084b9d72 100644
---- a/hw/block/pflash_cfi02.c
-+++ b/hw/block/pflash_cfi02.c
-@@ -317,6 +317,8 @@ static uint64_t pflash_read(void *opaque, hwaddr offs=
-et, unsigned int width)
-     boff =3D offset & 0xFF;
-     if (pfl->width =3D=3D 2) {
-         boff =3D boff >> 1;
-+    } else if (pfl->width =3D=3D 4) {
-+        boff =3D boff >> 2;
-     }
-     switch (pfl->cmd) {
-     default:
-@@ -447,6 +449,8 @@ static void pflash_write(void *opaque, hwaddr offset,=
- uint64_t value,
-     boff =3D offset;
-     if (pfl->width =3D=3D 2) {
-         boff =3D boff >> 1;
-+    } else if (pfl->width =3D=3D 4) {
-+        boff =3D boff >> 2;
-     }
-     /* Only the least-significant 11 bits are used in most cases. */
-     boff &=3D 0x7FF;
-@@ -706,7 +710,6 @@ static void pflash_write(void *opaque, hwaddr offset,=
- uint64_t value,
- static const MemoryRegionOps pflash_cfi02_ops =3D {
-     .read =3D pflash_read,
-     .write =3D pflash_write,
--    .impl.max_access_size =3D 2,
-     .valid.min_access_size =3D 1,
-     .valid.max_access_size =3D 4,
-     .endianness =3D DEVICE_NATIVE_ENDIAN,
---=20
-2.20.1
-
+> to an AXI slave error).
+> 
+> [*] https://www.xilinx.com/support/documentation/user_guides/ug1085-zynq-ultrascale-trm.pdf
+> 
+> Reported-by: Lei Sun <slei.casper@gmail.com>
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> ---
+>  hw/ssi/xilinx_spips.c | 16 ++++++++++++++++
+>  1 file changed, 16 insertions(+)
+> 
+> diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
+> index e80619aece..4c0b0aa3c9 100644
+> --- a/hw/ssi/xilinx_spips.c
+> +++ b/hw/ssi/xilinx_spips.c
+> @@ -1221,8 +1221,24 @@ static MemTxResult lqspi_read(void *opaque, hwaddr addr, uint64_t *value,
+>      return MEMTX_OK;
+>  }
+>  
+> +static MemTxResult lqspi_write(void *opaque, hwaddr offset, uint64_t value,
+> +                               unsigned size, MemTxAttrs attrs)
+> +{
+> +    /*
+> +     * From UG1085, Chapter 24 (Quad-SPI controllers):
+> +     * - Writes are ignored
+> +     * - AXI writes generate an external AXI slave error (SLVERR)
+> +     */
+> +    qemu_log_mask(LOG_GUEST_ERROR, "%s Unexpected %u-bit access to 0x%" PRIx64
+> +                                   " (value: 0x%" PRIx64 "\n",
+> +                  __func__, size << 3, offset, value);
+> +
+> +    return MEMTX_ERROR;
+> +}
+> +
+>  static const MemoryRegionOps lqspi_ops = {
+>      .read_with_attrs = lqspi_read,
+> +    .write_with_attrs = lqspi_write,
+>      .endianness = DEVICE_NATIVE_ENDIAN,
+>      .valid = {
+>          .min_access_size = 1,
+> -- 
+> 2.20.1
+> 
 
