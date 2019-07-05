@@ -6,44 +6,45 @@ X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DBAC2C468A0
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 16:42:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C748C46499
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 16:47:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B77BE21670
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 16:42:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B77BE21670
+	by mail.kernel.org (Postfix) with ESMTPS id 2461020843
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 16:47:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2461020843
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54872 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54892 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hjRIO-0007ea-Tu
-	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 12:42:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48646)
+	id 1hjRMp-0000pl-K4
+	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 12:47:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49598)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jsnow@redhat.com>) id 1hjRFu-0006Ss-Se
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 12:40:15 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hjRLD-0008VW-8D
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 12:45:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hjRFs-0006Ym-Qa
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 12:40:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49118)
+ (envelope-from <jsnow@redhat.com>) id 1hjRLB-0000Di-9r
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 12:45:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34654)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1hjRFq-0006Hq-D3; Fri, 05 Jul 2019 12:40:10 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ id 1hjRL0-00081h-Ui; Fri, 05 Jul 2019 12:45:31 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 9928430821FA;
- Fri,  5 Jul 2019 16:40:08 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id B4476307D93E;
+ Fri,  5 Jul 2019 16:45:28 +0000 (UTC)
 Received: from [10.10.122.149] (ovpn-122-149.rdu2.redhat.com [10.10.122.149])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7F6F7413F;
- Fri,  5 Jul 2019 16:40:00 +0000 (UTC)
-To: Markus Armbruster <armbru@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B23294C3;
+ Fri,  5 Jul 2019 16:45:23 +0000 (UTC)
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
 References: <20190703215542.16123-1-jsnow@redhat.com>
- <20190703215542.16123-5-jsnow@redhat.com> <87muhsimyg.fsf@dusky.pond.sub.org>
+ <20190703215542.16123-10-jsnow@redhat.com>
+ <b73e23a0-5454-c7d4-f1b3-da99e07b1edb@redhat.com>
 From: John Snow <jsnow@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
@@ -120,21 +121,22 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <25260b5c-035b-e663-72cd-3cd9cbc9eb44@redhat.com>
-Date: Fri, 5 Jul 2019 12:39:59 -0400
+Message-ID: <987b304e-2ad6-3342-3825-5f8e7b7dd06a@redhat.com>
+Date: Fri, 5 Jul 2019 12:45:22 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <87muhsimyg.fsf@dusky.pond.sub.org>
+In-Reply-To: <b73e23a0-5454-c7d4-f1b3-da99e07b1edb@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Fri, 05 Jul 2019 16:40:08 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.48]); Fri, 05 Jul 2019 16:45:28 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 04/18] qapi: add BitmapSyncMode enum
+Subject: Re: [Qemu-devel] [PATCH v2 09/18] block/dirty-bitmap: add
+ bdrv_dirty_bitmap_merge_internal
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -147,65 +149,115 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- vsementsov@virtuozzo.com, qemu-block@nongnu.org,
- Juan Quintela <quintela@redhat.com>, Wen Congyang <wencongyang2@huawei.com>,
- Xie Changlong <xiechanglong.d@gmail.com>, qemu-devel@nongnu.org,
+ vsementsov@virtuozzo.com, Juan Quintela <quintela@redhat.com>,
+ Wen Congyang <wencongyang2@huawei.com>,
+ Xie Changlong <xiechanglong.d@gmail.com>,
+ Markus Armbruster <armbru@redhat.com>,
  "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
+ Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 7/5/19 10:18 AM, Markus Armbruster wrote:
-> John Snow <jsnow@redhat.com> writes:
-> 
->> Depending on what a user is trying to accomplish, there might be a few
->> bitmap cleanup actions that occur when an operation is finished that
->> could be useful.
+On 7/4/19 12:49 PM, Max Reitz wrote:
+> On 03.07.19 23:55, John Snow wrote:
+>> I'm surprised it didn't come up sooner, but sometimes we have a +busy
+>> bitmap as a source. This is dangerous from the QMP API, but if we are
+>> the owner that marked the bitmap busy, it's safe to merge it using it as
+>> a read only source.
 >>
->> I am proposing three:
->> - NEVER: The bitmap is never synchronized against what was copied.
->> - ALWAYS: The bitmap is always synchronized, even on failures.
->> - CONDITIONAL: The bitmap is synchronized only on success.
->>
->> The existing incremental backup modes use 'conditional' semantics,
->> so add just that one for right now.
+>> It is not safe in the general case to allow users to read from in-use
+>> bitmaps, so create an internal variant that foregoes the safety
+>> checking.
 >>
 >> Signed-off-by: John Snow <jsnow@redhat.com>
 >> ---
->>  qapi/block-core.json | 14 ++++++++++++++
->>  1 file changed, 14 insertions(+)
+>>  block/dirty-bitmap.c      | 51 +++++++++++++++++++++++++++++++++------
+>>  include/block/block_int.h |  3 +++
+>>  2 files changed, 47 insertions(+), 7 deletions(-)
 >>
->> diff --git a/qapi/block-core.json b/qapi/block-core.json
->> index 7b23efcf13..87eba5a5d9 100644
->> --- a/qapi/block-core.json
->> +++ b/qapi/block-core.json
->> @@ -1134,6 +1134,20 @@
->>  { 'enum': 'MirrorSyncMode',
->>    'data': ['top', 'full', 'none', 'incremental'] }
+>> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+>> index 95a9c2a5d8..b0f76826b3 100644
+>> --- a/block/dirty-bitmap.c
+>> +++ b/block/dirty-bitmap.c
+>> @@ -810,11 +810,15 @@ bool bdrv_dirty_bitmap_next_dirty_area(BdrvDirtyBitmap *bitmap,
+>>      return hbitmap_next_dirty_area(bitmap->bitmap, offset, bytes);
+>>  }
 >>  
->> +##
->> +# @BitmapSyncMode:
->> +#
->> +# An enumeration of possible behaviors for the synchronization of a bitmap
->> +# when used for data copy operations.
->> +#
->> +# @conditional: The bitmap is only synced when the operation is successful.
->> +#               This is the behavior always used for 'INCREMENTAL' backups.
->> +#
->> +# Since: 4.2
->> +##
->> +{ 'enum': 'BitmapSyncMode',
->> +  'data': ['conditional'] }
->> +
->>  ##
->>  # @MirrorCopyMode:
->>  #
+>> +/**
+>> + * bdrv_merge_dirty_bitmap: merge src into dest.
+>> + * Ensures permissions on bitmaps are reasonable; use for public API.
+>> + *
+>> + * @backup: If provided, make a copy of dest here prior to merge.
+>> + */
+>>  void bdrv_merge_dirty_bitmap(BdrvDirtyBitmap *dest, const BdrvDirtyBitmap *src,
+>>                               HBitmap **backup, Error **errp)
+>>  {
+>> -    bool ret;
+>> -
+>>      qemu_mutex_lock(dest->mutex);
+>>      if (src->mutex != dest->mutex) {
+>>          qemu_mutex_lock(src->mutex);
+>> @@ -833,6 +837,37 @@ void bdrv_merge_dirty_bitmap(BdrvDirtyBitmap *dest, const BdrvDirtyBitmap *src,
+>>          goto out;
+>>      }
+>>  
+>> +    assert(bdrv_dirty_bitmap_merge_internal(dest, src, backup, false));
 > 
-> The name "conditional" makes me go "on what?".  What about "on-success"?
+> Please keep the explicit @ret.  We never define NDEBUG, but doing things
+> with side effects inside of assert() is bad style nonetheless.
 > 
 
-Good point. I do like that more.
+Thank you for saving me from myself. I consistently forget this :(
+
+>> +
+>> +out:
+>> +    qemu_mutex_unlock(dest->mutex);
+>> +    if (src->mutex != dest->mutex) {
+>> +        qemu_mutex_unlock(src->mutex);
+>> +    }
+>> +}
+>> +
+>> +/**
+>> + * bdrv_dirty_bitmap_merge_internal: merge src into dest.
+>> + * Does NOT check bitmap permissions; not suitable for use as public API.
+>> + *
+>> + * @backup: If provided, make a copy of dest here prior to merge.
+>> + * @lock: If true, lock and unlock bitmaps on the way in/out.
+>> + * returns true if the merge succeeded; false if unattempted.
+>> + */
+>> +bool bdrv_dirty_bitmap_merge_internal(BdrvDirtyBitmap *dest,
+>> +                                      const BdrvDirtyBitmap *src,
+>> +                                      HBitmap **backup,
+>> +                                      bool lock)
+>> +{
+>> +    bool ret;
+>> +
+>> +    if (lock) {
+>> +        qemu_mutex_lock(dest->mutex);
+>> +        if (src->mutex != dest->mutex) {
+>> +            qemu_mutex_lock(src->mutex);
+>> +        }
+>> +    }
+>> +
+> 
+> Why not check for INCONSISTENT and RO still?
+> 
+> Max
+> 
+
+Well. "why", I guess. The user-facing API will always use the
+non-internal version. This is the scary dangerous version that you don't
+call unless you are Very Sure You Know What You're Doing.
+
+I guess I just intended for the suitability checking to happen in
+bdrv_dirty_bitmap_merge, and this is the implementation that you can
+shoot yourself in the foot with if you'd like.
+
+>>      if (backup) {
+>>          *backup = dest->bitmap;
+>>          dest->bitmap = hbitmap_alloc(dest->size, hbitmap_granularity(*backup));
+> 
 
