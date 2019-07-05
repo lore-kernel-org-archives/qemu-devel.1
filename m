@@ -2,66 +2,79 @@ Return-Path: <SRS0=wUMn=VC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB2EAC5B57D
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 08:08:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37B0FC5B57D
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 08:26:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 896E4218BA
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 08:08:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 896E4218BA
+	by mail.kernel.org (Postfix) with ESMTPS id 0C0A9218A3
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 08:26:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C0A9218A3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50400 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50454 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hjJGW-0002zH-HT
-	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 04:08:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52734)
+	id 1hjJYD-0000IK-2U
+	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 04:26:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55573)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <stefanha@redhat.com>) id 1hjJFr-0002Y7-PY
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 04:07:40 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1hjJXN-0007x1-9X
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 04:25:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1hjJFq-0005pA-NF
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 04:07:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49302)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1hjJFq-0005oZ-F0
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 04:07:38 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id B69AD83F3C
- for <qemu-devel@nongnu.org>; Fri,  5 Jul 2019 08:07:26 +0000 (UTC)
-Received: from localhost (ovpn-117-133.ams2.redhat.com [10.36.117.133])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D2D93909F2;
- Fri,  5 Jul 2019 08:07:23 +0000 (UTC)
-Date: Fri, 5 Jul 2019 09:07:17 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Message-ID: <20190705080717.GD10995@stefanha-x1.localdomain>
-References: <20190703171005.26231-1-philmd@redhat.com>
- <20190703172501.GI23082@redhat.com>
- <20190704102457.GE1609@stefanha-x1.localdomain>
- <20190704102837.GA24190@redhat.com>
+ (envelope-from <pbonzini@redhat.com>) id 1hjJXM-0008Mq-6O
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 04:25:45 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:42463)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hjJXL-0008Je-WD
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 04:25:44 -0400
+Received: by mail-wr1-f65.google.com with SMTP id a10so7890260wrp.9
+ for <qemu-devel@nongnu.org>; Fri, 05 Jul 2019 01:25:41 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=Ijr9xB0HmlC16hfv500/PucNjrTmQyG4jNm1zULTIH4=;
+ b=Exg+s35hSsZ5/dWIV/MiIxLLwTeVhjc1zK+05Gp5wZEre1vYEkABCA+kzmAYdBhx45
+ zkVr5BCWvFMrR1NlRK0U+84loLIXFFAt+UYiosVCK3cEqkZ62bgn8dun6m428Tyzn+T5
+ ZMYgKfHfreciucmx1KFQBy5LnPr0ttXisGwBMPaD4xwXhgHKhEPLV+uxM8QH4r36yQGi
+ sYZ+xSONlZDxnNCxWrRjb7TmA/hPjntscEP0U8hmRXSW4Xccf0KR88iBwtSP6m/Lspuw
+ HtW/zp1IQ2BYF/sUoTdcm57m4bEXyK5YVu8nwC2FusWp8K56bEXjvWHYIeVCVYyJKvx7
+ Jt3A==
+X-Gm-Message-State: APjAAAVt1isVMbpO7wyJ+TVRIqSV6eZ4wXMjepe71yQdqT//CNY56qg+
+ jTjCDhA3zmOrc8wz83w3uKgsJQdzQTs=
+X-Google-Smtp-Source: APXvYqyoPfFXmwlX3pHPciLBkvncpk8laeRqk+4CrQANlD4wZgpVey2rKsFe04224pnnx1Ms0tLZWw==
+X-Received: by 2002:a05:6000:1203:: with SMTP id
+ e3mr2613083wrx.300.1562315140070; 
+ Fri, 05 Jul 2019 01:25:40 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:19db:ad53:90ea:9423?
+ ([2001:b07:6468:f312:19db:ad53:90ea:9423])
+ by smtp.gmail.com with ESMTPSA id t1sm10303766wra.74.2019.07.05.01.25.39
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Fri, 05 Jul 2019 01:25:39 -0700 (PDT)
+To: Julio Montes <julio.montes@intel.com>, qemu-devel@nongnu.org
+References: <be6aa304-a8e4-d64a-432f-24d52e42c097@redhat.com>
+ <20190704180350.2086-1-julio.montes@intel.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <1581b466-d574-66f9-dd59-6728a620acbc@redhat.com>
+Date: Fri, 5 Jul 2019 10:25:38 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="tEFtbjk+mNEviIIX"
-Content-Disposition: inline
-In-Reply-To: <20190704102837.GA24190@redhat.com>
-User-Agent: Mutt/1.12.0 (2019-05-25)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.27]); Fri, 05 Jul 2019 08:07:26 +0000 (UTC)
+In-Reply-To: <20190704180350.2086-1-julio.montes@intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [RFC PATCH-for-4.2] tracing: Allow to tune tracing
- options via the environment
+ [fuzzy]
+X-Received-From: 209.85.221.65
+Subject: Re: [Qemu-devel] [PATCH] hw/i386: Fix linker error when ISAPC is
+ disabled
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,89 +86,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 04/07/19 20:03, Julio Montes wrote:
+> How about a new header file with all devices? (see below patch)
 
---tEFtbjk+mNEviIIX
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Yes, looks good.
 
-On Thu, Jul 04, 2019 at 11:28:37AM +0100, Daniel P. Berrang=E9 wrote:
-> On Thu, Jul 04, 2019 at 11:24:57AM +0100, Stefan Hajnoczi wrote:
-> > On Wed, Jul 03, 2019 at 06:25:01PM +0100, Daniel P. Berrang=E9 wrote:
-> > > On Wed, Jul 03, 2019 at 07:10:05PM +0200, Philippe Mathieu-Daud=E9 wr=
-ote:
-> > > > @@ -306,6 +308,13 @@ bool trace_init_backends(void)
-> > > >      openlog(NULL, LOG_PID, LOG_DAEMON);
-> > > >  #endif
-> > > > =20
-> > > > +    trace_init_file(getenv("QEMU_TRACE_LOGFILE"));
-> > > > +    trace_init_events(getenv("QEMU_TRACE_EVENTFILE"));
-> > > > +    trace_env =3D getenv("QEMU_TRACE_EVENTS");
-> > > > +    if (trace_env) {
-> > > > +        trace_enable_events(trace_env);
-> > > > +    }
-> > > > +
-> > >=20
-> > > I don't think it is a nice idea to add this via environment variables
-> > > to QEMU itself. Why not modify libqtest qtest_init_without_qmp_handsh=
-ake
-> > > to read the env vars and then pass a suitable -trace arg when spawning
-> > > QEMU ?
-> >=20
-> > What is the concern about adding these environment variables to QEMU?
-> >=20
-> > It is convenient to be able to use tracing even if QEMU is invoked by
-> > something you cannot modify/control.
-> >=20
-> > The main issues I see with environment variables are:
-> >=20
-> > 1. Security.  Is there a scenario where an attacker can use environment
-> >    variables to influence the behavior of a QEMU process running at a
-> >    different trust level?
-> >=20
-> > 2. Name collision.  What is the chance that existing users already
-> >    define environment variables with these names and that unexpected
-> >    behavior could result?
->=20
-> One of the biggest problems with QEMU in general has been poorly modelled
-> & defined interfaces for configuration. At runtime we've solved this with
-> QMP. At startup we're still fighting the horror of QemuOpts in general and
-> haven't got startup modelling to be on a par with that offered by QEMU.
-> It was even worse when Audio didn't even use QemuOpts and instead used
-> an arbitrary set of poorly defined env variables. To me adding yet another
-> way to configure QEMU via env vars is moving in the opposite direction to
-> what we want.
+Paolo
 
-In this case the environment variables are optional and meant for cases
-where the user cannot change the QEMU command-line.  I think they serve
-a different purpose from the audio subsystem environment variables and
-I'd be happy to merge them.
+> ---
+>  Makefile.target       |  5 +++++
+>  hw/i386/pc_piix.c     | 11 ++++++++---
+>  include/qemu/osdep.h  |  1 +
+>  scripts/create_config |  2 ++
+>  4 files changed, 16 insertions(+), 3 deletions(-)
+> 
+> diff --git a/Makefile.target b/Makefile.target
+> index a6919e0caf..65eda0994d 100644
+> --- a/Makefile.target
+> +++ b/Makefile.target
+> @@ -45,6 +45,9 @@ include $(SRC_PATH)/tests/tcg/Makefile.include
+>  config-target.h: config-target.h-timestamp
+>  config-target.h-timestamp: config-target.mak
+> 
+> +config-devices.h: config-devices.h-timestamp
+> +config-devices.h-timestamp: config-devices.mak
+> +
+>  ifdef CONFIG_TRACE_SYSTEMTAP
+>  stap: $(QEMU_PROG).stp-installed $(QEMU_PROG).stp $(QEMU_PROG)-simpletrace.stp $(QEMU_PROG)-log.stp
+> 
+> @@ -170,6 +173,8 @@ generated-files-y += hmp-commands.h hmp-commands-info.h
+> 
+>  endif # CONFIG_SOFTMMU
+> 
+> +generated-files-y += config-devices.h
+> +
+>  dummy := $(call unnest-vars,,obj-y)
+>  all-obj-y := $(obj-y)
+> 
+> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+> index c07c4a5b38..b93f9327be 100644
+> --- a/hw/i386/pc_piix.c
+> +++ b/hw/i386/pc_piix.c
+> @@ -61,9 +61,11 @@
+> 
+>  #define MAX_IDE_BUS 2
+> 
+> +#ifdef CONFIG_IDE_ISA
+>  static const int ide_iobase[MAX_IDE_BUS] = { 0x1f0, 0x170 };
+>  static const int ide_iobase2[MAX_IDE_BUS] = { 0x3f6, 0x376 };
+>  static const int ide_irq[MAX_IDE_BUS] = { 14, 15 };
+> +#endif
+> 
+>  /* PC hardware initialisation */
+>  static void pc_init1(MachineState *machine,
+> @@ -254,7 +256,10 @@ static void pc_init1(MachineState *machine,
+>          }
+>          idebus[0] = qdev_get_child_bus(&dev->qdev, "ide.0");
+>          idebus[1] = qdev_get_child_bus(&dev->qdev, "ide.1");
+> -    } else {
+> +        pc_cmos_init(pcms, idebus[0], idebus[1], rtc_state);
+> +    }
+> +#ifdef CONFIG_IDE_ISA
+> +else {
+>          for(i = 0; i < MAX_IDE_BUS; i++) {
+>              ISADevice *dev;
+>              char busname[] = "ide.0";
+> @@ -268,9 +273,9 @@ static void pc_init1(MachineState *machine,
+>              busname[4] = '0' + i;
+>              idebus[i] = qdev_get_child_bus(DEVICE(dev), busname);
+>          }
+> +        pc_cmos_init(pcms, idebus[0], idebus[1], rtc_state);
+>      }
+> -
+> -    pc_cmos_init(pcms, idebus[0], idebus[1], rtc_state);
+> +#endif
+> 
+>      if (pcmc->pci_enabled && machine_usb(machine)) {
+>          pci_create_simple(pci_bus, piix3_devfn + 2, "piix3-usb-uhci");
+> diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
+> index af2b91f0b8..83b49a1e63 100644
+> --- a/include/qemu/osdep.h
+> +++ b/include/qemu/osdep.h
+> @@ -30,6 +30,7 @@
+>  #include "config-host.h"
+>  #ifdef NEED_CPU_H
+>  #include "config-target.h"
+> +#include "config-devices.h"
+>  #else
+>  #include "exec/poison.h"
+>  #endif
+> diff --git a/scripts/create_config b/scripts/create_config
+> index d727e5e36e..00e86c82b0 100755
+> --- a/scripts/create_config
+> +++ b/scripts/create_config
+> @@ -58,6 +58,8 @@ case $line in
+>      name=${line%=*}
+>      echo "#define $name 1"
+>      ;;
+> + CONFIG_*=n) # configuration
+> +    ;;
+>   CONFIG_*=*) # configuration
+>      name=${line%=*}
+>      value=${line#*=}
+> --
+> 2.17.2
+> 
 
-Philippe: Have you tried adding the environment variable to libqtest as
-Dan suggested and did it work for your use case?
-
-Stefan
-
---tEFtbjk+mNEviIIX
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl0fBTUACgkQnKSrs4Gr
-c8gWrgf+KJcaUe7DnR9nAMZwkUY6FWJoQKyiid4XMY5bQzxyq77P9NZhgM6BMkWM
-sv7+x94cdjmTSl1IPPoCBuwYIENnWsXHzRxFVuVsxeuo6kwcSPjwWYJquIr4C88k
-hPxdkrqEVgVCJq/DDCDShDufc1pin68c7zQD3fKANf5HISh+njKg0HyyEOYs+NeW
-xXBFbCSVgs7FPcj7vZ1XO+N1Y5HDlZ6WnkTLP0rtGQ6Arx4U9a67CqEgtPiBwayq
-PIsq91CTkSGcCRI6CdFqRso9L6hbON+FdQmNepxAZ0QVyw5rfx8OUrI7I8pcItM1
-uhdlrVOzaJITyKNtsneI5pFnx/YtPw==
-=n0DE
------END PGP SIGNATURE-----
-
---tEFtbjk+mNEviIIX--
 
