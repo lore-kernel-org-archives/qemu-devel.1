@@ -4,81 +4,86 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6231FC46499
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 20:36:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D412EC46499
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 20:39:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2F0F421670
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 20:36:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8983F216E3
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 20:39:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mHyCKijx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F0F421670
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Nd+YlPvY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8983F216E3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55930 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55954 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hjUwV-0008Ro-G8
-	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 16:36:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34235)
+	id 1hjUzl-0002lW-9c
+	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 16:39:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34168)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <paolo.bonzini@gmail.com>) id 1hjUkQ-0004TY-Ku
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 16:24:00 -0400
+ (envelope-from <paolo.bonzini@gmail.com>) id 1hjUk8-0004LB-HX
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 16:23:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1hjUkJ-0002zu-UD
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 16:23:55 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:42112)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1hjUk3-0002mw-A2
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 16:23:37 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:33052)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1hjUkC-0002li-VS
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 16:23:46 -0400
-Received: by mail-wr1-x444.google.com with SMTP id a10so9932830wrp.9
- for <qemu-devel@nongnu.org>; Fri, 05 Jul 2019 13:23:33 -0700 (PDT)
+ id 1hjUjz-0002jC-R2
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 16:23:32 -0400
+Received: by mail-wm1-x341.google.com with SMTP id h19so8294606wme.0
+ for <qemu-devel@nongnu.org>; Fri, 05 Jul 2019 13:23:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=JvV1iVqyAdHF++s4qbNgPhXah3+qiDNHrezSixoPhkU=;
- b=mHyCKijx57N9McKdZR2Ut8MF57TxOE2rTTDhHAREOehCXinalcBZgvaV6JWt1C8OC0
- 9ECGlWdHZvAM/YESYZRPSekk+JuAobLSYo1ZnjjFVf4CtETWyuepys+gyVTokMDy5lUm
- GQD3iJrxfoFPYM/l70pCIxKrBSpNGI9rJw7xMISx8e62PiGtI71y0F/ARjCH5Ocfpwb7
- sFmTPaWB9udUbUlKSDuU91+xlbo/mZ2UAUIIcUO+aYiACYJOrmICSc1PQxc68wGc9Zbp
- PK1Fx9L2mgIJWlBMKJIFwDcPCPBUbqqnN7CarD2MXN+ajgmhR9NNKC/Q4OyrCpeXAfF3
- moUw==
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=NL1qamEi1SWCxCZDQ+Ft1vPKiyaKCd/QL3Bjak1vxXQ=;
+ b=Nd+YlPvYNskjnp2NN5XY0QePTM253d0iLZfXER0olQ8TFtJt0zWB8nO/vin0waW/RJ
+ RNhAUriBDt8gzQydZHbd4ii8CRjTLrooceH1GGAARkD5eOQFk/+TRcjOFdP0qTSCcBOj
+ 1UBK9Ls6krJQSBH5uotnqZLuwLbPfSEuQFw/4BhKGJZVIn9Qlf2ud1s03EidXTVIFb4v
+ giMdepo8oIqx8RZb6wRe/KWv0nu4reQ2JYB8DNJbzMHzcKJYj5IGqV3ci7SrLm7Jzy/x
+ P4SfOjVrWvYd8kbWn6wFfirqNY+1v2VSylWhgi6JKoovUeJ9Ml9ut5flW5XH8ZmhtuPB
+ ObGQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references;
- bh=JvV1iVqyAdHF++s4qbNgPhXah3+qiDNHrezSixoPhkU=;
- b=CzmScz6R1Bsk4s51lLMOY+FUpZI1AR8DA5SOj+PT1xyXL/ay9I7XeNrKhTSk7vXfj/
- 734/8L3NDMxuddxd/Uj7Q2+n5P/m/ZIANGkCDb1VKsMso9pKMTYQNql0fGh1g9mePMfE
- S1lY1hcM51FtEUOhAp8T40aXSuVuMxVp9OZ5fy705znj5Dy4EiYuq7wjOIr662FQX/fw
- SjOKEOedklzZ2IXTbmUsb2yDC1Mx1CmVoXb2wYBMTUhq9KWRDGmpiklPHvQLsWQ6ulbG
- BmB4AzfLzyDx17MpvepB6MFNqk7tEZ+nfBTH78qX/3BKfNbaDwPw3cYXfXml9Rd4bzGQ
- /Aew==
-X-Gm-Message-State: APjAAAUzKCOD9DvcPtNIB1LuW/RTceMuivZHxgctfagdJT97f/ZSakdj
- nMlj0XUjz+JC3eqBeVxs9JvZthRBnuc=
-X-Google-Smtp-Source: APXvYqy3vrPXBKUIrjJ0vdtHgDMhQBdVUbEpDeJAhfYQtKbPCKIt5LeIogIFbCjWwdzDN0MAnCOtmw==
-X-Received: by 2002:a5d:4107:: with SMTP id l7mr2447440wrp.191.1562358211934; 
- Fri, 05 Jul 2019 13:23:31 -0700 (PDT)
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=NL1qamEi1SWCxCZDQ+Ft1vPKiyaKCd/QL3Bjak1vxXQ=;
+ b=DrBvo4XlMFuwQZJz7h3wXc2q5Vb4MmeL7Jwn1UNFvZeQuMjjZ+Z5zI3bz/gsK0PDJa
+ neowKdx/gG1zXJlPw7Z6flcvcBGIeVd8sXt6pxOoeypkKe8fIfcdSIXJYzJqzAOhSs6b
+ QbSCqtnQfY3a7npDizt2hy9i+2fHPo0Mb3AsGu+QbIArObeaqkD1H0U78Dd+RSL4reoh
+ LWrSC50fpgWZQ/pB86yTuMEM/4Bjj4UGX0kCg9ZpsUa8BdUzBnYaahCC0F2npdznFoS1
+ 5y4hcIPmUt6X4IHrYXoHfb7bbvcI50JoZ28tiCf2D1q5Y9vRAvVOpghG9XQmDBAP8OYL
+ 3utQ==
+X-Gm-Message-State: APjAAAXoUIwdpjUk6w2NvmeBiAWN7eE0szc8sbLHCgbNuHOlpFbJ+gtu
+ aMoV/hHvt//S8MHxJ9sK1Tk6rXZngCc=
+X-Google-Smtp-Source: APXvYqwJ0V5dfMDxy4F8t9gFM7WF1jwib/clFm4YPqc9GcJrTFWc0dR7nTO4OP038XF6viVLpHhvdg==
+X-Received: by 2002:a05:600c:2056:: with SMTP id
+ p22mr4453308wmg.155.1562358210084; 
+ Fri, 05 Jul 2019 13:23:30 -0700 (PDT)
 Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id v23sm3035875wmj.32.2019.07.05.13.23.30
+ by smtp.gmail.com with ESMTPSA id v23sm3035875wmj.32.2019.07.05.13.23.29
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Fri, 05 Jul 2019 13:23:31 -0700 (PDT)
+ Fri, 05 Jul 2019 13:23:29 -0700 (PDT)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Fri,  5 Jul 2019 22:23:19 +0200
-Message-Id: <1562358202-28008-10-git-send-email-pbonzini@redhat.com>
+Date: Fri,  5 Jul 2019 22:23:17 +0200
+Message-Id: <1562358202-28008-8-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1562358202-28008-1-git-send-email-pbonzini@redhat.com>
 References: <1562358202-28008-1-git-send-email-pbonzini@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::444
-Subject: [Qemu-devel] [PULL 09/12] target/i386: kvm: Fix when nested state
- is needed for migration
+X-Received-From: 2a00:1450:4864:20::341
+Subject: [Qemu-devel] [PULL 07/12] target/i386: fix feature check in
+ hyperv-stub.c
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,46 +95,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Liran Alon <liran.alon@oracle.com>
+Cc: Vitaly Kuznetsov <vkuznets@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Roman Kagan <rkagan@virtuozzo.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Liran Alon <liran.alon@oracle.com>
+From: Alex Bennée <alex.bennee@linaro.org>
 
-When vCPU is in VMX operation and enters SMM mode,
-it temporarily exits VMX operation but KVM maintained nested-state
-still stores the VMXON region physical address, i.e. even when the
-vCPU is in SMM mode then (nested_state->hdr.vmx.vmxon_pa != -1ull).
+Commit 2d384d7c8 broken the build when built with:
 
-Therefore, there is no need to explicitly check for
-KVM_STATE_NESTED_SMM_VMXON to determine if it is necessary
-to save nested-state as part of migration stream.
+  configure --without-default-devices --disable-user
 
-Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
-Signed-off-by: Liran Alon <liran.alon@oracle.com>
-Message-Id: <20190624230514.53326-1-liran.alon@oracle.com>
+The reason was the conversion of cpu->hyperv_synic to
+cpu->hyperv_synic_kvm_only although the rest of the patch introduces a
+feature checking mechanism. So I've fixed the KVM_EXIT_HYPERV_SYNIC in
+hyperv-stub to do the same feature check as in the real hyperv.c
+
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Roman Kagan <rkagan@virtuozzo.com>
+Message-Id: <20190624123835.28869-1-alex.bennee@linaro.org>
+Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- target/i386/machine.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ target/i386/hyperv-stub.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/target/i386/machine.c b/target/i386/machine.c
-index 851b249..704ba6d 100644
---- a/target/i386/machine.c
-+++ b/target/i386/machine.c
-@@ -997,9 +997,8 @@ static bool vmx_nested_state_needed(void *opaque)
+diff --git a/target/i386/hyperv-stub.c b/target/i386/hyperv-stub.c
+index fe548cb..0028527 100644
+--- a/target/i386/hyperv-stub.c
++++ b/target/i386/hyperv-stub.c
+@@ -15,7 +15,7 @@ int kvm_hv_handle_exit(X86CPU *cpu, struct kvm_hyperv_exit *exit)
  {
-     struct kvm_nested_state *nested_state = opaque;
+     switch (exit->type) {
+     case KVM_EXIT_HYPERV_SYNIC:
+-        if (!cpu->hyperv_synic) {
++        if (!hyperv_feat_enabled(cpu, HYPERV_FEAT_SYNIC)) {
+             return -1;
+         }
  
--    return ((nested_state->format == KVM_STATE_NESTED_FORMAT_VMX) &&
--            ((nested_state->hdr.vmx.vmxon_pa != -1ull) ||
--             (nested_state->hdr.vmx.smm.flags & KVM_STATE_NESTED_SMM_VMXON)));
-+    return (nested_state->format == KVM_STATE_NESTED_FORMAT_VMX &&
-+            nested_state->hdr.vmx.vmxon_pa != -1ull);
- }
- 
- static const VMStateDescription vmstate_vmx_nested_state = {
 -- 
 1.8.3.1
 
