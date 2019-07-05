@@ -2,80 +2,65 @@ Return-Path: <SRS0=wUMn=VC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E3E1C4649B
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 10:34:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA38DC46499
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 10:38:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 64EA6218BA
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 10:34:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 64EA6218BA
+	by mail.kernel.org (Postfix) with ESMTPS id 8EB6121852
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 10:38:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8EB6121852
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51416 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51460 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hjLXj-0000Ev-Lz
-	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 06:34:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55691)
+	id 1hjLbu-0003dg-Lz
+	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 06:38:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56184)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <pbonzini@redhat.com>) id 1hjLW9-0007El-Hr
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 06:32:38 -0400
+ (envelope-from <berrange@redhat.com>) id 1hjLYa-0001SY-CO
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 06:35:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1hjLW7-0006tT-LM
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 06:32:37 -0400
-Received: from mail-wm1-f48.google.com ([209.85.128.48]:40250)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hjLW6-0006SL-7w
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 06:32:35 -0400
-Received: by mail-wm1-f48.google.com with SMTP id v19so8809148wmj.5
- for <qemu-devel@nongnu.org>; Fri, 05 Jul 2019 03:32:22 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=WemfcOoQUXJMJ63Qbaq8mmA/KNa1Tig2gwghdZvpdYw=;
- b=JFncLQzlbpb1Zk4S6pnT1hfJlGH7cwg6DdWMgOYUlRDGMQ8vQdJNa0FjCbaMZ3s9jo
- WI/3ixGoP3fWDwUUg8N+qwf5Vt0lxyPMfJg2HP7zJWwrNLJkUPBGsLWh6lxePvtQR1dl
- AQmV5iyDi9CslbabZr9HRy9HiyqDRTZFKPofZjd4kjHL+dRI5ND3VmxSzdELz2Hzb0z0
- 9hWEKUVi1AFLlrpMSppkxL2kNmT602U2UKfhAH6wtBx0xJQl0Sl4Q1MorqWMgSChZCfh
- uSecmbBZzUhQ69BpYBEwgCEfXi73/iANsOXyRQM53mynxNBFgmdiYMPYwoAqnVFKR7XQ
- KIBw==
-X-Gm-Message-State: APjAAAXkkdBekJi0RudtK2ZcHftOnNvhZ4OBvc4l5ppPDYQ7N5MN74pd
- WNFQIPU/ZAozrGz4Cg54BsCCGg==
-X-Google-Smtp-Source: APXvYqzjsrPy/YhjgRipmDIxoGqN0Uc/Pa9UBsoK1F9PAgTMTTzih8kkPlfMNad2KwgeaXAw2tMBhg==
-X-Received: by 2002:a1c:b604:: with SMTP id g4mr3019840wmf.111.1562322741888; 
- Fri, 05 Jul 2019 03:32:21 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:19db:ad53:90ea:9423?
- ([2001:b07:6468:f312:19db:ad53:90ea:9423])
- by smtp.gmail.com with ESMTPSA id p3sm4930082wmg.15.2019.07.05.03.32.20
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Fri, 05 Jul 2019 03:32:21 -0700 (PDT)
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <CAFEAcA-yzWhwYPzC9px0H-=x3XEPVBjZOhk402is49YpbmJX9g@mail.gmail.com>
- <ac682594-fac7-ca67-2cef-85db15920c7c@redhat.com>
- <CAFEAcA-giDCA8ZTR3Ft3ZNQUBEJBaXNaMnZOmgPo3Auw1gvZjg@mail.gmail.com>
- <faeb493b-f61b-16fe-3aff-aa40dffaf06b@redhat.com>
- <CAFEAcA-o-_tvgxZFs8rWcgK147pFLrbQLZ1s_fD0Gzc+iQc4UQ@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <9a1dbf89-a0b1-aeea-9066-e21029b0c48f@redhat.com>
-Date: Fri, 5 Jul 2019 12:32:20 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+ (envelope-from <berrange@redhat.com>) id 1hjLYY-0003ZX-1h
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 06:35:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57440)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <berrange@redhat.com>)
+ id 1hjLYR-0003D6-JQ; Fri, 05 Jul 2019 06:35:00 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 84EB3307D869;
+ Fri,  5 Jul 2019 10:34:55 +0000 (UTC)
+Received: from redhat.com (ovpn-112-48.ams2.redhat.com [10.36.112.48])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2F443100164A;
+ Fri,  5 Jul 2019 10:34:53 +0000 (UTC)
+Date: Fri, 5 Jul 2019 11:34:50 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Max Reitz <mreitz@redhat.com>
+Message-ID: <20190705103450.GG32473@redhat.com>
+References: <20190703224707.12437-1-eblake@redhat.com>
+ <265ccc9f-9df9-3885-ec79-fef36b8d0acc@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-o-_tvgxZFs8rWcgK147pFLrbQLZ1s_fD0Gzc+iQc4UQ@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+In-Reply-To: <265ccc9f-9df9-3885-ec79-fef36b8d0acc@redhat.com>
+User-Agent: Mutt/1.12.0 (2019-05-25)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.48]); Fri, 05 Jul 2019 10:34:55 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.128.48
-Subject: Re: [Qemu-devel] pl031 time across vm save/reload
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2 RFC] qemu-nbd: Permit TLS with Unix
+ sockets
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,54 +72,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ "open list:Network Block Dev..." <qemu-block@nongnu.org>, rjones@redhat.com,
+ Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 05/07/19 12:21, Peter Maydell wrote:
-> On Fri, 5 Jul 2019 at 11:13, Paolo Bonzini <pbonzini@redhat.com> wrote:
->>
->> On 05/07/19 11:58, Peter Maydell wrote:
->>> On Fri, 5 Jul 2019 at 10:48, Paolo Bonzini <pbonzini@redhat.com> wrote:
->>>> You're right, the compatibility causes wrong behavior for the default
->>>> -rtc settings (the RC pauses across migration).  The right thing to do
->>>> would be to store the base rather than the offset: that is, you store
->>>> the time at which LR was written.  Then the offset is s->lr - s->base
->>>> and it's independent of the machine on which the rtc_clock is being read.
->>>
->>> Right. How do we handle this for back-compat purposes? I guess
->>> we need to have a new migration subsection, so if it's present
->>> it has the 'base' value and we ignore the 'offset' in the
->>> main migration data, and if it's not present we assume an
->>> old->new migration and use the existing offset code. New->old
->>> migration would not be possible as the new subsection is
->>> always-present.
->>
->> Yes, something like that but I would just bump the version.  Version 1
->> has the old meaning for the first field, version 2 has the new meaning.
-> 
-> Yeah, we could do that. I thought we preferred to avoid using
-> version-numbers for migration though these days ? (cc'ing DG
-> in case he has an opinion.)
+On Fri, Jul 05, 2019 at 11:31:51AM +0200, Max Reitz wrote:
+> On 04.07.19 00:47, Eric Blake wrote:
 
-Yeah I suppose a subsection would make it easier to keep the old broken
-behavior for old machine types.  It would be a bit more code.
 
->> And also, since our brains are fresh on pl031... currently s->lr is
->> always 0; besides the bug that writing RTC_LR should update it, the
->> datasheet says the counter counts up from 1 so perhaps at startup s->lr
->> should be set to a nonzero value?   That would be
->> qemu_ref_timedate(QEMU_CLOCK_VIRTUAL) - 1.
-> 
-> The 'summary of RTC registers' section in the datasheet says
-> that RTCLR's reset value is zero...
 
-Right, but RTCDR doesn't return the current wallclock after power up on
-real hardware, doesn't it?  So the choices are 1) RTCLR returns 0 and it
-looks like the board was powered on in the seventies; 2) RTCLR is not 0
-and it looks like some firmware ran initialized RTCLR.
+> > diff --git a/tests/qemu-iotests/233.out b/tests/qemu-iotests/233.out
+> > index 9b46284ab0de..b86bee020649 100644
+> > --- a/tests/qemu-iotests/233.out
+> > +++ b/tests/qemu-iotests/233.out
+>=20
+> [...]
+>=20
+> > +=3D=3D check TLS works over Unix =3D=3D
+> > +image: nbd+unix://?socket=3DSOCKET
+> > +file format: nbd
+> > +virtual size: 64 MiB (67108864 bytes)
+> > +disk size: unavailable
+>=20
+> This has worked surprisingly well considering you did not pass tls-host=
+name.
+>=20
+> On the same note: If I remove the tls-hostname option from the =E2=80=9C=
+perform
+> I/O over TLS=E2=80=9D test, it keeps working.
 
-Paolo
+Yeah, that's a bug in crypto/tlssession.c.
+
+It is assuming that the hostname will always be provided for sessions
+in client mode, which was valid previously as all sessions were TCP
+based. ie it assumed that if hostname was NULL, it was doing server
+side certificate validation.
+
+That assumption is bogus now we allow sessions on non-TCP, so we must
+fix the code thus:
+
+
+@@ -365,6 +367,14 @@ qcrypto_tls_session_check_certificate(QCryptoTLSSess=
+ion *session,
+                     goto error;
+                 }
+             }
++            if (!session->hostname &&
++                session->creds->endpoint =3D=3D
++                QCRYPTO_TLS_CREDS_ENDPOINT_CLIENT) {
++                error_setg(errp,
++                           "No hostname available to validate against "
++                           "server's x509 certificate");
++                goto error;
++            }
+             if (session->hostname) {
+                 if (!gnutls_x509_crt_check_hostname(cert, session->hostn=
+ame)) {
+                     error_setg(errp,
+
+
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
 
