@@ -2,61 +2,84 @@ Return-Path: <SRS0=wUMn=VC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9914C46499
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 20:30:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73D58C46499
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 20:31:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AC5B821670
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 20:30:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC5B821670
+	by mail.kernel.org (Postfix) with ESMTPS id 3BA7A21670
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 20:31:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W1C4IIIn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3BA7A21670
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55882 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55896 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hjUqF-00034E-Pa
-	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 16:29:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33047)
+	id 1hjUrq-0004Wx-Gs
+	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 16:31:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34183)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jsnow@redhat.com>) id 1hjUeO-0005tl-SL
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 16:17:45 -0400
+ (envelope-from <paolo.bonzini@gmail.com>) id 1hjUk9-0004Ld-W3
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 16:23:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hjUeN-0007Qo-SS
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 16:17:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60284)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1hjUeL-0007NL-FO; Fri, 05 Jul 2019 16:17:41 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id BE3F03082A98;
- Fri,  5 Jul 2019 20:17:40 +0000 (UTC)
-Received: from probe.redhat.com (ovpn-122-149.rdu2.redhat.com [10.10.122.149])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 58B48867E6;
- Fri,  5 Jul 2019 20:17:32 +0000 (UTC)
-From: John Snow <jsnow@redhat.com>
-To: qemu-devel@nongnu.org,
-	qemu-block@nongnu.org
-Date: Fri,  5 Jul 2019 16:16:27 -0400
-Message-Id: <20190705201631.26266-15-jsnow@redhat.com>
-In-Reply-To: <20190705201631.26266-1-jsnow@redhat.com>
-References: <20190705201631.26266-1-jsnow@redhat.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Fri, 05 Jul 2019 20:17:40 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v3 14/18] iotests: teach run_job to cancel
- pending jobs
+ (envelope-from <paolo.bonzini@gmail.com>) id 1hjUk4-0002ny-H6
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 16:23:39 -0400
+Received: from mail-wr1-x42b.google.com ([2a00:1450:4864:20::42b]:46956)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+ id 1hjUk0-0002gH-JE
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 16:23:33 -0400
+Received: by mail-wr1-x42b.google.com with SMTP id z1so6392869wru.13
+ for <qemu-devel@nongnu.org>; Fri, 05 Jul 2019 13:23:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:subject:date:message-id:in-reply-to:references;
+ bh=2QJXgDdeciu+QM4e3C1K2WEVvDtyNAWGx3hRO2WruJ0=;
+ b=W1C4IIInxHmm2j6ms/74hDmp0LtqX9wHVoNRfffyya+p8megN0YXbeVuSuCnnEyNTT
+ GVY8mjl4MdoUqydVMgWIRfnqBQcruMIb4BhZxkBsGpb4Vn5c5P+8/Uzqb3i0JaZ8aAxd
+ 2t/XnVwQ8mUgWxTXlXWsg+Xgjab0w5reGBA7mN/UYmZFd9m/r8YlMKU0ljiqxcWxeUtf
+ mgd+pikrgOjiNwXDAemnUOBY748n3QmLsgNbJ4ceexdZxJcHwFVvg4hhBoYS6Afdh/ua
+ Udj7BQ3I67GVJoFTIcVKUfJ0drngeo3NSXJdmZ8MlytyMCWiMwhjRUIxdQ9wSVCMGr5e
+ S/Mw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:subject:date:message-id
+ :in-reply-to:references;
+ bh=2QJXgDdeciu+QM4e3C1K2WEVvDtyNAWGx3hRO2WruJ0=;
+ b=bRt/h0T4oQjFalToH4aGsu4j9E9QOIAsJLeYKIz+e7CJI8bE5TfF+4U12ctGlyOVNF
+ RkRaMhk4MVnBIte6O3bed1PSh5U5MlfEgST/qsqY1Gc5SfpDleUHb5SXvL+UBc8TuaSf
+ JarYzT3ZpFgBWkczZKCd5vRZ/6121ar1WMPmpnVbKrANBweYinDDeevqqTkLwzgT1ctW
+ thiqeRYoTgKrm1PYOfr0IIHkdJmPwDHlvsyObLERxd3caU7NQ7k5cvk0a9YTCd+Kb9D+
+ kfqN400iZuqZJc3j+s9UOgDf7X4RbCSu2NC5FeMCrgCpstyGcbt5IBjuXIUfJuPzQqeQ
+ xx4w==
+X-Gm-Message-State: APjAAAV2swoAuRqsXXGfjpD8KMBl09onLi6wkI8RPW7ftyUVT/aydn9A
+ Vf7svX6ZGOm+1Rdj15zEOou7ZcG47r8=
+X-Google-Smtp-Source: APXvYqxytVifRVE+fgeroUdTtAW4PhIvmRt485rGBW7kvxqAMnBWjWNVGxoYN8peMrf+lWsl2oaNCg==
+X-Received: by 2002:adf:c706:: with SMTP id k6mr5239400wrg.40.1562358205626;
+ Fri, 05 Jul 2019 13:23:25 -0700 (PDT)
+Received: from 640k.lan ([93.56.166.5])
+ by smtp.gmail.com with ESMTPSA id v23sm3035875wmj.32.2019.07.05.13.23.24
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Fri, 05 Jul 2019 13:23:25 -0700 (PDT)
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Fri,  5 Jul 2019 22:23:12 +0200
+Message-Id: <1562358202-28008-3-git-send-email-pbonzini@redhat.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1562358202-28008-1-git-send-email-pbonzini@redhat.com>
+References: <1562358202-28008-1-git-send-email-pbonzini@redhat.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::42b
+Subject: [Qemu-devel] [PULL 02/12] checkpatch: do not warn for multiline
+ parenthesized returned value
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,73 +91,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- vsementsov@virtuozzo.com, Juan Quintela <quintela@redhat.com>,
- Wen Congyang <wencongyang2@huawei.com>,
- Xie Changlong <xiechanglong.d@gmail.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, John Snow <jsnow@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-run_job can cancel pending jobs to simulate failure. This lets us use
-the pending callback to issue test commands while the job is open, but
-then still have the job fail in the end.
+While indeed we do not want to have
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-Signed-off-by: John Snow <jsnow@redhat.com>
+    return (a);
+
+it is less clear that this applies to
+
+    return (a &&
+            b);
+
+Some editors indent more nicely if you have parentheses, and some people's
+eyes may appreciate that as well.
+
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <1561116534-21814-1-git-send-email-pbonzini@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- tests/qemu-iotests/iotests.py | 22 ++++++++++++++++++++--
- 1 file changed, 20 insertions(+), 2 deletions(-)
+ scripts/checkpatch.pl | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.p=
-y
-index fcad957d63..c544659ecb 100644
---- a/tests/qemu-iotests/iotests.py
-+++ b/tests/qemu-iotests/iotests.py
-@@ -541,7 +541,22 @@ class VM(qtest.QEMUQtestMachine):
-=20
-     # Returns None on success, and an error string on failure
-     def run_job(self, job, auto_finalize=3DTrue, auto_dismiss=3DFalse,
--                pre_finalize=3DNone, wait=3D60.0):
-+                pre_finalize=3DNone, cancel=3DFalse, wait=3D60.0):
-+        """
-+        run_job moves a job from creation through to dismissal.
-+
-+        :param job: String. ID of recently-launched job
-+        :param auto_finalize: Bool. True if the job was launched with
-+                              auto_finalize. Defaults to True.
-+        :param auto_dismiss: Bool. True if the job was launched with
-+                             auto_dismiss=3DTrue. Defaults to False.
-+        :param pre_finalize: Callback. A callable that takes no argument=
-s to be
-+                             invoked prior to issuing job-finalize, if a=
-ny.
-+        :param cancel: Bool. When true, cancels the job after the pre_fi=
-nalize
-+                       callback.
-+        :param wait: Float. Timeout value specifying how long to wait fo=
-r any
-+                     event, in seconds. Defaults to 60.0.
-+        """
-         match_device =3D {'data': {'device': job}}
-         match_id =3D {'data': {'id': job}}
-         events =3D [
-@@ -568,7 +583,10 @@ class VM(qtest.QEMUQtestMachine):
-             elif status =3D=3D 'pending' and not auto_finalize:
-                 if pre_finalize:
-                     pre_finalize()
--                self.qmp_log('job-finalize', id=3Djob)
-+                if cancel:
-+                    self.qmp_log('job-cancel', id=3Djob)
-+                else:
-+                    self.qmp_log('job-finalize', id=3Djob)
-             elif status =3D=3D 'concluded' and not auto_dismiss:
-                 self.qmp_log('job-dismiss', id=3Djob)
-             elif status =3D=3D 'null':
---=20
-2.21.0
+diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+index c2aaf42..2f81371 100755
+--- a/scripts/checkpatch.pl
++++ b/scripts/checkpatch.pl
+@@ -2296,7 +2296,8 @@ sub process {
+ 			       $value =~ s/\([^\(\)]*\)/1/) {
+ 			}
+ #print "value<$value>\n";
+-			if ($value =~ /^\s*(?:$Ident|-?$Constant)\s*$/) {
++			if ($value =~ /^\s*(?:$Ident|-?$Constant)\s*$/ &&
++			    $line =~ /;$/) {
+ 				ERROR("return is not a function, parentheses are not required\n" . $herecurr);
+ 
+ 			} elsif ($spacing !~ /\s+/) {
+-- 
+1.8.3.1
+
 
 
