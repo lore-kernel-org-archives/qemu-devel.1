@@ -6,57 +6,57 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF354C5B57D
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 22:18:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20778C5B57D
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 22:20:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9B864216E3
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 22:18:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B864216E3
+	by mail.kernel.org (Postfix) with ESMTPS id EB77D216E3
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 22:20:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB77D216E3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56510 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56512 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hjWXF-0000pn-R8
-	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 18:18:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54853)
+	id 1hjWYq-000254-9h
+	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 18:20:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54922)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <ehabkost@redhat.com>) id 1hjWUY-0007EA-Qz
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 18:15:44 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1hjWUe-0007Nk-Hz
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 18:15:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1hjWUX-0003Gz-2J
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 18:15:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53168)
+ (envelope-from <ehabkost@redhat.com>) id 1hjWUd-0003PF-BS
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 18:15:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54444)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hjWUS-0003DR-Uw
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 18:15:39 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hjWUc-0003Nx-QI
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 18:15:47 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 722F13082B4D;
- Fri,  5 Jul 2019 22:15:29 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 9B0F830842AC;
+ Fri,  5 Jul 2019 22:15:39 +0000 (UTC)
 Received: from localhost (ovpn-116-30.gru2.redhat.com [10.97.116.30])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 01BD72B597;
- Fri,  5 Jul 2019 22:15:28 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1C5EF51DF3;
+ Fri,  5 Jul 2019 22:15:38 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>,
  Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
  Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
  Richard Henderson <rth@twiddle.net>
-Date: Fri,  5 Jul 2019 19:14:28 -0300
-Message-Id: <20190705221504.25166-7-ehabkost@redhat.com>
+Date: Fri,  5 Jul 2019 19:14:33 -0300
+Message-Id: <20190705221504.25166-12-ehabkost@redhat.com>
 In-Reply-To: <20190705221504.25166-1-ehabkost@redhat.com>
 References: <20190705221504.25166-1-ehabkost@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Fri, 05 Jul 2019 22:15:29 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.40]); Fri, 05 Jul 2019 22:15:39 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL v6 06/42] hw/s390x: Replace global smp variables
- with machine smp properties
+Subject: [Qemu-devel] [PULL v6 11/42] i386: Add die-level cpu topology to
+ x86CPU on PCMachine
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,147 +75,102 @@ Sender: "Qemu-devel"
 
 From: Like Xu <like.xu@linux.intel.com>
 
-The global smp variables in s390x are replaced with smp machine properties.
+The die-level as the first PC-specific cpu topology is added to the leagcy
+cpu topology model, which has one die per package implicitly and only the
+numbers of sockets/cores/threads are configurable.
 
-A local variable of the same name would be introduced in the declaration
-phase if it's used widely in the context OR replace it on the spot if it's
-only used once. No semantic changes.
+In the new model with die-level support, the total number of logical
+processors (including offline) on board will be calculated as:
+
+     #cpus = #sockets * #dies * #cores * #threads
+
+and considering compatibility, the default value for #dies would be
+initialized to one in x86_cpu_initfn() and pc_machine_initfn().
 
 Signed-off-by: Like Xu <like.xu@linux.intel.com>
-Message-Id: <20190518205428.90532-7-like.xu@linux.intel.com>
-Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-[ehabkost: fix build failure at VCPU_IRQ_BUF_SIZE]
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-
-fixup! hw/s390x: Replace global smp variables with machine smp properties
-
+Message-Id: <20190612084104.34984-2-like.xu@linux.intel.com>
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- hw/s390x/s390-virtio-ccw.c |  3 ++-
- hw/s390x/sclp.c            |  2 +-
- target/s390x/cpu.c         |  3 +++
- target/s390x/excp_helper.c |  5 +++++
- target/s390x/kvm.c         | 10 ++++++----
- 5 files changed, 17 insertions(+), 6 deletions(-)
+ include/hw/i386/pc.h | 2 ++
+ target/i386/cpu.h    | 2 ++
+ hw/i386/pc.c         | 9 +++++++--
+ target/i386/cpu.c    | 1 +
+ 4 files changed, 12 insertions(+), 2 deletions(-)
 
-diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-index e09bf8f1b6..5b6a9a4e55 100644
---- a/hw/s390x/s390-virtio-ccw.c
-+++ b/hw/s390x/s390-virtio-ccw.c
-@@ -84,7 +84,7 @@ static void s390_init_cpus(MachineState *machine)
-     /* initialize possible_cpus */
-     mc->possible_cpu_arch_ids(machine);
- 
--    for (i = 0; i < smp_cpus; i++) {
-+    for (i = 0; i < machine->smp.cpus; i++) {
-         s390x_new_cpu(machine->cpu_type, i, &error_fatal);
-     }
- }
-@@ -411,6 +411,7 @@ static CpuInstanceProperties s390_cpu_index_to_props(MachineState *ms,
- static const CPUArchIdList *s390_possible_cpu_arch_ids(MachineState *ms)
- {
-     int i;
-+    unsigned int max_cpus = ms->smp.max_cpus;
- 
-     if (ms->possible_cpus) {
-         g_assert(ms->possible_cpus && ms->possible_cpus->len == max_cpus);
-diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
-index 4510a800cb..fac7c3bb6c 100644
---- a/hw/s390x/sclp.c
-+++ b/hw/s390x/sclp.c
-@@ -64,7 +64,7 @@ static void read_SCP_info(SCLPDevice *sclp, SCCB *sccb)
-     prepare_cpu_entries(sclp, read_info->entries, &cpu_count);
-     read_info->entries_cpu = cpu_to_be16(cpu_count);
-     read_info->offset_cpu = cpu_to_be16(offsetof(ReadInfo, entries));
--    read_info->highest_cpu = cpu_to_be16(max_cpus - 1);
-+    read_info->highest_cpu = cpu_to_be16(machine->smp.max_cpus - 1);
- 
-     read_info->ibc_val = cpu_to_be32(s390_get_ibc_val());
- 
-diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
-index 8540e7a2cb..736a7903e2 100644
---- a/target/s390x/cpu.c
-+++ b/target/s390x/cpu.c
-@@ -37,6 +37,7 @@
- #include "hw/qdev-properties.h"
- #ifndef CONFIG_USER_ONLY
- #include "hw/hw.h"
-+#include "hw/boards.h"
- #include "sysemu/arch_init.h"
- #include "sysemu/sysemu.h"
- #include "sysemu/tcg.h"
-@@ -197,6 +198,8 @@ static void s390_cpu_realizefn(DeviceState *dev, Error **errp)
-     }
- 
- #if !defined(CONFIG_USER_ONLY)
-+    MachineState *ms = MACHINE(qdev_get_machine());
-+    unsigned int max_cpus = ms->smp.max_cpus;
-     if (cpu->env.core_id >= max_cpus) {
-         error_setg(&err, "Unable to add CPU with core-id: %" PRIu32
-                    ", maximum core-id: %d", cpu->env.core_id,
-diff --git a/target/s390x/excp_helper.c b/target/s390x/excp_helper.c
-index 202456cdc5..892f659d5a 100644
---- a/target/s390x/excp_helper.c
-+++ b/target/s390x/excp_helper.c
-@@ -31,6 +31,7 @@
- #ifndef CONFIG_USER_ONLY
- #include "sysemu/sysemu.h"
- #include "hw/s390x/s390_flic.h"
-+#include "hw/boards.h"
- #endif
- 
- void QEMU_NORETURN tcg_s390_program_interrupt(CPUS390XState *env, uint32_t code,
-@@ -315,6 +316,10 @@ static void do_ext_interrupt(CPUS390XState *env)
-         g_assert(cpu_addr < S390_MAX_CPUS);
-         lowcore->cpu_addr = cpu_to_be16(cpu_addr);
-         clear_bit(cpu_addr, env->emergency_signals);
-+#ifndef CONFIG_USER_ONLY
-+        MachineState *ms = MACHINE(qdev_get_machine());
-+        unsigned int max_cpus = ms->smp.max_cpus;
-+#endif
-         if (bitmap_empty(env->emergency_signals, max_cpus)) {
-             env->pending_int &= ~INTERRUPT_EMERGENCY_SIGNAL;
-         }
-diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-index 0267c6c2f6..6e814c230b 100644
---- a/target/s390x/kvm.c
-+++ b/target/s390x/kvm.c
-@@ -119,8 +119,8 @@
-  * Needs to be big enough to contain max_cpus emergency signals
-  * and in addition NR_LOCAL_IRQS interrupts
+diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+index de3bd32f52..e56c1a39cb 100644
+--- a/include/hw/i386/pc.h
++++ b/include/hw/i386/pc.h
+@@ -24,6 +24,7 @@
+  * PCMachineState:
+  * @acpi_dev: link to ACPI PM device that performs ACPI hotplug handling
+  * @boot_cpus: number of present VCPUs
++ * @smp_dies: number of dies per one package
   */
--#define VCPU_IRQ_BUF_SIZE (sizeof(struct kvm_s390_irq) * \
--                           (max_cpus + NR_LOCAL_IRQS))
-+#define VCPU_IRQ_BUF_SIZE(max_cpus) (sizeof(struct kvm_s390_irq) * \
-+                                     (max_cpus + NR_LOCAL_IRQS))
+ struct PCMachineState {
+     /*< private >*/
+@@ -59,6 +60,7 @@ struct PCMachineState {
+     bool apic_xrupt_override;
+     unsigned apic_id_limit;
+     uint16_t boot_cpus;
++    unsigned smp_dies;
  
- static CPUWatchpoint hw_watchpoint;
- /*
-@@ -362,9 +362,10 @@ unsigned long kvm_arch_vcpu_id(CPUState *cpu)
+     /* NUMA information: */
+     uint64_t numa_nodes;
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 93345792f4..14c19e61b1 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -1385,6 +1385,8 @@ typedef struct CPUX86State {
+     uint64_t xss;
  
- int kvm_arch_init_vcpu(CPUState *cs)
- {
-+    unsigned int max_cpus = MACHINE(qdev_get_machine())->smp.max_cpus;
-     S390CPU *cpu = S390_CPU(cs);
-     kvm_s390_set_cpu_state(cpu, cpu->env.cpu_state);
--    cpu->irqstate = g_malloc0(VCPU_IRQ_BUF_SIZE);
-+    cpu->irqstate = g_malloc0(VCPU_IRQ_BUF_SIZE(max_cpus));
-     return 0;
+     TPRAccess tpr_access_type;
++
++    unsigned nr_dies;
+ } CPUX86State;
+ 
+ struct kvm_msrs;
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 269e44f0d0..d44b2d06db 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -2303,9 +2303,13 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
+         return;
+     }
+ 
+-    /* if APIC ID is not set, set it based on socket/core/thread properties */
++    /*
++     * If APIC ID is not set,
++     * set it based on socket/die/core/thread properties.
++     */
+     if (cpu->apic_id == UNASSIGNED_APIC_ID) {
+-        int max_socket = (ms->smp.max_cpus - 1) / smp_threads / smp_cores;
++        int max_socket = (ms->smp.max_cpus - 1) /
++                                smp_threads / smp_cores / pcms->smp_dies;
+ 
+         if (cpu->socket_id < 0) {
+             error_setg(errp, "CPU socket-id is not set");
+@@ -2684,6 +2688,7 @@ static void pc_machine_initfn(Object *obj)
+     pcms->smbus_enabled = true;
+     pcms->sata_enabled = true;
+     pcms->pit_enabled = true;
++    pcms->smp_dies = 1;
+ 
+     pc_system_flash_create(pcms);
  }
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 4b5cd49338..8ef3063140 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -5639,6 +5639,7 @@ static void x86_cpu_initfn(Object *obj)
+     CPUX86State *env = &cpu->env;
+     FeatureWord w;
  
-@@ -1950,9 +1951,10 @@ int kvm_s390_set_cpu_state(S390CPU *cpu, uint8_t cpu_state)
++    env->nr_dies = 1;
+     cpu_set_cpustate_pointers(cpu);
  
- void kvm_s390_vcpu_interrupt_pre_save(S390CPU *cpu)
- {
-+    unsigned int max_cpus = MACHINE(qdev_get_machine())->smp.max_cpus;
-     struct kvm_s390_irq_state irq_state = {
-         .buf = (uint64_t) cpu->irqstate,
--        .len = VCPU_IRQ_BUF_SIZE,
-+        .len = VCPU_IRQ_BUF_SIZE(max_cpus),
-     };
-     CPUState *cs = CPU(cpu);
-     int32_t bytes;
+     object_property_add(obj, "family", "int",
 -- 
 2.18.0.rc1.1.g3f1ff2140
 
