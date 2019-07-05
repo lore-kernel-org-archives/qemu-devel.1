@@ -2,85 +2,62 @@ Return-Path: <SRS0=wUMn=VC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BB51C46499
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 20:54:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5F42C46499
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 20:54:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 509EB2133F
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 20:54:42 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d6loAQFe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 509EB2133F
+	by mail.kernel.org (Postfix) with ESMTPS id 8F3602133F
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 20:54:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F3602133F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56072 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56076 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hjVE9-0007YS-K5
-	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 16:54:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34120)
+	id 1hjVEI-0007t1-R9
+	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 16:54:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40349)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <paolo.bonzini@gmail.com>) id 1hjUjz-0004EM-Ps
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 16:23:33 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1hjVC5-0006UV-07
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 16:52:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1hjUjx-0002iE-AO
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 16:23:31 -0400
-Received: from mail-wm1-x32e.google.com ([2a00:1450:4864:20::32e]:39487)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1hjUjt-0002fZ-Gp
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 16:23:26 -0400
-Received: by mail-wm1-x32e.google.com with SMTP id z23so10803843wma.4
- for <qemu-devel@nongnu.org>; Fri, 05 Jul 2019 13:23:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=7oTLlrL+kWrx1wogDdhfFI1GowG7GhBWapH2sls1gao=;
- b=d6loAQFeiI7Fl8mJKreiScE/qcMTczTfsPs7EIy0K7i0Hiwia30Yisgh7WCqZEEwDT
- EgP5wFW4ACJbQHxjDVWrtWDvla/RK0PYf9xf7hroK03jKaOljCbvwW0qyPnCahq858Xx
- D1a9FAh2JdOHMXnv/E0+i3stUyRQO1IjMmAgUc6gTusKF1eOy2J9ByTdHRfZ5CqYTz3t
- riikpK7K1wY1O9TswvyuVwULMQOhh20q8IE0OXdRCEi4xjIqT+0AH1tRnj+B/67sZ+/b
- acN0OnuoMdLdZp7YgHit0jo5fo9NAkVxPY4dkUj2FRAUEJuIfc8Nfnmt16uNpoLRShBE
- AEHw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:subject:date:message-id
- :mime-version:content-transfer-encoding;
- bh=7oTLlrL+kWrx1wogDdhfFI1GowG7GhBWapH2sls1gao=;
- b=BzEJ9rI08lWSXq8viaendGYZfWT8ZfJzfu5udrVXBkwfCP3q8iQc5qhhDOLYGMulkf
- sHVfzo2H9p2dzn85OQXkP6Sx8c1UopInAhhn7xKDH0DiPm6Q/ZpRdbfA59r5xnhZOcjR
- 0LDMuIMf1fFG/bPaM94QkkqPRqwevEw2RKHWtgGymnAeEREnKZEzVbLHHkV0Q72nMaFh
- 00Dgwphy4SZDZEW4NRt2FvCQIkP8hb487SrHlK9oKjyIvdl60zngQ5D8HFkJyVnnaAEr
- ZL1v1jufGQzJa7X1BsQwL+G1AiukbuhLKe2XHZOYxWZ1JKnM0sG4+vgX1o3hi3khEk6+
- Fw3g==
-X-Gm-Message-State: APjAAAXm1XOjgnXA1RrPp2DKVjpS3KKLhQuMZ+wUqqZHszhVl3+D2dY8
- zt3ZJlcCTE5spm5NUTOFXUZiMBSpnWY=
-X-Google-Smtp-Source: APXvYqyxIM0q7rB8CzjH7mmlBbYgJ2uyuqnLXEyZSnuANnaLBTYwUKUH3IRhswF1Pe4z00XOWztCMw==
-X-Received: by 2002:a1c:e90f:: with SMTP id q15mr4802759wmc.89.1562358204108; 
- Fri, 05 Jul 2019 13:23:24 -0700 (PDT)
-Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id v23sm3035875wmj.32.2019.07.05.13.23.23
- for <qemu-devel@nongnu.org>
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Fri, 05 Jul 2019 13:23:23 -0700 (PDT)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Fri,  5 Jul 2019 22:23:10 +0200
-Message-Id: <1562358202-28008-1-git-send-email-pbonzini@redhat.com>
-X-Mailer: git-send-email 1.8.3.1
+ (envelope-from <ehabkost@redhat.com>) id 1hjVC3-0008Jh-Dl
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 16:52:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42144)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hjVC3-0008J3-53
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 16:52:31 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id F3CB559442;
+ Fri,  5 Jul 2019 20:52:29 +0000 (UTC)
+Received: from localhost (ovpn-116-30.gru2.redhat.com [10.97.116.30])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7EFC0867F8;
+ Fri,  5 Jul 2019 20:52:29 +0000 (UTC)
+Date: Fri, 5 Jul 2019 17:52:28 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <20190705205228.GF5198@habkost.net>
+References: <1562079681-19204-1-git-send-email-pbonzini@redhat.com>
+ <1562079681-19204-3-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::32e
-Subject: [Qemu-devel] [PULL 00/12] Misc bugfixes for QEMU hard freeze
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1562079681-19204-3-git-send-email-pbonzini@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.39]); Fri, 05 Jul 2019 20:52:30 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 2/7] target/i386: introduce generic feature
+ dependency mechanism
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,70 +69,206 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Liran Alon <liran.alon@oracle.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit 39d1b92b810793e02558e05efa23059f67520bc9:
+On Tue, Jul 02, 2019 at 05:01:16PM +0200, Paolo Bonzini wrote:
+> Sometimes a CPU feature does not make sense unless another is
+> present.  In the case of VMX features, KVM does not even allow
+> setting the VMX controls to some invalid combinations.
+> 
+> Therefore, this patch adds a generic mechanism that looks for bits
+> that the user explicitly cleared, and uses them to remove other bits
+> from the expanded CPU definition.  If these dependent bits were also
+> explicitly *set* by the user, this will be a warning for "-cpu check"
+> and an error for "-cpu enforce".  If not, then the dependent bits are
+> cleared silently, for convenience.
+> 
+> With VMX features, this will be used so that for example
+> "-cpu host,-rdrand" will also hide support for RDRAND exiting.
+> 
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  target/i386/cpu.c | 77 +++++++++++++++++++++++++++++++++++--------------------
+>  1 file changed, 49 insertions(+), 28 deletions(-)
+> 
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index 9149d0d..412e834 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -799,10 +799,6 @@ typedef struct FeatureWordInfo {
+>          /* If type==MSR_FEATURE_WORD */
+>          struct {
+>              uint32_t index;
+> -            struct {   /*CPUID that enumerate this MSR*/
+> -                FeatureWord cpuid_class;
+> -                uint32_t    cpuid_flag;
+> -            } cpuid_dep;
+>          } msr;
+>      };
+>      uint32_t tcg_features; /* Feature flags supported by TCG */
+> @@ -1197,10 +1193,6 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
+>          },
+>          .msr = {
+>              .index = MSR_IA32_ARCH_CAPABILITIES,
+> -            .cpuid_dep = {
+> -                FEAT_7_0_EDX,
+> -                CPUID_7_0_EDX_ARCH_CAPABILITIES
+> -            }
+>          },
+>      },
+>      [FEAT_CORE_CAPABILITY] = {
+> @@ -1217,14 +1209,26 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
+>          },
+>          .msr = {
+>              .index = MSR_IA32_CORE_CAPABILITY,
+> -            .cpuid_dep = {
+> -                FEAT_7_0_EDX,
+> -                CPUID_7_0_EDX_CORE_CAPABILITY,
+> -            },
+>          },
+>      },
+>  };
+>  
+> +typedef struct FeatureDep {
+> +    uint16_t from, to;
 
-  Merge remote-tracking branch 'remotes/bkoppelmann2/tags/pull-tricore-20190625' into staging (2019-07-01 13:47:21 +0100)
+Why uint16_t and not FeatureWord?
 
-are available in the git repository at:
+> +    uint64_t from_flag, to_flags;
+
+There are other parts of the code that take a
+FeatureWord/uint32_t pair (which will become uint64_t).  I'd wrap
+this into a typedef.  I also miss documentation on the exact
+meaning of those fields.
+
+    typedef struct FeatureMask {
+        FeatureWord w;
+        uint64_t mask;
+    };
+    
+    
+    typedef struct FeatureDependency {
+       /*
+        * Features in @to may be present only if _all_ features in @from
+        * present too.
+        */
+       FeatureMask from, to;
+    };
+    
+    static FeatureDep feature_dependencies[] = {
+        {
+            .from = { FEAT_7_0_EDX, CPUID_7_0_EDX_ARCH_CAPABILITIES
+            .to =   { FEAT_ARCH_CAPABILITIES, ~0ull },
+        },
+        {
+            .from = { FEAT_7_0_EDX, CPUID_7_0_EDX_CORE_CAPABILITY },
+            .to =   { FEAT_CORE_CAPABILITY, ~0ull },
+        },
+    };
 
 
-  git://github.com/bonzini/qemu.git tags/for-upstream
+> +} FeatureDep;
+> +
+> +static FeatureDep feature_dependencies[] = {
+> +    {
+> +        .from = FEAT_7_0_EDX,            .from_flag = CPUID_7_0_EDX_ARCH_CAPABILITIES,
+> +        .to = FEAT_ARCH_CAPABILITIES,    .to_flags = ~0ull,
+> +    },
+> +    {
+> +        .from = FEAT_7_0_EDX,            .from_flag = CPUID_7_0_EDX_CORE_CAPABILITY,
+> +        .to = FEAT_CORE_CAPABILITY,      .to_flags = ~0ull,
+> +    },
+> +};
+> +
+>  typedef struct X86RegisterInfo32 {
+>      /* Name of register */
+>      const char *name;
+> @@ -5086,9 +5090,42 @@ static void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
+>  {
+>      CPUX86State *env = &cpu->env;
+>      FeatureWord w;
+> +    int i;
+>      GList *l;
+>      Error *local_err = NULL;
+>  
+> +    for (l = plus_features; l; l = l->next) {
+> +        const char *prop = l->data;
+> +        object_property_set_bool(OBJECT(cpu), true, prop, &local_err);
+> +        if (local_err) {
+> +            goto out;
+> +        }
+> +    }
+> +
+> +    for (l = minus_features; l; l = l->next) {
+> +        const char *prop = l->data;
+> +        object_property_set_bool(OBJECT(cpu), false, prop, &local_err);
+> +        if (local_err) {
+> +            goto out;
+> +        }
+> +    }
 
-for you to fetch changes up to 03f990a5e31e28c9a2794729638f2117e028bfa5:
+Maybe getting rid of plus_features/minus_features (as described
+in the TODO comment below) will make things simpler.
 
-  ioapic: use irq number instead of vector in ioapic_eoi_broadcast (2019-07-05 22:19:59 +0200)
+> +
+> +    for (i = 0; i < ARRAY_SIZE(feature_dependencies); i++) {
+> +        FeatureDep *d = &feature_dependencies[i];
+> +        if ((env->user_features[d->from] & d->from_flag) &&
+> +            !(env->features[d->from] & d->from_flag)) {
 
-----------------------------------------------------------------
-Bugfixes.
+Why does it matter if the feature was cleared explicitly by the
+user?
 
-----------------------------------------------------------------
-Alex Bennée (1):
-      target/i386: fix feature check in hyperv-stub.c
+> +            uint64_t unavailable_features = env->features[d->to] & d->to_flags;
+> +
+> +            /* Not an error unless the dependent feature was added explicitly.  */
+> +            mark_unavailable_features(cpu, d->to, unavailable_features & env->user_features[d->to],
+> +                                      "This feature depends on other features that were not requested");
+> +
+> +            /* Prevent adding the feature in the loop below.  */
+> +            env->user_features[d->to] |= d->to_flags;
+> +            env->features[d->to] &= ~d->to_flags;
+> +        }
+> +    }
 
-Igor Mammedov (1):
-      pc: fix possible NULL pointer dereference in pc_machine_get_device_memory_region_size()
+Maybe move this entire block inside x86_cpu_filter_features()?
 
-Julio Montes (2):
-      Makefile: generate header file with the list of devices enabled
-      hw/i386: Fix linker error when ISAPC is disabled
+> +
+>      /*TODO: Now cpu->max_features doesn't overwrite features
+>       * set using QOM properties, and we can convert
+>       * plus_features & minus_features to global properties
+> @@ -5106,22 +5143,6 @@ static void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
+>          }
+>      }
+>  
+> -    for (l = plus_features; l; l = l->next) {
+> -        const char *prop = l->data;
+> -        object_property_set_bool(OBJECT(cpu), true, prop, &local_err);
+> -        if (local_err) {
+> -            goto out;
+> -        }
+> -    }
+> -
+> -    for (l = minus_features; l; l = l->next) {
+> -        const char *prop = l->data;
+> -        object_property_set_bool(OBJECT(cpu), false, prop, &local_err);
+> -        if (local_err) {
+> -            goto out;
+> -        }
+> -    }
+> -
+>      if (!kvm_enabled() || !cpu->expose_kvm) {
+>          env->features[FEAT_KVM] = 0;
+>      }
+> -- 
+> 1.8.3.1
+> 
+> 
+> 
 
-Li Qiang (2):
-      ioapic: clear irq_eoi when updating the ioapic redirect table entry
-      ioapic: use irq number instead of vector in ioapic_eoi_broadcast
-
-Liran Alon (1):
-      target/i386: kvm: Fix when nested state is needed for migration
-
-Max Reitz (1):
-      i386/kvm: Fix build with -m32
-
-Paolo Bonzini (2):
-      checkpatch: do not warn for multiline parenthesized returned value
-      minikconf: do not include variables from MINIKCONF_ARGS in config-all-devices.mak
-
-Peter Xu (1):
-      intel_iommu: Fix unexpected unmaps during global unmap
-
-Yan Zhao (1):
-      intel_iommu: Fix incorrect "end" for vtd_address_space_unmap
-
- Makefile.target           |  4 +++
- hw/i386/intel_iommu.c     | 71 ++++++++++++++++++++++++++++-------------------
- hw/i386/pc.c              |  6 +++-
- hw/i386/pc_piix.c         | 12 ++++++--
- hw/intc/ioapic.c          | 11 ++++----
- scripts/checkpatch.pl     |  3 +-
- scripts/create_config     |  2 ++
- scripts/minikconf.py      |  5 +++-
- target/i386/hyperv-stub.c |  2 +-
- target/i386/kvm.c         |  7 +++--
- target/i386/machine.c     |  5 ++--
- 11 files changed, 82 insertions(+), 46 deletions(-)
 -- 
-1.8.3.1
-
+Eduardo
 
