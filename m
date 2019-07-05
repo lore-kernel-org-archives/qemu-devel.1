@@ -6,57 +6,57 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4810C46499
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 20:19:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A0EDC46499
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 20:21:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A010A2133F
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 20:19:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A010A2133F
+	by mail.kernel.org (Postfix) with ESMTPS id 459252133F
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 20:21:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 459252133F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55780 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55800 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hjUgI-0007iS-V1
-	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 16:19:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60982)
+	id 1hjUiJ-0001rf-Gv
+	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 16:21:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60717)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jsnow@redhat.com>) id 1hjUds-0005Ok-N0
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 16:17:14 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hjUdU-0004z7-Lu
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 16:16:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hjUdq-00071N-OH
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 16:17:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34504)
+ (envelope-from <jsnow@redhat.com>) id 1hjUdT-0006fC-4F
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 16:16:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56094)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1hjUdm-0006uK-VM; Fri, 05 Jul 2019 16:17:07 -0400
+ id 1hjUdQ-0006cf-01; Fri, 05 Jul 2019 16:16:44 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 6A9D53084034;
- Fri,  5 Jul 2019 20:17:04 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 51C23307D84D;
+ Fri,  5 Jul 2019 20:16:43 +0000 (UTC)
 Received: from probe.redhat.com (ovpn-122-149.rdu2.redhat.com [10.10.122.149])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7827E867E6;
- Fri,  5 Jul 2019 20:17:02 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3C192867E6;
+ Fri,  5 Jul 2019 20:16:40 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: qemu-devel@nongnu.org,
 	qemu-block@nongnu.org
-Date: Fri,  5 Jul 2019 16:16:21 -0400
-Message-Id: <20190705201631.26266-9-jsnow@redhat.com>
+Date: Fri,  5 Jul 2019 16:16:14 -0400
+Message-Id: <20190705201631.26266-2-jsnow@redhat.com>
 In-Reply-To: <20190705201631.26266-1-jsnow@redhat.com>
 References: <20190705201631.26266-1-jsnow@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Fri, 05 Jul 2019 20:17:04 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.48]); Fri, 05 Jul 2019 20:16:43 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v3 08/18] hbitmap: enable merging across
- granularities
+Subject: [Qemu-devel] [PATCH v3 01/18] qapi/block-core: Introduce
+ BackupCommon
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -79,75 +79,181 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+drive-backup and blockdev-backup have an awful lot of things in common
+that are the same. Let's fix that.
+
+I don't deduplicate 'target', because the semantics actually did change
+between each structure. Leave that one alone so it can be documented
+separately.
+
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- util/hbitmap.c | 36 +++++++++++++++++++++++++++++++++++-
- 1 file changed, 35 insertions(+), 1 deletion(-)
+ qapi/block-core.json | 103 ++++++++++++++-----------------------------
+ 1 file changed, 33 insertions(+), 70 deletions(-)
 
-diff --git a/util/hbitmap.c b/util/hbitmap.c
-index 3b6acae42b..306bc4876d 100644
---- a/util/hbitmap.c
-+++ b/util/hbitmap.c
-@@ -777,7 +777,27 @@ void hbitmap_truncate(HBitmap *hb, uint64_t size)
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 0d43d4f37c..0af3866015 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -1315,32 +1315,23 @@
+   'data': { 'node': 'str', 'overlay': 'str' } }
 =20
- bool hbitmap_can_merge(const HBitmap *a, const HBitmap *b)
- {
--    return (a->size =3D=3D b->size) && (a->granularity =3D=3D b->granula=
-rity);
-+    return (a->orig_size =3D=3D b->orig_size);
-+}
+ ##
+-# @DriveBackup:
++# @BackupCommon:
+ #
+ # @job-id: identifier for the newly-created block job. If
+ #          omitted, the device name will be used. (Since 2.7)
+ #
+ # @device: the device name or node-name of a root node which should be c=
+opied.
+ #
+-# @target: the target of the new image. If the file exists, or if it
+-#          is a device, the existing file/device will be used as the new
+-#          destination.  If it does not exist, a new file will be create=
+d.
+-#
+-# @format: the format of the new destination, default is to
+-#          probe if @mode is 'existing', else the format of the source
+-#
+ # @sync: what parts of the disk image should be copied to the destinatio=
+n
+ #        (all the disk, only the sectors allocated in the topmost image,=
+ from a
+ #        dirty bitmap, or only new I/O).
+ #
+-# @mode: whether and how QEMU should create a new image, default is
+-#        'absolute-paths'.
+-#
+-# @speed: the maximum speed, in bytes per second
++# @speed: the maximum speed, in bytes per second. The default is 0,
++#         for unlimited.
+ #
+ # @bitmap: the name of dirty bitmap if sync is "incremental".
+ #          Must be present if sync is "incremental", must NOT be present
+-#          otherwise. (Since 2.4)
++#          otherwise. (Since 2.4 (drive-backup), 3.1 (blockdev-backup))
+ #
+ # @compress: true to compress data, if the target format supports it.
+ #            (default: false) (since 2.8)
+@@ -1370,75 +1361,47 @@
+ # I/O.  If an error occurs during a guest write request, the device's
+ # rerror/werror actions will be used.
+ #
++# Since: 4.2
++##
++{ 'struct': 'BackupCommon',
++  'data': { '*job-id': 'str', 'device': 'str',
++            'sync': 'MirrorSyncMode', '*speed': 'int',
++            '*bitmap': 'str', '*compress': 'bool',
++            '*on-source-error': 'BlockdevOnError',
++            '*on-target-error': 'BlockdevOnError',
++            '*auto-finalize': 'bool', '*auto-dismiss': 'bool' } }
 +
-+/**
-+ * hbitmap_sparse_merge: performs dst =3D dst | src
-+ * works with differing granularities.
-+ * best used when src is sparsely populated.
-+ */
-+static void hbitmap_sparse_merge(HBitmap *dst, const HBitmap *src)
-+{
-+    uint64_t offset =3D 0;
-+    uint64_t count =3D src->orig_size;
-+
-+    while (hbitmap_next_dirty_area(src, &offset, &count)) {
-+        hbitmap_set(dst, offset, count);
-+        offset +=3D count;
-+        if (offset >=3D src->orig_size) {
-+            break;
-+        }
-+        count =3D src->orig_size - offset;
-+    }
- }
++##
++# @DriveBackup:
++#
++# @target: the target of the new image. If the file exists, or if it
++#          is a device, the existing file/device will be used as the new
++#          destination.  If it does not exist, a new file will be create=
+d.
++#
++# @format: the format of the new destination, default is to
++#          probe if @mode is 'existing', else the format of the source
++#
++# @mode: whether and how QEMU should create a new image, default is
++#        'absolute-paths'.
++#
+ # Since: 1.6
+ ##
+ { 'struct': 'DriveBackup',
+-  'data': { '*job-id': 'str', 'device': 'str', 'target': 'str',
+-            '*format': 'str', 'sync': 'MirrorSyncMode',
+-            '*mode': 'NewImageMode', '*speed': 'int',
+-            '*bitmap': 'str', '*compress': 'bool',
+-            '*on-source-error': 'BlockdevOnError',
+-            '*on-target-error': 'BlockdevOnError',
+-            '*auto-finalize': 'bool', '*auto-dismiss': 'bool' } }
++  'base': 'BackupCommon',
++  'data': { 'target': 'str',
++            '*format': 'str',
++            '*mode': 'NewImageMode' } }
 =20
- /**
-@@ -808,10 +828,24 @@ bool hbitmap_merge(const HBitmap *a, const HBitmap =
-*b, HBitmap *result)
-         return true;
-     }
+ ##
+ # @BlockdevBackup:
+ #
+-# @job-id: identifier for the newly-created block job. If
+-#          omitted, the device name will be used. (Since 2.7)
+-#
+-# @device: the device name or node-name of a root node which should be c=
+opied.
+-#
+ # @target: the device name or node-name of the backup target node.
+ #
+-# @sync: what parts of the disk image should be copied to the destinatio=
+n
+-#        (all the disk, only the sectors allocated in the topmost image,=
+ or
+-#        only new I/O).
+-#
+-# @speed: the maximum speed, in bytes per second. The default is 0,
+-#         for unlimited.
+-#
+-# @bitmap: the name of dirty bitmap if sync is "incremental".
+-#          Must be present if sync is "incremental", must NOT be present
+-#          otherwise. (Since 3.1)
+-#
+-# @compress: true to compress data, if the target format supports it.
+-#            (default: false) (since 2.8)
+-#
+-# @on-source-error: the action to take on an error on the source,
+-#                   default 'report'.  'stop' and 'enospc' can only be u=
+sed
+-#                   if the block device supports io-status (see BlockInf=
+o).
+-#
+-# @on-target-error: the action to take on an error on the target,
+-#                   default 'report' (no limitations, since this applies=
+ to
+-#                   a different block device than @device).
+-#
+-# @auto-finalize: When false, this job will wait in a PENDING state afte=
+r it has
+-#                 finished its work, waiting for @block-job-finalize bef=
+ore
+-#                 making any block graph changes.
+-#                 When true, this job will automatically
+-#                 perform its abort or commit actions.
+-#                 Defaults to true. (Since 2.12)
+-#
+-# @auto-dismiss: When false, this job will wait in a CONCLUDED state aft=
+er it
+-#                has completely ceased all work, and awaits @block-job-d=
+ismiss.
+-#                When true, this job will automatically disappear from t=
+he query
+-#                list without user intervention.
+-#                Defaults to true. (Since 2.12)
+-#
+-# Note: @on-source-error and @on-target-error only affect background
+-# I/O.  If an error occurs during a guest write request, the device's
+-# rerror/werror actions will be used.
+-#
+ # Since: 2.3
+ ##
+ { 'struct': 'BlockdevBackup',
+-  'data': { '*job-id': 'str', 'device': 'str', 'target': 'str',
+-            'sync': 'MirrorSyncMode', '*speed': 'int',
+-            '*bitmap': 'str', '*compress': 'bool',
+-            '*on-source-error': 'BlockdevOnError',
+-            '*on-target-error': 'BlockdevOnError',
+-            '*auto-finalize': 'bool', '*auto-dismiss': 'bool' } }
++  'base': 'BackupCommon',
++  'data': { 'target': 'str' } }
 =20
-+    if (a->granularity !=3D b->granularity) {
-+        if ((a !=3D result) && (b !=3D result)) {
-+            hbitmap_reset_all(result);
-+        }
-+        if (a !=3D result) {
-+            hbitmap_sparse_merge(result, a);
-+        }
-+        if (b !=3D result) {
-+            hbitmap_sparse_merge(result, b);
-+        }
-+        return true;
-+    }
-+
-     /* This merge is O(size), as BITS_PER_LONG and HBITMAP_LEVELS are co=
-nstant.
-      * It may be possible to improve running times for sparsely populate=
-d maps
-      * by using hbitmap_iter_next, but this is suboptimal for dense maps=
-.
-      */
-+    assert(a->size =3D=3D b->size);
-     for (i =3D HBITMAP_LEVELS - 1; i >=3D 0; i--) {
-         for (j =3D 0; j < a->sizes[i]; j++) {
-             result->levels[i][j] =3D a->levels[i][j] | b->levels[i][j];
+ ##
+ # @blockdev-snapshot-sync:
 --=20
 2.21.0
 
