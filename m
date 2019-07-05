@@ -6,57 +6,57 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BEA99C5B57D
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 22:42:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A65E4C5B57D
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 22:43:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9584A2147A
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 22:42:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9584A2147A
+	by mail.kernel.org (Postfix) with ESMTPS id 79BA32147A
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 22:43:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 79BA32147A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56680 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56694 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hjWuP-00004v-QZ
-	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 18:42:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55020)
+	id 1hjWvQ-0001kk-PX
+	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 18:43:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54992)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <ehabkost@redhat.com>) id 1hjWUn-0007nD-4D
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 18:15:58 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1hjWUj-0007eG-B6
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 18:15:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1hjWUm-0003ZP-1a
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 18:15:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48112)
+ (envelope-from <ehabkost@redhat.com>) id 1hjWUi-0003WB-D4
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 18:15:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59976)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hjWUl-0003Z5-SY
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 18:15:55 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hjWUi-0003UB-7T
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 18:15:52 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 336558552E;
- Fri,  5 Jul 2019 22:15:55 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id D28BB3082E42;
+ Fri,  5 Jul 2019 22:15:47 +0000 (UTC)
 Received: from localhost (ovpn-116-30.gru2.redhat.com [10.97.116.30])
- by smtp.corp.redhat.com (Postfix) with ESMTP id BBC7145A8;
- Fri,  5 Jul 2019 22:15:54 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 65AFA891CF;
+ Fri,  5 Jul 2019 22:15:47 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>,
  Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
  Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
  Richard Henderson <rth@twiddle.net>
-Date: Fri,  5 Jul 2019 19:14:40 -0300
-Message-Id: <20190705221504.25166-19-ehabkost@redhat.com>
+Date: Fri,  5 Jul 2019 19:14:37 -0300
+Message-Id: <20190705221504.25166-16-ehabkost@redhat.com>
 In-Reply-To: <20190705221504.25166-1-ehabkost@redhat.com>
 References: <20190705221504.25166-1-ehabkost@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.28]); Fri, 05 Jul 2019 22:15:55 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.46]); Fri, 05 Jul 2019 22:15:47 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL v6 18/42] numa: deprecate implict memory
- distribution between nodes
+Subject: [Qemu-devel] [PULL v6 15/42] pc: fix possible NULL pointer
+ dereference in pc_machine_get_device_memory_region_size()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,56 +75,39 @@ Sender: "Qemu-devel"
 
 From: Igor Mammedov <imammedo@redhat.com>
 
-Implicit RAM distribution between nodes has exactly the same issues as:
-  "numa: deprecate 'mem' parameter of '-numa node' option"
-only with QEMU being the user that's 'adding' 'mem' parameter.
+QEMU will crash when device-memory-region-size property is read if ms->device_memory
+wasn't initialized yet.
 
-Deprecate it, to get it out of the way so that we could consolidate
-guest RAM allocation using memory backends making it consistent and
-possibly later on transition to using memory devices instead of
-adhoc memory mapping for the initial RAM.
+Crash can be reproduced with:
+ $QEMU -preconfig -qmp unix:qmp_socket,server,nowait &
+ ./scripts/qmp/qom-get -s qmp_socket /machine.device-memory-region-size
+
+Instead of crashing return 0 if ms->device_memory hasn't been initialized.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Message-Id: <1559205199-233510-4-git-send-email-imammedo@redhat.com>
+Message-Id: <20190624090200.5383-1-imammedo@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- hw/core/numa.c       | 3 +++
- qemu-deprecated.texi | 8 ++++++++
- 2 files changed, 11 insertions(+)
+ hw/i386/pc.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/hw/core/numa.c b/hw/core/numa.c
-index b9e79b8c8b..cb5fdbcb1e 100644
---- a/hw/core/numa.c
-+++ b/hw/core/numa.c
-@@ -405,6 +405,9 @@ void numa_complete_configuration(MachineState *ms)
-         if (i == nb_numa_nodes) {
-             assert(mc->numa_auto_assign_ram);
-             mc->numa_auto_assign_ram(mc, numa_info, nb_numa_nodes, ram_size);
-+            warn_report("Default splitting of RAM between nodes is deprecated,"
-+                        " Use '-numa node,memdev' to explictly define RAM"
-+                        " allocation per node");
-         }
- 
-         numa_total = 0;
-diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-index ba52999f7f..4a626f535d 100644
---- a/qemu-deprecated.texi
-+++ b/qemu-deprecated.texi
-@@ -104,6 +104,14 @@ In future new machine versions will not accept the option but it will still
- work with old machine types. User can check QAPI schema to see if the legacy
- option is supported by looking at MachineInfo::numa-mem-supported property.
- 
-+@subsection -numa node (without memory specified) (since 4.1)
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index e8378f6a0a..2107532d12 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -2553,7 +2553,11 @@ pc_machine_get_device_memory_region_size(Object *obj, Visitor *v,
+                                          Error **errp)
+ {
+     MachineState *ms = MACHINE(obj);
+-    int64_t value = memory_region_size(&ms->device_memory->mr);
++    int64_t value = 0;
 +
-+Splitting RAM by default between NUMA nodes has the same issues as @option{mem}
-+parameter described above with the difference that the role of the user plays
-+QEMU using implicit generic or board specific splitting rule.
-+Use @option{memdev} with @var{memory-backend-ram} backend or @option{mem} (if
-+it's supported by used machine type) to define mapping explictly instead.
-+
- @section QEMU Machine Protocol (QMP) commands
++    if (ms->device_memory) {
++        value = memory_region_size(&ms->device_memory->mr);
++    }
  
- @subsection block-dirty-bitmap-add "autoload" parameter (since 2.12.0)
+     visit_type_int(v, name, &value, errp);
+ }
 -- 
 2.18.0.rc1.1.g3f1ff2140
 
