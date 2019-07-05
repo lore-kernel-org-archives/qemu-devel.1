@@ -2,78 +2,83 @@ Return-Path: <SRS0=wUMn=VC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.5 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F38BC4649B
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 10:45:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B43CCC46499
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 10:46:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0B2E92133F
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 10:45:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B2E92133F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7F5F721850
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 10:46:50 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Up9JyrcM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F5F721850
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51504 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51518 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hjLiE-00082Z-7b
-	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 06:45:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58099)
+	id 1hjLjt-0000yV-I8
+	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 06:46:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58043)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <sgarzare@redhat.com>) id 1hjLga-0006fv-Br
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 06:43:26 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hjLgP-0006Qc-94
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 06:43:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <sgarzare@redhat.com>) id 1hjLgZ-0005gJ-14
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 06:43:24 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:46740)
+ (envelope-from <peter.maydell@linaro.org>) id 1hjLgN-0005Fa-JJ
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 06:43:13 -0400
+Received: from mail-ot1-x334.google.com ([2607:f8b0:4864:20::334]:36826)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1hjLgY-0005e4-P2
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 06:43:22 -0400
-Received: by mail-wr1-f68.google.com with SMTP id z1so4794539wru.13
- for <qemu-devel@nongnu.org>; Fri, 05 Jul 2019 03:43:22 -0700 (PDT)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hjLgM-000552-Kg
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 06:43:11 -0400
+Received: by mail-ot1-x334.google.com with SMTP id r6so8637679oti.3
+ for <qemu-devel@nongnu.org>; Fri, 05 Jul 2019 03:43:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=v0qhgR18Fi9HfFrlJtSXlRGtgiDzyVzDSnBD1LqJNoQ=;
+ b=Up9JyrcMhbIv4DgwIeiphhPJ8C+R9qbl3MafDn6WcITYa56HhNrf02rAHjUrwikaLS
+ ttoHSy6NU0c+g55Cr4292V93Ea8nRgRgSt2fzSrot1J9iBdhW5qRNTsRaSNwylRrzCvf
+ 7aocgSAIwgRuckyzPUQLW1PBJOmA/QmBx8Q91sZ1wy+NIDny0DlEb1N4PP7qtTZKRh2K
+ qCom7bQHCsalGf0CKVYQmgVeTJEINW1rHtbwbwdor04kbBDiWfxk6LIbeCC1v3g2SLkH
+ dw63qvTnuSWrsNT6uFOFEtp/eHhjPhvmK51CXvgKMqxHjeC0A8frA5YvUMpKFN+PMFeO
+ aBeA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to:user-agent;
- bh=uUX8H1e+XL3KDdnpYS4qjFFDhuP6GaNmKAvjKyAJy78=;
- b=cR/HnZniZSbSf5GH3x5sJU/2g3pLRxelxmWzaAAzIBAt0yRiZxZEa7/1t+MA+8dz3G
- AsO6EP5rE6EVAR4XT+4iRjotpacvE+7qrPPm1yeC1oHL5WZ6aleRSkeTQP4Fzj4zP8XO
- /4RM/qCrkpnNEvqKVM0xMsuOmYb86jpTKYVQLszYnhrwLRZwKNvAyJFAr1CeRq7RcyYM
- 0S9ylFQuqSnKfP/FY5SQaZyvFZj4+OdEkpVdsDQO+DTHsn6deA+bju3+hqsIu+llmtHG
- QipDCjqV3VWhquO54A+Ele+ntE4oq9asJr3xbzYiOdS684XmP3fhNouAM8ocK5yTvJOc
- Yq2Q==
-X-Gm-Message-State: APjAAAX1Jla4piDdd//9GfUS2llCARfSBzXiZZ0pvvpLhAVyeXCfkDmn
- B56FBmxjLV0FViTGrYSNsEli3Q==
-X-Google-Smtp-Source: APXvYqzAcV3z5cNa9XJsvxjrcR+3+48zyEhV5JfHYvpPnG6g7s61z2jq76UxOSFLS0CZGZmu8YIh3Q==
-X-Received: by 2002:a5d:6182:: with SMTP id j2mr3337036wru.275.1562323401503; 
- Fri, 05 Jul 2019 03:43:21 -0700 (PDT)
-Received: from steredhat (host21-207-dynamic.52-79-r.retail.telecomitalia.it.
- [79.52.207.21])
- by smtp.gmail.com with ESMTPSA id 72sm8468936wrk.22.2019.07.05.03.43.20
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Fri, 05 Jul 2019 03:43:21 -0700 (PDT)
-Date: Fri, 5 Jul 2019 12:43:18 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, Jason Dillaman <jdillama@redhat.com>
-Message-ID: <20190705104318.dngmmu3lpuvbe2nh@steredhat>
-References: <20190705093258.47856-1-sgarzare@redhat.com>
- <dcc9f3dc-78b4-4216-2791-b7e90f6d79ff@redhat.com>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=v0qhgR18Fi9HfFrlJtSXlRGtgiDzyVzDSnBD1LqJNoQ=;
+ b=hJHTBs8KZi1EM1QP61cjEceWdPsaMX7zyXsNgSqZobsQJJvjxI79iZi5jBtTLTBqQv
+ awKZ/K7cyqkMRuEhdtFW6ph3+1ngLiQGUlzkCX8loIn1De43+qTCmPbPC/iCm1KeWHhR
+ uNcrXtGPcH60DHsKjYSWnq9cMnS/DJMuxTYQMlHd0X9QIV1v1qppaf/dBQl8KZUymML3
+ W3RM/TtNt87zVYhN/sLWvk2XtQL+MinDmlFxFWSmFo7mQh/tSnrgBgYWKgaUbCNEIWW1
+ hXYqC9k3MrfmZld0hiEJrJW1/bMHgryIiaXAXq39P5QaWbUkOvf5FsJ6gdcngi6/9Xio
+ J73Q==
+X-Gm-Message-State: APjAAAXJKs6AoAS2STVZHp7KT5G1teFLDG5JZC2qB8H5jr5dOzodwJdO
+ +BOkaFg4uerHsAsn0d5sJK1wa5nzFsFqHQRyxRTbfA==
+X-Google-Smtp-Source: APXvYqyhPKEIk5toetEPxl+OuHN45B+5FhSi+d5WnmgsbDd4+ErjZazdi0MofP9peyyRfxsZcjwjLZ4DJ2ZtrCZNI4I=
+X-Received: by 2002:a9d:4d81:: with SMTP id u1mr2182472otk.221.1562323387343; 
+ Fri, 05 Jul 2019 03:43:07 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <dcc9f3dc-78b4-4216-2791-b7e90f6d79ff@redhat.com>
-User-Agent: NeoMutt/20180716
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.221.68
-Subject: Re: [Qemu-devel] [PATCH v3] block/rbd: implement
- .bdrv_get_allocated_file_size callback
+References: <CAFEAcA-yzWhwYPzC9px0H-=x3XEPVBjZOhk402is49YpbmJX9g@mail.gmail.com>
+ <ac682594-fac7-ca67-2cef-85db15920c7c@redhat.com>
+ <CAFEAcA-giDCA8ZTR3Ft3ZNQUBEJBaXNaMnZOmgPo3Auw1gvZjg@mail.gmail.com>
+ <faeb493b-f61b-16fe-3aff-aa40dffaf06b@redhat.com>
+ <CAFEAcA-o-_tvgxZFs8rWcgK147pFLrbQLZ1s_fD0Gzc+iQc4UQ@mail.gmail.com>
+ <9a1dbf89-a0b1-aeea-9066-e21029b0c48f@redhat.com>
+In-Reply-To: <9a1dbf89-a0b1-aeea-9066-e21029b0c48f@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 5 Jul 2019 11:42:56 +0100
+Message-ID: <CAFEAcA-=qUZTUPOOf8YecS2ut26=WwNBR=uEKuKqn8TWjsQtVQ@mail.gmail.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::334
+Subject: Re: [Qemu-devel] pl031 time across vm save/reload
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,139 +90,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Josh Durgin <jdurgin@redhat.com>,
- John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: QEMU Developers <qemu-devel@nongnu.org>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jul 05, 2019 at 11:58:43AM +0200, Max Reitz wrote:
-> On 05.07.19 11:32, Stefano Garzarella wrote:
-> > This patch allows 'qemu-img info' to show the 'disk size' for
-> > the RBD images that have the fast-diff feature enabled.
-> > 
-> > If this feature is enabled, we use the rbd_diff_iterate2() API
-> > to calculate the allocated size for the image.
-> > 
-> > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-> > ---
-> > v3:
-> >   - return -ENOTSUP instead of -1 when fast-diff is not available
-> >     [John, Jason]
-> > v2:
-> >   - calculate the actual usage only if the fast-diff feature is
-> >     enabled [Jason]
-> > ---
-> >  block/rbd.c | 54 +++++++++++++++++++++++++++++++++++++++++++++++++++++
-> >  1 file changed, 54 insertions(+)
-> 
-> Well, the librbd documentation is non-existing as always, but while
-> googling, I at least found that libvirt has exactly the same code.  So I
-> suppose it must be quite correct, then.
-> 
+On Fri, 5 Jul 2019 at 11:32, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 05/07/19 12:21, Peter Maydell wrote:
+> > On Fri, 5 Jul 2019 at 11:13, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> >> Yes, something like that but I would just bump the version.  Version 1
+> >> has the old meaning for the first field, version 2 has the new meaning.
+> >
+> > Yeah, we could do that. I thought we preferred to avoid using
+> > version-numbers for migration though these days ? (cc'ing DG
+> > in case he has an opinion.)
+>
+> Yeah I suppose a subsection would make it easier to keep the old broken
+> behavior for old machine types.  It would be a bit more code.
 
-While I wrote this code I took a look at libvirt implementation and also
-at the "rbd" tool in the ceph repository: compute_image_disk_usage() in
-src/tools/rbd/action/DiskUsage.cc
+On which note, which of us is going to write this code ? :-)
 
-> > diff --git a/block/rbd.c b/block/rbd.c
-> > index 59757b3120..b6bed683e5 100644
-> > --- a/block/rbd.c
-> > +++ b/block/rbd.c
-> > @@ -1084,6 +1084,59 @@ static int64_t qemu_rbd_getlength(BlockDriverState *bs)
-> >      return info.size;
-> >  }
-> >  
-> > +static int rbd_allocated_size_cb(uint64_t offset, size_t len, int exists,
-> > +                                 void *arg)
-> > +{
-> > +    int64_t *alloc_size = (int64_t *) arg;
-> > +
-> > +    if (exists) {
-> > +        (*alloc_size) += len;
-> > +    }
-> > +
-> > +    return 0;
-> > +}
-> > +
-> > +static int64_t qemu_rbd_get_allocated_file_size(BlockDriverState *bs)
-> > +{
-> > +    BDRVRBDState *s = bs->opaque;
-> > +    uint64_t flags, features;
-> > +    int64_t alloc_size = 0;
-> > +    int r;
-> > +
-> > +    r = rbd_get_flags(s->image, &flags);
-> > +    if (r < 0) {
-> > +        return r;
-> > +    }
-> > +
-> > +    r = rbd_get_features(s->image, &features);
-> > +    if (r < 0) {
-> > +        return r;
-> > +    }
-> > +
-> > +    /*
-> > +     * We use rbd_diff_iterate2() only if the RBD image have fast-diff
-> > +     * feature enabled. If it is disabled, rbd_diff_iterate2() could be
-> > +     * very slow on a big image.
-> > +     */
-> > +    if (!(features & RBD_FEATURE_FAST_DIFF) ||
-> > +        (flags & RBD_FLAG_FAST_DIFF_INVALID)) {
-> > +        return -ENOTSUP;
-> > +    }
-> > +
-> > +    /*
-> > +     * rbd_diff_iterate2(), if the source snapshot name is NULL, invokes
-> > +     * the callback on all allocated regions of the image.
-> > +     */
-> > +    r = rbd_diff_iterate2(s->image, NULL, 0,
-> > +                          bs->total_sectors * BDRV_SECTOR_SIZE, 0, 1,
-> > +                          &rbd_allocated_size_cb, &alloc_size);
-> 
-> But I have a question.  This is basically block_status, right?  So it
-> gives us information on which areas are allocated and which are not.
-> The result thus gives us a lower bound on the allocation size, but is it
-> really exactly the allocation size?
-> 
-> There are two things I’m concerned about:
-> 
-> 1. What about metadata?
+> >> And also, since our brains are fresh on pl031... currently s->lr is
+> >> always 0; besides the bug that writing RTC_LR should update it, the
+> >> datasheet says the counter counts up from 1 so perhaps at startup s->lr
+> >> should be set to a nonzero value?   That would be
+> >> qemu_ref_timedate(QEMU_CLOCK_VIRTUAL) - 1.
+> >
+> > The 'summary of RTC registers' section in the datasheet says
+> > that RTCLR's reset value is zero...
+>
+> Right, but RTCDR doesn't return the current wallclock after power up on
+> real hardware, doesn't it?  So the choices are 1) RTCLR returns 0 and it
+> looks like the board was powered on in the seventies; 2) RTCLR is not 0
+> and it looks like some firmware ran initialized RTCLR.
 
-Good question, I don't think it includes the size used by metadata and I
-don't know if there is a way to know it. I'll check better.
+I would want to test the behaviour of real hardware here before
+bothering to change QEMU's implementation. And I'm not sure
+it really justifies fiddling with it... (It's not impossible
+that the hardware implementation really does hold "last value
+written to this register" distinct from "whatever the offset
+we have between the counter and RTCDR is", such that the value
+read from RTCLR immediately on reset has no relation to what
+the RTC is actually done and is just the reset value of the
+relevant flops (ie 0).)
 
-> 
-> 2. If you have multiple snapshots, this will only report the overall
-> allocation information, right?  So say there is something like this:
-> 
-> (“A” means an allocated MB, “-” is an unallocated MB)
-> 
-> Snapshot 1: AAAA---
-> Snapshot 2: --AAAAA
-> Snapshot 3: -AAAA--
-> 
-> I think the allocated data size is the number of As in total (13 MB).
-> But I suppose this API will just return 7 MB, because it looks on
-> everything an it sees the whole image range (7 MB) to be allocated.  It
-> doesn’t report in how many snapshots some region is allocated.
-
-Looking at the documentation of rbd_diff_iterate2() [1] they says:
-
- *                        If the source snapshot name is NULL, we
- * interpret that as the beginning of time and return all allocated
- * regions of the image.
-
-But I don't know the answer of your question (maybe Jason can help
-here).
-I should check better the implementation to understand if I can cycle
-on all snapshot to get the exact allocated data size.
-
-https://github.com/ceph/ceph/blob/master/src/include/rbd/librbd.h#L925
-
-I'll back when I have more details on the rbd implementation to better
-answer your questions.
-
-Thanks,
-Stefano
+thanks
+-- PMM
 
