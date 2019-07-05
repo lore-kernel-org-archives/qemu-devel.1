@@ -1,80 +1,67 @@
-Return-Path: <SRS0=wUMn=VC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=Pmsr=VD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33B8EC5B57D
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 23:06:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96D2CC5B57D
+	for <qemu-devel@archiver.kernel.org>; Sat,  6 Jul 2019 00:05:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F384220863
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 23:06:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F384220863
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5CE7B2184C
+	for <qemu-devel@archiver.kernel.org>; Sat,  6 Jul 2019 00:05:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5CE7B2184C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56895 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57072 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hjXHe-0007XA-BS
-	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 19:06:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60114)
+	id 1hjYCw-0003FG-52
+	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 20:05:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44226)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <pbonzini@redhat.com>) id 1hjWuQ-0000dM-3P
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 18:42:28 -0400
+ (envelope-from <no-reply@patchew.org>) id 1hjY7p-0001wr-9u
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 20:00:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1hjWuO-0004Kz-Sr
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 18:42:25 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:35095)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hjWuO-0004KI-M6
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 18:42:24 -0400
-Received: by mail-wm1-f65.google.com with SMTP id l2so3759895wmg.0
- for <qemu-devel@nongnu.org>; Fri, 05 Jul 2019 15:42:24 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=WbT8uddacS0MBsLdGmYorxeWsRGrlw65adq5Yikgh7Q=;
- b=pbKlR5K5AUhAGymJsWyweRu4RO+gAhl6RcsQdb8KMlwC4yTKCdwAXRFEpOzCLIu3qD
- O1ByPrPll1iE8/uhBmwjppNk4P0FWqA5qpLDZWLhyNq5d0Z4OviUUTXmR/lJoaqz7EcN
- QaasimhJLM2+XLwa6z7fMXU0GCDVZvR/qXNn9Vbe5DNg2BXDw1h4LYQdMAOAREGEcNNk
- 2c+MbdnqSgKkbQyLoFg5+6CRkewT/XZQHzRvGgIukQgT3p89fla8sYWCCr2iZc4vB/xf
- E7Qox2DE6H+qnIurdRFCgdssn9mnN3U8ZTK9Uqu+sQrwBFqry17MdaeBMr+8u89eHw6H
- /4gA==
-X-Gm-Message-State: APjAAAW2w6KkEFwKK4VSLHAXf69y2N4Bas2yu+/kAP8yDF+MUOeB/fC2
- y+jMWMtO9GSdr0dihpPRP7EXYA==
-X-Google-Smtp-Source: APXvYqzeCo4L6f6LHpoYFhUbGgmsJBWyyOpFBbl08JEHh4/Bf9dmtuN/tgls3y/DCnl1AMJKBcF48A==
-X-Received: by 2002:a1c:3587:: with SMTP id c129mr5055283wma.90.1562366543536; 
- Fri, 05 Jul 2019 15:42:23 -0700 (PDT)
-Received: from [192.168.10.150] ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id p4sm10293875wrs.35.2019.07.05.15.42.22
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Fri, 05 Jul 2019 15:42:22 -0700 (PDT)
-To: Eduardo Habkost <ehabkost@redhat.com>
-References: <1562079681-19204-1-git-send-email-pbonzini@redhat.com>
- <1562079681-19204-7-git-send-email-pbonzini@redhat.com>
- <20190705212249.GG5198@habkost.net>
- <6262c798-fc94-5100-8836-e3cbea306282@redhat.com>
- <20190705223329.GL5198@habkost.net>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <ea52e4c3-2553-b778-2b25-6a460fd67967@redhat.com>
-Date: Sat, 6 Jul 2019 00:42:22 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+ (envelope-from <no-reply@patchew.org>) id 1hjY7n-0002pF-CJ
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 20:00:21 -0400
+Resent-Date: Fri, 05 Jul 2019 20:00:21 -0400
+Resent-Message-Id: <E1hjY7n-0002pF-CJ@eggs.gnu.org>
+Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21570)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1hjY7n-0002oq-3k
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 20:00:19 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1562371181; cv=none; d=zoho.com; s=zohoarc; 
+ b=KYLJSYQGGX+no4rUbEFUBsTpzv/LgjT2UICGUAxAPJoFuYJ1rm61TLjYFKnj5S1L1ereeHUEfCa0NSjSWLxInHRFio71zpEkEkDTex0m3w1JmygV2j1bHX3hBeArlgTeDB9jGP6rtGgnqgzQhspcdd2zzXrPZc+fqIMRAUXTmso=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1562371181;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+ bh=PfD5DGjPxt19pv8FhEzBr8Pk4jEMUb9oQ/ZlaD51GXg=; 
+ b=Bta3uoPccH95rS0uYGusRedjNPEaloj6ERBbiWtS3LM+7p5hQ/SNJsnGQe5xmzO2jzyhrpQmB4LUPvwGPghH1YANRhVMotktokSDXDiUZ6LOpKvy4Y9dNHBdxnyF0wpfADFh47ITml6m20moZwR79laesoG1jFHVdGGj/wv9D+U=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1562371180584882.9153102588233;
+ Fri, 5 Jul 2019 16:59:40 -0700 (PDT)
+Message-ID: <156237117910.4200.14766638475489254088@c4a48874b076>
+In-Reply-To: <20190705083141.106254-1-ysato@users.sourceforge.jp>
 MIME-Version: 1.0
-In-Reply-To: <20190705223329.GL5198@habkost.net>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: ysato@users.sourceforge.jp
+Date: Fri, 5 Jul 2019 16:59:40 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.128.65
-Subject: Re: [Qemu-devel] [PATCH 6/7] target/i386: add VMX features
+X-Received-From: 136.143.188.55
+Subject: Re: [Qemu-devel] [PATCH v22 00/22] Add RX archtecture support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,52 +73,151 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Liran Alon <liran.alon@oracle.com>, qemu-devel@nongnu.org
+Reply-To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, ysato@users.sourceforge.jp,
+ richard.henderson@linaro.org, qemu-devel@nongnu.org, imammedo@redhat.com,
+ philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 06/07/19 00:33, Eduardo Habkost wrote:
-> Oh, that's the info I was missing.  I always expected
-> kvm_arch_get_supported_*() to be subject to change (depending on
-> KVM and hardware capabilities), and not be part of guest ABI.
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDcwNTA4MzE0MS4xMDYy
+NTQtMS15c2F0b0B1c2Vycy5zb3VyY2Vmb3JnZS5qcC8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVt
+cyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZv
+cgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1YmplY3Q6IFtRZW11LWRldmVsXSBb
+UEFUQ0ggdjIyIDAwLzIyXSBBZGQgUlggYXJjaHRlY3R1cmUgc3VwcG9ydApNZXNzYWdlLWlkOiAy
+MDE5MDcwNTA4MzE0MS4xMDYyNTQtMS15c2F0b0B1c2Vycy5zb3VyY2Vmb3JnZS5qcAoKPT09IFRF
+U1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJhc2UgPiAvZGV2
+L251bGwgfHwgZXhpdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0
+IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZm
+LmFsZ29yaXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBi
+YXNlLi4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3Bh
+dGNoZXctcHJvamVjdC9xZW11CiAtIFt0YWcgdXBkYXRlXSAgICAgIHBhdGNoZXcvMjAxOTA3MDUw
+ODMxNDEuMTA2MjU0LTEteXNhdG9AdXNlcnMuc291cmNlZm9yZ2UuanAgLT4gcGF0Y2hldy8yMDE5
+MDcwNTA4MzE0MS4xMDYyNTQtMS15c2F0b0B1c2Vycy5zb3VyY2Vmb3JnZS5qcApTd2l0Y2hlZCB0
+byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjc2OGRiMjYgdGFyZ2V0L3J4OiByZW1vdmUgdW51c2VkIGZ1
+bmN0aW9ucy4KZWQ4YTk5ZSBCb290TGludXhDb25zb2xlVGVzdDogVGVzdCB0aGUgUlgtVmlydCBt
+YWNoaW5lCmNlNjA0MTEgQWRkIHJ4LXNvZnRtbXUKYzVmZGIzMyBody9yeDogUmVzdHJpY3QgdGhl
+IFJYNjJOIG1pY3JvY29udHJvbGxlciB0byB0aGUgUlg2Mk4gQ1BVIGNvcmUKNDJlZDlmYyBody9y
+eDogSG9ub3IgLWFjY2VsIHF0ZXN0CjBhZjE5OGUgaHcvcng6IFJYIFRhcmdldCBoYXJkd2FyZSBk
+ZWZpbml0aW9uCjlkYmE3MGQgaHcvY2hhcjogUlg2Mk4gc2VyaWFsIGNvbW11bmljYXRpb24gaW50
+ZXJmYWNlIChTQ0kpCmJiMDJiZWYgaHcvdGltZXI6IFJYNjJOIGludGVybmFsIHRpbWVyIG1vZHVs
+ZXMKODRhOTg4YyBody9pbnRjOiBSWDYyTiBpbnRlcnJ1cHQgY29udHJvbGxlciAoSUNVYSkKMjE0
+ODYxYSB0YXJnZXQvcng6IER1bXAgYnl0ZXMgZm9yIGVhY2ggaW5zbiBkdXJpbmcgZGlzYXNzZW1i
+bHkKYmM1NDI2YSB0YXJnZXQvcng6IENvbGxlY3QgYWxsIGJ5dGVzIGR1cmluZyBkaXNhc3NlbWJs
+eQpiZTYyMWQxIHRhcmdldC9yeDogRW1pdCBhbGwgZGlzYXNzZW1ibHkgaW4gb25lIHBydCgpCmMw
+MzNlNTcgdGFyZ2V0L3J4OiBVc2UgcHJ0X2xkbWkgZm9yIFhDSEdfbXIgZGlzYXNzZW1ibHkKOGMw
+NjFlNCB0YXJnZXQvcng6IFJlcGxhY2Ugb3BlcmFuZCB3aXRoIHBydF9sZG1pIGluIGRpc2Fzc2Vt
+Ymxlcgo1ZmQxZDY5IHRhcmdldC9yeDogRGlzYXNzZW1ibGUgcnhfaW5kZXhfYWRkciBpbnRvIGEg
+c3RyaW5nCjRiMzYwYWMgdGFyZ2V0L3J4OiBSWCBkaXNhc3NlbWJsZXIKNTkwMDcyOSB0YXJnZXQv
+cng6IENQVSBkZWZpbml0aW9uCmEyYThmNGQgdGFyZ2V0L3J4OiBUQ0cgaGVscGVyCjRiYWZjM2Qg
+dGFyZ2V0L3J4OiBUQ0cgdHJhbnNsYXRpb24KY2JhNzgxOSBody9yZWdpc3RlcmZpZWxkcy5oOiBB
+ZGQgOGJpdCBhbmQgMTZiaXQgcmVnaXN0ZXIgbWFjcm9zCjlhOWRlNmUgcWVtdS9iaXRvcHMuaDog
+QWRkIGV4dHJhY3Q4IGFuZCBleHRyYWN0MTYKOGNhN2Y0ZiBNQUlOVEFJTkVSUzogQWRkIFJYCgo9
+PT0gT1VUUFVUIEJFR0lOID09PQoxLzIyIENoZWNraW5nIGNvbW1pdCA4Y2E3ZjRmZmRkMDcgKE1B
+SU5UQUlORVJTOiBBZGQgUlgpCjIvMjIgQ2hlY2tpbmcgY29tbWl0IDlhOWRlNmVkMjQxZCAocWVt
+dS9iaXRvcHMuaDogQWRkIGV4dHJhY3Q4IGFuZCBleHRyYWN0MTYpCjMvMjIgQ2hlY2tpbmcgY29t
+bWl0IGNiYTc4MTliMWYwYSAoaHcvcmVnaXN0ZXJmaWVsZHMuaDogQWRkIDhiaXQgYW5kIDE2Yml0
+IHJlZ2lzdGVyIG1hY3JvcykKVXNlIG9mIHVuaW5pdGlhbGl6ZWQgdmFsdWUgaW4gY29uY2F0ZW5h
+dGlvbiAoLikgb3Igc3RyaW5nIGF0IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIGxpbmUgMjQ2Ny4K
+RVJST1I6IE1hY3JvcyB3aXRoIG11bHRpcGxlIHN0YXRlbWVudHMgc2hvdWxkIGJlIGVuY2xvc2Vk
+IGluIGEgZG8gLSB3aGlsZSBsb29wCiMyNzogRklMRTogaW5jbHVkZS9ody9yZWdpc3RlcmZpZWxk
+cy5oOjI1OgorI2RlZmluZSBSRUc4KHJlZywgYWRkcikgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICBlbnVtIHsgQV8gIyMgcmVnID0gKGFkZHIp
+IH07ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgIGVudW0g
+eyBSXyAjIyByZWcgPSAoYWRkcikgfTsKCkVSUk9SOiBNYWNyb3Mgd2l0aCBtdWx0aXBsZSBzdGF0
+ZW1lbnRzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBhIGRvIC0gd2hpbGUgbG9vcAojMzE6IEZJTEU6
+IGluY2x1ZGUvaHcvcmVnaXN0ZXJmaWVsZHMuaDoyOToKKyNkZWZpbmUgUkVHMTYocmVnLCBhZGRy
+KSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAg
+IGVudW0geyBBXyAjIyByZWcgPSAoYWRkcikgfTsgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICBcCisgICAgZW51bSB7IFJfICMjIHJlZyA9IChhZGRyKSAvIDIgfTsKCnRv
+dGFsOiAyIGVycm9ycywgMCB3YXJuaW5ncywgNTYgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMy8yMiBo
+YXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3Jz
+CmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpD
+SEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKNC8yMiBDaGVja2luZyBjb21taXQgNGJhZmMzZGQw
+OWQ3ICh0YXJnZXQvcng6IFRDRyB0cmFuc2xhdGlvbikKV0FSTklORzogYWRkZWQsIG1vdmVkIG9y
+IGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMjA6IApu
+ZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAzMDY1IGxp
+bmVzIGNoZWNrZWQKClBhdGNoIDQvMjIgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3
+LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVt
+IHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KNS8yMiBD
+aGVja2luZyBjb21taXQgYTJhOGY0ZGNiNzM4ICh0YXJnZXQvcng6IFRDRyBoZWxwZXIpCldBUk5J
+Tkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVl
+ZCB1cGRhdGluZz8KIzI1OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywg
+MSB3YXJuaW5ncywgNjQ5IGxpbmVzIGNoZWNrZWQKClBhdGNoIDUvMjIgaGFzIHN0eWxlIHByb2Js
+ZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9z
+aXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBN
+QUlOVEFJTkVSUy4KNi8yMiBDaGVja2luZyBjb21taXQgNTkwMDcyOTA3OWNiICh0YXJnZXQvcng6
+IENQVSBkZWZpbml0aW9uKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMp
+LCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMyOTogCm5ldyBmaWxlIG1vZGUgMTAw
+NjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDYyMiBsaW5lcyBjaGVja2VkCgpQYXRj
+aCA2LzIyIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVz
+ZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5l
+ciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjcvMjIgQ2hlY2tpbmcgY29tbWl0IDRi
+MzYwYWM1YzJhMSAodGFyZ2V0L3J4OiBSWCBkaXNhc3NlbWJsZXIpCldBUk5JTkc6IGFkZGVkLCBt
+b3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8K
+IzM4OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywg
+MTQ5NyBsaW5lcyBjaGVja2VkCgpQYXRjaCA3LzIyIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNl
+IHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBv
+cnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMu
+CjgvMjIgQ2hlY2tpbmcgY29tbWl0IDVmZDFkNjlhODVlMyAodGFyZ2V0L3J4OiBEaXNhc3NlbWJs
+ZSByeF9pbmRleF9hZGRyIGludG8gYSBzdHJpbmcpCjkvMjIgQ2hlY2tpbmcgY29tbWl0IDhjMDYx
+ZTQxMmZlNSAodGFyZ2V0L3J4OiBSZXBsYWNlIG9wZXJhbmQgd2l0aCBwcnRfbGRtaSBpbiBkaXNh
+c3NlbWJsZXIpCjEwLzIyIENoZWNraW5nIGNvbW1pdCBjMDMzZTU3OWIzODYgKHRhcmdldC9yeDog
+VXNlIHBydF9sZG1pIGZvciBYQ0hHX21yIGRpc2Fzc2VtYmx5KQoxMS8yMiBDaGVja2luZyBjb21t
+aXQgYmU2MjFkMTY5ZThmICh0YXJnZXQvcng6IEVtaXQgYWxsIGRpc2Fzc2VtYmx5IGluIG9uZSBw
+cnQoKSkKMTIvMjIgQ2hlY2tpbmcgY29tbWl0IGJjNTQyNmFmMmMwMSAodGFyZ2V0L3J4OiBDb2xs
+ZWN0IGFsbCBieXRlcyBkdXJpbmcgZGlzYXNzZW1ibHkpCjEzLzIyIENoZWNraW5nIGNvbW1pdCAy
+MTQ4NjFhZDkzZGQgKHRhcmdldC9yeDogRHVtcCBieXRlcyBmb3IgZWFjaCBpbnNuIGR1cmluZyBk
+aXNhc3NlbWJseSkKMTQvMjIgQ2hlY2tpbmcgY29tbWl0IDg0YTk4OGNhY2Q1YSAoaHcvaW50Yzog
+Ulg2Mk4gaW50ZXJydXB0IGNvbnRyb2xsZXIgKElDVWEpKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQg
+b3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiM0MDog
+Cm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDQ0MiBs
+aW5lcyBjaGVja2VkCgpQYXRjaCAxNC8yMiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZp
+ZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRo
+ZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoxNS8y
+MiBDaGVja2luZyBjb21taXQgYmIwMmJlZjk4YTY2IChody90aW1lcjogUlg2Mk4gaW50ZXJuYWwg
+dGltZXIgbW9kdWxlcykKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwg
+ZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojNTA6IApuZXcgZmlsZSBtb2RlIDEwMDY0
+NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA4MzkgbGluZXMgY2hlY2tlZAoKUGF0Y2gg
+MTUvMjIgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
+IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
+LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMTYvMjIgQ2hlY2tpbmcgY29tbWl0IDlk
+YmE3MGQ5N2NjMyAoaHcvY2hhcjogUlg2Mk4gc2VyaWFsIGNvbW11bmljYXRpb24gaW50ZXJmYWNl
+IChTQ0kpKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1B
+SU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiM0MzogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3Rh
+bDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDM5OCBsaW5lcyBjaGVja2VkCgpQYXRjaCAxNi8yMiBo
+YXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3Jz
+CmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpD
+SEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoxNy8yMiBDaGVja2luZyBjb21taXQgMGFmMTk4ZTVh
+ODFhIChody9yeDogUlggVGFyZ2V0IGhhcmR3YXJlIGRlZmluaXRpb24pCldBUk5JTkc6IGFkZGVk
+LCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGlu
+Zz8KIzI2OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5n
+cywgNDc5IGxpbmVzIGNoZWNrZWQKClBhdGNoIDE3LzIyIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxl
+YXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyBy
+ZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5F
+UlMuCjE4LzIyIENoZWNraW5nIGNvbW1pdCA0MmVkOWZjYTkyY2UgKGh3L3J4OiBIb25vciAtYWNj
+ZWwgcXRlc3QpCjE5LzIyIENoZWNraW5nIGNvbW1pdCBjNWZkYjMzNGI1OGQgKGh3L3J4OiBSZXN0
+cmljdCB0aGUgUlg2Mk4gbWljcm9jb250cm9sbGVyIHRvIHRoZSBSWDYyTiBDUFUgY29yZSkKMjAv
+MjIgQ2hlY2tpbmcgY29tbWl0IGNlNjA0MTE2M2JkYSAoQWRkIHJ4LXNvZnRtbXUpCldBUk5JTkc6
+IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1
+cGRhdGluZz8KIzYxOiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3
+YXJuaW5ncywgNzMgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMjAvMjIgaGFzIHN0eWxlIHByb2JsZW1z
+LCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRp
+dmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlO
+VEFJTkVSUy4KMjEvMjIgQ2hlY2tpbmcgY29tbWl0IGVkOGE5OWVhYjBmNyAoQm9vdExpbnV4Q29u
+c29sZVRlc3Q6IFRlc3QgdGhlIFJYLVZpcnQgbWFjaGluZSkKMjIvMjIgQ2hlY2tpbmcgY29tbWl0
+IDc2OGRiMjY3ZjgyNSAodGFyZ2V0L3J4OiByZW1vdmUgdW51c2VkIGZ1bmN0aW9ucy4pCldBUk5J
+Tkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVl
+ZCB1cGRhdGluZz8KIzIxOiAKZGVsZXRlZCBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJv
+cnMsIDEgd2FybmluZ3MsIDUgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMjIvMjIgaGFzIHN0eWxlIHBy
+b2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2Ug
+cG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBp
+biBNQUlOVEFJTkVSUy4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdp
+dGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcu
+b3JnL2xvZ3MvMjAxOTA3MDUwODMxNDEuMTA2MjU0LTEteXNhdG9AdXNlcnMuc291cmNlZm9yZ2Uu
+anAvdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQg
+YXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBz
+ZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
 
-For most bits that's true.  Just not for these ones, because they are
-integer values rather than bit flags.
-
-The reason for the complex rules is that you need to know what is a
-flag, what is a fixed value that the guest uses, and what is a maximum
-supported value.  Simpler userspace than QEMU can just use the defaults
-since they don't care about maintaining the guest ABI.
-
-> Now, if KVM is going to to implement the guest ABI guarantee at
-> KVM_GET_MSRS, that's OK.  Is this going to be obvious to people
-> touching KVM_GET_MSRS in the future?
-> 
-> What if we do want the guest ABI to change in the future?  How do
-> you expect QEMU to ask KVM to enable the new guest ABI?  How do
-> you expect the user to ask QEMU to enable the new guest ABI?
-
-That would be with ioctl(KVM_ENABLE_CAP) for KVM, and with -cpu for QEMU.
-
->> - KVM could change bits 16-24, but it always allows writing a value that
->> is _smaller_ than the one you read.  So I'm zeroing those, ensuring no
->> future ABI changes.
->>
->> - KVM could in theory change bits 25-27: here it also allows writing a
->> value that is smaller than the one you read, so guest ABI is preserved.
->>  Such a change is very unlikely, all Intel silicon has always had 0
->> here.  But I can change the code to zero these three bits just like bits
->> 16-24.
-> 
-> The complex rules above make me a bit nervous.  Can we at least
-> make QEMU validate the values returned by
-> kvm_arch_get_supported_msr_feature() to catch ABI-breaking
-> mistakes in the future?
-
-I don't know... I'm a bit wary of adding hard-coded values in QEMU,
-userspace simply should not care.  But I can add comments to KVM to
-remind people of values that should not be changed.
-
-Paolo
 
