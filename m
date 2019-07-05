@@ -2,52 +2,72 @@ Return-Path: <SRS0=wUMn=VC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 575F5C5B57D
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 03:26:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5630FC5B57D
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 04:30:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 111CE21852
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 03:26:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 111CE21852
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ozlabs.ru
+	by mail.kernel.org (Postfix) with ESMTPS id 2B82421670
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 04:30:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B82421670
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49656 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49745 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hjErk-0006Op-QY
-	for qemu-devel@archiver.kernel.org; Thu, 04 Jul 2019 23:26:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34178)
+	id 1hjFs9-00036T-7e
+	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 00:30:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44264)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <aik@ozlabs.ru>) id 1hjEqx-0005nu-Ug
- for qemu-devel@nongnu.org; Thu, 04 Jul 2019 23:25:40 -0400
+ (envelope-from <bounces@canonical.com>) id 1hjFqz-0002Z4-Qg
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 00:29:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aik@ozlabs.ru>) id 1hjEqw-0004aC-8y
- for qemu-devel@nongnu.org; Thu, 04 Jul 2019 23:25:39 -0400
-Received: from ozlabs.ru ([107.173.13.209]:54631)
- by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <aik@ozlabs.ru>)
- id 1hjEqw-0004Z7-3t; Thu, 04 Jul 2019 23:25:38 -0400
-Received: from fstn1-p1.ozlabs.ibm.com (localhost [IPv6:::1])
- by ozlabs.ru (Postfix) with ESMTP id CED23AE80004;
- Thu,  4 Jul 2019 23:25:03 -0400 (EDT)
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
+ (envelope-from <bounces@canonical.com>) id 1hjFqy-0005i8-K5
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 00:29:45 -0400
+Received: from indium.canonical.com ([91.189.90.7]:47620)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1hjFqy-0005hR-EG
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 00:29:44 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1hjFqw-0006AG-Su
+ for <qemu-devel@nongnu.org>; Fri, 05 Jul 2019 04:29:42 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id D872B2E8024
+ for <qemu-devel@nongnu.org>; Fri,  5 Jul 2019 04:29:42 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 05 Jul 2019 04:18:03 -0000
+From: Launchpad Bug Tracker <1462640@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
-Date: Fri,  5 Jul 2019 13:25:01 +1000
-Message-Id: <20190705032501.106966-1-aik@ozlabs.ru>
-X-Mailer: git-send-email 2.17.1
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 107.173.13.209
-Subject: [Qemu-devel] [RFC PATCH qemu] vfio-quirks: Pass the actual parent
- when deleting a memory region
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Expired; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: janitor th-huth v-adrien
+X-Launchpad-Bug-Reporter: AH (v-adrien)
+X-Launchpad-Bug-Modifier: Launchpad Janitor (janitor)
+References: <20150606150101.12665.95850.malonedeb@soybean.canonical.com>
+Message-Id: <156230028392.2309.12774259651448971150.malone@loganberry.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="19007";
+ Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: 098ded36eccdd112df2d4a4fc0975176eef0b879
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1462640] Re: shmat fails on 32-to-64 setup
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -56,58 +76,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>,
- Alex Williamson <alex.williamson@redhat.com>, qemu-ppc@nongnu.org,
- David Gibson <david@gibson.dropbear.id.au>
+Reply-To: Bug 1462640 <1462640@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The usual way of using a quirk's MR is to add it as a subregion of a BAR
-as this is what quirks are for. However there is less than standard user
-of this - NVLink2-enabled NVIDIA GPU which exposes a GPU RAM and a ATSD
-64K region outside of PCI MMIO window so these MRs get the system address
-space root as a parent. So when the user unplugs such device, assert
-occurs:
+[Expired for QEMU because there has been no activity for 60 days.]
 
-qemu-system-ppc64: /home/aik/p/qemu/memory.c:2391: memory_region_del_subregion: Assertion `subregion->container == mr' failed.
+** Changed in: qemu
+       Status: Incomplete =3D> Expired
 
-This passes the actual parent MR to memory_region_del_subregion() in
-vfio_bar_quirk_exit.
+-- =
 
-Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
----
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1462640
 
-This removes an extra sanity check that a quirk has a correct parent;
-I am not sure if it is very useful.
-I could use the "system" MR if quirk->mem[i].container==get_system_memory()
-and quirk->mem[i].container otherwise to keep that assert working.
+Title:
+  shmat fails on 32-to-64 setup
 
-Also this does not help with the actual device removal much because of
-the closed source driver nature - the associated service
-(nvidia-persistenced, responsible for onlining GPU memory) crashes
-the guest system but at least the user can reboot the guest after
-the crash which is not as bad as assert.
+Status in QEMU:
+  Expired
 
----
- hw/vfio/pci-quirks.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Bug description:
+  =
 
-diff --git a/hw/vfio/pci-quirks.c b/hw/vfio/pci-quirks.c
-index 27dddbc8fa3e..ef2e182c1d36 100644
---- a/hw/vfio/pci-quirks.c
-+++ b/hw/vfio/pci-quirks.c
-@@ -1896,7 +1896,8 @@ void vfio_bar_quirk_exit(VFIOPCIDevice *vdev, int nr)
-         }
- 
-         for (i = 0; i < quirk->nr_mem; i++) {
--            memory_region_del_subregion(bar->region.mem, &quirk->mem[i]);
-+            memory_region_del_subregion(quirk->mem[i].container,
-+                                        &quirk->mem[i]);
-         }
-     }
- }
--- 
-2.17.1
+  I am trying to run a guest mips32 program (user mode) on a x86_64 host. T=
+he program fails on a call to shmat() reproducibly. when digging into this =
+problem, I could make a small guest POC that fails when compiled as i386 (-=
+m32) running on a x86_64 host, but pass when compiled as 64bit. The problem=
+ has to do with mmap flags.
 
+  From what I can understand, when running 32bits guests programs, qemu
+  reserve the whole guest virtual space with an mmap call. That mmap
+  call specifys MAP:PRIVATE flag. When shmat is called, it tries to make
+  part of that region MAP_SHARED and that fails.
+
+  As a possible fix, it looks like it is possible to first unmap the shm
+  region before calling shmat.
+
+  steps to reproduce: =
+
+  1 - create a file shm.c with content below
+  2 - compile with: gcc -m32 shm.c -o shm32
+  3 - run on a x86_64 host: qemu-i386 ./shm32 =
+
+  4 - observe shmat fails, by returning ptr -1
+
+  5- compile without -m32: : gcc shm.c -o shm64
+  6 - observe it pass: qemu-x84_64 ./shm64
+
+
+  #include <sys/ipc.h>
+  #include <sys/shm.h>
+  #include <sys/mman.h>
+  #include <stdio.h>
+
+  int main()
+  {
+      struct shmid_ds shm_desc;
+      int err =3D 0;
+      int id =3D shmget(IPC_PRIVATE, 688128, IPC_CREAT|IPC_EXCL|0666);
+      err =3D shmctl(id, IPC_STAT, &shm_desc);
+      const void *at =3D 0x7f7df38ea000;
+      void* ptr =3D shmat(id, at, 0);
+      printf( "got err %d, ptr %p\n", err, ptr );
+  }
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1462640/+subscriptions
 
