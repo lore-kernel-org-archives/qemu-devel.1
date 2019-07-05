@@ -2,78 +2,62 @@ Return-Path: <SRS0=wUMn=VC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.0 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07B5AC5B57D
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 22:13:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DCAAC5B57D
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 22:18:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CA6F4216E3
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 22:13:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA6F4216E3
+	by mail.kernel.org (Postfix) with ESMTPS id 2B046216E3
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 22:18:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B046216E3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56482 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56504 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hjWSm-00065p-2M
-	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 18:13:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54357)
+	id 1hjWX6-0000Rz-AX
+	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 18:18:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54727)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <pbonzini@redhat.com>) id 1hjWRp-0005eW-TR
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 18:12:55 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1hjWUB-0006tF-M9
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 18:15:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1hjWRo-0001ot-OK
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 18:12:53 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:40530)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hjWRo-0001oS-Gf
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 18:12:52 -0400
-Received: by mail-wr1-f66.google.com with SMTP id r1so4891008wrl.7
- for <qemu-devel@nongnu.org>; Fri, 05 Jul 2019 15:12:52 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=n2IJlSh9VQsCDYj93z1bizHu6SdHifxTbHs9hM9aYp0=;
- b=B8mx6LF/4PbBs3Nv72qd8w6lT9HpZ2Eh+Wb8ANa9uvSver3NCBuWx54ngewBL52csZ
- AeKqR0nbnqNqE0aJNaxmRDdsF78SrQmb3wH7loj6vfAnGZIoFoBbzdwx6yEuVGDfJG6j
- CofmLts7qd0Uz1gtGQuTsibxNmUOko57kRimnB3YjKI48Dr8+cCyaLnjTj2SVBEFrwdl
- lkMHKY+n5v+SWizni+SnZzgx1BjnM780iEsz40RZ4V2jTpWdGXcj5fRDkRPahOWLbl9O
- 2mE4/SOgBNz1H75vLk0Zt3xkZaVFuQTundAK/64u6RfvzKR6VfYJ7ORxbJZ/+I1S54Cv
- aT+A==
-X-Gm-Message-State: APjAAAVnmX47e1O+qenuEFCfEK654Ve7ROh73cedVtTyrbWCn8LiDvcE
- iXSJ63dl/HJxnCDV6CkNi3pWcw==
-X-Google-Smtp-Source: APXvYqyCSAi6Qdav2QOhDl7jVxQ4waUvd3MBgyAJu3+NKtHp/R0So1R11sivsKAe6f8RUadUIIR+7g==
-X-Received: by 2002:adf:aad1:: with SMTP id i17mr5837196wrc.63.1562364771173; 
- Fri, 05 Jul 2019 15:12:51 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:19db:ad53:90ea:9423?
- ([2001:b07:6468:f312:19db:ad53:90ea:9423])
- by smtp.gmail.com with ESMTPSA id u25sm12273195wmc.3.2019.07.05.15.12.50
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Fri, 05 Jul 2019 15:12:50 -0700 (PDT)
-To: Eduardo Habkost <ehabkost@redhat.com>
-References: <1562079681-19204-1-git-send-email-pbonzini@redhat.com>
- <1562079681-19204-7-git-send-email-pbonzini@redhat.com>
- <20190705212249.GG5198@habkost.net>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <6262c798-fc94-5100-8836-e3cbea306282@redhat.com>
-Date: Sat, 6 Jul 2019 00:12:49 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+ (envelope-from <ehabkost@redhat.com>) id 1hjWUA-0002rE-4H
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 18:15:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42456)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hjWU9-0002oA-MB
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 18:15:17 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id A5255368FF;
+ Fri,  5 Jul 2019 22:15:08 +0000 (UTC)
+Received: from localhost (ovpn-116-30.gru2.redhat.com [10.97.116.30])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2B8AE2B595;
+ Fri,  5 Jul 2019 22:15:05 +0000 (UTC)
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
+ Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+ Richard Henderson <rth@twiddle.net>
+Date: Fri,  5 Jul 2019 19:14:22 -0300
+Message-Id: <20190705221504.25166-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190705212249.GG5198@habkost.net>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.30]); Fri, 05 Jul 2019 22:15:16 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.221.66
-Subject: Re: [Qemu-devel] [PATCH 6/7] target/i386: add VMX features
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PULL v6 00/42] Machine and x86 queue, 2019-07-05
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,111 +69,207 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Liran Alon <liran.alon@oracle.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 05/07/19 23:22, Eduardo Habkost wrote:
->> +    switch (index) {
->> +    case MSR_IA32_VMX_TRUE_PINBASED_CTLS:
->> +        default1 = 0x00000016;
->> +        break;
->> +    case MSR_IA32_VMX_TRUE_PROCBASED_CTLS:
->> +        default1 = 0x0401e172;
->> +        break;
->> +    case MSR_IA32_VMX_TRUE_ENTRY_CTLS:
->> +        default1 = 0x000011ff;
->> +        break;
->> +    case MSR_IA32_VMX_TRUE_EXIT_CTLS:
->> +        default1 = 0x00036dff;
->> +        break;
->> +    case MSR_IA32_VMX_PROCBASED_CTLS2:
->> +        default1 = 0;
->> +        break;
-> How do you plan to implement backwards compatibility if these
-> defaults ever change?  Shouldn't these values be part of the CPU
-> model definitions so we can update them in the future?
+Changes v5 -> v6:
+* Rebase and solve conflicts with other pull requests
+  (for the 4th time)
+* Included Cascadelake-Server-v2 update
 
-These are not defaults, they are "default-1 bits": if a feature is
-disabled, these bits are 1 in both halves of the MSR rather than zero.
-The set of default-1 bits is documented and is not going to change in
-the future.
+Changes v4 -> v5:
+* Rebase and solve conflicts with commit 374f63f6810a ("Merge remote-trac=
+king
+  branch 'remotes/armbru/tags/pull-monitor-2019-07-02-v2' into staging")
 
-Some default-1 bits *could* however become features in the future, and
-four of these already have features associated to them:
-vmx-cr3-load-noexit, vmx-cr3-store-noexit, vmx-exit-nosave-debugctl,
-vmx-entry-noload-debugctl.  You can see that they have "no" in their
-name because the feature is about the ability to "do less" rather than
-"do more".
+Changes v3 -> v4:
+* Fix ppc64 "make check" failure
 
->> +    uint64_t kvm_vmx_basic =
->> +        kvm_arch_get_supported_msr_feature(kvm_state,
->> +                                           MSR_IA32_VMX_BASIC);
->> +    uint64_t kvm_vmx_misc =
->> +        kvm_arch_get_supported_msr_feature(kvm_state,
->> +                                           MSR_IA32_VMX_MISC);
->> +    uint64_t kvm_vmx_ept_vpid =
->> +        kvm_arch_get_supported_msr_feature(kvm_state,
->> +                                           MSR_IA32_VMX_EPT_VPID_CAP);
-> 
-> If the MSR value we're exposing to the guest depends on
-> kvm_arch_get_supported_msr_feature(), how will we ensure this
-> will be safe for live migration?
+Changes v2 -> v3:
+* Fix "make check" warnings (Igor Mammedov)
+* Fix conflicts of "hw/arm: Replace global smp variables with
+  machine smp properties" with recent arm changes (Eduardo Habkost)
+* x86 versioned CPU models (Eduardo Habkost)
+* SnowRidge CPU model (Paul Lai)
+* Add deprecation information to query-machines (Eduardo Habkost)
 
-Because KVM guarantees that this part of the guest ABI will never
-change.  These values do not come from the host values of the MSRs, they
-are fixed by KVM.  More details below.
+Changes v1 -> v2:
+* Fix s390x build failure
 
-> If we really need to tweak the MSR values based on the host for
-> some reason (which is not clear to me yet), why don't we update
-> env->features[...] at x86_cpu_expand_features() to reflect what
-> the guest is really seeing?
-> 
-> 
->> +    /*
->> +     * Bits 0-30, 32-44 and 50-53 come from the host.  KVM should
->> +     * not change them for backwards compatibility.
-> 
-> Backwards compatibility with what?
-> 
-> Don't we want the MSR values to depend solely on the QEMU command
-> line in the future?
+The following changes since commit d2c5f91ca944aaade642624397e1853801bbc7=
+44:
 
-These bits are: VMCS revision, VMCS size and VMCS memory type.  QEMU
-cannot know them, as they depend on the internal implementation details
-of KVM.
+  Merge remote-tracking branch 'remotes/vivier2/tags/trivial-branch-pull-=
+request' into staging (2019-07-05 16:16:15 +0100)
 
-Now that KVM supports nested virt live migration they cannot change
-anymore---otherwise KVM would break KVM live migration compatibility.
-However, theoretically in the future KVM could add some capability
-(which userspace would have to manually enable) and when the capability
-is enabled the values can change.
+are available in the Git repository at:
 
-> +    /*
-> +     * Same for bits 0-4 and 25-27.  Bits 16-24 (CR3 target count) can
-> +     * change in the future but are always zero for now, clear them to be
-> +     * future proof.  Bits 32-63 in theory could change, though KVM does
-> +     * not support dual-monitor treatment and probably never will; mask
-> +     * them out as well.
-> +     */
+  git://github.com/ehabkost/qemu.git tags/machine-next-pull-request
 
-The reasoning is more or less the same here.  These bits are part of the
-guest ABI (preemption timer scaling, CR3 target count, MSR count, MSEG
-revision).  Right now bits 0-4 are 5 and the others are 0; in the future:
+for you to fetch changes up to af135030e3405af5ce234a9f92cf8cc4e55fec96:
 
-- KVM cannot change bits 0-4 and 32-63 them without breaking guest ABI
-(the values must match between what you read and what you set)
+  tests: use -numa memdev option in tests instead of legacy 'mem' option =
+(2019-07-05 17:12:45 -0300)
 
-- KVM could change bits 16-24, but it always allows writing a value that
-is _smaller_ than the one you read.  So I'm zeroing those, ensuring no
-future ABI changes.
+----------------------------------------------------------------
+Machine and x86 queue, 2019-07-05
 
-- KVM could in theory change bits 25-27: here it also allows writing a
-value that is smaller than the one you read, so guest ABI is preserved.
- Such a change is very unlikely, all Intel silicon has always had 0
-here.  But I can change the code to zero these three bits just like bits
-16-24.
+* CPU die topology support (Like Xu)
+* Deprecation of features (Igor Mammedov):
+  * 'mem' parameter of '-numa node' option
+  * implict memory distribution between NUMA nodes
+  * deprecate -mem-path fallback to anonymous RAM
+* x86 versioned CPU models (Eduardo Habkost)
+* SnowRidge CPU model (Paul Lai)
+* Add deprecation information to query-machines (Eduardo Habkost)
+* Other i386 fixes
 
-Paolo
+----------------------------------------------------------------
+
+Queue for Machine Core patches
+
+
+Eduardo Habkost (15):
+  hppa: Delete unused hppa_cpu_list() function
+  i386: Don't print warning if phys-bits was set automatically
+  i386: Fix signedness of hyperv_spinlock_attempts
+  i386: Remove unused host_cpudef variable
+  qmp: Add deprecation information to query-machines
+  qmp: Add "alias-of" field to query-cpu-definitions
+  i386: Add x-force-features option for testing
+  i386: Get model-id from CPU object on "-cpu help"
+  i386: Register versioned CPU models
+  i386: Define -IBRS, -noTSX, -IBRS versions of CPU models
+  i386: Replace -noTSX, -IBRS, -IBPB CPU models with aliases
+  i386: Make unversioned CPU models be aliases
+  docs: Deprecate CPU model runnability guarantees
+  i386: Add Cascadelake-Server-v2 CPU model
+  numa: Make deprecation warnings conditional on !qtest_enabled()
+
+Igor Mammedov (7):
+  pc: fix possible NULL pointer dereference in
+    pc_machine_get_device_memory_region_size()
+  machine: show if CLI option '-numa node,mem' is supported in QAPI
+    schema
+  numa: deprecate 'mem' parameter of '-numa node' option
+  numa: deprecate implict memory distribution between nodes
+  deprecate -mem-path fallback to anonymous RAM
+  numa: allow memory-less nodes when using memdev as backend
+  tests: use -numa memdev option in tests instead of legacy 'mem' option
+
+Like Xu (17):
+  hw/boards: Add struct CpuTopology to MachineState
+  machine: Refactor smp-related call chains to pass MachineState
+  general: Replace global smp variables with smp machine properties
+  hw/ppc: Replace global smp variables with machine smp properties
+  hw/riscv: Replace global smp variables with machine smp properties
+  hw/s390x: Replace global smp variables with machine smp properties
+  hw/i386: Replace global smp variables with machine smp properties
+  hw/arm: Replace global smp variables with machine smp properties
+  hw: Replace global smp variables with MachineState for all remaining
+    archs
+  vl.c: Replace smp global variables with smp machine properties
+  i386: Add die-level cpu topology to x86CPU on PCMachine
+  hw/i386: Adjust nr_dies with configured smp_dies for PCMachine
+  i386/cpu: Consolidate die-id validity in smp context
+  i386: Update new x86_apicid parsing rules with die_offset support
+  target/i386: Add CPUID.1F generation support for multi-dies PCMachine
+  machine: Refactor smp_parse() in vl.c as MachineClass::smp_parse()
+  vl.c: Add -smp, dies=3D* command line support and update doc
+
+Paul Lai (1):
+  i386: Introduce SnowRidge CPU model
+
+Roman Kagan (1):
+  i386: make 'hv-spinlocks' a regular uint32 property
+
+Wei Yang (1):
+  x86/cpu: use FeatureWordArray to define filtered_features
+
+ qapi/machine-target.json                   |    9 +-
+ qapi/machine.json                          |   17 +-
+ include/hw/boards.h                        |   27 +-
+ include/hw/firmware/smbios.h               |    5 +-
+ include/hw/i386/pc.h                       |    8 +-
+ include/hw/i386/topology.h                 |   76 +-
+ target/hppa/cpu.h                          |    2 -
+ target/i386/cpu-qom.h                      |   10 +-
+ target/i386/cpu.h                          |   36 +-
+ accel/kvm/kvm-all.c                        |    4 +-
+ backends/hostmem.c                         |    6 +-
+ cpus.c                                     |    7 +-
+ exec.c                                     |    3 +-
+ gdbstub.c                                  |    4 +
+ hw/alpha/dp264.c                           |    1 +
+ hw/arm/aspeed.c                            |    2 +-
+ hw/arm/fsl-imx6.c                          |    6 +-
+ hw/arm/fsl-imx6ul.c                        |    6 +-
+ hw/arm/fsl-imx7.c                          |    7 +-
+ hw/arm/highbank.c                          |    1 +
+ hw/arm/mcimx6ul-evk.c                      |    2 +-
+ hw/arm/mcimx7d-sabre.c                     |    2 +-
+ hw/arm/raspi.c                             |    4 +-
+ hw/arm/realview.c                          |    1 +
+ hw/arm/sabrelite.c                         |    2 +-
+ hw/arm/sbsa-ref.c                          |    4 +
+ hw/arm/vexpress.c                          |   16 +-
+ hw/arm/virt.c                              |   11 +-
+ hw/arm/xlnx-zynqmp.c                       |   16 +-
+ hw/core/machine-hmp-cmds.c                 |    3 +
+ hw/core/machine-qmp-cmds.c                 |    4 +-
+ hw/core/machine.c                          |   88 ++
+ hw/core/numa.c                             |   36 +-
+ hw/cpu/core.c                              |    4 +-
+ hw/hppa/machine.c                          |    4 +-
+ hw/i386/acpi-build.c                       |   13 +-
+ hw/i386/kvmvapic.c                         |    7 +-
+ hw/i386/pc.c                               |  178 ++-
+ hw/i386/pc_piix.c                          |    4 +
+ hw/i386/pc_q35.c                           |    4 +
+ hw/i386/xen/xen-hvm.c                      |    4 +
+ hw/mips/boston.c                           |    2 +-
+ hw/mips/mips_malta.c                       |   24 +-
+ hw/openrisc/openrisc_sim.c                 |    1 +
+ hw/ppc/e500.c                              |    3 +
+ hw/ppc/mac_newworld.c                      |    3 +-
+ hw/ppc/mac_oldworld.c                      |    3 +-
+ hw/ppc/pnv.c                               |    9 +-
+ hw/ppc/prep.c                              |    4 +-
+ hw/ppc/spapr.c                             |   38 +-
+ hw/ppc/spapr_rtas.c                        |    4 +-
+ hw/riscv/sifive_e.c                        |    6 +-
+ hw/riscv/sifive_plic.c                     |    3 +
+ hw/riscv/sifive_u.c                        |   11 +-
+ hw/riscv/spike.c                           |    3 +
+ hw/riscv/virt.c                            |    1 +
+ hw/s390x/s390-virtio-ccw.c                 |    9 +-
+ hw/s390x/sclp.c                            |    2 +-
+ hw/smbios/smbios.c                         |   26 +-
+ hw/sparc/sun4m.c                           |    2 +
+ hw/sparc64/sun4u.c                         |    4 +-
+ hw/xtensa/sim.c                            |    2 +-
+ hw/xtensa/xtfpga.c                         |    1 +
+ migration/postcopy-ram.c                   |    8 +-
+ target/arm/cpu.c                           |    8 +-
+ target/hppa/cpu.c                          |   17 -
+ target/i386/cpu.c                          | 1171 ++++++++++----------
+ target/i386/kvm.c                          |   12 +
+ target/openrisc/sys_helper.c               |    6 +-
+ target/s390x/cpu.c                         |    3 +
+ target/s390x/excp_helper.c                 |    5 +
+ target/s390x/kvm.c                         |   10 +-
+ tcg/tcg.c                                  |   13 +-
+ tests/bios-tables-test.c                   |   40 +-
+ tests/test-x86-cpuid.c                     |   84 +-
+ vl.c                                       |   96 +-
+ qemu-deprecated.texi                       |   52 +
+ qemu-options.hx                            |   17 +-
+ tests/acceptance/x86_cpu_model_versions.py |  304 +++++
+ 79 files changed, 1701 insertions(+), 950 deletions(-)
+ create mode 100644 tests/acceptance/x86_cpu_model_versions.py
+
+--=20
+2.18.0.rc1.1.g3f1ff2140
+
 
