@@ -2,69 +2,62 @@ Return-Path: <SRS0=wUMn=VC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B63B1C4649E
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 16:29:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BF93C46499
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 16:34:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8FCF5216E3
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 16:29:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FCF5216E3
+	by mail.kernel.org (Postfix) with ESMTPS id 21D3F21721
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 16:34:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21D3F21721
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54824 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54842 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hjR5f-0000sl-Tv
-	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 12:29:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46036)
+	id 1hjRA4-0002vE-E9
+	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 12:34:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47267)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <berrange@redhat.com>) id 1hjR2O-0007N2-Ew
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 12:26:17 -0400
+ (envelope-from <alex.williamson@redhat.com>) id 1hjR8T-00026I-9j
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 12:32:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1hjR2M-0004xf-0H
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 12:26:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59108)
+ (envelope-from <alex.williamson@redhat.com>) id 1hjR8M-0002la-DF
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 12:32:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47710)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>)
- id 1hjR2H-0004RO-9r; Fri, 05 Jul 2019 12:26:09 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ (Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+ id 1hjR8H-0007vY-Qq; Fri, 05 Jul 2019 12:32:22 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 59FD23082135;
- Fri,  5 Jul 2019 16:25:54 +0000 (UTC)
-Received: from redhat.com (ovpn-112-48.ams2.redhat.com [10.36.112.48])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5A78C772AF;
- Fri,  5 Jul 2019 16:25:52 +0000 (UTC)
-Date: Fri, 5 Jul 2019 17:25:49 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: qemu-block@nongnu.org, kwolf@redhat.com, qemu-devel@nongnu.org,
- armbru@redhat.com, keith.busch@intel.com, mreitz@redhat.com,
- lersek@redhat.com
-Message-ID: <20190705162549.GP32473@redhat.com>
-References: <20190705072333.17171-1-klaus@birkelund.eu>
- <20190705072333.17171-17-klaus@birkelund.eu>
- <20190705133616.GA4707@bogfinke>
- <20190705134929.GM32473@redhat.com>
- <20190705162013.GB4707@bogfinke>
+ by mx1.redhat.com (Postfix) with ESMTPS id ECF7F308222F;
+ Fri,  5 Jul 2019 16:31:23 +0000 (UTC)
+Received: from x1.home (ovpn-116-83.phx2.redhat.com [10.3.116.83])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 08EB018657;
+ Fri,  5 Jul 2019 16:31:21 +0000 (UTC)
+Date: Fri, 5 Jul 2019 10:31:21 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <20190705103121.30363b9c@x1.home>
+In-Reply-To: <20190705032501.106966-1-aik@ozlabs.ru>
+References: <20190705032501.106966-1-aik@ozlabs.ru>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190705162013.GB4707@bogfinke>
-User-Agent: Mutt/1.12.0 (2019-05-25)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.42]); Fri, 05 Jul 2019 16:25:54 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ (mx1.redhat.com [10.5.110.47]); Fri, 05 Jul 2019 16:31:32 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 16/16] nvme: support multiple
- namespaces
+Subject: Re: [Qemu-devel] [RFC PATCH qemu] vfio-quirks: Pass the actual
+ parent when deleting a memory region
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,83 +69,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jul 05, 2019 at 06:20:14PM +0200, Klaus Birkelund wrote:
-> On Fri, Jul 05, 2019 at 02:49:29PM +0100, Daniel P. Berrang=C3=A9 wrote=
-:
-> > On Fri, Jul 05, 2019 at 03:36:17PM +0200, Klaus Birkelund wrote:
-> > > On Fri, Jul 05, 2019 at 09:23:33AM +0200, Klaus Birkelund Jensen wr=
-ote:
-> > > > This adds support for multiple namespaces by introducing a new 'n=
-vme-ns'
-> > > > device model. The nvme device creates a bus named from the device=
- name
-> > > > ('id'). The nvme-ns devices then connect to this and registers
-> > > > themselves with the nvme device.
-> > > >=20
-> > > > This changes how an nvme device is created. Example with two name=
-spaces:
-> > > >=20
-> > > >   -drive file=3Dnvme0n1.img,if=3Dnone,id=3Ddisk1
-> > > >   -drive file=3Dnvme0n2.img,if=3Dnone,id=3Ddisk2
-> > > >   -device nvme,serial=3Ddeadbeef,id=3Dnvme0
-> > > >   -device nvme-ns,drive=3Ddisk1,bus=3Dnvme0,nsid=3D1
-> > > >   -device nvme-ns,drive=3Ddisk2,bus=3Dnvme0,nsid=3D2
-> > > >=20
-> > > > A maximum of 256 namespaces can be configured.
-> > > >=20
-> > > =20
-> > > Well that was embarrasing.
-> > >=20
-> > > This patch breaks nvme-test.c. Which I obviously did not run.
-> > >=20
-> > > In my defense, the test doesn't do much currently, but I'll of cour=
-se
-> > > fix the test for v2.
-> >=20
-> > That highlights a more serious problem.  This series changes the synt=
-x
-> > for configuring the nvme device in a way that is not backwards compat=
-ible.
-> > So anyone who is using QEMU with NVME will be broken when they upgrad=
-e
-> > to the next QEMU release.
-> >=20
-> > I understand why you wanted to restructure things to have a separate
-> > nvme-ns device, but there needs to be some backcompat support in ther=
-e
-> > for the existing syntax to avoid breaking current users IMHO.
-> >=20
-> =20
-> Hi Daniel,
->=20
-> I raised this issue previously. I suggested that we keep the drive
-> property for the nvme device and only accept either that or an nvme-ns
-> device to be configured (but not both).
->=20
-> That would keep backward compatibilty, but enforce the use of nvme-ns
-> for any setup that requires multiple namespaces.
->=20
-> Would that work?
+On Fri,  5 Jul 2019 13:25:01 +1000
+Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
 
-Yes, that would be viable, as an existing CLI arg usage would continue
-to be supported as before.
+> The usual way of using a quirk's MR is to add it as a subregion of a BAR
+> as this is what quirks are for. However there is less than standard user
+> of this - NVLink2-enabled NVIDIA GPU which exposes a GPU RAM and a ATSD
+> 64K region outside of PCI MMIO window so these MRs get the system address
+> space root as a parent. So when the user unplugs such device, assert
+> occurs:
+> 
+> qemu-system-ppc64: /home/aik/p/qemu/memory.c:2391: memory_region_del_subregion: Assertion `subregion->container == mr' failed.
+> 
+> This passes the actual parent MR to memory_region_del_subregion() in
+> vfio_bar_quirk_exit.
+> 
+> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> ---
+> 
+> This removes an extra sanity check that a quirk has a correct parent;
+> I am not sure if it is very useful.
+> I could use the "system" MR if quirk->mem[i].container==get_system_memory()
+> and quirk->mem[i].container otherwise to keep that assert working.
+> 
+> Also this does not help with the actual device removal much because of
+> the closed source driver nature - the associated service
+> (nvidia-persistenced, responsible for onlining GPU memory) crashes
+> the guest system but at least the user can reboot the guest after
+> the crash which is not as bad as assert.
+> 
+> ---
+>  hw/vfio/pci-quirks.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/vfio/pci-quirks.c b/hw/vfio/pci-quirks.c
+> index 27dddbc8fa3e..ef2e182c1d36 100644
+> --- a/hw/vfio/pci-quirks.c
+> +++ b/hw/vfio/pci-quirks.c
+> @@ -1896,7 +1896,8 @@ void vfio_bar_quirk_exit(VFIOPCIDevice *vdev, int nr)
+>          }
+>  
+>          for (i = 0; i < quirk->nr_mem; i++) {
+> -            memory_region_del_subregion(bar->region.mem, &quirk->mem[i]);
+> +            memory_region_del_subregion(quirk->mem[i].container,
+> +                                        &quirk->mem[i]);
+>          }
+>      }
+>  }
 
-We could also list the back compat syntax as a deprecation in the docs
-(qemu-deprecated.texi) so that in a few releases in the future, we can
-drop the old syntax and then use nvme-ns exclusively thereafter.
+NAK
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+struct MemoryRegion {
+    Object parent_obj;
+
+    /* All fields are private - violators will be prosecuted */
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...
+    MemoryRegion *container;
 
