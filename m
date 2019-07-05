@@ -6,57 +6,57 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F304C46499
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 20:28:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71036C46499
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 20:29:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EC20B20645
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 20:28:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC20B20645
+	by mail.kernel.org (Postfix) with ESMTPS id 3D78A21670
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 20:29:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D78A21670
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55856 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55868 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hjUoP-0000G7-Vq
-	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 16:28:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32974)
+	id 1hjUpw-0002GB-AF
+	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 16:29:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60850)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jsnow@redhat.com>) id 1hjUeI-0005cJ-Dm
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 16:17:39 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hjUdl-0005HB-1f
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 16:17:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hjUeG-0007Ib-Le
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 16:17:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53196)
+ (envelope-from <jsnow@redhat.com>) id 1hjUdh-0006rI-FH
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 16:17:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53076)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1hjUe6-00079J-FG; Fri, 05 Jul 2019 16:17:28 -0400
+ id 1hjUda-0006l6-31; Fri, 05 Jul 2019 16:16:55 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 61427308FEC0;
- Fri,  5 Jul 2019 20:17:20 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id B59773098558;
+ Fri,  5 Jul 2019 20:16:52 +0000 (UTC)
 Received: from probe.redhat.com (ovpn-122-149.rdu2.redhat.com [10.10.122.149])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 05F81867E6;
- Fri,  5 Jul 2019 20:17:13 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 23CDA86432;
+ Fri,  5 Jul 2019 20:16:50 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: qemu-devel@nongnu.org,
 	qemu-block@nongnu.org
-Date: Fri,  5 Jul 2019 16:16:24 -0400
-Message-Id: <20190705201631.26266-12-jsnow@redhat.com>
+Date: Fri,  5 Jul 2019 16:16:18 -0400
+Message-Id: <20190705201631.26266-6-jsnow@redhat.com>
 In-Reply-To: <20190705201631.26266-1-jsnow@redhat.com>
 References: <20190705201631.26266-1-jsnow@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Fri, 05 Jul 2019 20:17:20 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.49]); Fri, 05 Jul 2019 20:16:52 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v3 11/18] block/backup: upgrade copy_bitmap to
- BdrvDirtyBitmap
+Subject: [Qemu-devel] [PATCH v3 05/18] block/backup: Add mirror sync mode
+ 'bitmap'
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -79,246 +79,275 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This simplifies some interface matters; namely the initialization and
-(later) merging the manifest back into the sync_bitmap if it was
-provided.
+We don't need or want a new sync mode for simple differences in
+semantics.  Create a new mode simply named "BITMAP" that is designed to
+make use of the new Bitmap Sync Mode field.
+
+Because the only bitmap sync mode is 'on-success', this adds no new
+functionality to the backup job (yet). The old incremental backup mode
+is maintained as a syntactic sugar for sync=3Dbitmap, mode=3Don-success.
+
+Add all of the plumbing necessary to support this new instruction.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- block/backup.c | 81 ++++++++++++++++++++++++++------------------------
- 1 file changed, 42 insertions(+), 39 deletions(-)
+ block/backup.c            | 20 ++++++++++++--------
+ block/mirror.c            |  6 ++++--
+ block/replication.c       |  2 +-
+ blockdev.c                | 25 +++++++++++++++++++++++--
+ include/block/block_int.h |  4 +++-
+ qapi/block-core.json      | 21 +++++++++++++++------
+ 6 files changed, 58 insertions(+), 20 deletions(-)
 
 diff --git a/block/backup.c b/block/backup.c
-index efd0dcd2e7..3c08d057cc 100644
+index 715e1d3be8..996941fa61 100644
 --- a/block/backup.c
 +++ b/block/backup.c
-@@ -38,7 +38,10 @@ typedef struct CowRequest {
+@@ -38,9 +38,9 @@ typedef struct CowRequest {
  typedef struct BackupBlockJob {
      BlockJob common;
      BlockBackend *target;
-+
+-    /* bitmap for sync=3Dincremental */
      BdrvDirtyBitmap *sync_bitmap;
-+    BdrvDirtyBitmap *copy_bitmap;
-+
      MirrorSyncMode sync_mode;
-     BitmapSyncMode bitmap_mode;
++    BitmapSyncMode bitmap_mode;
      BlockdevOnError on_source_error;
-@@ -51,7 +54,6 @@ typedef struct BackupBlockJob {
-     NotifierWithReturn before_write;
-     QLIST_HEAD(, CowRequest) inflight_reqs;
-=20
--    HBitmap *copy_bitmap;
-     bool use_copy_range;
-     int64_t copy_range_size;
-=20
-@@ -113,7 +115,7 @@ static int coroutine_fn backup_cow_with_bounce_buffer=
-(BackupBlockJob *job,
-     int write_flags =3D job->serialize_target_writes ? BDRV_REQ_SERIALIS=
-ING : 0;
-=20
-     assert(QEMU_IS_ALIGNED(start, job->cluster_size));
--    hbitmap_reset(job->copy_bitmap, start, job->cluster_size);
-+    bdrv_reset_dirty_bitmap(job->copy_bitmap, start, job->cluster_size);
-     nbytes =3D MIN(job->cluster_size, job->len - start);
-     if (!*bounce_buffer) {
-         *bounce_buffer =3D blk_blockalign(blk, job->cluster_size);
-@@ -146,7 +148,7 @@ static int coroutine_fn backup_cow_with_bounce_buffer=
-(BackupBlockJob *job,
-=20
-     return nbytes;
- fail:
--    hbitmap_set(job->copy_bitmap, start, job->cluster_size);
-+    bdrv_set_dirty_bitmap(job->copy_bitmap, start, job->cluster_size);
-     return ret;
-=20
- }
-@@ -169,12 +171,14 @@ static int coroutine_fn backup_cow_with_offload(Bac=
-kupBlockJob *job,
-     assert(QEMU_IS_ALIGNED(start, job->cluster_size));
-     nbytes =3D MIN(job->copy_range_size, end - start);
-     nr_clusters =3D DIV_ROUND_UP(nbytes, job->cluster_size);
--    hbitmap_reset(job->copy_bitmap, start, job->cluster_size * nr_cluste=
-rs);
-+    bdrv_reset_dirty_bitmap(job->copy_bitmap, start,
-+                            job->cluster_size * nr_clusters);
-     ret =3D blk_co_copy_range(blk, start, job->target, start, nbytes,
-                             read_flags, write_flags);
-     if (ret < 0) {
-         trace_backup_do_cow_copy_range_fail(job, start, ret);
--        hbitmap_set(job->copy_bitmap, start, job->cluster_size * nr_clus=
-ters);
-+        bdrv_set_dirty_bitmap(job->copy_bitmap, start,
-+                              job->cluster_size * nr_clusters);
-         return ret;
-     }
-=20
-@@ -202,7 +206,7 @@ static int coroutine_fn backup_do_cow(BackupBlockJob =
-*job,
-     cow_request_begin(&cow_request, job, start, end);
-=20
-     while (start < end) {
--        if (!hbitmap_get(job->copy_bitmap, start)) {
-+        if (!bdrv_dirty_bitmap_get(job->copy_bitmap, start)) {
-             trace_backup_do_cow_skip(job, start);
-             start +=3D job->cluster_size;
-             continue; /* already copied */
-@@ -298,14 +302,16 @@ static void backup_abort(Job *job)
- static void backup_clean(Job *job)
- {
-     BackupBlockJob *s =3D container_of(job, BackupBlockJob, common.job);
-+    BlockDriverState *target_bs =3D blk_bs(s->target);
-+
-+    if (s->copy_bitmap) {
-+        bdrv_release_dirty_bitmap(target_bs, s->copy_bitmap);
-+        s->copy_bitmap =3D NULL;
-+    }
-+
-     assert(s->target);
-     blk_unref(s->target);
-     s->target =3D NULL;
--
--    if (s->copy_bitmap) {
--        hbitmap_free(s->copy_bitmap);
--        s->copy_bitmap =3D NULL;
--    }
- }
-=20
- void backup_do_checkpoint(BlockJob *job, Error **errp)
-@@ -320,7 +326,7 @@ void backup_do_checkpoint(BlockJob *job, Error **errp=
-)
-         return;
-     }
-=20
--    hbitmap_set(backup_job->copy_bitmap, 0, backup_job->len);
-+    bdrv_set_dirty_bitmap(backup_job->copy_bitmap, 0, backup_job->len);
- }
-=20
- static void backup_drain(BlockJob *job)
-@@ -389,59 +395,52 @@ static bool bdrv_is_unallocated_range(BlockDriverSt=
-ate *bs,
-=20
- static int coroutine_fn backup_loop(BackupBlockJob *job)
- {
--    int ret;
-     bool error_is_read;
-     int64_t offset;
--    HBitmapIter hbi;
-+    BdrvDirtyBitmapIter *bdbi;
-     BlockDriverState *bs =3D blk_bs(job->common.blk);
-+    int ret =3D 0;
-=20
--    hbitmap_iter_init(&hbi, job->copy_bitmap, 0);
--    while ((offset =3D hbitmap_iter_next(&hbi)) !=3D -1) {
-+    bdbi =3D bdrv_dirty_iter_new(job->copy_bitmap);
-+    while ((offset =3D bdrv_dirty_iter_next(bdbi)) !=3D -1) {
-         if (job->sync_mode =3D=3D MIRROR_SYNC_MODE_TOP &&
-             bdrv_is_unallocated_range(bs, offset, job->cluster_size))
-         {
--            hbitmap_reset(job->copy_bitmap, offset, job->cluster_size);
-+            bdrv_reset_dirty_bitmap(job->copy_bitmap, offset,
-+                                    job->cluster_size);
-             continue;
-         }
-=20
-         do {
-             if (yield_and_check(job)) {
--                return 0;
-+                goto out;
-             }
-             ret =3D backup_do_cow(job, offset,
-                                 job->cluster_size, &error_is_read, false=
-);
-             if (ret < 0 && backup_error_action(job, error_is_read, -ret)=
- =3D=3D
-                            BLOCK_ERROR_ACTION_REPORT)
-             {
--                return ret;
-+                goto out;
-             }
-         } while (ret < 0);
-     }
-=20
--    return 0;
-+ out:
-+    bdrv_dirty_iter_free(bdbi);
-+    return ret;
- }
-=20
- /* init copy_bitmap from sync_bitmap */
- static void backup_incremental_init_copy_bitmap(BackupBlockJob *job)
- {
--    uint64_t offset =3D 0;
--    uint64_t bytes =3D job->len;
--
--    while (bdrv_dirty_bitmap_next_dirty_area(job->sync_bitmap,
--                                             &offset, &bytes))
--    {
--        hbitmap_set(job->copy_bitmap, offset, bytes);
--
--        offset +=3D bytes;
--        if (offset >=3D job->len) {
--            break;
--        }
--        bytes =3D job->len - offset;
--    }
-+    bool ret =3D bdrv_dirty_bitmap_merge_internal(job->copy_bitmap,
-+                                                job->sync_bitmap,
-+                                                NULL, true);
-+    assert(ret);
-=20
-     /* TODO job_progress_set_remaining() would make more sense */
-     job_progress_update(&job->common.job,
--        job->len - hbitmap_count(job->copy_bitmap));
-+                        job->len - bdrv_get_dirty_count(job->copy_bitmap=
-));
- }
-=20
- static int coroutine_fn backup_run(Job *job, Error **errp)
-@@ -458,7 +457,7 @@ static int coroutine_fn backup_run(Job *job, Error **=
+     BlockdevOnError on_target_error;
+     CoRwlock flush_rwlock;
+@@ -452,7 +452,7 @@ static int coroutine_fn backup_run(Job *job, Error **=
 errp)
-     if (s->sync_mode =3D=3D MIRROR_SYNC_MODE_BITMAP) {
+=20
+     job_progress_set_remaining(job, s->len);
+=20
+-    if (s->sync_mode =3D=3D MIRROR_SYNC_MODE_INCREMENTAL) {
++    if (s->sync_mode =3D=3D MIRROR_SYNC_MODE_BITMAP) {
          backup_incremental_init_copy_bitmap(s);
      } else {
--        hbitmap_set(s->copy_bitmap, 0, s->len);
-+        bdrv_set_dirty_bitmap(s->copy_bitmap, 0, s->len);
+         hbitmap_set(s->copy_bitmap, 0, s->len);
+@@ -536,6 +536,7 @@ static int64_t backup_calculate_cluster_size(BlockDri=
+verState *target,
+ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
+                   BlockDriverState *target, int64_t speed,
+                   MirrorSyncMode sync_mode, BdrvDirtyBitmap *sync_bitmap=
+,
++                  BitmapSyncMode bitmap_mode,
+                   bool compress,
+                   BlockdevOnError on_source_error,
+                   BlockdevOnError on_target_error,
+@@ -583,10 +584,13 @@ BlockJob *backup_job_create(const char *job_id, Blo=
+ckDriverState *bs,
+         return NULL;
      }
 =20
-     s->before_write.notify =3D backup_before_write_notify;
-@@ -551,7 +550,7 @@ BlockJob *backup_job_create(const char *job_id, Block=
+-    if (sync_mode =3D=3D MIRROR_SYNC_MODE_INCREMENTAL) {
++    /* QMP interface should have handled translating this to bitmap mode=
+ */
++    assert(sync_mode !=3D MIRROR_SYNC_MODE_INCREMENTAL);
++
++    if (sync_mode =3D=3D MIRROR_SYNC_MODE_BITMAP) {
+         if (!sync_bitmap) {
+             error_setg(errp, "must provide a valid bitmap name for "
+-                             "\"incremental\" sync mode");
++                       "'%s' sync mode", MirrorSyncMode_str(sync_mode));
+             return NULL;
+         }
+=20
+@@ -596,8 +600,8 @@ BlockJob *backup_job_create(const char *job_id, Block=
 DriverState *bs,
-     BackupBlockJob *job =3D NULL;
-     int ret;
-     int64_t cluster_size;
--    HBitmap *copy_bitmap =3D NULL;
-+    BdrvDirtyBitmap *copy_bitmap =3D NULL;
+         }
+     } else if (sync_bitmap) {
+         error_setg(errp,
+-                   "a sync_bitmap was provided to backup_run, "
+-                   "but received an incompatible sync_mode (%s)",
++                   "a bitmap was given to backup_job_create, "
++                   "but it received an incompatible sync_mode (%s)",
+                    MirrorSyncMode_str(sync_mode));
+         return NULL;
+     }
+@@ -639,8 +643,8 @@ BlockJob *backup_job_create(const char *job_id, Block=
+DriverState *bs,
+     job->on_source_error =3D on_source_error;
+     job->on_target_error =3D on_target_error;
+     job->sync_mode =3D sync_mode;
+-    job->sync_bitmap =3D sync_mode =3D=3D MIRROR_SYNC_MODE_INCREMENTAL ?
+-                       sync_bitmap : NULL;
++    job->sync_bitmap =3D sync_bitmap;
++    job->bitmap_mode =3D bitmap_mode;
+     job->compress =3D compress;
 =20
-     assert(bs);
-     assert(target);
-@@ -621,7 +620,11 @@ BlockJob *backup_job_create(const char *job_id, Bloc=
-kDriverState *bs,
-         goto error;
+     /* Detect image-fleecing (and similar) schemes */
+diff --git a/block/mirror.c b/block/mirror.c
+index d17be4cdbc..42b3d9acd0 100644
+--- a/block/mirror.c
++++ b/block/mirror.c
+@@ -1717,8 +1717,10 @@ void mirror_start(const char *job_id, BlockDriverS=
+tate *bs,
+     bool is_none_mode;
+     BlockDriverState *base;
+=20
+-    if (mode =3D=3D MIRROR_SYNC_MODE_INCREMENTAL) {
+-        error_setg(errp, "Sync mode 'incremental' not supported");
++    if ((mode =3D=3D MIRROR_SYNC_MODE_INCREMENTAL) ||
++        (mode =3D=3D MIRROR_SYNC_MODE_BITMAP)) {
++        error_setg(errp, "Sync mode '%s' not supported",
++                   MirrorSyncMode_str(mode));
+         return;
+     }
+     is_none_mode =3D mode =3D=3D MIRROR_SYNC_MODE_NONE;
+diff --git a/block/replication.c b/block/replication.c
+index b41bc507c0..5475217c69 100644
+--- a/block/replication.c
++++ b/block/replication.c
+@@ -543,7 +543,7 @@ static void replication_start(ReplicationState *rs, R=
+eplicationMode mode,
+=20
+         s->backup_job =3D backup_job_create(
+                                 NULL, s->secondary_disk->bs, s->hidden_d=
+isk->bs,
+-                                0, MIRROR_SYNC_MODE_NONE, NULL, false,
++                                0, MIRROR_SYNC_MODE_NONE, NULL, 0, false=
+,
+                                 BLOCKDEV_ON_ERROR_REPORT,
+                                 BLOCKDEV_ON_ERROR_REPORT, JOB_INTERNAL,
+                                 backup_job_completed, bs, NULL, &local_e=
+rr);
+diff --git a/blockdev.c b/blockdev.c
+index 77365d8166..5dfaa976c9 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -3464,12 +3464,31 @@ static BlockJob *do_backup_common(BackupCommon *b=
+ackup,
+         return NULL;
      }
 =20
--    copy_bitmap =3D hbitmap_alloc(len, ctz32(cluster_size));
-+    copy_bitmap =3D bdrv_create_dirty_bitmap(target, cluster_size, NULL,=
- errp);
-+    if (!copy_bitmap) {
-+        goto error;
++    if (backup->sync =3D=3D MIRROR_SYNC_MODE_INCREMENTAL) {
++        if (backup->has_bitmap_mode &&
++            backup->bitmap_mode !=3D BITMAP_SYNC_MODE_ON_SUCCESS) {
++            error_setg(errp, "Bitmap sync mode must be '%s' "
++                       "when using sync mode '%s'",
++                       BitmapSyncMode_str(BITMAP_SYNC_MODE_ON_SUCCESS),
++                       MirrorSyncMode_str(backup->sync));
++            return NULL;
++        }
++        backup->has_bitmap_mode =3D true;
++        backup->sync =3D MIRROR_SYNC_MODE_BITMAP;
++        backup->bitmap_mode =3D BITMAP_SYNC_MODE_ON_SUCCESS;
 +    }
-+    bdrv_disable_dirty_bitmap(copy_bitmap);
-=20
-     /* job->len is fixed, so we can't allow resize */
-     job =3D block_job_create(job_id, &backup_job_driver, txn, bs,
-@@ -672,7 +675,7 @@ BlockJob *backup_job_create(const char *job_id, Block=
-DriverState *bs,
-  error:
-     if (copy_bitmap) {
-         assert(!job || !job->copy_bitmap);
--        hbitmap_free(copy_bitmap);
-+        bdrv_release_dirty_bitmap(target, copy_bitmap);
++
+     if (backup->has_bitmap) {
+         bmap =3D bdrv_find_dirty_bitmap(bs, backup->bitmap);
+         if (!bmap) {
+             error_setg(errp, "Bitmap '%s' could not be found", backup->b=
+itmap);
+             return NULL;
+         }
++        if (!backup->has_bitmap_mode) {
++            error_setg(errp, "Bitmap sync mode must be given "
++                       "when providing a bitmap");
++            return NULL;
++        }
+         if (bdrv_dirty_bitmap_check(bmap, BDRV_BITMAP_DEFAULT, errp)) {
+             return NULL;
+         }
+@@ -3483,8 +3502,10 @@ static BlockJob *do_backup_common(BackupCommon *ba=
+ckup,
      }
-     if (sync_bitmap) {
-         bdrv_reclaim_dirty_bitmap(bs, sync_bitmap, NULL);
+=20
+     job =3D backup_job_create(backup->job_id, bs, target_bs, backup->spe=
+ed,
+-                            backup->sync, bmap, backup->compress,
+-                            backup->on_source_error, backup->on_target_e=
+rror,
++                            backup->sync, bmap, backup->bitmap_mode,
++                            backup->compress,
++                            backup->on_source_error,
++                            backup->on_target_error,
+                             job_flags, NULL, NULL, txn, errp);
+     return job;
+ }
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index d6415b53c1..e1f2aa627e 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -1132,7 +1132,8 @@ void mirror_start(const char *job_id, BlockDriverSt=
+ate *bs,
+  * @target: Block device to write to.
+  * @speed: The maximum speed, in bytes per second, or 0 for unlimited.
+  * @sync_mode: What parts of the disk image should be copied to the dest=
+ination.
+- * @sync_bitmap: The dirty bitmap if sync_mode is MIRROR_SYNC_MODE_INCRE=
+MENTAL.
++ * @sync_bitmap: The dirty bitmap if sync_mode is 'bitmap' or 'increment=
+al'
++ * @bitmap_mode: The bitmap synchronization policy to use.
+  * @on_source_error: The action to take upon error reading from the sour=
+ce.
+  * @on_target_error: The action to take upon error writing to the target=
+.
+  * @creation_flags: Flags that control the behavior of the Job lifetime.
+@@ -1148,6 +1149,7 @@ BlockJob *backup_job_create(const char *job_id, Blo=
+ckDriverState *bs,
+                             BlockDriverState *target, int64_t speed,
+                             MirrorSyncMode sync_mode,
+                             BdrvDirtyBitmap *sync_bitmap,
++                            BitmapSyncMode bitmap_mode,
+                             bool compress,
+                             BlockdevOnError on_source_error,
+                             BlockdevOnError on_target_error,
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 0c853d00bd..99dcd5f099 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -1127,12 +1127,15 @@
+ #
+ # @none: only copy data written from now on
+ #
+-# @incremental: only copy data described by the dirty bitmap. Since: 2.4
++# @incremental: only copy data described by the dirty bitmap. (since: 2.=
+4)
++#
++# @bitmap: only copy data described by the dirty bitmap. (since: 4.2)
++#          Behavior on completion is determined by the BitmapSyncMode.
+ #
+ # Since: 1.3
+ ##
+ { 'enum': 'MirrorSyncMode',
+-  'data': ['top', 'full', 'none', 'incremental'] }
++  'data': ['top', 'full', 'none', 'incremental', 'bitmap'] }
+=20
+ ##
+ # @BitmapSyncMode:
+@@ -1343,9 +1346,14 @@
+ # @speed: the maximum speed, in bytes per second. The default is 0,
+ #         for unlimited.
+ #
+-# @bitmap: the name of dirty bitmap if sync is "incremental".
+-#          Must be present if sync is "incremental", must NOT be present
+-#          otherwise. (Since 2.4 (drive-backup), 3.1 (blockdev-backup))
++# @bitmap: the name of a dirty bitmap if sync is "bitmap" or "incrementa=
+l".
++#          Must be present if sync is "bitmap" or "incremental".
++#          Must not be present otherwise.
++#          (Since 2.4 (drive-backup), 3.1 (blockdev-backup))
++#
++# @bitmap-mode: Specifies the type of data the bitmap should contain aft=
+er
++#               the operation concludes. Must be present if sync is "bit=
+map".
++#               Must NOT be present otherwise. (Since 4.2)
+ #
+ # @compress: true to compress data, if the target format supports it.
+ #            (default: false) (since 2.8)
+@@ -1380,7 +1388,8 @@
+ { 'struct': 'BackupCommon',
+   'data': { '*job-id': 'str', 'device': 'str',
+             'sync': 'MirrorSyncMode', '*speed': 'int',
+-            '*bitmap': 'str', '*compress': 'bool',
++            '*bitmap': 'str', '*bitmap-mode': 'BitmapSyncMode',
++            '*compress': 'bool',
+             '*on-source-error': 'BlockdevOnError',
+             '*on-target-error': 'BlockdevOnError',
+             '*auto-finalize': 'bool', '*auto-dismiss': 'bool' } }
 --=20
 2.21.0
 
