@@ -2,61 +2,91 @@ Return-Path: <SRS0=wUMn=VC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF08EC5B57D
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 22:53:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B0F6C5B57D
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 22:53:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B6F6C20659
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 22:53:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B6F6C20659
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 678E920659
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 22:53:37 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ibIK3ttG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 678E920659
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56762 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56770 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hjX4k-0003I4-1c
-	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 18:53:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55194)
+	id 1hjX5E-00049H-Mx
+	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 18:53:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57231)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <ehabkost@redhat.com>) id 1hjWV8-00084S-9c
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 18:16:19 -0400
+ (envelope-from <frasse.iglesias@gmail.com>) id 1hjWg7-0002Pf-JC
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 18:27:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1hjWV6-0003iU-MD
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 18:16:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54226)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hjWV6-0003i9-6K
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 18:16:16 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 4B7748A004;
- Fri,  5 Jul 2019 22:16:15 +0000 (UTC)
-Received: from localhost (ovpn-116-30.gru2.redhat.com [10.97.116.30])
- by smtp.corp.redhat.com (Postfix) with ESMTP id CD3332B597;
- Fri,  5 Jul 2019 22:16:14 +0000 (UTC)
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>,
- Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
- Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
- Richard Henderson <rth@twiddle.net>
-Date: Fri,  5 Jul 2019 19:14:50 -0300
-Message-Id: <20190705221504.25166-29-ehabkost@redhat.com>
-In-Reply-To: <20190705221504.25166-1-ehabkost@redhat.com>
-References: <20190705221504.25166-1-ehabkost@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.26]); Fri, 05 Jul 2019 22:16:15 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL v6 28/42] vl.c: Add -smp,
- dies=* command line support and update doc
+ (envelope-from <frasse.iglesias@gmail.com>) id 1hjWg6-0004FV-GS
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 18:27:39 -0400
+Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:32801)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <frasse.iglesias@gmail.com>)
+ id 1hjWg6-0004Ek-86; Fri, 05 Jul 2019 18:27:38 -0400
+Received: by mail-lj1-x241.google.com with SMTP id h10so10559645ljg.0;
+ Fri, 05 Jul 2019 15:27:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:content-transfer-encoding:in-reply-to
+ :user-agent; bh=EuO3SQ1JkM9Sd0A/U/2k2/nifapET8PHFaQtDL31u1I=;
+ b=ibIK3ttGn3y6OwHghSKS4CWfwU2hlW5hCVVf1qlvKSggOTE6xh9i9ERDm6QmSVXNT3
+ 4oGf5fraHkS12ccn0dr5MBgNHe8srC5WadCTZsrqsc/3yZLxO20MqmKO+vN2Sy499Ik7
+ jHjUPBiwToAmAS77npBS2rk63lYHKGGb81p7pBeNTcP6asMdqIsiaCC/WhD9r/9QdPTb
+ 8bAWpE6pDrO451+cp2feCGmo2teoC5GFWnPBjRSmidKJ+yZAeZc14Xavc+ORvDRF8E3T
+ CjzkufJuj2P0tTxTUZam+3U5oRkaSxnulqQskbo6sRwl2sBXpiUMSWdXVfhfTg9zni8O
+ NJyw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to:user-agent;
+ bh=EuO3SQ1JkM9Sd0A/U/2k2/nifapET8PHFaQtDL31u1I=;
+ b=RcE5M96lcpUrA0wBne+K1sBcmUjpPbF/NccmkPoVdrjyLy2DmSfJRj689UP6bkkLj1
+ FXOlmxKONzkhB0+56w/q40dIyOtHneamDomNH6rfx6NSm1jLUU5D1pE0+GHZlPpzQhir
+ F0V/51Hwupr7meePor/vILPo3uTNXXSln0piIBDaw5g6VgkooIx2aliIikJPcH2zq3BE
+ T21F8KoFab+zJ1NskhOVSEuNtHOtQPJoPdBciuLn25BBoNa5fv2pjaPOwK2gyn5zhQ1q
+ Rk2ky+tuyO+aZE7N5IdP09gBFdMSeJAd7bo1cQYYOn9KveC7Edu438H3FoCDc3uhsrXD
+ 2MHQ==
+X-Gm-Message-State: APjAAAUCBnAPdiBNcY+g9QrXriysg5M87d7QqocftmBl78NfjreWpM/S
+ Tya1OVWJoR2gyJSjf3sqp7E=
+X-Google-Smtp-Source: APXvYqwISrK/ObJxxZqaJCQQKctuBubUmguSy9iqdU9S3E0S+ViQCKDRkXOmpCKWtAJv+Y0Co4p8IQ==
+X-Received: by 2002:a2e:864d:: with SMTP id i13mr3297723ljj.92.1562365656593; 
+ Fri, 05 Jul 2019 15:27:36 -0700 (PDT)
+Received: from fralle-msi (31-208-27-151.cust.bredband2.com. [31.208.27.151])
+ by smtp.gmail.com with ESMTPSA id
+ z17sm2027186ljc.37.2019.07.05.15.27.35
+ (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+ Fri, 05 Jul 2019 15:27:36 -0700 (PDT)
+Date: Sat, 6 Jul 2019 00:27:34 +0200
+From: Francisco Iglesias <frasse.iglesias@gmail.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Message-ID: <20190705222733.csufstr4iua5wfle@fralle-msi>
+References: <20190705202500.18853-1-philmd@redhat.com>
+ <20190705202500.18853-2-philmd@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190705202500.18853-2-philmd@redhat.com>
+User-Agent: NeoMutt/20170113 (1.7.2)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::241
+Subject: Re: [Qemu-devel] [PATCH-for-4.1 v4 1/3] hw/ssi/xilinx_spips:
+ Convert lqspi_read() to read_with_attrs
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,165 +98,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Like Xu <like.xu@linux.intel.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Alistair Francis <alistair@alistair23.me>, qemu-devel@nongnu.org,
+ Prasad J Pandit <ppandit@redhat.com>, Lei Sun <slei.casper@gmail.com>,
+ qemu-arm@nongnu.org, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Like Xu <like.xu@linux.intel.com>
+On [2019 Jul 05] Fri 22:24:58, Philippe Mathieu-Daudé wrote:
+> In the next commit we will implement the write_with_attrs()
+> handler. To avoid using different APIs, convert the read()
+> handler first.
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-For PC target, users could configure the number of dies per one package
-via command line with this patch, such as "-smp dies=2,cores=4".
+Reviewed-by: Francisco Iglesias <frasse.iglesias@gmail.com>
 
-The parsing rules of new cpu-topology model obey the same restrictions/logic
-as the legacy socket/core/thread model especially on missing values computing.
-
-Signed-off-by: Like Xu <like.xu@linux.intel.com>
-Message-Id: <20190620054525.37188-4-like.xu@linux.intel.com>
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
- hw/i386/pc.c    | 30 +++++++++++++++++-------------
- vl.c            |  3 +++
- qemu-options.hx | 17 +++++++++--------
- 3 files changed, 29 insertions(+), 21 deletions(-)
-
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 894084c4e1..b9c55301a2 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -1540,9 +1540,12 @@ static void pc_new_cpu(PCMachineState *pcms, int64_t apic_id, Error **errp)
-  */
- void pc_smp_parse(MachineState *ms, QemuOpts *opts)
- {
-+    PCMachineState *pcms = PC_MACHINE(ms);
-+
-     if (opts) {
-         unsigned cpus    = qemu_opt_get_number(opts, "cpus", 0);
-         unsigned sockets = qemu_opt_get_number(opts, "sockets", 0);
-+        unsigned dies = qemu_opt_get_number(opts, "dies", 1);
-         unsigned cores   = qemu_opt_get_number(opts, "cores", 0);
-         unsigned threads = qemu_opt_get_number(opts, "threads", 0);
- 
-@@ -1552,24 +1555,24 @@ void pc_smp_parse(MachineState *ms, QemuOpts *opts)
-             threads = threads > 0 ? threads : 1;
-             if (cpus == 0) {
-                 sockets = sockets > 0 ? sockets : 1;
--                cpus = cores * threads * sockets;
-+                cpus = cores * threads * dies * sockets;
-             } else {
-                 ms->smp.max_cpus =
-                         qemu_opt_get_number(opts, "maxcpus", cpus);
--                sockets = ms->smp.max_cpus / (cores * threads);
-+                sockets = ms->smp.max_cpus / (cores * threads * dies);
-             }
-         } else if (cores == 0) {
-             threads = threads > 0 ? threads : 1;
--            cores = cpus / (sockets * threads);
-+            cores = cpus / (sockets * dies * threads);
-             cores = cores > 0 ? cores : 1;
-         } else if (threads == 0) {
--            threads = cpus / (cores * sockets);
-+            threads = cpus / (cores * dies * sockets);
-             threads = threads > 0 ? threads : 1;
--        } else if (sockets * cores * threads < cpus) {
-+        } else if (sockets * dies * cores * threads < cpus) {
-             error_report("cpu topology: "
--                         "sockets (%u) * cores (%u) * threads (%u) < "
-+                         "sockets (%u) * dies (%u) * cores (%u) * threads (%u) < "
-                          "smp_cpus (%u)",
--                         sockets, cores, threads, cpus);
-+                         sockets, dies, cores, threads, cpus);
-             exit(1);
-         }
- 
-@@ -1581,26 +1584,27 @@ void pc_smp_parse(MachineState *ms, QemuOpts *opts)
-             exit(1);
-         }
- 
--        if (sockets * cores * threads > ms->smp.max_cpus) {
-+        if (sockets * dies * cores * threads > ms->smp.max_cpus) {
-             error_report("cpu topology: "
--                         "sockets (%u) * cores (%u) * threads (%u) > "
-+                         "sockets (%u) * dies (%u) * cores (%u) * threads (%u) > "
-                          "maxcpus (%u)",
--                         sockets, cores, threads,
-+                         sockets, dies, cores, threads,
-                          ms->smp.max_cpus);
-             exit(1);
-         }
- 
--        if (sockets * cores * threads != ms->smp.max_cpus) {
-+        if (sockets * dies * cores * threads != ms->smp.max_cpus) {
-             warn_report("Invalid CPU topology deprecated: "
--                        "sockets (%u) * cores (%u) * threads (%u) "
-+                        "sockets (%u) * dies (%u) * cores (%u) * threads (%u) "
-                         "!= maxcpus (%u)",
--                        sockets, cores, threads,
-+                        sockets, dies, cores, threads,
-                         ms->smp.max_cpus);
-         }
- 
-         ms->smp.cpus = cpus;
-         ms->smp.cores = cores;
-         ms->smp.threads = threads;
-+        pcms->smp_dies = dies;
-     }
- 
-     if (ms->smp.cpus > 1) {
-diff --git a/vl.c b/vl.c
-index 96d2456f70..280e709e2c 100644
---- a/vl.c
-+++ b/vl.c
-@@ -1231,6 +1231,9 @@ static QemuOptsList qemu_smp_opts = {
-         }, {
-             .name = "sockets",
-             .type = QEMU_OPT_NUMBER,
-+        }, {
-+            .name = "dies",
-+            .type = QEMU_OPT_NUMBER,
-         }, {
-             .name = "cores",
-             .type = QEMU_OPT_NUMBER,
-diff --git a/qemu-options.hx b/qemu-options.hx
-index af850923f7..9621e934c0 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -138,25 +138,26 @@ no incompatible TCG features have been enabled (e.g. icount/replay).
- ETEXI
- 
- DEF("smp", HAS_ARG, QEMU_OPTION_smp,
--    "-smp [cpus=]n[,maxcpus=cpus][,cores=cores][,threads=threads][,sockets=sockets]\n"
-+    "-smp [cpus=]n[,maxcpus=cpus][,cores=cores][,threads=threads][,dies=dies][,sockets=sockets]\n"
-     "                set the number of CPUs to 'n' [default=1]\n"
-     "                maxcpus= maximum number of total cpus, including\n"
-     "                offline CPUs for hotplug, etc\n"
--    "                cores= number of CPU cores on one socket\n"
-+    "                cores= number of CPU cores on one socket (for PC, it's on one die)\n"
-     "                threads= number of threads on one CPU core\n"
-+    "                dies= number of CPU dies on one socket (for PC only)\n"
-     "                sockets= number of discrete sockets in the system\n",
-         QEMU_ARCH_ALL)
- STEXI
--@item -smp [cpus=]@var{n}[,cores=@var{cores}][,threads=@var{threads}][,sockets=@var{sockets}][,maxcpus=@var{maxcpus}]
-+@item -smp [cpus=]@var{n}[,cores=@var{cores}][,threads=@var{threads}][,dies=dies][,sockets=@var{sockets}][,maxcpus=@var{maxcpus}]
- @findex -smp
- Simulate an SMP system with @var{n} CPUs. On the PC target, up to 255
- CPUs are supported. On Sparc32 target, Linux limits the number of usable CPUs
- to 4.
--For the PC target, the number of @var{cores} per socket, the number
--of @var{threads} per cores and the total number of @var{sockets} can be
--specified. Missing values will be computed. If any on the three values is
--given, the total number of CPUs @var{n} can be omitted. @var{maxcpus}
--specifies the maximum number of hotpluggable CPUs.
-+For the PC target, the number of @var{cores} per die, the number of @var{threads}
-+per cores, the number of @var{dies} per packages and the total number of
-+@var{sockets} can be specified. Missing values will be computed.
-+If any on the three values is given, the total number of CPUs @var{n} can be omitted.
-+@var{maxcpus} specifies the maximum number of hotpluggable CPUs.
- ETEXI
- 
- DEF("numa", HAS_ARG, QEMU_OPTION_numa,
--- 
-2.18.0.rc1.1.g3f1ff2140
-
+> ---
+> v4: Do not ignore lqspi_read() return value (Francisco)
+> ---
+>  hw/ssi/xilinx_spips.c | 23 +++++++++++------------
+>  1 file changed, 11 insertions(+), 12 deletions(-)
+> 
+> diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
+> index 8115bb6d46..b7c7275dbe 100644
+> --- a/hw/ssi/xilinx_spips.c
+> +++ b/hw/ssi/xilinx_spips.c
+> @@ -1202,27 +1202,26 @@ static void lqspi_load_cache(void *opaque, hwaddr addr)
+>      }
+>  }
+>  
+> -static uint64_t
+> -lqspi_read(void *opaque, hwaddr addr, unsigned int size)
+> +static MemTxResult lqspi_read(void *opaque, hwaddr addr, uint64_t *value,
+> +                              unsigned size, MemTxAttrs attrs)
+>  {
+> -    XilinxQSPIPS *q = opaque;
+> -    uint32_t ret;
+> +    XilinxQSPIPS *q = XILINX_QSPIPS(opaque);
+>  
+>      if (addr >= q->lqspi_cached_addr &&
+>              addr <= q->lqspi_cached_addr + LQSPI_CACHE_SIZE - 4) {
+>          uint8_t *retp = &q->lqspi_buf[addr - q->lqspi_cached_addr];
+> -        ret = cpu_to_le32(*(uint32_t *)retp);
+> -        DB_PRINT_L(1, "addr: %08x, data: %08x\n", (unsigned)addr,
+> -                   (unsigned)ret);
+> -        return ret;
+> -    } else {
+> -        lqspi_load_cache(opaque, addr);
+> -        return lqspi_read(opaque, addr, size);
+> +        *value = cpu_to_le32(*(uint32_t *)retp);
+> +        DB_PRINT_L(1, "addr: %08" HWADDR_PRIx ", data: %08" PRIx64 "\n",
+> +                   addr, *value);
+> +        return MEMTX_OK;
+>      }
+> +
+> +    lqspi_load_cache(opaque, addr);
+> +    return lqspi_read(opaque, addr, value, size, attrs);
+>  }
+>  
+>  static const MemoryRegionOps lqspi_ops = {
+> -    .read = lqspi_read,
+> +    .read_with_attrs = lqspi_read,
+>      .endianness = DEVICE_NATIVE_ENDIAN,
+>      .valid = {
+>          .min_access_size = 1,
+> -- 
+> 2.20.1
+> 
 
