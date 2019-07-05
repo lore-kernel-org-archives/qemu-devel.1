@@ -2,64 +2,61 @@ Return-Path: <SRS0=wUMn=VC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 719E2C4649B
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 13:42:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E0DFC4649B
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 13:49:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 490FA218C9
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 13:42:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 490FA218C9
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 04AB320856
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 13:49:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 04AB320856
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53300 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53328 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hjOUG-0007Xe-KS
-	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 09:42:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40353)
+	id 1hjOaB-0001Lt-S7
+	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 09:48:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40876)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <groug@kaod.org>) id 1hjOS5-0005f6-Qx
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 09:40:39 -0400
+ (envelope-from <kraxel@redhat.com>) id 1hjOUB-0007b0-RB
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 09:42:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1hjORz-00061j-45
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 09:40:36 -0400
-Received: from 2.mo179.mail-out.ovh.net ([178.33.250.45]:48004)
+ (envelope-from <kraxel@redhat.com>) id 1hjOUA-0007bN-Ki
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 09:42:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44744)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1hjORx-0004NE-P9
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 09:40:31 -0400
-Received: from player732.ha.ovh.net (unknown [10.109.143.145])
- by mo179.mail-out.ovh.net (Postfix) with ESMTP id 195A3139316
- for <qemu-devel@nongnu.org>; Fri,  5 Jul 2019 15:40:07 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player732.ha.ovh.net (Postfix) with ESMTPSA id 1C5EB78326A2;
- Fri,  5 Jul 2019 13:40:03 +0000 (UTC)
-Date: Fri, 5 Jul 2019 15:40:00 +0200
-From: Greg Kurz <groug@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190705154000.78f67bc9@bahia.lan>
-In-Reply-To: <20190705045623.GB3266@umbus.fritz.box>
-References: <156217621200.562209.8968691631915806468.stgit@bahia.lan>
- <20190704002357.GR9442@umbus.fritz.box>
- <20190704101204.4968e0a1@bahia.lan>
- <20190705045623.GB3266@umbus.fritz.box>
-X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 5996261431116732902
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduvddrfeeggdeikecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+ (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hjOUA-0007Rs-F0
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 09:42:46 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 279318830B;
+ Fri,  5 Jul 2019 13:42:44 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-116-90.ams2.redhat.com
+ [10.36.116.90])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id AE497860E3;
+ Fri,  5 Jul 2019 13:42:40 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id B561117534; Fri,  5 Jul 2019 15:42:39 +0200 (CEST)
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Fri,  5 Jul 2019 15:42:39 +0200
+Message-Id: <20190705134239.11718-5-kraxel@redhat.com>
+In-Reply-To: <20190705134239.11718-1-kraxel@redhat.com>
+References: <20190705134239.11718-1-kraxel@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.28]); Fri, 05 Jul 2019 13:42:44 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 178.33.250.45
-Subject: Re: [Qemu-devel] [PATCH for-4.2] xics/kvm: Convert assert() to
- error_setg()
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PULL 4/4] ati-vga: Fix setting offset together with
+ pitch for r128pro
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,109 +68,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>,
- qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 5 Jul 2019 14:56:23 +1000
-David Gibson <david@gibson.dropbear.id.au> wrote:
+From: BALATON Zoltan <balaton@eik.bme.hu>
 
-> On Thu, Jul 04, 2019 at 10:12:04AM +0200, Greg Kurz wrote:
-> > On Thu, 4 Jul 2019 10:23:57 +1000
-> > David Gibson <david@gibson.dropbear.id.au> wrote:
-> > 
-> > > On Wed, Jul 03, 2019 at 07:50:12PM +0200, Greg Kurz wrote:
-> > > > ics_set_kvm_state_one() is called either during reset, in which case
-> > > > both 'saved priority' and 'current priority' are equal to 0xff, or
-> > > > during migration. In the latter case, 'saved priority' may differ
-> > > > from 'current priority' only if the interrupt had been masked with
-> > > > the ibm,int-off RTAS call. Instead of aborting QEMU, print out an
-> > > > error and exit.
-> > > 
-> > > What's the rationale for this?  Doesn't hitting this indicate an error
-> > > in the qemu code, for which an abort is the usual response?
-> > > 
-> > 
-> > This error can be hit by the destination during migration if the
-> > incoming stream is corrupted. Aborting in this case would mislead
-> > the user into suspecting a bug in the destination QEMU, which isn't
-> > the case.
-> 
-> Rather than a bug in the source qemu?  I guess so.
-> 
+Turns out my last fix to this broke one case for Rage 128 Pro so
+revert that part of previous patch. This now fixes the remaining
+rendering problems for MorphOS which now can produce picture with
+-device ati-vga (although it may not be optimised yet and video
+overlay emulation is still known to be missing).
 
-A bug in the source QEMU for live migration or a corrupted snapshot
-for load_vm, which could result from a qcow2 file corruption for
-example.
+Fixes: 866ad5f5ff620078f88183aa254f7b02727e6aa3
+Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+Message-id: da33261a841755691f698db8190c868df0c0d3ae.1562276605.git.balaton@eik.bme.hu
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ hw/display/ati.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-> > Appart from that, when the in-kernel XICS is in use, only two functions
-> > manipulate the ICS state: ics_set_kvm_state_one() and ics_get_kvm_state().
-> > The code is trivial enough that I don't see a great value in the assert
-> > in the first place... BTW, it comes from the commit:
-> > 
-> > commit 11ad93f68195f68cc94d988f2aa50b4d190ee52a
-> > Author: David Gibson <david@gibson.dropbear.id.au>
-> > Date:   Thu Sep 26 16:18:44 2013 +1000
-> > 
-> >     xics-kvm: Support for in-kernel XICS interrupt controller
-> > 
-> > Maybe you remember some context that justified the assert at the
-> > time ?
-> 
-> It was probably mostly about documenting the invariants that are
-> supposed to apply here.
-> 
-
-Indeed this error on the reset path is very likely a bug in QEMU,
-and the assert() makes sense in this case.
-
-I'm convinced by the documenting argument. Please forget this patch :)
-
-> > 
-> > > > 
-> > > > Based-on: <156217454083.559957.7359208229523652842.stgit@bahia.lan>
-> > > > Signed-off-by: Greg Kurz <groug@kaod.org>
-> > > > ---
-> > > > 
-> > > > This isn't a bugfix, hence targetting 4.2, but it depends on an actual
-> > > > fix for 4.1, as mentionned in the Based-on tag.
-> > > > ---
-> > > >  hw/intc/xics_kvm.c |   17 +++++++++++++++--
-> > > >  1 file changed, 15 insertions(+), 2 deletions(-)
-> > > > 
-> > > > diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
-> > > > index 2df1f3e92c7e..f8758b928250 100644
-> > > > --- a/hw/intc/xics_kvm.c
-> > > > +++ b/hw/intc/xics_kvm.c
-> > > > @@ -255,8 +255,21 @@ int ics_set_kvm_state_one(ICSState *ics, int srcno, Error **errp)
-> > > >      state = irq->server;
-> > > >      state |= (uint64_t)(irq->saved_priority & KVM_XICS_PRIORITY_MASK)
-> > > >          << KVM_XICS_PRIORITY_SHIFT;
-> > > > -    if (irq->priority != irq->saved_priority) {
-> > > > -        assert(irq->priority == 0xff);
-> > > > +
-> > > > +    /*
-> > > > +     * An interrupt can be masked either because the ICS is resetting, in
-> > > > +     * which case we expect 'current priority' and 'saved priority' to be
-> > > > +     * equal to 0xff, or because the guest has called the ibm,int-off RTAS
-> > > > +     * call, in which case we we have recorded the priority the interrupt
-> > > > +     * had before it was masked in 'saved priority'. If the interrupt isn't
-> > > > +     * masked, 'saved priority' and 'current priority' are equal (see
-> > > > +     * ics_get_kvm_state()). Make sure we restore a sane state, otherwise
-> > > > +     * fail migration.
-> > > > +     */
-> > > > +    if (irq->priority != irq->saved_priority && irq->priority != 0xff) {
-> > > > +        error_setg(errp, "Corrupted state detected for interrupt source %d",
-> > > > +                   srcno);
-> > > > +        return -EINVAL;
-> > > >      }
-> > > >  
-> > > >      if (irq->priority == 0xff) {
-> > > > 
-> > > 
-> > 
-> 
+diff --git a/hw/display/ati.c b/hw/display/ati.c
+index 590362ea568c..a747c4cc98c7 100644
+--- a/hw/display/ati.c
++++ b/hw/display/ati.c
+@@ -689,7 +689,7 @@ static void ati_mm_write(void *opaque, hwaddr addr,
+         break;
+     case SRC_PITCH_OFFSET:
+         if (s->dev_id == PCI_DEVICE_ID_ATI_RAGE128_PF) {
+-            s->regs.src_offset = (data & 0x1fffff) << 4;
++            s->regs.src_offset = (data & 0x1fffff) << 5;
+             s->regs.src_pitch = (data & 0x7fe00000) >> 21;
+             s->regs.src_tile = data >> 31;
+         } else {
+@@ -700,7 +700,7 @@ static void ati_mm_write(void *opaque, hwaddr addr,
+         break;
+     case DST_PITCH_OFFSET:
+         if (s->dev_id == PCI_DEVICE_ID_ATI_RAGE128_PF) {
+-            s->regs.dst_offset = (data & 0x1fffff) << 4;
++            s->regs.dst_offset = (data & 0x1fffff) << 5;
+             s->regs.dst_pitch = (data & 0x7fe00000) >> 21;
+             s->regs.dst_tile = data >> 31;
+         } else {
+-- 
+2.18.1
 
 
