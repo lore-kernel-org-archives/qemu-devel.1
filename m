@@ -2,72 +2,73 @@ Return-Path: <SRS0=wUMn=VC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01761C46499
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 13:21:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A895AC46499
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 13:24:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CBD8B218CA
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 13:21:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CBD8B218CA
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 80D14218A3
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 13:24:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 80D14218A3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53142 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53164 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hjO9a-0005R8-UU
-	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 09:21:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36100)
+	id 1hjOCs-0007EQ-D7
+	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 09:24:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36763)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bounces@canonical.com>) id 1hjO87-0004MF-Na
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 09:20:01 -0400
+ (envelope-from <groug@kaod.org>) id 1hjOBs-0006dR-8j
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 09:23:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1hjO83-0004r9-Qk
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 09:19:59 -0400
-Received: from indium.canonical.com ([91.189.90.7]:37524)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1hjO81-0004Nb-Dm
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 09:19:53 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1hjO7x-0008D0-5h
- for <qemu-devel@nongnu.org>; Fri, 05 Jul 2019 13:19:49 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 1BA662E80D2
- for <qemu-devel@nongnu.org>; Fri,  5 Jul 2019 13:19:49 +0000 (UTC)
+ (envelope-from <groug@kaod.org>) id 1hjOBq-0005nX-5y
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 09:23:52 -0400
+Received: from 13.mo5.mail-out.ovh.net ([87.98.182.191]:42111)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1hjOBm-0005DO-C2
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 09:23:47 -0400
+Received: from player760.ha.ovh.net (unknown [10.108.42.192])
+ by mo5.mail-out.ovh.net (Postfix) with ESMTP id A972123BBAF
+ for <qemu-devel@nongnu.org>; Fri,  5 Jul 2019 15:23:41 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player760.ha.ovh.net (Postfix) with ESMTPSA id 43AE87A32412;
+ Fri,  5 Jul 2019 13:23:34 +0000 (UTC)
+Date: Fri, 5 Jul 2019 15:23:32 +0200
+From: Greg Kurz <groug@kaod.org>
+To: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
+Message-ID: <20190705152332.40126a76@bahia.lan>
+In-Reply-To: <c0ab62c0-b170-2c11-221f-b46b1ba4339f@linux.vnet.ibm.com>
+References: <156033104292.26635.15759339817253067370.stgit@aravinda>
+ <156033126489.26635.3005245220857933178.stgit@aravinda>
+ <20190702035105.GG6779@umbus.fritz.box>
+ <fa2b5983-7cad-9679-489f-c273bd8216fb@linux.vnet.ibm.com>
+ <20190703030334.GF9442@umbus.fritz.box>
+ <a43707b0-8059-b2bd-a461-9f6de3285d8f@linux.vnet.ibm.com>
+ <20190704010714.GS9442@umbus.fritz.box>
+ <d5c75742-4f45-2f26-3837-098e8710ccd9@linux.vnet.ibm.com>
+ <20190705010755.GA3266@umbus.fritz.box>
+ <c0ab62c0-b170-2c11-221f-b46b1ba4339f@linux.vnet.ibm.com>
+X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 05 Jul 2019 13:06:53 -0000
-From: Ari Sundholm <1462640@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: janitor megari th-huth v-adrien
-X-Launchpad-Bug-Reporter: AH (v-adrien)
-X-Launchpad-Bug-Modifier: Ari Sundholm (megari)
-References: <20150606150101.12665.95850.malonedeb@soybean.canonical.com>
-Message-Id: <156233201336.2726.2829300029753713180.malone@wampee.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="19007";
- Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 56f037e8266f6bdd86b6fd4f81f1e7218c7d4c13
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 5718727102572960148
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduvddrfeeggdeigecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1462640] Re: shmat fails on 32-to-64 setup
+X-Received-From: 87.98.182.191
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v10 2/6] ppc: spapr: Introduce
+ FWNMI capability
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -76,108 +77,169 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1462640 <1462640@bugs.launchpad.net>
+Cc: aik@au1.ibm.com, qemu-devel@nongnu.org, paulus@ozlabs.org,
+ qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I can confirm that this bug still exists in the current qemu master
-(short commit ID 0050f9978e):
+On Fri, 5 Jul 2019 16:49:17 +0530
+Aravinda Prasad <aravinda@linux.vnet.ibm.com> wrote:
 
-~/qemu$ gcc -m32 shm_bug.c -o shm_bug32
-shm_bug.c: In function =E2=80=98main=E2=80=99:
-shm_bug.c:12:24: warning: initialization makes pointer from integer without=
- a cast [-Wint-conversion]
-       const void *at =3D 0x7f7df38ea000;
-                        ^~~~~~~~~~~~~~
-~/qemu$ i386-linux-user/qemu-i386 ./shm_bug32 =
+> 
+> 
+> On Friday 05 July 2019 06:37 AM, David Gibson wrote:
+> > On Thu, Jul 04, 2019 at 10:33:11AM +0530, Aravinda Prasad wrote:
+> >>
+> >>
+> >> On Thursday 04 July 2019 06:37 AM, David Gibson wrote:
+> >>> On Wed, Jul 03, 2019 at 02:58:24PM +0530, Aravinda Prasad wrote:
+> >>>>
+> >>>>
+> >>>> On Wednesday 03 July 2019 08:33 AM, David Gibson wrote:
+> >>>>> On Tue, Jul 02, 2019 at 11:54:26AM +0530, Aravinda Prasad wrote:
+> >>>>>>
+> >>>>>>
+> >>>>>> On Tuesday 02 July 2019 09:21 AM, David Gibson wrote:
+> >>>>>>> On Wed, Jun 12, 2019 at 02:51:04PM +0530, Aravinda Prasad wrote:
+> >>>>>>>> Introduce the KVM capability KVM_CAP_PPC_FWNMI so that
+> >>>>>>>> the KVM causes guest exit with NMI as exit reason
+> >>>>>>>> when it encounters a machine check exception on the
+> >>>>>>>> address belonging to a guest. Without this capability
+> >>>>>>>> enabled, KVM redirects machine check exceptions to
+> >>>>>>>> guest's 0x200 vector.
+> >>>>>>>>
+> >>>>>>>> This patch also introduces fwnmi-mce capability to
+> >>>>>>>> deal with the case when a guest with the
+> >>>>>>>> KVM_CAP_PPC_FWNMI capability enabled is attempted
+> >>>>>>>> to migrate to a host that does not support this
+> >>>>>>>> capability.
+> >>>>>>>>
+> >>>>>>>> Signed-off-by: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
+> >>>>>>>> ---
+> >>>>>>>>  hw/ppc/spapr.c         |    1 +
+> >>>>>>>>  hw/ppc/spapr_caps.c    |   26 ++++++++++++++++++++++++++
+> >>>>>>>>  include/hw/ppc/spapr.h |    4 +++-
+> >>>>>>>>  target/ppc/kvm.c       |   19 +++++++++++++++++++
+> >>>>>>>>  target/ppc/kvm_ppc.h   |   12 ++++++++++++
+> >>>>>>>>  5 files changed, 61 insertions(+), 1 deletion(-)
+> >>>>>>>>
+> >>>>>>>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> >>>>>>>> index 6dd8aaa..2ef86aa 100644
+> >>>>>>>> --- a/hw/ppc/spapr.c
+> >>>>>>>> +++ b/hw/ppc/spapr.c
+> >>>>>>>> @@ -4360,6 +4360,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
+> >>>>>>>>      smc->default_caps.caps[SPAPR_CAP_NESTED_KVM_HV] = SPAPR_CAP_OFF;
+> >>>>>>>>      smc->default_caps.caps[SPAPR_CAP_LARGE_DECREMENTER] = SPAPR_CAP_ON;
+> >>>>>>>>      smc->default_caps.caps[SPAPR_CAP_CCF_ASSIST] = SPAPR_CAP_OFF;
+> >>>>>>>> +    smc->default_caps.caps[SPAPR_CAP_FWNMI_MCE] = SPAPR_CAP_OFF;
+> >>>>>>>>      spapr_caps_add_properties(smc, &error_abort);
+> >>>>>>>>      smc->irq = &spapr_irq_dual;
+> >>>>>>>>      smc->dr_phb_enabled = true;
+> >>>>>>>> diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+> >>>>>>>> index 31b4661..2e92eb6 100644
+> >>>>>>>> --- a/hw/ppc/spapr_caps.c
+> >>>>>>>> +++ b/hw/ppc/spapr_caps.c
+> >>>>>>>> @@ -479,6 +479,22 @@ static void cap_ccf_assist_apply(SpaprMachineState *spapr, uint8_t val,
+> >>>>>>>>      }
+> >>>>>>>>  }
+> >>>>>>>>  
+> >>>>>>>> +static void cap_fwnmi_mce_apply(SpaprMachineState *spapr, uint8_t val,
+> >>>>>>>> +                                Error **errp)
+> >>>>>>>> +{
+> >>>>>>>> +    if (!val) {
+> >>>>>>>> +        return; /* Disabled by default */
+> >>>>>>>> +    }
+> >>>>>>>> +
+> >>>>>>>> +    if (tcg_enabled()) {
+> >>>>>>>> +        error_setg(errp,
+> >>>>>>>> +"No Firmware Assisted Non-Maskable Interrupts support in TCG, try cap-fwnmi-mce=off");
+> >>>>>>>
+> >>>>>>> Not allowing this for TCG creates an awkward incompatibility between
+> >>>>>>> KVM and TCG guests.  I can't actually see any reason to ban it for TCG
+> >>>>>>> - with the current code TCG won't ever generate NMIs, but I don't see
+> >>>>>>> that anything will actually break.
+> >>>>>>>
+> >>>>>>> In fact, we do have an nmi monitor command, currently wired to the
+> >>>>>>> spapr_nmi() function which resets each cpu, but it probably makes
+> >>>>>>> sense to wire it up to the fwnmi stuff when present.
+> >>>>>>
+> >>>>>> Yes, but that nmi support is not enough to inject a synchronous error
+> >>>>>> into the guest kernel. For example, we should provide the faulty address
+> >>>>>> along with other information such as the type of error (slb multi-hit,
+> >>>>>> memory error, TLB multi-hit) and when the error occurred (load/store)
+> >>>>>> and whether the error was completely recovered or not. Without such
+> >>>>>> information we cannot build the error log and pass it on to the guest
+> >>>>>> kernel. Right now nmi monitor command takes cpu number as the only argument.
+> >>>>>
+> >>>>> Obviously we can't inject an arbitrary MCE event with that monitor
+> >>>>> command.  But isn't there some sort of catch-all / unknown type of MCE
+> >>>>> event which we could inject?
+> >>>>
+> >>>> We have "unknown" type of error, but we should also pass an address in
+> >>>> the MCE event log. Strictly speaking this address should be a valid
+> >>>> address in the current CPU context as MCEs are synchronous errors
+> >>>> triggered when we touch a bad address.
+> >>>
+> >>> Well, some of them are.  At least historically both synchronous and
+> >>> asnchronous MCEs were possible.  Are there really no versions where
+> >>> you can report an MCE with unknown address?
+> >>
+> >> I am not aware of any such versions. Will cross check.
+> >>
+> >>>
+> >>>> We can pass a default address with every nmi, but I am not sure whether
+> >>>> that will be practically helpful.
+> >>>>
+> >>>>> It seems very confusing to me to have 2 totally separate "nmi"
+> >>>>> mechanisms.
+> >>>>>
+> >>>>>> So I think TCG support should be a separate patch by itself.
+> >>>>>
+> >>>>> Even if we don't wire up the monitor command, I still don't see
+> >>>>> anything that this patch breaks - we can support the nmi-register and
+> >>>>> nmi-interlock calls without ever actually creating MCE events.
+> >>>>
+> >>>> If we support nmi-register and nmi-interlock calls without the monitor
+> >>>> command wire-up then we will be falsely claiming the nmi support to the
+> >>>> guest while it is not actually supported.
+> >>>
+> >>> How so?  AFAICT, from the point of view of the guest this is not
+> >>> observably different from supporting the NMI mechanism but NMIs never
+> >>> occurring.
+> >>
+> >> A guest inserting a duplicate SLB will expect the machine check
+> >> exception delivered to the handler registered via nmi,register.
+> >> But we actually don't do that in TCG.
+> > 
+> > Ah, true, I was thinking of external hardware fault triggered MCEs
+> > rather than software error ones like duplicate SLB.
+> > 
+> > That said, I strongly suspect TCG is buggy enough at present that
+> > exact behaviour in rare error conditions like duplicate SLB is not
+> > really a big problem in the scheme of things.
+> > 
+> > I really don't think we can enable this by default until we allow it
+> > for TCG - we don't want starting a TCG guest to involve manually
+> > switching other options.
+> > 
+> > We could consider allowing it for TCG but just printing a warning that
+> > the behaviour may not be correct in some conditions - we do something
+> > similar for some of the Spectre workarounds already.
+> 
+> I think we better not enable this by default until we enhance TCG to
+> support fwnmi.
+> 
 
-got err 0, ptr 0xffffffff
-ari@ari-thinkpad:~/qemu$ gcc shm_bug.c -o shm_bug64
-shm_bug.c: In function =E2=80=98main=E2=80=99:
-shm_bug.c:12:24: warning: initialization makes pointer from integer without=
- a cast [-Wint-conversion]
-       const void *at =3D 0x7f7df38ea000;
-                        ^~~~~~~~~~~~~~
-~/qemu$ x86_64-linux-user/qemu-x86_64 ./shm_bug64 =
+If we ever enhance TCG... until this get done, I concur with David's
+idea of just printing a warning. System emulation+TCG is more a CI
+or developer thing: we just want FWNMI not to break anything, even
+if it doesn't work. KVM is the real life scenario we want to support.
+If the feature is valuable, and I think it is, it should be the
+default otherwise fewer people will have a chance to take benefit
+from it.
 
-got err 0, ptr 0x7f7df38ea000
-ari@ari-thinkpad:~/qemu$ =
+> > 
+> 
 
-
-Additionally, running each executable directly on a 64-bit Ubuntu 18.04
-system, we can see that the behavior of the 32-bit binary differs
-between qemu-i386 and native, while that of the 64-bit binary does not:
-
-~/qemu$ ./shm_bug32 =
-
-got err 0, ptr 0xf38ea000
-~/qemu$ ./shm_bug64
-got err 0, ptr 0x7f7df38ea000
-~/qemu$ =
-
-
-
-** Changed in: qemu
-       Status: Expired =3D> Confirmed
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1462640
-
-Title:
-  shmat fails on 32-to-64 setup
-
-Status in QEMU:
-  Confirmed
-
-Bug description:
-  =
-
-  I am trying to run a guest mips32 program (user mode) on a x86_64 host. T=
-he program fails on a call to shmat() reproducibly. when digging into this =
-problem, I could make a small guest POC that fails when compiled as i386 (-=
-m32) running on a x86_64 host, but pass when compiled as 64bit. The problem=
- has to do with mmap flags.
-
-  From what I can understand, when running 32bits guests programs, qemu
-  reserve the whole guest virtual space with an mmap call. That mmap
-  call specifys MAP:PRIVATE flag. When shmat is called, it tries to make
-  part of that region MAP_SHARED and that fails.
-
-  As a possible fix, it looks like it is possible to first unmap the shm
-  region before calling shmat.
-
-  steps to reproduce: =
-
-  1 - create a file shm.c with content below
-  2 - compile with: gcc -m32 shm.c -o shm32
-  3 - run on a x86_64 host: qemu-i386 ./shm32 =
-
-  4 - observe shmat fails, by returning ptr -1
-
-  5- compile without -m32: : gcc shm.c -o shm64
-  6 - observe it pass: qemu-x84_64 ./shm64
-
-
-  #include <sys/ipc.h>
-  #include <sys/shm.h>
-  #include <sys/mman.h>
-  #include <stdio.h>
-
-  int main()
-  {
-      struct shmid_ds shm_desc;
-      int err =3D 0;
-      int id =3D shmget(IPC_PRIVATE, 688128, IPC_CREAT|IPC_EXCL|0666);
-      err =3D shmctl(id, IPC_STAT, &shm_desc);
-      const void *at =3D 0x7f7df38ea000;
-      void* ptr =3D shmat(id, at, 0);
-      printf( "got err %d, ptr %p\n", err, ptr );
-  }
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1462640/+subscriptions
 
