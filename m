@@ -2,63 +2,81 @@ Return-Path: <SRS0=wUMn=VC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16AEFC46499
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 14:14:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C27BC4649B
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 14:17:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DF8EE20828
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 14:14:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF8EE20828
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id DE67B20828
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 14:17:14 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tyL3hlik"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE67B20828
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53562 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53624 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hjOyS-0006OH-6j
-	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 10:14:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46522)
+	id 1hjP1W-0000Ye-6m
+	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 10:17:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46835)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <pagupta@redhat.com>) id 1hjOuE-0002ZM-Fy
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 10:09:49 -0400
+ (envelope-from <laurent.desnogues@gmail.com>) id 1hjOv9-0003JD-1i
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 10:10:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pagupta@redhat.com>) id 1hjOuB-00042R-Fu
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 10:09:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45960)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1hjOuB-0003s8-AE
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 10:09:39 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 61E4A30C5859;
- Fri,  5 Jul 2019 14:09:21 +0000 (UTC)
-Received: from dhcp201-121.englab.pnq.redhat.com (ovpn-116-58.sin2.redhat.com
- [10.67.116.58])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5D98318657;
- Fri,  5 Jul 2019 14:08:42 +0000 (UTC)
-From: Pankaj Gupta <pagupta@redhat.com>
-To: dm-devel@redhat.com, linux-nvdimm@lists.01.org,
- linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org,
- kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org,
- linux-acpi@vger.kernel.org, qemu-devel@nongnu.org,
- linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org
-Date: Fri,  5 Jul 2019 19:33:26 +0530
-Message-Id: <20190705140328.20190-6-pagupta@redhat.com>
-In-Reply-To: <20190705140328.20190-1-pagupta@redhat.com>
-References: <20190705140328.20190-1-pagupta@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Fri, 05 Jul 2019 14:09:36 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v15 5/7] dax: check synchronous mapping is
- supported
+ (envelope-from <laurent.desnogues@gmail.com>) id 1hjOv8-0008Mv-0Q
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 10:10:38 -0400
+Received: from mail-io1-xd43.google.com ([2607:f8b0:4864:20::d43]:41514)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent.desnogues@gmail.com>)
+ id 1hjOv7-0007hn-Ml; Fri, 05 Jul 2019 10:10:37 -0400
+Received: by mail-io1-xd43.google.com with SMTP id j5so19070ioj.8;
+ Fri, 05 Jul 2019 07:10:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=jc8T6B1sYMgE8KUu3r8iCtOxhFzftBC0DO27E9t5POg=;
+ b=tyL3hlikgB7h11DqJBXwuvH1+JMnWTh2xDiNBC/IEwBdd1G6UxmyHfDcWRclCr4OPL
+ WGlaPixlePBhQzKgbBNrMvj+a3PtJlAvyOisdABzL1cqS+ZjhhJwsEHMipfeAUzH+6fW
+ EpIj8DZL74u/8uKgoI3ZKhpQrdk1YBZwe4sba8xlIkOxiz4phnwIp6nTSyM55dRV9W2Q
+ Wv2svVhyMFggrQ0a9BLg9zVx8BJ07DQ48muqSckgK0s+vmqjK0g+Ndp29yBQ1t8s/2hl
+ 0O7HiiMSABZLCveKMDOq+0mNSd0voyx+MdyPd6MEMaY/vAu31+5YtK7Bp7yrfqcnehhU
+ UOiw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=jc8T6B1sYMgE8KUu3r8iCtOxhFzftBC0DO27E9t5POg=;
+ b=X86y5N9flKx5B645lIqoXsOLwvZEc5YxLJpdd5MbJWaQfILYnOGWSQH4sc+hO/O3bv
+ 2IZUC5mOx2srdtbb2hcD3dZHvFQhmxp5j7hOyQIx2gVjfzBMEnjTaN0qbaqk+WX3yeSd
+ KjCSdfQeYwH9E9LkEPEBAAVylqHw5vWwyMNGCjOYkJ4TBd35F19X4Q1cc3b9R+0Ki3xg
+ GZXnb5u6K8VkHJHpyeMwJhFqOgWsCVsvZKPHt68Re0yuoRZzk08FV+A40A4bBwJkM5Kb
+ iRzFR0laJVXYyYmHCVNeoKEAiEorm3/GpwGkZXf4vfjjC7i/wWKRxo/O2c3p7cLkxqVw
+ tk5Q==
+X-Gm-Message-State: APjAAAXIylSBLuwZmNGiJhH17DoUGN/oSmBznfuwzQC5sdbCxW8hi5mY
+ 7XR7AtI+RIHk5T62hsc9vumJ9Nfvu7mtjYc329s=
+X-Google-Smtp-Source: APXvYqw498Icl14jRiBkwlADDXenfHTPtE0s9hLvZO1diJiBgjG12GHUUUc/aR3ZyCJaFgHxH5+1DSeq2xvT9WUbiHw=
+X-Received: by 2002:a02:ab83:: with SMTP id t3mr4830212jan.133.1562335828673; 
+ Fri, 05 Jul 2019 07:10:28 -0700 (PDT)
+MIME-Version: 1.0
+References: <20190705124318.1075-1-philmd@redhat.com>
+In-Reply-To: <20190705124318.1075-1-philmd@redhat.com>
+From: Laurent Desnogues <laurent.desnogues@gmail.com>
+Date: Fri, 5 Jul 2019 16:10:27 +0200
+Message-ID: <CABoDooNn3HzrgDd3sreGDogFE=_L26=si-ddkeZ6paeoMF+v6w@mail.gmail.com>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::d43
+Subject: Re: [Qemu-devel] [PATCH] target/arm/vfp_helper: Call
+ set_fpscr_to_host before updating to FPSCR
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,69 +88,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pagupta@redhat.com, rdunlap@infradead.org, jack@suse.cz, snitzer@redhat.com,
- mst@redhat.com, jasowang@redhat.com, david@fromorbit.com,
- lcapitulino@redhat.com, adilger.kernel@dilger.ca, zwisler@kernel.org,
- aarcange@redhat.com, dave.jiang@intel.com, jstaron@google.com,
- darrick.wong@oracle.com, vishal.l.verma@intel.com, david@redhat.com,
- willy@infradead.org, hch@infradead.org, jmoyer@redhat.com, nilal@redhat.com,
- lenb@kernel.org, kilobyte@angband.pl, riel@surriel.com, yuval.shaia@oracle.com,
- stefanha@redhat.com, pbonzini@redhat.com, dan.j.williams@intel.com,
- kwolf@redhat.com, tytso@mit.edu, xiaoguangrong.eric@gmail.com,
- cohuck@redhat.com, rjw@rjwysocki.net, imammedo@redhat.com
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch introduces 'daxdev_mapping_supported' helper
-which checks if 'MAP_SYNC' is supported with filesystem
-mapping. It also checks if corresponding dax_device is
-synchronous. Virtio pmem device is asynchronous and
-does not not support VM_SYNC.
+On Fri, Jul 5, 2019 at 2:43 PM Philippe Mathieu-Daud=C3=A9 <philmd@redhat.c=
+om> wrote:
+>
+> In commit e9d652824b0 we extracted the vfp_set_fpscr_to_host()
+> function but failed at calling it in the correct place, we call
+> it after xregs[ARM_VFP_FPSCR] is modified.
+>
+> Fix by calling this function before we update FPSCR.
+>
+> Reported-by: Laurent Desnogues <laurent.desnogues@gmail.com>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-Suggested-by: Jan Kara <jack@suse.cz>
-Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
-Reviewed-by: Jan Kara <jack@suse.cz>
----
- include/linux/dax.h | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+Reviewed-by: Laurent Desnogues <laurent.desnogues@gmail.com>
+Tested-by: Laurent Desnogues <laurent.desnogues@gmail.com>
 
-diff --git a/include/linux/dax.h b/include/linux/dax.h
-index 86fc55c99b58..d1bea3979b5a 100644
---- a/include/linux/dax.h
-+++ b/include/linux/dax.h
-@@ -53,6 +53,18 @@ static inline void set_dax_synchronous(struct dax_device *dax_dev)
- {
- 	__set_dax_synchronous(dax_dev);
- }
-+/*
-+ * Check if given mapping is supported by the file / underlying device.
-+ */
-+static inline bool daxdev_mapping_supported(struct vm_area_struct *vma,
-+					     struct dax_device *dax_dev)
-+{
-+	if (!(vma->vm_flags & VM_SYNC))
-+		return true;
-+	if (!IS_DAX(file_inode(vma->vm_file)))
-+		return false;
-+	return dax_synchronous(dax_dev);
-+}
- #else
- static inline struct dax_device *dax_get_by_host(const char *host)
- {
-@@ -87,6 +99,11 @@ static inline bool dax_synchronous(struct dax_device *dax_dev)
- static inline void set_dax_synchronous(struct dax_device *dax_dev)
- {
- }
-+static inline bool daxdev_mapping_supported(struct vm_area_struct *vma,
-+				struct dax_device *dax_dev)
-+{
-+	return !(vma->vm_flags & VM_SYNC);
-+}
- #endif
- 
- struct writeback_control;
--- 
-2.20.1
+Thanks,
 
+Laurent
+
+> ---
+>  target/arm/vfp_helper.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/target/arm/vfp_helper.c b/target/arm/vfp_helper.c
+> index 46041e3294..9710ef1c3e 100644
+> --- a/target/arm/vfp_helper.c
+> +++ b/target/arm/vfp_helper.c
+> @@ -197,6 +197,8 @@ void HELPER(vfp_set_fpscr)(CPUARMState *env, uint32_t=
+ val)
+>          val &=3D 0xf7c0009f;
+>      }
+>
+> +    vfp_set_fpscr_to_host(env, val);
+> +
+>      /*
+>       * We don't implement trapped exception handling, so the
+>       * trap enable bits, IDE|IXE|UFE|OFE|DZE|IOE are all RAZ/WI (not RES=
+0!)
+> @@ -217,8 +219,6 @@ void HELPER(vfp_set_fpscr)(CPUARMState *env, uint32_t=
+ val)
+>      env->vfp.qc[1] =3D 0;
+>      env->vfp.qc[2] =3D 0;
+>      env->vfp.qc[3] =3D 0;
+> -
+> -    vfp_set_fpscr_to_host(env, val);
+>  }
+>
+>  void vfp_set_fpscr(CPUARMState *env, uint32_t val)
+> --
+> 2.20.1
+>
 
