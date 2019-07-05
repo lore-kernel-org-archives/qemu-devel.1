@@ -2,86 +2,83 @@ Return-Path: <SRS0=wUMn=VC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5901BC5B57D
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 09:50:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4843AC46499
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 09:50:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2466E218C3
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 09:50:38 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cnl+Xprr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2466E218C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 24FA2218C3
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 09:50:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24FA2218C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51080 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51088 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hjKrV-0000zz-8q
-	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 05:50:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45247)
+	id 1hjKrc-0001Pr-E0
+	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 05:50:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45347)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hjKpe-0008UA-KX
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 05:48:48 -0400
+ (envelope-from <philmd@redhat.com>) id 1hjKps-0000Df-Qv
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 05:48:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hjKpS-0007gj-Io
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 05:48:34 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:39418)
+ (envelope-from <philmd@redhat.com>) id 1hjKpr-0007tf-9L
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 05:48:56 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:36507)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hjKpQ-0007dV-Cy
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 05:48:28 -0400
-Received: by mail-wm1-x344.google.com with SMTP id z23so8675420wma.4
- for <qemu-devel@nongnu.org>; Fri, 05 Jul 2019 02:48:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=DJgQt7YL6iWlivZMktmp+6RLn8cya2C11mFjRx5RqMo=;
- b=cnl+XprrN7uiZs+5WlwwepCMKFBSOxpjXOndEN3uA2itR5tJsJvqTvccm1+mvJeqh9
- kidp/NsCD9ebJ+jjH35wrDh5r+7LlZ8XPaDH0psZMwECud0zYnq1u265XuKGVDu+JL+D
- MtsOBeZUIplC1ncSHn+40YBq8fxeZVBaXAxeQRepo10i6oJIP3MpJ2CbbF21pTxCfNGq
- Zsz1Ieidq6+V+u+UYFsPh2eTIntvt8826grN2VEd4BSEo+qHO8QELdkoucT0UOKu7t9/
- m4qejkexxvBuoRt7XjF3TXvOj4k894xQaMguJ2MaRTOB/Kp+UbTu82vVNkSm/mewxZBk
- 8MIQ==
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hjKpq-0007sh-VG
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 05:48:55 -0400
+Received: by mail-wr1-f65.google.com with SMTP id n4so9281319wrs.3
+ for <qemu-devel@nongnu.org>; Fri, 05 Jul 2019 02:48:54 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=DJgQt7YL6iWlivZMktmp+6RLn8cya2C11mFjRx5RqMo=;
- b=mH87OManGtUIjZ/ceBHFze7WBnIUSluKK42ELniFqrL9Zz21ZfahkNv55XAISU/Sry
- KNPnf8BpZG0xeEKfL50+6nqE8fLqFr+7lLDoMB8pBCRKB/Bo+zIoCLC+RuyDs1eHSzYP
- 1yETDdSVD0J4laONbJ5KrEa4nckFiRu9OKtLTMQqP8eLJQzlEWlGvWdC6y3hx+gql8Ob
- mGw8fwv5RftZTYDNpCux/p6vBMoC2lqLDKkNvaEH0HeOmRNLg53AlGC5sZMXXHhGZ/W4
- kAJQiE5MELfBvAYrrWZrDRS363HygFbVovg/vdYSH4Sfgvpa8iw4Y6UymmG+rl/923Dy
- zeWQ==
-X-Gm-Message-State: APjAAAUE/1+4Ei6YYbqaWXMim2VSCA3MNRDglwr3nzjXNs/aNCy43XVq
- ybUKm6g92jNWSSxU8J5mD1sJopwY60VNFA==
-X-Google-Smtp-Source: APXvYqzpFwGJXBkFpt9LxebrpEjjA5DiSwKuAkjwnYivx/0vrHzfuo5QyP+orRhGmOFmOct3++IElg==
-X-Received: by 2002:a05:600c:114f:: with SMTP id
- z15mr2675364wmz.131.1562320106509; 
- Fri, 05 Jul 2019 02:48:26 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id v204sm9430455wma.20.2019.07.05.02.48.24
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Fri, 05 Jul 2019 02:48:25 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-arm@nongnu.org,
-	qemu-devel@nongnu.org
-Date: Fri,  5 Jul 2019 10:48:23 +0100
-Message-Id: <20190705094823.28905-1-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to;
+ bh=dLmi6jaQ72O2wh/NvFKzSc8JvyUz4kqxHa86vT+K2es=;
+ b=VJqh86kmcHSHOfER8xbVcflJT0r/4xzqv/G/DLMYEXEwmBYdmEBUyr/xnXhzWWTJIx
+ Z57X5fqME/8QQ4egB8Byh0mKs+ZJwgG5jZ3BZKRmGLQ7L+0BgDLUNYf28fqxpE+gUHfw
+ KiSxYFacvkZvcRjQkpVQRqPYPUNE7sV45pGMKrOHhnV713wLSx2oNjzYNX8Et9m4YjHv
+ kjTitC7ddvqSzcD90kdU1l0EGZ2xYqHEEd4vwVYTzke7XnzN93vbqMGhiNq6bmQkRPmp
+ lj6dsXP2cYTbHcnd28fEm7VeuxYSwL3uGDYm964jls43vxcAl15MW2z5j1I3bwR6lD5t
+ Ohbw==
+X-Gm-Message-State: APjAAAWV+WBf2x/3QsS/P0EqpCeOhrgc80Zvi1rtVFDukWTZLTuSekq1
+ /xexLPULZuaUqVzCezv+eM8JD9rSAsw=
+X-Google-Smtp-Source: APXvYqxW7Bj4qPWWMhNryNG+VP0Fy8GqcmAjPwM+jAx4p+Xy+aPCqvEi+eegyD1wqKnkiaJJFmR7uQ==
+X-Received: by 2002:a5d:4642:: with SMTP id j2mr3019677wrs.211.1562320133593; 
+ Fri, 05 Jul 2019 02:48:53 -0700 (PDT)
+Received: from [192.168.1.38] (56.red-88-18-140.staticip.rima-tde.net.
+ [88.18.140.56])
+ by smtp.gmail.com with ESMTPSA id h8sm8081888wmf.12.2019.07.05.02.48.52
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Fri, 05 Jul 2019 02:48:52 -0700 (PDT)
+To: Stefan Hajnoczi <stefanha@redhat.com>,
+ =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+References: <20190703171005.26231-1-philmd@redhat.com>
+ <20190703172501.GI23082@redhat.com>
+ <20190704102457.GE1609@stefanha-x1.localdomain>
+ <20190704102837.GA24190@redhat.com>
+ <20190705080717.GD10995@stefanha-x1.localdomain>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <8470a203-430b-1814-b2ef-6adf3fa739a6@redhat.com>
+Date: Fri, 5 Jul 2019 11:48:51 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::344
-Subject: [Qemu-devel] [PATCH v2 for-4.1] target/arm: NS BusFault on vector
- table fetch escalates to NS HardFault
+In-Reply-To: <20190705080717.GD10995@stefanha-x1.localdomain>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="aUl22ChN8BpGoc6E1XfyX28NidBumF8lP"
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.85.221.65
+Subject: Re: [Qemu-devel] [RFC PATCH-for-4.2] tracing: Allow to tune tracing
+ options via the environment
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,103 +90,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-In the M-profile architecture, when we do a vector table fetch and it
-fails, we need to report a HardFault.  Whether this is a Secure HF or
-a NonSecure HF depends on several things.  If AIRCR.BFHFNMINS is 0
-then HF is always Secure, because there is no NonSecure HardFault.
-Otherwise, the answer depends on whether the 'underlying exception'
-(MemManage, BusFault, SecureFault) targets Secure or NonSecure.  (In
-the pseudocode, this is handled in the Vector() function: the final
-exc.isSecure is calculated by looking at the exc.isSecure from the
-exception returned from the memory access, not the isSecure input
-argument.)
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--aUl22ChN8BpGoc6E1XfyX28NidBumF8lP
+Content-Type: multipart/mixed; boundary="d654zXpQZrOZ7CEE9LiFH0a0KU86smqMv";
+ protected-headers="v1"
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>,
+ =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org
+Message-ID: <8470a203-430b-1814-b2ef-6adf3fa739a6@redhat.com>
+Subject: Re: [Qemu-devel] [RFC PATCH-for-4.2] tracing: Allow to tune tracing
+ options via the environment
+References: <20190703171005.26231-1-philmd@redhat.com>
+ <20190703172501.GI23082@redhat.com>
+ <20190704102457.GE1609@stefanha-x1.localdomain>
+ <20190704102837.GA24190@redhat.com>
+ <20190705080717.GD10995@stefanha-x1.localdomain>
+In-Reply-To: <20190705080717.GD10995@stefanha-x1.localdomain>
 
-We weren't doing this correctly, because we were looking at
-the target security domain of the exception we were trying to
-load the vector table entry for. This produces errors of two kinds:
- * a load from the NS vector table which hits the "NS access
-   to S memory" SecureFault should end up as a Secure HardFault,
-   but we were raising an NS HardFault
- * a load from the S vector table which causes a BusFault
-   should raise an NS HardFault if BFHFNMINS == 1 (because
-   in that case all BusFaults are NonSecure), but we were raising
-   a Secure HardFault
+--d654zXpQZrOZ7CEE9LiFH0a0KU86smqMv
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-Correct the logic.
+On 7/5/19 10:07 AM, Stefan Hajnoczi wrote:
+> On Thu, Jul 04, 2019 at 11:28:37AM +0100, Daniel P. Berrang=E9 wrote:
+>> On Thu, Jul 04, 2019 at 11:24:57AM +0100, Stefan Hajnoczi wrote:
+>>> On Wed, Jul 03, 2019 at 06:25:01PM +0100, Daniel P. Berrang=E9 wrote:=
 
-We also fix a comment error where we claimed that we might
-be escalating MemManage to HardFault, and forgot about SecureFault.
-(Vector loads can never hit MPU access faults, because they're
-always aligned and always use the default address map.)
+>>>> On Wed, Jul 03, 2019 at 07:10:05PM +0200, Philippe Mathieu-Daud=E9 w=
+rote:
+>>>>> @@ -306,6 +308,13 @@ bool trace_init_backends(void)
+>>>>>      openlog(NULL, LOG_PID, LOG_DAEMON);
+>>>>>  #endif
+>>>>> =20
+>>>>> +    trace_init_file(getenv("QEMU_TRACE_LOGFILE"));
+>>>>> +    trace_init_events(getenv("QEMU_TRACE_EVENTFILE"));
+>>>>> +    trace_env =3D getenv("QEMU_TRACE_EVENTS");
+>>>>> +    if (trace_env) {
+>>>>> +        trace_enable_events(trace_env);
+>>>>> +    }
+>>>>> +
+>>>>
+>>>> I don't think it is a nice idea to add this via environment variable=
+s
+>>>> to QEMU itself. Why not modify libqtest qtest_init_without_qmp_hands=
+hake
+>>>> to read the env vars and then pass a suitable -trace arg when spawni=
+ng
+>>>> QEMU ?
+>>>
+>>> What is the concern about adding these environment variables to QEMU?=
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
-This is the one remaining patch from my earlier 'minor M-profile
-bugfixes' series; the rest are in master now.
+>>>
+>>> It is convenient to be able to use tracing even if QEMU is invoked by=
 
-Changes v1->v2:
- * rebased on master (function has moved to m_helper.c)
- * fixed logic bug pointed out by rth
----
- target/arm/m_helper.c | 21 +++++++++++++++++----
- 1 file changed, 17 insertions(+), 4 deletions(-)
+>>> something you cannot modify/control.
+>>>
+>>> The main issues I see with environment variables are:
+>>>
+>>> 1. Security.  Is there a scenario where an attacker can use environme=
+nt
+>>>    variables to influence the behavior of a QEMU process running at a=
 
-diff --git a/target/arm/m_helper.c b/target/arm/m_helper.c
-index 1867435db7d..84609f446e6 100644
---- a/target/arm/m_helper.c
-+++ b/target/arm/m_helper.c
-@@ -624,7 +624,11 @@ static bool arm_v7m_load_vector(ARMCPU *cpu, int exc, bool targets_secure,
-         if (sattrs.ns) {
-             attrs.secure = false;
-         } else if (!targets_secure) {
--            /* NS access to S memory */
-+            /*
-+             * NS access to S memory: the underlying exception which we escalate
-+             * to HardFault is SecureFault, which always targets Secure.
-+             */
-+            exc_secure = true;
-             goto load_fail;
-         }
-     }
-@@ -632,6 +636,11 @@ static bool arm_v7m_load_vector(ARMCPU *cpu, int exc, bool targets_secure,
-     vector_entry = address_space_ldl(arm_addressspace(cs, attrs), addr,
-                                      attrs, &result);
-     if (result != MEMTX_OK) {
-+        /*
-+         * Underlying exception is BusFault: its target security state
-+         * depends on BFHFNMINS.
-+         */
-+        exc_secure = !(cpu->env.v7m.aircr & R_V7M_AIRCR_BFHFNMINS_MASK);
-         goto load_fail;
-     }
-     *pvec = vector_entry;
-@@ -641,13 +650,17 @@ load_fail:
-     /*
-      * All vector table fetch fails are reported as HardFault, with
-      * HFSR.VECTTBL and .FORCED set. (FORCED is set because
--     * technically the underlying exception is a MemManage or BusFault
-+     * technically the underlying exception is a SecureFault or BusFault
-      * that is escalated to HardFault.) This is a terminal exception,
-      * so we will either take the HardFault immediately or else enter
-      * lockup (the latter case is handled in armv7m_nvic_set_pending_derived()).
-+     * The HardFault is Secure if BFHFNMINS is 0 (meaning that all HFs are
-+     * secure); otherwise it targets the same security state as the
-+     * underlying exception.
-      */
--    exc_secure = targets_secure ||
--        !(cpu->env.v7m.aircr & R_V7M_AIRCR_BFHFNMINS_MASK);
-+    if (!(cpu->env.v7m.aircr & R_V7M_AIRCR_BFHFNMINS_MASK)) {
-+        exc_secure = true;
-+    }
-     env->v7m.hfsr |= R_V7M_HFSR_VECTTBL_MASK | R_V7M_HFSR_FORCED_MASK;
-     armv7m_nvic_set_pending_derived(env->nvic, ARMV7M_EXCP_HARD, exc_secure);
-     return false;
--- 
-2.20.1
+>>>    different trust level?
+>>>
+>>> 2. Name collision.  What is the chance that existing users already
+>>>    define environment variables with these names and that unexpected
+>>>    behavior could result?
+>>
+>> One of the biggest problems with QEMU in general has been poorly model=
+led
+>> & defined interfaces for configuration. At runtime we've solved this w=
+ith
+>> QMP. At startup we're still fighting the horror of QemuOpts in general=
+ and
+>> haven't got startup modelling to be on a par with that offered by QEMU=
+=2E
+>> It was even worse when Audio didn't even use QemuOpts and instead used=
 
+>> an arbitrary set of poorly defined env variables. To me adding yet ano=
+ther
+>> way to configure QEMU via env vars is moving in the opposite direction=
+ to
+>> what we want.
+>=20
+> In this case the environment variables are optional and meant for cases=
+
+> where the user cannot change the QEMU command-line.  I think they serve=
+
+> a different purpose from the audio subsystem environment variables and
+> I'd be happy to merge them.
+>=20
+> Philippe: Have you tried adding the environment variable to libqtest as=
+
+> Dan suggested and did it work for your use case?
+
+Yes, but we loose the ability to use this feature from linux-user and
+other tools:
+
+$ git grep trace_opt_parse
+bsd-user/main.c:851:            trace_file =3D trace_opt_parse(optarg);
+linux-user/main.c:387:    trace_file =3D trace_opt_parse(arg);
+qemu-img.c:5063:            trace_file =3D trace_opt_parse(optarg);
+qemu-io.c:579:            trace_file =3D trace_opt_parse(optarg);
+qemu-nbd.c:862:            trace_file =3D trace_opt_parse(optarg);
+scsi/qemu-pr-helper.c:969:            trace_file =3D trace_opt_parse(opta=
+rg);
+vl.c:3730:                trace_file =3D trace_opt_parse(optarg);
+
+So I'm now mixed about the trade off regarding Daniel worries.
+
+
+--d654zXpQZrOZ7CEE9LiFH0a0KU86smqMv--
+
+--aUl22ChN8BpGoc6E1XfyX28NidBumF8lP
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEicHnj2Ae6GyGdJXLoqP9bt6twN4FAl0fHQMACgkQoqP9bt6t
+wN7urA/+PmSHgC5kPVFIcHLJT9LZqWrk+nNCpbRc1ybpwcTUpmqQEV58yLXzFKKC
+deb/Wfbz/FGp/VQPayloLC+s75HDuTojBpbRejZurX4GXqLJDY4QywhnJznXYtx1
+LwoGFoPEtAe5BnskUQjln0I5yBE3mxH0PIz/GADzIEsKmWy0lm75D3Q5w9jooJr4
+dBChwpKyTm5qeFezeV/epbBTKTtlI640lxCOLc4f0vg7DGKTHHqblafGghQX8KYd
+pX+ziHMMJMUQfHZVUN4vUcjRioT6HXj8ZWO8XuCqCQVdc/eGRPlp5NvLUgdT5IP3
+t9ezyE5jvhVEnB8532u3FfV0wCZ+VEpPokps8vigmXX+0Z9jyn6p/BnFIq7ZJEv0
+ab/nSBgRXUJEmlZL6qvlmtrdcy74SaVK7dpYUEXWY9gHpNpqGkkqLUk4ag/endSI
+kJXi8J4aOL6pgEx2a5urXDIGvrhIr8rv70pRVQnabi3USsoCn9WhdH9DxktWtO/f
+lxhAXN2BJgZjNfy1FmcOMS8K5Gfz/ffTQI4dZOuTKBCHhL0QPIrlIKZW5XDTtgjq
+xsPUR6/f84T0AZ4Mu5kpDG4LFbC7QyXlBHtrOhlnJJC0/6UncdTy1ktNGKZN96RU
+D73d5+6vIZ380/AvLfg+qvN9EBo27BqHQiIBk+hcMNC6v4ajyeg=
+=rkup
+-----END PGP SIGNATURE-----
+
+--aUl22ChN8BpGoc6E1XfyX28NidBumF8lP--
 
