@@ -7,78 +7,78 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4C8AC46499
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 19:54:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2097C46499
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 19:55:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B64332133F
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 19:54:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8304E2133F
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 19:55:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e5pxmWZ2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B64332133F
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qE9W2cIL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8304E2133F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55630 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55632 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hjUIM-00029Y-Tw
-	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 15:54:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55576)
+	id 1hjUIa-0002HO-SS
+	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 15:55:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55631)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <paolo.bonzini@gmail.com>) id 1hjUEJ-0005LB-IX
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 15:50:48 -0400
+ (envelope-from <paolo.bonzini@gmail.com>) id 1hjUEN-0005RV-7X
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 15:50:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1hjUEI-00045S-Ig
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 15:50:47 -0400
-Received: from mail-wr1-x434.google.com ([2a00:1450:4864:20::434]:44199)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1hjUEL-00049o-Tl
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 15:50:51 -0400
+Received: from mail-wm1-x330.google.com ([2a00:1450:4864:20::330]:35417)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1hjUEI-000443-9A
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 15:50:46 -0400
-Received: by mail-wr1-x434.google.com with SMTP id b2so9732155wrx.11
- for <qemu-devel@nongnu.org>; Fri, 05 Jul 2019 12:50:45 -0700 (PDT)
+ id 1hjUEL-000485-Lx
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 15:50:49 -0400
+Received: by mail-wm1-x330.google.com with SMTP id l2so3468596wmg.0
+ for <qemu-devel@nongnu.org>; Fri, 05 Jul 2019 12:50:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=uj5oH2lIOzQhbVvPGa1CJyfr5Ywg7honDl46Ua9isOg=;
- b=e5pxmWZ2x/jzmd+RME9rArhSd0/w0Vi9e31BTWwALanK87fWMVEx3M0etf5vu5TDXN
- O2e8DaKadtltS0hO/WIPNUIVNvG5iamw0kUMVgotOf7KAwJAIDFmGZuMiWEIdeiyY1Tv
- un4XOoZ+6d2WNBL23xHXL8LzFOC4Pgdb6kQRfqqfnkcssvmYdch1xW+RjOhuuOWqJru4
- rflbiofpPsnR0DRmT2R39evgVCvI5iJGOAj+0hRxcd4aohFzqmB2lFmf0j9QyuTMfxkR
- CkmquloIsvIn3CD7kDCRiTFUVHLQUsElGc0OGn++wjSUOHoHDHllwe+3jyn+Ht4LjFJS
- +MEg==
+ bh=YbMFVYWCeviKweLwBNufDDcBIGFAoGlnFAeGpWGi3rw=;
+ b=qE9W2cIL23CVTGW+X14b90rTfKOUhIlYYXjIAK8YD3iypSxlE82hInzAS1Znvz/o1e
+ OPoiWMXtE9fJayXuphV0drkNMS+xKkDbUumidYBHuqsMKIC6S5/EgbAISWRdf4xDa42L
+ yM6Pxslvny15/Awhl0MtyHhaP4umf1u+cSyu5q3v2ma15lFUGegRi5eNGQb3AqTzaoHj
+ vRRKFhBiA4AeXEOeh2Pkw4VoG0oWt4T0TAXsoBtl2IKubot16wQ2QVGgFquPZW3H4hAb
+ jdj02khXtZ/OL6evzY+Sl1fw6oLYfe5dXe1QV5yJNI/akI4VuQjR3x9F/HjUI0SfI2MV
+ uXKw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references;
- bh=uj5oH2lIOzQhbVvPGa1CJyfr5Ywg7honDl46Ua9isOg=;
- b=f3qoEDJshqg01pPjqjO0L7RIHGu9Zpoujg7TqkLAO5MgNnahCPqV1Xd7T19VqoZAJn
- sPPfDlYSuoR57ckb/fZY1gG1ZGbcjyfRTbhza2kjcUoMu8cGaVio01tGTQ4AN3XqDhb+
- wfxUJUQj19F4A0fb9EzsanZ3xIsDRm7wec7Nbz65xXrro5Ftiy4gE3dVBWwjMWg0AQWI
- kbVgT0Ef3o5Bv71OzOGa/WeXvBJGFA+VY5ytWQ13WwR+YGOWJMT+BhEKVK3TNGUsGuvv
- RVPYHZu9AhsYcUBYouiZGy8+limT73Xz7cRVnFQqcVoA+f90Ecmb54H4ocyDZBxgwgkX
- GYZw==
-X-Gm-Message-State: APjAAAUk/wDZA+w9ZI9HWrXULA4oAZyeS2vjwkx8dQBS6lvmvXppUcvl
- djKnlyFql8pn+nvjKBZGjpuEeOdl2ks=
-X-Google-Smtp-Source: APXvYqzmfCXV3CdgQICaUQf5wpuYRSPAtWCNBwDigJy94AGzPVD1r/sRcH7YFC2hSvdSwMRNkD3kGw==
-X-Received: by 2002:a5d:4a02:: with SMTP id m2mr322476wrq.193.1562356244178;
- Fri, 05 Jul 2019 12:50:44 -0700 (PDT)
+ bh=YbMFVYWCeviKweLwBNufDDcBIGFAoGlnFAeGpWGi3rw=;
+ b=lLL763Qi813Vd9pzcw+djlBE4Ark4/yNt5lPRsbrRLFTC7wdQvltki6tg7I7EXMUXz
+ wkwJ10MnPqVx2pvYgBYHgPwEvyieA6S5zVsYCqtAU1EaDJzKE6/2PsJ6F9udf7h4J/cQ
+ LyL0wVYXZ+QWtD9yte0McsrA051d8vjHGx4ZYr3GmzWxYnAxBPIzWb77w1K/KI58iZ49
+ 21vTwAyG6uqpKLho/M5Qjlgdfz/AZgmNQHO2KhiSBDAIVF7EcJJjho4PgO+lzNYXhicS
+ HuzJbL7fWZ0MGTCk5Zm7tqGF/YukXdGShJxdF+WPMsqEH95r82OG+mrzyWboFuHlxiHD
+ qrPQ==
+X-Gm-Message-State: APjAAAU22J70nCwKr2QNw1EODlyEuZq2TCYBMtw55nm/HetlSS+C8HEO
+ /zpgZRJ8zZs/ZAsFpu3/E4Se3dicRb0=
+X-Google-Smtp-Source: APXvYqwEyitwbtNRDOID1X7VFatWnWuQRkvLRpu2pvbM+42pyKqc+olna+JN9w2y5HRLw6DhlavX6A==
+X-Received: by 2002:a1c:f519:: with SMTP id t25mr4633720wmh.58.1562356248249; 
+ Fri, 05 Jul 2019 12:50:48 -0700 (PDT)
 Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id d10sm11478625wro.18.2019.07.05.12.50.42
+ by smtp.gmail.com with ESMTPSA id d10sm11478625wro.18.2019.07.05.12.50.47
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Fri, 05 Jul 2019 12:50:42 -0700 (PDT)
+ Fri, 05 Jul 2019 12:50:47 -0700 (PDT)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Fri,  5 Jul 2019 21:50:28 +0200
-Message-Id: <1562356239-19391-2-git-send-email-pbonzini@redhat.com>
+Date: Fri,  5 Jul 2019 21:50:32 +0200
+Message-Id: <1562356239-19391-6-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1562356239-19391-1-git-send-email-pbonzini@redhat.com>
 References: <1562356239-19391-1-git-send-email-pbonzini@redhat.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::434
-Subject: [Qemu-devel] [PULL 01/12] pc: fix possible NULL pointer dereference
- in pc_machine_get_device_memory_region_size()
+X-Received-From: 2a00:1450:4864:20::330
+Subject: [Qemu-devel] [PULL 05/12] intel_iommu: Fix unexpected unmaps during
+ global unmap
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,46 +90,136 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Igor Mammedov <imammedo@redhat.com>
+Cc: Peter Xu <peterx@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Igor Mammedov <imammedo@redhat.com>
+From: Peter Xu <peterx@redhat.com>
 
-QEMU will crash when device-memory-region-size property is read if ms->device_memory
-wasn't initialized yet.
+This is an replacement work of Yan Zhao's patch:
 
-Crash can be reproduced with:
- $QEMU -preconfig -qmp unix:qmp_socket,server,nowait &
- ./scripts/qmp/qom-get -s qmp_socket /machine.device-memory-region-size
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg625340.html
 
-Instead of crashing return 0 if ms->device_memory hasn't been initialized.
+vtd_address_space_unmap() will do proper page mask alignment to make
+sure each IOTLB message will have correct masks for notification
+messages (2^N-1), but sometimes it can be expanded to even supercede
+the registered range.  That could lead to unexpected UNMAP of already
+mapped regions in some other notifiers.
 
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Message-Id: <1560174635-22602-1-git-send-email-imammedo@redhat.com>
+Instead of doing mindless expension of the start address and address
+mask, we split the range into smaller ones and guarantee that each
+small range will have correct masks (2^N-1) and at the same time we
+should also try our best to generate as less IOTLB messages as
+possible.
+
+Reported-by: Yan Zhao <yan.y.zhao@intel.com>
+Signed-off-by: Peter Xu <peterx@redhat.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Tested-by: Yan Zhao <yan.y.zhao@intel.com>
+Message-Id: <20190624091811.30412-3-peterx@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/i386/pc.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ hw/i386/intel_iommu.c | 67 +++++++++++++++++++++++++++++++--------------------
+ 1 file changed, 41 insertions(+), 26 deletions(-)
 
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index e96360b..552f340 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -2458,7 +2458,11 @@ pc_machine_get_device_memory_region_size(Object *obj, Visitor *v,
-                                          Error **errp)
- {
-     MachineState *ms = MACHINE(obj);
--    int64_t value = memory_region_size(&ms->device_memory->mr);
-+    int64_t value = 0;
-+
-+    if (ms->device_memory) {
-+        value = memory_region_size(&ms->device_memory->mr);
-+    }
- 
-     visit_type_int(v, name, &value, errp);
+diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+index 719ce19..de86f53 100644
+--- a/hw/i386/intel_iommu.c
++++ b/hw/i386/intel_iommu.c
+@@ -3363,11 +3363,28 @@ VTDAddressSpace *vtd_find_add_as(IntelIOMMUState *s, PCIBus *bus, int devfn)
+     return vtd_dev_as;
  }
+ 
++static uint64_t get_naturally_aligned_size(uint64_t start,
++                                           uint64_t size, int gaw)
++{
++    uint64_t max_mask = 1ULL << gaw;
++    uint64_t alignment = start ? start & -start : max_mask;
++
++    alignment = MIN(alignment, max_mask);
++    size = MIN(size, max_mask);
++
++    if (alignment <= size) {
++        /* Increase the alignment of start */
++        return alignment;
++    } else {
++        /* Find the largest page mask from size */
++        return 1ULL << (63 - clz64(size));
++    }
++}
++
+ /* Unmap the whole range in the notifier's scope. */
+ static void vtd_address_space_unmap(VTDAddressSpace *as, IOMMUNotifier *n)
+ {
+-    IOMMUTLBEntry entry;
+-    hwaddr size;
++    hwaddr size, remain;
+     hwaddr start = n->start;
+     hwaddr end = n->end;
+     IntelIOMMUState *s = as->iommu_state;
+@@ -3388,39 +3405,37 @@ static void vtd_address_space_unmap(VTDAddressSpace *as, IOMMUNotifier *n)
+     }
+ 
+     assert(start <= end);
+-    size = end - start;
++    size = remain = end - start + 1;
+ 
+-    if (ctpop64(size) != 1) {
+-        /*
+-         * This size cannot format a correct mask. Let's enlarge it to
+-         * suite the minimum available mask.
+-         */
+-        int n = 64 - clz64(size);
+-        if (n > s->aw_bits) {
+-            /* should not happen, but in case it happens, limit it */
+-            n = s->aw_bits;
+-        }
+-        size = 1ULL << n;
++    while (remain >= VTD_PAGE_SIZE) {
++        IOMMUTLBEntry entry;
++        uint64_t mask = get_naturally_aligned_size(start, remain, s->aw_bits);
++
++        assert(mask);
++
++        entry.iova = start;
++        entry.addr_mask = mask - 1;
++        entry.target_as = &address_space_memory;
++        entry.perm = IOMMU_NONE;
++        /* This field is meaningless for unmap */
++        entry.translated_addr = 0;
++
++        memory_region_notify_one(n, &entry);
++
++        start += mask;
++        remain -= mask;
+     }
+ 
+-    entry.target_as = &address_space_memory;
+-    /* Adjust iova for the size */
+-    entry.iova = n->start & ~(size - 1);
+-    /* This field is meaningless for unmap */
+-    entry.translated_addr = 0;
+-    entry.perm = IOMMU_NONE;
+-    entry.addr_mask = size - 1;
++    assert(!remain);
+ 
+     trace_vtd_as_unmap_whole(pci_bus_num(as->bus),
+                              VTD_PCI_SLOT(as->devfn),
+                              VTD_PCI_FUNC(as->devfn),
+-                             entry.iova, size);
++                             n->start, size);
+ 
+-    map.iova = entry.iova;
+-    map.size = entry.addr_mask;
++    map.iova = n->start;
++    map.size = size;
+     iova_tree_remove(as->iova_tree, &map);
+-
+-    memory_region_notify_one(n, &entry);
+ }
+ 
+ static void vtd_address_space_unmap_all(IntelIOMMUState *s)
 -- 
 1.8.3.1
 
