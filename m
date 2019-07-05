@@ -2,64 +2,79 @@ Return-Path: <SRS0=wUMn=VC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.5 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3DA9C4649B
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 12:27:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 360CDC46499
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 12:37:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A314A21850
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 12:27:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A314A21850
+	by mail.kernel.org (Postfix) with ESMTPS id 0F5E621850
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 12:36:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F5E621850
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52624 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52670 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hjNIr-0006TO-ED
-	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 08:27:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52866)
+	id 1hjNSU-0000ty-Oj
+	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 08:36:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54106)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <ppandit@redhat.com>) id 1hjNHG-0005UG-IX
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 08:25:23 -0400
+ (envelope-from <philmd@redhat.com>) id 1hjNOC-0008FL-PG
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 08:32:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ppandit@redhat.com>) id 1hjNHE-0003oM-Fl
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 08:25:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36190)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1hjNHE-0003j3-AG
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 08:25:20 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 2C9CD59464;
- Fri,  5 Jul 2019 12:25:18 +0000 (UTC)
-Received: from kaapi (unknown [10.65.150.157])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C49C88E170;
- Fri,  5 Jul 2019 12:25:14 +0000 (UTC)
-Date: Fri, 5 Jul 2019 17:55:12 +0530 (IST)
-From: P J P <ppandit@redhat.com>
-X-X-Sender: pjp@kaapi
-To: =?ISO-8859-15?Q?Daniel_P=2E_Berrang=E9?= <berrange@redhat.com>
-In-Reply-To: <nycvar.YSQ.7.76.1907021539350.23656@xnncv>
-Message-ID: <nycvar.YSQ.7.76.1907051754170.15068@xnncv>
-References: <20190701123558.30512-1-ppandit@redhat.com>
- <20190701123558.30512-4-ppandit@redhat.com>
- <20190701175010.GN3573@redhat.com>
- <nycvar.YSQ.7.76.1907021539350.23656@xnncv>
+ (envelope-from <philmd@redhat.com>) id 1hjNO9-0006j6-IY
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 08:32:31 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:41333)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hjNO9-0006eX-AI
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 08:32:29 -0400
+Received: by mail-wr1-f68.google.com with SMTP id c2so9754731wrm.8
+ for <qemu-devel@nongnu.org>; Fri, 05 Jul 2019 05:32:29 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:references:cc:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=EPs6pnCG+3EGoIiNOTse+98zx5zAH0i5xLUtSjPQv0s=;
+ b=iG0oPpbCwvGWrR9J17n6YPhomBWF7rF4shdFghoG5MG5UvI6NI+Jt4u5tHoueECOld
+ /3Z5+FUL10edWY6XBjHHUuMRj8LEsD/YYP7kHr9CPC1R8UcW8R827vzgyDHvfuOu/hMe
+ rGmYrsiS7algtxlRa54/IkKpuPx++VQAlloO7YW/DX3UJqMBskiXlSJWpW1rwIR2LoSq
+ /RmyTIFNTRiYZLnZOcIAjGneLJQ4QYEJ54SBDKH01/Npa4q+rLn1hNhCixoAXQkZ9yiX
+ vqsH9R18I36txX0RMv+UusblhQG9MbySPGW4mI27XXFqQhWWtH6v3OFmFDdHEIFXh19w
+ uffg==
+X-Gm-Message-State: APjAAAWZaYmlEUqb60eUtkEQ2pt5ceSmH1L9cqEJFcxM1MvFOppkJF6d
+ sjeZbfOy0VZwTKBLKFc/HK6d6A==
+X-Google-Smtp-Source: APXvYqy5fCzD+An/9hkm9j5DQ3KxPG9eloj+dLIetGtnGzWAhqIbh+cp1tiNF5mlj7bu27mTTH1o3Q==
+X-Received: by 2002:adf:aad1:: with SMTP id i17mr4279502wrc.63.1562329948001; 
+ Fri, 05 Jul 2019 05:32:28 -0700 (PDT)
+Received: from [192.168.1.38] (56.red-88-18-140.staticip.rima-tde.net.
+ [88.18.140.56])
+ by smtp.gmail.com with ESMTPSA id h19sm19519148wrb.81.2019.07.05.05.32.27
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Fri, 05 Jul 2019 05:32:27 -0700 (PDT)
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+References: <20190702113414.6896-1-armbru@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <89290c81-ea80-a84d-fced-86764cab23ff@redhat.com>
+Date: Fri, 5 Jul 2019 14:32:26 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.39]); Fri, 05 Jul 2019 12:25:18 +0000 (UTC)
+In-Reply-To: <20190702113414.6896-1-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 3/3] net: tap: refactor
- net_bridge_run_helper routine
+ [fuzzy]
+X-Received-From: 209.85.221.68
+Subject: Re: [Qemu-devel] [PULL 0/4] Build system patches for 2019-07-02
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,63 +86,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riccardo Schirone <rschiron@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Li Qiang <liq3ea@gmail.com>, Qemu Developers <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-+-- On Tue, 2 Jul 2019, P J P wrote --+
-| |    -netdev bridge,helper="/path/to/helper myarg otherarg"
-| | 
-| | In theory any parts could contain shell meta characters, but even if
-| | they don't we'll have slightly broken compat with this change.
-| 
-| I wonder if anybody uses it like that. Because of the 3 arguments that 
-| qemu-bridge-helper takes
-| 
-|   --use-vnet --fd=sv[1] --br=bridge
-| 
-| only bridge name is supplied by user; Which is anyway comming without 'helper' 
-| having to include '--br=bridge' argument, as is looked for before shell 
-| invocation
-| 
-|   if (strstr(helper, "--br=") == NULL) {
-|       snprintf(br_buf, sizeof(br_buf), "%s%s", "--br=", bridge);
-|   }
-| 
-| '--br=bridge' has limited scope to use shell meta characters, ie. other than 
-| space(' ') and tab('\t').
-| 
-| 
-| | The QEMU man page has never documented that you can pass a command
-| | and args, which get sent via the shell though. It only ever documented
-| | the helper arg as being a plain qualified binary path.
-| | 
-| | So the question is how strictly we need to consider compatibility.
-| | 
-| | The "if it isn't documented it never existed" option is to use your
-| | patch here.
-| 
-| We don't know if "/path/to/helper arg1 arg2" usage exists in practice. And 
-| considering user would still be able to supply 'bridge' argument, I wonder if 
-| we are breaking compatibility.
-| 
-| | The safest option is to put in a place a deprecation saying we'll
-| | drop use of shell in future, only implementing the aggressive
-| | option in a later release.
-| 
-| ie. for Qemu > v4.0.0? How do we do this?
-| 
-| | Perhaps from your POV, the easy thing is to avoid this entire
-| | question - just leave the code calling shell, but switch to
-| | g_strdup_printf instead of snprintf.
-| 
-| Okay, this will be for Qemu <= v4.0.0?
-| 
+Hi Markus,
 
-@Dan:...ping!?
---
-Prasad J Pandit / Red Hat Product Security Team
-47AF CE69 3A90 54AA 9045 1053 DD13 3D32 FE5B 041F
+On 7/2/19 1:34 PM, Markus Armbruster wrote:
+> The following changes since commit ab200dafc0e8a9925bb0ad0be478621f5f117c95:
+> 
+>   Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request' into staging (2019-07-02 10:17:54 +0100)
+> 
+> are available in the Git repository at:
+> 
+>   git://repo.or.cz/qemu/armbru.git tags/pull-build-2019-07-02
+> 
+> for you to fetch changes up to b7f9b1b7fc9a00ab6e5f46555e87166533292576:
+> 
+>   Makefile: Reuse all's recursion machinery for clean and install (2019-07-02 12:48:40 +0200)
+> 
+> ----------------------------------------------------------------
+> Build system patches for 2019-07-02
+> 
+> ----------------------------------------------------------------
+> Markus Armbruster (4):
+>       Makefile: Remove code to smooth transition to config.status
+>       Makefile: Drop bogus cleaning of $(ALL_SUBDIRS)/qemu-options.def
+>       Makefile: Rename targets for make recursion
+>       Makefile: Reuse all's recursion machinery for clean and install
+
+I wonder if some rule is missing, I did:
+
+$ mkdir build
+$ cd build
+$ ../configure --python=python3 \
+  --disable-tools \
+  --enable-trace-backends=log \
+  --extra-cflags=-ggdb --enable-debug \
+  --target-list=arm-softmmu
+$ make check-tcg
+[...]
+  CC      arm-softmmu/target/arm/iwmmxt_helper.o
+  CC      arm-softmmu/target/arm/vec_helper.o
+  CC      arm-softmmu/target/arm/neon_helper.o
+  CC      arm-softmmu/target/arm/m_helper.o
+  CC      arm-softmmu/target/arm/psci.o
+  GEN     trace/generated-helpers.c
+make[1]: *** No rule to make target '../blockdev.o', needed by
+'qemu-system-arm'.  Stop.
+make[1]: *** Waiting for unfinished jobs....
+  CC      arm-softmmu/trace/control-target.o
+make: *** [tests/Makefile.include:1073: run-tcg-tests-arm-softmmu] Error 2
+$ make arm-softmmu/all
+  CC      authz/base.o
+  CC      authz/simple.o
+  CC      authz/list.o
+  CC      authz/listfile.o
+  CC      authz/pamacct.o
+  CC      block.o
+  CC      blockjob.o
+  CC      job.o
+  CC      qemu-io-cmds.o
+  CC      replication.o
+  CC      block/raw-format.o
+  CC      block/vmdk.o
+  CC      block/vpc.o
+  CC      block/qcow.o
+  CC      block/vdi.o
+  CC      block/cloop.o
+  CC      block/bochs.o
+^C
+$ make check-tcg
+  BUILD   debian9
+  BUILD   debian-armhf-cross
+  BUILD   TCG tests for arm-softmmu
+  CHECK   debian9
+  CHECK   debian-armhf-cross
+  BUILD   arm guest-tests with docker qemu:debian-armhf-cross
+  RUN     TCG tests for arm-softmmu
+  CHECK   debian9
+  CC      arm-softmmu/gdbstub-xml.o
+  CC      arm-softmmu/target/arm/vfp_helper.o
+  CC      arm-softmmu/target/arm/translate.o
+make[1]: *** No rule to make target '../hw/net/e1000.o', needed by
+'qemu-system-arm'.  Stop.
+make[1]: *** Waiting for unfinished jobs....
+make: *** [tests/Makefile.include:1073: run-tcg-tests-arm-softmmu] Error 2
+
+Any idea?
 
