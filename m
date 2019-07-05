@@ -6,63 +6,62 @@ X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37B0FC5B57D
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 08:26:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43306C5B57D
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 08:26:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0C0A9218A3
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 08:26:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C0A9218A3
+	by mail.kernel.org (Postfix) with ESMTPS id 1B36F218A3
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 08:26:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B36F218A3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50454 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50456 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hjJYD-0000IK-2U
-	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 04:26:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55573)
+	id 1hjJYI-0000Rr-Dw
+	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 04:26:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55586)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <pbonzini@redhat.com>) id 1hjJXN-0007x1-9X
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 04:25:46 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1hjJXR-0007zt-2l
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 04:25:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1hjJXM-0008Mq-6O
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 04:25:45 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:42463)
+ (envelope-from <pbonzini@redhat.com>) id 1hjJXP-0008Q4-UG
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 04:25:49 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:34805)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hjJXL-0008Je-WD
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 04:25:44 -0400
-Received: by mail-wr1-f65.google.com with SMTP id a10so7890260wrp.9
- for <qemu-devel@nongnu.org>; Fri, 05 Jul 2019 01:25:41 -0700 (PDT)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hjJXP-0008PM-ON
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 04:25:47 -0400
+Received: by mail-wm1-f65.google.com with SMTP id w9so6926435wmd.1
+ for <qemu-devel@nongnu.org>; Fri, 05 Jul 2019 01:25:47 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
  bh=Ijr9xB0HmlC16hfv500/PucNjrTmQyG4jNm1zULTIH4=;
- b=Exg+s35hSsZ5/dWIV/MiIxLLwTeVhjc1zK+05Gp5wZEre1vYEkABCA+kzmAYdBhx45
- zkVr5BCWvFMrR1NlRK0U+84loLIXFFAt+UYiosVCK3cEqkZ62bgn8dun6m428Tyzn+T5
- ZMYgKfHfreciucmx1KFQBy5LnPr0ttXisGwBMPaD4xwXhgHKhEPLV+uxM8QH4r36yQGi
- sYZ+xSONlZDxnNCxWrRjb7TmA/hPjntscEP0U8hmRXSW4Xccf0KR88iBwtSP6m/Lspuw
- HtW/zp1IQ2BYF/sUoTdcm57m4bEXyK5YVu8nwC2FusWp8K56bEXjvWHYIeVCVYyJKvx7
- Jt3A==
-X-Gm-Message-State: APjAAAVt1isVMbpO7wyJ+TVRIqSV6eZ4wXMjepe71yQdqT//CNY56qg+
- jTjCDhA3zmOrc8wz83w3uKgsJQdzQTs=
-X-Google-Smtp-Source: APXvYqyoPfFXmwlX3pHPciLBkvncpk8laeRqk+4CrQANlD4wZgpVey2rKsFe04224pnnx1Ms0tLZWw==
-X-Received: by 2002:a05:6000:1203:: with SMTP id
- e3mr2613083wrx.300.1562315140070; 
- Fri, 05 Jul 2019 01:25:40 -0700 (PDT)
+ b=kxwIvN2nARdAGHc1Fdc95WQ2T/bdp4Q2AUs4A2V35XGD2bSSNdlpKtIGrq2CIOlhb5
+ P6QpoLGubf3Bbo3qtuDUBKODa0A4Tjot/gCcd0pjr4c5iOcR8uAeD0/0+piDGCIzV+xL
+ femJiEwAutRpIr9KbP4OSEn7DMe2Uuh7aS7E5F3j8hlgL0rw5KqIsoyHBeiDcFCU2bMP
+ m6yJvjs+Be1sin5/nE4LXHKztFqHpvRERON1udEOb0DjroHRJom66xLIUh8dNNDFqUyB
+ 3vbiVBWWYrxcllulAubJMrfo36PUcblLlYRzj0qCQn5hJYXJ/maNRsC8gf4dKBGr0cNY
+ jfWQ==
+X-Gm-Message-State: APjAAAXoFIDMpdzhtjshX64ExKWoWz0iyIphKvIqKbxv7rVUXpu0mbj3
+ 45c+WjKP2rca8+I4NRCEbfk5x2QQRy4=
+X-Google-Smtp-Source: APXvYqyBstV+XdwAaphyeXvf2R1/2rmpOykK2ATEAnT0KJOwjDcZ+ntxVuZ1Shb3KtrhHb2uCR+H9A==
+X-Received: by 2002:a1c:ac81:: with SMTP id v123mr2296706wme.145.1562315146473; 
+ Fri, 05 Jul 2019 01:25:46 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:19db:ad53:90ea:9423?
  ([2001:b07:6468:f312:19db:ad53:90ea:9423])
- by smtp.gmail.com with ESMTPSA id t1sm10303766wra.74.2019.07.05.01.25.39
+ by smtp.gmail.com with ESMTPSA id k63sm9222989wmb.2.2019.07.05.01.25.45
  (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Fri, 05 Jul 2019 01:25:39 -0700 (PDT)
+ Fri, 05 Jul 2019 01:25:45 -0700 (PDT)
 To: Julio Montes <julio.montes@intel.com>, qemu-devel@nongnu.org
 References: <be6aa304-a8e4-d64a-432f-24d52e42c097@redhat.com>
  <20190704180350.2086-1-julio.montes@intel.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <1581b466-d574-66f9-dd59-6728a620acbc@redhat.com>
-Date: Fri, 5 Jul 2019 10:25:38 +0200
+Message-ID: <8ee9e6cd-52fd-af5b-f2d3-ac2881c27d11@redhat.com>
+Date: Fri, 5 Jul 2019 10:25:45 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
@@ -72,7 +71,7 @@ Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.221.65
+X-Received-From: 209.85.128.65
 Subject: Re: [Qemu-devel] [PATCH] hw/i386: Fix linker error when ISAPC is
  disabled
 X-BeenThere: qemu-devel@nongnu.org
