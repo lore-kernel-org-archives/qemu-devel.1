@@ -2,65 +2,64 @@ Return-Path: <SRS0=wUMn=VC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UPPERCASE_50_75 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF9ADC5B57D
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 22:59:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04F80C5B57D
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 23:00:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BADCC20863
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 22:59:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BADCC20863
+	by mail.kernel.org (Postfix) with ESMTPS id BDF1820863
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 23:00:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BDF1820863
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56828 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56830 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hjXB8-0002TI-W0
-	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 18:59:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60989)
+	id 1hjXBQ-0002nK-21
+	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 19:00:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55422)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <ehabkost@redhat.com>) id 1hjWzw-0007YT-NP
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 18:48:09 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1hjWVy-0008NX-Cg
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 18:17:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1hjWzv-0007i5-L3
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 18:48:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58560)
+ (envelope-from <ehabkost@redhat.com>) id 1hjWVt-00043O-B8
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 18:17:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57783)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hjWzv-0007hd-Fk
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 18:48:07 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hjWVp-0003u6-3h
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 18:17:02 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 9252E8665F;
- Fri,  5 Jul 2019 22:48:06 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 1735E3083363;
+ Fri,  5 Jul 2019 22:16:34 +0000 (UTC)
 Received: from localhost (ovpn-116-30.gru2.redhat.com [10.97.116.30])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 238B4891CF;
- Fri,  5 Jul 2019 22:48:05 +0000 (UTC)
-Date: Fri, 5 Jul 2019 19:48:04 -0300
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 36CD290CCC;
+ Fri,  5 Jul 2019 22:16:33 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <20190705224804.GM5198@habkost.net>
-References: <1562079681-19204-1-git-send-email-pbonzini@redhat.com>
- <1562079681-19204-7-git-send-email-pbonzini@redhat.com>
- <20190705212249.GG5198@habkost.net>
- <6262c798-fc94-5100-8836-e3cbea306282@redhat.com>
- <20190705223329.GL5198@habkost.net>
- <ea52e4c3-2553-b778-2b25-6a460fd67967@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
+ Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+ Richard Henderson <rth@twiddle.net>
+Date: Fri,  5 Jul 2019 19:14:58 -0300
+Message-Id: <20190705221504.25166-37-ehabkost@redhat.com>
+In-Reply-To: <20190705221504.25166-1-ehabkost@redhat.com>
+References: <20190705221504.25166-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ea52e4c3-2553-b778-2b25-6a460fd67967@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.26]); Fri, 05 Jul 2019 22:48:06 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.44]); Fri, 05 Jul 2019 22:16:34 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 6/7] target/i386: add VMX features
+Subject: [Qemu-devel] [PULL v6 36/42] i386: Replace -noTSX, -IBRS,
+ -IBPB CPU models with aliases
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,61 +71,881 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Liran Alon <liran.alon@oracle.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, Jul 06, 2019 at 12:42:22AM +0200, Paolo Bonzini wrote:
-> On 06/07/19 00:33, Eduardo Habkost wrote:
-> > Oh, that's the info I was missing.  I always expected
-> > kvm_arch_get_supported_*() to be subject to change (depending on
-> > KVM and hardware capabilities), and not be part of guest ABI.
-> 
-> For most bits that's true.  Just not for these ones, because they are
-> integer values rather than bit flags.
-> 
-> The reason for the complex rules is that you need to know what is a
-> flag, what is a fixed value that the guest uses, and what is a maximum
-> supported value.  Simpler userspace than QEMU can just use the defaults
-> since they don't care about maintaining the guest ABI.
-> 
-> > Now, if KVM is going to to implement the guest ABI guarantee at
-> > KVM_GET_MSRS, that's OK.  Is this going to be obvious to people
-> > touching KVM_GET_MSRS in the future?
-> > 
-> > What if we do want the guest ABI to change in the future?  How do
-> > you expect QEMU to ask KVM to enable the new guest ABI?  How do
-> > you expect the user to ask QEMU to enable the new guest ABI?
-> 
-> That would be with ioctl(KVM_ENABLE_CAP) for KVM, and with -cpu for QEMU.
+The old CPU models will be just aliases for specific versions of
+the original CPU models.
 
-Makes sense to me.
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+Message-Id: <20190628002844.24894-7-ehabkost@redhat.com>
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+---
+ target/i386/cpu.c | 601 ++--------------------------------------------
+ 1 file changed, 21 insertions(+), 580 deletions(-)
 
-> 
-> >> - KVM could change bits 16-24, but it always allows writing a value that
-> >> is _smaller_ than the one you read.  So I'm zeroing those, ensuring no
-> >> future ABI changes.
-> >>
-> >> - KVM could in theory change bits 25-27: here it also allows writing a
-> >> value that is smaller than the one you read, so guest ABI is preserved.
-> >>  Such a change is very unlikely, all Intel silicon has always had 0
-> >> here.  But I can change the code to zero these three bits just like bits
-> >> 16-24.
-> > 
-> > The complex rules above make me a bit nervous.  Can we at least
-> > make QEMU validate the values returned by
-> > kvm_arch_get_supported_msr_feature() to catch ABI-breaking
-> > mistakes in the future?
-> 
-> I don't know... I'm a bit wary of adding hard-coded values in QEMU,
-> userspace simply should not care.  But I can add comments to KVM to
-> remind people of values that should not be changed.
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 51beebdb27..f41917649d 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -1439,6 +1439,7 @@ typedef struct PropValue {
+=20
+ typedef struct X86CPUVersionDefinition {
+     X86CPUVersion version;
++    const char *alias;
+     PropValue *props;
+ } X86CPUVersionDefinition;
+=20
+@@ -1855,7 +1856,7 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
+             { .version =3D 1 },
+             {
+                 .version =3D 2,
+-                /* Equivalent to Nehalem-IBRS */
++                .alias =3D "Nehalem-IBRS",
+                 .props =3D (PropValue[]) {
+                     { "spec-ctrl", "on" },
+                     { "model-id",
+@@ -1866,36 +1867,6 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
+             { /* end of list */ }
+         }
+     },
+-    {
+-        .name =3D "Nehalem-IBRS",
+-        .level =3D 11,
+-        .vendor =3D CPUID_VENDOR_INTEL,
+-        .family =3D 6,
+-        .model =3D 26,
+-        .stepping =3D 3,
+-        .features[FEAT_1_EDX] =3D
+-            CPUID_VME | CPUID_SSE2 | CPUID_SSE | CPUID_FXSR | CPUID_MMX =
+|
+-            CPUID_CLFLUSH | CPUID_PSE36 | CPUID_PAT | CPUID_CMOV | CPUID=
+_MCA |
+-            CPUID_PGE | CPUID_MTRR | CPUID_SEP | CPUID_APIC | CPUID_CX8 =
+|
+-            CPUID_MCE | CPUID_PAE | CPUID_MSR | CPUID_TSC | CPUID_PSE |
+-            CPUID_DE | CPUID_FP87,
+-        .features[FEAT_1_ECX] =3D
+-            CPUID_EXT_POPCNT | CPUID_EXT_SSE42 | CPUID_EXT_SSE41 |
+-            CPUID_EXT_CX16 | CPUID_EXT_SSSE3 | CPUID_EXT_SSE3,
+-        .features[FEAT_7_0_EDX] =3D
+-            CPUID_7_0_EDX_SPEC_CTRL,
+-        .features[FEAT_8000_0001_EDX] =3D
+-            CPUID_EXT2_LM | CPUID_EXT2_SYSCALL | CPUID_EXT2_NX,
+-        .features[FEAT_8000_0001_ECX] =3D
+-            CPUID_EXT3_LAHF_LM,
+-        .xlevel =3D 0x80000008,
+-        .model_id =3D "Intel Core i7 9xx (Nehalem Core i7, IBRS update)"=
+,
+-        /*
+-         * This CPU model will eventually be replaced by an alias,
+-         * don't register any versions for it.
+-         */
+-        .versions =3D (X86CPUVersionDefinition[]) { { /* end of list */ =
+} },
+-    },
+     {
+         .name =3D "Westmere",
+         .level =3D 11,
+@@ -1925,7 +1896,7 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
+             { .version =3D 1 },
+             {
+                 .version =3D 2,
+-                /* Equivalent to Westmere-IBRS */
++                .alias =3D "Westmere-IBRS",
+                 .props =3D (PropValue[]) {
+                     { "spec-ctrl", "on" },
+                     { "model-id",
+@@ -1936,39 +1907,6 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
+             { /* end of list */ }
+         }
+     },
+-    {
+-        .name =3D "Westmere-IBRS",
+-        .level =3D 11,
+-        .vendor =3D CPUID_VENDOR_INTEL,
+-        .family =3D 6,
+-        .model =3D 44,
+-        .stepping =3D 1,
+-        .features[FEAT_1_EDX] =3D
+-            CPUID_VME | CPUID_SSE2 | CPUID_SSE | CPUID_FXSR | CPUID_MMX =
+|
+-            CPUID_CLFLUSH | CPUID_PSE36 | CPUID_PAT | CPUID_CMOV | CPUID=
+_MCA |
+-            CPUID_PGE | CPUID_MTRR | CPUID_SEP | CPUID_APIC | CPUID_CX8 =
+|
+-            CPUID_MCE | CPUID_PAE | CPUID_MSR | CPUID_TSC | CPUID_PSE |
+-            CPUID_DE | CPUID_FP87,
+-        .features[FEAT_1_ECX] =3D
+-            CPUID_EXT_AES | CPUID_EXT_POPCNT | CPUID_EXT_SSE42 |
+-            CPUID_EXT_SSE41 | CPUID_EXT_CX16 | CPUID_EXT_SSSE3 |
+-            CPUID_EXT_PCLMULQDQ | CPUID_EXT_SSE3,
+-        .features[FEAT_8000_0001_EDX] =3D
+-            CPUID_EXT2_LM | CPUID_EXT2_SYSCALL | CPUID_EXT2_NX,
+-        .features[FEAT_8000_0001_ECX] =3D
+-            CPUID_EXT3_LAHF_LM,
+-        .features[FEAT_7_0_EDX] =3D
+-            CPUID_7_0_EDX_SPEC_CTRL,
+-        .features[FEAT_6_EAX] =3D
+-            CPUID_6_EAX_ARAT,
+-        .xlevel =3D 0x80000008,
+-        .model_id =3D "Westmere E56xx/L56xx/X56xx (IBRS update)",
+-        /*
+-         * This CPU model will eventually be replaced by an alias,
+-         * don't register any versions for it.
+-         */
+-        .versions =3D (X86CPUVersionDefinition[]) { { /* end of list */ =
+} },
+-    },
+     {
+         .name =3D "SandyBridge",
+         .level =3D 0xd,
+@@ -2003,7 +1941,7 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
+             { .version =3D 1 },
+             {
+                 .version =3D 2,
+-                /* Equivalent to SandyBridge-IBRS */
++                .alias =3D "SandyBridge-IBRS",
+                 .props =3D (PropValue[]) {
+                     { "spec-ctrl", "on" },
+                     { "model-id",
+@@ -2014,44 +1952,6 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
+             { /* end of list */ }
+         }
+     },
+-    {
+-        .name =3D "SandyBridge-IBRS",
+-        .level =3D 0xd,
+-        .vendor =3D CPUID_VENDOR_INTEL,
+-        .family =3D 6,
+-        .model =3D 42,
+-        .stepping =3D 1,
+-        .features[FEAT_1_EDX] =3D
+-            CPUID_VME | CPUID_SSE2 | CPUID_SSE | CPUID_FXSR | CPUID_MMX =
+|
+-            CPUID_CLFLUSH | CPUID_PSE36 | CPUID_PAT | CPUID_CMOV | CPUID=
+_MCA |
+-            CPUID_PGE | CPUID_MTRR | CPUID_SEP | CPUID_APIC | CPUID_CX8 =
+|
+-            CPUID_MCE | CPUID_PAE | CPUID_MSR | CPUID_TSC | CPUID_PSE |
+-            CPUID_DE | CPUID_FP87,
+-        .features[FEAT_1_ECX] =3D
+-            CPUID_EXT_AVX | CPUID_EXT_XSAVE | CPUID_EXT_AES |
+-            CPUID_EXT_TSC_DEADLINE_TIMER | CPUID_EXT_POPCNT |
+-            CPUID_EXT_X2APIC | CPUID_EXT_SSE42 | CPUID_EXT_SSE41 |
+-            CPUID_EXT_CX16 | CPUID_EXT_SSSE3 | CPUID_EXT_PCLMULQDQ |
+-            CPUID_EXT_SSE3,
+-        .features[FEAT_8000_0001_EDX] =3D
+-            CPUID_EXT2_LM | CPUID_EXT2_RDTSCP | CPUID_EXT2_NX |
+-            CPUID_EXT2_SYSCALL,
+-        .features[FEAT_8000_0001_ECX] =3D
+-            CPUID_EXT3_LAHF_LM,
+-        .features[FEAT_7_0_EDX] =3D
+-            CPUID_7_0_EDX_SPEC_CTRL,
+-        .features[FEAT_XSAVE] =3D
+-            CPUID_XSAVE_XSAVEOPT,
+-        .features[FEAT_6_EAX] =3D
+-            CPUID_6_EAX_ARAT,
+-        .xlevel =3D 0x80000008,
+-        .model_id =3D "Intel Xeon E312xx (Sandy Bridge, IBRS update)",
+-        /*
+-         * This CPU model will eventually be replaced by an alias,
+-         * don't register any versions for it.
+-         */
+-        .versions =3D (X86CPUVersionDefinition[]) { { /* end of list */ =
+} },
+-    },
+     {
+         .name =3D "IvyBridge",
+         .level =3D 0xd,
+@@ -2089,7 +1989,7 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
+             { .version =3D 1 },
+             {
+                 .version =3D 2,
+-                /* Equivalent to IvyBridge-IBRS */
++                .alias =3D "IvyBridge-IBRS",
+                 .props =3D (PropValue[]) {
+                     { "spec-ctrl", "on" },
+                     { "model-id",
+@@ -2100,131 +2000,6 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
+             { /* end of list */ }
+         }
+     },
+-    {
+-        .name =3D "IvyBridge-IBRS",
+-        .level =3D 0xd,
+-        .vendor =3D CPUID_VENDOR_INTEL,
+-        .family =3D 6,
+-        .model =3D 58,
+-        .stepping =3D 9,
+-        .features[FEAT_1_EDX] =3D
+-            CPUID_VME | CPUID_SSE2 | CPUID_SSE | CPUID_FXSR | CPUID_MMX =
+|
+-            CPUID_CLFLUSH | CPUID_PSE36 | CPUID_PAT | CPUID_CMOV | CPUID=
+_MCA |
+-            CPUID_PGE | CPUID_MTRR | CPUID_SEP | CPUID_APIC | CPUID_CX8 =
+|
+-            CPUID_MCE | CPUID_PAE | CPUID_MSR | CPUID_TSC | CPUID_PSE |
+-            CPUID_DE | CPUID_FP87,
+-        .features[FEAT_1_ECX] =3D
+-            CPUID_EXT_AVX | CPUID_EXT_XSAVE | CPUID_EXT_AES |
+-            CPUID_EXT_TSC_DEADLINE_TIMER | CPUID_EXT_POPCNT |
+-            CPUID_EXT_X2APIC | CPUID_EXT_SSE42 | CPUID_EXT_SSE41 |
+-            CPUID_EXT_CX16 | CPUID_EXT_SSSE3 | CPUID_EXT_PCLMULQDQ |
+-            CPUID_EXT_SSE3 | CPUID_EXT_F16C | CPUID_EXT_RDRAND,
+-        .features[FEAT_7_0_EBX] =3D
+-            CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_SMEP |
+-            CPUID_7_0_EBX_ERMS,
+-        .features[FEAT_8000_0001_EDX] =3D
+-            CPUID_EXT2_LM | CPUID_EXT2_RDTSCP | CPUID_EXT2_NX |
+-            CPUID_EXT2_SYSCALL,
+-        .features[FEAT_8000_0001_ECX] =3D
+-            CPUID_EXT3_LAHF_LM,
+-        .features[FEAT_7_0_EDX] =3D
+-            CPUID_7_0_EDX_SPEC_CTRL,
+-        .features[FEAT_XSAVE] =3D
+-            CPUID_XSAVE_XSAVEOPT,
+-        .features[FEAT_6_EAX] =3D
+-            CPUID_6_EAX_ARAT,
+-        .xlevel =3D 0x80000008,
+-        .model_id =3D "Intel Xeon E3-12xx v2 (Ivy Bridge, IBRS)",
+-        /*
+-         * This CPU model will eventually be replaced by an alias,
+-         * don't register any versions for it.
+-         */
+-        .versions =3D (X86CPUVersionDefinition[]) { { /* end of list */ =
+} },
+-    },
+-    {
+-        .name =3D "Haswell-noTSX",
+-        .level =3D 0xd,
+-        .vendor =3D CPUID_VENDOR_INTEL,
+-        .family =3D 6,
+-        .model =3D 60,
+-        .stepping =3D 1,
+-        .features[FEAT_1_EDX] =3D
+-            CPUID_VME | CPUID_SSE2 | CPUID_SSE | CPUID_FXSR | CPUID_MMX =
+|
+-            CPUID_CLFLUSH | CPUID_PSE36 | CPUID_PAT | CPUID_CMOV | CPUID=
+_MCA |
+-            CPUID_PGE | CPUID_MTRR | CPUID_SEP | CPUID_APIC | CPUID_CX8 =
+|
+-            CPUID_MCE | CPUID_PAE | CPUID_MSR | CPUID_TSC | CPUID_PSE |
+-            CPUID_DE | CPUID_FP87,
+-        .features[FEAT_1_ECX] =3D
+-            CPUID_EXT_AVX | CPUID_EXT_XSAVE | CPUID_EXT_AES |
+-            CPUID_EXT_POPCNT | CPUID_EXT_X2APIC | CPUID_EXT_SSE42 |
+-            CPUID_EXT_SSE41 | CPUID_EXT_CX16 | CPUID_EXT_SSSE3 |
+-            CPUID_EXT_PCLMULQDQ | CPUID_EXT_SSE3 |
+-            CPUID_EXT_TSC_DEADLINE_TIMER | CPUID_EXT_FMA | CPUID_EXT_MOV=
+BE |
+-            CPUID_EXT_PCID | CPUID_EXT_F16C | CPUID_EXT_RDRAND,
+-        .features[FEAT_8000_0001_EDX] =3D
+-            CPUID_EXT2_LM | CPUID_EXT2_RDTSCP | CPUID_EXT2_NX |
+-            CPUID_EXT2_SYSCALL,
+-        .features[FEAT_8000_0001_ECX] =3D
+-            CPUID_EXT3_ABM | CPUID_EXT3_LAHF_LM,
+-        .features[FEAT_7_0_EBX] =3D
+-            CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 |
+-            CPUID_7_0_EBX_AVX2 | CPUID_7_0_EBX_SMEP |
+-            CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_ERMS | CPUID_7_0_EBX_INVP=
+CID,
+-        .features[FEAT_XSAVE] =3D
+-            CPUID_XSAVE_XSAVEOPT,
+-        .features[FEAT_6_EAX] =3D
+-            CPUID_6_EAX_ARAT,
+-        .xlevel =3D 0x80000008,
+-        .model_id =3D "Intel Core Processor (Haswell, no TSX)",
+-        /*
+-         * This CPU model will eventually be replaced by an alias,
+-         * don't register any versions for it.
+-         */
+-        .versions =3D (X86CPUVersionDefinition[]) { { /* end of list */ =
+} },
+-    },
+-    {
+-        .name =3D "Haswell-noTSX-IBRS",
+-        .level =3D 0xd,
+-        .vendor =3D CPUID_VENDOR_INTEL,
+-        .family =3D 6,
+-        .model =3D 60,
+-        .stepping =3D 1,
+-        .features[FEAT_1_EDX] =3D
+-            CPUID_VME | CPUID_SSE2 | CPUID_SSE | CPUID_FXSR | CPUID_MMX =
+|
+-            CPUID_CLFLUSH | CPUID_PSE36 | CPUID_PAT | CPUID_CMOV | CPUID=
+_MCA |
+-            CPUID_PGE | CPUID_MTRR | CPUID_SEP | CPUID_APIC | CPUID_CX8 =
+|
+-            CPUID_MCE | CPUID_PAE | CPUID_MSR | CPUID_TSC | CPUID_PSE |
+-            CPUID_DE | CPUID_FP87,
+-        .features[FEAT_1_ECX] =3D
+-            CPUID_EXT_AVX | CPUID_EXT_XSAVE | CPUID_EXT_AES |
+-            CPUID_EXT_POPCNT | CPUID_EXT_X2APIC | CPUID_EXT_SSE42 |
+-            CPUID_EXT_SSE41 | CPUID_EXT_CX16 | CPUID_EXT_SSSE3 |
+-            CPUID_EXT_PCLMULQDQ | CPUID_EXT_SSE3 |
+-            CPUID_EXT_TSC_DEADLINE_TIMER | CPUID_EXT_FMA | CPUID_EXT_MOV=
+BE |
+-            CPUID_EXT_PCID | CPUID_EXT_F16C | CPUID_EXT_RDRAND,
+-        .features[FEAT_8000_0001_EDX] =3D
+-            CPUID_EXT2_LM | CPUID_EXT2_RDTSCP | CPUID_EXT2_NX |
+-            CPUID_EXT2_SYSCALL,
+-        .features[FEAT_8000_0001_ECX] =3D
+-            CPUID_EXT3_ABM | CPUID_EXT3_LAHF_LM,
+-        .features[FEAT_7_0_EDX] =3D
+-            CPUID_7_0_EDX_SPEC_CTRL,
+-        .features[FEAT_7_0_EBX] =3D
+-            CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 |
+-            CPUID_7_0_EBX_AVX2 | CPUID_7_0_EBX_SMEP |
+-            CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_ERMS | CPUID_7_0_EBX_INVP=
+CID,
+-        .features[FEAT_XSAVE] =3D
+-            CPUID_XSAVE_XSAVEOPT,
+-        .features[FEAT_6_EAX] =3D
+-            CPUID_6_EAX_ARAT,
+-        .xlevel =3D 0x80000008,
+-        .model_id =3D "Intel Core Processor (Haswell, no TSX, IBRS)",
+-        /*
+-         * This CPU model will eventually be replaced by an alias,
+-         * don't register any versions for it.
+-         */
+-        .versions =3D (X86CPUVersionDefinition[]) { { /* end of list */ =
+} },
+-    },
+     {
+         .name =3D "Haswell",
+         .level =3D 0xd,
+@@ -2265,7 +2040,7 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
+             { .version =3D 1 },
+             {
+                 .version =3D 2,
+-                /* Equivalent to Haswell-noTSX */
++                .alias =3D "Haswell-noTSX",
+                 .props =3D (PropValue[]) {
+                     { "hle", "off" },
+                     { "rtm", "off" },
+@@ -2276,7 +2051,7 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
+             },
+             {
+                 .version =3D 3,
+-                /* Equivalent to Haswell-IBRS */
++                .alias =3D "Haswell-IBRS",
+                 .props =3D (PropValue[]) {
+                     /* Restore TSX features removed by -v2 above */
+                     { "hle", "on" },
+@@ -2294,7 +2069,7 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
+             },
+             {
+                 .version =3D 4,
+-                /* Equivalent to Haswell-noTSX-IBRS */
++                .alias =3D "Haswell-noTSX-IBRS",
+                 .props =3D (PropValue[]) {
+                     { "hle", "off" },
+                     { "rtm", "off" },
+@@ -2308,138 +2083,6 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
+             { /* end of list */ }
+         }
+     },
+-    {
+-        .name =3D "Haswell-IBRS",
+-        .level =3D 0xd,
+-        .vendor =3D CPUID_VENDOR_INTEL,
+-        .family =3D 6,
+-        .model =3D 60,
+-        .stepping =3D 4,
+-        .features[FEAT_1_EDX] =3D
+-            CPUID_VME | CPUID_SSE2 | CPUID_SSE | CPUID_FXSR | CPUID_MMX =
+|
+-            CPUID_CLFLUSH | CPUID_PSE36 | CPUID_PAT | CPUID_CMOV | CPUID=
+_MCA |
+-            CPUID_PGE | CPUID_MTRR | CPUID_SEP | CPUID_APIC | CPUID_CX8 =
+|
+-            CPUID_MCE | CPUID_PAE | CPUID_MSR | CPUID_TSC | CPUID_PSE |
+-            CPUID_DE | CPUID_FP87,
+-        .features[FEAT_1_ECX] =3D
+-            CPUID_EXT_AVX | CPUID_EXT_XSAVE | CPUID_EXT_AES |
+-            CPUID_EXT_POPCNT | CPUID_EXT_X2APIC | CPUID_EXT_SSE42 |
+-            CPUID_EXT_SSE41 | CPUID_EXT_CX16 | CPUID_EXT_SSSE3 |
+-            CPUID_EXT_PCLMULQDQ | CPUID_EXT_SSE3 |
+-            CPUID_EXT_TSC_DEADLINE_TIMER | CPUID_EXT_FMA | CPUID_EXT_MOV=
+BE |
+-            CPUID_EXT_PCID | CPUID_EXT_F16C | CPUID_EXT_RDRAND,
+-        .features[FEAT_8000_0001_EDX] =3D
+-            CPUID_EXT2_LM | CPUID_EXT2_RDTSCP | CPUID_EXT2_NX |
+-            CPUID_EXT2_SYSCALL,
+-        .features[FEAT_8000_0001_ECX] =3D
+-            CPUID_EXT3_ABM | CPUID_EXT3_LAHF_LM,
+-        .features[FEAT_7_0_EDX] =3D
+-            CPUID_7_0_EDX_SPEC_CTRL,
+-        .features[FEAT_7_0_EBX] =3D
+-            CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 |
+-            CPUID_7_0_EBX_HLE | CPUID_7_0_EBX_AVX2 | CPUID_7_0_EBX_SMEP =
+|
+-            CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_ERMS | CPUID_7_0_EBX_INVP=
+CID |
+-            CPUID_7_0_EBX_RTM,
+-        .features[FEAT_XSAVE] =3D
+-            CPUID_XSAVE_XSAVEOPT,
+-        .features[FEAT_6_EAX] =3D
+-            CPUID_6_EAX_ARAT,
+-        .xlevel =3D 0x80000008,
+-        .model_id =3D "Intel Core Processor (Haswell, IBRS)",
+-        /*
+-         * This CPU model will eventually be replaced by an alias,
+-         * don't register any versions for it.
+-         */
+-        .versions =3D (X86CPUVersionDefinition[]) { { /* end of list */ =
+} },
+-    },
+-    {
+-        .name =3D "Broadwell-noTSX",
+-        .level =3D 0xd,
+-        .vendor =3D CPUID_VENDOR_INTEL,
+-        .family =3D 6,
+-        .model =3D 61,
+-        .stepping =3D 2,
+-        .features[FEAT_1_EDX] =3D
+-            CPUID_VME | CPUID_SSE2 | CPUID_SSE | CPUID_FXSR | CPUID_MMX =
+|
+-            CPUID_CLFLUSH | CPUID_PSE36 | CPUID_PAT | CPUID_CMOV | CPUID=
+_MCA |
+-            CPUID_PGE | CPUID_MTRR | CPUID_SEP | CPUID_APIC | CPUID_CX8 =
+|
+-            CPUID_MCE | CPUID_PAE | CPUID_MSR | CPUID_TSC | CPUID_PSE |
+-            CPUID_DE | CPUID_FP87,
+-        .features[FEAT_1_ECX] =3D
+-            CPUID_EXT_AVX | CPUID_EXT_XSAVE | CPUID_EXT_AES |
+-            CPUID_EXT_POPCNT | CPUID_EXT_X2APIC | CPUID_EXT_SSE42 |
+-            CPUID_EXT_SSE41 | CPUID_EXT_CX16 | CPUID_EXT_SSSE3 |
+-            CPUID_EXT_PCLMULQDQ | CPUID_EXT_SSE3 |
+-            CPUID_EXT_TSC_DEADLINE_TIMER | CPUID_EXT_FMA | CPUID_EXT_MOV=
+BE |
+-            CPUID_EXT_PCID | CPUID_EXT_F16C | CPUID_EXT_RDRAND,
+-        .features[FEAT_8000_0001_EDX] =3D
+-            CPUID_EXT2_LM | CPUID_EXT2_RDTSCP | CPUID_EXT2_NX |
+-            CPUID_EXT2_SYSCALL,
+-        .features[FEAT_8000_0001_ECX] =3D
+-            CPUID_EXT3_ABM | CPUID_EXT3_LAHF_LM | CPUID_EXT3_3DNOWPREFET=
+CH,
+-        .features[FEAT_7_0_EBX] =3D
+-            CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 |
+-            CPUID_7_0_EBX_AVX2 | CPUID_7_0_EBX_SMEP |
+-            CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_ERMS | CPUID_7_0_EBX_INVP=
+CID |
+-            CPUID_7_0_EBX_RDSEED | CPUID_7_0_EBX_ADX |
+-            CPUID_7_0_EBX_SMAP,
+-        .features[FEAT_XSAVE] =3D
+-            CPUID_XSAVE_XSAVEOPT,
+-        .features[FEAT_6_EAX] =3D
+-            CPUID_6_EAX_ARAT,
+-        .xlevel =3D 0x80000008,
+-        .model_id =3D "Intel Core Processor (Broadwell, no TSX)",
+-        /*
+-         * This CPU model will eventually be replaced by an alias,
+-         * don't register any versions for it.
+-         */
+-        .versions =3D (X86CPUVersionDefinition[]) { { /* end of list */ =
+} },
+-    },
+-    {
+-        .name =3D "Broadwell-noTSX-IBRS",
+-        .level =3D 0xd,
+-        .vendor =3D CPUID_VENDOR_INTEL,
+-        .family =3D 6,
+-        .model =3D 61,
+-        .stepping =3D 2,
+-        .features[FEAT_1_EDX] =3D
+-            CPUID_VME | CPUID_SSE2 | CPUID_SSE | CPUID_FXSR | CPUID_MMX =
+|
+-            CPUID_CLFLUSH | CPUID_PSE36 | CPUID_PAT | CPUID_CMOV | CPUID=
+_MCA |
+-            CPUID_PGE | CPUID_MTRR | CPUID_SEP | CPUID_APIC | CPUID_CX8 =
+|
+-            CPUID_MCE | CPUID_PAE | CPUID_MSR | CPUID_TSC | CPUID_PSE |
+-            CPUID_DE | CPUID_FP87,
+-        .features[FEAT_1_ECX] =3D
+-            CPUID_EXT_AVX | CPUID_EXT_XSAVE | CPUID_EXT_AES |
+-            CPUID_EXT_POPCNT | CPUID_EXT_X2APIC | CPUID_EXT_SSE42 |
+-            CPUID_EXT_SSE41 | CPUID_EXT_CX16 | CPUID_EXT_SSSE3 |
+-            CPUID_EXT_PCLMULQDQ | CPUID_EXT_SSE3 |
+-            CPUID_EXT_TSC_DEADLINE_TIMER | CPUID_EXT_FMA | CPUID_EXT_MOV=
+BE |
+-            CPUID_EXT_PCID | CPUID_EXT_F16C | CPUID_EXT_RDRAND,
+-        .features[FEAT_8000_0001_EDX] =3D
+-            CPUID_EXT2_LM | CPUID_EXT2_RDTSCP | CPUID_EXT2_NX |
+-            CPUID_EXT2_SYSCALL,
+-        .features[FEAT_8000_0001_ECX] =3D
+-            CPUID_EXT3_ABM | CPUID_EXT3_LAHF_LM | CPUID_EXT3_3DNOWPREFET=
+CH,
+-        .features[FEAT_7_0_EDX] =3D
+-            CPUID_7_0_EDX_SPEC_CTRL,
+-        .features[FEAT_7_0_EBX] =3D
+-            CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 |
+-            CPUID_7_0_EBX_AVX2 | CPUID_7_0_EBX_SMEP |
+-            CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_ERMS | CPUID_7_0_EBX_INVP=
+CID |
+-            CPUID_7_0_EBX_RDSEED | CPUID_7_0_EBX_ADX |
+-            CPUID_7_0_EBX_SMAP,
+-        .features[FEAT_XSAVE] =3D
+-            CPUID_XSAVE_XSAVEOPT,
+-        .features[FEAT_6_EAX] =3D
+-            CPUID_6_EAX_ARAT,
+-        .xlevel =3D 0x80000008,
+-        .model_id =3D "Intel Core Processor (Broadwell, no TSX, IBRS)",
+-        /*
+-         * This CPU model will eventually be replaced by an alias,
+-         * don't register any versions for it.
+-         */
+-        .versions =3D (X86CPUVersionDefinition[]) { { /* end of list */ =
+} },
+-    },
+     {
+         .name =3D "Broadwell",
+         .level =3D 0xd,
+@@ -2481,7 +2124,7 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
+             { .version =3D 1 },
+             {
+                 .version =3D 2,
+-                /* Equivalent to Broadwell-noTSX */
++                .alias =3D "Broadwell-noTSX",
+                 .props =3D (PropValue[]) {
+                     { "hle", "off" },
+                     { "rtm", "off" },
+@@ -2491,7 +2134,7 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
+             },
+             {
+                 .version =3D 3,
+-                /* Equivalent to Broadwell-IBRS */
++                .alias =3D "Broadwell-IBRS",
+                 .props =3D (PropValue[]) {
+                     /* Restore TSX features removed by -v2 above */
+                     { "hle", "on" },
+@@ -2504,7 +2147,7 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
+             },
+             {
+                 .version =3D 4,
+-                /* Equivalent to Broadwell-noTSX-IBRS */
++                .alias =3D "Broadwell-noTSX-IBRS",
+                 .props =3D (PropValue[]) {
+                     { "hle", "off" },
+                     { "rtm", "off" },
+@@ -2517,51 +2160,6 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
+             { /* end of list */ }
+         }
+     },
+-    {
+-        .name =3D "Broadwell-IBRS",
+-        .level =3D 0xd,
+-        .vendor =3D CPUID_VENDOR_INTEL,
+-        .family =3D 6,
+-        .model =3D 61,
+-        .stepping =3D 2,
+-        .features[FEAT_1_EDX] =3D
+-            CPUID_VME | CPUID_SSE2 | CPUID_SSE | CPUID_FXSR | CPUID_MMX =
+|
+-            CPUID_CLFLUSH | CPUID_PSE36 | CPUID_PAT | CPUID_CMOV | CPUID=
+_MCA |
+-            CPUID_PGE | CPUID_MTRR | CPUID_SEP | CPUID_APIC | CPUID_CX8 =
+|
+-            CPUID_MCE | CPUID_PAE | CPUID_MSR | CPUID_TSC | CPUID_PSE |
+-            CPUID_DE | CPUID_FP87,
+-        .features[FEAT_1_ECX] =3D
+-            CPUID_EXT_AVX | CPUID_EXT_XSAVE | CPUID_EXT_AES |
+-            CPUID_EXT_POPCNT | CPUID_EXT_X2APIC | CPUID_EXT_SSE42 |
+-            CPUID_EXT_SSE41 | CPUID_EXT_CX16 | CPUID_EXT_SSSE3 |
+-            CPUID_EXT_PCLMULQDQ | CPUID_EXT_SSE3 |
+-            CPUID_EXT_TSC_DEADLINE_TIMER | CPUID_EXT_FMA | CPUID_EXT_MOV=
+BE |
+-            CPUID_EXT_PCID | CPUID_EXT_F16C | CPUID_EXT_RDRAND,
+-        .features[FEAT_8000_0001_EDX] =3D
+-            CPUID_EXT2_LM | CPUID_EXT2_RDTSCP | CPUID_EXT2_NX |
+-            CPUID_EXT2_SYSCALL,
+-        .features[FEAT_8000_0001_ECX] =3D
+-            CPUID_EXT3_ABM | CPUID_EXT3_LAHF_LM | CPUID_EXT3_3DNOWPREFET=
+CH,
+-        .features[FEAT_7_0_EDX] =3D
+-            CPUID_7_0_EDX_SPEC_CTRL,
+-        .features[FEAT_7_0_EBX] =3D
+-            CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 |
+-            CPUID_7_0_EBX_HLE | CPUID_7_0_EBX_AVX2 | CPUID_7_0_EBX_SMEP =
+|
+-            CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_ERMS | CPUID_7_0_EBX_INVP=
+CID |
+-            CPUID_7_0_EBX_RTM | CPUID_7_0_EBX_RDSEED | CPUID_7_0_EBX_ADX=
+ |
+-            CPUID_7_0_EBX_SMAP,
+-        .features[FEAT_XSAVE] =3D
+-            CPUID_XSAVE_XSAVEOPT,
+-        .features[FEAT_6_EAX] =3D
+-            CPUID_6_EAX_ARAT,
+-        .xlevel =3D 0x80000008,
+-        .model_id =3D "Intel Core Processor (Broadwell, IBRS)",
+-        /*
+-         * This CPU model will eventually be replaced by an alias,
+-         * don't register any versions for it.
+-         */
+-        .versions =3D (X86CPUVersionDefinition[]) { { /* end of list */ =
+} },
+-    },
+     {
+         .name =3D "Skylake-Client",
+         .level =3D 0xd,
+@@ -2610,7 +2208,7 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
+             { .version =3D 1 },
+             {
+                 .version =3D 2,
+-                /* Equivalent to Skylake-Client-IBRS */
++                .alias =3D "Skylake-Client-IBRS",
+                 .props =3D (PropValue[]) {
+                     { "spec-ctrl", "on" },
+                     { "model-id",
+@@ -2621,58 +2219,6 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
+             { /* end of list */ }
+         }
+     },
+-    {
+-        .name =3D "Skylake-Client-IBRS",
+-        .level =3D 0xd,
+-        .vendor =3D CPUID_VENDOR_INTEL,
+-        .family =3D 6,
+-        .model =3D 94,
+-        .stepping =3D 3,
+-        .features[FEAT_1_EDX] =3D
+-            CPUID_VME | CPUID_SSE2 | CPUID_SSE | CPUID_FXSR | CPUID_MMX =
+|
+-            CPUID_CLFLUSH | CPUID_PSE36 | CPUID_PAT | CPUID_CMOV | CPUID=
+_MCA |
+-            CPUID_PGE | CPUID_MTRR | CPUID_SEP | CPUID_APIC | CPUID_CX8 =
+|
+-            CPUID_MCE | CPUID_PAE | CPUID_MSR | CPUID_TSC | CPUID_PSE |
+-            CPUID_DE | CPUID_FP87,
+-        .features[FEAT_1_ECX] =3D
+-            CPUID_EXT_AVX | CPUID_EXT_XSAVE | CPUID_EXT_AES |
+-            CPUID_EXT_POPCNT | CPUID_EXT_X2APIC | CPUID_EXT_SSE42 |
+-            CPUID_EXT_SSE41 | CPUID_EXT_CX16 | CPUID_EXT_SSSE3 |
+-            CPUID_EXT_PCLMULQDQ | CPUID_EXT_SSE3 |
+-            CPUID_EXT_TSC_DEADLINE_TIMER | CPUID_EXT_FMA | CPUID_EXT_MOV=
+BE |
+-            CPUID_EXT_PCID | CPUID_EXT_F16C | CPUID_EXT_RDRAND,
+-        .features[FEAT_8000_0001_EDX] =3D
+-            CPUID_EXT2_LM | CPUID_EXT2_RDTSCP | CPUID_EXT2_NX |
+-            CPUID_EXT2_SYSCALL,
+-        .features[FEAT_8000_0001_ECX] =3D
+-            CPUID_EXT3_ABM | CPUID_EXT3_LAHF_LM | CPUID_EXT3_3DNOWPREFET=
+CH,
+-        .features[FEAT_7_0_EDX] =3D
+-            CPUID_7_0_EDX_SPEC_CTRL,
+-        .features[FEAT_7_0_EBX] =3D
+-            CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 |
+-            CPUID_7_0_EBX_HLE | CPUID_7_0_EBX_AVX2 | CPUID_7_0_EBX_SMEP =
+|
+-            CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_ERMS | CPUID_7_0_EBX_INVP=
+CID |
+-            CPUID_7_0_EBX_RTM | CPUID_7_0_EBX_RDSEED | CPUID_7_0_EBX_ADX=
+ |
+-            CPUID_7_0_EBX_SMAP,
+-        /* Missing: XSAVES (not supported by some Linux versions,
+-         * including v4.1 to v4.12).
+-         * KVM doesn't yet expose any XSAVES state save component,
+-         * and the only one defined in Skylake (processor tracing)
+-         * probably will block migration anyway.
+-         */
+-        .features[FEAT_XSAVE] =3D
+-            CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XSAVEC |
+-            CPUID_XSAVE_XGETBV1,
+-        .features[FEAT_6_EAX] =3D
+-            CPUID_6_EAX_ARAT,
+-        .xlevel =3D 0x80000008,
+-        .model_id =3D "Intel Core Processor (Skylake, IBRS)",
+-        /*
+-         * This CPU model will eventually be replaced by an alias,
+-         * don't register any versions for it.
+-         */
+-        .versions =3D (X86CPUVersionDefinition[]) { { /* end of list */ =
+} },
+-    },
+     {
+         .name =3D "Skylake-Server",
+         .level =3D 0xd,
+@@ -2726,7 +2272,7 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
+             { .version =3D 1 },
+             {
+                 .version =3D 2,
+-                /* Equivalent to Skylake-Server-IBRS */
++                .alias =3D "Skylake-Server-IBRS",
+                 .props =3D (PropValue[]) {
+                     /* clflushopt was not added to Skylake-Server-IBRS *=
+/
+                     /* TODO: add -v3 including clflushopt */
+@@ -2740,63 +2286,6 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
+             { /* end of list */ }
+         }
+     },
+-    {
+-        .name =3D "Skylake-Server-IBRS",
+-        .level =3D 0xd,
+-        .vendor =3D CPUID_VENDOR_INTEL,
+-        .family =3D 6,
+-        .model =3D 85,
+-        .stepping =3D 4,
+-        .features[FEAT_1_EDX] =3D
+-            CPUID_VME | CPUID_SSE2 | CPUID_SSE | CPUID_FXSR | CPUID_MMX =
+|
+-            CPUID_CLFLUSH | CPUID_PSE36 | CPUID_PAT | CPUID_CMOV | CPUID=
+_MCA |
+-            CPUID_PGE | CPUID_MTRR | CPUID_SEP | CPUID_APIC | CPUID_CX8 =
+|
+-            CPUID_MCE | CPUID_PAE | CPUID_MSR | CPUID_TSC | CPUID_PSE |
+-            CPUID_DE | CPUID_FP87,
+-        .features[FEAT_1_ECX] =3D
+-            CPUID_EXT_AVX | CPUID_EXT_XSAVE | CPUID_EXT_AES |
+-            CPUID_EXT_POPCNT | CPUID_EXT_X2APIC | CPUID_EXT_SSE42 |
+-            CPUID_EXT_SSE41 | CPUID_EXT_CX16 | CPUID_EXT_SSSE3 |
+-            CPUID_EXT_PCLMULQDQ | CPUID_EXT_SSE3 |
+-            CPUID_EXT_TSC_DEADLINE_TIMER | CPUID_EXT_FMA | CPUID_EXT_MOV=
+BE |
+-            CPUID_EXT_PCID | CPUID_EXT_F16C | CPUID_EXT_RDRAND,
+-        .features[FEAT_8000_0001_EDX] =3D
+-            CPUID_EXT2_LM | CPUID_EXT2_PDPE1GB | CPUID_EXT2_RDTSCP |
+-            CPUID_EXT2_NX | CPUID_EXT2_SYSCALL,
+-        .features[FEAT_8000_0001_ECX] =3D
+-            CPUID_EXT3_ABM | CPUID_EXT3_LAHF_LM | CPUID_EXT3_3DNOWPREFET=
+CH,
+-        .features[FEAT_7_0_EDX] =3D
+-            CPUID_7_0_EDX_SPEC_CTRL,
+-        .features[FEAT_7_0_EBX] =3D
+-            CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 |
+-            CPUID_7_0_EBX_HLE | CPUID_7_0_EBX_AVX2 | CPUID_7_0_EBX_SMEP =
+|
+-            CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_ERMS | CPUID_7_0_EBX_INVP=
+CID |
+-            CPUID_7_0_EBX_RTM | CPUID_7_0_EBX_RDSEED | CPUID_7_0_EBX_ADX=
+ |
+-            CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_CLWB |
+-            CPUID_7_0_EBX_AVX512F | CPUID_7_0_EBX_AVX512DQ |
+-            CPUID_7_0_EBX_AVX512BW | CPUID_7_0_EBX_AVX512CD |
+-            CPUID_7_0_EBX_AVX512VL,
+-        .features[FEAT_7_0_ECX] =3D
+-            CPUID_7_0_ECX_PKU,
+-        /* Missing: XSAVES (not supported by some Linux versions,
+-         * including v4.1 to v4.12).
+-         * KVM doesn't yet expose any XSAVES state save component,
+-         * and the only one defined in Skylake (processor tracing)
+-         * probably will block migration anyway.
+-         */
+-        .features[FEAT_XSAVE] =3D
+-            CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XSAVEC |
+-            CPUID_XSAVE_XGETBV1,
+-        .features[FEAT_6_EAX] =3D
+-            CPUID_6_EAX_ARAT,
+-        .xlevel =3D 0x80000008,
+-        .model_id =3D "Intel Xeon Processor (Skylake, IBRS)",
+-        /*
+-         * This CPU model will eventually be replaced by an alias,
+-         * don't register any versions for it.
+-         */
+-        .versions =3D (X86CPUVersionDefinition[]) { { /* end of list */ =
+} },
+-    },
+     {
+         .name =3D "Cascadelake-Server",
+         .level =3D 0xd,
+@@ -3258,7 +2747,7 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
+             { .version =3D 1 },
+             {
+                 .version =3D 2,
+-                /* Equivalent to EPYC-IBPB */
++                .alias =3D "EPYC-IBPB",
+                 .props =3D (PropValue[]) {
+                     { "ibpb", "on" },
+                     { "model-id",
+@@ -3269,61 +2758,6 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
+             { /* end of list */ }
+         }
+     },
+-    {
+-        .name =3D "EPYC-IBPB",
+-        .level =3D 0xd,
+-        .vendor =3D CPUID_VENDOR_AMD,
+-        .family =3D 23,
+-        .model =3D 1,
+-        .stepping =3D 2,
+-        .features[FEAT_1_EDX] =3D
+-            CPUID_SSE2 | CPUID_SSE | CPUID_FXSR | CPUID_MMX | CPUID_CLFL=
+USH |
+-            CPUID_PSE36 | CPUID_PAT | CPUID_CMOV | CPUID_MCA | CPUID_PGE=
+ |
+-            CPUID_MTRR | CPUID_SEP | CPUID_APIC | CPUID_CX8 | CPUID_MCE =
+|
+-            CPUID_PAE | CPUID_MSR | CPUID_TSC | CPUID_PSE | CPUID_DE |
+-            CPUID_VME | CPUID_FP87,
+-        .features[FEAT_1_ECX] =3D
+-            CPUID_EXT_RDRAND | CPUID_EXT_F16C | CPUID_EXT_AVX |
+-            CPUID_EXT_XSAVE | CPUID_EXT_AES |  CPUID_EXT_POPCNT |
+-            CPUID_EXT_MOVBE | CPUID_EXT_SSE42 | CPUID_EXT_SSE41 |
+-            CPUID_EXT_CX16 | CPUID_EXT_FMA | CPUID_EXT_SSSE3 |
+-            CPUID_EXT_MONITOR | CPUID_EXT_PCLMULQDQ | CPUID_EXT_SSE3,
+-        .features[FEAT_8000_0001_EDX] =3D
+-            CPUID_EXT2_LM | CPUID_EXT2_RDTSCP | CPUID_EXT2_PDPE1GB |
+-            CPUID_EXT2_FFXSR | CPUID_EXT2_MMXEXT | CPUID_EXT2_NX |
+-            CPUID_EXT2_SYSCALL,
+-        .features[FEAT_8000_0001_ECX] =3D
+-            CPUID_EXT3_OSVW | CPUID_EXT3_3DNOWPREFETCH |
+-            CPUID_EXT3_MISALIGNSSE | CPUID_EXT3_SSE4A | CPUID_EXT3_ABM |
+-            CPUID_EXT3_CR8LEG | CPUID_EXT3_SVM | CPUID_EXT3_LAHF_LM |
+-            CPUID_EXT3_TOPOEXT,
+-        .features[FEAT_8000_0008_EBX] =3D
+-            CPUID_8000_0008_EBX_IBPB,
+-        .features[FEAT_7_0_EBX] =3D
+-            CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 | CPUID_7_0_EBX_=
+AVX2 |
+-            CPUID_7_0_EBX_SMEP | CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_RDSE=
+ED |
+-            CPUID_7_0_EBX_ADX | CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_CLFLU=
+SHOPT |
+-            CPUID_7_0_EBX_SHA_NI,
+-        /* Missing: XSAVES (not supported by some Linux versions,
+-         * including v4.1 to v4.12).
+-         * KVM doesn't yet expose any XSAVES state save component.
+-         */
+-        .features[FEAT_XSAVE] =3D
+-            CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XSAVEC |
+-            CPUID_XSAVE_XGETBV1,
+-        .features[FEAT_6_EAX] =3D
+-            CPUID_6_EAX_ARAT,
+-        .features[FEAT_SVM] =3D
+-            CPUID_SVM_NPT | CPUID_SVM_NRIPSAVE,
+-        .xlevel =3D 0x8000001E,
+-        .model_id =3D "AMD EPYC Processor (with IBPB)",
+-        .cache_info =3D &epyc_cache_info,
+-        /*
+-         * This CPU model will eventually be replaced by an alias,
+-         * don't register any versions for it.
+-         */
+-        .versions =3D (X86CPUVersionDefinition[]) { { /* end of list */ =
+} },
+-    },
+     {
+         .name =3D "Dhyana",
+         .level =3D 0xd,
+@@ -4648,6 +4082,13 @@ static void x86_register_cpudef_types(X86CPUDefini=
+tion *def)
+         name =3D x86_cpu_versioned_model_name(def, vdef->version);
+         x86_register_cpu_model_type(name, m);
+         g_free(name);
++
++        if (vdef->alias) {
++            X86CPUModel *am =3D g_new0(X86CPUModel, 1);
++            am->cpudef =3D def;
++            am->version =3D vdef->version;
++            x86_register_cpu_model_type(vdef->alias, am);
++        }
+     }
+=20
+ }
+--=20
+2.18.0.rc1.1.g3f1ff2140
 
-Sounds good to me.  If we're worried about breaking guest ABI by
-accident, we can include the MSRs in the guest ABI validation
-test cases I'm working on.
-
--- 
-Eduardo
 
