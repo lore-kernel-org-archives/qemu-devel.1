@@ -3,60 +3,63 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D23ECC5B57D
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 22:37:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75300C5B57D
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 22:37:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A3F6D2147A
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 22:37:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A3F6D2147A
+	by mail.kernel.org (Postfix) with ESMTPS id 4BB162147A
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 22:37:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4BB162147A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56646 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56650 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hjWpm-00033Q-Qq
-	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 18:37:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54894)
+	id 1hjWpx-0003FB-KP
+	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 18:37:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55253)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <ehabkost@redhat.com>) id 1hjWUc-0007LM-RO
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 18:15:48 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1hjWVD-0008E5-Bi
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 18:16:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1hjWUa-0003Nk-Mp
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 18:15:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37772)
+ (envelope-from <ehabkost@redhat.com>) id 1hjWVC-0003op-89
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 18:16:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49504)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hjWUY-0003IE-RF
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 18:15:43 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hjWVC-0003n4-1R
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 18:16:22 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A8DA22F8BDC;
- Fri,  5 Jul 2019 22:15:41 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 461FD308FC20;
+ Fri,  5 Jul 2019 22:16:21 +0000 (UTC)
 Received: from localhost (ovpn-116-30.gru2.redhat.com [10.97.116.30])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 38A4E578A;
- Fri,  5 Jul 2019 22:15:41 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id CA7D9772D3;
+ Fri,  5 Jul 2019 22:16:20 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>,
  Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
  Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
  Richard Henderson <rth@twiddle.net>
-Date: Fri,  5 Jul 2019 19:14:34 -0300
-Message-Id: <20190705221504.25166-13-ehabkost@redhat.com>
+Date: Fri,  5 Jul 2019 19:14:53 -0300
+Message-Id: <20190705221504.25166-32-ehabkost@redhat.com>
 In-Reply-To: <20190705221504.25166-1-ehabkost@redhat.com>
 References: <20190705221504.25166-1-ehabkost@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.38]); Fri, 05 Jul 2019 22:15:41 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.43]); Fri, 05 Jul 2019 22:16:21 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL v6 12/42] hw/i386: Adjust nr_dies with
- configured smp_dies for PCMachine
+Subject: [Qemu-devel] [PULL v6 31/42] qmp: Add "alias-of" field to
+ query-cpu-definitions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,87 +71,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Like Xu <like.xu@linux.intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Like Xu <like.xu@linux.intel.com>
+Management software will be expected to resolve CPU model name
+aliases using the new field.
 
-To support multiple dies configuration on PCMachine, the best place to
-set CPUX86State->nr_dies with requested PCMachineState->smp_dies is in
-pc_new_cpu() and pc_cpu_pre_plug(). Refactoring pc_new_cpu() is applied
-and redundant parameter "const char *typename" would be removed.
-
-Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
-Signed-off-by: Like Xu <like.xu@linux.intel.com>
-Message-Id: <20190612084104.34984-3-like.xu@linux.intel.com>
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+Message-Id: <20190628002844.24894-2-ehabkost@redhat.com>
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- hw/i386/pc.c | 16 +++++++++++-----
- 1 file changed, 11 insertions(+), 5 deletions(-)
+ qapi/machine-target.json | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index d44b2d06db..4dac96860d 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -1514,12 +1514,16 @@ void pc_acpi_smi_interrupt(void *opaque, int irq, int level)
-     }
- }
- 
--static void pc_new_cpu(const char *typename, int64_t apic_id, Error **errp)
-+static void pc_new_cpu(PCMachineState *pcms, int64_t apic_id, Error **errp)
- {
-     Object *cpu = NULL;
-     Error *local_err = NULL;
-+    CPUX86State *env = NULL;
- 
--    cpu = object_new(typename);
-+    cpu = object_new(MACHINE(pcms)->cpu_type);
-+
-+    env = &X86_CPU(cpu)->env;
-+    env->nr_dies = pcms->smp_dies;
- 
-     object_property_set_uint(cpu, apic_id, "apic-id", &local_err);
-     object_property_set_bool(cpu, true, "realized", &local_err);
-@@ -1546,7 +1550,7 @@ void pc_hot_add_cpu(MachineState *ms, const int64_t id, Error **errp)
-         return;
-     }
- 
--    pc_new_cpu(ms->cpu_type, apic_id, &local_err);
-+    pc_new_cpu(PC_MACHINE(ms), apic_id, &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-         return;
-@@ -1571,8 +1575,7 @@ void pc_cpus_init(PCMachineState *pcms)
-                                                      ms->smp.max_cpus - 1) + 1;
-     possible_cpus = mc->possible_cpu_arch_ids(ms);
-     for (i = 0; i < ms->smp.cpus; i++) {
--        pc_new_cpu(possible_cpus->cpus[i].type, possible_cpus->cpus[i].arch_id,
--                   &error_fatal);
-+        pc_new_cpu(pcms, possible_cpus->cpus[i].arch_id, &error_fatal);
-     }
- }
- 
-@@ -2292,6 +2295,7 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
-     CPUArchId *cpu_slot;
-     X86CPUTopoInfo topo;
-     X86CPU *cpu = X86_CPU(dev);
-+    CPUX86State *env = &cpu->env;
-     MachineState *ms = MACHINE(hotplug_dev);
-     PCMachineState *pcms = PC_MACHINE(hotplug_dev);
-     unsigned int smp_cores = ms->smp.cores;
-@@ -2303,6 +2307,8 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
-         return;
-     }
- 
-+    env->nr_dies = pcms->smp_dies;
-+
-     /*
-      * If APIC ID is not set,
-      * set it based on socket/die/core/thread properties.
--- 
+diff --git a/qapi/machine-target.json b/qapi/machine-target.json
+index 5d7480f6ab..55310a6aa2 100644
+--- a/qapi/machine-target.json
++++ b/qapi/machine-target.json
+@@ -279,6 +279,12 @@
+ #            to introspect properties configurable using -cpu or -global=
+.
+ #            (since 2.9)
+ #
++# @alias-of: Name of CPU model this model is an alias for.  The target o=
+f the
++#            CPU model alias may change depending on the machine type.
++#            Management software is supposed to translate CPU model alia=
+ses
++#            in the VM configuration, because aliases may stop being
++#            migration-safe in the future (since 4.1)
++#
+ # @unavailable-features is a list of QOM property names that
+ # represent CPU model attributes that prevent the CPU from running.
+ # If the QOM property is read-only, that means there's no known
+@@ -302,7 +308,8 @@
+             '*migration-safe': 'bool',
+             'static': 'bool',
+             '*unavailable-features': [ 'str' ],
+-            'typename': 'str' },
++            'typename': 'str',
++            '*alias-of' : 'str' },
+   'if': 'defined(TARGET_PPC) || defined(TARGET_ARM) || defined(TARGET_I3=
+86) || defined(TARGET_S390X) || defined(TARGET_MIPS)' }
+=20
+ ##
+--=20
 2.18.0.rc1.1.g3f1ff2140
 
 
