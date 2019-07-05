@@ -4,83 +4,139 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83D1CC46499
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 17:12:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F2D9C46499
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 17:21:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 088DA20989
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 17:12:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 088DA20989
+	by mail.kernel.org (Postfix) with ESMTPS id 6E11620989
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 17:21:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E11620989
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54998 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55028 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hjRkn-0004AO-VJ
-	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 13:12:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53891)
+	id 1hjRtr-0007lG-CN
+	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 13:21:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56034)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <pbonzini@redhat.com>) id 1hjRhA-0003Pw-RE
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 13:08:31 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hjRsg-0006wW-Bb
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 13:20:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1hjRh8-0007Ab-Cg
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 13:08:24 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:36434)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hjRh7-00077s-5Y
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 13:08:21 -0400
-Received: by mail-wm1-f68.google.com with SMTP id g67so4201891wme.1
- for <qemu-devel@nongnu.org>; Fri, 05 Jul 2019 10:08:21 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language;
- bh=et+2Ji5OJc+DfnAsJcnGgxS9OgTkERVhP6Jdr1JO6ZY=;
- b=P/QNb/H/1TTPF81WdPMqsWqcQAuNw/TcVsqj8YcG7vaqfpEWwtBZBHANr0M+2qVMCd
- QIqe/LP4tATXquRjdbLgqccjRQ7thVo4LPLM07Hw3WaxLLLHiHr7mCcJkAjFdN2Mi6D5
- 401kX1Oqs97VVOIJ4ydYFyJjh4YSH1WKMC4+rUZyF9hXpB72KZaBk6GiVUJHahX/6q/w
- B98Whqo9BQpC/+gNnT1GCct8y9Wc+hKO1Mk3eawnMwvDa8+Myfi8Ttwddy+fc1c5hgqd
- EA051ibNsfAthauT77CtCH9+6CQOjchVZ4U7DKUsoMZhZOsOVQMVD8kZpuTepgWI9hAI
- AEqQ==
-X-Gm-Message-State: APjAAAWJwXPMsxT6/cnj5bBC/1ky+fVLIQhFHzGoAX4bU3PLlifP7Cw1
- TNPu/h2QkOG+vtOUbsrkvKQ0Te56P20=
-X-Google-Smtp-Source: APXvYqwtQ919c24oes/0jeW6navGlC36A8jNa5XhO9A+4CXgmecI6RWOFbFgsdHEn+VU44Ie9CS/GA==
-X-Received: by 2002:a1c:7a15:: with SMTP id v21mr4182654wmc.176.1562346499998; 
- Fri, 05 Jul 2019 10:08:19 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:e943:5a4e:e068:244a?
- ([2001:b07:6468:f312:e943:5a4e:e068:244a])
- by smtp.gmail.com with ESMTPSA id r12sm13873172wrt.95.2019.07.05.10.08.18
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Fri, 05 Jul 2019 10:08:18 -0700 (PDT)
-To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
- Alistair Francis <alistair23@gmail.com>
-References: <97104495f5c945d25315aff1bd618e1a7bacf34c.1561589072.git.alistair.francis@wdc.com>
- <1bd3ffcd-3f91-ecb9-2315-da7125f1dcdd@redhat.com>
- <CAKmqyKPeo4XXVy3onoM4W14N5Nj7CFWX=JpDT-JQQRUPw5CQ3Q@mail.gmail.com>
- <4428dc80-9ace-3bb0-a497-e3d416199bfd@redhat.com>
- <CAKmqyKMRSJTMxZ5c-yyuownYF8vJLYrzr92cE4rkiTdP7tmUzg@mail.gmail.com>
- <CY1PR04MB22682B84C1ABA7FB10752465EDF90@CY1PR04MB2268.namprd04.prod.outlook.com>
- <79c9e21f-06b1-6255-97af-95c08b354c8a@redhat.com>
- <CY1PR04MB22683409CB203BF5042697FBEDF80@CY1PR04MB2268.namprd04.prod.outlook.com>
- <5a741004-fc88-f31a-2abf-70f4a9b0d5a9@redhat.com>
- <BN3PR04MB22577C778C58BC5E2C8DD61FEDF50@BN3PR04MB2257.namprd04.prod.outlook.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <8a5bd434-4c4c-f5ae-cae4-a23f6463a05c@redhat.com>
-Date: Fri, 5 Jul 2019 19:08:17 +0200
+ (envelope-from <jsnow@redhat.com>) id 1hjRsf-00062d-6r
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 13:20:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36530)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>)
+ id 1hjRsc-0005uY-KH; Fri, 05 Jul 2019 13:20:14 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 1BF88368E3;
+ Fri,  5 Jul 2019 17:20:13 +0000 (UTC)
+Received: from [10.10.122.149] (ovpn-122-149.rdu2.redhat.com [10.10.122.149])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 94DA41001B0E;
+ Fri,  5 Jul 2019 17:20:06 +0000 (UTC)
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+References: <20190703215542.16123-1-jsnow@redhat.com>
+ <20190703215542.16123-3-jsnow@redhat.com>
+ <04397b94-63d6-7d2c-77ad-964abe0e0310@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <856930ff-e7f4-6cb8-c2af-c20dc4202629@redhat.com>
+Date: Fri, 5 Jul 2019 13:20:05 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <BN3PR04MB22577C778C58BC5E2C8DD61FEDF50@BN3PR04MB2257.namprd04.prod.outlook.com>
-Content-Type: multipart/mixed; boundary="------------8EC73DB6AA75C7B92F98E351"
+In-Reply-To: <04397b94-63d6-7d2c-77ad-964abe0e0310@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.30]); Fri, 05 Jul 2019 17:20:13 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.128.68
-Subject: Re: [Qemu-devel] [PATCH v1 1/1] hw/scsi: Report errors and sense to
- guests through scsi-block
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2 02/18] drive-backup: create
+ do_backup_common
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,428 +148,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "fam@euphon.net" <fam@euphon.net>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ vsementsov@virtuozzo.com, Juan Quintela <quintela@redhat.com>,
+ Wen Congyang <wencongyang2@huawei.com>,
+ Xie Changlong <xiechanglong.d@gmail.com>,
+ Markus Armbruster <armbru@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is a multi-part message in MIME format.
---------------8EC73DB6AA75C7B92F98E351
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-
-On 05/07/19 12:31, Shinichiro Kawasaki wrote:
->> This way there's generally no need to shoehorn ASC codes into errno.  I
->> still have to test my changes, but I hope to send something within a
->> couple of days.
-> 
-> Thanks for sharing your thoughts. Now I understand your idea.
-> 
-> I'm awaiting your patch. In case you want me to create the patch based on your 
-> idea, please let me know. I can afford some time next week to work on it.
-
-I didn't have time to finish, but since I will be out for part of next
-week, here is what I currently have (untested, somewhat uncompiled).
-It's a bugfix so it can be included after hard freeze.
-
-Thanks!
-
-Paolo
-
---------------8EC73DB6AA75C7B92F98E351
-Content-Type: text/x-patch;
- name="scsi-sense.patch"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
- filename="scsi-sense.patch"
-
-From fdccbd77192ca4450f6e8900bef392fa36242200 Mon Sep 17 00:00:00 2001
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri, 5 Jul 2019 19:07:17 +0200
-Subject: [PATCH 0/5] *** SUBJECT HERE ***
-
-*** BLURB HERE ***
-
-Paolo Bonzini (4):
-  scsi: explicitly list guest-recoverable sense codes
-  scsi: add guest-recoverable ZBC errors
-  iscsi: fix busy/timeout/task set full
-  iscsi: base all handling of check condition on scsi_sense_to_errno
-
-Shinichiro Kawasaki (1):
-  scsi-disk: pass sense correctly for guest-recoverable errors
-
- block/iscsi.c        | 28 +++++++++++------------
- hw/scsi/scsi-disk.c  | 15 ++++++++++---
- include/scsi/utils.h |  1 +
- scsi/utils.c         | 53 +++++++++++++++++++++++++++++++++++++++++---
- 4 files changed, 77 insertions(+), 20 deletions(-)
-
--- 
-2.21.0
-
-From f8a4b9cd0cd878aacbdf4ad4e7a2451c87339dab Mon Sep 17 00:00:00 2001
-From: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Date: Tue, 2 Jul 2019 10:08:00 +0200
-Subject: [PATCH 1/5] scsi-disk: pass sense correctly for guest-recoverable
- errors
-
-When an error was passed down to the guest because it was recoverable,
-the sense length was not copied from the SG_IO data.  As a result,
-the guest saw the CHECK CONDITION status but not the sense data.
-
-Signed-off-by: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- hw/scsi/scsi-disk.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
-
-diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
-index ed7295bfd7..5d3fb3c9d5 100644
---- a/hw/scsi/scsi-disk.c
-+++ b/hw/scsi/scsi-disk.c
-@@ -62,6 +62,7 @@ typedef struct SCSIDiskClass {
-     DMAIOFunc       *dma_readv;
-     DMAIOFunc       *dma_writev;
-     bool            (*need_fua_emulation)(SCSICommand *cmd);
-+    void            (*update_sense)(SCSIRequest *r);
- } SCSIDiskClass;
- 
- typedef struct SCSIDiskReq {
-@@ -438,6 +439,7 @@ static bool scsi_handle_rw_error(SCSIDiskReq *r, int error, bool acct_failed)
- {
-     bool is_read = (r->req.cmd.mode == SCSI_XFER_FROM_DEV);
-     SCSIDiskState *s = DO_UPCAST(SCSIDiskState, qdev, r->req.dev);
-+    SCSIDiskClass *sdc = (SCSIDiskClass *) object_get_class(OBJECT(s));
-     BlockErrorAction action = blk_get_error_action(s->qdev.conf.blk,
-                                                    is_read, error);
- 
-@@ -456,6 +458,7 @@ static bool scsi_handle_rw_error(SCSIDiskReq *r, int error, bool acct_failed)
-             if (error == ECANCELED || error == EAGAIN || error == ENOTCONN ||
-                 error == 0)  {
-                 /* These errors are handled by guest. */
-+                sdc->update_sense(&r->req);
-                 scsi_req_complete(&r->req, *r->status);
-                 return true;
-             }
-@@ -2894,6 +2897,12 @@ static int scsi_block_parse_cdb(SCSIDevice *d, SCSICommand *cmd,
-     }
- }
- 
-+static void scsi_block_update_sense(SCSIRequest *req)
-+{
-+    SCSIDiskReq *r = DO_UPCAST(SCSIDiskReq, req, req);
-+    SCSIBlockReq *br = DO_UPCAST(SCSIBlockReq, req, r);
-+    r->req.sense_len = MIN(br->io_header.sb_len_wr, sizeof(r->req.sense));
-+}
- #endif
- 
- static
-@@ -3059,6 +3068,7 @@ static void scsi_block_class_initfn(ObjectClass *klass, void *data)
-     sc->parse_cdb    = scsi_block_parse_cdb;
-     sdc->dma_readv   = scsi_block_dma_readv;
-     sdc->dma_writev  = scsi_block_dma_writev;
-+    sdc->update_sense = scsi_block_update_sense;
-     sdc->need_fua_emulation = scsi_block_no_fua;
-     dc->desc = "SCSI block device passthrough";
-     dc->props = scsi_block_properties;
--- 
-2.21.0
 
 
-From ab60dfcd4c2bbad79d2bdfae37a88b031917ec99 Mon Sep 17 00:00:00 2001
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 2 Jul 2019 10:23:20 +0200
-Subject: [PATCH 2/5] scsi: explicitly list guest-recoverable sense codes
+On 7/4/19 11:06 AM, Max Reitz wrote:
+> On 03.07.19 23:55, John Snow wrote:
+>> Create a common core that comprises the actual meat of what the backup=
+ API
+>> boundary needs to do, and then switch drive-backup to use it.
+>>
+>> Questions:
+>>  - do_drive_backup now acquires and releases the aio_context in additi=
+on
+>>    to do_backup_common doing the same. Can I drop this from drive_back=
+up?
+>=20
+> I wonder why you don=E2=80=99t just make it a requirement that
+> do_backup_common() is called with the context acquired?
+>=20
 
-It's not really possible to fit all sense codes into errno codes, especially
-in such a way that sense codes can be properly categorized as either.
-guest-recoverable and host-handled.  Just create a new function that
-checks for guest recoverable sense, then scsi_sense_buf_to_errno only
-needs to be called for host handled sense codes.
----
- hw/scsi/scsi-disk.c  |  5 ++---
- include/scsi/utils.h |  1 +
- scsi/utils.c         | 43 +++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 46 insertions(+), 3 deletions(-)
+Ehm, it just honestly didn't occur to me that I could acquire the
+context before doing the input sanitizing.
 
-diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
-index 5d3fb3c9d5..8e95e3e38d 100644
---- a/hw/scsi/scsi-disk.c
-+++ b/hw/scsi/scsi-disk.c
-@@ -454,14 +454,13 @@ static bool scsi_handle_rw_error(SCSIDiskReq *r, int error, bool acct_failed)
-              * pause the host.
-              */
-             assert(r->status && *r->status);
--            error = scsi_sense_buf_to_errno(r->req.sense, sizeof(r->req.sense));
--            if (error == ECANCELED || error == EAGAIN || error == ENOTCONN ||
--                error == 0)  {
-+            if (scsi_sense_buf_is_guest_recoverable(r->req.sense, sizeof(r->req.sense))) {
-                 /* These errors are handled by guest. */
-                 sdc->update_sense(&r->req);
-                 scsi_req_complete(&r->req, *r->status);
-                 return true;
-             }
-+            error = scsi_sense_buf_to_errno(r->req.sense, sizeof(r->req.sense));
-             break;
-         case ENOMEDIUM:
-             scsi_check_condition(r, SENSE_CODE(NO_MEDIUM));
-diff --git a/include/scsi/utils.h b/include/scsi/utils.h
-index 9351b21ead..fee6212e85 100644
---- a/include/scsi/utils.h
-+++ b/include/scsi/utils.h
-@@ -106,6 +106,7 @@ extern const struct SCSISense sense_code_SPACE_ALLOC_FAILED;
- 
- int scsi_sense_to_errno(int key, int asc, int ascq);
- int scsi_sense_buf_to_errno(const uint8_t *sense, size_t sense_size);
-+int scsi_sense_buf_is_guest_recoverable(const uint8_t *sense, size_t sense_size);
- 
- int scsi_convert_sense(uint8_t *in_buf, int in_len,
-                        uint8_t *buf, int len, bool fixed);
-diff --git a/scsi/utils.c b/scsi/utils.c
-index 8738522955..3ad28face1 100644
---- a/scsi/utils.c
-+++ b/scsi/utils.c
-@@ -336,6 +336,38 @@ int scsi_convert_sense(uint8_t *in_buf, int in_len,
-     }
- }
- 
-+static bool scsi_sense_is_guest_recoverable(int key, int asc, int ascq)
-+{
-+    switch (key) {
-+    case NO_SENSE:
-+    case RECOVERED_ERROR:
-+    case UNIT_ATTENTION:
-+    case ABORTED_COMMAND:
-+        return true;
-+    case NOT_READY:
-+    case ILLEGAL_REQUEST:
-+    case DATA_PROTECT:
-+        /* Parse ASCQ */
-+        break;
-+    default:
-+        return false;
-+    }
-+
-+    switch ((asc << 8) | ascq) {
-+    case 0x1a00: /* PARAMETER LIST LENGTH ERROR */
-+    case 0x2000: /* INVALID OPERATION CODE */
-+    case 0x2400: /* INVALID FIELD IN CDB */
-+    case 0x2500: /* LOGICAL UNIT NOT SUPPORTED */
-+    case 0x2600: /* INVALID FIELD IN PARAMETER LIST */
-+
-+    case 0x0401: /* NOT READY, IN PROGRESS OF BECOMING READY */
-+    case 0x0402: /* NOT READY, INITIALIZING COMMAND REQUIRED */
-+        return true;
-+    default:
-+        return false;
-+    }
-+}
-+
- int scsi_sense_to_errno(int key, int asc, int ascq)
- {
-     switch (key) {
-@@ -391,6 +423,17 @@ int scsi_sense_buf_to_errno(const uint8_t *in_buf, size_t in_len)
-     return scsi_sense_to_errno(sense.key, sense.asc, sense.ascq);
- }
- 
-+bool scsi_sense_buf_is_guest_recoverable(const uint8_t *in_buf, size_t in_len)
-+{
-+    SCSISense sense;
-+    if (in_len < 1) {
-+        return false;
-+    }
-+
-+    sense = scsi_parse_sense_buf(in_buf, in_len);
-+    return scsi_sense_to_errno(sense.key, sense.asc, sense.ascq);
-+}
-+
- const char *scsi_command_name(uint8_t cmd)
- {
-     static const char *names[] = {
--- 
-2.21.0
+In this case, it is OK to do it, so I will hoist it back up into
+do_blockdev_backup.
 
+--js
 
-From eca5917fcdf3ea690ee80d6f073d3b915691a499 Mon Sep 17 00:00:00 2001
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 2 Jul 2019 10:01:03 +0200
-Subject: [PATCH 3/5] scsi: add guest-recoverable ZBC errors
+>> Signed-off-by: John Snow <jsnow@redhat.com>
+>> ---
+>>  blockdev.c | 138 ++++++++++++++++++++++++++++++++--------------------=
+-
+>>  1 file changed, 83 insertions(+), 55 deletions(-)
+>>
+>> diff --git a/blockdev.c b/blockdev.c
+>> index 4d141e9a1f..5fd663a7e5 100644
+>> --- a/blockdev.c
+>> +++ b/blockdev.c
+>> @@ -3425,6 +3425,86 @@ out:
+>>      aio_context_release(aio_context);
+>>  }
+>> =20
+>> +static BlockJob *do_backup_common(BackupCommon *backup,
+>> +                                  BlockDriverState *target_bs,
+>> +                                  JobTxn *txn, Error **errp)
+>> +{
+>=20
+> [...]
+>=20
+>> +    job =3D backup_job_create(backup->job_id, bs, target_bs, backup->=
+speed,
+>> +                            backup->sync, bmap, backup->compress,
+>> +                            backup->on_source_error, backup->on_targe=
+t_error,
+>> +                            job_flags, NULL, NULL, txn, &local_err);
+>> +    if (local_err !=3D NULL) {
+>> +        error_propagate(errp, local_err);
+>> +        goto out;
+>> +    }
+>=20
+> Below, you change do_drive_backup() to just pass errp instead of
+> local_err and not do error handling.  Why not do the same here?
+>=20
 
-When I ran basic operations to the zoned storage from the guest via
-scsi-block the following ASCs are reported for write or read commands
-due to unexpected zone status or write pointer status:
+Inertia.
 
-     21h 04h: UNALIGNED WRITE COMMAND
-     21h 05h: WRITE BOUNDARY VIOLATION
-     21h 06h: ATTEMPT TO READ INVALID DATA
-     55h 0Eh: INSUFFICIENT ZONE RESOURCES
+> Other than that:
+>=20
+> Reviewed-by: Max Reitz <mreitz@redhat.com>
+>=20
 
-Reporting these ASCs to the guest, the user applications can handle
-them to manage zone/write pointer status, or help the user application
-developers to understand the failure reason and fix bugs.
-
-Reported-by: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- scsi/utils.c | 5 +++++
- 1 file changed, 5 insertions(+)
-
-diff --git a/scsi/utils.c b/scsi/utils.c
-index 3ad28face1..53274f62d7 100644
---- a/scsi/utils.c
-+++ b/scsi/utils.c
-@@ -360,6 +360,11 @@ static bool scsi_sense_is_guest_recoverable(int key, int asc, int ascq)
-     case 0x2500: /* LOGICAL UNIT NOT SUPPORTED */
-     case 0x2600: /* INVALID FIELD IN PARAMETER LIST */
- 
-+    case 0x2104: /* UNALIGNED WRITE COMMAND */
-+    case 0x2105: /* WRITE BOUNDARY VIOLATION */
-+    case 0x2106: /* ATTEMPT TO READ INVALID DATA */
-+    case 0x550e: /* INSUFFICIENT ZONE RESOURCES */
-+
-     case 0x0401: /* NOT READY, IN PROGRESS OF BECOMING READY */
-     case 0x0402: /* NOT READY, INITIALIZING COMMAND REQUIRED */
-         return true;
--- 
-2.21.0
-
-
-From 594c17e8f6d617d5f234e1d3701cfc54e6804d1a Mon Sep 17 00:00:00 2001
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 2 Jul 2019 10:45:54 +0200
-Subject: [PATCH 4/5] iscsi: fix busy/timeout/task set full
-
-In this case, do_retry was set without calling aio_co_wake, thus never
-waking up the coroutine.
-
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- block/iscsi.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/block/iscsi.c b/block/iscsi.c
-index 267f160bf6..6e238bf0ad 100644
---- a/block/iscsi.c
-+++ b/block/iscsi.c
-@@ -272,7 +272,7 @@ iscsi_co_generic_cb(struct iscsi_context *iscsi, int status,
-                 timer_mod(&iTask->retry_timer,
-                           qemu_clock_get_ms(QEMU_CLOCK_REALTIME) + retry_time);
-                 iTask->do_retry = 1;
--                return;
-+                goto out;
-             }
-         }
-         iTask->err_code = iscsi_translate_sense(&task->sense);
--- 
-2.21.0
-
-
-From fdccbd77192ca4450f6e8900bef392fa36242200 Mon Sep 17 00:00:00 2001
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 2 Jul 2019 11:40:41 +0200
-Subject: [PATCH 5/5] iscsi: base all handling of check condition on
- scsi_sense_to_errno
-
-Now that scsi-disk is not using scsi_sense_to_errno to separate guest-recoverable
-sense codes, we can modify it to simplify iscsi's own sense handling.
-
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- block/iscsi.c | 28 ++++++++++++++--------------
- scsi/utils.c  |  5 ++---
- 2 files changed, 16 insertions(+), 17 deletions(-)
-
-diff --git a/block/iscsi.c b/block/iscsi.c
-index 6e238bf0ad..5817967205 100644
---- a/block/iscsi.c
-+++ b/block/iscsi.c
-@@ -225,9 +225,9 @@ static inline unsigned exp_random(double mean)
- 
- static int iscsi_translate_sense(struct scsi_sense *sense)
- {
--    return - scsi_sense_to_errno(sense->key,
--                                 (sense->ascq & 0xFF00) >> 8,
--                                 sense->ascq & 0xFF);
-+    return scsi_sense_to_errno(sense->key,
-+                               (sense->ascq & 0xFF00) >> 8,
-+                               sense->ascq & 0xFF);
- }
- 
- /* Called (via iscsi_service) with QemuMutex held.  */
-@@ -244,13 +244,6 @@ iscsi_co_generic_cb(struct iscsi_context *iscsi, int status,
- 
-     if (status != SCSI_STATUS_GOOD) {
-         if (iTask->retries++ < ISCSI_CMD_RETRIES) {
--            if (status == SCSI_STATUS_CHECK_CONDITION
--                && task->sense.key == SCSI_SENSE_UNIT_ATTENTION) {
--                error_report("iSCSI CheckCondition: %s",
--                             iscsi_get_error(iscsi));
--                iTask->do_retry = 1;
--                goto out;
--            }
-             if (status == SCSI_STATUS_BUSY ||
-                 status == SCSI_STATUS_TIMEOUT ||
-                 status == SCSI_STATUS_TASK_SET_FULL) {
-@@ -272,11 +265,18 @@ iscsi_co_generic_cb(struct iscsi_context *iscsi, int status,
-                 timer_mod(&iTask->retry_timer,
-                           qemu_clock_get_ms(QEMU_CLOCK_REALTIME) + retry_time);
-                 iTask->do_retry = 1;
--                goto out;
-+            }
-+        } else if (status == SCSI_STATUS_CHECK_CONDITION) {
-+            int error = iscsi_translate_sense(&task->sense);
-+            if (error == EAGAIN) {
-+                error_report("iSCSI CheckCondition: %s",
-+                             iscsi_get_error(iscsi));
-+                iTask->do_retry = 1;
-+            } else {
-+                iTask->err_code = -error;
-+                iTask->err_str = g_strdup(iscsi_get_error(iscsi));
-             }
-         }
--        iTask->err_code = iscsi_translate_sense(&task->sense);
--        iTask->err_str = g_strdup(iscsi_get_error(iscsi));
-     }
- 
- out:
-@@ -974,7 +974,7 @@ iscsi_aio_ioctl_cb(struct iscsi_context *iscsi, int status,
-     if (status < 0) {
-         error_report("Failed to ioctl(SG_IO) to iSCSI lun. %s",
-                      iscsi_get_error(iscsi));
--        acb->status = iscsi_translate_sense(&acb->task->sense);
-+        acb->status = -iscsi_translate_sense(&acb->task->sense);
-     }
- 
-     acb->ioh->driver_status = 0;
-diff --git a/scsi/utils.c b/scsi/utils.c
-index 53274f62d7..7f332ebf1f 100644
---- a/scsi/utils.c
-+++ b/scsi/utils.c
-@@ -379,8 +379,7 @@ int scsi_sense_to_errno(int key, int asc, int ascq)
-     case NO_SENSE:
-     case RECOVERED_ERROR:
-     case UNIT_ATTENTION:
--        /* These sense keys are not errors */
--        return 0;
-+        return EAGAIN;
-     case ABORTED_COMMAND: /* COMMAND ABORTED */
-         return ECANCELED;
-     case NOT_READY:
-@@ -409,7 +408,7 @@ int scsi_sense_to_errno(int key, int asc, int ascq)
-     case 0x2700: /* WRITE PROTECTED */
-         return EACCES;
-     case 0x0401: /* NOT READY, IN PROGRESS OF BECOMING READY */
--        return EAGAIN;
-+        return EINPROGRESS;
-     case 0x0402: /* NOT READY, INITIALIZING COMMAND REQUIRED */
-         return ENOTCONN;
-     default:
--- 
-2.21.0
-
-
---------------8EC73DB6AA75C7B92F98E351--
+Suggestions applied, thank you.
 
