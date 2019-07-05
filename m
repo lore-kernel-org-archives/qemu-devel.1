@@ -2,62 +2,79 @@ Return-Path: <SRS0=wUMn=VC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BF93C46499
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 16:34:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C280BC46499
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 16:36:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 21D3F21721
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 16:34:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21D3F21721
+	by mail.kernel.org (Postfix) with ESMTPS id 9918E216E3
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 16:36:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9918E216E3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54842 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54848 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hjRA4-0002vE-E9
-	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 12:34:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47267)
+	id 1hjRBu-00048d-VC
+	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 12:36:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47668)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.williamson@redhat.com>) id 1hjR8T-00026I-9j
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 12:32:35 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1hjRAa-0003SU-Ee
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 12:34:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.williamson@redhat.com>) id 1hjR8M-0002la-DF
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 12:32:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47710)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
- id 1hjR8H-0007vY-Qq; Fri, 05 Jul 2019 12:32:22 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id ECF7F308222F;
- Fri,  5 Jul 2019 16:31:23 +0000 (UTC)
-Received: from x1.home (ovpn-116-83.phx2.redhat.com [10.3.116.83])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 08EB018657;
- Fri,  5 Jul 2019 16:31:21 +0000 (UTC)
-Date: Fri, 5 Jul 2019 10:31:21 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Message-ID: <20190705103121.30363b9c@x1.home>
-In-Reply-To: <20190705032501.106966-1-aik@ozlabs.ru>
-References: <20190705032501.106966-1-aik@ozlabs.ru>
-Organization: Red Hat
+ (envelope-from <pbonzini@redhat.com>) id 1hjRAZ-0002fd-FF
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 12:34:44 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:53010)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hjRAZ-0002Yh-8H
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 12:34:43 -0400
+Received: by mail-wm1-f67.google.com with SMTP id s3so9800232wms.2
+ for <qemu-devel@nongnu.org>; Fri, 05 Jul 2019 09:34:42 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=fr2kXBCduSPIsghpXfkFcQnUi2J6tezzdHcEXQiqW7s=;
+ b=G5luhCNGAhpfHamWy2w8njK0ZfdiZ+9Lw6X9vk6ruttSqxQ9wxtIVlFoj7XCY/IDGI
+ QJvJVlJvfTXtnMY03dm2on5pSWFvlZkcdzLLFxnMV/qg95B5F9tPOC6jx3YGlMVVGBoK
+ jb4NPeqev/XzhWypYg8JA6l3+dLyApRQE+VGIKYrIQ9/V3sB/8Q5chvncMh8Y63PtZu9
+ wU3QwdvfrQ2Q7mGKXkeCF96QOj0RL9Hypfodwv5ZXdL6Aqln5UjKzvUfrFXlOk2T4Y1E
+ OCoYIg8Qz6D+mCYXGUFhwWUoh3Pgk9tcOzB6LBlt/erG8WZHR6qlGQURmQ1zadYz9atw
+ QPjg==
+X-Gm-Message-State: APjAAAUpLkVLecL4TAYrPVfgJDDXmb8SqAxWIJkvrAcH+xgjgWhggTug
+ bHEtrMZx4FhGfTsVzfdwgr9Wpg==
+X-Google-Smtp-Source: APXvYqzBFc4ZxfMvtuL2D1VIqqzmxQ9JxGrtgnlQX3OpBGu6aLoB49MOTTc99WVJa+XZkqfZpYou2A==
+X-Received: by 2002:a7b:c356:: with SMTP id l22mr4110865wmj.97.1562344481115; 
+ Fri, 05 Jul 2019 09:34:41 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:e943:5a4e:e068:244a?
+ ([2001:b07:6468:f312:e943:5a4e:e068:244a])
+ by smtp.gmail.com with ESMTPSA id z6sm7026708wrw.2.2019.07.05.09.34.40
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Fri, 05 Jul 2019 09:34:40 -0700 (PDT)
+To: Julio Montes <julio.montes@intel.com>, qemu-devel@nongnu.org
+References: <20190703154958.29004-1-julio.montes@intel.com>
+ <20190705143554.10295-1-julio.montes@intel.com>
+ <20190705143554.10295-2-julio.montes@intel.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <b9e3630f-1ce1-2833-8133-336de83faab9@redhat.com>
+Date: Fri, 5 Jul 2019 18:34:39 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20190705143554.10295-2-julio.montes@intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Fri, 05 Jul 2019 16:31:32 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [RFC PATCH qemu] vfio-quirks: Pass the actual
- parent when deleting a memory region
+ [fuzzy]
+X-Received-From: 209.85.128.67
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] hw/i386: Fix linker error when
+ ISAPC is disabled
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,67 +86,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: sgarzare@redhat.com, mst@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri,  5 Jul 2019 13:25:01 +1000
-Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
-
-> The usual way of using a quirk's MR is to add it as a subregion of a BAR
-> as this is what quirks are for. However there is less than standard user
-> of this - NVLink2-enabled NVIDIA GPU which exposes a GPU RAM and a ATSD
-> 64K region outside of PCI MMIO window so these MRs get the system address
-> space root as a parent. So when the user unplugs such device, assert
-> occurs:
-> 
-> qemu-system-ppc64: /home/aik/p/qemu/memory.c:2391: memory_region_del_subregion: Assertion `subregion->container == mr' failed.
-> 
-> This passes the actual parent MR to memory_region_del_subregion() in
-> vfio_bar_quirk_exit.
-> 
-> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-> ---
-> 
-> This removes an extra sanity check that a quirk has a correct parent;
-> I am not sure if it is very useful.
-> I could use the "system" MR if quirk->mem[i].container==get_system_memory()
-> and quirk->mem[i].container otherwise to keep that assert working.
-> 
-> Also this does not help with the actual device removal much because of
-> the closed source driver nature - the associated service
-> (nvidia-persistenced, responsible for onlining GPU memory) crashes
-> the guest system but at least the user can reboot the guest after
-> the crash which is not as bad as assert.
+On 05/07/19 16:35, Julio Montes wrote:
+> v2: include config-devices.h to use CONFIG_IDE_ISA
 > 
 > ---
->  hw/vfio/pci-quirks.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+> In pc_init1(), ISA IDE is initialized without checking if ISAPC or IDE_ISA
+> configs are enabled. This results in a link error when
+> CONFIG_ISAPC is set to 'n' in the file default-configs/i386-softmmu.mak:
 > 
-> diff --git a/hw/vfio/pci-quirks.c b/hw/vfio/pci-quirks.c
-> index 27dddbc8fa3e..ef2e182c1d36 100644
-> --- a/hw/vfio/pci-quirks.c
-> +++ b/hw/vfio/pci-quirks.c
-> @@ -1896,7 +1896,8 @@ void vfio_bar_quirk_exit(VFIOPCIDevice *vdev, int nr)
+> hw/i386/pc_piix.o: In function `pc_init1':
+> hw/i386/pc_piix.c:261: undefined reference to `isa_ide_init'
+> hw/i386/pc_piix.c:261: undefined reference to `isa_ide_init'
+> 
+> Place ide_isa code under #ifdef CONFIG_IDE_ISA to fix linker errors
+> 
+> Signed-off-by: Julio Montes <julio.montes@intel.com>
+> ---
+>  hw/i386/pc_piix.c    | 11 ++++++++---
+>  include/qemu/osdep.h |  1 +
+>  2 files changed, 9 insertions(+), 3 deletions(-)
+> 
+> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+> index f29de58636..c7d4645a3f 100644
+> --- a/hw/i386/pc_piix.c
+> +++ b/hw/i386/pc_piix.c
+> @@ -61,9 +61,11 @@
+> 
+>  #define MAX_IDE_BUS 2
+> 
+> +#ifdef CONFIG_IDE_ISA
+>  static const int ide_iobase[MAX_IDE_BUS] = { 0x1f0, 0x170 };
+>  static const int ide_iobase2[MAX_IDE_BUS] = { 0x3f6, 0x376 };
+>  static const int ide_irq[MAX_IDE_BUS] = { 14, 15 };
+> +#endif
+> 
+>  /* PC hardware initialisation */
+>  static void pc_init1(MachineState *machine,
+> @@ -254,7 +256,10 @@ static void pc_init1(MachineState *machine,
 >          }
->  
->          for (i = 0; i < quirk->nr_mem; i++) {
-> -            memory_region_del_subregion(bar->region.mem, &quirk->mem[i]);
-> +            memory_region_del_subregion(quirk->mem[i].container,
-> +                                        &quirk->mem[i]);
+>          idebus[0] = qdev_get_child_bus(&dev->qdev, "ide.0");
+>          idebus[1] = qdev_get_child_bus(&dev->qdev, "ide.1");
+> -    } else {
+> +        pc_cmos_init(pcms, idebus[0], idebus[1], rtc_state);
+> +    }
+> +#ifdef CONFIG_IDE_ISA
+> +else {
+>          for(i = 0; i < MAX_IDE_BUS; i++) {
+>              ISADevice *dev;
+>              char busname[] = "ide.0";
+> @@ -268,9 +273,9 @@ static void pc_init1(MachineState *machine,
+>              busname[4] = '0' + i;
+>              idebus[i] = qdev_get_child_bus(DEVICE(dev), busname);
 >          }
+> +        pc_cmos_init(pcms, idebus[0], idebus[1], rtc_state);
 >      }
->  }
+> -
+> -    pc_cmos_init(pcms, idebus[0], idebus[1], rtc_state);
+> +#endif
+> 
+>      if (pcmc->pci_enabled && machine_usb(machine)) {
+>          pci_create_simple(pci_bus, piix3_devfn + 2, "piix3-usb-uhci");
+> diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
+> index af2b91f0b8..f1c682e52c 100644
+> --- a/include/qemu/osdep.h
+> +++ b/include/qemu/osdep.h
+> @@ -29,6 +29,7 @@
+> 
+>  #include "config-host.h"
+>  #ifdef NEED_CPU_H
+> +#include "config-devices.h"
+>  #include "config-target.h"
+>  #else
+>  #include "exec/poison.h"
+> --
+> 2.17.2
+> 
 
-NAK
+Queued, thanks.
 
-struct MemoryRegion {
-    Object parent_obj;
-
-    /* All fields are private - violators will be prosecuted */
-    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    ...
-    MemoryRegion *container;
+Paolo
 
