@@ -6,77 +6,86 @@ X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3846CC46499
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 17:07:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 360F1C46499
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 17:07:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0AB49216E3
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 17:07:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0AB49216E3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0B662216E3
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 17:07:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B662216E3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54988 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54990 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hjRgJ-0002CN-En
-	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 13:07:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53551)
+	id 1hjRgc-0002bk-BB
+	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 13:07:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53631)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hjRfD-0001QV-15
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 13:06:24 -0400
+ (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hjRfP-0001hg-9X
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 13:06:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hjRfB-00047N-6T
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 13:06:22 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:44915)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hjRfA-00045C-W5
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 13:06:21 -0400
-Received: by mail-wr1-f68.google.com with SMTP id b2so9377808wrx.11
- for <qemu-devel@nongnu.org>; Fri, 05 Jul 2019 10:06:20 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=g7Zjgn9ccbxMWD7R6vbyKhMxyc8I0phsWXHyjwKi3Bg=;
- b=S0fx3u+ufW/zIGD0SOUIPECzd/zNqcFwrYXOZVXESWGeDmFY3dixLaEQbXApBYfiVu
- ilbn3KX8l6nowj1AJQkGkmqz4wBHryoGwHQZHB/E3tl3uAFgxyk011rdj/WntprF1SpY
- HBjocBLDmOf83N6Ipj/OxNKlbdAgZbtEkQ9LiUPepiR1qSTt+3wiPeUKAGKvHR4l9Ws4
- 56nU0Us0yYk2AfWumLSfAcjnbNfSTKGKfZt2rn+DCQ3qk3qgND2M3PkN+1lLbHCqfaIv
- dp4nfIz8Qi4WrZvhEoGsJBwIVdFiW1Bgrz342CFIF5/C7x7zTxLfLYaVAQWCTUFMCb5k
- lIdg==
-X-Gm-Message-State: APjAAAXKZJPshqpIWMD/fIdaYERqoQXsvxSG2pNIGR9EeRzDZxXUFHZM
- jdv+v/T4rxmoqtGAFpjEk6xytw==
-X-Google-Smtp-Source: APXvYqw9j3Ol+WNJZcg/6X3bvovItST9nM9FigpNe0ldrE1zNzuiXDV+EW0NCHiYER5pf773tRIkyw==
-X-Received: by 2002:a5d:4a46:: with SMTP id v6mr4810283wrs.105.1562346379327; 
- Fri, 05 Jul 2019 10:06:19 -0700 (PDT)
-Received: from [192.168.1.38] (56.red-88-18-140.staticip.rima-tde.net.
- [88.18.140.56])
- by smtp.gmail.com with ESMTPSA id f7sm8247894wrv.38.2019.07.05.10.06.18
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Fri, 05 Jul 2019 10:06:18 -0700 (PDT)
-To: Francisco Iglesias <frasse.iglesias@gmail.com>
-References: <20190705150850.4967-1-philmd@redhat.com>
- <20190705150850.4967-2-philmd@redhat.com>
- <20190705155338.duhw5hw4tnaixyp4@fralle-msi>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <a6a359ac-6cbf-b7bf-ab18-096976110483@redhat.com>
-Date: Fri, 5 Jul 2019 19:06:17 +0200
+ (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hjRfO-0004Tj-73
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 13:06:35 -0400
+Received: from mail.ilande.co.uk ([46.43.2.167]:49110
+ helo=mail.default.ilande.uk0.bigv.io)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1hjRfO-0004QU-0j
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 13:06:34 -0400
+Received: from host109-146-132-17.range109-146.btcentralplus.com
+ ([109.146.132.17] helo=[192.168.1.65])
+ by mail.default.ilande.uk0.bigv.io with esmtpsa
+ (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
+ (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1hjReA-0002LT-Nx; Fri, 05 Jul 2019 18:05:19 +0100
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
+References: <20190705132954.19500-1-alex.bennee@linaro.org>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
+ mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
+ 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
+ E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
+ PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
+ PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
+ AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
+ OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
+ NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
+ mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
+ z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
+ T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
+ DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
+ y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
+ 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
+ 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
+ YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
+ Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
+ BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
+ opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
+ NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
+ Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
+ KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
+ imgcU9TTGC5qd9g=
+Message-ID: <0924e73d-e098-01ee-67d8-3747116bef1e@ilande.co.uk>
+Date: Fri, 5 Jul 2019 18:05:55 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <20190705155338.duhw5hw4tnaixyp4@fralle-msi>
+In-Reply-To: <20190705132954.19500-1-alex.bennee@linaro.org>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Language: en-GB
 Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 109.146.132.17
+X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
+X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
+X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.221.68
-Subject: Re: [Qemu-devel] [PATCH v3 1/2] hw/ssi/xilinx_spips: Convert
- lqspi_read() to read_with_attrs
+X-Received-From: 46.43.2.167
+Subject: Re: [Qemu-devel] [PATCH for 4.1] gdbstub: revert to previous
+ set_reg behaviour
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,87 +97,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Alistair Francis <alistair@alistair23.me>, qemu-devel@nongnu.org,
- Prasad J Pandit <ppandit@redhat.com>, Lei Sun <slei.casper@gmail.com>,
- qemu-arm@nongnu.org, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Jon Doron <arilou@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/5/19 5:53 PM, Francisco Iglesias wrote:
-> Hi Philippe,
-> 
-> On [2019 Jul 05] Fri 17:08:49, Philippe Mathieu-Daudé wrote:
->> In the next commit we will implement the write_with_attrs()
->> handler. To avoid using different APIs, convert the read()
->> handler first.
->>
->> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
->> ---
->>  hw/ssi/xilinx_spips.c | 20 ++++++++++----------
->>  1 file changed, 10 insertions(+), 10 deletions(-)
->>
->> diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
->> index 8115bb6d46..e80619aece 100644
->> --- a/hw/ssi/xilinx_spips.c
->> +++ b/hw/ssi/xilinx_spips.c
->> @@ -1202,27 +1202,27 @@ static void lqspi_load_cache(void *opaque, hwaddr addr)
->>      }
->>  }
->>  
->> -static uint64_t
->> -lqspi_read(void *opaque, hwaddr addr, unsigned int size)
->> +static MemTxResult lqspi_read(void *opaque, hwaddr addr, uint64_t *value,
->> +                              unsigned size, MemTxAttrs attrs)
->>  {
->> -    XilinxQSPIPS *q = opaque;
->> -    uint32_t ret;
->> +    XilinxQSPIPS *q = XILINX_QSPIPS(opaque);
->>  
->>      if (addr >= q->lqspi_cached_addr &&
->>              addr <= q->lqspi_cached_addr + LQSPI_CACHE_SIZE - 4) {
->>          uint8_t *retp = &q->lqspi_buf[addr - q->lqspi_cached_addr];
->> -        ret = cpu_to_le32(*(uint32_t *)retp);
->> -        DB_PRINT_L(1, "addr: %08x, data: %08x\n", (unsigned)addr,
->> -                   (unsigned)ret);
->> -        return ret;
->> +        *value = cpu_to_le32(*(uint32_t *)retp);
->> +        DB_PRINT_L(1, "addr: %08" HWADDR_PRIx ", data: %08" PRIx64 "\n",
->> +                   addr, *value);
->>      } else {
->>          lqspi_load_cache(opaque, addr);
->> -        return lqspi_read(opaque, addr, size);
->> +        lqspi_read(opaque, addr, value, size, attrs);
-> 
-> If you don't want to leave the return value floating you can always keep the
-> 'return' (I'm unsure if coverity will complain about that).
+On 05/07/2019 14:29, Alex Bennée wrote:
 
-Ah, I missed that, I'll fix.
-
+> The refactoring of handle_set_reg missed the fact we previously had
+> responded with an empty packet when we were not using XML based
+> protocols. This broke the fallback behaviour for architectures that
+> don't have registers defined in QEMU's gdb-xml directory.
 > 
-> Either way:
+> Revert to the previous behaviour and clean up the commentary for what
+> is going on.
 > 
-> Reviewed-by: Francisco Iglesias <frasse.iglesias@gmail.com>
-
-Thanks!
-
-I'll wait some more time of other want to review, then I'll respin with
-the typo you corrected in the 2nd patch fixed.
-
+> Fixes: 62b3320bddd
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> Cc: Jon Doron <arilou@gmail.com>
+> Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> ---
+>  gdbstub.c | 18 ++++++++++++------
+>  1 file changed, 12 insertions(+), 6 deletions(-)
 > 
->>      }
->> +
->> +    return MEMTX_OK;
->>  }
->>  
->>  static const MemoryRegionOps lqspi_ops = {
->> -    .read = lqspi_read,
->> +    .read_with_attrs = lqspi_read,
->>      .endianness = DEVICE_NATIVE_ENDIAN,
->>      .valid = {
->>          .min_access_size = 1,
->> -- 
->> 2.20.1
->>
+> diff --git a/gdbstub.c b/gdbstub.c
+> index ea3349d1aa..b6df7ee25a 100644
+> --- a/gdbstub.c
+> +++ b/gdbstub.c
+> @@ -1669,12 +1669,23 @@ static void handle_remove_bp(GdbCmdContext *gdb_ctx, void *user_ctx)
+>      put_packet(gdb_ctx->s, "E22");
+>  }
+>  
+> +/*
+> + * handle_set/get_reg
+> + *
+> + * Older gdb are really dumb, and don't use 'G/g' if 'P/p' is available.
+> + * This works, but can be very slow. Anything new enough to understand
+> + * XML also knows how to use this properly. However to use this we
+> + * need to define a local XML file as well as be talking to a
+> + * reasonably modern gdb. Responding with an empty packet will cause
+> + * the remote gdb to fallback to older methods.
+> + */
+> +
+>  static void handle_set_reg(GdbCmdContext *gdb_ctx, void *user_ctx)
+>  {
+>      int reg_size;
+>  
+>      if (!gdb_has_xml) {
+> -        put_packet(gdb_ctx->s, "E00");
+> +        put_packet(gdb_ctx->s, "");
+>          return;
+>      }
+>  
+> @@ -1694,11 +1705,6 @@ static void handle_get_reg(GdbCmdContext *gdb_ctx, void *user_ctx)
+>  {
+>      int reg_size;
+>  
+> -    /*
+> -     * Older gdb are really dumb, and don't use 'g' if 'p' is avaialable.
+> -     * This works, but can be very slow.  Anything new enough to
+> -     * understand XML also knows how to use this properly.
+> -     */
+>      if (!gdb_has_xml) {
+>          put_packet(gdb_ctx->s, "");
+>          return;
+> 
+
+Works for me - thanks for the quick response!
+
+Tested-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+
+
+ATB,
+
+Mark.
 
