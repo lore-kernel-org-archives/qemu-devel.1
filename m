@@ -2,93 +2,60 @@ Return-Path: <SRS0=wUMn=VC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_SBL,URIBL_SBL_A autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DA3DC4649B
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 15:36:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B080C46499
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 15:42:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E785121721
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 15:36:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E785121721
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id D3F592184C
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 15:42:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D3F592184C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54214 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54248 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hjQFp-0006XM-RC
-	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 11:36:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34321)
+	id 1hjQMK-0000wo-KY
+	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 11:42:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35473)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <borntraeger@de.ibm.com>) id 1hjQDn-0005lB-NF
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 11:34:01 -0400
+ (envelope-from <berrange@redhat.com>) id 1hjQLe-0000G4-4F
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 11:42:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <borntraeger@de.ibm.com>) id 1hjQDg-0008CM-QQ
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 11:33:55 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:6366)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
- id 1hjQDg-00041a-Fu
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 11:33:52 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x65FVqlX075845
- for <qemu-devel@nongnu.org>; Fri, 5 Jul 2019 11:32:57 -0400
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2tj7chd168-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Fri, 05 Jul 2019 11:32:56 -0400
-Received: from localhost
- by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
- Fri, 5 Jul 2019 16:32:54 +0100
-Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
- by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Fri, 5 Jul 2019 16:32:52 +0100
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com
- [9.149.105.232])
- by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
- id x65FWolh35324318
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 5 Jul 2019 15:32:50 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 7D0F352051;
- Fri,  5 Jul 2019 15:32:50 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
- by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTPS id 5CF185204F;
- Fri,  5 Jul 2019 15:32:50 +0000 (GMT)
-Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 25651)
- id 04660E00C5; Fri,  5 Jul 2019 17:32:50 +0200 (CEST)
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-To: Cornelia Huck <cohuck@redhat.com>
-Date: Fri,  5 Jul 2019 17:32:49 +0200
-X-Mailer: git-send-email 2.21.0
+ (envelope-from <berrange@redhat.com>) id 1hjQLc-0001OU-QH
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 11:42:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42058)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hjQLc-0001An-IG
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 11:42:04 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id DD3BE301E111;
+ Fri,  5 Jul 2019 15:42:01 +0000 (UTC)
+Received: from localhost.localdomain.com (ovpn-112-48.ams2.redhat.com
+ [10.36.112.48])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9073E772A7;
+ Fri,  5 Jul 2019 15:41:56 +0000 (UTC)
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Fri,  5 Jul 2019 16:41:54 +0100
+Message-Id: <20190705154154.9305-1-berrange@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 19070515-0020-0000-0000-000003509241
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19070515-0021-0000-0000-000021A435D3
-Message-Id: <20190705153249.12525-1-borntraeger@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
- definitions=2019-07-05_05:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1907050189
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
-Subject: [Qemu-devel] [PATCH] s390x/cpumodel: Set up CPU model for AQIC
- interception
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.41]); Fri, 05 Jul 2019 15:42:01 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH v3] doc: document that the monitor console is a
+ privileged control interface
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,90 +67,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Tony Krowiak <akrowiak@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>,
- David Hildenbrand <david@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- qemu-s390x <qemu-s390x@nongnu.org>, Richard Henderson <rth@twiddle.net>
+Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ Prasad J Pandit <pjp@fedoraproject.org>, Stefan Hajnoczi <stefanha@gmail.com>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ P J P <ppandit@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Pierre Morel <pmorel@linux.ibm.com>
+A supposed exploit of QEMU was recently announced as CVE-2019-12928
+claiming that the monitor console was insecure because the "migrate"
+command enabled arbitrary command execution for a remote attacker.
 
-Let's add support for the AP-Queue interruption facility to the CPU
-model.
+To be a security risk the user launching QEMU must have configured
+the monitor in a way that allows for other users to access it. The
+exploit report quoted use of the "tcp" character device backend for
+QMP.
 
-The S390_FEAT_AP_QUEUE_INTERRUPT_CONTROL, CPU facility indicates
-whether the PQAP instruction with the AQIC command is available
-to the guest.
-This feature will be enabled only if the AP instructions are
-available on the linux host and AQIC facility is installed on
-the host.
+This would indeed allow any network user to connect to QEMU and
+execute arbitrary commands, however, this is not a flaw in QEMU.
+It is the normal expected behaviour of the monitor console and the
+commands it supports. Given a monitor connection, there are many
+ways to access host file system content besides the migrate command.
 
-This feature must be turned on from userspace to intercept AP
-instructions on the KVM guest. The QEMU command line to turn
-this feature on looks something like this:
+The reality is that the monitor console (whether QMP or HMP) is
+considered a privileged interface to QEMU and as such must only
+be made available to trusted users. IOW, making it available with
+no authentication over TCP is simply a, very serious, user
+configuration error not a security flaw in QEMU itself.
 
-    qemu-system-s390x ... -cpu xxx,apqi=on ...
-or
-    ... -cpu host
+The one thing this bogus security report highlights though is that
+we have not clearly documented the security implications around the
+use of the monitor. Add a few paragraphs of text to the security
+docs explaining why the monitor is a privileged interface and making
+a recommendation to only use the UNIX socket character device backend.
 
-Right now AP pass-through devices do not support migration,
-which means that we do not have to take care of migrating
-the interrupt data:
-virsh migrate apguest --live qemu+ssh://root@target.lan/system
-error: Requested operation is not valid: domain has assigned non-USB host devices
-
-Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-Reviewed-by: Tony Krowiak <akrowiak@linux.ibm.com>
-Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
-Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
-Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-[rebase to newest qemu and fixup description]
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Prasad J Pandit <pjp@fedoraproject.org>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 ---
- target/s390x/cpu_features_def.inc.h | 1 +
- target/s390x/cpu_models.c           | 1 +
- target/s390x/gen-features.c         | 1 +
- 3 files changed, 3 insertions(+)
 
-diff --git a/target/s390x/cpu_features_def.inc.h b/target/s390x/cpu_features_def.inc.h
-index c20c780f2ea7..ef190e2fc783 100644
---- a/target/s390x/cpu_features_def.inc.h
-+++ b/target/s390x/cpu_features_def.inc.h
-@@ -77,6 +77,7 @@ DEF_FEAT(SEMAPHORE_ASSIST, "sema", STFL, 59, "Semaphore-assist facility")
- DEF_FEAT(TIME_SLICE_INSTRUMENTATION, "tsi", STFL, 60, "Time-slice Instrumentation facility")
- DEF_FEAT(MISC_INSTRUCTION_EXT3, "minste3", STFL, 61, "Miscellaneous-Instruction-Extensions Facility 3")
- DEF_FEAT(RUNTIME_INSTRUMENTATION, "ri", STFL, 64, "CPU runtime-instrumentation facility")
-+DEF_FEAT(AP_QUEUE_INTERRUPT_CONTROL, "apqi", STFL, 65, "AP-Queue interruption facility")
- DEF_FEAT(ZPCI, "zpci", STFL, 69, "z/PCI facility")
- DEF_FEAT(ADAPTER_EVENT_NOTIFICATION, "aen", STFL, 71, "General-purpose-adapter-event-notification facility")
- DEF_FEAT(ADAPTER_INT_SUPPRESSION, "ais", STFL, 72, "General-purpose-adapter-interruption-suppression facility")
-diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
-index 2cb09c078055..1d16d7d5e794 100644
---- a/target/s390x/cpu_models.c
-+++ b/target/s390x/cpu_models.c
-@@ -818,6 +818,7 @@ static void check_consistency(const S390CPUModel *model)
-         { S390_FEAT_PTFF_QTOUE, S390_FEAT_MULTIPLE_EPOCH },
-         { S390_FEAT_PTFF_STOE, S390_FEAT_MULTIPLE_EPOCH },
-         { S390_FEAT_PTFF_STOUE, S390_FEAT_MULTIPLE_EPOCH },
-+        { S390_FEAT_AP_QUEUE_INTERRUPT_CONTROL, S390_FEAT_AP },
-     };
-     int i;
- 
-diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
-index af06be3e3b98..9f216219ff53 100644
---- a/target/s390x/gen-features.c
-+++ b/target/s390x/gen-features.c
-@@ -519,6 +519,7 @@ static uint16_t full_GEN12_GA1[] = {
-     S390_FEAT_EDAT_2,
-     S390_FEAT_SIDE_EFFECT_ACCESS_ESOP2,
-     S390_FEAT_AP_QUERY_CONFIG_INFO,
-+    S390_FEAT_AP_QUEUE_INTERRUPT_CONTROL,
-     S390_FEAT_AP_FACILITIES_TEST,
-     S390_FEAT_AP,
- };
--- 
+Changed in v3:
+
+ - More copy editing from review feedback (Markus, PJP, Alex)
+
+Changed in v2:
+
+ - Addressed misc typos (Eric / Philippe)
+
+ docs/security.texi | 36 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 36 insertions(+)
+
+diff --git a/docs/security.texi b/docs/security.texi
+index 927764f1e6..0d6b30edfc 100644
+--- a/docs/security.texi
++++ b/docs/security.texi
+@@ -129,3 +129,39 @@ those resources that were granted to it.
+ system calls that are not needed by QEMU, thereby reducing the host kern=
+el
+ attack surface.
+ @end itemize
++
++@section Sensitive configurations
++
++There are aspects of QEMU that can have security implications which user=
+s &
++management applications must be aware of.
++
++@subsection Monitor console (QMP and HMP)
++
++The monitor console (whether used with QMP or HMP) provides an interface
++to dynamically control many aspects of QEMU's runtime operation. Many of=
+ the
++commands exposed will instruct QEMU to access content on the host file s=
+ystem
++and/or trigger spawning of external processes.
++
++For example, the @code{migrate} command allows for the spawning of arbit=
+rary
++processes for the purpose of tunnelling the migration data stream. The
++@code{blockdev-add} command instructs QEMU to open arbitrary files, expo=
+sing
++their content to the guest as a virtual disk.
++
++Unless QEMU is otherwise confined using technologies such as SELinux, Ap=
+pArmor,
++or Linux namespaces, the monitor console should be considered to have pr=
+ivileges
++equivalent to those of the user account QEMU is running under.
++
++It is further important to consider the security of the character device=
+ backend
++over which the monitor console is exposed. It needs to have protection a=
+gainst
++malicious third parties which might try to make unauthorized connections=
+, or
++perform man-in-the-middle attacks. Many of the character device backends=
+ do not
++satisfy this requirement and so must not be used for the monitor console=
+.
++
++The general recommendation is that the monitor console should be exposed=
+ over
++a UNIX domain socket backend to the local host only. Use of the TCP base=
+d
++character device backend is inappropriate unless configured to use both =
+TLS
++encryption and authorization control policy on client connections.
++
++In summary, the monitor console is considered a privileged control inter=
+face to
++QEMU and as such should only be made accessible to a trusted management
++application or user.
+--=20
 2.21.0
 
 
