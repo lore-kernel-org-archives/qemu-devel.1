@@ -6,66 +6,67 @@ X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E991C4649C
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 14:51:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8460AC4649B
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 15:01:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E927221721
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 14:51:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E927221721
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 5D39321738
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 15:01:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D39321738
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53924 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53990 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hjPYL-0001PI-2I
-	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 10:51:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54362)
+	id 1hjPiT-0005Rv-5M
+	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 11:01:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56092)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bounces@canonical.com>) id 1hjPXo-0000y1-Lo
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 10:50:38 -0400
+ (envelope-from <bounces@canonical.com>) id 1hjPgj-0004sG-Gt
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 10:59:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1hjPXn-0001VB-J5
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 10:50:36 -0400
-Received: from indium.canonical.com ([91.189.90.7]:55436)
+ (envelope-from <bounces@canonical.com>) id 1hjPgh-0000Kg-D8
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 10:59:49 -0400
+Received: from indium.canonical.com ([91.189.90.7]:57044)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1hjPXn-0001Jn-Cs
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 10:50:35 -0400
+ id 1hjPgh-0008SR-5u
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 10:59:47 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1hjPXk-0001IG-Tp
- for <qemu-devel@nongnu.org>; Fri, 05 Jul 2019 14:50:32 +0000
+ id 1hjPgc-0002RE-Sb
+ for <qemu-devel@nongnu.org>; Fri, 05 Jul 2019 14:59:42 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id DFA832E80C9
- for <qemu-devel@nongnu.org>; Fri,  5 Jul 2019 14:50:32 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id CAA142E80CD
+ for <qemu-devel@nongnu.org>; Fri,  5 Jul 2019 14:59:42 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 05 Jul 2019 14:42:01 -0000
-From: Moshe Immerman <1835477@bugs.launchpad.net>
+Date: Fri, 05 Jul 2019 14:48:18 -0000
+From: =?utf-8?q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Tags: mips testcase
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: moshloop
-X-Launchpad-Bug-Reporter: Moshe Immerman (moshloop)
-X-Launchpad-Bug-Modifier: Moshe Immerman (moshloop)
-References: <156230276883.25246.16130789765520855631.malonedeb@soybean.canonical.com>
-Message-Id: <156233772141.22911.17573135422599416222.malone@chaenomeles.canonical.com>
+X-Launchpad-Bug-Commenters: ajbennee janitor megari th-huth v-adrien
+X-Launchpad-Bug-Reporter: AH (v-adrien)
+X-Launchpad-Bug-Modifier: =?utf-8?q?Alex_Benn=C3=A9e_=28ajbennee=29?=
+References: <20150606150101.12665.95850.malonedeb@soybean.canonical.com>
+Message-Id: <156233809816.21113.10714261367390158519.malone@gac.canonical.com>
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com); Revision="19007";
  Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: aa5324219dd86c4a9c7e846ee49fbf204cd6dc2b
+X-Launchpad-Hash: 79e43e3c59a1bc8a4bdb816be455109381d2eb3b
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1835477] Re: Converting qcow2 to vmdk on MacOSX
- results in a non-bootable image
+Subject: [Qemu-devel] [Bug 1462640] Re: shmat fails on 32-to-64 setup
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 List-Id: <qemu-devel.nongnu.org>
@@ -76,38 +77,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1835477 <1835477@bugs.launchpad.net>
+Reply-To: Bug 1462640 <1462640@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Try the solutions in 1828508 ( -o
-adapter_type=3Dlsilogic,subformat=3DmonolithicFlat)  1776920 ( -S 0 ) do not
-work either
+Erm isn't your 64bit pointer being truncated when you build for 32 bit?
 
-What other steps can I take to troubleshoot?
+** Tags added: mips testcase
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1835477
+https://bugs.launchpad.net/bugs/1462640
 
 Title:
-  Converting qcow2 to vmdk on MacOSX results in a non-bootable image
+  shmat fails on 32-to-64 setup
 
 Status in QEMU:
-  New
+  Confirmed
 
 Bug description:
-  When using qemu-img convert -O vmdk  with version 3.1.0 or 4.0.0 on
-  OSX (10.14.3) with a qcow2 image  (https://cloud-
-  images.ubuntu.com/bionic/20190703/bionic-server-cloudimg-amd64.img),
-  the resulting image is not bootable.
+  =
 
-  Running the same command on Ubuntu 18.04 results in a bootable image
-  as expected
+  I am trying to run a guest mips32 program (user mode) on a x86_64 host. T=
+he program fails on a call to shmat() reproducibly. when digging into this =
+problem, I could make a small guest POC that fails when compiled as i386 (-=
+m32) running on a x86_64 host, but pass when compiled as 64bit. The problem=
+ has to do with mmap flags.
+
+  From what I can understand, when running 32bits guests programs, qemu
+  reserve the whole guest virtual space with an mmap call. That mmap
+  call specifys MAP:PRIVATE flag. When shmat is called, it tries to make
+  part of that region MAP_SHARED and that fails.
+
+  As a possible fix, it looks like it is possible to first unmap the shm
+  region before calling shmat.
+
+  steps to reproduce: =
+
+  1 - create a file shm.c with content below
+  2 - compile with: gcc -m32 shm.c -o shm32
+  3 - run on a x86_64 host: qemu-i386 ./shm32 =
+
+  4 - observe shmat fails, by returning ptr -1
+
+  5- compile without -m32: : gcc shm.c -o shm64
+  6 - observe it pass: qemu-x84_64 ./shm64
+
+
+  #include <sys/ipc.h>
+  #include <sys/shm.h>
+  #include <sys/mman.h>
+  #include <stdio.h>
+
+  int main()
+  {
+      struct shmid_ds shm_desc;
+      int err =3D 0;
+      int id =3D shmget(IPC_PRIVATE, 688128, IPC_CREAT|IPC_EXCL|0666);
+      err =3D shmctl(id, IPC_STAT, &shm_desc);
+      const void *at =3D 0x7f7df38ea000;
+      void* ptr =3D shmat(id, at, 0);
+      printf( "got err %d, ptr %p\n", err, ptr );
+  }
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1835477/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1462640/+subscriptions
 
