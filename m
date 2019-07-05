@@ -2,63 +2,67 @@ Return-Path: <SRS0=wUMn=VC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21120C5B57D
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 05:24:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C982BC5B57D
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 07:05:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DB490218A3
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 05:24:56 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="fjv+cF4M"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB490218A3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id 9D49F21670
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 07:05:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D49F21670
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49868 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50036 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hjGiN-0008Mm-S3
-	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 01:24:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53127)
+	id 1hjIHR-0001Mm-JR
+	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 03:05:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40674)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgibson@ozlabs.org>) id 1hjGhF-0007We-TD
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 01:23:47 -0400
+ (envelope-from <armbru@redhat.com>) id 1hjIFz-0000rz-Ol
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 03:03:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1hjGhE-0007AR-PR
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 01:23:45 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:58719 helo=ozlabs.org)
+ (envelope-from <armbru@redhat.com>) id 1hjIFy-0001m9-D9
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 03:03:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46186)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1hjGhD-00073l-CE; Fri, 05 Jul 2019 01:23:44 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 45g3Ct2mNPz9sNp; Fri,  5 Jul 2019 15:23:38 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1562304218;
- bh=Rladb2u5r1twdla6zW8hxtyP/5iCd/Z1a8RQPSFhopk=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=fjv+cF4MU1CjEb5YocgDMh4hf3FfkNsNrGAgJv54udh9821ZIJb7z89R+KsD1FYKX
- GGbD6FHHg4NRt5IuWHDBOsCjLbtz8d6FWgU9mF955w2iCu7r6gHmWCxVyrVqoU354N
- 4Ps5TG6FR/kElz14302ICr+A1sL2g/FZJAFBihCw=
-Date: Fri, 5 Jul 2019 15:18:42 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Message-ID: <20190705051842.GC3266@umbus.fritz.box>
-References: <20190705032501.106966-1-aik@ozlabs.ru>
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hjIFy-0001lX-5J
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 03:03:42 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 64E8E3071D7E;
+ Fri,  5 Jul 2019 07:03:38 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-111.ams2.redhat.com
+ [10.36.116.111])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E21D17DE22;
+ Fri,  5 Jul 2019 07:03:37 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 695871132ABF; Fri,  5 Jul 2019 09:03:31 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Daniel P. =?utf-8?Q?Berrang=C3=A9?= <berrange@redhat.com>
+References: <20190703135411.28436-1-berrange@redhat.com>
+Date: Fri, 05 Jul 2019 09:03:31 +0200
+In-Reply-To: <20190703135411.28436-1-berrange@redhat.com> ("Daniel
+ P. =?utf-8?Q?Berrang=C3=A9=22's?= message of "Wed, 3 Jul 2019 14:54:11
+ +0100")
+Message-ID: <8736jl6jzw.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="H8ygTp4AXg6deix2"
-Content-Disposition: inline
-In-Reply-To: <20190705032501.106966-1-aik@ozlabs.ru>
-User-Agent: Mutt/1.12.0 (2019-05-25)
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.47]); Fri, 05 Jul 2019 07:03:40 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 203.11.71.1
-Subject: Re: [Qemu-devel] [RFC PATCH qemu] vfio-quirks: Pass the actual
- parent when deleting a memory region
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH] doc: document that the monitor console is
+ a privileged control interface
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,95 +74,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alex Williamson <alex.williamson@redhat.com>, qemu-ppc@nongnu.org,
- qemu-devel@nongnu.org
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, P J P <ppandit@redhat.com>,
+ qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
 
---H8ygTp4AXg6deix2
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> A supposed exploit of QEMU was recently announced as CVE-2019-12928
+> claiming that the monitor console was insecure because the "migrate"
+> comand enabled arbitrary command execution for a remote attacker.
+>
+> For this to be a flaw the user launching QEMU must have configured
+> the monitor in a way that allows for other userrs to access it. The
+> exploit report quoted use of the "tcp" character device backend for
+> QMP.
+>
+> This would indeed allow any network user to connect to QEMU and
+> execute arbitrary comamnds, however, this is not a flaw in QEMU.
+> It is the normal expected behaviour of the monitor console and the
+> commands it supports. Given a monitor connection, there are many
+> ways to access host filesystem content besides the migrate command.
+>
+> The reality is that the monitor console (whether QMP or HMP) is
+> considered a privileged interface to QEMU and as such must only
+> be made available to trusted users. IOW, making it available with
+> no authentication over TCP is simply a, very serious, user
+> configuration error not a security flaw in QEMU itself.
 
-On Fri, Jul 05, 2019 at 01:25:01PM +1000, Alexey Kardashevskiy wrote:
-> The usual way of using a quirk's MR is to add it as a subregion of a BAR
-> as this is what quirks are for. However there is less than standard user
-> of this - NVLink2-enabled NVIDIA GPU which exposes a GPU RAM and a ATSD
-> 64K region outside of PCI MMIO window so these MRs get the system address
-> space root as a parent. So when the user unplugs such device, assert
-> occurs:
->=20
-> qemu-system-ppc64: /home/aik/p/qemu/memory.c:2391: memory_region_del_subr=
-egion: Assertion `subregion->container =3D=3D mr' failed.
->=20
-> This passes the actual parent MR to memory_region_del_subregion() in
-> vfio_bar_quirk_exit.
->=20
-> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+https://xkcd.com/2166/
 
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+> The one thing this bogus security report highlights though is that
+> we have not clearly documented the security implications around the
+> use of the monitor. Add a few paragraphs of text to the security
+> docs explaining why the monitor is a privileged interface and making
+> a recommendation to only use the UNIX socket character device backend.
 
+Good idea.
+
+> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 > ---
->=20
-> This removes an extra sanity check that a quirk has a correct parent;
-> I am not sure if it is very useful.
-> I could use the "system" MR if quirk->mem[i].container=3D=3Dget_system_me=
-mory()
-> and quirk->mem[i].container otherwise to keep that assert working.
->=20
-> Also this does not help with the actual device removal much because of
-> the closed source driver nature - the associated service
-> (nvidia-persistenced, responsible for onlining GPU memory) crashes
-> the guest system but at least the user can reboot the guest after
-> the crash which is not as bad as assert.
->=20
-> ---
->  hw/vfio/pci-quirks.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->=20
-> diff --git a/hw/vfio/pci-quirks.c b/hw/vfio/pci-quirks.c
-> index 27dddbc8fa3e..ef2e182c1d36 100644
-> --- a/hw/vfio/pci-quirks.c
-> +++ b/hw/vfio/pci-quirks.c
-> @@ -1896,7 +1896,8 @@ void vfio_bar_quirk_exit(VFIOPCIDevice *vdev, int n=
-r)
->          }
-> =20
->          for (i =3D 0; i < quirk->nr_mem; i++) {
-> -            memory_region_del_subregion(bar->region.mem, &quirk->mem[i]);
-> +            memory_region_del_subregion(quirk->mem[i].container,
-> +                                        &quirk->mem[i]);
->          }
->      }
->  }
+>  docs/security.texi | 36 ++++++++++++++++++++++++++++++++++++
+>  1 file changed, 36 insertions(+)
+>
+> diff --git a/docs/security.texi b/docs/security.texi
+> index 927764f1e6..5bff01449d 100644
+> --- a/docs/security.texi
+> +++ b/docs/security.texi
+> @@ -129,3 +129,39 @@ those resources that were granted to it.
+>  system calls that are not needed by QEMU, thereby reducing the host kern=
+el
+>  attack surface.
+>  @end itemize
+> +
+> +@section Sensitive configurations
+> +
+> +There are aspects of QEMU that can have non-obvious security implications
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+Is calling the implications "non-obvious" useful?  One guy's
+"non-obvious" can be the next guy's "trivial"...
 
---H8ygTp4AXg6deix2
-Content-Type: application/pgp-signature; name="signature.asc"
+> +which users & management applications must be aware of.
+> +
+> +@subsection Monitor console (QMP and HMP)
+> +
+> +The monitor console (whether used with QMP or HMP) provides an RPC inter=
+face
 
------BEGIN PGP SIGNATURE-----
+"RPC" is unnecessary detail I find distracting (and not entirely fitting
+besides).  Please scratch it.
 
-iQIyBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl0e3bAACgkQbDjKyiDZ
-s5IbKg/44U9BYLm4RP9wadwbqWJRwtMeSQcJicZOcoPmAnkOonp1TllQUjxNA5K+
-Qd1FmtCPBFVnXZfe9hX5O+me7cODWls/G5FbrHGXfYzEkRQVfR63ZGyMlyRdYCpu
-g89bWOVEQWN1NtTKVY6FWTsLHXFXBqSVNzIW8LenxAOhzK3AMHUVV/tu6MsExTSy
-ntZE14/n4WAj6IVGzVUh8Zl0GH6Jh0kNI6CgwkaQNxp9Dc+mf9cKfZfq8/LpcSHZ
-j/R5ub88QXCntDnYbjaLGhMOPatZqrIHJRxf+PENDxlztk7ydYmbYWV0tm7pHDE2
-CGQ32WKLas2ozquAre7jE3YLhrf2Ih81X2uw+cW2YSuvmO57+FAYIPK41e0/P50C
-S7Ua0nb0MOkYUAYI717LJm0c8fYF9WzXcq2VY4oTdayFcTcezJP+OZDlyRiK2EGf
-E7NO1K6FD/V8qsF4nQhOIkAnKPPfqDmuHBCBOHJCApCN/jbf5sxCQo7DgwXsS45u
-RcJguw0lgxWWX+u5vNR6h5xnzC1hy0Q/CAHyD5OaLTnq7y2jQzW9hVN2PR0YqKQd
-zZWBG0KsGMTu7+AN9I6xA1l9HKnCID0H28XaTKJfeo3CwFdqZ135C2d3oYSxNvzG
-n7fuiKuM4WbznZlrjrKXVEnAxCtHKKbbWpXfLUCNfVsP4sOKQQ==
-=txQd
------END PGP SIGNATURE-----
+> +to dynamically control many aspects of QEMU's runtime operation. Many of=
+ the
+> +commands exposed will instruct QEMU to access content on the host filesy=
+system
+> +and/or trigger spawning of external processes.
+> +
+> +For example, the @code{migrate} command allows for the spawning of arbit=
+rary
+> +processes for the purpose of tunnelling the migration data stream. The
+> +@code{blockdev-add} command instructs QEMU to open arbitrary files, expo=
+sing
+> +their content to the guest as a virtual disk.
+> +
+> +Unless QEMU is otherwise confined using technologies such as SELinux, Ap=
+pArmor,
+> +or Linux namespaces, the monitor console should be considered to have pr=
+ivileges
+> +equivalent to those of the user account QEMU is running under.
+> +
+> +It is further important to consider the security of the character device=
+ backend
+> +over which the monitor console is exposed. It needs to have protection a=
+gainst
+> +malicious third parties which might try to make unauthorized connections=
+, or
+> +perform man-in-the-middle attacks. Many of the character device backends=
+ do not
+> +satisfy this requirement and so must not be used for the monitor console.
+> +
+> +The general recommendation is that the monitor console should be exposed=
+ over
+> +a UNIX domain socket backend to the local host only. Use of the TCP based
+> +character device backend is inappropriate unless configured to use both =
+TLS
+> +encryption and authorization control policy on client connections.
+> +
+> +In summary the monitor console is considered a privileged control interf=
+ace to
+> +QEMU and as such should only be made accessible to a trusted management
+> +application or user.
 
---H8ygTp4AXg6deix2--
+With "RPC" scratched:
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
 
