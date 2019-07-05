@@ -2,87 +2,91 @@ Return-Path: <SRS0=wUMn=VC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99545C4649B
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 11:58:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30B87C4649B
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 11:59:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6874A218CA
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 11:58:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6874A218CA
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
+	by mail.kernel.org (Postfix) with ESMTPS id 06E3A218CA
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 11:59:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06E3A218CA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52018 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52040 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hjMqv-0004Z1-KW
-	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 07:58:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46227)
+	id 1hjMsR-0006KU-CZ
+	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 07:59:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46521)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hjMpY-0003nJ-AI
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 07:56:45 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hjMrB-00053A-JP
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 07:58:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hjMpW-0001ie-2e
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 07:56:44 -0400
-Received: from mail.ilande.co.uk ([46.43.2.167]:48620
- helo=mail.default.ilande.uk0.bigv.io)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1hjMpV-0006GW-Ru
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 07:56:42 -0400
-Received: from host109-146-132-17.range109-146.btcentralplus.com
- ([109.146.132.17] helo=[192.168.1.65])
- by mail.default.ilande.uk0.bigv.io with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
- (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1hjMjV-0001If-MN; Fri, 05 Jul 2019 12:50:33 +0100
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+ (envelope-from <mreitz@redhat.com>) id 1hjMr9-0007jU-Fz
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 07:58:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:32928)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1hjMr5-0007RG-E2; Fri, 05 Jul 2019 07:58:19 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 872933082DD3;
+ Fri,  5 Jul 2019 11:58:18 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-204-154.brq.redhat.com
+ [10.40.204.154])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C1B511001B23;
+ Fri,  5 Jul 2019 11:58:11 +0000 (UTC)
+To: Maxim Levitsky <mlevitsk@redhat.com>, qemu-devel@nongnu.org
+References: <20190703155944.9637-1-mlevitsk@redhat.com>
+ <20190703155944.9637-4-mlevitsk@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
-Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
- mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
- 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
- E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
- PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
- PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
- AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
- OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
- NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
- mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
- z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
- T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
- DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
- y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
- 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
- 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
- YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
- Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
- BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
- opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
- NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
- Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
- KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
- imgcU9TTGC5qd9g=
-To: qemu-devel <qemu-devel@nongnu.org>
-Message-ID: <4453b1be-8775-1d47-83fa-19102bf8dd95@ilande.co.uk>
-Date: Fri, 5 Jul 2019 12:50:52 +0100
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <e405b915-b333-936d-7c4a-8b6024c1e189@redhat.com>
+Date: Fri, 5 Jul 2019 13:58:07 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 109.146.132.17
-X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
-X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
+In-Reply-To: <20190703155944.9637-4-mlevitsk@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="WoQhDNCKs2zBkXps3xNzYYL24VSrqNcQg"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.46]); Fri, 05 Jul 2019 11:58:18 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.43.2.167
-Subject: [Qemu-devel] Unable to set register on qemu-system-sparc64 via
- gdbstub
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v3 3/6] block/nvme: support larger that 512
+ bytes sector devices
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,79 +98,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, arilou@gmail.com
+Cc: Fam Zheng <fam@euphon.net>, Paolo Bonzini <pbonzini@redhat.com>,
+ John Snow <jsnow@redhat.com>, qemu-block@nongnu.org,
+ Kevin Wolf <kwolf@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi all,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--WoQhDNCKs2zBkXps3xNzYYL24VSrqNcQg
+Content-Type: multipart/mixed; boundary="nRsFRlaRDZEDP62tuGl0f59cXNS6StqtB";
+ protected-headers="v1"
+From: Max Reitz <mreitz@redhat.com>
+To: Maxim Levitsky <mlevitsk@redhat.com>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <fam@euphon.net>,
+ Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>,
+ qemu-block@nongnu.org
+Message-ID: <e405b915-b333-936d-7c4a-8b6024c1e189@redhat.com>
+Subject: Re: [PATCH v3 3/6] block/nvme: support larger that 512 bytes sector
+ devices
+References: <20190703155944.9637-1-mlevitsk@redhat.com>
+ <20190703155944.9637-4-mlevitsk@redhat.com>
+In-Reply-To: <20190703155944.9637-4-mlevitsk@redhat.com>
 
-It looks as if the recent gdbstub code rework has broken the ability to set registers
-under qemu-system-sparc64:
+--nRsFRlaRDZEDP62tuGl0f59cXNS6StqtB
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-$ sparc64-linux-gdb obj-sparc64/openbios-builtin.elf.nostrip
-GNU gdb (GDB) 8.1
-Copyright (C) 2018 Free Software Foundation, Inc.
-License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
-This is free software: you are free to change and redistribute it.
-There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
-and "show warranty" for details.
-This GDB was configured as "--host=x86_64-pc-linux-gnu --target=sparc64-linux".
-Type "show configuration" for configuration details.
-For bug reporting instructions, please see:
-<http://www.gnu.org/software/gdb/bugs/>.
-Find the GDB manual and other documentation resources online at:
-<http://www.gnu.org/software/gdb/documentation/>.
-For help, type "help".
-Type "apropos word" to search for commands related to "word"...
-Reading symbols from obj-sparc64/openbios-builtin.elf.nostrip...done.
-(gdb) target remote :1234
-Remote debugging using :1234
-0x000001fff0000020 in ?? ()
-(gdb) info regi $g1
-g1             0x0      0
-(gdb) set $g1 = 0x55
-Could not write register "g1"; remote failure reply 'E00'
-(gdb)
+On 03.07.19 17:59, Maxim Levitsky wrote:
+> Currently the driver hardcodes the sector size to 512,
+> and doesn't check the underlying device. Fix that.
+>=20
+> Also fail if underlying nvme device is formatted with metadata
+> as this needs special support.
+>=20
+> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> ---
+>  block/nvme.c | 45 ++++++++++++++++++++++++++++++++++++++++-----
+>  1 file changed, 40 insertions(+), 5 deletions(-)
+>=20
+> diff --git a/block/nvme.c b/block/nvme.c
+> index 52798081b2..1f0d09349f 100644
+> --- a/block/nvme.c
+> +++ b/block/nvme.c
 
-I managed to narrow this down to the recent gdbstub rework, and in particular to this
-patch:
+[...]
 
-commit 62b3320bddd79c050553ea7f81f20c6d3b401ce3
-Author: Jon Doron <arilou@gmail.com>
-Date:   Wed May 29 09:41:36 2019 +0300
-
-    gdbstub: Implement set register (P pkt) with new infra
-
-    Signed-off-by: Jon Doron <arilou@gmail.com>
-    Message-Id: <20190529064148.19856-9-arilou@gmail.com>
-    Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-
-Tracing through I see that the problem occurs because of this code in gdbstub's
-handle_set_reg:
-
-static void handle_set_reg(GdbCmdContext *gdb_ctx, void *user_ctx)
+> @@ -463,7 +467,22 @@ static void nvme_identify(BlockDriverState *bs, in=
+t namespace, Error **errp)
+>      }
+> =20
+>      s->nsze =3D le64_to_cpu(idns->nsze);
+> +    lbaf =3D &idns->lbaf[NVME_ID_NS_FLBAS_INDEX(idns->flbas)];
+> +
+> +    if (lbaf->ms) {
+> +        error_setg(errp, "Namespaces with metadata are not yet support=
+ed");
+> +        goto out;
+> +    }
+> +
+> +    hwsect_size =3D 1 << lbaf->ds;
+> +
+> +    if (hwsect_size < BDRV_SECTOR_BITS || hwsect_size > s->page_size) =
 {
-    int reg_size;
 
-    if (!gdb_has_xml) {
-        put_packet(gdb_ctx->s, "E00");
-        return;
-    }
+s/BDRV_SECTOR_BITS/BDRV_SECTOR_SIZE/
 
-    ...
-    ...
-}
+> +        error_setg(errp, "Namespace has unsupported block size (%d)",
+> +                hwsect_size);
+> +        goto out;
+> +    }
+> =20
+> +    s->blkshift =3D lbaf->ds;
+>  out:
+>      qemu_vfio_dma_unmap(s->vfio, resp);
+>      qemu_vfree(resp);
+> @@ -782,8 +801,22 @@ fail:
+>  static int64_t nvme_getlength(BlockDriverState *bs)
+>  {
+>      BDRVNVMeState *s =3D bs->opaque;
+> +    return s->nsze << s->blkshift;
+> +}
+> =20
+> -    return s->nsze << BDRV_SECTOR_BITS;
+> +static int64_t nvme_get_blocksize(BlockDriverState *bs)
+> +{
+> +    BDRVNVMeState *s =3D bs->opaque;
+> +    assert(s->blkshift >=3D 9);
 
-Because SPARC doesn't have any GDB XML files then this check always fails which is
-why the E00 error code is being returned.
+I think BDRV_SECTOR_BITS is more correct here (this is about what the
+general block layer code expects).  Also, there=E2=80=99s no pain in doin=
+g so,
+as you did check against BDRV_SECTOR_SIZE in nvme_identify().
 
-In fact if I simply comment out the above check then everything appears to work
-again, however I'm not sure that this is the correct fix because there are several
-other references to gdb_has_xml remaining in the file?
+Max
+
+> +    return 1 << s->blkshift;
+> +}
+> +
+> +static int nvme_probe_blocksizes(BlockDriverState *bs, BlockSizes *bsz=
+)
+> +{
+> +    int64_t blocksize =3D nvme_get_blocksize(bs);
+> +    bsz->phys =3D blocksize;
+> +    bsz->log =3D blocksize;
+> +    return 0;
+>  }
+> =20
+>  /* Called with s->dma_map_lock */
 
 
-ATB,
+--nRsFRlaRDZEDP62tuGl0f59cXNS6StqtB--
 
-Mark.
+--WoQhDNCKs2zBkXps3xNzYYL24VSrqNcQg
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0fO08ACgkQ9AfbAGHV
+z0BmhQf6A7NMzNXbjEIDa99n46D9xluyh2jYRdGIXEkbBgRDknqnsZLbAzz0sNO1
+NwBreDCp/cqi0elo8+Ob3dnApoC6YFtoWIpOBhEB7CwvRo3kmrvMs7xN3EsOr+TX
+fi18v7gY3U8jdpIhwc4X213GK03SgX5iupsneHW1YCeYy0eZep63FUz4MUrkHJWE
+/upTz5TjDQO8U/9iBLJbQ99qQWHTbPvrc6uUzBg22JVnsnbkqZAvKof/LFnIESnc
+LDpfBWgqOj3nIKU4vlwPpR20a4ROHVx+cxcGbC4WZFH9SSn+S6niGW9OGCbdt2xu
+Brg0EUhgNQyMe+aro9LTxHh6+hyYkQ==
+=zO7c
+-----END PGP SIGNATURE-----
+
+--WoQhDNCKs2zBkXps3xNzYYL24VSrqNcQg--
 
