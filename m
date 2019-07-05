@@ -3,60 +3,63 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 180F5C5B57D
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 22:41:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CEFEC5B57D
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 22:41:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DF7C92147A
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 22:41:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF7C92147A
+	by mail.kernel.org (Postfix) with ESMTPS id 142972147A
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 22:41:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 142972147A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56670 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56674 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hjWtD-0006l6-6o
-	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 18:41:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54932)
+	id 1hjWtN-0006uV-ST
+	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 18:41:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55280)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <ehabkost@redhat.com>) id 1hjWUe-0007Pu-VL
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 18:15:50 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1hjWVI-0008Hw-7B
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 18:16:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1hjWUc-0003OY-Iz
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 18:15:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48690)
+ (envelope-from <ehabkost@redhat.com>) id 1hjWVG-0003qi-HQ
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 18:16:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33958)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hjWUa-0003Ir-L5
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 18:15:45 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hjWVG-0003qI-Bx
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 18:16:26 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 9636F307D84F;
- Fri,  5 Jul 2019 22:15:37 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 8ACE6308218D;
+ Fri,  5 Jul 2019 22:16:25 +0000 (UTC)
 Received: from localhost (ovpn-116-30.gru2.redhat.com [10.97.116.30])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 23AA4578A;
- Fri,  5 Jul 2019 22:15:36 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B09C560BEE;
+ Fri,  5 Jul 2019 22:16:24 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>,
  Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
  Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
  Richard Henderson <rth@twiddle.net>
-Date: Fri,  5 Jul 2019 19:14:32 -0300
-Message-Id: <20190705221504.25166-11-ehabkost@redhat.com>
+Date: Fri,  5 Jul 2019 19:14:55 -0300
+Message-Id: <20190705221504.25166-34-ehabkost@redhat.com>
 In-Reply-To: <20190705221504.25166-1-ehabkost@redhat.com>
 References: <20190705221504.25166-1-ehabkost@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.48]); Fri, 05 Jul 2019 22:15:37 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.47]); Fri, 05 Jul 2019 22:16:25 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL v6 10/42] vl.c: Replace smp global variables
- with smp machine properties
+Subject: [Qemu-devel] [PULL v6 33/42] i386: Get model-id from CPU object on
+ "-cpu help"
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,140 +71,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Like Xu <like.xu@linux.intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Like Xu <like.xu@linux.intel.com>
+When introducing versioned CPU models, the string at
+X86CPUDefinition::model_id might not be the model-id we'll really
+use.  Instantiate a CPU object and check the model-id property on
+"-cpu help"
 
-The global smp variables in vl.c are completely replaced with machine properties.
-
-Form this commit, the smp_cpus/smp_cores/smp_threads/max_cpus are deprecated
-and only machine properties within MachineState are fully applied and enabled.
-
-Signed-off-by: Like Xu <like.xu@linux.intel.com>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Message-Id: <20190518205428.90532-11-like.xu@linux.intel.com>
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+Message-Id: <20190628002844.24894-4-ehabkost@redhat.com>
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- vl.c | 53 ++++++++++++++++++++++++++---------------------------
- 1 file changed, 26 insertions(+), 27 deletions(-)
+ target/i386/cpu.c | 16 +++++++++++++---
+ 1 file changed, 13 insertions(+), 3 deletions(-)
 
-diff --git a/vl.c b/vl.c
-index d657faec03..56aa221385 100644
---- a/vl.c
-+++ b/vl.c
-@@ -163,10 +163,6 @@ static Chardev **serial_hds;
- Chardev *parallel_hds[MAX_PARALLEL_PORTS];
- int win2k_install_hack = 0;
- int singlestep = 0;
--int smp_cpus;
--unsigned int max_cpus;
--int smp_cores = 1;
--int smp_threads = 1;
- int acpi_enabled = 1;
- int no_hpet = 0;
- int fd_bootchk = 1;
-@@ -1265,8 +1261,9 @@ static void smp_parse(QemuOpts *opts)
-                 sockets = sockets > 0 ? sockets : 1;
-                 cpus = cores * threads * sockets;
-             } else {
--                max_cpus = qemu_opt_get_number(opts, "maxcpus", cpus);
--                sockets = max_cpus / (cores * threads);
-+                current_machine->smp.max_cpus =
-+                        qemu_opt_get_number(opts, "maxcpus", cpus);
-+                sockets = current_machine->smp.max_cpus / (cores * threads);
-             }
-         } else if (cores == 0) {
-             threads = threads > 0 ? threads : 1;
-@@ -1283,34 +1280,37 @@ static void smp_parse(QemuOpts *opts)
-             exit(1);
-         }
- 
--        max_cpus = qemu_opt_get_number(opts, "maxcpus", cpus);
-+        current_machine->smp.max_cpus =
-+                qemu_opt_get_number(opts, "maxcpus", cpus);
- 
--        if (max_cpus < cpus) {
-+        if (current_machine->smp.max_cpus < cpus) {
-             error_report("maxcpus must be equal to or greater than smp");
-             exit(1);
-         }
- 
--        if (sockets * cores * threads > max_cpus) {
-+        if (sockets * cores * threads > current_machine->smp.max_cpus) {
-             error_report("cpu topology: "
-                          "sockets (%u) * cores (%u) * threads (%u) > "
-                          "maxcpus (%u)",
--                         sockets, cores, threads, max_cpus);
-+                         sockets, cores, threads,
-+                         current_machine->smp.max_cpus);
-             exit(1);
-         }
- 
--        if (sockets * cores * threads != max_cpus) {
-+        if (sockets * cores * threads != current_machine->smp.max_cpus) {
-             warn_report("Invalid CPU topology deprecated: "
-                         "sockets (%u) * cores (%u) * threads (%u) "
-                         "!= maxcpus (%u)",
--                        sockets, cores, threads, max_cpus);
-+                        sockets, cores, threads,
-+                        current_machine->smp.max_cpus);
-         }
- 
--        smp_cpus = cpus;
--        smp_cores = cores;
--        smp_threads = threads;
-+        current_machine->smp.cpus = cpus;
-+        current_machine->smp.cores = cores;
-+        current_machine->smp.threads = threads;
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 8852b57c0b..a0e422adf3 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -3837,18 +3837,28 @@ static GSList *get_sorted_cpu_model_list(void)
+     return list;
+ }
+=20
++static char *x86_cpu_class_get_model_id(X86CPUClass *xc)
++{
++    Object *obj =3D object_new(object_class_get_name(OBJECT_CLASS(xc)));
++    char *r =3D object_property_get_str(obj, "model-id", &error_abort);
++    object_unref(obj);
++    return r;
++}
++
+ static void x86_cpu_list_entry(gpointer data, gpointer user_data)
+ {
+     ObjectClass *oc =3D data;
+     X86CPUClass *cc =3D X86_CPU_CLASS(oc);
+     char *name =3D x86_cpu_class_get_model_name(cc);
+-    const char *desc =3D cc->model_description;
+-    if (!desc && cc->cpu_def) {
+-        desc =3D cc->cpu_def->model_id;
++    char *desc =3D g_strdup(cc->model_description);
++
++    if (!desc) {
++        desc =3D x86_cpu_class_get_model_id(cc);
      }
- 
--    if (smp_cpus > 1) {
-+    if (current_machine->smp.cpus > 1) {
-         Error *blocker = NULL;
-         error_setg(&blocker, QERR_REPLAY_NOT_SUPPORTED, "smp");
-         replay_add_blocker(blocker);
-@@ -4009,26 +4009,25 @@ int main(int argc, char **argv, char **envp)
-     machine_class->default_cpus = machine_class->default_cpus ?: 1;
- 
-     /* default to machine_class->default_cpus */
--    smp_cpus = machine_class->default_cpus;
--    max_cpus = machine_class->default_cpus;
-+    current_machine->smp.cpus = machine_class->default_cpus;
-+    current_machine->smp.max_cpus = machine_class->default_cpus;
-+    current_machine->smp.cores = 1;
-+    current_machine->smp.threads = 1;
- 
-     smp_parse(qemu_opts_find(qemu_find_opts("smp-opts"), NULL));
- 
--    current_machine->smp.cpus = smp_cpus;
--    current_machine->smp.max_cpus = max_cpus;
--    current_machine->smp.cores = smp_cores;
--    current_machine->smp.threads = smp_threads;
--
-     /* sanity-check smp_cpus and max_cpus against machine_class */
--    if (smp_cpus < machine_class->min_cpus) {
-+    if (current_machine->smp.cpus < machine_class->min_cpus) {
-         error_report("Invalid SMP CPUs %d. The min CPUs "
--                     "supported by machine '%s' is %d", smp_cpus,
-+                     "supported by machine '%s' is %d",
-+                     current_machine->smp.cpus,
-                      machine_class->name, machine_class->min_cpus);
-         exit(1);
-     }
--    if (max_cpus > machine_class->max_cpus) {
-+    if (current_machine->smp.max_cpus > machine_class->max_cpus) {
-         error_report("Invalid SMP CPUs %d. The max CPUs "
--                     "supported by machine '%s' is %d", max_cpus,
-+                     "supported by machine '%s' is %d",
-+                     current_machine->smp.max_cpus,
-                      machine_class->name, machine_class->max_cpus);
-         exit(1);
-     }
--- 
+=20
+     qemu_printf("x86 %-20s  %-48s\n", name, desc);
+     g_free(name);
++    g_free(desc);
+ }
+=20
+ /* list available CPU models and flags */
+--=20
 2.18.0.rc1.1.g3f1ff2140
 
 
