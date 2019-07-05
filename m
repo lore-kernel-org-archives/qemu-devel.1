@@ -6,57 +6,57 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76F2AC468AA
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 20:19:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4810C46499
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 20:19:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 56C4A2133F
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 20:19:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56C4A2133F
+	by mail.kernel.org (Postfix) with ESMTPS id A010A2133F
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 20:19:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A010A2133F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55778 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55780 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hjUg8-0007Pc-Lq
-	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 16:19:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60925)
+	id 1hjUgI-0007iS-V1
+	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 16:19:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60982)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jsnow@redhat.com>) id 1hjUdo-0005MF-Ld
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 16:17:10 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hjUds-0005Ok-N0
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 16:17:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hjUdm-0006wP-W9
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 16:17:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53120)
+ (envelope-from <jsnow@redhat.com>) id 1hjUdq-00071N-OH
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 16:17:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34504)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1hjUdg-0006qH-HD; Fri, 05 Jul 2019 16:17:00 -0400
+ id 1hjUdm-0006uK-VM; Fri, 05 Jul 2019 16:17:07 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id CC73B3098558;
- Fri,  5 Jul 2019 20:16:59 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 6A9D53084034;
+ Fri,  5 Jul 2019 20:17:04 +0000 (UTC)
 Received: from probe.redhat.com (ovpn-122-149.rdu2.redhat.com [10.10.122.149])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DF61C86432;
- Fri,  5 Jul 2019 20:16:52 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7827E867E6;
+ Fri,  5 Jul 2019 20:17:02 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: qemu-devel@nongnu.org,
 	qemu-block@nongnu.org
-Date: Fri,  5 Jul 2019 16:16:19 -0400
-Message-Id: <20190705201631.26266-7-jsnow@redhat.com>
+Date: Fri,  5 Jul 2019 16:16:21 -0400
+Message-Id: <20190705201631.26266-9-jsnow@redhat.com>
 In-Reply-To: <20190705201631.26266-1-jsnow@redhat.com>
 References: <20190705201631.26266-1-jsnow@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Fri, 05 Jul 2019 20:16:59 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.40]); Fri, 05 Jul 2019 20:17:04 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v3 06/18] block/backup: add 'never' policy to
- bitmap sync mode
+Subject: [Qemu-devel] [PATCH v3 08/18] hbitmap: enable merging across
+ granularities
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -79,57 +79,75 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This adds a "never" policy for bitmap synchronization. Regardless of if
-the job succeeds or fails, we never update the bitmap. This can be used
-to perform differential backups, or simply to avoid the job modifying a
-bitmap.
-
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- block/backup.c       | 7 +++++--
- qapi/block-core.json | 5 ++++-
- 2 files changed, 9 insertions(+), 3 deletions(-)
+ util/hbitmap.c | 36 +++++++++++++++++++++++++++++++++++-
+ 1 file changed, 35 insertions(+), 1 deletion(-)
 
-diff --git a/block/backup.c b/block/backup.c
-index 996941fa61..efd0dcd2e7 100644
---- a/block/backup.c
-+++ b/block/backup.c
-@@ -265,8 +265,11 @@ static void backup_cleanup_sync_bitmap(BackupBlockJo=
-b *job, int ret)
-     BdrvDirtyBitmap *bm;
-     BlockDriverState *bs =3D blk_bs(job->common.blk);
+diff --git a/util/hbitmap.c b/util/hbitmap.c
+index 3b6acae42b..306bc4876d 100644
+--- a/util/hbitmap.c
++++ b/util/hbitmap.c
+@@ -777,7 +777,27 @@ void hbitmap_truncate(HBitmap *hb, uint64_t size)
 =20
--    if (ret < 0) {
--        /* Merge the successor back into the parent, delete nothing. */
-+    if (ret < 0 || job->bitmap_mode =3D=3D BITMAP_SYNC_MODE_NEVER) {
-+        /*
-+         * Failure, or we don't want to synchronize the bitmap.
-+         * Merge the successor back into the parent, delete nothing.
-+         */
-         bm =3D bdrv_reclaim_dirty_bitmap(bs, job->sync_bitmap, NULL);
-         assert(bm);
-     } else {
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 99dcd5f099..b1aaaaa98e 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -1146,10 +1146,13 @@
- # @on-success: The bitmap is only synced when the operation is successfu=
-l.
- #              This is the behavior always used for 'INCREMENTAL' backup=
-s.
- #
-+# @never: The bitmap is never synchronized with the operation, and is
-+#         treated solely as a read-only manifest of blocks to copy.
-+#
- # Since: 4.2
- ##
- { 'enum': 'BitmapSyncMode',
--  'data': ['on-success'] }
-+  'data': ['on-success', 'never'] }
+ bool hbitmap_can_merge(const HBitmap *a, const HBitmap *b)
+ {
+-    return (a->size =3D=3D b->size) && (a->granularity =3D=3D b->granula=
+rity);
++    return (a->orig_size =3D=3D b->orig_size);
++}
++
++/**
++ * hbitmap_sparse_merge: performs dst =3D dst | src
++ * works with differing granularities.
++ * best used when src is sparsely populated.
++ */
++static void hbitmap_sparse_merge(HBitmap *dst, const HBitmap *src)
++{
++    uint64_t offset =3D 0;
++    uint64_t count =3D src->orig_size;
++
++    while (hbitmap_next_dirty_area(src, &offset, &count)) {
++        hbitmap_set(dst, offset, count);
++        offset +=3D count;
++        if (offset >=3D src->orig_size) {
++            break;
++        }
++        count =3D src->orig_size - offset;
++    }
+ }
 =20
- ##
- # @MirrorCopyMode:
+ /**
+@@ -808,10 +828,24 @@ bool hbitmap_merge(const HBitmap *a, const HBitmap =
+*b, HBitmap *result)
+         return true;
+     }
+=20
++    if (a->granularity !=3D b->granularity) {
++        if ((a !=3D result) && (b !=3D result)) {
++            hbitmap_reset_all(result);
++        }
++        if (a !=3D result) {
++            hbitmap_sparse_merge(result, a);
++        }
++        if (b !=3D result) {
++            hbitmap_sparse_merge(result, b);
++        }
++        return true;
++    }
++
+     /* This merge is O(size), as BITS_PER_LONG and HBITMAP_LEVELS are co=
+nstant.
+      * It may be possible to improve running times for sparsely populate=
+d maps
+      * by using hbitmap_iter_next, but this is suboptimal for dense maps=
+.
+      */
++    assert(a->size =3D=3D b->size);
+     for (i =3D HBITMAP_LEVELS - 1; i >=3D 0; i--) {
+         for (j =3D 0; j < a->sizes[i]; j++) {
+             result->levels[i][j] =3D a->levels[i][j] | b->levels[i][j];
 --=20
 2.21.0
 
