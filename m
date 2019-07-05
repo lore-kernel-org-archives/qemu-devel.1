@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DF1CC46499
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 16:38:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DBAC2C468A0
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 16:42:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D204821670
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 16:38:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D204821670
+	by mail.kernel.org (Postfix) with ESMTPS id B77BE21670
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 16:42:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B77BE21670
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54862 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54872 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hjREf-0005nH-QW
-	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 12:38:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48309)
+	id 1hjRIO-0007ea-Tu
+	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 12:42:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48646)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jsnow@redhat.com>) id 1hjRDp-0005Ju-5L
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 12:38:08 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hjRFu-0006Ss-Se
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 12:40:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hjRDn-0006rC-F7
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 12:38:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51708)
+ (envelope-from <jsnow@redhat.com>) id 1hjRFs-0006Ym-Qa
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 12:40:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49118)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1hjRDe-0005SD-Sf; Fri, 05 Jul 2019 12:37:55 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ id 1hjRFq-0006Hq-D3; Fri, 05 Jul 2019 12:40:10 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id B99BB3083363;
- Fri,  5 Jul 2019 16:37:39 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 9928430821FA;
+ Fri,  5 Jul 2019 16:40:08 +0000 (UTC)
 Received: from [10.10.122.149] (ovpn-122-149.rdu2.redhat.com [10.10.122.149])
- by smtp.corp.redhat.com (Postfix) with ESMTP id CC529772B0;
- Fri,  5 Jul 2019 16:37:33 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7F6F7413F;
+ Fri,  5 Jul 2019 16:40:00 +0000 (UTC)
 To: Markus Armbruster <armbru@redhat.com>
 References: <20190703215542.16123-1-jsnow@redhat.com>
- <20190703215542.16123-2-jsnow@redhat.com> <87sgrkin5j.fsf@dusky.pond.sub.org>
+ <20190703215542.16123-5-jsnow@redhat.com> <87muhsimyg.fsf@dusky.pond.sub.org>
 From: John Snow <jsnow@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
@@ -120,22 +120,21 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <5a6527dc-15ff-9dbc-8e47-7d5b250fe4ea@redhat.com>
-Date: Fri, 5 Jul 2019 12:37:33 -0400
+Message-ID: <25260b5c-035b-e663-72cd-3cd9cbc9eb44@redhat.com>
+Date: Fri, 5 Jul 2019 12:39:59 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <87sgrkin5j.fsf@dusky.pond.sub.org>
+In-Reply-To: <87muhsimyg.fsf@dusky.pond.sub.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.44]); Fri, 05 Jul 2019 16:37:40 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.47]); Fri, 05 Jul 2019 16:40:08 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 01/18] qapi/block-core: Introduce
- BackupCommon
+Subject: Re: [Qemu-devel] [PATCH v2 04/18] qapi: add BitmapSyncMode enum
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -159,196 +158,54 @@ Sender: "Qemu-devel"
 
 
 
-On 7/5/19 10:14 AM, Markus Armbruster wrote:
+On 7/5/19 10:18 AM, Markus Armbruster wrote:
 > John Snow <jsnow@redhat.com> writes:
 > 
->> drive-backup and blockdev-backup have an awful lot of things in common
->> that are the same. Let's fix that.
+>> Depending on what a user is trying to accomplish, there might be a few
+>> bitmap cleanup actions that occur when an operation is finished that
+>> could be useful.
 >>
->> I don't deduplicate 'target', because the semantics actually did change
->> between each structure. Leave that one alone so it can be documented
->> separately.
+>> I am proposing three:
+>> - NEVER: The bitmap is never synchronized against what was copied.
+>> - ALWAYS: The bitmap is always synchronized, even on failures.
+>> - CONDITIONAL: The bitmap is synchronized only on success.
+>>
+>> The existing incremental backup modes use 'conditional' semantics,
+>> so add just that one for right now.
 >>
 >> Signed-off-by: John Snow <jsnow@redhat.com>
 >> ---
->>  qapi/block-core.json | 103 ++++++++++++++-----------------------------
->>  1 file changed, 33 insertions(+), 70 deletions(-)
+>>  qapi/block-core.json | 14 ++++++++++++++
+>>  1 file changed, 14 insertions(+)
 >>
 >> diff --git a/qapi/block-core.json b/qapi/block-core.json
->> index 0d43d4f37c..7b23efcf13 100644
+>> index 7b23efcf13..87eba5a5d9 100644
 >> --- a/qapi/block-core.json
 >> +++ b/qapi/block-core.json
->> @@ -1315,32 +1315,23 @@
->>    'data': { 'node': 'str', 'overlay': 'str' } }
+>> @@ -1134,6 +1134,20 @@
+>>  { 'enum': 'MirrorSyncMode',
+>>    'data': ['top', 'full', 'none', 'incremental'] }
 >>  
->>  ##
->> -# @DriveBackup:
->> +# @BackupCommon:
->>  #
->>  # @job-id: identifier for the newly-created block job. If
->>  #          omitted, the device name will be used. (Since 2.7)
->>  #
->>  # @device: the device name or node-name of a root node which should be copied.
->>  #
->> -# @target: the target of the new image. If the file exists, or if it
->> -#          is a device, the existing file/device will be used as the new
->> -#          destination.  If it does not exist, a new file will be created.
->> -#
->> -# @format: the format of the new destination, default is to
->> -#          probe if @mode is 'existing', else the format of the source
->> -#
->>  # @sync: what parts of the disk image should be copied to the destination
->>  #        (all the disk, only the sectors allocated in the topmost image, from a
->>  #        dirty bitmap, or only new I/O).
-> 
-> This is DriveBackup's wording.  Blockdev lacks "from a dirty bitmap, ".
-> Is this a doc fix?
-> 
-
-Yes.
-
->>  #
->> -# @mode: whether and how QEMU should create a new image, default is
->> -#        'absolute-paths'.
->> -#
->> -# @speed: the maximum speed, in bytes per second
->> +# @speed: the maximum speed, in bytes per second. The default is 0,
->> +#         for unlimited.
-> 
-> This is Blockdev's wording.  DriveBackup lacks "the default is 0, for
-> unlimited."  Is this a doc fix?
-> 
-
-Yes.
-
->>  #
->>  # @bitmap: the name of dirty bitmap if sync is "incremental".
->>  #          Must be present if sync is "incremental", must NOT be present
->> -#          otherwise. (Since 2.4)
->> +#          otherwise. (Since 2.4 (Drive), 3.1 (Blockdev))
-> 
-> I second Max's request to say (drive-backup) and (blockdev-backup),
-> strongly.
-> 
-
-OK.
-
->>  #
->>  # @compress: true to compress data, if the target format supports it.
->>  #            (default: false) (since 2.8)
->> @@ -1372,73 +1363,45 @@
->>  #
->>  # Since: 1.6
-> 
-> BackupCommon is actually since 4.2.
-> 
-> The type doesn't appear in the external interface (only its extensions
-> DriveBackup and BlockdevBackup do), so documenting "since" is actually
-> pointless.  However, we blindly document "since" for *everything*,
-> simply because we don't want to waste time on deciding whether we have
-> to.
-> 
-
-Ah, sure.
-
->>  ##
->> +{ 'struct': 'BackupCommon',
->> +  'data': { '*job-id': 'str', 'device': 'str',
->> +            'sync': 'MirrorSyncMode', '*speed': 'int',
->> +            '*bitmap': 'str', '*compress': 'bool',
->> +            '*on-source-error': 'BlockdevOnError',
->> +            '*on-target-error': 'BlockdevOnError',
->> +            '*auto-finalize': 'bool', '*auto-dismiss': 'bool' } }
+>> +##
+>> +# @BitmapSyncMode:
+>> +#
+>> +# An enumeration of possible behaviors for the synchronization of a bitmap
+>> +# when used for data copy operations.
+>> +#
+>> +# @conditional: The bitmap is only synced when the operation is successful.
+>> +#               This is the behavior always used for 'INCREMENTAL' backups.
+>> +#
+>> +# Since: 4.2
+>> +##
+>> +{ 'enum': 'BitmapSyncMode',
+>> +  'data': ['conditional'] }
 >> +
->> +##
->> +# @DriveBackup:
->> +#
->> +# @target: the target of the new image. If the file exists, or if it
->> +#          is a device, the existing file/device will be used as the new
->> +#          destination.  If it does not exist, a new file will be created.
->> +#
->> +# @format: the format of the new destination, default is to
->> +#          probe if @mode is 'existing', else the format of the source
->> +#
->> +# @mode: whether and how QEMU should create a new image, default is
->> +#        'absolute-paths'.
->> +#
->> +# Since: 1.6
->> +##
->>  { 'struct': 'DriveBackup',
->> -  'data': { '*job-id': 'str', 'device': 'str', 'target': 'str',
->> -            '*format': 'str', 'sync': 'MirrorSyncMode',
->> -            '*mode': 'NewImageMode', '*speed': 'int',
->> -            '*bitmap': 'str', '*compress': 'bool',
->> -            '*on-source-error': 'BlockdevOnError',
->> -            '*on-target-error': 'BlockdevOnError',
->> -            '*auto-finalize': 'bool', '*auto-dismiss': 'bool' } }
->> +  'base': 'BackupCommon',
->> +  'data': { 'target': 'str',
->> +            '*format': 'str',
->> +            '*mode': 'NewImageMode' } }
->>  
 >>  ##
->>  # @BlockdevBackup:
+>>  # @MirrorCopyMode:
 >>  #
->> -# @job-id: identifier for the newly-created block job. If
->> -#          omitted, the device name will be used. (Since 2.7)
->> -#
->> -# @device: the device name or node-name of a root node which should be copied.
->> -#
->>  # @target: the device name or node-name of the backup target node.
->>  #
->> -# @sync: what parts of the disk image should be copied to the destination
->> -#        (all the disk, only the sectors allocated in the topmost image, or
->> -#        only new I/O).
->> -#
->> -# @speed: the maximum speed, in bytes per second. The default is 0,
->> -#         for unlimited.
->> -#
->> -# @bitmap: the name of dirty bitmap if sync is "incremental".
->> -#          Must be present if sync is "incremental", must NOT be present
->> -#          otherwise. (Since 3.1)
->> -#
->> -# @compress: true to compress data, if the target format supports it.
->> -#            (default: false) (since 2.8)
->> -#
->> -# @on-source-error: the action to take on an error on the source,
->> -#                   default 'report'.  'stop' and 'enospc' can only be used
->> -#                   if the block device supports io-status (see BlockInfo).
->> -#
->> -# @on-target-error: the action to take on an error on the target,
->> -#                   default 'report' (no limitations, since this applies to
->> -#                   a different block device than @device).
->> -#
->> -# @auto-finalize: When false, this job will wait in a PENDING state after it has
->> -#                 finished its work, waiting for @block-job-finalize before
->> -#                 making any block graph changes.
->> -#                 When true, this job will automatically
->> -#                 perform its abort or commit actions.
->> -#                 Defaults to true. (Since 2.12)
->> -#
->> -# @auto-dismiss: When false, this job will wait in a CONCLUDED state after it
->> -#                has completely ceased all work, and awaits @block-job-dismiss.
->> -#                When true, this job will automatically disappear from the query
->> -#                list without user intervention.
->> -#                Defaults to true. (Since 2.12)
->> -#
->> -# Note: @on-source-error and @on-target-error only affect background
->> -# I/O.  If an error occurs during a guest write request, the device's
->> -# rerror/werror actions will be used.
->> -#
->>  # Since: 2.3
->>  ##
->>  { 'struct': 'BlockdevBackup',
->> -  'data': { '*job-id': 'str', 'device': 'str', 'target': 'str',
->> -            'sync': 'MirrorSyncMode', '*speed': 'int',
->> -            '*bitmap': 'str', '*compress': 'bool',
->> -            '*on-source-error': 'BlockdevOnError',
->> -            '*on-target-error': 'BlockdevOnError',
->> -            '*auto-finalize': 'bool', '*auto-dismiss': 'bool' } }
->> +  'base': 'BackupCommon',
->> +  'data': { 'target': 'str' } }
->>  
->>  ##
->>  # @blockdev-snapshot-sync:
+> 
+> The name "conditional" makes me go "on what?".  What about "on-success"?
+> 
+
+Good point. I do like that more.
 
