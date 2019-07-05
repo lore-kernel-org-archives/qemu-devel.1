@@ -2,78 +2,145 @@ Return-Path: <SRS0=wUMn=VC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89D22C46499
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D088AC468A7
 	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 21:33:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6032A216E3
+	by mail.kernel.org (Postfix) with ESMTPS id 9D155216E3
 	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 21:33:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6032A216E3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D155216E3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56352 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56350 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hjVq9-0001um-Dp
+	id 1hjVq9-0001uf-Vv
 	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 17:33:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47812)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47759)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <pbonzini@redhat.com>) id 1hjVoS-0000rT-Dq
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 17:32:13 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1hjVoR-00056s-9J
+ (envelope-from <borntraeger@de.ibm.com>) id 1hjVoQ-0000qx-MG
  for qemu-devel@nongnu.org; Fri, 05 Jul 2019 17:32:12 -0400
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:36833)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hjVoQ-00055r-VV
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 17:32:11 -0400
-Received: by mail-wm1-f67.google.com with SMTP id g67so4730116wme.1
- for <qemu-devel@nongnu.org>; Fri, 05 Jul 2019 14:32:10 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=UXAZsZeL7QsQEuCCkFmyg+1v547nYOhI7Xx0Bjhq8eM=;
- b=FjOPxbaaKUFr4YRfikXxsMSlrYps8y3uRPR4rQy5Xy+jvJvzY6EsMllDEhCKHCl3ad
- PKSgtNYpBonbUkB/aNQIwH2BiLUhuhG9c60CTqkC+LSwwb5yyNzXdWIpoKsXFynBFv3V
- kVDy3KF3UToKRzZ9NDeRlbjQOFKHH2UnsOTb0WJJoH7hp6eOGnr3L8CfQrGZJsOr4YP8
- Q72EcGKMweSHCvco0b0iCFzyvP2V88PMFT+/B+pEi5yOuN/kx6aJAxLBATb1uFtFCvv5
- XeTyN/x0Jm0gsjdFMQpoC45oWpeYr0ypKpdz04Pibl6AzRuCCPrIPXV36pwskHpKywpz
- vxtg==
-X-Gm-Message-State: APjAAAV4qaji0Ut4pi9LVAe0XSD7I0tPDyGHUmOJFv3ffvAP4gErnu/b
- dr1Dx9msprET5Gnqhdz1LdxOLg==
-X-Google-Smtp-Source: APXvYqy51QTrQiJ8i5mxqvDOUx/TW/I3DfyX3hdwE1ivAX52NUnEfdFKvlAvHWgiRmW92RZ4P+oOyw==
-X-Received: by 2002:a1c:305:: with SMTP id 5mr4852657wmd.101.1562362329869;
- Fri, 05 Jul 2019 14:32:09 -0700 (PDT)
-Received: from [192.168.10.150] ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id o185sm9912095wmo.45.2019.07.05.14.32.08
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Fri, 05 Jul 2019 14:32:08 -0700 (PDT)
-To: Eduardo Habkost <ehabkost@redhat.com>
-References: <1562079681-19204-1-git-send-email-pbonzini@redhat.com>
- <1562079681-19204-2-git-send-email-pbonzini@redhat.com>
- <20190705203728.GE5198@habkost.net>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <0c1f3a3f-c59d-9866-7fc9-3d9c99af17e5@redhat.com>
-Date: Fri, 5 Jul 2019 23:32:07 +0200
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <borntraeger@de.ibm.com>) id 1hjVoO-000538-Uh
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 17:32:10 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57644)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+ id 1hjVoO-0004xO-Et
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 17:32:08 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ x65LVk11123819
+ for <qemu-devel@nongnu.org>; Fri, 5 Jul 2019 17:31:47 -0400
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2tjcmfkdam-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Fri, 05 Jul 2019 17:31:47 -0400
+Received: from localhost
+ by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+ Fri, 5 Jul 2019 22:31:39 +0100
+Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
+ by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Fri, 5 Jul 2019 22:31:37 +0100
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com
+ [9.149.105.60])
+ by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
+ id x65LVaTc26739140
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 5 Jul 2019 21:31:36 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 0A07742041;
+ Fri,  5 Jul 2019 21:31:36 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id B74544203F;
+ Fri,  5 Jul 2019 21:31:35 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.145.35.167])
+ by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Fri,  5 Jul 2019 21:31:35 +0000 (GMT)
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+References: <20190702113414.6896-1-armbru@redhat.com>
+ <20190702113414.6896-5-armbru@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+ syiRa+UVlsKmx1hsEg==
+Date: Fri, 5 Jul 2019 23:31:35 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <20190705203728.GE5198@habkost.net>
+In-Reply-To: <20190702113414.6896-5-armbru@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.128.67
-Subject: Re: [Qemu-devel] [PATCH 1/7] target/i386: handle filtered_features
- in a new function mark_unavailable_features
+X-TM-AS-GCONF: 00
+x-cbid: 19070521-0008-0000-0000-000002FA43F4
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19070521-0009-0000-0000-000022679B17
+Message-Id: <e7916e59-75a9-cfd2-a2a3-ab30787a60e6@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+ definitions=2019-07-05_06:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1907050273
+Content-Transfer-Encoding: quoted-printable
+X-MIME-Autoconverted: from 8bit to quoted-printable by
+ mx0a-001b2d01.pphosted.com id x65LVk11123819
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.156.1
+Subject: Re: [Qemu-devel] [PULL 4/4] Makefile: Reuse all's recursion
+ machinery for clean and install
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,20 +152,164 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Liran Alon <liran.alon@oracle.com>, qemu-devel@nongnu.org
+Cc: Richard Henderson <richard.henderson@linaro.org>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 05/07/19 22:37, Eduardo Habkost wrote:
-> Filtering and reporting is separate because
-> x86_cpu_filter_features() is also called from a QMP command
-> handler that is not supposed to generate any warnings on stderr
-> (query-cpu-model-expansion).
+This seems to break "make clean" and "make distclean" in the source direc=
+tory if there was never
+a configure.
 
-But that one should not set check_cpuid or enforce_cpuid, should it?
+qemu]$ make clean
+  LD      recurse-clean.mo
+cc: fatal error: no input files
+compilation terminated.
+make: *** [rules.mak:118: recurse-clean.mo] Error 1
 
-(I can still split the filtering and reporting if you prefer).
 
-Paolo
+
+On 02.07.19 13:34, Markus Armbruster wrote:
+> Targets "clean" and "install" run make recursively in a for loop.
+> This ignores -j and -k.  Target "all" depends on SUBDIR/all to recurse
+> into each SUBDIR.  Behaves nicely with -j and -k.  Put that to use for
+> "clean" and "install": depend on SUBDIR/clean or SUBDIR/install,
+> respectively, and delete the loop.
+>=20
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> Message-Id: <20190528082308.22032-5-armbru@redhat.com>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+>  Makefile | 53 +++++++++++++++++++++++++----------------------------
+>  1 file changed, 25 insertions(+), 28 deletions(-)
+>=20
+> diff --git a/Makefile b/Makefile
+> index e68982bd99..8cf6cbc4c4 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -454,20 +454,22 @@ config-host.h-timestamp: config-host.mak
+>  qemu-options.def: $(SRC_PATH)/qemu-options.hx $(SRC_PATH)/scripts/hxto=
+ol
+>  	$(call quiet-command,sh $(SRC_PATH)/scripts/hxtool -h < $< > $@,"GEN"=
+,"$@")
+> =20
+> -SUBDIR_RULES=3D$(addsuffix /all, $(TARGET_DIRS))
+> -SOFTMMU_SUBDIR_RULES=3D$(filter %-softmmu/all,$(SUBDIR_RULES))
+> +TARGET_DIRS_RULES :=3D $(foreach t, all clean install, $(addsuffix /$(=
+t), $(TARGET_DIRS)))
+> =20
+> -$(SOFTMMU_SUBDIR_RULES): $(authz-obj-y)
+> -$(SOFTMMU_SUBDIR_RULES): $(block-obj-y)
+> -$(SOFTMMU_SUBDIR_RULES): $(chardev-obj-y)
+> -$(SOFTMMU_SUBDIR_RULES): $(crypto-obj-y)
+> -$(SOFTMMU_SUBDIR_RULES): $(io-obj-y)
+> -$(SOFTMMU_SUBDIR_RULES): config-all-devices.mak
+> -$(SOFTMMU_SUBDIR_RULES): $(edk2-decompressed)
+> +SOFTMMU_ALL_RULES=3D$(filter %-softmmu/all, $(TARGET_DIRS_RULES))
+> +$(SOFTMMU_ALL_RULES): $(authz-obj-y)
+> +$(SOFTMMU_ALL_RULES): $(block-obj-y)
+> +$(SOFTMMU_ALL_RULES): $(chardev-obj-y)
+> +$(SOFTMMU_ALL_RULES): $(crypto-obj-y)
+> +$(SOFTMMU_ALL_RULES): $(io-obj-y)
+> +$(SOFTMMU_ALL_RULES): config-all-devices.mak
+> +$(SOFTMMU_ALL_RULES): $(edk2-decompressed)
+> =20
+> -.PHONY: $(SUBDIR_RULES)
+> -$(SUBDIR_RULES):
+> -	$(call quiet-command,$(MAKE) $(SUBDIR_MAKEFLAGS) -C $(dir $@) V=3D"$(=
+V)" TARGET_DIR=3D"$(dir $@)" all,)
+> +.PHONY: $(TARGET_DIRS_RULES)
+> +# The $(TARGET_DIRS_RULES) are of the form SUBDIR/GOAL, so that
+> +# $(dir $@) yields the sub-directory, and $(notdir $@) yields the sub-=
+goal
+> +$(TARGET_DIRS_RULES):
+> +	$(call quiet-command,$(MAKE) $(SUBDIR_MAKEFLAGS) -C $(dir $@) V=3D"$(=
+V)" TARGET_DIR=3D"$(dir $@)" $(notdir $@),)
+> =20
+>  DTC_MAKE_ARGS=3D-I$(SRC_PATH)/dtc VPATH=3D$(SRC_PATH)/dtc -C dtc V=3D"=
+$(V)" LIBFDT_srcdir=3D$(SRC_PATH)/dtc/libfdt
+>  DTC_CFLAGS=3D$(CFLAGS) $(QEMU_CFLAGS)
+> @@ -500,19 +502,19 @@ capstone/all: .git-submodule-status
+>  slirp/all: .git-submodule-status
+>  	$(call quiet-command,$(MAKE) -C $(SRC_PATH)/slirp BUILD_DIR=3D"$(BUIL=
+D_DIR)/slirp" CC=3D"$(CC)" AR=3D"$(AR)" LD=3D"$(LD)" RANLIB=3D"$(RANLIB)"=
+ CFLAGS=3D"$(QEMU_CFLAGS) $(CFLAGS)" LDFLAGS=3D"$(LDFLAGS)")
+> =20
+> -$(SUBDIR_RULES): libqemuutil.a $(common-obj-y) \
+> +$(filter %/all, $(TARGET_DIRS_RULES)): libqemuutil.a $(common-obj-y) \
+>  	$(qom-obj-y) $(crypto-user-obj-$(CONFIG_USER_ONLY))
+> =20
+>  ROM_DIRS =3D $(addprefix pc-bios/, $(ROMS))
+> -ROMSUBDIR_RULES=3D$(addsuffix /all, $(ROM_DIRS))
+> +ROM_DIRS_RULES=3D$(foreach t, all clean, $(addsuffix /$(t), $(ROM_DIRS=
+)))
+>  # Only keep -O and -g cflags
+> -.PHONY: $(ROMSUBDIR_RULES)
+> -$(ROMSUBDIR_RULES):
+> -	$(call quiet-command,$(MAKE) $(SUBDIR_MAKEFLAGS) -C $(dir $@) V=3D"$(=
+V)" TARGET_DIR=3D"$(dir $@)" CFLAGS=3D"$(filter -O% -g%,$(CFLAGS))",)
+> +.PHONY: $(ROM_DIRS_RULES)
+> +$(ROM_DIRS_RULES):
+> +	$(call quiet-command,$(MAKE) $(SUBDIR_MAKEFLAGS) -C $(dir $@) V=3D"$(=
+V)" TARGET_DIR=3D"$(dir $@)" CFLAGS=3D"$(filter -O% -g%,$(CFLAGS))" $(not=
+dir $@),)
+> =20
+> -ALL_SUBDIRS=3D$(TARGET_DIRS) $(ROM_DIRS)
+> -
+> -recurse-all: $(SUBDIR_RULES) $(ROMSUBDIR_RULES)
+> +recurse-all: $(addsuffix /all, $(TARGET_DIRS) $(ROM_DIRS))
+> +recurse-clean: $(addsuffix /clean, $(TARGET_DIRS) $(ROM_DIRS))
+> +recurse-install: $(addsuffix /install, $(TARGET_DIRS))
+> =20
+>  $(BUILD_DIR)/version.o: $(SRC_PATH)/version.rc config-host.h
+>  	$(call quiet-command,$(WINDRES) -I$(BUILD_DIR) -o $@ $<,"RC","version=
+.o")
+> @@ -661,7 +663,7 @@ clean-coverage:
+>  		"CLEAN", "coverage files")
+>  endif
+> =20
+> -clean:
+> +clean: recurse-clean
+>  # avoid old build problems by removing potentially incorrect old files
+>  	rm -f config.mak op-i386.h opc-i386.h gen-op-i386.h op-arm.h opc-arm.=
+h gen-op-arm.h
+>  	rm -f qemu-options.def
+> @@ -682,9 +684,6 @@ clean:
+>  	rm -f $(foreach f,$(generated-files-y),$(f) $(f)-timestamp)
+>  	rm -f qapi-gen-timestamp
+>  	rm -rf qga/qapi-generated
+> -	for d in $(ALL_SUBDIRS); do \
+> -	if test -d $$d; then $(MAKE) -C $$d $@ || exit 1; fi; \
+> -        done
+>  	rm -f config-all-devices.mak
+> =20
+>  VERSION ?=3D $(shell cat VERSION)
+> @@ -832,7 +831,8 @@ endif
+>  ICON_SIZES=3D16x16 24x24 32x32 48x48 64x64 128x128 256x256 512x512
+> =20
+>  install: all $(if $(BUILD_DOCS),install-doc) install-datadir install-l=
+ocalstatedir \
+> -	$(if $(INSTALL_BLOBS),$(edk2-decompressed))
+> +	$(if $(INSTALL_BLOBS),$(edk2-decompressed)) \
+> +	recurse-install
+>  ifneq ($(TOOLS),)
+>  	$(call install-prog,$(subst qemu-ga,qemu-ga$(EXESUF),$(TOOLS)),$(DEST=
+DIR)$(bindir))
+>  endif
+> @@ -898,9 +898,6 @@ endif
+>  		$(INSTALL_DATA) $(SRC_PATH)/pc-bios/keymaps/$$x "$(DESTDIR)$(qemu_da=
+tadir)/keymaps"; \
+>  	done
+>  	$(INSTALL_DATA) $(BUILD_DIR)/trace-events-all "$(DESTDIR)$(qemu_datad=
+ir)/trace-events-all"
+> -	for d in $(TARGET_DIRS); do \
+> -	$(MAKE) $(SUBDIR_MAKEFLAGS) TARGET_DIR=3D$$d/ -C $$d $@ || exit 1 ; \
+> -        done
+> =20
+>  .PHONY: ctags
+>  ctags:
+>=20
+
 
