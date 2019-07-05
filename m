@@ -2,86 +2,59 @@ Return-Path: <SRS0=wUMn=VC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC3D4C4649E
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 16:20:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C62DCC4649E
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 16:21:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 978E0216FD
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 16:20:16 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nQns0Qcn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 978E0216FD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 9F12E216FD
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 16:21:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F12E216FD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54746 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54748 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hjQwV-0001Fw-Rs
-	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 12:20:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40380)
+	id 1hjQxQ-0001gy-QA
+	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 12:21:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42291)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hjQhh-0002zx-50
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 12:04:54 -0400
+ (envelope-from <philmd@redhat.com>) id 1hjQoi-0002hH-Ae
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 12:12:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hjQhe-00029b-RH
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 12:04:52 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:53527)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hjQhd-0000L4-FS
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 12:04:50 -0400
-Received: by mail-wm1-x341.google.com with SMTP id x15so9662741wmj.3
- for <qemu-devel@nongnu.org>; Fri, 05 Jul 2019 09:04:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=IA9jQ8jl+c2/RuKmRF2JO1M1hIb19YRvsyc1s94BgiI=;
- b=nQns0QcnvgprMmSFmKg5ZouU0gP9psSbjKFL8wMX043yaIIxFUSa+x42/W8Vi186Yl
- SRXMAtZr1bmPw0Qidze+ppB6RniA2CNcoVR9vPYjOeW0bHCxWls4tUFK2D9ePcQetXCB
- FOU4M1uR8G1KRunwrsbroZyQPvPkMGLb+J4z6zkehHfHvzLPB1RDfViqCOPlXSpCtQtJ
- 3iGcWYE3uVSDkd1WVK5TkDw1Dywp5XvPE7pCa6AihtXPWPZLXnAlOwOMgMQCQgIYNIZx
- MwSG6N1wSkv5c5qXRfSXZcmXYA2hbHJmd79TS+8afu9FUXDfPoGeSdolSONgzxfh4ak5
- 4/Qw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=IA9jQ8jl+c2/RuKmRF2JO1M1hIb19YRvsyc1s94BgiI=;
- b=Iaiapthzel2jBkvRrMdQw5xMwC2ArNQI2MifKpUDdfK+Om5kOwGrOE01prjbAFYVRa
- 3abCVMNUPFn1+CJWMcvfLhQcD1bOxwGS4/1fGuU78yIi9+2RPYqcA9ysdvKxsF9AeT8l
- xnjq7Xy0vE/dVQsZKBZ2FqxcKOco/p9K26yPM9H43pDFhvYNvF+CM45ZvU0p/BXgn+Ff
- 9K4+vpD0lvZ8yMydJf9ciMro6cxvXimLhoPZcTG/6oth3SNxUaVRaFVImYYRqrA6Pi0M
- T8mKiO+LoDhUQ17/+mhzQhTAnIMz7cS+24uXK1x1I0b4qasxHAuY3MJhdgDvZntaERCF
- RKrA==
-X-Gm-Message-State: APjAAAUNDfNrb25lbeXtFJUAHpCih/TvqZxOriqmqt5r4IBmh0T+HKzX
- roALqN6/h28uynrea7/z635lcg==
-X-Google-Smtp-Source: APXvYqx8Y0QnLP6sttdvemxWuSeVTny9+BqnQqqW5MweVjINCO3XuUmU2DlCXCpp564P0mDqpfo8/A==
-X-Received: by 2002:a1c:a514:: with SMTP id o20mr4162743wme.149.1562342662369; 
- Fri, 05 Jul 2019 09:04:22 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id d9sm13335588wrb.71.2019.07.05.09.04.21
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Fri, 05 Jul 2019 09:04:21 -0700 (PDT)
-Received: from zen.linaroharston. (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 75FCB1FF87;
- Fri,  5 Jul 2019 17:04:21 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+ (envelope-from <philmd@redhat.com>) id 1hjQog-0008Mz-9T
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 12:12:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57748)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>)
+ id 1hjQoW-0007p5-T0; Fri, 05 Jul 2019 12:11:58 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id C963EC057EC6;
+ Fri,  5 Jul 2019 16:11:52 +0000 (UTC)
+Received: from x1w.redhat.com (ovpn-204-45.brq.redhat.com [10.40.204.45])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id CC5FD80A33;
+ Fri,  5 Jul 2019 16:11:46 +0000 (UTC)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Fri,  5 Jul 2019 17:04:16 +0100
-Message-Id: <20190705160421.19015-1-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
+Date: Fri,  5 Jul 2019 18:11:44 +0200
+Message-Id: <20190705161144.18533-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::341
-Subject: [Qemu-devel] [PATCH for 4.1 0/5] tcg tests and gdbstub fixes
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.32]); Fri, 05 Jul 2019 16:11:54 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH-for-4.1] Revert "hw/block/pflash_cfi02: Reduce
+ I/O accesses to 16-bit"
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,39 +66,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm@nongnu.org,
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ Stephen Checkoway <stephen.checkoway@oberlin.edu>, qemu-block@nongnu.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Alistair Francis <alistair.francis@wdc.com>,
  =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
+Stephen Checkoway noticed commit 3ae0343db69 is incorrect.
+This commit state all parallel flashes are limited to 16-bit
+accesses, however the x32 configuration exists in some models,
+such the Cypress S29CL032J, which CFI Device Geometry Definition
+announces:
 
-A small selection of clean-up patches covering failing tests and
-gdbstub.
+  CFI ADDR     DATA
+  0x28,0x29 =3D 0x0003 (x32-only asynchronous interface)
 
-The following patches need review
- patch 0002/tests tcg fix up test i386 fprem.ref generation.patch
- patch 0003/tests tcg fix diff out pass to properly report fa.patch
- patch 0004/gdbstub add some notes to the header comment.patch
+Guests should not be affected by the previous change, because
+QEMU does not announce itself as x32 capable:
 
-Alex Bennée (4):
-  tests/tcg: fix up test-i386-fprem.ref generation
-  tests/tcg: fix diff-out pass to properly report failure
-  gdbstub: add some notes to the header comment
-  gdbstub: revert to previous set_reg behaviour
+    /* Flash device interface (8 & 16 bits) */
+    pfl->cfi_table[0x28] =3D 0x02;
+    pfl->cfi_table[0x29] =3D 0x00;
 
-Philippe Mathieu-Daudé (1):
-  target/arm/vfp_helper: Call set_fpscr_to_host before updating FPSCR
-    reg
+Commit 3ae0343db69 does not restrict the bus to 16-bit accesses,
+but restrict the implementation as 16-bit access max, so a guest
+32-bit access will result in 2x 16-bit calls.
 
- gdbstub.c                      | 24 ++++++++++++++++++------
- target/arm/vfp_helper.c        |  4 ++--
- tests/tcg/Makefile             |  6 +++++-
- tests/tcg/i386/Makefile.target |  4 ++--
- 4 files changed, 27 insertions(+), 11 deletions(-)
+Now, we have 2 boards that register the flash device in 32-bit
+access:
 
--- 
+- PPC: taihu_405ep
+
+  The CFI id matches the S29AL008J that is a 1MB in x16, while
+  the code QEMU forces it to be 2MB, and checking Linux it expects
+  a 4MB flash.
+
+- ARM: Digic4
+
+  While the comment says "Samsung K8P3215UQB 64M Bit (4Mx16)",
+  this flash is 32Mb (2MB). Also note the CFI id does not match
+  the comment.
+
+To avoid unexpected side effect, we revert commit 3ae0343db69,
+and will clean the board code later.
+
+Reported-by: Stephen Checkoway <stephen.checkoway@oberlin.edu>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+ hw/block/pflash_cfi02.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
+index 5392290c72..83084b9d72 100644
+--- a/hw/block/pflash_cfi02.c
++++ b/hw/block/pflash_cfi02.c
+@@ -317,6 +317,8 @@ static uint64_t pflash_read(void *opaque, hwaddr offs=
+et, unsigned int width)
+     boff =3D offset & 0xFF;
+     if (pfl->width =3D=3D 2) {
+         boff =3D boff >> 1;
++    } else if (pfl->width =3D=3D 4) {
++        boff =3D boff >> 2;
+     }
+     switch (pfl->cmd) {
+     default:
+@@ -447,6 +449,8 @@ static void pflash_write(void *opaque, hwaddr offset,=
+ uint64_t value,
+     boff =3D offset;
+     if (pfl->width =3D=3D 2) {
+         boff =3D boff >> 1;
++    } else if (pfl->width =3D=3D 4) {
++        boff =3D boff >> 2;
+     }
+     /* Only the least-significant 11 bits are used in most cases. */
+     boff &=3D 0x7FF;
+@@ -706,7 +710,6 @@ static void pflash_write(void *opaque, hwaddr offset,=
+ uint64_t value,
+ static const MemoryRegionOps pflash_cfi02_ops =3D {
+     .read =3D pflash_read,
+     .write =3D pflash_write,
+-    .impl.max_access_size =3D 2,
+     .valid.min_access_size =3D 1,
+     .valid.max_access_size =3D 4,
+     .endianness =3D DEVICE_NATIVE_ENDIAN,
+--=20
 2.20.1
 
 
