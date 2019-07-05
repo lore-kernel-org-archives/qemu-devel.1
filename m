@@ -7,44 +7,44 @@ X-Spam-Status: No, score=-10.0 required=3.0
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31ECCC5B57D
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 08:48:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38CF4C5B57D
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 08:51:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F1A2221670
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 08:48:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1A2221670
+	by mail.kernel.org (Postfix) with ESMTPS id 0504F218BC
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jul 2019 08:51:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0504F218BC
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50639 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50654 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hjJtJ-0006Un-8R
-	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 04:48:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57132)
+	id 1hjJwR-0000Vk-An
+	for qemu-devel@archiver.kernel.org; Fri, 05 Jul 2019 04:51:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56899)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <ysato@users.sourceforge.jp>) id 1hjJdu-0003TX-1u
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 04:32:33 -0400
+ (envelope-from <ysato@users.sourceforge.jp>) id 1hjJdf-0003FM-CS
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 04:32:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ysato@users.sourceforge.jp>) id 1hjJdq-00069z-Cz
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 04:32:29 -0400
-Received: from mail03.asahi-net.or.jp ([202.224.55.15]:39717)
+ (envelope-from <ysato@users.sourceforge.jp>) id 1hjJdZ-0005ry-0I
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 04:32:15 -0400
+Received: from mail01.asahi-net.or.jp ([202.224.55.13]:44246)
  by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <ysato@users.sourceforge.jp>) id 1hjJdp-0005sk-Cc
- for qemu-devel@nongnu.org; Fri, 05 Jul 2019 04:32:26 -0400
+ (envelope-from <ysato@users.sourceforge.jp>) id 1hjJdU-0005ja-Tp
+ for qemu-devel@nongnu.org; Fri, 05 Jul 2019 04:32:06 -0400
 Received: from h61-195-96-97.vps.ablenet.jp (h61-195-96-97.ablenetvps.ne.jp
  [61.195.96.97]) (Authenticated sender: PQ4Y-STU)
- by mail03.asahi-net.or.jp (Postfix) with ESMTPA id 566FD4DE9E;
- Fri,  5 Jul 2019 17:32:06 +0900 (JST)
+ by mail01.asahi-net.or.jp (Postfix) with ESMTPA id 90BD312B2A2;
+ Fri,  5 Jul 2019 17:32:02 +0900 (JST)
 Received: from yo-satoh-debian.localdomain (ZM005235.ppp.dion.ne.jp
  [222.8.5.235])
- by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id B890C240085;
- Fri,  5 Jul 2019 17:32:05 +0900 (JST)
+ by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id 029FC240085;
+ Fri,  5 Jul 2019 17:32:01 +0900 (JST)
 From: Yoshinori Sato <ysato@users.sourceforge.jp>
 To: qemu-devel@nongnu.org
-Date: Fri,  5 Jul 2019 17:31:36 +0900
-Message-Id: <20190705083141.106254-18-ysato@users.sourceforge.jp>
+Date: Fri,  5 Jul 2019 17:31:26 +0900
+Message-Id: <20190705083141.106254-8-ysato@users.sourceforge.jp>
 X-Mailer: git-send-email 2.11.0
 In-Reply-To: <20190705083141.106254-1-ysato@users.sourceforge.jp>
 References: <20190705083141.106254-1-ysato@users.sourceforge.jp>
@@ -53,8 +53,8 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 202.224.55.15
-Subject: [Qemu-devel] [PATCH v22 17/22] hw/rx: RX Target hardware definition
+X-Received-From: 202.224.55.13
+Subject: [Qemu-devel] [PATCH v22 07/22] target/rx: RX disassembler
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,166 +72,53 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-rx62n - RX62N cpu.
-rx-virt - RX QEMU virtual target.
-
-v21 changes.
-rx_load_image move to rx-virt.c
-
 Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
-
-Message-Id: <20190616142836.10614-17-ysato@users.sourceforge.jp>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Message-Id: <20190607091116.49044-9-ysato@users.sourceforge.jp>
+Message-Id: <20190607091116.49044-5-ysato@users.sourceforge.jp>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-[PMD: Use TYPE_RX62N_CPU, use #define for RX62N_NR_TMR/CMT/SCI,
- renamed CPU -> MCU, device -> microcontroller]
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
-v19: Fixed typo (Peter Maydell)
-
-Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
----
- include/hw/rx/rx.h    |   7 ++
- include/hw/rx/rx62n.h |  91 +++++++++++++++++++
- hw/rx/rx-virt.c       | 127 +++++++++++++++++++++++++++
- hw/rx/rx62n.c         | 238 ++++++++++++++++++++++++++++++++++++++++++++=
+ include/disas/dis-asm.h |    5 +
+ target/rx/disas.c       | 1480 +++++++++++++++++++++++++++++++++++++++++=
 ++++++
- hw/rx/Kconfig         |  14 +++
- hw/rx/Makefile.objs   |   2 +
- 6 files changed, 479 insertions(+)
- create mode 100644 include/hw/rx/rx.h
- create mode 100644 include/hw/rx/rx62n.h
- create mode 100644 hw/rx/rx-virt.c
- create mode 100644 hw/rx/rx62n.c
- create mode 100644 hw/rx/Kconfig
- create mode 100644 hw/rx/Makefile.objs
+ 2 files changed, 1485 insertions(+)
+ create mode 100644 target/rx/disas.c
 
-diff --git a/include/hw/rx/rx.h b/include/hw/rx/rx.h
+diff --git a/include/disas/dis-asm.h b/include/disas/dis-asm.h
+index e9c7dd8eb4..a900bd0a27 100644
+--- a/include/disas/dis-asm.h
++++ b/include/disas/dis-asm.h
+@@ -226,6 +226,10 @@ enum bfd_architecture
+ #define bfd_mach_nios2r2        2
+   bfd_arch_lm32,       /* Lattice Mico32 */
+ #define bfd_mach_lm32 1
++  bfd_arch_rx,       /* Renesas RX */
++#define bfd_mach_rx            0x75
++#define bfd_mach_rx_v2         0x76
++#define bfd_mach_rx_v3         0x77
+   bfd_arch_last
+   };
+ #define bfd_mach_s390_31 31
+@@ -433,6 +437,7 @@ int print_insn_little_nios2     (bfd_vma, disassemble=
+_info*);
+ int print_insn_xtensa           (bfd_vma, disassemble_info*);
+ int print_insn_riscv32          (bfd_vma, disassemble_info*);
+ int print_insn_riscv64          (bfd_vma, disassemble_info*);
++int print_insn_rx(bfd_vma, disassemble_info *);
+=20
+ #if 0
+ /* Fetch the disassembler for a given BFD, if that support is available.=
+  */
+diff --git a/target/rx/disas.c b/target/rx/disas.c
 new file mode 100644
-index 0000000000..ff5924b81f
+index 0000000000..8cada4825d
 --- /dev/null
-+++ b/include/hw/rx/rx.h
-@@ -0,0 +1,7 @@
-+#ifndef QEMU_RX_H
-+#define QEMU_RX_H
-+/* Definitions for RX board emulation.  */
-+
-+#include "target/rx/cpu-qom.h"
-+
-+#endif
-diff --git a/include/hw/rx/rx62n.h b/include/hw/rx/rx62n.h
-new file mode 100644
-index 0000000000..97ea8ddb8e
---- /dev/null
-+++ b/include/hw/rx/rx62n.h
-@@ -0,0 +1,91 @@
++++ b/target/rx/disas.c
+@@ -0,0 +1,1480 @@
 +/*
-+ * RX62N MCU Object
++ * Renesas RX Disassembler
 + *
-+ * Datasheet: RX62N Group, RX621 Group User's Manual: Hardware
-+ * (Rev.1.40 R01UH0033EJ0140)
-+ *
-+ * Copyright (c) 2019 Yoshinori Sato
-+ *
-+ * This program is free software; you can redistribute it and/or modify =
-it
-+ * under the terms and conditions of the GNU General Public License,
-+ * version 2 or later, as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope it will be useful, but WITHOU=
-T
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License=
- for
-+ * more details.
-+ *
-+ * You should have received a copy of the GNU General Public License alo=
-ng with
-+ * this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#ifndef HW_RX_RX62N_H
-+#define HW_RX_RX62N_H
-+
-+#include "hw/sysbus.h"
-+#include "hw/intc/rx_icu.h"
-+#include "hw/timer/renesas_tmr.h"
-+#include "hw/timer/renesas_cmt.h"
-+#include "hw/char/renesas_sci.h"
-+#include "target/rx/cpu.h"
-+#include "qemu/units.h"
-+
-+#define TYPE_RX62N "rx62n"
-+#define RX62N(obj) OBJECT_CHECK(RX62NState, (obj), TYPE_RX62N)
-+
-+#define RX62N_NR_TMR    2
-+#define RX62N_NR_CMT    2
-+#define RX62N_NR_SCI    6
-+
-+typedef struct RX62NState {
-+    SysBusDevice parent_obj;
-+
-+    RXCPU cpu;
-+    RXICUState icu;
-+    RTMRState tmr[RX62N_NR_TMR];
-+    RCMTState cmt[RX62N_NR_CMT];
-+    RSCIState sci[RX62N_NR_SCI];
-+
-+    MemoryRegion *sysmem;
-+    bool kernel;
-+
-+    MemoryRegion iram;
-+    MemoryRegion iomem1;
-+    MemoryRegion d_flash;
-+    MemoryRegion iomem2;
-+    MemoryRegion iomem3;
-+    MemoryRegion c_flash;
-+    qemu_irq irq[NR_IRQS];
-+} RX62NState;
-+
-+/*
-+ * RX62N Peripheral Address
-+ * See users manual section 5
-+ */
-+#define RX62N_ICUBASE 0x00087000
-+#define RX62N_TMRBASE 0x00088200
-+#define RX62N_CMTBASE 0x00088000
-+#define RX62N_SCIBASE 0x00088240
-+
-+/*
-+ * RX62N Peripheral IRQ
-+ * See users manual section 11
-+ */
-+#define RX62N_TMR_IRQBASE 174
-+#define RX62N_CMT_IRQBASE 28
-+#define RX62N_SCI_IRQBASE 214
-+
-+/*
-+ * RX62N Internal Memory
-+ * It is the value of R5F562N8.
-+ * Please change the size for R5F562N7.
-+ */
-+#define RX62N_IRAM_BASE 0x00000000
-+#define RX62N_IRAM_SIZE (96 * KiB)
-+#define RX62N_DFLASH_BASE 0x00100000
-+#define RX62N_DFLASH_SIZE (32 * KiB)
-+#define RX62N_CFLASH_BASE 0xfff80000
-+#define RX62N_CFLASH_SIZE (512 * KiB)
-+
-+#define RX62N_PCLK (48 * 1000 * 1000)
-+#endif
-diff --git a/hw/rx/rx-virt.c b/hw/rx/rx-virt.c
-new file mode 100644
-index 0000000000..4cfe2e3123
---- /dev/null
-+++ b/hw/rx/rx-virt.c
-@@ -0,0 +1,127 @@
-+/*
-+ * RX QEMU virtual platform
-+ *
-+ * Copyright (c) 2019 Yoshinori Sato
++ * Copyright (c) 2019 Yoshinori Sato <ysato@users.sourceforge.jp>
 + *
 + * This program is free software; you can redistribute it and/or modify =
 it
@@ -251,398 +138,1469 @@ ng with
 + */
 +
 +#include "qemu/osdep.h"
-+#include "qapi/error.h"
-+#include "qemu-common.h"
++#include "disas/dis-asm.h"
++#include "qemu/bitops.h"
 +#include "cpu.h"
-+#include "hw/hw.h"
-+#include "hw/sysbus.h"
-+#include "hw/loader.h"
-+#include "hw/rx/rx62n.h"
-+#include "sysemu/sysemu.h"
-+#include "sysemu/qtest.h"
-+#include "sysemu/device_tree.h"
-+#include "hw/boards.h"
 +
-+/* Same address of GDB integrated simulator */
-+#define SDRAM_BASE 0x01000000
++typedef struct DisasContext {
++    disassemble_info *dis;
++    uint32_t addr;
++    uint32_t pc;
++} DisasContext;
 +
-+static void rx_load_image(RXCPU *cpu, const char *filename,
-+                          uint32_t start, uint32_t size)
++
++static uint32_t decode_load_bytes(DisasContext *ctx, uint32_t insn,
++                           int i, int n)
 +{
-+    static uint32_t extable[32];
-+    long kernel_size;
-+    int i;
-+
-+    kernel_size =3D load_image_targphys(filename, start, size);
-+    if (kernel_size < 0) {
-+        fprintf(stderr, "qemu: could not load kernel '%s'\n", filename);
-+        exit(1);
++    bfd_byte buf;
++    while (++i <=3D n) {
++        ctx->dis->read_memory_func(ctx->addr++, &buf, 1, ctx->dis);
++        insn |=3D buf << (32 - i * 8);
 +    }
-+    cpu->env.pc =3D start;
-+
-+    /* setup exception trap trampoline */
-+    /* linux kernel only works little-endian mode */
-+    for (i =3D 0; i < ARRAY_SIZE(extable); i++) {
-+        extable[i] =3D cpu_to_le32(0x10 + i * 4);
-+    }
-+    rom_add_blob_fixed("extable", extable, sizeof(extable), 0xffffff80);
++    return insn;
 +}
 +
-+static void rxvirt_init(MachineState *machine)
++static int32_t li(DisasContext *ctx, int sz)
 +{
-+    RX62NState *s =3D g_new(RX62NState, 1);
-+    MemoryRegion *sysmem =3D get_system_memory();
-+    MemoryRegion *sdram =3D g_new(MemoryRegion, 1);
-+    const char *kernel_filename =3D machine->kernel_filename;
-+    const char *dtb_filename =3D machine->dtb;
-+    void *dtb =3D NULL;
-+    int dtb_size;
++    int32_t addr;
++    bfd_byte buf[4];
++    addr =3D ctx->addr;
 +
-+    /* Allocate memory space */
-+    memory_region_init_ram(sdram, NULL, "sdram", 16 * MiB,
-+                           &error_fatal);
-+    memory_region_add_subregion(sysmem, SDRAM_BASE, sdram);
++    switch (sz) {
++    case 1:
++        ctx->addr +=3D 1;
++        ctx->dis->read_memory_func(addr, buf, 1, ctx->dis);
++        return (int8_t)buf[0];
++    case 2:
++        ctx->addr +=3D 2;
++        ctx->dis->read_memory_func(addr, buf, 2, ctx->dis);
++        return ldsw_le_p(buf);
++    case 3:
++        ctx->addr +=3D 3;
++        ctx->dis->read_memory_func(addr, buf, 3, ctx->dis);
++        return (int8_t)buf[2] << 16 | lduw_le_p(buf);
++    case 0:
++        ctx->addr +=3D 4;
++        ctx->dis->read_memory_func(addr, buf, 4, ctx->dis);
++        return ldl_le_p(buf);
++    default:
++        g_assert_not_reached();
++    }
++}
 +
-+    /* Initialize MCU */
-+    object_initialize_child(OBJECT(machine), "mcu", s,
-+                            sizeof(RX62NState), TYPE_RX62N,
-+                            &error_fatal, NULL);
-+    object_property_set_link(OBJECT(s), OBJECT(get_system_memory()),
-+                             "memory", &error_abort);
-+    object_property_set_bool(OBJECT(s), kernel_filename !=3D NULL,
-+                             "load-kernel", &error_abort);
-+    object_property_set_bool(OBJECT(s), true, "realized", &error_abort);
++static int bdsp_s(DisasContext *ctx, int d)
++{
++    /*
++     * 0 -> 8
++     * 1 -> 9
++     * 2 -> 10
++     * 3 -> 3
++     * :
++     * 7 -> 7
++     */
++    if (d < 3) {
++        d +=3D 8;
++    }
++    return d;
++}
 +
-+    /* Load kernel and dtb */
-+    if (kernel_filename) {
-+        rx_load_image(RXCPU(first_cpu), kernel_filename,
-+                      SDRAM_BASE + 8 * MiB, 8 * MiB);
-+        if (dtb_filename) {
-+            dtb =3D load_device_tree(dtb_filename, &dtb_size);
-+            if (dtb =3D=3D NULL) {
-+                fprintf(stderr, "Couldn't open dtb file %s\n", dtb_filen=
-ame);
-+                exit(1);
++/* Include the auto-generated decoder.  */
++#include "decode.inc.c"
++
++#define prt(...) (ctx->dis->fprintf_func)((ctx->dis->stream), __VA_ARGS_=
+_)
++
++#define RX_MEMORY_BYTE 0
++#define RX_MEMORY_WORD 1
++#define RX_MEMORY_LONG 2
++
++#define RX_IM_BYTE 0
++#define RX_IM_WORD 1
++#define RX_IM_LONG 2
++#define RX_IM_UWORD 3
++
++static const char size[] =3D {'b', 'w', 'l'};
++static const char cond[][4] =3D {
++    "eq", "ne", "c", "nc", "gtu", "leu", "pz", "n",
++    "ge", "lt", "gt", "le", "o", "no", "ra", "f"
++};
++static const char psw[] =3D {
++    'c', 'z', 's', 'o', 0, 0, 0, 0,
++    'i', 'u', 0, 0, 0, 0, 0, 0,
++};
++
++static uint32_t rx_index_addr(int ld, int size, DisasContext *ctx)
++{
++    bfd_byte buf[2];
++    switch (ld) {
++    case 0:
++        return 0;
++    case 1:
++        ctx->dis->read_memory_func(ctx->addr, buf, 1, ctx->dis);
++        ctx->addr +=3D 1;
++        return ((uint8_t)buf[0]) << size;
++    case 2:
++        ctx->dis->read_memory_func(ctx->addr, buf, 2, ctx->dis);
++        ctx->addr +=3D 2;
++        return lduw_le_p(buf) << size;
++    }
++    g_assert_not_reached();
++}
++
++static void operand(DisasContext *ctx, int ld, int mi, int rs, int rd)
++{
++    int dsp;
++    static const char sizes[][4] =3D {".b", ".w", ".l", ".uw", ".ub"};
++    if (ld < 3) {
++        switch (mi) {
++        case 4:
++            /* dsp[rs].ub */
++            dsp =3D rx_index_addr(ld, RX_MEMORY_BYTE, ctx);
++            break;
++        case 3:
++            /* dsp[rs].uw */
++            dsp =3D rx_index_addr(ld, RX_MEMORY_WORD, ctx);
++            break;
++        default:
++            /* dsp[rs].b */
++            /* dsp[rs].w */
++            /* dsp[rs].l */
++            dsp =3D rx_index_addr(ld, mi, ctx);
++            break;
++        }
++        if (dsp > 0) {
++            prt("%d", dsp);
++        }
++        prt("[r%d]%s", rs, sizes[mi]);
++    } else {
++        prt("r%d", rs);
++    }
++    prt(", r%d", rd);
++}
++
++static void prt_ir(DisasContext *ctx, const char *insn, int imm, int rd)
++{
++    if (imm < 0x100) {
++        prt("%s\t#%d, r%d", insn, imm, rd);
++    } else {
++        prt("%s\t#0x%08x, r%d", insn, imm, rd);
++    }
++}
++
++/* mov.[bwl] rs,dsp:[rd] */
++static bool trans_MOV_rm(DisasContext *ctx, arg_MOV_rm *a)
++{
++    if (a->dsp > 0) {
++        prt("mov.%c\tr%d,%d[r%d]",
++            size[a->sz], a->rs, a->dsp << a->sz, a->rd);
++    } else {
++        prt("mov.%c\tr%d,[r%d]",
++            size[a->sz], a->rs, a->rd);
++    }
++    return true;
++}
++
++/* mov.[bwl] dsp:[rs],rd */
++static bool trans_MOV_mr(DisasContext *ctx, arg_MOV_mr *a)
++{
++    if (a->dsp > 0) {
++        prt("mov.%c\t%d[r%d], r%d",
++            size[a->sz], a->dsp << a->sz, a->rs, a->rd);
++    } else {
++        prt("mov.%c\t[r%d], r%d",
++            size[a->sz], a->rs, a->rd);
++    }
++    return true;
++}
++
++/* mov.l #uimm4,rd */
++/* mov.l #uimm8,rd */
++/* mov.l #imm,rd */
++static bool trans_MOV_ir(DisasContext *ctx, arg_MOV_ir *a)
++{
++    prt_ir(ctx, "mov.l", a->imm, a->rd);
++    return true;
++}
++
++/* mov.[bwl] #uimm8,dsp:[rd] */
++/* mov #imm, dsp:[rd] */
++static bool trans_MOV_im(DisasContext *ctx, arg_MOV_im *a)
++{
++    if (a->dsp > 0) {
++        prt("mov.%c\t#%d,%d[r%d]",
++            size[a->sz], a->imm, a->dsp << a->sz, a->rd);
++    } else {
++        prt("mov.%c\t#%d,[r%d]",
++            size[a->sz], a->imm, a->rd);
++    }
++    return true;
++}
++
++/* mov.[bwl] [ri,rb],rd */
++static bool trans_MOV_ar(DisasContext *ctx, arg_MOV_ar *a)
++{
++    prt("mov.%c\t[r%d,r%d], r%d", size[a->sz], a->ri, a->rb, a->rd);
++    return true;
++}
++
++/* mov.[bwl] rd,[ri,rb] */
++static bool trans_MOV_ra(DisasContext *ctx, arg_MOV_ra *a)
++{
++    prt("mov.%c\tr%d, [r%d, r%d]", size[a->sz], a->rs, a->ri, a->rb);
++    return true;
++}
++
++
++/* mov.[bwl] dsp:[rs],dsp:[rd] */
++/* mov.[bwl] rs,dsp:[rd] */
++/* mov.[bwl] dsp:[rs],rd */
++/* mov.[bwl] rs,rd */
++static bool trans_MOV_mm(DisasContext *ctx, arg_MOV_mm *a)
++{
++    int dsp;
++
++    prt("mov.%c\t", size[a->sz]);
++    if (a->lds =3D=3D 3 && a->ldd =3D=3D 3) {
++        /* mov.[bwl] rs,rd */
++        prt("r%d, r%d", a->rs, a->rd);
++        return true;
++    }
++    if (a->lds =3D=3D 3) {
++        prt("r%d, ", a->rd);
++        dsp =3D rx_index_addr(a->ldd, a->sz, ctx);
++        if (dsp > 0) {
++            prt("%d", dsp);
++        }
++        prt("[r%d]", a->rs);
++    } else if (a->ldd =3D=3D 3) {
++        dsp =3D rx_index_addr(a->lds, a->sz, ctx);
++        if (dsp > 0) {
++            prt("%d", dsp);
++        }
++        prt("[r%d], r%d", a->rs, a->rd);
++    } else {
++        dsp =3D rx_index_addr(a->lds, a->sz, ctx);
++        if (dsp > 0) {
++            prt("%d", dsp);
++        }
++        prt("[r%d], ", a->rs);
++        dsp =3D rx_index_addr(a->ldd, a->sz, ctx);
++        if (dsp > 0) {
++            prt("%d", dsp);
++        }
++        prt("[r%d]", a->rd);
++    }
++    return true;
++}
++
++/* mov.[bwl] rs,[rd+] */
++/* mov.[bwl] rs,[-rd] */
++static bool trans_MOV_rp(DisasContext *ctx, arg_MOV_rp *a)
++{
++    prt("mov.%c\tr%d, ", size[a->sz], a->rs);
++    prt((a->ad =3D=3D 0) ? "[r%d+]" : "[-r%d]", a->rd);
++    return true;
++}
++
++/* mov.[bwl] [rd+],rs */
++/* mov.[bwl] [-rd],rs */
++static bool trans_MOV_pr(DisasContext *ctx, arg_MOV_pr *a)
++{
++    prt("mov.%c\t", size[a->sz]);
++    prt((a->ad =3D=3D 0) ? "[r%d+]" : "[-r%d]", a->rd);
++    prt(", r%d", a->rs);
++    return true;
++}
++
++/* movu.[bw] dsp5:[rs],rd */
++static bool trans_MOVU_mr(DisasContext *ctx, arg_MOVU_mr *a)
++{
++    if (a->dsp > 0) {
++        prt("movu.%c\t%d[r%d], r%d", size[a->sz],
++            a->dsp << a->sz, a->rs, a->rd);
++    } else {
++        prt("movu.%c\t[r%d], r%d", size[a->sz], a->rs, a->rd);
++    }
++    return true;
++}
++
++/* movu.[bw] rs,rd */
++static bool trans_MOVU_rr(DisasContext *ctx, arg_MOVU_rr *a)
++{
++    prt("movu.%c\tr%d, r%d", size[a->sz], a->rs, a->rd);
++    return true;
++}
++
++/* movu.[bw] [ri,rb],rd */
++static bool trans_MOVU_ar(DisasContext *ctx, arg_MOVU_ar *a)
++{
++    prt("mov.%c\t[r%d,r%d], r%d", size[a->sz], a->ri, a->rb, a->rd);
++    return true;
++}
++
++/* movu.[bw] [rs+],rd */
++/* movu.[bw] [-rs],rd */
++static bool trans_MOVU_pr(DisasContext *ctx, arg_MOVU_pr *a)
++{
++    prt("movu.%c\t", size[a->sz]);
++    prt((a->ad =3D=3D 0) ? "[r%d+]" : "[-r%d]", a->rd);
++    prt(", r%d", a->rs);
++    return true;
++}
++
++/* pop rd */
++static bool trans_POP(DisasContext *ctx, arg_POP *a)
++{
++    prt("pop\tr%d", a->rd);
++    return true;
++}
++
++/* popc rx */
++static bool trans_POPC(DisasContext *ctx, arg_POPC *a)
++{
++    prt("pop\tr%s", rx_crname[a->cr]);
++    return true;
++}
++
++/* popm rd-rd2 */
++static bool trans_POPM(DisasContext *ctx, arg_POPM *a)
++{
++    prt("popm\tr%d-r%d", a->rd, a->rd2);
++    return true;
++}
++
++/* push rs */
++static bool trans_PUSH_r(DisasContext *ctx, arg_PUSH_r *a)
++{
++    prt("push\tr%d", a->rs);
++    return true;
++}
++
++/* push dsp[rs] */
++static bool trans_PUSH_m(DisasContext *ctx, arg_PUSH_m *a)
++{
++    prt("push\t");
++    int dsp =3D rx_index_addr(a->ld, a->sz, ctx);
++    if (dsp > 0) {
++        prt("%d", dsp);
++    }
++    prt("[r%d]", a->rs);
++    return true;
++}
++
++/* pushc rx */
++static bool trans_PUSHC(DisasContext *ctx, arg_PUSHC *a)
++{
++    prt("push\t%s", rx_crname[a->cr]);
++    return true;
++}
++
++/* pushm rs-rs2*/
++static bool trans_PUSHM(DisasContext *ctx, arg_PUSHM *a)
++{
++    prt("pushm\tr%d-r%d", a->rs, a->rs2);
++    return true;
++}
++
++/* xchg rs,rd */
++static bool trans_XCHG_rr(DisasContext *ctx, arg_XCHG_rr *a)
++{
++    prt("xchg\tr%d, r%d", a->rs, a->rd);
++    return true;
++}
++/* xchg dsp[rs].<mi>,rd */
++static bool trans_XCHG_mr(DisasContext *ctx, arg_XCHG_mr *a)
++{
++    int dsp;
++    static const char msize[][4] =3D {
++        "b", "w", "l", "ub", "uw",
++    };
++
++    prt("xchg\t");
++    dsp =3D rx_index_addr(a->ld, a->mi, ctx);
++    if (dsp > 0) {
++        prt("%d", dsp);
++    }
++    prt("[r%d].%s, r%d", a->rs, msize[a->mi], a->rd);
++    return true;
++}
++
++/* stz #imm,rd */
++static bool trans_STZ(DisasContext *ctx, arg_STZ *a)
++{
++    prt_ir(ctx, "stz", a->imm, a->rd);
++    return true;
++}
++
++/* stnz #imm,rd */
++static bool trans_STNZ(DisasContext *ctx, arg_STNZ *a)
++{
++    prt_ir(ctx, "stnz", a->imm, a->rd);
++    return true;
++}
++
++/* rtsd #imm */
++static bool trans_RTSD_i(DisasContext *ctx, arg_RTSD_i *a)
++{
++    prt("rtsd\t#%d", a->imm << 2);
++    return true;
++}
++
++/* rtsd #imm, rd-rd2 */
++static bool trans_RTSD_irr(DisasContext *ctx, arg_RTSD_irr *a)
++{
++    prt("rtsd\t#%d, r%d - r%d", a->imm << 2, a->rd, a->rd2);
++    return true;
++}
++
++/* and #uimm:4, rd */
++/* and #imm, rd */
++static bool trans_AND_ir(DisasContext *ctx, arg_AND_ir *a)
++{
++    prt_ir(ctx, "and", a->imm, a->rd);
++    return true;
++}
++
++/* and dsp[rs], rd */
++/* and rs,rd */
++static bool trans_AND_mr(DisasContext *ctx, arg_AND_mr *a)
++{
++    prt("and\t");
++    operand(ctx, a->ld, a->mi, a->rs, a->rd);
++    return true;
++}
++
++/* and rs,rs2,rd */
++static bool trans_AND_rrr(DisasContext *ctx, arg_AND_rrr *a)
++{
++    prt("and\tr%d,r%d, r%d", a->rs, a->rs2, a->rd);
++    return true;
++}
++
++/* or #uimm:4, rd */
++/* or #imm, rd */
++static bool trans_OR_ir(DisasContext *ctx, arg_OR_ir *a)
++{
++    prt_ir(ctx, "or", a->imm, a->rd);
++    return true;
++}
++
++/* or dsp[rs], rd */
++/* or rs,rd */
++static bool trans_OR_mr(DisasContext *ctx, arg_OR_mr *a)
++{
++    prt("or\t");
++    operand(ctx, a->ld, a->mi, a->rs, a->rd);
++    return true;
++}
++
++/* or rs,rs2,rd */
++static bool trans_OR_rrr(DisasContext *ctx, arg_OR_rrr *a)
++{
++    prt("or\tr%d, r%d, r%d", a->rs, a->rs2, a->rd);
++    return true;
++}
++
++/* xor #imm, rd */
++static bool trans_XOR_ir(DisasContext *ctx, arg_XOR_ir *a)
++{
++    prt_ir(ctx, "xor", a->imm, a->rd);
++    return true;
++}
++
++/* xor dsp[rs], rd */
++/* xor rs,rd */
++static bool trans_XOR_mr(DisasContext *ctx, arg_XOR_mr *a)
++{
++    prt("xor\t");
++    operand(ctx, a->ld, a->mi, a->rs, a->rd);
++    return true;
++}
++
++/* tst #imm, rd */
++static bool trans_TST_ir(DisasContext *ctx, arg_TST_ir *a)
++{
++    prt_ir(ctx, "tst", a->imm, a->rd);
++    return true;
++}
++
++/* tst dsp[rs], rd */
++/* tst rs, rd */
++static bool trans_TST_mr(DisasContext *ctx, arg_TST_mr *a)
++{
++    prt("tst\t");
++    operand(ctx, a->ld, a->mi, a->rs, a->rd);
++    return true;
++}
++
++/* not rd */
++/* not rs, rd */
++static bool trans_NOT_rr(DisasContext *ctx, arg_NOT_rr *a)
++{
++    prt("not\t");
++    if (a->rs !=3D a->rd) {
++        prt("r%d, ", a->rs);
++    }
++    prt("r%d", a->rd);
++    return true;
++}
++
++/* neg rd */
++/* neg rs, rd */
++static bool trans_NEG_rr(DisasContext *ctx, arg_NEG_rr *a)
++{
++    prt("neg\t");
++    if (a->rs !=3D a->rd) {
++        prt("r%d, ", a->rs);
++    }
++    prt("r%d", a->rd);
++    return true;
++}
++
++/* adc #imm, rd */
++static bool trans_ADC_ir(DisasContext *ctx, arg_ADC_ir *a)
++{
++    prt_ir(ctx, "adc", a->imm, a->rd);
++    return true;
++}
++
++/* adc rs, rd */
++static bool trans_ADC_rr(DisasContext *ctx, arg_ADC_rr *a)
++{
++    prt("adc\tr%d, r%d", a->rs, a->rd);
++    return true;
++}
++
++/* adc dsp[rs], rd */
++static bool trans_ADC_mr(DisasContext *ctx, arg_ADC_mr *a)
++{
++    int dsp;
++    prt("adc\t");
++    dsp =3D rx_index_addr(a->ld, 2, ctx);
++    if (dsp > 0) {
++        prt("%d", dsp);
++    }
++    prt("[r%d], r%d", a->rs, a->rd);
++    return true;
++}
++
++/* add #uimm4, rd */
++/* add #imm, rs, rd */
++static bool trans_ADD_irr(DisasContext *ctx, arg_ADD_irr *a)
++{
++    if (a->imm < 0x10 && a->rs2 =3D=3D a->rd) {
++        prt("add\t#%d, r%d", a->imm, a->rd);
++    } else {
++        prt("add\t#0x%08x, r%d, r%d", a->imm, a->rs2, a->rd);
++    }
++    return true;
++}
++
++/* add rs, rd */
++/* add dsp[rs], rd */
++static bool trans_ADD_mr(DisasContext *ctx, arg_ADD_mr *a)
++{
++    prt("add\t");
++    operand(ctx, a->ld, a->mi, a->rs, a->rd);
++    return true;
++}
++
++/* add rs, rs2, rd */
++static bool trans_ADD_rrr(DisasContext *ctx, arg_ADD_rrr *a)
++{
++    prt("add\tr%d, r%d, r%d", a->rs, a->rs2, a->rd);
++    return true;
++}
++
++/* cmp #imm4, rd */
++/* cmp #imm8, rd */
++/* cmp #imm, rs2 */
++static bool trans_CMP_ir(DisasContext *ctx, arg_CMP_ir *a)
++{
++    prt_ir(ctx, "cmp", a->imm, a->rs2);
++    return true;
++}
++
++/* cmp rs, rs2 */
++/* cmp dsp[rs], rs2 */
++static bool trans_CMP_mr(DisasContext *ctx, arg_CMP_mr *a)
++{
++    prt("cmp\t");
++    operand(ctx, a->ld, a->mi, a->rs, a->rd);
++    return true;
++}
++
++/* sub #imm4, rd */
++static bool trans_SUB_ir(DisasContext *ctx, arg_SUB_ir *a)
++{
++    prt("sub\t#%d, r%d", a->imm, a->rd);
++    return true;
++}
++
++/* sub rs, rd */
++/* sub dsp[rs], rd */
++static bool trans_SUB_mr(DisasContext *ctx, arg_SUB_mr *a)
++{
++    prt("sub\t");
++    operand(ctx, a->ld, a->mi, a->rs, a->rd);
++    return true;
++}
++
++/* sub rs, rs2, rd */
++static bool trans_SUB_rrr(DisasContext *ctx, arg_SUB_rrr *a)
++{
++    prt("sub\tr%d, r%d, r%d", a->rs, a->rs2, a->rd);
++    return true;
++}
++
++/* sbb rs, rd */
++static bool trans_SBB_rr(DisasContext *ctx, arg_SBB_rr *a)
++{
++    prt("sbb\tr%d, r%d", a->rs, a->rd);
++    return true;
++}
++
++/* sbb dsp[rs], rd */
++static bool trans_SBB_mr(DisasContext *ctx, arg_SBB_mr *a)
++{
++    prt("sbb\t");
++    operand(ctx, a->ld, RX_IM_LONG, a->rs, a->rd);
++    return true;
++}
++
++/* abs rd */
++/* abs rs, rd */
++static bool trans_ABS_rr(DisasContext *ctx, arg_ABS_rr *a)
++{
++    prt("abs\t");
++    if (a->rs =3D=3D a->rd) {
++        prt("r%d", a->rd);
++    } else {
++        prt("r%d, r%d", a->rs, a->rd);
++    }
++    return true;
++}
++
++/* max #imm, rd */
++static bool trans_MAX_ir(DisasContext *ctx, arg_MAX_ir *a)
++{
++    prt_ir(ctx, "max", a->imm, a->rd);
++    return true;
++}
++
++/* max rs, rd */
++/* max dsp[rs], rd */
++static bool trans_MAX_mr(DisasContext *ctx, arg_MAX_mr *a)
++{
++    prt("max\t");
++    operand(ctx, a->ld, a->mi, a->rs, a->rd);
++    return true;
++}
++
++/* min #imm, rd */
++static bool trans_MIN_ir(DisasContext *ctx, arg_MIN_ir *a)
++{
++    prt_ir(ctx, "min", a->imm, a->rd);
++    return true;
++}
++
++/* min rs, rd */
++/* min dsp[rs], rd */
++static bool trans_MIN_mr(DisasContext *ctx, arg_MIN_mr *a)
++{
++    prt("max\t");
++    operand(ctx, a->ld, a->mi, a->rs, a->rd);
++    return true;
++}
++
++/* mul #uimm4, rd */
++/* mul #imm, rd */
++static bool trans_MUL_ir(DisasContext *ctx, arg_MUL_ir *a)
++{
++    prt_ir(ctx, "mul", a->imm, a->rd);
++    return true;
++}
++
++/* mul rs, rd */
++/* mul dsp[rs], rd */
++static bool trans_MUL_mr(DisasContext *ctx, arg_MUL_mr *a)
++{
++    prt("mul\t");
++    operand(ctx, a->ld, a->mi, a->rs, a->rd);
++    return true;
++}
++
++/* mul rs, rs2, rd */
++static bool trans_MUL_rrr(DisasContext *ctx, arg_MUL_rrr *a)
++{
++    prt("mul\tr%d,r%d,r%d", a->rs, a->rs2, a->rd);
++    return true;
++}
++
++/* emul #imm, rd */
++static bool trans_EMUL_ir(DisasContext *ctx, arg_EMUL_ir *a)
++{
++    prt_ir(ctx, "emul", a->imm, a->rd);
++    return true;
++}
++
++/* emul rs, rd */
++/* emul dsp[rs], rd */
++static bool trans_EMUL_mr(DisasContext *ctx, arg_EMUL_mr *a)
++{
++    prt("emul\t");
++    operand(ctx, a->ld, a->mi, a->rs, a->rd);
++    return true;
++}
++
++/* emulu #imm, rd */
++static bool trans_EMULU_ir(DisasContext *ctx, arg_EMULU_ir *a)
++{
++    prt_ir(ctx, "emulu", a->imm, a->rd);
++    return true;
++}
++
++/* emulu rs, rd */
++/* emulu dsp[rs], rd */
++static bool trans_EMULU_mr(DisasContext *ctx, arg_EMULU_mr *a)
++{
++    prt("emulu\t");
++    operand(ctx, a->ld, a->mi, a->rs, a->rd);
++    return true;
++}
++
++/* div #imm, rd */
++static bool trans_DIV_ir(DisasContext *ctx, arg_DIV_ir *a)
++{
++    prt_ir(ctx, "div", a->imm, a->rd);
++    return true;
++}
++
++/* div rs, rd */
++/* div dsp[rs], rd */
++static bool trans_DIV_mr(DisasContext *ctx, arg_DIV_mr *a)
++{
++    prt("div\t");
++    operand(ctx, a->ld, a->mi, a->rs, a->rd);
++    return true;
++}
++
++/* divu #imm, rd */
++static bool trans_DIVU_ir(DisasContext *ctx, arg_DIVU_ir *a)
++{
++    prt_ir(ctx, "divu", a->imm, a->rd);
++    return true;
++}
++
++/* divu rs, rd */
++/* divu dsp[rs], rd */
++static bool trans_DIVU_mr(DisasContext *ctx, arg_DIVU_mr *a)
++{
++    prt("divu\t");
++    operand(ctx, a->ld, a->mi, a->rs, a->rd);
++    return true;
++}
++
++
++/* shll #imm:5, rd */
++/* shll #imm:5, rs, rd */
++static bool trans_SHLL_irr(DisasContext *ctx, arg_SHLL_irr *a)
++{
++    prt("shll\t#%d, ", a->imm);
++    if (a->rs2 !=3D a->rd) {
++        prt("r%d, ", a->rs2);
++    }
++    prt("r%d", a->rd);
++    return true;
++}
++
++/* shll rs, rd */
++static bool trans_SHLL_rr(DisasContext *ctx, arg_SHLL_rr *a)
++{
++    prt("shll\tr%d, r%d", a->rs, a->rd);
++    return true;
++}
++
++/* shar #imm:5, rd */
++/* shar #imm:5, rs, rd */
++static bool trans_SHAR_irr(DisasContext *ctx, arg_SHAR_irr *a)
++{
++    prt("shar\t#%d,", a->imm);
++    if (a->rs2 !=3D a->rd) {
++        prt("r%d, ", a->rs2);
++    }
++    prt("r%d", a->rd);
++    return true;
++}
++
++/* shar rs, rd */
++static bool trans_SHAR_rr(DisasContext *ctx, arg_SHAR_rr *a)
++{
++    prt("shar\tr%d, r%d", a->rs, a->rd);
++    return true;
++}
++
++/* shlr #imm:5, rd */
++/* shlr #imm:5, rs, rd */
++static bool trans_SHLR_irr(DisasContext *ctx, arg_SHLR_irr *a)
++{
++    prt("shlr\t#%d, ", a->imm);
++    if (a->rs2 !=3D a->rd) {
++        prt("r%d, ", a->rs2);
++    }
++    prt("r%d", a->rd);
++    return true;
++}
++
++/* shlr rs, rd */
++static bool trans_SHLR_rr(DisasContext *ctx, arg_SHLR_rr *a)
++{
++    prt("shlr\tr%d, r%d", a->rs, a->rd);
++    return true;
++}
++
++/* rolc rd */
++static bool trans_ROLC(DisasContext *ctx, arg_ROLC *a)
++{
++    prt("rorc\tr%d", a->rd);
++    return true;
++}
++
++/* rorc rd */
++static bool trans_RORC(DisasContext *ctx, arg_RORC *a)
++{
++    prt("rorc\tr%d", a->rd);
++    return true;
++}
++
++/* rotl #imm, rd */
++static bool trans_ROTL_ir(DisasContext *ctx, arg_ROTL_ir *a)
++{
++    prt("rotl\t#%d, r%d", a->imm, a->rd);
++    return true;
++}
++
++/* rotl rs, rd */
++static bool trans_ROTL_rr(DisasContext *ctx, arg_ROTL_rr *a)
++{
++    prt("rotl\tr%d, r%d", a->rs, a->rd);
++    return true;
++}
++
++/* rotr #imm, rd */
++static bool trans_ROTR_ir(DisasContext *ctx, arg_ROTR_ir *a)
++{
++    prt("rotr\t#%d, r%d", a->imm, a->rd);
++    return true;
++}
++
++/* rotr rs, rd */
++static bool trans_ROTR_rr(DisasContext *ctx, arg_ROTR_rr *a)
++{
++    prt("rotr\tr%d, r%d", a->rs, a->rd);
++    return true;
++}
++
++/* revl rs, rd */
++static bool trans_REVL(DisasContext *ctx, arg_REVL *a)
++{
++    prt("revl\tr%d, r%d", a->rs, a->rd);
++    return true;
++}
++
++/* revw rs, rd */
++static bool trans_REVW(DisasContext *ctx, arg_REVW *a)
++{
++    prt("revw\tr%d, r%d", a->rs, a->rd);
++    return true;
++}
++
++/* conditional branch helper */
++static void rx_bcnd_main(DisasContext *ctx, int cd, int len, int dst)
++{
++    static const char sz[] =3D {'s', 'b', 'w', 'a'};
++    prt("b%s.%c\t%08x", cond[cd], sz[len - 1], ctx->pc + dst);
++}
++
++/* beq dsp:3 / bne dsp:3 */
++/* beq dsp:8 / bne dsp:8 */
++/* bc dsp:8 / bnc dsp:8 */
++/* bgtu dsp:8 / bleu dsp:8 */
++/* bpz dsp:8 / bn dsp:8 */
++/* bge dsp:8 / blt dsp:8 */
++/* bgt dsp:8 / ble dsp:8 */
++/* bo dsp:8 / bno dsp:8 */
++/* beq dsp:16 / bne dsp:16 */
++static bool trans_BCnd(DisasContext *ctx, arg_BCnd *a)
++{
++    rx_bcnd_main(ctx, a->cd, a->sz, a->dsp);
++    return true;
++}
++
++/* bra dsp:3 */
++/* bra dsp:8 */
++/* bra dsp:16 */
++/* bra dsp:24 */
++static bool trans_BRA(DisasContext *ctx, arg_BRA *a)
++{
++    rx_bcnd_main(ctx, 14, a->sz, a->dsp);
++    return true;
++}
++
++/* bra rs */
++static bool trans_BRA_l(DisasContext *ctx, arg_BRA_l *a)
++{
++    prt("bra.l\tr%d", a->rd);
++    return true;
++}
++
++/* jmp rs */
++static bool trans_JMP(DisasContext *ctx, arg_JMP *a)
++{
++    prt("jmp\tr%d", a->rs);
++    return true;
++}
++
++/* jsr rs */
++static bool trans_JSR(DisasContext *ctx, arg_JSR *a)
++{
++    prt("jsr\tr%d", a->rs);
++    return true;
++}
++
++/* bsr dsp:16 */
++/* bsr dsp:24 */
++static bool trans_BSR(DisasContext *ctx, arg_BSR *a)
++{
++    static const char sz[] =3D {'w', 'a'};
++    prt("bsr.%c\t%08x", sz[a->sz - 3], ctx->pc + a->dsp);
++    return true;
++}
++
++/* bsr rs */
++static bool trans_BSR_l(DisasContext *ctx, arg_BSR_l *a)
++{
++    prt("bsr.l\tr%d", a->rd);
++    return true;
++}
++
++/* rts */
++static bool trans_RTS(DisasContext *ctx, arg_RTS *a)
++{
++    prt("rts");
++    return true;
++}
++
++/* nop */
++static bool trans_NOP(DisasContext *ctx, arg_NOP *a)
++{
++    prt("nop");
++    return true;
++}
++
++/* scmpu */
++static bool trans_SCMPU(DisasContext *ctx, arg_SCMPU *a)
++{
++    prt("scmpu");
++    return true;
++}
++
++/* smovu */
++static bool trans_SMOVU(DisasContext *ctx, arg_SMOVU *a)
++{
++    prt("smovu");
++    return true;
++}
++
++/* smovf */
++static bool trans_SMOVF(DisasContext *ctx, arg_SMOVF *a)
++{
++    prt("smovf");
++    return true;
++}
++
++/* smovb */
++static bool trans_SMOVB(DisasContext *ctx, arg_SMOVB *a)
++{
++    prt("smovb");
++    return true;
++}
++
++/* suntile */
++static bool trans_SUNTIL(DisasContext *ctx, arg_SUNTIL *a)
++{
++    prt("suntil.%c", size[a->sz]);
++    return true;
++}
++
++/* swhile */
++static bool trans_SWHILE(DisasContext *ctx, arg_SWHILE *a)
++{
++    prt("swhile.%c", size[a->sz]);
++    return true;
++}
++/* sstr */
++static bool trans_SSTR(DisasContext *ctx, arg_SSTR *a)
++{
++    prt("sstr.%c", size[a->sz]);
++    return true;
++}
++
++/* rmpa */
++static bool trans_RMPA(DisasContext *ctx, arg_RMPA *a)
++{
++    prt("rmpa.%c", size[a->sz]);
++    return true;
++}
++
++/* mulhi rs,rs2 */
++static bool trans_MULHI(DisasContext *ctx, arg_MULHI *a)
++{
++    prt("mulhi\tr%d,r%d", a->rs, a->rs2);
++    return true;
++}
++
++/* mullo rs,rs2 */
++static bool trans_MULLO(DisasContext *ctx, arg_MULLO *a)
++{
++    prt("mullo\tr%d, r%d", a->rs, a->rs2);
++    return true;
++}
++
++/* machi rs,rs2 */
++static bool trans_MACHI(DisasContext *ctx, arg_MACHI *a)
++{
++    prt("machi\tr%d, r%d", a->rs, a->rs2);
++    return true;
++}
++
++/* maclo rs,rs2 */
++static bool trans_MACLO(DisasContext *ctx, arg_MACLO *a)
++{
++    prt("maclo\tr%d, r%d", a->rs, a->rs2);
++    return true;
++}
++
++/* mvfachi rd */
++static bool trans_MVFACHI(DisasContext *ctx, arg_MVFACHI *a)
++{
++    prt("mvfachi\tr%d", a->rd);
++    return true;
++}
++
++/* mvfacmi rd */
++static bool trans_MVFACMI(DisasContext *ctx, arg_MVFACMI *a)
++{
++    prt("mvfacmi\tr%d", a->rd);
++    return true;
++}
++
++/* mvtachi rs */
++static bool trans_MVTACHI(DisasContext *ctx, arg_MVTACHI *a)
++{
++    prt("mvtachi\tr%d", a->rs);
++    return true;
++}
++
++/* mvtaclo rs */
++static bool trans_MVTACLO(DisasContext *ctx, arg_MVTACLO *a)
++{
++    prt("mvtaclo\tr%d", a->rs);
++    return true;
++}
++
++/* racw #imm */
++static bool trans_RACW(DisasContext *ctx, arg_RACW *a)
++{
++    prt("racw\t#%d", a->imm + 1);
++    return true;
++}
++
++/* sat rd */
++static bool trans_SAT(DisasContext *ctx, arg_SAT *a)
++{
++    prt("sat\tr%d", a->rd);
++    return true;
++}
++
++/* satr */
++static bool trans_SATR(DisasContext *ctx, arg_SATR *a)
++{
++    prt("satr");
++    return true;
++}
++
++/* fadd #imm, rd */
++static bool trans_FADD_ir(DisasContext *ctx, arg_FADD_ir *a)
++{
++    prt("fadd\t#%d,r%d", li(ctx, 0), a->rd);
++    return true;
++}
++
++/* fadd dsp[rs], rd */
++/* fadd rs, rd */
++static bool trans_FADD_mr(DisasContext *ctx, arg_FADD_mr *a)
++{
++    prt("fadd\t");
++    operand(ctx, a->ld, RX_IM_LONG, a->rs, a->rd);
++    return true;
++}
++
++/* fcmp #imm, rd */
++static bool trans_FCMP_ir(DisasContext *ctx, arg_FCMP_ir *a)
++{
++    prt("fadd\t#%d,r%d", li(ctx, 0), a->rd);
++    return true;
++}
++
++/* fcmp dsp[rs], rd */
++/* fcmp rs, rd */
++static bool trans_FCMP_mr(DisasContext *ctx, arg_FCMP_mr *a)
++{
++    prt("fcmp\t");
++    operand(ctx, a->ld, RX_IM_LONG, a->rs, a->rd);
++    return true;
++}
++
++/* fsub #imm, rd */
++static bool trans_FSUB_ir(DisasContext *ctx, arg_FSUB_ir *a)
++{
++    prt("fsub\t#%d,r%d", li(ctx, 0), a->rd);
++    return true;
++}
++
++/* fsub dsp[rs], rd */
++/* fsub rs, rd */
++static bool trans_FSUB_mr(DisasContext *ctx, arg_FSUB_mr *a)
++{
++    prt("fsub\t");
++    operand(ctx, a->ld, RX_IM_LONG, a->rs, a->rd);
++    return true;
++}
++
++/* ftoi dsp[rs], rd */
++/* ftoi rs, rd */
++static bool trans_FTOI(DisasContext *ctx, arg_FTOI *a)
++{
++    prt("ftoi\t");
++    operand(ctx, a->ld, RX_IM_LONG, a->rs, a->rd);
++    return true;
++}
++
++/* fmul #imm, rd */
++static bool trans_FMUL_ir(DisasContext *ctx, arg_FMUL_ir *a)
++{
++    prt("fmul\t#%d,r%d", li(ctx, 0), a->rd);
++    return true;
++}
++
++/* fmul dsp[rs], rd */
++/* fmul rs, rd */
++static bool trans_FMUL_mr(DisasContext *ctx, arg_FMUL_mr *a)
++{
++    prt("fmul\t");
++    operand(ctx, a->ld, RX_IM_LONG, a->rs, a->rd);
++    return true;
++}
++
++/* fdiv #imm, rd */
++static bool trans_FDIV_ir(DisasContext *ctx, arg_FDIV_ir *a)
++{
++    prt("fdiv\t#%d,r%d", li(ctx, 0), a->rd);
++    return true;
++}
++
++/* fdiv dsp[rs], rd */
++/* fdiv rs, rd */
++static bool trans_FDIV_mr(DisasContext *ctx, arg_FDIV_mr *a)
++{
++    prt("fdiv\t");
++    operand(ctx, a->ld, RX_IM_LONG, a->rs, a->rd);
++    return true;
++}
++
++/* round dsp[rs], rd */
++/* round rs, rd */
++static bool trans_ROUND(DisasContext *ctx, arg_ROUND *a)
++{
++    prt("round\t");
++    operand(ctx, a->ld, RX_IM_LONG, a->rs, a->rd);
++    return true;
++}
++
++/* itof rs, rd */
++/* itof dsp[rs], rd */
++static bool trans_ITOF(DisasContext *ctx, arg_ITOF *a)
++{
++    prt("itof\t");
++    operand(ctx, a->ld, RX_IM_LONG, a->rs, a->rd);
++    return true;
++}
++
++#define BOP_IM(name, reg)                                       \
++    do {                                                        \
++        int dsp;                                                \
++        prt("b%s\t#%d, ", #name, a->imm);                       \
++        dsp =3D rx_index_addr(a->ld, RX_MEMORY_BYTE, ctx);        \
++        if (dsp > 0) {                                          \
++            prt("%d", dsp);                                     \
++        }                                                       \
++        prt("[r%d]", reg);                                      \
++        return true;                                            \
++    } while (0)
++
++#define BOP_RM(name)                                            \
++    do {                                                        \
++        int dsp;                                                \
++        prt("b%s\tr%d, ", #name, a->rd);                        \
++        dsp =3D rx_index_addr(a->ld, RX_MEMORY_BYTE, ctx);        \
++        if (dsp > 0) {                                          \
++            prt("%d", dsp);                                     \
++        }                                                       \
++        prt("[r%d]", a->rs);                                    \
++        return true;                                            \
++    } while (0)
++
++/* bset #imm, dsp[rd] */
++static bool trans_BSET_im(DisasContext *ctx, arg_BSET_im *a)
++{
++    BOP_IM(bset, a->rs);
++}
++
++/* bset rs, dsp[rd] */
++static bool trans_BSET_rm(DisasContext *ctx, arg_BSET_rm *a)
++{
++    BOP_RM(set);
++}
++
++/* bset rs, rd */
++static bool trans_BSET_rr(DisasContext *ctx, arg_BSET_rr *a)
++{
++    prt("bset\tr%d,r%d", a->rs, a->rd);
++    return true;
++}
++
++/* bset #imm, rd */
++static bool trans_BSET_ir(DisasContext *ctx, arg_BSET_ir *a)
++{
++    prt("bset\t#%d, r%d", a->imm, a->rd);
++    return true;
++}
++
++/* bclr #imm, dsp[rd] */
++static bool trans_BCLR_im(DisasContext *ctx, arg_BCLR_im *a)
++{
++    BOP_IM(clr, a->rs);
++}
++
++/* bclr rs, dsp[rd] */
++static bool trans_BCLR_rm(DisasContext *ctx, arg_BCLR_rm *a)
++{
++    BOP_RM(clr);
++}
++
++/* bclr rs, rd */
++static bool trans_BCLR_rr(DisasContext *ctx, arg_BCLR_rr *a)
++{
++    prt("bclr\tr%d, r%d", a->rs, a->rd);
++    return true;
++}
++
++/* bclr #imm, rd */
++static bool trans_BCLR_ir(DisasContext *ctx, arg_BCLR_ir *a)
++{
++    prt("bclr\t#%d,r%d", a->imm, a->rd);
++    return true;
++}
++
++/* btst #imm, dsp[rd] */
++static bool trans_BTST_im(DisasContext *ctx, arg_BTST_im *a)
++{
++    BOP_IM(tst, a->rs);
++}
++
++/* btst rs, dsp[rd] */
++static bool trans_BTST_rm(DisasContext *ctx, arg_BTST_rm *a)
++{
++    BOP_RM(tst);
++}
++
++/* btst rs, rd */
++static bool trans_BTST_rr(DisasContext *ctx, arg_BTST_rr *a)
++{
++    prt("btst\tr%d, r%d", a->rs, a->rd);
++    return true;
++}
++
++/* btst #imm, rd */
++static bool trans_BTST_ir(DisasContext *ctx, arg_BTST_ir *a)
++{
++    prt("btst\t#%d, r%d", a->imm, a->rd);
++    return true;
++}
++
++/* bnot rs, dsp[rd] */
++static bool trans_BNOT_rm(DisasContext *ctx, arg_BNOT_rm *a)
++{
++    BOP_RM(not);
++}
++
++/* bnot rs, rd */
++static bool trans_BNOT_rr(DisasContext *ctx, arg_BNOT_rr *a)
++{
++    prt("bnot\tr%d, r%d", a->rs, a->rd);
++    return true;
++}
++
++/* bnot #imm, dsp[rd] */
++static bool trans_BNOT_im(DisasContext *ctx, arg_BNOT_im *a)
++{
++    BOP_IM(not, a->rs);
++}
++
++/* bnot #imm, rd */
++static bool trans_BNOT_ir(DisasContext *ctx, arg_BNOT_ir *a)
++{
++    prt("bnot\t#%d, r%d", a->imm, a->rd);
++    return true;
++}
++
++/* bmcond #imm, dsp[rd] */
++static bool trans_BMCnd_im(DisasContext *ctx, arg_BMCnd_im *a)
++{
++    int dsp =3D rx_index_addr(a->ld, RX_MEMORY_BYTE, ctx);
++    prt("bm%s\t#%d, ", cond[a->cd], a->imm);
++    if (dsp > 0) {
++        prt("%d", dsp);
++    }
++    prt("[%d]", a->rd);
++    return true;
++}
++
++/* bmcond #imm, rd */
++static bool trans_BMCnd_ir(DisasContext *ctx, arg_BMCnd_ir *a)
++{
++    prt("bm%s\t#%d, r%d", cond[a->cd], a->imm, a->rd);
++    return true;
++}
++
++/* clrpsw psw */
++static bool trans_CLRPSW(DisasContext *ctx, arg_CLRPSW *a)
++{
++    prt("clrpsw\t%c", psw[a->cb]);
++    return true;
++}
++
++/* setpsw psw */
++static bool trans_SETPSW(DisasContext *ctx, arg_SETPSW *a)
++{
++    prt("setpsw\t%c", psw[a->cb]);
++    return true;
++}
++
++/* mvtipl #imm */
++static bool trans_MVTIPL(DisasContext *ctx, arg_MVTIPL *a)
++{
++    prt("movtipl\t#%d", a->imm);
++    return true;
++}
++
++/* mvtc #imm, rd */
++static bool trans_MVTC_i(DisasContext *ctx, arg_MVTC_i *a)
++{
++    prt("mvtc\t#0x%08x, %s", a->imm, rx_crname[a->cr]);
++    return true;
++}
++
++/* mvtc rs, rd */
++static bool trans_MVTC_r(DisasContext *ctx, arg_MVTC_r *a)
++{
++    prt("mvtc\tr%d, %s", a->rs, rx_crname[a->cr]);
++    return true;
++}
++
++/* mvfc rs, rd */
++static bool trans_MVFC(DisasContext *ctx, arg_MVFC *a)
++{
++    prt("mvfc\t%s, r%d", rx_crname[a->cr], a->rd);
++    return true;
++}
++
++/* rtfi */
++static bool trans_RTFI(DisasContext *ctx, arg_RTFI *a)
++{
++    prt("rtfi");
++    return true;
++}
++
++/* rte */
++static bool trans_RTE(DisasContext *ctx, arg_RTE *a)
++{
++    prt("rte");
++    return true;
++}
++
++/* brk */
++static bool trans_BRK(DisasContext *ctx, arg_BRK *a)
++{
++    prt("brk");
++    return true;
++}
++
++/* int #imm */
++static bool trans_INT(DisasContext *ctx, arg_INT *a)
++{
++    prt("int\t#%d", a->imm);
++    return true;
++}
++
++/* wait */
++static bool trans_WAIT(DisasContext *ctx, arg_WAIT *a)
++{
++    prt("wait");
++    return true;
++}
++
++/* sccnd.[bwl] rd */
++/* sccnd.[bwl] dsp:[rd] */
++static bool trans_SCCnd(DisasContext *ctx, arg_SCCnd *a)
++{
++    int dsp;
++    prt("sc%s.%c\t", cond[a->cd], size[a->sz]);
++    if (a->ld < 3) {
++        dsp =3D rx_index_addr(a->sz, a->ld, ctx);
++        if (dsp > 0) {
++            prt("%d", dsp);
++        }
++        prt("[r%d]", a->rd);
++    } else {
++        prt("r%d", a->rd);
++    }
++    return true;
++}
++
++int print_insn_rx(bfd_vma addr, disassemble_info *dis)
++{
++    DisasContext ctx;
++    uint32_t insn;
++    int i;
++    ctx.dis =3D dis;
++    ctx.pc =3D ctx.addr =3D addr;
++
++    insn =3D decode_load(&ctx);
++    if (!decode(&ctx, insn)) {
++        ctx.dis->fprintf_func(ctx.dis->stream, ".byte\t");
++        for (i =3D 0; i < ctx.addr - addr; i++) {
++            if (i > 0) {
++                ctx.dis->fprintf_func(ctx.dis->stream, ",");
 +            }
-+            if (machine->kernel_cmdline &&
-+                qemu_fdt_setprop_string(dtb, "/chosen", "bootargs",
-+                                        machine->kernel_cmdline) < 0) {
-+                fprintf(stderr, "couldn't set /chosen/bootargs\n");
-+                exit(1);
-+            }
-+            rom_add_blob_fixed("dtb", dtb, dtb_size,
-+                               SDRAM_BASE + 16 * MiB - dtb_size);
-+            /* Set dtb address to R1 */
-+            RXCPU(first_cpu)->env.regs[1] =3D 0x02000000 - dtb_size;
++            ctx.dis->fprintf_func(ctx.dis->stream, "0x%02x", insn >> 24)=
+;
++            insn <<=3D 8;
 +        }
 +    }
++    return ctx.addr - addr;
 +}
-+
-+static void rxvirt_class_init(ObjectClass *oc, void *data)
-+{
-+    MachineClass *mc =3D MACHINE_CLASS(oc);
-+
-+    mc->desc =3D "RX QEMU Virtual Target";
-+    mc->init =3D rxvirt_init;
-+    mc->is_default =3D 1;
-+    mc->default_cpu_type =3D TYPE_RX62N_CPU;
-+}
-+
-+static const TypeInfo rxvirt_type =3D {
-+    .name =3D MACHINE_TYPE_NAME("rx-virt"),
-+    .parent =3D TYPE_MACHINE,
-+    .class_init =3D rxvirt_class_init,
-+};
-+
-+static void rxvirt_machine_init(void)
-+{
-+    type_register_static(&rxvirt_type);
-+}
-+
-+type_init(rxvirt_machine_init)
-diff --git a/hw/rx/rx62n.c b/hw/rx/rx62n.c
-new file mode 100644
-index 0000000000..74d2fd0ee3
---- /dev/null
-+++ b/hw/rx/rx62n.c
-@@ -0,0 +1,238 @@
-+/*
-+ * RX62N Microcontroller
-+ *
-+ * Datasheet: RX62N Group, RX621 Group User's Manual: Hardware
-+ * (Rev.1.40 R01UH0033EJ0140)
-+ *
-+ * Copyright (c) 2019 Yoshinori Sato
-+ *
-+ * This program is free software; you can redistribute it and/or modify =
-it
-+ * under the terms and conditions of the GNU General Public License,
-+ * version 2 or later, as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope it will be useful, but WITHOU=
-T
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License=
- for
-+ * more details.
-+ *
-+ * You should have received a copy of the GNU General Public License alo=
-ng with
-+ * this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qapi/error.h"
-+#include "hw/hw.h"
-+#include "hw/rx/rx62n.h"
-+#include "hw/loader.h"
-+#include "hw/sysbus.h"
-+#include "sysemu/sysemu.h"
-+#include "cpu.h"
-+
-+/*
-+ * IRQ -> IPR mapping table
-+ * 0x00 - 0x91: IPR no (IPR00 to IPR91)
-+ * 0xff: IPR not assigned
-+ * See "11.3.1 Interrupt Vector Table" in hardware manual.
-+ */
-+static const int ipr_table[NR_IRQS] =3D {
-+    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, /* 15 */
-+    0x00, 0xff, 0xff, 0xff, 0xff, 0x01, 0xff, 0x02,
-+    0xff, 0xff, 0xff, 0x03, 0x04, 0x05, 0x06, 0x07, /* 31 */
-+    0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
-+    0x10, 0x11, 0x12, 0x13, 0x14, 0x14, 0x14, 0x14, /* 47 */
-+    0x15, 0x15, 0x15, 0x15, 0xff, 0xff, 0xff, 0xff,
-+    0x18, 0x18, 0x18, 0x18, 0x18, 0x1d, 0x1e, 0x1f, /* 63 */
-+    0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27,
-+    0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f, /* 79 */
-+    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+    0xff, 0xff, 0x3a, 0x3b, 0x3c, 0xff, 0xff, 0xff, /* 95 */
-+    0x40, 0xff, 0x44, 0x45, 0xff, 0xff, 0x48, 0xff,
-+    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, /* 111 */
-+    0xff, 0xff, 0x51, 0x51, 0x51, 0x51, 0x52, 0x52,
-+    0x52, 0x53, 0x53, 0x54, 0x54, 0x55, 0x55, 0x56, /* 127 */
-+    0x56, 0x57, 0x57, 0x57, 0x57, 0x58, 0x59, 0x59,
-+    0x59, 0x59, 0x5a, 0x5b, 0x5b, 0x5b, 0x5c, 0x5c, /* 143 */
-+    0x5c, 0x5c, 0x5d, 0x5d, 0x5d, 0x5e, 0x5e, 0x5f,
-+    0x5f, 0x60, 0x60, 0x61, 0x61, 0x62, 0x62, 0x62, /* 159 */
-+    0x62, 0x63, 0x64, 0x64, 0x64, 0x64, 0x65, 0x66,
-+    0x66, 0x66, 0x67, 0x67, 0x67, 0x67, 0x68, 0x68, /* 175 */
-+    0x68, 0x69, 0x69, 0x69, 0x6a, 0x6a, 0x6a, 0x6b,
-+    0x6b, 0x6b, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, /* 191 */
-+    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x70, 0x71,
-+    0x72, 0x73, 0x74, 0x75, 0xff, 0xff, 0xff, 0xff, /* 207 */
-+    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x80, 0x80,
-+    0x80, 0x80, 0x81, 0x81, 0x81, 0x81, 0x82, 0x82, /* 223 */
-+    0x82, 0x82, 0x83, 0x83, 0x83, 0x83, 0xff, 0xff,
-+    0xff, 0xff, 0x85, 0x85, 0x85, 0x85, 0x86, 0x86, /* 239 */
-+    0x86, 0x86, 0xff, 0xff, 0xff, 0xff, 0x88, 0x89,
-+    0x8a, 0x8b, 0x8c, 0x8d, 0x8e, 0x8f, 0x90, 0x91, /* 255 */
-+};
-+
-+/*
-+ * Level triggerd IRQ list
-+ * Not listed IRQ is Edge trigger.
-+ * See "11.3.1 Interrupt Vector Table" in hardware manual.
-+ */
-+static const uint32_t levelirq[] =3D {
-+     16,  21,  32,  44,  47,  48,  51,  64,  65,  66,
-+     67,  68,  69,  70,  71,  72,  73,  74,  75,  76,
-+     77,  78,  79,  90,  91, 170, 171, 172, 173, 214,
-+    217, 218, 221, 222, 225, 226, 229, 234, 237, 238,
-+    241, 246, 249, 250, 253,
-+};
-+
-+static void register_icu(RX62NState *s)
-+{
-+    int i;
-+    SysBusDevice *icu;
-+
-+    object_initialize_child(OBJECT(s), "icu", &s->icu, sizeof(RXICUState=
-),
-+                            TYPE_RXICU, &error_abort, NULL);
-+
-+    icu =3D SYS_BUS_DEVICE(&s->icu);
-+    sysbus_mmio_map(SYS_BUS_DEVICE(icu), 0, RX62N_ICUBASE);
-+    qdev_prop_set_uint32(DEVICE(icu), "len-ipr-map", NR_IRQS);
-+    for (i =3D 0; i < NR_IRQS; i++) {
-+        char propname[32];
-+        snprintf(propname, sizeof(propname), "ipr-map[%d]", i);
-+        qdev_prop_set_uint32(DEVICE(icu), propname, ipr_table[i]);
-+    }
-+    qdev_prop_set_uint32(DEVICE(icu), "len-trigger-level",
-+                         ARRAY_SIZE(levelirq));
-+    for (i =3D 0; i < ARRAY_SIZE(levelirq); i++) {
-+        char propname[32];
-+        snprintf(propname, sizeof(propname), "trigger-level[%d]", i);
-+        qdev_prop_set_uint32(DEVICE(icu), propname, levelirq[i]);
-+    }
-+
-+    for (i =3D 0; i < NR_IRQS; i++) {
-+        s->irq[i] =3D qdev_get_gpio_in(DEVICE(icu), i);
-+    }
-+
-+    qdev_init_nofail(DEVICE(icu));
-+    sysbus_connect_irq(icu, 0, qdev_get_gpio_in(DEVICE(&s->cpu), RX_CPU_=
-IRQ));
-+    sysbus_connect_irq(icu, 1, qdev_get_gpio_in(DEVICE(&s->cpu), RX_CPU_=
-FIR));
-+    sysbus_connect_irq(icu, 2, s->irq[SWI]);
-+
-+}
-+
-+static void register_tmr(RX62NState *s, int unit)
-+{
-+    SysBusDevice *tmr;
-+    int i, irqbase;
-+
-+    object_initialize_child(OBJECT(s), "tmr[*]", &s->tmr[unit],
-+                            sizeof(RTMRState), TYPE_RENESAS_TMR,
-+                            &error_abort, NULL);
-+
-+    tmr =3D SYS_BUS_DEVICE(&s->tmr[unit]);
-+    sysbus_mmio_map(tmr, 0, RX62N_TMRBASE + unit * 0x10);
-+    qdev_prop_set_uint64(DEVICE(tmr), "input-freq", RX62N_PCLK);
-+
-+    qdev_init_nofail(DEVICE(tmr));
-+    irqbase =3D RX62N_TMR_IRQBASE + TMR_NR_IRQ * unit;
-+    for (i =3D 0; i < TMR_NR_IRQ; i++) {
-+        sysbus_connect_irq(tmr, i, s->irq[irqbase + i]);
-+    }
-+}
-+
-+static void register_cmt(RX62NState *s, int unit)
-+{
-+    SysBusDevice *cmt;
-+    int i, irqbase;
-+
-+    object_initialize_child(OBJECT(s), "cmt[*]", &s->cmt[unit],
-+                            sizeof(RCMTState), TYPE_RENESAS_CMT,
-+                            &error_abort, NULL);
-+
-+    cmt =3D SYS_BUS_DEVICE(&s->cmt[unit]);
-+    sysbus_mmio_map(cmt, 0, RX62N_CMTBASE + unit * 0x10);
-+    qdev_prop_set_uint64(DEVICE(cmt), "input-freq", RX62N_PCLK);
-+
-+    qdev_init_nofail(DEVICE(cmt));
-+    irqbase =3D RX62N_CMT_IRQBASE + CMT_NR_IRQ * unit;
-+    for (i =3D 0; i < CMT_NR_IRQ; i++) {
-+        sysbus_connect_irq(cmt, i, s->irq[irqbase + i]);
-+    }
-+}
-+
-+static void register_sci(RX62NState *s, int unit)
-+{
-+    SysBusDevice *sci;
-+    int i, irqbase;
-+
-+    object_initialize_child(OBJECT(s), "sci[*]", &s->sci[unit],
-+                            sizeof(RSCIState), TYPE_RENESAS_SCI,
-+                            &error_abort, NULL);
-+
-+    sci =3D SYS_BUS_DEVICE(&s->sci[unit]);
-+    sysbus_mmio_map(sci, 0, RX62N_SCIBASE + unit * 0x08);
-+    qdev_prop_set_chr(DEVICE(sci), "chardev", serial_hd(unit));
-+    qdev_prop_set_uint64(DEVICE(sci), "input-freq", RX62N_PCLK);
-+
-+    qdev_init_nofail(DEVICE(sci));
-+    irqbase =3D RX62N_SCI_IRQBASE + SCI_NR_IRQ * unit;
-+    for (i =3D 0; i < SCI_NR_IRQ; i++) {
-+        sysbus_connect_irq(sci, i, s->irq[irqbase + i]);
-+    }
-+}
-+
-+static void rx62n_realize(DeviceState *dev, Error **errp)
-+{
-+    RX62NState *s =3D RX62N(dev);
-+
-+    memory_region_init_ram(&s->iram, NULL, "iram", RX62N_IRAM_SIZE, errp=
-);
-+    memory_region_add_subregion(s->sysmem, RX62N_IRAM_BASE, &s->iram);
-+    memory_region_init_rom(&s->d_flash, NULL, "dataflash",
-+                           RX62N_DFLASH_SIZE, errp);
-+    memory_region_add_subregion(s->sysmem, RX62N_DFLASH_BASE, &s->d_flas=
-h);
-+    memory_region_init_rom(&s->c_flash, NULL, "codeflash",
-+                           RX62N_CFLASH_SIZE, errp);
-+    memory_region_add_subregion(s->sysmem, RX62N_CFLASH_BASE, &s->c_flas=
-h);
-+    if (!s->kernel) {
-+        rom_add_file_fixed(bios_name, RX62N_CFLASH_BASE, 0);
-+    }
-+
-+    /* Initialize CPU */
-+    object_initialize_child(OBJECT(s), "cpu", &s->cpu, sizeof(RXCPU),
-+                            TYPE_RX62N_CPU, errp, NULL);
-+    object_property_set_bool(OBJECT(&s->cpu), true, "realized", errp);
-+
-+    register_icu(s);
-+    s->cpu.env.ack =3D qdev_get_gpio_in_named(DEVICE(&s->icu), "ack", 0)=
-;
-+    register_tmr(s, 0);
-+    register_tmr(s, 1);
-+    register_cmt(s, 0);
-+    register_cmt(s, 1);
-+    register_sci(s, 0);
-+}
-+
-+static Property rx62n_properties[] =3D {
-+    DEFINE_PROP_LINK("memory", RX62NState, sysmem, TYPE_MEMORY_REGION,
-+                     MemoryRegion *),
-+    DEFINE_PROP_BOOL("load-kernel", RX62NState, kernel, false),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void rx62n_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc =3D DEVICE_CLASS(klass);
-+
-+    dc->realize =3D rx62n_realize;
-+    dc->props =3D rx62n_properties;
-+}
-+
-+static const TypeInfo rx62n_info =3D {
-+    .name =3D TYPE_RX62N,
-+    .parent =3D TYPE_SYS_BUS_DEVICE,
-+    .instance_size =3D sizeof(RX62NState),
-+    .class_init =3D rx62n_class_init,
-+};
-+
-+static void rx62n_register_types(void)
-+{
-+    type_register_static(&rx62n_info);
-+}
-+
-+type_init(rx62n_register_types)
-diff --git a/hw/rx/Kconfig b/hw/rx/Kconfig
-new file mode 100644
-index 0000000000..a07490a65e
---- /dev/null
-+++ b/hw/rx/Kconfig
-@@ -0,0 +1,14 @@
-+config RX
-+    bool
-+
-+config RX62N
-+    bool
-+    select RX
-+    select RX_ICU
-+    select RENESAS_TMR8
-+    select RENESAS_CMT
-+    select RENESAS_SCI
-+
-+config RX_VIRT
-+    bool
-+    select RX62N
-diff --git a/hw/rx/Makefile.objs b/hw/rx/Makefile.objs
-new file mode 100644
-index 0000000000..63f8be0e82
---- /dev/null
-+++ b/hw/rx/Makefile.objs
-@@ -0,0 +1,2 @@
-+obj-$(CONFIG_RX62N) +=3D rx62n.o
-+obj-$(CONFIG_RX_VIRT) +=3D rx-virt.o
 --=20
 2.11.0
 
