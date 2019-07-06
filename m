@@ -2,90 +2,69 @@ Return-Path: <SRS0=Pmsr=VD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 668DCC5B578
-	for <qemu-devel@archiver.kernel.org>; Sat,  6 Jul 2019 04:50:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11D87C5B578
+	for <qemu-devel@archiver.kernel.org>; Sat,  6 Jul 2019 06:10:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 372542089C
-	for <qemu-devel@archiver.kernel.org>; Sat,  6 Jul 2019 04:50:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 372542089C
+	by mail.kernel.org (Postfix) with ESMTPS id D09B52089C
+	for <qemu-devel@archiver.kernel.org>; Sat,  6 Jul 2019 06:10:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D09B52089C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57762 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57900 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hjcee-0002K9-Dy
-	for qemu-devel@archiver.kernel.org; Sat, 06 Jul 2019 00:50:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58505)
+	id 1hjduO-0007nX-MJ
+	for qemu-devel@archiver.kernel.org; Sat, 06 Jul 2019 02:10:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42298)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <eblake@redhat.com>) id 1hjcdW-0001nr-Lf
- for qemu-devel@nongnu.org; Sat, 06 Jul 2019 00:49:24 -0400
+ (envelope-from <armbru@redhat.com>) id 1hjdtT-0007JJ-Mq
+ for qemu-devel@nongnu.org; Sat, 06 Jul 2019 02:09:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1hjcdU-0008VZ-Ny
- for qemu-devel@nongnu.org; Sat, 06 Jul 2019 00:49:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42096)
+ (envelope-from <armbru@redhat.com>) id 1hjdtR-0002mH-CW
+ for qemu-devel@nongnu.org; Sat, 06 Jul 2019 02:09:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34030)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1hjcdS-0008TA-Qy
- for qemu-devel@nongnu.org; Sat, 06 Jul 2019 00:49:20 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hjdtR-0002k6-4S
+ for qemu-devel@nongnu.org; Sat, 06 Jul 2019 02:09:53 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id F3A5183F3B
- for <qemu-devel@nongnu.org>; Sat,  6 Jul 2019 04:49:17 +0000 (UTC)
-Received: from [10.3.116.152] (ovpn-116-152.phx2.redhat.com [10.3.116.152])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 828E28681E;
- Sat,  6 Jul 2019 04:49:17 +0000 (UTC)
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-References: <1562356239-19391-1-git-send-email-pbonzini@redhat.com>
- <420745c6-4709-d32a-b4f0-f0ffc066bd2b@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
- xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
- xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
- TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
- GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
- sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
- AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
- CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
- RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
- wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
- Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
- gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
- pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
- zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
- pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
- 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
- NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
- cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
- SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
- I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
- mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
- Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
- 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <36134cb8-44e2-d7d4-bd95-4fae15573e7a@redhat.com>
-Date: Fri, 5 Jul 2019 23:49:16 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ by mx1.redhat.com (Postfix) with ESMTPS id C6EC0C0467E4;
+ Sat,  6 Jul 2019 06:09:51 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-111.ams2.redhat.com
+ [10.36.116.111])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 44DB18D668;
+ Sat,  6 Jul 2019 06:09:48 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id CC9251132ABF; Sat,  6 Jul 2019 08:09:46 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+References: <20190702210017.4275-1-vandersonmr2@gmail.com>
+ <20190702210017.4275-5-vandersonmr2@gmail.com>
+ <877e8wk2nm.fsf@dusky.pond.sub.org> <87tvc0v99m.fsf@zen.linaroharston>
+Date: Sat, 06 Jul 2019 08:09:46 +0200
+In-Reply-To: <87tvc0v99m.fsf@zen.linaroharston> ("Alex =?utf-8?Q?Benn?=
+ =?utf-8?Q?=C3=A9e=22's?= message of
+ "Fri, 05 Jul 2019 15:36:05 +0100")
+Message-ID: <87lfxbelsl.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <420745c6-4709-d32a-b4f0-f0ffc066bd2b@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="qI28ZbkFbovnpI8lhzcFjgRBTbuy7J5Eo"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.27]); Sat, 06 Jul 2019 04:49:18 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.31]); Sat, 06 Jul 2019 06:09:51 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PULL 00/12] Misc bugfixes for QEMU hard freeze
+Subject: Re: [Qemu-devel] [PATCH v3 5/6] monitor: adding info tb and tbs to
+ monitor
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,76 +76,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: =?utf-8?Q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@redhat.com>,
+ vandersonmr <vandersonmr2@gmail.com>, qemu-devel@nongnu.org, "Dr.
+ David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---qI28ZbkFbovnpI8lhzcFjgRBTbuy7J5Eo
-Content-Type: multipart/mixed; boundary="4PtxPfduMAoOuBwt5bhodDeTREokPM0uL";
- protected-headers="v1"
-From: Eric Blake <eblake@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Message-ID: <36134cb8-44e2-d7d4-bd95-4fae15573e7a@redhat.com>
-Subject: Re: [Qemu-devel] [PULL 00/12] Misc bugfixes for QEMU hard freeze
-References: <1562356239-19391-1-git-send-email-pbonzini@redhat.com>
- <420745c6-4709-d32a-b4f0-f0ffc066bd2b@redhat.com>
-In-Reply-To: <420745c6-4709-d32a-b4f0-f0ffc066bd2b@redhat.com>
+Cc: Marc-Andr=C3=A9, who has patches that might be useful here.
 
---4PtxPfduMAoOuBwt5bhodDeTREokPM0uL
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
 
-On 7/5/19 11:32 PM, Eric Blake wrote:
-> On 7/5/19 2:50 PM, Paolo Bonzini wrote:
->> The following changes since commit 68d7ff0cff0c4905802104843cf0100543b=
-47314:
+> Markus Armbruster <armbru@redhat.com> writes:
+>
+>> vandersonmr <vandersonmr2@gmail.com> writes:
 >>
->>   Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' int=
-o staging (2019-06-21 13:32:10 +0100)
+> <snip>
+>
+> I'll leave Vanderson to address your other comments.
+>
 >>
->> are available in the git repository at:
+>> Debugging commands are kind of borderline.  Debugging is commonly a
+>> human activity, where HMP is just fine.  However, humans create tools to
+>> assist with their activities, and then QMP is useful.  While I wouldn't
+>> encourage HMP-only for the debugging use case, I wouldn't veto it.
 >>
->>
->>   git://github.com/bonzini/qemu.git tags/for-upstream
->>
->> for you to fetch changes up to 2994e7e66a8902d0e42c5e528489ca6484c66d2=
-d:
->>
->>   ioapic: use irq number instead of vector in ioapic_eoi_broadcast (20=
-19-07-05 18:35:43 +0200)
->=20
-> Missing v2 in the subject line to distinguish this from the failed v1
-> pull request. And per the comments on 11/12, it may need a v3 pull
-> request to fix an issue with a missing S-o-b.
+>> Your (overly terse!) commit message and help texts make me guess the
+>> commands are for gathering statistics.  Statistics can have debugging
+>> uses.  But they often have non-debugging uses as well.  What use cases
+>> can you imagine for these commands?
+>
+> So this is all really aimed at making TCG go faster - but before we can
+> make it go faster we need better tools for seeing where the time is
+> being spent and examining the code that we generate. So I expect the
+> main users of this functionality will be QEMU developers.
+>
+> That said I can see a good rationale for supporting QMP because it is
+> more amenable to automation. However this is early days so I would
+> caution about exposing this stuff too early least we bake in a woolly
+> API.
 
-Or is this the v1, and the other posting v2?
+Development tools should exempt themselves from QMP's interface
+stability promise: prefix the command names with 'x-'.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+> The other wrinkle is we do have to take control of the emulator to
+> safely calculate some of the numbers we output. This essentially means
+> the HMP commands are asynchronous - we kick of safe work which waits
+> until all vCPU threads are stopped before we go through the records and
+> add up numbers. This is fine for the HMP because we just output to the
+> monitor FD when we are ready. I assume for QMP commands there is more
+> housekeeping to do? Can QMP commands wait for a response to be
+> calculated by another thread? Are there any existing commands that have
+> to support this sort of pattern?
 
+Let me clarify "synchronous" to avoid confusion.
 
---4PtxPfduMAoOuBwt5bhodDeTREokPM0uL--
+Both QMP and HMP commands are synchronous protocols in the sense that
+commands are executed one after the other, without overlap.  When a
+client sends multiple commands, it can assume that each one starts only
+after the previous one completed.
 
---qI28ZbkFbovnpI8lhzcFjgRBTbuy7J5Eo
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Both HMP and QMP commands execute synchronously in the sense that the
+command runs to completion without ever yielding the thread.  Any
+blocking operations put the thread to sleep (but see below).
 
------BEGIN PGP SIGNATURE-----
+HMP runs in the main thread.  Putting the main thread to sleep is
+generally undesirable.
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl0gKEwACgkQp6FrSiUn
-Q2rvUQgAj96gxIl88s/QBLHwwssYLdeUao21whty82qRfU9k1xNtx/t8CkayBbAT
-i2UoHrAIN2RbKI5k5QS+g8TCxfJS0BXMt4oFhqG+OETbNv5FGmRCOCRZ3XgbnJ0y
-gpivnv4ngBHQ+yiAi/GRTW6W6vW9JtIIoupGUbzmJuE/unqy7aBoVmzwUKdcqoLA
-OEXq3T87jyZRef3t7mo9I6RZJND5IDquufNbgkW6RXd8KEeOTPeL3++y+V6tvdh5
-A9daiZneBbCIUKqoMBPkDZrCwI/EhI2enD9hFA7UAdgLPZCoP/MVTthDrgNvmo7Z
-zgNKDAj7EeEcnGCq0kL3ICw2APSO+g==
-=sivA
------END PGP SIGNATURE-----
+QMP used to run in the main thread, too.  Nowadays, the QMP core runs in
+an I/O thread shared by all monitors, and dispatches commands to the
+main thread.  Moving command execution out of the main thread as well
+requires careful review of the command's code for hidden assumptions.
+Major project.
 
---qI28ZbkFbovnpI8lhzcFjgRBTbuy7J5Eo--
+Fine print: OOB commands are a special case, but I doubt you want to
+know more.
+
+Fine print: certain character devices can't support use of an I/O
+thread; QMP runs in the main thread then.  The ones you want to use with
+QMP all support I/O threads.
+
+You wrote "we kick of safe work which waits until all vCPU threads are
+stopped before we go through the records and add up numbers [...] we
+just output to the monitor FD".  Does this mean the HMP command kicks
+off the work, terminates, and some time later something else prints
+results to the monitor?  How much later?
+
+If "later" is actually "soon", for a suitable value of "soon",
+Marc-Andr=C3=A9's work on "asynchronous" QMP might be pertinent.  I put
+"asynchronous" in scare quotes, because of the confusion it has caused.
+My current understanding (Marc-Andr=C3=A9, please correct me if wrong): it
+lets QMP commands to block without putting their thread to sleep.  It
+does not make QMP an asynchronous protocol.
+
+If "later" need not be "soon", read on.
+
+In QMP, there are two established ways to do potentially long-running
+work.  Both ways use a command that kicks off the work, then terminates
+without waiting for it to complete.
+
+The first way is traditional: pair the kick off command with a query
+command and optionally an event.
+
+When the work completes, it fires off the event.  The event is broadcast
+to all QMP monitors (we could implement unicast if we have a compelling
+use case).
+
+The query command reports whether the work has completed, and if yes,
+the work's results, if any.
+
+You need the event if you want to avoid polling.
+
+Even with an event, you still need a query command.  If your management
+application loses its QMP connection temporarily, you can miss the
+event.  You want to poll on reconnect, with the query command.
+
+If more than one instance of the work can be pending at any one time,
+event and query need to identify the instance somehow.  This is
+completely ad hoc.
+
+The second way is a full-blown "job".  This provides more control: you
+can cancel, pause, resume, ...  It also provides a job ID.  More
+featureful and more structured.
+
+Jobs have grown out of block jobs.  I'd love to see some uses outside
+the block subsystem.
+
+Hope this helps!
 
