@@ -2,68 +2,85 @@ Return-Path: <SRS0=Pmsr=VD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86672C5B578
-	for <qemu-devel@archiver.kernel.org>; Sat,  6 Jul 2019 04:06:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF109C5B578
+	for <qemu-devel@archiver.kernel.org>; Sat,  6 Jul 2019 04:11:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 51CF720843
-	for <qemu-devel@archiver.kernel.org>; Sat,  6 Jul 2019 04:06:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51CF720843
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id B142B216B7
+	for <qemu-devel@archiver.kernel.org>; Sat,  6 Jul 2019 04:11:45 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MCAQ+e/o"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B142B216B7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57632 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57642 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hjbxa-0004eF-AG
-	for qemu-devel@archiver.kernel.org; Sat, 06 Jul 2019 00:06:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52383)
+	id 1hjc36-00077Z-Tf
+	for qemu-devel@archiver.kernel.org; Sat, 06 Jul 2019 00:11:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53241)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <armbru@redhat.com>) id 1hjbvT-0003pN-1r
- for qemu-devel@nongnu.org; Sat, 06 Jul 2019 00:03:51 -0400
+ (envelope-from <skrtbhtngr@gmail.com>) id 1hjc1E-0006Ba-FM
+ for qemu-devel@nongnu.org; Sat, 06 Jul 2019 00:09:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1hjbvR-0005IY-WD
- for qemu-devel@nongnu.org; Sat, 06 Jul 2019 00:03:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44860)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>)
- id 1hjbvP-0005GR-Js; Sat, 06 Jul 2019 00:03:47 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id C66D4308FF23;
- Sat,  6 Jul 2019 04:03:41 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-111.ams2.redhat.com
- [10.36.116.111])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A95A861993;
- Sat,  6 Jul 2019 04:03:36 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 7ABCF1132ABF; Sat,  6 Jul 2019 06:03:35 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: John Snow <jsnow@redhat.com>
-References: <20190703215542.16123-1-jsnow@redhat.com>
- <20190703215542.16123-2-jsnow@redhat.com>
- <87sgrkin5j.fsf@dusky.pond.sub.org>
- <5a6527dc-15ff-9dbc-8e47-7d5b250fe4ea@redhat.com>
-Date: Sat, 06 Jul 2019 06:03:35 +0200
-In-Reply-To: <5a6527dc-15ff-9dbc-8e47-7d5b250fe4ea@redhat.com> (John Snow's
- message of "Fri, 5 Jul 2019 12:37:33 -0400")
-Message-ID: <87zhlrg67c.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+ (envelope-from <skrtbhtngr@gmail.com>) id 1hjc1D-0000i1-9h
+ for qemu-devel@nongnu.org; Sat, 06 Jul 2019 00:09:48 -0400
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:35652)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <skrtbhtngr@gmail.com>)
+ id 1hjc1D-0000hl-2a
+ for qemu-devel@nongnu.org; Sat, 06 Jul 2019 00:09:47 -0400
+Received: by mail-pg1-x543.google.com with SMTP id s27so5078071pgl.2
+ for <qemu-devel@nongnu.org>; Fri, 05 Jul 2019 21:09:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=K0PbUUNwlQKjDXefzf4ftnqJzOIPHz8PpZV3qjdWqjE=;
+ b=MCAQ+e/o//Bd71Tt6r/s4Epa1M1h4Hkx80GlAmaphHRzy5wJhod7lnHVJp+noON5q7
+ PtQ+vQEFb6cHkI+rGYvNMQcPD+d5hIJIt4wXaFmP+i0qIRpBNOC33za2+k0g4o7MHwvN
+ w62w7rlU2fMPZwLTTnd7dxnbAcS98EjsCkIVNQFoOg8Cy6fApOY+UbSSvmknwyUi4HTB
+ 0a6xayChYDwyWc0SxSgZrtREkyLN4M8hc6lrxzsJNzkObwOGvlmAWEgvrOJdmGgotgKD
+ bNYodyt+8k6YYmFBW8A3V98CzcUVSMjtLhYZdKiSznvquAsegKdO37uZx2MlkEaDoX0x
+ 8bTw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=K0PbUUNwlQKjDXefzf4ftnqJzOIPHz8PpZV3qjdWqjE=;
+ b=hK/tsTSDZe/FtwlzaTCRepiyrkb70LmXS63rfVUMvwnT9BlEg3VzDetfRLygNLGJog
+ m06y1BMKYo/rYZlcC0unr5B1SWY8tw7jJOrMGEWXJgwFlQBNOkyJq4p/lXMN5pIldi4v
+ JNg3PvypfWL6W7LdU6EJUpV7SksffZEI+5EECIajzfSKOjfXoO92HxEcAoCXW9FpN6RD
+ Vj794jvmHlvfB8LgA72e9SgXhyrdFHs2JEGcva4X3Hn91TWDYMnUgWws+ZfhOamJ3ZIy
+ RHCAR9NPtyPk41j6jwdKc1GSPmzrEOlsgwLO5emYZvsHw3JZIWw1PoH1tnQ2RSkV4gw1
+ Youg==
+X-Gm-Message-State: APjAAAVgMCLlvBfFzE1flxvlAtF7RDIMaDfHe86muVAGC0/8CS2tDkjx
+ NrXoJ0Ibku0DlAK7D5O3ssMa+u0C
+X-Google-Smtp-Source: APXvYqx8knuir32PQBx67uOMjRwpS7a2iSh0+Z3OMKeuUUzD3hwzkQYa5cEy9WXIVgW+yK/yLPb9uA==
+X-Received: by 2002:a65:4786:: with SMTP id e6mr8894013pgs.448.1562386185463; 
+ Fri, 05 Jul 2019 21:09:45 -0700 (PDT)
+Received: from localhost.localdomain ([2405:204:22f:6255:6f39:949d:5942:eaaf])
+ by smtp.gmail.com with ESMTPSA id
+ q126sm17330847pfq.123.2019.07.05.21.09.42
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Fri, 05 Jul 2019 21:09:44 -0700 (PDT)
+From: Sukrit Bhatnagar <skrtbhtngr@gmail.com>
+To: qemu-devel@nongnu.org
+Date: Sat,  6 Jul 2019 09:39:38 +0530
+Message-Id: <20190706040940.7884-1-skrtbhtngr@gmail.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Sat, 06 Jul 2019 04:03:46 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 01/18] qapi/block-core: Introduce
- BackupCommon
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::543
+Subject: [Qemu-devel] [RFC v2 0/2] Add live migration support in the PVRDMA
+ device
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,82 +92,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- vsementsov@virtuozzo.com, qemu-block@nongnu.org,
- Juan Quintela <quintela@redhat.com>, Wen Congyang <wencongyang2@huawei.com>,
- Xie Changlong <xiechanglong.d@gmail.com>,
- Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
- Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Yuval Shaia <yuval.shaia@oracle.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-John Snow <jsnow@redhat.com> writes:
+Changes in v2:
 
-> On 7/5/19 10:14 AM, Markus Armbruster wrote:
->> John Snow <jsnow@redhat.com> writes:
->> 
->>> drive-backup and blockdev-backup have an awful lot of things in common
->>> that are the same. Let's fix that.
->>>
->>> I don't deduplicate 'target', because the semantics actually did change
->>> between each structure. Leave that one alone so it can be documented
->>> separately.
->>>
->>> Signed-off-by: John Snow <jsnow@redhat.com>
->>> ---
->>>  qapi/block-core.json | 103 ++++++++++++++-----------------------------
->>>  1 file changed, 33 insertions(+), 70 deletions(-)
->>>
->>> diff --git a/qapi/block-core.json b/qapi/block-core.json
->>> index 0d43d4f37c..7b23efcf13 100644
->>> --- a/qapi/block-core.json
->>> +++ b/qapi/block-core.json
->>> @@ -1315,32 +1315,23 @@
->>>    'data': { 'node': 'str', 'overlay': 'str' } }
->>>  
->>>  ##
->>> -# @DriveBackup:
->>> +# @BackupCommon:
->>>  #
->>>  # @job-id: identifier for the newly-created block job. If
->>>  #          omitted, the device name will be used. (Since 2.7)
->>>  #
->>>  # @device: the device name or node-name of a root node which should be copied.
->>>  #
->>> -# @target: the target of the new image. If the file exists, or if it
->>> -#          is a device, the existing file/device will be used as the new
->>> -#          destination.  If it does not exist, a new file will be created.
->>> -#
->>> -# @format: the format of the new destination, default is to
->>> -#          probe if @mode is 'existing', else the format of the source
->>> -#
->>>  # @sync: what parts of the disk image should be copied to the destination
->>>  #        (all the disk, only the sectors allocated in the topmost image, from a
->>>  #        dirty bitmap, or only new I/O).
->> 
->> This is DriveBackup's wording.  Blockdev lacks "from a dirty bitmap, ".
->> Is this a doc fix?
->
-> Yes.
+* Modify load_dsr() such that dsr mapping is not performed if dsr value
+  is non-NULL. Also move free_dsr() out of load_dsr() and call it right
+  before if needed. These two changes will allow us to call load_dsr()
+  even when we have already done dsr mapping and would like to go on
+  with the rest of mappings.
 
-Worth mentioning in the commit message?
+* Use VMStateDescription instead of SaveVMHandlers to describe migration
+  state. Also add fields for parent PCI object and MSIX.
 
->>>  #
->>> -# @mode: whether and how QEMU should create a new image, default is
->>> -#        'absolute-paths'.
->>> -#
->>> -# @speed: the maximum speed, in bytes per second
->>> +# @speed: the maximum speed, in bytes per second. The default is 0,
->>> +#         for unlimited.
->> 
->> This is Blockdev's wording.  DriveBackup lacks "the default is 0, for
->> unlimited."  Is this a doc fix?
->
-> Yes.
+* Use a temporary structure (struct PVRDMAMigTmp) to hold some fields
+  during migration. These fields, such as cmd_slot_dma and resp_slot_dma
+  inside dsr, do not fit into VMSTATE macros as their container
+  (dsr_info->dsr) will not be ready until it is mapped on the dest.
 
-Worth mentioning in the commit message?
+* Perform mappings to CQ and event notification rings after the state is
+  loaded. This is an extension to the mappings performed in v1;
+  following the flow of load_dsr(). All the mappings are succesfully
+  done on the dest on state load.
 
-[...]
+Link(s) to v1:
+https://lists.gnu.org/archive/html/qemu-devel/2019-06/msg04924.html
+https://lists.gnu.org/archive/html/qemu-devel/2019-06/msg04923.html
+
+
+Things working now (were not working at the time of v1):
+
+* vmxnet3 is migrating successfully. The issue was in the migration of
+  its PCI configuration space, and is solved by the patch Marcel had sent:
+  https://lists.gnu.org/archive/html/qemu-devel/2019-07/msg01500.html
+
+* There is no problem due to BounceBuffers which were failing the dma mapping
+  calls in state load logic earlier. Not sure exactly how it went away. I am
+  guessing that adding the PCI and MSIX state to migration solved the issue.
+
+
+What is still needed:
+
+* A workaround to get libvirt to support same-host migration. Since
+  the problems faced in v1 (mentioned above) are out of the way, we
+  can move further, and in doing so, we will need this.
+
+Sukrit Bhatnagar (2):
+  hw/pvrdma: make DSR mapping idempotent in load_dsr()
+  hw/pvrdma: add live migration support
+
+ hw/rdma/vmw/pvrdma_main.c | 104 +++++++++++++++++++++++++++++++++++---
+ 1 file changed, 96 insertions(+), 8 deletions(-)
+
+-- 
+2.21.0
+
 
