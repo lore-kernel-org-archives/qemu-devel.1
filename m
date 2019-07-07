@@ -2,76 +2,63 @@ Return-Path: <SRS0=qwNR=VE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00715C5B578
-	for <qemu-devel@archiver.kernel.org>; Sun,  7 Jul 2019 01:20:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98DB1C0650E
+	for <qemu-devel@archiver.kernel.org>; Sun,  7 Jul 2019 08:44:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BFA3120836
-	for <qemu-devel@archiver.kernel.org>; Sun,  7 Jul 2019 01:20:19 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X7ShMRw9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BFA3120836
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 70EAC20989
+	for <qemu-devel@archiver.kernel.org>; Sun,  7 Jul 2019 08:44:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 70EAC20989
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33548 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34324 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hjvqk-0006CT-N5
-	for qemu-devel@archiver.kernel.org; Sat, 06 Jul 2019 21:20:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60122)
+	id 1hk2mN-00074a-N1
+	for qemu-devel@archiver.kernel.org; Sun, 07 Jul 2019 04:44:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43916)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jidong.xiao@gmail.com>) id 1hjvq0-0005kX-F8
- for qemu-devel@nongnu.org; Sat, 06 Jul 2019 21:19:33 -0400
+ (envelope-from <mlevitsk@redhat.com>) id 1hk2lu-0006Ux-08
+ for qemu-devel@nongnu.org; Sun, 07 Jul 2019 04:43:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jidong.xiao@gmail.com>) id 1hjvpy-0002ux-VA
- for qemu-devel@nongnu.org; Sat, 06 Jul 2019 21:19:32 -0400
-Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:41509)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <jidong.xiao@gmail.com>)
- id 1hjvpy-0002s5-L6
- for qemu-devel@nongnu.org; Sat, 06 Jul 2019 21:19:30 -0400
-Received: by mail-wr1-x42e.google.com with SMTP id c2so13379775wrm.8
- for <qemu-devel@nongnu.org>; Sat, 06 Jul 2019 18:19:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:from:date:message-id:subject:to;
- bh=mHGaMIkIHgR5W5GBE4MbBOlXpjzscLPMPDa9lxC5WZ0=;
- b=X7ShMRw9E11Qqa0KY7/Efwg1OYn5A5SFM9xhQ4zfzva+zdqj49Ma7wcqV7mIhLmZ9R
- suQMn3NgaY8SVs2PR/uhI+/lfhYFnUQM+1EFf2aPw8BrRfI0NS5uzNo7CRtI2arkC/R3
- f8PJwPdZbKMcEVFVbOfhZWy9iDkj5LI+7Ol/0bi+yER+3NZUTjOYezEqACSxZ5JPCWRE
- GtXQBN3LOs22oPQDDnhs78jkc8TbWehbrIkfl1eCB9gRBoqN2Yrep4Lyha4ctZ16xR17
- cYf5PP/WaTSVPoI1uFdcEK0XodseFdK4NcarXxLqrdEWTICduEwGTR+kR71GVSe8HJVB
- qwpQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
- bh=mHGaMIkIHgR5W5GBE4MbBOlXpjzscLPMPDa9lxC5WZ0=;
- b=PNdjfASDQ202XOWMyr/26oGSeZ5GKWq0SAKtPSsHQs7drq4Y8+cDS3RLgCxQeuyAoq
- 94Kl/Grsy9vIJ9SoklX3Ajkz8HJ7IUCuc0zo9FuMMV0IsujOvCxn9TdAbgQgXu+WD1Mq
- 5JkTRiTagDf44WOcE/rNuiHv1AiKtMPmTwdTBZpuwPn8uHjTOnGedi1P83a41dsZVCLc
- HKde+od9wNvrN53QhEbJIvcCmEPlTUqSUBx4iCqTe2JVbKtG6JBle+VP/AR48vMcHpHN
- TZ/JRi5eaQBeTxEID42dOTFWHAPdWefQPS82FGLywGyFbwsHUJ1YIFp+JNycmMyUSJyh
- LXlA==
-X-Gm-Message-State: APjAAAX9f5bIRX+7EZyrgbqZKHilpkga2P8ExE0+bydCQi45EC+OtecR
- HLrpQhHvtTyUXWw8q16LTT1p35o/meHte5Y9eBs=
-X-Google-Smtp-Source: APXvYqy5h3w+hBaWCn9KCSqxcfKxtt4AW/rylPotZEwuHbVmm89HPZpyuhfCP22l2POX7oWEIiylFzQWffqdgtcE5j8=
-X-Received: by 2002:adf:db12:: with SMTP id s18mr10235515wri.335.1562462368644; 
- Sat, 06 Jul 2019 18:19:28 -0700 (PDT)
-MIME-Version: 1.0
-From: Jidong Xiao <jidong.xiao@gmail.com>
-Date: Sat, 6 Jul 2019 19:20:31 -0600
-Message-ID: <CAG4AFWag_Q44SetzaZBpD8963NG-H9ajc8GHq07zVv_xaE9WKA@mail.gmail.com>
-To: KVM <kvm@vger.kernel.org>, qemu-devel <qemu-devel@nongnu.org>
+ (envelope-from <mlevitsk@redhat.com>) id 1hk2ls-0000o9-VC
+ for qemu-devel@nongnu.org; Sun, 07 Jul 2019 04:43:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49364)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mlevitsk@redhat.com>)
+ id 1hk2lq-0000lO-JV; Sun, 07 Jul 2019 04:43:42 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 3436D883BA;
+ Sun,  7 Jul 2019 08:43:40 +0000 (UTC)
+Received: from dhcp-4-67.tlv.redhat.com (dhcp-4-67.tlv.redhat.com [10.35.4.67])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id DD03618234;
+ Sun,  7 Jul 2019 08:43:34 +0000 (UTC)
+Message-ID: <d009ad68b237aae51d327955367dc2356f33bba0.camel@redhat.com>
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
+Date: Sun, 07 Jul 2019 11:43:33 +0300
+In-Reply-To: <c47da7ef-82ac-1a76-9c8e-f76336c20c44@redhat.com>
+References: <20190703155944.9637-1-mlevitsk@redhat.com>
+ <20190703155944.9637-2-mlevitsk@redhat.com>
+ <c47da7ef-82ac-1a76-9c8e-f76336c20c44@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::42e
-Subject: [Qemu-devel] Nested virtual machine introspection
+Mime-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.26]); Sun, 07 Jul 2019 08:43:40 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v3 1/6] block/nvme: don't touch the
+ completion entries
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -83,36 +70,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Fam Zheng <fam@euphon.net>, Paolo Bonzini <pbonzini@redhat.com>,
+ John Snow <jsnow@redhat.com>, qemu-block@nongnu.org,
+ Kevin Wolf <kwolf@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
+On Fri, 2019-07-05 at 13:03 +0200, Max Reitz wrote:
+> On 03.07.19 17:59, Maxim Levitsky wrote:
+> > Completion entries are meant to be only read by the host and written =
+by the device.
+> > The driver is supposed to scan the completions from the last point wh=
+ere it left,
+> > and until it sees a completion with non flipped phase bit.
+>=20
+> (Disclaimer: This is the first time I read the nvme driver, or really
+> something in the nvme spec.)
+>=20
+> Well, no, completion entries are also meant to be initialized by the
+> host.  To me it looks like this is the place where that happens:
+> Everything that has been processed by the device is immediately being
+> re-initialized.
+>=20
+> Maybe we shouldn=E2=80=99t do that here but in nvme_submit_command().  =
+But
+> currently we don=E2=80=99t, and I don=E2=80=99t see any other place whe=
+re we currently
+> initialize the CQ entries.
 
-We are working on a project where we need to explore the virtual
-machine introspection technique in a nested environment. More
-specifically, we want to know if from L0, we can reconstruct the
-process list of L2. And to begin with, we just want to explore a
-relatively simple case, i.e., only one virtual machine at L1, and only
-one virtual machine at L2.
+Hi!
+I couldn't find any place in the spec that says that completion entries s=
+hould be initialized.
+It is probably wise to initialize that area to 0 on driver initialization=
+, but nothing beyond that.
+In particular that is what the kernel nvme driver does.=20
+Other that allocating a zeroed memory (and even that I am not sure it doe=
+s),=20
+it doesn't write to the completion entries.
 
-Several studies have shown that from L0, people can reconstruct the
-process list of L1. For example, in the context of Qemu/KVM, the
-process linked list of L1 basically is existing in the L1's kernel
-space. And in Qemu, the function cpu_memory_rw_debug() allows us to
-access the virtual memory of L1. With the help of this function, we
-will be able to scan L1's kernel space thus reconstruct the process
-linked list.
+Thanks for the very very good review btw. I will go over all patches now =
+and fix things.
 
-Now considering there is L2, can we still use cpu_memory_rw_debug() to
-scan somewhere and find out L2's process linked list? We have tried,
-but it doesn't work. Any hints on this? Like where exactly shall we
-search?
+Best regards,
+	Maxim Levitsky
 
-We have been stuck in here for quite a while, any suggestions would be
-truly appreciated.
+>=20
+> Max
+>=20
+> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> > ---
+> >  block/nvme.c | 5 +----
+> >  1 file changed, 1 insertion(+), 4 deletions(-)
+> >=20
+> > diff --git a/block/nvme.c b/block/nvme.c
+> > index 73ed5fa75f..6d4e7f3d83 100644
+> > --- a/block/nvme.c
+> > +++ b/block/nvme.c
+> > @@ -315,7 +315,7 @@ static bool nvme_process_completion(BDRVNVMeState=
+ *s, NVMeQueuePair *q)
+> >      while (q->inflight) {
+> >          int16_t cid;
+> >          c =3D (NvmeCqe *)&q->cq.queue[q->cq.head * NVME_CQ_ENTRY_BYT=
+ES];
+> > -        if (!c->cid || (le16_to_cpu(c->status) & 0x1) =3D=3D q->cq_p=
+hase) {
+> > +        if ((le16_to_cpu(c->status) & 0x1) =3D=3D q->cq_phase) {
+> >              break;
+> >          }
+> >          q->cq.head =3D (q->cq.head + 1) % NVME_QUEUE_SIZE;
+> > @@ -339,10 +339,7 @@ static bool nvme_process_completion(BDRVNVMeStat=
+e *s, NVMeQueuePair *q)
+> >          qemu_mutex_unlock(&q->lock);
+> >          req.cb(req.opaque, nvme_translate_error(c));
+> >          qemu_mutex_lock(&q->lock);
+> > -        c->cid =3D cpu_to_le16(0);
+> >          q->inflight--;
+> > -        /* Flip Phase Tag bit. */
+> > -        c->status =3D cpu_to_le16(le16_to_cpu(c->status) ^ 0x1);
+> >          progress =3D true;
+> >      }
+> >      if (progress) {
+> >=20
+>=20
+>=20
 
-Thanks!
 
--Jidong
 
