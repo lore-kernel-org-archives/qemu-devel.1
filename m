@@ -7,47 +7,47 @@ X-Spam-Status: No, score=-10.0 required=3.0
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C43AC48BDB
-	for <qemu-devel@archiver.kernel.org>; Sun,  7 Jul 2019 14:40:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A010C48BDE
+	for <qemu-devel@archiver.kernel.org>; Sun,  7 Jul 2019 14:40:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2592F2082F
+	by mail.kernel.org (Postfix) with ESMTPS id EA1FC2082F
 	for <qemu-devel@archiver.kernel.org>; Sun,  7 Jul 2019 14:40:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2592F2082F
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA1FC2082F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35672 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35674 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hk8LP-0000B9-6r
-	for qemu-devel@archiver.kernel.org; Sun, 07 Jul 2019 10:40:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49638)
+	id 1hk8LQ-0000Dy-98
+	for qemu-devel@archiver.kernel.org; Sun, 07 Jul 2019 10:40:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49537)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <tao3.xu@intel.com>) id 1hk8EI-0008Nn-Dx
- for qemu-devel@nongnu.org; Sun, 07 Jul 2019 10:33:28 -0400
+ (envelope-from <tao3.xu@intel.com>) id 1hk8E1-0008Fe-A8
+ for qemu-devel@nongnu.org; Sun, 07 Jul 2019 10:33:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tao3.xu@intel.com>) id 1hk8EE-0003f8-Ip
- for qemu-devel@nongnu.org; Sun, 07 Jul 2019 10:33:26 -0400
+ (envelope-from <tao3.xu@intel.com>) id 1hk8Dy-0003QE-Jn
+ for qemu-devel@nongnu.org; Sun, 07 Jul 2019 10:33:08 -0400
 Received: from mga03.intel.com ([134.134.136.65]:31568)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1hk8EC-000363-M2
- for qemu-devel@nongnu.org; Sun, 07 Jul 2019 10:33:22 -0400
+ (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1hk8Dx-000363-Al
+ for qemu-devel@nongnu.org; Sun, 07 Jul 2019 10:33:05 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga001.fm.intel.com ([10.253.24.23])
  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 07 Jul 2019 07:33:02 -0700
+ 07 Jul 2019 07:32:52 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.63,462,1557212400"; d="scan'208";a="185497868"
+X-IronPort-AV: E=Sophos;i="5.63,462,1557212400"; d="scan'208";a="185497835"
 Received: from tao-optiplex-7060.sh.intel.com ([10.239.13.104])
- by fmsmga001.fm.intel.com with ESMTP; 07 Jul 2019 07:33:01 -0700
+ by fmsmga001.fm.intel.com with ESMTP; 07 Jul 2019 07:32:51 -0700
 From: Tao Xu <tao3.xu@intel.com>
 To: imammedo@redhat.com,
 	eblake@redhat.com,
 	ehabkost@redhat.com
-Date: Sun,  7 Jul 2019 22:29:56 +0800
-Message-Id: <20190707142958.31316-13-tao3.xu@intel.com>
+Date: Sun,  7 Jul 2019 22:29:50 +0800
+Message-Id: <20190707142958.31316-7-tao3.xu@intel.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190707142958.31316-1-tao3.xu@intel.com>
 References: <20190707142958.31316-1-tao3.xu@intel.com>
@@ -56,8 +56,8 @@ Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
 X-Received-From: 134.134.136.65
-Subject: [Qemu-devel] [PATCH v6 12/14] hmat acpi: Implement _HMA method to
- update HMAT at runtime
+Subject: [Qemu-devel] [PATCH v6 06/14] hmat acpi: Build Memory Proximity
+ Domain Attributes Structure(s)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,563 +77,252 @@ Sender: "Qemu-devel"
 
 From: Liu Jingqi <jingqi.liu@intel.com>
 
-OSPM evaluates HMAT only during system initialization.
-Any changes to the HMAT state at runtime or information
-regarding HMAT for hot plug are communicated using _HMA method.
+HMAT is defined in ACPI 6.3: 5.2.27 Heterogeneous Memory Attribute Table
+(HMAT). The specification references below link:
+http://www.uefi.org/sites/default/files/resources/ACPI_6_3_final_Jan30.pdf
 
-_HMA is an optional object that enables the platform to provide
-the OS with updated Heterogeneous Memory Attributes information
-at runtime. _HMA provides OSPM with the latest HMAT in entirety
-overriding existing HMAT.
+It describes the memory attributes, such as memory side cache
+attributes and bandwidth and latency details, related to the
+Memory Proximity Domain. The software is
+expected to use this information as hint for optimization.
+
+This structure describes Memory Proximity Domain Attributes by memory
+subsystem and its associativity with processor proximity domain as well as
+hint for memory usage.
 
 Signed-off-by: Liu Jingqi <jingqi.liu@intel.com>
 Signed-off-by: Tao Xu <tao3.xu@intel.com>
 ---
 
 Changes in v6:
-    - move AcpiHmaState from PCMachineState to MachineState
-    to make HMAT more generalic (Igor)
-    - use build_acpi_aml_common() introduced in patch 10/11 to
-    simplify hmat_build_aml (Igor)
-    - Add _HMA only qemu use hmat-lb or hmat-cache
+Update to ACPI 6.3, main changes are:
+    - Renamed as Memory Proximity Domain Attributes, use numa nodes to
+      replace memory ranges
+    - Use "-numa initiator" to describe "the Attached Initiator", more
+      clear for memory topology
+    - Because HMAT does not use memory ranges, remove the codes to build
+      mem_renges for dimm device
 ---
- hw/acpi/hmat.c        | 297 ++++++++++++++++++++++++++++++++++++++++++
- hw/acpi/hmat.h        |  68 ++++++++++
- hw/core/machine.c     |   4 +
- hw/i386/acpi-build.c  |   4 +
- hw/i386/pc_piix.c     |   6 +
- hw/i386/pc_q35.c      |   6 +
- include/sysemu/numa.h |   5 +
- numa.c                |  10 ++
- 8 files changed, 400 insertions(+)
+ hw/acpi/Kconfig       |   5 +++
+ hw/acpi/Makefile.objs |   1 +
+ hw/acpi/hmat.c        | 101 ++++++++++++++++++++++++++++++++++++++++++
+ hw/acpi/hmat.h        |  45 +++++++++++++++++++
+ hw/i386/acpi-build.c  |   3 ++
+ 5 files changed, 155 insertions(+)
+ create mode 100644 hw/acpi/hmat.c
+ create mode 100644 hw/acpi/hmat.h
 
+diff --git a/hw/acpi/Kconfig b/hw/acpi/Kconfig
+index 7c59cf900b..039bb99efa 100644
+--- a/hw/acpi/Kconfig
++++ b/hw/acpi/Kconfig
+@@ -7,6 +7,7 @@ config ACPI_X86
+     select ACPI_NVDIMM
+     select ACPI_CPU_HOTPLUG
+     select ACPI_MEMORY_HOTPLUG
++    select ACPI_HMAT
+ 
+ config ACPI_X86_ICH
+     bool
+@@ -31,3 +32,7 @@ config ACPI_VMGENID
+     bool
+     default y
+     depends on PC
++
++config ACPI_HMAT
++    bool
++    depends on ACPI
+diff --git a/hw/acpi/Makefile.objs b/hw/acpi/Makefile.objs
+index 9bb2101e3b..c05019b059 100644
+--- a/hw/acpi/Makefile.objs
++++ b/hw/acpi/Makefile.objs
+@@ -6,6 +6,7 @@ common-obj-$(CONFIG_ACPI_MEMORY_HOTPLUG) += memory_hotplug.o
+ common-obj-$(CONFIG_ACPI_CPU_HOTPLUG) += cpu.o
+ common-obj-$(CONFIG_ACPI_NVDIMM) += nvdimm.o
+ common-obj-$(CONFIG_ACPI_VMGENID) += vmgenid.o
++common-obj-$(CONFIG_ACPI_HMAT) += hmat.o
+ common-obj-$(call lnot,$(CONFIG_ACPI_X86)) += acpi-stub.o
+ 
+ common-obj-y += acpi_interface.o
 diff --git a/hw/acpi/hmat.c b/hw/acpi/hmat.c
-index a207581f11..33b9dd2e04 100644
---- a/hw/acpi/hmat.c
+new file mode 100644
+index 0000000000..abf99b1adc
+--- /dev/null
 +++ b/hw/acpi/hmat.c
-@@ -27,6 +27,8 @@
- #include "qemu/osdep.h"
- #include "sysemu/numa.h"
- #include "hw/acpi/hmat.h"
-+#include "hw/mem/nvdimm.h"
-+#include "hw/nvram/fw_cfg.h"
- 
- /*
-  * ACPI 6.3:
-@@ -238,6 +240,270 @@ static void hmat_build_table_structs(GArray *table_data, NumaState *nstat)
-     }
- }
- 
-+static uint64_t
-+hmat_hma_method_read(void *opaque, hwaddr addr, unsigned size)
+@@ -0,0 +1,101 @@
++/*
++ * HMAT ACPI Implementation
++ *
++ * Copyright(C) 2019 Intel Corporation.
++ *
++ * Author:
++ *  Liu jingqi <jingqi.liu@linux.intel.com>
++ *  Tao Xu <tao3.xu@intel.com>
++ *
++ * HMAT is defined in ACPI 6.3: 5.2.27 Heterogeneous Memory Attribute Table
++ * (HMAT)
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/licenses/>
++ */
++
++#include "qemu/osdep.h"
++#include "sysemu/numa.h"
++#include "hw/acpi/hmat.h"
++
++/*
++ * ACPI 6.3:
++ * 5.2.27.3 Memory Proximity Domain Attributes Structure: Table 5-141
++ */
++static void build_hmat_mpda(GArray *table_data, uint16_t flags, int initiator,
++                           int mem_node)
 +{
-+    printf("BUG: we never read _HMA IO Port.\n");
-+    return 0;
-+}
 +
-+/* _HMA Method: read HMA data. */
-+static void hmat_handle_hma_method(AcpiHmaState *state,
-+                                   HmatHmamIn *in, hwaddr hmam_mem_addr)
-+{
-+    HmatHmaBuffer *hma_buf = &state->hma_buf;
-+    HmatHmamOut *read_hma_out;
-+    GArray *hma;
-+    uint32_t read_len = 0, ret_status;
-+    int size;
-+
-+    if (in != NULL) {
-+        le32_to_cpus(&in->offset);
-+    }
-+
-+    hma = hma_buf->hma;
-+    if (in->offset > hma->len) {
-+        ret_status = HMAM_RET_STATUS_INVALID;
-+        goto exit;
-+    }
-+
-+   /* It is the first time to read HMA. */
-+    if (!in->offset) {
-+        hma_buf->dirty = false;
-+    } else if (hma_buf->dirty) {
-+        /* HMA has been changed during Reading HMA. */
-+        ret_status = HMAM_RET_STATUS_HMA_CHANGED;
-+        goto exit;
-+    }
-+
-+    ret_status = HMAM_RET_STATUS_SUCCESS;
-+    read_len = MIN(hma->len - in->offset,
-+                   HMAM_MEMORY_SIZE - 2 * sizeof(uint32_t));
-+exit:
-+    size = sizeof(HmatHmamOut) + read_len;
-+    read_hma_out = g_malloc(size);
-+
-+    read_hma_out->len = cpu_to_le32(size);
-+    read_hma_out->ret_status = cpu_to_le32(ret_status);
-+    memcpy(read_hma_out->data, hma->data + in->offset, read_len);
-+
-+    cpu_physical_memory_write(hmam_mem_addr, read_hma_out, size);
-+
-+    g_free(read_hma_out);
-+}
-+
-+static void
-+hmat_hma_method_write(void *opaque, hwaddr addr, uint64_t val, unsigned size)
-+{
-+    AcpiHmaState *state = opaque;
-+    hwaddr hmam_mem_addr = val;
-+    HmatHmamIn *in;
-+
-+    in = g_new(HmatHmamIn, 1);
-+    cpu_physical_memory_read(hmam_mem_addr, in, sizeof(*in));
-+
-+    hmat_handle_hma_method(state, in, hmam_mem_addr);
-+}
-+
-+static const MemoryRegionOps hmat_hma_method_ops = {
-+    .read = hmat_hma_method_read,
-+    .write = hmat_hma_method_write,
-+    .endianness = DEVICE_LITTLE_ENDIAN,
-+    .valid = {
-+        .min_access_size = 4,
-+        .max_access_size = 4,
-+    },
-+};
-+
-+static void hmat_init_hma_buffer(HmatHmaBuffer *hma_buf)
-+{
-+    hma_buf->hma = g_array_new(false, true /* clear */, 1);
-+}
-+
-+static uint8_t hmat_acpi_table_checksum(uint8_t *buffer, uint32_t length)
-+{
-+    uint8_t sum = 0;
-+    uint8_t *end = buffer + length;
-+
-+    while (buffer < end) {
-+        sum = (uint8_t) (sum + *(buffer++));
-+    }
-+    return (uint8_t)(0 - sum);
-+}
-+
-+static void hmat_build_header(AcpiTableHeader *h,
-+             const char *sig, int len, uint8_t rev,
-+             const char *oem_id, const char *oem_table_id)
-+{
-+    memcpy(&h->signature, sig, 4);
-+    h->length = cpu_to_le32(len);
-+    h->revision = rev;
-+
-+    if (oem_id) {
-+        strncpy((char *)h->oem_id, oem_id, sizeof h->oem_id);
-+    } else {
-+        memcpy(h->oem_id, ACPI_BUILD_APPNAME6, 6);
-+    }
-+
-+    if (oem_table_id) {
-+        strncpy((char *)h->oem_table_id, oem_table_id, sizeof(h->oem_table_id));
-+    } else {
-+        memcpy(h->oem_table_id, ACPI_BUILD_APPNAME4, 4);
-+        memcpy(h->oem_table_id + 4, sig, 4);
-+    }
-+
-+    h->oem_revision = cpu_to_le32(1);
-+    memcpy(h->asl_compiler_id, ACPI_BUILD_APPNAME4, 4);
-+    h->asl_compiler_revision = cpu_to_le32(1);
-+
-+    /* Caculate the checksum of acpi table. */
-+    h->checksum = 0;
-+    h->checksum = hmat_acpi_table_checksum((uint8_t *)h, len);
-+}
-+
-+static void hmat_build_hma_buffer(NumaState *nstat)
-+{
-+    HmatHmaBuffer *hma_buf = &(nstat->acpi_hma_state->hma_buf);
-+
-+    /* Free the old hma buffer before new allocation. */
-+    g_array_free(hma_buf->hma, true);
-+
-+    hma_buf->hma = g_array_new(false, true /* clear */, 1);
-+    acpi_data_push(hma_buf->hma, 40);
-+
-+    /* build HMAT in a given buffer. */
-+    hmat_build_table_structs(hma_buf->hma, nstat);
-+    hmat_build_header((void *)hma_buf->hma->data,
-+                      "HMAT", hma_buf->hma->len, 2, NULL, NULL);
-+    hma_buf->dirty = true;
-+}
-+
-+static void hmat_build_common_aml(Aml *dev)
-+{
-+    Aml *method, *ifctx, *hmam_mem;
-+    Aml *unsupport;
-+    Aml *pckg, *pckg_index, *pckg_buf, *field;
-+    Aml *hmam_out_buf, *hmam_out_buf_size;
-+    uint8_t byte_list[1];
-+
-+    method = aml_method(HMA_COMMON_METHOD, 1, AML_SERIALIZED);
-+    hmam_mem = aml_local(6);
-+    hmam_out_buf = aml_local(7);
-+
-+    aml_append(method, aml_store(aml_name(HMAM_ACPI_MEM_ADDR), hmam_mem));
-+
-+    /* map _HMA memory and IO into ACPI namespace. */
-+    aml_append(method, aml_operation_region(HMAM_IOPORT, AML_SYSTEM_IO,
-+               aml_int(HMAM_ACPI_IO_BASE), HMAM_ACPI_IO_LEN));
-+    aml_append(method, aml_operation_region(HMAM_MEMORY,
-+               AML_SYSTEM_MEMORY, hmam_mem, HMAM_MEMORY_SIZE));
-+
++    /* Memory Proximity Domain Attributes Structure */
++    /* Type */
++    build_append_int_noprefix(table_data, 0, 2);
++    /* Reserved */
++    build_append_int_noprefix(table_data, 0, 2);
++    /* Length */
++    build_append_int_noprefix(table_data, 40, 4);
++    /* Flags */
++    build_append_int_noprefix(table_data, flags, 2);
++    /* Reserved */
++    build_append_int_noprefix(table_data, 0, 2);
++    /* Proximity Domain for the Attached Initiator */
++    build_append_int_noprefix(table_data, initiator, 4);
++    /* Proximity Domain for the Memory */
++    build_append_int_noprefix(table_data, mem_node, 4);
++    /* Reserved */
++    build_append_int_noprefix(table_data, 0, 4);
 +    /*
-+     * _HMAC notifier:
-+     * HMAM_NOTIFY: write the address of DSM memory and notify QEMU to
-+     *                    emulate the access.
-+     *
-+     * It is the IO port so that accessing them will cause VM-exit, the
-+     * control will be transferred to QEMU.
++     * Reserved:
++     * Previously defined as the Start Address of the System Physical
++     * Address Range. Deprecated since ACPI Spec 6.3.
 +     */
-+    field = aml_field(HMAM_IOPORT, AML_DWORD_ACC, AML_NOLOCK,
-+                      AML_PRESERVE);
-+    aml_append(field, aml_named_field(HMAM_NOTIFY,
-+               sizeof(uint32_t) * BITS_PER_BYTE));
-+    aml_append(method, field);
-+
++    build_append_int_noprefix(table_data, 0, 8);
 +    /*
-+     * _HMAC input:
-+     * HMAM_OFFSET: store the current offset of _HMA buffer.
-+     *
-+     * They are RAM mapping on host so that these accesses never cause VMExit.
++     * Reserved:
++     * Previously defined as the Range Length of the region in bytes.
++     * Deprecated since ACPI Spec 6.3.
 +     */
-+    field = aml_field(HMAM_MEMORY, AML_DWORD_ACC, AML_NOLOCK,
-+                      AML_PRESERVE);
-+    aml_append(field, aml_named_field(HMAM_OFFSET,
-+               sizeof(typeof_field(HmatHmamIn, offset)) * BITS_PER_BYTE));
-+    aml_append(method, field);
-+
-+    /*
-+     * _HMAC output:
-+     * HMAM_OUT_BUF_SIZE: the size of the buffer filled by QEMU.
-+     * HMAM_OUT_BUF: the buffer QEMU uses to store the result.
-+     *
-+     * Since the page is reused by both input and out, the input data
-+     * will be lost after storing new result into ODAT so we should fetch
-+     * all the input data before writing the result.
-+     */
-+    field = aml_field(HMAM_MEMORY, AML_DWORD_ACC, AML_NOLOCK,
-+                      AML_PRESERVE);
-+    aml_append(field, aml_named_field(HMAM_OUT_BUF_SIZE,
-+               sizeof(typeof_field(HmatHmamOut, len)) * BITS_PER_BYTE));
-+    aml_append(field, aml_named_field(HMAM_OUT_BUF,
-+       (sizeof(HmatHmamOut) - sizeof(uint32_t)) * BITS_PER_BYTE));
-+    aml_append(method, field);
-+
-+    /*
-+     * do not support any method if HMA memory address has not been
-+     * patched.
-+     */
-+    unsupport = aml_if(aml_equal(hmam_mem, aml_int(0x0)));
-+    byte_list[0] = HMAM_RET_STATUS_UNSUPPORT;
-+    aml_append(unsupport, aml_return(aml_buffer(1, byte_list)));
-+    aml_append(method, unsupport);
-+
-+    /* The parameter (Arg0) of _HMAC is a package which contains a buffer. */
-+    pckg = aml_arg(0);
-+    ifctx = aml_if(aml_and(aml_equal(aml_object_type(pckg),
-+                   aml_int(4 /* Package */)) /* It is a Package? */,
-+                   aml_equal(aml_sizeof(pckg), aml_int(1)) /* 1 element */,
-+                   NULL));
-+
-+    pckg_index = aml_local(2);
-+    pckg_buf = aml_local(3);
-+    aml_append(ifctx, aml_store(aml_index(pckg, aml_int(0)), pckg_index));
-+    aml_append(ifctx, aml_store(aml_derefof(pckg_index), pckg_buf));
-+    aml_append(ifctx, aml_store(pckg_buf, aml_name(HMAM_OFFSET)));
-+    aml_append(method, ifctx);
-+
-+    /*
-+     * tell QEMU about the real address of HMA memory, then QEMU
-+     * gets the control and fills the result in _HMAC memory.
-+     */
-+    aml_append(method, aml_store(hmam_mem, aml_name(HMAM_NOTIFY)));
-+
-+    hmam_out_buf_size = aml_local(1);
-+    /* RLEN is not included in the payload returned to guest. */
-+    aml_append(method, aml_subtract(aml_name(HMAM_OUT_BUF_SIZE),
-+                                aml_int(4), hmam_out_buf_size));
-+    aml_append(method, aml_store(aml_shiftleft(hmam_out_buf_size, aml_int(3)),
-+                                 hmam_out_buf_size));
-+    aml_append(method, aml_create_field(aml_name(HMAM_OUT_BUF),
-+                                aml_int(0), hmam_out_buf_size, "OBUF"));
-+    aml_append(method, aml_concatenate(aml_buffer(0, NULL), aml_name("OBUF"),
-+                                hmam_out_buf));
-+    aml_append(method, aml_return(hmam_out_buf));
-+    aml_append(dev, method);
++    build_append_int_noprefix(table_data, 0, 8);
 +}
 +
-+void hmat_init_acpi_state(AcpiHmaState *state, MemoryRegion *io,
-+                          FWCfgState *fw_cfg, Object *owner)
++/* Build HMAT sub table structures */
++static void hmat_build_table_structs(GArray *table_data, NumaState *nstat)
 +{
-+    memory_region_init_io(&state->io_mr, owner, &hmat_hma_method_ops, state,
-+                          "hma-acpi-io", HMAM_ACPI_IO_LEN);
-+    memory_region_add_subregion(io, HMAM_ACPI_IO_BASE, &state->io_mr);
++    uint16_t flags;
++    int i;
 +
-+    state->hmam_mem = g_array_new(false, true /* clear */, 1);
-+    fw_cfg_add_file(fw_cfg, HMAM_MEM_FILE, state->hmam_mem->data,
-+                    state->hmam_mem->len);
++    for (i = 0; i < nstat->num_nodes; i++) {
++        flags = 0;
 +
-+    hmat_init_hma_buffer(&state->hma_buf);
++        if (nstat->nodes[i].initiator_valid) {
++            flags |= HMAT_PROX_INIT_VALID;
++        }
++
++        build_hmat_mpda(table_data, flags, nstat->nodes[i].initiator, i);
++    }
 +}
 +
-+void hmat_update(NumaState *nstat)
++void build_hmat(GArray *table_data, BIOSLinker *linker, NumaState *nstat)
 +{
-+    /* build HMAT in a given buffer. */
-+    hmat_build_hma_buffer(nstat);
-+}
++    uint64_t hmat_start;
 +
- void build_hmat(GArray *table_data, BIOSLinker *linker, NumaState *nstat)
- {
-     uint64_t hmat_start;
-@@ -253,3 +519,34 @@ void build_hmat(GArray *table_data, BIOSLinker *linker, NumaState *nstat)
-                  (void *)(table_data->data + hmat_start),
-                  "HMAT", table_data->len - hmat_start, 2, NULL, NULL);
- }
++    hmat_start = table_data->len;
 +
-+void hmat_build_aml(Aml *dev)
-+{
-+    Aml *method, *pkg, *buf, *buf_name, *buf_size, *call_result;
++    /* reserve space for HMAT header  */
++    acpi_data_push(table_data, 40);
 +
-+    hmat_build_common_aml(dev);
++    hmat_build_table_structs(table_data, nstat);
 +
-+    buf = aml_local(0);
-+    buf_size = aml_local(1);
-+    buf_name = aml_local(2);
-+
-+    aml_append(dev, aml_name_decl(HMAM_RHMA_STATUS, aml_int(0)));
-+
-+    /* build helper function, RHMA. */
-+    method = aml_method("RHMA", 1, AML_SERIALIZED);
-+    aml_append(method, aml_name_decl("OFST", aml_int(0)));
-+
-+    /* prepare input package. */
-+    pkg = aml_package(1);
-+    aml_append(method, aml_store(aml_arg(0), aml_name("OFST")));
-+    aml_append(pkg, aml_name("OFST"));
-+
-+    /* call Read HMA function. */
-+    call_result = aml_call1(HMA_COMMON_METHOD, pkg);
-+
-+    aml_build_runtime_buf(method, buf, buf_size,
-+                          call_result, buf_name, dev,
-+                          "RHMA", "_HMA",
-+                          HMAM_RET_STATUS_SUCCESS,
-+                          HMAM_RET_STATUS_HMA_CHANGED);
++    build_header(linker, table_data,
++                 (void *)(table_data->data + hmat_start),
++                 "HMAT", table_data->len - hmat_start, 2, NULL, NULL);
 +}
 diff --git a/hw/acpi/hmat.h b/hw/acpi/hmat.h
-index ba655281cc..937d5ee6dc 100644
---- a/hw/acpi/hmat.h
+new file mode 100644
+index 0000000000..574cfba60a
+--- /dev/null
 +++ b/hw/acpi/hmat.h
-@@ -99,6 +99,74 @@ struct HMAT_Cache_Info {
-     uint16_t    line_size;
- };
- 
-+#define HMAM_MEMORY_SIZE    4096
-+#define HMAM_MEM_FILE       "etc/acpi/hma-mem"
+@@ -0,0 +1,45 @@
++/*
++ * HMAT ACPI Implementation Header
++ *
++ * Copyright(C) 2019 Intel Corporation.
++ *
++ * Author:
++ *  Liu jingqi <jingqi.liu@linux.intel.com>
++ *  Tao Xu <tao3.xu@intel.com>
++ *
++ * HMAT is defined in ACPI 6.3: 5.2.27 Heterogeneous Memory Attribute Table
++ * (HMAT)
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/licenses/>
++ */
++
++#ifndef HMAT_H
++#define HMAT_H
++
++#include "hw/acpi/acpi-defs.h"
++#include "hw/acpi/acpi.h"
++#include "hw/acpi/bios-linker-loader.h"
++#include "hw/acpi/aml-build.h"
 +
 +/*
-+ * 32 bits IO port starting from 0x0a19 in guest is reserved for
-+ * HMA ACPI emulation.
++ * ACPI 6.3: 5.2.27.3 Memory Proximity Domain Attributes Structure,
++ * Table 5-141, Field "flag", Bit [0]: set to 1 to indicate that data in
++ * the Proximity Domain for the Attached Initiator field is valid.
++ * Other bits reserved.
 + */
-+#define HMAM_ACPI_IO_BASE     0x0a19
-+#define HMAM_ACPI_IO_LEN      4
++#define HMAT_PROX_INIT_VALID 0x1
 +
-+#define HMAM_ACPI_MEM_ADDR  "HMTA"
-+#define HMAM_MEMORY         "HRAM"
-+#define HMAM_IOPORT         "HPIO"
++void build_hmat(GArray *table_data, BIOSLinker *linker, NumaState *nstat);
 +
-+#define HMAM_NOTIFY         "NTFI"
-+#define HMAM_OUT_BUF_SIZE   "RLEN"
-+#define HMAM_OUT_BUF        "ODAT"
-+
-+#define HMAM_RHMA_STATUS    "RSTA"
-+#define HMA_COMMON_METHOD   "HMAC"
-+#define HMAM_OFFSET         "OFFT"
-+
-+#define HMAM_RET_STATUS_SUCCESS        0 /* Success */
-+#define HMAM_RET_STATUS_UNSUPPORT      1 /* Not Supported */
-+#define HMAM_RET_STATUS_INVALID        2 /* Invalid Input Parameters */
-+#define HMAM_RET_STATUS_HMA_CHANGED    0x100 /* HMA Changed */
-+
-+/*
-+ * HmatHmaBuffer:
-+ * @hma: HMA buffer with the updated HMAT. It is updated when
-+ *   the memory device is plugged or unplugged.
-+ * @dirty: It allows OSPM to detect changes and restart read if there is any.
-+ */
-+struct HmatHmaBuffer {
-+    GArray *hma;
-+    bool dirty;
-+};
-+typedef struct HmatHmaBuffer HmatHmaBuffer;
-+
-+struct AcpiHmaState {
-+    /* the data of the fw_cfg file HMAM_MEM_FILE. */
-+    GArray *hmam_mem;
-+
-+    HmatHmaBuffer hma_buf;
-+
-+    /* the IO region used by OSPM to transfer control to QEMU. */
-+    MemoryRegion io_mr;
-+};
-+typedef struct AcpiHmaState AcpiHmaState;
-+
-+struct HmatHmamIn {
-+    /* the offset in the _HMA buffer */
-+    uint32_t offset;
-+} QEMU_PACKED;
-+typedef struct HmatHmamIn HmatHmamIn;
-+
-+struct HmatHmamOut {
-+    /* the size of buffer filled by QEMU. */
-+    uint32_t len;
-+    uint32_t ret_status;   /* return status code. */
-+    uint8_t data[4088];
-+} QEMU_PACKED;
-+typedef struct HmatHmamOut HmatHmamOut;
-+
- void build_hmat(GArray *table_data, BIOSLinker *linker, NumaState *nstat);
-+void hmat_build_aml(Aml *dsdt);
-+void hmat_init_acpi_state(AcpiHmaState *state, MemoryRegion *io,
-+                          FWCfgState *fw_cfg, Object *owner);
-+void hmat_update(NumaState *nstat);
- 
- #endif
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index c48e5b8078..ab38ef4214 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -23,6 +23,7 @@
- #include "sysemu/qtest.h"
- #include "hw/pci/pci.h"
- #include "hw/mem/nvdimm.h"
-+#include "hw/acpi/hmat.h"
- 
- GlobalProperty hw_compat_4_0[] = {
-     { "VGA",            "edid", "false" },
-@@ -914,6 +915,9 @@ static void machine_finalize(Object *obj)
-     g_free(ms->firmware);
-     g_free(ms->device_memory);
-     g_free(ms->nvdimms_state);
-+    if (ms->numa_state->hma_enabled) {
-+        g_free(ms->numa_state->acpi_hma_state);
-+    }
-     g_free(ms->numa_state);
- }
- 
++#endif
 diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 34f2f898ce..940d140a43 100644
+index 0e451e06d1..34f2f898ce 100644
 --- a/hw/i386/acpi-build.c
 +++ b/hw/i386/acpi-build.c
-@@ -1854,6 +1854,10 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
-         build_q35_pci0_int(dsdt);
-     }
+@@ -65,6 +65,7 @@
+ #include "hw/i386/intel_iommu.h"
  
-+    if (machine->numa_state->hma_enabled) {
-+        hmat_build_aml(dsdt);
-+    }
-+
-     if (pcmc->legacy_cpu_hotplug) {
-         build_legacy_cpu_hotplug_aml(dsdt, machine, pm->cpu_hp_io_base);
-     } else {
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index c07c4a5b38..b0a95b5160 100644
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -58,6 +58,7 @@
- #include "migration/misc.h"
- #include "kvm_i386.h"
- #include "sysemu/numa.h"
+ #include "hw/acpi/ipmi.h"
 +#include "hw/acpi/hmat.h"
  
- #define MAX_IDE_BUS 2
- 
-@@ -301,6 +302,11 @@ static void pc_init1(MachineState *machine,
-         nvdimm_init_acpi_state(machine->nvdimms_state, system_io,
-                                pcms->fw_cfg, OBJECT(pcms));
+ /* These are used to size the ACPI tables for -M pc-i440fx-1.7 and
+  * -M pc-i440fx-2.0.  Even if the actual amount of AML generated grows
+@@ -2684,6 +2685,8 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
+             acpi_add_table(table_offsets, tables_blob);
+             build_slit(tables_blob, tables->linker, machine);
+         }
++        acpi_add_table(table_offsets, tables_blob);
++        build_hmat(tables_blob, tables->linker, machine->numa_state);
      }
-+
-+    if (machine->numa_state->hma_enabled) {
-+        hmat_init_acpi_state(machine->numa_state->acpi_hma_state, system_io,
-+                             pcms->fw_cfg, OBJECT(pcms));
-+    }
- }
- 
- /* Looking for a pc_compat_2_4() function? It doesn't exist.
-diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-index 57232aed6b..12178f4f59 100644
---- a/hw/i386/pc_q35.c
-+++ b/hw/i386/pc_q35.c
-@@ -54,6 +54,7 @@
- #include "qapi/error.h"
- #include "qemu/error-report.h"
- #include "sysemu/numa.h"
-+#include "hw/acpi/hmat.h"
- 
- /* ICH9 AHCI has 6 ports */
- #define MAX_SATA_PORTS     6
-@@ -333,6 +334,11 @@ static void pc_q35_init(MachineState *machine)
-         nvdimm_init_acpi_state(machine->nvdimms_state, system_io,
-                                pcms->fw_cfg, OBJECT(pcms));
-     }
-+
-+    if (machine->numa_state->hma_enabled) {
-+        hmat_init_acpi_state(machine->numa_state->acpi_hma_state, system_io,
-+                             pcms->fw_cfg, OBJECT(pcms));
-+    }
- }
- 
- #define DEFINE_Q35_MACHINE(suffix, name, compatfn, optionfn) \
-diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
-index 2e5bdcbd19..1d221cf63a 100644
---- a/include/sysemu/numa.h
-+++ b/include/sysemu/numa.h
-@@ -38,6 +38,11 @@ struct NumaState {
- 
-     /* Memory Side Cache Information Structure */
-     HMAT_Cache_Info *hmat_cache[MAX_NODES][MAX_HMAT_CACHE_LEVEL + 1];
-+
-+    /* Detect if HMA support is enabled. */
-+    bool hma_enabled;
-+
-+    struct AcpiHmaState *acpi_hma_state;
- };
- typedef struct NumaState NumaState;
- 
-diff --git a/numa.c b/numa.c
-index 1cbfb8ab4e..e34a08d84b 100644
---- a/numa.c
-+++ b/numa.c
-@@ -254,6 +254,11 @@ static void parse_numa_hmat_lb(MachineState *ms, NumaHmatLBOptions *node,
-         return;
-     }
- 
-+    if (!ms->numa_state->hma_enabled && !ms->numa_state->acpi_hma_state) {
-+        ms->numa_state->hma_enabled = true;
-+        ms->numa_state->acpi_hma_state = g_new0(AcpiHmaState, 1);
-+    }
-+
-     if (node->has_latency) {
-         hmat_lb = ms->numa_state->hmat_lb[node->hierarchy][node->data_type];
- 
-@@ -356,6 +361,11 @@ void parse_numa_hmat_cache(MachineState *ms, NumaHmatCacheOptions *node,
-         return;
-     }
- 
-+    if (!ms->numa_state->hma_enabled && !ms->numa_state->acpi_hma_state) {
-+        ms->numa_state->hma_enabled = true;
-+        ms->numa_state->acpi_hma_state = g_new0(AcpiHmaState, 1);
-+    }
-+
-     hmat_cache = g_malloc0(sizeof(*hmat_cache));
- 
-     hmat_cache->mem_proximity = node->node_id;
+     if (acpi_get_mcfg(&mcfg)) {
+         acpi_add_table(table_offsets, tables_blob);
 -- 
 2.20.1
 
