@@ -7,47 +7,47 @@ X-Spam-Status: No, score=-10.0 required=3.0
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6B72C48BDB
-	for <qemu-devel@archiver.kernel.org>; Sun,  7 Jul 2019 14:37:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C43AC48BDB
+	for <qemu-devel@archiver.kernel.org>; Sun,  7 Jul 2019 14:40:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AFE7C2082F
-	for <qemu-devel@archiver.kernel.org>; Sun,  7 Jul 2019 14:37:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AFE7C2082F
+	by mail.kernel.org (Postfix) with ESMTPS id 2592F2082F
+	for <qemu-devel@archiver.kernel.org>; Sun,  7 Jul 2019 14:40:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2592F2082F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35650 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35672 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hk8IO-0005D1-0X
-	for qemu-devel@archiver.kernel.org; Sun, 07 Jul 2019 10:37:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49508)
+	id 1hk8LP-0000B9-6r
+	for qemu-devel@archiver.kernel.org; Sun, 07 Jul 2019 10:40:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49638)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <tao3.xu@intel.com>) id 1hk8Dz-0008FD-Sx
- for qemu-devel@nongnu.org; Sun, 07 Jul 2019 10:33:13 -0400
+ (envelope-from <tao3.xu@intel.com>) id 1hk8EI-0008Nn-Dx
+ for qemu-devel@nongnu.org; Sun, 07 Jul 2019 10:33:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tao3.xu@intel.com>) id 1hk8Dv-0003NW-L6
- for qemu-devel@nongnu.org; Sun, 07 Jul 2019 10:33:07 -0400
-Received: from mga03.intel.com ([134.134.136.65]:31571)
+ (envelope-from <tao3.xu@intel.com>) id 1hk8EE-0003f8-Ip
+ for qemu-devel@nongnu.org; Sun, 07 Jul 2019 10:33:26 -0400
+Received: from mga03.intel.com ([134.134.136.65]:31568)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1hk8Du-00038w-K2
- for qemu-devel@nongnu.org; Sun, 07 Jul 2019 10:33:03 -0400
+ (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1hk8EC-000363-M2
+ for qemu-devel@nongnu.org; Sun, 07 Jul 2019 10:33:22 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga001.fm.intel.com ([10.253.24.23])
  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 07 Jul 2019 07:32:46 -0700
+ 07 Jul 2019 07:33:02 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.63,462,1557212400"; d="scan'208";a="185497818"
+X-IronPort-AV: E=Sophos;i="5.63,462,1557212400"; d="scan'208";a="185497868"
 Received: from tao-optiplex-7060.sh.intel.com ([10.239.13.104])
- by fmsmga001.fm.intel.com with ESMTP; 07 Jul 2019 07:32:44 -0700
+ by fmsmga001.fm.intel.com with ESMTP; 07 Jul 2019 07:33:01 -0700
 From: Tao Xu <tao3.xu@intel.com>
 To: imammedo@redhat.com,
 	eblake@redhat.com,
 	ehabkost@redhat.com
-Date: Sun,  7 Jul 2019 22:29:46 +0800
-Message-Id: <20190707142958.31316-3-tao3.xu@intel.com>
+Date: Sun,  7 Jul 2019 22:29:56 +0800
+Message-Id: <20190707142958.31316-13-tao3.xu@intel.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190707142958.31316-1-tao3.xu@intel.com>
 References: <20190707142958.31316-1-tao3.xu@intel.com>
@@ -56,8 +56,8 @@ Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
 X-Received-From: 134.134.136.65
-Subject: [Qemu-devel] [PATCH v6 02/14] numa: move numa global variable
- nb_numa_nodes into MachineState
+Subject: [Qemu-devel] [PATCH v6 12/14] hmat acpi: Implement _HMA method to
+ update HMAT at runtime
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,738 +75,565 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add struct NumaState in MachineState and move existing numa global
-nb_numa_nodes(renamed as "num_nodes") into NumaState. And add variable
-numa_support into MachineClass to decide which submachines support NUMA.
+From: Liu Jingqi <jingqi.liu@intel.com>
 
-Suggested-by: Igor Mammedov <imammedo@redhat.com>
-Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
+OSPM evaluates HMAT only during system initialization.
+Any changes to the HMAT state at runtime or information
+regarding HMAT for hot plug are communicated using _HMA method.
+
+_HMA is an optional object that enables the platform to provide
+the OS with updated Heterogeneous Memory Attributes information
+at runtime. _HMA provides OSPM with the latest HMAT in entirety
+overriding existing HMAT.
+
+Signed-off-by: Liu Jingqi <jingqi.liu@intel.com>
 Signed-off-by: Tao Xu <tao3.xu@intel.com>
 ---
 
 Changes in v6:
-    - Rebase to upstream, move globals in arm/sbsa-ref
-    - When used once or twice in the function, use
-      ms->numa_state->num_nodes directly
-    - Correct some mistakes
-    - Use once monitor_printf in hmp_info_numa
+    - move AcpiHmaState from PCMachineState to MachineState
+    to make HMAT more generalic (Igor)
+    - use build_acpi_aml_common() introduced in patch 10/11 to
+    simplify hmat_build_aml (Igor)
+    - Add _HMA only qemu use hmat-lb or hmat-cache
 ---
- exec.c                              |  5 ++-
- hw/acpi/aml-build.c                 |  3 +-
- hw/arm/boot.c                       |  4 +-
- hw/arm/sbsa-ref.c                   |  4 +-
- hw/arm/virt-acpi-build.c            | 10 +++--
- hw/arm/virt.c                       |  5 ++-
- hw/core/machine.c                   | 14 +++++--
- hw/i386/acpi-build.c                |  2 +-
- hw/i386/pc.c                        | 10 +++--
- hw/mem/pc-dimm.c                    |  2 +
- hw/pci-bridge/pci_expander_bridge.c |  3 +-
- hw/ppc/spapr.c                      | 26 +++++++-----
- include/hw/acpi/aml-build.h         |  2 +-
- include/hw/boards.h                 |  2 +
- include/sysemu/numa.h               | 11 ++++-
- monitor/misc.c                      | 12 ++++--
- numa.c                              | 62 +++++++++++++++++------------
- 17 files changed, 116 insertions(+), 61 deletions(-)
+ hw/acpi/hmat.c        | 297 ++++++++++++++++++++++++++++++++++++++++++
+ hw/acpi/hmat.h        |  68 ++++++++++
+ hw/core/machine.c     |   4 +
+ hw/i386/acpi-build.c  |   4 +
+ hw/i386/pc_piix.c     |   6 +
+ hw/i386/pc_q35.c      |   6 +
+ include/sysemu/numa.h |   5 +
+ numa.c                |  10 ++
+ 8 files changed, 400 insertions(+)
 
-diff --git a/exec.c b/exec.c
-index e7622d1956..6054034f9f 100644
---- a/exec.c
-+++ b/exec.c
-@@ -1736,6 +1736,7 @@ long qemu_minrampagesize(void)
-     long hpsize = LONG_MAX;
-     long mainrampagesize;
-     Object *memdev_root;
-+    MachineState *ms = MACHINE(qdev_get_machine());
+diff --git a/hw/acpi/hmat.c b/hw/acpi/hmat.c
+index a207581f11..33b9dd2e04 100644
+--- a/hw/acpi/hmat.c
++++ b/hw/acpi/hmat.c
+@@ -27,6 +27,8 @@
+ #include "qemu/osdep.h"
+ #include "sysemu/numa.h"
+ #include "hw/acpi/hmat.h"
++#include "hw/mem/nvdimm.h"
++#include "hw/nvram/fw_cfg.h"
  
-     mainrampagesize = qemu_mempath_getpagesize(mem_path);
- 
-@@ -1763,7 +1764,9 @@ long qemu_minrampagesize(void)
-      * so if its page size is smaller we have got to report that size instead.
-      */
-     if (hpsize > mainrampagesize &&
--        (nb_numa_nodes == 0 || numa_info[0].node_memdev == NULL)) {
-+        (ms->numa_state == NULL ||
-+         ms->numa_state->num_nodes == 0 ||
-+         numa_info[0].node_memdev == NULL)) {
-         static bool warned;
-         if (!warned) {
-             error_report("Huge page support disabled (n/a for main memory).");
-diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
-index 555c24f21d..63c1cae8c9 100644
---- a/hw/acpi/aml-build.c
-+++ b/hw/acpi/aml-build.c
-@@ -1726,10 +1726,11 @@ void build_srat_memory(AcpiSratMemoryAffinity *numamem, uint64_t base,
-  * ACPI spec 5.2.17 System Locality Distance Information Table
-  * (Revision 2.0 or later)
-  */
--void build_slit(GArray *table_data, BIOSLinker *linker)
-+void build_slit(GArray *table_data, BIOSLinker *linker, MachineState *ms)
- {
-     int slit_start, i, j;
-     slit_start = table_data->len;
-+    int nb_numa_nodes = ms->numa_state->num_nodes;
- 
-     acpi_data_push(table_data, sizeof(AcpiTableHeader));
- 
-diff --git a/hw/arm/boot.c b/hw/arm/boot.c
-index a90151f465..e28daa5278 100644
---- a/hw/arm/boot.c
-+++ b/hw/arm/boot.c
-@@ -598,9 +598,9 @@ int arm_load_dtb(hwaddr addr, const struct arm_boot_info *binfo,
+ /*
+  * ACPI 6.3:
+@@ -238,6 +240,270 @@ static void hmat_build_table_structs(GArray *table_data, NumaState *nstat)
      }
-     g_strfreev(node_path);
- 
--    if (nb_numa_nodes > 0) {
-+    if (ms->numa_state != NULL && ms->numa_state->num_nodes > 0) {
-         mem_base = binfo->loader_start;
--        for (i = 0; i < nb_numa_nodes; i++) {
-+        for (i = 0; i < ms->numa_state->num_nodes; i++) {
-             mem_len = numa_info[i].node_mem;
-             rc = fdt_add_memory_node(fdt, acells, mem_base,
-                                      scells, mem_len, i);
-diff --git a/hw/arm/sbsa-ref.c b/hw/arm/sbsa-ref.c
-index 33087b8d94..9f0cd37d72 100644
---- a/hw/arm/sbsa-ref.c
-+++ b/hw/arm/sbsa-ref.c
-@@ -144,6 +144,7 @@ static void create_fdt(SBSAMachineState *sms)
- {
-     void *fdt = create_device_tree(&sms->fdt_size);
-     const MachineState *ms = MACHINE(sms);
-+    int nb_numa_nodes = ms->numa_state->num_nodes;
-     int cpu;
- 
-     if (!fdt) {
-@@ -760,7 +761,7 @@ sbsa_ref_cpu_index_to_props(MachineState *ms, unsigned cpu_index)
- static int64_t
- sbsa_ref_get_default_cpu_node_id(const MachineState *ms, int idx)
- {
--    return idx % nb_numa_nodes;
-+    return idx % ms->numa_state->num_nodes;
  }
  
- static void sbsa_ref_instance_init(Object *obj)
-@@ -787,6 +788,7 @@ static void sbsa_ref_class_init(ObjectClass *oc, void *data)
-     mc->possible_cpu_arch_ids = sbsa_ref_possible_cpu_arch_ids;
-     mc->cpu_index_to_instance_props = sbsa_ref_cpu_index_to_props;
-     mc->get_default_cpu_node_id = sbsa_ref_get_default_cpu_node_id;
-+    mc->numa_supported = true;
- }
- 
- static const TypeInfo sbsa_ref_info = {
-diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-index 0afb372769..a2cc4b84fe 100644
---- a/hw/arm/virt-acpi-build.c
-+++ b/hw/arm/virt-acpi-build.c
-@@ -516,7 +516,8 @@ build_srat(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
-     int i, srat_start;
-     uint64_t mem_base;
-     MachineClass *mc = MACHINE_GET_CLASS(vms);
--    const CPUArchIdList *cpu_list = mc->possible_cpu_arch_ids(MACHINE(vms));
-+    MachineState *ms = MACHINE(vms);
-+    const CPUArchIdList *cpu_list = mc->possible_cpu_arch_ids(ms);
- 
-     srat_start = table_data->len;
-     srat = acpi_data_push(table_data, sizeof(*srat));
-@@ -532,7 +533,7 @@ build_srat(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
-     }
- 
-     mem_base = vms->memmap[VIRT_MEM].base;
--    for (i = 0; i < nb_numa_nodes; ++i) {
-+    for (i = 0; i < ms->numa_state->num_nodes; ++i) {
-         if (numa_info[i].node_mem > 0) {
-             numamem = acpi_data_push(table_data, sizeof(*numamem));
-             build_srat_memory(numamem, mem_base, numa_info[i].node_mem, i,
-@@ -758,6 +759,7 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
-     GArray *table_offsets;
-     unsigned dsdt, xsdt;
-     GArray *tables_blob = tables->table_data;
-+    MachineState *ms = MACHINE(vms);
- 
-     table_offsets = g_array_new(false, true /* clear */,
-                                         sizeof(uint32_t));
-@@ -792,12 +794,12 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
-     acpi_add_table(table_offsets, tables_blob);
-     build_spcr(tables_blob, tables->linker, vms);
- 
--    if (nb_numa_nodes > 0) {
-+    if (ms->numa_state->num_nodes > 0) {
-         acpi_add_table(table_offsets, tables_blob);
-         build_srat(tables_blob, tables->linker, vms);
-         if (have_numa_distance) {
-             acpi_add_table(table_offsets, tables_blob);
--            build_slit(tables_blob, tables->linker);
-+            build_slit(tables_blob, tables->linker, ms);
-         }
-     }
- 
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 65acb40c37..e7d72096e5 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -199,6 +199,8 @@ static bool cpu_type_valid(const char *cpu)
- 
- static void create_fdt(VirtMachineState *vms)
++static uint64_t
++hmat_hma_method_read(void *opaque, hwaddr addr, unsigned size)
++{
++    printf("BUG: we never read _HMA IO Port.\n");
++    return 0;
++}
++
++/* _HMA Method: read HMA data. */
++static void hmat_handle_hma_method(AcpiHmaState *state,
++                                   HmatHmamIn *in, hwaddr hmam_mem_addr)
++{
++    HmatHmaBuffer *hma_buf = &state->hma_buf;
++    HmatHmamOut *read_hma_out;
++    GArray *hma;
++    uint32_t read_len = 0, ret_status;
++    int size;
++
++    if (in != NULL) {
++        le32_to_cpus(&in->offset);
++    }
++
++    hma = hma_buf->hma;
++    if (in->offset > hma->len) {
++        ret_status = HMAM_RET_STATUS_INVALID;
++        goto exit;
++    }
++
++   /* It is the first time to read HMA. */
++    if (!in->offset) {
++        hma_buf->dirty = false;
++    } else if (hma_buf->dirty) {
++        /* HMA has been changed during Reading HMA. */
++        ret_status = HMAM_RET_STATUS_HMA_CHANGED;
++        goto exit;
++    }
++
++    ret_status = HMAM_RET_STATUS_SUCCESS;
++    read_len = MIN(hma->len - in->offset,
++                   HMAM_MEMORY_SIZE - 2 * sizeof(uint32_t));
++exit:
++    size = sizeof(HmatHmamOut) + read_len;
++    read_hma_out = g_malloc(size);
++
++    read_hma_out->len = cpu_to_le32(size);
++    read_hma_out->ret_status = cpu_to_le32(ret_status);
++    memcpy(read_hma_out->data, hma->data + in->offset, read_len);
++
++    cpu_physical_memory_write(hmam_mem_addr, read_hma_out, size);
++
++    g_free(read_hma_out);
++}
++
++static void
++hmat_hma_method_write(void *opaque, hwaddr addr, uint64_t val, unsigned size)
++{
++    AcpiHmaState *state = opaque;
++    hwaddr hmam_mem_addr = val;
++    HmatHmamIn *in;
++
++    in = g_new(HmatHmamIn, 1);
++    cpu_physical_memory_read(hmam_mem_addr, in, sizeof(*in));
++
++    hmat_handle_hma_method(state, in, hmam_mem_addr);
++}
++
++static const MemoryRegionOps hmat_hma_method_ops = {
++    .read = hmat_hma_method_read,
++    .write = hmat_hma_method_write,
++    .endianness = DEVICE_LITTLE_ENDIAN,
++    .valid = {
++        .min_access_size = 4,
++        .max_access_size = 4,
++    },
++};
++
++static void hmat_init_hma_buffer(HmatHmaBuffer *hma_buf)
++{
++    hma_buf->hma = g_array_new(false, true /* clear */, 1);
++}
++
++static uint8_t hmat_acpi_table_checksum(uint8_t *buffer, uint32_t length)
++{
++    uint8_t sum = 0;
++    uint8_t *end = buffer + length;
++
++    while (buffer < end) {
++        sum = (uint8_t) (sum + *(buffer++));
++    }
++    return (uint8_t)(0 - sum);
++}
++
++static void hmat_build_header(AcpiTableHeader *h,
++             const char *sig, int len, uint8_t rev,
++             const char *oem_id, const char *oem_table_id)
++{
++    memcpy(&h->signature, sig, 4);
++    h->length = cpu_to_le32(len);
++    h->revision = rev;
++
++    if (oem_id) {
++        strncpy((char *)h->oem_id, oem_id, sizeof h->oem_id);
++    } else {
++        memcpy(h->oem_id, ACPI_BUILD_APPNAME6, 6);
++    }
++
++    if (oem_table_id) {
++        strncpy((char *)h->oem_table_id, oem_table_id, sizeof(h->oem_table_id));
++    } else {
++        memcpy(h->oem_table_id, ACPI_BUILD_APPNAME4, 4);
++        memcpy(h->oem_table_id + 4, sig, 4);
++    }
++
++    h->oem_revision = cpu_to_le32(1);
++    memcpy(h->asl_compiler_id, ACPI_BUILD_APPNAME4, 4);
++    h->asl_compiler_revision = cpu_to_le32(1);
++
++    /* Caculate the checksum of acpi table. */
++    h->checksum = 0;
++    h->checksum = hmat_acpi_table_checksum((uint8_t *)h, len);
++}
++
++static void hmat_build_hma_buffer(NumaState *nstat)
++{
++    HmatHmaBuffer *hma_buf = &(nstat->acpi_hma_state->hma_buf);
++
++    /* Free the old hma buffer before new allocation. */
++    g_array_free(hma_buf->hma, true);
++
++    hma_buf->hma = g_array_new(false, true /* clear */, 1);
++    acpi_data_push(hma_buf->hma, 40);
++
++    /* build HMAT in a given buffer. */
++    hmat_build_table_structs(hma_buf->hma, nstat);
++    hmat_build_header((void *)hma_buf->hma->data,
++                      "HMAT", hma_buf->hma->len, 2, NULL, NULL);
++    hma_buf->dirty = true;
++}
++
++static void hmat_build_common_aml(Aml *dev)
++{
++    Aml *method, *ifctx, *hmam_mem;
++    Aml *unsupport;
++    Aml *pckg, *pckg_index, *pckg_buf, *field;
++    Aml *hmam_out_buf, *hmam_out_buf_size;
++    uint8_t byte_list[1];
++
++    method = aml_method(HMA_COMMON_METHOD, 1, AML_SERIALIZED);
++    hmam_mem = aml_local(6);
++    hmam_out_buf = aml_local(7);
++
++    aml_append(method, aml_store(aml_name(HMAM_ACPI_MEM_ADDR), hmam_mem));
++
++    /* map _HMA memory and IO into ACPI namespace. */
++    aml_append(method, aml_operation_region(HMAM_IOPORT, AML_SYSTEM_IO,
++               aml_int(HMAM_ACPI_IO_BASE), HMAM_ACPI_IO_LEN));
++    aml_append(method, aml_operation_region(HMAM_MEMORY,
++               AML_SYSTEM_MEMORY, hmam_mem, HMAM_MEMORY_SIZE));
++
++    /*
++     * _HMAC notifier:
++     * HMAM_NOTIFY: write the address of DSM memory and notify QEMU to
++     *                    emulate the access.
++     *
++     * It is the IO port so that accessing them will cause VM-exit, the
++     * control will be transferred to QEMU.
++     */
++    field = aml_field(HMAM_IOPORT, AML_DWORD_ACC, AML_NOLOCK,
++                      AML_PRESERVE);
++    aml_append(field, aml_named_field(HMAM_NOTIFY,
++               sizeof(uint32_t) * BITS_PER_BYTE));
++    aml_append(method, field);
++
++    /*
++     * _HMAC input:
++     * HMAM_OFFSET: store the current offset of _HMA buffer.
++     *
++     * They are RAM mapping on host so that these accesses never cause VMExit.
++     */
++    field = aml_field(HMAM_MEMORY, AML_DWORD_ACC, AML_NOLOCK,
++                      AML_PRESERVE);
++    aml_append(field, aml_named_field(HMAM_OFFSET,
++               sizeof(typeof_field(HmatHmamIn, offset)) * BITS_PER_BYTE));
++    aml_append(method, field);
++
++    /*
++     * _HMAC output:
++     * HMAM_OUT_BUF_SIZE: the size of the buffer filled by QEMU.
++     * HMAM_OUT_BUF: the buffer QEMU uses to store the result.
++     *
++     * Since the page is reused by both input and out, the input data
++     * will be lost after storing new result into ODAT so we should fetch
++     * all the input data before writing the result.
++     */
++    field = aml_field(HMAM_MEMORY, AML_DWORD_ACC, AML_NOLOCK,
++                      AML_PRESERVE);
++    aml_append(field, aml_named_field(HMAM_OUT_BUF_SIZE,
++               sizeof(typeof_field(HmatHmamOut, len)) * BITS_PER_BYTE));
++    aml_append(field, aml_named_field(HMAM_OUT_BUF,
++       (sizeof(HmatHmamOut) - sizeof(uint32_t)) * BITS_PER_BYTE));
++    aml_append(method, field);
++
++    /*
++     * do not support any method if HMA memory address has not been
++     * patched.
++     */
++    unsupport = aml_if(aml_equal(hmam_mem, aml_int(0x0)));
++    byte_list[0] = HMAM_RET_STATUS_UNSUPPORT;
++    aml_append(unsupport, aml_return(aml_buffer(1, byte_list)));
++    aml_append(method, unsupport);
++
++    /* The parameter (Arg0) of _HMAC is a package which contains a buffer. */
++    pckg = aml_arg(0);
++    ifctx = aml_if(aml_and(aml_equal(aml_object_type(pckg),
++                   aml_int(4 /* Package */)) /* It is a Package? */,
++                   aml_equal(aml_sizeof(pckg), aml_int(1)) /* 1 element */,
++                   NULL));
++
++    pckg_index = aml_local(2);
++    pckg_buf = aml_local(3);
++    aml_append(ifctx, aml_store(aml_index(pckg, aml_int(0)), pckg_index));
++    aml_append(ifctx, aml_store(aml_derefof(pckg_index), pckg_buf));
++    aml_append(ifctx, aml_store(pckg_buf, aml_name(HMAM_OFFSET)));
++    aml_append(method, ifctx);
++
++    /*
++     * tell QEMU about the real address of HMA memory, then QEMU
++     * gets the control and fills the result in _HMAC memory.
++     */
++    aml_append(method, aml_store(hmam_mem, aml_name(HMAM_NOTIFY)));
++
++    hmam_out_buf_size = aml_local(1);
++    /* RLEN is not included in the payload returned to guest. */
++    aml_append(method, aml_subtract(aml_name(HMAM_OUT_BUF_SIZE),
++                                aml_int(4), hmam_out_buf_size));
++    aml_append(method, aml_store(aml_shiftleft(hmam_out_buf_size, aml_int(3)),
++                                 hmam_out_buf_size));
++    aml_append(method, aml_create_field(aml_name(HMAM_OUT_BUF),
++                                aml_int(0), hmam_out_buf_size, "OBUF"));
++    aml_append(method, aml_concatenate(aml_buffer(0, NULL), aml_name("OBUF"),
++                                hmam_out_buf));
++    aml_append(method, aml_return(hmam_out_buf));
++    aml_append(dev, method);
++}
++
++void hmat_init_acpi_state(AcpiHmaState *state, MemoryRegion *io,
++                          FWCfgState *fw_cfg, Object *owner)
++{
++    memory_region_init_io(&state->io_mr, owner, &hmat_hma_method_ops, state,
++                          "hma-acpi-io", HMAM_ACPI_IO_LEN);
++    memory_region_add_subregion(io, HMAM_ACPI_IO_BASE, &state->io_mr);
++
++    state->hmam_mem = g_array_new(false, true /* clear */, 1);
++    fw_cfg_add_file(fw_cfg, HMAM_MEM_FILE, state->hmam_mem->data,
++                    state->hmam_mem->len);
++
++    hmat_init_hma_buffer(&state->hma_buf);
++}
++
++void hmat_update(NumaState *nstat)
++{
++    /* build HMAT in a given buffer. */
++    hmat_build_hma_buffer(nstat);
++}
++
+ void build_hmat(GArray *table_data, BIOSLinker *linker, NumaState *nstat)
  {
-+    MachineState *ms = MACHINE(vms);
-+    int nb_numa_nodes = ms->numa_state->num_nodes;
-     void *fdt = create_device_tree(&vms->fdt_size);
- 
-     if (!fdt) {
-@@ -1837,7 +1839,7 @@ virt_cpu_index_to_props(MachineState *ms, unsigned cpu_index)
- 
- static int64_t virt_get_default_cpu_node_id(const MachineState *ms, int idx)
- {
--    return idx % nb_numa_nodes;
-+    return idx % ms->numa_state->num_nodes;
+     uint64_t hmat_start;
+@@ -253,3 +519,34 @@ void build_hmat(GArray *table_data, BIOSLinker *linker, NumaState *nstat)
+                  (void *)(table_data->data + hmat_start),
+                  "HMAT", table_data->len - hmat_start, 2, NULL, NULL);
  }
++
++void hmat_build_aml(Aml *dev)
++{
++    Aml *method, *pkg, *buf, *buf_name, *buf_size, *call_result;
++
++    hmat_build_common_aml(dev);
++
++    buf = aml_local(0);
++    buf_size = aml_local(1);
++    buf_name = aml_local(2);
++
++    aml_append(dev, aml_name_decl(HMAM_RHMA_STATUS, aml_int(0)));
++
++    /* build helper function, RHMA. */
++    method = aml_method("RHMA", 1, AML_SERIALIZED);
++    aml_append(method, aml_name_decl("OFST", aml_int(0)));
++
++    /* prepare input package. */
++    pkg = aml_package(1);
++    aml_append(method, aml_store(aml_arg(0), aml_name("OFST")));
++    aml_append(pkg, aml_name("OFST"));
++
++    /* call Read HMA function. */
++    call_result = aml_call1(HMA_COMMON_METHOD, pkg);
++
++    aml_build_runtime_buf(method, buf, buf_size,
++                          call_result, buf_name, dev,
++                          "RHMA", "_HMA",
++                          HMAM_RET_STATUS_SUCCESS,
++                          HMAM_RET_STATUS_HMA_CHANGED);
++}
+diff --git a/hw/acpi/hmat.h b/hw/acpi/hmat.h
+index ba655281cc..937d5ee6dc 100644
+--- a/hw/acpi/hmat.h
++++ b/hw/acpi/hmat.h
+@@ -99,6 +99,74 @@ struct HMAT_Cache_Info {
+     uint16_t    line_size;
+ };
  
- static const CPUArchIdList *virt_possible_cpu_arch_ids(MachineState *ms)
-@@ -1943,6 +1945,7 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
-     mc->kvm_type = virt_kvm_type;
-     assert(!mc->get_hotplug_handler);
-     mc->get_hotplug_handler = virt_machine_get_hotplug_handler;
-+    mc->numa_supported = true;
-     hc->plug = virt_machine_device_plug_cb;
- }
++#define HMAM_MEMORY_SIZE    4096
++#define HMAM_MEM_FILE       "etc/acpi/hma-mem"
++
++/*
++ * 32 bits IO port starting from 0x0a19 in guest is reserved for
++ * HMA ACPI emulation.
++ */
++#define HMAM_ACPI_IO_BASE     0x0a19
++#define HMAM_ACPI_IO_LEN      4
++
++#define HMAM_ACPI_MEM_ADDR  "HMTA"
++#define HMAM_MEMORY         "HRAM"
++#define HMAM_IOPORT         "HPIO"
++
++#define HMAM_NOTIFY         "NTFI"
++#define HMAM_OUT_BUF_SIZE   "RLEN"
++#define HMAM_OUT_BUF        "ODAT"
++
++#define HMAM_RHMA_STATUS    "RSTA"
++#define HMA_COMMON_METHOD   "HMAC"
++#define HMAM_OFFSET         "OFFT"
++
++#define HMAM_RET_STATUS_SUCCESS        0 /* Success */
++#define HMAM_RET_STATUS_UNSUPPORT      1 /* Not Supported */
++#define HMAM_RET_STATUS_INVALID        2 /* Invalid Input Parameters */
++#define HMAM_RET_STATUS_HMA_CHANGED    0x100 /* HMA Changed */
++
++/*
++ * HmatHmaBuffer:
++ * @hma: HMA buffer with the updated HMAT. It is updated when
++ *   the memory device is plugged or unplugged.
++ * @dirty: It allows OSPM to detect changes and restart read if there is any.
++ */
++struct HmatHmaBuffer {
++    GArray *hma;
++    bool dirty;
++};
++typedef struct HmatHmaBuffer HmatHmaBuffer;
++
++struct AcpiHmaState {
++    /* the data of the fw_cfg file HMAM_MEM_FILE. */
++    GArray *hmam_mem;
++
++    HmatHmaBuffer hma_buf;
++
++    /* the IO region used by OSPM to transfer control to QEMU. */
++    MemoryRegion io_mr;
++};
++typedef struct AcpiHmaState AcpiHmaState;
++
++struct HmatHmamIn {
++    /* the offset in the _HMA buffer */
++    uint32_t offset;
++} QEMU_PACKED;
++typedef struct HmatHmamIn HmatHmamIn;
++
++struct HmatHmamOut {
++    /* the size of buffer filled by QEMU. */
++    uint32_t len;
++    uint32_t ret_status;   /* return status code. */
++    uint8_t data[4088];
++} QEMU_PACKED;
++typedef struct HmatHmamOut HmatHmamOut;
++
+ void build_hmat(GArray *table_data, BIOSLinker *linker, NumaState *nstat);
++void hmat_build_aml(Aml *dsdt);
++void hmat_init_acpi_state(AcpiHmaState *state, MemoryRegion *io,
++                          FWCfgState *fw_cfg, Object *owner);
++void hmat_update(NumaState *nstat);
  
+ #endif
 diff --git a/hw/core/machine.c b/hw/core/machine.c
-index ea5a01aa49..77b5967a68 100644
+index c48e5b8078..ab38ef4214 100644
 --- a/hw/core/machine.c
 +++ b/hw/core/machine.c
-@@ -880,6 +880,9 @@ static void machine_initfn(Object *obj)
-                                         NULL);
-     }
+@@ -23,6 +23,7 @@
+ #include "sysemu/qtest.h"
+ #include "hw/pci/pci.h"
+ #include "hw/mem/nvdimm.h"
++#include "hw/acpi/hmat.h"
  
-+    if (mc->numa_supported) {
-+        ms->numa_state = g_new0(NumaState, 1);
-+    }
- 
-     /* Register notifier when init is done for sysbus sanity checks */
-     ms->sysbus_notifier.notify = machine_init_notify;
-@@ -900,6 +903,7 @@ static void machine_finalize(Object *obj)
+ GlobalProperty hw_compat_4_0[] = {
+     { "VGA",            "edid", "false" },
+@@ -914,6 +915,9 @@ static void machine_finalize(Object *obj)
      g_free(ms->firmware);
      g_free(ms->device_memory);
      g_free(ms->nvdimms_state);
-+    g_free(ms->numa_state);
++    if (ms->numa_state->hma_enabled) {
++        g_free(ms->numa_state->acpi_hma_state);
++    }
+     g_free(ms->numa_state);
  }
  
- bool machine_usb(MachineState *machine)
-@@ -971,7 +975,7 @@ static void machine_numa_finish_cpu_init(MachineState *machine)
-     MachineClass *mc = MACHINE_GET_CLASS(machine);
-     const CPUArchIdList *possible_cpus = mc->possible_cpu_arch_ids(machine);
- 
--    assert(nb_numa_nodes);
-+    assert(machine->numa_state->num_nodes);
-     for (i = 0; i < possible_cpus->len; i++) {
-         if (possible_cpus->cpus[i].props.has_node_id) {
-             break;
-@@ -1017,9 +1021,11 @@ void machine_run_board_init(MachineState *machine)
- {
-     MachineClass *machine_class = MACHINE_GET_CLASS(machine);
- 
--    numa_complete_configuration(machine);
--    if (nb_numa_nodes) {
--        machine_numa_finish_cpu_init(machine);
-+    if (machine_class->numa_supported) {
-+        numa_complete_configuration(machine);
-+        if (machine->numa_state->num_nodes) {
-+            machine_numa_finish_cpu_init(machine);
-+        }
-     }
- 
-     /* If the machine supports the valid_cpu_types check and the user
 diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 31a1c1e3ad..d26a7be7a6 100644
+index 34f2f898ce..940d140a43 100644
 --- a/hw/i386/acpi-build.c
 +++ b/hw/i386/acpi-build.c
-@@ -2682,7 +2682,7 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
-         build_srat(tables_blob, tables->linker, machine);
-         if (have_numa_distance) {
-             acpi_add_table(table_offsets, tables_blob);
--            build_slit(tables_blob, tables->linker);
-+            build_slit(tables_blob, tables->linker, machine);
-         }
-     }
-     if (acpi_get_mcfg(&mcfg)) {
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index e96360b47a..d0e5897c3f 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -995,6 +995,8 @@ static FWCfgState *bochs_bios_init(AddressSpace *as, PCMachineState *pcms)
-     int i;
-     const CPUArchIdList *cpus;
-     MachineClass *mc = MACHINE_GET_CLASS(pcms);
-+    MachineState *ms = MACHINE(pcms);
-+    int nb_numa_nodes = ms->numa_state->num_nodes;
- 
-     fw_cfg = fw_cfg_init_io_dma(FW_CFG_IO_BASE, FW_CFG_IO_BASE + 4, as);
-     fw_cfg_add_i16(fw_cfg, FW_CFG_NB_CPUS, pcms->boot_cpus);
-@@ -1671,12 +1673,13 @@ void pc_machine_done(Notifier *notifier, void *data)
- void pc_guest_info_init(PCMachineState *pcms)
- {
-     int i;
-+    MachineState *ms = MACHINE(pcms);
- 
-     pcms->apic_xrupt_override = kvm_allows_irq0_override();
--    pcms->numa_nodes = nb_numa_nodes;
-+    pcms->numa_nodes = ms->numa_state->num_nodes;
-     pcms->node_mem = g_malloc0(pcms->numa_nodes *
-                                     sizeof *pcms->node_mem);
--    for (i = 0; i < nb_numa_nodes; i++) {
-+    for (i = 0; i < ms->numa_state->num_nodes; i++) {
-         pcms->node_mem[i] = numa_info[i].node_mem;
+@@ -1854,6 +1854,10 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+         build_q35_pci0_int(dsdt);
      }
  
-@@ -2655,7 +2658,7 @@ static int64_t pc_get_default_cpu_node_id(const MachineState *ms, int idx)
-    assert(idx < ms->possible_cpus->len);
-    x86_topo_ids_from_apicid(ms->possible_cpus->cpus[idx].arch_id,
-                             smp_cores, smp_threads, &topo);
--   return topo.pkg_id % nb_numa_nodes;
-+   return topo.pkg_id % ms->numa_state->num_nodes;
++    if (machine->numa_state->hma_enabled) {
++        hmat_build_aml(dsdt);
++    }
++
+     if (pcmc->legacy_cpu_hotplug) {
+         build_legacy_cpu_hotplug_aml(dsdt, machine, pm->cpu_hp_io_base);
+     } else {
+diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+index c07c4a5b38..b0a95b5160 100644
+--- a/hw/i386/pc_piix.c
++++ b/hw/i386/pc_piix.c
+@@ -58,6 +58,7 @@
+ #include "migration/misc.h"
+ #include "kvm_i386.h"
+ #include "sysemu/numa.h"
++#include "hw/acpi/hmat.h"
+ 
+ #define MAX_IDE_BUS 2
+ 
+@@ -301,6 +302,11 @@ static void pc_init1(MachineState *machine,
+         nvdimm_init_acpi_state(machine->nvdimms_state, system_io,
+                                pcms->fw_cfg, OBJECT(pcms));
+     }
++
++    if (machine->numa_state->hma_enabled) {
++        hmat_init_acpi_state(machine->numa_state->acpi_hma_state, system_io,
++                             pcms->fw_cfg, OBJECT(pcms));
++    }
  }
  
- static const CPUArchIdList *pc_possible_cpu_arch_ids(MachineState *ms)
-@@ -2749,6 +2752,7 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
-     nc->nmi_monitor_handler = x86_nmi;
-     mc->default_cpu_type = TARGET_DEFAULT_CPU_TYPE;
-     mc->nvdimm_supported = true;
-+    mc->numa_supported = true;
+ /* Looking for a pc_compat_2_4() function? It doesn't exist.
+diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+index 57232aed6b..12178f4f59 100644
+--- a/hw/i386/pc_q35.c
++++ b/hw/i386/pc_q35.c
+@@ -54,6 +54,7 @@
+ #include "qapi/error.h"
+ #include "qemu/error-report.h"
+ #include "sysemu/numa.h"
++#include "hw/acpi/hmat.h"
  
-     object_class_property_add(oc, PC_MACHINE_DEVMEM_REGION_SIZE, "int",
-         pc_machine_get_device_memory_region_size, NULL,
-diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
-index b1239fd0d3..0a32a9fb17 100644
---- a/hw/mem/pc-dimm.c
-+++ b/hw/mem/pc-dimm.c
-@@ -161,6 +161,8 @@ static void pc_dimm_realize(DeviceState *dev, Error **errp)
- {
-     PCDIMMDevice *dimm = PC_DIMM(dev);
-     PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
-+    MachineState *ms = MACHINE(qdev_get_machine());
-+    int nb_numa_nodes = ms->numa_state->num_nodes;
- 
-     if (!dimm->hostmem) {
-         error_setg(errp, "'" PC_DIMM_MEMDEV_PROP "' property is not set");
-diff --git a/hw/pci-bridge/pci_expander_bridge.c b/hw/pci-bridge/pci_expander_bridge.c
-index aecf3d7ddf..0b4c5f1e71 100644
---- a/hw/pci-bridge/pci_expander_bridge.c
-+++ b/hw/pci-bridge/pci_expander_bridge.c
-@@ -212,9 +212,10 @@ static void pxb_dev_realize_common(PCIDevice *dev, bool pcie, Error **errp)
-     PCIBus *bus;
-     const char *dev_name = NULL;
-     Error *local_err = NULL;
-+    MachineState *ms = MACHINE(qdev_get_machine());
- 
-     if (pxb->numa_node != NUMA_NODE_UNASSIGNED &&
--        pxb->numa_node >= nb_numa_nodes) {
-+        pxb->numa_node >= ms->numa_state->num_nodes) {
-         error_setg(errp, "Illegal numa node %d", pxb->numa_node);
-         return;
+ /* ICH9 AHCI has 6 ports */
+ #define MAX_SATA_PORTS     6
+@@ -333,6 +334,11 @@ static void pc_q35_init(MachineState *machine)
+         nvdimm_init_acpi_state(machine->nvdimms_state, system_io,
+                                pcms->fw_cfg, OBJECT(pcms));
      }
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index b502fcac2e..47b625ad7b 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -291,6 +291,7 @@ static int spapr_fixup_cpu_dt(void *fdt, SpaprMachineState *spapr)
-     CPUState *cs;
-     char cpu_model[32];
-     uint32_t pft_size_prop[] = {0, cpu_to_be32(spapr->htab_shift)};
-+    MachineState *ms = MACHINE(spapr);
- 
-     CPU_FOREACH(cs) {
-         PowerPCCPU *cpu = POWERPC_CPU(cs);
-@@ -325,7 +326,7 @@ static int spapr_fixup_cpu_dt(void *fdt, SpaprMachineState *spapr)
-             return ret;
-         }
- 
--        if (nb_numa_nodes > 1) {
-+        if (ms->numa_state->num_nodes > 1) {
-             ret = spapr_fixup_cpu_numa_dt(fdt, offset, cpu);
-             if (ret < 0) {
-                 return ret;
-@@ -345,9 +346,9 @@ static int spapr_fixup_cpu_dt(void *fdt, SpaprMachineState *spapr)
- 
- static hwaddr spapr_node0_size(MachineState *machine)
- {
--    if (nb_numa_nodes) {
-+    if (machine->numa_state->num_nodes) {
-         int i;
--        for (i = 0; i < nb_numa_nodes; ++i) {
-+        for (i = 0; i < machine->numa_state->num_nodes; ++i) {
-             if (numa_info[i].node_mem) {
-                 return MIN(pow2floor(numa_info[i].node_mem),
-                            machine->ram_size);
-@@ -392,18 +393,18 @@ static int spapr_populate_memory(SpaprMachineState *spapr, void *fdt)
- {
-     MachineState *machine = MACHINE(spapr);
-     hwaddr mem_start, node_size;
--    int i, nb_nodes = nb_numa_nodes;
-+    int i;
-     NodeInfo *nodes = numa_info;
-     NodeInfo ramnode;
- 
-     /* No NUMA nodes, assume there is just one node with whole RAM */
--    if (!nb_numa_nodes) {
--        nb_nodes = 1;
-+    if (!machine->numa_state->num_nodes) {
-+        machine->numa_state->num_nodes = 1;
-         ramnode.node_mem = machine->ram_size;
-         nodes = &ramnode;
-     }
- 
--    for (i = 0, mem_start = 0; i < nb_nodes; ++i) {
-+    for (i = 0, mem_start = 0; i < machine->numa_state->num_nodes; ++i) {
-         if (!nodes[i].node_mem) {
-             continue;
-         }
-@@ -445,6 +446,7 @@ static void spapr_populate_cpu_dt(CPUState *cs, void *fdt, int offset,
-     PowerPCCPU *cpu = POWERPC_CPU(cs);
-     CPUPPCState *env = &cpu->env;
-     PowerPCCPUClass *pcc = POWERPC_CPU_GET_CLASS(cs);
-+    MachineState *ms = MACHINE(spapr);
-     int index = spapr_get_vcpu_id(cpu);
-     uint32_t segs[] = {cpu_to_be32(28), cpu_to_be32(40),
-                        0xffffffff, 0xffffffff};
-@@ -546,7 +548,7 @@ static void spapr_populate_cpu_dt(CPUState *cs, void *fdt, int offset,
-     _FDT((fdt_setprop(fdt, offset, "ibm,pft-size",
-                       pft_size_prop, sizeof(pft_size_prop))));
- 
--    if (nb_numa_nodes > 1) {
-+    if (ms->numa_state->num_nodes > 1) {
-         _FDT(spapr_fixup_cpu_numa_dt(fdt, offset, cpu));
-     }
- 
-@@ -853,6 +855,7 @@ static int spapr_populate_drmem_v1(SpaprMachineState *spapr, void *fdt,
- static int spapr_populate_drconf_memory(SpaprMachineState *spapr, void *fdt)
- {
-     MachineState *machine = MACHINE(spapr);
-+    int nb_numa_nodes = machine->numa_state->num_nodes;
-     int ret, i, offset;
-     uint64_t lmb_size = SPAPR_MEMORY_BLOCK_SIZE;
-     uint32_t prop_lmb_size[] = {0, cpu_to_be32(lmb_size)};
-@@ -1742,7 +1745,7 @@ static void spapr_machine_reset(void)
-      * The final value of spapr->gpu_numa_id is going to be written to
-      * max-associativity-domains in spapr_build_fdt().
-      */
--    spapr->gpu_numa_id = MAX(1, nb_numa_nodes);
-+    spapr->gpu_numa_id = MAX(1, machine->numa_state->num_nodes);
-     qemu_devices_reset();
- 
-     /*
-@@ -2529,7 +2532,7 @@ static void spapr_validate_node_memory(MachineState *machine, Error **errp)
-         return;
-     }
- 
--    for (i = 0; i < nb_numa_nodes; i++) {
-+    for (i = 0; i < machine->numa_state->num_nodes; i++) {
-         if (numa_info[i].node_mem % SPAPR_MEMORY_BLOCK_SIZE) {
-             error_setg(errp,
-                        "Node %d memory size 0x%" PRIx64
-@@ -4125,7 +4128,7 @@ spapr_cpu_index_to_props(MachineState *machine, unsigned cpu_index)
- 
- static int64_t spapr_get_default_cpu_node_id(const MachineState *ms, int idx)
- {
--    return idx / smp_cores % nb_numa_nodes;
-+    return idx / smp_cores % ms->numa_state->num_nodes;
++
++    if (machine->numa_state->hma_enabled) {
++        hmat_init_acpi_state(machine->numa_state->acpi_hma_state, system_io,
++                             pcms->fw_cfg, OBJECT(pcms));
++    }
  }
  
- static const CPUArchIdList *spapr_possible_cpu_arch_ids(MachineState *machine)
-@@ -4329,6 +4332,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
-     smc->update_dt_enabled = true;
-     mc->default_cpu_type = POWERPC_CPU_TYPE_NAME("power9_v2.0");
-     mc->has_hotpluggable_cpus = true;
-+    mc->numa_supported = true;
-     smc->resize_hpt_default = SPAPR_RESIZE_HPT_ENABLED;
-     fwc->get_dev_path = spapr_get_fw_dev_path;
-     nc->nmi_monitor_handler = spapr_nmi;
-diff --git a/include/hw/acpi/aml-build.h b/include/hw/acpi/aml-build.h
-index 1a563ad756..991cf05134 100644
---- a/include/hw/acpi/aml-build.h
-+++ b/include/hw/acpi/aml-build.h
-@@ -414,7 +414,7 @@ build_append_gas_from_struct(GArray *table, const struct AcpiGenericAddress *s)
- void build_srat_memory(AcpiSratMemoryAffinity *numamem, uint64_t base,
-                        uint64_t len, int node, MemoryAffinityFlags flags);
- 
--void build_slit(GArray *table_data, BIOSLinker *linker);
-+void build_slit(GArray *table_data, BIOSLinker *linker, MachineState *ms);
- 
- void build_fadt(GArray *tbl, BIOSLinker *linker, const AcpiFadtData *f,
-                 const char *oem_id, const char *oem_table_id);
-diff --git a/include/hw/boards.h b/include/hw/boards.h
-index eaa050a7ab..10e1984c31 100644
---- a/include/hw/boards.h
-+++ b/include/hw/boards.h
-@@ -211,6 +211,7 @@ struct MachineClass {
-     bool ignore_boot_device_suffixes;
-     bool smbus_no_migration_support;
-     bool nvdimm_supported;
-+    bool numa_supported;
- 
-     HotplugHandler *(*get_hotplug_handler)(MachineState *machine,
-                                            DeviceState *dev);
-@@ -274,6 +275,7 @@ struct MachineState {
-     AccelState *accelerator;
-     CPUArchIdList *possible_cpus;
-     struct NVDIMMState *nvdimms_state;
-+    struct NumaState *numa_state;
- };
- 
- #define DEFINE_MACHINE(namestr, machine_initfn) \
+ #define DEFINE_Q35_MACHINE(suffix, name, compatfn, optionfn) \
 diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
-index b6ac7de43e..bea3b5b899 100644
+index 2e5bdcbd19..1d221cf63a 100644
 --- a/include/sysemu/numa.h
 +++ b/include/sysemu/numa.h
-@@ -6,7 +6,6 @@
- #include "sysemu/hostmem.h"
- #include "hw/boards.h"
+@@ -38,6 +38,11 @@ struct NumaState {
  
--extern int nb_numa_nodes;   /* Number of NUMA nodes */
- extern bool have_numa_distance;
- 
- struct NodeInfo {
-@@ -22,9 +21,17 @@ struct NumaNodeMem {
+     /* Memory Side Cache Information Structure */
+     HMAT_Cache_Info *hmat_cache[MAX_NODES][MAX_HMAT_CACHE_LEVEL + 1];
++
++    /* Detect if HMA support is enabled. */
++    bool hma_enabled;
++
++    struct AcpiHmaState *acpi_hma_state;
  };
+ typedef struct NumaState NumaState;
  
- extern NodeInfo numa_info[MAX_NODES];
-+
-+struct NumaState {
-+    /* Number of NUMA nodes */
-+    int num_nodes;
-+
-+};
-+typedef struct NumaState NumaState;
-+
- void parse_numa_opts(MachineState *ms);
- void numa_complete_configuration(MachineState *ms);
--void query_numa_node_mem(NumaNodeMem node_mem[]);
-+void query_numa_node_mem(NumaNodeMem node_mem[], MachineState *ms);
- extern QemuOptsList qemu_numa_opts;
- void numa_legacy_auto_assign_ram(MachineClass *mc, NodeInfo *nodes,
-                                  int nb_nodes, ram_addr_t size);
-diff --git a/monitor/misc.c b/monitor/misc.c
-index bf9faceb86..a5351a8b2a 100644
---- a/monitor/misc.c
-+++ b/monitor/misc.c
-@@ -1083,15 +1083,21 @@ static void hmp_info_mtree(Monitor *mon, const QDict *qdict)
- 
- static void hmp_info_numa(Monitor *mon, const QDict *qdict)
- {
--    int i;
-+    int i, nb_numa_nodes;
-     NumaNodeMem *node_mem;
-     CpuInfoList *cpu_list, *cpu;
-+    MachineState *ms = MACHINE(qdev_get_machine());
-+
-+    nb_numa_nodes = ms->numa_state ? ms->numa_state->num_nodes : 0;
-+    monitor_printf(mon, "%d nodes\n", nb_numa_nodes);
-+    if (!nb_numa_nodes) {
-+        return;
-+    }
- 
-     cpu_list = qmp_query_cpus(&error_abort);
-     node_mem = g_new0(NumaNodeMem, nb_numa_nodes);
- 
--    query_numa_node_mem(node_mem);
--    monitor_printf(mon, "%d nodes\n", nb_numa_nodes);
-+    query_numa_node_mem(node_mem, ms);
-     for (i = 0; i < nb_numa_nodes; i++) {
-         monitor_printf(mon, "node %d cpus:", i);
-         for (cpu = cpu_list; cpu; cpu = cpu->next) {
 diff --git a/numa.c b/numa.c
-index 955ec0c830..d35e5c2c2e 100644
+index 1cbfb8ab4e..e34a08d84b 100644
 --- a/numa.c
 +++ b/numa.c
-@@ -52,7 +52,6 @@ static int have_memdevs = -1;
- static int max_numa_nodeid; /* Highest specified NUMA node ID, plus one.
-                              * For all nodes, nodeid < max_numa_nodeid
-                              */
--int nb_numa_nodes;
- bool have_numa_distance;
- NodeInfo numa_info[MAX_NODES];
- 
-@@ -68,7 +67,7 @@ static void parse_numa_node(MachineState *ms, NumaNodeOptions *node,
-     if (node->has_nodeid) {
-         nodenr = node->nodeid;
-     } else {
--        nodenr = nb_numa_nodes;
-+        nodenr = ms->numa_state->num_nodes;
+@@ -254,6 +254,11 @@ static void parse_numa_hmat_lb(MachineState *ms, NumaHmatLBOptions *node,
+         return;
      }
  
-     if (nodenr >= MAX_NODES) {
-@@ -136,10 +135,11 @@ static void parse_numa_node(MachineState *ms, NumaNodeOptions *node,
-     }
-     numa_info[nodenr].present = true;
-     max_numa_nodeid = MAX(max_numa_nodeid, nodenr + 1);
--    nb_numa_nodes++;
-+    ms->numa_state->num_nodes++;
- }
- 
--static void parse_numa_distance(NumaDistOptions *dist, Error **errp)
-+static
-+void parse_numa_distance(MachineState *ms, NumaDistOptions *dist, Error **errp)
- {
-     uint16_t src = dist->src;
-     uint16_t dst = dist->dst;
-@@ -178,6 +178,12 @@ static
- void set_numa_options(MachineState *ms, NumaOptions *object, Error **errp)
- {
-     Error *err = NULL;
-+    MachineClass *mc = MACHINE_GET_CLASS(ms);
-+
-+    if (!mc->numa_supported) {
-+        error_setg(errp, "NUMA is not supported by this machine-type");
-+        goto end;
++    if (!ms->numa_state->hma_enabled && !ms->numa_state->acpi_hma_state) {
++        ms->numa_state->hma_enabled = true;
++        ms->numa_state->acpi_hma_state = g_new0(AcpiHmaState, 1);
 +    }
++
+     if (node->has_latency) {
+         hmat_lb = ms->numa_state->hmat_lb[node->hierarchy][node->data_type];
  
-     switch (object->type) {
-     case NUMA_OPTIONS_TYPE_NODE:
-@@ -187,7 +193,7 @@ void set_numa_options(MachineState *ms, NumaOptions *object, Error **errp)
-         }
-         break;
-     case NUMA_OPTIONS_TYPE_DIST:
--        parse_numa_distance(&object->u.dist, &err);
-+        parse_numa_distance(ms, &object->u.dist, &err);
-         if (err) {
-             goto end;
-         }
-@@ -252,10 +258,11 @@ end:
-  * distance from a node to itself is always NUMA_DISTANCE_MIN,
-  * so providing it is never necessary.
-  */
--static void validate_numa_distance(void)
-+static void validate_numa_distance(MachineState *ms)
- {
-     int src, dst;
-     bool is_asymmetrical = false;
-+    int nb_numa_nodes = ms->numa_state->num_nodes;
- 
-     for (src = 0; src < nb_numa_nodes; src++) {
-         for (dst = src; dst < nb_numa_nodes; dst++) {
-@@ -293,7 +300,7 @@ static void validate_numa_distance(void)
-     }
- }
- 
--static void complete_init_numa_distance(void)
-+static void complete_init_numa_distance(MachineState *ms)
- {
-     int src, dst;
- 
-@@ -302,8 +309,8 @@ static void complete_init_numa_distance(void)
-      * there would not be any missing distance except local node, which
-      * is verified by validate_numa_distance above.
-      */
--    for (src = 0; src < nb_numa_nodes; src++) {
--        for (dst = 0; dst < nb_numa_nodes; dst++) {
-+    for (src = 0; src < ms->numa_state->num_nodes; src++) {
-+        for (dst = 0; dst < ms->numa_state->num_nodes; dst++) {
-             if (numa_info[src].distance[dst] == 0) {
-                 if (src == dst) {
-                     numa_info[src].distance[dst] = NUMA_DISTANCE_MIN;
-@@ -369,7 +376,7 @@ void numa_complete_configuration(MachineState *ms)
-      *
-      * Enable NUMA implicitly by adding a new NUMA node automatically.
-      */
--    if (ms->ram_slots > 0 && nb_numa_nodes == 0 &&
-+    if (ms->ram_slots > 0 && ms->numa_state->num_nodes == 0 &&
-         mc->auto_enable_numa_with_memhp) {
-             NumaNodeOptions node = { };
-             parse_numa_node(ms, &node, &error_abort);
-@@ -387,30 +394,33 @@ void numa_complete_configuration(MachineState *ms)
-     }
- 
-     /* This must be always true if all nodes are present: */
--    assert(nb_numa_nodes == max_numa_nodeid);
-+    assert(ms->numa_state->num_nodes == max_numa_nodeid);
- 
--    if (nb_numa_nodes > 0) {
-+    if (ms->numa_state->num_nodes > 0) {
-         uint64_t numa_total;
- 
--        if (nb_numa_nodes > MAX_NODES) {
--            nb_numa_nodes = MAX_NODES;
-+        if (ms->numa_state->num_nodes > MAX_NODES) {
-+            ms->numa_state->num_nodes = MAX_NODES;
-         }
- 
-         /* If no memory size is given for any node, assume the default case
-          * and distribute the available memory equally across all nodes
-          */
--        for (i = 0; i < nb_numa_nodes; i++) {
-+        for (i = 0; i < ms->numa_state->num_nodes; i++) {
-             if (numa_info[i].node_mem != 0) {
-                 break;
-             }
-         }
--        if (i == nb_numa_nodes) {
-+        if (i == ms->numa_state->num_nodes) {
-             assert(mc->numa_auto_assign_ram);
--            mc->numa_auto_assign_ram(mc, numa_info, nb_numa_nodes, ram_size);
-+            mc->numa_auto_assign_ram(mc,
-+                                     numa_info,
-+                                     ms->numa_state->num_nodes,
-+                                     ram_size);
-         }
- 
-         numa_total = 0;
--        for (i = 0; i < nb_numa_nodes; i++) {
-+        for (i = 0; i < ms->numa_state->num_nodes; i++) {
-             numa_total += numa_info[i].node_mem;
-         }
-         if (numa_total != ram_size) {
-@@ -434,10 +444,10 @@ void numa_complete_configuration(MachineState *ms)
-          */
-         if (have_numa_distance) {
-             /* Validate enough NUMA distance information was provided. */
--            validate_numa_distance();
-+            validate_numa_distance(ms);
- 
-             /* Validation succeeded, now fill in any missing distances. */
--            complete_init_numa_distance();
-+            complete_init_numa_distance(ms);
-         }
-     }
- }
-@@ -513,14 +523,16 @@ void memory_region_allocate_system_memory(MemoryRegion *mr, Object *owner,
- {
-     uint64_t addr = 0;
-     int i;
-+    MachineState *ms = MACHINE(qdev_get_machine());
- 
--    if (nb_numa_nodes == 0 || !have_memdevs) {
-+    if (ms->numa_state == NULL ||
-+        ms->numa_state->num_nodes == 0 || !have_memdevs) {
-         allocate_system_memory_nonnuma(mr, owner, name, ram_size);
+@@ -356,6 +361,11 @@ void parse_numa_hmat_cache(MachineState *ms, NumaHmatCacheOptions *node,
          return;
      }
  
-     memory_region_init(mr, owner, name, ram_size);
--    for (i = 0; i < nb_numa_nodes; i++) {
-+    for (i = 0; i < ms->numa_state->num_nodes; i++) {
-         uint64_t size = numa_info[i].node_mem;
-         HostMemoryBackend *backend = numa_info[i].node_memdev;
-         if (!backend) {
-@@ -578,16 +590,16 @@ static void numa_stat_memory_devices(NumaNodeMem node_mem[])
-     qapi_free_MemoryDeviceInfoList(info_list);
- }
++    if (!ms->numa_state->hma_enabled && !ms->numa_state->acpi_hma_state) {
++        ms->numa_state->hma_enabled = true;
++        ms->numa_state->acpi_hma_state = g_new0(AcpiHmaState, 1);
++    }
++
+     hmat_cache = g_malloc0(sizeof(*hmat_cache));
  
--void query_numa_node_mem(NumaNodeMem node_mem[])
-+void query_numa_node_mem(NumaNodeMem node_mem[], MachineState *ms)
- {
-     int i;
- 
--    if (nb_numa_nodes <= 0) {
-+    if (ms->numa_state == NULL || ms->numa_state->num_nodes <= 0) {
-         return;
-     }
- 
-     numa_stat_memory_devices(node_mem);
--    for (i = 0; i < nb_numa_nodes; i++) {
-+    for (i = 0; i < ms->numa_state->num_nodes; i++) {
-         node_mem[i].node_mem += numa_info[i].node_mem;
-     }
- }
+     hmat_cache->mem_proximity = node->node_id;
 -- 
 2.20.1
 
