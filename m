@@ -2,50 +2,49 @@ Return-Path: <SRS0=vrBk=VF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13B39C606AC
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 11:18:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81B28C606AF
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 11:19:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D81AF20665
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 11:18:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D81AF20665
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4D3E920665
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 11:19:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D3E920665
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40500 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40502 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hkRf1-0004eu-Jp
-	for qemu-devel@archiver.kernel.org; Mon, 08 Jul 2019 07:18:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46260)
+	id 1hkRga-0005Q6-IX
+	for qemu-devel@archiver.kernel.org; Mon, 08 Jul 2019 07:19:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46262)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bounces@canonical.com>) id 1hkRcg-0003i5-LW
+ (envelope-from <bounces@canonical.com>) id 1hkRcg-0003iA-Sa
  for qemu-devel@nongnu.org; Mon, 08 Jul 2019 07:15:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1hkRcf-0001Dq-E7
+ (envelope-from <bounces@canonical.com>) id 1hkRcf-0001E4-LZ
  for qemu-devel@nongnu.org; Mon, 08 Jul 2019 07:15:54 -0400
-Received: from indium.canonical.com ([91.189.90.7]:56276)
+Received: from indium.canonical.com ([91.189.90.7]:56320)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1hkRcf-0001DG-95
+ id 1hkRcf-0001DQ-G6
  for qemu-devel@nongnu.org; Mon, 08 Jul 2019 07:15:53 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1hkRcc-0000yL-Ii
- for <qemu-devel@nongnu.org>; Mon, 08 Jul 2019 11:15:50 +0000
+ id 1hkRcd-0000z6-2b
+ for <qemu-devel@nongnu.org>; Mon, 08 Jul 2019 11:15:51 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 543EB2E80D1
+ by loganberry.canonical.com (Postfix) with ESMTP id DC0D22E80E2
  for <qemu-devel@nongnu.org>; Mon,  8 Jul 2019 11:15:49 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 08 Jul 2019 11:02:48 -0000
-From: =?utf-8?q?Alex_Benn=C3=A9e?= <alex.bennee@gmail.com>
+Date: Mon, 08 Jul 2019 11:07:44 -0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
@@ -55,15 +54,15 @@ X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
 X-Launchpad-Bug-Commenters: dgilbert-h tristan-vanberkom
 X-Launchpad-Bug-Reporter: Tristan Van Berkom (tristan-vanberkom)
-X-Launchpad-Bug-Modifier: =?utf-8?q?Alex_Benn=C3=A9e_=28alex-bennee=29?=
+X-Launchpad-Bug-Modifier: Dr. David Alan Gilbert (dgilbert-h)
 References: <156258349508.21433.10621774615794067692.malonedeb@gac.canonical.com>
-Message-Id: <156258376860.23597.7156546966254737820.launchpad@chaenomeles.canonical.com>
+Message-Id: <156258406504.21151.10032177714764488815.malone@gac.canonical.com>
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com); Revision="19007";
  Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: e8e4796e7107e11bce7876c3f2725e701f2907d1
+X-Launchpad-Hash: e12da4b5763d0bf12999902bdfb9e782667cd29d
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
 Subject: [Qemu-devel] [Bug 1835732] Re: GTK display zoom in, zooms infinitely
@@ -82,7 +81,14 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Tags added: gtk ui
+This seems to work for me
+
+Can you confirm:
+  a) Guest OS and version
+  b) Guest desktop environment
+  c) Host OS version
+  d) Host desktop env
+  e) The full command line you used for qemu.
 
 -- =
 
