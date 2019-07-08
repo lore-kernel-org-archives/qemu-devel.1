@@ -6,61 +6,60 @@ X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64C23C5B578
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 08:05:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84A98C48BE7
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 08:06:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 39D9720665
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 08:05:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 39D9720665
+	by mail.kernel.org (Postfix) with ESMTPS id 57AC12064B
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 08:06:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57AC12064B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39240 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39250 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hkOdz-0005XZ-FM
-	for qemu-devel@archiver.kernel.org; Mon, 08 Jul 2019 04:05:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53453)
+	id 1hkOfa-0006wk-L2
+	for qemu-devel@archiver.kernel.org; Mon, 08 Jul 2019 04:06:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53822)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <quintela@redhat.com>) id 1hkOcX-0004i9-A4
- for qemu-devel@nongnu.org; Mon, 08 Jul 2019 04:03:34 -0400
+ (envelope-from <quintela@redhat.com>) id 1hkOe2-0005uq-Km
+ for qemu-devel@nongnu.org; Mon, 08 Jul 2019 04:05:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <quintela@redhat.com>) id 1hkOcW-00039d-12
- for qemu-devel@nongnu.org; Mon, 08 Jul 2019 04:03:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58188)
+ (envelope-from <quintela@redhat.com>) id 1hkOe1-0003oC-NU
+ for qemu-devel@nongnu.org; Mon, 08 Jul 2019 04:05:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58588)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1hkOcU-00031j-U5
- for qemu-devel@nongnu.org; Mon, 08 Jul 2019 04:03:31 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1hkOe1-0003nz-Hp
+ for qemu-devel@nongnu.org; Mon, 08 Jul 2019 04:05:05 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 91B94C02938A
- for <qemu-devel@nongnu.org>; Mon,  8 Jul 2019 08:03:08 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id E00583082E44
+ for <qemu-devel@nongnu.org>; Mon,  8 Jul 2019 08:05:04 +0000 (UTC)
 Received: from redhat.com (unknown [10.36.118.49])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id ECDDC19C77;
- Mon,  8 Jul 2019 08:03:04 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 231945D70D;
+ Mon,  8 Jul 2019 08:05:01 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
 To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-In-Reply-To: <20190708072437.3339-2-marcandre.lureau@redhat.com>
+In-Reply-To: <20190708072437.3339-3-marcandre.lureau@redhat.com>
  (=?utf-8?Q?=22Marc-Andr=C3=A9?=
- Lureau"'s message of "Mon, 8 Jul 2019 11:24:35 +0400")
+ Lureau"'s message of "Mon, 8 Jul 2019 11:24:36 +0400")
 References: <20190708072437.3339-1-marcandre.lureau@redhat.com>
- <20190708072437.3339-2-marcandre.lureau@redhat.com>
+ <20190708072437.3339-3-marcandre.lureau@redhat.com>
 User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
-Date: Mon, 08 Jul 2019 10:03:01 +0200
-Message-ID: <871rz1dkcq.fsf@trasno.org>
+Date: Mon, 08 Jul 2019 10:04:59 +0200
+Message-ID: <87wogtc5p0.fsf@trasno.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.32]); Mon, 08 Jul 2019 08:03:08 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.46]); Mon, 08 Jul 2019 08:05:04 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 1/3] qemu-file: move qemu_{get,
- put}_counted_string() declarations
+Subject: Re: [Qemu-devel] [PATCH 2/3] tests: add qtest_set_exit_status()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -82,13 +81,13 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
-> Move migration helpers for strings under include/, so they can be used
-> outside of migration/
+> Modify the behaviour of qtest_quit() to check against the expected
+> exit status value. The default remains 0.
 >
 > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
 Reviewed-by: Juan Quintela <quintela@redhat.com>
 
-Not that I am the biggest fan of exporting it, but we don't have
-anything better to offer.
+
+But I would like a review from anyone from qtest.
 
