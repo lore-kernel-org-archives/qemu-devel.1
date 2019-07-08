@@ -2,82 +2,82 @@ Return-Path: <SRS0=vrBk=VF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BAA3CC606D1
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 20:51:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75D7EC606D1
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 20:54:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8563A2171F
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 20:51:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 06B152173E
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 20:54:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rNzqCJqH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8563A2171F
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZFcFxu0A"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06B152173E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44660 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44680 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hkabn-0004Xn-Rw
-	for qemu-devel@archiver.kernel.org; Mon, 08 Jul 2019 16:51:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55959)
+	id 1hkaei-0005mE-1k
+	for qemu-devel@archiver.kernel.org; Mon, 08 Jul 2019 16:54:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56592)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <marcandre.lureau@gmail.com>) id 1hkab0-0003dv-88
- for qemu-devel@nongnu.org; Mon, 08 Jul 2019 16:50:47 -0400
+ (envelope-from <alistair23@gmail.com>) id 1hkae3-0005KM-OC
+ for qemu-devel@nongnu.org; Mon, 08 Jul 2019 16:53:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@gmail.com>) id 1hkaaz-00070B-7H
- for qemu-devel@nongnu.org; Mon, 08 Jul 2019 16:50:46 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:42645)
+ (envelope-from <alistair23@gmail.com>) id 1hkae2-0008Pm-I6
+ for qemu-devel@nongnu.org; Mon, 08 Jul 2019 16:53:55 -0400
+Received: from mail-lf1-x141.google.com ([2a00:1450:4864:20::141]:34071)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
- id 1hkaaz-0006yY-10
- for qemu-devel@nongnu.org; Mon, 08 Jul 2019 16:50:45 -0400
-Received: by mail-wr1-x442.google.com with SMTP id a10so17500762wrp.9
- for <qemu-devel@nongnu.org>; Mon, 08 Jul 2019 13:50:43 -0700 (PDT)
+ (Exim 4.71) (envelope-from <alistair23@gmail.com>)
+ id 1hkae2-0008Oq-Af; Mon, 08 Jul 2019 16:53:54 -0400
+Received: by mail-lf1-x141.google.com with SMTP id b29so11909691lfq.1;
+ Mon, 08 Jul 2019 13:53:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=8pUp+EN8OKyEOt0IR3UHz+DFxJDwX3bUYNujyhvPFGg=;
- b=rNzqCJqHUQ9tq0tGWhnq9dbaIcu/Qq/zv/idc0nWFpZtcbtIIABjG9ggpQHrQtGPeS
- gvL2AB5G3JF3aG6qZqZxsXenTAgcmbMD1GPaoL8I1nNxoWzXc+Mzq0TzvJNXhsznC/dS
- aQtW7eMmJ3RcD2ZBUFErWPCP1T+W8dbtZ9i9/MpY7xsNYb3l+wqsGmY8I7oIagZQbpoM
- 5zlIUawqWxbuTdNBpnER/NMXX7VY9Ph7AHHHRWZWwBCfA1p40bNHx2lsI+Ooa5+NqMdL
- pkMBE4IwbygjzydtLSZ+S2virR21HgD22GywN6imwnRYLPBkfuNJdQX0164ZFDfEy3oq
- bmUg==
+ bh=xNJdLUDck8N9rbAuIyFgiog/r0oXVAnMf289PEsEveo=;
+ b=ZFcFxu0A6CFFdXyMSYXszvSKQEC4F6z4B1lO9Ppiwl8uVruxwaqIeedovwYy9NDwXY
+ Qr/rN10312vkO9aykNxla35kH1TD3EFVfW64M2kJENbVSHnYqvTFqr6UtfBc6g0OxamB
+ Gs2oDIKKExvihq+1G0AXrBPyBYmd97WnmvInMAWXHCm8aIxhm2QyBAcWuj/E24vHerZF
+ Ags0buF03ozRPeLYJeJ7GbQqij/hYux7e0ByncsOvwUXi0mky8HIfPVk4woYvpgVnLhF
+ OSUTiYJu9IL/DlWhGOlrsXCfBuAlnRVEYXtQqxQKy6AiNRAdqnHO181PDJLKRaJrEhd6
+ dGBQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=8pUp+EN8OKyEOt0IR3UHz+DFxJDwX3bUYNujyhvPFGg=;
- b=L4O5BMyQSUoYbJPBp0eziNFEOC8nXTpPWexrQ7KQeYBDPZ+sDnocpQh3p1AwP6X/K+
- eA7x3N9lNzt6cnsslRzTEgpctYBSh8e3mcHbRFL8VoJQsjNCtZc8UTtcHkOCt+CP0/jp
- OX+PstZKaXFrpNugSN7J1zyfjD/bYK63XvezbROOhz3LMQzibJD9FVIoJpO+r1pR4r8c
- k5zd+S6kSJob8+/HEJAGtoSAh9YMPXq40EwZkuhuLG2b7SDaJCDN42mXI+VVWxMmclqt
- A6UoNYUot5d/S3gl9EG5HX8ukekGP9KUGRwaah+9bmAiLtsK6gdyxtMKxcs64rM6/aRo
- RrYQ==
-X-Gm-Message-State: APjAAAWtcV8BHPHhpCSo67Y2gCB5gtpRoZXivwse+LEwoUXXnQwukC8R
- 01tjEkFFiKualUlssLjKVVl5vxykAoGA7jEwfKk=
-X-Google-Smtp-Source: APXvYqz9dDbG0Jve+aii1X3Fxo5561U0pP+dqSc3V7OauWnwCM7GmE0WfO5KWZOuW7KC/8WzjCa0eLAmsxEtng0Hhgo=
-X-Received: by 2002:a5d:55cc:: with SMTP id i12mr21162375wrw.201.1562619041724; 
- Mon, 08 Jul 2019 13:50:41 -0700 (PDT)
+ bh=xNJdLUDck8N9rbAuIyFgiog/r0oXVAnMf289PEsEveo=;
+ b=i7s4/PrDrtPVoKZjxmnAR4mPHmMvcmmKyhYYPjKRtvPRwsbsfjVbJ5rF/9sc3xZp8V
+ eyKSaxCAwXJ/hqu9sX9ZZFzLois+rv+NAgaxw3m095khmJKYpL7haDLokVIuO6NvW6RO
+ lfGSFFpAmAnzSlNWdMPPcdR/kP7ijsEzU6X1vUAWaCqEmhWqQ5BUULfHirXvlKsup3OL
+ DMsjEbX8arN3ujKWp9iPweO1I0k3EFulUPaAPuCsf0B9b2sUeIqQZP+1/J8sgfsQAIY4
+ eyi4182NiW0iAt40SsWHDMZlG4p3fbD/HhyvQeiAu0Uu3gTEKdQXEa4p3j/j4n4gyUdg
+ SrnA==
+X-Gm-Message-State: APjAAAVtqjr9iEwjrFP7RrUM+4mpsi2H0L1/ubHeNRCXIjDxRBGqRdw3
+ 7VIEEKIaVST7LJq0wkeU9we/CRnXxHiM6re2Kx0=
+X-Google-Smtp-Source: APXvYqzA+QhzXF/x/NjBw9Nj5ay/KPe0X8lbf7hUr63Gnh3Teal5BBP9wMpXNIoymlfQqiCAV9rEZWkNpdRB3L5djOk=
+X-Received: by 2002:a19:6a01:: with SMTP id u1mr9466275lfu.141.1562619231633; 
+ Mon, 08 Jul 2019 13:53:51 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190107122304.22997-1-marcandre.lureau@redhat.com>
- <CAFEAcA_AFvdzWP7a9hE9qeqAp22swiP7MKBTO9yWJUoW4JnRjA@mail.gmail.com>
-In-Reply-To: <CAFEAcA_AFvdzWP7a9hE9qeqAp22swiP7MKBTO9yWJUoW4JnRjA@mail.gmail.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 9 Jul 2019 00:50:29 +0400
-Message-ID: <CAJ+F1CKRG2DjSkw-eZ8H-QkDRS1GfGBDxv5w=Ri8=D700HCW5A@mail.gmail.com>
-To: Peter Maydell <peter.maydell@linaro.org>
+References: <20190705154639.16591-1-philmd@redhat.com>
+ <20190705154639.16591-6-philmd@redhat.com>
+In-Reply-To: <20190705154639.16591-6-philmd@redhat.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Mon, 8 Jul 2019 13:50:43 -0700
+Message-ID: <CAKmqyKPoM+=0+pa6mG6mE4JVz99dDpnx0cciYfOvYWgpBTtXWg@mail.gmail.com>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::442
-Subject: Re: [Qemu-devel] [PULL v2 00/28] Machine props patches
+X-Received-From: 2a00:1450:4864:20::141
+Subject: Re: [Qemu-devel] [PATCH v3 5/9] hw/block/pflash_cfi01: Add the
+ DeviceReset() handler
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,59 +89,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Qemu-block <qemu-block@nongnu.org>,
+ John Snow <jsnow@redhat.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>, Alistair Francis <alistair.francis@wdc.com>,
+ Laszlo Ersek <lersek@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi
-
-On Mon, Jul 8, 2019 at 8:40 PM Peter Maydell <peter.maydell@linaro.org> wro=
-te:
+On Fri, Jul 5, 2019 at 8:51 AM Philippe Mathieu-Daud=C3=A9 <philmd@redhat.c=
+om> wrote:
 >
-> On Mon, 7 Jan 2019 at 12:23, Marc-Andr=C3=A9 Lureau
-> <marcandre.lureau@redhat.com> wrote:
-> > ----------------------------------------------------------------
-> > Generalize machine compatibility properties
-> >
-> > During "[PATCH v2 05/10] qom/globals: generalize
-> > object_property_set_globals()" review, Eduardo suggested to rework the
-> > GlobalProperty handling, so that -global is limited to QDev only and
-> > we avoid mixing the machine compats and the user-provided -global
-> > properties (instead of generalizing -global to various object kinds,
-> > like I proposed in v2).
-> >
-> > "qdev: do not mix compat props with global props" patch decouples a
-> > bit user-provided -global from machine compat properties. This allows
-> > to get rid of "user_provided" and "errp" fields in following patches.
-> >
-> > A new compat property "x-use-canonical-path-for-ramblock-id" is added
-> > to hostmem for legacy canonical path names, set to true for -file and
-> > -memfd with qemu < 4.0.
-> >
-> > (this series was initially titled "[PATCH v2 00/10] hostmem: use
-> > object "id" for memory region name with >=3D 3.1", but its focus is mor=
-e
-> > in refactoring the global and compatilibity properties handling now)
+> A "system reset" sets the device state machine in READ_ARRAY mode
+> and, after some delay, set the SR.7 READY bit.
 >
-> Hi; I've just noticed that this refactoring that removed all the
-> HW_COMPAT and PC_COMPAT macros left a couple of references to
-> them behind in documentation/comments:
+> We do not model timings, so we set the SR.7 bit directly.
 >
-> $ git grep HW_COMPAT
-> docs/devel/migration.rst:   b) Add an entry to the ``HW_COMPAT_`` for
-> the previous version that sets
-> hw/i386/pc_piix.c: * HW_COMPAT_*, PC_COMPAT_*, or * pc_*_machine_options(=
-).
+> The TYPE_DEVICE interface provides a DeviceReset handler.
+> This pflash device is a subclass of TYPE_SYS_BUS_DEVICE (which
+> is a subclass of TYPE_DEVICE).
+> SYS_BUS devices are automatically plugged into the 'main system
+> bus', which is the root of the qbus tree.
+> Devices in the qbus tree are guaranteed to have their reset()
+> handler called after realize() and before we try to run the guest.
 >
-> Could you write a patch which updates these bits of documentation
-> to refer to the new scheme, please?
+> To avoid incoherent states when the machine resets (see but report
+> below), factor out the reset code into pflash_cfi01_system_reset,
+> and register the method as a device reset callback.
+>
+> Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=3D1678713
+> Reported-by: Laszlo Ersek <lersek@redhat.com>
+> Reviewed-by: John Snow <jsnow@redhat.com>
+> Regression-tested-by: Laszlo Ersek <lersek@redhat.com>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-Ok, patch sent. (it is trivial, as I didn't see any need to change the
-documentation further)
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
-thanks
+Alistair
 
---=20
-Marc-Andr=C3=A9 Lureau
+> ---
+> v3: reword description
+> ---
+>  hw/block/pflash_cfi01.c | 15 +++++++++++++--
+>  1 file changed, 13 insertions(+), 2 deletions(-)
+>
+> diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
+> index 200bfd0ab8..c32c67d01d 100644
+> --- a/hw/block/pflash_cfi01.c
+> +++ b/hw/block/pflash_cfi01.c
+> @@ -762,8 +762,6 @@ static void pflash_cfi01_realize(DeviceState *dev, Er=
+ror **errp)
+>          pfl->max_device_width =3D pfl->device_width;
+>      }
+>
+> -    pflash_mode_read_array(pfl);
+> -    pfl->status =3D 0x80; /* WSM ready */
+>      /* Hardcoded CFI table */
+>      /* Standard "QRY" string */
+>      pfl->cfi_table[0x10] =3D 'Q';
+> @@ -851,6 +849,18 @@ static void pflash_cfi01_realize(DeviceState *dev, E=
+rror **errp)
+>      pfl->cfi_table[0x3f] =3D 0x01; /* Number of protection fields */
+>  }
+>
+> +static void pflash_cfi01_system_reset(DeviceState *dev)
+> +{
+> +    PFlashCFI01 *pfl =3D PFLASH_CFI01(dev);
+> +
+> +    pflash_mode_read_array(pfl);
+> +    /*
+> +     * The WSM ready timer occurs at most 150ns after system reset.
+> +     * This model deliberately ignores this delay.
+> +     */
+> +    pfl->status =3D 0x80;
+> +}
+> +
+>  static Property pflash_cfi01_properties[] =3D {
+>      DEFINE_PROP_DRIVE("drive", PFlashCFI01, blk),
+>      /* num-blocks is the number of blocks actually visible to the guest,
+> @@ -895,6 +905,7 @@ static void pflash_cfi01_class_init(ObjectClass *klas=
+s, void *data)
+>  {
+>      DeviceClass *dc =3D DEVICE_CLASS(klass);
+>
+> +    dc->reset =3D pflash_cfi01_system_reset;
+>      dc->realize =3D pflash_cfi01_realize;
+>      dc->props =3D pflash_cfi01_properties;
+>      dc->vmsd =3D &vmstate_pflash;
+> --
+> 2.20.1
+>
+>
 
