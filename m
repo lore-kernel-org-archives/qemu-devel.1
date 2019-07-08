@@ -3,80 +3,82 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2AC6C5B578
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 08:43:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DBFC9C5B578
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 08:54:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8BFCF2064B
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 08:43:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ABF4820844
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 08:54:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lpd3z7S3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8BFCF2064B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OlRoo8OB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ABF4820844
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39502 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39550 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hkPF7-0004XI-TM
-	for qemu-devel@archiver.kernel.org; Mon, 08 Jul 2019 04:43:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35720)
+	id 1hkPQ5-0007w7-75
+	for qemu-devel@archiver.kernel.org; Mon, 08 Jul 2019 04:54:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38077)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hkPEV-0003sP-Uo
- for qemu-devel@nongnu.org; Mon, 08 Jul 2019 04:42:48 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hkPNb-00075L-P1
+ for qemu-devel@nongnu.org; Mon, 08 Jul 2019 04:52:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hkPEU-00037n-56
- for qemu-devel@nongnu.org; Mon, 08 Jul 2019 04:42:47 -0400
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:39752)
+ (envelope-from <peter.maydell@linaro.org>) id 1hkPNa-0007sG-EW
+ for qemu-devel@nongnu.org; Mon, 08 Jul 2019 04:52:11 -0400
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:40438)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hkPET-000366-VZ
- for qemu-devel@nongnu.org; Mon, 08 Jul 2019 04:42:46 -0400
-Received: by mail-ot1-x344.google.com with SMTP id r21so10660004otq.6
- for <qemu-devel@nongnu.org>; Mon, 08 Jul 2019 01:42:43 -0700 (PDT)
+ id 1hkPNa-0007pL-7u
+ for qemu-devel@nongnu.org; Mon, 08 Jul 2019 04:52:10 -0400
+Received: by mail-oi1-x242.google.com with SMTP id w196so11978464oie.7
+ for <qemu-devel@nongnu.org>; Mon, 08 Jul 2019 01:52:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=uwbJ25+r35jJQL/3asJogy7vu9WA0Vrs0dGPAxruM9U=;
- b=lpd3z7S35JtzepOs1j8KunULl3POixSV7gXQSfxTdGn5nKiEGWRie0jsc7Z9Aujjen
- 0swP17dymg5vI4q2IBPxp3+a4DHjyBc1f3156ACeK0EFwu3poQDg+CYTpPpX5SeWYksi
- IXxgDJWx1N3R0iHhDYZswddIhvTSy7nWRQ1kqS5Co6i7A6qNp+3syAg4SAHVk8LJbxWo
- am69AeaxqTCmrci2lMnMf4sK4WC73cc0k8Mi8HmUg5X42vN/L7OD1PJ/6WPrwOq6Wo36
- Gbg0Vj6qE4glKKTpWAZRt9ecUgKchniKRMzf47ey1bbHyR/9SmFITJN+j70QEcmLGUXW
- radg==
+ :cc:content-transfer-encoding;
+ bh=iUdf517MWdBwlxi0FoaYCJGa4nrX7/86UoauhXyfiSM=;
+ b=OlRoo8OBH9PuUUBviIr6FgaaQQVm3RktmdZmv5jADXQQiuFTvq85quX6WK/bfoyssf
+ e7WO0GS8rtCJstbdF3xurKj0XjvyR2QQgvqbeDurxX6GAzJ5maxjxarNH0EryTczTOTd
+ lso+KIL4xV4+qB1XsvAxkIaEGJZoODcPDsOi3Kzkw+huNg2QAw1ZybEHehZUX5Rpj7x4
+ M9QNj/8xbZyCRDwMtvlL/2+3Dc55TDkiLINSdaw/SvTDxUqZpajSjOXBB89m5HUs4Pmp
+ G7p/psqoEmMhuBTVlUBtIwLUi+RLRZlbr1TUNBq7DYNmvTLynC0ljwJCdXwBQV+CJG9/
+ ZCaA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=uwbJ25+r35jJQL/3asJogy7vu9WA0Vrs0dGPAxruM9U=;
- b=lSSobUJMBMiJyBGHhjFw2AvHRcPkW0aHAvyVcRqfw/Z4cd+q2Qz8RipWs3I8H4HwIX
- TgW6yTPNzDN0GI23lvdKFNeiE49gre3VpqDQ4Tf41PixehtlnHPHzrFpGm/X3GYcfhk0
- ZqeBo3uWmiA/efnzDYSCyY6l3C9EX/bFk2516yT6d/65MLmWLtkEjpHJudxcA1sV3XpG
- 18iJPkrIVWiINCLlRCPVwzN2qyYej0Vl9IS+KfIBf1qLV815DsbRS26/KsC4O0qOayiu
- +BIhRUbd09ObRN2S3EhjjD2qogHd1hTGUA+k5jEbk0Y+DnkhccRIxCSX0vsfsWX1pKpJ
- SB6A==
-X-Gm-Message-State: APjAAAXOsx05NWVYhQ4kpTkT/PEz9hQu2czNQ99Zkl45sUBQ9QbKjPW7
- 6T6U42jkvrHIHBP1DdzKE4UQrGklnX1IngtP1l8uiw==
-X-Google-Smtp-Source: APXvYqyuh0upOb5TRMENgbSpFkcP/SqfchdDEGnGiIfUxFvwtqngcHmPxd8tiUWdWQpYKBC+RNXYrchCiFKea5HYcY0=
-X-Received: by 2002:a9d:4d81:: with SMTP id u1mr13005198otk.221.1562575362321; 
- Mon, 08 Jul 2019 01:42:42 -0700 (PDT)
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=iUdf517MWdBwlxi0FoaYCJGa4nrX7/86UoauhXyfiSM=;
+ b=jmmb7m3zpGLmOZqhZbI0pGNI4C5FMuwM/JHIo7+Xq7W1kIVuHmcDuFLeHJiaDNB9/t
+ i7OvyKC5yN6ni8AjYRg9NzpG6rFA/MS4bnWK7+Kk5DrjXD01YNOD/ulU0tJxdWEf0mIT
+ mtfo8sluSi55s31Oqa5eibYGY9x8tZXXKb2B5GKO+qLy7PyKC3ys634eeOlfjGCSefCH
+ mNYOmR1fOv2PaYpfgfy7gQuXVZdUvrxqJ0QHqkvpmr3PjsZdPY51J6FULY+fm6LA2otD
+ ANg5ZstxY8U66JFy5hgHbyVbKprqxufFBaO6kMZOXbZofDL4de3qMmme8dxbKe2hqCtA
+ 7A3Q==
+X-Gm-Message-State: APjAAAWdkKlQ6SFiRDkSVX3s7q7NBWlgSSXZ7aznn+z7ktRFy6KLD3S7
+ HmkVirhLWfn0zArJlTHDa0ckOPwUcB4WdUrDsF6vyrikwU0=
+X-Google-Smtp-Source: APXvYqxl0BL7lqJIUdNiO9qQfgieVa6mvnO9t/kBNy0qMFUArS3q59wjVb7dI9BS1rddusddnWDX2Ym+K1pPGR210Aw=
+X-Received: by 2002:a05:6808:8c2:: with SMTP id
+ k2mr8609311oij.98.1562575576736; 
+ Mon, 08 Jul 2019 01:46:16 -0700 (PDT)
 MIME-Version: 1.0
-References: <1534182832-554-1-git-send-email-aleksandar.markovic@rt-rk.com>
- <1534182832-554-5-git-send-email-aleksandar.markovic@rt-rk.com>
- <4da49ffe-902f-2cf2-8a21-2bbd511b17a4@weilnetz.de>
-In-Reply-To: <4da49ffe-902f-2cf2-8a21-2bbd511b17a4@weilnetz.de>
+References: <156217961567.21218.1941224583128986225@c4a48874b076>
+ <0a0abd7a-ce36-6faa-cba8-b6a40e7b503e@vivier.eu>
+ <CAFEAcA96z+9kMG1iDmBLa-MXuRez7XNyN7TigdaiNCBiy=2UuA@mail.gmail.com>
+In-Reply-To: <CAFEAcA96z+9kMG1iDmBLa-MXuRez7XNyN7TigdaiNCBiy=2UuA@mail.gmail.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 8 Jul 2019 09:42:31 +0100
-Message-ID: <CAFEAcA8fW0odS4pT9XNWoti7PM6TpdJ06o=43vmdRBArNM=iuw@mail.gmail.com>
-To: Stefan Weil <sw@weilnetz.de>
+Date: Mon, 8 Jul 2019 09:46:05 +0100
+Message-ID: <CAFEAcA8xFy+dC-WzurjieTaj5wK5H_eRx3R6LScck=08u5pmkw@mail.gmail.com>
+To: Laurent Vivier <laurent@vivier.eu>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::344
-Subject: Re: [Qemu-devel] Handling of fall through code (was: [PATCH v8
- 04/87] target/mips: Mark switch fallthroughs with interpretable comments
+X-Received-From: 2607:f8b0:4864:20::242
+Subject: Re: [Qemu-devel] [PULL v2 0/2] Trivial branch patches
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,49 +90,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paul Burton <pburton@wavecomp.com>,
- Stefan Markovic <smarkovic@wavecomp.com>, Riku Voipio <riku.voipio@iki.fi>,
- Richard Henderson <richard.henderson@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <laurent@vivier.eu>,
- Aleksandar Markovic <aleksandar.markovic@rt-rk.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philippe.mathieu.daude@gmail.com>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Petar Jovanovic <pjovanovic@wavecomp.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: no-reply@patchew.org, QEMU Trivial <qemu-trivial@nongnu.org>,
+ Michael Tokarev <mjt@tls.msk.ru>, QEMU Developers <qemu-devel@nongnu.org>,
+ Amit Shah <amit@kernel.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, 7 Jul 2019 at 21:26, Stefan Weil <sw@weilnetz.de> wrote:
-> This is a general problem all over the QEMU code. I usually compile with
-> nearly all warnings enabled and get now lots of errors with the latest
-> code and after updating to gcc-8.3.0 (Debian buster). It should be
-> reproducible by enabling -Werror=implicit-fallthrough.
+On Fri, 5 Jul 2019 at 16:16, Peter Maydell <peter.maydell@linaro.org> wrote=
+:
+>
+> On Fri, 5 Jul 2019 at 16:10, Laurent Vivier <laurent@vivier.eu> wrote:
+> >
+> > Le 03/07/2019 =C3=A0 20:46, no-reply@patchew.org a =C3=A9crit :
+> > > Patchew URL: https://patchew.org/QEMU/20190703152513.29166-1-laurent@=
+vivier.eu/
+> > >
+> > ...
+> > > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > > =3D=3D12708=3D=3DERROR: LeakSanitizer: detected memory leaks
+> > >
+> > > Direct leak of 32 byte(s) in 1 object(s) allocated from:
+> > >     #0 0x56164f580b6e in calloc (/tmp/qemu-test/build/x86_64-softmmu/=
+qemu-system-x86_64+0x19f9b6e)
+> > > ---
+> >
+> > It seems not related. Does it prevent the series to be merged?
+>
+> Yeah, it's unrelated (an issue in master which is now fixed), but I
+> had missed your v2 pullreq amongst all the noise. Thanks for the ping --
+> I'm running it through the test process now.
 
-Coverity warns about implicit fallthroughs, and we are
-currently warning-free in that department, so I think
-our remaining problems are largely down to perhaps
-using idioms which the compiler doesn't spot.
-Being able to enable gcc implicit-fallthrough errors would
-definitely be better than spotting them only after the
-fact with Coverity.
 
-> I suggest to enable -Werror=implicit-fallthrough by default and add a
-> new macro to mark all fallthrough locations which are correct, but not
-> accepted by the compiler.
+Applied, thanks.
 
-I'm not sure why we need a macro. Our standard way to
-mark fallthrough is /* fall through */, which has hundreds
-of uses in the codebase. -Wimplicit-fallthrough=2 will match this,
-so it seems simpler to just use that rather than to rework
-how we mark fallthroughs.
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.1
+for any user-visible changes.
 
-Since vixl is 3rd-party code it might be easier to just
-add -Wno-implicit-fallthrough to the cflags that
-disas/libvixl/Makefile.objs sets up for building those files.
-(We should check also for newer libvixl and/or suggest
-something upstream that works with gcc.)
-
-thanks
 -- PMM
 
