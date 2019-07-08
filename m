@@ -2,57 +2,62 @@ Return-Path: <SRS0=vrBk=VF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AFACC606C7
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 18:50:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1562C606C9
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 18:52:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D12772086D
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 18:50:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D12772086D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 77E092086D
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 18:52:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 77E092086D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=siemens.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43942 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43962 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hkYia-0008Ex-5d
-	for qemu-devel@archiver.kernel.org; Mon, 08 Jul 2019 14:50:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54824)
+	id 1hkYkD-0001Rv-Qu
+	for qemu-devel@archiver.kernel.org; Mon, 08 Jul 2019 14:52:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55859)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <eblake@redhat.com>) id 1hkYgo-0007I8-HW
- for qemu-devel@nongnu.org; Mon, 08 Jul 2019 14:48:42 -0400
+ (envelope-from <jan.kiszka@siemens.com>) id 1hkYjk-00013H-3x
+ for qemu-devel@nongnu.org; Mon, 08 Jul 2019 14:51:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1hkYgZ-0000cz-8s
- for qemu-devel@nongnu.org; Mon, 08 Jul 2019 14:48:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47782)
+ (envelope-from <jan.kiszka@siemens.com>) id 1hkYji-00067O-5G
+ for qemu-devel@nongnu.org; Mon, 08 Jul 2019 14:51:40 -0400
+Received: from goliath.siemens.de ([192.35.17.28]:49978)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1hkYgC-0008G6-PP; Mon, 08 Jul 2019 14:48:00 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id DBAA530BD1B4;
- Mon,  8 Jul 2019 18:47:06 +0000 (UTC)
-Received: from blue.redhat.com (ovpn-116-78.phx2.redhat.com [10.3.116.78])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4AF625C219;
- Mon,  8 Jul 2019 18:47:06 +0000 (UTC)
-From: Eric Blake <eblake@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Mon,  8 Jul 2019 13:47:03 -0500
-Message-Id: <20190708184703.19251-1-eblake@redhat.com>
+ (Exim 4.71) (envelope-from <jan.kiszka@siemens.com>)
+ id 1hkYjg-0005vs-Uy
+ for qemu-devel@nongnu.org; Mon, 08 Jul 2019 14:51:38 -0400
+Received: from mail2.sbs.de (mail2.sbs.de [192.129.41.66])
+ by goliath.siemens.de (8.15.2/8.15.2) with ESMTPS id x68IpWE4029344
+ (version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 8 Jul 2019 20:51:32 +0200
+Received: from [167.87.37.3] ([167.87.37.3])
+ by mail2.sbs.de (8.15.2/8.15.2) with ESMTP id x68IpUOS011958;
+ Mon, 8 Jul 2019 20:51:31 +0200
+From: Jan Kiszka <jan.kiszka@siemens.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+References: <1561116620-22245-1-git-send-email-pbonzini@redhat.com>
+ <1561116620-22245-23-git-send-email-pbonzini@redhat.com>
+ <e253d736-8cf5-0c5c-5766-ee71ad808cfd@siemens.com>
+Message-ID: <ffeb0352-0040-5f37-3cb1-b1931714f744@siemens.com>
+Date: Mon, 8 Jul 2019 20:51:30 +0200
+User-Agent: Mozilla/5.0 (X11; U; Linux i686 (x86_64); de; rv:1.8.1.12)
+ Gecko/20080226 SUSE/2.0.0.12-1.1 Thunderbird/2.0.0.12 Mnenhy/0.7.5.666
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Mon, 08 Jul 2019 18:47:06 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH for-4.1] iotests: Update 082 expected output
+In-Reply-To: <e253d736-8cf5-0c5c-5766-ee71ad808cfd@siemens.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 192.35.17.28
+Subject: Re: [Qemu-devel] [PULL 22/25] target/i386: kvm: Add nested
+ migration blocker only when kernel lacks required capabilities
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -64,301 +69,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, "open list:Block layer core" <qemu-block@nongnu.org>,
- Max Reitz <mreitz@redhat.com>
+Cc: Liran Alon <liran.alon@oracle.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-A recent tweak to the '-o help' output for qemu-img needs to be
-reflected into the iotests expected outputs.
+On 08.07.19 20:31, Jan Kiszka wrote:
+> 
+> On 21.06.19 13:30, Paolo Bonzini wrote:
+>> From: Liran Alon <liran.alon@oracle.com>
+>>
+>> Previous commits have added support for migration of nested virtualization
+>> workloads. This was done by utilising two new KVM capabilities:
+>> KVM_CAP_NESTED_STATE and KVM_CAP_EXCEPTION_PAYLOAD. Both which are
+>> required in order to correctly migrate such workloads.
+>>
+>> Therefore, change code to add a migration blocker for vCPUs exposed with
+>> Intel VMX or AMD SVM in case one of these kernel capabilities is
+>> missing.
+>>
+>> Signed-off-by: Liran Alon <liran.alon@oracle.com>
+>> Reviewed-by: Maran Wilson <maran.wilson@oracle.com>
+>> Message-Id: <20190619162140.133674-11-liran.alon@oracle.com>
+>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>> ---
+>>  target/i386/kvm.c     | 9 +++++++--
+>>  target/i386/machine.c | 2 +-
+>>  2 files changed, 8 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+>> index c931e9d..e4b4f57 100644
+>> --- a/target/i386/kvm.c
+>> +++ b/target/i386/kvm.c
+>> @@ -1640,9 +1640,14 @@ int kvm_arch_init_vcpu(CPUState *cs)
+>>                                    !!(c->ecx & CPUID_EXT_SMX);
+>>      }
+>>  
+>> -    if (cpu_has_nested_virt(env) && !nested_virt_mig_blocker) {
+>> +    if (cpu_has_vmx(env) && !nested_virt_mig_blocker &&
+>> +        ((kvm_max_nested_state_length() <= 0) || !has_exception_payload)) {
+>>          error_setg(&nested_virt_mig_blocker,
+>> -                   "Nested virtualization does not support live migration yet");
+>> +                   "Kernel do not provide required capabilities for "
+>> +                   "nested virtualization migration. "
+>> +                   "(CAP_NESTED_STATE=%d, CAP_EXCEPTION_PAYLOAD=%d)",
+>> +                   kvm_max_nested_state_length() > 0,
+>> +                   has_exception_payload);
+>>          r = migrate_add_blocker(nested_virt_mig_blocker, &local_err);
+>>          if (local_err) {
+>>              error_report_err(local_err);
+>> diff --git a/target/i386/machine.c b/target/i386/machine.c
+>> index fc49e5a..851b249 100644
+>> --- a/target/i386/machine.c
+>> +++ b/target/i386/machine.c
+>> @@ -233,7 +233,7 @@ static int cpu_pre_save(void *opaque)
+>>  
+>>  #ifdef CONFIG_KVM
+>>      /* Verify we have nested virtualization state from kernel if required */
+>> -    if (cpu_has_nested_virt(env) && !env->nested_state) {
+>> +    if (kvm_enabled() && cpu_has_vmx(env) && !env->nested_state) {
+>>          error_report("Guest enabled nested virtualization but kernel "
+>>                  "does not support saving of nested state");
+>>          return -EINVAL;
+>>
+> 
+> Starting with this commit latest (bisection issue...), running Jailhouse in a
+> guest first stalls L1 (looks like we lose interrupts), and if I try to reset
+> that VM, I lose my host as well:
+> 
+> kvm: vmptrld           (null)/6eb900000000 failed
+> kvm: vmclear fail:           (null)/6eb900000000
+> 
+> and then things start to lock up because we seem to lose the CPUs the guest was
+> running on. Once I had this in the logs:
+> 
+> rcu: INFO: rcu_sched detected expedited stalls on CPUs/tasks: { 7-... } 15040
+> jiffies s: 4673 root: 0x80/.
+> rcu: blocking rcu_node structures:
+> Task dump for CPU 7:
+> qemu-system-x86 R  running task        0 17413  17345 0x00000008
+> Call Trace:
+>  ? x86_virt_spec_ctrl+0x7/0xe0
+>  ? vmx_vcpu_run.part.0+0x2a4/0xfa0 [kvm_intel]
+>  ? vcpu_enter_guest+0x349/0xe80 [kvm]
+>  ? kvm_arch_vcpu_ioctl_run+0xff/0x550 [kvm]
+>  ? kvm_vcpu_ioctl+0x20d/0x590 [kvm]
+>  ? get_futex_key+0x35d/0x3b0
+>  ? do_vfs_ioctl+0x447/0x640
+>  ? do_futex+0x157/0x1d0
+>  ? ksys_ioctl+0x5e/0x90
+>  ? __x64_sys_ioctl+0x16/0x20
+>  ? do_syscall_64+0x60/0x120
+>  ? entry_SYSCALL_64_after_hwframe+0x49/0xbe
+> 
+> This was on a 5.1.16 distro kernel. Currently rebuilding 5.2 vanilla.
+> 
+> Looks like we have up to two critical bugs here...
+> 
+> Jan
+> 
 
-Fixes: f7077c98
-Reported-by: Kevin Wolf <kwolf@redhat.com>
-Signed-off-by: Eric Blake <eblake@redhat.com>
----
+It turns out it's actually patch 20 that introduces the problem. Maybe it is
+only the kernel, but I rather suspect a combination of userspace not providing
+the right state (specifically on reset) and the kernel accepting that.
 
-'git grep -l "0.10 or 1.1" tests' confirms this was the only
-output file affected
+Continuing the search on 5.2 now.
 
- tests/qemu-iotests/082.out | 54 +++++++++++++++++++-------------------
- 1 file changed, 27 insertions(+), 27 deletions(-)
+Jan
 
-diff --git a/tests/qemu-iotests/082.out b/tests/qemu-iotests/082.out
-index 58de358b38f3..9d4ed4dc9d61 100644
---- a/tests/qemu-iotests/082.out
-+++ b/tests/qemu-iotests/082.out
-@@ -47,7 +47,7 @@ Supported options:
-   backing_file=3D<str>     - File name of a base image
-   backing_fmt=3D<str>      - Image format of the base image
-   cluster_size=3D<size>    - qcow2 cluster size
--  compat=3D<str>           - Compatibility level (0.10 or 1.1)
-+  compat=3D<str>           - Compatibility level (v2 [0.10] or v3 [1.1])
-   data_file=3D<str>        - File name of an external data file
-   data_file_raw=3D<bool (on/off)> - The external data file must stay val=
-id as a raw image
-   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
-@@ -70,7 +70,7 @@ Supported options:
-   backing_file=3D<str>     - File name of a base image
-   backing_fmt=3D<str>      - Image format of the base image
-   cluster_size=3D<size>    - qcow2 cluster size
--  compat=3D<str>           - Compatibility level (0.10 or 1.1)
-+  compat=3D<str>           - Compatibility level (v2 [0.10] or v3 [1.1])
-   data_file=3D<str>        - File name of an external data file
-   data_file_raw=3D<bool (on/off)> - The external data file must stay val=
-id as a raw image
-   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
-@@ -93,7 +93,7 @@ Supported options:
-   backing_file=3D<str>     - File name of a base image
-   backing_fmt=3D<str>      - Image format of the base image
-   cluster_size=3D<size>    - qcow2 cluster size
--  compat=3D<str>           - Compatibility level (0.10 or 1.1)
-+  compat=3D<str>           - Compatibility level (v2 [0.10] or v3 [1.1])
-   data_file=3D<str>        - File name of an external data file
-   data_file_raw=3D<bool (on/off)> - The external data file must stay val=
-id as a raw image
-   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
-@@ -116,7 +116,7 @@ Supported options:
-   backing_file=3D<str>     - File name of a base image
-   backing_fmt=3D<str>      - Image format of the base image
-   cluster_size=3D<size>    - qcow2 cluster size
--  compat=3D<str>           - Compatibility level (0.10 or 1.1)
-+  compat=3D<str>           - Compatibility level (v2 [0.10] or v3 [1.1])
-   data_file=3D<str>        - File name of an external data file
-   data_file_raw=3D<bool (on/off)> - The external data file must stay val=
-id as a raw image
-   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
-@@ -139,7 +139,7 @@ Supported options:
-   backing_file=3D<str>     - File name of a base image
-   backing_fmt=3D<str>      - Image format of the base image
-   cluster_size=3D<size>    - qcow2 cluster size
--  compat=3D<str>           - Compatibility level (0.10 or 1.1)
-+  compat=3D<str>           - Compatibility level (v2 [0.10] or v3 [1.1])
-   data_file=3D<str>        - File name of an external data file
-   data_file_raw=3D<bool (on/off)> - The external data file must stay val=
-id as a raw image
-   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
-@@ -162,7 +162,7 @@ Supported options:
-   backing_file=3D<str>     - File name of a base image
-   backing_fmt=3D<str>      - Image format of the base image
-   cluster_size=3D<size>    - qcow2 cluster size
--  compat=3D<str>           - Compatibility level (0.10 or 1.1)
-+  compat=3D<str>           - Compatibility level (v2 [0.10] or v3 [1.1])
-   data_file=3D<str>        - File name of an external data file
-   data_file_raw=3D<bool (on/off)> - The external data file must stay val=
-id as a raw image
-   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
-@@ -185,7 +185,7 @@ Supported options:
-   backing_file=3D<str>     - File name of a base image
-   backing_fmt=3D<str>      - Image format of the base image
-   cluster_size=3D<size>    - qcow2 cluster size
--  compat=3D<str>           - Compatibility level (0.10 or 1.1)
-+  compat=3D<str>           - Compatibility level (v2 [0.10] or v3 [1.1])
-   data_file=3D<str>        - File name of an external data file
-   data_file_raw=3D<bool (on/off)> - The external data file must stay val=
-id as a raw image
-   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
-@@ -208,7 +208,7 @@ Supported options:
-   backing_file=3D<str>     - File name of a base image
-   backing_fmt=3D<str>      - Image format of the base image
-   cluster_size=3D<size>    - qcow2 cluster size
--  compat=3D<str>           - Compatibility level (0.10 or 1.1)
-+  compat=3D<str>           - Compatibility level (v2 [0.10] or v3 [1.1])
-   data_file=3D<str>        - File name of an external data file
-   data_file_raw=3D<bool (on/off)> - The external data file must stay val=
-id as a raw image
-   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
-@@ -246,7 +246,7 @@ Supported qcow2 options:
-   backing_file=3D<str>     - File name of a base image
-   backing_fmt=3D<str>      - Image format of the base image
-   cluster_size=3D<size>    - qcow2 cluster size
--  compat=3D<str>           - Compatibility level (0.10 or 1.1)
-+  compat=3D<str>           - Compatibility level (v2 [0.10] or v3 [1.1])
-   data_file=3D<str>        - File name of an external data file
-   data_file_raw=3D<bool (on/off)> - The external data file must stay val=
-id as a raw image
-   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
-@@ -327,7 +327,7 @@ Supported options:
-   backing_file=3D<str>     - File name of a base image
-   backing_fmt=3D<str>      - Image format of the base image
-   cluster_size=3D<size>    - qcow2 cluster size
--  compat=3D<str>           - Compatibility level (0.10 or 1.1)
-+  compat=3D<str>           - Compatibility level (v2 [0.10] or v3 [1.1])
-   data_file=3D<str>        - File name of an external data file
-   data_file_raw=3D<bool (on/off)> - The external data file must stay val=
-id as a raw image
-   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
-@@ -350,7 +350,7 @@ Supported options:
-   backing_file=3D<str>     - File name of a base image
-   backing_fmt=3D<str>      - Image format of the base image
-   cluster_size=3D<size>    - qcow2 cluster size
--  compat=3D<str>           - Compatibility level (0.10 or 1.1)
-+  compat=3D<str>           - Compatibility level (v2 [0.10] or v3 [1.1])
-   data_file=3D<str>        - File name of an external data file
-   data_file_raw=3D<bool (on/off)> - The external data file must stay val=
-id as a raw image
-   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
-@@ -373,7 +373,7 @@ Supported options:
-   backing_file=3D<str>     - File name of a base image
-   backing_fmt=3D<str>      - Image format of the base image
-   cluster_size=3D<size>    - qcow2 cluster size
--  compat=3D<str>           - Compatibility level (0.10 or 1.1)
-+  compat=3D<str>           - Compatibility level (v2 [0.10] or v3 [1.1])
-   data_file=3D<str>        - File name of an external data file
-   data_file_raw=3D<bool (on/off)> - The external data file must stay val=
-id as a raw image
-   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
-@@ -396,7 +396,7 @@ Supported options:
-   backing_file=3D<str>     - File name of a base image
-   backing_fmt=3D<str>      - Image format of the base image
-   cluster_size=3D<size>    - qcow2 cluster size
--  compat=3D<str>           - Compatibility level (0.10 or 1.1)
-+  compat=3D<str>           - Compatibility level (v2 [0.10] or v3 [1.1])
-   data_file=3D<str>        - File name of an external data file
-   data_file_raw=3D<bool (on/off)> - The external data file must stay val=
-id as a raw image
-   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
-@@ -419,7 +419,7 @@ Supported options:
-   backing_file=3D<str>     - File name of a base image
-   backing_fmt=3D<str>      - Image format of the base image
-   cluster_size=3D<size>    - qcow2 cluster size
--  compat=3D<str>           - Compatibility level (0.10 or 1.1)
-+  compat=3D<str>           - Compatibility level (v2 [0.10] or v3 [1.1])
-   data_file=3D<str>        - File name of an external data file
-   data_file_raw=3D<bool (on/off)> - The external data file must stay val=
-id as a raw image
-   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
-@@ -442,7 +442,7 @@ Supported options:
-   backing_file=3D<str>     - File name of a base image
-   backing_fmt=3D<str>      - Image format of the base image
-   cluster_size=3D<size>    - qcow2 cluster size
--  compat=3D<str>           - Compatibility level (0.10 or 1.1)
-+  compat=3D<str>           - Compatibility level (v2 [0.10] or v3 [1.1])
-   data_file=3D<str>        - File name of an external data file
-   data_file_raw=3D<bool (on/off)> - The external data file must stay val=
-id as a raw image
-   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
-@@ -465,7 +465,7 @@ Supported options:
-   backing_file=3D<str>     - File name of a base image
-   backing_fmt=3D<str>      - Image format of the base image
-   cluster_size=3D<size>    - qcow2 cluster size
--  compat=3D<str>           - Compatibility level (0.10 or 1.1)
-+  compat=3D<str>           - Compatibility level (v2 [0.10] or v3 [1.1])
-   data_file=3D<str>        - File name of an external data file
-   data_file_raw=3D<bool (on/off)> - The external data file must stay val=
-id as a raw image
-   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
-@@ -488,7 +488,7 @@ Supported options:
-   backing_file=3D<str>     - File name of a base image
-   backing_fmt=3D<str>      - Image format of the base image
-   cluster_size=3D<size>    - qcow2 cluster size
--  compat=3D<str>           - Compatibility level (0.10 or 1.1)
-+  compat=3D<str>           - Compatibility level (v2 [0.10] or v3 [1.1])
-   data_file=3D<str>        - File name of an external data file
-   data_file_raw=3D<bool (on/off)> - The external data file must stay val=
-id as a raw image
-   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
-@@ -526,7 +526,7 @@ Supported qcow2 options:
-   backing_file=3D<str>     - File name of a base image
-   backing_fmt=3D<str>      - Image format of the base image
-   cluster_size=3D<size>    - qcow2 cluster size
--  compat=3D<str>           - Compatibility level (0.10 or 1.1)
-+  compat=3D<str>           - Compatibility level (v2 [0.10] or v3 [1.1])
-   data_file=3D<str>        - File name of an external data file
-   data_file_raw=3D<bool (on/off)> - The external data file must stay val=
-id as a raw image
-   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
-@@ -618,7 +618,7 @@ Creation options for 'qcow2':
-   backing_file=3D<str>     - File name of a base image
-   backing_fmt=3D<str>      - Image format of the base image
-   cluster_size=3D<size>    - qcow2 cluster size
--  compat=3D<str>           - Compatibility level (0.10 or 1.1)
-+  compat=3D<str>           - Compatibility level (v2 [0.10] or v3 [1.1])
-   data_file=3D<str>        - File name of an external data file
-   data_file_raw=3D<bool (on/off)> - The external data file must stay val=
-id as a raw image
-   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
-@@ -642,7 +642,7 @@ Creation options for 'qcow2':
-   backing_file=3D<str>     - File name of a base image
-   backing_fmt=3D<str>      - Image format of the base image
-   cluster_size=3D<size>    - qcow2 cluster size
--  compat=3D<str>           - Compatibility level (0.10 or 1.1)
-+  compat=3D<str>           - Compatibility level (v2 [0.10] or v3 [1.1])
-   data_file=3D<str>        - File name of an external data file
-   data_file_raw=3D<bool (on/off)> - The external data file must stay val=
-id as a raw image
-   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
-@@ -666,7 +666,7 @@ Creation options for 'qcow2':
-   backing_file=3D<str>     - File name of a base image
-   backing_fmt=3D<str>      - Image format of the base image
-   cluster_size=3D<size>    - qcow2 cluster size
--  compat=3D<str>           - Compatibility level (0.10 or 1.1)
-+  compat=3D<str>           - Compatibility level (v2 [0.10] or v3 [1.1])
-   data_file=3D<str>        - File name of an external data file
-   data_file_raw=3D<bool (on/off)> - The external data file must stay val=
-id as a raw image
-   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
-@@ -690,7 +690,7 @@ Creation options for 'qcow2':
-   backing_file=3D<str>     - File name of a base image
-   backing_fmt=3D<str>      - Image format of the base image
-   cluster_size=3D<size>    - qcow2 cluster size
--  compat=3D<str>           - Compatibility level (0.10 or 1.1)
-+  compat=3D<str>           - Compatibility level (v2 [0.10] or v3 [1.1])
-   data_file=3D<str>        - File name of an external data file
-   data_file_raw=3D<bool (on/off)> - The external data file must stay val=
-id as a raw image
-   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
-@@ -714,7 +714,7 @@ Creation options for 'qcow2':
-   backing_file=3D<str>     - File name of a base image
-   backing_fmt=3D<str>      - Image format of the base image
-   cluster_size=3D<size>    - qcow2 cluster size
--  compat=3D<str>           - Compatibility level (0.10 or 1.1)
-+  compat=3D<str>           - Compatibility level (v2 [0.10] or v3 [1.1])
-   data_file=3D<str>        - File name of an external data file
-   data_file_raw=3D<bool (on/off)> - The external data file must stay val=
-id as a raw image
-   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
-@@ -738,7 +738,7 @@ Creation options for 'qcow2':
-   backing_file=3D<str>     - File name of a base image
-   backing_fmt=3D<str>      - Image format of the base image
-   cluster_size=3D<size>    - qcow2 cluster size
--  compat=3D<str>           - Compatibility level (0.10 or 1.1)
-+  compat=3D<str>           - Compatibility level (v2 [0.10] or v3 [1.1])
-   data_file=3D<str>        - File name of an external data file
-   data_file_raw=3D<bool (on/off)> - The external data file must stay val=
-id as a raw image
-   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
-@@ -762,7 +762,7 @@ Creation options for 'qcow2':
-   backing_file=3D<str>     - File name of a base image
-   backing_fmt=3D<str>      - Image format of the base image
-   cluster_size=3D<size>    - qcow2 cluster size
--  compat=3D<str>           - Compatibility level (0.10 or 1.1)
-+  compat=3D<str>           - Compatibility level (v2 [0.10] or v3 [1.1])
-   data_file=3D<str>        - File name of an external data file
-   data_file_raw=3D<bool (on/off)> - The external data file must stay val=
-id as a raw image
-   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
-@@ -786,7 +786,7 @@ Creation options for 'qcow2':
-   backing_file=3D<str>     - File name of a base image
-   backing_fmt=3D<str>      - Image format of the base image
-   cluster_size=3D<size>    - qcow2 cluster size
--  compat=3D<str>           - Compatibility level (0.10 or 1.1)
-+  compat=3D<str>           - Compatibility level (v2 [0.10] or v3 [1.1])
-   data_file=3D<str>        - File name of an external data file
-   data_file_raw=3D<bool (on/off)> - The external data file must stay val=
-id as a raw image
-   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
-@@ -827,7 +827,7 @@ Creation options for 'qcow2':
-   backing_file=3D<str>     - File name of a base image
-   backing_fmt=3D<str>      - Image format of the base image
-   cluster_size=3D<size>    - qcow2 cluster size
--  compat=3D<str>           - Compatibility level (0.10 or 1.1)
-+  compat=3D<str>           - Compatibility level (v2 [0.10] or v3 [1.1])
-   data_file=3D<str>        - File name of an external data file
-   data_file_raw=3D<bool (on/off)> - The external data file must stay val=
-id as a raw image
-   encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
---=20
-2.20.1
-
+-- 
+Siemens AG, Corporate Technology, CT RDA IOT SES-DE
+Corporate Competence Center Embedded Linux
 
