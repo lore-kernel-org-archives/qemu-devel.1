@@ -2,83 +2,64 @@ Return-Path: <SRS0=vrBk=VF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DBFC9C5B578
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 08:54:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC3D6C48BE7
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 09:10:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ABF4820844
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 08:54:48 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OlRoo8OB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ABF4820844
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id B106D205ED
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 09:10:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B106D205ED
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39550 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39666 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hkPQ5-0007w7-75
-	for qemu-devel@archiver.kernel.org; Mon, 08 Jul 2019 04:54:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38077)
+	id 1hkPfD-0002zD-S5
+	for qemu-devel@archiver.kernel.org; Mon, 08 Jul 2019 05:10:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42741)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hkPNb-00075L-P1
- for qemu-devel@nongnu.org; Mon, 08 Jul 2019 04:52:12 -0400
+ (envelope-from <imammedo@redhat.com>) id 1hkPeL-0002Pq-Qx
+ for qemu-devel@nongnu.org; Mon, 08 Jul 2019 05:09:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hkPNa-0007sG-EW
- for qemu-devel@nongnu.org; Mon, 08 Jul 2019 04:52:11 -0400
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:40438)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hkPNa-0007pL-7u
- for qemu-devel@nongnu.org; Mon, 08 Jul 2019 04:52:10 -0400
-Received: by mail-oi1-x242.google.com with SMTP id w196so11978464oie.7
- for <qemu-devel@nongnu.org>; Mon, 08 Jul 2019 01:52:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=iUdf517MWdBwlxi0FoaYCJGa4nrX7/86UoauhXyfiSM=;
- b=OlRoo8OBH9PuUUBviIr6FgaaQQVm3RktmdZmv5jADXQQiuFTvq85quX6WK/bfoyssf
- e7WO0GS8rtCJstbdF3xurKj0XjvyR2QQgvqbeDurxX6GAzJ5maxjxarNH0EryTczTOTd
- lso+KIL4xV4+qB1XsvAxkIaEGJZoODcPDsOi3Kzkw+huNg2QAw1ZybEHehZUX5Rpj7x4
- M9QNj/8xbZyCRDwMtvlL/2+3Dc55TDkiLINSdaw/SvTDxUqZpajSjOXBB89m5HUs4Pmp
- G7p/psqoEmMhuBTVlUBtIwLUi+RLRZlbr1TUNBq7DYNmvTLynC0ljwJCdXwBQV+CJG9/
- ZCaA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=iUdf517MWdBwlxi0FoaYCJGa4nrX7/86UoauhXyfiSM=;
- b=jmmb7m3zpGLmOZqhZbI0pGNI4C5FMuwM/JHIo7+Xq7W1kIVuHmcDuFLeHJiaDNB9/t
- i7OvyKC5yN6ni8AjYRg9NzpG6rFA/MS4bnWK7+Kk5DrjXD01YNOD/ulU0tJxdWEf0mIT
- mtfo8sluSi55s31Oqa5eibYGY9x8tZXXKb2B5GKO+qLy7PyKC3ys634eeOlfjGCSefCH
- mNYOmR1fOv2PaYpfgfy7gQuXVZdUvrxqJ0QHqkvpmr3PjsZdPY51J6FULY+fm6LA2otD
- ANg5ZstxY8U66JFy5hgHbyVbKprqxufFBaO6kMZOXbZofDL4de3qMmme8dxbKe2hqCtA
- 7A3Q==
-X-Gm-Message-State: APjAAAWdkKlQ6SFiRDkSVX3s7q7NBWlgSSXZ7aznn+z7ktRFy6KLD3S7
- HmkVirhLWfn0zArJlTHDa0ckOPwUcB4WdUrDsF6vyrikwU0=
-X-Google-Smtp-Source: APXvYqxl0BL7lqJIUdNiO9qQfgieVa6mvnO9t/kBNy0qMFUArS3q59wjVb7dI9BS1rddusddnWDX2Ym+K1pPGR210Aw=
-X-Received: by 2002:a05:6808:8c2:: with SMTP id
- k2mr8609311oij.98.1562575576736; 
- Mon, 08 Jul 2019 01:46:16 -0700 (PDT)
+ (envelope-from <imammedo@redhat.com>) id 1hkPeK-0001Ih-L9
+ for qemu-devel@nongnu.org; Mon, 08 Jul 2019 05:09:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50110)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hkPeK-0001Hq-FJ
+ for qemu-devel@nongnu.org; Mon, 08 Jul 2019 05:09:28 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id B2E7A3086218;
+ Mon,  8 Jul 2019 09:09:26 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.182])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3403D5D9E5;
+ Mon,  8 Jul 2019 09:09:25 +0000 (UTC)
+Date: Mon, 8 Jul 2019 11:09:20 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Tao Xu <tao3.xu@intel.com>
+Message-ID: <20190708110920.40204b47@redhat.com>
+In-Reply-To: <77ae1297-edb1-dcb2-b57e-e9e01b64139a@intel.com>
+References: <20190614155626.27932-1-tao3.xu@intel.com>
+ <20190614155626.27932-7-tao3.xu@intel.com>
+ <20190701132532.2699a98a@redhat.com>
+ <77ae1297-edb1-dcb2-b57e-e9e01b64139a@intel.com>
 MIME-Version: 1.0
-References: <156217961567.21218.1941224583128986225@c4a48874b076>
- <0a0abd7a-ce36-6faa-cba8-b6a40e7b503e@vivier.eu>
- <CAFEAcA96z+9kMG1iDmBLa-MXuRez7XNyN7TigdaiNCBiy=2UuA@mail.gmail.com>
-In-Reply-To: <CAFEAcA96z+9kMG1iDmBLa-MXuRez7XNyN7TigdaiNCBiy=2UuA@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 8 Jul 2019 09:46:05 +0100
-Message-ID: <CAFEAcA8xFy+dC-WzurjieTaj5wK5H_eRx3R6LScck=08u5pmkw@mail.gmail.com>
-To: Laurent Vivier <laurent@vivier.eu>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::242
-Subject: Re: [Qemu-devel] [PULL v2 0/2] Trivial branch patches
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.42]); Mon, 08 Jul 2019 09:09:27 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v5 6/8] hmat acpi: Build Memory Subsystem
+ Address Range Structure(s) in ACPI HMAT
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,44 +71,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: no-reply@patchew.org, QEMU Trivial <qemu-trivial@nongnu.org>,
- Michael Tokarev <mjt@tls.msk.ru>, QEMU Developers <qemu-devel@nongnu.org>,
- Amit Shah <amit@kernel.org>
+Cc: ehabkost@redhat.com, jingqi.liu@intel.com, fan.du@intel.com,
+ qemu-devel@nongnu.org, Jonathan Cameron <jonathan.cameron@huawei.com>,
+ Dan Williams <dan.j.williams@intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 5 Jul 2019 at 16:16, Peter Maydell <peter.maydell@linaro.org> wrote=
-:
->
-> On Fri, 5 Jul 2019 at 16:10, Laurent Vivier <laurent@vivier.eu> wrote:
-> >
-> > Le 03/07/2019 =C3=A0 20:46, no-reply@patchew.org a =C3=A9crit :
-> > > Patchew URL: https://patchew.org/QEMU/20190703152513.29166-1-laurent@=
-vivier.eu/
-> > >
-> > ...
-> > > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > > =3D=3D12708=3D=3DERROR: LeakSanitizer: detected memory leaks
-> > >
-> > > Direct leak of 32 byte(s) in 1 object(s) allocated from:
-> > >     #0 0x56164f580b6e in calloc (/tmp/qemu-test/build/x86_64-softmmu/=
-qemu-system-x86_64+0x19f9b6e)
-> > > ---
-> >
-> > It seems not related. Does it prevent the series to be merged?
->
-> Yeah, it's unrelated (an issue in master which is now fixed), but I
-> had missed your v2 pullreq amongst all the noise. Thanks for the ping --
-> I'm running it through the test process now.
+On Tue, 2 Jul 2019 16:50:24 +0800
+Tao Xu <tao3.xu@intel.com> wrote:
 
+> On 7/1/2019 7:25 PM, Igor Mammedov wrote:
+> > On Fri, 14 Jun 2019 23:56:24 +0800
+> > Tao Xu <tao3.xu@intel.com> wrote:
+> >   
+> ...
+> >> @@ -2710,6 +2711,8 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
+> >>               acpi_add_table(table_offsets, tables_blob);
+> >>               build_slit(tables_blob, tables->linker, machine);
+> >>           }
+> >> +        acpi_add_table(table_offsets, tables_blob);
+> >> +        build_hmat(tables_blob, tables->linker, machine);  
+> > I'm not sure if we should add it unconditionally.
+> > Is this table used in any meaningful manner by guest when
+> > it's incomplete (i.e. populated only with SPA records)?
+> >   
+> Hi Igor,
+> 
+> In ACPI 6.2, the linux kernel use it to show the memory ranges' 
+> node-id(Proximity Domain). In ACPI 6.3, the linux kernel use it to show 
+> the numa node's closest initiator(Generic Initiator or Processor, directly
+> attached). It is useful for a memory only numa node, because with 
+> SPA(renamed as "Memory Proximity Domain Attributes Structure" in ACPI 
+> 6.3) the user-space can know the topology of hardware heterogeneous 
+> memory. I think I should add a doc to describe the use case in QEMU.
+Could you point out to me the specific kernel code that parses and uses HMAT?
 
-Applied, thanks.
+> 
+> Therefore, the numa CLI may be lack of a input which can indicate the 
+> Initiator of a memory only numa node. Dan suggested me to add a new 
+> parameter for that[1].
+> 
+> Maybe like:
+> -numa node,mem=4G,nodeid=2,initiator=0
+> 
+> [1] https://patchwork.kernel.org/cover/10934417/
+> 
+> Thanks
+> 
+> Tao
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.1
-for any user-visible changes.
-
--- PMM
 
