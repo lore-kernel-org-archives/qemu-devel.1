@@ -6,57 +6,57 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5476DC606BF
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 14:23:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECB78C606BD
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 14:24:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 281BA20844
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 14:23:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 281BA20844
+	by mail.kernel.org (Postfix) with ESMTPS id C113B20844
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 14:24:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C113B20844
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42158 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42180 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hkUYI-0006aX-GB
-	for qemu-devel@archiver.kernel.org; Mon, 08 Jul 2019 10:23:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39912)
+	id 1hkUZL-0008Oo-0M
+	for qemu-devel@archiver.kernel.org; Mon, 08 Jul 2019 10:24:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40008)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <kwolf@redhat.com>) id 1hkUTc-0001qK-TR
- for qemu-devel@nongnu.org; Mon, 08 Jul 2019 10:18:45 -0400
+ (envelope-from <kwolf@redhat.com>) id 1hkUTw-0002Bt-N2
+ for qemu-devel@nongnu.org; Mon, 08 Jul 2019 10:19:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1hkUTb-0008VA-OW
- for qemu-devel@nongnu.org; Mon, 08 Jul 2019 10:18:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47568)
+ (envelope-from <kwolf@redhat.com>) id 1hkUTt-0000id-QO
+ for qemu-devel@nongnu.org; Mon, 08 Jul 2019 10:19:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43650)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <kwolf@redhat.com>)
- id 1hkUTY-0008LM-Be; Mon, 08 Jul 2019 10:18:40 -0400
+ id 1hkUTo-0000Ux-Q0; Mon, 08 Jul 2019 10:18:57 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A1B902E95BE;
- Mon,  8 Jul 2019 14:18:34 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 52E5B3002738;
+ Mon,  8 Jul 2019 14:18:40 +0000 (UTC)
 Received: from linux.fritz.box.com (ovpn-116-204.ams2.redhat.com
  [10.36.116.204])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 143B751DFA;
- Mon,  8 Jul 2019 14:18:30 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 492F851F02;
+ Mon,  8 Jul 2019 14:18:37 +0000 (UTC)
 From: Kevin Wolf <kwolf@redhat.com>
 To: qemu-block@nongnu.org
-Date: Mon,  8 Jul 2019 16:18:10 +0200
-Message-Id: <20190708141812.3974-5-kwolf@redhat.com>
+Date: Mon,  8 Jul 2019 16:18:12 +0200
+Message-Id: <20190708141812.3974-7-kwolf@redhat.com>
 In-Reply-To: <20190708141812.3974-1-kwolf@redhat.com>
 References: <20190708141812.3974-1-kwolf@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.29]); Mon, 08 Jul 2019 14:18:39 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.46]); Mon, 08 Jul 2019 14:18:45 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 4/6] block/qcow: Improve error when opening
- qcow2 files as qcow
+Subject: [Qemu-devel] [PULL 6/6] qcow2: Allow -o compat=v3 during qemu-img
+ amend
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,40 +73,49 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: John Snow <jsnow@redhat.com>
+From: Eric Blake <eblake@redhat.com>
 
-Reported-by: radmehrsaeed7@gmail.com
-Fixes: https://bugs.launchpad.net/bugs/1832914
-Signed-off-by: John Snow <jsnow@redhat.com>
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Commit b76b4f60 allowed '-o compat=3Dv3' as an alias for the
+less-appealing '-o compat=3D1.1' for 'qemu-img create' since we want to
+use the QMP form as much as possible, but forgot to do likewise for
+qemu-img amend.  Also, it doesn't help that '-o help' doesn't list our
+new preferred spellings.
+
+Signed-off-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/qcow.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ block/qcow2.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/block/qcow.c b/block/qcow.c
-index 6dee5bb792..5bdf72ba33 100644
---- a/block/qcow.c
-+++ b/block/qcow.c
-@@ -156,7 +156,12 @@ static int qcow_open(BlockDriverState *bs, QDict *op=
-tions, int flags,
-         goto fail;
-     }
-     if (header.version !=3D QCOW_VERSION) {
--        error_setg(errp, "Unsupported qcow version %" PRIu32, header.ver=
-sion);
-+        error_setg(errp, "qcow (v%d) does not support qcow version %" PR=
-Iu32,
-+                   QCOW_VERSION, header.version);
-+        if (header.version =3D=3D 2 || header.version =3D=3D 3) {
-+            error_append_hint(errp, "Try the 'qcow2' driver instead.\n")=
-;
-+        }
-+
-         ret =3D -ENOTSUP;
-         goto fail;
-     }
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 2a59eb27fe..039bdc2f7e 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -4823,9 +4823,9 @@ static int qcow2_amend_options(BlockDriverState *bs=
+, QemuOpts *opts,
+             compat =3D qemu_opt_get(opts, BLOCK_OPT_COMPAT_LEVEL);
+             if (!compat) {
+                 /* preserve default */
+-            } else if (!strcmp(compat, "0.10")) {
++            } else if (!strcmp(compat, "0.10") || !strcmp(compat, "v2"))=
+ {
+                 new_version =3D 2;
+-            } else if (!strcmp(compat, "1.1")) {
++            } else if (!strcmp(compat, "1.1") || !strcmp(compat, "v3")) =
+{
+                 new_version =3D 3;
+             } else {
+                 error_setg(errp, "Unknown compatibility level %s", compa=
+t);
+@@ -5098,7 +5098,7 @@ static QemuOptsList qcow2_create_opts =3D {
+         {
+             .name =3D BLOCK_OPT_COMPAT_LEVEL,
+             .type =3D QEMU_OPT_STRING,
+-            .help =3D "Compatibility level (0.10 or 1.1)"
++            .help =3D "Compatibility level (v2 [0.10] or v3 [1.1])"
+         },
+         {
+             .name =3D BLOCK_OPT_BACKING_FILE,
 --=20
 2.20.1
 
