@@ -2,81 +2,72 @@ Return-Path: <SRS0=vrBk=VF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6AA9C606A7
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 10:34:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 408E9C606AA
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 10:39:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B631D20656
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 10:34:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B631D20656
+	by mail.kernel.org (Postfix) with ESMTPS id 0FF392053B
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 10:39:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0FF392053B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40280 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40296 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hkQyZ-00084V-VH
-	for qemu-devel@archiver.kernel.org; Mon, 08 Jul 2019 06:34:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36019)
+	id 1hkR3E-00017A-31
+	for qemu-devel@archiver.kernel.org; Mon, 08 Jul 2019 06:39:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37431)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hkQvL-0007KY-9t
- for qemu-devel@nongnu.org; Mon, 08 Jul 2019 06:31:08 -0400
+ (envelope-from <berrange@redhat.com>) id 1hkR2H-0000fM-IP
+ for qemu-devel@nongnu.org; Mon, 08 Jul 2019 06:38:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hkQvK-0005lr-53
- for qemu-devel@nongnu.org; Mon, 08 Jul 2019 06:31:07 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:46740)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hkQvJ-0005lU-Rd
- for qemu-devel@nongnu.org; Mon, 08 Jul 2019 06:31:05 -0400
-Received: by mail-wr1-f66.google.com with SMTP id z1so11811568wru.13
- for <qemu-devel@nongnu.org>; Mon, 08 Jul 2019 03:31:05 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=hF7UVqwijPHZ9t69gGwYDNbu+YA+hZic/Nq2VgyNwJ4=;
- b=OBezDiqL+RFyBkLwCRiRpyDWy7kAoQ8kG0zzI0p9uX7oLvSemhuuQZhf8wFJNQ+qp5
- xPf4X1Wqtusx6PTLxqrjjEclbpgMF1ARuYhWv/N7PmFscpJ86hF4+i6PkL5LpMyjlg9F
- C3IH+syZ5Ut9zT2sqNGo9bYkcFuCBqUUmN8FZgsLgFysTFUVwKc859qU3uHv45UkAYO6
- 2QTyeeEqwOL4UsT+/+qz3yA67UxhMkQapJAxPVHuCy6lqM25JKKLoyoCuohMA3iMNg3V
- 8ice7W3QZajG18eAzynys8MAHwwTPOUexufQKt8gVcYu+xhZ1ybRCqajIdI0Nx4YjJ5q
- Tofg==
-X-Gm-Message-State: APjAAAVTYW6w+DhThjoBhw/TBmtg4GSZE2I9Qdq6uAkuiyLEMB2IdyZf
- Vf5FKJ0S6pkkwanqSLFCYTP5aA==
-X-Google-Smtp-Source: APXvYqxpiXJ0zU5+9vs/stvk+BZZf3glwtKTYz09yA7S45gyGAET6Sp+2d2rRQU+Cu9PWJLD8B1hxg==
-X-Received: by 2002:adf:ea45:: with SMTP id j5mr17520034wrn.11.1562581864769; 
- Mon, 08 Jul 2019 03:31:04 -0700 (PDT)
-Received: from [192.168.1.103] (56.red-88-18-140.staticip.rima-tde.net.
- [88.18.140.56])
- by smtp.gmail.com with ESMTPSA id u18sm15832471wmd.19.2019.07.08.03.31.03
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Mon, 08 Jul 2019 03:31:04 -0700 (PDT)
-To: Francisco Iglesias <frasse.iglesias@gmail.com>
-References: <20190705202500.18853-1-philmd@redhat.com>
- <20190705202500.18853-4-philmd@redhat.com>
- <20190705222429.ox6z6wckkupjpug2@fralle-msi>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <cc2c2c78-70ad-f7e2-99a9-a428303c7f5e@redhat.com>
-Date: Mon, 8 Jul 2019 12:31:02 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ (envelope-from <berrange@redhat.com>) id 1hkR2F-0000DG-Vy
+ for qemu-devel@nongnu.org; Mon, 08 Jul 2019 06:38:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42016)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hkR2F-0000Ca-OT
+ for qemu-devel@nongnu.org; Mon, 08 Jul 2019 06:38:15 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id D8F7281DFC
+ for <qemu-devel@nongnu.org>; Mon,  8 Jul 2019 10:38:11 +0000 (UTC)
+Received: from redhat.com (unknown [10.42.17.95])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id BAE5D5C46B;
+ Mon,  8 Jul 2019 10:38:06 +0000 (UTC)
+Date: Mon, 8 Jul 2019 11:38:04 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Message-ID: <20190708103804.GG3082@redhat.com>
+References: <20190703172501.GI23082@redhat.com>
+ <20190704102457.GE1609@stefanha-x1.localdomain>
+ <20190704102837.GA24190@redhat.com>
+ <20190705080717.GD10995@stefanha-x1.localdomain>
+ <8470a203-430b-1814-b2ef-6adf3fa739a6@redhat.com>
+ <87d0iok4ai.fsf@dusky.pond.sub.org>
+ <c4997dee-932c-eb57-23b9-4b51e8856f91@redhat.com>
+ <874l3zhktx.fsf@dusky.pond.sub.org>
+ <20190708093400.GB3082@redhat.com>
+ <e396d430-1e6e-2e0b-454b-5c4208756742@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190705222429.ox6z6wckkupjpug2@fralle-msi>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Disposition: inline
+In-Reply-To: <e396d430-1e6e-2e0b-454b-5c4208756742@redhat.com>
+User-Agent: Mutt/1.12.0 (2019-05-25)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.25]); Mon, 08 Jul 2019 10:38:14 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.221.66
-Subject: Re: [Qemu-devel] [RFC PATCH-for-4.1 v4 3/3] hw/ssi/xilinx_spips:
- Avoid out-of-bound access to lqspi_buf[]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [RFC PATCH-for-4.2] tracing: Allow to tune tracing
+ options via the environment
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,65 +79,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Alistair Francis <alistair@alistair23.me>, qemu-devel@nongnu.org,
- Prasad J Pandit <ppandit@redhat.com>, Lei Sun <slei.casper@gmail.com>,
- qemu-arm@nongnu.org, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/6/19 12:24 AM, Francisco Iglesias wrote:
-> Hi Philippe,
-> 
-> On [2019 Jul 05] Fri 22:25:00, Philippe Mathieu-Daudé wrote:
->> Both lqspi_read() and lqspi_load_cache() expect a 32-bit
->> aligned address.
->>
->> Set MemoryRegionOps.impl values to force 32-bit accesses,
->> this way we are sure we do not access the lqspi_buf[] array
->> out of bound.
-> 
-> The patch and correction follows chapter 24 aswell (UG1085) so I suggest
-> dropping 'RFC' in the subject.
+On Mon, Jul 08, 2019 at 12:27:12PM +0200, Philippe Mathieu-Daud=C3=A9 wro=
+te:
+> On 7/8/19 11:34 AM, Daniel P. Berrang=C3=A9 wrote:
+> > On Sat, Jul 06, 2019 at 06:02:18AM +0200, Markus Armbruster wrote:
+> >> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+> >>
+> >>> On 7/5/19 3:19 PM, Markus Armbruster wrote:
+> >>>> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+> >>>>> On 7/5/19 10:07 AM, Stefan Hajnoczi wrote:
+> >>>>>> On Thu, Jul 04, 2019 at 11:28:37AM +0100, Daniel P. Berrang=C3=A9=
+ wrote:
+> >>>>>>> On Thu, Jul 04, 2019 at 11:24:57AM +0100, Stefan Hajnoczi wrote=
+:
+> >> [...]
+> >>>>>>>> What is the concern about adding these environment variables t=
+o QEMU?
+> >>>>>>>>
+> >>>>>>>> It is convenient to be able to use tracing even if QEMU is inv=
+oked by
+> >>>>>>>> something you cannot modify/control.
+> >>>>>>>>
+> >>>>>>>> The main issues I see with environment variables are:
+> >>>>>>>>
+> >>>>>>>> 1. Security.  Is there a scenario where an attacker can use en=
+vironment
+> >>>>>>>>    variables to influence the behavior of a QEMU process runni=
+ng at a
+> >>>>>>>>    different trust level?
+> >>>>
+> >>>> The common (and sad) solution for this is to require whatever runs=
+ $PROG
+> >>>> at a different trust level to scrub the environment.
+> >>>
+> >>> I hope people concerned by security build QEMU with the NOP trace b=
+ackend.
+> >>
+> >> I sure hope at least one of our tracing backends (other than nop) ca=
+n be
+> >> used safely in production.
+>=20
+> I'm not saying production and security are orthogonal, but recent trend
+> in security seems to reduce code exposure by disabling component, so I'=
+d
+> not be surprise if people who primary concern is strong security to use
+> the NOP trace backend as default.
+>=20
+> > AFAIK, *all* of the trace backends are safe for use in production. Th=
+e
+> > only questions are around performance in production.  If anyone knows=
+ of
+> > any security problems with specific backends we should either address=
+ them,
+> > or document the backend is unsafe.
+>=20
+> I hope the tracing backend/frontends are safe. Now the trace events log
+> a bunch of interesting information, so I'd not be surprise if some
+> security researcher open a "QEMU information leak" CVE because we log
+> various guest pointers i.e.
 
-OK.
+There would only be an information leak if the information was made
+available to users/apps which are running at a lower privilege level
+than QEMU. If you are root, or running as the QEMU user/group, then
+all the information is already available by ptrace'ing QEMU or other
+means. The tracing framework merely makes it available in an easier
+to access way.
 
->>
->> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
->> ---
->> Late friday patch...
->>
->>  hw/ssi/xilinx_spips.c | 4 ++++
->>  1 file changed, 4 insertions(+)
->>
->> diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
->> index 3c4e8365ee..8f705132a3 100644
->> --- a/hw/ssi/xilinx_spips.c
->> +++ b/hw/ssi/xilinx_spips.c
->> @@ -1243,6 +1243,10 @@ static const MemoryRegionOps lqspi_ops = {
->>          .min_access_size = 1,
->>          .max_access_size = 4
->>      }
-> 
-> A comma is missing on the line above (else the patch doesn't compile).
+> Anyway, to stop bikeshedding this thread, can you add few lines about
+> why not use getenv() in the HACKING?
 
-Sorry, I first added this block before '.valid' and tested it, then
-moved it and thought the trailing comma was not useful and forgot to
-test for the previous '.valid' field :/
+I don't actually think the getenv thing is a security issue in any case.
+If there was a security problem exploitable via getenv, then the bug woul=
+d
+lie in the application invoking QEMU for not ensuring the ENV contents
+were safe before exec'ing QEMU. Libvirt is paranoid by default and scrubs
+QEMU's env only keeping a specific sanitized whitelist for exactly these
+reasons.
 
-> 
-> Best regards,
-> Francisco
-> 
->> +    .impl = {
->> +        .min_access_size = 4,
->> +        .max_access_size = 4,
->> +    }
->>  };
->>  
->>  static void xilinx_spips_realize(DeviceState *dev, Error **errp)
->> -- 
->> 2.20.1
->>
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
 
