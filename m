@@ -2,68 +2,98 @@ Return-Path: <SRS0=vrBk=VF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC42CC48BE7
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 04:53:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6961CC48BE7
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 05:14:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9411220659
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 04:53:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9411220659
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=weilnetz.de
+	by mail.kernel.org (Postfix) with ESMTPS id 27DB020651
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 05:14:58 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="QSAxz4wZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 27DB020651
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38632 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38654 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hkLeS-0001Lj-Ty
-	for qemu-devel@archiver.kernel.org; Mon, 08 Jul 2019 00:53:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39625)
+	id 1hkLzN-00040x-8G
+	for qemu-devel@archiver.kernel.org; Mon, 08 Jul 2019 01:14:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43981)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <sw@weilnetz.de>) id 1hkLdy-0000uN-86
- for qemu-devel@nongnu.org; Mon, 08 Jul 2019 00:52:51 -0400
+ (envelope-from <yuval.shaia@oracle.com>) id 1hkLyM-0003Z0-2w
+ for qemu-devel@nongnu.org; Mon, 08 Jul 2019 01:13:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <sw@weilnetz.de>) id 1hkLdw-0001Jb-DG
- for qemu-devel@nongnu.org; Mon, 08 Jul 2019 00:52:49 -0400
-Received: from mail.weilnetz.de ([37.120.169.71]:54538
- helo=v2201612906741603.powersrv.de)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <sw@weilnetz.de>) id 1hkLds-0001Fz-Ea
- for qemu-devel@nongnu.org; Mon, 08 Jul 2019 00:52:46 -0400
-Received: from localhost (localhost [127.0.0.1])
- by v2201612906741603.powersrv.de (Postfix) with ESMTP id BE7F8DB85DF;
- Mon,  8 Jul 2019 06:52:40 +0200 (CEST)
-X-Virus-Scanned: Debian amavisd-new at v2201612906741603.powersrv.de
-Received: from v2201612906741603.powersrv.de ([127.0.0.1])
- by localhost (v2201612906741603.powersrv.de [127.0.0.1]) (amavisd-new,
- port 10024)
- with ESMTP id 3bsF8pbFGyWq; Mon,  8 Jul 2019 06:52:39 +0200 (CEST)
-Received: from edv-macbook-pro.fritz.box (p57B4293C.dip0.t-ipconnect.de
- [87.180.41.60])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by v2201612906741603.powersrv.de (Postfix) with ESMTPSA id 1C264DB7F0B;
- Mon,  8 Jul 2019 06:52:39 +0200 (CEST)
-To: Markus Armbruster <armbru@redhat.com>
-References: <1534182832-554-1-git-send-email-aleksandar.markovic@rt-rk.com>
- <1534182832-554-5-git-send-email-aleksandar.markovic@rt-rk.com>
- <4da49ffe-902f-2cf2-8a21-2bbd511b17a4@weilnetz.de>
- <87imsdcf5l.fsf@dusky.pond.sub.org>
-From: Stefan Weil <sw@weilnetz.de>
-Message-ID: <7e6fb611-ef18-459a-4676-3c10c2f41249@weilnetz.de>
-Date: Mon, 8 Jul 2019 06:52:38 +0200
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
- Gecko/20100101 Thunderbird/60.7.2
+ (envelope-from <yuval.shaia@oracle.com>) id 1hkLyK-0003yQ-LZ
+ for qemu-devel@nongnu.org; Mon, 08 Jul 2019 01:13:54 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:36518)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
+ id 1hkLyK-0003wu-Bw
+ for qemu-devel@nongnu.org; Mon, 08 Jul 2019 01:13:52 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+ by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x685DchH155572;
+ Mon, 8 Jul 2019 05:13:48 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=corp-2018-07-02;
+ bh=bKpHI3iHiimOh+WP1IiqFKrgV4gWcpStEG+H2R2hG/s=;
+ b=QSAxz4wZXrUTrbN3MJ0XjGWmfRTsyA0vE4nb2thhPW3ttStgGCHO8rkFzuOYyYsDREMX
+ PiXOvA6Ttw8/coe+HyHsq2ME5+5IlKpdiHen3CqKnlUUySyAiJqCUVT09mFHFTdghv18
+ zCe3/P8XgVKEOFMjEI3NBzABEbC2iiWaIaTI3eDuziw/haR2+xW5lNy7x/bYM6jOmowb
+ KSEj60LwDZiOYa+NKzPNbI+oJSE4hTmCbaSSJU5OF6F9EDEyK76GUxgvWcxnK/rnWG/q
+ q9zzwXFedFJJlBjwUWPc83peaw27VkNjXWaNtUefMSzl8k1Df90UziCD1LAmCSba0TwG kg== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+ by userp2120.oracle.com with ESMTP id 2tjm9qc2nk-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 08 Jul 2019 05:13:47 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+ by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x685CsAI007646;
+ Mon, 8 Jul 2019 05:13:47 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+ by userp3030.oracle.com with ESMTP id 2tjgrtanxv-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 08 Jul 2019 05:13:47 +0000
+Received: from abhmp0020.oracle.com (abhmp0020.oracle.com [141.146.116.26])
+ by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x685Dkms008724;
+ Mon, 8 Jul 2019 05:13:47 GMT
+Received: from lap1 (/77.138.183.59) by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Sun, 07 Jul 2019 22:13:45 -0700
+Date: Mon, 8 Jul 2019 08:13:39 +0300
+From: Yuval Shaia <yuval.shaia@oracle.com>
+To: Sukrit Bhatnagar <skrtbhtngr@gmail.com>
+Message-ID: <20190708051338.GA5441@lap1>
+References: <20190706040940.7884-1-skrtbhtngr@gmail.com>
+ <20190706040940.7884-3-skrtbhtngr@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <87imsdcf5l.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 37.120.169.71
-Subject: Re: [Qemu-devel] Handling of fall through code
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190706040940.7884-3-skrtbhtngr@gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9311
+ signatures=668688
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
+ malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1907080067
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9311
+ signatures=668688
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+ priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1907080067
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 156.151.31.85
+Subject: Re: [Qemu-devel] [RFC v2 2/2] hw/pvrdma: add live migration support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,115 +105,206 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, pburton@wavecomp.com, smarkovic@wavecomp.com,
- riku.voipio@iki.fi, richard.henderson@linaro.org, qemu-devel@nongnu.org,
- laurent@vivier.eu, Aleksandar Markovic <aleksandar.markovic@rt-rk.com>,
- philippe.mathieu.daude@gmail.com, amarkovic@wavecomp.com,
- pjovanovic@wavecomp.com, aurelien@aurel32.net
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 08.07.19 um 06:40 schrieb Markus Armbruster:
+On Sat, Jul 06, 2019 at 09:39:40AM +0530, Sukrit Bhatnagar wrote:
+> Use VMStateDescription for migrating device state. Currently,
 
-> Stefan Weil <sw@weilnetz.de> writes:
->
->> - Some code is correct, but has no indication that the fallthrough is
->> intentional.
-> I'd treat that as a bug.
+What do you mean by 'Currently'?
 
+> 'vmstate_pvrdma' describes the PCI and MSIX state for pvrdma and
+> 'vmstate_pvrdma_dsr_dma' describes a temporary state containing
+> some values obtained only after mapping to dsr in the source.
+> Since the dsr will not be available on dest until we map to the
+> dma address we had on source, these values cannot be migrated
+> directly.
+> 
+> Add PVRDMAMigTmp to store this temporary state which consists of
+> dma addresses and ring page information. The 'parent' member is
+> used to refer to the device state (PVRDMADev) so that parent PCI
+> device object is accessible, which is needed to remap to DSR.
+> 
+> pvrdma_dsr_dma_pre_save() saves the dsr state into this temporary
+> representation and pvrdma_dsr_dma_post_load() loads it back.
+> This load function also remaps to the dsr and and calls
+> load_dsr() for further map and ring init operations.
+> 
+> Please note that this call to load_dsr() can be removed from the
+> migration flow and included in pvrdma_regs_write() to perform a
+> lazy load.
 
-Sure.
+The lazy load was suggested to overcome a potential problem with mapping to
+addresses while still in migration process. With that been solved i would
+suggest to drop the idea of lazy load.
 
+> As of now, migration will fail if there in an error in load_dsr().
+> Also, there might be a considerable amount of pages in the rings,
+> which will have dma map operations when the init functions are
+> called.
+> If this takes noticeable time, it might be better to have lazy
+> load instead.
 
->
->> - There is also fallthrough code which is obviously not correct (even
->> in target/mips/translate.c).
-> Bug.
+Yeah, make sense but i hope we will not get to this.
 
+> 
+> Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+> Cc: Yuval Shaia <yuval.shaia@oracle.com>
+> Signed-off-by: Sukrit Bhatnagar <skrtbhtngr@gmail.com>
+> ---
+>  hw/rdma/vmw/pvrdma_main.c | 87 +++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 87 insertions(+)
+> 
+> diff --git a/hw/rdma/vmw/pvrdma_main.c b/hw/rdma/vmw/pvrdma_main.c
+> index 6c90db96f9..4a10bd2fc7 100644
+> --- a/hw/rdma/vmw/pvrdma_main.c
+> +++ b/hw/rdma/vmw/pvrdma_main.c
+> @@ -28,6 +28,7 @@
+>  #include "sysemu/sysemu.h"
+>  #include "monitor/monitor.h"
+>  #include "hw/rdma/rdma.h"
+> +#include "migration/register.h"
+>  
+>  #include "../rdma_rm.h"
+>  #include "../rdma_backend.h"
+> @@ -593,6 +594,91 @@ static void pvrdma_shutdown_notifier(Notifier *n, void *opaque)
+>      pvrdma_fini(pci_dev);
+>  }
+>  
+> +struct PVRDMAMigTmp {
+> +    PVRDMADev *parent;
+> +    uint64_t dma;
+> +    uint64_t cmd_slot_dma;
+> +    uint64_t resp_slot_dma;
+> +    uint32_t cq_ring_pages_num_pages;
+> +    uint64_t cq_ring_pages_pdir_dma;
+> +    uint32_t async_ring_pages_num_pages;
+> +    uint64_t async_ring_pages_pdir_dma;
+> +};
+> +
+> +static int pvrdma_dsr_dma_pre_save(void *opaque)
+> +{
+> +    struct PVRDMAMigTmp *tmp = opaque;
 
-Yes, of course.
+For me tmp sounds like a very bad name, if it is the convention then i can
+live with that, anyways suggesting something like mig_tmp_info or something
+like that.
 
+> +    DSRInfo *dsr_info = &tmp->parent->dsr_info;
 
->
->> I suggest to enable -Werror=3Dimplicit-fallthrough by default and add =
-a
->> new macro to mark all fallthrough locations which are correct, but not
->> accepted by the compiler.
->>
->> This can be done with a definition for GCC compatible compilers in
->> include/qemu/compiler.h:
->>
->> #define QEMU_FALLTHROUGH __attribute__ ((fallthrough))
->>
->> Then fallthrough code would look like this:
->>
->>  =C2=A0=C2=A0=C2=A0 case 1:
->>  =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 do_something();
->>  =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 QEMU_FALLTHROUGH;
->>
->>  =C2=A0=C2=A0=C2=A0 case 2:
->>
->>
->> VIXL_FALLTHROUGH also needs a similar definition to work with gcc-8.3.=
-0.
->>
->> Please comment. Would you prefer another macro name or a macro with
->> parentheses like this:
->>
->> #define QEMU_FALLTHROUGH() __attribute__ ((fallthrough))
-> In my opinion, the macro is no clearer than proper comments.
->
-> I'd prefer -Wimplicit-fallthrough=3D1 or 2.  The former makes gcc accep=
-t
-> any comment.  The latter makes it accept '.*falls?[ \t-]*thr(ough|u).*'=
-,
-> which should still match the majority of our comments.  Less churn than
-> the macro.
-[...]
-> Another macro which is currently missing is a scanf variant of GCC_FMT_=
-ATTR.
->
-> I suggest to add and use a GCC_SCANF_ATTR macro:
->
-> #define GCC_SCANF_ATTR(n, m) __attribute__((format(gnu_scanf, n, m)))
-> Do we define our own scanf()-like functions?  If yes, decorating them
-> with the attribute is a good idea.
+Can you shad some light on how the parent field is initialized with the
+pointer to the device object?
 
+> +    struct pvrdma_device_shared_region *dsr = dsr_info->dsr;
+> +
+> +    tmp->dma = dsr_info->dma;
+> +    tmp->cmd_slot_dma = dsr->cmd_slot_dma;
+> +    tmp->resp_slot_dma = dsr->resp_slot_dma;
+> +    tmp->cq_ring_pages_num_pages = dsr->cq_ring_pages.num_pages;
+> +    tmp->cq_ring_pages_pdir_dma = dsr->cq_ring_pages.pdir_dma;
+> +    tmp->async_ring_pages_num_pages = dsr->async_ring_pages.num_pages;
+> +    tmp->async_ring_pages_pdir_dma = dsr->async_ring_pages.pdir_dma;
+> +
+> +    return 0;
+> +}
+> +
+> +static int pvrdma_dsr_dma_post_load(void *opaque, int version_id)
+> +{
+> +    struct PVRDMAMigTmp *tmp = opaque;
+> +    PVRDMADev *dev = tmp->parent;
+> +    PCIDevice *pci_dev = PCI_DEVICE(dev);
+> +    DSRInfo *dsr_info = &dev->dsr_info;
+> +    struct pvrdma_device_shared_region *dsr;
+> +
+> +    dsr_info->dma = tmp->dma;
+> +    dsr_info->dsr = rdma_pci_dma_map(pci_dev, dsr_info->dma,
+> +                                sizeof(struct pvrdma_device_shared_region));
+> +    if (!dsr_info->dsr) {
+> +        rdma_error_report("Failed to map to DSR");
+> +        return -ENOMEM;
 
-xen_device_backend_scanf, xs_node_vscanf, xs_node_scanf,=20
-xen_device_frontend_scanf
+Will this cause the VM on source host to continue functioning besides
+failing the migration?
 
-Maybe more. The compiler can tell you missing attributes.
+> +    }
+> +
+> +    dsr = dsr_info->dsr;
+> +    dsr->cmd_slot_dma = tmp->cmd_slot_dma;
+> +    dsr->resp_slot_dma = tmp->resp_slot_dma;
+> +    dsr->cq_ring_pages.num_pages = tmp->cq_ring_pages_num_pages;
+> +    dsr->cq_ring_pages.pdir_dma = tmp->cq_ring_pages_pdir_dma;
+> +    dsr->async_ring_pages.num_pages = tmp->async_ring_pages_num_pages;
+> +    dsr->async_ring_pages.pdir_dma = tmp->async_ring_pages_pdir_dma;
 
+I expect the above 6 fields to be already populated with the correct values
+as we just map to driver's DSR that should be migrated as part of memory
+copy of source to dest host.
+Can you verify it and if my assumptions are correct to remove these
+assignments (and the corresponding from pre_save)?
 
->
-> However, the gnu_ in gnu_scanf tells the compiler we're linking with th=
-e
-> GNU C Library, which seems unwise.  Hmm, we already use gnu_printf.
-> Commit 9c9e7d51bf0:
->
->      Newer gcc versions support format gnu_printf which is
->      better suited for use in QEMU than format printf
->      (QEMU always uses standard format strings (even with mingw32)).
->
-> Should we limit the use of gnu_printf to #ifdef _WIN32?
+> +
+> +    return load_dsr(dev);
+> +}
+> +
+> +static const VMStateDescription vmstate_pvrdma_dsr_dma = {
+> +    .name = "pvrdma-dsr-dma",
+> +    .pre_save = pvrdma_dsr_dma_pre_save,
+> +    .post_load = pvrdma_dsr_dma_post_load,
 
+I'm looking for a hook that is triggered just before leaving the source
+host so we can do some needed cleanups such as unmapping the DSR, removing
+IP addresses from the host etc.
 
-No, because we don't want lots of conditional code with different format=20
-strings for POSIX and Windows (I made that commit 9 years ago).
+> +    .fields = (VMStateField[]) {
+> +            VMSTATE_UINT64(dma, struct PVRDMAMigTmp),
+> +            VMSTATE_UINT64(cmd_slot_dma, struct PVRDMAMigTmp),
+> +            VMSTATE_UINT64(resp_slot_dma, struct PVRDMAMigTmp),
+> +            VMSTATE_UINT32(async_ring_pages_num_pages, struct PVRDMAMigTmp),
+> +            VMSTATE_UINT64(async_ring_pages_pdir_dma, struct PVRDMAMigTmp),
+> +            VMSTATE_UINT32(cq_ring_pages_num_pages, struct PVRDMAMigTmp),
+> +            VMSTATE_UINT64(cq_ring_pages_pdir_dma, struct PVRDMAMigTmp),
+> +            VMSTATE_END_OF_LIST()
+> +    }
+> +};
+> +
+> +static const VMStateDescription vmstate_pvrdma = {
+> +    .name = "pvrdma",
 
+Suggesting to use the already defined constant PVRDMA_HW_NAME.
 
->> A more regular solution would require renaming GCC_FMT_ATTR to
->> GCC_FMT_PRINTF and use GCC_FMT_SCANF for the new macro.
-> Quite some churn, but regularity matters.
+> +    .version_id = 1,
+> +    .minimum_version_id = 1,
 
+Hmmm...interesting, what's the use of these fields?
 
-I could do that when adding the new macro, but would like to hear more=20
-opinions on that.
+> +    .fields = (VMStateField[]) {
+> +            VMSTATE_PCI_DEVICE(parent_obj, PVRDMADev),
+> +            VMSTATE_MSIX(parent_obj, PVRDMADev),
+> +            VMSTATE_WITH_TMP(PVRDMADev,
+> +                             struct PVRDMAMigTmp,
+> +                             vmstate_pvrdma_dsr_dma),
+> +            VMSTATE_END_OF_LIST()
+> +    }
+> +};
+> +
+>  static void pvrdma_realize(PCIDevice *pdev, Error **errp)
+>  {
+>      int rc = 0;
+> @@ -688,6 +774,7 @@ static void pvrdma_class_init(ObjectClass *klass, void *data)
+>  
+>      dc->desc = "RDMA Device";
+>      dc->props = pvrdma_dev_properties;
+> +    dc->vmsd = &vmstate_pvrdma;
+>      set_bit(DEVICE_CATEGORY_NETWORK, dc->categories);
 
-Thank you,
+Besides the above comments looks like a great job, thanks!
 
-Stefan
-
+>  
+>      ir->print_statistics = pvrdma_print_statistics;
+> -- 
+> 2.21.0
+> 
+> 
 
