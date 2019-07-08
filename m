@@ -6,63 +6,59 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD5E5C606AC
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 13:08:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6830CC606B4
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 13:19:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A582120861
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 13:08:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A582120861
+	by mail.kernel.org (Postfix) with ESMTPS id 44F3920861
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 13:19:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 44F3920861
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41586 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41654 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hkTNN-0008NO-Ow
-	for qemu-devel@archiver.kernel.org; Mon, 08 Jul 2019 09:08:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48165)
+	id 1hkTYZ-00047y-CS
+	for qemu-devel@archiver.kernel.org; Mon, 08 Jul 2019 09:19:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50937)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mlevitsk@redhat.com>) id 1hkTMA-0007fr-Af
- for qemu-devel@nongnu.org; Mon, 08 Jul 2019 09:06:59 -0400
+ (envelope-from <mlevitsk@redhat.com>) id 1hkTWk-0002lO-G3
+ for qemu-devel@nongnu.org; Mon, 08 Jul 2019 09:18:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlevitsk@redhat.com>) id 1hkTM9-0001Mw-5y
- for qemu-devel@nongnu.org; Mon, 08 Jul 2019 09:06:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33050)
+ (envelope-from <mlevitsk@redhat.com>) id 1hkTWi-0000Pd-DN
+ for qemu-devel@nongnu.org; Mon, 08 Jul 2019 09:17:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58710)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mlevitsk@redhat.com>)
- id 1hkTM2-0001IA-Mc; Mon, 08 Jul 2019 09:06:50 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ id 1hkTWV-0008KI-Vs; Mon, 08 Jul 2019 09:17:41 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id EB11AC0578F2;
- Mon,  8 Jul 2019 13:06:49 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 930B98E22C;
+ Mon,  8 Jul 2019 13:16:50 +0000 (UTC)
 Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.83])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5B85D57984;
- Mon,  8 Jul 2019 13:06:45 +0000 (UTC)
-Message-ID: <55254f0299763e72795830220c6ceadb8d460bfb.camel@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 01AD42B9F5;
+ Mon,  8 Jul 2019 13:16:46 +0000 (UTC)
+Message-ID: <7470cb6f1a3889015a086d340cc83ff326b9e720.camel@redhat.com>
 From: Maxim Levitsky <mlevitsk@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
-Date: Mon, 08 Jul 2019 16:06:44 +0300
-In-Reply-To: <32e58390-1093-c470-84be-980f1b3e12f5@redhat.com>
-References: <20190703155944.9637-1-mlevitsk@redhat.com>
- <20190703155944.9637-2-mlevitsk@redhat.com>
- <c47da7ef-82ac-1a76-9c8e-f76336c20c44@redhat.com>
- <d009ad68b237aae51d327955367dc2356f33bba0.camel@redhat.com>
- <5d32c846-1ff6-ec99-af20-8e7a794c4fe2@redhat.com>
- <7eeafe074290d5374b5ad6c0fc81d1c0dea492e1.camel@redhat.com>
- <32e58390-1093-c470-84be-980f1b3e12f5@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, "wangjie (P)" <wangjie88@huawei.com>
+Date: Mon, 08 Jul 2019 16:16:43 +0300
+In-Reply-To: <20190705075053.GA5016@dhcp-200-226.str.redhat.com>
+References: <2b55a1d9-7c4f-c895-95fa-a32a7f63ad07@huawei.com>
+ <20190705075053.GA5016@dhcp-200-226.str.redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Mon, 08 Jul 2019 13:06:50 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.26]); Mon, 08 Jul 2019 13:16:55 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 1/6] block/nvme: don't touch the
- completion entries
+Subject: Re: [Qemu-devel] 
+ =?utf-8?q?=5BQemu-block=5D_question=EF=BC=9Aabout_i?=
+ =?utf-8?q?ntroduce_a_new_feature_named_=E2=80=9CI/O_hang=E2=80=9D?=
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,114 +70,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Paolo Bonzini <pbonzini@redhat.com>,
- John Snow <jsnow@redhat.com>, qemu-block@nongnu.org,
- Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, "Fangyi \(C\)" <eric.fangyi@huawei.com>,
+ armbru@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 2019-07-08 at 15:00 +0200, Max Reitz wrote:
-> On 08.07.19 14:51, Maxim Levitsky wrote:
-> > On Mon, 2019-07-08 at 14:23 +0200, Max Reitz wrote:
-> > > On 07.07.19 10:43, Maxim Levitsky wrote:
-> > > > On Fri, 2019-07-05 at 13:03 +0200, Max Reitz wrote:
-> > > > > On 03.07.19 17:59, Maxim Levitsky wrote:
-> > > > > > Completion entries are meant to be only read by the host and =
-written by the device.
-> > > > > > The driver is supposed to scan the completions from the last =
-point where it left,
-> > > > > > and until it sees a completion with non flipped phase bit.
-> > > > >=20
-> > > > > (Disclaimer: This is the first time I read the nvme driver, or =
-really
-> > > > > something in the nvme spec.)
-> > > > >=20
-> > > > > Well, no, completion entries are also meant to be initialized b=
-y the
-> > > > > host.  To me it looks like this is the place where that happens=
-:
-> > > > > Everything that has been processed by the device is immediately=
- being
-> > > > > re-initialized.
-> > > > >=20
-> > > > > Maybe we shouldn=E2=80=99t do that here but in nvme_submit_comm=
-and().  But
-> > > > > currently we don=E2=80=99t, and I don=E2=80=99t see any other p=
-lace where we currently
-> > > > > initialize the CQ entries.
-> > > >=20
-> > > > Hi!
-> > > > I couldn't find any place in the spec that says that completion e=
-ntries should be initialized.
-> > > > It is probably wise to initialize that area to 0 on driver initia=
-lization, but nothing beyond that.
-> > >=20
-> > > Ah, you=E2=80=99re right, I misread.  I didn=E2=80=99t pay as much =
-attention to the
-> > > =E2=80=9C...prior to setting CC.EN to =E2=80=981=E2=80=99=E2=80=9D =
-as I should have.  Yep, and that is
-> > > done in nvme_init_queue().
-> > >=20
-> > > OK, I cease my wrongful protest:
-> > >=20
-> > > Reviewed-by: Max Reitz <mreitz@redhat.com>
-> > >=20
-> > > >=20
+On Fri, 2019-07-05 at 09:50 +0200, Kevin Wolf wrote:
+> Am 04.07.2019 um 17:16 hat wangjie (P) geschrieben:
+> > Hi, everybody=EF=BC=9A
 > >=20
-> > Thank you very much!
-> > BTW, the qemu driver does allocate zeroed memory (in nvme_init_queue,=
-=20
-> > "q->queue =3D qemu_try_blockalign0(bs, bytes);"
+> > I developed a feature named "I/O hang"=EF=BC=8Cmy intention is to sol=
+ve the problem
+> > like that=EF=BC=9A
+> > If the backend storage media of VM disk is far-end storage like IPSAN=
+ or
+> > FCSAN, storage net link will always disconnection and
+> > make I/O requests return EIO to Guest, and the status of filesystem i=
+n Guest
+> > will be read-only, even the link recovered
+> > after a while, the status of filesystem in Guest will not recover.
 >=20
-> Yes, that=E2=80=99s what I was referring to above. :-)
->=20
-> > Thus I think this is all that is needed in that regard.
-> >=20
-> > Note that this patch doesn't fix any real bug I know of,=20
-> > but just makes the thing right in regard to the spec.
-> > Also racing with hardware in theory can have various memory ordering =
-bugs,
-> > although in this case the writes are done in=20
-> > entries which controller probably won't touch, but still.
-> >=20
-> > TL;DR - no need in code which does nothing and might cause issues.
-> >=20
-> > Do you want me to resend the series or shall I wait till we decide
-> > what to do with the image creation support? I done fixing all the
-> > review comments long ago, just didn't want to resend the series.
-> > Or shall I drop that patch and resend?
->=20
-> I think I won=E2=80=99t apply the image creation patch now, so it=E2=80=
-=99s probably
-> better to just drop it for now.
->=20
-> > From the urgency standpoint the only patch that really should
-> > be merged ASAP is the one that adds support for block sizes,
-> > because without it, the whole thing crashes and burns on 4K
-> > nvme drives.
->=20
-> By now we=E2=80=99re in softfreeze anyway, so unless write-zeroes/disca=
-rd
-> support is important now, it=E2=80=99s difficult to justify taking them=
- for 4.1.
->  So for me it would be best if you put patches 1 through 3 into a
-> for-4.1 series and move the rest to 4.2.  (I=E2=80=99d probably also sp=
-lit the
-> creation patch off, because I don=E2=80=99t think I=E2=80=99m going to =
-apply it before
-> having experimented a bit with blockdev-create for qemu-img.)
->=20
-> If you think write-zeroes/discard support is important for 4.1, feel
-> free to include them in the for-4.1 series along with an explanation as
-> to why it=E2=80=99s important.
-
-I don't think either that these are important, so I split them as you say=
+> The standard solution for this is configuring the guest device with
+> werror=3Dstop,rerror=3Dstop so that the error is not delivered to the g=
+uest,
+> but the VM is stopped. When you run 'cont', the request is then retried=
 .
+>=20
+> > So I developed a feature named "I/O hang" to solve this problem, the
+> > solution like that=EF=BC=9A
+> > when some I/O requests return EIO in backend, "I/O hang" will catch t=
+he
+> > requests in qemu block layer and
+> > insert the requests to a rehandle queue but not return EIO to Guest, =
+the I/O
+> > requests in Guest will hang but it does not lead
+> > Guest filesystem to be read-only, then "I/O hang" will loop to rehand=
+le the
+> > requests for a period time(ex. 5 second) until the requests
+> > not return EIO(when backend storage link recovered).
+>=20
+> Letting requests hang without stopping the VM risks the guest running
+> into timeouts and deciding that its disk is broken.
+I came to say exactly this.
+While developing the nvme-mdev I also had this problem and due to assumpt=
+ions built in the block layer,
+you can't just let the guest wait forever for a request.
+
+Note that Linux's nvme driver does know how to retry failed requests, inc=
+luding these that timed out if that helps in any way.
 
 Best regards,
 	Maxim Levitsky
 
+
+>=20
+> As you say your "hang" and retry logic sits in the block layer, what do
+> you do when you encounter a bdrv_drain() request?
+>=20
+> > In addition to the function as above, "I/O hang" also can sent event =
+to
+> > libvirt after backend storage status changed.
+> >=20
+> > configure methods:
+> > 1. "I/O hang" ability can be configured for each disk as a disk attri=
+bute.
+> > 2. "I/O hang" timeout value also can be configured for each disk, whe=
+n
+> > storage link not recover in timeout value,
+> >    "I/O hang" will disable rehandle I/O requests and return EIO to Gu=
+est.
+> >=20
+> > Are you interested in the feature?  I intend to push this feature to =
+qemu
+> > org, what's your opinion?
+>=20
+> Were you aware of werror/rerror? Before we add another mechanism, we
+> need to be sure how the features compare, that the new mechanism
+> provides a significant advantage and that we keep code duplication as
+> low as possible.
+>=20
+> Kevin
+>=20
 
 
 
