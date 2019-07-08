@@ -6,65 +6,68 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E237C606C1
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 15:22:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B4F7C606BD
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 15:35:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4A436216E3
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 15:22:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A436216E3
+	by mail.kernel.org (Postfix) with ESMTPS id 179B821738
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 15:35:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 179B821738
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42616 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42708 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hkVTJ-0003Vr-S4
-	for qemu-devel@archiver.kernel.org; Mon, 08 Jul 2019 11:22:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57381)
+	id 1hkVft-0007Vz-Rz
+	for qemu-devel@archiver.kernel.org; Mon, 08 Jul 2019 11:35:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60988)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bounces@canonical.com>) id 1hkVRe-0002yy-9E
- for qemu-devel@nongnu.org; Mon, 08 Jul 2019 11:20:47 -0400
+ (envelope-from <bounces@canonical.com>) id 1hkVbo-0005jv-P5
+ for qemu-devel@nongnu.org; Mon, 08 Jul 2019 11:31:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1hkVRc-0008SV-VM
- for qemu-devel@nongnu.org; Mon, 08 Jul 2019 11:20:46 -0400
-Received: from indium.canonical.com ([91.189.90.7]:38548)
+ (envelope-from <bounces@canonical.com>) id 1hkVbn-0003q5-FB
+ for qemu-devel@nongnu.org; Mon, 08 Jul 2019 11:31:16 -0400
+Received: from indium.canonical.com ([91.189.90.7]:42512)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1hkVRc-0008Jr-Oj
- for qemu-devel@nongnu.org; Mon, 08 Jul 2019 11:20:44 -0400
+ id 1hkVbl-0003f6-Cg
+ for qemu-devel@nongnu.org; Mon, 08 Jul 2019 11:31:15 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1hkVRZ-0002Zj-Kr
- for <qemu-devel@nongnu.org>; Mon, 08 Jul 2019 15:20:41 +0000
+ id 1hkVbi-0004gE-Mb
+ for <qemu-devel@nongnu.org>; Mon, 08 Jul 2019 15:31:10 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 9A4BB2E80BA
- for <qemu-devel@nongnu.org>; Mon,  8 Jul 2019 15:20:41 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id A53722E804E
+ for <qemu-devel@nongnu.org>; Mon,  8 Jul 2019 15:31:10 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 08 Jul 2019 15:11:27 -0000
+Date: Mon, 08 Jul 2019 15:22:32 -0000
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug: product=qemu; status=Fix Committed; importance=Undecided;
+ assignee=rth@twiddle.net; 
+X-Launchpad-Bug-Tags: arm tcg testcase
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: mintriago pmaydell
-X-Launchpad-Bug-Reporter: Matthew Intriago (mintriago)
+X-Launchpad-Bug-Commenters: ajbennee christophe-lyon pmaydell rth
+X-Launchpad-Bug-Reporter: Christophe Lyon (christophe-lyon)
 X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
-References: <156259768655.23216.11898576300198780398.malonedeb@chaenomeles.canonical.com>
-Message-Id: <156259868748.23172.15735392480581630204.malone@chaenomeles.canonical.com>
+References: <156025884763.18155.9614824235777300144.malonedeb@wampee.canonical.com>
+Message-Id: <156259935287.23134.15406095978480159975.malone@chaenomeles.canonical.com>
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com); Revision="19007";
  Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 7b5529ba272d4990f8c17976efa1c9051027e6d1
+X-Launchpad-Hash: 7a9d0faf8d39686e38d856c5a3fbfd66defd4f80
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1835793] Re: Running an edk2 based bios
+Subject: [Qemu-devel] [Bug 1832353] Re: cpu_exec: Assertion
+ !have_mmap_lock() failed
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 List-Id: <qemu-devel.nongnu.org>
@@ -75,67 +78,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1835793 <1835793@bugs.launchpad.net>
+Reply-To: Bug 1832353 <1832353@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-"Guest has not initialized display" simply means that the guest code
-you're running has not done anything to the display device (VGA in this
-case). There are two main reasons for this:
+The fix for this bug is now in master and will be in QEMU 4.1.
 
- (1) the guest code isn't intended to output to the display -- perhaps
-it sends its output to the serial port instead. In this case the fix is
-to use the right QEMU arguments to send the serial port output somewhere
-you can read it (or to reconfigure the guest code to output where you
-want it to).
 
- (2) the guest code is intended to output to the display, but it crashed
-before it got as far as doing that. In this case, the fix is to debug
-your guest code. QEMU's gdbstub is usually a good tool to use here. If
-you control the guest code (ie you can modify and recompile it) you can
-also add extra debugging to it (like making it output more information
-earlier, or output debugging trace information to the serial port so you
-can see how far it has got).
+** Changed in: qemu
+       Status: In Progress =3D> Won't Fix
 
-My guess would be that this is a variation on 2 caused by your BIOS
-being compiled to assume different hardware from what QEMU is providing
--- if the BIOS tries to write to a device that isn't present it will
-likely crash or go into an infinite loop.
+** Changed in: qemu
+       Status: Won't Fix =3D> Fix Committed
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1835793
+https://bugs.launchpad.net/bugs/1832353
 
 Title:
-  Running an edk2 based bios
+  cpu_exec: Assertion !have_mmap_lock() failed
 
 Status in QEMU:
-  New
+  Fix Committed
 
 Bug description:
-  This is not necessarily a bug, however I wasn't sure were to get help.
+  Hi,
 
-  I am currently working on using QEMU  to run a BIOS my company has
-  developed. In order to see if the software was working correctly, I
-  was able to successfully run the edk2 bios using the following
-  command:
+  I have isolated a testcase from the GCC testsuite (actually gfortran,
+  test proc_ptr_51.f90) which produces tons of:
 
-  qemu-system-x86_64.exe -bios
-  "C:\Users\matthew.intriago\Desktop\ovmf.fd" -net none
+  qemu-arm: /home/christophe.lyon/src/qemu/accel/tcg/cpu-exec.c:701:
+  cpu_exec: Assertion `!have_mmap_lock()' failed.
 
-  However, when running the same command using  our personalized bios,
-  QEMU launches stating that =E2=80=9Cguest has not initialized display=E2=
-=80=9D.
-  Theoretically, QEMU should be able to run the bios since it is edk2
-  based, the only difference between the two is that our bios has more
-  features.
+  including with master qemu as of today.
 
-  If anyone has any insight on what the issue might be I would greatly
-  appreciate any help.
+  I'm attaching a tarball containing:
+  qemu-assert:
+  cmd  lib  proc_ptr_51.exe
+
+  qemu-assert/lib:
+  ld-linux-armhf.so.3  libc.so.6  libgcc_s.so.1  libgfortran.so.5  libm.so.6
+
+  where cmd is the basic command used to launch the test & reproduce the
+  failure.
+
+  Note that the test or the generated may actually be buggy: I have
+  reported failures on native aarch64 and arm machines. Yet, qemu should
+  not fail with a loop of asserts.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1835793/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1832353/+subscriptions
 
