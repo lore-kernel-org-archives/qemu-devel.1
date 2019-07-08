@@ -2,65 +2,93 @@ Return-Path: <SRS0=vrBk=VF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8127DC606BD
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 16:07:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D228C606BD
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 16:08:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 59846204EC
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 16:07:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 59846204EC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4BB9A20693
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 16:08:46 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a6oz8I6g"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4BB9A20693
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43164 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43176 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hkWBH-00077l-HW
-	for qemu-devel@archiver.kernel.org; Mon, 08 Jul 2019 12:07:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42320)
+	id 1hkWC5-00006l-8z
+	for qemu-devel@archiver.kernel.org; Mon, 08 Jul 2019 12:08:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42410)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgilbert@redhat.com>) id 1hkW6y-0004NS-RS
- for qemu-devel@nongnu.org; Mon, 08 Jul 2019 12:03:30 -0400
+ (envelope-from <frasse.iglesias@gmail.com>) id 1hkW7D-0004oH-Lc
+ for qemu-devel@nongnu.org; Mon, 08 Jul 2019 12:03:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1hkW6x-0004SC-JM
- for qemu-devel@nongnu.org; Mon, 08 Jul 2019 12:03:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:61529)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hkW6w-0004NA-0D
- for qemu-devel@nongnu.org; Mon, 08 Jul 2019 12:03:27 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E316885540;
- Mon,  8 Jul 2019 16:03:23 +0000 (UTC)
-Received: from work-vm (ovpn-117-74.ams2.redhat.com [10.36.117.74])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A23F05D9C8;
- Mon,  8 Jul 2019 16:03:22 +0000 (UTC)
-Date: Mon, 8 Jul 2019 17:03:20 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Message-ID: <20190708160320.GM2746@work-vm>
-References: <20190705010711.23277-1-marcel.apfelbaum@gmail.com>
- <03CB6DEC-3D25-4C09-9C9C-3A5206D1D1F7@gmail.com>
- <CAMzgYoMzLHEpSwLOu4nZAEK_E50xBsaYUfdXeCeHrq+-kaL=4w@mail.gmail.com>
- <49bb8456-a4b1-5a0e-e34d-cf5977e821ae@gmail.com>
+ (envelope-from <frasse.iglesias@gmail.com>) id 1hkW7C-0004po-A3
+ for qemu-devel@nongnu.org; Mon, 08 Jul 2019 12:03:43 -0400
+Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:44919)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <frasse.iglesias@gmail.com>)
+ id 1hkW7C-0004mD-0x; Mon, 08 Jul 2019 12:03:42 -0400
+Received: by mail-lj1-x241.google.com with SMTP id k18so16468282ljc.11;
+ Mon, 08 Jul 2019 09:03:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:content-transfer-encoding:in-reply-to
+ :user-agent; bh=KBRi8cQQBvYj9KgVf2TGXS8dksaF/hFUiXEmkZ/cCDY=;
+ b=a6oz8I6g+LvCFA04palZPcwOX+tiqF8U9i9sx8lVPAbi41jksm29RNZYh87lVcIT9f
+ p4wQ4hwrpYeVK2cQpQRiSDHprReCbZ0CXjh7Oks3nB7tN52XkyBitBPsqgHoUqEolaGd
+ 5jYzyehU5JNNdT0mjq0z56kQvlQ6Kwl/eGURP0kQmxnGIVj9FDnQWsSThC4Vp745+X95
+ 1Wt2nWf8rNfLI4fqqC+qxj+v2wcw9795rhS317Ts/YT3XpQ/CNE9XhOyXP8WXwzlMYZc
+ qyA13i3M47e1fpSz946Jk2D6gU+RkVNzrT4N20N+MG+mjsnuLXhx9HfGoudnN33z8bII
+ 7jpg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to:user-agent;
+ bh=KBRi8cQQBvYj9KgVf2TGXS8dksaF/hFUiXEmkZ/cCDY=;
+ b=TQiNa+AY5HCkWNY24w+JH3zaqSY8uc1HYgJuLjYH68vebdtxhnvltIa3dT2zbdjp10
+ UiQ98G124aGKwIvGdTmdXhV0JKayziQEOzBxGntaGaO5VW1C1ULzcUcT3K4aTefZVAzZ
+ CK55es5IIRbgtMRix7Q/Of1x82pJtDbeScoBYocTP+OEueRY5TNsHnyQqclhHQTRtN7n
+ FkE3w7hYksuymHZuWE6sX40YDQEbQB/GJaB36VNT35uXhmys6UOhge6wN2ZwkcqxuCfA
+ 3XKR6LC8t1HRQELfU+B8IpxvIAJzVHCVjenfklgkclaLFvXWNMxhNtsUfRCFRMuZCAax
+ QBFw==
+X-Gm-Message-State: APjAAAValDi6gP3Yg26kYlDyWY2X4jo+5/9MkjA3AoCDkGNWjTeSfKI1
+ EDUsyg/p32ijmn2910GHuqo=
+X-Google-Smtp-Source: APXvYqzRASdJIgnTV1nPpnut6ER3B32uN3LRuDrVYPM+eTnVXRJQzBvC0Rk1n5gV35/7jHDdMf+AZw==
+X-Received: by 2002:a2e:868e:: with SMTP id l14mr10710670lji.16.1562601819690; 
+ Mon, 08 Jul 2019 09:03:39 -0700 (PDT)
+Received: from fralle-msi (31-208-27-151.cust.bredband2.com. [31.208.27.151])
+ by smtp.gmail.com with ESMTPSA id
+ z17sm3756526ljc.37.2019.07.08.09.03.38
+ (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+ Mon, 08 Jul 2019 09:03:39 -0700 (PDT)
+Date: Mon, 8 Jul 2019 18:03:37 +0200
+From: Francisco Iglesias <frasse.iglesias@gmail.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Message-ID: <20190708160335.u3zamevyrbnx6nvb@fralle-msi>
+References: <20190708104750.1071-1-philmd@redhat.com>
+ <20190708104750.1071-4-philmd@redhat.com>
+ <20190708142622.k4s5oknmzzj4brxd@fralle-msi>
+ <41f075ef-9b80-cb66-0fb1-d03079cd93a4@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <49bb8456-a4b1-5a0e-e34d-cf5977e821ae@gmail.com>
-User-Agent: Mutt/1.12.0 (2019-05-25)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.28]); Mon, 08 Jul 2019 16:03:23 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] hw/net: fix vmxnet3 live migration
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <41f075ef-9b80-cb66-0fb1-d03079cd93a4@redhat.com>
+User-Agent: NeoMutt/20170113 (1.7.2)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::241
+Subject: Re: [Qemu-devel] [PATCH-for-4.1 v5 3/3] hw/ssi/xilinx_spips: Avoid
+ out-of-bound access to lqspi_buf[]
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,189 +100,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Sukrit Bhatnagar <skrtbhtngr@gmail.com>,
- Dmitry Fleytman <dmitry.fleytman@gmail.com>, qemu-devel@nongnu.org,
- Yuval Shaia <yuval.shaia@oracle.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-stable@nongnu.org,
+ Alistair Francis <alistair@alistair23.me>, qemu-devel@nongnu.org,
+ Prasad J Pandit <ppandit@redhat.com>, Lei Sun <slei.casper@gmail.com>,
+ qemu-arm@nongnu.org, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Marcel Apfelbaum (marcel.apfelbaum@gmail.com) wrote:
->=20
->=20
-> On 7/5/19 2:14 PM, Sukrit Bhatnagar wrote:
-> > On Fri, 5 Jul 2019 at 16:29, Dmitry Fleytman <dmitry.fleytman@gmail.c=
-om> wrote:
-> > >=20
-> > > > On 5 Jul 2019, at 4:07, Marcel Apfelbaum <marcel.apfelbaum@gmail.=
-com> wrote:
-> > > >=20
-> > > > At some point vmxnet3 live migration stopped working and git-bise=
-ct
-> > > > didn't help finding a working version.
-> > > > The issue is the PCI configuration space is not being migrated
-> > > > successfully and MSIX remains masked at destination.
-> > > >=20
-> > > > Remove the migration differentiation between PCI and PCIe since
-> > > > the logic resides now inside VMSTATE_PCI_DEVICE.
-> > > > Remove also the VMXNET3_COMPAT_FLAG_DISABLE_PCIE based differenti=
-ation
-> > > > since at 'realize' time is decided if the device is PCI or PCIe,
-> > > > then the above macro is enough.
-> > > >=20
-> > > > Use the opportunity to move to the standard VMSTATE_MSIX
-> > > > instead of the deprecated SaveVMHandlers.
-> > > >=20
-> > > > Signed-off-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-> > >=20
-> > > Reviewed-by: Dmitry Fleytman <dmitry.fleytman@gmail.com>
-> > >=20
-> > Tested-by: Sukrit Bhatnagar <skrtbhtngr@gmail.com>
->=20
-> Thanks for the fast testing and review!
->=20
-> David, since the live migration was broken long before this patch,
-> I don't need=A0 to add any compatibility code, right?
+Hi Philippe,
 
-Right, although we should probably bump the version_id field, that way
-you'll get a nice clean error if you try and migrate from the old<->new.
+On [2019 Jul 08] Mon 16:58:29, Philippe Mathieu-Daudé wrote:
+> Hi Francisco,
+> 
+> On 7/8/19 4:26 PM, Francisco Iglesias wrote:
+> > Hi Philippe,
+> > 
+> > On [2019 Jul 08] Mon 12:47:50, Philippe Mathieu-Daudé wrote:
+> >> Both lqspi_read() and lqspi_load_cache() expect a 32-bit
+> >> aligned address.
+> >>
+> >> From UG1085 datasheet [*] Chapter 22: Quad-SPI Controller:
+> > 
+> > s/22/24/
+> 
+> I'm confuse, Chapter 24 is "SD/SDIO Controller", so it seems this Xilinx
+> datasheet is not stable to refer to. Maybe I should simply use:
+> 
+>   From UG1085 datasheet [*] Chapter on 'Quad-SPI Controller':
 
-(It's nice to get rid of the old msix oddity).
+I just clicked on the link and ended up into this version of the UG1085:
 
-> If so, can you merge it using your migration tree?
+'UG1085 (v1.9) January 17, 2019'
 
-I could do; or since it's entirely in vmxnet3 Dmitry can take it.
+But your right its probably better to refer to a specific version of the
+UG1085 instead? Then both should be ok, either to write the way you
+suggest above or refer to the chapter number in that UG1085 version (as it
+was before).
 
-Dave
+Best regards,
+Francisco
 
-> Thanks,
-> Marcel
->=20
->=20
-> > > > ---
-> > > > hw/net/vmxnet3.c | 52 ++-----------------------------------------=
------
-> > > > 1 file changed, 2 insertions(+), 50 deletions(-)
-> > > >=20
-> > > > diff --git a/hw/net/vmxnet3.c b/hw/net/vmxnet3.c
-> > > > index 10d01d0058..8b17548b02 100644
-> > > > --- a/hw/net/vmxnet3.c
-> > > > +++ b/hw/net/vmxnet3.c
-> > > > @@ -2141,21 +2141,6 @@ vmxnet3_cleanup_msi(VMXNET3State *s)
-> > > >      msi_uninit(d);
-> > > > }
-> > > >=20
-> > > > -static void
-> > > > -vmxnet3_msix_save(QEMUFile *f, void *opaque)
-> > > > -{
-> > > > -    PCIDevice *d =3D PCI_DEVICE(opaque);
-> > > > -    msix_save(d, f);
-> > > > -}
-> > > > -
-> > > > -static int
-> > > > -vmxnet3_msix_load(QEMUFile *f, void *opaque, int version_id)
-> > > > -{
-> > > > -    PCIDevice *d =3D PCI_DEVICE(opaque);
-> > > > -    msix_load(d, f);
-> > > > -    return 0;
-> > > > -}
-> > > > -
-> > > > static const MemoryRegionOps b0_ops =3D {
-> > > >      .read =3D vmxnet3_io_bar0_read,
-> > > >      .write =3D vmxnet3_io_bar0_write,
-> > > > @@ -2176,11 +2161,6 @@ static const MemoryRegionOps b1_ops =3D {
-> > > >      },
-> > > > };
-> > > >=20
-> > > > -static SaveVMHandlers savevm_vmxnet3_msix =3D {
-> > > > -    .save_state =3D vmxnet3_msix_save,
-> > > > -    .load_state =3D vmxnet3_msix_load,
-> > > > -};
-> > > > -
-> > > > static uint64_t vmxnet3_device_serial_num(VMXNET3State *s)
-> > > > {
-> > > >      uint64_t dsn_payload;
-> > > > @@ -2203,7 +2183,6 @@ static uint64_t vmxnet3_device_serial_num(V=
-MXNET3State *s)
-> > > >=20
-> > > > static void vmxnet3_pci_realize(PCIDevice *pci_dev, Error **errp)
-> > > > {
-> > > > -    DeviceState *dev =3D DEVICE(pci_dev);
-> > > >      VMXNET3State *s =3D VMXNET3(pci_dev);
-> > > >      int ret;
-> > > >=20
-> > > > @@ -2249,8 +2228,6 @@ static void vmxnet3_pci_realize(PCIDevice *=
-pci_dev, Error **errp)
-> > > >          pcie_dev_ser_num_init(pci_dev, VMXNET3_DSN_OFFSET,
-> > > >                                vmxnet3_device_serial_num(s));
-> > > >      }
-> > > > -
-> > > > -    register_savevm_live(dev, "vmxnet3-msix", -1, 1, &savevm_vmx=
-net3_msix, s);
-> > > > }
-> > > >=20
-> > > > static void vmxnet3_instance_init(Object *obj)
-> > > > @@ -2440,29 +2417,6 @@ static const VMStateDescription vmstate_vm=
-xnet3_int_state =3D {
-> > > >      }
-> > > > };
-> > > >=20
-> > > > -static bool vmxnet3_vmstate_need_pcie_device(void *opaque)
-> > > > -{
-> > > > -    VMXNET3State *s =3D VMXNET3(opaque);
-> > > > -
-> > > > -    return !(s->compat_flags & VMXNET3_COMPAT_FLAG_DISABLE_PCIE)=
-;
-> > > > -}
-> > > > -
-> > > > -static bool vmxnet3_vmstate_test_pci_device(void *opaque, int ve=
-rsion_id)
-> > > > -{
-> > > > -    return !vmxnet3_vmstate_need_pcie_device(opaque);
-> > > > -}
-> > > > -
-> > > > -static const VMStateDescription vmstate_vmxnet3_pcie_device =3D =
-{
-> > > > -    .name =3D "vmxnet3/pcie",
-> > > > -    .version_id =3D 1,
-> > > > -    .minimum_version_id =3D 1,
-> > > > -    .needed =3D vmxnet3_vmstate_need_pcie_device,
-> > > > -    .fields =3D (VMStateField[]) {
-> > > > -        VMSTATE_PCI_DEVICE(parent_obj, VMXNET3State),
-> > > > -        VMSTATE_END_OF_LIST()
-> > > > -    }
-> > > > -};
-> > > > -
-> > > > static const VMStateDescription vmstate_vmxnet3 =3D {
-> > > >      .name =3D "vmxnet3",
-> > > >      .version_id =3D 1,
-> > > > @@ -2470,9 +2424,8 @@ static const VMStateDescription vmstate_vmx=
-net3 =3D {
-> > > >      .pre_save =3D vmxnet3_pre_save,
-> > > >      .post_load =3D vmxnet3_post_load,
-> > > >      .fields =3D (VMStateField[]) {
-> > > > -            VMSTATE_STRUCT_TEST(parent_obj, VMXNET3State,
-> > > > -                                vmxnet3_vmstate_test_pci_device,=
- 0,
-> > > > -                                vmstate_pci_device, PCIDevice),
-> > > > +            VMSTATE_PCI_DEVICE(parent_obj, VMXNET3State),
-> > > > +            VMSTATE_MSIX(parent_obj, VMXNET3State),
-> > > >              VMSTATE_BOOL(rx_packets_compound, VMXNET3State),
-> > > >              VMSTATE_BOOL(rx_vlan_stripping, VMXNET3State),
-> > > >              VMSTATE_BOOL(lro_supported, VMXNET3State),
-> > > > @@ -2508,7 +2461,6 @@ static const VMStateDescription vmstate_vmx=
-net3 =3D {
-> > > >      },
-> > > >      .subsections =3D (const VMStateDescription*[]) {
-> > > >          &vmxstate_vmxnet3_mcast_list,
-> > > > -        &vmstate_vmxnet3_pcie_device,
-> > > >          NULL
-> > > >      }
-> > > > };
-> > > > --
-> > > > 2.17.1
-> > > >=20
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> 
+> > 
+> > After above change:
+> > 
+> > Reviewed-by: Francisco Iglesias <frasse.iglesias@gmail.com> 
+> > Tested-by: Francisco Iglesias <frasse.iglesias@gmail.com>
+> > 
+> > (I tested all three patches so the Tested-by tag can also be appended on the
+> > other two)
+> 
+> Thanks!
+> 
+> > 
+> > Best regards,
+> > Francisco Iglesias
+> > 
+> >>
+> >>   Transfer Size Limitations
+> >>
+> >>     Because of the 32-bit wide TX, RX, and generic FIFO, all
+> >>     APB/AXI transfers must be an integer multiple of 4-bytes.
+> >>     Shorter transfers are not possible.
+> >>
+> >> Set MemoryRegionOps.impl values to force 32-bit accesses,
+> >> this way we are sure we do not access the lqspi_buf[] array
+> >> out of bound.
+> >>
+> >> [*] https://www.xilinx.com/support/documentation/user_guides/ug1085-zynq-ultrascale-trm.pdf
+> >>
+> >> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> >> ---
+> >> v5: add datasheet reference, drop RFC prefix, fix build (Francisco)
+> >> ---
+> >>  hw/ssi/xilinx_spips.c | 4 ++++
+> >>  1 file changed, 4 insertions(+)
+> >>
+> >> diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
+> >> index 3c4e8365ee..b29e0a4a89 100644
+> >> --- a/hw/ssi/xilinx_spips.c
+> >> +++ b/hw/ssi/xilinx_spips.c
+> >> @@ -1239,6 +1239,10 @@ static const MemoryRegionOps lqspi_ops = {
+> >>      .read_with_attrs = lqspi_read,
+> >>      .write_with_attrs = lqspi_write,
+> >>      .endianness = DEVICE_NATIVE_ENDIAN,
+> >> +    .impl = {
+> >> +        .min_access_size = 4,
+> >> +        .max_access_size = 4,
+> >> +    },
+> >>      .valid = {
+> >>          .min_access_size = 1,
+> >>          .max_access_size = 4
+> >> -- 
+> >> 2.20.1
+> >>
 
