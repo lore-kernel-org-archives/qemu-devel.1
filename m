@@ -2,94 +2,79 @@ Return-Path: <SRS0=vrBk=VF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 427ADC606AC
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 13:31:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DBF11C606BD
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 13:55:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 176DC204EC
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 13:31:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 176DC204EC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id A01F121479
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 13:55:29 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LMU+3QNv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A01F121479
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41784 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41950 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hkTk7-0004zz-92
-	for qemu-devel@archiver.kernel.org; Mon, 08 Jul 2019 09:31:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53625)
+	id 1hkU76-0002yh-NQ
+	for qemu-devel@archiver.kernel.org; Mon, 08 Jul 2019 09:55:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60227)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <eblake@redhat.com>) id 1hkThx-0003h9-DX
- for qemu-devel@nongnu.org; Mon, 08 Jul 2019 09:29:31 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hkU6b-0002ZU-TX
+ for qemu-devel@nongnu.org; Mon, 08 Jul 2019 09:54:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1hkThv-0005Su-Dg
- for qemu-devel@nongnu.org; Mon, 08 Jul 2019 09:29:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37608)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1hkThn-00059Z-Um
- for qemu-devel@nongnu.org; Mon, 08 Jul 2019 09:29:23 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id BE61430860B3;
- Mon,  8 Jul 2019 13:29:11 +0000 (UTC)
-Received: from [10.3.116.78] (ovpn-116-78.phx2.redhat.com [10.3.116.78])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9078D608A4;
- Mon,  8 Jul 2019 13:29:09 +0000 (UTC)
-To: Eduardo Habkost <ehabkost@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini
- <pbonzini@redhat.com>, qemu-devel@nongnu.org,
- Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
- Richard Henderson <rth@twiddle.net>, Markus Armbruster <armbru@redhat.com>
-References: <20190705221504.25166-1-ehabkost@redhat.com>
- <20190705221504.25166-30-ehabkost@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
- xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
- xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
- TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
- GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
- sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
- AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
- CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
- RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
- wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
- Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
- gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
- pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
- zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
- pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
- 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
- NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
- cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
- SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
- I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
- mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
- Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
- 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <e0329cb8-a5a6-6497-975b-71546f5eb921@redhat.com>
-Date: Mon, 8 Jul 2019 08:29:08 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ (envelope-from <peter.maydell@linaro.org>) id 1hkU6a-0000Le-8U
+ for qemu-devel@nongnu.org; Mon, 08 Jul 2019 09:54:57 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:33981)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hkU6Z-0000Ip-Tq
+ for qemu-devel@nongnu.org; Mon, 08 Jul 2019 09:54:56 -0400
+Received: by mail-ot1-x342.google.com with SMTP id n5so16292437otk.1
+ for <qemu-devel@nongnu.org>; Mon, 08 Jul 2019 06:54:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
+ bh=FfVzBSYimixQ3rekhUE+RC8BfTRQKR8Q6zHyHJcs/i4=;
+ b=LMU+3QNvcyQBD1zdFHbHeZfzB9qj5ADd20nLcSzdAhumNA0lr7Rigp+KYsQuHLDFDp
+ Ym/bDX0YCl+z0G5Rw4JR45MSAbQAhVqOlmdfzEkq0N20xsNPwpkLM5i3xWJkMb/9rzW6
+ 6joP2S2aZVBWztEGm5bP5GRyn1+RTap5jtlPgIi1S0+4y9tNgsov0Ak1YpK3M8HjnxNO
+ Ji+DIZbwbIMZZ6dZWnneO6Sey6IFHfjrh45dO2vP6n0Umbey2uDcA0qYkKHLX9swD2gM
+ Jo544rUtIUJ2YBXcCrPUE+zoAO8KQUXoAx4/50Bga8D/I6SjFvruesYUUgSOqi07V8K2
+ DDLg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to;
+ bh=FfVzBSYimixQ3rekhUE+RC8BfTRQKR8Q6zHyHJcs/i4=;
+ b=rV3WcUKVCzg4ra3krBZpIY9NgIj8qH2vcdNdJ7H4YJlamdxPuQx1F5cdHU6NM4hpTN
+ CrAljULV+nkjiyCPzziTbHCxMBciPf6VSQqnS5lpxrnhMONKSVP8Oy8JXe39mkA50efD
+ FCoXSwiLB+2zQiFs58Dz7Ax1vjVQVDWneGdx0j78I/kAep93Ep4s+xAuWBcsQ/G/QWHt
+ cmQZLNj9V/F/ywxOcZqRISH+0hIHkHmJwrkM7AZ2DJk8ykO6bl1xCfUyek7x3bp5Litl
+ yeZWLQvWOvbI3SonTgnyW8TI33EhaHjnMnqlN9h8y735uDi8e2jjFdAHhHcEcGcmOT0M
+ Z6aw==
+X-Gm-Message-State: APjAAAXReJ9cOuoc3EJOJ4tbHWY0NqixeAWoqj8PfFFuXboVcyvk1krN
+ OTYYHI4Yh6SGPu0f+rr+4SM320XkF/NzQ0L5UBwzXODIZhs=
+X-Google-Smtp-Source: APXvYqy303iZY+u6riMkOhE+v2b9D5VJwY8B1hk40cc5zi1Z4baFHCqPhv4r/58dmySDRAln00dtaXlrppfMC/7vI0Y=
+X-Received: by 2002:a9d:5f1a:: with SMTP id f26mr15099358oti.91.1562594092915; 
+ Mon, 08 Jul 2019 06:54:52 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190705221504.25166-30-ehabkost@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="2BCQuAfVWvfNldOgTDt55f3DUaHyw7ujB"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.44]); Mon, 08 Jul 2019 13:29:11 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PULL v6 29/42] qmp: Add deprecation information
- to query-machines
+References: <20190708132237.7911-1-peter.maydell@linaro.org>
+In-Reply-To: <20190708132237.7911-1-peter.maydell@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 8 Jul 2019 14:54:42 +0100
+Message-ID: <CAFEAcA_JwDw3-+ZMj91rDKyAp_yYxSXE9O87KeNAMhFqybbcsQ@mail.gmail.com>
+To: QEMU Developers <qemu-devel@nongnu.org>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::342
+Subject: Re: [Qemu-devel] [PULL 0/4] target-arm queue
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,87 +90,41 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---2BCQuAfVWvfNldOgTDt55f3DUaHyw7ujB
-Content-Type: multipart/mixed; boundary="wyExcWFhYZm7gGZvI6GzXq8nPgpRSfNPz";
- protected-headers="v1"
-From: Eric Blake <eblake@redhat.com>
-To: Eduardo Habkost <ehabkost@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini
- <pbonzini@redhat.com>, qemu-devel@nongnu.org,
- Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
- Richard Henderson <rth@twiddle.net>, Markus Armbruster <armbru@redhat.com>
-Message-ID: <e0329cb8-a5a6-6497-975b-71546f5eb921@redhat.com>
-Subject: Re: [Qemu-devel] [PULL v6 29/42] qmp: Add deprecation information to
- query-machines
-References: <20190705221504.25166-1-ehabkost@redhat.com>
- <20190705221504.25166-30-ehabkost@redhat.com>
-In-Reply-To: <20190705221504.25166-30-ehabkost@redhat.com>
-
---wyExcWFhYZm7gGZvI6GzXq8nPgpRSfNPz
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 7/5/19 5:14 PM, Eduardo Habkost wrote:
-> Export machine type deprecation status through the query-machines
-> QMP command.  With this, libvirt and management software will be
-> able to show this information to users and/or suggest changes to
-> VM configuration to avoid deprecated machines.
->=20
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> Message-Id: <20190608233447.27970-2-ehabkost@redhat.com>
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> ---
->  qapi/machine.json          | 7 ++++++-
->  hw/core/machine-qmp-cmds.c | 1 +
->  2 files changed, 7 insertions(+), 1 deletion(-)
->=20
-> diff --git a/qapi/machine.json b/qapi/machine.json
-> index 78d34ef717..6db8a7e2ec 100644
-> --- a/qapi/machine.json
-> +++ b/qapi/machine.json
-> @@ -321,12 +321,17 @@
->  # @numa-mem-supported: true if '-numa node,mem' option is supported by=
-
->  #                      the machine type and false otherwise (since 4.1=
-)
->  #
-> +# @deprecated: if true, the machine type is deprecated and may be remo=
-ved
-> +#              in future versions of QEMU according to the QEMU deprec=
-ation
-> +#              policy (since 4.1.0)
-
-Here, you used 'since 4.1.0'; in patch 31, you used merely 'since 4.1'.
-It's not the first time we are inconsistent, but if someone wants a
-trivial cleanup job, scrubbing the docs for all 3-element versions and
-converting them to 2-element may be an interesting beginner's task.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+On Mon, 8 Jul 2019 at 14:22, Peter Maydell <peter.maydell@linaro.org> wrote:
+>
+> A last handful of patches before the rc0. These are all bugfixes
+> so they could equally well go into rc1, but since my pullreq
+> queue is otherwise empty I might as well push them out. The
+> FPSCR bugfix is definitely one I'd like in rc0; the rest are
+> not really user-visible I think.
+>
+> thanks
+> -- PMM
+>
+> The following changes since commit c4107e8208d0222f9b328691b519aaee4101db87:
+>
+>   Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into staging (2019-07-08 10:26:18 +0100)
+>
+> are available in the Git repository at:
+>
+>   https://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20190708
+>
+> for you to fetch changes up to 85795187f416326f87177cabc39fae1911f04c50:
+>
+>   target/arm/vfp_helper: Call set_fpscr_to_host before updating to FPSCR (2019-07-08 14:11:31 +0100)
+>
+> ----------------------------------------------------------------
+> target-arm queue:
+>  * tests/migration-test: Fix read off end of aarch64_kernel array
+>  * Fix sve_zcr_len_for_el off-by-one error
+>  * hw/arm/sbsa-ref: Silence Coverity nit
+>  * vfp_helper: Call set_fpscr_to_host before updating to FPSCR
 
 
---wyExcWFhYZm7gGZvI6GzXq8nPgpRSfNPz--
+Applied, thanks.
 
---2BCQuAfVWvfNldOgTDt55f3DUaHyw7ujB
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.1
+for any user-visible changes.
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl0jRSQACgkQp6FrSiUn
-Q2qkqgf/VrcRbkumOErFWDbGDnBpfBHnkwTaGPC/GL9dVrrPfLFenjTOLrhvbffM
-NqSlweE3fusqjCHeDi3X07OJ2q7wwR/8nl4Qgh0und9v53Eczr7z9rbHCsEbr3nB
-bmxpmTM72MgFPFiL8g3iVqNtlxvcqwLGcpGrp075niHzChjp/rV0yenW82dswnOo
-IIXhNMPZij6D4CqXkboiqNUpJnKktI1BwoJMezjNjpUAToOKiLaknv9u2HiwUl+G
-elcwQqNAAQZahp3ldHTM4cU10pf8vbuSUSve2cOSh+jkFwJWP5PRbY1dEP1WLYiy
-OR2npifMcEQ0OmifjQNADJaZKgemCg==
-=fpx5
------END PGP SIGNATURE-----
-
---2BCQuAfVWvfNldOgTDt55f3DUaHyw7ujB--
+-- PMM
 
