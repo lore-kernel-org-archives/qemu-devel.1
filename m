@@ -2,90 +2,85 @@ Return-Path: <SRS0=vrBk=VF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 674FCC606AC
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 13:22:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0DF9C606AC
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 13:24:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3EBB22086D
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 13:22:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3EBB22086D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 285C1204EC
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 13:24:25 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FNXprbSq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 285C1204EC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41672 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41706 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hkTan-0005UM-JZ
-	for qemu-devel@archiver.kernel.org; Mon, 08 Jul 2019 09:22:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51823)
+	id 1hkTd2-0007Hn-VE
+	for qemu-devel@archiver.kernel.org; Mon, 08 Jul 2019 09:24:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52245)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <eblake@redhat.com>) id 1hkTZh-0004kR-Cx
- for qemu-devel@nongnu.org; Mon, 08 Jul 2019 09:20:58 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hkTbO-00060u-1f
+ for qemu-devel@nongnu.org; Mon, 08 Jul 2019 09:22:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1hkTZg-0002s7-Dd
- for qemu-devel@nongnu.org; Mon, 08 Jul 2019 09:20:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52518)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1hkTZg-0002ij-4a
- for qemu-devel@nongnu.org; Mon, 08 Jul 2019 09:20:56 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 45BFD307D846;
- Mon,  8 Jul 2019 13:20:35 +0000 (UTC)
-Received: from [10.3.116.78] (ovpn-116-78.phx2.redhat.com [10.3.116.78])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A5EEC5D9C8;
- Mon,  8 Jul 2019 13:20:28 +0000 (UTC)
-To: Tao Xu <tao3.xu@intel.com>, imammedo@redhat.com, ehabkost@redhat.com
-References: <20190707142958.31316-1-tao3.xu@intel.com>
- <20190707142958.31316-6-tao3.xu@intel.com>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
- xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
- xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
- TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
- GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
- sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
- AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
- CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
- RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
- wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
- Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
- gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
- pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
- zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
- pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
- 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
- NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
- cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
- SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
- I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
- mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
- Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
- 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <69280ef3-ed37-6ed0-3e95-17084c2e1d48@redhat.com>
-Date: Mon, 8 Jul 2019 08:20:27 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ (envelope-from <peter.maydell@linaro.org>) id 1hkTbM-0003wc-VP
+ for qemu-devel@nongnu.org; Mon, 08 Jul 2019 09:22:41 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:36469)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hkTbM-0003w1-NH
+ for qemu-devel@nongnu.org; Mon, 08 Jul 2019 09:22:40 -0400
+Received: by mail-wm1-x342.google.com with SMTP id g67so10232034wme.1
+ for <qemu-devel@nongnu.org>; Mon, 08 Jul 2019 06:22:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=MLOZGrFnYC2EQGNmEQhBH73Q9zu0yBRbLKf9tNDYTAU=;
+ b=FNXprbSqn9B5bkmQnzvucHU8kqTd6tweejjsjKqfQ1K3LA+SL+l1WDbFEyrpBZcWEs
+ vx2J7K5bIUsD0UYHQ1gNYRAPAIwTRisfFKY7JT8pdZmGp02aqgJTYIAzKhWf1w8Jybgg
+ mvMQoRAwSp1jdPUYmYU/HaiS2bRX6fuBT1dqfPfXkqWRSbdEJ6QTNdpB3Mzcw+dCbJAE
+ tJwGVNoCJl3prY37HptByNCZGTEGRfDPWDDYg6sfqYwh00PTUaaL7fWuW1j+q0D7WOvL
+ RFGWKwYA7CyHlKeMk8RZHK7fCbzC+E9ZyTREgh4aE9arSafPiwxj6g9Yv9Q427z9qD7t
+ IYtg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=MLOZGrFnYC2EQGNmEQhBH73Q9zu0yBRbLKf9tNDYTAU=;
+ b=Ge8M5oOVw/+XfruMYQPZmn5M5MqN6Fb10q2fQror20u/cTK9ymkLjZulZSjPB5fdm+
+ PnBnnHdLJegBk1p6ePNkyCmP6tLGiy4iFNWKoeKUaeOgjPD3xg516cQjnv2y4fUNFi3S
+ 4o25rgN03845chLedJ61NhGjajpOV4QJ/SKfOVfqM/u3naEBwtREcSIZqXqcWd0ywgfN
+ OBw8N8JJh69I6myzje0cs+ZQxTu1jM7NeAT0RrJ0szV80ZB0gOBy9ilJCBeZ8rbPLyUC
+ 5reH6gBbCnLoZL4H1BoAwD26Inn1qMbzJwSSmG9BiO4C5Y6f/jI3eEDsbVBP7ONQWrGI
+ TosA==
+X-Gm-Message-State: APjAAAWplX/rBex/YQzTQ5x5Soe+O+Te3EqDln1iR5FmSw1DBWesYXaB
+ LA0g+zqZSdZyx0Bv/cQMXAsz0eHqQSexgQ==
+X-Google-Smtp-Source: APXvYqwyeKFLLWjPDHvSA1NRAo4tYR9CJzA1utOnypM03ioVceWRZllzKlKuz+2LEDVeZImIgEzaZA==
+X-Received: by 2002:a1c:4803:: with SMTP id v3mr17230387wma.49.1562592159237; 
+ Mon, 08 Jul 2019 06:22:39 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id v15sm13773744wrt.25.2019.07.08.06.22.38
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Mon, 08 Jul 2019 06:22:38 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Date: Mon,  8 Jul 2019 14:22:33 +0100
+Message-Id: <20190708132237.7911-1-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <20190707142958.31316-6-tao3.xu@intel.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="wOizWNk4TlWIVtavGczDF7j1GPZeCuVw5"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.48]); Mon, 08 Jul 2019 13:20:39 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v6 05/14] numa: Extend CLI to provide
- initiator information for numa nodes
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::342
+Subject: [Qemu-devel] [PULL 0/4] target-arm queue
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,88 +92,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jingqi.liu@intel.com, dan.j.williams@intel.com, fan.du@intel.com,
- qemu-devel@nongnu.org, jonathan.cameron@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---wOizWNk4TlWIVtavGczDF7j1GPZeCuVw5
-Content-Type: multipart/mixed; boundary="hMidNGWg3WyfYEgnvW9Gx8ubRgTIeG1u3";
- protected-headers="v1"
-From: Eric Blake <eblake@redhat.com>
-To: Tao Xu <tao3.xu@intel.com>, imammedo@redhat.com, ehabkost@redhat.com
-Cc: jingqi.liu@intel.com, dan.j.williams@intel.com,
- jonathan.cameron@huawei.com, fan.du@intel.com, qemu-devel@nongnu.org
-Message-ID: <69280ef3-ed37-6ed0-3e95-17084c2e1d48@redhat.com>
-Subject: Re: [PATCH v6 05/14] numa: Extend CLI to provide initiator
- information for numa nodes
-References: <20190707142958.31316-1-tao3.xu@intel.com>
- <20190707142958.31316-6-tao3.xu@intel.com>
-In-Reply-To: <20190707142958.31316-6-tao3.xu@intel.com>
+A last handful of patches before the rc0. These are all bugfixes
+so they could equally well go into rc1, but since my pullreq
+queue is otherwise empty I might as well push them out. The
+FPSCR bugfix is definitely one I'd like in rc0; the rest are
+not really user-visible I think.
 
---hMidNGWg3WyfYEgnvW9Gx8ubRgTIeG1u3
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+thanks
+-- PMM
 
-On 7/7/19 9:29 AM, Tao Xu wrote:
-> In ACPI 6.3 chapter 5.2.27 Heterogeneous Memory Attribute Table (HMAT),=
+The following changes since commit c4107e8208d0222f9b328691b519aaee4101db87:
 
-> The initiator represents processor which access to memory. And in 5.2.2=
-7.3
-> Memory Proximity Domain Attributes Structure, the attached initiator is=
+  Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into staging (2019-07-08 10:26:18 +0100)
 
-> defined as where the memory controller responsible for a memory proximi=
-ty
-> domain. With attached initiator information, the topology of heterogene=
-ous
-> memory can be described.
->=20
-> Extend CLI of "-numa node" option to indicate the initiator numa
-> node-id.
->=20
-> Suggested-by: Dan Williams <dan.j.williams@intel.com>
-> Signed-off-by: Tao Xu <tao3.xu@intel.com>
-> ---
+are available in the Git repository at:
 
-> +++ b/qapi/misc.json
-> @@ -2572,6 +2572,9 @@
->  # @memdev: memory backend object.  If specified for one node,
->  #          it must be specified for all nodes.
->  #
-> +# @initiator: the initiator numa nodeid that is closest (as in directl=
-y
-> +#             attached) to this numa node.
+  https://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20190708
 
-Missing a '(since 4.2)' designator. We've already missed softfreeze for
-4.1, and this is a new feature, so probably does have to slip into 4.2.
+for you to fetch changes up to 85795187f416326f87177cabc39fae1911f04c50:
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+  target/arm/vfp_helper: Call set_fpscr_to_host before updating to FPSCR (2019-07-08 14:11:31 +0100)
 
+----------------------------------------------------------------
+target-arm queue:
+ * tests/migration-test: Fix read off end of aarch64_kernel array
+ * Fix sve_zcr_len_for_el off-by-one error
+ * hw/arm/sbsa-ref: Silence Coverity nit
+ * vfp_helper: Call set_fpscr_to_host before updating to FPSCR
 
---hMidNGWg3WyfYEgnvW9Gx8ubRgTIeG1u3--
+----------------------------------------------------------------
+Peter Maydell (2):
+      tests/migration-test: Fix read off end of aarch64_kernel array
+      hw/arm/sbsa-ref: Remove unnecessary check for secure_sysmem == NULL
 
---wOizWNk4TlWIVtavGczDF7j1GPZeCuVw5
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Philippe Mathieu-Daudé (1):
+      target/arm/vfp_helper: Call set_fpscr_to_host before updating to FPSCR
 
------BEGIN PGP SIGNATURE-----
+Richard Henderson (1):
+      target/arm: Fix sve_zcr_len_for_el
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl0jQxsACgkQp6FrSiUn
-Q2qPUAf/SHLb5gd0Lm1K4H+eF1tYZJVOk+O+s2vaTeyxt6UuJBeK3Y3UThTaWpDn
-+Ksh2ht3l/qXahqMygH7x/atBL8gME3lyXuqjhzkktQSdZFDeLHvWPlnCFp84ixl
-7tvy/oae3vbZTM8eA57tAZ7MuKCnnqe+KR20iwbPdzaggqCK2cTifycsgQjkBeC9
-i+cYKxJsOyE6+gc+pspCQrNpHD/gqSCcQpnJ6t/Liv8/YGKCpC0+4oyIetNO04/z
-UqtLCGKGpfHbW+Kbeld4EQYT4s9vBTkN3b7gxbwTEqJMqmMVBgYWlfeJAmSnkkGN
-7d2+tb0xu/24ayUzaf/XpHJ0IuxpEQ==
-=Nrex
------END PGP SIGNATURE-----
-
---wOizWNk4TlWIVtavGczDF7j1GPZeCuVw5--
+ hw/arm/sbsa-ref.c       |  8 ++------
+ target/arm/helper.c     |  4 ++--
+ target/arm/vfp_helper.c |  4 ++--
+ tests/migration-test.c  | 22 +++++++---------------
+ 4 files changed, 13 insertions(+), 25 deletions(-)
 
