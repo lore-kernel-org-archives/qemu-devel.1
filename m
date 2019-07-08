@@ -2,62 +2,79 @@ Return-Path: <SRS0=vrBk=VF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13A80C606A1
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 09:26:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5ED8AC606A1
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 09:27:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E063B20651
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 09:26:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E063B20651
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2B9A720651
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 09:27:47 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="U/EI+C9V"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B9A720651
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39724 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39744 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hkPuK-0006Pz-55
-	for qemu-devel@archiver.kernel.org; Mon, 08 Jul 2019 05:26:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45754)
+	id 1hkPw2-0008Na-H2
+	for qemu-devel@archiver.kernel.org; Mon, 08 Jul 2019 05:27:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46098)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <imammedo@redhat.com>) id 1hkPss-0004yo-9d
- for qemu-devel@nongnu.org; Mon, 08 Jul 2019 05:24:31 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hkPug-0007OD-6S
+ for qemu-devel@nongnu.org; Mon, 08 Jul 2019 05:26:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1hkPsq-0000uW-AX
- for qemu-devel@nongnu.org; Mon, 08 Jul 2019 05:24:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45734)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hkPsq-0000tl-5H
- for qemu-devel@nongnu.org; Mon, 08 Jul 2019 05:24:28 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A99B081E0E
- for <qemu-devel@nongnu.org>; Mon,  8 Jul 2019 09:24:21 +0000 (UTC)
-Received: from dell-r430-03.lab.eng.brq.redhat.com
- (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D7EAB2B1BB;
- Mon,  8 Jul 2019 09:24:18 +0000 (UTC)
-From: Igor Mammedov <imammedo@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Mon,  8 Jul 2019 05:24:10 -0400
-Message-Id: <20190708092410.11167-3-imammedo@redhat.com>
-In-Reply-To: <20190708092410.11167-1-imammedo@redhat.com>
-References: <20190708092410.11167-1-imammedo@redhat.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1hkPue-0001dd-G4
+ for qemu-devel@nongnu.org; Mon, 08 Jul 2019 05:26:22 -0400
+Received: from mail-ot1-x333.google.com ([2607:f8b0:4864:20::333]:41215)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hkPud-0001cP-T9
+ for qemu-devel@nongnu.org; Mon, 08 Jul 2019 05:26:20 -0400
+Received: by mail-ot1-x333.google.com with SMTP id o101so15492576ota.8
+ for <qemu-devel@nongnu.org>; Mon, 08 Jul 2019 02:26:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=X8q78jn6JanoTAhsBQyowuRiRowJqQ9lzD7506F5mx8=;
+ b=U/EI+C9VnD/7+fP3PpoU+tu1Ci3lSJkcPrRYdKPQJVwNPSQwnpsh+2wKhB9O+C1y5E
+ tQaKPMGFAy4y+5ARR95RJy6Vq6OnC66FGVtWxo9h8yhCy7S0btFIQFxWxebyzZlz0T/8
+ yyqlxqSunioZRXfy5CAHBijLIg0iHE0Ylb/3UY/Yq3x2DJ88Vm0BJBqTAqJHzQKzWHgv
+ uqZ7nEl3VHNXXNP6sKyWmqitPQ6+nvV0WFS9JqJZqtlnRUDkOINq/KQLsY6zRSABlvw9
+ WwPuK7s214sl46nVZoXD39ze1vw3Pt5DYpvzE7BP3LUBclA8XUizciqG3PGbdmQ94eou
+ ZtNw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=X8q78jn6JanoTAhsBQyowuRiRowJqQ9lzD7506F5mx8=;
+ b=T5piAeU6L8X6bAZcDuz/hSZ+Cj/KY9hfPiGtPaTA/I88taNRFPK/F2QAlwKaciKzw8
+ /xm9MINj6GPlTw9JrD0j9343lHdo06xncPQ4WT0wc/9MkGMqle7hixyH4RJiuydi3+p6
+ u9TwpZHXJoUdRNLAO5dxPoZwoxyX91K1ZJQg8t5z5rpqIJ7RKpJw8eZg7EBi0+wpSh1Y
+ cYchYMAXXGTR07H3gX84nxMwZdbgl1/bNxC6zuoHZkPuMIBPIOWePr2bEn7ihVlHi9C7
+ MeOg28zL/RivEuOfcBTmGIZvltH3su6k8M/jsWjujeJJLbKqCW6JEC/J4HlZVij1S52V
+ erpw==
+X-Gm-Message-State: APjAAAWrm45xm5zW743n7lz4e8Q4nzkw3FmiEQ6R5+lH/PO6+VRQhigM
+ mayAe6Rpn0UwBVmU8BEND3WEv8OrOCBQ/ru9pXPqKg==
+X-Google-Smtp-Source: APXvYqzyaAD6/YjAwUZaVCZtqaKxfteH1ub2EYUgSm00DLy0CG9c3nzlR+Mn4SjEt/ICoLFL+xao1RBi9/F1AfEw8Xc=
+X-Received: by 2002:a9d:4d81:: with SMTP id u1mr13123122otk.221.1562577976631; 
+ Mon, 08 Jul 2019 02:26:16 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.25]); Mon, 08 Jul 2019 09:24:21 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v3 2/2] tests: acpi: do not skip tests when
- IASL is not installed
+References: <20190705221504.25166-1-ehabkost@redhat.com>
+In-Reply-To: <20190705221504.25166-1-ehabkost@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 8 Jul 2019 10:26:05 +0100
+Message-ID: <CAFEAcA-sJ0VDvxUgWO6H6E1kgCU8RVrygcJYpbk_341wwW+H2A@mail.gmail.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::333
+Subject: Re: [Qemu-devel] [PULL v6 00/42] Machine and x86 queue, 2019-07-05
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,72 +86,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: mst@redhat.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-tests do binary comparision so we can check tables without
-IASL. Move IASL condition right before decompilation step
-and skip it if IASL is not installed.
+On Fri, 5 Jul 2019 at 23:15, Eduardo Habkost <ehabkost@redhat.com> wrote:
+>
+> Changes v5 -> v6:
+> * Rebase and solve conflicts with other pull requests
+>   (for the 4th time)
+> * Included Cascadelake-Server-v2 update
+>
+> Changes v4 -> v5:
+> * Rebase and solve conflicts with commit 374f63f6810a ("Merge remote-tracking
+>   branch 'remotes/armbru/tags/pull-monitor-2019-07-02-v2' into staging")
+>
+> Changes v3 -> v4:
+> * Fix ppc64 "make check" failure
+>
+> Changes v2 -> v3:
+> * Fix "make check" warnings (Igor Mammedov)
+> * Fix conflicts of "hw/arm: Replace global smp variables with
+>   machine smp properties" with recent arm changes (Eduardo Habkost)
+> * x86 versioned CPU models (Eduardo Habkost)
+> * SnowRidge CPU model (Paul Lai)
+> * Add deprecation information to query-machines (Eduardo Habkost)
+>
+> Changes v1 -> v2:
+> * Fix s390x build failure
+>
+> The following changes since commit d2c5f91ca944aaade642624397e1853801bbc744:
+>
+>   Merge remote-tracking branch 'remotes/vivier2/tags/trivial-branch-pull-request' into staging (2019-07-05 16:16:15 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/ehabkost/qemu.git tags/machine-next-pull-request
+>
+> for you to fetch changes up to af135030e3405af5ce234a9f92cf8cc4e55fec96:
+>
+>   tests: use -numa memdev option in tests instead of legacy 'mem' option (2019-07-05 17:12:45 -0300)
+>
+> ----------------------------------------------------------------
+> Machine and x86 queue, 2019-07-05
+>
+> * CPU die topology support (Like Xu)
+> * Deprecation of features (Igor Mammedov):
+>   * 'mem' parameter of '-numa node' option
+>   * implict memory distribution between NUMA nodes
+>   * deprecate -mem-path fallback to anonymous RAM
+> * x86 versioned CPU models (Eduardo Habkost)
+> * SnowRidge CPU model (Paul Lai)
+> * Add deprecation information to query-machines (Eduardo Habkost)
+> * Other i386 fixes
+>
 
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
-v2:
- - fix typo in commit message
-     Eric Auger <eric.auger@redhat.com>
 
+Applied, thanks.
 
- tests/bios-tables-test.c | 15 ++++++++++++++-
- 1 file changed, 14 insertions(+), 1 deletion(-)
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.1
+for any user-visible changes.
 
-diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
-index 13bd166b81..a356ac3489 100644
---- a/tests/bios-tables-test.c
-+++ b/tests/bios-tables-test.c
-@@ -389,6 +389,14 @@ static void test_acpi_asl(test_data *data)
-         all_tables_match =3D all_tables_match &&
-             test_acpi_find_diff_allowed(exp_sdt);
-=20
-+        /*
-+         *  don't try to decompile if IASL isn't present, in this case u=
-ser
-+         * will just 'get binary file mismatch' warnings and test failur=
-e
-+         */
-+        if (!iasl) {
-+            continue;
-+        }
-+
-         err =3D load_asl(data->tables, sdt);
-         asl =3D normalize_asl(sdt->asl);
-=20
-@@ -431,6 +439,11 @@ static void test_acpi_asl(test_data *data)
-         g_string_free(asl, true);
-         g_string_free(exp_asl, true);
-     }
-+    if (!iasl && !all_tables_match) {
-+        fprintf(stderr, "to see ASL diff between mismatched files instal=
-l IASL,"
-+                " rebuild QEMU from scratch and re-run tests with V=3D1"
-+                " environment variable set");
-+    }
-     g_assert(all_tables_match);
-=20
-     free_test_data(&exp_data);
-@@ -599,7 +612,7 @@ static void test_acpi_one(const char *params, test_da=
-ta *data)
-=20
-     if (getenv(ACPI_REBUILD_EXPECTED_AML)) {
-         dump_aml_files(data, true);
--    } else if (iasl) {
-+    } else {
-         test_acpi_asl(data);
-     }
-=20
---=20
-2.18.1
-
+-- PMM
 
