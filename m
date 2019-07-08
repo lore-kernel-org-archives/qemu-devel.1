@@ -2,91 +2,92 @@ Return-Path: <SRS0=vrBk=VF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D5E5C606BF
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 14:28:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74C75C606BF
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 14:41:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5B77421537
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 14:28:13 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aDQNFrO0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B77421537
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4C9BA21537
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 14:41:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C9BA21537
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42212 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42290 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hkUcl-0001Na-O1
-	for qemu-devel@archiver.kernel.org; Mon, 08 Jul 2019 10:28:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41948)
+	id 1hkUpR-0003y2-Ir
+	for qemu-devel@archiver.kernel.org; Mon, 08 Jul 2019 10:41:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45003)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <frasse.iglesias@gmail.com>) id 1hkUbJ-0000lU-Db
- for qemu-devel@nongnu.org; Mon, 08 Jul 2019 10:26:42 -0400
+ (envelope-from <borntraeger@de.ibm.com>) id 1hkUoi-0003Y0-Ik
+ for qemu-devel@nongnu.org; Mon, 08 Jul 2019 10:40:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <frasse.iglesias@gmail.com>) id 1hkUbI-0002YC-3x
- for qemu-devel@nongnu.org; Mon, 08 Jul 2019 10:26:41 -0400
-Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:41834)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <frasse.iglesias@gmail.com>)
- id 1hkUbH-0001zF-H5; Mon, 08 Jul 2019 10:26:40 -0400
-Received: by mail-lj1-x241.google.com with SMTP id d24so7023886ljg.8;
- Mon, 08 Jul 2019 07:26:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:content-transfer-encoding:in-reply-to
- :user-agent; bh=ZUjIs7HyOXCHTzrNzHkS1o7+7iYW6+PyowkFVyfSvLU=;
- b=aDQNFrO0AGR/wscuI6Ju3Wcc4KERqlUO2HvJGQFI1aSCrh0DAqGqpeKQmtH+UVLHrv
- TMMweWDqaQxcYh8B6h34PWwcs1nXss9K9sKjYHZqlIO14otUhjmxKdfaLIltDubjbfgl
- NcK3gTnKY0gjNidB5TqkO+lII2km3p+1xxsD4ixCpOO7QJb+lb95fSeOq3fgmNsANKlr
- BalxAl7bAMzdudYiOof7yQdVg8JgXqoe5AKWAfHGpaYqHI7t/t5L9CqrkecUP6sADu0s
- TJMR+J43tRwd1UJO3hFU7ubf74ohbD8+yrRhMbDSgKnG4SqUMSFMgHGPu5j7m5zNqGKf
- ivgA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to:user-agent;
- bh=ZUjIs7HyOXCHTzrNzHkS1o7+7iYW6+PyowkFVyfSvLU=;
- b=JdCNpQFGKzE1ytbgD5HHw0yNZbqQus8y57tn7uY5qkNUHcfXUEO2MVRH7zyi42viag
- iY8m997dmGh4jhq450TASFEwqHXy31DeaGt4AX/a7qWZ4XFdFp/7oyZw7CtsBSzXfJKA
- O/RcX+A9fk28hi2K/9DeaPgQqtdv1cTGXWoaSdCjZrNiFWuka8fzY681VMWAxtK9lJua
- E88viO3huHZTAUElWnissW/kcsmmEYb4DsQUWG8p8YIswngC8d9zfpNKqcQg0iCckV6I
- pQ30b4LTTshsjRgYAgH7EWnYoCyLSZBFea0hCUTUzDZyQRUGuYEbssFV7w5+lE/H+oPz
- ATiw==
-X-Gm-Message-State: APjAAAUd2pQnBOPtpNrlSbu+9R24kwwJ81UOIB5BFjKtKG12hJGQ87Ye
- oVfqF164yIi1e3MsGTc95MQ=
-X-Google-Smtp-Source: APXvYqyCA+Ms8DRbsdvdOmbBzFctjugv+nuZobEGfk8XGje/ahvz4DjPeJY8nXVkPAYdl6d8MA4TkQ==
-X-Received: by 2002:a2e:8999:: with SMTP id c25mr10416692lji.169.1562595986160; 
- Mon, 08 Jul 2019 07:26:26 -0700 (PDT)
-Received: from fralle-msi (31-208-27-151.cust.bredband2.com. [31.208.27.151])
- by smtp.gmail.com with ESMTPSA id
- t1sm1870955lji.52.2019.07.08.07.26.25
- (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
- Mon, 08 Jul 2019 07:26:25 -0700 (PDT)
-Date: Mon, 8 Jul 2019 16:26:23 +0200
-From: Francisco Iglesias <frasse.iglesias@gmail.com>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Message-ID: <20190708142622.k4s5oknmzzj4brxd@fralle-msi>
-References: <20190708104750.1071-1-philmd@redhat.com>
- <20190708104750.1071-4-philmd@redhat.com>
+ (envelope-from <borntraeger@de.ibm.com>) id 1hkUof-0006Am-OX
+ for qemu-devel@nongnu.org; Mon, 08 Jul 2019 10:40:31 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:26522)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+ id 1hkUoe-0005W1-VZ
+ for qemu-devel@nongnu.org; Mon, 08 Jul 2019 10:40:29 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ x68EdIwI015056
+ for <qemu-devel@nongnu.org>; Mon, 8 Jul 2019 10:40:19 -0400
+Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2tm60yw056-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Mon, 08 Jul 2019 10:40:19 -0400
+Received: from localhost
+ by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+ Mon, 8 Jul 2019 15:40:17 +0100
+Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
+ by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Mon, 8 Jul 2019 15:40:15 +0100
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com
+ [9.149.105.232])
+ by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
+ id x68EeEix34537914
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 8 Jul 2019 14:40:14 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 2175A52051;
+ Mon,  8 Jul 2019 14:40:14 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+ by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTPS id 109F15204E;
+ Mon,  8 Jul 2019 14:40:14 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 25651)
+ id CF834E0269; Mon,  8 Jul 2019 16:40:13 +0200 (CEST)
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Date: Mon,  8 Jul 2019 16:40:13 +0200
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20190708104750.1071-4-philmd@redhat.com>
-User-Agent: NeoMutt/20170113 (1.7.2)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::241
-Subject: Re: [Qemu-devel] [PATCH-for-4.1 v5 3/3] hw/ssi/xilinx_spips: Avoid
- out-of-bound access to lqspi_buf[]
+X-TM-AS-GCONF: 00
+x-cbid: 19070814-4275-0000-0000-0000034A3A39
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19070814-4276-0000-0000-0000385A61F6
+Message-Id: <20190708144013.83474-1-borntraeger@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+ definitions=2019-07-08_05:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=851 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1907080182
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.156.1
+Subject: [Qemu-devel] [PATCH] s390: cpumodel: fix name and description for
+ the new vector facility
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,71 +99,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-stable@nongnu.org,
- Alistair Francis <alistair@alistair23.me>, qemu-devel@nongnu.org,
- Prasad J Pandit <ppandit@redhat.com>, Lei Sun <slei.casper@gmail.com>,
- qemu-arm@nongnu.org, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Cc: Tony Krowiak <akrowiak@linux.ibm.com>, David Hildenbrand <david@redhat.com>,
+ qemu-devel <qemu-devel@nongnu.org>, Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ qemu-s390x <qemu-s390x@nongnu.org>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Philippe,
+The new facility is called "Vector-Packed-Decimal-Enhancement Facility"
+and not "Vector BCD enhancements facility 1". Also fixup the short
+name to "vxp" to match the Linux kernel.
 
-On [2019 Jul 08] Mon 12:47:50, Philippe Mathieu-Daudé wrote:
-> Both lqspi_read() and lqspi_load_cache() expect a 32-bit
-> aligned address.
-> 
-> From UG1085 datasheet [*] Chapter 22: Quad-SPI Controller:
+Fixes: 54d65de0b525 ("s390x/cpumodel: vector enhancements")
+Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+---
+ target/s390x/cpu_features_def.inc.h | 2 +-
+ target/s390x/gen-features.c         | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-s/22/24/
+diff --git a/target/s390x/cpu_features_def.inc.h b/target/s390x/cpu_features_def.inc.h
+index ef190e2fc783..631584786921 100644
+--- a/target/s390x/cpu_features_def.inc.h
++++ b/target/s390x/cpu_features_def.inc.h
+@@ -104,7 +104,7 @@ DEF_FEAT(CMM_NT, "cmmnt", STFL, 147, "CMM: ESSA-enhancement (no translate) facil
+ DEF_FEAT(VECTOR_ENH2, "vxeh2", STFL, 148, "Vector Enhancements facility 2")
+ DEF_FEAT(ESORT_BASE, "esort-base", STFL, 150, "Enhanced-sort facility (excluding subfunctions)")
+ DEF_FEAT(DEFLATE_BASE, "deflate-base", STFL, 151, "Deflate-conversion facility (excluding subfunctions)")
+-DEF_FEAT(VECTOR_BCD_ENH, "vxbeh", STFL, 152, "Vector BCD enhancements facility 1")
++DEF_FEAT(VECTOR_PACKED_DEC, "vxp", STFL, 152, "Vector-Packed-Decimal-Enhancement Facility")
+ DEF_FEAT(MSA_EXT_9, "msa9-base", STFL, 155, "Message-security-assist-extension-9 facility (excluding subfunctions)")
+ DEF_FEAT(ETOKEN, "etoken", STFL, 156, "Etoken facility")
+ 
+diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
+index 9f216219ff53..7b5ed15071fa 100644
+--- a/target/s390x/gen-features.c
++++ b/target/s390x/gen-features.c
+@@ -558,7 +558,7 @@ static uint16_t full_GEN15_GA1[] = {
+     S390_FEAT_VECTOR_ENH2,
+     S390_FEAT_GROUP_ENH_SORT,
+     S390_FEAT_GROUP_DEFLATE_CONVERSION,
+-    S390_FEAT_VECTOR_BCD_ENH,
++    S390_FEAT_VECTOR_PACKED_DEC,
+     S390_FEAT_GROUP_MSA_EXT_9,
+     S390_FEAT_GROUP_MSA_EXT_9_PCKMO,
+     S390_FEAT_ETOKEN,
+@@ -644,7 +644,7 @@ static uint16_t default_GEN15_GA1[] = {
+     S390_FEAT_VECTOR_ENH2,
+     S390_FEAT_GROUP_ENH_SORT,
+     S390_FEAT_GROUP_DEFLATE_CONVERSION,
+-    S390_FEAT_VECTOR_BCD_ENH,
++    S390_FEAT_VECTOR_PACKED_DEC,
+     S390_FEAT_GROUP_MSA_EXT_9,
+     S390_FEAT_GROUP_MSA_EXT_9_PCKMO,
+     S390_FEAT_ETOKEN,
+-- 
+2.21.0
 
-After above change:
-
-Reviewed-by: Francisco Iglesias <frasse.iglesias@gmail.com> 
-Tested-by: Francisco Iglesias <frasse.iglesias@gmail.com>
-
-(I tested all three patches so the Tested-by tag can also be appended on the
-other two)
-
-Best regards,
-Francisco Iglesias
-
-> 
->   Transfer Size Limitations
-> 
->     Because of the 32-bit wide TX, RX, and generic FIFO, all
->     APB/AXI transfers must be an integer multiple of 4-bytes.
->     Shorter transfers are not possible.
-> 
-> Set MemoryRegionOps.impl values to force 32-bit accesses,
-> this way we are sure we do not access the lqspi_buf[] array
-> out of bound.
-> 
-> [*] https://www.xilinx.com/support/documentation/user_guides/ug1085-zynq-ultrascale-trm.pdf
-> 
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> ---
-> v5: add datasheet reference, drop RFC prefix, fix build (Francisco)
-> ---
->  hw/ssi/xilinx_spips.c | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
-> index 3c4e8365ee..b29e0a4a89 100644
-> --- a/hw/ssi/xilinx_spips.c
-> +++ b/hw/ssi/xilinx_spips.c
-> @@ -1239,6 +1239,10 @@ static const MemoryRegionOps lqspi_ops = {
->      .read_with_attrs = lqspi_read,
->      .write_with_attrs = lqspi_write,
->      .endianness = DEVICE_NATIVE_ENDIAN,
-> +    .impl = {
-> +        .min_access_size = 4,
-> +        .max_access_size = 4,
-> +    },
->      .valid = {
->          .min_access_size = 1,
->          .max_access_size = 4
-> -- 
-> 2.20.1
-> 
 
