@@ -2,72 +2,65 @@ Return-Path: <SRS0=vrBk=VF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52680C606AC
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 12:48:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56CC7C606AF
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 12:52:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1D88D20665
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 12:48:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D88D20665
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2D0E02064A
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 12:52:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D0E02064A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41390 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41460 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hkT4g-0000bb-CG
-	for qemu-devel@archiver.kernel.org; Mon, 08 Jul 2019 08:48:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40938)
+	id 1hkT8b-000201-At
+	for qemu-devel@archiver.kernel.org; Mon, 08 Jul 2019 08:52:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42657)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <palmer@dabbelt.com>) id 1hkT2r-0008Vo-CU
- for qemu-devel@nongnu.org; Mon, 08 Jul 2019 08:47:03 -0400
+ (envelope-from <mlevitsk@redhat.com>) id 1hkT7f-0001PC-Mb
+ for qemu-devel@nongnu.org; Mon, 08 Jul 2019 08:52:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <palmer@dabbelt.com>) id 1hkT2k-00046o-US
- for qemu-devel@nongnu.org; Mon, 08 Jul 2019 08:46:59 -0400
-Received: from mail-lj1-f194.google.com ([209.85.208.194]:44801)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1hkT2e-00043Z-O6
- for qemu-devel@nongnu.org; Mon, 08 Jul 2019 08:46:52 -0400
-Received: by mail-lj1-f194.google.com with SMTP id k18so15750937ljc.11
- for <qemu-devel@nongnu.org>; Mon, 08 Jul 2019 05:46:44 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:subject:in-reply-to:cc:from:to:message-id
- :mime-version:content-transfer-encoding;
- bh=Y/jtFao6VAyZjhlyG7vlyADHIkDbBiTq0IGy4aFAAnw=;
- b=ESZZhMpVabuyAGsdopLUgtKKnkSl0pWeXantMCEMMxxieUmx6g7LyNQF0zwFdEujO3
- mZ5hgu7a1Z8//FV4LK1FraHriKVOUqD/hxWkFdo149SgbiSwbvTZrndt6Wujwhvl2P48
- BAX8svWgTUCvB6+0YcO47QF5bJkiXBk0OvnUrKWmQK7ueyN3hKlaXDddERtGV921jQuH
- xje3sIgHAdYb6fM6juZqTnllf66cv9Sfqx4GtH534Jn/hZHBMeFKNytZbRd3QGmm5RcZ
- gZ44apxpNJg5saBA+sL/6RXXzbgvii45BrDkjDr8yTCQtR/gmlPuDzAG8wzP53XlEAdf
- Qelw==
-X-Gm-Message-State: APjAAAVhsaTe1weR0Rg7ImEmf+22J69TQ5+bQfOXc1kZ8DCP0biUqY57
- MuT8oqzHxeDqeTKhnu+yiruBIA==
-X-Google-Smtp-Source: APXvYqwq+eYH/ADKYDrC7K+UEUfe0PIs8dTk0JwZTzGIIJfQV3Ef6rlyPF1npketr68+2BunTQkE4g==
-X-Received: by 2002:a2e:9209:: with SMTP id k9mr10168716ljg.96.1562590002984; 
- Mon, 08 Jul 2019 05:46:42 -0700 (PDT)
-Received: from localhost ([134.17.27.127])
- by smtp.gmail.com with ESMTPSA id p9sm3664382lji.107.2019.07.08.05.46.41
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Mon, 08 Jul 2019 05:46:42 -0700 (PDT)
-Date: Mon, 08 Jul 2019 05:46:42 -0700 (PDT)
-X-Google-Original-Date: Mon, 08 Jul 2019 05:46:40 PDT (-0700)
-In-Reply-To: <c64fa0e8-fd9c-8e86-418c-0553f56a0f34@linaro.org>
-From: Palmer Dabbelt <palmer@sifive.com>
-To: richard.henderson@linaro.org
-Message-ID: <mhng-3d187b03-c0e9-4b44-aec3-1b09fcf01fa5@palmer-si-x1e>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+ (envelope-from <mlevitsk@redhat.com>) id 1hkT7c-0007LA-2O
+ for qemu-devel@nongnu.org; Mon, 08 Jul 2019 08:51:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49218)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mlevitsk@redhat.com>)
+ id 1hkT7U-0007FF-Fa; Mon, 08 Jul 2019 08:51:50 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 6B1D4308429B;
+ Mon,  8 Jul 2019 12:51:40 +0000 (UTC)
+Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.83])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C23125798D;
+ Mon,  8 Jul 2019 12:51:35 +0000 (UTC)
+Message-ID: <7eeafe074290d5374b5ad6c0fc81d1c0dea492e1.camel@redhat.com>
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
+Date: Mon, 08 Jul 2019 15:51:34 +0300
+In-Reply-To: <5d32c846-1ff6-ec99-af20-8e7a794c4fe2@redhat.com>
+References: <20190703155944.9637-1-mlevitsk@redhat.com>
+ <20190703155944.9637-2-mlevitsk@redhat.com>
+ <c47da7ef-82ac-1a76-9c8e-f76336c20c44@redhat.com>
+ <d009ad68b237aae51d327955367dc2356f33bba0.camel@redhat.com>
+ <5d32c846-1ff6-ec99-af20-8e7a794c4fe2@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.40]); Mon, 08 Jul 2019 12:51:40 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.208.194
-Subject: Re: [Qemu-devel] [Qemu-riscv] [PULL 10/34] RISC-V: Fix a PMP check
- with the correct access size
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v3 1/6] block/nvme: don't touch the
+ completion entries
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -79,84 +72,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-riscv@nongnu.org,
- qemu-devel@nongnu.org, fintelia@gmail.com,
- Alistair Francis <Alistair.Francis@wdc.com>, Hesham.Almatary@cl.cam.ac.uk
+Cc: Fam Zheng <fam@euphon.net>, Paolo Bonzini <pbonzini@redhat.com>,
+ John Snow <jsnow@redhat.com>, qemu-block@nongnu.org,
+ Kevin Wolf <kwolf@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 27 Jun 2019 11:23:20 PDT (-0700), richard.henderson@linaro.org wrote:
-> On 6/27/19 7:44 PM, Jonathan Behrens wrote:
->> I think this patch is slightly incorrect. If the PMP region is valid for
->> the size of the access, but not the rest of the page then a few lines down
->> in this function the entire page should not be placed into the TLB. Instead
->> only the portion of the page that passed the access check should be
->> included. To give an example of where this goes wrong, in the code below
->> access to address 0x90000008 should always fail due to PMP rules, but if
->> the TLB has already been primed by loading the (allowed) address 0x90000000
->> then no fault will be triggered. Notably, this code also executes
->> improperly without the patch because the first `ld` instruction traps when
->> it shouldn't.
->>
->>   li t0, 0x0000000024000000 // region[0]: 0x90000000..0x90000007
->>   csrw pmpaddr0, t0
->>
->>   li t0, 0x00000000240001FF // region[1]: 0x90000000..0x90000fff
->>   csrw pmpaddr1, t0
->>
->>   li t0, 0x1F0000000000989F // cfg[0] = LXRW, cfg[1] = L
->>   csrw pmpcfg0, t0
->>
->>   sfence.vma
->>
->>   li t0, 0x90000000
->>   ld s0, 0(t0)
->>   ld s1, 8(t0) // NO TRAP: address is incorrectly in TLB!
->
-> Nice test case.
->
->> I think that the proper fix would be to first do a PMP check for the full
->> PAGE_SIZE and execute normally if it passes. Then in the event the full
->> page fails, there could be a more granular PMP check with only the accessed
->> region inserted as an entry in the TLB.
->
-> This feature looks to be almost identical to the ARM m-profile MPU.
->
-> The fix is:
->
-> If the PMP check is valid for the entire page, then continue to call
-> tlb_set_page with size=TARGET_PAGE_SIZE.
->
-> If the PMP check is valid for the current access, but not for the entire page,
-> then call tlb_set_page with any size < TARGET_PAGE_SIZE.  This change alone is
-> sufficient, even though the full argument tuple (paddr, vaddr, size) no longer
-> quite make perfect sense.  (For the arm mpu, we compute some 1 << rsize, but
-> the actual value is never used; setting size=1 would be sufficient.)
->
-> Any size < TARGET_PAGE_SIZE will cause TLB_RECHECK to be set for the page,
-> which will force all accesses to the page to go back through riscv_cpu_tlb_fill
-> for re-validation.
+On Mon, 2019-07-08 at 14:23 +0200, Max Reitz wrote:
+> On 07.07.19 10:43, Maxim Levitsky wrote:
+> > On Fri, 2019-07-05 at 13:03 +0200, Max Reitz wrote:
+> > > On 03.07.19 17:59, Maxim Levitsky wrote:
+> > > > Completion entries are meant to be only read by the host and writ=
+ten by the device.
+> > > > The driver is supposed to scan the completions from the last poin=
+t where it left,
+> > > > and until it sees a completion with non flipped phase bit.
+> > >=20
+> > > (Disclaimer: This is the first time I read the nvme driver, or real=
+ly
+> > > something in the nvme spec.)
+> > >=20
+> > > Well, no, completion entries are also meant to be initialized by th=
+e
+> > > host.  To me it looks like this is the place where that happens:
+> > > Everything that has been processed by the device is immediately bei=
+ng
+> > > re-initialized.
+> > >=20
+> > > Maybe we shouldn=E2=80=99t do that here but in nvme_submit_command(=
+).  But
+> > > currently we don=E2=80=99t, and I don=E2=80=99t see any other place=
+ where we currently
+> > > initialize the CQ entries.
+> >=20
+> > Hi!
+> > I couldn't find any place in the spec that says that completion entri=
+es should be initialized.
+> > It is probably wise to initialize that area to 0 on driver initializa=
+tion, but nothing beyond that.
+>=20
+> Ah, you=E2=80=99re right, I misread.  I didn=E2=80=99t pay as much atte=
+ntion to the
+> =E2=80=9C...prior to setting CC.EN to =E2=80=981=E2=80=99=E2=80=9D as I=
+ should have.  Yep, and that is
+> done in nvme_init_queue().
+>=20
+> OK, I cease my wrongful protest:
+>=20
+> Reviewed-by: Max Reitz <mreitz@redhat.com>
+>=20
+> >=20
 
-RISC-V allows another option: support for fine-grained PMPs is optional, which
-allows implementations ignore this issue to save on hardware costs.  It looks
-like Rocket leaves this as a parameter
+Thank you very much!
+BTW, the qemu driver does allocate zeroed memory (in nvme_init_queue,=20
+"q->queue =3D qemu_try_blockalign0(bs, bytes);"
 
-   https://github.com/chipsalliance/rocket-chip/blob/master/src/main/scala/rocket/TLB.scala#L159
+Thus I think this is all that is needed in that regard.
 
-but our implementations always have page-granularity PMPs if virtual memory is
-supported.
+Note that this patch doesn't fix any real bug I know of,=20
+but just makes the thing right in regard to the spec.
+Also racing with hardware in theory can have various memory ordering bugs=
+,
+although in this case the writes are done in=20
+entries which controller probably won't touch, but still.
 
-Unless anyone objects, I'll restrict the PMP granularity to 4K on all systems
-that support virtual memory as a bug fix.  We can add the configuration option
-in as a feature.
+TL;DR - no need in code which does nothing and might cause issues.
 
->> Unrelated question: should I be sending "Reviewed By" lines if I read
->> through patches that seem reasonable? Or there some formal process I'd have
->> to go through first to be approved?
->
-> No formal process.  More eyes are always welcome.
->
->
-> r~
+Do you want me to resend the series or shall I wait till we decide
+what to do with the image creation support? I done fixing all the
+review comments long ago, just didn't want to resend the series.
+Or shall I drop that patch and resend?
+
+From the urgency standpoint the only patch that really should
+be merged ASAP is the one that adds support for block sizes,
+because without it, the whole thing crashes and burns on 4K
+nvme drives.
+
+Best regards,
+	Maxim Levitsky
+
+
+
+
 
