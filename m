@@ -2,98 +2,59 @@ Return-Path: <SRS0=vrBk=VF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6961CC48BE7
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 05:14:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E574C48BE7
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 07:26:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 27DB020651
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 05:14:58 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="QSAxz4wZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 27DB020651
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	by mail.kernel.org (Postfix) with ESMTPS id EA2E02084A
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 07:26:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA2E02084A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38654 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39058 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hkLzN-00040x-8G
-	for qemu-devel@archiver.kernel.org; Mon, 08 Jul 2019 01:14:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43981)
+	id 1hkO2Y-0003LJ-1M
+	for qemu-devel@archiver.kernel.org; Mon, 08 Jul 2019 03:26:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45388)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <yuval.shaia@oracle.com>) id 1hkLyM-0003Z0-2w
- for qemu-devel@nongnu.org; Mon, 08 Jul 2019 01:13:55 -0400
+ (envelope-from <marcandre.lureau@redhat.com>) id 1hkO14-000217-JE
+ for qemu-devel@nongnu.org; Mon, 08 Jul 2019 03:24:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yuval.shaia@oracle.com>) id 1hkLyK-0003yQ-LZ
- for qemu-devel@nongnu.org; Mon, 08 Jul 2019 01:13:54 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:36518)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
- id 1hkLyK-0003wu-Bw
- for qemu-devel@nongnu.org; Mon, 08 Jul 2019 01:13:52 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
- by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x685DchH155572;
- Mon, 8 Jul 2019 05:13:48 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=date : from : to : cc
- : subject : message-id : references : mime-version : content-type :
- in-reply-to; s=corp-2018-07-02;
- bh=bKpHI3iHiimOh+WP1IiqFKrgV4gWcpStEG+H2R2hG/s=;
- b=QSAxz4wZXrUTrbN3MJ0XjGWmfRTsyA0vE4nb2thhPW3ttStgGCHO8rkFzuOYyYsDREMX
- PiXOvA6Ttw8/coe+HyHsq2ME5+5IlKpdiHen3CqKnlUUySyAiJqCUVT09mFHFTdghv18
- zCe3/P8XgVKEOFMjEI3NBzABEbC2iiWaIaTI3eDuziw/haR2+xW5lNy7x/bYM6jOmowb
- KSEj60LwDZiOYa+NKzPNbI+oJSE4hTmCbaSSJU5OF6F9EDEyK76GUxgvWcxnK/rnWG/q
- q9zzwXFedFJJlBjwUWPc83peaw27VkNjXWaNtUefMSzl8k1Df90UziCD1LAmCSba0TwG kg== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
- by userp2120.oracle.com with ESMTP id 2tjm9qc2nk-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 08 Jul 2019 05:13:47 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
- by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x685CsAI007646;
- Mon, 8 Jul 2019 05:13:47 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
- by userp3030.oracle.com with ESMTP id 2tjgrtanxv-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 08 Jul 2019 05:13:47 +0000
-Received: from abhmp0020.oracle.com (abhmp0020.oracle.com [141.146.116.26])
- by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x685Dkms008724;
- Mon, 8 Jul 2019 05:13:47 GMT
-Received: from lap1 (/77.138.183.59) by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Sun, 07 Jul 2019 22:13:45 -0700
-Date: Mon, 8 Jul 2019 08:13:39 +0300
-From: Yuval Shaia <yuval.shaia@oracle.com>
-To: Sukrit Bhatnagar <skrtbhtngr@gmail.com>
-Message-ID: <20190708051338.GA5441@lap1>
-References: <20190706040940.7884-1-skrtbhtngr@gmail.com>
- <20190706040940.7884-3-skrtbhtngr@gmail.com>
+ (envelope-from <marcandre.lureau@redhat.com>) id 1hkO13-0000ld-EX
+ for qemu-devel@nongnu.org; Mon, 08 Jul 2019 03:24:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39824)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+ id 1hkO12-0000jn-2U
+ for qemu-devel@nongnu.org; Mon, 08 Jul 2019 03:24:48 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 508FA883BA
+ for <qemu-devel@nongnu.org>; Mon,  8 Jul 2019 07:24:45 +0000 (UTC)
+Received: from localhost (ovpn-112-17.ams2.redhat.com [10.36.112.17])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7A3D737DD;
+ Mon,  8 Jul 2019 07:24:41 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Mon,  8 Jul 2019 11:24:34 +0400
+Message-Id: <20190708072437.3339-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190706040940.7884-3-skrtbhtngr@gmail.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9311
- signatures=668688
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
- malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1907080067
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9311
- signatures=668688
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
- priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1907080067
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 156.151.31.85
-Subject: Re: [Qemu-devel] [RFC v2 2/2] hw/pvrdma: add live migration support
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.26]); Mon, 08 Jul 2019 07:24:45 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH 0/3] Add dbus-vmstate
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,206 +66,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ berrange@redhat.com, Juan Quintela <quintela@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, Jul 06, 2019 at 09:39:40AM +0530, Sukrit Bhatnagar wrote:
-> Use VMStateDescription for migrating device state. Currently,
+Hi,
 
-What do you mean by 'Currently'?
+With external processes or helpers participating to the VM support, it
+becomes necessary to handle their migration. Various options exist to
+transfer their state:
+1) as the VM memory, RAM or devices (we could say that's how
+   vhost-user devices can be handled today, they are expected to
+   restore from ring state)
+2) other "vmstate" (as with TPM emulator state blobs)
+3) left to be handled by management layer
 
-> 'vmstate_pvrdma' describes the PCI and MSIX state for pvrdma and
-> 'vmstate_pvrdma_dsr_dma' describes a temporary state containing
-> some values obtained only after mapping to dsr in the source.
-> Since the dsr will not be available on dest until we map to the
-> dma address we had on source, these values cannot be migrated
-> directly.
-> 
-> Add PVRDMAMigTmp to store this temporary state which consists of
-> dma addresses and ring page information. The 'parent' member is
-> used to refer to the device state (PVRDMADev) so that parent PCI
-> device object is accessible, which is needed to remap to DSR.
-> 
-> pvrdma_dsr_dma_pre_save() saves the dsr state into this temporary
-> representation and pvrdma_dsr_dma_post_load() loads it back.
-> This load function also remaps to the dsr and and calls
-> load_dsr() for further map and ring init operations.
-> 
-> Please note that this call to load_dsr() can be removed from the
-> migration flow and included in pvrdma_regs_write() to perform a
-> lazy load.
+1) is not practical, since an external processes may legitimatelly
+need arbitrary state date to back a device or a service, or may not
+even have an associated device.
 
-The lazy load was suggested to overcome a potential problem with mapping to
-addresses while still in migration process. With that been solved i would
-suggest to drop the idea of lazy load.
+2) needs ad-hoc code for each helper, but is simple and working
 
-> As of now, migration will fail if there in an error in load_dsr().
-> Also, there might be a considerable amount of pages in the rings,
-> which will have dma map operations when the init functions are
-> called.
-> If this takes noticeable time, it might be better to have lazy
-> load instead.
+3) is complicated for management layer, QEMU has the migration timing
 
-Yeah, make sense but i hope we will not get to this.
+The proposed "dbus-vmstate" object will connect to a given D-Bus
+address, and save/load from org.qemu.VMState1 owners on migration.
 
-> 
-> Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-> Cc: Yuval Shaia <yuval.shaia@oracle.com>
-> Signed-off-by: Sukrit Bhatnagar <skrtbhtngr@gmail.com>
-> ---
->  hw/rdma/vmw/pvrdma_main.c | 87 +++++++++++++++++++++++++++++++++++++++
->  1 file changed, 87 insertions(+)
-> 
-> diff --git a/hw/rdma/vmw/pvrdma_main.c b/hw/rdma/vmw/pvrdma_main.c
-> index 6c90db96f9..4a10bd2fc7 100644
-> --- a/hw/rdma/vmw/pvrdma_main.c
-> +++ b/hw/rdma/vmw/pvrdma_main.c
-> @@ -28,6 +28,7 @@
->  #include "sysemu/sysemu.h"
->  #include "monitor/monitor.h"
->  #include "hw/rdma/rdma.h"
-> +#include "migration/register.h"
->  
->  #include "../rdma_rm.h"
->  #include "../rdma_backend.h"
-> @@ -593,6 +594,91 @@ static void pvrdma_shutdown_notifier(Notifier *n, void *opaque)
->      pvrdma_fini(pci_dev);
->  }
->  
-> +struct PVRDMAMigTmp {
-> +    PVRDMADev *parent;
-> +    uint64_t dma;
-> +    uint64_t cmd_slot_dma;
-> +    uint64_t resp_slot_dma;
-> +    uint32_t cq_ring_pages_num_pages;
-> +    uint64_t cq_ring_pages_pdir_dma;
-> +    uint32_t async_ring_pages_num_pages;
-> +    uint64_t async_ring_pages_pdir_dma;
-> +};
-> +
-> +static int pvrdma_dsr_dma_pre_save(void *opaque)
-> +{
-> +    struct PVRDMAMigTmp *tmp = opaque;
+Thus helpers can easily have their state migrated with QEMU, without
+implementing ad-hoc support (such as done for TPM emulation)
 
-For me tmp sounds like a very bad name, if it is the convention then i can
-live with that, anyways suggesting something like mig_tmp_info or something
-like that.
+I chose D-Bus as it is ubiquitous on Linux (it is systemd IPC), and
+can be made to work on various other OSes. There are several
+implementations and good bindings for various languages.
+(the tests/dbus-vmstate-test.c is a good example of how simple
+the implementation of services can be, even in C)
 
-> +    DSRInfo *dsr_info = &tmp->parent->dsr_info;
+The D-Bus protocol can be made to work peer-to-peer, but the most
+common and practical way is through a bus daemon. This also has the
+advantage of increased debuggability (you can eavesdrop on the bus and
+introspect it).
 
-Can you shad some light on how the parent field is initialized with the
-pointer to the device object?
+dbus-vmstate is put into use by the libvirt series "[PATCH 00/23] Use
+a slirp helper process".
 
-> +    struct pvrdma_device_shared_region *dsr = dsr_info->dsr;
-> +
-> +    tmp->dma = dsr_info->dma;
-> +    tmp->cmd_slot_dma = dsr->cmd_slot_dma;
-> +    tmp->resp_slot_dma = dsr->resp_slot_dma;
-> +    tmp->cq_ring_pages_num_pages = dsr->cq_ring_pages.num_pages;
-> +    tmp->cq_ring_pages_pdir_dma = dsr->cq_ring_pages.pdir_dma;
-> +    tmp->async_ring_pages_num_pages = dsr->async_ring_pages.num_pages;
-> +    tmp->async_ring_pages_pdir_dma = dsr->async_ring_pages.pdir_dma;
-> +
-> +    return 0;
-> +}
-> +
-> +static int pvrdma_dsr_dma_post_load(void *opaque, int version_id)
-> +{
-> +    struct PVRDMAMigTmp *tmp = opaque;
-> +    PVRDMADev *dev = tmp->parent;
-> +    PCIDevice *pci_dev = PCI_DEVICE(dev);
-> +    DSRInfo *dsr_info = &dev->dsr_info;
-> +    struct pvrdma_device_shared_region *dsr;
-> +
-> +    dsr_info->dma = tmp->dma;
-> +    dsr_info->dsr = rdma_pci_dma_map(pci_dev, dsr_info->dma,
-> +                                sizeof(struct pvrdma_device_shared_region));
-> +    if (!dsr_info->dsr) {
-> +        rdma_error_report("Failed to map to DSR");
-> +        return -ENOMEM;
+Marc-Andr=C3=A9 Lureau (3):
+  qemu-file: move qemu_{get,put}_counted_string() declarations
+  tests: add qtest_set_exit_status()
+  Add dbus-vmstate object
 
-Will this cause the VM on source host to continue functioning besides
-failing the migration?
+ MAINTAINERS                         |   6 +
+ backends/Makefile.objs              |   4 +
+ backends/dbus-vmstate.c             | 497 ++++++++++++++++++++++++++++
+ configure                           |   7 +
+ docs/interop/dbus-vmstate.rst       |  64 ++++
+ docs/interop/index.rst              |   1 +
+ include/migration/qemu-file-types.h |   4 +
+ migration/qemu-file.h               |   4 -
+ tests/Makefile.include              |  18 +-
+ tests/dbus-vmstate-test.c           | 387 ++++++++++++++++++++++
+ tests/dbus-vmstate1.xml             |  12 +
+ tests/libqtest.c                    |  41 +--
+ tests/libqtest.h                    |   9 +
+ 13 files changed, 1030 insertions(+), 24 deletions(-)
+ create mode 100644 backends/dbus-vmstate.c
+ create mode 100644 docs/interop/dbus-vmstate.rst
+ create mode 100644 tests/dbus-vmstate-test.c
+ create mode 100644 tests/dbus-vmstate1.xml
 
-> +    }
-> +
-> +    dsr = dsr_info->dsr;
-> +    dsr->cmd_slot_dma = tmp->cmd_slot_dma;
-> +    dsr->resp_slot_dma = tmp->resp_slot_dma;
-> +    dsr->cq_ring_pages.num_pages = tmp->cq_ring_pages_num_pages;
-> +    dsr->cq_ring_pages.pdir_dma = tmp->cq_ring_pages_pdir_dma;
-> +    dsr->async_ring_pages.num_pages = tmp->async_ring_pages_num_pages;
-> +    dsr->async_ring_pages.pdir_dma = tmp->async_ring_pages_pdir_dma;
+--=20
+2.22.0.214.g8dca754b1e
 
-I expect the above 6 fields to be already populated with the correct values
-as we just map to driver's DSR that should be migrated as part of memory
-copy of source to dest host.
-Can you verify it and if my assumptions are correct to remove these
-assignments (and the corresponding from pre_save)?
-
-> +
-> +    return load_dsr(dev);
-> +}
-> +
-> +static const VMStateDescription vmstate_pvrdma_dsr_dma = {
-> +    .name = "pvrdma-dsr-dma",
-> +    .pre_save = pvrdma_dsr_dma_pre_save,
-> +    .post_load = pvrdma_dsr_dma_post_load,
-
-I'm looking for a hook that is triggered just before leaving the source
-host so we can do some needed cleanups such as unmapping the DSR, removing
-IP addresses from the host etc.
-
-> +    .fields = (VMStateField[]) {
-> +            VMSTATE_UINT64(dma, struct PVRDMAMigTmp),
-> +            VMSTATE_UINT64(cmd_slot_dma, struct PVRDMAMigTmp),
-> +            VMSTATE_UINT64(resp_slot_dma, struct PVRDMAMigTmp),
-> +            VMSTATE_UINT32(async_ring_pages_num_pages, struct PVRDMAMigTmp),
-> +            VMSTATE_UINT64(async_ring_pages_pdir_dma, struct PVRDMAMigTmp),
-> +            VMSTATE_UINT32(cq_ring_pages_num_pages, struct PVRDMAMigTmp),
-> +            VMSTATE_UINT64(cq_ring_pages_pdir_dma, struct PVRDMAMigTmp),
-> +            VMSTATE_END_OF_LIST()
-> +    }
-> +};
-> +
-> +static const VMStateDescription vmstate_pvrdma = {
-> +    .name = "pvrdma",
-
-Suggesting to use the already defined constant PVRDMA_HW_NAME.
-
-> +    .version_id = 1,
-> +    .minimum_version_id = 1,
-
-Hmmm...interesting, what's the use of these fields?
-
-> +    .fields = (VMStateField[]) {
-> +            VMSTATE_PCI_DEVICE(parent_obj, PVRDMADev),
-> +            VMSTATE_MSIX(parent_obj, PVRDMADev),
-> +            VMSTATE_WITH_TMP(PVRDMADev,
-> +                             struct PVRDMAMigTmp,
-> +                             vmstate_pvrdma_dsr_dma),
-> +            VMSTATE_END_OF_LIST()
-> +    }
-> +};
-> +
->  static void pvrdma_realize(PCIDevice *pdev, Error **errp)
->  {
->      int rc = 0;
-> @@ -688,6 +774,7 @@ static void pvrdma_class_init(ObjectClass *klass, void *data)
->  
->      dc->desc = "RDMA Device";
->      dc->props = pvrdma_dev_properties;
-> +    dc->vmsd = &vmstate_pvrdma;
->      set_bit(DEVICE_CATEGORY_NETWORK, dc->categories);
-
-Besides the above comments looks like a great job, thanks!
-
->  
->      ir->print_statistics = pvrdma_print_statistics;
-> -- 
-> 2.21.0
-> 
-> 
 
