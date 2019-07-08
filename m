@@ -2,93 +2,63 @@ Return-Path: <SRS0=vrBk=VF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D228C606BD
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 16:08:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4216C606C1
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 16:10:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4BB9A20693
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 16:08:46 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a6oz8I6g"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4BB9A20693
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id AF97220693
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 16:10:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF97220693
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43176 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43184 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hkWC5-00006l-8z
-	for qemu-devel@archiver.kernel.org; Mon, 08 Jul 2019 12:08:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42410)
+	id 1hkWDJ-00013z-1h
+	for qemu-devel@archiver.kernel.org; Mon, 08 Jul 2019 12:10:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43718)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <frasse.iglesias@gmail.com>) id 1hkW7D-0004oH-Lc
- for qemu-devel@nongnu.org; Mon, 08 Jul 2019 12:03:44 -0400
+ (envelope-from <berrange@redhat.com>) id 1hkWC1-0000Bl-IP
+ for qemu-devel@nongnu.org; Mon, 08 Jul 2019 12:08:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <frasse.iglesias@gmail.com>) id 1hkW7C-0004po-A3
- for qemu-devel@nongnu.org; Mon, 08 Jul 2019 12:03:43 -0400
-Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:44919)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <frasse.iglesias@gmail.com>)
- id 1hkW7C-0004mD-0x; Mon, 08 Jul 2019 12:03:42 -0400
-Received: by mail-lj1-x241.google.com with SMTP id k18so16468282ljc.11;
- Mon, 08 Jul 2019 09:03:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:content-transfer-encoding:in-reply-to
- :user-agent; bh=KBRi8cQQBvYj9KgVf2TGXS8dksaF/hFUiXEmkZ/cCDY=;
- b=a6oz8I6g+LvCFA04palZPcwOX+tiqF8U9i9sx8lVPAbi41jksm29RNZYh87lVcIT9f
- p4wQ4hwrpYeVK2cQpQRiSDHprReCbZ0CXjh7Oks3nB7tN52XkyBitBPsqgHoUqEolaGd
- 5jYzyehU5JNNdT0mjq0z56kQvlQ6Kwl/eGURP0kQmxnGIVj9FDnQWsSThC4Vp745+X95
- 1Wt2nWf8rNfLI4fqqC+qxj+v2wcw9795rhS317Ts/YT3XpQ/CNE9XhOyXP8WXwzlMYZc
- qyA13i3M47e1fpSz946Jk2D6gU+RkVNzrT4N20N+MG+mjsnuLXhx9HfGoudnN33z8bII
- 7jpg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to:user-agent;
- bh=KBRi8cQQBvYj9KgVf2TGXS8dksaF/hFUiXEmkZ/cCDY=;
- b=TQiNa+AY5HCkWNY24w+JH3zaqSY8uc1HYgJuLjYH68vebdtxhnvltIa3dT2zbdjp10
- UiQ98G124aGKwIvGdTmdXhV0JKayziQEOzBxGntaGaO5VW1C1ULzcUcT3K4aTefZVAzZ
- CK55es5IIRbgtMRix7Q/Of1x82pJtDbeScoBYocTP+OEueRY5TNsHnyQqclhHQTRtN7n
- FkE3w7hYksuymHZuWE6sX40YDQEbQB/GJaB36VNT35uXhmys6UOhge6wN2ZwkcqxuCfA
- 3XKR6LC8t1HRQELfU+B8IpxvIAJzVHCVjenfklgkclaLFvXWNMxhNtsUfRCFRMuZCAax
- QBFw==
-X-Gm-Message-State: APjAAAValDi6gP3Yg26kYlDyWY2X4jo+5/9MkjA3AoCDkGNWjTeSfKI1
- EDUsyg/p32ijmn2910GHuqo=
-X-Google-Smtp-Source: APXvYqzRASdJIgnTV1nPpnut6ER3B32uN3LRuDrVYPM+eTnVXRJQzBvC0Rk1n5gV35/7jHDdMf+AZw==
-X-Received: by 2002:a2e:868e:: with SMTP id l14mr10710670lji.16.1562601819690; 
- Mon, 08 Jul 2019 09:03:39 -0700 (PDT)
-Received: from fralle-msi (31-208-27-151.cust.bredband2.com. [31.208.27.151])
- by smtp.gmail.com with ESMTPSA id
- z17sm3756526ljc.37.2019.07.08.09.03.38
- (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
- Mon, 08 Jul 2019 09:03:39 -0700 (PDT)
-Date: Mon, 8 Jul 2019 18:03:37 +0200
-From: Francisco Iglesias <frasse.iglesias@gmail.com>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Message-ID: <20190708160335.u3zamevyrbnx6nvb@fralle-msi>
-References: <20190708104750.1071-1-philmd@redhat.com>
- <20190708104750.1071-4-philmd@redhat.com>
- <20190708142622.k4s5oknmzzj4brxd@fralle-msi>
- <41f075ef-9b80-cb66-0fb1-d03079cd93a4@redhat.com>
+ (envelope-from <berrange@redhat.com>) id 1hkWC0-000311-DD
+ for qemu-devel@nongnu.org; Mon, 08 Jul 2019 12:08:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44432)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hkWC0-00030Q-5U
+ for qemu-devel@nongnu.org; Mon, 08 Jul 2019 12:08:40 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 6F82FC004BA8
+ for <qemu-devel@nongnu.org>; Mon,  8 Jul 2019 16:08:39 +0000 (UTC)
+Received: from redhat.com (unknown [10.42.17.95])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E87C55D9E5;
+ Mon,  8 Jul 2019 16:08:35 +0000 (UTC)
+Date: Mon, 8 Jul 2019 17:08:33 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190708160833.GM3082@redhat.com>
+References: <20190708072437.3339-1-marcandre.lureau@redhat.com>
+ <20190708154406.GL2746@work-vm>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <41f075ef-9b80-cb66-0fb1-d03079cd93a4@redhat.com>
-User-Agent: NeoMutt/20170113 (1.7.2)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::241
-Subject: Re: [Qemu-devel] [PATCH-for-4.1 v5 3/3] hw/ssi/xilinx_spips: Avoid
- out-of-bound access to lqspi_buf[]
+In-Reply-To: <20190708154406.GL2746@work-vm>
+User-Agent: Mutt/1.12.0 (2019-05-25)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.32]); Mon, 08 Jul 2019 16:08:39 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 0/3] Add dbus-vmstate
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,99 +70,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-stable@nongnu.org,
- Alistair Francis <alistair@alistair23.me>, qemu-devel@nongnu.org,
- Prasad J Pandit <ppandit@redhat.com>, Lei Sun <slei.casper@gmail.com>,
- qemu-arm@nongnu.org, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Philippe,
+On Mon, Jul 08, 2019 at 04:44:06PM +0100, Dr. David Alan Gilbert wrote:
+> * Marc-Andr=C3=A9 Lureau (marcandre.lureau@redhat.com) wrote:
+> > Hi,
+> >=20
+> > With external processes or helpers participating to the VM support, i=
+t
+> > becomes necessary to handle their migration. Various options exist to
+> > transfer their state:
+> > 1) as the VM memory, RAM or devices (we could say that's how
+> >    vhost-user devices can be handled today, they are expected to
+> >    restore from ring state)
+> > 2) other "vmstate" (as with TPM emulator state blobs)
+> > 3) left to be handled by management layer
+> >=20
+> > 1) is not practical, since an external processes may legitimatelly
+> > need arbitrary state date to back a device or a service, or may not
+> > even have an associated device.
+> >=20
+> > 2) needs ad-hoc code for each helper, but is simple and working
+> >=20
+> > 3) is complicated for management layer, QEMU has the migration timing
+> >=20
+> > The proposed "dbus-vmstate" object will connect to a given D-Bus
+> > address, and save/load from org.qemu.VMState1 owners on migration.
+>=20
+> Some very high level questions:
+>   a) If I've got two QEMU's running, how do the right devices
+>    end up migrating to the right qemu?
 
-On [2019 Jul 08] Mon 16:58:29, Philippe Mathieu-Daudé wrote:
-> Hi Francisco,
-> 
-> On 7/8/19 4:26 PM, Francisco Iglesias wrote:
-> > Hi Philippe,
-> > 
-> > On [2019 Jul 08] Mon 12:47:50, Philippe Mathieu-Daudé wrote:
-> >> Both lqspi_read() and lqspi_load_cache() expect a 32-bit
-> >> aligned address.
-> >>
-> >> From UG1085 datasheet [*] Chapter 22: Quad-SPI Controller:
-> > 
-> > s/22/24/
-> 
-> I'm confuse, Chapter 24 is "SD/SDIO Controller", so it seems this Xilinx
-> datasheet is not stable to refer to. Maybe I should simply use:
-> 
->   From UG1085 datasheet [*] Chapter on 'Quad-SPI Controller':
+This isn't using the normal DBus instance. It needs a new isntance of
+dbus-daemon to be spawned for each VM IIUC.
 
-I just clicked on the link and ended up into this version of the UG1085:
+>   b) Why use dbus for the comms? Don't all of the daemons have some
+>    protocol'd socket between QEMU and the daemon? If so they could
+>    send up a separate FD for migration data
 
-'UG1085 (v1.9) January 17, 2019'
+There's two distinct aspects here
 
-But your right its probably better to refer to a specific version of the
-UG1085 instead? Then both should be ok, either to write the way you
-suggest above or refer to the chapter number in that UG1085 version (as it
-was before).
+ - Whether to use a bus vs peer-to-peer
+ - What protocol to run over the wire
 
-Best regards,
-Francisco
+DBus defines a low level wire protocol. It just happens that it is
+commonly used in bus topology, but it is fine being used peer-to-peer
+instead.
 
-> 
-> > 
-> > After above change:
-> > 
-> > Reviewed-by: Francisco Iglesias <frasse.iglesias@gmail.com> 
-> > Tested-by: Francisco Iglesias <frasse.iglesias@gmail.com>
-> > 
-> > (I tested all three patches so the Tested-by tag can also be appended on the
-> > other two)
-> 
-> Thanks!
-> 
-> > 
-> > Best regards,
-> > Francisco Iglesias
-> > 
-> >>
-> >>   Transfer Size Limitations
-> >>
-> >>     Because of the 32-bit wide TX, RX, and generic FIFO, all
-> >>     APB/AXI transfers must be an integer multiple of 4-bytes.
-> >>     Shorter transfers are not possible.
-> >>
-> >> Set MemoryRegionOps.impl values to force 32-bit accesses,
-> >> this way we are sure we do not access the lqspi_buf[] array
-> >> out of bound.
-> >>
-> >> [*] https://www.xilinx.com/support/documentation/user_guides/ug1085-zynq-ultrascale-trm.pdf
-> >>
-> >> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> >> ---
-> >> v5: add datasheet reference, drop RFC prefix, fix build (Francisco)
-> >> ---
-> >>  hw/ssi/xilinx_spips.c | 4 ++++
-> >>  1 file changed, 4 insertions(+)
-> >>
-> >> diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
-> >> index 3c4e8365ee..b29e0a4a89 100644
-> >> --- a/hw/ssi/xilinx_spips.c
-> >> +++ b/hw/ssi/xilinx_spips.c
-> >> @@ -1239,6 +1239,10 @@ static const MemoryRegionOps lqspi_ops = {
-> >>      .read_with_attrs = lqspi_read,
-> >>      .write_with_attrs = lqspi_write,
-> >>      .endianness = DEVICE_NATIVE_ENDIAN,
-> >> +    .impl = {
-> >> +        .min_access_size = 4,
-> >> +        .max_access_size = 4,
-> >> +    },
-> >>      .valid = {
-> >>          .min_access_size = 1,
-> >>          .max_access_size = 4
-> >> -- 
-> >> 2.20.1
-> >>
+IOW, we could use Dbus as the wire encoding, and still have a direct
+FD betwwen QEMU & the helper program, without needign dbus-daemon
+present.
+
+>   c) Your 1MB limit is pretty aribtary - it's nice to have a limit
+>     but it's hard to justify why it's that one.
+
+IIRC, that's the default DBus message size limit. You can choose to
+raise that in the client & server impl if desired, or alternatively
+just pass back a memfd() handle with the DBus relpy, over which to
+access the bulk data out of band.
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
 
