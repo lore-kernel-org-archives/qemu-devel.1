@@ -2,96 +2,80 @@ Return-Path: <SRS0=vrBk=VF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC4B5C606C1
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 15:10:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33B06C606C1
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 15:14:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AF64F20844
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 15:10:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF64F20844
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0159C214C6
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 15:14:17 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LMh6E3iI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0159C214C6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42514 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42544 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hkVHc-0006rM-R9
-	for qemu-devel@archiver.kernel.org; Mon, 08 Jul 2019 11:10:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53730)
+	id 1hkVLM-0008TT-AN
+	for qemu-devel@archiver.kernel.org; Mon, 08 Jul 2019 11:14:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54768)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <borntraeger@de.ibm.com>) id 1hkVH0-0006Aw-JQ
- for qemu-devel@nongnu.org; Mon, 08 Jul 2019 11:09:47 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hkVJr-0007q4-VS
+ for qemu-devel@nongnu.org; Mon, 08 Jul 2019 11:12:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <borntraeger@de.ibm.com>) id 1hkVGy-0004GC-Lt
- for qemu-devel@nongnu.org; Mon, 08 Jul 2019 11:09:46 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:33732
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
- id 1hkVGx-00048d-AQ
- for qemu-devel@nongnu.org; Mon, 08 Jul 2019 11:09:44 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x68ExvRZ063928
- for <qemu-devel@nongnu.org>; Mon, 8 Jul 2019 11:09:39 -0400
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2tm7yngrum-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Mon, 08 Jul 2019 11:09:38 -0400
-Received: from localhost
- by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
- Mon, 8 Jul 2019 16:09:36 +0100
-Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
- by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Mon, 8 Jul 2019 16:09:33 +0100
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com
- [9.149.105.59])
- by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
- id x68F9V9438666696
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 8 Jul 2019 15:09:31 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id A2A7CA404D;
- Mon,  8 Jul 2019 15:09:31 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 8FFC4A4040;
- Mon,  8 Jul 2019 15:09:31 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
- by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
- Mon,  8 Jul 2019 15:09:31 +0000 (GMT)
-Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 25651)
- id 51DD7E01F2; Mon,  8 Jul 2019 17:09:31 +0200 (CEST)
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-To: Cornelia Huck <cohuck@redhat.com>
-Date: Mon,  8 Jul 2019 17:09:31 +0200
-X-Mailer: git-send-email 2.21.0
+ (envelope-from <peter.maydell@linaro.org>) id 1hkVJq-0003mg-Q4
+ for qemu-devel@nongnu.org; Mon, 08 Jul 2019 11:12:43 -0400
+Received: from mail-oi1-x234.google.com ([2607:f8b0:4864:20::234]:45847)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hkVJq-0003ig-AV
+ for qemu-devel@nongnu.org; Mon, 08 Jul 2019 11:12:42 -0400
+Received: by mail-oi1-x234.google.com with SMTP id m206so12835394oib.12
+ for <qemu-devel@nongnu.org>; Mon, 08 Jul 2019 08:12:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=EHb4vILNWMjD4mpXSVNFblOCeZRXoUDcbG4yA/ma+6g=;
+ b=LMh6E3iIt/Qcd+vK6q51M74HWQfWo1Bj2a+G4HeSfoF8r71q+dH4kVQYQ9MHN5nWaz
+ qrQNxgqZRKwGEic4WxhjVZE8tZ6D0WU6a1DXQdR4B373Kt9Iq7mT8fTH+d39lP4kXKAH
+ FBUuB8J279hmunaTHNCYVn5E0kO3QmDT0okyjsQfHyW+Y+pFAXMd2sErUQx2G+A3f3Yv
+ NIfGvSCTCzY3xhSsXW1IpHcLWRERY/iA+lnK1e/DMTY6HSRUALCWMpfoa9nKtoayg1Ge
+ mSYnhKWqxaO8kUpOIINNCU7VOit0tLeqhN0sJHCwm+NpZFHUjph9eYBz1USfOvq4oSyd
+ QQMA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=EHb4vILNWMjD4mpXSVNFblOCeZRXoUDcbG4yA/ma+6g=;
+ b=SZUpODW5qLfzAnToV30W9hfFcR7FjxKPBV+p5xxTv0NJTnPqp5em1bCfDOAIWgaTqC
+ Jh4Ziphy5zeSk4hmvEGwo+xHceLaVkfjea+YZyqEBkw8+ja2GledcPpn6Lfys79U2DqF
+ 3Gvq0iOFexfJU/f4rC0iDj49mSHgXw5ZZ5FiGrFnW5K3Qf6+Ex3hqY13AFqTa4sFSErQ
+ r5JkBhVqzw9DGumTUazYBhWSedwNrgtGgaEXM1rDSCngYaqv7l/Q2P0MaNlTqPk6ckY1
+ M/Rd03nggJ78seBe9VOmX841mAkhZPJ0xTnf81fVSnf8zMwGfgBJE2zaeEz+KkuA7pP4
+ b8eg==
+X-Gm-Message-State: APjAAAXX8cMdI8sfzN96PUZxj7KFVQfBxzsjump1PwNyIojBYm8/e/Ch
+ kn3k/E90+wiYHSWZY+5vCuLYpqOU+GgLeA9BElf0gw==
+X-Google-Smtp-Source: APXvYqw5vpe7BpaJgNaXGvaUb071+APti0p9x45SVcs+nKtOtKzVm/ZAd4hi33qrOfTeOeLSscg6rsK9x1zvRUBHfoo=
+X-Received: by 2002:a05:6808:8c2:: with SMTP id
+ k2mr9573073oij.98.1562598761329; 
+ Mon, 08 Jul 2019 08:12:41 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 19070815-0028-0000-0000-00000381FFB9
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19070815-0029-0000-0000-0000244208D5
-Message-Id: <20190708150931.93448-1-borntraeger@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
- definitions=2019-07-08_05:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=810 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1907080187
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
-Subject: [Qemu-devel] [PATCH v2] s390: cpumodel: fix description for the new
- vector facility
+References: <20190708141812.3974-1-kwolf@redhat.com>
+In-Reply-To: <20190708141812.3974-1-kwolf@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 8 Jul 2019 16:12:30 +0100
+Message-ID: <CAFEAcA-eM-yqxak=hM6NN9LxDHcdruX8VuBuK9zZcxLkCb++5A@mail.gmail.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::234
+Subject: Re: [Qemu-devel] [PULL 0/6] Block layer patches
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,39 +87,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Collin Walling <walling@linux.ibm.com>,
- David Hildenbrand <david@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- qemu-s390x <qemu-s390x@nongnu.org>, Richard Henderson <rth@twiddle.net>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The new facility is called "Vector-Packed-Decimal-Enhancement Facility"
-and not "Vector BCD enhancements facility 1". As the shortname might
-have already found its way into some backports lets keep vxbeh.
+On Mon, 8 Jul 2019 at 15:18, Kevin Wolf <kwolf@redhat.com> wrote:
+>
+> The following changes since commit df34fe314b5da628bc9a2664fb1b887bc0a6cc6d:
+>
+>   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20190708' into staging (2019-07-08 14:23:32 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://repo.or.cz/qemu/kevin.git tags/for-upstream
+>
+> for you to fetch changes up to f7077c9860a438087c2d9a8cc27cb8438c98a748:
+>
+>   qcow2: Allow -o compat=v3 during qemu-img amend (2019-07-08 16:00:31 +0200)
+>
+> ----------------------------------------------------------------
+> Block layer patches:
+>
+> - virtio-scsi: Fix request resubmission after I/O error with iothreads
+> - qcow2: Fix missing v2/v3 subformat aliases for amend
+> - qcow(1): More specific error message for wrong format version
+> - MAINTAINERS: update RBD block maintainer
+>
 
-Fixes: 54d65de0b525 ("s390x/cpumodel: vector enhancements")
-Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
----
- target/s390x/cpu_features_def.inc.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/target/s390x/cpu_features_def.inc.h b/target/s390x/cpu_features_def.inc.h
-index ef190e2fc783..3118a9f89228 100644
---- a/target/s390x/cpu_features_def.inc.h
-+++ b/target/s390x/cpu_features_def.inc.h
-@@ -104,7 +104,7 @@ DEF_FEAT(CMM_NT, "cmmnt", STFL, 147, "CMM: ESSA-enhancement (no translate) facil
- DEF_FEAT(VECTOR_ENH2, "vxeh2", STFL, 148, "Vector Enhancements facility 2")
- DEF_FEAT(ESORT_BASE, "esort-base", STFL, 150, "Enhanced-sort facility (excluding subfunctions)")
- DEF_FEAT(DEFLATE_BASE, "deflate-base", STFL, 151, "Deflate-conversion facility (excluding subfunctions)")
--DEF_FEAT(VECTOR_BCD_ENH, "vxbeh", STFL, 152, "Vector BCD enhancements facility 1")
-+DEF_FEAT(VECTOR_BCD_ENH, "vxbeh", STFL, 152, "Vector-Packed-Decimal-Enhancement Facility")
- DEF_FEAT(MSA_EXT_9, "msa9-base", STFL, 155, "Message-security-assist-extension-9 facility (excluding subfunctions)")
- DEF_FEAT(ETOKEN, "etoken", STFL, 156, "Etoken facility")
- 
--- 
-2.21.0
+Applied, thanks.
 
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.1
+for any user-visible changes.
+
+-- PMM
 
