@@ -6,68 +6,68 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B4F7C606BD
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DE84C606C1
 	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 15:35:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 179B821738
+	by mail.kernel.org (Postfix) with ESMTPS id 1747121537
 	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 15:35:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 179B821738
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1747121537
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42708 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42710 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hkVft-0007Vz-Rz
-	for qemu-devel@archiver.kernel.org; Mon, 08 Jul 2019 11:35:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60988)
+	id 1hkVfu-0007WA-BY
+	for qemu-devel@archiver.kernel.org; Mon, 08 Jul 2019 11:35:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60989)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bounces@canonical.com>) id 1hkVbo-0005jv-P5
+ (envelope-from <bounces@canonical.com>) id 1hkVbo-0005jw-PH
  for qemu-devel@nongnu.org; Mon, 08 Jul 2019 11:31:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1hkVbn-0003q5-FB
+ (envelope-from <bounces@canonical.com>) id 1hkVbn-0003qi-J0
  for qemu-devel@nongnu.org; Mon, 08 Jul 2019 11:31:16 -0400
-Received: from indium.canonical.com ([91.189.90.7]:42512)
+Received: from indium.canonical.com ([91.189.90.7]:42578)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1hkVbl-0003f6-Cg
+ id 1hkVbn-0003ki-Bh
  for qemu-devel@nongnu.org; Mon, 08 Jul 2019 11:31:15 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1hkVbi-0004gE-Mb
- for <qemu-devel@nongnu.org>; Mon, 08 Jul 2019 15:31:10 +0000
+ id 1hkVbl-0004iX-2m
+ for <qemu-devel@nongnu.org>; Mon, 08 Jul 2019 15:31:13 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id A53722E804E
- for <qemu-devel@nongnu.org>; Mon,  8 Jul 2019 15:31:10 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 124992E804E
+ for <qemu-devel@nongnu.org>; Mon,  8 Jul 2019 15:31:13 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 08 Jul 2019 15:22:32 -0000
+Date: Mon, 08 Jul 2019 15:19:39 -0000
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=Fix Committed; importance=Undecided;
- assignee=rth@twiddle.net; 
-X-Launchpad-Bug-Tags: arm tcg testcase
+ assignee=None; 
+X-Launchpad-Bug-Tags: arm
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: ajbennee christophe-lyon pmaydell rth
-X-Launchpad-Bug-Reporter: Christophe Lyon (christophe-lyon)
+X-Launchpad-Bug-Commenters: pmaydell sedrubal
+X-Launchpad-Bug-Reporter: sedrubal (sedrubal)
 X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
-References: <156025884763.18155.9614824235777300144.malonedeb@wampee.canonical.com>
-Message-Id: <156259935287.23134.15406095978480159975.malone@chaenomeles.canonical.com>
+References: <153782360135.24561.14757076619752022286.malonedeb@gac.canonical.com>
+Message-Id: <156259917974.21433.3305464938496675800.malone@gac.canonical.com>
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com); Revision="19007";
  Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 7a9d0faf8d39686e38d856c5a3fbfd66defd4f80
+X-Launchpad-Hash: ca62e06f82908712191e2d66603ca2a49ab2081a
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1832353] Re: cpu_exec: Assertion
- !have_mmap_lock() failed
+Subject: [Qemu-devel] [Bug 1794187] Re: improve error message,
+ when using raspi3 and RAM>4G
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 List-Id: <qemu-devel.nongnu.org>
@@ -78,57 +78,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1832353 <1832353@bugs.launchpad.net>
+Reply-To: Bug 1794187 <1794187@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The fix for this bug is now in master and will be in QEMU 4.1.
+Improved diagnostic message is now in master and will be in QEMU 4.1.
 
 
 ** Changed in: qemu
-       Status: In Progress =3D> Won't Fix
-
-** Changed in: qemu
-       Status: Won't Fix =3D> Fix Committed
+       Status: In Progress =3D> Fix Committed
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1832353
+https://bugs.launchpad.net/bugs/1794187
 
 Title:
-  cpu_exec: Assertion !have_mmap_lock() failed
+  improve error message, when using raspi3 and RAM>4G
 
 Status in QEMU:
   Fix Committed
 
 Bug description:
-  Hi,
+  Running `qemu-system-aarch64 image-aarch64.iso --machine raspi3 -m 8G`
+  prints this error message:
 
-  I have isolated a testcase from the GCC testsuite (actually gfortran,
-  test proc_ptr_51.f90) which produces tons of:
+  ```
+  Unexpected error in visit_type_uintN() at /builddir/build/BUILD/qemu-3.0.=
+0/qapi/qapi-visit-core.c:164:
+  qemu-system-aarch64: Parameter 'vcram-base' expects uint32_t
+  ```
 
-  qemu-arm: /home/christophe.lyon/src/qemu/accel/tcg/cpu-exec.c:701:
-  cpu_exec: Assertion `!have_mmap_lock()' failed.
+  The problem is, that you musn't use more than 4 GB RAM for machine
+  raspi3. As it took me some time to figure that out, I'd be glad, if
+  you can print better error message, like you do, when using more than
+  4 CPU cores with machine raspi3:
 
-  including with master qemu as of today.
+  ```
+  Invalid SMP CPUs 8. The max CPUs supported by machine 'raspi3' is 4 =
 
-  I'm attaching a tarball containing:
-  qemu-assert:
-  cmd  lib  proc_ptr_51.exe
-
-  qemu-assert/lib:
-  ld-linux-armhf.so.3  libc.so.6  libgcc_s.so.1  libgfortran.so.5  libm.so.6
-
-  where cmd is the basic command used to launch the test & reproduce the
-  failure.
-
-  Note that the test or the generated may actually be buggy: I have
-  reported failures on native aarch64 and arm machines. Yet, qemu should
-  not fail with a loop of asserts.
+  ```
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1832353/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1794187/+subscriptions
 
