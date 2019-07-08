@@ -2,67 +2,70 @@ Return-Path: <SRS0=vrBk=VF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33CC7C606AA
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 10:19:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CFD4C606A7
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 10:25:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0344B20651
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 10:19:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0344B20651
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7232720656
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jul 2019 10:25:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7232720656
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40172 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40200 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hkQkX-0002vP-6m
-	for qemu-devel@archiver.kernel.org; Mon, 08 Jul 2019 06:19:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60704)
+	id 1hkQqL-0004Tq-Fe
+	for qemu-devel@archiver.kernel.org; Mon, 08 Jul 2019 06:25:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34066)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <berrange@redhat.com>) id 1hkQk4-0002RU-8H
- for qemu-devel@nongnu.org; Mon, 08 Jul 2019 06:19:29 -0400
+ (envelope-from <geert.uytterhoeven@gmail.com>) id 1hkQou-0003u1-6b
+ for qemu-devel@nongnu.org; Mon, 08 Jul 2019 06:24:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1hkQk1-00089B-Fx
- for qemu-devel@nongnu.org; Mon, 08 Jul 2019 06:19:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46124)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hkQk1-00088W-9O
- for qemu-devel@nongnu.org; Mon, 08 Jul 2019 06:19:25 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 85B2C308620E;
- Mon,  8 Jul 2019 10:19:24 +0000 (UTC)
-Received: from redhat.com (unknown [10.42.17.95])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B0DF85C46B;
- Mon,  8 Jul 2019 10:19:21 +0000 (UTC)
-Date: Mon, 8 Jul 2019 11:19:19 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Message-ID: <20190708101919.GF3082@redhat.com>
-References: <3c8b83fe-120b-40e6-84d5-5a3b88e46ee3@ilande.co.uk>
- <CAFEAcA9KjJUE7R0OYfM9AT=Ydu8eXBYJR=sGoGog25xrpRMZig@mail.gmail.com>
- <914f608a-5128-87a5-1c08-e20db88ad216@ilande.co.uk>
- <CAFEAcA9=KKtbR624rV77cu41zUTyu2N8-+1Gjmg-rQwdS1htuw@mail.gmail.com>
- <20190708094107.GD3082@redhat.com>
- <28ca7c60-5795-31ff-1d71-1fac477ad996@redhat.com>
+ (envelope-from <geert.uytterhoeven@gmail.com>) id 1hkQos-0002PS-MB
+ for qemu-devel@nongnu.org; Mon, 08 Jul 2019 06:24:28 -0400
+Received: from mail-oi1-f196.google.com ([209.85.167.196]:42466)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <geert.uytterhoeven@gmail.com>)
+ id 1hkQos-0002Ox-H0
+ for qemu-devel@nongnu.org; Mon, 08 Jul 2019 06:24:26 -0400
+Received: by mail-oi1-f196.google.com with SMTP id s184so12166110oie.9
+ for <qemu-devel@nongnu.org>; Mon, 08 Jul 2019 03:24:25 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=ZH94yRQagyEtEFCXe5BGPELbKznvxiS9C2fS8RtGieU=;
+ b=EvEWSvTJ4E6mhRqLbqjiKlRR1Uc3hM+rKjvtrtfeucNF9eAHl7nf0K/yd7LC5vMv04
+ TsFakd7o+ki//ut43zwZLl9k9/RBA4iIS2Z2pc6eFGcATrnEOaFClcjeCT8kCtbQqwAD
+ GZlzipAki8shBM911NYJNqynuaMV7DcjEsUUKbiMjl5YV+7QiiM5zD0LMe/fLkofO2dj
+ xV5FUg/Qpa3mRwVtG9H+tjyLHa+t9nlUF8w9UET22+My3rBnKs0AMtNiqiTeghZwyz3m
+ OiJybCEGwXl1V94lxxCr/o7/uPA3sXnOdPkS0ZLDRFVl8yK6dyTogBnv8fuvQIyAFWJU
+ 7eMw==
+X-Gm-Message-State: APjAAAXDkKaQELHZjx9gxYpmyKJrWwkhhgvS7BBcUifXY4f8JbHyo6Km
+ T5D0DmlY+CU+Wbea8lOAdQ7oPaBKEJEHK+y3azM=
+X-Google-Smtp-Source: APXvYqwSYKqvIlZpX/kEBMpX3NmwEXdcEPgN/3e1aYMYlW0L0auvkQf9qdI+BIfG8hC8I/lwj/25JbA37h2UxuYXNIw=
+X-Received: by 2002:aca:3bc6:: with SMTP id i189mr8740984oia.153.1562581464846; 
+ Mon, 08 Jul 2019 03:24:24 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <28ca7c60-5795-31ff-1d71-1fac477ad996@redhat.com>
-User-Agent: Mutt/1.12.0 (2019-05-25)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.42]); Mon, 08 Jul 2019 10:19:24 +0000 (UTC)
+References: <20190705160536.12047-1-geert+renesas@glider.be>
+ <CAMpxmJXOrDLdw6ZPBHxzsDRYiLmhRNCb-s_Z=Gu=Ecg1XA5ONQ@mail.gmail.com>
+In-Reply-To: <CAMpxmJXOrDLdw6ZPBHxzsDRYiLmhRNCb-s_Z=Gu=Ecg1XA5ONQ@mail.gmail.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Mon, 8 Jul 2019 12:24:13 +0200
+Message-ID: <CAMuHMdWdb0dcS8Nvk-Poz2dT7nuHjFhqpsRPZZnSKsc3VffcRA@mail.gmail.com>
+To: Bartosz Golaszewski <bgolaszewski@baylibre.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] Parallel make build fails on fast machine
+ [fuzzy]
+X-Received-From: 209.85.167.196
+Subject: Re: [Qemu-devel] [PATCH RFC] gpio: Add Virtual Aggregator GPIO
+ Driver
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,63 +77,186 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 Cc: Peter Maydell <peter.maydell@linaro.org>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- qemu-devel <qemu-devel@nongnu.org>
+ Geert Uytterhoeven <geert+renesas@glider.be>,
+ LKML <linux-kernel@vger.kernel.org>, Linus Walleij <linus.walleij@linaro.org>,
+ Magnus Damm <magnus.damm@gmail.com>, Alexander Graf <agraf@suse.de>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
+ linux-gpio <linux-gpio@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Jul 08, 2019 at 12:17:12PM +0200, Philippe Mathieu-Daud=C3=A9 wro=
-te:
-> On 7/8/19 11:41 AM, Daniel P. Berrang=C3=A9 wrote:
-> > On Sat, Jul 06, 2019 at 09:35:30PM +0100, Peter Maydell wrote:
-> >> On Sat, 6 Jul 2019 at 11:28, Mark Cave-Ayland
-> >> <mark.cave-ayland@ilande.co.uk> wrote:
-> >>>
-> >>> On 06/07/2019 11:16, Peter Maydell wrote:
-> >>>> If you just do 'make' rather than 'make install' does it fail the =
-same way?
-> >>>
-> >>> Interesting. A quick test shows that "make V=3D1 -j2" works fine, i=
-t's just "make V=3D1
-> >>> -j2 install" which is failing.
-> >>
-> >> Mmm. I suspect most people just do the plain make (with the make ins=
-tall
-> >> phase either never or as a second command afterwards), so missing-de=
-pendency
-> >> bugs between the install targets and the build targets are probably =
-more
-> >> likely to lurk around. We should stil fix them, though, assuming we
-> >> can track them down...
-> >=20
-> > The main 'install' target depends on 'all':
-> >=20
-> > install: all $(if $(BUILD_DOCS),install-doc) install-datadir install-=
-localstatedir \
-> >=20
-> >=20
-> > but I think still allows 'install-doc', 'install-datadir' and
-> > 'install-localstatedir'  to parallelize wrt 'all'. I guess the fix is=
- to
-> > make each of those 'install-xxx' targets depend on 'all' instead.
->=20
-> I'm not sure I follow, are you suggesting this as a kludge for this
-> release, or you recommend this as a default?
+Hi Bartosz,
 
-I think it is the right solution in general.
+On Mon, Jul 8, 2019 at 11:45 AM Bartosz Golaszewski
+<bgolaszewski@baylibre.com> wrote:
+> pt., 5 lip 2019 o 18:05 Geert Uytterhoeven <geert+renesas@glider.be> napi=
+sa=C5=82(a):
+> > GPIO controllers are exported to userspace using /dev/gpiochip*
+> > character devices.  Access control to these devices is provided by
+> > standard UNIX file system permissions, on an all-or-nothing basis:
+> > either a GPIO controller is accessible for a user, or it is not.
+> > Currently no mechanism exists to control access to individual GPIOs.
+> >
+> > Hence add a virtual GPIO driver to aggregate existing GPIOs (up to 32),
+> > and expose them as a new gpiochip.  This is useful for implementing
+> > access control, and assigning a set of GPIOs to a specific user.
+> > Furthermore, it would simplify and harden exporting GPIOs to a virtual
+> > machine, as the VM can just grab the full virtual GPIO controller, and
+> > no longer needs to care about which GPIOs to grab and which not,
+> > reducing the attack surface.
+> >
+> > Virtual GPIO controllers are instantiated by writing to the "new_device=
+"
+> > attribute file in sysfs:
+> >
+> >     $ echo "<gpiochipA> <gpioA1> [<gpioA2> ...]"
+> >            "[, <gpiochipB> <gpioB1> [<gpioB2> ...]] ...]"
+> >             > /sys/bus/platform/drivers/gpio-virt-agg/new_device
+> >
+> > Likewise, virtual GPIO controllers can be destroyed after use:
+> >
+> >     $ echo gpio-virt-agg.<N> \
+> >             > /sys/bus/platform/drivers/gpio-virt-agg/delete_device
+> >
+> > Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
 
-> Apparently only 'recurse-install' depends of 'all'.
+> I like the general idea and the interface looks mostly fine. Since
+> this is new ABI I think it needs to be documented as well.
 
-Regards,
-Daniel
+Sure.
+
+> I'm having trouble building this module:
+>
+>   CALL    scripts/atomic/check-atomics.sh
+>   CALL    scripts/checksyscalls.sh
+>   CHK     include/generated/compile.h
+>   Kernel: arch/arm/boot/Image is ready
+>   Building modules, stage 2.
+>   MODPOST 235 modules
+> ERROR: "gpiod_request" [drivers/gpio/gpio-virt-agg.ko] undefined!
+> ERROR: "gpiochip_get_desc" [drivers/gpio/gpio-virt-agg.ko] undefined!
+> ERROR: "gpiod_free" [drivers/gpio/gpio-virt-agg.ko] undefined!
+> scripts/Makefile.modpost:91: recipe for target '__modpost' failed
+> make[1]: *** [__modpost] Error 1
+> Makefile:1287: recipe for target 'modules' failed
+> make: *** [modules] Error 2
+> make: *** Waiting for unfinished jobs....
+>
+> I'm not sure what the problem is.
+
+Oops. As this is an RFC, I didn't bother trying to build this driver as
+a module, only builtin.  Apparently the 3 symbols above are not yet
+exported using EXPORT_SYMBOL_GPL().
+
+> > --- /dev/null
+> > +++ b/drivers/gpio/gpio-virt-agg.c
+> > @@ -0,0 +1,390 @@
+> > +// SPDX-License-Identifier: GPL-2.0-only
+> > +//
+> > +// GPIO Virtual Aggregator
+> > +//
+> > +// Copyright (C) 2019 Glider bvba
+> > +
+> > +#include <linux/gpio/driver.h>
+> > +#include <linux/idr.h>
+> > +#include <linux/kernel.h>
+> > +#include <linux/module.h>
+> > +#include <linux/mutex.h>
+> > +#include <linux/platform_device.h>
+> > +
+> > +#include "gpiolib.h"
+> > +
+> > +#define DRV_NAME       "gpio-virt-agg"
+> > +#define MAX_GPIOS      32
+>
+> Do we really need this limit? I see it simplifies the code, but maybe
+> we can allocate the relevant arrays dynamically and not limit users?
+
+Sure. That limit can be lifted.
+
+> > +static int gpio_virt_agg_set_config(struct gpio_chip *chip,
+> > +                                   unsigned int offset, unsigned long =
+config)
+> > +{
+> > +       struct gpio_virt_agg_priv *priv =3D gpiochip_get_data(chip);
+> > +
+> > +       chip =3D priv->desc[offset]->gdev->chip;
+> > +       if (chip->set_config)
+> > +               return chip->set_config(chip, offset, config);
+> > +
+> > +       // FIXME gpiod_set_transitory() expects success if not implemen=
+ted
+
+BTW, do you have a comment about this FIXME?
+
+> > +       return -ENOTSUPP;
+> > +}
+
+> > +static int gpio_virt_agg_probe(struct platform_device *pdev)
+> > +{
+> > +       struct device *dev =3D &pdev->dev;
+> > +       const char *param =3D dev_get_platdata(dev);
+> > +       struct gpio_virt_agg_priv *priv;
+> > +       const char *label =3D NULL;
+> > +       struct gpio_chip *chip;
+> > +       struct gpio_desc *desc;
+> > +       unsigned int offset;
+> > +       int error, i;
+>
+> This 'i' here is reported as possibly not initialized:
+>
+> drivers/gpio/gpio-virt-agg.c: In function =E2=80=98gpio_virt_agg_probe=E2=
+=80=99:
+> drivers/gpio/gpio-virt-agg.c:230:13: warning: =E2=80=98i=E2=80=99 may be =
+used
+> uninitialized in this function [-Wmaybe-uninitialized]
+>   int error, i;
+>              ^
+
+Oops, should be preinitialized to zero. WIll fix.
+
+> > +static int gpio_virt_agg_remove(struct platform_device *pdev)
+> > +{
+> > +       struct gpio_virt_agg_priv *priv =3D platform_get_drvdata(pdev);
+> > +       unsigned int i;
+> > +
+> > +       gpiochip_remove(&priv->chip);
+> > +
+> > +       for (i =3D 0; i < priv->chip.ngpio; i++)
+> > +               gpiod_free(priv->desc[i]);
+
+Perhaps I should use gpiod_put() instead, which is exported to modules?
+
+> > +
+> > +       return 0;
+> > +}
+>
+> You shouldn't need this function at all. It's up to users to free descrip=
+tors.
+
+This frees the upstream descriptors, not the descriptors used by users
+of the virtual gpiochip. Shouldn't they be freed, as they are no longer
+in use?
+
+Note that .probe() doesn't use devm_gpiochip_add_data(), as the upstream
+descriptors need to be freed after the call to gpiochip_remove().
+
+Thanks!
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
 --=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
+.org
+
+In personal conversations with technical people, I call myself a hacker. Bu=
+t
+when I'm talking to journalists I just say "programmer" or something like t=
+hat.
+                                -- Linus Torvalds
 
