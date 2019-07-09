@@ -2,64 +2,84 @@ Return-Path: <SRS0=huOX=VG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	HK_RANDOM_FROM,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37542C73C46
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 16:27:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE54FC73C56
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 16:40:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C71FE21670
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 16:27:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C71FE21670
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 68D0421537
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 16:40:11 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="f+RSbrIZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 68D0421537
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51834 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51918 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hksxt-0007w0-O2
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jul 2019 12:27:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35118)
+	id 1hktA2-00048K-6g
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jul 2019 12:40:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37897)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <xiaoyao.li@linux.intel.com>) id 1hksvu-0007J4-Je
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 12:25:36 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1hkt7I-000393-4u
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 12:37:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <xiaoyao.li@linux.intel.com>) id 1hksvt-00074r-48
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 12:25:34 -0400
-Received: from mga11.intel.com ([192.55.52.93]:12712)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <xiaoyao.li@linux.intel.com>)
- id 1hksvp-0006qU-S8
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 12:25:32 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
- by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 09 Jul 2019 09:25:21 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.63,470,1557212400"; d="scan'208";a="176545338"
-Received: from lxy-dell.sh.intel.com ([10.239.159.145])
- by orsmga002.jf.intel.com with ESMTP; 09 Jul 2019 09:25:20 -0700
-Message-ID: <636bad06254a55eacc4b33c72d48c419271e3833.camel@linux.intel.com>
-From: Xiaoyao Li <xiaoyao.li@linux.intel.com>
-To: Tao Xu <tao3.xu@intel.com>, ehabkost@redhat.com, rth@twiddle.net, 
- pbonzini@redhat.com
-Date: Wed, 10 Jul 2019 00:20:26 +0800
-In-Reply-To: <4c09858a-1bb3-13d3-333a-07639db9a03d@intel.com>
-References: <20190709044420.14525-1-tao3.xu@intel.com>
- <8ac04db5-0a69-c74e-dab4-14159b8d22b6@linux.intel.com>
- <4c09858a-1bb3-13d3-333a-07639db9a03d@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.28.5 (3.28.5-2.el7) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+ (envelope-from <richard.henderson@linaro.org>) id 1hkt7G-0006Wz-84
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 12:37:19 -0400
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:39447)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1hkt7D-0006QP-I4
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 12:37:15 -0400
+Received: by mail-pg1-x542.google.com with SMTP id u17so9237624pgi.6
+ for <qemu-devel@nongnu.org>; Tue, 09 Jul 2019 09:37:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=JVOyp/SQtLtkdq8BjHn2mlzsOWIS2SvfgbnRIW9MzD8=;
+ b=f+RSbrIZuaswgLSXeBK5hU/c/5bgbr2AuerajJMVw+GRyWgrOOX05ai/0S8/LHZisD
+ EqUwPB5qTVJpGHvpB7dWyY85DD7P76o6wmXpsK1g9gZtvQ1OmReqhnp/SchCC5EqPHLo
+ 6XBunsMwINll0qnCPRDONQUzR1jiXNeOvzpzs/oNEMFgpwzBj02pytvAtTLLIMjmhrMa
+ Y5Xqbin+DaNGYnWjp4GETzlvk7mIgE6zjaKdtWXT9LsxFCMXj825rya+Pl2OMKzxlSbm
+ qulQqDeXsjfJmHhMVcRZM3wHfCwUkMpLqgOabnuPZ4oqk4zs+aRU8ld7YZgm8KBbpNqR
+ /UYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=JVOyp/SQtLtkdq8BjHn2mlzsOWIS2SvfgbnRIW9MzD8=;
+ b=oCcBtzEEImgvhw9L8So1vi3mWWkTqh2BS6Hvb3aK9R90Ec4bkqGMssaRZTt/XgmaDT
+ FBgLWYLhR1UQbscJLI0N5vBVU1qKicJeItpJZNnUBywjnLx8ejTz81/tcOehSA3FMsvL
+ QEEnREa2LZqQTH5nKg7zTkFSFHMSx4ENhhiVcWsC8aq3erPc8bvZbb8Fhuwj5BAvkZDR
+ aiHIPUscLsMFylFKPaGvO6DNFefYmj32h2e9x72BaOHjHRVN8n+mutGPBqo5wTJ9pZQ/
+ WprtcbxHUcUSg8JLICnw493lqmZf4zvVo0mOmh1HHYjmIXRR7HuvEoeHgQlemkiH6wQh
+ 25JQ==
+X-Gm-Message-State: APjAAAWc1yUFoCfqS5OSBhi5NkS17slX90zSRqqC85gnN0NsCgzDocsj
+ CRe7gMXK04B2MaoCWDSdrwrZYlmj0Ps=
+X-Google-Smtp-Source: APXvYqzKwffXyji522+N677RI0Bi575GgRKjLe2y2urf1nUzWjpo0w0UGXfCSU5+J3ZAv+Eo9CRvSA==
+X-Received: by 2002:a63:fb4b:: with SMTP id w11mr31690318pgj.415.1562690227163; 
+ Tue, 09 Jul 2019 09:37:07 -0700 (PDT)
+Received: from localhost.localdomain ([172.56.12.212])
+ by smtp.gmail.com with ESMTPSA id v8sm19225231pgs.82.2019.07.09.09.37.02
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Tue, 09 Jul 2019 09:37:06 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Date: Tue,  9 Jul 2019 18:36:51 +0200
+Message-Id: <20190709163656.3100-1-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.17.1
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 192.55.52.93
-Subject: Re: [Qemu-devel] [PATCH] target/i386: Introduce Denverton CPU model
+X-Received-From: 2607:f8b0:4864:20::542
+Subject: [Qemu-devel] [PATCH v2 0/5] tcg: Fix mmap_lock assertion failure,
+ take 2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,86 +91,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: lvivier@redhat.com, peter.maydell@linaro.org, alex.bennee@linaro.org,
+ pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 2019-07-09 at 22:27 +0800, Tao Xu wrote:
-> On 7/9/2019 4:39 PM, Xiaoyao Li wrote:
-> > On 7/9/2019 12:44 PM, Tao Xu wrote:
-> > > Denverton-Server is the Atom Processor of Intel Harrisonville platform.
-> > > 
-> > > For more information:
-> > > https://ark.intel.com/content/www/us/en/ark/products/\
-> > > codename/63508/denverton.html
-> > > 
-> > > Signed-off-by: Tao Xu <tao3.xu@intel.com>
-> > > ---
-> > >   target/i386/cpu.c | 45 +++++++++++++++++++++++++++++++++++++++++++++
-> > >   1 file changed, 45 insertions(+)
-> > > 
-> > > diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> > > index 805ce95247..4efaff9918 100644
-> > > --- a/target/i386/cpu.c
-> > > +++ b/target/i386/cpu.c
-> > > @@ -2471,6 +2471,51 @@ static X86CPUDefinition builtin_x86_defs[] = {
-> > >           .xlevel = 0x80000008,
-> > >           .model_id = "Intel Xeon Processor (Icelake)",
-> > >       },
-> > > +    {
-> > > +        .name = "Denverton-Server",
-> > > +        .level = 21,
-> > > +        .vendor = CPUID_VENDOR_INTEL,
-> > > +        .family = 6,
-> > > +        .model = 95,
-> > > +        .stepping = 1,
-> > > +        .features[FEAT_1_EDX] =
-> > > +            CPUID_FP87 | CPUID_VME | CPUID_DE | CPUID_PSE | CPUID_TSC |
-> > > +            CPUID_MSR | CPUID_PAE | CPUID_MCE | CPUID_CX8 | CPUID_APIC |
-> > > +            CPUID_SEP | CPUID_MTRR | CPUID_PGE | CPUID_MCA | 
-> > > CPUID_CMOV |
-> > > +            CPUID_PAT | CPUID_PSE36 | CPUID_CLFLUSH | CPUID_MMX | 
-> > > CPUID_FXSR |
-> > > +            CPUID_SSE | CPUID_SSE2,
-> > > +        .features[FEAT_1_ECX] =
-> > > +            CPUID_EXT_SSE3 | CPUID_EXT_PCLMULQDQ | CPUID_EXT_MONITOR |
-> > > +            CPUID_EXT_VMX | CPUID_EXT_SSSE3 | CPUID_EXT_CX16 |
-> > > +            CPUID_EXT_SSE41 | CPUID_EXT_SSE42 | CPUID_EXT_X2APIC |
-> > > +            CPUID_EXT_MOVBE | CPUID_EXT_POPCNT | 
-> > > CPUID_EXT_TSC_DEADLINE_TIMER |
-> > > +            CPUID_EXT_AES | CPUID_EXT_XSAVE | CPUID_EXT_RDRAND,
-> > > +        .features[FEAT_8000_0001_EDX] =
-> > > +            CPUID_EXT2_SYSCALL | CPUID_EXT2_NX | CPUID_EXT2_PDPE1GB |
-> > > +            CPUID_EXT2_RDTSCP | CPUID_EXT2_LM,
-> > > +        .features[FEAT_8000_0001_ECX] =
-> > > +            CPUID_EXT3_LAHF_LM | CPUID_EXT3_3DNOWPREFETCH,
-> > > +        .features[FEAT_7_0_EBX] =
-> > > +            CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_SMEP | 
-> > > CPUID_7_0_EBX_ERMS |
-> > > +            CPUID_7_0_EBX_MPX | CPUID_7_0_EBX_RDSEED | 
-> > > CPUID_7_0_EBX_SMAP |
-> > > +            CPUID_7_0_EBX_CLFLUSHOPT | CPUID_7_0_EBX_SHA_NI,
-> > > +        .features[FEAT_7_0_EDX] =
-> > > +            CPUID_7_0_EDX_SPEC_CTRL | CPUID_7_0_EDX_ARCH_CAPABILITIES |
-> > > +            CPUID_7_0_EDX_SPEC_CTRL_SSBD,
-> > 
-> > The output of CPUID_7_0:EDX is 0 in my Denverton machine, of which the 
-> > stepping is 0 and microcode is 0xe.
-> > 
-> > Maybe we need to remove these 3 flag in the initial Denverton cpu model 
-> > and add these features as 2nd version alias as Denverton-Server-IBRS? (I 
-> > don't if SPEC_CTRL_SSBD and ARCH_CAPABILITIES belong to IBRS, may be we 
-> > need 3rd version for these?)
-> > 
-> 
-> I am wondering if we cover all the stepping of CPU, all existing CPU 
-> model should be add initial stepping cpu model. The same circumstance 
-> occurred before because Cascadelake CPU stepping 5 haven't AVX512_VNNI, 
-> then updated to stepping 6. Denverton has been released in Q3'2017, the 
-> customer may not use the early stepping machine.
-> 
-Focusing on spec_ctrl, my question is: Does Denverton with stepping 1 have this
-feature regardless of microcode.
+Changes from v1:
+  * Fix whitespace error
+  * Fix cpu_lds*_code(), where cut-and-paste failed to extend the data.
+    Noticable with check-tcg with docker cross-compiler for cris-linux-user.
+
+Blurb from v1:
+
+While I could not replicate the failure Peter reported, the apparent
+root cause -- the old magic fixed page -- should affect other guests
+as well.  In particular, the old arm32 magic fixed page at 0xffff0f00,
+and the hppa magic fixed page at 0.
+
+In the arm32 and hppa cases that I just mentioned -- but notably not
+the x86_64 case that Peter reported -- there is special-case code in
+target/*/translate.c to handle those addresses without actually doing
+the read from the unmapped address.
+
+Therefore, until we fix these sort of address space representational
+errors, we cannot even rely on page_check_range() to validate the
+execute access.
+
+Instead, modify the host signal handler to intercept this at SIGSEGV.
+At this point we're sure that there is no guest special case that we
+have overlooked, because we did attempt the read for execute.
+
+Also, I noticed that we really ought to have some barriers around this
+code to make sure that the modifications to helper_retaddr are in fact
+visible to the host signal handler.
+
+Also, some minor cleanups to the set of read functions that we expose
+for use during translation.
+
+Also, a trivial duplicated condition.
+
+
+r~
+
+
+Richard Henderson (5):
+  include/qemu/atomic.h: Add signal_barrier
+  tcg: Introduce set/clear_helper_retaddr
+  tcg: Remove cpu_ld*_code_ra
+  tcg: Remove duplicate #if !defined(CODE_ACCESS)
+  tcg: Release mmap_lock on translation fault
+
+ include/exec/cpu_ldst.h                   | 20 ++++++
+ include/exec/cpu_ldst_useronly_template.h | 40 ++++++++----
+ include/qemu/atomic.h                     | 11 ++++
+ accel/tcg/user-exec.c                     | 77 ++++++++++++++++-------
+ target/arm/helper-a64.c                   |  8 +--
+ target/arm/sve_helper.c                   | 43 +++++++------
+ 6 files changed, 136 insertions(+), 63 deletions(-)
+
+-- 
+2.17.1
 
 
