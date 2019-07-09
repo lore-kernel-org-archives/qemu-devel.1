@@ -7,56 +7,53 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 946A7C606B0
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 04:13:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2742DC606B0
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 04:13:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5D2EA2073D
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 04:13:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EDE162073D
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 04:13:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="cl/tSWu+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D2EA2073D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="Hnrrjp0w"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EDE162073D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46552 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46554 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hkhVB-0007gj-LZ
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jul 2019 00:13:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35059)
+	id 1hkhVD-0007ld-8D
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jul 2019 00:13:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35026)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <kwankhede@nvidia.com>) id 1hkhQo-0002aL-T0
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 00:08:44 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwankhede@nvidia.com>) id 1hkhQn-0003Qm-NP
+ (envelope-from <kwankhede@nvidia.com>) id 1hkhQn-0002Vu-My
  for qemu-devel@nongnu.org; Tue, 09 Jul 2019 00:08:42 -0400
-Received: from hqemgate14.nvidia.com ([216.228.121.143]:10233)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <kwankhede@nvidia.com>) id 1hkhQk-0003Pm-P1
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 00:08:39 -0400
+Received: from hqemgate16.nvidia.com ([216.228.121.65]:11839)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <kwankhede@nvidia.com>)
- id 1hkhQl-0003Ox-HL
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 00:08:39 -0400
+ id 1hkhQk-0003Op-6V
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 00:08:38 -0400
 Received: from hqpgpgate102.nvidia.com (Not Verified[216.228.121.13]) by
- hqemgate14.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
- id <B5d2413240003>; Mon, 08 Jul 2019 21:08:05 -0700
+ hqemgate16.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+ id <B5d2413280008>; Mon, 08 Jul 2019 21:08:09 -0700
 Received: from hqmail.nvidia.com ([172.20.161.6])
  by hqpgpgate102.nvidia.com (PGP Universal service);
  Mon, 08 Jul 2019 21:08:10 -0700
 X-PGP-Universal: processed;
  by hqpgpgate102.nvidia.com on Mon, 08 Jul 2019 21:08:10 -0700
-Received: from HQMAIL110.nvidia.com (172.18.146.15) by HQMAIL108.nvidia.com
+Received: from HQMAIL104.nvidia.com (172.18.146.11) by HQMAIL108.nvidia.com
  (172.18.146.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 9 Jul
- 2019 02:02:33 +0000
-Received: from HQMAIL104.nvidia.com (172.18.146.11) by hqmail110.nvidia.com
- (172.18.146.15) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 9 Jul
- 2019 02:02:32 +0000
+ 2019 02:03:13 +0000
 Received: from kwankhede-dev.nvidia.com (10.124.1.5) by HQMAIL104.nvidia.com
  (172.18.146.11) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via Frontend
- Transport; Tue, 9 Jul 2019 02:02:26 +0000
+ Transport; Tue, 9 Jul 2019 02:03:06 +0000
 From: Kirti Wankhede <kwankhede@nvidia.com>
 To: <alex.williamson@redhat.com>, <cjia@nvidia.com>
-Date: Tue, 9 Jul 2019 07:29:08 +0530
-Message-ID: <1562637554-22439-8-git-send-email-kwankhede@nvidia.com>
+Date: Tue, 9 Jul 2019 07:29:14 +0530
+Message-ID: <1562637554-22439-14-git-send-email-kwankhede@nvidia.com>
 X-Mailer: git-send-email 2.7.0
 In-Reply-To: <1562637554-22439-1-git-send-email-kwankhede@nvidia.com>
 References: <1562637554-22439-1-git-send-email-kwankhede@nvidia.com>
@@ -64,20 +61,20 @@ X-NVConfidentiality: public
 MIME-Version: 1.0
 Content-Type: text/plain
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
- t=1562645307; bh=SI3JRw38FBSF2Z2uCSJm8vd8dZhbA/5dfd1kkJAiy8A=;
+ t=1562645296; bh=oDXfXH2QKaDnSbDGeApTn7hYtedGL0xz2YwbKpIZ7YQ=;
  h=X-PGP-Universal:From:To:CC:Subject:Date:Message-ID:X-Mailer:
  In-Reply-To:References:X-NVConfidentiality:MIME-Version:
  Content-Type;
- b=cl/tSWu+Vfvjk+/URz3wwbD2yJo7t7nkoZXhvlGcAwk5VlPE4/E2pCYyDKFh/Q7zR
- jlroX5Rd84ptzZRRraUyRByG/cpq8PwaoWVaYuiMxSJvkHuErdAXV6kwNfknfYnhB3
- kJfY0KDuFAJ0EBs6tze42dnTNiHtBvDoDB7+LITphg1wDLgAPJEUe5a/1Ie7lSGFZ2
- il8ytmicWDD0TWmfpbaNRe5a1IT961fYWOj0RRd5IA3CCVNeQoCKzKAMN4NurMQOZa
- 7Js9DOYR5KnE3EtXwFIpSw6m4OAi+nL48G3ORd8N0wE95xlXj8Dx7BKLFG2de/gFVD
- zMMDwEEzCxVPA==
+ b=Hnrrjp0wk6SdJX/6NHmxeiN13Cby44HgAKY6a+IMh6Z+aAC8d5PFtVCwoymLtMYks
+ iTz0MervqLRW3kooXvy7h9qgxt+FvGlofQRLxkyBqNg91P8uqGKNC6YVefQN5w7HDB
+ LMJ8juz6D6QkaJCUtca6JN2F++KZEIGUnf5i+kno/L8yB20ctmHsuP5OORArtcKpF6
+ 5zDnEmlCwMwFBIJEnpia+2T6agJBJelIJCALXVFxZpPdBEE38p0m7nrHXamIIQN+cY
+ puSjkJHvCoKSxH+ISq1nUbgpPaBNxDbUTQjkx0x7oWQY2PI5IdXXUtmQohzw6TvIDQ
+ GOKYlZYq6Eseg==
 X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8
-X-Received-From: 216.228.121.143
-Subject: [Qemu-devel] [PATCH v6 07/13] vfio: Add migration state change
- notifier
+X-Received-From: 216.228.121.65
+Subject: [Qemu-devel] [PATCH v6 13/13] vfio: Make vfio-pci device migration
+ capable.
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,118 +97,77 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Added migration state change notifier to get notification on migration state
-change. These states are translated to VFIO device state and conveyed to vendor
-driver.
+Call vfio_migration_probe() and vfio_migration_finalize() functions for
+vfio-pci device to enable migration for vfio PCI device.
+Removed vfio_pci_vmstate structure.
 
 Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
 Reviewed-by: Neo Jia <cjia@nvidia.com>
 ---
- hw/vfio/migration.c           | 54 +++++++++++++++++++++++++++++++++++++++++++
- hw/vfio/trace-events          |  1 +
- include/hw/vfio/vfio-common.h |  1 +
- 3 files changed, 56 insertions(+)
+ hw/vfio/pci.c | 15 +++++++++------
+ 1 file changed, 9 insertions(+), 6 deletions(-)
 
-diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
-index c01f08b659d0..e4a89a6f9bc7 100644
---- a/hw/vfio/migration.c
-+++ b/hw/vfio/migration.c
-@@ -132,6 +132,53 @@ static void vfio_vmstate_change(void *opaque, int running, RunState state)
+diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+index 5fe4f8076cac..2ea17a814d55 100644
+--- a/hw/vfio/pci.c
++++ b/hw/vfio/pci.c
+@@ -2852,6 +2852,7 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
+     vdev->vbasedev.ops = &vfio_pci_ops;
+     vdev->vbasedev.type = VFIO_DEVICE_TYPE_PCI;
+     vdev->vbasedev.dev = DEVICE(vdev);
++    vdev->vbasedev.device_state = 0;
+ 
+     tmp = g_strdup_printf("%s/iommu_group", vdev->vbasedev.sysfsdev);
+     len = readlink(tmp, group_path, sizeof(group_path));
+@@ -3112,6 +3113,12 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
+         }
      }
+ 
++    ret = vfio_migration_probe(&vdev->vbasedev, errp);
++    if (ret) {
++            error_report("%s: Failed to setup for migration",
++                         vdev->vbasedev.name);
++    }
++
+     vfio_register_err_notifier(vdev);
+     vfio_register_req_notifier(vdev);
+     vfio_setup_resetfn_quirk(vdev);
+@@ -3131,6 +3138,7 @@ static void vfio_instance_finalize(Object *obj)
+     VFIOPCIDevice *vdev = PCI_VFIO(obj);
+     VFIOGroup *group = vdev->vbasedev.group;
+ 
++    vdev->vbasedev.device_state = 0;
+     vfio_display_finalize(vdev);
+     vfio_bars_finalize(vdev);
+     g_free(vdev->emulated_config_bits);
+@@ -3159,6 +3167,7 @@ static void vfio_exitfn(PCIDevice *pdev)
+     }
+     vfio_teardown_msi(vdev);
+     vfio_bars_exit(vdev);
++    vfio_migration_finalize(&vdev->vbasedev);
  }
  
-+static void vfio_migration_state_notifier(Notifier *notifier, void *data)
-+{
-+    MigrationState *s = data;
-+    VFIODevice *vbasedev = container_of(notifier, VFIODevice, migration_state);
-+    int ret;
-+
-+    trace_vfio_migration_state_notifier(vbasedev->name, s->state);
-+
-+    switch (s->state) {
-+    case MIGRATION_STATUS_ACTIVE:
-+        if (vbasedev->device_state & VFIO_DEVICE_STATE_RUNNING) {
-+            if (vbasedev->vm_running) {
-+                ret = vfio_migration_set_state(vbasedev,
-+                          VFIO_DEVICE_STATE_RUNNING | VFIO_DEVICE_STATE_SAVING);
-+                if (ret) {
-+                    error_report("%s: Failed to set state RUNNING and SAVING",
-+                                  vbasedev->name);
-+                }
-+            } else {
-+                ret = vfio_migration_set_state(vbasedev,
-+                                               VFIO_DEVICE_STATE_SAVING);
-+                if (ret) {
-+                    error_report("%s: Failed to set state STOP and SAVING",
-+                                 vbasedev->name);
-+                }
-+            }
-+        } else {
-+            ret = vfio_migration_set_state(vbasedev,
-+                                           VFIO_DEVICE_STATE_RESUMING);
-+            if (ret) {
-+                error_report("%s: Failed to set state RESUMING",
-+                             vbasedev->name);
-+            }
-+        }
-+        return;
-+
-+    case MIGRATION_STATUS_CANCELLING:
-+    case MIGRATION_STATUS_CANCELLED:
-+    case MIGRATION_STATUS_FAILED:
-+        ret = vfio_migration_set_state(vbasedev, VFIO_DEVICE_STATE_RUNNING);
-+        if (ret) {
-+            error_report("%s: Failed to set state RUNNING", vbasedev->name);
-+        }
-+        return;
-+    }
-+}
-+
- static int vfio_migration_init(VFIODevice *vbasedev,
-                                struct vfio_region_info *info)
+ static void vfio_pci_reset(DeviceState *dev)
+@@ -3267,11 +3276,6 @@ static Property vfio_pci_dev_properties[] = {
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
+-static const VMStateDescription vfio_pci_vmstate = {
+-    .name = "vfio-pci",
+-    .unmigratable = 1,
+-};
+-
+ static void vfio_pci_dev_class_init(ObjectClass *klass, void *data)
  {
-@@ -152,6 +199,9 @@ static int vfio_migration_init(VFIODevice *vbasedev,
-     vbasedev->vm_state = qemu_add_vm_change_state_handler(vfio_vmstate_change,
-                                                           vbasedev);
+     DeviceClass *dc = DEVICE_CLASS(klass);
+@@ -3279,7 +3283,6 @@ static void vfio_pci_dev_class_init(ObjectClass *klass, void *data)
  
-+    vbasedev->migration_state.notify = vfio_migration_state_notifier;
-+    add_migration_state_change_notifier(&vbasedev->migration_state);
-+
-     return 0;
- }
- 
-@@ -194,6 +244,10 @@ void vfio_migration_finalize(VFIODevice *vbasedev)
-         return;
-     }
- 
-+    if (vbasedev->migration_state.notify) {
-+        remove_migration_state_change_notifier(&vbasedev->migration_state);
-+    }
-+
-     if (vbasedev->vm_state) {
-         qemu_del_vm_change_state_handler(vbasedev->vm_state);
-     }
-diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
-index 3d15bacd031a..69503228f20e 100644
---- a/hw/vfio/trace-events
-+++ b/hw/vfio/trace-events
-@@ -148,3 +148,4 @@ vfio_display_edid_write_error(void) ""
- vfio_migration_probe(char *name, uint32_t index) " (%s) Region %d"
- vfio_migration_set_state(char *name, uint32_t state) " (%s) state %d"
- vfio_vmstate_change(char *name, int running, const char *reason, uint32_t dev_state) " (%s) running %d reason %s device state %d"
-+vfio_migration_state_notifier(char *name, int state) " (%s) state %d"
-diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-index f6c70db3a9c1..a022484d2636 100644
---- a/include/hw/vfio/vfio-common.h
-+++ b/include/hw/vfio/vfio-common.h
-@@ -128,6 +128,7 @@ typedef struct VFIODevice {
-     uint32_t device_state;
-     VMChangeStateEntry *vm_state;
-     int vm_running;
-+    Notifier migration_state;
- } VFIODevice;
- 
- struct VFIODeviceOps {
+     dc->reset = vfio_pci_reset;
+     dc->props = vfio_pci_dev_properties;
+-    dc->vmsd = &vfio_pci_vmstate;
+     dc->desc = "VFIO-based PCI device assignment";
+     set_bit(DEVICE_CATEGORY_MISC, dc->categories);
+     pdc->realize = vfio_realize;
 -- 
 2.7.0
 
