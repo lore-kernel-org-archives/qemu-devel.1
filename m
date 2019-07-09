@@ -8,77 +8,77 @@ X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96CB8C73C53
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 17:05:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 504F4C73C46
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 17:11:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 219462082A
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 17:05:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D1B9320651
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 17:11:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YPYCbjNy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 219462082A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="p0xwYqJQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1B9320651
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52146 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52188 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hktY8-0002VB-0J
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jul 2019 13:05:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46157)
+	id 1hkteM-0005rd-Fq
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jul 2019 13:11:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46954)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alistair23@gmail.com>) id 1hktRz-0007L0-46
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 12:58:45 -0400
+ (envelope-from <alistair23@gmail.com>) id 1hktTe-00005C-SD
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 13:00:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1hktRu-0000Q9-1w
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 12:58:42 -0400
-Received: from mail-lf1-x144.google.com ([2a00:1450:4864:20::144]:38778)
+ (envelope-from <alistair23@gmail.com>) id 1hktTQ-0001k8-Ns
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 13:00:17 -0400
+Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:43574)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1hktRt-0000Nr-O9; Tue, 09 Jul 2019 12:58:37 -0400
-Received: by mail-lf1-x144.google.com with SMTP id h28so9571904lfj.5;
- Tue, 09 Jul 2019 09:58:37 -0700 (PDT)
+ id 1hktTI-0001Z5-8b; Tue, 09 Jul 2019 13:00:06 -0400
+Received: by mail-lj1-x242.google.com with SMTP id 16so20242536ljv.10;
+ Tue, 09 Jul 2019 10:00:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=B+qh/ApQkXMn4HseSP48lVMnG6hVBYWQPWRivAa1eus=;
- b=YPYCbjNy7drtBhmXn1RdwPPB1i+i0t2hQ4ZqXIvmW/YmiiewJhxwWFDNeIXSxHNndj
- kroxzFRjMkyeTZveGOuLVaW0bO8dIjOoc9O3xuSN4NjnaMaNzLMfRXbPCo8UpziLFlGx
- dQFu9slahJ1MfwZw+avoSYuI21dujLgQhY5GKvMzNirPVG0BUcyQTxNIp6WsMGzFrNNI
- l6L0mXL1f6FqgOwJNbEENE4v9PPJ49KAjlNbNW5+h5NlHjtQp8eUaFddZfuJf2WNg0d8
- mzSJSzBc9WKY9sojdj925JyT9LYlAtV3ZuAqRzZXE8FSVG2yO/KxMmhcT3lKdiRii9Ix
- KPBg==
+ bh=lItc9gAwv9zbMEx6MjHCHOxGakzxL9FxuZYPnMDnwFw=;
+ b=p0xwYqJQ3MaWh8XzIPVAIo7AyaxxtYZCSY+Ox5rMZmYloN7oXMjo/sfmuW/ImRfLEa
+ qtrru3ssk/9qbc7iXHapm3/6qyJaIUKTWI7YBIW7jX9CgjCqerHd8fnprdGzgJlLuQzb
+ Cy1DSgl/gg2FV6CRMeJVyJdnqxItQMg5uwPNZ5LY8u7ySCTW8S+R0/TRDGo1V3QXLTB7
+ zcOmbaXUmH22a9d86+9d/HUxrZq3R2RJkFbFvlQFqvm9ujcn43mu0LRzvc9Y6DCfuxUi
+ vtE0PC7IigShB+GU1gQQ1rNDDIcqbT8U4Ode1yBe1GMtqav6UWMurXGzj59d1mHANSVJ
+ JgfQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=B+qh/ApQkXMn4HseSP48lVMnG6hVBYWQPWRivAa1eus=;
- b=D/O2Zhuy1iebEImDOK5FRuuWGrBhQmi3cflsm+JsRU/91ka2hWKCmqWSapnEkAz3tN
- aUZlsc4tc78H3lV+Q+uIm2+SD6KXnkcSqK0DuGGZlSTrw/vDHbypYELikNuF/yNzAWj0
- 9zBfvRlQJEm9WA8Lv/LBDia8evjXAnY6OToLXMMOVfvFWyH2HEreaTuUyEJiWtz5LBco
- NeZYxduDasBLHU8R2t199/tDQKUTR+4UoX3As5zIvv9fvKDNyNybjG/mVN40bDLTydP7
- EKYBWeqpImqxpJ8dkRgOytwvrdj75eb+sxq5dgc6Vozko3lxtTmgS6uXd3pCpfvH9bxH
- Aqmg==
-X-Gm-Message-State: APjAAAV6cmgn73IPAVSo7TeYsdvmQpMEwYeXEdLgOq3akME/O5F/WAG4
- 00fPMZyQ/R4pBCZ4fqeUmIXiBqraubFN4+LEc9U=
-X-Google-Smtp-Source: APXvYqxD3yIk/HBNhjw7JWTBHz2fpSyknmzzdFStCRq0R0IeU6eOM4OhYAiyIqHiE0gELWRi64i47ayv7MPlAftu/mM=
-X-Received: by 2002:a19:7709:: with SMTP id s9mr11595074lfc.86.1562691516331; 
- Tue, 09 Jul 2019 09:58:36 -0700 (PDT)
+ bh=lItc9gAwv9zbMEx6MjHCHOxGakzxL9FxuZYPnMDnwFw=;
+ b=LkEb+yO2w8wT5+9EVyuZpHoVib4t7+8KJmnm2OHy5tNihZB9lZJcIwDFRaF4lkQZCp
+ E4CbVZ8pHVal9yJoIiYyeREd/prf08c/M6fM3nx0AMs74qQ2iq8Q5GuCR4kpXvmD2snB
+ x2wBotz6qWZwhHH1fNz4VCra/8wvXMK/sNwGjph+hRYhpPRw0gxkdx+pwN3JGfftVsHh
+ 8cSOW/oWFCY2EtoB92wVTLsr3ZA/b1hdFhpMrXWdqNS/wr0arugpk8K88kSA2dqqp1rE
+ kHFUGPGW/alKOcUzQh2iyVEzXjDd4ieJmPDOz/eQ7oiO8VPEBCH0+rOp+MdLgcQwWCEP
+ EdRQ==
+X-Gm-Message-State: APjAAAXPvMPdyhD5KdPl9oHzrfFKZCwmxuKx8U2pGBL6qRdb9/YDNeB3
+ JtYDUOYk8/QVnq4dXVREqemwDWxzJYNXxn88pokDLG1B
+X-Google-Smtp-Source: APXvYqwNR10t3FVA4Z0KV3pquxUvr1HMrp9BbBT4xqL0y8rf3fgyfVJwHiYjAksfaiea2utLPwJ4osw8H96xxTzYSRs=
+X-Received: by 2002:a2e:9158:: with SMTP id q24mr14584240ljg.119.1562691600972; 
+ Tue, 09 Jul 2019 10:00:00 -0700 (PDT)
 MIME-Version: 1.0
 References: <20190709113715.7761-1-philmd@redhat.com>
- <20190709113715.7761-3-philmd@redhat.com>
-In-Reply-To: <20190709113715.7761-3-philmd@redhat.com>
+ <20190709113715.7761-2-philmd@redhat.com>
+In-Reply-To: <20190709113715.7761-2-philmd@redhat.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Tue, 9 Jul 2019 09:55:26 -0700
-Message-ID: <CAKmqyKMxA6Dh=-=Pb3UnOdLStyVSW+HoWJK8Z4JfLXmVk=yEOA@mail.gmail.com>
+Date: Tue, 9 Jul 2019 09:56:51 -0700
+Message-ID: <CAKmqyKN+wczk1TvWcswV9AaarMXNddJGSfxDatU-QERSM1bC7g@mail.gmail.com>
 To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::144
-Subject: Re: [Qemu-devel] [PATCH-for-4.1 2/3] hw/ssi/mss-spi: Avoid crash
- when reading empty RX FIFO
+X-Received-From: 2a00:1450:4864:20::242
+Subject: Re: [Qemu-devel] [PATCH 1/3] hw/ssi/mss-spi: Convert debug
+ printf()s to trace events
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,67 +99,8 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Jul 9, 2019 at 4:42 AM Philippe Mathieu-Daud=C3=A9 <philmd@redhat.c=
+On Tue, Jul 9, 2019 at 4:40 AM Philippe Mathieu-Daud=C3=A9 <philmd@redhat.c=
 om> wrote:
->
-> Reading the RX_DATA register when the RX_FIFO is empty triggers
-> an abort. This can be easily reproduced:
->
->   $ qemu-system-arm -M emcraft-sf2 -monitor stdio -S
->   QEMU 4.0.50 monitor - type 'help' for more information
->   (qemu) x 0x40001010
->   Aborted (core dumped)
->
->   (gdb) bt
->   #1  0x00007f035874f895 in abort () at /lib64/libc.so.6
->   #2  0x00005628686591ff in fifo8_pop (fifo=3D0x56286a9a4c68) at util/fif=
-o8.c:66
->   #3  0x00005628683e0b8e in fifo32_pop (fifo=3D0x56286a9a4c68) at include=
-/qemu/fifo32.h:137
->   #4  0x00005628683e0efb in spi_read (opaque=3D0x56286a9a4850, addr=3D4, =
-size=3D4) at hw/ssi/mss-spi.c:168
->   #5  0x0000562867f96801 in memory_region_read_accessor (mr=3D0x56286a9a4=
-b60, addr=3D16, value=3D0x7ffeecb0c5c8, size=3D4, shift=3D0, mask=3D4294967=
-295, attrs=3D...) at memory.c:439
->   #6  0x0000562867f96cdb in access_with_adjusted_size (addr=3D16, value=
-=3D0x7ffeecb0c5c8, size=3D4, access_size_min=3D1, access_size_max=3D4, acce=
-ss_fn=3D0x562867f967c3 <memory_region_read_accessor>, mr=3D0x56286a9a4b60, =
-attrs=3D...) at memory.c:569
->   #7  0x0000562867f99940 in memory_region_dispatch_read1 (mr=3D0x56286a9a=
-4b60, addr=3D16, pval=3D0x7ffeecb0c5c8, size=3D4, attrs=3D...) at memory.c:=
-1420
->   #8  0x0000562867f99a08 in memory_region_dispatch_read (mr=3D0x56286a9a4=
-b60, addr=3D16, pval=3D0x7ffeecb0c5c8, size=3D4, attrs=3D...) at memory.c:1=
-447
->   #9  0x0000562867f38721 in flatview_read_continue (fv=3D0x56286aec6360, =
-addr=3D1073745936, attrs=3D..., buf=3D0x7ffeecb0c7c0 "\340=C7=B0\354\376\17=
-7", len=3D4, addr1=3D16, l=3D4, mr=3D0x56286a9a4b60) at exec.c:3385
->   #10 0x0000562867f38874 in flatview_read (fv=3D0x56286aec6360, addr=3D10=
-73745936, attrs=3D..., buf=3D0x7ffeecb0c7c0 "\340=C7=B0\354\376\177", len=
-=3D4) at exec.c:3423
->   #11 0x0000562867f388ea in address_space_read_full (as=3D0x56286aa3e890,=
- addr=3D1073745936, attrs=3D..., buf=3D0x7ffeecb0c7c0 "\340=C7=B0\354\376\1=
-77", len=3D4) at exec.c:3436
->   #12 0x0000562867f389c5 in address_space_rw (as=3D0x56286aa3e890, addr=
-=3D1073745936, attrs=3D..., buf=3D0x7ffeecb0c7c0 "\340=C7=B0\354\376\177", =
-len=3D4, is_write=3Dfalse) at exec.c:3466
->   #13 0x0000562867f3bdd7 in cpu_memory_rw_debug (cpu=3D0x56286aa19d00, ad=
-dr=3D1073745936, buf=3D0x7ffeecb0c7c0 "\340=C7=B0\354\376\177", len=3D4, is=
-_write=3D0) at exec.c:3976
->   #14 0x000056286811ed51 in memory_dump (mon=3D0x56286a8c32d0, count=3D1,=
- format=3D120, wsize=3D4, addr=3D1073745936, is_physical=3D0) at monitor/mi=
-sc.c:730
->   #15 0x000056286811eff1 in hmp_memory_dump (mon=3D0x56286a8c32d0, qdict=
-=3D0x56286b15c400) at monitor/misc.c:785
->   #16 0x00005628684740ee in handle_hmp_command (mon=3D0x56286a8c32d0, cmd=
-line=3D0x56286a8caeb2 "0x40001010") at monitor/hmp.c:1082
->
-> From the datasheet "Actel SmartFusion Microcontroller Subsystem
-> User's Guide" Rev.1, Table 13-3 "SPI Register Summary", this
-> register has a reset value of 0.
->
-> Check the FIFO is not empty before accessing it, else log an
-> error message.
 >
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
@@ -168,29 +109,101 @@ Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Alistair
 
 > ---
->  hw/ssi/mss-spi.c | 8 +++++++-
->  1 file changed, 7 insertions(+), 1 deletion(-)
+> Useful while debugging, can be skipped for next dev cycle.
 >
+>  Makefile.objs       |  1 +
+>  hw/ssi/mss-spi.c    | 23 ++++++-----------------
+>  hw/ssi/trace-events |  6 ++++++
+>  3 files changed, 13 insertions(+), 17 deletions(-)
+>  create mode 100644 hw/ssi/trace-events
+>
+> diff --git a/Makefile.objs b/Makefile.objs
+> index 6a143dcd57..60ec443091 100644
+> --- a/Makefile.objs
+> +++ b/Makefile.objs
+> @@ -178,6 +178,7 @@ trace-events-subdirs +=3D hw/scsi
+>  trace-events-subdirs +=3D hw/sd
+>  trace-events-subdirs +=3D hw/sparc
+>  trace-events-subdirs +=3D hw/sparc64
+> +trace-events-subdirs +=3D hw/ssi
+>  trace-events-subdirs +=3D hw/timer
+>  trace-events-subdirs +=3D hw/tpm
+>  trace-events-subdirs +=3D hw/usb
 > diff --git a/hw/ssi/mss-spi.c b/hw/ssi/mss-spi.c
-> index 4878279482..3201a577a1 100644
+> index 918b1f3e82..4878279482 100644
 > --- a/hw/ssi/mss-spi.c
 > +++ b/hw/ssi/mss-spi.c
-> @@ -155,7 +155,13 @@ spi_read(void *opaque, hwaddr addr, unsigned int siz=
-e)
->      case R_SPI_RX:
->          s->regs[R_SPI_STATUS] &=3D ~S_RXFIFOFUL;
->          s->regs[R_SPI_STATUS] &=3D ~S_RXCHOVRF;
-> -        ret =3D fifo32_pop(&s->rx_fifo);
-> +        if (fifo32_is_empty(&s->rx_fifo)) {
-> +            qemu_log_mask(LOG_GUEST_ERROR,
-> +                          "%s: Reading empty RX_FIFO\n",
-> +                          __func__);
-> +        } else {
-> +            ret =3D fifo32_pop(&s->rx_fifo);
-> +        }
->          if (fifo32_is_empty(&s->rx_fifo)) {
->              s->regs[R_SPI_STATUS] |=3D S_RXFIFOEMP;
+> @@ -27,18 +27,8 @@
+>  #include "hw/ssi/mss-spi.h"
+>  #include "qemu/log.h"
+>  #include "qemu/module.h"
+> +#include "trace.h"
+>
+> -#ifndef MSS_SPI_ERR_DEBUG
+> -#define MSS_SPI_ERR_DEBUG   0
+> -#endif
+> -
+> -#define DB_PRINT_L(lvl, fmt, args...) do { \
+> -    if (MSS_SPI_ERR_DEBUG >=3D lvl) { \
+> -        qemu_log("%s: " fmt "\n", __func__, ## args); \
+> -    } \
+> -} while (0)
+> -
+> -#define DB_PRINT(fmt, args...) DB_PRINT_L(1, fmt, ## args)
+>
+>  #define FIFO_CAPACITY         32
+>
+> @@ -187,9 +177,9 @@ spi_read(void *opaque, hwaddr addr, unsigned int size=
+)
 >          }
+>          break;
+>      }
+> -
+> -    DB_PRINT("addr=3D0x%" HWADDR_PRIx " =3D 0x%" PRIx32, addr * 4, ret);
+> +    trace_mss_spi_read(addr << 2, ret);
+>      spi_update_irq(s);
+> +
+>      return ret;
+>  }
+>
+> @@ -225,9 +215,9 @@ static void spi_flush_txfifo(MSSSpiState *s)
+>          s->regs[R_SPI_STATUS] &=3D ~(S_TXDONE | S_RXRDY);
+>
+>          tx =3D fifo32_pop(&s->tx_fifo);
+> -        DB_PRINT("data tx:0x%" PRIx32, tx);
+> +        trace_mss_spi_flush_fifo("tx", tx);
+>          rx =3D ssi_transfer(s->spi, tx);
+> -        DB_PRINT("data rx:0x%" PRIx32, rx);
+> +        trace_mss_spi_flush_fifo("rx", rx);
+>
+>          if (fifo32_num_used(&s->rx_fifo) =3D=3D s->fifo_depth) {
+>              s->regs[R_SPI_STATUS] |=3D S_RXCHOVRF;
+> @@ -262,9 +252,8 @@ static void spi_write(void *opaque, hwaddr addr,
+>      MSSSpiState *s =3D opaque;
+>      uint32_t value =3D val64;
+>
+> -    DB_PRINT("addr=3D0x%" HWADDR_PRIx " =3D0x%" PRIx32, addr, value);
+> +    trace_mss_spi_write(addr, value);
+>      addr >>=3D 2;
+> -
+>      switch (addr) {
+>      case R_SPI_TX:
+>          /* adding to already full FIFO */
+> diff --git a/hw/ssi/trace-events b/hw/ssi/trace-events
+> new file mode 100644
+> index 0000000000..6e494b913c
+> --- /dev/null
+> +++ b/hw/ssi/trace-events
+> @@ -0,0 +1,6 @@
+> +# See docs/devel/tracing.txt for syntax documentation.
+> +
+> +# mss-spi.c
+> +mss_spi_read(uint32_t addr, uint32_t value) "read addr:0x%02x value:0x%0=
+8x"
+> +mss_spi_write(uint32_t addr, uint32_t value) "write addr:0x%02x value:0x=
+%08x"
+> +mss_spi_flush_fifo(const char *name, uint32_t value) "flush fifo:%s valu=
+e:0x%08x"
 > --
 > 2.20.1
 >
