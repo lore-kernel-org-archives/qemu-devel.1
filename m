@@ -3,67 +3,75 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DB46C606B0
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 05:51:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C76D9C606B0
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 05:53:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0B26D20861
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 05:51:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B26D20861
+	by mail.kernel.org (Postfix) with ESMTPS id 930B12166E
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 05:53:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 930B12166E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46928 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46934 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hkj2T-0005PQ-0M
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jul 2019 01:51:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53306)
+	id 1hkj4Z-0006OY-U4
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jul 2019 01:53:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53715)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <armbru@redhat.com>) id 1hkj1b-0004w4-2W
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 01:50:47 -0400
+ (envelope-from <armbru@redhat.com>) id 1hkj47-0005xw-Fs
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 01:53:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1hkj1a-0007Py-1E
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 01:50:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57120)
+ (envelope-from <armbru@redhat.com>) id 1hkj46-0000FZ-Ix
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 01:53:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57462)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hkj1Z-0007Pc-SA
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 01:50:45 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hkj46-0000FD-Bf
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 01:53:22 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id C71013099FC5;
- Tue,  9 Jul 2019 05:42:07 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 8BB9299DD9
+ for <qemu-devel@nongnu.org>; Tue,  9 Jul 2019 05:53:21 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-111.ams2.redhat.com
  [10.36.116.111])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8EFFD5C2F1;
- Tue,  9 Jul 2019 05:42:07 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id F340F7FCD6;
+ Tue,  9 Jul 2019 05:53:16 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 3F10A1138648; Tue,  9 Jul 2019 07:42:01 +0200 (CEST)
+ id 8707B1138648; Tue,  9 Jul 2019 07:53:15 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <1534182832-554-1-git-send-email-aleksandar.markovic@rt-rk.com>
- <1534182832-554-5-git-send-email-aleksandar.markovic@rt-rk.com>
- <4da49ffe-902f-2cf2-8a21-2bbd511b17a4@weilnetz.de>
- <CAFEAcA8fW0odS4pT9XNWoti7PM6TpdJ06o=43vmdRBArNM=iuw@mail.gmail.com>
-Date: Tue, 09 Jul 2019 07:42:01 +0200
-In-Reply-To: <CAFEAcA8fW0odS4pT9XNWoti7PM6TpdJ06o=43vmdRBArNM=iuw@mail.gmail.com>
- (Peter Maydell's message of "Mon, 8 Jul 2019 09:42:31 +0100")
-Message-ID: <87zhlnahna.fsf@dusky.pond.sub.org>
+To: Daniel P. =?utf-8?Q?Berrang=C3=A9?= <berrange@redhat.com>
+References: <20190703172501.GI23082@redhat.com>
+ <20190704102457.GE1609@stefanha-x1.localdomain>
+ <20190704102837.GA24190@redhat.com>
+ <20190705080717.GD10995@stefanha-x1.localdomain>
+ <8470a203-430b-1814-b2ef-6adf3fa739a6@redhat.com>
+ <87d0iok4ai.fsf@dusky.pond.sub.org>
+ <c4997dee-932c-eb57-23b9-4b51e8856f91@redhat.com>
+ <874l3zhktx.fsf@dusky.pond.sub.org> <20190708093400.GB3082@redhat.com>
+ <e396d430-1e6e-2e0b-454b-5c4208756742@redhat.com>
+ <20190708103804.GG3082@redhat.com>
+Date: Tue, 09 Jul 2019 07:53:15 +0200
+In-Reply-To: <20190708103804.GG3082@redhat.com> ("Daniel P. =?utf-8?Q?Berr?=
+ =?utf-8?Q?ang=C3=A9=22's?=
+ message of "Mon, 8 Jul 2019 11:38:04 +0100")
+Message-ID: <87r26zah4k.fsf@dusky.pond.sub.org>
 User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.41]); Tue, 09 Jul 2019 05:42:11 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.38]); Tue, 09 Jul 2019 05:53:21 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] Handling of fall through code (was: [PATCH v8
- 04/87] target/mips: Mark switch fallthroughs with interpretable comments
+Subject: Re: [Qemu-devel] [RFC PATCH-for-4.2] tracing: Allow to tune tracing
+ options via the environment
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,51 +83,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paul Burton <pburton@wavecomp.com>,
- Stefan Markovic <smarkovic@wavecomp.com>, Stefan Weil <sw@weilnetz.de>,
- Riku Voipio <riku.voipio@iki.fi>,
- Richard Henderson <richard.henderson@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <laurent@vivier.eu>,
- Aleksandar Markovic <aleksandar.markovic@rt-rk.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philippe.mathieu.daude@gmail.com>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Petar Jovanovic <pjovanovic@wavecomp.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
 
-> On Sun, 7 Jul 2019 at 21:26, Stefan Weil <sw@weilnetz.de> wrote:
->> This is a general problem all over the QEMU code. I usually compile with
->> nearly all warnings enabled and get now lots of errors with the latest
->> code and after updating to gcc-8.3.0 (Debian buster). It should be
->> reproducible by enabling -Werror=implicit-fallthrough.
+> On Mon, Jul 08, 2019 at 12:27:12PM +0200, Philippe Mathieu-Daud=C3=A9 wro=
+te:
+[...]
+>> Anyway, to stop bikeshedding this thread, can you add few lines about
+>> why not use getenv() in the HACKING?
 >
-> Coverity warns about implicit fallthroughs, and we are
-> currently warning-free in that department, so I think
-> our remaining problems are largely down to perhaps
-> using idioms which the compiler doesn't spot.
-> Being able to enable gcc implicit-fallthrough errors would
-> definitely be better than spotting them only after the
-> fact with Coverity.
->
->> I suggest to enable -Werror=implicit-fallthrough by default and add a
->> new macro to mark all fallthrough locations which are correct, but not
->> accepted by the compiler.
->
-> I'm not sure why we need a macro. Our standard way to
-> mark fallthrough is /* fall through */, which has hundreds
-> of uses in the codebase. -Wimplicit-fallthrough=2 will match this,
-> so it seems simpler to just use that rather than to rework
-> how we mark fallthroughs.
->
-> Since vixl is 3rd-party code it might be easier to just
-> add -Wno-implicit-fallthrough to the cflags that
-> disas/libvixl/Makefile.objs sets up for building those files.
-> (We should check also for newer libvixl and/or suggest
-> something upstream that works with gcc.)
+> I don't actually think the getenv thing is a security issue in any case.
+> If there was a security problem exploitable via getenv, then the bug would
+> lie in the application invoking QEMU for not ensuring the ENV contents
+> were safe before exec'ing QEMU.
 
-Concur.
+Correct.
+
+>                                 Libvirt is paranoid by default and scrubs
+> QEMU's env only keeping a specific sanitized whitelist for exactly these
+> reasons.
+
+Must have for running programs with different privileges.
+
+Corrollary: a program that does not use getenv() at all is slightly
+harder to misuse with different privileges.  Irrelevant in practice,
+because libraries use getenv(), starting with ld.so.
 
