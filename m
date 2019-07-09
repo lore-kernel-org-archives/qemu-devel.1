@@ -2,71 +2,77 @@ Return-Path: <SRS0=huOX=VG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74321C606B0
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 03:10:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 391F2C606B0
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 03:53:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4A43B2166E
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 03:10:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A43B2166E
+	by mail.kernel.org (Postfix) with ESMTPS id 11594216C4
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 03:53:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 11594216C4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46326 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46434 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hkgWY-0005dy-W1
-	for qemu-devel@archiver.kernel.org; Mon, 08 Jul 2019 23:10:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51624)
+	id 1hkhBu-0004YQ-90
+	for qemu-devel@archiver.kernel.org; Mon, 08 Jul 2019 23:53:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41426)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jdillama@redhat.com>) id 1hkgVK-00058J-2y
- for qemu-devel@nongnu.org; Mon, 08 Jul 2019 23:09:19 -0400
+ (envelope-from <zhexu@redhat.com>) id 1hkffv-0008LX-N8
+ for qemu-devel@nongnu.org; Mon, 08 Jul 2019 22:16:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jdillama@redhat.com>) id 1hkgVF-00079g-JH
- for qemu-devel@nongnu.org; Mon, 08 Jul 2019 23:09:16 -0400
-Received: from mail-ed1-f65.google.com ([209.85.208.65]:44444)
+ (envelope-from <zhexu@redhat.com>) id 1hkffu-0003cU-E2
+ for qemu-devel@nongnu.org; Mon, 08 Jul 2019 22:16:11 -0400
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:44992)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <jdillama@redhat.com>) id 1hkgVC-00071x-1A
- for qemu-devel@nongnu.org; Mon, 08 Jul 2019 23:09:11 -0400
-Received: by mail-ed1-f65.google.com with SMTP id k8so16282910edr.11
- for <qemu-devel@nongnu.org>; Mon, 08 Jul 2019 20:09:05 -0700 (PDT)
+ (Exim 4.71) (envelope-from <zhexu@redhat.com>) id 1hkfft-0003Zc-6A
+ for qemu-devel@nongnu.org; Mon, 08 Jul 2019 22:16:10 -0400
+Received: by mail-pf1-f193.google.com with SMTP id t16so8482428pfe.11
+ for <qemu-devel@nongnu.org>; Mon, 08 Jul 2019 19:16:07 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
- :from:date:message-id:subject:to:cc:content-transfer-encoding;
- bh=bscJhhfWM7bBPgunbuc02TusfvSCtAO1YzH3WxQyjL8=;
- b=dhOo6FdeNH2Vgs9CiQcxCfZf+LmUytVqnK7W2/yHYSOx342d8RsXWonDjtweATbxOo
- pgCZ3DuPSsqRsuv58Cvz9vYhwqAsauhS5o7mhrwr/f2oYJjdPxKfnHm+C9R1ExoNCsZT
- uYhKXVG/545XajKQdFqsDDrkkOoeKpwoDY866Yk1U55mJcQfdHeG1s6RzpUnbI40OXaK
- EdD5jCF8YcpNwOk5Z45QR/B6vWntMf4P9ZfN5IvK7coCFShJEOqsI8/296rRd87r0iYG
- MWQ12/kI7dPtfUsBuqYxFiGjhH/T1JOgPk7f6Xp0AM4Hz7Axe90gOT0ZMFpK7cGGK3R9
- Rc1A==
-X-Gm-Message-State: APjAAAXpBMJNRFRTa1SU0NhsiGa6q5jqIaxY7/R5GcDlUbEdWtWUACvJ
- KgclyULbCtas0MQj+IdG0+geVUsrYeiQcn4VJmT+sw==
-X-Google-Smtp-Source: APXvYqwiSMJuQBXMhRp3VKqbBHFu4Kuc4nrZEAxnqUfayrxbg27v/gTmrDkXQEsBJV+giRss2WVbWBVNUbBIjgDgho8=
-X-Received: by 2002:aa7:c753:: with SMTP id c19mr17031830eds.81.1562641744412; 
- Mon, 08 Jul 2019 20:09:04 -0700 (PDT)
+ h=x-gm-message-state:from:date:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to:user-agent;
+ bh=AejX9I0nPw0C0alAPdpDESjIN8ZZo4n3Ywa8AB9AMrA=;
+ b=I2RorO9TEPoyWGC6ocQaqSo7jiDUgr5xSSwG6Negr6te7xMMIJbPm/OKm7Qtq3s3cR
+ I6NA5piE4FbiHyu0G7fcwih+wah3Rac1IWZ7vRK7gA28i2A8UDfK/nZI2/93BxKpHWq3
+ 1Yw89IehoqjjpwNwTZgNcl9/45B2ePpfpyhP6Pvrz/vm3ZOkin37JZ/eGGxAZSCM+MXJ
+ joxdXBNGodSCRDaQ0YcWOmC8L52esFA8p29TZBsJrWP3LndtZ2MejeNUEn033oVYK8cl
+ r7Qt05iYtvGr8E2FePb6cE1PySy4Lnk2KX2hsis9Z0TTNOtEnXByp9P1CXHyU5GsqTtE
+ lftg==
+X-Gm-Message-State: APjAAAUS25FscsryozxzzmUBw+BE8WFpIcuJVC6G++6ukWe3q+LSySGr
+ /5ohmstLB7VV3j61IBefw88VXA==
+X-Google-Smtp-Source: APXvYqwiHBXdfW1lQRsPP9qtg3vYT14hpbHkuAdm3AVWoWrwhMRY7huqrXfHQq6nGgsXieZZDbWI9w==
+X-Received: by 2002:a17:90a:ac0e:: with SMTP id
+ o14mr30006833pjq.142.1562638566419; 
+ Mon, 08 Jul 2019 19:16:06 -0700 (PDT)
+Received: from xz-x1 ([209.132.188.80])
+ by smtp.gmail.com with ESMTPSA id 11sm19146288pfw.33.2019.07.08.19.16.01
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Mon, 08 Jul 2019 19:16:05 -0700 (PDT)
+From: Peter Xu <zhexu@redhat.com>
+X-Google-Original-From: Peter Xu <peterx@redhat.com>
+Date: Tue, 9 Jul 2019 10:15:54 +0800
+To: Liu Yi L <yi.l.liu@intel.com>
+Message-ID: <20190709021554.GB5178@xz-x1>
+References: <1562324511-2910-1-git-send-email-yi.l.liu@intel.com>
+ <1562324511-2910-5-git-send-email-yi.l.liu@intel.com>
 MIME-Version: 1.0
-References: <20190705093258.47856-1-sgarzare@redhat.com>
- <dcc9f3dc-78b4-4216-2791-b7e90f6d79ff@redhat.com>
- <20190705104318.dngmmu3lpuvbe2nh@steredhat>
-In-Reply-To: <20190705104318.dngmmu3lpuvbe2nh@steredhat>
-From: Jason Dillaman <jdillama@redhat.com>
-Date: Mon, 8 Jul 2019 23:08:53 -0400
-Message-ID: <CA+aFP1AgNGJMdAG_E23Q-rf2Gt1rpeKjDfrk1PLA3f4XiUkGtw@mail.gmail.com>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1562324511-2910-5-git-send-email-yi.l.liu@intel.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.208.65
-Subject: Re: [Qemu-devel] [PATCH v3] block/rbd: implement
- .bdrv_get_allocated_file_size callback
+X-Received-From: 209.85.210.193
+X-Mailman-Approved-At: Mon, 08 Jul 2019 23:51:52 -0400
+Subject: Re: [Qemu-devel] [RFC v1 04/18] intel_iommu: add "sm_model" option
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -78,168 +84,151 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: dillaman@redhat.com
-Cc: Kevin Wolf <kwolf@redhat.com>, Josh Durgin <jdurgin@redhat.com>,
- qemu-block <qemu-block@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>,
- Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>
+Cc: tianyu.lan@intel.com, kevin.tian@intel.com,
+ Jacob Pan <jacob.jun.pan@linux.intel.com>, Yi Sun <yi.y.sun@linux.intel.com>,
+ kvm@vger.kernel.org, mst@redhat.com, jun.j.tian@intel.com,
+ qemu-devel@nongnu.org, eric.auger@redhat.com, alex.williamson@redhat.com,
+ pbonzini@redhat.com, yi.y.sun@intel.com, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jul 5, 2019 at 6:43 AM Stefano Garzarella <sgarzare@redhat.com> wro=
-te:
->
-> On Fri, Jul 05, 2019 at 11:58:43AM +0200, Max Reitz wrote:
-> > On 05.07.19 11:32, Stefano Garzarella wrote:
-> > > This patch allows 'qemu-img info' to show the 'disk size' for
-> > > the RBD images that have the fast-diff feature enabled.
-> > >
-> > > If this feature is enabled, we use the rbd_diff_iterate2() API
-> > > to calculate the allocated size for the image.
-> > >
-> > > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-> > > ---
-> > > v3:
-> > >   - return -ENOTSUP instead of -1 when fast-diff is not available
-> > >     [John, Jason]
-> > > v2:
-> > >   - calculate the actual usage only if the fast-diff feature is
-> > >     enabled [Jason]
-> > > ---
-> > >  block/rbd.c | 54 +++++++++++++++++++++++++++++++++++++++++++++++++++=
-++
-> > >  1 file changed, 54 insertions(+)
-> >
-> > Well, the librbd documentation is non-existing as always, but while
-> > googling, I at least found that libvirt has exactly the same code.  So =
-I
-> > suppose it must be quite correct, then.
-> >
->
-> While I wrote this code I took a look at libvirt implementation and also
-> at the "rbd" tool in the ceph repository: compute_image_disk_usage() in
-> src/tools/rbd/action/DiskUsage.cc
->
-> > > diff --git a/block/rbd.c b/block/rbd.c
-> > > index 59757b3120..b6bed683e5 100644
-> > > --- a/block/rbd.c
-> > > +++ b/block/rbd.c
-> > > @@ -1084,6 +1084,59 @@ static int64_t qemu_rbd_getlength(BlockDriverS=
-tate *bs)
-> > >      return info.size;
-> > >  }
-> > >
-> > > +static int rbd_allocated_size_cb(uint64_t offset, size_t len, int ex=
-ists,
-> > > +                                 void *arg)
-> > > +{
-> > > +    int64_t *alloc_size =3D (int64_t *) arg;
-> > > +
-> > > +    if (exists) {
-> > > +        (*alloc_size) +=3D len;
-> > > +    }
-> > > +
-> > > +    return 0;
-> > > +}
-> > > +
-> > > +static int64_t qemu_rbd_get_allocated_file_size(BlockDriverState *bs=
-)
-> > > +{
-> > > +    BDRVRBDState *s =3D bs->opaque;
-> > > +    uint64_t flags, features;
-> > > +    int64_t alloc_size =3D 0;
-> > > +    int r;
-> > > +
-> > > +    r =3D rbd_get_flags(s->image, &flags);
-> > > +    if (r < 0) {
-> > > +        return r;
-> > > +    }
-> > > +
-> > > +    r =3D rbd_get_features(s->image, &features);
-> > > +    if (r < 0) {
-> > > +        return r;
-> > > +    }
-> > > +
-> > > +    /*
-> > > +     * We use rbd_diff_iterate2() only if the RBD image have fast-di=
-ff
-> > > +     * feature enabled. If it is disabled, rbd_diff_iterate2() could=
- be
-> > > +     * very slow on a big image.
-> > > +     */
-> > > +    if (!(features & RBD_FEATURE_FAST_DIFF) ||
-> > > +        (flags & RBD_FLAG_FAST_DIFF_INVALID)) {
-> > > +        return -ENOTSUP;
-> > > +    }
-> > > +
-> > > +    /*
-> > > +     * rbd_diff_iterate2(), if the source snapshot name is NULL, inv=
-okes
-> > > +     * the callback on all allocated regions of the image.
-> > > +     */
-> > > +    r =3D rbd_diff_iterate2(s->image, NULL, 0,
-> > > +                          bs->total_sectors * BDRV_SECTOR_SIZE, 0, 1=
-,
-> > > +                          &rbd_allocated_size_cb, &alloc_size);
-> >
-> > But I have a question.  This is basically block_status, right?  So it
-> > gives us information on which areas are allocated and which are not.
-> > The result thus gives us a lower bound on the allocation size, but is i=
-t
-> > really exactly the allocation size?
-> >
-> > There are two things I=E2=80=99m concerned about:
-> >
-> > 1. What about metadata?
->
-> Good question, I don't think it includes the size used by metadata and I
-> don't know if there is a way to know it. I'll check better.
+On Fri, Jul 05, 2019 at 07:01:37PM +0800, Liu Yi L wrote:
+> Intel VT-d 3.0 introduces scalable mode, and it has a bunch of
+> capabilities related to scalable mode translation, thus there
+> are multiple combinations. While this vIOMMU implementation
+> wants simplify it for user by providing typical combinations.
+> User could config it by "sm_model" option. The usage is as
+> below:
+> 
+> "-device intel-iommu,x-scalable-mode=on,sm_model=["legacy"|"scalable"]"
 
-It does not include the size of metadata, the "rbd_diff_iterate2"
-function is literally just looking for touched data blocks within the
-RBD image.
+Is it a requirement to split into two parameters, instead of just
+exposing everything about scalable mode when x-scalable-mode is set?
 
-> >
-> > 2. If you have multiple snapshots, this will only report the overall
-> > allocation information, right?  So say there is something like this:
-> >
-> > (=E2=80=9CA=E2=80=9D means an allocated MB, =E2=80=9C-=E2=80=9D is an u=
-nallocated MB)
-> >
-> > Snapshot 1: AAAA---
-> > Snapshot 2: --AAAAA
-> > Snapshot 3: -AAAA--
-> >
-> > I think the allocated data size is the number of As in total (13 MB).
-> > But I suppose this API will just return 7 MB, because it looks on
-> > everything an it sees the whole image range (7 MB) to be allocated.  It
-> > doesn=E2=80=99t report in how many snapshots some region is allocated.
+> 
+>  - "legacy": gives support for SL page table
+>  - "scalable": gives support for FL page table, pasid, virtual command
+>  - default to be "legacy" if "x-scalable-mode=on while no sm_model is
+>    configured
+> 
+> Cc: Kevin Tian <kevin.tian@intel.com>
+> Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> Cc: Peter Xu <peterx@redhat.com>
+> Cc: Yi Sun <yi.y.sun@linux.intel.com>
+> Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
+> Signed-off-by: Yi Sun <yi.y.sun@linux.intel.com>
+> ---
+>  hw/i386/intel_iommu.c          | 28 +++++++++++++++++++++++++++-
+>  hw/i386/intel_iommu_internal.h |  2 ++
+>  include/hw/i386/intel_iommu.h  |  1 +
+>  3 files changed, 30 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+> index 44b1231..3160a05 100644
+> --- a/hw/i386/intel_iommu.c
+> +++ b/hw/i386/intel_iommu.c
+> @@ -3014,6 +3014,7 @@ static Property vtd_properties[] = {
+>      DEFINE_PROP_BOOL("caching-mode", IntelIOMMUState, caching_mode, FALSE),
+>      DEFINE_PROP_BOOL("x-scalable-mode", IntelIOMMUState, scalable_mode, FALSE),
+>      DEFINE_PROP_BOOL("dma-drain", IntelIOMMUState, dma_drain, true),
+> +    DEFINE_PROP_STRING("sm_model", IntelIOMMUState, sm_model),
 
-It should return 13 dirty data blocks (multipled by the size of the
-data block) since when you don't provide a "from snapshot" name, it
-will iterate from the first snapshot to the HEAD revision.
+Can do 's/-/_/' to follow the rest if we need it.
 
-> Looking at the documentation of rbd_diff_iterate2() [1] they says:
->
->  *                        If the source snapshot name is NULL, we
->  * interpret that as the beginning of time and return all allocated
->  * regions of the image.
->
-> But I don't know the answer of your question (maybe Jason can help
-> here).
-> I should check better the implementation to understand if I can cycle
-> on all snapshot to get the exact allocated data size.
->
-> https://github.com/ceph/ceph/blob/master/src/include/rbd/librbd.h#L925
->
-> I'll back when I have more details on the rbd implementation to better
-> answer your questions.
->
-> Thanks,
-> Stefano
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+>  
+> @@ -3489,6 +3490,14 @@ static void vtd_iommu_replay(IOMMUMemoryRegion *iommu_mr, IOMMUNotifier *n)
+>      return;
+>  }
+>  
+> +const char sm_model_manual[] =
+> +        "\"-device intel-iommu,x-scalable-mode=on,"
+> +        "sm_model=[\"legacy\"|\"scalable\"]\"\n"
+> +        " - \"legacy\" gives support for SL page table based IOVA\n"
+> +        " - \"scalable\" gives support for FL page table based IOVA and SVA\n"
+> +        " - default to be \"legacy\" if \"x-scalable-mode=on\""
+> +        " while no sm_model is configured\n";
+> +
+>  /* Do the initialization. It will also be called when reset, so pay
+>   * attention when adding new initialization stuff.
+>   */
+> @@ -3557,9 +3566,26 @@ static void vtd_init(IntelIOMMUState *s)
+>          s->cap |= VTD_CAP_CM;
+>      }
+>  
+> +    if (s->sm_model && !s->scalable_mode) {
+> +        printf("\n\"sm_model\" depends on \"x-scalable-mode\"\n"
+> +               "please check if \"x-scalable-mode\" is expected\n"
+> +               "\"sm_model\" manual:\n%s", sm_model_manual);
+> +        exit(1);
 
+Let's avoid calling exit() directly considering that we've had things
+like vtd_decide_config() already which allows an Error**.  We can also
+introduce that too into vtd_init() and pass the error to upper to
+handle the failure.
 
+> +    }
+> +
+>      /* TODO: read cap/ecap from host to decide which cap to be exposed. */
+>      if (s->scalable_mode) {
+> -        s->ecap |= VTD_ECAP_SMTS | VTD_ECAP_SRS | VTD_ECAP_SLTS;
+> +        if (!s->sm_model || !strcmp(s->sm_model, "legacy")) {
+> +            s->ecap |= VTD_ECAP_SMTS | VTD_ECAP_SRS | VTD_ECAP_SLTS;
+> +        } else if (!strcmp(s->sm_model, "scalable")) {
+> +            s->ecap |= VTD_ECAP_SMTS | VTD_ECAP_SRS | VTD_ECAP_PASID
+> +                       | VTD_ECAP_FLTS;
 
---=20
-Jason
+Do you also need VTD_ECAP_SLTS here?
+
+> +        } else {
+> +            printf("\n!!!!! Invalid sm_model config !!!!!\n"
+> +                "Please config sm_model=[\"legacy\"|\"scalable\"]\n"
+> +                "\"sm_model\" manual:\n%s", sm_model_manual);
+> +            exit(1);
+
+Same here.
+
+Thanks,
+
+> +        }
+>      }
+>  
+>      vtd_reset_caches(s);
+> diff --git a/hw/i386/intel_iommu_internal.h b/hw/i386/intel_iommu_internal.h
+> index c1235a7..adae198 100644
+> --- a/hw/i386/intel_iommu_internal.h
+> +++ b/hw/i386/intel_iommu_internal.h
+> @@ -190,8 +190,10 @@
+>  #define VTD_ECAP_PT                 (1ULL << 6)
+>  #define VTD_ECAP_MHMV               (15ULL << 20)
+>  #define VTD_ECAP_SRS                (1ULL << 31)
+> +#define VTD_ECAP_PASID              (1ULL << 40)
+>  #define VTD_ECAP_SMTS               (1ULL << 43)
+>  #define VTD_ECAP_SLTS               (1ULL << 46)
+> +#define VTD_ECAP_FLTS               (1ULL << 47)
+>  
+>  /* CAP_REG */
+>  /* (offset >> 4) << 24 */
+> diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.h
+> index 12f3d26..b51cc9f 100644
+> --- a/include/hw/i386/intel_iommu.h
+> +++ b/include/hw/i386/intel_iommu.h
+> @@ -270,6 +270,7 @@ struct IntelIOMMUState {
+>      bool buggy_eim;                 /* Force buggy EIM unless eim=off */
+>      uint8_t aw_bits;                /* Host/IOVA address width (in bits) */
+>      bool dma_drain;                 /* Whether DMA r/w draining enabled */
+> +    char *sm_model;          /* identify actual scalable mode iommu model*/
+>  
+>      /*
+>       * Protects IOMMU states in general.  Currently it protects the
+> -- 
+> 2.7.4
+> 
+
+Regards,
+
+-- 
+Peter Xu
 
