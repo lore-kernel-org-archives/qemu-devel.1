@@ -8,78 +8,77 @@ X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 721BFC73C5C
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 21:41:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 713DEC73C5C
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 21:43:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 401D520656
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 21:41:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2B5E020656
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 21:43:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QyntcApD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 401D520656
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d5nLGSeq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B5E020656
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56288 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56290 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hkxs1-0006Nc-Ev
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jul 2019 17:41:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48075)
+	id 1hkxts-000151-Ca
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jul 2019 17:43:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47901)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mrolnik@gmail.com>) id 1hkxnX-0002vh-3F
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 17:37:16 -0400
+ (envelope-from <mrolnik@gmail.com>) id 1hkxnQ-0002oo-W5
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 17:37:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mrolnik@gmail.com>) id 1hkxnT-0006tI-75
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 17:37:14 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:54775)
+ (envelope-from <mrolnik@gmail.com>) id 1hkxnM-0006jf-NO
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 17:37:08 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:41142)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1hkxnR-0006pB-1W
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 17:37:10 -0400
-Received: by mail-wm1-x343.google.com with SMTP id p74so229463wme.4
- for <qemu-devel@nongnu.org>; Tue, 09 Jul 2019 14:37:08 -0700 (PDT)
+ (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1hkxnM-0006cO-8C
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 17:37:04 -0400
+Received: by mail-wr1-x441.google.com with SMTP id c2so309798wrm.8
+ for <qemu-devel@nongnu.org>; Tue, 09 Jul 2019 14:36:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=RXy8Z57iz19jbcENY65M0/IBu7nS3oHPtX9g9yK/Kfs=;
- b=QyntcApDF7dsDjQWc+ZUCWBTYMBEKCQFOSQbkCwACwVjrW4BoUwgmg6augXadB4WE+
- 2x2HYej8ThmKiFqUfiuitz2rRGy9Jxq0FVbEDs76uvsbxnIPadyQaFznK1qFpjhtZ1Sz
- Ug90bhI0J5iIj3fPKCNvQ+VhwKSS3Og8pingDrC+1V568YCwF1gl2ZZw40UFPvzuKy6N
- IgnptT5XlgrUhmuZs2enrmheRKcuGAXQfFUjHWLfg5JiWoVcaFwjVUZoydmM2qFPW02e
- HfK0s7PoBHk0Ugi0viPCTvv9voRAhT+xkjo+3Y9G51jwugwKa+OSm2PUIlxgLMXi3T27
- 9SIw==
+ bh=ZAv2GmrH/Kmmg8GCSUmc46XHLP4lwXUbqGZaXA47o+M=;
+ b=d5nLGSeqIYOjxA38Zl3AYPiB6bSLQgNCYMV58ODNdd2KWpxetIMYbl010h17Oeqyp1
+ PSgjlK0TQThsyMxoE80k/Z/kRyivN3PnD6HqkRxnxA4m22epcX5V9RKzuaHvDn3Hs3or
+ DZqieUkR+rU0zr0ieUtiUeEThKKSuhVKHDixgfVgAQZCHYvGBCBgj9nFRAZcldnh5P+e
+ jTtEOwdRhkhINP1+41hwrZkusRaDg9ph6ZSId3abVfZaf6Y5qkIxstVFJ63hADHbe2UC
+ tYpHr3TU32z9jQs81kcVaY6crwLo37WOG8CJ5oZAZJguyiR8BKM4wadrCWwxWy4ebyuw
+ bdPA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=RXy8Z57iz19jbcENY65M0/IBu7nS3oHPtX9g9yK/Kfs=;
- b=BjrmQnDdF6Y9EepCvCc9KNFqAWT/v13KPZiyTQQ1KMWhOFwYGf3P2Aqd3bcGNswww4
- sJ/gWhWGnw+3Z1OFPcdXiqnYNiTm5GUZ5WBjalW+YOpV7OexqGxpEB7o5EpgqUnCv5Ty
- gflFMEV6desx5gNAqZlx3HVdD9x/K+p4V1OYKKYZ/gWURTHcEtNQOhMr0danVBXEyv1v
- Xud+XTeyQBOlMqqoyQiuHkl4uIaMIdr/Lr2nOs/V7p7EF+HS0x4msaGgym1mk+dc1iT9
- 2GYc0YN+0x0JVlDPqP5qSPvbaYi+2Lh47t4uthWrVNLaFcoBrPp2lAeN6OmjqCP4iwO+
- SbQw==
-X-Gm-Message-State: APjAAAUYo/iMY/zfe19JIDIHOv0RduU2Y5G8SnKFm3eeeeVf6i6z7xEi
- NZdU6STWJVmwVN1KBpLiuFNjklG7ICk=
-X-Google-Smtp-Source: APXvYqz4KCBA9pDvYfc/k3+OrqjFQ1S/QunDxxdCHTzNIPgaCIhA6bjkfUVUfr31AmsiTofxOJhx9g==
-X-Received: by 2002:a1c:d107:: with SMTP id i7mr1619541wmg.92.1562708227395;
- Tue, 09 Jul 2019 14:37:07 -0700 (PDT)
+ bh=ZAv2GmrH/Kmmg8GCSUmc46XHLP4lwXUbqGZaXA47o+M=;
+ b=eFZkU9HuN1RVA6702L5Od+3ikUVGty0BDEeffaNdkGTQyvPjnCBoUKIPU4WAObjoHv
+ FMHliidWGtkPIWYfOwjmA5vn1tisWp3FFtK1dlfHdsRGh9BNga8mZa/jWGssHyW7SKxZ
+ FK3KXBP1TWVRVqQbHAd9aYjSgGdZcZHu1PzpyKhi1Heee1HhIif4kXJN5SFiUoWJAWR+
+ DFQFL/BFyhy0z9pknT2Q7iFz/a63AoihYYukHExMWREl9bsPXN5eH2UKjveEvIvVtm3O
+ zqmYM1xCmqEUMu8fjVD8tgihkTZ/nWlfZi1D+nKbspvG+IkX5ul1Sb/yrr3XxfO2Da4y
+ jfYw==
+X-Gm-Message-State: APjAAAWzCeZoUPpHZY++rapMbzK7dSI1zVe5DCJD6yzzVB2l4+hgU4fA
+ ZwB47IZnB58mK85J+FIihiri1xEwVfg=
+X-Google-Smtp-Source: APXvYqw7oKRY48AWPmLW/Hb9DLYXg109/39oLmDGubkg5FX7YftwKj8XPyl7NeT9/nBaUh3YqzIrsg==
+X-Received: by 2002:adf:df10:: with SMTP id y16mr728953wrl.302.1562708217733; 
+ Tue, 09 Jul 2019 14:36:57 -0700 (PDT)
 Received: from 8c859074c0ff.ant.amazon.com.com
  (bzq-79-178-2-209.red.bezeqint.net. [79.178.2.209])
- by smtp.gmail.com with ESMTPSA id c1sm141207wrh.1.2019.07.09.14.37.06
+ by smtp.gmail.com with ESMTPSA id c1sm141207wrh.1.2019.07.09.14.36.56
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
- Tue, 09 Jul 2019 14:37:06 -0700 (PDT)
+ Tue, 09 Jul 2019 14:36:57 -0700 (PDT)
 From: Michael Rolnik <mrolnik@gmail.com>
 To: qemu-devel@nongnu.org
-Date: Wed, 10 Jul 2019 00:36:51 +0300
-Message-Id: <20190709213651.77315-8-mrolnik@gmail.com>
+Date: Wed, 10 Jul 2019 00:36:46 +0300
+Message-Id: <20190709213651.77315-3-mrolnik@gmail.com>
 X-Mailer: git-send-email 2.17.2 (Apple Git-113)
 In-Reply-To: <20190709213651.77315-1-mrolnik@gmail.com>
 References: <20190709213651.77315-1-mrolnik@gmail.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::343
-Subject: [Qemu-devel] [PATCH v25 7/7] target/avr: Register AVR support with
- the rest of QEMU, the build system, and the MAINTAINERS file
+X-Received-From: 2a00:1450:4864:20::441
+Subject: [Qemu-devel] [PATCH v25 2/7] target/avr: Add instruction helpers
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,246 +98,414 @@ Sender: "Qemu-devel"
 
 From: Sarah Harris <S.E.Harris@kent.ac.uk>
 
+Stubs for unimplemented instructions and helpers for instructions that need to interact with QEMU.
+SPM and WDR are unimplemented because they require emulation of complex peripherals.
+The implementation of SLEEP is very limited due to the lack of peripherals to generate wake interrupts.
+Memory access instructions are implemented here because some address ranges actually refer to CPU registers.
+
 Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
 ---
- MAINTAINERS                     |  6 ++++++
- arch_init.c                     |  2 ++
- configure                       |  7 +++++++
- default-configs/avr-softmmu.mak |  5 +++++
- hw/avr/sample.c                 |  2 +-
- include/disas/dis-asm.h         |  6 ++++++
- include/sysemu/arch_init.h      |  1 +
- qapi/common.json                |  3 ++-
- target/avr/Makefile.objs        | 33 +++++++++++++++++++++++++++++++++
- target/avr/cpu.c                | 13 ++++---------
- target/avr/cpu.h                |  3 ---
- tests/machine-none-test.c       |  1 +
- 12 files changed, 68 insertions(+), 14 deletions(-)
- create mode 100644 default-configs/avr-softmmu.mak
- create mode 100644 target/avr/Makefile.objs
+ target/avr/helper.c | 354 ++++++++++++++++++++++++++++++++++++++++++++
+ target/avr/helper.h |  29 ++++
+ 2 files changed, 383 insertions(+)
+ create mode 100644 target/avr/helper.c
+ create mode 100644 target/avr/helper.h
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index cc9636b43a..934ad5739b 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -163,6 +163,12 @@ S: Maintained
- F: hw/arm/smmu*
- F: include/hw/arm/smmu*
- 
-+AVR TCG CPUs
-+M: Michael Rolnik <mrolnik@gmail.com>
-+S: Maintained
-+F: target/avr/
-+F: hw/avr/
-+
- CRIS TCG CPUs
- M: Edgar E. Iglesias <edgar.iglesias@gmail.com>
- S: Maintained
-diff --git a/arch_init.c b/arch_init.c
-index 74b0708634..413ad7acfd 100644
---- a/arch_init.c
-+++ b/arch_init.c
-@@ -85,6 +85,8 @@ int graphic_depth = 32;
- #define QEMU_ARCH QEMU_ARCH_UNICORE32
- #elif defined(TARGET_XTENSA)
- #define QEMU_ARCH QEMU_ARCH_XTENSA
-+#elif defined(TARGET_AVR)
-+#define QEMU_ARCH QEMU_ARCH_AVR
- #endif
- 
- const uint32_t arch_type = QEMU_ARCH;
-diff --git a/configure b/configure
-index 4983c8b533..ab8ebba100 100755
---- a/configure
-+++ b/configure
-@@ -7503,6 +7503,10 @@ case "$target_name" in
-     target_compiler=$cross_cc_aarch64
-     eval "target_compiler_cflags=\$cross_cc_cflags_${target_name}"
-   ;;
-+  avr)
-+	gdb_xml_files="avr-cpu.xml"
-+    target_compiler=$cross_cc_avr
-+  ;;
-   cris)
-     target_compiler=$cross_cc_cris
-   ;;
-@@ -7780,6 +7784,9 @@ for i in $ARCH $TARGET_BASE_ARCH ; do
-       disas_config "ARM_A64"
-     fi
-   ;;
-+  avr)
-+    disas_config "AVR"
-+  ;;
-   cris)
-     disas_config "CRIS"
-   ;;
-diff --git a/default-configs/avr-softmmu.mak b/default-configs/avr-softmmu.mak
+diff --git a/target/avr/helper.c b/target/avr/helper.c
 new file mode 100644
-index 0000000000..d1e1c28118
+index 0000000000..4d4eaed5ea
 --- /dev/null
-+++ b/default-configs/avr-softmmu.mak
-@@ -0,0 +1,5 @@
-+# Default configuration for avr-softmmu
++++ b/target/avr/helper.c
+@@ -0,0 +1,354 @@
++/*
++ * QEMU AVR CPU
++ *
++ * Copyright (c) 2016 Michael Rolnik
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see
++ * <http://www.gnu.org/licenses/lgpl-2.1.html>
++ */
 +
-+# Boards:
-+#
-+CONFIG_AVR_SAMPLE=y
-diff --git a/hw/avr/sample.c b/hw/avr/sample.c
-index e4cb548a33..de97fe4ae7 100644
---- a/hw/avr/sample.c
-+++ b/hw/avr/sample.c
-@@ -197,7 +197,7 @@ static void sample_class_init(ObjectClass *oc, void *data)
-     mc->default_cpus = 1;
-     mc->min_cpus = mc->default_cpus;
-     mc->max_cpus = mc->default_cpus;
--    mc->default_cpu_type = AVR_CPU_TYPE_NAME("avr6"); /* ATmega2560. */
-+    mc->default_cpu_type = "avr6-avr-cpu"; /* ATmega2560. */
-     mc->is_default = 1;
- }
- 
-diff --git a/include/disas/dis-asm.h b/include/disas/dis-asm.h
-index e9c7dd8eb4..8bedce17ac 100644
---- a/include/disas/dis-asm.h
-+++ b/include/disas/dis-asm.h
-@@ -211,6 +211,12 @@ enum bfd_architecture
- #define bfd_mach_m32r          0  /* backwards compatibility */
-   bfd_arch_mn10200,    /* Matsushita MN10200 */
-   bfd_arch_mn10300,    /* Matsushita MN10300 */
-+  bfd_arch_avr,       /* Atmel AVR microcontrollers.  */
-+#define bfd_mach_avr1          1
-+#define bfd_mach_avr2          2
-+#define bfd_mach_avr3          3
-+#define bfd_mach_avr4          4
-+#define bfd_mach_avr5          5
-   bfd_arch_cris,       /* Axis CRIS */
- #define bfd_mach_cris_v0_v10   255
- #define bfd_mach_cris_v32      32
-diff --git a/include/sysemu/arch_init.h b/include/sysemu/arch_init.h
-index 10cbafe970..aff57bfe61 100644
---- a/include/sysemu/arch_init.h
-+++ b/include/sysemu/arch_init.h
-@@ -25,6 +25,7 @@ enum {
-     QEMU_ARCH_NIOS2 = (1 << 17),
-     QEMU_ARCH_HPPA = (1 << 18),
-     QEMU_ARCH_RISCV = (1 << 19),
-+    QEMU_ARCH_AVR = (1 << 20),
- };
- 
- extern const uint32_t arch_type;
-diff --git a/qapi/common.json b/qapi/common.json
-index 99d313ef3b..6866c3e81d 100644
---- a/qapi/common.json
-+++ b/qapi/common.json
-@@ -183,11 +183,12 @@
- #        is true even for "qemu-system-x86_64".
- #
- # ppcemb: dropped in 3.1
-+# avr: added in 4.1
- #
- # Since: 3.0
- ##
- { 'enum' : 'SysEmuTarget',
--  'data' : [ 'aarch64', 'alpha', 'arm', 'cris', 'hppa', 'i386', 'lm32',
-+  'data' : [ 'aarch64', 'alpha', 'arm', 'avr', 'cris', 'hppa', 'i386', 'lm32',
-              'm68k', 'microblaze', 'microblazeel', 'mips', 'mips64',
-              'mips64el', 'mipsel', 'moxie', 'nios2', 'or1k', 'ppc',
-              'ppc64', 'riscv32', 'riscv64', 's390x', 'sh4',
-diff --git a/target/avr/Makefile.objs b/target/avr/Makefile.objs
++#include "qemu/osdep.h"
++
++#include "cpu.h"
++#include "hw/irq.h"
++#include "hw/sysbus.h"
++#include "sysemu/sysemu.h"
++#include "exec/exec-all.h"
++#include "exec/cpu_ldst.h"
++#include "exec/helper-proto.h"
++#include "exec/ioport.h"
++#include "qemu/host-utils.h"
++#include "qemu/error-report.h"
++
++bool avr_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
++{
++    bool ret = false;
++    CPUClass *cc = CPU_GET_CLASS(cs);
++    AVRCPU *cpu = AVR_CPU(cs);
++    CPUAVRState *env = &cpu->env;
++
++    if (interrupt_request & CPU_INTERRUPT_RESET) {
++        if (cpu_interrupts_enabled(env)) {
++            cs->exception_index = EXCP_RESET;
++            cc->do_interrupt(cs);
++
++            cs->interrupt_request &= ~CPU_INTERRUPT_RESET;
++
++            ret = true;
++        }
++    }
++    if (interrupt_request & CPU_INTERRUPT_HARD) {
++        if (cpu_interrupts_enabled(env) && env->intsrc != 0) {
++            int index = ctz32(env->intsrc);
++            cs->exception_index = EXCP_INT(index);
++            cc->do_interrupt(cs);
++
++            env->intsrc &= env->intsrc - 1; /* clear the interrupt */
++            cs->interrupt_request &= ~CPU_INTERRUPT_HARD;
++
++            ret = true;
++        }
++    }
++    return ret;
++}
++
++void avr_cpu_do_interrupt(CPUState *cs)
++{
++    AVRCPU *cpu = AVR_CPU(cs);
++    CPUAVRState *env = &cpu->env;
++
++    uint32_t ret = env->pc_w;
++    int vector = 0;
++    int size = avr_feature(env, AVR_FEATURE_JMP_CALL) ? 2 : 1;
++    int base = 0;
++
++    if (cs->exception_index == EXCP_RESET) {
++        vector = 0;
++    } else if (env->intsrc != 0) {
++        vector = ctz32(env->intsrc) + 1;
++    }
++
++    if (avr_feature(env, AVR_FEATURE_3_BYTE_PC)) {
++        cpu_stb_data(env, env->sp--, (ret & 0x0000ff));
++        cpu_stb_data(env, env->sp--, (ret & 0x00ff00) >> 8);
++        cpu_stb_data(env, env->sp--, (ret & 0xff0000) >> 16);
++    } else if (avr_feature(env, AVR_FEATURE_2_BYTE_PC)) {
++        cpu_stb_data(env, env->sp--, (ret & 0x0000ff));
++        cpu_stb_data(env, env->sp--, (ret & 0x00ff00) >> 8);
++    } else {
++        cpu_stb_data(env, env->sp--, (ret & 0x0000ff));
++    }
++
++    env->pc_w = base + vector * size;
++    env->sregI = 0; /* clear Global Interrupt Flag */
++
++    cs->exception_index = -1;
++}
++
++int avr_cpu_memory_rw_debug(CPUState *cs, vaddr addr, uint8_t *buf,
++                                int len, bool is_write)
++{
++    return cpu_memory_rw_debug(cs, addr, buf, len, is_write);
++}
++
++hwaddr avr_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
++{
++    return addr; /* I assume 1:1 address correspondance */
++}
++
++int avr_cpu_handle_mmu_fault(
++    CPUState *cs, vaddr address, int size, int rw, int mmu_idx)
++{
++    /* currently it's assumed that this will never happen */
++    cs->exception_index = EXCP_DEBUG;
++    cpu_dump_state(cs, stderr, 0);
++    return 1;
++}
++
++bool avr_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
++                        MMUAccessType access_type, int mmu_idx,
++                        bool probe, uintptr_t retaddr)
++{
++    int prot = 0;
++    MemTxAttrs attrs = {};
++    uint32_t paddr;
++
++    address &= TARGET_PAGE_MASK;
++
++    if (mmu_idx == MMU_CODE_IDX) {
++        /* access to code in flash */
++        paddr = OFFSET_CODE + address;
++        prot = PAGE_READ | PAGE_EXEC;
++        if (paddr + TARGET_PAGE_SIZE > OFFSET_DATA) {
++            error_report("execution left flash memory");
++            exit(1);
++        }
++    } else if (address < NO_CPU_REGISTERS + NO_IO_REGISTERS) {
++        /*
++         * access to CPU registers, exit and rebuilt this TB to use full access
++         * incase it touches specially handled registers like SREG or SP
++         */
++        AVRCPU *cpu = AVR_CPU(cs);
++        CPUAVRState *env = &cpu->env;
++        env->fullacc = 1;
++        cpu_loop_exit_restore(cs, retaddr);
++    } else {
++        /* access to memory. nothing special */
++        paddr = OFFSET_DATA + address;
++        prot = PAGE_READ | PAGE_WRITE;
++    }
++
++    tlb_set_page_with_attrs(
++        cs, address, paddr, attrs, prot, mmu_idx, TARGET_PAGE_SIZE);
++
++    return true;
++}
++
++void helper_sleep(CPUAVRState *env)
++{
++    CPUState *cs = env_cpu(env);
++
++    cs->exception_index = EXCP_HLT;
++    cpu_loop_exit(cs);
++}
++
++void helper_unsupported(CPUAVRState *env)
++{
++    CPUState *cs = env_cpu(env);
++
++    /*
++     *  I count not find what happens on the real platform, so
++     *  it's EXCP_DEBUG for meanwhile
++     */
++    cs->exception_index = EXCP_DEBUG;
++    if (qemu_loglevel_mask(LOG_UNIMP)) {
++        qemu_log("UNSUPPORTED\n");
++        cpu_dump_state(cs, qemu_logfile, 0);
++    }
++    cpu_loop_exit(cs);
++}
++
++void helper_debug(CPUAVRState *env)
++{
++    CPUState *cs = env_cpu(env);
++
++    cs->exception_index = EXCP_DEBUG;
++    cpu_loop_exit(cs);
++}
++
++void helper_break(CPUAVRState *env)
++{
++    CPUState *cs = env_cpu(env);
++
++    cs->exception_index = EXCP_DEBUG;
++    cpu_loop_exit(cs);
++}
++
++void helper_wdr(CPUAVRState *env)
++{
++    CPUState *cs = env_cpu(env);
++
++    /* WD is not implemented yet, placeholder */
++    cs->exception_index = EXCP_DEBUG;
++    cpu_loop_exit(cs);
++}
++
++/*
++ * This function implements IN instruction
++ *
++ * It does the following
++ * a.  if an IO register belongs to CPU, its value is read and returned
++ * b.  otherwise io address is translated to mem address and physical memory
++ *     is read.
++ * c.  it caches the value for sake of SBI, SBIC, SBIS & CBI implementation
++ *
++ */
++target_ulong helper_inb(CPUAVRState *env, uint32_t port)
++{
++    target_ulong data = 0;
++
++    switch (port) {
++    case 0x38: /* RAMPD */
++        data = 0xff & (env->rampD >> 16);
++        break;
++    case 0x39: /* RAMPX */
++        data = 0xff & (env->rampX >> 16);
++        break;
++    case 0x3a: /* RAMPY */
++        data = 0xff & (env->rampY >> 16);
++        break;
++    case 0x3b: /* RAMPZ */
++        data = 0xff & (env->rampZ >> 16);
++        break;
++    case 0x3c: /* EIND */
++        data = 0xff & (env->eind >> 16);
++        break;
++    case 0x3d: /* SPL */
++        data = env->sp & 0x00ff;
++        break;
++    case 0x3e: /* SPH */
++        data = env->sp >> 8;
++        break;
++    case 0x3f: /* SREG */
++        data = cpu_get_sreg(env);
++        break;
++    default:
++        /* not a special register, pass to normal memory access */
++        cpu_physical_memory_read(OFFSET_IO_REGISTERS + port, &data, 1);
++    }
++
++    return data;
++}
++
++/*
++ *  This function implements OUT instruction
++ *
++ *  It does the following
++ *  a.  if an IO register belongs to CPU, its value is written into the register
++ *  b.  otherwise io address is translated to mem address and physical memory
++ *      is written.
++ *  c.  it caches the value for sake of SBI, SBIC, SBIS & CBI implementation
++ *
++ */
++void helper_outb(CPUAVRState *env, uint32_t port, uint32_t data)
++{
++    data &= 0x000000ff;
++
++    switch (port) {
++    case 0x38: /* RAMPD */
++        if (avr_feature(env, AVR_FEATURE_RAMPD)) {
++            env->rampD = (data & 0xff) << 16;
++        }
++        break;
++    case 0x39: /* RAMPX */
++        if (avr_feature(env, AVR_FEATURE_RAMPX)) {
++            env->rampX = (data & 0xff) << 16;
++        }
++        break;
++    case 0x3a: /* RAMPY */
++        if (avr_feature(env, AVR_FEATURE_RAMPY)) {
++            env->rampY = (data & 0xff) << 16;
++        }
++        break;
++    case 0x3b: /* RAMPZ */
++        if (avr_feature(env, AVR_FEATURE_RAMPZ)) {
++            env->rampZ = (data & 0xff) << 16;
++        }
++        break;
++    case 0x3c: /* EIDN */
++        env->eind = (data & 0xff) << 16;
++        break;
++    case 0x3d: /* SPL */
++        env->sp = (env->sp & 0xff00) | (data);
++        break;
++    case 0x3e: /* SPH */
++        if (avr_feature(env, AVR_FEATURE_2_BYTE_SP)) {
++            env->sp = (env->sp & 0x00ff) | (data << 8);
++        }
++        break;
++    case 0x3f: /* SREG */
++        cpu_set_sreg(env, data);
++        break;
++    default:
++        /* not a special register, pass to normal memory access */
++        cpu_physical_memory_write(OFFSET_IO_REGISTERS + port, &data, 1);
++    }
++}
++
++/*
++ *  this function implements LD instruction when there is a posibility to read
++ *  from a CPU register
++ */
++target_ulong helper_fullrd(CPUAVRState *env, uint32_t addr)
++{
++    uint8_t data;
++
++    env->fullacc = false;
++
++    if (addr < NO_CPU_REGISTERS) {
++        /* CPU registers */
++        data = env->r[addr];
++    } else if (addr < NO_CPU_REGISTERS + NO_IO_REGISTERS) {
++        /* IO registers */
++        data = helper_inb(env, addr - NO_CPU_REGISTERS);
++    } else {
++        /* memory */
++        cpu_physical_memory_read(OFFSET_DATA + addr, &data, 1);
++    }
++    return data;
++}
++
++/*
++ *  this function implements ST instruction when there is a posibility to write
++ *  into a CPU register
++ */
++void helper_fullwr(CPUAVRState *env, uint32_t data, uint32_t addr)
++{
++    env->fullacc = false;
++
++    /* Following logic assumes this: */
++    assert(OFFSET_CPU_REGISTERS == OFFSET_DATA);
++    assert(OFFSET_IO_REGISTERS == OFFSET_CPU_REGISTERS + NO_CPU_REGISTERS);
++
++    if (addr < NO_CPU_REGISTERS) {
++        /* CPU registers */
++        env->r[addr] = data;
++    } else if (addr < NO_CPU_REGISTERS + NO_IO_REGISTERS) {
++        /* IO registers */
++        helper_outb(env, addr - NO_CPU_REGISTERS, data);
++    } else {
++        /* memory */
++        cpu_physical_memory_write(OFFSET_DATA + addr, &data, 1);
++    }
++}
+diff --git a/target/avr/helper.h b/target/avr/helper.h
 new file mode 100644
-index 0000000000..1034d87525
+index 0000000000..af4221acd5
 --- /dev/null
-+++ b/target/avr/Makefile.objs
-@@ -0,0 +1,33 @@
-+#
-+#  QEMU AVR CPU
-+#
-+#  Copyright (c) 2016 Michael Rolnik
-+#
-+#  This library is free software; you can redistribute it and/or
-+#  modify it under the terms of the GNU Lesser General Public
-+#  License as published by the Free Software Foundation; either
-+#  version 2.1 of the License, or (at your option) any later version.
-+#
-+#  This library is distributed in the hope that it will be useful,
-+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+#  Lesser General Public License for more details.
-+#
-+#  You should have received a copy of the GNU Lesser General Public
-+#  License along with this library; if not, see
-+#  <http://www.gnu.org/licenses/lgpl-2.1.html>
-+#
++++ b/target/avr/helper.h
+@@ -0,0 +1,29 @@
++/*
++ * QEMU AVR CPU
++ *
++ * Copyright (c) 2016 Michael Rolnik
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see
++ * <http://www.gnu.org/licenses/lgpl-2.1.html>
++ */
 +
-+DECODETREE = $(SRC_PATH)/scripts/decodetree.py
-+decode-y = $(SRC_PATH)/target/avr/insn.decode
-+
-+target/avr/decode_insn.inc.c: $(decode-y) $(DECODETREE)
-+	$(call quiet-command, \
-+	  $(PYTHON) $(DECODETREE) -o $@ --decode decode_insn --insnwidth 16 $<, \
-+	  "GEN", $(TARGET_DIR)$@)
-+
-+target/avr/translate.o: target/avr/decode_insn.inc.c
-+
-+obj-y += translate.o cpu.o helper.o
-+obj-y += gdbstub.o
-+obj-$(CONFIG_SOFTMMU) += machine.o
-diff --git a/target/avr/cpu.c b/target/avr/cpu.c
-index ac85508156..f4e3b1956f 100644
---- a/target/avr/cpu.c
-+++ b/target/avr/cpu.c
-@@ -136,11 +136,6 @@ static void avr_cpu_initfn(Object *obj)
- #endif
- }
- 
--static char *avr_cpu_type_name(const char *cpu_model)
--{
--    return g_strdup_printf(AVR_CPU_TYPE_NAME("%s"), cpu_model);
--}
--
- static ObjectClass *avr_cpu_class_by_name(const char *cpu_model)
- {
-     ObjectClass *oc;
-@@ -548,10 +543,10 @@ void avr_cpu_list(void)
- }
- 
- #define DEFINE_AVR_CPU_TYPE(model, initfn) \
--    {                                      \
--        .parent = TYPE_AVR_CPU,            \
--        .instance_init = initfn,           \
--        .name = AVR_CPU_TYPE_NAME(model),  \
-+    { \
-+        .parent = TYPE_AVR_CPU, \
-+        .instance_init = initfn, \
-+        .name = model "-avr-cpu", \
-     }
- 
- static const TypeInfo avr_cpu_type_info[] = {
-diff --git a/target/avr/cpu.h b/target/avr/cpu.h
-index 3f9a803193..bda810c23e 100644
---- a/target/avr/cpu.h
-+++ b/target/avr/cpu.h
-@@ -29,9 +29,6 @@
- #define TCG_GUEST_DEFAULT_MO 0
- 
- #define TYPE_AVR_CPU "avr-cpu"
--
--#define AVR_CPU_TYPE_SUFFIX "-" TYPE_AVR_CPU
--#define AVR_CPU_TYPE_NAME(name) (name AVR_CPU_TYPE_SUFFIX)
- #define CPU_RESOLVING_TYPE TYPE_AVR_CPU
- 
- /*
-diff --git a/tests/machine-none-test.c b/tests/machine-none-test.c
-index 5953d31755..3e5c74e73e 100644
---- a/tests/machine-none-test.c
-+++ b/tests/machine-none-test.c
-@@ -27,6 +27,7 @@ static struct arch2cpu cpus_map[] = {
-     /* tested targets list */
-     { "arm", "cortex-a15" },
-     { "aarch64", "cortex-a57" },
-+    { "avr", "avr6-avr-cpu" },
-     { "x86_64", "qemu64,apic-id=0" },
-     { "i386", "qemu32,apic-id=0" },
-     { "alpha", "ev67" },
++DEF_HELPER_1(wdr, void, env)
++DEF_HELPER_1(debug, void, env)
++DEF_HELPER_1(break, void, env)
++DEF_HELPER_1(sleep, void, env)
++DEF_HELPER_1(unsupported, void, env)
++DEF_HELPER_3(outb, void, env, i32, i32)
++DEF_HELPER_2(inb, tl, env, i32)
++DEF_HELPER_3(fullwr, void, env, i32, i32)
++DEF_HELPER_2(fullrd, tl, env, i32)
 -- 
 2.17.2 (Apple Git-113)
 
