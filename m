@@ -6,57 +6,56 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 855EFC73C65
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 23:38:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 112F5C73C65
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 23:44:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 59DE520693
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 23:38:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 59DE520693
+	by mail.kernel.org (Postfix) with ESMTPS id CD39E20693
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 23:44:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD39E20693
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56856 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56878 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hkzgg-0005v3-It
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jul 2019 19:38:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49029)
+	id 1hkzmx-0000zJ-Sk
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jul 2019 19:44:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49178)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jsnow@redhat.com>) id 1hkzVL-0007MY-Dk
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 19:26:38 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hkzVh-0007QS-Pb
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 19:26:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hkzVI-0003BA-4U
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 19:26:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48932)
+ (envelope-from <jsnow@redhat.com>) id 1hkzVX-0003R0-Eu
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 19:26:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37442)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1hkzV9-0002tN-F3; Tue, 09 Jul 2019 19:26:23 -0400
+ id 1hkzVD-00030x-OT; Tue, 09 Jul 2019 19:26:27 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 3B2A6C0005DA;
- Tue,  9 Jul 2019 23:26:21 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id B238430C31B4;
+ Tue,  9 Jul 2019 23:26:25 +0000 (UTC)
 Received: from probe.bos.redhat.com (dhcp-17-215.bos.redhat.com [10.18.17.215])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D5F825B80B;
- Tue,  9 Jul 2019 23:26:19 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5D0265B80B;
+ Tue,  9 Jul 2019 23:26:24 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: qemu-block@nongnu.org,
 	qemu-devel@nongnu.org
-Date: Tue,  9 Jul 2019 19:25:45 -0400
-Message-Id: <20190709232550.10724-14-jsnow@redhat.com>
+Date: Tue,  9 Jul 2019 19:25:48 -0400
+Message-Id: <20190709232550.10724-17-jsnow@redhat.com>
 In-Reply-To: <20190709232550.10724-1-jsnow@redhat.com>
 References: <20190709232550.10724-1-jsnow@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Tue, 09 Jul 2019 23:26:21 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.40]); Tue, 09 Jul 2019 23:26:25 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v4 13/18] iotests: add testing shim for
- script-style python tests
+Subject: [Qemu-devel] [PATCH v4 16/18] iotests: Add virtio-scsi device helper
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -78,99 +77,106 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Because the new-style python tests don't use the iotests.main() test
-launcher, we don't turn on the debugger logging for these scripts
-when invoked via ./check -d.
-
-Refactor the launcher shim into new and old style shims so that they
-share environmental configuration.
-
-Two cleanup notes: debug was not actually used as a global, and there
-was no reason to create a class in an inner scope just to achieve
-default variables; we can simply create an instance of the runner with
-the values we want instead.
+Seems that it comes up enough.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- tests/qemu-iotests/iotests.py | 40 +++++++++++++++++++++++------------
- 1 file changed, 26 insertions(+), 14 deletions(-)
+ tests/qemu-iotests/040        | 6 +-----
+ tests/qemu-iotests/093        | 6 ++----
+ tests/qemu-iotests/139        | 7 ++-----
+ tests/qemu-iotests/238        | 5 +----
+ tests/qemu-iotests/iotests.py | 4 ++++
+ 5 files changed, 10 insertions(+), 18 deletions(-)
 
+diff --git a/tests/qemu-iotests/040 b/tests/qemu-iotests/040
+index b81133a474..657b37103c 100755
+--- a/tests/qemu-iotests/040
++++ b/tests/qemu-iotests/040
+@@ -85,11 +85,7 @@ class TestSingleDrive(ImageCommitTestCase):
+         qemu_io('-f', 'raw', '-c', 'write -P 0xab 0 524288', backing_img=
+)
+         qemu_io('-f', iotests.imgfmt, '-c', 'write -P 0xef 524288 524288=
+', mid_img)
+         self.vm =3D iotests.VM().add_drive(test_img, "node-name=3Dtop,ba=
+cking.node-name=3Dmid,backing.backing.node-name=3Dbase", interface=3D"non=
+e")
+-        if iotests.qemu_default_machine =3D=3D 's390-ccw-virtio':
+-            self.vm.add_device("virtio-scsi-ccw")
+-        else:
+-            self.vm.add_device("virtio-scsi-pci")
+-
++        self.vm.add_device(iotests.get_virtio_scsi_device())
+         self.vm.add_device("scsi-hd,id=3Dscsi0,drive=3Ddrive0")
+         self.vm.launch()
+=20
+diff --git a/tests/qemu-iotests/093 b/tests/qemu-iotests/093
+index d88fbc182e..46153220f8 100755
+--- a/tests/qemu-iotests/093
++++ b/tests/qemu-iotests/093
+@@ -366,10 +366,8 @@ class ThrottleTestGroupNames(iotests.QMPTestCase):
+ class ThrottleTestRemovableMedia(iotests.QMPTestCase):
+     def setUp(self):
+         self.vm =3D iotests.VM()
+-        if iotests.qemu_default_machine =3D=3D 's390-ccw-virtio':
+-            self.vm.add_device("virtio-scsi-ccw,id=3Dvirtio-scsi")
+-        else:
+-            self.vm.add_device("virtio-scsi-pci,id=3Dvirtio-scsi")
++        self.vm.add_device("{},id=3Dvirtio-scsi".format(
++            iotests.get_virtio_scsi_device()))
+         self.vm.launch()
+=20
+     def tearDown(self):
+diff --git a/tests/qemu-iotests/139 b/tests/qemu-iotests/139
+index 933b45121a..2176ea51ba 100755
+--- a/tests/qemu-iotests/139
++++ b/tests/qemu-iotests/139
+@@ -35,11 +35,8 @@ class TestBlockdevDel(iotests.QMPTestCase):
+     def setUp(self):
+         iotests.qemu_img('create', '-f', iotests.imgfmt, base_img, '1M')
+         self.vm =3D iotests.VM()
+-        if iotests.qemu_default_machine =3D=3D 's390-ccw-virtio':
+-            self.vm.add_device("virtio-scsi-ccw,id=3Dvirtio-scsi")
+-        else:
+-            self.vm.add_device("virtio-scsi-pci,id=3Dvirtio-scsi")
+-
++        self.vm.add_device("{},id=3Dvirtio-scsi".format(
++            iotests.get_virtio_scsi_device()))
+         self.vm.launch()
+=20
+     def tearDown(self):
+diff --git a/tests/qemu-iotests/238 b/tests/qemu-iotests/238
+index 1c0a46fa90..387a77b2cd 100755
+--- a/tests/qemu-iotests/238
++++ b/tests/qemu-iotests/238
+@@ -23,10 +23,7 @@ import os
+ import iotests
+ from iotests import log
+=20
+-if iotests.qemu_default_machine =3D=3D 's390-ccw-virtio':
+-    virtio_scsi_device =3D 'virtio-scsi-ccw'
+-else:
+-    virtio_scsi_device =3D 'virtio-scsi-pci'
++virtio_scsi_device =3D iotests.get_virtio_scsi_device()
+=20
+ vm =3D iotests.VM()
+ vm.launch()
 diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.p=
 y
-index 3ecef5bc90..fcad957d63 100644
+index 6135c9663d..8ae7bc353e 100644
 --- a/tests/qemu-iotests/iotests.py
 +++ b/tests/qemu-iotests/iotests.py
-@@ -61,7 +61,6 @@ cachemode =3D os.environ.get('CACHEMODE')
- qemu_default_machine =3D os.environ.get('QEMU_DEFAULT_MACHINE')
+@@ -164,6 +164,10 @@ def qemu_io_silent(*args):
+                          (-exitcode, ' '.join(args)))
+     return exitcode
 =20
- socket_scm_helper =3D os.environ.get('SOCKET_SCM_HELPER', 'socket_scm_he=
-lper')
--debug =3D False
++def get_virtio_scsi_device():
++    if qemu_default_machine =3D=3D 's390-ccw-virtio':
++        return 'virtio-scsi-ccw'
++    return 'virtio-scsi-pci'
 =20
- luks_default_secret_object =3D 'secret,id=3Dkeysec0,data=3D' + \
-                              os.environ.get('IMGKEYSECRET', '')
-@@ -834,11 +833,22 @@ def skip_if_unsupported(required_formats=3D[], read=
-_only=3DFalse):
-         return func_wrapper
-     return skip_test_decorator
-=20
--def main(supported_fmts=3D[], supported_oses=3D['linux'], supported_cach=
-e_modes=3D[],
--         unsupported_fmts=3D[]):
--    '''Run tests'''
-+def execute_unittest(output, verbosity, debug):
-+    runner =3D unittest.TextTestRunner(stream=3Doutput, descriptions=3DT=
-rue,
-+                                     verbosity=3Dverbosity)
-+    try:
-+        # unittest.main() will use sys.exit(); so expect a SystemExit
-+        # exception
-+        unittest.main(testRunner=3Drunner)
-+    finally:
-+        if not debug:
-+            sys.stderr.write(re.sub(r'Ran (\d+) tests? in [\d.]+s',
-+                                    r'Ran \1 tests', output.getvalue()))
-=20
--    global debug
-+def execute_test(test_function=3DNone,
-+                 supported_fmts=3D[], supported_oses=3D['linux'],
-+                 supported_cache_modes=3D[], unsupported_fmts=3D[]):
-+    """Run either unittest or script-style tests."""
-=20
-     # We are using TEST_DIR and QEMU_DEFAULT_MACHINE as proxies to
-     # indicate that we're not being run via "check". There may be
-@@ -870,13 +880,15 @@ def main(supported_fmts=3D[], supported_oses=3D['li=
-nux'], supported_cache_modes=3D[],
-=20
-     logging.basicConfig(level=3D(logging.DEBUG if debug else logging.WAR=
-N))
-=20
--    class MyTestRunner(unittest.TextTestRunner):
--        def __init__(self, stream=3Doutput, descriptions=3DTrue, verbosi=
-ty=3Dverbosity):
--            unittest.TextTestRunner.__init__(self, stream, descriptions,=
- verbosity)
-+    if not test_function:
-+        execute_unittest(output, verbosity, debug)
-+    else:
-+        test_function()
-=20
--    # unittest.main() will use sys.exit() so expect a SystemExit excepti=
-on
--    try:
--        unittest.main(testRunner=3DMyTestRunner)
--    finally:
--        if not debug:
--            sys.stderr.write(re.sub(r'Ran (\d+) tests? in [\d.]+s', r'Ra=
-n \1 tests', output.getvalue()))
-+def script_main(test_function, *args, **kwargs):
-+    """Run script-style tests outside of the unittest framework"""
-+    execute_test(test_function, *args, **kwargs)
-+
-+def main(*args, **kwargs):
-+    """Run tests using the unittest framework"""
-+    execute_test(None, *args, **kwargs)
+ class QemuIoInteractive:
+     def __init__(self, *args):
 --=20
 2.21.0
 
