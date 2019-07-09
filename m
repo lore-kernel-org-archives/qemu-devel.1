@@ -2,82 +2,94 @@ Return-Path: <SRS0=huOX=VG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF0C3C606B0
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 09:27:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C524C606B0
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 09:46:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 83C49214AF
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 09:27:16 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PXqwmcqI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83C49214AF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 43177214AF
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 09:46:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43177214AF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48108 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48173 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hkmP5-00058B-Qn
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jul 2019 05:27:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43506)
+	id 1hkmhK-0001TF-90
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jul 2019 05:46:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48188)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1hkmJW-00072R-Oi
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 05:21:32 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hkmgm-00010j-5c
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 05:45:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1hkmJV-00024Z-3t
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 05:21:30 -0400
-Received: from mail-io1-xd44.google.com ([2607:f8b0:4864:20::d44]:34861)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1hkmJS-000210-V3
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 05:21:28 -0400
-Received: by mail-io1-xd44.google.com with SMTP id m24so32166341ioo.2
- for <qemu-devel@nongnu.org>; Tue, 09 Jul 2019 02:21:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=kUYtEVCtbbNfYNqyJu/DwHfi1v5PGfant7R2M4Nf9u8=;
- b=PXqwmcqId/ArQolYsEqS2pncOb0V2THv1ejejqPpn4Jcf0f5St0oe9uIjiBfWgC+wC
- 1uc6dGyI2fnLp6ywHdLzbeTXpowSV+v9RZZCeFMOsBGjNz5rkinlxeP2FHCOhVrA9jVl
- aPfDs3zUZhBEOHY+eOohvIsoPvaQqBTd7LE3AHCF0BVd65PCUoQYA7opghOkc6DmUuS3
- zMcpjuAVr+MKUxMtHbK4opUnoE48vK1DL8vCZmd7X6YNfJBDtBLcy/s01eMWIxMwJgWl
- +rqZ3G8SqP6kgGxidc5nQ3v/slS5Zzd5KVM9098ehdEw8zdfDEG0B+o88vCd2BfSEFqI
- Y/PA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=kUYtEVCtbbNfYNqyJu/DwHfi1v5PGfant7R2M4Nf9u8=;
- b=PYV56qTyGNoMX11vRMFaANKPALeVrcs3pTWpiA8R/LXN2C8N3WTOc4PTSb6qE1Z8Af
- zarcCp3OmxeUlHCRAMwRh5HVQqE274ZxPnNNfcEQJh2L0vDIgwGLyl+ACD31KlYUVK8Z
- eLtYcBfvjFSxs0Z7kWWkPakZ4njR1pxitGTcXAz3fWj2Ocyua290TNu07fvWEYhhPhou
- SIipNs/gL33f/DpjVI6Zb7NZ0xWJLvKiCsj788VpcFOgKsHm19Dkj8at4KmLcbmqddqZ
- NxxFuhs0mwxeVAaIlYCiy3tq9JGIG9Qf+Kl9Yxwa3dXE/AqjJZ/ziJJ1kx83FiRz50H1
- i2oQ==
-X-Gm-Message-State: APjAAAUaphUpire/afQkrcaYt2ScO/UZ/oiriztNeHASF96Johl12BM9
- j97j1FAuNKmsiBOWrSWiG0Vh4eL6hdk=
-X-Google-Smtp-Source: APXvYqwcOv4bWXLxEQ8rjMuPi/S/dIgM895kzPQcyDQIB9/e/Khg4V2UJCwE80glcXDd6PctGMa2Yg==
-X-Received: by 2002:a02:6616:: with SMTP id k22mr27315822jac.100.1562664085043; 
- Tue, 09 Jul 2019 02:21:25 -0700 (PDT)
-Received: from localhost.localdomain ([172.56.12.212])
- by smtp.gmail.com with ESMTPSA id c17sm17613817ioo.82.2019.07.09.02.21.20
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Tue, 09 Jul 2019 02:21:24 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-Date: Tue,  9 Jul 2019 11:20:49 +0200
-Message-Id: <20190709092049.13771-6-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190709092049.13771-1-richard.henderson@linaro.org>
-References: <20190709092049.13771-1-richard.henderson@linaro.org>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::d44
-Subject: [Qemu-devel] [PATCH 5/5] tcg: Release mmap_lock on translation fault
+ (envelope-from <mreitz@redhat.com>) id 1hkmgj-0008Hb-Sl
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 05:45:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43808)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1hkmgb-0007uJ-W6; Tue, 09 Jul 2019 05:45:23 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id C44648F917;
+ Tue,  9 Jul 2019 09:45:20 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-204-52.brq.redhat.com
+ [10.40.204.52])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 777B35DA9B;
+ Tue,  9 Jul 2019 09:45:11 +0000 (UTC)
+From: Max Reitz <mreitz@redhat.com>
+To: dillaman@redhat.com, Stefano Garzarella <sgarzare@redhat.com>
+References: <20190705093258.47856-1-sgarzare@redhat.com>
+ <dcc9f3dc-78b4-4216-2791-b7e90f6d79ff@redhat.com>
+ <20190705104318.dngmmu3lpuvbe2nh@steredhat>
+ <CA+aFP1AgNGJMdAG_E23Q-rf2Gt1rpeKjDfrk1PLA3f4XiUkGtw@mail.gmail.com>
+ <754459cc-08c7-6cce-02c6-10f765cb9d00@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <9438ac63-949b-9e08-42a2-4b4ff2c778f8@redhat.com>
+Date: Tue, 9 Jul 2019 11:45:09 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
+MIME-Version: 1.0
+In-Reply-To: <754459cc-08c7-6cce-02c6-10f765cb9d00@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="RDHRwO9TAgVW4zTZ06mtcvzbe1P52H1lN"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.26]); Tue, 09 Jul 2019 09:45:20 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v3] block/rbd: implement
+ .bdrv_get_allocated_file_size callback
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,157 +101,293 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, peter.maydell@linaro.org, alex.bennee@linaro.org,
- pbonzini@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Josh Durgin <jdurgin@redhat.com>,
+ John Snow <jsnow@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
+ qemu-block <qemu-block@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Turn helper_retaddr into a multi-state flag that may now also
-indicate when we're performing a read on behalf of the translator.
-In this case, release the mmap_lock before the longjmp back to
-the main cpu loop, and thereby avoid a failing assert therein.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--RDHRwO9TAgVW4zTZ06mtcvzbe1P52H1lN
+Content-Type: multipart/mixed; boundary="YB0Mtu7fdg1qAkIJyScqrwkAlI4uLcMpL";
+ protected-headers="v1"
+From: Max Reitz <mreitz@redhat.com>
+To: dillaman@redhat.com, Stefano Garzarella <sgarzare@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-block <qemu-block@nongnu.org>,
+ Josh Durgin <jdurgin@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
+ John Snow <jsnow@redhat.com>
+Message-ID: <9438ac63-949b-9e08-42a2-4b4ff2c778f8@redhat.com>
+Subject: Re: [PATCH v3] block/rbd: implement .bdrv_get_allocated_file_size
+ callback
+References: <20190705093258.47856-1-sgarzare@redhat.com>
+ <dcc9f3dc-78b4-4216-2791-b7e90f6d79ff@redhat.com>
+ <20190705104318.dngmmu3lpuvbe2nh@steredhat>
+ <CA+aFP1AgNGJMdAG_E23Q-rf2Gt1rpeKjDfrk1PLA3f4XiUkGtw@mail.gmail.com>
+ <754459cc-08c7-6cce-02c6-10f765cb9d00@redhat.com>
+In-Reply-To: <754459cc-08c7-6cce-02c6-10f765cb9d00@redhat.com>
 
-Fixes: https://bugs.launchpad.net/qemu/+bug/1832353
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- include/exec/cpu_ldst_useronly_template.h | 20 +++++--
- accel/tcg/user-exec.c                     | 65 ++++++++++++++++-------
- 2 files changed, 62 insertions(+), 23 deletions(-)
+--YB0Mtu7fdg1qAkIJyScqrwkAlI4uLcMpL
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/include/exec/cpu_ldst_useronly_template.h b/include/exec/cpu_ldst_useronly_template.h
-index d663826ac2..35caae8ca6 100644
---- a/include/exec/cpu_ldst_useronly_template.h
-+++ b/include/exec/cpu_ldst_useronly_template.h
-@@ -64,12 +64,18 @@
- static inline RES_TYPE
- glue(glue(cpu_ld, USUFFIX), MEMSUFFIX)(CPUArchState *env, abi_ptr ptr)
- {
--#if !defined(CODE_ACCESS)
-+#ifdef CODE_ACCESS
-+    RES_TYPE ret;
-+    set_helper_retaddr(1);
-+    ret = glue(glue(ld, USUFFIX), _p)(g2h(ptr));
-+    clear_helper_retaddr();
-+    return ret;
-+#else
-     trace_guest_mem_before_exec(
-         env_cpu(env), ptr,
-         trace_mem_build_info(SHIFT, false, MO_TE, false));
--#endif
-     return glue(glue(ld, USUFFIX), _p)(g2h(ptr));
-+#endif
- }
- 
- #ifndef CODE_ACCESS
-@@ -90,12 +96,18 @@ glue(glue(glue(cpu_ld, USUFFIX), MEMSUFFIX), _ra)(CPUArchState *env,
- static inline int
- glue(glue(cpu_lds, SUFFIX), MEMSUFFIX)(CPUArchState *env, abi_ptr ptr)
- {
--#if !defined(CODE_ACCESS)
-+#ifdef CODE_ACCESS
-+    int ret;
-+    set_helper_retaddr(1);
-+    ret = glue(glue(ld, USUFFIX), _p)(g2h(ptr));
-+    clear_helper_retaddr();
-+    return ret;
-+#else
-     trace_guest_mem_before_exec(
-         env_cpu(env), ptr,
-         trace_mem_build_info(SHIFT, true, MO_TE, false));
--#endif
-     return glue(glue(lds, SUFFIX), _p)(g2h(ptr));
-+#endif
- }
- 
- #ifndef CODE_ACCESS
-diff --git a/accel/tcg/user-exec.c b/accel/tcg/user-exec.c
-index 4384b59a4d..5adea629de 100644
---- a/accel/tcg/user-exec.c
-+++ b/accel/tcg/user-exec.c
-@@ -64,27 +64,55 @@ static inline int handle_cpu_signal(uintptr_t pc, siginfo_t *info,
-     CPUState *cpu = current_cpu;
-     CPUClass *cc;
-     unsigned long address = (unsigned long)info->si_addr;
--    MMUAccessType access_type;
-+    MMUAccessType access_type = is_write ? MMU_DATA_STORE : MMU_DATA_LOAD;
- 
--    /* We must handle PC addresses from two different sources:
--     * a call return address and a signal frame address.
--     *
--     * Within cpu_restore_state_from_tb we assume the former and adjust
--     * the address by -GETPC_ADJ so that the address is within the call
--     * insn so that addr does not accidentally match the beginning of the
--     * next guest insn.
--     *
--     * However, when the PC comes from the signal frame, it points to
--     * the actual faulting host insn and not a call insn.  Subtracting
--     * GETPC_ADJ in that case may accidentally match the previous guest insn.
--     *
--     * So for the later case, adjust forward to compensate for what
--     * will be done later by cpu_restore_state_from_tb.
--     */
--    if (helper_retaddr) {
-+    switch (helper_retaddr) {
-+    default:
-+        /*
-+         * Fault during host memory operation within a helper function.
-+         * The helper's host return address, saved here, gives us a
-+         * pointer into the generated code that will unwind to the
-+         * correct guest pc.
-+         */
-         pc = helper_retaddr;
--    } else {
-+        break;
-+
-+    case 0:
-+        /*
-+         * Fault during host memory operation within generated code.
-+         * (Or, a unrelated bug within qemu, but we can't tell from here).
-+         *
-+         * We take the host pc from the signal frame.  However, we cannot
-+         * use that value directly.  Within cpu_restore_state_from_tb, we
-+         * assume PC comes from GETPC(), as used by the helper functions,
-+         * so we adjust the address by -GETPC_ADJ to form an address that
-+         * is within the call insn, so that the address does not accidentially
-+         * match the beginning of the next guest insn.  However, when the
-+         * pc comes fromt he signal frame it points to the actual faulting
-+         * host memory insn and not a call insn.
-+         *
-+         * Therefore, adjust to compensate for what will be done later
-+         * by cpu_restore_state_from_tb.
-+         */
-         pc += GETPC_ADJ;
-+        break;
-+
-+    case 1:
-+        /*
-+         * Fault during host read for translation, or loosely, "execution".
-+         * 
-+         * The guest pc is already pointing to the start of the TB for which
-+         * code is being generated.  If the guest translator manages the
-+         * page crossings correctly, this is exactly the correct address
-+         * (and if it doesn't there's little we can do about that here).
-+         * Therefore, do not trigger the unwinder.
-+         *
-+         * Like tb_gen_code, release the memory lock before cpu_loop_exit.
-+         */
-+        pc = 0;
-+        access_type = MMU_INST_FETCH;
-+        mmap_unlock();
-+        break;
-     }
- 
-     /* For synchronous signals we expect to be coming from the vCPU
-@@ -155,7 +183,6 @@ static inline int handle_cpu_signal(uintptr_t pc, siginfo_t *info,
-     clear_helper_retaddr();
- 
-     cc = CPU_GET_CLASS(cpu);
--    access_type = is_write ? MMU_DATA_STORE : MMU_DATA_LOAD;
-     cc->tlb_fill(cpu, address, 0, access_type, MMU_USER_IDX, false, pc);
-     g_assert_not_reached();
- }
--- 
-2.17.1
+On 09.07.19 10:55, Max Reitz wrote:
+> On 09.07.19 05:08, Jason Dillaman wrote:
+>> On Fri, Jul 5, 2019 at 6:43 AM Stefano Garzarella <sgarzare@redhat.com=
+> wrote:
+>>>
+>>> On Fri, Jul 05, 2019 at 11:58:43AM +0200, Max Reitz wrote:
+>>>> On 05.07.19 11:32, Stefano Garzarella wrote:
+>>>>> This patch allows 'qemu-img info' to show the 'disk size' for
+>>>>> the RBD images that have the fast-diff feature enabled.
+>>>>>
+>>>>> If this feature is enabled, we use the rbd_diff_iterate2() API
+>>>>> to calculate the allocated size for the image.
+>>>>>
+>>>>> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+>>>>> ---
+>>>>> v3:
+>>>>>   - return -ENOTSUP instead of -1 when fast-diff is not available
+>>>>>     [John, Jason]
+>>>>> v2:
+>>>>>   - calculate the actual usage only if the fast-diff feature is
+>>>>>     enabled [Jason]
+>>>>> ---
+>>>>>  block/rbd.c | 54 +++++++++++++++++++++++++++++++++++++++++++++++++=
+++++
+>>>>>  1 file changed, 54 insertions(+)
+>>>>
+>>>> Well, the librbd documentation is non-existing as always, but while
+>>>> googling, I at least found that libvirt has exactly the same code.  =
+So I
+>>>> suppose it must be quite correct, then.
+>>>>
+>>>
+>>> While I wrote this code I took a look at libvirt implementation and a=
+lso
+>>> at the "rbd" tool in the ceph repository: compute_image_disk_usage() =
+in
+>>> src/tools/rbd/action/DiskUsage.cc
+>>>
+>>>>> diff --git a/block/rbd.c b/block/rbd.c
+>>>>> index 59757b3120..b6bed683e5 100644
+>>>>> --- a/block/rbd.c
+>>>>> +++ b/block/rbd.c
+>>>>> @@ -1084,6 +1084,59 @@ static int64_t qemu_rbd_getlength(BlockDrive=
+rState *bs)
+>>>>>      return info.size;
+>>>>>  }
+>>>>>
+>>>>> +static int rbd_allocated_size_cb(uint64_t offset, size_t len, int =
+exists,
+>>>>> +                                 void *arg)
+>>>>> +{
+>>>>> +    int64_t *alloc_size =3D (int64_t *) arg;
+>>>>> +
+>>>>> +    if (exists) {
+>>>>> +        (*alloc_size) +=3D len;
+>>>>> +    }
+>>>>> +
+>>>>> +    return 0;
+>>>>> +}
+>>>>> +
+>>>>> +static int64_t qemu_rbd_get_allocated_file_size(BlockDriverState *=
+bs)
+>>>>> +{
+>>>>> +    BDRVRBDState *s =3D bs->opaque;
+>>>>> +    uint64_t flags, features;
+>>>>> +    int64_t alloc_size =3D 0;
+>>>>> +    int r;
+>>>>> +
+>>>>> +    r =3D rbd_get_flags(s->image, &flags);
+>>>>> +    if (r < 0) {
+>>>>> +        return r;
+>>>>> +    }
+>>>>> +
+>>>>> +    r =3D rbd_get_features(s->image, &features);
+>>>>> +    if (r < 0) {
+>>>>> +        return r;
+>>>>> +    }
+>>>>> +
+>>>>> +    /*
+>>>>> +     * We use rbd_diff_iterate2() only if the RBD image have fast-=
+diff
+>>>>> +     * feature enabled. If it is disabled, rbd_diff_iterate2() cou=
+ld be
+>>>>> +     * very slow on a big image.
+>>>>> +     */
+>>>>> +    if (!(features & RBD_FEATURE_FAST_DIFF) ||
+>>>>> +        (flags & RBD_FLAG_FAST_DIFF_INVALID)) {
+>>>>> +        return -ENOTSUP;
+>>>>> +    }
+>>>>> +
+>>>>> +    /*
+>>>>> +     * rbd_diff_iterate2(), if the source snapshot name is NULL, i=
+nvokes
+>>>>> +     * the callback on all allocated regions of the image.
+>>>>> +     */
+>>>>> +    r =3D rbd_diff_iterate2(s->image, NULL, 0,
+>>>>> +                          bs->total_sectors * BDRV_SECTOR_SIZE, 0,=
+ 1,
+>>>>> +                          &rbd_allocated_size_cb, &alloc_size);
+>>>>
+>>>> But I have a question.  This is basically block_status, right?  So i=
+t
+>>>> gives us information on which areas are allocated and which are not.=
 
+>>>> The result thus gives us a lower bound on the allocation size, but i=
+s it
+>>>> really exactly the allocation size?
+>>>>
+>>>> There are two things I=E2=80=99m concerned about:
+>>>>
+>>>> 1. What about metadata?
+>>>
+>>> Good question, I don't think it includes the size used by metadata an=
+d I
+>>> don't know if there is a way to know it. I'll check better.
+>>
+>> It does not include the size of metadata, the "rbd_diff_iterate2"
+>> function is literally just looking for touched data blocks within the
+>> RBD image.
+>>
+>>>>
+>>>> 2. If you have multiple snapshots, this will only report the overall=
+
+>>>> allocation information, right?  So say there is something like this:=
+
+>>>>
+>>>> (=E2=80=9CA=E2=80=9D means an allocated MB, =E2=80=9C-=E2=80=9D is a=
+n unallocated MB)
+>>>>
+>>>> Snapshot 1: AAAA---
+>>>> Snapshot 2: --AAAAA
+>>>> Snapshot 3: -AAAA--
+>>>>
+>>>> I think the allocated data size is the number of As in total (13 MB)=
+=2E
+>>>> But I suppose this API will just return 7 MB, because it looks on
+>>>> everything an it sees the whole image range (7 MB) to be allocated. =
+ It
+>>>> doesn=E2=80=99t report in how many snapshots some region is allocate=
+d.
+>>
+>> It should return 13 dirty data blocks (multipled by the size of the
+>> data block) since when you don't provide a "from snapshot" name, it
+>> will iterate from the first snapshot to the HEAD revision.
+>=20
+> Have you tested that?
+>=20
+> I=E2=80=98m so skeptical because the callback function interface has no=
+ way of
+> distinguishing between different layers of snapshots.
+>=20
+> And also because we have the bdrv_block_status_above() function which
+> just looks strikingly similar (with the difference that it does not
+> invoke a callback but just returns the next allocated range).  If you
+> pass base=3DNULL to it, it will also =E2=80=9Cinterpret that as the beg=
+inning of
+> time and return all allocated regions of the image=E2=80=9D (or rather =
+image
+> chain, in our case).  But it would just return 7 MB as allocated.  (Eve=
+n
+> though it does in fact return layer information, i.e. where a given
+> continuous chunk of data is allocated.)
+>=20
+> Sure, there is no good reason for why our interface should by chance be=
+
+> the same as librbd=E2=80=99s interface.  But without having tested it, =
+the fact
+> that the callback cannot detect which layer a chunk is allocated on jus=
+t
+> makes me wary.
+
+And the librbd code doesn=E2=80=99t alleviate my concerns.
+
+=46rom what I can see, it first creates a bitmap (two bits per entry) tha=
+t
+covers the whole image and says which objects are allocated and which
+aren=E2=80=98t.  Through the whole chain, that is.  So in the above examp=
+le, the
+bitmap would report everything as allocated.  (Or rather =E2=80=9Cupdated=
+=E2=80=9C in
+librbd=E2=80=98s terms.)
+
+Then it has this piece:
+
+>   uint64_t off =3D m_offset;
+>   uint64_t left =3D m_length;
+>=20
+>   while (left > 0) {
+>     uint64_t period_off =3D off - (off % period);                      =
+                                                                         =
+   =20
+>     uint64_t read_len =3D min(period_off + period - off, left);
+>=20
+>     // map to extents
+>     map<object_t,vector<ObjectExtent> > object_extents;
+>     Striper::file_to_extents(cct, m_image_ctx.format_string,
+>                              &m_image_ctx.layout, off, read_len, 0,
+>                              object_extents, 0);
+>=20
+>     // get snap info for each object
+>     for (map<object_t,vector<ObjectExtent> >::iterator p =3D
+>            object_extents.begin();
+>          p !=3D object_extents.end(); ++p)=20
+[...]
+>           for (std::vector<ObjectExtent>::iterator q =3D p->second.begi=
+n();
+>                q !=3D p->second.end(); ++q) {
+>             r =3D m_callback(off + q->offset, q->length, updated, m_cal=
+lback_arg);
+[...]
+>           }
+[...]
+>     }
+>>     left -=3D read_len;
+>     off +=3D read_len;
+>   }
+
+So that iterates over the whole image (in our case, because m_offset is
+0 and m_length is the image length), then picks out a chunk of read_len
+length, converts that to objects, and then iterates over all of those
+objects and all of their extents.
+
+file_to_extents looks like it=E2=80=99s just an arithmetic operation.  So=
+ it
+doesn=E2=80=98t look like that function returns extents in multiple snaps=
+hots.
+It just converts a range into subranges called =E2=80=9Cobjects=E2=80=9D =
+and =E2=80=9Cextents=E2=80=9D
+(at least that=E2=80=99s the way it looks to me).
+
+So overall, this looks awfully like it simply iterates over the whole
+image and then returns allocation information gathered as a top-down
+view through all of the snapshots, but not for each snapshot individually=
+=2E
+
+Max
+
+
+--YB0Mtu7fdg1qAkIJyScqrwkAlI4uLcMpL--
+
+--RDHRwO9TAgVW4zTZ06mtcvzbe1P52H1lN
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0kYiUACgkQ9AfbAGHV
+z0BLCQgApq4AyGqixdoo43fOj0rrvd7FpW3ywO5wSj6nfDzSZyH+FK6tY/xMbbd2
+iC8j2yxV4gwudvbrcbcIsybHpP8/v8vKYOKAJ7WILfui9jGp3LFGOAQCfXnQL+cN
+mPSJIs8Qfkz3J9z/heEf5cgE1pZyuZGY31lHIur3i6lPfK3lRSFPfqJ85ckIxX1t
+Pe3UpLo+gHEIW6NJ6O9Eic98tfwpAPoU0++7VmF61gOwxafbp59v+nh2ntleT/Po
+6NXeoqe77CFLI2fXk8Vb/WOa+VWrFknaUAPDN9dceSF964uFNq8TGB973wVUTdrE
+N5vw0w8OIsm/3/DXGIImNQvsDb686A==
+=5ERq
+-----END PGP SIGNATURE-----
+
+--RDHRwO9TAgVW4zTZ06mtcvzbe1P52H1lN--
 
