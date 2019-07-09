@@ -2,49 +2,49 @@ Return-Path: <SRS0=huOX=VG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 236E1C606B0
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 09:12:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0602C606B0
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 09:13:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EA7A321537
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 09:12:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA7A321537
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=twiddle.net
+	by mail.kernel.org (Postfix) with ESMTPS id A959421537
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 09:13:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A959421537
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48008 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48014 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hkmAU-00049d-Ua
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jul 2019 05:12:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41309)
+	id 1hkmBW-000564-Vi
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jul 2019 05:13:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41307)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bounces@canonical.com>) id 1hkm9l-0003iG-7d
+ (envelope-from <bounces@canonical.com>) id 1hkm9l-0003iE-4B
  for qemu-devel@nongnu.org; Tue, 09 Jul 2019 05:11:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1hkm9k-00021U-0A
+ (envelope-from <bounces@canonical.com>) id 1hkm9k-00021Z-0Q
  for qemu-devel@nongnu.org; Tue, 09 Jul 2019 05:11:25 -0400
-Received: from indium.canonical.com ([91.189.90.7]:55360)
+Received: from indium.canonical.com ([91.189.90.7]:55358)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1hkm9j-000212-Pn
+ id 1hkm9j-000211-QP
  for qemu-devel@nongnu.org; Tue, 09 Jul 2019 05:11:23 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1hkm9h-00078P-Ez
+ id 1hkm9h-0006xL-KW
  for <qemu-devel@nongnu.org>; Tue, 09 Jul 2019 09:11:21 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id BE1B12E80D3
- for <qemu-devel@nongnu.org>; Tue,  9 Jul 2019 09:11:20 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 160D32E80DA
+ for <qemu-devel@nongnu.org>; Tue,  9 Jul 2019 09:11:21 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 09 Jul 2019 09:03:59 -0000
-From: Richard Henderson <rth@twiddle.net>
+Date: Tue, 09 Jul 2019 09:04:31 -0000
+From: =?utf-8?q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=New; importance=Undecided;
@@ -55,15 +55,15 @@ X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
 X-Launchpad-Bug-Commenters: ajbennee christophe-lyon
 X-Launchpad-Bug-Reporter: Christophe Lyon (christophe-lyon)
-X-Launchpad-Bug-Modifier: Richard Henderson (rth)
+X-Launchpad-Bug-Modifier: =?utf-8?q?Alex_Benn=C3=A9e_=28ajbennee=29?=
 References: <156164884976.17804.15592866928864750515.malonedeb@wampee.canonical.com>
-Message-Id: <156266304018.21151.12692090928166164849.launchpad@gac.canonical.com>
+Message-Id: <156266307169.2608.5732328652022464005.malone@wampee.canonical.com>
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com); Revision="19007";
  Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 0140837622040a489f120f39f5bed191d9d0ae15
+X-Launchpad-Hash: 5b4aac34773fb49c2e2a6756f964421b8c4b0307
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
 Subject: [Qemu-devel] [Bug 1834496] Re: Regressions on arm target with some
@@ -83,8 +83,18 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Changed in: qemu
-     Assignee: (unassigned) =3D> Richard Henderson (rth)
+I bisected a chunk of the errors to:
+
+  commit c6fb8c0cf704c4a1a48c3e99e995ad4c58150dab (refs/bisect/bad)
+  Author: Richard Henderson <richard.henderson@linaro.org>
+  Date:   Mon Feb 25 11:42:35 2019 -0800
+
+      tcg/i386: Support INDEX_op_extract2_{i32,i64}
+
+      Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+
+Specifically I think when tcg_gen_deposit_i32 handles the if (ofs + len
+=3D=3D 32) case.
 
 -- =
 
