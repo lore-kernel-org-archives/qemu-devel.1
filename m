@@ -2,61 +2,59 @@ Return-Path: <SRS0=huOX=VG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EC6CC73C42
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 12:41:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B745C73C41
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 12:41:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6616A21537
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 12:41:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6616A21537
+	by mail.kernel.org (Postfix) with ESMTPS id 769F321537
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 12:41:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 769F321537
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49658 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49660 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hkpQs-0000Rs-H6
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jul 2019 08:41:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59482)
+	id 1hkpQw-0000Ya-1c
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jul 2019 08:41:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59683)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hkpIx-0002ix-Uj
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 08:33:10 -0400
+ (envelope-from <cohuck@redhat.com>) id 1hkpJS-0003Cy-UC
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 08:33:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hkpIw-0004Zk-KG
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 08:33:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60514)
+ (envelope-from <cohuck@redhat.com>) id 1hkpJQ-0004u8-Fc
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 08:33:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42060)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>)
- id 1hkpIt-0004WJ-Qs; Tue, 09 Jul 2019 08:33:03 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>)
+ id 1hkpJQ-0004jO-13; Tue, 09 Jul 2019 08:33:36 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 6A4BD3179B62;
- Tue,  9 Jul 2019 12:32:57 +0000 (UTC)
-Received: from x1w.redhat.com (ovpn-204-166.brq.redhat.com [10.40.204.166])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A3CF21001B0F;
- Tue,  9 Jul 2019 12:32:54 +0000 (UTC)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Tue,  9 Jul 2019 14:32:39 +0200
-Message-Id: <20190709123240.16298-3-philmd@redhat.com>
-In-Reply-To: <20190709123240.16298-1-philmd@redhat.com>
-References: <20190709123240.16298-1-philmd@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 6FD17C055677;
+ Tue,  9 Jul 2019 12:25:50 +0000 (UTC)
+Received: from localhost (unknown [10.40.205.62])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 052328681C;
+ Tue,  9 Jul 2019 12:25:49 +0000 (UTC)
+From: Cornelia Huck <cohuck@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue,  9 Jul 2019 14:25:42 +0200
+Message-Id: <20190709122546.12373-1-cohuck@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.41]); Tue, 09 Jul 2019 12:32:57 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.32]); Tue, 09 Jul 2019 12:25:50 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH-for-4.1 v6 2/3] hw/ssi/xilinx_spips: Avoid AXI
- writes to the LQSPI linear memory
+Subject: [Qemu-devel] [PULL for-4.1 0/4] s390x patches for -rc0
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,71 +66,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Francisco Iglesias <frasse.iglesias@gmail.com>,
- Alistair Francis <alistair@alistair23.me>, qemu-stable@nongnu.org,
- Prasad J Pandit <ppandit@redhat.com>, Lei Sun <slei.casper@gmail.com>,
- qemu-arm@nongnu.org, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Lei Sun found while auditing the code that a CPU write would
-trigger a NULL pointer dereference.
+The following changes since commit 3a1acf5d47295d22ffdae0982a2fd808b802a7=
+da:
 
-From UG1085 datasheet [*] AXI writes in this region are ignored
-and generates an AXI Slave Error (SLVERR).
+  Merge remote-tracking branch 'remotes/ehabkost/tags/machine-next-pull-r=
+equest' into staging (2019-07-08 09:46:19 +0100)
 
-Fix by implementing the write_with_attrs() handler.
-Return MEMTX_ERROR when the region is accessed (this error maps
-to an AXI slave error).
+are available in the Git repository at:
 
-[*] https://www.xilinx.com/support/documentation/user_guides/ug1085-zynq-=
-ultrascale-trm.pdf
+  https://github.com/cohuck/qemu tags/s390x-20190709
 
-Reported-by: Lei Sun <slei.casper@gmail.com>
-Reviewed-by: Francisco Iglesias <frasse.iglesias@gmail.com>
-Tested-by: Francisco Iglesias <frasse.iglesias@gmail.com>
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
-v4: Fix typos (Francisco)
----
- hw/ssi/xilinx_spips.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+for you to fetch changes up to 92b9afe45e10edd8eaed6329366201c2165a8065:
 
-diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
-index b7c7275dbe..3c4e8365ee 100644
---- a/hw/ssi/xilinx_spips.c
-+++ b/hw/ssi/xilinx_spips.c
-@@ -1220,8 +1220,24 @@ static MemTxResult lqspi_read(void *opaque, hwaddr=
- addr, uint64_t *value,
-     return lqspi_read(opaque, addr, value, size, attrs);
- }
-=20
-+static MemTxResult lqspi_write(void *opaque, hwaddr offset, uint64_t val=
-ue,
-+                               unsigned size, MemTxAttrs attrs)
-+{
-+    /*
-+     * From UG1085, Chapter 24 (Quad-SPI controllers):
-+     * - Writes are ignored
-+     * - AXI writes generate an external AXI slave error (SLVERR)
-+     */
-+    qemu_log_mask(LOG_GUEST_ERROR, "%s Unexpected %u-bit access to 0x%" =
-PRIx64
-+                                   " (value: 0x%" PRIx64 "\n",
-+                  __func__, size << 3, offset, value);
-+
-+    return MEMTX_ERROR;
-+}
-+
- static const MemoryRegionOps lqspi_ops =3D {
-     .read_with_attrs =3D lqspi_read,
-+    .write_with_attrs =3D lqspi_write,
-     .endianness =3D DEVICE_NATIVE_ENDIAN,
-     .valid =3D {
-         .min_access_size =3D 1,
+  s390x/tcg: move fallthrough annotation (2019-07-09 10:37:44 +0200)
+
+----------------------------------------------------------------
+Fixes in cpu models, tcg, and vfio-ccw.
+
+----------------------------------------------------------------
+
+Alex Williamson (1):
+  vfio-ccw: Test vfio_set_irq_signaling() return value
+
+Christian Borntraeger (1):
+  s390: cpumodel: fix description for the new vector facility
+
+Cornelia Huck (1):
+  s390x/tcg: move fallthrough annotation
+
+Pierre Morel (1):
+  s390x/cpumodel: Set up CPU model for AQIC interception
+
+ hw/vfio/ccw.c                       | 5 ++---
+ target/s390x/cpu_features_def.inc.h | 3 ++-
+ target/s390x/cpu_models.c           | 1 +
+ target/s390x/gen-features.c         | 1 +
+ target/s390x/translate_vx.inc.c     | 2 +-
+ 5 files changed, 7 insertions(+), 5 deletions(-)
+
 --=20
 2.20.1
 
