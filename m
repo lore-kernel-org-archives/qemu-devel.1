@@ -4,59 +4,91 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF84DC606B0
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 08:53:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04BD3C606B0
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 08:56:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A79B5216C4
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 08:53:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A79B5216C4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id CF082216C4
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 08:56:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF082216C4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47904 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47914 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hklsr-0006rH-VO
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jul 2019 04:53:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36914)
+	id 1hklvM-0008Nx-5J
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jul 2019 04:56:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37694)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jonathan.cameron@huawei.com>) id 1hklrS-0005rt-Jm
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 04:52:32 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hkluL-0007re-Us
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 04:55:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jonathan.cameron@huawei.com>) id 1hklrQ-0007qE-Oe
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 04:52:30 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:41988 helo=huawei.com)
+ (envelope-from <mreitz@redhat.com>) id 1hkluK-000159-HK
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 04:55:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51784)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jonathan.cameron@huawei.com>)
- id 1hklrP-0007mB-Tz
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 04:52:28 -0400
-Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id 7A1612CD4C008101BDD4;
- Tue,  9 Jul 2019 16:52:22 +0800 (CST)
-Received: from localhost (10.227.98.71) by DGGEMS406-HUB.china.huawei.com
- (10.3.19.206) with Microsoft SMTP Server id 14.3.439.0; Tue, 9 Jul 2019
- 16:52:17 +0800
-Date: Tue, 9 Jul 2019 16:25:07 +0800
-From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-To: Tao Xu <tao3.xu@intel.com>
-Message-ID: <20190709162507.00005cf7@huawei.com>
-In-Reply-To: <20190707142958.31316-7-tao3.xu@intel.com>
-References: <20190707142958.31316-1-tao3.xu@intel.com>
- <20190707142958.31316-7-tao3.xu@intel.com>
-Organization: Huawei R&D UK Ltd.
-X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; i686-w64-mingw32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1hkluG-0000yA-Qa; Tue, 09 Jul 2019 04:55:25 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 99367B2DC8;
+ Tue,  9 Jul 2019 08:55:23 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-204-52.brq.redhat.com
+ [10.40.204.52])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9AD8053B27;
+ Tue,  9 Jul 2019 08:55:12 +0000 (UTC)
+To: dillaman@redhat.com, Stefano Garzarella <sgarzare@redhat.com>
+References: <20190705093258.47856-1-sgarzare@redhat.com>
+ <dcc9f3dc-78b4-4216-2791-b7e90f6d79ff@redhat.com>
+ <20190705104318.dngmmu3lpuvbe2nh@steredhat>
+ <CA+aFP1AgNGJMdAG_E23Q-rf2Gt1rpeKjDfrk1PLA3f4XiUkGtw@mail.gmail.com>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <754459cc-08c7-6cce-02c6-10f765cb9d00@redhat.com>
+Date: Tue, 9 Jul 2019 10:55:09 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.227.98.71]
-X-CFilter-Loop: Reflected
+In-Reply-To: <CA+aFP1AgNGJMdAG_E23Q-rf2Gt1rpeKjDfrk1PLA3f4XiUkGtw@mail.gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="KOg7Jpg4d2ZwPZS3hvtylJt0ILB9gkYWZ"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.26]); Tue, 09 Jul 2019 08:55:23 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 45.249.212.35
-Subject: Re: [Qemu-devel] [PATCH v6 06/14] hmat acpi: Build Memory Proximity
- Domain Attributes Structure(s)
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v3] block/rbd: implement
+ .bdrv_get_allocated_file_size callback
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,267 +100,221 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, jingqi.liu@intel.com, fan.du@intel.com,
- qemu-devel@nongnu.org, imammedo@redhat.com, dan.j.williams@intel.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Josh Durgin <jdurgin@redhat.com>,
+ John Snow <jsnow@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
+ qemu-block <qemu-block@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, 7 Jul 2019 22:29:50 +0800
-Tao Xu <tao3.xu@intel.com> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--KOg7Jpg4d2ZwPZS3hvtylJt0ILB9gkYWZ
+Content-Type: multipart/mixed; boundary="B8TiQ4nJRhnlmDZZsxa7a5rde9HdDvw9d";
+ protected-headers="v1"
+From: Max Reitz <mreitz@redhat.com>
+To: dillaman@redhat.com, Stefano Garzarella <sgarzare@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-block <qemu-block@nongnu.org>,
+ Josh Durgin <jdurgin@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
+ John Snow <jsnow@redhat.com>
+Message-ID: <754459cc-08c7-6cce-02c6-10f765cb9d00@redhat.com>
+Subject: Re: [PATCH v3] block/rbd: implement .bdrv_get_allocated_file_size
+ callback
+References: <20190705093258.47856-1-sgarzare@redhat.com>
+ <dcc9f3dc-78b4-4216-2791-b7e90f6d79ff@redhat.com>
+ <20190705104318.dngmmu3lpuvbe2nh@steredhat>
+ <CA+aFP1AgNGJMdAG_E23Q-rf2Gt1rpeKjDfrk1PLA3f4XiUkGtw@mail.gmail.com>
+In-Reply-To: <CA+aFP1AgNGJMdAG_E23Q-rf2Gt1rpeKjDfrk1PLA3f4XiUkGtw@mail.gmail.com>
 
-> From: Liu Jingqi <jingqi.liu@intel.com>
-> 
-> HMAT is defined in ACPI 6.3: 5.2.27 Heterogeneous Memory Attribute Table
-> (HMAT). The specification references below link:
-> http://www.uefi.org/sites/default/files/resources/ACPI_6_3_final_Jan30.pdf
-> 
-> It describes the memory attributes, such as memory side cache
-> attributes and bandwidth and latency details, related to the
-> Memory Proximity Domain. The software is
-> expected to use this information as hint for optimization.
-> 
-> This structure describes Memory Proximity Domain Attributes by memory
-> subsystem and its associativity with processor proximity domain as well as
-> hint for memory usage.
-> 
-> Signed-off-by: Liu Jingqi <jingqi.liu@intel.com>
-> Signed-off-by: Tao Xu <tao3.xu@intel.com>
-Looks good to me.  Thanks for changing to 6.3.
+--B8TiQ4nJRhnlmDZZsxa7a5rde9HdDvw9d
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+On 09.07.19 05:08, Jason Dillaman wrote:
+> On Fri, Jul 5, 2019 at 6:43 AM Stefano Garzarella <sgarzare@redhat.com>=
+ wrote:
+>>
+>> On Fri, Jul 05, 2019 at 11:58:43AM +0200, Max Reitz wrote:
+>>> On 05.07.19 11:32, Stefano Garzarella wrote:
+>>>> This patch allows 'qemu-img info' to show the 'disk size' for
+>>>> the RBD images that have the fast-diff feature enabled.
+>>>>
+>>>> If this feature is enabled, we use the rbd_diff_iterate2() API
+>>>> to calculate the allocated size for the image.
+>>>>
+>>>> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+>>>> ---
+>>>> v3:
+>>>>   - return -ENOTSUP instead of -1 when fast-diff is not available
+>>>>     [John, Jason]
+>>>> v2:
+>>>>   - calculate the actual usage only if the fast-diff feature is
+>>>>     enabled [Jason]
+>>>> ---
+>>>>  block/rbd.c | 54 ++++++++++++++++++++++++++++++++++++++++++++++++++=
++++
+>>>>  1 file changed, 54 insertions(+)
+>>>
+>>> Well, the librbd documentation is non-existing as always, but while
+>>> googling, I at least found that libvirt has exactly the same code.  S=
+o I
+>>> suppose it must be quite correct, then.
+>>>
+>>
+>> While I wrote this code I took a look at libvirt implementation and al=
+so
+>> at the "rbd" tool in the ceph repository: compute_image_disk_usage() i=
+n
+>> src/tools/rbd/action/DiskUsage.cc
+>>
+>>>> diff --git a/block/rbd.c b/block/rbd.c
+>>>> index 59757b3120..b6bed683e5 100644
+>>>> --- a/block/rbd.c
+>>>> +++ b/block/rbd.c
+>>>> @@ -1084,6 +1084,59 @@ static int64_t qemu_rbd_getlength(BlockDriver=
+State *bs)
+>>>>      return info.size;
+>>>>  }
+>>>>
+>>>> +static int rbd_allocated_size_cb(uint64_t offset, size_t len, int e=
+xists,
+>>>> +                                 void *arg)
+>>>> +{
+>>>> +    int64_t *alloc_size =3D (int64_t *) arg;
+>>>> +
+>>>> +    if (exists) {
+>>>> +        (*alloc_size) +=3D len;
+>>>> +    }
+>>>> +
+>>>> +    return 0;
+>>>> +}
+>>>> +
+>>>> +static int64_t qemu_rbd_get_allocated_file_size(BlockDriverState *b=
+s)
+>>>> +{
+>>>> +    BDRVRBDState *s =3D bs->opaque;
+>>>> +    uint64_t flags, features;
+>>>> +    int64_t alloc_size =3D 0;
+>>>> +    int r;
+>>>> +
+>>>> +    r =3D rbd_get_flags(s->image, &flags);
+>>>> +    if (r < 0) {
+>>>> +        return r;
+>>>> +    }
+>>>> +
+>>>> +    r =3D rbd_get_features(s->image, &features);
+>>>> +    if (r < 0) {
+>>>> +        return r;
+>>>> +    }
+>>>> +
+>>>> +    /*
+>>>> +     * We use rbd_diff_iterate2() only if the RBD image have fast-d=
+iff
+>>>> +     * feature enabled. If it is disabled, rbd_diff_iterate2() coul=
+d be
+>>>> +     * very slow on a big image.
+>>>> +     */
+>>>> +    if (!(features & RBD_FEATURE_FAST_DIFF) ||
+>>>> +        (flags & RBD_FLAG_FAST_DIFF_INVALID)) {
+>>>> +        return -ENOTSUP;
+>>>> +    }
+>>>> +
+>>>> +    /*
+>>>> +     * rbd_diff_iterate2(), if the source snapshot name is NULL, in=
+vokes
+>>>> +     * the callback on all allocated regions of the image.
+>>>> +     */
+>>>> +    r =3D rbd_diff_iterate2(s->image, NULL, 0,
+>>>> +                          bs->total_sectors * BDRV_SECTOR_SIZE, 0, =
+1,
+>>>> +                          &rbd_allocated_size_cb, &alloc_size);
+>>>
+>>> But I have a question.  This is basically block_status, right?  So it=
 
-> ---
-> 
-> Changes in v6:
-> Update to ACPI 6.3, main changes are:
->     - Renamed as Memory Proximity Domain Attributes, use numa nodes to
->       replace memory ranges
->     - Use "-numa initiator" to describe "the Attached Initiator", more
->       clear for memory topology
->     - Because HMAT does not use memory ranges, remove the codes to build
->       mem_renges for dimm device
-> ---
->  hw/acpi/Kconfig       |   5 +++
->  hw/acpi/Makefile.objs |   1 +
->  hw/acpi/hmat.c        | 101 ++++++++++++++++++++++++++++++++++++++++++
->  hw/acpi/hmat.h        |  45 +++++++++++++++++++
->  hw/i386/acpi-build.c  |   3 ++
->  5 files changed, 155 insertions(+)
->  create mode 100644 hw/acpi/hmat.c
->  create mode 100644 hw/acpi/hmat.h
-> 
-> diff --git a/hw/acpi/Kconfig b/hw/acpi/Kconfig
-> index 7c59cf900b..039bb99efa 100644
-> --- a/hw/acpi/Kconfig
-> +++ b/hw/acpi/Kconfig
-> @@ -7,6 +7,7 @@ config ACPI_X86
->      select ACPI_NVDIMM
->      select ACPI_CPU_HOTPLUG
->      select ACPI_MEMORY_HOTPLUG
-> +    select ACPI_HMAT
->  
->  config ACPI_X86_ICH
->      bool
-> @@ -31,3 +32,7 @@ config ACPI_VMGENID
->      bool
->      default y
->      depends on PC
-> +
-> +config ACPI_HMAT
-> +    bool
-> +    depends on ACPI
-> diff --git a/hw/acpi/Makefile.objs b/hw/acpi/Makefile.objs
-> index 9bb2101e3b..c05019b059 100644
-> --- a/hw/acpi/Makefile.objs
-> +++ b/hw/acpi/Makefile.objs
-> @@ -6,6 +6,7 @@ common-obj-$(CONFIG_ACPI_MEMORY_HOTPLUG) += memory_hotplug.o
->  common-obj-$(CONFIG_ACPI_CPU_HOTPLUG) += cpu.o
->  common-obj-$(CONFIG_ACPI_NVDIMM) += nvdimm.o
->  common-obj-$(CONFIG_ACPI_VMGENID) += vmgenid.o
-> +common-obj-$(CONFIG_ACPI_HMAT) += hmat.o
->  common-obj-$(call lnot,$(CONFIG_ACPI_X86)) += acpi-stub.o
->  
->  common-obj-y += acpi_interface.o
-> diff --git a/hw/acpi/hmat.c b/hw/acpi/hmat.c
-> new file mode 100644
-> index 0000000000..abf99b1adc
-> --- /dev/null
-> +++ b/hw/acpi/hmat.c
-> @@ -0,0 +1,101 @@
-> +/*
-> + * HMAT ACPI Implementation
-> + *
-> + * Copyright(C) 2019 Intel Corporation.
-> + *
-> + * Author:
-> + *  Liu jingqi <jingqi.liu@linux.intel.com>
-> + *  Tao Xu <tao3.xu@intel.com>
-> + *
-> + * HMAT is defined in ACPI 6.3: 5.2.27 Heterogeneous Memory Attribute Table
-> + * (HMAT)
-> + *
-> + * This library is free software; you can redistribute it and/or
-> + * modify it under the terms of the GNU Lesser General Public
-> + * License as published by the Free Software Foundation; either
-> + * version 2 of the License, or (at your option) any later version.
-> + *
-> + * This library is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-> + * Lesser General Public License for more details.
-> + *
-> + * You should have received a copy of the GNU Lesser General Public
-> + * License along with this library; if not, see <http://www.gnu.org/licenses/>
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "sysemu/numa.h"
-> +#include "hw/acpi/hmat.h"
-> +
-> +/*
-> + * ACPI 6.3:
-> + * 5.2.27.3 Memory Proximity Domain Attributes Structure: Table 5-141
-> + */
-> +static void build_hmat_mpda(GArray *table_data, uint16_t flags, int initiator,
-> +                           int mem_node)
-> +{
-> +
-> +    /* Memory Proximity Domain Attributes Structure */
-> +    /* Type */
-> +    build_append_int_noprefix(table_data, 0, 2);
-> +    /* Reserved */
-> +    build_append_int_noprefix(table_data, 0, 2);
-> +    /* Length */
-> +    build_append_int_noprefix(table_data, 40, 4);
-> +    /* Flags */
-> +    build_append_int_noprefix(table_data, flags, 2);
-> +    /* Reserved */
-> +    build_append_int_noprefix(table_data, 0, 2);
-> +    /* Proximity Domain for the Attached Initiator */
-> +    build_append_int_noprefix(table_data, initiator, 4);
-> +    /* Proximity Domain for the Memory */
-> +    build_append_int_noprefix(table_data, mem_node, 4);
-> +    /* Reserved */
-> +    build_append_int_noprefix(table_data, 0, 4);
-> +    /*
-> +     * Reserved:
-> +     * Previously defined as the Start Address of the System Physical
-> +     * Address Range. Deprecated since ACPI Spec 6.3.
-> +     */
-> +    build_append_int_noprefix(table_data, 0, 8);
-> +    /*
-> +     * Reserved:
-> +     * Previously defined as the Range Length of the region in bytes.
-> +     * Deprecated since ACPI Spec 6.3.
-> +     */
-> +    build_append_int_noprefix(table_data, 0, 8);
-> +}
-> +
-> +/* Build HMAT sub table structures */
-> +static void hmat_build_table_structs(GArray *table_data, NumaState *nstat)
-> +{
-> +    uint16_t flags;
-> +    int i;
-> +
-> +    for (i = 0; i < nstat->num_nodes; i++) {
-> +        flags = 0;
-> +
-> +        if (nstat->nodes[i].initiator_valid) {
-> +            flags |= HMAT_PROX_INIT_VALID;
-> +        }
-> +
-> +        build_hmat_mpda(table_data, flags, nstat->nodes[i].initiator, i);
-> +    }
-> +}
-> +
-> +void build_hmat(GArray *table_data, BIOSLinker *linker, NumaState *nstat)
-> +{
-> +    uint64_t hmat_start;
-> +
-> +    hmat_start = table_data->len;
-> +
-> +    /* reserve space for HMAT header  */
-> +    acpi_data_push(table_data, 40);
-> +
-> +    hmat_build_table_structs(table_data, nstat);
-> +
-> +    build_header(linker, table_data,
-> +                 (void *)(table_data->data + hmat_start),
-> +                 "HMAT", table_data->len - hmat_start, 2, NULL, NULL);
-> +}
-> diff --git a/hw/acpi/hmat.h b/hw/acpi/hmat.h
-> new file mode 100644
-> index 0000000000..574cfba60a
-> --- /dev/null
-> +++ b/hw/acpi/hmat.h
-> @@ -0,0 +1,45 @@
-> +/*
-> + * HMAT ACPI Implementation Header
-> + *
-> + * Copyright(C) 2019 Intel Corporation.
-> + *
-> + * Author:
-> + *  Liu jingqi <jingqi.liu@linux.intel.com>
-> + *  Tao Xu <tao3.xu@intel.com>
-> + *
-> + * HMAT is defined in ACPI 6.3: 5.2.27 Heterogeneous Memory Attribute Table
-> + * (HMAT)
-> + *
-> + * This library is free software; you can redistribute it and/or
-> + * modify it under the terms of the GNU Lesser General Public
-> + * License as published by the Free Software Foundation; either
-> + * version 2 of the License, or (at your option) any later version.
-> + *
-> + * This library is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-> + * Lesser General Public License for more details.
-> + *
-> + * You should have received a copy of the GNU Lesser General Public
-> + * License along with this library; if not, see <http://www.gnu.org/licenses/>
-> + */
-> +
-> +#ifndef HMAT_H
-> +#define HMAT_H
-> +
-> +#include "hw/acpi/acpi-defs.h"
-> +#include "hw/acpi/acpi.h"
-> +#include "hw/acpi/bios-linker-loader.h"
-> +#include "hw/acpi/aml-build.h"
-> +
-> +/*
-> + * ACPI 6.3: 5.2.27.3 Memory Proximity Domain Attributes Structure,
-> + * Table 5-141, Field "flag", Bit [0]: set to 1 to indicate that data in
-> + * the Proximity Domain for the Attached Initiator field is valid.
-> + * Other bits reserved.
-> + */
-> +#define HMAT_PROX_INIT_VALID 0x1
-> +
-> +void build_hmat(GArray *table_data, BIOSLinker *linker, NumaState *nstat);
-> +
-> +#endif
-> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> index 0e451e06d1..34f2f898ce 100644
-> --- a/hw/i386/acpi-build.c
-> +++ b/hw/i386/acpi-build.c
-> @@ -65,6 +65,7 @@
->  #include "hw/i386/intel_iommu.h"
->  
->  #include "hw/acpi/ipmi.h"
-> +#include "hw/acpi/hmat.h"
->  
->  /* These are used to size the ACPI tables for -M pc-i440fx-1.7 and
->   * -M pc-i440fx-2.0.  Even if the actual amount of AML generated grows
-> @@ -2684,6 +2685,8 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
->              acpi_add_table(table_offsets, tables_blob);
->              build_slit(tables_blob, tables->linker, machine);
->          }
-> +        acpi_add_table(table_offsets, tables_blob);
-> +        build_hmat(tables_blob, tables->linker, machine->numa_state);
->      }
->      if (acpi_get_mcfg(&mcfg)) {
->          acpi_add_table(table_offsets, tables_blob);
+>>> gives us information on which areas are allocated and which are not.
+>>> The result thus gives us a lower bound on the allocation size, but is=
+ it
+>>> really exactly the allocation size?
+>>>
+>>> There are two things I=E2=80=99m concerned about:
+>>>
+>>> 1. What about metadata?
+>>
+>> Good question, I don't think it includes the size used by metadata and=
+ I
+>> don't know if there is a way to know it. I'll check better.
+>=20
+> It does not include the size of metadata, the "rbd_diff_iterate2"
+> function is literally just looking for touched data blocks within the
+> RBD image.
+>=20
+>>>
+>>> 2. If you have multiple snapshots, this will only report the overall
+>>> allocation information, right?  So say there is something like this:
+>>>
+>>> (=E2=80=9CA=E2=80=9D means an allocated MB, =E2=80=9C-=E2=80=9D is an=
+ unallocated MB)
+>>>
+>>> Snapshot 1: AAAA---
+>>> Snapshot 2: --AAAAA
+>>> Snapshot 3: -AAAA--
+>>>
+>>> I think the allocated data size is the number of As in total (13 MB).=
+
+>>> But I suppose this API will just return 7 MB, because it looks on
+>>> everything an it sees the whole image range (7 MB) to be allocated.  =
+It
+>>> doesn=E2=80=99t report in how many snapshots some region is allocated=
+=2E
+>=20
+> It should return 13 dirty data blocks (multipled by the size of the
+> data block) since when you don't provide a "from snapshot" name, it
+> will iterate from the first snapshot to the HEAD revision.
+
+Have you tested that?
+
+I=E2=80=98m so skeptical because the callback function interface has no w=
+ay of
+distinguishing between different layers of snapshots.
+
+And also because we have the bdrv_block_status_above() function which
+just looks strikingly similar (with the difference that it does not
+invoke a callback but just returns the next allocated range).  If you
+pass base=3DNULL to it, it will also =E2=80=9Cinterpret that as the begin=
+ning of
+time and return all allocated regions of the image=E2=80=9D (or rather im=
+age
+chain, in our case).  But it would just return 7 MB as allocated.  (Even
+though it does in fact return layer information, i.e. where a given
+continuous chunk of data is allocated.)
+
+Sure, there is no good reason for why our interface should by chance be
+the same as librbd=E2=80=99s interface.  But without having tested it, th=
+e fact
+that the callback cannot detect which layer a chunk is allocated on just
+makes me wary.
+
+Max
 
 
+--B8TiQ4nJRhnlmDZZsxa7a5rde9HdDvw9d--
+
+--KOg7Jpg4d2ZwPZS3hvtylJt0ILB9gkYWZ
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0kVm4ACgkQ9AfbAGHV
+z0DJtQf/SzZBdMh0/kUB66Kw2UrvrtVLs7bVhJijv1Z/XRy9cG52iF3WQAjbnvex
+qQ6HrwKtD7I68sze1rl/RDXWV6OEzUPOL0JmgJA/w9/mm1k0EVr1s3OuCWLBGRbA
+l6TkVbdpwXm/CZC1PXopCN+vxjhYuIAQCAprE+eN8All28JbgULDhBH8lt8q3qQ4
+M65yfw1cj1bTngl8yd/gQuL7bJadHtlQ6DXpvuHumknOmDS/O5458j/8ipfwSts1
+4d1397uhE/aQAecxJh8MIilFqbnp9Q5vf6qtePvcOMdXrkbUPax7yunVv1D/vbjD
+9mF7Xzszk4GSRZT/GMuGbOU/uaDEhw==
+=K827
+-----END PGP SIGNATURE-----
+
+--KOg7Jpg4d2ZwPZS3hvtylJt0ILB9gkYWZ--
 
