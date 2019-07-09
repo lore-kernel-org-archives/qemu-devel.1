@@ -2,91 +2,79 @@ Return-Path: <SRS0=huOX=VG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BEF4AC606B0
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 10:05:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BCBFC606B0
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 10:06:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8D08421670
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 10:05:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4B17720844
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 10:06:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bhwPvoI1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D08421670
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="gIihGRvO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B17720844
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48306 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48316 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hkn05-0007Bv-TQ
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jul 2019 06:05:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52868)
+	id 1hkn16-0008EA-FC
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jul 2019 06:06:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50010)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hkmxq-0005jT-4t
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 06:03:11 -0400
+ (envelope-from <kwankhede@nvidia.com>) id 1hkmnf-0004KL-QC
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 05:52:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hkmxo-0002Dh-V2
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 06:03:10 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:55967)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hkmxo-0002BT-KZ
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 06:03:08 -0400
-Received: by mail-wm1-x343.google.com with SMTP id a15so2401282wmj.5
- for <qemu-devel@nongnu.org>; Tue, 09 Jul 2019 03:03:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=RWp8PyFUvwxe4IGkdf/lfIE/HIqcrD/3ALTosh4dDng=;
- b=bhwPvoI1jHtgCV+YAZV+5Q/OhGDa2L01n9z9kBCUNBA6Dr4kMoHctP3hZpVukfAJQ3
- 0NbxOmbY0dSM5FhUAralPdc6fIsvX0DuHKPGfFMaGNws046v0qDaZtlubn6uIU1DFvsP
- Z6VHBTOm60AtP9pRnSp1Uvj0w7a/Ki2eaj9cyQtNHUqGtL4AHlHrtQPIOYp5+MwaVYmh
- PlRta3fuVcnKQZi7hTv8GBT1isbUtZR35rk+Uw74qNPszVYKcYTqmXQ/2DtKOp+9MKEr
- UfuAwgb213l8cFbNL55RoYEAPRgHIGZ/eBIkud4x88pIa4JzST5F6dlPEfS8WkLD56EV
- N1UQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=RWp8PyFUvwxe4IGkdf/lfIE/HIqcrD/3ALTosh4dDng=;
- b=ApTH3OIDyMkRFzBVpQfS0lLGKGHpNXHYFJCckbb1MQU9a3Rh/raiix24v0X2jeT0jp
- gPNCWyZXwdcqNve7P4tvUXt3XwGCNNUQL4mv3FW/phLtzeNGGICa7Gzr6IgRLtfQWKKr
- m2u0KtUuuq2cr7P2PSuyfcyLeBIMRvsOnUl0kZljb2aYghYtCVj9AAvJxhPlZBjGelSN
- ME/MCSXDYPBNckidSKlYWekMZzaeK2y0DA3jSCq9BHoPyo5QzQlkmBoWexcwEXDggDo2
- GTaeR2YinlRnIE9FqMyzu7d4VoZgQcLp11icuxEtf5dWE7+FtXQWIG4GxSSwv12q5QVQ
- 9bGw==
-X-Gm-Message-State: APjAAAWtI8DsTem6eUrETTiSH0Wr3H7VOh51BVJgLVWeQS3LehFbxw6g
- 20DFMNQG9Ux1tCCKl1yjGK0hOg==
-X-Google-Smtp-Source: APXvYqxykAQ3Zb5v2M6FUWvzoT6WVKP5tjAgjFv0Q2+pLui4n5KhN/RJiXMyGn2lzZu7oEW1aBlFKg==
-X-Received: by 2002:a1c:3587:: with SMTP id c129mr22481436wma.90.1562666586096; 
- Tue, 09 Jul 2019 03:03:06 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id o126sm2294300wmo.1.2019.07.09.03.03.05
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Tue, 09 Jul 2019 03:03:05 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id D534B1FF87;
- Tue,  9 Jul 2019 11:03:04 +0100 (BST)
-References: <20190709092049.13771-1-richard.henderson@linaro.org>
- <20190709092049.13771-2-richard.henderson@linaro.org>
-User-agent: mu4e 1.3.2; emacs 26.1
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Richard Henderson <richard.henderson@linaro.org>
-In-reply-to: <20190709092049.13771-2-richard.henderson@linaro.org>
-Date: Tue, 09 Jul 2019 11:03:04 +0100
-Message-ID: <871ryzfrtz.fsf@zen.linaroharston>
+ (envelope-from <kwankhede@nvidia.com>) id 1hkmne-0004FS-Jl
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 05:52:39 -0400
+Received: from hqemgate15.nvidia.com ([216.228.121.64]:2535)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kwankhede@nvidia.com>)
+ id 1hkmnc-0004Dd-Lo
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 05:52:37 -0400
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by
+ hqemgate15.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+ id <B5d2463e60000>; Tue, 09 Jul 2019 02:52:38 -0700
+Received: from hqmail.nvidia.com ([172.20.161.6])
+ by hqpgpgate101.nvidia.com (PGP Universal service);
+ Tue, 09 Jul 2019 02:52:34 -0700
+X-PGP-Universal: processed;
+ by hqpgpgate101.nvidia.com on Tue, 09 Jul 2019 02:52:34 -0700
+Received: from HQMAIL101.nvidia.com (172.20.187.10) by HQMAIL106.nvidia.com
+ (172.18.146.12) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 9 Jul
+ 2019 09:52:33 +0000
+Received: from kwankhede-dev.nvidia.com (10.124.1.5) by HQMAIL101.nvidia.com
+ (172.20.187.10) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via Frontend
+ Transport; Tue, 9 Jul 2019 09:52:27 +0000
+From: Kirti Wankhede <kwankhede@nvidia.com>
+To: <alex.williamson@redhat.com>, <cjia@nvidia.com>
+Date: Tue, 9 Jul 2019 15:19:13 +0530
+Message-ID: <1562665760-26158-7-git-send-email-kwankhede@nvidia.com>
+X-Mailer: git-send-email 2.7.0
+In-Reply-To: <1562665760-26158-1-git-send-email-kwankhede@nvidia.com>
+References: <1562665760-26158-1-git-send-email-kwankhede@nvidia.com>
+X-NVConfidentiality: public
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::343
-Subject: Re: [Qemu-devel] [PATCH 1/5] include/qemu/atomic.h: Add
- signal_barrier
+Content-Type: text/plain
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+ t=1562665959; bh=CzIjuh45DV8zioWi2bRTMYHoiTulp8p5NKtpMhF1Pz8=;
+ h=X-PGP-Universal:From:To:CC:Subject:Date:Message-ID:X-Mailer:
+ In-Reply-To:References:X-NVConfidentiality:MIME-Version:
+ Content-Type;
+ b=gIihGRvOKcEraFkCuUdl+z+GEYwrGVrurc6N87dLRQfdtWJp5nMwUmXlLzUHwvEe6
+ dpj/srGFtI88MoNw1mWAcDWnRJIpHENfHESYdHm2vwoRuTGPTenOhPByHMhpdJOb82
+ BCPOgvThceCfM7Hnl+6Q7oOdK2iZXencpaKOG86UPmgH0l94XeAsr6i+2QHpqb6m6W
+ 3gU+YGzIomGPcgeaPP0no/jcjnePnWfugkK7z62kd/ao9ydacTvp8Bw1k8ee2mz6yi
+ VOv+2aSqOzoJ5cy9M4VKSqCEhz6PdL1QzMkohiPi6CkHq5TcIE/5A4GSeEVL1hZtBN
+ nPrbCG44iI22A==
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8
+X-Received-From: 216.228.121.64
+Subject: [Qemu-devel] [PATCH v7 06/13] vfio: Add VM state change handler to
+ know state of VM
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,61 +86,159 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org,
- pbonzini@redhat.com
+Cc: Zhengxiao.zx@Alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com,
+ yan.y.zhao@intel.com, eskultet@redhat.com, ziye.yang@intel.com,
+ qemu-devel@nongnu.org, cohuck@redhat.com, shuangtai.tst@alibaba-inc.com,
+ dgilbert@redhat.com, zhi.a.wang@intel.com, mlevitsk@redhat.com,
+ pasic@linux.ibm.com, aik@ozlabs.ru, Kirti Wankhede <kwankhede@nvidia.com>,
+ eauger@redhat.com, felipe@nutanix.com, jonathan.davies@nutanix.com,
+ changpeng.liu@intel.com, Ken.Xue@amd.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+VM state change handler gets called on change in VM's state. This is used to set
+VFIO device state to _RUNNING.
+VM state change handler, migration state change handler and log_sync listener
+are called asynchronously, which sometimes lead to data corruption in migration
+region. Initialised mutex that is used to serialize operations on migration data
+region during saving state.
 
-Richard Henderson <richard.henderson@linaro.org> writes:
+Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+Reviewed-by: Neo Jia <cjia@nvidia.com>
+---
+ hw/vfio/migration.c           | 64 +++++++++++++++++++++++++++++++++++++++++++
+ hw/vfio/trace-events          |  2 ++
+ include/hw/vfio/vfio-common.h |  4 +++
+ 3 files changed, 70 insertions(+)
 
-> We have some potential race conditions vs our user-exec signal
-> handler that will be solved with this barrier.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
+index a2cfbd5af2e1..c01f08b659d0 100644
+--- a/hw/vfio/migration.c
++++ b/hw/vfio/migration.c
+@@ -78,6 +78,60 @@ err:
+     return ret;
+ }
+ 
++static int vfio_migration_set_state(VFIODevice *vbasedev, uint32_t state)
++{
++    VFIOMigration *migration = vbasedev->migration;
++    VFIORegion *region = &migration->region.buffer;
++    uint32_t device_state;
++    int ret = 0;
++
++    device_state = (state & VFIO_DEVICE_STATE_MASK) |
++                   (vbasedev->device_state & ~VFIO_DEVICE_STATE_MASK);
++
++    if ((device_state & VFIO_DEVICE_STATE_MASK) == VFIO_DEVICE_STATE_INVALID) {
++        return -EINVAL;
++    }
++
++    ret = pwrite(vbasedev->fd, &device_state, sizeof(device_state),
++                 region->fd_offset + offsetof(struct vfio_device_migration_info,
++                                              device_state));
++    if (ret < 0) {
++        error_report("%s: Failed to set device state %d %s",
++                     vbasedev->name, ret, strerror(errno));
++        return ret;
++    }
++
++    vbasedev->device_state = device_state;
++    trace_vfio_migration_set_state(vbasedev->name, device_state);
++    return 0;
++}
++
++static void vfio_vmstate_change(void *opaque, int running, RunState state)
++{
++    VFIODevice *vbasedev = opaque;
++
++    if ((vbasedev->vm_running != running)) {
++        int ret;
++        uint32_t dev_state;
++
++        if (running) {
++            dev_state = VFIO_DEVICE_STATE_RUNNING;
++        } else {
++            dev_state = (vbasedev->device_state & VFIO_DEVICE_STATE_MASK) &
++                     ~VFIO_DEVICE_STATE_RUNNING;
++        }
++
++        ret = vfio_migration_set_state(vbasedev, dev_state);
++        if (ret) {
++            error_report("%s: Failed to set device state 0x%x",
++                         vbasedev->name, dev_state);
++        }
++        vbasedev->vm_running = running;
++        trace_vfio_vmstate_change(vbasedev->name, running, RunState_str(state),
++                                  dev_state);
++    }
++}
++
+ static int vfio_migration_init(VFIODevice *vbasedev,
+                                struct vfio_region_info *info)
+ {
+@@ -93,6 +147,11 @@ static int vfio_migration_init(VFIODevice *vbasedev,
+         return ret;
+     }
+ 
++    qemu_mutex_init(&vbasedev->migration->lock);
++
++    vbasedev->vm_state = qemu_add_vm_change_state_handler(vfio_vmstate_change,
++                                                          vbasedev);
++
+     return 0;
+ }
+ 
+@@ -135,11 +194,16 @@ void vfio_migration_finalize(VFIODevice *vbasedev)
+         return;
+     }
+ 
++    if (vbasedev->vm_state) {
++        qemu_del_vm_change_state_handler(vbasedev->vm_state);
++    }
++
+     if (vbasedev->migration_blocker) {
+         migrate_del_blocker(vbasedev->migration_blocker);
+         error_free(vbasedev->migration_blocker);
+     }
+ 
++    qemu_mutex_destroy(&vbasedev->migration->lock);
+     vfio_migration_region_exit(vbasedev);
+     g_free(vbasedev->migration);
+ }
+diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
+index 191a726a1312..3d15bacd031a 100644
+--- a/hw/vfio/trace-events
++++ b/hw/vfio/trace-events
+@@ -146,3 +146,5 @@ vfio_display_edid_write_error(void) ""
+ 
+ # migration.c
+ vfio_migration_probe(char *name, uint32_t index) " (%s) Region %d"
++vfio_migration_set_state(char *name, uint32_t state) " (%s) state %d"
++vfio_vmstate_change(char *name, int running, const char *reason, uint32_t dev_state) " (%s) running %d reason %s device state %d"
+diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
+index 152da3f8d6f3..f6c70db3a9c1 100644
+--- a/include/hw/vfio/vfio-common.h
++++ b/include/hw/vfio/vfio-common.h
+@@ -29,6 +29,7 @@
+ #ifdef CONFIG_LINUX
+ #include <linux/vfio.h>
+ #endif
++#include "sysemu/sysemu.h"
+ 
+ #define VFIO_MSG_PREFIX "vfio %s: "
+ 
+@@ -124,6 +125,9 @@ typedef struct VFIODevice {
+     unsigned int flags;
+     VFIOMigration *migration;
+     Error *migration_blocker;
++    uint32_t device_state;
++    VMChangeStateEntry *vm_state;
++    int vm_running;
+ } VFIODevice;
+ 
+ struct VFIODeviceOps {
+-- 
+2.7.0
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
-> ---
->  include/qemu/atomic.h | 11 +++++++++++
->  1 file changed, 11 insertions(+)
->
-> diff --git a/include/qemu/atomic.h b/include/qemu/atomic.h
-> index a6ac188188..f9cd24c899 100644
-> --- a/include/qemu/atomic.h
-> +++ b/include/qemu/atomic.h
-> @@ -88,6 +88,13 @@
->  #define smp_read_barrier_depends()   barrier()
->  #endif
->
-> +/*
-> + * A signal barrier forces all pending local memory ops to be observed b=
-efore
-> + * a SIGSEGV is delivered to the *same* thread.  In practice this is exa=
-ctly
-> + * the same as barrier(), but since we have the correct builtin, use it.
-> + */
-> +#define signal_barrier()    __atomic_signal_fence(__ATOMIC_SEQ_CST)
-> +
->  /* Sanity check that the size of an atomic operation isn't "overly large=
-".
->   * Despite the fact that e.g. i686 has 64-bit atomic operations, we do n=
-ot
->   * want to use them because we ought not need them, and this lets us do a
-> @@ -308,6 +315,10 @@
->  #define smp_read_barrier_depends()   barrier()
->  #endif
->
-> +#ifndef signal_barrier
-> +#define signal_barrier()    barrier()
-> +#endif
-> +
->  /* These will only be atomic if the processor does the fetch or store
->   * in a single issue memory operation
->   */
-
-
---
-Alex Benn=C3=A9e
 
