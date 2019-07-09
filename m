@@ -2,91 +2,83 @@ Return-Path: <SRS0=huOX=VG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2E7DC73C56
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 20:52:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 334DAC73C53
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 21:41:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C26CA20861
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 20:52:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F342620656
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 21:41:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mNX/RKsW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C26CA20861
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S57CWp9o"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F342620656
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56062 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56284 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hkx6U-0005iQ-Jx
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jul 2019 16:52:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39238)
+	id 1hkxrF-0005t8-Sa
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jul 2019 17:41:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47854)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hkx31-0004FR-Kh
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 16:49:13 -0400
+ (envelope-from <mrolnik@gmail.com>) id 1hkxnP-0002og-0m
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 17:37:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hkx2v-0002sg-PS
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 16:49:11 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:36924)
+ (envelope-from <mrolnik@gmail.com>) id 1hkxnM-0006kL-Qj
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 17:37:06 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:38101)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hkx2n-0002jt-4i
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 16:48:58 -0400
-Received: by mail-wm1-x344.google.com with SMTP id f17so142129wme.2
- for <qemu-devel@nongnu.org>; Tue, 09 Jul 2019 13:48:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=0fBXuyK5wDpaOTyxXaPAaiswAOct2dT4WjnyrTPSA1k=;
- b=mNX/RKsWfncUUDLAMI/2wBb0DtxyVLMec5iT0L9FtYNRsG5pH53wE0Y1lbocN8JzSe
- qZDBWDJTol+RkvAs/D0URHR9+f4CZQWiAgbRVQXTSy1sN8R/35o3U0NH8NTLovwafmk5
- rP/SOoI55vKUWeDefrVL+f4RI19Cstb8x3ZNszeaBCH3S4zxttlGPOeoAF0V0aNaSEjG
- z/j2Jm24Da3umPKxlsdOCDKMmh8YfQwwwgNgjYJG1QpkXV+xXnFuRsid+J6bw2fdDHmt
- Zw3Q65XiaNmXacTm3Djw2HmutAPqjqlY5LU0VYpSRdn8gn57IZQrzdQimBQh0dGYbHoh
- n9yA==
+ (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1hkxnM-0006cv-D6
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 17:37:04 -0400
+Received: by mail-wr1-x443.google.com with SMTP id g17so322686wrr.5
+ for <qemu-devel@nongnu.org>; Tue, 09 Jul 2019 14:37:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=oElsIV9jGIkcznG1hjJ8A0RR90Xk82sVn+s7o2gFZVw=;
+ b=S57CWp9o/DXw92HBaJqP5THL/ioHBmc4kVtgDBJGMDygpvAJyrTI+2Kfh7yer/2lsg
+ mXVTDEVP8DQG5sGzZ47uLV8cEEOs0HjNVM3ZSpKhgG+ory3hNNxk8vOuAeZ0vkkQu3ts
+ vnN1dGjvjNNS3aeD+4rWDOG+GXzPWqEpHTE2G0Vs+Fc3HvaUUjSEX0keBTe2jCgfd3U6
+ bpPfQ4aPPf2HileggQWtV3T76C5BiO26OapmLfikBGzh3HtDgvgvPx1+yACQBy2nR//o
+ syH3pe/IgxOsZB4JgZjqkC3W4MseWucWEaHaxw1fros8HWVirerZODFGdgMxC/ocbxeJ
+ 9K6A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=0fBXuyK5wDpaOTyxXaPAaiswAOct2dT4WjnyrTPSA1k=;
- b=qWdcoideRqvRtZdmckHMuCHXs0K1QNY2niET8zAhjPuF4t1snfS5xN2fdoowMC1+sS
- u4yUh9p3bwkA862+oZVi/kbCPQkR6GBiEm4fIjBQhZWYys6OCDL0ETcHoJe1ohevRir8
- wYyHb8jtwgsNgHdZe+f6gVrcsr/kE6hy6+3jSV5hJK1sm3tC3u8P/oO5YPkDP26PoLtk
- ryyt5ey8hZpN0yFUnEbgd0bo8n3IDXZ0pfPaoSc6sgY5VC2u4/lWjewbUCCvIAYGPokx
- FajE8/q/47b5VjTmJJWPCZQN/5DyPxUDG6K7Cl/fUkOx095+Hw5XyGelQ5ff3seHKhFz
- VNiw==
-X-Gm-Message-State: APjAAAVPbNd0W+63xb+amX3oPoBJeSL0332tlNPb9YhFXT4Gait6RPV5
- k3AY1Y3YE7EbyFVLYRiQYOUvPA==
-X-Google-Smtp-Source: APXvYqwKhz+6yxq0CGZkBXKX/Wx4irs+z7dpblxehZraHC+I+Ui7psdwbDUmB1mK+19ehPCziKx2+A==
-X-Received: by 2002:a1c:a00f:: with SMTP id j15mr1412574wme.167.1562705335495; 
- Tue, 09 Jul 2019 13:48:55 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id l9sm49689wmh.36.2019.07.09.13.48.54
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Tue, 09 Jul 2019 13:48:54 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 7A2901FF87;
- Tue,  9 Jul 2019 21:48:54 +0100 (BST)
-References: <20190709163656.3100-1-richard.henderson@linaro.org>
- <20190709163656.3100-6-richard.henderson@linaro.org>
-User-agent: mu4e 1.3.2; emacs 26.1
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Richard Henderson <richard.henderson@linaro.org>
-In-reply-to: <20190709163656.3100-6-richard.henderson@linaro.org>
-Date: Tue, 09 Jul 2019 21:48:54 +0100
-Message-ID: <87r26zdjd5.fsf@zen.linaroharston>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references;
+ bh=oElsIV9jGIkcznG1hjJ8A0RR90Xk82sVn+s7o2gFZVw=;
+ b=F8MZIOnV4MWvESbBew95Zcch9A91QPgbUGWxy+T+GdumlYpQV4xxBD3LCPOIkkgZQg
+ z9IbyPGf6wwVKwMaWk3jIyZ6J7GcNLFF3sVxCVd3Pge0scvomAvY+w44sQVgJSnhlUBT
+ KHFHPprDMIeKn4xGMXNlOhX59RVN7ZYdnhogW7AW2JRaO1vwLKLn26sIg0loc8aWsfKF
+ u3LMY06JJXOyS5plQWdWhw1EXHTrnEB85TdCGcreeXwNXd0puF5mk5UaUywCZcYFZxaA
+ xLsP2TNgMUmWnxmBd/zV1Oi4TlMFpeTbFsz9nYa4hbHQ87Ja2E8ecRBn3LYbZZvFga1k
+ OJWw==
+X-Gm-Message-State: APjAAAW5F5kf0GJXdCyVsVx4U7o6zooonz1mFAsg1KhPj8VfxK+/JEEp
+ cipBLm0x0bS1Nt4LI0wJsW1/PNyv8Og=
+X-Google-Smtp-Source: APXvYqwqScCB2u63iFkMOvk9Nu/7dtZLnUhQYzVXPXm0y/WnHB7JGTKH6W7yiN26ESAqpIcMBGaDnA==
+X-Received: by 2002:adf:e843:: with SMTP id d3mr27933735wrn.249.1562708219063; 
+ Tue, 09 Jul 2019 14:36:59 -0700 (PDT)
+Received: from 8c859074c0ff.ant.amazon.com.com
+ (bzq-79-178-2-209.red.bezeqint.net. [79.178.2.209])
+ by smtp.gmail.com with ESMTPSA id c1sm141207wrh.1.2019.07.09.14.36.57
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
+ Tue, 09 Jul 2019 14:36:58 -0700 (PDT)
+From: Michael Rolnik <mrolnik@gmail.com>
+To: qemu-devel@nongnu.org
+Date: Wed, 10 Jul 2019 00:36:47 +0300
+Message-Id: <20190709213651.77315-4-mrolnik@gmail.com>
+X-Mailer: git-send-email 2.17.2 (Apple Git-113)
+In-Reply-To: <20190709213651.77315-1-mrolnik@gmail.com>
+References: <20190709213651.77315-1-mrolnik@gmail.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::344
-Subject: Re: [Qemu-devel] [PATCH v2 5/5] tcg: Release mmap_lock on
- translation fault
+X-Received-From: 2a00:1450:4864:20::443
+Subject: [Qemu-devel] [PATCH v25 3/7] target/avr: Add instruction decoding
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,182 +90,204 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org,
- pbonzini@redhat.com
+Cc: imammedo@redhat.com, richard.henderson@linaro.org,
+ Michael Rolnik <mrolnik@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This includes:
+- encoding of all 16 bit instructions
+- encoding of all 32 bit instructions
 
-Richard Henderson <richard.henderson@linaro.org> writes:
+Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
+---
+ target/avr/insn.decode | 175 +++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 175 insertions(+)
+ create mode 100644 target/avr/insn.decode
 
-> Turn helper_retaddr into a multi-state flag that may now also
-> indicate when we're performing a read on behalf of the translator.
-> In this case, release the mmap_lock before the longjmp back to
-> the main cpu loop, and thereby avoid a failing assert therein.
->
-> Fixes: https://bugs.launchpad.net/qemu/+bug/1832353
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+diff --git a/target/avr/insn.decode b/target/avr/insn.decode
+new file mode 100644
+index 0000000000..6b387762c6
+--- /dev/null
++++ b/target/avr/insn.decode
+@@ -0,0 +1,175 @@
++#
++#   A = [16 .. 31]
++#   B = [16 .. 23]
++#   C = [24, 26, 28, 30]
++#   D = [0, 2, 4, 6, 8, .. 30]
++
++%rd             4:5
++%rr             9:1 0:4
++
++&rd_rr          rd rr
++&rd_imm         rd imm
++
++@op_rd_rr       .... .. . ..... ....        &rd_rr      rd=%rd rr=%rr
++ADD             0000 11 . ..... ....        @op_rd_rr
++ADC             0001 11 . ..... ....        @op_rd_rr
++AND             0010 00 . ..... ....        @op_rd_rr
++CP              0001 01 . ..... ....        @op_rd_rr
++CPC             0000 01 . ..... ....        @op_rd_rr
++CPSE            0001 00 . ..... ....        @op_rd_rr
++EOR             0010 01 . ..... ....        @op_rd_rr
++MOV             0010 11 . ..... ....        @op_rd_rr
++MUL             1001 11 . ..... ....        @op_rd_rr
++OR              0010 10 . ..... ....        @op_rd_rr
++SBC             0000 10 . ..... ....        @op_rd_rr
++SUB             0001 10 . ..... ....        @op_rd_rr
++
++
++%rd_c           4:2                         !function=to_C
++%imm6           6:2 0:4
++
++@op_rd_imm6     .... .... .. .. ....        &rd_imm     rd=%rd_c imm=%imm6
++ADIW            1001 0110 .. .. ....        @op_rd_imm6
++SBIW            1001 0111 .. .. ....        @op_rd_imm6
++
++
++%rd_a           4:4                         !function=to_A
++%rr_a           0:4                         !function=to_A
++%rd_d           4:4                         !function=to_D
++%rr_d           0:4                         !function=to_D
++%imm8           8:4 0:4
++
++@op_rd_imm8     .... .... .... ....         &rd_imm     rd=%rd_a imm=%imm8
++ANDI            0111 .... .... ....         @op_rd_imm8
++CPI             0011 .... .... ....         @op_rd_imm8
++LDI             1110 .... .... ....         @op_rd_imm8
++ORI             0110 .... .... ....         @op_rd_imm8
++SBCI            0100 .... .... ....         @op_rd_imm8
++SUBI            0101 .... .... ....         @op_rd_imm8
++
++
++@op_rd          .... ... rd:5 ....
++ASR             1001 010 ..... 0101         @op_rd
++COM             1001 010 ..... 0000         @op_rd
++DEC             1001 010 ..... 1010         @op_rd
++ELPM2           1001 000 ..... 0110         @op_rd
++ELPMX           1001 000 ..... 0111         @op_rd
++INC             1001 010 ..... 0011         @op_rd
++LDX1            1001 000 ..... 1100         @op_rd
++LDX2            1001 000 ..... 1101         @op_rd
++LDX3            1001 000 ..... 1110         @op_rd
++LDY2            1001 000 ..... 1001         @op_rd
++LDY3            1001 000 ..... 1010         @op_rd
++LDZ2            1001 000 ..... 0001         @op_rd
++LDZ3            1001 000 ..... 0010         @op_rd
++LPM2            1001 000 ..... 0100         @op_rd
++LPMX            1001 000 ..... 0101         @op_rd
++LSR             1001 010 ..... 0110         @op_rd
++NEG             1001 010 ..... 0001         @op_rd
++POP             1001 000 ..... 1111         @op_rd
++PUSH            1001 001 ..... 1111         @op_rd
++ROR             1001 010 ..... 0111         @op_rd
++STY2            1001 001 ..... 1001         @op_rd
++STY3            1001 001 ..... 1010         @op_rd
++STZ2            1001 001 ..... 0001         @op_rd
++STZ3            1001 001 ..... 0010         @op_rd
++SWAP            1001 010 ..... 0010         @op_rd
++
++
++@op_bit         .... .... . bit:3 ....
++BCLR            1001 0100 1 ... 1000        @op_bit
++BSET            1001 0100 0 ... 1000        @op_bit
++
++
++@op_rd_bit      .... ... rd:5 . bit:3
++BLD             1111 100 ..... 0 ...        @op_rd_bit
++BST             1111 101 ..... 0 ...        @op_rd_bit
++
++
++@op_bit_imm     .... .. imm:s7 bit:3
++BRBC            1111 01 ....... ...         @op_bit_imm
++BRBS            1111 00 ....... ...         @op_bit_imm
++
++
++BREAK           1001 0101 1001 1000
++EICALL          1001 0101 0001 1001
++EIJMP           1001 0100 0001 1001
++ELPM1           1001 0101 1101 1000
++ICALL           1001 0101 0000 1001
++IJMP            1001 0100 0000 1001
++LPM1            1001 0101 1100 1000
++NOP             0000 0000 0000 0000
++RET             1001 0101 0000 1000
++RETI            1001 0101 0001 1000
++SLEEP           1001 0101 1000 1000
++SPM             1001 0101 1110 1000
++SPMX            1001 0101 1111 1000
++WDR             1001 0101 1010 1000
++
++
++@op_reg_bit     .... .... reg:5 bit:3
++CBI             1001 1000 ..... ...         @op_reg_bit
++SBI             1001 1010 ..... ...         @op_reg_bit
++SBIC            1001 1001 ..... ...         @op_reg_bit
++SBIS            1001 1011 ..... ...         @op_reg_bit
++
++
++DES             1001 0100 imm:4 1011
++
++
++%rd_b           4:3                         !function=to_B
++%rr_b           0:3                         !function=to_B
++@fmul           .... .... . ... . ...       &rd_rr      rd=%rd_b rr=%rr_b
++FMUL            0000 0011 0 ... 1 ...       @fmul
++FMULS           0000 0011 1 ... 0 ...       @fmul
++FMULSU          0000 0011 1 ... 1 ...       @fmul
++MULSU           0000 0011 0 ... 0 ...       @fmul
++
++
++%io_imm         9:2 0:4
++@io_rd_imm      .... . .. ..... ....        &rd_imm     rd=%rd imm=%io_imm
++IN              1011 0 .. ..... ....        @io_rd_imm
++OUT             1011 1 .. ..... ....        @io_rd_imm
++
++
++XCH             1001 001 rd:5 0100
++LAC             1001 001 rd:5 0110
++LAS             1001 001 rd:5 0101
++LAT             1001 001 rd:5 0111
++STX1            1001 001 rr:5 1100
++STX2            1001 001 rr:5 1101
++STX3            1001 001 rr:5 1110
++
++
++%ldst_d_imm     13:1 10:2 0:3
++@ldst_d         .. . . .. . rd:5  . ...     &rd_imm     imm=%ldst_d_imm
++LDDY            10 . 0 .. 0 ..... 1 ...     @ldst_d
++LDDZ            10 . 0 .. 0 ..... 0 ...     @ldst_d
++STDY            10 . 0 .. 1 ..... 1 ...     @ldst_d
++STDZ            10 . 0 .. 1 ..... 0 ...     @ldst_d
++
++
++MOVW            0000 0001 .... ....         &rd_rr      rd=%rd_d rr=%rr_d
++MULS            0000 0010 .... ....         &rd_rr      rd=%rd_a rr=%rr_a
++
++RCALL           1101 imm:s12
++RJMP            1100 imm:s12
++
++SBRC            1111 110 rr:5 0 bit:3
++SBRS            1111 111 rr:5 0 bit:3
++
++# The 22-bit immediate is partially in the opcode word,
++# and partially in the next.  Use append_16 to build the
++# complete 22-bit value.
++%imm_call       4:5 0:1                     !function=append_16
++CALL            1001 010 ..... 111 .        imm=%imm_call
++JMP             1001 010 ..... 110 .        imm=%imm_call
++
++
++# The 16-bit immediate is completely in the next word.
++# Fields cannot be defined with no bits, so we cannot play
++# the same trick and append to a zero-bit value.
++# Defer reading the immediate until trans_{LDS,STS}.
++@ldst_s         .... ... rd:5 ....          imm=0
++LDS             1001 000 ..... 0000         @ldst_s
++STS             1001 001 ..... 0000         @ldst_s
+-- 
+2.17.2 (Apple Git-113)
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
-with check-tcg this time
-
-Tested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
-> ---
->  include/exec/cpu_ldst_useronly_template.h | 20 +++++--
->  accel/tcg/user-exec.c                     | 66 ++++++++++++++++-------
->  2 files changed, 63 insertions(+), 23 deletions(-)
->
-> diff --git a/include/exec/cpu_ldst_useronly_template.h b/include/exec/cpu=
-_ldst_useronly_template.h
-> index d663826ac2..2378f2958c 100644
-> --- a/include/exec/cpu_ldst_useronly_template.h
-> +++ b/include/exec/cpu_ldst_useronly_template.h
-> @@ -64,12 +64,18 @@
->  static inline RES_TYPE
->  glue(glue(cpu_ld, USUFFIX), MEMSUFFIX)(CPUArchState *env, abi_ptr ptr)
->  {
-> -#if !defined(CODE_ACCESS)
-> +#ifdef CODE_ACCESS
-> +    RES_TYPE ret;
-> +    set_helper_retaddr(1);
-> +    ret =3D glue(glue(ld, USUFFIX), _p)(g2h(ptr));
-> +    clear_helper_retaddr();
-> +    return ret;
-> +#else
->      trace_guest_mem_before_exec(
->          env_cpu(env), ptr,
->          trace_mem_build_info(SHIFT, false, MO_TE, false));
-> -#endif
->      return glue(glue(ld, USUFFIX), _p)(g2h(ptr));
-> +#endif
->  }
->
->  #ifndef CODE_ACCESS
-> @@ -90,12 +96,18 @@ glue(glue(glue(cpu_ld, USUFFIX), MEMSUFFIX), _ra)(CPU=
-ArchState *env,
->  static inline int
->  glue(glue(cpu_lds, SUFFIX), MEMSUFFIX)(CPUArchState *env, abi_ptr ptr)
->  {
-> -#if !defined(CODE_ACCESS)
-> +#ifdef CODE_ACCESS
-> +    int ret;
-> +    set_helper_retaddr(1);
-> +    ret =3D glue(glue(lds, SUFFIX), _p)(g2h(ptr));
-> +    clear_helper_retaddr();
-> +    return ret;
-> +#else
->      trace_guest_mem_before_exec(
->          env_cpu(env), ptr,
->          trace_mem_build_info(SHIFT, true, MO_TE, false));
-> -#endif
->      return glue(glue(lds, SUFFIX), _p)(g2h(ptr));
-> +#endif
->  }
->
->  #ifndef CODE_ACCESS
-> diff --git a/accel/tcg/user-exec.c b/accel/tcg/user-exec.c
-> index 4384b59a4d..897d1571c4 100644
-> --- a/accel/tcg/user-exec.c
-> +++ b/accel/tcg/user-exec.c
-> @@ -64,27 +64,56 @@ static inline int handle_cpu_signal(uintptr_t pc, sig=
-info_t *info,
->      CPUState *cpu =3D current_cpu;
->      CPUClass *cc;
->      unsigned long address =3D (unsigned long)info->si_addr;
-> -    MMUAccessType access_type;
-> +    MMUAccessType access_type =3D is_write ? MMU_DATA_STORE : MMU_DATA_L=
-OAD;
->
-> -    /* We must handle PC addresses from two different sources:
-> -     * a call return address and a signal frame address.
-> -     *
-> -     * Within cpu_restore_state_from_tb we assume the former and adjust
-> -     * the address by -GETPC_ADJ so that the address is within the call
-> -     * insn so that addr does not accidentally match the beginning of the
-> -     * next guest insn.
-> -     *
-> -     * However, when the PC comes from the signal frame, it points to
-> -     * the actual faulting host insn and not a call insn.  Subtracting
-> -     * GETPC_ADJ in that case may accidentally match the previous guest =
-insn.
-> -     *
-> -     * So for the later case, adjust forward to compensate for what
-> -     * will be done later by cpu_restore_state_from_tb.
-> -     */
-> -    if (helper_retaddr) {
-> +    switch (helper_retaddr) {
-> +    default:
-> +        /*
-> +         * Fault during host memory operation within a helper function.
-> +         * The helper's host return address, saved here, gives us a
-> +         * pointer into the generated code that will unwind to the
-> +         * correct guest pc.
-> +         */
->          pc =3D helper_retaddr;
-> -    } else {
-> +        break;
-> +
-> +    case 0:
-> +        /*
-> +         * Fault during host memory operation within generated code.
-> +         * (Or, a unrelated bug within qemu, but we can't tell from here=
-).
-> +         *
-> +         * We take the host pc from the signal frame.  However, we cannot
-> +         * use that value directly.  Within cpu_restore_state_from_tb, we
-> +         * assume PC comes from GETPC(), as used by the helper functions,
-> +         * so we adjust the address by -GETPC_ADJ to form an address that
-> +         * is within the call insn, so that the address does not acciden=
-tially
-> +         * match the beginning of the next guest insn.  However, when the
-> +         * pc comes from the signal frame it points to the actual faulti=
-ng
-> +         * host memory insn and not the return from a call insn.
-> +         *
-> +         * Therefore, adjust to compensate for what will be done later
-> +         * by cpu_restore_state_from_tb.
-> +         */
->          pc +=3D GETPC_ADJ;
-> +        break;
-> +
-> +    case 1:
-> +        /*
-> +         * Fault during host read for translation, or loosely, "executio=
-n".
-> +         *
-> +         * The guest pc is already pointing to the start of the TB for w=
-hich
-> +         * code is being generated.  If the guest translator manages the
-> +         * page crossings correctly, this is exactly the correct address
-> +         * (and if the translator doesn't handle page boundaries correct=
-ly
-> +         * there's little we can do about that here).  Therefore, do not
-> +         * trigger the unwinder.
-> +         *
-> +         * Like tb_gen_code, release the memory lock before cpu_loop_exi=
-t.
-> +         */
-> +        pc =3D 0;
-> +        access_type =3D MMU_INST_FETCH;
-> +        mmap_unlock();
-> +        break;
->      }
->
->      /* For synchronous signals we expect to be coming from the vCPU
-> @@ -155,7 +184,6 @@ static inline int handle_cpu_signal(uintptr_t pc, sig=
-info_t *info,
->      clear_helper_retaddr();
->
->      cc =3D CPU_GET_CLASS(cpu);
-> -    access_type =3D is_write ? MMU_DATA_STORE : MMU_DATA_LOAD;
->      cc->tlb_fill(cpu, address, 0, access_type, MMU_USER_IDX, false, pc);
->      g_assert_not_reached();
->  }
-
-
---
-Alex Benn=C3=A9e
 
