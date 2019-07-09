@@ -2,82 +2,80 @@ Return-Path: <SRS0=huOX=VG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD125C73C42
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 12:13:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3349CC73C42
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 12:19:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7D2A920844
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 12:13:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D2A920844
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 000C320861
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 12:19:52 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="v26oM0jv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 000C320861
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49470 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49506 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hkp0D-0003sO-Io
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jul 2019 08:13:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54424)
+	id 1hkp68-00061Y-6b
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jul 2019 08:19:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56652)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hkowy-0002xJ-Sk
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 08:10:26 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1hkp5e-0005SR-OB
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 08:19:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hkowv-00068z-6L
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 08:10:22 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:38639)
+ (envelope-from <richard.henderson@linaro.org>) id 1hkp5a-0004JN-T2
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 08:19:20 -0400
+Received: from mail-io1-xd44.google.com ([2607:f8b0:4864:20::d44]:47061)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hkowv-000650-0S
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 08:10:21 -0400
-Received: by mail-wr1-f67.google.com with SMTP id g17so10610933wrr.5
- for <qemu-devel@nongnu.org>; Tue, 09 Jul 2019 05:10:16 -0700 (PDT)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1hkp5V-0004Er-GM
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 08:19:15 -0400
+Received: by mail-io1-xd44.google.com with SMTP id i10so42576891iol.13
+ for <qemu-devel@nongnu.org>; Tue, 09 Jul 2019 05:19:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id;
+ bh=OK1MSHEGp42FLTG7BTsbKchHFLEmkUzYclHLe8Hq4YU=;
+ b=v26oM0jvUUWY+r4nVhU9Wex7i99pdYiVryuZ4XqT1omD/ocoX0jCOI17Gu/2qvbcj7
+ 22NkJmtrDQQ8bn7KOXW5Ll0per+cUxOfZEAaSarbzqLqVxgm1E2vxtkB/40uXV/wYCnL
+ nRDWzEuVyZU9kzqV9DCaxsZ9kLuH7zKHaVuRgJKezdtWNe+DFtvmJnpT4laLvuEAZnKx
+ lG86NdrkpOVhKCSjOzfkt581kL1QKL00wt6ZIuUc1O7AxaLNzvnYt/49WDIZVOEOEskb
+ h0d5jqqK9a9nufDSp9MEBOK26gXVPNme8IuQhOoOLYJ5UWYljqBIWGU17sec7pd9RRfG
+ 5DMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=8JQUSvCxgUt0Zcu2VBjbCtR+wnHkSCBgdtHjjyiw7QE=;
- b=uM0E9saNaborbfwfL7tZB4eQqLx6nUaIyqu0JosueFVyYcUtmuBm0BZqFuJwAGPxuK
- XQFgAo86miYD2cxGZA6DfPen+7dj8/J08NfzLJJaNmp+BLQVdLlQU/0bpjYvdUe+sSEv
- DEUKqqMSNgO9uPFAue4eHLp0BdfsN47iTmJdgTmnGrnM8nFeWd6EUjArexmtMd8sY1GZ
- pbmMIpXMQYefq+VXT/vBqAh5BQRkLWBfhsqerHfungvUBvwirHtUDTkhZ/9JPdV3FuGn
- 3YiT0IduIwn7/S70H5hE2NqjywXRm+eziey2sMYzwu3XiMgZOphTc25Iu0OpMJ3fZdQL
- IYcw==
-X-Gm-Message-State: APjAAAWyCXVVhfdDTKGhouNZZlarfoH+lsn9TFC9eFywlxTTbBO6PO6M
- km4lDaXuJUk6uQVACG0WgY7yaw==
-X-Google-Smtp-Source: APXvYqwAsuTJodqZBZF5iza+qgMbNOF4NE7nYJqGUuxZ7d0lhC02c6TkRrbDyq+XnGCxN46TDlvPBA==
-X-Received: by 2002:a05:6000:1203:: with SMTP id
- e3mr23868472wrx.300.1562674215836; 
- Tue, 09 Jul 2019 05:10:15 -0700 (PDT)
-Received: from [192.168.1.38] (62.red-83-42-61.dynamicip.rima-tde.net.
- [83.42.61.62])
- by smtp.gmail.com with ESMTPSA id b8sm3508363wmh.46.2019.07.09.05.10.14
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Tue, 09 Jul 2019 05:10:15 -0700 (PDT)
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20190708104750.1071-1-philmd@redhat.com>
- <20190708104750.1071-2-philmd@redhat.com>
- <CAFEAcA_NnBYWKs89B5apxmXFBUcA5oh3QShRM-1CkWu4Rp6aug@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <86758a18-b117-a2f0-cb62-1977a6507a6c@redhat.com>
-Date: Tue, 9 Jul 2019 14:10:13 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_NnBYWKs89B5apxmXFBUcA5oh3QShRM-1CkWu4Rp6aug@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.221.67
-Subject: Re: [Qemu-devel] [PATCH-for-4.1 v5 1/3] hw/ssi/xilinx_spips:
- Convert lqspi_read() to read_with_attrs
+ h=x-gm-message-state:from:to:cc:subject:date:message-id;
+ bh=OK1MSHEGp42FLTG7BTsbKchHFLEmkUzYclHLe8Hq4YU=;
+ b=VgJ7KCqGfT4RmReLM9696dHLGHujSrNcLyqxPcIuesRV5x72C3mIZZ4i8m6xPwVHci
+ eZry+MwtuBXMNcuODUeFz7+/4tsnmr2tBJsbNVud4LKqeu69ll7NO4YlJtmWAJTuTiwE
+ VGC9saOgy8arI2xwb+unLvy+Sks0olrd0b36b/IFpa0sjAHgiVCSjVNKbFogl945jQRZ
+ AIZFelM8Tdeux1CqOR89FMlVdaK3TBwAE8tF9HNxKXXCwtk2vQw07czDi/Pla9SoU3oU
+ IldhibxA+XlSNyQkB0b2DLmyx6qRJw3p/t6Kyyhlk3lUwBl0EaZ9fNE2nTdturBb7pWF
+ dPfA==
+X-Gm-Message-State: APjAAAU+YCpjcU8JfEoIgRXigZZUJnMgqBPVVeeJ0QKu+OExHVk0cVTQ
+ YMjJSfPSY2mpp6nUDbbgsuZBfyJt11w=
+X-Google-Smtp-Source: APXvYqyllbPftZP7ADZPemXU1xRKXRDG3sibqZHpfi0nnAC9UfLVXhNjlQk74Be7McD6mk8Lv9rihw==
+X-Received: by 2002:a5e:cb43:: with SMTP id h3mr3590987iok.252.1562674749840; 
+ Tue, 09 Jul 2019 05:19:09 -0700 (PDT)
+Received: from localhost.localdomain ([172.56.12.212])
+ by smtp.gmail.com with ESMTPSA id s10sm13592593iod.46.2019.07.09.05.19.06
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Tue, 09 Jul 2019 05:19:09 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Date: Tue,  9 Jul 2019 14:19:00 +0200
+Message-Id: <20190709121900.25644-1-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.17.1
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::d44
+Subject: [Qemu-devel] [PATCH for-4.1] tcg: Fix constant folding of
+ INDEX_op_extract2_i32
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,79 +87,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Francisco Iglesias <frasse.iglesias@gmail.com>,
- Alistair Francis <alistair@alistair23.me>,
- QEMU Developers <qemu-devel@nongnu.org>, qemu-stable <qemu-stable@nongnu.org>,
- Lei Sun <slei.casper@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Prasad J Pandit <ppandit@redhat.com>
+Cc: christophe.lyon@linaro.org, alex.bennee@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/9/19 1:11 PM, Peter Maydell wrote:
-> On Mon, 8 Jul 2019 at 11:48, Philippe Mathieu-Daudé <philmd@redhat.com> wrote:
->>
->> In the next commit we will implement the write_with_attrs()
->> handler. To avoid using different APIs, convert the read()
->> handler first.
->>
->> Reviewed-by: Francisco Iglesias <frasse.iglesias@gmail.com>
->> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
->> ---
->> v4: Do not ignore lqspi_read() return value (Francisco)
->> ---
->>  hw/ssi/xilinx_spips.c | 23 +++++++++++------------
->>  1 file changed, 11 insertions(+), 12 deletions(-)
->>
->> diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
->> index 8115bb6d46..b7c7275dbe 100644
->> --- a/hw/ssi/xilinx_spips.c
->> +++ b/hw/ssi/xilinx_spips.c
->> @@ -1202,27 +1202,26 @@ static void lqspi_load_cache(void *opaque, hwaddr addr)
->>      }
->>  }
->>
->> -static uint64_t
->> -lqspi_read(void *opaque, hwaddr addr, unsigned int size)
->> +static MemTxResult lqspi_read(void *opaque, hwaddr addr, uint64_t *value,
->> +                              unsigned size, MemTxAttrs attrs)
->>  {
->> -    XilinxQSPIPS *q = opaque;
->> -    uint32_t ret;
->> +    XilinxQSPIPS *q = XILINX_QSPIPS(opaque);
->>
->>      if (addr >= q->lqspi_cached_addr &&
->>              addr <= q->lqspi_cached_addr + LQSPI_CACHE_SIZE - 4) {
->>          uint8_t *retp = &q->lqspi_buf[addr - q->lqspi_cached_addr];
->> -        ret = cpu_to_le32(*(uint32_t *)retp);
->> -        DB_PRINT_L(1, "addr: %08x, data: %08x\n", (unsigned)addr,
->> -                   (unsigned)ret);
->> -        return ret;
->> -    } else {
->> -        lqspi_load_cache(opaque, addr);
->> -        return lqspi_read(opaque, addr, size);
->> +        *value = cpu_to_le32(*(uint32_t *)retp);
-> 
-> If you find yourself casting a uint8_t* to uint32_t* in
-> order to pass it to cpu_to_le32(), it's a sign that you
-> should instead be using one of the "load/store value in
-> appropriate endianness" operations. In this case I think
-> you want
->     *value = ldl_le_p(retp);
-> 
-> That looks like it was an issue already present in this code,
-> though, (we do it several times in various places in the source file)
-> so we can fix it later.
+On a 64-bit host, discard any replications of the 32-bit
+sign bit when performing the shift and merge.
 
-Well, other places check GQSPI_CFG.ENDIAN bit for switching endianess,
-here we don't... Dubious code? Per the code DMA accesses seems
-little-endian. However tx_data_bytes() handles endian swaping, while
-rx_data_bytes() doesn't.
+Fixes: https://bugs.launchpad.net/bugs/1834496
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ tcg/optimize.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-It seems wise to postpone this after the current release, indeed.
+diff --git a/tcg/optimize.c b/tcg/optimize.c
+index d7c71a6085..d2424de4af 100644
+--- a/tcg/optimize.c
++++ b/tcg/optimize.c
+@@ -1213,8 +1213,8 @@ void tcg_optimize(TCGContext *s)
+                 if (opc == INDEX_op_extract2_i64) {
+                     tmp = (v1 >> op->args[3]) | (v2 << (64 - op->args[3]));
+                 } else {
+-                    tmp = (v1 >> op->args[3]) | (v2 << (32 - op->args[3]));
+-                    tmp = (int32_t)tmp;
++                    tmp = (int32_t)(((uint32_t)v1 >> op->args[3]) |
++                                    ((uint32_t)v2 << (32 - op->args[3])));
+                 }
+                 tcg_opt_gen_movi(s, op, op->args[0], tmp);
+                 break;
+-- 
+2.17.1
 
-Thanks,
-
-Phil.
 
