@@ -2,83 +2,73 @@ Return-Path: <SRS0=huOX=VG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3349CC73C42
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 12:19:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D07C4C73C42
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 12:21:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 000C320861
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 12:19:52 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="v26oM0jv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 000C320861
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id A03A820861
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 12:21:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A03A820861
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=physik.fu-berlin.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49506 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49520 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hkp68-00061Y-6b
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jul 2019 08:19:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56652)
+	id 1hkp7s-00072e-VR
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jul 2019 08:21:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56966)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1hkp5e-0005SR-OB
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 08:19:23 -0400
+ (envelope-from <bounces@canonical.com>) id 1hkp7O-0006b8-Aj
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 08:21:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1hkp5a-0004JN-T2
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 08:19:20 -0400
-Received: from mail-io1-xd44.google.com ([2607:f8b0:4864:20::d44]:47061)
+ (envelope-from <bounces@canonical.com>) id 1hkp7M-0005NG-87
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 08:21:10 -0400
+Received: from indium.canonical.com ([91.189.90.7]:59004)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1hkp5V-0004Er-GM
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 08:19:15 -0400
-Received: by mail-io1-xd44.google.com with SMTP id i10so42576891iol.13
- for <qemu-devel@nongnu.org>; Tue, 09 Jul 2019 05:19:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id;
- bh=OK1MSHEGp42FLTG7BTsbKchHFLEmkUzYclHLe8Hq4YU=;
- b=v26oM0jvUUWY+r4nVhU9Wex7i99pdYiVryuZ4XqT1omD/ocoX0jCOI17Gu/2qvbcj7
- 22NkJmtrDQQ8bn7KOXW5Ll0per+cUxOfZEAaSarbzqLqVxgm1E2vxtkB/40uXV/wYCnL
- nRDWzEuVyZU9kzqV9DCaxsZ9kLuH7zKHaVuRgJKezdtWNe+DFtvmJnpT4laLvuEAZnKx
- lG86NdrkpOVhKCSjOzfkt581kL1QKL00wt6ZIuUc1O7AxaLNzvnYt/49WDIZVOEOEskb
- h0d5jqqK9a9nufDSp9MEBOK26gXVPNme8IuQhOoOLYJ5UWYljqBIWGU17sec7pd9RRfG
- 5DMw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id;
- bh=OK1MSHEGp42FLTG7BTsbKchHFLEmkUzYclHLe8Hq4YU=;
- b=VgJ7KCqGfT4RmReLM9696dHLGHujSrNcLyqxPcIuesRV5x72C3mIZZ4i8m6xPwVHci
- eZry+MwtuBXMNcuODUeFz7+/4tsnmr2tBJsbNVud4LKqeu69ll7NO4YlJtmWAJTuTiwE
- VGC9saOgy8arI2xwb+unLvy+Sks0olrd0b36b/IFpa0sjAHgiVCSjVNKbFogl945jQRZ
- AIZFelM8Tdeux1CqOR89FMlVdaK3TBwAE8tF9HNxKXXCwtk2vQw07czDi/Pla9SoU3oU
- IldhibxA+XlSNyQkB0b2DLmyx6qRJw3p/t6Kyyhlk3lUwBl0EaZ9fNE2nTdturBb7pWF
- dPfA==
-X-Gm-Message-State: APjAAAU+YCpjcU8JfEoIgRXigZZUJnMgqBPVVeeJ0QKu+OExHVk0cVTQ
- YMjJSfPSY2mpp6nUDbbgsuZBfyJt11w=
-X-Google-Smtp-Source: APXvYqyllbPftZP7ADZPemXU1xRKXRDG3sibqZHpfi0nnAC9UfLVXhNjlQk74Be7McD6mk8Lv9rihw==
-X-Received: by 2002:a5e:cb43:: with SMTP id h3mr3590987iok.252.1562674749840; 
- Tue, 09 Jul 2019 05:19:09 -0700 (PDT)
-Received: from localhost.localdomain ([172.56.12.212])
- by smtp.gmail.com with ESMTPSA id s10sm13592593iod.46.2019.07.09.05.19.06
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Tue, 09 Jul 2019 05:19:09 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1hkp7K-0005L3-7e
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 08:21:07 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1hkp79-0001En-D8
+ for <qemu-devel@nongnu.org>; Tue, 09 Jul 2019 12:20:55 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 6195B2E80CC
+ for <qemu-devel@nongnu.org>; Tue,  9 Jul 2019 12:20:55 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 09 Jul 2019 12:12:08 -0000
+From: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
 To: qemu-devel@nongnu.org
-Date: Tue,  9 Jul 2019 14:19:00 +0200
-Message-Id: <20190709121900.25644-1-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.17.1
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::d44
-Subject: [Qemu-devel] [PATCH for-4.1] tcg: Fix constant folding of
- INDEX_op_extract2_i32
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: glaubitz laurent-vivier pmaydell
+X-Launchpad-Bug-Reporter: John Paul Adrian Glaubitz (glaubitz)
+X-Launchpad-Bug-Modifier: John Paul Adrian Glaubitz (glaubitz)
+References: <156262578461.2222.11301272429426949561.malonedeb@wampee.canonical.com>
+ <156267329906.2764.88840211247289671.malone@wampee.canonical.com>
+Message-Id: <06bf8be7-c97e-9a42-06c4-82f303dc1a76@physik.fu-berlin.de>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="19007";
+ Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: d231adbc072c45a5f8d5503b9edfecbf938cc834
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
+Subject: Re: [Qemu-devel] [Bug 1835839] Re: qemu-user: $0 incorrectly always
+ reports absolute path
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -87,36 +77,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: christophe.lyon@linaro.org, alex.bennee@linaro.org
+Reply-To: Bug 1835839 <1835839@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On a 64-bit host, discard any replications of the 32-bit
-sign bit when performing the shift and merge.
+On 7/9/19 1:54 PM, Laurent Vivier wrote:
+> ** Patch added: "Enable binfmt-misc preserve-arg[0] flag"
+>    https://bugs.launchpad.net/qemu/+bug/1835839/+attachment/5275869/+file=
+s/0001-linux-user-manage-binfmt-misc-preserve-arg-0-flags.patch
 
-Fixes: https://bugs.launchpad.net/bugs/1834496
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- tcg/optimize.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Thanks! I just tried the patch and ran the setup script with:
 
-diff --git a/tcg/optimize.c b/tcg/optimize.c
-index d7c71a6085..d2424de4af 100644
---- a/tcg/optimize.c
-+++ b/tcg/optimize.c
-@@ -1213,8 +1213,8 @@ void tcg_optimize(TCGContext *s)
-                 if (opc == INDEX_op_extract2_i64) {
-                     tmp = (v1 >> op->args[3]) | (v2 << (64 - op->args[3]));
-                 } else {
--                    tmp = (v1 >> op->args[3]) | (v2 << (32 - op->args[3]));
--                    tmp = (int32_t)tmp;
-+                    tmp = (int32_t)(((uint32_t)v1 >> op->args[3]) |
-+                                    ((uint32_t)v2 << (32 - op->args[3])));
-                 }
-                 tcg_opt_gen_movi(s, op, op->args[0], tmp);
-                 break;
--- 
-2.17.1
+./scripts/qemu-binfmt-conf.sh --debian --qemu-path=3D/usr/bin --qemu-
+suffix=3D-static --preserve-arg0 yes
 
+and:
+
+root@nofan:~/qemu> systemctl restart binfmt-support.service =
+
+root@nofan:~/qemu>
+
+But still don't get the correct path:
+
+(sid-m68k-sbuild)root@nofan:/# sh -c 'echo $0'
+/bin/sh
+(sid-m68k-sbuild)root@nofan:/#
+
+Do I need to do anything else?
+
+-- =
+
+ .''`.  John Paul Adrian Glaubitz
+: :' :  Debian Developer - glaubitz@debian.org
+`. `'   Freie Universitaet Berlin - glaubitz@physik.fu-berlin.de
+  `-    GPG: 62FF 8A75 84E0 2956 9546  0006 7426 3B37 F5B5 F913
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1835839
+
+Title:
+  qemu-user: $0 incorrectly always reports absolute path
+
+Status in QEMU:
+  New
+
+Bug description:
+  We just ran into an issue with the Perl package on Debian/m68k when
+  being built with qemu-user [1].
+
+  The problem can be boiled down to qemu-user always reporting absolute
+  paths for the shell variable $0 no matter on how the command was
+  invoked.
+
+  A simple reproducer is this:
+
+  On normal system (no emulation):
+
+  root@nofan:~> sh -c 'echo $0'
+  sh
+  root@nofan:~>
+
+  On qemu-user:
+
+  (sid-m68k-sbuild)root@nofan:/# sh -c 'echo $0'
+  /bin/sh
+  (sid-m68k-sbuild)root@nofan:/#
+
+  > [1] https://lists.debian.org/debian-68k/2019/07/msg00007.html
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1835839/+subscriptions
 
