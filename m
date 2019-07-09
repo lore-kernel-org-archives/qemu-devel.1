@@ -2,62 +2,120 @@ Return-Path: <SRS0=huOX=VG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A0C7C73C46
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 15:27:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE036C73C53
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 15:29:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EA76121537
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 15:27:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA76121537
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 962B720656
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 15:29:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 962B720656
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51064 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51090 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hks1w-0000bz-7V
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jul 2019 11:27:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43594)
+	id 1hks3f-00033c-5V
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jul 2019 11:29:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44472)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hkrwZ-0002rS-Po
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 11:22:13 -0400
+ (envelope-from <laurent@vivier.eu>) id 1hks09-0006S4-1i
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 11:25:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hkrwV-0007km-Ql
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 11:22:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41928)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>)
- id 1hkrwR-0007iM-Rq; Tue, 09 Jul 2019 11:22:04 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id B4402C0733C9;
- Tue,  9 Jul 2019 15:21:59 +0000 (UTC)
-Received: from x1w.redhat.com (ovpn-204-166.brq.redhat.com [10.40.204.166])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id AE26A8491B;
- Tue,  9 Jul 2019 15:21:55 +0000 (UTC)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>,
-	qemu-devel@nongnu.org
-Date: Tue,  9 Jul 2019 17:21:45 +0200
-Message-Id: <20190709152145.21308-2-philmd@redhat.com>
-In-Reply-To: <20190709152145.21308-1-philmd@redhat.com>
-References: <20190709152145.21308-1-philmd@redhat.com>
+ (envelope-from <laurent@vivier.eu>) id 1hks08-0000sq-0Z
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 11:25:52 -0400
+Received: from mout.kundenserver.de ([217.72.192.75]:47211)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hks07-0000rd-Nm
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 11:25:51 -0400
+Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
+ (mreue107 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1Mq2Wi-1iG1wP2rGE-00n98V; Tue, 09 Jul 2019 17:25:47 +0200
+To: Bug 1835839 <1835839@bugs.launchpad.net>, qemu-devel@nongnu.org
+References: <156262578461.2222.11301272429426949561.malonedeb@wampee.canonical.com>
+ <156267329906.2764.88840211247289671.malone@wampee.canonical.com>
+ <06bf8be7-c97e-9a42-06c4-82f303dc1a76@physik.fu-berlin.de>
+ <3e3ac1b4-dd46-988a-9801-cd1353e81714@vivier.eu>
+ <b88a6279-8e7a-32b6-4fc1-98be496aaaf0@physik.fu-berlin.de>
+ <30e7b9fe-a99d-a83c-e4b6-7021a076332d@vivier.eu>
+ <0211fabd-65fe-f6b0-00b9-1f0969e4bc1c@physik.fu-berlin.de>
+From: Laurent Vivier <laurent@vivier.eu>
+Openpgp: preference=signencrypt
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <4b359373-608c-d4a4-c9ac-e2a3af840b21@vivier.eu>
+Date: Tue, 9 Jul 2019 17:25:46 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Tue, 09 Jul 2019 15:22:01 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <0211fabd-65fe-f6b0-00b9-1f0969e4bc1c@physik.fu-berlin.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:XCNSPOM1g9k9M+kfpbemTFHTX89HqvwzHov+AVjqLMDgxyxuxKX
+ iY/fdjOdIo8HvQHmi3ALAh9u09gtwmQvedu2L2P+DhXOjleNSnJ1ppomP0ussBNUS89niyK
+ A3EZYRl/xY2WlHi3GAHfPldurw539DMoeyqOAi7bgyE2uUw8LH3brvjC9NmD64NvyLtzZNT
+ ti0Uapmn/y5/N5UJqm5XQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:+ACP/YPQi28=:8YaM7Mwf60rr+QzAF/ggAl
+ AcSso0gG9U46H9W2olCQNAp0kK/pXQa+wIazaXkenLWB/ZpRIzZdY6nPu4gR0Qt6XXg+kjPa+
+ jDBWipCNgR53TDLfsaiDB724Vyu5qzeTBIlH6nb+cbz7T0SzJ9PAX9a2Y4SXreM0qEE2BNpJU
+ hry6pHk8TDEHODlc+q9HrDvzL+qKM8Hd7iOilxGYg/IFnAZAsJfWE0a5O9XZ5oQF9UU3yonIM
+ +SoyU3/FeKFo759dBX6PNLIZlGXpogcV3wSHElaQ70WGygTHl2fXuRK56Wei+0VwjV35znTpt
+ NY6jNMr/pWG3Oie03rBQLph7oKhKAmbwIsXQUJkZM38jnWIzvLFJs8XxHqgkVpMVSgB/32pOv
+ fKtY8DgvGTnwLRcLiPvosyJhviWtviW193jCHexHJUlU1FEP1TvEdToSVVIfz2Fpvn/0HkjQX
+ u7+vyxyfk1ng9b8SgW2LjN1W1VvyGgJyB7cLVgPSQBsfa8+Okgsv87LRS6KT3cMsGBfuSkIBt
+ D5LShg4QgNcWRyvaiUVb6br38s8BTh8pVZRb1bWf4T+qG0brdC/hwzwnMgd3uyAdJLODMrtFB
+ WAKTFoPuw34exQs0W4wm03RHi+yZsGfmXVsxhrHANXHehDboXNFSAy7kMNl4fBn7faM/GYaQ/
+ VFLxp9Q2q8CuMnufU5k5lHJUrGErQwOVVnl+RzXFkNbbiPa+Y3xST6SbCsmVKRp5Iq9AweR74
+ G1TK0b1oVkZy4TTZtyRdx7ixnbuYFank2WBemlGvl0G2H1R7gqMmxnghans=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 1/1] Revert "hw/block/pflash_cfi02: Reduce I/O
- accesses to 16-bit"
+X-Received-From: 217.72.192.75
+Subject: Re: [Qemu-devel] [Bug 1835839] Re: qemu-user: $0 incorrectly always
+ reports absolute path
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,95 +127,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Stephen Checkoway <stephen.checkoway@oberlin.edu>, qemu-block@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This reverts commit 3ae0343db69c379beb5750b4ed70794bbed51b85.
+Le 09/07/2019 à 17:09, John Paul Adrian Glaubitz a écrit :
+> On 7/9/19 4:01 PM, Laurent Vivier wrote:
+>> What is the content of:
+>>
+>> /etc/binfmt.d/qemu-m68k.conf
+>> /proc/sys/fs/binfmt_misc/qemu-m68k
+> 
+> root@nofan:~> cat /etc/binfmt.d/qemu-m68k.conf
+> :qemu-m68k:M::\x7fELF\x01\x02\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x04:\xff\xff\xff\xff\xff\xff\xfe\x00\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff:/usr/bin/qemu-m68k-static:P
+> root@nofan:~> cat /proc/sys/fs/binfmt_misc/qemu-m68k
+> enabled
+> interpreter /usr/bin/qemu-m68k-static
+> flags: OCF
+> offset 0
+> magic 7f454c4601020100000000000000000000020004
+> mask ffffffffffffff00fffffffffffffffffffeffff
 
-Stephen Checkoway noticed commit 3ae0343db69 is incorrect.
-This commit state all parallel flashes are limited to 16-bit
-accesses, however the x32 configuration exists in some models,
-such the Cypress S29CL032J, which CFI Device Geometry Definition
-announces:
+This is not consistent: you have 'P' in /etc/binfmt.d/qemu-m68k.conf but
+'OCF' in /proc/sys/fs/binfmt_misc/qemu-m68k.
 
-  CFI ADDR     DATA
-  0x28,0x29 =3D 0x0003 (x32-only asynchronous interface)
+Check "systemctl status binfmt-support.service"
 
-Guests should not be affected by the previous change, because
-QEMU does not announce itself as x32 capable:
+With 'P' when you change the binary you must reload the configuration
+because the binary is loaded in memory once when the configuration is
+updated.
 
-    /* Flash device interface (8 & 16 bits) */
-    pfl->cfi_table[0x28] =3D 0x02;
-    pfl->cfi_table[0x29] =3D 0x00;
-
-Commit 3ae0343db69 does not restrict the bus to 16-bit accesses,
-but restrict the implementation as 16-bit access max, so a guest
-32-bit access will result in 2x 16-bit calls.
-
-Now, we have 2 boards that register the flash device in 32-bit
-access:
-
-- PPC: taihu_405ep
-
-  The CFI id matches the S29AL008J that is a 1MB in x16, while
-  the code QEMU forces it to be 2MB, and checking Linux it expects
-  a 4MB flash.
-
-- ARM: Digic4
-
-  While the comment says "Samsung K8P3215UQB 64M Bit (4Mx16)",
-  this flash is 32Mb (2MB). Also note the CFI id does not match
-  the comment.
-
-To avoid unexpected side effect, we revert commit 3ae0343db69,
-and will clean the board code later.
-
-Reported-by: Stephen Checkoway <stephen.checkoway@oberlin.edu>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- hw/block/pflash_cfi02.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
-
-diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
-index 5392290c72..83084b9d72 100644
---- a/hw/block/pflash_cfi02.c
-+++ b/hw/block/pflash_cfi02.c
-@@ -317,6 +317,8 @@ static uint64_t pflash_read(void *opaque, hwaddr offs=
-et, unsigned int width)
-     boff =3D offset & 0xFF;
-     if (pfl->width =3D=3D 2) {
-         boff =3D boff >> 1;
-+    } else if (pfl->width =3D=3D 4) {
-+        boff =3D boff >> 2;
-     }
-     switch (pfl->cmd) {
-     default:
-@@ -447,6 +449,8 @@ static void pflash_write(void *opaque, hwaddr offset,=
- uint64_t value,
-     boff =3D offset;
-     if (pfl->width =3D=3D 2) {
-         boff =3D boff >> 1;
-+    } else if (pfl->width =3D=3D 4) {
-+        boff =3D boff >> 2;
-     }
-     /* Only the least-significant 11 bits are used in most cases. */
-     boff &=3D 0x7FF;
-@@ -706,7 +710,6 @@ static void pflash_write(void *opaque, hwaddr offset,=
- uint64_t value,
- static const MemoryRegionOps pflash_cfi02_ops =3D {
-     .read =3D pflash_read,
-     .write =3D pflash_write,
--    .impl.max_access_size =3D 2,
-     .valid.min_access_size =3D 1,
-     .valid.max_access_size =3D 4,
-     .endianness =3D DEVICE_NATIVE_ENDIAN,
---=20
-2.20.1
+Thanks,
+Laurent
 
 
