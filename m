@@ -2,86 +2,87 @@ Return-Path: <SRS0=huOX=VG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF39FC73C46
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 17:25:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5154C73C46
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 17:25:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 79CE6214AF
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 17:25:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9297F214AF
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 17:25:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="RNGncph7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 79CE6214AF
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="ljaH5H6f"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9297F214AF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52304 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52312 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hktrQ-0006qZ-Ez
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jul 2019 13:25:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56322)
+	id 1hktsM-0007Wr-TW
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jul 2019 13:25:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55928)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <maran.wilson@oracle.com>) id 1hktof-00058d-Cx
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 13:22:13 -0400
+ (envelope-from <maran.wilson@oracle.com>) id 1hkto6-0004tW-ER
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 13:21:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <maran.wilson@oracle.com>) id 1hktod-0001Zj-Bf
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 13:22:09 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:48458)
+ (envelope-from <maran.wilson@oracle.com>) id 1hkto3-00017I-04
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 13:21:33 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:44544)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <maran.wilson@oracle.com>)
- id 1hktoc-0001On-W1
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 13:22:07 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
- by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x69HIvev193944;
- Tue, 9 Jul 2019 17:21:48 GMT
+ id 1hkto2-0000nf-BG
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 13:21:30 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+ by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x69HJV5i106130;
+ Tue, 9 Jul 2019 17:21:19 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
  h=subject : to : cc :
  references : from : message-id : date : mime-version : in-reply-to :
  content-type : content-transfer-encoding; s=corp-2018-07-02;
- bh=XYj+GDRKK5JQOb0CJXIRlb2h76QXpcgtreKbx1Eu/s0=;
- b=RNGncph72i8TFUaChCyiRZlG2emlSbYe79UojdhL2SlCMcic2pvyZjhgVxMnnAxE2rYo
- UnKQ9uE2si15Tledq2TiJbqT1BNVxOCf6PiLRrLHa4fzykcQAR0a2cpFwa9WCiiHZA3Y
- Kw4ZJEnX+/j7EmgRHC9XL8g/K/VQqlTKZNQwhdaRc1VYWa1zFrxJ8VWPVR8VNPpFip2Q
- 36ihqX2wvvHyZVyf3xxjHKF2PkTQMzGLC9fxmkZxEIgqqAV5e2Fp18Ac0liZGpfFjAl9
- yfpL0sO1TyPDUyt1qX1/5YDITdXWgR4DOp/mlwPYRGRtA3J2iNbUiSJV/3TXqi/BgUlE sg== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
- by aserp2120.oracle.com with ESMTP id 2tjkkpnp28-1
+ bh=QG7Cn5ilNtKmYY+Sw+y1cHv7M7dmnZ2eB20dwustp3g=;
+ b=ljaH5H6fiMn7s3EW14oRNzJt+sQvH1CGyyuqeC2jVUtu642GMfoyP14W2zxOvKfo5uET
+ q0L8n6kWqmgxAIod5xUtvdbikueSos6F1NX98qyGAv273S4K8R9OhjnFvMzvT4Ey9YIX
+ Xb4DFJnidqItMQnxawLQW8w5eYHQmvwtFmDPxYZyKlxYklyICa1Sr3cBilvl0miCWOFK
+ L6EaxvWdrtMjKxQAO4PGu5JnYfcT3YxUNwWkmcwPfdSNcZTlMBo17sx+k76fa4Duu+fl
+ VPFeaOjBNVVXEKkkJQsa22+lX4aR0khUac4BlFrDvnFiJPUMWWCwvc9Usr4bKwNvujto qQ== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+ by userp2120.oracle.com with ESMTP id 2tjm9qnn6e-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 09 Jul 2019 17:21:48 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
- by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x69HI19E086078;
- Tue, 9 Jul 2019 17:21:47 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
- by aserp3030.oracle.com with ESMTP id 2tmwgx1wde-1
+ Tue, 09 Jul 2019 17:21:19 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+ by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x69HI2lo028495;
+ Tue, 9 Jul 2019 17:21:19 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+ by userp3020.oracle.com with ESMTP id 2tjjykx7by-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 09 Jul 2019 17:21:47 +0000
-Received: from abhmp0020.oracle.com (abhmp0020.oracle.com [141.146.116.26])
- by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x69HLkmf013815;
- Tue, 9 Jul 2019 17:21:46 GMT
+ Tue, 09 Jul 2019 17:21:19 +0000
+Received: from abhmp0022.oracle.com (abhmp0022.oracle.com [141.146.116.28])
+ by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x69HLHwi020202;
+ Tue, 9 Jul 2019 17:21:18 GMT
 Received: from [10.159.233.89] (/10.159.233.89)
  by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Tue, 09 Jul 2019 10:21:46 -0700
+ with ESMTP ; Tue, 09 Jul 2019 10:21:17 -0700
 To: Liran Alon <liran.alon@oracle.com>, qemu-devel@nongnu.org
 References: <20190705210636.3095-1-liran.alon@oracle.com>
- <20190705210636.3095-5-liran.alon@oracle.com>
+ <20190705210636.3095-2-liran.alon@oracle.com>
 From: Maran Wilson <maran.wilson@oracle.com>
 Organization: Oracle Corporation
-Message-ID: <b5a8e30b-e5eb-9bd7-5ad7-8eba56da051f@oracle.com>
-Date: Tue, 9 Jul 2019 10:21:43 -0700
+Message-ID: <7958e451-b39a-76ae-1b57-dc92572e7b5d@oracle.com>
+Date: Tue, 9 Jul 2019 10:21:15 -0700
 User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <20190705210636.3095-5-liran.alon@oracle.com>
+In-Reply-To: <20190705210636.3095-2-liran.alon@oracle.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Content-Language: en-US
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9313
  signatures=668688
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=2
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
  malwarescore=0
  phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
  adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
@@ -90,17 +91,14 @@ X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9313
  signatures=668688
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
  priorityscore=1501 malwarescore=0
- suspectscore=2 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
  lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
  definitions=main-1907090204
-Content-Transfer-Encoding: quoted-printable
-X-MIME-Autoconverted: from 8bit to quoted-printable by aserp2120.oracle.com id
- x69HIvev193944
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 141.146.126.78
-Subject: Re: [Qemu-devel] [PATCH 4/4] target/i386: kvm: Demand nested
- migration kernel capabilities only when vCPU may have enabled VMX
+X-Received-From: 156.151.31.85
+Subject: Re: [Qemu-devel] [PATCH 1/4] target/i386: kvm: Init nested-state
+ for VMX when vCPU expose VMX
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -118,273 +116,29 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Just a bunch of grammar and style nits below. As for the actual code=20
-changes:
-
-Reviewed-by: Maran Wilson <maran.wilson@oracle.com>
-Tested-by: Maran Wilson <maran.wilson@oracle.com>
-
-Thanks,
--Maran
-
 On 7/5/2019 2:06 PM, Liran Alon wrote:
-> Previous to this change, a vCPU exposed with VMX running on a kernel wi=
-thout KVM_CAP_NESTED_STATE
-> or KVM_CAP_EXCEPTION_PAYLOAD resulted in adding a migration blocker. Th=
-is was because when code
-
-s/code/the code/
-
-Also, note that you have commit message lines that are much longer than=20
-76 chars here.
-
-> was written it was thought there is no way to reliabely know if a vCPU =
-is utilising VMX or not
-> at runtime. However, it turns out that this can be known to some extent=
-:
->
-> In order for a vCPU to enter VMX operation it must have CR4.VMXE set.
-> Since it was set, CR4.VMXE must remain set as long as vCPU is in
-
-s/vCPU/the vCPU/
-
-> VMX operation. This is because CR4.VMXE is one of the bits set
-> in MSR_IA32_VMX_CR4_FIXED1.
-> There is one exception to above statement when vCPU enters SMM mode.
-
-s/above/the above/
-
-> When a vCPU enters SMM mode, it temporarily exit VMX operation and
-
-s/exit/exits/
-
-> may also reset CR4.VMXE during execution in SMM mode.
-> When vCPU exits SMM mode, vCPU state is restored to be in VMX operation
-
-s/vCPU exits SMM mode, vCPU/the vCPU exits SMM mode, its/
-
-> and CR4.VMXE is restored to it's original value of being set.
-
-s/it's/its/
-
-> Therefore, when vCPU is not in SMM mode, we can infer whether
-
-s/vCPU/the vCPU/
-
-> VMX is being used by examining CR4.VMXE. Otherwise, we cannot
-> know for certain but assume the worse that vCPU may utilise VMX.
->
-> Summaring all the above, a vCPU may have enabled VMX in case
-> CR4.VMXE is set or vCPU is in SMM mode.
->
-> Therefore, remove migration blocker and check before migration (cpu_pre=
-_save())
-> if vCPU may have enabled VMX. If true, only then require relevant kerne=
-l capabilities.
->
-> While at it, demand KVM_CAP_EXCEPTION_PAYLOAD only when vCPU is in gues=
-t-mode and
-
-s/vCPU/the vCPU/
-
-> there is a pending/injected exception. Otherwise, this kernel capabilit=
-y is
-> not required for proper migration.
->
 > Reviewed-by: Joao Martins <joao.m.martins@oracle.com>
 > Signed-off-by: Liran Alon <liran.alon@oracle.com>
 > ---
->   target/i386/cpu.h      | 22 ++++++++++++++++++++++
->   target/i386/kvm.c      | 26 ++++++--------------------
->   target/i386/kvm_i386.h |  1 +
->   target/i386/machine.c  | 24 ++++++++++++++++++++----
->   4 files changed, 49 insertions(+), 24 deletions(-)
+>   target/i386/kvm.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
 >
-> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> index cdb0e43676a9..c752c4d936ee 100644
-> --- a/target/i386/cpu.h
-> +++ b/target/i386/cpu.h
-> @@ -1872,6 +1872,28 @@ static inline bool cpu_has_svm(CPUX86State *env)
->       return env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_SVM;
->   }
->  =20
-> +/*
-> + * In order for a vCPU to enter VMX operation it must have CR4.VMXE se=
-t.
-> + * Since it was set, CR4.VMXE must remain set as long as vCPU is in
-
-s/vCPU/the vCPU/
-
-> + * VMX operation. This is because CR4.VMXE is one of the bits set
-> + * in MSR_IA32_VMX_CR4_FIXED1.
-> + *
-> + * There is one exception to above statement when vCPU enters SMM mode.
-> + * When a vCPU enters SMM mode, it temporarily exit VMX operation and
-
-instead of:
- =C2=A0=C2=A0 statement when vCPU enters SMM mode. When a vCPU enters SMM=
- mode, it=20
-temporarily exit
-use:
- =C2=A0=C2=A0 statement: When a vCPU enters SMM mode, it temporarily exit=
-s
-
-> + * may also reset CR4.VMXE during execution in SMM mode.
-> + * When vCPU exits SMM mode, vCPU state is restored to be in VMX opera=
-tion
-
-s/vCPU exits SMM mode, vCPU/the vCPU exits SMM mode, its/
-
-
-> + * and CR4.VMXE is restored to it's original value of being set.
-
-s/it's/its/
-
-> + *
-> + * Therefore, when vCPU is not in SMM mode, we can infer whether
-
-s/vCPU/the vCPU/
-
-> + * VMX is being used by examining CR4.VMXE. Otherwise, we cannot
-> + * know for certain.
-> + */
-> +static inline bool cpu_vmx_maybe_enabled(CPUX86State *env)
-> +{
-> +    return cpu_has_vmx(env) &&
-> +           ((env->cr[4] & CR4_VMXE_MASK) || (env->hflags & HF_SMM_MASK=
-));
-> +}
-> +
->   /* fpu_helper.c */
->   void update_fp_status(CPUX86State *env);
->   void update_mxcsr_status(CPUX86State *env);
 > diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-> index 4e2c8652168f..d3af445eeb5d 100644
+> index e4b4f5756a34..b57f873ec9e8 100644
 > --- a/target/i386/kvm.c
 > +++ b/target/i386/kvm.c
-> @@ -128,6 +128,11 @@ bool kvm_has_adjust_clock_stable(void)
->       return (ret =3D=3D KVM_CLOCK_TSC_STABLE);
->   }
->  =20
-> +bool kvm_has_exception_payload(void)
-> +{
-> +    return has_exception_payload;
-> +}
-> +
->   bool kvm_allows_irq0_override(void)
->   {
->       return !kvm_irqchip_in_kernel() || kvm_has_gsi_routing();
-> @@ -1341,7 +1346,6 @@ static int hyperv_init_vcpu(X86CPU *cpu)
->   }
->  =20
->   static Error *invtsc_mig_blocker;
-> -static Error *nested_virt_mig_blocker;
->  =20
->   #define KVM_MAX_CPUID_ENTRIES  100
->  =20
-> @@ -1640,22 +1644,6 @@ int kvm_arch_init_vcpu(CPUState *cs)
->                                     !!(c->ecx & CPUID_EXT_SMX);
->       }
->  =20
-> -    if (cpu_has_vmx(env) && !nested_virt_mig_blocker &&
-> -        ((kvm_max_nested_state_length() <=3D 0) || !has_exception_payl=
-oad)) {
-> -        error_setg(&nested_virt_mig_blocker,
-> -                   "Kernel do not provide required capabilities for "
-> -                   "nested virtualization migration. "
-> -                   "(CAP_NESTED_STATE=3D%d, CAP_EXCEPTION_PAYLOAD=3D%d=
-)",
-> -                   kvm_max_nested_state_length() > 0,
-> -                   has_exception_payload);
-> -        r =3D migrate_add_blocker(nested_virt_mig_blocker, &local_err)=
-;
-> -        if (local_err) {
-> -            error_report_err(local_err);
-> -            error_free(nested_virt_mig_blocker);
-> -            return r;
-> -        }
-> -    }
-> -
->       if (env->mcg_cap & MCG_LMCE_P) {
->           has_msr_mcg_ext_ctl =3D has_msr_feature_control =3D true;
->       }
-> @@ -1670,7 +1658,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
->               if (local_err) {
->                   error_report_err(local_err);
->                   error_free(invtsc_mig_blocker);
-> -                goto fail2;
-> +                return r;
->               }
->           }
->       }
-> @@ -1741,8 +1729,6 @@ int kvm_arch_init_vcpu(CPUState *cs)
->  =20
->    fail:
->       migrate_del_blocker(invtsc_mig_blocker);
-> - fail2:
-> -    migrate_del_blocker(nested_virt_mig_blocker);
->  =20
->       return r;
->   }
-> diff --git a/target/i386/kvm_i386.h b/target/i386/kvm_i386.h
-> index 3057ba4f7d19..06fe06bdb3d6 100644
-> --- a/target/i386/kvm_i386.h
-> +++ b/target/i386/kvm_i386.h
-> @@ -35,6 +35,7 @@
->   bool kvm_allows_irq0_override(void);
->   bool kvm_has_smm(void);
->   bool kvm_has_adjust_clock_stable(void);
-> +bool kvm_has_exception_payload(void);
->   void kvm_synchronize_all_tsc(void);
->   void kvm_arch_reset_vcpu(X86CPU *cs);
->   void kvm_arch_do_init_vcpu(X86CPU *cs);
-> diff --git a/target/i386/machine.c b/target/i386/machine.c
-> index 20bda9f80154..c04021937722 100644
-> --- a/target/i386/machine.c
-> +++ b/target/i386/machine.c
-> @@ -7,6 +7,7 @@
->   #include "hw/isa/isa.h"
->   #include "migration/cpu.h"
->   #include "hyperv.h"
-> +#include "kvm_i386.h"
->  =20
->   #include "sysemu/kvm.h"
->   #include "sysemu/tcg.h"
-> @@ -232,10 +233,25 @@ static int cpu_pre_save(void *opaque)
->       }
->  =20
->   #ifdef CONFIG_KVM
-> -    /* Verify we have nested virtualization state from kernel if requi=
-red */
-> -    if (kvm_enabled() && cpu_has_vmx(env) && !env->nested_state) {
-> -        error_report("Guest enabled nested virtualization but kernel "
-> -                "does not support saving of nested state");
-> +    /*
-> +     * In case vCPU may have enabled VMX, we need to make sure kernel =
-have
-> +     * required capabilities in order to perform migration correctly:
-> +     *
-> +     * 1) We must be able to extract vCPU nested-state from KVM.
-> +     *
-> +     * 2) In case vCPU is running in guest-mode and it has a pending e=
-xception,
-> +     * we must be able to determine if it's in a pending or injected s=
-tate.
-> +     * Note that in case KVM don't have required capability to do so,
-> +     * a pending/injected exception will always appear as an
-> +     * injected exception.
-> +     */
-> +    if (kvm_enabled() && cpu_vmx_maybe_enabled(env) &&
-> +        (!env->nested_state ||
-> +         (!kvm_has_exception_payload() && (env->hflags & HF_GUEST_MASK=
-) &&
-> +          env->exception_injected))) {
-> +        error_report("Guest maybe enabled nested virtualization but ke=
-rnel "
-> +                "does not support required capabilities to save vCPU "
-> +                "nested state");
->           return -EINVAL;
->       }
->   #endif
+> @@ -1714,7 +1714,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
+>   
+>           env->nested_state->size = max_nested_state_len;
+>   
+> -        if (IS_INTEL_CPU(env)) {
+> +        if (cpu_has_vmx(env)) {
+>               struct kvm_vmx_nested_state_hdr *vmx_hdr =
+>                   &env->nested_state->hdr.vmx;
+>   
 
+Reviewed-by: Maran Wilson <maran.wilson@oracle.com>
+
+Thanks,
+-Maran
 
