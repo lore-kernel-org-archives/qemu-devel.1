@@ -3,60 +3,60 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23539C73C65
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 23:37:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 842A2C73C65
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 23:38:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EC00220693
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 23:37:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC00220693
+	by mail.kernel.org (Postfix) with ESMTPS id 5602A20693
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 23:38:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5602A20693
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56850 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56852 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hkzg5-0005P7-Vi
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jul 2019 19:37:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49028)
+	id 1hkzgZ-0005oX-F2
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jul 2019 19:38:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48779)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jsnow@redhat.com>) id 1hkzVL-0007MX-D7
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 19:26:38 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hkzVG-0007GI-6G
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 19:26:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hkzVH-0003A9-Uh
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 19:26:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:13378)
+ (envelope-from <jsnow@redhat.com>) id 1hkzVD-00033F-RH
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 19:26:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43974)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1hkzV9-0002ug-Mj; Tue, 09 Jul 2019 19:26:25 -0400
+ id 1hkzV9-0002da-B8; Tue, 09 Jul 2019 19:26:23 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id B697E3D95A;
- Tue,  9 Jul 2019 23:26:22 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 13B2E8831C;
+ Tue,  9 Jul 2019 23:26:06 +0000 (UTC)
 Received: from probe.bos.redhat.com (dhcp-17-215.bos.redhat.com [10.18.17.215])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5D6755B80B;
- Tue,  9 Jul 2019 23:26:21 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id AE5465B810;
+ Tue,  9 Jul 2019 23:26:04 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: qemu-block@nongnu.org,
 	qemu-devel@nongnu.org
-Date: Tue,  9 Jul 2019 19:25:46 -0400
-Message-Id: <20190709232550.10724-15-jsnow@redhat.com>
+Date: Tue,  9 Jul 2019 19:25:38 -0400
+Message-Id: <20190709232550.10724-7-jsnow@redhat.com>
 In-Reply-To: <20190709232550.10724-1-jsnow@redhat.com>
 References: <20190709232550.10724-1-jsnow@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.30]); Tue, 09 Jul 2019 23:26:22 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.28]); Tue, 09 Jul 2019 23:26:06 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v4 14/18] iotests: teach run_job to cancel
- pending jobs
+Subject: [Qemu-devel] [PATCH v4 06/18] block/backup: add 'never' policy to
+ bitmap sync mode
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -78,61 +78,58 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-run_job can cancel pending jobs to simulate failure. This lets us use
-the pending callback to issue test commands while the job is open, but
-then still have the job fail in the end.
+This adds a "never" policy for bitmap synchronization. Regardless of if
+the job succeeds or fails, we never update the bitmap. This can be used
+to perform differential backups, or simply to avoid the job modifying a
+bitmap.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- tests/qemu-iotests/iotests.py | 22 ++++++++++++++++++++--
- 1 file changed, 20 insertions(+), 2 deletions(-)
+ block/backup.c       | 7 +++++--
+ qapi/block-core.json | 5 ++++-
+ 2 files changed, 9 insertions(+), 3 deletions(-)
 
-diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.p=
-y
-index fcad957d63..c544659ecb 100644
---- a/tests/qemu-iotests/iotests.py
-+++ b/tests/qemu-iotests/iotests.py
-@@ -541,7 +541,22 @@ class VM(qtest.QEMUQtestMachine):
+diff --git a/block/backup.c b/block/backup.c
+index 996941fa61..efd0dcd2e7 100644
+--- a/block/backup.c
++++ b/block/backup.c
+@@ -265,8 +265,11 @@ static void backup_cleanup_sync_bitmap(BackupBlockJo=
+b *job, int ret)
+     BdrvDirtyBitmap *bm;
+     BlockDriverState *bs =3D blk_bs(job->common.blk);
 =20
-     # Returns None on success, and an error string on failure
-     def run_job(self, job, auto_finalize=3DTrue, auto_dismiss=3DFalse,
--                pre_finalize=3DNone, wait=3D60.0):
-+                pre_finalize=3DNone, cancel=3DFalse, wait=3D60.0):
-+        """
-+        run_job moves a job from creation through to dismissal.
-+
-+        :param job: String. ID of recently-launched job
-+        :param auto_finalize: Bool. True if the job was launched with
-+                              auto_finalize. Defaults to True.
-+        :param auto_dismiss: Bool. True if the job was launched with
-+                             auto_dismiss=3DTrue. Defaults to False.
-+        :param pre_finalize: Callback. A callable that takes no argument=
-s to be
-+                             invoked prior to issuing job-finalize, if a=
-ny.
-+        :param cancel: Bool. When true, cancels the job after the pre_fi=
-nalize
-+                       callback.
-+        :param wait: Float. Timeout value specifying how long to wait fo=
-r any
-+                     event, in seconds. Defaults to 60.0.
-+        """
-         match_device =3D {'data': {'device': job}}
-         match_id =3D {'data': {'id': job}}
-         events =3D [
-@@ -568,7 +583,10 @@ class VM(qtest.QEMUQtestMachine):
-             elif status =3D=3D 'pending' and not auto_finalize:
-                 if pre_finalize:
-                     pre_finalize()
--                self.qmp_log('job-finalize', id=3Djob)
-+                if cancel:
-+                    self.qmp_log('job-cancel', id=3Djob)
-+                else:
-+                    self.qmp_log('job-finalize', id=3Djob)
-             elif status =3D=3D 'concluded' and not auto_dismiss:
-                 self.qmp_log('job-dismiss', id=3Djob)
-             elif status =3D=3D 'null':
+-    if (ret < 0) {
+-        /* Merge the successor back into the parent, delete nothing. */
++    if (ret < 0 || job->bitmap_mode =3D=3D BITMAP_SYNC_MODE_NEVER) {
++        /*
++         * Failure, or we don't want to synchronize the bitmap.
++         * Merge the successor back into the parent, delete nothing.
++         */
+         bm =3D bdrv_reclaim_dirty_bitmap(bs, job->sync_bitmap, NULL);
+         assert(bm);
+     } else {
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 99dcd5f099..b1aaaaa98e 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -1146,10 +1146,13 @@
+ # @on-success: The bitmap is only synced when the operation is successfu=
+l.
+ #              This is the behavior always used for 'INCREMENTAL' backup=
+s.
+ #
++# @never: The bitmap is never synchronized with the operation, and is
++#         treated solely as a read-only manifest of blocks to copy.
++#
+ # Since: 4.2
+ ##
+ { 'enum': 'BitmapSyncMode',
+-  'data': ['on-success'] }
++  'data': ['on-success', 'never'] }
+=20
+ ##
+ # @MirrorCopyMode:
 --=20
 2.21.0
 
