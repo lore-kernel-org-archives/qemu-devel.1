@@ -6,57 +6,57 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F3B8C73C65
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 23:48:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A58C2C73C65
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 23:54:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 06D9620861
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 23:48:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06D9620861
+	by mail.kernel.org (Postfix) with ESMTPS id 24D80206C3
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 23:54:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24D80206C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56890 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56922 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hkzqe-0001lA-19
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jul 2019 19:48:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49118)
+	id 1hkzw2-0005Xt-5P
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jul 2019 19:54:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48775)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jsnow@redhat.com>) id 1hkzVX-0007OZ-Eo
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 19:26:50 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hkzVG-0007GG-5L
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 19:26:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hkzVL-0003IO-CU
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 19:26:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37298)
+ (envelope-from <jsnow@redhat.com>) id 1hkzVD-000330-SK
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 19:26:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33800)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1hkzVD-0002mC-Sh; Tue, 09 Jul 2019 19:26:29 -0400
+ id 1hkzV9-0002ZP-9C; Tue, 09 Jul 2019 19:26:23 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 3632FC05678B;
- Tue,  9 Jul 2019 23:26:15 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 89C9CCAA74;
+ Tue,  9 Jul 2019 23:26:01 +0000 (UTC)
 Received: from probe.bos.redhat.com (dhcp-17-215.bos.redhat.com [10.18.17.215])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 369BE5B0BD;
- Tue,  9 Jul 2019 23:26:09 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 324EA5B0BD;
+ Tue,  9 Jul 2019 23:26:00 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: qemu-block@nongnu.org,
 	qemu-devel@nongnu.org
-Date: Tue,  9 Jul 2019 19:25:41 -0400
-Message-Id: <20190709232550.10724-10-jsnow@redhat.com>
+Date: Tue,  9 Jul 2019 19:25:35 -0400
+Message-Id: <20190709232550.10724-4-jsnow@redhat.com>
 In-Reply-To: <20190709232550.10724-1-jsnow@redhat.com>
 References: <20190709232550.10724-1-jsnow@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.32]); Tue, 09 Jul 2019 23:26:15 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.38]); Tue, 09 Jul 2019 23:26:01 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v4 09/18] block/dirty-bitmap: add
- bdrv_dirty_bitmap_merge_internal
+Subject: [Qemu-devel] [PATCH v4 03/18] blockdev-backup: utilize
+ do_backup_common
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -78,122 +78,105 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I'm surprised it didn't come up sooner, but sometimes we have a +busy
-bitmap as a source. This is dangerous from the QMP API, but if we are
-the owner that marked the bitmap busy, it's safe to merge it using it as
-a read only source.
-
-It is not safe in the general case to allow users to read from in-use
-bitmaps, so create an internal variant that foregoes the safety
-checking.
-
 Signed-off-by: John Snow <jsnow@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- block/dirty-bitmap.c      | 54 +++++++++++++++++++++++++++++++++++----
- include/block/block_int.h |  3 +++
- 2 files changed, 52 insertions(+), 5 deletions(-)
+ blockdev.c | 65 +++++-------------------------------------------------
+ 1 file changed, 6 insertions(+), 59 deletions(-)
 
-diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-index 95a9c2a5d8..7881fea684 100644
---- a/block/dirty-bitmap.c
-+++ b/block/dirty-bitmap.c
-@@ -810,6 +810,12 @@ bool bdrv_dirty_bitmap_next_dirty_area(BdrvDirtyBitm=
-ap *bitmap,
-     return hbitmap_next_dirty_area(bitmap->bitmap, offset, bytes);
- }
-=20
-+/**
-+ * bdrv_merge_dirty_bitmap: merge src into dest.
-+ * Ensures permissions on bitmaps are reasonable; use for public API.
-+ *
-+ * @backup: If provided, make a copy of dest here prior to merge.
-+ */
- void bdrv_merge_dirty_bitmap(BdrvDirtyBitmap *dest, const BdrvDirtyBitma=
-p *src,
-                              HBitmap **backup, Error **errp)
+diff --git a/blockdev.c b/blockdev.c
+index 5bc8ecd087..77365d8166 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -3624,78 +3624,25 @@ BlockJob *do_blockdev_backup(BlockdevBackup *back=
+up, JobTxn *txn,
  {
-@@ -833,6 +839,42 @@ void bdrv_merge_dirty_bitmap(BdrvDirtyBitmap *dest, =
-const BdrvDirtyBitmap *src,
-         goto out;
+     BlockDriverState *bs;
+     BlockDriverState *target_bs;
+-    Error *local_err =3D NULL;
+-    BdrvDirtyBitmap *bmap =3D NULL;
+     AioContext *aio_context;
+-    BlockJob *job =3D NULL;
+-    int job_flags =3D JOB_DEFAULT;
+-    int ret;
+-
+-    if (!backup->has_speed) {
+-        backup->speed =3D 0;
+-    }
+-    if (!backup->has_on_source_error) {
+-        backup->on_source_error =3D BLOCKDEV_ON_ERROR_REPORT;
+-    }
+-    if (!backup->has_on_target_error) {
+-        backup->on_target_error =3D BLOCKDEV_ON_ERROR_REPORT;
+-    }
+-    if (!backup->has_job_id) {
+-        backup->job_id =3D NULL;
+-    }
+-    if (!backup->has_auto_finalize) {
+-        backup->auto_finalize =3D true;
+-    }
+-    if (!backup->has_auto_dismiss) {
+-        backup->auto_dismiss =3D true;
+-    }
+-    if (!backup->has_compress) {
+-        backup->compress =3D false;
+-    }
++    BlockJob *job;
+=20
+     bs =3D bdrv_lookup_bs(backup->device, backup->device, errp);
+     if (!bs) {
+         return NULL;
      }
 =20
-+    ret =3D bdrv_dirty_bitmap_merge_internal(dest, src, backup, false);
-+    assert(ret);
-+
-+out:
-+    qemu_mutex_unlock(dest->mutex);
-+    if (src->mutex !=3D dest->mutex) {
-+        qemu_mutex_unlock(src->mutex);
-+    }
-+}
-+
-+/**
-+ * bdrv_dirty_bitmap_merge_internal: merge src into dest.
-+ * Does NOT check bitmap permissions; not suitable for use as public API=
-.
-+ *
-+ * @backup: If provided, make a copy of dest here prior to merge.
-+ * @lock: If true, lock and unlock bitmaps on the way in/out.
-+ * returns true if the merge succeeded; false if unattempted.
-+ */
-+bool bdrv_dirty_bitmap_merge_internal(BdrvDirtyBitmap *dest,
-+                                      const BdrvDirtyBitmap *src,
-+                                      HBitmap **backup,
-+                                      bool lock)
-+{
-+    bool ret;
-+
-+    assert(!bdrv_dirty_bitmap_readonly(dest));
-+    assert(!bdrv_dirty_bitmap_inconsistent(dest));
-+    assert(!bdrv_dirty_bitmap_inconsistent(src));
-+
-+    if (lock) {
-+        qemu_mutex_lock(dest->mutex);
-+        if (src->mutex !=3D dest->mutex) {
-+            qemu_mutex_lock(src->mutex);
-+        }
-+    }
-+
-     if (backup) {
-         *backup =3D dest->bitmap;
-         dest->bitmap =3D hbitmap_alloc(dest->size, hbitmap_granularity(*=
-backup));
-@@ -840,11 +882,13 @@ void bdrv_merge_dirty_bitmap(BdrvDirtyBitmap *dest,=
- const BdrvDirtyBitmap *src,
-     } else {
-         ret =3D hbitmap_merge(dest->bitmap, src->bitmap, dest->bitmap);
+-    aio_context =3D bdrv_get_aio_context(bs);
+-    aio_context_acquire(aio_context);
+-
+     target_bs =3D bdrv_lookup_bs(backup->target, backup->target, errp);
+     if (!target_bs) {
+-        goto out;
++        return NULL;
      }
--    assert(ret);
 =20
+-    ret =3D bdrv_try_set_aio_context(target_bs, aio_context, errp);
+-    if (ret < 0) {
+-        goto out;
+-    }
++    aio_context =3D bdrv_get_aio_context(bs);
++    aio_context_acquire(aio_context);
+=20
+-    if (backup->has_bitmap) {
+-        bmap =3D bdrv_find_dirty_bitmap(bs, backup->bitmap);
+-        if (!bmap) {
+-            error_setg(errp, "Bitmap '%s' could not be found", backup->b=
+itmap);
+-            goto out;
+-        }
+-        if (bdrv_dirty_bitmap_check(bmap, BDRV_BITMAP_DEFAULT, errp)) {
+-            goto out;
+-        }
+-    }
++    job =3D do_backup_common(qapi_BlockdevBackup_base(backup),
++                           bs, target_bs, aio_context, txn, errp);
+=20
+-    if (!backup->auto_finalize) {
+-        job_flags |=3D JOB_MANUAL_FINALIZE;
+-    }
+-    if (!backup->auto_dismiss) {
+-        job_flags |=3D JOB_MANUAL_DISMISS;
+-    }
+-    job =3D backup_job_create(backup->job_id, bs, target_bs, backup->spe=
+ed,
+-                            backup->sync, bmap, backup->compress,
+-                            backup->on_source_error, backup->on_target_e=
+rror,
+-                            job_flags, NULL, NULL, txn, &local_err);
+-    if (local_err !=3D NULL) {
+-        error_propagate(errp, local_err);
+-    }
 -out:
--    qemu_mutex_unlock(dest->mutex);
--    if (src->mutex !=3D dest->mutex) {
--        qemu_mutex_unlock(src->mutex);
-+    if (lock) {
-+        qemu_mutex_unlock(dest->mutex);
-+        if (src->mutex !=3D dest->mutex) {
-+            qemu_mutex_unlock(src->mutex);
-+        }
-     }
-+
-+    return ret;
+     aio_context_release(aio_context);
+     return job;
  }
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index e1f2aa627e..83ffdf4950 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -1238,6 +1238,9 @@ void bdrv_set_dirty(BlockDriverState *bs, int64_t o=
-ffset, int64_t bytes);
-=20
- void bdrv_clear_dirty_bitmap(BdrvDirtyBitmap *bitmap, HBitmap **out);
- void bdrv_restore_dirty_bitmap(BdrvDirtyBitmap *bitmap, HBitmap *backup)=
-;
-+bool bdrv_dirty_bitmap_merge_internal(BdrvDirtyBitmap *dest,
-+                                      const BdrvDirtyBitmap *src,
-+                                      HBitmap **backup, bool lock);
-=20
- void bdrv_inc_in_flight(BlockDriverState *bs);
- void bdrv_dec_in_flight(BlockDriverState *bs);
 --=20
 2.21.0
 
