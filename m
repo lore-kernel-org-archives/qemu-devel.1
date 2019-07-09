@@ -2,88 +2,79 @@ Return-Path: <SRS0=huOX=VG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7983FC73C53
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 16:51:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CFAEBC73C46
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 16:54:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 340F621537
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 16:51:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9A9AB2082A
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 16:54:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="w1w9jfpB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 340F621537
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IctNM5TM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A9AB2082A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52008 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52032 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hktL9-0002T1-3b
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jul 2019 12:51:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38092)
+	id 1hktOC-0004ji-7d
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jul 2019 12:54:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39024)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1hkt7T-0003BQ-A1
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 12:37:34 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hktAr-0005PR-72
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 12:41:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1hkt7Q-0006gv-CM
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 12:37:29 -0400
-Received: from mail-pf1-x429.google.com ([2607:f8b0:4864:20::429]:44677)
+ (envelope-from <peter.maydell@linaro.org>) id 1hktAq-0000sS-4s
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 12:41:01 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:39542)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1hkt7Q-0006fi-6F
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 12:37:28 -0400
-Received: by mail-pf1-x429.google.com with SMTP id t16so9548901pfe.11
- for <qemu-devel@nongnu.org>; Tue, 09 Jul 2019 09:37:27 -0700 (PDT)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hktAp-0000rY-UU
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 12:41:00 -0400
+Received: by mail-ot1-x341.google.com with SMTP id r21so5141278otq.6
+ for <qemu-devel@nongnu.org>; Tue, 09 Jul 2019 09:40:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=sH3HXM90i35Znfmo2ZGAwhUVyrLtmUH4wH93sEFL2IQ=;
- b=w1w9jfpBUL2R9wo3JtnQGTgHsunNZVJRYWCWyI0mNGTUG0OqHsGbVl854Q8IFI9GKU
- Ffb6NLTpjccUz0+1mre52bKP+Tf/V5xwYxglRR39pAH7x7Gd07+HRmm/LtfPmKBTCdoQ
- iThfxeO2e10Koi59KD/0Xau41Fye4XGJX76/+9pqia2WTBgjowGkNSW2gvEliwzq89+0
- qJa20oKZDPgCROUjtw1mZWOWqUGvMfpexdl04126IpF5m35/tdvtBiTRLOQ8AyzvX/0Z
- kIENDloEuhIMk5kJ42KVhb32PmmKSpryZkO9e5YQwYnkg/QymSAEo7AeBZxOgouW6G47
- RoMg==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=FSd5U/AhRoKw0D9xITYs6vnqrq5TrBfzrsxGk3E6fXY=;
+ b=IctNM5TMIMIAnQmDhQYY9NaGZx9dD1NL5bLH5ydIWH9Y6xI+sqOWL0sKIOn/EQ0CnP
+ vJasigen5fmpnmg6laCnxu9BI7vEhjKWQz/YzQJzkd/P8+pTqDc6lx1HoFSt4FH5N9du
+ 5bUfcqfVPBj7I9tunK/XemQq7PsjRMWA8EixIhF1DAJRyw+zbKk+hblmGh45l1c2N4Vd
+ ElNnmv0vRKTfpaF59FMQBssbWLxEYJDHAImg5/aAOapJ1ENhPWN9gTi2DLIlrC6VWyVx
+ q27L9eyKm6Vk1VOSoZgf2OnQPMgjmyrgUcl/BKYfqeFT+6BEsrj3vI4ck824lmMEDini
+ KpnA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=sH3HXM90i35Znfmo2ZGAwhUVyrLtmUH4wH93sEFL2IQ=;
- b=a7SUZUH/FcXPzX9u4OLCRjwIPi6ta9dsLJq1ai0L/o3QSr4XsSckYi+YG4rpcNFpvi
- TItesqfgpUTX14L/k/BxUT7g43VpEOgG8UwL8a2xTCtwSMElSM2zB4QIUS64bdUFrD+r
- poYqb0rRc1LoaTUvOScUoORvr0vX42Zkbjti4SIFSdczwm8arPfpErat46ORSpfz3HKO
- yo+IvHZEHeCivSJcGBuUlV7iQDecuk4Z2QIZfUH9pMOgMN5vCfqDjuA8doBKWV0E3djm
- krhTkgm7dF/63NI38eqY5Em9yqxgS4VeUfmjAzjSN5I/dg5Ew3pEgqyi+NuPn1oWv7oK
- ScCQ==
-X-Gm-Message-State: APjAAAXsfOZdpkmYMrpNInUByfTJDH3beXVribkrvQIhBaSuG2EmkjGT
- WbRrzvu/4WYe72zpw1zmOBJ11DppewQ=
-X-Google-Smtp-Source: APXvYqxbwEZ14n4UEMtyG43rn7pIKIqiFm8k4838eIYPjmrpNrFf03LqF52JSEf1UiCHMonDqJf4Nw==
-X-Received: by 2002:a17:90a:3247:: with SMTP id
- k65mr1053401pjb.49.1562690246238; 
- Tue, 09 Jul 2019 09:37:26 -0700 (PDT)
-Received: from localhost.localdomain ([172.56.12.212])
- by smtp.gmail.com with ESMTPSA id v8sm19225231pgs.82.2019.07.09.09.37.22
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Tue, 09 Jul 2019 09:37:25 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-Date: Tue,  9 Jul 2019 18:36:55 +0200
-Message-Id: <20190709163656.3100-5-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190709163656.3100-1-richard.henderson@linaro.org>
-References: <20190709163656.3100-1-richard.henderson@linaro.org>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=FSd5U/AhRoKw0D9xITYs6vnqrq5TrBfzrsxGk3E6fXY=;
+ b=EjO9hyvMCaMby5yhleCTM566QCPbwVJ+wWl+T2ZN5XBj851weGu1btW7VzmNoX5qC8
+ rSAYwDB4f1Oaty+htuQfiLYX7M5kOb6tKN+x9S0cXNZKg8yH27/VYd0vsIcwLrIvhQQ+
+ zZAoRMMEJCo38NE9UJ6gGP95pIv1PDGHAGnRwZ6ZHptM+40BAm7tQKPrNAEby04kVvK7
+ G/q/+DTYZoV9qJfq7P4yh43K0Ih1Owftt2863GDrs6bpNczK2lTcknNHxjTS4KjaETdt
+ t+0OJ8lJOHEqK9MUetiDktCiSbgIriAZPDv5kzbhdEE5Rs0ZoVup4DTU0PsYUDKld6zE
+ uVkA==
+X-Gm-Message-State: APjAAAVJ5+RNK2fHNezNDYIiudisXtToxqwT7JCKAT8GQHdRBMW8QR4U
+ bVELJEaW1xpkZRcggvm1KOj13ISXcSEdn1/jwqpMCQ==
+X-Google-Smtp-Source: APXvYqyAxzmI9auaDf5KLwlsoibEefo9qkKQP9BIHgw0vEL4ikn0igD07yRBskvWFY4zfeBufOowCnxpPgc6UQ63/3M=
+X-Received: by 2002:a9d:4d81:: with SMTP id u1mr19054781otk.221.1562690458835; 
+ Tue, 09 Jul 2019 09:40:58 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20190514011129.11330-1-richard.henderson@linaro.org>
+ <20190514011129.11330-2-richard.henderson@linaro.org>
+In-Reply-To: <20190514011129.11330-2-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 9 Jul 2019 17:40:48 +0100
+Message-ID: <CAFEAcA8k9+XW9uPujk3Zp3CxvYm6Qj6kVEig+KuNO2ywOK0tTA@mail.gmail.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::429
-Subject: [Qemu-devel] [PATCH v2 4/5] tcg: Remove duplicate #if
- !defined(CODE_ACCESS)
+X-Received-From: 2607:f8b0:4864:20::341
+Subject: Re: [Qemu-devel] [PATCH 1/2] target/arm: Use extract2 for EXTR
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,37 +86,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, peter.maydell@linaro.org, alex.bennee@linaro.org,
- pbonzini@redhat.com
+Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Beata Michalska <beata.michalska@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This code block is already surrounded by #ifndef CODE_ACCESS.
+On Tue, 14 May 2019 at 02:11, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> This is, after all, how we implement extract2 in tcg/aarch64.
+>
+> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/arm/translate-a64.c | 38 ++++++++++++++++++++------------------
+>  1 file changed, 20 insertions(+), 18 deletions(-)
 
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- include/exec/cpu_ldst_useronly_template.h | 2 --
- 1 file changed, 2 deletions(-)
+It turns out that we have a regression in booting at least
+some Linux kernels with TCG on aarch64 hosts (the same
+config works fine on x86-64 hosts). Git bisect points to
+this commit (80ac954c369e7e61bd1ed0) as the cause, and
+reverting this commit on top of current master also fixes
+the problem.
 
-diff --git a/include/exec/cpu_ldst_useronly_template.h b/include/exec/cpu_ldst_useronly_template.h
-index 8c7a2c6cd7..d663826ac2 100644
---- a/include/exec/cpu_ldst_useronly_template.h
-+++ b/include/exec/cpu_ldst_useronly_template.h
-@@ -118,11 +118,9 @@ static inline void
- glue(glue(cpu_st, SUFFIX), MEMSUFFIX)(CPUArchState *env, abi_ptr ptr,
-                                       RES_TYPE v)
- {
--#if !defined(CODE_ACCESS)
-     trace_guest_mem_before_exec(
-         env_cpu(env), ptr,
-         trace_mem_build_info(SHIFT, false, MO_TE, true));
--#endif
-     glue(glue(st, SUFFIX), _p)(g2h(ptr), v);
- }
- 
--- 
-2.17.1
-
+thanks
+-- PMM
 
