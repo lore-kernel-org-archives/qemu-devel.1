@@ -2,74 +2,82 @@ Return-Path: <SRS0=huOX=VG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C624C606B0
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 09:21:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14F33C606B0
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 09:22:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5AA3B2073D
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 09:21:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5AA3B2073D
+	by mail.kernel.org (Postfix) with ESMTPS id D6FB1214AF
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 09:22:30 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qPv0t56E"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D6FB1214AF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48062 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48064 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hkmJx-0007QM-Lx
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jul 2019 05:21:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43308)
+	id 1hkmKU-00083W-5y
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jul 2019 05:22:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43368)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bounces@canonical.com>) id 1hkmIv-0006bF-NX
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 05:20:54 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1hkmJ5-0006le-IX
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 05:21:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1hkmIu-0001af-Mp
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 05:20:53 -0400
-Received: from indium.canonical.com ([91.189.90.7]:57260)
+ (envelope-from <richard.henderson@linaro.org>) id 1hkmJ4-0001kA-FC
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 05:21:03 -0400
+Received: from mail-io1-xd2d.google.com ([2607:f8b0:4864:20::d2d]:36957)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1hkmIu-0001Zr-HD
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 05:20:52 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1hkmIt-0008Co-4O
- for <qemu-devel@nongnu.org>; Tue, 09 Jul 2019 09:20:51 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 16E662E80CC
- for <qemu-devel@nongnu.org>; Tue,  9 Jul 2019 09:20:51 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 09 Jul 2019 09:11:07 -0000
-From: =?utf-8?q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1hkmJ4-0001hs-72
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 05:21:02 -0400
+Received: by mail-io1-xd2d.google.com with SMTP id q22so19833539iog.4
+ for <qemu-devel@nongnu.org>; Tue, 09 Jul 2019 02:21:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id;
+ bh=aslcPXfLU1TSCE/SrDWJaSKWFbXWWjgh8Wz68TylcYE=;
+ b=qPv0t56EOYDG4jB984oUtmrVo8l7wVc1yrMQanP/8YxnqZ53eGyPCvGUe3G/43KHh8
+ z9d5Wcha5CodNy0G7Dl9UXAo/WEeuDrxM9BYco3YTUnXd3iPzWU64Gj9Lu3rtl5fY4Qw
+ 44RCOePcOz2wE/rikQIMEH3XHWrwiQQbBRBuRVabUyts4wnIEzg2wSKeQZBXhCWC2lfs
+ BQcDJLtch8R8OdFy7VONfFuw1j5BEetPxtFtrytlqUpcdX8PdozX5ejGpDN9F4X977ju
+ OP60OjNyOHXE3Yn4hiLpibcpZLB7ng/99wzPVI7BPLxwAMLMt2kLEUYVLeNw7fRXoqmR
+ Z3Fg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id;
+ bh=aslcPXfLU1TSCE/SrDWJaSKWFbXWWjgh8Wz68TylcYE=;
+ b=nIeERY09+eNWHUxD++d32QS5xBk9J/UryNDrb2c6xr1CPouOnnr2nr3cTeNHYakQDk
+ Jqti6VdNwq/UjzWrXmjjQ4f6mwGF1EbYP8bERyNf5lprrlI3J9iOCIkuFjdz5wtazpTE
+ /N20uN0ZUp/ck11u8sab9rrBq8cdtxUUKpNrgrCVV/bLXt9RToHsaVgTqey/sxtHQxHo
+ LMpfEW+uEfeilLqFD6TqrEFL90ANoptm9McDE7IDKjmrvwIe39o2B0yAuOZx3S/Myjrw
+ 0x3EieP6L0EI7lHrMpsAXt05oRd3A8rgrRbnTkB0TnwHw/Yoj31bytJn7IkwF7FA/3cE
+ fEYA==
+X-Gm-Message-State: APjAAAVjwDctFCm/7hsHMv0ihu+9xfP4I/y0J9+aacnp19/MkjkHKUCX
+ tgdd+WN0i8jNYwQ6Qhk/grmgx5bnOC0=
+X-Google-Smtp-Source: APXvYqw2g4wsJFnzJbrqCDtVMtvlHZi7XM5tu71Evf8qDWnGwyOU8VcxP+g29mnkheZJk+6MuG9Obw==
+X-Received: by 2002:a6b:4101:: with SMTP id n1mr57157ioa.138.1562664060818;
+ Tue, 09 Jul 2019 02:21:00 -0700 (PDT)
+Received: from localhost.localdomain ([172.56.12.212])
+ by smtp.gmail.com with ESMTPSA id c17sm17613817ioo.82.2019.07.09.02.20.56
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Tue, 09 Jul 2019 02:21:00 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=In Progress; importance=Undecided;
- assignee=rth@twiddle.net; 
-X-Launchpad-Bug-Tags: arm tcg testcase
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: ajbennee christophe-lyon pmaydell rth
-X-Launchpad-Bug-Reporter: Christophe Lyon (christophe-lyon)
-X-Launchpad-Bug-Modifier: =?utf-8?q?Alex_Benn=C3=A9e_=28ajbennee=29?=
-References: <156025884763.18155.9614824235777300144.malonedeb@wampee.canonical.com>
-Message-Id: <156266346841.23706.4826780197693140024.launchpad@chaenomeles.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="19007";
- Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 087ec7f40abba719f4ba92b5eecd9fd3737de7e7
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1832353] Re: cpu_exec: Assertion
- !have_mmap_lock() failed
+Date: Tue,  9 Jul 2019 11:20:44 +0200
+Message-Id: <20190709092049.13771-1-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.17.1
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::d2d
+Subject: [Qemu-devel] [PATCH 0/5] tcg: Fix mmap_lock assertion failure,
+ take 2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -78,51 +86,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1832353 <1832353@bugs.launchpad.net>
+Cc: lvivier@redhat.com, peter.maydell@linaro.org, alex.bennee@linaro.org,
+ pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Changed in: qemu
-       Status: Fix Committed =3D> In Progress
+While I could not replicate the failure Peter reported, the apparent
+root cause -- the old magic fixed page -- should affect other guests
+as well.  In particular, the old arm32 magic fixed page at 0xffff0f00,
+and the hppa magic fixed page at 0.
 
--- =
+In the arm32 and hppa cases that I just mentioned -- but notably not
+the x86_64 case that Peter reported -- there is special-case code in
+target/*/translate.c to handle those addresses without actually doing
+the read from the unmapped address.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1832353
+Therefore, until we fix these sort of address space representational
+errors, we cannot even rely on page_check_range() to validate the
+execute access.
 
-Title:
-  cpu_exec: Assertion !have_mmap_lock() failed
+Instead, modify the host signal handler to intercept this at SIGSEGV.
+At this point we're sure that there is no guest special case that we
+have overlooked, because we did attempt the read for execute.
 
-Status in QEMU:
-  In Progress
+Also, I noticed that we really ought to have some barriers around this
+code to make sure that the modifications to helper_retaddr are in fact
+visible to the host signal handler.
 
-Bug description:
-  Hi,
+Also, some minor cleanups to the set of read functions that we expose
+for use during translation.
 
-  I have isolated a testcase from the GCC testsuite (actually gfortran,
-  test proc_ptr_51.f90) which produces tons of:
+Also, a trivial duplicated condition.
 
-  qemu-arm: /home/christophe.lyon/src/qemu/accel/tcg/cpu-exec.c:701:
-  cpu_exec: Assertion `!have_mmap_lock()' failed.
 
-  including with master qemu as of today.
+r~
 
-  I'm attaching a tarball containing:
-  qemu-assert:
-  cmd  lib  proc_ptr_51.exe
 
-  qemu-assert/lib:
-  ld-linux-armhf.so.3  libc.so.6  libgcc_s.so.1  libgfortran.so.5  libm.so.6
+Richard Henderson (5):
+  include/qemu/atomic.h: Add signal_barrier
+  tcg: Introduce set/clear_helper_retaddr
+  tcg: Remove cpu_ld*_code_ra
+  tcg: Remove duplicate #if !defined(CODE_ACCESS)
+  tcg: Release mmap_lock on translation fault
 
-  where cmd is the basic command used to launch the test & reproduce the
-  failure.
+ include/exec/cpu_ldst.h                   | 20 ++++++
+ include/exec/cpu_ldst_useronly_template.h | 40 ++++++++----
+ include/qemu/atomic.h                     | 11 ++++
+ accel/tcg/user-exec.c                     | 76 ++++++++++++++++-------
+ target/arm/helper-a64.c                   |  8 +--
+ target/arm/sve_helper.c                   | 43 +++++++------
+ 6 files changed, 135 insertions(+), 63 deletions(-)
 
-  Note that the test or the generated may actually be buggy: I have
-  reported failures on native aarch64 and arm machines. Yet, qemu should
-  not fail with a loop of asserts.
+-- 
+2.17.1
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1832353/+subscriptions
 
