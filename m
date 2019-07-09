@@ -2,90 +2,91 @@ Return-Path: <SRS0=huOX=VG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FD2EC73C53
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 20:46:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2E7DC73C56
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 20:52:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3BA952073D
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 20:46:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C26CA20861
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 20:52:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="QaF7MxlH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3BA952073D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mNX/RKsW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C26CA20861
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56022 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56062 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hkwzv-0002KE-Ha
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jul 2019 16:45:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60399)
+	id 1hkx6U-0005iQ-Jx
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jul 2019 16:52:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39238)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <prvs=086c9c2ca=dmitry.fomichev@wdc.com>)
- id 1hkwt5-0005sM-DC
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 16:38:57 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hkx31-0004FR-Kh
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 16:49:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <prvs=086c9c2ca=dmitry.fomichev@wdc.com>)
- id 1hkwt0-00011C-4a
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 16:38:53 -0400
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:50362)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <prvs=086c9c2ca=dmitry.fomichev@wdc.com>)
- id 1hkwst-0000jE-Js; Tue, 09 Jul 2019 16:38:43 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1562704733; x=1594240733;
- h=from:to:cc:subject:date:message-id:in-reply-to:
- references:mime-version:content-transfer-encoding;
- bh=Sv7iJyU3lEXrOaUa/SEaaTKyC8QKbb+Dk4Hz74sYrj0=;
- b=QaF7MxlHUzNUvglh13GuAAU9zXWPgJg1JMBzZ1oWAPOSQORUQGuFxaAt
- QoZ5RGYU1Rp4RAsHexBgubz6z4dYa4uEbCK7naxyQFkD8p4txzqz0fONP
- FWFnsKSmnTvlaO2ydREatD7Yh0FyjdCn4GFso8PNIikj0OnOGBpYncxQm
- 8kjtJhenu2foGCH1W+cAHNygWEQ/Gg3i5aBrB16HEXb6FFkNWJklsyp1K
- q0V9UHa4LKVx40sZAD73NYjYcN58+hYPKcCbOKilWExYr8sFeLFDtQVYy
- sVM/qTPOuVcaBzJG4UPMKtJHSdPIJqLPmXTi79Gseh9DZ/CahAitqgy/k w==;
-IronPort-SDR: 8xJcHaT2LDwxyzKgViPzhBMjN4RuX5Bn8PPPMkp18q+XhBoeL3EQVaIHg+SmvL7FisM21kWy3i
- lzBd0OiTkVphCr3ZKznmx7Q67h1Bf3sws6JTPB8mHe2rdVF1F2DN5Er8ckg++FI7p38eGef11A
- miWfhoBGsu1cxW6Lq/gEnnFn7L6rfJo4Cf0nYEs8lUQeuhUVs4Xgci38nDfP/oRn7FfRLE2Ppn
- k9eFGV/lSTOvoG+3jsDwVfieN/lej3VbOZYIxCbyUGul7pAzHsfHk1XXbhVnP0hHHok4ShTitB
- ZNk=
-X-IronPort-AV: E=Sophos;i="5.63,471,1557158400"; d="scan'208";a="212488453"
-Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com)
- ([199.255.45.15])
- by ob1.hgst.iphmx.com with ESMTP; 10 Jul 2019 04:38:49 +0800
-IronPort-SDR: yVf5SLn/mnWibPCPDzNEv+FmjiAY6c9ylzBYfxU3xGM/XN1h/ZdrcZ7D1/Pj3UApD88+O5Ocg7
- Y4AF8rWVRY2p9pf/nk8JsPeNhsyCicG80EZmgWHs2G6T9QgRNUe3qS/rrydWFWXUeLK45dsZUn
- ZKBvRCUe1k405eKh1dYq11iA1KHNPTfsSQ0kwfZcKRCXEsKdTca1U9y66duK4ocQGvRhsDBUd3
- i7pLTghzVN/IMaAGugEzlhySOuisCW71Yogz6PZ5+2ZyMOOgfUhPx3oVpflDLHBnBqmP7GNLnm
- sifJhsZ/Q1UG6KNLgJw1PPOz
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
- by uls-op-cesaep02.wdc.com with ESMTP; 09 Jul 2019 13:37:28 -0700
-IronPort-SDR: It3eFzaf/J8QLJI+9AnCsDyc95s8jHkk0MSBB0hxOBLF6wkN/xiIJUueYojGYXmjEnebfsWPOn
- pNzYUgtqsk1vz+LECY+DZR7JlJkp4yb7/g2qH8WT6XmLbGqWRDqzNGoNttoRT2kcgKq77Z207p
- ALtI7jZt4j9BiucXeIzsU5q2KhdqWxSq9FQy4Qpx/44TU6Cg0x7DHSuOC49R1HBd/W6WRwE3B4
- YkUWNxF1gpH2omyT4qtvKWxCRi0d4OeUb+aedNznfHRxVHiARyJxk2JmB5zFExOxEXUCwb6y2H
- aNk=
-Received: from dhcp-10-88-173-43.hgst.com ([10.88.173.43])
- by uls-op-cesaip02.wdc.com with ESMTP; 09 Jul 2019 13:38:41 -0700
-From: Dmitry Fomichev <dmitry.fomichev@wdc.com>
-To: kwolf@redhat.com, mreitz@redhat.com, mst@redhat.com, stefanha@redhat.com,
- pbonzini@redhat.com, fam@euphon.net, qemu-block@nongnu.org,
- qemu-devel@nongnu.org
-Date: Tue,  9 Jul 2019 16:38:04 -0400
-Message-Id: <20190709203806.17550-3-dmitry.fomichev@wdc.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190709203806.17550-1-dmitry.fomichev@wdc.com>
-References: <20190709203806.17550-1-dmitry.fomichev@wdc.com>
+ (envelope-from <alex.bennee@linaro.org>) id 1hkx2v-0002sg-PS
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 16:49:11 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:36924)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1hkx2n-0002jt-4i
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 16:48:58 -0400
+Received: by mail-wm1-x344.google.com with SMTP id f17so142129wme.2
+ for <qemu-devel@nongnu.org>; Tue, 09 Jul 2019 13:48:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=0fBXuyK5wDpaOTyxXaPAaiswAOct2dT4WjnyrTPSA1k=;
+ b=mNX/RKsWfncUUDLAMI/2wBb0DtxyVLMec5iT0L9FtYNRsG5pH53wE0Y1lbocN8JzSe
+ qZDBWDJTol+RkvAs/D0URHR9+f4CZQWiAgbRVQXTSy1sN8R/35o3U0NH8NTLovwafmk5
+ rP/SOoI55vKUWeDefrVL+f4RI19Cstb8x3ZNszeaBCH3S4zxttlGPOeoAF0V0aNaSEjG
+ z/j2Jm24Da3umPKxlsdOCDKMmh8YfQwwwgNgjYJG1QpkXV+xXnFuRsid+J6bw2fdDHmt
+ Zw3Q65XiaNmXacTm3Djw2HmutAPqjqlY5LU0VYpSRdn8gn57IZQrzdQimBQh0dGYbHoh
+ n9yA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=0fBXuyK5wDpaOTyxXaPAaiswAOct2dT4WjnyrTPSA1k=;
+ b=qWdcoideRqvRtZdmckHMuCHXs0K1QNY2niET8zAhjPuF4t1snfS5xN2fdoowMC1+sS
+ u4yUh9p3bwkA862+oZVi/kbCPQkR6GBiEm4fIjBQhZWYys6OCDL0ETcHoJe1ohevRir8
+ wYyHb8jtwgsNgHdZe+f6gVrcsr/kE6hy6+3jSV5hJK1sm3tC3u8P/oO5YPkDP26PoLtk
+ ryyt5ey8hZpN0yFUnEbgd0bo8n3IDXZ0pfPaoSc6sgY5VC2u4/lWjewbUCCvIAYGPokx
+ FajE8/q/47b5VjTmJJWPCZQN/5DyPxUDG6K7Cl/fUkOx095+Hw5XyGelQ5ff3seHKhFz
+ VNiw==
+X-Gm-Message-State: APjAAAVPbNd0W+63xb+amX3oPoBJeSL0332tlNPb9YhFXT4Gait6RPV5
+ k3AY1Y3YE7EbyFVLYRiQYOUvPA==
+X-Google-Smtp-Source: APXvYqwKhz+6yxq0CGZkBXKX/Wx4irs+z7dpblxehZraHC+I+Ui7psdwbDUmB1mK+19ehPCziKx2+A==
+X-Received: by 2002:a1c:a00f:: with SMTP id j15mr1412574wme.167.1562705335495; 
+ Tue, 09 Jul 2019 13:48:55 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+ by smtp.gmail.com with ESMTPSA id l9sm49689wmh.36.2019.07.09.13.48.54
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Tue, 09 Jul 2019 13:48:54 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 7A2901FF87;
+ Tue,  9 Jul 2019 21:48:54 +0100 (BST)
+References: <20190709163656.3100-1-richard.henderson@linaro.org>
+ <20190709163656.3100-6-richard.henderson@linaro.org>
+User-agent: mu4e 1.3.2; emacs 26.1
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+In-reply-to: <20190709163656.3100-6-richard.henderson@linaro.org>
+Date: Tue, 09 Jul 2019 21:48:54 +0100
+Message-ID: <87r26zdjd5.fsf@zen.linaroharston>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x
-X-Received-From: 68.232.143.124
-Subject: [Qemu-devel] [PATCH 2/4] raw: Recognize zoned backing devices
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::344
+Subject: Re: [Qemu-devel] [PATCH v2 5/5] tcg: Release mmap_lock on
+ translation fault
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,172 +98,182 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Dmitry Fomichev <dmitry.fomichev@wdc.com>
+Cc: lvivier@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org,
+ pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The purpose of this patch is to recognize a zoned block device (ZBD)
-when it is opened as a raw file. The new code initializes the zoned
-model propery introduced by the previous commit.
 
-This commit is Linux-specific and in essence it checks the Zoned
-Block Device Model (None/Host-managed/Host-aware) value in sysfs on
-the host.
+Richard Henderson <richard.henderson@linaro.org> writes:
 
-In order to avoid code duplication in file-posix.c, a common helper
-function is added to read value of a sysfs entry under
-/sys/block/<dev>/queue. Now, the existing function that reads the
-"max_segments" value and the the new function that reads "zoned"
-value share the same helper code.
+> Turn helper_retaddr into a multi-state flag that may now also
+> indicate when we're performing a read on behalf of the translator.
+> In this case, release the mmap_lock before the longjmp back to
+> the main cpu loop, and thereby avoid a failing assert therein.
+>
+> Fixes: https://bugs.launchpad.net/qemu/+bug/1832353
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
-Signed-off-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
----
- block/file-posix.c | 69 ++++++++++++++++++++++++++++++++++++++--------
- block/raw-format.c |  8 ++++++
- 2 files changed, 66 insertions(+), 11 deletions(-)
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
-diff --git a/block/file-posix.c b/block/file-posix.c
-index ab05b51a66..dd81dc3301 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -1055,33 +1055,53 @@ static int hdev_get_max_transfer_length(BlockDriverState *bs, int fd)
- #endif
- }
- 
--static int hdev_get_max_segments(const struct stat *st)
-+static int hdev_read_blk_queue_entry(const struct stat *st, const char *key,
-+    char *buf, int buf_len)
- {
- #ifdef CONFIG_LINUX
--    char buf[32];
--    const char *end;
-     char *sysfspath;
-     int ret;
-     int fd = -1;
--    long max_segments;
- 
--    sysfspath = g_strdup_printf("/sys/dev/block/%u:%u/queue/max_segments",
--                                major(st->st_rdev), minor(st->st_rdev));
-+    sysfspath = g_strdup_printf("/sys/dev/block/%u:%u/queue/%s",
-+                                major(st->st_rdev), minor(st->st_rdev), key);
-     fd = open(sysfspath, O_RDONLY);
-     if (fd == -1) {
-         ret = -errno;
-         goto out;
-     }
-     do {
--        ret = read(fd, buf, sizeof(buf) - 1);
-+        ret = read(fd, buf, buf_len - 1);
-     } while (ret == -1 && errno == EINTR);
-     if (ret < 0) {
-         ret = -errno;
--        goto out;
-     } else if (ret == 0) {
-         ret = -EIO;
-+    }
-+out:
-+    if (fd != -1) {
-+        close(fd);
-+    }
-+    g_free(sysfspath);
-+    return ret;
-+#else
-+    return -ENOTSUP;
-+#endif
-+}
-+
-+static int hdev_get_max_segments(const struct stat *st)
-+{
-+#ifdef CONFIG_LINUX
-+    char buf[32];
-+    const char *end;
-+    int ret;
-+    long max_segments;
-+
-+    ret = hdev_read_blk_queue_entry(st, "max_segments", buf, sizeof(buf));
-+    if (ret < 0) {
-         goto out;
-     }
-+
-     buf[ret] = 0;
-     /* The file is ended with '\n', pass 'end' to accept that. */
-     ret = qemu_strtol(buf, &end, 10, &max_segments);
-@@ -1090,10 +1110,33 @@ static int hdev_get_max_segments(const struct stat *st)
-     }
- 
- out:
--    if (fd != -1) {
--        close(fd);
-+    return ret;
-+#else
-+    return -ENOTSUP;
-+#endif
-+}
-+
-+static int hdev_get_zoned_model(const struct stat *st)
-+{
-+#ifdef CONFIG_LINUX
-+    char buf[32];
-+    int ret;
-+
-+    ret = hdev_read_blk_queue_entry(st, "zoned", buf, sizeof(buf));
-+    if (ret < 0) {
-+        ret = BLK_ZONED_NONE;
-+        goto out;
-     }
--    g_free(sysfspath);
-+
-+    buf[ret - 1] = 0;
-+    ret = BLK_ZONED_NONE;
-+    if (strcmp(buf, "host-managed") == 0) {
-+        ret = BLK_ZONED_HM;
-+    } else if (strcmp(buf, "host-aware") == 0) {
-+        ret = BLK_ZONED_HA;
-+    }
-+
-+out:
-     return ret;
- #else
-     return -ENOTSUP;
-@@ -1116,6 +1159,10 @@ static void raw_refresh_limits(BlockDriverState *bs, Error **errp)
-                 bs->bl.max_transfer = MIN(bs->bl.max_transfer,
-                                           ret * getpagesize());
-             }
-+            ret = hdev_get_zoned_model(&st);
-+            if (ret >= 0) {
-+                bs->bl.zoned_model = ret;
-+            }
-         }
-     }
- 
-diff --git a/block/raw-format.c b/block/raw-format.c
-index bffd424dd0..12c2a3f95d 100644
---- a/block/raw-format.c
-+++ b/block/raw-format.c
-@@ -369,6 +369,13 @@ static void raw_refresh_limits(BlockDriverState *bs, Error **errp)
-     }
- }
- 
-+static void raw_get_zoned_info(BlockDriverState *bs)
-+{
-+    if (!bs->probed) {
-+        bs->bl.zoned_model = bs->file->bs->bl.zoned_model;
-+    }
-+}
-+
- static int coroutine_fn raw_co_truncate(BlockDriverState *bs, int64_t offset,
-                                         PreallocMode prealloc, Error **errp)
- {
-@@ -572,6 +579,7 @@ BlockDriver bdrv_raw = {
-     .bdrv_co_ioctl        = &raw_co_ioctl,
-     .create_opts          = &raw_create_opts,
-     .bdrv_has_zero_init   = &raw_has_zero_init,
-+    .bdrv_get_zoned_info  = &raw_get_zoned_info,
-     .strong_runtime_opts  = raw_strong_runtime_opts,
-     .mutable_opts         = mutable_opts,
- };
--- 
-2.21.0
+with check-tcg this time
 
+Tested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+> ---
+>  include/exec/cpu_ldst_useronly_template.h | 20 +++++--
+>  accel/tcg/user-exec.c                     | 66 ++++++++++++++++-------
+>  2 files changed, 63 insertions(+), 23 deletions(-)
+>
+> diff --git a/include/exec/cpu_ldst_useronly_template.h b/include/exec/cpu=
+_ldst_useronly_template.h
+> index d663826ac2..2378f2958c 100644
+> --- a/include/exec/cpu_ldst_useronly_template.h
+> +++ b/include/exec/cpu_ldst_useronly_template.h
+> @@ -64,12 +64,18 @@
+>  static inline RES_TYPE
+>  glue(glue(cpu_ld, USUFFIX), MEMSUFFIX)(CPUArchState *env, abi_ptr ptr)
+>  {
+> -#if !defined(CODE_ACCESS)
+> +#ifdef CODE_ACCESS
+> +    RES_TYPE ret;
+> +    set_helper_retaddr(1);
+> +    ret =3D glue(glue(ld, USUFFIX), _p)(g2h(ptr));
+> +    clear_helper_retaddr();
+> +    return ret;
+> +#else
+>      trace_guest_mem_before_exec(
+>          env_cpu(env), ptr,
+>          trace_mem_build_info(SHIFT, false, MO_TE, false));
+> -#endif
+>      return glue(glue(ld, USUFFIX), _p)(g2h(ptr));
+> +#endif
+>  }
+>
+>  #ifndef CODE_ACCESS
+> @@ -90,12 +96,18 @@ glue(glue(glue(cpu_ld, USUFFIX), MEMSUFFIX), _ra)(CPU=
+ArchState *env,
+>  static inline int
+>  glue(glue(cpu_lds, SUFFIX), MEMSUFFIX)(CPUArchState *env, abi_ptr ptr)
+>  {
+> -#if !defined(CODE_ACCESS)
+> +#ifdef CODE_ACCESS
+> +    int ret;
+> +    set_helper_retaddr(1);
+> +    ret =3D glue(glue(lds, SUFFIX), _p)(g2h(ptr));
+> +    clear_helper_retaddr();
+> +    return ret;
+> +#else
+>      trace_guest_mem_before_exec(
+>          env_cpu(env), ptr,
+>          trace_mem_build_info(SHIFT, true, MO_TE, false));
+> -#endif
+>      return glue(glue(lds, SUFFIX), _p)(g2h(ptr));
+> +#endif
+>  }
+>
+>  #ifndef CODE_ACCESS
+> diff --git a/accel/tcg/user-exec.c b/accel/tcg/user-exec.c
+> index 4384b59a4d..897d1571c4 100644
+> --- a/accel/tcg/user-exec.c
+> +++ b/accel/tcg/user-exec.c
+> @@ -64,27 +64,56 @@ static inline int handle_cpu_signal(uintptr_t pc, sig=
+info_t *info,
+>      CPUState *cpu =3D current_cpu;
+>      CPUClass *cc;
+>      unsigned long address =3D (unsigned long)info->si_addr;
+> -    MMUAccessType access_type;
+> +    MMUAccessType access_type =3D is_write ? MMU_DATA_STORE : MMU_DATA_L=
+OAD;
+>
+> -    /* We must handle PC addresses from two different sources:
+> -     * a call return address and a signal frame address.
+> -     *
+> -     * Within cpu_restore_state_from_tb we assume the former and adjust
+> -     * the address by -GETPC_ADJ so that the address is within the call
+> -     * insn so that addr does not accidentally match the beginning of the
+> -     * next guest insn.
+> -     *
+> -     * However, when the PC comes from the signal frame, it points to
+> -     * the actual faulting host insn and not a call insn.  Subtracting
+> -     * GETPC_ADJ in that case may accidentally match the previous guest =
+insn.
+> -     *
+> -     * So for the later case, adjust forward to compensate for what
+> -     * will be done later by cpu_restore_state_from_tb.
+> -     */
+> -    if (helper_retaddr) {
+> +    switch (helper_retaddr) {
+> +    default:
+> +        /*
+> +         * Fault during host memory operation within a helper function.
+> +         * The helper's host return address, saved here, gives us a
+> +         * pointer into the generated code that will unwind to the
+> +         * correct guest pc.
+> +         */
+>          pc =3D helper_retaddr;
+> -    } else {
+> +        break;
+> +
+> +    case 0:
+> +        /*
+> +         * Fault during host memory operation within generated code.
+> +         * (Or, a unrelated bug within qemu, but we can't tell from here=
+).
+> +         *
+> +         * We take the host pc from the signal frame.  However, we cannot
+> +         * use that value directly.  Within cpu_restore_state_from_tb, we
+> +         * assume PC comes from GETPC(), as used by the helper functions,
+> +         * so we adjust the address by -GETPC_ADJ to form an address that
+> +         * is within the call insn, so that the address does not acciden=
+tially
+> +         * match the beginning of the next guest insn.  However, when the
+> +         * pc comes from the signal frame it points to the actual faulti=
+ng
+> +         * host memory insn and not the return from a call insn.
+> +         *
+> +         * Therefore, adjust to compensate for what will be done later
+> +         * by cpu_restore_state_from_tb.
+> +         */
+>          pc +=3D GETPC_ADJ;
+> +        break;
+> +
+> +    case 1:
+> +        /*
+> +         * Fault during host read for translation, or loosely, "executio=
+n".
+> +         *
+> +         * The guest pc is already pointing to the start of the TB for w=
+hich
+> +         * code is being generated.  If the guest translator manages the
+> +         * page crossings correctly, this is exactly the correct address
+> +         * (and if the translator doesn't handle page boundaries correct=
+ly
+> +         * there's little we can do about that here).  Therefore, do not
+> +         * trigger the unwinder.
+> +         *
+> +         * Like tb_gen_code, release the memory lock before cpu_loop_exi=
+t.
+> +         */
+> +        pc =3D 0;
+> +        access_type =3D MMU_INST_FETCH;
+> +        mmap_unlock();
+> +        break;
+>      }
+>
+>      /* For synchronous signals we expect to be coming from the vCPU
+> @@ -155,7 +184,6 @@ static inline int handle_cpu_signal(uintptr_t pc, sig=
+info_t *info,
+>      clear_helper_retaddr();
+>
+>      cc =3D CPU_GET_CLASS(cpu);
+> -    access_type =3D is_write ? MMU_DATA_STORE : MMU_DATA_LOAD;
+>      cc->tlb_fill(cpu, address, 0, access_type, MMU_USER_IDX, false, pc);
+>      g_assert_not_reached();
+>  }
+
+
+--
+Alex Benn=C3=A9e
 
