@@ -4,60 +4,59 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1E91C606D8
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 07:20:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 641E3C606B0
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 07:23:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AB26720449
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 07:20:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB26720449
+	by mail.kernel.org (Postfix) with ESMTPS id 38864216C4
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 07:23:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38864216C4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47336 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47358 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hkkQU-0000Dc-VH
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jul 2019 03:20:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43470)
+	id 1hkkTA-00034C-Fz
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jul 2019 03:23:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43350)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <tao3.xu@intel.com>) id 1hkkON-0006rK-78
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 03:18:24 -0400
+ (envelope-from <tao3.xu@intel.com>) id 1hkkOE-0006bG-Bm
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 03:18:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tao3.xu@intel.com>) id 1hkkOL-0007be-Mp
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 03:18:23 -0400
-Received: from mga17.intel.com ([192.55.52.151]:58451)
+ (envelope-from <tao3.xu@intel.com>) id 1hkkOD-0007W9-3O
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 03:18:14 -0400
+Received: from mga17.intel.com ([192.55.52.151]:58442)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1hkkOL-0007Zo-Ct
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 03:18:21 -0400
+ (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1hkkOC-0007Ul-Nn
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 03:18:13 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga008.fm.intel.com ([10.253.24.58])
  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 09 Jul 2019 00:18:20 -0700
+ 09 Jul 2019 00:18:12 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.63,469,1557212400"; d="scan'208";a="165681684"
+X-IronPort-AV: E=Sophos;i="5.63,469,1557212400"; d="scan'208";a="165681650"
 Received: from tao-optiplex-7060.sh.intel.com ([10.239.13.104])
- by fmsmga008.fm.intel.com with ESMTP; 09 Jul 2019 00:18:19 -0700
+ by fmsmga008.fm.intel.com with ESMTP; 09 Jul 2019 00:18:10 -0700
 From: Tao Xu <tao3.xu@intel.com>
 To: imammedo@redhat.com,
 	eblake@redhat.com,
 	ehabkost@redhat.com
-Date: Tue,  9 Jul 2019 15:15:14 +0800
-Message-Id: <20190709071520.8745-9-tao3.xu@intel.com>
+Date: Tue,  9 Jul 2019 15:15:09 +0800
+Message-Id: <20190709071520.8745-4-tao3.xu@intel.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190709071520.8745-1-tao3.xu@intel.com>
 References: <20190709071520.8745-1-tao3.xu@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
 X-Received-From: 192.55.52.151
-Subject: [Qemu-devel] [PATCH RESEND v6 08/14] hmat acpi: Build Memory Side
- Cache Information Structure(s)
+Subject: [Qemu-devel] [PATCH RESEND v6 03/14] numa: move numa global
+ variable have_numa_distance into MachineState
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,187 +74,129 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Liu Jingqi <jingqi.liu@intel.com>
+Move existing numa global have_numa_distance into NumaState.
 
-This structure describes memory side cache information for memory
-proximity domains if the memory side cache is present and the
-physical device forms the memory side cache.
-The software could use this information to effectively place
-the data in memory to maximize the performance of the system
-memory that use the memory side cache.
-
-Signed-off-by: Liu Jingqi <jingqi.liu@intel.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Liu Jingqi <jingqi.liu@intel.com>
+Suggested-by: Igor Mammedov <imammedo@redhat.com>
+Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
 Signed-off-by: Tao Xu <tao3.xu@intel.com>
 ---
 
 Changes in v6:
-    - Add descriptions from ACPI 6.3 spec
+    - rebase to upstream, move globals in arm/sbsa-ref
 ---
- hw/acpi/hmat.c          | 64 ++++++++++++++++++++++++++++++++++++++++-
- hw/acpi/hmat.h          | 20 +++++++++++++
- include/qemu/typedefs.h |  1 +
- include/sysemu/numa.h   |  3 ++
- include/sysemu/sysemu.h |  2 ++
- 5 files changed, 89 insertions(+), 1 deletion(-)
+ hw/arm/sbsa-ref.c        | 2 +-
+ hw/arm/virt-acpi-build.c | 2 +-
+ hw/arm/virt.c            | 2 +-
+ hw/core/numa.c           | 5 ++---
+ hw/i386/acpi-build.c     | 2 +-
+ include/sysemu/numa.h    | 4 ++--
+ 6 files changed, 8 insertions(+), 9 deletions(-)
 
-diff --git a/hw/acpi/hmat.c b/hw/acpi/hmat.c
-index 6dd39b0c85..a207581f11 100644
---- a/hw/acpi/hmat.c
-+++ b/hw/acpi/hmat.c
-@@ -133,14 +133,63 @@ static void build_hmat_lb(GArray *table_data, HMAT_LB_Info *numa_hmat_lb,
-     }
- }
+diff --git a/hw/arm/sbsa-ref.c b/hw/arm/sbsa-ref.c
+index 22847909bf..7e4c471717 100644
+--- a/hw/arm/sbsa-ref.c
++++ b/hw/arm/sbsa-ref.c
+@@ -158,7 +158,7 @@ static void create_fdt(SBSAMachineState *sms)
+     qemu_fdt_setprop_cell(fdt, "/", "#address-cells", 0x2);
+     qemu_fdt_setprop_cell(fdt, "/", "#size-cells", 0x2);
  
-+/* ACPI 6.3: 5.2.27.5 Memory Side Cache Information Structure: Table 5-143 */
-+static void build_hmat_cache(GArray *table_data, HMAT_Cache_Info *hmat_cache)
-+{
-+    /*
-+     * Cache Attributes: Bits [3:0] – Total Cache Levels
-+     * for this Memory Proximity Domain
-+     */
-+    uint32_t cache_attr = hmat_cache->total_levels & 0xF;
-+
-+    /* Bits [7:4] : Cache Level described in this structure */
-+    cache_attr |= (hmat_cache->level & 0xF) << 4;
-+
-+    /* Bits [11:8] - Cache Associativity */
-+    cache_attr |= (hmat_cache->associativity & 0xF) << 8;
-+
-+    /* Bits [15:12] - Write Policy */
-+    cache_attr |= (hmat_cache->write_policy & 0xF) << 12;
-+
-+    /* Bits [31:16] - Cache Line size in bytes */
-+    cache_attr |= (hmat_cache->line_size & 0xFFFF) << 16;
-+
-+    cache_attr = cpu_to_le32(cache_attr);
-+
-+    /* Type */
-+    build_append_int_noprefix(table_data, 2, 2);
-+    /* Reserved */
-+    build_append_int_noprefix(table_data, 0, 2);
-+    /* Length */
-+    build_append_int_noprefix(table_data, 32, 4);
-+    /* Proximity Domain for the Memory */
-+    build_append_int_noprefix(table_data, hmat_cache->mem_proximity, 4);
-+    /* Reserved */
-+    build_append_int_noprefix(table_data, 0, 4);
-+    /* Memory Side Cache Size */
-+    build_append_int_noprefix(table_data, hmat_cache->size, 8);
-+    /* Cache Attributes */
-+    build_append_int_noprefix(table_data, cache_attr, 4);
-+    /* Reserved */
-+    build_append_int_noprefix(table_data, 0, 2);
-+    /*
-+     * Number of SMBIOS handles (n)
-+     * Linux kernel uses Memory Side Cache Information Structure
-+     * without SMBIOS entries for now, so set Number of SMBIOS handles
-+     * as 0.
-+     */
-+    build_append_int_noprefix(table_data, 0, 2);
-+}
-+
- /* Build HMAT sub table structures */
- static void hmat_build_table_structs(GArray *table_data, NumaState *nstat)
- {
-     uint16_t flags;
-     uint32_t num_initiator = 0;
-     uint32_t initiator_pxm[MAX_NODES];
--    int i, hrchy, type;
-+    int i, hrchy, type, level;
-     HMAT_LB_Info *numa_hmat_lb;
-+    HMAT_Cache_Info *numa_hmat_cache;
- 
-     for (i = 0; i < nstat->num_nodes; i++) {
-         flags = 0;
-@@ -174,6 +223,19 @@ static void hmat_build_table_structs(GArray *table_data, NumaState *nstat)
-             }
+-    if (have_numa_distance) {
++    if (ms->numa_state->have_numa_distance) {
+         int size = nb_numa_nodes * nb_numa_nodes * 3 * sizeof(uint32_t);
+         uint32_t *matrix = g_malloc0(size);
+         int idx, i, j;
+diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+index a2cc4b84fe..461a44b5b0 100644
+--- a/hw/arm/virt-acpi-build.c
++++ b/hw/arm/virt-acpi-build.c
+@@ -797,7 +797,7 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
+     if (ms->numa_state->num_nodes > 0) {
+         acpi_add_table(table_offsets, tables_blob);
+         build_srat(tables_blob, tables->linker, vms);
+-        if (have_numa_distance) {
++        if (ms->numa_state->have_numa_distance) {
+             acpi_add_table(table_offsets, tables_blob);
+             build_slit(tables_blob, tables->linker, ms);
          }
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index 01a32272b4..984f162531 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -232,7 +232,7 @@ static void create_fdt(VirtMachineState *vms)
+                                 "clk24mhz");
+     qemu_fdt_setprop_cell(fdt, "/apb-pclk", "phandle", vms->clock_phandle);
+ 
+-    if (have_numa_distance) {
++    if (nb_numa_nodes > 0 && ms->numa_state->have_numa_distance) {
+         int size = nb_numa_nodes * nb_numa_nodes * 3 * sizeof(uint32_t);
+         uint32_t *matrix = g_malloc0(size);
+         int idx, i, j;
+diff --git a/hw/core/numa.c b/hw/core/numa.c
+index 4d5e308bf1..2142ec29e8 100644
+--- a/hw/core/numa.c
++++ b/hw/core/numa.c
+@@ -50,7 +50,6 @@ static int have_mem;
+ static int max_numa_nodeid; /* Highest specified NUMA node ID, plus one.
+                              * For all nodes, nodeid < max_numa_nodeid
+                              */
+-bool have_numa_distance;
+ NodeInfo numa_info[MAX_NODES];
+ 
+ 
+@@ -168,7 +167,7 @@ void parse_numa_distance(MachineState *ms, NumaDistOptions *dist, Error **errp)
      }
-+
-+    /*
-+     * ACPI 6.3: 5.2.27.5 Memory Side Cache Information Structure:
-+     * Table 5-143
-+     */
-+    for (i = 0; i < nstat->num_nodes; i++) {
-+        for (level = 0; level <= MAX_HMAT_CACHE_LEVEL; level++) {
-+            numa_hmat_cache = nstat->hmat_cache[i][level];
-+            if (numa_hmat_cache) {
-+                build_hmat_cache(table_data, numa_hmat_cache);
-+            }
-+        }
-+    }
+ 
+     numa_info[src].distance[dst] = val;
+-    have_numa_distance = true;
++    ms->numa_state->have_numa_distance = true;
  }
  
- void build_hmat(GArray *table_data, BIOSLinker *linker, NumaState *nstat)
-diff --git a/hw/acpi/hmat.h b/hw/acpi/hmat.h
-index 9d5f407b8a..ba655281cc 100644
---- a/hw/acpi/hmat.h
-+++ b/hw/acpi/hmat.h
-@@ -79,6 +79,26 @@ struct HMAT_LB_Info {
-     uint16_t    bandwidth[MAX_NODES][MAX_NODES];
- };
+ void set_numa_options(MachineState *ms, NumaOptions *object, Error **errp)
+@@ -441,7 +440,7 @@ void numa_complete_configuration(MachineState *ms)
+          * asymmetric. In this case, the distances for both directions
+          * of all node pairs are required.
+          */
+-        if (have_numa_distance) {
++        if (ms->numa_state->have_numa_distance) {
+             /* Validate enough NUMA distance information was provided. */
+             validate_numa_distance(ms);
  
-+struct HMAT_Cache_Info {
-+    /* The memory proximity domain to which the memory belongs. */
-+    uint32_t    mem_proximity;
-+    /* Size of memory side cache in bytes. */
-+    uint64_t    size;
-+    /*
-+     * Total cache levels for this memory
-+     * pr#include "hw/acpi/aml-build.h"oximity domain.
-+     */
-+    uint8_t     total_levels;
-+    /* Cache level described in this structure. */
-+    uint8_t     level;
-+    /* Cache Associativity: None/Direct Mapped/Comple Cache Indexing */
-+    uint8_t     associativity;
-+    /* Write Policy: None/Write Back(WB)/Write Through(WT) */
-+    uint8_t     write_policy;
-+    /* Cache Line size in bytes. */
-+    uint16_t    line_size;
-+};
-+
- void build_hmat(GArray *table_data, BIOSLinker *linker, NumaState *nstat);
- 
- #endif
-diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
-index c0257e936b..d971f5109e 100644
---- a/include/qemu/typedefs.h
-+++ b/include/qemu/typedefs.h
-@@ -33,6 +33,7 @@ typedef struct FWCfgEntry FWCfgEntry;
- typedef struct FWCfgIoState FWCfgIoState;
- typedef struct FWCfgMemState FWCfgMemState;
- typedef struct FWCfgState FWCfgState;
-+typedef struct HMAT_Cache_Info HMAT_Cache_Info;
- typedef struct HMAT_LB_Info HMAT_LB_Info;
- typedef struct HVFX86EmulatorState HVFX86EmulatorState;
- typedef struct I2CBus I2CBus;
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index 83a8551af6..243c5b85c8 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -2683,7 +2683,7 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
+     if (pcms->numa_nodes) {
+         acpi_add_table(table_offsets, tables_blob);
+         build_srat(tables_blob, tables->linker, machine);
+-        if (have_numa_distance) {
++        if (machine->numa_state->have_numa_distance) {
+             acpi_add_table(table_offsets, tables_blob);
+             build_slit(tables_blob, tables->linker, machine);
+         }
 diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
-index 6b4037d1ca..6aecbdbdc7 100644
+index 3e8dbf20c1..2e5e998adb 100644
 --- a/include/sysemu/numa.h
 +++ b/include/sysemu/numa.h
-@@ -35,6 +35,9 @@ struct NumaState {
+@@ -6,8 +6,6 @@
+ #include "sysemu/hostmem.h"
+ #include "hw/boards.h"
  
-     /* NUMA modes HMAT Locality Latency and Bandwidth Information */
-     HMAT_LB_Info *hmat_lb[HMAT_LB_LEVELS][HMAT_LB_TYPES];
-+
-+    /* Memory Side Cache Information Structure */
-+    HMAT_Cache_Info *hmat_cache[MAX_NODES][MAX_HMAT_CACHE_LEVEL + 1];
+-extern bool have_numa_distance;
+-
+ struct NodeInfo {
+     uint64_t node_mem;
+     struct HostMemoryBackend *node_memdev;
+@@ -26,6 +24,8 @@ struct NumaState {
+     /* Number of NUMA nodes */
+     int num_nodes;
+ 
++    /* Allow setting NUMA distance for different NUMA nodes */
++    bool have_numa_distance;
  };
  typedef struct NumaState NumaState;
- 
-diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-index b6649c37ed..08925abeb8 100644
---- a/include/sysemu/sysemu.h
-+++ b/include/sysemu/sysemu.h
-@@ -145,6 +145,8 @@ enum {
-     HMAT_LB_DATA_WRITE_BANDWIDTH  = 5,
- };
- 
-+#define MAX_HMAT_CACHE_LEVEL        3
-+
- #define HMAT_LB_LEVELS    (HMAT_LB_MEM_CACHE_3RD_LEVEL + 1)
- #define HMAT_LB_TYPES     (HMAT_LB_DATA_WRITE_BANDWIDTH + 1)
  
 -- 
 2.20.1
