@@ -7,56 +7,56 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79D92C606B0
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 09:56:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3AEDC606B0
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 09:56:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 40DA22080C
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 09:56:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8D1FC2080C
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 09:56:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="JEoGVd97"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 40DA22080C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="LJV2WjWP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D1FC2080C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48234 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48236 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hkmrA-000860-Ac
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jul 2019 05:56:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49880)
+	id 1hkmrJ-00009m-Nh
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jul 2019 05:56:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50196)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <kwankhede@nvidia.com>) id 1hkmnI-0003je-KQ
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 05:52:17 -0400
+ (envelope-from <kwankhede@nvidia.com>) id 1hkmoG-0005DI-9z
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 05:53:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwankhede@nvidia.com>) id 1hkmnH-00044M-MN
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 05:52:16 -0400
-Received: from hqemgate16.nvidia.com ([216.228.121.65]:10308)
+ (envelope-from <kwankhede@nvidia.com>) id 1hkmoF-0004dO-5r
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 05:53:16 -0400
+Received: from hqemgate14.nvidia.com ([216.228.121.143]:7233)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <kwankhede@nvidia.com>)
- id 1hkmnH-000441-Er
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 05:52:15 -0400
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by
- hqemgate16.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
- id <B5d2463cc0000>; Tue, 09 Jul 2019 02:52:13 -0700
+ id 1hkmoE-0004d2-UM
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 05:53:15 -0400
+Received: from hqpgpgate102.nvidia.com (Not Verified[216.228.121.13]) by
+ hqemgate14.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+ id <B5d2464040000>; Tue, 09 Jul 2019 02:53:08 -0700
 Received: from hqmail.nvidia.com ([172.20.161.6])
- by hqpgpgate101.nvidia.com (PGP Universal service);
- Tue, 09 Jul 2019 02:52:14 -0700
+ by hqpgpgate102.nvidia.com (PGP Universal service);
+ Tue, 09 Jul 2019 02:53:13 -0700
 X-PGP-Universal: processed;
- by hqpgpgate101.nvidia.com on Tue, 09 Jul 2019 02:52:14 -0700
-Received: from HQMAIL109.nvidia.com (172.20.187.15) by HQMAIL105.nvidia.com
- (172.20.187.12) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 9 Jul
- 2019 09:52:13 +0000
-Received: from HQMAIL101.nvidia.com (172.20.187.10) by HQMAIL109.nvidia.com
- (172.20.187.15) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 9 Jul
- 2019 09:52:13 +0000
+ by hqpgpgate102.nvidia.com on Tue, 09 Jul 2019 02:53:13 -0700
+Received: from HQMAIL111.nvidia.com (172.20.187.18) by HQMAIL104.nvidia.com
+ (172.18.146.11) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 9 Jul
+ 2019 09:53:13 +0000
+Received: from HQMAIL101.nvidia.com (172.20.187.10) by HQMAIL111.nvidia.com
+ (172.20.187.18) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 9 Jul
+ 2019 09:53:12 +0000
 Received: from kwankhede-dev.nvidia.com (10.124.1.5) by HQMAIL101.nvidia.com
  (172.20.187.10) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via Frontend
- Transport; Tue, 9 Jul 2019 09:52:07 +0000
+ Transport; Tue, 9 Jul 2019 09:53:06 +0000
 From: Kirti Wankhede <kwankhede@nvidia.com>
 To: <alex.williamson@redhat.com>, <cjia@nvidia.com>
-Date: Tue, 9 Jul 2019 15:19:10 +0530
-Message-ID: <1562665760-26158-4-git-send-email-kwankhede@nvidia.com>
+Date: Tue, 9 Jul 2019 15:19:19 +0530
+Message-ID: <1562665760-26158-13-git-send-email-kwankhede@nvidia.com>
 X-Mailer: git-send-email 2.7.0
 In-Reply-To: <1562665760-26158-1-git-send-email-kwankhede@nvidia.com>
 References: <1562665760-26158-1-git-send-email-kwankhede@nvidia.com>
@@ -64,20 +64,20 @@ X-NVConfidentiality: public
 MIME-Version: 1.0
 Content-Type: text/plain
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
- t=1562665933; bh=PSRLy6S6kyHPuidTbjM/3kb9fZJQ4RoIRSGUoB0Hfcs=;
+ t=1562665989; bh=gFFxatm5vEcsYi2oQ1vg+wARzP2JUq9a8FiNQRij5Bw=;
  h=X-PGP-Universal:From:To:CC:Subject:Date:Message-ID:X-Mailer:
  In-Reply-To:References:X-NVConfidentiality:MIME-Version:
  Content-Type;
- b=JEoGVd97X3kaRC1M1ROxRsYJ55Zfk8AZhJtRmy/BpdQMDPldQLX2xbZP7tOjBWrJ4
- 0iTObC7w34Uw8AN4xyomIHkUVNz2+P5EHeb8TJxtJ443zucJL5mO4WF+uNeVNzzNd4
- o3N7cRPSISnIlnzfcxD3ucs+VonHolemwXAsgxTJnDlQ8bQCHdkUHDwXbQdwitTtpN
- PUlj6E0Pho6Zr+V7yvXvQc/8dnk1h67w0Z1/sShG7GJlHiIQWr+ESPXwVcP8KSypH4
- bFSjhWy+Q8UBdQoCQUq46F3j7G5zrUyzGuoWahIiRSIejNmPCpK7cBtspRMInUVdU/
- l9sRf+5i5KtpQ==
+ b=LJV2WjWPAK8+Qgc6QLSb3lq3dnGL2Xzk4HHIXk6tVPtOEZoNDf+rVYUjzcwZQSV5C
+ 3WY1kBj+hYudUUi/Yvker7OviOzuxsyVPOZpBDYyWkOb4lsvEiCLqxMnynOMRT9hC0
+ 7ZCVY4cNf0EhitX7iWhJKd35NEX/z0lNFLRt7tcVe2xqYqVoye3TwoXc8mP7cmEZLT
+ IsctoOX+/WMlWaOTIDv4wA/BJgrParWZTyXSW7uC494p/HpoBM9lbnCJG9/6JRv1fD
+ adrclxTigJcg20uZg5QUQIU+IlpkYkSmm2SnifraXjjL2fHWPt9mIMj03drQ/XcPC/
+ EL0nZ2vMt+HYg==
 X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8
-X-Received-From: 216.228.121.65
-Subject: [Qemu-devel] [PATCH v7 03/13] vfio: Add vfio_get_object callback to
- VFIODeviceOps
+X-Received-From: 216.228.121.143
+Subject: [Qemu-devel] [PATCH v7 12/13] vfio: Add vfio_listerner_log_sync to
+ mark dirty pages
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,51 +100,72 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hook vfio_get_object callback for PCI devices.
+vfio_listerner_log_sync gets list of dirty pages from vendor driver and mark
+those pages dirty when in _SAVING state.
+Return early for the RAM block section of mapped MMIO region.
 
 Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
 Reviewed-by: Neo Jia <cjia@nvidia.com>
-Suggested-by: Cornelia Huck <cohuck@redhat.com>
 ---
- hw/vfio/pci.c                 | 8 ++++++++
- include/hw/vfio/vfio-common.h | 1 +
- 2 files changed, 9 insertions(+)
+ hw/vfio/common.c | 35 +++++++++++++++++++++++++++++++++++
+ 1 file changed, 35 insertions(+)
 
-diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-index d7a4e1875c05..de0d286fc9dd 100644
---- a/hw/vfio/pci.c
-+++ b/hw/vfio/pci.c
-@@ -2388,10 +2388,18 @@ static void vfio_pci_compute_needs_reset(VFIODevice *vbasedev)
+diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+index de74dae8d6a6..d5ee35c95e76 100644
+--- a/hw/vfio/common.c
++++ b/hw/vfio/common.c
+@@ -36,6 +36,7 @@
+ #include "sysemu/kvm.h"
+ #include "trace.h"
+ #include "qapi/error.h"
++#include "migration/migration.h"
+ 
+ VFIOGroupList vfio_group_list =
+     QLIST_HEAD_INITIALIZER(vfio_group_list);
+@@ -794,9 +795,43 @@ static void vfio_listener_region_del(MemoryListener *listener,
      }
  }
  
-+static Object *vfio_pci_get_object(VFIODevice *vbasedev)
++static void vfio_listerner_log_sync(MemoryListener *listener,
++                                    MemoryRegionSection *section)
 +{
-+    VFIOPCIDevice *vdev = container_of(vbasedev, VFIOPCIDevice, vbasedev);
++    uint64_t start_addr, size, pfn_count;
++    VFIOGroup *group;
++    VFIODevice *vbasedev;
 +
-+    return OBJECT(vdev);
++    if (memory_region_is_ram_device(section->mr)) {
++        return;
++    }
++
++    QLIST_FOREACH(group, &vfio_group_list, next) {
++        QLIST_FOREACH(vbasedev, &group->device_list, next) {
++            if (vbasedev->device_state & VFIO_DEVICE_STATE_SAVING) {
++                continue;
++            } else {
++                return;
++            }
++        }
++    }
++
++    start_addr = TARGET_PAGE_ALIGN(section->offset_within_address_space);
++    size = int128_get64(section->size);
++    pfn_count = size >> TARGET_PAGE_BITS;
++
++    QLIST_FOREACH(group, &vfio_group_list, next) {
++        QLIST_FOREACH(vbasedev, &group->device_list, next) {
++            vfio_get_dirty_page_list(vbasedev, start_addr >> TARGET_PAGE_BITS,
++                                     pfn_count, TARGET_PAGE_SIZE);
++        }
++    }
 +}
 +
- static VFIODeviceOps vfio_pci_ops = {
-     .vfio_compute_needs_reset = vfio_pci_compute_needs_reset,
-     .vfio_hot_reset_multi = vfio_pci_hot_reset_multi,
-     .vfio_eoi = vfio_intx_eoi,
-+    .vfio_get_object = vfio_pci_get_object,
+ static const MemoryListener vfio_memory_listener = {
+     .region_add = vfio_listener_region_add,
+     .region_del = vfio_listener_region_del,
++    .log_sync = vfio_listerner_log_sync,
  };
  
- int vfio_populate_vga(VFIOPCIDevice *vdev, Error **errp)
-diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-index 93493891ba40..771b6d59a3db 100644
---- a/include/hw/vfio/vfio-common.h
-+++ b/include/hw/vfio/vfio-common.h
-@@ -119,6 +119,7 @@ struct VFIODeviceOps {
-     void (*vfio_compute_needs_reset)(VFIODevice *vdev);
-     int (*vfio_hot_reset_multi)(VFIODevice *vdev);
-     void (*vfio_eoi)(VFIODevice *vdev);
-+    Object *(*vfio_get_object)(VFIODevice *vdev);
- };
- 
- typedef struct VFIOGroup {
+ static void vfio_listener_release(VFIOContainer *container)
 -- 
 2.7.0
 
