@@ -2,67 +2,80 @@ Return-Path: <SRS0=huOX=VG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-13.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E77FC606B0
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 07:48:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BEB2C606B0
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 07:52:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4F73B21537
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 07:48:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F73B21537
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id E993820449
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 07:52:31 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DCZtEeXr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E993820449
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47562 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47578 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hkkrV-00053t-Gc
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jul 2019 03:48:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51308)
+	id 1hkkvO-00072c-RY
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jul 2019 03:52:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52130)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <no-reply@patchew.org>) id 1hkkqe-0004aJ-Dn
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 03:47:37 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1hkktx-0005je-6b
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 03:51:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1hkkqd-0006KX-DH
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 03:47:36 -0400
-Resent-Date: Tue, 09 Jul 2019 03:47:36 -0400
-Resent-Message-Id: <E1hkkqd-0006KX-DH@eggs.gnu.org>
-Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21582)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1hkkqd-0006Jd-5S
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 03:47:35 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1562658378; cv=none; d=zoho.com; s=zohoarc; 
- b=BWf6BHuHIo+reO3wZmT1vHgeTaBDee0EknghsPUATtHj+vC4eBuRQmXE3Etkbb62EYmkbWJ3JhcML/TWvXCViy7p7I5vEnWjku3eyXMZmOj6AaAW8f10pCRKUZm7deG7WjJM2415apVczK9jQzqYOX9PHjJ0xJGsWMQnXfG0zDI=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1562658378;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
- bh=fPWusUpxLdBhB1NtCVvk2CsPnOjDljp2tuWm0okOFfc=; 
- b=h2BwyqqCkyRIC+FYIpCP4RtwWi4amL/jgki7/EwVKHyS3x9SzPHgRP2nAE9nvmohOJOIjFbNtsBoeGSdOlJO/2yy+InuzO+Nlj9A35isaDeyhedMqlYkKJI33boLV/DTAn9LOyPmiPP6FpsoLnziOyGEI0B6kT13hL9IoLF3MyY=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1562658378198924.0888617927673;
- Tue, 9 Jul 2019 00:46:18 -0700 (PDT)
-Message-ID: <156265837660.29610.11551024573363799482@c4a48874b076>
-In-Reply-To: <20190709071520.8745-1-tao3.xu@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: tao3.xu@intel.com
-Date: Tue, 9 Jul 2019 00:46:18 -0700 (PDT)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 136.143.188.55
-Subject: Re: [Qemu-devel] [PATCH RESEND v6 00/14] Build ACPI Heterogeneous
- Memory Attribute Table (HMAT)
+ (envelope-from <richard.henderson@linaro.org>) id 1hkktw-0000zZ-4u
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 03:51:01 -0400
+Received: from mail-pl1-x62c.google.com ([2607:f8b0:4864:20::62c]:37111)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1hkktv-0000sv-TV
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 03:51:00 -0400
+Received: by mail-pl1-x62c.google.com with SMTP id b3so6344615plr.4
+ for <qemu-devel@nongnu.org>; Tue, 09 Jul 2019 00:50:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id;
+ bh=t5El953k6NH1n+xV8lDwymmaxDXjTJBkzNI+f57sIwE=;
+ b=DCZtEeXrk5Bhd+8grwE5WkniMgAUoyAEiYXii5okPmBf4WOk/qPLhdZCtpS+M6Y/nx
+ 2C6synfxh3aFFNcz3Ih9l2iioyNrTxXnz84KxRytwA5fwDVLq/IesebObeDsMZtfo7OH
+ 8EXsvjPf65tvrBSvtJix73h6vsTPzERKe0LNcKPUaZHJfECJ413zxonZqlaK2lQbB+hy
+ qE7RdlUVf9rYeH5RXMpSMXEjFzRJcfwnVCc+Ufv8DdEtj2SAOeW53tQ+T7ZwoqMbEai7
+ zxfGDWUPI4KN8B67oqFZZLqGynNXrkKzOgns1P6Ri3YsH13VBRUtW1+ntnkTrFsLc5ur
+ j1fQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id;
+ bh=t5El953k6NH1n+xV8lDwymmaxDXjTJBkzNI+f57sIwE=;
+ b=q0VAuNbQl18+fffQYecYcTHpmfrTCu0KtoL67N+2rKyylBFwqH5l8FGWoPOCXhweJq
+ GJbdlpP9VWoA9sRx0SbD3CL6wl/7+/x42seiHtEMZq3qi7vReXgQcLrhj6S6S98ZATeq
+ YD6NzdvKHbnPG5PhixiVCPd/M9hNEbRA17q2NqTXxdk1sMklcYtYnwSCpf0/WUIb312l
+ NgDfGUSqG2s0rFAXOr8y9GFzZld1KZnbQbhMGc4RqLJsbHf5aXUtoa5LYGFfiSBBw9C8
+ Dn1ToBpLgmG2TgtirwYtOUrbJwhtSvp3sdOKIZoORqbJFz60ki15R3LDpm/QKgH1dUVQ
+ ZfIw==
+X-Gm-Message-State: APjAAAUpKSZqJ6vW9FcyWX2Bzgu+Q9f1UR2V85e5sTajLWK3LZ9eJqIE
+ NQRTWgnIy4DDepeuNFNesUOaYOhE3aRVLg==
+X-Google-Smtp-Source: APXvYqzhPW8aF08AuDjbE+vQ1F7Ui759j7Di+2i2BxK4u/ZS6531epX9lf28MdLYTia/l/IUvebk7g==
+X-Received: by 2002:a17:902:1e9:: with SMTP id
+ b96mr30571700plb.277.1562658653175; 
+ Tue, 09 Jul 2019 00:50:53 -0700 (PDT)
+Received: from localhost.localdomain ([172.56.12.212])
+ by smtp.gmail.com with ESMTPSA id y22sm28237375pfo.39.2019.07.09.00.50.50
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Tue, 09 Jul 2019 00:50:52 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Date: Tue,  9 Jul 2019 09:50:37 +0200
+Message-Id: <20190709075042.13941-1-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.17.1
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::62c
+Subject: [Qemu-devel] [PULL v2 for-4.1 0/2] tcg patch queue
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,32 +87,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: ehabkost@redhat.com, jingqi.liu@intel.com, tao3.xu@intel.com,
- fan.du@intel.com, qemu-devel@nongnu.org, jonathan.cameron@huawei.com,
- imammedo@redhat.com, dan.j.williams@intel.com
+Cc: peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDcwOTA3MTUyMC44NzQ1
-LTEtdGFvMy54dUBpbnRlbC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRoZSBhc2Fu
-IGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5nIGNvbW1hbmRzIGFuZAp0aGVpciBv
-dXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0YWxsZWQsIHlvdSBjYW4gcHJvYmFi
-bHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jp
-bi9iYXNoCm1ha2UgZG9ja2VyLWltYWdlLWZlZG9yYSBWPTEgTkVUV09SSz0xCnRpbWUgbWFrZSBk
-b2NrZXItdGVzdC1kZWJ1Z0BmZWRvcmEgVEFSR0VUX0xJU1Q9eDg2XzY0LXNvZnRtbXUgSj0xNCBO
-RVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCiAgQ0MgICAgICBody9hdWRpby9hYzk3
-Lm8KICBDQyAgICAgIGh3L2F1ZGlvL2Ztb3BsLm8KICBDQyAgICAgIGh3L2F1ZGlvL2FkbGliLm8K
-L3RtcC9xZW11LXRlc3Qvc3JjL2h3L2FjcGkvaG1hdC5jOjI2MToyMzogZXJyb3I6IHRha2luZyBh
-ZGRyZXNzIG9mIHBhY2tlZCBtZW1iZXIgJ29mZnNldCcgb2YgY2xhc3Mgb3Igc3RydWN0dXJlICdI
-bWF0SG1hbUluJyBtYXkgcmVzdWx0IGluIGFuIHVuYWxpZ25lZCBwb2ludGVyIHZhbHVlIFstV2Vy
-cm9yLC1XYWRkcmVzcy1vZi1wYWNrZWQtbWVtYmVyXQogICAgICAgIGxlMzJfdG9fY3B1cygmaW4t
-Pm9mZnNldCk7CiAgICAgICAgICAgICAgICAgICAgICBefn5+fn5+fn5+CjEgZXJyb3IgZ2VuZXJh
-dGVkLgoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xv
-Z3MvMjAxOTA3MDkwNzE1MjAuODc0NS0xLXRhbzMueHVAaW50ZWwuY29tL3Rlc3RpbmcuYXNhbi8/
-dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hl
-dyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBh
-dGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+For v2, drop the PAGE_EXEC patch that appeared to cause
+problems during Peter's testing.
 
+
+r~
+
+
+The following changes since commit f34edbc760b0f689deddd175fc08732ecb46665f:
+
+  Merge remote-tracking branch 'remotes/stefanberger/tags/pull-tpm-2019-07-08-1' into staging (2019-07-08 17:40:05 +0100)
+
+are available in the Git repository at:
+
+  https://github.com/rth7680/qemu.git tags/pull-tcg-20190709
+
+for you to fetch changes up to 11978f6f58f1d3d66429f7ff897524f693d823ce:
+
+  tcg: Fix expansion of INDEX_op_not_vec (2019-07-09 08:26:11 +0200)
+
+----------------------------------------------------------------
+Minor gvec fix for as-yet uncommitted altivec host.
+Build fix for riscv host.
+
+----------------------------------------------------------------
+Alistair Francis (1):
+      tcg/riscv: Fix RISC-VH host build failure
+
+Richard Henderson (1):
+      tcg: Fix expansion of INDEX_op_not_vec
+
+ tcg/riscv/tcg-target.inc.c | 4 ++--
+ tcg/tcg-op-vec.c           | 6 ++++++
+ 2 files changed, 8 insertions(+), 2 deletions(-)
 
