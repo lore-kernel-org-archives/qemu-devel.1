@@ -7,56 +7,53 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E45FC606B0
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85AA3C606D4
 	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 04:10:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1CF912073D
+	by mail.kernel.org (Postfix) with ESMTPS id 47EB921707
 	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 04:10:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="gXPjuCn8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CF912073D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="ZoVXMsO2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47EB921707
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46524 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46526 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hkhS9-00044J-Df
+	id 1hkhS9-00045c-Ho
 	for qemu-devel@archiver.kernel.org; Tue, 09 Jul 2019 00:10:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34861)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34926)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <kwankhede@nvidia.com>) id 1hkhQN-0002N3-Rj
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 00:08:18 -0400
+ (envelope-from <kwankhede@nvidia.com>) id 1hkhQW-0002Ri-Ng
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 00:08:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwankhede@nvidia.com>) id 1hkhQL-0003F2-9E
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 00:08:15 -0400
-Received: from hqemgate15.nvidia.com ([216.228.121.64]:3828)
+ (envelope-from <kwankhede@nvidia.com>) id 1hkhQU-0003J3-W4
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 00:08:24 -0400
+Received: from hqemgate16.nvidia.com ([216.228.121.65]:11689)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <kwankhede@nvidia.com>)
- id 1hkhQH-0003Bd-CU
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 00:08:10 -0400
-Received: from hqpgpgate102.nvidia.com (Not Verified[216.228.121.13]) by
- hqemgate15.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
- id <B5d24131f001a>; Mon, 08 Jul 2019 21:08:00 -0700
+ id 1hkhQU-0003Go-Kb
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 00:08:22 -0400
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by
+ hqemgate16.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+ id <B5d2413260014>; Mon, 08 Jul 2019 21:08:06 -0700
 Received: from hqmail.nvidia.com ([172.20.161.6])
- by hqpgpgate102.nvidia.com (PGP Universal service);
- Mon, 08 Jul 2019 21:07:55 -0700
+ by hqpgpgate101.nvidia.com (PGP Universal service);
+ Mon, 08 Jul 2019 21:08:08 -0700
 X-PGP-Universal: processed;
- by hqpgpgate102.nvidia.com on Mon, 08 Jul 2019 21:07:55 -0700
-Received: from HQMAIL110.nvidia.com (172.18.146.15) by HQMAIL105.nvidia.com
- (172.20.187.12) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 9 Jul
- 2019 02:01:54 +0000
-Received: from HQMAIL104.nvidia.com (172.18.146.11) by hqmail110.nvidia.com
- (172.18.146.15) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 9 Jul
- 2019 02:01:53 +0000
+ by hqpgpgate101.nvidia.com on Mon, 08 Jul 2019 21:08:08 -0700
+Received: from HQMAIL104.nvidia.com (172.18.146.11) by HQMAIL106.nvidia.com
+ (172.18.146.12) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 9 Jul
+ 2019 02:02:47 +0000
 Received: from kwankhede-dev.nvidia.com (10.124.1.5) by HQMAIL104.nvidia.com
  (172.18.146.11) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via Frontend
- Transport; Tue, 9 Jul 2019 02:01:47 +0000
+ Transport; Tue, 9 Jul 2019 02:02:40 +0000
 From: Kirti Wankhede <kwankhede@nvidia.com>
 To: <alex.williamson@redhat.com>, <cjia@nvidia.com>
-Date: Tue, 9 Jul 2019 07:29:02 +0530
-Message-ID: <1562637554-22439-2-git-send-email-kwankhede@nvidia.com>
+Date: Tue, 9 Jul 2019 07:29:10 +0530
+Message-ID: <1562637554-22439-10-git-send-email-kwankhede@nvidia.com>
 X-Mailer: git-send-email 2.7.0
 In-Reply-To: <1562637554-22439-1-git-send-email-kwankhede@nvidia.com>
 References: <1562637554-22439-1-git-send-email-kwankhede@nvidia.com>
@@ -64,19 +61,20 @@ X-NVConfidentiality: public
 MIME-Version: 1.0
 Content-Type: text/plain
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
- t=1562645291; bh=gmFkRUjnMPn0H+3vl9QKit/mJp2xO4oax1Qjt+/ao9s=;
+ t=1562645296; bh=A7n9cER+6zEZkC/xqKdfpyvX2vkSehF/2cfBoKCsIo4=;
  h=X-PGP-Universal:From:To:CC:Subject:Date:Message-ID:X-Mailer:
  In-Reply-To:References:X-NVConfidentiality:MIME-Version:
  Content-Type;
- b=gXPjuCn8cVrd12LfGssq12/sDvwUwyZ+ZHQwY3KDjKVRHC/k4A+2RkdPgn31gBfh+
- x9ornbvuff5xCwjqsa2IY7qhjMaBdLggd0p4GRgZJVzFbR13r48E6Q0/43HIL0Mhaw
- u04Vvf0XcgzSj4dUrTlax6gPGpvuBvLS7mzQ9XtBhFbl1z3aX2Rz6tWhAjZ7jWuuCV
- oLJP6rWgz/sAJyRtN7PvwGoyiE2x7Z4ONG2Y4YbJx4iZx0PupuCOyVO1FlSIx+upra
- rncEbuKG09Hi2niKAa+0nXXu4sMpGLl3EaIJpVbyWsLf2W8ba7YNTmSKTq6zgXG6Zd
- mzeUj3WYOiQwg==
+ b=ZoVXMsO2SCjcW6Adl7Ew/eCR7cfom1FNYS6BnmCuuNYXXty8CZMfHYn+hMk/4YvLi
+ biAFS6F/XY/ylYwY9Z5wIMbKlh39b8b1FhUyrMrHKp3PCn7czzUAhotsftT902u4lk
+ iOoCZeSuN1AeFZ57sz+bcx1U5Jc2bxAkOAHrjw/DBZY+uuIKzB6EOqQBERcSdh7e7P
+ VJaGdpaqVlgnd+sHIVDskDMQ3Cmh9D61XDNKks9wFRemA3q0vFwSpoqz6qjzhO39zn
+ cIbr07IteX9CI2Nf12Uamh390qFxof1aPVPEqD7dYx3sbihb+juIw4YQ1fPKRwIPVO
+ wmieEBOUbiqHg==
 X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8
-X-Received-From: 216.228.121.64
-Subject: [Qemu-devel] [PATCH v6 01/13] vfio: KABI for migration interface
+X-Received-From: 216.228.121.65
+Subject: [Qemu-devel] [PATCH v6 09/13] vfio: Add save state functions to
+ SaveVMHandlers
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,246 +97,333 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-- Defined MIGRATION region type and sub-type.
-- Used 3 bits to define VFIO device states.
-    Bit 0 => _RUNNING
-    Bit 1 => _SAVING
-    Bit 2 => _RESUMING
-    Combination of these bits defines VFIO device's state during migration
-    _STOPPED => All bits 0 indicates VFIO device stopped.
-    _RUNNING => Normal VFIO device running state.
-    _SAVING | _RUNNING => vCPUs are running, VFIO device is running but start
-                          saving state of device i.e. pre-copy state
-    _SAVING  => vCPUs are stoppped, VFIO device should be stopped, and
-                          save device state,i.e. stop-n-copy state
-    _RESUMING => VFIO device resuming state.
-    _SAVING | _RESUMING => Invalid state if _SAVING and _RESUMING bits are set
-- Defined vfio_device_migration_info structure which will be placed at 0th
-  offset of migration region to get/set VFIO device related information.
-  Defined members of structure and usage on read/write access:
-    * device_state: (read/write)
-        To convey VFIO device state to be transitioned to. Only 3 bits are used
-        as of now.
-    * pending bytes: (read only)
-        To get pending bytes yet to be migrated for VFIO device.
-    * data_offset: (read only)
-        To get data offset in migration from where data exist during _SAVING
-        and from where data should be written by user space application during
-         _RESUMING state
-    * data_size: (read/write)
-        To get and set size of data copied in migration region during _SAVING
-        and _RESUMING state.
-    * start_pfn, page_size, total_pfns: (write only)
-        To get bitmap of dirty pages from vendor driver from given
-        start address for total_pfns.
-    * copied_pfns: (read only)
-        To get number of pfns bitmap copied in migration region.
-        Vendor driver should copy the bitmap with bits set only for
-        pages to be marked dirty in migration region. Vendor driver
-        should return 0 if there are 0 pages dirty in requested
-        range. Vendor driver should return -1 to mark all pages in the section
-        as dirty
+Added .save_live_pending, .save_live_iterate and .save_live_complete_precopy
+functions. These functions handles pre-copy and stop-and-copy phase.
 
-Migration region looks like:
- ------------------------------------------------------------------
-|vfio_device_migration_info|    data section                      |
-|                          |     ///////////////////////////////  |
- ------------------------------------------------------------------
- ^                              ^                              ^
- offset 0-trapped part        data_offset                 data_size
+In _SAVING|_RUNNING device state or pre-copy phase:
+- read pending_bytes
+- read data_offset - indicates kernel driver to write data to staging
+  buffer which is mmapped.
+- read data_size - amount of data in bytes written by vendor driver in migration
+  region.
+- if data section is trapped, pread() from data_offset of data_size.
+- if data section is mmaped, read mmaped buffer of data_size.
+- Write data packet to file stream as below:
+{VFIO_MIG_FLAG_DEV_DATA_STATE, data_size, actual data,
+VFIO_MIG_FLAG_END_OF_STATE }
 
-Data section is always followed by vfio_device_migration_info
-structure in the region, so data_offset will always be none-0.
-Offset from where data is copied is decided by kernel driver, data
-section can be trapped or mapped depending on how kernel driver
-defines data section. If mmapped, then data_offset should be page
-aligned, where as initial section which contain
-vfio_device_migration_info structure might not end at offset which
-is page aligned.
+In _SAVING device state or stop-and-copy phase
+a. read config space of device and save to migration file stream. This
+   doesn't need to be from vendor driver. Any other special config state
+   from driver can be saved as data in following iteration.
+b. read pending_bytes
+c. read data_offset - indicates kernel driver to write data to staging
+   buffer which is mmapped.
+d. read data_size - amount of data in bytes written by vendor driver in
+   migration region.
+e. if data section is trapped, pread() from data_offset of data_size.
+f. if data section is mmaped, read mmaped buffer of data_size.
+g. Write data packet as below:
+   {VFIO_MIG_FLAG_DEV_DATA_STATE, data_size, actual data}
+h. iterate through steps b to g while (pending_bytes > 0)
+i. Write {VFIO_MIG_FLAG_END_OF_STATE}
+
+When data region is mapped, its user's responsibility to read data from
+data_offset of data_size before moving to next steps.
+
+.save_live_iterate runs outside the iothread lock in the migration case, which
+could race with asynchronous call to get dirty page list causing data corruption
+in mapped migration region. Mutex added here to serial migration buffer read
+operation.
 
 Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
 Reviewed-by: Neo Jia <cjia@nvidia.com>
 ---
- linux-headers/linux/vfio.h | 166 +++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 166 insertions(+)
+ hw/vfio/migration.c  | 246 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ hw/vfio/trace-events |   6 ++
+ 2 files changed, 252 insertions(+)
 
-diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
-index 24f505199f83..6696a4600545 100644
---- a/linux-headers/linux/vfio.h
-+++ b/linux-headers/linux/vfio.h
-@@ -372,6 +372,172 @@ struct vfio_region_gfx_edid {
-  */
- #define VFIO_REGION_SUBTYPE_IBM_NVLINK2_ATSD	(1)
+diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
+index 0597a45fda2d..4e9b4cce230b 100644
+--- a/hw/vfio/migration.c
++++ b/hw/vfio/migration.c
+@@ -117,6 +117,138 @@ static int vfio_migration_set_state(VFIODevice *vbasedev, uint32_t state)
+     return 0;
+ }
  
-+/* Migration region type and sub-type */
-+#define VFIO_REGION_TYPE_MIGRATION	        (2)
-+#define VFIO_REGION_SUBTYPE_MIGRATION	        (1)
++static void *find_data_region(VFIORegion *region,
++                              uint64_t data_offset,
++                              uint64_t data_size)
++{
++    void *ptr = NULL;
++    int i;
 +
-+/**
-+ * Structure vfio_device_migration_info is placed at 0th offset of
-+ * VFIO_REGION_SUBTYPE_MIGRATION region to get/set VFIO device related migration
-+ * information. Field accesses from this structure are only supported at their
-+ * native width and alignment, otherwise should return error.
-+ *
-+ * device_state: (read/write)
-+ *      To indicate vendor driver the state VFIO device should be transitioned
-+ *      to. If device state transition fails, write on this field return error.
-+ *      It consists of 3 bits:
-+ *      - If bit 0 set, indicates _RUNNING state. When its reset, that indicates
-+ *        _STOPPED state. When device is changed to _STOPPED, driver should stop
-+ *        device before write() returns.
-+ *      - If bit 1 set, indicates _SAVING state.
-+ *      - If bit 2 set, indicates _RESUMING state.
-+ *      _SAVING and _RESUMING set at the same time is invalid state.
-+ *
-+ * pending bytes: (read only)
-+ *      Number of pending bytes yet to be migrated from vendor driver
-+ *
-+ * data_offset: (read only)
-+ *      User application should read data_offset in migration region from where
-+ *      user application should read device data during _SAVING state or write
-+ *      device data during _RESUMING state or read dirty pages bitmap. See below
-+ *      for detail of sequence to be followed.
-+ *
-+ * data_size: (read/write)
-+ *      User application should read data_size to get size of data copied in
-+ *      migration region during _SAVING state and write size of data copied in
-+ *      migration region during _RESUMING state.
-+ *
-+ * start_pfn: (write only)
-+ *      Start address pfn to get bitmap of dirty pages from vendor driver duing
-+ *      _SAVING state.
-+ *
-+ * page_size: (write only)
-+ *      User application should write the page_size of pfn.
-+ *
-+ * total_pfns: (write only)
-+ *      Total pfn count from start_pfn for which dirty bitmap is requested.
-+ *
-+ * copied_pfns: (read only)
-+ *      pfn count for which dirty bitmap is copied to migration region.
-+ *      Vendor driver should copy the bitmap with bits set only for pages to be
-+ *      marked dirty in migration region.
-+ *      - Vendor driver should return VFIO_DEVICE_DIRTY_PFNS_NONE if none of the
-+ *        pages are dirty in requested range or rest of the range.
-+ *      - Vendor driver should return VFIO_DEVICE_DIRTY_PFNS_ALL to mark all
-+ *        pages dirty in the given section.
-+ *      - Vendor driver should return pfn count for which bitmap is written in
-+ *        the region.
-+ *
-+ * Migration region looks like:
-+ *  ------------------------------------------------------------------
-+ * |vfio_device_migration_info|    data section                      |
-+ * |                          |     ///////////////////////////////  |
-+ * ------------------------------------------------------------------
-+ *   ^                              ^                              ^
-+ *  offset 0-trapped part        data_offset                 data_size
-+ *
-+ * Data section is always followed by vfio_device_migration_info structure
-+ * in the region, so data_offset will always be none-0. Offset from where data
-+ * is copied is decided by kernel driver, data section can be trapped or
-+ * mapped depending on how kernel driver defines data section. If mmapped,
-+ * then data_offset should be page aligned, where as initial section which
-+ * contain vfio_device_migration_info structure might not end at offset which
-+ * is page aligned.
-+ * Data_offset can be same or different for device data and dirty page bitmap.
-+ * Vendor driver should decide whether to partition data section and how to
-+ * partition the data section. Vendor driver should return data_offset
-+ * accordingly.
-+ *
-+ * Sequence to be followed:
-+ * In _SAVING|_RUNNING device state or pre-copy phase:
-+ * a. read pending_bytes. If pending_bytes > 0, go through below steps.
-+ * b. read data_offset, indicates kernel driver to write data to staging buffer
-+ *    which is mmapped.
-+ * c. read data_size, amount of data in bytes written by vendor driver in
-+ *    migration region.
-+ * d. if data section is trapped, read from data_offset of data_size.
-+ * e. if data section is mmaped, read data_size bytes from mmaped buffer from
-+ *    data_offset in the migration region.
-+ * f. Write data_size and data to file stream.
-+ * g. iterate through steps a to f while (pending_bytes > 0)
-+ *
-+ * In _SAVING device state or stop-and-copy phase:
-+ * a. read config space of device and save to migration file stream. This
-+ *    doesn't need to be from vendor driver. Any other special config state
-+ *    from driver can be saved as data in following iteration.
-+ * b. read pending_bytes.
-+ * c. read data_offset, indicates kernel driver to write data to staging
-+ *    buffer which is mmapped.
-+ * d. read data_size, amount of data in bytes written by vendor driver in
-+ *    migration region.
-+ * e. if data section is trapped, read from data_offset of data_size.
-+ * f. if data section is mmaped, read data_size bytes from mmaped buffer from
-+ *    data_offset in the migration region.
-+ * g. Write data_size and data to file stream
-+ * h. iterate through steps b to g while (pending_bytes > 0)
-+ *
-+ * When data region is mapped, its user's responsibility to read data from
-+ * data_offset of data_size before moving to next steps.
-+ *
-+ * Dirty page tracking is part of RAM copy state, where vendor driver
-+ * provides the bitmap of pages which are dirtied by vendor driver through
-+ * migration region and as part of RAM copy those pages gets copied to file
-+ * stream.
-+ *
-+ * To get dirty page bitmap:
-+ * a. write start_pfn, page_size and total_pfns.
-+ * b. read copied_pfns.
-+ *     - Vendor driver should return VFIO_DEVICE_DIRTY_PFNS_NONE if driver
-+ *       doesn't have any page to report dirty in given range or rest of the
-+ *       range. Exit loop.
-+ *     - Vendor driver should return VFIO_DEVICE_DIRTY_PFNS_ALL to mark all
-+ *       pages dirty for given range. Mark all pages in the range as dirty and
-+ *       exit the loop.
-+ *     - Vendor driver should return copied_pfns and provide bitmap for
-+ *       copied_pfn, which means that bitmap copied for given range contains
-+ *       information for all pages where some bits are 0s and some are 1s.
-+ * c. read data_offset, where vendor driver has written bitmap.
-+ * d. read bitmap from the region or mmaped part of the region.
-+ * e. Iterate through steps a to d while (total copied_pfns < total_pfns)
-+ *
-+ * In _RESUMING device state:
-+ * - Load device config state.
-+ * - While end of data for this device is not reached, repeat below steps:
-+ *      - read data_size from file stream, read data from file stream of
-+ *        data_size.
-+ *      - read data_offset from where User application should write data.
-+ *          if region is mmaped, write data of data_size to mmaped region.
-+ *      - write data_size.
-+ *          In case of mmapped region, write on data_size indicates kernel
-+ *          driver that data is written in staging buffer.
-+ *      - if region is trapped, write data of data_size from data_offset.
-+ *
-+ * For user application, data is opaque. User should write data in the same
-+ * order as received.
-+ */
++    for (i = 0; i < region->nr_mmaps; i++) {
++        if ((data_offset >= region->mmaps[i].offset) &&
++            (data_offset < region->mmaps[i].offset + region->mmaps[i].size) &&
++            (data_size <= region->mmaps[i].size)) {
++            ptr = region->mmaps[i].mmap + (data_offset -
++                                           region->mmaps[i].offset);
++            break;
++        }
++    }
++    return ptr;
++}
 +
-+struct vfio_device_migration_info {
-+        __u32 device_state;         /* VFIO device state */
-+#define VFIO_DEVICE_STATE_RUNNING   (1 << 0)
-+#define VFIO_DEVICE_STATE_SAVING    (1 << 1)
-+#define VFIO_DEVICE_STATE_RESUMING  (1 << 2)
-+#define VFIO_DEVICE_STATE_MASK      (VFIO_DEVICE_STATE_RUNNING | \
-+                                     VFIO_DEVICE_STATE_SAVING | \
-+                                     VFIO_DEVICE_STATE_RESUMING)
-+#define VFIO_DEVICE_STATE_INVALID   (VFIO_DEVICE_STATE_SAVING | \
-+                                     VFIO_DEVICE_STATE_RESUMING)
-+        __u32 reserved;
-+        __u64 pending_bytes;
-+        __u64 data_offset;
-+        __u64 data_size;
-+        __u64 start_pfn;
-+        __u64 page_size;
-+        __u64 total_pfns;
-+        __u64 copied_pfns;
-+#define VFIO_DEVICE_DIRTY_PFNS_NONE     (0)
-+#define VFIO_DEVICE_DIRTY_PFNS_ALL      (~0ULL)
-+} __attribute__((packed));
++static int vfio_save_buffer(QEMUFile *f, VFIODevice *vbasedev)
++{
++    VFIOMigration *migration = vbasedev->migration;
++    VFIORegion *region = &migration->region.buffer;
++    uint64_t data_offset = 0, data_size = 0;
++    int ret;
 +
- /*
-  * The MSIX mappable capability informs that MSIX data of a BAR can be mmapped
-  * which allows direct access to non-MSIX registers which happened to be within
++    ret = pread(vbasedev->fd, &data_offset, sizeof(data_offset),
++                region->fd_offset + offsetof(struct vfio_device_migration_info,
++                                             data_offset));
++    if (ret != sizeof(data_offset)) {
++        error_report("%s: Failed to get migration buffer data offset %d",
++                     vbasedev->name, ret);
++        return -EINVAL;
++    }
++
++    ret = pread(vbasedev->fd, &data_size, sizeof(data_size),
++                region->fd_offset + offsetof(struct vfio_device_migration_info,
++                                             data_size));
++    if (ret != sizeof(data_size)) {
++        error_report("%s: Failed to get migration buffer data size %d",
++                     vbasedev->name, ret);
++        return -EINVAL;
++    }
++
++    if (data_size > 0) {
++        void *buf = NULL;
++        bool buffer_mmaped;
++
++        if (region->mmaps) {
++            buf = find_data_region(region, data_offset, data_size);
++        }
++
++        buffer_mmaped = (buf != NULL) ? true : false;
++
++        if (!buffer_mmaped) {
++            buf = g_try_malloc0(data_size);
++            if (!buf) {
++                error_report("%s: Error allocating buffer ", __func__);
++                return -ENOMEM;
++            }
++
++            ret = pread(vbasedev->fd, buf, data_size,
++                        region->fd_offset + data_offset);
++            if (ret != data_size) {
++                error_report("%s: Failed to get migration data %d",
++                             vbasedev->name, ret);
++                g_free(buf);
++                return -EINVAL;
++            }
++        }
++
++        qemu_put_be64(f, data_size);
++        qemu_put_buffer(f, buf, data_size);
++
++        if (!buffer_mmaped) {
++            g_free(buf);
++        }
++        migration->pending_bytes -= data_size;
++    } else {
++        qemu_put_be64(f, data_size);
++    }
++
++    trace_vfio_save_buffer(vbasedev->name, data_offset, data_size,
++                           migration->pending_bytes);
++
++    ret = qemu_file_get_error(f);
++    if (ret) {
++        return ret;
++    }
++
++    return data_size;
++}
++
++static int vfio_update_pending(VFIODevice *vbasedev)
++{
++    VFIOMigration *migration = vbasedev->migration;
++    VFIORegion *region = &migration->region.buffer;
++    uint64_t pending_bytes = 0;
++    int ret;
++
++    ret = pread(vbasedev->fd, &pending_bytes, sizeof(pending_bytes),
++                region->fd_offset + offsetof(struct vfio_device_migration_info,
++                                             pending_bytes));
++    if ((ret < 0) || (ret != sizeof(pending_bytes))) {
++        error_report("%s: Failed to get pending bytes %d",
++                     vbasedev->name, ret);
++        migration->pending_bytes = 0;
++        return (ret < 0) ? ret : -EINVAL;
++    }
++
++    migration->pending_bytes = pending_bytes;
++    trace_vfio_update_pending(vbasedev->name, pending_bytes);
++    return 0;
++}
++
++static int vfio_save_device_config_state(QEMUFile *f, void *opaque)
++{
++    VFIODevice *vbasedev = opaque;
++
++    qemu_put_be64(f, VFIO_MIG_FLAG_DEV_CONFIG_STATE);
++
++    if (vbasedev->ops && vbasedev->ops->vfio_save_config) {
++        vbasedev->ops->vfio_save_config(vbasedev, f);
++    }
++
++    qemu_put_be64(f, VFIO_MIG_FLAG_END_OF_STATE);
++
++    trace_vfio_save_device_config_state(vbasedev->name);
++
++    return qemu_file_get_error(f);
++}
++
+ /* ---------------------------------------------------------------------- */
+ 
+ static int vfio_save_setup(QEMUFile *f, void *opaque)
+@@ -178,9 +310,123 @@ static void vfio_save_cleanup(void *opaque)
+     trace_vfio_save_cleanup(vbasedev->name);
+ }
+ 
++static void vfio_save_pending(QEMUFile *f, void *opaque,
++                              uint64_t threshold_size,
++                              uint64_t *res_precopy_only,
++                              uint64_t *res_compatible,
++                              uint64_t *res_postcopy_only)
++{
++    VFIODevice *vbasedev = opaque;
++    VFIOMigration *migration = vbasedev->migration;
++    int ret;
++
++    ret = vfio_update_pending(vbasedev);
++    if (ret) {
++        return;
++    }
++
++    *res_precopy_only += migration->pending_bytes;
++
++    trace_vfio_save_pending(vbasedev->name, *res_precopy_only,
++                            *res_postcopy_only, *res_compatible);
++}
++
++static int vfio_save_iterate(QEMUFile *f, void *opaque)
++{
++    VFIODevice *vbasedev = opaque;
++    VFIOMigration *migration = vbasedev->migration;
++    int ret, data_size;
++
++    qemu_put_be64(f, VFIO_MIG_FLAG_DEV_DATA_STATE);
++
++    qemu_mutex_lock(&migration->lock);
++    data_size = vfio_save_buffer(f, vbasedev);
++    qemu_mutex_unlock(&migration->lock);
++
++    if (data_size < 0) {
++        error_report("%s: vfio_save_buffer failed %s", vbasedev->name,
++                     strerror(errno));
++        return data_size;
++    }
++
++    qemu_put_be64(f, VFIO_MIG_FLAG_END_OF_STATE);
++
++    ret = qemu_file_get_error(f);
++    if (ret) {
++        return ret;
++    }
++
++    trace_vfio_save_iterate(vbasedev->name, data_size);
++    if (data_size == 0) {
++        /* indicates data finished, goto complete phase */
++        return 1;
++    }
++
++    return 0;
++}
++
++static int vfio_save_complete_precopy(QEMUFile *f, void *opaque)
++{
++    VFIODevice *vbasedev = opaque;
++    VFIOMigration *migration = vbasedev->migration;
++    int ret;
++
++    ret = vfio_migration_set_state(vbasedev, VFIO_DEVICE_STATE_SAVING);
++    if (ret) {
++        error_report("%s: Failed to set state STOP and SAVING",
++                     vbasedev->name);
++        return ret;
++    }
++
++    ret = vfio_save_device_config_state(f, opaque);
++    if (ret) {
++        return ret;
++    }
++
++    ret = vfio_update_pending(vbasedev);
++    if (ret) {
++        return ret;
++    }
++
++    while (migration->pending_bytes > 0) {
++        qemu_put_be64(f, VFIO_MIG_FLAG_DEV_DATA_STATE);
++        ret = vfio_save_buffer(f, vbasedev);
++        if (ret < 0) {
++            error_report("%s: Failed to save buffer", vbasedev->name);
++            return ret;
++        } else if (ret == 0) {
++            break;
++        }
++
++        ret = vfio_update_pending(vbasedev);
++        if (ret) {
++            return ret;
++        }
++    }
++
++    qemu_put_be64(f, VFIO_MIG_FLAG_END_OF_STATE);
++
++    ret = qemu_file_get_error(f);
++    if (ret) {
++        return ret;
++    }
++
++    ret = vfio_migration_set_state(vbasedev, ~VFIO_DEVICE_STATE_MASK);
++    if (ret) {
++        error_report("%s: Failed to set state STOPPED", vbasedev->name);
++        return ret;
++    }
++
++    trace_vfio_save_complete_precopy(vbasedev->name);
++    return ret;
++}
++
+ static SaveVMHandlers savevm_vfio_handlers = {
+     .save_setup = vfio_save_setup,
+     .save_cleanup = vfio_save_cleanup,
++    .save_live_pending = vfio_save_pending,
++    .save_live_iterate = vfio_save_iterate,
++    .save_live_complete_precopy = vfio_save_complete_precopy,
+ };
+ 
+ /* ---------------------------------------------------------------------- */
+diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
+index 4bb43f18f315..e21da4773af3 100644
+--- a/hw/vfio/trace-events
++++ b/hw/vfio/trace-events
+@@ -151,3 +151,9 @@ vfio_vmstate_change(char *name, int running, const char *reason, uint32_t dev_st
+ vfio_migration_state_notifier(char *name, int state) " (%s) state %d"
+ vfio_save_setup(char *name) " (%s)"
+ vfio_save_cleanup(char *name) " (%s)"
++vfio_save_buffer(char *name, uint64_t data_offset, uint64_t data_size, uint64_t pending) " (%s), Offset 0x%"PRIx64" size 0x%"PRIx64" pending 0x%"PRIx64
++vfio_update_pending(char *name, uint64_t pending) " (%s), pending 0x%"PRIx64
++vfio_save_device_config_state(char *name) " (%s)"
++vfio_save_pending(char *name, uint64_t precopy, uint64_t postcopy, uint64_t compatible) " (%s), precopy 0x%"PRIx64" postcopy 0x%x"PRIx64" compatible 0x%"PRIx64
++vfio_save_iterate(char *name, int data_size) " (%s) data_size %d"
++vfio_save_complete_precopy(char *name) " (%s)"
 -- 
 2.7.0
 
