@@ -3,60 +3,60 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23F6EC73C64
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 23:31:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23539C73C65
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 23:37:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EDA442082A
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 23:31:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EDA442082A
+	by mail.kernel.org (Postfix) with ESMTPS id EC00220693
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 23:37:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC00220693
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56802 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56850 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hkzZd-0001iz-H1
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jul 2019 19:31:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48855)
+	id 1hkzg5-0005P7-Vi
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jul 2019 19:37:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49028)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jsnow@redhat.com>) id 1hkzVH-0007Iq-VR
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 19:26:34 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hkzVL-0007MX-D7
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 19:26:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hkzVD-00033K-UL
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 19:26:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48846)
+ (envelope-from <jsnow@redhat.com>) id 1hkzVH-0003A9-Uh
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 19:26:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:13378)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1hkzV6-0002Wo-Vl; Tue, 09 Jul 2019 19:26:22 -0400
+ id 1hkzV9-0002ug-Mj; Tue, 09 Jul 2019 19:26:25 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 8D54EC0495A6;
- Tue,  9 Jul 2019 23:25:58 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id B697E3D95A;
+ Tue,  9 Jul 2019 23:26:22 +0000 (UTC)
 Received: from probe.bos.redhat.com (dhcp-17-215.bos.redhat.com [10.18.17.215])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 12E755B810;
- Tue,  9 Jul 2019 23:25:56 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5D6755B80B;
+ Tue,  9 Jul 2019 23:26:21 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: qemu-block@nongnu.org,
 	qemu-devel@nongnu.org
-Date: Tue,  9 Jul 2019 19:25:33 -0400
-Message-Id: <20190709232550.10724-2-jsnow@redhat.com>
+Date: Tue,  9 Jul 2019 19:25:46 -0400
+Message-Id: <20190709232550.10724-15-jsnow@redhat.com>
 In-Reply-To: <20190709232550.10724-1-jsnow@redhat.com>
 References: <20190709232550.10724-1-jsnow@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Tue, 09 Jul 2019 23:25:58 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.30]); Tue, 09 Jul 2019 23:26:22 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v4 01/18] qapi/block-core: Introduce
- BackupCommon
+Subject: [Qemu-devel] [PATCH v4 14/18] iotests: teach run_job to cancel
+ pending jobs
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -78,181 +78,61 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-drive-backup and blockdev-backup have an awful lot of things in common
-that are the same. Let's fix that.
-
-I don't deduplicate 'target', because the semantics actually did change
-between each structure. Leave that one alone so it can be documented
-separately.
+run_job can cancel pending jobs to simulate failure. This lets us use
+the pending callback to issue test commands while the job is open, but
+then still have the job fail in the end.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- qapi/block-core.json | 103 ++++++++++++++-----------------------------
- 1 file changed, 33 insertions(+), 70 deletions(-)
+ tests/qemu-iotests/iotests.py | 22 ++++++++++++++++++++--
+ 1 file changed, 20 insertions(+), 2 deletions(-)
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 0d43d4f37c..0af3866015 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -1315,32 +1315,23 @@
-   'data': { 'node': 'str', 'overlay': 'str' } }
+diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.p=
+y
+index fcad957d63..c544659ecb 100644
+--- a/tests/qemu-iotests/iotests.py
++++ b/tests/qemu-iotests/iotests.py
+@@ -541,7 +541,22 @@ class VM(qtest.QEMUQtestMachine):
 =20
- ##
--# @DriveBackup:
-+# @BackupCommon:
- #
- # @job-id: identifier for the newly-created block job. If
- #          omitted, the device name will be used. (Since 2.7)
- #
- # @device: the device name or node-name of a root node which should be c=
-opied.
- #
--# @target: the target of the new image. If the file exists, or if it
--#          is a device, the existing file/device will be used as the new
--#          destination.  If it does not exist, a new file will be create=
-d.
--#
--# @format: the format of the new destination, default is to
--#          probe if @mode is 'existing', else the format of the source
--#
- # @sync: what parts of the disk image should be copied to the destinatio=
-n
- #        (all the disk, only the sectors allocated in the topmost image,=
- from a
- #        dirty bitmap, or only new I/O).
- #
--# @mode: whether and how QEMU should create a new image, default is
--#        'absolute-paths'.
--#
--# @speed: the maximum speed, in bytes per second
-+# @speed: the maximum speed, in bytes per second. The default is 0,
-+#         for unlimited.
- #
- # @bitmap: the name of dirty bitmap if sync is "incremental".
- #          Must be present if sync is "incremental", must NOT be present
--#          otherwise. (Since 2.4)
-+#          otherwise. (Since 2.4 (drive-backup), 3.1 (blockdev-backup))
- #
- # @compress: true to compress data, if the target format supports it.
- #            (default: false) (since 2.8)
-@@ -1370,75 +1361,47 @@
- # I/O.  If an error occurs during a guest write request, the device's
- # rerror/werror actions will be used.
- #
-+# Since: 4.2
-+##
-+{ 'struct': 'BackupCommon',
-+  'data': { '*job-id': 'str', 'device': 'str',
-+            'sync': 'MirrorSyncMode', '*speed': 'int',
-+            '*bitmap': 'str', '*compress': 'bool',
-+            '*on-source-error': 'BlockdevOnError',
-+            '*on-target-error': 'BlockdevOnError',
-+            '*auto-finalize': 'bool', '*auto-dismiss': 'bool' } }
+     # Returns None on success, and an error string on failure
+     def run_job(self, job, auto_finalize=3DTrue, auto_dismiss=3DFalse,
+-                pre_finalize=3DNone, wait=3D60.0):
++                pre_finalize=3DNone, cancel=3DFalse, wait=3D60.0):
++        """
++        run_job moves a job from creation through to dismissal.
 +
-+##
-+# @DriveBackup:
-+#
-+# @target: the target of the new image. If the file exists, or if it
-+#          is a device, the existing file/device will be used as the new
-+#          destination.  If it does not exist, a new file will be create=
-d.
-+#
-+# @format: the format of the new destination, default is to
-+#          probe if @mode is 'existing', else the format of the source
-+#
-+# @mode: whether and how QEMU should create a new image, default is
-+#        'absolute-paths'.
-+#
- # Since: 1.6
- ##
- { 'struct': 'DriveBackup',
--  'data': { '*job-id': 'str', 'device': 'str', 'target': 'str',
--            '*format': 'str', 'sync': 'MirrorSyncMode',
--            '*mode': 'NewImageMode', '*speed': 'int',
--            '*bitmap': 'str', '*compress': 'bool',
--            '*on-source-error': 'BlockdevOnError',
--            '*on-target-error': 'BlockdevOnError',
--            '*auto-finalize': 'bool', '*auto-dismiss': 'bool' } }
-+  'base': 'BackupCommon',
-+  'data': { 'target': 'str',
-+            '*format': 'str',
-+            '*mode': 'NewImageMode' } }
-=20
- ##
- # @BlockdevBackup:
- #
--# @job-id: identifier for the newly-created block job. If
--#          omitted, the device name will be used. (Since 2.7)
--#
--# @device: the device name or node-name of a root node which should be c=
-opied.
--#
- # @target: the device name or node-name of the backup target node.
- #
--# @sync: what parts of the disk image should be copied to the destinatio=
-n
--#        (all the disk, only the sectors allocated in the topmost image,=
- or
--#        only new I/O).
--#
--# @speed: the maximum speed, in bytes per second. The default is 0,
--#         for unlimited.
--#
--# @bitmap: the name of dirty bitmap if sync is "incremental".
--#          Must be present if sync is "incremental", must NOT be present
--#          otherwise. (Since 3.1)
--#
--# @compress: true to compress data, if the target format supports it.
--#            (default: false) (since 2.8)
--#
--# @on-source-error: the action to take on an error on the source,
--#                   default 'report'.  'stop' and 'enospc' can only be u=
-sed
--#                   if the block device supports io-status (see BlockInf=
-o).
--#
--# @on-target-error: the action to take on an error on the target,
--#                   default 'report' (no limitations, since this applies=
- to
--#                   a different block device than @device).
--#
--# @auto-finalize: When false, this job will wait in a PENDING state afte=
-r it has
--#                 finished its work, waiting for @block-job-finalize bef=
-ore
--#                 making any block graph changes.
--#                 When true, this job will automatically
--#                 perform its abort or commit actions.
--#                 Defaults to true. (Since 2.12)
--#
--# @auto-dismiss: When false, this job will wait in a CONCLUDED state aft=
-er it
--#                has completely ceased all work, and awaits @block-job-d=
-ismiss.
--#                When true, this job will automatically disappear from t=
-he query
--#                list without user intervention.
--#                Defaults to true. (Since 2.12)
--#
--# Note: @on-source-error and @on-target-error only affect background
--# I/O.  If an error occurs during a guest write request, the device's
--# rerror/werror actions will be used.
--#
- # Since: 2.3
- ##
- { 'struct': 'BlockdevBackup',
--  'data': { '*job-id': 'str', 'device': 'str', 'target': 'str',
--            'sync': 'MirrorSyncMode', '*speed': 'int',
--            '*bitmap': 'str', '*compress': 'bool',
--            '*on-source-error': 'BlockdevOnError',
--            '*on-target-error': 'BlockdevOnError',
--            '*auto-finalize': 'bool', '*auto-dismiss': 'bool' } }
-+  'base': 'BackupCommon',
-+  'data': { 'target': 'str' } }
-=20
- ##
- # @blockdev-snapshot-sync:
++        :param job: String. ID of recently-launched job
++        :param auto_finalize: Bool. True if the job was launched with
++                              auto_finalize. Defaults to True.
++        :param auto_dismiss: Bool. True if the job was launched with
++                             auto_dismiss=3DTrue. Defaults to False.
++        :param pre_finalize: Callback. A callable that takes no argument=
+s to be
++                             invoked prior to issuing job-finalize, if a=
+ny.
++        :param cancel: Bool. When true, cancels the job after the pre_fi=
+nalize
++                       callback.
++        :param wait: Float. Timeout value specifying how long to wait fo=
+r any
++                     event, in seconds. Defaults to 60.0.
++        """
+         match_device =3D {'data': {'device': job}}
+         match_id =3D {'data': {'id': job}}
+         events =3D [
+@@ -568,7 +583,10 @@ class VM(qtest.QEMUQtestMachine):
+             elif status =3D=3D 'pending' and not auto_finalize:
+                 if pre_finalize:
+                     pre_finalize()
+-                self.qmp_log('job-finalize', id=3Djob)
++                if cancel:
++                    self.qmp_log('job-cancel', id=3Djob)
++                else:
++                    self.qmp_log('job-finalize', id=3Djob)
+             elif status =3D=3D 'concluded' and not auto_dismiss:
+                 self.qmp_log('job-dismiss', id=3Djob)
+             elif status =3D=3D 'null':
 --=20
 2.21.0
 
