@@ -2,76 +2,76 @@ Return-Path: <SRS0=huOX=VG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C76D9C606B0
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 05:53:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB144C606B0
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 06:13:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 930B12166E
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 05:53:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 930B12166E
+	by mail.kernel.org (Postfix) with ESMTPS id AC11921537
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 06:13:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC11921537
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46934 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47004 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hkj4Z-0006OY-U4
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jul 2019 01:53:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53715)
+	id 1hkjNv-0000nJ-On
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jul 2019 02:13:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57544)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <armbru@redhat.com>) id 1hkj47-0005xw-Fs
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 01:53:24 -0400
+ (envelope-from <zhexu@redhat.com>) id 1hkjN2-0000J5-VY
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 02:12:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1hkj46-0000FZ-Ix
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 01:53:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57462)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hkj46-0000FD-Bf
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 01:53:22 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 8BB9299DD9
- for <qemu-devel@nongnu.org>; Tue,  9 Jul 2019 05:53:21 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-111.ams2.redhat.com
- [10.36.116.111])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id F340F7FCD6;
- Tue,  9 Jul 2019 05:53:16 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 8707B1138648; Tue,  9 Jul 2019 07:53:15 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Daniel P. =?utf-8?Q?Berrang=C3=A9?= <berrange@redhat.com>
-References: <20190703172501.GI23082@redhat.com>
- <20190704102457.GE1609@stefanha-x1.localdomain>
- <20190704102837.GA24190@redhat.com>
- <20190705080717.GD10995@stefanha-x1.localdomain>
- <8470a203-430b-1814-b2ef-6adf3fa739a6@redhat.com>
- <87d0iok4ai.fsf@dusky.pond.sub.org>
- <c4997dee-932c-eb57-23b9-4b51e8856f91@redhat.com>
- <874l3zhktx.fsf@dusky.pond.sub.org> <20190708093400.GB3082@redhat.com>
- <e396d430-1e6e-2e0b-454b-5c4208756742@redhat.com>
- <20190708103804.GG3082@redhat.com>
-Date: Tue, 09 Jul 2019 07:53:15 +0200
-In-Reply-To: <20190708103804.GG3082@redhat.com> ("Daniel P. =?utf-8?Q?Berr?=
- =?utf-8?Q?ang=C3=A9=22's?=
- message of "Mon, 8 Jul 2019 11:38:04 +0100")
-Message-ID: <87r26zah4k.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+ (envelope-from <zhexu@redhat.com>) id 1hkjN1-0002jS-Hd
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 02:12:56 -0400
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:46295)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <zhexu@redhat.com>) id 1hkjN1-0002io-Bi
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 02:12:55 -0400
+Received: by mail-pf1-f196.google.com with SMTP id c73so4092177pfb.13
+ for <qemu-devel@nongnu.org>; Mon, 08 Jul 2019 23:12:53 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:date:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to:user-agent;
+ bh=nvrrdFwLavFegQ89jBa6tFS05TG/raQM37KhZRycP+U=;
+ b=jKawuw/VjZ/t4jUiuEMZJ/D9TEKZWd55IsEYqeQGcJhyB0HsfUH3M0bM5KO9YsU+m0
+ DDrfa6+4atsISJtNUjbtMssXDIzZVU87NvBzgWfmyNi2vXZkP8KOnoxM7ONAEr0XLn08
+ qw/8KHYioUhW3XuLDzZwQbJpBfeAw7FbKczgv6bNutjrbWMBizQ6huSeMI6yM5eyU+rW
+ 1/GGv3xnm16qK0a9L+haM793wJp1ybggRWyzGXCsP/9NeSYkFoqxpidWxxPYAzQUVrjs
+ o+5vASUP+Q45GspVqUwburURwzbQrLC/4yrH9q08/FnV3EgKk7/nQhBXlructx/qK7Um
+ a0lA==
+X-Gm-Message-State: APjAAAXVyp2froorafo6EhgrRBPifEV6wlGoN7gpFnfU/d6Vxbl0j5qU
+ le9t+e600r61VQbTAXwMgG0qzQ==
+X-Google-Smtp-Source: APXvYqw/Xmo/GQdncSlnPMpnScbCTZIkWo24q1AKPaW+ouX5tU2i+uKwkwvTaM1mb1pqSkIInxZajQ==
+X-Received: by 2002:a17:90a:fe5:: with SMTP id
+ 92mr14385283pjz.35.1562652772796; 
+ Mon, 08 Jul 2019 23:12:52 -0700 (PDT)
+Received: from xz-x1 ([209.132.188.80])
+ by smtp.gmail.com with ESMTPSA id p13sm2739247pjb.30.2019.07.08.23.12.47
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Mon, 08 Jul 2019 23:12:51 -0700 (PDT)
+From: Peter Xu <zhexu@redhat.com>
+X-Google-Original-From: Peter Xu <peterx@redhat.com>
+Date: Tue, 9 Jul 2019 14:12:40 +0800
+To: Liu Yi L <yi.l.liu@intel.com>
+Message-ID: <20190709061240.GF5178@xz-x1>
+References: <1562324511-2910-1-git-send-email-yi.l.liu@intel.com>
+ <1562324511-2910-11-git-send-email-yi.l.liu@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.38]); Tue, 09 Jul 2019 05:53:21 +0000 (UTC)
+Content-Disposition: inline
+In-Reply-To: <1562324511-2910-11-git-send-email-yi.l.liu@intel.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [RFC PATCH-for-4.2] tracing: Allow to tune tracing
- options via the environment
+ [fuzzy]
+X-Received-From: 209.85.210.196
+Subject: Re: [Qemu-devel] [RFC v1 10/18] intel_iommu: tag VTDAddressSpace
+ instance with PASID
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -83,34 +83,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: tianyu.lan@intel.com, kevin.tian@intel.com,
+ Jacob Pan <jacob.jun.pan@linux.intel.com>, Yi Sun <yi.y.sun@linux.intel.com>,
+ kvm@vger.kernel.org, mst@redhat.com, jun.j.tian@intel.com,
+ qemu-devel@nongnu.org, eric.auger@redhat.com, alex.williamson@redhat.com,
+ pbonzini@redhat.com, yi.y.sun@intel.com, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
+On Fri, Jul 05, 2019 at 07:01:43PM +0800, Liu Yi L wrote:
+> This patch introduces new fields in VTDAddressSpace for further PASID support
+> in Intel vIOMMU. In old time, each device has a VTDAddressSpace instance to
+> stand for its guest IOVA address space when vIOMMU is enabled. However, when
+> PASID is exposed to guest, device will have multiple address spaces which
+> are tagged with PASID. To suit this change, VTDAddressSpace should be tagged
+> with PASIDs in Intel vIOMMU.
+> 
+> To record PASID tagged VTDAddressSpaces, a hash table is introduced. The
+> data in the hash table can be used for future sanity check and retrieve
+> previous PASID configs of guest and also future emulated SVA DMA support
+> for emulated SVA capable devices. The lookup key is a string and its format
+> is as below:
+> 
+> "rsv%04dpasid%010dsid%06d" -- totally 32 bytes
 
-> On Mon, Jul 08, 2019 at 12:27:12PM +0200, Philippe Mathieu-Daud=C3=A9 wro=
-te:
+Can we make it simply a struct?
+
+        struct pasid_key {
+                uint32_t pasid;
+                uint16_t sid;
+        }
+
+Also I think we don't need to keep reserved bits because it'll be a
+structure that'll only be used by QEMU so we can extend it easily in
+the future when necessary.
+
 [...]
->> Anyway, to stop bikeshedding this thread, can you add few lines about
->> why not use getenv() in the HACKING?
->
-> I don't actually think the getenv thing is a security issue in any case.
-> If there was a security problem exploitable via getenv, then the bug would
-> lie in the application invoking QEMU for not ensuring the ENV contents
-> were safe before exec'ing QEMU.
 
-Correct.
+> +static int vtd_pasid_cache_dsi(IntelIOMMUState *s, uint16_t domain_id)
+> +{
+> +    VTDPASIDCacheInfo pc_info;
+> +
+> +    trace_vtd_pasid_cache_dsi(domain_id);
+> +
+> +    pc_info.flags = VTD_PASID_CACHE_DOMSI;
+> +    pc_info.domain_id = domain_id;
+> +
+> +    /*
+> +     * use g_hash_table_foreach_remove(), which will free the
+> +     * vtd_pasid_as instances.
+> +     */
+> +    g_hash_table_foreach_remove(s->vtd_pasid_as, vtd_flush_pasid, &pc_info);
+> +    /*
+> +     * TODO: Domain selective PASID cache invalidation
+> +     * may be issued wrongly by programmer, to be safe,
+> +     * after invalidating the pasid caches, emulator
+> +     * needs to replay the pasid bindings by walking guest
+> +     * pasid dir and pasid table.
+> +     */
 
->                                 Libvirt is paranoid by default and scrubs
-> QEMU's env only keeping a specific sanitized whitelist for exactly these
-> reasons.
+It seems to me that this is still unchanged for the whole series.
+It's fine for RFC, but just a reminder that please either comment on
+why we don't have something or implement what we need here...
 
-Must have for running programs with different privileges.
+[...]
 
-Corrollary: a program that does not use getenv() at all is slightly
-harder to misuse with different privileges.  Irrelevant in practice,
-because libraries use getenv(), starting with ld.so.
+>  /* Unmap the whole range in the notifier's scope. */
+>  static void vtd_address_space_unmap(VTDAddressSpace *as, IOMMUNotifier *n)
+>  {
+> @@ -3914,6 +4076,8 @@ static void vtd_realize(DeviceState *dev, Error **errp)
+>                                       g_free, g_free);
+>      s->vtd_as_by_busptr = g_hash_table_new_full(vtd_uint64_hash, vtd_uint64_equal,
+>                                                g_free, g_free);
+> +    s->vtd_pasid_as = g_hash_table_new_full(&g_str_hash, &g_str_equal,
+> +                                     g_free, hash_pasid_as_free);
+
+Can use g_free() and drop hash_pasid_as_free()?
+
+Also, this patch only tries to drop entries of the hash table but the
+hash table is never inserted or used.  I would suggest that you put
+that part to be with this patch as a whole otherwise it's hard to
+clarify how this hash table will be used.
+
+Regards,
+
+-- 
+Peter Xu
 
