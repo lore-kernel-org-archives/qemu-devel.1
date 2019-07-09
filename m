@@ -2,56 +2,59 @@ Return-Path: <SRS0=huOX=VG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8D55C606B0
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 06:49:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B55BC606B0
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 07:19:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 611F9216C4
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 06:49:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 611F9216C4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=birkelund.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 119E620449
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 07:19:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 119E620449
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47188 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47330 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hkjwD-0002rp-92
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jul 2019 02:49:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36282)
+	id 1hkkPZ-0007xk-Vk
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jul 2019 03:19:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43320)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <klaus@birkelund.eu>) id 1hkjsd-00028L-Bj
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 02:45:37 -0400
+ (envelope-from <tao3.xu@intel.com>) id 1hkkOB-0006av-Ug
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 03:18:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <klaus@birkelund.eu>) id 1hkjsb-0005Km-Su
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 02:45:35 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:34892)
+ (envelope-from <tao3.xu@intel.com>) id 1hkkOA-0007Uc-Bm
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 03:18:11 -0400
+Received: from mga17.intel.com ([192.55.52.151]:58439)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <klaus@birkelund.eu>)
- id 1hkjsY-0005Fx-7t; Tue, 09 Jul 2019 02:45:30 -0400
-Received: from bogfinke (ip-5-186-120-196.cgn.fibianet.dk [5.186.120.196])
- by charlie.dont.surf (Postfix) with ESMTPSA id C7835BF6BC;
- Tue,  9 Jul 2019 06:45:27 +0000 (UTC)
-Date: Tue, 9 Jul 2019 08:45:24 +0200
-From: Klaus Birkelund <klaus@birkelund.eu>
-To: kwolf@redhat.com
-Message-ID: <20190709064523.GA27395@bogfinke>
-References: <8115eb18-38c0-2bd9-b7d7-2d0c96a106e7@oakgatetech.com>
- <20190705075000.GA17345@bogfinke>
- <3157dd16-4caa-2242-c568-c9a267f274ac@oakgatetech.com>
+ (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1hkkOA-0007ST-1p
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 03:18:10 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+ by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 09 Jul 2019 00:18:06 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.63,469,1557212400"; d="scan'208";a="165681633"
+Received: from tao-optiplex-7060.sh.intel.com ([10.239.13.104])
+ by fmsmga008.fm.intel.com with ESMTP; 09 Jul 2019 00:18:05 -0700
+From: Tao Xu <tao3.xu@intel.com>
+To: imammedo@redhat.com,
+	eblake@redhat.com,
+	ehabkost@redhat.com
+Date: Tue,  9 Jul 2019 15:15:06 +0800
+Message-Id: <20190709071520.8745-1-tao3.xu@intel.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <3157dd16-4caa-2242-c568-c9a267f274ac@oakgatetech.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 128.199.63.193
-Subject: Re: [Qemu-devel] [Qemu-block]   [RFC,
- v1] Namespace Management Support
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 192.55.52.151
+Subject: [Qemu-devel] [PATCH RESEND v6 00/14] Build ACPI Heterogeneous
+ Memory Attribute Table (HMAT)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -63,132 +66,170 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: keith.busch@intel.com, Matt Fitzpatrick <matt.fitzpatrick@oakgatetech.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
+Cc: jingqi.liu@intel.com, tao3.xu@intel.com, fan.du@intel.com,
+ qemu-devel@nongnu.org, jonathan.cameron@huawei.com, dan.j.williams@intel.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Jul 08, 2019 at 03:52:29PM -0700, Matt Fitzpatrick wrote:
-> Hey Klaus,
->=20
-> Sorry for the late reply!=A0 I finally found this message amid the pile=
- of
-> emails Qemu dumped on me.
->=20
-> I don't know what the right answer is here... NVMe is designed in a way
-> where you *do* "carve up" the flash into logical groupings and the nvme
-> firmware decides on how that's done. Those logical groupings can be att=
-ached
-> to different controllers(which we don't have here yet?) after init, but
-> that's a problem for future us I guess?But that's all stuff you already
-> know.
->=20
+This series of patches will build Heterogeneous Memory Attribute Table (HMAT)
+according to the command line. The ACPI HMAT describes the memory attributes,
+such as memory side cache attributes and bandwidth and latency details,
+related to the Memory Proximity Domain.
+The software is expected to use HMAT information as hint for optimization.
 
-Yeah, I havn't started worrying about that ;)
+In the linux kernel, the codes in drivers/acpi/hmat/hmat.c parse and report
+the platform's HMAT tables.
 
-> The "nvme-nvm" solution might be the right approach, but I'm a bit hesi=
-tant
-> on the idea of growing tnvmcap...
->=20
-> I can't think of any way to create namespaces on the fly and not have i=
-t use
-> some single existing block backend, unless we defined a range of block
-> images on qemu start and namespace create/attach only uses one image up=
- to
-> and including it's max size per namespace? That might work, and I think
-> that's what you suggested (or at least is similar to), though it could =
-be
-> pretty wasteful. It wouldn't offer a "true" namespace management suppor=
-t,
-> but could be close enough.
->=20
+The V5 patches link:
+https://lists.gnu.org/archive/html/qemu-devel/2019-06/msg03138.html
 
-Having an emulated device that supports namespace management would be
-very useful for testing software, but yeah, I have a hard time seeing
-how we can make that fit with the current "QEMU model".
+Changelog:
+v6:
+    - Rebase to upstream, move numa globals in arm/sbsa-ref
+    - When used once or twice in the function, use
+      ms->numa_state->num_nodes(numa_info) directly (Igor)
+    - Correct some mistakes
+    - Use once monitor_printf in hmp_info_numa (Igor)
+    - Add new patch to extend CLI of "-numa node" option to indicate the
+      initiator numa node-id (Dan)
+    - Update to ACPI 6.3 (Jonathan)
+    - Add QMP interface to update HMAT at runtime (Igor)
+    - Add test cases for ACPI HMAT
 
-> I'm in the middle of going through the patch you posted. Nice job!=A0 I=
-'m glad
-> to see more people adding enhancements. It was pretty stale for years.
->=20
+v5:
+    - spilt the 1-6/11 and 8/11 from patch v4 to build Memory Subsystem
+    Address Range Structure(s) and System Locality Latency and Bandwidth
+    Information Structure(s) firstly.
+    - add 1/8 of patch v5 to simplify arm_load_dtb() (Igor)
+    - drop the helper machine_num_numa_nodes() and use
+    machine->numa_state->num_nodes (and numa_state->nodes) directly (Igor)
+    - Add more descriptions from ACPI spec (Igor)
+    - Add the reason of using stub (Igor)
+    - Use GArray for NUMA memory ranges data (Igor)
+    - Separate hmat_build_lb() (Igor)
+    - Drop all global variables and use local variables instead (Igor)
+    - Add error message when base unit < 10
+    - Update the hmat-lb option example by using '-numa cpu'
+    and '-numa memdev' (Igor)
 
-Thanks for looking at it, I know it's a lot to go through ;)
+v4:
+    - send the patch of "move numa global variables into MachineState"
+    together with HMAT patches.
+    https://lists.gnu.org/archive/html/qemu-devel/2019-04/msg03662.html
+    - spilt the 1/8 of v3 patch into two patches, 4/11 introduces
+    build_mem_ranges() and 5/11 builds HMAT (Igor)
+    - use build_append_int_noprefix() to build parts of ACPI table in
+    all patches (Igor)
+    - Split 8/8 of patch v3 into two parts, 10/11 introduces NFIT
+    generalizations (build_acpi_aml_common), and use it in 11/11 to
+    simplify hmat_build_aml (Igor)
+    - use MachineState instead of PCMachineState to build HMAT more
+    generalic (Igor)
+    - move the 7/8 v3 patch into the former patches
+    - update the version tag from 4.0 to 4.1
+v3:
+    - rebase the fixing patch into the jingqi's patches (Eric)
+    - update the version tag from 3.10 to 4.0 (Eric)
+v2:
+  Per Igor and Eric's comments, fix some coding style and small issues:
+    - update the version number in qapi/misc.json
+    - including the expansion of the acronym HMAT in qapi/misc.json
+    - correct spell mistakes in qapi/misc.json and qemu-options.hx
+    - fix the comment syle in hw/i386/acpi-build.c
+    and hw/acpi/hmat.h
+   - remove some unnecessary head files in hw/acpi/hmat.c 
+   - use hardcoded numbers from spec to generate
+   Memory Subsystem Address Range Structure in hw/acpi/hmat.c
+   - drop the struct AcpiHmat and AcpiHmatSpaRange
+    in hw/acpi/hmat.h
+   - rewrite NFIT code to build _HMA method
 
-> -Matt
-> On 7/5/19 12:50 AM, Klaus Birkelund wrote:
-> > On Tue, Jul 02, 2019 at 10:39:36AM -0700, Matt Fitzpatrick wrote:
-> > > Adding namespace management support to the nvme device. Namespace c=
-reation
-> > > requires contiguous block space for a simple method of allocation.
-> > >=20
-> > > I wrote this a few years ago based on Keith's fork and nvmeqemu for=
-k and
-> > > have recently re-synced with the latest trunk.=A0 Some data structu=
-res in
-> > > nvme.h are a bit more filled out that strictly necessary as this is=
- also the
-> > > base for sr-iov and IOD patched to be submitted later.
-> > >=20
-> > Hi Matt,
-> >=20
-> > Nice! I'm always happy when new features for the nvme device is poste=
-d!
-> >=20
-> > I'll be happy to review it, but I won't start going through it in
-> > details because I believe the approach to supporting multiple namespa=
-ces
-> > is flawed. We had a recent discussion on this and I also got some
-> > unrelated patches rejected due to implementing it similarly by carvin=
-g
-> > up the image.
-> >=20
-> > I have posted a long series that includes a patch for multiple
-> > namespaces. It is implemented by introducing a fresh `nvme-ns` device
-> > model that represents a namespace and attaches to a bus created by th=
-e
-> > parent `nvme` controller device.
-> >=20
-> > The core issue is that a qemu image /should/ be attachable to other
-> > devices (say ide) and not strictly tied to the one device model. Thus=
-,
-> > we cannot just shove a bunch of namespaces into a single image.
-> >=20
-> > But, in light of your patch, I'm not convinced that my implementation=
- is
-> > the correct solution. Maybe the abstraction should not be an `nvme-ns=
-`
-> > device, but a `nvme-nvm` device that when attached changes TNVMCAP an=
-d
-> > UNVMCAP? Maybe you have some input for this? Or we could have both an=
-d
-> > dynamically create the nvme-ns devices on top of nvme-nvm devices. I
-> > think it would still require a 1-to-1 mapping, but it could be a way =
-to
-> > support the namespace management capability.
-> >=20
-> >=20
-> > Cheers,
-> > Klaus
-> >=20
->=20
+Liu Jingqi (6):
+  hmat acpi: Build Memory Proximity Domain Attributes Structure(s)
+  hmat acpi: Build System Locality Latency and Bandwidth Information
+    Structure(s)
+  hmat acpi: Build Memory Side Cache Information Structure(s)
+  numa: Extend the CLI to provide memory latency and bandwidth
+    information
+  numa: Extend the CLI to provide memory side cache information
+  hmat acpi: Implement _HMA method to update HMAT at runtime
 
-Hi Kevin,
+Tao Xu (8):
+  hw/arm: simplify arm_load_dtb
+  numa: move numa global variable nb_numa_nodes into MachineState
+  numa: move numa global variable have_numa_distance into MachineState
+  numa: move numa global variable numa_info into MachineState
+  numa: Extend CLI to provide initiator information for numa nodes
+  acpi: introduce aml_build_runtime_buf for NFIT generalizations
+  QMP: Add QMP interface to update HMAT at runtime
+  tests/bios-tables-test: add test cases for ACPI HMAT
 
-This highlights another situation where the "1 image to 1 block device"
-model doesn't fit that well with NVMe. Especially with the introduction
-of "NVM Sets" in NVMe 1.4. It would be very nice to introduce a
-'nvme-nvmset' device model that adds an NVM Set which the controller can
-then create namespaces in.
+ exec.c                              |   5 +-
+ hw/acpi/Kconfig                     |   5 +
+ hw/acpi/Makefile.objs               |   1 +
+ hw/acpi/acpi-stub.c                 |   7 +
+ hw/acpi/aml-build.c                 |   9 +-
+ hw/acpi/hmat.c                      | 552 ++++++++++++++++++++++++++++
+ hw/acpi/hmat.h                      | 172 +++++++++
+ hw/acpi/nvdimm.c                    |  49 ++-
+ hw/arm/aspeed.c                     |   5 +-
+ hw/arm/boot.c                       |  20 +-
+ hw/arm/collie.c                     |   8 +-
+ hw/arm/cubieboard.c                 |   5 +-
+ hw/arm/exynos4_boards.c             |   7 +-
+ hw/arm/highbank.c                   |   8 +-
+ hw/arm/imx25_pdk.c                  |   5 +-
+ hw/arm/integratorcp.c               |   8 +-
+ hw/arm/kzm.c                        |   5 +-
+ hw/arm/mainstone.c                  |   5 +-
+ hw/arm/mcimx6ul-evk.c               |   5 +-
+ hw/arm/mcimx7d-sabre.c              |   5 +-
+ hw/arm/musicpal.c                   |   8 +-
+ hw/arm/nseries.c                    |   5 +-
+ hw/arm/omap_sx1.c                   |   5 +-
+ hw/arm/palm.c                       |  10 +-
+ hw/arm/raspi.c                      |   6 +-
+ hw/arm/realview.c                   |   5 +-
+ hw/arm/sabrelite.c                  |   5 +-
+ hw/arm/sbsa-ref.c                   |  12 +-
+ hw/arm/spitz.c                      |   5 +-
+ hw/arm/tosa.c                       |   8 +-
+ hw/arm/versatilepb.c                |   5 +-
+ hw/arm/vexpress.c                   |   5 +-
+ hw/arm/virt-acpi-build.c            |  19 +-
+ hw/arm/virt.c                       |  17 +-
+ hw/arm/xilinx_zynq.c                |   8 +-
+ hw/arm/xlnx-versal-virt.c           |   7 +-
+ hw/arm/xlnx-zcu102.c                |   5 +-
+ hw/arm/z2.c                         |   8 +-
+ hw/core/machine-hmp-cmds.c          |  12 +-
+ hw/core/machine-qmp-cmds.c          |  39 ++
+ hw/core/machine.c                   |  42 ++-
+ hw/core/numa.c                      | 300 +++++++++++++--
+ hw/i386/acpi-build.c                |  11 +-
+ hw/i386/pc.c                        |  13 +-
+ hw/i386/pc_piix.c                   |   6 +
+ hw/i386/pc_q35.c                    |   6 +
+ hw/mem/pc-dimm.c                    |   2 +
+ hw/pci-bridge/pci_expander_bridge.c |   3 +-
+ hw/ppc/spapr.c                      |  33 +-
+ hw/ppc/spapr_pci.c                  |   4 +-
+ include/hw/acpi/aml-build.h         |   2 +-
+ include/hw/arm/boot.h               |   4 +-
+ include/hw/boards.h                 |   1 +
+ include/hw/mem/nvdimm.h             |   6 +
+ include/qemu/typedefs.h             |   2 +
+ include/sysemu/numa.h               |  35 +-
+ include/sysemu/sysemu.h             |  24 ++
+ qapi/machine.json                   | 235 +++++++++++-
+ qemu-options.hx                     |  84 ++++-
+ tests/bios-tables-test.c            |  43 +++
+ 60 files changed, 1672 insertions(+), 264 deletions(-)
+ create mode 100644 hw/acpi/hmat.c
+ create mode 100644 hw/acpi/hmat.h
 
-Is it completely unacceptable for a device to use the image in such a
-way that it would not make sense (aka present the same block device)
-when attached to another device (ide, ...)?
+-- 
+2.20.1
 
-I really have a hard time seeing how we could support these features
-without violating the '1 image to 1 block device" model.
-
-
-Cheers,
-Klaus
 
