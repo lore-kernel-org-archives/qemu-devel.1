@@ -3,60 +3,60 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 919ADC73C65
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 00:04:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B54F3C73C63
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 00:08:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 223072073D
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 00:04:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 223072073D
+	by mail.kernel.org (Postfix) with ESMTPS id 809A82081C
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 00:08:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 809A82081C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57002 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57026 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hl06O-0003w9-Tu
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jul 2019 20:04:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49157)
+	id 1hl09Y-0005Wt-RO
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jul 2019 20:08:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48856)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jsnow@redhat.com>) id 1hkzVf-0007PL-FC
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 19:26:57 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hkzVH-0007Iu-Vb
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 19:26:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hkzVQ-0003M6-Lt
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 19:26:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42834)
+ (envelope-from <jsnow@redhat.com>) id 1hkzVD-000334-Pz
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 19:26:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42808)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1hkzVB-0002yA-LO; Tue, 09 Jul 2019 19:26:27 -0400
+ id 1hkzV9-0002qJ-Au; Tue, 09 Jul 2019 19:26:23 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 3A67D3082E51;
- Tue,  9 Jul 2019 23:26:24 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 386563082E51;
+ Tue,  9 Jul 2019 23:26:18 +0000 (UTC)
 Received: from probe.bos.redhat.com (dhcp-17-215.bos.redhat.com [10.18.17.215])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D88525B80B;
- Tue,  9 Jul 2019 23:26:22 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D539D5B80B;
+ Tue,  9 Jul 2019 23:26:16 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: qemu-block@nongnu.org,
 	qemu-devel@nongnu.org
-Date: Tue,  9 Jul 2019 19:25:47 -0400
-Message-Id: <20190709232550.10724-16-jsnow@redhat.com>
+Date: Tue,  9 Jul 2019 19:25:43 -0400
+Message-Id: <20190709232550.10724-12-jsnow@redhat.com>
 In-Reply-To: <20190709232550.10724-1-jsnow@redhat.com>
 References: <20190709232550.10724-1-jsnow@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Tue, 09 Jul 2019 23:26:24 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.46]); Tue, 09 Jul 2019 23:26:18 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v4 15/18] iotests: teach FilePath to produce
- multiple paths
+Subject: [Qemu-devel] [PATCH v4 11/18] block/backup: upgrade copy_bitmap to
+ BdrvDirtyBitmap
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -78,89 +78,246 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Use "FilePaths" instead of "FilePath" to request multiple files be
-cleaned up after we leave that object's scope.
-
-This is not crucial; but it saves a little typing.
+This simplifies some interface matters; namely the initialization and
+(later) merging the manifest back into the sync_bitmap if it was
+provided.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- tests/qemu-iotests/iotests.py | 34 ++++++++++++++++++++++++----------
- 1 file changed, 24 insertions(+), 10 deletions(-)
+ block/backup.c | 81 ++++++++++++++++++++++++++------------------------
+ 1 file changed, 42 insertions(+), 39 deletions(-)
 
-diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.p=
-y
-index c544659ecb..6135c9663d 100644
---- a/tests/qemu-iotests/iotests.py
-+++ b/tests/qemu-iotests/iotests.py
-@@ -358,31 +358,45 @@ class Timeout:
-     def timeout(self, signum, frame):
-         raise Exception(self.errmsg)
-=20
-+def file_pattern(name):
-+    return "{0}-{1}".format(os.getpid(), name)
-=20
--class FilePath(object):
--    '''An auto-generated filename that cleans itself up.
-+class FilePaths(object):
-+    """
-+    FilePaths is an auto-generated filename that cleans itself up.
-=20
-     Use this context manager to generate filenames and ensure that the f=
-ile
-     gets deleted::
-=20
--        with TestFilePath('test.img') as img_path:
-+        with FilePaths(['test.img']) as img_path:
-             qemu_img('create', img_path, '1G')
-         # migration_sock_path is automatically deleted
--    '''
--    def __init__(self, name):
--        filename =3D '{0}-{1}'.format(os.getpid(), name)
--        self.path =3D os.path.join(test_dir, filename)
-+    """
-+    def __init__(self, names):
-+        self.paths =3D []
-+        for name in names:
-+            self.paths.append(os.path.join(test_dir, file_pattern(name))=
-)
-=20
-     def __enter__(self):
--        return self.path
-+        return self.paths
-=20
-     def __exit__(self, exc_type, exc_val, exc_tb):
-         try:
--            os.remove(self.path)
-+            for path in self.paths:
-+                os.remove(path)
-         except OSError:
-             pass
-         return False
-=20
-+class FilePath(FilePaths):
-+    """
-+    FilePath is a specialization of FilePaths that takes a single filena=
-me.
-+    """
-+    def __init__(self, name):
-+        super(FilePath, self).__init__([name])
+diff --git a/block/backup.c b/block/backup.c
+index efd0dcd2e7..fb1b39c44e 100644
+--- a/block/backup.c
++++ b/block/backup.c
+@@ -38,7 +38,10 @@ typedef struct CowRequest {
+ typedef struct BackupBlockJob {
+     BlockJob common;
+     BlockBackend *target;
 +
-+    def __enter__(self):
-+        return self.paths[0]
+     BdrvDirtyBitmap *sync_bitmap;
++    BdrvDirtyBitmap *copy_bitmap;
++
+     MirrorSyncMode sync_mode;
+     BitmapSyncMode bitmap_mode;
+     BlockdevOnError on_source_error;
+@@ -51,7 +54,6 @@ typedef struct BackupBlockJob {
+     NotifierWithReturn before_write;
+     QLIST_HEAD(, CowRequest) inflight_reqs;
 =20
- def file_path_remover():
-     for path in reversed(file_path_remover.paths):
-@@ -407,7 +421,7 @@ def file_path(*names):
+-    HBitmap *copy_bitmap;
+     bool use_copy_range;
+     int64_t copy_range_size;
 =20
-     paths =3D []
-     for name in names:
--        filename =3D '{0}-{1}'.format(os.getpid(), name)
-+        filename =3D file_pattern(name)
-         path =3D os.path.join(test_dir, filename)
-         file_path_remover.paths.append(path)
-         paths.append(path)
+@@ -113,7 +115,7 @@ static int coroutine_fn backup_cow_with_bounce_buffer=
+(BackupBlockJob *job,
+     int write_flags =3D job->serialize_target_writes ? BDRV_REQ_SERIALIS=
+ING : 0;
+=20
+     assert(QEMU_IS_ALIGNED(start, job->cluster_size));
+-    hbitmap_reset(job->copy_bitmap, start, job->cluster_size);
++    bdrv_reset_dirty_bitmap(job->copy_bitmap, start, job->cluster_size);
+     nbytes =3D MIN(job->cluster_size, job->len - start);
+     if (!*bounce_buffer) {
+         *bounce_buffer =3D blk_blockalign(blk, job->cluster_size);
+@@ -146,7 +148,7 @@ static int coroutine_fn backup_cow_with_bounce_buffer=
+(BackupBlockJob *job,
+=20
+     return nbytes;
+ fail:
+-    hbitmap_set(job->copy_bitmap, start, job->cluster_size);
++    bdrv_set_dirty_bitmap(job->copy_bitmap, start, job->cluster_size);
+     return ret;
+=20
+ }
+@@ -169,12 +171,14 @@ static int coroutine_fn backup_cow_with_offload(Bac=
+kupBlockJob *job,
+     assert(QEMU_IS_ALIGNED(start, job->cluster_size));
+     nbytes =3D MIN(job->copy_range_size, end - start);
+     nr_clusters =3D DIV_ROUND_UP(nbytes, job->cluster_size);
+-    hbitmap_reset(job->copy_bitmap, start, job->cluster_size * nr_cluste=
+rs);
++    bdrv_reset_dirty_bitmap(job->copy_bitmap, start,
++                            job->cluster_size * nr_clusters);
+     ret =3D blk_co_copy_range(blk, start, job->target, start, nbytes,
+                             read_flags, write_flags);
+     if (ret < 0) {
+         trace_backup_do_cow_copy_range_fail(job, start, ret);
+-        hbitmap_set(job->copy_bitmap, start, job->cluster_size * nr_clus=
+ters);
++        bdrv_set_dirty_bitmap(job->copy_bitmap, start,
++                              job->cluster_size * nr_clusters);
+         return ret;
+     }
+=20
+@@ -202,7 +206,7 @@ static int coroutine_fn backup_do_cow(BackupBlockJob =
+*job,
+     cow_request_begin(&cow_request, job, start, end);
+=20
+     while (start < end) {
+-        if (!hbitmap_get(job->copy_bitmap, start)) {
++        if (!bdrv_dirty_bitmap_get(job->copy_bitmap, start)) {
+             trace_backup_do_cow_skip(job, start);
+             start +=3D job->cluster_size;
+             continue; /* already copied */
+@@ -298,14 +302,16 @@ static void backup_abort(Job *job)
+ static void backup_clean(Job *job)
+ {
+     BackupBlockJob *s =3D container_of(job, BackupBlockJob, common.job);
++    BlockDriverState *bs =3D blk_bs(s->common.blk);
++
++    if (s->copy_bitmap) {
++        bdrv_release_dirty_bitmap(bs, s->copy_bitmap);
++        s->copy_bitmap =3D NULL;
++    }
++
+     assert(s->target);
+     blk_unref(s->target);
+     s->target =3D NULL;
+-
+-    if (s->copy_bitmap) {
+-        hbitmap_free(s->copy_bitmap);
+-        s->copy_bitmap =3D NULL;
+-    }
+ }
+=20
+ void backup_do_checkpoint(BlockJob *job, Error **errp)
+@@ -320,7 +326,7 @@ void backup_do_checkpoint(BlockJob *job, Error **errp=
+)
+         return;
+     }
+=20
+-    hbitmap_set(backup_job->copy_bitmap, 0, backup_job->len);
++    bdrv_set_dirty_bitmap(backup_job->copy_bitmap, 0, backup_job->len);
+ }
+=20
+ static void backup_drain(BlockJob *job)
+@@ -389,59 +395,52 @@ static bool bdrv_is_unallocated_range(BlockDriverSt=
+ate *bs,
+=20
+ static int coroutine_fn backup_loop(BackupBlockJob *job)
+ {
+-    int ret;
+     bool error_is_read;
+     int64_t offset;
+-    HBitmapIter hbi;
++    BdrvDirtyBitmapIter *bdbi;
+     BlockDriverState *bs =3D blk_bs(job->common.blk);
++    int ret =3D 0;
+=20
+-    hbitmap_iter_init(&hbi, job->copy_bitmap, 0);
+-    while ((offset =3D hbitmap_iter_next(&hbi)) !=3D -1) {
++    bdbi =3D bdrv_dirty_iter_new(job->copy_bitmap);
++    while ((offset =3D bdrv_dirty_iter_next(bdbi)) !=3D -1) {
+         if (job->sync_mode =3D=3D MIRROR_SYNC_MODE_TOP &&
+             bdrv_is_unallocated_range(bs, offset, job->cluster_size))
+         {
+-            hbitmap_reset(job->copy_bitmap, offset, job->cluster_size);
++            bdrv_reset_dirty_bitmap(job->copy_bitmap, offset,
++                                    job->cluster_size);
+             continue;
+         }
+=20
+         do {
+             if (yield_and_check(job)) {
+-                return 0;
++                goto out;
+             }
+             ret =3D backup_do_cow(job, offset,
+                                 job->cluster_size, &error_is_read, false=
+);
+             if (ret < 0 && backup_error_action(job, error_is_read, -ret)=
+ =3D=3D
+                            BLOCK_ERROR_ACTION_REPORT)
+             {
+-                return ret;
++                goto out;
+             }
+         } while (ret < 0);
+     }
+=20
+-    return 0;
++ out:
++    bdrv_dirty_iter_free(bdbi);
++    return ret;
+ }
+=20
+ /* init copy_bitmap from sync_bitmap */
+ static void backup_incremental_init_copy_bitmap(BackupBlockJob *job)
+ {
+-    uint64_t offset =3D 0;
+-    uint64_t bytes =3D job->len;
+-
+-    while (bdrv_dirty_bitmap_next_dirty_area(job->sync_bitmap,
+-                                             &offset, &bytes))
+-    {
+-        hbitmap_set(job->copy_bitmap, offset, bytes);
+-
+-        offset +=3D bytes;
+-        if (offset >=3D job->len) {
+-            break;
+-        }
+-        bytes =3D job->len - offset;
+-    }
++    bool ret =3D bdrv_dirty_bitmap_merge_internal(job->copy_bitmap,
++                                                job->sync_bitmap,
++                                                NULL, true);
++    assert(ret);
+=20
+     /* TODO job_progress_set_remaining() would make more sense */
+     job_progress_update(&job->common.job,
+-        job->len - hbitmap_count(job->copy_bitmap));
++                        job->len - bdrv_get_dirty_count(job->copy_bitmap=
+));
+ }
+=20
+ static int coroutine_fn backup_run(Job *job, Error **errp)
+@@ -458,7 +457,7 @@ static int coroutine_fn backup_run(Job *job, Error **=
+errp)
+     if (s->sync_mode =3D=3D MIRROR_SYNC_MODE_BITMAP) {
+         backup_incremental_init_copy_bitmap(s);
+     } else {
+-        hbitmap_set(s->copy_bitmap, 0, s->len);
++        bdrv_set_dirty_bitmap(s->copy_bitmap, 0, s->len);
+     }
+=20
+     s->before_write.notify =3D backup_before_write_notify;
+@@ -551,7 +550,7 @@ BlockJob *backup_job_create(const char *job_id, Block=
+DriverState *bs,
+     BackupBlockJob *job =3D NULL;
+     int ret;
+     int64_t cluster_size;
+-    HBitmap *copy_bitmap =3D NULL;
++    BdrvDirtyBitmap *copy_bitmap =3D NULL;
+=20
+     assert(bs);
+     assert(target);
+@@ -621,7 +620,11 @@ BlockJob *backup_job_create(const char *job_id, Bloc=
+kDriverState *bs,
+         goto error;
+     }
+=20
+-    copy_bitmap =3D hbitmap_alloc(len, ctz32(cluster_size));
++    copy_bitmap =3D bdrv_create_dirty_bitmap(bs, cluster_size, NULL, err=
+p);
++    if (!copy_bitmap) {
++        goto error;
++    }
++    bdrv_disable_dirty_bitmap(copy_bitmap);
+=20
+     /* job->len is fixed, so we can't allow resize */
+     job =3D block_job_create(job_id, &backup_job_driver, txn, bs,
+@@ -672,7 +675,7 @@ BlockJob *backup_job_create(const char *job_id, Block=
+DriverState *bs,
+  error:
+     if (copy_bitmap) {
+         assert(!job || !job->copy_bitmap);
+-        hbitmap_free(copy_bitmap);
++        bdrv_release_dirty_bitmap(bs, copy_bitmap);
+     }
+     if (sync_bitmap) {
+         bdrv_reclaim_dirty_bitmap(bs, sync_bitmap, NULL);
 --=20
 2.21.0
 
