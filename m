@@ -6,57 +6,57 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4BE6C606B0
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 08:51:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EB08C606B0
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 08:53:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7F0CE214AF
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 08:51:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F0CE214AF
+	by mail.kernel.org (Postfix) with ESMTPS id D07D5216C4
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 08:53:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D07D5216C4
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47892 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47902 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hklq4-0005GC-Rm
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jul 2019 04:51:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36358)
+	id 1hklsh-0006gF-5T
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jul 2019 04:53:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36866)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jonathan.cameron@huawei.com>) id 1hklpW-0004r4-Gi
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 04:50:32 -0400
+ (envelope-from <jonathan.cameron@huawei.com>) id 1hklrL-0005nx-N6
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 04:52:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jonathan.cameron@huawei.com>) id 1hklpU-0006q4-Tn
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 04:50:30 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:2172 helo=huawei.com)
+ (envelope-from <jonathan.cameron@huawei.com>) id 1hklrK-0007li-8C
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 04:52:23 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:2234 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jonathan.cameron@huawei.com>)
- id 1hklpU-0006gt-7h
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 04:50:28 -0400
-Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id A62B711241454A0211B6;
- Tue,  9 Jul 2019 16:50:16 +0800 (CST)
-Received: from localhost (10.227.98.71) by DGGEMS411-HUB.china.huawei.com
- (10.3.19.211) with Microsoft SMTP Server id 14.3.439.0; Tue, 9 Jul 2019
- 16:50:13 +0800
-Date: Tue, 9 Jul 2019 16:50:01 +0800
+ id 1hklrJ-0007kN-KV
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 04:52:22 -0400
+Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id 6FB8CB8720BC677EF093;
+ Tue,  9 Jul 2019 16:52:17 +0800 (CST)
+Received: from localhost (10.227.98.71) by DGGEMS406-HUB.china.huawei.com
+ (10.3.19.206) with Microsoft SMTP Server id 14.3.439.0; Tue, 9 Jul 2019
+ 16:52:15 +0800
+Date: Tue, 9 Jul 2019 16:24:59 +0800
 From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
 To: Tao Xu <tao3.xu@intel.com>
-Message-ID: <20190709165001.0000657d@huawei.com>
-In-Reply-To: <20190707142958.31316-8-tao3.xu@intel.com>
+Message-ID: <20190709162459.00004032@huawei.com>
+In-Reply-To: <20190707142958.31316-9-tao3.xu@intel.com>
 References: <20190707142958.31316-1-tao3.xu@intel.com>
- <20190707142958.31316-8-tao3.xu@intel.com>
+ <20190707142958.31316-9-tao3.xu@intel.com>
 Organization: Huawei R&D UK Ltd.
 X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; i686-w64-mingw32)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="GB18030"
 X-Originating-IP: [10.227.98.71]
 X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 45.249.212.190
-Subject: Re: [Qemu-devel] [PATCH v6 07/14] hmat acpi: Build System Locality
- Latency and Bandwidth Information Structure(s)
+X-Received-From: 45.249.212.191
+Subject: Re: [Qemu-devel] [PATCH v6 08/14] hmat acpi: Build Memory Side
+ Cache Information Structure(s)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,290 +74,211 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, 7 Jul 2019 22:29:51 +0800
+On Sun, 7 Jul 2019 22:29:52 +0800
 Tao Xu <tao3.xu@intel.com> wrote:
 
 > From: Liu Jingqi <jingqi.liu@intel.com>
-> 
-> This structure describes the memory access latency and bandwidth
-> information from various memory access initiator proximity domains.
-> The latency and bandwidth numbers represented in this structure
-> correspond to rated latency and bandwidth for the platform.
-> The software could use this information as hint for optimization.
-> 
+>=20
+> This structure describes memory side cache information for memory
+> proximity domains if the memory side cache is present and the
+> physical device forms the memory side cache.
+> The software could use this information to effectively place
+> the data in memory to maximize the performance of the system
+> memory that use the memory side cache.
+>=20
 > Signed-off-by: Liu Jingqi <jingqi.liu@intel.com>
 > Signed-off-by: Tao Xu <tao3.xu@intel.com>
 
-I think you've missed one of the 6.3 changes.  Otherwise a few nitpicks
-but looks good to me.
+There is what I'll call a paste 'splurge' inline.
+
+Otherwise looks good.
 
 Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
 
-I've focused on the patches actually dealing with the ACPI tables because
-I'm far less familiar with the opt parsing etc in qemu so don't
-feel confident expressing a view on those.
-
-Thanks,
-
-Jonathan
-
 > ---
-> 
+>=20
 > Changes in v6:
->     - Update the describes in ACPI 6.3
->     - remove num target and target_pxm, because all numa node can be
->       target(no matter it can be reached or not, The Entry Base Unit for
->       latency 0xFFFF means the initiator and target domains are
->       unreachable from each other)
+>     - Add descriptions from ACPI 6.3 spec
 > ---
->  hw/acpi/hmat.c          | 94 ++++++++++++++++++++++++++++++++++++++++-
->  hw/acpi/hmat.h          | 39 +++++++++++++++++
+>  hw/acpi/hmat.c          | 64 ++++++++++++++++++++++++++++++++++++++++-
+>  hw/acpi/hmat.h          | 20 +++++++++++++
 >  include/qemu/typedefs.h |  1 +
 >  include/sysemu/numa.h   |  3 ++
->  include/sysemu/sysemu.h | 22 ++++++++++
->  5 files changed, 158 insertions(+), 1 deletion(-)
-> 
+>  include/sysemu/sysemu.h |  2 ++
+>  5 files changed, 89 insertions(+), 1 deletion(-)
+>=20
 > diff --git a/hw/acpi/hmat.c b/hw/acpi/hmat.c
-> index abf99b1adc..6dd39b0c85 100644
+> index 6dd39b0c85..a207581f11 100644
 > --- a/hw/acpi/hmat.c
 > +++ b/hw/acpi/hmat.c
-> @@ -67,11 +67,80 @@ static void build_hmat_mpda(GArray *table_data, uint16_t flags, int initiator,
->      build_append_int_noprefix(table_data, 0, 8);
+> @@ -133,14 +133,63 @@ static void build_hmat_lb(GArray *table_data, HMA=
+T_LB_Info *numa_hmat_lb,
+>      }
 >  }
->  
-> +/*
-> + * ACPI 6.3: 5.2.27.4 System Locality Latency and Bandwidth Information
-> + * Structure: Table 5-142
-> + */
-> +static void build_hmat_lb(GArray *table_data, HMAT_LB_Info *numa_hmat_lb,
-> +                          uint32_t num_initiator, uint32_t num_target,
-> +                          uint32_t *initiator_pxm, int type)
+> =20
+> +/* ACPI 6.3: 5.2.27.5 Memory Side Cache Information Structure: Table 5=
+-143 */
+> +static void build_hmat_cache(GArray *table_data, HMAT_Cache_Info *hmat=
+_cache)
 > +{
-> +    uint32_t s = num_initiator;
-> +    uint32_t t = num_target;
-> +    uint8_t m, n;
-> +    int i;
+> +    /*
+> +     * Cache Attributes: Bits [3:0] =A8C Total Cache Levels
+> +     * for this Memory Proximity Domain
+> +     */
+> +    uint32_t cache_attr =3D hmat_cache->total_levels & 0xF;
+> +
+> +    /* Bits [7:4] : Cache Level described in this structure */
+> +    cache_attr |=3D (hmat_cache->level & 0xF) << 4;
+> +
+> +    /* Bits [11:8] - Cache Associativity */
+> +    cache_attr |=3D (hmat_cache->associativity & 0xF) << 8;
+> +
+> +    /* Bits [15:12] - Write Policy */
+> +    cache_attr |=3D (hmat_cache->write_policy & 0xF) << 12;
+> +
+> +    /* Bits [31:16] - Cache Line size in bytes */
+> +    cache_attr |=3D (hmat_cache->line_size & 0xFFFF) << 16;
+> +
+> +    cache_attr =3D cpu_to_le32(cache_attr);
 > +
 > +    /* Type */
-> +    build_append_int_noprefix(table_data, 1, 2);
+> +    build_append_int_noprefix(table_data, 2, 2);
 > +    /* Reserved */
 > +    build_append_int_noprefix(table_data, 0, 2);
 > +    /* Length */
-> +    build_append_int_noprefix(table_data, 32 + 4 * s + 4 * t + 2 * s * t, 4);
-> +    /* Flags */
-> +    build_append_int_noprefix(table_data, numa_hmat_lb->hierarchy, 1);
-
-There might be a small argument in favour of masking this as half the bits
-are reserved.
-
-> +    /* Data Type */
-> +    build_append_int_noprefix(table_data, numa_hmat_lb->data_type, 1);
-> +    /* Reserved */
-> +    build_append_int_noprefix(table_data, 0, 2);
-> +    /* Number of Initiator Proximity Domains (s) */
-> +    build_append_int_noprefix(table_data, s, 4);
-> +    /* Number of Target Proximity Domains (t) */
-> +    build_append_int_noprefix(table_data, t, 4);
+> +    build_append_int_noprefix(table_data, 32, 4);
+> +    /* Proximity Domain for the Memory */
+> +    build_append_int_noprefix(table_data, hmat_cache->mem_proximity, 4=
+);
 > +    /* Reserved */
 > +    build_append_int_noprefix(table_data, 0, 4);
-> +
-> +    /* Entry Base Unit */
-> +    if (type <= HMAT_LB_DATA_WRITE_LATENCY) {
-
-I'd slightly prefer this as an explicit switch with all the elements laid out.
-That would make it 'obvious' that this is all the Latency cases and the
-next path is all the Bandwidth ones.
-(up to you though!)
-
-> +        build_append_int_noprefix(table_data, numa_hmat_lb->base_lat, 8);
-> +    } else {
-> +        build_append_int_noprefix(table_data, numa_hmat_lb->base_bw, 8);
-> +    }
-> +
-> +    /* Initiator Proximity Domain List */
-> +    for (i = 0; i < s; i++) {
-> +        build_append_int_noprefix(table_data, initiator_pxm[i], 4);
-> +    }
-> +
-> +    /* Target Proximity Domain List */
-> +    for (i = 0; i < t; i++) {
-> +        build_append_int_noprefix(table_data, i, 4);
-> +    }
-> +
-> +    /* Latency or Bandwidth Entries */
-> +    for (i = 0; i < s; i++) {
-> +        m = initiator_pxm[i];
-> +        for (n = 0; n < t; n++) {
-> +            uint16_t entry;
-> +
-> +            if (type <= HMAT_LB_DATA_WRITE_LATENCY) {
-As above, a switch is more code, but it's clearer.  Alternative would be
-a macro HMAT_IS_LATENCY()
-
-> +                entry = numa_hmat_lb->latency[m][n];
-> +            } else {
-> +                entry = numa_hmat_lb->bandwidth[m][n];
-> +            }
-> +
-> +            build_append_int_noprefix(table_data, entry, 2);
-> +        }
-> +    }
+> +    /* Memory Side Cache Size */
+> +    build_append_int_noprefix(table_data, hmat_cache->size, 8);
+> +    /* Cache Attributes */
+> +    build_append_int_noprefix(table_data, cache_attr, 4);
+> +    /* Reserved */
+> +    build_append_int_noprefix(table_data, 0, 2);
+> +    /*
+> +     * Number of SMBIOS handles (n)
+> +     * Linux kernel uses Memory Side Cache Information Structure
+> +     * without SMBIOS entries for now, so set Number of SMBIOS handles
+> +     * as 0.
+> +     */
+> +    build_append_int_noprefix(table_data, 0, 2);
 > +}
 > +
 >  /* Build HMAT sub table structures */
->  static void hmat_build_table_structs(GArray *table_data, NumaState *nstat)
+>  static void hmat_build_table_structs(GArray *table_data, NumaState *ns=
+tat)
 >  {
 >      uint16_t flags;
-> -    int i;
-> +    uint32_t num_initiator = 0;
-> +    uint32_t initiator_pxm[MAX_NODES];
-> +    int i, hrchy, type;
-> +    HMAT_LB_Info *numa_hmat_lb;
->  
->      for (i = 0; i < nstat->num_nodes; i++) {
->          flags = 0;
-> @@ -82,6 +151,29 @@ static void hmat_build_table_structs(GArray *table_data, NumaState *nstat)
->  
->          build_hmat_mpda(table_data, flags, nstat->nodes[i].initiator, i);
+>      uint32_t num_initiator =3D 0;
+>      uint32_t initiator_pxm[MAX_NODES];
+> -    int i, hrchy, type;
+> +    int i, hrchy, type, level;
+>      HMAT_LB_Info *numa_hmat_lb;
+> +    HMAT_Cache_Info *numa_hmat_cache;
+> =20
+>      for (i =3D 0; i < nstat->num_nodes; i++) {
+>          flags =3D 0;
+> @@ -174,6 +223,19 @@ static void hmat_build_table_structs(GArray *table=
+_data, NumaState *nstat)
+>              }
+>          }
 >      }
 > +
-> +    for (i = 0; i < nstat->num_nodes; i++) {
-> +        if (nstat->nodes[i].has_cpu) {
-> +            initiator_pxm[num_initiator++] = i;
-> +        }
-> +    }
-> +
 > +    /*
-> +     * ACPI 6.3: 5.2.27.4 System Locality Latency and Bandwidth Information
-> +     * Structure: Table 5-142
+> +     * ACPI 6.3: 5.2.27.5 Memory Side Cache Information Structure:
+> +     * Table 5-143
 > +     */
-> +    for (hrchy = HMAT_LB_MEM_MEMORY;
-> +         hrchy <= HMAT_LB_MEM_CACHE_3RD_LEVEL; hrchy++) {
-> +        for (type = HMAT_LB_DATA_ACCESS_LATENCY;
-> +             type <= HMAT_LB_DATA_WRITE_BANDWIDTH; type++) {
-> +            numa_hmat_lb = nstat->hmat_lb[hrchy][type];
-> +
-> +            if (numa_hmat_lb) {
-> +                build_hmat_lb(table_data, numa_hmat_lb, num_initiator,
-> +                              nstat->num_nodes, initiator_pxm, type);
+> +    for (i =3D 0; i < nstat->num_nodes; i++) {
+> +        for (level =3D 0; level <=3D MAX_HMAT_CACHE_LEVEL; level++) {
+> +            numa_hmat_cache =3D nstat->hmat_cache[i][level];
+> +            if (numa_hmat_cache) {
+> +                build_hmat_cache(table_data, numa_hmat_cache);
 > +            }
 > +        }
 > +    }
 >  }
->  
->  void build_hmat(GArray *table_data, BIOSLinker *linker, NumaState *nstat)
+> =20
+>  void build_hmat(GArray *table_data, BIOSLinker *linker, NumaState *nst=
+at)
 > diff --git a/hw/acpi/hmat.h b/hw/acpi/hmat.h
-> index 574cfba60a..9d5f407b8a 100644
+> index 9d5f407b8a..ba655281cc 100644
 > --- a/hw/acpi/hmat.h
 > +++ b/hw/acpi/hmat.h
-> @@ -40,6 +40,45 @@
->   */
->  #define HMAT_PROX_INIT_VALID 0x1
->  
-> +struct HMAT_LB_Info {
+> @@ -79,6 +79,26 @@ struct HMAT_LB_Info {
+>      uint16_t    bandwidth[MAX_NODES][MAX_NODES];
+>  };
+> =20
+> +struct HMAT_Cache_Info {
+> +    /* The memory proximity domain to which the memory belongs. */
+> +    uint32_t    mem_proximity;
+> +    /* Size of memory side cache in bytes. */
+> +    uint64_t    size;
 > +    /*
-> +     * Indicates total number of Proximity Domains
-> +     * that can initiate memory access requests.
+> +     * Total cache levels for this memory
+> +     * pr#include "hw/acpi/aml-build.h"oximity domain.
+
+:)  Happens to us all. (I went back and checked original email in case
+I'd just inserted that.
+
 > +     */
-> +    uint32_t    num_initiator;
-> +    /*
-> +     * Indicates total number of Proximity Domains
-> +     * that can act as target.
-> +     */
-> +    uint32_t    num_target;
-> +    /*
-> +     * Indicates it's memory or
-> +     * the specified level memory side cache.
-> +     */
-> +    uint8_t     hierarchy;
-> +    /*
-> +     * Present the type of data,
-> +     * access/read/write latency or bandwidth.
-> +     */
-> +    uint8_t     data_type;
-> +    /* The base unit for latency in nanoseconds. */
-> +    uint64_t    base_lat;
-> +    /* The base unit for bandwidth in megabytes per second(MB/s). */
-> +    uint64_t    base_bw;
-> +    /*
-> +     * latency[i][j]:
-> +     * Indicates the latency based on base_lat
-> +     * from Initiator Proximity Domain i to Target Proximity Domain j.
-> +     */
-> +    uint16_t    latency[MAX_NODES][MAX_NODES];
-> +    /*
-> +     * bandwidth[i][j]:
-> +     * Indicates the bandwidth based on base_bw
-> +     * from Initiator Proximity Domain i to Target Proximity Domain j.
-> +     */
-> +    uint16_t    bandwidth[MAX_NODES][MAX_NODES];
+> +    uint8_t     total_levels;
+> +    /* Cache level described in this structure. */
+> +    uint8_t     level;
+> +    /* Cache Associativity: None/Direct Mapped/Comple Cache Indexing *=
+/
+> +    uint8_t     associativity;
+> +    /* Write Policy: None/Write Back(WB)/Write Through(WT) */
+> +    uint8_t     write_policy;
+> +    /* Cache Line size in bytes. */
+> +    uint16_t    line_size;
 > +};
 > +
->  void build_hmat(GArray *table_data, BIOSLinker *linker, NumaState *nstat);
->  
+>  void build_hmat(GArray *table_data, BIOSLinker *linker, NumaState *nst=
+at);
+> =20
 >  #endif
 > diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
-> index fcdaae58c4..c0257e936b 100644
+> index c0257e936b..d971f5109e 100644
 > --- a/include/qemu/typedefs.h
 > +++ b/include/qemu/typedefs.h
 > @@ -33,6 +33,7 @@ typedef struct FWCfgEntry FWCfgEntry;
 >  typedef struct FWCfgIoState FWCfgIoState;
 >  typedef struct FWCfgMemState FWCfgMemState;
 >  typedef struct FWCfgState FWCfgState;
-> +typedef struct HMAT_LB_Info HMAT_LB_Info;
+> +typedef struct HMAT_Cache_Info HMAT_Cache_Info;
+>  typedef struct HMAT_LB_Info HMAT_LB_Info;
 >  typedef struct HVFX86EmulatorState HVFX86EmulatorState;
 >  typedef struct I2CBus I2CBus;
->  typedef struct I2SCodec I2SCodec;
 > diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
-> index 357aaeda80..0b80bc2fa2 100644
+> index 0b80bc2fa2..2e5bdcbd19 100644
 > --- a/include/sysemu/numa.h
 > +++ b/include/sysemu/numa.h
-> @@ -32,6 +32,9 @@ struct NumaState {
->  
->      /* NUMA nodes information */
->      NodeInfo nodes[MAX_NODES];
+> @@ -35,6 +35,9 @@ struct NumaState {
+> =20
+>      /* NUMA modes HMAT Locality Latency and Bandwidth Information */
+>      HMAT_LB_Info *hmat_lb[HMAT_LB_LEVELS][HMAT_LB_TYPES];
 > +
-> +    /* NUMA modes HMAT Locality Latency and Bandwidth Information */
-> +    HMAT_LB_Info *hmat_lb[HMAT_LB_LEVELS][HMAT_LB_TYPES];
+> +    /* Memory Side Cache Information Structure */
+> +    HMAT_Cache_Info *hmat_cache[MAX_NODES][MAX_HMAT_CACHE_LEVEL + 1];
 >  };
 >  typedef struct NumaState NumaState;
->  
+> =20
 > diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-> index 61579ae71e..3f83fc0d58 100644
+> index 3f83fc0d58..85c584c531 100644
 > --- a/include/sysemu/sysemu.h
 > +++ b/include/sysemu/sysemu.h
-> @@ -124,6 +124,28 @@ extern int mem_prealloc;
->  #define NUMA_DISTANCE_MAX         254
->  #define NUMA_DISTANCE_UNREACHABLE 255
->  
-> +/* the value of AcpiHmatLBInfo flags */
-> +enum {
-> +    HMAT_LB_MEM_MEMORY           = 0,
-> +    HMAT_LB_MEM_CACHE_LAST_LEVEL = 1,
-
-This changed in 6.3.  There isn't a last level one now.
-
-> +    HMAT_LB_MEM_CACHE_1ST_LEVEL  = 2,
-> +    HMAT_LB_MEM_CACHE_2ND_LEVEL  = 3,
-> +    HMAT_LB_MEM_CACHE_3RD_LEVEL  = 4,
-> +};
+> @@ -143,6 +143,8 @@ enum {
+>      HMAT_LB_DATA_WRITE_BANDWIDTH  =3D 5,
+>  };
+> =20
+> +#define MAX_HMAT_CACHE_LEVEL        3
 > +
-> +/* the value of AcpiHmatLBInfo data type */
-> +enum {
-> +    HMAT_LB_DATA_ACCESS_LATENCY   = 0,
-> +    HMAT_LB_DATA_READ_LATENCY     = 1,
-> +    HMAT_LB_DATA_WRITE_LATENCY    = 2,
-> +    HMAT_LB_DATA_ACCESS_BANDWIDTH = 3,
-> +    HMAT_LB_DATA_READ_BANDWIDTH   = 4,
-> +    HMAT_LB_DATA_WRITE_BANDWIDTH  = 5,
-> +};
-> +
-> +#define HMAT_LB_LEVELS    (HMAT_LB_MEM_CACHE_3RD_LEVEL + 1)
-> +#define HMAT_LB_TYPES     (HMAT_LB_DATA_WRITE_BANDWIDTH + 1)
-> +
->  #define MAX_OPTION_ROMS 16
->  typedef struct QEMUOptionRom {
->      const char *name;
+>  #define HMAT_LB_LEVELS    (HMAT_LB_MEM_CACHE_3RD_LEVEL + 1)
+>  #define HMAT_LB_TYPES     (HMAT_LB_DATA_WRITE_BANDWIDTH + 1)
+> =20
 
 
 
