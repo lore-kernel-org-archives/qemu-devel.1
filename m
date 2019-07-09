@@ -7,76 +7,76 @@ X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 741A6C73C53
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 17:26:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B20E9C73C46
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 17:29:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 44AA9214AF
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 17:26:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7F90020665
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jul 2019 17:29:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="u6NPtatc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 44AA9214AF
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="f5Wyiq71"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F90020665
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52320 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52340 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hkttH-00009X-J9
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jul 2019 13:26:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56033)
+	id 1hktvn-000275-0x
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jul 2019 13:29:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56040)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <maran.wilson@oracle.com>) id 1hktoC-0004x0-7w
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 13:21:42 -0400
+ (envelope-from <maran.wilson@oracle.com>) id 1hktoC-0004xb-Fn
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 13:21:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <maran.wilson@oracle.com>) id 1hktoB-0001GG-6z
+ (envelope-from <maran.wilson@oracle.com>) id 1hktoB-0001Gh-AB
  for qemu-devel@nongnu.org; Tue, 09 Jul 2019 13:21:40 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:59942)
+Received: from userp2130.oracle.com ([156.151.31.86]:60084)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <maran.wilson@oracle.com>)
- id 1hkto7-0000vP-93
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 13:21:37 -0400
+ id 1hkto9-0001Cj-AD
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 13:21:39 -0400
 Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
- by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x69HItej094709;
- Tue, 9 Jul 2019 17:21:26 GMT
+ by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x69HIxZh094804;
+ Tue, 9 Jul 2019 17:21:35 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
  h=subject : to : cc :
  references : from : message-id : date : mime-version : in-reply-to :
  content-type : content-transfer-encoding; s=corp-2018-07-02;
- bh=MjEJhBt7sS82dhXCnwYDQHj5u/g/AGE0b3Hpz5Cr1NA=;
- b=u6NPtatca4FUH8oCXACu7G7vB7R+mVFJZ/mVqTa3nry33wQW20DellT1B4vypv4K0gnz
- fJKQr6/pWaqNaiLnvD0d0l/idlyjBKs7PIZvOAj9y8pfrNb/Lwwt6n3T7eqzcSc8M4nj
- aWdB67nmpcK+Wtf4wNAZuZvQlTgMhKf61Zo6LhOydVTHVpXxybiIjbXGL5MvCGArgcA3
- dhnS64369LjXp24gWTF9NIgUjauWyhXwtAROe5WbLjwyy1eDH2fcCvHGsog6TTs9f8WX
- P6AYm2mzGpphWiFlass+mQzaEcyrC+5oyjQFMP657OWTSX8vgQWP2/p2npkD6ANDUxFZ 4w== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
- by userp2130.oracle.com with ESMTP id 2tjk2tnqx4-1
+ bh=Wv0QUFTPKvZPvBylNpFSHK+beuMbdZ6PAa8/4zex8pU=;
+ b=f5Wyiq713b1LDv5QQVmhayE2rDpYLQH0yecZBlW07bR/zVghQ6J1qqu4ntdJSARAW/Xk
+ AbcNX1IiNw5DG78qBaO4yri3Khb+u+A08+CF4qTbMcaxhsmX/rH5yf3oMZUWGQxAwljk
+ MOBN5TTltVf431N3644U/JyDbyf0Dxvk/9rl8vqboSG1piy8GAOwYwpijHeHQ3Lbkr02
+ KbdClQ7PFfsc5fFnC9sBhfJJsgiUwnykUL4ZKRhiUpcrDuHQDy6KjG6AEjwBnjsAW+P5
+ 4Se6be5EN+5i31J034NL3m0C8qfkGSXFvVhgiEbEo1gmcZaKdZ8a074a0BUKPwx2fRv0 nA== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+ by userp2130.oracle.com with ESMTP id 2tjk2tnqxp-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 09 Jul 2019 17:21:26 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
- by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x69HI1Wx160262;
- Tue, 9 Jul 2019 17:21:26 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
- by userp3030.oracle.com with ESMTP id 2tjgru7ufk-1
+ Tue, 09 Jul 2019 17:21:35 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+ by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x69HHwUE028387;
+ Tue, 9 Jul 2019 17:21:34 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+ by userp3020.oracle.com with ESMTP id 2tjjykx7fh-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 09 Jul 2019 17:21:25 +0000
+ Tue, 09 Jul 2019 17:21:34 +0000
 Received: from abhmp0013.oracle.com (abhmp0013.oracle.com [141.146.116.19])
- by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x69HLOe1023541;
- Tue, 9 Jul 2019 17:21:24 GMT
+ by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x69HLXgR013704;
+ Tue, 9 Jul 2019 17:21:33 GMT
 Received: from [10.159.233.89] (/10.159.233.89)
  by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Tue, 09 Jul 2019 10:21:24 -0700
+ with ESMTP ; Tue, 09 Jul 2019 10:21:33 -0700
 To: Liran Alon <liran.alon@oracle.com>, qemu-devel@nongnu.org
 References: <20190705210636.3095-1-liran.alon@oracle.com>
- <20190705210636.3095-3-liran.alon@oracle.com>
+ <20190705210636.3095-4-liran.alon@oracle.com>
 From: Maran Wilson <maran.wilson@oracle.com>
 Organization: Oracle Corporation
-Message-ID: <0608e757-148b-4125-6d0a-9b3700f1cc4a@oracle.com>
-Date: Tue, 9 Jul 2019 10:21:23 -0700
+Message-ID: <f264c433-facc-5316-e3e7-11a7bb97ea7a@oracle.com>
+Date: Tue, 9 Jul 2019 10:21:32 -0700
 User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <20190705210636.3095-3-liran.alon@oracle.com>
+In-Reply-To: <20190705210636.3095-4-liran.alon@oracle.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Content-Language: en-US
@@ -97,8 +97,8 @@ X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
  definitions=main-1907090204
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
 X-Received-From: 156.151.31.86
-Subject: Re: [Qemu-devel] [PATCH 2/4] target/i386: kvm: Init nested-state
- for vCPU exposed with SVM
+Subject: Re: [Qemu-devel] [PATCH 3/4] target/i386: kvm: Save nested-state
+ only in case vCPU have set VMXON region
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -117,45 +117,46 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 7/5/2019 2:06 PM, Liran Alon wrote:
-> Reviewed-by: Joao Martins <joao.m.martins@oracle.com>
-> Signed-off-by: Liran Alon <liran.alon@oracle.com>
-> ---
->   target/i386/cpu.h | 5 +++++
->   target/i386/kvm.c | 2 ++
->   2 files changed, 7 insertions(+)
->
-> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> index 93345792f4cb..cdb0e43676a9 100644
-> --- a/target/i386/cpu.h
-> +++ b/target/i386/cpu.h
-> @@ -1867,6 +1867,11 @@ static inline bool cpu_has_vmx(CPUX86State *env)
->       return env->features[FEAT_1_ECX] & CPUID_EXT_VMX;
->   }
->   
-> +static inline bool cpu_has_svm(CPUX86State *env)
-> +{
-> +    return env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_SVM;
-> +}
-> +
->   /* fpu_helper.c */
->   void update_fp_status(CPUX86State *env);
->   void update_mxcsr_status(CPUX86State *env);
-> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-> index b57f873ec9e8..4e2c8652168f 100644
-> --- a/target/i386/kvm.c
-> +++ b/target/i386/kvm.c
-> @@ -1721,6 +1721,8 @@ int kvm_arch_init_vcpu(CPUState *cs)
->               env->nested_state->format = KVM_STATE_NESTED_FORMAT_VMX;
->               vmx_hdr->vmxon_pa = -1ull;
->               vmx_hdr->vmcs12_pa = -1ull;
-> +        } else if (cpu_has_svm(env)) {
-> +            env->nested_state->format = KVM_STATE_NESTED_FORMAT_SVM;
->           }
->       }
->   
+> Having (nested_state->hdr.vmx.vmxon_pa != -1ull) signals that vCPU have set
+> at some point in time a VMXON region. Note that even though when vCPU enters
+> SMM mode it temporarily exit VMX operation, KVM still reports (vmxon_pa != -1ull).
+> Therefore, this field can be used as a reliable indicator on when we require to
+
+s/on when we require/for when we are required/
+
+Also, note that you have commit message lines are longer than 76 
+characters (longer than 80, for that matter).
+
+But aside from those nits:
 
 Reviewed-by: Maran Wilson <maran.wilson@oracle.com>
 
 Thanks,
 -Maran
+
+> send VMX nested-state as part of migration stream.
+>
+> Reviewed-by: Joao Martins <joao.m.martins@oracle.com>
+> Signed-off-by: Liran Alon <liran.alon@oracle.com>
+> ---
+>   target/i386/machine.c | 5 ++---
+>   1 file changed, 2 insertions(+), 3 deletions(-)
+>
+> diff --git a/target/i386/machine.c b/target/i386/machine.c
+> index 851b249d1a39..20bda9f80154 100644
+> --- a/target/i386/machine.c
+> +++ b/target/i386/machine.c
+> @@ -997,9 +997,8 @@ static bool vmx_nested_state_needed(void *opaque)
+>   {
+>       struct kvm_nested_state *nested_state = opaque;
+>   
+> -    return ((nested_state->format == KVM_STATE_NESTED_FORMAT_VMX) &&
+> -            ((nested_state->hdr.vmx.vmxon_pa != -1ull) ||
+> -             (nested_state->hdr.vmx.smm.flags & KVM_STATE_NESTED_SMM_VMXON)));
+> +    return (nested_state->format == KVM_STATE_NESTED_FORMAT_VMX) &&
+> +           (nested_state->hdr.vmx.vmxon_pa != -1ull);
+>   }
+>   
+>   static const VMStateDescription vmstate_vmx_nested_state = {
+
 
