@@ -2,48 +2,49 @@ Return-Path: <SRS0=axyf=VH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2B56C74A35
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 21:31:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2F7CC74A36
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 21:53:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 27176208E4
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 21:31:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 27176208E4
+	by mail.kernel.org (Postfix) with ESMTPS id 984252087F
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 21:53:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 984252087F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37232 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37310 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlKB9-0000PA-FX
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jul 2019 17:31:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50777)
+	id 1hlKWy-00075X-4o
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jul 2019 17:53:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32861)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hlK9W-0008AO-6w
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 17:29:27 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hlKVz-0006Eb-Sa
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 17:52:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hlK9U-0002zI-84
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 17:29:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44614)
+ (envelope-from <mreitz@redhat.com>) id 1hlKVx-0001KK-SU
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 17:52:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51672)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hlK9K-0002M6-5n; Wed, 10 Jul 2019 17:29:16 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ id 1hlKVs-00019Q-BT; Wed, 10 Jul 2019 17:52:33 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 86B7330B97AA;
- Wed, 10 Jul 2019 21:29:01 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id C432D36899;
+ Wed, 10 Jul 2019 21:52:27 +0000 (UTC)
 Received: from dresden.str.redhat.com (unknown [10.40.205.108])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 86BB05D9CA;
- Wed, 10 Jul 2019 21:29:00 +0000 (UTC)
-To: qemu-block@nongnu.org
-References: <20190703172813.6868-1-mreitz@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6F78660C05;
+ Wed, 10 Jul 2019 21:52:26 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
+To: Maxim Levitsky <mlevitsk@redhat.com>, qemu-devel@nongnu.org
+References: <20190710170349.1548-1-mlevitsk@redhat.com>
+ <84232589-627a-8151-a3d5-84c053d9a257@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
@@ -69,22 +70,21 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <8920a73b-36fd-ab1f-8a6a-8fa600e5f788@redhat.com>
-Date: Wed, 10 Jul 2019 23:28:58 +0200
+Message-ID: <3e82ff24-6f84-9de8-d3ab-c34966f875f0@redhat.com>
+Date: Wed, 10 Jul 2019 23:52:24 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190703172813.6868-1-mreitz@redhat.com>
+In-Reply-To: <84232589-627a-8151-a3d5-84c053d9a257@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="t0pNsTNK30pWZDrN4MaRsmCSavGkcz4RY"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+ boundary="Cl8axl6flIGJVUJSSdFvyqQiycy0mVxC2"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Wed, 10 Jul 2019 21:29:01 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.30]); Wed, 10 Jul 2019 21:52:27 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 00/12] block: Fixes for concurrent block
- jobs
+Subject: Re: [Qemu-devel] [PATCH] LUKS: support preallocation in qemu-img
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,148 +96,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---t0pNsTNK30pWZDrN4MaRsmCSavGkcz4RY
-Content-Type: multipart/mixed; boundary="4ULhHFGuD74yHSZDMiYsF2i4qyHybbH6K";
+--Cl8axl6flIGJVUJSSdFvyqQiycy0mVxC2
+Content-Type: multipart/mixed; boundary="UrhKt66gsyVr1zTbQjTX224A9dbJfhEkz";
  protected-headers="v1"
 From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
-Message-ID: <8920a73b-36fd-ab1f-8a6a-8fa600e5f788@redhat.com>
-Subject: Re: [PATCH v2 00/12] block: Fixes for concurrent block jobs
-References: <20190703172813.6868-1-mreitz@redhat.com>
-In-Reply-To: <20190703172813.6868-1-mreitz@redhat.com>
+To: Maxim Levitsky <mlevitsk@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+Message-ID: <3e82ff24-6f84-9de8-d3ab-c34966f875f0@redhat.com>
+Subject: Re: [PATCH] LUKS: support preallocation in qemu-img
+References: <20190710170349.1548-1-mlevitsk@redhat.com>
+ <84232589-627a-8151-a3d5-84c053d9a257@redhat.com>
+In-Reply-To: <84232589-627a-8151-a3d5-84c053d9a257@redhat.com>
 
---4ULhHFGuD74yHSZDMiYsF2i4qyHybbH6K
+--UrhKt66gsyVr1zTbQjTX224A9dbJfhEkz
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-Ping
+On 10.07.19 23:24, Max Reitz wrote:
+> On 10.07.19 19:03, Maxim Levitsky wrote:
+>> preallocation=3Doff and preallocation=3Dmetadata
+>> both allocate luks header only, and preallocation=3Dfalloc/full
+>> is passed to underlying file, with the given image size.
+>>
+>> Note that the actual preallocated size is a bit smaller due
+>> to luks header.
+>=20
+> Couldn=E2=80=99t you just preallocate it after creating the crypto head=
+er so
+> qcrypto_block_get_payload_offset(crypto->block) + size is the actual
+> file size?
+>=20
+>> Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=3D1534951
+>>
+>> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+>> ---
+>>  block/crypto.c | 28 ++++++++++++++++++++++++++--
+>>  1 file changed, 26 insertions(+), 2 deletions(-)
+>=20
+> Hm.  I would expect a preallocated image to read 0.  But if you just
+> pass this through to the protocol layer, it won=E2=80=99t read 0.
+>=20
+> (In fact, I don=E2=80=99t even quite see the point of having LUKS as an=
+ own
+> format still.  It was useful when qcow2 didn=E2=80=99t have LUKS suppor=
+t, but
+> now it does, so...  I suppose everyone using the LUKS format should
+> actually be using qcow2 with LUKS?)
 
-I suppose I=E2=80=99ll apply the patches I had in v1 if I don=E2=80=99t g=
-et reviews for
-the new patches, because some fixes are better than none.
+Kevin just pointed out to me that our LUKS format is compatible to the
+actual layout cryptsetup uses.  OK, that is an important use case.
 
-(And probably patch 2, because it=E2=80=99s obvious.)
+Hm.  Unfortunately, that doesn=E2=80=99t really necessitate preallocation=
+=2E
+
+Well, whatever.  If it=E2=80=99s simple enough, that shouldn=E2=80=99t st=
+op us from
+implementing preallocation anyway.
+
+
+Now I found that qapi/block-core.json defines PreallocMode=E2=80=99s fall=
+oc and
+full values as follows:
+
+> # @falloc: like @full preallocation but allocate disk space by
+> #          posix_fallocate() rather than writing zeros.
+> # @full: preallocate all data by writing zeros to device to ensure disk=
+
+> #        space is really available. @full preallocation also sets up
+> #        metadata correctly.
+
+So it isn=E2=80=99t just me who expects these to pre-initialize the image=
+ to 0.
+ Hm, although...  I suppose @falloc technically does not specify whether
+the data reads as zeroes.  I kind of find it to be implied, but, well...
 
 Max
 
-On 03.07.19 19:28, Max Reitz wrote:
-> This is a v2 to =E2=80=9Cblock: Add BDS.never_freeze=E2=80=9D.
->=20
-> It depends on my =E2=80=9Cblock: Delay poll when ending drained section=
-s=E2=80=9D
-> series:
->=20
-> Depends-on: <20190619152603.5937-1-mreitz@redhat.com>
->=20
->=20
-> It turned out that if you run 030 (or just the new test_overlapping_5
-> case) sufficiently often, it breaks; which is why I=E2=80=99m hesitant =
-to just
-> merge the =E2=80=9Cadd never_freeze=E2=80=9D series as it is.
->=20
-> There are several reasons for why this test case breaks, I hope patches=
 
-> 3 to 6 fix them.  Patch 12 adds a test that is much more reliable than
-> test_overlapping_5 at detecting the problems fixed by at least patches =
-4
-> to 6.  (I think that 3 doesn=E2=80=99t really need a test.)
->=20
-> I=E2=80=99m sure there are other ways to see these problems, but well, =
-coming
-> from 030, concurrent commit/stream jobs are how I reproduced them.
-> Hence the same of this series.
->=20
-> Patch 2 is for something I encountered on the way.  Patch 11 tests it.
->=20
->=20
-> v2:
-> - Added a bunch of more patches.
->=20
->=20
-> git backport-diff against v1:
->=20
-> Key:
-> [----] : patches are identical
-> [####] : number of functional differences between upstream/downstream p=
-atch
-> [down] : patch is downstream-only
-> The flags [FC] indicate (F)unctional and (C)ontextual differences, resp=
-ectively
->=20
-> 001/12:[----] [--] 'block: Add BDS.never_freeze'
-> 002/12:[down] 'block/stream: Fix error path'
-> 003/12:[down] 'block/stream: Swap backing file change order'
-> 004/12:[down] 'block: Keep subtree drained in drop_intermediate'
-> 005/12:[down] 'block: Reduce (un)drains when replacing a child'
-> 006/12:[down] 'block: Deep-clear inherits_from'
-> 007/12:[----] [--] 'iotests: Fix throttling in 030'
-> 008/12:[----] [--] 'iotests: Compare error messages in 030'
-> 009/12:[----] [--] 'iotests: Add @use_log to VM.run_job()'
-> 010/12:[----] [--] 'iotests: Add new case to 030'
-> 011/12:[down] 'iotests: Add read-only test case to 030'
-> 012/12:[down] 'iotests: Add test for concurrent stream/commit'
->=20
->=20
->=20
-> Max Reitz (12):
->   block: Add BDS.never_freeze
->   block/stream: Fix error path
->   block/stream: Swap backing file change order
->   block: Keep subtree drained in drop_intermediate
->   block: Reduce (un)drains when replacing a child
->   block: Deep-clear inherits_from
->   iotests: Fix throttling in 030
->   iotests: Compare error messages in 030
->   iotests: Add @use_log to VM.run_job()
->   iotests: Add new case to 030
->   iotests: Add read-only test case to 030
->   iotests: Add test for concurrent stream/commit
->=20
->  include/block/block_int.h     |   3 +
->  block.c                       |  93 +++++++++++++------
->  block/commit.c                |   4 +
->  block/mirror.c                |   4 +
->  block/stream.c                |   4 +-
->  tests/qemu-iotests/030        | 150 +++++++++++++++++++++++++------
->  tests/qemu-iotests/030.out    |   4 +-
->  tests/qemu-iotests/258        | 163 ++++++++++++++++++++++++++++++++++=
+--UrhKt66gsyVr1zTbQjTX224A9dbJfhEkz--
 
->  tests/qemu-iotests/258.out    |  33 +++++++
->  tests/qemu-iotests/group      |   1 +
->  tests/qemu-iotests/iotests.py |  18 ++--
->  11 files changed, 413 insertions(+), 64 deletions(-)
->  create mode 100755 tests/qemu-iotests/258
->  create mode 100644 tests/qemu-iotests/258.out
->=20
-
-
-
---4ULhHFGuD74yHSZDMiYsF2i4qyHybbH6K--
-
---t0pNsTNK30pWZDrN4MaRsmCSavGkcz4RY
+--Cl8axl6flIGJVUJSSdFvyqQiycy0mVxC2
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0mWJsACgkQ9AfbAGHV
-z0ChnQf7BVGhvc388oq0S/bi6DnDrcpYcpMtGZj86taweMzLAkZu6/EY+HbhhGgN
-8rksbYt+2tdHXj6WOmV3iUgKpVNn9Ai0lOGfexSfO0XgIfZEqCdwgRjaz5LiEAJY
-BBevaT89jdC/qQItvAp0Mjyae9rg8HTHoGY61xdc+4Lw3ETHZ4GAaP5C9IUWek0Z
-uks3j4/AVTtwZEtt3dkaZDEKNeFrfta9+RQmmly9pCP2+KTyi8y1rJMBOerevmWs
-zop35rRIJgFcrdUBoLoR2BDfEkwgyJwH2jaTYg8GknpOFvPgxxymP4WZyjvOWBAY
-zWgwzsWScHluDX0y320XSwQM35/NcQ==
-=aE2g
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0mXhgACgkQ9AfbAGHV
+z0C0fwf9GW1scMueh0tVnZi8c8r3O0rrCZFJ7VLpdI8HrQmNnrwyo56aBpTrh7ww
+XGVVWh00WCioy/6CvTXpDKzCBxMuBuSK+sWYqVM4crNF+XCQb0Nz9vkpH97tc8M/
+ltHqjkgnSlIclcd8SX+46zg1VV53wYfoEm3Ze4c1dsUIuEu/ndkdVzvz+Hvbnj/F
+J+my10p9d25A5zEvKVDs84SCX5cagBuwTagO4O4VZKx1T+BIzcvQN9/2Tr3DNfxu
+WV6aTxe9w2+JshSjNdLIKRZYLFTzJiXU2HjqitLzwZYjKZMk4WfQrVRzP0I602/N
+9dUhj47dYheQkGgl4ivewRmQBam2/g==
+=vHyT
 -----END PGP SIGNATURE-----
 
---t0pNsTNK30pWZDrN4MaRsmCSavGkcz4RY--
+--Cl8axl6flIGJVUJSSdFvyqQiycy0mVxC2--
 
