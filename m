@@ -2,82 +2,90 @@ Return-Path: <SRS0=axyf=VH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2D7CC74A2B
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 16:22:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7AC6C74A2B
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 16:22:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 94F772086D
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 16:22:39 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="enMWWHMh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 94F772086D
+	by mail.kernel.org (Postfix) with ESMTPS id BA63521473
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 16:22:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA63521473
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35256 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35258 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlFMc-0003Gu-U4
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jul 2019 12:22:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55410)
+	id 1hlFMh-0003QY-1y
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jul 2019 12:22:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54087)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <paolo.bonzini@gmail.com>) id 1hlFF4-00068T-6l
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 12:14:54 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hlFBY-0003XA-8a
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 12:11:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1hlFEy-0007b5-0b
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 12:14:46 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:55620)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1hlFEv-0007SF-4O
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 12:14:41 -0400
-Received: by mail-wm1-x342.google.com with SMTP id a15so2890765wmj.5
- for <qemu-devel@nongnu.org>; Wed, 10 Jul 2019 09:14:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=jIw3wGu90O5VPci/xvcIGXIfoKSHop6LUOoGJt7ZTWc=;
- b=enMWWHMhdGScWeiH9/8UKECqgmTSu17wDmSjJK72LOxDFdTgOvdgz7yQ3ijCMvLbrB
- rOQkuXzS4XyCuv+ZC5yT3e3CJqSl/tyTcW8isk2BNnHz76fOqus50Ddl93eh7/F7DiUF
- W3X90JXamLEaiCgM+BuDlk9qE/IowstDZ9yrMBxJR175DUmOtmcNqfWPfV40iN1mMBak
- xOklGzeevOBCYfjDguSoc8DMqwvhIbdpnhDr7ROgNCsEHB1lu8UMP3WymzP15QqyMRvg
- Zzi2alBWuNNiqFlQlQAWcPqXHPRkOEj9TOvOu2TucpYjSeFMvJjQba6PuorTnSozrKTY
- 6W1w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references;
- bh=jIw3wGu90O5VPci/xvcIGXIfoKSHop6LUOoGJt7ZTWc=;
- b=KgULuhHvZwex8bLL3Zw9GxsSl72i6/0hOnVc8rAvO0o3fdOyvaC25XZf2mKFrzgZsL
- sqf1rhIWkq3OEkEf9gpcjEkomw/N1gsdifFvgYrGg2EI2WSXLsdSJgQ6TriJrxbxbict
- OuwNXnEzOkjOspxi5XorqQLTe/24DeNaFM7kvkze2tbqeuqR3FS+lRKe1h7J9QUIax2Z
- OqLk5qa+XeTQ1vsn/Kj5XYXYJj1jtFNBIou7yEreWctUxdntiiUnGZTvHIZf92rgzrgf
- kPSFXOPlaireUP79dq1m8F6rqDyH91V1ulgEG7e6B7KQ88W9mMDFv8OHPXaANndw9guh
- vcLw==
-X-Gm-Message-State: APjAAAUr+oiC5K7h3serJY7zZ37YE2k/7S0YwQrcB4gzys87HY7OSYQ+
- 0naE3ToPRvr43dxVWozKo1jF8zVDODw=
-X-Google-Smtp-Source: APXvYqwvunjfBK2yqOmf+RskOpwp/guTdq7v7TXbm2tasfOLXWevCHT/RI4yABOZwq+Oz/CmxL0hrw==
-X-Received: by 2002:a7b:cb08:: with SMTP id u8mr5916598wmj.167.1562775275945; 
- Wed, 10 Jul 2019 09:14:35 -0700 (PDT)
-Received: from 640k.localdomain ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id w14sm2573747wrk.44.2019.07.10.09.14.35
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 10 Jul 2019 09:14:35 -0700 (PDT)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Wed, 10 Jul 2019 18:14:24 +0200
-Message-Id: <1562775267-1222-6-git-send-email-pbonzini@redhat.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1562775267-1222-1-git-send-email-pbonzini@redhat.com>
-References: <1562775267-1222-1-git-send-email-pbonzini@redhat.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::342
-Subject: [Qemu-devel] [PATCH 5/8] libvhost-user: convert to Meson
+ (envelope-from <mreitz@redhat.com>) id 1hlFBX-0004B3-6l
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 12:11:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:65510)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1hlFBU-00044k-M8; Wed, 10 Jul 2019 12:11:08 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 2E4A93082E09;
+ Wed, 10 Jul 2019 16:11:07 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.40.205.108])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 3B50760BFC;
+ Wed, 10 Jul 2019 16:11:03 +0000 (UTC)
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+References: <20190710010556.32365-1-jsnow@redhat.com>
+ <20190710010556.32365-5-jsnow@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <0f0c6f6e-501a-d747-13ff-edc45ccc231d@redhat.com>
+Date: Wed, 10 Jul 2019 18:11:01 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
+MIME-Version: 1.0
+In-Reply-To: <20190710010556.32365-5-jsnow@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="18aNSlpuna02idV0GLqeh4DcofqkiP8zZ"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.46]); Wed, 10 Jul 2019 16:11:07 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 4/8] block/backup: hoist bitmap check into
+ QMP interface
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,117 +97,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- berrange@redhat.com, armbru@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Since libqemuutil.a has been converted to Meson, the conversion is
-straightforward.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--18aNSlpuna02idV0GLqeh4DcofqkiP8zZ
+Content-Type: multipart/mixed; boundary="azElZnUYUstFG6vT81TcL30hsnCV4MzOb";
+ protected-headers="v1"
+From: Max Reitz <mreitz@redhat.com>
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
+ Eric Blake <eblake@redhat.com>
+Message-ID: <0f0c6f6e-501a-d747-13ff-edc45ccc231d@redhat.com>
+Subject: Re: [PATCH 4/8] block/backup: hoist bitmap check into QMP interface
+References: <20190710010556.32365-1-jsnow@redhat.com>
+ <20190710010556.32365-5-jsnow@redhat.com>
+In-Reply-To: <20190710010556.32365-5-jsnow@redhat.com>
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- Makefile                            | 14 ++++----------
- Makefile.objs                       |  1 -
- contrib/libvhost-user/Makefile.objs |  1 -
- contrib/libvhost-user/meson.build   |  2 ++
- meson.build                         |  4 ++++
- 5 files changed, 10 insertions(+), 12 deletions(-)
- delete mode 100644 contrib/libvhost-user/Makefile.objs
- create mode 100644 contrib/libvhost-user/meson.build
+--azElZnUYUstFG6vT81TcL30hsnCV4MzOb
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/Makefile b/Makefile
-index ddc7d27..3763d8c 100644
---- a/Makefile
-+++ b/Makefile
-@@ -323,7 +323,6 @@ dummy := $(call unnest-vars,, \
-                 ivshmem-client-obj-y \
-                 ivshmem-server-obj-y \
-                 rdmacm-mux-obj-y \
--                libvhost-user-obj-y \
-                 vhost-user-scsi-obj-y \
-                 vhost-user-blk-obj-y \
-                 vhost-user-input-obj-y \
-@@ -422,11 +421,6 @@ $(BUILD_DIR)/version.o: $(SRC_PATH)/version.rc config-host.h
- Makefile: $(version-obj-y)
- 
- ######################################################################
--# Build libraries
--
--libvhost-user.a: $(libvhost-user-obj-y)
--
--######################################################################
- 
- COMMON_LDADDS = libqemuutil.a
- 
-@@ -517,21 +511,21 @@ ivshmem-client$(EXESUF): $(ivshmem-client-obj-y) $(COMMON_LDADDS)
- ivshmem-server$(EXESUF): $(ivshmem-server-obj-y) $(COMMON_LDADDS)
- 	$(call LINK, $^)
- endif
--vhost-user-scsi$(EXESUF): $(vhost-user-scsi-obj-y) libvhost-user.a $(COMMON_LDADDS)
-+vhost-user-scsi$(EXESUF): $(vhost-user-scsi-obj-y) contrib/libvhost-user/libvhost-user.a $(COMMON_LDADDS)
- 	$(call LINK, $^)
--vhost-user-blk$(EXESUF): $(vhost-user-blk-obj-y) libvhost-user.a $(COMMON_LDADDS)
-+vhost-user-blk$(EXESUF): $(vhost-user-blk-obj-y) contrib/libvhost-user/libvhost-user.a $(COMMON_LDADDS)
- 	$(call LINK, $^)
- 
- rdmacm-mux$(EXESUF): LIBS += "-libumad"
- rdmacm-mux$(EXESUF): $(rdmacm-mux-obj-y) $(COMMON_LDADDS)
- 	$(call LINK, $^)
- 
--vhost-user-gpu$(EXESUF): $(vhost-user-gpu-obj-y) $(libvhost-user-obj-y) $(COMMON_LDADDS)
-+vhost-user-gpu$(EXESUF): $(vhost-user-gpu-obj-y) contrib/libvhost-user/libvhost-user.a $(COMMON_LDADDS)
- 	$(call LINK, $^)
- 
- ifdef CONFIG_VHOST_USER_INPUT
- ifdef CONFIG_LINUX
--vhost-user-input$(EXESUF): $(vhost-user-input-obj-y) libvhost-user.a $(COMMON_LDADDS)
-+vhost-user-input$(EXESUF): $(vhost-user-input-obj-y) contrib/libvhost-user/libvhost-user.a $(COMMON_LDADDS)
- 	$(call LINK, $^)
- 
- # build by default, do not install
-diff --git a/Makefile.objs b/Makefile.objs
-index 29ffaa3..0bcba93 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -114,7 +114,6 @@ qga-vss-dll-obj-y = qga/
- elf2dmp-obj-y = contrib/elf2dmp/
- ivshmem-client-obj-$(CONFIG_IVSHMEM) = contrib/ivshmem-client/
- ivshmem-server-obj-$(CONFIG_IVSHMEM) = contrib/ivshmem-server/
--libvhost-user-obj-y = contrib/libvhost-user/
- vhost-user-scsi.o-cflags := $(LIBISCSI_CFLAGS)
- vhost-user-scsi.o-libs := $(LIBISCSI_LIBS)
- vhost-user-scsi-obj-y = contrib/vhost-user-scsi/
-diff --git a/contrib/libvhost-user/Makefile.objs b/contrib/libvhost-user/Makefile.objs
-deleted file mode 100644
-index ef3778e..0000000
---- a/contrib/libvhost-user/Makefile.objs
-+++ /dev/null
-@@ -1 +0,0 @@
--libvhost-user-obj-y += libvhost-user.o libvhost-user-glib.o
-diff --git a/contrib/libvhost-user/meson.build b/contrib/libvhost-user/meson.build
-new file mode 100644
-index 0000000..03ba2af
---- /dev/null
-+++ b/contrib/libvhost-user/meson.build
-@@ -0,0 +1,2 @@
-+libvhost_user = static_library('vhost-user',
-+                               [files('libvhost-user.c', 'libvhost-user-glib.c')])
-diff --git a/meson.build b/meson.build
-index c625547..a0a8554 100644
---- a/meson.build
-+++ b/meson.build
-@@ -140,3 +140,7 @@ util_obj = util_obj.apply(config_host, strict: false)
- libqemuutil = static_library('qemuutil',
-                              sources: util_obj.sources(),
-                              dependencies: util_obj.dependencies())
-+
-+# Other build targets
-+
-+subdir('contrib/libvhost-user')
--- 
-1.8.3.1
+On 10.07.19 03:05, John Snow wrote:
+> This is nicer to do in the unified QMP interface that we have now,
+> because it lets us use the right terminology back at the user.
+>=20
+> Signed-off-by: John Snow <jsnow@redhat.com>
+> ---
+>  block/backup.c | 13 ++++---------
+>  blockdev.c     | 10 ++++++++++
+>  2 files changed, 14 insertions(+), 9 deletions(-)
+>=20
+> diff --git a/block/backup.c b/block/backup.c
+> index e2729cf6fa..a64b768e24 100644
+> --- a/block/backup.c
+> +++ b/block/backup.c
+> @@ -566,6 +566,10 @@ BlockJob *backup_job_create(const char *job_id, Bl=
+ockDriverState *bs,
+>      assert(bs);
+>      assert(target);
+> =20
+> +    /* QMP interface protects us from these cases */
+> +    assert(sync_mode !=3D MIRROR_SYNC_MODE_INCREMENTAL);
+> +    assert(sync_bitmap || sync_mode !=3D MIRROR_SYNC_MODE_BITMAP);
+
+Implication would be a nice operator sometimes.
+
+("assert(sync_mode =3D=3D MIRROR_SYNC_MODE_BITMAP -> sync_bitmap)")
+
+(Can you do that in C++?  No, you can=E2=80=99t overload bool=E2=80=99s o=
+perators, right?)
+
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 
+--azElZnUYUstFG6vT81TcL30hsnCV4MzOb--
+
+--18aNSlpuna02idV0GLqeh4DcofqkiP8zZ
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0mDhUACgkQ9AfbAGHV
+z0CFegf+MW8PSW6+opd3d4pcX+otViUCY3Frz40mMtfPu2yq7lMfwSU2DA5wKt9Z
+g8nXhcc0CqUOCx0VQlJgDOnh+jma5xddsRUXaIL/Tvhkthm34w4uIoR3/4xJydNx
+IitQHf8E/qUngT30nUlvaH1pMQRpiHjkRqss6ACBa0iBf7CbQ60+i1qgxB2rlLcY
+vQ4pU+kzfHF1sFqLI52zu27O8KtIINGuhYko9GMPMbx4AmMov9nvFb1XG6/q0+tQ
+eQo2U518qW4gVxMItoo+aRPBtQ9qo2TRiGLrPaOu2zarnjGz0ziuyMtkQyKbVru9
+kcUwy55vTItJgaJLf5xYAxkzhS6AIw==
+=bUJY
+-----END PGP SIGNATURE-----
+
+--18aNSlpuna02idV0GLqeh4DcofqkiP8zZ--
 
