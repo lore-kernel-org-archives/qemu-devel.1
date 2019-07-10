@@ -2,90 +2,83 @@ Return-Path: <SRS0=axyf=VH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48FE8C004EF
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 10:29:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0858AC73C7C
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 10:35:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 19B2D20665
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 10:29:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C7BFC20665
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 10:35:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lIXILrVI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19B2D20665
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JgFIiROA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C7BFC20665
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59786 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59856 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hl9rJ-0005SX-DA
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jul 2019 06:29:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41735)
+	id 1hl9wO-00009q-Gh
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jul 2019 06:35:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45246)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hl9nk-0001J4-Qg
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 06:26:18 -0400
+ (envelope-from <mrolnik@gmail.com>) id 1hl9vd-00082r-P2
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 06:34:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hl9nj-0000m4-IM
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 06:26:16 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:45392)
+ (envelope-from <mrolnik@gmail.com>) id 1hl9vc-0000ex-Fx
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 06:34:25 -0400
+Received: from mail-qk1-x741.google.com ([2607:f8b0:4864:20::741]:46799)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hl9nj-0000QF-8A
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 06:26:15 -0400
-Received: by mail-wr1-x444.google.com with SMTP id f9so1821865wre.12
- for <qemu-devel@nongnu.org>; Wed, 10 Jul 2019 03:26:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=2xglArbFUfwd3/IFA91rmfZG+5etlym8PqDYDWRMM+M=;
- b=lIXILrVIrja/6LD0fWFP/pJct/hfmtiq9zHnk1fZ9I9H67NADezkqr7abp8xDvnH13
- sIUTYWR9V//i7zttXEu3japECj7zzInkcg4IQS5AaWFYrPUP2RW9bZxtHz/CPBx31Egk
- ZddJmzQcBuwRaCcezDw8ygHQ7rRCQ99VTgAh7eJ35maFiGwFWCetxl4HYZ6+Oc/6Cgoi
- RpgA+oS2W7m/7SSkO/9Ze1Bwffk9SNyBHiPQwIVngXa53LhTpwZEab7dE971lEARn/ZH
- e6DJu1AMooy2x8RcwrV4exL/qhxf68wwlKYFEgLRUYQ3tg27RfFDrpqLyVPE9I2SFudR
- QuhQ==
+ (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1hl9vc-0000cs-5x
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 06:34:24 -0400
+Received: by mail-qk1-x741.google.com with SMTP id r4so1406310qkm.13
+ for <qemu-devel@nongnu.org>; Wed, 10 Jul 2019 03:34:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=TA8KfUWPpwMfIHjv+1wev+PVDZCNC1XIvpAX53YemRE=;
+ b=JgFIiROABoi6cOgZqiH0H6hNqyFasJ+BsgwBuoUjMrjbe+ehSUShOKhg6Dst6YWVjh
+ WJWZsxUoSFR7LscisN1Xh/fs5NuKw6iNf8ZTXaCBfCr9hztOFXcHoAibpSJgxAn2sbmS
+ tFxhiydfHwKM27Bnaz3RD4PAufE0gVdE1aMTi8u+mGlSWMaNnGhMo4dWvaP+5yu1Hjmq
+ r90C00ueWW+oJngojRKPc/bMKSV1A1CokcuhyWmLYXxY4RFoz03r+RZYyHWP/s9gg4oY
+ FS74J6prYb023AYN7t1sD/ps8+YBvmE+/yCxpgl7f0O7YTVter7fR8cZSWZ2lGs6g5LF
+ YDBA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=2xglArbFUfwd3/IFA91rmfZG+5etlym8PqDYDWRMM+M=;
- b=rMAS7Z6RDkUKqWj8hh8OJTqX4akqhN+hsnpKsqtcJQZagFtULYeCOcecUfhMkQGiBL
- ekoMj1EGXda0d0UUKKwGUDJXjrAiiWJmZdQXJYtL9v2yCYtGd6b3KTo7T9jkBxtyQWEU
- hc7NmniSMplSgZXl6161iY+Dfs8+j5VIi4dUGY0UwVP1GwWGuHKWA4RdFyfIIMwEQgct
- SuwwCOV97tpzzgRjUHtx9JHFltH375MMyMJuxTE/7F/KkRddOhtJN9p8TOJzaKtuvnAp
- fBLwgPeZxBQmVGSHcTgu75DFrnRmvdOHas2/uWgVq8qXnr/GurPnybLsgB+jSx9FYM9a
- 9HUw==
-X-Gm-Message-State: APjAAAVytSTTxcdq2GgiPUihRxIbYOV+JZvPu4d7sp2mcjnAHxx2ua9y
- sHxyBAJ35Hz1+PI/V281hN3GQw==
-X-Google-Smtp-Source: APXvYqwuW8n3QeE0k2P0biyKm2koBbYc5zxK7caNiHMBpWvfN5i+CSOu57vyEEykMT8pk4MC3Ln3Nw==
-X-Received: by 2002:a5d:4b0a:: with SMTP id v10mr30565732wrq.308.1562754361296; 
- Wed, 10 Jul 2019 03:26:01 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id s25sm1575252wmc.21.2019.07.10.03.25.58
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Wed, 10 Jul 2019 03:25:59 -0700 (PDT)
-Received: from zen.linaroharston. (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 1676A1FF91;
- Wed, 10 Jul 2019 11:25:58 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: peter.maydell@linaro.org
-Date: Wed, 10 Jul 2019 11:25:57 +0100
-Message-Id: <20190710102557.3107-5-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190710102557.3107-1-alex.bennee@linaro.org>
-References: <20190710102557.3107-1-alex.bennee@linaro.org>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=TA8KfUWPpwMfIHjv+1wev+PVDZCNC1XIvpAX53YemRE=;
+ b=TBG6Y3Tt1NUy4S0TsGs5ZaxKu2Uh0BKQQQsN71UwXU0KQWpFmp0h2oAz4FhEwDFmA/
+ UczQZuji5Is5lShPS1iASMBXWI/ormHrrtpU7NsXIAMx6J2BZlsizu9rE5W4FFr1YusX
+ Kg0l0c5yrScS788ZsmfQKc1atyNxknqPs7/t6VOIVoy4rIL1U3f+ojlBKSTxvmLSsy6Y
+ UT8QUuXuy6oZCpZSDHRmCUuIKzGI6zmiyJ1vztycK3LPT6lrFe6JGpBPg1edZ3+BEsuK
+ IUjrecAokv5OE0oDTYT6oe/J0hiZ+jh2TlJbxWfyTQaRUKuLKIe1LWLeeaSX/peyhd/4
+ IzoA==
+X-Gm-Message-State: APjAAAUr+UVTH9mvG0zLM2BTYhqt24LtPISG7rKALzXWaqNdkIMaJ4sW
+ rLwhXUvlK2WhV+d4xHDlX+8haen3THgm7pG4/mE=
+X-Google-Smtp-Source: APXvYqxQ2wiQEk0r0p00X85PgwWuKZf0+gZSXUQxO1sk5jGkV8QJtDet+xBkM6lUpA3Pbv7WBrDrRUr1Mbz+aEc6SVo=
+X-Received: by 2002:a37:a854:: with SMTP id r81mr21993345qke.378.1562754862263; 
+ Wed, 10 Jul 2019 03:34:22 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20190709213651.77315-1-mrolnik@gmail.com>
+ <20190709213651.77315-7-mrolnik@gmail.com>
+ <bf1181ea-0ad3-c6fa-c580-1175daa373ce@redhat.com>
+In-Reply-To: <bf1181ea-0ad3-c6fa-c580-1175daa373ce@redhat.com>
+From: Michael Rolnik <mrolnik@gmail.com>
+Date: Wed, 10 Jul 2019 13:33:43 +0300
+Message-ID: <CAK4993igbJbbBfH-1zGu_uThHqujm3Caev=+z5t_y34HrUfC0Q@mail.gmail.com>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::444
-Subject: [Qemu-devel] [PULL 4/4] gdbstub: revert to previous set_reg
- behaviour
+X-Received-From: 2607:f8b0:4864:20::741
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] [PATCH v25 6/7] target/avr: Add example board
+ configuration
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,72 +90,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jon Doron <arilou@gmail.com>,
+Cc: Igor Mammedov <imammedo@redhat.com>, Sarah Harris <S.E.Harris@kent.ac.uk>,
  Richard Henderson <richard.henderson@linaro.org>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The refactoring of handle_set_reg missed the fact we previously had
-responded with an empty packet when we were not using XML based
-protocols. This broke the fallback behaviour for architectures that
-don't have registers defined in QEMU's gdb-xml directory.
+Hi Philippe.
 
-Revert to the previous behaviour and clean up the commentary for what
-is going on.
+My intension was to implement CPU only. I was not interested in modelling
+boards, I hoped other people would do it. that's why I stopped two years
+ago and did not proceed as there was no interest.
+however, it seems there is an interest as Sarah added some peripheral and
+fixed some bugs.
+I am still not interested in modelling boards, nonetheless, I will support
+/ maintain the CPU and whatever other people will add.
 
-Fixes: 62b3320bddd
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Tested-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Cc: Jon Doron <arilou@gmail.com>
+Regards,
+Michael
 
-diff --git a/gdbstub.c b/gdbstub.c
-index 8363683852..b470aec8ea 100644
---- a/gdbstub.c
-+++ b/gdbstub.c
-@@ -1673,12 +1673,23 @@ static void handle_remove_bp(GdbCmdContext *gdb_ctx, void *user_ctx)
-     put_packet(gdb_ctx->s, "E22");
- }
- 
-+/*
-+ * handle_set/get_reg
-+ *
-+ * Older gdb are really dumb, and don't use 'G/g' if 'P/p' is available.
-+ * This works, but can be very slow. Anything new enough to understand
-+ * XML also knows how to use this properly. However to use this we
-+ * need to define a local XML file as well as be talking to a
-+ * reasonably modern gdb. Responding with an empty packet will cause
-+ * the remote gdb to fallback to older methods.
-+ */
-+
- static void handle_set_reg(GdbCmdContext *gdb_ctx, void *user_ctx)
- {
-     int reg_size;
- 
-     if (!gdb_has_xml) {
--        put_packet(gdb_ctx->s, "E00");
-+        put_packet(gdb_ctx->s, "");
-         return;
-     }
- 
-@@ -1698,11 +1709,6 @@ static void handle_get_reg(GdbCmdContext *gdb_ctx, void *user_ctx)
- {
-     int reg_size;
- 
--    /*
--     * Older gdb are really dumb, and don't use 'g' if 'p' is avaialable.
--     * This works, but can be very slow.  Anything new enough to
--     * understand XML also knows how to use this properly.
--     */
-     if (!gdb_has_xml) {
-         put_packet(gdb_ctx->s, "");
-         return;
--- 
-2.20.1
+On Wed, Jul 10, 2019 at 1:10 PM Philippe Mathieu-Daud=C3=A9 <philmd@redhat.=
+com>
+wrote:
+
+> On 7/9/19 11:36 PM, Michael Rolnik wrote:
+> > From: Sarah Harris <S.E.Harris@kent.ac.uk>
+> >
+> > A simple board setup that configures an AVR CPU to run a given firmware
+> image.
+> > This is all that's useful to implement without peripheral emulation as
+> AVR CPUs include a lot of on-board peripherals.
+>
+> Why not model a tiny existing board?
+>
+> You can mark various pieces of hardware as 'unimplemented'.
+>
+> >
+> > Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
+> > ---
+> >  hw/Kconfig           |   1 +
+> >  hw/avr/Kconfig       |   4 +
+> >  hw/avr/Makefile.objs |   1 +
+> >  hw/avr/sample.c      | 217 +++++++++++++++++++++++++++++++++++++++++++
+> [...]
+>
 
 
+--=20
+Best Regards,
+Michael Rolnik
