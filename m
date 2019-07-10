@@ -7,72 +7,71 @@ X-Spam-Status: No, score=-1.9 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6066C74A35
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 18:05:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37E78C74A35
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 18:09:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7593720844
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 18:05:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 053CD208C4
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 18:09:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GsAa48+9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7593720844
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OPrEki+h"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 053CD208C4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35898 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35924 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlGyL-0000Ve-KK
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jul 2019 14:05:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33441)
+	id 1hlH27-0002Zw-7i
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jul 2019 14:09:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35778)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jan.bobek@gmail.com>) id 1hlGvp-0007gD-0F
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 14:03:07 -0400
+ (envelope-from <jan.bobek@gmail.com>) id 1hlH1U-0001rm-8H
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 14:08:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jan.bobek@gmail.com>) id 1hlGvn-0007QQ-N1
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 14:03:04 -0400
-Received: from mail-yw1-xc42.google.com ([2607:f8b0:4864:20::c42]:38454)
+ (envelope-from <jan.bobek@gmail.com>) id 1hlH1S-0008B6-LU
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 14:08:56 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:46849)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <jan.bobek@gmail.com>) id 1hlGvn-00070v-Ag
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 14:03:03 -0400
-Received: by mail-yw1-xc42.google.com with SMTP id f187so1106894ywa.5
- for <qemu-devel@nongnu.org>; Wed, 10 Jul 2019 11:02:56 -0700 (PDT)
+ (Exim 4.71) (envelope-from <jan.bobek@gmail.com>) id 1hlH1S-00085E-8D
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 14:08:54 -0400
+Received: by mail-ot1-x343.google.com with SMTP id z23so3041038ote.13
+ for <qemu-devel@nongnu.org>; Wed, 10 Jul 2019 11:08:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=subject:to:cc:references:from:openpgp:autocrypt:message-id:date
  :user-agent:mime-version:in-reply-to;
- bh=JRT4TwRQH49zsvlDzmtS1h2K5OHTaSOVzXXdYBbKYR4=;
- b=GsAa48+947iAam4FzpxYL00IHciYcwU4Xr6TGKDnXC33beUd5dVmq04oNohjvEth4D
- OP5PhqX46Ry5n5zoDQtjcV/MHsm+9rpb6VAIRSHRQr1tS8Phn+8k4ksUR05qMONhc3aY
- YoW35IJJ8IRpp2BbbZndMzFhqbYXfyPX/dX3Bx5KhQhzOvEcgOJInJBQ8KzEf7tbD26p
- ExbB8jg27hIzZWLPSsPj4a1k9shNvLtKjmeo50EXFvZ2TZUL3bRBbDHJ2bvBhv2K1E7r
- +8PvjTKSKFbeWdZi7KbK/PSjasaPqHoK2EVHcFZO6DdZxz1SnwcrS/mqToQGspxHoJlF
- 2zWw==
+ bh=lzzA9XwcT+iY7Qeb/waYVWtesydnrNYCbNcfL+TGpyE=;
+ b=OPrEki+hdhPMn/Sx7c9mOxy38lvTnr0Z9qjaBoXs2qhyG5tqoMAHtOW9LfOZUvTfF0
+ qWgYSUV0sE7tzrQJvAwPttHKYKua/h/qVndiBu3lYul6xjtI7HkNxBxWrvB6Bas6uW07
+ i+k0opuZkW5XlGLhwZdJoeJf0BVHNJL3s4Y2AT0K6A1KwRn/Iu2uJWlEIMjeNuw75h0P
+ pMAqvZx9OyHPV1EG7k705eNNyiQvxvOB/mqg51Hz3VxuFBtAfYccOhim+o8rZQTh89ar
+ bZPr1k8thgIMjUyr5nyBUNdKB8DJXz34ii+dxnP+KnJgH/CXBSNszblEcBKQS3fkkFZU
+ d+9g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:openpgp:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to;
- bh=JRT4TwRQH49zsvlDzmtS1h2K5OHTaSOVzXXdYBbKYR4=;
- b=k6R7dPXiQPOCzXPjWy8BfAZKA+UOqRcjFud++J4EhoyknuN36AZ/3PpDYCCvASnID7
- TeK+kBl7aWmfW1hDIeecESDYRKBmNWQzlH6uDo9LTqJgbRtT9fqM46oSEGkK20efz2IA
- ZvKI9o3CjpemRNr+rx85hMuTXL5whNMhLDIIvujTugjvJ7XvEP4va41uB02Kb59zidLL
- bFywLN40qlSy/KTHw0kjLH5qtdqFPcM5McJyeUXXK46RsSVSMJFQygcDLCGUxQVKL8vo
- gl9mmWvdF+kwXRNT7P8lU9oUqku0fnxyMz+Odx8+jvEbPDU2I7H5tLQ1xqyCLA/qqOVQ
- Qn9g==
-X-Gm-Message-State: APjAAAVAx0I7w0ni3790eZ8jiuHBllej6Jja/VfPjDxTYJfHjG2b7YX1
- TL1OpJ4QND6xdoVhTin/0yE=
-X-Google-Smtp-Source: APXvYqyEBCk1PUuH3wEEvB4H3qsidRilukcEKkoreCT7xSHpyFMamfEiPfkpDmMqHE2JIqp3rMNmPw==
-X-Received: by 2002:a81:a785:: with SMTP id
- e127mr10201850ywh.317.1562781775746; 
- Wed, 10 Jul 2019 11:02:55 -0700 (PDT)
+ bh=lzzA9XwcT+iY7Qeb/waYVWtesydnrNYCbNcfL+TGpyE=;
+ b=dNMOCycy0HQXjYq6r87oi+/jpLsMrXaeVU3XO4msNYoh9jAbRUaxKO/AyUBVqCo8sp
+ jQ17xEdos5KQ8NFnIkzf10OzD/HCSBgFkD36JG3zfjvaYcU2FZYjRittA3msjrL3JYIO
+ RklVmZv4ZXziK/HkBzJBeRFNC/81NWffCjuff+eLXEYjwYIvdyjboZVb8M0/3ElSGXLp
+ kLzeFWDZcRPOKhIjFW6eG+jrY9XrMyqv7m6CTdOBhLbrXfFvWpIEZ8GtNPpFHqJpKU2I
+ DrU7uZMBbtKfuW2Rl5qfbAgnGc2zrsVdUG6pY9Ddd453Y1RHDRpY4KfHZgzFRUuFo0lw
+ k6Jw==
+X-Gm-Message-State: APjAAAVGOb0yLs8oO6/k6hWgtCBFfYkV+h0hU1k3K63ZlobV6xVYrH1W
+ QngKyVoYjnPlbSGeV8auk60=
+X-Google-Smtp-Source: APXvYqwfasZuUwToIJOumMc32R6FVx6NheQnwM9rjIEJhnDf05BAstFc29YXRapAAU924Tl/xwQPdQ==
+X-Received: by 2002:a9d:529:: with SMTP id 38mr24836106otw.145.1562782129050; 
+ Wed, 10 Jul 2019 11:08:49 -0700 (PDT)
 Received: from [192.168.1.96] (69-222-133-165.lightspeed.tukrga.sbcglobal.net.
  [69.222.133.165])
- by smtp.googlemail.com with ESMTPSA id q83sm771551ywq.88.2019.07.10.11.02.54
+ by smtp.googlemail.com with ESMTPSA id v203sm1107657oie.5.2019.07.10.11.08.48
  (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Wed, 10 Jul 2019 11:02:55 -0700 (PDT)
+ Wed, 10 Jul 2019 11:08:48 -0700 (PDT)
 To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 References: <20190701043536.26019-1-jan.bobek@gmail.com>
- <20190701043536.26019-3-jan.bobek@gmail.com>
- <c98ee4eb-44ff-83ff-6fc6-5f97174b0044@linaro.org>
+ <20190701043536.26019-4-jan.bobek@gmail.com>
+ <4e13bccc-9498-8514-b828-c8d79652bfd6@linaro.org>
 From: Jan Bobek <jan.bobek@gmail.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=jan.bobek@gmail.com; prefer-encrypt=mutual; keydata=
@@ -149,19 +148,19 @@ Autocrypt: addr=jan.bobek@gmail.com; prefer-encrypt=mutual; keydata=
  uD1PmEfcmmfqPmuv037Dzpe5hYj5csGsdNLMLSK1WZqaAhBAtCnh3Rme71Je7f+eObRAHHGZ
  sftsaIi3kpdIyUnKybZhViIlXs8Cde5O2HCI0NhHnaDnxKdmHaIZVlH1hX3koaRrWCeGjts1
  WWOVGHwSUSJ3lpUXEBHBicrX3bH/vUVTNTnwzGLSf/23VC9WYAe69II=
-Message-ID: <a64c7e5e-7fbf-a3a0-5af2-c3e45c699b16@gmail.com>
-Date: Wed, 10 Jul 2019 14:02:54 -0400
+Message-ID: <dbc3b954-c8dc-db9c-ff6d-836113ad8762@gmail.com>
+Date: Wed, 10 Jul 2019 14:08:47 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <c98ee4eb-44ff-83ff-6fc6-5f97174b0044@linaro.org>
+In-Reply-To: <4e13bccc-9498-8514-b828-c8d79652bfd6@linaro.org>
 Content-Type: multipart/signed; micalg=pgp-sha512;
  protocol="application/pgp-signature";
- boundary="gNQ755gaGnwr6MEJtVZfuTQaSB6mc4bsG"
+ boundary="UXr2gkUMm17ksSUTRM2z4edMzuPkbETk6"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::c42
-Subject: Re: [Qemu-devel] [RISU RFC PATCH v2 02/14] risugen_x86_asm: add
+X-Received-From: 2607:f8b0:4864:20::343
+Subject: Re: [Qemu-devel] [RISU RFC PATCH v2 03/14] risugen_x86_emit: add
  module
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -180,119 +179,76 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---gNQ755gaGnwr6MEJtVZfuTQaSB6mc4bsG
-Content-Type: multipart/mixed; boundary="4fimAXTNtrNdzXubiILzCRuV72m23YXdu";
+--UXr2gkUMm17ksSUTRM2z4edMzuPkbETk6
+Content-Type: multipart/mixed; boundary="6rtPqmrWtvrSAoiZ1maYXGsykF2AUgO7K";
  protected-headers="v1"
 From: Jan Bobek <jan.bobek@gmail.com>
 To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Message-ID: <a64c7e5e-7fbf-a3a0-5af2-c3e45c699b16@gmail.com>
-Subject: Re: [RISU RFC PATCH v2 02/14] risugen_x86_asm: add module
+Message-ID: <dbc3b954-c8dc-db9c-ff6d-836113ad8762@gmail.com>
+Subject: Re: [RISU RFC PATCH v2 03/14] risugen_x86_emit: add module
 References: <20190701043536.26019-1-jan.bobek@gmail.com>
- <20190701043536.26019-3-jan.bobek@gmail.com>
- <c98ee4eb-44ff-83ff-6fc6-5f97174b0044@linaro.org>
-In-Reply-To: <c98ee4eb-44ff-83ff-6fc6-5f97174b0044@linaro.org>
+ <20190701043536.26019-4-jan.bobek@gmail.com>
+ <4e13bccc-9498-8514-b828-c8d79652bfd6@linaro.org>
+In-Reply-To: <4e13bccc-9498-8514-b828-c8d79652bfd6@linaro.org>
 
---4fimAXTNtrNdzXubiILzCRuV72m23YXdu
+--6rtPqmrWtvrSAoiZ1maYXGsykF2AUgO7K
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 7/3/19 11:37 AM, Richard Henderson wrote:
+On 7/3/19 11:47 AM, Richard Henderson wrote:
 > On 7/1/19 6:35 AM, Jan Bobek wrote:
->> +    VEX_V_UNUSED =3D> 0b1111,
->=20
-> I think perhaps this is a mistake.  Yes, that's what goes in the field,=
- but
-> what goes in the field is ~(logical_value).
->=20
-> While for general RISU-ish operation, ~(random_number) is just as rando=
-m as
-> +(random_number), the difference will be if we ever want to explicitly =
-emit
-> with this interface a specific vex instruction which also requires the =
-v-register.
-
-See below.
-
->> +sub rex_encode(%)
+>> +sub parse_emitblock($$)
 >> +{
->> +    my (%args) =3D @_;
+>> +    my ($rec, $insn) =3D @_;
+>> +    my $insnname =3D $rec->{name};
+>> +    my $opcode =3D $insn->{opcode}{value};
 >> +
->> +    $args{w} =3D 0 unless defined $args{w};
->> +    $args{r} =3D 0 unless defined $args{r};
->> +    $args{x} =3D 0 unless defined $args{x};
->> +    $args{b} =3D 0 unless defined $args{b};
+>> +    $emit_opts =3D {};
 >> +
->> +    return (value =3D> 0x40
->> +            | (($args{w} ? 1 : 0) << 3)
->> +            | (($args{r} ? 1 : 0) << 2)
->> +            | (($args{x} ? 1 : 0) << 1)
->> +            | ($args{b} ? 1 : 0),
->> +            len =3D> 1);
->> +}
+>> +    my $emitblock =3D $rec->{blocks}{"emit"};
+>> +    if (defined $emitblock) {
+>> +        eval_with_fields($insnname, $opcode, $rec, "emit", $emitblock=
+);
+>> +    }
 >=20
-> Does
+> And if !defined?  Silently discard?
 >=20
-> 	(defined $args{w} && $args{w}) << 3
->=20
-> work?  That seems tidier to me than splitting these conditions.
+> Is this just weirdness higher in the risugen stack,
+> such that this might be called maybe_parse_emitblock?
 
-It does, I will change it. Thanks!
-
->> +        return (value =3D> (0xC4 << 16)
->> +                | (($args{r} ? 1 : 0) << 15)
->> +                | (($args{x} ? 1 : 0) << 14)
->> +                | (($args{b} ? 1 : 0) << 13)
->=20
-> Further down in vex_encode, and along the lines of VEX_V_UNUSED, this a=
-ppears
-> to be actively wrong, since these bits are encoded as inverses.  What t=
-his
-> *really* means is that because of that, rex_encode and vex_encode will =
-not
-> encode the same registers for a given instruction.  Which really does f=
-eel
-> bug-like, random inputs or no.
-
-So, vex_encode, rex_encode and friends were meant to be really
-low-level functions; they literally just encode the bits from what you
-pass in, without any concern for what the fields even mean. In that
-spirit, write_insn itself never did much of error-checking.
-
-I have added quite a lot of code to risugen_x86_asm in v3; most
-importantly, there are now asm_insn_* functions which are more
-high-level, in that you pass in the logical values and they care of
-error checks and encoding. I also removed write_insn and all the
-encoding-related symbolic constants from the public interface of the
-module.
+If !defined, there _is_ no emit block, and we treat that as an empty
+block. The caller gets an empty hash, and it's up to them to decide
+what that means. I could rename it, but the difference doesn't seem
+that important to me...?
 
 -Jan
 
 
---4fimAXTNtrNdzXubiILzCRuV72m23YXdu--
+--6rtPqmrWtvrSAoiZ1maYXGsykF2AUgO7K--
 
---gNQ755gaGnwr6MEJtVZfuTQaSB6mc4bsG
+--UXr2gkUMm17ksSUTRM2z4edMzuPkbETk6
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCgAdFiEESPYOqtMR3qRZrEutZeg2ldrjNs8FAl0mKE4ACgkQZeg2ldrj
-Ns8ffg/9ERKFqB0A7d36XNLc7CEQKoXoW5iwtUc0lOdot5Nn2baEut9aJEhqQrA9
-s1wUF2NySLe19mfQVDDXm86+oaQMWIg5m0Bm/afkTZSWC5qS6xXTs+3zJ18jZzS2
-OeyrAh9spaWwNzud7n2ABrpe7OQ3AiNGNoHooEjz4gtB76qxTxKJNLAofpvRpuS6
-p/neBnz+4uuf+gHHDcFt3oGD/0dJ3ZVNs6ycE5YV9Zh0RvdIGIKIMuaxKs9rKiFH
-Z/V283pwrAzDypujHv9msHTiX+JoFy9j++ftZpteJjUx16pDJyhQhSf32Ia+Ih4D
-K4hzDZKbBvuPy0Hx8kTBgBRHW8Gbngvfd+VxeKWuR7vfbG47ePqECwR6yCAf6F40
-qTisXTUjCGBUI7D2n2dCu+u/yPJnB+AAes7lzDK6YqoqhNtTY57hznaOedDzMVpv
-9oOd3piyOIhFWzuQhE0VjyiyhgsxxBMj4yPt6HfcKcqLFafGPAlHkOZA5KhKDovZ
-hvquNMKceP1OOu+w9PxV4oLItMkV4ubvkJMWEk/q7IXalNi/4QrSvx/3dA+KjpD/
-dMRzHeYzFylWGR+vmCYELBhFTKmGEUyFandpVq6RHVJD1E+/vFma0ESPrIJAQ7xg
-zG6+unbztbsquPfZsyEvEmQagKApoMal8DfadWLr+NBdPO/zqVg=
-=H4Wd
+iQIzBAEBCgAdFiEESPYOqtMR3qRZrEutZeg2ldrjNs8FAl0mKa8ACgkQZeg2ldrj
+Ns+gAg/7BJMHNuAvPUyFXg34XyZjeMwQaZ7omHUUON+F/mobrdlW2kuirhY3S81X
++2NmumEUVnikQcq+lgb7xoUR0iVrSJzhqsuhdRrl6cLiFnyqMX4INDtjhYfZufF5
+XH6aan79EcSoLw2z9sKmK9KIXyIdA8nLB5aGkwJ1fhb5+egVJylssLbjomtkSbHC
+WHgKjT9q5AwsQfNaDFSGN2xU0vOMnTjlrpn6Yfw5EoY5mdEF3bS7Bj150/J/w/eJ
+0OM0fxyhpu5as++brh/EJzjdKZlMFwfhL7/gF+Cq82cORa1ORr9e4nT1eWnXSLxU
+V3cv3xK/f7Eju1NhuulcJoWmQIQUWCDDkDM3kv/rvL+sjdOKdKI75Lez15D7sqDK
+/mWTIr0genADJSowvey4iceNGP5kfdC2uTd+zc0nvtiw297pHKbekP6HZe/Z+gEa
+aKQx9tAoTJQJvV//QoYVOyd0NU8catq1R8LI4cHSyYFTO9ZIX/bek8wol05FiONX
+jZbILOJf/W5J4S+nb5M30WVizjeDcFKjH7vDHrKHIv7wxhfC96Z1TVDZwmc4+v7n
+naPiRWIwOsOXUYYCs5Xvn8hHSVibF2TlK7cwfJp14V0jYy/2ZJKrY5XbC5TrCkzE
+d1QdRou2h83DDZlCHwOok4g8FoDGS+GbRQtUvmduGe+m3EsV8Vo=
+=2qLg
 -----END PGP SIGNATURE-----
 
---gNQ755gaGnwr6MEJtVZfuTQaSB6mc4bsG--
+--UXr2gkUMm17ksSUTRM2z4edMzuPkbETk6--
 
