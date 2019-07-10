@@ -2,79 +2,79 @@ Return-Path: <SRS0=axyf=VH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F422C004EF
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 09:49:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 049FAC73C7C
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 09:56:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1CA8D20651
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 09:49:12 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="p8uY0QyH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CA8D20651
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id D0A392054F
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 09:56:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0A392054F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59596 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59610 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hl9Dr-0004ID-EE
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jul 2019 05:49:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57691)
+	id 1hl9Kg-00064c-W3
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jul 2019 05:56:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59871)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1hl9D5-0003qx-QT
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 05:48:24 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1hl9JO-0005Sy-D5
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 05:54:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1hl9D4-0004wO-PY
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 05:48:23 -0400
-Received: from mail-ed1-x543.google.com ([2a00:1450:4864:20::543]:35287)
+ (envelope-from <pbonzini@redhat.com>) id 1hl9JN-0003Sf-8k
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 05:54:54 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:34811)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1hl9D4-0004s8-HS
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 05:48:22 -0400
-Received: by mail-ed1-x543.google.com with SMTP id w20so1573501edd.2
- for <qemu-devel@nongnu.org>; Wed, 10 Jul 2019 02:48:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=V5t6SotKs6cZ6ijkO0HwVeZ62+FJrDDjXc0QtzhWc90=;
- b=p8uY0QyHhjyPFvHg2J9Xld3ViwLDnhmHlACtmOG6qFLeLPjETkXZWcQOWVCGIC7o1U
- fFuP6wEAJuKQXwGNz0gyvAzVasPvRR9oVWFA72Bi3JJqESURxb3XCFlsjZ6WF2QPywfE
- 0gzDkWn6H9ASwnO0tE4vi3vcmzqJ5r8MZMAZz8K2xgpNTGMuz0bLVdn98I1n8Pa8hl/h
- UaC9Wyx3XhE6T/WwIOpyJSM2nWgfjYIAUgibJKgSlZ2wX3cizRFxspcENIUaXs28ke66
- X5rW8QfFYZG6v6lzuJtS356Pgi+ApQSeBjgI8g8yURAkoYnK8dP5yKCYslPDp9GAwCmC
- yIGQ==
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hl9JN-0003Q6-30
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 05:54:53 -0400
+Received: by mail-wr1-f65.google.com with SMTP id 31so1762875wrm.1
+ for <qemu-devel@nongnu.org>; Wed, 10 Jul 2019 02:54:52 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=V5t6SotKs6cZ6ijkO0HwVeZ62+FJrDDjXc0QtzhWc90=;
- b=CtJUYuT0SM81iOxVEM9A/5xeaLYASo9S2o+rlmLWcwP8R353FX/hSyEwOmW4EskcUE
- NQ4A8oKs5OL5bRFO+ZrNpgkvSTqAJvYRtuTL3s+D8YF63jh8CpSt8xZKB+3oW8VdSuqs
- a2JGXlEOCsBM2I5KgzvdotbNVtF6NXONN2mByxtrxiiUpTrKoH0kTu9NxCMcEEDfE2WF
- ojIDrVOJceIFjU+fkI/Vek1Lv3MmM2LeUDYuG0R2IZIH8nRxB+fxVg5Eg+JpOGl/x9vh
- 1LYt5HKydEbIl5Y77hfum0H1J5FaYGTXO+m3zedTJXYrMihJ9q/F7ZLDidWkgj12AUnD
- wdog==
-X-Gm-Message-State: APjAAAXpmTw/729xU5TYVFQk//Fy/L/QzT+5MpIildxkWgp8jfARKtfv
- s1ZRyqgFXrb8zAjxLi/MeYYykxNKWjMJ1DN0nnp36A==
-X-Google-Smtp-Source: APXvYqyI+hsh3CFE1wuJDDhhYZeleZnSXLzF+RGoRTUfFU7pf6c/GKr8x9T9BsIm1m+GtuENfbR5tf8wnU5YP0GM0ms=
-X-Received: by 2002:a50:ba78:: with SMTP id 53mr28273248eds.6.1562752099033;
- Wed, 10 Jul 2019 02:48:19 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=U7/c7segJ4ORFqqbJ2ay3Z0UjGaztEmOOHHf3O9Zun0=;
+ b=lvjlEa1aSH0Mt+Xp5QGejXqLo8kDoRpF7YI+DQsdGxXF5he0P/+uvDo19Vygot0uIr
+ hxFL9MR5bhs1JzpExhZEXXnf6c+KNpL8s5kaWhL8N5nTD2KSm9CBycb5QGtvmYRKbLjK
+ /nWB/eR0FlTUE4nOWxOQJi7HBVfkyuRAR+I4RqnOdL8IKxRrpuWmcfWUxwf2cFSsm36y
+ vg213dT1aRe9MhieFzLUAR/lhgd4eqfNLh/NkMJbdkO3OgXMl4RZffIsoJiJZUt5+4GX
+ Xm3O3OqNnpBqBWeBdIo6hevijR80DZ6kQD3GoOmbl7HiciGLp1KgiLAAHzNHCUgYYxFE
+ qPXg==
+X-Gm-Message-State: APjAAAUC6pqXqlm4y+0OucYoteEoRmLrIIQsK5MtFkYNrjuJy7SQh+J7
+ rA20y5D7dIKwOOpD/xjZn1THDQ==
+X-Google-Smtp-Source: APXvYqwfqT8ec4TejHe5RzapZDDQNaINq38MgOWDO9AQa3cZsEzqwoCl8Qw1WoY1fIOrZt9CjJxUkQ==
+X-Received: by 2002:adf:fe4f:: with SMTP id m15mr30246110wrs.36.1562752491564; 
+ Wed, 10 Jul 2019 02:54:51 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:d066:6881:ec69:75ab?
+ ([2001:b07:6468:f312:d066:6881:ec69:75ab])
+ by smtp.gmail.com with ESMTPSA id w7sm1460152wmc.46.2019.07.10.02.54.50
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Wed, 10 Jul 2019 02:54:51 -0700 (PDT)
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+References: <20190708072437.3339-1-marcandre.lureau@redhat.com>
+ <20190708160442.GL3082@redhat.com>
+ <8914dc43-0b99-ff83-7ff9-8f7b8f256909@redhat.com>
+ <20190710090350.GC30831@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <f029851a-a7de-b7ca-a9c3-949fb25a9756@redhat.com>
+Date: Wed, 10 Jul 2019 11:54:54 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-References: <20190709184823.4135-1-richard.henderson@linaro.org>
- <CAL1e-=i7Paug3G4xFCVRpH=NadNti1oG9y8n7geUJeGDoizc4w@mail.gmail.com>
-In-Reply-To: <CAL1e-=i7Paug3G4xFCVRpH=NadNti1oG9y8n7geUJeGDoizc4w@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Date: Wed, 10 Jul 2019 11:48:07 +0200
-Message-ID: <CAFXwXrn4S-Xtd=3Yv2JaqK1fmkYHHQf6VOcc+VsDxgVr05pPXA@mail.gmail.com>
-To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::543
-Subject: Re: [Qemu-devel] [PATCH] tcg/aarch64: Fix output of extract2 opcodes
+In-Reply-To: <20190710090350.GC30831@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.85.221.65
+Subject: Re: [Qemu-devel] [PATCH 0/3] Add dbus-vmstate
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,60 +86,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Beata Michalska <beata.michalska@linaro.org>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 10 Jul 2019 at 11:22, Aleksandar Markovic
-<aleksandar.m.mail@gmail.com> wrote:
-> On Jul 9, 2019 8:56 PM, "Richard Henderson" <richard.henderson@linaro.org> wrote:
-> >
-> > The aarch64 argument ordering for the operands is big-endian,
-> > whereas the tcg argument ordering is little-endian.  Use REG0
-> > so that we honor the rZ constraints.
-> >
-> > Fixes: 464c2969d5d
-> > Reported-by: Peter Maydell <peter.maydell@linaro.org>
-> > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> > ---
->
-> The commit message looks more like a list of some random items than logical explanation of the code change. Improve it.
+On 10/07/19 11:03, Daniel P. Berrangé wrote:
+>> Would it be possible to make QEMU the broker?  That is, how hard would it
+>> be to embed a minimal DBus broker (which only takes care of connecting servers
+>> and clients---stuff like launching servers would be completely out of scope)?
+> What would be the benefit of embedding it in QEMU ?
 
-Vague and non-constructive comments like this are and will continue to
-be ignored.
+If in the future we want to keep only the multiprocess case then QEMU
+would be able to launch subprocesses itself.  In this case you'd keep
+the old command line working but QEMU would set up the bus and the
+services that work together on it (for example the basic QOM operations
+such as unparent and property get/set could be mapped to a DBus
+interface, and QOM classes and interfaces could also become DBus
+interfaces).  The broker itself could be a separate subprocess.
 
-If you want to review a patch, then you're going to have to actually
-read it.  There are two obvious changes in the one line patch.  Each
-sentence describes the reason for each change.  There is no subtle
-complex problem here.
-
-r~
-
->
-> Regards,
-> Aleksandar
->
-> >  tcg/aarch64/tcg-target.inc.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >
-> > diff --git a/tcg/aarch64/tcg-target.inc.c b/tcg/aarch64/tcg-target.inc.c
-> > index b0f8106642..0713448bf5 100644
-> > --- a/tcg/aarch64/tcg-target.inc.c
-> > +++ b/tcg/aarch64/tcg-target.inc.c
-> > @@ -2226,7 +2226,7 @@ static void tcg_out_op(TCGContext *s, TCGOpcode opc,
-> >
-> >      case INDEX_op_extract2_i64:
-> >      case INDEX_op_extract2_i32:
-> > -        tcg_out_extr(s, ext, a0, a1, a2, args[3]);
-> > +        tcg_out_extr(s, ext, a0, REG0(2), REG0(1), args[3]);
-> >          break;
-> >
-> >      case INDEX_op_add2_i32:
-> > --
-> > 2.17.1
-> >
-> >
+Paolo
 
