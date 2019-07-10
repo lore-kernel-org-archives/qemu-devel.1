@@ -2,62 +2,83 @@ Return-Path: <SRS0=axyf=VH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E93CAC74A22
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 13:12:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D02EC74A22
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 13:28:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BE49620838
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 13:12:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE49620838
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id DB0402064B
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 13:28:50 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="j2iWWJwV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB0402064B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32800 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32890 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlCOW-0002f9-O8
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jul 2019 09:12:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45429)
+	id 1hlCeQ-0007nu-05
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jul 2019 09:28:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51208)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgilbert@redhat.com>) id 1hlCNe-000222-Ra
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 09:11:32 -0400
+ (envelope-from <christophe.lyon@linaro.org>) id 1hlCcv-0007I8-BY
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 09:27:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1hlCNd-0003WY-92
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 09:11:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36428)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>)
- id 1hlCNY-0003LG-SP; Wed, 10 Jul 2019 09:11:25 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 1C04830BF4B7;
- Wed, 10 Jul 2019 13:11:22 +0000 (UTC)
-Received: from work-vm (ovpn-117-216.ams2.redhat.com [10.36.117.216])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 969468491B;
- Wed, 10 Jul 2019 13:11:20 +0000 (UTC)
-Date: Wed, 10 Jul 2019 14:11:18 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Message-ID: <20190710131118.GC2682@work-vm>
-References: <20190709143912.28905-1-peter.maydell@linaro.org>
+ (envelope-from <christophe.lyon@linaro.org>) id 1hlCct-0002TN-Un
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 09:27:17 -0400
+Received: from mail-lf1-x142.google.com ([2a00:1450:4864:20::142]:44656)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <christophe.lyon@linaro.org>)
+ id 1hlCct-0002RW-L9
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 09:27:15 -0400
+Received: by mail-lf1-x142.google.com with SMTP id r15so1574946lfm.11
+ for <qemu-devel@nongnu.org>; Wed, 10 Jul 2019 06:27:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=EgCBmtVyKSOLbMLxU1gRJDabje58eRMdzIG7CsC18xc=;
+ b=j2iWWJwVouix8mgsHL9bj1fQZcF+yiSUuo86uraV6ZIJEEPN1Fs4Bl9G4n7v6AFtEY
+ uaqV4SyfSrkE/rHCESgukvOhrCNsVOZkdklappMfzqmXBNeszB19mbRLZpKpsmKnzVFk
+ GWXLWGY6pRo6XMplIwANoCsGj/ss+mBqPy+9NUijV8xzJvveT55emFkXS6uxy9Izeiyn
+ kUYs257khziW59QHOfOlTA36vTEDT4y2sjbDUXZopqpBx9KHqxO8YU1rCXK1MrpDbVfn
+ QgfCrwGsqEmLA8kUNj9H+6d9iDWrBGSgsqmr8CKsBfniEiSnQb6zlRIPSYXd2ix4nREO
+ Wd0g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=EgCBmtVyKSOLbMLxU1gRJDabje58eRMdzIG7CsC18xc=;
+ b=XGE9m9DBscGj1IxiTk20/MoE2pqez4s9K0mZxNWLnjZNwCynRoq8+FrraSVGRpd9RU
+ jItp1vU8PSK7GkC6xiSNmjwvhjy+09HGaL9S/iuIr4l+lMbxyImBkuDQRtcGp/KEo0H3
+ CNNWCvj+sdhRS29nxsyiNjDiYKWedBoS7eoLaX2aJvR1UwTetd7PUkoZRArUJfLwIN2s
+ DeSbJ3T58+1pbfkSEzSoQlMcvjaHrdeNhl9Y1ZFJlFlass2dSGkqEc6HeZAdI5DaSIUh
+ zvBqvKvRYux0fL2M59B0bHVo/Mm2tgnHAOY+LSk8qK30bZsBBkZyHY/wviHBikGMxPTJ
+ GDxw==
+X-Gm-Message-State: APjAAAU0s6YvkH6UA6TaqRX9qOJXA/pBh/k0Iibqpy+iC7tp7mfxQ1fA
+ r45eX/aOdclslukyoksFfo0frXlAo042UmbwzYOuPA==
+X-Google-Smtp-Source: APXvYqweducevTg03okCnDalulbqzIP2Yt7nKX+Ekn3sUaflWtCUO+xPCiVh/BvMr5Ox8EzT9MoLQB2jMhdKG6fgjKU=
+X-Received: by 2002:ac2:5c1d:: with SMTP id r29mr13907617lfp.72.1562765233580; 
+ Wed, 10 Jul 2019 06:27:13 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190709143912.28905-1-peter.maydell@linaro.org>
-User-Agent: Mutt/1.12.0 (2019-05-25)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.42]); Wed, 10 Jul 2019 13:11:22 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH for-4.1] pl031: Correctly migrate state
- when using -rtc clock=host
+References: <20190709121900.25644-1-richard.henderson@linaro.org>
+ <87sgrfe4y9.fsf@zen.linaroharston>
+In-Reply-To: <87sgrfe4y9.fsf@zen.linaroharston>
+From: Christophe Lyon <christophe.lyon@linaro.org>
+Date: Wed, 10 Jul 2019 15:27:02 +0200
+Message-ID: <CAKdteOZ2aVuRGO92kFKfkXub6f0aydc-W6=uDq3Jtz2gDVi58A@mail.gmail.com>
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::142
+Subject: Re: [Qemu-devel] [PATCH for-4.1] tcg: Fix constant folding of
+ INDEX_op_extract2_i32
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,223 +90,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Russell King <rmk@armlinux.org.uk>,
- qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: Richard Henderson <richard.henderson@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Peter Maydell (peter.maydell@linaro.org) wrote:
-> The PL031 RTC tracks the difference between the guest RTC
-> and the host RTC using a tick_offset field. For migration,
-> however, we currently always migrate the offset between
-> the guest and the vm_clock, even if the RTC clock is not
-> the same as the vm_clock; this was an attempt to retain
-> migration backwards compatibility.
-> 
-> Unfortunately this results in the RTC behaving oddly across
-> a VM state save and restore -- since the VM clock stands still
-> across save-then-restore, regardless of how much real world
-> time has elapsed, the guest RTC ends up out of sync with the
-> host RTC in the restored VM.
-> 
-> Fix this by migrating the raw tick_offset. To retain migration
-> compatibility as far as possible, we have a new property
-> migrate-tick-offset; by default this is 'true' and we will
-> migrate the true tick offset in a new subsection; if the
-> incoming data has no subsection we fall back to the old
-> vm_clock-based offset information, so old->new migration
-> compatibility is preserved. For complete new->old migration
-> compatibility, the property is set to 'false' for 4.0 and
-> earlier machine types (this will only affect 'virt-4.0'
-> and below, as none of the other pl031-using machines are
-> versioned).
-> 
-> Reported-by: Russell King <rmk@armlinux.org.uk>
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+On Tue, 9 Jul 2019 at 15:02, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrot=
+e:
+>
+>
+> Richard Henderson <richard.henderson@linaro.org> writes:
+>
+> > On a 64-bit host, discard any replications of the 32-bit
+> > sign bit when performing the shift and merge.
+> >
+> > Fixes: https://bugs.launchpad.net/bugs/1834496
+> > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+>
+> Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Tested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>
 
-Yes, I think so;
+Tested-by: Christophe Lyon <christophe.lyon@linaro.org>
+
+Hi,
+
+I ran GCC validations with your fix, it does fix the problems I
+reported with the arm-none-linux-gnueabi target.
+
+Unfortunately, we are unlucky because there are still regressions
+compared to qemu-3.1 when using the arm-none-linux-gnueabihf target,
+as well as arm-eabi and aarch64-elf.
+I hoped all had the same root cause..... I'll report the remaining
+ones in a new launchpad bug.
+
+Thanks
+
+Christophe
 
 
-
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
-> ---
-> I think this is correct, and it makes the "rtc clock should
-> not stay still across a save/reload" work, but I feel like
-> there might be some subtlety I've missed here. Review
-> definitely needed...
-> 
->  include/hw/timer/pl031.h |  2 +
->  hw/core/machine.c        |  1 +
->  hw/timer/pl031.c         | 92 ++++++++++++++++++++++++++++++++++++++--
->  3 files changed, 91 insertions(+), 4 deletions(-)
-> 
-> diff --git a/include/hw/timer/pl031.h b/include/hw/timer/pl031.h
-> index 8857c24ca5d..8c3f555ee28 100644
-> --- a/include/hw/timer/pl031.h
-> +++ b/include/hw/timer/pl031.h
-> @@ -33,6 +33,8 @@ typedef struct PL031State {
->       */
->      uint32_t tick_offset_vmstate;
->      uint32_t tick_offset;
-> +    bool tick_offset_migrated;
-> +    bool migrate_tick_offset;
->  
->      uint32_t mr;
->      uint32_t lr;
-> diff --git a/hw/core/machine.c b/hw/core/machine.c
-> index 2be19ec0cd5..37a1111da1d 100644
-> --- a/hw/core/machine.c
-> +++ b/hw/core/machine.c
-> @@ -34,6 +34,7 @@ GlobalProperty hw_compat_4_0[] = {
->      { "virtio-vga",     "edid", "false" },
->      { "virtio-gpu-pci", "edid", "false" },
->      { "virtio-device", "use-started", "false" },
-> +    { "pl031", "migrate-tick-offset", "false" },
->  };
->  const size_t hw_compat_4_0_len = G_N_ELEMENTS(hw_compat_4_0);
->  
-> diff --git a/hw/timer/pl031.c b/hw/timer/pl031.c
-> index 3378084f4a8..1a7e2ee06b3 100644
-> --- a/hw/timer/pl031.c
-> +++ b/hw/timer/pl031.c
-> @@ -199,29 +199,94 @@ static int pl031_pre_save(void *opaque)
->  {
->      PL031State *s = opaque;
->  
-> -    /* tick_offset is base_time - rtc_clock base time.  Instead, we want to
-> -     * store the base time relative to the QEMU_CLOCK_VIRTUAL for backwards-compatibility.  */
-> +    /*
-> +     * The PL031 device model code uses the tick_offset field, which is
-> +     * the offset between what the guest RTC should read and what the
-> +     * QEMU rtc_clock reads:
-> +     *  guest_rtc = rtc_clock + tick_offset
-> +     * and so
-> +     *  tick_offset = guest_rtc - rtc_clock
-> +     *
-> +     * We want to migrate this offset, which sounds straightforward.
-> +     * Unfortunately older versions of QEMU migrated a conversion of this
-> +     * offset into an offset from the vm_clock. (This was in turn an
-> +     * attempt to be compatible with even older QEMU versions, but it
-> +     * has incorrect behaviour if the rtc_clock is not the same as the
-> +     * vm_clock.) So we put the actual tick_offset into a migration
-> +     * subsection, and the backwards-compatible time-relative-to-vm_clock
-> +     * in the main migration state.
-> +     *
-> +     * Calculate base time relative to QEMU_CLOCK_VIRTUAL:
-> +     */
->      int64_t delta = qemu_clock_get_ns(rtc_clock) - qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
->      s->tick_offset_vmstate = s->tick_offset + delta / NANOSECONDS_PER_SECOND;
->  
->      return 0;
->  }
->  
-> +static int pl031_pre_load(void *opaque)
-> +{
-> +    PL031State *s = opaque;
-> +
-> +    s->tick_offset_migrated = false;
-> +    return 0;
-> +}
-> +
->  static int pl031_post_load(void *opaque, int version_id)
->  {
->      PL031State *s = opaque;
->  
-> -    int64_t delta = qemu_clock_get_ns(rtc_clock) - qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-> -    s->tick_offset = s->tick_offset_vmstate - delta / NANOSECONDS_PER_SECOND;
-> +    /*
-> +     * If we got the tick_offset subsection, then we can just use
-> +     * the value in that. Otherwise the source is an older QEMU and
-> +     * has given us the offset from the vm_clock; convert it back to
-> +     * an offset from the rtc_clock. This will cause time to incorrectly
-> +     * go backwards compared to the host RTC, but this is unavoidable.
-> +     */
-> +
-> +    if (!s->tick_offset_migrated) {
-> +        int64_t delta = qemu_clock_get_ns(rtc_clock) -
-> +            qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-> +        s->tick_offset = s->tick_offset_vmstate -
-> +            delta / NANOSECONDS_PER_SECOND;
-> +    }
->      pl031_set_alarm(s);
->      return 0;
->  }
->  
-> +static int pl031_tick_offset_post_load(void *opaque, int version_id)
-> +{
-> +    PL031State *s = opaque;
-> +
-> +    s->tick_offset_migrated = true;
-> +    return 0;
-> +}
-> +
-> +static bool pl031_tick_offset_needed(void *opaque)
-> +{
-> +    PL031State *s = opaque;
-> +
-> +    return s->migrate_tick_offset;
-> +}
-> +
-> +static const VMStateDescription vmstate_pl031_tick_offset = {
-> +    .name = "pl031/tick-offset",
-> +    .version_id = 1,
-> +    .minimum_version_id = 1,
-> +    .needed = pl031_tick_offset_needed,
-> +    .post_load = pl031_tick_offset_post_load,
-> +    .fields = (VMStateField[]) {
-> +        VMSTATE_UINT32(tick_offset, PL031State),
-> +        VMSTATE_END_OF_LIST()
-> +    }
-> +};
-> +
->  static const VMStateDescription vmstate_pl031 = {
->      .name = "pl031",
->      .version_id = 1,
->      .minimum_version_id = 1,
->      .pre_save = pl031_pre_save,
-> +    .pre_load = pl031_pre_load,
->      .post_load = pl031_post_load,
->      .fields = (VMStateField[]) {
->          VMSTATE_UINT32(tick_offset_vmstate, PL031State),
-> @@ -231,14 +296,33 @@ static const VMStateDescription vmstate_pl031 = {
->          VMSTATE_UINT32(im, PL031State),
->          VMSTATE_UINT32(is, PL031State),
->          VMSTATE_END_OF_LIST()
-> +    },
-> +    .subsections = (const VMStateDescription*[]) {
-> +        &vmstate_pl031_tick_offset,
-> +        NULL
->      }
->  };
->  
-> +static Property pl031_properties[] = {
-> +    /*
-> +     * True to correctly migrate the tick offset of the RTC. False to
-> +     * obtain backward migration compatibility with older QEMU versions,
-> +     * at the expense of the guest RTC going backwards compared with the
-> +     * host RTC when the VM is saved/restored if using -rtc host.
-> +     * (Even if set to 'true' older QEMU can migrate forward to newer QEMU;
-> +     * 'false' also permits newer QEMU to migrate to older QEMU.)
-> +     */
-> +    DEFINE_PROP_BOOL("migrate-tick-offset",
-> +                     PL031State, migrate_tick_offset, true),
-> +    DEFINE_PROP_END_OF_LIST()
-> +};
-> +
->  static void pl031_class_init(ObjectClass *klass, void *data)
->  {
->      DeviceClass *dc = DEVICE_CLASS(klass);
->  
->      dc->vmsd = &vmstate_pl031;
-> +    dc->props = pl031_properties;
->  }
->  
->  static const TypeInfo pl031_info = {
-> -- 
-> 2.20.1
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> > ---
+> >  tcg/optimize.c | 4 ++--
+> >  1 file changed, 2 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/tcg/optimize.c b/tcg/optimize.c
+> > index d7c71a6085..d2424de4af 100644
+> > --- a/tcg/optimize.c
+> > +++ b/tcg/optimize.c
+> > @@ -1213,8 +1213,8 @@ void tcg_optimize(TCGContext *s)
+> >                  if (opc =3D=3D INDEX_op_extract2_i64) {
+> >                      tmp =3D (v1 >> op->args[3]) | (v2 << (64 - op->arg=
+s[3]));
+> >                  } else {
+> > -                    tmp =3D (v1 >> op->args[3]) | (v2 << (32 - op->arg=
+s[3]));
+> > -                    tmp =3D (int32_t)tmp;
+> > +                    tmp =3D (int32_t)(((uint32_t)v1 >> op->args[3]) |
+> > +                                    ((uint32_t)v2 << (32 - op->args[3]=
+)));
+> >                  }
+> >                  tcg_opt_gen_movi(s, op, op->args[0], tmp);
+> >                  break;
+>
+>
+> --
+> Alex Benn=C3=A9e
 
