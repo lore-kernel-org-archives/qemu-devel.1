@@ -2,66 +2,78 @@ Return-Path: <SRS0=axyf=VH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 467CDC73C6D
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 06:13:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1583C73C6D
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 06:14:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1D82D2064A
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 06:13:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D82D2064A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 899572064A
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 06:14:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 899572064A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58196 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58212 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hl5r5-0006s8-Cb
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jul 2019 02:13:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37541)
+	id 1hl5sR-000810-Pl
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jul 2019 02:14:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38160)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <no-reply@patchew.org>) id 1hl5qF-00060n-3a
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 02:12:36 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1hl5rt-0007Ui-MB
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 02:14:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1hl5qD-00084M-Lm
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 02:12:35 -0400
-Resent-Date: Wed, 10 Jul 2019 02:12:35 -0400
-Resent-Message-Id: <E1hl5qD-00084M-Lm@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21496)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1hl5qD-0007zK-Cy; Wed, 10 Jul 2019 02:12:33 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1562739134; cv=none; d=zoho.com; s=zohoarc; 
- b=mH4aPJS8VOcMMaciV6FwHXOyGI6G4SfGOfLva0aLf4aChOTxN1cM8YWCPEsYeF400XSouaqoQ0HPvc5xdHrrGEburlOnwti6bLn1tMyIeIkQvqkFDpy7Tq17xQELA4iTOTS5oxGHPIO2eE1rMw75g3cj8AaAfObhtl80PJfAlU4=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1562739134;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
- bh=zIRkXxrNbhEOPTPyFYFwX7UR5j2Q0+monOgGgRI8g2o=; 
- b=aAbI2HSaXxWPqiTXu56wCmYVkjKeWtFkbPQ+hIAvYlmfFhkq1Umw6cE/WYjrRFw6oP/8UlzstVoCHv/PaaRmz8aWjtltybR9DrD6pLb0TmKNjc8ggzfJv51MSDylh2eS0+nfiZY9gsNSeQ+mLLGX68c6avATN0rIkJktYcxsxqY=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1562739133663843.5632843826825;
- Tue, 9 Jul 2019 23:12:13 -0700 (PDT)
-Message-ID: <156273913241.3386.15746188914180946036@c4a48874b076>
-In-Reply-To: <20190710060621.16430-1-bharata@linux.ibm.com>
+ (envelope-from <pbonzini@redhat.com>) id 1hl5rq-0001HV-1f
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 02:14:15 -0400
+Received: from mail-ed1-f68.google.com ([209.85.208.68]:38007)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hl5rp-00019G-Hh
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 02:14:13 -0400
+Received: by mail-ed1-f68.google.com with SMTP id r12so899950edo.5
+ for <qemu-devel@nongnu.org>; Tue, 09 Jul 2019 23:14:02 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=/o3x5qOy3xHjcrMltm0J8mgZ8oU3Ci8q369/gw2f3TQ=;
+ b=TDNgoNHfAxLywDEbDe65QFFDjHcJFssdgBAHW/HK95zNvvjAjmHpPLsNDeJlX75NXP
+ 2KW7SqeULA3JasvZmCX4ZMDvcStdDfhyOeRwe7KRMYOh1YMQMfnp/iq+Ks4iNLopUA24
+ GWZuo/nMiXLih/wKVtu8yEWOvlt/Eybh80s4VtlGlaJEJVov8tmGWgLBdgID4wI1PZoe
+ cEY7Y8MCWq7G/Ppqe/YPjOIaoDSr3sLs/TwzGiA3zpNUf0D/lodig13ztefp8QPmtQXK
+ sJMWSO3EYPy5IWit7MapoISKf9aCAx/cSWFrvkrHF9N+nDX2bpYKzU1Dhz8GW+m+i9RL
+ MNzw==
+X-Gm-Message-State: APjAAAV36y9Kpmjzrp7+fdH7QnAN5Pqw45NRhKnWJua7cjJ+v/CXce7n
+ byECobY3Ulpcc56jDG6YIyQqrQ==
+X-Google-Smtp-Source: APXvYqwsQzBhmt6AcViAF4XM4ASlOWMomaRXFrQpfbCVH3evWQEOhYDNuY+mKWgro5KgGtR3Zj7d8A==
+X-Received: by 2002:a50:e718:: with SMTP id a24mr29394494edn.91.1562739241377; 
+ Tue, 09 Jul 2019 23:14:01 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:19db:ad53:90ea:9423?
+ ([2001:b07:6468:f312:19db:ad53:90ea:9423])
+ by smtp.gmail.com with ESMTPSA id c7sm833660wro.70.2019.07.09.23.14.00
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Tue, 09 Jul 2019 23:14:00 -0700 (PDT)
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20190708072437.3339-1-marcandre.lureau@redhat.com>
+ <20190708072437.3339-4-marcandre.lureau@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <d6d9d0fe-d2ca-3130-dba0-b602c533c536@redhat.com>
+Date: Wed, 10 Jul 2019 08:14:03 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: bharata@linux.ibm.com
-Date: Tue, 9 Jul 2019 23:12:13 -0700 (PDT)
-X-ZohoMailClient: External
+In-Reply-To: <20190708072437.3339-4-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 135.84.80.217
-Subject: Re: [Qemu-devel] [PATCH v0] ppc/spapr: Support reboot of secure
- pseries guest
+ [fuzzy]
+X-Received-From: 209.85.208.68
+Subject: Re: [Qemu-devel] [PATCH 3/3] Add dbus-vmstate object
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,40 +85,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, linuxram@us.ibm.com,
- qemu-devel@nongnu.org, bharata@linux.ibm.com
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ berrange@redhat.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Juan Quintela <quintela@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDcxMDA2MDYyMS4xNjQz
-MC0xLWJoYXJhdGFAbGludXguaWJtLmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBo
-YXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3Jl
-IGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAxOTA3MTAwNjA2MjEuMTY0MzAtMS1iaGFyYXRh
-QGxpbnV4LmlibS5jb20KVHlwZTogc2VyaWVzClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0gg
-djBdIHBwYy9zcGFwcjogU3VwcG9ydCByZWJvb3Qgb2Ygc2VjdXJlIHBzZXJpZXMgZ3Vlc3QKCj09
-PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4g
-L2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAw
-CmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwg
-ZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJh
-Y2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpGcm9tIGh0dHBzOi8vZ2l0aHViLmNv
-bS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3
-LzIwMTkwNzEwMDYwNjIxLjE2NDMwLTEtYmhhcmF0YUBsaW51eC5pYm0uY29tIC0+IHBhdGNoZXcv
-MjAxOTA3MTAwNjA2MjEuMTY0MzAtMS1iaGFyYXRhQGxpbnV4LmlibS5jb20KU3dpdGNoZWQgdG8g
-YSBuZXcgYnJhbmNoICd0ZXN0Jwo2MzZhMjdmODBmIHBwYy9zcGFwcjogU3VwcG9ydCByZWJvb3Qg
-b2Ygc2VjdXJlIHBzZXJpZXMgZ3Vlc3QKCj09PSBPVVRQVVQgQkVHSU4gPT09CkVSUk9SOiBjb2Rl
-IGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzc5OiBGSUxFOiB0YXJnZXQvcHBjL2t2bV9w
-cGMuaDoyMDc6CiteSXJldHVybiAwOyQKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgNDIg
-bGluZXMgY2hlY2tlZAoKQ29tbWl0IDYzNmEyN2Y4MGYwZCAocHBjL3NwYXByOiBTdXBwb3J0IHJl
-Ym9vdCBvZiBzZWN1cmUgcHNlcmllcyBndWVzdCkgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2Ug
-cmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9y
-dCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4K
-PT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRo
-ZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTA3
-MTAwNjA2MjEuMTY0MzAtMS1iaGFyYXRhQGxpbnV4LmlibS5jb20vdGVzdGluZy5jaGVja3BhdGNo
-Lz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRj
-aGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8g
-cGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+On 08/07/19 09:24, Marc-André Lureau wrote:
+> +
+> +    dstaddr = g_strsplit(g_test_dbus_get_bus_address(dstbus), ",", 2);
+> +    dst_qemu_args =
+> +        g_strdup_printf("-object dbus-vmstate,id=dv,addr=%s -incoming %s",
+> +                        dstaddr[0], uri);
+> +
 
+Stupid question: what does the address look like, and what prevents user
+A from using this to "steal" data from user B's virtual machine?
+
+Paolo
 
