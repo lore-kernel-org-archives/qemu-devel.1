@@ -2,81 +2,82 @@ Return-Path: <SRS0=axyf=VH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42826C73C7C
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 09:26:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 217B3C73C7C
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 09:28:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0D62020838
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 09:26:45 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="i2Xdgw/t"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D62020838
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
+	by mail.kernel.org (Postfix) with ESMTPS id ED05A2084B
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 09:28:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED05A2084B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59296 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59304 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hl8s7-0002Ft-3Y
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jul 2019 05:26:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47440)
+	id 1hl8ta-0003RW-5q
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jul 2019 05:28:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47705)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <yury-kotov@yandex-team.ru>) id 1hl8pe-0008Ak-8c
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 05:24:11 -0400
+ (envelope-from <philmd@redhat.com>) id 1hl8qg-0000rN-Bi
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 05:25:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yury-kotov@yandex-team.ru>) id 1hl8pc-0007sg-Ls
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 05:24:10 -0400
-Received: from forwardcorp1p.mail.yandex.net ([77.88.29.217]:54452)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yury-kotov@yandex-team.ru>)
- id 1hl8pb-0007l9-St
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 05:24:08 -0400
-Received: from mxbackcorp1g.mail.yandex.net (mxbackcorp1g.mail.yandex.net
- [IPv6:2a02:6b8:0:1402::301])
- by forwardcorp1p.mail.yandex.net (Yandex) with ESMTP id 6A6922E0A7B;
- Wed, 10 Jul 2019 12:24:03 +0300 (MSK)
-Received: from smtpcorp1p.mail.yandex.net (smtpcorp1p.mail.yandex.net
- [2a02:6b8:0:1472:2741:0:8b6:10])
- by mxbackcorp1g.mail.yandex.net (nwsmtp/Yandex) with ESMTP id
- X8sHBziPgT-O2t030o3; Wed, 10 Jul 2019 12:24:03 +0300
-Precedence: bulk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
- s=default; 
- t=1562750643; bh=iNLAWaDyxeZFg8sfSzat7F4C9cqCNn/ipANDNCAdqNw=;
- h=In-Reply-To:Message-Id:References:Date:Subject:To:From:Cc;
- b=i2Xdgw/tTAx2HWOUSXLtnWVLvbl4/YDJSkB6cHeYvxA3cXMEMnV88AohiruJSbweR
- 9LhzNLCbAHRH2UhRafw9IX1I/SxFD91yK0LLq4IW02ZFgj2CnLAQAirqV4jz+1pe2l
- l+sd0xaRv/D4xttWvLHqCS+1PmqJaXLhoUXDOJdM=
-Authentication-Results: mxbackcorp1g.mail.yandex.net;
- dkim=pass header.i=@yandex-team.ru
-Received: from dynamic-red.dhcp.yndx.net (dynamic-red.dhcp.yndx.net
- [2a02:6b8:0:40c:649c:ccd6:daab:d003])
- by smtpcorp1p.mail.yandex.net (nwsmtp/Yandex) with ESMTPSA id
- c6HGiW8rtf-O2waPrXp; Wed, 10 Jul 2019 12:24:02 +0300
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
- (Client certificate not present)
-From: Yury Kotov <yury-kotov@yandex-team.ru>
-To: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
- Stefan Weil <sw@weilnetz.de>, Juan Quintela <quintela@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Date: Wed, 10 Jul 2019 12:23:38 +0300
-Message-Id: <20190710092338.23559-3-yury-kotov@yandex-team.ru>
-X-Mailer: git-send-email 2.22.0
-In-Reply-To: <20190710092338.23559-1-yury-kotov@yandex-team.ru>
-References: <20190710092338.23559-1-yury-kotov@yandex-team.ru>
+ (envelope-from <philmd@redhat.com>) id 1hl8qe-0000Rt-Nv
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 05:25:14 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:44198)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hl8qe-0000Kc-EN
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 05:25:12 -0400
+Received: by mail-wr1-f65.google.com with SMTP id p17so1615255wrf.11
+ for <qemu-devel@nongnu.org>; Wed, 10 Jul 2019 02:25:07 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=y8X0q8JkQpXHnegDLoHI+R1uM+Iea5X+qbInC9hVKMM=;
+ b=oNq6P2UJTBl6KYu6h4nwzUKpsUtXKDdptJLvkedXONUaz4GtqHyXKd34Wo1oIhvZ1x
+ JQuBrhImgBej9Nm8mYW8Ud1rKUnhpH7ALUHQctgQRfMm5499d9XCWxYSO5tRY7eALyWT
+ AS/jA6UFKhE2f+vFZaGxi8G6dlhfv3YfvYox35W1vCkL0329b1eEwasfwlc69VmPuspo
+ 5A8/YmZcT0Re9ktyEWiBNGiTrJbmzsb35DJs4lGV7LLjWFpSxwwQjDuUvqhvoViSCXPS
+ yBPNg1BMC98G00aaAvs0BBZV5z4BcscPLY+OiyvYz9BED3sDLaEx60VSsali7jr+QV/n
+ mfYA==
+X-Gm-Message-State: APjAAAVEo8qlrWkdAF+v6KOyIYDES+T9oRoZydKh1zZre93vrk9BBnwo
+ yjtMev5kAoWlIHZqOioVht52Tg==
+X-Google-Smtp-Source: APXvYqw9ChRmJNTXNH0fhz7uDKgJ2177oBZguFUQXqC4kDnFchlGyEszUobtPFO5xHHBqoiaUMIQeA==
+X-Received: by 2002:adf:ff84:: with SMTP id j4mr28800651wrr.71.1562750706505; 
+ Wed, 10 Jul 2019 02:25:06 -0700 (PDT)
+Received: from [10.32.224.100] (red-hat-inc.vlan560.asr1.mad1.gblx.net.
+ [159.63.51.90])
+ by smtp.gmail.com with ESMTPSA id b203sm1638790wmd.41.2019.07.10.02.25.05
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Wed, 10 Jul 2019 02:25:05 -0700 (PDT)
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+References: <20190709185936.31335-1-armbru@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <501e0780-21cf-b1f1-1a93-1f8a9f1cf8e1@redhat.com>
+Date: Wed, 10 Jul 2019 11:25:04 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20190709185936.31335-1-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 77.88.29.217
-Subject: [Qemu-devel] [RFC PATCH 2/2] cpus: Fix throttling during vm_stop
+X-Received-From: 209.85.221.65
+Subject: Re: [Qemu-devel] [PATCH] qdev: Collect HMP handlers command
+ handlers in qdev-monitor.c
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -85,87 +86,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:Overall" <qemu-devel@nongnu.org>, yc-core@yandex-team.ru
+Cc: pbonzini@redhat.com, berrange@redhat.com, ehabkost@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Throttling thread sleeps in VCPU thread. For high throttle percentage
-this sleep is more than 10ms. E.g. for 60% - 15ms, for 99% - 990ms.
-vm_stop() kicks all VCPUs and waits for them. It's called at the end of
-migration and because of the long sleep the migration downtime might be
-more than 100ms even for downtime-limit 1ms.
-Use qemu_cond_timedwait for high percentage to wake up during vm_stop.
+On 7/9/19 8:59 PM, Markus Armbruster wrote:
+> Move hmp_device_add(), hmp_device_del() from monitor/hmp-cmds.c to
+> qdev-monitor.c, where they are covered by MAINTAINERS section "QOM",
+> just like qapi/qdev.json.  hmp_info_qtree() and hmp_info_qdm() are
+> already there.
+> 
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+> This is a follow-up to my "Move QOM, qdev, machine core and dump code"
+> series, merged in commit 374f63f6810.
+> 
+>  monitor/hmp-cmds.c | 19 -------------------
+>  qdev-monitor.c     | 18 ++++++++++++++++++
+>  2 files changed, 18 insertions(+), 19 deletions(-)
+> 
+> diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
+> index 99ceb0846b..550d363374 100644
+> --- a/monitor/hmp-cmds.c
+> +++ b/monitor/hmp-cmds.c
+> @@ -25,7 +25,6 @@
+>  #include "qemu/timer.h"
+>  #include "qemu/sockets.h"
+>  #include "monitor/monitor-internal.h"
+> -#include "monitor/qdev.h"
+>  #include "qapi/error.h"
+>  #include "qapi/clone-visitor.h"
+>  #include "qapi/opts-visitor.h"
+> @@ -35,7 +34,6 @@
+>  #include "qapi/qapi-commands-migration.h"
+>  #include "qapi/qapi-commands-misc.h"
+>  #include "qapi/qapi-commands-net.h"
+> -#include "qapi/qapi-commands-qdev.h"
+>  #include "qapi/qapi-commands-rocker.h"
+>  #include "qapi/qapi-commands-run-state.h"
+>  #include "qapi/qapi-commands-tpm.h"
+> @@ -2181,23 +2179,6 @@ void hmp_migrate(Monitor *mon, const QDict *qdict)
+>      }
+>  }
+>  
+> -void hmp_device_add(Monitor *mon, const QDict *qdict)
+> -{
+> -    Error *err = NULL;
+> -
+> -    qmp_device_add((QDict *)qdict, NULL, &err);
+> -    hmp_handle_error(mon, &err);
+> -}
+> -
+> -void hmp_device_del(Monitor *mon, const QDict *qdict)
+> -{
+> -    const char *id = qdict_get_str(qdict, "id");
+> -    Error *err = NULL;
+> -
+> -    qmp_device_del(id, &err);
+> -    hmp_handle_error(mon, &err);
+> -}
+> -
+>  void hmp_netdev_add(Monitor *mon, const QDict *qdict)
+>  {
+>      Error *err = NULL;
+> diff --git a/qdev-monitor.c b/qdev-monitor.c
+> index 58222c2211..cd6299e92b 100644
+> --- a/qdev-monitor.c
+> +++ b/qdev-monitor.c
+> @@ -20,6 +20,7 @@
+>  #include "qemu/osdep.h"
+>  #include "hw/qdev.h"
+>  #include "hw/sysbus.h"
+> +#include "monitor/hmp.h"
+>  #include "monitor/monitor.h"
+>  #include "monitor/qdev.h"
+>  #include "sysemu/arch_init.h"
+> @@ -844,6 +845,23 @@ void qmp_device_del(const char *id, Error **errp)
+>      }
+>  }
+>  
+> +void hmp_device_add(Monitor *mon, const QDict *qdict)
+> +{
+> +    Error *err = NULL;
+> +
+> +    qmp_device_add((QDict *)qdict, NULL, &err);
+> +    hmp_handle_error(mon, &err);
+> +}
+> +
+> +void hmp_device_del(Monitor *mon, const QDict *qdict)
+> +{
+> +    const char *id = qdict_get_str(qdict, "id");
+> +    Error *err = NULL;
+> +
+> +    qmp_device_del(id, &err);
+> +    hmp_handle_error(mon, &err);
+> +}
+> +
+>  BlockBackend *blk_by_qdev_id(const char *id, Error **errp)
+>  {
+>      DeviceState *dev;
+> 
 
-Signed-off-by: Yury Kotov <yury-kotov@yandex-team.ru>
----
- cpus.c | 27 +++++++++++++++++++--------
- 1 file changed, 19 insertions(+), 8 deletions(-)
-
-diff --git a/cpus.c b/cpus.c
-index ffc57119ca..3c069cdc33 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -74,6 +74,8 @@
-=20
- #endif /* CONFIG_LINUX */
-=20
-+static QemuMutex qemu_global_mutex;
-+
- int64_t max_delay;
- int64_t max_advance;
-=20
-@@ -776,7 +778,7 @@ static void cpu_throttle_thread(CPUState *cpu, run_on=
-_cpu_data opaque)
- {
-     double pct;
-     double throttle_ratio;
--    long sleeptime_ns;
-+    int64_t sleeptime_ns;
-=20
-     if (!cpu_throttle_get_percentage()) {
-         return;
-@@ -784,11 +786,22 @@ static void cpu_throttle_thread(CPUState *cpu, run_=
-on_cpu_data opaque)
-=20
-     pct =3D (double)cpu_throttle_get_percentage()/100;
-     throttle_ratio =3D pct / (1 - pct);
--    sleeptime_ns =3D (long)(throttle_ratio * CPU_THROTTLE_TIMESLICE_NS);
--
--    qemu_mutex_unlock_iothread();
--    g_usleep(sleeptime_ns / 1000); /* Convert ns to us for usleep call *=
-/
--    qemu_mutex_lock_iothread();
-+    /* Add 1ns to fix double's rounding error (like 0.9999999...) */
-+    sleeptime_ns =3D (int64_t)(throttle_ratio * CPU_THROTTLE_TIMESLICE_N=
-S + 1);
-+
-+    while (sleeptime_ns >=3D SCALE_MS && !cpu->stop) {
-+        int64_t start, end;
-+        start =3D qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
-+        qemu_cond_timedwait(cpu->halt_cond, &qemu_global_mutex,
-+                            sleeptime_ns / SCALE_MS);
-+        end =3D qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
-+        sleeptime_ns -=3D end - start;
-+    }
-+    if (sleeptime_ns >=3D SCALE_US && !cpu->stop) {
-+        qemu_mutex_unlock_iothread();
-+        g_usleep(sleeptime_ns / SCALE_US);
-+        qemu_mutex_lock_iothread();
-+    }
-     atomic_set(&cpu->throttle_thread_scheduled, 0);
- }
-=20
-@@ -1166,8 +1179,6 @@ static void qemu_init_sigbus(void)
- }
- #endif /* !CONFIG_LINUX */
-=20
--static QemuMutex qemu_global_mutex;
--
- static QemuThread io_thread;
-=20
- /* cpu creation */
---=20
-2.22.0
-
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
