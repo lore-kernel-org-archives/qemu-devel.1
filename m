@@ -6,45 +6,45 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4802AC74A36
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 17:58:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0978AC74A36
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 18:04:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D4FE320844
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 17:58:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D4FE320844
+	by mail.kernel.org (Postfix) with ESMTPS id 910F420844
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 18:03:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 910F420844
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35862 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35886 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlGrj-0006TP-Vb
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jul 2019 13:58:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59613)
+	id 1hlGwg-0007pR-9D
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jul 2019 14:03:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60701)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jsnow@redhat.com>) id 1hlGqM-0005Uc-1c
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 13:57:28 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hlGtZ-00074u-Gb
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 14:00:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hlGqK-0004EK-Pv
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 13:57:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46908)
+ (envelope-from <jsnow@redhat.com>) id 1hlGtS-0003A8-3k
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 14:00:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49584)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1hlGqF-0003xZ-3C; Wed, 10 Jul 2019 13:57:19 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ id 1hlGtK-0002pv-Vt; Wed, 10 Jul 2019 14:00:32 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id B4CA130C5854;
- Wed, 10 Jul 2019 17:57:17 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 65EAD305D46D;
+ Wed, 10 Jul 2019 18:00:27 +0000 (UTC)
 Received: from [10.18.17.130] (dhcp-17-130.bos.redhat.com [10.18.17.130])
- by smtp.corp.redhat.com (Postfix) with ESMTP id EDB881001B03;
- Wed, 10 Jul 2019 17:57:16 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A320B5C1B5;
+ Wed, 10 Jul 2019 18:00:24 +0000 (UTC)
 To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
 References: <20190710010556.32365-1-jsnow@redhat.com>
- <20190710010556.32365-5-jsnow@redhat.com>
- <0f0c6f6e-501a-d747-13ff-edc45ccc231d@redhat.com>
+ <20190710010556.32365-6-jsnow@redhat.com>
+ <f6176b50-785a-52d4-0a1d-bfdbc6780801@redhat.com>
 From: John Snow <jsnow@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
@@ -121,22 +121,21 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <4bc49e42-2dfa-8ca9-2cb6-678962f75f0a@redhat.com>
-Date: Wed, 10 Jul 2019 13:57:16 -0400
+Message-ID: <66a4db9e-12b0-6e30-d2b7-be2a3078411b@redhat.com>
+Date: Wed, 10 Jul 2019 14:00:24 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <0f0c6f6e-501a-d747-13ff-edc45ccc231d@redhat.com>
+In-Reply-To: <f6176b50-785a-52d4-0a1d-bfdbc6780801@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Wed, 10 Jul 2019 17:57:17 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.46]); Wed, 10 Jul 2019 18:00:27 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 4/8] block/backup: hoist bitmap check into
- QMP interface
+Subject: Re: [Qemu-devel] [PATCH 5/8] iotests/257: test API failures
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -155,52 +154,46 @@ Sender: "Qemu-devel"
 
 
 
-On 7/10/19 12:11 PM, Max Reitz wrote:
+On 7/10/19 12:22 PM, Max Reitz wrote:
 > On 10.07.19 03:05, John Snow wrote:
->> This is nicer to do in the unified QMP interface that we have now,
->> because it lets us use the right terminology back at the user.
->>
 >> Signed-off-by: John Snow <jsnow@redhat.com>
 >> ---
->>  block/backup.c | 13 ++++---------
->>  blockdev.c     | 10 ++++++++++
->>  2 files changed, 14 insertions(+), 9 deletions(-)
+>>  tests/qemu-iotests/257     | 69 +++++++++++++++++++++++++++++++
+>>  tests/qemu-iotests/257.out | 85 +++++++++++++++++++++++++++++++++++++=
++
+>>  2 files changed, 154 insertions(+)
 >>
->> diff --git a/block/backup.c b/block/backup.c
->> index e2729cf6fa..a64b768e24 100644
->> --- a/block/backup.c
->> +++ b/block/backup.c
->> @@ -566,6 +566,10 @@ BlockJob *backup_job_create(const char *job_id, B=
-lockDriverState *bs,
->>      assert(bs);
->>      assert(target);
+>> diff --git a/tests/qemu-iotests/257 b/tests/qemu-iotests/257
+>> index 2eb4f26c28..de8707cb19 100755
+>> --- a/tests/qemu-iotests/257
+>> +++ b/tests/qemu-iotests/257
+>> @@ -450,10 +450,79 @@ def test_bitmap_sync(bsync_mode, msync_mode=3D'b=
+itmap', failure=3DNone):
+>>          compare_images(img_path, fbackup2)
+>>          log('')
 >> =20
->> +    /* QMP interface protects us from these cases */
->> +    assert(sync_mode !=3D MIRROR_SYNC_MODE_INCREMENTAL);
->> +    assert(sync_bitmap || sync_mode !=3D MIRROR_SYNC_MODE_BITMAP);
+>> +def test_backup_api():
+>> +    """
+>> +    """
 >=20
-> Implication would be a nice operator sometimes.
+> Er, OK?
 >=20
-> ("assert(sync_mode =3D=3D MIRROR_SYNC_MODE_BITMAP -> sync_bitmap)")
->=20
-> (Can you do that in C++?  No, you can=E2=80=99t overload bool=E2=80=99s=
- operators, right?)
->=20
-> Reviewed-by: Max Reitz <mreitz@redhat.com>
+> [...]
 >=20
 
-Yes, I also find this assertion kind of hard to read personally, but it
-feels somewhat clunky to write:
+Whooooooooops.
 
-if (antecedent) {
-    assert(condition);
-}
+>> +        for sync_mode, config in error_cases.items():
+>> +            log("-- Sync mode {:s} tests --\n".format(sync_mode))
+>> +            for bitmap, policies in config.items():
+>=20
+> You might be interested in the fact that the iteration order is
+> different for Python2.  Or maybe you aren=E2=80=99t.
+>=20
 
-I suppose we can also phrase this as:
-
-assert(sync_mode =3D=3D MIRROR_SYNC_MODE_BITMAP ? sync_bitmap : true);
-
-Which might honestly be pretty good. Mind if I change it to this?
+asdf. This is undoubtedly the worst thing about Python. I'll have to fix
+this, because the ordering isn't guaranteed until 3.5 or some such and
+we're only EOLing Python2.
 
 --js
 
