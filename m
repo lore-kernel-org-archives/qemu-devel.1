@@ -2,48 +2,47 @@ Return-Path: <SRS0=axyf=VH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05DDFC74A2B
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 14:48:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BD42C74A2B
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 14:51:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D136B20645
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 14:48:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D136B20645
+	by mail.kernel.org (Postfix) with ESMTPS id 2C22720645
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 14:51:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C22720645
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34248 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34274 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlDtH-0005Ue-63
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jul 2019 10:48:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55029)
+	id 1hlDvx-00075n-2C
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jul 2019 10:51:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56189)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hlDqh-0004px-8R
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 10:45:36 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hlDuF-00065U-CM
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 10:49:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hlDqg-0001dq-8u
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 10:45:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:9014)
+ (envelope-from <mreitz@redhat.com>) id 1hlDuE-0005OA-Ge
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 10:49:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55827)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hlDqd-0001Uu-G4; Wed, 10 Jul 2019 10:45:31 -0400
+ id 1hlDuA-0004zA-VX; Wed, 10 Jul 2019 10:49:11 -0400
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 9A4B13082141;
- Wed, 10 Jul 2019 14:45:26 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 66C932F8BC9;
+ Wed, 10 Jul 2019 14:48:53 +0000 (UTC)
 Received: from dresden.str.redhat.com (unknown [10.40.205.108])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id AC0DE2B5AC;
- Wed, 10 Jul 2019 14:45:18 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2091D196FE;
+ Wed, 10 Jul 2019 14:48:45 +0000 (UTC)
 To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
 References: <20190709232550.10724-1-jsnow@redhat.com>
- <20190709232550.10724-18-jsnow@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
@@ -70,22 +69,22 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <f21b0921-9f81-cc78-a8c2-9d4ba7c20c2b@redhat.com>
-Date: Wed, 10 Jul 2019 16:45:17 +0200
+Message-ID: <45f3abee-cd8c-2f3f-3ff4-2387f251bd61@redhat.com>
+Date: Wed, 10 Jul 2019 16:48:44 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190709232550.10724-18-jsnow@redhat.com>
+In-Reply-To: <20190709232550.10724-1-jsnow@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="xObBID486OS9NA6e79icG0sLLY2eRu08a"
+ boundary="iTY96ZJIVpt4fEWQIEKSccXPfnIxXffab"
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.42]); Wed, 10 Jul 2019 14:45:26 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.38]); Wed, 10 Jul 2019 14:48:53 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v4 17/18] iotests: add test 257 for
- bitmap-mode backups
+Subject: Re: [Qemu-devel] [PATCH v4 00/18] bitmaps: introduce 'bitmap' sync
+ mode
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,8 +107,8 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---xObBID486OS9NA6e79icG0sLLY2eRu08a
-Content-Type: multipart/mixed; boundary="gbVSXRUn0KHwJBybRm87de0o1XXusXJfB";
+--iTY96ZJIVpt4fEWQIEKSccXPfnIxXffab
+Content-Type: multipart/mixed; boundary="9uQpUiTZg0JIput9nXJ4OBMATkojYI6ul";
  protected-headers="v1"
 From: Max Reitz <mreitz@redhat.com>
 To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
@@ -119,49 +118,49 @@ Cc: Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
  <quintela@redhat.com>, Fam Zheng <fam@euphon.net>,
  "Dr. David Alan Gilbert" <dgilbert@redhat.com>, vsementsov@virtuozzo.com,
  Markus Armbruster <armbru@redhat.com>, Wen Congyang <wencongyang2@huawei.com>
-Message-ID: <f21b0921-9f81-cc78-a8c2-9d4ba7c20c2b@redhat.com>
-Subject: Re: [PATCH v4 17/18] iotests: add test 257 for bitmap-mode backups
+Message-ID: <45f3abee-cd8c-2f3f-3ff4-2387f251bd61@redhat.com>
+Subject: Re: [PATCH v4 00/18] bitmaps: introduce 'bitmap' sync mode
 References: <20190709232550.10724-1-jsnow@redhat.com>
- <20190709232550.10724-18-jsnow@redhat.com>
-In-Reply-To: <20190709232550.10724-18-jsnow@redhat.com>
+In-Reply-To: <20190709232550.10724-1-jsnow@redhat.com>
 
---gbVSXRUn0KHwJBybRm87de0o1XXusXJfB
+--9uQpUiTZg0JIput9nXJ4OBMATkojYI6ul
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
 On 10.07.19 01:25, John Snow wrote:
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> ---
->  tests/qemu-iotests/257     |  416 +++++++
->  tests/qemu-iotests/257.out | 2247 ++++++++++++++++++++++++++++++++++++=
+> This series adds a new "BITMAP" sync mode that is meant to replace the
+> existing "INCREMENTAL" sync mode.
 
->  tests/qemu-iotests/group   |    1 +
->  3 files changed, 2664 insertions(+)
->  create mode 100755 tests/qemu-iotests/257
->  create mode 100644 tests/qemu-iotests/257.out
+So who=E2=80=99s going to take it? :-)
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+get_maintainer.pl says I=E2=80=99m responsible for 14/18 patches, and you=
+ are
+for 9/18.  But you did prefix the title with =E2=80=9Cbitmaps=E2=80=9D, w=
+hich
+MAINTAINERS clearly states is your territory. ;-)
+
+Max
 
 
---gbVSXRUn0KHwJBybRm87de0o1XXusXJfB--
+--9uQpUiTZg0JIput9nXJ4OBMATkojYI6ul--
 
---xObBID486OS9NA6e79icG0sLLY2eRu08a
+--iTY96ZJIVpt4fEWQIEKSccXPfnIxXffab
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0l+f0ACgkQ9AfbAGHV
-z0CJ9gf6AlRsV53ggsIezf4zUV70FNoyKsQggp/u7miJiBvIq229udEl33fQmkJH
-HDgGjFgc6voAQMiksf5Kxuc4a808LpcyVMmSlB0wxstA5Lr9LHHvFWS79HqhcMNY
-0S3r1aBNt/lkgjk14Sak3mF4+nHEoSGdxjeWgrgBPqYRA393wjz/gwLglCuSOHA9
-Ei/LtaC/I5cY+APin2FJSP4woVzBcfb1C3XTZ5iqSugmWt1B3t0+OmS6Gy5NqkHi
-jPl6POBOL0mOmarbm2f5ejo2TjmzmIP4SSR0n058/JZffhgnkHD8SvmbeIX73Kly
-JivbMWGFTVw6E9275WwHT0Bp6QELGA==
-=VSny
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0l+swACgkQ9AfbAGHV
+z0Bvqwf+M9XfrFMFhymO9Ctd0mCNGTVbmz0IvcQg85GR5xEpCPG6FNkfXzMiJOVR
+QBHp2YaHZcFlOQZm9859UcxhZ8wduZH4SpfGu4fR2Ob6Lk1DF6DUeHy/B5d7gzEP
+3OuzoxTkJY86Nti3MS55kLkksRBxxLnIWQyTB7m1NA+GZJmFKkke+hYx+j6OqK9n
+kJsAAJQ8GjMmkFFXrk6HSgKeu/mAg+CRYr1WmuWwIPp0trltJiKiuUiCH8slxi5L
+ZLy978jYazz0BgrNhLAvc8+EVxrBUPxYMUzH8eQEwOq1+gCB6gTpZ2y+ANihy5fG
+Dbq2mRCgj/lKu3gzMr2m3vqQ49tM3w==
+=vWbq
 -----END PGP SIGNATURE-----
 
---xObBID486OS9NA6e79icG0sLLY2eRu08a--
+--iTY96ZJIVpt4fEWQIEKSccXPfnIxXffab--
 
