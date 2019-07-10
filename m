@@ -2,82 +2,92 @@ Return-Path: <SRS0=axyf=VH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3A3CC73C7C
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 11:09:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54BBAC004EF
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 11:34:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 99F1920665
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 11:09:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 99F1920665
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 250A22064A
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 11:34:01 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jDpQ9/ci"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 250A22064A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59976 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60094 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlATf-0002EF-OY
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jul 2019 07:09:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57620)
+	id 1hlArI-00087O-CI
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jul 2019 07:34:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37517)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <yi.l.liu@intel.com>) id 1hlASf-0001dI-Ie
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 07:08:35 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hlAqK-0007ET-Gi
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 07:33:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yi.l.liu@intel.com>) id 1hlASb-0001md-L7
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 07:08:31 -0400
-Received: from mga06.intel.com ([134.134.136.31]:63059)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1hlASZ-0001ZM-L8
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 07:08:29 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
- by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 10 Jul 2019 04:08:17 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.63,474,1557212400"; d="scan'208";a="364444601"
-Received: from fmsmsx107.amr.corp.intel.com ([10.18.124.205])
- by fmsmga005.fm.intel.com with ESMTP; 10 Jul 2019 04:08:17 -0700
-Received: from fmsmsx113.amr.corp.intel.com (10.18.116.7) by
- fmsmsx107.amr.corp.intel.com (10.18.124.205) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Wed, 10 Jul 2019 04:08:17 -0700
-Received: from shsmsx101.ccr.corp.intel.com (10.239.4.153) by
- FMSMSX113.amr.corp.intel.com (10.18.116.7) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Wed, 10 Jul 2019 04:08:17 -0700
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.110]) by
- SHSMSX101.ccr.corp.intel.com ([169.254.1.134]) with mapi id 14.03.0439.000;
- Wed, 10 Jul 2019 19:08:15 +0800
-From: "Liu, Yi L" <yi.l.liu@intel.com>
-To: Peter Xu <zhexu@redhat.com>
-Thread-Topic: [RFC v1 03/18] hw/pci: introduce PCIPASIDOps to PCIDevice
-Thread-Index: AQHVM+yjwx3TWeXThE+Y1TsJTJWrjKbBCXeAgAKsLDA=
-Date: Wed, 10 Jul 2019 11:08:15 +0000
-Message-ID: <A2975661238FB949B60364EF0F2C257439F2A5F2@SHSMSX104.ccr.corp.intel.com>
-References: <1562324511-2910-1-git-send-email-yi.l.liu@intel.com>
- <1562324511-2910-4-git-send-email-yi.l.liu@intel.com>
- <20190709021209.GA5178@xz-x1>
-In-Reply-To: <20190709021209.GA5178@xz-x1>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.0.600.7
-dlp-reaction: no-action
-x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiMzYwNjgwYWYtYmI1ZS00MjA5LWFjNzAtNzQzMzFlMDhkY2M3IiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiWTNTRXpzdWdBdGdMMmxweVF6VlNXTFpmblNWYkk4Tnh2RlNnb0JtalJ2SUh1M1VQU1BnS3liU3UzVmNhQVp3dCJ9
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ (envelope-from <alex.bennee@linaro.org>) id 1hlAqI-000834-IU
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 07:33:00 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:44346)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1hlAqE-0007za-PZ
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 07:32:56 -0400
+Received: by mail-wr1-x441.google.com with SMTP id p17so2046308wrf.11
+ for <qemu-devel@nongnu.org>; Wed, 10 Jul 2019 04:32:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=bxFICg0n+PhHstls7ISCQcf1IBEcjTvTD7T9ypnPc84=;
+ b=jDpQ9/cilI43qrSxr+FX9gxN4anKeoQau1ytvMClf5Xv5zJlFFJhv/sDGvlq6VVCLq
+ kBHBu9UhhfX3c8gAHWUbqFpoE+pd8dUZrz6NMrxU1MLaLDIzBibKcvkV74Qr7mDTKuXN
+ zPfXoGE7F4quwdUfBC2l4FdKBtoXQ8AswJimezlIxYpMngTwZtxq1narGZS/iEYpJ88u
+ 0tKUNgyfKbEhS+O3ZTtZ3h+mEoOVxZ7NuoGQvkI3cUZGE3N7vgqOU9GAWtsK2M6CZZp4
+ B5gggE8lZf31ZyWUt5YHvp7HisZn2N3nmgtRPwigsVtmL9YjPN/EWy97gU65xEB7+wtn
+ qjdA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=bxFICg0n+PhHstls7ISCQcf1IBEcjTvTD7T9ypnPc84=;
+ b=okMLbteLT1Zho0Oudy4g9T/Ie8+RgRU93KdAV6pkAIcuOLqbna5BwfZLG023Ib3tiX
+ k7U8ZfQLE2eL9kBqr82i13rzp9wTOnGH+xc/a3uMdNj0MrjJshIBDgpOGrk7dQ5jJmbl
+ ehC5NuUhzN2323Ge3ucvVg79dfLD5YSGx6HkBp4qYl8C20RTjCTJJRi+IHwSltT/B76H
+ sHzzUq7PhssFtqcSSAmx0N82CJD0QyIxbXZZuGRnEHFKJ6qstRxAFXnW1KjCs/gBMawL
+ cQ9uK8zd4wH4LobhHzKIjrhd9W0uFTHpgPQjht19xKri7FHONW0kuKcVaC7xcS4lXl2g
+ NfBA==
+X-Gm-Message-State: APjAAAUYZ9nMbzVn0Sksdp3jGq3n5WtrxWVhXs2v22Q/nwcQh6BY6+6t
+ WRHUu+P1mQvYM0A7WhNoPfKh6A==
+X-Google-Smtp-Source: APXvYqwc4p2Tr7pqsNYNM3m0cne/0MCiO+R9yFLyDv9MOndySV6iOPOPZt+JhRRMm0p0h9Vhz8xp5A==
+X-Received: by 2002:adf:f8cf:: with SMTP id f15mr30481649wrq.333.1562758372024; 
+ Wed, 10 Jul 2019 04:32:52 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+ by smtp.gmail.com with ESMTPSA id 66sm1612942wma.11.2019.07.10.04.32.51
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Wed, 10 Jul 2019 04:32:51 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id D5BCB1FF87;
+ Wed, 10 Jul 2019 12:32:50 +0100 (BST)
+References: <20190705160421.19015-1-alex.bennee@linaro.org>
+ <20190705160421.19015-3-alex.bennee@linaro.org>
+ <af417ca3-248a-d1a8-51c4-46676b6d9d4a@redhat.com>
+User-agent: mu4e 1.3.2; emacs 26.1
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+In-reply-to: <af417ca3-248a-d1a8-51c4-46676b6d9d4a@redhat.com>
+Date: Wed, 10 Jul 2019 12:32:50 +0100
+Message-ID: <87lfx6dt0d.fsf@zen.linaroharston>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 134.134.136.31
-Subject: Re: [Qemu-devel] [RFC v1 03/18] hw/pci: introduce PCIPASIDOps to
- PCIDevice
+X-Received-From: 2a00:1450:4864:20::441
+Subject: Re: [Qemu-devel] [PATCH v1 2/5] tests/tcg: fix up
+ test-i386-fprem.ref generation
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,52 +99,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Tian, Kevin" <kevin.tian@intel.com>,
- Jacob Pan <jacob.jun.pan@linux.intel.com>, Yi Sun <yi.y.sun@linux.intel.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mst@redhat.com" <mst@redhat.com>,
- "Tian, Jun J" <jun.j.tian@intel.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "eric.auger@redhat.com" <eric.auger@redhat.com>,
- "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>, "Sun, Yi Y" <yi.y.sun@intel.com>,
- "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org,
+ qemu-arm@nongnu.org, Jan Bobek <jan.bobek@gmail.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-PiBGcm9tOiBQZXRlciBYdSBbbWFpbHRvOnpoZXh1QHJlZGhhdC5jb21dDQo+IFNlbnQ6IFR1ZXNk
-YXksIEp1bHkgOSwgMjAxOSAxMDoxMiBBTQ0KPiBUbzogTGl1LCBZaSBMIDx5aS5sLmxpdUBpbnRl
-bC5jb20+DQo+IFN1YmplY3Q6IFJlOiBbUkZDIHYxIDAzLzE4XSBody9wY2k6IGludHJvZHVjZSBQ
-Q0lQQVNJRE9wcyB0byBQQ0lEZXZpY2UNCj4gDQo+IE9uIEZyaSwgSnVsIDA1LCAyMDE5IGF0IDA3
-OjAxOjM2UE0gKzA4MDAsIExpdSBZaSBMIHdyb3RlOg0KPiA+ICt2b2lkIHBjaV9zZXR1cF9wYXNp
-ZF9vcHMoUENJRGV2aWNlICpkZXYsIFBDSVBBU0lET3BzICpvcHMpDQo+ID4gK3sNCj4gPiArICAg
-IGFzc2VydChvcHMgJiYgIWRldi0+cGFzaWRfb3BzKTsNCj4gPiArICAgIGRldi0+cGFzaWRfb3Bz
-ID0gb3BzOw0KPiA+ICt9DQo+ID4gKw0KPiA+ICtib29sIHBjaV9kZXZpY2VfaXNfb3BzX3NldChQ
-Q0lCdXMgKmJ1cywgaW50MzJfdCBkZXZmbikNCj4gDQo+IE5hbWUgc2hvdWxkIGJlICJwY2lfZGV2
-aWNlX2lzX3Bhc2lkX29wc19zZXQiLiAgT3IgbWF5YmUgeW91IGNhbiBzaW1wbHkNCj4gZHJvcCB0
-aGlzIGZ1bmN0aW9uIGJlY2F1c2UgYXMgbG9uZyBhcyB5b3UgY2hlY2sgaXQgaW4gaGVscGVyIGZ1
-bmN0aW9ucw0KPiBsaWtlIFsxXSBiZWxvdyBhbHdheXMgdGhlbiBpdCBzZWVtcyBldmVuIHVuZWNl
-c3NhcnkuDQoNCnllcywgdGhlIG5hbWUgc2hvdWxkIGJlICJwY2lfZGV2aWNlX2lzX3Bhc2lkX29w
-c19zZXQiLiBJIG5vdGljZWQgeW91cg0KY29tbWVudHMgb24gdGhlIG5lY2Vzc2l0eSBpbiBhbm90
-aGVyLCBsZXQncyB0YWxrIGluIHRoYXQgdGhyZWFkLiA6LSkNCg0KPiA+ICt7DQo+ID4gKyAgICBQ
-Q0lEZXZpY2UgKmRldjsNCj4gPiArDQo+ID4gKyAgICBpZiAoIWJ1cykgew0KPiA+ICsgICAgICAg
-IHJldHVybiBmYWxzZTsNCj4gPiArICAgIH0NCj4gPiArDQo+ID4gKyAgICBkZXYgPSBidXMtPmRl
-dmljZXNbZGV2Zm5dOw0KPiA+ICsgICAgcmV0dXJuICEhKGRldiAmJiBkZXYtPnBhc2lkX29wcyk7
-DQo+ID4gK30NCj4gPiArDQo+ID4gK2ludCBwY2lfZGV2aWNlX3JlcXVlc3RfcGFzaWRfYWxsb2Mo
-UENJQnVzICpidXMsIGludDMyX3QgZGV2Zm4sDQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgdWludDMyX3QgbWluX3Bhc2lkLCB1aW50MzJfdCBtYXhfcGFzaWQpDQo+IA0K
-PiBGcm9tIFZULWQgc3BlYyBJIHNlZSB0aGF0IHRoZSB2aXJ0dWFsIGNvbW1hbmQgImFsbG9jYXRl
-IHBhc2lkIiBkb2VzDQo+IG5vdCBoYXZlIGJkZiBpbmZvcm1hdGlvbiBzbyBpdCdzIGdsb2JhbCwg
-YnV0IGhlcmUgd2UndmUgZ290IGJ1cy9kZXZmbi4NCj4gSSdtIGN1cmlvdXMgaXMgdGhhdCByZXNl
-cnZlZCBmb3IgQVJNIG9yIHNvbWUgb3RoZXIgYXJjaD8NCg0KWW91IGFyZSByaWdodC4gVlQtZCBz
-cGVjIGRvZXNu4oCZdCBoYXZlIGJkZiBpbmZvLiBCdXQgd2UgbmVlZCB0byBwYXNzIHRoZQ0KYWxs
-b2NhdGlvbiByZXF1ZXN0IHZpYSB2ZmlvLiBTbyB0aGlzIGZ1bmN0aW9uIGhhcyBiZGYgaW5mby4g
-SW4gdklPTU1VIHNpZGUsDQppdCBzaG91bGQgc2VsZWN0IGEgdmZpby1wY2kgZGV2aWNlIGFuZCBp
-bnZva2UgdGhpcyBjYWxsYmFjayB3aGVuIGl0IHdhbnRzIHRvDQpyZXF1ZXN0IFBBU0lEIGFsbG9j
-L2ZyZWUuDQoNCj4gPiArew0KPiA+ICsgICAgUENJRGV2aWNlICpkZXY7DQo+ID4gKw0KPiA+ICsg
-ICAgaWYgKCFidXMpIHsNCj4gPiArICAgICAgICByZXR1cm4gLTE7DQo+ID4gKyAgICB9DQo+ID4g
-Kw0KPiA+ICsgICAgZGV2ID0gYnVzLT5kZXZpY2VzW2RldmZuXTsNCj4gPiArICAgIGlmIChkZXYg
-JiYgZGV2LT5wYXNpZF9vcHMgJiYgZGV2LT5wYXNpZF9vcHMtPmFsbG9jX3Bhc2lkKSB7DQo+IA0K
-PiBbMV0NCj4gDQo+ID4gKyAgICAgICAgcmV0dXJuIGRldi0+cGFzaWRfb3BzLT5hbGxvY19wYXNp
-ZChidXMsIGRldmZuLCBtaW5fcGFzaWQsIG1heF9wYXNpZCk7DQoNClRoYW5rcywNCllpIExpdQ0K
+
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+
+> On 7/5/19 6:04 PM, Alex Benn=C3=A9e wrote:
+>> We never shipped the reference data in the source tree because it was
+>> quite big (64M). As a result the only option is to generate it
+>
+> Can we fetch it (with hash verification) or store it compressed?
+
+Seems like a lot of hoops to jump through. The limitation is that you
+need to be on an x86 to generate the reference data but that isn't very
+hard these days. If you do happen to be on non-x86 and are not paying
+attention it becomes a simple regression test against the system
+(binfmt_misc) run QEMU. But as it is currently broken and needing some
+love it's just an incremental improvement for where we are at the
+moment.
+
+>
+> $ du -ch pc-bios/edk2-*bz2
+> 1.2M    pc-bios/edk2-aarch64-code.fd.bz2
+> 1.2M    pc-bios/edk2-arm-code.fd.bz2
+> 4.0K    pc-bios/edk2-arm-vars.fd.bz2
+> 1.7M    pc-bios/edk2-i386-code.fd.bz2
+> 1.9M    pc-bios/edk2-i386-secure-code.fd.bz2
+> 4.0K    pc-bios/edk2-i386-vars.fd.bz2
+> 1.7M    pc-bios/edk2-x86_64-code.fd.bz2
+> 1.9M    pc-bios/edk2-x86_64-secure-code.fd.bz2
+> 9.3M    total
+>
+>> locally. Although we have a rule to generate the reference file we
+>> missed the dependency and location changes, probably because it is
+>> only run for SLOW test runs.
+>>
+>> The test still fails with mostly incorrect flags and different than
+>> expected NaNs. I'll leave that for the x86 experts to look at.
+>>
+>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>> Cc: Paolo Bonzini <pbonzini@redhat.com>
+>> Cc: Richard Henderson <rth@twiddle.net>
+>> Cc: Eduardo Habkost <ehabkost@redhat.com>
+>> Cc: Jan Bobek <jan.bobek@gmail.com>
+>> ---
+>>  tests/tcg/i386/Makefile.target | 4 ++--
+>>  1 file changed, 2 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/tests/tcg/i386/Makefile.target b/tests/tcg/i386/Makefile.ta=
+rget
+>> index b4033ba3d1..d0eb7023e5 100644
+>> --- a/tests/tcg/i386/Makefile.target
+>> +++ b/tests/tcg/i386/Makefile.target
+>> @@ -35,9 +35,9 @@ test-i386-fprem.ref: test-i386-fprem
+>>  	$(call quiet-command, ./$< > $@,"GENREF","generating $@")
+>>
+>>  run-test-i386-fprem: TIMEOUT=3D60
+>> -run-test-i386-fprem: test-i386-fprem
+>> +run-test-i386-fprem: test-i386-fprem test-i386-fprem.ref
+>>  	$(call run-test,test-i386-fprem, $(QEMU) $<,"$< on $(TARGET_NAME)")
+>> -	$(call diff-out,test-i386-fprem, $(I386_SRC)/$<.ref)
+>> +	$(call diff-out,test-i386-fprem, test-i386-fprem.ref)
+>>  else
+>>  run-test-i386-fprem: test-i386-fprem
+>>  	$(call skip-test, $<, "SLOW")
+>>
+
+
+--
+Alex Benn=C3=A9e
 
