@@ -6,45 +6,45 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52C09C74A35
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 17:54:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4802AC74A36
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 17:58:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2C11620844
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 17:54:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C11620844
+	by mail.kernel.org (Postfix) with ESMTPS id D4FE320844
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 17:58:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D4FE320844
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35824 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35862 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlGn1-0003hr-GG
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jul 2019 13:53:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58289)
+	id 1hlGrj-0006TP-Vb
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jul 2019 13:58:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59613)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jsnow@redhat.com>) id 1hlGlm-0002nP-Py
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 13:52:44 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hlGqM-0005Uc-1c
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 13:57:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hlGlk-0001tI-Qp
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 13:52:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59940)
+ (envelope-from <jsnow@redhat.com>) id 1hlGqK-0004EK-Pv
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 13:57:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46908)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1hlGlg-0001j1-SC; Wed, 10 Jul 2019 13:52:37 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ id 1hlGqF-0003xZ-3C; Wed, 10 Jul 2019 13:57:19 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 38C10307D987;
- Wed, 10 Jul 2019 17:52:32 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id B4CA130C5854;
+ Wed, 10 Jul 2019 17:57:17 +0000 (UTC)
 Received: from [10.18.17.130] (dhcp-17-130.bos.redhat.com [10.18.17.130])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 82C181FE;
- Wed, 10 Jul 2019 17:52:29 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id EDB881001B03;
+ Wed, 10 Jul 2019 17:57:16 +0000 (UTC)
 To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
 References: <20190710010556.32365-1-jsnow@redhat.com>
- <20190710010556.32365-4-jsnow@redhat.com>
- <b8e70883-2e64-aa6a-6a70-dd0aedd63f17@redhat.com>
+ <20190710010556.32365-5-jsnow@redhat.com>
+ <0f0c6f6e-501a-d747-13ff-edc45ccc231d@redhat.com>
 From: John Snow <jsnow@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
@@ -121,21 +121,22 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <7f302053-b624-8beb-840c-a467b6862e08@redhat.com>
-Date: Wed, 10 Jul 2019 13:52:29 -0400
+Message-ID: <4bc49e42-2dfa-8ca9-2cb6-678962f75f0a@redhat.com>
+Date: Wed, 10 Jul 2019 13:57:16 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <b8e70883-2e64-aa6a-6a70-dd0aedd63f17@redhat.com>
+In-Reply-To: <0f0c6f6e-501a-d747-13ff-edc45ccc231d@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.48]); Wed, 10 Jul 2019 17:52:32 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.46]); Wed, 10 Jul 2019 17:57:17 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 3/8] iotests/257: Refactor backup helpers
+Subject: Re: [Qemu-devel] [PATCH 4/8] block/backup: hoist bitmap check into
+ QMP interface
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -154,123 +155,52 @@ Sender: "Qemu-devel"
 
 
 
-On 7/10/19 12:04 PM, Max Reitz wrote:
+On 7/10/19 12:11 PM, Max Reitz wrote:
 > On 10.07.19 03:05, John Snow wrote:
->> This test needs support for non-bitmap backups and missing or
->> unspecified bitmap sync modes, so rewrite the helpers to be a little
->> more generic.
+>> This is nicer to do in the unified QMP interface that we have now,
+>> because it lets us use the right terminology back at the user.
 >>
 >> Signed-off-by: John Snow <jsnow@redhat.com>
 >> ---
->>  tests/qemu-iotests/257     |  46 +++++----
->>  tests/qemu-iotests/257.out | 192 ++++++++++++++++++------------------=
--
->>  2 files changed, 124 insertions(+), 114 deletions(-)
+>>  block/backup.c | 13 ++++---------
+>>  blockdev.c     | 10 ++++++++++
+>>  2 files changed, 14 insertions(+), 9 deletions(-)
 >>
->> diff --git a/tests/qemu-iotests/257 b/tests/qemu-iotests/257
->> index 2ff4aa8695..2eb4f26c28 100755
->> --- a/tests/qemu-iotests/257
->> +++ b/tests/qemu-iotests/257
->=20
-> [...]
->=20
->> -def bitmap_backup(drive, n, filepath, bitmap, bitmap_mode):
->> -    log("--- Bitmap Backup #{:d} ---\n".format(n))
->> -    target_id =3D "bitmap_target_{:d}".format(n)
->> -    job_id =3D "bitmap_backup_{:d}".format(n)
->> +def backup(drive, n, filepath, bitmap, bitmap_mode, sync=3D'bitmap'):
->> +    log("--- Test Backup #{:d} ---\n".format(n))
->> +    target_id =3D "backup_target_{:d}".format(n)
->> +    job_id =3D "backup_{:d}".format(n)
->>      target_drive =3D Drive(filepath, vm=3Ddrive.vm)
+>> diff --git a/block/backup.c b/block/backup.c
+>> index e2729cf6fa..a64b768e24 100644
+>> --- a/block/backup.c
+>> +++ b/block/backup.c
+>> @@ -566,6 +566,10 @@ BlockJob *backup_job_create(const char *job_id, B=
+lockDriverState *bs,
+>>      assert(bs);
+>>      assert(target);
 >> =20
->>      target_drive.create_target(target_id, drive.fmt, drive.size)
->> -    drive.vm.qmp_log("blockdev-backup", job_id=3Djob_id, device=3Ddri=
-ve.name,
->> -                     target=3Dtarget_id, sync=3D"bitmap",
->> -                     bitmap_mode=3Dbitmap_mode,
->> -                     bitmap=3Dbitmap,
->> -                     auto_finalize=3DFalse)
->> +
->> +    kwargs =3D {
->> +        'job_id': job_id,
->> +        'auto_finalize': False,
->> +        'bitmap': bitmap,
->> +        'bitmap_mode': bitmap_mode,
->> +    }
->> +    kwargs =3D {key: val for key, val in kwargs.items() if val is not=
- None}
+>> +    /* QMP interface protects us from these cases */
+>> +    assert(sync_mode !=3D MIRROR_SYNC_MODE_INCREMENTAL);
+>> +    assert(sync_bitmap || sync_mode !=3D MIRROR_SYNC_MODE_BITMAP);
 >=20
-> I suppose this is to remove items that are None?
+> Implication would be a nice operator sometimes.
 >=20
-> Very cute, but why not just
+> ("assert(sync_mode =3D=3D MIRROR_SYNC_MODE_BITMAP -> sync_bitmap)")
 >=20
->   kwargs =3D {
->     'job_id': job_id,
->     'auto_finalize': False,
->   }
->   if bitmap is not None:
->     kwargs['bitmap'] =3D bitmap
->     kwargs['bitmap_mode'] =3D bitmap_mode
->=20
-> Exactly the same number of lines, but immediately makes it clear what=E2=
-=80=99s
-> going on.  Not as cute, I admit.
->=20
-> (Yes, I am indeed actively trying to train you not to write cute code.)
->=20
-
-It sneaks in. I genuinely struggle with understanding what other people
-will find readable; I have an authentically hard time reviewing other
-people's patches too. I'm earnestly not sure how I can help improve
-this, but I would like to.
-
-I wasn't sure what the easiest way to avoid sending the "None" over the
-wire was, so I went with a general thing, but yes: it's because bitmap
-and bitmap_mode are set to None sometimes and I need to omit such keys.
-
-In this case, though, I do test bitmap and bitmap_mode separately, so
-for the purposes of testing intentionally bad combinations you do need:
-
-if bitmap is not None:
-    kwargs['bitmap'] =3D bitmap
-if bitmap_mode is not None:
-    kwargs['bitmap_mode'] =3D bitmap_mode
-
-And I just looked at this and it did not spark joy; so I went with a
-generic filter to remove nulled keys. I admit it's /slightly/ cute and
-not immediately obvious why it needs to be done.
-
-
-This is even cuter, so maybe I am traveling in the wrong direction:
-
-def backup(drive, n, filepath, sync, **kwargs):
-    log("--- Test Backup #{:d} ---\n".format(n))
-    target_id =3D "backup_target_{:d}".format(n)
-    job_id =3D "backup_{:d}".format(n)
-    target_drive =3D Drive(filepath, vm=3Ddrive.vm)
-
-    target_drive.create_target(target_id, drive.fmt, drive.size)
-    kwargs.setdefault('auto_finalize', False)
-    # Strip any arguments explicitly nulled by the caller:
-    kwargs =3D {key: val for key, val in kwargs.items()
-              if val is not None}
-    blockdev_backup(drive.vm, drive.name, target_id, sync, **kwargs)
-    return job_id
-
-It's quite a bit shorter and also makes backup() more flexible by
-omitting the bitmap and bitmap_mode arguments entirely, allowing the
-caller to override the auto_finalize default, etc. In this permutation,
-we don't know the full extent of kwargs so it makes sense to generically
-filter it.
-
-Manually conditionally setting arguments is probably also fine.
-Do you still have a preference for the more static approach?
-
-> The rest looks good to me:
+> (Can you do that in C++?  No, you can=E2=80=99t overload bool=E2=80=99s=
+ operators, right?)
 >=20
 > Reviewed-by: Max Reitz <mreitz@redhat.com>
 >=20
 
-Thanks for reviewing, as always!
+Yes, I also find this assertion kind of hard to read personally, but it
+feels somewhat clunky to write:
+
+if (antecedent) {
+    assert(condition);
+}
+
+I suppose we can also phrase this as:
+
+assert(sync_mode =3D=3D MIRROR_SYNC_MODE_BITMAP ? sync_bitmap : true);
+
+Which might honestly be pretty good. Mind if I change it to this?
+
+--js
 
