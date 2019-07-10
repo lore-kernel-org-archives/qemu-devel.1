@@ -2,92 +2,106 @@ Return-Path: <SRS0=axyf=VH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90136C74A35
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 20:20:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FF9EC74A35
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 20:24:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 63C8F2064A
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 20:20:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 63C8F2064A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0AC4B20693
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 20:24:22 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="qE6rF72n"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0AC4B20693
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amd.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36768 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36806 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlJ4t-00006V-C8
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jul 2019 16:20:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55843)
+	id 1hlJ8X-0002sS-58
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jul 2019 16:24:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57046)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hlJ4B-0007aT-6h
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 16:19:52 -0400
+ (envelope-from <brijesh.singh@amd.com>) id 1hlJ7H-0001UI-JQ
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 16:23:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hlJ4A-0005s6-4T
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 16:19:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44790)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hlJ47-0005nR-PD; Wed, 10 Jul 2019 16:19:47 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 1240636899;
- Wed, 10 Jul 2019 20:19:47 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.40.205.108])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0C47860BFC;
- Wed, 10 Jul 2019 20:19:42 +0000 (UTC)
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-References: <20190710010556.32365-1-jsnow@redhat.com>
- <20190710010556.32365-5-jsnow@redhat.com>
- <0f0c6f6e-501a-d747-13ff-edc45ccc231d@redhat.com>
- <4bc49e42-2dfa-8ca9-2cb6-678962f75f0a@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <837ad3c2-efe7-5937-d9ba-c1084f2c7a17@redhat.com>
-Date: Wed, 10 Jul 2019 22:19:41 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ (envelope-from <brijesh.singh@amd.com>) id 1hlJ7G-0002FY-DN
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 16:23:03 -0400
+Received: from mail-eopbgr710059.outbound.protection.outlook.com
+ ([40.107.71.59]:24298 helo=NAM05-BY2-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
+ id 1hlJ7G-0002Ap-2b
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 16:23:02 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amdcloud.onmicrosoft.com; s=selector1-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=/HYqE1PCJLcOxRWS0i6CAUS74pHoE7gwQc8fgLK9XvE=;
+ b=qE6rF72nH0RWASnigtsL+kwYnqrkjnyRbc+8wq7M0baT8BqS93Hk62yuCwKsaCQRLlrkBFwUn6FXjw45vi6jhCLudmg0lwm6siPUrBLlGIodVIfos0SHPmbKNKWJAXQpI9RFvZn+oL0lcJnJUSnWAe5qAAheShZazBKzKRIRDU4=
+Received: from DM6PR12MB2682.namprd12.prod.outlook.com (20.176.116.31) by
+ DM6PR12MB2618.namprd12.prod.outlook.com (20.176.116.15) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2052.19; Wed, 10 Jul 2019 20:22:59 +0000
+Received: from DM6PR12MB2682.namprd12.prod.outlook.com
+ ([fe80::bc1a:a30d:9da2:1cdd]) by DM6PR12MB2682.namprd12.prod.outlook.com
+ ([fe80::bc1a:a30d:9da2:1cdd%6]) with mapi id 15.20.2073.008; Wed, 10 Jul 2019
+ 20:22:59 +0000
+From: "Singh, Brijesh" <brijesh.singh@amd.com>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Thread-Topic: [PATCH v2 00/13] Add SEV guest live migration support
+Thread-Index: AQHVN11DVr1yNvx2/kyGjSnRTUfVFw==
+Date: Wed, 10 Jul 2019 20:22:58 +0000
+Message-ID: <20190710202219.25939-1-brijesh.singh@amd.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: DM3PR11CA0020.namprd11.prod.outlook.com
+ (2603:10b6:0:54::30) To DM6PR12MB2682.namprd12.prod.outlook.com
+ (2603:10b6:5:4a::31)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=brijesh.singh@amd.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-mailer: git-send-email 2.17.1
+x-originating-ip: [165.204.77.1]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 56075fd3-b01d-495b-61c9-08d70574665a
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0; PCL:0;
+ RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);
+ SRVR:DM6PR12MB2618; 
+x-ms-traffictypediagnostic: DM6PR12MB2618:
+x-ms-exchange-purlcount: 2
+x-microsoft-antispam-prvs: <DM6PR12MB26188429DDE0195B47758AF1E5F00@DM6PR12MB2618.namprd12.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:6430;
+x-forefront-prvs: 0094E3478A
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10009020)(4636009)(366004)(346002)(136003)(39860400002)(376002)(396003)(189003)(199004)(5640700003)(14444005)(8676002)(99286004)(66066001)(53936002)(2351001)(6306002)(6116002)(3846002)(6436002)(6486002)(305945005)(7736002)(52116002)(6916009)(6512007)(81166006)(5660300002)(8936002)(66946007)(66476007)(81156014)(386003)(6506007)(2501003)(2906002)(486006)(476003)(50226002)(68736007)(2616005)(86362001)(478600001)(25786009)(316002)(966005)(54906003)(66446008)(64756008)(256004)(71200400001)(71190400001)(66556008)(14454004)(102836004)(1076003)(26005)(36756003)(4326008)(186003)(6606295002);
+ DIR:OUT; SFP:1101; SCL:1; SRVR:DM6PR12MB2618;
+ H:DM6PR12MB2682.namprd12.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: amd.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: cJGOrxlCtyKYX+XZ5/hQp9pebiWpyhMtyCynBBKfDWkNZqEYkz7nv7Y/xUMVk+Hivab7tL+xuhg3iU+NoePrvssSxR/9sU+lpd8YbQ1hXjhGcDoYDpu28teDmV/mZYpTcg9x1uc215ZftoIIR/NwVLiBnkGbowTYhS1ZM6bIUfmEEIIr/12m9rQGDZVzKCSoWiL/d8OU/4ue4ROauRqjxv9k7FSLtBpAHsZCouCXcL0DyOkK48zOpLJFTJONXly7rz76+qN7lqAikpKElGH67K/WYcmcu7IpbBNv99nnCvWvZ+/Vd0uR7N6VxZ9WL36+mFCqUpOep19PTwP2rO4hg0KCSD5KawmlsMv/f1lexJTgRtgxHRIOQPkpHxNt2L0tJisYhqKUtntC2tiuQuaXlCI0lfJLriVYbOI95bs4vnQ=
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-In-Reply-To: <4bc49e42-2dfa-8ca9-2cb6-678962f75f0a@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="fQNT5iv1OAQGGTb3oJ32D2qkFy1jt71Ws"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.30]); Wed, 10 Jul 2019 20:19:47 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 4/8] block/backup: hoist bitmap check into
- QMP interface
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 56075fd3-b01d-495b-61c9-08d70574665a
+X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Jul 2019 20:22:58.9038 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: sbrijesh@amd.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB2618
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.71.59
+Subject: [Qemu-devel] [PATCH v2 00/13] Add SEV guest live migration support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,106 +113,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>, "Lendacky,
+ Thomas" <Thomas.Lendacky@amd.com>, "Singh, Brijesh" <brijesh.singh@amd.com>,
+ "dgilbert@redhat.com" <dgilbert@redhat.com>,
+ "ehabkost@redhat.com" <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---fQNT5iv1OAQGGTb3oJ32D2qkFy1jt71Ws
-Content-Type: multipart/mixed; boundary="zyRNDII5gOIgeLqWEbhJuFlIJHy9si8yj";
- protected-headers="v1"
-From: Max Reitz <mreitz@redhat.com>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
- Eric Blake <eblake@redhat.com>
-Message-ID: <837ad3c2-efe7-5937-d9ba-c1084f2c7a17@redhat.com>
-Subject: Re: [PATCH 4/8] block/backup: hoist bitmap check into QMP interface
-References: <20190710010556.32365-1-jsnow@redhat.com>
- <20190710010556.32365-5-jsnow@redhat.com>
- <0f0c6f6e-501a-d747-13ff-edc45ccc231d@redhat.com>
- <4bc49e42-2dfa-8ca9-2cb6-678962f75f0a@redhat.com>
-In-Reply-To: <4bc49e42-2dfa-8ca9-2cb6-678962f75f0a@redhat.com>
+AMD SEV encrypts the memory of VMs and because this encryption is done usin=
+g
+an address tweak, the hypervisor will not be able to simply copy ciphertext
+between machines to migrate a VM. Instead the AMD SEV Key Management API
+provides a set of functions which the hypervisor can use to package a
+guest encrypted pages for migration, while maintaining the confidentiality
+provided by AMD SEV.
 
---zyRNDII5gOIgeLqWEbhJuFlIJHy9si8yj
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+The patch series add the support required in Qemu to perform the SEV
+guest live migration. Before initiating the live migration a user
+should use newly added 'migrate-set-sev-info' command to pass the
+target machines certificate chain. See the docs/amd-memory-encryption.txt
+for further details.
 
-On 10.07.19 19:57, John Snow wrote:
->=20
->=20
-> On 7/10/19 12:11 PM, Max Reitz wrote:
->> On 10.07.19 03:05, John Snow wrote:
->>> This is nicer to do in the unified QMP interface that we have now,
->>> because it lets us use the right terminology back at the user.
->>>
->>> Signed-off-by: John Snow <jsnow@redhat.com>
->>> ---
->>>  block/backup.c | 13 ++++---------
->>>  blockdev.c     | 10 ++++++++++
->>>  2 files changed, 14 insertions(+), 9 deletions(-)
->>>
->>> diff --git a/block/backup.c b/block/backup.c
->>> index e2729cf6fa..a64b768e24 100644
->>> --- a/block/backup.c
->>> +++ b/block/backup.c
->>> @@ -566,6 +566,10 @@ BlockJob *backup_job_create(const char *job_id, =
-BlockDriverState *bs,
->>>      assert(bs);
->>>      assert(target);
->>> =20
->>> +    /* QMP interface protects us from these cases */
->>> +    assert(sync_mode !=3D MIRROR_SYNC_MODE_INCREMENTAL);
->>> +    assert(sync_bitmap || sync_mode !=3D MIRROR_SYNC_MODE_BITMAP);
->>
->> Implication would be a nice operator sometimes.
->>
->> ("assert(sync_mode =3D=3D MIRROR_SYNC_MODE_BITMAP -> sync_bitmap)")
->>
->> (Can you do that in C++?  No, you can=E2=80=99t overload bool=E2=80=99=
-s operators, right?)
->>
->> Reviewed-by: Max Reitz <mreitz@redhat.com>
->>
->=20
-> Yes, I also find this assertion kind of hard to read personally, but it=
+The patch series depends on kernel patches available here:
+https://marc.info/?l=3Dkvm&m=3D156278967226011&w=3D2
 
-> feels somewhat clunky to write:
->=20
-> if (antecedent) {
->     assert(condition);
-> }
->=20
-> I suppose we can also phrase this as:
->=20
-> assert(sync_mode =3D=3D MIRROR_SYNC_MODE_BITMAP ? sync_bitmap : true);
->=20
-> Which might honestly be pretty good. Mind if I change it to this?
+The complete tree with patch is available at:
+https://github.com/codomania/qemu/tree/sev-migration-v2
 
-Looks weird (mostly unfamiliar), but I do not.
+Changes since v1:
+ - use the dirty log sync APIs to also sync the page encryption bitmap
+   when SEV is active.
 
-Max
+Brijesh Singh (13):
+  linux-headers: update kernel header to include SEV migration commands
+  kvm: introduce high-level API to support encrypted page migration
+  migration/ram: add support to send encrypted pages
+  kvm: add support to sync the page encryption state bitmap
+  doc: update AMD SEV API spec web link
+  doc: update AMD SEV to include Live migration flow
+  target/i386: sev: do not create launch context for an incoming guest
+  misc.json: add migrate-set-sev-info command
+  target/i386: sev: add support to encrypt the outgoing page
+  target/i386: sev: add support to load incoming encrypted page
+  kvm: introduce high-level API to migrate the page encryption bitmap
+  migration: add support to migrate page encryption bitmap
+  target/i386: sev: remove migration blocker
 
+ accel/kvm/kvm-all.c            | 108 ++++++++
+ accel/kvm/sev-stub.c           |  22 ++
+ accel/stubs/kvm-stub.c         |  22 ++
+ docs/amd-memory-encryption.txt |  44 +++-
+ include/exec/ram_addr.h        | 161 +++++++++++-
+ include/exec/ramlist.h         |   3 +-
+ include/sysemu/kvm.h           |  25 ++
+ include/sysemu/sev.h           |   6 +
+ linux-headers/linux/kvm.h      |  53 ++++
+ migration/ram.c                |  91 ++++++-
+ qapi/misc-target.json          |  18 ++
+ target/i386/monitor.c          |  10 +
+ target/i386/sev-stub.c         |   5 +
+ target/i386/sev.c              | 455 +++++++++++++++++++++++++++++++--
+ target/i386/sev_i386.h         |  11 +-
+ target/i386/trace-events       |   8 +
+ 16 files changed, 1016 insertions(+), 26 deletions(-)
 
---zyRNDII5gOIgeLqWEbhJuFlIJHy9si8yj--
+--=20
+2.17.1
 
---fQNT5iv1OAQGGTb3oJ32D2qkFy1jt71Ws
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0mSF0ACgkQ9AfbAGHV
-z0BggQgAjBDDj+yiV0EGXvX0W7Bvmw/Z79ZWAhs/r+IdIpj8U6yT3Tyk+qRrsdSa
-VnpTpb+CGccIxfzBp5NXADhUnAgt5CAcw8gjAU2Y5DDkij7jLBVE0Gh3wLbHAHhy
-tdyegrJEghu1PwswEaJTOiui2rdwqCIa1b2QNikTDKb3R5vdMbNADHPr9SaOBTTC
-6aNNwdflIY8IQE2uuYJiy6+CqzTz3c3LPVsYoygT+3fwy5sUMOwCDFGboMGcX/tx
-BvmT4IvhgEoa8DtS1HAwh24EI0OY46uvR2FCTrAYdUqOT9SobJqAVp+X3rogY3D7
-x7xbmcwg3GGD2WwZmVZLOZ2oco3P/A==
-=DiEW
------END PGP SIGNATURE-----
-
---fQNT5iv1OAQGGTb3oJ32D2qkFy1jt71Ws--
 
