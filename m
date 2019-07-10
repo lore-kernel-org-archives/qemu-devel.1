@@ -6,75 +6,57 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 049FAC73C7C
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 09:56:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73FFEC73C7C
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 09:57:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D0A392054F
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 09:56:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0A392054F
+	by mail.kernel.org (Postfix) with ESMTPS id 4B5D12054F
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 09:57:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B5D12054F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59610 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59616 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hl9Kg-00064c-W3
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jul 2019 05:56:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59871)
+	id 1hl9M8-00071d-IQ
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jul 2019 05:57:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60471)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <pbonzini@redhat.com>) id 1hl9JO-0005Sy-D5
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 05:54:55 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1hl9LV-0006aD-T3
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 05:57:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1hl9JN-0003Sf-8k
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 05:54:54 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:34811)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hl9JN-0003Q6-30
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 05:54:53 -0400
-Received: by mail-wr1-f65.google.com with SMTP id 31so1762875wrm.1
- for <qemu-devel@nongnu.org>; Wed, 10 Jul 2019 02:54:52 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=U7/c7segJ4ORFqqbJ2ay3Z0UjGaztEmOOHHf3O9Zun0=;
- b=lvjlEa1aSH0Mt+Xp5QGejXqLo8kDoRpF7YI+DQsdGxXF5he0P/+uvDo19Vygot0uIr
- hxFL9MR5bhs1JzpExhZEXXnf6c+KNpL8s5kaWhL8N5nTD2KSm9CBycb5QGtvmYRKbLjK
- /nWB/eR0FlTUE4nOWxOQJi7HBVfkyuRAR+I4RqnOdL8IKxRrpuWmcfWUxwf2cFSsm36y
- vg213dT1aRe9MhieFzLUAR/lhgd4eqfNLh/NkMJbdkO3OgXMl4RZffIsoJiJZUt5+4GX
- Xm3O3OqNnpBqBWeBdIo6hevijR80DZ6kQD3GoOmbl7HiciGLp1KgiLAAHzNHCUgYYxFE
- qPXg==
-X-Gm-Message-State: APjAAAUC6pqXqlm4y+0OucYoteEoRmLrIIQsK5MtFkYNrjuJy7SQh+J7
- rA20y5D7dIKwOOpD/xjZn1THDQ==
-X-Google-Smtp-Source: APXvYqwfqT8ec4TejHe5RzapZDDQNaINq38MgOWDO9AQa3cZsEzqwoCl8Qw1WoY1fIOrZt9CjJxUkQ==
-X-Received: by 2002:adf:fe4f:: with SMTP id m15mr30246110wrs.36.1562752491564; 
- Wed, 10 Jul 2019 02:54:51 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:d066:6881:ec69:75ab?
- ([2001:b07:6468:f312:d066:6881:ec69:75ab])
- by smtp.gmail.com with ESMTPSA id w7sm1460152wmc.46.2019.07.10.02.54.50
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Wed, 10 Jul 2019 02:54:51 -0700 (PDT)
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-References: <20190708072437.3339-1-marcandre.lureau@redhat.com>
- <20190708160442.GL3082@redhat.com>
- <8914dc43-0b99-ff83-7ff9-8f7b8f256909@redhat.com>
- <20190710090350.GC30831@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <f029851a-a7de-b7ca-a9c3-949fb25a9756@redhat.com>
-Date: Wed, 10 Jul 2019 11:54:54 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+ (envelope-from <dgilbert@redhat.com>) id 1hl9LU-0005UC-LD
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 05:57:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33550)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hl9LU-0005Ti-Ex
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 05:57:04 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 5388E81120;
+ Wed, 10 Jul 2019 09:57:03 +0000 (UTC)
+Received: from work-vm (ovpn-117-216.ams2.redhat.com [10.36.117.216])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9AF5B1001B19;
+ Wed, 10 Jul 2019 09:57:01 +0000 (UTC)
+Date: Wed, 10 Jul 2019 10:56:57 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Yury Kotov <yury-kotov@yandex-team.ru>
+Message-ID: <20190710095657.GB2682@work-vm>
+References: <20190710092338.23559-1-yury-kotov@yandex-team.ru>
 MIME-Version: 1.0
-In-Reply-To: <20190710090350.GC30831@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190710092338.23559-1-yury-kotov@yandex-team.ru>
+User-Agent: Mutt/1.12.0 (2019-05-25)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.28]); Wed, 10 Jul 2019 09:57:03 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.221.65
-Subject: Re: [Qemu-devel] [PATCH 0/3] Add dbus-vmstate
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [RFC PATCH 0/2] High downtime with 95+ throttle pct
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,27 +68,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+Cc: Juan Quintela <quintela@redhat.com>, Stefan Weil <sw@weilnetz.de>,
+ "open list:Overall" <qemu-devel@nongnu.org>, yc-core@yandex-team.ru,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/07/19 11:03, Daniel P. Berrangé wrote:
->> Would it be possible to make QEMU the broker?  That is, how hard would it
->> be to embed a minimal DBus broker (which only takes care of connecting servers
->> and clients---stuff like launching servers would be completely out of scope)?
-> What would be the benefit of embedding it in QEMU ?
+* Yury Kotov (yury-kotov@yandex-team.ru) wrote:
+> Hi,
+> 
+> I wrote a test for migration auto converge and found out a strange thing:
+> 1. Enable auto converge
+> 2. Set max-bandwidth 1Gb/s
+> 3. Set downtime-limit 1ms
+> 4. Run standard test (just writes a byte per page)
+> 5. Wait for converge
+> 6. It's converged with 99% throttle percentage
+> 7. The result downtime was about 300-600ms   <<<<
+> 
+> It's much higher than expected 1ms. I figured out that cpu_throttle_thread()
+> function sleeps for 100ms+ for high throttle percentage (>=95%) in VCPU thread.
+> And it sleeps even after a cpu kick.
+> 
+> I tried to fix it by using timedwait for ms part of sleep.
+> E.g timedwait(halt_cond, 1ms) + usleep(500).
+> 
+> But I'm not sure about using timedwait function here with qemu_global_mutex.
+> The original function uses qemu_mutex_unlock_iothread + qemu_mutex_lock_iothread
+> It differs from locking/unlocking (inside timedwait) qemu_global_mutex
+> because of using qemu_bql_mutex_lock_func function which could be anything.
+> This is why the series is RFC.
+> 
+> What do you think?
 
-If in the future we want to keep only the multiprocess case then QEMU
-would be able to launch subprocesses itself.  In this case you'd keep
-the old command line working but QEMU would set up the bus and the
-services that work together on it (for example the basic QOM operations
-such as unparent and property get/set could be mapped to a DBus
-interface, and QOM classes and interfaces could also become DBus
-interfaces).  The broker itself could be a separate subprocess.
+Would qemu_sem_timedwait work for your use?  I use it in
+migration_thread for the bandwidth limiting and allowing that to be
+woken up.
 
-Paolo
+Dave
+
+> Thanks!
+> 
+> Yury Kotov (2):
+>   qemu-thread: Add qemu_cond_timedwait
+>   cpus: Fix throttling during vm_stop
+> 
+>  cpus.c                   | 27 +++++++++++++++++++--------
+>  include/qemu/thread.h    | 12 ++++++++++++
+>  util/qemu-thread-posix.c | 40 ++++++++++++++++++++++++++++------------
+>  util/qemu-thread-win32.c | 16 ++++++++++++++++
+>  4 files changed, 75 insertions(+), 20 deletions(-)
+> 
+> -- 
+> 2.22.0
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
