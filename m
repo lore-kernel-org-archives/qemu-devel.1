@@ -2,83 +2,89 @@ Return-Path: <SRS0=axyf=VH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FF01C74A21
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 16:26:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A92AC74A21
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 16:27:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 081762086D
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 16:26:53 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oJfimRZ2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 081762086D
+	by mail.kernel.org (Postfix) with ESMTPS id 712C02086D
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 16:27:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 712C02086D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35304 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35310 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlFQi-0008LW-AQ
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jul 2019 12:26:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55397)
+	id 1hlFRL-0000iZ-KX
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jul 2019 12:27:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59825)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <paolo.bonzini@gmail.com>) id 1hlFEz-00067v-NG
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 12:14:51 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hlFQT-0008HZ-5L
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 12:26:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1hlFEt-0007Vj-SP
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 12:14:43 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:35900)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1hlFEq-0007RV-BK
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 12:14:37 -0400
-Received: by mail-wr1-x442.google.com with SMTP id n4so3115583wrs.3
- for <qemu-devel@nongnu.org>; Wed, 10 Jul 2019 09:14:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=x4rRhYjREcr+YSPm4mYpFmjXbWbQ8j4+OdfsbSKEHKQ=;
- b=oJfimRZ2lWzBzWMuDJ16ooYUP3BsXJDaJ6bDh2MhI3rMEJUDYFP/X8yRsFTUYHFWI8
- /VxhY00acOq/t1GgSd0bHLL26Yngz9m5haACdV+HnadBY+pJgaTEWQoMDP42cewhc0S+
- k/JhG0sjYOJWA6Uav0gvj2w1NMaAn/0QU/JUxKG1RhTDg/+MAg0uJp60+hcP5F+dZ9x7
- c6MTbVlIyi4u9lnhGP1D5jOIIONxPPMUaP016y8RqigCeRW7CeiK2kkCETylIZG0z7Ls
- hTy0t4NzfNKjQmQaeklCbzALxynJ0+4NtoqQgxgI2z854UBccqBUzoBKausKqF8KaVnm
- jFCg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references;
- bh=x4rRhYjREcr+YSPm4mYpFmjXbWbQ8j4+OdfsbSKEHKQ=;
- b=LTdjYqsHkTnZsGMZKNm9sMBkfGThjhsPWMMptIqsGl6Ji5akgKEp3X/an3rFBTbp6L
- 6d4Iz8PoYrpQBzygZZfBa+T++IiBMNYhvO2Mchcy4DOqYsuNeaV4lI68OgFaAMBB1/Z9
- xVnQJknekZrHCxqbVFa/+ETnDmbDCoZbO0css3VebUNz/kl8Jvv4afDxy5NV3SbLIM/4
- xEjLdHYimqo352v1r3g1GqL/za9dV+EuJMbqPEfy+KoKaU+OAK8JJ2KWs7To1SH+28RW
- OY27ySvLNIGaINqFdXrwvFPkp9raQR4oCmKcZNMEqU2h4rbAnQgt+YYPYuRk6flTv2F6
- 0xVw==
-X-Gm-Message-State: APjAAAUjOc2YWdCyZ3idMcH5ZunyZyJUEiIblq9q31i5CNIw/kvYbq3e
- LgaacVPN/uPb5perWrgyXXqAPQHlXpI=
-X-Google-Smtp-Source: APXvYqxubLg5x1RZFQztX10CxAwmE7y6A9d5wZABPwnDsx4eUxEUz21IJebs4OUflMNFYq5kTUOAcg==
-X-Received: by 2002:a5d:6a84:: with SMTP id s4mr421123wru.125.1562775274253;
- Wed, 10 Jul 2019 09:14:34 -0700 (PDT)
-Received: from 640k.localdomain ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id w14sm2573747wrk.44.2019.07.10.09.14.32
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 10 Jul 2019 09:14:33 -0700 (PDT)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Wed, 10 Jul 2019 18:14:22 +0200
-Message-Id: <1562775267-1222-4-git-send-email-pbonzini@redhat.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1562775267-1222-1-git-send-email-pbonzini@redhat.com>
-References: <1562775267-1222-1-git-send-email-pbonzini@redhat.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::442
-Subject: [Qemu-devel] [PATCH 3/8] configure: integrate Meson in the build
- system
+ (envelope-from <mreitz@redhat.com>) id 1hlFQQ-0004dg-Fw
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 12:26:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56126)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1hlFQM-0004Oz-Qa; Wed, 10 Jul 2019 12:26:31 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 9D970C0733FB;
+ Wed, 10 Jul 2019 16:26:25 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.40.205.108])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 3CCF1608A6;
+ Wed, 10 Jul 2019 16:26:16 +0000 (UTC)
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+References: <20190710010556.32365-1-jsnow@redhat.com>
+ <20190710010556.32365-2-jsnow@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <71300a46-3bbd-7c6a-dd25-baf17364e07e@redhat.com>
+Date: Wed, 10 Jul 2019 18:26:14 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
+MIME-Version: 1.0
+In-Reply-To: <20190710010556.32365-2-jsnow@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="1obWltBLUt6XJH4OekukPBmTKzpKZDYBC"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.31]); Wed, 10 Jul 2019 16:26:25 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 1/8] iotests/257: add Pattern class
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,1133 +96,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- berrange@redhat.com, armbru@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The Meson build system is integrated in the existing configure/make steps
-by invoking Meson from the configure script and converting Meson's build.ninja
-rules to an included Makefile.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--1obWltBLUt6XJH4OekukPBmTKzpKZDYBC
+Content-Type: multipart/mixed; boundary="InwhnsRdmaarXwNvnPaPiNIpwa8eCPynk";
+ protected-headers="v1"
+From: Max Reitz <mreitz@redhat.com>
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
+ Eric Blake <eblake@redhat.com>
+Message-ID: <71300a46-3bbd-7c6a-dd25-baf17364e07e@redhat.com>
+Subject: Re: [PATCH 1/8] iotests/257: add Pattern class
+References: <20190710010556.32365-1-jsnow@redhat.com>
+ <20190710010556.32365-2-jsnow@redhat.com>
+In-Reply-To: <20190710010556.32365-2-jsnow@redhat.com>
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- Makefile             |   8 +
- configure            |  27 ++
- meson.build          |  13 +
- scripts/ninjatool.py | 988 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 1036 insertions(+)
- create mode 100644 meson.build
- create mode 100755 scripts/ninjatool.py
+--InwhnsRdmaarXwNvnPaPiNIpwa8eCPynk
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/Makefile b/Makefile
-index cfb18f1..7636cec 100644
---- a/Makefile
-+++ b/Makefile
-@@ -48,6 +48,14 @@ git-submodule-update:
- endif
- endif
- 
-+export NINJA=./ninjatool
-+Makefile.ninja: build.ninja ninjatool
-+	./ninjatool -t ninja2make --omit dist uninstall < $< > $@
-+-include Makefile.ninja
-+
-+ninjatool: $(SRC_PATH)/scripts/ninjatool.py
-+	$(MESON) setup --reconfigure . $(SRC_PATH)
-+
- .git-submodule-status: git-submodule-update config-host.mak
- 
- # Check that we're not trying to do an out-of-tree build from
-diff --git a/configure b/configure
-index 49cb3f3..dfd603c 100755
---- a/configure
-+++ b/configure
-@@ -493,6 +493,7 @@ docker="no"
- debug_mutex="no"
- libpmem=""
- default_devices="yes"
-+meson=meson
- 
- # cross compilers defaults, can be overridden with --cross-cc-ARCH
- cross_cc_aarch64="aarch64-linux-gnu-gcc"
-@@ -983,6 +984,8 @@ for opt do
-   ;;
-   --python=*) python="$optarg"
-   ;;
-+  --meson=*) meson="$optarg"
-+  ;;
-   --gcov=*) gcov_tool="$optarg"
-   ;;
-   --smbd=*) smbd="$optarg"
-@@ -1685,6 +1688,7 @@ Advanced options (experts only):
-   --make=MAKE              use specified make [$make]
-   --install=INSTALL        use specified install [$install]
-   --python=PYTHON          use specified python [$python]
-+  --meson=MESON            use specified meson [$meson]
-   --smbd=SMBD              use specified smbd [$smbd]
-   --with-git=GIT           use specified git [$git]
-   --static                 enable static build [$static]
-@@ -1850,6 +1854,12 @@ then
-     error_exit "Python not found. Use --python=/path/to/python"
- fi
- 
-+if ! has "$meson"
-+then
-+    error_exit "Meson not found. Use --meson=/path/to/meson"
-+fi
-+meson=$(command -v $meson)
-+
- # Note that if the Python conditional here evaluates True we will exit
- # with status 1 which is a shell 'false' value.
- if ! $python -c 'import sys; sys.exit(sys.version_info < (2,7))'; then
-@@ -7314,6 +7324,7 @@ echo "INSTALL_PROG=$install -c -m 0755" >> $config_host_mak
- echo "INSTALL_LIB=$install -c -m 0644" >> $config_host_mak
- echo "PYTHON=$python" >> $config_host_mak
- echo "PYTHON_VERSION=$python_version" >> $config_host_mak
-+echo "MESON=$meson" >> $config_host_mak
- echo "CC=$cc" >> $config_host_mak
- if $iasl -h > /dev/null 2>&1; then
-   echo "IASL=$iasl" >> $config_host_mak
-@@ -7964,6 +7975,22 @@ echo "# Automatically generated by configure - do not modify" > "$iotests_common
- echo >> "$iotests_common_env"
- echo "export PYTHON='$python'" >> "$iotests_common_env"
- 
-+rm -rf meson-private meson-info meson-logs
-+NINJA=$PWD/ninjatool $python $meson setup \
-+	--prefix "$prefix" \
-+	--libdir "$libdir" \
-+	--libexecdir "$libexecdir" \
-+	--bindir "$bindir" \
-+	--includedir "$includedir" \
-+	--datadir "$datadir" \
-+	--mandir "$mandir" \
-+	--sysconfdir "$sysconfdir" \
-+	--localstatedir "$local_statedir" \
-+	$(test "$strip_opt" = yes && echo --strip) \
-+	--buildtype $(if test "$debug" = yes; then echo debug; else echo release; fi) \
-+	"$PWD" "$source_path"
-+
-+
- # Save the configure command line for later reuse.
- cat <<EOD >config.status
- #!/bin/sh
-diff --git a/meson.build b/meson.build
-new file mode 100644
-index 0000000..7615817
---- /dev/null
-+++ b/meson.build
-@@ -0,0 +1,13 @@
-+project('qemu', 'c', meson_version: '>=0.50.999')
-+
-+kconfig = import('unstable-kconfig')
-+config_host = kconfig.load(meson.current_build_dir() / 'config-host.mak')
-+
-+add_project_arguments(config_host['QEMU_CFLAGS'].split(),
-+                      language: 'c')
-+add_project_arguments(config_host['QEMU_INCLUDES'].split(),
-+                      language: 'c')
-+
-+configure_file(input: files('scripts/ninjatool.py'),
-+               output: 'ninjatool',
-+               configuration: config_host)
-diff --git a/scripts/ninjatool.py b/scripts/ninjatool.py
-new file mode 100755
-index 0000000..7ef7415
---- /dev/null
-+++ b/scripts/ninjatool.py
-@@ -0,0 +1,988 @@
-+#! /bin/sh
-+
-+# Python module for parsing and processing .ninja files.
-+#
-+# Author: Paolo Bonzini
-+#
-+# Copyright (C) 2019 Red Hat, Inc.
-+
-+
-+# We don't want to put "#! @PYTHON@" as the shebang and
-+# make the file executable, so instead we make this a
-+# Python/shell polyglot.  The first line below starts a
-+# multiline string literal for Python, while it is just
-+# ":" for bash.  The closing of the multiline string literal
-+# is never parsed by bash since it exits before.
-+
-+'''':
-+case "$0" in
-+  /*) me=$0 ;;
-+  *) me=$(command -v "$0") ;;
-+esac
-+python="@PYTHON@"
-+case $python in
-+  @*) python=python3 ;;
-+esac
-+exec $python "$me" "$@"
-+exit 1
-+'''
-+
-+
-+from collections import namedtuple, defaultdict
-+import sys
-+import os
-+import re
-+import json
-+import argparse
-+
-+
-+class InvalidArgumentError(Exception):
-+    pass
-+
-+
-+# ---- lexer and parser ----
-+
-+BUILD = 1
-+POOL = 2
-+RULE = 3
-+DEFAULT = 4
-+EQUALS = 5
-+COLON = 6
-+PIPE = 7
-+PIPE2 = 8
-+IDENT = 9
-+INCLUDE = 10
-+INDENT = 11
-+EOL = 12
-+
-+
-+class LexerError(Exception):
-+    pass
-+
-+
-+class ParseError(Exception):
-+    pass
-+
-+
-+class NinjaParserEvents(object):
-+    def __init__(self, parser):
-+        self.parser = parser
-+
-+    def literal_token(self, word, in_path=False):
-+        word = word.replace('$', '$$')
-+        if in_path:
-+            word = word.replace(' ', '$ ').replace(':', '$:')
-+        return word
-+
-+    def variable_expansion_token(self, varname):
-+        return '${%s}' % varname
-+
-+    def tokens_to_arg(self, tokens):
-+        return ''.join(tokens or [])
-+
-+    def variable(self, name, arg):
-+        pass
-+
-+    def begin_file(self):
-+        pass
-+
-+    def end_file(self):
-+        pass
-+
-+    def end_scope(self):
-+        pass
-+
-+    def begin_pool(self, name):
-+        pass
-+
-+    def begin_rule(self, name):
-+        pass
-+
-+    def begin_build(self, out, iout, rule, in_, iin, orderdep):
-+        pass
-+
-+    def default(self, targets):
-+        pass
-+
-+
-+class NinjaParser(object):
-+    PATH_RE = r"[^$\s:|]+|\$[$ :]|\$[a-zA-Z0-9_-]+|\$\{[a-zA-Z0-9_.-]+\}"
-+    STRING_RE = r"(" + PATH_RE + r"|[\s:|])(?:\r?\n)?"
-+    TOPLEVEL_RE = r"([=:#]|\|\|?|^ +|(?:" + PATH_RE + r")+)\s*"
-+    IDENT_RE = r"[a-zA-Z0-9_.-]+$"
-+
-+    InputFile = namedtuple('InputFile', 'filename iter lineno')
-+
-+    def __init__(self, filename, input):
-+        self.stack = []
-+        self.lineno = None
-+        self.match_keyword = True
-+        self.push(filename, input)
-+
-+    def __iter__(self):
-+        return self
-+
-+    def __next__(self):
-+        while len(self.stack):
-+            try:
-+                return next(self.stack[-1].iter)
-+            except StopIteration:
-+                self.pop()
-+        raise StopIteration
-+
-+    def push(self, filename, input):
-+        entered = self.InputFile(filename=filename or 'stdin',
-+                                 iter=self._tokens(input),
-+                                 lineno=self.lineno)
-+        self.stack.append(entered)
-+        self.lineno = 0
-+        if filename is not None:
-+            os.chdir(os.path.dirname(filename) or '.')
-+
-+    def pop(self):
-+        left = self.stack.pop()
-+        self.lineno = left.lineno
-+        if len(self.stack):
-+            os.chdir(os.path.dirname(self.stack[-1].filename) or '.')
-+
-+    def next_line(self, input):
-+        line = next(input).rstrip()
-+        self.lineno += 1
-+        while len(line) and line[-1] == '$':
-+            line = line[0:-1] + next(input).strip()
-+            self.lineno += 1
-+        return line
-+
-+    def print_token(self, tok):
-+        if tok == EOL:
-+            return "end of line"
-+        if tok == BUILD:
-+            return '"build"'
-+        if tok == POOL:
-+            return '"pool"'
-+        if tok == RULE:
-+            return '"rule"'
-+        if tok == DEFAULT:
-+            return '"default"'
-+        if tok == EQUALS:
-+            return '"="'
-+        if tok == COLON:
-+            return '":"'
-+        if tok == PIPE:
-+            return '"|"'
-+        if tok == PIPE2:
-+            return '"||"'
-+        if tok == INCLUDE:
-+            return '"include"'
-+        if tok == IDENT:
-+            return 'identifier'
-+        return '"%s"' % tok
-+
-+    def error(self, msg):
-+        raise LexerError("%s:%d: %s" % (self.stack[-1].filename, self.lineno, msg))
-+
-+    def parse_error(self, msg):
-+        raise ParseError("%s:%d: %s" % (self.stack[-1].filename, self.lineno, msg))
-+
-+    def expected(self, expected, tok):
-+        msg = "found %s, expected " % (self.print_token(tok), )
-+        for i, exp_tok in enumerate(expected):
-+            if i > 0:
-+                msg = msg + (' or ' if i == len(expected) - 1 else ', ')
-+            msg = msg + self.print_token(exp_tok)
-+        self.parse_error(msg)
-+
-+    def find_tokens(self, regex, line):
-+        # group 1 is used to distinguish expected input from bad characters
-+        # group 2, which is really group 1 in regex, is returned
-+        for m in re.finditer("(" + regex + ")|.", line):
-+            if not m.group(1):
-+                self.error("unexpected '%s'" % (m.group(0), ))
-+            if m.group(2):
-+                yield m.span(), m.group(2)
-+
-+    def _variable_tokens(self, value):
-+        for span, match in self.find_tokens(self.STRING_RE, value):
-+            yield match
-+
-+    def _tokens(self, input):
-+        while True:
-+            try:
-+                line = self.next_line(input)
-+            except StopIteration:
-+                return
-+            for span, match in self.find_tokens(self.TOPLEVEL_RE, line):
-+                if match == ':':
-+                    yield COLON
-+                    continue
-+                if match == '|':
-+                    yield PIPE
-+                    continue
-+                if match == '||':
-+                    yield PIPE2
-+                    continue
-+                if match[0] == ' ':
-+                    yield INDENT
-+                    continue
-+                if match[0] == '=':
-+                    value = line[span[0] + 1:].lstrip()
-+                    yield EQUALS
-+                    yield from self._variable_tokens(value)
-+                    break
-+                if match[0] == '#':
-+                    break
-+
-+                # identifier
-+                if self.match_keyword:
-+                    if match == 'build':
-+                        yield BUILD
-+                        continue
-+                    if match == 'pool':
-+                        yield POOL
-+                        continue
-+                    if match == 'rule':
-+                        yield RULE
-+                        continue
-+                    if match == 'default':
-+                        yield DEFAULT
-+                        continue
-+                    if match == 'include':
-+                        filename = line[span[0] + 8:].strip()
-+                        self.push(filename, open(filename, 'r'))
-+                        break
-+                    if match == 'subninja':
-+                        self.error('subninja is not supported')
-+                yield match
-+            yield EOL
-+
-+    def read_ident(self):
-+        """Read an identifier, where the only allowed characters are
-+           letter, numbers, dash, period and underscore."""
-+        self.match_keyword = False
-+        token = self.__next__()
-+        self.match_keyword = True
-+        if isinstance(token, str) and not re.match(self.IDENT_RE, token):
-+            self.parse_error('variable expansion not allowed')
-+        return token
-+
-+    def read_path(self):
-+        """Read a space-delimited path or a non-alphanumeric token, and
-+           return a generator that produces either the token alone, or
-+           the components of the path (identifiers and variable expansions)."""
-+        self.match_keyword = False
-+        token = self.__next__()
-+        self.match_keyword = True
-+        if isinstance(token, str):
-+            yield from self._variable_tokens(token)
-+        else:
-+            yield token
-+
-+    def parse(self, events):
-+        global_var = True
-+
-+        def advance():
-+            try:
-+                return next(self)
-+            except StopIteration:
-+                return None
-+
-+        def look_for(*expected):
-+            tok = advance()
-+            if tok in expected:
-+                return tok
-+            self.expected(expected, tok)
-+
-+        def look_for_ident(*expected):
-+            try:
-+                tok = self.read_ident()
-+            except StopIteration:
-+                tok = None
-+            if isinstance(tok, str) or tok in expected:
-+                return tok
-+            self.expected(expected + (IDENT,), tok)
-+
-+        def parse_assignment_rhs(gen, expected, in_path):
-+            value = []
-+            for tok in gen:
-+                if not isinstance(tok, str):
-+                    if tok in expected:
-+                        break
-+                    self.expected(expected + (IDENT,), tok)
-+                if tok[0] != '$':
-+                    value.append(events.literal_token(tok, in_path))
-+                elif tok == '$ ' or tok == '$$' or tok == '$:':
-+                    value.append(events.literal_token(tok[1], in_path))
-+                else:
-+                    var = tok[2:-1] if tok[1] == '{' else tok[1:]
-+                    value.append(events.variable_expansion_token(var))
-+            else:
-+                # gen must have raised StopIteration, return None
-+                # for consistency with advance()
-+                tok = None
-+            value = value if len(value) else None
-+            return value, tok
-+
-+        def look_for_path(*expected):
-+            # paths in build rules are parsed one space-separated token
-+            # at a time and expanded
-+            gen = self.read_path()
-+            value, tok = parse_assignment_rhs(gen, expected, True)
-+            return value, tok
-+
-+        def parse_assignment(tok):
-+            assert isinstance(tok, str)
-+            look_for(EQUALS)
-+            name = tok
-+            value, tok = parse_assignment_rhs(self, (EOL,), False)
-+            assert tok == EOL
-+            events.variable(name, events.tokens_to_arg(value))
-+
-+        def parse_build():
-+            # parse outputs
-+            out = []
-+            iout = []
-+            while True:
-+                value, tok = look_for_path(COLON, PIPE)
-+                if value is None:
-+                    break
-+                out.append(events.tokens_to_arg(value))
-+            if tok == PIPE:
-+                while True:
-+                    value, tok = look_for_path(COLON)
-+                    if value is None:
-+                        break
-+                    iout.append(events.tokens_to_arg(value))
-+
-+            # parse rule
-+            assert tok == COLON
-+            rule = look_for_ident()
-+
-+            # parse inputs and dependencies
-+            in_ = []
-+            iin = []
-+            orderdep = []
-+            while True:
-+                value, tok = look_for_path(PIPE, PIPE2, EOL)
-+                if value is None:
-+                    break
-+                in_.append(events.tokens_to_arg(value))
-+            if tok == PIPE:
-+                while True:
-+                    value, tok = look_for_path(PIPE2, EOL)
-+                    if value is None:
-+                        break
-+                    iin.append(events.tokens_to_arg(value))
-+            if tok == PIPE2:
-+                while True:
-+                    value, tok = look_for_path(EOL)
-+                    if value is None:
-+                        break
-+                    orderdep.append(events.tokens_to_arg(value))
-+            assert tok == EOL
-+            events.begin_build(out, iout, rule, in_, iin, orderdep)
-+            nonlocal global_var
-+            global_var = False
-+
-+        def parse_pool():
-+            # pool declarations are ignored.  Just gobble all the variables
-+            ident = look_for_ident()
-+            look_for(EOL)
-+            events.begin_pool(ident)
-+            nonlocal global_var
-+            global_var = False
-+
-+        def parse_rule():
-+            ident = look_for_ident()
-+            look_for(EOL)
-+            events.begin_rule(ident)
-+            nonlocal global_var
-+            global_var = False
-+
-+        def parse_default():
-+            idents = []
-+            while True:
-+                ident = look_for_ident(EOL)
-+                if ident == EOL:
-+                    break
-+                idents.append(ident)
-+            events.default(idents)
-+
-+        def parse_declaration(tok):
-+            if tok == EOL:
-+                return
-+
-+            nonlocal global_var
-+            if tok == INDENT:
-+                if global_var:
-+                    self.parse_error('indented line outside rule or edge')
-+                tok = look_for_ident(EOL)
-+                if tok == EOL:
-+                    return
-+                parse_assignment(tok)
-+                return
-+
-+            if not global_var:
-+                events.end_scope()
-+                global_var = True
-+            if not tok:
-+                return
-+            if tok == POOL:
-+                parse_pool()
-+            elif tok == BUILD:
-+                parse_build()
-+            elif tok == RULE:
-+                parse_rule()
-+            elif tok == DEFAULT:
-+                parse_default()
-+            elif isinstance(tok, str):
-+                parse_assignment(tok)
-+            else:
-+                self.expected((POOL, BUILD, RULE, INCLUDE, DEFAULT, IDENT), tok)
-+
-+        events.begin_file()
-+        while True:
-+            tok = advance()
-+            parse_declaration(tok)
-+            if not tok:
-+                break
-+        events.end_file()
-+
-+
-+# ---- variable handling ----
-+
-+def expand(x, rule_vars=None, build_vars=None, global_vars=None):
-+    if x is None:
-+        return None
-+    changed = True
-+    while changed:
-+        changed = False
-+        matches = list(re.finditer(r'\$\$|\$\{([^}]*)\}', x))
-+        if not matches:
-+            break
-+
-+        # Reverse the match so that expanding later matches does not
-+        # invalidate m.span() for earlier ones.  Do not reduce $$ to $
-+        # until all variables are dealt with.
-+        matches.reverse()
-+        for m in matches:
-+            if not m.group(1):
-+                continue
-+            changed = True
-+            name = m.group(1)
-+            if build_vars and name in build_vars:
-+                value = build_vars[name]
-+            elif rule_vars and name in rule_vars:
-+                value = rule_vars[name]
-+            elif name in global_vars:
-+                value = global_vars[name]
-+            else:
-+                value = ''
-+            start, end = m.span()
-+            x = x[:start] + value + x[end:]
-+    return x.replace('$$', '$')
-+
-+
-+class Scope(object):
-+    def __init__(self, events):
-+        self.events = events
-+
-+    def on_left_scope(self):
-+        pass
-+
-+    def on_variable(self, key, value):
-+        pass
-+
-+
-+class BuildScope(Scope):
-+    def __init__(self, events, out, iout, rule, in_, iin, orderdep, rule_vars):
-+        super().__init__(events)
-+        self.rule = rule
-+        self.out = [events.expand_and_normalize(x) for x in out]
-+        self.in_ = [events.expand_and_normalize(x) for x in in_]
-+        self.iin = [events.expand_and_normalize(x) for x in iin]
-+        self.orderdep = [events.expand_and_normalize(x) for x in orderdep]
-+        self.iout = [events.expand_and_normalize(x) for x in iout]
-+        self.rule_vars = rule_vars
-+        self.build_vars = dict()
-+        self._define_variable('out', ' '.join(self.out))
-+        self._define_variable('in', ' '.join(self.in_))
-+
-+    def expand(self, x):
-+        return self.events.expand(x, self.rule_vars, self.build_vars)
-+
-+    def on_left_scope(self):
-+        self.events.variable('out', self.build_vars['out'])
-+        self.events.variable('in', self.build_vars['in'])
-+        self.events.end_build(self, self.out, self.iout, self.rule, self.in_,
-+                              self.iin, self.orderdep)
-+
-+    def _define_variable(self, key, value):
-+        # The value has been expanded already, quote it for further
-+        # expansion from rule variables
-+        value = value.replace('$', '$$')
-+        self.build_vars[key] = value
-+
-+    def on_variable(self, key, value):
-+        # in and out are at the top of the lookup order and cannot
-+        # be overridden.  Also, unlike what the manual says, build
-+        # variables only lookup global variables.  They never lookup
-+        # rule variables, earlier build variables, or in/out.
-+        if key not in ('in', 'out'):
-+            self._define_variable(key, self.events.expand(value))
-+
-+
-+class RuleScope(Scope):
-+    def __init__(self, events, name, vars_dict):
-+        super().__init__(events)
-+        self.name = name
-+        self.vars_dict = vars_dict
-+        self.generator = False
-+
-+    def on_left_scope(self):
-+        self.events.end_rule(self, self.name)
-+
-+    def on_variable(self, key, value):
-+        self.vars_dict[key] = value
-+        if key == 'generator':
-+            self.generator = True
-+
-+
-+class NinjaParserEventsWithVars(NinjaParserEvents):
-+    def __init__(self, parser):
-+        super().__init__(parser)
-+        self.rule_vars = defaultdict(lambda: dict())
-+        self.global_vars = dict()
-+        self.scope = None
-+
-+    def variable(self, name, value):
-+        if self.scope:
-+            self.scope.on_variable(name, value)
-+        else:
-+            self.global_vars[name] = self.expand(value)
-+
-+    def begin_build(self, out, iout, rule, in_, iin, orderdep):
-+        if rule != 'phony' and rule not in self.rule_vars:
-+            self.parser.parse_error("undefined rule '%s'" % rule)
-+
-+        self.scope = BuildScope(self, out, iout, rule, in_, iin, orderdep, self.rule_vars[rule])
-+
-+    def begin_pool(self, name):
-+        # pool declarations are ignored.  Just gobble all the variables
-+        self.scope = Scope(self)
-+
-+    def begin_rule(self, name):
-+        if name in self.rule_vars:
-+            self.parser.parse_error("duplicate rule '%s'" % name)
-+        self.scope = RuleScope(self, name, self.rule_vars[name])
-+
-+    def end_scope(self):
-+        self.scope.on_left_scope()
-+        self.scope = None
-+
-+    # utility functions:
-+
-+    def expand(self, x, rule_vars=None, build_vars=None):
-+        return expand(x, rule_vars, build_vars, self.global_vars)
-+
-+    def expand_and_normalize(self, x):
-+        return os.path.normpath(self.expand(x))
-+
-+    # extra events not present in the superclass:
-+
-+    def end_build(self, scope, out, iout, rule, in_, iin, orderdep):
-+        pass
-+
-+    def end_rule(self, scope, name):
-+        pass
-+
-+
-+# ---- test client that just prints back whatever it parsed  ----
-+
-+class Writer(NinjaParserEvents):
-+    ARGS = argparse.ArgumentParser(description='Rewrite input build.ninja to stdout.')
-+
-+    def __init__(self, output, parser, args):
-+        super().__init__(parser)
-+        self.output = output
-+        self.indent = ''
-+        self.had_vars = False
-+
-+    def print(self, *args, **kwargs):
-+        if len(args):
-+            self.output.write(self.indent)
-+        print(*args, **kwargs, file=self.output)
-+
-+    def variable(self, name, value):
-+        self.print('%s = %s' % (name, value))
-+        self.had_vars = True
-+
-+    def begin_scope(self):
-+        self.indent = '  '
-+        self.had_vars = False
-+
-+    def end_scope(self):
-+        if self.had_vars:
-+            self.print()
-+        self.indent = ''
-+        self.had_vars = False
-+
-+    def begin_pool(self, name):
-+        self.print('pool %s' % name)
-+        self.begin_scope()
-+
-+    def begin_rule(self, name):
-+        self.print('rule %s' % name)
-+        self.begin_scope()
-+
-+    def begin_build(self, outputs, implicit_outputs, rule, inputs, implicit, order_only):
-+        all_outputs = list(outputs)
-+        all_inputs = list(inputs)
-+
-+        if implicit:
-+            all_inputs.append('|')
-+            all_inputs.extend(implicit)
-+        if order_only:
-+            all_inputs.append('||')
-+            all_inputs.extend(order_only)
-+        if implicit_outputs:
-+            all_outputs.append('|')
-+            all_outputs.extend(implicit_outputs)
-+
-+        self.print('build %s: %s' % (' '.join(all_outputs),
-+                                     ' '.join([rule] + all_inputs)))
-+        self.begin_scope()
-+
-+    def default(self, targets):
-+        self.print('default %s' % ' '.join(targets))
-+
-+
-+# ---- emit compile_commands.json ----
-+
-+class Compdb(NinjaParserEventsWithVars):
-+    ARGS = argparse.ArgumentParser(description='Emit compile_commands.json.')
-+    ARGS.add_argument('rules', nargs='*',
-+                      help='The ninja rules to emit compilation commands for.')
-+
-+    def __init__(self, output, parser, args):
-+        super().__init__(parser)
-+        self.output = output
-+        self.rules = args.rules
-+        self.sep = ''
-+
-+    def begin_file(self):
-+        self.output.write('[')
-+        self.directory = os.getcwd()
-+
-+    def print_entry(self, **entry):
-+        entry['directory'] = self.directory
-+        self.output.write(self.sep + json.dumps(entry))
-+        self.sep = ',\n'
-+
-+    def begin_build(self, out, iout, rule, in_, iin, orderdep):
-+        if in_ and rule in self.rules:
-+            super().begin_build(out, iout, rule, in_, iin, orderdep)
-+        else:
-+            self.scope = Scope(self)
-+
-+    def end_build(self, scope, out, iout, rule, in_, iin, orderdep):
-+        self.print_entry(command=scope.expand('${command}'), file=in_[0])
-+
-+    def end_file(self):
-+        self.output.write(']\n')
-+
-+
-+# ---- clean output files ----
-+
-+class Clean(NinjaParserEventsWithVars):
-+    ARGS = argparse.ArgumentParser(description='Remove output build files.')
-+    ARGS.add_argument('-g', dest='generator', action='store_true',
-+                      help='clean generated files too')
-+
-+    def __init__(self, output, parser, args):
-+        super().__init__(parser)
-+        self.dry_run = args.dry_run
-+        self.verbose = args.verbose or args.dry_run
-+        self.generator = args.generator
-+
-+    def begin_file(self):
-+        print('Cleaning... ', end=(None if self.verbose else ''), flush=True)
-+        self.cnt = 0
-+
-+    def end_file(self):
-+        print('%d files' % self.cnt)
-+
-+    def do_clean(self, *files):
-+        for f in files:
-+            if self.dry_run:
-+                if os.path.exists(f):
-+                    self.cnt += 1
-+                    print('Would remove ' + f)
-+                    continue
-+            else:
-+                try:
-+                    os.unlink(f)
-+                    self.cnt += 1
-+                    if self.verbose:
-+                        print('Removed ' + f)
-+                except FileNotFoundError:
-+                    pass
-+
-+    def end_build(self, scope, out, iout, rule, in_, iin, orderdep):
-+        if not self.generator and scope.expand('${generator}'):
-+            return
-+        if rule == 'phony':
-+            return
-+        self.do_clean(*out, *iout)
-+        depfile = scope.expand('${depfile}')
-+        if depfile:
-+            self.do_clean(depfile)
-+
-+
-+# ---- convert build.ninja to makefile ----
-+
-+class Ninja2Make(NinjaParserEventsWithVars):
-+    ARGS = argparse.ArgumentParser(description='Convert build.ninja to a Makefile.')
-+    ARGS.add_argument('--clean', dest='emit_clean', action='store_true',
-+                      help='Emit clean/distclean rules.')
-+    ARGS.add_argument('--doublecolon', action='store_true',
-+                      help='Emit double-colon rules for phony targets.')
-+    ARGS.add_argument('--omit', metavar='TARGET', nargs='+',
-+                      help='Targets to omit.')
-+
-+    def __init__(self, output, parser, args):
-+        super().__init__(parser)
-+        self.output = output
-+
-+        self.emit_clean = args.emit_clean
-+        self.doublecolon = args.doublecolon
-+        self.omit = set(args.omit)
-+
-+        if self.emit_clean:
-+            self.omit.update(['clean', 'distclean'])
-+
-+        # Lists of targets are kept in memory and emitted only at the
-+        # end because appending is really inefficient in GNU make.
-+        # We only do it when it's O(#rules) or O(#variables), but
-+        # never when it could be O(#targets).
-+        self.depfiles = list()
-+        self.build_vars = defaultdict(lambda: dict())
-+        self.rule_targets = defaultdict(lambda: list())
-+        self.all_outs = set()
-+        self.all_ins = set()
-+        self.all_phony = set()
-+        self.seen_default = False
-+
-+    def print(self, *args, **kwargs):
-+        print(*args, **kwargs, file=self.output)
-+
-+    def literal_token(self, word, in_path=False):
-+        if in_path and ' ' in word:
-+            self.parser.parse_error('Make does not support spaces in filenames')
-+        return word.replace('$', '$$')
-+
-+    def print_phony(self, outs, ins):
-+        targets = ' '.join(outs).replace('$', '$$')
-+        deps = ' '.join(ins).replace('$', '$$')
-+        deps = deps.strip()
-+        if self.doublecolon:
-+            self.print(targets + '::' + (' ' if deps else '') + deps + ';@:')
-+        else:
-+            self.print(targets + ':' + (' ' if deps else '') + deps)
-+        self.all_phony.update(outs)
-+
-+    def begin_file(self):
-+        self.print(r'# This is an automatically generated file, and it shows.')
-+        self.print(r'ninja-default:')
-+        self.print(r'.PHONY: ninja-default')
-+        if self.emit_clean:
-+            self.print(r'ninja-clean:: ninja-clean-start; $(if $V,,@)rm -f ${ninja-depfiles}')
-+            self.print(r'ninja-clean-start:; $(if $V,,@echo Cleaning...)')
-+            self.print(r'ninja-distclean:: clean')
-+            self.print(r'.PHONY: ninja-clean ninja-clean-start ninja-distclean')
-+            self.print_phony(['clean'], ['ninja-clean'])
-+            self.print_phony(['distclean'], ['ninja-distclean'])
-+        self.print(r'vpath')
-+        self.print(r'NULL :=')
-+        self.print(r'SPACE := ${NULL} #')
-+        self.print(r'MAKEFLAGS += -rR')
-+        self.print(r'define NEWLINE')
-+        self.print(r'')
-+        self.print(r'endef')
-+        self.print(r'.var.in_newline = $(subst $(SPACE),$(NEWLINE),${.var.in})')
-+        self.print(r"ninja-command = $(if $V,,@printf '%s\n' '$(subst ','\'',${.var.description})' && )${.var.command}")
-+
-+    def mangle_vars_for_make(self, x):
-+        matches = list(re.finditer(r'\$\$|\$\{([^}]*)\}', x))
-+
-+        # Reverse the match so that expanding later matches does not
-+        # invalidate m.span() for earlier ones.
-+        matches.reverse()
-+        for m in matches:
-+            if not m.group(1):
-+                continue
-+            value = '${.var.' + m.group(1) + '}'
-+            start, end = m.span()
-+            x = x[:start] + value + x[end:]
-+        return x
-+
-+    def end_file(self):
-+        def natural_sort_key(s, _nsre=re.compile('([0-9]+)')):
-+            return [int(text) if text.isdigit() else text.lower()
-+                    for text in _nsre.split(s)]
-+
-+        self.print()
-+        self.print('ninja-outputdirs :=')
-+        for rule in self.rule_vars:
-+            if rule == 'phony':
-+                continue
-+            self.print('ninja-targets-%s := %s' % (rule, ' '.join(self.rule_targets[rule])))
-+            for name, value in self.rule_vars[rule].items():
-+                self.print('$(ninja-targets-%s): .var.%s = %s' % (rule, name, self.mangle_vars_for_make(value)))
-+            self.print('ninja-outputdirs += $(sort $(dir ${ninja-targets-%s}))' % rule)
-+            self.print()
-+        self.print('dummy := $(shell mkdir -p . $(sort $(ninja-outputdirs)))')
-+        self.print('ninja-depfiles :=' + ' '.join(self.depfiles))
-+        self.print('-include ${ninja-depfiles}')
-+        self.print()
-+        for targets in self.build_vars:
-+            for name, value in self.build_vars[targets].items():
-+                self.print('%s: .var.%s := %s' % (targets, name, value))
-+            self.print()
-+        if not self.seen_default:
-+            default_targets = sorted(self.all_outs - self.all_ins, key=natural_sort_key)
-+            self.print('ninja-default: ' + ' '.join(default_targets))
-+
-+        # This is a hack...  Meson declares input meson.build files as
-+        # phony, because Ninja does not have an equivalent of Make's
-+        # "path/to/file:" declaration that ignores "path/to/file" even
-+        # if it is absent.  However, Makefile.ninja wants to depend on
-+        # build.ninja, which in turn depends on these phony targets which
-+        # would cause Makefile.ninja to be rebuilt in a loop.
-+        phony_targets = sorted(self.all_phony - self.all_ins, key=natural_sort_key)
-+        self.print('.PHONY: ' + ' '.join(phony_targets))
-+
-+    def variable(self, name, value):
-+        super().variable(name, value)
-+        if self.scope is None:
-+            self.global_vars[name] = self.expand(value)
-+            self.print('.var.%s := %s' % (name, self.global_vars[name]))
-+        elif isinstance(self.scope, BuildScope):
-+            # These have to be printed last, because they override rule variables
-+            # but we cannot print rule variables until we know the list of targets
-+            # for each rule.
-+            self.build_vars[self.current_targets][name] = self.scope.build_vars[name]
-+
-+    def begin_build(self, out, iout, rule, in_, iin, orderdep):
-+        if any(x in self.omit for x in out):
-+            self.scope = Scope(self)
-+            return
-+
-+        super().begin_build(out, iout, rule, in_, iin, orderdep)
-+        self.rule_targets[rule] += self.scope.out
-+        self.rule_targets[rule] += self.scope.iout
-+
-+        self.all_outs.update(self.scope.iout)
-+        self.all_outs.update(self.scope.out)
-+        self.all_ins.update(self.scope.in_)
-+        self.all_ins.update(self.scope.iin)
-+
-+        if rule == 'phony':
-+            # Phony rules treat order-only dependencies as normal deps
-+            self.print_phony(self.scope.out + self.scope.iout,
-+                             self.scope.in_ + self.scope.iin + self.scope.orderdep)
-+            self.scope = Scope(self)
-+            return
-+
-+        targets = ' '.join(self.scope.out + self.scope.iout).replace('$', '$$')
-+        inputs = ' '.join(self.scope.in_ + self.scope.iin).replace('$', '$$')
-+        orderonly = ' '.join(self.scope.orderdep).replace('$', '$$')
-+        self.print('%s: %s | %s; ${ninja-command}' % (targets, inputs, orderonly))
-+        self.current_targets = targets
-+
-+    def end_build(self, scope, out, iout, rule, in_, iin, orderdep):
-+        depfile = scope.expand('${depfile}')
-+        if depfile:
-+            self.depfiles.append(depfile)
-+        self.current_targets = None
-+
-+    def end_rule(self, scope, name):
-+        if self.emit_clean:
-+            self.print('ninja-%s:: ; $(if $V,,@)rm -f ${ninja-targets-%s}' % (
-+                'distclean' if scope.generator else 'clean',
-+                name))
-+
-+    def default(self, targets):
-+        self.print("ninja-default: " + ' '.join(targets))
-+        self.seen_default = True
-+
-+
-+# ---- command line parsing ----
-+
-+# we cannot use subparsers because tools are chosen through the "-t"
-+# option.
-+
-+class ToolAction(argparse.Action):
-+    def __init__(self, option_strings, dest, choices, metavar='TOOL', nargs=None, **kwargs):
-+        if nargs is not None:
-+            raise ValueError("nargs not allowed")
-+        super().__init__(option_strings, dest, required=True, choices=choices,
-+                         metavar=metavar, **kwargs)
-+
-+    def __call__(self, parser, namespace, value, option_string):
-+        tool = self.choices[value]
-+        setattr(namespace, self.dest, tool)
-+        tool.ARGS.prog = '%s %s %s' % (parser.prog, option_string, value)
-+
-+
-+class ToolHelpAction(argparse.Action):
-+    def __init__(self, option_strings, dest, nargs=None, **kwargs):
-+        if nargs is not None:
-+            raise ValueError("nargs not allowed")
-+        super().__init__(option_strings, dest, nargs=0, **kwargs)
-+
-+    def __call__(self, parser, namespace, values, option_string=None):
-+        if namespace.tool:
-+            namespace.tool.ARGS.print_help()
-+        else:
-+            parser.print_help()
-+        parser.exit()
-+
-+
-+tools = {
-+    'test': Writer,
-+    'ninja2make': Ninja2Make,
-+    'compdb': Compdb,
-+    'clean': Clean,
-+}
-+
-+parser = argparse.ArgumentParser(description='Process and transform build.ninja files.',
-+                                 add_help=False)
-+parser.add_argument('-C', metavar='DIR', dest='dir', default='.',
-+                    help='change to DIR before doing anything else')
-+parser.add_argument('-f', metavar='FILE', dest='file', default='build.ninja',
-+                    help='specify input build file [default=build.ninja]')
-+parser.add_argument('-n', dest='dry_run', action='store_true',
-+                    help='do not actually do anything')
-+parser.add_argument('-v', dest='verbose', action='store_true',
-+                    help='be more verbose')
-+
-+parser.add_argument('-t', dest='tool', choices=tools, action=ToolAction,
-+                    help='choose the tool to run')
-+parser.add_argument('-h', '--help', action=ToolHelpAction,
-+                    help='show this help message and exit')
-+
-+if len(sys.argv) >= 2 and sys.argv[1] == '--version':
-+    print('1.8')
-+    sys.exit(0)
-+
-+args, tool_args = parser.parse_known_args()
-+args.tool.ARGS.parse_args(tool_args, args)
-+
-+os.chdir(args.dir)
-+with open(args.file, 'r') as f:
-+    parser = NinjaParser(args.file, f)
-+    try:
-+        events = args.tool(sys.stdout, parser, args)
-+    except InvalidArgumentError as e:
-+        parser.error(str(e))
-+    parser.parse(events)
--- 
-1.8.3.1
+On 10.07.19 03:05, John Snow wrote:
+> Just kidding, this is easier to manage with a full class instead of a
+> namedtuple.
+>=20
+> Signed-off-by: John Snow <jsnow@redhat.com>
+> ---
+>  tests/qemu-iotests/257 | 58 +++++++++++++++++++++++-------------------=
+
+>  1 file changed, 32 insertions(+), 26 deletions(-)
+>=20
+> diff --git a/tests/qemu-iotests/257 b/tests/qemu-iotests/257
+> index 75a651c7c3..f576a35a5c 100755
+> --- a/tests/qemu-iotests/257
+> +++ b/tests/qemu-iotests/257
+> @@ -19,7 +19,6 @@
+>  #
+>  # owner=3Djsnow@redhat.com
+> =20
+> -from collections import namedtuple
+>  import math
+>  import os
+> =20
+> @@ -29,10 +28,18 @@ from iotests import log, qemu_img
+>  SIZE =3D 64 * 1024 * 1024
+>  GRANULARITY =3D 64 * 1024
+> =20
+> -Pattern =3D namedtuple('Pattern', ['byte', 'offset', 'size'])
+> -def mkpattern(byte, offset, size=3DGRANULARITY):
+> -    """Constructor for Pattern() with default size"""
+> -    return Pattern(byte, offset, size)
+> +
+> +class Pattern:
+> +    def __init__(self, byte, offset, size=3DGRANULARITY):
+> +        self.byte =3D byte
+> +        self.offset =3D offset
+> +        self.size =3D size
+> +
+> +    def bits(self, granularity):
+> +        lower =3D math.floor(self.offset / granularity)
+> +        upper =3D math.floor((self.offset + self.size - 1) / granulari=
+ty)
+> +        return set(range(lower, upper + 1))
+
+By the way, this doesn=E2=80=99t work with Python2 (pre-existing in your =
+other
+series).  It complains that these are floats.
+
+Now I don=E2=80=99t know whether you care but there is the fact that the
+expressions would be shorter if they were of the form x // y instead of
+math.floor(x / y).
+
+Max
 
 
+--InwhnsRdmaarXwNvnPaPiNIpwa8eCPynk--
+
+--1obWltBLUt6XJH4OekukPBmTKzpKZDYBC
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0mEaYACgkQ9AfbAGHV
+z0A/tQgAmbscMDXXA4+Gc7xM0Uvi54OamLQ87a6XVGp14t+8sSvKI/lE/SnNuEyC
+xiXziKf+rYkgRNBYUgyqJXtoI9DFdMzZRg2tyDuCaZhssSzIyLJhjCNHqqshCNT5
+PxqZtzr0Z+331ognIdJE2SYu888W0cwd+TUteSwuSGCMu6/kY02D/Tb61fDQyoBt
+hMU975Rcn0yZCSfKljPC0iXH6u7J498MBdjizy0IwO3IFHp2e1aLvoiHy5J/oW62
+DpQaLPIS2lmui58ZtTdWnlwibur/dGaeBPvp6Sq+Q0ISripViKUGB7fCr4yMe/g3
+0GEc7d7xC5QwSJLeEW5MjAkk7aWQqw==
+=w65F
+-----END PGP SIGNATURE-----
+
+--1obWltBLUt6XJH4OekukPBmTKzpKZDYBC--
 
