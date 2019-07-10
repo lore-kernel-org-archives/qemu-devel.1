@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA949C74A2B
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 14:39:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 201FAC74A21
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 14:41:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A2BB920651
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 14:39:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2BB920651
+	by mail.kernel.org (Postfix) with ESMTPS id E7A0820651
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 14:41:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E7A0820651
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34174 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34194 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlDl1-00012G-7N
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jul 2019 10:39:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52594)
+	id 1hlDmg-0002Tp-8T
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jul 2019 10:41:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53009)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hlDkA-0000Nf-TA
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 10:38:51 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hlDkn-0001Db-Oe
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 10:39:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hlDk9-0002LF-R3
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 10:38:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47206)
+ (envelope-from <mreitz@redhat.com>) id 1hlDkl-0003Mp-U8
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 10:39:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43524)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hlDk7-0001o0-Cm; Wed, 10 Jul 2019 10:38:47 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ id 1hlDkg-0003DK-R1; Wed, 10 Jul 2019 10:39:23 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 42618307CDF2;
- Wed, 10 Jul 2019 14:38:29 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id E98AB5945B;
+ Wed, 10 Jul 2019 14:39:20 +0000 (UTC)
 Received: from dresden.str.redhat.com (unknown [10.40.205.108])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 941BD60603;
- Wed, 10 Jul 2019 14:38:21 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 568D45FC01;
+ Wed, 10 Jul 2019 14:39:12 +0000 (UTC)
 To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
 References: <20190709232550.10724-1-jsnow@redhat.com>
- <20190709232550.10724-10-jsnow@redhat.com>
+ <20190709232550.10724-12-jsnow@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
@@ -70,22 +70,22 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <1062f3f5-0812-d97a-4284-f3e715883b97@redhat.com>
-Date: Wed, 10 Jul 2019 16:38:14 +0200
+Message-ID: <2cafab94-809d-f8b8-00b9-f49b66c13d89@redhat.com>
+Date: Wed, 10 Jul 2019 16:39:10 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190709232550.10724-10-jsnow@redhat.com>
+In-Reply-To: <20190709232550.10724-12-jsnow@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="CpgVB4POqjis08r4fs8bHtOWM8oIHmKNX"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+ boundary="1TiWomSxOBeCCb82BlaL9WckcHGiUfcdM"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Wed, 10 Jul 2019 14:38:29 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.39]); Wed, 10 Jul 2019 14:39:21 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v4 09/18] block/dirty-bitmap: add
- bdrv_dirty_bitmap_merge_internal
+Subject: Re: [Qemu-devel] [PATCH v4 11/18] block/backup: upgrade copy_bitmap
+ to BdrvDirtyBitmap
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,8 +108,8 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---CpgVB4POqjis08r4fs8bHtOWM8oIHmKNX
-Content-Type: multipart/mixed; boundary="Zyx7m0kGpXHA4TfxMbwgGBcUILiet14d7";
+--1TiWomSxOBeCCb82BlaL9WckcHGiUfcdM
+Content-Type: multipart/mixed; boundary="6fpdsJajWepwEYeGgWqeQhmGK6Ca6dNKq";
  protected-headers="v1"
 From: Max Reitz <mreitz@redhat.com>
 To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
@@ -119,57 +119,50 @@ Cc: Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
  <quintela@redhat.com>, Fam Zheng <fam@euphon.net>,
  "Dr. David Alan Gilbert" <dgilbert@redhat.com>, vsementsov@virtuozzo.com,
  Markus Armbruster <armbru@redhat.com>, Wen Congyang <wencongyang2@huawei.com>
-Message-ID: <1062f3f5-0812-d97a-4284-f3e715883b97@redhat.com>
-Subject: Re: [PATCH v4 09/18] block/dirty-bitmap: add
- bdrv_dirty_bitmap_merge_internal
+Message-ID: <2cafab94-809d-f8b8-00b9-f49b66c13d89@redhat.com>
+Subject: Re: [PATCH v4 11/18] block/backup: upgrade copy_bitmap to
+ BdrvDirtyBitmap
 References: <20190709232550.10724-1-jsnow@redhat.com>
- <20190709232550.10724-10-jsnow@redhat.com>
-In-Reply-To: <20190709232550.10724-10-jsnow@redhat.com>
+ <20190709232550.10724-12-jsnow@redhat.com>
+In-Reply-To: <20190709232550.10724-12-jsnow@redhat.com>
 
---Zyx7m0kGpXHA4TfxMbwgGBcUILiet14d7
+--6fpdsJajWepwEYeGgWqeQhmGK6Ca6dNKq
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
 On 10.07.19 01:25, John Snow wrote:
-> I'm surprised it didn't come up sooner, but sometimes we have a +busy
-> bitmap as a source. This is dangerous from the QMP API, but if we are
-> the owner that marked the bitmap busy, it's safe to merge it using it a=
-s
-> a read only source.
->=20
-> It is not safe in the general case to allow users to read from in-use
-> bitmaps, so create an internal variant that foregoes the safety
-> checking.
+> This simplifies some interface matters; namely the initialization and
+> (later) merging the manifest back into the sync_bitmap if it was
+> provided.
 >=20
 > Signed-off-by: John Snow <jsnow@redhat.com>
 > ---
->  block/dirty-bitmap.c      | 54 +++++++++++++++++++++++++++++++++++----=
+>  block/backup.c | 81 ++++++++++++++++++++++++++------------------------=
 
->  include/block/block_int.h |  3 +++
->  2 files changed, 52 insertions(+), 5 deletions(-)
+>  1 file changed, 42 insertions(+), 39 deletions(-)
 
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 
---Zyx7m0kGpXHA4TfxMbwgGBcUILiet14d7--
+--6fpdsJajWepwEYeGgWqeQhmGK6Ca6dNKq--
 
---CpgVB4POqjis08r4fs8bHtOWM8oIHmKNX
+--1TiWomSxOBeCCb82BlaL9WckcHGiUfcdM
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0l+FYACgkQ9AfbAGHV
-z0CevQf/TMRHbb9IRC768qEqSgeqF7+bW51jCrbdCuT4pm+b401fRZTyuemHK15w
-A8lQ4l2HHftcPwPRVclcI/0uRvyI8KH9jSZXXz12UuHB8MgEDBnjOMssFLwm68G3
-tH9u0+dWFACwefFIPjYi65by9RmHloq9RBuw1fnZAdj+7jD11dxs1xs1dBOBIArm
-qwmwys56vlAJLZTIMspDpX2pTdZn/peBG8d4ivGhHJqTLeLfNy/9uNHVgP1hAeuR
-ln1bH5YN4H+iCkIQuJFzr204pSW+SzdX8m2opIzvovfrj4uEREXqMg9gijy4gwv9
-1KkIk5VFGNj4aUazAGUyskN29S3vxQ==
-=c9dO
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0l+I4ACgkQ9AfbAGHV
+z0CLxQf/Up9Id3+R4jjnN3zBrJXcSHVA40LQlYkBKJVJcgkdRJrBiipkOQdjXbbt
+z6TwzUwShJGIw/HUlGafhiI0VGqLmQW4KP9NIiZNrWyzBpzDp+qWsLTSHbkd2llY
+Lka6EB0ADvX6wQlOHsx5hdt2mT4PU5L2AaGh5QcDw2/KG6afGgOagv+KlOWCD5o3
+HLl/26UVG1g8zt8SBEizgSCHznQ1SulRdo5I2auV/EC3L1sDyHNfw9u1wWHiMubF
+wlAfeKlHH8M3Qnsdp/EOdmHNL/nMbSJgNnWyoYJLPJy4wBWmFn1etkbme1KCeitv
+dKavsIIopAe0u/pheg6/Y6uDbbUi5w==
+=kFwa
 -----END PGP SIGNATURE-----
 
---CpgVB4POqjis08r4fs8bHtOWM8oIHmKNX--
+--1TiWomSxOBeCCb82BlaL9WckcHGiUfcdM--
 
