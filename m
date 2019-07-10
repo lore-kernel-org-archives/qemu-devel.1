@@ -2,81 +2,89 @@ Return-Path: <SRS0=axyf=VH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2E09C73C7C
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 10:43:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26BB9C004EF
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 10:44:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BEF9E20861
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 10:43:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BEF9E20861
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E32BF2084B
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 10:44:07 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="egvSQ/Tj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E32BF2084B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59880 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59882 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlA4c-0002mN-Tq
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jul 2019 06:43:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48347)
+	id 1hlA51-0003iJ-9W
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jul 2019 06:44:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49016)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hlA2Q-0001dP-G8
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 06:41:27 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hlA43-0002kL-L4
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 06:43:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hlA2P-0001mG-1n
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 06:41:26 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:40151)
+ (envelope-from <alex.bennee@linaro.org>) id 1hlA3r-0003hP-3d
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 06:43:00 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:38467)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hlA2O-0001kk-3X
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 06:41:24 -0400
-Received: by mail-wr1-f66.google.com with SMTP id r1so1892855wrl.7
- for <qemu-devel@nongnu.org>; Wed, 10 Jul 2019 03:41:23 -0700 (PDT)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1hlA3q-0003g7-SS
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 06:42:55 -0400
+Received: by mail-wr1-x441.google.com with SMTP id g17so1907054wrr.5
+ for <qemu-devel@nongnu.org>; Wed, 10 Jul 2019 03:42:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=sCLrU4HA9cFcMbhCjFqoPBGhIojQl55A+scyrMpFmNE=;
+ b=egvSQ/TjcJG4VJ+baqQ1N/i0X9q3euU3CdUXd+msp/C9lGC9iOCdz/MrTFSjOSpjdi
+ Wt2NMQey8i7AIanp+OuASuRayF8jTJvVmcLib2oRU4GYCaRZn3jIDFfXb9oxU6D92I6M
+ t6oy0TRhyH/nnZHRaucjdFD7B0K7eL1gTqgpHktzsRAbUmo/TncSLit+B918mXNoWzqH
+ 1im7dM5qnzmIdhUuARPGaBWaxaenI/Y3SbhPY6WW5SWoVtBtPj3tl8vPB+mcGSpKvQ5M
+ bxW8eOeKzQNsqw055yDBsezi3iqwf4jy1RrfCVFxesT95587SwTIWX/zrVFN72G3lMeN
+ qJTg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=bikpCkm7t8bGzapIgCxmtWgANhQEbQ0YH3XGd5eUdek=;
- b=tSa9fU19DVZCB9MBC35N8pwvPBhEwDjToAsXNNzNgfrDSXHPKz9JGQZdUw/fn85QxS
- kLKDv8NcpZDDlOtXQTIptcfkrE05yZZnkrLhYk0girlJw4C/m95I2QiyRJUnoJGSQIVY
- XGoq6iCVXoZAGB+HYIdyautR+wWKDbWVXPRz7q46dro7wabavyiitbBaEY3D+da7h1vW
- mw92C8gnd0YdINUkfdGJQE+hMwwZcTQkDOhGipeS9/PLd8M04EpyclvpcbClpe+Dcl5s
- /1wBoK2VpBPVhZsrt/i41NQaKDlokopi4BvJnN/TiJIIu8AD2z9gVA16cig3avT4yR4v
- oHRg==
-X-Gm-Message-State: APjAAAXzv9KfaPyLaIHPxOgOLHvH6K+ukQm+jm7PC1TcLtZfg60RSFjy
- xSfOs+iwWCkIA3X1qKZB4gdEiA==
-X-Google-Smtp-Source: APXvYqyJdSFRu81RB9HMQUu54MV0VqESbKlUFPLMJjIwGb4aDSSnggDJ3uJcjLKdgGPWECHjG7e57w==
-X-Received: by 2002:adf:eb86:: with SMTP id t6mr2360129wrn.96.1562755282632;
- Wed, 10 Jul 2019 03:41:22 -0700 (PDT)
-Received: from [10.32.224.100] (red-hat-inc.vlan560.asr1.mad1.gblx.net.
- [159.63.51.90])
- by smtp.gmail.com with ESMTPSA id b15sm2305028wrt.77.2019.07.10.03.41.21
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Wed, 10 Jul 2019 03:41:22 -0700 (PDT)
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org
-References: <20190705160421.19015-1-alex.bennee@linaro.org>
- <20190705160421.19015-3-alex.bennee@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <af417ca3-248a-d1a8-51c4-46676b6d9d4a@redhat.com>
-Date: Wed, 10 Jul 2019 12:41:20 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=sCLrU4HA9cFcMbhCjFqoPBGhIojQl55A+scyrMpFmNE=;
+ b=ZxwAgY+gsek2wPe88omA0agQuymk1pKfeTeuC52Khqmqnv8yPED7/dLO0hwsafYi/g
+ dMNLS6cQuki9prwnBbFGfXkKEcDHyA8JaLf9fxYlUDdg7uC951/ID4jA478xUthlwRF/
+ vWpGfgq769PDUhp6IDAGc3l0Dg1ufyQhWTHgJeBg9pQCr6anAgQN/Uqk0Cyqp8HbInHI
+ r93eucqKYp1IsfCKe7ELkIfj8+XfF80EIEVORnCkUsBW24iMh0/gTcfxG8PZ7nhr3zVQ
+ VPDqObuDIZuZVTtjPWoc6QuhU5h93FuRabqWwhLIUdw6wsjKP1OalurZGWaDEY/KW9Q+
+ 5Ong==
+X-Gm-Message-State: APjAAAWqw8tn9HFnMiMuOPDBFM69JCfwr3vJwtVags5MRPIPDV5mb9Bz
+ wGwQeXfcOOYwvh8Ez2a6SbYfBARxZAU=
+X-Google-Smtp-Source: APXvYqyvmipb5zDEHM7rLe/E5CjMYdxQdVa1rS8D1A+p1z60WooDDgpgcaXp8Zi6aiXz+rB20oFaXw==
+X-Received: by 2002:adf:fd03:: with SMTP id e3mr30588755wrr.338.1562755373066; 
+ Wed, 10 Jul 2019 03:42:53 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+ by smtp.gmail.com with ESMTPSA id j26sm3158172wrb.88.2019.07.10.03.42.52
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Wed, 10 Jul 2019 03:42:52 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 0D1271FF87;
+ Wed, 10 Jul 2019 11:42:52 +0100 (BST)
+References: <20190709184823.4135-1-richard.henderson@linaro.org>
+User-agent: mu4e 1.3.2; emacs 26.1
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+In-reply-to: <20190709184823.4135-1-richard.henderson@linaro.org>
+Date: Wed, 10 Jul 2019 11:42:51 +0100
+Message-ID: <87muhmdvbo.fsf@zen.linaroharston>
 MIME-Version: 1.0
-In-Reply-To: <20190705160421.19015-3-alex.bennee@linaro.org>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.221.66
-Subject: Re: [Qemu-devel] [PATCH v1 2/5] tests/tcg: fix up
- test-i386-fprem.ref generation
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::441
+Subject: Re: [Qemu-devel] [PATCH] tcg/aarch64: Fix output of extract2 opcodes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,61 +96,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-arm@nongnu.org,
- Jan Bobek <jan.bobek@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: peter.maydell@linaro.org, beata.michalska@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/5/19 6:04 PM, Alex Bennée wrote:
-> We never shipped the reference data in the source tree because it was
-> quite big (64M). As a result the only option is to generate it
 
-Can we fetch it (with hash verification) or store it compressed?
+Richard Henderson <richard.henderson@linaro.org> writes:
 
-$ du -ch pc-bios/edk2-*bz2
-1.2M    pc-bios/edk2-aarch64-code.fd.bz2
-1.2M    pc-bios/edk2-arm-code.fd.bz2
-4.0K    pc-bios/edk2-arm-vars.fd.bz2
-1.7M    pc-bios/edk2-i386-code.fd.bz2
-1.9M    pc-bios/edk2-i386-secure-code.fd.bz2
-4.0K    pc-bios/edk2-i386-vars.fd.bz2
-1.7M    pc-bios/edk2-x86_64-code.fd.bz2
-1.9M    pc-bios/edk2-x86_64-secure-code.fd.bz2
-9.3M    total
+> The aarch64 argument ordering for the operands is big-endian,
+> whereas the tcg argument ordering is little-endian.  Use REG0
+> so that we honor the rZ constraints.
+>
+> Fixes: 464c2969d5d
+> Reported-by: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
-> locally. Although we have a rule to generate the reference file we
-> missed the dependency and location changes, probably because it is
-> only run for SLOW test runs.
-> 
-> The test still fails with mostly incorrect flags and different than
-> expected NaNs. I'll leave that for the x86 experts to look at.
-> 
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Richard Henderson <rth@twiddle.net>
-> Cc: Eduardo Habkost <ehabkost@redhat.com>
-> Cc: Jan Bobek <jan.bobek@gmail.com>
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+I ran a bunch of AArch64 EXTR testcases on AArch64 and hit the code at
+least 4600 times ;-)
+
+Tested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
 > ---
->  tests/tcg/i386/Makefile.target | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/tests/tcg/i386/Makefile.target b/tests/tcg/i386/Makefile.target
-> index b4033ba3d1..d0eb7023e5 100644
-> --- a/tests/tcg/i386/Makefile.target
-> +++ b/tests/tcg/i386/Makefile.target
-> @@ -35,9 +35,9 @@ test-i386-fprem.ref: test-i386-fprem
->  	$(call quiet-command, ./$< > $@,"GENREF","generating $@")
->  
->  run-test-i386-fprem: TIMEOUT=60
-> -run-test-i386-fprem: test-i386-fprem
-> +run-test-i386-fprem: test-i386-fprem test-i386-fprem.ref
->  	$(call run-test,test-i386-fprem, $(QEMU) $<,"$< on $(TARGET_NAME)")
-> -	$(call diff-out,test-i386-fprem, $(I386_SRC)/$<.ref)
-> +	$(call diff-out,test-i386-fprem, test-i386-fprem.ref)
->  else
->  run-test-i386-fprem: test-i386-fprem
->  	$(call skip-test, $<, "SLOW")
-> 
+>  tcg/aarch64/tcg-target.inc.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/tcg/aarch64/tcg-target.inc.c b/tcg/aarch64/tcg-target.inc.c
+> index b0f8106642..0713448bf5 100644
+> --- a/tcg/aarch64/tcg-target.inc.c
+> +++ b/tcg/aarch64/tcg-target.inc.c
+> @@ -2226,7 +2226,7 @@ static void tcg_out_op(TCGContext *s, TCGOpcode opc,
+>
+>      case INDEX_op_extract2_i64:
+>      case INDEX_op_extract2_i32:
+> -        tcg_out_extr(s, ext, a0, a1, a2, args[3]);
+> +        tcg_out_extr(s, ext, a0, REG0(2), REG0(1), args[3]);
+>          break;
+>
+>      case INDEX_op_add2_i32:
+
+
+--
+Alex Benn=C3=A9e
 
