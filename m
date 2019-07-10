@@ -2,94 +2,67 @@ Return-Path: <SRS0=axyf=VH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1673AC74A36
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 20:54:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D40F8C74A36
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 20:55:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DF1F920838
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 20:54:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF1F920838
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id A7C8120844
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 20:55:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A7C8120844
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37070 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37080 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlJbr-0007en-Rv
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jul 2019 16:54:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39550)
+	id 1hlJcp-0000HV-UL
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jul 2019 16:55:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39752)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hlJb9-0007Bv-0N
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 16:53:56 -0400
+ (envelope-from <no-reply@patchew.org>) id 1hlJbt-0007qd-7r
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 16:54:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hlJb6-0007rE-Qt
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 16:53:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50732)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hlJb4-0007jK-22; Wed, 10 Jul 2019 16:53:50 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 2630E3082B44;
- Wed, 10 Jul 2019 20:53:49 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.40.205.108])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1DEF198BA;
- Wed, 10 Jul 2019 20:53:44 +0000 (UTC)
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-References: <20190710010556.32365-1-jsnow@redhat.com>
- <20190710010556.32365-7-jsnow@redhat.com>
- <24cb63cb-e19c-c4cb-fb08-c8f1d086cabf@redhat.com>
- <5b3f6dad-c438-861f-b4cf-236b3f058322@redhat.com>
- <4e9b8a92-c98d-0f19-3f8f-636dc64ca0b4@redhat.com>
- <6a3440ed-f9d2-8f84-a5a7-d9db34a79b5b@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <03822316-9e9f-b538-85f0-1404852af514@redhat.com>
-Date: Wed, 10 Jul 2019 22:53:43 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ (envelope-from <no-reply@patchew.org>) id 1hlJbr-0000Yw-2D
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 16:54:40 -0400
+Resent-Date: Wed, 10 Jul 2019 16:54:40 -0400
+Resent-Message-Id: <E1hlJbr-0000Yw-2D@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21446)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1hlJbq-0000VA-Ft
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 16:54:38 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1562792053; cv=none; d=zoho.com; s=zohoarc; 
+ b=Nensz3ZZK40Q+/fVQq6gpnOBk/8Tno6ADYudMmpr+x3w9Bgsrj0OA6IdEqQdgGfagQOFdfVfFSdTzKVrabEmEd7KMbEA4iZ3S3M1V/cuN8fhPGwAnUEhtUBEPv0VyLMAyIE5quBJ2q8or729PMGoW4f+TJTZNPq5RVTSP+geaPs=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1562792053;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+ bh=OmBYen+6PmJmKiJX9dAaTxb8QncqF53K/tFkEJtKm/0=; 
+ b=D5B5Z0wwhL2++K8+T+3LQSB47Hz4QAQmFC57P4GYT3PlJQIslykXMpiVPE0fjxFvvYJ9K4jeNK5ElzF59TAyO+9qme9+Iqs5HgpP867Dhu8IqQ+08/FuL+TOQx1HU0mt8INjHDjcbHHWuBBMpSnFhnQS08AmAsKk5sKgePnF0C4=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1562792052303420.14554292743105;
+ Wed, 10 Jul 2019 13:54:12 -0700 (PDT)
+Message-ID: <156279205106.7449.9428591736937282769@c4a48874b076>
+In-Reply-To: <20190710202219.25939-1-brijesh.singh@amd.com>
 MIME-Version: 1.0
-In-Reply-To: <6a3440ed-f9d2-8f84-a5a7-d9db34a79b5b@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="Lr2Ew4piNay6zYcqIvYuPfhNCz6p56UC4"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Wed, 10 Jul 2019 20:53:49 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: brijesh.singh@amd.com
+Date: Wed, 10 Jul 2019 13:54:12 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 6/8] block/backup: issue progress updates
- for skipped regions
+X-Received-From: 135.84.80.217
+Subject: Re: [Qemu-devel] [PATCH v2 00/13] Add SEV guest live migration
+ support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,160 +74,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: Thomas.Lendacky@amd.com, brijesh.singh@amd.com, ehabkost@redhat.com,
+ qemu-devel@nongnu.org, dgilbert@redhat.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Lr2Ew4piNay6zYcqIvYuPfhNCz6p56UC4
-Content-Type: multipart/mixed; boundary="zUupGiqpNhNHo3am9AMycR4qfgKa2KCrf";
- protected-headers="v1"
-From: Max Reitz <mreitz@redhat.com>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
- Eric Blake <eblake@redhat.com>
-Message-ID: <03822316-9e9f-b538-85f0-1404852af514@redhat.com>
-Subject: Re: [PATCH 6/8] block/backup: issue progress updates for skipped
- regions
-References: <20190710010556.32365-1-jsnow@redhat.com>
- <20190710010556.32365-7-jsnow@redhat.com>
- <24cb63cb-e19c-c4cb-fb08-c8f1d086cabf@redhat.com>
- <5b3f6dad-c438-861f-b4cf-236b3f058322@redhat.com>
- <4e9b8a92-c98d-0f19-3f8f-636dc64ca0b4@redhat.com>
- <6a3440ed-f9d2-8f84-a5a7-d9db34a79b5b@redhat.com>
-In-Reply-To: <6a3440ed-f9d2-8f84-a5a7-d9db34a79b5b@redhat.com>
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDcxMDIwMjIxOS4yNTkz
+OS0xLWJyaWplc2guc2luZ2hAYW1kLmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQgYnVp
+bGQgdGVzdCBvbiBzMzkweCBob3N0LiBQbGVhc2UgZmluZCB0aGUgZGV0YWlscyBiZWxvdy4KCj09
+PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKIyBUZXN0aW5nIHNjcmlwdCB3aWxs
+IGJlIGludm9rZWQgdW5kZXIgdGhlIGdpdCBjaGVja291dCB3aXRoCiMgSEVBRCBwb2ludGluZyB0
+byBhIGNvbW1pdCB0aGF0IGhhcyB0aGUgcGF0Y2hlcyBhcHBsaWVkIG9uIHRvcCBvZiAiYmFzZSIK
+IyBicmFuY2gKc2V0IC1lCgplY2hvCmVjaG8gIj09PSBFTlYgPT09IgplbnYKCmVjaG8KZWNobyAi
+PT09IFBBQ0tBR0VTID09PSIKcnBtIC1xYQoKZWNobwplY2hvICI9PT0gVU5BTUUgPT09Igp1bmFt
+ZSAtYQoKQ0M9JEhPTUUvYmluL2NjCklOU1RBTEw9JFBXRC9pbnN0YWxsCkJVSUxEPSRQV0QvYnVp
+bGQKbWtkaXIgLXAgJEJVSUxEICRJTlNUQUxMClNSQz0kUFdECmNkICRCVUlMRAokU1JDL2NvbmZp
+Z3VyZSAtLWNjPSRDQyAtLXByZWZpeD0kSU5TVEFMTAptYWtlIC1qNAojIFhYWDogd2UgbmVlZCBy
+ZWxpYWJsZSBjbGVhbiB1cAojIG1ha2UgY2hlY2sgLWo0IFY9MQptYWtlIGluc3RhbGwKPT09IFRF
+U1QgU0NSSVBUIEVORCA9PT0KCiAgQ0MgICAgICBhbHBoYS1zb2Z0bW11L2h3L3Njc2kvdmlydGlv
+LXNjc2ktZGF0YXBsYW5lLm8KL3Vzci9iaW4vbGQ6IHFhcGkvcWFwaS1jb21tYW5kcy1taXNjLXRh
+cmdldC5vOiBpbiBmdW5jdGlvbiBgcW1wX21hcnNoYWxfbWlncmF0ZV9zZXRfc2V2X2luZm8nOgov
+dmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtaWluam8xYmkvc3JjL2J1aWxkL3FhcGkvcWFwaS1j
+b21tYW5kcy1taXNjLXRhcmdldC5jOjM2MzogdW5kZWZpbmVkIHJlZmVyZW5jZSB0byBgcW1wX21p
+Z3JhdGVfc2V0X3Nldl9pbmZvJwpjb2xsZWN0MjogZXJyb3I6IGxkIHJldHVybmVkIDEgZXhpdCBz
+dGF0dXMKbWFrZVsxXTogKioqIFtNYWtlZmlsZToyMDg6IHFlbXUtc3lzdGVtLWNyaXNdIEVycm9y
+IDEKbWFrZTogKioqIFtNYWtlZmlsZTo0NzI6IGNyaXMtc29mdG1tdS9hbGxdIEVycm9yIDIKbWFr
+ZTogKioqIFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9icy4uLi4KLS0tCiAgQ0MgICAgICBhYXJj
+aDY0LXNvZnRtbXUvaHcvbWlzYy9iY20yODM1X21ib3gubwovdXNyL2Jpbi9sZDogcWFwaS9xYXBp
+LWNvbW1hbmRzLW1pc2MtdGFyZ2V0Lm86IGluIGZ1bmN0aW9uIGBxbXBfbWFyc2hhbF9taWdyYXRl
+X3NldF9zZXZfaW5mbyc6Ci92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC1paW5qbzFiaS9zcmMv
+YnVpbGQvcWFwaS9xYXBpLWNvbW1hbmRzLW1pc2MtdGFyZ2V0LmM6MzYzOiB1bmRlZmluZWQgcmVm
+ZXJlbmNlIHRvIGBxbXBfbWlncmF0ZV9zZXRfc2V2X2luZm8nCmNvbGxlY3QyOiBlcnJvcjogbGQg
+cmV0dXJuZWQgMSBleGl0IHN0YXR1cwptYWtlWzFdOiAqKiogW01ha2VmaWxlOjIwODogcWVtdS1z
+eXN0ZW0tYWxwaGFdIEVycm9yIDEKbWFrZTogKioqIFtNYWtlZmlsZTo0NzI6IGFscGhhLXNvZnRt
+bXUvYWxsXSBFcnJvciAyCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvbWlzYy9iY20yODM1
+X3Byb3BlcnR5Lm8KLS0tCiAgQ0MgICAgICBhcm0tc29mdG1tdS90YXJnZXQvYXJtL2RlYnVnX2hl
+bHBlci5vCi91c3IvYmluL2xkOiBxYXBpL3FhcGktY29tbWFuZHMtbWlzYy10YXJnZXQubzogaW4g
+ZnVuY3Rpb24gYHFtcF9tYXJzaGFsX21pZ3JhdGVfc2V0X3Nldl9pbmZvJzoKL3Zhci90bXAvcGF0
+Y2hldy10ZXN0ZXItdG1wLWlpbmpvMWJpL3NyYy9idWlsZC9xYXBpL3FhcGktY29tbWFuZHMtbWlz
+Yy10YXJnZXQuYzozNjM6IHVuZGVmaW5lZCByZWZlcmVuY2UgdG8gYHFtcF9taWdyYXRlX3NldF9z
+ZXZfaW5mbycKY29sbGVjdDI6IGVycm9yOiBsZCByZXR1cm5lZCAxIGV4aXQgc3RhdHVzCm1ha2Vb
+MV06ICoqKiBbTWFrZWZpbGU6MjA4OiBxZW11LXN5c3RlbS1hYXJjaDY0XSBFcnJvciAxCm1ha2U6
+ICoqKiBbTWFrZWZpbGU6NDcyOiBhYXJjaDY0LXNvZnRtbXUvYWxsXSBFcnJvciAyCiAgR0VOICAg
+ICBhcm0tc29mdG1tdS90YXJnZXQvYXJtL2RlY29kZS12ZnAuaW5jLmMKLS0tCiAgTElOSyAgICBh
+cm0tc29mdG1tdS9xZW11LXN5c3RlbS1hcm0KL3Vzci9iaW4vbGQ6IHFhcGkvcWFwaS1jb21tYW5k
+cy1taXNjLXRhcmdldC5vOiBpbiBmdW5jdGlvbiBgcW1wX21hcnNoYWxfbWlncmF0ZV9zZXRfc2V2
+X2luZm8nOgovdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtaWluam8xYmkvc3JjL2J1aWxkL3Fh
+cGkvcWFwaS1jb21tYW5kcy1taXNjLXRhcmdldC5jOjM2MzogdW5kZWZpbmVkIHJlZmVyZW5jZSB0
+byBgcW1wX21pZ3JhdGVfc2V0X3Nldl9pbmZvJwpjb2xsZWN0MjogZXJyb3I6IGxkIHJldHVybmVk
+IDEgZXhpdCBzdGF0dXMKbWFrZVsxXTogKioqIFtNYWtlZmlsZToyMDg6IHFlbXUtc3lzdGVtLWFy
+bV0gRXJyb3IgMQptYWtlOiAqKiogW01ha2VmaWxlOjQ3MjogYXJtLXNvZnRtbXUvYWxsXSBFcnJv
+ciAyCj09PSBPVVRQVVQgRU5EID09PQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0
+cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTA3MTAyMDIyMTkuMjU5MzktMS1icmlqZXNoLnNpbmdo
+QGFtZC5jb20vdGVzdGluZy5zMzkweC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVk
+IGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ug
+c2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
 
---zUupGiqpNhNHo3am9AMycR4qfgKa2KCrf
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 10.07.19 22:47, John Snow wrote:
->=20
->=20
-> On 7/10/19 4:30 PM, Max Reitz wrote:
->> On 10.07.19 20:20, John Snow wrote:
->>>
->>>
->>> On 7/10/19 12:36 PM, Max Reitz wrote:
->>>> On 10.07.19 03:05, John Snow wrote:
->>>>> The way bitmap backups work is by starting at 75% if it needs
->>>>> to copy just 25% of the disk.
->>>>
->>>> Although there is this comment:
->>>>
->>>>> /* TODO job_progress_set_remaining() would make more sense */
->>>>
->>>> So...
->>>>
->>>>> The way sync=3Dtop currently works, however, is to start at 0% and =
-then
->>>>> never update the progress if it doesn't copy a region. If it needs =
-to
->>>>> copy 25% of the disk, we'll finish at 25%.
->>>>>
->>>>> Update the progress when we skip regions.
->>>>
->>>> Wouldn=E2=80=99t it be more correct to decrease the job length?
->>>>
->>>> Max
->>>>
->>>
->>> Admittedly I have precisely no idea. Maybe? As far as I understand it=
-,
->>> we guarantee only:
->>>
->>> (1) Progress monotonically increases
->>> (2) Upon completion, progress will equal the total work estimate.
->>>     [Trying to fix that to be true here.]
->>>
->>> This means we can do stuff like:
->>>
->>> - Total work estimate can increase or decrease arbitrarily
->>> - Neither value has to mean anything in particular
->>>
->>>
->>> Bitmap sync works by artificially increasing progress for NOP regions=
-,
->>> seen in init_copy_bitmap.
->>
->> Yes, and it has a TODO comment that says it should be done differently=
-=2E
->>
->>> Full sync also tends to increase progress regardless of it actually d=
-id
->>> a copy or not; offload support also counts as progress here. So if yo=
-u
->>> full sync an empty image, you'll see it increasing the progress as it=
-
->>> doesn't actually do anything.
->>>
->>> Top sync is the odd one out, which just omits progress for regions it=
- skips.
->>>
->>> My only motivation here was to make them consistent. Can I do it the
->>> other way? Yeah, probably. Is one way better than the other? I
->>> legitimately have no idea. I guess whoever wrote the last comment fel=
-t
->>> that it should all be the other way instead. Why'd they not do that?
->>
->> If you look at the commit (05df8a6a2b4), I suppose it was because that=
-
->> commit simply did not intend to change behavior.  It just touched that=
-
->> piece of code and noted that maybe there should be a follow-up commit =
-to
->> change it.
->>
->> But yeah, whatever.
->>
->> Reviewed-by: Max Reitz <mreitz@redhat.com>
->>
->=20
-> I mean. I'll make it consistent either way, but I actually don't know
-> which way I should make it go. I just think that all the modes should
-> work the same if we can help it.
->=20
-> Flip a coin?
-
-If you=E2=80=99d flip a coin, I can say that I=E2=80=99d find it a bit mo=
-re meaningful
-to reduce the length.  Especially if you change sync=3Dtop to calculate
-beforehand how much we need to copy, so the length isn=E2=80=99t even red=
-uced
-while the job is running.
-
-And it=E2=80=99s easier to remove the TODO comment this way.  If we decid=
-e
-against it, you=E2=80=99d have to remove the TODO comment aso (because we=
-
-decided against it), but you=E2=80=99d need to justify it in the commit m=
-essage.
- And we all know that writing explanations and documentation is the
-hardest thing of all.
-
-Max
-
-
---zUupGiqpNhNHo3am9AMycR4qfgKa2KCrf--
-
---Lr2Ew4piNay6zYcqIvYuPfhNCz6p56UC4
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0mUFcACgkQ9AfbAGHV
-z0BQQgf/fxV4TAzdPxBXFRbE1UE1uYoX5CoJ5fDgTQpCsGG9RiuThFjdnZdKy3No
-XwXp/+WCGXyu5/H7ps8B3Hl6rdp3Ew/MVTTjvq0ihjvoahlTWBZrDcbNTKVTwyYM
-Ug5sN9thZ99tb/wr0iV4NZGqoFkUMc/MvWKAOBUxtkT7eDmPQoYwSO8zobDUJvb2
-TaBt1eW7/9XlNNHrZV93Ed80pT3tj1+BsQ4SoJ63aU7M867OXSy6WuqH+XHV2RUz
-s71Q9UlUXa8m6UKoN9RV4d7UWg9buyAShi0AxVk31Ls+TkfDMDcS3+fUUbE7nGH+
-uKK/LTECuoorAp9DRsZ8LGiFDilneQ==
-=wjEA
------END PGP SIGNATURE-----
-
---Lr2Ew4piNay6zYcqIvYuPfhNCz6p56UC4--
 
