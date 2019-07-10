@@ -2,81 +2,89 @@ Return-Path: <SRS0=axyf=VH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62343C74A21
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 15:42:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B15EBC74A21
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 15:50:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 36A522086D
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 15:42:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 36A522086D
+	by mail.kernel.org (Postfix) with ESMTPS id 8764D2086D
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 15:50:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8764D2086D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34774 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34838 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlEjk-00083J-IO
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jul 2019 11:42:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44782)
+	id 1hlEri-000265-M0
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jul 2019 11:50:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47286)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hlEib-00075z-66
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 11:41:19 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hlEpL-0000rl-Ag
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 11:48:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hlEiZ-0005um-5v
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 11:41:17 -0400
-Received: from mail-wr1-f50.google.com ([209.85.221.50]:36391)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hlEiX-0005tM-8M
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 11:41:13 -0400
-Received: by mail-wr1-f50.google.com with SMTP id n4so2998518wrs.3
- for <qemu-devel@nongnu.org>; Wed, 10 Jul 2019 08:41:12 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=ZqJtaq4MsF6xGIt7c7isyPRuOSya3UoPfm+iGAPvqWY=;
- b=RnoxSw4hV2jtajCyngVGgXT+C2psx/Lf3mcokWlbuNjXr9CJ5MwASg3k+60XU2g256
- EIIlqJrTgFXEzIz3GyGcWFcK0fm/Fz3YHT97zzfNFRAJ9jKMIdjPndReyC5HB11OAsFz
- Fqubx7mB+n4ZVp8lwV8wPCk7YOuLvzs4yCUf5yPbjpWVPyd2mjaXkwdBLqvM1kNXjI3H
- dUrnOVBDWCMStrasrChVRxytEY1ePxxf6/PKr6+8JaLvsGyrbMnZ3JZY7SJOFmW3opVb
- Do/Bwo5xTuxzbmBNYKU315NOO2g2GWRGY+RxZ6dxkCYfF8bdcjtXqQOk5wbE4NSWvxlw
- Ga1Q==
-X-Gm-Message-State: APjAAAXZX9h0+qu4zbhelzu/ijfuJuuWzJ5KpFkW+zStdSdwcmeU1zT9
- 7/JuS1iRYCJIWyya/k2A5zOuoA==
-X-Google-Smtp-Source: APXvYqwkuwg2cSReIswXneeRD487T9Z9ZyCCfNV8kZo3fwebzhDKWjtQnI0wVfVMbfFV3BX2JCOwbw==
-X-Received: by 2002:a5d:4a02:: with SMTP id m2mr17511668wrq.78.1562773271186; 
- Wed, 10 Jul 2019 08:41:11 -0700 (PDT)
-Received: from [192.168.1.103] (62.red-83-42-61.dynamicip.rima-tde.net.
- [83.42.61.62])
- by smtp.gmail.com with ESMTPSA id j10sm2674691wrw.96.2019.07.10.08.41.10
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Wed, 10 Jul 2019 08:41:10 -0700 (PDT)
-To: ddm <hope2hope@163.com>, qemu-devel@nongnu.org,
- Richard Henderson <richard.henderson@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-References: <c49fcb4.af77.16bdae2795a.Coremail.hope2hope@163.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <adefe3b6-f8ff-5010-58e5-45a4445a648f@redhat.com>
-Date: Wed, 10 Jul 2019 17:41:09 +0200
+ (envelope-from <mreitz@redhat.com>) id 1hlEpK-00067C-9T
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 11:48:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52184)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1hlEp7-00058k-VK; Wed, 10 Jul 2019 11:48:03 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id D2347308330C;
+ Wed, 10 Jul 2019 15:47:48 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.40.205.108])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1AFBC60636;
+ Wed, 10 Jul 2019 15:47:33 +0000 (UTC)
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+References: <20190710010556.32365-1-jsnow@redhat.com>
+ <20190710010556.32365-3-jsnow@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <a246f50d-cce2-27da-c501-f6c01837c4f9@redhat.com>
+Date: Wed, 10 Jul 2019 17:47:32 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <c49fcb4.af77.16bdae2795a.Coremail.hope2hope@163.com>
-Content-Type: text/plain; charset=gbk
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20190710010556.32365-3-jsnow@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="echKXd4az91ZFioFTZxLrxKEbwYprgYvq"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.44]); Wed, 10 Jul 2019 15:47:48 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.221.50
-Subject: Re: [Qemu-devel] Can not relocate APIC registers address from
- 0xFEE00000 to self-defined physical addr
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 2/8] iotests/257: add EmulatedBitmap class
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,24 +96,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Cc'ing x86 ppl
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--echKXd4az91ZFioFTZxLrxKEbwYprgYvq
+Content-Type: multipart/mixed; boundary="Y4vnCdrv0hfDkGLld7wJQFLSKMNSvLUH3";
+ protected-headers="v1"
+From: Max Reitz <mreitz@redhat.com>
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
+ Eric Blake <eblake@redhat.com>
+Message-ID: <a246f50d-cce2-27da-c501-f6c01837c4f9@redhat.com>
+Subject: Re: [PATCH 2/8] iotests/257: add EmulatedBitmap class
+References: <20190710010556.32365-1-jsnow@redhat.com>
+ <20190710010556.32365-3-jsnow@redhat.com>
+In-Reply-To: <20190710010556.32365-3-jsnow@redhat.com>
 
-On 7/10/19 9:56 AM, ddm wrote:
-> hi guys, 
-> 
-> 
-> I wrote a Small OS (based on linux0.11) support SMP, and it can run well on bochs, 
-> Now i want to migrate it to Qemu, i found that when i use wrmsr command to relocate the APIC regsiters addr to a new physical address, 
-> it can not work, i can not initial APIC timer to trigger timer interrupt by the new physical addr just i relocate, but when use rdmsr to get APIC base addr has been changed to the new physical address, it's strange. 
-> In SMP env, if can not relocate APIC registers addr for each processor with  different addr, it will result in conflict. 
-> So, i want to know qemu4.0 whether support remaping APIC base address by wrmsr command?
-> if support, please tell me how to remap APIC base addr for each processor.
-> 
-> 
-> Thank you!
-> 
+--Y4vnCdrv0hfDkGLld7wJQFLSKMNSvLUH3
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 10.07.19 03:05, John Snow wrote:
+> Represent a bitmap with an object that we can mark and clear bits in.
+> This makes it easier to manage partial writes when we don't write a
+> full group's worth of patterns before an error.
+>=20
+> Signed-off-by: John Snow <jsnow@redhat.com>
+> ---
+>  tests/qemu-iotests/257 | 125 +++++++++++++++++++++++++----------------=
+
+>  1 file changed, 76 insertions(+), 49 deletions(-)
+>=20
+> diff --git a/tests/qemu-iotests/257 b/tests/qemu-iotests/257
+> index f576a35a5c..2ff4aa8695 100755
+> --- a/tests/qemu-iotests/257
+> +++ b/tests/qemu-iotests/257
+> @@ -85,6 +85,60 @@ GROUPS =3D [
+>          Pattern('0xdd', 0x3fc0000)]), # New; leaving a gap to the righ=
+t
+>  ]
+> =20
+> +
+> +class EmulatedBitmap:
+> +    def __init__(self, granularity=3DGRANULARITY):
+> +        self._bits =3D set()
+> +        self.groups =3D set()
+> +        self.granularity =3D granularity
+> +
+> +    def dirty_bits(self, bits):
+> +        self._bits |=3D set(bits)
+> +
+> +    def dirty_group(self, n):
+> +        self.dirty_bits(GROUPS[n].bits(self.granularity))
+> +
+> +    def clear(self):
+> +        self._bits =3D set()
+> +
+> +    def clear_bits(self, bits):
+> +        self._bits =3D self._bits - set(bits)
+
+Does -=3D not work here?
+
+No real complaints.  Sorry.
+
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+
+
+--Y4vnCdrv0hfDkGLld7wJQFLSKMNSvLUH3--
+
+--echKXd4az91ZFioFTZxLrxKEbwYprgYvq
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0mCJQACgkQ9AfbAGHV
+z0AXNAgAsO3iqrqSW6uRxTrpMJz6aRpRZasEvdCrMigLJqbfzJi49d7T4fOkz/ow
+16SUgNIGfBbbhYBm3REyZlujQoYKbEo+Jfc6h+50RX0wG4HkrKZTTrrgsov7N5O9
+xjTcfnEds8A1fNJ/ZQUcH3AVLaS346FYHth73xAuluAm3zSLk917tFz07TQsvDeV
+5EQmj0jP85WUl2UqAUcQGm9TIPuwMm3Od0TOP98x/KCdME2eGJcyN1+p8/Uet4Ah
+qoAaWCzKvC9cegy855pukwwTiFl6kdg6OQiRKUapyFy69sBQw72digiUqZ81M6fZ
+uUVBCRFyBMBZF4NX3WU1kGSI4PLd/w==
+=qt8A
+-----END PGP SIGNATURE-----
+
+--echKXd4az91ZFioFTZxLrxKEbwYprgYvq--
 
