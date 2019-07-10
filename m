@@ -8,78 +8,78 @@ X-Spam-Status: No, score=-6.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95ED0C74A35
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 20:01:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25F78C74A35
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 20:02:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5250B2064B
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 20:01:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C93922064B
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 20:02:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OI0ZORCt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5250B2064B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LgoObZlb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C93922064B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36646 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36668 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlImf-0000G4-I3
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jul 2019 16:01:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50166)
+	id 1hlInI-0001XI-2m
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jul 2019 16:02:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50401)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <marcandre.lureau@gmail.com>) id 1hlIja-0002pV-AG
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 15:58:36 -0400
+ (envelope-from <marcandre.lureau@gmail.com>) id 1hlIk5-0003l0-Ac
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 15:59:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@gmail.com>) id 1hlIjY-0002Ws-6n
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 15:58:34 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:43210)
+ (envelope-from <marcandre.lureau@gmail.com>) id 1hlIk3-0003G6-C9
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 15:59:05 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:37891)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
- id 1hlIjX-0002WH-V6
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 15:58:32 -0400
-Received: by mail-wr1-x443.google.com with SMTP id p13so3727255wru.10
- for <qemu-devel@nongnu.org>; Wed, 10 Jul 2019 12:58:31 -0700 (PDT)
+ id 1hlIk2-00038f-CN
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 15:59:03 -0400
+Received: by mail-wr1-x441.google.com with SMTP id g17so3749464wrr.5
+ for <qemu-devel@nongnu.org>; Wed, 10 Jul 2019 12:58:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=OnYAvrTpS2BRRGWc1xmVZdXr5Nei3fk/A5VT1VHtjds=;
- b=OI0ZORCtDBoFjVD0ewi3YRgewXy/w6YulZqHL2qhja5zzyHwkbOQtiLZ+2nSq0P1LC
- pgPTnHWsO9PiIT/c88rVi2htUuBc7DveHN5nQc56ydZleI+lslt5YmxVUfbfzsmVBTLd
- OaGA+GpTj3mKiOi1GNxYUFQ0MhWRGZLkEfwD9Kcpal1Zh1Dn5jNoskIHxHDp9qPjp23e
- QNugAUxhAIpdBFAAtNA612EtplevscpG8FvCD7J7+5bAQb98Gp+mbH5dgo1Lhs3IC4xg
- Xwo1p6ZBYqHw7ZI6UR877pwE7LLPQ9ZS+0+FlaylCh5wPugHWaCJNGv4NAI4cY9p3tcS
- sb3Q==
+ bh=gDDpEpey4sAkhttwGTcvfE+cB6UpxJ1NwcQkwHTBCJU=;
+ b=LgoObZlb7vcIcUwM+I+Uw8gjFHEcc5HPbQnZrKTUtBOoo5bgWVza46020vvRUoNMAL
+ VhCHxFXB+keo6n5b2WPajgBWZ6yLMeZ3uw5ti6cItxdQfB8pi55ztPyhe0zstODfR7IE
+ 1ljJijsnEqwDtFP9CX8IoGzNxgNN7vJkHeXbC7Mj2nSqb2tX0QLBEz+njcfRQEF00rEC
+ NbnlMex8S6rMRQmlV5gkjwc4XFdJskPVyRosoHbNGTOKQuxIQMlWZs+Pdb1zOxRWXiUK
+ 7i1rDJCTbpztcmZLHqWQMTiIa8edmHdz8rZ8s70GerI3j8HE6cNQ3raGbxeVm6iaMLC8
+ f08Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=OnYAvrTpS2BRRGWc1xmVZdXr5Nei3fk/A5VT1VHtjds=;
- b=FLRpGfzzilMMK2Du6aGkIIv2PB3FjwKQJYHTjGD+5MzCqtGC9d4x+523J0LujWRAX0
- gUTjSjaW9a5eiVLlOO/01uee5YMOyiQ3T8uyxkfNm0/MSnops2BHkhYF8Sq+99LBXVrQ
- WGpa87j6d3HkCf0pagofMOluux5CVZ3ZQA3LXUY5fMMIiN0YZj9DJ9JztwFgwToC6OBm
- KpF3UU/fD3ogBnjs/ayHV62wkoqTt857Y4qC2rNb0dODI1ePRybGEDNQq1xpmDyx4OAM
- aMuTC54J1Yd4M8ZRxQgFNFyC/4iiJu/VCqAuA12HLjpYG0e1Wz8XcAGWMLnDvvbzI//J
- sf9A==
-X-Gm-Message-State: APjAAAUfMvBAjTUmT1upsoXzXQvlFFKxaBvAWk2U0YdWZoeKkRD273D0
- MvPihlI+60WLHrGKXkXe05ut6R4/f09oTuWlO6A=
-X-Google-Smtp-Source: APXvYqwiJCCLHswBWx8XP3dKkj1Hg0NOrh4JAMr+gHs9+UPYws/f5Fa3OVJyKr205UC0/2pWpMvMb8eVl8RoQ1cjAeU=
-X-Received: by 2002:adf:ea8b:: with SMTP id s11mr32294136wrm.100.1562788710956; 
- Wed, 10 Jul 2019 12:58:30 -0700 (PDT)
+ bh=gDDpEpey4sAkhttwGTcvfE+cB6UpxJ1NwcQkwHTBCJU=;
+ b=r7Wc8GZIXswajy7EEtfkABQi8lWHAjDbp7kV4LDp0A3GEyVUo4KLrel/L+b4Y/2g7I
+ aGiz6KnI37vi5E7/3WEPUL7S5WyeZANhMTPBd2lOtYIbDrIEmVsVKTs0jWhDPhnWALIy
+ cn9qP6t1pJGyBtqhqVjRxVebdsS2tYtAUnQiJD4Q5tyBq1qtMjEzNkYeHTqdHR0TK+k9
+ qRaZIg+qFvImttosJrWYlH0ptETLgMhLkrkSVZXTdNbT78eJkkRoe1XsW0daMxH6KB7w
+ rTb5wnaDZP+vKpr368kZMfFpSB8UB7tjVPVY5Wco8yjOuWKV8392MeXXmltZd2Y4KFXB
+ ByPQ==
+X-Gm-Message-State: APjAAAXl0DTb2OyI+Nhqnf1Mj6pNSoGZ9LsSIEpMjHMXCMZRuwaimbls
+ //kwxBVCPN6/Q30fh47AQPx1Ki0fi0rEJKkoT+egM0jF
+X-Google-Smtp-Source: APXvYqyt+3/lm6dJ+4eQm3QFjf8OfsJDfI2ZPo7X1qGpb9gpXoOfVrKa+2cUHswQGzI/JvYsEi+6jZS69NVu7Ie2kOs=
+X-Received: by 2002:adf:c70e:: with SMTP id k14mr684307wrg.201.1562788738699; 
+ Wed, 10 Jul 2019 12:58:58 -0700 (PDT)
 MIME-Version: 1.0
 References: <cover.1562695780.git.DirtY.iCE.hu@gmail.com>
- <597ee579c3d14ff6f0892ee9e1905cdb0e0990ad.1562695780.git.DirtY.iCE.hu@gmail.com>
-In-Reply-To: <597ee579c3d14ff6f0892ee9e1905cdb0e0990ad.1562695780.git.DirtY.iCE.hu@gmail.com>
+ <4f1ee2a0876bca759311c0efb31fbe7a6850fbad.1562695780.git.DirtY.iCE.hu@gmail.com>
+In-Reply-To: <4f1ee2a0876bca759311c0efb31fbe7a6850fbad.1562695780.git.DirtY.iCE.hu@gmail.com>
 From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Wed, 10 Jul 2019 23:58:18 +0400
-Message-ID: <CAJ+F1CLbHktECo+86kXBe8jMsCLX0N50C_48i5Xp3NzbsDNaQg@mail.gmail.com>
+Date: Wed, 10 Jul 2019 23:58:46 +0400
+Message-ID: <CAJ+F1CJyQX2fv51xe+5BzX1pnq=HqxG-0F5_LJJhyqXT6XrYtg@mail.gmail.com>
 To: =?UTF-8?B?S8WRdsOhZ8OzLCBab2x0w6Fu?= <dirty.ice.hu@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::443
-Subject: Re: [Qemu-devel] [PATCH 02/11] audio: basic support for multi
- backend audio
+X-Received-From: 2a00:1450:4864:20::441
+Subject: Re: [Qemu-devel] [PATCH 03/11] audio: add audiodev properties to
+ frontends
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,502 +91,351 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, QEMU <qemu-devel@nongnu.org>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Markus Armbruster <armbru@redhat.com>
+Cc: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, QEMU <qemu-devel@nongnu.org>,
+ Michael Walle <michael@walle.cc>, Gerd Hoffmann <kraxel@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Jul 9, 2019 at 11:02 PM K=C5=91v=C3=A1g=C3=B3, Zolt=C3=A1n <dirty.i=
+On Tue, Jul 9, 2019 at 10:58 PM K=C5=91v=C3=A1g=C3=B3, Zolt=C3=A1n <dirty.i=
 ce.hu@gmail.com> wrote:
 >
-> Audio functions no longer access glob_audio_state, instead they get an
-> AudioState as a parameter.  This is required in order to support
-> multiple backends.
+> Finally add audiodev=3D options to audio frontends so users can specify
+> which backend to use when multiple backends exist.  Not specifying an
+> audiodev=3D option currently causes the first audiodev to be used, this i=
+s
+> fixed in the next commit.
 >
-> glob_audio_state is also gone, and replaced with a tailq so we can store
-> more than one states.
+> Example usage: -audiodev pa,id=3Dfoo -device AC97,audiodev=3Dfoo
 >
 > Signed-off-by: K=C5=91v=C3=A1g=C3=B3, Zolt=C3=A1n <DirtY.iCE.hu@gmail.com=
 >
 
-
-I guess you could have made the vnc and wavcapture audiodev argument a
-seperate commit. Or mention it in commit message.
-
 Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
 
-
-
 > ---
->  audio/audio.h          |  12 +++--
->  audio/audio_int.h      |   2 +
->  audio/audio_template.h |   2 +-
->  ui/vnc.h               |   2 +
->  audio/audio.c          | 102 +++++++++++++++++++++++++++++++----------
->  audio/wavcapture.c     |   6 +--
->  monitor/misc.c         |  12 ++++-
->  ui/vnc.c               |  15 +++++-
->  hmp-commands.hx        |  11 +++--
->  qemu-options.hx        |   5 ++
->  10 files changed, 131 insertions(+), 38 deletions(-)
+>  audio/audio.h                    |  3 ++
+>  include/hw/qdev-properties.h     |  3 ++
+>  hw/audio/ac97.c                  |  1 +
+>  hw/audio/adlib.c                 |  1 +
+>  hw/audio/cs4231a.c               |  1 +
+>  hw/audio/es1370.c                |  7 +++-
+>  hw/audio/gus.c                   |  1 +
+>  hw/audio/hda-codec.c             |  1 +
+>  hw/audio/milkymist-ac97.c        |  6 ++++
+>  hw/audio/pcspk.c                 |  1 +
+>  hw/audio/pl041.c                 |  1 +
+>  hw/audio/sb16.c                  |  1 +
+>  hw/audio/wm8750.c                |  6 ++++
+>  hw/core/qdev-properties-system.c | 57 ++++++++++++++++++++++++++++++++
+>  hw/usb/dev-audio.c               |  1 +
+>  15 files changed, 90 insertions(+), 1 deletion(-)
 >
 > diff --git a/audio/audio.h b/audio/audio.h
-> index 64b0f761bc..ad2457f4de 100644
+> index ad2457f4de..c0722a5cda 100644
 > --- a/audio/audio.h
 > +++ b/audio/audio.h
-> @@ -78,8 +78,10 @@ typedef struct SWVoiceOut SWVoiceOut;
->  typedef struct CaptureVoiceOut CaptureVoiceOut;
->  typedef struct SWVoiceIn SWVoiceIn;
+> @@ -181,4 +181,7 @@ void audio_legacy_help(void);
+>  AudioState *audio_state_by_name(const char *name);
+>  const char *audio_get_id(QEMUSoundCard *card);
 >
-> +typedef struct AudioState AudioState;
->  typedef struct QEMUSoundCard {
->      char *name;
-> +    AudioState *state;
->      QLIST_ENTRY (QEMUSoundCard) entries;
->  } QEMUSoundCard;
->
-> @@ -92,7 +94,8 @@ void AUD_log (const char *cap, const char *fmt, ...) GC=
-C_FMT_ATTR(2, 3);
->
->  void AUD_register_card (const char *name, QEMUSoundCard *card);
->  void AUD_remove_card (QEMUSoundCard *card);
-> -CaptureVoiceOut *AUD_add_capture (
-> +CaptureVoiceOut *AUD_add_capture(
-> +    AudioState *s,
->      struct audsettings *as,
->      struct audio_capture_ops *ops,
->      void *opaque
-> @@ -160,8 +163,8 @@ static inline void *advance (void *p, int incr)
->  #define audio_MAX(a, b) ((a)<(b)?(b):(a))
->  #endif
->
-> -int wav_start_capture (CaptureState *s, const char *path, int freq,
-> -                       int bits, int nchannels);
-> +int wav_start_capture(AudioState *state, CaptureState *s, const char *pa=
-th,
-> +                      int freq, int bits, int nchannels);
->
->  bool audio_is_cleaning_up(void);
->  void audio_cleanup(void);
-> @@ -175,4 +178,7 @@ void audio_parse_option(const char *opt);
->  void audio_init_audiodevs(void);
->  void audio_legacy_help(void);
->
-> +AudioState *audio_state_by_name(const char *name);
-> +const char *audio_get_id(QEMUSoundCard *card);
+> +#define DEFINE_AUDIO_PROPERTIES(_s, _f)         \
+> +    DEFINE_PROP_AUDIODEV("audiodev", _s, _f)
 > +
 >  #endif /* QEMU_AUDIO_H */
-> diff --git a/audio/audio_int.h b/audio/audio_int.h
-> index 8164696b2c..9f01f6ad00 100644
-> --- a/audio/audio_int.h
-> +++ b/audio/audio_int.h
-> @@ -196,6 +196,8 @@ typedef struct AudioState {
+> diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
+> index 1eae5ab056..de0b2c8423 100644
+> --- a/include/hw/qdev-properties.h
+> +++ b/include/hw/qdev-properties.h
+> @@ -35,6 +35,7 @@ extern const PropertyInfo qdev_prop_blocksize;
+>  extern const PropertyInfo qdev_prop_pci_host_devaddr;
+>  extern const PropertyInfo qdev_prop_uuid;
+>  extern const PropertyInfo qdev_prop_arraylen;
+> +extern const PropertyInfo qdev_prop_audiodev;
+>  extern const PropertyInfo qdev_prop_link;
+>  extern const PropertyInfo qdev_prop_off_auto_pcibar;
+>  extern const PropertyInfo qdev_prop_pcie_link_speed;
+> @@ -236,6 +237,8 @@ extern const PropertyInfo qdev_prop_pcie_link_width;
+>              + type_check(QemuUUID, typeof_field(_state, _field)),  \
+>          .set_default =3D true,                                       \
+>          }
+> +#define DEFINE_PROP_AUDIODEV(_n, _s, _f) \
+> +    DEFINE_PROP(_n, _s, _f, qdev_prop_audiodev, QEMUSoundCard)
 >
->      bool timer_running;
->      uint64_t timer_last;
-> +
-> +    QTAILQ_ENTRY(AudioState) list;
->  } AudioState;
+>  #define DEFINE_PROP_END_OF_LIST()               \
+>      {}
+> diff --git a/hw/audio/ac97.c b/hw/audio/ac97.c
+> index fb98da2678..0d8e524233 100644
+> --- a/hw/audio/ac97.c
+> +++ b/hw/audio/ac97.c
+> @@ -1409,6 +1409,7 @@ static int ac97_init (PCIBus *bus)
+>  }
 >
->  extern const struct mixeng_volume nominal_volume;
-> diff --git a/audio/audio_template.h b/audio/audio_template.h
-> index c721fed75d..54f07338e7 100644
-> --- a/audio/audio_template.h
-> +++ b/audio/audio_template.h
-> @@ -428,7 +428,7 @@ SW *glue (AUD_open_, TYPE) (
->      struct audsettings *as
->      )
->  {
-> -    AudioState *s =3D &glob_audio_state;
-> +    AudioState *s =3D card->state;
->      AudiodevPerDirectionOptions *pdo =3D glue(audio_get_pdo_, TYPE)(s->d=
-ev);
->
->      if (audio_bug(__func__, !card || !name || !callback_fn || !as)) {
-> diff --git a/ui/vnc.h b/ui/vnc.h
-> index 2f84db3142..6f54653455 100644
-> --- a/ui/vnc.h
-> +++ b/ui/vnc.h
-> @@ -183,6 +183,8 @@ struct VncDisplay
->  #ifdef CONFIG_VNC_SASL
->      VncDisplaySASL sasl;
->  #endif
-> +
-> +    AudioState *audio_state;
+>  static Property ac97_properties[] =3D {
+> +    DEFINE_AUDIO_PROPERTIES(AC97LinkState, card),
+>      DEFINE_PROP_UINT32 ("use_broken_id", AC97LinkState, use_broken_id, 0=
+),
+>      DEFINE_PROP_END_OF_LIST (),
 >  };
->
->  typedef struct VncTight {
-> diff --git a/audio/audio.c b/audio/audio.c
-> index 8d2f580788..e9dd7c8b32 100644
-> --- a/audio/audio.c
-> +++ b/audio/audio.c
-> @@ -87,7 +87,8 @@ audio_driver *audio_driver_lookup(const char *name)
->      return NULL;
+> diff --git a/hw/audio/adlib.c b/hw/audio/adlib.c
+> index 7dd9a89b89..df2e781788 100644
+> --- a/hw/audio/adlib.c
+> +++ b/hw/audio/adlib.c
+> @@ -299,6 +299,7 @@ static void adlib_realizefn (DeviceState *dev, Error =
+**errp)
 >  }
 >
-> -static AudioState glob_audio_state;
-> +static QTAILQ_HEAD(AudioStateHead, AudioState) audio_states =3D
-> +    QTAILQ_HEAD_INITIALIZER(audio_states);
+>  static Property adlib_properties[] =3D {
+> +    DEFINE_AUDIO_PROPERTIES(AdlibState, card),
+>      DEFINE_PROP_UINT32 ("iobase",  AdlibState, port, 0x220),
+>      DEFINE_PROP_UINT32 ("freq",    AdlibState, freq,  44100),
+>      DEFINE_PROP_END_OF_LIST (),
+> diff --git a/hw/audio/cs4231a.c b/hw/audio/cs4231a.c
+> index 7216b41cc1..e3ea830b47 100644
+> --- a/hw/audio/cs4231a.c
+> +++ b/hw/audio/cs4231a.c
+> @@ -689,6 +689,7 @@ static int cs4231a_init (ISABus *bus)
+>  }
 >
->  const struct mixeng_volume nominal_volume =3D {
->      .mute =3D 0,
-> @@ -1236,11 +1237,14 @@ static void audio_run_capture (AudioState *s)
+>  static Property cs4231a_properties[] =3D {
+> +    DEFINE_AUDIO_PROPERTIES(CSState, card),
+>      DEFINE_PROP_UINT32 ("iobase",  CSState, port, 0x534),
+>      DEFINE_PROP_UINT32 ("irq",     CSState, irq,  9),
+>      DEFINE_PROP_UINT32 ("dma",     CSState, dma,  3),
+> diff --git a/hw/audio/es1370.c b/hw/audio/es1370.c
+> index 260c142b70..7589671d20 100644
+> --- a/hw/audio/es1370.c
+> +++ b/hw/audio/es1370.c
+> @@ -887,6 +887,11 @@ static int es1370_init (PCIBus *bus)
+>      return 0;
+>  }
 >
->  void audio_run (const char *msg)
->  {
-> -    AudioState *s =3D &glob_audio_state;
-> +    AudioState *s;
+> +static Property es1370_properties[] =3D {
+> +    DEFINE_AUDIO_PROPERTIES(ES1370State, card),
+> +    DEFINE_PROP_END_OF_LIST(),
+> +};
 > +
-> +    QTAILQ_FOREACH(s, &audio_states, list) {
-> +        audio_run_out(s);
-> +        audio_run_in(s);
-> +        audio_run_capture(s);
-> +    }
->
-> -    audio_run_out (s);
-> -    audio_run_in (s);
-> -    audio_run_capture (s);
->  #ifdef DEBUG_POLL
->      {
->          static double prevtime;
-> @@ -1304,13 +1308,11 @@ bool audio_is_cleaning_up(void)
->      return is_cleaning_up;
->  }
->
-> -void audio_cleanup(void)
-> +static void free_audio_state(AudioState *s)
+>  static void es1370_class_init (ObjectClass *klass, void *data)
 >  {
-> -    AudioState *s =3D &glob_audio_state;
->      HWVoiceOut *hwo, *hwon;
->      HWVoiceIn *hwi, *hwin;
->
-> -    is_cleaning_up =3D true;
->      QLIST_FOREACH_SAFE(hwo, &s->hw_head_out, entries, hwon) {
->          SWVoiceCap *sc;
->
-> @@ -1347,6 +1349,17 @@ void audio_cleanup(void)
->          qapi_free_Audiodev(s->dev);
->          s->dev =3D NULL;
->      }
-> +    g_free(s);
-> +}
-> +
-> +void audio_cleanup(void)
-> +{
-> +    is_cleaning_up =3D true;
-> +    while (!QTAILQ_EMPTY(&audio_states)) {
-> +        AudioState *s =3D QTAILQ_FIRST(&audio_states);
-> +        QTAILQ_REMOVE(&audio_states, s, list);
-> +        free_audio_state(s);
-> +    }
+>      DeviceClass *dc =3D DEVICE_CLASS (klass);
+> @@ -903,6 +908,7 @@ static void es1370_class_init (ObjectClass *klass, vo=
+id *data)
+>      dc->desc =3D "ENSONIQ AudioPCI ES1370";
+>      dc->vmsd =3D &vmstate_es1370;
+>      dc->reset =3D es1370_on_reset;
+> +    dc->props =3D es1370_properties;
 >  }
 >
->  static const VMStateDescription vmstate_audio =3D {
-> @@ -1373,28 +1386,33 @@ static AudiodevListEntry *audiodev_find(
->      return NULL;
+>  static const TypeInfo es1370_info =3D {
+> @@ -923,4 +929,3 @@ static void es1370_register_types (void)
 >  }
 >
-> -static int audio_init(Audiodev *dev)
-> +/*
-> + * if we have dev, this function was called because of an -audiodev argu=
-ment =3D>
-> + *   initialize a new state with it
-> + * if dev =3D=3D NULL =3D> legacy implicit initialization, return the al=
-ready created
-> + *   state or create a new one
-> + */
-> +static AudioState *audio_init(Audiodev *dev)
->  {
-> +    static bool atexit_registered;
->      size_t i;
->      int done =3D 0;
->      const char *drvname =3D NULL;
->      VMChangeStateEntry *e;
-> -    AudioState *s =3D &glob_audio_state;
-> +    AudioState *s;
->      struct audio_driver *driver;
->      /* silence gcc warning about uninitialized variable */
->      AudiodevListHead head =3D QSIMPLEQ_HEAD_INITIALIZER(head);
->
-> -    if (s->drv) {
-> -        if (dev) {
-> -            dolog("Cannot create more than one audio backend, sorry\n");
-> -            qapi_free_Audiodev(dev);
-> -        }
-> -        return -1;
-> -    }
+>  type_init (es1370_register_types)
 > -
->      if (dev) {
->          /* -audiodev option */
->          drvname =3D AudiodevDriver_str(dev->driver);
-> +    } else if (!QTAILQ_EMPTY(&audio_states)) {
-> +        /*
-> +         * todo: check for -audiodev once we have normal audiodev select=
-ion
-> +         * support
-> +         */
-> +        return QTAILQ_FIRST(&audio_states);
->      } else {
->          /* legacy implicit initialization */
->          head =3D audio_handle_legacy_opts();
-> @@ -1408,12 +1426,18 @@ static int audio_init(Audiodev *dev)
->          dev =3D QSIMPLEQ_FIRST(&head)->dev;
->          audio_validate_opts(dev, &error_abort);
->      }
-> +
-> +    s =3D g_malloc0(sizeof(AudioState));
->      s->dev =3D dev;
->
->      QLIST_INIT (&s->hw_head_out);
->      QLIST_INIT (&s->hw_head_in);
->      QLIST_INIT (&s->cap_head);
-> -    atexit(audio_cleanup);
-> +    if (!atexit_registered) {
-> +        atexit(audio_cleanup);
-> +        atexit_registered =3D true;
-> +    }
-> +    QTAILQ_INSERT_TAIL(&audio_states, s, list);
->
->      s->ts =3D timer_new_ns(QEMU_CLOCK_VIRTUAL, audio_timer, s);
->
-> @@ -1478,7 +1502,7 @@ static int audio_init(Audiodev *dev)
->
->      QLIST_INIT (&s->card_head);
->      vmstate_register (NULL, 0, &vmstate_audio, s);
-> -    return 0;
-> +    return s;
+> diff --git a/hw/audio/gus.c b/hw/audio/gus.c
+> index 9ab51631d9..566864bc9e 100644
+> --- a/hw/audio/gus.c
+> +++ b/hw/audio/gus.c
+> @@ -297,6 +297,7 @@ static int GUS_init (ISABus *bus)
 >  }
 >
->  void audio_free_audiodev_list(AudiodevListHead *head)
-> @@ -1493,10 +1517,13 @@ void audio_free_audiodev_list(AudiodevListHead *h=
-ead)
->
->  void AUD_register_card (const char *name, QEMUSoundCard *card)
->  {
-> -    audio_init(NULL);
-> +    if (!card->state) {
-> +        card->state =3D audio_init(NULL);
-> +    }
-> +
->      card->name =3D g_strdup (name);
->      memset (&card->entries, 0, sizeof (card->entries));
-> -    QLIST_INSERT_HEAD (&glob_audio_state.card_head, card, entries);
-> +    QLIST_INSERT_HEAD (&card->state->card_head, card, entries);
->  }
->
->  void AUD_remove_card (QEMUSoundCard *card)
-> @@ -1506,16 +1533,21 @@ void AUD_remove_card (QEMUSoundCard *card)
->  }
->
->
-> -CaptureVoiceOut *AUD_add_capture (
-> +CaptureVoiceOut *AUD_add_capture(
-> +    AudioState *s,
->      struct audsettings *as,
->      struct audio_capture_ops *ops,
->      void *cb_opaque
->      )
->  {
-> -    AudioState *s =3D &glob_audio_state;
->      CaptureVoiceOut *cap;
->      struct capture_callback *cb;
->
-> +    if (!s) {
-> +        /* todo: remove when we have normal audiodev selection support *=
-/
-> +        s =3D audio_init(NULL);
-> +    }
-> +
->      if (audio_validate_settings (as)) {
->          dolog ("Invalid settings were passed when trying to add capture\=
-n");
->          audio_print_settings (as);
-> @@ -1805,3 +1837,25 @@ int audio_buffer_bytes(AudiodevPerDirectionOptions=
- *pdo,
->      return audio_buffer_samples(pdo, as, def_usecs) *
->          audioformat_bytes_per_sample(as->fmt);
->  }
-> +
-> +AudioState *audio_state_by_name(const char *name)
-> +{
-> +    AudioState *s;
-> +    QTAILQ_FOREACH(s, &audio_states, list) {
-> +        assert(s->dev);
-> +        if (strcmp(name, s->dev->id) =3D=3D 0) {
-> +            return s;
-> +        }
-> +    }
-> +    return NULL;
-> +}
-> +
-> +const char *audio_get_id(QEMUSoundCard *card)
-> +{
-> +    if (card->state) {
-> +        assert(card->state->dev);
-> +        return card->state->dev->id;
-> +    } else {
-> +        return "";
-> +    }
-> +}
-> diff --git a/audio/wavcapture.c b/audio/wavcapture.c
-> index 74320dfecc..81c5c19032 100644
-> --- a/audio/wavcapture.c
-> +++ b/audio/wavcapture.c
-> @@ -105,8 +105,8 @@ static struct capture_ops wav_capture_ops =3D {
->      .info =3D wav_capture_info
+>  static Property gus_properties[] =3D {
+> +    DEFINE_AUDIO_PROPERTIES(GUSState, card),
+>      DEFINE_PROP_UINT32 ("freq",    GUSState, freq,        44100),
+>      DEFINE_PROP_UINT32 ("iobase",  GUSState, port,        0x240),
+>      DEFINE_PROP_UINT32 ("irq",     GUSState, emu.gusirq,  7),
+> diff --git a/hw/audio/hda-codec.c b/hw/audio/hda-codec.c
+> index 84639b5424..967a10f189 100644
+> --- a/hw/audio/hda-codec.c
+> +++ b/hw/audio/hda-codec.c
+> @@ -840,6 +840,7 @@ static const VMStateDescription vmstate_hda_audio =3D=
+ {
 >  };
 >
-> -int wav_start_capture (CaptureState *s, const char *path, int freq,
-> -                       int bits, int nchannels)
-> +int wav_start_capture(AudioState *state, CaptureState *s, const char *pa=
-th,
-> +                      int freq, int bits, int nchannels)
+>  static Property hda_audio_properties[] =3D {
+> +    DEFINE_AUDIO_PROPERTIES(HDAAudioState, card),
+>      DEFINE_PROP_UINT32("debug", HDAAudioState, debug,   0),
+>      DEFINE_PROP_BOOL("mixer", HDAAudioState, mixer,  true),
+>      DEFINE_PROP_BOOL("use-timer", HDAAudioState, use_timer,  true),
+> diff --git a/hw/audio/milkymist-ac97.c b/hw/audio/milkymist-ac97.c
+> index bf6a5a6b96..4835229326 100644
+> --- a/hw/audio/milkymist-ac97.c
+> +++ b/hw/audio/milkymist-ac97.c
+> @@ -329,6 +329,11 @@ static const VMStateDescription vmstate_milkymist_ac=
+97 =3D {
+>      }
+>  };
+>
+> +static Property milkymist_ac97_properties[] =3D {
+> +    DEFINE_AUDIO_PROPERTIES(MilkymistAC97State, card),
+> +    DEFINE_PROP_END_OF_LIST(),
+> +};
+> +
+>  static void milkymist_ac97_class_init(ObjectClass *klass, void *data)
 >  {
->      WAVState *wav;
->      uint8_t hdr[] =3D {
-> @@ -171,7 +171,7 @@ int wav_start_capture (CaptureState *s, const char *p=
-ath, int freq,
->          goto error_free;
->      }
+>      DeviceClass *dc =3D DEVICE_CLASS(klass);
+> @@ -336,6 +341,7 @@ static void milkymist_ac97_class_init(ObjectClass *kl=
+ass, void *data)
+>      dc->realize =3D milkymist_ac97_realize;
+>      dc->reset =3D milkymist_ac97_reset;
+>      dc->vmsd =3D &vmstate_milkymist_ac97;
+> +    dc->props =3D milkymist_ac97_properties;
+>  }
 >
-> -    cap =3D AUD_add_capture (&as, &ops, wav);
-> +    cap =3D AUD_add_capture(state, &as, &ops, wav);
->      if (!cap) {
->          error_report("Failed to add audio capture");
->          goto error_free;
-> diff --git a/monitor/misc.c b/monitor/misc.c
-> index 00338c002a..f97810d370 100644
-> --- a/monitor/misc.c
-> +++ b/monitor/misc.c
-> @@ -1148,7 +1148,17 @@ static void hmp_wavcapture(Monitor *mon, const QDi=
-ct *qdict)
->      int bits =3D qdict_get_try_int(qdict, "bits", -1);
->      int has_channels =3D qdict_haskey(qdict, "nchannels");
->      int nchannels =3D qdict_get_try_int(qdict, "nchannels", -1);
-> +    const char *audiodev =3D qdict_get_try_str(qdict, "audiodev");
->      CaptureState *s;
-> +    AudioState *as =3D NULL;
+>  static const TypeInfo milkymist_ac97_info =3D {
+> diff --git a/hw/audio/pcspk.c b/hw/audio/pcspk.c
+> index a7b3ab0c2b..01127304c2 100644
+> --- a/hw/audio/pcspk.c
+> +++ b/hw/audio/pcspk.c
+> @@ -209,6 +209,7 @@ static const VMStateDescription vmstate_spk =3D {
+>  };
+>
+>  static Property pcspk_properties[] =3D {
+> +    DEFINE_AUDIO_PROPERTIES(PCSpkState, card),
+>      DEFINE_PROP_UINT32("iobase", PCSpkState, iobase,  -1),
+>      DEFINE_PROP_BOOL("migrate", PCSpkState, migrate,  true),
+>      DEFINE_PROP_END_OF_LIST(),
+> diff --git a/hw/audio/pl041.c b/hw/audio/pl041.c
+> index 59c6ce1f2e..ce430a7821 100644
+> --- a/hw/audio/pl041.c
+> +++ b/hw/audio/pl041.c
+> @@ -622,6 +622,7 @@ static const VMStateDescription vmstate_pl041 =3D {
+>  };
+>
+>  static Property pl041_device_properties[] =3D {
+> +    DEFINE_AUDIO_PROPERTIES(PL041State, codec.card),
+>      /* Non-compact FIFO depth property */
+>      DEFINE_PROP_UINT32("nc_fifo_depth", PL041State, fifo_depth,
+>                         DEFAULT_FIFO_DEPTH),
+> diff --git a/hw/audio/sb16.c b/hw/audio/sb16.c
+> index a2db06a2bb..6b604979cf 100644
+> --- a/hw/audio/sb16.c
+> +++ b/hw/audio/sb16.c
+> @@ -1421,6 +1421,7 @@ static int SB16_init (ISABus *bus)
+>  }
+>
+>  static Property sb16_properties[] =3D {
+> +    DEFINE_AUDIO_PROPERTIES(SB16State, card),
+>      DEFINE_PROP_UINT32 ("version", SB16State, ver,  0x0405), /* 4.5 */
+>      DEFINE_PROP_UINT32 ("iobase",  SB16State, port, 0x220),
+>      DEFINE_PROP_UINT32 ("irq",     SB16State, irq,  5),
+> diff --git a/hw/audio/wm8750.c b/hw/audio/wm8750.c
+> index 81f83eea88..dfb4156ff4 100644
+> --- a/hw/audio/wm8750.c
+> +++ b/hw/audio/wm8750.c
+> @@ -701,6 +701,11 @@ void wm8750_set_bclk_in(void *opaque, int new_hz)
+>      wm8750_clk_update(s, 1);
+>  }
+>
+> +static Property wm8750_properties[] =3D {
+> +    DEFINE_AUDIO_PROPERTIES(WM8750State, card),
+> +    DEFINE_PROP_END_OF_LIST(),
+> +};
 > +
-> +    if (audiodev) {
-> +        as =3D audio_state_by_name(audiodev);
-> +        if (!as) {
-> +            monitor_printf(mon, "Invalid audiodev specified\n");
-> +            return;
-> +        }
+>  static void wm8750_class_init(ObjectClass *klass, void *data)
+>  {
+>      DeviceClass *dc =3D DEVICE_CLASS(klass);
+> @@ -711,6 +716,7 @@ static void wm8750_class_init(ObjectClass *klass, voi=
+d *data)
+>      sc->recv =3D wm8750_rx;
+>      sc->send =3D wm8750_tx;
+>      dc->vmsd =3D &vmstate_wm8750;
+> +    dc->props =3D wm8750_properties;
+>  }
+>
+>  static const TypeInfo wm8750_info =3D {
+> diff --git a/hw/core/qdev-properties-system.c b/hw/core/qdev-properties-s=
+ystem.c
+> index ba412dd2ca..bf9974370c 100644
+> --- a/hw/core/qdev-properties-system.c
+> +++ b/hw/core/qdev-properties-system.c
+> @@ -11,6 +11,7 @@
+>   */
+>
+>  #include "qemu/osdep.h"
+> +#include "audio/audio.h"
+>  #include "net/net.h"
+>  #include "hw/qdev.h"
+>  #include "qapi/error.h"
+> @@ -353,6 +354,62 @@ const PropertyInfo qdev_prop_netdev =3D {
+>  };
+>
+>
+> +/* --- audiodev --- */
+> +static void get_audiodev(Object *obj, Visitor *v, const char* name,
+> +                         void *opaque, Error **errp)
+> +{
+> +    DeviceState *dev =3D DEVICE(obj);
+> +    Property *prop =3D opaque;
+> +    QEMUSoundCard *card =3D qdev_get_prop_ptr(dev, prop);
+> +    char *p =3D g_strdup(audio_get_id(card));
+> +
+> +    visit_type_str(v, name, &p, errp);
+> +    g_free(p);
+> +}
+> +
+> +static void set_audiodev(Object *obj, Visitor *v, const char* name,
+> +                         void *opaque, Error **errp)
+> +{
+> +    DeviceState *dev =3D DEVICE(obj);
+> +    Property *prop =3D opaque;
+> +    QEMUSoundCard *card =3D qdev_get_prop_ptr(dev, prop);
+> +    AudioState *state;
+> +    Error *local_err =3D NULL;
+> +    int err =3D 0;
+> +    char *str;
+> +
+> +    if (dev->realized) {
+> +        qdev_prop_set_after_realize(dev, name, errp);
+> +        return;
 > +    }
->
->      s =3D g_malloc0 (sizeof (*s));
->
-> @@ -1156,7 +1166,7 @@ static void hmp_wavcapture(Monitor *mon, const QDic=
-t *qdict)
->      bits =3D has_bits ? bits : 16;
->      nchannels =3D has_channels ? nchannels : 2;
->
-> -    if (wav_start_capture (s, path, freq, bits, nchannels)) {
-> +    if (wav_start_capture(as, s, path, freq, bits, nchannels)) {
->          monitor_printf(mon, "Failed to add wave capture\n");
->          g_free (s);
->          return;
-> diff --git a/ui/vnc.c b/ui/vnc.c
-> index 38f92bfca3..24f9be5b5d 100644
-> --- a/ui/vnc.c
-> +++ b/ui/vnc.c
-> @@ -1222,7 +1222,7 @@ static void audio_add(VncState *vs)
->      ops.destroy =3D audio_capture_destroy;
->      ops.capture =3D audio_capture;
->
-> -    vs->audio_cap =3D AUD_add_capture(&vs->as, &ops, vs);
-> +    vs->audio_cap =3D AUD_add_capture(vs->vd->audio_state, &vs->as, &ops=
-, vs);
->      if (!vs->audio_cap) {
->          error_report("Failed to add audio capture");
->      }
-> @@ -3369,6 +3369,9 @@ static QemuOptsList qemu_vnc_opts =3D {
->          },{
->              .name =3D "non-adaptive",
->              .type =3D QEMU_OPT_BOOL,
-> +        },{
-> +            .name =3D "audiodev",
-> +            .type =3D QEMU_OPT_STRING,
->          },
->          { /* end of list */ }
->      },
-> @@ -3806,6 +3809,7 @@ void vnc_display_open(const char *id, Error **errp)
->      const char *saslauthz;
->      int lock_key_sync =3D 1;
->      int key_delay_ms;
-> +    const char *audiodev;
->
->      if (!vd) {
->          error_setg(errp, "VNC display not active");
-> @@ -3991,6 +3995,15 @@ void vnc_display_open(const char *id, Error **errp=
-)
->      }
->      vd->ledstate =3D 0;
->
-> +    audiodev =3D qemu_opt_get(opts, "audiodev");
-> +    if (audiodev) {
-> +        vd->audio_state =3D audio_state_by_name(audiodev);
-> +        if (!vd->audio_state) {
-> +            error_setg(errp, "Audiodev '%s' not found", audiodev);
-> +            goto fail;
-> +        }
+> +
+> +    visit_type_str(v, name, &str, &local_err);
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +        return;
 > +    }
 > +
->      device_id =3D qemu_opt_get(opts, "display");
->      if (device_id) {
->          int head =3D qemu_opt_get_number(opts, "head", 0);
-> diff --git a/hmp-commands.hx b/hmp-commands.hx
-> index bfa5681dd2..23196da3fe 100644
-> --- a/hmp-commands.hx
-> +++ b/hmp-commands.hx
-> @@ -819,16 +819,17 @@ ETEXI
->
->      {
->          .name       =3D "wavcapture",
-> -        .args_type  =3D "path:F,freq:i?,bits:i?,nchannels:i?",
-> -        .params     =3D "path [frequency [bits [channels]]]",
-> +        .args_type  =3D "path:F,freq:i?,bits:i?,nchannels:i?,audiodev:s?=
-",
-> +        .params     =3D "path [frequency [bits [channels [audiodev]]]]",
->          .help       =3D "capture audio to a wave file (default frequency=
-=3D44100 bits=3D16 channels=3D2)",
->          .cmd        =3D hmp_wavcapture,
->      },
->  STEXI
-> -@item wavcapture @var{filename} [@var{frequency} [@var{bits} [@var{chann=
-els}]]]
-> +@item wavcapture @var{filename} [@var{frequency} [@var{bits} [@var{chann=
-els} [@var{audiodev}]]]]
->  @findex wavcapture
-> -Capture audio into @var{filename}. Using sample rate @var{frequency}
-> -bits per sample @var{bits} and number of channels @var{channels}.
-> +Capture audio into @var{filename} from @var{audiodev}. Using sample rate
-> +@var{frequency} bits per sample @var{bits} and number of channels
-> +@var{channels}.
->
->  Defaults:
->  @itemize @minus
-> diff --git a/qemu-options.hx b/qemu-options.hx
-> index 9621e934c0..0111055aa4 100644
-> --- a/qemu-options.hx
-> +++ b/qemu-options.hx
-> @@ -1978,6 +1978,11 @@ can help the device and guest to keep up and not l=
-ose events in case
->  events are arriving in bulk.  Possible causes for the latter are flaky
->  network connections, or scripts for automated testing.
->
-> +@item audiodev=3D@var{audiodev}
+> +    state =3D audio_state_by_name(str);
 > +
-> +Use the specified @var{audiodev} when the VNC client requests audio
-> +transmission.
+> +    if (!state) {
+> +        err =3D -ENOENT;
+> +        goto out;
+> +    }
+> +    card->state =3D state;
 > +
->  @end table
->  ETEXI
+> +out:
+> +    error_set_from_qdev_prop_error(errp, err, dev, prop, str);
+> +    g_free(str);
+> +}
+> +
+> +const PropertyInfo qdev_prop_audiodev =3D {
+> +    .name =3D "str",
+> +    .description =3D "ID of an audiodev to use as a backend",
+> +    /* release done on shutdown */
+> +    .get =3D get_audiodev,
+> +    .set =3D set_audiodev,
+> +};
+> +
+>  void qdev_prop_set_drive(DeviceState *dev, const char *name,
+>                           BlockBackend *value, Error **errp)
+>  {
+> diff --git a/hw/usb/dev-audio.c b/hw/usb/dev-audio.c
+> index 718ab53cbb..1b1cf91132 100644
+> --- a/hw/usb/dev-audio.c
+> +++ b/hw/usb/dev-audio.c
+> @@ -666,6 +666,7 @@ static const VMStateDescription vmstate_usb_audio =3D=
+ {
+>  };
 >
+>  static Property usb_audio_properties[] =3D {
+> +    DEFINE_AUDIO_PROPERTIES(USBAudioState, card),
+>      DEFINE_PROP_UINT32("debug", USBAudioState, debug, 0),
+>      DEFINE_PROP_UINT32("buffer", USBAudioState, buffer,
+>                         32 * USBAUDIO_PACKET_SIZE),
 > --
 > 2.22.0
 >
