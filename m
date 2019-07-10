@@ -2,67 +2,94 @@ Return-Path: <SRS0=axyf=VH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65958C74A36
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 20:49:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1673AC74A36
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 20:54:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 20CC820844
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 20:49:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20CC820844
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id DF1F920838
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 20:54:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF1F920838
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37038 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37070 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlJWe-0005vs-FA
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jul 2019 16:49:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37646)
+	id 1hlJbr-0007en-Rv
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jul 2019 16:54:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39550)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <no-reply@patchew.org>) id 1hlJVt-0005NW-ES
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 16:48:31 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hlJb9-0007Bv-0N
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 16:53:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1hlJVr-0001Yb-HL
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 16:48:29 -0400
-Resent-Date: Wed, 10 Jul 2019 16:48:29 -0400
-Resent-Message-Id: <E1hlJVr-0001Yb-HL@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21449)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1hlJVr-0001N5-6f
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 16:48:27 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1562791693; cv=none; d=zoho.com; s=zohoarc; 
- b=KnvJOjbLQGdWQslPqcmPPghxysB88wwDCJrbcUCLGew6gEjdzkxCmuwanYyQ5YJVKJhF3CPdl+ZyeZvoVZIek8xl4DgZBZqihLLDW0gX3UvN0rN0mJ5z9ItpuCHUKecb+YoieQdA1xgNOhVR1yfOxCYHl2FTK7D9EPA9KmVQiEU=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1562791693;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
- bh=jw8TtRc7WsfeTuxyEFm7uK2OLqEYL/9hKzG2uZV9EXo=; 
- b=EIFy6w682LeNGPIxF6PRw0X+4gCAmqv3RbeU6opkUezBvKY8iaJfdW9JjK7BCWwVoikCOlqCFpd5n69cdYA+CMtlRm4qQhfVTt3pV0CBndf1HukrhPxsYMhhLhRkhLYN/qBeZAW4paKtI+bu8fB0Dv1y4oXtMqURzT3JmxzoRMY=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1562791691663603.7626861502124;
- Wed, 10 Jul 2019 13:48:11 -0700 (PDT)
-Message-ID: <156279169028.7449.16733682813636724503@c4a48874b076>
-In-Reply-To: <20190710202219.25939-1-brijesh.singh@amd.com>
+ (envelope-from <mreitz@redhat.com>) id 1hlJb6-0007rE-Qt
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 16:53:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50732)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1hlJb4-0007jK-22; Wed, 10 Jul 2019 16:53:50 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 2630E3082B44;
+ Wed, 10 Jul 2019 20:53:49 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.40.205.108])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1DEF198BA;
+ Wed, 10 Jul 2019 20:53:44 +0000 (UTC)
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+References: <20190710010556.32365-1-jsnow@redhat.com>
+ <20190710010556.32365-7-jsnow@redhat.com>
+ <24cb63cb-e19c-c4cb-fb08-c8f1d086cabf@redhat.com>
+ <5b3f6dad-c438-861f-b4cf-236b3f058322@redhat.com>
+ <4e9b8a92-c98d-0f19-3f8f-636dc64ca0b4@redhat.com>
+ <6a3440ed-f9d2-8f84-a5a7-d9db34a79b5b@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <03822316-9e9f-b538-85f0-1404852af514@redhat.com>
+Date: Wed, 10 Jul 2019 22:53:43 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: brijesh.singh@amd.com
-Date: Wed, 10 Jul 2019 13:48:11 -0700 (PDT)
-X-ZohoMailClient: External
+In-Reply-To: <6a3440ed-f9d2-8f84-a5a7-d9db34a79b5b@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="Lr2Ew4piNay6zYcqIvYuPfhNCz6p56UC4"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.45]); Wed, 10 Jul 2019 20:53:49 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 135.84.80.217
-Subject: Re: [Qemu-devel] [PATCH v2 00/13] Add SEV guest live migration
- support
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 6/8] block/backup: issue progress updates
+ for skipped regions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,151 +101,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: Thomas.Lendacky@amd.com, brijesh.singh@amd.com, ehabkost@redhat.com,
- qemu-devel@nongnu.org, dgilbert@redhat.com, pbonzini@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDcxMDIwMjIxOS4yNTkz
-OS0xLWJyaWplc2guc2luZ2hAYW1kLmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBo
-YXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3Jl
-IGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2MiAwMC8xM10gQWRk
-IFNFViBndWVzdCBsaXZlIG1pZ3JhdGlvbiBzdXBwb3J0ClR5cGU6IHNlcmllcwpNZXNzYWdlLWlk
-OiAyMDE5MDcxMDIwMjIxOS4yNTkzOS0xLWJyaWplc2guc2luZ2hAYW1kLmNvbQoKPT09IFRFU1Qg
-U0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJhc2UgPiAvZGV2L251
-bGwgfHwgZXhpdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNv
-bmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFs
-Z29yaXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBiYXNl
-Li4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVz
-dCcKOWViOTYzOSB0YXJnZXQvaTM4Njogc2V2OiByZW1vdmUgbWlncmF0aW9uIGJsb2NrZXIKMDBj
-MTgyNiBtaWdyYXRpb246IGFkZCBzdXBwb3J0IHRvIG1pZ3JhdGUgcGFnZSBlbmNyeXB0aW9uIGJp
-dG1hcApjYzVkNDU5IGt2bTogaW50cm9kdWNlIGhpZ2gtbGV2ZWwgQVBJIHRvIG1pZ3JhdGUgdGhl
-IHBhZ2UgZW5jcnlwdGlvbiBiaXRtYXAKNzQ0YjkzMyB0YXJnZXQvaTM4Njogc2V2OiBhZGQgc3Vw
-cG9ydCB0byBsb2FkIGluY29taW5nIGVuY3J5cHRlZCBwYWdlCjAzNjUyNTMgdGFyZ2V0L2kzODY6
-IHNldjogYWRkIHN1cHBvcnQgdG8gZW5jcnlwdCB0aGUgb3V0Z29pbmcgcGFnZQpiNjE2ZTExIG1p
-c2MuanNvbjogYWRkIG1pZ3JhdGUtc2V0LXNldi1pbmZvIGNvbW1hbmQKNmRiYzI1ZCB0YXJnZXQv
-aTM4Njogc2V2OiBkbyBub3QgY3JlYXRlIGxhdW5jaCBjb250ZXh0IGZvciBhbiBpbmNvbWluZyBn
-dWVzdAo0NjdjZGMwIGRvYzogdXBkYXRlIEFNRCBTRVYgdG8gaW5jbHVkZSBMaXZlIG1pZ3JhdGlv
-biBmbG93CmEwMmJkNmYgZG9jOiB1cGRhdGUgQU1EIFNFViBBUEkgc3BlYyB3ZWIgbGluawoyNmZl
-ZTVjIGt2bTogYWRkIHN1cHBvcnQgdG8gc3luYyB0aGUgcGFnZSBlbmNyeXB0aW9uIHN0YXRlIGJp
-dG1hcAplYzgwYjljIG1pZ3JhdGlvbi9yYW06IGFkZCBzdXBwb3J0IHRvIHNlbmQgZW5jcnlwdGVk
-IHBhZ2VzCmYwOWJmNGUga3ZtOiBpbnRyb2R1Y2UgaGlnaC1sZXZlbCBBUEkgdG8gc3VwcG9ydCBl
-bmNyeXB0ZWQgcGFnZSBtaWdyYXRpb24KOWIxZTVhZSBsaW51eC1oZWFkZXJzOiB1cGRhdGUga2Vy
-bmVsIGhlYWRlciB0byBpbmNsdWRlIFNFViBtaWdyYXRpb24gY29tbWFuZHMKCj09PSBPVVRQVVQg
-QkVHSU4gPT09CjEvMTMgQ2hlY2tpbmcgY29tbWl0IDliMWU1YWVmNTNmNCAobGludXgtaGVhZGVy
-czogdXBkYXRlIGtlcm5lbCBoZWFkZXIgdG8gaW5jbHVkZSBTRVYgbWlncmF0aW9uIGNvbW1hbmRz
-KQoyLzEzIENoZWNraW5nIGNvbW1pdCBmMDliZjRlNGQ5ZTAgKGt2bTogaW50cm9kdWNlIGhpZ2gt
-bGV2ZWwgQVBJIHRvIHN1cHBvcnQgZW5jcnlwdGVkIHBhZ2UgbWlncmF0aW9uKQpXQVJOSU5HOiBs
-aW5lIG92ZXIgODAgY2hhcmFjdGVycwojNDU6IEZJTEU6IGFjY2VsL2t2bS9rdm0tYWxsLmM6MTc3
-OgorICAgICAgICByZXR1cm4ga3ZtX3N0YXRlLT5tZW1jcnlwdF9zYXZlX291dGdvaW5nX3BhZ2Uo
-a3ZtX3N0YXRlLT5tZW1jcnlwdF9oYW5kbGUsCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFj
-dGVycwojNTY6IEZJTEU6IGFjY2VsL2t2bS9rdm0tYWxsLmM6MTg4OgorICAgICAgICByZXR1cm4g
-a3ZtX3N0YXRlLT5tZW1jcnlwdF9sb2FkX2luY29taW5nX3BhZ2Uoa3ZtX3N0YXRlLT5tZW1jcnlw
-dF9oYW5kbGUsCgp0b3RhbDogMCBlcnJvcnMsIDIgd2FybmluZ3MsIDk2IGxpbmVzIGNoZWNrZWQK
-ClBhdGNoIDIvMTMgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9m
-IHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWlu
-dGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMy8xMyBDaGVja2luZyBjb21t
-aXQgZWM4MGI5YzFkNTllIChtaWdyYXRpb24vcmFtOiBhZGQgc3VwcG9ydCB0byBzZW5kIGVuY3J5
-cHRlZCBwYWdlcykKNC8xMyBDaGVja2luZyBjb21taXQgMjZmZWU1Y2YxY2VmIChrdm06IGFkZCBz
-dXBwb3J0IHRvIHN5bmMgdGhlIHBhZ2UgZW5jcnlwdGlvbiBzdGF0ZSBiaXRtYXApCldBUk5JTkc6
-IEJsb2NrIGNvbW1lbnRzIHVzZSBhIGxlYWRpbmcgLyogb24gYSBzZXBhcmF0ZSBsaW5lCiM0MDog
-RklMRTogYWNjZWwva3ZtL2t2bS1hbGwuYzo1MjA6CisgICAgICAgICAgICAgICAgIC8qSE9TVF9M
-T05HX0JJVFMqLyA2NCkgLyA4OwoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzEx
-MDogRklMRTogaW5jbHVkZS9leGVjL3JhbV9hZGRyLmg6MzM2OgorICAgIHNyYyA9IGF0b21pY19y
-Y3VfcmVhZCgmcmFtX2xpc3QuZGlydHlfbWVtb3J5W0RJUlRZX01FTU9SWV9FTkNSWVBURURdKS0+
-YmxvY2tzOwoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzEyNDogRklMRTogaW5j
-bHVkZS9leGVjL3JhbV9hZGRyLmg6MzUwOgorc3RhdGljIGlubGluZSB2b2lkIGNwdV9waHlzaWNh
-bF9tZW1vcnlfc2V0X2RpcnR5X2VuY19sZWJpdG1hcCh1bnNpZ25lZCBsb25nICpiaXRtYXAsCgpX
-QVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMTQxOiBGSUxFOiBpbmNsdWRlL2V4ZWMv
-cmFtX2FkZHIuaDozODc6CisgICAgICAgICAgICAgICAgICAgIGF0b21pY194Y2hnKCZibG9ja3Nb
-RElSVFlfTUVNT1JZX0VOQ1JZUFRFRF1baWR4XVtvZmZzZXRdLCB0ZW1wKTsKCldBUk5JTkc6IGxp
-bmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMxNDM6IEZJTEU6IGluY2x1ZGUvZXhlYy9yYW1fYWRkci5o
-OjM4OToKKyAgICAgICAgICAgICAgICAgICAgYXRvbWljX29yKCZibG9ja3NbRElSVFlfTUVNT1JZ
-X01JR1JBVElPTl1baWR4XVtvZmZzZXRdLCB0ZW1wKTsKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBj
-aGFyYWN0ZXJzCiMxNDY6IEZJTEU6IGluY2x1ZGUvZXhlYy9yYW1fYWRkci5oOjM5MjoKKyAgICAg
-ICAgICAgICAgICAgICAgICAgIGF0b21pY19vcigmYmxvY2tzW0RJUlRZX01FTU9SWV9DT0RFXVtp
-ZHhdW29mZnNldF0sIHRlbXApOwoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgbGVhZGlu
-ZyAvKiBvbiBhIHNlcGFyYXRlIGxpbmUKIzE1NjogRklMRTogaW5jbHVkZS9leGVjL3JhbV9hZGRy
-Lmg6NDE0OgorICAgICAgICAgICAgLyogSWYgaXRzIGVuY3J5cHRlZCBiaXRtYXAgdXBkYXRlLCB0
-aGVuIHdlIG5lZWQgdG8gY29weSB0aGUgYml0bWFwCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hh
-cmFjdGVycwojMTYwOiBGSUxFOiBpbmNsdWRlL2V4ZWMvcmFtX2FkZHIuaDo0MTg6CisgICAgICAg
-ICAgICAgICAgY3B1X3BoeXNpY2FsX21lbW9yeV9zZXRfZW5jcnlwdGVkX3JhbmdlKHN0YXJ0ICsg
-aSAqIFRBUkdFVF9QQUdFX1NJWkUsCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwoj
-MTYxOiBGSUxFOiBpbmNsdWRlL2V4ZWMvcmFtX2FkZHIuaDo0MTk6CisgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFRBUkdFVF9QQUdFX1NJWkUg
-KiBocHJhdGlvLAoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzE3NDogRklMRTog
-aW5jbHVkZS9leGVjL3JhbV9hZGRyLmg6NDQwOgorc3RhdGljIGlubGluZSB2b2lkIGNwdV9waHlz
-aWNhbF9tZW1vcnlfc2V0X2VuY3J5cHRlZF9sZWJpdG1hcCh1bnNpZ25lZCBsb25nICpiaXRtYXAs
-CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMTc4OiBGSUxFOiBpbmNsdWRlL2V4
-ZWMvcmFtX2FkZHIuaDo0NDQ6CisgICAgcmV0dXJuIGNwdV9waHlzaWNhbF9tZW1vcnlfc2V0X2Rp
-cnR5X2VuY19sZWJpdG1hcChiaXRtYXAsIHN0YXJ0LCBwYWdlcywgdHJ1ZSk7CgpXQVJOSU5HOiBs
-aW5lIG92ZXIgODAgY2hhcmFjdGVycwojMTg1OiBGSUxFOiBpbmNsdWRlL2V4ZWMvcmFtX2FkZHIu
-aDo0NTE6CisgICAgcmV0dXJuIGNwdV9waHlzaWNhbF9tZW1vcnlfc2V0X2RpcnR5X2VuY19sZWJp
-dG1hcChiaXRtYXAsIHN0YXJ0LCBwYWdlcywgZmFsc2UpOwoKV0FSTklORzogbGluZSBvdmVyIDgw
-IGNoYXJhY3RlcnMKIzE5NTogRklMRTogaW5jbHVkZS9leGVjL3JhbV9hZGRyLmg6NDczOgorICAg
-IGNwdV9waHlzaWNhbF9tZW1vcnlfdGVzdF9hbmRfY2xlYXJfZGlydHkoc3RhcnQsIGxlbmd0aCwg
-RElSVFlfTUVNT1JZX0VOQ1JZUFRFRCk7CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVy
-cwojMjIwOiBGSUxFOiBpbmNsdWRlL2V4ZWMvcmFtX2FkZHIuaDo1NTk6CisgICAgc3JjID0gYXRv
-bWljX3JjdV9yZWFkKCZyYW1fbGlzdC5kaXJ0eV9tZW1vcnlbRElSVFlfTUVNT1JZX0VOQ1JZUFRF
-RF0pLT5ibG9ja3M7Cgp0b3RhbDogMCBlcnJvcnMsIDE0IHdhcm5pbmdzLCAzMjAgbGluZXMgY2hl
-Y2tlZAoKUGF0Y2ggNC8xMyBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBh
-bnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhl
-IG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo1LzEzIENoZWNraW5n
-IGNvbW1pdCBhMDJiZDZmZjA0N2MgKGRvYzogdXBkYXRlIEFNRCBTRVYgQVBJIHNwZWMgd2ViIGxp
-bmspCjYvMTMgQ2hlY2tpbmcgY29tbWl0IDQ2N2NkYzBmMzgxYyAoZG9jOiB1cGRhdGUgQU1EIFNF
-ViB0byBpbmNsdWRlIExpdmUgbWlncmF0aW9uIGZsb3cpCjcvMTMgQ2hlY2tpbmcgY29tbWl0IDZk
-YmMyNWRhNDQ3MyAodGFyZ2V0L2kzODY6IHNldjogZG8gbm90IGNyZWF0ZSBsYXVuY2ggY29udGV4
-dCBmb3IgYW4gaW5jb21pbmcgZ3Vlc3QpCjgvMTMgQ2hlY2tpbmcgY29tbWl0IGI2MTZlMTFlYmZm
-YSAobWlzYy5qc29uOiBhZGQgbWlncmF0ZS1zZXQtc2V2LWluZm8gY29tbWFuZCkKOS8xMyBDaGVj
-a2luZyBjb21taXQgMDM2NTI1M2I4Njg5ICh0YXJnZXQvaTM4Njogc2V2OiBhZGQgc3VwcG9ydCB0
-byBlbmNyeXB0IHRoZSBvdXRnb2luZyBwYWdlKQpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFj
-dGVycwojMTk5OiBGSUxFOiB0YXJnZXQvaTM4Ni9zZXYuYzo5Nzg6CisgICAgcmV0ID0gc2V2X2lv
-Y3RsKHNldl9zdGF0ZS0+c2V2X2ZkLCBLVk1fU0VWX1NFTkRfVVBEQVRFX0RBVEEsIHVwZGF0ZSwg
-ZndfZXJyKTsKCldBUk5JTkc6IEJsb2NrIGNvbW1lbnRzIHVzZSBhIGxlYWRpbmcgLyogb24gYSBz
-ZXBhcmF0ZSBsaW5lCiMyMjI6IEZJTEU6IHRhcmdldC9pMzg2L3Nldi5jOjEwMDE6CisgICAgLyog
-SWYgdGhpcyBpcyBmaXJzdCBjYWxsIHRoZW4gcXVlcnkgdGhlIHBhY2tldCBoZWFkZXIgYnl0ZXMg
-YW5kIGFsbG9jYXRlCgp0b3RhbDogMCBlcnJvcnMsIDIgd2FybmluZ3MsIDI3NCBsaW5lcyBjaGVj
-a2VkCgpQYXRjaCA5LzEzIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFu
-eSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUg
-bWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjEwLzEzIENoZWNraW5n
-IGNvbW1pdCA3NDRiOTMzZDkwMGMgKHRhcmdldC9pMzg2OiBzZXY6IGFkZCBzdXBwb3J0IHRvIGxv
-YWQgaW5jb21pbmcgZW5jcnlwdGVkIHBhZ2UpCldBUk5JTkc6IEJsb2NrIGNvbW1lbnRzIHVzZSBh
-IGxlYWRpbmcgLyogb24gYSBzZXBhcmF0ZSBsaW5lCiMxNjc6IEZJTEU6IHRhcmdldC9pMzg2L3Nl
-di5jOjExODE6CisgICAgLyogSWYgdGhpcyBpcyBmaXJzdCBidWZmZXIgYW5kIFNFViBpcyBub3Qg
-aW4gcmVjaWVpdmluZyBzdGF0ZSB0aGVuCgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDE1
-NyBsaW5lcyBjaGVja2VkCgpQYXRjaCAxMC8xMyBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSBy
-ZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0
-IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgox
-MS8xMyBDaGVja2luZyBjb21taXQgY2M1ZDQ1OTUyNDA0IChrdm06IGludHJvZHVjZSBoaWdoLWxl
-dmVsIEFQSSB0byBtaWdyYXRlIHRoZSBwYWdlIGVuY3J5cHRpb24gYml0bWFwKQoxMi8xMyBDaGVj
-a2luZyBjb21taXQgMDBjMTgyNmM5YzE5IChtaWdyYXRpb246IGFkZCBzdXBwb3J0IHRvIG1pZ3Jh
-dGUgcGFnZSBlbmNyeXB0aW9uIGJpdG1hcCkKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3Rl
-cnMKIzQwOiBGSUxFOiBtaWdyYXRpb24vcmFtLmM6ODE6CisjZGVmaW5lIFJBTV9TQVZFX0ZMQUdf
-UEFHRV9FTkNSWVBURURfQklUTUFQICAgICAgIDB4NDAwIC8qIHVzZWQgaW4gdGFyZ2V0L2kzODYv
-c2V2LmMgKi8KCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJysnIChjdHg6VnhW
-KQojODQ6IEZJTEU6IHRhcmdldC9pMzg2L3Nldi5jOjExOTM6CisjZGVmaW5lIEFMSUdOKHgsIHkp
-ICAoKCh4KSsoeSktMSkgJiB+KCh5KS0xKSkKICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoK
-RVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnLScgKGN0eDpWeFYpCiM4NDogRklM
-RTogdGFyZ2V0L2kzODYvc2V2LmM6MTE5MzoKKyNkZWZpbmUgQUxJR04oeCwgeSkgICgoKHgpKyh5
-KS0xKSAmIH4oKHkpLTEpKQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6
-IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnLScgKGN0eDpWeFYpCiM4NDogRklMRTogdGFy
-Z2V0L2kzODYvc2V2LmM6MTE5MzoKKyNkZWZpbmUgQUxJR04oeCwgeSkgICgoKHgpKyh5KS0xKSAm
-IH4oKHkpLTEpKQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpX
-QVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGlu
-ZQojMTI2OiBGSUxFOiB0YXJnZXQvaTM4Ni9zZXYuYzoxMjM1OgorICAgIHNpemUgPSBBTElHTigo
-bGVuZ3RoID4+IFRBUkdFVF9QQUdFX0JJVFMpLCAvKkhPU1RfTE9OR19CSVRTKi8gNjQpIC8gODsK
-CnRvdGFsOiAzIGVycm9ycywgMiB3YXJuaW5ncywgMTIzIGxpbmVzIGNoZWNrZWQKClBhdGNoIDEy
-LzEzIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBl
-cnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwg
-c2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgoxMy8xMyBDaGVja2luZyBjb21taXQgOWVi
-OTYzOTI5N2RlICh0YXJnZXQvaTM4Njogc2V2OiByZW1vdmUgbWlncmF0aW9uIGJsb2NrZXIpCj09
-PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUg
-ZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkwNzEw
-MjAyMjE5LjI1OTM5LTEtYnJpamVzaC5zaW5naEBhbWQuY29tL3Rlc3RpbmcuY2hlY2twYXRjaC8/
-dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hl
-dyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBh
-dGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Lr2Ew4piNay6zYcqIvYuPfhNCz6p56UC4
+Content-Type: multipart/mixed; boundary="zUupGiqpNhNHo3am9AMycR4qfgKa2KCrf";
+ protected-headers="v1"
+From: Max Reitz <mreitz@redhat.com>
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
+ Eric Blake <eblake@redhat.com>
+Message-ID: <03822316-9e9f-b538-85f0-1404852af514@redhat.com>
+Subject: Re: [PATCH 6/8] block/backup: issue progress updates for skipped
+ regions
+References: <20190710010556.32365-1-jsnow@redhat.com>
+ <20190710010556.32365-7-jsnow@redhat.com>
+ <24cb63cb-e19c-c4cb-fb08-c8f1d086cabf@redhat.com>
+ <5b3f6dad-c438-861f-b4cf-236b3f058322@redhat.com>
+ <4e9b8a92-c98d-0f19-3f8f-636dc64ca0b4@redhat.com>
+ <6a3440ed-f9d2-8f84-a5a7-d9db34a79b5b@redhat.com>
+In-Reply-To: <6a3440ed-f9d2-8f84-a5a7-d9db34a79b5b@redhat.com>
 
+--zUupGiqpNhNHo3am9AMycR4qfgKa2KCrf
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 10.07.19 22:47, John Snow wrote:
+>=20
+>=20
+> On 7/10/19 4:30 PM, Max Reitz wrote:
+>> On 10.07.19 20:20, John Snow wrote:
+>>>
+>>>
+>>> On 7/10/19 12:36 PM, Max Reitz wrote:
+>>>> On 10.07.19 03:05, John Snow wrote:
+>>>>> The way bitmap backups work is by starting at 75% if it needs
+>>>>> to copy just 25% of the disk.
+>>>>
+>>>> Although there is this comment:
+>>>>
+>>>>> /* TODO job_progress_set_remaining() would make more sense */
+>>>>
+>>>> So...
+>>>>
+>>>>> The way sync=3Dtop currently works, however, is to start at 0% and =
+then
+>>>>> never update the progress if it doesn't copy a region. If it needs =
+to
+>>>>> copy 25% of the disk, we'll finish at 25%.
+>>>>>
+>>>>> Update the progress when we skip regions.
+>>>>
+>>>> Wouldn=E2=80=99t it be more correct to decrease the job length?
+>>>>
+>>>> Max
+>>>>
+>>>
+>>> Admittedly I have precisely no idea. Maybe? As far as I understand it=
+,
+>>> we guarantee only:
+>>>
+>>> (1) Progress monotonically increases
+>>> (2) Upon completion, progress will equal the total work estimate.
+>>>     [Trying to fix that to be true here.]
+>>>
+>>> This means we can do stuff like:
+>>>
+>>> - Total work estimate can increase or decrease arbitrarily
+>>> - Neither value has to mean anything in particular
+>>>
+>>>
+>>> Bitmap sync works by artificially increasing progress for NOP regions=
+,
+>>> seen in init_copy_bitmap.
+>>
+>> Yes, and it has a TODO comment that says it should be done differently=
+=2E
+>>
+>>> Full sync also tends to increase progress regardless of it actually d=
+id
+>>> a copy or not; offload support also counts as progress here. So if yo=
+u
+>>> full sync an empty image, you'll see it increasing the progress as it=
+
+>>> doesn't actually do anything.
+>>>
+>>> Top sync is the odd one out, which just omits progress for regions it=
+ skips.
+>>>
+>>> My only motivation here was to make them consistent. Can I do it the
+>>> other way? Yeah, probably. Is one way better than the other? I
+>>> legitimately have no idea. I guess whoever wrote the last comment fel=
+t
+>>> that it should all be the other way instead. Why'd they not do that?
+>>
+>> If you look at the commit (05df8a6a2b4), I suppose it was because that=
+
+>> commit simply did not intend to change behavior.  It just touched that=
+
+>> piece of code and noted that maybe there should be a follow-up commit =
+to
+>> change it.
+>>
+>> But yeah, whatever.
+>>
+>> Reviewed-by: Max Reitz <mreitz@redhat.com>
+>>
+>=20
+> I mean. I'll make it consistent either way, but I actually don't know
+> which way I should make it go. I just think that all the modes should
+> work the same if we can help it.
+>=20
+> Flip a coin?
+
+If you=E2=80=99d flip a coin, I can say that I=E2=80=99d find it a bit mo=
+re meaningful
+to reduce the length.  Especially if you change sync=3Dtop to calculate
+beforehand how much we need to copy, so the length isn=E2=80=99t even red=
+uced
+while the job is running.
+
+And it=E2=80=99s easier to remove the TODO comment this way.  If we decid=
+e
+against it, you=E2=80=99d have to remove the TODO comment aso (because we=
+
+decided against it), but you=E2=80=99d need to justify it in the commit m=
+essage.
+ And we all know that writing explanations and documentation is the
+hardest thing of all.
+
+Max
+
+
+--zUupGiqpNhNHo3am9AMycR4qfgKa2KCrf--
+
+--Lr2Ew4piNay6zYcqIvYuPfhNCz6p56UC4
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0mUFcACgkQ9AfbAGHV
+z0BQQgf/fxV4TAzdPxBXFRbE1UE1uYoX5CoJ5fDgTQpCsGG9RiuThFjdnZdKy3No
+XwXp/+WCGXyu5/H7ps8B3Hl6rdp3Ew/MVTTjvq0ihjvoahlTWBZrDcbNTKVTwyYM
+Ug5sN9thZ99tb/wr0iV4NZGqoFkUMc/MvWKAOBUxtkT7eDmPQoYwSO8zobDUJvb2
+TaBt1eW7/9XlNNHrZV93Ed80pT3tj1+BsQ4SoJ63aU7M867OXSy6WuqH+XHV2RUz
+s71Q9UlUXa8m6UKoN9RV4d7UWg9buyAShi0AxVk31Ls+TkfDMDcS3+fUUbE7nGH+
+uKK/LTECuoorAp9DRsZ8LGiFDilneQ==
+=wjEA
+-----END PGP SIGNATURE-----
+
+--Lr2Ew4piNay6zYcqIvYuPfhNCz6p56UC4--
 
