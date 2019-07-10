@@ -2,94 +2,140 @@ Return-Path: <SRS0=axyf=VH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 374CAC74A35
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 17:53:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52C09C74A35
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 17:54:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B2E5E20844
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 17:53:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rilG+KSF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2E5E20844
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2C11620844
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 17:54:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C11620844
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35822 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35824 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlGmo-0003Zj-4V
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jul 2019 13:53:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57722)
+	id 1hlGn1-0003hr-GG
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jul 2019 13:53:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58289)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <lucienmp.qemu@gmail.com>) id 1hlGkA-0001jB-72
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 13:51:03 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hlGlm-0002nP-Py
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 13:52:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lucienmp.qemu@gmail.com>) id 1hlGk9-0007QQ-0f
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 13:51:02 -0400
-Received: from mail-qt1-x830.google.com ([2607:f8b0:4864:20::830]:36126)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <lucienmp.qemu@gmail.com>)
- id 1hlGk7-0007Ef-Ff
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 13:51:00 -0400
-Received: by mail-qt1-x830.google.com with SMTP id z4so3391198qtc.3
- for <qemu-devel@nongnu.org>; Wed, 10 Jul 2019 10:50:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=8W/Y05Li8VFvO1Ks+KVGlZBRIMg+6RO3kbPzP3ielB8=;
- b=rilG+KSFoZZEmBz974V9eC0mwzz9LcMtBnlCpAdZfvzC5glj0W0gTNpxRosspUURno
- 2g/Q1K2C6xO+yuW5+n5nSJ8m39xKYKteHplV6H2fLCSkaqLZpWeO1blSC3c3n21KSctJ
- 3Bjs5gRqAtY1Ojrn/mdm43L2/KWsKUlvKW6rRZmy/dDqN1R0HDv0lQCrr3erXI9x2qx0
- M7dcLcTSR4B3Q8bDPAflyLhM5VN7pJjLf3KwbNrhwULUT9cvy4HPWY8vSDu2qwIVAM0a
- R95utWi2v5tz4UH/trqj2cHvV8/jI9QJ55rDzALazDrc2f+NuLCVROSsc0KvfIj141I+
- 5CQg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=8W/Y05Li8VFvO1Ks+KVGlZBRIMg+6RO3kbPzP3ielB8=;
- b=U2iwVtaC6Jq18Io/gHKAmPtBGba5yWLkx0ktKZnhemZlg/vHkatRCaeGyRnxtQycCK
- tlZmRezCh/pnFZ+J7MkEuBpdsAUIylMxEPYANd906aKdx0NRCsPT11FsxMHT8JKqT0Sl
- poFS5FEn2WoCEmGGx6t0vOQXMLj8CiQn0DMFBCEcMZk418J+HaDqGMUvW3L84ZfAURv7
- Zk014NhFAvCRytItJ2A/9J4/Ue+rHnbnfcfCGLZYEdhHtm3/UY9M8F0hwoQBsnaOApzQ
- Gwjnw8CIIdUaIc8nZobUgjaLznWw+uPEK4OAltWILyiM4pMS4yoNhjGhRgRhK4fi6VEp
- 90HQ==
-X-Gm-Message-State: APjAAAXiQibBCmWJddkprpi1oifzxGo4DDOO85YbyBS6Yq6ycv6CrQBw
- 8vrA6CPgLJzgwxqxbLWJn/JAzhf9KHKHj2GNJbw=
-X-Google-Smtp-Source: APXvYqzqOqMdxNNKuxM72jLztR3cJtg9//zbL7WQCsqxZ2wVq0yV/kbw+BRLv8AGBYKflSt5b4w0Bb0ybtVqPEkcHuc=
-X-Received: by 2002:aed:3535:: with SMTP id a50mr25964038qte.237.1562781056712; 
- Wed, 10 Jul 2019 10:50:56 -0700 (PDT)
+ (envelope-from <jsnow@redhat.com>) id 1hlGlk-0001tI-Qp
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 13:52:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59940)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>)
+ id 1hlGlg-0001j1-SC; Wed, 10 Jul 2019 13:52:37 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 38C10307D987;
+ Wed, 10 Jul 2019 17:52:32 +0000 (UTC)
+Received: from [10.18.17.130] (dhcp-17-130.bos.redhat.com [10.18.17.130])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 82C181FE;
+ Wed, 10 Jul 2019 17:52:29 +0000 (UTC)
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+References: <20190710010556.32365-1-jsnow@redhat.com>
+ <20190710010556.32365-4-jsnow@redhat.com>
+ <b8e70883-2e64-aa6a-6a70-dd0aedd63f17@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <7f302053-b624-8beb-840c-a467b6862e08@redhat.com>
+Date: Wed, 10 Jul 2019 13:52:29 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-References: <2136180936.260219.1561641583358.ref@mail.yahoo.com>
- <2136180936.260219.1561641583358@mail.yahoo.com>
- <1079763171.281101.1561641752988@mail.yahoo.com>
- <e4c1fbc4-3e43-5df4-a17c-527d98d9763c@linaro.org>
- <20190628002713.GA19257@localhost.localdomain>
- <eadb57ae-256d-0bb7-5988-f493662a5caf@linaro.org>
- <20190628155030.GA34320@localhost.localdomain>
- <ea16a81c-5b94-8dd0-8339-2bd82733aed2@linaro.org>
- <20190629163621.GA111724@localhost.localdomain>
- <CAFEAcA9sfNisAz-zAZAx=ZNFmsEpP0Ec2DeRedtZSd9KQ4fvNA@mail.gmail.com>
- <1399218244.1210557.1561982640362@mail.yahoo.com>
- <CAFEAcA-0vGg_1nfkbq+o6JwoDsRyP=6mnv6ADi-atV0ROX269Q@mail.gmail.com>
- <CALvKS=GvAkNr3OKZzjGoTGG_Eys76zjcjodiN4hKXjFM5B0a4A@mail.gmail.com>
- <d9e5602c-bb33-1812-ebc2-b533e9dd5f25@linaro.org>
-In-Reply-To: <d9e5602c-bb33-1812-ebc2-b533e9dd5f25@linaro.org>
-From: Lucien Murray-Pitts <lucienmp.qemu@gmail.com>
-Date: Thu, 11 Jul 2019 02:50:47 +0900
-Message-ID: <CALvKS=EbuQOvRx+bmRnqCD6JuHK87dnkx00EiH--aXYWuNF0VQ@mail.gmail.com>
-To: Richard Henderson <richard.henderson@linaro.org>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::830
-Content-Type: text/plain; charset="UTF-8"
-X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: Re: [Qemu-devel] RFC: Why does target/m68k RTE insn. use
- gen_exception
+In-Reply-To: <b8e70883-2e64-aa6a-6a70-dd0aedd63f17@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.48]); Wed, 10 Jul 2019 17:52:32 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 3/8] iotests/257: Refactor backup helpers
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,37 +147,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Lucien Anti-Spam <lucienmp_antispam@yahoo.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <laurent@vivier.eu>
+Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> On Wed, Jul 10, 2019 at 4:04 AM Richard Henderson <
-richard.henderson@linaro.org> wrote:
 
-> > I did have a suggestion.  It was fairly detailed.
-> > https://lists.gnu.org/archive/html/qemu-devel/2019-06/msg06522.html
->
-> Your solution is elegant at about 10 lines that return getl_ilen(pc), but
-it seems the s390 has a far simpler
-instruction word format than the m68k.
 
-However then that got me to thinking, it seems that we can call a portion
-of the TCG system to disassemble a single instruction.
-    TranslationBlock tb;
-    tb.pc = env->pc;
-    gen_intermediate_code(cs, &tb, /* max isn */ 1);
-    int ilen = tb.size;
-    printf( "PC: %08x sz:%08x\n", env->pc, tb, ilen ) ;
+On 7/10/19 12:04 PM, Max Reitz wrote:
+> On 10.07.19 03:05, John Snow wrote:
+>> This test needs support for non-bitmap backups and missing or
+>> unspecified bitmap sync modes, so rewrite the helpers to be a little
+>> more generic.
+>>
+>> Signed-off-by: John Snow <jsnow@redhat.com>
+>> ---
+>>  tests/qemu-iotests/257     |  46 +++++----
+>>  tests/qemu-iotests/257.out | 192 ++++++++++++++++++------------------=
+-
+>>  2 files changed, 124 insertions(+), 114 deletions(-)
+>>
+>> diff --git a/tests/qemu-iotests/257 b/tests/qemu-iotests/257
+>> index 2ff4aa8695..2eb4f26c28 100755
+>> --- a/tests/qemu-iotests/257
+>> +++ b/tests/qemu-iotests/257
+>=20
+> [...]
+>=20
+>> -def bitmap_backup(drive, n, filepath, bitmap, bitmap_mode):
+>> -    log("--- Bitmap Backup #{:d} ---\n".format(n))
+>> -    target_id =3D "bitmap_target_{:d}".format(n)
+>> -    job_id =3D "bitmap_backup_{:d}".format(n)
+>> +def backup(drive, n, filepath, bitmap, bitmap_mode, sync=3D'bitmap'):
+>> +    log("--- Test Backup #{:d} ---\n".format(n))
+>> +    target_id =3D "backup_target_{:d}".format(n)
+>> +    job_id =3D "backup_{:d}".format(n)
+>>      target_drive =3D Drive(filepath, vm=3Ddrive.vm)
+>> =20
+>>      target_drive.create_target(target_id, drive.fmt, drive.size)
+>> -    drive.vm.qmp_log("blockdev-backup", job_id=3Djob_id, device=3Ddri=
+ve.name,
+>> -                     target=3Dtarget_id, sync=3D"bitmap",
+>> -                     bitmap_mode=3Dbitmap_mode,
+>> -                     bitmap=3Dbitmap,
+>> -                     auto_finalize=3DFalse)
+>> +
+>> +    kwargs =3D {
+>> +        'job_id': job_id,
+>> +        'auto_finalize': False,
+>> +        'bitmap': bitmap,
+>> +        'bitmap_mode': bitmap_mode,
+>> +    }
+>> +    kwargs =3D {key: val for key, val in kwargs.items() if val is not=
+ None}
+>=20
+> I suppose this is to remove items that are None?
+>=20
+> Very cute, but why not just
+>=20
+>   kwargs =3D {
+>     'job_id': job_id,
+>     'auto_finalize': False,
+>   }
+>   if bitmap is not None:
+>     kwargs['bitmap'] =3D bitmap
+>     kwargs['bitmap_mode'] =3D bitmap_mode
+>=20
+> Exactly the same number of lines, but immediately makes it clear what=E2=
+=80=99s
+> going on.  Not as cute, I admit.
+>=20
+> (Yes, I am indeed actively trying to train you not to write cute code.)
+>=20
 
-I am very new to TCG, so it does seem there is a lot of code in the
-translator_loop that appears to be interacting with the CPU model/state.
-Should I be worried about this, or is this a safe function to call outside
-of the translator core proper?
-(if everyone is too busy I can dig by myself but I think its going to take
-some time)
+It sneaks in. I genuinely struggle with understanding what other people
+will find readable; I have an authentically hard time reviewing other
+people's patches too. I'm earnestly not sure how I can help improve
+this, but I would like to.
 
-Cheers,
-Luc
+I wasn't sure what the easiest way to avoid sending the "None" over the
+wire was, so I went with a general thing, but yes: it's because bitmap
+and bitmap_mode are set to None sometimes and I need to omit such keys.
+
+In this case, though, I do test bitmap and bitmap_mode separately, so
+for the purposes of testing intentionally bad combinations you do need:
+
+if bitmap is not None:
+    kwargs['bitmap'] =3D bitmap
+if bitmap_mode is not None:
+    kwargs['bitmap_mode'] =3D bitmap_mode
+
+And I just looked at this and it did not spark joy; so I went with a
+generic filter to remove nulled keys. I admit it's /slightly/ cute and
+not immediately obvious why it needs to be done.
+
+
+This is even cuter, so maybe I am traveling in the wrong direction:
+
+def backup(drive, n, filepath, sync, **kwargs):
+    log("--- Test Backup #{:d} ---\n".format(n))
+    target_id =3D "backup_target_{:d}".format(n)
+    job_id =3D "backup_{:d}".format(n)
+    target_drive =3D Drive(filepath, vm=3Ddrive.vm)
+
+    target_drive.create_target(target_id, drive.fmt, drive.size)
+    kwargs.setdefault('auto_finalize', False)
+    # Strip any arguments explicitly nulled by the caller:
+    kwargs =3D {key: val for key, val in kwargs.items()
+              if val is not None}
+    blockdev_backup(drive.vm, drive.name, target_id, sync, **kwargs)
+    return job_id
+
+It's quite a bit shorter and also makes backup() more flexible by
+omitting the bitmap and bitmap_mode arguments entirely, allowing the
+caller to override the auto_finalize default, etc. In this permutation,
+we don't know the full extent of kwargs so it makes sense to generically
+filter it.
+
+Manually conditionally setting arguments is probably also fine.
+Do you still have a preference for the more static approach?
+
+> The rest looks good to me:
+>=20
+> Reviewed-by: Max Reitz <mreitz@redhat.com>
+>=20
+
+Thanks for reviewing, as always!
+
