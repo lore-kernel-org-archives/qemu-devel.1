@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A92AC74A21
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 16:27:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36D10C74A21
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 16:32:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 712C02086D
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 16:27:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 712C02086D
+	by mail.kernel.org (Postfix) with ESMTPS id C038820844
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 16:32:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C038820844
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35310 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35342 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlFRL-0000iZ-KX
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jul 2019 12:27:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59825)
+	id 1hlFWK-0003OZ-Om
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jul 2019 12:32:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58207)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hlFQT-0008HZ-5L
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 12:26:38 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hlFMw-0004RS-EM
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 12:22:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hlFQQ-0004dg-Fw
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 12:26:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56126)
+ (envelope-from <mreitz@redhat.com>) id 1hlFMv-0000rN-Iw
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 12:22:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:11522)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hlFQM-0004Oz-Qa; Wed, 10 Jul 2019 12:26:31 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ id 1hlFMt-0000nS-FM; Wed, 10 Jul 2019 12:22:55 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 9D970C0733FB;
- Wed, 10 Jul 2019 16:26:25 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id B7001B0CFB;
+ Wed, 10 Jul 2019 16:22:54 +0000 (UTC)
 Received: from dresden.str.redhat.com (unknown [10.40.205.108])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3CCF1608A6;
- Wed, 10 Jul 2019 16:26:16 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9617A1001B34;
+ Wed, 10 Jul 2019 16:22:50 +0000 (UTC)
 To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
 References: <20190710010556.32365-1-jsnow@redhat.com>
- <20190710010556.32365-2-jsnow@redhat.com>
+ <20190710010556.32365-6-jsnow@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
@@ -70,21 +70,21 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <71300a46-3bbd-7c6a-dd25-baf17364e07e@redhat.com>
-Date: Wed, 10 Jul 2019 18:26:14 +0200
+Message-ID: <f6176b50-785a-52d4-0a1d-bfdbc6780801@redhat.com>
+Date: Wed, 10 Jul 2019 18:22:49 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190710010556.32365-2-jsnow@redhat.com>
+In-Reply-To: <20190710010556.32365-6-jsnow@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="1obWltBLUt6XJH4OekukPBmTKzpKZDYBC"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+ boundary="wFeEtOgw4FfStMeoCrFUEscJnGpTUJ5St"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Wed, 10 Jul 2019 16:26:25 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.26]); Wed, 10 Jul 2019 16:22:54 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 1/8] iotests/257: add Pattern class
+Subject: Re: [Qemu-devel] [PATCH 5/8] iotests/257: test API failures
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,96 +102,77 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---1obWltBLUt6XJH4OekukPBmTKzpKZDYBC
-Content-Type: multipart/mixed; boundary="InwhnsRdmaarXwNvnPaPiNIpwa8eCPynk";
+--wFeEtOgw4FfStMeoCrFUEscJnGpTUJ5St
+Content-Type: multipart/mixed; boundary="xzQ1Itkh1HEvjtcJCs4Y1dwx5uarZc5v3";
  protected-headers="v1"
 From: Max Reitz <mreitz@redhat.com>
 To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
  Eric Blake <eblake@redhat.com>
-Message-ID: <71300a46-3bbd-7c6a-dd25-baf17364e07e@redhat.com>
-Subject: Re: [PATCH 1/8] iotests/257: add Pattern class
+Message-ID: <f6176b50-785a-52d4-0a1d-bfdbc6780801@redhat.com>
+Subject: Re: [PATCH 5/8] iotests/257: test API failures
 References: <20190710010556.32365-1-jsnow@redhat.com>
- <20190710010556.32365-2-jsnow@redhat.com>
-In-Reply-To: <20190710010556.32365-2-jsnow@redhat.com>
+ <20190710010556.32365-6-jsnow@redhat.com>
+In-Reply-To: <20190710010556.32365-6-jsnow@redhat.com>
 
---InwhnsRdmaarXwNvnPaPiNIpwa8eCPynk
+--xzQ1Itkh1HEvjtcJCs4Y1dwx5uarZc5v3
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
 On 10.07.19 03:05, John Snow wrote:
-> Just kidding, this is easier to manage with a full class instead of a
-> namedtuple.
->=20
 > Signed-off-by: John Snow <jsnow@redhat.com>
 > ---
->  tests/qemu-iotests/257 | 58 +++++++++++++++++++++++-------------------=
+>  tests/qemu-iotests/257     | 69 +++++++++++++++++++++++++++++++
+>  tests/qemu-iotests/257.out | 85 ++++++++++++++++++++++++++++++++++++++=
 
->  1 file changed, 32 insertions(+), 26 deletions(-)
+>  2 files changed, 154 insertions(+)
 >=20
 > diff --git a/tests/qemu-iotests/257 b/tests/qemu-iotests/257
-> index 75a651c7c3..f576a35a5c 100755
+> index 2eb4f26c28..de8707cb19 100755
 > --- a/tests/qemu-iotests/257
 > +++ b/tests/qemu-iotests/257
-> @@ -19,7 +19,6 @@
->  #
->  # owner=3Djsnow@redhat.com
+> @@ -450,10 +450,79 @@ def test_bitmap_sync(bsync_mode, msync_mode=3D'bi=
+tmap', failure=3DNone):
+>          compare_images(img_path, fbackup2)
+>          log('')
 > =20
-> -from collections import namedtuple
->  import math
->  import os
-> =20
-> @@ -29,10 +28,18 @@ from iotests import log, qemu_img
->  SIZE =3D 64 * 1024 * 1024
->  GRANULARITY =3D 64 * 1024
-> =20
-> -Pattern =3D namedtuple('Pattern', ['byte', 'offset', 'size'])
-> -def mkpattern(byte, offset, size=3DGRANULARITY):
-> -    """Constructor for Pattern() with default size"""
-> -    return Pattern(byte, offset, size)
-> +
-> +class Pattern:
-> +    def __init__(self, byte, offset, size=3DGRANULARITY):
-> +        self.byte =3D byte
-> +        self.offset =3D offset
-> +        self.size =3D size
-> +
-> +    def bits(self, granularity):
-> +        lower =3D math.floor(self.offset / granularity)
-> +        upper =3D math.floor((self.offset + self.size - 1) / granulari=
-ty)
-> +        return set(range(lower, upper + 1))
+> +def test_backup_api():
+> +    """
+> +    """
 
-By the way, this doesn=E2=80=99t work with Python2 (pre-existing in your =
-other
-series).  It complains that these are floats.
+Er, OK?
 
-Now I don=E2=80=99t know whether you care but there is the fact that the
-expressions would be shorter if they were of the form x // y instead of
-math.floor(x / y).
+[...]
 
-Max
+> +        for sync_mode, config in error_cases.items():
+> +            log("-- Sync mode {:s} tests --\n".format(sync_mode))
+> +            for bitmap, policies in config.items():
+
+You might be interested in the fact that the iteration order is
+different for Python2.  Or maybe you aren=E2=80=99t.
+
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 
---InwhnsRdmaarXwNvnPaPiNIpwa8eCPynk--
+--xzQ1Itkh1HEvjtcJCs4Y1dwx5uarZc5v3--
 
---1obWltBLUt6XJH4OekukPBmTKzpKZDYBC
+--wFeEtOgw4FfStMeoCrFUEscJnGpTUJ5St
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0mEaYACgkQ9AfbAGHV
-z0A/tQgAmbscMDXXA4+Gc7xM0Uvi54OamLQ87a6XVGp14t+8sSvKI/lE/SnNuEyC
-xiXziKf+rYkgRNBYUgyqJXtoI9DFdMzZRg2tyDuCaZhssSzIyLJhjCNHqqshCNT5
-PxqZtzr0Z+331ognIdJE2SYu888W0cwd+TUteSwuSGCMu6/kY02D/Tb61fDQyoBt
-hMU975Rcn0yZCSfKljPC0iXH6u7J498MBdjizy0IwO3IFHp2e1aLvoiHy5J/oW62
-DpQaLPIS2lmui58ZtTdWnlwibur/dGaeBPvp6Sq+Q0ISripViKUGB7fCr4yMe/g3
-0GEc7d7xC5QwSJLeEW5MjAkk7aWQqw==
-=w65F
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0mENkACgkQ9AfbAGHV
+z0BxlAf/aQ0tORtKKjFZTreFo+PxTOQGg6TPc7oXi3YKtX7/3GhdvdecZ8mcNp8N
+OKMbl1nUK+X4FoPBHesDdtYCBFPJxcwzYXPR8VbVG9Vo4s7Vyjmmv6qWlQ+Lu2fM
+Hul/K2kQKP9hnMxWQRyakP6QMjicXuSto25d8DwBfdCMSdocNeYK3B4z97RljOt+
+oUTUQIEI3g3eh5mb2LkYb5z5JZWYmcuCduwpkP5tfNPlTE81X4SIKY6g8Hgdn6QB
+iqLxAWmrxdupDXdnKQYArU0cymLHeIceQjtCj61b91kxXYtgdtsgoeRdJ8gjDF7P
+Hl/mPFXIgvOl2IPs4V5s8ucwhLaaEw==
+=FU+5
 -----END PGP SIGNATURE-----
 
---1obWltBLUt6XJH4OekukPBmTKzpKZDYBC--
+--wFeEtOgw4FfStMeoCrFUEscJnGpTUJ5St--
 
