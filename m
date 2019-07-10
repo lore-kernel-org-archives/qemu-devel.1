@@ -2,82 +2,93 @@ Return-Path: <SRS0=axyf=VH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E44DC73C6D
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 07:09:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A330C73C6D
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 07:15:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D8F0020693
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 07:09:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8F0020693
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 963FD20693
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 07:15:07 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="H83HKWhI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 963FD20693
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58352 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58374 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hl6jk-0001aj-MV
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jul 2019 03:09:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56147)
+	id 1hl6ok-0003AL-JA
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jul 2019 03:15:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58057)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <wentong.wu@intel.com>) id 1hl6iF-00014U-F0
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 03:08:24 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1hl6oE-0002fJ-M9
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 03:14:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <wentong.wu@intel.com>) id 1hl6iD-0003IV-R4
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 03:08:23 -0400
-Received: from mga01.intel.com ([192.55.52.88]:57902)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <wentong.wu@intel.com>)
- id 1hl6iB-0003Ak-K6
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 03:08:21 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
- by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 10 Jul 2019 00:08:15 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.63,473,1557212400"; 
- d="scan'208,217";a="192950188"
-Received: from fmsmsx104.amr.corp.intel.com ([10.18.124.202])
- by fmsmga002.fm.intel.com with ESMTP; 10 Jul 2019 00:08:15 -0700
-Received: from fmsmsx102.amr.corp.intel.com (10.18.124.200) by
- fmsmsx104.amr.corp.intel.com (10.18.124.202) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Wed, 10 Jul 2019 00:08:15 -0700
-Received: from shsmsx154.ccr.corp.intel.com (10.239.6.54) by
- FMSMSX102.amr.corp.intel.com (10.18.124.200) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Wed, 10 Jul 2019 00:08:15 -0700
-Received: from shsmsx106.ccr.corp.intel.com ([169.254.10.240]) by
- SHSMSX154.ccr.corp.intel.com ([169.254.7.240]) with mapi id 14.03.0439.000;
- Wed, 10 Jul 2019 15:08:13 +0800
-From: "Wu, Wentong" <wentong.wu@intel.com>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Thread-Topic: in icount mode guest OS can't boot on qemu_x86 when shift
- value range in [0, 3] 
-Thread-Index: AdU27Jpm512BV98IRK+ajWB/8kN2SwAAWfpA
-Date: Wed, 10 Jul 2019 07:08:12 +0000
-Message-ID: <228A20DABA3D9846AF1B64E31C217296010BF183@SHSMSX106.ccr.corp.intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiMzljZTRiZGEtY2Q0Ny00ZWE5LWFkNWItNzBlYWIwNzBiODg1IiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoidkhrWHl3S3pGb2hSK05oZWdtOTBYWGtsb0JuWjhleWdEbTlKWjNQbEwzb3ZwbnlSc2pqejBjanhyd3BpM1MzdCJ9
-x-ctpclassification: CTP_NT
-dlp-product: dlpe-windows
-dlp-version: 11.0.600.7
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.40]
+ (envelope-from <richard.henderson@linaro.org>) id 1hl6oD-0007qf-D5
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 03:14:34 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:34332)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1hl6oD-0007pj-1H
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 03:14:33 -0400
+Received: by mail-ot1-x341.google.com with SMTP id n5so1156799otk.1
+ for <qemu-devel@nongnu.org>; Wed, 10 Jul 2019 00:14:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=h5S9zXKt2KZUpFw1CUz/xrLyFiXFBrqUIN37igt1/Ec=;
+ b=H83HKWhIRijbLJo31EI5qu0ud6sr5wOd2RdlH94W2msrE/vb7h1Kpiu0Ynn62Kpn8q
+ unkh3iBPE0JEa6rtA8dWuNwwOU1B5dfv9DM/cca0mnMePPNJ5eRyjIZ686lplVZ0/SnA
+ cEXNfRPdpKW/pmVb6P1eH15+uhYZQIZbtsdpqAwL4Rwvd94e5uavkmPmXokXC+YyZWRU
+ RvFPY1ytpel4i70ov5M64XiFOhAXOClozrd/gjt2m3MnEg9qm8HzJTLF5i0I1F430of0
+ lPBycSXlNECNBu1ksMvooXcDifAFNs+gBWKVuVPqN36boiwACLAxFlKpCre1Q9McUBp7
+ dRoA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=h5S9zXKt2KZUpFw1CUz/xrLyFiXFBrqUIN37igt1/Ec=;
+ b=jmncLPN5X7jHZfXrU+ayvEvR1b5I1AUioGZs+JSQij4aftsvPt/3MlU9AFJZtwBiuK
+ cVWHqr3k/cOIev7YLcTi5/qQCZx/baebe5k01K4K7YjV9kyou/V6wpjEm5C3Wm0QCWvx
+ mfvYCUMg95GW7aCxRBwt5wN5ZHw8kZWhej/d/qP3ITuZFu1Fkd8zYiiH12g+ybinAG/F
+ DP03VkKbd4BqEk0ZtU3duXzl2YA9ZPkyaVUUbN2Im2oGIiyGIx1+ddmwYMNm5QRrTAmP
+ coqaH29bRVONCMDXWnYk6OqHPWYBRnyGfViXo6wLMkcAqYtZd+tzitB+XBXBKRbYzULu
+ Im+g==
+X-Gm-Message-State: APjAAAWVJViLuHKgll246T5re+ajdcc/OZ4qstOL8hpc9z/GRammYrFf
+ SeC7PAu90WLyvausBBYsqk2T8Q==
+X-Google-Smtp-Source: APXvYqw+x2+k/dfy1dgX97DTyXtqPJy4dECE0GVAhrop20WK33O+1tkYhmuIYllKBQ6y2u7wXzssDw==
+X-Received: by 2002:a9d:664c:: with SMTP id q12mr21149674otm.175.1562742871937; 
+ Wed, 10 Jul 2019 00:14:31 -0700 (PDT)
+Received: from [192.168.43.94] ([172.56.7.82])
+ by smtp.gmail.com with ESMTPSA id r130sm556344oib.41.2019.07.10.00.14.28
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Wed, 10 Jul 2019 00:14:31 -0700 (PDT)
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
+References: <20190705160421.19015-1-alex.bennee@linaro.org>
+ <20190705160421.19015-5-alex.bennee@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <aec9314d-c1e9-2521-6170-d8ce6be97a97@linaro.org>
+Date: Wed, 10 Jul 2019 09:14:19 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.1
 MIME-Version: 1.0
+In-Reply-To: <20190705160421.19015-5-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 192.55.52.88
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: Re: [Qemu-devel] in icount mode guest OS can't boot on qemu_x86
- when shift value range in [0, 3]
+X-Received-From: 2607:f8b0:4864:20::341
+Subject: Re: [Qemu-devel] [PATCH v1 4/5] gdbstub: add some notes to the
+ header comment
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,27 +100,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: qemu-arm@nongnu.org,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add more info:
+On 7/5/19 6:04 PM, Alex Bennée wrote:
+> Add a link to the remote protocol spec and an SPDX tag.
+> 
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> ---
+>  gdbstub.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+> 
+> diff --git a/gdbstub.c b/gdbstub.c
+> index 8618e34311..ea3349d1aa 100644
+> --- a/gdbstub.c
+> +++ b/gdbstub.c
+> @@ -1,6 +1,10 @@
+>  /*
+>   * gdb server stub
+>   *
+> + * This implements a subset of the remote protocol as described in:
+> + *
+> + *   https://sourceware.org/gdb/onlinedocs/gdb/Remote-Protocol.html
+> + *
 
-the qemu binary is qemu-system-i386 and it's TCG mode, not kvm.
+Ack.
 
-From: Wu, Wentong
-Sent: Wednesday, July 10, 2019 3:01 PM
-To: 'qemu-devel@nongnu.org' <qemu-devel@nongnu.org>
-Subject: in icount mode guest OS can't boot on qemu_x86 when shift value ra=
-nge in [0, 3]
+>   * Copyright (c) 2003-2005 Fabrice Bellard
+>   *
+>   * This library is free software; you can redistribute it and/or
+> @@ -15,6 +19,8 @@
+>   *
+>   * You should have received a copy of the GNU Lesser General Public
+>   * License along with this library; if not, see <http://www.gnu.org/licenses/>.
+> + *
+> + * SPDX-License-Identifier: GPL-2.0-or-later
 
-
-Hi all,
-
-I'm running a rtos on qemu_x86 with icount mode enabled, shift value locate=
-d in [0, 3], there is very high possibility that the guest os(the rtos) can=
-'t boot up. Does anyone have any idea for this issue? And this issue blocke=
-d me long time, appreciate any input?
+Nack.  The text is for the LGPL.
 
 
-Thanks
+r~
+
