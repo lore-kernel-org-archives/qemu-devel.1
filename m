@@ -6,45 +6,45 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EA6CC74A36
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 17:40:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 798EFC74A35
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 17:43:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1591620693
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 17:40:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1591620693
+	by mail.kernel.org (Postfix) with ESMTPS id 517002087F
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 17:43:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 517002087F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35744 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35768 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlGa0-0005ES-08
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jul 2019 13:40:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52391)
+	id 1hlGcm-0007Ji-Ac
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jul 2019 13:43:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51950)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jsnow@redhat.com>) id 1hlGVv-0003Mi-Dw
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 13:36:20 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hlGUH-0002iJ-Lu
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 13:34:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hlGVu-0006X3-Gj
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 13:36:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55068)
+ (envelope-from <jsnow@redhat.com>) id 1hlGUF-0003j3-7O
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 13:34:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50206)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1hlGVm-0006C8-Uj; Wed, 10 Jul 2019 13:36:11 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ id 1hlGU9-0003KS-1x; Wed, 10 Jul 2019 13:34:30 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E5061916CA;
- Wed, 10 Jul 2019 17:36:09 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 7F73430C34C3;
+ Wed, 10 Jul 2019 17:34:23 +0000 (UTC)
 Received: from [10.18.17.130] (dhcp-17-130.bos.redhat.com [10.18.17.130])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3AE7C60A97;
- Wed, 10 Jul 2019 17:36:09 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id CDF2C60BFC;
+ Wed, 10 Jul 2019 17:34:22 +0000 (UTC)
 To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
 References: <20190710010556.32365-1-jsnow@redhat.com>
- <20190710010556.32365-3-jsnow@redhat.com>
- <a246f50d-cce2-27da-c501-f6c01837c4f9@redhat.com>
+ <20190710010556.32365-2-jsnow@redhat.com>
+ <71300a46-3bbd-7c6a-dd25-baf17364e07e@redhat.com>
 From: John Snow <jsnow@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
@@ -121,21 +121,21 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <40975a77-80e7-9231-8fd2-0ba3d8b08494@redhat.com>
-Date: Wed, 10 Jul 2019 13:36:08 -0400
+Message-ID: <a2db1182-1dea-b657-5124-32a40eaedeca@redhat.com>
+Date: Wed, 10 Jul 2019 13:34:22 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <a246f50d-cce2-27da-c501-f6c01837c4f9@redhat.com>
+In-Reply-To: <71300a46-3bbd-7c6a-dd25-baf17364e07e@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.29]); Wed, 10 Jul 2019 17:36:09 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.40]); Wed, 10 Jul 2019 17:34:23 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 2/8] iotests/257: add EmulatedBitmap class
+Subject: Re: [Qemu-devel] [PATCH 1/8] iotests/257: add Pattern class
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -154,60 +154,62 @@ Sender: "Qemu-devel"
 
 
 
-On 7/10/19 11:47 AM, Max Reitz wrote:
+On 7/10/19 12:26 PM, Max Reitz wrote:
 > On 10.07.19 03:05, John Snow wrote:
->> Represent a bitmap with an object that we can mark and clear bits in.
->> This makes it easier to manage partial writes when we don't write a
->> full group's worth of patterns before an error.
+>> Just kidding, this is easier to manage with a full class instead of a
+>> namedtuple.
 >>
 >> Signed-off-by: John Snow <jsnow@redhat.com>
 >> ---
->>  tests/qemu-iotests/257 | 125 +++++++++++++++++++++++++----------------
->>  1 file changed, 76 insertions(+), 49 deletions(-)
+>>  tests/qemu-iotests/257 | 58 +++++++++++++++++++++++------------------=
+-
+>>  1 file changed, 32 insertions(+), 26 deletions(-)
 >>
 >> diff --git a/tests/qemu-iotests/257 b/tests/qemu-iotests/257
->> index f576a35a5c..2ff4aa8695 100755
+>> index 75a651c7c3..f576a35a5c 100755
 >> --- a/tests/qemu-iotests/257
 >> +++ b/tests/qemu-iotests/257
->> @@ -85,6 +85,60 @@ GROUPS = [
->>          Pattern('0xdd', 0x3fc0000)]), # New; leaving a gap to the right
->>  ]
->>  
+>> @@ -19,7 +19,6 @@
+>>  #
+>>  # owner=3Djsnow@redhat.com
+>> =20
+>> -from collections import namedtuple
+>>  import math
+>>  import os
+>> =20
+>> @@ -29,10 +28,18 @@ from iotests import log, qemu_img
+>>  SIZE =3D 64 * 1024 * 1024
+>>  GRANULARITY =3D 64 * 1024
+>> =20
+>> -Pattern =3D namedtuple('Pattern', ['byte', 'offset', 'size'])
+>> -def mkpattern(byte, offset, size=3DGRANULARITY):
+>> -    """Constructor for Pattern() with default size"""
+>> -    return Pattern(byte, offset, size)
 >> +
->> +class EmulatedBitmap:
->> +    def __init__(self, granularity=GRANULARITY):
->> +        self._bits = set()
->> +        self.groups = set()
->> +        self.granularity = granularity
+>> +class Pattern:
+>> +    def __init__(self, byte, offset, size=3DGRANULARITY):
+>> +        self.byte =3D byte
+>> +        self.offset =3D offset
+>> +        self.size =3D size
 >> +
->> +    def dirty_bits(self, bits):
->> +        self._bits |= set(bits)
->> +
->> +    def dirty_group(self, n):
->> +        self.dirty_bits(GROUPS[n].bits(self.granularity))
->> +
->> +    def clear(self):
->> +        self._bits = set()
->> +
->> +    def clear_bits(self, bits):
->> +        self._bits = self._bits - set(bits)
-> 
-> Does -= not work here?
-> 
-> No real complaints.  Sorry.
-> 
-> Reviewed-by: Max Reitz <mreitz@redhat.com>
-> 
+>> +    def bits(self, granularity):
+>> +        lower =3D math.floor(self.offset / granularity)
+>> +        upper =3D math.floor((self.offset + self.size - 1) / granular=
+ity)
+>> +        return set(range(lower, upper + 1))
+>=20
+> By the way, this doesn=E2=80=99t work with Python2 (pre-existing in you=
+r other
+> series).  It complains that these are floats.
+>=20
+> Now I don=E2=80=99t know whether you care but there is the fact that th=
+e
+> expressions would be shorter if they were of the form x // y instead of
+> math.floor(x / y).
+>=20
+> Max
+>=20
 
-It's okay. I forget which shorthand operators Python has for which types
-sometimes.
-
->>> a = {'a', 'b', 'c'}
->>> a -= {'c'}
->>> a
-{'b', 'a'}
-
-Well, apparently it does. I'll change it.
-
---js
+Ah, crud; OK -- I'll play nice with python2 for a while longer. Thanks
+for pointing this out.
 
