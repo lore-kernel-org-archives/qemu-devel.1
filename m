@@ -2,76 +2,78 @@ Return-Path: <SRS0=axyf=VH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.9 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-1.9 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E57F7C74A35
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 18:36:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 005B9C74A35
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 18:36:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A5C3D20651
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 18:36:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C74F520651
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 18:36:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mJl3EWlM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A5C3D20651
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bhGW7j/v"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C74F520651
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36094 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36096 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlHRy-0008Q6-5R
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jul 2019 14:36:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44198)
+	id 1hlHSR-0000Ny-3L
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jul 2019 14:36:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45245)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jan.bobek@gmail.com>) id 1hlHLm-0001Ia-P5
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 14:29:57 -0400
+ (envelope-from <jan.bobek@gmail.com>) id 1hlHOg-0006Ak-Gn
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 14:32:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jan.bobek@gmail.com>) id 1hlHLk-0008OF-T9
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 14:29:54 -0400
-Received: from mail-yw1-xc42.google.com ([2607:f8b0:4864:20::c42]:34818)
+ (envelope-from <jan.bobek@gmail.com>) id 1hlHOf-0003Yz-0b
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 14:32:54 -0400
+Received: from mail-yw1-xc42.google.com ([2607:f8b0:4864:20::c42]:33063)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <jan.bobek@gmail.com>) id 1hlHLk-0008JA-88
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 14:29:52 -0400
-Received: by mail-yw1-xc42.google.com with SMTP id g19so509632ywe.2
- for <qemu-devel@nongnu.org>; Wed, 10 Jul 2019 11:29:48 -0700 (PDT)
+ (Exim 4.71) (envelope-from <jan.bobek@gmail.com>) id 1hlHOe-0002xg-7q
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 14:32:52 -0400
+Received: by mail-yw1-xc42.google.com with SMTP id l124so1149162ywd.0
+ for <qemu-devel@nongnu.org>; Wed, 10 Jul 2019 11:32:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=subject:to:cc:references:from:openpgp:autocrypt:message-id:date
- :user-agent:mime-version:in-reply-to;
- bh=fBjvpYZGNbPKygli6Lf6Pnl/DrEp9p519Jo0EJHWGFI=;
- b=mJl3EWlMFBWU3IgzoPmqg7Li76zvMQaMY7qy6LXnd3qO97T90YJF0GolLjkQqiUMQ2
- 7Z6j+OeAFKhs5E6KEMDJeKYTeO8jrCJK2JKf8MNpHVTWi1WoJIsI3uL74JmlWXerPdhm
- RmS3JwQDeGNDRZkLyHG/3LfPYXYS8gMhh8TLi3cL9l0vRqTNlYIumd/qNRoJH117BLu3
- vHDBj8orywnk66WH5HMNSc2V5TzDvuACJdznc7BRE/mQ0LvxI2iAg994pmMJZTTKA0xi
- nMv2oscbz/2BwImLMgVsR993RDlrOxSJS4Nm57qmAM2fdBSEpcYlir6uwBdFio0SWjVA
- ZQDQ==
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=oAghzLklCzygIO2Gg8U3q0A4ukmhd/Zz6v2tieI+zFc=;
+ b=bhGW7j/vWHFTQKhhYZFqTaZEECGvBgfU9gCe2R3hqudOhLiE+dlNt79ObH8cW9xz/2
+ aBsCuELQBoPYUAnTXl+fZWUxjzXUZHNTYTfHuLmnwntg6l9j4Yu+U/zNB6OlKPegdzpd
+ RTuvYc1/5cJWYLtb30LjDYCiBU0fb4KLSXkgkJhX4W5/XxlmefBrxTij1cEmcBRVKs05
+ +WbP9ZtVwJykf1fQL1gqdD9GlNiCFiuML6QKR7OwcVQ+xe6l14QmlEi2/dVqS5E2xnW+
+ nDxM2il8e5rIXMd2doG5C/Y9f1BYukH5QWIHYsUoHbhSu9ZkfTyLecOQUop3iBttQr7t
+ KNjQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:openpgp:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to;
- bh=fBjvpYZGNbPKygli6Lf6Pnl/DrEp9p519Jo0EJHWGFI=;
- b=fAaoAfcK4HY4u/MDRDqZN62Zgu/PZOfweoUaaiSBjYNmhQXrKbaYI5B/PZookdsAER
- lN5ZyN4Y/tIL8G9mgQH7G07qGeZp9+BG/y2hEhY8jfJplpQWo9eQ/YEaAjaA31kh8dJ0
- 6pJBYwfb8GZfUhH72BW8IfEOz+6+PJssDdzXP4RFOC1+WC5paxRnrt81zxFsmUTlEp8D
- 1YgtnwfeFFr/bSGXrFa1gr/rX7W43i/ladhv740p6/vdJ8t9rAyTTm1QSby9uj+sEAu/
- 4X8MXvz7gArrJTevw4IUxldkMsGhBOS/wbIIcCLXMexQVz5KOuJXvEe+f3RlEgQHVru2
- a2BA==
-X-Gm-Message-State: APjAAAUonaxvO4Q2sVXundSqZCP3b/aXPq6Ky6vai6fecPobyWUqYc3n
- 4nRBz09BgRR3qlB3OO8k9KoyQu0x
-X-Google-Smtp-Source: APXvYqwly12XSPmwZogMW77MA6o3ttv1w6ZciW2q0g5Zsr5aE2nblKva9mYzdRaX5moUuO3BL8SuqA==
-X-Received: by 2002:a81:98f:: with SMTP id 137mr2555880ywj.293.1562783387633; 
- Wed, 10 Jul 2019 11:29:47 -0700 (PDT)
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=oAghzLklCzygIO2Gg8U3q0A4ukmhd/Zz6v2tieI+zFc=;
+ b=EI8Qd0NHzaUYUZazuNUJynRSufeeP8mExl2gz6vO32EZWPJOhldIfoCUkMLn3Nwo8d
+ YwjzziiU3MJ+SRao7FjWsBgx1qXm3xl4X0BwAzqxxSnHVfBfujQ48YQdG8z/iXl7fpd/
+ wml3blNgu6JWTmIU7whp24EDjRNJx+wbwxIbyeou7AIDcwG6TqJz1lmYGt8/5XeyEviM
+ fwiP8KjhxpldzbZioka8hhmpVk42tzWWq/U9JDGajrM0vCxtFX+MfdZWcmfrshCV34Fo
+ /XuZsaaZ9lWlw1WVdNhXX6zDzP78xhBsaqjGb/6EPPxl6bJimXqqOsnHE8/8PocuRRbo
+ xLow==
+X-Gm-Message-State: APjAAAWUpPPcthhKfNi5kK0gX99poGWM5lreg/4P/CS5DqGFQ3SY0vO8
+ Z0FGFsXW3FlwYG+/e2J01y0=
+X-Google-Smtp-Source: APXvYqzwYcG4zrnNhDO7mctbrotJmsEYvn1Tg4gY2TjruUIO/NzaRGK9c6gE9Ly2WMbwF3UpUjkJyQ==
+X-Received: by 2002:a81:5e57:: with SMTP id s84mr18139762ywb.244.1562783552592; 
+ Wed, 10 Jul 2019 11:32:32 -0700 (PDT)
 Received: from [192.168.1.96] (69-222-133-165.lightspeed.tukrga.sbcglobal.net.
  [69.222.133.165])
- by smtp.googlemail.com with ESMTPSA id j207sm732093ywj.35.2019.07.10.11.29.46
+ by smtp.googlemail.com with ESMTPSA id h134sm681992ywa.110.2019.07.10.11.32.31
  (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Wed, 10 Jul 2019 11:29:46 -0700 (PDT)
+ Wed, 10 Jul 2019 11:32:32 -0700 (PDT)
 To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 References: <20190701043536.26019-1-jan.bobek@gmail.com>
  <20190701043536.26019-7-jan.bobek@gmail.com>
- <9e107b82-4a51-e2ea-ee1e-19c4d4e05d01@linaro.org>
+ <f1b0ff64-0c62-f1b0-8362-539d9d37156c@linaro.org>
 From: Jan Bobek <jan.bobek@gmail.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=jan.bobek@gmail.com; prefer-encrypt=mutual; keydata=
@@ -148,15 +150,15 @@ Autocrypt: addr=jan.bobek@gmail.com; prefer-encrypt=mutual; keydata=
  uD1PmEfcmmfqPmuv037Dzpe5hYj5csGsdNLMLSK1WZqaAhBAtCnh3Rme71Je7f+eObRAHHGZ
  sftsaIi3kpdIyUnKybZhViIlXs8Cde5O2HCI0NhHnaDnxKdmHaIZVlH1hX3koaRrWCeGjts1
  WWOVGHwSUSJ3lpUXEBHBicrX3bH/vUVTNTnwzGLSf/23VC9WYAe69II=
-Message-ID: <5f9b2e47-9fd8-8825-2169-c9398099d515@gmail.com>
-Date: Wed, 10 Jul 2019 14:29:45 -0400
+Message-ID: <53d71ce2-54da-b118-c5b9-c49216d13d51@gmail.com>
+Date: Wed, 10 Jul 2019 14:32:31 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <9e107b82-4a51-e2ea-ee1e-19c4d4e05d01@linaro.org>
-Content-Type: multipart/signed; micalg=pgp-sha512;
- protocol="application/pgp-signature";
- boundary="Qm1Rvmi8GMqFkYkVgzA9iNPytYfrfbe31"
+In-Reply-To: <f1b0ff64-0c62-f1b0-8362-539d9d37156c@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
 X-Received-From: 2607:f8b0:4864:20::c42
@@ -178,106 +180,16 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Qm1Rvmi8GMqFkYkVgzA9iNPytYfrfbe31
-Content-Type: multipart/mixed; boundary="JgRVLrAwuk0XBb227GqgkRM5ZIegTPwuf";
- protected-headers="v1"
-From: Jan Bobek <jan.bobek@gmail.com>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Message-ID: <5f9b2e47-9fd8-8825-2169-c9398099d515@gmail.com>
-Subject: Re: [RISU RFC PATCH v2 06/14] x86.risu: add MMX instructions
-References: <20190701043536.26019-1-jan.bobek@gmail.com>
- <20190701043536.26019-7-jan.bobek@gmail.com>
- <9e107b82-4a51-e2ea-ee1e-19c4d4e05d01@linaro.org>
-In-Reply-To: <9e107b82-4a51-e2ea-ee1e-19c4d4e05d01@linaro.org>
-
---JgRVLrAwuk0XBb227GqgkRM5ZIegTPwuf
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 7/3/19 5:35 PM, Richard Henderson wrote:
+On 7/3/19 5:49 PM, Richard Henderson wrote:
 > On 7/1/19 6:35 AM, Jan Bobek wrote:
->> Add an x86 configuration file with all MMX instructions.
->>
->> Signed-off-by: Jan Bobek <jan.bobek@gmail.com>
->> ---
->>  x86.risu | 96 +++++++++++++++++++++++++++++++++++++++++++++++++++++++=
-+
->>  1 file changed, 96 insertions(+)
->>  create mode 100644 x86.risu
->=20
-> Note that most of these MMX instructions affect the FPU, not the vector=
- unit.
-> We would want to extend risu again to handle this.  You'd also need to =
-seed the
-> FPU with random data.
->=20
-> I was thinking for a moment that this is really beyond what you've sign=
-ed up
-> for, but on second thoughts it's not.  Decoding SSE is really tangled w=
-ith
-> decoding MMX, via the 0x66 prefix, and you'll want to be able to verify=
- that
-> you don't regress.
+>> +MOVQ            MMX     00001111 011 d 1110 !emit { rex(w => 1); modrm(mod => MOD_DIRECT, rm => ~REG_ESP); }
+>> +MOVQ_mem        MMX     00001111 011 d 1110 !emit { rex(w => 1); modrm(mod => ~MOD_DIRECT); mem(size => 8); }
+> 
+> Oh, note that there are only 8 mmx registers, so the respective rex.{r,b} bit
+> can't be set.
 
-Honestly, I added MMX instructions just for completeness; I figured it ca=
-n't
-hurt, and you can always filter them out via command-line switches. You h=
-ave
-a point with the regression testing, though...
-
->> +# State Management Instructions
->> +EMMS            MMX     00001111 01110111 !emit { }
->=20
-> I'm not sure this is really testable, because of the state change.  But=
- we'll
-> see what happens with the aforementioned dumping.
->=20
->> +# Arithmetic Instructions
->> +PADDB           MMX     00001111 11111100 !emit { modrm(); mem(size =3D=
-> 8); }
->> +PADDW           MMX     00001111 11111101 !emit { modrm(); mem(size =3D=
-> 8); }
->> +PADDD           MMX     00001111 11111110 !emit { modrm(); mem(size =3D=
-> 8); }
->> +PADDQ           MMX     00001111 11010100 !emit { modrm(); mem(size =3D=
-> 8); }
-
-Not this one, at least according to the Intel docs:
-
-NP 0F D4 /r: PADDQ mm, mm/m64          (MMX)
-66 0F D4 /r: PADDQ xmm1, xmm2/m128     (SSE2)
-
-The SSE2 version is added in a later patch.
+Actually, my CPU chewed it without choking even when the bits were
+set, but it will taken care of in v3.
 
 -Jan
-
-
---JgRVLrAwuk0XBb227GqgkRM5ZIegTPwuf--
-
---Qm1Rvmi8GMqFkYkVgzA9iNPytYfrfbe31
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCgAdFiEESPYOqtMR3qRZrEutZeg2ldrjNs8FAl0mLpkACgkQZeg2ldrj
-Ns8boxAAl34YFZWb8N4kJsigV+CKIDb4VjqUqvNVpOu/AsU1s/i8TzMyWqCy6LJA
-FfaZQNRv6LJp86HWLAcMyIgFG4CkurfBvnP8ztrBSIVILDoX2RfLE9SKm++FIaBd
-zhp8olGX4X5Re+gDUqS8lVsctekpJ11Sbha1Minw9bwt+gqmIJIR+vlLnzc/GqMx
-vFENxZYJxYgluI2gUpR+rmhzbfwtyRYVgA2mCCQBZMx/MYSPQEIc66igZyl2BgQV
-Um+c0UcODLhxTjhG5HL05/5NsjV+MvuS170vZWwpvRkplFUqw8Rw/5HX3z220FS3
-skN3CBkCEYX9kv1AVSTgxWEf6yWXM0MtMqzJN2Y69GEQJsLXRCyZWewBBlnCiZMf
-Wtzhotqif6xaz4koQEUk1P60pjtA6cVRLbNRqA/ahX/xyc+td9AfkRu6BaiNkR1K
-i846+T9iEfMXxq2fP2U3e1LIdRV/U+ZdlCc7xSc63SMAR2ZG6NJNo/7nOgbFEwB3
-jswfGmvpCW6lhevmmwXaXH91UPE5psSdRAZ+ZY2UWyCznbxFJiNurkhlD63gbXlX
-fZUyRXGSQK4ZCcTtk5Ht/s5CjAKGAN/ugGg4iYS5TAg3shs/eeDvHmFgRa47nOK4
-ifipA7LCJ2KNsoD2iW52zhD94WRXvujZ5eVNwyiznhEZIOz9Rmg=
-=m1Gf
------END PGP SIGNATURE-----
-
---Qm1Rvmi8GMqFkYkVgzA9iNPytYfrfbe31--
 
