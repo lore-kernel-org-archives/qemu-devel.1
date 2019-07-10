@@ -6,56 +6,56 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32906C73C65
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33F69C73C66
 	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 01:11:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0055020645
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 01:11:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0055020645
+	by mail.kernel.org (Postfix) with ESMTPS id 0576D2073D
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 01:11:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0576D2073D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57354 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57356 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hl192-0004cc-U5
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jul 2019 21:11:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48911)
+	id 1hl193-0004e8-9M
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jul 2019 21:11:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49282)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jsnow@redhat.com>) id 1hl13j-0000HL-6v
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 21:06:13 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hl13t-0000Ve-SQ
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 21:06:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hl13h-0004KL-2i
- for qemu-devel@nongnu.org; Tue, 09 Jul 2019 21:06:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58800)
+ (envelope-from <jsnow@redhat.com>) id 1hl13p-0004a2-FV
+ for qemu-devel@nongnu.org; Tue, 09 Jul 2019 21:06:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54364)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1hl13Z-0004EC-J1; Tue, 09 Jul 2019 21:06:03 -0400
+ id 1hl13g-0004Ii-5o; Tue, 09 Jul 2019 21:06:09 -0400
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 79713D6F02;
- Wed, 10 Jul 2019 01:06:00 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 5D7CB369CC;
+ Wed, 10 Jul 2019 01:06:06 +0000 (UTC)
 Received: from probe.bos.redhat.com (dhcp-17-215.bos.redhat.com [10.18.17.215])
- by smtp.corp.redhat.com (Postfix) with ESMTP id AFFDB1001B1B;
- Wed, 10 Jul 2019 01:05:59 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 934991001B19;
+ Wed, 10 Jul 2019 01:06:05 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: qemu-block@nongnu.org,
 	qemu-devel@nongnu.org
-Date: Tue,  9 Jul 2019 21:05:49 -0400
-Message-Id: <20190710010556.32365-2-jsnow@redhat.com>
+Date: Tue,  9 Jul 2019 21:05:53 -0400
+Message-Id: <20190710010556.32365-6-jsnow@redhat.com>
 In-Reply-To: <20190710010556.32365-1-jsnow@redhat.com>
 References: <20190710010556.32365-1-jsnow@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.38]); Wed, 10 Jul 2019 01:06:00 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.30]); Wed, 10 Jul 2019 01:06:06 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH 1/8] iotests/257: add Pattern class
+Subject: [Qemu-devel] [PATCH 5/8] iotests/257: test API failures
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,115 +73,253 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Just kidding, this is easier to manage with a full class instead of a
-namedtuple.
-
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- tests/qemu-iotests/257 | 58 +++++++++++++++++++++++-------------------
- 1 file changed, 32 insertions(+), 26 deletions(-)
+ tests/qemu-iotests/257     | 69 +++++++++++++++++++++++++++++++
+ tests/qemu-iotests/257.out | 85 ++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 154 insertions(+)
 
 diff --git a/tests/qemu-iotests/257 b/tests/qemu-iotests/257
-index 75a651c7c3..f576a35a5c 100755
+index 2eb4f26c28..de8707cb19 100755
 --- a/tests/qemu-iotests/257
 +++ b/tests/qemu-iotests/257
-@@ -19,7 +19,6 @@
- #
- # owner=3Djsnow@redhat.com
+@@ -450,10 +450,79 @@ def test_bitmap_sync(bsync_mode, msync_mode=3D'bitm=
+ap', failure=3DNone):
+         compare_images(img_path, fbackup2)
+         log('')
 =20
--from collections import namedtuple
- import math
- import os
-=20
-@@ -29,10 +28,18 @@ from iotests import log, qemu_img
- SIZE =3D 64 * 1024 * 1024
- GRANULARITY =3D 64 * 1024
-=20
--Pattern =3D namedtuple('Pattern', ['byte', 'offset', 'size'])
--def mkpattern(byte, offset, size=3DGRANULARITY):
--    """Constructor for Pattern() with default size"""
--    return Pattern(byte, offset, size)
++def test_backup_api():
++    """
++    """
++    with iotests.FilePaths(['img', 'bsync1']) as \
++         (img_path, backup_path), \
++         iotests.VM() as vm:
 +
-+class Pattern:
-+    def __init__(self, byte, offset, size=3DGRANULARITY):
-+        self.byte =3D byte
-+        self.offset =3D offset
-+        self.size =3D size
++        log("\n=3D=3D=3D API failure tests =3D=3D=3D\n")
++        log('--- Preparing image & VM ---\n')
++        drive0 =3D Drive(img_path, vm=3Dvm)
++        drive0.img_create(iotests.imgfmt, SIZE)
++        vm.add_device("{},id=3Dscsi0".format(iotests.get_virtio_scsi_dev=
+ice()))
++        vm.launch()
 +
-+    def bits(self, granularity):
-+        lower =3D math.floor(self.offset / granularity)
-+        upper =3D math.floor((self.offset + self.size - 1) / granularity=
-)
-+        return set(range(lower, upper + 1))
++        file_config =3D {
++            'driver': 'file',
++            'filename': drive0.path
++        }
 +
++        vm.qmp_log('blockdev-add',
++                   filters=3D[iotests.filter_qmp_testfiles],
++                   node_name=3D"drive0",
++                   driver=3Ddrive0.fmt,
++                   file=3Dfile_config)
++        drive0.node =3D 'drive0'
++        drive0.device =3D 'device0'
++        vm.qmp_log("device_add", id=3Ddrive0.device,
++                   drive=3Ddrive0.name, driver=3D"scsi-hd")
++        log('')
++
++        target0 =3D Drive(backup_path, vm=3Dvm)
++        target0.create_target("backup_target", drive0.fmt, drive0.size)
++        log('')
++
++        vm.qmp_log("block-dirty-bitmap-add", node=3Ddrive0.name,
++                   name=3D"bitmap0", granularity=3DGRANULARITY)
++        log('')
++
++        log('-- Testing invalid QMP commands --\n')
++
++        error_cases =3D {
++            'incremental': {
++                None:        ['on-success', 'always', 'never', None],
++                'bitmap404': ['on-success', 'always', 'never', None],
++                'bitmap0':   ['always', 'never']
++            },
++            'bitmap': {
++                None:        ['on-success', 'always', 'never', None],
++                'bitmap404': ['on-success', 'always', 'never', None],
++                'bitmap0':   [None],
++            },
++        }
++
++        for sync_mode, config in error_cases.items():
++            log("-- Sync mode {:s} tests --\n".format(sync_mode))
++            for bitmap, policies in config.items():
++                for policy in policies:
++                    kwargs =3D { 'job_id': 'api_job' }
++                    if bitmap is not None:
++                        kwargs['bitmap'] =3D bitmap
++                    if policy is not None:
++                        kwargs['bitmap-mode'] =3D policy
++                    blockdev_backup(drive0.vm, drive0.name, "backup_targ=
+et",
++                                    sync_mode, **kwargs)
++                    log('')
++
++
+ def main():
+     for bsync_mode in ("never", "on-success", "always"):
+         for failure in ("simulated", "intermediate", None):
+             test_bitmap_sync(bsync_mode, "bitmap", failure)
 =20
- class PatternGroup:
-     """Grouping of Pattern objects. Initialize with an iterable of Patte=
-rns."""
-@@ -43,40 +50,39 @@ class PatternGroup:
-         """Calculate the unique bits dirtied by this pattern grouping"""
-         res =3D set()
-         for pattern in self.patterns:
--            lower =3D math.floor(pattern.offset / granularity)
--            upper =3D math.floor((pattern.offset + pattern.size - 1) / g=
-ranularity)
--            res =3D res | set(range(lower, upper + 1))
-+            res =3D res | pattern.bits(granularity)
-         return res
++    test_backup_api()
++
+ if __name__ =3D=3D '__main__':
+     iotests.script_main(main, supported_fmts=3D['qcow2'])
+diff --git a/tests/qemu-iotests/257.out b/tests/qemu-iotests/257.out
+index 0abc96acd3..43f2e0f9c9 100644
+--- a/tests/qemu-iotests/257.out
++++ b/tests/qemu-iotests/257.out
+@@ -2245,3 +2245,88 @@ qemu_img compare "TEST_DIR/PID-bsync1" "TEST_DIR/P=
+ID-fbackup1" =3D=3D> Identical, OK
+ qemu_img compare "TEST_DIR/PID-bsync2" "TEST_DIR/PID-fbackup2" =3D=3D> I=
+dentical, OK!
+ qemu_img compare "TEST_DIR/PID-img" "TEST_DIR/PID-fbackup2" =3D=3D> Iden=
+tical, OK!
 =20
 +
- GROUPS =3D [
-     PatternGroup([
-         # Batch 0: 4 clusters
--        mkpattern('0x49', 0x0000000),
--        mkpattern('0x6c', 0x0100000),   # 1M
--        mkpattern('0x6f', 0x2000000),   # 32M
--        mkpattern('0x76', 0x3ff0000)]), # 64M - 64K
-+        Pattern('0x49', 0x0000000),
-+        Pattern('0x6c', 0x0100000),   # 1M
-+        Pattern('0x6f', 0x2000000),   # 32M
-+        Pattern('0x76', 0x3ff0000)]), # 64M - 64K
-     PatternGroup([
-         # Batch 1: 6 clusters (3 new)
--        mkpattern('0x65', 0x0000000),   # Full overwrite
--        mkpattern('0x77', 0x00f8000),   # Partial-left (1M-32K)
--        mkpattern('0x72', 0x2008000),   # Partial-right (32M+32K)
--        mkpattern('0x69', 0x3fe0000)]), # Adjacent-left (64M - 128K)
-+        Pattern('0x65', 0x0000000),   # Full overwrite
-+        Pattern('0x77', 0x00f8000),   # Partial-left (1M-32K)
-+        Pattern('0x72', 0x2008000),   # Partial-right (32M+32K)
-+        Pattern('0x69', 0x3fe0000)]), # Adjacent-left (64M - 128K)
-     PatternGroup([
-         # Batch 2: 7 clusters (3 new)
--        mkpattern('0x74', 0x0010000),   # Adjacent-right
--        mkpattern('0x69', 0x00e8000),   # Partial-left  (1M-96K)
--        mkpattern('0x6e', 0x2018000),   # Partial-right (32M+96K)
--        mkpattern('0x67', 0x3fe0000,
--                  2*GRANULARITY)]),     # Overwrite [(64M-128K)-64M)
-+        Pattern('0x74', 0x0010000),   # Adjacent-right
-+        Pattern('0x69', 0x00e8000),   # Partial-left  (1M-96K)
-+        Pattern('0x6e', 0x2018000),   # Partial-right (32M+96K)
-+        Pattern('0x67', 0x3fe0000,
-+                2*GRANULARITY)]),     # Overwrite [(64M-128K)-64M)
-     PatternGroup([
-         # Batch 3: 8 clusters (5 new)
-         # Carefully chosen such that nothing re-dirties the one cluster
-         # that copies out successfully before failure in Group #1.
--        mkpattern('0xaa', 0x0010000,
--                  3*GRANULARITY),       # Overwrite and 2x Adjacent-righ=
-t
--        mkpattern('0xbb', 0x00d8000),   # Partial-left (1M-160K)
--        mkpattern('0xcc', 0x2028000),   # Partial-right (32M+160K)
--        mkpattern('0xdd', 0x3fc0000)]), # New; leaving a gap to the righ=
-t
-+        Pattern('0xaa', 0x0010000,
-+                3*GRANULARITY),       # Overwrite and 2x Adjacent-right
-+        Pattern('0xbb', 0x00d8000),   # Partial-left (1M-160K)
-+        Pattern('0xcc', 0x2028000),   # Partial-right (32M+160K)
-+        Pattern('0xdd', 0x3fc0000)]), # New; leaving a gap to the right
- ]
-=20
- class Drive:
++=3D=3D=3D API failure tests =3D=3D=3D
++
++--- Preparing image & VM ---
++
++{"execute": "blockdev-add", "arguments": {"driver": "qcow2", "file": {"d=
+river": "file", "filename": "TEST_DIR/PID-img"}, "node-name": "drive0"}}
++{"return": {}}
++{"execute": "device_add", "arguments": {"drive": "drive0", "driver": "sc=
+si-hd", "id": "device0"}}
++{"return": {}}
++
++{}
++{"execute": "job-dismiss", "arguments": {"id": "bdc-file-job"}}
++{"return": {}}
++{}
++{}
++{"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
++{"return": {}}
++{}
++
++{"execute": "block-dirty-bitmap-add", "arguments": {"granularity": 65536=
+, "name": "bitmap0", "node": "drive0"}}
++{"return": {}}
++
++-- Testing invalid QMP commands --
++
++-- Sync mode incremental tests --
++
++{"execute": "blockdev-backup", "arguments": {"bitmap-mode": "on-success"=
+, "device": "drive0", "job-id": "api_job", "sync": "incremental", "target=
+": "backup_target"}}
++{"error": {"class": "GenericError", "desc": "must provide a valid bitmap=
+ name for 'incremental' sync mode"}}
++
++{"execute": "blockdev-backup", "arguments": {"bitmap-mode": "always", "d=
+evice": "drive0", "job-id": "api_job", "sync": "incremental", "target": "=
+backup_target"}}
++{"error": {"class": "GenericError", "desc": "must provide a valid bitmap=
+ name for 'incremental' sync mode"}}
++
++{"execute": "blockdev-backup", "arguments": {"bitmap-mode": "never", "de=
+vice": "drive0", "job-id": "api_job", "sync": "incremental", "target": "b=
+ackup_target"}}
++{"error": {"class": "GenericError", "desc": "must provide a valid bitmap=
+ name for 'incremental' sync mode"}}
++
++{"execute": "blockdev-backup", "arguments": {"device": "drive0", "job-id=
+": "api_job", "sync": "incremental", "target": "backup_target"}}
++{"error": {"class": "GenericError", "desc": "must provide a valid bitmap=
+ name for 'incremental' sync mode"}}
++
++{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap404", "bit=
+map-mode": "on-success", "device": "drive0", "job-id": "api_job", "sync":=
+ "incremental", "target": "backup_target"}}
++{"error": {"class": "GenericError", "desc": "Bitmap 'bitmap404' could no=
+t be found"}}
++
++{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap404", "bit=
+map-mode": "always", "device": "drive0", "job-id": "api_job", "sync": "in=
+cremental", "target": "backup_target"}}
++{"error": {"class": "GenericError", "desc": "Bitmap sync mode must be 'o=
+n-success' when using sync mode 'incremental'"}}
++
++{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap404", "bit=
+map-mode": "never", "device": "drive0", "job-id": "api_job", "sync": "inc=
+remental", "target": "backup_target"}}
++{"error": {"class": "GenericError", "desc": "Bitmap sync mode must be 'o=
+n-success' when using sync mode 'incremental'"}}
++
++{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap404", "dev=
+ice": "drive0", "job-id": "api_job", "sync": "incremental", "target": "ba=
+ckup_target"}}
++{"error": {"class": "GenericError", "desc": "Bitmap 'bitmap404' could no=
+t be found"}}
++
++{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap0", "bitma=
+p-mode": "always", "device": "drive0", "job-id": "api_job", "sync": "incr=
+emental", "target": "backup_target"}}
++{"error": {"class": "GenericError", "desc": "Bitmap sync mode must be 'o=
+n-success' when using sync mode 'incremental'"}}
++
++{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap0", "bitma=
+p-mode": "never", "device": "drive0", "job-id": "api_job", "sync": "incre=
+mental", "target": "backup_target"}}
++{"error": {"class": "GenericError", "desc": "Bitmap sync mode must be 'o=
+n-success' when using sync mode 'incremental'"}}
++
++-- Sync mode bitmap tests --
++
++{"execute": "blockdev-backup", "arguments": {"bitmap-mode": "on-success"=
+, "device": "drive0", "job-id": "api_job", "sync": "bitmap", "target": "b=
+ackup_target"}}
++{"error": {"class": "GenericError", "desc": "must provide a valid bitmap=
+ name for 'bitmap' sync mode"}}
++
++{"execute": "blockdev-backup", "arguments": {"bitmap-mode": "always", "d=
+evice": "drive0", "job-id": "api_job", "sync": "bitmap", "target": "backu=
+p_target"}}
++{"error": {"class": "GenericError", "desc": "must provide a valid bitmap=
+ name for 'bitmap' sync mode"}}
++
++{"execute": "blockdev-backup", "arguments": {"bitmap-mode": "never", "de=
+vice": "drive0", "job-id": "api_job", "sync": "bitmap", "target": "backup=
+_target"}}
++{"error": {"class": "GenericError", "desc": "must provide a valid bitmap=
+ name for 'bitmap' sync mode"}}
++
++{"execute": "blockdev-backup", "arguments": {"device": "drive0", "job-id=
+": "api_job", "sync": "bitmap", "target": "backup_target"}}
++{"error": {"class": "GenericError", "desc": "must provide a valid bitmap=
+ name for 'bitmap' sync mode"}}
++
++{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap404", "bit=
+map-mode": "on-success", "device": "drive0", "job-id": "api_job", "sync":=
+ "bitmap", "target": "backup_target"}}
++{"error": {"class": "GenericError", "desc": "Bitmap 'bitmap404' could no=
+t be found"}}
++
++{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap404", "bit=
+map-mode": "always", "device": "drive0", "job-id": "api_job", "sync": "bi=
+tmap", "target": "backup_target"}}
++{"error": {"class": "GenericError", "desc": "Bitmap 'bitmap404' could no=
+t be found"}}
++
++{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap404", "bit=
+map-mode": "never", "device": "drive0", "job-id": "api_job", "sync": "bit=
+map", "target": "backup_target"}}
++{"error": {"class": "GenericError", "desc": "Bitmap 'bitmap404' could no=
+t be found"}}
++
++{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap404", "dev=
+ice": "drive0", "job-id": "api_job", "sync": "bitmap", "target": "backup_=
+target"}}
++{"error": {"class": "GenericError", "desc": "Bitmap 'bitmap404' could no=
+t be found"}}
++
++{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap0", "devic=
+e": "drive0", "job-id": "api_job", "sync": "bitmap", "target": "backup_ta=
+rget"}}
++{"error": {"class": "GenericError", "desc": "Bitmap sync mode must be gi=
+ven when providing a bitmap"}}
++
 --=20
 2.21.0
 
