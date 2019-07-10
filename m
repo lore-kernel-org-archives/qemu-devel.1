@@ -2,82 +2,94 @@ Return-Path: <SRS0=axyf=VH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 343F8C74A36
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 17:51:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 374CAC74A35
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 17:53:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 04C762087F
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 17:51:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B2E5E20844
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 17:53:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="QBgmalqq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 04C762087F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rilG+KSF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2E5E20844
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35812 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35822 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlGl1-00027E-T9
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jul 2019 13:51:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57613)
+	id 1hlGmo-0003Zj-4V
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jul 2019 13:53:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57722)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <chihmin.chao@sifive.com>) id 1hlGjp-0001Sh-1L
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 13:50:42 -0400
+ (envelope-from <lucienmp.qemu@gmail.com>) id 1hlGkA-0001jB-72
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 13:51:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <chihmin.chao@sifive.com>) id 1hlGjn-0006l8-RU
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 13:50:40 -0400
-Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:33386)
+ (envelope-from <lucienmp.qemu@gmail.com>) id 1hlGk9-0007QQ-0f
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 13:51:02 -0400
+Received: from mail-qt1-x830.google.com ([2607:f8b0:4864:20::830]:36126)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <chihmin.chao@sifive.com>)
- id 1hlGjn-0006jq-KG
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 13:50:39 -0400
-Received: by mail-pl1-x642.google.com with SMTP id c14so1598097plo.0
- for <qemu-devel@nongnu.org>; Wed, 10 Jul 2019 10:50:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
- h=from:to:cc:subject:date:message-id;
- bh=1GCsi4BIUSnxiBHAMkfzcUMMzqZQxWCpZrkscVs0YSU=;
- b=QBgmalqqkDyg6XBfx8a0I35nQZmePG6mk8O1AUr2Az+yGKqB3lA1R04khVzaxVRjw0
- iUx2nNxn4W+IGsWDwHle5meWonmGHKn+l1QKCWGKWwwLb+SeIZbQ+PJHkUR0XAA3+3Ee
- C5BQlcMwG7e+L3usSyJscrjVv4FMeZJYRje6KCiI7KbmRi+tvfqYX1TcQr5NkDbITyw0
- 3jjISgoeWVBQBFO8DPVQsodasjYVys17p0UllW2UD94WpwQbX/f+y+X7FzChQDcqic44
- H9wznJXrO/ndCjfhjNbvZU5e9q3QLue7eRc0r+0ZyxpTxsYB1zCjQHN9RZFGqVqxjdm/
- ZSYA==
+ (Exim 4.71) (envelope-from <lucienmp.qemu@gmail.com>)
+ id 1hlGk7-0007Ef-Ff
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 13:51:00 -0400
+Received: by mail-qt1-x830.google.com with SMTP id z4so3391198qtc.3
+ for <qemu-devel@nongnu.org>; Wed, 10 Jul 2019 10:50:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=8W/Y05Li8VFvO1Ks+KVGlZBRIMg+6RO3kbPzP3ielB8=;
+ b=rilG+KSFoZZEmBz974V9eC0mwzz9LcMtBnlCpAdZfvzC5glj0W0gTNpxRosspUURno
+ 2g/Q1K2C6xO+yuW5+n5nSJ8m39xKYKteHplV6H2fLCSkaqLZpWeO1blSC3c3n21KSctJ
+ 3Bjs5gRqAtY1Ojrn/mdm43L2/KWsKUlvKW6rRZmy/dDqN1R0HDv0lQCrr3erXI9x2qx0
+ M7dcLcTSR4B3Q8bDPAflyLhM5VN7pJjLf3KwbNrhwULUT9cvy4HPWY8vSDu2qwIVAM0a
+ R95utWi2v5tz4UH/trqj2cHvV8/jI9QJ55rDzALazDrc2f+NuLCVROSsc0KvfIj141I+
+ 5CQg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id;
- bh=1GCsi4BIUSnxiBHAMkfzcUMMzqZQxWCpZrkscVs0YSU=;
- b=pWtg2/fAy28AAVUH3r63PIFBlFEHw1BQqkWaUDk6KCtlfaSHvSdcSvfsnNf5a7Yk9V
- sUpaV0P5EnTYHKHpOWIhLD8/sVRv3XY+q9QzO2/odcA16/N0FvmEgvwVXpxEv72OeZEG
- qr61I3GuB9agFX2FbeSRJWMLCiFpTxNiexVpSnrBmG3vL+GS2Q22ZIXcTOFdlk9ysB12
- 55uzbmg1sTZuDE1KqBzqeiRWggvKPOt2t6Gxqt2VT8E2qP3RNcgzn+nOrPiqgdz5NUcK
- mbjjYFZ85PUcruLACBoVNj/Mm0R9665iacio78pWf7NpCn8FIKRCxxEspUkC3zjgy/LY
- bvuQ==
-X-Gm-Message-State: APjAAAXJ2v/hE/owk+HqVzzPjyCJcciYTzBDdsWnt8e5Qs950t5DZTTJ
- M68B/eRlwcQYKgPuUZFJ81vTb5AspNE=
-X-Google-Smtp-Source: APXvYqz0lxMkhLBTuScdgjgw6yensoXAKWGmzQY9A4/SVWMbAI0Uj5A+FCUlpvg8wkc9cEGr4+CSfw==
-X-Received: by 2002:a17:902:7c05:: with SMTP id
- x5mr18598444pll.321.1562781037653; 
- Wed, 10 Jul 2019 10:50:37 -0700 (PDT)
-Received: from gamma06.internal.sifive.com ([64.62.193.194])
- by smtp.gmail.com with ESMTPSA id o11sm7323891pfh.114.2019.07.10.10.50.36
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
- Wed, 10 Jul 2019 10:50:36 -0700 (PDT)
-From: Chih-Min Chao <chihmin.chao@sifive.com>
-To: qemu-devel@nongnu.org,
-	qemu-riscv@nongnu.org
-Date: Wed, 10 Jul 2019 10:50:23 -0700
-Message-Id: <1562781026-27570-1-git-send-email-chihmin.chao@sifive.com>
-X-Mailer: git-send-email 2.7.4
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=8W/Y05Li8VFvO1Ks+KVGlZBRIMg+6RO3kbPzP3ielB8=;
+ b=U2iwVtaC6Jq18Io/gHKAmPtBGba5yWLkx0ktKZnhemZlg/vHkatRCaeGyRnxtQycCK
+ tlZmRezCh/pnFZ+J7MkEuBpdsAUIylMxEPYANd906aKdx0NRCsPT11FsxMHT8JKqT0Sl
+ poFS5FEn2WoCEmGGx6t0vOQXMLj8CiQn0DMFBCEcMZk418J+HaDqGMUvW3L84ZfAURv7
+ Zk014NhFAvCRytItJ2A/9J4/Ue+rHnbnfcfCGLZYEdhHtm3/UY9M8F0hwoQBsnaOApzQ
+ Gwjnw8CIIdUaIc8nZobUgjaLznWw+uPEK4OAltWILyiM4pMS4yoNhjGhRgRhK4fi6VEp
+ 90HQ==
+X-Gm-Message-State: APjAAAXiQibBCmWJddkprpi1oifzxGo4DDOO85YbyBS6Yq6ycv6CrQBw
+ 8vrA6CPgLJzgwxqxbLWJn/JAzhf9KHKHj2GNJbw=
+X-Google-Smtp-Source: APXvYqzqOqMdxNNKuxM72jLztR3cJtg9//zbL7WQCsqxZ2wVq0yV/kbw+BRLv8AGBYKflSt5b4w0Bb0ybtVqPEkcHuc=
+X-Received: by 2002:aed:3535:: with SMTP id a50mr25964038qte.237.1562781056712; 
+ Wed, 10 Jul 2019 10:50:56 -0700 (PDT)
+MIME-Version: 1.0
+References: <2136180936.260219.1561641583358.ref@mail.yahoo.com>
+ <2136180936.260219.1561641583358@mail.yahoo.com>
+ <1079763171.281101.1561641752988@mail.yahoo.com>
+ <e4c1fbc4-3e43-5df4-a17c-527d98d9763c@linaro.org>
+ <20190628002713.GA19257@localhost.localdomain>
+ <eadb57ae-256d-0bb7-5988-f493662a5caf@linaro.org>
+ <20190628155030.GA34320@localhost.localdomain>
+ <ea16a81c-5b94-8dd0-8339-2bd82733aed2@linaro.org>
+ <20190629163621.GA111724@localhost.localdomain>
+ <CAFEAcA9sfNisAz-zAZAx=ZNFmsEpP0Ec2DeRedtZSd9KQ4fvNA@mail.gmail.com>
+ <1399218244.1210557.1561982640362@mail.yahoo.com>
+ <CAFEAcA-0vGg_1nfkbq+o6JwoDsRyP=6mnv6ADi-atV0ROX269Q@mail.gmail.com>
+ <CALvKS=GvAkNr3OKZzjGoTGG_Eys76zjcjodiN4hKXjFM5B0a4A@mail.gmail.com>
+ <d9e5602c-bb33-1812-ebc2-b533e9dd5f25@linaro.org>
+In-Reply-To: <d9e5602c-bb33-1812-ebc2-b533e9dd5f25@linaro.org>
+From: Lucien Murray-Pitts <lucienmp.qemu@gmail.com>
+Date: Thu, 11 Jul 2019 02:50:47 +0900
+Message-ID: <CALvKS=EbuQOvRx+bmRnqCD6JuHK87dnkx00EiH--aXYWuNF0VQ@mail.gmail.com>
+To: Richard Henderson <richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::642
-Subject: [Qemu-devel] [PATCH] tests/boot_linux_console: add a test for
- riscv64 + virt
+X-Received-From: 2607:f8b0:4864:20::830
+Content-Type: text/plain; charset="UTF-8"
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] RFC: Why does target/m68k RTE insn. use
+ gen_exception
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,79 +101,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Chih-Min Chao <chihmin.chao@sifive.com>, Cleber Rosa <crosa@redhat.com>,
- Caio Carrara <ccarrara@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Lucien Anti-Spam <lucienmp_antispam@yahoo.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Similar to the mips + malta test, it boots a Linux kernel on a virt
-board and verify the serial is working.  Also, it relies on the serial
-device set by the machine itself.
+> On Wed, Jul 10, 2019 at 4:04 AM Richard Henderson <
+richard.henderson@linaro.org> wrote:
 
-If riscv64 is a target being built, "make check-acceptance" will
-automatically include this test by the use of the "arch:riscv64" tags.
+> > I did have a suggestion.  It was fairly detailed.
+> > https://lists.gnu.org/archive/html/qemu-devel/2019-06/msg06522.html
+>
+> Your solution is elegant at about 10 lines that return getl_ilen(pc), but
+it seems the s390 has a far simpler
+instruction word format than the m68k.
 
-Alternatively, this test can be run using:
+However then that got me to thinking, it seems that we can call a portion
+of the TCG system to disassemble a single instruction.
+    TranslationBlock tb;
+    tb.pc = env->pc;
+    gen_intermediate_code(cs, &tb, /* max isn */ 1);
+    int ilen = tb.size;
+    printf( "PC: %08x sz:%08x\n", env->pc, tb, ilen ) ;
 
-  $ avocado run -t arch:riscv64 tests/acceptance
+I am very new to TCG, so it does seem there is a lot of code in the
+translator_loop that appears to be interacting with the CPU model/state.
+Should I be worried about this, or is this a safe function to call outside
+of the translator core proper?
+(if everyone is too busy I can dig by myself but I think its going to take
+some time)
 
-Signed-off-by: Chih-Min Chao <chihmin.chao@sifive.com>
----
- tests/acceptance/boot_linux_console.py | 40 ++++++++++++++++++++++++++++++++++
- 1 file changed, 40 insertions(+)
-
-diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
-index 3215950..bbc6b06 100644
---- a/tests/acceptance/boot_linux_console.py
-+++ b/tests/acceptance/boot_linux_console.py
-@@ -354,3 +354,43 @@ class BootLinuxConsole(Test):
-         self.vm.launch()
-         console_pattern = 'Kernel command line: %s' % kernel_command_line
-         self.wait_for_console_pattern(console_pattern)
-+
-+    def test_riscv64_virt(self):
-+        """
-+        :avocado: tags=arch:riscv64
-+        :avocado: tags=machine:virt
-+        """
-+
-+        kernel_url = ('https://github.com/chihminchao/test-binary/raw/'
-+                      '0b7787305d9e40815c05a805266cc74ff356239e/qemu/riscv64/'
-+                      'bbl_w_kernel.gz')
-+        kernel_hash = 'c7f6cc7967975ad42dc61ee0535db01c9cbd0968'
-+        kernel_path_gz = self.fetch_asset(kernel_url, asset_hash=kernel_hash)
-+        kernel_path = self.workdir + "bbl_w_kernel"
-+
-+        with gzip.open(kernel_path_gz, 'rb') as f_in:
-+            with open(kernel_path, 'wb') as f_out:
-+                shutil.copyfileobj(f_in, f_out)
-+
-+        initrd_url = ('https://github.com/groeck/linux-build-test/raw/'
-+                      '8584a59ed9e5eb5ee7ca91f6d74bbb06619205b8/rootfs/'
-+                      'riscv64/rootfs.cpio.gz')
-+        initrd_hash = 'f4867d263754961b6f626cdcdc0cb334c47e3b49'
-+        initrd_path = self.fetch_asset(initrd_url, asset_hash=initrd_hash)
-+
-+        self.vm.set_machine('virt')
-+        self.vm.set_console()
-+        kernel_command_line = (self.KERNEL_COMMON_COMMAND_LINE
-+                               + 'console=ttyS0 noreboot')
-+        self.vm.add_args('-kernel', kernel_path,
-+                         '-initrd', initrd_path,
-+                         '-append', kernel_command_line)
-+        self.vm.launch()
-+        self.wait_for_console_pattern('Boot successful.')
-+
-+        self.exec_command_and_wait_for_pattern('cat /proc/cpuinfo',
-+                                               'isa')
-+        self.exec_command_and_wait_for_pattern('uname -a',
-+                                               'sifive')
-+        self.exec_command_and_wait_for_pattern('reboot',
-+                                               'reboot: Restarting system')
--- 
-2.7.4
-
-
+Cheers,
+Luc
