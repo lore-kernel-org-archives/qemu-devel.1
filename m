@@ -2,140 +2,167 @@ Return-Path: <SRS0=axyf=VH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.9 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0978AC74A36
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 18:04:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6066C74A35
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 18:05:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 910F420844
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 18:03:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 910F420844
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7593720844
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 18:05:42 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GsAa48+9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7593720844
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35886 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35898 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlGwg-0007pR-9D
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jul 2019 14:03:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60701)
+	id 1hlGyL-0000Ve-KK
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jul 2019 14:05:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33441)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jsnow@redhat.com>) id 1hlGtZ-00074u-Gb
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 14:00:46 -0400
+ (envelope-from <jan.bobek@gmail.com>) id 1hlGvp-0007gD-0F
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 14:03:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hlGtS-0003A8-3k
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 14:00:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49584)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1hlGtK-0002pv-Vt; Wed, 10 Jul 2019 14:00:32 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 65EAD305D46D;
- Wed, 10 Jul 2019 18:00:27 +0000 (UTC)
-Received: from [10.18.17.130] (dhcp-17-130.bos.redhat.com [10.18.17.130])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A320B5C1B5;
- Wed, 10 Jul 2019 18:00:24 +0000 (UTC)
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-References: <20190710010556.32365-1-jsnow@redhat.com>
- <20190710010556.32365-6-jsnow@redhat.com>
- <f6176b50-785a-52d4-0a1d-bfdbc6780801@redhat.com>
-From: John Snow <jsnow@redhat.com>
+ (envelope-from <jan.bobek@gmail.com>) id 1hlGvn-0007QQ-N1
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 14:03:04 -0400
+Received: from mail-yw1-xc42.google.com ([2607:f8b0:4864:20::c42]:38454)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <jan.bobek@gmail.com>) id 1hlGvn-00070v-Ag
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 14:03:03 -0400
+Received: by mail-yw1-xc42.google.com with SMTP id f187so1106894ywa.5
+ for <qemu-devel@nongnu.org>; Wed, 10 Jul 2019 11:02:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=subject:to:cc:references:from:openpgp:autocrypt:message-id:date
+ :user-agent:mime-version:in-reply-to;
+ bh=JRT4TwRQH49zsvlDzmtS1h2K5OHTaSOVzXXdYBbKYR4=;
+ b=GsAa48+947iAam4FzpxYL00IHciYcwU4Xr6TGKDnXC33beUd5dVmq04oNohjvEth4D
+ OP5PhqX46Ry5n5zoDQtjcV/MHsm+9rpb6VAIRSHRQr1tS8Phn+8k4ksUR05qMONhc3aY
+ YoW35IJJ8IRpp2BbbZndMzFhqbYXfyPX/dX3Bx5KhQhzOvEcgOJInJBQ8KzEf7tbD26p
+ ExbB8jg27hIzZWLPSsPj4a1k9shNvLtKjmeo50EXFvZ2TZUL3bRBbDHJ2bvBhv2K1E7r
+ +8PvjTKSKFbeWdZi7KbK/PSjasaPqHoK2EVHcFZO6DdZxz1SnwcrS/mqToQGspxHoJlF
+ 2zWw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to;
+ bh=JRT4TwRQH49zsvlDzmtS1h2K5OHTaSOVzXXdYBbKYR4=;
+ b=k6R7dPXiQPOCzXPjWy8BfAZKA+UOqRcjFud++J4EhoyknuN36AZ/3PpDYCCvASnID7
+ TeK+kBl7aWmfW1hDIeecESDYRKBmNWQzlH6uDo9LTqJgbRtT9fqM46oSEGkK20efz2IA
+ ZvKI9o3CjpemRNr+rx85hMuTXL5whNMhLDIIvujTugjvJ7XvEP4va41uB02Kb59zidLL
+ bFywLN40qlSy/KTHw0kjLH5qtdqFPcM5McJyeUXXK46RsSVSMJFQygcDLCGUxQVKL8vo
+ gl9mmWvdF+kwXRNT7P8lU9oUqku0fnxyMz+Odx8+jvEbPDU2I7H5tLQ1xqyCLA/qqOVQ
+ Qn9g==
+X-Gm-Message-State: APjAAAVAx0I7w0ni3790eZ8jiuHBllej6Jja/VfPjDxTYJfHjG2b7YX1
+ TL1OpJ4QND6xdoVhTin/0yE=
+X-Google-Smtp-Source: APXvYqyEBCk1PUuH3wEEvB4H3qsidRilukcEKkoreCT7xSHpyFMamfEiPfkpDmMqHE2JIqp3rMNmPw==
+X-Received: by 2002:a81:a785:: with SMTP id
+ e127mr10201850ywh.317.1562781775746; 
+ Wed, 10 Jul 2019 11:02:55 -0700 (PDT)
+Received: from [192.168.1.96] (69-222-133-165.lightspeed.tukrga.sbcglobal.net.
+ [69.222.133.165])
+ by smtp.googlemail.com with ESMTPSA id q83sm771551ywq.88.2019.07.10.11.02.54
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Wed, 10 Jul 2019 11:02:55 -0700 (PDT)
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20190701043536.26019-1-jan.bobek@gmail.com>
+ <20190701043536.26019-3-jan.bobek@gmail.com>
+ <c98ee4eb-44ff-83ff-6fc6-5f97174b0044@linaro.org>
+From: Jan Bobek <jan.bobek@gmail.com>
 Openpgp: preference=signencrypt
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <66a4db9e-12b0-6e30-d2b7-be2a3078411b@redhat.com>
-Date: Wed, 10 Jul 2019 14:00:24 -0400
+Autocrypt: addr=jan.bobek@gmail.com; prefer-encrypt=mutual; keydata=
+ mQINBFbeakcBEACzYOxOXdeT3Ns+5fdSqZFODAb3VXBKQ9DL7ooxLQRhvAx6rKXP/ZkBD7eg
+ q8DJuvx6FbH227wpX+JZQawtolRJO+BTOuyU4ANPn3LGQHNtI78VhjafK7/Geb/9J6mTLl+P
+ iS1EpLjKFbaLQboOaVVCPOHfLJOMNm5Ks9iHVKPQcUWUnroZdm55MIWjRw+wYGpmLD/R+FK/
+ Cm1fS3j+tu9VYFoEFZmwW//PYzmEtYHpwXA6dOWEd12cu2208/JcEHYBl0Z6Oga0xAk2OxU5
+ BOELuewGLuSiWik4z594GLVleC2NMnr3gUPl1y8ADrKzQwYmPgytIdsQ0tkV5rK9R1XTk03e
+ ZLViYWJt5dgea+jGWcHPKPfLln53V4nCbwklGFLJQDMo8hL82bjJ7x9bsXoAnkPxJgYHgsM0
+ LCLewqEIN6khniNv/1vOAKnwoXywlIKsWrx/pFz4xXNLVHoLlkRUl1DeWWzuaha2xEsm0yfe
+ QkntqMrHC0CkBFzM1/ZE8fj8JBMjMG8me93RK9mr03TV4aROgQfi4Pjy55VKal/WpVkD4tKo
+ nTN0nHkPVsHfx+htN/+A3nnUFyfesE1wWdCxhqhIn8d/Aw9KqraYmbyTzRErXLadA4O0UmZZ
+ yPyNWQhTgGfJ9r66S+CifsiHkHlzJ/9i9AcHeh6+rXs9gjk4YwARAQABtB9KYW4gQm9iZWsg
+ PGphbi5ib2Jla0BnbWFpbC5jb20+iQJRBBMBAgA7AhsDAh4BAheAAhkBFiEETAzi4j5xV5X9
+ nNm0vpyriGq+2b4FAlwy32MFCwkIBwIGFQoJCAsCBBYCAwEACgkQvpyriGq+2b6NPw/9Fi+N
+ vmxMd81Oh3hHUZlh8fNqcvXmHqnKHslJJG9M8CXkWcd1cF+sWX+lhi2Pvi4KA2Ng++NEpi6p
+ sPrY9ZSPb4gAQYFgq6aXonnsrNSHeBMZI0E2mbK1YW4lYYJuMpqotBKqpgpoP9Fd8QbBR9vA
+ Dm18fcDQFJP0vBmLY2TWo2tdqUH1X3z1xpdADpdjMZeQ+LrQ823Vi8ib0aanaR+gJ+20w7tn
+ M+iTAGSz9jj+IAjDvrt6dpgwKaN+sFpqQFr0ClItDgtWWChIOEo7AVxK35jEHZnRpAbSvX3q
+ WxETfA/1/UiDD67FQ5mwzTm95oYw+bN6jYpQgv9BkWeOhvVi63bcQ212B5w/YJ/WysriD2tp
+ j/cTbVBgW2Al29fbeKyqdCr43yqR0ZyZcKuOKpwEtkF4xo3Z4ZR6x4uZewCjNirlwKDSI9sE
+ w137DWzREIk7sd2kZrMnFAjVOTVic8fs+jCeohuy6Eq7l+lMCWsyJTcXSY3HHmXAgoQu8HRE
+ uwQB0H5rTWn4Hz/2OtWlYHxHcqGwcUP3bdxqch001JwycoYJFnqM27whPussfxRK3i6d0CiX
+ 8N1lwBb4ukIH8y5ZFmdhMA960aTGVpeew5fnzRveZj2Fn6kPZX7Z5t0eXpdl0sYyKvxPy/rP
+ 9atlD0qdA7LSBksLIoSQ5EE+rfhAvSO5Ag0EVt5qRwEQAL1zSWDNDk5M7kPTRuonvez0WbBq
+ Sl36BBKMSsAVT7L5TTksQH0T/5N7+vTIXlOTefP2KN+8uITUR7Ld2grjdcLIpx86ff4gVmuv
+ P7Xc0wKd/dmDPVqEtBKbCPCtnHznZWUWe/zJNru9aE2RwumMjMzAqXX8VEzy+XSqToneX1a2
+ +k6+4ZRWvrJ5Kb+5vs+ccw5hQlWyF7vruUNLLVO9LgPD4BbIKyyhosuVp8PtJqdsz27eb3y0
+ oh4ThSwx+S7lYucUB30HUtqBWJ9gMiqmXDLEhx+3v5wxCWm0oko9nnwk0PstRkZ39WAawnix
+ gpQ+3Gw32yFZaDOEbfbob2+Tyc3/NA7aTnllvK1ihXaHr7dzwbE96XSEsz1RPOl/Cn2cZ0gY
+ 1/kMzUesBqrlyBIGl9TY/QLu3z2B/INwc/ZlN3oEIJRXhS0KvtUA8tT4NSXVz8yLLO7tQv/g
+ tSP0B2jsZRhm3QReCJT/cNmlOJ3O7b835Vpd+QbFoyCbKRcT6dVHl+Ay5UZykihg45HXDwtl
+ FRgYUh7xJuxHnF8SDMlPcFqdOocPXq/fgfbxDFhLOFIj/qzEI892wu5lxfDGn9u8KCZ8p55N
+ YSlcLOYlvDfCr5/syBWqO928XMOXdmQqhUFsP2aV0L3pL35qh7kfsAdSN4S0KgdQq4DUe8Mf
+ +GXaHyIVABEBAAGJAjwEGAECACYCGwwWIQRMDOLiPnFXlf2c2bS+nKuIar7ZvgUCXGyXZwUJ
+ By12uwAKCRC+nKuIar7Zvj4mEACW5/tViY+6MMv4Qh7zCXTmyNOepFjaSdbeBXpgL6IHbO3y
+ kH5K90vCGl8rgQvIxOnX5cj/o1/y8NnfJ+lv94Hlqg9DkDHt4V2Zu570gIs81dlhxOqjZh/h
+ 14LLigmx699j6ZfpRksuGKS07/3ZomrBBsMTzK+44+BXX1zLBqSamwD038TAq8n9DwILAVma
+ 5C814/i1OciQz2HhK6QH8hMFMtX/8E//B6Q5oy9GPjrznYy+Wq52cmrwX7asqTkJ8q+oryaO
+ I/popEdiE2boPz2KTa2fti2otyhU7Qc1iTdvIoUxyXZtQP7bI5RspvGHk6IP+5ksOdBjG6D6
+ IifJ1gw7cHip1mxz75uFb52jscIjkdSDhveAiSqnwAlMBy/UD2QVwTTL2o34jXwofkK+I20S
+ J5kDhUuqYrsD4zMGHX/PWa7w7oeUU3cHejj0KI6MrN6LdvYPckycglZbS2AKUd82m6XES8gA
+ 2pVPSjTH8BQKQ/Bbdgt7X416igU0nfpuj5aXe3NuLSO1sJbYRGFERTkUgxZm/RpRytGL4SPt
+ PQUBJBl8uNYwyN5Y19lwsghGFPeYeTgcPsaEf6YsLVwozZBId4WNDAaVgnxibxH4Xjb6JkwJ
+ 2W9jjN3tvmY+O0w1rnvRIJ99Btq6Qls7Nj+tdDDEKhufxpRrHTmwBUuLN+zZ9LkCDQRcbJZM
+ ARAAvczli16jbnLXksVpMj0Z8JRiIdJvE23xofalA4R+Y5oKrK+mcpTUcb+XIdkArrQNQQtq
+ pgPHLI5Dn4urmgs4E9KlBe+4fQBIzP0jyx8wH1MjhGak9QQXpLL5Z6evUdhjuyIoAb5rUgOb
+ yl+wu9vmIYsJD4HzYul+nQkx/RxTZ3/OUN5JamL7AoAL5dHKOSpEUqRHq7ZoNqn6OGDxRInX
+ dgnSs0SDYVAKVK7B8iFhEmdFXN25jOXLAtwtAh9cVGISfjEQftlvnoLQ6g+UbJ0XMWr6Y8pf
+ mfOXPEoP9takIlhoZqxFiJ98lHtbkJ2u0hDTuAYe+HxBZT16bcCsucSITC6h3qQJTMxJgQ0C
+ 5fA23ZUA9l4RszA7Lb6/wxIzko2jzZDbMaK8tsX5hHn7pJoPA34w3sY9hocMn707PWcxVVYf
+ zl9YL3cAqcbD3hMTi3v+ukw7ArQ8sKaSYMBBC9GH54ePmiLpJ3wOsgNxxeIVvnCjVwMms8Br
+ fLfnV+kuB0GABOOCsVXLkS73VjpouDzZ9k7SuZ+wVPZbJfgqLIHOT/j2nyVYVQCmzZ733E2c
+ 1/Qywe2hUfZz5NWg4fFiFywBGqcHCoeMjDuZgJ6VRMxtfAQhC3FWoLrcQYhY3l1MvNToIm6M
+ 4quvsQcJ6CMnVxpu1ULAhSkpmTvsH0BCjWeYLBEAEQEAAYkEcgQYAQoAJgIbAhYhBEwM4uI+
+ cVeV/ZzZtL6cq4hqvtm+BQJcbJqwBQkBn0q2AkDBdCAEGQEKAB0WIQRI9g6q0xHepFmsS61l
+ 6DaV2uM2zwUCXGyWTAAKCRBl6DaV2uM2z0m3D/9ebunqJVHvk1pIiJ29GfzXqUIVCyG3aXyG
+ T0RwXrQ9mKil+6/zLvAWh9NeksSIqKFDCQkC55WTUd1jL/lpDdipLo32BBLG+N0L40Nab1dM
+ QldolDWocwmJuD99bWJmd0bkmVGCLDiXVgOyec8BFggixnqVEvrz7Sh0lP9tnsb4BE7v63Q0
+ q8uFt+n3swBvMnbjbNs2uGCyRz4f0tasF3Dd3R+08LZydrarJ15C0Smqghjald8UmJNi7uvI
+ ZVwcEHSt6imp9gd4uAtcis8ebXkwAkWhW/n5DCpNVlZ8ve3haA767SJCuf4eIcPLIwW9KcgE
+ nZ3zQPqclkd9TEmttIxk7C/MoRjxNC+gkyAMQXksxPIDVutythS8JVacMSaDshFtO0RiZ/mH
+ e4oGdsBcRhThM923M9iMZAM1XLQpd5Pe+VhDsDN3+QXwkDH88t7tocamj/Ew5UT8qmZy7BJt
+ vtDPeybOgxgiVDTlvEARUHK20UiLa7l8HEnJNInlSjakch6MF6axI1Ye81Ahc/snl5PP1gYl
+ lmoQkJlRPTYgH/NLtRqcECff5pjOtUEoWWXrxRSKc0QRsTT5DhC4Z2CX3p6k0RDeMvZJnbyV
+ geYWFyT5YBPvZBf0meL541JsfvTpOhcfdk//2RvMsyxNaGeemvWQEJKg/C/fTH3So3pEmPkE
+ GwkQvpyriGq+2b6xKw//ToIcWJv1S+COsfuCZLTPL0f80pIr7yFYGcOcEfhbkdoZHAcWZP/X
+ 50NeUuSOYGoT6+pU6a6lvycB7JTuAHuSIHo8HpIPF+sju14FN47Yd1n9akW89HLeSzR5paw3
+ g9FD1TbK9uFmK+bxMREAj1Gtd7qcummK6ArpjkEdOjwPXBz9n1iVo/Jgq11Mbhg8TYCP8WRw
+ 8Lv+znH/cTSTgDxM92S79wDuFoO50zhlWzPa/g2prrUIxJxs74uBEGYy8LulRv25MfdQJVAY
+ YE6+HYAJL6S/ko2m6XCr3hLsnD0kXamzvpJtDhbgBcXDd05XDjEFurZTOWv+thwVb+BAedhP
+ XrH9DQ7/VUQBHnXz1ts5NYMjBI5NC1d16DYPtkCY0N9Jcv+fyJlAYpS7PHlZsyZmK7uUbm6p
+ xRARxxjf+U86NTBAtdnDIO/NYxhX587vXuTm2pA2pnkKYTK74QLc/ys6rO3Cwo2QSFkxx3UZ
+ uD1PmEfcmmfqPmuv037Dzpe5hYj5csGsdNLMLSK1WZqaAhBAtCnh3Rme71Je7f+eObRAHHGZ
+ sftsaIi3kpdIyUnKybZhViIlXs8Cde5O2HCI0NhHnaDnxKdmHaIZVlH1hX3koaRrWCeGjts1
+ WWOVGHwSUSJ3lpUXEBHBicrX3bH/vUVTNTnwzGLSf/23VC9WYAe69II=
+Message-ID: <a64c7e5e-7fbf-a3a0-5af2-c3e45c699b16@gmail.com>
+Date: Wed, 10 Jul 2019 14:02:54 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <f6176b50-785a-52d4-0a1d-bfdbc6780801@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Wed, 10 Jul 2019 18:00:27 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 5/8] iotests/257: test API failures
+In-Reply-To: <c98ee4eb-44ff-83ff-6fc6-5f97174b0044@linaro.org>
+Content-Type: multipart/signed; micalg=pgp-sha512;
+ protocol="application/pgp-signature";
+ boundary="gNQ755gaGnwr6MEJtVZfuTQaSB6mc4bsG"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::c42
+Subject: Re: [Qemu-devel] [RISU RFC PATCH v2 02/14] risugen_x86_asm: add
+ module
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -147,53 +174,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--gNQ755gaGnwr6MEJtVZfuTQaSB6mc4bsG
+Content-Type: multipart/mixed; boundary="4fimAXTNtrNdzXubiILzCRuV72m23YXdu";
+ protected-headers="v1"
+From: Jan Bobek <jan.bobek@gmail.com>
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Message-ID: <a64c7e5e-7fbf-a3a0-5af2-c3e45c699b16@gmail.com>
+Subject: Re: [RISU RFC PATCH v2 02/14] risugen_x86_asm: add module
+References: <20190701043536.26019-1-jan.bobek@gmail.com>
+ <20190701043536.26019-3-jan.bobek@gmail.com>
+ <c98ee4eb-44ff-83ff-6fc6-5f97174b0044@linaro.org>
+In-Reply-To: <c98ee4eb-44ff-83ff-6fc6-5f97174b0044@linaro.org>
 
+--4fimAXTNtrNdzXubiILzCRuV72m23YXdu
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-On 7/10/19 12:22 PM, Max Reitz wrote:
-> On 10.07.19 03:05, John Snow wrote:
->> Signed-off-by: John Snow <jsnow@redhat.com>
->> ---
->>  tests/qemu-iotests/257     | 69 +++++++++++++++++++++++++++++++
->>  tests/qemu-iotests/257.out | 85 +++++++++++++++++++++++++++++++++++++=
-+
->>  2 files changed, 154 insertions(+)
->>
->> diff --git a/tests/qemu-iotests/257 b/tests/qemu-iotests/257
->> index 2eb4f26c28..de8707cb19 100755
->> --- a/tests/qemu-iotests/257
->> +++ b/tests/qemu-iotests/257
->> @@ -450,10 +450,79 @@ def test_bitmap_sync(bsync_mode, msync_mode=3D'b=
-itmap', failure=3DNone):
->>          compare_images(img_path, fbackup2)
->>          log('')
->> =20
->> +def test_backup_api():
->> +    """
->> +    """
+On 7/3/19 11:37 AM, Richard Henderson wrote:
+> On 7/1/19 6:35 AM, Jan Bobek wrote:
+>> +    VEX_V_UNUSED =3D> 0b1111,
 >=20
-> Er, OK?
+> I think perhaps this is a mistake.  Yes, that's what goes in the field,=
+ but
+> what goes in the field is ~(logical_value).
 >=20
-> [...]
+> While for general RISU-ish operation, ~(random_number) is just as rando=
+m as
+> +(random_number), the difference will be if we ever want to explicitly =
+emit
+> with this interface a specific vex instruction which also requires the =
+v-register.
+
+See below.
+
+>> +sub rex_encode(%)
+>> +{
+>> +    my (%args) =3D @_;
+>> +
+>> +    $args{w} =3D 0 unless defined $args{w};
+>> +    $args{r} =3D 0 unless defined $args{r};
+>> +    $args{x} =3D 0 unless defined $args{x};
+>> +    $args{b} =3D 0 unless defined $args{b};
+>> +
+>> +    return (value =3D> 0x40
+>> +            | (($args{w} ? 1 : 0) << 3)
+>> +            | (($args{r} ? 1 : 0) << 2)
+>> +            | (($args{x} ? 1 : 0) << 1)
+>> +            | ($args{b} ? 1 : 0),
+>> +            len =3D> 1);
+>> +}
 >=20
-
-Whooooooooops.
-
->> +        for sync_mode, config in error_cases.items():
->> +            log("-- Sync mode {:s} tests --\n".format(sync_mode))
->> +            for bitmap, policies in config.items():
+> Does
 >=20
-> You might be interested in the fact that the iteration order is
-> different for Python2.  Or maybe you aren=E2=80=99t.
+> 	(defined $args{w} && $args{w}) << 3
 >=20
+> work?  That seems tidier to me than splitting these conditions.
 
-asdf. This is undoubtedly the worst thing about Python. I'll have to fix
-this, because the ordering isn't guaranteed until 3.5 or some such and
-we're only EOLing Python2.
+It does, I will change it. Thanks!
 
---js
+>> +        return (value =3D> (0xC4 << 16)
+>> +                | (($args{r} ? 1 : 0) << 15)
+>> +                | (($args{x} ? 1 : 0) << 14)
+>> +                | (($args{b} ? 1 : 0) << 13)
+>=20
+> Further down in vex_encode, and along the lines of VEX_V_UNUSED, this a=
+ppears
+> to be actively wrong, since these bits are encoded as inverses.  What t=
+his
+> *really* means is that because of that, rex_encode and vex_encode will =
+not
+> encode the same registers for a given instruction.  Which really does f=
+eel
+> bug-like, random inputs or no.
+
+So, vex_encode, rex_encode and friends were meant to be really
+low-level functions; they literally just encode the bits from what you
+pass in, without any concern for what the fields even mean. In that
+spirit, write_insn itself never did much of error-checking.
+
+I have added quite a lot of code to risugen_x86_asm in v3; most
+importantly, there are now asm_insn_* functions which are more
+high-level, in that you pass in the logical values and they care of
+error checks and encoding. I also removed write_insn and all the
+encoding-related symbolic constants from the public interface of the
+module.
+
+-Jan
+
+
+--4fimAXTNtrNdzXubiILzCRuV72m23YXdu--
+
+--gNQ755gaGnwr6MEJtVZfuTQaSB6mc4bsG
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEESPYOqtMR3qRZrEutZeg2ldrjNs8FAl0mKE4ACgkQZeg2ldrj
+Ns8ffg/9ERKFqB0A7d36XNLc7CEQKoXoW5iwtUc0lOdot5Nn2baEut9aJEhqQrA9
+s1wUF2NySLe19mfQVDDXm86+oaQMWIg5m0Bm/afkTZSWC5qS6xXTs+3zJ18jZzS2
+OeyrAh9spaWwNzud7n2ABrpe7OQ3AiNGNoHooEjz4gtB76qxTxKJNLAofpvRpuS6
+p/neBnz+4uuf+gHHDcFt3oGD/0dJ3ZVNs6ycE5YV9Zh0RvdIGIKIMuaxKs9rKiFH
+Z/V283pwrAzDypujHv9msHTiX+JoFy9j++ftZpteJjUx16pDJyhQhSf32Ia+Ih4D
+K4hzDZKbBvuPy0Hx8kTBgBRHW8Gbngvfd+VxeKWuR7vfbG47ePqECwR6yCAf6F40
+qTisXTUjCGBUI7D2n2dCu+u/yPJnB+AAes7lzDK6YqoqhNtTY57hznaOedDzMVpv
+9oOd3piyOIhFWzuQhE0VjyiyhgsxxBMj4yPt6HfcKcqLFafGPAlHkOZA5KhKDovZ
+hvquNMKceP1OOu+w9PxV4oLItMkV4ubvkJMWEk/q7IXalNi/4QrSvx/3dA+KjpD/
+dMRzHeYzFylWGR+vmCYELBhFTKmGEUyFandpVq6RHVJD1E+/vFma0ESPrIJAQ7xg
+zG6+unbztbsquPfZsyEvEmQagKApoMal8DfadWLr+NBdPO/zqVg=
+=H4Wd
+-----END PGP SIGNATURE-----
+
+--gNQ755gaGnwr6MEJtVZfuTQaSB6mc4bsG--
 
