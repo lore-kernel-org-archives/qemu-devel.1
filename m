@@ -2,58 +2,78 @@ Return-Path: <SRS0=axyf=VH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DDA4EC73C68
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 05:10:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1508AC73C68
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 05:18:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B447120838
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 05:10:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B447120838
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id DF76720838
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jul 2019 05:18:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF76720838
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57976 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58028 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hl4sD-0003gs-7H
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jul 2019 01:10:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44297)
+	id 1hl50H-0006KA-5s
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jul 2019 01:18:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46798)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richardw.yang@linux.intel.com>) id 1hl4qm-0002QY-9a
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 01:09:06 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1hl4yh-0005gu-Ql
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 01:17:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richardw.yang@linux.intel.com>) id 1hl4qk-0000Pu-G1
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 01:09:04 -0400
-Received: from mga02.intel.com ([134.134.136.20]:6071)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
- id 1hl4qi-0000AM-IN
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 01:09:02 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
- by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 09 Jul 2019 22:08:57 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.63,473,1557212400"; d="scan'208";a="364360413"
-Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
- by fmsmga005.fm.intel.com with ESMTP; 09 Jul 2019 22:08:57 -0700
-From: Wei Yang <richardw.yang@linux.intel.com>
-To: qemu-devel@nongnu.org
-Date: Wed, 10 Jul 2019 13:08:14 +0800
-Message-Id: <20190710050814.31344-3-richardw.yang@linux.intel.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190710050814.31344-1-richardw.yang@linux.intel.com>
-References: <20190710050814.31344-1-richardw.yang@linux.intel.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 134.134.136.20
-Subject: [Qemu-devel] [PATCH 2/2] migration/postcopy: do_fixup is true when
- host_offset is non-zero
+ (envelope-from <pbonzini@redhat.com>) id 1hl4yd-0007qW-0j
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 01:17:13 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:40746)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hl4yc-0007h1-D6
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 01:17:10 -0400
+Received: by mail-wm1-f65.google.com with SMTP id v19so915130wmj.5
+ for <qemu-devel@nongnu.org>; Tue, 09 Jul 2019 22:17:05 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=jvXgVgHwU5VN3XdGoyLLLJeBT/9qkkJah9Go9SvGdt8=;
+ b=OOOyK7JnfaPZkvc4kFzGmLd48LlYxfbp8NaZkazo4ForiDQUTZPgZ7gowcEqmZSw14
+ yYR1L5TfFUZMLtBmpU0NsMxYPOSgfjaHlcUEoDyYa/lZ7HzBbme7mR0iOjVgQrnFTqsZ
+ NTBxtXwDqIIv8wxAnaboeCT8Uzs4d9UxeBMkve52tQ/0g9JkaRJRZtevH2tyoZJK9Pin
+ Z8FrOhxCxYShNwCJwtkRHgFmiun5zkPcD8uWdjYjSafxkXw0Kjta6sCKsWkHYFn9fpZn
+ jbmPXTrKOwRyEhjGJ2FhqI7LhmLpath5Pkcs4bEUOgWpEYmRLepnpv+irwisU5kM4K1K
+ Jklw==
+X-Gm-Message-State: APjAAAWfp7llS81EKNdOqMJgUwAUZlf6k2wILaiqRa5Bz1lCTIF4WSTz
+ 0bccD/1O5OIpBMpJ4nsUaYaixA==
+X-Google-Smtp-Source: APXvYqzoCw5az67kO4lEGRhPP2/G8vGfAeKP5/m7r0FkoOzzocfB6KGv7GetvHUstthCLuaKpWlQHw==
+X-Received: by 2002:a1c:c005:: with SMTP id q5mr3097838wmf.59.1562735823791;
+ Tue, 09 Jul 2019 22:17:03 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:19db:ad53:90ea:9423?
+ ([2001:b07:6468:f312:19db:ad53:90ea:9423])
+ by smtp.gmail.com with ESMTPSA id s10sm1000053wmf.8.2019.07.09.22.17.02
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Tue, 09 Jul 2019 22:17:03 -0700 (PDT)
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+ qemu-devel@nongnu.org
+References: <20190709143912.28905-1-peter.maydell@linaro.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <dc709a38-b858-8611-986e-52be36696609@redhat.com>
+Date: Wed, 10 Jul 2019 07:17:07 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
+MIME-Version: 1.0
+In-Reply-To: <20190709143912.28905-1-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.85.128.65
+Subject: Re: [Qemu-devel] [PATCH for-4.1] pl031: Correctly migrate state
+ when using -rtc clock=host
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,58 +85,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Wei Yang <richardw.yang@linux.intel.com>, dgilbert@redhat.com,
- quintela@redhat.com
+Cc: Russell King <rmk@armlinux.org.uk>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This means it is not necessary to spare an extra variable to hold this
-condition. Use host_offset directly is fine.
+On 09/07/19 16:39, Peter Maydell wrote:
+> Reported-by: Russell King <rmk@armlinux.org.uk>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+> I think this is correct, and it makes the "rtc clock should
+> not stay still across a save/reload" work, but I feel like
+> there might be some subtlety I've missed here. Review
+> definitely needed...
 
-Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
----
- migration/ram.c | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
+Yes, this looks good.
 
-diff --git a/migration/ram.c b/migration/ram.c
-index c4dc36e525..b0ca0059c4 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -2873,7 +2873,6 @@ static void postcopy_chunk_hostpages_pass(MigrationState *ms, bool unsent_pass,
-     }
- 
-     while (run_start < pages) {
--        bool do_fixup = false;
-         unsigned long fixup_start_addr;
-         unsigned long host_offset;
- 
-@@ -2883,7 +2882,6 @@ static void postcopy_chunk_hostpages_pass(MigrationState *ms, bool unsent_pass,
-          */
-         host_offset = run_start % host_ratio;
-         if (host_offset) {
--            do_fixup = true;
-             fixup_start_addr = run_start - host_offset;
-             /*
-              * This host page has gone, the next loop iteration starts
-@@ -2905,7 +2903,6 @@ static void postcopy_chunk_hostpages_pass(MigrationState *ms, bool unsent_pass,
-              */
-             host_offset = run_end % host_ratio;
-             if (host_offset) {
--                do_fixup = true;
-                 fixup_start_addr = run_end - host_offset;
-                 /*
-                  * This host page has gone, the next loop iteration starts
-@@ -2921,7 +2918,7 @@ static void postcopy_chunk_hostpages_pass(MigrationState *ms, bool unsent_pass,
-             }
-         }
- 
--        if (do_fixup) {
-+        if (host_offset) {
-             unsigned long page;
- 
-             /* Tell the destination to discard this page */
--- 
-2.17.1
-
+Paolo
 
