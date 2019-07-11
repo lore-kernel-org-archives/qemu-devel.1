@@ -6,45 +6,46 @@ X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C2D1C74A35
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 12:24:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 024DFC74A35
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 12:26:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 332BD20872
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 12:24:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 332BD20872
+	by mail.kernel.org (Postfix) with ESMTPS id CDD6020872
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 12:26:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CDD6020872
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41286 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41294 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlY83-0002wK-Ce
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 08:24:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51815)
+	id 1hlY9R-00048Q-0z
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 08:26:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52216)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hlY7K-0002JT-RJ
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 08:24:09 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hlY85-00038n-Cq
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 08:24:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hlY7I-0004s0-7a
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 08:24:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44294)
+ (envelope-from <mreitz@redhat.com>) id 1hlY84-0005xZ-2E
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 08:24:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35677)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hlY7E-0004ny-Tt; Thu, 11 Jul 2019 08:24:01 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ id 1hlY80-0005tb-VQ; Thu, 11 Jul 2019 08:24:49 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 30689C057F2E;
- Thu, 11 Jul 2019 12:24:00 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 3E1595D60F;
+ Thu, 11 Jul 2019 12:24:48 +0000 (UTC)
 Received: from dresden.str.redhat.com (unknown [10.40.205.198])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id EAD4D1001B00;
- Thu, 11 Jul 2019 12:23:57 +0000 (UTC)
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 0D1985D9DC;
+ Thu, 11 Jul 2019 12:24:46 +0000 (UTC)
+To: Maxim Levitsky <mlevitsk@redhat.com>, qemu-devel@nongnu.org
 References: <20190710170349.1548-1-mlevitsk@redhat.com>
  <84232589-627a-8151-a3d5-84c053d9a257@redhat.com>
- <20190711092031.GB11930@redhat.com>
+ <3e82ff24-6f84-9de8-d3ab-c34966f875f0@redhat.com>
+ <096a8bcf57997c594e1d5d7ea9606029909b81fc.camel@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
@@ -71,18 +72,18 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <4af9b328-f74b-50db-f130-3ce551239e14@redhat.com>
-Date: Thu, 11 Jul 2019 14:23:55 +0200
+Message-ID: <1bdb9136-ae97-7bf3-762e-0774b0980160@redhat.com>
+Date: Thu, 11 Jul 2019 14:24:45 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190711092031.GB11930@redhat.com>
+In-Reply-To: <096a8bcf57997c594e1d5d7ea9606029909b81fc.camel@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="dfvQSI82xShk9DBo3k96bes5ZR0jPxzo4"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+ boundary="Xu0aL0HgbFlKjppDeqXLsbc3cRkkv5N9P"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.32]); Thu, 11 Jul 2019 12:24:00 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.39]); Thu, 11 Jul 2019 12:24:48 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 Subject: Re: [Qemu-devel] [PATCH] LUKS: support preallocation in qemu-img
@@ -97,134 +98,159 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org,
- Maxim Levitsky <mlevitsk@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---dfvQSI82xShk9DBo3k96bes5ZR0jPxzo4
-Content-Type: multipart/mixed; boundary="9RgCwFplqr9LCZBqM6lUVGEIWf4J1iiv6";
+--Xu0aL0HgbFlKjppDeqXLsbc3cRkkv5N9P
+Content-Type: multipart/mixed; boundary="t087NMi0UEBHdh0sGt5nuWbWeEo80LVKt";
  protected-headers="v1"
 From: Max Reitz <mreitz@redhat.com>
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-Cc: Maxim Levitsky <mlevitsk@redhat.com>, qemu-devel@nongnu.org,
- Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Message-ID: <4af9b328-f74b-50db-f130-3ce551239e14@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] LUKS: support preallocation in qemu-img
+To: Maxim Levitsky <mlevitsk@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+Message-ID: <1bdb9136-ae97-7bf3-762e-0774b0980160@redhat.com>
+Subject: Re: [PATCH] LUKS: support preallocation in qemu-img
 References: <20190710170349.1548-1-mlevitsk@redhat.com>
  <84232589-627a-8151-a3d5-84c053d9a257@redhat.com>
- <20190711092031.GB11930@redhat.com>
-In-Reply-To: <20190711092031.GB11930@redhat.com>
+ <3e82ff24-6f84-9de8-d3ab-c34966f875f0@redhat.com>
+ <096a8bcf57997c594e1d5d7ea9606029909b81fc.camel@redhat.com>
+In-Reply-To: <096a8bcf57997c594e1d5d7ea9606029909b81fc.camel@redhat.com>
 
---9RgCwFplqr9LCZBqM6lUVGEIWf4J1iiv6
+--t087NMi0UEBHdh0sGt5nuWbWeEo80LVKt
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 11.07.19 11:20, Daniel P. Berrang=C3=A9 wrote:
-> On Wed, Jul 10, 2019 at 11:24:46PM +0200, Max Reitz wrote:
->> On 10.07.19 19:03, Maxim Levitsky wrote:
->>> preallocation=3Doff and preallocation=3Dmetadata
->>> both allocate luks header only, and preallocation=3Dfalloc/full
->>> is passed to underlying file, with the given image size.
+On 11.07.19 10:39, Maxim Levitsky wrote:
+> On Wed, 2019-07-10 at 23:52 +0200, Max Reitz wrote:
+>> On 10.07.19 23:24, Max Reitz wrote:
+>>> On 10.07.19 19:03, Maxim Levitsky wrote:
+>>>> preallocation=3Doff and preallocation=3Dmetadata
+>>>> both allocate luks header only, and preallocation=3Dfalloc/full
+>>>> is passed to underlying file, with the given image size.
+>>>>
+>>>> Note that the actual preallocated size is a bit smaller due
+>>>> to luks header.
 >>>
->>> Note that the actual preallocated size is a bit smaller due
->>> to luks header.
->>
->> Couldn=E2=80=99t you just preallocate it after creating the crypto hea=
-der so
->> qcrypto_block_get_payload_offset(crypto->block) + size is the actual
->> file size?
+>>> Couldn=E2=80=99t you just preallocate it after creating the crypto he=
+ader so
+>>> qcrypto_block_get_payload_offset(crypto->block) + size is the actual
+>>> file size?
 >=20
-> Yeah that would be preferrable. If that's really not possible, we
-> could likely provide some API to query the expected hreader size for
-> a given set of creation options.=20
+> I kind of thought of the same thing after I send the patch. I'll see no=
+w it I can make it work.
 >=20
->>
->>> Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=3D1534951
+>=20
 >>>
->>> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
->>> ---
->>>  block/crypto.c | 28 ++++++++++++++++++++++++++--
->>>  1 file changed, 26 insertions(+), 2 deletions(-)
+>>>> Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=3D1534951
+>>>>
+>>>> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+>>>> ---
+>>>>  block/crypto.c | 28 ++++++++++++++++++++++++++--
+>>>>  1 file changed, 26 insertions(+), 2 deletions(-)
+>>>
+>>> Hm.  I would expect a preallocated image to read 0.  But if you just
+>>> pass this through to the protocol layer, it won=E2=80=99t read 0.
+>>>
+>>> (In fact, I don=E2=80=99t even quite see the point of having LUKS as =
+an own
+>>> format still.  It was useful when qcow2 didn=E2=80=99t have LUKS supp=
+ort, but
+>>> now it does, so...  I suppose everyone using the LUKS format should
+>>> actually be using qcow2 with LUKS?)
 >>
->> Hm.  I would expect a preallocated image to read 0.  But if you just
->> pass this through to the protocol layer, it won=E2=80=99t read 0.
+>> Kevin just pointed out to me that our LUKS format is compatible to the=
+
+>> actual layout cryptsetup uses.  OK, that is an important use case.
+>>
+>> Hm.  Unfortunately, that doesn=E2=80=99t really necessitate preallocat=
+ion.
+>>
+>> Well, whatever.  If it=E2=80=99s simple enough, that shouldn=E2=80=99t=
+ stop us from
+>> implementing preallocation anyway.
+> Exactly. Since I already know the area of qemu-img relatively well, and=
+
+> this bug is on my backlog, I thought why not to do it.
 >=20
-> Yes, it will be zeros at the physical layer, but unintelligble
-> garbage from POV of the virtual disk.
 >=20
-> I don't think this is really a problem though - this is what you
-> get already if you create a LUKS volume on top of a block device
-> today.
-
-Which is why we have BlockDriver.bdrv_has_zero_init(), which the LUKS
-driver does not implement, hence it being treated as false.
-
-But if you are preallocating, you have a choice of what you write, and
-why not make that zeroes?
-
-> AFAIK, we've not documented that preallocation guarantees future
-> reads will return zeros. Preallocation simply ensures that all
-> required space is allocated upfront. We do mention that it might
-> be achieved by writing zeros to the underlying storage but never
-> said you'll get zeros back.
-
-But we have, as I wrote in my second reply.  PreallocMode's
-documentation says that at least =E2=80=9Cfull=E2=80=9D is writing zeroes=
-, and to say
-those zeroes can be anywhere in the stack is cheating, from my POV.
-
-> IOW I think its at most a docs problem to more clearly explain
-> that preallocation !=3D guaranteed zeros for reads.
+>>
+>>
+>> Now I found that qapi/block-core.json defines PreallocMode=E2=80=99s f=
+alloc and
+>> full values as follows:
+>>
+>>> # @falloc: like @full preallocation but allocate disk space by
+>>> #          posix_fallocate() rather than writing zeros.
+>>> # @full: preallocate all data by writing zeros to device to ensure di=
+sk
+>>> #        space is really available. @full preallocation also sets up
+>>> #        metadata correctly.
+>>
+>> So it isn=E2=80=99t just me who expects these to pre-initialize the im=
+age to 0.
+>>  Hm, although...  I suppose @falloc technically does not specify wheth=
+er
+>> the data reads as zeroes.  I kind of find it to be implied, but, well.=
+=2E.
 >=20
->> (In fact, I don=E2=80=99t even quite see the point of having LUKS as a=
-n own
->> format still.  It was useful when qcow2 didn=E2=80=99t have LUKS suppo=
-rt, but
->> now it does, so...  I suppose everyone using the LUKS format should
->> actually be using qcow2 with LUKS?)
+> I personally don't really think that zeros are important, but rather th=
+e level of allocation.
+> posix_fallocate probably won't write the data blocks but rather only th=
+e inode metadata / used block bitmap/etc.
 >=20
-> Certainly not. LUKS on raw is going to be very common, not least becaus=
-e
-> that's directly compatible with what Linux kernel supports. If you don'=
-t
-> want the features of qcow2 like snapshots, it just adds overhead and mg=
-mt
-> complexity for no gain, especially if dealing with block device backed
-> storage (iSCSI, RBD).
+> On the other hand writing zeros (or anything else) will force the block=
+ layer to actually write to the underlying
+> storage which could trigger lower layer allocation if the underlying st=
+orage is thin-provisioned.
 >=20
-> OpenStack will use cryptsetup when initializing its block storage with
-> LUKS, then tell QEMU to run with the raw + LUKS driver.
+> In fact IMHO, instead of writing zeros, it would be better to write ran=
+dom garbage instead (or have that as an even 'fuller'
+> preallocation mode), since underlying storage might 'compress' the zero=
+s.=20
 
-I see the compatibility with the Linux kernel, yes (as I wrote in my
-second reply), but I=E2=80=99m not sure whether =E2=80=9Coverhead=E2=80=9D=
- really is that big of
-a point when using encryption.
+Which is actually an argument why you should just write zeroes on the
+LUKS layer, because this will then turn into quasi-random data on the
+protocol layer.
 
 Max
 
+> In this version I do have a bug that I mentioned, about not preallocati=
+on some data at the end of the image, and I will
+> fix it, so that all image is zeros as expected
+>=20
+> Best regards,
+> 	Maxim Levitsky
+>=20
+>=20
+>>
+>> Max
+>>
+>=20
+>=20
 
---9RgCwFplqr9LCZBqM6lUVGEIWf4J1iiv6--
 
---dfvQSI82xShk9DBo3k96bes5ZR0jPxzo4
+
+--t087NMi0UEBHdh0sGt5nuWbWeEo80LVKt--
+
+--Xu0aL0HgbFlKjppDeqXLsbc3cRkkv5N9P
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0nKlsACgkQ9AfbAGHV
-z0D+0Qf/dVdf53xNBSn+mq4GwR3zXlNAjewUs3MoBCv25GBvF+yKVnkdCU/euNbl
-oVI2hYDu3bkjUZSJx1snwTqomv1MvJbtQDvwQ6A2xTU9XJ8CTLYQEmu/KkCTzLyh
-qHnMovYugXnbCRaoary9hUlJczXup76Elrw7GyxkoiTjg+z9El1Ifz9+4U8I6z5R
-zySVPIDVe5ffq572UZW6ZEi9ir9Iq6DcH5sH7mXFkw1HcRNpynRu4u6TOzsykBcK
-MmIf9S99K7K+5zdJi2RCI7GtF1QqoxbjQUdxxbcRlxlom65nzfH+mUa5NJHGgasn
-JUmry6ynObkA0sS6EpdEj/PHfPPYJg==
-=eEnC
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0nKo0ACgkQ9AfbAGHV
+z0CWBAf9HqDCH33VaeuM7fhbLLkCkGSz2/Lx0AIG71etBgVghTf6liKd7C8MwGUj
+creNQg8gk2E2M3BoGavtt87IvhUun+J0L2gWT4Ctaup/8HJ+O4Ptausao5FPSdun
+UoSBkT2Q3l5HmnmuzKCdI/sM7Iy6JPEO+VZeTA5/f+RlcWgy45VO782fQG0IbwPw
+pEi4J7Kl9j1prtRgqiywE5aB2E4uQYuNyU5xVo60N7aKJ3Wncz7fyknjKnrex+wv
+btTvpPOyMIe/6cziLMoXULtpQ5f17hRCq7xf9+tfa1GpTAg/3zKauowo08S9+sE9
+kHL4PRudsPjfYq0eFZhbc4VRmHSwhg==
+=1euu
 -----END PGP SIGNATURE-----
 
---dfvQSI82xShk9DBo3k96bes5ZR0jPxzo4--
+--Xu0aL0HgbFlKjppDeqXLsbc3cRkkv5N9P--
 
