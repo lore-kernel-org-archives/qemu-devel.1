@@ -8,71 +8,72 @@ X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1733AC742A1
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 22:34:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06C16C742A1
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 22:34:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C534520872
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 22:34:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B89D620872
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 22:34:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KrEwspbX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C534520872
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q5F9oOXe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B89D620872
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45646 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45652 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlheE-0005TV-Of
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 18:34:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40467)
+	id 1hlheN-00063M-K7
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 18:34:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40448)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jan.bobek@gmail.com>) id 1hlhdL-0001xi-Ro
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 18:33:49 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jan.bobek@gmail.com>) id 1hlhdJ-00047B-2J
+ (envelope-from <jan.bobek@gmail.com>) id 1hlhdJ-0001l2-5e
  for qemu-devel@nongnu.org; Thu, 11 Jul 2019 18:33:47 -0400
-Received: from mail-yw1-xc41.google.com ([2607:f8b0:4864:20::c41]:35102)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <jan.bobek@gmail.com>) id 1hlhdG-0003hl-3H
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <jan.bobek@gmail.com>) id 1hlhdE-00043m-J0
  for qemu-devel@nongnu.org; Thu, 11 Jul 2019 18:33:43 -0400
-Received: by mail-yw1-xc41.google.com with SMTP id g19so3840220ywe.2
- for <qemu-devel@nongnu.org>; Thu, 11 Jul 2019 15:33:20 -0700 (PDT)
+Received: from mail-yb1-xb44.google.com ([2607:f8b0:4864:20::b44]:40665)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <jan.bobek@gmail.com>) id 1hlhd5-0003ek-Uf
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 18:33:37 -0400
+Received: by mail-yb1-xb44.google.com with SMTP id i14so3194020ybp.7
+ for <qemu-devel@nongnu.org>; Thu, 11 Jul 2019 15:33:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=qMfM6LMdYDZMdtezCn2Gp9rtfQAN2Pf/g18YxiRTC2w=;
- b=KrEwspbXds2GCzGZLUZQuZv/SqgdX+n5pXeOgrLi8QaUywY72amiquWfAwZmuOQj3T
- 9NsOb/5eq2odPzFUd+YM/iuCRkBnApzBUbBKs89xvyYLhMGIxYz6AkrnjAMTKufFFW8M
- EI53PtYsbHrZnLpxeLEerQUH5QARbPajktvy5BAOBSicGQkfzGgZHxZO6hrKwks9dF28
- tvBQt0mR7Vlla30c2TTbwylILi9OlgKjgJhEssp+Aan1/pXB1p0+EM+HIiEiMYx1AYD+
- R/4c4XwXTT8Jj4rU3QpcMp2obbbL6dp4G3NcpdFD9eT/20SUHGtE56szA+Pth3hbTbfe
- G4bQ==
+ bh=B/9ak8o8VhmXZsAeWLe+xR8AkOtaBvxJ+j0gYAHd5PM=;
+ b=Q5F9oOXeNUupQ8Qvny2hcpWNO1bZarqIS5uyLsvWSNo0QrfssZgwhG7e9rOTiuZyQG
+ EU6ZzN13UAK9US7t/LiCkdGV24UzcqPWLVgHRGqVvIJroASxG22xnm4bUiiLttXZ+ItX
+ 8hPbCo4Oat50R9ZF49sZIsAKmFU68Cht+zgCX4DpaF1qxmJ2tLopaB+gr+s7kfHoIGaK
+ 5RHjrzsNkVdpps6Iu7OC1bO97/UlGdmrztXTG6L4wzu5nM/WJT5BMX7NF95HkUo8TyKq
+ JPOekVW1u5vluWFKDxb3KQiDwBrUgn4ze45y68DR17IbYSBX+vuzwqw3QbhE2k0vBwM0
+ UnDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=qMfM6LMdYDZMdtezCn2Gp9rtfQAN2Pf/g18YxiRTC2w=;
- b=iItxJ1ijVVMlKfSHBQKDIC7DpdRt27ub84lJMJQhQp7UFGgu3IjX+502bZOzWeIBUx
- 4P1jYf0BLeNZ6xe2kCqgyweu5Mx5QKSArRNrK2gt+7e4Avhyqy9Y/k0M4w0bSk0xuY3a
- vVre1ONCYjSipfPu428fLKAIDZScLV7V4M8buu7gu8Y7Pxh87PIWjr3s99h8xbrj4biy
- GcbSIWoKvoPbgeu+0k8sbwI2dRuxRgEZiLbICp1D4fYSeJTRLbNSkLvAtcVDuVRaSvMq
- EKhbafo+WlQIzY40fQtArxVKxwjP4U08cDaQYdaB3g1bzfUp+GB+JayWVLcKyYzMufWe
- q8jw==
-X-Gm-Message-State: APjAAAUppMHnthbClP8MaPPKG2hgRu3P/OohTdtlwXCauybnB1h++aLA
- KZA8rtowEyg3WEA+xPcJUjgC3uBJ
-X-Google-Smtp-Source: APXvYqx/GJNmU81z0j1p0ek8fLudU7fjtHeuL0JZpViHswDyV55idT4SIwWlqRL+pl6Ciia/eTqRrA==
-X-Received: by 2002:a81:2e45:: with SMTP id u66mr3652408ywu.410.1562884400086; 
- Thu, 11 Jul 2019 15:33:20 -0700 (PDT)
+ bh=B/9ak8o8VhmXZsAeWLe+xR8AkOtaBvxJ+j0gYAHd5PM=;
+ b=a8bjudsL1s8nFMgfm+yxcQpeoqdTB8wHbzwr5guG1IMkVscrU2iIJs9YiYvOtjN3YS
+ gIRzjQYXBIV+zFQD/feA9t/37dsktlbB7wDbL6vwOBd4oSmhSCA9FJx+7q/2x4t/rzf2
+ SyY0ktkq1lFlVNypiw6jJA+TEd636ynPoem0q0t0ltxP/AkHSDTOV+LI9ahK/OwhZ0pG
+ vw4huuygNR/6RNHqCP8jvQAPNfwTZ5pS3hlYPJP4hTZw3KwpVxFxFNOQ8MZa0MAmdDoN
+ xansR/s4moLTIs+QQzeBa+c+vKmk0WSok+3eQoeuu2IjqupyWSSNeLYS9ujPpwdhZKMk
+ 1yBQ==
+X-Gm-Message-State: APjAAAXuUGrSG4Y6IQmQcZEJdyd7eLQiuWsWQMLp/ODtxvk34osVbA4S
+ 9190IjXPAPr8sVLCGL4Wjbz4zQTi
+X-Google-Smtp-Source: APXvYqyvb9aQ0tspvdRb0hh7HuxoTBm8zu9HwS79EGsSek5rZJO7DnbGIFmGx2BW9ksfZMcDynQxUw==
+X-Received: by 2002:a05:6902:4e7:: with SMTP id
+ w7mr3927734ybs.389.1562884396900; 
+ Thu, 11 Jul 2019 15:33:16 -0700 (PDT)
 Received: from dionysus.attlocal.net
  (69-222-133-165.lightspeed.tukrga.sbcglobal.net. [69.222.133.165])
- by smtp.gmail.com with ESMTPSA id z191sm1676728ywa.31.2019.07.11.15.33.19
+ by smtp.gmail.com with ESMTPSA id z191sm1676728ywa.31.2019.07.11.15.33.16
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Thu, 11 Jul 2019 15:33:19 -0700 (PDT)
+ Thu, 11 Jul 2019 15:33:16 -0700 (PDT)
 From: Jan Bobek <jan.bobek@gmail.com>
 To: qemu-devel@nongnu.org
-Date: Thu, 11 Jul 2019 18:32:53 -0400
-Message-Id: <20190711223300.6061-12-jan.bobek@gmail.com>
+Date: Thu, 11 Jul 2019 18:32:48 -0400
+Message-Id: <20190711223300.6061-7-jan.bobek@gmail.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190711223300.6061-1-jan.bobek@gmail.com>
 References: <20190711223300.6061-1-jan.bobek@gmail.com>
@@ -80,8 +81,8 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::c41
-Subject: [Qemu-devel] [RISU PATCH v3 11/18] x86.risu: add SSE instructions
+X-Received-From: 2607:f8b0:4864:20::b44
+Subject: [Qemu-devel] [RISU PATCH v3 06/18] risugen_x86: add module
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,408 +101,540 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add SSE instructions to the x86 configuration file.
+risugen_x86.pm is the main backend module for Intel i386 and x86_64
+architectures; it orchestrates generation of the test code with
+support from the rest of risugen_x86_* modules.
 
 Signed-off-by: Jan Bobek <jan.bobek@gmail.com>
 ---
- x86.risu | 318 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 318 insertions(+)
+ risugen_x86.pm | 518 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 518 insertions(+)
+ create mode 100644 risugen_x86.pm
 
-diff --git a/x86.risu b/x86.risu
-index 208ac16..2d963fc 100644
---- a/x86.risu
-+++ b/x86.risu
-@@ -35,6 +35,52 @@ MOVQ_mm MMX 00001111 011 d 1111 \
-   !constraints { modrm($_); $_->{modrm}{reg} &= 0b111; $_->{modrm}{reg2} &= 0b111 if defined $_->{modrm}{reg2}; 1 } \
-   !memory { $d ? store(size => 8) : load(size => 8); }
- 
-+# NP 0F 28 /r: MOVAPS xmm1, xmm2/m128
-+# NP 0F 29 /r: MOVAPS xmm2/m128, xmm1
-+MOVAPS SSE 00001111 0010100 d \
-+  !constraints { modrm($_); 1 } \
-+  !memory { $d ? store(size => 16, align => 16) : load(size => 16, align => 16); }
-+
-+# NP 0F 10 /r: MOVUPS xmm1, xmm2/m128
-+# NP 0F 11 /r: MOVUPS xmm2/m128, xmm1
-+MOVUPS SSE 00001111 0001000 d \
-+  !constraints { modrm($_); 1 } \
-+  !memory { $d ? store(size => 16) : load(size => 16); }
-+
-+# F3 0F 10 /r: MOVSS xmm1, xmm2/m32
-+# F3 0F 11 /r: MOVSS xmm2/m32, xmm1
-+MOVSS SSE 00001111 0001000 d \
-+  !constraints { rep($_); modrm($_); 1 } \
-+  !memory { $d ? store(size => 4) : load(size => 4); }
-+
-+# NP 0F 12 /r: MOVLPS xmm1, m64
-+# 0F 13 /r: MOVLPS m64, xmm1
-+MOVLPS SSE 00001111 0001001 d \
-+  !constraints { modrm($_); !defined $_->{modrm}{reg2} } \
-+  !memory { $d ? store(size => 8) : load(size => 8); }
-+
-+# NP 0F 16 /r: MOVHPS xmm1, m64
-+# NP 0F 17 /r: MOVHPS m64, xmm1
-+MOVHPS SSE 00001111 0001011 d \
-+  !constraints { modrm($_); !defined $_->{modrm}{reg2} } \
-+  !memory { $d ? store(size => 8) : load(size => 8); }
-+
-+# NP 0F 16 /r: MOVLHPS xmm1, xmm2
-+MOVLHPS SSE 00001111 00010110 \
-+  !constraints { modrm($_); defined $_->{modrm}{reg2} }
-+
-+# NP 0F 12 /r: MOVHLPS xmm1, xmm2
-+MOVHLPS SSE 00001111 00010010 \
-+  !constraints { modrm($_); defined $_->{modrm}{reg2} }
-+
-+# NP 0F D7 /r: PMOVMSKB reg, mm
-+PMOVMSKB SSE 00001111 11010111 \
-+  !constraints { modrm($_); $_->{modrm}{reg2} &= 0b111 if defined $_->{modrm}{reg2}; $_->{modrm}{reg} != REG_RSP && defined $_->{modrm}{reg2} }
-+
-+# NP 0F 50 /r: MOVMSKPS reg, xmm
-+MOVMSKPS SSE 00001111 01010000 \
-+  !constraints { modrm($_); $_->{modrm}{reg} != REG_RSP && defined $_->{modrm}{reg2} }
-+
- #
- # Arithmetic Instructions
- # -----------------------
-@@ -75,6 +121,16 @@ PADDUSW MMX 00001111 11011101 \
-   !constraints { modrm($_); $_->{modrm}{reg} &= 0b111; $_->{modrm}{reg2} &= 0b111 if defined $_->{modrm}{reg2}; 1 } \
-   !memory { load(size => 8); }
- 
-+# NP 0F 58 /r: ADDPS xmm1, xmm2/m128
-+ADDPS SSE 00001111 01011000 \
-+  !constraints { modrm($_); 1 } \
-+  !memory { load(size => 16, align => 16); }
-+
-+# F3 0F 58 /r: ADDSS xmm1, xmm2/m32
-+ADDSS SSE 00001111 01011000 \
-+  !constraints { rep($_); modrm($_); 1 } \
-+  !memory { load(size => 4); }
-+
- # NP 0F F8 /r: PSUBB mm, mm/m64
- PSUBB MMX 00001111 11111000 \
-   !constraints { modrm($_); $_->{modrm}{reg} &= 0b111; $_->{modrm}{reg2} &= 0b111 if defined $_->{modrm}{reg2}; 1 } \
-@@ -110,6 +166,16 @@ PSUBUSW MMX 00001111 11011001 \
-   !constraints { modrm($_); $_->{modrm}{reg} &= 0b111; $_->{modrm}{reg2} &= 0b111 if defined $_->{modrm}{reg2}; 1 } \
-   !memory { load(size => 8); }
- 
-+# NP 0F 5C /r: SUBPS xmm1, xmm2/m128
-+SUBPS SSE 00001111 01011100 \
-+  !constraints { modrm($_); 1 } \
-+  !memory { load(size => 16, align => 16); }
-+
-+# F3 0F 5C /r: SUBSS xmm1, xmm2/m32
-+SUBSS SSE 00001111 01011100 \
-+  !constraints { rep($_); modrm($_); 1 } \
-+  !memory { load(size => 4); }
-+
- # NP 0F D5 /r: PMULLW mm, mm/m64
- PMULLW MMX 00001111 11010101 \
-   !constraints { modrm($_); $_->{modrm}{reg} &= 0b111; $_->{modrm}{reg2} &= 0b111 if defined $_->{modrm}{reg2}; 1 } \
-@@ -120,11 +186,121 @@ PMULHW MMX 00001111 11100101 \
-   !constraints { modrm($_); $_->{modrm}{reg} &= 0b111; $_->{modrm}{reg2} &= 0b111 if defined $_->{modrm}{reg2}; 1 } \
-   !memory { load(size => 8); }
- 
-+# NP 0F E4 /r: PMULHUW mm1, mm2/m64
-+PMULHUW SSE 00001111 11100100 \
-+  !constraints { modrm($_); $_->{modrm}{reg} &= 0b111; $_->{modrm}{reg2} &= 0b111 if defined $_->{modrm}{reg2}; 1 } \
-+  !memory { load(size => 8); }
-+
-+# NP 0F 59 /r: MULPS xmm1, xmm2/m128
-+MULPS SSE 00001111 01011001 \
-+  !constraints { modrm($_); 1 } \
-+  !memory { load(size => 16, align => 16); }
-+
-+# F3 0F 59 /r: MULSS xmm1,xmm2/m32
-+MULSS SSE 00001111 01011001 \
-+  !constraints { rep($_); modrm($_); 1 } \
-+  !memory { load(size => 4); }
-+
- # NP 0F F5 /r: PMADDWD mm, mm/m64
- PMADDWD MMX 00001111 11110101 \
-   !constraints { modrm($_); $_->{modrm}{reg} &= 0b111; $_->{modrm}{reg2} &= 0b111 if defined $_->{modrm}{reg2}; 1 } \
-   !memory { load(size => 8); }
- 
-+# NP 0F 5E /r: DIVPS xmm1, xmm2/m128
-+DIVPS SSE 00001111 01011110 \
-+  !constraints { modrm($_); 1 } \
-+  !memory { load(size => 16, align => 16); }
-+
-+# F3 0F 5E /r: DIVSS xmm1, xmm2/m32
-+DIVSS SSE 00001111 01011110 \
-+  !constraints { rep($_); modrm($_); 1 } \
-+  !memory { load(size => 4); }
-+
-+# NP 0F 53 /r: RCPPS xmm1, xmm2/m128
-+RCPPS SSE 00001111 01010011 \
-+  !constraints { modrm($_); 1 } \
-+  !memory { load(size => 16, align => 16); }
-+
-+# F3 0F 53 /r: RCPSS xmm1, xmm2/m32
-+RCPSS SSE 00001111 01010011 \
-+  !constraints { rep($_); modrm($_); 1 } \
-+  !memory { load(size => 4); }
-+
-+# NP 0F 51 /r: SQRTPS xmm1, xmm2/m128
-+SQRTPS SSE 00001111 01010001 \
-+  !constraints { modrm($_); 1 } \
-+  !memory { load(size => 16, align => 16); }
-+
-+# F3 0F 51 /r: SQRTSS xmm1, xmm2/m32
-+SQRTSS SSE 00001111 01010001 \
-+  !constraints { rep($_); modrm($_); 1 } \
-+  !memory { load(size => 4); }
-+
-+# NP 0F 52 /r: RSQRTPS xmm1, xmm2/m128
-+RSQRTPS SSE 00001111 01010010 \
-+  !constraints { modrm($_); 1 } \
-+  !memory { load(size => 16, align => 16); }
-+
-+# F3 0F 52 /r: RSQRTSS xmm1, xmm2/m32
-+RSQRTSS SSE 00001111 01010010 \
-+  !constraints { rep($_); modrm($_); 1 } \
-+  !memory { load(size => 4); }
-+
-+# NP 0F DA /r: PMINUB mm1, mm2/m64
-+PMINUB SSE 00001111 11011010 \
-+  !constraints { modrm($_); $_->{modrm}{reg} &= 0b111; $_->{modrm}{reg2} &= 0b111 if defined $_->{modrm}{reg2}; 1 } \
-+  !memory { load(size => 8); }
-+
-+# NP 0F EA /r: PMINSW mm1, mm2/m64
-+PMINSW SSE 00001111 11101010 \
-+  !constraints { modrm($_); $_->{modrm}{reg} &= 0b111; $_->{modrm}{reg2} &= 0b111 if defined $_->{modrm}{reg2}; 1 } \
-+  !memory { load(size => 8); }
-+
-+# NP 0F 5D /r: MINPS xmm1, xmm2/m128
-+MINPS SSE 00001111 01011101 \
-+  !constraints { modrm($_); 1 } \
-+  !memory { load(size => 16, align => 16); }
-+
-+# F3 0F 5D /r: MINSS xmm1,xmm2/m32
-+MINSS SSE 00001111 01011101 \
-+  !constraints { rep($_); modrm($_); 1 } \
-+  !memory { load(size => 4); }
-+
-+# NP 0F DE /r: PMAXUB mm1, mm2/m64
-+PMAXUB SSE 00001111 11011110 \
-+  !constraints { modrm($_); $_->{modrm}{reg} &= 0b111; $_->{modrm}{reg2} &= 0b111 if defined $_->{modrm}{reg2}; 1 } \
-+  !memory { load(size => 8); }
-+
-+# NP 0F EE /r: PMAXSW mm1, mm2/m64
-+PMAXSW SSE 00001111 11101110 \
-+  !constraints { modrm($_); $_->{modrm}{reg} &= 0b111; $_->{modrm}{reg2} &= 0b111 if defined $_->{modrm}{reg2}; 1 } \
-+  !memory { load(size => 8); }
-+
-+# NP 0F 5F /r: MAXPS xmm1, xmm2/m128
-+MAXPS SSE 00001111 01011111 \
-+  !constraints { modrm($_); 1 } \
-+  !memory { load(size => 16, align => 16); }
-+
-+# F3 0F 5F /r: MAXSS xmm1, xmm2/m32
-+MAXSS SSE 00001111 01011111 \
-+  !constraints { rep($_); modrm($_); 1 } \
-+  !memory { load(size => 4); }
-+
-+# NP 0F E0 /r: PAVGB mm1, mm2/m64
-+PAVGB SSE 00001111 11100000 \
-+  !constraints { modrm($_); $_->{modrm}{reg} &= 0b111; $_->{modrm}{reg2} &= 0b111 if defined $_->{modrm}{reg2}; 1 } \
-+  !memory { load(size => 8); }
-+
-+# NP 0F E3 /r: PAVGW mm1, mm2/m64
-+PAVGW SSE 00001111 11100011 \
-+  !constraints { modrm($_); $_->{modrm}{reg} &= 0b111; $_->{modrm}{reg2} &= 0b111 if defined $_->{modrm}{reg2}; 1 } \
-+  !memory { load(size => 8); }
-+
-+# NP 0F F6 /r: PSADBW mm1, mm2/m64
-+PSADBW SSE 00001111 11110110 \
-+  !constraints { modrm($_); $_->{modrm}{reg} &= 0b111; $_->{modrm}{reg2} &= 0b111 if defined $_->{modrm}{reg2}; 1 } \
-+  !memory { load(size => 8); }
-+
- #
- # Comparison Instructions
- # -----------------------
-@@ -160,6 +336,26 @@ PCMPGTD MMX 00001111 01100110 \
-   !constraints { modrm($_); $_->{modrm}{reg} &= 0b111; $_->{modrm}{reg2} &= 0b111 if defined $_->{modrm}{reg2}; 1 } \
-   !memory { load(size => 8); }
- 
-+# NP 0F C2 /r ib: CMPPS xmm1, xmm2/m128, imm8
-+CMPPS SSE 00001111 11000010 \
-+  !constraints { modrm($_); imm($_, width => 8); 1 } \
-+  !memory { load(size => 16, align => 16); }
-+
-+# F3 0F C2 /r ib: CMPSS xmm1, xmm2/m32, imm8
-+CMPSS SSE 00001111 11000010 \
-+  !constraints { rep($_); modrm($_); imm($_, width => 8); 1 } \
-+  !memory { load(size => 4); }
-+
-+# NP 0F 2E /r: UCOMISS xmm1, xmm2/m32
-+UCOMISS SSE 00001111 00101110 \
-+  !constraints { modrm($_); 1 } \
-+  !memory { load(size => 4); }
-+
-+# NP 0F 2F /r: COMISS xmm1, xmm2/m32
-+COMISS SSE 00001111 00101111 \
-+  !constraints { modrm($_); 1 } \
-+  !memory { load(size => 4); }
-+
- #
- # Logical Instructions
- # --------------------
-@@ -170,21 +366,41 @@ PAND MMX 00001111 11011011 \
-   !constraints { modrm($_); $_->{modrm}{reg} &= 0b111; $_->{modrm}{reg2} &= 0b111 if defined $_->{modrm}{reg2}; 1 } \
-   !memory { load(size => 8); }
- 
-+# NP 0F 54 /r: ANDPS xmm1, xmm2/m128
-+ANDPS SSE 00001111 01010100 \
-+  !constraints { modrm($_); 1 } \
-+  !memory { load(size => 16, align => 16); }
-+
- # NP 0F DF /r: PANDN mm, mm/m64
- PANDN MMX 00001111 11011111 \
-   !constraints { modrm($_); $_->{modrm}{reg} &= 0b111; $_->{modrm}{reg2} &= 0b111 if defined $_->{modrm}{reg2}; 1 } \
-   !memory { load(size => 8); }
- 
-+# NP 0F 55 /r: ANDNPS xmm1, xmm2/m128
-+ANDNPS SSE 00001111 01010101 \
-+  !constraints { modrm($_); 1 } \
-+  !memory { load(size => 16, align => 16); }
-+
- # NP 0F EB /r: POR mm, mm/m64
- POR MMX 00001111 11101011 \
-   !constraints { modrm($_); $_->{modrm}{reg} &= 0b111; $_->{modrm}{reg2} &= 0b111 if defined $_->{modrm}{reg2}; 1 } \
-   !memory { load(size => 8); }
- 
-+# NP 0F 56 /r: ORPS xmm1, xmm2/m128
-+ORPS SSE 00001111 01010110 \
-+  !constraints { modrm($_); 1 } \
-+  !memory { load(size => 16, align => 16); }
-+
- # NP 0F EF /r: PXOR mm, mm/m64
- PXOR MMX 00001111 11101111 \
-   !constraints { modrm($_); $_->{modrm}{reg} &= 0b111; $_->{modrm}{reg2} &= 0b111 if defined $_->{modrm}{reg2}; 1 } \
-   !memory { load(size => 8); }
- 
-+# NP 0F 57 /r: XORPS xmm1, xmm2/m128
-+XORPS SSE 00001111 01010111 \
-+  !constraints { modrm($_); 1 } \
-+  !memory { load(size => 16, align => 16); }
-+
- #
- # Shift and Rotate Instructions
- # -----------------------------
-@@ -312,6 +528,98 @@ PUNPCKLDQ MMX 00001111 01100010 \
-   !constraints { modrm($_); $_->{modrm}{reg} &= 0b111; $_->{modrm}{reg2} &= 0b111 if defined $_->{modrm}{reg2}; 1 } \
-   !memory { load(size => 4); }
- 
-+# NP 0F 14 /r: UNPCKLPS xmm1, xmm2/m128
-+UNPCKLPS SSE 00001111 00010100 \
-+  !constraints { modrm($_); 1 } \
-+  !memory { load(size => 16, align => 16); }
-+
-+# NP 0F 15 /r: UNPCKHPS xmm1, xmm2/m128
-+UNPCKHPS SSE 00001111 00010101 \
-+  !constraints { modrm($_); 1 } \
-+  !memory { load(size => 16, align => 16); }
-+
-+# NP 0F 70 /r ib: PSHUFW mm1, mm2/m64, imm8
-+PSHUFW SSE 00001111 01110000 \
-+  !constraints { modrm($_); imm($_, width => 8); $_->{modrm}{reg} &= 0b111; $_->{modrm}{reg2} &= 0b111 if defined $_->{modrm}{reg2}; 1 } \
-+  !memory { load(size => 8); }
-+
-+# NP 0F C6 /r ib: SHUFPS xmm1, xmm3/m128, imm8
-+SHUFPS SSE 00001111 11000110 \
-+  !constraints { modrm($_); imm($_, width => 8); 1 } \
-+  !memory { load(size => 16, align => 16); }
-+
-+# NP 0F C4 /r ib: PINSRW mm, r32/m16, imm8
-+PINSRW SSE 00001111 11000100 \
-+  !constraints { modrm($_); imm($_, width => 8); $_->{modrm}{reg} &= 0b111; !(defined $_->{modrm}{reg2} && $_->{modrm}{reg2} == REG_RSP) } \
-+  !memory { load(size => 2); }
-+
-+# NP 0F C5 /r ib: PEXTRW reg, mm, imm8
-+PEXTRW_reg SSE 00001111 11000101 \
-+  !constraints { modrm($_); imm($_, width => 8); $_->{modrm}{reg2} &= 0b111 if defined $_->{modrm}{reg2}; $_->{modrm}{reg} != REG_RSP && defined $_->{modrm}{reg2} }
-+
+diff --git a/risugen_x86.pm b/risugen_x86.pm
+new file mode 100644
+index 0000000..ae11843
+--- /dev/null
++++ b/risugen_x86.pm
+@@ -0,0 +1,518 @@
++#!/usr/bin/perl -w
++###############################################################################
++# Copyright (c) 2019 Jan Bobek
++# All rights reserved. This program and the accompanying materials
++# are made available under the terms of the Eclipse Public License v1.0
++# which accompanies this distribution, and is available at
++# http://www.eclipse.org/legal/epl-v10.html
 +#
-+# Conversion Instructions
-+# -----------------------
-+#
++# Contributors:
++#     Jan Bobek - initial implementation
++###############################################################################
 +
-+# NP 0F 2A /r: CVTPI2PS xmm, mm/m64
-+CVTPI2PS SSE 00001111 00101010 \
-+  !constraints { modrm($_); $_->{modrm}{reg2} &= 0b111 if defined $_->{modrm}{reg2}; 1 } \
-+  !memory { load(size => 8); }
++# risugen_x86 -- risugen module for Intel i386/x86_64 architectures
++package risugen_x86;
 +
-+# NP 0F 2D /r: CVTPS2PI mm, xmm/m64
-+CVTPS2PI SSE 00001111 00101101 \
-+  !constraints { modrm($_); $_->{modrm}{reg} &= 0b111; 1 } \
-+  !memory { load(size => 8); }
++use strict;
++use warnings;
 +
-+# NP 0F 2C /r: CVTTPS2PI mm, xmm/m64
-+CVTTPS2PI SSE 00001111 00101100 \
-+  !constraints { modrm($_); $_->{modrm}{reg} &= 0b111; 1 } \
-+  !memory { load(size => 8); }
++use risugen_common;
++use risugen_x86_asm;
++use risugen_x86_constraints;
++use risugen_x86_memory;
 +
-+#
-+# Cacheability Control, Prefetch, and Instruction Ordering Instructions
-+# ---------------------------------------------------------------------
-+#
++require Exporter;
 +
-+# NP 0F F7 /r: MASKMOVQ mm1, mm2
-+MASKMOVQ SSE 00001111 11110111 \
-+  !constraints { modrm($_); $_->{modrm}{reg} &= 0b111; $_->{modrm}{reg2} &= 0b111 if defined $_->{modrm}{reg2}; defined $_->{modrm}{reg2} } \
-+  !memory { load(size => 8, base => REG_RDI, rollback => 1); }
++our @ISA    = qw(Exporter);
++our @EXPORT = qw(write_test_code);
 +
-+# NP 0F 2B /r: MOVNTPS m128, xmm1
-+MOVNTPS SSE 00001111 00101011 \
-+  !constraints { modrm($_); !defined $_->{modrm}{reg2} } \
-+  !memory { store(size => 16, align => 16); }
++use constant {
++    RISUOP_COMPARE     => 0,        # compare registers
++    RISUOP_TESTEND     => 1,        # end of test, stop
++    RISUOP_SETMEMBLOCK => 2,        # eax is address of memory block (8192 bytes)
++    RISUOP_GETMEMBLOCK => 3,        # add the address of memory block to eax
++    RISUOP_COMPAREMEM  => 4,        # compare memory block
 +
-+# NP 0F E7 /r: MOVNTQ m64, mm
-+MOVNTQ SSE 00001111 11100111 \
-+  !constraints { modrm($_); $_->{modrm}{reg} &= 0b111; !defined $_->{modrm}{reg2} } \
-+  !memory { store(size => 8); }
++    # Maximum alignment restriction permitted for a memory op.
++    MAXALIGN => 64,
++    MEMBLOCK_LEN => 8192,
++};
 +
-+# 0F 18 /1: PREFETCHT0 m8
-+PREFETCHT0 SSE 00001111 00011000 \
-+  !constraints { modrm($_, reg => 1); !defined $_->{modrm}{reg2} } \
-+  !memory { load(size => 1); }
++my $periodic_reg_random = 1;
++my $is_x86_64 = 0;
 +
-+# 0F 18 /2: PREFETCHT1 m8
-+PREFETCHT1 SSE 00001111 00011000 \
-+  !constraints { modrm($_, reg => 2); !defined $_->{modrm}{reg2} } \
-+  !memory { load(size => 1); }
++sub wrap_int32($)
++{
++    my ($x) = @_;
++    my $r = 1 << 31;
++    return ($x + $r) % (2 * $r) - $r;
++}
 +
-+# 0F 18 /3: PREFETCHT2 m8
-+PREFETCHT2 SSE 00001111 00011000 \
-+  !constraints { modrm($_, reg => 3); !defined $_->{modrm}{reg2} } \
-+  !memory { load(size => 1); }
++sub asm_insn_risuop($)
++{
++    my ($op) = @_;
++    asm_insn_ud1(reg => REG_RAX, reg2 => $op);
++}
 +
-+# 0F 18 /0: PREFETCHNTA m8
-+PREFETCHNTA SSE 00001111 00011000 \
-+  !constraints { modrm($_, reg => 0); !defined $_->{modrm}{reg2} } \
-+  !memory { load(size => 1); }
++sub asm_insn_movT(%)
++{
++    my (%args) = @_;
 +
-+# NP 0F AE F8: SFENCE
-+SFENCE SSE 00001111 10101110 11111000
++    if ($is_x86_64) {
++        asm_insn_mov64(%args);
++    } else {
++        asm_insn_mov(%args);
++    }
++}
 +
- #
- # State Management Instructions
- # -----------------------------
-@@ -319,3 +627,13 @@ PUNPCKLDQ MMX 00001111 01100010 \
- 
- # NP 0F 77: EMMS
- EMMS MMX 00001111 01110111
++sub asm_insn_movT_imm(%)
++{
++    my (%args) = @_;
++    my $imm = $args{imm}; delete $args{imm};
 +
-+# NP 0F AE /2: LDMXCSR m32
-+LDMXCSR SSE 00001111 10101110 \
-+  !constraints { modrm($_, reg => 2); !defined $_->{modrm}{reg2} } \
-+  !memory { load(size => 4, value => 0x000001f80, mask => 0xffff1f80); }
++    my $is_sint32 = (-0x80000000 <= $imm && $imm <= 0x7fffffff);
++    my $is_uint32 = (0 <= $imm && $imm <= 0xffffffff);
 +
-+# NP 0F AE /3: STMXCSR m32
-+STMXCSR SSE 00001111 10101110 \
-+  !constraints { modrm($_, reg => 3); !defined $_->{modrm}{reg2} } \
-+  !memory { store(size => 4); }
++    $args{$is_sint32 || $is_uint32 ? 'imm32' : 'imm64'} = $imm;
++    asm_insn_movT(%args);
++}
++
++sub asm_insn_addT(%)
++{
++    my (%args) = @_;
++
++    if ($is_x86_64) {
++        asm_insn_add64(%args);
++    } else {
++        asm_insn_add(%args);
++    }
++}
++
++sub asm_insn_negT(%)
++{
++    my (%args) = @_;
++
++    if ($is_x86_64) {
++        asm_insn_neg64(%args);
++    } else {
++        asm_insn_neg(%args);
++    }
++}
++
++sub asm_insn_xchgT(%)
++{
++    my (%args) = @_;
++
++    if ($is_x86_64) {
++        asm_insn_xchg64(%args);
++    } else {
++        asm_insn_xchg(%args);
++    }
++}
++
++sub write_random_regdata()
++{
++    my $reg_cnt = $is_x86_64 ? 16 : 8;
++    my $reg_width = $is_x86_64 ? 64 : 32;
++
++    # initialize flags register
++    asm_insn_xor(reg => REG_RAX, reg2 => REG_RAX);
++    asm_insn_sahf();
++
++    # general purpose registers
++    for (my $reg = 0; $reg < $reg_cnt; $reg++) {
++        if ($reg != REG_RSP) {
++            my $imm = randint(width => $reg_width, signed => 1);
++            asm_insn_movT_imm(reg => $reg, imm => $imm);
++        }
++    }
++}
++
++# At the end of this function, we can emit $datalen data-bytes which
++# will be skipped over at runtime, but whose address will be present
++# in EAX and optionally aligned.
++sub prepare_datablock(%)
++{
++    my (%args) = @_;
++    $args{align} = 0 unless defined $args{align} && $args{align} > 1;
++
++    # First, load current EIP/RIP into EAX/RAX. Easy to do on x86_64
++    # thanks to RIP-relative addressing, but on i386 we need to play
++    # some well-known tricks with the CALL instruction. Then, AND the
++    # EAX/RAX register with correct mask to obtain the aligned
++    # address.
++    my $reg = REG_RAX;
++
++    if ($is_x86_64) {
++        my $disp32 = 5;         # 5-byte JMP
++        $disp32 += 4 + ($args{align} - 1) if $args{align}; # 4-byte AND
++
++        asm_insn_lea64(reg => $reg, disp32 => $disp32);
++        asm_insn_and64(reg2 => $reg, imm8 => ~($args{align} - 1))
++            if $args{align};
++    } else {
++        my $imm8 = 1 + 3 + 5;   # 1-byte POP + 3-byte ADD + 5-byte JMP
++        $imm8 += 3 + ($args{align} - 1) if $args{align}; # 3-byte AND
++
++        # displacement = next instruction
++        asm_insn_call(imm32 => 0x00000000);
++        asm_insn_pop(reg => $reg);
++        asm_insn_add(reg2 => $reg, imm8 => $imm8);
++        asm_insn_and(reg2 => $reg, imm8 => ~($args{align} - 1))
++            if $args{align};
++    }
++
++    # JMP over the data blob.
++    asm_insn_jmp(imm32 => $args{datalen});
++}
++
++# Write a block of random data, $datalen bytes long, optionally
++# aligned, and load its address into EAX/RAX.
++sub write_random_datablock(%)
++{
++    my (%args) = @_;
++    prepare_datablock(%args);
++
++    # Generate the random data
++    my $datalen = $args{datalen};
++    for (my $w = 8; 0 < $w; $w /= 2) {
++        for (; $w <= $datalen; $datalen -= $w) {
++            my $value = randint(width => 8 * $w);
++            insnv(value => $value, width => 8 * $w);
++        }
++    }
++}
++
++sub write_random_vregdata(%)
++{
++    my (%args) = @_;
++    $args{ymm} = 0          unless defined $args{ymm};
++    $args{xmm} = $args{ymm} unless defined $args{xmm};
++    $args{mm}  = 0          unless defined $args{mm};
++
++    die "cannot initialize YMM registers only\n"
++        if $args{ymm} && !$args{xmm};
++
++    my $datalen = 0;
++
++    my $mmreg_count = 8;
++    my $mmreg_size  = 8;
++    $datalen += $mmreg_count * $mmreg_size if $args{mm};
++
++    my $xmmreg_count = $is_x86_64 ? 16 : 8;
++    my $xmmreg_size  = 16;
++    $datalen += $xmmreg_count * $xmmreg_size if $args{xmm};
++
++    my $ymmreg_count = $xmmreg_count;
++    my $ymmreg_size  = 32 - $xmmreg_size;
++    $datalen += $ymmreg_count * $ymmreg_size if $args{ymm};
++
++    return unless $datalen > 0;
++
++    # Generate random data blob
++    write_random_datablock(datalen => $datalen + MAXALIGN - 1,
++                           align => MAXALIGN);
++
++    # Load the random data into vector regs.
++    my $offset = 0;
++
++    if ($args{mm}) {
++        for (my $mmreg = 0; $mmreg < $mmreg_count; $mmreg += 1) {
++            asm_insn_movq(reg => $mmreg,
++                          base => REG_RAX,
++                          disp32 => $offset);
++            $offset += $mmreg_size;
++        }
++    }
++    if ($args{ymm}) {
++        for (my $ymmreg = 0; $ymmreg < $ymmreg_count; $ymmreg += 1) {
++            asm_insn_vmovaps(l => ($xmmreg_size + $ymmreg_size) * 8,
++                             reg => $ymmreg,
++                             base => REG_RAX,
++                             disp32 => $offset);
++            $offset += $xmmreg_size + $ymmreg_size;
++        }
++    } elsif ($args{xmm}) {
++        for (my $xmmreg = 0; $xmmreg < $xmmreg_count; $xmmreg += 1) {
++            asm_insn_movaps(reg => $xmmreg,
++                            base => REG_RAX,
++                            disp32 => $offset);
++            $offset += $xmmreg_size;
++        }
++    }
++}
++
++sub write_memblock_setup()
++{
++    # Generate random data blob
++    write_random_datablock(datalen => MEMBLOCK_LEN + MAXALIGN - 1,
++                           align => MAXALIGN);
++
++    # Pointer is in EAX/RAX; set the memblock
++    asm_insn_risuop(RISUOP_SETMEMBLOCK);
++}
++
++sub write_random_register_data(%)
++{
++    my (%args) = @_;
++    write_random_vregdata(%{$args{vregs}}) if defined $args{vregs};
++    write_random_regdata();
++    asm_insn_risuop(RISUOP_COMPARE);
++}
++
++sub write_mem_getoffset(%)
++{
++    my (%args) = @_;
++
++    my @tokens;
++    push @tokens, "BASE"   if defined $args{base};
++    push @tokens, "INDEX"  if defined $args{index};
++    push @tokens, "VINDEX" if defined $args{vindex};
++    push @tokens, "END";
++
++    # (BASE (INDEX | VINDEX)?)? END
++    my $token = shift @tokens;
++
++    if ($token eq "BASE") {
++        $token = shift @tokens;
++        # We must not modify RSP during tests, therefore it cannot be a
++        # base register.
++        return 0 if $args{base} == REG_RSP;
++
++        if ($token eq "VINDEX") {
++            $token = shift @tokens;
++
++            die "VSIB requested, but addrw undefined"
++                unless defined $args{addrw};
++            die "VSIB requested, but count undefined"
++                unless defined $args{count};
++
++            write_mem_getoffset_base_vindex(%args);
++        } elsif ($token eq "INDEX") {
++            $token = shift @tokens;
++            # RSP cannot be used as an index in regular SIB... And we may
++            # not modify it anyway.
++            return 0 if $args{index} == REG_RSP;
++            # If index and base registers are the same, we may not be able
++            # to honor the alignment requirements.
++            return 0 if $args{index} == $args{base};
++
++            write_mem_getoffset_base_index(%args);
++        } else {
++            write_mem_getoffset_base(%args);
++        }
++    }
++
++    die "unexpected junk at the end of getoffset tokens: $token @tokens\n"
++        unless $token eq "END";
++}
++
++sub write_mem_getoffset_base(%)
++{
++    my (%args) = @_;
++
++    if ($args{mask}) {
++        die "size $args{size} is too large for masking"
++            unless $args{size} <= 8;
++        die "simultaneous alignment and masking not supported"
++            if $args{align} > 1;
++
++        prepare_datablock(datalen => $args{size});
++
++        my $width = $args{size} * 8;
++        my $value = randint(width => $width);
++        $value = ($value & ~$args{mask}) | ($args{value} & $args{mask});
++        insnv(value => $value, width => $width, bigendian => 0);
++
++        my $offset = -$args{disp};
++        $offset = wrap_int32($offset) if !$is_x86_64;
++
++        asm_insn_movT_imm(reg => REG_RDX, imm => $offset);
++        asm_insn_addT(reg2 => REG_RAX, reg => REG_RDX);
++    } else {
++        my $offset = int(rand(MEMBLOCK_LEN - $args{size}));
++        $offset &= ~($args{align} - 1);
++
++        $offset -= $args{disp};
++        $offset = wrap_int32($offset) if !$is_x86_64;
++
++        asm_insn_movT_imm(reg => REG_RAX, imm => $offset);
++        asm_insn_risuop(RISUOP_GETMEMBLOCK);
++    }
++
++    asm_insn_xchgT(reg => $args{base}, reg2 => REG_RAX)
++        unless $args{base} == REG_RAX;
++}
++
++sub write_mem_getoffset_base_index(%)
++{
++    my (%args) = @_;
++
++    my $addrw = ($is_x86_64 ? 64 : 32) - $args{ss} - 1;
++    my $index = randint(width => $addrw, signed => 1);
++    $args{disp} += $index * (1 << $args{ss});
++
++    write_mem_getoffset_base(%args);
++    asm_insn_movT_imm(reg => $args{index}, imm => $index);
++}
++
++sub write_mem_getoffset_base_vindex(%)
++{
++    my (%args) = @_;
++
++    my $addrw = $args{addrw} - $args{ss} - 1;
++    my $base = randint(width => $addrw, signed => 1);
++    $args{disp} += $base * (1 << $args{ss});
++
++    my $datalen = $args{addrw} * $args{count} / 8;
++    prepare_datablock(datalen => $datalen);
++
++    for(my $i = 0; $i < $args{count}; ++$i) {
++        my $index = int(rand(MEMBLOCK_LEN - $args{size}));
++        $index &= ~($args{align} - 1);
++        $index >>= $args{ss};
++
++        insnv(value => $base + $index,
++              width => $args{addrw},
++              bigendian => 0);
++    }
++
++    asm_insn_vmovdqu(l => $args{addrw} * $args{count},
++                     reg => $args{vindex},
++                     base => REG_RAX);
++
++    write_mem_getoffset_base(%args, size => MEMBLOCK_LEN);
++}
++
++sub write_mem_getoffset_rollback(%)
++{
++    my (%args) = @_;
++
++    # The base register contains an address of the form &memblock +
++    # offset. We need to turn it into just offset, otherwise we may
++    # get value mismatches since the memory layout can be different.
++    asm_insn_xchgT(reg => $args{base}, reg2 => REG_RAX)
++        unless $args{base} == REG_RAX;
++    asm_insn_negT(reg2 => REG_RAX);
++    asm_insn_risuop(RISUOP_GETMEMBLOCK);
++
++    # I didn't originally think this was neccessary, but there were
++    # random sign-flag mismatch failures on 32-bit, probably due to
++    # the absolute address being randomly in the positive/negative
++    # range of int32 -- the first NEG would then pollute the EFLAGS
++    # register with this information. Using another NEG is a neat
++    # way of overwriting all this information with consistent values.
++    asm_insn_negT(reg2 => REG_RAX);
++}
++
++sub gen_one_insn($)
++{
++    # Given an instruction-details array, generate an instruction
++    my ($rec) = @_;
++    my $insnname = $rec->{name};
++    my $insnwidth = $rec->{width};
++
++    my $constraintfailures = 0;
++
++    my %insn;
++    my %memopts;
++    INSN: while(1) {
++        my $opcode = randint(width => 32);
++        $opcode &= ~$rec->{fixedbitmask};
++        $opcode |= $rec->{fixedbits};
++
++        # This is not 100 % correct, since $opcode is still padded to
++        # 32-bit width. This is necessary so that extract_fields in
++        # eval_constraints_block and eval_memory_block works
++        # correctly, but we need to fix it up before calling asm_insn.
++        %insn                = ();
++        $insn{opcode}{value} = $opcode;
++        $insn{opcode}{width} = $insnwidth;
++
++        my $v = eval_constraints_block(rec => $rec, insn => \%insn,
++                                       is_x86_64 => $is_x86_64);
++        if ($v && !$is_x86_64 && defined $insn{rex}) {
++            # REX.W is part of the opcode; we will never be able to
++            # generate this instruction in 32-bit mode.
++            return 0 if defined $insn{rex}{w} && $insn{rex}{w};
++            $v = 0;
++        }
++        if ($v) {
++            %memopts = eval_memory_block(rec => $rec, insn => \%insn);
++            $v = write_mem_getoffset(%memopts);
++        }
++        if (!$v) {
++            $constraintfailures++;
++            if ($constraintfailures > 10000) {
++                print "10000 consecutive constraint failures for $insnname constraints\n";
++                exit (1);
++            }
++            next INSN;
++        }
++
++        # OK, we got a good one
++        $constraintfailures = 0;
++
++        # Get rid of the extra padding before calling asm_insn; see
++        # above for details.
++        $insn{opcode}{value} >>= 32 - $insnwidth;
++
++        asm_insn(%insn);
++        write_mem_getoffset_rollback(%memopts) if $memopts{rollback};
++        asm_insn_risuop(RISUOP_COMPAREMEM)     if $memopts{is_write};
++        asm_insn_risuop(RISUOP_COMPARE);
++
++        return 1;
++    }
++}
++
++sub write_test_code($)
++{
++    my ($params) = @_;
++
++    my $numinsns = $params->{ 'numinsns' };
++    my $outfile = $params->{ 'outfile' };
++
++    my %insn_details = %{ $params->{ 'details' } };
++    my @keys = @{ $params->{ 'keys' } };
++
++    $is_x86_64 = $params->{ 'x86_64' };
++    my $xfeatures = $params->{ 'xfeatures' };
++
++    my %vregs   = ();
++    $vregs{ymm} = $xfeatures eq 'avx';
++    $vregs{xmm} = $vregs{ymm} || $xfeatures eq 'sse';
++    $vregs{mm}  = $vregs{xmm} || $xfeatures eq 'mmx';
++
++    open_bin($outfile);
++
++    # TODO better random number generator?
++    srand(0);
++
++    print "Generating code using patterns: @keys...\n";
++    progress_start(78, $numinsns);
++
++    write_memblock_setup();
++
++    # memblock setup doesn't clean its registers, so this must come afterwards.
++    write_random_register_data(vregs => \%vregs);
++
++    for (my $i = 0; $i < $numinsns;) {
++        my $insn_enc = $keys[int rand (@keys)];
++
++        next if !gen_one_insn($insn_details{$insn_enc});
++        $i += 1;
++
++        # Rewrite the registers periodically. This avoids the tendency
++        # for the VFP registers to decay to NaNs and zeroes.
++        if ($periodic_reg_random && ($i % 100) == 0) {
++            write_random_register_data(vregs => \%vregs);
++        }
++        progress_update($i);
++    }
++    asm_insn_risuop(RISUOP_TESTEND);
++    progress_end();
++    close_bin();
++}
++
++1;
 -- 
 2.20.1
 
