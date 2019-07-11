@@ -6,59 +6,59 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61835C74A35
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 12:30:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8067C74A52
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 12:30:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 19DE620872
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 12:30:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19DE620872
+	by mail.kernel.org (Postfix) with ESMTPS id 5EBDA20872
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 12:30:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5EBDA20872
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41310 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41312 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlYDf-0006NN-Dd
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 08:30:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53254)
+	id 1hlYDk-0006VW-H0
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 08:30:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53283)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <armbru@redhat.com>) id 1hlYBk-0004yO-Lf
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 08:28:48 -0400
+ (envelope-from <armbru@redhat.com>) id 1hlYBm-0004zq-CF
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 08:28:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1hlYBb-0001sE-Ni
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 08:28:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50742)
+ (envelope-from <armbru@redhat.com>) id 1hlYBc-0001sc-01
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 08:28:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54104)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hlYBb-0001pT-5P
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hlYBb-0001pY-5N
  for qemu-devel@nongnu.org; Thu, 11 Jul 2019 08:28:31 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id D23BA30821EC;
+ by mx1.redhat.com (Postfix) with ESMTPS id E2F1830842AC;
  Thu, 11 Jul 2019 12:28:29 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-111.ams2.redhat.com
  [10.36.116.111])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id EC8AC5C559;
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id F1F9560BFC;
  Thu, 11 Jul 2019 12:28:28 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 721A11138661; Thu, 11 Jul 2019 14:28:27 +0200 (CEST)
+ id 76C1D113860E; Thu, 11 Jul 2019 14:28:27 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Thu, 11 Jul 2019 14:28:26 +0200
-Message-Id: <20190711122827.18970-3-armbru@redhat.com>
+Date: Thu, 11 Jul 2019 14:28:27 +0200
+Message-Id: <20190711122827.18970-4-armbru@redhat.com>
 In-Reply-To: <20190711122827.18970-1-armbru@redhat.com>
 References: <20190711122827.18970-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Thu, 11 Jul 2019 12:28:29 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.40]); Thu, 11 Jul 2019 12:28:29 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH RFC v5 2/3] include: Make headers more
- self-contained
+Subject: [Qemu-devel] [PATCH RFC v5 3/3] tests: Check target-independent
+ headers for each target, too
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,2639 +75,4038 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The previous commit marked 182 headers FIXME:
+Testing target-independent headers for each target is massive
+overkill, and may well be inacceptably slow.  But let's see what
+explodes.
 
-      1 FIXME Does not pass make check-headers without CONFIG_CPUID_H, ye=
-t!
-      2 FIXME Does not pass make check-headers without CONFIG_LINUX, yet!
-      2 FIXME Does not pass make check-headers without CONFIG_OPENGL, yet=
-!
-      1 FIXME Does not pass make check-headers without CONFIG_POSIX, yet!
-      1 FIXME Does not pass make check-headers without CONFIG_SPICE, yet!
-      2 FIXME Does not pass make check-headers without CONFIG_WIN32, yet!
-      7 FIXME Does not pass make check-headers without CONFIG_XEN, yet!
-     17 FIXME Does not pass make check-headers without pixman, yet!
-      7 FIXME Does not pass make check-headers without system emulation, =
-yet!
-    150 FIXME Does not pass make check-headers, yet!
+Numerous target-independent headers don't pass this test, by design or
+by accident.  Fortunately, they all fail for a user emulation target.
 
-As explained in the commit message, the configuration-specific ones
-may not actually need fixing.
+Most failing headers may not be included into user emulation code:
+they include hw/hw.h.  Mark them with a comment
 
-Clean up the headers some, so that 56 of the 150 blanket FIXMEs go
-away, and 76 get replaced by configuration-specific ones, and just 18
-blanket FIXMEs remain:
+    /* NOTE: May not be included into user emulation code */
 
-     16 FIXME Does not pass make check-headers for TARGET_BASE_ARCH other=
- than arm, yet!
-      1 FIXME Does not pass make check-headers for TARGET_BASE_ARCH other=
- than i386, yet!
-      2 FIXME Does not pass make check-headers for TARGET_BASE_ARCH other=
- than mips, yet!
-     41 FIXME Does not pass make check-headers for user emulation, yet!
-      1 FIXME Does not pass make check-headers without CONFIG_CPUID_H, ye=
-t!
-      2 FIXME Does not pass make check-headers without CONFIG_LINUX, yet!
-      3 FIXME Does not pass make check-headers without CONFIG_OPENGL, yet=
-!
-      1 FIXME Does not pass make check-headers without CONFIG_POSIX, yet!
-      2 FIXME Does not pass make check-headers without CONFIG_SPICE, yet!
-      3 FIXME Does not pass make check-headers without CONFIG_WIN32, yet!
-      7 FIXME Does not pass make check-headers without CONFIG_XEN, yet!
-     17 FIXME Does not pass make check-headers without pixman, yet!
-      9 FIXME Does not pass make check-headers without system emulation, =
-yet!
-     18 FIXME Does not pass make check-headers, yet!
+so that the test skips them for user emulation targets.
+
+Add the customary
+
+    /* FIXME Does not pass make check-headers for user emulation, yet! */
+
+to the remaining ones.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- include/block/raw-aio.h               |  3 +--
- include/block/write-threshold.h       |  3 +--
- include/disas/disas.h                 |  3 +--
- include/exec/cputlb.h                 |  4 ++--
- include/exec/exec-all.h               |  2 +-
- include/exec/ioport.h                 |  4 ++--
- include/exec/memory-internal.h        |  4 +++-
- include/exec/ram_addr.h               |  2 +-
- include/exec/softmmu-semi.h           |  3 ++-
- include/exec/tb-hash.h                |  3 ++-
- include/exec/translator.h             |  1 -
- include/exec/user/thunk.h             |  2 +-
- include/fpu/softfloat-macros.h        |  4 +++-
- include/hw/acpi/pci.h                 |  4 ++--
- include/hw/acpi/tco.h                 |  4 ++--
- include/hw/adc/stm32f2xx_adc.h        |  4 ++--
- include/hw/arm/allwinner-a10.h        |  5 ++++-
- include/hw/arm/armsse.h               |  3 ++-
- include/hw/arm/armv7m.h               |  3 ++-
- include/hw/arm/aspeed_soc.h           |  5 ++++-
- include/hw/arm/bcm2836.h              |  5 ++++-
- include/hw/arm/digic.h                |  3 ++-
- include/hw/arm/exynos4210.h           |  4 +---
- include/hw/arm/fsl-imx25.h            |  5 ++++-
- include/hw/arm/fsl-imx31.h            |  5 ++++-
- include/hw/arm/fsl-imx6.h             |  3 ++-
- include/hw/arm/fsl-imx6ul.h           |  3 ++-
- include/hw/arm/fsl-imx7.h             |  3 ++-
- include/hw/arm/msf2-soc.h             |  3 ++-
- include/hw/arm/nrf51_soc.h            |  3 ++-
- include/hw/arm/sharpsl.h              |  4 ++--
- include/hw/arm/stm32f205_soc.h        |  3 ++-
- include/hw/arm/xlnx-zynqmp.h          |  5 ++++-
- include/hw/block/fdc.h                |  4 ++--
- include/hw/block/flash.h              |  3 +--
- include/hw/char/escc.h                |  3 +--
- include/hw/char/xilinx_uartlite.h     |  4 ++--
- include/hw/core/generic-loader.h      |  3 +--
- include/hw/cris/etraxfs.h             |  3 +--
- include/hw/cris/etraxfs_dma.h         |  5 +++--
- include/hw/display/i2c-ddc.h          |  3 +--
- include/hw/empty_slot.h               |  4 ++--
- include/hw/gpio/bcm2835_gpio.h        |  3 +--
- include/hw/i2c/aspeed_i2c.h           |  3 +--
- include/hw/i386/apic_internal.h       |  4 +++-
- include/hw/i386/ioapic_internal.h     |  3 +--
- include/hw/input/hid.h                |  2 --
- include/hw/intc/allwinner-a10-pic.h   |  4 ++--
- include/hw/intc/armv7m_nvic.h         |  3 ++-
- include/hw/intc/heathrow_pic.h        |  4 ++--
- include/hw/intc/mips_gic.h            |  4 +++-
- include/hw/isa/vt82c686.h             |  4 ++--
- include/hw/mips/cps.h                 |  4 +++-
- include/hw/misc/macio/cuda.h          |  4 ++--
- include/hw/misc/macio/gpio.h          |  5 +++--
- include/hw/misc/macio/macio.h         |  4 ++--
- include/hw/misc/macio/pmu.h           |  5 +++--
- include/hw/misc/mips_cmgcr.h          |  4 ++--
- include/hw/misc/mips_cpc.h            |  4 ++--
- include/hw/misc/pvpanic.h             |  4 ++--
- include/hw/net/allwinner_emac.h       |  3 +--
- include/hw/net/lance.h                |  3 +--
- include/hw/nvram/chrp_nvram.h         |  4 ++--
- include/hw/pci-host/sabre.h           |  4 ++--
- include/hw/pci-host/spapr.h           |  2 +-
- include/hw/pci-host/uninorth.h        |  4 +---
- include/hw/pci/pcie_aer.h             |  3 +--
- include/hw/ppc/pnv.h                  |  1 +
- include/hw/ppc/pnv_core.h             |  4 +++-
- include/hw/ppc/ppc4xx.h               |  7 ++++++-
- include/hw/ppc/spapr.h                |  2 +-
- include/hw/ppc/spapr_cpu_core.h       |  2 +-
- include/hw/ppc/spapr_irq.h            |  5 ++++-
- include/hw/ppc/spapr_vio.h            | 11 +++++++----
- include/hw/ppc/spapr_xive.h           |  5 ++++-
- include/hw/ppc/xics_spapr.h           |  2 +-
- include/hw/ppc/xive_regs.h            |  5 +++--
- include/hw/riscv/boot.h               |  4 +++-
- include/hw/riscv/riscv_hart.h         |  6 +++++-
- include/hw/riscv/riscv_htif.h         |  2 +-
- include/hw/riscv/sifive_clint.h       |  4 ++--
- include/hw/riscv/sifive_e.h           |  4 +++-
- include/hw/riscv/sifive_plic.h        |  4 +---
- include/hw/riscv/sifive_prci.h        |  4 ++--
- include/hw/riscv/sifive_test.h        |  4 ++--
- include/hw/riscv/sifive_u.h           |  4 +++-
- include/hw/riscv/sifive_uart.h        |  5 +++--
- include/hw/riscv/spike.h              |  6 +++++-
- include/hw/riscv/virt.h               |  6 +++++-
- include/hw/s390x/3270-ccw.h           |  2 +-
- include/hw/s390x/ap-device.h          |  4 ++--
- include/hw/s390x/css-bridge.h         |  5 ++---
- include/hw/s390x/css.h                |  3 ++-
- include/hw/s390x/s390-ccw.h           |  2 +-
- include/hw/s390x/storage-attributes.h |  2 +-
- include/hw/s390x/tod.h                |  4 +---
- include/hw/s390x/vfio-ccw.h           |  2 +-
- include/hw/semihosting/console.h      |  3 ++-
- include/hw/sh4/sh.h                   |  2 --
- include/hw/sh4/sh_intc.h              |  3 +--
- include/hw/sparc/sparc64.h            |  4 +++-
- include/hw/ssi/aspeed_smc.h           |  3 +--
- include/hw/ssi/xilinx_spips.h         |  3 +--
- include/hw/timer/allwinner-a10-pit.h  |  3 +--
- include/hw/timer/i8254_internal.h     |  3 +--
- include/hw/timer/m48t59.h             |  4 ++--
- include/hw/timer/mc146818rtc.h        |  2 --
- include/hw/timer/mc146818rtc_regs.h   |  4 ++--
- include/hw/timer/sun4v-rtc.h          |  7 ++++++-
- include/hw/timer/xlnx-zynqmp-rtc.h    |  3 +--
- include/hw/virtio/virtio-access.h     |  3 ++-
- include/hw/virtio/virtio-gpu-bswap.h  |  3 +--
- include/hw/virtio/virtio-input.h      |  2 --
- include/hw/virtio/virtio-rng.h        |  3 +--
- include/hw/watchdog/wdt_aspeed.h      |  3 +--
- include/libdecnumber/decNumberLocal.h |  3 +--
- include/migration/cpu.h               |  3 ++-
- include/monitor/hmp-target.h          |  3 ++-
- include/qemu/atomic128.h              |  4 ++--
- include/qemu/ratelimit.h              |  4 ++--
- include/qemu/thread-win32.h           |  4 ++--
- include/sysemu/balloon.h              |  3 +--
- include/sysemu/cryptodev-vhost-user.h |  4 ++--
- include/sysemu/dump.h                 |  3 ++-
- include/sysemu/hvf.h                  |  2 +-
- include/sysemu/iothread.h             |  3 +--
- include/sysemu/kvm_int.h              |  4 ++--
- include/sysemu/memory_mapping.h       |  5 ++++-
- include/sysemu/xen-mapcache.h         |  4 ++--
- include/ui/egl-helpers.h              |  6 +++++-
- include/ui/input.h                    |  3 +--
- include/ui/pixel_ops.h                |  5 ++++-
- include/ui/spice-display.h            |  4 +++-
- target/hppa/cpu.h                     |  2 +-
- tests/check-headers.mak               | 18 ++++++++++++++++++
- 135 files changed, 291 insertions(+), 213 deletions(-)
+ include/exec/ioport.h                    |  2 ++
+ include/hw/acpi/acpi.h                   |  2 ++
+ include/hw/acpi/acpi_dev_interface.h     |  2 ++
+ include/hw/acpi/cpu.h                    |  3 +++
+ include/hw/acpi/cpu_hotplug.h            |  2 ++
+ include/hw/acpi/ich9.h                   |  2 ++
+ include/hw/acpi/memory_hotplug.h         |  2 ++
+ include/hw/acpi/pcihp.h                  |  2 ++
+ include/hw/acpi/tco.h                    |  2 ++
+ include/hw/acpi/utils.h                  |  2 ++
+ include/hw/acpi/vmgenid.h                |  2 ++
+ include/hw/adc/stm32f2xx_adc.h           |  2 ++
+ include/hw/arm/aspeed.h                  |  3 +++
+ include/hw/arm/exynos4210.h              |  2 ++
+ include/hw/arm/pxa.h                     |  2 ++
+ include/hw/arm/smmu-common.h             |  3 ++-
+ include/hw/arm/smmuv3.h                  |  2 ++
+ include/hw/arm/soc_dma.h                 |  2 ++
+ include/hw/arm/virt.h                    |  2 ++
+ include/hw/arm/xlnx-versal.h             |  2 ++
+ include/hw/audio/pcspk.h                 |  2 ++
+ include/hw/audio/wm8750.h                |  3 +++
+ include/hw/block/flash.h                 |  2 ++
+ include/hw/boards.h                      |  2 ++
+ include/hw/char/bcm2835_aux.h            |  2 ++
+ include/hw/char/cadence_uart.h           |  2 ++
+ include/hw/char/cmsdk-apb-uart.h         |  2 ++
+ include/hw/char/digic-uart.h             |  3 ++-
+ include/hw/char/escc.h                   |  2 ++
+ include/hw/char/imx_serial.h             |  2 ++
+ include/hw/char/lm32_juart.h             |  2 ++
+ include/hw/char/nrf51_uart.h             |  2 ++
+ include/hw/char/parallel.h               |  2 ++
+ include/hw/char/pl011.h                  |  2 ++
+ include/hw/char/serial.h                 |  2 ++
+ include/hw/char/stm32f2xx_usart.h        |  2 ++
+ include/hw/char/xilinx_uartlite.h        |  2 ++
+ include/hw/core/split-irq.h              |  3 +++
+ include/hw/cpu/a15mpcore.h               |  3 +++
+ include/hw/cpu/a9mpcore.h                |  3 +++
+ include/hw/cpu/arm11mpcore.h             |  2 ++
+ include/hw/cpu/cluster.h                 |  3 +++
+ include/hw/cpu/core.h                    |  3 +++
+ include/hw/cris/etraxfs.h                |  2 ++
+ include/hw/display/edid.h                |  2 ++
+ include/hw/display/i2c-ddc.h             |  2 ++
+ include/hw/display/milkymist_tmu2.h      |  3 ++-
+ include/hw/display/vga.h                 |  3 +++
+ include/hw/dma/bcm2835_dma.h             |  2 ++
+ include/hw/dma/i8257.h                   |  2 ++
+ include/hw/dma/pl080.h                   |  2 ++
+ include/hw/dma/xlnx-zdma.h               |  2 ++
+ include/hw/dma/xlnx-zynq-devcfg.h        |  2 ++
+ include/hw/gpio/bcm2835_gpio.h           |  2 ++
+ include/hw/gpio/imx_gpio.h               |  2 ++
+ include/hw/gpio/nrf51_gpio.h             |  4 +++-
+ include/hw/hw.h                          |  2 ++
+ include/hw/i2c/aspeed_i2c.h              |  2 ++
+ include/hw/i2c/bitbang_i2c.h             |  2 ++
+ include/hw/i2c/i2c.h                     |  2 ++
+ include/hw/i2c/imx_i2c.h                 |  3 ++-
+ include/hw/i2c/microbit_i2c.h            |  2 ++
+ include/hw/i2c/pm_smbus.h                |  2 ++
+ include/hw/i2c/ppc4xx_i2c.h              |  2 ++
+ include/hw/i2c/smbus_eeprom.h            |  2 ++
+ include/hw/i2c/smbus_master.h            |  2 ++
+ include/hw/i2c/smbus_slave.h             |  2 ++
+ include/hw/i386/ich9.h                   |  2 ++
+ include/hw/i386/intel_iommu.h            |  2 ++
+ include/hw/i386/ioapic_internal.h        |  2 ++
+ include/hw/i386/pc.h                     |  2 ++
+ include/hw/i386/x86-iommu.h              |  2 ++
+ include/hw/ide.h                         |  2 ++
+ include/hw/ide/ahci.h                    |  3 ++-
+ include/hw/ide/internal.h                |  2 ++
+ include/hw/ide/pci.h                     |  2 ++
+ include/hw/input/adb.h                   |  2 ++
+ include/hw/input/i8042.h                 |  3 +++
+ include/hw/intc/allwinner-a10-pic.h      |  2 ++
+ include/hw/intc/arm_gic.h                |  2 ++
+ include/hw/intc/arm_gic_common.h         |  2 ++
+ include/hw/intc/arm_gicv3.h              |  2 ++
+ include/hw/intc/arm_gicv3_common.h       |  2 ++
+ include/hw/intc/arm_gicv3_its_common.h   |  2 ++
+ include/hw/intc/aspeed_vic.h             |  3 +++
+ include/hw/intc/bcm2835_ic.h             |  2 ++
+ include/hw/intc/bcm2836_control.h        |  2 ++
+ include/hw/intc/heathrow_pic.h           |  2 ++
+ include/hw/intc/imx_avic.h               |  3 +++
+ include/hw/intc/imx_gpcv2.h              |  2 ++
+ include/hw/intc/realview_gic.h           |  2 ++
+ include/hw/intc/xlnx-pmu-iomod-intc.h    |  2 ++
+ include/hw/intc/xlnx-zynqmp-ipi.h        |  2 ++
+ include/hw/ipack/ipack.h                 |  2 ++
+ include/hw/ipmi/ipmi.h                   |  2 ++
+ include/hw/isa/apm.h                     |  2 ++
+ include/hw/isa/i8259_internal.h          |  2 ++
+ include/hw/isa/isa.h                     |  2 ++
+ include/hw/isa/pc87312.h                 |  3 +++
+ include/hw/isa/superio.h                 |  3 +++
+ include/hw/loader.h                      |  2 ++
+ include/hw/mem/memory-device.h           |  2 ++
+ include/hw/mem/nvdimm.h                  |  2 ++
+ include/hw/mem/pc-dimm.h                 |  3 ++-
+ include/hw/misc/a9scu.h                  |  3 +++
+ include/hw/misc/arm11scu.h               |  2 ++
+ include/hw/misc/armsse-cpuid.h           |  2 ++
+ include/hw/misc/armsse-mhu.h             |  2 ++
+ include/hw/misc/aspeed_scu.h             |  3 +++
+ include/hw/misc/aspeed_sdmc.h            |  3 +++
+ include/hw/misc/aspeed_xdma.h            |  2 ++
+ include/hw/misc/auxbus.h                 |  3 ++-
+ include/hw/misc/bcm2835_mbox.h           |  2 ++
+ include/hw/misc/bcm2835_rng.h            |  2 ++
+ include/hw/misc/imx25_ccm.h              |  2 ++
+ include/hw/misc/imx2_wdt.h               |  2 ++
+ include/hw/misc/imx31_ccm.h              |  2 ++
+ include/hw/misc/imx6_ccm.h               |  2 ++
+ include/hw/misc/imx6_src.h               |  2 ++
+ include/hw/misc/imx6ul_ccm.h             |  2 ++
+ include/hw/misc/imx7_ccm.h               |  2 ++
+ include/hw/misc/imx7_gpr.h               |  2 ++
+ include/hw/misc/imx7_snvs.h              |  2 ++
+ include/hw/misc/imx_ccm.h                |  2 ++
+ include/hw/misc/iotkit-secctl.h          |  2 ++
+ include/hw/misc/iotkit-sysctl.h          |  2 ++
+ include/hw/misc/iotkit-sysinfo.h         |  2 ++
+ include/hw/misc/macio/cuda.h             |  2 ++
+ include/hw/misc/macio/gpio.h             |  2 ++
+ include/hw/misc/macio/macio.h            |  2 ++
+ include/hw/misc/macio/pmu.h              |  2 ++
+ include/hw/misc/mips_cmgcr.h             |  3 ++-
+ include/hw/misc/mips_cpc.h               |  2 ++
+ include/hw/misc/mips_itu.h               |  2 ++
+ include/hw/misc/mos6522.h                |  2 ++
+ include/hw/misc/mps2-fpgaio.h            |  2 ++
+ include/hw/misc/mps2-scc.h               |  2 ++
+ include/hw/misc/msf2-sysreg.h            |  2 ++
+ include/hw/misc/nrf51_rng.h              |  3 ++-
+ include/hw/misc/pca9552.h                |  3 +++
+ include/hw/misc/stm32f2xx_syscfg.h       |  2 ++
+ include/hw/misc/tz-mpc.h                 |  2 ++
+ include/hw/misc/tz-msc.h                 |  2 ++
+ include/hw/misc/tz-ppc.h                 |  2 ++
+ include/hw/misc/unimp.h                  |  2 ++
+ include/hw/misc/vmcoreinfo.h             |  4 +++-
+ include/hw/misc/zynq-xadc.h              |  2 ++
+ include/hw/net/allwinner_emac.h          |  3 ++-
+ include/hw/net/cadence_gem.h             |  2 ++
+ include/hw/net/ftgmac100.h               |  2 ++
+ include/hw/net/imx_fec.h                 |  2 ++
+ include/hw/net/lance.h                   |  2 ++
+ include/hw/net/ne2000-isa.h              |  2 ++
+ include/hw/nvram/fw_cfg.h                |  2 ++
+ include/hw/nvram/nrf51_nvm.h             |  4 +++-
+ include/hw/or-irq.h                      |  2 ++
+ include/hw/pci-bridge/simba.h            |  2 ++
+ include/hw/pci-host/designware.h         |  2 ++
+ include/hw/pci-host/gpex.h               |  2 ++
+ include/hw/pci-host/pam.h                |  2 ++
+ include/hw/pci-host/q35.h                |  2 ++
+ include/hw/pci-host/sabre.h              |  2 ++
+ include/hw/pci-host/uninorth.h           |  2 ++
+ include/hw/pci-host/xilinx-pcie.h        |  2 ++
+ include/hw/pci/msi.h                     |  2 ++
+ include/hw/pci/msix.h                    |  2 ++
+ include/hw/pci/pci.h                     |  2 ++
+ include/hw/pci/pci_bridge.h              |  3 ++-
+ include/hw/pci/pci_bus.h                 |  2 ++
+ include/hw/pci/pci_host.h                |  2 ++
+ include/hw/pci/pcie.h                    |  2 ++
+ include/hw/pci/pcie_aer.h                |  2 ++
+ include/hw/pci/pcie_host.h               |  2 ++
+ include/hw/pci/pcie_port.h               |  2 ++
+ include/hw/pci/shpc.h                    |  2 ++
+ include/hw/pcmcia.h                      |  2 ++
+ include/hw/platform-bus.h                |  2 ++
+ include/hw/ppc/mac_dbdma.h               |  2 ++
+ include/hw/ppc/openpic.h                 |  2 ++
+ include/hw/ppc/pnv_lpc.h                 |  2 ++
+ include/hw/ppc/pnv_occ.h                 |  2 ++
+ include/hw/ppc/pnv_psi.h                 |  2 ++
+ include/hw/ppc/pnv_xive.h                |  2 ++
+ include/hw/ppc/spapr_drc.h               |  2 ++
+ include/hw/ppc/xics.h                    |  3 ++-
+ include/hw/ppc/xive.h                    |  3 ++-
+ include/hw/qdev.h                        |  2 ++
+ include/hw/register.h                    |  2 ++
+ include/hw/riscv/sifive_clint.h          |  2 ++
+ include/hw/riscv/sifive_gpio.h           |  3 +++
+ include/hw/riscv/sifive_plic.h           |  2 ++
+ include/hw/riscv/sifive_prci.h           |  2 ++
+ include/hw/riscv/sifive_test.h           |  2 ++
+ include/hw/riscv/sifive_uart.h           |  2 ++
+ include/hw/s390x/css-bridge.h            |  2 ++
+ include/hw/s390x/event-facility.h        |  3 ++-
+ include/hw/s390x/s390-virtio-ccw.h       |  3 +++
+ include/hw/s390x/s390_flic.h             |  2 ++
+ include/hw/s390x/sclp.h                  |  3 ++-
+ include/hw/s390x/storage-keys.h          |  2 ++
+ include/hw/s390x/tod.h                   |  2 ++
+ include/hw/scsi/esp.h                    |  2 ++
+ include/hw/scsi/scsi.h                   |  2 ++
+ include/hw/sd/bcm2835_sdhost.h           |  2 ++
+ include/hw/sd/sd.h                       |  2 ++
+ include/hw/sd/sdhci.h                    |  2 ++
+ include/hw/sh4/sh.h                      |  2 ++
+ include/hw/sh4/sh_intc.h                 |  2 ++
+ include/hw/sparc/grlib.h                 |  2 ++
+ include/hw/sparc/sparc32_dma.h           |  2 ++
+ include/hw/sparc/sun4m_iommu.h           |  2 ++
+ include/hw/sparc/sun4u_iommu.h           |  2 ++
+ include/hw/ssi/aspeed_smc.h              |  2 ++
+ include/hw/ssi/imx_spi.h                 |  2 ++
+ include/hw/ssi/mss-spi.h                 |  2 ++
+ include/hw/ssi/pl022.h                   |  2 ++
+ include/hw/ssi/ssi.h                     |  2 ++
+ include/hw/ssi/stm32f2xx_spi.h           |  2 ++
+ include/hw/ssi/xilinx_spips.h            |  2 ++
+ include/hw/sysbus.h                      |  2 ++
+ include/hw/timer/a9gtimer.h              |  2 ++
+ include/hw/timer/allwinner-a10-pit.h     |  2 ++
+ include/hw/timer/arm_mptimer.h           |  3 +++
+ include/hw/timer/armv7m_systick.h        |  2 ++
+ include/hw/timer/aspeed_rtc.h            |  3 +++
+ include/hw/timer/aspeed_timer.h          |  3 +++
+ include/hw/timer/cmsdk-apb-dualtimer.h   |  2 ++
+ include/hw/timer/cmsdk-apb-timer.h       |  2 ++
+ include/hw/timer/digic-timer.h           |  3 ++-
+ include/hw/timer/i8254.h                 |  2 ++
+ include/hw/timer/i8254_internal.h        |  2 ++
+ include/hw/timer/imx_epit.h              |  2 ++
+ include/hw/timer/imx_gpt.h               |  2 ++
+ include/hw/timer/mc146818rtc.h           |  2 ++
+ include/hw/timer/mss-timer.h             |  2 ++
+ include/hw/timer/nrf51_timer.h           |  3 +++
+ include/hw/timer/pl031.h                 |  2 ++
+ include/hw/timer/stm32f2xx_timer.h       |  2 ++
+ include/hw/timer/xlnx-zynqmp-rtc.h       |  2 ++
+ include/hw/usb.h                         |  2 ++
+ include/hw/usb/chipidea.h                |  2 ++
+ include/hw/virtio/vhost-backend.h        |  3 ++-
+ include/hw/virtio/vhost-scsi-common.h    |  3 ++-
+ include/hw/virtio/vhost-scsi.h           |  3 ++-
+ include/hw/virtio/vhost-user-blk.h       |  3 ++-
+ include/hw/virtio/vhost-user-scsi.h      |  3 ++-
+ include/hw/virtio/vhost-user.h           |  2 ++
+ include/hw/virtio/vhost-vsock.h          |  2 ++
+ include/hw/virtio/vhost.h                |  2 ++
+ include/hw/virtio/virtio-balloon.h       |  3 ++-
+ include/hw/virtio/virtio-blk.h           |  3 ++-
+ include/hw/virtio/virtio-bus.h           |  3 ++-
+ include/hw/virtio/virtio-crypto.h        |  2 ++
+ include/hw/virtio/virtio-input.h         |  2 ++
+ include/hw/virtio/virtio-net.h           |  3 ++-
+ include/hw/virtio/virtio-pmem.h          |  2 ++
+ include/hw/virtio/virtio-rng.h           |  2 ++
+ include/hw/virtio/virtio-scsi.h          |  3 ++-
+ include/hw/virtio/virtio-serial.h        |  3 ++-
+ include/hw/virtio/virtio.h               |  3 ++-
+ include/hw/watchdog/cmsdk-apb-watchdog.h |  2 ++
+ include/hw/watchdog/wdt_aspeed.h         |  2 ++
+ include/hw/watchdog/wdt_diag288.h        |  2 ++
+ include/hw/xen/xen.h                     |  2 ++
+ include/net/vhost_net.h                  |  2 ++
+ include/qemu/iova-tree.h                 |  3 +++
+ include/sysemu/balloon.h                 |  3 ++-
+ include/sysemu/cryptodev-vhost-user.h    |  3 ++-
+ include/sysemu/cryptodev-vhost.h         |  4 +++-
+ include/sysemu/dma.h                     |  2 ++
+ include/sysemu/hostmem.h                 |  2 ++
+ include/sysemu/kvm_int.h                 |  3 ++-
+ include/sysemu/numa.h                    |  2 ++
+ include/sysemu/vhost-user-backend.h      |  3 +++
+ include/sysemu/xen-mapcache.h            |  3 ++-
+ tests/check-headers.mak                  | 14 ++++++++++----
+ 276 files changed, 590 insertions(+), 40 deletions(-)
 
-diff --git a/include/block/raw-aio.h b/include/block/raw-aio.h
-index 3e7692eb64..4629f24d08 100644
---- a/include/block/raw-aio.h
-+++ b/include/block/raw-aio.h
-@@ -13,11 +13,10 @@
+diff --git a/include/exec/ioport.h b/include/exec/ioport.h
+index 97feb296d2..7368812ba4 100644
+--- a/include/exec/ioport.h
++++ b/include/exec/ioport.h
+@@ -17,6 +17,8 @@
+  * License along with this library; if not, see <http://www.gnu.org/lice=
+nses/>.
+  */
+=20
++/* FIXME Does not pass make check-headers for user emulation, yet! */
++
+ /***********************************************************************=
+***
+  * IO ports API
+  */
+diff --git a/include/hw/acpi/acpi.h b/include/hw/acpi/acpi.h
+index c91e2b9df2..1a42e077a4 100644
+--- a/include/hw/acpi/acpi.h
++++ b/include/hw/acpi/acpi.h
+@@ -1,3 +1,5 @@
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef QEMU_HW_ACPI_H
+ #define QEMU_HW_ACPI_H
+=20
+diff --git a/include/hw/acpi/acpi_dev_interface.h b/include/hw/acpi/acpi_=
+dev_interface.h
+index 43ff119179..f169574f3c 100644
+--- a/include/hw/acpi/acpi_dev_interface.h
++++ b/include/hw/acpi/acpi_dev_interface.h
+@@ -1,3 +1,5 @@
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef ACPI_DEV_INTERFACE_H
+ #define ACPI_DEV_INTERFACE_H
+=20
+diff --git a/include/hw/acpi/cpu.h b/include/hw/acpi/cpu.h
+index 62f0278ba2..6b5e4efe1b 100644
+--- a/include/hw/acpi/cpu.h
++++ b/include/hw/acpi/cpu.h
+@@ -9,6 +9,9 @@
+  * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
+  * See the COPYING file in the top-level directory.
+  */
++
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef ACPI_CPU_H
+ #define ACPI_CPU_H
+=20
+diff --git a/include/hw/acpi/cpu_hotplug.h b/include/hw/acpi/cpu_hotplug.=
+h
+index 3b932abbbb..63a1f7f1bb 100644
+--- a/include/hw/acpi/cpu_hotplug.h
++++ b/include/hw/acpi/cpu_hotplug.h
+@@ -10,6 +10,8 @@
+  * See the COPYING file in the top-level directory.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_ACPI_CPU_HOTPLUG_H
+ #define HW_ACPI_CPU_HOTPLUG_H
+=20
+diff --git a/include/hw/acpi/ich9.h b/include/hw/acpi/ich9.h
+index 41568d1837..2e2845afe6 100644
+--- a/include/hw/acpi/ich9.h
++++ b/include/hw/acpi/ich9.h
+@@ -18,6 +18,8 @@
+  * License along with this library; if not, see <http://www.gnu.org/lice=
+nses/>
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_ACPI_ICH9_H
+ #define HW_ACPI_ICH9_H
+=20
+diff --git a/include/hw/acpi/memory_hotplug.h b/include/hw/acpi/memory_ho=
+tplug.h
+index 77c65765d6..693f16e6d5 100644
+--- a/include/hw/acpi/memory_hotplug.h
++++ b/include/hw/acpi/memory_hotplug.h
+@@ -1,3 +1,5 @@
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef QEMU_HW_ACPI_MEMORY_HOTPLUG_H
+ #define QEMU_HW_ACPI_MEMORY_HOTPLUG_H
+=20
+diff --git a/include/hw/acpi/pcihp.h b/include/hw/acpi/pcihp.h
+index 8bc4a4c01d..79aa1e4868 100644
+--- a/include/hw/acpi/pcihp.h
++++ b/include/hw/acpi/pcihp.h
+@@ -24,6 +24,8 @@
   * GNU GPL, version 2 or (at your option) any later version.
   */
 =20
--/* FIXME Does not pass make check-headers, yet! */
--
- #ifndef QEMU_RAW_AIO_H
- #define QEMU_RAW_AIO_H
-=20
-+#include "block/aio.h"
- #include "qemu/coroutine.h"
- #include "qemu/iov.h"
-=20
-diff --git a/include/block/write-threshold.h b/include/block/write-thresh=
-old.h
-index 7b5adb2e6e..c646f267a4 100644
---- a/include/block/write-threshold.h
-+++ b/include/block/write-threshold.h
-@@ -10,11 +10,10 @@
-  * See the COPYING.LIB file in the top-level directory.
-  */
-=20
--/* FIXME Does not pass make check-headers, yet! */
--
- #ifndef BLOCK_WRITE_THRESHOLD_H
- #define BLOCK_WRITE_THRESHOLD_H
-=20
-+#include "block/block_int.h"
-=20
- /*
-  * bdrv_write_threshold_set:
-diff --git a/include/disas/disas.h b/include/disas/disas.h
-index f60bbc752c..ba47e9197c 100644
---- a/include/disas/disas.h
-+++ b/include/disas/disas.h
-@@ -1,8 +1,7 @@
--/* FIXME Does not pass make check-headers, yet! */
--
- #ifndef QEMU_DISAS_H
- #define QEMU_DISAS_H
-=20
-+#include "exec/hwaddr.h"
-=20
- #ifdef NEED_CPU_H
- #include "cpu.h"
-diff --git a/include/exec/cputlb.h b/include/exec/cputlb.h
-index 361df6dee0..a62cfb28d5 100644
---- a/include/exec/cputlb.h
-+++ b/include/exec/cputlb.h
-@@ -17,11 +17,11 @@
-  * License along with this library; if not, see <http://www.gnu.org/lice=
-nses/>.
-  */
-=20
--/* FIXME Does not pass make check-headers, yet! */
--
- #ifndef CPUTLB_H
- #define CPUTLB_H
-=20
-+#include "exec/cpu-common.h"
++/* NOTE: May not be included into user emulation code */
 +
- #if !defined(CONFIG_USER_ONLY)
- /* cputlb.c */
- void tlb_protect_code(ram_addr_t ram_addr);
-diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
-index 547f539acc..4b6471014a 100644
---- a/include/exec/exec-all.h
-+++ b/include/exec/exec-all.h
-@@ -18,11 +18,11 @@
-  */
+ #ifndef HW_ACPI_PCIHP_H
+ #define HW_ACPI_PCIHP_H
 =20
- /* NOTE: May only be included into target-dependent code */
--/* FIXME Does not pass make check-headers, yet! */
-=20
- #ifndef EXEC_ALL_H
- #define EXEC_ALL_H
-=20
-+#include "cpu.h"
- #include "exec/tb-context.h"
- #include "sysemu/cpus.h"
-=20
-diff --git a/include/exec/ioport.h b/include/exec/ioport.h
-index 96dc6f5662..97feb296d2 100644
---- a/include/exec/ioport.h
-+++ b/include/exec/ioport.h
-@@ -21,11 +21,11 @@
-  * IO ports API
-  */
-=20
--/* FIXME Does not pass make check-headers, yet! */
--
- #ifndef IOPORT_H
- #define IOPORT_H
-=20
-+#include "exec/memory.h"
-+
- #define MAX_IOPORTS     (64 * 1024)
- #define IOPORTS_MASK    (MAX_IOPORTS - 1)
-=20
-diff --git a/include/exec/memory-internal.h b/include/exec/memory-interna=
-l.h
-index d16ec2d36d..d9d871d827 100644
---- a/include/exec/memory-internal.h
-+++ b/include/exec/memory-internal.h
-@@ -17,11 +17,13 @@
-  * internals and the TCG TLB code. Do not include it from elsewhere.
-  */
-=20
--/* FIXME Does not pass make check-headers, yet! */
-+/* NOTE: May only be included into target-dependent code */
-=20
- #ifndef MEMORY_INTERNAL_H
- #define MEMORY_INTERNAL_H
-=20
-+#include "cpu.h"
-+
- #ifndef CONFIG_USER_ONLY
- static inline AddressSpaceDispatch *flatview_to_dispatch(FlatView *fv)
- {
-diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
-index 507050a2e7..27d567b192 100644
---- a/include/exec/ram_addr.h
-+++ b/include/exec/ram_addr.h
-@@ -17,12 +17,12 @@
-  */
-=20
- /* NOTE: May only be included into target-dependent code */
--/* FIXME Does not pass make check-headers, yet! */
-=20
- #ifndef RAM_ADDR_H
- #define RAM_ADDR_H
-=20
- #ifndef CONFIG_USER_ONLY
-+#include "cpu.h"
- #include "hw/xen/xen.h"
- #include "sysemu/tcg.h"
- #include "exec/ramlist.h"
-diff --git a/include/exec/softmmu-semi.h b/include/exec/softmmu-semi.h
-index 551c013652..e00efba166 100644
---- a/include/exec/softmmu-semi.h
-+++ b/include/exec/softmmu-semi.h
-@@ -8,11 +8,12 @@
-  */
-=20
- /* NOTE: May only be included into target-dependent code */
--/* FIXME Does not pass make check-headers, yet! */
-=20
- #ifndef SOFTMMU_SEMI_H
- #define SOFTMMU_SEMI_H
-=20
-+#include "cpu.h"
-+
- static inline uint64_t softmmu_tget64(CPUArchState *env, target_ulong ad=
-dr)
- {
-     uint64_t val;
-diff --git a/include/exec/tb-hash.h b/include/exec/tb-hash.h
-index 79e53fb73d..a26f23d62d 100644
---- a/include/exec/tb-hash.h
-+++ b/include/exec/tb-hash.h
-@@ -18,11 +18,12 @@
-  */
-=20
- /* NOTE: May only be included into target-dependent code */
--/* FIXME Does not pass make check-headers, yet! */
-=20
- #ifndef EXEC_TB_HASH_H
- #define EXEC_TB_HASH_H
-=20
-+#include "exec/cpu-defs.h"
-+#include "exec/exec-all.h"
- #include "qemu/xxhash.h"
-=20
- #ifdef CONFIG_SOFTMMU
-diff --git a/include/exec/translator.h b/include/exec/translator.h
-index 301c740c4e..7f7c4e7d71 100644
---- a/include/exec/translator.h
-+++ b/include/exec/translator.h
-@@ -8,7 +8,6 @@
-  */
-=20
- /* NOTE: May only be included into target-dependent code */
--/* FIXME Does not pass make check-headers, yet! */
-=20
- #ifndef EXEC__TRANSLATOR_H
- #define EXEC__TRANSLATOR_H
-diff --git a/include/exec/user/thunk.h b/include/exec/user/thunk.h
-index 933fd77436..4b345ba7ca 100644
---- a/include/exec/user/thunk.h
-+++ b/include/exec/user/thunk.h
-@@ -18,12 +18,12 @@
-  */
-=20
- /* NOTE: May only be included into target-dependent code */
--/* FIXME Does not pass make check-headers, yet! */
-=20
- #ifndef THUNK_H
- #define THUNK_H
-=20
- #include "cpu.h"
-+#include "exec/user/abitypes.h"
-=20
- /* types enums definitions */
-=20
-diff --git a/include/fpu/softfloat-macros.h b/include/fpu/softfloat-macro=
-s.h
-index df33e55c70..11690c3f89 100644
---- a/include/fpu/softfloat-macros.h
-+++ b/include/fpu/softfloat-macros.h
-@@ -79,11 +79,13 @@ this code that are retained.
-  * version 2 or later. See the COPYING file in the top-level directory.
-  */
-=20
--/* FIXME Does not pass make check-headers, yet! */
-+/* NOTE: May only be included into target-dependent code */
-=20
- #ifndef FPU_SOFTFLOAT_MACROS_H
- #define FPU_SOFTFLOAT_MACROS_H
-=20
-+#include "fpu/softfloat.h"
-+
- /*----------------------------------------------------------------------=
-------
- | Shifts `a' right by the number of bits given in `count'.  If any nonze=
-ro
- | bits are shifted off, they are ``jammed'' into the least significant b=
-it of
-diff --git a/include/hw/acpi/pci.h b/include/hw/acpi/pci.h
-index 45d8a38589..bf2a3ed0ba 100644
---- a/include/hw/acpi/pci.h
-+++ b/include/hw/acpi/pci.h
-@@ -23,11 +23,11 @@
-  * with this program; if not, see <http://www.gnu.org/licenses/>.
-  */
-=20
--/* FIXME Does not pass make check-headers, yet! */
--
- #ifndef HW_ACPI_PCI_H
- #define HW_ACPI_PCI_H
-=20
-+#include "hw/acpi/bios-linker-loader.h"
-+
- typedef struct AcpiMcfgInfo {
-     uint64_t base;
-     uint32_t size;
 diff --git a/include/hw/acpi/tco.h b/include/hw/acpi/tco.h
-index 1f3c2d17fb..726f840cce 100644
+index 726f840cce..a9079d4abd 100644
 --- a/include/hw/acpi/tco.h
 +++ b/include/hw/acpi/tco.h
-@@ -7,11 +7,11 @@
+@@ -7,6 +7,8 @@
   * See the COPYING file in the top-level directory.
   */
 =20
--/* FIXME Does not pass make check-headers, yet! */
--
++/* FIXME Does not pass make check-headers for user emulation, yet! */
++
  #ifndef HW_ACPI_TCO_H
  #define HW_ACPI_TCO_H
 =20
-+#include "exec/memory.h"
-+#include "migration/vmstate.h"
+diff --git a/include/hw/acpi/utils.h b/include/hw/acpi/utils.h
+index 140b4de603..ac86b6f8ed 100644
+--- a/include/hw/acpi/utils.h
++++ b/include/hw/acpi/utils.h
+@@ -1,3 +1,5 @@
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_ACPI_UTILS_H
+ #define HW_ACPI_UTILS_H
 =20
- /* As per ICH9 spec, the internal timer has an error of ~0.6s on every t=
-ick */
- #define TCO_TICK_NSEC 600000000LL
+diff --git a/include/hw/acpi/vmgenid.h b/include/hw/acpi/vmgenid.h
+index 38586ecbdf..fbeb4dd8a8 100644
+--- a/include/hw/acpi/vmgenid.h
++++ b/include/hw/acpi/vmgenid.h
+@@ -1,3 +1,5 @@
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef ACPI_VMGENID_H
+ #define ACPI_VMGENID_H
+=20
 diff --git a/include/hw/adc/stm32f2xx_adc.h b/include/hw/adc/stm32f2xx_ad=
 c.h
-index 8e67c0f24d..663b79f4f3 100644
+index 663b79f4f3..f9eafe12b9 100644
 --- a/include/hw/adc/stm32f2xx_adc.h
 +++ b/include/hw/adc/stm32f2xx_adc.h
-@@ -22,11 +22,11 @@
+@@ -22,6 +22,8 @@
   * THE SOFTWARE.
   */
 =20
--/* FIXME Does not pass make check-headers, yet! */
--
++/* NOTE: May not be included into user emulation code */
++
  #ifndef HW_STM32F2XX_ADC_H
  #define HW_STM32F2XX_ADC_H
 =20
-+#include "hw/sysbus.h"
-+
- #define ADC_SR    0x00
- #define ADC_CR1   0x04
- #define ADC_CR2   0x08
-diff --git a/include/hw/arm/allwinner-a10.h b/include/hw/arm/allwinner-a1=
-0.h
-index e8b8cc2ceb..91cc544ac3 100644
---- a/include/hw/arm/allwinner-a10.h
-+++ b/include/hw/arm/allwinner-a10.h
-@@ -1,4 +1,6 @@
--/* FIXME Does not pass make check-headers, yet! */
-+/* NOTE: May only be included into target-dependent code */
-+/* FIXME Does not pass make check-headers for TARGET_BASE_ARCH other tha=
-n arm, yet! */
-+/* FIXME Does not pass make check-headers for user emulation, yet! */
-=20
- #ifndef HW_ARM_ALLWINNER_A10_H
- #define HW_ARM_ALLWINNER_A10_H
-@@ -13,6 +15,7 @@
- #include "hw/ide/ahci.h"
-=20
- #include "sysemu/sysemu.h"
-+#include "target/arm/cpu.h"
-=20
-=20
- #define AW_A10_PIC_REG_BASE     0x01c20400
-diff --git a/include/hw/arm/armsse.h b/include/hw/arm/armsse.h
-index 201893ccf5..8ecfbf1a7d 100644
---- a/include/hw/arm/armsse.h
-+++ b/include/hw/arm/armsse.h
-@@ -87,7 +87,8 @@
-  */
-=20
- /* NOTE: May only be included into target-dependent code */
--/* FIXME Does not pass make check-headers, yet! */
-+/* FIXME Does not pass make check-headers for TARGET_BASE_ARCH other tha=
-n arm, yet! */
-+/* FIXME Does not pass make check-headers for user emulation, yet! */
-=20
- #ifndef ARMSSE_H
- #define ARMSSE_H
-diff --git a/include/hw/arm/armv7m.h b/include/hw/arm/armv7m.h
-index fdb777d875..dfb87e0546 100644
---- a/include/hw/arm/armv7m.h
-+++ b/include/hw/arm/armv7m.h
-@@ -8,7 +8,8 @@
-  */
-=20
- /* NOTE: May only be included into target-dependent code */
--/* FIXME Does not pass make check-headers, yet! */
-+/* FIXME Does not pass make check-headers for TARGET_BASE_ARCH other tha=
-n arm, yet! */
-+/* FIXME Does not pass make check-headers for user emulation, yet! */
-=20
- #ifndef HW_ARM_ARMV7M_H
- #define HW_ARM_ARMV7M_H
-diff --git a/include/hw/arm/aspeed_soc.h b/include/hw/arm/aspeed_soc.h
-index c502ef0e65..70017e7cb6 100644
---- a/include/hw/arm/aspeed_soc.h
-+++ b/include/hw/arm/aspeed_soc.h
-@@ -9,7 +9,9 @@
+diff --git a/include/hw/arm/aspeed.h b/include/hw/arm/aspeed.h
+index 02073a6b4d..42edd4a0fe 100644
+--- a/include/hw/arm/aspeed.h
++++ b/include/hw/arm/aspeed.h
+@@ -6,6 +6,9 @@
+  * This code is licensed under the GPL version 2 or later.  See
   * the COPYING file in the top-level directory.
   */
++
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef ARM_ASPEED_H
+ #define ARM_ASPEED_H
 =20
--/* FIXME Does not pass make check-headers, yet! */
-+/* NOTE: May only be included into target-dependent code */
-+/* FIXME Does not pass make check-headers for TARGET_BASE_ARCH other tha=
-n arm, yet! */
-+/* FIXME Does not pass make check-headers for user emulation, yet! */
-=20
- #ifndef ASPEED_SOC_H
- #define ASPEED_SOC_H
-@@ -24,6 +26,7 @@
- #include "hw/ssi/aspeed_smc.h"
- #include "hw/watchdog/wdt_aspeed.h"
- #include "hw/net/ftgmac100.h"
-+#include "target/arm/cpu.h"
-=20
- #define ASPEED_SPIS_NUM  2
- #define ASPEED_WDTS_NUM  3
-diff --git a/include/hw/arm/bcm2836.h b/include/hw/arm/bcm2836.h
-index aaa12f5cdb..da2a6eac4a 100644
---- a/include/hw/arm/bcm2836.h
-+++ b/include/hw/arm/bcm2836.h
-@@ -8,13 +8,16 @@
-  * This code is licensed under the GNU GPLv2 and later.
-  */
-=20
--/* FIXME Does not pass make check-headers, yet! */
-+/* NOTE: May only be included into target-dependent code */
-+/* FIXME Does not pass make check-headers for TARGET_BASE_ARCH other tha=
-n arm, yet! */
-+/* FIXME Does not pass make check-headers for user emulation, yet! */
-=20
- #ifndef BCM2836_H
- #define BCM2836_H
-=20
- #include "hw/arm/bcm2835_peripherals.h"
- #include "hw/intc/bcm2836_control.h"
-+#include "target/arm/cpu.h"
-=20
- #define TYPE_BCM283X "bcm283x"
- #define BCM283X(obj) OBJECT_CHECK(BCM283XState, (obj), TYPE_BCM283X)
-diff --git a/include/hw/arm/digic.h b/include/hw/arm/digic.h
-index 79f9278c64..7cbf6ad0cb 100644
---- a/include/hw/arm/digic.h
-+++ b/include/hw/arm/digic.h
-@@ -16,7 +16,8 @@
-  */
-=20
- /* NOTE: May only be included into target-dependent code */
--/* FIXME Does not pass make check-headers, yet! */
-+/* FIXME Does not pass make check-headers for TARGET_BASE_ARCH other tha=
-n arm, yet! */
-+/* FIXME Does not pass make check-headers for user emulation, yet! */
-=20
- #ifndef HW_ARM_DIGIC_H
- #define HW_ARM_DIGIC_H
 diff --git a/include/hw/arm/exynos4210.h b/include/hw/arm/exynos4210.h
-index 0d0898e613..f0f23b0e9b 100644
+index f0f23b0e9b..04a9e38fc9 100644
 --- a/include/hw/arm/exynos4210.h
 +++ b/include/hw/arm/exynos4210.h
-@@ -21,12 +21,10 @@
+@@ -21,6 +21,8 @@
   *  with this program; if not, see <http://www.gnu.org/licenses/>.
   */
 =20
--/* FIXME Does not pass make check-headers, yet! */
--
++/* NOTE: May not be included into user emulation code */
++
  #ifndef EXYNOS4210_H
  #define EXYNOS4210_H
 =20
--#include "exec/memory.h"
-+#include "hw/sysbus.h"
- #include "target/arm/cpu-qom.h"
-=20
- #define EXYNOS4210_NCPUS                    2
-diff --git a/include/hw/arm/fsl-imx25.h b/include/hw/arm/fsl-imx25.h
-index 61028eaa99..69732692cf 100644
---- a/include/hw/arm/fsl-imx25.h
-+++ b/include/hw/arm/fsl-imx25.h
-@@ -14,7 +14,9 @@
-  * for more details.
+diff --git a/include/hw/arm/pxa.h b/include/hw/arm/pxa.h
+index f6dfb5c0cf..3a4e157cad 100644
+--- a/include/hw/arm/pxa.h
++++ b/include/hw/arm/pxa.h
+@@ -7,6 +7,8 @@
+  * This code is licensed under the GNU GPL v2.
   */
 =20
--/* FIXME Does not pass make check-headers, yet! */
-+/* NOTE: May only be included into target-dependent code */
-+/* FIXME Does not pass make check-headers for TARGET_BASE_ARCH other tha=
-n arm, yet! */
-+/* FIXME Does not pass make check-headers for user emulation, yet! */
-=20
- #ifndef FSL_IMX25_H
- #define FSL_IMX25_H
-@@ -29,6 +31,7 @@
- #include "hw/i2c/imx_i2c.h"
- #include "hw/gpio/imx_gpio.h"
- #include "exec/memory.h"
-+#include "target/arm/cpu.h"
-=20
- #define TYPE_FSL_IMX25 "fsl,imx25"
- #define FSL_IMX25(obj) OBJECT_CHECK(FslIMX25State, (obj), TYPE_FSL_IMX25=
-)
-diff --git a/include/hw/arm/fsl-imx31.h b/include/hw/arm/fsl-imx31.h
-index bff92e79c0..b844812eb9 100644
---- a/include/hw/arm/fsl-imx31.h
-+++ b/include/hw/arm/fsl-imx31.h
-@@ -14,7 +14,9 @@
-  * for more details.
-  */
-=20
--/* FIXME Does not pass make check-headers, yet! */
-+/* NOTE: May only be included into target-dependent code */
-+/* FIXME Does not pass make check-headers for TARGET_BASE_ARCH other tha=
-n arm, yet! */
-+/* FIXME Does not pass make check-headers for user emulation, yet! */
-=20
- #ifndef FSL_IMX31_H
- #define FSL_IMX31_H
-@@ -28,6 +30,7 @@
- #include "hw/i2c/imx_i2c.h"
- #include "hw/gpio/imx_gpio.h"
- #include "exec/memory.h"
-+#include "target/arm/cpu.h"
-=20
- #define TYPE_FSL_IMX31 "fsl,imx31"
- #define FSL_IMX31(obj) OBJECT_CHECK(FslIMX31State, (obj), TYPE_FSL_IMX31=
-)
-diff --git a/include/hw/arm/fsl-imx6.h b/include/hw/arm/fsl-imx6.h
-index 230d44c793..133d4e3e67 100644
---- a/include/hw/arm/fsl-imx6.h
-+++ b/include/hw/arm/fsl-imx6.h
-@@ -15,7 +15,8 @@
-  */
-=20
- /* NOTE: May only be included into target-dependent code */
--/* FIXME Does not pass make check-headers, yet! */
-+/* FIXME Does not pass make check-headers for TARGET_BASE_ARCH other tha=
-n arm, yet! */
-+/* FIXME Does not pass make check-headers for user emulation, yet! */
-=20
- #ifndef FSL_IMX6_H
- #define FSL_IMX6_H
-diff --git a/include/hw/arm/fsl-imx6ul.h b/include/hw/arm/fsl-imx6ul.h
-index 25e8540908..20ffb44ab6 100644
---- a/include/hw/arm/fsl-imx6ul.h
-+++ b/include/hw/arm/fsl-imx6ul.h
-@@ -15,7 +15,8 @@
-  */
-=20
- /* NOTE: May only be included into target-dependent code */
--/* FIXME Does not pass make check-headers, yet! */
-+/* FIXME Does not pass make check-headers for TARGET_BASE_ARCH other tha=
-n arm, yet! */
-+/* FIXME Does not pass make check-headers for user emulation, yet! */
-=20
- #ifndef FSL_IMX6UL_H
- #define FSL_IMX6UL_H
-diff --git a/include/hw/arm/fsl-imx7.h b/include/hw/arm/fsl-imx7.h
-index e32873ca73..f1df5e3608 100644
---- a/include/hw/arm/fsl-imx7.h
-+++ b/include/hw/arm/fsl-imx7.h
-@@ -17,7 +17,8 @@
-  */
-=20
- /* NOTE: May only be included into target-dependent code */
--/* FIXME Does not pass make check-headers, yet! */
-+/* FIXME Does not pass make check-headers for TARGET_BASE_ARCH other tha=
-n arm, yet! */
-+/* FIXME Does not pass make check-headers for user emulation, yet! */
-=20
- #ifndef FSL_IMX7_H
- #define FSL_IMX7_H
-diff --git a/include/hw/arm/msf2-soc.h b/include/hw/arm/msf2-soc.h
-index 3a209e48b8..d2d81364da 100644
---- a/include/hw/arm/msf2-soc.h
-+++ b/include/hw/arm/msf2-soc.h
-@@ -23,7 +23,8 @@
-  */
-=20
- /* NOTE: May only be included into target-dependent code */
--/* FIXME Does not pass make check-headers, yet! */
-+/* FIXME Does not pass make check-headers for TARGET_BASE_ARCH other tha=
-n arm, yet! */
-+/* FIXME Does not pass make check-headers for user emulation, yet! */
-=20
- #ifndef HW_ARM_MSF2_SOC_H
- #define HW_ARM_MSF2_SOC_H
-diff --git a/include/hw/arm/nrf51_soc.h b/include/hw/arm/nrf51_soc.h
-index b5a3da0bdc..8fef32792b 100644
---- a/include/hw/arm/nrf51_soc.h
-+++ b/include/hw/arm/nrf51_soc.h
-@@ -8,7 +8,8 @@
-  */
-=20
- /* NOTE: May only be included into target-dependent code */
--/* FIXME Does not pass make check-headers, yet! */
-+/* FIXME Does not pass make check-headers for TARGET_BASE_ARCH other tha=
-n arm, yet! */
-+/* FIXME Does not pass make check-headers for user emulation, yet! */
-=20
- #ifndef NRF51_SOC_H
- #define NRF51_SOC_H
-diff --git a/include/hw/arm/sharpsl.h b/include/hw/arm/sharpsl.h
-index dc456653e1..89e168fbff 100644
---- a/include/hw/arm/sharpsl.h
-+++ b/include/hw/arm/sharpsl.h
-@@ -4,11 +4,11 @@
-  * This file is licensed under the GNU GPL.
-  */
-=20
--/* FIXME Does not pass make check-headers, yet! */
--
- #ifndef QEMU_SHARPSL_H
- #define QEMU_SHARPSL_H
-=20
-+#include "exec/hwaddr.h"
++/* NOTE: May not be included into user emulation code */
 +
- #define zaurus_printf(format, ...)	\
-     fprintf(stderr, "%s: " format, __func__, ##__VA_ARGS__)
+ #ifndef PXA_H
+ #define PXA_H
 =20
-diff --git a/include/hw/arm/stm32f205_soc.h b/include/hw/arm/stm32f205_so=
-c.h
-index 4558c64823..7842fe616b 100644
---- a/include/hw/arm/stm32f205_soc.h
-+++ b/include/hw/arm/stm32f205_soc.h
-@@ -23,7 +23,8 @@
+diff --git a/include/hw/arm/smmu-common.h b/include/hw/arm/smmu-common.h
+index 1f37844e5c..95b96e582d 100644
+--- a/include/hw/arm/smmu-common.h
++++ b/include/hw/arm/smmu-common.h
+@@ -13,9 +13,10 @@
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  * GNU General Public License for more details.
+- *
   */
 =20
- /* NOTE: May only be included into target-dependent code */
--/* FIXME Does not pass make check-headers, yet! */
-+/* FIXME Does not pass make check-headers for TARGET_BASE_ARCH other tha=
-n arm, yet! */
-+/* FIXME Does not pass make check-headers for user emulation, yet! */
-=20
- #ifndef HW_ARM_STM32F205_SOC_H
- #define HW_ARM_STM32F205_SOC_H
-diff --git a/include/hw/arm/xlnx-zynqmp.h b/include/hw/arm/xlnx-zynqmp.h
-index 8c4a3a2815..0d2b8f20a0 100644
---- a/include/hw/arm/xlnx-zynqmp.h
-+++ b/include/hw/arm/xlnx-zynqmp.h
-@@ -15,7 +15,9 @@
-  * for more details.
-  */
-=20
--/* FIXME Does not pass make check-headers, yet! */
-+/* NOTE: May only be included into target-dependent code */
-+/* FIXME Does not pass make check-headers for TARGET_BASE_ARCH other tha=
-n arm, yet! */
-+/* FIXME Does not pass make check-headers for user emulation, yet! */
-=20
- #ifndef XLNX_ZYNQMP_H
- #define XLNX_ZYNQMP_H
-@@ -34,6 +36,7 @@
- #include "hw/intc/xlnx-zynqmp-ipi.h"
- #include "hw/timer/xlnx-zynqmp-rtc.h"
- #include "hw/cpu/cluster.h"
-+#include "target/arm/cpu.h"
-=20
- #define TYPE_XLNX_ZYNQMP "xlnx,zynqmp"
- #define XLNX_ZYNQMP(obj) OBJECT_CHECK(XlnxZynqMPState, (obj), \
-diff --git a/include/hw/block/fdc.h b/include/hw/block/fdc.h
-index d43a2fbd66..f4fe2f471b 100644
---- a/include/hw/block/fdc.h
-+++ b/include/hw/block/fdc.h
-@@ -1,8 +1,8 @@
--/* FIXME Does not pass make check-headers, yet! */
--
- #ifndef HW_FDC_H
- #define HW_FDC_H
-=20
-+#include "exec/hwaddr.h"
-+#include "hw/irq.h"
- #include "qapi/qapi-types-block.h"
-=20
- /* fdc.c */
-diff --git a/include/hw/block/flash.h b/include/hw/block/flash.h
-index 15ce2b3f14..83a75f3170 100644
---- a/include/hw/block/flash.h
-+++ b/include/hw/block/flash.h
-@@ -1,11 +1,10 @@
--/* FIXME Does not pass make check-headers, yet! */
--
- #ifndef HW_FLASH_H
- #define HW_FLASH_H
-=20
- /* NOR flash devices */
-=20
- #include "exec/memory.h"
-+#include "migration/vmstate.h"
-=20
- /* pflash_cfi01.c */
-=20
-diff --git a/include/hw/char/escc.h b/include/hw/char/escc.h
-index 71b95dd152..d5196c53e6 100644
---- a/include/hw/char/escc.h
-+++ b/include/hw/char/escc.h
-@@ -1,10 +1,9 @@
--/* FIXME Does not pass make check-headers, yet! */
--
- #ifndef HW_ESCC_H
- #define HW_ESCC_H
-=20
- #include "chardev/char-fe.h"
- #include "chardev/char-serial.h"
-+#include "hw/sysbus.h"
- #include "ui/input.h"
-=20
- /* escc.c */
-diff --git a/include/hw/char/xilinx_uartlite.h b/include/hw/char/xilinx_u=
-artlite.h
-index a003b5977f..99d8bbf405 100644
---- a/include/hw/char/xilinx_uartlite.h
-+++ b/include/hw/char/xilinx_uartlite.h
-@@ -12,11 +12,11 @@
-  * this program.  If not, see <http://www.gnu.org/licenses/>.
-  */
-=20
--/* FIXME Does not pass make check-headers, yet! */
--
- #ifndef XILINX_UARTLITE_H
- #define XILINX_UARTLITE_H
-=20
-+#include "hw/sysbus.h"
++/* NOTE: May not be included into user emulation code */
 +
- static inline DeviceState *xilinx_uartlite_create(hwaddr addr,
-                                         qemu_irq irq,
-                                         Chardev *chr)
-diff --git a/include/hw/core/generic-loader.h b/include/hw/core/generic-l=
-oader.h
-index 3827144a5f..9ffce1c5a3 100644
---- a/include/hw/core/generic-loader.h
-+++ b/include/hw/core/generic-loader.h
-@@ -15,12 +15,11 @@
-  * for more details.
-  */
-=20
--/* FIXME Does not pass make check-headers, yet! */
--
- #ifndef GENERIC_LOADER_H
- #define GENERIC_LOADER_H
-=20
- #include "elf.h"
-+#include "hw/qdev-core.h"
-=20
- typedef struct GenericLoaderState {
-     /* <private> */
-diff --git a/include/hw/cris/etraxfs.h b/include/hw/cris/etraxfs.h
-index 108692bac3..494222d315 100644
---- a/include/hw/cris/etraxfs.h
-+++ b/include/hw/cris/etraxfs.h
-@@ -22,13 +22,12 @@
-  * THE SOFTWARE.
-  */
-=20
--/* FIXME Does not pass make check-headers, yet! */
--
- #ifndef HW_ETRAXFS_H
- #define HW_ETRAXFS_H
-=20
- #include "net/net.h"
- #include "hw/cris/etraxfs_dma.h"
-+#include "hw/sysbus.h"
-=20
- /* Instantiate an ETRAXFS Ethernet MAC.  */
- static inline DeviceState *
-diff --git a/include/hw/cris/etraxfs_dma.h b/include/hw/cris/etraxfs_dma.=
-h
-index a1c6ce44ba..31ae360611 100644
---- a/include/hw/cris/etraxfs_dma.h
-+++ b/include/hw/cris/etraxfs_dma.h
-@@ -1,8 +1,9 @@
--/* FIXME Does not pass make check-headers, yet! */
--
- #ifndef HW_ETRAXFS_DMA_H
- #define HW_ETRAXFS_DMA_H
-=20
-+#include "exec/hwaddr.h"
-+#include "hw/irq.h"
-+
- struct dma_context_metadata {
- 	/* data descriptor md */
- 	uint16_t metadata;
-diff --git a/include/hw/display/i2c-ddc.h b/include/hw/display/i2c-ddc.h
-index 814be09922..1cf53a0c8d 100644
---- a/include/hw/display/i2c-ddc.h
-+++ b/include/hw/display/i2c-ddc.h
-@@ -16,12 +16,11 @@
-  *  with this program; if not, see <http://www.gnu.org/licenses/>.
-  */
-=20
--/* FIXME Does not pass make check-headers, yet! */
--
- #ifndef I2C_DDC_H
- #define I2C_DDC_H
-=20
- #include "hw/display/edid.h"
-+#include "hw/i2c/i2c.h"
-=20
- /* A simple I2C slave which just returns the contents of its EDID blob. =
-*/
- struct I2CDDCState {
-diff --git a/include/hw/empty_slot.h b/include/hw/empty_slot.h
-index 249092a1cd..cb9a221aa6 100644
---- a/include/hw/empty_slot.h
-+++ b/include/hw/empty_slot.h
-@@ -1,8 +1,8 @@
--/* FIXME Does not pass make check-headers, yet! */
--
- #ifndef HW_EMPTY_SLOT_H
- #define HW_EMPTY_SLOT_H
-=20
-+#include "exec/hwaddr.h"
-+
- /* empty_slot.c */
- void empty_slot_init(hwaddr addr, uint64_t slot_size);
-=20
-diff --git a/include/hw/gpio/bcm2835_gpio.h b/include/hw/gpio/bcm2835_gpi=
-o.h
-index c24106aba5..b0de0a3c74 100644
---- a/include/hw/gpio/bcm2835_gpio.h
-+++ b/include/hw/gpio/bcm2835_gpio.h
-@@ -11,12 +11,11 @@
-  * See the COPYING file in the top-level directory.
-  */
-=20
--/* FIXME Does not pass make check-headers, yet! */
--
- #ifndef BCM2835_GPIO_H
- #define BCM2835_GPIO_H
-=20
- #include "hw/sd/sd.h"
-+#include "hw/sysbus.h"
-=20
- typedef struct BCM2835GpioState {
-     SysBusDevice parent_obj;
-diff --git a/include/hw/i2c/aspeed_i2c.h b/include/hw/i2c/aspeed_i2c.h
-index ee215ff26e..a2753f0bbb 100644
---- a/include/hw/i2c/aspeed_i2c.h
-+++ b/include/hw/i2c/aspeed_i2c.h
-@@ -18,12 +18,11 @@
-  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-  */
-=20
--/* FIXME Does not pass make check-headers, yet! */
--
- #ifndef ASPEED_I2C_H
- #define ASPEED_I2C_H
-=20
- #include "hw/i2c/i2c.h"
-+#include "hw/sysbus.h"
-=20
- #define TYPE_ASPEED_I2C "aspeed.i2c"
- #define ASPEED_I2C(obj) \
-diff --git a/include/hw/i386/apic_internal.h b/include/hw/i386/apic_inter=
-nal.h
-index ec00577253..1dbee70cfd 100644
---- a/include/hw/i386/apic_internal.h
-+++ b/include/hw/i386/apic_internal.h
-@@ -19,7 +19,8 @@
-  */
-=20
- /* NOTE: May only be included into target-dependent code */
--/* FIXME Does not pass make check-headers, yet! */
-+/* FIXME Does not pass make check-headers for TARGET_BASE_ARCH other tha=
-n i386, yet! */
-+/* FIXME Does not pass make check-headers for user emulation, yet! */
-=20
- #ifndef QEMU_APIC_INTERNAL_H
- #define QEMU_APIC_INTERNAL_H
-@@ -27,6 +28,7 @@
- #include "cpu.h"
- #include "exec/memory.h"
- #include "qemu/timer.h"
-+#include "target/i386/cpu-qom.h"
-=20
- /* APIC Local Vector Table */
- #define APIC_LVT_TIMER                  0
-diff --git a/include/hw/i386/ioapic_internal.h b/include/hw/i386/ioapic_i=
-nternal.h
-index 9a9cd96788..3d2eec2aa7 100644
---- a/include/hw/i386/ioapic_internal.h
-+++ b/include/hw/i386/ioapic_internal.h
-@@ -19,13 +19,12 @@
-  * License along with this library; if not, see <http://www.gnu.org/lice=
-nses/>.
-  */
-=20
--/* FIXME Does not pass make check-headers, yet! */
--
- #ifndef QEMU_IOAPIC_INTERNAL_H
- #define QEMU_IOAPIC_INTERNAL_H
-=20
- #include "hw/hw.h"
- #include "exec/memory.h"
-+#include "hw/i386/ioapic.h"
- #include "hw/sysbus.h"
- #include "qemu/notify.h"
-=20
-diff --git a/include/hw/input/hid.h b/include/hw/input/hid.h
-index aec04352e0..2127c7ce45 100644
---- a/include/hw/input/hid.h
-+++ b/include/hw/input/hid.h
-@@ -1,5 +1,3 @@
--/* FIXME Does not pass make check-headers, yet! */
--
- #ifndef QEMU_HID_H
- #define QEMU_HID_H
-=20
-diff --git a/include/hw/intc/allwinner-a10-pic.h b/include/hw/intc/allwin=
-ner-a10-pic.h
-index 897d5ad6cc..a5895401d1 100644
---- a/include/hw/intc/allwinner-a10-pic.h
-+++ b/include/hw/intc/allwinner-a10-pic.h
-@@ -1,8 +1,8 @@
--/* FIXME Does not pass make check-headers, yet! */
--
- #ifndef ALLWINNER_A10_PIC_H
- #define ALLWINNER_A10_PIC_H
-=20
-+#include "hw/sysbus.h"
-+
- #define TYPE_AW_A10_PIC  "allwinner-a10-pic"
- #define AW_A10_PIC(obj) OBJECT_CHECK(AwA10PICState, (obj), TYPE_AW_A10_P=
-IC)
-=20
-diff --git a/include/hw/intc/armv7m_nvic.h b/include/hw/intc/armv7m_nvic.=
-h
-index 5bcb946035..7dd0a14830 100644
---- a/include/hw/intc/armv7m_nvic.h
-+++ b/include/hw/intc/armv7m_nvic.h
-@@ -8,7 +8,8 @@
-  */
-=20
- /* NOTE: May only be included into target-dependent code */
--/* FIXME Does not pass make check-headers, yet! */
-+/* FIXME Does not pass make check-headers for TARGET_BASE_ARCH other tha=
-n arm, yet! */
-+/* FIXME Does not pass make check-headers for user emulation, yet! */
-=20
- #ifndef HW_ARM_ARMV7M_NVIC_H
- #define HW_ARM_ARMV7M_NVIC_H
-diff --git a/include/hw/intc/heathrow_pic.h b/include/hw/intc/heathrow_pi=
-c.h
-index 9724912d59..b163e27ab9 100644
---- a/include/hw/intc/heathrow_pic.h
-+++ b/include/hw/intc/heathrow_pic.h
-@@ -23,11 +23,11 @@
-  * THE SOFTWARE.
-  */
-=20
--/* FIXME Does not pass make check-headers, yet! */
--
- #ifndef HW_INTC_HEATHROW_PIC_H
- #define HW_INTC_HEATHROW_PIC_H
-=20
-+#include "hw/sysbus.h"
-+
- #define TYPE_HEATHROW "heathrow"
- #define HEATHROW(obj) OBJECT_CHECK(HeathrowState, (obj), TYPE_HEATHROW)
-=20
-diff --git a/include/hw/intc/mips_gic.h b/include/hw/intc/mips_gic.h
-index 870daa94c1..9a2185bf9b 100644
---- a/include/hw/intc/mips_gic.h
-+++ b/include/hw/intc/mips_gic.h
-@@ -9,13 +9,15 @@
-  */
-=20
- /* NOTE: May only be included into target-dependent code */
--/* FIXME Does not pass make check-headers, yet! */
-+/* FIXME Does not pass make check-headers for TARGET_BASE_ARCH other tha=
-n mips, yet! */
-+/* FIXME Does not pass make check-headers for user emulation, yet! */
-=20
- #ifndef MIPS_GIC_H
- #define MIPS_GIC_H
-=20
- #include "qemu/units.h"
- #include "hw/timer/mips_gictimer.h"
-+#include "hw/sysbus.h"
- #include "cpu.h"
- /*
-  * GIC Specific definitions
-diff --git a/include/hw/isa/vt82c686.h b/include/hw/isa/vt82c686.h
-index 49b3a96e4a..a54c3fe60a 100644
---- a/include/hw/isa/vt82c686.h
-+++ b/include/hw/isa/vt82c686.h
-@@ -1,8 +1,8 @@
--/* FIXME Does not pass make check-headers, yet! */
--
- #ifndef HW_VT82C686_H
- #define HW_VT82C686_H
-=20
-+#include "hw/irq.h"
-+
- #define TYPE_VT82C686B_SUPERIO "vt82c686b-superio"
-=20
- /* vt82c686.c */
-diff --git a/include/hw/mips/cps.h b/include/hw/mips/cps.h
-index af8d25e142..52cd4bed93 100644
---- a/include/hw/mips/cps.h
-+++ b/include/hw/mips/cps.h
-@@ -18,7 +18,8 @@
-  */
-=20
- /* NOTE: May only be included into target-dependent code */
--/* FIXME Does not pass make check-headers, yet! */
-+/* FIXME Does not pass make check-headers for TARGET_BASE_ARCH other tha=
-n mips, yet! */
-+/* FIXME Does not pass make check-headers for user emulation, yet! */
-=20
- #ifndef MIPS_CPS_H
- #define MIPS_CPS_H
-@@ -28,6 +29,7 @@
- #include "hw/intc/mips_gic.h"
- #include "hw/misc/mips_cpc.h"
- #include "hw/misc/mips_itu.h"
-+#include "target/mips/cpu.h"
-=20
- #define TYPE_MIPS_CPS "mips-cps"
- #define MIPS_CPS(obj) OBJECT_CHECK(MIPSCPSState, (obj), TYPE_MIPS_CPS)
-diff --git a/include/hw/misc/macio/cuda.h b/include/hw/misc/macio/cuda.h
-index 562927e1da..5768075ac5 100644
---- a/include/hw/misc/macio/cuda.h
-+++ b/include/hw/misc/macio/cuda.h
-@@ -23,11 +23,11 @@
-  * THE SOFTWARE.
-  */
-=20
--/* FIXME Does not pass make check-headers, yet! */
--
- #ifndef CUDA_H
- #define CUDA_H
-=20
-+#include "hw/misc/mos6522.h"
-+
- /* CUDA commands (2nd byte) */
- #define CUDA_WARM_START                0x0
- #define CUDA_AUTOPOLL                  0x1
-diff --git a/include/hw/misc/macio/gpio.h b/include/hw/misc/macio/gpio.h
-index c5231896ce..24a4364b39 100644
---- a/include/hw/misc/macio/gpio.h
-+++ b/include/hw/misc/macio/gpio.h
-@@ -23,11 +23,12 @@
-  * THE SOFTWARE.
-  */
-=20
--/* FIXME Does not pass make check-headers, yet! */
--
- #ifndef MACIO_GPIO_H
- #define MACIO_GPIO_H
-=20
-+#include "hw/ppc/openpic.h"
-+#include "hw/sysbus.h"
-+
- #define TYPE_MACIO_GPIO "macio-gpio"
- #define MACIO_GPIO(obj) OBJECT_CHECK(MacIOGPIOState, (obj), TYPE_MACIO_G=
-PIO)
-=20
-diff --git a/include/hw/misc/macio/macio.h b/include/hw/misc/macio/macio.=
-h
-index f19f756f38..070a694eb5 100644
---- a/include/hw/misc/macio/macio.h
-+++ b/include/hw/misc/macio/macio.h
-@@ -23,16 +23,16 @@
-  * THE SOFTWARE.
-  */
-=20
--/* FIXME Does not pass make check-headers, yet! */
--
- #ifndef MACIO_H
- #define MACIO_H
-=20
- #include "hw/char/escc.h"
-+#include "hw/ide/internal.h"
- #include "hw/intc/heathrow_pic.h"
- #include "hw/misc/macio/cuda.h"
- #include "hw/misc/macio/gpio.h"
- #include "hw/misc/macio/pmu.h"
-+#include "hw/ppc/mac.h"
- #include "hw/ppc/mac_dbdma.h"
- #include "hw/ppc/openpic.h"
-=20
-diff --git a/include/hw/misc/macio/pmu.h b/include/hw/misc/macio/pmu.h
-index 0ab3c06a7e..7ef83dee4c 100644
---- a/include/hw/misc/macio/pmu.h
-+++ b/include/hw/misc/macio/pmu.h
-@@ -7,11 +7,12 @@
-  * Copyright (C) 2016 Ben Herrenschmidt
-  */
-=20
--/* FIXME Does not pass make check-headers, yet! */
--
- #ifndef PMU_H
- #define PMU_H
-=20
-+#include "hw/misc/mos6522.h"
-+#include "hw/misc/macio/gpio.h"
-+
- /*
-  * PMU commands
-  */
-diff --git a/include/hw/misc/mips_cmgcr.h b/include/hw/misc/mips_cmgcr.h
-index 70b95ab163..3e6e223273 100644
---- a/include/hw/misc/mips_cmgcr.h
-+++ b/include/hw/misc/mips_cmgcr.h
-@@ -7,11 +7,11 @@
-  *
-  */
-=20
--/* FIXME Does not pass make check-headers, yet! */
--
- #ifndef MIPS_CMGCR_H
- #define MIPS_CMGCR_H
-=20
-+#include "hw/sysbus.h"
-+
- #define TYPE_MIPS_GCR "mips-gcr"
- #define MIPS_GCR(obj) OBJECT_CHECK(MIPSGCRState, (obj), TYPE_MIPS_GCR)
-=20
-diff --git a/include/hw/misc/mips_cpc.h b/include/hw/misc/mips_cpc.h
-index 86d2705526..3f670578b0 100644
---- a/include/hw/misc/mips_cpc.h
-+++ b/include/hw/misc/mips_cpc.h
-@@ -17,11 +17,11 @@
-  * License along with this library; if not, see <http://www.gnu.org/lice=
-nses/>.
-  */
-=20
--/* FIXME Does not pass make check-headers, yet! */
--
- #ifndef MIPS_CPC_H
- #define MIPS_CPC_H
-=20
-+#include "hw/sysbus.h"
-+
- #define CPC_ADDRSPACE_SZ    0x6000
-=20
- /* CPC blocks offsets relative to base address */
-diff --git a/include/hw/misc/pvpanic.h b/include/hw/misc/pvpanic.h
-index 65c67e31f4..ae0c8188ce 100644
---- a/include/hw/misc/pvpanic.h
-+++ b/include/hw/misc/pvpanic.h
-@@ -12,11 +12,11 @@
-  *
-  */
-=20
--/* FIXME Does not pass make check-headers, yet! */
--
- #ifndef HW_MISC_PVPANIC_H
- #define HW_MISC_PVPANIC_H
-=20
-+#include "qom/object.h"
-+
- #define TYPE_PVPANIC "pvpanic"
-=20
- #define PVPANIC_IOPORT_PROP "ioport"
-diff --git a/include/hw/net/allwinner_emac.h b/include/hw/net/allwinner_e=
-mac.h
-index 9389cb82c6..5013207d15 100644
---- a/include/hw/net/allwinner_emac.h
-+++ b/include/hw/net/allwinner_emac.h
-@@ -20,8 +20,6 @@
-  *
-  */
-=20
--/* FIXME Does not pass make check-headers, yet! */
--
- #ifndef ALLWINNER_EMAC_H
- #define ALLWINNER_EMAC_H
-=20
-@@ -29,6 +27,7 @@
- #include "net/net.h"
- #include "qemu/fifo8.h"
- #include "hw/net/mii.h"
-+#include "hw/sysbus.h"
-=20
- #define TYPE_AW_EMAC "allwinner-emac"
- #define AW_EMAC(obj) OBJECT_CHECK(AwEmacState, (obj), TYPE_AW_EMAC)
-diff --git a/include/hw/net/lance.h b/include/hw/net/lance.h
-index 2b99153bbc..0357f5f65c 100644
---- a/include/hw/net/lance.h
-+++ b/include/hw/net/lance.h
-@@ -26,13 +26,12 @@
-  * THE SOFTWARE.
-  */
-=20
--/* FIXME Does not pass make check-headers, yet! */
--
- #ifndef LANCE_H
- #define LANCE_H
-=20
- #include "net/net.h"
- #include "hw/net/pcnet.h"
-+#include "hw/sysbus.h"
-=20
- #define TYPE_LANCE "lance"
- #define SYSBUS_PCNET(obj) \
-diff --git a/include/hw/nvram/chrp_nvram.h b/include/hw/nvram/chrp_nvram.=
-h
-index ae99396eab..09941a9be4 100644
---- a/include/hw/nvram/chrp_nvram.h
-+++ b/include/hw/nvram/chrp_nvram.h
-@@ -15,11 +15,11 @@
-  * along with this program; if not, see <http://www.gnu.org/licenses/>.
-  */
-=20
--/* FIXME Does not pass make check-headers, yet! */
--
- #ifndef CHRP_NVRAM_H
- #define CHRP_NVRAM_H
-=20
-+#include "qemu/bswap.h"
-+
- /* OpenBIOS NVRAM partition */
- typedef struct {
-     uint8_t signature;
-diff --git a/include/hw/pci-host/sabre.h b/include/hw/pci-host/sabre.h
-index 003bd17842..99b5aefbec 100644
---- a/include/hw/pci-host/sabre.h
-+++ b/include/hw/pci-host/sabre.h
-@@ -1,8 +1,8 @@
--/* FIXME Does not pass make check-headers, yet! */
--
- #ifndef HW_PCI_HOST_SABRE_H
- #define HW_PCI_HOST_SABRE_H
-=20
-+#include "hw/pci/pci.h"
-+#include "hw/pci/pci_host.h"
- #include "hw/sparc/sun4u_iommu.h"
-=20
- #define MAX_IVEC 0x40
-diff --git a/include/hw/pci-host/spapr.h b/include/hw/pci-host/spapr.h
-index 9d2e3e313c..0f75b03924 100644
---- a/include/hw/pci-host/spapr.h
-+++ b/include/hw/pci-host/spapr.h
-@@ -18,7 +18,7 @@
-  */
-=20
- /* NOTE: May only be included into target-dependent code */
--/* FIXME Does not pass make check-headers, yet! */
-+/* FIXME Does not pass make check-headers for user emulation, yet! */
-=20
- #ifndef PCI_HOST_SPAPR_H
- #define PCI_HOST_SPAPR_H
-diff --git a/include/hw/pci-host/uninorth.h b/include/hw/pci-host/uninort=
-h.h
-index b541fbc12d..9a5cabd4c5 100644
---- a/include/hw/pci-host/uninorth.h
-+++ b/include/hw/pci-host/uninorth.h
-@@ -22,13 +22,11 @@
-  * THE SOFTWARE.
-  */
-=20
--/* FIXME Does not pass make check-headers, yet! */
--
- #ifndef UNINORTH_H
- #define UNINORTH_H
-=20
- #include "hw/hw.h"
--
-+#include "hw/pci/pci_host.h"
- #include "hw/ppc/openpic.h"
-=20
- /* UniNorth version */
-diff --git a/include/hw/pci/pcie_aer.h b/include/hw/pci/pcie_aer.h
-index a2e8bc77a7..502dcd7eba 100644
---- a/include/hw/pci/pcie_aer.h
-+++ b/include/hw/pci/pcie_aer.h
-@@ -18,12 +18,11 @@
+ #ifndef HW_ARM_SMMU_COMMON_H
+ #define HW_ARM_SMMU_COMMON_H
+=20
+diff --git a/include/hw/arm/smmuv3.h b/include/hw/arm/smmuv3.h
+index 36b2f45253..cc1c7502b7 100644
+--- a/include/hw/arm/smmuv3.h
++++ b/include/hw/arm/smmuv3.h
+@@ -16,6 +16,8 @@
   * with this program; if not, see <http://www.gnu.org/licenses/>.
   */
 =20
--/* FIXME Does not pass make check-headers, yet! */
--
- #ifndef QEMU_PCIE_AER_H
- #define QEMU_PCIE_AER_H
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_ARM_SMMUV3_H
+ #define HW_ARM_SMMUV3_H
 =20
- #include "hw/hw.h"
-+#include "hw/pci/pci_regs.h"
-=20
- /* definitions which PCIExpressDevice uses */
-=20
-diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
-index 3435ac4d13..0bc9c26bda 100644
---- a/include/hw/ppc/pnv.h
-+++ b/include/hw/ppc/pnv.h
-@@ -17,6 +17,7 @@
-  * License along with this library; if not, see <http://www.gnu.org/lice=
-nses/>.
+diff --git a/include/hw/arm/soc_dma.h b/include/hw/arm/soc_dma.h
+index fae322997e..6a8a9721ee 100644
+--- a/include/hw/arm/soc_dma.h
++++ b/include/hw/arm/soc_dma.h
+@@ -18,6 +18,8 @@
+  * with this program; if not, see <http://www.gnu.org/licenses/>.
   */
 =20
-+/* NOTE: May only be included into target-dependent code */
- /* FIXME Does not pass make check-headers, yet! */
-=20
- #ifndef PPC_PNV_H
-diff --git a/include/hw/ppc/pnv_core.h b/include/hw/ppc/pnv_core.h
-index 403b9f1e49..cf597f45f4 100644
---- a/include/hw/ppc/pnv_core.h
-+++ b/include/hw/ppc/pnv_core.h
-@@ -17,12 +17,14 @@
-  * License along with this library; if not, see <http://www.gnu.org/lice=
-nses/>.
-  */
-=20
--/* FIXME Does not pass make check-headers, yet! */
-+/* NOTE: May only be included into target-dependent code */
 +/* FIXME Does not pass make check-headers for user emulation, yet! */
++
+ #ifndef HW_SOC_DMA_H
+ #define HW_SOC_DMA_H
 =20
- #ifndef PPC_PNV_CORE_H
- #define PPC_PNV_CORE_H
+diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
+index a72094204e..f317017823 100644
+--- a/include/hw/arm/virt.h
++++ b/include/hw/arm/virt.h
+@@ -27,6 +27,8 @@
+  * This is essentially the same approach kvmtool uses.
+  */
 =20
- #include "hw/cpu/core.h"
-+#include "target/ppc/cpu.h"
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef QEMU_ARM_VIRT_H
+ #define QEMU_ARM_VIRT_H
 =20
- #define TYPE_PNV_CORE "powernv-cpu-core"
- #define PNV_CORE(obj) \
-diff --git a/include/hw/ppc/ppc4xx.h b/include/hw/ppc/ppc4xx.h
-index 2732200997..757ff6bee1 100644
---- a/include/hw/ppc/ppc4xx.h
-+++ b/include/hw/ppc/ppc4xx.h
-@@ -22,11 +22,16 @@
+diff --git a/include/hw/arm/xlnx-versal.h b/include/hw/arm/xlnx-versal.h
+index 14405c1465..fb703b19bb 100644
+--- a/include/hw/arm/xlnx-versal.h
++++ b/include/hw/arm/xlnx-versal.h
+@@ -9,6 +9,8 @@
+  * (at your option) any later version.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef XLNX_VERSAL_H
+ #define XLNX_VERSAL_H
+=20
+diff --git a/include/hw/audio/pcspk.h b/include/hw/audio/pcspk.h
+index 172afbf146..70f3018608 100644
+--- a/include/hw/audio/pcspk.h
++++ b/include/hw/audio/pcspk.h
+@@ -22,6 +22,8 @@
   * THE SOFTWARE.
   */
 =20
--/* FIXME Does not pass make check-headers, yet! */
-+/* NOTE: May only be included into target-dependent code */
-+/* FIXME Does not pass make check-headers for user emulation, yet! */
-=20
- #ifndef PPC4XX_H
- #define PPC4XX_H
-=20
-+#include "hw/ppc/ppc.h"
-+#include "exec/cpu-common.h"
-+#include "exec/memory.h"
++/* NOTE: May not be included into user emulation code */
 +
- /* PowerPC 4xx core initialization */
- PowerPCCPU *ppc4xx_init(const char *cpu_model,
-                         clk_setup_t *cpu_clk, clk_setup_t *tb_clk,
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index c7a31e43ea..1f63ad2e59 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -1,5 +1,5 @@
- /* NOTE: May only be included into target-dependent code */
--/* FIXME Does not pass make check-headers, yet! */
-+/* FIXME Does not pass make check-headers for user emulation, yet! */
+ #ifndef HW_PCSPK_H
+ #define HW_PCSPK_H
 =20
- #ifndef HW_SPAPR_H
- #define HW_SPAPR_H
-diff --git a/include/hw/ppc/spapr_cpu_core.h b/include/hw/ppc/spapr_cpu_c=
-ore.h
-index 980d9ded69..372ed69440 100644
---- a/include/hw/ppc/spapr_cpu_core.h
-+++ b/include/hw/ppc/spapr_cpu_core.h
-@@ -8,7 +8,7 @@
+diff --git a/include/hw/audio/wm8750.h b/include/hw/audio/wm8750.h
+index e12cb886d1..9781e81ac4 100644
+--- a/include/hw/audio/wm8750.h
++++ b/include/hw/audio/wm8750.h
+@@ -11,6 +11,9 @@
+  * You should have received a copy of the GNU General Public License alo=
+ng with
+  * this program.  If not, see <http://www.gnu.org/licenses/>.
+  */
++
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_DAC_WM8750_H
+ #define HW_DAC_WM8750_H
+=20
+diff --git a/include/hw/block/flash.h b/include/hw/block/flash.h
+index 83a75f3170..170f9dff4d 100644
+--- a/include/hw/block/flash.h
++++ b/include/hw/block/flash.h
+@@ -1,3 +1,5 @@
++/* FIXME Does not pass make check-headers for user emulation, yet! */
++
+ #ifndef HW_FLASH_H
+ #define HW_FLASH_H
+=20
+diff --git a/include/hw/boards.h b/include/hw/boards.h
+index a71d1a53a5..ffd72515bc 100644
+--- a/include/hw/boards.h
++++ b/include/hw/boards.h
+@@ -1,5 +1,7 @@
+ /* Declarations for use by board files for creating devices.  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_BOARDS_H
+ #define HW_BOARDS_H
+=20
+diff --git a/include/hw/char/bcm2835_aux.h b/include/hw/char/bcm2835_aux.=
+h
+index cdbf7e3e37..f0227d330d 100644
+--- a/include/hw/char/bcm2835_aux.h
++++ b/include/hw/char/bcm2835_aux.h
+@@ -5,6 +5,8 @@
+  * This code is licensed under the GNU GPLv2 and later.
   */
 =20
- /* NOTE: May only be included into target-dependent code */
--/* FIXME Does not pass make check-headers, yet! */
-+/* FIXME Does not pass make check-headers for user emulation, yet! */
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef BCM2835_AUX_H
+ #define BCM2835_AUX_H
 =20
- #ifndef HW_SPAPR_CPU_CORE_H
- #define HW_SPAPR_CPU_CORE_H
-diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
-index 9d9ef40388..f541b80fb0 100644
---- a/include/hw/ppc/spapr_irq.h
-+++ b/include/hw/ppc/spapr_irq.h
-@@ -7,11 +7,14 @@
-  * COPYING file in the top-level directory.
+diff --git a/include/hw/char/cadence_uart.h b/include/hw/char/cadence_uar=
+t.h
+index e1cf33e94c..3f76d3a4ae 100644
+--- a/include/hw/char/cadence_uart.h
++++ b/include/hw/char/cadence_uart.h
+@@ -16,6 +16,8 @@
+  * with this program; if not, see <http://www.gnu.org/licenses/>.
   */
 =20
--/* FIXME Does not pass make check-headers, yet! */
-+/* NOTE: May only be included into target-dependent code */
-=20
- #ifndef HW_SPAPR_IRQ_H
- #define HW_SPAPR_IRQ_H
-=20
-+#include "hw/irq.h"
-+#include "target/ppc/cpu-qom.h"
++/* NOTE: May not be included into user emulation code */
 +
- /*
-  * IRQ range offsets per device type
+ #ifndef CADENCE_UART_H
+ #define CADENCE_UART_H
+=20
+diff --git a/include/hw/char/cmsdk-apb-uart.h b/include/hw/char/cmsdk-apb=
+-uart.h
+index c41fba9a27..126b36fd7e 100644
+--- a/include/hw/char/cmsdk-apb-uart.h
++++ b/include/hw/char/cmsdk-apb-uart.h
+@@ -9,6 +9,8 @@
+  *  (at your option) any later version.
   */
-diff --git a/include/hw/ppc/spapr_vio.h b/include/hw/ppc/spapr_vio.h
-index 50cf292803..6f81b37901 100644
---- a/include/hw/ppc/spapr_vio.h
-+++ b/include/hw/ppc/spapr_vio.h
-@@ -1,8 +1,11 @@
--/* FIXME Does not pass make check-headers, yet! */
-+/* NOTE: May only be included into target-dependent code */
-+/* FIXME Does not pass make check-headers for user emulation, yet! */
 =20
- #ifndef HW_SPAPR_VIO_H
- #define HW_SPAPR_VIO_H
-=20
-+#include "hw/ppc/spapr.h"
++/* NOTE: May not be included into user emulation code */
 +
- /*
-  * QEMU sPAPR VIO bus definitions
+ #ifndef CMSDK_APB_UART_H
+ #define CMSDK_APB_UART_H
+=20
+diff --git a/include/hw/char/digic-uart.h b/include/hw/char/digic-uart.h
+index de9a3e3551..1aae939226 100644
+--- a/include/hw/char/digic-uart.h
++++ b/include/hw/char/digic-uart.h
+@@ -12,9 +12,10 @@
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  * GNU General Public License for more details.
+- *
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_CHAR_DIGIC_UART_H
+ #define HW_CHAR_DIGIC_UART_H
+=20
+diff --git a/include/hw/char/escc.h b/include/hw/char/escc.h
+index d5196c53e6..5127b5b655 100644
+--- a/include/hw/char/escc.h
++++ b/include/hw/char/escc.h
+@@ -1,3 +1,5 @@
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_ESCC_H
+ #define HW_ESCC_H
+=20
+diff --git a/include/hw/char/imx_serial.h b/include/hw/char/imx_serial.h
+index c8b74284f8..1e27383d52 100644
+--- a/include/hw/char/imx_serial.h
++++ b/include/hw/char/imx_serial.h
+@@ -15,6 +15,8 @@
+  * with this program; if not, see <http://www.gnu.org/licenses/>.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef IMX_SERIAL_H
+ #define IMX_SERIAL_H
+=20
+diff --git a/include/hw/char/lm32_juart.h b/include/hw/char/lm32_juart.h
+index e7c6fb5a3b..d86c8de178 100644
+--- a/include/hw/char/lm32_juart.h
++++ b/include/hw/char/lm32_juart.h
+@@ -1,3 +1,5 @@
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef QEMU_HW_CHAR_LM32_JUART_H
+ #define QEMU_HW_CHAR_LM32_JUART_H
+=20
+diff --git a/include/hw/char/nrf51_uart.h b/include/hw/char/nrf51_uart.h
+index eb1c15b490..41b1bf1617 100644
+--- a/include/hw/char/nrf51_uart.h
++++ b/include/hw/char/nrf51_uart.h
+@@ -8,6 +8,8 @@
+  * (at your option) any later version.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef NRF51_UART_H
+ #define NRF51_UART_H
+=20
+diff --git a/include/hw/char/parallel.h b/include/hw/char/parallel.h
+index d6dd62fb9f..a607986c8b 100644
+--- a/include/hw/char/parallel.h
++++ b/include/hw/char/parallel.h
+@@ -1,3 +1,5 @@
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_PARALLEL_H
+ #define HW_PARALLEL_H
+=20
+diff --git a/include/hw/char/pl011.h b/include/hw/char/pl011.h
+index dad3cf2912..ee4e0269f0 100644
+--- a/include/hw/char/pl011.h
++++ b/include/hw/char/pl011.h
+@@ -12,6 +12,8 @@
+  * this program.  If not, see <http://www.gnu.org/licenses/>.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_PL011_H
+ #define HW_PL011_H
+=20
+diff --git a/include/hw/char/serial.h b/include/hw/char/serial.h
+index abd5cf71a9..c4e409509e 100644
+--- a/include/hw/char/serial.h
++++ b/include/hw/char/serial.h
+@@ -23,6 +23,8 @@
+  * THE SOFTWARE.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_SERIAL_H
+ #define HW_SERIAL_H
+=20
+diff --git a/include/hw/char/stm32f2xx_usart.h b/include/hw/char/stm32f2x=
+x_usart.h
+index 84c4029777..4793b3cebd 100644
+--- a/include/hw/char/stm32f2xx_usart.h
++++ b/include/hw/char/stm32f2xx_usart.h
+@@ -22,6 +22,8 @@
+  * THE SOFTWARE.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_STM32F2XX_USART_H
+ #define HW_STM32F2XX_USART_H
+=20
+diff --git a/include/hw/char/xilinx_uartlite.h b/include/hw/char/xilinx_u=
+artlite.h
+index 99d8bbf405..1fa64a15c6 100644
+--- a/include/hw/char/xilinx_uartlite.h
++++ b/include/hw/char/xilinx_uartlite.h
+@@ -12,6 +12,8 @@
+  * this program.  If not, see <http://www.gnu.org/licenses/>.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef XILINX_UARTLITE_H
+ #define XILINX_UARTLITE_H
+=20
+diff --git a/include/hw/core/split-irq.h b/include/hw/core/split-irq.h
+index bb87157c5a..a9695a8e66 100644
+--- a/include/hw/core/split-irq.h
++++ b/include/hw/core/split-irq.h
+@@ -32,6 +32,9 @@
+  *  + N unnamed GPIO outputs: the output lines
+  *  + QOM property "num-lines": sets the number of output lines
+  */
++
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_SPLIT_IRQ_H
+ #define HW_SPLIT_IRQ_H
+=20
+diff --git a/include/hw/cpu/a15mpcore.h b/include/hw/cpu/a15mpcore.h
+index b423533d20..3617e850b7 100644
+--- a/include/hw/cpu/a15mpcore.h
++++ b/include/hw/cpu/a15mpcore.h
+@@ -17,6 +17,9 @@
+  * You should have received a copy of the GNU General Public License alo=
+ng
+  * with this program; if not, see <http://www.gnu.org/licenses/>.
+  */
++
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_CPU_A15MPCORE_H
+ #define HW_CPU_A15MPCORE_H
+=20
+diff --git a/include/hw/cpu/a9mpcore.h b/include/hw/cpu/a9mpcore.h
+index 5d67ca22c4..c8167aca66 100644
+--- a/include/hw/cpu/a9mpcore.h
++++ b/include/hw/cpu/a9mpcore.h
+@@ -7,6 +7,9 @@
   *
-@@ -39,6 +42,9 @@
-=20
- #define TYPE_SPAPR_VIO_BRIDGE "spapr-vio-bridge"
-=20
-+typedef struct SpaprVioDevice SpaprVioDevice;
-+typedef struct SpaprVioBus SpaprVioBus;
+  * This code is licensed under the GPL.
+  */
 +
- typedef struct SpaprVioCrq {
-     uint64_t qladdr;
-     uint32_t qsize;
-@@ -46,9 +52,6 @@ typedef struct SpaprVioCrq {
-     int(*SendFunc)(struct SpaprVioDevice *vdev, uint8_t *crq);
- } SpaprVioCrq;
-=20
--typedef struct SpaprVioDevice SpaprVioDevice;
--typedef struct SpaprVioBus SpaprVioBus;
--
- typedef struct SpaprVioDeviceClass {
-     DeviceClass parent_class;
-=20
-diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
-index 45a06cf4aa..aba36eefbd 100644
---- a/include/hw/ppc/spapr_xive.h
-+++ b/include/hw/ppc/spapr_xive.h
-@@ -7,12 +7,15 @@
-  * COPYING file in the top-level directory.
-  */
-=20
--/* FIXME Does not pass make check-headers, yet! */
-+/* NOTE: May only be included into target-dependent code */
-+/* FIXME Does not pass make check-headers for user emulation, yet! */
-=20
- #ifndef PPC_SPAPR_XIVE_H
- #define PPC_SPAPR_XIVE_H
-=20
-+#include "hw/ppc/spapr_irq.h"
- #include "hw/ppc/xive.h"
-+#include "sysemu/sysemu.h"
-=20
- #define TYPE_SPAPR_XIVE "spapr-xive"
- #define SPAPR_XIVE(obj) OBJECT_CHECK(SpaprXive, (obj), TYPE_SPAPR_XIVE)
-diff --git a/include/hw/ppc/xics_spapr.h b/include/hw/ppc/xics_spapr.h
-index 5372a160ab..fbc2d52174 100644
---- a/include/hw/ppc/xics_spapr.h
-+++ b/include/hw/ppc/xics_spapr.h
-@@ -25,7 +25,7 @@
-  */
-=20
- /* NOTE: May only be included into target-dependent code */
--/* FIXME Does not pass make check-headers, yet! */
-+/* FIXME Does not pass make check-headers for user emulation, yet! */
-=20
- #ifndef XICS_SPAPR_H
- #define XICS_SPAPR_H
-diff --git a/include/hw/ppc/xive_regs.h b/include/hw/ppc/xive_regs.h
-index 4a6ed49215..b0c68ab5f7 100644
---- a/include/hw/ppc/xive_regs.h
-+++ b/include/hw/ppc/xive_regs.h
-@@ -13,11 +13,12 @@
-  * COPYING file in the top-level directory.
-  */
-=20
--/* FIXME Does not pass make check-headers, yet! */
--
- #ifndef PPC_XIVE_REGS_H
- #define PPC_XIVE_REGS_H
-=20
-+#include "qemu/bswap.h"
-+#include "qemu/host-utils.h"
++/* NOTE: May not be included into user emulation code */
 +
- /*
-  * Interrupt source number encoding on PowerBUS
+ #ifndef HW_CPU_A9MPCORE_H
+ #define HW_CPU_A9MPCORE_H
+=20
+diff --git a/include/hw/cpu/arm11mpcore.h b/include/hw/cpu/arm11mpcore.h
+index 6196109ca2..606f641ce3 100644
+--- a/include/hw/cpu/arm11mpcore.h
++++ b/include/hw/cpu/arm11mpcore.h
+@@ -7,6 +7,8 @@
+  * This code is licensed under the GPL.
   */
-diff --git a/include/hw/riscv/boot.h b/include/hw/riscv/boot.h
-index 01c67335b1..84dcb239fd 100644
---- a/include/hw/riscv/boot.h
-+++ b/include/hw/riscv/boot.h
-@@ -17,11 +17,13 @@
-  * this program.  If not, see <http://www.gnu.org/licenses/>.
-  */
 =20
--/* FIXME Does not pass make check-headers, yet! */
-+/* NOTE: May only be included into target-dependent code */
-=20
- #ifndef RISCV_BOOT_H
- #define RISCV_BOOT_H
-=20
-+#include "exec/cpu-defs.h"
++/* NOTE: May not be included into user emulation code */
 +
- target_ulong riscv_load_firmware(const char *firmware_filename,
-                                  hwaddr firmware_load_addr);
- target_ulong riscv_load_kernel(const char *kernel_filename);
-diff --git a/include/hw/riscv/riscv_hart.h b/include/hw/riscv/riscv_hart.=
-h
-index 846a22c17d..d1ad1dade4 100644
---- a/include/hw/riscv/riscv_hart.h
-+++ b/include/hw/riscv/riscv_hart.h
-@@ -18,11 +18,15 @@
-  * this program.  If not, see <http://www.gnu.org/licenses/>.
+ #ifndef HW_CPU_ARM11MPCORE_H
+ #define HW_CPU_ARM11MPCORE_H
+=20
+diff --git a/include/hw/cpu/cluster.h b/include/hw/cpu/cluster.h
+index 01c1e50cd2..8238ee9a1e 100644
+--- a/include/hw/cpu/cluster.h
++++ b/include/hw/cpu/cluster.h
+@@ -17,6 +17,9 @@
+  * along with this program; if not, see
+  * <http://www.gnu.org/licenses/gpl-2.0.html>
   */
-=20
--/* FIXME Does not pass make check-headers, yet! */
-+/* NOTE: May only be included into target-dependent code */
-+/* FIXME Does not pass make check-headers for user emulation, yet! */
-=20
- #ifndef HW_RISCV_HART_H
- #define HW_RISCV_HART_H
-=20
-+#include "hw/sysbus.h"
-+#include "target/riscv/cpu.h"
 +
- #define TYPE_RISCV_HART_ARRAY "riscv.hart_array"
-=20
- #define RISCV_HART_ARRAY(obj) \
-diff --git a/include/hw/riscv/riscv_htif.h b/include/hw/riscv/riscv_htif.=
-h
-index df385dacf4..44f90d5eca 100644
---- a/include/hw/riscv/riscv_htif.h
-+++ b/include/hw/riscv/riscv_htif.h
-@@ -18,7 +18,7 @@
-  */
-=20
- /* NOTE: May only be included into target-dependent code */
--/* FIXME Does not pass make check-headers, yet! */
-+/* FIXME Does not pass make check-headers for user emulation, yet! */
-=20
- #ifndef HW_RISCV_HTIF_H
- #define HW_RISCV_HTIF_H
-diff --git a/include/hw/riscv/sifive_clint.h b/include/hw/riscv/sifive_cl=
-int.h
-index dd9999333f..ae8286c884 100644
---- a/include/hw/riscv/sifive_clint.h
-+++ b/include/hw/riscv/sifive_clint.h
-@@ -17,11 +17,11 @@
-  * this program.  If not, see <http://www.gnu.org/licenses/>.
-  */
-=20
--/* FIXME Does not pass make check-headers, yet! */
--
- #ifndef HW_SIFIVE_CLINT_H
- #define HW_SIFIVE_CLINT_H
-=20
-+#include "hw/sysbus.h"
++/* NOTE: May not be included into user emulation code */
 +
- #define TYPE_SIFIVE_CLINT "riscv.sifive.clint"
+ #ifndef HW_CPU_CLUSTER_H
+ #define HW_CPU_CLUSTER_H
 =20
- #define SIFIVE_CLINT(obj) \
-diff --git a/include/hw/riscv/sifive_e.h b/include/hw/riscv/sifive_e.h
-index a799718f2a..ce7083f4c1 100644
---- a/include/hw/riscv/sifive_e.h
-+++ b/include/hw/riscv/sifive_e.h
-@@ -16,11 +16,13 @@
-  * this program.  If not, see <http://www.gnu.org/licenses/>.
+diff --git a/include/hw/cpu/core.h b/include/hw/cpu/core.h
+index b7470644d8..388886c282 100644
+--- a/include/hw/cpu/core.h
++++ b/include/hw/cpu/core.h
+@@ -6,6 +6,9 @@
+  * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
+  * See the COPYING file in the top-level directory.
   */
-=20
--/* FIXME Does not pass make check-headers, yet! */
-+/* NOTE: May only be included into target-dependent code */
-+/* FIXME Does not pass make check-headers for user emulation, yet! */
-=20
- #ifndef HW_SIFIVE_E_H
- #define HW_SIFIVE_E_H
-=20
-+#include "hw/riscv/riscv_hart.h"
- #include "hw/riscv/sifive_gpio.h"
-=20
- #define TYPE_RISCV_E_SOC "riscv.sifive.e.soc"
-diff --git a/include/hw/riscv/sifive_plic.h b/include/hw/riscv/sifive_pli=
-c.h
-index c292e578c6..b0edba2884 100644
---- a/include/hw/riscv/sifive_plic.h
-+++ b/include/hw/riscv/sifive_plic.h
-@@ -18,12 +18,10 @@
-  * this program.  If not, see <http://www.gnu.org/licenses/>.
-  */
-=20
--/* FIXME Does not pass make check-headers, yet! */
--
- #ifndef HW_SIFIVE_PLIC_H
- #define HW_SIFIVE_PLIC_H
-=20
--#include "hw/irq.h"
-+#include "hw/sysbus.h"
-=20
- #define TYPE_SIFIVE_PLIC "riscv.sifive.plic"
-=20
-diff --git a/include/hw/riscv/sifive_prci.h b/include/hw/riscv/sifive_prc=
-i.h
-index 1fc80724c2..8b7de134f8 100644
---- a/include/hw/riscv/sifive_prci.h
-+++ b/include/hw/riscv/sifive_prci.h
-@@ -16,11 +16,11 @@
-  * this program.  If not, see <http://www.gnu.org/licenses/>.
-  */
-=20
--/* FIXME Does not pass make check-headers, yet! */
--
- #ifndef HW_SIFIVE_PRCI_H
- #define HW_SIFIVE_PRCI_H
-=20
-+#include "hw/sysbus.h"
 +
- enum {
-     SIFIVE_PRCI_HFROSCCFG   =3D 0x0,
-     SIFIVE_PRCI_HFXOSCCFG   =3D 0x4,
-diff --git a/include/hw/riscv/sifive_test.h b/include/hw/riscv/sifive_tes=
-t.h
-index ca775d8e68..3a603a6ead 100644
---- a/include/hw/riscv/sifive_test.h
-+++ b/include/hw/riscv/sifive_test.h
-@@ -16,11 +16,11 @@
-  * this program.  If not, see <http://www.gnu.org/licenses/>.
-  */
-=20
--/* FIXME Does not pass make check-headers, yet! */
--
- #ifndef HW_SIFIVE_TEST_H
- #define HW_SIFIVE_TEST_H
-=20
-+#include "hw/sysbus.h"
++/* NOTE: May not be included into user emulation code */
 +
- #define TYPE_SIFIVE_TEST "riscv.sifive.test"
+ #ifndef HW_CPU_CORE_H
+ #define HW_CPU_CORE_H
 =20
- #define SIFIVE_TEST(obj) \
-diff --git a/include/hw/riscv/sifive_u.h b/include/hw/riscv/sifive_u.h
-index 74d8fbbf57..0f361a827a 100644
---- a/include/hw/riscv/sifive_u.h
-+++ b/include/hw/riscv/sifive_u.h
-@@ -16,12 +16,14 @@
-  * this program.  If not, see <http://www.gnu.org/licenses/>.
+diff --git a/include/hw/cris/etraxfs.h b/include/hw/cris/etraxfs.h
+index 494222d315..8606e8536a 100644
+--- a/include/hw/cris/etraxfs.h
++++ b/include/hw/cris/etraxfs.h
+@@ -22,6 +22,8 @@
+  * THE SOFTWARE.
   */
 =20
--/* FIXME Does not pass make check-headers, yet! */
-+/* NOTE: May only be included into target-dependent code */
-+/* FIXME Does not pass make check-headers for user emulation, yet! */
-=20
- #ifndef HW_SIFIVE_U_H
- #define HW_SIFIVE_U_H
-=20
- #include "hw/net/cadence_gem.h"
-+#include "hw/riscv/riscv_hart.h"
-=20
- #define TYPE_RISCV_U_SOC "riscv.sifive.u.soc"
- #define RISCV_U_SOC(obj) \
-diff --git a/include/hw/riscv/sifive_uart.h b/include/hw/riscv/sifive_uar=
-t.h
-index 62f36ec2d1..65668825a3 100644
---- a/include/hw/riscv/sifive_uart.h
-+++ b/include/hw/riscv/sifive_uart.h
-@@ -17,11 +17,12 @@
-  * this program.  If not, see <http://www.gnu.org/licenses/>.
-  */
-=20
--/* FIXME Does not pass make check-headers, yet! */
--
- #ifndef HW_SIFIVE_UART_H
- #define HW_SIFIVE_UART_H
-=20
-+#include "chardev/char-fe.h"
-+#include "hw/sysbus.h"
++/* NOTE: May not be included into user emulation code */
 +
- enum {
-     SIFIVE_UART_TXFIFO        =3D 0,
-     SIFIVE_UART_RXFIFO        =3D 4,
-diff --git a/include/hw/riscv/spike.h b/include/hw/riscv/spike.h
-index f259d2558b..835b94162e 100644
---- a/include/hw/riscv/spike.h
-+++ b/include/hw/riscv/spike.h
-@@ -16,11 +16,15 @@
-  * this program.  If not, see <http://www.gnu.org/licenses/>.
-  */
+ #ifndef HW_ETRAXFS_H
+ #define HW_ETRAXFS_H
 =20
--/* FIXME Does not pass make check-headers, yet! */
-+/* NOTE: May only be included into target-dependent code */
-+/* FIXME Does not pass make check-headers for user emulation, yet! */
-=20
- #ifndef HW_RISCV_SPIKE_H
- #define HW_RISCV_SPIKE_H
-=20
-+#include "hw/riscv/riscv_hart.h"
-+#include "hw/sysbus.h"
+diff --git a/include/hw/display/edid.h b/include/hw/display/edid.h
+index 7948bd2c40..63957010e5 100644
+--- a/include/hw/display/edid.h
++++ b/include/hw/display/edid.h
+@@ -1,3 +1,5 @@
++/* NOTE: May not be included into user emulation code */
 +
- typedef struct {
-     /*< private >*/
-     SysBusDevice parent_obj;
-diff --git a/include/hw/riscv/virt.h b/include/hw/riscv/virt.h
-index d6f34cd19f..ac693a33f8 100644
---- a/include/hw/riscv/virt.h
-+++ b/include/hw/riscv/virt.h
-@@ -16,11 +16,15 @@
-  * this program.  If not, see <http://www.gnu.org/licenses/>.
+ #ifndef EDID_H
+ #define EDID_H
+=20
+diff --git a/include/hw/display/i2c-ddc.h b/include/hw/display/i2c-ddc.h
+index 1cf53a0c8d..3796f94a3b 100644
+--- a/include/hw/display/i2c-ddc.h
++++ b/include/hw/display/i2c-ddc.h
+@@ -16,6 +16,8 @@
+  *  with this program; if not, see <http://www.gnu.org/licenses/>.
   */
 =20
--/* FIXME Does not pass make check-headers, yet! */
-+/* NOTE: May only be included into target-dependent code */
-+/* FIXME Does not pass make check-headers for user emulation, yet! */
-=20
- #ifndef HW_RISCV_VIRT_H
- #define HW_RISCV_VIRT_H
-=20
-+#include "hw/riscv/riscv_hart.h"
-+#include "hw/sysbus.h"
++/* NOTE: May not be included into user emulation code */
 +
- typedef struct {
-     /*< private >*/
-     SysBusDevice parent_obj;
-diff --git a/include/hw/s390x/3270-ccw.h b/include/hw/s390x/3270-ccw.h
-index bc24e78ec6..4921e44654 100644
---- a/include/hw/s390x/3270-ccw.h
-+++ b/include/hw/s390x/3270-ccw.h
-@@ -11,7 +11,7 @@
+ #ifndef I2C_DDC_H
+ #define I2C_DDC_H
+=20
+diff --git a/include/hw/display/milkymist_tmu2.h b/include/hw/display/mil=
+kymist_tmu2.h
+index 148a119a1d..81e9318661 100644
+--- a/include/hw/display/milkymist_tmu2.h
++++ b/include/hw/display/milkymist_tmu2.h
+@@ -21,9 +21,10 @@
+  *
+  * Specification available at:
+  *   http://milkymist.walle.cc/socdoc/tmu2.pdf
+- *
   */
 =20
- /* NOTE: May only be included into target-dependent code */
--/* FIXME Does not pass make check-headers, yet! */
-+/* FIXME Does not pass make check-headers for user emulation, yet! */
-=20
- #ifndef HW_S390X_3270_CCW_H
- #define HW_S390X_3270_CCW_H
-diff --git a/include/hw/s390x/ap-device.h b/include/hw/s390x/ap-device.h
-index 2f3488115e..8df9cd2954 100644
---- a/include/hw/s390x/ap-device.h
-+++ b/include/hw/s390x/ap-device.h
-@@ -8,11 +8,11 @@
-  * directory.
-  */
-=20
--/* FIXME Does not pass make check-headers, yet! */
--
- #ifndef HW_S390X_AP_DEVICE_H
- #define HW_S390X_AP_DEVICE_H
-=20
-+#include "hw/qdev-core.h"
++/* NOTE: May not be included into user emulation code */
 +
- #define AP_DEVICE_TYPE       "ap-device"
+ #ifndef HW_DISPLAY_MILKYMIST_TMU2_H
+ #define HW_DISPLAY_MILKYMIST_TMU2_H
 =20
- typedef struct APDevice {
-diff --git a/include/hw/s390x/css-bridge.h b/include/hw/s390x/css-bridge.=
-h
-index 1f5efeb203..f7ed2d9a03 100644
---- a/include/hw/s390x/css-bridge.h
-+++ b/include/hw/s390x/css-bridge.h
-@@ -10,12 +10,11 @@
-  * directory.
+diff --git a/include/hw/display/vga.h b/include/hw/display/vga.h
+index 0401a3a292..51032e7ee6 100644
+--- a/include/hw/display/vga.h
++++ b/include/hw/display/vga.h
+@@ -6,6 +6,9 @@
+  * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
+  * See the COPYING file in the top-level directory.
   */
-=20
--/* FIXME Does not pass make check-headers, yet! */
--
- #ifndef HW_S390X_CSS_BRIDGE_H
- #define HW_S390X_CSS_BRIDGE_H
 +
- #include "qom/object.h"
--#include "hw/qdev-core.h"
-+#include "hw/sysbus.h"
++/* FIXME Does not pass make check-headers for user emulation, yet! */
++
+ #ifndef QEMU_HW_DISPLAY_VGA_H
+ #define QEMU_HW_DISPLAY_VGA_H
 =20
- /* virtual css bridge */
- typedef struct VirtualCssBridge {
-diff --git a/include/hw/s390x/css.h b/include/hw/s390x/css.h
-index 3d55971ef5..49433718a4 100644
---- a/include/hw/s390x/css.h
-+++ b/include/hw/s390x/css.h
-@@ -10,7 +10,7 @@
+diff --git a/include/hw/dma/bcm2835_dma.h b/include/hw/dma/bcm2835_dma.h
+index 91ed8d05d1..7a0293f999 100644
+--- a/include/hw/dma/bcm2835_dma.h
++++ b/include/hw/dma/bcm2835_dma.h
+@@ -3,6 +3,8 @@
+  * This code is licensed under the GNU GPLv2 and later.
   */
 =20
- /* NOTE: May only be included into target-dependent code */
--/* FIXME Does not pass make check-headers, yet! */
-+/* FIXME Does not pass make check-headers for user emulation, yet! */
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef BCM2835_DMA_H
+ #define BCM2835_DMA_H
 =20
- #ifndef CSS_H
- #define CSS_H
-@@ -20,6 +20,7 @@
- #include "hw/s390x/s390_flic.h"
- #include "hw/s390x/ioinst.h"
- #include "sysemu/kvm.h"
-+#include "target/s390x/cpu-qom.h"
+diff --git a/include/hw/dma/i8257.h b/include/hw/dma/i8257.h
+index 2cab50bb6c..c6c0d3accc 100644
+--- a/include/hw/dma/i8257.h
++++ b/include/hw/dma/i8257.h
+@@ -1,3 +1,5 @@
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_I8257_H
+ #define HW_I8257_H
 =20
- /* Channel subsystem constants. */
- #define MAX_DEVNO 65535
-diff --git a/include/hw/s390x/s390-ccw.h b/include/hw/s390x/s390-ccw.h
-index 91c1a8d21f..a940eeb469 100644
---- a/include/hw/s390x/s390-ccw.h
-+++ b/include/hw/s390x/s390-ccw.h
-@@ -11,7 +11,7 @@
+diff --git a/include/hw/dma/pl080.h b/include/hw/dma/pl080.h
+index 9d4b3df143..8ae0927458 100644
+--- a/include/hw/dma/pl080.h
++++ b/include/hw/dma/pl080.h
+@@ -25,6 +25,8 @@
+  *   bus master transactions are made
   */
 =20
- /* NOTE: May only be included into target-dependent code */
--/* FIXME Does not pass make check-headers, yet! */
-+/* FIXME Does not pass make check-headers for user emulation, yet! */
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_DMA_PL080_H
+ #define HW_DMA_PL080_H
 =20
- #ifndef HW_S390_CCW_H
- #define HW_S390_CCW_H
-diff --git a/include/hw/s390x/storage-attributes.h b/include/hw/s390x/sto=
-rage-attributes.h
-index 5bc4715c6b..d859bd5ff0 100644
---- a/include/hw/s390x/storage-attributes.h
-+++ b/include/hw/s390x/storage-attributes.h
-@@ -10,7 +10,7 @@
+diff --git a/include/hw/dma/xlnx-zdma.h b/include/hw/dma/xlnx-zdma.h
+index 0b240b4c3c..2991771f14 100644
+--- a/include/hw/dma/xlnx-zdma.h
++++ b/include/hw/dma/xlnx-zdma.h
+@@ -26,6 +26,8 @@
+  * THE SOFTWARE.
   */
 =20
- /* NOTE: May only be included into target-dependent code */
--/* FIXME Does not pass make check-headers, yet! */
-+/* FIXME Does not pass make check-headers for user emulation, yet! */
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef XLNX_ZDMA_H
+ #define XLNX_ZDMA_H
 =20
- #ifndef S390_STORAGE_ATTRIBUTES_H
- #define S390_STORAGE_ATTRIBUTES_H
-diff --git a/include/hw/s390x/tod.h b/include/hw/s390x/tod.h
-index 0ad708998b..d71f4ea8a7 100644
---- a/include/hw/s390x/tod.h
-+++ b/include/hw/s390x/tod.h
-@@ -8,13 +8,11 @@
+diff --git a/include/hw/dma/xlnx-zynq-devcfg.h b/include/hw/dma/xlnx-zynq=
+-devcfg.h
+index 1d3969d91f..56c1b9bf6f 100644
+--- a/include/hw/dma/xlnx-zynq-devcfg.h
++++ b/include/hw/dma/xlnx-zynq-devcfg.h
+@@ -24,6 +24,8 @@
+  * THE SOFTWARE.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef XLNX_ZYNQ_DEVCFG_H
+ #define XLNX_ZYNQ_DEVCFG_H
+=20
+diff --git a/include/hw/gpio/bcm2835_gpio.h b/include/hw/gpio/bcm2835_gpi=
+o.h
+index b0de0a3c74..242c81f9bb 100644
+--- a/include/hw/gpio/bcm2835_gpio.h
++++ b/include/hw/gpio/bcm2835_gpio.h
+@@ -11,6 +11,8 @@
   * See the COPYING file in the top-level directory.
   */
 =20
--/* FIXME Does not pass make check-headers, yet! */
--
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef BCM2835_GPIO_H
+ #define BCM2835_GPIO_H
+=20
+diff --git a/include/hw/gpio/imx_gpio.h b/include/hw/gpio/imx_gpio.h
+index ffab437f23..60e729e031 100644
+--- a/include/hw/gpio/imx_gpio.h
++++ b/include/hw/gpio/imx_gpio.h
+@@ -17,6 +17,8 @@
+  * with this program; if not, see <http://www.gnu.org/licenses/>.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef IMX_GPIO_H
+ #define IMX_GPIO_H
+=20
+diff --git a/include/hw/gpio/nrf51_gpio.h b/include/hw/gpio/nrf51_gpio.h
+index 337ee534bb..d692d6636f 100644
+--- a/include/hw/gpio/nrf51_gpio.h
++++ b/include/hw/gpio/nrf51_gpio.h
+@@ -21,8 +21,10 @@
+  *
+  * This code is licensed under the GPL version 2 or later.  See
+  * the COPYING file in the top-level directory.
+- *
+  */
++
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef NRF51_GPIO_H
+ #define NRF51_GPIO_H
+=20
+diff --git a/include/hw/hw.h b/include/hw/hw.h
+index b1b79964b5..596845ba75 100644
+--- a/include/hw/hw.h
++++ b/include/hw/hw.h
+@@ -1,3 +1,5 @@
++/* NOTE: May not be included into user emulation code */
++
+ /* Declarations for use by hardware emulation.  */
+ #ifndef QEMU_HW_H
+ #define QEMU_HW_H
+diff --git a/include/hw/i2c/aspeed_i2c.h b/include/hw/i2c/aspeed_i2c.h
+index a2753f0bbb..de6fea31d4 100644
+--- a/include/hw/i2c/aspeed_i2c.h
++++ b/include/hw/i2c/aspeed_i2c.h
+@@ -18,6 +18,8 @@
+  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef ASPEED_I2C_H
+ #define ASPEED_I2C_H
+=20
+diff --git a/include/hw/i2c/bitbang_i2c.h b/include/hw/i2c/bitbang_i2c.h
+index 92334e9016..73c043d04e 100644
+--- a/include/hw/i2c/bitbang_i2c.h
++++ b/include/hw/i2c/bitbang_i2c.h
+@@ -1,3 +1,5 @@
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef BITBANG_I2C_H
+ #define BITBANG_I2C_H
+=20
+diff --git a/include/hw/i2c/i2c.h b/include/hw/i2c/i2c.h
+index 75c5bd638b..fce4deb244 100644
+--- a/include/hw/i2c/i2c.h
++++ b/include/hw/i2c/i2c.h
+@@ -1,3 +1,5 @@
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef QEMU_I2C_H
+ #define QEMU_I2C_H
+=20
+diff --git a/include/hw/i2c/imx_i2c.h b/include/hw/i2c/imx_i2c.h
+index 7c73a1fa28..2acb129e60 100644
+--- a/include/hw/i2c/imx_i2c.h
++++ b/include/hw/i2c/imx_i2c.h
+@@ -15,9 +15,10 @@
+  *
+  *  You should have received a copy of the GNU General Public License al=
+ong
+  *  with this program; if not, see <http://www.gnu.org/licenses/>.
+- *
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef IMX_I2C_H
+ #define IMX_I2C_H
+=20
+diff --git a/include/hw/i2c/microbit_i2c.h b/include/hw/i2c/microbit_i2c.=
+h
+index aad636127e..61159b3f0e 100644
+--- a/include/hw/i2c/microbit_i2c.h
++++ b/include/hw/i2c/microbit_i2c.h
+@@ -8,6 +8,8 @@
+  * the COPYING file in the top-level directory.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef MICROBIT_I2C_H
+ #define MICROBIT_I2C_H
+=20
+diff --git a/include/hw/i2c/pm_smbus.h b/include/hw/i2c/pm_smbus.h
+index fb55c44444..48a0c089ba 100644
+--- a/include/hw/i2c/pm_smbus.h
++++ b/include/hw/i2c/pm_smbus.h
+@@ -1,3 +1,5 @@
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef PM_SMBUS_H
+ #define PM_SMBUS_H
+=20
+diff --git a/include/hw/i2c/ppc4xx_i2c.h b/include/hw/i2c/ppc4xx_i2c.h
+index f6f837fbec..c1f768c8c0 100644
+--- a/include/hw/i2c/ppc4xx_i2c.h
++++ b/include/hw/i2c/ppc4xx_i2c.h
+@@ -24,6 +24,8 @@
+  * THE SOFTWARE.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef PPC4XX_I2C_H
+ #define PPC4XX_I2C_H
+=20
+diff --git a/include/hw/i2c/smbus_eeprom.h b/include/hw/i2c/smbus_eeprom.=
+h
+index 0f96836bab..4adef59ef1 100644
+--- a/include/hw/i2c/smbus_eeprom.h
++++ b/include/hw/i2c/smbus_eeprom.h
+@@ -20,6 +20,8 @@
+  * THE SOFTWARE.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_SMBUS_EEPROM_H
+ #define HW_SMBUS_EEPROM_H
+=20
+diff --git a/include/hw/i2c/smbus_master.h b/include/hw/i2c/smbus_master.=
+h
+index bb13bc423c..891133fc15 100644
+--- a/include/hw/i2c/smbus_master.h
++++ b/include/hw/i2c/smbus_master.h
+@@ -22,6 +22,8 @@
+  * THE SOFTWARE.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_SMBUS_MASTER_H
+ #define HW_SMBUS_MASTER_H
+=20
+diff --git a/include/hw/i2c/smbus_slave.h b/include/hw/i2c/smbus_slave.h
+index ebe068304e..fdd010a33e 100644
+--- a/include/hw/i2c/smbus_slave.h
++++ b/include/hw/i2c/smbus_slave.h
+@@ -22,6 +22,8 @@
+  * THE SOFTWARE.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_SMBUS_SLAVE_H
+ #define HW_SMBUS_SLAVE_H
+=20
+diff --git a/include/hw/i386/ich9.h b/include/hw/i386/ich9.h
+index 046bcf33be..3cc1e787d4 100644
+--- a/include/hw/i386/ich9.h
++++ b/include/hw/i386/ich9.h
+@@ -1,3 +1,5 @@
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_ICH9_H
+ #define HW_ICH9_H
+=20
+diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.=
+h
+index 12f3d266e2..04febf831f 100644
+--- a/include/hw/i386/intel_iommu.h
++++ b/include/hw/i386/intel_iommu.h
+@@ -19,6 +19,8 @@
+  * with this program; if not, see <http://www.gnu.org/licenses/>.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef INTEL_IOMMU_H
+ #define INTEL_IOMMU_H
+ #include "hw/qdev.h"
+diff --git a/include/hw/i386/ioapic_internal.h b/include/hw/i386/ioapic_i=
+nternal.h
+index 3d2eec2aa7..aa74ab108b 100644
+--- a/include/hw/i386/ioapic_internal.h
++++ b/include/hw/i386/ioapic_internal.h
+@@ -19,6 +19,8 @@
+  * License along with this library; if not, see <http://www.gnu.org/lice=
+nses/>.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef QEMU_IOAPIC_INTERNAL_H
+ #define QEMU_IOAPIC_INTERNAL_H
+=20
+diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+index 859b64c51d..9a7770fb83 100644
+--- a/include/hw/i386/pc.h
++++ b/include/hw/i386/pc.h
+@@ -1,3 +1,5 @@
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_PC_H
+ #define HW_PC_H
+=20
+diff --git a/include/hw/i386/x86-iommu.h b/include/hw/i386/x86-iommu.h
+index 8e10383b11..910d4dfe86 100644
+--- a/include/hw/i386/x86-iommu.h
++++ b/include/hw/i386/x86-iommu.h
+@@ -17,6 +17,8 @@
+  * with this program; if not, see <http://www.gnu.org/licenses/>.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_I386_X86_IOMMU_H
+ #define HW_I386_X86_IOMMU_H
+=20
+diff --git a/include/hw/ide.h b/include/hw/ide.h
+index 28d8a06439..3f62d45e41 100644
+--- a/include/hw/ide.h
++++ b/include/hw/ide.h
+@@ -1,3 +1,5 @@
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_IDE_H
+ #define HW_IDE_H
+=20
+diff --git a/include/hw/ide/ahci.h b/include/hw/ide/ahci.h
+index b44e3000cf..9b9c6d38c2 100644
+--- a/include/hw/ide/ahci.h
++++ b/include/hw/ide/ahci.h
+@@ -18,9 +18,10 @@
+  *
+  * You should have received a copy of the GNU Lesser General Public
+  * License along with this library; if not, see <http://www.gnu.org/lice=
+nses/>.
+- *
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_IDE_AHCI_H
+ #define HW_IDE_AHCI_H
+=20
+diff --git a/include/hw/ide/internal.h b/include/hw/ide/internal.h
+index 8efd03132b..d5eee2d2a5 100644
+--- a/include/hw/ide/internal.h
++++ b/include/hw/ide/internal.h
+@@ -1,3 +1,5 @@
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_IDE_INTERNAL_H
+ #define HW_IDE_INTERNAL_H
+=20
+diff --git a/include/hw/ide/pci.h b/include/hw/ide/pci.h
+index a9f2c33e68..6d76e84350 100644
+--- a/include/hw/ide/pci.h
++++ b/include/hw/ide/pci.h
+@@ -1,3 +1,5 @@
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_IDE_PCI_H
+ #define HW_IDE_PCI_H
+=20
+diff --git a/include/hw/input/adb.h b/include/hw/input/adb.h
+index f99d478252..9edd7d8e40 100644
+--- a/include/hw/input/adb.h
++++ b/include/hw/input/adb.h
+@@ -23,6 +23,8 @@
+  * THE SOFTWARE.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef ADB_H
+ #define ADB_H
+=20
+diff --git a/include/hw/input/i8042.h b/include/hw/input/i8042.h
+index f6ff146364..34821919e7 100644
+--- a/include/hw/input/i8042.h
++++ b/include/hw/input/i8042.h
+@@ -5,6 +5,9 @@
+  *
+  * SPDX-License-Identifier: MIT
+  */
++
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_INPUT_I8042_H
+ #define HW_INPUT_I8042_H
+=20
+diff --git a/include/hw/intc/allwinner-a10-pic.h b/include/hw/intc/allwin=
+ner-a10-pic.h
+index a5895401d1..248a5f5218 100644
+--- a/include/hw/intc/allwinner-a10-pic.h
++++ b/include/hw/intc/allwinner-a10-pic.h
+@@ -1,3 +1,5 @@
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef ALLWINNER_A10_PIC_H
+ #define ALLWINNER_A10_PIC_H
+=20
+diff --git a/include/hw/intc/arm_gic.h b/include/hw/intc/arm_gic.h
+index ed703a1720..c520fabd1e 100644
+--- a/include/hw/intc/arm_gic.h
++++ b/include/hw/intc/arm_gic.h
+@@ -61,6 +61,8 @@
+  *      ...
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_ARM_GIC_H
+ #define HW_ARM_GIC_H
+=20
+diff --git a/include/hw/intc/arm_gic_common.h b/include/hw/intc/arm_gic_c=
+ommon.h
+index b5585fec45..c46693b9bd 100644
+--- a/include/hw/intc/arm_gic_common.h
++++ b/include/hw/intc/arm_gic_common.h
+@@ -18,6 +18,8 @@
+  * with this program; if not, see <http://www.gnu.org/licenses/>.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_ARM_GIC_COMMON_H
+ #define HW_ARM_GIC_COMMON_H
+=20
+diff --git a/include/hw/intc/arm_gicv3.h b/include/hw/intc/arm_gicv3.h
+index 4a6fd85e22..5a1e973175 100644
+--- a/include/hw/intc/arm_gicv3.h
++++ b/include/hw/intc/arm_gicv3.h
+@@ -9,6 +9,8 @@
+  * any later version.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_ARM_GICV3_H
+ #define HW_ARM_GICV3_H
+=20
+diff --git a/include/hw/intc/arm_gicv3_common.h b/include/hw/intc/arm_gic=
+v3_common.h
+index 31ec9a1ae4..c82cee7052 100644
+--- a/include/hw/intc/arm_gicv3_common.h
++++ b/include/hw/intc/arm_gicv3_common.h
+@@ -21,6 +21,8 @@
+  * with this program; if not, see <http://www.gnu.org/licenses/>.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_ARM_GICV3_COMMON_H
+ #define HW_ARM_GICV3_COMMON_H
+=20
+diff --git a/include/hw/intc/arm_gicv3_its_common.h b/include/hw/intc/arm=
+_gicv3_its_common.h
+index fd1fe64c03..e792750998 100644
+--- a/include/hw/intc/arm_gicv3_its_common.h
++++ b/include/hw/intc/arm_gicv3_its_common.h
+@@ -18,6 +18,8 @@
+  * with this program; if not, see <http://www.gnu.org/licenses/>.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef QEMU_ARM_GICV3_ITS_COMMON_H
+ #define QEMU_ARM_GICV3_ITS_COMMON_H
+=20
+diff --git a/include/hw/intc/aspeed_vic.h b/include/hw/intc/aspeed_vic.h
+index 107ff17c3b..ce1457dfb6 100644
+--- a/include/hw/intc/aspeed_vic.h
++++ b/include/hw/intc/aspeed_vic.h
+@@ -10,6 +10,9 @@
+  *
+  * Need to add SVIC and CVIC support
+  */
++
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef ASPEED_VIC_H
+ #define ASPEED_VIC_H
+=20
+diff --git a/include/hw/intc/bcm2835_ic.h b/include/hw/intc/bcm2835_ic.h
+index fb75fa0064..17cc8f6ea6 100644
+--- a/include/hw/intc/bcm2835_ic.h
++++ b/include/hw/intc/bcm2835_ic.h
+@@ -3,6 +3,8 @@
+  * This code is licensed under the GNU GPLv2 and later.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef BCM2835_IC_H
+ #define BCM2835_IC_H
+=20
+diff --git a/include/hw/intc/bcm2836_control.h b/include/hw/intc/bcm2836_=
+control.h
+index de061b8929..f8c4761bbc 100644
+--- a/include/hw/intc/bcm2836_control.h
++++ b/include/hw/intc/bcm2836_control.h
+@@ -11,6 +11,8 @@
+  * This code is licensed under the GNU GPLv2 and later.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef BCM2836_CONTROL_H
+ #define BCM2836_CONTROL_H
+=20
+diff --git a/include/hw/intc/heathrow_pic.h b/include/hw/intc/heathrow_pi=
+c.h
+index b163e27ab9..2102197e05 100644
+--- a/include/hw/intc/heathrow_pic.h
++++ b/include/hw/intc/heathrow_pic.h
+@@ -23,6 +23,8 @@
+  * THE SOFTWARE.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_INTC_HEATHROW_PIC_H
+ #define HW_INTC_HEATHROW_PIC_H
+=20
+diff --git a/include/hw/intc/imx_avic.h b/include/hw/intc/imx_avic.h
+index 1b80769018..7fcf37119f 100644
+--- a/include/hw/intc/imx_avic.h
++++ b/include/hw/intc/imx_avic.h
+@@ -14,6 +14,9 @@
+  *
+  * TODO: implement vectors.
+  */
++
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef IMX_AVIC_H
+ #define IMX_AVIC_H
+=20
+diff --git a/include/hw/intc/imx_gpcv2.h b/include/hw/intc/imx_gpcv2.h
+index ed978b24bb..7b58a9adda 100644
+--- a/include/hw/intc/imx_gpcv2.h
++++ b/include/hw/intc/imx_gpcv2.h
+@@ -1,3 +1,5 @@
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef IMX_GPCV2_H
+ #define IMX_GPCV2_H
+=20
+diff --git a/include/hw/intc/realview_gic.h b/include/hw/intc/realview_gi=
+c.h
+index 1783ea11b9..47d5dcfd1b 100644
+--- a/include/hw/intc/realview_gic.h
++++ b/include/hw/intc/realview_gic.h
+@@ -7,6 +7,8 @@
+  * This code is licensed under the GPL.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_INTC_REALVIEW_GIC_H
+ #define HW_INTC_REALVIEW_GIC_H
+=20
+diff --git a/include/hw/intc/xlnx-pmu-iomod-intc.h b/include/hw/intc/xlnx=
+-pmu-iomod-intc.h
+index 0bd118884a..065717b7bc 100644
+--- a/include/hw/intc/xlnx-pmu-iomod-intc.h
++++ b/include/hw/intc/xlnx-pmu-iomod-intc.h
+@@ -22,6 +22,8 @@
+  * THE SOFTWARE.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_INTC_XLNX_PMU_IOMOD_INTC_H
+ #define HW_INTC_XLNX_PMU_IOMOD_INTC_H
+=20
+diff --git a/include/hw/intc/xlnx-zynqmp-ipi.h b/include/hw/intc/xlnx-zyn=
+qmp-ipi.h
+index 866c719c6f..effb50ce49 100644
+--- a/include/hw/intc/xlnx-zynqmp-ipi.h
++++ b/include/hw/intc/xlnx-zynqmp-ipi.h
+@@ -22,6 +22,8 @@
+  * THE SOFTWARE.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef XLNX_ZYNQMP_IPI_H
+ #define XLNX_ZYNQMP_IPI_H
+=20
+diff --git a/include/hw/ipack/ipack.h b/include/hw/ipack/ipack.h
+index e33e032ced..839f18ee2f 100644
+--- a/include/hw/ipack/ipack.h
++++ b/include/hw/ipack/ipack.h
+@@ -8,6 +8,8 @@
+  * later version.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef QEMU_IPACK_H
+ #define QEMU_IPACK_H
+=20
+diff --git a/include/hw/ipmi/ipmi.h b/include/hw/ipmi/ipmi.h
+index 011faf22e9..67d33dc415 100644
+--- a/include/hw/ipmi/ipmi.h
++++ b/include/hw/ipmi/ipmi.h
+@@ -22,6 +22,8 @@
+  * THE SOFTWARE.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_IPMI_H
+ #define HW_IPMI_H
+=20
+diff --git a/include/hw/isa/apm.h b/include/hw/isa/apm.h
+index 0f93602936..51897f2e38 100644
+--- a/include/hw/isa/apm.h
++++ b/include/hw/isa/apm.h
+@@ -1,3 +1,5 @@
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef APM_H
+ #define APM_H
+=20
+diff --git a/include/hw/isa/i8259_internal.h b/include/hw/isa/i8259_inter=
+nal.h
+index f742c2a726..4b04a29154 100644
+--- a/include/hw/isa/i8259_internal.h
++++ b/include/hw/isa/i8259_internal.h
+@@ -22,6 +22,8 @@
+  * THE SOFTWARE.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef QEMU_I8259_INTERNAL_H
+ #define QEMU_I8259_INTERNAL_H
+=20
+diff --git a/include/hw/isa/isa.h b/include/hw/isa/isa.h
+index e62ac91c19..e2b44ed653 100644
+--- a/include/hw/isa/isa.h
++++ b/include/hw/isa/isa.h
+@@ -1,3 +1,5 @@
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_ISA_H
+ #define HW_ISA_H
+=20
+diff --git a/include/hw/isa/pc87312.h b/include/hw/isa/pc87312.h
+index e16263d4b1..cb5bd952a2 100644
+--- a/include/hw/isa/pc87312.h
++++ b/include/hw/isa/pc87312.h
+@@ -22,6 +22,9 @@
+  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
+S IN
+  * THE SOFTWARE.
+  */
++
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef QEMU_PC87312_H
+ #define QEMU_PC87312_H
+=20
+diff --git a/include/hw/isa/superio.h b/include/hw/isa/superio.h
+index b151dcd753..806efdd6e6 100644
+--- a/include/hw/isa/superio.h
++++ b/include/hw/isa/superio.h
+@@ -7,6 +7,9 @@
+  * See the COPYING file in the top-level directory.
+  * SPDX-License-Identifier: GPL-2.0-or-later
+  */
++
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_ISA_SUPERIO_H
+ #define HW_ISA_SUPERIO_H
+=20
+diff --git a/include/hw/loader.h b/include/hw/loader.h
+index 3e1b3a4566..29930fc9cd 100644
+--- a/include/hw/loader.h
++++ b/include/hw/loader.h
+@@ -1,3 +1,5 @@
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef LOADER_H
+ #define LOADER_H
+ #include "hw/nvram/fw_cfg.h"
+diff --git a/include/hw/mem/memory-device.h b/include/hw/mem/memory-devic=
+e.h
+index 0293a96abb..af1ce670bb 100644
+--- a/include/hw/mem/memory-device.h
++++ b/include/hw/mem/memory-device.h
+@@ -10,6 +10,8 @@
+  * See the COPYING file in the top-level directory.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef MEMORY_DEVICE_H
+ #define MEMORY_DEVICE_H
+=20
+diff --git a/include/hw/mem/nvdimm.h b/include/hw/mem/nvdimm.h
+index 523a9b3d4a..a596c390ad 100644
+--- a/include/hw/mem/nvdimm.h
++++ b/include/hw/mem/nvdimm.h
+@@ -20,6 +20,8 @@
+  * See the COPYING file in the top-level directory.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef QEMU_NVDIMM_H
+ #define QEMU_NVDIMM_H
+=20
+diff --git a/include/hw/mem/pc-dimm.h b/include/hw/mem/pc-dimm.h
+index 01436b9f50..c74f1c9c1e 100644
+--- a/include/hw/mem/pc-dimm.h
++++ b/include/hw/mem/pc-dimm.h
+@@ -10,9 +10,10 @@
+  *
+  * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
+  * See the COPYING file in the top-level directory.
+- *
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef QEMU_PC_DIMM_H
+ #define QEMU_PC_DIMM_H
+=20
+diff --git a/include/hw/misc/a9scu.h b/include/hw/misc/a9scu.h
+index efb0c305c2..6a0476fdc1 100644
+--- a/include/hw/misc/a9scu.h
++++ b/include/hw/misc/a9scu.h
+@@ -7,6 +7,9 @@
+  *
+  * This code is licensed under the GPL.
+  */
++
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_MISC_A9SCU_H
+ #define HW_MISC_A9SCU_H
+=20
+diff --git a/include/hw/misc/arm11scu.h b/include/hw/misc/arm11scu.h
+index 5ad0f3d339..72335bd789 100644
+--- a/include/hw/misc/arm11scu.h
++++ b/include/hw/misc/arm11scu.h
+@@ -8,6 +8,8 @@
+  * This code is licensed under the GPL.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_MISC_ARM11SCU_H
+ #define HW_MISC_ARM11SCU_H
+=20
+diff --git a/include/hw/misc/armsse-cpuid.h b/include/hw/misc/armsse-cpui=
+d.h
+index 0ef33fcaba..6dfbe87215 100644
+--- a/include/hw/misc/armsse-cpuid.h
++++ b/include/hw/misc/armsse-cpuid.h
+@@ -19,6 +19,8 @@
+  *  + sysbus MMIO region 0: the system information register bank
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_MISC_ARMSSE_CPUID_H
+ #define HW_MISC_ARMSSE_CPUID_H
+=20
+diff --git a/include/hw/misc/armsse-mhu.h b/include/hw/misc/armsse-mhu.h
+index cf5d8a73e6..ba731630c5 100644
+--- a/include/hw/misc/armsse-mhu.h
++++ b/include/hw/misc/armsse-mhu.h
+@@ -20,6 +20,8 @@
+  *  + sysbus IRQ 1: interrupt for CPU 1
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_MISC_ARMSSE_MHU_H
+ #define HW_MISC_ARMSSE_MHU_H
+=20
+diff --git a/include/hw/misc/aspeed_scu.h b/include/hw/misc/aspeed_scu.h
+index 38996adc59..2470c15b6b 100644
+--- a/include/hw/misc/aspeed_scu.h
++++ b/include/hw/misc/aspeed_scu.h
+@@ -8,6 +8,9 @@
+  * This code is licensed under the GPL version 2 or later.  See
+  * the COPYING file in the top-level directory.
+  */
++
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef ASPEED_SCU_H
+ #define ASPEED_SCU_H
+=20
+diff --git a/include/hw/misc/aspeed_sdmc.h b/include/hw/misc/aspeed_sdmc.=
+h
+index b3c926acae..b2a29c3deb 100644
+--- a/include/hw/misc/aspeed_sdmc.h
++++ b/include/hw/misc/aspeed_sdmc.h
+@@ -6,6 +6,9 @@
+  * This code is licensed under the GPL version 2 or later. See the
+  * COPYING file in the top-level directory.
+  */
++
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef ASPEED_SDMC_H
+ #define ASPEED_SDMC_H
+=20
+diff --git a/include/hw/misc/aspeed_xdma.h b/include/hw/misc/aspeed_xdma.=
+h
+index 00b45d931f..e334842342 100644
+--- a/include/hw/misc/aspeed_xdma.h
++++ b/include/hw/misc/aspeed_xdma.h
+@@ -6,6 +6,8 @@
+  * SPDX-License-Identifer: GPL-2.0-or-later
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef ASPEED_XDMA_H
+ #define ASPEED_XDMA_H
+=20
+diff --git a/include/hw/misc/auxbus.h b/include/hw/misc/auxbus.h
+index c15b444748..27e1cf571e 100644
+--- a/include/hw/misc/auxbus.h
++++ b/include/hw/misc/auxbus.h
+@@ -19,9 +19,10 @@
+  *
+  * You should have received a copy of the GNU General Public License alo=
+ng
+  * with this program; if not, see <http://www.gnu.org/licenses/>.
+- *
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_MISC_AUXBUS_H
+ #define HW_MISC_AUXBUS_H
+=20
+diff --git a/include/hw/misc/bcm2835_mbox.h b/include/hw/misc/bcm2835_mbo=
+x.h
+index 7e8f3ce86d..9bc9de8dc9 100644
+--- a/include/hw/misc/bcm2835_mbox.h
++++ b/include/hw/misc/bcm2835_mbox.h
+@@ -3,6 +3,8 @@
+  * This code is licensed under the GNU GPLv2 and later.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef BCM2835_MBOX_H
+ #define BCM2835_MBOX_H
+=20
+diff --git a/include/hw/misc/bcm2835_rng.h b/include/hw/misc/bcm2835_rng.=
+h
+index 41a531bce7..a5f9291ee8 100644
+--- a/include/hw/misc/bcm2835_rng.h
++++ b/include/hw/misc/bcm2835_rng.h
+@@ -7,6 +7,8 @@
+  * See the COPYING file in the top-level directory.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef BCM2835_RNG_H
+ #define BCM2835_RNG_H
+=20
+diff --git a/include/hw/misc/imx25_ccm.h b/include/hw/misc/imx25_ccm.h
+index 296321c612..5f95c9f4e4 100644
+--- a/include/hw/misc/imx25_ccm.h
++++ b/include/hw/misc/imx25_ccm.h
+@@ -8,6 +8,8 @@
+  * See the COPYING file in the top-level directory.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef IMX25_CCM_H
+ #define IMX25_CCM_H
+=20
+diff --git a/include/hw/misc/imx2_wdt.h b/include/hw/misc/imx2_wdt.h
+index b91b002528..41b53f7591 100644
+--- a/include/hw/misc/imx2_wdt.h
++++ b/include/hw/misc/imx2_wdt.h
+@@ -9,6 +9,8 @@
+  * See the COPYING file in the top-level directory.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef IMX2_WDT_H
+ #define IMX2_WDT_H
+=20
+diff --git a/include/hw/misc/imx31_ccm.h b/include/hw/misc/imx31_ccm.h
+index c376fad14c..55e0961794 100644
+--- a/include/hw/misc/imx31_ccm.h
++++ b/include/hw/misc/imx31_ccm.h
+@@ -8,6 +8,8 @@
+  * See the COPYING file in the top-level directory.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef IMX31_CCM_H
+ #define IMX31_CCM_H
+=20
+diff --git a/include/hw/misc/imx6_ccm.h b/include/hw/misc/imx6_ccm.h
+index 80505809b4..a7d9d5fc0e 100644
+--- a/include/hw/misc/imx6_ccm.h
++++ b/include/hw/misc/imx6_ccm.h
+@@ -8,6 +8,8 @@
+  * See the COPYING file in the top-level directory.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef IMX6_CCM_H
+ #define IMX6_CCM_H
+=20
+diff --git a/include/hw/misc/imx6_src.h b/include/hw/misc/imx6_src.h
+index eb3640732e..b561e5bbaa 100644
+--- a/include/hw/misc/imx6_src.h
++++ b/include/hw/misc/imx6_src.h
+@@ -8,6 +8,8 @@
+  * See the COPYING file in the top-level directory.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef IMX6_SRC_H
+ #define IMX6_SRC_H
+=20
+diff --git a/include/hw/misc/imx6ul_ccm.h b/include/hw/misc/imx6ul_ccm.h
+index 377ddca244..8abf48aa16 100644
+--- a/include/hw/misc/imx6ul_ccm.h
++++ b/include/hw/misc/imx6ul_ccm.h
+@@ -7,6 +7,8 @@
+  * See the COPYING file in the top-level directory.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef IMX6UL_CCM_H
+ #define IMX6UL_CCM_H
+=20
+diff --git a/include/hw/misc/imx7_ccm.h b/include/hw/misc/imx7_ccm.h
+index 9538f37d98..ad180b8d31 100644
+--- a/include/hw/misc/imx7_ccm.h
++++ b/include/hw/misc/imx7_ccm.h
+@@ -9,6 +9,8 @@
+  * See the COPYING file in the top-level directory.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef IMX7_CCM_H
+ #define IMX7_CCM_H
+=20
+diff --git a/include/hw/misc/imx7_gpr.h b/include/hw/misc/imx7_gpr.h
+index e19373d274..3d0aaf2087 100644
+--- a/include/hw/misc/imx7_gpr.h
++++ b/include/hw/misc/imx7_gpr.h
+@@ -9,6 +9,8 @@
+  * See the COPYING file in the top-level directory.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef IMX7_GPR_H
+ #define IMX7_GPR_H
+=20
+diff --git a/include/hw/misc/imx7_snvs.h b/include/hw/misc/imx7_snvs.h
+index 255f8f26f9..773af6d5bf 100644
+--- a/include/hw/misc/imx7_snvs.h
++++ b/include/hw/misc/imx7_snvs.h
+@@ -9,6 +9,8 @@
+  * See the COPYING file in the top-level directory.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef IMX7_SNVS_H
+ #define IMX7_SNVS_H
+=20
+diff --git a/include/hw/misc/imx_ccm.h b/include/hw/misc/imx_ccm.h
+index 33cbc09952..f561877694 100644
+--- a/include/hw/misc/imx_ccm.h
++++ b/include/hw/misc/imx_ccm.h
+@@ -8,6 +8,8 @@
+  * See the COPYING file in the top-level directory.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef IMX_CCM_H
+ #define IMX_CCM_H
+=20
+diff --git a/include/hw/misc/iotkit-secctl.h b/include/hw/misc/iotkit-sec=
+ctl.h
+index bcb0437be5..d3e1c92090 100644
+--- a/include/hw/misc/iotkit-secctl.h
++++ b/include/hw/misc/iotkit-secctl.h
+@@ -52,6 +52,8 @@
+  *  + named GPIO outputs mscexp_ns[0..15]
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef IOTKIT_SECCTL_H
+ #define IOTKIT_SECCTL_H
+=20
+diff --git a/include/hw/misc/iotkit-sysctl.h b/include/hw/misc/iotkit-sys=
+ctl.h
+index 601c8ecc0d..716c84aee8 100644
+--- a/include/hw/misc/iotkit-sysctl.h
++++ b/include/hw/misc/iotkit-sysctl.h
+@@ -24,6 +24,8 @@
+  *  + sysbus MMIO region 1: the system control register bank
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_MISC_IOTKIT_SYSCTL_H
+ #define HW_MISC_IOTKIT_SYSCTL_H
+=20
+diff --git a/include/hw/misc/iotkit-sysinfo.h b/include/hw/misc/iotkit-sy=
+sinfo.h
+index d84eb203b9..1f8b341993 100644
+--- a/include/hw/misc/iotkit-sysinfo.h
++++ b/include/hw/misc/iotkit-sysinfo.h
+@@ -19,6 +19,8 @@
+  *  + sysbus MMIO region 0: the system information register bank
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_MISC_IOTKIT_SYSINFO_H
+ #define HW_MISC_IOTKIT_SYSINFO_H
+=20
+diff --git a/include/hw/misc/macio/cuda.h b/include/hw/misc/macio/cuda.h
+index 5768075ac5..6fb02c102f 100644
+--- a/include/hw/misc/macio/cuda.h
++++ b/include/hw/misc/macio/cuda.h
+@@ -23,6 +23,8 @@
+  * THE SOFTWARE.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef CUDA_H
+ #define CUDA_H
+=20
+diff --git a/include/hw/misc/macio/gpio.h b/include/hw/misc/macio/gpio.h
+index 24a4364b39..b691322273 100644
+--- a/include/hw/misc/macio/gpio.h
++++ b/include/hw/misc/macio/gpio.h
+@@ -23,6 +23,8 @@
+  * THE SOFTWARE.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef MACIO_GPIO_H
+ #define MACIO_GPIO_H
+=20
+diff --git a/include/hw/misc/macio/macio.h b/include/hw/misc/macio/macio.=
+h
+index 070a694eb5..446ce74c11 100644
+--- a/include/hw/misc/macio/macio.h
++++ b/include/hw/misc/macio/macio.h
+@@ -23,6 +23,8 @@
+  * THE SOFTWARE.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef MACIO_H
+ #define MACIO_H
+=20
+diff --git a/include/hw/misc/macio/pmu.h b/include/hw/misc/macio/pmu.h
+index 7ef83dee4c..8d95483813 100644
+--- a/include/hw/misc/macio/pmu.h
++++ b/include/hw/misc/macio/pmu.h
+@@ -7,6 +7,8 @@
+  * Copyright (C) 2016 Ben Herrenschmidt
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef PMU_H
+ #define PMU_H
+=20
+diff --git a/include/hw/misc/mips_cmgcr.h b/include/hw/misc/mips_cmgcr.h
+index 3e6e223273..c0eb309f48 100644
+--- a/include/hw/misc/mips_cmgcr.h
++++ b/include/hw/misc/mips_cmgcr.h
+@@ -4,9 +4,10 @@
+  * for more details.
+  *
+  * Copyright (C) 2015 Imagination Technologies
+- *
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef MIPS_CMGCR_H
+ #define MIPS_CMGCR_H
+=20
+diff --git a/include/hw/misc/mips_cpc.h b/include/hw/misc/mips_cpc.h
+index 3f670578b0..907737f306 100644
+--- a/include/hw/misc/mips_cpc.h
++++ b/include/hw/misc/mips_cpc.h
+@@ -17,6 +17,8 @@
+  * License along with this library; if not, see <http://www.gnu.org/lice=
+nses/>.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef MIPS_CPC_H
+ #define MIPS_CPC_H
+=20
+diff --git a/include/hw/misc/mips_itu.h b/include/hw/misc/mips_itu.h
+index c44e7672b6..2733ada5c9 100644
+--- a/include/hw/misc/mips_itu.h
++++ b/include/hw/misc/mips_itu.h
+@@ -17,6 +17,8 @@
+  * License along with this library; if not, see <http://www.gnu.org/lice=
+nses/>.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef MIPS_ITU_H
+ #define MIPS_ITU_H
+=20
+diff --git a/include/hw/misc/mos6522.h b/include/hw/misc/mos6522.h
+index 03d9f0c059..7c1a2d93cf 100644
+--- a/include/hw/misc/mos6522.h
++++ b/include/hw/misc/mos6522.h
+@@ -24,6 +24,8 @@
+  * THE SOFTWARE.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef MOS6522_H
+ #define MOS6522_H
+=20
+diff --git a/include/hw/misc/mps2-fpgaio.h b/include/hw/misc/mps2-fpgaio.=
+h
+index 69e265cd4b..cf447dfc0b 100644
+--- a/include/hw/misc/mps2-fpgaio.h
++++ b/include/hw/misc/mps2-fpgaio.h
+@@ -18,6 +18,8 @@
+  *  + sysbus MMIO region 0: the register bank
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef MPS2_FPGAIO_H
+ #define MPS2_FPGAIO_H
+=20
+diff --git a/include/hw/misc/mps2-scc.h b/include/hw/misc/mps2-scc.h
+index 7045473788..c2ddf7a29d 100644
+--- a/include/hw/misc/mps2-scc.h
++++ b/include/hw/misc/mps2-scc.h
+@@ -9,6 +9,8 @@
+  *  (at your option) any later version.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef MPS2_SCC_H
+ #define MPS2_SCC_H
+=20
+diff --git a/include/hw/misc/msf2-sysreg.h b/include/hw/misc/msf2-sysreg.=
+h
+index 5993f67b4e..41029df3d8 100644
+--- a/include/hw/misc/msf2-sysreg.h
++++ b/include/hw/misc/msf2-sysreg.h
+@@ -22,6 +22,8 @@
+  * THE SOFTWARE.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_MSF2_SYSREG_H
+ #define HW_MSF2_SYSREG_H
+=20
+diff --git a/include/hw/misc/nrf51_rng.h b/include/hw/misc/nrf51_rng.h
+index b0133bf665..909d4158fc 100644
+--- a/include/hw/misc/nrf51_rng.h
++++ b/include/hw/misc/nrf51_rng.h
+@@ -28,9 +28,10 @@
+  *
+  * This code is licensed under the GPL version 2 or later.  See
+  * the COPYING file in the top-level directory.
+- *
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef NRF51_RNG_H
+ #define NRF51_RNG_H
+=20
+diff --git a/include/hw/misc/pca9552.h b/include/hw/misc/pca9552.h
+index ebb43c63fe..fce7a03810 100644
+--- a/include/hw/misc/pca9552.h
++++ b/include/hw/misc/pca9552.h
+@@ -6,6 +6,9 @@
+  * This work is licensed under the terms of the GNU GPL, version 2 or
+  * later. See the COPYING file in the top-level directory.
+  */
++
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef PCA9552_H
+ #define PCA9552_H
+=20
+diff --git a/include/hw/misc/stm32f2xx_syscfg.h b/include/hw/misc/stm32f2=
+xx_syscfg.h
+index 69e6a30fc5..23f48122b8 100644
+--- a/include/hw/misc/stm32f2xx_syscfg.h
++++ b/include/hw/misc/stm32f2xx_syscfg.h
+@@ -22,6 +22,8 @@
+  * THE SOFTWARE.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_STM32F2XX_SYSCFG_H
+ #define HW_STM32F2XX_SYSCFG_H
+=20
+diff --git a/include/hw/misc/tz-mpc.h b/include/hw/misc/tz-mpc.h
+index 6f15945410..95ab9f98d8 100644
+--- a/include/hw/misc/tz-mpc.h
++++ b/include/hw/misc/tz-mpc.h
+@@ -28,6 +28,8 @@
+  * + Named GPIO output "irq": set for a transaction-failed interrupt
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef TZ_MPC_H
+ #define TZ_MPC_H
+=20
+diff --git a/include/hw/misc/tz-msc.h b/include/hw/misc/tz-msc.h
+index 116b96ae9b..f3654b7b13 100644
+--- a/include/hw/misc/tz-msc.h
++++ b/include/hw/misc/tz-msc.h
+@@ -47,6 +47,8 @@
+  *   make memory transactions to
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef TZ_MSC_H
+ #define TZ_MSC_H
+=20
+diff --git a/include/hw/misc/tz-ppc.h b/include/hw/misc/tz-ppc.h
+index 080d6e2ec1..e4e74337f0 100644
+--- a/include/hw/misc/tz-ppc.h
++++ b/include/hw/misc/tz-ppc.h
+@@ -62,6 +62,8 @@
+  *   parameter.)
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef TZ_PPC_H
+ #define TZ_PPC_H
+=20
+diff --git a/include/hw/misc/unimp.h b/include/hw/misc/unimp.h
+index 2a291ca42d..c54a2f4871 100644
+--- a/include/hw/misc/unimp.h
++++ b/include/hw/misc/unimp.h
+@@ -5,6 +5,8 @@
+  * Written by Peter Maydell
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_MISC_UNIMP_H
+ #define HW_MISC_UNIMP_H
+=20
+diff --git a/include/hw/misc/vmcoreinfo.h b/include/hw/misc/vmcoreinfo.h
+index 0d11578059..59964b0c0e 100644
+--- a/include/hw/misc/vmcoreinfo.h
++++ b/include/hw/misc/vmcoreinfo.h
+@@ -7,8 +7,10 @@
+  *
+  * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
+  * See the COPYING file in the top-level directory.
+- *
+  */
++
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef VMCOREINFO_H
+ #define VMCOREINFO_H
+=20
+diff --git a/include/hw/misc/zynq-xadc.h b/include/hw/misc/zynq-xadc.h
+index f1a410a376..65c8b3480c 100644
+--- a/include/hw/misc/zynq-xadc.h
++++ b/include/hw/misc/zynq-xadc.h
+@@ -12,6 +12,8 @@
+  * with this program; if not, see <http://www.gnu.org/licenses/>.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef ZYNQ_XADC_H
+ #define ZYNQ_XADC_H
+=20
+diff --git a/include/hw/net/allwinner_emac.h b/include/hw/net/allwinner_e=
+mac.h
+index 5013207d15..c2a84682c6 100644
+--- a/include/hw/net/allwinner_emac.h
++++ b/include/hw/net/allwinner_emac.h
+@@ -17,9 +17,10 @@
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  * GNU General Public License for more details.
+- *
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef ALLWINNER_EMAC_H
+ #define ALLWINNER_EMAC_H
+=20
+diff --git a/include/hw/net/cadence_gem.h b/include/hw/net/cadence_gem.h
+index 5c83036ade..fa94136e56 100644
+--- a/include/hw/net/cadence_gem.h
++++ b/include/hw/net/cadence_gem.h
+@@ -22,6 +22,8 @@
+  * THE SOFTWARE.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef CADENCE_GEM_H
+ #define CADENCE_GEM_H
+=20
+diff --git a/include/hw/net/ftgmac100.h b/include/hw/net/ftgmac100.h
+index 94cfe05332..f7088321c7 100644
+--- a/include/hw/net/ftgmac100.h
++++ b/include/hw/net/ftgmac100.h
+@@ -7,6 +7,8 @@
+  * COPYING file in the top-level directory.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef FTGMAC100_H
+ #define FTGMAC100_H
+=20
+diff --git a/include/hw/net/imx_fec.h b/include/hw/net/imx_fec.h
+index 7b3faa4019..5b879c66ea 100644
+--- a/include/hw/net/imx_fec.h
++++ b/include/hw/net/imx_fec.h
+@@ -21,6 +21,8 @@
+  *  with this program; if not, see <http://www.gnu.org/licenses/>.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef IMX_FEC_H
+ #define IMX_FEC_H
+=20
+diff --git a/include/hw/net/lance.h b/include/hw/net/lance.h
+index 0357f5f65c..7e7747f536 100644
+--- a/include/hw/net/lance.h
++++ b/include/hw/net/lance.h
+@@ -26,6 +26,8 @@
+  * THE SOFTWARE.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef LANCE_H
+ #define LANCE_H
+=20
+diff --git a/include/hw/net/ne2000-isa.h b/include/hw/net/ne2000-isa.h
+index 5acf4a494e..1a90173e1e 100644
+--- a/include/hw/net/ne2000-isa.h
++++ b/include/hw/net/ne2000-isa.h
+@@ -7,6 +7,8 @@
+  * See the COPYING file in the top-level directory.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_NET_NE2000_ISA_H
+ #define HW_NET_NE2000_ISA_H
+=20
+diff --git a/include/hw/nvram/fw_cfg.h b/include/hw/nvram/fw_cfg.h
+index 80e435d303..9e7f4b8644 100644
+--- a/include/hw/nvram/fw_cfg.h
++++ b/include/hw/nvram/fw_cfg.h
+@@ -1,3 +1,5 @@
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef FW_CFG_H
+ #define FW_CFG_H
+=20
+diff --git a/include/hw/nvram/nrf51_nvm.h b/include/hw/nvram/nrf51_nvm.h
+index 3792e4a9fe..083d132143 100644
+--- a/include/hw/nvram/nrf51_nvm.h
++++ b/include/hw/nvram/nrf51_nvm.h
+@@ -17,8 +17,10 @@
+  *
+  * This code is licensed under the GPL version 2 or later.  See
+  * the COPYING file in the top-level directory.
+- *
+  */
++
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef NRF51_NVM_H
+ #define NRF51_NVM_H
+=20
+diff --git a/include/hw/or-irq.h b/include/hw/or-irq.h
+index 5a31e5a188..6da7d5f6ac 100644
+--- a/include/hw/or-irq.h
++++ b/include/hw/or-irq.h
+@@ -22,6 +22,8 @@
+  * THE SOFTWARE.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_OR_IRQ_H
+ #define HW_OR_IRQ_H
+=20
+diff --git a/include/hw/pci-bridge/simba.h b/include/hw/pci-bridge/simba.=
+h
+index d8649973ee..63db2a8e5a 100644
+--- a/include/hw/pci-bridge/simba.h
++++ b/include/hw/pci-bridge/simba.h
+@@ -24,6 +24,8 @@
+  * THE SOFTWARE.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_PCI_BRIDGE_SIMBA_H
+ #define HW_PCI_BRIDGE_SIMBA_H
+=20
+diff --git a/include/hw/pci-host/designware.h b/include/hw/pci-host/desig=
+nware.h
+index 186bb36238..4e22252964 100644
+--- a/include/hw/pci-host/designware.h
++++ b/include/hw/pci-host/designware.h
+@@ -18,6 +18,8 @@
+  * <http://www.gnu.org/licenses/>.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef DESIGNWARE_H
+ #define DESIGNWARE_H
+=20
+diff --git a/include/hw/pci-host/gpex.h b/include/hw/pci-host/gpex.h
+index 2af1c4a37e..4192fe8da4 100644
+--- a/include/hw/pci-host/gpex.h
++++ b/include/hw/pci-host/gpex.h
+@@ -17,6 +17,8 @@
+  * along with this program; if not, see <http://www.gnu.org/licenses/>
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_GPEX_H
+ #define HW_GPEX_H
+=20
+diff --git a/include/hw/pci-host/pam.h b/include/hw/pci-host/pam.h
+index fec5cd35d6..50c9fcf0f7 100644
+--- a/include/hw/pci-host/pam.h
++++ b/include/hw/pci-host/pam.h
+@@ -1,3 +1,5 @@
++/* FIXME Does not pass make check-headers for user emulation, yet! */
++
+ #ifndef QEMU_PAM_H
+ #define QEMU_PAM_H
+=20
+diff --git a/include/hw/pci-host/q35.h b/include/hw/pci-host/q35.h
+index 5ed77facd0..2671c868cf 100644
+--- a/include/hw/pci-host/q35.h
++++ b/include/hw/pci-host/q35.h
+@@ -19,6 +19,8 @@
+  * along with this program; if not, see <http://www.gnu.org/licenses/>
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_Q35_H
+ #define HW_Q35_H
+=20
+diff --git a/include/hw/pci-host/sabre.h b/include/hw/pci-host/sabre.h
+index 99b5aefbec..cff4ec9b53 100644
+--- a/include/hw/pci-host/sabre.h
++++ b/include/hw/pci-host/sabre.h
+@@ -1,3 +1,5 @@
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_PCI_HOST_SABRE_H
+ #define HW_PCI_HOST_SABRE_H
+=20
+diff --git a/include/hw/pci-host/uninorth.h b/include/hw/pci-host/uninort=
+h.h
+index 9a5cabd4c5..e1fae2eccd 100644
+--- a/include/hw/pci-host/uninorth.h
++++ b/include/hw/pci-host/uninorth.h
+@@ -22,6 +22,8 @@
+  * THE SOFTWARE.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef UNINORTH_H
+ #define UNINORTH_H
+=20
+diff --git a/include/hw/pci-host/xilinx-pcie.h b/include/hw/pci-host/xili=
+nx-pcie.h
+index 74c04dc9bb..957143c8bc 100644
+--- a/include/hw/pci-host/xilinx-pcie.h
++++ b/include/hw/pci-host/xilinx-pcie.h
+@@ -17,6 +17,8 @@
+  * License along with this library; if not, see <http://www.gnu.org/lice=
+nses/>.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_XILINX_PCIE_H
+ #define HW_XILINX_PCIE_H
+=20
+diff --git a/include/hw/pci/msi.h b/include/hw/pci/msi.h
+index 4087688486..775e3c05a0 100644
+--- a/include/hw/pci/msi.h
++++ b/include/hw/pci/msi.h
+@@ -18,6 +18,8 @@
+  * with this program; if not, see <http://www.gnu.org/licenses/>.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef QEMU_MSI_H
+ #define QEMU_MSI_H
+=20
+diff --git a/include/hw/pci/msix.h b/include/hw/pci/msix.h
+index 4c4a60c739..6624223ae2 100644
+--- a/include/hw/pci/msix.h
++++ b/include/hw/pci/msix.h
+@@ -1,3 +1,5 @@
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef QEMU_MSIX_H
+ #define QEMU_MSIX_H
+=20
+diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
+index aaf1b9f70d..5d4f0d607f 100644
+--- a/include/hw/pci/pci.h
++++ b/include/hw/pci/pci.h
+@@ -1,3 +1,5 @@
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef QEMU_PCI_H
+ #define QEMU_PCI_H
+=20
+diff --git a/include/hw/pci/pci_bridge.h b/include/hw/pci/pci_bridge.h
+index ba488818d2..7bd53c6ce2 100644
+--- a/include/hw/pci/pci_bridge.h
++++ b/include/hw/pci/pci_bridge.h
+@@ -20,9 +20,10 @@
+  * split out pci bus specific stuff from pci.[hc] to pci_bridge.[hc]
+  * Copyright (c) 2009 Isaku Yamahata <yamahata at valinux co jp>
+  *                    VA Linux Systems Japan K.K.
+- *
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef QEMU_PCI_BRIDGE_H
+ #define QEMU_PCI_BRIDGE_H
+=20
+diff --git a/include/hw/pci/pci_bus.h b/include/hw/pci/pci_bus.h
+index 0714f578af..1e668e9596 100644
+--- a/include/hw/pci/pci_bus.h
++++ b/include/hw/pci/pci_bus.h
+@@ -1,3 +1,5 @@
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef QEMU_PCI_BUS_H
+ #define QEMU_PCI_BUS_H
+=20
+diff --git a/include/hw/pci/pci_host.h b/include/hw/pci/pci_host.h
+index ba31595fc7..d07d557501 100644
+--- a/include/hw/pci/pci_host.h
++++ b/include/hw/pci/pci_host.h
+@@ -25,6 +25,8 @@
+ /* Worker routines for a PCI host controller that uses an {address,data}
+    register pair to access PCI configuration space.  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef PCI_HOST_H
+ #define PCI_HOST_H
+=20
+diff --git a/include/hw/pci/pcie.h b/include/hw/pci/pcie.h
+index 34f277735c..a70e66583f 100644
+--- a/include/hw/pci/pcie.h
++++ b/include/hw/pci/pcie.h
+@@ -18,6 +18,8 @@
+  * with this program; if not, see <http://www.gnu.org/licenses/>.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef QEMU_PCIE_H
+ #define QEMU_PCIE_H
+=20
+diff --git a/include/hw/pci/pcie_aer.h b/include/hw/pci/pcie_aer.h
+index 502dcd7eba..85e501854d 100644
+--- a/include/hw/pci/pcie_aer.h
++++ b/include/hw/pci/pcie_aer.h
+@@ -18,6 +18,8 @@
+  * with this program; if not, see <http://www.gnu.org/licenses/>.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef QEMU_PCIE_AER_H
+ #define QEMU_PCIE_AER_H
+=20
+diff --git a/include/hw/pci/pcie_host.h b/include/hw/pci/pcie_host.h
+index 3f7b9886d1..e5ad2eceb8 100644
+--- a/include/hw/pci/pcie_host.h
++++ b/include/hw/pci/pcie_host.h
+@@ -18,6 +18,8 @@
+  * with this program; if not, see <http://www.gnu.org/licenses/>.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef PCIE_HOST_H
+ #define PCIE_HOST_H
+=20
+diff --git a/include/hw/pci/pcie_port.h b/include/hw/pci/pcie_port.h
+index 09586f4641..683cd61764 100644
+--- a/include/hw/pci/pcie_port.h
++++ b/include/hw/pci/pcie_port.h
+@@ -18,6 +18,8 @@
+  * with this program; if not, see <http://www.gnu.org/licenses/>.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef QEMU_PCIE_PORT_H
+ #define QEMU_PCIE_PORT_H
+=20
+diff --git a/include/hw/pci/shpc.h b/include/hw/pci/shpc.h
+index bd8204f64e..5a966276eb 100644
+--- a/include/hw/pci/shpc.h
++++ b/include/hw/pci/shpc.h
+@@ -1,3 +1,5 @@
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef SHPC_H
+ #define SHPC_H
+=20
+diff --git a/include/hw/pcmcia.h b/include/hw/pcmcia.h
+index 1b4080764f..166e41ea93 100644
+--- a/include/hw/pcmcia.h
++++ b/include/hw/pcmcia.h
+@@ -1,3 +1,5 @@
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_PCMCIA_H
+ #define HW_PCMCIA_H
+=20
+diff --git a/include/hw/platform-bus.h b/include/hw/platform-bus.h
+index 19e20c57ce..511b1c4f16 100644
+--- a/include/hw/platform-bus.h
++++ b/include/hw/platform-bus.h
+@@ -1,3 +1,5 @@
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_PLATFORM_BUS_H
+ #define HW_PLATFORM_BUS_H
+=20
+diff --git a/include/hw/ppc/mac_dbdma.h b/include/hw/ppc/mac_dbdma.h
+index 26cc469de4..35e5c92074 100644
+--- a/include/hw/ppc/mac_dbdma.h
++++ b/include/hw/ppc/mac_dbdma.h
+@@ -20,6 +20,8 @@
+  * THE SOFTWARE.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_MAC_DBDMA_H
+ #define HW_MAC_DBDMA_H
+=20
+diff --git a/include/hw/ppc/openpic.h b/include/hw/ppc/openpic.h
+index 7642a8ea1d..ea4210ca37 100644
+--- a/include/hw/ppc/openpic.h
++++ b/include/hw/ppc/openpic.h
+@@ -1,3 +1,5 @@
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef OPENPIC_H
+ #define OPENPIC_H
+=20
+diff --git a/include/hw/ppc/pnv_lpc.h b/include/hw/ppc/pnv_lpc.h
+index f659410716..1e2ea00cb1 100644
+--- a/include/hw/ppc/pnv_lpc.h
++++ b/include/hw/ppc/pnv_lpc.h
+@@ -17,6 +17,8 @@
+  * License along with this library; if not, see <http://www.gnu.org/lice=
+nses/>.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef PPC_PNV_LPC_H
+ #define PPC_PNV_LPC_H
+=20
+diff --git a/include/hw/ppc/pnv_occ.h b/include/hw/ppc/pnv_occ.h
+index ed0709bfc0..6e8e71e927 100644
+--- a/include/hw/ppc/pnv_occ.h
++++ b/include/hw/ppc/pnv_occ.h
+@@ -17,6 +17,8 @@
+  * License along with this library; if not, see <http://www.gnu.org/lice=
+nses/>.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef PPC_PNV_OCC_H
+ #define PPC_PNV_OCC_H
+=20
+diff --git a/include/hw/ppc/pnv_psi.h b/include/hw/ppc/pnv_psi.h
+index e82df9709f..df7864b322 100644
+--- a/include/hw/ppc/pnv_psi.h
++++ b/include/hw/ppc/pnv_psi.h
+@@ -17,6 +17,8 @@
+  * License along with this library; if not, see <http://www.gnu.org/lice=
+nses/>.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef PPC_PNV_PSI_H
+ #define PPC_PNV_PSI_H
+=20
+diff --git a/include/hw/ppc/pnv_xive.h b/include/hw/ppc/pnv_xive.h
+index 4fdaa9247d..5f10d64267 100644
+--- a/include/hw/ppc/pnv_xive.h
++++ b/include/hw/ppc/pnv_xive.h
+@@ -7,6 +7,8 @@
+  * COPYING file in the top-level directory.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef PPC_PNV_XIVE_H
+ #define PPC_PNV_XIVE_H
+=20
+diff --git a/include/hw/ppc/spapr_drc.h b/include/hw/ppc/spapr_drc.h
+index c2c543a591..80fba16a74 100644
+--- a/include/hw/ppc/spapr_drc.h
++++ b/include/hw/ppc/spapr_drc.h
+@@ -10,6 +10,8 @@
+  * See the COPYING file in the top-level directory.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_SPAPR_DRC_H
+ #define HW_SPAPR_DRC_H
+=20
+diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
+index 1eb7b5cd68..f777dd22f0 100644
+--- a/include/hw/ppc/xics.h
++++ b/include/hw/ppc/xics.h
+@@ -22,9 +22,10 @@
+  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISI=
+NG FROM,
+  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
+S IN
+  * THE SOFTWARE.
+- *
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef XICS_H
+ #define XICS_H
+=20
+diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
+index 55c53c7417..d181857bc7 100644
+--- a/include/hw/ppc/xive.h
++++ b/include/hw/ppc/xive.h
+@@ -134,9 +134,10 @@
+  *
+  * This code is licensed under the GPL version 2 or later. See the
+  * COPYING file in the top-level directory.
+- *
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef PPC_XIVE_H
+ #define PPC_XIVE_H
+=20
+diff --git a/include/hw/qdev.h b/include/hw/qdev.h
+index 5cb8b080a6..405bb798e6 100644
+--- a/include/hw/qdev.h
++++ b/include/hw/qdev.h
+@@ -1,3 +1,5 @@
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef QDEV_H
+ #define QDEV_H
+=20
+diff --git a/include/hw/register.h b/include/hw/register.h
+index 5796584588..7bd60b7035 100644
+--- a/include/hw/register.h
++++ b/include/hw/register.h
+@@ -8,6 +8,8 @@
+  * the COPYING file in the top-level directory.
+  */
+=20
++/* FIXME Does not pass make check-headers for user emulation, yet! */
++
+ #ifndef REGISTER_H
+ #define REGISTER_H
+=20
+diff --git a/include/hw/riscv/sifive_clint.h b/include/hw/riscv/sifive_cl=
+int.h
+index ae8286c884..29829932bc 100644
+--- a/include/hw/riscv/sifive_clint.h
++++ b/include/hw/riscv/sifive_clint.h
+@@ -17,6 +17,8 @@
+  * this program.  If not, see <http://www.gnu.org/licenses/>.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_SIFIVE_CLINT_H
+ #define HW_SIFIVE_CLINT_H
+=20
+diff --git a/include/hw/riscv/sifive_gpio.h b/include/hw/riscv/sifive_gpi=
+o.h
+index fce03d6c41..56c8bfce7b 100644
+--- a/include/hw/riscv/sifive_gpio.h
++++ b/include/hw/riscv/sifive_gpio.h
+@@ -10,6 +10,9 @@
+  * This code is licensed under the GPL version 2 or later.  See
+  * the COPYING file in the top-level directory.
+  */
++
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef SIFIVE_GPIO_H
+ #define SIFIVE_GPIO_H
+=20
+diff --git a/include/hw/riscv/sifive_plic.h b/include/hw/riscv/sifive_pli=
+c.h
+index b0edba2884..0b06df45d0 100644
+--- a/include/hw/riscv/sifive_plic.h
++++ b/include/hw/riscv/sifive_plic.h
+@@ -18,6 +18,8 @@
+  * this program.  If not, see <http://www.gnu.org/licenses/>.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_SIFIVE_PLIC_H
+ #define HW_SIFIVE_PLIC_H
+=20
+diff --git a/include/hw/riscv/sifive_prci.h b/include/hw/riscv/sifive_prc=
+i.h
+index 8b7de134f8..76564fdf69 100644
+--- a/include/hw/riscv/sifive_prci.h
++++ b/include/hw/riscv/sifive_prci.h
+@@ -16,6 +16,8 @@
+  * this program.  If not, see <http://www.gnu.org/licenses/>.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_SIFIVE_PRCI_H
+ #define HW_SIFIVE_PRCI_H
+=20
+diff --git a/include/hw/riscv/sifive_test.h b/include/hw/riscv/sifive_tes=
+t.h
+index 3a603a6ead..e6c4a18f8f 100644
+--- a/include/hw/riscv/sifive_test.h
++++ b/include/hw/riscv/sifive_test.h
+@@ -16,6 +16,8 @@
+  * this program.  If not, see <http://www.gnu.org/licenses/>.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_SIFIVE_TEST_H
+ #define HW_SIFIVE_TEST_H
+=20
+diff --git a/include/hw/riscv/sifive_uart.h b/include/hw/riscv/sifive_uar=
+t.h
+index 65668825a3..36bef84374 100644
+--- a/include/hw/riscv/sifive_uart.h
++++ b/include/hw/riscv/sifive_uart.h
+@@ -17,6 +17,8 @@
+  * this program.  If not, see <http://www.gnu.org/licenses/>.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_SIFIVE_UART_H
+ #define HW_SIFIVE_UART_H
+=20
+diff --git a/include/hw/s390x/css-bridge.h b/include/hw/s390x/css-bridge.=
+h
+index f7ed2d9a03..2956ca11f5 100644
+--- a/include/hw/s390x/css-bridge.h
++++ b/include/hw/s390x/css-bridge.h
+@@ -10,6 +10,8 @@
+  * directory.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_S390X_CSS_BRIDGE_H
+ #define HW_S390X_CSS_BRIDGE_H
+=20
+diff --git a/include/hw/s390x/event-facility.h b/include/hw/s390x/event-f=
+acility.h
+index 6cf71cec38..59ee4b5e36 100644
+--- a/include/hw/s390x/event-facility.h
++++ b/include/hw/s390x/event-facility.h
+@@ -9,9 +9,10 @@
+  *
+  * This work is licensed under the terms of the GNU GPL, version 2 or (a=
+t your
+  * option) any later version.  See the COPYING file in the top-level dir=
+ectory.
+- *
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_S390_SCLP_EVENT_FACILITY_H
+ #define HW_S390_SCLP_EVENT_FACILITY_H
+=20
+diff --git a/include/hw/s390x/s390-virtio-ccw.h b/include/hw/s390x/s390-v=
+irtio-ccw.h
+index 8aa27199c9..821f5098cb 100644
+--- a/include/hw/s390x/s390-virtio-ccw.h
++++ b/include/hw/s390x/s390-virtio-ccw.h
+@@ -8,6 +8,9 @@
+  * your option) any later version. See the COPYING file in the top-level
+  * directory.
+  */
++
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_S390X_S390_VIRTIO_CCW_H
+ #define HW_S390X_S390_VIRTIO_CCW_H
+=20
+diff --git a/include/hw/s390x/s390_flic.h b/include/hw/s390x/s390_flic.h
+index 4687ecfe83..fb78e601c3 100644
+--- a/include/hw/s390x/s390_flic.h
++++ b/include/hw/s390x/s390_flic.h
+@@ -10,6 +10,8 @@
+  * directory.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_S390_FLIC_H
+ #define HW_S390_FLIC_H
+=20
+diff --git a/include/hw/s390x/sclp.h b/include/hw/s390x/sclp.h
+index f9db243484..fc08c07119 100644
+--- a/include/hw/s390x/sclp.h
++++ b/include/hw/s390x/sclp.h
+@@ -8,9 +8,10 @@
+  *
+  * This work is licensed under the terms of the GNU GPL, version 2 or (a=
+t your
+  * option) any later version.  See the COPYING file in the top-level dir=
+ectory.
+- *
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_S390_SCLP_H
+ #define HW_S390_SCLP_H
+=20
+diff --git a/include/hw/s390x/storage-keys.h b/include/hw/s390x/storage-k=
+eys.h
+index 62df48ec06..633b534b51 100644
+--- a/include/hw/s390x/storage-keys.h
++++ b/include/hw/s390x/storage-keys.h
+@@ -9,6 +9,8 @@
+  * directory.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef S390_STORAGE_KEYS_H
+ #define S390_STORAGE_KEYS_H
+=20
+diff --git a/include/hw/s390x/tod.h b/include/hw/s390x/tod.h
+index d71f4ea8a7..23294050e8 100644
+--- a/include/hw/s390x/tod.h
++++ b/include/hw/s390x/tod.h
+@@ -8,6 +8,8 @@
+  * See the COPYING file in the top-level directory.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
  #ifndef HW_S390_TOD_H
  #define HW_S390_TOD_H
 =20
- #include "hw/qdev.h"
--#include "s390-tod.h"
-+#include "target/s390x/s390-tod.h"
-=20
- typedef struct S390TOD {
-     uint8_t high;
-diff --git a/include/hw/s390x/vfio-ccw.h b/include/hw/s390x/vfio-ccw.h
-index c35e86f9e8..e0db828023 100644
---- a/include/hw/s390x/vfio-ccw.h
-+++ b/include/hw/s390x/vfio-ccw.h
-@@ -12,7 +12,7 @@
-  */
-=20
- /* NOTE: May only be included into target-dependent code */
--/* FIXME Does not pass make check-headers, yet! */
-+/* FIXME Does not pass make check-headers for user emulation, yet! */
-=20
- #ifndef HW_VFIO_CCW_H
- #define HW_VFIO_CCW_H
-diff --git a/include/hw/semihosting/console.h b/include/hw/semihosting/co=
-nsole.h
-index 03e6bdb985..0649bc60c7 100644
---- a/include/hw/semihosting/console.h
-+++ b/include/hw/semihosting/console.h
-@@ -7,11 +7,12 @@
-  */
-=20
- /* NOTE: May only be included into target-dependent code */
--/* FIXME Does not pass make check-headers, yet! */
-=20
- #ifndef SEMIHOST_CONSOLE_H
- #define SEMIHOST_CONSOLE_H
-=20
-+#include "cpu.h"
+diff --git a/include/hw/scsi/esp.h b/include/hw/scsi/esp.h
+index adab63d1c9..4760aa9bfe 100644
+--- a/include/hw/scsi/esp.h
++++ b/include/hw/scsi/esp.h
+@@ -1,3 +1,5 @@
++/* NOTE: May not be included into user emulation code */
 +
- /**
-  * qemu_semihosting_console_outs:
-  * @env: CPUArchState
+ #ifndef QEMU_HW_ESP_H
+ #define QEMU_HW_ESP_H
+=20
+diff --git a/include/hw/scsi/scsi.h b/include/hw/scsi/scsi.h
+index 426566a5c6..6b6a038678 100644
+--- a/include/hw/scsi/scsi.h
++++ b/include/hw/scsi/scsi.h
+@@ -1,3 +1,5 @@
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef QEMU_HW_SCSI_H
+ #define QEMU_HW_SCSI_H
+=20
+diff --git a/include/hw/sd/bcm2835_sdhost.h b/include/hw/sd/bcm2835_sdhos=
+t.h
+index 7520dd6507..81aea28e6d 100644
+--- a/include/hw/sd/bcm2835_sdhost.h
++++ b/include/hw/sd/bcm2835_sdhost.h
+@@ -11,6 +11,8 @@
+  * See the COPYING file in the top-level directory.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef BCM2835_SDHOST_H
+ #define BCM2835_SDHOST_H
+=20
+diff --git a/include/hw/sd/sd.h b/include/hw/sd/sd.h
+index b865aafc33..5d19fc1d6a 100644
+--- a/include/hw/sd/sd.h
++++ b/include/hw/sd/sd.h
+@@ -27,6 +27,8 @@
+  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_SD_H
+ #define HW_SD_H
+=20
+diff --git a/include/hw/sd/sdhci.h b/include/hw/sd/sdhci.h
+index cbf415e43a..de9589eafa 100644
+--- a/include/hw/sd/sdhci.h
++++ b/include/hw/sd/sdhci.h
+@@ -22,6 +22,8 @@
+  * with this program; if not, see <http://www.gnu.org/licenses/>.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef SDHCI_H
+ #define SDHCI_H
+=20
 diff --git a/include/hw/sh4/sh.h b/include/hw/sh4/sh.h
-index 1884271351..767a2df7e2 100644
+index 767a2df7e2..02151a6c68 100644
 --- a/include/hw/sh4/sh.h
 +++ b/include/hw/sh4/sh.h
-@@ -1,5 +1,3 @@
--/* FIXME Does not pass make check-headers, yet! */
--
+@@ -1,3 +1,5 @@
++/* FIXME Does not pass make check-headers for user emulation, yet! */
++
  #ifndef QEMU_SH_H
  #define QEMU_SH_H
  /* Definitions for SH board emulation.  */
 diff --git a/include/hw/sh4/sh_intc.h b/include/hw/sh4/sh_intc.h
-index ed56215736..3d3efde059 100644
+index 3d3efde059..585342f2dd 100644
 --- a/include/hw/sh4/sh_intc.h
 +++ b/include/hw/sh4/sh_intc.h
-@@ -1,8 +1,7 @@
--/* FIXME Does not pass make check-headers, yet! */
--
+@@ -1,3 +1,5 @@
++/* FIXME Does not pass make check-headers for user emulation, yet! */
++
  #ifndef SH_INTC_H
  #define SH_INTC_H
 =20
-+#include "exec/memory.h"
- #include "hw/irq.h"
-=20
- typedef unsigned char intc_enum;
-diff --git a/include/hw/sparc/sparc64.h b/include/hw/sparc/sparc64.h
-index 81b9c8a675..c778453b6d 100644
---- a/include/hw/sparc/sparc64.h
-+++ b/include/hw/sparc/sparc64.h
-@@ -1,8 +1,10 @@
--/* FIXME Does not pass make check-headers, yet! */
-+/* NOTE: May only be included into target-dependent code */
-=20
- #ifndef HW_SPARC_SPARC64_H
- #define HW_SPARC_SPARC64_H
-=20
-+#include "target/sparc/cpu-qom.h"
-+
- #define IVEC_MAX             0x40
-=20
- SPARCCPU *sparc64_cpu_devinit(const char *cpu_type, uint64_t prom_addr);
-diff --git a/include/hw/ssi/aspeed_smc.h b/include/hw/ssi/aspeed_smc.h
-index 06b50143c3..aa07dac4fe 100644
---- a/include/hw/ssi/aspeed_smc.h
-+++ b/include/hw/ssi/aspeed_smc.h
-@@ -22,12 +22,11 @@
+diff --git a/include/hw/sparc/grlib.h b/include/hw/sparc/grlib.h
+index 5606ff0a97..0dd51246bd 100644
+--- a/include/hw/sparc/grlib.h
++++ b/include/hw/sparc/grlib.h
+@@ -22,6 +22,8 @@
   * THE SOFTWARE.
   */
 =20
--/* FIXME Does not pass make check-headers, yet! */
--
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef GRLIB_H
+ #define GRLIB_H
+=20
+diff --git a/include/hw/sparc/sparc32_dma.h b/include/hw/sparc/sparc32_dm=
+a.h
+index ab42c5421b..951bd7a6d5 100644
+--- a/include/hw/sparc/sparc32_dma.h
++++ b/include/hw/sparc/sparc32_dma.h
+@@ -1,3 +1,5 @@
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef SPARC32_DMA_H
+ #define SPARC32_DMA_H
+=20
+diff --git a/include/hw/sparc/sun4m_iommu.h b/include/hw/sparc/sun4m_iomm=
+u.h
+index 482266c6a7..dc42f8bb28 100644
+--- a/include/hw/sparc/sun4m_iommu.h
++++ b/include/hw/sparc/sun4m_iommu.h
+@@ -22,6 +22,8 @@
+  * THE SOFTWARE.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef SUN4M_IOMMU_H
+ #define SUN4M_IOMMU_H
+=20
+diff --git a/include/hw/sparc/sun4u_iommu.h b/include/hw/sparc/sun4u_iomm=
+u.h
+index 5472d489cf..d0caf0fa42 100644
+--- a/include/hw/sparc/sun4u_iommu.h
++++ b/include/hw/sparc/sun4u_iommu.h
+@@ -24,6 +24,8 @@
+  * THE SOFTWARE.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef SUN4U_IOMMU_H
+ #define SUN4U_IOMMU_H
+=20
+diff --git a/include/hw/ssi/aspeed_smc.h b/include/hw/ssi/aspeed_smc.h
+index aa07dac4fe..8f1acbf810 100644
+--- a/include/hw/ssi/aspeed_smc.h
++++ b/include/hw/ssi/aspeed_smc.h
+@@ -22,6 +22,8 @@
+  * THE SOFTWARE.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
  #ifndef ASPEED_SMC_H
  #define ASPEED_SMC_H
 =20
- #include "hw/ssi/ssi.h"
-+#include "hw/sysbus.h"
-=20
- typedef struct AspeedSegments {
-     hwaddr addr;
-diff --git a/include/hw/ssi/xilinx_spips.h b/include/hw/ssi/xilinx_spips.=
-h
-index 7929546ad7..6a39b55a7b 100644
---- a/include/hw/ssi/xilinx_spips.h
-+++ b/include/hw/ssi/xilinx_spips.h
-@@ -22,14 +22,13 @@
-  * THE SOFTWARE.
-  */
-=20
--/* FIXME Does not pass make check-headers, yet! */
--
- #ifndef XILINX_SPIPS_H
- #define XILINX_SPIPS_H
-=20
- #include "hw/ssi/ssi.h"
- #include "qemu/fifo32.h"
- #include "hw/stream.h"
-+#include "hw/sysbus.h"
-=20
- typedef struct XilinxSPIPS XilinxSPIPS;
-=20
-diff --git a/include/hw/timer/allwinner-a10-pit.h b/include/hw/timer/allw=
-inner-a10-pit.h
-index 16cfc0d62d..871c95b512 100644
---- a/include/hw/timer/allwinner-a10-pit.h
-+++ b/include/hw/timer/allwinner-a10-pit.h
-@@ -1,9 +1,8 @@
--/* FIXME Does not pass make check-headers, yet! */
--
- #ifndef ALLWINNER_A10_PIT_H
- #define ALLWINNER_A10_PIT_H
-=20
- #include "hw/ptimer.h"
-+#include "hw/sysbus.h"
-=20
- #define TYPE_AW_A10_PIT "allwinner-A10-timer"
- #define AW_A10_PIT(obj) OBJECT_CHECK(AwA10PITState, (obj), TYPE_AW_A10_P=
-IT)
-diff --git a/include/hw/timer/i8254_internal.h b/include/hw/timer/i8254_i=
-nternal.h
-index 8d0e0ed17f..e611c6f227 100644
---- a/include/hw/timer/i8254_internal.h
-+++ b/include/hw/timer/i8254_internal.h
-@@ -22,13 +22,12 @@
-  * THE SOFTWARE.
-  */
-=20
--/* FIXME Does not pass make check-headers, yet! */
--
- #ifndef QEMU_I8254_INTERNAL_H
- #define QEMU_I8254_INTERNAL_H
-=20
- #include "hw/hw.h"
- #include "hw/isa/isa.h"
-+#include "hw/timer/i8254.h"
- #include "qemu/timer.h"
-=20
- typedef struct PITChannelState {
-diff --git a/include/hw/timer/m48t59.h b/include/hw/timer/m48t59.h
-index 97c2471f2c..d3fb50e08c 100644
---- a/include/hw/timer/m48t59.h
-+++ b/include/hw/timer/m48t59.h
-@@ -1,8 +1,8 @@
--/* FIXME Does not pass make check-headers, yet! */
--
- #ifndef HW_M48T59_H
- #define HW_M48T59_H
-=20
-+#include "exec/hwaddr.h"
-+#include "hw/irq.h"
- #include "qom/object.h"
-=20
- #define TYPE_NVRAM "nvram"
-diff --git a/include/hw/timer/mc146818rtc.h b/include/hw/timer/mc146818rt=
-c.h
-index a781ff1fb3..fe6ed63f71 100644
---- a/include/hw/timer/mc146818rtc.h
-+++ b/include/hw/timer/mc146818rtc.h
-@@ -1,5 +1,3 @@
--/* FIXME Does not pass make check-headers, yet! */
--
- #ifndef MC146818RTC_H
- #define MC146818RTC_H
-=20
-diff --git a/include/hw/timer/mc146818rtc_regs.h b/include/hw/timer/mc146=
-818rtc_regs.h
-index 0b38971417..bfbb57e570 100644
---- a/include/hw/timer/mc146818rtc_regs.h
-+++ b/include/hw/timer/mc146818rtc_regs.h
-@@ -22,11 +22,11 @@
-  * THE SOFTWARE.
-  */
-=20
--/* FIXME Does not pass make check-headers, yet! */
--
- #ifndef MC146818RTC_REGS_H
- #define MC146818RTC_REGS_H
-=20
-+#include "qemu/timer.h"
-+
- #define RTC_ISA_IRQ 8
-=20
- #define RTC_SECONDS             0
-diff --git a/include/hw/timer/sun4v-rtc.h b/include/hw/timer/sun4v-rtc.h
-index 11ced390a3..4db0352e2b 100644
---- a/include/hw/timer/sun4v-rtc.h
-+++ b/include/hw/timer/sun4v-rtc.h
-@@ -1,3 +1,8 @@
--/* FIXME Does not pass make check-headers, yet! */
-+#ifndef HW_TIMER_SUN4V_RTC_H
-+#define HW_TIMER_SUN4V_RTC_H
-+
-+#include "exec/hwaddr.h"
-=20
- void sun4v_rtc_init(hwaddr addr);
-+
-+#endif
-diff --git a/include/hw/timer/xlnx-zynqmp-rtc.h b/include/hw/timer/xlnx-z=
-ynqmp-rtc.h
-index 23f37fe21a..97e32322ed 100644
---- a/include/hw/timer/xlnx-zynqmp-rtc.h
-+++ b/include/hw/timer/xlnx-zynqmp-rtc.h
-@@ -24,12 +24,11 @@
-  * THE SOFTWARE.
-  */
-=20
--/* FIXME Does not pass make check-headers, yet! */
--
- #ifndef HW_TIMER_XLNX_ZYNQMP_RTC_H
- #define HW_TIMER_XLNX_ZYNQMP_RTC_H
-=20
- #include "hw/register.h"
-+#include "hw/sysbus.h"
-=20
- #define TYPE_XLNX_ZYNQMP_RTC "xlnx-zynmp.rtc"
-=20
-diff --git a/include/hw/virtio/virtio-access.h b/include/hw/virtio/virtio=
--access.h
-index 9a155f4c69..eaaf4dd033 100644
---- a/include/hw/virtio/virtio-access.h
-+++ b/include/hw/virtio/virtio-access.h
-@@ -14,11 +14,12 @@
-  */
-=20
- /* NOTE: May only be included into target-dependent code */
--/* FIXME Does not pass make check-headers, yet! */
-+/* FIXME Does not pass make check-headers for user emulation, yet! */
-=20
- #ifndef QEMU_VIRTIO_ACCESS_H
- #define QEMU_VIRTIO_ACCESS_H
-=20
-+#include "exec/hwaddr.h"
- #include "hw/virtio/virtio.h"
- #include "hw/virtio/virtio-bus.h"
-=20
-diff --git a/include/hw/virtio/virtio-gpu-bswap.h b/include/hw/virtio/vir=
-tio-gpu-bswap.h
-index b3c749ebf2..203f9e1718 100644
---- a/include/hw/virtio/virtio-gpu-bswap.h
-+++ b/include/hw/virtio/virtio-gpu-bswap.h
-@@ -11,12 +11,11 @@
+diff --git a/include/hw/ssi/imx_spi.h b/include/hw/ssi/imx_spi.h
+index 7103953581..6437c82f88 100644
+--- a/include/hw/ssi/imx_spi.h
++++ b/include/hw/ssi/imx_spi.h
+@@ -7,6 +7,8 @@
   * See the COPYING file in the top-level directory.
   */
 =20
--/* FIXME Does not pass make check-headers, yet! */
--
- #ifndef HW_VIRTIO_GPU_BSWAP_H
- #define HW_VIRTIO_GPU_BSWAP_H
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef IMX_SPI_H
+ #define IMX_SPI_H
 =20
- #include "qemu/bswap.h"
-+#include "standard-headers/linux/virtio_gpu.h"
+diff --git a/include/hw/ssi/mss-spi.h b/include/hw/ssi/mss-spi.h
+index f0cf3243e0..dbb142fd71 100644
+--- a/include/hw/ssi/mss-spi.h
++++ b/include/hw/ssi/mss-spi.h
+@@ -22,6 +22,8 @@
+  * THE SOFTWARE.
+  */
 =20
- static inline void
- virtio_gpu_ctrl_hdr_bswap(struct virtio_gpu_ctrl_hdr *hdr)
-diff --git a/include/hw/virtio/virtio-input.h b/include/hw/virtio/virtio-=
-input.h
-index 0727d5449b..4fca03e796 100644
---- a/include/hw/virtio/virtio-input.h
-+++ b/include/hw/virtio/virtio-input.h
-@@ -1,5 +1,3 @@
--/* FIXME Does not pass make check-headers, yet! */
--
- #ifndef QEMU_VIRTIO_INPUT_H
- #define QEMU_VIRTIO_INPUT_H
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_MSS_SPI_H
+ #define HW_MSS_SPI_H
 =20
-diff --git a/include/hw/virtio/virtio-rng.h b/include/hw/virtio/virtio-rn=
-g.h
-index ee650297c2..ff699335e3 100644
---- a/include/hw/virtio/virtio-rng.h
-+++ b/include/hw/virtio/virtio-rng.h
-@@ -9,11 +9,10 @@
+diff --git a/include/hw/ssi/pl022.h b/include/hw/ssi/pl022.h
+index a080519366..62172e3c73 100644
+--- a/include/hw/ssi/pl022.h
++++ b/include/hw/ssi/pl022.h
+@@ -18,6 +18,8 @@
+  * + sysbus MMIO region 0: MemoryRegion for the device's registers
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_SSI_PL022_H
+ #define HW_SSI_PL022_H
+=20
+diff --git a/include/hw/ssi/ssi.h b/include/hw/ssi/ssi.h
+index 6a0c3c3cdb..63561e3bac 100644
+--- a/include/hw/ssi/ssi.h
++++ b/include/hw/ssi/ssi.h
+@@ -8,6 +8,8 @@
+    It is assumed that master and slave are both using the same transfer =
+width.
+    */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef QEMU_SSI_H
+ #define QEMU_SSI_H
+=20
+diff --git a/include/hw/ssi/stm32f2xx_spi.h b/include/hw/ssi/stm32f2xx_sp=
+i.h
+index 1cd73e4cd4..71367a62b7 100644
+--- a/include/hw/ssi/stm32f2xx_spi.h
++++ b/include/hw/ssi/stm32f2xx_spi.h
+@@ -22,6 +22,8 @@
+  * THE SOFTWARE.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_STM32F2XX_SPI_H
+ #define HW_STM32F2XX_SPI_H
+=20
+diff --git a/include/hw/ssi/xilinx_spips.h b/include/hw/ssi/xilinx_spips.=
+h
+index 6a39b55a7b..9a7b54326a 100644
+--- a/include/hw/ssi/xilinx_spips.h
++++ b/include/hw/ssi/xilinx_spips.h
+@@ -22,6 +22,8 @@
+  * THE SOFTWARE.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef XILINX_SPIPS_H
+ #define XILINX_SPIPS_H
+=20
+diff --git a/include/hw/sysbus.h b/include/hw/sysbus.h
+index 4c668fbbdc..d905217d5c 100644
+--- a/include/hw/sysbus.h
++++ b/include/hw/sysbus.h
+@@ -1,3 +1,5 @@
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_SYSBUS_H
+ #define HW_SYSBUS_H
+=20
+diff --git a/include/hw/timer/a9gtimer.h b/include/hw/timer/a9gtimer.h
+index 81c4388784..12e4be0ec7 100644
+--- a/include/hw/timer/a9gtimer.h
++++ b/include/hw/timer/a9gtimer.h
+@@ -20,6 +20,8 @@
+  * with this program; if not, see <http://www.gnu.org/licenses/>.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef A9GTIMER_H
+ #define A9GTIMER_H
+=20
+diff --git a/include/hw/timer/allwinner-a10-pit.h b/include/hw/timer/allw=
+inner-a10-pit.h
+index 871c95b512..96c1f0f024 100644
+--- a/include/hw/timer/allwinner-a10-pit.h
++++ b/include/hw/timer/allwinner-a10-pit.h
+@@ -1,3 +1,5 @@
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef ALLWINNER_A10_PIT_H
+ #define ALLWINNER_A10_PIT_H
+=20
+diff --git a/include/hw/timer/arm_mptimer.h b/include/hw/timer/arm_mptime=
+r.h
+index c46d8d2309..130d99a393 100644
+--- a/include/hw/timer/arm_mptimer.h
++++ b/include/hw/timer/arm_mptimer.h
+@@ -18,6 +18,9 @@
+  * You should have received a copy of the GNU General Public License alo=
+ng
+  * with this program; if not, see <http://www.gnu.org/licenses/>.
+  */
++
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_TIMER_ARM_MPTIMER_H
+ #define HW_TIMER_ARM_MPTIMER_H
+=20
+diff --git a/include/hw/timer/armv7m_systick.h b/include/hw/timer/armv7m_=
+systick.h
+index 25e5ceacc8..a0d7266e68 100644
+--- a/include/hw/timer/armv7m_systick.h
++++ b/include/hw/timer/armv7m_systick.h
+@@ -9,6 +9,8 @@
+  * This code is licensed under the GPL (version 2 or later).
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_TIMER_ARMV7M_SYSTICK_H
+ #define HW_TIMER_ARMV7M_SYSTICK_H
+=20
+diff --git a/include/hw/timer/aspeed_rtc.h b/include/hw/timer/aspeed_rtc.=
+h
+index 1f1155a676..b90e41c566 100644
+--- a/include/hw/timer/aspeed_rtc.h
++++ b/include/hw/timer/aspeed_rtc.h
+@@ -5,6 +5,9 @@
+  * Copyright 2019 IBM Corp
+  * SPDX-License-Identifier: GPL-2.0-or-later
+  */
++
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef ASPEED_RTC_H
+ #define ASPEED_RTC_H
+=20
+diff --git a/include/hw/timer/aspeed_timer.h b/include/hw/timer/aspeed_ti=
+mer.h
+index 1fb949e167..e3f5e87d41 100644
+--- a/include/hw/timer/aspeed_timer.h
++++ b/include/hw/timer/aspeed_timer.h
+@@ -19,6 +19,9 @@
+  *  with this program; if not, write to the Free Software Foundation, In=
+c.,
+  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+  */
++
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef ASPEED_TIMER_H
+ #define ASPEED_TIMER_H
+=20
+diff --git a/include/hw/timer/cmsdk-apb-dualtimer.h b/include/hw/timer/cm=
+sdk-apb-dualtimer.h
+index 9843a9dbb1..fafa1d89c9 100644
+--- a/include/hw/timer/cmsdk-apb-dualtimer.h
++++ b/include/hw/timer/cmsdk-apb-dualtimer.h
+@@ -23,6 +23,8 @@
+  *  + sysbus IRQ 2: timer block 2 interrupt TIMINT2
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef CMSDK_APB_DUALTIMER_H
+ #define CMSDK_APB_DUALTIMER_H
+=20
+diff --git a/include/hw/timer/cmsdk-apb-timer.h b/include/hw/timer/cmsdk-=
+apb-timer.h
+index f21686d26b..697d92036c 100644
+--- a/include/hw/timer/cmsdk-apb-timer.h
++++ b/include/hw/timer/cmsdk-apb-timer.h
+@@ -9,6 +9,8 @@
+  *  (at your option) any later version.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef CMSDK_APB_TIMER_H
+ #define CMSDK_APB_TIMER_H
+=20
+diff --git a/include/hw/timer/digic-timer.h b/include/hw/timer/digic-time=
+r.h
+index d9e67fe291..fcde81d4ab 100644
+--- a/include/hw/timer/digic-timer.h
++++ b/include/hw/timer/digic-timer.h
+@@ -12,9 +12,10 @@
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  * GNU General Public License for more details.
+- *
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_TIMER_DIGIC_TIMER_H
+ #define HW_TIMER_DIGIC_TIMER_H
+=20
+diff --git a/include/hw/timer/i8254.h b/include/hw/timer/i8254.h
+index 5b12eb918e..a380824cea 100644
+--- a/include/hw/timer/i8254.h
++++ b/include/hw/timer/i8254.h
+@@ -22,6 +22,8 @@
+  * THE SOFTWARE.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_I8254_H
+ #define HW_I8254_H
+=20
+diff --git a/include/hw/timer/i8254_internal.h b/include/hw/timer/i8254_i=
+nternal.h
+index e611c6f227..4422c1963a 100644
+--- a/include/hw/timer/i8254_internal.h
++++ b/include/hw/timer/i8254_internal.h
+@@ -22,6 +22,8 @@
+  * THE SOFTWARE.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef QEMU_I8254_INTERNAL_H
+ #define QEMU_I8254_INTERNAL_H
+=20
+diff --git a/include/hw/timer/imx_epit.h b/include/hw/timer/imx_epit.h
+index 0730ac35e6..16a1580b08 100644
+--- a/include/hw/timer/imx_epit.h
++++ b/include/hw/timer/imx_epit.h
+@@ -26,6 +26,8 @@
+  * THE SOFTWARE.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef IMX_EPIT_H
+ #define IMX_EPIT_H
+=20
+diff --git a/include/hw/timer/imx_gpt.h b/include/hw/timer/imx_gpt.h
+index 20ccb327c4..d14c2f4e28 100644
+--- a/include/hw/timer/imx_gpt.h
++++ b/include/hw/timer/imx_gpt.h
+@@ -26,6 +26,8 @@
+  * THE SOFTWARE.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef IMX_GPT_H
+ #define IMX_GPT_H
+=20
+diff --git a/include/hw/timer/mc146818rtc.h b/include/hw/timer/mc146818rt=
+c.h
+index fe6ed63f71..97e3a3d63c 100644
+--- a/include/hw/timer/mc146818rtc.h
++++ b/include/hw/timer/mc146818rtc.h
+@@ -1,3 +1,5 @@
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef MC146818RTC_H
+ #define MC146818RTC_H
+=20
+diff --git a/include/hw/timer/mss-timer.h b/include/hw/timer/mss-timer.h
+index d15d1732f8..ed8246b28d 100644
+--- a/include/hw/timer/mss-timer.h
++++ b/include/hw/timer/mss-timer.h
+@@ -22,6 +22,8 @@
+  * THE SOFTWARE.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_MSS_TIMER_H
+ #define HW_MSS_TIMER_H
+=20
+diff --git a/include/hw/timer/nrf51_timer.h b/include/hw/timer/nrf51_time=
+r.h
+index 85cad2300d..4d67a1f68f 100644
+--- a/include/hw/timer/nrf51_timer.h
++++ b/include/hw/timer/nrf51_timer.h
+@@ -10,6 +10,9 @@
+  * This code is licensed under the GPL version 2 or later.  See
+  * the COPYING file in the top-level directory.
+  */
++
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef NRF51_TIMER_H
+ #define NRF51_TIMER_H
+=20
+diff --git a/include/hw/timer/pl031.h b/include/hw/timer/pl031.h
+index 8857c24ca5..314a2472ae 100644
+--- a/include/hw/timer/pl031.h
++++ b/include/hw/timer/pl031.h
+@@ -11,6 +11,8 @@
+  * GNU GPL, version 2 or (at your option) any later version.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_TIMER_PL031_H
+ #define HW_TIMER_PL031_H
+=20
+diff --git a/include/hw/timer/stm32f2xx_timer.h b/include/hw/timer/stm32f=
+2xx_timer.h
+index e6a83237a5..1f72ae6e97 100644
+--- a/include/hw/timer/stm32f2xx_timer.h
++++ b/include/hw/timer/stm32f2xx_timer.h
+@@ -22,6 +22,8 @@
+  * THE SOFTWARE.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_STM32F2XX_TIMER_H
+ #define HW_STM32F2XX_TIMER_H
+=20
+diff --git a/include/hw/timer/xlnx-zynqmp-rtc.h b/include/hw/timer/xlnx-z=
+ynqmp-rtc.h
+index 97e32322ed..4ba2644f2b 100644
+--- a/include/hw/timer/xlnx-zynqmp-rtc.h
++++ b/include/hw/timer/xlnx-zynqmp-rtc.h
+@@ -24,6 +24,8 @@
+  * THE SOFTWARE.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_TIMER_XLNX_ZYNQMP_RTC_H
+ #define HW_TIMER_XLNX_ZYNQMP_RTC_H
+=20
+diff --git a/include/hw/usb.h b/include/hw/usb.h
+index c21f41c8a9..df72f05112 100644
+--- a/include/hw/usb.h
++++ b/include/hw/usb.h
+@@ -1,3 +1,5 @@
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef QEMU_USB_H
+ #define QEMU_USB_H
+=20
+diff --git a/include/hw/usb/chipidea.h b/include/hw/usb/chipidea.h
+index 1ec2e9dbda..abc8073086 100644
+--- a/include/hw/usb/chipidea.h
++++ b/include/hw/usb/chipidea.h
+@@ -1,3 +1,5 @@
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef CHIPIDEA_H
+ #define CHIPIDEA_H
+=20
+diff --git a/include/hw/virtio/vhost-backend.h b/include/hw/virtio/vhost-=
+backend.h
+index 6f6670783f..e8ddcf0cb5 100644
+--- a/include/hw/virtio/vhost-backend.h
++++ b/include/hw/virtio/vhost-backend.h
+@@ -5,9 +5,10 @@
+  *
+  * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
+  * See the COPYING file in the top-level directory.
+- *
+  */
+=20
++/* FIXME Does not pass make check-headers for user emulation, yet! */
++
+ #ifndef VHOST_BACKEND_H
+ #define VHOST_BACKEND_H
+=20
+diff --git a/include/hw/virtio/vhost-scsi-common.h b/include/hw/virtio/vh=
+ost-scsi-common.h
+index 54357164f0..b26a0936b6 100644
+--- a/include/hw/virtio/vhost-scsi-common.h
++++ b/include/hw/virtio/vhost-scsi-common.h
+@@ -8,9 +8,10 @@
+  *
+  * This work is licensed under the terms of the GNU LGPL, version 2 or l=
+ater.
+  * See the COPYING.LIB file in the top-level directory.
+- *
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef VHOST_SCSI_COMMON_H
+ #define VHOST_SCSI_COMMON_H
+=20
+diff --git a/include/hw/virtio/vhost-scsi.h b/include/hw/virtio/vhost-scs=
+i.h
+index df5bfdb188..b1b5a05e6f 100644
+--- a/include/hw/virtio/vhost-scsi.h
++++ b/include/hw/virtio/vhost-scsi.h
+@@ -8,9 +8,10 @@
+  *
+  * This work is licensed under the terms of the GNU LGPL, version 2 or l=
+ater.
+  * See the COPYING.LIB file in the top-level directory.
+- *
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef VHOST_SCSI_H
+ #define VHOST_SCSI_H
+=20
+diff --git a/include/hw/virtio/vhost-user-blk.h b/include/hw/virtio/vhost=
+-user-blk.h
+index 8dbf11c6f0..28fa790e6d 100644
+--- a/include/hw/virtio/vhost-user-blk.h
++++ b/include/hw/virtio/vhost-user-blk.h
+@@ -9,9 +9,10 @@
+  *
+  * This work is licensed under the terms of the GNU LGPL, version 2 or l=
+ater.
+  * See the COPYING.LIB file in the top-level directory.
+- *
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef VHOST_USER_BLK_H
+ #define VHOST_USER_BLK_H
+=20
+diff --git a/include/hw/virtio/vhost-user-scsi.h b/include/hw/virtio/vhos=
+t-user-scsi.h
+index 1b332ea910..707fba45da 100644
+--- a/include/hw/virtio/vhost-user-scsi.h
++++ b/include/hw/virtio/vhost-user-scsi.h
+@@ -11,9 +11,10 @@
+  *
+  * This work is licensed under the terms of the GNU LGPL, version 2 or l=
+ater.
+  * See the COPYING.LIB file in the top-level directory.
+- *
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef VHOST_USER_SCSI_H
+ #define VHOST_USER_SCSI_H
+=20
+diff --git a/include/hw/virtio/vhost-user.h b/include/hw/virtio/vhost-use=
+r.h
+index 811e325f42..a2d3ab21e6 100644
+--- a/include/hw/virtio/vhost-user.h
++++ b/include/hw/virtio/vhost-user.h
+@@ -5,6 +5,8 @@
+  * See the COPYING file in the top-level directory.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_VIRTIO_VHOST_USER_H
+ #define HW_VIRTIO_VHOST_USER_H
+=20
+diff --git a/include/hw/virtio/vhost-vsock.h b/include/hw/virtio/vhost-vs=
+ock.h
+index d509d67c4a..c86de7a8d3 100644
+--- a/include/hw/virtio/vhost-vsock.h
++++ b/include/hw/virtio/vhost-vsock.h
+@@ -11,6 +11,8 @@
   * top-level directory.
   */
 =20
--/* FIXME Does not pass make check-headers, yet! */
--
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef QEMU_VHOST_VSOCK_H
+ #define QEMU_VHOST_VSOCK_H
+=20
+diff --git a/include/hw/virtio/vhost.h b/include/hw/virtio/vhost.h
+index 619498c8f4..8c18a4409f 100644
+--- a/include/hw/virtio/vhost.h
++++ b/include/hw/virtio/vhost.h
+@@ -1,3 +1,5 @@
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef VHOST_H
+ #define VHOST_H
+=20
+diff --git a/include/hw/virtio/virtio-balloon.h b/include/hw/virtio/virti=
+o-balloon.h
+index 1afafb12f6..b9c4736656 100644
+--- a/include/hw/virtio/virtio-balloon.h
++++ b/include/hw/virtio/virtio-balloon.h
+@@ -9,9 +9,10 @@
+  *
+  * This work is licensed under the terms of the GNU GPL, version 2.  See
+  * the COPYING file in the top-level directory.
+- *
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef QEMU_VIRTIO_BALLOON_H
+ #define QEMU_VIRTIO_BALLOON_H
+=20
+diff --git a/include/hw/virtio/virtio-blk.h b/include/hw/virtio/virtio-bl=
+k.h
+index cddcfbebe9..4947202519 100644
+--- a/include/hw/virtio/virtio-blk.h
++++ b/include/hw/virtio/virtio-blk.h
+@@ -8,9 +8,10 @@
+  *
+  * This work is licensed under the terms of the GNU GPL, version 2.  See
+  * the COPYING file in the top-level directory.
+- *
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef QEMU_VIRTIO_BLK_H
+ #define QEMU_VIRTIO_BLK_H
+=20
+diff --git a/include/hw/virtio/virtio-bus.h b/include/hw/virtio/virtio-bu=
+s.h
+index 7fec9dc929..7e72b4aa3c 100644
+--- a/include/hw/virtio/virtio-bus.h
++++ b/include/hw/virtio/virtio-bus.h
+@@ -19,9 +19,10 @@
+  *
+  * You should have received a copy of the GNU General Public License alo=
+ng
+  * with this program; if not, see <http://www.gnu.org/licenses/>.
+- *
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef VIRTIO_BUS_H
+ #define VIRTIO_BUS_H
+=20
+diff --git a/include/hw/virtio/virtio-crypto.h b/include/hw/virtio/virtio=
+-crypto.h
+index ffe2391ece..4f2d1e80ce 100644
+--- a/include/hw/virtio/virtio-crypto.h
++++ b/include/hw/virtio/virtio-crypto.h
+@@ -11,6 +11,8 @@
+  * top-level directory.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef QEMU_VIRTIO_CRYPTO_H
+ #define QEMU_VIRTIO_CRYPTO_H
+=20
+diff --git a/include/hw/virtio/virtio-input.h b/include/hw/virtio/virtio-=
+input.h
+index 4fca03e796..8b84ec71a6 100644
+--- a/include/hw/virtio/virtio-input.h
++++ b/include/hw/virtio/virtio-input.h
+@@ -1,3 +1,5 @@
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef QEMU_VIRTIO_INPUT_H
+ #define QEMU_VIRTIO_INPUT_H
+=20
+diff --git a/include/hw/virtio/virtio-net.h b/include/hw/virtio/virtio-ne=
+t.h
+index b96f0c643f..b7858a4fc0 100644
+--- a/include/hw/virtio/virtio-net.h
++++ b/include/hw/virtio/virtio-net.h
+@@ -8,9 +8,10 @@
+  *
+  * This work is licensed under the terms of the GNU GPL, version 2.  See
+  * the COPYING file in the top-level directory.
+- *
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef QEMU_VIRTIO_NET_H
+ #define QEMU_VIRTIO_NET_H
+=20
+diff --git a/include/hw/virtio/virtio-pmem.h b/include/hw/virtio/virtio-p=
+mem.h
+index 19b6ee6d75..ed3679fae3 100644
+--- a/include/hw/virtio/virtio-pmem.h
++++ b/include/hw/virtio/virtio-pmem.h
+@@ -11,6 +11,8 @@
+  * See the COPYING file in the top-level directory.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef HW_VIRTIO_PMEM_H
+ #define HW_VIRTIO_PMEM_H
+=20
+diff --git a/include/hw/virtio/virtio-rng.h b/include/hw/virtio/virtio-rn=
+g.h
+index ff699335e3..9868edee18 100644
+--- a/include/hw/virtio/virtio-rng.h
++++ b/include/hw/virtio/virtio-rng.h
+@@ -9,6 +9,8 @@
+  * top-level directory.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
  #ifndef QEMU_VIRTIO_RNG_H
  #define QEMU_VIRTIO_RNG_H
 =20
-+#include "hw/virtio/virtio.h"
- #include "sysemu/rng.h"
- #include "sysemu/rng-random.h"
- #include "standard-headers/linux/virtio_rng.h"
+diff --git a/include/hw/virtio/virtio-scsi.h b/include/hw/virtio/virtio-s=
+csi.h
+index 4c0bcdb788..84db6e7874 100644
+--- a/include/hw/virtio/virtio-scsi.h
++++ b/include/hw/virtio/virtio-scsi.h
+@@ -8,9 +8,10 @@
+  *
+  * This work is licensed under the terms of the GNU GPL, version 2.  See
+  * the COPYING file in the top-level directory.
+- *
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef QEMU_VIRTIO_SCSI_H
+ #define QEMU_VIRTIO_SCSI_H
+=20
+diff --git a/include/hw/virtio/virtio-serial.h b/include/hw/virtio/virtio=
+-serial.h
+index 12657a9f39..091f9c5dc0 100644
+--- a/include/hw/virtio/virtio-serial.h
++++ b/include/hw/virtio/virtio-serial.h
+@@ -10,9 +10,10 @@
+  *
+  * This work is licensed under the terms of the GNU GPL, version 2.  See
+  * the COPYING file in the top-level directory.
+- *
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef QEMU_VIRTIO_SERIAL_H
+ #define QEMU_VIRTIO_SERIAL_H
+=20
+diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
+index b189788cb2..7d2fd4063b 100644
+--- a/include/hw/virtio/virtio.h
++++ b/include/hw/virtio/virtio.h
+@@ -8,9 +8,10 @@
+  *
+  * This work is licensed under the terms of the GNU GPL, version 2.  See
+  * the COPYING file in the top-level directory.
+- *
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef QEMU_VIRTIO_H
+ #define QEMU_VIRTIO_H
+=20
+diff --git a/include/hw/watchdog/cmsdk-apb-watchdog.h b/include/hw/watchd=
+og/cmsdk-apb-watchdog.h
+index 6ae9531370..b9c9bbc348 100644
+--- a/include/hw/watchdog/cmsdk-apb-watchdog.h
++++ b/include/hw/watchdog/cmsdk-apb-watchdog.h
+@@ -28,6 +28,8 @@
+  * to watchdog_perform_action(), at least for the moment.
+  */
+=20
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef CMSDK_APB_WATCHDOG_H
+ #define CMSDK_APB_WATCHDOG_H
+=20
 diff --git a/include/hw/watchdog/wdt_aspeed.h b/include/hw/watchdog/wdt_a=
 speed.h
-index 39e5689165..8c5691ce20 100644
+index 8c5691ce20..8e9c301177 100644
 --- a/include/hw/watchdog/wdt_aspeed.h
 +++ b/include/hw/watchdog/wdt_aspeed.h
-@@ -7,11 +7,10 @@
+@@ -7,6 +7,8 @@
   * COPYING file in the top-level directory.
   */
 =20
--/* FIXME Does not pass make check-headers, yet! */
--
++/* NOTE: May not be included into user emulation code */
++
  #ifndef WDT_ASPEED_H
  #define WDT_ASPEED_H
 =20
-+#include "hw/misc/aspeed_scu.h"
- #include "hw/sysbus.h"
-=20
- #define TYPE_ASPEED_WDT "aspeed.wdt"
-diff --git a/include/libdecnumber/decNumberLocal.h b/include/libdecnumber=
-/decNumberLocal.h
-index 01ba6c7aea..4d53c077f2 100644
---- a/include/libdecnumber/decNumberLocal.h
-+++ b/include/libdecnumber/decNumberLocal.h
-@@ -37,8 +37,6 @@
- /* decNumber.h or one of decDouble (etc.) must be included first.     */
- /* ------------------------------------------------------------------ */
-=20
--/* FIXME Does not pass make check-headers, yet! */
--
- #ifndef DECNUMBERLOCAL_H
- #define DECNUMBERLOCAL_H
-=20
-@@ -46,6 +44,7 @@
-   #define DECNLAUTHOR	"Mike Cowlishaw"	      /* Who to blame */
-=20
-   #include "libdecnumber/dconfig.h"
-+  #include "libdecnumber/decContext.h"
-=20
-   /* Conditional code flag -- set this to match hardware platform     */
-   /* 1=3Dlittle-endian, 0=3Dbig-endian	                              */
-diff --git a/include/migration/cpu.h b/include/migration/cpu.h
-index 4c8dde2e95..37c04fe9e7 100644
---- a/include/migration/cpu.h
-+++ b/include/migration/cpu.h
-@@ -1,11 +1,12 @@
- /* Declarations for use for CPU state serialization.  */
-=20
- /* NOTE: May only be included into target-dependent code */
--/* FIXME Does not pass make check-headers, yet! */
-=20
- #ifndef MIGRATION_CPU_H
- #define MIGRATION_CPU_H
-=20
-+#include "exec/cpu-defs.h"
+diff --git a/include/hw/watchdog/wdt_diag288.h b/include/hw/watchdog/wdt_=
+diag288.h
+index 706d96b753..f637df74a6 100644
+--- a/include/hw/watchdog/wdt_diag288.h
++++ b/include/hw/watchdog/wdt_diag288.h
+@@ -1,3 +1,5 @@
++/* NOTE: May not be included into user emulation code */
 +
- #if TARGET_LONG_BITS =3D=3D 64
- #define qemu_put_betl qemu_put_be64
- #define qemu_get_betl qemu_get_be64
-diff --git a/include/monitor/hmp-target.h b/include/monitor/hmp-target.h
-index c022fd3b39..8d4a172efa 100644
---- a/include/monitor/hmp-target.h
-+++ b/include/monitor/hmp-target.h
-@@ -23,11 +23,12 @@
-  */
+ #ifndef WDT_DIAG288_H
+ #define WDT_DIAG288_H
 =20
- /* NOTE: May only be included into target-dependent code */
--/* FIXME Does not pass make check-headers, yet! */
-=20
- #ifndef MONITOR_HMP_TARGET_H
- #define MONITOR_HMP_TARGET_H
-=20
-+#include "cpu.h"
+diff --git a/include/hw/xen/xen.h b/include/hw/xen/xen.h
+index 9c7b5f78dc..e24b9e41cc 100644
+--- a/include/hw/xen/xen.h
++++ b/include/hw/xen/xen.h
+@@ -1,3 +1,5 @@
++/* FIXME Does not pass make check-headers for user emulation, yet! */
 +
- #define MD_TLONG 0
- #define MD_I32   1
+ #ifndef QEMU_HW_XEN_H
+ #define QEMU_HW_XEN_H
 =20
-diff --git a/include/qemu/atomic128.h b/include/qemu/atomic128.h
-index 8dcf19482d..6b34484e15 100644
---- a/include/qemu/atomic128.h
-+++ b/include/qemu/atomic128.h
-@@ -10,11 +10,11 @@
-  * atomic primitive is meant to provide.
-  */
-=20
--/* FIXME Does not pass make check-headers, yet! */
--
- #ifndef QEMU_ATOMIC128_H
- #define QEMU_ATOMIC128_H
-=20
-+#include "qemu/int128.h"
+diff --git a/include/net/vhost_net.h b/include/net/vhost_net.h
+index 77e47398c4..6f14740e84 100644
+--- a/include/net/vhost_net.h
++++ b/include/net/vhost_net.h
+@@ -1,3 +1,5 @@
++/* FIXME Does not pass make check-headers for user emulation, yet! */
 +
- /*
-  * GCC is a house divided about supporting large atomic operations.
+ #ifndef VHOST_NET_H
+ #define VHOST_NET_H
+=20
+diff --git a/include/qemu/iova-tree.h b/include/qemu/iova-tree.h
+index b66cf93c4b..21bffa7f8c 100644
+--- a/include/qemu/iova-tree.h
++++ b/include/qemu/iova-tree.h
+@@ -8,6 +8,9 @@
   *
-diff --git a/include/qemu/ratelimit.h b/include/qemu/ratelimit.h
-index efd6074823..01da8d63f1 100644
---- a/include/qemu/ratelimit.h
-+++ b/include/qemu/ratelimit.h
-@@ -11,11 +11,11 @@
-  *
+  * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
   */
-=20
--/* FIXME Does not pass make check-headers, yet! */
--
- #ifndef QEMU_RATELIMIT_H
- #define QEMU_RATELIMIT_H
-=20
-+#include "qemu/timer.h"
 +
- typedef struct {
-     int64_t slice_start_time;
-     int64_t slice_end_time;
-diff --git a/include/qemu/thread-win32.h b/include/qemu/thread-win32.h
-index e09a7ba397..94e7579b4e 100644
---- a/include/qemu/thread-win32.h
-+++ b/include/qemu/thread-win32.h
-@@ -1,4 +1,4 @@
--/* FIXME Does not pass make check-headers, yet! */
-+/* FIXME Does not pass make check-headers without CONFIG_WIN32, yet! */
++/* FIXME Does not pass make check-headers for user emulation, yet! */
++
+ #ifndef IOVA_TREE_H
+ #define IOVA_TREE_H
 =20
- #ifndef QEMU_THREAD_WIN32_H
- #define QEMU_THREAD_WIN32_H
-@@ -49,6 +49,6 @@ struct QemuThread {
- };
-=20
- /* Only valid for joinable threads.  */
--HANDLE qemu_thread_get_handle(QemuThread *thread);
-+HANDLE qemu_thread_get_handle(struct QemuThread *thread);
-=20
- #endif
 diff --git a/include/sysemu/balloon.h b/include/sysemu/balloon.h
-index ec77a48925..aea0c44985 100644
+index aea0c44985..30f244cbaa 100644
 --- a/include/sysemu/balloon.h
 +++ b/include/sysemu/balloon.h
-@@ -11,11 +11,10 @@
+@@ -8,9 +8,10 @@
   *
+  * This work is licensed under the terms of the GNU GPL, version 2.  See
+  * the COPYING file in the top-level directory.
+- *
   */
 =20
--/* FIXME Does not pass make check-headers, yet! */
--
++/* FIXME Does not pass make check-headers for user emulation, yet! */
++
  #ifndef QEMU_BALLOON_H
  #define QEMU_BALLOON_H
 =20
-+#include "exec/cpu-common.h"
- #include "qapi/qapi-types-misc.h"
-=20
- typedef void (QEMUBalloonEvent)(void *opaque, ram_addr_t target);
 diff --git a/include/sysemu/cryptodev-vhost-user.h b/include/sysemu/crypt=
 odev-vhost-user.h
-index d2bbd854c4..0d3421e7e8 100644
+index 0d3421e7e8..06c0213c29 100644
 --- a/include/sysemu/cryptodev-vhost-user.h
 +++ b/include/sysemu/cryptodev-vhost-user.h
-@@ -21,11 +21,11 @@
+@@ -18,9 +18,10 @@
   *
+  * You should have received a copy of the GNU Lesser General Public
+  * License along with this library; if not, see <http://www.gnu.org/lice=
+nses/>.
+- *
   */
 =20
--/* FIXME Does not pass make check-headers, yet! */
--
++/* NOTE: May not be included into user emulation code */
++
  #ifndef CRYPTODEV_VHOST_USER_H
  #define CRYPTODEV_VHOST_USER_H
 =20
-+#include "sysemu/cryptodev-vhost.h"
+diff --git a/include/sysemu/cryptodev-vhost.h b/include/sysemu/cryptodev-=
+vhost.h
+index f42824fbde..59d55704f9 100644
+--- a/include/sysemu/cryptodev-vhost.h
++++ b/include/sysemu/cryptodev-vhost.h
+@@ -19,8 +19,10 @@
+  *
+  * You should have received a copy of the GNU Lesser General Public
+  * License along with this library; if not, see <http://www.gnu.org/lice=
+nses/>.
+- *
+  */
 +
- #define VHOST_USER_MAX_AUTH_KEY_LEN    512
- #define VHOST_USER_MAX_CIPHER_KEY_LEN  64
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef CRYPTODEV_VHOST_H
+ #define CRYPTODEV_VHOST_H
 =20
-diff --git a/include/sysemu/dump.h b/include/sysemu/dump.h
-index c5efa8b2f2..82be70d46a 100644
---- a/include/sysemu/dump.h
-+++ b/include/sysemu/dump.h
-@@ -11,7 +11,8 @@
-  *
+diff --git a/include/sysemu/dma.h b/include/sysemu/dma.h
+index 5da3c4e3c5..07fa2d5a04 100644
+--- a/include/sysemu/dma.h
++++ b/include/sysemu/dma.h
+@@ -7,6 +7,8 @@
+  * (GNU GPL), version 2 or later.
   */
 =20
--/* FIXME Does not pass make check-headers, yet! */
-+/* NOTE: May only be included into target-dependent code */
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef DMA_H
+ #define DMA_H
+=20
+diff --git a/include/sysemu/hostmem.h b/include/sysemu/hostmem.h
+index 92fa0e458c..34f753d89c 100644
+--- a/include/sysemu/hostmem.h
++++ b/include/sysemu/hostmem.h
+@@ -10,6 +10,8 @@
+  * See the COPYING file in the top-level directory.
+  */
+=20
 +/* FIXME Does not pass make check-headers for user emulation, yet! */
-=20
- #ifndef DUMP_H
- #define DUMP_H
-diff --git a/include/sysemu/hvf.h b/include/sysemu/hvf.h
-index 2df17c4ed3..25b1e58cf4 100644
---- a/include/sysemu/hvf.h
-+++ b/include/sysemu/hvf.h
-@@ -11,11 +11,11 @@
- /* header to be included in non-HVF-specific code */
-=20
- /* NOTE: May only be included into target-dependent code */
--/* FIXME Does not pass make check-headers, yet! */
-=20
- #ifndef HVF_H
- #define HVF_H
-=20
-+#include "cpu.h"
- #include "qemu/bitops.h"
- #include "exec/memory.h"
- #include "sysemu/accel.h"
-diff --git a/include/sysemu/iothread.h b/include/sysemu/iothread.h
-index 8d8af53df8..6181486401 100644
---- a/include/sysemu/iothread.h
-+++ b/include/sysemu/iothread.h
-@@ -11,13 +11,12 @@
-  *
-  */
-=20
--/* FIXME Does not pass make check-headers, yet! */
--
- #ifndef IOTHREAD_H
- #define IOTHREAD_H
-=20
- #include "block/aio.h"
- #include "qemu/thread.h"
-+#include "qom/object.h"
-=20
- #define TYPE_IOTHREAD "iothread"
++
+ #ifndef SYSEMU_HOSTMEM_H
+ #define SYSEMU_HOSTMEM_H
 =20
 diff --git a/include/sysemu/kvm_int.h b/include/sysemu/kvm_int.h
-index 18f48589c1..7a1c3cdcb1 100644
+index 7a1c3cdcb1..a5f1198af4 100644
 --- a/include/sysemu/kvm_int.h
 +++ b/include/sysemu/kvm_int.h
-@@ -6,11 +6,11 @@
+@@ -3,9 +3,10 @@
   *
+  * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
+  * See the COPYING file in the top-level directory.
+- *
   */
 =20
--/* FIXME Does not pass make check-headers, yet! */
--
++/* FIXME Does not pass make check-headers for user emulation, yet! */
++
  #ifndef QEMU_KVM_INT_H
  #define QEMU_KVM_INT_H
 =20
-+#include "exec/cpu-common.h"
-+#include "exec/memory.h"
- #include "sysemu/sysemu.h"
- #include "sysemu/accel.h"
- #include "sysemu/kvm.h"
-diff --git a/include/sysemu/memory_mapping.h b/include/sysemu/memory_mapp=
-ing.h
-index 6fb5b42cf1..b02978543c 100644
---- a/include/sysemu/memory_mapping.h
-+++ b/include/sysemu/memory_mapping.h
-@@ -11,12 +11,15 @@
-  *
+diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
+index 01a263eba2..5e481b4de6 100644
+--- a/include/sysemu/numa.h
++++ b/include/sysemu/numa.h
+@@ -1,3 +1,5 @@
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef SYSEMU_NUMA_H
+ #define SYSEMU_NUMA_H
+=20
+diff --git a/include/sysemu/vhost-user-backend.h b/include/sysemu/vhost-u=
+ser-backend.h
+index 9abf8f06a1..b505fe386a 100644
+--- a/include/sysemu/vhost-user-backend.h
++++ b/include/sysemu/vhost-user-backend.h
+@@ -9,6 +9,9 @@
+  * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
+  * See the COPYING file in the top-level directory.
   */
++
++/* NOTE: May not be included into user emulation code */
++
+ #ifndef QEMU_VHOST_USER_BACKEND_H
+ #define QEMU_VHOST_USER_BACKEND_H
 =20
--/* FIXME Does not pass make check-headers, yet! */
-+/* NOTE: May only be included into target-dependent code */
-+/* FIXME Does not pass make check-headers for user emulation, yet! */
-=20
- #ifndef MEMORY_MAPPING_H
- #define MEMORY_MAPPING_H
-=20
- #include "qemu/queue.h"
-+#include "exec/cpu-common.h"
-+#include "exec/cpu-defs.h"
- #include "exec/memory.h"
-=20
- typedef struct GuestPhysBlock {
 diff --git a/include/sysemu/xen-mapcache.h b/include/sysemu/xen-mapcache.=
 h
-index e3acb95b42..c8e7c2f6cf 100644
+index c8e7c2f6cf..6f3cadcfeb 100644
 --- a/include/sysemu/xen-mapcache.h
 +++ b/include/sysemu/xen-mapcache.h
-@@ -6,11 +6,11 @@
+@@ -3,9 +3,10 @@
   *
+  * This work is licensed under the terms of the GNU GPL, version 2.  See
+  * the COPYING file in the top-level directory.
+- *
   */
 =20
--/* FIXME Does not pass make check-headers, yet! */
--
++/* NOTE: May not be included into user emulation code */
++
  #ifndef XEN_MAPCACHE_H
  #define XEN_MAPCACHE_H
 =20
-+#include "exec/cpu-common.h"
-+
- typedef hwaddr (*phys_offset_to_gaddr_t)(hwaddr phys_offset,
-                                          ram_addr_t size);
- #ifdef CONFIG_XEN
-diff --git a/include/ui/egl-helpers.h b/include/ui/egl-helpers.h
-index 5ea65ddfa1..151e1c92b6 100644
---- a/include/ui/egl-helpers.h
-+++ b/include/ui/egl-helpers.h
-@@ -1,4 +1,5 @@
--/* FIXME Does not pass make check-headers, yet! */
-+/* FIXME Does not pass make check-headers without CONFIG_OPENGL, yet! */
-+/* FIXME Does not pass make check-headers without system emulation, yet!=
- */
-=20
- #ifndef EGL_HELPERS_H
- #define EGL_HELPERS_H
-@@ -6,6 +7,9 @@
- #include <epoxy/gl.h>
- #include <epoxy/egl.h>
- #include <gbm.h>
-+#include "qapi/qapi-types-ui.h"
-+#include "ui/console.h"
-+#include "ui/shader.h"
-=20
- extern EGLDisplay *qemu_egl_display;
- extern EGLConfig qemu_egl_config;
-diff --git a/include/ui/input.h b/include/ui/input.h
-index 718f152f98..c86219a1c1 100644
---- a/include/ui/input.h
-+++ b/include/ui/input.h
-@@ -1,9 +1,8 @@
--/* FIXME Does not pass make check-headers, yet! */
--
- #ifndef INPUT_H
- #define INPUT_H
-=20
- #include "qapi/qapi-types-ui.h"
-+#include "qemu/notify.h"
-=20
- #define INPUT_EVENT_MASK_KEY   (1<<INPUT_EVENT_KIND_KEY)
- #define INPUT_EVENT_MASK_BTN   (1<<INPUT_EVENT_KIND_BTN)
-diff --git a/include/ui/pixel_ops.h b/include/ui/pixel_ops.h
-index 18d5e181a6..7952be77bf 100644
---- a/include/ui/pixel_ops.h
-+++ b/include/ui/pixel_ops.h
-@@ -1,4 +1,5 @@
--/* FIXME Does not pass make check-headers, yet! */
-+#ifndef UI_PIXEL_OPS_H
-+#define UI_PIXEL_OPS_H
-=20
- static inline unsigned int rgb_to_pixel8(unsigned int r, unsigned int g,
-                                          unsigned int b)
-@@ -53,3 +54,5 @@ static inline unsigned int rgb_to_pixel32bgr(unsigned i=
-nt r, unsigned int g,
- {
-     return (b << 16) | (g << 8) | r;
- }
-+
-+#endif
-diff --git a/include/ui/spice-display.h b/include/ui/spice-display.h
-index 4bb30522a6..93930889cc 100644
---- a/include/ui/spice-display.h
-+++ b/include/ui/spice-display.h
-@@ -15,11 +15,13 @@
-  * along with this program; if not, see <http://www.gnu.org/licenses/>.
-  */
-=20
--/* FIXME Does not pass make check-headers, yet! */
-+/* FIXME Does not pass make check-headers without CONFIG_SPICE, yet! */
-+/* FIXME Does not pass make check-headers without system emulation, yet!=
- */
-=20
- #ifndef UI_SPICE_DISPLAY_H
- #define UI_SPICE_DISPLAY_H
-=20
-+#include <spice.h>
- #include <spice/ipc_ring.h>
- #include <spice/enums.h>
- #include <spice/qxl_dev.h>
-diff --git a/target/hppa/cpu.h b/target/hppa/cpu.h
-index aab251bc4b..e9fba96be9 100644
---- a/target/hppa/cpu.h
-+++ b/target/hppa/cpu.h
-@@ -22,7 +22,7 @@
-=20
- #include "cpu-qom.h"
- #include "exec/cpu-defs.h"
--
-+#include "exec/memory.h"
-=20
- /* PA-RISC 1.x processors have a strong memory model.  */
- /* ??? While we do not yet implement PA-RISC 2.0, those processors have
 diff --git a/tests/check-headers.mak b/tests/check-headers.mak
-index 367b9dfb9a..fee538c33b 100644
+index fee538c33b..0186adabb0 100644
 --- a/tests/check-headers.mak
 +++ b/tests/check-headers.mak
-@@ -25,6 +25,24 @@ untarget-headers :=3D include/exec/poison.h
+@@ -21,6 +21,10 @@ target-headers :=3D $(shell cd $(SRC_PATH) && egrep -l=
+ '$(target-header-regexp)' $
+ # Headers for target-independent code only
+ untarget-headers :=3D include/exec/poison.h
+=20
++# Headers not for user emulation (include hw/hw.h)
++hw-header-regexp :=3D NOTE: May not be included into user emulation code
++hw-headers :=3D $(shell cd $(SRC_PATH) && egrep -l '$(hw-header-regexp)'=
+ $(src-headers))
++
+ # Headers carrying a FIXME about this test
  # Extended regular expression matching the FIXME comment in headers
  # not expected to pass the test in this build's configuration:
- bad-header-regexp :=3D FIXME Does not pass make check-headers(
-+# Fails in %-user:
+@@ -93,10 +97,12 @@ checked-headers :=3D $(filter-out $(excluded-headers)=
+ $(bad-headers) $(target-head
+ check-header-tests :=3D $(patsubst %.h, tests/headers/%.c, $(checked-hea=
+ders))
+ # to be checked for each target: all less excluded, bad, and untarget
+ checked-target-headers :=3D $(filter-out $(excluded-headers) $(bad-heade=
+rs) $(untarget-headers), $(src-headers))
+-# Testing target-independent headers for each target is massive
+-# overkill, limit to target-dependent headers for now.  This leaves
+-# gaps in testing.  TODO accept the overkill or pick something in betwee=
+n
+-checked-target-headers :=3D $(filter $(target-headers), $(checked-target=
+-headers))
++# less hw for user emulation targets
 +ifneq ($(TARGET_DIR),)
 +ifneq ($(CONFIG_USER_ONLY),)
-+bad-header-regexp +=3D for user emulation|
++checked-target-headers :=3D $(filter-out $(hw-headers), $(checked-target=
+-headers))
 +endif
 +endif
-+# Target-dependent arm only:
-+ifneq ($(TARGET_BASE_ARCH),arm)
-+bad-header-regexp +=3D for TARGET_BASE_ARCH other than arm|
-+endif
-+# Target-dependent i386 only:
-+ifneq ($(TARGET_BASE_ARCH),i386)
-+bad-header-regexp +=3D for TARGET_BASE_ARCH other than i386|
-+endif
-+# Target-dependent mips only:
-+ifneq ($(TARGET_BASE_ARCH),mips)
-+bad-header-regexp +=3D for TARGET_BASE_ARCH other than mips|
-+endif
- # Require <cpuid.h>:
- ifneq ($(CONFIG_CPUID_H),y)
- bad-header-regexp +=3D without CONFIG_CPUID_H|
+ check-target-header-tests :=3D $(patsubst %.h, tests/headers-tgt/%.c, $(=
+checked-target-headers))
+=20
+ # Bad headers (all less excluded and checked):
 --=20
 2.21.0
 
