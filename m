@@ -7,78 +7,76 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25DFFC71142
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 17:22:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 679EBC74A5B
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 17:27:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E87D120863
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 17:22:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3521D20863
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 17:27:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PmGVcfth"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E87D120863
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nSnmul48"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3521D20863
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43748 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43756 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlcmV-0007w8-7u
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 13:22:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60001)
+	id 1hlcqW-0000mM-Cg
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 13:27:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33036)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <paolo.bonzini@gmail.com>) id 1hlcm0-0005q5-2q
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 13:22:24 -0400
+ (envelope-from <paolo.bonzini@gmail.com>) id 1hlcqM-0000MU-E1
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 13:26:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1hlclz-0003jJ-1s
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 13:22:24 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:37882)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1hlcqL-0007wM-An
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 13:26:54 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:38614)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1hlcly-0003i1-Rd
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 13:22:22 -0400
-Received: by mail-wr1-x442.google.com with SMTP id n9so7167585wrr.4
- for <qemu-devel@nongnu.org>; Thu, 11 Jul 2019 10:22:21 -0700 (PDT)
+ id 1hlcqL-0007v1-4e
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 13:26:53 -0400
+Received: by mail-wm1-x343.google.com with SMTP id s15so6458533wmj.3
+ for <qemu-devel@nongnu.org>; Thu, 11 Jul 2019 10:26:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=RxYfAEyw36ihWSXQYKfqSMDy1K9OXWQsSR7Cb5/oOMk=;
- b=PmGVcfthSxJ+fHCa/bi19s0VtpgRlUtxyC7RLRL1GOu0yffMUyI32MIwnAzKz5FOL7
- 99KmcX5Nvcl8n/kuNbgg12N73vApHl7H7h7PYkuLT5p1JkeHGF5AlKhx5TBoCmK8plHO
- ROS4aQK3dsGp85OcNr5OuCP6AbkZasJSffPWKM/PDtk2Utns2V3NWXl8q6/Ygu0nTU+A
- 5eS8h85lsavLJnU2OL0+WsE9+hizNirIfUTXfMiTSeEmE/xwHUzKKQZawjQuCaEadLUf
- wXJTE558QiUSwm1LWLPIgGZNvqFrZ1AUStOb46EA1xxEjBdD4GQf2EJe/5ooL6BeDS8/
- wL+g==
+ h=sender:from:to:subject:date:message-id;
+ bh=iUgof65FlBg0LXx+uLyqSdziWBu7F3VhET5Hbgi+8Ac=;
+ b=nSnmul48Fsa+bnPIajSKakOIIRERqIcXICBJrNOidlOdb9JtgvR3sWzRbaOin1J7Rw
+ dN4O/vaXuTn46LPy4CpJN9NBCHddyZUTFGI9MrdK0cGhBDhpxa0tJrqgF65D9uwmsOSE
+ 5v/Blh83dnjHwuHIxGaT9dpGQGXQHk4whTrlJ/+xPF9iR9KoZMZCoPL+prpQcWoBTw54
+ CuYHA7yGY6g7DpNa0ici10G7qsGiSlHSZcQAXG2lqvKtxnTt7hV8UhHosisbhuKbA+Sj
+ B4ajztMrP8zYcnkknl3o/w09+2vzXu/v8NVWEm4uqIHiYTSrlQq4aqrFzzVFhccd8Z8P
+ /DKA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references;
- bh=RxYfAEyw36ihWSXQYKfqSMDy1K9OXWQsSR7Cb5/oOMk=;
- b=GuQda7FDJqvrvPFfRgw0j+MEPGlGgL6teWtsuOUi9zR4B3yKbS0KvACUcFxvq0dWPv
- Nrgbp/XPcBR+3KkmBuu9hO4ekx0tcXYmH+2FA3Jgj9iUb6gjAPOsX4bCBhllPuhQeyrn
- 8PsHtnH2FAaY5ni62WKMTBVqqHdahSvPOqk702geTyB3rod+odh7b7u/7BlXduYPat0v
- aCPagxHJS22mk7LWKhoXuwBIibjgBxpJ6okbJnSxmNfLqpki/bd2MxZzMzCZM+LUijBM
- Se4Dcug7S9GWtgvVJpRRhL6UV6nlSAaCfrVyj0ik1BVg+kyVZbl2uXe4zJOXx0Cn1fit
- YDFQ==
-X-Gm-Message-State: APjAAAWsTvPcHVfIkBGGF6jeVQGX6EHXVldgOQ7DLURywZ4d/n5XHt6U
- kAT1cIHEskHX7+yrzB2+Grd13soQcdU=
-X-Google-Smtp-Source: APXvYqzchK2uToAFfTfutp8KJqYHTQciCRLD2h3RWRxRvPbn2xlvFt/6nD1IdosiefQ3ZccRsa5c2g==
-X-Received: by 2002:adf:e4c6:: with SMTP id v6mr6004069wrm.315.1562865740294; 
- Thu, 11 Jul 2019 10:22:20 -0700 (PDT)
+ h=x-gm-message-state:sender:from:to:subject:date:message-id;
+ bh=iUgof65FlBg0LXx+uLyqSdziWBu7F3VhET5Hbgi+8Ac=;
+ b=fMJ50tvNa6a8TXLiqPr9ZX1G1m1U8LxzUSdT/LwX6digFO4Dbs4C1K+u+/87gpIGK2
+ 0qiJN/UogIBuu9LbDaX+uQyiWdcZTXBA0v/Itrj1sCvkNisV15n4DWUunQIUM9tdI1qE
+ vvzTSDiXsqzjNsyNuBkZZ17risQsyKaGdmy49s6NhP7rvGwxt18NbmpuuzoMLDiYvLtS
+ buEOjdcGUihDuTt7Y0rR0F1GD4fiTxRh7YqrsN6U1660FvzBA2fURy/XXifSWk3nBHil
+ oTbpHRRiJ3wZ/v1hHfQ3NeM8nEXGCCRnqzFwQMLtQ3j9q9Y6Fk7rW7IVTGVSF5It4TwF
+ RVxQ==
+X-Gm-Message-State: APjAAAXA58tbDZeH3e6Fcvhkh+yWKoG9zA1yfxEsSjct6VkX9K7YmKcm
+ 6ObLovpqFiNeyOwPkjdzvTokUSJ6Twk=
+X-Google-Smtp-Source: APXvYqySaaMIc18XW+avIJRv2JwmlqD0GzcldyRxJyr+lgqQeF04nDKYUwiMW63fbm5cFZlQMNCgAw==
+X-Received: by 2002:a1c:f914:: with SMTP id x20mr5344997wmh.142.1562866011732; 
+ Thu, 11 Jul 2019 10:26:51 -0700 (PDT)
 Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id c11sm8654514wrq.45.2019.07.11.10.22.19
+ by smtp.gmail.com with ESMTPSA id a64sm9701910wmf.1.2019.07.11.10.26.51
+ for <qemu-devel@nongnu.org>
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 11 Jul 2019 10:22:19 -0700 (PDT)
+ Thu, 11 Jul 2019 10:26:51 -0700 (PDT)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Thu, 11 Jul 2019 19:22:16 +0200
-Message-Id: <1562865736-3546-3-git-send-email-pbonzini@redhat.com>
+Date: Thu, 11 Jul 2019 19:26:50 +0200
+Message-Id: <1562866010-5355-1-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1562865736-3546-1-git-send-email-pbonzini@redhat.com>
-References: <1562865736-3546-1-git-send-email-pbonzini@redhat.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::442
-Subject: [Qemu-devel] [PATCH 2/2] create_config: remove $(CONFIG_SOFTMMU)
- hack
+X-Received-From: 2a00:1450:4864:20::343
+Subject: [Qemu-devel] [PATCH] target/i386: skip KVM_GET/SET_NESTED_STATE if
+ VMX disabled, or for SVM
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,48 +88,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-CONFIG_TPM is defined to a rather weird $(CONFIG_SOFTMMU) so that it
-expands to the right thing in hw/Makefile.objs.  This however is not
-needed anymore and it has a corresponding hack in create_config
-to turn it into "#define CONFIG_TPM 1".  Clean up.
+Do not allocate env->nested_state unless we later need to migrate the
+nested virtualization state.
+
+With this change, nested_state_needed() will return false if the
+VMX flag is not included in the virtual machine.  KVM_GET/SET_NESTED_STATE
+is also disabled for SVM which is safer (we know that at least the NPT
+root and paging mode have to be saved/loaded), and thus the corresponding
+subsection can go away as well.
+
+Inspired by a patch from Liran Alon.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- configure             | 2 +-
- scripts/create_config | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ target/i386/kvm.c     | 11 +++++------
+ target/i386/machine.c | 21 +--------------------
+ 2 files changed, 6 insertions(+), 26 deletions(-)
 
-diff --git a/configure b/configure
-index 4983c8b..eb635c3 100755
---- a/configure
-+++ b/configure
-@@ -7159,7 +7159,7 @@ if test "$live_block_migration" = "yes" ; then
- fi
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index 5035092..73ab102 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -1748,14 +1748,13 @@ int kvm_arch_init_vcpu(CPUState *cs)
+     max_nested_state_len = kvm_max_nested_state_length();
+     if (max_nested_state_len > 0) {
+         assert(max_nested_state_len >= offsetof(struct kvm_nested_state, data));
+-        env->nested_state = g_malloc0(max_nested_state_len);
  
- if test "$tpm" = "yes"; then
--  echo 'CONFIG_TPM=$(CONFIG_SOFTMMU)' >> $config_host_mak
-+  echo 'CONFIG_TPM=y' >> $config_host_mak
- fi
+-        env->nested_state->size = max_nested_state_len;
+-
+-        if (IS_INTEL_CPU(env)) {
++        if (cpu_has_vmx(env)) {
+             struct kvm_vmx_nested_state_hdr *vmx_hdr =
+                 &env->nested_state->hdr.vmx;
  
- echo "TRACE_BACKENDS=$trace_backends" >> $config_host_mak
-diff --git a/scripts/create_config b/scripts/create_config
-index 00e86c8..6d8f08b 100755
---- a/scripts/create_config
-+++ b/scripts/create_config
-@@ -54,7 +54,7 @@ case $line in
-     done
-     echo "    NULL"
-     ;;
-- CONFIG_*='$(CONFIG_SOFTMMU)'|CONFIG_*=y) # configuration
-+ CONFIG_*=y) # configuration
-     name=${line%=*}
-     echo "#define $name 1"
-     ;;
++            env->nested_state = g_malloc0(max_nested_state_len);
++            env->nested_state->size = max_nested_state_len;
+             env->nested_state->format = KVM_STATE_NESTED_FORMAT_VMX;
+             vmx_hdr->vmxon_pa = -1ull;
+             vmx_hdr->vmcs12_pa = -1ull;
+@@ -3682,7 +3681,7 @@ static int kvm_put_nested_state(X86CPU *cpu)
+     CPUX86State *env = &cpu->env;
+     int max_nested_state_len = kvm_max_nested_state_length();
+ 
+-    if (max_nested_state_len <= 0) {
++    if (!env->nested_state) {
+         return 0;
+     }
+ 
+@@ -3696,7 +3695,7 @@ static int kvm_get_nested_state(X86CPU *cpu)
+     int max_nested_state_len = kvm_max_nested_state_length();
+     int ret;
+ 
+-    if (max_nested_state_len <= 0) {
++    if (!env->nested_state) {
+         return 0;
+     }
+ 
+diff --git a/target/i386/machine.c b/target/i386/machine.c
+index ac2d1d1..b114609 100644
+--- a/target/i386/machine.c
++++ b/target/i386/machine.c
+@@ -1035,31 +1035,13 @@ static const VMStateDescription vmstate_vmx_nested_state = {
+     }
+ };
+ 
+-static bool svm_nested_state_needed(void *opaque)
+-{
+-    struct kvm_nested_state *nested_state = opaque;
+-
+-    return (nested_state->format == KVM_STATE_NESTED_FORMAT_SVM);
+-}
+-
+-static const VMStateDescription vmstate_svm_nested_state = {
+-    .name = "cpu/kvm_nested_state/svm",
+-    .version_id = 1,
+-    .minimum_version_id = 1,
+-    .needed = svm_nested_state_needed,
+-    .fields = (VMStateField[]) {
+-        VMSTATE_END_OF_LIST()
+-    }
+-};
+-
+ static bool nested_state_needed(void *opaque)
+ {
+     X86CPU *cpu = opaque;
+     CPUX86State *env = &cpu->env;
+ 
+     return (env->nested_state &&
+-            (vmx_nested_state_needed(env->nested_state) ||
+-             svm_nested_state_needed(env->nested_state)));
++            vmx_nested_state_needed(env->nested_state));
+ }
+ 
+ static int nested_state_post_load(void *opaque, int version_id)
+@@ -1121,7 +1103,6 @@ static const VMStateDescription vmstate_kvm_nested_state = {
+     },
+     .subsections = (const VMStateDescription*[]) {
+         &vmstate_vmx_nested_state,
+-        &vmstate_svm_nested_state,
+         NULL
+     }
+ };
 -- 
 1.8.3.1
 
