@@ -2,81 +2,90 @@ Return-Path: <SRS0=FHOf=VI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57766C74A4B
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 11:42:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A027C74A35
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 11:47:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 24B1F208E4
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 11:42:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 27DCA216C4
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 11:47:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CEqSRnHZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24B1F208E4
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EseCbotW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 27DCA216C4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40706 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40718 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlXSl-0002rK-UW
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 07:42:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38262)
+	id 1hlXXp-0004Jb-Kw
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 07:47:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39536)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hlXS0-0002PS-AK
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 07:41:26 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1hlXWE-0003r4-7z
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 07:45:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hlXRw-0008JG-GY
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 07:41:22 -0400
-Received: from mail-ot1-x32b.google.com ([2607:f8b0:4864:20::32b]:36192)
+ (envelope-from <richard.henderson@linaro.org>) id 1hlXW7-0005ia-5m
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 07:45:42 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:37444)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hlXRu-0008Bf-Di
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 07:41:18 -0400
-Received: by mail-ot1-x32b.google.com with SMTP id r6so5517669oti.3
- for <qemu-devel@nongnu.org>; Thu, 11 Jul 2019 04:41:09 -0700 (PDT)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1hlXW5-0005WZ-4z
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 07:45:38 -0400
+Received: by mail-ot1-x343.google.com with SMTP id s20so5517472otp.4
+ for <qemu-devel@nongnu.org>; Thu, 11 Jul 2019 04:45:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=6/ihvuG+Zz2knpTKa3HCbLWQcxpbQDC96GCD7P4u6Y0=;
- b=CEqSRnHZMl5hYYkCLLgBtdldODBB3zkXuQ6Yh6KWtkBeLP7DZ0TS16tCkKh0zMkNx7
- Un4T4+EpPmz9AnnF+WxFm5fZiHXBFS9E6ibSyI6SEgxMljKWIfGPPw3DPV/9aPsKDPIY
- /Li4JFIA7eb6R4Vf8yVS2ni4/lpQFo0wslGfgWPy9lYAtRTo8AQ9Hq/OIydJW6wXe7Nu
- KcbX+M+KhIVkrsDkCXNn1+n0P2LYyEKkSA/uTh5XlaV2lJhlJIRspUliFdYfloMK381W
- kLRWc++ZLRTDVPT3EDd0ufPxNa5UA3xu5wCAafEquwuU0+DpIXZ1zbXrfEfPBas0pjRJ
- GuMA==
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=dJfFZP3bg4pM90L/c2Nl2J7Ii52GtDYmQSGRpgrzDTo=;
+ b=EseCbotWV1KZtWbQYSfU89bW4h+GNf498W57gjM6i8/NkOTH2bW6qgs/EH4RyWOF/N
+ 3XcjnLzsgnYARAv7cEBWpaElLTGNdQ8Jqe1QVl+GHZE6SBHyUWWq+zEyCJrkF0WzmNjC
+ Mwm8v3lWs5CuX9Yb5khEBUa7+zKd4/SQuRo5tlaR6OuAhZEd88EVguEVmmHgd+/4Wxz+
+ OI70Zs+lj7pRD/etinBC2KGsXEiHNDLJ2Vo3NIQtdjUC65k+RaxsMhK+tLgn+lYUX38f
+ YrUhf8wBV6/YDvdct2y5QYOae/9pYhJJ6az4Rkl6/XnmANDX44XvAvl7v9M3HGfZK2FG
+ xrJQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=6/ihvuG+Zz2knpTKa3HCbLWQcxpbQDC96GCD7P4u6Y0=;
- b=PAnRVpTjS9BTLo+7qJcxxTck+niFkHSQKtuZ6+Tz++/ViIqpX+WT4M6uKjwVlZdlEJ
- ee7Xirf4z3iYyRJxV7UiUu16Q/QcdrmLP58gfBbopXscFdgWhu7HM7GYJD9XN4fZ8JLB
- 2XElrJqOPGaNBJyEX88Q/9ZZ7Vt/OxeKD72TSd8V688FRrsDZMv0rMvCR5lbU9BotxUn
- 8tqFOtmsfnjD6WbReyzhe1Fm3MCQsMkNuW6Nx1NyjxaWZLZENvniyAzVyMgBwvt1jssl
- 6ZtwAGKtquy+52JSANpmED1F8B3qlbXL+PN0WRtH9bVMda9ZllqpZIhtPkZgqT3ND0d+
- Xo7g==
-X-Gm-Message-State: APjAAAVDfNysDF+FbtnSKghe3IuqjuseTyDoezUQLtPN4L5kHyMyAoqK
- RoeDF1Q0eBWUtdjIrjgIzy6FwHKZuyZ7d2SuFiAkFQ==
-X-Google-Smtp-Source: APXvYqy0Tb678D01LSWx+o+6Zw78Scs1IqJfTLAPAlqUyks2As5G9ZCR+avslPTzavnk/DdVd5BXCoKYr+hhEZpqOAY=
-X-Received: by 2002:a9d:4d81:: with SMTP id u1mr2847957otk.221.1562845268790; 
- Thu, 11 Jul 2019 04:41:08 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=dJfFZP3bg4pM90L/c2Nl2J7Ii52GtDYmQSGRpgrzDTo=;
+ b=Uem/ip2zdTJeR67ilKQCd00KHXpMM935uEqPKn3YCZA1YJqjCbedwN+H0Hioe+x1bJ
+ FcUUM/E9BXQdY2X0Ru2tSeniR9UqiPwWEZQ2Z6sJeBU7T+JqRGh/rc7KFqwxX9IMUoir
+ 5u4EMRLDHrQZNv13rnoGMEKYy3T0KdjuDd1M37a/kdsQG3kGtM/9uM1/RWC+Finfc+/B
+ /d4A6TH+Gm4fzSn2t75+GIbpmsmab53M0LfExclgsTqgwD01vEtBPRfPASO5fK2QloYQ
+ WzTUoBjgNRIFpRNABTZr9n3u6ohzAetNwi8lezmU+WygdEcdkXVbso3AnlVdcG6qkKHs
+ wiWQ==
+X-Gm-Message-State: APjAAAVLNYqLoXD/DL+DpOvs/j2BPTHDp082ha2XuIjdExMNAbBfUWya
+ pDjxIqRyRqPX/AO8DtsJPsZUcg==
+X-Google-Smtp-Source: APXvYqzE+S+fcH2dm8FZqyzJJ4C09yEM0ko5Sf4g8/gbZ0r6RGerCpx6hmZ+vhrohZe+HXXPcaH1tg==
+X-Received: by 2002:a9d:73d0:: with SMTP id m16mr3127942otk.190.1562845530078; 
+ Thu, 11 Jul 2019 04:45:30 -0700 (PDT)
+Received: from [192.168.43.94] ([208.54.86.238])
+ by smtp.gmail.com with ESMTPSA id u16sm1775144otk.46.2019.07.11.04.45.26
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Thu, 11 Jul 2019 04:45:29 -0700 (PDT)
+To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+References: <20190709184823.4135-1-richard.henderson@linaro.org>
+ <CAL1e-=j8J0WLUjhaOvecSU3VtRf5W+zP-Ydi_kZth4BYV_cXtg@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <d92c85b6-f7a4-71b8-9601-03d8975b5212@linaro.org>
+Date: Thu, 11 Jul 2019 13:45:18 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.1
 MIME-Version: 1.0
-References: <20190711104412.31233-1-quintela@redhat.com>
- <c2bfa537-8a5a-86a1-495c-a6c1d0f85dc5@redhat.com>
- <20190711113404.GK3971@work-vm>
-In-Reply-To: <20190711113404.GK3971@work-vm>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 11 Jul 2019 12:40:57 +0100
-Message-ID: <CAFEAcA_6-F_8OhX4vw7m1sCPrEZfeVjGP25=Cz7nGJOHSXy1kQ@mail.gmail.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <CAL1e-=j8J0WLUjhaOvecSU3VtRf5W+zP-Ydi_kZth4BYV_cXtg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::32b
-Subject: Re: [Qemu-devel] [PULL 00/19] Migration patches
+X-Received-From: 2607:f8b0:4864:20::343
+Subject: Re: [Qemu-devel] [PATCH] tcg/aarch64: Fix output of extract2 opcodes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,40 +97,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- kvm-devel <kvm@vger.kernel.org>, Juan Quintela <quintela@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Beata Michalska <beata.michalska@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 11 Jul 2019 at 12:34, Dr. David Alan Gilbert
-<dgilbert@redhat.com> wrote:
->
-> * Paolo Bonzini (pbonzini@redhat.com) wrote:
-> > On 11/07/19 12:43, Juan Quintela wrote:
-> > > The following changes since commit 6df2cdf44a82426f7a59dcb03f0dd2181ed7fdfa:
-> > >
-> > >   Update version for v4.1.0-rc0 release (2019-07-09 17:21:53 +0100)
-> > >
-> > > are available in the Git repository at:
-> > >
-> > >   https://github.com/juanquintela/qemu.git tags/migration-pull-request
-> > >
-> > > for you to fetch changes up to 0b47e79b3d04f500b6f3490628905ec5884133df:
-> > >
-> > >   migration: allow private destination ram with x-ignore-shared (2019-07-11 12:30:40 +0200)
-> >
-> > Aren't we in hard freeze already?
->
-> They were all sent and review-by long before the freeze.
-> This pull got stuck though; the original version of the pull was also
-> sent before the freeze but some stuff has got added.
+On 7/10/19 8:12 PM, Aleksandar Markovic wrote:
+> On Tue, Jul 9, 2019 at 8:56 PM Richard Henderson
+> <richard.henderson@linaro.org> wrote:
+>>
+>> The aarch64 argument ordering for the operands is big-endian,
+>> whereas the tcg argument ordering is little-endian.  Use REG0
+>> so that we honor the rZ constraints.
+> 
+> Hello, Richard.
+> 
+> If endian and rZ constraints are unrelated problems, then I think the
+> commit message
+> should be:
+> 
+> "This patch fixes two problem:
+> 
+> - endianness: the aarch64 argument ordering for the operands is
+> big-endian, whereas the tcg argument ordering is little-endian.
+> 
+> - rZ constrains: REG0() macro should be applied to the affected
+> arguments."
 
-This is the sort of detail which it's useful to include in
-the pull request cover letter...
+That's fair.
 
-thanks
--- PMM
+> One could argue that in this case the patch this should be actually two patches.
+> This is better because of bisectability. The number of line in the
+> patch doesn't matter.
+
+Well, nothing between the faulty commit (Fixes: 464c2969d5d) and the second of
+the two prospective patches is really bisectable.  For the given test case, all
+points in between will fail at runtime, even if each point compiles.
+
+Therefore I don't see the point in separating the two changes.
+
+> Would you be so kind to consider my opinion?
+
+Yes.  Thanks for the expanded opinion.
+
+I plan to change the commit message to:
+
+---
+tcg/aarch64: Fix output of extract2 opcodes
+
+This patch fixes two problems:
+(1) The inputs to the EXTR insn were reversed,
+(2) The input constraints use rZ, which means that we need to use
+    the REG0 macro in order to supply XZR for a constant 0 input.
+
+r-b, s-o-b, etc
+---
+
+Does that seem sufficient to you?
+
+
+r~
 
