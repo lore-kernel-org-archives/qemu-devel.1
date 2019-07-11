@@ -2,65 +2,61 @@ Return-Path: <SRS0=FHOf=VI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE493C73C66
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 17:36:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E430BC71142
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 17:37:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CB8722084B
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 17:36:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB8722084B
+	by mail.kernel.org (Postfix) with ESMTPS id 93A2F208E4
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 17:37:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 93A2F208E4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44078 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43946 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlczg-0005Uv-3j
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 13:36:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36485)
+	id 1hlcwy-0002J9-5x
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 13:33:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34816)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <eric.auger@redhat.com>) id 1hlczN-0004VB-Fn
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 13:36:16 -0400
+ (envelope-from <eric.auger@redhat.com>) id 1hlcv8-0004ha-Ok
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 13:31:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1hlczB-0008FY-1x
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 13:36:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46722)
+ (envelope-from <eric.auger@redhat.com>) id 1hlcv5-000465-Rj
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 13:31:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51000)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1hlcz0-00085W-3o; Thu, 11 Jul 2019 13:35:50 -0400
+ id 1hlcv1-0003z7-NB; Thu, 11 Jul 2019 13:31:43 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 59D6587638;
- Thu, 11 Jul 2019 17:35:45 +0000 (UTC)
-Received: from [10.36.116.46] (ovpn-116-46.ams2.redhat.com [10.36.116.46])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 81D7C5C207;
- Thu, 11 Jul 2019 17:35:35 +0000 (UTC)
-To: eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
- peter.maydell@linaro.org
-References: <20190711172845.31035-1-eric.auger@redhat.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <5b8bf522-b87c-f18e-1154-a3d0ae3741c7@redhat.com>
-Date: Thu, 11 Jul 2019 19:35:32 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
-MIME-Version: 1.0
+ by mx1.redhat.com (Postfix) with ESMTPS id 2745E85540;
+ Thu, 11 Jul 2019 17:31:41 +0000 (UTC)
+Received: from laptop.redhat.com (ovpn-116-46.ams2.redhat.com [10.36.116.46])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id CF04E5C1B4;
+ Thu, 11 Jul 2019 17:31:35 +0000 (UTC)
+From: Eric Auger <eric.auger@redhat.com>
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org,
+ qemu-arm@nongnu.org, peter.maydell@linaro.org
+Date: Thu, 11 Jul 2019 19:28:36 +0200
+Message-Id: <20190711172845.31035-21-eric.auger@redhat.com>
 In-Reply-To: <20190711172845.31035-1-eric.auger@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20190711172845.31035-1-eric.auger@redhat.com>
+MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.26]); Thu, 11 Jul 2019 17:35:45 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.28]); Thu, 11 Jul 2019 17:31:41 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [RFC v4 00/29] vSMMUv3/pSMMUv3 2 stage VFIO
- integration
+Subject: [Qemu-devel] [RFC v4 20/29] vfio/pci: Register handler for iommu
+ fault
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -79,166 +75,185 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
+We use the new extended IRQ VFIO_IRQ_TYPE_NESTED type and
+VFIO_IRQ_SUBTYPE_DMA_FAULT subtype to set/unset
+a notifier for physical DMA faults. The associated eventfd is
+triggered, in nested mode, whenever a fault is detected at IOMMU
+physical level.
 
-On 7/11/19 7:28 PM, Eric Auger wrote:
-> Up to now vSMMUv3 has not been integrated with VFIO. VFIO
-> integration requires to program the physical IOMMU consistently
-> with the guest mappings. However, as opposed to VTD, SMMUv3 has
-> no "Caching Mode" which allows easy trapping of guest mappings.
-> This means the vSMMUV3 cannot use the same VFIO integration as VTD.
-> 
-> However SMMUv3 has 2 translation stages. This was devised with
-> virtualization use case in mind where stage 1 is "owned" by the
-> guest whereas the host uses stage 2 for VM isolation.
-> 
-> This series sets up this nested translation stage. It only works
-> if there is one physical SMMUv3 used along with QEMU vSMMUv3 (in
-> other words, it does not work if there is a physical SMMUv2).
-> 
-> The series uses a new kernel user API [1] not yet upstream.
-> 
-> - We force the host to use stage 2 instead of stage 1, when we
->   detect a vSMMUV3 is behind a VFIO device. For a VFIO device
->   without any virtual IOMMU, we still use stage 1 as many existing
->   SMMUs expect this behavior.
-> - We use PCIPASIDOps to propage guest stage1 config changes on
->   STE (Stream Table Entry) changes.
-> - We implement a specific UNMAP notifier that conveys guest
->   IOTLB invalidations to the host
-> - We register MSI IOVA/GPA bindings to the host so that this latter
->   can build a nested stage translation
-> - As the legacy MAP notifier is not called anymore, we must make
->   sure stage 2 mappings are set. This is achieved through another
->   prereg memory listener.
-> - Physical SMMU stage 1 related faults are reported to the guest
->   via en eventfd mechanism and exposed trhough a dedicated VFIO-PCI
->   region. Then they are reinjected into the guest.
-> 
-> Best Regards
-> 
-> Eric
-> 
-> This series can be found at:
-> https://github.com/eauger/qemu/tree/v4.1.0-rc0-2stage-rfcv5
-Please forgive me. This is the v5 of the RFC. Resending it with the
-correct prefix ...
+The actual handler will be implemented in subsequent patches.
 
-Sorry for the spam :-(
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
-Eric
-> 
-> Kernel Dependencies:
-> [1] [PATCH v9 00/11] SMMUv3 Nested Stage Setup (VFIO part)
-> [2] [PATCH v9 00/14] SMMUv3 Nested Stage Setup (IOMMU part)
-> branch at: https://github.com/eauger/linux/tree/v5.3.0-rc0-2stage-v9
-> 
-> Includes fixes sent separately:
-> [3] [PATCH-for-4.2 v3 0/5] ARM SMMUv3: Fix spurious notification
->     errors and assert with vfio: in case of any comment on those
->     patches, please comment the other series.
-> 
-> History:
-> 
-> v4 -> v5:
-> - Use PCIPASIDOps for config update notifications
-> - removal of notification for MSI binding which is not needed
->   anymore
-> - Uses fixes in [3]
-> - Use a single fault region
-> - use the specific interrupt index
-> 
-> v3 -> v4:
-> - adapt to changes in uapi (asid cache invalidation)
-> - check VFIO_PCI_DMA_FAULT_IRQ_INDEX is supported at kernel level
->   before attempting to set signaling for it.
-> - sync on 5.2-rc1 kernel headers + Drew's patch that imports sve_context.h
-> - fix MSI binding for MSI (not MSIX)
-> - fix mingw compilation
-> 
-> v2 -> v3:
-> - rework fault handling
-> - MSI binding registration done in vfio-pci. MSI binding tear down called
->   on container cleanup path
-> - leaf parameter propagated
-> 
-> v1 -> v2:
-> - Fixed dual assignment (asid now correctly propagated on TLB invalidations)
-> - Integrated fault reporting
-> 
-> Andrew Jones (1):
->   update-linux-headers: Add sve_context.h to asm-arm64
-> 
-> Eric Auger (27):
->   memory: Remove unused memory_region_iommu_replay_all()
->   memory: Add IOMMU_ATTR_VFIO_NESTED IOMMU memory region attribute
->   hw/vfio/common: Assert in case of nested mode
->   hw/arm/smmuv3: Log a guest error when decoding an invalid STE
->   hw/arm/smmuv3: Remove spurious error messages on IOVA invalidations
->   update-linux-headers: Import iommu.h
->   header update against 5.3.0-rc0 and IOMMU/VFIO nested stage APIs
->   memory: Add IOMMU_ATTR_MSI_TRANSLATE IOMMU memory region attribute
->   memory: Introduce IOMMU Memory Region inject_faults API
->   memory: Add arch_id and leaf fields in IOTLBEntry
->   iommu: Introduce generic header
->   vfio: Force nested if iommu requires it
->   vfio: Introduce hostwin_from_range helper
->   vfio: Introduce helpers to DMA map/unmap a RAM section
->   vfio: Set up nested stage mappings
->   vfio: Pass stage 1 MSI bindings to the host
->   vfio: Helper to get IRQ info including capabilities
->   vfio/pci: Register handler for iommu fault
->   vfio/pci: Set up the DMA FAULT region
->   vfio/pci: Implement the DMA fault handler
->   hw/arm/smmuv3: Advertise MSI_TRANSLATE attribute
->   hw/arm/smmuv3: Store the PASID table GPA in the translation config
->   hw/arm/smmuv3: Fill the IOTLBEntry arch_id on NH_VA invalidation
->   hw/arm/smmuv3: Fill the IOTLBEntry leaf field on NH_VA invalidation
->   hw/arm/smmuv3: Pass stage 1 configurations to the host
->   hw/arm/smmuv3: Implement fault injection
->   vfio: Remove VFIO/SMMUv3 assert
-> 
-> Liu Yi L (1):
->   pci: introduce PCIPASIDOps to PCIDevice
-> 
->  hw/arm/smmuv3-internal.h                     |   1 +
->  hw/arm/smmuv3.c                              | 195 +++++--
->  hw/arm/trace-events                          |   3 +-
->  hw/pci/pci.c                                 |  34 ++
->  hw/vfio/common.c                             | 517 +++++++++++++++----
->  hw/vfio/pci.c                                | 267 +++++++++-
->  hw/vfio/pci.h                                |   9 +
->  hw/vfio/trace-events                         |   9 +-
->  include/exec/memory.h                        |  59 ++-
->  include/hw/arm/smmu-common.h                 |   1 +
->  include/hw/iommu/iommu.h                     |  28 +
->  include/hw/pci/pci.h                         |  11 +
->  include/hw/vfio/vfio-common.h                |  16 +
->  include/standard-headers/asm-x86/bootparam.h |   2 +
->  include/standard-headers/linux/virtio_ids.h  |   1 -
->  include/standard-headers/linux/virtio_pmem.h |  34 --
->  linux-headers/asm-arm/unistd-common.h        |   1 +
->  linux-headers/asm-arm64/kvm.h                |   7 +
->  linux-headers/asm-generic/unistd.h           |   4 +-
->  linux-headers/asm-mips/unistd_n32.h          |   1 +
->  linux-headers/asm-mips/unistd_n64.h          |   1 +
->  linux-headers/asm-mips/unistd_o32.h          |   1 +
->  linux-headers/asm-powerpc/unistd_32.h        |   1 +
->  linux-headers/asm-powerpc/unistd_64.h        |   1 +
->  linux-headers/asm-s390/unistd_32.h           |   1 +
->  linux-headers/asm-s390/unistd_64.h           |   1 +
->  linux-headers/asm-x86/kvm.h                  |   6 +-
->  linux-headers/asm-x86/unistd_32.h            |   1 +
->  linux-headers/asm-x86/unistd_64.h            |   1 +
->  linux-headers/asm-x86/unistd_x32.h           |   1 +
->  linux-headers/linux/iommu.h                  | 316 ++++++++++++
->  linux-headers/linux/psp-sev.h                |   5 +-
->  linux-headers/linux/vfio.h                   | 109 +++-
->  memory.c                                     |  19 +-
->  scripts/update-linux-headers.sh              |   5 +-
->  35 files changed, 1462 insertions(+), 207 deletions(-)
->  create mode 100644 include/hw/iommu/iommu.h
->  delete mode 100644 include/standard-headers/linux/virtio_pmem.h
->  create mode 100644 linux-headers/linux/iommu.h
-> 
+---
+
+v4 -> v5:
+- index_to_str now returns the index name, ie. DMA_FAULT
+- use the extended IRQ
+
+v3 -> v4:
+- check VFIO_PCI_DMA_FAULT_IRQ_INDEX is supported at kernel level
+  before attempting to set signaling for it.
+---
+ hw/vfio/pci.c | 81 ++++++++++++++++++++++++++++++++++++++++++++++++++-
+ hw/vfio/pci.h |  7 +++++
+ 2 files changed, 87 insertions(+), 1 deletion(-)
+
+diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+index 45e007575e..19702cdbbf 100644
+--- a/hw/vfio/pci.c
++++ b/hw/vfio/pci.c
+@@ -2761,6 +2761,76 @@ static PCIPASIDOps vfio_pci_pasid_ops =3D {
+     .set_pasid_table =3D vfio_iommu_set_pasid_table,
+ };
+=20
++static void vfio_dma_fault_notifier_handler(void *opaque)
++{
++    VFIOPCIExtIRQ *ext_irq =3D opaque;
++
++    if (!event_notifier_test_and_clear(&ext_irq->notifier)) {
++        return;
++    }
++}
++
++static int vfio_register_ext_irq_handler(VFIOPCIDevice *vdev,
++                                         uint32_t type, uint32_t subtype=
+,
++                                         IOHandler *handler)
++{
++    int32_t fd, ext_irq_index, index;
++    struct vfio_irq_info *irq_info;
++    Error *err =3D NULL;
++    EventNotifier *n;
++    int ret;
++
++    ret =3D vfio_get_dev_irq_info(&vdev->vbasedev, type, subtype, &irq_i=
+nfo);
++    if (ret) {
++        return ret;
++    }
++    index =3D irq_info->index;
++    ext_irq_index =3D irq_info->index - VFIO_PCI_NUM_IRQS;
++    g_free(irq_info);
++
++    vdev->ext_irqs[ext_irq_index].vdev =3D vdev;
++    vdev->ext_irqs[ext_irq_index].index =3D index;
++    n =3D &vdev->ext_irqs[ext_irq_index].notifier;
++
++    ret =3D event_notifier_init(n, 0);
++    if (ret) {
++        error_report("vfio: Unable to init event notifier for ext irq %d=
+(%d)",
++                     ext_irq_index, ret);
++        return ret;
++    }
++
++    fd =3D event_notifier_get_fd(n);
++    qemu_set_fd_handler(fd, vfio_dma_fault_notifier_handler, NULL,
++                        &vdev->ext_irqs[ext_irq_index]);
++
++    ret =3D vfio_set_irq_signaling(&vdev->vbasedev, index, 0,
++                                 VFIO_IRQ_SET_ACTION_TRIGGER, fd, &err);
++    if (ret) {
++        error_reportf_err(err, VFIO_MSG_PREFIX, vdev->vbasedev.name);
++        qemu_set_fd_handler(fd, NULL, NULL, vdev);
++        event_notifier_cleanup(n);
++    }
++    return ret;
++}
++
++static void vfio_unregister_ext_irq_notifiers(VFIOPCIDevice *vdev)
++{
++    VFIODevice *vbasedev =3D &vdev->vbasedev;
++    Error *err =3D NULL;
++    int i;
++
++    for (i =3D 0; i < vbasedev->num_irqs - VFIO_PCI_NUM_IRQS; i++) {
++        if (vfio_set_irq_signaling(vbasedev, i + VFIO_PCI_NUM_IRQS , 0,
++                                   VFIO_IRQ_SET_ACTION_TRIGGER, -1, &err=
+)) {
++            error_reportf_err(err, VFIO_MSG_PREFIX, vdev->vbasedev.name)=
+;
++        }
++        qemu_set_fd_handler(event_notifier_get_fd(&vdev->ext_irqs[i].not=
+ifier),
++                            NULL, NULL, vdev);
++        event_notifier_cleanup(&vdev->ext_irqs[i].notifier);
++    }
++    g_free(vdev->ext_irqs);
++}
++
+ static void vfio_realize(PCIDevice *pdev, Error **errp)
+ {
+     VFIOPCIDevice *vdev =3D PCI_VFIO(pdev);
+@@ -2771,7 +2841,7 @@ static void vfio_realize(PCIDevice *pdev, Error **e=
+rrp)
+     ssize_t len;
+     struct stat st;
+     int groupid;
+-    int i, ret;
++    int i, ret, nb_ext_irqs;
+     bool is_mdev;
+=20
+     if (!vdev->vbasedev.sysfsdev) {
+@@ -2859,6 +2929,11 @@ static void vfio_realize(PCIDevice *pdev, Error **=
+errp)
+         goto error;
+     }
+=20
++    nb_ext_irqs =3D vdev->vbasedev.num_irqs - VFIO_PCI_NUM_IRQS;
++    if (nb_ext_irqs > 0) {
++        vdev->ext_irqs =3D g_new0(VFIOPCIExtIRQ, nb_ext_irqs);
++    }
++
+     vfio_populate_device(vdev, &err);
+     if (err) {
+         error_propagate(errp, err);
+@@ -3060,6 +3135,9 @@ static void vfio_realize(PCIDevice *pdev, Error **e=
+rrp)
+=20
+     vfio_register_err_notifier(vdev);
+     vfio_register_req_notifier(vdev);
++    vfio_register_ext_irq_handler(vdev, VFIO_IRQ_TYPE_NESTED,
++                                  VFIO_IRQ_SUBTYPE_DMA_FAULT,
++                                  vfio_dma_fault_notifier_handler);
+     vfio_setup_resetfn_quirk(vdev);
+=20
+     pci_setup_pasid_ops(pdev, &vfio_pci_pasid_ops);
+@@ -3100,6 +3178,7 @@ static void vfio_exitfn(PCIDevice *pdev)
+=20
+     vfio_unregister_req_notifier(vdev);
+     vfio_unregister_err_notifier(vdev);
++    vfio_unregister_ext_irq_notifiers(vdev);
+     pci_device_set_intx_routing_notifier(&vdev->pdev, NULL);
+     vfio_disable_interrupts(vdev);
+     if (vdev->intx.mmap_timer) {
+diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
+index 834a90d646..893d074375 100644
+--- a/hw/vfio/pci.h
++++ b/hw/vfio/pci.h
+@@ -113,6 +113,12 @@ typedef struct VFIOMSIXInfo {
+     unsigned long *pending;
+ } VFIOMSIXInfo;
+=20
++typedef struct VFIOPCIExtIRQ {
++    struct VFIOPCIDevice *vdev;
++    EventNotifier notifier;
++    uint32_t index;
++} VFIOPCIExtIRQ;
++
+ typedef struct VFIOPCIDevice {
+     PCIDevice pdev;
+     VFIODevice vbasedev;
+@@ -134,6 +140,7 @@ typedef struct VFIOPCIDevice {
+     PCIHostDeviceAddress host;
+     EventNotifier err_notifier;
+     EventNotifier req_notifier;
++    VFIOPCIExtIRQ *ext_irqs;
+     int (*resetfn)(struct VFIOPCIDevice *);
+     uint32_t vendor_id;
+     uint32_t device_id;
+--=20
+2.20.1
+
 
