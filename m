@@ -2,82 +2,63 @@ Return-Path: <SRS0=FHOf=VI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62FD0C74A4B
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 08:14:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09FBCC74A4B
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 08:31:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 333CA20872
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 08:14:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 333CA20872
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id D1BFA21019
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 08:31:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1BFA21019
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39362 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39432 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlUDn-0004Jo-5H
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 04:14:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50483)
+	id 1hlUTw-0000K6-Bl
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 04:31:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56830)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <yi.l.liu@intel.com>) id 1hlUDI-0003uf-F3
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 04:14:01 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1hlUTL-0008Io-0o
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 04:30:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yi.l.liu@intel.com>) id 1hlUDH-0004Z6-6P
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 04:14:00 -0400
-Received: from mga14.intel.com ([192.55.52.115]:21236)
+ (envelope-from <dgilbert@redhat.com>) id 1hlUTJ-0007rS-Iz
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 04:30:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48672)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1hlUDG-0004Vl-Sl
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 04:13:59 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
- by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 11 Jul 2019 01:13:55 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.63,476,1557212400"; d="scan'208";a="364742387"
-Received: from fmsmsx107.amr.corp.intel.com ([10.18.124.205])
- by fmsmga005.fm.intel.com with ESMTP; 11 Jul 2019 01:13:55 -0700
-Received: from fmsmsx111.amr.corp.intel.com (10.18.116.5) by
- fmsmsx107.amr.corp.intel.com (10.18.124.205) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Thu, 11 Jul 2019 01:13:55 -0700
-Received: from shsmsx101.ccr.corp.intel.com (10.239.4.153) by
- fmsmsx111.amr.corp.intel.com (10.18.116.5) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Thu, 11 Jul 2019 01:13:54 -0700
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.110]) by
- SHSMSX101.ccr.corp.intel.com ([169.254.1.134]) with mapi id 14.03.0439.000;
- Thu, 11 Jul 2019 16:13:51 +0800
-From: "Liu, Yi L" <yi.l.liu@intel.com>
-To: Peter Xu <zhexu@redhat.com>
-Thread-Topic: [RFC v1 11/18] intel_iommu: create VTDAddressSpace per BDF+PASID
-Thread-Index: AQHVM+yrBZlmLzzpm0uvJxEFyEF+iabBVBeAgAO6QOA=
-Date: Thu, 11 Jul 2019 08:13:51 +0000
-Message-ID: <A2975661238FB949B60364EF0F2C257439F2C862@SHSMSX104.ccr.corp.intel.com>
-References: <1562324511-2910-1-git-send-email-yi.l.liu@intel.com>
- <1562324511-2910-12-git-send-email-yi.l.liu@intel.com>
- <20190709063915.GG5178@xz-x1>
-In-Reply-To: <20190709063915.GG5178@xz-x1>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.0.600.7
-dlp-reaction: no-action
-x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiZjNhMzM2YzAtZTU3OS00NTExLWEzZGQtOGQyOWNhMDBkM2UxIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiS2IzaElCU2w1UTdZa2djV3lVZUd2QnBITEJUVVlGUVdab2xuQ3p5d3M2MTNKbGZuK2JvZ2txdTNQbHhrVk1lbyJ9
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hlUTJ-0007p4-7h
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 04:30:33 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id AEAC6C057E9F;
+ Thu, 11 Jul 2019 08:30:31 +0000 (UTC)
+Received: from work-vm (ovpn-117-165.ams2.redhat.com [10.36.117.165])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 82FEE1001DCC;
+ Thu, 11 Jul 2019 08:30:23 +0000 (UTC)
+Date: Thu, 11 Jul 2019 09:30:20 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Wolfgang Bumiller <w.bumiller@proxmox.com>
+Message-ID: <20190711083020.GB3971@work-vm>
+References: <20190710141440.27635-1-stefanha@redhat.com>
+ <20190711071843.GA9211@olga.proxmox.com>
 MIME-Version: 1.0
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 192.55.52.115
-Subject: Re: [Qemu-devel] [RFC v1 11/18] intel_iommu: create VTDAddressSpace
- per BDF+PASID
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190711071843.GA9211@olga.proxmox.com>
+User-Agent: Mutt/1.12.0 (2019-05-25)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.32]); Thu, 11 Jul 2019 08:30:32 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH] virtio-balloon: fix QEMU 4.0 config size
+ migration incompatibility
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,97 +70,156 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "tianyu.lan@intel.com" <tianyu.lan@intel.com>, "Tian,
- Kevin" <kevin.tian@intel.com>, Jacob Pan <jacob.jun.pan@linux.intel.com>,
- Yi Sun <yi.y.sun@linux.intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "mst@redhat.com" <mst@redhat.com>, "Tian, Jun J" <jun.j.tian@intel.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "eric.auger@redhat.com" <eric.auger@redhat.com>,
- "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>, "Sun, Yi Y" <yi.y.sun@intel.com>,
- "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+ Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-PiBGcm9tOiBrdm0tb3duZXJAdmdlci5rZXJuZWwub3JnIFttYWlsdG86a3ZtLW93bmVyQHZnZXIu
-a2VybmVsLm9yZ10gT24gQmVoYWxmDQo+IE9mIFBldGVyIFh1DQo+IFNlbnQ6IFR1ZXNkYXksIEp1
-bHkgOSwgMjAxOSAyOjM5IFBNDQo+IFRvOiBMaXUsIFlpIEwgPHlpLmwubGl1QGludGVsLmNvbT4N
-Cj4gU3ViamVjdDogUmU6IFtSRkMgdjEgMTEvMThdIGludGVsX2lvbW11OiBjcmVhdGUgVlREQWRk
-cmVzc1NwYWNlIHBlciBCREYrUEFTSUQNCj4gDQo+IE9uIEZyaSwgSnVsIDA1LCAyMDE5IGF0IDA3
-OjAxOjQ0UE0gKzA4MDAsIExpdSBZaSBMIHdyb3RlOg0KPiANCj4gWy4uLl0NCj4gDQo+ID4gKy8q
-Kg0KPiA+ICsgKiBUaGlzIGZ1bmN0aW9uIGZpbmRzIG9yIGFkZHMgYSBWVERBZGRyZXNzU3BhY2Ug
-Zm9yIGEgZGV2aWNlIHdoZW4NCj4gPiArICogaXQgaXMgYm91bmQgdG8gYSBwYXNpZA0KPiA+ICsg
-Ki8NCj4gPiArc3RhdGljIFZUREFkZHJlc3NTcGFjZSAqdnRkX2FkZF9maW5kX3Bhc2lkX2FzKElu
-dGVsSU9NTVVTdGF0ZSAqcywNCj4gPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgIFBDSUJ1cyAqYnVzLA0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgaW50IGRldmZuLA0KPiA+ICsgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgdWludDMyX3QgcGFzaWQsDQo+ID4gKyAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBib29sIGFsbG9jYXRlKQ0KPiA+
-ICt7DQo+ID4gKyAgICBjaGFyIGtleVszMl07DQo+ID4gKyAgICBjaGFyICpuZXdfa2V5Ow0KPiA+
-ICsgICAgVlREQWRkcmVzc1NwYWNlICp2dGRfcGFzaWRfYXM7DQo+ID4gKyAgICB1aW50MTZfdCBz
-aWQ7DQo+ID4gKw0KPiA+ICsgICAgc2lkID0gdnRkX21ha2Vfc291cmNlX2lkKHBjaV9idXNfbnVt
-KGJ1cyksIGRldmZuKTsNCj4gPiArICAgIHZ0ZF9nZXRfcGFzaWRfa2V5KCZrZXlbMF0sIDMyLCBw
-YXNpZCwgc2lkKTsNCj4gPiArICAgIHZ0ZF9wYXNpZF9hcyA9IGdfaGFzaF90YWJsZV9sb29rdXAo
-cy0+dnRkX3Bhc2lkX2FzLCAma2V5WzBdKTsNCj4gPiArDQo+ID4gKyAgICBpZiAoIXZ0ZF9wYXNp
-ZF9hcyAmJiBhbGxvY2F0ZSkgew0KPiA+ICsgICAgICAgIG5ld19rZXkgPSBnX21hbGxvYygzMik7
-DQo+ID4gKyAgICAgICAgdnRkX2dldF9wYXNpZF9rZXkoJm5ld19rZXlbMF0sIDMyLCBwYXNpZCwg
-c2lkKTsNCj4gPiArICAgICAgICAvKg0KPiA+ICsgICAgICAgICAqIEluaXRpYXRlIHRoZSB2dGRf
-cGFzaWRfYXMgc3RydWN0dXJlLg0KPiA+ICsgICAgICAgICAqDQo+ID4gKyAgICAgICAgICogVGhp
-cyBzdHJ1Y3R1cmUgaGVyZSBpcyB1c2VkIHRvIHRyYWNrIHRoZSBndWVzdCBwYXNpZA0KPiA+ICsg
-ICAgICAgICAqIGJpbmRpbmcgYW5kIGFsc28gc2VydmVzIGFzIHBhc2lkLWNhY2hlIG1hbmdlbWVu
-dCBlbnRyeS4NCj4gPiArICAgICAgICAgKg0KPiA+ICsgICAgICAgICAqIFRPRE86IGluIGZ1dHVy
-ZSwgaWYgd2FudHMgdG8gc3VwcG9ydCB0aGUgU1ZBLWF3YXJlIERNQQ0KPiA+ICsgICAgICAgICAq
-ICAgICAgIGVtdWxhdGlvbiwgdGhlIHZ0ZF9wYXNpZF9hcyBzaG91bGQgYmUgZnVsbHkgaW5pdGlh
-bGl6ZWQuDQo+ID4gKyAgICAgICAgICogICAgICAgZS5nLiB0aGUgYWRkcmVzc19zcGFjZSBhbmQg
-bWVtb3J5IHJlZ2lvbiBmaWVsZHMuDQo+ID4gKyAgICAgICAgICovDQo+IA0KPiBJJ20gbm90IHZl
-cnkgc3VyZSBhYm91dCB0aGlzIHBhcnQuICBJTUhPIGFsbCB0aG9zZSBtZW1vcnkgcmVnaW9ucyBh
-cmUNCj4gdXNlZCB0byBpbmxheSB0aGUgd2hvbGUgSU9NTVUgaWRlYSBpbnRvIFFFTVUncyBtZW1v
-cnkgQVBJIGZyYW1ld29yay4NCj4gTm93IGV2ZW4gd2l0aG91dCB0aGUgd2hvbGUgUEFTSUQgc3Vw
-cG9ydCB3ZSd2ZSBhbHJlYWR5IGhhdmUgYSB3b3JrYWJsZQ0KPiB2dGRfaW9tbXVfdHJhbnNsYXRl
-KCkgdGhhdCB3aWxsIGludGVyY2VwdCBkZXZpY2UgRE1BIG9wZXJhdGlvbnMgYW5kIHdlDQo+IGNh
-biB0cnkgdG8gdHJhbnNsYXRlIHRoZSBJT1ZBIHRvIGFueXRoaW5nIHdlIHdhbnQuICBOb3cgdGhl
-IGlvbW11X2lkeA0KPiBwYXJhbWV0ZXIgb2YgdnRkX2lvbW11X3RyYW5zbGF0ZSgpIGlzIG5ldmVy
-IHVzZWQgKEknZCBzYXkgdW50aWwgbm93IEkNCj4gc3RpbGwgZG9uJ3Qgc3VyZSBvbiB3aGV0aGVy
-IHRoZSAiaW9tbXVfaWR4IiBpZGVhIGlzIHRoZSBiZXN0IHdlIGNhbg0KPiBoYXZlLi4uIEkndmUg
-dHJpZWQgdG8gZGViYXRlIG9uIHRoYXQgYnV0Li4uIGFueXdheSBJIGFzc3VtZSBmb3IgSW50ZWwN
-Cj4gd2UgY2FuIHRoaW5rIGl0IGFzIHRoZSAicGFzaWQiIGluZm9ybWF0aW9uIG9yIGF0IGxlYXN0
-IGNvbnRhaW5zIGl0KSwNCj4gaG93ZXZlciBpbiB0aGUgZnVydGhlciB3ZSBjYW4gaGF2ZSB0aGF0
-IFBBU0lEL2lvbW11X2lkeC93aGF0ZXZlcg0KPiBwYXNzZWQgaW50byB0aGlzIHRyYW5zbGF0ZSgp
-IGZ1bmN0aW9uIHRvbywgdGhlbiB3ZSBjYW4gd2FsayB0aGUgMXN0DQo+IGxldmVsIHBhZ2UgdGFi
-bGUgdGhlcmUgaWYgd2UgZm91bmQgdGhhdCB0aGlzIGRldmljZSBoYWQgZW5hYmxlZCB0aGUNCj4g
-MXN0IGxldmVsIG1hcHBpbmcgKG9yIGV2ZW4gbmVzdGVkKS4gIEkgZG9uJ3Qgc2VlIHdoYXQgZWxz
-ZSB3ZSBuZWVkIHRvDQo+IGRvIHRvIHBsYXkgd2l0aCBleHRyYSBtZW1vcnkgcmVnaW9ucy4NCg0K
-Tm90IHN1cmUgaWYgcGFzc2luZyBhIFBBU0lEIHRvIHRyYW5zbGF0ZSgpIGZ1bmN0aW9uIGlzIGdv
-b2Qgc2luY2Ugd2UgbWF5DQpuZWVkIHRvIHBhc3MgUEFTSUQgcGFyYW1ldGVyIHRocm91Z2ggYWxs
-IHRoZSBRRU1VIEFkZHJlc3NTcGFjZSByZWFkLw0Kd3JpdGUgc3RhY2suDQoNCkFjdHVhbGx5LCBJ
-IGRpZCBzb21lIGV4cGVyaW1lbnQgd2l0aCBhIHNpbXBsZSBlbXVsYXRlZCBTVkEtY2FwYWJsZSBk
-ZXZpY2UNCnNvbWUgdGltZSBhZ28gKG5vIGlvbW11X2lkeCBhdCB0aGF0IHRpbWUpLiBQZXIgbXkg
-dW5kZXJzdGFuZGluZywgYQ0KU1ZBIGNhcGFibGUgZGV2aWNlIG1vZGVsIG5lZWRzIHRvIGZldGNo
-IGFuIEFkZHJlc3NTcGFjZSB3aXRoIGEgUEFTSUQNCmFuZCB0aGVuIGNhbGwgZG1hX21lbW9yeV9y
-dygpIHdoaWNoIHdpbGwgaW52b2tlIHRoZSBRRU1VIEFkZHJlc3NTcGFjZQ0KcmVhZC93cml0ZSBz
-dGFjaywgdGhlbiBmaW5hbGx5IGNhbGwgaW50byB2dGRfaW9tbXVfdHJhbnNsYXRlKCksIGFuZCBp
-bg0KdHJhbnNsYXRlKCkgd2UgY2FuIGdldCB0aGUgVlREQWRkcmVzc1NwYWNlIGluc3RhbmNlIGFu
-ZCBpdCBoYXMgYSBmbGFnDQoicGFzaWRfYWxsb2NhdGVkIi4gSWYgaXQgaXMgdHJ1ZSwgdHJhbnNs
-YXRlIHRoZSBpbnB1dCBhZGRyZXNzIHdpdGggcGFnZSB0YWJsZQ0KYmVoaW5kIHRoZSBQQVNJRCBm
-cm9tIHRoZSAicGFzaWQiIGZpZWxkIGluIFZUREFkZHJlc3NTcGFjZS4gSSBndWVzcyB0aGlzDQpt
-YXkgaW50cm9kdWNlIHRoZSBsZWFzdCBjaGFuZ2VzIHRvIGV4aXN0aW5nIGxvZ2ljLg0KDQo+IA0K
-PiBDb25jbHVzaW9uOiBJIGZlZWwgbGlrZSBTVkEgY2FuIHVzZSBpdHMgb3duIHN0cnVjdHVyZSBo
-ZXJlIGluc3RlYWQgb2YNCj4gcmV1c2luZyBWVERBZGRyZXNzU3BhY2UsIGJlY2F1c2UgSSB0aGlu
-ayB0aG9zZSBtZW1vcnkgcmVnaW9ucyBjYW4NCj4gcHJvYmFibHkgYmUgdXNlbGVzcy4gIEV2ZW4g
-aXQgd2lsbCwgd2UgY2FuIHJlZmFjdG9yIHRoZSBjb2RlIGxhdGVyLA0KPiBidXQgSSByZWFsbHkg
-ZG91YnQgaXQuLi4NCg0KSG1tbSwgcmlnaHQsIGV2ZW4gbmVjZXNzYXJ5LCBTVkEgd2lsbCByZXF1
-aXJlIGxlc3MgbWVtb3J5IHJlZ2lvbnMuIEkgY2FuDQpzd2l0Y2ggdG8gdXNlIGEgc3RydWN0dXJl
-IG5hbWVkIFZURFBBU0lEQWRkcmVzc1NwYWNlIG9yIGFsaWtlLg0KDQpUaGFua3MsDQpZaSBMaXUN
-Cg0KPiA+ICsgICAgICAgIHZ0ZF9wYXNpZF9hcyA9IGdfbWFsbG9jMChzaXplb2YoVlREQWRkcmVz
-c1NwYWNlKSk7DQo+ID4gKyAgICAgICAgdnRkX3Bhc2lkX2FzLT5pb21tdV9zdGF0ZSA9IHM7DQo+
-ID4gKyAgICAgICAgdnRkX3Bhc2lkX2FzLT5idXMgPSBidXM7DQo+ID4gKyAgICAgICAgdnRkX3Bh
-c2lkX2FzLT5kZXZmbiA9IGRldmZuOw0KPiA+ICsgICAgICAgIHZ0ZF9wYXNpZF9hcy0+Y29udGV4
-dF9jYWNoZV9lbnRyeS5jb250ZXh0X2NhY2hlX2dlbiA9IDA7DQo+ID4gKyAgICAgICAgdnRkX3Bh
-c2lkX2FzLT5wYXNpZCA9IHBhc2lkOw0KPiA+ICsgICAgICAgIHZ0ZF9wYXNpZF9hcy0+cGFzaWRf
-YWxsb2NhdGVkID0gdHJ1ZTsNCj4gPiArICAgICAgICB2dGRfcGFzaWRfYXMtPnBhc2lkX2NhY2hl
-X2VudHJ5LnBhc2lkX2NhY2hlX2dlbiA9IDA7DQo+ID4gKyAgICAgICAgZ19oYXNoX3RhYmxlX2lu
-c2VydChzLT52dGRfcGFzaWRfYXMsIG5ld19rZXksIHZ0ZF9wYXNpZF9hcyk7DQo+ID4gKyAgICB9
-DQo+ID4gKyAgICByZXR1cm4gdnRkX3Bhc2lkX2FzOw0KPiA+ICt9DQo+IA0KPiBSZWdhcmRzLA0K
-PiANCj4gLS0NCj4gUGV0ZXIgWHUNCg==
+* Wolfgang Bumiller (w.bumiller@proxmox.com) wrote:
+> On Wed, Jul 10, 2019 at 04:14:40PM +0200, Stefan Hajnoczi wrote:
+> > The virtio-balloon config size changed in QEMU 4.0 even for existing
+> > machine types.  Migration from QEMU 3.1 to 4.0 can fail in some
+> > circumstances with the following error:
+> > 
+> >   qemu-system-x86_64: get_pci_config_device: Bad config data: i=0x10 read: a1 device: 1 cmask: ff wmask: c0 w1cmask:0
+> > 
+> > This happens because the virtio-balloon config size affects the VIRTIO
+> > Legacy I/O Memory PCI BAR size.
+> > 
+> > Introduce a qdev property called "qemu-4-0-config-size" and enable it
+> > only for the QEMU 4.0 machine types.  This way <4.0 machine types use
+> > the old size, 4.0 uses the larger size, and >4.0 machine types use the
+> > appropriate size depending on enabled virtio-balloon features.
+> > 
+> > Live migration to and from old QEMUs to QEMU 4.1 works again as long as
+> > a versioned machine type is specified (do not use just "pc"!).
+> > 
+> > Originally-by: Wolfgang Bumiller <w.bumiller@proxmox.com>
+> > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> 
+> Tested-by: Wolfgang Bumiller <w.bumiller@proxmox.com>
+> 
+> Works with my otherwise failing VM from 3.0.1 -> patched-4.0.
+> Somehow I missed the `DEFINE_PROP_*` macros, sorry, and thanks for
+> fixing this up.
+
+Thanks again for spotting it!
+
+Dave
+
+> > ---
+> >  include/hw/virtio/virtio-balloon.h |  2 ++
+> >  hw/core/machine.c                  |  2 ++
+> >  hw/virtio/virtio-balloon.c         | 28 +++++++++++++++++++++++++---
+> >  3 files changed, 29 insertions(+), 3 deletions(-)
+> > 
+> > diff --git a/include/hw/virtio/virtio-balloon.h b/include/hw/virtio/virtio-balloon.h
+> > index 1afafb12f6..5a99293a45 100644
+> > --- a/include/hw/virtio/virtio-balloon.h
+> > +++ b/include/hw/virtio/virtio-balloon.h
+> > @@ -71,6 +71,8 @@ typedef struct VirtIOBalloon {
+> >      int64_t stats_poll_interval;
+> >      uint32_t host_features;
+> >      PartiallyBalloonedPage *pbp;
+> > +
+> > +    bool qemu_4_0_config_size;
+> >  } VirtIOBalloon;
+> >  
+> >  #endif
+> > diff --git a/hw/core/machine.c b/hw/core/machine.c
+> > index 2be19ec0cd..c4ead16010 100644
+> > --- a/hw/core/machine.c
+> > +++ b/hw/core/machine.c
+> > @@ -34,6 +34,7 @@ GlobalProperty hw_compat_4_0[] = {
+> >      { "virtio-vga",     "edid", "false" },
+> >      { "virtio-gpu-pci", "edid", "false" },
+> >      { "virtio-device", "use-started", "false" },
+> > +    { "virtio-balloon-device", "qemu-4-0-config-size", "true" },
+> >  };
+> >  const size_t hw_compat_4_0_len = G_N_ELEMENTS(hw_compat_4_0);
+> >  
+> > @@ -49,6 +50,7 @@ GlobalProperty hw_compat_3_1[] = {
+> >      { "usb-tablet", "serial", "42" },
+> >      { "virtio-blk-device", "discard", "false" },
+> >      { "virtio-blk-device", "write-zeroes", "false" },
+> > +    { "virtio-balloon-device", "qemu-4-0-config-size", "false" },
+> >  };
+> >  const size_t hw_compat_3_1_len = G_N_ELEMENTS(hw_compat_3_1);
+> >  
+> > diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
+> > index 11fad86d64..e85d1c0d5c 100644
+> > --- a/hw/virtio/virtio-balloon.c
+> > +++ b/hw/virtio/virtio-balloon.c
+> > @@ -615,6 +615,22 @@ virtio_balloon_free_page_report_notify(NotifierWithReturn *n, void *data)
+> >      return 0;
+> >  }
+> >  
+> > +static size_t virtio_balloon_config_size(VirtIOBalloon *s)
+> > +{
+> > +    uint64_t features = s->host_features;
+> > +
+> > +    if (s->qemu_4_0_config_size) {
+> > +        return sizeof(struct virtio_balloon_config);
+> > +    }
+> > +    if (virtio_has_feature(features, VIRTIO_BALLOON_F_PAGE_POISON)) {
+> > +        return sizeof(struct virtio_balloon_config);
+> > +    }
+> > +    if (virtio_has_feature(features, VIRTIO_BALLOON_F_FREE_PAGE_HINT)) {
+> > +        return offsetof(struct virtio_balloon_config, poison_val);
+> > +    }
+> > +    return offsetof(struct virtio_balloon_config, free_page_report_cmd_id);
+> > +}
+> > +
+> >  static void virtio_balloon_get_config(VirtIODevice *vdev, uint8_t *config_data)
+> >  {
+> >      VirtIOBalloon *dev = VIRTIO_BALLOON(vdev);
+> > @@ -635,7 +651,7 @@ static void virtio_balloon_get_config(VirtIODevice *vdev, uint8_t *config_data)
+> >      }
+> >  
+> >      trace_virtio_balloon_get_config(config.num_pages, config.actual);
+> > -    memcpy(config_data, &config, sizeof(struct virtio_balloon_config));
+> > +    memcpy(config_data, &config, virtio_balloon_config_size(dev));
+> >  }
+> >  
+> >  static int build_dimm_list(Object *obj, void *opaque)
+> > @@ -679,7 +695,7 @@ static void virtio_balloon_set_config(VirtIODevice *vdev,
+> >      uint32_t oldactual = dev->actual;
+> >      ram_addr_t vm_ram_size = get_current_ram_size();
+> >  
+> > -    memcpy(&config, config_data, sizeof(struct virtio_balloon_config));
+> > +    memcpy(&config, config_data, virtio_balloon_config_size(dev));
+> >      dev->actual = le32_to_cpu(config.actual);
+> >      if (dev->actual != oldactual) {
+> >          qapi_event_send_balloon_change(vm_ram_size -
+> > @@ -766,7 +782,7 @@ static void virtio_balloon_device_realize(DeviceState *dev, Error **errp)
+> >      int ret;
+> >  
+> >      virtio_init(vdev, "virtio-balloon", VIRTIO_ID_BALLOON,
+> > -                sizeof(struct virtio_balloon_config));
+> > +                virtio_balloon_config_size(s));
+> >  
+> >      ret = qemu_add_balloon_handler(virtio_balloon_to_target,
+> >                                     virtio_balloon_stat, s);
+> > @@ -897,6 +913,12 @@ static Property virtio_balloon_properties[] = {
+> >                      VIRTIO_BALLOON_F_DEFLATE_ON_OOM, false),
+> >      DEFINE_PROP_BIT("free-page-hint", VirtIOBalloon, host_features,
+> >                      VIRTIO_BALLOON_F_FREE_PAGE_HINT, false),
+> > +    /* QEMU 4.0 accidentally changed the config size even when free-page-hint
+> > +     * is disabled, resulting in QEMU 3.1 migration incompatibility.  This
+> > +     * property retains this quirk for QEMU 4.1 machine types.
+> > +     */
+> > +    DEFINE_PROP_BOOL("qemu-4-0-config-size", VirtIOBalloon,
+> > +                     qemu_4_0_config_size, false),
+> >      DEFINE_PROP_LINK("iothread", VirtIOBalloon, iothread, TYPE_IOTHREAD,
+> >                       IOThread *),
+> >      DEFINE_PROP_END_OF_LIST(),
+> > -- 
+> > 2.21.0
+> > 
+> > 
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
