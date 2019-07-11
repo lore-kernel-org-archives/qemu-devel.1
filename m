@@ -2,83 +2,83 @@ Return-Path: <SRS0=FHOf=VI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E10DDC74A42
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 07:31:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A00A1C74A4B
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 07:48:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B49AC20838
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 07:31:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B49AC20838
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6F0B121019
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 07:48:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F0B121019
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39170 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39248 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlTXq-0002Mg-Rw
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 03:31:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36397)
+	id 1hlToo-0005cZ-6I
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 03:48:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42160)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <yi.l.liu@intel.com>) id 1hlTX3-0001uU-MI
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 03:30:22 -0400
+ (envelope-from <philmd@redhat.com>) id 1hlToK-0005CN-Bs
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 03:48:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yi.l.liu@intel.com>) id 1hlTX2-0008PY-DF
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 03:30:21 -0400
-Received: from mga17.intel.com ([192.55.52.151]:7717)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1hlTX1-0008K4-W0
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 03:30:20 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
- by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 11 Jul 2019 00:30:16 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.63,476,1557212400"; d="scan'208";a="193315394"
-Received: from fmsmsx108.amr.corp.intel.com ([10.18.124.206])
- by fmsmga002.fm.intel.com with ESMTP; 11 Jul 2019 00:30:16 -0700
-Received: from fmsmsx115.amr.corp.intel.com (10.18.116.19) by
- FMSMSX108.amr.corp.intel.com (10.18.124.206) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Thu, 11 Jul 2019 00:30:16 -0700
-Received: from shsmsx153.ccr.corp.intel.com (10.239.6.53) by
- fmsmsx115.amr.corp.intel.com (10.18.116.19) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Thu, 11 Jul 2019 00:30:15 -0700
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.110]) by
- SHSMSX153.ccr.corp.intel.com ([169.254.12.60]) with mapi id 14.03.0439.000;
- Thu, 11 Jul 2019 15:24:41 +0800
-From: "Liu, Yi L" <yi.l.liu@intel.com>
-To: Peter Xu <zhexu@redhat.com>
-Thread-Topic: [RFC v1 10/18] intel_iommu: tag VTDAddressSpace instance with
- PASID
-Thread-Index: AQHVM+yp75CJKWp0K0q167GQ/LUaeqbBTKoAgAO8UqA=
-Date: Thu, 11 Jul 2019 07:24:40 +0000
-Message-ID: <A2975661238FB949B60364EF0F2C257439F2C703@SHSMSX104.ccr.corp.intel.com>
-References: <1562324511-2910-1-git-send-email-yi.l.liu@intel.com>
- <1562324511-2910-11-git-send-email-yi.l.liu@intel.com>
- <20190709061240.GF5178@xz-x1>
-In-Reply-To: <20190709061240.GF5178@xz-x1>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.0.600.7
-dlp-reaction: no-action
-x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiYTM2NThjMGYtM2I5NS00OTRhLWI4ZWItNWJlYTI3ODA5NzViIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoieTgycGZxMHhqWG5ucjlVdGhNVHhWU0RGWHJ6cnM2ZkI0b1F6SmNkZjJTb0trNUF6R2dnVDBNdmJTMU9PODB0YiJ9
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ (envelope-from <philmd@redhat.com>) id 1hlToJ-0007Un-7x
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 03:48:12 -0400
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:34499)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hlToJ-0007T4-0s
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 03:48:11 -0400
+Received: by mail-wm1-f66.google.com with SMTP id w9so6332390wmd.1
+ for <qemu-devel@nongnu.org>; Thu, 11 Jul 2019 00:48:10 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=A3Etdi5nPKQWgNN3kQA4KRfVFUZLkNVqiDdxffRi8mE=;
+ b=PKK6YiFHNvfhPPJNOM8QJQuuThMj4aZgto9agDkoCBpKZpRUUUlEbRAxsRKRjeInbz
+ 1RquM2H7wIoDgmYlI9udBIvwkSJgmWwO0hNnwjFjo42FFRFDxOzOk2k+RtUNG3/Z9QU7
+ Sgp1BkSlTYSpj99l1AuN3YK0PNqhmQgjK0bGSeQ+a774sS5wsS+fSFN74GwnkQ5GcZiw
+ wkhHgJwaN6UTQ6nKVLbt49atogFS7ow93IuXmiZzX5cuKsYiZnHtt43hfjM4cexGTpBd
+ rZRIp34NDFS7KpSheFNEpfuyrz1qmMf+P0/SXHXaAWQKvqh4KGHKr5LRTMZp65Vae4mw
+ +VWQ==
+X-Gm-Message-State: APjAAAW2cuMC+H6gfSH1SzQSR7D8d/orFYJZdMOGb9JKYy53YfwX6UDy
+ GdQwwMbxIzoxPPOCCKDOY9OWDA==
+X-Google-Smtp-Source: APXvYqy24a4SjsGvHKMFPcgttVoejFlHdzdXqYKnP6bbcAHv84uvtxrb2v9DkJecvuXaw35WuNjrAw==
+X-Received: by 2002:a1c:2c41:: with SMTP id s62mr2557786wms.8.1562831289381;
+ Thu, 11 Jul 2019 00:48:09 -0700 (PDT)
+Received: from [192.168.1.38] (62.red-83-42-61.dynamicip.rima-tde.net.
+ [83.42.61.62])
+ by smtp.gmail.com with ESMTPSA id h8sm4274600wmf.12.2019.07.11.00.48.08
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Thu, 11 Jul 2019 00:48:08 -0700 (PDT)
+To: Guenter Roeck <linux@roeck-us.net>, qemu-devel@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>,
+ "Daniel P. Berrange" <berrange@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+References: <20190710220153.GA10826@roeck-us.net>
+ <20190711010742.GA810@roeck-us.net>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <dc31e591-3b22-8626-10b2-48597f56ee0a@redhat.com>
+Date: Thu, 11 Jul 2019 09:48:07 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 192.55.52.151
-Subject: Re: [Qemu-devel] [RFC v1 10/18] intel_iommu: tag VTDAddressSpace
- instance with PASID
+In-Reply-To: <20190711010742.GA810@roeck-us.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.85.128.66
+Subject: Re: [Qemu-devel] Problems building and installing qemu v4.1.0-rc1
+ in single step
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,90 +90,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "tianyu.lan@intel.com" <tianyu.lan@intel.com>, "Tian,
- Kevin" <kevin.tian@intel.com>, Jacob Pan <jacob.jun.pan@linux.intel.com>,
- Yi Sun <yi.y.sun@linux.intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "mst@redhat.com" <mst@redhat.com>, "Tian, Jun J" <jun.j.tian@intel.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "eric.auger@redhat.com" <eric.auger@redhat.com>,
- "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>, "Sun, Yi Y" <yi.y.sun@intel.com>,
- "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-PiBGcm9tOiBrdm0tb3duZXJAdmdlci5rZXJuZWwub3JnIFttYWlsdG86a3ZtLW93bmVyQHZnZXIu
-a2VybmVsLm9yZ10gT24gQmVoYWxmDQo+IE9mIFBldGVyIFh1DQo+IFNlbnQ6IFR1ZXNkYXksIEp1
-bHkgOSwgMjAxOSAyOjEzIFBNDQo+IFRvOiBMaXUsIFlpIEwgPHlpLmwubGl1QGludGVsLmNvbT4N
-Cj4gU3ViamVjdDogUmU6IFtSRkMgdjEgMTAvMThdIGludGVsX2lvbW11OiB0YWcgVlREQWRkcmVz
-c1NwYWNlIGluc3RhbmNlIHdpdGggUEFTSUQNCj4gDQo+IE9uIEZyaSwgSnVsIDA1LCAyMDE5IGF0
-IDA3OjAxOjQzUE0gKzA4MDAsIExpdSBZaSBMIHdyb3RlOg0KPiA+IFRoaXMgcGF0Y2ggaW50cm9k
-dWNlcyBuZXcgZmllbGRzIGluIFZUREFkZHJlc3NTcGFjZSBmb3IgZnVydGhlciBQQVNJRA0KPiA+
-IHN1cHBvcnQgaW4gSW50ZWwgdklPTU1VLiBJbiBvbGQgdGltZSwgZWFjaCBkZXZpY2UgaGFzIGEN
-Cj4gPiBWVERBZGRyZXNzU3BhY2UgaW5zdGFuY2UgdG8gc3RhbmQgZm9yIGl0cyBndWVzdCBJT1ZB
-IGFkZHJlc3Mgc3BhY2UNCj4gPiB3aGVuIHZJT01NVSBpcyBlbmFibGVkLiBIb3dldmVyLCB3aGVu
-IFBBU0lEIGlzIGV4cG9zZWQgdG8gZ3Vlc3QsDQo+ID4gZGV2aWNlIHdpbGwgaGF2ZSBtdWx0aXBs
-ZSBhZGRyZXNzIHNwYWNlcyB3aGljaCBhcmUgdGFnZ2VkIHdpdGggUEFTSUQuDQo+ID4gVG8gc3Vp
-dCB0aGlzIGNoYW5nZSwgVlREQWRkcmVzc1NwYWNlIHNob3VsZCBiZSB0YWdnZWQgd2l0aCBQQVNJ
-RHMgaW4gSW50ZWwNCj4gdklPTU1VLg0KPiA+DQo+ID4gVG8gcmVjb3JkIFBBU0lEIHRhZ2dlZCBW
-VERBZGRyZXNzU3BhY2VzLCBhIGhhc2ggdGFibGUgaXMgaW50cm9kdWNlZC4NCj4gPiBUaGUgZGF0
-YSBpbiB0aGUgaGFzaCB0YWJsZSBjYW4gYmUgdXNlZCBmb3IgZnV0dXJlIHNhbml0eSBjaGVjayBh
-bmQNCj4gPiByZXRyaWV2ZSBwcmV2aW91cyBQQVNJRCBjb25maWdzIG9mIGd1ZXN0IGFuZCBhbHNv
-IGZ1dHVyZSBlbXVsYXRlZCBTVkENCj4gPiBETUEgc3VwcG9ydCBmb3IgZW11bGF0ZWQgU1ZBIGNh
-cGFibGUgZGV2aWNlcy4gVGhlIGxvb2t1cCBrZXkgaXMgYQ0KPiA+IHN0cmluZyBhbmQgaXRzIGZv
-cm1hdCBpcyBhcyBiZWxvdzoNCj4gPg0KPiA+ICJyc3YlMDRkcGFzaWQlMDEwZHNpZCUwNmQiIC0t
-IHRvdGFsbHkgMzIgYnl0ZXMNCj4gDQo+IENhbiB3ZSBtYWtlIGl0IHNpbXBseSBhIHN0cnVjdD8N
-Cj4gDQo+ICAgICAgICAgc3RydWN0IHBhc2lkX2tleSB7DQo+ICAgICAgICAgICAgICAgICB1aW50
-MzJfdCBwYXNpZDsNCj4gICAgICAgICAgICAgICAgIHVpbnQxNl90IHNpZDsNCj4gICAgICAgICB9
-DQoNCk5pY2Ugc3VnZ2VzdGlvbi4gTGV0IG1lIHRyeSBpdC4NCg0KPiBBbHNvIEkgdGhpbmsgd2Ug
-ZG9uJ3QgbmVlZCB0byBrZWVwIHJlc2VydmVkIGJpdHMgYmVjYXVzZSBpdCdsbCBiZSBhIHN0cnVj
-dHVyZSB0aGF0J2xsDQo+IG9ubHkgYmUgdXNlZCBieSBRRU1VIHNvIHdlIGNhbiBleHRlbmQgaXQg
-ZWFzaWx5IGluIHRoZSBmdXR1cmUgd2hlbiBuZWNlc3NhcnkuDQoNCklmIHVzaW5nIHN0cnVjdHVy
-ZSwgbm8gbmVlZCBpbmRlZWQuIDotKQ0KDQo+IFsuLi5dDQo+IA0KPiA+ICtzdGF0aWMgaW50IHZ0
-ZF9wYXNpZF9jYWNoZV9kc2koSW50ZWxJT01NVVN0YXRlICpzLCB1aW50MTZfdA0KPiA+ICtkb21h
-aW5faWQpIHsNCj4gPiArICAgIFZURFBBU0lEQ2FjaGVJbmZvIHBjX2luZm87DQo+ID4gKw0KPiA+
-ICsgICAgdHJhY2VfdnRkX3Bhc2lkX2NhY2hlX2RzaShkb21haW5faWQpOw0KPiA+ICsNCj4gPiAr
-ICAgIHBjX2luZm8uZmxhZ3MgPSBWVERfUEFTSURfQ0FDSEVfRE9NU0k7DQo+ID4gKyAgICBwY19p
-bmZvLmRvbWFpbl9pZCA9IGRvbWFpbl9pZDsNCj4gPiArDQo+ID4gKyAgICAvKg0KPiA+ICsgICAg
-ICogdXNlIGdfaGFzaF90YWJsZV9mb3JlYWNoX3JlbW92ZSgpLCB3aGljaCB3aWxsIGZyZWUgdGhl
-DQo+ID4gKyAgICAgKiB2dGRfcGFzaWRfYXMgaW5zdGFuY2VzLg0KPiA+ICsgICAgICovDQo+ID4g
-KyAgICBnX2hhc2hfdGFibGVfZm9yZWFjaF9yZW1vdmUocy0+dnRkX3Bhc2lkX2FzLCB2dGRfZmx1
-c2hfcGFzaWQsICZwY19pbmZvKTsNCj4gPiArICAgIC8qDQo+ID4gKyAgICAgKiBUT0RPOiBEb21h
-aW4gc2VsZWN0aXZlIFBBU0lEIGNhY2hlIGludmFsaWRhdGlvbg0KPiA+ICsgICAgICogbWF5IGJl
-IGlzc3VlZCB3cm9uZ2x5IGJ5IHByb2dyYW1tZXIsIHRvIGJlIHNhZmUsDQo+ID4gKyAgICAgKiBh
-ZnRlciBpbnZhbGlkYXRpbmcgdGhlIHBhc2lkIGNhY2hlcywgZW11bGF0b3INCj4gPiArICAgICAq
-IG5lZWRzIHRvIHJlcGxheSB0aGUgcGFzaWQgYmluZGluZ3MgYnkgd2Fsa2luZyBndWVzdA0KPiA+
-ICsgICAgICogcGFzaWQgZGlyIGFuZCBwYXNpZCB0YWJsZS4NCj4gPiArICAgICAqLw0KPiANCj4g
-SXQgc2VlbXMgdG8gbWUgdGhhdCB0aGlzIGlzIHN0aWxsIHVuY2hhbmdlZCBmb3IgdGhlIHdob2xl
-IHNlcmllcy4NCj4gSXQncyBmaW5lIGZvciBSRkMsIGJ1dCBqdXN0IGEgcmVtaW5kZXIgdGhhdCBw
-bGVhc2UgZWl0aGVyIGNvbW1lbnQgb24gd2h5IHdlIGRvbid0DQo+IGhhdmUgc29tZXRoaW5nIG9y
-IGltcGxlbWVudCB3aGF0IHdlIG5lZWQgaGVyZS4uLg0KDQpZZXMsIEkgaGF2ZW7igJl0IGFkZGVk
-IGluIHRoaXMgUkZDLiBTbyBsaXN0ZWQgaXQgYXMgYSBUT0RPIGhlcmUuIFRoaXMgd291bGQgYmUg
-ZG9uZQ0KYWZ0ZXIgdGhlIHdvcmsgZmxvdyBpcyBjbGVhci4gOi0pDQoNCj4gWy4uLl0NCj4gDQo+
-ID4gIC8qIFVubWFwIHRoZSB3aG9sZSByYW5nZSBpbiB0aGUgbm90aWZpZXIncyBzY29wZS4gKi8g
-IHN0YXRpYyB2b2lkDQo+ID4gdnRkX2FkZHJlc3Nfc3BhY2VfdW5tYXAoVlREQWRkcmVzc1NwYWNl
-ICphcywgSU9NTVVOb3RpZmllciAqbikgIHsgQEANCj4gPiAtMzkxNCw2ICs0MDc2LDggQEAgc3Rh
-dGljIHZvaWQgdnRkX3JlYWxpemUoRGV2aWNlU3RhdGUgKmRldiwgRXJyb3IgKiplcnJwKQ0KPiA+
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgZ19mcmVlLCBnX2ZyZWUpOw0K
-PiA+ICAgICAgcy0+dnRkX2FzX2J5X2J1c3B0ciA9IGdfaGFzaF90YWJsZV9uZXdfZnVsbCh2dGRf
-dWludDY0X2hhc2gsDQo+IHZ0ZF91aW50NjRfZXF1YWwsDQo+ID4gICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICBnX2ZyZWUsIGdfZnJlZSk7DQo+ID4gKyAgICBz
-LT52dGRfcGFzaWRfYXMgPSBnX2hhc2hfdGFibGVfbmV3X2Z1bGwoJmdfc3RyX2hhc2gsICZnX3N0
-cl9lcXVhbCwNCj4gPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGdfZnJl
-ZSwgaGFzaF9wYXNpZF9hc19mcmVlKTsNCj4gDQo+IENhbiB1c2UgZ19mcmVlKCkgYW5kIGRyb3Ag
-aGFzaF9wYXNpZF9hc19mcmVlKCk/DQoNCk5pY2UgY2F0Y2guIEkgdXNlZCBoYXNoX3Bhc2lkX2Fz
-X2ZyZWUoKSBiZWNhdXNlIG9mIHRoYXQgSSdkIGxpa2UgdG8gZG8gc29tZXRoaW5nIG90aGVyDQp0
-aGFuIGZyZWUgdGhlIFZUREFkZHJlc3NTcGFjZSBpbnN0YW5jZS4gZS5nLiBkZXN0cm95IHRoZSBB
-ZGRyZXNzU3BhY2UgTWVtb3J5UmVnaW9uDQppbnN0YW5jZXMgYmVmb3JlIGZyZWUgVlREQWRkcmVz
-c1NwYWNlIGluc3RhbmNlLiBUaGF0J3MgcmVsYXRlZCB0byBhbm90aGVyIGNvbW1lbnQNCmZyb20g
-eW91IGluIGFudGhlciB0aHJlYWQuIDotKQ0KDQpGb3Igbm93LCBJIHRoaW5rIGl0IGlzIGZpbmUg
-dG8gZHJvcCBpdCBhbmQganVzdCB1c2UgZ19mcmVlLg0KDQo+IEFsc28sIHRoaXMgcGF0Y2ggb25s
-eSB0cmllcyB0byBkcm9wIGVudHJpZXMgb2YgdGhlIGhhc2ggdGFibGUgYnV0IHRoZSBoYXNoIHRh
-YmxlIGlzIG5ldmVyDQo+IGluc2VydGVkIG9yIHVzZWQuICBJIHdvdWxkIHN1Z2dlc3QgdGhhdCB5
-b3UgcHV0IHRoYXQgcGFydCB0byBiZSB3aXRoIHRoaXMgcGF0Y2ggYXMgYQ0KPiB3aG9sZSBvdGhl
-cndpc2UgaXQncyBoYXJkIHRvIGNsYXJpZnkgaG93IHRoaXMgaGFzaCB0YWJsZSB3aWxsIGJlIHVz
-ZWQuDQoNCkdvb2Qgc3VnZ2VzdGlvbiwgd2lsbCBtYWtlIGl0IHNvdW5kIGluIG5leHQgdmVyc2lv
-bi4NCg0KVGhhbmtzLA0KWWkgTGl1DQoNCj4gUmVnYXJkcywNCj4gDQo+IC0tDQo+IFBldGVyIFh1
-DQo=
+Hi Guenter,
+
+Cc'ing Markus/Dan/Alex
+
+On 7/11/19 3:07 AM, Guenter Roeck wrote:
+> On Wed, Jul 10, 2019 at 03:01:53PM -0700, Guenter Roeck wrote:
+>> Hi,
+>>
+>> when trying to run "make -j30 install" from a clean tree on v4.1.0-rc0, I get
+>> _lots_ of undefined symbol errors.
+>>
+>> If I run "make -j30" followed by "make -j30 install", make succeeds, but then
+>> I get linker errors such as the following when running "make -j30 install".
+
+Seems similar to this report:
+https://lists.gnu.org/archive/html/qemu-devel/2019-07/msg01860.html
+
+>>
+>> /usr/bin/ld: final link failed: File truncated
+>> /usr/bin/ld: BFD (GNU Binutils for Ubuntu) 2.26.1 internal error,
+>> 	aborting at ../../bfd/merge.c:905 in _bfd_merged_section_offset
+
+This seems new, what is your host?
+
+"File truncated" reminds me out-of-space issues.
+
+FWIW sometimes I'm having some weird issue when calling "make
+check-tcg". Docker is used to build target binaries, but apparently it
+tries to compile some host object instead and fails, but I don't reach
+the linking.
+Just to clear this out, do you see any docker started?
+
+>>
+>> Running "make -j30" followed by "make install" succeeds.
+>>
+> 
+> Correction: This doesn't always work either. Sometimes I still get a linker
+> error. If that happens, another round of "make; make install" succeeds.
+> 
+> Guenter
+> 
+>> This looks like "make install" may have bad dependencies. Has anyone else
+>> experienced this problem ?
+>>
+>> Thanks,
+>> Guenter
+> 
 
