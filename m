@@ -2,88 +2,88 @@ Return-Path: <SRS0=r3/N=VJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.3 required=3.0 tests=DATE_IN_PAST_12_24,
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DATE_IN_PAST_12_24,
 	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_SBL,URIBL_SBL_A,USER_AGENT_SANE_1 autolearn=no
+	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2FB8C742A8
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 08:09:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A5A9C742A5
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 08:09:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C17B520863
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 08:09:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 591D320863
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 08:09:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dMzqJa1i"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C17B520863
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="saBchn4M"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 591D320863
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47392 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47396 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlqc2-000460-Rh
-	for qemu-devel@archiver.kernel.org; Fri, 12 Jul 2019 04:09:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48450)
+	id 1hlqc8-0004bN-Fd
+	for qemu-devel@archiver.kernel.org; Fri, 12 Jul 2019 04:09:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48493)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <stefanha@gmail.com>) id 1hlqbe-0002ib-TJ
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 04:08:40 -0400
+ (envelope-from <stefanha@gmail.com>) id 1hlqbl-00031d-3C
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 04:08:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@gmail.com>) id 1hlqbd-0004re-QA
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 04:08:38 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:40022)
+ (envelope-from <stefanha@gmail.com>) id 1hlqbg-0004vF-Qe
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 04:08:42 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:40022)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1hlqbd-0004qK-JA
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 04:08:37 -0400
-Received: by mail-wr1-x444.google.com with SMTP id r1so8929134wrl.7
- for <qemu-devel@nongnu.org>; Fri, 12 Jul 2019 01:08:37 -0700 (PDT)
+ (Exim 4.71) (envelope-from <stefanha@gmail.com>)
+ id 1hlqbg-0004ut-Ja; Fri, 12 Jul 2019 04:08:40 -0400
+Received: by mail-wr1-x443.google.com with SMTP id r1so8929305wrl.7;
+ Fri, 12 Jul 2019 01:08:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=date:from:to:cc:subject:message-id:references:mime-version
  :content-disposition:in-reply-to:user-agent;
- bh=oUyvG8ADCkc+zDBWJNSf/kJzw7uQYjwcsWjp0+Lpe0c=;
- b=dMzqJa1ivacnHs06eswckqgPPL2Gh3qiGB6+NI63idrPnxEOgiYZmjMhGfdwhyxsQp
- VojOYwTB4Oy8r2HfNH+Y78JPtnBnHxK3gxTrJy4ID37zrYSVCYwCB8eYspvJAGvPUcDM
- h2n93R+XN84WyiVJjxwIqw1OmXgwkCh8P5tdbDWZzcvh5RKUN+nFerKErJXEqYg6HLvU
- 0h7WnYEmvX7ZLYZ7e1czYMVtBmL0A0FeW5ovxNTcTSXtGqybOHyDxT91wLIAv2gKGSL1
- GBklq81fw2YeJKNB6nQKTnk5NUqTu+/3ra23y1yshkFRxl+1qDMn6Q7ZvlyVcohat0Ij
- v4FQ==
+ bh=8Uh9U6frhW0MIoKGkbYWr6ViDpRba0ohH7xp8mVHHyE=;
+ b=saBchn4MzZsZY3Tyre/yGcnplUIfRCgkR5Est6BWvVV6fK26kWWA5vtcRH4FU8KmCu
+ hAYOgkk8DqNNv4UiSVUUWa2x9G1GyTUaSyLGnhS8Qi1zhf/hvoRbFEzxn1OpDGjjMJIB
+ 9ep2ubsErfRIL2jfPwzSlO56ijBGFVDTvPL9P4j683JqpUPG/JBHdDGTnzl7IFRVXg6K
+ bV9DdJTh2g4NH0Kl5admoPmZqBQE3UbiVhZGiZnQQQ5EeiRFDF03piaehfQV2kzvdAGv
+ ZUsUQvrIMs+yOWjWX/l1u5xvSK/0tyjxAGPYNWMPLTQr+H5k2HY/I32RJtBzxgbD3ARa
+ dUBw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to:user-agent;
- bh=oUyvG8ADCkc+zDBWJNSf/kJzw7uQYjwcsWjp0+Lpe0c=;
- b=DW/CZDNTnwyIvE1Cs6eHo3stITb02f+aTQ2R7Z5r5qM2ZDX9w+k6mqCPx0qbEQv4KA
- 1Yq2Ypt5PeUhx3wVc/wnjU0dDb3GCPvb3HLt4raMim0waZElKD9XcIxosqq1Xe6MvzBA
- pJDmPEuvrvxoXisJR0MfNRr1+us8SpBGOE/bR7o5C2GC2usTdUzaCnNeU7tR0cUYoXuZ
- BomM/W2YSUt0hDaQkiCmSbbuQC2D5XO9xGAXE32gtzzD5V7IZqJqK+8WznL3409R4zSZ
- h8zyCHfEb169QHThmGnhtjJgzMx8/1/r3obwDjdpKiMEK0dA4FSX5mv4NwZXbyUyjAMR
- TayQ==
-X-Gm-Message-State: APjAAAUMePuDDOhYo/6/6AMlcUoAXFoYW5uALDFhLJYJThhxJw/63aej
- 8Y4Qcna8saz2HBnbdnoRosQ=
-X-Google-Smtp-Source: APXvYqztYEiN2C5zLge3Mqr1vmMs30pLn23t8+ZLN8JQmNbhHLLJIsDWo0j29Yg9y3Ufu40ZBBvOXQ==
-X-Received: by 2002:adf:afe2:: with SMTP id y34mr9857679wrd.250.1562918916484; 
- Fri, 12 Jul 2019 01:08:36 -0700 (PDT)
+ bh=8Uh9U6frhW0MIoKGkbYWr6ViDpRba0ohH7xp8mVHHyE=;
+ b=a/lRYOLxfnj5by6fiqy1vZVk1jm1yO8qF1qa5ScMllojsmc1jNMSharclA3Myb/KNt
+ As24PGqWG7TcebM60t16e52d1zue372gCT0bu7zKB5gRLM2QrTfIZ45mPcaGyLV0omM5
+ f6uI55KTKEYPV1wcQ3uhCvPS2h3km5BiLf4rmLkNVmbu/aWKigbRoeOCLQRndftMKiFU
+ wNKYS215kGqxU2xE++XyQPNLqvPjKcVE76U7Biu69gMoepK/JvRG+sFnndPQtFb4y8Z7
+ Lo0DXhZGSje6eh6i7RoJZ7V/Q9SlaWVf1rgeXAvQGqzTDNYfnWmQq4H9F+LQ+1mJ3Mhu
+ vmNA==
+X-Gm-Message-State: APjAAAUeWm/9AaJmBW/en0oDJJql66kwYEbR0u0fQTe5fpEknbH+Cz3G
+ EyYtl+6I5QVroYU9dwTkZOL5TOx2wQZ3nQ==
+X-Google-Smtp-Source: APXvYqymhJ38nIX2cUHezUfr0LW7nRNXGfDNBgYYG004amfiK++40q4jIcsciJn2caoXG9KTt02E/g==
+X-Received: by 2002:adf:8364:: with SMTP id 91mr10081563wrd.13.1562918919610; 
+ Fri, 12 Jul 2019 01:08:39 -0700 (PDT)
 Received: from localhost ([92.184.96.85])
- by smtp.gmail.com with ESMTPSA id c12sm12075597wrd.21.2019.07.12.01.08.35
+ by smtp.gmail.com with ESMTPSA id j9sm5386044wrn.81.2019.07.12.01.08.38
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Fri, 12 Jul 2019 01:08:35 -0700 (PDT)
-Date: Thu, 11 Jul 2019 12:37:12 +0200
+ Fri, 12 Jul 2019 01:08:38 -0700 (PDT)
+Date: Thu, 11 Jul 2019 14:24:36 +0200
 From: Stefan Hajnoczi <stefanha@gmail.com>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Message-ID: <20190711103712.GG13422@stefanha-x1.localdomain>
-References: <20190705154154.9305-1-berrange@redhat.com>
+To: shaju.abraham@nutanix.com
+Message-ID: <20190711122436.GH13422@stefanha-x1.localdomain>
+References: <1562554503-177179-1-git-send-email-shaju.abraham@nutanix.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="m0vRWufqUC70IDnR"
+ protocol="application/pgp-signature"; boundary="oyqLL/JqMvClXZi1"
 Content-Disposition: inline
-In-Reply-To: <20190705154154.9305-1-berrange@redhat.com>
+In-Reply-To: <1562554503-177179-1-git-send-email-shaju.abraham@nutanix.com>
 User-Agent: Mutt/1.12.0 (2019-05-25)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::444
-Subject: Re: [Qemu-devel] [PATCH v3] doc: document that the monitor console
- is a privileged control interface
+X-Received-From: 2a00:1450:4864:20::443
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] Fix Guest VM crash due to
+ iSCSI Sense Key error
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,84 +95,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Prasad J Pandit <pjp@fedoraproject.org>, qemu-devel@nongnu.org,
- P J P <ppandit@redhat.com>,
- Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
- Markus Armbruster <armbru@redhat.com>
+Cc: jsnow@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---m0vRWufqUC70IDnR
-Content-Type: text/plain; charset=iso-8859-1
+--oyqLL/JqMvClXZi1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jul 05, 2019 at 04:41:54PM +0100, Daniel P. Berrang=E9 wrote:
-> A supposed exploit of QEMU was recently announced as CVE-2019-12928
-> claiming that the monitor console was insecure because the "migrate"
-> command enabled arbitrary command execution for a remote attacker.
->=20
-> To be a security risk the user launching QEMU must have configured
-> the monitor in a way that allows for other users to access it. The
-> exploit report quoted use of the "tcp" character device backend for
-> QMP.
->=20
-> This would indeed allow any network user to connect to QEMU and
-> execute arbitrary commands, however, this is not a flaw in QEMU.
-> It is the normal expected behaviour of the monitor console and the
-> commands it supports. Given a monitor connection, there are many
-> ways to access host file system content besides the migrate command.
->=20
-> The reality is that the monitor console (whether QMP or HMP) is
-> considered a privileged interface to QEMU and as such must only
-> be made available to trusted users. IOW, making it available with
-> no authentication over TCP is simply a, very serious, user
-> configuration error not a security flaw in QEMU itself.
->=20
-> The one thing this bogus security report highlights though is that
-> we have not clearly documented the security implications around the
-> use of the monitor. Add a few paragraphs of text to the security
-> docs explaining why the monitor is a privileged interface and making
-> a recommendation to only use the UNIX socket character device backend.
->=20
-> Reviewed-by: Alex Benn=E9e <alex.bennee@linaro.org>
-> Reviewed-by: Markus Armbruster <armbru@redhat.com>
-> Reviewed-by: Prasad J Pandit <pjp@fedoraproject.org>
-> Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
-> Signed-off-by: Daniel P. Berrang=E9 <berrange@redhat.com>
-> ---
->=20
-> Changed in v3:
->=20
->  - More copy editing from review feedback (Markus, PJP, Alex)
->=20
-> Changed in v2:
->=20
->  - Addressed misc typos (Eric / Philippe)
->=20
->  docs/security.texi | 36 ++++++++++++++++++++++++++++++++++++
->  1 file changed, 36 insertions(+)
+On Sun, Jul 07, 2019 at 07:55:03PM -0700, shaju.abraham@nutanix.com wrote:
 
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
---m0vRWufqUC70IDnR
+CCing John Snow, IDE maintainer.
+
+You can use scripts/get_maintainer.pl -f hw/ide/core.c to find out who
+to send patches to.
+
+Stefan
+
+> From: Shaju Abraham <shaju.abraham@nutanix.com>
+>=20
+> During the  IDE DMA transfer for a ISCSI target,when libiscsi encounters
+> a SENSE KEY error, it sets the task->sense to  the value "COMMAND ABORTED=
+".
+> The function iscsi_translate_sense() later translaters this error to -ECA=
+NCELED
+> and this value is passed to the callback function. In the case of  IDE DM=
+A read
+> or write, the callback function returns immediately if the value of the r=
+et
+> argument is -ECANCELED.
+> Later when ide_cancel_dma_sync() function is invoked  the assertion
+> "s->bus->dma->aiocb =3D=3D ((void *)0)" fails and the qemu process gets t=
+erminated.
+> Fix the issue by making the value of s->bus->dma->aiocb =3D NULL when
+> -ECANCELED is passed to the callback.
+>=20
+> Signed-off-by: Shaju Abraham <shaju.abraham@nutanix.com>
+> ---
+>  hw/ide/core.c | 1 +
+>  1 file changed, 1 insertion(+)
+>=20
+> diff --git a/hw/ide/core.c b/hw/ide/core.c
+> index 6afadf8..78ea357 100644
+> --- a/hw/ide/core.c
+> +++ b/hw/ide/core.c
+> @@ -841,6 +841,7 @@ static void ide_dma_cb(void *opaque, int ret)
+>      bool stay_active =3D false;
+> =20
+>      if (ret =3D=3D -ECANCELED) {
+> +        s->bus->dma->aiocb =3D NULL;
+>          return;
+>      }
+> =20
+> --=20
+> 1.9.4
+>=20
+>=20
+
+--oyqLL/JqMvClXZi1
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl0nEVgACgkQnKSrs4Gr
-c8igBwf/Ul5aXf5cjYdnS9d60PVMjzDPYTkR+Xh2GFfXOfuXqEG03d5EcpdugSQm
-n2d9c9dcyjL2D1mtjWSB9V3fjzJyewlXw9MhfQEP0GeEu1jo6TkcuU+dkezxkRIE
-6MKbulABm18rm+7PH6nBny+EiLMST2x+DymCJqComjELjVanW30DDiy4Je/SAv97
-gMhsUGcT4ZEGYu9k9ydkiwCMT1UJxq/4JdOWDolPy903qcrhhXs6wXQdV0KDfUdw
-0Nk5VZJhqMcbB6RUC5+Vt7hjgFnlbOJTG1GfVeRUobaH3Fiqcy9PGTKU+MbKVAaH
-Ufj2NdNDF6yBDHWnrTHy7apoToVa7A==
-=LAfQ
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl0nKoQACgkQnKSrs4Gr
+c8jrWgf+KX6mIQYRt8k9knmf7XVr7PYP9vzI8N3fTRFbT+s70CzRyXpUghbZp3WY
+wN7pOURiBOCuaQe2YJacLqdjGOYgtvmldk3IXDR+K4ctplOd/qs9MQPCMhDXOO8S
+FzKopdrWMOxg4MkZwNhmPPs3WfYprFRGDQKdEloCn71BZZwFQ3HxmdH9R2EFWLtC
+ZsCIbt+lIrMSSYdtGFlRm3kisl37Tecgk8wEi35Cn1aUA9kblZvVim6FEzFxNwj+
+eYUm4Q3ZgvYKsyFadaFSFFZ5W3FMwoLhGsm7tZO6hIBjj+z30sF4Iog2lhHfXK16
+/y2vDqVE27DyzheO0SC0qBv3MZwaKg==
+=Dg0k
 -----END PGP SIGNATURE-----
 
---m0vRWufqUC70IDnR--
+--oyqLL/JqMvClXZi1--
 
