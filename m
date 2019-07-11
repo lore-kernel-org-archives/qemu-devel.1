@@ -2,142 +2,79 @@ Return-Path: <SRS0=FHOf=VI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E045AC74A35
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 12:56:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37FA2C74A35
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 12:58:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B5B9D21019
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 12:56:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5B9D21019
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0215D21019
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 12:58:33 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HXIPIvr1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0215D21019
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41472 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41498 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlYcv-00075D-3I
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 08:56:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60372)
+	id 1hlYef-0008TV-7T
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 08:58:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32784)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <borntraeger@de.ibm.com>) id 1hlYc1-0006Ig-EJ
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 08:55:50 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hlYeB-0007xN-Gd
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 08:58:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <borntraeger@de.ibm.com>) id 1hlYc0-0001Cw-Cx
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 08:55:49 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:43310)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
- id 1hlYbz-0001Bk-Vg
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 08:55:48 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x6BCs0vC006081
- for <qemu-devel@nongnu.org>; Thu, 11 Jul 2019 08:55:39 -0400
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2tp49bbt10-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Thu, 11 Jul 2019 08:55:38 -0400
-Received: from localhost
- by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
- Thu, 11 Jul 2019 13:55:35 +0100
-Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
- by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Thu, 11 Jul 2019 13:55:33 +0100
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
- [9.149.105.62])
- by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
- id x6BCtJ7h39125376
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 11 Jul 2019 12:55:19 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 04517AE051;
- Thu, 11 Jul 2019 12:55:32 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id B1426AE05D;
- Thu, 11 Jul 2019 12:55:31 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.152.224.140])
- by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Thu, 11 Jul 2019 12:55:31 +0000 (GMT)
-To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
-References: <20190711104412.31233-1-quintela@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- syiRa+UVlsKmx1hsEg==
-Date: Thu, 11 Jul 2019 14:55:31 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+ (envelope-from <peter.maydell@linaro.org>) id 1hlYeA-0003p8-ES
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 08:58:03 -0400
+Received: from mail-ot1-x334.google.com ([2607:f8b0:4864:20::334]:41005)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hlYeA-0003mn-7n
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 08:58:02 -0400
+Received: by mail-ot1-x334.google.com with SMTP id o101so5724793ota.8
+ for <qemu-devel@nongnu.org>; Thu, 11 Jul 2019 05:58:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=W1i3c8PHWYx6uqL/+yt4ilyF0xqyR3GkinwVyqSUpfU=;
+ b=HXIPIvr10uIu8/+JOup58AzBoQGrzg+O37GrX9yWAr0EJljESSPJqCQgaLbBo6ZNG/
+ zeNIzp49CmwAddYlAuoyf1I0A2B4tpJsB7BNbsK+i+ghUKOtJT81Su7c1WIkgmekIEId
+ 3QmR8sWaCmyCaoe5F6TqKPYYCFKIRLbt1yWmtI5d3Gent6obtMMbzzgHCq/q9aki89Ax
+ 4PN6tsHseJDgLXaM2v8CPvmtIixsXedVWK/sDQ11ivYA6jx9YOcib3WYF/9lkZ4ucu8Z
+ vhNlXBKLfTuxRIxGS1iGvxruaexiPg33GmnlEnteWV39YGEdni9oYHfb2UaIXNbQBlOr
+ /7JQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=W1i3c8PHWYx6uqL/+yt4ilyF0xqyR3GkinwVyqSUpfU=;
+ b=TU4vZYVvZWV3nrasxjRJvK2yuysm8dmmel9aZ/9rd0XSJLfNFizTtCj+OjvbHqSr70
+ +W8iF0BngXsGS8AtHrdkM3r9rPYA5D77MwLknTAwBcSaK9/Ss1EbosCLSwRFOfohhkFj
+ 4jpOK/L41IuhUKbdN7z5AqCGXSV859/4376S+aGbvokXu0a/nI37u1B1uYgdZkf1S7fm
+ ixs9Rf2+7V+XLA1sgJGgUK9b7sM0rEoRiRnxxW+7w91gPkiEDO28dkhIS9n4Y6if66WU
+ 3Z3MoJ/KBiqUhVSI6ZOxPWTu90q0PkI9r+afYDbP6FArNkirippTHKOAagP5iJRGdpkE
+ 8fzg==
+X-Gm-Message-State: APjAAAXj4gcenWlgb3UsxKd8/+HT7S7jYhJKMpbMTj9tXTBHyXgXsRsY
+ ozhtmYFEmi4N5baeZBpzK2n2dKn0MudMOumAYJlh0A==
+X-Google-Smtp-Source: APXvYqzzxziPF4ASlKh41zrUav9ybf7OW4lQf5nJh076jcHiqFA/cJPSz3CymA4Q6wi1UFh2A+TUyPMymEXhMJEmZlg=
+X-Received: by 2002:a9d:7245:: with SMTP id a5mr3430757otk.232.1562849880704; 
+ Thu, 11 Jul 2019 05:58:00 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190711104412.31233-1-quintela@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19071112-0016-0000-0000-00000291C381
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19071112-0017-0000-0000-000032EF82DA
-Message-Id: <5828a0c7-bcb4-2ca4-eec3-cb44f9ab1312@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
- definitions=2019-07-11_02:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1907110146
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
-Subject: Re: [Qemu-devel] [PULL 00/19] Migration patches
+References: <20190702150606.24851-1-mst@redhat.com>
+ <20190619094907.10131-2-pagupta@redhat.com>
+In-Reply-To: <20190619094907.10131-2-pagupta@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 11 Jul 2019 13:57:49 +0100
+Message-ID: <CAFEAcA9=t7uK+=P3noWnP2Ga7=eKiPy9ZoDG9x=ty1P9UJgS3g@mail.gmail.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::334
+Subject: Re: [Qemu-devel] [PULL 05/22] virtio-pmem: add virtio device
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -149,43 +86,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- kvm@vger.kernel.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: Pankaj Gupta <pagupta@redhat.com>, David Hildenbrand <david@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Tue, 2 Jul 2019 at 16:07, Michael S. Tsirkin <mst@redhat.com> wrote:
+>
+> From: Pankaj Gupta <pagupta@redhat.com>
+>
+> This is the implementation of virtio-pmem device. Support will require
+> machine changes for the architectures that will support it, so it will
+> not yet be compiled. It can be unlocked with VIRTIO_PMEM_SUPPORTED per
+> machine and disabled globally via VIRTIO_PMEM.
+>
+> We cannot use the "addr" property as that is already used e.g. for
+> virtio-pci/pci devices. And we will have e.g. virtio-pmem-pci as a proxy.
+> So we have to choose a different one (unfortunately). "memaddr" it is.
+> That name should ideally be used by all other virtio-* based memory
+> devices in the future.
+>     -device virtio-pmem-pci,id=p0,bus=bux0,addr=0x01,memaddr=0x1000000...
+>
+> Acked-by: Markus Armbruster <armbru@redhat.com>
+> [ QAPI bits ]
+> Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
+> [ MemoryDevice/MemoryRegion changes, cleanups, addr property "memaddr",
+>   split up patches, unplug handler ]
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> Message-Id: <20190619094907.10131-2-pagupta@redhat.com>
+> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 
+> +static void virtio_pmem_fill_device_info(const VirtIOPMEM *pmem,
+> +                                         VirtioPMEMDeviceInfo *vi)
+> +{
+> +    vi->memaddr = pmem->start;
+> +    vi->size = pmem->memdev ? memory_region_size(&pmem->memdev->mr) : 0;
+> +    vi->memdev = object_get_canonical_path(OBJECT(pmem->memdev));
 
-On 11.07.19 12:43, Juan Quintela wrote:
-> The following changes since commit 6df2cdf44a82426f7a59dcb03f0dd2181ed7fdfa:
-> 
->   Update version for v4.1.0-rc0 release (2019-07-09 17:21:53 +0100)
-> 
-> are available in the Git repository at:
-> 
->   https://github.com/juanquintela/qemu.git tags/migration-pull-request
-> 
-> for you to fetch changes up to 0b47e79b3d04f500b6f3490628905ec5884133df:
-> 
->   migration: allow private destination ram with x-ignore-shared (2019-07-11 12:30:40 +0200)
-> 
-> ----------------------------------------------------------------
-> Migration pull request
-> 
-> ----------------------------------------------------------------
-> 
-[...]
->  include/exec/memory.h        |   19 +
->  include/exec/memory.h.rej    |   26 +
->  include/exec/ram_addr.h      |   92 +-
->  include/exec/ram_addr.h.orig |  488 +++
-[...]
->  migration/ram.c              |   93 +-
->  migration/ram.c.orig         | 4599 ++++++++++++++++++++++++++++++++++
->  migration/ram.c.rej          |   33 +
+Hi; Coverity points out (CID 1403009) that when we're assigning
+vi->size we handle the "pmem->memdev is NULL" case; but we then
+pass it into object_get_canonical_path(), which unconditionally
+dereferences it and will crash if it is NULL. If this pointer
+can be NULL then we need to do something else here.
 
-The .ref and .orig look odd. And they are is not part of the patches.
+> +}
 
+thanks
+-- PMM
 
