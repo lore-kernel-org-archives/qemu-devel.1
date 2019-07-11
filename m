@@ -3,59 +3,58 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3E42C742A1
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 19:59:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73115C742A1
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 20:28:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 875FF208E4
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 19:59:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 875FF208E4
+	by mail.kernel.org (Postfix) with ESMTPS id 46207206B8
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 20:28:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46207206B8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44996 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45148 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlfEH-0000ON-KA
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 15:59:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51736)
+	id 1hlfgY-0007gH-8X
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 16:28:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33531)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hlfDV-0005qF-TL
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 15:58:59 -0400
+ (envelope-from <mst@redhat.com>) id 1hlfgO-0007I9-Dv
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 16:28:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hlfDS-0001FK-Tz
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 15:58:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58386)
+ (envelope-from <mst@redhat.com>) id 1hlfgM-0006qp-LB
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 16:28:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47040)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hlfDP-0000sz-9d; Thu, 11 Jul 2019 15:58:51 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1hlfgM-0006nN-Ff
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 16:28:46 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id B65AC356C4;
- Thu, 11 Jul 2019 19:58:26 +0000 (UTC)
-Received: from localhost (unknown [10.40.205.198])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4EF3360BE2;
- Thu, 11 Jul 2019 19:58:26 +0000 (UTC)
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Date: Thu, 11 Jul 2019 21:58:04 +0200
-Message-Id: <20190711195804.30703-6-mreitz@redhat.com>
-In-Reply-To: <20190711195804.30703-1-mreitz@redhat.com>
-References: <20190711195804.30703-1-mreitz@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id A924C308FC4B;
+ Thu, 11 Jul 2019 20:28:43 +0000 (UTC)
+Received: from redhat.com (ovpn-116-67.ams2.redhat.com [10.36.116.67])
+ by smtp.corp.redhat.com (Postfix) with SMTP id 342EA600D1;
+ Thu, 11 Jul 2019 20:28:41 +0000 (UTC)
+Date: Thu, 11 Jul 2019 16:28:40 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: qemu-devel@nongnu.org
+Message-ID: <20190711202819.3500-1-mst@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Mutt-Fcc: =sent
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.30]); Thu, 11 Jul 2019 19:58:26 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ (mx1.redhat.com [10.5.110.43]); Thu, 11 Jul 2019 20:28:43 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [RFC 5/5] iotests: Add test for fallback
- truncate/create
+Subject: [Qemu-devel] [PATCH v2] pcie: consistent names for function args
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,138 +66,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
- Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
+The function declarations for pci_cap_slot_get and
+pci_cap_slot_write_config call the argument "slot_ctl", but the function
+definitions and all the call sites drop the 'o' and call it "slt_ctl".
+Let's be consistent.
+
+Reported-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- tests/qemu-iotests/259     | 71 ++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/259.out | 20 +++++++++++
- tests/qemu-iotests/group   |  1 +
- 3 files changed, 92 insertions(+)
- create mode 100755 tests/qemu-iotests/259
- create mode 100644 tests/qemu-iotests/259.out
 
-diff --git a/tests/qemu-iotests/259 b/tests/qemu-iotests/259
-new file mode 100755
-index 0000000000..6e3941378f
---- /dev/null
-+++ b/tests/qemu-iotests/259
-@@ -0,0 +1,71 @@
-+#!/usr/bin/env bash
-+#
-+# Test generic image creation and truncation fallback (by using NBD)
-+#
-+# Copyright (C) 2019 Red Hat, Inc.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+# creator
-+owner=3Dmreitz@redhat.com
-+
-+seq=3D$(basename $0)
-+echo "QA output created by $seq"
-+
-+status=3D1	# failure is the default!
-+
-+_cleanup()
-+{
-+    _cleanup_test_img
-+}
-+trap "_cleanup; exit \$status" 0 1 2 3 15
-+
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.filter
-+
-+_supported_fmt raw
-+_supported_proto nbd
-+_supported_os Linux
-+
-+
-+_make_test_img 64M
-+
-+echo
-+echo '--- Testing no-op shrinking ---'
-+
-+$QEMU_IMG resize -f raw --shrink "$TEST_IMG" 32M
-+
-+echo
-+echo '--- Testing non-working growing ---'
-+
-+$QEMU_IMG resize -f raw "$TEST_IMG" 128M
-+
-+echo
-+echo '--- Testing creation ---'
-+
-+$QEMU_IMG create -f qcow2 "$TEST_IMG" 64M | _filter_img_create
-+$QEMU_IMG info "$TEST_IMG" | _filter_img_info
-+
-+echo
-+echo '--- Testing creation for which the node would need to grow ---'
-+
-+$QEMU_IMG create -f qcow2 -o preallocation=3Dmetadata "$TEST_IMG" 64M 2>=
-&1 \
-+    | _filter_img_create
-+
-+# success, all done
-+echo "*** done"
-+rm -f $seq.full
-+status=3D0
-diff --git a/tests/qemu-iotests/259.out b/tests/qemu-iotests/259.out
-new file mode 100644
-index 0000000000..1e4b11055f
---- /dev/null
-+++ b/tests/qemu-iotests/259.out
-@@ -0,0 +1,20 @@
-+QA output created by 259
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D67108864
-+
-+--- Testing no-op shrinking ---
-+qemu-img: Image was not resized; resizing may not be supported for this =
-image
-+
-+--- Testing non-working growing ---
-+qemu-img: Cannot grow this nbd node
-+
-+--- Testing creation ---
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=3Dqcow2 size=3D67108864
-+image: TEST_DIR/t.IMGFMT
-+file format: qcow2
-+virtual size: 64 MiB (67108864 bytes)
-+disk size: unavailable
-+
-+--- Testing creation for which the node would need to grow ---
-+qemu-img: TEST_DIR/t.IMGFMT: Could not resize image: Cannot grow this nb=
-d node
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=3Dqcow2 size=3D67108864 preallocatio=
-n=3Dmetadata
-+*** done
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index b34c8e3c0c..80e7603174 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -269,3 +269,4 @@
- 254 rw auto backing quick
- 255 rw auto quick
- 256 rw auto quick
-+259 rw auto quick
---=20
-2.21.0
+Fix pcie_cap_slot_write_config too.
 
+ include/hw/pci/pcie.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/include/hw/pci/pcie.h b/include/hw/pci/pcie.h
+index 34f277735c..8cf3361fc4 100644
+--- a/include/hw/pci/pcie.h
++++ b/include/hw/pci/pcie.h
+@@ -107,9 +107,9 @@ void pcie_cap_lnkctl_reset(PCIDevice *dev);
+ 
+ void pcie_cap_slot_init(PCIDevice *dev, uint16_t slot);
+ void pcie_cap_slot_reset(PCIDevice *dev);
+-void pcie_cap_slot_get(PCIDevice *dev, uint16_t *slot_ctl, uint16_t *slt_sta);
++void pcie_cap_slot_get(PCIDevice *dev, uint16_t *slt_ctl, uint16_t *slt_sta);
+ void pcie_cap_slot_write_config(PCIDevice *dev,
+-                                uint16_t old_slot_ctl, uint16_t old_slt_sta,
++                                uint16_t old_slt_ctl, uint16_t old_slt_sta,
+                                 uint32_t addr, uint32_t val, int len);
+ int pcie_cap_slot_post_load(void *opaque, int version_id);
+ void pcie_cap_slot_push_attention_button(PCIDevice *dev);
+-- 
+MST
 
