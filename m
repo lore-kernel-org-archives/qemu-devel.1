@@ -2,66 +2,96 @@ Return-Path: <SRS0=FHOf=VI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17C8FC74A4B
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 08:59:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D56FFC74A4B
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 09:02:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C2E8F20872
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 08:59:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2E8F20872
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9F9AF20872
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 09:02:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Tqc25jtd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F9AF20872
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39544 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39576 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlUuy-00068h-Rr
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 04:59:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35622)
+	id 1hlUyL-0000IR-Rg
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 05:02:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36169)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgilbert@redhat.com>) id 1hlUu9-0005Nw-3x
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 04:58:18 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hlUwN-00070x-O1
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 05:00:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1hlUu7-0008Kp-SP
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 04:58:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:32888)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hlUu7-0008JK-Hl
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 04:58:15 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 6D387C047B7A;
- Thu, 11 Jul 2019 08:58:13 +0000 (UTC)
-Received: from work-vm (ovpn-117-165.ams2.redhat.com [10.36.117.165])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B92EF194B5;
- Thu, 11 Jul 2019 08:58:09 +0000 (UTC)
-Date: Thu, 11 Jul 2019 09:58:07 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: =?utf-8?B?Wm9sdMOhbiBLxZF2w6Fnw7M=?= <dirty.ice.hu@gmail.com>
-Message-ID: <20190711085807.GD3971@work-vm>
-References: <cover.1562695780.git.DirtY.iCE.hu@gmail.com>
- <597ee579c3d14ff6f0892ee9e1905cdb0e0990ad.1562695780.git.DirtY.iCE.hu@gmail.com>
- <87ef2yy1n4.fsf@dusky.pond.sub.org>
- <c0ada78b-6d77-936d-f059-3458ca74a156@gmail.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1hlUwM-000311-Nr
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 05:00:35 -0400
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:36126)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hlUwM-0002tl-FG
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 05:00:34 -0400
+Received: by mail-oi1-x242.google.com with SMTP id w7so3915116oic.3
+ for <qemu-devel@nongnu.org>; Thu, 11 Jul 2019 02:00:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=tfwTdkcJBEvZeWdEKfKcZzF1aRHF6elEA4SgwB16G04=;
+ b=Tqc25jtd/AxxEGSVVSxd+L7xZ8HpkfIy6Te0O7kZF/C9+p3njcu7cl4Z/1FKQ7W4Te
+ sHDDXWpoNqvnmbWYcHhk6f21e3AeVR3b8em2lvW6iQ0CEa7tWTzLub9Q8tAaTFEtKlmN
+ xUkODHufLL2WYgOpfn0ye7UC0UetiXAYDLioXG2naofdlE1XJT9vSQaYo4smLTtMzFDj
+ WZJI+aNYUCEAWiGkxyBG674ktpP2tXTxSbRIMvsiBD2o3J8yh+Q8M0cFq0kGLQWCBulQ
+ 1fchWLWzeD/ikEeGO3LFXmZf0Z2x07oL5mrXW9w3nE5O1f2x/8gyBw9GYpkmyE8knPgA
+ WDGA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=tfwTdkcJBEvZeWdEKfKcZzF1aRHF6elEA4SgwB16G04=;
+ b=g4zQnSNqKZ3AUoVpq72q4ojHWH6WfRv9HCb/Be4sY+CN+8n5inMB5Vi7fszJl1TIb0
+ Ug/bmmJns4jzI4Rt/b115klIve0O2JjIbGL8rNxg+3CCEiGtN6XosYaXh6F5/6gqbBBk
+ n+utroaw6Scvn9F/CevOvFTVmArFCbdCSBtcxwZhQZkWnBPqQ5M0+Xpw9skc8FdzGYYC
+ Pq0yH5C2MwnHnDrj8d2m/rDeD/DeqLlEt9zX5dz4aFoQvjl/Sr7RQPlU0kVW2RdyIXQg
+ 87BPrmBAbAZlZaDownUtYLULRmqmogAVHKkiLk7yjW04ed7GuAe1k2tQSuZFvj5o1DvN
+ kLlw==
+X-Gm-Message-State: APjAAAXmTGdcQ/DHj5lvLvHg7aqdNCkLjZf6hHaNT6uOn+Rnhhs4wT31
+ wR6k2UNh2ElnBWG7sXP4J1yOvWUga/Fl3EEmDHQsoA==
+X-Google-Smtp-Source: APXvYqz1ITVa2brsDnXL2+2grkblmm6w0LeCq04EnWmYp5kumpSZ6GjeYXuTT0g+JBj3fbzraANtOHwKJOfxI9NsWXo=
+X-Received: by 2002:aca:6185:: with SMTP id v127mr1796406oib.163.1562835630448; 
+ Thu, 11 Jul 2019 02:00:30 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <c0ada78b-6d77-936d-f059-3458ca74a156@gmail.com>
-User-Agent: Mutt/1.12.0 (2019-05-25)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Thu, 11 Jul 2019 08:58:13 +0000 (UTC)
+References: <2136180936.260219.1561641583358.ref@mail.yahoo.com>
+ <2136180936.260219.1561641583358@mail.yahoo.com>
+ <1079763171.281101.1561641752988@mail.yahoo.com>
+ <e4c1fbc4-3e43-5df4-a17c-527d98d9763c@linaro.org>
+ <20190628002713.GA19257@localhost.localdomain>
+ <eadb57ae-256d-0bb7-5988-f493662a5caf@linaro.org>
+ <20190628155030.GA34320@localhost.localdomain>
+ <ea16a81c-5b94-8dd0-8339-2bd82733aed2@linaro.org>
+ <20190629163621.GA111724@localhost.localdomain>
+ <CAFEAcA9sfNisAz-zAZAx=ZNFmsEpP0Ec2DeRedtZSd9KQ4fvNA@mail.gmail.com>
+ <1399218244.1210557.1561982640362@mail.yahoo.com>
+ <CAFEAcA-0vGg_1nfkbq+o6JwoDsRyP=6mnv6ADi-atV0ROX269Q@mail.gmail.com>
+ <CALvKS=GvAkNr3OKZzjGoTGG_Eys76zjcjodiN4hKXjFM5B0a4A@mail.gmail.com>
+ <d9e5602c-bb33-1812-ebc2-b533e9dd5f25@linaro.org>
+ <CALvKS=EbuQOvRx+bmRnqCD6JuHK87dnkx00EiH--aXYWuNF0VQ@mail.gmail.com>
+ <87ims9eox5.fsf@zen.linaroharston>
+In-Reply-To: <87ims9eox5.fsf@zen.linaroharston>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 11 Jul 2019 10:00:19 +0100
+Message-ID: <CAFEAcA9EoVv2uStszMmGD4EwJB8CCN_rgCbD8_nru_sUP74dsQ@mail.gmail.com>
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 02/11] audio: basic support for multi
- backend audio
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::242
+Subject: Re: [Qemu-devel] RFC: Why does target/m68k RTE insn. use
+ gen_exception
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,107 +103,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- qemu-devel@nongnu.org
+Cc: Lucien Anti-Spam <lucienmp_antispam@yahoo.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Zolt=C3=A1n K=C5=91v=C3=A1g=C3=B3 (dirty.ice.hu@gmail.com) wrote:
-> On 2019-07-10 06:06, Markus Armbruster wrote:
-> > "K=C5=91v=C3=A1g=C3=B3, Zolt=C3=A1n" <dirty.ice.hu@gmail.com> writes:
-> >=20
-> >> Audio functions no longer access glob_audio_state, instead they get =
-an
-> >> AudioState as a parameter.  This is required in order to support
-> >> multiple backends.
-> >>
-> >> glob_audio_state is also gone, and replaced with a tailq so we can s=
-tore
-> >> more than one states.
-> >>
-> >> Signed-off-by: K=C5=91v=C3=A1g=C3=B3, Zolt=C3=A1n <DirtY.iCE.hu@gmai=
-l.com>
-> >> ---
-> > [...]
-> >> diff --git a/hmp-commands.hx b/hmp-commands.hx
-> >> index bfa5681dd2..23196da3fe 100644
-> >> --- a/hmp-commands.hx
-> >> +++ b/hmp-commands.hx
-> >> @@ -819,16 +819,17 @@ ETEXI
-> >> =20
-> >>      {
-> >>          .name       =3D "wavcapture",
-> >> -        .args_type  =3D "path:F,freq:i?,bits:i?,nchannels:i?",
-> >> -        .params     =3D "path [frequency [bits [channels]]]",
-> >> +        .args_type  =3D "path:F,freq:i?,bits:i?,nchannels:i?,audiod=
-ev:s?",
-> >> +        .params     =3D "path [frequency [bits [channels [audiodev]=
-]]]",
-> >>          .help       =3D "capture audio to a wave file (default freq=
-uency=3D44100 bits=3D16 channels=3D2)",
-> >>          .cmd        =3D hmp_wavcapture,
-> >>      },
-> >>  STEXI
-> >> -@item wavcapture @var{filename} [@var{frequency} [@var{bits} [@var{=
-channels}]]]
-> >> +@item wavcapture @var{filename} [@var{frequency} [@var{bits} [@var{=
-channels} [@var{audiodev}]]]]
-> >>  @findex wavcapture
-> >> -Capture audio into @var{filename}. Using sample rate @var{frequency=
-}
-> >> -bits per sample @var{bits} and number of channels @var{channels}.
-> >> +Capture audio into @var{filename} from @var{audiodev}. Using sample=
- rate
-> >> +@var{frequency} bits per sample @var{bits} and number of channels
-> >> +@var{channels}.
-> >> =20
-> >>  Defaults:
-> >>  @itemize @minus
-> >    @item Sample rate =3D 44100 Hz - CD quality
-> >    @item Bits =3D 16
-> >    @item Number of channels =3D 2 - Stereo
-> >    @end itemize
-> >    ETEXI
-> >=20
-> > Defaults for the other optional arguments are listed here.  Why not f=
-or
-> > @audiodev?
->=20
-> There's no default listed because there's no default when you use the
-> -audiodev options, since there's no good default.  When you don't use
-> -audiodev, it'll use the implicitly created audiodev which doesn't have
-> a name, so it can't be specified.  But I agree that this situation
-> should be documented somehow.
->=20
-> >=20
-> >> diff --git a/qemu-options.hx b/qemu-options.hx
-> >> index 9621e934c0..0111055aa4 100644
-> >> --- a/qemu-options.hx
-> >> +++ b/qemu-options.hx
-> >> @@ -1978,6 +1978,11 @@ can help the device and guest to keep up and =
-not lose events in case
-> >>  events are arriving in bulk.  Possible causes for the latter are fl=
-aky
-> >>  network connections, or scripts for automated testing.
-> >> =20
-> >> +@item audiodev=3D@var{audiodev}
-> >> +
-> >> +Use the specified @var{audiodev} when the VNC client requests audio
-> >> +transmission.
-> >> +
-> >=20
-> > What's the default?
->=20
-> It's the same story as wav_capture.
+On Wed, 10 Jul 2019 at 19:15, Alex Benn=C3=A9e <alex.bennee@linaro.org> wro=
+te:
+> Lucien Murray-Pitts <lucienmp.qemu@gmail.com> writes:
+> > I am very new to TCG, so it does seem there is a lot of code in the
+> > translator_loop that appears to be interacting with the CPU model/state=
+.
+> > Should I be worried about this, or is this a safe function to call outs=
+ide
+> > of the translator core proper?
+>
+> I would recommend against it - the time to do stuff like this would be
+> during translation phase where you can save the data. Don't re-invoke the
+> translator while trying to process an exception.
+>
+> Is the instruction format that irregular that you can't do a simple
+> disassembly in a helper?
 
-OK, so I think you're saying the default behaviour doesn't change.
-Add a comment to document that, and that seems OK.
+For anything moderately complicated, the use of the tcg_set_insn_param()
+and restore_state_to_opc() that RTH recommends is definitely the
+way to go. That way you can just save the right information when
+you translate the code and don't have two separate bits of decoding
+logic that need to agree.
 
-Dave
+For a more complicated example than the s390 one, you can look
+at target/arm, which uses this to generate the 'syndrome' register
+value which can include things like "which register was this faulting
+load trying to load to".
 
-> Regards,
-> Zoltan
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+thanks
+-- PMM
 
