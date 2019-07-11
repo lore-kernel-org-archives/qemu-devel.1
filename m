@@ -2,92 +2,81 @@ Return-Path: <SRS0=FHOf=VI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17000C74A5B
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 16:56:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDB8AC74A5B
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 17:07:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D8EEB2084B
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 16:56:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AC4632084B
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 17:07:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dW4M2ax0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8EEB2084B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KG2r1ZtT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC4632084B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43642 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43702 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlcND-0008Hc-SW
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 12:56:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52089)
+	id 1hlcXA-0002LI-AP
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 13:07:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55459)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1hlcN2-0007tL-O1
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 12:56:37 -0400
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1hlcX0-0001x5-CJ
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 13:06:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1hlcN1-0007Sf-Ix
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 12:56:36 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:34542)
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1hlcWz-0008LB-BL
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 13:06:54 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:40326)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1hlcN1-0007Ru-BG
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 12:56:35 -0400
-Received: by mail-wm1-x341.google.com with SMTP id w9so7402244wmd.1
- for <qemu-devel@nongnu.org>; Thu, 11 Jul 2019 09:56:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=nADoGqFUDZNofvaSIAdY16hExFovZ6z93MDS0pJfIgU=;
- b=dW4M2ax0WTYzmIqYE/5XQwwF7RVlCkF3EOgXVhaOTnFBuu+CA2oVrmEprpLC17yCB7
- Aa3CqizPgy6Rk9QEBu6ETtK+JCKfH4MnHpcNH/zZbaJB9LPgm4POJOQE16IhO02DwuY0
- vNaILd+oTPHPmbjoNOeO1O/3TjKXI820/Mrwjm6+rwMr6msSbLREnUcuTGMQ61apXt5x
- XyiA+o9XztVK+R5OLFskz1Hoxu5MXa3JSf1ZI2Fh8FbuhSK1n/5LdLGM40RGEUxwqa74
- 9ynZqL9AFyuzNmHSogBPz4CDaVp9Eg5VUmJRF7Qt07Yc1eD3DAGz1+OxCaqgI+Bz2lbu
- A/Ng==
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1hlcWz-0008Ij-3w
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 13:06:53 -0400
+Received: by mail-ot1-x344.google.com with SMTP id e8so6573947otl.7
+ for <qemu-devel@nongnu.org>; Thu, 11 Jul 2019 10:06:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=0NTeAw455IiAkWw9aWmMtYBPnwbCpVek6mthoHIFr40=;
+ b=KG2r1ZtT8Tqd08mLQomxcav0G7/fMR4o4kgpVADmxu3LHj+u+LojgriDq+lpOyavUq
+ EbUe593ugI/a4YnaK9cDfqUrBm/k2ey0YUe58hzejrYRd2HF8ml+eWUwuVWufMwxzW8T
+ gb2MigdyiKzUZgEBhtZTcfc8Cl1qscwsvbf11E4izXP7mIvDQ9Dw2Uxxc4r+SqSqG/NN
+ 4tpANkweFDxEg2iz0keZ3pF7Q1MySduWm7IkjXCaZbxowgpyuRkTG2qdHwWqBqF20Q+v
+ jFf4E8IcRHNxkvlwf9sOPIoxYAodDlTBVcRMTpJaMvYyr9BJBhz3jIn5HvqbNgeKgGr6
+ xEDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=nADoGqFUDZNofvaSIAdY16hExFovZ6z93MDS0pJfIgU=;
- b=LEtZyY+wUJU0THAXL8pzfgwwwt+qpvPaEbxuTk72IqIris0OikZm0MkHKnEB2vnh5S
- nUjxh/PxZBcujeWHX/ZWxfIU1m3WnM7PLXW/rVs2fAwIR3xXZj3fuxKJ6bEqFQoZtX8Y
- xsWvGbimVB7/lzMWBjkr7x8gXAQWKm108yfRk380NZgdfELMJauMf7havkCFN4eKgZcF
- AzrdS9GK0p/tTy4h9H4aw33htt/BFcM66yoUXhx/jtvfVAoo9Y9OXN2Nn3pX2p8zOZeL
- YcHgk39OzNhQKKnjcP++cyidRjlwKWSAkD4+7A22yLfaYfAOj87UzD1wSnCCFYRpfRny
- 4AUA==
-X-Gm-Message-State: APjAAAV6uzkkk/avgMqMNuHXIkpX3ePF21ErKp3elqnGSJrJH8SSTOQF
- I/1YFkRV9i5XJoyaLPi/Zmpo4g==
-X-Google-Smtp-Source: APXvYqxW2fG8EHG9wC+x7U0oh27DFgX2yyhrmbBpjhLxHJA1SSKrswAE767D0Yvh7x3JhyPHMQPRAw==
-X-Received: by 2002:a1c:345:: with SMTP id 66mr5169343wmd.8.1562864193282;
- Thu, 11 Jul 2019 09:56:33 -0700 (PDT)
-Received: from [192.168.12.133] (ip-208-51.sn2.clouditalia.com.
- [83.211.208.51])
- by smtp.gmail.com with ESMTPSA id y10sm4101130wmj.2.2019.07.11.09.56.32
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 11 Jul 2019 09:56:32 -0700 (PDT)
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-References: <20190711122827.18970-1-armbru@redhat.com>
- <20190711122827.18970-2-armbru@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <e5139329-82e3-26dc-b72a-136f8a9c1cc0@linaro.org>
-Date: Thu, 11 Jul 2019 18:56:30 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.1
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=0NTeAw455IiAkWw9aWmMtYBPnwbCpVek6mthoHIFr40=;
+ b=RbTZMMDVomwQxnx+kjyDcHPG3U/+1Wc30+Mu0LsgxUZaO7BHjTsS70YrNMwStzjTJE
+ tbzSz1dvf49ZRsecpYecnkH2HfvkrPXY7kyI8kw8CIeHpg+4QMjtmBTLBNH9iyQe8nas
+ W3TEm2icoPf6o4IYNxbnI59LdVeH6wroL5B/vsDyn3H8Y/yO2oYCCwHHFtfgBVxZY9/p
+ fcsDjEYpNbu3lcV0WGKbWz0MIpexv7IJDrZYi6fdjE7l+4PMN48PTdt2qc1Ca8KwZ1h8
+ 926K457AK8ZcA8u9FYRd6G90QJsxafysgRZWlhOVZzfb8JNy3iv3CkdV+4n92hHygwv4
+ yb5Q==
+X-Gm-Message-State: APjAAAXDuoGDxA1AgL6y3XZDKlG7NhlrXQXbk152zRuuOgnodA8hJbv1
+ JFXdQwtsD2muRNE01Tw18g8GmaIjiTV+6hZyHA8=
+X-Google-Smtp-Source: APXvYqw+Pl0hBlXvsP8UCKDdJO+Y7rNkCJJKXmot9wK6Yg4FJdI2q4weGX+7GavJ/9428LBuCLcDID/O46MR1dXTVUg=
+X-Received: by 2002:a9d:6ad7:: with SMTP id m23mr4317176otq.306.1562864811637; 
+ Thu, 11 Jul 2019 10:06:51 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190711122827.18970-2-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20190709184823.4135-1-richard.henderson@linaro.org>
+ <CAL1e-=j8J0WLUjhaOvecSU3VtRf5W+zP-Ydi_kZth4BYV_cXtg@mail.gmail.com>
+ <d92c85b6-f7a4-71b8-9601-03d8975b5212@linaro.org>
+In-Reply-To: <d92c85b6-f7a4-71b8-9601-03d8975b5212@linaro.org>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Thu, 11 Jul 2019 19:06:40 +0200
+Message-ID: <CAL1e-=hmUUcztCMpEXAGk0AaqitARTJf2hxLgNybKO9o=ga=Wg@mail.gmail.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::341
-Subject: Re: [Qemu-devel] [PATCH RFC v5 1/3] tests: New make target
- check-source
+X-Received-From: 2607:f8b0:4864:20::344
+Subject: Re: [Qemu-devel] [PATCH] tcg/aarch64: Fix output of extract2 opcodes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,33 +88,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, pbonzini@redhat.com
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Beata Michalska <beata.michalska@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/11/19 2:28 PM, Markus Armbruster wrote:
->  include/exec/cpu_ldst_template.h          |  3 +
->  include/exec/cpu_ldst_useronly_template.h |  3 +
->  include/exec/cputlb.h                     |  3 +
->  include/exec/exec-all.h                   |  3 +
->  include/exec/gen-icount.h                 |  2 +
->  include/exec/helper-gen.h                 |  2 +
->  include/exec/helper-proto.h               |  2 +
->  include/exec/helper-tcg.h                 |  2 +
->  include/exec/ioport.h                     |  2 +
->  include/exec/memory-internal.h            |  2 +
->  include/exec/memory_ldst.inc.h            |  2 +
->  include/exec/memory_ldst_cached.inc.h     |  2 +
->  include/exec/memory_ldst_phys.inc.h       |  2 +
+On Thu, Jul 11, 2019 at 1:45 PM Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> On 7/10/19 8:12 PM, Aleksandar Markovic wrote:
+> > On Tue, Jul 9, 2019 at 8:56 PM Richard Henderson
+> > <richard.henderson@linaro.org> wrote:
+> >>
+> >> The aarch64 argument ordering for the operands is big-endian,
+> >> whereas the tcg argument ordering is little-endian.  Use REG0
+> >> so that we honor the rZ constraints.
+> >
+> > Hello, Richard.
+> >
+> > If endian and rZ constraints are unrelated problems, then I think the
+> > commit message
+> > should be:
+> >
+> > "This patch fixes two problem:
+> >
+> > - endianness: the aarch64 argument ordering for the operands is
+> > big-endian, whereas the tcg argument ordering is little-endian.
+> >
+> > - rZ constrains: REG0() macro should be applied to the affected
+> > arguments."
+>
+> That's fair.
+>
+> > One could argue that in this case the patch this should be actually two patches.
+> > This is better because of bisectability. The number of line in the
+> > patch doesn't matter.
+>
+> Well, nothing between the faulty commit (Fixes: 464c2969d5d) and the second of
+> the two prospective patches is really bisectable.  For the given test case, all
+> points in between will fail at runtime, even if each point compiles.
+>
+> Therefore I don't see the point in separating the two changes.
+>
+> > Would you be so kind to consider my opinion?
+>
+> Yes.  Thanks for the expanded opinion.
+>
+> I plan to change the commit message to:
+>
+> ---
+> tcg/aarch64: Fix output of extract2 opcodes
+>
+> This patch fixes two problems:
+> (1) The inputs to the EXTR insn were reversed,
+> (2) The input constraints use rZ, which means that we need to use
+>     the REG0 macro in order to supply XZR for a constant 0 input.
+>
+> r-b, s-o-b, etc
+> ---
+>
+> Does that seem sufficient to you?
+>
 
-The pattern used should not match all *.h, but exclude *_template.h (older
-naming style) and *.inc.h (newer naming style; we really should finish the
-conversion).
+It does. That's super. Thank you very much!
 
-These headers are not standalone, and will be included multiple times by one of
-the other headers.
+Yours,
+Aleksandar
 
-
-r~
+>
+> r~
 
