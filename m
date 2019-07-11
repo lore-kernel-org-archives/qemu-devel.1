@@ -2,61 +2,67 @@ Return-Path: <SRS0=FHOf=VI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5D57C742A1
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 17:43:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57B9CC742A1
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 17:44:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7FA14208E4
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 17:43:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7FA14208E4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3224D208E4
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 17:44:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3224D208E4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44256 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44262 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hld6h-0006rd-DW
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 13:43:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38924)
+	id 1hld6s-0007gd-7l
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 13:43:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38864)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <eric.auger@redhat.com>) id 1hld5E-0000g2-JU
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 13:42:17 -0400
+ (envelope-from <no-reply@patchew.org>) id 1hld57-00007f-4j
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 13:42:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1hld59-0005vd-Me
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 13:42:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58224)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1hld4y-0005ap-3K; Thu, 11 Jul 2019 13:42:01 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 5B64E30821B2;
- Thu, 11 Jul 2019 17:41:56 +0000 (UTC)
-Received: from laptop.redhat.com (ovpn-116-46.ams2.redhat.com [10.36.116.46])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6A9ED60600;
- Thu, 11 Jul 2019 17:41:53 +0000 (UTC)
-From: Eric Auger <eric.auger@redhat.com>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org,
- qemu-arm@nongnu.org, peter.maydell@linaro.org
-Date: Thu, 11 Jul 2019 19:39:24 +0200
-Message-Id: <20190711173933.31203-21-eric.auger@redhat.com>
-In-Reply-To: <20190711173933.31203-1-eric.auger@redhat.com>
-References: <20190711173933.31203-1-eric.auger@redhat.com>
+ (envelope-from <no-reply@patchew.org>) id 1hld51-0005ku-IW
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 13:42:07 -0400
+Resent-Date: Thu, 11 Jul 2019 13:42:04 -0400
+Resent-Message-Id: <E1hld51-0005ku-IW@eggs.gnu.org>
+Received: from sender4-of-o59.zoho.com ([136.143.188.59]:21943)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1hld51-0005e6-3c
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 13:42:03 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1562866879; cv=none; d=zoho.com; s=zohoarc; 
+ b=VFG6Pq/zaU/OO49fzrfYliDckE2JLY5DIv3So/cdcqBHd7icI131UhraNcWvbHGmVPGeBUTFDNstN8pOae9NJOjA/x2O+DjI25Vw110YMTMkPkfonoz4NIvYblaGVVwxq89fyVpD56Rgbbf3YVmB9kQo4hIBoNTW0YzhY2NcUCQ=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1562866879;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+ bh=Jcr7jjp63ZpdSXnllpDchI4NZLlG/wwwaMvsDONCols=; 
+ b=kAqtcjRV0LKJ5RcxJatnTrw3OB91DhNRM20KYDqWK1W81PUFfHXjUMJsaeucbGpMCRHnIVp6hDPeFb9hMi83CrrwDZqJ6pWu3gEHKW5i8+CbGez5Kat4m5wVh2X8ZLUJhnYbnJiw/QJsookSQR3QZ6tXjpLgaqdDGq9K596OMiQ=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1562866878972127.62788161850324;
+ Thu, 11 Jul 2019 10:41:18 -0700 (PDT)
+Message-ID: <156286687760.12463.11131522037817931956@c4a48874b076>
+In-Reply-To: <20190711173131.6347-1-laurent@vivier.eu>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Thu, 11 Jul 2019 17:41:56 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: laurent@vivier.eu
+Date: Thu, 11 Jul 2019 10:41:18 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [RFC v5 20/29] vfio/pci: Register handler for iommu
- fault
+X-Received-From: 136.143.188.59
+Subject: Re: [Qemu-devel] [PATCH v4] linux-user: fix to handle variably
+ sized SIOCGSTAMP with new kernels
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,192 +74,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: drjones@redhat.com, yi.l.liu@intel.com, mst@redhat.com,
- jean-philippe.brucker@arm.com, zhangfei.gao@foxmail.com, peterx@redhat.com,
- alex.williamson@redhat.com, vincent.stehle@arm.com
+Reply-To: qemu-devel@nongnu.org
+Cc: berrange@redhat.com, arnd@arndb.de, gerhard.stenzel@de.ibm.com,
+ riku.voipio@iki.fi, qemu-devel@nongnu.org, christian.ehrhardt@canonical.com,
+ laurent@vivier.eu, borntraeger@de.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We use the new extended IRQ VFIO_IRQ_TYPE_NESTED type and
-VFIO_IRQ_SUBTYPE_DMA_FAULT subtype to set/unset
-a notifier for physical DMA faults. The associated eventfd is
-triggered, in nested mode, whenever a fault is detected at IOMMU
-physical level.
-
-The actual handler will be implemented in subsequent patches.
-
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
-
----
-
-v4 -> v5:
-- index_to_str now returns the index name, ie. DMA_FAULT
-- use the extended IRQ
-
-v3 -> v4:
-- check VFIO_PCI_DMA_FAULT_IRQ_INDEX is supported at kernel level
-  before attempting to set signaling for it.
----
- hw/vfio/pci.c | 81 ++++++++++++++++++++++++++++++++++++++++++++++++++-
- hw/vfio/pci.h |  7 +++++
- 2 files changed, 87 insertions(+), 1 deletion(-)
-
-diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-index 45e007575e..19702cdbbf 100644
---- a/hw/vfio/pci.c
-+++ b/hw/vfio/pci.c
-@@ -2761,6 +2761,76 @@ static PCIPASIDOps vfio_pci_pasid_ops =3D {
-     .set_pasid_table =3D vfio_iommu_set_pasid_table,
- };
-=20
-+static void vfio_dma_fault_notifier_handler(void *opaque)
-+{
-+    VFIOPCIExtIRQ *ext_irq =3D opaque;
-+
-+    if (!event_notifier_test_and_clear(&ext_irq->notifier)) {
-+        return;
-+    }
-+}
-+
-+static int vfio_register_ext_irq_handler(VFIOPCIDevice *vdev,
-+                                         uint32_t type, uint32_t subtype=
-,
-+                                         IOHandler *handler)
-+{
-+    int32_t fd, ext_irq_index, index;
-+    struct vfio_irq_info *irq_info;
-+    Error *err =3D NULL;
-+    EventNotifier *n;
-+    int ret;
-+
-+    ret =3D vfio_get_dev_irq_info(&vdev->vbasedev, type, subtype, &irq_i=
-nfo);
-+    if (ret) {
-+        return ret;
-+    }
-+    index =3D irq_info->index;
-+    ext_irq_index =3D irq_info->index - VFIO_PCI_NUM_IRQS;
-+    g_free(irq_info);
-+
-+    vdev->ext_irqs[ext_irq_index].vdev =3D vdev;
-+    vdev->ext_irqs[ext_irq_index].index =3D index;
-+    n =3D &vdev->ext_irqs[ext_irq_index].notifier;
-+
-+    ret =3D event_notifier_init(n, 0);
-+    if (ret) {
-+        error_report("vfio: Unable to init event notifier for ext irq %d=
-(%d)",
-+                     ext_irq_index, ret);
-+        return ret;
-+    }
-+
-+    fd =3D event_notifier_get_fd(n);
-+    qemu_set_fd_handler(fd, vfio_dma_fault_notifier_handler, NULL,
-+                        &vdev->ext_irqs[ext_irq_index]);
-+
-+    ret =3D vfio_set_irq_signaling(&vdev->vbasedev, index, 0,
-+                                 VFIO_IRQ_SET_ACTION_TRIGGER, fd, &err);
-+    if (ret) {
-+        error_reportf_err(err, VFIO_MSG_PREFIX, vdev->vbasedev.name);
-+        qemu_set_fd_handler(fd, NULL, NULL, vdev);
-+        event_notifier_cleanup(n);
-+    }
-+    return ret;
-+}
-+
-+static void vfio_unregister_ext_irq_notifiers(VFIOPCIDevice *vdev)
-+{
-+    VFIODevice *vbasedev =3D &vdev->vbasedev;
-+    Error *err =3D NULL;
-+    int i;
-+
-+    for (i =3D 0; i < vbasedev->num_irqs - VFIO_PCI_NUM_IRQS; i++) {
-+        if (vfio_set_irq_signaling(vbasedev, i + VFIO_PCI_NUM_IRQS , 0,
-+                                   VFIO_IRQ_SET_ACTION_TRIGGER, -1, &err=
-)) {
-+            error_reportf_err(err, VFIO_MSG_PREFIX, vdev->vbasedev.name)=
-;
-+        }
-+        qemu_set_fd_handler(event_notifier_get_fd(&vdev->ext_irqs[i].not=
-ifier),
-+                            NULL, NULL, vdev);
-+        event_notifier_cleanup(&vdev->ext_irqs[i].notifier);
-+    }
-+    g_free(vdev->ext_irqs);
-+}
-+
- static void vfio_realize(PCIDevice *pdev, Error **errp)
- {
-     VFIOPCIDevice *vdev =3D PCI_VFIO(pdev);
-@@ -2771,7 +2841,7 @@ static void vfio_realize(PCIDevice *pdev, Error **e=
-rrp)
-     ssize_t len;
-     struct stat st;
-     int groupid;
--    int i, ret;
-+    int i, ret, nb_ext_irqs;
-     bool is_mdev;
-=20
-     if (!vdev->vbasedev.sysfsdev) {
-@@ -2859,6 +2929,11 @@ static void vfio_realize(PCIDevice *pdev, Error **=
-errp)
-         goto error;
-     }
-=20
-+    nb_ext_irqs =3D vdev->vbasedev.num_irqs - VFIO_PCI_NUM_IRQS;
-+    if (nb_ext_irqs > 0) {
-+        vdev->ext_irqs =3D g_new0(VFIOPCIExtIRQ, nb_ext_irqs);
-+    }
-+
-     vfio_populate_device(vdev, &err);
-     if (err) {
-         error_propagate(errp, err);
-@@ -3060,6 +3135,9 @@ static void vfio_realize(PCIDevice *pdev, Error **e=
-rrp)
-=20
-     vfio_register_err_notifier(vdev);
-     vfio_register_req_notifier(vdev);
-+    vfio_register_ext_irq_handler(vdev, VFIO_IRQ_TYPE_NESTED,
-+                                  VFIO_IRQ_SUBTYPE_DMA_FAULT,
-+                                  vfio_dma_fault_notifier_handler);
-     vfio_setup_resetfn_quirk(vdev);
-=20
-     pci_setup_pasid_ops(pdev, &vfio_pci_pasid_ops);
-@@ -3100,6 +3178,7 @@ static void vfio_exitfn(PCIDevice *pdev)
-=20
-     vfio_unregister_req_notifier(vdev);
-     vfio_unregister_err_notifier(vdev);
-+    vfio_unregister_ext_irq_notifiers(vdev);
-     pci_device_set_intx_routing_notifier(&vdev->pdev, NULL);
-     vfio_disable_interrupts(vdev);
-     if (vdev->intx.mmap_timer) {
-diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
-index 834a90d646..893d074375 100644
---- a/hw/vfio/pci.h
-+++ b/hw/vfio/pci.h
-@@ -113,6 +113,12 @@ typedef struct VFIOMSIXInfo {
-     unsigned long *pending;
- } VFIOMSIXInfo;
-=20
-+typedef struct VFIOPCIExtIRQ {
-+    struct VFIOPCIDevice *vdev;
-+    EventNotifier notifier;
-+    uint32_t index;
-+} VFIOPCIExtIRQ;
-+
- typedef struct VFIOPCIDevice {
-     PCIDevice pdev;
-     VFIODevice vbasedev;
-@@ -134,6 +140,7 @@ typedef struct VFIOPCIDevice {
-     PCIHostDeviceAddress host;
-     EventNotifier err_notifier;
-     EventNotifier req_notifier;
-+    VFIOPCIExtIRQ *ext_irqs;
-     int (*resetfn)(struct VFIOPCIDevice *);
-     uint32_t vendor_id;
-     uint32_t device_id;
---=20
-2.20.1
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDcxMTE3MzEzMS42MzQ3
+LTEtbGF1cmVudEB2aXZpZXIuZXUvCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2ZSBz
+b21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBpbmZv
+cm1hdGlvbjoKClR5cGU6IHNlcmllcwpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHY0XSBs
+aW51eC11c2VyOiBmaXggdG8gaGFuZGxlIHZhcmlhYmx5IHNpemVkIFNJT0NHU1RBTVAgd2l0aCBu
+ZXcga2VybmVscwpNZXNzYWdlLWlkOiAyMDE5MDcxMTE3MzEzMS42MzQ3LTEtbGF1cmVudEB2aXZp
+ZXIuZXUKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJz
+ZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5h
+bWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmln
+IC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBs
+IC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpTd2l0Y2hlZCB0byBh
+IG5ldyBicmFuY2ggJ3Rlc3QnCmFkYjM0MDUgbGludXgtdXNlcjogZml4IHRvIGhhbmRsZSB2YXJp
+YWJseSBzaXplZCBTSU9DR1NUQU1QIHdpdGggbmV3IGtlcm5lbHMKCj09PSBPVVRQVVQgQkVHSU4g
+PT09CkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojNzk6IEZJTEU6IGxpbnV4LXVzZXIv
+c3lzY2FsbF9kZWZzLmg6NzU2OgorI2RlZmluZSBUQVJHRVRfU0lPQ0dTVEFNUF9ORVcgICBUQVJH
+RVRfSU9SKDB4ODksIDB4MDYsIGFiaV9sbG9uZ1syXSkgLyogR2V0IHN0YW1wICh0aW1ldmFsNjQp
+ICovCgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzgwOiBGSUxFOiBsaW51eC11c2Vy
+L3N5c2NhbGxfZGVmcy5oOjc1NzoKKyNkZWZpbmUgVEFSR0VUX1NJT0NHU1RBTVBOU19ORVcgVEFS
+R0VUX0lPUigweDg5LCAweDA3LCBhYmlfbGxvbmdbMl0pIC8qIEdldCBzdGFtcCAodGltZXNwZWM2
+NCkgKi8KCnRvdGFsOiAyIGVycm9ycywgMCB3YXJuaW5ncywgNTAgbGluZXMgY2hlY2tlZAoKQ29t
+bWl0IGFkYjM0MDVhMDZhNCAobGludXgtdXNlcjogZml4IHRvIGhhbmRsZSB2YXJpYWJseSBzaXpl
+ZCBTSU9DR1NUQU1QIHdpdGggbmV3IGtlcm5lbHMpIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNl
+IHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBv
+cnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMu
+Cj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpU
+aGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkw
+NzExMTczMTMxLjYzNDctMS1sYXVyZW50QHZpdmllci5ldS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5
+cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcg
+W2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRj
+aGV3LWRldmVsQHJlZGhhdC5jb20=
 
 
