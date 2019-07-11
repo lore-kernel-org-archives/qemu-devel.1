@@ -2,72 +2,88 @@ Return-Path: <SRS0=FHOf=VI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BBD1C74A35
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 12:11:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24828C74A52
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 12:13:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EE54F20665
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 12:11:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE54F20665
+	by mail.kernel.org (Postfix) with ESMTPS id E75BB20665
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 12:13:35 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="u83XEOxf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E75BB20665
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41222 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41236 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlXvN-0004qC-2y
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 08:11:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48222)
+	id 1hlXx9-0006Po-4E
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 08:13:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48645)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bounces@canonical.com>) id 1hlXuV-0003zW-Pt
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 08:10:52 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hlXwE-0005lT-Ln
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 08:12:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1hlXuU-0007UY-LY
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 08:10:51 -0400
-Received: from indium.canonical.com ([91.189.90.7]:35190)
+ (envelope-from <peter.maydell@linaro.org>) id 1hlXwC-0000iz-FV
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 08:12:38 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:52436)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1hlXuU-0007UB-G7
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 08:10:50 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1hlXuT-0000Fv-LB
- for <qemu-devel@nongnu.org>; Thu, 11 Jul 2019 12:10:49 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 94C392E802E
- for <qemu-devel@nongnu.org>; Thu, 11 Jul 2019 12:10:49 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 11 Jul 2019 12:02:08 -0000
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hlXwB-0000hV-W9
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 08:12:36 -0400
+Received: by mail-wm1-x344.google.com with SMTP id s3so5453801wms.2
+ for <qemu-devel@nongnu.org>; Thu, 11 Jul 2019 05:12:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=V3cMonKbsaOdqE8YXh9RMaH2ufvX5rqBag4d1fqLsno=;
+ b=u83XEOxfttHrkYfRR73FH+1Bt+QVdu6ihf18+K/CsYJfsbore+Nud1Giocp4+HS0Kt
+ MFCwzg+hfmaS0GGCA3QBl38im7IDB9q/qf55dLqYYFNzTu+GcO43QDLcB7RVU+yp+/F9
+ W8dqbGbmYd4RPFbSVt6HNdgIoQmDg+RDBEPpbr2n249w/2qlW1NACfEYV9UTanDuCOL0
+ MUN/LnilhLZAWQiRCeqfXSvontMpYIV89mh0gY7kYwmMT813osJM8c6hmEJAAonFTkc2
+ TLIls6cmJbfmcAuiSLg1R8Pz/QJujVDGNGVbZDR9DmgOJj5XXIl1LY/YuJlSpdZDctpE
+ gvaA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=V3cMonKbsaOdqE8YXh9RMaH2ufvX5rqBag4d1fqLsno=;
+ b=d8CE7P5b/yx6CqFQ+uzaRHpm09nUnrOvVaOY+TNp7l5kXLgU+k43bBaLeJiFVH/paH
+ AiOpSV/4WE9R+PeOFIu9lOPDk/ya2YEaczqIFsf25nsKisQnHVOQ4DYS835bpt4bpE1k
+ oy/ZyFude8l5toEEvFbW5lBA9uCOpIoGf+lbJhN3PxPwXObt+JQUkuExK6hValTMKruG
+ gUwZAPiMpoAgktEWxk7O02nXQr+xyADsA0Ji5Nvg+W1Q8j2tlaKXLfSkNEd3z1hlrI+6
+ lUQwDX3dr0g8hnD2Z84gabyPq1wxoba1IQn1H37enD5uwNol/+Ot6J4O+yZHxUGgiedy
+ +z1A==
+X-Gm-Message-State: APjAAAW88EziJo5Vi8aE0VlVYIzUE4zxA2CAqlqcgygK6dOG+PZ2cBA5
+ 4oojZ7KM/CsVw5gF15gGvbK/lg==
+X-Google-Smtp-Source: APXvYqyjRL4Pm4DJ6gxCMhMAABASOjX9YkWy30mz3VnyIHV5hXZJr9CkbqrhyS3PouGt0usrziod8A==
+X-Received: by 2002:a1c:eb17:: with SMTP id j23mr4268983wmh.151.1562847154257; 
+ Thu, 11 Jul 2019 05:12:34 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id s25sm5129296wmc.21.2019.07.11.05.12.33
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Thu, 11 Jul 2019 05:12:33 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: christophe-lyon pmaydell
-X-Launchpad-Bug-Reporter: Christophe Lyon (christophe-lyon)
-X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
-References: <156284637398.20784.534354445818037577.malonedeb@gac.canonical.com>
-Message-Id: <156284652859.20514.9654009057153641780.malone@gac.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="19007";
- Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: e8694e7cb1cf950cd7c926cdd1b4f76cc35fcd0a
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1836192] Re: Regressions on arm926 target with
- some GCC tests
+To: qemu-arm@nongnu.org,
+	qemu-devel@nongnu.org
+Date: Thu, 11 Jul 2019 13:12:31 +0100
+Message-Id: <20190711121231.3601-1-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::344
+Subject: [Qemu-devel] [PATCH for-4.1] target/arm: Set VFP-related MVFR0
+ fields for arm926 and arm1026
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -76,54 +92,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1836192 <1836192@bugs.launchpad.net>
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Christophe Lyon <christophe.lyon@linaro.org>,
+ Richard Henderson <richard.henderson@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We didn't spot that armv5 CPUs don't have mvfr0, so now the vfp refactor
-is looking at mvfr0 fields to gate feature presence we need to
-initialize cpu->isar.mvfr0 specifically to a value that indicates the
-right thing even on the armv5 CPUs which don't have a guest-visible
-mvfr0. This specifically affects just arm926 and arm1026, which have
-accidentally lost short-vector support and double-precision support.
+The ARMv5 architecture didn't specify detailed per-feature ID
+registers. Now that we're using the MVFR0 register fields to
+gate the existence of VFP instructions, we need to set up
+the correct values in the cpu->isar structure so that we still
+provide an FPU to the guest.
 
--- =
+This fixes a regression in the arm926 and arm1026 CPUs, which
+are the only ones that both have VFP and are ARMv5 or earlier.
+This regression was introduced by the VFP refactoring, and more
+specifically by commits 1120827fa182f0e76 and 266bd25c485597c,
+which accidentally disabled VFP short-vector support and
+double-precision support on these CPUs.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1836192
+Reported-by: Christophe Lyon <christophe.lyon@linaro.org>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Fixes: 1120827fa182f0e
+Fixes: 266bd25c485597c
+Fixes: https://bugs.launchpad.net/qemu/+bug/1836192
+---
+I've followed the existing approach we used for ISAR1 here
+of just filling in the fields we care about, rather than trying
+to set the entire register value.
 
-Title:
-  Regressions on arm926 target with some GCC tests
+ target/arm/cpu.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-Status in QEMU:
-  New
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index e75a64a25a4..446dd5163dc 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -1666,6 +1666,12 @@ static void arm926_initfn(Object *obj)
+      * set the field to indicate Jazelle support within QEMU.
+      */
+     cpu->isar.id_isar1 = FIELD_DP32(cpu->isar.id_isar1, ID_ISAR1, JAZELLE, 1);
++    /*
++     * Similarly, we need to set MVFR0 fields to enable double precision
++     * and short vector support even though ARMv5 doesn't have this register.
++     */
++    cpu->isar.mvfr0 = FIELD_DP32(cpu->isar.mvfr0, MVFR0, FPSHVEC, 1);
++    cpu->isar.mvfr0 = FIELD_DP32(cpu->isar.mvfr0, MVFR0, FPDP, 1);
+ }
+ 
+ static void arm946_initfn(Object *obj)
+@@ -1713,6 +1719,12 @@ static void arm1026_initfn(Object *obj)
+         };
+         define_one_arm_cp_reg(cpu, &ifar);
+     }
++    /*
++     * Similarly, we need to set MVFR0 fields to enable double precision
++     * and short vector support even though ARMv5 doesn't have this register.
++     */
++    cpu->isar.mvfr0 = FIELD_DP32(cpu->isar.mvfr0, MVFR0, FPSHVEC, 1);
++    cpu->isar.mvfr0 = FIELD_DP32(cpu->isar.mvfr0, MVFR0, FPDP, 1);
+ }
+ 
+ static void arm1136_r2_initfn(Object *obj)
+-- 
+2.20.1
 
-Bug description:
-  Hi,
-
-  After trying qemu master:
-  commit 474f3938d79ab36b9231c9ad3b5a9314c2aeacde
-  Merge: 68d7ff0 14f5d87
-  Author: Peter Maydell <email address hidden>
-  Date: Fri Jun 21 15:40:50 2019 +0100
-
-  even with the fix for https://bugs.launchpad.net/qemu/+bug/1834496,
-  I've noticed several regressions compared to qemu-3.1 when running the GC=
-C testsuite, with GCC configured to generate arm10tdmi code by default, and=
- using qemu's --cpu arm926.
-
-  I'm attaching a tarball containing one of the GCC tests (binaries),
-  needed shared libs, and a short script to run the test.
-
-  This was noticed with GCC master configured with
-  --target arm-none-linux-gnueabi
-  --with-cpu arm10tdmi
-  --with-fpu vfp
-
-  Thanks
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1836192/+subscriptions
 
