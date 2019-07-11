@@ -2,91 +2,60 @@ Return-Path: <SRS0=FHOf=VI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 024DFC74A35
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 12:26:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C124C74A35
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 12:29:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CDD6020872
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 12:26:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CDD6020872
+	by mail.kernel.org (Postfix) with ESMTPS id 233A220872
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 12:29:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 233A220872
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41294 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41308 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlY9R-00048Q-0z
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 08:26:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52216)
+	id 1hlYCj-0005nO-EP
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 08:29:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53223)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hlY85-00038n-Cq
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 08:24:54 -0400
+ (envelope-from <armbru@redhat.com>) id 1hlYBf-0004xf-Dn
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 08:28:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hlY84-0005xZ-2E
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 08:24:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35677)
+ (envelope-from <armbru@redhat.com>) id 1hlYBb-0001ry-I3
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 08:28:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35230)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hlY80-0005tb-VQ; Thu, 11 Jul 2019 08:24:49 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hlYBb-0001oy-5O
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 08:28:31 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 3E1595D60F;
- Thu, 11 Jul 2019 12:24:48 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.40.205.198])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0D1985D9DC;
- Thu, 11 Jul 2019 12:24:46 +0000 (UTC)
-To: Maxim Levitsky <mlevitsk@redhat.com>, qemu-devel@nongnu.org
-References: <20190710170349.1548-1-mlevitsk@redhat.com>
- <84232589-627a-8151-a3d5-84c053d9a257@redhat.com>
- <3e82ff24-6f84-9de8-d3ab-c34966f875f0@redhat.com>
- <096a8bcf57997c594e1d5d7ea9606029909b81fc.camel@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <1bdb9136-ae97-7bf3-762e-0774b0980160@redhat.com>
-Date: Thu, 11 Jul 2019 14:24:45 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ by mx1.redhat.com (Postfix) with ESMTPS id 7671783F51;
+ Thu, 11 Jul 2019 12:28:29 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-111.ams2.redhat.com
+ [10.36.116.111])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E531960BFB;
+ Thu, 11 Jul 2019 12:28:28 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 69EE01138648; Thu, 11 Jul 2019 14:28:27 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Thu, 11 Jul 2019 14:28:24 +0200
+Message-Id: <20190711122827.18970-1-armbru@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <096a8bcf57997c594e1d5d7ea9606029909b81fc.camel@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="Xu0aL0HgbFlKjppDeqXLsbc3cRkkv5N9P"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.39]); Thu, 11 Jul 2019 12:24:48 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.27]); Thu, 11 Jul 2019 12:28:29 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] LUKS: support preallocation in qemu-img
+Subject: [Qemu-devel] [PATCH RFC v5 0/3] Baby steps towards saner headers
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,159 +67,560 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: peter.maydell@linaro.org, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Xu0aL0HgbFlKjppDeqXLsbc3cRkkv5N9P
-Content-Type: multipart/mixed; boundary="t087NMi0UEBHdh0sGt5nuWbWeEo80LVKt";
- protected-headers="v1"
-From: Max Reitz <mreitz@redhat.com>
-To: Maxim Levitsky <mlevitsk@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
-Message-ID: <1bdb9136-ae97-7bf3-762e-0774b0980160@redhat.com>
-Subject: Re: [PATCH] LUKS: support preallocation in qemu-img
-References: <20190710170349.1548-1-mlevitsk@redhat.com>
- <84232589-627a-8151-a3d5-84c053d9a257@redhat.com>
- <3e82ff24-6f84-9de8-d3ab-c34966f875f0@redhat.com>
- <096a8bcf57997c594e1d5d7ea9606029909b81fc.camel@redhat.com>
-In-Reply-To: <096a8bcf57997c594e1d5d7ea9606029909b81fc.camel@redhat.com>
+Back in 2016, we discussed rules for headers, and these were
+generally liked:
 
---t087NMi0UEBHdh0sGt5nuWbWeEo80LVKt
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+1. Have a carefully curated header that's included everywhere first.  We
+   got that already thanks to Peter: osdep.h.
 
-On 11.07.19 10:39, Maxim Levitsky wrote:
-> On Wed, 2019-07-10 at 23:52 +0200, Max Reitz wrote:
->> On 10.07.19 23:24, Max Reitz wrote:
->>> On 10.07.19 19:03, Maxim Levitsky wrote:
->>>> preallocation=3Doff and preallocation=3Dmetadata
->>>> both allocate luks header only, and preallocation=3Dfalloc/full
->>>> is passed to underlying file, with the given image size.
->>>>
->>>> Note that the actual preallocated size is a bit smaller due
->>>> to luks header.
->>>
->>> Couldn=E2=80=99t you just preallocate it after creating the crypto he=
-ader so
->>> qcrypto_block_get_payload_offset(crypto->block) + size is the actual
->>> file size?
->=20
-> I kind of thought of the same thing after I send the patch. I'll see no=
-w it I can make it work.
->=20
->=20
->>>
->>>> Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=3D1534951
->>>>
->>>> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
->>>> ---
->>>>  block/crypto.c | 28 ++++++++++++++++++++++++++--
->>>>  1 file changed, 26 insertions(+), 2 deletions(-)
->>>
->>> Hm.  I would expect a preallocated image to read 0.  But if you just
->>> pass this through to the protocol layer, it won=E2=80=99t read 0.
->>>
->>> (In fact, I don=E2=80=99t even quite see the point of having LUKS as =
-an own
->>> format still.  It was useful when qcow2 didn=E2=80=99t have LUKS supp=
-ort, but
->>> now it does, so...  I suppose everyone using the LUKS format should
->>> actually be using qcow2 with LUKS?)
->>
->> Kevin just pointed out to me that our LUKS format is compatible to the=
+2. Headers should normally include everything they need beyond osdep.h.
+   If exceptions are needed for some reason, they must be documented in
+   the header.  If all that's needed from a header is typedefs, put
+   those into qemu/typedefs.h instead of including the header.
 
->> actual layout cryptsetup uses.  OK, that is an important use case.
->>
->> Hm.  Unfortunately, that doesn=E2=80=99t really necessitate preallocat=
-ion.
->>
->> Well, whatever.  If it=E2=80=99s simple enough, that shouldn=E2=80=99t=
- stop us from
->> implementing preallocation anyway.
-> Exactly. Since I already know the area of qemu-img relatively well, and=
+3. Cyclic inclusion is forbidden.
 
-> this bug is on my backlog, I thought why not to do it.
->=20
->=20
->>
->>
->> Now I found that qapi/block-core.json defines PreallocMode=E2=80=99s f=
-alloc and
->> full values as follows:
->>
->>> # @falloc: like @full preallocation but allocate disk space by
->>> #          posix_fallocate() rather than writing zeros.
->>> # @full: preallocate all data by writing zeros to device to ensure di=
-sk
->>> #        space is really available. @full preallocation also sets up
->>> #        metadata correctly.
->>
->> So it isn=E2=80=99t just me who expects these to pre-initialize the im=
-age to 0.
->>  Hm, although...  I suppose @falloc technically does not specify wheth=
-er
->> the data reads as zeroes.  I kind of find it to be implied, but, well.=
-=2E.
->=20
-> I personally don't really think that zeros are important, but rather th=
-e level of allocation.
-> posix_fallocate probably won't write the data blocks but rather only th=
-e inode metadata / used block bitmap/etc.
->=20
-> On the other hand writing zeros (or anything else) will force the block=
- layer to actually write to the underlying
-> storage which could trigger lower layer allocation if the underlying st=
-orage is thin-provisioned.
->=20
-> In fact IMHO, instead of writing zeros, it would be better to write ran=
-dom garbage instead (or have that as an even 'fuller'
-> preallocation mode), since underlying storage might 'compress' the zero=
-s.=20
+Message-ID: <87h9g8j57d.fsf@blackfin.pond.sub.org>
+http://lists.nongnu.org/archive/html/qemu-devel/2016-03/msg03345.html
 
-Which is actually an argument why you should just write zeroes on the
-LUKS layer, because this will then turn into quasi-random data on the
-protocol layer.
+Trouble is we're not exactly close to obeying 2.  This series
+demonstrates a possible path towards obeying it: enforce it in "make
+check", except for known-bad headers.  We can then whittle down
+known-bad headers step by step in future patches.
 
-Max
+PATCH 1 adds the tests, but only for include/.  764 headers, 179
+known-bad.
 
-> In this version I do have a bug that I mentioned, about not preallocati=
-on some data at the end of the image, and I will
-> fix it, so that all image is zeros as expected
->=20
-> Best regards,
-> 	Maxim Levitsky
->=20
->=20
->>
->> Max
->>
->=20
->=20
+PATCH 2 cleans up include/ somewhat.  The work remaining should be
+fairly obvious now.  I plan to spin out my cleanups as a separate
+non-RFC patch submission.
 
+PATCH 3 makes the tests more thorough in a simple and stupid way.
+Massive overkill, painfully slow.  I'm open for better ideas.
 
+Previous iterations had additional patches to test all headers, not
+just include/.  I decided to focus in include/ and shelve them for
+now.
 
---t087NMi0UEBHdh0sGt5nuWbWeEo80LVKt--
+Testing:
 
---Xu0aL0HgbFlKjppDeqXLsbc3cRkkv5N9P
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+I tested various configurations on an x86 host (everything enabled,
+everything disabled, KVM only (TCG disabled), user only, MinGW).  I
+also tested lightly on ARM and PPC hosts.  Exhaustive testing is not
+practical.  I can't exclude the possibility that the new test fails in
+configurations I didn't test.
 
------BEGIN PGP SIGNATURE-----
+Known issues:
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0nKo0ACgkQ9AfbAGHV
-z0CWBAf9HqDCH33VaeuM7fhbLLkCkGSz2/Lx0AIG71etBgVghTf6liKd7C8MwGUj
-creNQg8gk2E2M3BoGavtt87IvhUun+J0L2gWT4Ctaup/8HJ+O4Ptausao5FPSdun
-UoSBkT2Q3l5HmnmuzKCdI/sM7Iy6JPEO+VZeTA5/f+RlcWgy45VO782fQG0IbwPw
-pEi4J7Kl9j1prtRgqiywE5aB2E4uQYuNyU5xVo60N7aKJ3Wncz7fyknjKnrex+wv
-btTvpPOyMIe/6cziLMoXULtpQ5f17hRCq7xf9+tfa1GpTAg/3zKauowo08S9+sE9
-kHL4PRudsPjfYq0eFZhbc4VRmHSwhg==
-=1euu
------END PGP SIGNATURE-----
+(1) Many headers are (meant to be) only included into certain
+    contexts.  In two places, the code makes its intent explicit:
 
---Xu0aL0HgbFlKjppDeqXLsbc3cRkkv5N9P--
+    * include/exec/cpu-defs.h #errors out when included into
+      target-independent code (#ifndef NEED_CPU_H)
+
+    * include/hw/hw.h #errors out when included into user emulation
+      code (#ifdef CONFIG_USER_ONLY)
+
+    I manually marked headers including them, so that the test can
+    treat them specially.  Better ideas welcome.
+
+    Such #erroring isn't done for other contexts (perhaps it should
+    be).  Inclusion into the wrong context fails in various ways
+    instead.  The resulting test failures are marked FIXME.  The ones
+    that fail by accident (if any) should be fixed.  The ones that
+    aren't meant to succeed need to be treated specially by the test.
+
+(2) A few headers are only included into code that's compiled with
+    special CFLAGS.  The test doesn't know, and the resulting test
+    failures are marked FIXME.  Known instances: include/ui/gtk.h and
+    GTK_CFLAGS, include/ui/sdl2.h and SDL_CFLAGS.
+
+Please have a look and tell me what you think.
+
+v5:
+* Old PATCH 1-4: Merged in commit 234e256511e
+* Old PATCH 6-7: Shelved for now
+* PATCH 1:
+  - Rebased (uff)
+  - Suppress debug info to save disk space
+  - Fix .SECONDARY for $(check-bad-target-header-tests)
+  - Minor tweaks to make PATCH 3 simpler
+  - Add include/hw/xen/interface/ to excluded-headers
+  - Rewrite the Make code to find magic comments
+  - Test with -Wunused-function to cope with static inline functions
+* PATCH 2-3: New
+
+v4:
+* PATCH 1-4: New.
+* PATCH 5:
+  - Implement testing of target-dependent headers
+  - Replace crude "expected to fail with WIN32" by a set of "expected
+    to fail without FOO".
+* Old PATCH 3-5: Dropped.  These were examples for whittling down
+  known-bad headers.
+
+v3:
+* Old PATH 1 moved to another series
+* PATCH 1:
+  - Skip the test unless $(SRC_PATH)/.git exists
+  - Exclude third-party headers [Peter]
+  - Exclude Coccinelle header
+  - Fix egrep vs. fgrep typos
+  - Mark and exclude headers that die due to poison.h, because testing
+    them isn't implemented, yet
+  - tests/header-test-template.c not omitted (d'oh)
+* PATCH 3: Replaced
+* PATCH 5: New
+
+v2:
+* PATCH 2:
+  - Use fixed-format FIXME comments in headers instead of a blacklist
+    in the makefile [Paolo]
+  - Make target check-source [Peter]
+  - Special-case CONFIG_WIN32
+* PATCH 3:
+  - replaced by an unrelated one that makes actual sense (I hope)
+
+Markus Armbruster (3):
+  tests: New make target check-source
+  include: Make headers more self-contained
+  tests: Check target-independent headers for each target, too
+
+ Makefile                                  |   4 +-
+ Makefile.target                           |  20 ++++
+ include/block/raw-aio.h                   |   2 +
+ include/block/write-threshold.h           |   2 +
+ include/chardev/char-win.h                |   3 +
+ include/chardev/spice.h                   |   2 +
+ include/disas/disas.h                     |   1 +
+ include/exec/cpu-all.h                    |   4 +
+ include/exec/cpu-defs.h                   |   3 +
+ include/exec/cpu_ldst.h                   |   4 +
+ include/exec/cpu_ldst_template.h          |   3 +
+ include/exec/cpu_ldst_useronly_template.h |   3 +
+ include/exec/cputlb.h                     |   3 +
+ include/exec/exec-all.h                   |   3 +
+ include/exec/gen-icount.h                 |   2 +
+ include/exec/helper-gen.h                 |   2 +
+ include/exec/helper-proto.h               |   2 +
+ include/exec/helper-tcg.h                 |   2 +
+ include/exec/ioport.h                     |   4 +
+ include/exec/memory-internal.h            |   4 +
+ include/exec/memory_ldst.inc.h            |   2 +
+ include/exec/memory_ldst_cached.inc.h     |   2 +
+ include/exec/memory_ldst_phys.inc.h       |   2 +
+ include/exec/ram_addr.h                   |   3 +
+ include/exec/softmmu-semi.h               |   4 +
+ include/exec/tb-hash.h                    |   4 +
+ include/exec/tb-lookup.h                  |   3 +
+ include/exec/translator.h                 |   2 +
+ include/exec/user/abitypes.h              |   2 +
+ include/exec/user/thunk.h                 |   4 +
+ include/fpu/softfloat-macros.h            |   4 +
+ include/fpu/softfloat.h                   |   2 +
+ include/hw/acpi/acpi.h                    |   2 +
+ include/hw/acpi/acpi_dev_interface.h      |   2 +
+ include/hw/acpi/cpu.h                     |   3 +
+ include/hw/acpi/cpu_hotplug.h             |   2 +
+ include/hw/acpi/ich9.h                    |   2 +
+ include/hw/acpi/memory_hotplug.h          |   2 +
+ include/hw/acpi/pci.h                     |   3 +
+ include/hw/acpi/pcihp.h                   |   2 +
+ include/hw/acpi/tco.h                     |   5 +
+ include/hw/acpi/utils.h                   |   2 +
+ include/hw/acpi/vmgenid.h                 |   2 +
+ include/hw/adc/stm32f2xx_adc.h            |   4 +
+ include/hw/arm/allwinner-a10.h            |   5 +
+ include/hw/arm/armsse.h                   |   4 +
+ include/hw/arm/armv7m.h                   |   4 +
+ include/hw/arm/aspeed.h                   |   3 +
+ include/hw/arm/aspeed_soc.h               |   5 +
+ include/hw/arm/bcm2835_peripherals.h      |   2 +
+ include/hw/arm/bcm2836.h                  |   5 +
+ include/hw/arm/digic.h                    |   4 +
+ include/hw/arm/exynos4210.h               |   5 +-
+ include/hw/arm/fsl-imx25.h                |   5 +
+ include/hw/arm/fsl-imx31.h                |   5 +
+ include/hw/arm/fsl-imx6.h                 |   4 +
+ include/hw/arm/fsl-imx6ul.h               |   4 +
+ include/hw/arm/fsl-imx7.h                 |   4 +
+ include/hw/arm/msf2-soc.h                 |   4 +
+ include/hw/arm/nrf51_soc.h                |   4 +
+ include/hw/arm/omap.h                     |   2 +
+ include/hw/arm/pxa.h                      |   2 +
+ include/hw/arm/sharpsl.h                  |   3 +
+ include/hw/arm/smmu-common.h              |   3 +-
+ include/hw/arm/smmuv3.h                   |   2 +
+ include/hw/arm/soc_dma.h                  |   2 +
+ include/hw/arm/stm32f205_soc.h            |   4 +
+ include/hw/arm/virt.h                     |   2 +
+ include/hw/arm/xlnx-versal.h              |   2 +
+ include/hw/arm/xlnx-zynqmp.h              |   5 +
+ include/hw/audio/pcspk.h                  |   2 +
+ include/hw/audio/wm8750.h                 |   3 +
+ include/hw/block/fdc.h                    |   2 +
+ include/hw/block/flash.h                  |   3 +
+ include/hw/boards.h                       |   2 +
+ include/hw/char/bcm2835_aux.h             |   2 +
+ include/hw/char/cadence_uart.h            |   2 +
+ include/hw/char/cmsdk-apb-uart.h          |   2 +
+ include/hw/char/digic-uart.h              |   3 +-
+ include/hw/char/escc.h                    |   3 +
+ include/hw/char/imx_serial.h              |   2 +
+ include/hw/char/lm32_juart.h              |   2 +
+ include/hw/char/nrf51_uart.h              |   2 +
+ include/hw/char/parallel.h                |   2 +
+ include/hw/char/pl011.h                   |   2 +
+ include/hw/char/serial.h                  |   2 +
+ include/hw/char/stm32f2xx_usart.h         |   2 +
+ include/hw/char/xilinx_uartlite.h         |   4 +
+ include/hw/core/generic-loader.h          |   1 +
+ include/hw/core/split-irq.h               |   3 +
+ include/hw/cpu/a15mpcore.h                |   3 +
+ include/hw/cpu/a9mpcore.h                 |   3 +
+ include/hw/cpu/arm11mpcore.h              |   2 +
+ include/hw/cpu/cluster.h                  |   3 +
+ include/hw/cpu/core.h                     |   3 +
+ include/hw/cris/etraxfs.h                 |   3 +
+ include/hw/cris/etraxfs_dma.h             |   3 +
+ include/hw/display/bcm2835_fb.h           |   2 +
+ include/hw/display/edid.h                 |   2 +
+ include/hw/display/i2c-ddc.h              |   3 +
+ include/hw/display/milkymist_tmu2.h       |   3 +-
+ include/hw/display/vga.h                  |   3 +
+ include/hw/display/xlnx_dp.h              |   2 +
+ include/hw/dma/bcm2835_dma.h              |   2 +
+ include/hw/dma/i8257.h                    |   2 +
+ include/hw/dma/pl080.h                    |   2 +
+ include/hw/dma/xlnx-zdma.h                |   2 +
+ include/hw/dma/xlnx-zynq-devcfg.h         |   2 +
+ include/hw/dma/xlnx_dpdma.h               |   2 +
+ include/hw/elf_ops.h                      |   2 +
+ include/hw/empty_slot.h                   |   2 +
+ include/hw/gpio/bcm2835_gpio.h            |   3 +
+ include/hw/gpio/imx_gpio.h                |   2 +
+ include/hw/gpio/nrf51_gpio.h              |   4 +-
+ include/hw/hw.h                           |   2 +
+ include/hw/hyperv/hyperv.h                |   2 +
+ include/hw/i2c/aspeed_i2c.h               |   4 +
+ include/hw/i2c/bitbang_i2c.h              |   2 +
+ include/hw/i2c/i2c.h                      |   2 +
+ include/hw/i2c/imx_i2c.h                  |   3 +-
+ include/hw/i2c/microbit_i2c.h             |   2 +
+ include/hw/i2c/pm_smbus.h                 |   2 +
+ include/hw/i2c/ppc4xx_i2c.h               |   2 +
+ include/hw/i2c/smbus_eeprom.h             |   2 +
+ include/hw/i2c/smbus_master.h             |   2 +
+ include/hw/i2c/smbus_slave.h              |   2 +
+ include/hw/i386/apic_internal.h           |   5 +
+ include/hw/i386/ich9.h                    |   2 +
+ include/hw/i386/intel_iommu.h             |   2 +
+ include/hw/i386/ioapic_internal.h         |   3 +
+ include/hw/i386/pc.h                      |   2 +
+ include/hw/i386/x86-iommu.h               |   2 +
+ include/hw/ide.h                          |   2 +
+ include/hw/ide/ahci.h                     |   3 +-
+ include/hw/ide/internal.h                 |   2 +
+ include/hw/ide/pci.h                      |   2 +
+ include/hw/input/adb.h                    |   2 +
+ include/hw/input/i8042.h                  |   3 +
+ include/hw/input/tsc2xxx.h                |   2 +
+ include/hw/intc/allwinner-a10-pic.h       |   4 +
+ include/hw/intc/arm_gic.h                 |   2 +
+ include/hw/intc/arm_gic_common.h          |   2 +
+ include/hw/intc/arm_gicv3.h               |   2 +
+ include/hw/intc/arm_gicv3_common.h        |   2 +
+ include/hw/intc/arm_gicv3_its_common.h    |   2 +
+ include/hw/intc/armv7m_nvic.h             |   4 +
+ include/hw/intc/aspeed_vic.h              |   3 +
+ include/hw/intc/bcm2835_ic.h              |   2 +
+ include/hw/intc/bcm2836_control.h         |   2 +
+ include/hw/intc/heathrow_pic.h            |   4 +
+ include/hw/intc/imx_avic.h                |   3 +
+ include/hw/intc/imx_gpcv2.h               |   2 +
+ include/hw/intc/mips_gic.h                |   5 +
+ include/hw/intc/realview_gic.h            |   2 +
+ include/hw/intc/xlnx-pmu-iomod-intc.h     |   2 +
+ include/hw/intc/xlnx-zynqmp-ipi.h         |   2 +
+ include/hw/ipack/ipack.h                  |   2 +
+ include/hw/ipmi/ipmi.h                    |   2 +
+ include/hw/isa/apm.h                      |   2 +
+ include/hw/isa/i8259_internal.h           |   2 +
+ include/hw/isa/isa.h                      |   2 +
+ include/hw/isa/pc87312.h                  |   3 +
+ include/hw/isa/superio.h                  |   3 +
+ include/hw/isa/vt82c686.h                 |   2 +
+ include/hw/kvm/clock.h                    |   2 +
+ include/hw/loader.h                       |   2 +
+ include/hw/mem/memory-device.h            |   2 +
+ include/hw/mem/nvdimm.h                   |   2 +
+ include/hw/mem/pc-dimm.h                  |   3 +-
+ include/hw/mips/bios.h                    |   2 +
+ include/hw/mips/cps.h                     |   5 +
+ include/hw/mips/cpudevs.h                 |   2 +
+ include/hw/misc/a9scu.h                   |   3 +
+ include/hw/misc/arm11scu.h                |   2 +
+ include/hw/misc/armsse-cpuid.h            |   2 +
+ include/hw/misc/armsse-mhu.h              |   2 +
+ include/hw/misc/aspeed_scu.h              |   3 +
+ include/hw/misc/aspeed_sdmc.h             |   3 +
+ include/hw/misc/aspeed_xdma.h             |   2 +
+ include/hw/misc/auxbus.h                  |   3 +-
+ include/hw/misc/bcm2835_mbox.h            |   2 +
+ include/hw/misc/bcm2835_property.h        |   2 +
+ include/hw/misc/bcm2835_rng.h             |   2 +
+ include/hw/misc/imx25_ccm.h               |   2 +
+ include/hw/misc/imx2_wdt.h                |   2 +
+ include/hw/misc/imx31_ccm.h               |   2 +
+ include/hw/misc/imx6_ccm.h                |   2 +
+ include/hw/misc/imx6_src.h                |   2 +
+ include/hw/misc/imx6ul_ccm.h              |   2 +
+ include/hw/misc/imx7_ccm.h                |   2 +
+ include/hw/misc/imx7_gpr.h                |   2 +
+ include/hw/misc/imx7_snvs.h               |   2 +
+ include/hw/misc/imx_ccm.h                 |   2 +
+ include/hw/misc/iotkit-secctl.h           |   2 +
+ include/hw/misc/iotkit-sysctl.h           |   2 +
+ include/hw/misc/iotkit-sysinfo.h          |   2 +
+ include/hw/misc/macio/cuda.h              |   4 +
+ include/hw/misc/macio/gpio.h              |   5 +
+ include/hw/misc/macio/macio.h             |   4 +
+ include/hw/misc/macio/pmu.h               |   5 +
+ include/hw/misc/mips_cmgcr.h              |   5 +-
+ include/hw/misc/mips_cpc.h                |   4 +
+ include/hw/misc/mips_itu.h                |   2 +
+ include/hw/misc/mos6522.h                 |   2 +
+ include/hw/misc/mps2-fpgaio.h             |   2 +
+ include/hw/misc/mps2-scc.h                |   2 +
+ include/hw/misc/msf2-sysreg.h             |   2 +
+ include/hw/misc/nrf51_rng.h               |   3 +-
+ include/hw/misc/pca9552.h                 |   3 +
+ include/hw/misc/pvpanic.h                 |   3 +
+ include/hw/misc/stm32f2xx_syscfg.h        |   2 +
+ include/hw/misc/tz-mpc.h                  |   2 +
+ include/hw/misc/tz-msc.h                  |   2 +
+ include/hw/misc/tz-ppc.h                  |   2 +
+ include/hw/misc/unimp.h                   |   2 +
+ include/hw/misc/vmcoreinfo.h              |   4 +-
+ include/hw/misc/zynq-xadc.h               |   2 +
+ include/hw/net/allwinner_emac.h           |   4 +-
+ include/hw/net/cadence_gem.h              |   2 +
+ include/hw/net/ftgmac100.h                |   2 +
+ include/hw/net/imx_fec.h                  |   2 +
+ include/hw/net/lance.h                    |   3 +
+ include/hw/net/ne2000-isa.h               |   2 +
+ include/hw/nvram/chrp_nvram.h             |   2 +
+ include/hw/nvram/fw_cfg.h                 |   2 +
+ include/hw/nvram/nrf51_nvm.h              |   4 +-
+ include/hw/or-irq.h                       |   2 +
+ include/hw/pci-bridge/simba.h             |   2 +
+ include/hw/pci-host/designware.h          |   2 +
+ include/hw/pci-host/gpex.h                |   2 +
+ include/hw/pci-host/pam.h                 |   2 +
+ include/hw/pci-host/q35.h                 |   2 +
+ include/hw/pci-host/sabre.h               |   4 +
+ include/hw/pci-host/spapr.h               |   3 +
+ include/hw/pci-host/uninorth.h            |   4 +-
+ include/hw/pci-host/xilinx-pcie.h         |   2 +
+ include/hw/pci/msi.h                      |   2 +
+ include/hw/pci/msix.h                     |   2 +
+ include/hw/pci/pci.h                      |   2 +
+ include/hw/pci/pci_bridge.h               |   3 +-
+ include/hw/pci/pci_bus.h                  |   2 +
+ include/hw/pci/pci_host.h                 |   2 +
+ include/hw/pci/pcie.h                     |   2 +
+ include/hw/pci/pcie_aer.h                 |   3 +
+ include/hw/pci/pcie_host.h                |   2 +
+ include/hw/pci/pcie_port.h                |   2 +
+ include/hw/pci/shpc.h                     |   2 +
+ include/hw/pcmcia.h                       |   2 +
+ include/hw/platform-bus.h                 |   2 +
+ include/hw/ppc/fdt.h                      |   2 +
+ include/hw/ppc/mac_dbdma.h                |   2 +
+ include/hw/ppc/openpic.h                  |   2 +
+ include/hw/ppc/pnv.h                      |   3 +
+ include/hw/ppc/pnv_core.h                 |   4 +
+ include/hw/ppc/pnv_lpc.h                  |   2 +
+ include/hw/ppc/pnv_occ.h                  |   2 +
+ include/hw/ppc/pnv_psi.h                  |   2 +
+ include/hw/ppc/pnv_xive.h                 |   2 +
+ include/hw/ppc/pnv_xscom.h                |   2 +
+ include/hw/ppc/ppc.h                      |   2 +
+ include/hw/ppc/ppc4xx.h                   |   7 ++
+ include/hw/ppc/spapr.h                    |   3 +
+ include/hw/ppc/spapr_cpu_core.h           |   4 +
+ include/hw/ppc/spapr_drc.h                |   2 +
+ include/hw/ppc/spapr_irq.h                |   5 +
+ include/hw/ppc/spapr_ovec.h               |   2 +
+ include/hw/ppc/spapr_vio.h                |  11 +-
+ include/hw/ppc/spapr_xive.h               |   5 +
+ include/hw/ppc/xics.h                     |   3 +-
+ include/hw/ppc/xics_spapr.h               |   3 +
+ include/hw/ppc/xive.h                     |   3 +-
+ include/hw/ppc/xive_regs.h                |   3 +
+ include/hw/qdev.h                         |   2 +
+ include/hw/register.h                     |   2 +
+ include/hw/riscv/boot.h                   |   4 +
+ include/hw/riscv/riscv_hart.h             |   6 ++
+ include/hw/riscv/riscv_htif.h             |   3 +
+ include/hw/riscv/sifive_clint.h           |   4 +
+ include/hw/riscv/sifive_e.h               |   4 +
+ include/hw/riscv/sifive_gpio.h            |   3 +
+ include/hw/riscv/sifive_plic.h            |   4 +-
+ include/hw/riscv/sifive_prci.h            |   4 +
+ include/hw/riscv/sifive_test.h            |   4 +
+ include/hw/riscv/sifive_u.h               |   4 +
+ include/hw/riscv/sifive_uart.h            |   5 +
+ include/hw/riscv/spike.h                  |   6 ++
+ include/hw/riscv/virt.h                   |   6 ++
+ include/hw/s390x/3270-ccw.h               |   3 +
+ include/hw/s390x/ap-device.h              |   3 +
+ include/hw/s390x/css-bridge.h             |   5 +-
+ include/hw/s390x/css.h                    |   4 +
+ include/hw/s390x/event-facility.h         |   3 +-
+ include/hw/s390x/s390-ccw.h               |   3 +
+ include/hw/s390x/s390-virtio-ccw.h        |   3 +
+ include/hw/s390x/s390_flic.h              |   2 +
+ include/hw/s390x/sclp.h                   |   3 +-
+ include/hw/s390x/storage-attributes.h     |   3 +
+ include/hw/s390x/storage-keys.h           |   2 +
+ include/hw/s390x/tod.h                    |   4 +-
+ include/hw/s390x/vfio-ccw.h               |   3 +
+ include/hw/scsi/esp.h                     |   2 +
+ include/hw/scsi/scsi.h                    |   2 +
+ include/hw/sd/bcm2835_sdhost.h            |   2 +
+ include/hw/sd/sd.h                        |   2 +
+ include/hw/sd/sdhci.h                     |   2 +
+ include/hw/semihosting/console.h          |   4 +
+ include/hw/sh4/sh.h                       |   2 +
+ include/hw/sh4/sh_intc.h                  |   3 +
+ include/hw/sparc/grlib.h                  |   2 +
+ include/hw/sparc/sparc32_dma.h            |   2 +
+ include/hw/sparc/sparc64.h                |   4 +
+ include/hw/sparc/sun4m_iommu.h            |   2 +
+ include/hw/sparc/sun4u_iommu.h            |   2 +
+ include/hw/ssi/aspeed_smc.h               |   3 +
+ include/hw/ssi/imx_spi.h                  |   2 +
+ include/hw/ssi/mss-spi.h                  |   2 +
+ include/hw/ssi/pl022.h                    |   2 +
+ include/hw/ssi/ssi.h                      |   2 +
+ include/hw/ssi/stm32f2xx_spi.h            |   2 +
+ include/hw/ssi/xilinx_spips.h             |   3 +
+ include/hw/sysbus.h                       |   2 +
+ include/hw/timer/a9gtimer.h               |   2 +
+ include/hw/timer/allwinner-a10-pit.h      |   3 +
+ include/hw/timer/arm_mptimer.h            |   3 +
+ include/hw/timer/armv7m_systick.h         |   2 +
+ include/hw/timer/aspeed_rtc.h             |   3 +
+ include/hw/timer/aspeed_timer.h           |   3 +
+ include/hw/timer/cmsdk-apb-dualtimer.h    |   2 +
+ include/hw/timer/cmsdk-apb-timer.h        |   2 +
+ include/hw/timer/digic-timer.h            |   3 +-
+ include/hw/timer/i8254.h                  |   2 +
+ include/hw/timer/i8254_internal.h         |   3 +
+ include/hw/timer/imx_epit.h               |   2 +
+ include/hw/timer/imx_gpt.h                |   2 +
+ include/hw/timer/m48t59.h                 |   2 +
+ include/hw/timer/mc146818rtc.h            |   2 +
+ include/hw/timer/mc146818rtc_regs.h       |   2 +
+ include/hw/timer/mss-timer.h              |   2 +
+ include/hw/timer/nrf51_timer.h            |   3 +
+ include/hw/timer/pl031.h                  |   2 +
+ include/hw/timer/stm32f2xx_timer.h        |   2 +
+ include/hw/timer/sun4v-rtc.h              |   7 ++
+ include/hw/timer/xlnx-zynqmp-rtc.h        |   3 +
+ include/hw/usb.h                          |   2 +
+ include/hw/usb/chipidea.h                 |   2 +
+ include/hw/vfio/vfio-amd-xgbe.h           |   2 +
+ include/hw/vfio/vfio-calxeda-xgmac.h      |   2 +
+ include/hw/vfio/vfio-common.h             |   2 +
+ include/hw/vfio/vfio-platform.h           |   2 +
+ include/hw/virtio/vhost-backend.h         |   3 +-
+ include/hw/virtio/vhost-scsi-common.h     |   3 +-
+ include/hw/virtio/vhost-scsi.h            |   3 +-
+ include/hw/virtio/vhost-user-blk.h        |   3 +-
+ include/hw/virtio/vhost-user-scsi.h       |   3 +-
+ include/hw/virtio/vhost-user.h            |   2 +
+ include/hw/virtio/vhost-vsock.h           |   2 +
+ include/hw/virtio/vhost.h                 |   2 +
+ include/hw/virtio/virtio-access.h         |   4 +
+ include/hw/virtio/virtio-balloon.h        |   3 +-
+ include/hw/virtio/virtio-blk.h            |   3 +-
+ include/hw/virtio/virtio-bus.h            |   3 +-
+ include/hw/virtio/virtio-crypto.h         |   2 +
+ include/hw/virtio/virtio-gpu-bswap.h      |   1 +
+ include/hw/virtio/virtio-gpu-pci.h        |   2 +
+ include/hw/virtio/virtio-gpu-pixman.h     |   2 +
+ include/hw/virtio/virtio-gpu.h            |   2 +
+ include/hw/virtio/virtio-input.h          |   2 +
+ include/hw/virtio/virtio-net.h            |   3 +-
+ include/hw/virtio/virtio-pmem.h           |   2 +
+ include/hw/virtio/virtio-rng.h            |   3 +
+ include/hw/virtio/virtio-scsi.h           |   3 +-
+ include/hw/virtio/virtio-serial.h         |   3 +-
+ include/hw/virtio/virtio.h                |   3 +-
+ include/hw/watchdog/cmsdk-apb-watchdog.h  |   2 +
+ include/hw/watchdog/wdt_aspeed.h          |   3 +
+ include/hw/watchdog/wdt_diag288.h         |   2 +
+ include/hw/xen/xen-backend.h              |   3 +
+ include/hw/xen/xen-block.h                |   3 +
+ include/hw/xen/xen-bus-helper.h           |   3 +
+ include/hw/xen/xen-bus.h                  |   3 +
+ include/hw/xen/xen-legacy-backend.h       |   3 +
+ include/hw/xen/xen.h                      |   2 +
+ include/hw/xen/xen_common.h               |   3 +
+ include/hw/xen/xen_pvdev.h                |   3 +
+ include/libdecnumber/decNumberLocal.h     |   1 +
+ include/migration/cpu.h                   |   5 +
+ include/monitor/hmp-target.h              |   4 +
+ include/net/vhost_net.h                   |   2 +
+ include/qemu/atomic128.h                  |   2 +
+ include/qemu/cpuid.h                      |   2 +
+ include/qemu/futex.h                      |   2 +
+ include/qemu/iova-tree.h                  |   3 +
+ include/qemu/ratelimit.h                  |   2 +
+ include/qemu/thread-win32.h               |   4 +-
+ include/qemu/xattr.h                      |   3 +
+ include/sysemu/balloon.h                  |   4 +-
+ include/sysemu/cryptodev-vhost-user.h     |   6 +-
+ include/sysemu/cryptodev-vhost.h          |   4 +-
+ include/sysemu/dma.h                      |   2 +
+ include/sysemu/dump.h                     |   3 +
+ include/sysemu/hostmem.h                  |   2 +
+ include/sysemu/hvf.h                      |   3 +
+ include/sysemu/iothread.h                 |   1 +
+ include/sysemu/kvm_int.h                  |   5 +-
+ include/sysemu/memory_mapping.h           |   5 +
+ include/sysemu/numa.h                     |   2 +
+ include/sysemu/os-posix.h                 |   2 +
+ include/sysemu/os-win32.h                 |   2 +
+ include/sysemu/vhost-user-backend.h       |   3 +
+ include/sysemu/xen-mapcache.h             |   5 +-
+ include/trace-tcg.h                       |   2 +
+ include/ui/console.h                      |   2 +
+ include/ui/egl-context.h                  |   3 +
+ include/ui/egl-helpers.h                  |   6 ++
+ include/ui/gtk.h                          |   2 +
+ include/ui/input.h                        |   1 +
+ include/ui/pixel_ops.h                    |   5 +
+ include/ui/qemu-pixman.h                  |   2 +
+ include/ui/sdl2.h                         |   2 +
+ include/ui/shader.h                       |   2 +
+ include/ui/spice-display.h                |   4 +
+ target/hppa/cpu.h                         |   2 +-
+ tests/Makefile.include                    |  33 +++++-
+ tests/check-headers.mak                   | 116 ++++++++++++++++++++++
+ tests/header-test-template.c              |  23 +++++
+ 425 files changed, 1292 insertions(+), 50 deletions(-)
+ create mode 100644 tests/check-headers.mak
+ create mode 100644 tests/header-test-template.c
+
+--=20
+2.21.0
+
 
