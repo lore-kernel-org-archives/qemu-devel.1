@@ -2,94 +2,62 @@ Return-Path: <SRS0=FHOf=VI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FA15C74A4B
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 09:34:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3C52C74A4B
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 09:35:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5C386208E4
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 09:34:57 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FJF2xOJE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C386208E4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id C1685208E4
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 09:35:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1685208E4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39816 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39832 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlVTc-00077B-NI
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 05:34:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45759)
+	id 1hlVUO-0008EO-0V
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 05:35:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45937)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1hlVSv-0006gz-AM
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 05:34:14 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1hlVTF-00075e-Rc
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 05:34:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1hlVSu-0006PE-Au
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 05:34:13 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:40779)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1hlVSu-0006Nn-4C
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 05:34:12 -0400
-Received: by mail-wm1-x344.google.com with SMTP id v19so4983378wmj.5
- for <qemu-devel@nongnu.org>; Thu, 11 Jul 2019 02:34:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=NbCv3xeLcLIU7KIztu3hH9p6DXa8jBZ+bQ7id5ZKNUY=;
- b=FJF2xOJEt7sIv1Jr7pEfwo5/xdt5EoHL4APE/5KtIB9X4Op7a79qL3Z5othwHaJOrt
- SOGNgyWcHR2m4yg4H076AkaLykS5zYyzUe9h4eztldRa7BGT1Rmrp9zBsm+v8+kddm7j
- IkmT2vb7c/CymxpQz1cbd8tvoCUp0Y2NcRxF/MdeJoJEDPaIEBZ5DFqICCIY+x51Khxd
- O4YEPJ9btaeJmqQLWalUc1z8rpBsCsxYxl1GDzUAcHU1HaYD1F330Dzkdbg/Z8zM38Kv
- A9mD3qsL903iDIqDAPfMkcLfm/5Ygp4/kpwrCGxLOoLlFIBdP9nJ1eBMGxqL/apZ+rZf
- YLBQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=NbCv3xeLcLIU7KIztu3hH9p6DXa8jBZ+bQ7id5ZKNUY=;
- b=ZImK+Z+l0AOps2GAqdrHRlY8CARSv0hfsAiWQMG02LTeL9HT7Jg7NuuPq4DIF2weTY
- P4tTVW+IjVLKD7R/mDY2eJEs4/3h5IhHpcme1mvSfDX//fl7Ak7qfj7Wj+mOpfcjAIcZ
- dQYxsQeOY9yBPgenIMkQWQnfAdNCcUg2i4r7L7wzC9kOpxEHruyYy3RVR9F6GZI8XhoY
- jmev2jO00bzem5p8pJhlN7095hoR/S2DH1DQR2KMcRZSaizIBHipXzb+/y1CcYUnntSr
- gYXKpWSdIsd6kpxOfWXAas0q5sMqDg/v1U7/cZMghNC48m6LSeCOHIUfRxNSgukl4tuo
- sjtQ==
-X-Gm-Message-State: APjAAAVM/Nwdevc0iyXFDz6PTAfXDSRZ1GxICxd47q/l25QzuU3Gvyao
- E3wvb6+B6/QDbpwaGT3pLBMvaA==
-X-Google-Smtp-Source: APXvYqwIQY+WwlYEXtbfiYdRUqKgAJu7/tiixhXjCA6M/rxSVoRoABi7bZEmUxL1aI2X3IoHYmhrPA==
-X-Received: by 2002:a1c:44d7:: with SMTP id r206mr3327629wma.164.1562837650703; 
- Thu, 11 Jul 2019 02:34:10 -0700 (PDT)
-Received: from [172.16.96.70] (mob-31-157-172-216.net.vodafone.it.
- [31.157.172.216])
- by smtp.gmail.com with ESMTPSA id y18sm4843114wmi.23.2019.07.11.02.34.05
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 11 Jul 2019 02:34:10 -0700 (PDT)
-To: Jan Bobek <jan.bobek@gmail.com>, qemu-devel@nongnu.org
-References: <20190701043536.26019-1-jan.bobek@gmail.com>
- <20190701043536.26019-7-jan.bobek@gmail.com>
- <f1b0ff64-0c62-f1b0-8362-539d9d37156c@linaro.org>
- <53d71ce2-54da-b118-c5b9-c49216d13d51@gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <e2947ad4-3668-0d23-1374-4101ebad6c9d@linaro.org>
-Date: Thu, 11 Jul 2019 11:34:02 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.1
+ (envelope-from <dgilbert@redhat.com>) id 1hlVTE-0006u5-QZ
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 05:34:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46648)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hlVTE-0006sj-JZ
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 05:34:32 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 2D3513082A9C;
+ Thu, 11 Jul 2019 09:34:31 +0000 (UTC)
+Received: from work-vm (unknown [10.36.118.40])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 548675D720;
+ Thu, 11 Jul 2019 09:34:30 +0000 (UTC)
+Date: Thu, 11 Jul 2019 10:34:27 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Wei Yang <richardw.yang@linux.intel.com>
+Message-ID: <20190711093427.GE3971@work-vm>
+References: <20190703011234.20517-1-richardw.yang@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <53d71ce2-54da-b118-c5b9-c49216d13d51@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::344
-Subject: Re: [Qemu-devel] [RISU RFC PATCH v2 06/14] x86.risu: add MMX
- instructions
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190703011234.20517-1-richardw.yang@linux.intel.com>
+User-Agent: Mutt/1.12.0 (2019-05-25)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.45]); Thu, 11 Jul 2019 09:34:31 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH] migration/postcopy: fix document of
+ postcopy_send_discard_bm_ram()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,28 +69,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, quintela@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/10/19 8:32 PM, Jan Bobek wrote:
-> On 7/3/19 5:49 PM, Richard Henderson wrote:
->> On 7/1/19 6:35 AM, Jan Bobek wrote:
->>> +MOVQ            MMX     00001111 011 d 1110 !emit { rex(w => 1); modrm(mod => MOD_DIRECT, rm => ~REG_ESP); }
->>> +MOVQ_mem        MMX     00001111 011 d 1110 !emit { rex(w => 1); modrm(mod => ~MOD_DIRECT); mem(size => 8); }
->>
->> Oh, note that there are only 8 mmx registers, so the respective rex.{r,b} bit
->> can't be set.
+* Wei Yang (richardw.yang@linux.intel.com) wrote:
+> Commit 6b6712efccd3 ('ram: Split dirty bitmap by RAMBlock') changes the
+> parameter of postcopy_send_discard_bm_ram(), while left the document
+> part untouched.
 > 
-> Actually, my CPU chewed it without choking even when the bits were
-> set, but it will taken care of in v3.
+> This patch correct the document and fix one typo by hand.
+> 
+> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+> ---
+>  migration/ram.c | 5 ++---
+>  1 file changed, 2 insertions(+), 3 deletions(-)
+> 
+> diff --git a/migration/ram.c b/migration/ram.c
+> index 246efe6939..410e0f89fe 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -2763,8 +2763,7 @@ void ram_postcopy_migrated_memory_release(MigrationState *ms)
+>   *
+>   * @ms: current migration state
+>   * @pds: state for postcopy
+> - * @start: RAMBlock starting page
+> - * @length: RAMBlock size
+> + * @block: RAMBlock to discard
+>   */
+>  static int postcopy_send_discard_bm_ram(MigrationState *ms,
+>                                          PostcopyDiscardState *pds,
+> @@ -2961,7 +2960,7 @@ static void postcopy_chunk_hostpages_pass(MigrationState *ms, bool unsent_pass,
+>  }
+>  
+>  /**
+> - * postcopy_chuck_hostpages: discrad any partially sent host page
+> + * postcopy_chuck_hostpages: discard any partially sent host page
 
-That's interesting data.
+While we're here we should probably fix the name of the function as
+well!   s/chuck/chunk/
 
-I wonder if it's worth retaining this as a feature in order to check qemu's
-implementation?
+Dave
 
-
-r~
+>   *
+>   * Utility for the outgoing postcopy code.
+>   *
+> -- 
+> 2.19.1
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
