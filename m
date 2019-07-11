@@ -2,83 +2,79 @@ Return-Path: <SRS0=FHOf=VI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A00A1C74A4B
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 07:48:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73521C74A4B
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 08:03:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6F0B121019
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 07:48:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F0B121019
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4C02F208E4
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 08:03:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C02F208E4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=canonical.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39248 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39316 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlToo-0005cZ-6I
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 03:48:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42160)
+	id 1hlU2i-0000QM-CG
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 04:03:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46900)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hlToK-0005CN-Bs
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 03:48:13 -0400
+ (envelope-from <christian.ehrhardt@canonical.com>)
+ id 1hlU2C-0008RO-4v
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 04:02:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hlToJ-0007Un-7x
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 03:48:12 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:34499)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hlToJ-0007T4-0s
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 03:48:11 -0400
-Received: by mail-wm1-f66.google.com with SMTP id w9so6332390wmd.1
- for <qemu-devel@nongnu.org>; Thu, 11 Jul 2019 00:48:10 -0700 (PDT)
+ (envelope-from <christian.ehrhardt@canonical.com>)
+ id 1hlU2A-0006Mt-M2
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 04:02:32 -0400
+Received: from youngberry.canonical.com ([91.189.89.112]:36325)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <christian.ehrhardt@canonical.com>)
+ id 1hlU2A-0006LX-Fm
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 04:02:30 -0400
+Received: from mail-ua1-f72.google.com ([209.85.222.72])
+ by youngberry.canonical.com with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.76) (envelope-from <christian.ehrhardt@canonical.com>)
+ id 1hlU28-0005ez-In
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 08:02:28 +0000
+Received: by mail-ua1-f72.google.com with SMTP id d1so882252uak.23
+ for <qemu-devel@nongnu.org>; Thu, 11 Jul 2019 01:02:28 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=A3Etdi5nPKQWgNN3kQA4KRfVFUZLkNVqiDdxffRi8mE=;
- b=PKK6YiFHNvfhPPJNOM8QJQuuThMj4aZgto9agDkoCBpKZpRUUUlEbRAxsRKRjeInbz
- 1RquM2H7wIoDgmYlI9udBIvwkSJgmWwO0hNnwjFjo42FFRFDxOzOk2k+RtUNG3/Z9QU7
- Sgp1BkSlTYSpj99l1AuN3YK0PNqhmQgjK0bGSeQ+a774sS5wsS+fSFN74GwnkQ5GcZiw
- wkhHgJwaN6UTQ6nKVLbt49atogFS7ow93IuXmiZzX5cuKsYiZnHtt43hfjM4cexGTpBd
- rZRIp34NDFS7KpSheFNEpfuyrz1qmMf+P0/SXHXaAWQKvqh4KGHKr5LRTMZp65Vae4mw
- +VWQ==
-X-Gm-Message-State: APjAAAW2cuMC+H6gfSH1SzQSR7D8d/orFYJZdMOGb9JKYy53YfwX6UDy
- GdQwwMbxIzoxPPOCCKDOY9OWDA==
-X-Google-Smtp-Source: APXvYqy24a4SjsGvHKMFPcgttVoejFlHdzdXqYKnP6bbcAHv84uvtxrb2v9DkJecvuXaw35WuNjrAw==
-X-Received: by 2002:a1c:2c41:: with SMTP id s62mr2557786wms.8.1562831289381;
- Thu, 11 Jul 2019 00:48:09 -0700 (PDT)
-Received: from [192.168.1.38] (62.red-83-42-61.dynamicip.rima-tde.net.
- [83.42.61.62])
- by smtp.gmail.com with ESMTPSA id h8sm4274600wmf.12.2019.07.11.00.48.08
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Thu, 11 Jul 2019 00:48:08 -0700 (PDT)
-To: Guenter Roeck <linux@roeck-us.net>, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>,
- "Daniel P. Berrange" <berrange@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-References: <20190710220153.GA10826@roeck-us.net>
- <20190711010742.GA810@roeck-us.net>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <dc31e591-3b22-8626-10b2-48597f56ee0a@redhat.com>
-Date: Thu, 11 Jul 2019 09:48:07 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=FBlpKQcfevzmyQhC3ZU2LozlX2sdjdgD3qSnxcPJTLY=;
+ b=b3cjLiDAD311xUbMGEIbEQWf1lb+s+QHUIJEyAYk3ruwnxjESZFrwoXJC8HHowsFN5
+ zIs3xyYaYM5ilZVHnzS5JlPARZ2cEMVt23uR+aGnJ+6ZGeP/Uu+TJ7a5NMCN/Xt03c8u
+ fLKpzXRNidXIuKIT/TwjG6cAfW1xDdZbZG34/l/EedXIrKq+uUGeP2wrIQjp65DNH9GT
+ NI45KjoQi5k5E4BFQD6787fH1a+JNn6/QKhNLXOTYlirE4g41cyrwdcHSSpHkk45JKPV
+ mlpLH5FfgSwEGon8sDlT1BtZwXvHZwwje4x0kLyxoT3WR+2E+8VdVfkzKhUu1LUtPouG
+ pdtg==
+X-Gm-Message-State: APjAAAXZ778BKWnlLDFbDcMU5DtdpJu4IhJiNCSPTTv6OE9b2BZ18dFn
+ On5VGou84gtuPHJlTzK1mLZg8/pYrieaqVZ7aAHKCqLRL4XYIHVGv8swpsDPErEdtevTcgKvYQn
+ OgUGvh2sQaKhZFk1ogmR6Bld04Y3BBQGSofqDu70Fu04PMKEV
+X-Received: by 2002:ab0:7143:: with SMTP id k3mr2055046uao.91.1562832147451;
+ Thu, 11 Jul 2019 01:02:27 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqxvLT7mkyqC52FZMMDMPKZ/HVBXHT8xsg/bpo4DvkmCl9lF0HkV/HzzMWM3JVNohrOpn3ortf36i6v5O+zEe9M=
+X-Received: by 2002:ab0:7143:: with SMTP id k3mr2055017uao.91.1562832147190;
+ Thu, 11 Jul 2019 01:02:27 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190711010742.GA810@roeck-us.net>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.128.66
-Subject: Re: [Qemu-devel] Problems building and installing qemu v4.1.0-rc1
- in single step
+References: <20190617131103.1413-1-berrange@redhat.com>
+ <b6d3c3b0-da81-8b59-1660-83ef5423b097@vivier.eu>
+In-Reply-To: <b6d3c3b0-da81-8b59-1660-83ef5423b097@vivier.eu>
+From: Christian Ehrhardt <christian.ehrhardt@canonical.com>
+Date: Thu, 11 Jul 2019 10:02:01 +0200
+Message-ID: <CAATJJ0K4xZ4iPxBKz-iCv6sDTjWE5y+-wg7T9OOiRq4tTG__mA@mail.gmail.com>
+To: Laurent Vivier <laurent@vivier.eu>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 91.189.89.112
+Subject: Re: [Qemu-devel] [PATCH v2] linux-user: fix to handle variably
+ sized SIOCGSTAMP with new kernels
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,55 +86,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ Arnd Bergmann <arnd@arndb.de>, Gerhard Stenzel <gerhard.stenzel@de.ibm.com>,
+ Riku Voipio <riku.voipio@iki.fi>, qemu-devel <qemu-devel@nongnu.org>,
+ Christian Borntraeger <borntraeger@de.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Guenter,
+On Mon, Jun 17, 2019 at 5:35 PM Laurent Vivier <laurent@vivier.eu> wrote:
+>
+> Le 17/06/2019 =C3=A0 15:11, Daniel P. Berrang=C3=A9 a =C3=A9crit :
+> > The SIOCGSTAMP symbol was previously defined in the
+> > asm-generic/sockios.h header file. QEMU sees that header
+> > indirectly via sys/socket.h
+> >
+> > In linux kernel commit 0768e17073dc527ccd18ed5f96ce85f9985e9115
+> > the asm-generic/sockios.h header no longer defines SIOCGSTAMP.
+> > Instead it provides only SIOCGSTAMP_OLD, which only uses a
+> > 32-bit time_t on 32-bit architectures.
+> >
+> > The linux/sockios.h header then defines SIOCGSTAMP using
+> > either SIOCGSTAMP_OLD or SIOCGSTAMP_NEW as appropriate. If
+> > SIOCGSTAMP_NEW is used, then the tv_sec field is 64-bit even
+> > on 32-bit architectures
+> >
+> > To cope with this we must now define two separate syscalls,
+> > with corresponding old and new sizes, as well as including
+> > the new linux/sockios.h header.
+> >
+> > Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> > ---
+> >  linux-user/ioctls.h        | 15 +++++++++++++++
+> >  linux-user/syscall.c       |  1 +
+> >  linux-user/syscall_defs.h  |  5 +++++
+> >  linux-user/syscall_types.h |  4 ++++
+> >  4 files changed, 25 insertions(+)
+> >
+> > diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
+> > index 5e84dc7c3a..5a6d6def7e 100644
+> > --- a/linux-user/ioctls.h
+> > +++ b/linux-user/ioctls.h
+> > @@ -222,8 +222,23 @@
+> >    IOCTL(SIOCGIWNAME, IOC_W | IOC_R, MK_PTR(MK_STRUCT(STRUCT_char_ifreq=
+)))
+> >    IOCTL(SIOCSPGRP, IOC_W, MK_PTR(TYPE_INT)) /* pid_t */
+> >    IOCTL(SIOCGPGRP, IOC_R, MK_PTR(TYPE_INT)) /* pid_t */
+> > +
+> > +#ifdef SIOCGSTAMP_OLD
+> > +  IOCTL(SIOCGSTAMP_OLD, IOC_R, MK_PTR(MK_STRUCT(STRUCT_timeval)))
+> > +#else
+> >    IOCTL(SIOCGSTAMP, IOC_R, MK_PTR(MK_STRUCT(STRUCT_timeval)))
+> > +#endif
+> > +#ifdef SIOCGSTAMPNS_OLD
+> > +  IOCTL(SIOCGSTAMPNS_OLD, IOC_R, MK_PTR(MK_STRUCT(STRUCT_timespec)))
+> > +#else
+> >    IOCTL(SIOCGSTAMPNS, IOC_R, MK_PTR(MK_STRUCT(STRUCT_timespec)))
+> > +#endif
+> > +#ifdef SIOCGSTAMP_NEW
+> > +  IOCTL(SIOCGSTAMP_NEW, IOC_R, MK_PTR(MK_STRUCT(STRUCT_timeval64)))
+> > +#endif
+> > +#ifdef SIOCGSTAMPNS_NEW
+> > +  IOCTL(SIOCGSTAMPNS_NEW, IOC_R, MK_PTR(MK_STRUCT(STRUCT_timespec64)))
+> > +#endif
+> >
+> >    IOCTL(RNDGETENTCNT, IOC_R, MK_PTR(TYPE_INT))
+> >    IOCTL(RNDADDTOENTCNT, IOC_W, MK_PTR(TYPE_INT))
+> > diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+> > index b187c1281d..f13e260b02 100644
+> > --- a/linux-user/syscall.c
+> > +++ b/linux-user/syscall.c
+> > @@ -37,6 +37,7 @@
+> >  #include <sched.h>
+> >  #include <sys/timex.h>
+> >  #include <sys/socket.h>
+> > +#include <linux/sockios.h>
+> >  #include <sys/un.h>
+> >  #include <sys/uio.h>
+> >  #include <poll.h>
+> > diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
+> > index 7f141f699c..7830b600e7 100644
+> > --- a/linux-user/syscall_defs.h
+> > +++ b/linux-user/syscall_defs.h
+> > @@ -750,6 +750,11 @@ struct target_pollfd {
+> >
+> >  #define TARGET_SIOCGSTAMP      0x8906          /* Get stamp (timeval) =
+*/
+> >  #define TARGET_SIOCGSTAMPNS    0x8907          /* Get stamp (timespec)=
+ */
+> > +#define TARGET_SIOCGSTAMP_OLD   0x8906          /* Get stamp (timeval)=
+ */
+> > +#define TARGET_SIOCGSTAMPNS_OLD 0x8907          /* Get stamp (timespec=
+) */
+> > +#define TARGET_SIOCGSTAMP_NEW   TARGET_IOC(TARGET_IOC_READ, 's', 6, si=
+zeof(long long) + sizeof(long)) /* Get stamp (timeval64) */
+> > +#define TARGET_SIOCGSTAMPNS_NEW TARGET_IOC(TARGET_IOC_READ, 's', 7, si=
+zeof(long long) + sizeof(long)) /* Get stamp (timespec64) */
+> kernel defines:
+>
+> #define SIOCGSTAMP_NEW   _IOR(SOCK_IOC_TYPE, 0x06, long long[2])
+> #define SIOCGSTAMPNS_NEW _IOR(SOCK_IOC_TYPE, 0x07, long long[2])
+>
+> So it should be TARGET_IOR(0x89, 0x6, abi_llong[2])
+>
+> Their codes are 0x80108906 and 80108907.
 
-Cc'ing Markus/Dan/Alex
+Hi,
+I found the discussion around this topic being almost a month old.
+And related to this fedora bug [1] was closed by adding [2] which
+matches [3] that was nacked in the discussion here.
 
-On 7/11/19 3:07 AM, Guenter Roeck wrote:
-> On Wed, Jul 10, 2019 at 03:01:53PM -0700, Guenter Roeck wrote:
->> Hi,
->>
->> when trying to run "make -j30 install" from a clean tree on v4.1.0-rc0, I get
->> _lots_ of undefined symbol errors.
->>
->> If I run "make -j30" followed by "make -j30 install", make succeeds, but then
->> I get linker errors such as the following when running "make -j30 install".
+Since I found nothing later (neither qemu commits nor further
+discussions) I wonder if it has fallen through the cracks OR if there
+was a kernel fix/change to resolve it (if that is the case a pointer
+to the related kernel change would be nice)?
 
-Seems similar to this report:
-https://lists.gnu.org/archive/html/qemu-devel/2019-07/msg01860.html
+[1]: https://bugzilla.redhat.com/show_bug.cgi?id=3D1718926
+[2]: https://src.fedoraproject.org/rpms/qemu/blob/master/f/0005-NOT-UPSTREA=
+M-Build-fix-with-latest-kernel.patch
+[3]: https://patchew.org/QEMU/20190604071915.288045-1-borntraeger@de.ibm.co=
+m/
 
->>
->> /usr/bin/ld: final link failed: File truncated
->> /usr/bin/ld: BFD (GNU Binutils for Ubuntu) 2.26.1 internal error,
->> 	aborting at ../../bfd/merge.c:905 in _bfd_merged_section_offset
+> Thanks,
+> Laurent
+>
 
-This seems new, what is your host?
 
-"File truncated" reminds me out-of-space issues.
-
-FWIW sometimes I'm having some weird issue when calling "make
-check-tcg". Docker is used to build target binaries, but apparently it
-tries to compile some host object instead and fails, but I don't reach
-the linking.
-Just to clear this out, do you see any docker started?
-
->>
->> Running "make -j30" followed by "make install" succeeds.
->>
-> 
-> Correction: This doesn't always work either. Sometimes I still get a linker
-> error. If that happens, another round of "make; make install" succeeds.
-> 
-> Guenter
-> 
->> This looks like "make install" may have bad dependencies. Has anyone else
->> experienced this problem ?
->>
->> Thanks,
->> Guenter
-> 
+--=20
+Christian Ehrhardt
+Software Engineer, Ubuntu Server
+Canonical Ltd
 
