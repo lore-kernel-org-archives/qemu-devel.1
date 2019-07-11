@@ -2,85 +2,56 @@ Return-Path: <SRS0=FHOf=VI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87CB8C74A42
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 05:26:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07B3EC74A45
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 05:34:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 44D83208E4
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 05:26:51 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ohpNlEys"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 44D83208E4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id D7D06208E4
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 05:34:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D7D06208E4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38660 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38676 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlRbW-0001Qd-9A
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 01:26:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52408)
+	id 1hlRj3-0002xC-2N
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 01:34:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54984)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <suratiamol@gmail.com>) id 1hlRb2-0000yy-R7
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 01:26:22 -0400
+ (envelope-from <jing2.liu@linux.intel.com>) id 1hlRiZ-0002XB-Ia
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 01:34:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <suratiamol@gmail.com>) id 1hlRb0-0003bA-UA
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 01:26:20 -0400
-Received: from mail-pl1-x62f.google.com ([2607:f8b0:4864:20::62f]:39342)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <suratiamol@gmail.com>)
- id 1hlRay-0003QU-R1
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 01:26:17 -0400
-Received: by mail-pl1-x62f.google.com with SMTP id b7so2396176pls.6
- for <qemu-devel@nongnu.org>; Wed, 10 Jul 2019 22:26:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:mime-version:content-disposition
- :content-transfer-encoding;
- bh=PCKCM48EOEDT7QabbySsUTyPsWZSjTpNK9Q/GRexDyA=;
- b=ohpNlEys7iO85q0RsDt/dGKbABNr2e9UAGCe13Hta+Q5zSaswPN8s/rZgtV9E2SV9E
- fJb1Mo3BK3MRdsc6gCDCSTKE/+TuHxknj5RmcSimTUpEGS6w/4NWRDwiAYE8AdTipgdd
- 20Zhh8eT5ngAw/JAkwZGVkW2AWJ1n+j3gCUrPlNQ4a3ud3Efl3y5lCgNOKoAZj2D8nL3
- 22MlpT24uE37ThjG1uZ+Wrz+AmAb1vvRJW52yeKpNp6kljxyJLPdfNm7AatKsEUJahvw
- BIK9RB42sIZYfnDSY7j15vQSPuHMDSCXzZQWecSDPeM0+LNN1D42q5KZ+roMcd8+j7S6
- bTMA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
- :content-disposition:content-transfer-encoding;
- bh=PCKCM48EOEDT7QabbySsUTyPsWZSjTpNK9Q/GRexDyA=;
- b=j5IOWzw13BwSdAtyYhn1gGC4q5ENrKKpycPMVwnWs29Q5BeM/8fy1P9JAoPcHkQAmJ
- Kd0reKXWFJQulnVKs3m27+lpvrRhHw6eLGkllXrZnHR8vIoSBvrWA14l3M6ZarNp0toS
- kJM45A5Q2LJq43fyBNQF3QLkW/7ZKrsZL+4Ed3vLG/pZzgD+Fr1JNrPAXExERr9mLEUi
- O+IZnWmofcyv2Ndu2UhqcBzffdChmQHRR7DzHRxgQ45vNrS0xWiMwIha0hXCLU4xKE5U
- SRlVCJhbz7IFb0DV6kmEAbDR9kDKC83yzbrZ3QAfoxSbZDKs4G6Q3TwkFXKQaGLnHVzv
- RwGw==
-X-Gm-Message-State: APjAAAXiELV9EKVKr6RVU9atySkT162FfPUIVgWzYBlRpYw/PTmoc0jL
- PsOOijZTh+rUB7+xmDKIpusF3wGmlusbnw==
-X-Google-Smtp-Source: APXvYqyNMpSs4RXfHtJ3uYYCaw0xNIIbfBo7cuuPVJ6PGLD1P/j+R3tFF9xoCjRbHBcd7HSlAU6KjQ==
-X-Received: by 2002:a17:902:2ec5:: with SMTP id
- r63mr2458044plb.21.1562822772696; 
- Wed, 10 Jul 2019 22:26:12 -0700 (PDT)
-Received: from arch ([103.238.107.151])
- by smtp.gmail.com with ESMTPSA id x9sm4328499pfn.177.2019.07.10.22.26.10
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Wed, 10 Jul 2019 22:26:11 -0700 (PDT)
-Date: Thu, 11 Jul 2019 10:56:08 +0530
-From: Amol Surati <suratiamol@gmail.com>
-To: qemu-devel@nongnu.org
-Message-ID: <20190711052608.GA2619@arch>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+ (envelope-from <jing2.liu@linux.intel.com>) id 1hlRiX-0002Oj-HT
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 01:34:06 -0400
+Received: from mga17.intel.com ([192.55.52.151]:63403)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jing2.liu@linux.intel.com>)
+ id 1hlRiX-0001LD-7q
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 01:34:05 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+ by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 10 Jul 2019 22:32:59 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.63,476,1557212400"; d="scan'208";a="317576902"
+Received: from liujing-dell.bj.intel.com ([10.238.145.70])
+ by orsmga004.jf.intel.com with ESMTP; 10 Jul 2019 22:32:57 -0700
+From: Jing Liu <jing2.liu@linux.intel.com>
+To: qemu-devel@nongnu.org,
+	pbonzini@redhat.com
+Date: Thu, 11 Jul 2019 13:38:29 +0800
+Message-Id: <1562823509-13072-1-git-send-email-jing2.liu@linux.intel.com>
+X-Mailer: git-send-email 1.8.3.1
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::62f
-Subject: [Qemu-devel] qemu compilation failure with nettle 3.5.1
+X-Received-From: 192.55.52.151
+Subject: [Qemu-devel] [PATCH v1] x86: Intel AVX512_BF16 feature enabling
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,40 +63,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: suratiamol@gmail.com
+Cc: Jing Liu <jing2.liu@linux.intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
+Intel CooperLake cpu adds AVX512_BF16 instruction, defining as
+CPUID.(EAX=7,ECX=1):EAX[bit 05].
 
-The qemu upstream (at commit 6df2cdf44a at the moment) fails to compile
-with nettle 3.5.1. It seems that Nettle has deprecated a few parts of
-its API.
+The release spec link as follows,
+https://software.intel.com/sites/default/files/managed/c5/15/\
+architecture-instruction-set-extensions-programming-reference.pdf
 
-A workaround is to provide --disable-nettle during qemu configuration.
+Signed-off-by: Jing Liu <jing2.liu@linux.intel.com>
+---
+ target/i386/cpu.c | 29 ++++++++++++++++++++++++++++-
+ target/i386/cpu.h |  3 +++
+ target/i386/kvm.c |  3 ++-
+ 3 files changed, 33 insertions(+), 2 deletions(-)
 
-A portion of the error log:
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index c1ab86d..de3daf5 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -767,6 +767,7 @@ static void x86_cpu_vendor_words2str(char *dst, uint32_t vendor1,
+           /* CPUID_7_0_ECX_OSPKE is dynamic */ \
+           CPUID_7_0_ECX_LA57)
+ #define TCG_7_0_EDX_FEATURES 0
++#define TCG_7_1_EAX_FEATURES 0
+ #define TCG_APM_FEATURES 0
+ #define TCG_6_EAX_FEATURES CPUID_6_EAX_ARAT
+ #define TCG_XSAVE_FEATURES (CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XGETBV1)
+@@ -1092,6 +1093,25 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
+         },
+         .tcg_features = TCG_7_0_EDX_FEATURES,
+     },
++    [FEAT_7_1_EAX] = {
++        .type = CPUID_FEATURE_WORD,
++        .feat_names = {
++            NULL, NULL, NULL, NULL,
++            NULL, "avx512-bf16", NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++        },
++        .cpuid = {
++            .eax = 7,
++            .needs_ecx = true, .ecx = 1,
++            .reg = R_EAX,
++        },
++        .tcg_features = TCG_7_1_EAX_FEATURES,
++    },
+     [FEAT_8000_0007_EDX] = {
+         .type = CPUID_FEATURE_WORD,
+         .feat_names = {
+@@ -4344,13 +4364,20 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+     case 7:
+         /* Structured Extended Feature Flags Enumeration Leaf */
+         if (count == 0) {
+-            *eax = 0; /* Maximum ECX value for sub-leaves */
++            /* Maximum ECX value for sub-leaves */
++            *eax = kvm_arch_get_supported_cpuid(cs->kvm_state, 0x7,
++                                                count, R_EAX);
+             *ebx = env->features[FEAT_7_0_EBX]; /* Feature flags */
+             *ecx = env->features[FEAT_7_0_ECX]; /* Feature flags */
+             if ((*ecx & CPUID_7_0_ECX_PKU) && env->cr[4] & CR4_PKE_MASK) {
+                 *ecx |= CPUID_7_0_ECX_OSPKE;
+             }
+             *edx = env->features[FEAT_7_0_EDX]; /* Feature flags */
++        } else if (count == 1) {
++            *eax = env->features[FEAT_7_1_EAX];
++            *ebx = 0;
++            *ecx = 0;
++            *edx = 0;
+         } else {
+             *eax = 0;
+             *ebx = 0;
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index bd06523..40594a1 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -488,6 +488,7 @@ typedef enum FeatureWord {
+     FEAT_7_0_EBX,       /* CPUID[EAX=7,ECX=0].EBX */
+     FEAT_7_0_ECX,       /* CPUID[EAX=7,ECX=0].ECX */
+     FEAT_7_0_EDX,       /* CPUID[EAX=7,ECX=0].EDX */
++    FEAT_7_1_EAX,       /* CPUID[EAX=7,ECX=1].EAX */
+     FEAT_8000_0001_EDX, /* CPUID[8000_0001].EDX */
+     FEAT_8000_0001_ECX, /* CPUID[8000_0001].ECX */
+     FEAT_8000_0007_EDX, /* CPUID[8000_0007].EDX */
+@@ -699,6 +700,8 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
+ #define CPUID_7_0_EDX_ARCH_CAPABILITIES (1U << 29)  /*Arch Capabilities*/
+ #define CPUID_7_0_EDX_SPEC_CTRL_SSBD  (1U << 31) /* Speculative Store Bypass Disable */
+ 
++#define CPUID_7_1_EAX_AVX512_BF16 (1U << 5) /* AVX512 BFloat16 Instruction */
++
+ #define CPUID_8000_0008_EBX_WBNOINVD  (1U << 9)  /* Write back and
+                                                                              do not invalidate cache */
+ #define CPUID_8000_0008_EBX_IBPB    (1U << 12) /* Indirect Branch Prediction Barrier */
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index 3b29ce5..977aaa5 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -1110,6 +1110,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
+                 c = &cpuid_data.entries[cpuid_i++];
+             }
+             break;
++        case 0x7:
+         case 0x14: {
+             uint32_t times;
+ 
+@@ -1122,7 +1123,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
+             for (j = 1; j <= times; ++j) {
+                 if (cpuid_i == KVM_MAX_CPUID_ENTRIES) {
+                     fprintf(stderr, "cpuid_data is full, no space for "
+-                                "cpuid(eax:0x14,ecx:0x%x)\n", j);
++                                "cpuid(eax:0x%x,ecx:0x%x)\n", i, j);
+                     abort();
+                 }
+                 c = &cpuid_data.entries[cpuid_i++];
+-- 
+1.8.3.1
 
-error: ‘nettle_aes_encrypt’ is deprecated
-error: ‘nettle_aes_decrypt’ is deprecated
-error: ‘nettle_aes_encrypt’ is deprecated
-error: ‘nettle_aes_decrypt’ is deprecated
-error: ‘nettle_aes_set_encrypt_key’ is deprecated
-error: ‘nettle_aes_set_decrypt_key’ is deprecated
-error: ‘nettle_aes_set_encrypt_key’ is deprecated
-error: ‘nettle_aes_set_decrypt_key’ is deprecated
-error: ‘nettle_aes_set_encrypt_key’ is deprecated
-error: ‘nettle_aes_set_decrypt_key’ is deprecated
-
-
-The declaration of one of the functions from nettle's aes.h:
-
-void
-aes_encrypt(const struct aes_ctx *ctx,
-            size_t length, uint8_t *dst,
-            const uint8_t *src) _NETTLE_ATTRIBUTE_DEPRECATED;
-
-Thanks,
-Amol
 
