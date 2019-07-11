@@ -2,81 +2,82 @@ Return-Path: <SRS0=FHOf=VI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 679EBC74A5B
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 17:27:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 604B0C74A5B
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 17:27:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3521D20863
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 17:27:05 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nSnmul48"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3521D20863
+	by mail.kernel.org (Postfix) with ESMTPS id 36C8420863
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 17:27:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 36C8420863
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43756 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43762 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlcqW-0000mM-Cg
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 13:27:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33036)
+	id 1hlcr3-0001cR-Cl
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 13:27:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33193)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <paolo.bonzini@gmail.com>) id 1hlcqM-0000MU-E1
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 13:26:55 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1hlcqu-0001DW-9O
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 13:27:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1hlcqL-0007wM-An
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 13:26:54 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:38614)
+ (envelope-from <pbonzini@redhat.com>) id 1hlcqs-0008PH-AY
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 13:27:28 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:53624)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1hlcqL-0007v1-4e
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 13:26:53 -0400
-Received: by mail-wm1-x343.google.com with SMTP id s15so6458533wmj.3
- for <qemu-devel@nongnu.org>; Thu, 11 Jul 2019 10:26:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:subject:date:message-id;
- bh=iUgof65FlBg0LXx+uLyqSdziWBu7F3VhET5Hbgi+8Ac=;
- b=nSnmul48Fsa+bnPIajSKakOIIRERqIcXICBJrNOidlOdb9JtgvR3sWzRbaOin1J7Rw
- dN4O/vaXuTn46LPy4CpJN9NBCHddyZUTFGI9MrdK0cGhBDhpxa0tJrqgF65D9uwmsOSE
- 5v/Blh83dnjHwuHIxGaT9dpGQGXQHk4whTrlJ/+xPF9iR9KoZMZCoPL+prpQcWoBTw54
- CuYHA7yGY6g7DpNa0ici10G7qsGiSlHSZcQAXG2lqvKtxnTt7hV8UhHosisbhuKbA+Sj
- B4ajztMrP8zYcnkknl3o/w09+2vzXu/v8NVWEm4uqIHiYTSrlQq4aqrFzzVFhccd8Z8P
- /DKA==
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hlcqq-0008Mt-9A
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 13:27:26 -0400
+Received: by mail-wm1-f65.google.com with SMTP id x15so6462781wmj.3
+ for <qemu-devel@nongnu.org>; Thu, 11 Jul 2019 10:27:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:subject:date:message-id;
- bh=iUgof65FlBg0LXx+uLyqSdziWBu7F3VhET5Hbgi+8Ac=;
- b=fMJ50tvNa6a8TXLiqPr9ZX1G1m1U8LxzUSdT/LwX6digFO4Dbs4C1K+u+/87gpIGK2
- 0qiJN/UogIBuu9LbDaX+uQyiWdcZTXBA0v/Itrj1sCvkNisV15n4DWUunQIUM9tdI1qE
- vvzTSDiXsqzjNsyNuBkZZ17risQsyKaGdmy49s6NhP7rvGwxt18NbmpuuzoMLDiYvLtS
- buEOjdcGUihDuTt7Y0rR0F1GD4fiTxRh7YqrsN6U1660FvzBA2fURy/XXifSWk3nBHil
- oTbpHRRiJ3wZ/v1hHfQ3NeM8nEXGCCRnqzFwQMLtQ3j9q9Y6Fk7rW7IVTGVSF5It4TwF
- RVxQ==
-X-Gm-Message-State: APjAAAXA58tbDZeH3e6Fcvhkh+yWKoG9zA1yfxEsSjct6VkX9K7YmKcm
- 6ObLovpqFiNeyOwPkjdzvTokUSJ6Twk=
-X-Google-Smtp-Source: APXvYqySaaMIc18XW+avIJRv2JwmlqD0GzcldyRxJyr+lgqQeF04nDKYUwiMW63fbm5cFZlQMNCgAw==
-X-Received: by 2002:a1c:f914:: with SMTP id x20mr5344997wmh.142.1562866011732; 
- Thu, 11 Jul 2019 10:26:51 -0700 (PDT)
-Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id a64sm9701910wmf.1.2019.07.11.10.26.51
- for <qemu-devel@nongnu.org>
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 11 Jul 2019 10:26:51 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=yO1sVfSkD66Za17PbFJm0jKswKayheW9pPIfZ1g9g0M=;
+ b=GSDHDrXkdXzBRxFb9y9ue+BJomNXXUbZfe9WayCzUnlNBkOWkUFmmUJKQ367fOdNvX
+ z4kjgfXIMpGt1OXeqGfoBCImAJwL66uKrVhllNZpW4dM4oJtGJF/AfsqdaZEkJiq9oRn
+ cCfHQZT1QMFxSXrgLLPcS2x4mPlFVZbKclLv1svHiSVWnAgC92yamu1sY7qEYCIQnJcx
+ tUPpCdAd2CHovQGwZchqbL8lGwdhXly9cPskN7gM02aUhnIUF/L4rSYVpt4uepudZ2cL
+ SXtEDTxAhfF/NvXJdrjU63H9v66UZZHv9isCpJ7/LKxnUVMH0ozT7+loqu1O6VdkZvaR
+ CN8g==
+X-Gm-Message-State: APjAAAXxP9tZrwzAz5pOo7bYFiRzEu8C+RuX0WbJPwqDdBiYUzRpqiIb
+ LPpuiHGGnPLhEvpzTRnXbkcspA==
+X-Google-Smtp-Source: APXvYqx8KI07GrT6NEmbPmphqRvGt4b6iNnncRRuBpdsEsmCKeO8h6PRw0o7xlHVpOeQipnTuCTgBQ==
+X-Received: by 2002:a05:600c:2503:: with SMTP id
+ d3mr5334642wma.41.1562866041534; 
+ Thu, 11 Jul 2019 10:27:21 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:d066:6881:ec69:75ab?
+ ([2001:b07:6468:f312:d066:6881:ec69:75ab])
+ by smtp.gmail.com with ESMTPSA id x83sm5924039wmb.42.2019.07.11.10.27.20
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Thu, 11 Jul 2019 10:27:20 -0700 (PDT)
+To: Liran Alon <liran.alon@oracle.com>
+References: <20190705210636.3095-1-liran.alon@oracle.com>
+ <20190705210636.3095-2-liran.alon@oracle.com>
+ <805d7eb5-e171-60bb-94c2-574180f5c44c@redhat.com>
+ <901DE868-40A4-4668-8E10-D14B1E97BAE0@oracle.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Thu, 11 Jul 2019 19:26:50 +0200
-Message-Id: <1562866010-5355-1-git-send-email-pbonzini@redhat.com>
-X-Mailer: git-send-email 1.8.3.1
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::343
-Subject: [Qemu-devel] [PATCH] target/i386: skip KVM_GET/SET_NESTED_STATE if
- VMX disabled, or for SVM
+Openpgp: preference=signencrypt
+Message-ID: <365df187-07b9-77ba-f5ef-35d0330aa914@redhat.com>
+Date: Thu, 11 Jul 2019 19:27:20 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
+MIME-Version: 1.0
+In-Reply-To: <901DE868-40A4-4668-8E10-D14B1E97BAE0@oracle.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.85.128.65
+Subject: Re: [Qemu-devel] [PATCH 1/4] target/i386: kvm: Init nested-state
+ for VMX when vCPU expose VMX
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,113 +89,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Joao Martins <joao.m.martins@oracle.com>, qemu-devel@nongnu.org,
+ kvm@vger.kernel.org, ehabkost@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Do not allocate env->nested_state unless we later need to migrate the
-nested virtualization state.
+On 11/07/19 16:36, Liran Alon wrote:
+> Will you submit a new patch or should I?
 
-With this change, nested_state_needed() will return false if the
-VMX flag is not included in the virtual machine.  KVM_GET/SET_NESTED_STATE
-is also disabled for SVM which is safer (we know that at least the NPT
-root and paging mode have to be saved/loaded), and thus the corresponding
-subsection can go away as well.
+I've just sent it, I was waiting for you to comment on the idea.  I
+forgot to CC you though.
 
-Inspired by a patch from Liran Alon.
-
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- target/i386/kvm.c     | 11 +++++------
- target/i386/machine.c | 21 +--------------------
- 2 files changed, 6 insertions(+), 26 deletions(-)
-
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 5035092..73ab102 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -1748,14 +1748,13 @@ int kvm_arch_init_vcpu(CPUState *cs)
-     max_nested_state_len = kvm_max_nested_state_length();
-     if (max_nested_state_len > 0) {
-         assert(max_nested_state_len >= offsetof(struct kvm_nested_state, data));
--        env->nested_state = g_malloc0(max_nested_state_len);
- 
--        env->nested_state->size = max_nested_state_len;
--
--        if (IS_INTEL_CPU(env)) {
-+        if (cpu_has_vmx(env)) {
-             struct kvm_vmx_nested_state_hdr *vmx_hdr =
-                 &env->nested_state->hdr.vmx;
- 
-+            env->nested_state = g_malloc0(max_nested_state_len);
-+            env->nested_state->size = max_nested_state_len;
-             env->nested_state->format = KVM_STATE_NESTED_FORMAT_VMX;
-             vmx_hdr->vmxon_pa = -1ull;
-             vmx_hdr->vmcs12_pa = -1ull;
-@@ -3682,7 +3681,7 @@ static int kvm_put_nested_state(X86CPU *cpu)
-     CPUX86State *env = &cpu->env;
-     int max_nested_state_len = kvm_max_nested_state_length();
- 
--    if (max_nested_state_len <= 0) {
-+    if (!env->nested_state) {
-         return 0;
-     }
- 
-@@ -3696,7 +3695,7 @@ static int kvm_get_nested_state(X86CPU *cpu)
-     int max_nested_state_len = kvm_max_nested_state_length();
-     int ret;
- 
--    if (max_nested_state_len <= 0) {
-+    if (!env->nested_state) {
-         return 0;
-     }
- 
-diff --git a/target/i386/machine.c b/target/i386/machine.c
-index ac2d1d1..b114609 100644
---- a/target/i386/machine.c
-+++ b/target/i386/machine.c
-@@ -1035,31 +1035,13 @@ static const VMStateDescription vmstate_vmx_nested_state = {
-     }
- };
- 
--static bool svm_nested_state_needed(void *opaque)
--{
--    struct kvm_nested_state *nested_state = opaque;
--
--    return (nested_state->format == KVM_STATE_NESTED_FORMAT_SVM);
--}
--
--static const VMStateDescription vmstate_svm_nested_state = {
--    .name = "cpu/kvm_nested_state/svm",
--    .version_id = 1,
--    .minimum_version_id = 1,
--    .needed = svm_nested_state_needed,
--    .fields = (VMStateField[]) {
--        VMSTATE_END_OF_LIST()
--    }
--};
--
- static bool nested_state_needed(void *opaque)
- {
-     X86CPU *cpu = opaque;
-     CPUX86State *env = &cpu->env;
- 
-     return (env->nested_state &&
--            (vmx_nested_state_needed(env->nested_state) ||
--             svm_nested_state_needed(env->nested_state)));
-+            vmx_nested_state_needed(env->nested_state));
- }
- 
- static int nested_state_post_load(void *opaque, int version_id)
-@@ -1121,7 +1103,6 @@ static const VMStateDescription vmstate_kvm_nested_state = {
-     },
-     .subsections = (const VMStateDescription*[]) {
-         &vmstate_vmx_nested_state,
--        &vmstate_svm_nested_state,
-         NULL
-     }
- };
--- 
-1.8.3.1
-
+Paolo
 
