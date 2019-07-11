@@ -2,59 +2,81 @@ Return-Path: <SRS0=FHOf=VI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 165A2C74A35
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 12:49:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A54EC74A35
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 12:52:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DC9612084B
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 12:49:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC9612084B
+	by mail.kernel.org (Postfix) with ESMTPS id 1FB8721537
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 12:52:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1FB8721537
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41412 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41428 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlYWE-0001TV-Sm
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 08:49:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58188)
+	id 1hlYYY-0002qn-C3
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 08:52:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59178)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hlYUp-0008CH-GT
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 08:48:24 -0400
+ (envelope-from <philmd@redhat.com>) id 1hlYY3-0002Lq-2a
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 08:51:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hlYUn-0002up-G0
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 08:48:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53506)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hlYUf-0002j7-Qs
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 08:48:17 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id B8E2D308624A;
- Thu, 11 Jul 2019 12:48:10 +0000 (UTC)
-Received: from x1w.redhat.com (ovpn-204-45.brq.redhat.com [10.40.204.45])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1F41460BFB;
- Thu, 11 Jul 2019 12:48:06 +0000 (UTC)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Thu, 11 Jul 2019 14:48:04 +0200
-Message-Id: <20190711124805.26476-1-philmd@redhat.com>
+ (envelope-from <philmd@redhat.com>) id 1hlYY2-00064e-11
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 08:51:43 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:46349)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hlYY1-000648-QL
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 08:51:41 -0400
+Received: by mail-wr1-f65.google.com with SMTP id z1so6134803wru.13
+ for <qemu-devel@nongnu.org>; Thu, 11 Jul 2019 05:51:41 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=SlPxaTmiSiArxzojp0dbqOkx2AWVUzv/4AcMbw5NJDM=;
+ b=jzQR/z/wKxJ/lYaaHgN2XzD/+99VmT/AawzfNeQcXs2SKhDLVIh5ntA0EJf5RXfV38
+ b/SftJ4Mu4utpiyUVbtXcdH4Tvdf8NGtUxOQfQ3J3O1j7Tb0AoqiNZYMohKTaQTJwH/Y
+ qm3Qot5SswHipLDuXBmhxEnarNyiGpGLYPnLicufSL29sMGm7qzmdBzBZSidL/8h+bOp
+ khdYu6hqoVo9N0/boEhvlivaKO2D8sAe49wzZeJiyVTWUJnRJAfqI5jqMf0ak0r/g8P/
+ n1kLQ5NbyFt62Sn3B4OXAygDUxXT6RU0NNWHf+VaUHVF949G1lZ1+C+8uiJy4Z2S/9jv
+ ibZQ==
+X-Gm-Message-State: APjAAAVjRYX1rI4vNC/Vg3U1e/g804p2z7bjp7R0WcgPXrOTC9nNVK/R
+ YqvK3CU+Sx0YAx+ifJNcbGs7Gw==
+X-Google-Smtp-Source: APXvYqxAg1V3WiLb9lgSJJ3TAhcoxAF7RdcdLOAqxLmVbcEVoA7vZ2t1QoKFR0QelOo9+vmDdvLBcA==
+X-Received: by 2002:adf:f812:: with SMTP id s18mr5511182wrp.32.1562849500754; 
+ Thu, 11 Jul 2019 05:51:40 -0700 (PDT)
+Received: from [192.168.1.38] (62.red-83-42-61.dynamicip.rima-tde.net.
+ [83.42.61.62])
+ by smtp.gmail.com with ESMTPSA id f192sm6258366wmg.30.2019.07.11.05.51.39
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Thu, 11 Jul 2019 05:51:40 -0700 (PDT)
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20190702005912.15905-1-philmd@redhat.com>
+ <20190702005912.15905-25-philmd@redhat.com>
+ <CAFEAcA9zUUjvfsmswwnTaKEp+NbB3u+zohD9cH8hufbZLRqGWQ@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <97b14ab3-2d00-ea23-a31b-101cdbd37836@redhat.com>
+Date: Thu, 11 Jul 2019 14:51:39 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Thu, 11 Jul 2019 12:48:10 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <CAFEAcA9zUUjvfsmswwnTaKEp+NbB3u+zohD9cH8hufbZLRqGWQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH-for-4.1] tests/docker: Install Ubuntu images
- noninteractively
+ [fuzzy]
+X-Received-From: 209.85.221.65
+Subject: Re: [Qemu-devel] [PULL 24/27] hw/block/pflash_cfi02: Implement
+ erase suspend/resume
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,76 +88,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
+ Thomas Huth <thuth@redhat.com>,
+ Stephen Checkoway <stephen.checkoway@oberlin.edu>,
+ Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We correctly use the DEBIAN_FRONTEND environment variable on
-the Debian images, but forgot the Ubuntu ones are based on it.
+On 7/11/19 2:35 PM, Peter Maydell wrote:
+> On Tue, 2 Jul 2019 at 04:29, Philippe Mathieu-Daudé <philmd@redhat.com> wrote:
+>>
+>> From: Stephen Checkoway <stephen.checkoway@oberlin.edu>
+>>
+>> During a sector erase (but not a chip erase), the embeded erase program
+>> can be suspended. Once suspended, the sectors not selected for erasure
+>> may be read and programmed. Autoselect mode is allowed during erase
+>> suspend mode. Presumably, CFI queries are similarly allowed so this
+>> commit allows them as well.
+>>
+>> Since guest firmware can use status bits DQ7, DQ6, DQ3, and DQ2 to
+>> determine the current state of sector erasure, these bits are properly
+>> implemented.
+>>
+>> @@ -305,13 +364,16 @@ static uint64_t pflash_read(void *opaque, hwaddr offset, unsigned int width)
+>>          }
+>>          DPRINTF("%s: ID " TARGET_FMT_plx " %" PRIx64 "\n", __func__, boff, ret);
+>>          break;
+>> -    case 0xA0:
+>>      case 0x10:
+>>      case 0x30:
+>> +        /* Toggle bit 2 during erase, but not program. */
+>> +        toggle_dq2(pfl);
+>> +    case 0xA0:
+>> +        /* Toggle bit 6 */
+>> +        toggle_dq6(pfl);
+>>          /* Status register read */
+>>          ret = pfl->status;
+>>          DPRINTF("%s: status %" PRIx64 "\n", __func__, ret);
+>> -        toggle_dq6(pfl);
+>>          break;
+>>      case 0x98:
+>>          /* CFI query mode */
+> 
+> Hi; Coverity (CID 1403012) flags up the case 0x30 as an implicit
+> fallthrough. Should it have an explicit "break" or a "/* fall through */"
+> comment?
 
-Since building docker images is not interactive, we need to
-inform the APT tools about it using the DEBIAN_FRONTEND
-environment variable (we already use it on our Debian images).
+Yes, it is an implicit fallthrough. I'll send a patch.
 
-This fixes:
+Thanks,
 
-  $ make docker-image-ubuntu V=3D1
-  [...]
-  Setting up tzdata (2019b-0ubuntu0.19.04) ...
-  debconf: unable to initialize frontend: Dialog
-  debconf: (TERM is not set, so the dialog frontend is not usable.)
-  debconf: falling back to frontend: Readline
-  Configuring tzdata
-  ------------------
-
-  Please select the geographic area in which you live. Subsequent configu=
-ration
-  questions will narrow this down by presenting a list of cities, represe=
-nting
-  the time zones in which they are located.
-
-    1. Africa      4. Australia  7. Atlantic  10. Pacific  13. Etc
-    2. America     5. Arctic     8. Europe    11. SystemV
-    3. Antarctica  6. Asia       9. Indian    12. US
-  Geographic area: 12
-  [HANG]
-
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- tests/docker/dockerfiles/ubuntu.docker     | 2 +-
- tests/docker/dockerfiles/ubuntu1804.docker | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/tests/docker/dockerfiles/ubuntu.docker b/tests/docker/docker=
-files/ubuntu.docker
-index d3b72209c8..f2fc1da6c5 100644
---- a/tests/docker/dockerfiles/ubuntu.docker
-+++ b/tests/docker/dockerfiles/ubuntu.docker
-@@ -65,6 +65,6 @@ ENV PACKAGES flex bison \
-     texinfo \
-     xfslibs-dev
- RUN apt-get update && \
--    apt-get -y install $PACKAGES
-+    DEBIAN_FRONTEND=3Dnoninteractive apt-get -y install $PACKAGES
- RUN dpkg -l $PACKAGES | sort > /packages.txt
- ENV FEATURES clang pyyaml sdl2
-diff --git a/tests/docker/dockerfiles/ubuntu1804.docker b/tests/docker/do=
-ckerfiles/ubuntu1804.docker
-index 9d80b11500..d2d127340c 100644
---- a/tests/docker/dockerfiles/ubuntu1804.docker
-+++ b/tests/docker/dockerfiles/ubuntu1804.docker
-@@ -52,6 +52,6 @@ ENV PACKAGES flex bison \
-     texinfo \
-     xfslibs-dev
- RUN apt-get update && \
--    apt-get -y install $PACKAGES
-+    DEBIAN_FRONTEND=3Dnoninteractive apt-get -y install $PACKAGES
- RUN dpkg -l $PACKAGES | sort > /packages.txt
- ENV FEATURES clang pyyaml sdl2
---=20
-2.20.1
-
+Phil.
 
