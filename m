@@ -6,55 +6,56 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6F1BC742A1
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 19:59:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3E42C742A1
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 19:59:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AACF3208E4
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 19:59:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AACF3208E4
+	by mail.kernel.org (Postfix) with ESMTPS id 875FF208E4
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 19:59:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 875FF208E4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44984 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44996 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlfDy-0007J9-90
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 15:59:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51752)
+	id 1hlfEH-0000ON-KA
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 15:59:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51736)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hlfDW-0005sd-MF
+ (envelope-from <mreitz@redhat.com>) id 1hlfDV-0005qF-TL
  for qemu-devel@nongnu.org; Thu, 11 Jul 2019 15:58:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hlfDU-0001JV-Nc
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 15:58:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57714)
+ (envelope-from <mreitz@redhat.com>) id 1hlfDS-0001FK-Tz
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 15:58:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58386)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hlfDQ-0000rh-Dx; Thu, 11 Jul 2019 15:58:52 -0400
+ id 1hlfDP-0000sz-9d; Thu, 11 Jul 2019 15:58:51 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 6DB32308213A;
- Thu, 11 Jul 2019 19:58:24 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id B65AC356C4;
+ Thu, 11 Jul 2019 19:58:26 +0000 (UTC)
 Received: from localhost (unknown [10.40.205.198])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 6D77B60BE2;
- Thu, 11 Jul 2019 19:58:22 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4EF3360BE2;
+ Thu, 11 Jul 2019 19:58:26 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Date: Thu, 11 Jul 2019 21:58:03 +0200
-Message-Id: <20190711195804.30703-5-mreitz@redhat.com>
+Date: Thu, 11 Jul 2019 21:58:04 +0200
+Message-Id: <20190711195804.30703-6-mreitz@redhat.com>
 In-Reply-To: <20190711195804.30703-1-mreitz@redhat.com>
 References: <20190711195804.30703-1-mreitz@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.42]); Thu, 11 Jul 2019 19:58:24 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.30]); Thu, 11 Jul 2019 19:58:26 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [RFC 4/5] block: Generic file creation fallback
+Subject: [Qemu-devel] [RFC 5/5] iotests: Add test for fallback
+ truncate/create
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,133 +73,131 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If a protocol driver does not support image creation, we can see whether
-maybe the file exists already.  If so, just truncating it will be
-sufficient.
-
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block.c | 77 ++++++++++++++++++++++++++++++++++++++++++++++++---------
- 1 file changed, 65 insertions(+), 12 deletions(-)
+ tests/qemu-iotests/259     | 71 ++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/259.out | 20 +++++++++++
+ tests/qemu-iotests/group   |  1 +
+ 3 files changed, 92 insertions(+)
+ create mode 100755 tests/qemu-iotests/259
+ create mode 100644 tests/qemu-iotests/259.out
 
-diff --git a/block.c b/block.c
-index c139540f2b..8fb8e4dfda 100644
---- a/block.c
-+++ b/block.c
-@@ -531,20 +531,57 @@ out:
-     return ret;
- }
-=20
--int bdrv_create_file(const char *filename, QemuOpts *opts, Error **errp)
-+static int bdrv_create_file_fallback(const char *filename, BlockDriver *=
-drv,
-+                                     QemuOpts *opts, Error **errp)
- {
--    BlockDriver *drv;
-+    BlockBackend *blk;
-+    QDict *options =3D qdict_new();
-+    int64_t size =3D 0;
-+    char *buf =3D NULL;
-+    PreallocMode prealloc;
-     Error *local_err =3D NULL;
-     int ret;
-=20
-+    size =3D qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0);
-+    buf =3D qemu_opt_get_del(opts, BLOCK_OPT_PREALLOC);
-+    prealloc =3D qapi_enum_parse(&PreallocMode_lookup, buf,
-+                               PREALLOC_MODE_OFF, &local_err);
-+    g_free(buf);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        return -EINVAL;
-+    }
+diff --git a/tests/qemu-iotests/259 b/tests/qemu-iotests/259
+new file mode 100755
+index 0000000000..6e3941378f
+--- /dev/null
++++ b/tests/qemu-iotests/259
+@@ -0,0 +1,71 @@
++#!/usr/bin/env bash
++#
++# Test generic image creation and truncation fallback (by using NBD)
++#
++# Copyright (C) 2019 Red Hat, Inc.
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
 +
-+    qdict_put_str(options, "driver", drv->format_name);
++# creator
++owner=3Dmreitz@redhat.com
 +
-+    blk =3D blk_new_open(filename, NULL, options,
-+                       BDRV_O_RDWR | BDRV_O_RESIZE, errp);
-+    if (!blk) {
-+        error_prepend(errp, "Protocol driver '%s' does not support "
-+                      "image creation, and opening the image failed: ",
-+                      drv->format_name);
-+        return -EINVAL;
-+    }
++seq=3D$(basename $0)
++echo "QA output created by $seq"
 +
-+    ret =3D blk_truncate(blk, size, prealloc, errp);
-+    blk_unref(blk);
-+    return ret;
-+}
++status=3D1	# failure is the default!
 +
-+int bdrv_create_file(const char *filename, QemuOpts *opts, Error **errp)
++_cleanup()
 +{
-+    BlockDriver *drv;
++    _cleanup_test_img
++}
++trap "_cleanup; exit \$status" 0 1 2 3 15
 +
-     drv =3D bdrv_find_protocol(filename, true, errp);
-     if (drv =3D=3D NULL) {
-         return -ENOENT;
-     }
-=20
--    ret =3D bdrv_create(drv, filename, opts, &local_err);
--    error_propagate(errp, local_err);
--    return ret;
-+    if (drv->bdrv_co_create_opts) {
-+        return bdrv_create(drv, filename, opts, errp);
-+    } else {
-+        return bdrv_create_file_fallback(filename, drv, opts, errp);
-+    }
- }
-=20
- /**
-@@ -1420,6 +1457,24 @@ QemuOptsList bdrv_runtime_opts =3D {
-     },
- };
-=20
-+static QemuOptsList fallback_create_opts =3D {
-+    .name =3D "fallback-create-opts",
-+    .head =3D QTAILQ_HEAD_INITIALIZER(fallback_create_opts.head),
-+    .desc =3D {
-+        {
-+            .name =3D BLOCK_OPT_SIZE,
-+            .type =3D QEMU_OPT_SIZE,
-+            .help =3D "Virtual disk size"
-+        },
-+        {
-+            .name =3D BLOCK_OPT_PREALLOC,
-+            .type =3D QEMU_OPT_STRING,
-+            .help =3D "Preallocation mode (allowed values: off)"
-+        },
-+        { /* end of list */ }
-+    }
-+};
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.filter
 +
- /*
-  * Common part for opening disk images and files
-  *
-@@ -5681,14 +5736,12 @@ void bdrv_img_create(const char *filename, const =
-char *fmt,
-         return;
-     }
-=20
--    if (!proto_drv->create_opts) {
--        error_setg(errp, "Protocol driver '%s' does not support image cr=
-eation",
--                   proto_drv->format_name);
--        return;
--    }
--
-     create_opts =3D qemu_opts_append(create_opts, drv->create_opts);
--    create_opts =3D qemu_opts_append(create_opts, proto_drv->create_opts=
-);
-+    if (proto_drv->create_opts) {
-+        create_opts =3D qemu_opts_append(create_opts, proto_drv->create_=
-opts);
-+    } else {
-+        create_opts =3D qemu_opts_append(create_opts, &fallback_create_o=
-pts);
-+    }
-=20
-     /* Create parameter list with default values */
-     opts =3D qemu_opts_create(create_opts, NULL, 0, &error_abort);
++_supported_fmt raw
++_supported_proto nbd
++_supported_os Linux
++
++
++_make_test_img 64M
++
++echo
++echo '--- Testing no-op shrinking ---'
++
++$QEMU_IMG resize -f raw --shrink "$TEST_IMG" 32M
++
++echo
++echo '--- Testing non-working growing ---'
++
++$QEMU_IMG resize -f raw "$TEST_IMG" 128M
++
++echo
++echo '--- Testing creation ---'
++
++$QEMU_IMG create -f qcow2 "$TEST_IMG" 64M | _filter_img_create
++$QEMU_IMG info "$TEST_IMG" | _filter_img_info
++
++echo
++echo '--- Testing creation for which the node would need to grow ---'
++
++$QEMU_IMG create -f qcow2 -o preallocation=3Dmetadata "$TEST_IMG" 64M 2>=
+&1 \
++    | _filter_img_create
++
++# success, all done
++echo "*** done"
++rm -f $seq.full
++status=3D0
+diff --git a/tests/qemu-iotests/259.out b/tests/qemu-iotests/259.out
+new file mode 100644
+index 0000000000..1e4b11055f
+--- /dev/null
++++ b/tests/qemu-iotests/259.out
+@@ -0,0 +1,20 @@
++QA output created by 259
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D67108864
++
++--- Testing no-op shrinking ---
++qemu-img: Image was not resized; resizing may not be supported for this =
+image
++
++--- Testing non-working growing ---
++qemu-img: Cannot grow this nbd node
++
++--- Testing creation ---
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3Dqcow2 size=3D67108864
++image: TEST_DIR/t.IMGFMT
++file format: qcow2
++virtual size: 64 MiB (67108864 bytes)
++disk size: unavailable
++
++--- Testing creation for which the node would need to grow ---
++qemu-img: TEST_DIR/t.IMGFMT: Could not resize image: Cannot grow this nb=
+d node
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3Dqcow2 size=3D67108864 preallocatio=
+n=3Dmetadata
++*** done
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index b34c8e3c0c..80e7603174 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -269,3 +269,4 @@
+ 254 rw auto backing quick
+ 255 rw auto quick
+ 256 rw auto quick
++259 rw auto quick
 --=20
 2.21.0
 
