@@ -2,67 +2,87 @@ Return-Path: <SRS0=FHOf=VI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33A93C742A1
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 22:27:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F07F8C742A1
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 22:33:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0D6B221537
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 22:27:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D6B221537
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id B637C20645
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 22:33:41 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HrSWGET7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B637C20645
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45578 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45616 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlhWm-0007Gu-4B
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 18:27:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38832)
+	id 1hlhdE-00014U-89
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 18:33:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40380)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <no-reply@patchew.org>) id 1hlhWa-0006lw-Rx
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 18:26:49 -0400
+ (envelope-from <jan.bobek@gmail.com>) id 1hlhd2-0000cp-2i
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 18:33:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1hlhWZ-0005gd-Jy
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 18:26:48 -0400
-Resent-Date: Thu, 11 Jul 2019 18:26:48 -0400
-Resent-Message-Id: <E1hlhWZ-0005gd-Jy@eggs.gnu.org>
-Received: from sender4-of-o59.zoho.com ([136.143.188.59]:21920)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1hlhWZ-0005ZP-Bn
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 18:26:47 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1562883968; cv=none; d=zoho.com; s=zohoarc; 
- b=HVNOUPdVC4adh+ON1SafTmT/PKJ7N9PKJH3QIInf0BID5/KWpbviZTjI7DHqnwxcdGmL4AmfsgfkHlxPU+MRgz5GK0MyFXcP0las2gFoui7OPKLkG/vKo3oASL+C0+oxaunJdXx64jBB1ogIQSQ4ZxqIS7Kh9YwMuEFpcA8K+aU=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1562883968;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
- bh=aifl6bsVuqHmMA4CldjdqwLxfkuDkSE718RvMbYrfr8=; 
- b=f1zlHT6GraTMFbshz07ZI8V3YwVxOlxi37J7f24ccXn+l5+kBzaOzOSWP4H0LiBwCGqUujm5bK17ECLluLUfIkRS+8nvgSAiDtFWEI8ltSPesHzsNPc3/tPzOHxyQMT6PtCWGKbFqq/GpVyYlz9LaP2K0nXGWlU45JloFXz28kg=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1562883966760138.24248795858557;
- Thu, 11 Jul 2019 15:26:06 -0700 (PDT)
-Message-ID: <156288396475.12463.8495950257512135187@c4a48874b076>
-In-Reply-To: <20190711173933.31203-1-eric.auger@redhat.com>
+ (envelope-from <jan.bobek@gmail.com>) id 1hlhcy-0003nU-8F
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 18:33:25 -0400
+Received: from mail-yb1-xb42.google.com ([2607:f8b0:4864:20::b42]:45649)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <jan.bobek@gmail.com>) id 1hlhcv-0003fq-S6
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 18:33:22 -0400
+Received: by mail-yb1-xb42.google.com with SMTP id s41so470756ybe.12
+ for <qemu-devel@nongnu.org>; Thu, 11 Jul 2019 15:33:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=ctqvTfqT7Ubb65t8HNXXqwuoSxzAReasBqWUr5W5NVg=;
+ b=HrSWGET7uicruYcsffXuHfwf16GGWd0kbNuXWtfsI6HSbMHQkNkyx1djVjYtKIZJFd
+ 9QDRfiUOPm57Yu//DxpecZHMcNyAGAeIt+l8+trJK5xaEd6yVbi6Mnfdv0Cx9Y22kFpL
+ MJBC2GMm9zTxHavD3W3UhnlDS6U5TzpHCNmrk0qRlzpENJOCxZeHQunwy1QduqWHvm/E
+ RECI6DoJ6090EFNzcSAGyXkkcQkYpPJZQItYA/GvWcdk0gFd4eDI3bWKA4OKpplmmGue
+ /8L8nGSN5vP46cnEHHk19Ao/jnWkxMfzJeYejGKoOh4n0EoKR5LAN+jtNvB2t6VysNEn
+ 7Qtg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=ctqvTfqT7Ubb65t8HNXXqwuoSxzAReasBqWUr5W5NVg=;
+ b=ME39qke8+bOs83GIMjhpphHKc6Vho14pyM0JrgovkZkh0Fc50+9gCa8q7RJQVoR176
+ dFIy3HKTU1LeoLLbKNnwAaCDns27qNzSAft3Sny2PZ3cnfE635fYqonv+qNFhjAM215C
+ PdXq2uYqEdmOZB8aS1hFHn5ZJrFnqQInzxMKjBnAdNomEjdDBddUB5UfcAcEEE+l4aZO
+ VnprqDwf/oF/yn8+r3n+GCaExT9NKekCmSdhUV7QbvauTcPo+8EcPiaEoBThrXodnUqB
+ Uhn24pDolEDJhok1Pw1E0/Yujbd9vmvxLSRDCeQhUkr4q+/DmQrN3cYizrNRzWuT33WL
+ hP3g==
+X-Gm-Message-State: APjAAAXF4H/Fp1FCQefcGHyMC4jXeE7ejbbZGulFGcjLxNwaPgBF0OOx
+ rNVI9rmE1DKrYyu3xKEDhWbqYtSV
+X-Google-Smtp-Source: APXvYqwYL36h+W7AMhM9WHtN6vkZ1jLwFAqx549FCtCqHbs1mIjLpxEA5hoK+EKygy8OLKeLsjun2w==
+X-Received: by 2002:a25:aab2:: with SMTP id t47mr3903149ybi.342.1562884398745; 
+ Thu, 11 Jul 2019 15:33:18 -0700 (PDT)
+Received: from dionysus.attlocal.net
+ (69-222-133-165.lightspeed.tukrga.sbcglobal.net. [69.222.133.165])
+ by smtp.gmail.com with ESMTPSA id z191sm1676728ywa.31.2019.07.11.15.33.17
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Thu, 11 Jul 2019 15:33:18 -0700 (PDT)
+From: Jan Bobek <jan.bobek@gmail.com>
+To: qemu-devel@nongnu.org
+Date: Thu, 11 Jul 2019 18:32:51 -0400
+Message-Id: <20190711223300.6061-10-jan.bobek@gmail.com>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190711223300.6061-1-jan.bobek@gmail.com>
+References: <20190711223300.6061-1-jan.bobek@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: eric.auger@redhat.com
-Date: Thu, 11 Jul 2019 15:26:06 -0700 (PDT)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 136.143.188.59
-Subject: Re: [Qemu-devel] [RFC v5 00/29] vSMMUv3/pSMMUv3 2 stage VFIO
- integration
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::b42
+Subject: [Qemu-devel] [RISU PATCH v3 09/18] risugen: add --xfeatures option
+ for x86
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,40 +94,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, drjones@redhat.com, yi.l.liu@intel.com,
- mst@redhat.com, jean-philippe.brucker@arm.com, zhangfei.gao@foxmail.com,
- qemu-devel@nongnu.org, peterx@redhat.com, eric.auger@redhat.com,
- alex.williamson@redhat.com, qemu-arm@nongnu.org, vincent.stehle@arm.com,
- eric.auger.pro@gmail.com
+Cc: Jan Bobek <jan.bobek@gmail.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Richard Henderson <richard.henderson@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDcxMTE3MzkzMy4zMTIw
-My0xLWVyaWMuYXVnZXJAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQgYnVp
-bGQgdGVzdCBvbiBzMzkweCBob3N0LiBQbGVhc2UgZmluZCB0aGUgZGV0YWlscyBiZWxvdy4KCj09
-PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKIyBUZXN0aW5nIHNjcmlwdCB3aWxs
-IGJlIGludm9rZWQgdW5kZXIgdGhlIGdpdCBjaGVja291dCB3aXRoCiMgSEVBRCBwb2ludGluZyB0
-byBhIGNvbW1pdCB0aGF0IGhhcyB0aGUgcGF0Y2hlcyBhcHBsaWVkIG9uIHRvcCBvZiAiYmFzZSIK
-IyBicmFuY2gKc2V0IC1lCgplY2hvCmVjaG8gIj09PSBFTlYgPT09IgplbnYKCmVjaG8KZWNobyAi
-PT09IFBBQ0tBR0VTID09PSIKcnBtIC1xYQoKZWNobwplY2hvICI9PT0gVU5BTUUgPT09Igp1bmFt
-ZSAtYQoKQ0M9JEhPTUUvYmluL2NjCklOU1RBTEw9JFBXRC9pbnN0YWxsCkJVSUxEPSRQV0QvYnVp
-bGQKbWtkaXIgLXAgJEJVSUxEICRJTlNUQUxMClNSQz0kUFdECmNkICRCVUlMRAokU1JDL2NvbmZp
-Z3VyZSAtLWNjPSRDQyAtLXByZWZpeD0kSU5TVEFMTAptYWtlIC1qNAojIFhYWDogd2UgbmVlZCBy
-ZWxpYWJsZSBjbGVhbiB1cAojIG1ha2UgY2hlY2sgLWo0IFY9MQptYWtlIGluc3RhbGwKPT09IFRF
-U1QgU0NSSVBUIEVORCA9PT0KCiAgQ0MgICAgICBpMzg2LXNvZnRtbXUvaHcvdmlydGlvL3ZpcnRp
-by1jcnlwdG8ubwogIENDICAgICAgaTM4Ni1zb2Z0bW11L2h3L3ZpcnRpby92aXJ0aW8tY3J5cHRv
-LXBjaS5vCiAgQ0MgICAgICBpMzg2LXNvZnRtbXUvaHcvdmlydGlvL3ZpcnRpby1wbWVtLm8KL3Zh
-ci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLXU1MmxqamswL3NyYy9ody92aXJ0aW8vdmlydGlvLXBt
-ZW0uYzoyMToxMDogZmF0YWwgZXJyb3I6IHN0YW5kYXJkLWhlYWRlcnMvbGludXgvdmlydGlvX3Bt
-ZW0uaDogTm8gc3VjaCBmaWxlIG9yIGRpcmVjdG9yeQogICAyMSB8ICNpbmNsdWRlICJzdGFuZGFy
-ZC1oZWFkZXJzL2xpbnV4L3ZpcnRpb19wbWVtLmgiCiAgICAgIHwgICAgICAgICAgXn5+fn5+fn5+
-fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn4KY29tcGlsYXRpb24gdGVybWluYXRlZC4KCgpU
-aGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkw
-NzExMTczOTMzLjMxMjAzLTEtZXJpYy5hdWdlckByZWRoYXQuY29tL3Rlc3RpbmcuczM5MHgvP3R5
-cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcg
-W2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRj
-aGV3LWRldmVsQHJlZGhhdC5jb20=
+The --xfeatures option is modelled after identically-named option to
+RISU itself; it allows the user to specify which vector registers
+should be initialized, so that the test image doesn't try to access
+registers which may not be present at runtime. Note that it is still
+the user's responsibility to filter out the test instructions using
+these registers.
+
+Signed-off-by: Jan Bobek <jan.bobek@gmail.com>
+---
+ risugen | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+diff --git a/risugen b/risugen
+index 50920eb..76424e1 100755
+--- a/risugen
++++ b/risugen
+@@ -311,6 +311,9 @@ Valid options:
+     --sve        : enable sve floating point
+     --be         : generate instructions in Big-Endian byte order (ppc64 only).
+     --x86_64     : generate 64-bit (rather than 32-bit) code. (x86 only)
++    --xfeatures {none|mmx|sse|avx} : what SIMD registers should be
++                   initialized. The initialization is cumulative,
++                   i.e. AVX includes both MMX and SSE. (x86 only)
+     --help       : print this message
+ EOT
+ }
+@@ -324,6 +327,7 @@ sub main()
+     my $sve_enabled = 0;
+     my $big_endian = 0;
+     my $is_x86_64 = 0;
++    my $xfeatures = 'none';
+     my ($infile, $outfile);
+ 
+     GetOptions( "help" => sub { usage(); exit(0); },
+@@ -342,6 +346,14 @@ sub main()
+                 "no-fp" => sub { $fp_enabled = 0; },
+                 "sve" => sub { $sve_enabled = 1; },
+                 "x86_64" => sub { $is_x86_64 = 1; },
++                "xfeatures=s" => sub {
++                    $xfeatures = $_[1];
++                    die "value for xfeatures must be one of 'none', 'mmx', 'sse', 'avx' (got '$xfeatures')\n"
++                        unless ($xfeatures eq 'none'
++                                || $xfeatures eq 'mmx'
++                                || $xfeatures eq 'sse'
++                                || $xfeatures eq 'avx');
++                },
+         ) or return 1;
+     # allow "--pattern re,re" and "--pattern re --pattern re"
+     @pattern_re = split(/,/,join(',',@pattern_re));
+@@ -377,6 +389,7 @@ sub main()
+         'subarch' => $full_arch[1] || '',
+         'bigendian' => $big_endian,
+         'x86_64' => $is_x86_64,
++        'xfeatures' => $xfeatures,
+     );
+ 
+     write_test_code(\%params);
+-- 
+2.20.1
 
 
