@@ -2,55 +2,90 @@ Return-Path: <SRS0=FHOf=VI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F4167C74A35
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 15:10:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CCECFC74A35
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 15:20:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CC0C721019
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 15:10:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC0C721019
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 98D7920644
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 15:20:52 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pp92MxNj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 98D7920644
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42576 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42646 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlaiK-0000bC-7g
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 11:10:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46670)
+	id 1hlasM-0002Q3-Id
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 11:20:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49357)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mlevitsk@redhat.com>) id 1hlahh-0008Vz-CY
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 11:09:50 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hlarp-0001gL-N6
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 11:20:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlevitsk@redhat.com>) id 1hlahf-00065j-Vy
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 11:09:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47232)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mlevitsk@redhat.com>)
- id 1hlahd-00060L-1J; Thu, 11 Jul 2019 11:09:45 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 5DF6581DE5;
- Thu, 11 Jul 2019 15:09:44 +0000 (UTC)
-Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.89])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8BF0F1001B03;
- Thu, 11 Jul 2019 15:09:42 +0000 (UTC)
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Thu, 11 Jul 2019 18:09:40 +0300
-Message-Id: <20190711150940.17483-1-mlevitsk@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.25]); Thu, 11 Jul 2019 15:09:44 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v3] LUKS: support preallocation
+ (envelope-from <alex.bennee@linaro.org>) id 1hlarn-0004Kn-Ni
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 11:20:17 -0400
+Received: from mail-wm1-x32a.google.com ([2a00:1450:4864:20::32a]:34007)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1hlarl-0004EQ-8V
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 11:20:15 -0400
+Received: by mail-wm1-x32a.google.com with SMTP id w9so7220728wmd.1
+ for <qemu-devel@nongnu.org>; Thu, 11 Jul 2019 08:20:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=mC4yKMF4gve9tIITKvkpYtbq1oCTPM8ghSoRbyrzX+w=;
+ b=pp92MxNjsE8TZ8DvEv4vd0Bx0t/tWpGC/jbpD26mfsD35Jvss8BkgQlgfGvamMeUql
+ Y/+IlN9VULY4kFIPy6QzAAymj1z25/elty615nA+qjBQ9Iy8lMZXQcNUM48R7G2VdBe2
+ ThD3GMpBI2xqXeN5oVcOwODVoQ7EIBiLu/fEn4DeScOzZStfZB8KDCjLy26Fn4IPmLS7
+ +6qFGKd+E3btgLwEeTyJaYLl+EXnL/EvdlqDB717hSf8RMxdetU7297WTVT+wwaeGhPe
+ 7TmYmr2+EkMU3XB+ZFSzH0oNGSO5YEwrQAAeec6UtVE2vNXzWou3V5r6acjdOHH5W6Aq
+ 3IKA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=mC4yKMF4gve9tIITKvkpYtbq1oCTPM8ghSoRbyrzX+w=;
+ b=fP9VcIzTDj60xaj+DQ6b9hl8oReBirSJbmdTkpFYFIwpw87WHiAKi1KkFS+BGE511S
+ IQ3Y3ikI0eV9TYjSCIzr/8emW2AXrtf8YxkAs1JPGtqGTujAimTvERUzuVJ83x7RyeDX
+ CAzbvKnem3u7pAG7pnn+EcQfWuBUIZFHzgs8Mgxgsq68P/E0W/D8atoRtUGp8zt8PIz1
+ ue/66Oa/qvugs0G/WmW3Sl3yfVE4l1byuPW1RvKKunlk/Mng39HFrqDbY87bvViQu4hu
+ keIJVuXEkUVG2OT8O215VJK/tMSAddG6/5+xCOLj/FSsjhxrOknafPesRuosWlZWp2ri
+ orBA==
+X-Gm-Message-State: APjAAAWVoC1lxYYvMITSMQpCJkDWxzdXCI2LV8JTKStfs5Lcni5W8MNz
+ 5jTi2sZM12SVJI+y1zDaT3HMYQ==
+X-Google-Smtp-Source: APXvYqymvcUcNq4nyquuqkrqtiUV+KmfTMLhrEfYdDAtCn+4KHkb/JX6A1QOk1AN8dZgHQtWkPWUGw==
+X-Received: by 2002:a05:600c:303:: with SMTP id
+ q3mr4917237wmd.130.1562858411120; 
+ Thu, 11 Jul 2019 08:20:11 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+ by smtp.gmail.com with ESMTPSA id c30sm8160081wrb.15.2019.07.11.08.20.10
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Thu, 11 Jul 2019 08:20:10 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 1577F1FF87;
+ Thu, 11 Jul 2019 16:20:10 +0100 (BST)
+References: <20190711124805.26476-1-philmd@redhat.com>
+User-agent: mu4e 1.3.2; emacs 26.1
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+In-reply-to: <20190711124805.26476-1-philmd@redhat.com>
+Date: Thu, 11 Jul 2019 16:20:10 +0100
+Message-ID: <878st4egyd.fsf@zen.linaroharston>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::32a
+Subject: Re: [Qemu-devel] [PATCH-for-4.1] tests/docker: Install Ubuntu
+ images noninteractively
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -62,157 +97,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, Maxim Levitsky <mlevitsk@redhat.com>,
- Max Reitz <mreitz@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-preallocation=off and preallocation=metadata
-both allocate luks header only, and preallocation=falloc/full
-is passed to underlying file.
 
-Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=1534951
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
 
-Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> We correctly use the DEBIAN_FRONTEND environment variable on
+> the Debian images, but forgot the Ubuntu ones are based on it.
+>
+> Since building docker images is not interactive, we need to
+> inform the APT tools about it using the DEBIAN_FRONTEND
+> environment variable (we already use it on our Debian images).
 
----
+I've queued this and the other docker patches into testing/next
 
-Note that QMP support was only compile tested, since I am still learning
-on how to use it.
-
-If there is some library/script/etc which makes it more high level,
-I would more that glad to hear about it. So far I used the qmp-shell
-
-Also can I use qmp's blockdev-create outside a vm running?
-
- block/crypto.c       | 29 ++++++++++++++++++++++++++---
- qapi/block-core.json |  5 ++++-
- 2 files changed, 30 insertions(+), 4 deletions(-)
-
-diff --git a/block/crypto.c b/block/crypto.c
-index 8237424ae6..034a645652 100644
---- a/block/crypto.c
-+++ b/block/crypto.c
-@@ -74,6 +74,7 @@ static ssize_t block_crypto_read_func(QCryptoBlock *block,
- struct BlockCryptoCreateData {
-     BlockBackend *blk;
-     uint64_t size;
-+    PreallocMode prealloc;
- };
- 
- 
-@@ -112,7 +113,7 @@ static ssize_t block_crypto_init_func(QCryptoBlock *block,
-      * available to the guest, so we must take account of that
-      * which will be used by the crypto header
-      */
--    return blk_truncate(data->blk, data->size + headerlen, PREALLOC_MODE_OFF,
-+    return blk_truncate(data->blk, data->size + headerlen, data->prealloc,
-                         errp);
- }
- 
-@@ -251,6 +252,7 @@ static int block_crypto_open_generic(QCryptoBlockFormat format,
- static int block_crypto_co_create_generic(BlockDriverState *bs,
-                                           int64_t size,
-                                           QCryptoBlockCreateOptions *opts,
-+                                          PreallocMode prealloc,
-                                           Error **errp)
- {
-     int ret;
-@@ -266,9 +268,14 @@ static int block_crypto_co_create_generic(BlockDriverState *bs,
-         goto cleanup;
-     }
- 
-+    if (prealloc == PREALLOC_MODE_METADATA) {
-+        prealloc = PREALLOC_MODE_OFF;
-+    }
-+
-     data = (struct BlockCryptoCreateData) {
-         .blk = blk,
-         .size = size,
-+        .prealloc = prealloc,
-     };
- 
-     crypto = qcrypto_block_create(opts, NULL,
-@@ -500,6 +507,7 @@ block_crypto_co_create_luks(BlockdevCreateOptions *create_options, Error **errp)
-     BlockdevCreateOptionsLUKS *luks_opts;
-     BlockDriverState *bs = NULL;
-     QCryptoBlockCreateOptions create_opts;
-+    PreallocMode preallocation = PREALLOC_MODE_OFF;
-     int ret;
- 
-     assert(create_options->driver == BLOCKDEV_DRIVER_LUKS);
-@@ -515,8 +523,11 @@ block_crypto_co_create_luks(BlockdevCreateOptions *create_options, Error **errp)
-         .u.luks = *qapi_BlockdevCreateOptionsLUKS_base(luks_opts),
-     };
- 
-+    if (luks_opts->has_preallocation)
-+        preallocation = luks_opts->preallocation;
-+
-     ret = block_crypto_co_create_generic(bs, luks_opts->size, &create_opts,
--                                         errp);
-+                                         preallocation, errp);
-     if (ret < 0) {
-         goto fail;
-     }
-@@ -534,12 +545,24 @@ static int coroutine_fn block_crypto_co_create_opts_luks(const char *filename,
-     QCryptoBlockCreateOptions *create_opts = NULL;
-     BlockDriverState *bs = NULL;
-     QDict *cryptoopts;
-+    PreallocMode prealloc;
-+    char *buf = NULL;
-     int64_t size;
-     int ret;
-+    Error *local_err = NULL;
- 
-     /* Parse options */
-     size = qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0);
- 
-+    buf = qemu_opt_get_del(opts, BLOCK_OPT_PREALLOC);
-+    prealloc = qapi_enum_parse(&PreallocMode_lookup, buf,
-+                               PREALLOC_MODE_OFF, &local_err);
-+    g_free(buf);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        return -EINVAL;
-+    }
-+
-     cryptoopts = qemu_opts_to_qdict_filtered(opts, NULL,
-                                              &block_crypto_create_opts_luks,
-                                              true);
-@@ -565,7 +588,7 @@ static int coroutine_fn block_crypto_co_create_opts_luks(const char *filename,
-     }
- 
-     /* Create format layer */
--    ret = block_crypto_co_create_generic(bs, size, create_opts, errp);
-+    ret = block_crypto_co_create_generic(bs, size, create_opts, prealloc, errp);
-     if (ret < 0) {
-         goto fail;
-     }
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 0d43d4f37c..ebcfc9f903 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -4205,13 +4205,16 @@
- #
- # @file             Node to create the image format on
- # @size             Size of the virtual disk in bytes
-+# @preallocation    Preallocation mode for the new image (default: off;
-+#                   allowed values: off/falloc/full
- #
- # Since: 2.12
- ##
- { 'struct': 'BlockdevCreateOptionsLUKS',
-   'base': 'QCryptoBlockCreateOptionsLUKS',
-   'data': { 'file':             'BlockdevRef',
--            'size':             'size' } }
-+            'size':             'size',
-+            '*preallocation':   'PreallocMode' } }
- 
- ##
- # @BlockdevCreateOptionsNfs:
--- 
-2.17.2
-
+--
+Alex Benn=C3=A9e
 
