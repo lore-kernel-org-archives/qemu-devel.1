@@ -2,114 +2,62 @@ Return-Path: <SRS0=FHOf=VI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F4F2C74A5B
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 17:28:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E29F3C74A5B
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 17:29:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 34F7620863
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 17:28:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 34F7620863
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id BFB6120863
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 17:29:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BFB6120863
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43768 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43782 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlcs6-0002cA-Cv
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 13:28:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33453)
+	id 1hlcst-000460-Ob
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 13:29:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33708)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <laurent@vivier.eu>) id 1hlcrv-0002Ax-PK
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 13:28:32 -0400
+ (envelope-from <eric.auger@redhat.com>) id 1hlcsb-00038q-Ft
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 13:29:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1hlcru-00013V-Rb
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 13:28:31 -0400
-Received: from mout.kundenserver.de ([212.227.126.135]:52387)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hlcru-00012H-Im
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 13:28:30 -0400
-Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue012 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1MLRgp-1i2KfW04LT-00IQXX; Thu, 11 Jul 2019 19:28:13 +0200
-To: qemu-devel@nongnu.org
-References: <20190711171556.3377-1-laurent@vivier.eu>
-From: Laurent Vivier <laurent@vivier.eu>
-Openpgp: preference=signencrypt
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <7b6221eb-2ea6-b0ec-f423-667933143a8f@vivier.eu>
-Date: Thu, 11 Jul 2019 19:28:09 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+ (envelope-from <eric.auger@redhat.com>) id 1hlcsa-0001bQ-FG
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 13:29:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41858)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+ id 1hlcsY-0001Yb-9d; Thu, 11 Jul 2019 13:29:10 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 83316308FB9D;
+ Thu, 11 Jul 2019 17:29:09 +0000 (UTC)
+Received: from laptop.redhat.com (ovpn-116-46.ams2.redhat.com [10.36.116.46])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 94C8A5C1B4;
+ Thu, 11 Jul 2019 17:29:06 +0000 (UTC)
+From: Eric Auger <eric.auger@redhat.com>
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org,
+ qemu-arm@nongnu.org, peter.maydell@linaro.org
+Date: Thu, 11 Jul 2019 19:28:17 +0200
+Message-Id: <20190711172845.31035-2-eric.auger@redhat.com>
+In-Reply-To: <20190711172845.31035-1-eric.auger@redhat.com>
+References: <20190711172845.31035-1-eric.auger@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190711171556.3377-1-laurent@vivier.eu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:ciU56i2nFxrLXe89umt4oJN5nEQOOnZSR9TzDW0F1wM658Rhz7A
- czUxwDMw2pEHPAQ6kw7H8tVLj04FXtp4vacCJpaclf/ro6DooOgdCPxGDgsAYpwXw5S0qtI
- XB/VRKpYpzZ6qvi2FWGP1X/E4UTiBozdBFG2nCCLIu7BJ5MOD23vGOgZ9J+MspSN1vA1B4H
- ryUp8VmeTeFTGK7bZV/cg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:rdMhIgGVMk4=:QW56bkcNI6KGtuKxDLKwH/
- LKFpgLVrP3i+gdz0rwOXioddpItJwBCmgOHCORYUbNhp9N6Mx/CBDg+gopER8WsI0HT1tLNjE
- tduNet+y+67O0pOHq+C0kCJEc9ZiPG0PrkA7pjUMfF1fgwsFqnhWRzh41LllGWBZlqUId4nkY
- PBet4vbxis1DvGtjhZxn6enhXTk3DO+6nYh54yb3rSCSinLHbN73wAKxCeFPf2bKKUANHY0Cj
- lfKKouynZCwAJv0FlRpiYHj2KdVpPDmisy6ealLyMsrl6VVcdZIM/bd2G0/FmNcvmbwS9dmFY
- /j7ATWa5UlpSflG/1vFfp15vlS1uuSuB3IGsEhIktKexPlKR8rcjktuS2wHZYu7kJgkkmNcjm
- sBphYYSHQ18DbvWPvJtKiQh8f3swIZHI57+dSgKk7QDLHYeT29idApCjzDRI+AuiOW8Rw4BxH
- OiiAmAyOESkMS4jLa+f2aMBNvoPSuoYeiarpATjYdS2JikSjnpvi9TLYgNo7o18ULFnBeIi2C
- Hhd6vQUoi9Iqwt3e4CYn8JfVDQ9gL0x+0XdL4Su0gzljMSeCX7GuaOUIN3JJXV14bPm+HnvIz
- hchpq4O+u8tpw6+RWVof/mysECMiCio70+KDwN/e9q9hp290g3a+4NpaDaKjK8QDsgVRuBM9W
- cyWAiVk6o5IIlOj8VyFIejM0Ak3eegkYR6gBxyaCtk5iwpZU9UNXdhWCqIzvFbCtQw2mpnD+j
- 87WCaUGfNbVJv7oks4Q0KTuIW/11jlupoDx4LqfppMD2eH4RMD0BHD1JufA=
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.43]); Thu, 11 Jul 2019 17:29:09 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.135
-Subject: Re: [Qemu-devel] [PATCH v3] linux-user: fix to handle variably
- sized SIOCGSTAMP with new kernels
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [RFC v4 01/29] memory: Remove unused
+ memory_region_iommu_replay_all()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -121,48 +69,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Arnd Bergmann <arnd@arndb.de>, Gerhard Stenzel <gerhard.stenzel@de.ibm.com>,
- Riku Voipio <riku.voipio@iki.fi>,
- Christian Ehrhardt <christian.ehrhardt@canonical.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: drjones@redhat.com, yi.l.liu@intel.com, mst@redhat.com,
+ jean-philippe.brucker@arm.com, zhangfei.gao@foxmail.com, peterx@redhat.com,
+ alex.williamson@redhat.com, vincent.stehle@arm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 11/07/2019 à 19:15, Laurent Vivier a écrit :
-> diff --git a/linux-user/syscall_types.h b/linux-user/syscall_types.h
-> index b98a23b0f1b0..584087301edc 100644
-> --- a/linux-user/syscall_types.h
-> +++ b/linux-user/syscall_types.h
-> @@ -20,6 +20,12 @@ STRUCT(timeval,
->  STRUCT(timespec,
->         MK_ARRAY(TYPE_LONG, 2))
->  
-> +STRUCT(timeval64,
-> +       MK_ARRAY(TYPE_LONGLONG, 2))
-> +
-> +STRUCT(timespec64,
-> +       MK_ARRAY(TYPE_LONGLONG, 2))
-> +
+memory_region_iommu_replay_all is not used. Remove it.
 
-kernel type is:
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Reported-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
+---
+ include/exec/memory.h | 10 ----------
+ memory.c              |  9 ---------
+ 2 files changed, 19 deletions(-)
 
-typedef __s64 time64_t;
-struct timespec64 {
-        time64_t        tv_sec;                 /* seconds */
-        long            tv_nsec;                /* nanoseconds */
-};
+diff --git a/include/exec/memory.h b/include/exec/memory.h
+index 2c5cdffa31..a078cd033f 100644
+--- a/include/exec/memory.h
++++ b/include/exec/memory.h
+@@ -1076,16 +1076,6 @@ void memory_region_register_iommu_notifier(MemoryR=
+egion *mr,
+  */
+ void memory_region_iommu_replay(IOMMUMemoryRegion *iommu_mr, IOMMUNotifi=
+er *n);
+=20
+-/**
+- * memory_region_iommu_replay_all: replay existing IOMMU translations
+- * to all the notifiers registered.
+- *
+- * Note: this is not related to record-and-replay functionality.
+- *
+- * @iommu_mr: the memory region to observe
+- */
+-void memory_region_iommu_replay_all(IOMMUMemoryRegion *iommu_mr);
+-
+ /**
+  * memory_region_unregister_iommu_notifier: unregister a notifier for
+  * changes to IOMMU translation entries.
+diff --git a/memory.c b/memory.c
+index 480f3d989b..90967b579d 100644
+--- a/memory.c
++++ b/memory.c
+@@ -1910,15 +1910,6 @@ void memory_region_iommu_replay(IOMMUMemoryRegion =
+*iommu_mr, IOMMUNotifier *n)
+     }
+ }
+=20
+-void memory_region_iommu_replay_all(IOMMUMemoryRegion *iommu_mr)
+-{
+-    IOMMUNotifier *notifier;
+-
+-    IOMMU_NOTIFIER_FOREACH(notifier, iommu_mr) {
+-        memory_region_iommu_replay(iommu_mr, notifier);
+-    }
+-}
+-
+ void memory_region_unregister_iommu_notifier(MemoryRegion *mr,
+                                              IOMMUNotifier *n)
+ {
+--=20
+2.20.1
 
-So the definitions from v2 were good:
-
-STRUCT(timeval64, TYPE_LONGLONG, TYPE_LONG)
-STRUCT(timespec64, TYPE_LONGLONG, TYPE_LONG)
-
-kernel uses the same type for timeval and timespec.
-
-I send a v4.
-
-Thanks,
-Laurent
 
