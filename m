@@ -6,56 +6,57 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E30BC73C66
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 17:42:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DE88C71142
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 17:42:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 24C96208E4
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 17:42:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24C96208E4
+	by mail.kernel.org (Postfix) with ESMTPS id 1BE6C208E4
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 17:42:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BE6C208E4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44194 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44196 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hld5A-0008JF-K5
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 13:42:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38437)
+	id 1hld5D-0008RG-Qf
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 13:42:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38306)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <eric.auger@redhat.com>) id 1hld4R-0005XQ-Q1
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 13:41:28 -0400
+ (envelope-from <eric.auger@redhat.com>) id 1hld4K-00054C-Uv
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 13:41:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1hld4P-0004y5-9p
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 13:41:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38106)
+ (envelope-from <eric.auger@redhat.com>) id 1hld4I-0004sj-TV
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 13:41:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50590)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1hld4L-0004lI-5p; Thu, 11 Jul 2019 13:41:21 -0400
+ id 1hld41-0004aO-1T; Thu, 11 Jul 2019 13:41:05 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id AD94930832E1;
- Thu, 11 Jul 2019 17:41:07 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 22D8A3082B6D;
+ Thu, 11 Jul 2019 17:40:46 +0000 (UTC)
 Received: from laptop.redhat.com (ovpn-116-46.ams2.redhat.com [10.36.116.46])
- by smtp.corp.redhat.com (Postfix) with ESMTP id BA39B60A97;
- Thu, 11 Jul 2019 17:41:04 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id EB4BA6092E;
+ Thu, 11 Jul 2019 17:40:33 +0000 (UTC)
 From: Eric Auger <eric.auger@redhat.com>
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org,
  qemu-arm@nongnu.org, peter.maydell@linaro.org
-Date: Thu, 11 Jul 2019 19:39:16 +0200
-Message-Id: <20190711173933.31203-13-eric.auger@redhat.com>
+Date: Thu, 11 Jul 2019 19:39:13 +0200
+Message-Id: <20190711173933.31203-10-eric.auger@redhat.com>
 In-Reply-To: <20190711173933.31203-1-eric.auger@redhat.com>
 References: <20190711173933.31203-1-eric.auger@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.44]); Thu, 11 Jul 2019 17:41:07 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.45]); Thu, 11 Jul 2019 17:40:46 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [RFC v5 12/29] iommu: Introduce generic header
+Subject: [Qemu-devel] [RFC v5 09/29] memory: Add IOMMU_ATTR_MSI_TRANSLATE
+ IOMMU memory region attribute
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,47 +75,29 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This header is meant to exposes data types used by
-several IOMMU devices such as struct for SVA and
-nested stage configuration.
+We introduce a new IOMMU Memory Region attribute, IOMMU_ATTR_MSI_TRANSLAT=
+E
+which tells whether the virtual IOMMU translates MSIs. ARM SMMU
+will expose this attribute since, as opposed to Intel DMAR, MSIs
+are translated as any other DMA requests.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 ---
- include/hw/iommu/iommu.h | 25 +++++++++++++++++++++++++
- 1 file changed, 25 insertions(+)
- create mode 100644 include/hw/iommu/iommu.h
+ include/exec/memory.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/include/hw/iommu/iommu.h b/include/hw/iommu/iommu.h
-new file mode 100644
-index 0000000000..9e60ece160
---- /dev/null
-+++ b/include/hw/iommu/iommu.h
-@@ -0,0 +1,25 @@
-+/*
-+ * common header for iommu devices
-+ *
-+ * Copyright Red Hat, Inc. 2019
-+ *
-+ * Authors:
-+ *  Eric Auger <eric.auger@redhat.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2.  See
-+ * the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef QEMU_HW_IOMMU_IOMMU_H
-+#define QEMU_HW_IOMMU_IOMMU_H
-+
-+typedef struct IOMMUConfig {
-+    union {
-+#ifdef __linux__
-+        struct iommu_pasid_table_config pasid_cfg;
-+#endif
-+          };
-+} IOMMUConfig;
-+
-+
-+#endif /* QEMU_HW_IOMMU_IOMMU_H */
+diff --git a/include/exec/memory.h b/include/exec/memory.h
+index e477a630a8..593ef947c6 100644
+--- a/include/exec/memory.h
++++ b/include/exec/memory.h
+@@ -206,6 +206,7 @@ struct MemoryRegionOps {
+ enum IOMMUMemoryRegionAttr {
+     IOMMU_ATTR_SPAPR_TCE_FD,
+     IOMMU_ATTR_VFIO_NESTED,
++    IOMMU_ATTR_MSI_TRANSLATE,
+ };
+=20
+ /**
 --=20
 2.20.1
 
