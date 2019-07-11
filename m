@@ -6,56 +6,57 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D0DAC74A5B
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 17:31:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA187C74A5B
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 17:31:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5417920863
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 17:31:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5417920863
+	by mail.kernel.org (Postfix) with ESMTPS id 9393120863
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 17:31:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9393120863
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43850 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43854 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlcuU-0001r8-8H
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 13:31:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33995)
+	id 1hlcuc-0002PG-Ft
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 13:31:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34039)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <eric.auger@redhat.com>) id 1hlctA-0005g5-7n
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 13:29:49 -0400
+ (envelope-from <eric.auger@redhat.com>) id 1hlctE-0005zZ-G6
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 13:29:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1hlct9-00028k-4x
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 13:29:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43984)
+ (envelope-from <eric.auger@redhat.com>) id 1hlctC-0002DI-Cz
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 13:29:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:32076)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1hlct7-00025Z-1A; Thu, 11 Jul 2019 13:29:45 -0400
+ id 1hlctA-00029e-AN; Thu, 11 Jul 2019 13:29:48 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 4155D3082133;
- Thu, 11 Jul 2019 17:29:44 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 8F2B9308424C;
+ Thu, 11 Jul 2019 17:29:47 +0000 (UTC)
 Received: from laptop.redhat.com (ovpn-116-46.ams2.redhat.com [10.36.116.46])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 183905C1B4;
- Thu, 11 Jul 2019 17:29:31 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 98FD75C1B4;
+ Thu, 11 Jul 2019 17:29:44 +0000 (UTC)
 From: Eric Auger <eric.auger@redhat.com>
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org,
  qemu-arm@nongnu.org, peter.maydell@linaro.org
-Date: Thu, 11 Jul 2019 19:28:22 +0200
-Message-Id: <20190711172845.31035-7-eric.auger@redhat.com>
+Date: Thu, 11 Jul 2019 19:28:23 +0200
+Message-Id: <20190711172845.31035-8-eric.auger@redhat.com>
 In-Reply-To: <20190711172845.31035-1-eric.auger@redhat.com>
 References: <20190711172845.31035-1-eric.auger@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.42]); Thu, 11 Jul 2019 17:29:44 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.40]); Thu, 11 Jul 2019 17:29:47 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [RFC v4 06/29] update-linux-headers: Import iommu.h
+Subject: [Qemu-devel] [RFC v4 07/29] update-linux-headers: Add sve_context.h
+ to asm-arm64
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,27 +75,32 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Update the script to import the new iommu.h uapi header.
+From: Andrew Jones <drjones@redhat.com>
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Signed-off-by: Andrew Jones <drjones@redhat.com>
 ---
- scripts/update-linux-headers.sh | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ scripts/update-linux-headers.sh | 3 +++
+ 1 file changed, 3 insertions(+)
 
 diff --git a/scripts/update-linux-headers.sh b/scripts/update-linux-heade=
 rs.sh
-index f76d77363b..dfdfdfddcf 100755
+index dfdfdfddcf..c97d485b08 100755
 --- a/scripts/update-linux-headers.sh
 +++ b/scripts/update-linux-headers.sh
-@@ -141,7 +141,7 @@ done
+@@ -99,6 +99,9 @@ for arch in $ARCHLIST; do
+         cp "$tmpdir/include/asm/$header" "$output/linux-headers/asm-$arc=
+h"
+     done
 =20
- rm -rf "$output/linux-headers/linux"
- mkdir -p "$output/linux-headers/linux"
--for header in kvm.h vfio.h vfio_ccw.h vhost.h \
-+for header in kvm.h vfio.h vfio_ccw.h vhost.h iommu.h \
-               psci.h psp-sev.h userfaultfd.h mman.h; do
-     cp "$tmpdir/include/linux/$header" "$output/linux-headers/linux"
- done
++    if [ $arch =3D arm64 ]; then
++        cp "$tmpdir/include/asm/sve_context.h" "$output/linux-headers/as=
+m-arm64/"
++    fi
+     if [ $arch =3D mips ]; then
+         cp "$tmpdir/include/asm/sgidefs.h" "$output/linux-headers/asm-mi=
+ps/"
+         cp "$tmpdir/include/asm/unistd_o32.h" "$output/linux-headers/asm=
+-mips/"
 --=20
 2.20.1
 
