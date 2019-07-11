@@ -2,78 +2,79 @@ Return-Path: <SRS0=FHOf=VI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BA96C74A52
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 11:20:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A832AC74A4B
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 11:31:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1135521019
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 11:20:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1135521019
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 718D720665
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 11:31:52 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fYlac6r6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 718D720665
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40606 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40660 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlX81-0004Zn-5T
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 07:20:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59124)
+	id 1hlXIl-0007iR-6x
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 07:31:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35294)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <pbonzini@redhat.com>) id 1hlX77-00043z-LE
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 07:19:51 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hlXHw-00073P-Ve
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 07:31:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1hlX76-0000vC-8r
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 07:19:49 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:52989)
+ (envelope-from <peter.maydell@linaro.org>) id 1hlXHv-0007Th-US
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 07:31:00 -0400
+Received: from mail-ot1-x32b.google.com ([2607:f8b0:4864:20::32b]:36108)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hlX76-0000sd-1E
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 07:19:48 -0400
-Received: by mail-wm1-f68.google.com with SMTP id s3so5292870wms.2
- for <qemu-devel@nongnu.org>; Thu, 11 Jul 2019 04:19:47 -0700 (PDT)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hlXHv-0007SS-MQ
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 07:30:59 -0400
+Received: by mail-ot1-x32b.google.com with SMTP id r6so5489778oti.3
+ for <qemu-devel@nongnu.org>; Thu, 11 Jul 2019 04:30:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=n9h+l7zfjbFTjzSbBjlvzaQnM98sJDFa70lf9OiwVJc=;
+ b=fYlac6r6OJakJJV7Rd3BFhJp/Z0bKMpTYdjS6FxD9JV+8g8tpjDq6Uk+RTqTZWEN7G
+ qXHgDsUJJ432KHYSVow1CkGRzTxyZHrRQ9U3n3u7iokoZuR67TQsLrZKhwyrCEWldooQ
+ bJwWzxEQeCvorjE/NVb9hv4ENDqGGSYDjtWWayIRDp2RvFSOEFEhPbL5qAibqKKg5erZ
+ hmTOJISWV52Gooy4ifPIqs4CQf/qldtiB6UAEfjXQFMQM5XLBheX8cq1qgaiaQcWdeUb
+ YUas5zS1AaKRQEnJkF5/M8fMgutDHPBWYmcSbIUFlezucx28ZBdDmyOtmXhmbs5B1xiT
+ au8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=pvvl2KFZw3Bgffir1oDtkHVfWW/qFKlBFNsSp/JHeUA=;
- b=J9oRGA34xA7HfSA+gcqPhQwggBBA2i4/GiuaNHPFVh9en0DvWw0zmXIaIXbuqGro7e
- DxUT72roEEt7RvEhVFgARIBAiSfs7lzEwdBhDjGt9jLkcTlJO0tKeQJUTskYiUfRbC1T
- 6Ih89v/3dVFdjtxl7BzCjYX12JnljYvVv69fxIhkPm6NO4XsgbqxbivIuHK1mHddmM5P
- BqAT8T5mLLBDbCf7v1QvlHvVyh9Mhh0UXSOsojM25dISnaQfAJ/W5NgjiYZvN/tO5+L5
- HhgvXODRFkY9Vo2aiLZCPR2zM78hZJDfxxoiM4IYUsZ2C9xEXk3+LKS6cueJnBr4KWgD
- 4Unw==
-X-Gm-Message-State: APjAAAVbJw37svou2eDiBFpozK4bS9/Rsa+F/YB81cPMGSK2XQUYyJS2
- c6NDwSs6hfnGxaUWH5XeF2lBeg==
-X-Google-Smtp-Source: APXvYqyjd7ZrSwYYmw978V8fjgofoBdAe7oUaU3LEfGBuDO/2NMl98HOIH2vayVmNwq0aY4meeWBNw==
-X-Received: by 2002:a7b:c95a:: with SMTP id i26mr3998130wml.175.1562843986138; 
- Thu, 11 Jul 2019 04:19:46 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:d066:6881:ec69:75ab?
- ([2001:b07:6468:f312:d066:6881:ec69:75ab])
- by smtp.gmail.com with ESMTPSA id o24sm10071088wmh.2.2019.07.11.04.19.45
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Thu, 11 Jul 2019 04:19:45 -0700 (PDT)
-To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
-References: <20190711104412.31233-1-quintela@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <c2bfa537-8a5a-86a1-495c-a6c1d0f85dc5@redhat.com>
-Date: Thu, 11 Jul 2019 13:19:44 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=n9h+l7zfjbFTjzSbBjlvzaQnM98sJDFa70lf9OiwVJc=;
+ b=nclc6Y7K6sXjkR25gyUNUhHo/ehhPvsROGbsuVWWi8GQK6QbvoGnjsSdInXbpe4zcg
+ RE1ixmw3zxL2MajhFAZ8tA9G8zd4S3N+JXJtDb6MFjNQ/XVPASOabsojC15Xm2T+PvfJ
+ Hs2wJb1foLUtBCzFPGefzRrp+LK+yKPyKkHoeW+tIqlj7joOzCs7ldmYmI/foC2sXMDR
+ LGd7IxUqhteRIBtrOFghxAvc7pJCzceRFBtDfZMJ/hwPLPlrz59sxU8l53MxpnhWZj/a
+ OMmfEWrZFJxhVu7yvRajxxleC8otdQtNmn0IIVO1x8r3+a8ULAR4kO04yd0OCwbglawF
+ p79Q==
+X-Gm-Message-State: APjAAAWI5B4R/lOAFKitALIrCYlPMXcEdE3Dg059rUy+PeZoqTXr4ykE
+ Y2nPW7iIiadAylYHpZs54WNSEe1UVCLSlyP5FJbfIA==
+X-Google-Smtp-Source: APXvYqwJWCXZUsYSshFsoYnQfBBZPemPZ2x/DAuk2gV6clHvkxPZwsUzJF0kDxxt+sWFr4y3b/Cl3ndDZADTwsEUd+g=
+X-Received: by 2002:a9d:6a0f:: with SMTP id g15mr3056300otn.135.1562844658550; 
+ Thu, 11 Jul 2019 04:30:58 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190711104412.31233-1-quintela@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.128.68
-Subject: Re: [Qemu-devel] [PULL 00/19] Migration patches
+References: <20190710192306.28604-1-jsnow@redhat.com>
+In-Reply-To: <20190710192306.28604-1-jsnow@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 11 Jul 2019 12:30:47 +0100
+Message-ID: <CAFEAcA_pWT9qM-n76v81rPZiAX4y_72CYeKa3Tf9yprTnmP6hQ@mail.gmail.com>
+To: John Snow <jsnow@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::32b
+Subject: Re: [Qemu-devel] [PULL 0/3] Bitmaps patches
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,96 +86,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, kvm@vger.kernel.org,
- Richard Henderson <rth@twiddle.net>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>,
+ qemu-stable <qemu-stable@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/07/19 12:43, Juan Quintela wrote:
+On Wed, 10 Jul 2019 at 20:23, John Snow <jsnow@redhat.com> wrote:
+>
 > The following changes since commit 6df2cdf44a82426f7a59dcb03f0dd2181ed7fdfa:
-> 
+>
 >   Update version for v4.1.0-rc0 release (2019-07-09 17:21:53 +0100)
-> 
+>
 > are available in the Git repository at:
-> 
->   https://github.com/juanquintela/qemu.git tags/migration-pull-request
-> 
-> for you to fetch changes up to 0b47e79b3d04f500b6f3490628905ec5884133df:
-> 
->   migration: allow private destination ram with x-ignore-shared (2019-07-11 12:30:40 +0200)
-
-Aren't we in hard freeze already?
-
-Paolo
-
+>
+>   https://github.com/jnsnow/qemu.git tags/bitmaps-pull-request
+>
+> for you to fetch changes up to a7786bfb0effe0b4b0fc61d8a8cd307c0b739ed7:
+>
+>   docs/bitmaps: use QMP lexer instead of json (2019-07-10 15:08:07 -0400)
+>
 > ----------------------------------------------------------------
-> Migration pull request
-> 
+> Pull request:
+>   This is a build fix.
+>
 > ----------------------------------------------------------------
-> 
-> Juan Quintela (3):
->   migration: fix multifd_recv event typo
->   migration-test: rename parameter to parameter_int
->   migration-test: Add migration multifd test
-> 
-> Peng Tao (1):
->   migration: allow private destination ram with x-ignore-shared
-> 
-> Peter Xu (10):
->   migration: No need to take rcu during sync_dirty_bitmap
->   memory: Don't set migration bitmap when without migration
->   bitmap: Add bitmap_copy_with_{src|dst}_offset()
->   memory: Pass mr into snapshot_and_clear_dirty
->   memory: Introduce memory listener hook log_clear()
->   kvm: Update comments for sync_dirty_bitmap
->   kvm: Persistent per kvmslot dirty bitmap
->   kvm: Introduce slots lock for memory listener
->   kvm: Support KVM_CLEAR_DIRTY_LOG
->   migration: Split log_clear() into smaller chunks
-> 
-> Wei Yang (5):
->   migration/multifd: call multifd_send_sync_main when sending
->     RAM_SAVE_FLAG_EOS
->   migration/xbzrle: update cache and current_data in one place
->   cutils: remove one unnecessary pointer operation
->   migration/multifd: sync packet_num after all thread are done
->   migratioin/ram.c: reset complete_round when we gets a queued page
-> 
->  accel/kvm/kvm-all.c          |  260 +-
->  accel/kvm/trace-events       |    1 +
->  exec.c                       |   15 +-
->  include/exec/memory.h        |   19 +
->  include/exec/memory.h.rej    |   26 +
->  include/exec/ram_addr.h      |   92 +-
->  include/exec/ram_addr.h.orig |  488 ++++
->  include/qemu/bitmap.h        |    9 +
->  include/sysemu/kvm_int.h     |    4 +
->  memory.c                     |   56 +-
->  memory.c.rej                 |   17 +
->  migration/migration.c        |    4 +
->  migration/migration.h        |   27 +
->  migration/migration.h.orig   |  315 +++
->  migration/ram.c              |   93 +-
->  migration/ram.c.orig         | 4599 ++++++++++++++++++++++++++++++++++
->  migration/ram.c.rej          |   33 +
->  migration/trace-events       |    3 +-
->  migration/trace-events.orig  |  297 +++
->  tests/Makefile.include       |    2 +
->  tests/migration-test.c       |  103 +-
->  tests/test-bitmap.c          |   72 +
->  util/bitmap.c                |   85 +
->  util/cutils.c                |    8 +-
->  24 files changed, 6545 insertions(+), 83 deletions(-)
->  create mode 100644 include/exec/memory.h.rej
->  create mode 100644 include/exec/ram_addr.h.orig
->  create mode 100644 memory.c.rej
->  create mode 100644 migration/migration.h.orig
->  create mode 100644 migration/ram.c.orig
->  create mode 100644 migration/ram.c.rej
->  create mode 100644 migration/trace-events.orig
->  create mode 100644 tests/test-bitmap.c
-> 
+>
+> John Snow (3):
+>   docs/interop/bitmaps.rst: Fix typos
+>   sphinx: add qmp_lexer
+>   docs/bitmaps: use QMP lexer instead of json
 
+
+Applied, thanks.
+
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.1
+for any user-visible changes.
+
+-- PMM
 
