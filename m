@@ -3,59 +3,59 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84596C71142
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 17:42:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E30BC73C66
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 17:42:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 61870208E4
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 17:42:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61870208E4
+	by mail.kernel.org (Postfix) with ESMTPS id 24C96208E4
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 17:42:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24C96208E4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44192 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44194 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hld58-00089I-Ur
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 13:42:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38107)
+	id 1hld5A-0008JF-K5
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 13:42:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38437)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <eric.auger@redhat.com>) id 1hld3a-0001ll-QO
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 13:40:35 -0400
+ (envelope-from <eric.auger@redhat.com>) id 1hld4R-0005XQ-Q1
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 13:41:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1hld3Z-0004Oo-Ll
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 13:40:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40116)
+ (envelope-from <eric.auger@redhat.com>) id 1hld4P-0004y5-9p
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 13:41:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38106)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1hld3V-0004CK-Eh; Thu, 11 Jul 2019 13:40:29 -0400
+ id 1hld4L-0004lI-5p; Thu, 11 Jul 2019 13:41:21 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A17033001822;
- Thu, 11 Jul 2019 17:40:26 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id AD94930832E1;
+ Thu, 11 Jul 2019 17:41:07 +0000 (UTC)
 Received: from laptop.redhat.com (ovpn-116-46.ams2.redhat.com [10.36.116.46])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 986296092E;
- Thu, 11 Jul 2019 17:40:14 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BA39B60A97;
+ Thu, 11 Jul 2019 17:41:04 +0000 (UTC)
 From: Eric Auger <eric.auger@redhat.com>
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org,
  qemu-arm@nongnu.org, peter.maydell@linaro.org
-Date: Thu, 11 Jul 2019 19:39:10 +0200
-Message-Id: <20190711173933.31203-7-eric.auger@redhat.com>
+Date: Thu, 11 Jul 2019 19:39:16 +0200
+Message-Id: <20190711173933.31203-13-eric.auger@redhat.com>
 In-Reply-To: <20190711173933.31203-1-eric.auger@redhat.com>
 References: <20190711173933.31203-1-eric.auger@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Thu, 11 Jul 2019 17:40:26 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.44]); Thu, 11 Jul 2019 17:41:07 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [RFC v5 06/29] update-linux-headers: Import iommu.h
+Subject: [Qemu-devel] [RFC v5 12/29] iommu: Introduce generic header
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,27 +74,47 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Update the script to import the new iommu.h uapi header.
+This header is meant to exposes data types used by
+several IOMMU devices such as struct for SVA and
+nested stage configuration.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 ---
- scripts/update-linux-headers.sh | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ include/hw/iommu/iommu.h | 25 +++++++++++++++++++++++++
+ 1 file changed, 25 insertions(+)
+ create mode 100644 include/hw/iommu/iommu.h
 
-diff --git a/scripts/update-linux-headers.sh b/scripts/update-linux-heade=
-rs.sh
-index f76d77363b..dfdfdfddcf 100755
---- a/scripts/update-linux-headers.sh
-+++ b/scripts/update-linux-headers.sh
-@@ -141,7 +141,7 @@ done
-=20
- rm -rf "$output/linux-headers/linux"
- mkdir -p "$output/linux-headers/linux"
--for header in kvm.h vfio.h vfio_ccw.h vhost.h \
-+for header in kvm.h vfio.h vfio_ccw.h vhost.h iommu.h \
-               psci.h psp-sev.h userfaultfd.h mman.h; do
-     cp "$tmpdir/include/linux/$header" "$output/linux-headers/linux"
- done
+diff --git a/include/hw/iommu/iommu.h b/include/hw/iommu/iommu.h
+new file mode 100644
+index 0000000000..9e60ece160
+--- /dev/null
++++ b/include/hw/iommu/iommu.h
+@@ -0,0 +1,25 @@
++/*
++ * common header for iommu devices
++ *
++ * Copyright Red Hat, Inc. 2019
++ *
++ * Authors:
++ *  Eric Auger <eric.auger@redhat.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2.  See
++ * the COPYING file in the top-level directory.
++ */
++
++#ifndef QEMU_HW_IOMMU_IOMMU_H
++#define QEMU_HW_IOMMU_IOMMU_H
++
++typedef struct IOMMUConfig {
++    union {
++#ifdef __linux__
++        struct iommu_pasid_table_config pasid_cfg;
++#endif
++          };
++} IOMMUConfig;
++
++
++#endif /* QEMU_HW_IOMMU_IOMMU_H */
 --=20
 2.20.1
 
