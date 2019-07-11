@@ -2,57 +2,68 @@ Return-Path: <SRS0=FHOf=VI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F855C74A4B
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 09:12:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2958DC74A4B
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 09:18:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 17AC621537
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 09:12:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 17AC621537
+	by mail.kernel.org (Postfix) with ESMTPS id 010E621019
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 09:18:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 010E621019
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39676 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39714 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlV7Z-0003cR-EG
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 05:12:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39104)
+	id 1hlVE9-0005QC-2A
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 05:18:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41329)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mlevitsk@redhat.com>) id 1hlV73-0002rI-Od
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 05:11:38 -0400
+ (envelope-from <jasowang@redhat.com>) id 1hlVDR-0004vG-2R
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 05:18:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlevitsk@redhat.com>) id 1hlV72-0004ck-LP
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 05:11:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59862)
+ (envelope-from <jasowang@redhat.com>) id 1hlVDP-0001BI-CS
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 05:18:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:11334)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mlevitsk@redhat.com>)
- id 1hlV6z-0004aB-Rk; Thu, 11 Jul 2019 05:11:34 -0400
+ (Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1hlVDP-00018Y-4G
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 05:18:11 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 1E61D30821C2;
- Thu, 11 Jul 2019 09:11:33 +0000 (UTC)
-Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.89])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 501AC60160;
- Thu, 11 Jul 2019 09:11:29 +0000 (UTC)
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Thu, 11 Jul 2019 12:11:27 +0300
-Message-Id: <20190711091127.12988-1-mlevitsk@redhat.com>
-In-Reply-To: <096a8bcf57997c594e1d5d7ea9606029909b81fc.camel@redhat.com>
-References: <096a8bcf57997c594e1d5d7ea9606029909b81fc.camel@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 1A8238665F;
+ Thu, 11 Jul 2019 09:18:08 +0000 (UTC)
+Received: from [10.72.12.56] (ovpn-12-56.pek2.redhat.com [10.72.12.56])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 48F5B60148;
+ Thu, 11 Jul 2019 09:18:04 +0000 (UTC)
+To: "Zhang, Chen" <chen.zhang@intel.com>,
+ Li Zhijian <lizhijian@cn.fujitsu.com>,
+ Peter Maydell <peter.maydell@linaro.org>, qemu-dev <qemu-devel@nongnu.org>
+References: <20190704083647.30614-1-chen.zhang@intel.com>
+ <ad2627e3-8198-42f2-a89d-8e6a5596ef20@redhat.com>
+ <9CFF81C0F6B98A43A459C9EDAD400D78061C2546@shsmsx102.ccr.corp.intel.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <5cf779de-9d97-63f4-00d5-560202890af0@redhat.com>
+Date: Thu, 11 Jul 2019 17:17:57 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
+MIME-Version: 1.0
+In-Reply-To: <9CFF81C0F6B98A43A459C9EDAD400D78061C2546@shsmsx102.ccr.corp.intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Thu, 11 Jul 2019 09:11:33 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.26]); Thu, 11 Jul 2019 09:18:08 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2] LUKS: support preallocation in qemu-img
+Subject: Re: [Qemu-devel] [PATCH V2] net/colo-compare.c: Fix memory leak and
+ code style issue.
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -64,108 +75,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Maxim Levitsky <mlevitsk@redhat.com>,
- qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: Zhang Chen <zhangckid@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-preallocation=off and preallocation=metadata
-both allocate luks header only, and preallocation=falloc/full
-is passed to underlying file.
 
-Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=1534951
+On 2019/7/10 =E4=B8=8B=E5=8D=883:50, Zhang, Chen wrote:
+>
+>> -----Original Message-----
+>> From: Jason Wang [mailto:jasowang@redhat.com]
+>> Sent: Tuesday, July 9, 2019 10:48 PM
+>> To: Zhang, Chen <chen.zhang@intel.com>; Li Zhijian <lizhijian@cn.fujit=
+su.com>;
+>> Peter Maydell <peter.maydell@linaro.org>; qemu-dev <qemu-
+>> devel@nongnu.org>
+>> Cc: Zhang Chen <zhangckid@gmail.com>
+>> Subject: Re: [Qemu-devel] [PATCH V2] net/colo-compare.c: Fix memory le=
+ak
+>> and code style issue.
+>>
+>>
+>> On 2019/7/4 =E4=B8=8B=E5=8D=884:36, Zhang Chen wrote:
+>>> From: Zhang Chen <chen.zhang@intel.com>
+>>>
+>>> This patch to fix the origin "char *data" menory leak, code style
+>>> issue and add necessary check here.
+>>> Reported-by: Coverity (CID 1402785)
+>>>
+>>> Signed-off-by: Zhang Chen <chen.zhang@intel.com>
+>>> ---
+>>>    net/colo-compare.c | 28 +++++++++++++++++++++-------
+>>>    1 file changed, 21 insertions(+), 7 deletions(-)
+>>>
+>>> diff --git a/net/colo-compare.c b/net/colo-compare.c index
+>>> 909dd6c6eb..ed349f5f6a 100644
+>>> --- a/net/colo-compare.c
+>>> +++ b/net/colo-compare.c
+>>> @@ -127,6 +127,17 @@ static int compare_chr_send(CompareState *s,
+>>>                                uint32_t vnet_hdr_len,
+>>>                                bool notify_remote_frame);
+>>>
+>>> +static bool packet_matches_str(const char *str,
+>>> +                               uint8_t *buf,
+>>> +                               uint32_t packet_len) {
+>>> +    if (packet_len <=3D strlen(str)) {
+>>> +        return false;
+>>> +    }
+>>> +
+>>> +    return !memcmp(str, buf, strlen(str) + 1);
+>>
+>> This assumes buf is NULL terminated (you pass notify_rs->buf) which is=
+ not
+>> correct I think?
+> Yes, you are right.
+> How about this:
+>
+> static bool packet_matches_str(const char *str,
+>                                 uint8_t *buf,
+>                                 uint32_t packet_len) {
+>      if (packet_len !=3D strlen(str) || !buf) {
+>          return false;
+>      }
 
-Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
----
- block/crypto.c | 25 ++++++++++++++++++++++---
- 1 file changed, 22 insertions(+), 3 deletions(-)
 
-diff --git a/block/crypto.c b/block/crypto.c
-index 8237424ae6..cbc291301e 100644
---- a/block/crypto.c
-+++ b/block/crypto.c
-@@ -74,6 +74,7 @@ static ssize_t block_crypto_read_func(QCryptoBlock *block,
- struct BlockCryptoCreateData {
-     BlockBackend *blk;
-     uint64_t size;
-+    PreallocMode prealloc;
- };
- 
- 
-@@ -112,7 +113,7 @@ static ssize_t block_crypto_init_func(QCryptoBlock *block,
-      * available to the guest, so we must take account of that
-      * which will be used by the crypto header
-      */
--    return blk_truncate(data->blk, data->size + headerlen, PREALLOC_MODE_OFF,
-+    return blk_truncate(data->blk, data->size + headerlen, data->prealloc,
-                         errp);
- }
- 
-@@ -251,6 +252,7 @@ static int block_crypto_open_generic(QCryptoBlockFormat format,
- static int block_crypto_co_create_generic(BlockDriverState *bs,
-                                           int64_t size,
-                                           QCryptoBlockCreateOptions *opts,
-+                                          PreallocMode prealloc,
-                                           Error **errp)
- {
-     int ret;
-@@ -269,6 +271,7 @@ static int block_crypto_co_create_generic(BlockDriverState *bs,
-     data = (struct BlockCryptoCreateData) {
-         .blk = blk,
-         .size = size,
-+        .prealloc = prealloc,
-     };
- 
-     crypto = qcrypto_block_create(opts, NULL,
-@@ -516,7 +519,7 @@ block_crypto_co_create_luks(BlockdevCreateOptions *create_options, Error **errp)
-     };
- 
-     ret = block_crypto_co_create_generic(bs, luks_opts->size, &create_opts,
--                                         errp);
-+                                         PREALLOC_MODE_OFF, errp);
-     if (ret < 0) {
-         goto fail;
-     }
-@@ -534,12 +537,28 @@ static int coroutine_fn block_crypto_co_create_opts_luks(const char *filename,
-     QCryptoBlockCreateOptions *create_opts = NULL;
-     BlockDriverState *bs = NULL;
-     QDict *cryptoopts;
-+    PreallocMode prealloc;
-+    char *buf = NULL;
-     int64_t size;
-     int ret;
-+    Error *local_err = NULL;
- 
-     /* Parse options */
-     size = qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0);
- 
-+    buf = qemu_opt_get_del(opts, BLOCK_OPT_PREALLOC);
-+    prealloc = qapi_enum_parse(&PreallocMode_lookup, buf,
-+                                   PREALLOC_MODE_OFF, &local_err);
-+    g_free(buf);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        return -EINVAL;
-+    }
-+
-+    if (prealloc == PREALLOC_MODE_METADATA) {
-+        prealloc  = PREALLOC_MODE_OFF;
-+    }
-+
-     cryptoopts = qemu_opts_to_qdict_filtered(opts, NULL,
-                                              &block_crypto_create_opts_luks,
-                                              true);
-@@ -565,7 +584,7 @@ static int coroutine_fn block_crypto_co_create_opts_luks(const char *filename,
-     }
- 
-     /* Create format layer */
--    ret = block_crypto_co_create_generic(bs, size, create_opts, errp);
-+    ret = block_crypto_co_create_generic(bs, size, create_opts, prealloc, errp);
-     if (ret < 0) {
-         goto fail;
-     }
--- 
-2.17.2
+When can we hit !buf?
 
+Thanks
+
+
+>
+>      return !memcmp(str, buf, strlen(str));
+> }
+>
+> Thanks
+> Zhang Chen
+>
+>
+>> Thanks
+>>
+>>
+>>> +}
+>>> +
+>>>    static void notify_remote_frame(CompareState *s)
+>>>    {
+>>>        char msg[] =3D "DO_CHECKPOINT";
+>>> @@ -1008,21 +1019,24 @@ static void
+>> compare_notify_rs_finalize(SocketReadState *notify_rs)
+>>>    {
+>>>        CompareState *s =3D container_of(notify_rs, CompareState,
+>>> notify_rs);
+>>>
+>>> -    /* Get Xen colo-frame's notify and handle the message */
+>>> -    char *data =3D g_memdup(notify_rs->buf, notify_rs->packet_len);
+>>> -    char msg[] =3D "COLO_COMPARE_GET_XEN_INIT";
+>>> +    const char msg[] =3D "COLO_COMPARE_GET_XEN_INIT";
+>>>        int ret;
+>>>
+>>> -    if (!strcmp(data, "COLO_USERSPACE_PROXY_INIT")) {
+>>> +    if (packet_matches_str("COLO_USERSPACE_PROXY_INIT",
+>>> +                           notify_rs->buf,
+>>> +                           notify_rs->packet_len)) {
+>>>            ret =3D compare_chr_send(s, (uint8_t *)msg, strlen(msg), 0=
+, true);
+>>>            if (ret < 0) {
+>>>                error_report("Notify Xen COLO-frame INIT failed");
+>>>            }
+>>> -    }
+>>> -
+>>> -    if (!strcmp(data, "COLO_CHECKPOINT")) {
+>>> +    } else if (packet_matches_str("COLO_CHECKPOINT",
+>>> +                                  notify_rs->buf,
+>>> +                                  notify_rs->packet_len)) {
+>>>            /* colo-compare do checkpoint, flush pri packet and remove=
+ sec packet
+>> */
+>>>            g_queue_foreach(&s->conn_list, colo_flush_packets, s);
+>>> +    } else {
+>>> +        error_report("COLO compare got unsupported instruction '%s'"=
+,
+>>> +                     (char *)notify_rs->buf);
+>>>        }
+>>>    }
+>>>
 
