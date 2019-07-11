@@ -2,81 +2,67 @@ Return-Path: <SRS0=FHOf=VI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.3 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4445FC74A35
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 13:57:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C16CC74A54
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 13:57:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1CDD520872
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 13:57:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CDD520872
+	by mail.kernel.org (Postfix) with ESMTPS id 14A5720872
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 13:57:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 14A5720872
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41988 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41990 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlZZX-0001Em-Gz
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 09:57:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51910)
+	id 1hlZZe-0001Rd-Cw
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 09:57:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51989)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hlZYh-0000O3-G9
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 09:56:28 -0400
+ (envelope-from <berrange@redhat.com>) id 1hlZYq-0000Zm-98
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 09:56:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hlZYg-0006kO-1x
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 09:56:27 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:39108)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hlZYf-0006iT-QD
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 09:56:25 -0400
-Received: by mail-wr1-f68.google.com with SMTP id x4so6408505wrt.6
- for <qemu-devel@nongnu.org>; Thu, 11 Jul 2019 06:56:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=9XcUkxuS1Ft/qbru0yxa1/rGH/W5tcz8bzDQ94VVXfo=;
- b=Yu+Yiw2gNS2Da0NOoWWycQN8H1GoJWiM08wHYRh/zS5up/7MLVJaQ+h/MR0mVEPte1
- 3wyk3mjzj22pJDCuovBxYrCgjb24DNfKtq1ordASclgHqdv8Py2QP7PKaFmZ3p0C3JJ1
- 16hhg4pCtUkDCEMzrULUks52v4WfEnGa51jL7OjKXKr2+us3m7aQp0yS/P0hOuPuJ70n
- 9edONJlVqwasAqAI4UQg6/9BO/OznuXks9ueyJUQVoq3gSHueODPGZ9MOS0tgQeT2rS+
- doGbgY9QaKngos56RbIYx2ERowt7tm2X4ZO77vjCLRXC4DBKX4Xk0Lt1Wr//xdKgYHTt
- MRmQ==
-X-Gm-Message-State: APjAAAVkij05Ek9AOc1QoJG1qe/WE2B4SR0PMypiIeyxGcB2SYAqjdaX
- zQcXNkitmXeAlxIbO+Qar1nM/Q==
-X-Google-Smtp-Source: APXvYqxK7uNnNDkMGDfDdbLZly+thpKJp9zv21Cd/H7YFmHbwoQbPp6uWlCBsZc1wB/w8deYbSfKHQ==
-X-Received: by 2002:a5d:4090:: with SMTP id o16mr5599870wrp.292.1562853384730; 
- Thu, 11 Jul 2019 06:56:24 -0700 (PDT)
-Received: from [192.168.1.38] (62.red-83-42-61.dynamicip.rima-tde.net.
- [83.42.61.62])
- by smtp.gmail.com with ESMTPSA id x17sm4398480wrq.64.2019.07.11.06.56.23
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Thu, 11 Jul 2019 06:56:23 -0700 (PDT)
-To: Chih-Min Chao <chihmin.chao@sifive.com>, qemu-devel@nongnu.org,
- qemu-riscv@nongnu.org
-References: <1562781026-27570-1-git-send-email-chihmin.chao@sifive.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <57c27698-c9ee-72f9-7074-0c0eee2ab275@redhat.com>
-Date: Thu, 11 Jul 2019 15:56:22 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ (envelope-from <berrange@redhat.com>) id 1hlZYn-0006ro-V5
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 09:56:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56648)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <berrange@redhat.com>)
+ id 1hlZYl-0006np-3d; Thu, 11 Jul 2019 09:56:31 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 09DFE85550;
+ Thu, 11 Jul 2019 13:56:30 +0000 (UTC)
+Received: from redhat.com (unknown [10.42.17.95])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1AA7860633;
+ Thu, 11 Jul 2019 13:56:26 +0000 (UTC)
+Date: Thu, 11 Jul 2019 14:56:24 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Message-ID: <20190711135624.GN11930@redhat.com>
+References: <20190710170349.1548-1-mlevitsk@redhat.com>
+ <84232589-627a-8151-a3d5-84c053d9a257@redhat.com>
+ <3e82ff24-6f84-9de8-d3ab-c34966f875f0@redhat.com>
+ <096a8bcf57997c594e1d5d7ea9606029909b81fc.camel@redhat.com>
+ <1bdb9136-ae97-7bf3-762e-0774b0980160@redhat.com>
+ <45b56973-cc6c-2968-e758-7e10734b75bf@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1562781026-27570-1-git-send-email-chihmin.chao@sifive.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+In-Reply-To: <45b56973-cc6c-2968-e758-7e10734b75bf@redhat.com>
+User-Agent: Mutt/1.12.0 (2019-05-25)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.28]); Thu, 11 Jul 2019 13:56:30 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.221.68
-Subject: Re: [Qemu-devel] [PATCH] tests/boot_linux_console: add a test for
- riscv64 + virt
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH] LUKS: support preallocation in qemu-img
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,95 +74,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Cleber Rosa <crosa@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Caio Carrara <ccarrara@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Maxim Levitsky <mlevitsk@redhat.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Chih-Min,
+On Thu, Jul 11, 2019 at 08:50:56AM -0500, Eric Blake wrote:
+> On 7/11/19 7:24 AM, Max Reitz wrote:
+>=20
+> >>> So it isn=E2=80=99t just me who expects these to pre-initialize the=
+ image to 0.
+> >>>  Hm, although...  I suppose @falloc technically does not specify wh=
+ether
+> >>> the data reads as zeroes.  I kind of find it to be implied, but, we=
+ll...
+> >>
+> >> I personally don't really think that zeros are important, but rather=
+ the level of allocation.
+> >> posix_fallocate probably won't write the data blocks but rather only=
+ the inode metadata / used block bitmap/etc.
+> >>
+> >> On the other hand writing zeros (or anything else) will force the bl=
+ock layer to actually write to the underlying
+> >> storage which could trigger lower layer allocation if the underlying=
+ storage is thin-provisioned.
+> >>
+> >> In fact IMHO, instead of writing zeros, it would be better to write =
+random garbage instead (or have that as an even 'fuller'
+> >> preallocation mode), since underlying storage might 'compress' the z=
+eros.=20
+> >=20
+> > Which is actually an argument why you should just write zeroes on the
+> > LUKS layer, because this will then turn into quasi-random data on the
+> > protocol layer.
+>=20
+> We want preallocation to be fast (insofar as possible). Writing zeroes
+> in LUKS is not fast, because it forces random data on the protocol
+> layer; while writing zeroes on the protocol layer can be fast, even if
+> it reads back as random on the LUKS layer. If you WANT to guarantee
+> reading zeroes, that's image scrubbing, not preallocation.  I think thi=
+s
+> patch is taking the right approach, of letting the underlying layer
+> allocate data efficiently (but the burden is then on the underlying
+> layer to actually allocate data, and not optimize by compressing zeroes
+> into non-allocated storage).
 
-On 7/10/19 7:50 PM, Chih-Min Chao wrote:
-> Similar to the mips + malta test, it boots a Linux kernel on a virt
-> board and verify the serial is working.  Also, it relies on the serial
-> device set by the machine itself.
+On the topic of scrubbing, it would actually be nice to have a
+"secure delete" for QEMU block driver formats that can do some
+level of scrubbing in software and/or calling out to hardware support.
 
-Good idea!
-
-> 
-> If riscv64 is a target being built, "make check-acceptance" will
-> automatically include this test by the use of the "arch:riscv64" tags.
-> 
-> Alternatively, this test can be run using:
-> 
->   $ avocado run -t arch:riscv64 tests/acceptance
-> 
-> Signed-off-by: Chih-Min Chao <chihmin.chao@sifive.com>
-> ---
->  tests/acceptance/boot_linux_console.py | 40 ++++++++++++++++++++++++++++++++++
->  1 file changed, 40 insertions(+)
-> 
-> diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
-> index 3215950..bbc6b06 100644
-> --- a/tests/acceptance/boot_linux_console.py
-> +++ b/tests/acceptance/boot_linux_console.py
-> @@ -354,3 +354,43 @@ class BootLinuxConsole(Test):
->          self.vm.launch()
->          console_pattern = 'Kernel command line: %s' % kernel_command_line
->          self.wait_for_console_pattern(console_pattern)
-> +
-> +    def test_riscv64_virt(self):
-> +        """
-> +        :avocado: tags=arch:riscv64
-> +        :avocado: tags=machine:virt
-> +        """
-> +
-> +        kernel_url = ('https://github.com/chihminchao/test-binary/raw/'
-> +                      '0b7787305d9e40815c05a805266cc74ff356239e/qemu/riscv64/'
-> +                      'bbl_w_kernel.gz')
-
-I recommend you to extract fw_jump.elf from [1] and
-vmlinux-4.19.0-5-riscv64 from [2] with the extract_from_deb() helper.
-
-[1] https://packages.debian.org/sid/all/opensbi
-[2] https://packages.debian.org/sid/linux-image-4.19.0-5-riscv64
-
-> +        kernel_hash = 'c7f6cc7967975ad42dc61ee0535db01c9cbd0968'
-> +        kernel_path_gz = self.fetch_asset(kernel_url, asset_hash=kernel_hash)
-> +        kernel_path = self.workdir + "bbl_w_kernel"
-> +
-> +        with gzip.open(kernel_path_gz, 'rb') as f_in:
-> +            with open(kernel_path, 'wb') as f_out:
-> +                shutil.copyfileobj(f_in, f_out)
-> +
-> +        initrd_url = ('https://github.com/groeck/linux-build-test/raw/'
-> +                      '8584a59ed9e5eb5ee7ca91f6d74bbb06619205b8/rootfs/'
-> +                      'riscv64/rootfs.cpio.gz')
-> +        initrd_hash = 'f4867d263754961b6f626cdcdc0cb334c47e3b49'
-> +        initrd_path = self.fetch_asset(initrd_url, asset_hash=initrd_hash)
-> +
-> +        self.vm.set_machine('virt')
-> +        self.vm.set_console()
-> +        kernel_command_line = (self.KERNEL_COMMON_COMMAND_LINE
-> +                               + 'console=ttyS0 noreboot')
-> +        self.vm.add_args('-kernel', kernel_path,
-> +                         '-initrd', initrd_path,
-> +                         '-append', kernel_command_line)
-
-You might want to use '-no-reboot' here too.
-
-> +        self.vm.launch()
-> +        self.wait_for_console_pattern('Boot successful.')
-> +
-> +        self.exec_command_and_wait_for_pattern('cat /proc/cpuinfo',
-> +                                               'isa')
-> +        self.exec_command_and_wait_for_pattern('uname -a',
-> +                                               'sifive')
-> +        self.exec_command_and_wait_for_pattern('reboot',
-> +                                               'reboot: Restarting system')
+Similarly to prealloc a choice of 'metadata' or 'full'. Wwith LUKS
+you can do well by just scrubbing the image header (which kills the
+master decryption key rendering payload useless).
 
 Regards,
-
-Phil.
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
 
