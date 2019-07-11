@@ -6,59 +6,70 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C36FC74A4B
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 10:53:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B24B7C74A51
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 10:53:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 21E02206B8
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 10:53:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21E02206B8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8B3E721537
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 10:53:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8B3E721537
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40370 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40372 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlWi4-000115-Ea
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 06:53:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45620)
+	id 1hlWi6-00016C-NF
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 06:53:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45661)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <quintela@redhat.com>) id 1hlWev-0004VJ-S5
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 06:50:43 -0400
+ (envelope-from <bounces@canonical.com>) id 1hlWex-0004Yl-MN
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 06:50:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <quintela@redhat.com>) id 1hlWet-0004FO-QG
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 06:50:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48148)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1hlWer-00047O-Nq
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 06:50:39 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id B25FE3082AEF;
- Thu, 11 Jul 2019 10:44:32 +0000 (UTC)
-Received: from localhost.localdomain (unknown [10.36.118.16])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9A8D660600;
- Thu, 11 Jul 2019 10:44:30 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Thu, 11 Jul 2019 12:43:59 +0200
-Message-Id: <20190711104412.31233-7-quintela@redhat.com>
-In-Reply-To: <20190711104412.31233-1-quintela@redhat.com>
-References: <20190711104412.31233-1-quintela@redhat.com>
+ (envelope-from <bounces@canonical.com>) id 1hlWew-0004In-DD
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 06:50:43 -0400
+Received: from indium.canonical.com ([91.189.90.7]:44360)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1hlWew-0004HG-4o
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 06:50:42 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1hlWeu-0005PO-Rc
+ for <qemu-devel@nongnu.org>; Thu, 11 Jul 2019 10:50:40 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id CCF7C2E8070
+ for <qemu-devel@nongnu.org>; Thu, 11 Jul 2019 10:50:40 +0000 (UTC)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Thu, 11 Jul 2019 10:44:32 +0000 (UTC)
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
+Date: Thu, 11 Jul 2019 10:32:57 -0000
+From: =?utf-8?q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=In Progress; importance=Undecided;
+ assignee=alex.bennee@linaro.org; 
+X-Launchpad-Bug-Tags: arm testcase
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: ajbennee christophe-lyon
+X-Launchpad-Bug-Reporter: Christophe Lyon (christophe-lyon)
+X-Launchpad-Bug-Modifier: =?utf-8?q?Alex_Benn=C3=A9e_=28ajbennee=29?=
+References: <156277131341.2267.3199507288563083183.malonedeb@wampee.canonical.com>
+Message-Id: <87ef2weu92.fsf@zen.linaroharston>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="19007";
+ Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: e644d64ca17236995bb00b17bc3a8068f3e3da64
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 06/19] cutils: remove one unnecessary pointer
- operation
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1836078] Re: [PATCH for 4.1] target/arm: report
+ ARMv8.2 FP16 for ARM -cpu max
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -67,70 +78,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- kvm@vger.kernel.org, Juan Quintela <quintela@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Wei Yang <richardw.yang@linux.intel.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Reply-To: Bug 1836078 <1836078@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Message-ID: <20190711103257.BchdJSNTy9PDRF-KqTzGlbl2vtkgiIMPa16mRFm-xrc@z>
 
-From: Wei Yang <richardw.yang@linux.intel.com>
+Richard Henderson <richard.henderson@linaro.org> writes:
 
-Since we will not operate on the next address pointed by out, it is not
-necessary to do addition on it.
+> On 7/10/19 7:24 PM, Alex Benn=C3=A9e wrote:
+>> When we converted to using feature bits in 602f6e42cfbf we missed out
+>> the fact (dp && arm_dc_feature(s, ARM_FEATURE_V8)) was supported for
+>> -cpu max configurations. This caused a regression in the GCC test
+>> suite. Fix this by setting the appropriate FP16 bits in mvfr1.FPHP.
+>>
+>> Fixes: https://bugs.launchpad.net/qemu/+bug/1836078
+>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>> ---
+>>  target/arm/cpu.c | 4 ++++
+>>  1 file changed, 4 insertions(+)
+>>
+>> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+>> index e75a64a25a..0a0a202fe3 100644
+>> --- a/target/arm/cpu.c
+>> +++ b/target/arm/cpu.c
+>> @@ -2452,6 +2452,10 @@ static void arm_max_initfn(Object *obj)
+>>              t =3D FIELD_DP32(t, ID_ISAR6, SPECRES, 1);
+>>              cpu->isar.id_isar6 =3D t;
+>>
+>> +            t =3D cpu->isar.mvfr1;
+>> +            t =3D FIELD_DP32(t, MVFR1, FPHP, 2);     /* v8.2 FP16 */
+>
+> The comment is wrong.  This is not full v8.2 FP16 support (which would be=
+ value
+> 3, plus a change to SIMDHP), but v8.0 support for double<->half
+> conversions.
 
-After removing the operation, the function size reduced 16/18 bytes.
+Good catch - will fix in v2.
+>
+> Otherwise,
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+>
+>
+> r~
 
-Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
-Reviewed-by: Juan Quintela <quintela@redhat.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-Message-Id: <20190610030852.16039-2-richardw.yang@linux.intel.com>
-Signed-off-by: Juan Quintela <quintela@redhat.com>
----
- util/cutils.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+--
+Alex Benn=C3=A9e
 
-diff --git a/util/cutils.c b/util/cutils.c
-index dfc605f1ef..fd591cadf0 100644
---- a/util/cutils.c
-+++ b/util/cutils.c
-@@ -756,11 +756,11 @@ int uleb128_encode_small(uint8_t *out, uint32_t n)
- {
-     g_assert(n <=3D 0x3fff);
-     if (n < 0x80) {
--        *out++ =3D n;
-+        *out =3D n;
-         return 1;
-     } else {
-         *out++ =3D (n & 0x7f) | 0x80;
--        *out++ =3D n >> 7;
-+        *out =3D n >> 7;
-         return 2;
-     }
- }
-@@ -768,7 +768,7 @@ int uleb128_encode_small(uint8_t *out, uint32_t n)
- int uleb128_decode_small(const uint8_t *in, uint32_t *n)
- {
-     if (!(*in & 0x80)) {
--        *n =3D *in++;
-+        *n =3D *in;
-         return 1;
-     } else {
-         *n =3D *in++ & 0x7f;
-@@ -776,7 +776,7 @@ int uleb128_decode_small(const uint8_t *in, uint32_t =
-*n)
-         if (*in & 0x80) {
-             return -1;
-         }
--        *n |=3D *in++ << 7;
-+        *n |=3D *in << 7;
-         return 2;
-     }
- }
---=20
-2.21.0
+-- =
 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1836078
+
+Title:
+  Regressions on arm-linux-gnueabihf target with some GCC tests
+
+Status in QEMU:
+  In Progress
+
+Bug description:
+  Hi,
+
+  After trying qemu master:
+  commit 474f3938d79ab36b9231c9ad3b5a9314c2aeacde
+  Merge: 68d7ff0 14f5d87
+  Author: Peter Maydell <email address hidden>
+  Date: Fri Jun 21 15:40:50 2019 +0100
+
+  even with the fix for https://bugs.launchpad.net/qemu/+bug/1834496,
+  I've noticed several regressions compared to qemu-3.1 when running the GC=
+C testsuite.
+  I'm attaching a tarball containing several GCC tests (binaries), needed s=
+hared libs, and a short script to run all the tests.
+
+  All tests used to pass w/o error, but with a recent qemu, all of them
+  make qemu crash.
+
+  This was noticed with GCC master configured with
+  --target arm-none-linux-gnueabihf
+  --with-cpu cortex-a57
+  --with-fpu crypto-neon-fp-armv8
+
+  Thanks
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1836078/+subscriptions
 
