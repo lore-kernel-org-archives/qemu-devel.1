@@ -2,90 +2,78 @@ Return-Path: <SRS0=FHOf=VI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C096C74A35
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 12:44:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6011C74A35
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 12:48:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 348DA2084B
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 12:44:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7D47A2084B
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 12:48:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PipvIq/C"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 348DA2084B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zVNe892c"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D47A2084B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41384 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41400 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlYQp-0006oq-IT
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 08:44:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56960)
+	id 1hlYVC-0008GP-Nw
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 08:48:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57830)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1hlYQI-0006I5-Ej
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 08:43:43 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hlYTV-0007Vg-CJ
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 08:47:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1hlYQH-000774-64
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 08:43:42 -0400
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:44650)
+ (envelope-from <peter.maydell@linaro.org>) id 1hlYTU-0001o5-BC
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 08:47:01 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:36542)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1hlYQH-00076L-0R
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 08:43:41 -0400
-Received: by mail-ot1-x341.google.com with SMTP id b7so5655329otl.11
- for <qemu-devel@nongnu.org>; Thu, 11 Jul 2019 05:43:40 -0700 (PDT)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hlYTS-0001m7-Ha
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 08:46:59 -0400
+Received: by mail-ot1-x343.google.com with SMTP id r6so5704113oti.3
+ for <qemu-devel@nongnu.org>; Thu, 11 Jul 2019 05:46:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=ZUHo5N51KdqNy5ukMcABAlH5JkqI72LPh9L730eX+XY=;
- b=PipvIq/CXIytzDBbqHrOuYDS6WfJakY9xOZl1JgEk14B8Dreu6mUdqW/AMvHU/cj8b
- mLSuZ4dh/+R6R4yfjvo+rvEpQE5Porx5isnhwSart0KfOH6JQNsFdFPnQ17aA8VEWT+g
- 0kpSzVKN1uwn9ugIUIw0WndQY4XeWWmDCwdfaD8nS8/TNGoKUieFeZ3on7ttmanYJ0UV
- nWYSTGP8g2jO1wIxq6pvi9+gHgCSfa9XTlq9MlSmkfVSeiVTq6EBD4Gl5Q2rJzYdJ7ta
- nvflHr80Ha4kFjCQATX28vCJBIb9mTekit1Tg3F9aKr+jf9N2f/JF8cC7z/pesNvciZF
- 3JPA==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=p97YX3IoJy94wJq9tTL1wuf0ASRWpNpZgfBlTY7Zy78=;
+ b=zVNe892cf8T64t9Poweuxia2hTaNBG0dcRus7B/4/adsYiq/mJlZJEIP8XCxKc+Apr
+ cf4OCyI3HspQ/SphiawqlaKfVKSnaZ3kK8pFSy7mLWLCsjOzo3K5RBH7jnvUkUapQtHa
+ FDwONXmh7vTfQg0+w47JjfR6OSgQpg297Q9HLjcujrw3yogd+vwF8vEiRKuAXL9dTHer
+ 8R3GTxfIDZykwX7Zm8ck0EGnfhtZJ/foiNF0563FfDgmx+r4/zepfvEyC8BanR3kzCE3
+ inpXIz3lXAnMPBhZDQCamCypBTdw+zQAwiAFHgwCZQY8iUkPvM4cPh806C7LLQ86TcwK
+ q9AA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=ZUHo5N51KdqNy5ukMcABAlH5JkqI72LPh9L730eX+XY=;
- b=c9Ri0fTEcMkEU8oIXgW9GdcN1H+oFzl/EAMcjEoS03lhAaa6C+dXi8A1Z4iYlkBtzW
- Iv/pwqafGdAN30oT1TGBSfTGUb/CwhtJm9gfbKO6mPq6r1GJwknJKlgBb00l6M5VMM+7
- cyJYS63jh45JFlntSMgEcYziczX3KXZZD6zM03abypQRW0EDt0RiR7W8Hv9XfELYyFX/
- 0f4Pcbz7jE2HCAAJiEYDJHzgjJZrZNk9uVSnNGxPjGSYrazbuQwrD6byXIJzGLBVYyo0
- 33aETBuWFB+EIUbS8J/1Asse9GZIVd5QTtnafl5jS80MYcDh63qXTPiPVxNpOw+g0JyS
- rsUg==
-X-Gm-Message-State: APjAAAXxEwR0KnDrwXytNwvszDCJonRkw+JpOY63LC1HcutpoxDZl0l0
- W0CKPe/13NHY6ipV1Xza31A06w==
-X-Google-Smtp-Source: APXvYqyEi5mYggz8BKINh53jJUmmIGXfz58mflarfxnaw+/Q63cHyENzkiSQzgHz/jzgXIqvNQQ6Iw==
-X-Received: by 2002:a9d:7352:: with SMTP id l18mr3330291otk.292.1562849019954; 
- Thu, 11 Jul 2019 05:43:39 -0700 (PDT)
-Received: from [192.168.43.94] ([208.54.86.238])
- by smtp.gmail.com with ESMTPSA id w9sm1801712otk.16.2019.07.11.05.43.33
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 11 Jul 2019 05:43:39 -0700 (PDT)
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
- qemu-devel@nongnu.org
-References: <20190711121231.3601-1-peter.maydell@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <21ffce4e-72cf-2c5f-71b1-cb53367dccda@linaro.org>
-Date: Thu, 11 Jul 2019 14:43:18 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.1
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=p97YX3IoJy94wJq9tTL1wuf0ASRWpNpZgfBlTY7Zy78=;
+ b=CIerfnHo4+COe7ja4qviNbKamXbtoC5qJYg6RpFoVRIyea0tFMQ8ZMCC35UrVKxlPh
+ UQtnkySzxjp/0XoLBgh3YfuKbK4qFPaqHby8Wjqa47QqZHndFnkdvWP76kj7xiKWxpbe
+ xSZnNXQg9QyyWygXsnjphE8dsPFfot/OPPtvyeo8IwvT50eAA1dQvZ8iauXlM1L/ZRKR
+ zqvAPBHZtLd6hYbGFAw4lacWgioA0GnHMmbaPcQYvDz29nlUtiu3+GYgslZOZSr+JEFn
+ BlK2f98oAChaAogkT2C056Ol68gwUsn+yH0hqONRVMykrylVIXix0su5T/SPn8nUVTVo
+ Duyw==
+X-Gm-Message-State: APjAAAWxF+4DokHXxAc6Mj8j6Vjh+mq6HCWyTBoOtZf1IiH43m+1846N
+ R1c1ugxrvYIvmHI2I4Qt7M4cLi6e0yBBndo4H+BkIw==
+X-Google-Smtp-Source: APXvYqwIuUVnErABgjVY5ASG37fqqVeG7zVNobq/ht3B+tVjL4E39+AYZKLw3JJnxAF+WuLWHzw+0OYnhSHhW96cPVU=
+X-Received: by 2002:a9d:711e:: with SMTP id n30mr3036913otj.97.1562849217964; 
+ Thu, 11 Jul 2019 05:46:57 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190711121231.3601-1-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20190711121231.3601-1-peter.maydell@linaro.org>
+ <21ffce4e-72cf-2c5f-71b1-cb53367dccda@linaro.org>
+In-Reply-To: <21ffce4e-72cf-2c5f-71b1-cb53367dccda@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 11 Jul 2019 13:46:47 +0100
+Message-ID: <CAFEAcA_3RMV1vMk5CQf1Wjk1SJUjhEFxaevn6hupp9+ZjDktAQ@mail.gmail.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::341
+X-Received-From: 2607:f8b0:4864:20::343
 Subject: Re: [Qemu-devel] [PATCH for-4.1] target/arm: Set VFP-related MVFR0
  fields for arm926 and arm1026
 X-BeenThere: qemu-devel@nongnu.org
@@ -100,52 +88,36 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Christophe Lyon <christophe.lyon@linaro.org>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+ qemu-arm <qemu-arm@nongnu.org>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/11/19 2:12 PM, Peter Maydell wrote:
-> The ARMv5 architecture didn't specify detailed per-feature ID
-> registers. Now that we're using the MVFR0 register fields to
-> gate the existence of VFP instructions, we need to set up
-> the correct values in the cpu->isar structure so that we still
-> provide an FPU to the guest.
-> 
-> This fixes a regression in the arm926 and arm1026 CPUs, which
-> are the only ones that both have VFP and are ARMv5 or earlier.
-> This regression was introduced by the VFP refactoring, and more
-> specifically by commits 1120827fa182f0e76 and 266bd25c485597c,
-> which accidentally disabled VFP short-vector support and
-> double-precision support on these CPUs.
-> 
-> Reported-by: Christophe Lyon <christophe.lyon@linaro.org>
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> Fixes: 1120827fa182f0e
-> Fixes: 266bd25c485597c
-> Fixes: https://bugs.launchpad.net/qemu/+bug/1836192
-> ---
-> I've followed the existing approach we used for ISAR1 here
-> of just filling in the fields we care about, rather than trying
-> to set the entire register value.
+On Thu, 11 Jul 2019 at 13:43, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> On 7/11/19 2:12 PM, Peter Maydell wrote:
+> > @@ -1713,6 +1719,12 @@ static void arm1026_initfn(Object *obj)
+> >          };
+> >          define_one_arm_cp_reg(cpu, &ifar);
+> >      }
+> > +    /*
+> > +     * Similarly, we need to set MVFR0 fields to enable double precision
+> > +     * and short vector support even though ARMv5 doesn't have this register.
+> > +     */
+> > +    cpu->isar.mvfr0 = FIELD_DP32(cpu->isar.mvfr0, MVFR0, FPSHVEC, 1);
+> > +    cpu->isar.mvfr0 = FIELD_DP32(cpu->isar.mvfr0, MVFR0, FPDP, 1);
+> >  }
+>
+> I would have placed this immediately after the Jazelle isar setup, so that the
+> "Similarly" comment had the proper referent.  But, no biggie.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Yes, I'll move it. I'd misread the chunk of code that sets the custom
+IFAR as "ISAR" and assumed it was all of a piece with the Jazelle ISAR
+setup.
 
-> @@ -1713,6 +1719,12 @@ static void arm1026_initfn(Object *obj)
->          };
->          define_one_arm_cp_reg(cpu, &ifar);
->      }
-> +    /*
-> +     * Similarly, we need to set MVFR0 fields to enable double precision
-> +     * and short vector support even though ARMv5 doesn't have this register.
-> +     */
-> +    cpu->isar.mvfr0 = FIELD_DP32(cpu->isar.mvfr0, MVFR0, FPSHVEC, 1);
-> +    cpu->isar.mvfr0 = FIELD_DP32(cpu->isar.mvfr0, MVFR0, FPDP, 1);
->  }
-
-I would have placed this immediately after the Jazelle isar setup, so that the
-"Similarly" comment had the proper referent.  But, no biggie.
-
-
-r~
+thanks
+-- PMM
 
