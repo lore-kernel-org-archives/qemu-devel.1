@@ -2,58 +2,60 @@ Return-Path: <SRS0=FHOf=VI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E1B9C74A4B
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 10:56:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0F99C74A4B
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 10:56:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 061AA208E4
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 10:56:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 061AA208E4
+	by mail.kernel.org (Postfix) with ESMTPS id 7D0EF208E4
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 10:56:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D0EF208E4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40394 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40398 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlWkJ-0004YL-9t
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 06:56:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45744)
+	id 1hlWkL-0004dI-Pb
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 06:56:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45609)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <quintela@redhat.com>) id 1hlWf3-0004le-9Z
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 06:50:50 -0400
+ (envelope-from <quintela@redhat.com>) id 1hlWev-0004Ua-FX
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 06:50:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <quintela@redhat.com>) id 1hlWf1-0004Od-U7
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 06:50:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48604)
+ (envelope-from <quintela@redhat.com>) id 1hlWet-0004FY-R2
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 06:50:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48150)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1hlWf1-0004Nh-MW
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 06:50:47 -0400
+ (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1hlWer-00047Q-NH
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 06:50:39 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 0AF6181F01;
- Thu, 11 Jul 2019 10:44:18 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 6EECA3082A8D;
+ Thu, 11 Jul 2019 10:44:56 +0000 (UTC)
 Received: from localhost.localdomain (unknown [10.36.118.16])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0A90460600;
- Thu, 11 Jul 2019 10:44:15 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2710960600;
+ Thu, 11 Jul 2019 10:44:51 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Thu, 11 Jul 2019 12:43:53 +0200
-Message-Id: <20190711104412.31233-1-quintela@redhat.com>
+Date: Thu, 11 Jul 2019 12:44:06 +0200
+Message-Id: <20190711104412.31233-14-quintela@redhat.com>
+In-Reply-To: <20190711104412.31233-1-quintela@redhat.com>
+References: <20190711104412.31233-1-quintela@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.25]); Thu, 11 Jul 2019 10:44:18 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.45]); Thu, 11 Jul 2019 10:44:56 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 00/19] Migration patches
+Subject: [Qemu-devel] [PULL 13/19] memory: Introduce memory listener hook
+ log_clear()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,93 +69,236 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
  kvm@vger.kernel.org, Juan Quintela <quintela@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Peter Xu <peterx@redhat.com>,
  Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit 6df2cdf44a82426f7a59dcb03f0dd2181ed7fd=
-fa:
+From: Peter Xu <peterx@redhat.com>
 
-  Update version for v4.1.0-rc0 release (2019-07-09 17:21:53 +0100)
+Introduce a new memory region listener hook log_clear() to allow the
+listeners to hook onto the points where the dirty bitmap is cleared by
+the bitmap users.
 
-are available in the Git repository at:
+Previously log_sync() contains two operations:
 
-  https://github.com/juanquintela/qemu.git tags/migration-pull-request
+  - dirty bitmap collection, and,
+  - dirty bitmap clear on remote site.
 
-for you to fetch changes up to 0b47e79b3d04f500b6f3490628905ec5884133df:
+Let's take KVM as example - log_sync() for KVM will first copy the
+kernel dirty bitmap to userspace, and at the same time we'll clear the
+dirty bitmap there along with re-protecting all the guest pages again.
 
-  migration: allow private destination ram with x-ignore-shared (2019-07-=
-11 12:30:40 +0200)
+We add this new log_clear() interface only to split the old log_sync()
+into two separated procedures:
 
-----------------------------------------------------------------
-Migration pull request
+  - use log_sync() to collect the collection only, and,
+  - use log_clear() to clear the remote dirty bitmap.
 
-----------------------------------------------------------------
+With the new interface, the memory listener users will still be able
+to decide how to implement the log synchronization procedure, e.g.,
+they can still only provide log_sync() method only and put all the two
+procedures within log_sync() (that's how the old KVM works before
+KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2 is introduced).  However with this
+new interface the memory listener users will start to have a chance to
+postpone the log clear operation explicitly if the module supports.
+That can really benefit users like KVM at least for host kernels that
+support KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2.
 
-Juan Quintela (3):
-  migration: fix multifd_recv event typo
-  migration-test: rename parameter to parameter_int
-  migration-test: Add migration multifd test
+There are three places that can clear dirty bits in any one of the
+dirty bitmap in the ram_list.dirty_memory[3] array:
 
-Peng Tao (1):
-  migration: allow private destination ram with x-ignore-shared
+        cpu_physical_memory_snapshot_and_clear_dirty
+        cpu_physical_memory_test_and_clear_dirty
+        cpu_physical_memory_sync_dirty_bitmap
 
-Peter Xu (10):
-  migration: No need to take rcu during sync_dirty_bitmap
-  memory: Don't set migration bitmap when without migration
-  bitmap: Add bitmap_copy_with_{src|dst}_offset()
-  memory: Pass mr into snapshot_and_clear_dirty
-  memory: Introduce memory listener hook log_clear()
-  kvm: Update comments for sync_dirty_bitmap
-  kvm: Persistent per kvmslot dirty bitmap
-  kvm: Introduce slots lock for memory listener
-  kvm: Support KVM_CLEAR_DIRTY_LOG
-  migration: Split log_clear() into smaller chunks
+Currently we hook directly into each of the functions to notify about
+the log_clear().
 
-Wei Yang (5):
-  migration/multifd: call multifd_send_sync_main when sending
-    RAM_SAVE_FLAG_EOS
-  migration/xbzrle: update cache and current_data in one place
-  cutils: remove one unnecessary pointer operation
-  migration/multifd: sync packet_num after all thread are done
-  migratioin/ram.c: reset complete_round when we gets a queued page
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: Peter Xu <peterx@redhat.com>
+Reviewed-by: Juan Quintela <quintela@redhat.com>
+Message-Id: <20190603065056.25211-7-peterx@redhat.com>
+Signed-off-by: Juan Quintela <quintela@redhat.com>
+---
+ exec.c                  | 12 ++++++++++
+ include/exec/memory.h   | 17 ++++++++++++++
+ include/exec/ram_addr.h |  3 +++
+ memory.c                | 51 +++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 83 insertions(+)
 
- accel/kvm/kvm-all.c          |  260 +-
- accel/kvm/trace-events       |    1 +
- exec.c                       |   15 +-
- include/exec/memory.h        |   19 +
- include/exec/memory.h.rej    |   26 +
- include/exec/ram_addr.h      |   92 +-
- include/exec/ram_addr.h.orig |  488 ++++
- include/qemu/bitmap.h        |    9 +
- include/sysemu/kvm_int.h     |    4 +
- memory.c                     |   56 +-
- memory.c.rej                 |   17 +
- migration/migration.c        |    4 +
- migration/migration.h        |   27 +
- migration/migration.h.orig   |  315 +++
- migration/ram.c              |   93 +-
- migration/ram.c.orig         | 4599 ++++++++++++++++++++++++++++++++++
- migration/ram.c.rej          |   33 +
- migration/trace-events       |    3 +-
- migration/trace-events.orig  |  297 +++
- tests/Makefile.include       |    2 +
- tests/migration-test.c       |  103 +-
- tests/test-bitmap.c          |   72 +
- util/bitmap.c                |   85 +
- util/cutils.c                |    8 +-
- 24 files changed, 6545 insertions(+), 83 deletions(-)
- create mode 100644 include/exec/memory.h.rej
- create mode 100644 include/exec/ram_addr.h.orig
- create mode 100644 memory.c.rej
- create mode 100644 migration/migration.h.orig
- create mode 100644 migration/ram.c.orig
- create mode 100644 migration/ram.c.rej
- create mode 100644 migration/trace-events.orig
- create mode 100644 tests/test-bitmap.c
-
+diff --git a/exec.c b/exec.c
+index 3a00698cc0..3e78de3b8f 100644
+--- a/exec.c
++++ b/exec.c
+@@ -1358,6 +1358,8 @@ bool cpu_physical_memory_test_and_clear_dirty(ram_a=
+ddr_t start,
+     DirtyMemoryBlocks *blocks;
+     unsigned long end, page;
+     bool dirty =3D false;
++    RAMBlock *ramblock;
++    uint64_t mr_offset, mr_size;
+=20
+     if (length =3D=3D 0) {
+         return false;
+@@ -1369,6 +1371,10 @@ bool cpu_physical_memory_test_and_clear_dirty(ram_=
+addr_t start,
+     rcu_read_lock();
+=20
+     blocks =3D atomic_rcu_read(&ram_list.dirty_memory[client]);
++    ramblock =3D qemu_get_ram_block(start);
++    /* Range sanity check on the ramblock */
++    assert(start >=3D ramblock->offset &&
++           start + length <=3D ramblock->offset + ramblock->used_length)=
+;
+=20
+     while (page < end) {
+         unsigned long idx =3D page / DIRTY_MEMORY_BLOCK_SIZE;
+@@ -1380,6 +1386,10 @@ bool cpu_physical_memory_test_and_clear_dirty(ram_=
+addr_t start,
+         page +=3D num;
+     }
+=20
++    mr_offset =3D (ram_addr_t)(page << TARGET_PAGE_BITS) - ramblock->off=
+set;
++    mr_size =3D (end - page) << TARGET_PAGE_BITS;
++    memory_region_clear_dirty_bitmap(ramblock->mr, mr_offset, mr_size);
++
+     rcu_read_unlock();
+=20
+     if (dirty && tcg_enabled()) {
+@@ -1435,6 +1445,8 @@ DirtyBitmapSnapshot *cpu_physical_memory_snapshot_a=
+nd_clear_dirty
+         tlb_reset_dirty_range_all(start, length);
+     }
+=20
++    memory_region_clear_dirty_bitmap(mr, offset, length);
++
+     return snap;
+ }
+=20
+diff --git a/include/exec/memory.h b/include/exec/memory.h
+index 70d6f7e451..bb0961ddb9 100644
+--- a/include/exec/memory.h
++++ b/include/exec/memory.h
+@@ -416,6 +416,7 @@ struct MemoryListener {
+     void (*log_stop)(MemoryListener *listener, MemoryRegionSection *sect=
+ion,
+                      int old, int new);
+     void (*log_sync)(MemoryListener *listener, MemoryRegionSection *sect=
+ion);
++    void (*log_clear)(MemoryListener *listener, MemoryRegionSection *sec=
+tion);
+     void (*log_global_start)(MemoryListener *listener);
+     void (*log_global_stop)(MemoryListener *listener);
+     void (*eventfd_add)(MemoryListener *listener, MemoryRegionSection *s=
+ection,
+@@ -1269,6 +1270,22 @@ void memory_region_set_log(MemoryRegion *mr, bool =
+log, unsigned client);
+ void memory_region_set_dirty(MemoryRegion *mr, hwaddr addr,
+                              hwaddr size);
+=20
++/**
++ * memory_region_clear_dirty_bitmap - clear dirty bitmap for memory rang=
+e
++ *
++ * This function is called when the caller wants to clear the remote
++ * dirty bitmap of a memory range within the memory region.  This can
++ * be used by e.g. KVM to manually clear dirty log when
++ * KVM_CAP_MANUAL_DIRTY_LOG_PROTECT is declared support by the host
++ * kernel.
++ *
++ * @mr:     the memory region to clear the dirty log upon
++ * @start:  start address offset within the memory region
++ * @len:    length of the memory region to clear dirty bitmap
++ */
++void memory_region_clear_dirty_bitmap(MemoryRegion *mr, hwaddr start,
++                                      hwaddr len);
++
+ /**
+  * memory_region_snapshot_and_clear_dirty: Get a snapshot of the dirty
+  *                                         bitmap and clear it.
+diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
+index 1843b6f2d3..222b4338fb 100644
+--- a/include/exec/ram_addr.h
++++ b/include/exec/ram_addr.h
+@@ -462,6 +462,9 @@ uint64_t cpu_physical_memory_sync_dirty_bitmap(RAMBlo=
+ck *rb,
+                 idx++;
+             }
+         }
++
++        /* TODO: split the huge bitmap into smaller chunks */
++        memory_region_clear_dirty_bitmap(rb->mr, start, length);
+     } else {
+         ram_addr_t offset =3D rb->offset;
+=20
+diff --git a/memory.c b/memory.c
+index 71fcaf2d00..beac26e173 100644
+--- a/memory.c
++++ b/memory.c
+@@ -2064,6 +2064,57 @@ static void memory_region_sync_dirty_bitmap(Memory=
+Region *mr)
+     }
+ }
+=20
++void memory_region_clear_dirty_bitmap(MemoryRegion *mr, hwaddr start,
++                                      hwaddr len)
++{
++    MemoryRegionSection mrs;
++    MemoryListener *listener;
++    AddressSpace *as;
++    FlatView *view;
++    FlatRange *fr;
++    hwaddr sec_start, sec_end, sec_size;
++
++    QTAILQ_FOREACH(listener, &memory_listeners, link) {
++        if (!listener->log_clear) {
++            continue;
++        }
++        as =3D listener->address_space;
++        view =3D address_space_get_flatview(as);
++        FOR_EACH_FLAT_RANGE(fr, view) {
++            if (!fr->dirty_log_mask || fr->mr !=3D mr) {
++                /*
++                 * Clear dirty bitmap operation only applies to those
++                 * regions whose dirty logging is at least enabled
++                 */
++                continue;
++            }
++
++            mrs =3D section_from_flat_range(fr, view);
++
++            sec_start =3D MAX(mrs.offset_within_region, start);
++            sec_end =3D mrs.offset_within_region + int128_get64(mrs.size=
+);
++            sec_end =3D MIN(sec_end, start + len);
++
++            if (sec_start >=3D sec_end) {
++                /*
++                 * If this memory region section has no intersection
++                 * with the requested range, skip.
++                 */
++                continue;
++            }
++
++            /* Valid case; shrink the section if needed */
++            mrs.offset_within_address_space +=3D
++                sec_start - mrs.offset_within_region;
++            mrs.offset_within_region =3D sec_start;
++            sec_size =3D sec_end - sec_start;
++            mrs.size =3D int128_make64(sec_size);
++            listener->log_clear(listener, &mrs);
++        }
++        flatview_unref(view);
++    }
++}
++
+ DirtyBitmapSnapshot *memory_region_snapshot_and_clear_dirty(MemoryRegion=
+ *mr,
+                                                             hwaddr addr,
+                                                             hwaddr size,
 --=20
 2.21.0
 
