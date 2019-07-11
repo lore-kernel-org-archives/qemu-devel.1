@@ -6,57 +6,57 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63A01C71142
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 17:31:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 312CFC71142
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 17:32:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3AECD20863
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 17:31:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3AECD20863
+	by mail.kernel.org (Postfix) with ESMTPS id 08EAE20863
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 17:32:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08EAE20863
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43872 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43878 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlcvD-0004W9-HH
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 13:31:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34335)
+	id 1hlcvS-0005N6-Eu
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 13:32:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34134)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <eric.auger@redhat.com>) id 1hlcu4-0000xA-0v
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 13:30:44 -0400
+ (envelope-from <eric.auger@redhat.com>) id 1hlctV-0007A8-K3
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 13:30:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1hlcu1-0002zP-N2
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 13:30:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60514)
+ (envelope-from <eric.auger@redhat.com>) id 1hlctU-0002Sw-Kq
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 13:30:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35718)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1hlctu-0002pq-8B; Thu, 11 Jul 2019 13:30:34 -0400
+ id 1hlctS-0002R5-H0; Thu, 11 Jul 2019 13:30:06 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id F3DC830C31AA;
- Thu, 11 Jul 2019 17:30:31 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 923E1C049598;
+ Thu, 11 Jul 2019 17:30:05 +0000 (UTC)
 Received: from laptop.redhat.com (ovpn-116-46.ams2.redhat.com [10.36.116.46])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A4B865C1B4;
- Thu, 11 Jul 2019 17:30:11 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6FE285C1B4;
+ Thu, 11 Jul 2019 17:29:51 +0000 (UTC)
 From: Eric Auger <eric.auger@redhat.com>
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org,
  qemu-arm@nongnu.org, peter.maydell@linaro.org
-Date: Thu, 11 Jul 2019 19:28:27 +0200
-Message-Id: <20190711172845.31035-12-eric.auger@redhat.com>
+Date: Thu, 11 Jul 2019 19:28:25 +0200
+Message-Id: <20190711172845.31035-10-eric.auger@redhat.com>
 In-Reply-To: <20190711172845.31035-1-eric.auger@redhat.com>
 References: <20190711172845.31035-1-eric.auger@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Thu, 11 Jul 2019 17:30:32 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.31]); Thu, 11 Jul 2019 17:30:05 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [RFC v4 11/29] memory: Add arch_id and leaf fields in
- IOTLBEntry
+Subject: [Qemu-devel] [RFC v4 09/29] memory: Add IOMMU_ATTR_MSI_TRANSLATE
+ IOMMU memory region attribute
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,57 +75,29 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-TLB entries are usually tagged with some ids such as the asid
-or pasid. When propagating an invalidation command from the
-guest to the host, we need to pass this id.
-
-Also we add a leaf field which indicates, in case of invalidation
-notification whether only cache entries for the last level of
-translation are required to be invalidated.
+We introduce a new IOMMU Memory Region attribute, IOMMU_ATTR_MSI_TRANSLAT=
+E
+which tells whether the virtual IOMMU translates MSIs. ARM SMMU
+will expose this attribute since, as opposed to Intel DMAR, MSIs
+are translated as any other DMA requests.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 ---
- include/exec/memory.h | 20 +++++++++++++++++++-
- 1 file changed, 19 insertions(+), 1 deletion(-)
+ include/exec/memory.h | 1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/include/exec/memory.h b/include/exec/memory.h
-index d0de192887..8dd4d787d4 100644
+index e477a630a8..593ef947c6 100644
 --- a/include/exec/memory.h
 +++ b/include/exec/memory.h
-@@ -68,12 +68,30 @@ typedef enum {
-=20
- #define IOMMU_ACCESS_FLAG(r, w) (((r) ? IOMMU_RO : 0) | ((w) ? IOMMU_WO =
-: 0))
-=20
-+/**
-+ * IOMMUTLBEntry - IOMMU TLB entry
-+ *
-+ * Structure used when performing a translation or when notifying MAP or
-+ * UNMAP (invalidation) events
-+ *
-+ * @target_as: target address space
-+ * @iova: IO virtual address (input)
-+ * @translated_addr: translated address (output)
-+ * @addr_mask: address mask (0xfff means 4K binding), must be multiple o=
-f 2
-+ * @perm: permission flag of the mapping (NONE encodes no mapping or
-+ * invalidation notification)
-+ * @arch_id: architecture specific ID tagging the TLB
-+ * @leaf: when @perm is NONE, indicates whether only caches for the last
-+ * level of translation need to be invalidated.
-+ */
- struct IOMMUTLBEntry {
-     AddressSpace    *target_as;
-     hwaddr           iova;
-     hwaddr           translated_addr;
--    hwaddr           addr_mask;  /* 0xfff =3D 4k translation */
-+    hwaddr           addr_mask;
-     IOMMUAccessFlags perm;
-+    uint32_t         arch_id;
-+    bool             leaf;
+@@ -206,6 +206,7 @@ struct MemoryRegionOps {
+ enum IOMMUMemoryRegionAttr {
+     IOMMU_ATTR_SPAPR_TCE_FD,
+     IOMMU_ATTR_VFIO_NESTED,
++    IOMMU_ATTR_MSI_TRANSLATE,
  };
 =20
- /*
+ /**
 --=20
 2.20.1
 
