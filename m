@@ -2,101 +2,65 @@ Return-Path: <SRS0=FHOf=VI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1A32C74A42
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 05:51:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3D75C74A42
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 05:56:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9049920838
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 05:51:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9049920838
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 791E020872
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 05:56:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 791E020872
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38724 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38736 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlRzq-0007gQ-UW
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 01:51:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60248)
+	id 1hlS3u-0000r7-P6
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 01:56:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33356)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <sbhat@linux.ibm.com>) id 1hlRzK-000792-US
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 01:51:27 -0400
+ (envelope-from <eric.auger@redhat.com>) id 1hlS3R-0000MN-57
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 01:55:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <sbhat@linux.ibm.com>) id 1hlRzJ-00059t-Vv
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 01:51:26 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:62250
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <sbhat@linux.ibm.com>) id 1hlRzJ-00059E-RT
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 01:51:25 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x6B5l766023254
- for <qemu-devel@nongnu.org>; Thu, 11 Jul 2019 01:51:24 -0400
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2tny7v86q5-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Thu, 11 Jul 2019 01:51:23 -0400
-Received: from localhost
- by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <sbhat@linux.ibm.com>;
- Thu, 11 Jul 2019 06:51:22 +0100
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
- by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Thu, 11 Jul 2019 06:51:19 +0100
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com
- [9.149.105.59])
- by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- x6B5pItc51642586
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 11 Jul 2019 05:51:18 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 66DBEA405B;
- Thu, 11 Jul 2019 05:51:18 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 332C4A405F;
- Thu, 11 Jul 2019 05:51:17 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.124.35.17])
- by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Thu, 11 Jul 2019 05:51:17 +0000 (GMT)
-To: Fabiano Rosas <farosas@linux.ibm.com>, imammedo@redhat.com,
- david@gibson.dropbear.id.au, xiaoguangrong.eric@gmail.com, mst@redhat.com
-References: <155773946961.49142.5208084426066783536.stgit@lep8c.aus.stglabs.ibm.com>
- <155773968985.49142.1164691973469833295.stgit@lep8c.aus.stglabs.ibm.com>
- <875zq25plp.fsf@linux.ibm.com>
-From: Shivaprasad G Bhat <sbhat@linux.ibm.com>
-Date: Thu, 11 Jul 2019 11:21:16 +0530
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.5.2
+ (envelope-from <eric.auger@redhat.com>) id 1hlS3P-0002fC-Sv
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 01:55:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60734)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+ id 1hlS3M-0002a7-OJ; Thu, 11 Jul 2019 01:55:36 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 24EBD59461;
+ Thu, 11 Jul 2019 05:55:33 +0000 (UTC)
+Received: from [10.36.116.46] (ovpn-116-46.ams2.redhat.com [10.36.116.46])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 71C7E60600;
+ Thu, 11 Jul 2019 05:55:20 +0000 (UTC)
+To: Zhangfei Gao <zhangfei.gao@gmail.com>
+References: <20190527114203.2762-1-eric.auger@redhat.com>
+ <CAMj5BkgsJxKY89hURnf3dp2GE0quLr-NOPtQsYFQjOPEx6=Cqw@mail.gmail.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <63543f88-bdf7-753d-0337-67e7e86f0893@redhat.com>
+Date: Thu, 11 Jul 2019 07:55:18 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-In-Reply-To: <875zq25plp.fsf@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <CAMj5BkgsJxKY89hURnf3dp2GE0quLr-NOPtQsYFQjOPEx6=Cqw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-TM-AS-GCONF: 00
-x-cbid: 19071105-4275-0000-0000-0000034BD79A
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19071105-4276-0000-0000-0000385BDD5A
-Message-Id: <07b3c842-e313-aec9-8558-1944c39b1072@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
- definitions=2019-07-11_01:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1907110068
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
-Subject: Re: [Qemu-devel] [RFC v2 PATCH 3/3] spapr: Add Hcalls to support
- PAPR NVDIMM device
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.39]); Thu, 11 Jul 2019 05:55:33 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [RFC v4 00/27] vSMMUv3/pSMMUv3 2 stage VFIO
+ integration
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,49 +72,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, drjones@redhat.com,
+ yi.l.liu@intel.com, "Michael S. Tsirkin" <mst@redhat.com>,
+ jean-philippe.brucker@arm.com, zhangfei.gao@foxmail.com, qemu-devel@nongnu.org,
+ peterx@redhat.com, alex.williamson@redhat.com, qemu-arm@nongnu.org,
+ vincent.stehle@arm.com, eric.auger.pro@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Thanks for the comments Fabiano.
+Hi Zhangfei,
 
-
-On 05/22/2019 11:38 PM, Fabiano Rosas wrote:
-> Shivaprasad G Bhat <sbhat@linux.ibm.com> writes:
->
-> +
->> +    ddc = NVDIMM_GET_CLASS(nvdimm);
->> +    ddc->read_label_data(nvdimm, &args[0], numBytesToRead, offset);
->> +
->> +    return H_SUCCESS;
->> +}
->> +
->> +
->> +static target_ulong h_scm_write_metadata(PowerPCCPU *cpu,
->> +                                         SpaprMachineState *spapr,
->> +                                         target_ulong opcode,
->> +                                         target_ulong *args)
->> +{
->> +    uint32_t drc_index = args[0];
->> +    uint64_t offset = args[1];
->> +    uint64_t data = args[2];
->> +    int8_t numBytesToWrite = args[3];
-> Likewise.
-
-This is supposed to be uint64_t like used in other places.
-Will fix it in the next version.
-
-Rest of the comments I think David has already answered the rational
-behind the usage to avoid integer overflow.
-
->
->> +    SpaprDrc *drc = spapr_drc_by_index(drc_index);
->> +    NVDIMMDevice *nvdimm = NULL;
->> +    DeviceState *dev = NULL;
+On 7/11/19 3:53 AM, Zhangfei Gao wrote:
+> On Mon, May 27, 2019 at 7:44 PM Eric Auger <eric.auger@redhat.com> wrote:
 >>
+>> Up to now vSMMUv3 has not been integrated with VFIO. VFIO
+>> integration requires to program the physical IOMMU consistently
+>> with the guest mappings. However, as opposed to VTD, SMMUv3 has
+>> no "Caching Mode" which allows easy trapping of guest mappings.
+>> This means the vSMMUV3 cannot use the same VFIO integration as VTD.
+>>
+>> However SMMUv3 has 2 translation stages. This was devised with
+>> virtualization use case in mind where stage 1 is "owned" by the
+>> guest whereas the host uses stage 2 for VM isolation.
+>>
+>> This series sets up this nested translation stage. It only works
+>> if there is one physical SMMUv3 used along with QEMU vSMMUv3 (in
+>> other words, it does not work if there is a physical SMMUv2).
+>>
+>> The series uses a new kernel user API [1], still under definition.
+>>
+>> - We force the host to use stage 2 instead of stage 1, when we
+>>   detect a vSMMUV3 is behind a VFIO device. For a VFIO device
+>>   without any virtual IOMMU, we still use stage 1 as many existing
+>>   SMMUs expect this behavior.
+>> - We introduce new IOTLB "config" notifiers, requested to notify
+>>   changes in the config of a given iommu memory region. So now
+>>   we have notifiers for IOTLB changes and config changes.
+>> - vSMMUv3 calls config notifiers when STE (Stream Table Entries)
+>>   are updated by the guest.
+>> - We implement a specific UNMAP notifier that conveys guest
+>>   IOTLB invalidations to the host
+>> - We implement a new MAP notifiers only used for MSI IOVAs so
+>>   that the host can build a nested stage translation for MSI IOVAs
+>> - As the legacy MAP notifier is not called anymore, we must make
+>>   sure stage 2 mappings are set. This is achieved through another
+>>   memory listener.
+>> - Physical SMMUs faults are reported to the guest via en eventfd
+>>   mechanism and reinjected into this latter.
+>>
+>> Note: The first patch is a code cleanup and was sent separately.
+>>
+>> Best Regards
+>>
+>> Eric
+>>
+>> This series can be found at:
+>> https://github.com/eauger/qemu/tree/v4.0.0-2stage-rfcv4
+>>
+>> Compatible with kernel series:
+>> [PATCH v8 00/29] SMMUv3 Nested Stage Setup
+>> (https://lkml.org/lkml/2019/5/26/95)
+>>
+> 
+> Have tested vfio mode in qemu on arm64 platform.
+> 
+> Tested-by: Zhangfei Gao <zhangfei.gao@linaro.org>
+> qemu: https://github.com/eauger/qemu/tree/v4.0.0-2stage-rfcv4
+> kernel: https://github.com/eauger/linux/tree/v5.2-rc1-2stage-v8
 
-Regards,
-Shivaprasad
+Your testing is really appreciated.
 
+Both kernel and QEMU series will be respinned. I am currently waiting
+for 5.3 kernel window as it will resolve some dependencies on the fault
+reporting APIs. My focus is to get the updated kernel series reviewed
+and tested and then refine the QEMU integration accordingly.
+
+Thanks
+
+Eric
+
+
+> 
 
