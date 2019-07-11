@@ -2,79 +2,66 @@ Return-Path: <SRS0=FHOf=VI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-5.2 required=3.0 tests=FROM_EXCESS_BASE64,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 162E6C74A52
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 13:00:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4609C74A35
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 13:02:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D7FFC21019
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 13:00:42 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="d/KKUsqJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D7FFC21019
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id BB87C21019
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 13:02:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB87C21019
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41530 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41572 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlYgj-0001Cj-B6
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 09:00:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33209)
+	id 1hlYiw-0003J5-1E
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 09:02:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33838)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hlYfq-0000dY-9Y
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 08:59:47 -0400
+ (envelope-from <berrange@redhat.com>) id 1hlYhR-0001he-UP
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 09:01:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hlYfp-0005yq-8d
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 08:59:46 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:45715)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hlYfp-0005xs-38
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 08:59:45 -0400
-Received: by mail-ot1-x342.google.com with SMTP id x21so5699410otq.12
- for <qemu-devel@nongnu.org>; Thu, 11 Jul 2019 05:59:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=Me9ADo/C9cmgC762XJrfpOD5onZSeKsx2B01+M4r6Lk=;
- b=d/KKUsqJHraL3rbuOvnlW/8MM3VlQ0rZcAzq5rNqiWsGJD0LI0RHY7I19NMz8Wd5Df
- o9SQxPCSkfI7OUoM88shXk5GVjRj5NITE80zo9BQEENxy8sQi/1wKs3JY3NYFeQqL2Ca
- laRGFLV8jFg+03jtrPKo8BfE59jmzNe8gEYifWKjG6psvqfa+ouPqlo6P/yv7DaInEqq
- 0mx45vN5rbJxoyasj2ryDOHercytS65v3NvYWeCFOvZH9jb6NR62N6m23x0vhaGXECU0
- tVA5fTEBpCcz6iMpfNv75kDF4ceob5rmQC00JvOq+OO3Dq/7BDW4P7xGhhNIKcB1huXR
- ItoA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=Me9ADo/C9cmgC762XJrfpOD5onZSeKsx2B01+M4r6Lk=;
- b=o4A1OiH9JICl2Sk30eSODoOg8txpbu6vXa3sHs8pXK8Flc4fC79y64jkCogSDvvB77
- eYzXNnUBt2TXh0yzYvcmYCsS4/S9VUcuz6WwMiwuo2okqIQJdJZAdFTfmMEgqXmIKZZg
- Q9QetHocdHFEHADudcPcbhC5aqdfJywzosLf77kT9NcyVjBUX11biUG8Dx2B4P2A6uqB
- w5/NPtiiJn2fVhWe2kifZwNl5zjK97Wr3dFYVLt6Ht6JypvOcSPzxY2qST56x9lab4OR
- I3hxOrTJ4MGP7s43ShPE7jI+nsyVyb+6s1MNxQV3UrRPkO/tMhFvPJC7aEb4rUKqaENR
- A/LA==
-X-Gm-Message-State: APjAAAXaoLIDsYs3UWNKaFb9ofAevCv4QfFEZvC3QBndTIRXAyNdf2mX
- V9Xc8O0sQChAikLIeVRGt3+UnHhhkKFj6gdIOJ4Tdw==
-X-Google-Smtp-Source: APXvYqyv/etiWX38sdstFWl2AIQMi1TWd+PZQpnvi2yBUk6ZDKcezEaVcJlQWOWEgWqJo4YlWLXaSXzbPR3L6mUD/Lo=
-X-Received: by 2002:a9d:711e:: with SMTP id n30mr3075519otj.97.1562849984271; 
- Thu, 11 Jul 2019 05:59:44 -0700 (PDT)
+ (envelope-from <berrange@redhat.com>) id 1hlYhP-0007cN-Lu
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 09:01:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40736)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <berrange@redhat.com>)
+ id 1hlYhL-0007Yb-PF; Thu, 11 Jul 2019 09:01:19 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 531BA4E908;
+ Thu, 11 Jul 2019 13:01:18 +0000 (UTC)
+Received: from redhat.com (unknown [10.42.17.95])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5951760143;
+ Thu, 11 Jul 2019 13:01:17 +0000 (UTC)
+Date: Thu, 11 Jul 2019 14:01:15 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Max Reitz <mreitz@redhat.com>
+Message-ID: <20190711130115.GJ11930@redhat.com>
+References: <20190710170349.1548-1-mlevitsk@redhat.com>
+ <84232589-627a-8151-a3d5-84c053d9a257@redhat.com>
+ <20190711092031.GB11930@redhat.com>
+ <4af9b328-f74b-50db-f130-3ce551239e14@redhat.com>
 MIME-Version: 1.0
-References: <20190702150606.24851-1-mst@redhat.com>
- <20190619094907.10131-5-pagupta@redhat.com>
-In-Reply-To: <20190619094907.10131-5-pagupta@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 11 Jul 2019 13:59:33 +0100
-Message-ID: <CAFEAcA_fHQKz3Kw1sumQHRLvq+LQ1nLo3V3v_dXE7PRT8xou9w@mail.gmail.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::342
-Subject: Re: [Qemu-devel] [PULL 08/22] virtio-pci: Proxy for virtio-pmem
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <4af9b328-f74b-50db-f130-3ce551239e14@redhat.com>
+User-Agent: Mutt/1.12.0 (2019-05-25)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.38]); Thu, 11 Jul 2019 13:01:18 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH] LUKS: support preallocation in qemu-img
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,59 +73,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Pankaj Gupta <pagupta@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
- David Hildenbrand <david@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org,
+ Maxim Levitsky <mlevitsk@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 2 Jul 2019 at 16:07, Michael S. Tsirkin <mst@redhat.com> wrote:
->
-> From: Pankaj Gupta <pagupta@redhat.com>
->
-> We need a proxy device for virtio-pmem, and this device has to be the
-> actual memory device so we can cleanly hotplug it.
->
-> Forward memory device class functions either to the actual device or use
-> properties of the virtio-pmem device to implement these in the proxy.
->
-> virtio-pmem will only be compiled for selected, supported architectures
-> (that can deal with virtio/pci devices being memory devices). An
-> architecture that is prepared for that can simply enable
-> CONFIG_VIRTIO_PMEM to make it work.
->
-> As not all architectures support memory devices (and CONFIG_VIRTIO_PMEM
-> will be enabled per supported architecture), we have to move the PCI proxy
-> to a separate file.
->
-> Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
-> [ split up patches, memory-device changes, move pci proxy]
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> Message-Id: <20190619094907.10131-5-pagupta@redhat.com>
-> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> ---
+On Thu, Jul 11, 2019 at 02:23:55PM +0200, Max Reitz wrote:
+> On 11.07.19 11:20, Daniel P. Berrang=C3=A9 wrote:
+> > On Wed, Jul 10, 2019 at 11:24:46PM +0200, Max Reitz wrote:
+> >> On 10.07.19 19:03, Maxim Levitsky wrote:
+> >>> preallocation=3Doff and preallocation=3Dmetadata
+> >>> both allocate luks header only, and preallocation=3Dfalloc/full
+> >>> is passed to underlying file, with the given image size.
+> >>>
+> >>> Note that the actual preallocated size is a bit smaller due
+> >>> to luks header.
+> >>
+> >> Couldn=E2=80=99t you just preallocate it after creating the crypto h=
+eader so
+> >> qcrypto_block_get_payload_offset(crypto->block) + size is the actual
+> >> file size?
+> >=20
+> > Yeah that would be preferrable. If that's really not possible, we
+> > could likely provide some API to query the expected hreader size for
+> > a given set of creation options.=20
+> >=20
+> >>
+> >>> Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=3D1534951
+> >>>
+> >>> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> >>> ---
+> >>>  block/crypto.c | 28 ++++++++++++++++++++++++++--
+> >>>  1 file changed, 26 insertions(+), 2 deletions(-)
+> >>
+> >> Hm.  I would expect a preallocated image to read 0.  But if you just
+> >> pass this through to the protocol layer, it won=E2=80=99t read 0.
+> >=20
+> > Yes, it will be zeros at the physical layer, but unintelligble
+> > garbage from POV of the virtual disk.
+> >=20
+> > I don't think this is really a problem though - this is what you
+> > get already if you create a LUKS volume on top of a block device
+> > today.
+>=20
+> Which is why we have BlockDriver.bdrv_has_zero_init(), which the LUKS
+> driver does not implement, hence it being treated as false.
+>=20
+> But if you are preallocating, you have a choice of what you write, and
+> why not make that zeroes?
+>=20
+> > AFAIK, we've not documented that preallocation guarantees future
+> > reads will return zeros. Preallocation simply ensures that all
+> > required space is allocated upfront. We do mention that it might
+> > be achieved by writing zeros to the underlying storage but never
+> > said you'll get zeros back.
+>=20
+> But we have, as I wrote in my second reply.  PreallocMode's
+> documentation says that at least =E2=80=9Cfull=E2=80=9D is writing zero=
+es, and to say
+> those zeroes can be anywhere in the stack is cheating, from my POV.
 
-Hi; Coverity spotted a bug here (CID 1403010):
+I guess it depends on your interpretation of the docs. In qemu-img
+man page it says
 
-> +static uint64_t virtio_pmem_pci_get_plugged_size(const MemoryDeviceState *md,
-> +                                                 Error **errp)
-> +{
-> +    VirtIOPMEMPCI *pci_pmem = VIRTIO_PMEM_PCI(md);
-> +    VirtIOPMEM *pmem = VIRTIO_PMEM(&pci_pmem->vdev);
-> +    VirtIOPMEMClass *vpc = VIRTIO_PMEM_GET_CLASS(pmem);
-> +    MemoryRegion *mr = vpc->get_memory_region(pmem, errp);
-> +
-> +    /* the plugged size corresponds to the region size */
-> +    return mr ? 0 : memory_region_size(mr);
+  "falloc" mode preallocates space for image by calling posix_fallocate()=
+.
+  "full" mode preallocates space for image by writing zeros to underlying
+  storage.
 
-This looks like maybe the arguments to ?: have been put
-the wrong way round? If mr is non-NULL we'll return 0
-and if it is NULL then we'll crash because memory_region_size()
-dereferences mr...
+To me both those sentances are talking about the lowest level in the
+stack, closest to the physical storage medium, though I can understand
+if people have other interpretations.
 
-> +}
+> > IOW I think its at most a docs problem to more clearly explain
+> > that preallocation !=3D guaranteed zeros for reads.
+> >=20
+> >> (In fact, I don=E2=80=99t even quite see the point of having LUKS as=
+ an own
+> >> format still.  It was useful when qcow2 didn=E2=80=99t have LUKS sup=
+port, but
+> >> now it does, so...  I suppose everyone using the LUKS format should
+> >> actually be using qcow2 with LUKS?)
+> >=20
+> > Certainly not. LUKS on raw is going to be very common, not least beca=
+use
+> > that's directly compatible with what Linux kernel supports. If you do=
+n't
+> > want the features of qcow2 like snapshots, it just adds overhead and =
+mgmt
+> > complexity for no gain, especially if dealing with block device backe=
+d
+> > storage (iSCSI, RBD).
+> >=20
+> > OpenStack will use cryptsetup when initializing its block storage wit=
+h
+> > LUKS, then tell QEMU to run with the raw + LUKS driver.
+>=20
+> I see the compatibility with the Linux kernel, yes (as I wrote in my
+> second reply), but I=E2=80=99m not sure whether =E2=80=9Coverhead=E2=80=
+=9D really is that big of
+> a point when using encryption.
 
-thanks
--- PMM
+Overhead is not purely about CPU burn. There's non-negligible memory
+overhead for qcow2s data tables that doesn't exist at all with raw.
+The mgmt complexity & interoperability is the real killer feature
+benefit of raw + LUKS vs qcow + LUKS though.
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
 
