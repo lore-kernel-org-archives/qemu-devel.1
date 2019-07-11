@@ -2,80 +2,82 @@ Return-Path: <SRS0=FHOf=VI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99CFEC74A36
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 01:54:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 372B0C74A36
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 01:54:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 671C720844
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 01:54:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 05A0720844
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 01:54:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U91na2lN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 671C720844
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="JriJHo/J"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 05A0720844
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38040 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38050 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlOHp-0006Rk-L6
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jul 2019 21:54:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45582)
+	id 1hlOIR-0007QZ-C7
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jul 2019 21:54:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45666)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <zhangfei.gao@gmail.com>) id 1hlOHN-00062s-W0
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 21:53:51 -0400
+ (envelope-from <chihmin.chao@sifive.com>) id 1hlOHr-0006c7-75
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 21:54:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <zhangfei.gao@gmail.com>) id 1hlOHM-00046L-OG
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 21:53:49 -0400
-Received: from mail-io1-xd43.google.com ([2607:f8b0:4864:20::d43]:46200)
+ (envelope-from <chihmin.chao@sifive.com>) id 1hlOHp-0004WD-HA
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 21:54:19 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:40599)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <zhangfei.gao@gmail.com>)
- id 1hlOHM-000458-Jh; Wed, 10 Jul 2019 21:53:48 -0400
-Received: by mail-io1-xd43.google.com with SMTP id i10so8991483iol.13;
- Wed, 10 Jul 2019 18:53:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ (Exim 4.71) (envelope-from <chihmin.chao@sifive.com>)
+ id 1hlOHp-0004Up-83
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 21:54:17 -0400
+Received: by mail-wr1-x442.google.com with SMTP id r1so4391060wrl.7
+ for <qemu-devel@nongnu.org>; Wed, 10 Jul 2019 18:54:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=Es0Wtn4JN9EHXFe85J1N6WEDUP7z/C4Ydh/XQ51XykY=;
- b=U91na2lNCQdCwoRsJSc+NFxKvGYkw2iE6EqdT0nXFXQNcoAU1fyzqErifW9rkRunIh
- NqM+h3098fLcGUxFVSRUkfpvzqneY1fF6fztlGC3s7nIRgaHIkL+a3LmTcSGbom6EKN8
- kFL3ybJoKNtj1reL7fB7m8igx0lgwllhqSS6sVDa6KvHOCFRYe9E4gqISrVImWxJgBGr
- 8pZKWhkBxos1uYG+qOGoZpxZaNbGmwVQlcuNsytkIureNQVAqWBx1wCPlpZXCKpCRpLl
- FspVt4PM35NbyvCHwXVMcnkbLODms3UgD9xnhz2HphqEKdVaKWEUblcP4n5HjgCgdDmy
- 6NoQ==
+ :cc; bh=/PMUVmrY2ARplVL3XfABugpLB3GvXOo7X/tk3K246JQ=;
+ b=JriJHo/JZz4qvz6USRy5j5mGgTF5uQGUQmMt1kaVN6vLrBThlo3BYji9NU1mDyqGhM
+ qJT7ZFQ8kpFK4jqPpTA7RnPSgoSTQsv+8O6Hp96NTqDz2j9GC6cecIDeJ6Olvy+Yj9eM
+ 1ImdEUA3AGUEFa3MqEOUORJQvffLV7LTH2czzYTX8z6b/Nbuytre+1MImPvVHf4urZmm
+ WUmDJYx8DFco1DclCrnJL3WZLIV0MPS/LwSu8MfDlD6VBAgku5noB/j4YYHjiASGxREs
+ HdOc+0D0ai8dg+4v9E7y4WUzG1sk47gaUoZXy/J4/y4AhGzlxA+DYS7FIfXNlxHH3Bo7
+ TRmg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=Es0Wtn4JN9EHXFe85J1N6WEDUP7z/C4Ydh/XQ51XykY=;
- b=QaxV0PD5RuqzCfT1KDB5NqLPc+7K0LriokBNTAqQOq2Qse+7deph1vGNfHl759aXcI
- JCgo22TTyTg71GPeIBH+/xCi5c+hSgFXb/1nEVx8EH08ewFNN+chXvVAG4SoNIL4XRwr
- OpBueUTR44DftmjeDE6QBtLgXuG4epY6oBgI6LPCZcO7i7sFL+TTQXPoxciVauKAOtH3
- KLa/VV+hYNV+4ehy4OpcvPOuR+bX6bsDnLyzM3dq3jDoNUXCFX+cSlIYknKC6okTFSz4
- sDhYet7sgGA7kFnnZ/eXxGfRo8yxjVFfcyPmKo8cKvHElwv/P6fJDRx+1pwDMkir7Tq7
- ccEw==
-X-Gm-Message-State: APjAAAUyYmhf+wh5qFYDyCEAz6GCM18de2MY9j8wzrD/cj2e65Song0V
- H47pDtd0mVyQA+HrYZHI3VyxRLnhhCsCIrIIeKA=
-X-Google-Smtp-Source: APXvYqw+6n7FIl0E5DRwhVYeUULnc2IRJcidDMShWA7dxI1ddmkhZU9k61NqGzon2PKHRHS+WfXX8tDMqoEPHlbpe4U=
-X-Received: by 2002:a6b:d008:: with SMTP id x8mr1342557ioa.129.1562810026308; 
- Wed, 10 Jul 2019 18:53:46 -0700 (PDT)
+ bh=/PMUVmrY2ARplVL3XfABugpLB3GvXOo7X/tk3K246JQ=;
+ b=WUl1NpkxVXxXZ+4KBY8iptVLlRgtRTvBKdjMg3paNWI4xT5aXEbGJL7f9V8hkN6ZRQ
+ 5dfWDIoe4+khm5WEF9xvbTVTiq0dFX9JzQJLbILKv+C32vVsnZ6v6c3eTu6pC/nQ5+Ql
+ oLFkPYmlsBmFb1GoCQOSpOjhrBta65scyULlI1PaQMReOfCV5cLsVGIgpkDNI1XGjg4d
+ ONbIJYEsw4PuodWkcWLNrOy5Z6Ni4RaJT1Iku5YvcX4T3HwA6Vi8dUQeeT5s75LC3gED
+ ONXQIKfXKqcfhIDk9jgB7qyfDHAqKq7vJPWN9h7QVeK324SxAqfqQzXghYYJzXIL/2YZ
+ fA9g==
+X-Gm-Message-State: APjAAAWoz9/zVAHZsNmPOiRUZ0nnHH9OzNAaL9KZvNlX8MqUNWPqt9ec
+ W31ZfRTYqCh1PcwFgMgaZC7SJG+IdkezPgFz0jgAUg==
+X-Google-Smtp-Source: APXvYqy8Y8FhBsSPkVtTabs9pMRgRl+7o5RnarZdzIqAYODHWGdgFb0raXt3nOcPmIp2zoJlM/X3+P6nRGhjl4t/Ohk=
+X-Received: by 2002:adf:de90:: with SMTP id w16mr655540wrl.217.1562810055423; 
+ Wed, 10 Jul 2019 18:54:15 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190527114203.2762-1-eric.auger@redhat.com>
-In-Reply-To: <20190527114203.2762-1-eric.auger@redhat.com>
-From: Zhangfei Gao <zhangfei.gao@gmail.com>
-Date: Thu, 11 Jul 2019 09:53:35 +0800
-Message-ID: <CAMj5BkgsJxKY89hURnf3dp2GE0quLr-NOPtQsYFQjOPEx6=Cqw@mail.gmail.com>
-To: Eric Auger <eric.auger@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+References: <1562781026-27570-1-git-send-email-chihmin.chao@sifive.com>
+ <CAKmqyKMHxX6dhopB8fxH31HGAQ3y-EvL+09jNvp3xMS-dxirQA@mail.gmail.com>
+In-Reply-To: <CAKmqyKMHxX6dhopB8fxH31HGAQ3y-EvL+09jNvp3xMS-dxirQA@mail.gmail.com>
+From: Chih-Min Chao <chihmin.chao@sifive.com>
+Date: Thu, 11 Jul 2019 09:54:04 +0800
+Message-ID: <CAEiOBXUZ51h165GMEJEyDhToD2op7Z6S86B+Wnt9taZ3Q2iGfA@mail.gmail.com>
+To: Alistair Francis <alistair23@gmail.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::d43
-Subject: Re: [Qemu-devel] [RFC v4 00/27] vSMMUv3/pSMMUv3 2 stage VFIO
- integration
+X-Received-From: 2a00:1450:4864:20::442
+Content-Type: text/plain; charset="UTF-8"
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] [PATCH] tests/boot_linux_console: add a test for
+ riscv64 + virt
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,69 +89,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, drjones@redhat.com,
- yi.l.liu@intel.com, "Michael S. Tsirkin" <mst@redhat.com>,
- jean-philippe.brucker@arm.com, zhangfei.gao@foxmail.com, qemu-devel@nongnu.org,
- peterx@redhat.com, alex.williamson@redhat.com, qemu-arm@nongnu.org,
- vincent.stehle@arm.com, eric.auger.pro@gmail.com
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Caio Carrara <ccarrara@redhat.com>, Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, May 27, 2019 at 7:44 PM Eric Auger <eric.auger@redhat.com> wrote:
+On Thu, Jul 11, 2019 at 2:53 AM Alistair Francis <alistair23@gmail.com>
+wrote:
+
+> On Wed, Jul 10, 2019 at 10:51 AM Chih-Min Chao <chihmin.chao@sifive.com>
+> wrote:
+> >
+> > Similar to the mips + malta test, it boots a Linux kernel on a virt
+> > board and verify the serial is working.  Also, it relies on the serial
+> > device set by the machine itself.
+> >
+> > If riscv64 is a target being built, "make check-acceptance" will
+> > automatically include this test by the use of the "arch:riscv64" tags.
+> >
+> > Alternatively, this test can be run using:
+> >
+> >   $ avocado run -t arch:riscv64 tests/acceptance
+> >
+> > Signed-off-by: Chih-Min Chao <chihmin.chao@sifive.com>
 >
-> Up to now vSMMUv3 has not been integrated with VFIO. VFIO
-> integration requires to program the physical IOMMU consistently
-> with the guest mappings. However, as opposed to VTD, SMMUv3 has
-> no "Caching Mode" which allows easy trapping of guest mappings.
-> This means the vSMMUV3 cannot use the same VFIO integration as VTD.
+> Awesome! Thanks for the test case. This will help a lot with RISC-V
+> regressions in QEMU.
 >
-> However SMMUv3 has 2 translation stages. This was devised with
-> virtualization use case in mind where stage 1 is "owned" by the
-> guest whereas the host uses stage 2 for VM isolation.
+> > ---
+> >  tests/acceptance/boot_linux_console.py | 40
+> ++++++++++++++++++++++++++++++++++
+> >  1 file changed, 40 insertions(+)
+> >
+> > diff --git a/tests/acceptance/boot_linux_console.py
+> b/tests/acceptance/boot_linux_console.py
+> > index 3215950..bbc6b06 100644
+> > --- a/tests/acceptance/boot_linux_console.py
+> > +++ b/tests/acceptance/boot_linux_console.py
+> > @@ -354,3 +354,43 @@ class BootLinuxConsole(Test):
+> >          self.vm.launch()
+> >          console_pattern = 'Kernel command line: %s' %
+> kernel_command_line
+> >          self.wait_for_console_pattern(console_pattern)
+> > +
+> > +    def test_riscv64_virt(self):
+> > +        """
+> > +        :avocado: tags=arch:riscv64
+> > +        :avocado: tags=machine:virt
+> > +        """
+> > +
+> > +        kernel_url = ('https://github.com/chihminchao/test-binary/raw/'
 >
-> This series sets up this nested translation stage. It only works
-> if there is one physical SMMUv3 used along with QEMU vSMMUv3 (in
-> other words, it does not work if there is a physical SMMUv2).
->
-> The series uses a new kernel user API [1], still under definition.
->
-> - We force the host to use stage 2 instead of stage 1, when we
->   detect a vSMMUV3 is behind a VFIO device. For a VFIO device
->   without any virtual IOMMU, we still use stage 1 as many existing
->   SMMUs expect this behavior.
-> - We introduce new IOTLB "config" notifiers, requested to notify
->   changes in the config of a given iommu memory region. So now
->   we have notifiers for IOTLB changes and config changes.
-> - vSMMUv3 calls config notifiers when STE (Stream Table Entries)
->   are updated by the guest.
-> - We implement a specific UNMAP notifier that conveys guest
->   IOTLB invalidations to the host
-> - We implement a new MAP notifiers only used for MSI IOVAs so
->   that the host can build a nested stage translation for MSI IOVAs
-> - As the legacy MAP notifier is not called anymore, we must make
->   sure stage 2 mappings are set. This is achieved through another
->   memory listener.
-> - Physical SMMUs faults are reported to the guest via en eventfd
->   mechanism and reinjected into this latter.
->
-> Note: The first patch is a code cleanup and was sent separately.
->
-> Best Regards
->
-> Eric
->
-> This series can be found at:
-> https://github.com/eauger/qemu/tree/v4.0.0-2stage-rfcv4
->
-> Compatible with kernel series:
-> [PATCH v8 00/29] SMMUv3 Nested Stage Setup
-> (https://lkml.org/lkml/2019/5/26/95)
+> These images need to be built with a standard build flow. Having them
+> built from SiFive's custom scripts will make debugging problems in the
+> future impossible. I'm also a little worried here about GPL
+> violations, I'm not sure if it's enough to just point to a script SHA
+> to meet GPL source disclosure. I know companies have huge headaches
+> meeting GPL requirements so this seems too easy.
 >
 
-Have tested vfio mode in qemu on arm64 platform.
+   I am not very familiar with this kind of binary and source license
+conflict.
+   Is it ok if I write a simple script with BSD license to build  kernel
+and image from sifive's linux/buildroot repo and commit the script to my
+test-binary repo ?
 
-Tested-by: Zhangfei Gao <zhangfei.gao@linaro.org>
-qemu: https://github.com/eauger/qemu/tree/v4.0.0-2stage-rfcv4
-kernel: https://github.com/eauger/linux/tree/v5.2-rc1-2stage-v8
+>
+> > +
+> '0b7787305d9e40815c05a805266cc74ff356239e/qemu/riscv64/'
+> > +                      'bbl_w_kernel.gz')
+>
+> Don't use BBL, most people use OpenSBI now which is what we should be
+> testing with.
+>
+   I will try to move to OpenSBI in next version. My environment is based
+freedom-u-sdk and It still relays  on BBL. So ..:P
 
+>
+> > +        kernel_hash = 'c7f6cc7967975ad42dc61ee0535db01c9cbd0968'
+> > +        kernel_path_gz = self.fetch_asset(kernel_url,
+> asset_hash=kernel_hash)
+> > +        kernel_path = self.workdir + "bbl_w_kernel"
+> > +
+> > +        with gzip.open(kernel_path_gz, 'rb') as f_in:
+> > +            with open(kernel_path, 'wb') as f_out:
+> > +                shutil.copyfileobj(f_in, f_out)
+> > +
+> > +        initrd_url = ('https://github.com/groeck/linux-build-test/raw/'
+> > +                      '8584a59ed9e5eb5ee7ca91f6d74bbb06619205b8/rootfs/'
+> > +                      'riscv64/rootfs.cpio.gz')
+>
+> Same comment about build tools.
+>
+>
+> Alistair
+>
+>     Got it
+
+> > +        initrd_hash = 'f4867d263754961b6f626cdcdc0cb334c47e3b49'
+> > +        initrd_path = self.fetch_asset(initrd_url,
+> asset_hash=initrd_hash)
+> > +
+> > +        self.vm.set_machine('virt')
+> > +        self.vm.set_console()
+> > +        kernel_command_line = (self.KERNEL_COMMON_COMMAND_LINE
+> > +                               + 'console=ttyS0 noreboot')
+> > +        self.vm.add_args('-kernel', kernel_path,
+> > +                         '-initrd', initrd_path,
+> > +                         '-append', kernel_command_line)
+> > +        self.vm.launch()
+> > +        self.wait_for_console_pattern('Boot successful.')
+> > +
+> > +        self.exec_command_and_wait_for_pattern('cat /proc/cpuinfo',
+> > +                                               'isa')
+> > +        self.exec_command_and_wait_for_pattern('uname -a',
+> > +                                               'sifive')
+> > +        self.exec_command_and_wait_for_pattern('reboot',
+> > +                                               'reboot: Restarting
+> system')
+> > --
+> > 2.7.4
+> >
+> >
+>
