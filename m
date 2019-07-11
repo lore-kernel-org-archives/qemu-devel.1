@@ -2,61 +2,63 @@ Return-Path: <SRS0=FHOf=VI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9528DC742A2
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 18:06:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8AA7C742A2
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 18:06:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6CD0920863
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 18:06:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6CD0920863
+	by mail.kernel.org (Postfix) with ESMTPS id 8BA2420863
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 18:06:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8BA2420863
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43948 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44504 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlcwz-0002Zb-L9
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 13:33:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34817)
+	id 1hldSx-0002zR-N6
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 14:06:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46721)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <eric.auger@redhat.com>) id 1hlcv7-0004hb-Mv
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 13:31:50 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1hldSo-0002ZV-5N
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 14:06:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1hlcv5-00045k-JY
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 13:31:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44728)
+ (envelope-from <dgilbert@redhat.com>) id 1hldSm-0006IF-Vs
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 14:06:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53486)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1hlcuu-0003rj-9V; Thu, 11 Jul 2019 13:31:37 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hldSm-0006HC-QM
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 14:06:36 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 771D23082B6D;
- Thu, 11 Jul 2019 17:31:35 +0000 (UTC)
-Received: from laptop.redhat.com (ovpn-116-46.ams2.redhat.com [10.36.116.46])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 858F25C1B4;
- Thu, 11 Jul 2019 17:31:26 +0000 (UTC)
-From: Eric Auger <eric.auger@redhat.com>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org,
- qemu-arm@nongnu.org, peter.maydell@linaro.org
-Date: Thu, 11 Jul 2019 19:28:35 +0200
-Message-Id: <20190711172845.31035-20-eric.auger@redhat.com>
-In-Reply-To: <20190711172845.31035-1-eric.auger@redhat.com>
-References: <20190711172845.31035-1-eric.auger@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id D300230842AF;
+ Thu, 11 Jul 2019 18:06:35 +0000 (UTC)
+Received: from work-vm (unknown [10.36.118.40])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 44D5860606;
+ Thu, 11 Jul 2019 18:06:33 +0000 (UTC)
+Date: Thu, 11 Jul 2019 19:06:31 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: "Singh, Brijesh" <brijesh.singh@amd.com>
+Message-ID: <20190711180631.GT3971@work-vm>
+References: <20190710202219.25939-1-brijesh.singh@amd.com>
+ <20190710202219.25939-6-brijesh.singh@amd.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190710202219.25939-6-brijesh.singh@amd.com>
+User-Agent: Mutt/1.12.0 (2019-05-25)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Thu, 11 Jul 2019 17:31:35 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ (mx1.redhat.com [10.5.110.40]); Thu, 11 Jul 2019 18:06:35 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [RFC v4 19/29] vfio: Helper to get IRQ info including
- capabilities
+Subject: Re: [Qemu-devel] [PATCH v2 05/13] doc: update AMD SEV API spec web
+ link
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,203 +70,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: drjones@redhat.com, yi.l.liu@intel.com, mst@redhat.com,
- jean-philippe.brucker@arm.com, zhangfei.gao@foxmail.com, peterx@redhat.com,
- alex.williamson@redhat.com, vincent.stehle@arm.com
+Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>, "Lendacky,
+ Thomas" <Thomas.Lendacky@amd.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "ehabkost@redhat.com" <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-As done for vfio regions, add helpers to retrieve irq info
-including their optional capabilities.
+* Singh, Brijesh (brijesh.singh@amd.com) wrote:
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> ---
+>  docs/amd-memory-encryption.txt | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/docs/amd-memory-encryption.txt b/docs/amd-memory-encryption.txt
+> index 43bf3ee6a5..abb9a976f5 100644
+> --- a/docs/amd-memory-encryption.txt
+> +++ b/docs/amd-memory-encryption.txt
+> @@ -98,7 +98,7 @@ AMD Memory Encryption whitepaper:
+>  http://amd-dev.wpengine.netdna-cdn.com/wordpress/media/2013/12/AMD_Memory_Encryption_Whitepaper_v7-Public.pdf
+>  
+>  Secure Encrypted Virtualization Key Management:
+> -[1] http://support.amd.com/TechDocs/55766_SEV-KM API_Specification.pdf
+> +[1] https://developer.amd.com/sev/ (Secure Encrypted Virtualization API)
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
----
- hw/vfio/common.c              | 97 +++++++++++++++++++++++++++++++++++
- hw/vfio/trace-events          |  1 +
- include/hw/vfio/vfio-common.h |  7 +++
- 3 files changed, 105 insertions(+)
+No; that reference [1] is used a few lines hire up for:
 
-diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index 4bbce6a43a..8a2d201058 100644
---- a/hw/vfio/common.c
-+++ b/hw/vfio/common.c
-@@ -1007,6 +1007,25 @@ vfio_get_region_info_cap(struct vfio_region_info *=
-info, uint16_t id)
-     return NULL;
- }
-=20
-+struct vfio_info_cap_header *
-+vfio_get_irq_info_cap(struct vfio_irq_info *info, uint16_t id)
-+{
-+    struct vfio_info_cap_header *hdr;
-+    void *ptr =3D info;
-+
-+    if (!(info->flags & VFIO_IRQ_INFO_FLAG_CAPS)) {
-+        return NULL;
-+    }
-+
-+    for (hdr =3D ptr + info->cap_offset; hdr !=3D ptr; hdr =3D ptr + hdr=
-->next) {
-+        if (hdr->id =3D=3D id) {
-+            return hdr;
-+        }
-+    }
-+
-+    return NULL;
-+}
-+
- static int vfio_setup_region_sparse_mmaps(VFIORegion *region,
-                                           struct vfio_region_info *info)
- {
-@@ -1833,6 +1852,33 @@ retry:
-     return 0;
- }
-=20
-+int vfio_get_irq_info(VFIODevice *vbasedev, int index,
-+                      struct vfio_irq_info **info)
-+{
-+    size_t argsz =3D sizeof(struct vfio_irq_info);
-+
-+    *info =3D g_malloc0(argsz);
-+
-+    (*info)->index =3D index;
-+retry:
-+    (*info)->argsz =3D argsz;
-+
-+    if (ioctl(vbasedev->fd, VFIO_DEVICE_GET_IRQ_INFO, *info)) {
-+        g_free(*info);
-+        *info =3D NULL;
-+        return -errno;
-+    }
-+
-+    if ((*info)->argsz > argsz) {
-+        argsz =3D (*info)->argsz;
-+        *info =3D g_realloc(*info, argsz);
-+
-+        goto retry;
-+    }
-+
-+    return 0;
-+}
-+
- int vfio_get_dev_region_info(VFIODevice *vbasedev, uint32_t type,
-                              uint32_t subtype, struct vfio_region_info *=
-*info)
- {
-@@ -1868,6 +1914,42 @@ int vfio_get_dev_region_info(VFIODevice *vbasedev,=
- uint32_t type,
-     return -ENODEV;
- }
-=20
-+int vfio_get_dev_irq_info(VFIODevice *vbasedev, uint32_t type,
-+                          uint32_t subtype, struct vfio_irq_info **info)
-+{
-+    int i;
-+
-+    for (i =3D 0; i < vbasedev->num_irqs; i++) {
-+        struct vfio_info_cap_header *hdr;
-+        struct vfio_irq_info_cap_type *cap_type;
-+
-+        if (vfio_get_irq_info(vbasedev, i, info)) {
-+            continue;
-+        }
-+
-+        hdr =3D vfio_get_irq_info_cap(*info, VFIO_IRQ_INFO_CAP_TYPE);
-+        if (!hdr) {
-+            g_free(*info);
-+            continue;
-+        }
-+
-+        cap_type =3D container_of(hdr, struct vfio_irq_info_cap_type, he=
-ader);
-+
-+        trace_vfio_get_dev_irq(vbasedev->name, i,
-+                               cap_type->type, cap_type->subtype);
-+
-+        if (cap_type->type =3D=3D type && cap_type->subtype =3D=3D subty=
-pe) {
-+            return 0;
-+        }
-+
-+        g_free(*info);
-+    }
-+
-+    *info =3D NULL;
-+    return -ENODEV;
-+}
-+
-+
- bool vfio_has_region_cap(VFIODevice *vbasedev, int region, uint16_t cap_=
-type)
- {
-     struct vfio_region_info *info =3D NULL;
-@@ -1883,6 +1965,21 @@ bool vfio_has_region_cap(VFIODevice *vbasedev, int=
- region, uint16_t cap_type)
-     return ret;
- }
-=20
-+bool vfio_has_irq_cap(VFIODevice *vbasedev, int region, uint16_t cap_typ=
-e)
-+{
-+    struct vfio_region_info *info =3D NULL;
-+    bool ret =3D false;
-+
-+    if (!vfio_get_region_info(vbasedev, region, &info)) {
-+        if (vfio_get_region_info_cap(info, cap_type)) {
-+            ret =3D true;
-+        }
-+        g_free(info);
-+    }
-+
-+    return ret;
-+}
-+
- /*
-  * Interfaces for IBM EEH (Enhanced Error Handling)
-  */
-diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
-index 5de97a8882..c04a8c12d8 100644
---- a/hw/vfio/trace-events
-+++ b/hw/vfio/trace-events
-@@ -114,6 +114,7 @@ vfio_region_mmaps_set_enabled(const char *name, bool =
-enabled) "Region %s mmaps e
- vfio_region_sparse_mmap_header(const char *name, int index, int nr_areas=
-) "Device %s region %d: %d sparse mmap entries"
- vfio_region_sparse_mmap_entry(int i, unsigned long start, unsigned long =
-end) "sparse entry %d [0x%lx - 0x%lx]"
- vfio_get_dev_region(const char *name, int index, uint32_t type, uint32_t=
- subtype) "%s index %d, %08x/%0x8"
-+vfio_get_dev_irq(const char *name, int index, uint32_t type, uint32_t su=
-btype) "%s index %d, %08x/%0x8"
- vfio_dma_unmap_overflow_workaround(void) ""
- vfio_iommu_addr_inv_iotlb(int asid, uint64_t addr, uint64_t size, uint64=
-_t nb_granules, bool leaf) "nested IOTLB invalidate asid=3D%d, addr=3D0x%=
-"PRIx64" granule_size=3D0x%"PRIx64" nb_granules=3D0x%"PRIx64" leaf=3D%d"
- vfio_iommu_asid_inv_iotlb(int asid) "nested IOTLB invalidate asid=3D%d"
-diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.=
-h
-index a88b4dd986..79d48df351 100644
---- a/include/hw/vfio/vfio-common.h
-+++ b/include/hw/vfio/vfio-common.h
-@@ -200,6 +200,13 @@ int vfio_get_dev_region_info(VFIODevice *vbasedev, u=
-int32_t type,
- bool vfio_has_region_cap(VFIODevice *vbasedev, int region, uint16_t cap_=
-type);
- struct vfio_info_cap_header *
- vfio_get_region_info_cap(struct vfio_region_info *info, uint16_t id);
-+int vfio_get_irq_info(VFIODevice *vbasedev, int index,
-+                      struct vfio_irq_info **info);
-+int vfio_get_dev_irq_info(VFIODevice *vbasedev, uint32_t type,
-+                          uint32_t subtype, struct vfio_irq_info **info)=
-;
-+bool vfio_has_irq_cap(VFIODevice *vbasedev, int irq, uint16_t cap_type);
-+struct vfio_info_cap_header *
-+vfio_get_irq_info_cap(struct vfio_irq_info *info, uint16_t id);
- #endif
- extern const MemoryListener vfio_prereg_listener;
-=20
---=20
-2.20.1
+See SEV KM API Spec [1] 'Launching a guest' usage flow (Appendix A) for the
+complete flow chart.
 
+
+so that needs fixing up to actually point to that flowchart or
+equivalent.
+
+That site is useful to include, but I guess it also needs a pointer
+to the Volume2 section 15.34 or the like.
+
+Dave
+
+
+>  KVM Forum slides:
+>  http://www.linux-kvm.org/images/7/74/02x08A-Thomas_Lendacky-AMDs_Virtualizatoin_Memory_Encryption_Technology.pdf
+> -- 
+> 2.17.1
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
