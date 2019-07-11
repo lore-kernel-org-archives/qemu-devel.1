@@ -2,89 +2,78 @@ Return-Path: <SRS0=FHOf=VI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 653FAC74A35
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 13:44:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB405C74A35
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 13:46:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3B19E21019
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 13:44:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B19E21019
+	by mail.kernel.org (Postfix) with ESMTPS id C6F9321019
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 13:46:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C6F9321019
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41892 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41912 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlZNK-0007ek-Ia
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 09:44:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47747)
+	id 1hlZP8-0002dC-PL
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 09:46:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48182)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hlZMk-0006sD-EE
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 09:44:07 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1hlZNs-0008Pp-L2
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 09:45:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hlZMi-0000Wr-Qr
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 09:44:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39294)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hlZMa-0000QV-Fw; Thu, 11 Jul 2019 09:43:58 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id DE2A7307D85E;
- Thu, 11 Jul 2019 13:43:54 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.40.205.198])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B56C51001947;
- Thu, 11 Jul 2019 13:43:53 +0000 (UTC)
-To: Maxim Levitsky <mlevitsk@redhat.com>, qemu-devel@nongnu.org
-References: <096a8bcf57997c594e1d5d7ea9606029909b81fc.camel@redhat.com>
- <20190711091127.12988-1-mlevitsk@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <aab36239-5717-e918-05c9-1876d87fd7a8@redhat.com>
-Date: Thu, 11 Jul 2019 15:43:46 +0200
+ (envelope-from <pbonzini@redhat.com>) id 1hlZNr-0001zl-Kv
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 09:45:16 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:38459)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hlZNr-0001yv-DV
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 09:45:15 -0400
+Received: by mail-wr1-f65.google.com with SMTP id g17so6378783wrr.5
+ for <qemu-devel@nongnu.org>; Thu, 11 Jul 2019 06:45:15 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=tNB+Cdder5uir4F/Y1o1Nv0qZI/Q9BfOtg7q5GBmh1s=;
+ b=XYiaVZsdY1ReO5SyVt/9CddTSXOGIXNf2F/kc4Dy6wFssGZDsIsEl+APzivBTH63Sc
+ 6PS+/NBfIyN9Jk9/y3kusBZsXUVv0Y6tI9twsR/HqSfBJYZagrHk0lW2zq8f0sdEC1n1
+ AEsbFzi91HdW9i9hnd5AgZJeNO3CGcCqQ/6F0bAz+KwwvIn7OB8x6lX77yl5pa9PYGjZ
+ ti+VfMcyQmFNgFb5alYPfA+nii6WQIp7Qa7sNfDPpYyzTRl3zwgHUmZlXnLt0lr2zdUs
+ 3UveZzpVyeppXU8Z5d+Adia1T1sWh8eWo/a7QcEzLr48ApgaxyBc0Y/u4llG9e+n07NG
+ 2EVw==
+X-Gm-Message-State: APjAAAWR+iOTCTvD4gFCP3rxm0wg/fgT7I0WLUzQJ0xbPgkgRIoXGYi2
+ t3sg0UtE5zlJffOPDS0niTSWrA==
+X-Google-Smtp-Source: APXvYqzFyb+Jy/hSvo8JhEg2qgu6yKRmj3xzahjZ/U2b9GBadqIjUPYWPxzHnqcBuew+Nte86S5XzA==
+X-Received: by 2002:a5d:55c2:: with SMTP id i2mr5297276wrw.96.1562852714320;
+ Thu, 11 Jul 2019 06:45:14 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:d066:6881:ec69:75ab?
+ ([2001:b07:6468:f312:d066:6881:ec69:75ab])
+ by smtp.gmail.com with ESMTPSA id y18sm5636707wmi.23.2019.07.11.06.45.13
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Thu, 11 Jul 2019 06:45:13 -0700 (PDT)
+To: Liran Alon <liran.alon@oracle.com>, qemu-devel@nongnu.org
+References: <20190705210636.3095-1-liran.alon@oracle.com>
+ <20190705210636.3095-2-liran.alon@oracle.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <805d7eb5-e171-60bb-94c2-574180f5c44c@redhat.com>
+Date: Thu, 11 Jul 2019 15:45:12 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <20190711091127.12988-1-mlevitsk@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="SzKMKSXNVjAzTtaC23C4FhbpxaYrQiL1Y"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.48]); Thu, 11 Jul 2019 13:43:54 +0000 (UTC)
+In-Reply-To: <20190705210636.3095-2-liran.alon@oracle.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2] LUKS: support preallocation in qemu-img
+ [fuzzy]
+X-Received-From: 209.85.221.65
+Subject: Re: [Qemu-devel] [PATCH 1/4] target/i386: kvm: Init nested-state
+ for VMX when vCPU expose VMX
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,119 +85,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: Joao Martins <joao.m.martins@oracle.com>, ehabkost@redhat.com,
+ kvm@vger.kernel.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---SzKMKSXNVjAzTtaC23C4FhbpxaYrQiL1Y
-Content-Type: multipart/mixed; boundary="iz0BN6zH8ALR4Ij9QZkJuYpfEwzaYXC7f";
- protected-headers="v1"
-From: Max Reitz <mreitz@redhat.com>
-To: Maxim Levitsky <mlevitsk@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Message-ID: <aab36239-5717-e918-05c9-1876d87fd7a8@redhat.com>
-Subject: Re: [PATCH v2] LUKS: support preallocation in qemu-img
-References: <096a8bcf57997c594e1d5d7ea9606029909b81fc.camel@redhat.com>
- <20190711091127.12988-1-mlevitsk@redhat.com>
-In-Reply-To: <20190711091127.12988-1-mlevitsk@redhat.com>
+On 05/07/19 23:06, Liran Alon wrote:
+> -        if (IS_INTEL_CPU(env)) {
+> +        if (cpu_has_vmx(env)) {
+>              struct kvm_vmx_nested_state_hdr *vmx_hdr =
+>                  &env->nested_state->hdr.vmx;
+>  
 
---iz0BN6zH8ALR4Ij9QZkJuYpfEwzaYXC7f
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+I am not sure this is enough, because kvm_get_nested_state and kvm_put_nested_state would run anyway later.  If we want to cull them completely for a non-VMX virtual machine, I'd do something like this:
 
-On 11.07.19 11:11, Maxim Levitsky wrote:
-> preallocation=3Doff and preallocation=3Dmetadata
-> both allocate luks header only, and preallocation=3Dfalloc/full
-> is passed to underlying file.
->=20
-> Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=3D1534951
->=20
-> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> ---
->  block/crypto.c | 25 ++++++++++++++++++++++---
->  1 file changed, 22 insertions(+), 3 deletions(-)
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index 5035092..73ab102 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -1748,14 +1748,13 @@ int kvm_arch_init_vcpu(CPUState *cs)
+     max_nested_state_len = kvm_max_nested_state_length();
+     if (max_nested_state_len > 0) {
+         assert(max_nested_state_len >= offsetof(struct kvm_nested_state, data));
+-        env->nested_state = g_malloc0(max_nested_state_len);
+ 
+-        env->nested_state->size = max_nested_state_len;
+-
+-        if (IS_INTEL_CPU(env)) {
++        if (cpu_has_vmx(env)) {
+             struct kvm_vmx_nested_state_hdr *vmx_hdr =
+                 &env->nested_state->hdr.vmx;
+ 
++            env->nested_state = g_malloc0(max_nested_state_len);
++            env->nested_state->size = max_nested_state_len;
+             env->nested_state->format = KVM_STATE_NESTED_FORMAT_VMX;
+             vmx_hdr->vmxon_pa = -1ull;
+             vmx_hdr->vmcs12_pa = -1ull;
+@@ -3682,7 +3681,7 @@ static int kvm_put_nested_state(X86CPU *cpu)
+     CPUX86State *env = &cpu->env;
+     int max_nested_state_len = kvm_max_nested_state_length();
+ 
+-    if (max_nested_state_len <= 0) {
++    if (!env->nested_state) {
+         return 0;
+     }
+ 
+@@ -3696,7 +3695,7 @@ static int kvm_get_nested_state(X86CPU *cpu)
+     int max_nested_state_len = kvm_max_nested_state_length();
+     int ret;
+ 
+-    if (max_nested_state_len <= 0) {
++    if (!env->nested_state) {
+         return 0;
+     }
+ 
 
-FWIW, do you see the implementation of block_crypto_co_truncate()?
-Like, how it just passes preallocation requests through to the
-underlying layer?  How I said it shouldn=E2=80=99t be done?
+What do you think?  (As a side effect, this completely disables
+KVM_GET/SET_NESTED_STATE on SVM, which I think is safer since it
+will have to save at least the NPT root and the paging mode.  So we
+could remove vmstate_svm_nested_state as well).
 
-Yes, that was me, in commit 7ea37c30660.
-
-So, er, yeah.
-
-> diff --git a/block/crypto.c b/block/crypto.c
-> index 8237424ae6..cbc291301e 100644
-> --- a/block/crypto.c
-> +++ b/block/crypto.c
-[...]
-
-> @@ -534,12 +537,28 @@ static int coroutine_fn block_crypto_co_create_op=
-ts_luks(const char *filename,
->      QCryptoBlockCreateOptions *create_opts =3D NULL;
->      BlockDriverState *bs =3D NULL;
->      QDict *cryptoopts;
-> +    PreallocMode prealloc;
-> +    char *buf =3D NULL;
->      int64_t size;
->      int ret;
-> +    Error *local_err =3D NULL;
-> =20
->      /* Parse options */
->      size =3D qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0);
-> =20
-> +    buf =3D qemu_opt_get_del(opts, BLOCK_OPT_PREALLOC);
-> +    prealloc =3D qapi_enum_parse(&PreallocMode_lookup, buf,
-> +                                   PREALLOC_MODE_OFF, &local_err);
-
-Please align such lines to the opening parenthesis.
-
-> +    g_free(buf);
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
-> +        return -EINVAL;
-> +    }
-> +
-> +    if (prealloc =3D=3D PREALLOC_MODE_METADATA) {
-> +        prealloc  =3D PREALLOC_MODE_OFF;
-
-There is one space too many here.
-
-> +    }
-> +
-
-I think you also need to add a @preallocation parameter to
-BlockdevCreateOptionsLUKS and handle it in block_crypto_co_create_luks().=
-
-
-Max
-
->      cryptoopts =3D qemu_opts_to_qdict_filtered(opts, NULL,
->                                               &block_crypto_create_opts=
-_luks,
->                                               true);
-
-
---iz0BN6zH8ALR4Ij9QZkJuYpfEwzaYXC7f--
-
---SzKMKSXNVjAzTtaC23C4FhbpxaYrQiL1Y
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0nPRMACgkQ9AfbAGHV
-z0B6owf6AqW8ZW73LeHlZegrei/MuH8ji+0dEW/Hl7T4nQ7455DjLBM+mw+Bd71P
-F4KN0GJdwEZJAUBx9FQAnBY/zWJrzS0Lvj/38QEvvEcOqD40xzVHfhxdZjoXpt9V
-MAbYvOWsGjBgvZ1MVxyScXTpCUMQh8hn8E9SLU7VdwVhNvdmIhexE4op1znwab1K
-L1UKAfDe3MnWkxfpG9wZ7PhcdDHRGFGpjErHUwQcjC64OoASE/kqXr8cj28DKTsL
-G8Nyqi+TxdQ1I28o+wwwUykIVjalRTVKksE6OVsyjTSFUNddw6u2SkclQTZghrGA
-Z9fY8WcFe4kw+fHzEfN9g3pGf9A2LQ==
-=I6bH
------END PGP SIGNATURE-----
-
---SzKMKSXNVjAzTtaC23C4FhbpxaYrQiL1Y--
+Paolo
 
