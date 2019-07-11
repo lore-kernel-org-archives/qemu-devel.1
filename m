@@ -2,63 +2,88 @@ Return-Path: <SRS0=FHOf=VI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E089C74A35
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 13:05:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84C11C74A52
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 13:07:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1752121019
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 13:05:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1752121019
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4B0DB21019
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 13:07:06 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jOW1N5Hu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B0DB21019
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41612 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41618 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlYlg-0007lM-E2
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 09:05:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34584)
+	id 1hlYmv-0000JA-Ln
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 09:07:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35255)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <berrange@redhat.com>) id 1hlYjs-0005Qw-3X
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 09:03:57 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hlYls-00088p-Nm
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 09:06:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1hlYjq-00017w-Sb
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 09:03:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55664)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hlYjq-00017U-KL
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 09:03:54 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E8B2FC047B7A;
- Thu, 11 Jul 2019 13:03:53 +0000 (UTC)
-Received: from redhat.com (unknown [10.42.17.95])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3C8C15C221;
- Thu, 11 Jul 2019 13:03:53 +0000 (UTC)
-Date: Thu, 11 Jul 2019 14:03:51 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20190711130351.GK11930@redhat.com>
-References: <20190711052608.GA2619@arch>
- <20190711121817.GB5846@work-vm>
+ (envelope-from <alex.bennee@linaro.org>) id 1hlYlr-00035u-Ov
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 09:06:00 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:36459)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1hlYlr-00034G-FY
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 09:05:59 -0400
+Received: by mail-wr1-x443.google.com with SMTP id n4so6244586wrs.3
+ for <qemu-devel@nongnu.org>; Thu, 11 Jul 2019 06:05:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=pMptNYx7j6lTFXnWKRgMhwTkAsBoGv6gfvDFvlHI1ec=;
+ b=jOW1N5HuTFyICWIkjAm6uCFt8ceJ63UySq73+F5KcNO8U+NcYTizmCGfIj8wlLX4hw
+ WOkQd3mWVfnym9ic+O83Y8RUlTWVaXkMkiQywLm6Wd8PY8wl1v3N/dsm5APo516zk2/m
+ qdsrPt5jPNBHtKH9PPxCWt6zC14a3ZJmTl2GqGg9cEXnETKgHLsX4au19GcveL4HAP3x
+ Ql43TW7l9R9sr2XZopGn2oO7/jwjFVdCtwrrEL7Jolm/c77xR64vOoxBNPvrb4iTKpIV
+ iZ/rWhYWbFfR7K75mmeIMbQoXTzqde5ViwCae/1Huz8/gkjBz5nOuWViOPGWhKiKvpMe
+ W/Yw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=pMptNYx7j6lTFXnWKRgMhwTkAsBoGv6gfvDFvlHI1ec=;
+ b=HNN4umODUwAvs65ZguJHOzOmSgJn5Iqrd8ul+9k8q3a+f0Ie80FVAI2sFxCCutJhIW
+ TDTBF2KqNqi96uGZtOuSYbu/iU3j+YHM064l+5hVEZKj5NHR7lzFzU2V6TOlD8ghiiW+
+ pdrhYG66vdUL9X7bMVIxgcs40ARjC8DiXYS3hqGOY2/TUIOBi/nYRI/1cwkX1vu73z79
+ kvFtZHOrLPj9Z4l7O6K/USa2gHauKyn9RvOUGGHWhJ83BUnbpJNgNq6K3r3K51JmJ/zG
+ Q4FAL7uEQiHdqcr6RK5UfLwwHzOJ5fFHj5Yr2ljsKg2vox0UMUktG5LLyN/VTcHKjneT
+ 8klg==
+X-Gm-Message-State: APjAAAUmNhTy01UeaD3rWGdhHPncyIbRaEQ/1wRmNH1vG00Hkbdx6BZK
+ mBpFAXIT3xC9NO1lCsAC3lRCCy/E/X4=
+X-Google-Smtp-Source: APXvYqyfmjdF8MQ/jEVMSDYSTlfDdnrOzqaZm6nU+fT1osbmHH3xdcmChw8xeJkQt3LmY0L9IkvHHw==
+X-Received: by 2002:a5d:498f:: with SMTP id r15mr4945718wrq.353.1562850358048; 
+ Thu, 11 Jul 2019 06:05:58 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+ by smtp.gmail.com with ESMTPSA id g17sm4137226wrm.7.2019.07.11.06.05.57
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Thu, 11 Jul 2019 06:05:57 -0700 (PDT)
+Received: from zen.linaroharston. (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 21B181FF87;
+ Thu, 11 Jul 2019 14:05:57 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Date: Thu, 11 Jul 2019 14:05:46 +0100
+Message-Id: <20190711130546.18578-1-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190711121817.GB5846@work-vm>
-User-Agent: Mutt/1.12.0 (2019-05-25)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Thu, 11 Jul 2019 13:03:53 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] qemu compilation failure with nettle 3.5.1
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::443
+Subject: [Qemu-devel] [PATCH for 4.1?] includes: remove stale [smp|max]_cpus
+ externs
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,60 +95,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Amol Surati <suratiamol@gmail.com>, qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Like Xu <like.xu@linux.intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jul 11, 2019 at 01:18:17PM +0100, Dr. David Alan Gilbert wrote:
-> Copying in Daniel
->=20
-> * Amol Surati (suratiamol@gmail.com) wrote:
-> > Hi,
-> >=20
-> > The qemu upstream (at commit 6df2cdf44a at the moment) fails to compi=
-le
-> > with nettle 3.5.1. It seems that Nettle has deprecated a few parts of
-> > its API.
-> >=20
-> > A workaround is to provide --disable-nettle during qemu configuration=
-.
-> >=20
-> > A portion of the error log:
-> >=20
-> > error: =E2=80=98nettle_aes_encrypt=E2=80=99 is deprecated
-> > error: =E2=80=98nettle_aes_decrypt=E2=80=99 is deprecated
-> > error: =E2=80=98nettle_aes_encrypt=E2=80=99 is deprecated
-> > error: =E2=80=98nettle_aes_decrypt=E2=80=99 is deprecated
-> > error: =E2=80=98nettle_aes_set_encrypt_key=E2=80=99 is deprecated
-> > error: =E2=80=98nettle_aes_set_decrypt_key=E2=80=99 is deprecated
-> > error: =E2=80=98nettle_aes_set_encrypt_key=E2=80=99 is deprecated
-> > error: =E2=80=98nettle_aes_set_decrypt_key=E2=80=99 is deprecated
-> > error: =E2=80=98nettle_aes_set_encrypt_key=E2=80=99 is deprecated
-> > error: =E2=80=98nettle_aes_set_decrypt_key=E2=80=99 is deprecated
-> >=20
-> >=20
-> > The declaration of one of the functions from nettle's aes.h:
-> >=20
-> > void
-> > aes_encrypt(const struct aes_ctx *ctx,
-> >             size_t length, uint8_t *dst,
-> >             const uint8_t *src) _NETTLE_ATTRIBUTE_DEPRECATED;
+Commit a5e0b3311 removed these in favour of querying machine
+properties. Remove the extern declarations as well.
 
-Yep, I'm already working on a patch, but in the meantime you should
-use --disable-werror, as this is merely a deprecation, not any real
-functional problem.
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Cc: Like Xu <like.xu@linux.intel.com>
+---
+ include/sysemu/sysemu.h | 2 --
+ 1 file changed, 2 deletions(-)
 
+diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+index 984c439ac9..e70edf7c1c 100644
+--- a/include/sysemu/sysemu.h
++++ b/include/sysemu/sysemu.h
+@@ -103,8 +103,6 @@ extern const char *keyboard_layout;
+ extern int win2k_install_hack;
+ extern int alt_grab;
+ extern int ctrl_grab;
+-extern int smp_cpus;
+-extern unsigned int max_cpus;
+ extern int cursor_hide;
+ extern int graphic_rotate;
+ extern int no_quit;
+-- 
+2.20.1
 
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
 
