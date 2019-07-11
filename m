@@ -2,99 +2,83 @@ Return-Path: <SRS0=FHOf=VI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	FROM_EXCESS_BASE64,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D247C742A2
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 19:08:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F77DC742A2
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 19:09:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 193CA208E4
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 19:08:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 198CD208E4
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 19:09:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IDMMR2Ui"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 193CA208E4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="IcLUw76M"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 198CD208E4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44738 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44758 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hleQV-0003ZG-1g
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 15:08:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37059)
+	id 1hleRT-0004t9-Ow
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 15:09:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37312)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dirty.ice.hu@gmail.com>) id 1hleQL-0003A3-EW
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 15:08:10 -0400
+ (envelope-from <kwankhede@nvidia.com>) id 1hleR7-000436-UF
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 15:08:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dirty.ice.hu@gmail.com>) id 1hleQJ-0004Km-9C
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 15:08:09 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:45046)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <dirty.ice.hu@gmail.com>)
- id 1hleQH-0004Ed-S1
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 15:08:06 -0400
-Received: by mail-wr1-x441.google.com with SMTP id p17so7418125wrf.11
- for <qemu-devel@nongnu.org>; Thu, 11 Jul 2019 12:08:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:subject:to:cc:references:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=cIgv8NonJJLD60VFU0VJmfMgsAeSqJsqXOeW3Ay30pY=;
- b=IDMMR2UiNKRwI2bnGJHhrJ+79jPyZnhCv5LmWRaHo+Qju2NEGbkGQnM98GErqJ8t06
- ozFQDcl2C7aHe7DN6n2RzizDRhvEsoIDwBK8Cz+Ar2RMTx8oHUHDpP1ZUTzgbX4mJKwH
- G5Z2xzKMxaory5WW6dhAyuKjrdTMLgk9E3XVVA51TKpDRoKFMbvz4Sp/SArbMX+HJ4I/
- fdPubN/Z0jIoTbo3htR7/aFslnqeiUoO/FsfCw8Eq9cMaovxqcDIlnH0wtgGcyRQxvmn
- R0DQrSUnY96vORRqVO0q1CYBqMxSGpbFPLFKXh9ykzmDVpMJDYVasUtilarEycsEKMf/
- VvYA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:subject:to:cc:references:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=cIgv8NonJJLD60VFU0VJmfMgsAeSqJsqXOeW3Ay30pY=;
- b=btkcig/J1ohYqISSrj1IB8ezKe4QlCBXHBVRhCvJ7tXA7U0RGdBVKJmO0X1FBUBabq
- 4l1fOtja9NNEGwV5HRN39FnFJBdDx8Fx1BlRc6xmAmWrfHY73YiMwiXbxMRvvjEGqcX1
- SJwQ5tSSXgsd9IMkxwclRgGN+lkgkrldDxnUae9ARYbXnbulmABvoHPMproGsKa0gusi
- luE2Lp+N9w0FdqfAf1hPpCo+1Je70SyFIN54dOTERDZL2g/WG8VIEGxni0UTVCHMVLqK
- LUFbvrmXYtMi2JDhCKBp9cC+oPSNY7N1wiK6dKbsKEoa5JF2C9m4UBP0Tl/z81gt1o6b
- fVpA==
-X-Gm-Message-State: APjAAAXv3rVU2VHPuF00FEv72c5cBLbEVSKATty3e3vQULfgDQt5iDLC
- jFG/s+vsY9Y6Y/+2L6skbJ5h5/No
-X-Google-Smtp-Source: APXvYqxvULe/BNUPYUadmJewMp5Vrexcub1xyMcILsZAyCIxoBDNHLPiOu9YzM4o/n2lhsJmen/nJQ==
-X-Received: by 2002:adf:fdcc:: with SMTP id i12mr6844413wrs.88.1562872079084; 
- Thu, 11 Jul 2019 12:07:59 -0700 (PDT)
-Received: from ?IPv6:fd00:835b:d940:d4fc:1::ca?
- (2a01-036c-0113-6e3f-0001-0000-0000-00ca.pool6.digikabel.hu.
- [2a01:36c:113:6e3f:1::ca])
- by smtp.gmail.com with ESMTPSA id 32sm3833360wrh.76.2019.07.11.12.07.57
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 11 Jul 2019 12:07:58 -0700 (PDT)
-From: "=?UTF-8?B?Wm9sdMOhbiBLxZF2w6Fnw7M=?=" <dirty.ice.hu@gmail.com>
-X-Google-Original-From: =?UTF-8?B?Wm9sdMOhbiBLxZF2w6Fnw7M=?=
- <DirtY.iCE.hu@gmail.com>
-To: Markus Armbruster <armbru@redhat.com>
-References: <cover.1562695780.git.DirtY.iCE.hu@gmail.com>
- <597ee579c3d14ff6f0892ee9e1905cdb0e0990ad.1562695780.git.DirtY.iCE.hu@gmail.com>
- <87ef2yy1n4.fsf@dusky.pond.sub.org>
- <c0ada78b-6d77-936d-f059-3458ca74a156@gmail.com>
- <87bly0iqm6.fsf@dusky.pond.sub.org>
-Message-ID: <14cfeb63-0c6a-baa0-a840-054e686e170d@gmail.com>
-Date: Thu, 11 Jul 2019 21:07:56 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.9.1
+ (envelope-from <kwankhede@nvidia.com>) id 1hleR5-0005LQ-Om
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 15:08:57 -0400
+Received: from hqemgate14.nvidia.com ([216.228.121.143]:4891)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kwankhede@nvidia.com>)
+ id 1hleR5-0005FZ-Bs
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 15:08:55 -0400
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by
+ hqemgate14.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+ id <B5d27893d0000>; Thu, 11 Jul 2019 12:08:45 -0700
+Received: from hqmail.nvidia.com ([172.20.161.6])
+ by hqpgpgate101.nvidia.com (PGP Universal service);
+ Thu, 11 Jul 2019 12:08:50 -0700
+X-PGP-Universal: processed;
+ by hqpgpgate101.nvidia.com on Thu, 11 Jul 2019 12:08:50 -0700
+Received: from [10.24.71.30] (10.124.1.5) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Thu, 11 Jul
+ 2019 19:08:41 +0000
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Yan Zhao
+ <yan.y.zhao@intel.com>
+References: <1562665760-26158-1-git-send-email-kwankhede@nvidia.com>
+ <20190711025524.GB9176@joy-OptiPlex-7040> <20190711105012.GI3971@work-vm>
+ <20190711114715.GC9176@joy-OptiPlex-7040> <20190711162315.GP3971@work-vm>
+X-Nvconfidentiality: public
+From: Kirti Wankhede <kwankhede@nvidia.com>
+Message-ID: <2dd65778-8661-929d-392f-4db25cf7162b@nvidia.com>
+Date: Fri, 12 Jul 2019 00:38:31 +0530
 MIME-Version: 1.0
-In-Reply-To: <87bly0iqm6.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20190711162315.GP3971@work-vm>
+X-Originating-IP: [10.124.1.5]
+X-ClientProxiedBy: HQMAIL101.nvidia.com (172.20.187.10) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::441
-Subject: Re: [Qemu-devel] [PATCH 02/11] audio: basic support for multi
- backend audio
+Content-Transfer-Encoding: 7bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+ t=1562872125; bh=jdZy5NCY7ZBM9zeG1pyzwPn2t9ypHE8tAefyyGjSbFk=;
+ h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
+ Message-ID:Date:MIME-Version:In-Reply-To:X-Originating-IP:
+ X-ClientProxiedBy:Content-Type:Content-Language:
+ Content-Transfer-Encoding;
+ b=IcLUw76MCZTRwuhxzH+2vFBhkHBZNlG69BcbWOd+3MklRah1lzBY2/ql54xcYAugT
+ r1aEEJdN0A8UQFjSq/X/Xi37IjKZEnLARUkGOVWD9ijP8CLKZcEsJBrZR6+3IRaXgD
+ gCbrMLERr6NMKvFF1qtjD2GCG3rXf6y5z1LNBUN6DrwFFQWpCM2nslBZpWaxVTk4j8
+ WbaNk1Lbck8m4AgaYOCOLWTyrgQjiKmnh4pQGY/TBPtobiZ7L4y7aN6Pbaf4wJND0D
+ PLlE/sRx41Jm3zWUR8NWo5g7zHy51TRZH3ukFI2zyWNZeTTapxIsX/55d/yzCGYLW7
+ xdr8Gd9nspjng==
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8
+X-Received-From: 216.228.121.143
+Subject: Re: [Qemu-devel] [PATCH v7 00/13] Add migration support for VFIO
+ device
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,102 +90,277 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@alibaba-inc.com>, "Tian,
+ Kevin" <kevin.tian@intel.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
+ "cjia@nvidia.com" <cjia@nvidia.com>,
+ "eskultet@redhat.com" <eskultet@redhat.com>, "Yang,
+ Ziye" <ziye.yang@intel.com>, "cohuck@redhat.com" <cohuck@redhat.com>,
+ "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Wang, 
+ Zhi A" <zhi.a.wang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
+ "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>,
+ "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+ "eauger@redhat.com" <eauger@redhat.com>,
+ "felipe@nutanix.com" <felipe@nutanix.com>,
+ "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "Liu,
+ Changpeng" <changpeng.liu@intel.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2019-07-11 16:37, Markus Armbruster wrote:
-> "Zoltán Kővágó" <dirty.ice.hu@gmail.com> writes:
-> 
->> On 2019-07-10 06:06, Markus Armbruster wrote:
->>> "Kővágó, Zoltán" <dirty.ice.hu@gmail.com> writes:
->>>
->>>> Audio functions no longer access glob_audio_state, instead they get an
->>>> AudioState as a parameter.  This is required in order to support
->>>> multiple backends.
+
+
+On 7/11/2019 9:53 PM, Dr. David Alan Gilbert wrote:
+> * Yan Zhao (yan.y.zhao@intel.com) wrote:
+>> On Thu, Jul 11, 2019 at 06:50:12PM +0800, Dr. David Alan Gilbert wrote:
+>>> * Yan Zhao (yan.y.zhao@intel.com) wrote:
+>>>> Hi Kirti,
+>>>> There are still unaddressed comments to your patches v4.
+>>>> Would you mind addressing them?
 >>>>
->>>> glob_audio_state is also gone, and replaced with a tailq so we can store
->>>> more than one states.
+>>>> 1. should we register two migration interfaces simultaneously
+>>>> (https://lists.gnu.org/archive/html/qemu-devel/2019-06/msg04750.html)
+>>>
+>>> Please don't do this.
+>>> As far as I'm aware we currently only have one device that does that
+>>> (vmxnet3) and a patch has just been posted that fixes/removes that.
+>>>
+>>> Dave
+>>>
+>> hi Dave,
+>> Thanks for notifying this. but if we want to support postcopy in future,
+>> after device stops, what interface could we use to transfer data of
+>> device state only?
+>> for postcopy, when source device stops, we need to transfer only
+>> necessary device state to target vm before target vm starts, and we
+>> don't want to transfer device memory as we'll do that after target vm
+>> resuming.
+> 
+> Hmm ok, lets see; that's got to happen in the call to:
+>     qemu_savevm_state_complete_precopy(fb, false, false);
+> that's made from postcopy_start.
+>  (the false's are iterable_only and inactivate_disks)
+> 
+> and at that time I believe the state is POSTCOPY_ACTIVE, so in_postcopy
+> is true.
+> 
+> If you're doing postcopy, then you'll probably define a has_postcopy()
+> function, so qemu_savevm_state_complete_precopy will skip the
+> save_live_complete_precopy call from it's loop for at least two of the
+> reasons in it's big if.
+> 
+> So you're right; you need the VMSD for this to happen in the second
+> loop in qemu_savevm_state_complete_precopy.  Hmm.
+> 
+> Now, what worries me, and I don't know the answer, is how the section
+> header for the vmstate and the section header for an iteration look
+> on the stream; how are they different?
+> 
+
+I don't have way to test postcopy migration - is one of the major reason
+I had not included postcopy support in this patchset and clearly called
+out in cover letter.
+This patchset is thoroughly tested for precopy migration.
+If anyone have hardware that supports fault, then I would prefer to add
+postcopy support as incremental change later which can be tested before
+submitting.
+
+Just a suggestion, instead of using VMSD, is it possible to have some
+additional check to call save_live_complete_precopy from
+qemu_savevm_state_complete_precopy?
+
+
+>>
+>>>> 2. in each save iteration, how much data is to be saved
+>>>> (https://lists.gnu.org/archive/html/qemu-devel/2019-06/msg04683.html)
+
+> how big is the data_size ?
+> if this size is too big, it may take too much time and block others.
+
+I do had mentioned this in the comment about the structure in vfio.h
+header. data_size will be provided by vendor driver and obviously will
+not be greater that migration region size. Vendor driver should be
+responsible to keep its solution optimized.
+
+
+>>>> 3. do we need extra interface to get data for device state only
+>>>> (https://lists.gnu.org/archive/html/qemu-devel/2019-06/msg04812.html)
+
+I don't think so. Opaque Device data from vendor driver can include
+device state and device memory. Vendor driver who is managing his device
+can decide how to place data over the stream.
+
+>>>> 4. definition of dirty page copied_pfn
+>>>> (https://lists.gnu.org/archive/html/qemu-devel/2019-06/msg05592.html)
 >>>>
->>>> Signed-off-by: Kővágó, Zoltán <DirtY.iCE.hu@gmail.com>
->>>> ---
->>> [...]
->>>> diff --git a/hmp-commands.hx b/hmp-commands.hx
->>>> index bfa5681dd2..23196da3fe 100644
->>>> --- a/hmp-commands.hx
->>>> +++ b/hmp-commands.hx
->>>> @@ -819,16 +819,17 @@ ETEXI
->>>>  
->>>>      {
->>>>          .name       = "wavcapture",
->>>> -        .args_type  = "path:F,freq:i?,bits:i?,nchannels:i?",
->>>> -        .params     = "path [frequency [bits [channels]]]",
->>>> +        .args_type  = "path:F,freq:i?,bits:i?,nchannels:i?,audiodev:s?",
->>>> +        .params     = "path [frequency [bits [channels [audiodev]]]]",
->>>>          .help       = "capture audio to a wave file (default frequency=44100 bits=16 channels=2)",
->>>>          .cmd        = hmp_wavcapture,
->>>>      },
->>>>  STEXI
->>>> -@item wavcapture @var{filename} [@var{frequency} [@var{bits} [@var{channels}]]]
->>>> +@item wavcapture @var{filename} [@var{frequency} [@var{bits} [@var{channels} [@var{audiodev}]]]]
->>>>  @findex wavcapture
->>>> -Capture audio into @var{filename}. Using sample rate @var{frequency}
->>>> -bits per sample @var{bits} and number of channels @var{channels}.
->>>> +Capture audio into @var{filename} from @var{audiodev}. Using sample rate
->>>> +@var{frequency} bits per sample @var{bits} and number of channels
->>>> +@var{channels}.
->>>>  
->>>>  Defaults:
->>>>  @itemize @minus
->>>    @item Sample rate = 44100 Hz - CD quality
->>>    @item Bits = 16
->>>    @item Number of channels = 2 - Stereo
->>>    @end itemize
->>>    ETEXI
->>>
->>> Defaults for the other optional arguments are listed here.  Why not for
->>> @audiodev?
->>
->> There's no default listed because there's no default when you use the
->> -audiodev options, since there's no good default.  When you don't use
->> -audiodev, it'll use the implicitly created audiodev which doesn't have
->> a name, so it can't be specified.
-> 
-> Double-checking to avoid misunderstandings: there is a default
-> *behavior*, but no default *value*, i.e. there is no VALUE that makes
-> audiodev=VALUE give you the same behavior as no audiodev.  Correct?
 
-Yes.  If there is no audiodev=VALUE, and no -audiodev on the command
-line, use the legacy config.  If there is audiodev=VALUE and -audiodev
-id=VALUE, use that device.  Otherwise, it's an error.
+This was inline to discussion going with Alex. I addressed the concern
+there. Please check current patchset, which addresses the concerns raised.
 
-> 
->>                                    But I agree that this situation
->> should be documented somehow.
-> 
-> Yes, please.
-> 
->>>> diff --git a/qemu-options.hx b/qemu-options.hx
->>>> index 9621e934c0..0111055aa4 100644
->>>> --- a/qemu-options.hx
->>>> +++ b/qemu-options.hx
->>>> @@ -1978,6 +1978,11 @@ can help the device and guest to keep up and not lose events in case
->>>>  events are arriving in bulk.  Possible causes for the latter are flaky
->>>>  network connections, or scripts for automated testing.
->>>>  
->>>> +@item audiodev=@var{audiodev}
->>>> +
->>>> +Use the specified @var{audiodev} when the VNC client requests audio
->>>> +transmission.
->>>> +
->>>
->>> What's the default?
->>
->> It's the same story as wav_capture.
->>
->> Regards,
->> Zoltan
+>>>> Also, I'm glad to see that you updated code by following my comments below,
+>>>> but please don't forget to reply my comments next time:)
 
+I tried to reply top of threads and addressed common concerns raised in
+that. Sorry If I missed any, I'll make sure to point you to my replies
+going ahead.
+
+Thanks,
+Kirti
+
+>>>> https://lists.gnu.org/archive/html/qemu-devel/2019-06/msg05357.html
+>>>> https://lists.gnu.org/archive/html/qemu-devel/2019-06/msg06454.html
+>>>>
+>>>> Thanks
+>>>> Yan
+>>>>
+>>>> On Tue, Jul 09, 2019 at 05:49:07PM +0800, Kirti Wankhede wrote:
+>>>>> Add migration support for VFIO device
+>>>>>
+>>>>> This Patch set include patches as below:
+>>>>> - Define KABI for VFIO device for migration support.
+>>>>> - Added save and restore functions for PCI configuration space
+>>>>> - Generic migration functionality for VFIO device.
+>>>>>   * This patch set adds functionality only for PCI devices, but can be
+>>>>>     extended to other VFIO devices.
+>>>>>   * Added all the basic functions required for pre-copy, stop-and-copy and
+>>>>>     resume phases of migration.
+>>>>>   * Added state change notifier and from that notifier function, VFIO
+>>>>>     device's state changed is conveyed to VFIO device driver.
+>>>>>   * During save setup phase and resume/load setup phase, migration region
+>>>>>     is queried and is used to read/write VFIO device data.
+>>>>>   * .save_live_pending and .save_live_iterate are implemented to use QEMU's
+>>>>>     functionality of iteration during pre-copy phase.
+>>>>>   * In .save_live_complete_precopy, that is in stop-and-copy phase,
+>>>>>     iteration to read data from VFIO device driver is implemented till pending
+>>>>>     bytes returned by driver are not zero.
+>>>>>   * Added function to get dirty pages bitmap for the pages which are used by
+>>>>>     driver.
+>>>>> - Add vfio_listerner_log_sync to mark dirty pages.
+>>>>> - Make VFIO PCI device migration capable. If migration region is not provided by
+>>>>>   driver, migration is blocked.
+>>>>>
+>>>>> Below is the flow of state change for live migration where states in brackets
+>>>>> represent VM state, migration state and VFIO device state as:
+>>>>>     (VM state, MIGRATION_STATUS, VFIO_DEVICE_STATE)
+>>>>>
+>>>>> Live migration save path:
+>>>>>         QEMU normal running state
+>>>>>         (RUNNING, _NONE, _RUNNING)
+>>>>>                         |
+>>>>>     migrate_init spawns migration_thread.
+>>>>>     (RUNNING, _SETUP, _RUNNING|_SAVING)
+>>>>>     Migration thread then calls each device's .save_setup()
+>>>>>                         |
+>>>>>     (RUNNING, _ACTIVE, _RUNNING|_SAVING)
+>>>>>     If device is active, get pending bytes by .save_live_pending()
+>>>>>     if pending bytes >= threshold_size,  call save_live_iterate()
+>>>>>     Data of VFIO device for pre-copy phase is copied.
+>>>>>     Iterate till pending bytes converge and are less than threshold
+>>>>>                         |
+>>>>>     On migration completion, vCPUs stops and calls .save_live_complete_precopy
+>>>>>     for each active device. VFIO device is then transitioned in
+>>>>>      _SAVING state.
+>>>>>     (FINISH_MIGRATE, _DEVICE, _SAVING)
+>>>>>     For VFIO device, iterate in  .save_live_complete_precopy  until
+>>>>>     pending data is 0.
+>>>>>     (FINISH_MIGRATE, _DEVICE, _STOPPED)
+>>>>>                         |
+>>>>>     (FINISH_MIGRATE, _COMPLETED, STOPPED)
+>>>>>     Migraton thread schedule cleanup bottom half and exit
+>>>>>
+>>>>> Live migration resume path:
+>>>>>     Incomming migration calls .load_setup for each device
+>>>>>     (RESTORE_VM, _ACTIVE, STOPPED)
+>>>>>                         |
+>>>>>     For each device, .load_state is called for that device section data
+>>>>>                         |
+>>>>>     At the end, called .load_cleanup for each device and vCPUs are started.
+>>>>>                         |
+>>>>>         (RUNNING, _NONE, _RUNNING)
+>>>>>
+>>>>> Note that:
+>>>>> - Migration post copy is not supported.
+>>>>>
+>>>>> v6 -> v7:
+>>>>> - Fix build failures.
+>>>>>
+>>>>> v5 -> v6:
+>>>>> - Fix build failure.
+>>>>>
+>>>>> v4 -> v5:
+>>>>> - Added decriptive comment about the sequence of access of members of structure
+>>>>>   vfio_device_migration_info to be followed based on Alex's suggestion
+>>>>> - Updated get dirty pages sequence.
+>>>>> - As per Cornelia Huck's suggestion, added callbacks to VFIODeviceOps to
+>>>>>   get_object, save_config and load_config.
+>>>>> - Fixed multiple nit picks.
+>>>>> - Tested live migration with multiple vfio device assigned to a VM.
+>>>>>
+>>>>> v3 -> v4:
+>>>>> - Added one more bit for _RESUMING flag to be set explicitly.
+>>>>> - data_offset field is read-only for user space application.
+>>>>> - data_size is read for every iteration before reading data from migration, that
+>>>>>   is removed assumption that data will be till end of migration region.
+>>>>> - If vendor driver supports mappable sparsed region, map those region during
+>>>>>   setup state of save/load, similarly unmap those from cleanup routines.
+>>>>> - Handles race condition that causes data corruption in migration region during
+>>>>>   save device state by adding mutex and serialiaing save_buffer and
+>>>>>   get_dirty_pages routines.
+>>>>> - Skip called get_dirty_pages routine for mapped MMIO region of device.
+>>>>> - Added trace events.
+>>>>> - Splitted into multiple functional patches.
+>>>>>
+>>>>> v2 -> v3:
+>>>>> - Removed enum of VFIO device states. Defined VFIO device state with 2 bits.
+>>>>> - Re-structured vfio_device_migration_info to keep it minimal and defined action
+>>>>>   on read and write access on its members.
+>>>>>
+>>>>> v1 -> v2:
+>>>>> - Defined MIGRATION region type and sub-type which should be used with region
+>>>>>   type capability.
+>>>>> - Re-structured vfio_device_migration_info. This structure will be placed at 0th
+>>>>>   offset of migration region.
+>>>>> - Replaced ioctl with read/write for trapped part of migration region.
+>>>>> - Added both type of access support, trapped or mmapped, for data section of the
+>>>>>   region.
+>>>>> - Moved PCI device functions to pci file.
+>>>>> - Added iteration to get dirty page bitmap until bitmap for all requested pages
+>>>>>   are copied.
+>>>>>
+>>>>> Thanks,
+>>>>> Kirti
+>>>>>
+>>>>> Kirti Wankhede (13):
+>>>>>   vfio: KABI for migration interface
+>>>>>   vfio: Add function to unmap VFIO region
+>>>>>   vfio: Add vfio_get_object callback to VFIODeviceOps
+>>>>>   vfio: Add save and load functions for VFIO PCI devices
+>>>>>   vfio: Add migration region initialization and finalize function
+>>>>>   vfio: Add VM state change handler to know state of VM
+>>>>>   vfio: Add migration state change notifier
+>>>>>   vfio: Register SaveVMHandlers for VFIO device
+>>>>>   vfio: Add save state functions to SaveVMHandlers
+>>>>>   vfio: Add load state functions to SaveVMHandlers
+>>>>>   vfio: Add function to get dirty page list
+>>>>>   vfio: Add vfio_listerner_log_sync to mark dirty pages
+>>>>>   vfio: Make vfio-pci device migration capable.
+>>>>>
+>>>>>  hw/vfio/Makefile.objs         |   2 +-
+>>>>>  hw/vfio/common.c              |  55 +++
+>>>>>  hw/vfio/migration.c           | 874 ++++++++++++++++++++++++++++++++++++++++++
+>>>>>  hw/vfio/pci.c                 | 137 ++++++-
+>>>>>  hw/vfio/trace-events          |  19 +
+>>>>>  include/hw/vfio/vfio-common.h |  25 ++
+>>>>>  linux-headers/linux/vfio.h    | 166 ++++++++
+>>>>>  7 files changed, 1271 insertions(+), 7 deletions(-)
+>>>>>  create mode 100644 hw/vfio/migration.c
+>>>>>
+>>>>> -- 
+>>>>> 2.7.0
+>>>>>
+>>> --
+>>> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> 
 
