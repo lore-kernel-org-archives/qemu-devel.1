@@ -2,85 +2,63 @@ Return-Path: <SRS0=FHOf=VI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24828C74A52
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 12:13:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A069C74A35
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 12:14:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E75BB20665
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 12:13:35 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="u83XEOxf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E75BB20665
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id E67E820665
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 12:14:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E67E820665
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41236 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41242 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlXx9-0006Po-4E
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 08:13:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48645)
+	id 1hlXy3-0007J5-2l
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 08:14:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48926)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hlXwE-0005lT-Ln
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 08:12:40 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1hlXx9-0006bi-Nw
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 08:13:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hlXwC-0000iz-FV
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 08:12:38 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:52436)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hlXwB-0000hV-W9
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 08:12:36 -0400
-Received: by mail-wm1-x344.google.com with SMTP id s3so5453801wms.2
- for <qemu-devel@nongnu.org>; Thu, 11 Jul 2019 05:12:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=V3cMonKbsaOdqE8YXh9RMaH2ufvX5rqBag4d1fqLsno=;
- b=u83XEOxfttHrkYfRR73FH+1Bt+QVdu6ihf18+K/CsYJfsbore+Nud1Giocp4+HS0Kt
- MFCwzg+hfmaS0GGCA3QBl38im7IDB9q/qf55dLqYYFNzTu+GcO43QDLcB7RVU+yp+/F9
- W8dqbGbmYd4RPFbSVt6HNdgIoQmDg+RDBEPpbr2n249w/2qlW1NACfEYV9UTanDuCOL0
- MUN/LnilhLZAWQiRCeqfXSvontMpYIV89mh0gY7kYwmMT813osJM8c6hmEJAAonFTkc2
- TLIls6cmJbfmcAuiSLg1R8Pz/QJujVDGNGVbZDR9DmgOJj5XXIl1LY/YuJlSpdZDctpE
- gvaA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=V3cMonKbsaOdqE8YXh9RMaH2ufvX5rqBag4d1fqLsno=;
- b=d8CE7P5b/yx6CqFQ+uzaRHpm09nUnrOvVaOY+TNp7l5kXLgU+k43bBaLeJiFVH/paH
- AiOpSV/4WE9R+PeOFIu9lOPDk/ya2YEaczqIFsf25nsKisQnHVOQ4DYS835bpt4bpE1k
- oy/ZyFude8l5toEEvFbW5lBA9uCOpIoGf+lbJhN3PxPwXObt+JQUkuExK6hValTMKruG
- gUwZAPiMpoAgktEWxk7O02nXQr+xyADsA0Ji5Nvg+W1Q8j2tlaKXLfSkNEd3z1hlrI+6
- lUQwDX3dr0g8hnD2Z84gabyPq1wxoba1IQn1H37enD5uwNol/+Ot6J4O+yZHxUGgiedy
- +z1A==
-X-Gm-Message-State: APjAAAW88EziJo5Vi8aE0VlVYIzUE4zxA2CAqlqcgygK6dOG+PZ2cBA5
- 4oojZ7KM/CsVw5gF15gGvbK/lg==
-X-Google-Smtp-Source: APXvYqyjRL4Pm4DJ6gxCMhMAABASOjX9YkWy30mz3VnyIHV5hXZJr9CkbqrhyS3PouGt0usrziod8A==
-X-Received: by 2002:a1c:eb17:: with SMTP id j23mr4268983wmh.151.1562847154257; 
- Thu, 11 Jul 2019 05:12:34 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id s25sm5129296wmc.21.2019.07.11.05.12.33
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Thu, 11 Jul 2019 05:12:33 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-arm@nongnu.org,
-	qemu-devel@nongnu.org
-Date: Thu, 11 Jul 2019 13:12:31 +0100
-Message-Id: <20190711121231.3601-1-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
+ (envelope-from <dgilbert@redhat.com>) id 1hlXx8-0001sT-CR
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 08:13:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37326)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hlXx8-0001rB-42
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 08:13:34 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id D4FDF307CDD1;
+ Thu, 11 Jul 2019 12:13:32 +0000 (UTC)
+Received: from work-vm (unknown [10.36.118.40])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 66D7160BFC;
+ Thu, 11 Jul 2019 12:13:26 +0000 (UTC)
+Date: Thu, 11 Jul 2019 13:13:23 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Kirti Wankhede <kwankhede@nvidia.com>
+Message-ID: <20190711121323.GN3971@work-vm>
+References: <1562665760-26158-1-git-send-email-kwankhede@nvidia.com>
+ <1562665760-26158-7-git-send-email-kwankhede@nvidia.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::344
-Subject: [Qemu-devel] [PATCH for-4.1] target/arm: Set VFP-related MVFR0
- fields for arm926 and arm1026
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1562665760-26158-7-git-send-email-kwankhede@nvidia.com>
+User-Agent: Mutt/1.12.0 (2019-05-25)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.49]); Thu, 11 Jul 2019 12:13:33 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v7 06/13] vfio: Add VM state change handler
+ to know state of VM
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,70 +70,167 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Christophe Lyon <christophe.lyon@linaro.org>,
- Richard Henderson <richard.henderson@linaro.org>
+Cc: Zhengxiao.zx@alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com,
+ cjia@nvidia.com, eskultet@redhat.com, ziye.yang@intel.com, cohuck@redhat.com,
+ shuangtai.tst@alibaba-inc.com, qemu-devel@nongnu.org, zhi.a.wang@intel.com,
+ mlevitsk@redhat.com, pasic@linux.ibm.com, aik@ozlabs.ru,
+ alex.williamson@redhat.com, eauger@redhat.com, felipe@nutanix.com,
+ jonathan.davies@nutanix.com, yan.y.zhao@intel.com, changpeng.liu@intel.com,
+ Ken.Xue@amd.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The ARMv5 architecture didn't specify detailed per-feature ID
-registers. Now that we're using the MVFR0 register fields to
-gate the existence of VFP instructions, we need to set up
-the correct values in the cpu->isar structure so that we still
-provide an FPU to the guest.
+* Kirti Wankhede (kwankhede@nvidia.com) wrote:
+> VM state change handler gets called on change in VM's state. This is used to set
+> VFIO device state to _RUNNING.
+> VM state change handler, migration state change handler and log_sync listener
+> are called asynchronously, which sometimes lead to data corruption in migration
+> region. Initialised mutex that is used to serialize operations on migration data
+> region during saving state.
+> 
+> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+> Reviewed-by: Neo Jia <cjia@nvidia.com>
+> ---
+>  hw/vfio/migration.c           | 64 +++++++++++++++++++++++++++++++++++++++++++
+>  hw/vfio/trace-events          |  2 ++
+>  include/hw/vfio/vfio-common.h |  4 +++
+>  3 files changed, 70 insertions(+)
+> 
+> diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
+> index a2cfbd5af2e1..c01f08b659d0 100644
+> --- a/hw/vfio/migration.c
+> +++ b/hw/vfio/migration.c
+> @@ -78,6 +78,60 @@ err:
+>      return ret;
+>  }
+>  
+> +static int vfio_migration_set_state(VFIODevice *vbasedev, uint32_t state)
+> +{
+> +    VFIOMigration *migration = vbasedev->migration;
+> +    VFIORegion *region = &migration->region.buffer;
+> +    uint32_t device_state;
+> +    int ret = 0;
+> +
+> +    device_state = (state & VFIO_DEVICE_STATE_MASK) |
+> +                   (vbasedev->device_state & ~VFIO_DEVICE_STATE_MASK);
+> +
+> +    if ((device_state & VFIO_DEVICE_STATE_MASK) == VFIO_DEVICE_STATE_INVALID) {
+> +        return -EINVAL;
+> +    }
+> +
+> +    ret = pwrite(vbasedev->fd, &device_state, sizeof(device_state),
+> +                 region->fd_offset + offsetof(struct vfio_device_migration_info,
+> +                                              device_state));
+> +    if (ret < 0) {
+> +        error_report("%s: Failed to set device state %d %s",
+> +                     vbasedev->name, ret, strerror(errno));
+> +        return ret;
+> +    }
+> +
+> +    vbasedev->device_state = device_state;
+> +    trace_vfio_migration_set_state(vbasedev->name, device_state);
+> +    return 0;
+> +}
+> +
+> +static void vfio_vmstate_change(void *opaque, int running, RunState state)
+> +{
+> +    VFIODevice *vbasedev = opaque;
+> +
+> +    if ((vbasedev->vm_running != running)) {
+> +        int ret;
+> +        uint32_t dev_state;
+> +
+> +        if (running) {
+> +            dev_state = VFIO_DEVICE_STATE_RUNNING;
+> +        } else {
+> +            dev_state = (vbasedev->device_state & VFIO_DEVICE_STATE_MASK) &
+> +                     ~VFIO_DEVICE_STATE_RUNNING;
+> +        }
+> +
+> +        ret = vfio_migration_set_state(vbasedev, dev_state);
+> +        if (ret) {
+> +            error_report("%s: Failed to set device state 0x%x",
+> +                         vbasedev->name, dev_state);
+> +        }
+> +        vbasedev->vm_running = running;
+> +        trace_vfio_vmstate_change(vbasedev->name, running, RunState_str(state),
+> +                                  dev_state);
+> +    }
+> +}
+> +
+>  static int vfio_migration_init(VFIODevice *vbasedev,
+>                                 struct vfio_region_info *info)
+>  {
+> @@ -93,6 +147,11 @@ static int vfio_migration_init(VFIODevice *vbasedev,
+>          return ret;
+>      }
+>  
+> +    qemu_mutex_init(&vbasedev->migration->lock);
 
-This fixes a regression in the arm926 and arm1026 CPUs, which
-are the only ones that both have VFP and are ARMv5 or earlier.
-This regression was introduced by the VFP refactoring, and more
-specifically by commits 1120827fa182f0e76 and 266bd25c485597c,
-which accidentally disabled VFP short-vector support and
-double-precision support on these CPUs.
+Does this and it's friend below belong in this patch?  As far as I can
+tell you init/deinit the lock here but don't use it which is strange.
 
-Reported-by: Christophe Lyon <christophe.lyon@linaro.org>
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Fixes: 1120827fa182f0e
-Fixes: 266bd25c485597c
-Fixes: https://bugs.launchpad.net/qemu/+bug/1836192
----
-I've followed the existing approach we used for ISAR1 here
-of just filling in the fields we care about, rather than trying
-to set the entire register value.
+Dave
 
- target/arm/cpu.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
-
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index e75a64a25a4..446dd5163dc 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -1666,6 +1666,12 @@ static void arm926_initfn(Object *obj)
-      * set the field to indicate Jazelle support within QEMU.
-      */
-     cpu->isar.id_isar1 = FIELD_DP32(cpu->isar.id_isar1, ID_ISAR1, JAZELLE, 1);
-+    /*
-+     * Similarly, we need to set MVFR0 fields to enable double precision
-+     * and short vector support even though ARMv5 doesn't have this register.
-+     */
-+    cpu->isar.mvfr0 = FIELD_DP32(cpu->isar.mvfr0, MVFR0, FPSHVEC, 1);
-+    cpu->isar.mvfr0 = FIELD_DP32(cpu->isar.mvfr0, MVFR0, FPDP, 1);
- }
- 
- static void arm946_initfn(Object *obj)
-@@ -1713,6 +1719,12 @@ static void arm1026_initfn(Object *obj)
-         };
-         define_one_arm_cp_reg(cpu, &ifar);
-     }
-+    /*
-+     * Similarly, we need to set MVFR0 fields to enable double precision
-+     * and short vector support even though ARMv5 doesn't have this register.
-+     */
-+    cpu->isar.mvfr0 = FIELD_DP32(cpu->isar.mvfr0, MVFR0, FPSHVEC, 1);
-+    cpu->isar.mvfr0 = FIELD_DP32(cpu->isar.mvfr0, MVFR0, FPDP, 1);
- }
- 
- static void arm1136_r2_initfn(Object *obj)
--- 
-2.20.1
-
+> +    vbasedev->vm_state = qemu_add_vm_change_state_handler(vfio_vmstate_change,
+> +                                                          vbasedev);
+> +
+>      return 0;
+>  }
+>  
+> @@ -135,11 +194,16 @@ void vfio_migration_finalize(VFIODevice *vbasedev)
+>          return;
+>      }
+>  
+> +    if (vbasedev->vm_state) {
+> +        qemu_del_vm_change_state_handler(vbasedev->vm_state);
+> +    }
+> +
+>      if (vbasedev->migration_blocker) {
+>          migrate_del_blocker(vbasedev->migration_blocker);
+>          error_free(vbasedev->migration_blocker);
+>      }
+>  
+> +    qemu_mutex_destroy(&vbasedev->migration->lock);
+>      vfio_migration_region_exit(vbasedev);
+>      g_free(vbasedev->migration);
+>  }
+> diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
+> index 191a726a1312..3d15bacd031a 100644
+> --- a/hw/vfio/trace-events
+> +++ b/hw/vfio/trace-events
+> @@ -146,3 +146,5 @@ vfio_display_edid_write_error(void) ""
+>  
+>  # migration.c
+>  vfio_migration_probe(char *name, uint32_t index) " (%s) Region %d"
+> +vfio_migration_set_state(char *name, uint32_t state) " (%s) state %d"
+> +vfio_vmstate_change(char *name, int running, const char *reason, uint32_t dev_state) " (%s) running %d reason %s device state %d"
+> diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
+> index 152da3f8d6f3..f6c70db3a9c1 100644
+> --- a/include/hw/vfio/vfio-common.h
+> +++ b/include/hw/vfio/vfio-common.h
+> @@ -29,6 +29,7 @@
+>  #ifdef CONFIG_LINUX
+>  #include <linux/vfio.h>
+>  #endif
+> +#include "sysemu/sysemu.h"
+>  
+>  #define VFIO_MSG_PREFIX "vfio %s: "
+>  
+> @@ -124,6 +125,9 @@ typedef struct VFIODevice {
+>      unsigned int flags;
+>      VFIOMigration *migration;
+>      Error *migration_blocker;
+> +    uint32_t device_state;
+> +    VMChangeStateEntry *vm_state;
+> +    int vm_running;
+>  } VFIODevice;
+>  
+>  struct VFIODeviceOps {
+> -- 
+> 2.7.0
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
