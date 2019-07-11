@@ -2,93 +2,71 @@ Return-Path: <SRS0=FHOf=VI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 595D6C74A4B
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 09:52:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A1DCC74A51
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 09:55:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 281CC20872
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 09:52:06 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hL1f+CP1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 281CC20872
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 11FB221019
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 09:55:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 11FB221019
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39894 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39904 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlVkD-0004D0-EH
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 05:52:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51566)
+	id 1hlVnC-0005Zh-1w
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 05:55:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52590)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1hlVjk-0003lW-6X
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 05:51:37 -0400
+ (envelope-from <geert.uytterhoeven@gmail.com>) id 1hlVmi-0005Az-7X
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 05:54:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1hlVjj-0006Du-1d
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 05:51:36 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:55517)
+ (envelope-from <geert.uytterhoeven@gmail.com>) id 1hlVmg-0002J3-FR
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 05:54:40 -0400
+Received: from mail-ot1-f67.google.com ([209.85.210.67]:37426)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1hlVji-00066c-QG
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 05:51:34 -0400
-Received: by mail-wm1-x341.google.com with SMTP id a15so5006423wmj.5
- for <qemu-devel@nongnu.org>; Thu, 11 Jul 2019 02:51:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=gAVGaU2EukknbVz3LSnjZp6iwEIEBAJJTIj+DEAIuGA=;
- b=hL1f+CP1d1r1rCTc4Mh4G/HBYQOTVazEk02NzfndEkGBM7GTGwMFSutQwL89DfP9xx
- rO80l9S3LAFzmNQXxfVsAKmAslTpO3XL4pzLrSL5HL1JD3eZCA0Hz8RXaHzbQWwMOJ5t
- 5oMqIszRtjXUZytr3XDvEoVkQDluxM7DTMlb6tbkzQtv2TWRV4pKlLQDkXQ1xt5wWs6w
- FGaebiNqbrGdTfCaYj9dkpoa63FxRotjOgm7gVxZSty4oJQ+O8ixs4528jsX3RSbKijg
- 66yR461+5MZHQWIu7FDesye0kWU8o9kgm5lgwnn6Vf8dJBnc7eg84RVO1N1pvSAkS8Rn
- pVDA==
+ (Exim 4.71) (envelope-from <geert.uytterhoeven@gmail.com>)
+ id 1hlVmg-0002I6-AO
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 05:54:38 -0400
+Received: by mail-ot1-f67.google.com with SMTP id s20so5226462otp.4
+ for <qemu-devel@nongnu.org>; Thu, 11 Jul 2019 02:54:37 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=gAVGaU2EukknbVz3LSnjZp6iwEIEBAJJTIj+DEAIuGA=;
- b=DGd5d/a9GmMcTkRUNyVvPrUXmH384jjWs1JiE2QYFuhXd1XFpdNPl8QWSltsqhaeXa
- VVlyDNCnoc9jSJdEdeazX4K2wh4tx9EYxHMEdlVCTViuIYV8qYss6+J5RNAmITvywbSc
- 1LWFUGnQxg10MrBh5Gfku594/n545zjxn7Fe6xFtQifbfDtFgitePjMaO4C0nr6VP7wf
- e+drCw5Z7zYsSTwBsrKubs5rvQuGQbqKXwU25B9Ryewi/kxdWBUHMSI6Vw6Xp4mipQSe
- hv/KstTLcaWeRwxN8bOKxvRpWHXrPXQKcsQVj08ynlI1FqMUK+VCdadgS5jzwLo4lKxL
- oIBg==
-X-Gm-Message-State: APjAAAUERh8sCC7rZwaegCO/IwOoqNR5WDmoLJnyNdY7pyqCV/VfmKPQ
- WmRJoOzL6XJOy0u2dVVq+oWOhA==
-X-Google-Smtp-Source: APXvYqzI4Qq0waYStIaqE86ndu7D18y7if+Ng8n5LfJrim4ezQyG64Kz9Hssm22fUfnjmY/HlKdRnQ==
-X-Received: by 2002:a1c:2e09:: with SMTP id u9mr3325599wmu.137.1562838692706; 
- Thu, 11 Jul 2019 02:51:32 -0700 (PDT)
-Received: from [172.16.96.70] (mob-31-157-172-216.net.vodafone.it.
- [31.157.172.216])
- by smtp.gmail.com with ESMTPSA id g11sm5481552wrq.92.2019.07.11.02.51.31
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 11 Jul 2019 02:51:31 -0700 (PDT)
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org
-References: <20190710172437.628-1-alex.bennee@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <f85b75f3-f903-7bad-d43e-a545cafdb57d@linaro.org>
-Date: Thu, 11 Jul 2019 11:51:28 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.1
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=O/5PBzbOSkarM0fR7QZKIT7PJomPF+Mz3qw+l6PgF5Y=;
+ b=DlNxn8yxB3nQJnEp8UT7IkBbpLu8ubVTAmcNGVae4nIgZ+xQ9QSY53dHCoUKwy092s
+ l+Bj44QOCaHIhNCMs9dQ8O1JZhIrcgKXzILJDUTWpbIPxaugUSXfKWjTPrzyiZiyY7ln
+ PgHU6jPCO5iAEOfG/NhLmZ62Z99t0+VYe23NDv5ZxjlJO6xIAe3vuv/bTVxrqhRGDbXe
+ dqwUbUctNp9UwxLggKWKGzJJmLOyL2si/5mi/6GpU+MuIr8LTHUhzlBlKxqwHPSy4VMw
+ nMG7jPPh8rruz1+cU4JO2JNMK4Dti+6xwtI8vKgthiSdqgXD/ncytZbqaocJu8W4IR12
+ OH/Q==
+X-Gm-Message-State: APjAAAUITuDfM4AUx7Mun22zhkCq9SomHFKnyaWgeytNmj2tbdChOmYu
+ zrK1DnP9iZQSInX8bnuYSSqY7KoLjBji+7uP/NI=
+X-Google-Smtp-Source: APXvYqyK0DKq3ZkjRdl7YQmWxsya6hifOg7+4DokzYCRW2KnOdJBEZwbn4B17kuLWtHJCatZb6xcjHbBhlJ8ZYeniDE=
+X-Received: by 2002:a9d:7a90:: with SMTP id l16mr2691084otn.297.1562838876685; 
+ Thu, 11 Jul 2019 02:54:36 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190710172437.628-1-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::341
-Subject: Re: [Qemu-devel] [PATCH for 4.1] target/arm: report ARMv8.2 FP16
- for ARM -cpu max
+References: <20190705160536.12047-1-geert+renesas@glider.be>
+ <8500a069-9e29-d6ad-e5e4-22d5a3eead59@electromag.com.au>
+ <CAMuHMdWLcr0pf-ZM3+iWQGwDLB2xoHAZaeCKAjtEVEaiNed63Q@mail.gmail.com>
+ <1fc3a5ad-6eb6-3356-5fd4-93ce0482bb7e@electromag.com.au>
+In-Reply-To: <1fc3a5ad-6eb6-3356-5fd4-93ce0482bb7e@electromag.com.au>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Thu, 11 Jul 2019 11:54:25 +0200
+Message-ID: <CAMuHMdXTyN0wHJyZJavER7b5h5j=7j8MADhZvFwBLpH60x39sA@mail.gmail.com>
+To: Phil Reid <preid@electromag.com.au>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.85.210.67
+Subject: Re: [Qemu-devel] [PATCH RFC] gpio: Add Virtual Aggregator GPIO
+ Driver
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,41 +78,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
- 1836078@bugs.launchpad.net
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Geert Uytterhoeven <geert+renesas@glider.be>,
+ "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ Linus Walleij <linus.walleij@linaro.org>, Magnus Damm <magnus.damm@gmail.com>,
+ Alexander Graf <agraf@suse.de>, QEMU Developers <qemu-devel@nongnu.org>,
+ Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
+ Bartosz Golaszewski <bgolaszewski@baylibre.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/10/19 7:24 PM, Alex Bennée wrote:
-> When we converted to using feature bits in 602f6e42cfbf we missed out
-> the fact (dp && arm_dc_feature(s, ARM_FEATURE_V8)) was supported for
-> -cpu max configurations. This caused a regression in the GCC test
-> suite. Fix this by setting the appropriate FP16 bits in mvfr1.FPHP.
-> 
-> Fixes: https://bugs.launchpad.net/qemu/+bug/1836078
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> ---
->  target/arm/cpu.c | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-> index e75a64a25a..0a0a202fe3 100644
-> --- a/target/arm/cpu.c
-> +++ b/target/arm/cpu.c
-> @@ -2452,6 +2452,10 @@ static void arm_max_initfn(Object *obj)
->              t = FIELD_DP32(t, ID_ISAR6, SPECRES, 1);
->              cpu->isar.id_isar6 = t;
->  
-> +            t = cpu->isar.mvfr1;
-> +            t = FIELD_DP32(t, MVFR1, FPHP, 2);     /* v8.2 FP16 */
+Hi Phil,
 
-The comment is wrong.  This is not full v8.2 FP16 support (which would be value
-3, plus a change to SIMDHP), but v8.0 support for double<->half conversions.
+On Thu, Jul 11, 2019 at 11:24 AM Phil Reid <preid@electromag.com.au> wrote:
+> On 10/07/2019 18:21, Geert Uytterhoeven wrote:
+> > On Wed, Jul 10, 2019 at 4:00 AM Phil Reid <preid@electromag.com.au> wrote:
+> >> On 6/07/2019 00:05, Geert Uytterhoeven wrote:
+> >>> GPIO controllers are exported to userspace using /dev/gpiochip*
+> >>> character devices.  Access control to these devices is provided by
+> >>> standard UNIX file system permissions, on an all-or-nothing basis:
+> >>> either a GPIO controller is accessible for a user, or it is not.
+> >>> Currently no mechanism exists to control access to individual GPIOs.
+> >>>
+> >>> Hence add a virtual GPIO driver to aggregate existing GPIOs (up to 32),
+> >>> and expose them as a new gpiochip.  This is useful for implementing
+> >>> access control, and assigning a set of GPIOs to a specific user.
+> >>> Furthermore, it would simplify and harden exporting GPIOs to a virtual
+> >>> machine, as the VM can just grab the full virtual GPIO controller, and
+> >>> no longer needs to care about which GPIOs to grab and which not,
+> >>> reducing the attack surface.
+> >>>
+> >>> Virtual GPIO controllers are instantiated by writing to the "new_device"
+> >>> attribute file in sysfs:
+> >>>
+> >>>       $ echo "<gpiochipA> <gpioA1> [<gpioA2> ...]"
+> >>>              "[, <gpiochipB> <gpioB1> [<gpioB2> ...]] ...]"
+> >>>               > /sys/bus/platform/drivers/gpio-virt-agg/new_device
+> >>>
+> >>> Likewise, virtual GPIO controllers can be destroyed after use:
+> >>>
+> >>>       $ echo gpio-virt-agg.<N> \
+> >>>               > /sys/bus/platform/drivers/gpio-virt-agg/delete_device
+> >>>
 
-Otherwise,
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> >> Would it be possible to do the lookup via line names?
+> >
+> > Doesn't the fact that a GPIO has a line name means that it is in use, and
+> > thus cannot be aggregated and exported to another user?
+>
+> They can be given line names via the dt property gpio-line-names.
+> Which can be used by user space to find a gpio. Not sure if there's an equivalent api inkerenl.
+> But it looks like we can find the info via struct gpiochip_info / gpioline_info linfo and work
+> out the chip name and line offsets. So probably not required.
+>
+> Find the right gpio always seems tricky.
+> We have systems with multiple i2c gpio behind muxes that may or may not be present.
+> So i2c bus numbers are never consistent. And then different board revisions move the
+> same gpio line to a different pin (or cahnge the gpio chip type completely) to make routing easier etc.
 
+OK, so extending lookup to line names makes sense.
+This requires making gpio_name_to_desc() public.
 
-r~
+Gr{oetje,eeting}s,
+
+                        Geert
+
+-- 
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
 
