@@ -4,73 +4,73 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-13.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,LOTS_OF_MONEY,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17961C74A3F
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 01:06:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C3DDC74A3F
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 01:06:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A595421019
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 01:06:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 186FE21019
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 01:06:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PDd0GmAo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A595421019
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TKkKrWU+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 186FE21019
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37874 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37882 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlNXJ-00021P-TW
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jul 2019 21:06:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60297)
+	id 1hlNXa-0002Pw-Bw
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jul 2019 21:06:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60399)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <groeck7@gmail.com>) id 1hlNVj-0000Um-04
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 21:04:44 -0400
+ (envelope-from <groeck7@gmail.com>) id 1hlNW0-0000jo-LB
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 21:05:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groeck7@gmail.com>) id 1hlNVZ-00030g-2e
- for qemu-devel@nongnu.org; Wed, 10 Jul 2019 21:04:34 -0400
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:37123)
+ (envelope-from <groeck7@gmail.com>) id 1hlNVr-0003HG-1j
+ for qemu-devel@nongnu.org; Wed, 10 Jul 2019 21:04:52 -0400
+Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:41773)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <groeck7@gmail.com>)
- id 1hlNVY-0002ya-82; Wed, 10 Jul 2019 21:04:25 -0400
-Received: by mail-pf1-x443.google.com with SMTP id 19so1909709pfa.4;
- Wed, 10 Jul 2019 18:04:24 -0700 (PDT)
+ id 1hlNVn-0003By-0m; Wed, 10 Jul 2019 21:04:41 -0400
+Received: by mail-pl1-x641.google.com with SMTP id m9so2076302pls.8;
+ Wed, 10 Jul 2019 18:04:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:date:from:to:cc:subject:message-id:references:mime-version
  :content-disposition:in-reply-to:user-agent;
- bh=kI2z/r/F8kG/u3ONokx7PbjTIDA9B9vpkbxgyLya3O8=;
- b=PDd0GmAouGgzUkNfUQ+AUp1JIkRzgDivjFvKIDKwGjck6FOQn2wDLldV20DC28/U1u
- XtRLYobZ+vWiqkzbed0c18qA/OxaezRzTZOXyEKswI2U4cbJMHJ8z8XMFBqNcjWaIs+j
- 0HpMJtx1X3gek7wRLdBGEvqES2KocWkXtKDqZdQ2p+IJAWpLodS4xXWMrYLmZt59Zuyx
- OEV0zXLIgxT/nsGjsiU3Wkc6iRRIemho3+jSUonDtNptBfLayX4UXLa1N7SoynuOBrdI
- ArDebmByJgx/UjiC5EfOcglhXNE7BAvUixIfgxiGsU8SPW8TuJAVZ/bZ97NlzdxzX89w
- VADw==
+ bh=0H/wqK+97+E7/2C0v0UlAlXLSe6WYFo3pbcBcwLAanY=;
+ b=TKkKrWU+Kb1jOXUT4fBnOKQ743ll9oSB18RPAPppLMpb/MqSnCttH6vFKidKCi0DvP
+ hiNUq09WyAIuFUb7sdeerCjOo9B8QCYoQT+YwxaVG7xl95Sszt0G5SBPDYGk9/x0LK5P
+ 4PGonh7jrIdjXh3Fy4gQd5vPauFv7vcchdFEbYysW8B3gcNyzpCXhXqcloRyQRkmH+9g
+ UgJgD0rDbCCo2TM3INP1oiREgvZgrVAU5HlKkyIcz8GZA+7DNqN09N2rm/xEV35THxGK
+ G9rvq61C5IdYLOSXVHVZeShavn17rFsbYc3RKEZRqw4ez9JMgH/yOp8Wlb6Edi5U+do+
+ 4Dgw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
  :references:mime-version:content-disposition:in-reply-to:user-agent;
- bh=kI2z/r/F8kG/u3ONokx7PbjTIDA9B9vpkbxgyLya3O8=;
- b=IBxYhmrMxXOJboJ4t/pP+w/UsPoMrNXNZcyC26NFfVlZG0+C6J9mTsFN/ylNn7LlSy
- d7tGRTxhkFnzw3bE3t21OCjAsRlqYhlMppOGVngnNoTv3nA9/Pg2zYY+O8wFQVXwVyKc
- SOD3aZ0lOhOmA8c1fjhSHn+17xvNHHwLr9rgoyswO1fFHqwS7cL/XefX++6wv4TAkrWS
- pjb3aKqZTmRmu5MTcR+hoTwXZA/9sAkShjo9RwFSEldBp1YBVI3ujyT8e+ziRj1IHXwT
- jRWTdcYrM4DIhp2N9mBJQCyfYut+IZJhiz1WPyGuoztbTDVoRm5tGTLF0AgBDLj3iudX
- 8tNg==
-X-Gm-Message-State: APjAAAVgb211zEJdrEezZ8TJoegeBex+MlO4uWUn5CoaDPZe9BoLu06F
- 6TIhrTE9HMoXS8LKdXx12es=
-X-Google-Smtp-Source: APXvYqzorc1kAT349tAKvjqlcReFTyKIa92eZIJrjxvTumZg29D1BTJun8sAJzNqnH8M7eTOOdwj9A==
-X-Received: by 2002:a63:2807:: with SMTP id o7mr1295492pgo.219.1562807061447; 
- Wed, 10 Jul 2019 18:04:21 -0700 (PDT)
+ bh=0H/wqK+97+E7/2C0v0UlAlXLSe6WYFo3pbcBcwLAanY=;
+ b=ati77gmmU1vfH2S4NJod42xLwbJBmc+H7siACAY9QHOUiFeDe0KuURoFn8qvffaaAe
+ 5qtgfeQmgaDrn4YESaLEOJnQTTGgCxk0BEGOryZuuzuwdauaOKPHjxyYL4KETLrvL152
+ bNfAGBquHbS+sz2G5gOYzXU6bryDozrzno2r4MTPQdGsGXKLkHMqW0QqQ/OF325BkBOt
+ 77d4uL/hvHY+NwkomIxNtHZPTFxj5BHtY12mNlyEMJtHSc7xQSkfxTkBHpyDrG7rGIKf
+ S+v4xVVeTKWnzm65tHHhg2+Nu4snbcqVj9wst5xpmAKEuVsINgwNNN28X+knAkpLgUqu
+ n31w==
+X-Gm-Message-State: APjAAAVGAymiCYz68q3MpUppSxtIlvx9GeZs2hliq94b/6TUi+Bx+0wd
+ VWVrdIhLiyX3FqN8vMUrOVE=
+X-Google-Smtp-Source: APXvYqx9auy8CdD6sckmozg1E6nkGJMMj8DQnd0s0bSiRVeCnHpIoJxWjUn6qs0S2JZR65FnPK3S5w==
+X-Received: by 2002:a17:902:d81:: with SMTP id 1mr1357461plv.323.1562807074855; 
+ Wed, 10 Jul 2019 18:04:34 -0700 (PDT)
 Received: from localhost ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
- by smtp.gmail.com with ESMTPSA id s24sm3717767pfh.133.2019.07.10.18.04.19
+ by smtp.gmail.com with ESMTPSA id t11sm2954909pgp.1.2019.07.10.18.04.33
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 10 Jul 2019 18:04:20 -0700 (PDT)
-Date: Wed, 10 Jul 2019 18:04:18 -0700
+ Wed, 10 Jul 2019 18:04:33 -0700 (PDT)
+Date: Wed, 10 Jul 2019 18:04:32 -0700
 From: Guenter Roeck <linux@roeck-us.net>
 To: Alistair Francis <alistair.francis@wdc.com>
-Message-ID: <20190711010418.GA707@roeck-us.net>
+Message-ID: <20190711010432.GB707@roeck-us.net>
 References: <cover.1562803960.git.alistair.francis@wdc.com>
  <1ef8cbbcf0c74fe423019eb91d58543b7778e062.1562803960.git.alistair.francis@wdc.com>
 MIME-Version: 1.0
@@ -80,7 +80,7 @@ In-Reply-To: <1ef8cbbcf0c74fe423019eb91d58543b7778e062.1562803960.git.alistair.f
 User-Agent: Mutt/1.5.24 (2015-08-30)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::443
+X-Received-From: 2607:f8b0:4864:20::641
 Subject: Re: [Qemu-devel] [PATCH v2 1/2] roms: Add OpenSBI version 0.4
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -124,7 +124,7 @@ On Wed, Jul 10, 2019 at 05:14:04PM -0700, Alistair Francis wrote:
 > Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 > Reviewed-by: Bin Meng <bmeng.cn@gmail.com>
 
-Reviewed-by: Guenter Roeck <linux@roeck-us.net>
+Tested-by: Guenter Roeck <linux@roeck-us.net>
 
 > ---
 >  .gitmodules                                  |   3 ++
