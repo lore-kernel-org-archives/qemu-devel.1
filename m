@@ -2,106 +2,63 @@ Return-Path: <SRS0=FHOf=VI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 662D7C74A51
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 09:19:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73320C74A4B
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 09:21:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3047021019
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 09:19:21 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="oeEJWo69"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3047021019
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 4781A21019
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jul 2019 09:21:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4781A21019
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39716 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39730 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlVEW-00066m-2w
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 05:19:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41448)
+	id 1hlVGG-0007OC-Ft
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jul 2019 05:21:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41921)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1hlVDt-0005GN-I6
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 05:18:42 -0400
+ (envelope-from <berrange@redhat.com>) id 1hlVFn-0006v7-Il
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 05:20:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1hlVDs-0001Zk-Am
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 05:18:41 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:46460)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1hlVDs-0001XG-2T
- for qemu-devel@nongnu.org; Thu, 11 Jul 2019 05:18:40 -0400
-Received: by mail-wr1-x443.google.com with SMTP id z1so5397319wru.13
- for <qemu-devel@nongnu.org>; Thu, 11 Jul 2019 02:18:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=r54CdrpSuY7zS9bElZAV4WeTYN4hYu7B7/8ZwNdMmpU=;
- b=oeEJWo69Un3Jf4jYychp0nR+FA0eULcSRAuz6FAPx+RH3DdrjmgXKJA3FbTCCgk61B
- s1q5YBIFN7TbS8W0yIr8ebVyx5DeC1Jrl4N0cdqiKWj+DOC8i8C79K7EiDkHJ+a0U2pc
- W1Sg/e3FRj8G28be2TmJqIS1QuHYtQkK+7OAczzYIDecp/OYOhTYdSK3baU9xkNdnxcC
- 9sQ9e3jtIo40+gK2lCMZRcdP/zjZsX7ArNbhkOSFHovQ/BrkeeN28Kp2/1bdgaoyf52z
- T2nkw3lcT5xTHA3VwEPXvHa131cYFtgRNisomMfp/jCkjl3tlplBaSqFSI7u7sUXV8W8
- KRIg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=r54CdrpSuY7zS9bElZAV4WeTYN4hYu7B7/8ZwNdMmpU=;
- b=MWl5XWtpiFDhbDZmlPY7NLUnY0iEJk2EI/C7HERtq/ji7yQqzRJzKY74CBGAq2tk9b
- 1aUCeVEbPdAOpCTxvPwm0ZILrNIy6UiVQADvjeTZ3OeG6ryoIiIhs4X5fwNoulYpn1LX
- t0Bj3js2b6lQ37jTPovuPLsHFOUgPK6n2Sk6jQUxqq67r7aLJp/c1aLW8Q/1Wwoliuge
- a+NFTFzAQwF/bCl6GU6USYwL0xcFbuzJGURYreHp4utHPGZlvGRlVzCdgbTdKMBbHeX8
- QKJY0CgVONgXYWrVI+5VeXkv7Hl2aaXTMWDWihNlNzJQKnSuFhPSHtMVZ4fI0cBjx62D
- ug3g==
-X-Gm-Message-State: APjAAAVtYhvt4axKPykW+tEkyMpHCunRbK6YJP/7ISLokC0mHWTF1gf6
- MrRSg8brkz3KhnQ3190tOWTb1w==
-X-Google-Smtp-Source: APXvYqyx0jz/U1mydNmV4irCk0LKqbKrZvrxXYWAij7hZMSnjCIkvnfNi66m2D0yMGtZ1O2Z0c0XTw==
-X-Received: by 2002:a05:6000:3:: with SMTP id h3mr3915832wrx.114.1562836717980; 
- Thu, 11 Jul 2019 02:18:37 -0700 (PDT)
-Received: from [172.16.96.70] (mob-31-157-172-216.net.vodafone.it.
- [31.157.172.216])
- by smtp.gmail.com with ESMTPSA id c78sm5314911wmd.16.2019.07.11.02.18.32
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 11 Jul 2019 02:18:37 -0700 (PDT)
-To: Lucien Murray-Pitts <lucienmp.qemu@gmail.com>
-References: <2136180936.260219.1561641583358.ref@mail.yahoo.com>
- <2136180936.260219.1561641583358@mail.yahoo.com>
- <1079763171.281101.1561641752988@mail.yahoo.com>
- <e4c1fbc4-3e43-5df4-a17c-527d98d9763c@linaro.org>
- <20190628002713.GA19257@localhost.localdomain>
- <eadb57ae-256d-0bb7-5988-f493662a5caf@linaro.org>
- <20190628155030.GA34320@localhost.localdomain>
- <ea16a81c-5b94-8dd0-8339-2bd82733aed2@linaro.org>
- <20190629163621.GA111724@localhost.localdomain>
- <CAFEAcA9sfNisAz-zAZAx=ZNFmsEpP0Ec2DeRedtZSd9KQ4fvNA@mail.gmail.com>
- <1399218244.1210557.1561982640362@mail.yahoo.com>
- <CAFEAcA-0vGg_1nfkbq+o6JwoDsRyP=6mnv6ADi-atV0ROX269Q@mail.gmail.com>
- <CALvKS=GvAkNr3OKZzjGoTGG_Eys76zjcjodiN4hKXjFM5B0a4A@mail.gmail.com>
- <d9e5602c-bb33-1812-ebc2-b533e9dd5f25@linaro.org>
- <CALvKS=EbuQOvRx+bmRnqCD6JuHK87dnkx00EiH--aXYWuNF0VQ@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <ba03e07a-6061-69f2-1042-020de8990929@linaro.org>
-Date: Thu, 11 Jul 2019 11:18:21 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.1
+ (envelope-from <berrange@redhat.com>) id 1hlVFm-0003ao-Ee
+ for qemu-devel@nongnu.org; Thu, 11 Jul 2019 05:20:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56458)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <berrange@redhat.com>)
+ id 1hlVFj-0003Vi-Ha; Thu, 11 Jul 2019 05:20:35 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 368AA3084242;
+ Thu, 11 Jul 2019 09:20:34 +0000 (UTC)
+Received: from redhat.com (unknown [10.42.17.95])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 40A3B1001B2B;
+ Thu, 11 Jul 2019 09:20:33 +0000 (UTC)
+Date: Thu, 11 Jul 2019 10:20:31 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Max Reitz <mreitz@redhat.com>
+Message-ID: <20190711092031.GB11930@redhat.com>
+References: <20190710170349.1548-1-mlevitsk@redhat.com>
+ <84232589-627a-8151-a3d5-84c053d9a257@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CALvKS=EbuQOvRx+bmRnqCD6JuHK87dnkx00EiH--aXYWuNF0VQ@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::443
-Subject: Re: [Qemu-devel] RFC: Why does target/m68k RTE insn. use
- gen_exception
+Content-Disposition: inline
+In-Reply-To: <84232589-627a-8151-a3d5-84c053d9a257@redhat.com>
+User-Agent: Mutt/1.12.0 (2019-05-25)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.40]); Thu, 11 Jul 2019 09:20:34 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH] LUKS: support preallocation in qemu-img
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -113,52 +70,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Lucien Anti-Spam <lucienmp_antispam@yahoo.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <laurent@vivier.eu>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org,
+ Maxim Levitsky <mlevitsk@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/10/19 7:50 PM, Lucien Murray-Pitts wrote:
-> 
-> 
->> On Wed, Jul 10, 2019 at 4:04 AM Richard Henderson
-> <richard.henderson@linaro.org <mailto:richard.henderson@linaro.org>> wrote:
-> 
->     > I did have a suggestion.  It was fairly detailed.
->     > https://lists.gnu.org/archive/html/qemu-devel/2019-06/msg06522.html
-> 
-> Your solution is elegant at about 10 lines that return getl_ilen(pc), but it
-> seems the s390 has a far simpler 
-> instruction word format than the m68k. 
+On Wed, Jul 10, 2019 at 11:24:46PM +0200, Max Reitz wrote:
+> On 10.07.19 19:03, Maxim Levitsky wrote:
+> > preallocation=3Doff and preallocation=3Dmetadata
+> > both allocate luks header only, and preallocation=3Dfalloc/full
+> > is passed to underlying file, with the given image size.
+> >=20
+> > Note that the actual preallocated size is a bit smaller due
+> > to luks header.
+>=20
+> Couldn=E2=80=99t you just preallocate it after creating the crypto head=
+er so
+> qcrypto_block_get_payload_offset(crypto->block) + size is the actual
+> file size?
 
-S390 is simpler, in that it encodes the total length into the first two bits of
-the opcode.  That said, the same technique can apply.  The only difference is
-the location at which you would record the length.
+Yeah that would be preferrable. If that's really not possible, we
+could likely provide some API to query the expected hreader size for
+a given set of creation options.=20
 
-For s390, we do this immediately after loading the entire instruction, having
-parsed the length as you saw.
+>=20
+> > Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=3D1534951
+> >=20
+> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> > ---
+> >  block/crypto.c | 28 ++++++++++++++++++++++++++--
+> >  1 file changed, 26 insertions(+), 2 deletions(-)
+>=20
+> Hm.  I would expect a preallocated image to read 0.  But if you just
+> pass this through to the protocol layer, it won=E2=80=99t read 0.
 
-For m68k, we would do this after decoding the entire instruction, as
-pc_at_insn_end - pc_at_insn_start.
+Yes, it will be zeros at the physical layer, but unintelligble
+garbage from POV of the virtual disk.
 
-> However then that got me to thinking, it seems that we can call a portion of
-> the TCG system to disassemble a single instruction.
->     TranslationBlock tb;
->     tb.pc = env->pc;
->     gen_intermediate_code(cs, &tb, /* max isn */ 1);
->     int ilen = tb.size;
->     printf( "PC: %08x sz:%08x\n", env->pc, tb, ilen ) ;
-> 
-> I am very new to TCG, so it does seem there is a lot of code in the
-> translator_loop that appears to be interacting with the CPU model/state.
-> Should I be worried about this, or is this a safe function to call outside of
-> the translator core proper? 
+I don't think this is really a problem though - this is what you
+get already if you create a LUKS volume on top of a block device
+today.
 
-No, it is not safe to call outside of the translator core, because of how this
-interacts with emitting tcg opcodes.
+AFAIK, we've not documented that preallocation guarantees future
+reads will return zeros. Preallocation simply ensures that all
+required space is allocated upfront. We do mention that it might
+be achieved by writing zeros to the underlying storage but never
+said you'll get zeros back.
 
+IOW I think its at most a docs problem to more clearly explain
+that preallocation !=3D guaranteed zeros for reads.
 
-r~
+> (In fact, I don=E2=80=99t even quite see the point of having LUKS as an=
+ own
+> format still.  It was useful when qcow2 didn=E2=80=99t have LUKS suppor=
+t, but
+> now it does, so...  I suppose everyone using the LUKS format should
+> actually be using qcow2 with LUKS?)
+
+Certainly not. LUKS on raw is going to be very common, not least because
+that's directly compatible with what Linux kernel supports. If you don't
+want the features of qcow2 like snapshots, it just adds overhead and mgmt
+complexity for no gain, especially if dealing with block device backed
+storage (iSCSI, RBD).
+
+OpenStack will use cryptsetup when initializing its block storage with
+LUKS, then tell QEMU to run with the raw + LUKS driver.
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
 
