@@ -2,54 +2,46 @@ Return-Path: <SRS0=r3/N=VJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB706C742D7
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 19:37:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D21A0C742D7
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 19:44:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B891C205C9
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 19:37:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B891C205C9
+	by mail.kernel.org (Postfix) with ESMTPS id A6ADB2146E
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 19:44:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6ADB2146E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52020 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52028 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hm1Me-0000xX-Bb
-	for qemu-devel@archiver.kernel.org; Fri, 12 Jul 2019 15:37:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48381)
+	id 1hm1T7-0002Z7-G5
+	for qemu-devel@archiver.kernel.org; Fri, 12 Jul 2019 15:44:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49839)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hm1MU-0000Z6-Aw
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 15:37:43 -0400
+ (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hm1Sx-00029n-2w
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 15:44:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hm1MS-0008DL-AO
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 15:37:41 -0400
-Received: from mail.ilande.co.uk ([46.43.2.167]:59976
+ (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hm1Sw-0000z1-20
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 15:44:22 -0400
+Received: from mail.ilande.co.uk ([46.43.2.167]:59996
  helo=mail.default.ilande.uk0.bigv.io)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1hm1MS-0006Cq-3Y
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 15:37:40 -0400
+ id 1hm1Sr-0000da-4K
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 15:44:18 -0400
 Received: from host86-189-155-55.range86-189.btcentralplus.com
  ([86.189.155.55] helo=[192.168.1.65])
  by mail.default.ilande.uk0.bigv.io with esmtpsa
  (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
  (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1hm1Ia-00072Y-2I; Fri, 12 Jul 2019 20:33:40 +0100
-To: Markus Armbruster <armbru@redhat.com>
-References: <3c8b83fe-120b-40e6-84d5-5a3b88e46ee3@ilande.co.uk>
- <CAFEAcA9KjJUE7R0OYfM9AT=Ydu8eXBYJR=sGoGog25xrpRMZig@mail.gmail.com>
- <914f608a-5128-87a5-1c08-e20db88ad216@ilande.co.uk>
- <CAFEAcA9=KKtbR624rV77cu41zUTyu2N8-+1Gjmg-rQwdS1htuw@mail.gmail.com>
- <20190708094107.GD3082@redhat.com>
- <28ca7c60-5795-31ff-1d71-1fac477ad996@redhat.com>
- <20190708101919.GF3082@redhat.com>
- <267315a5-9969-9bfb-b4f6-57c61890fae4@ilande.co.uk>
- <87lfx4wry6.fsf@dusky.pond.sub.org>
+ id 1hm1Rj-00076h-94; Fri, 12 Jul 2019 20:43:07 +0100
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+References: <20190712055935.23061-1-armbru@redhat.com>
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Openpgp: preference=signencrypt
 Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
@@ -76,12 +68,12 @@ Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
  Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
  KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
  imgcU9TTGC5qd9g=
-Message-ID: <98789380-7402-535b-0db9-b6c90af2f161@ilande.co.uk>
-Date: Fri, 12 Jul 2019 20:34:26 +0100
+Message-ID: <539320ea-50d5-b868-14fd-c84c33aa68fe@ilande.co.uk>
+Date: Fri, 12 Jul 2019 20:43:53 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <87lfx4wry6.fsf@dusky.pond.sub.org>
+In-Reply-To: <20190712055935.23061-1-armbru@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-GB
 Content-Transfer-Encoding: 7bit
@@ -91,7 +83,8 @@ X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
 X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 46.43.2.167
-Subject: Re: [Qemu-devel] Parallel make build fails on fast machine
+Subject: Re: [Qemu-devel] [PATCH for-4.1] Makefile: Fix "make install" when
+ "make all" needs work
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,48 +96,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>
+Cc: peter.maydell@linaro.org, Guenter Roeck <linux@roeck-us.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/07/2019 15:45, Markus Armbruster wrote:
+On 12/07/2019 06:59, Markus Armbruster wrote:
 
-> Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk> writes:
+> Until recently, target install used to recurse into target directories
+> in its recipe: it ran make install in a for-loop.  Since target
+> install depends on target all, this trivially ensured we run the
+> sub-make install only after completing target all.
 > 
->> Something also looks a bit odd with distclean here on a fresh checkout:
->>
->> build@ezio:~/src/qemu/git/tmp/qemu$ make distclean
->>   LD      recurse-clean.mo
->> cc: fatal error: no input files
->> compilation terminated.
->> rules.mak:118: recipe for target 'recurse-clean.mo' failed
->> make: *** [recurse-clean.mo] Error 1
+> Commit 1338a4b "Makefile: Reuse all's recursion machinery for clean
+> and install" moved the target recursion to dependencies.  That's good
+> (the commit message explains why), but I forgot to add dependencies to
+> ensure make runs the sub-make install only after completing target
+> all.  Do that now.
 > 
-> This one should be fixed in master (commit 8d358a5ea08).  If it's still
-> broken for you, let me know.
+> Fixes: 1338a4b72659ce08eacb9de0205fe16202a22d9c
+> Reported-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> Reported-by: Guenter Roeck <linux@roeck-us.net>
+> Tested-by: Guenter Roeck <linux@roeck-us.net>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  Makefile | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/Makefile b/Makefile
+> index 1fcbaed62c..09b77e8a7b 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -522,6 +522,7 @@ $(ROM_DIRS_RULES):
+>  recurse-all: $(addsuffix /all, $(TARGET_DIRS) $(ROM_DIRS))
+>  recurse-clean: $(addsuffix /clean, $(TARGET_DIRS) $(ROM_DIRS))
+>  recurse-install: $(addsuffix /install, $(TARGET_DIRS))
+> +$(addsuffix /install, $(TARGET_DIRS)): all
+>  
+>  $(BUILD_DIR)/version.o: $(SRC_PATH)/version.rc config-host.h
+>  	$(call quiet-command,$(WINDRES) -I$(BUILD_DIR) -o $@ $<,"RC","version.o")
+> 
 
-Yes, this is certainly looking much better! There still seems to be something wrong
-with the tests/ subdirectory with your "make install" patch applied to git master if
-I attempt a "make distclean" after a successful "make V=1 -j2 install" in an
-out-of-tree build:
+I've just tried this on my faster workstation and it now works fine with all of -j2,
+-j4 and -j8.
 
-build@ezio:~/src/qemu/git/obj$ ../qemu/configure '--target-list=x86_64-softmmu
-sparc64-softmmu sparc-softmmu ppc-softmmu arm-softmmu'
-'--prefix=/home/build/rel-qemu-git' '--disable-pie' '--enable-debug'
-build@ezio:~/src/qemu/git/obj$ make V=1 -j2 install
-
-(lots of build output cut, but completes successfully)
-
-build@ezio:~/src/qemu/git/obj$ make distclean
-Makefile:85: rules.mak: No such file or directory
-Makefile:437: tests/Makefile.include: No such file or directory
-cat: VERSION: No such file or directory
-Makefile:1127: tests/docker/Makefile.include: No such file or directory
-Makefile:1128: tests/vm/Makefile.include: No such file or directory
-make: *** No rule to make target 'tests/vm/Makefile.include'.  Stop.
+Tested-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
 
 ATB,
