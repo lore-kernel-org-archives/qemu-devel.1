@@ -2,57 +2,64 @@ Return-Path: <SRS0=r3/N=VJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7474FC742A8
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 06:53:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54C2BC742A5
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 07:24:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 476D62084B
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 06:53:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 476D62084B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2C8CF20863
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 07:24:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C8CF20863
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47052 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47156 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlpQo-0007Nh-DU
-	for qemu-devel@archiver.kernel.org; Fri, 12 Jul 2019 02:53:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56098)
+	id 1hlpui-0005hu-7w
+	for qemu-devel@archiver.kernel.org; Fri, 12 Jul 2019 03:24:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36167)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <king.wang@huawei.com>) id 1hlpQe-0006yd-VC
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 02:53:13 -0400
+ (envelope-from <eric.auger@redhat.com>) id 1hlpuX-0005Dd-F3
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 03:24:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <king.wang@huawei.com>) id 1hlpQd-0001jd-Ip
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 02:53:12 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:53354 helo=huawei.com)
+ (envelope-from <eric.auger@redhat.com>) id 1hlpuW-0008TC-Am
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 03:24:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50402)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <king.wang@huawei.com>)
- id 1hlpQd-0001bN-4g
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 02:53:11 -0400
-Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id 5F8741FB7011A7BED614;
- Fri, 12 Jul 2019 14:52:58 +0800 (CST)
-Received: from localhost (10.177.17.7) by DGGEMS410-HUB.china.huawei.com
- (10.3.19.210) with Microsoft SMTP Server id 14.3.439.0; Fri, 12 Jul 2019
- 14:52:48 +0800
-From: Wang King <king.wang@huawei.com>
-To: <pbonzini@redhat.com>
-Date: Fri, 12 Jul 2019 14:52:41 +0800
-Message-ID: <20190712065241.11784-1-king.wang@huawei.com>
-X-Mailer: git-send-email 2.21.0
+ (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+ id 1hlpuT-0008RF-QK; Fri, 12 Jul 2019 03:24:01 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 31A5B1556B;
+ Fri, 12 Jul 2019 07:23:59 +0000 (UTC)
+Received: from [10.36.116.46] (ovpn-116-46.ams2.redhat.com [10.36.116.46])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 66EC95DDA2;
+ Fri, 12 Jul 2019 07:23:49 +0000 (UTC)
+To: qemu-devel@nongnu.org
+References: <156288396475.12463.8495950257512135187@c4a48874b076>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <b0d9cfea-0060-7c44-59e1-fc109784f501@redhat.com>
+Date: Fri, 12 Jul 2019 09:23:47 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.177.17.7]
-X-CFilter-Loop: Reflected
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <156288396475.12463.8495950257512135187@c4a48874b076>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.29]); Fri, 12 Jul 2019 07:23:59 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 45.249.212.35
-Subject: [Qemu-devel] [PATCH] memory: unref the memory region in simplify
- flatview
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [RFC v5 00/29] vSMMUv3/pSMMUv3 2 stage VFIO
+ integration
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -64,94 +71,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: weidong.huang@huawei.com, qemu-devel@nongnu.org, king.wang@huawei.com
+Cc: peter.maydell@linaro.org, drjones@redhat.com, yi.l.liu@intel.com,
+ mst@redhat.com, jean-philippe.brucker@arm.com, zhangfei.gao@foxmail.com,
+ peterx@redhat.com, alex.williamson@redhat.com, qemu-arm@nongnu.org,
+ vincent.stehle@arm.com, eric.auger.pro@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: King Wang<king.wang@huawei.com>
+Hi,
 
-The memory region reference is increased when insert a range
-into flatview range array, then decreased by destroy flatview.
-If some flat range merged by flatview_simplify, the memory region
-reference can not be decreased by destroy flatview any more.
+On 7/12/19 12:26 AM, no-reply@patchew.org wrote:
+> Patchew URL: https://patchew.org/QEMU/20190711173933.31203-1-eric.auger@redhat.com/
+> 
+> 
+> 
+> Hi,
+> 
+> This series failed build test on s390x host. Please find the details below.
+> 
+> === TEST SCRIPT BEGIN ===
+> #!/bin/bash
+> # Testing script will be invoked under the git checkout with
+> # HEAD pointing to a commit that has the patches applied on top of "base"
+> # branch
+> set -e
+> 
+> echo
+> echo "=== ENV ==="
+> env
+> 
+> echo
+> echo "=== PACKAGES ==="
+> rpm -qa
+> 
+> echo
+> echo "=== UNAME ==="
+> uname -a
+> 
+> CC=$HOME/bin/cc
+> INSTALL=$PWD/install
+> BUILD=$PWD/build
+> mkdir -p $BUILD $INSTALL
+> SRC=$PWD
+> cd $BUILD
+> $SRC/configure --cc=$CC --prefix=$INSTALL
+> make -j4
+> # XXX: we need reliable clean up
+> # make check -j4 V=1
+> make install
+> === TEST SCRIPT END ===
+> 
+>   CC      i386-softmmu/hw/virtio/virtio-crypto.o
+>   CC      i386-softmmu/hw/virtio/virtio-crypto-pci.o
+>   CC      i386-softmmu/hw/virtio/virtio-pmem.o
+> /var/tmp/patchew-tester-tmp-u52ljjk0/src/hw/virtio/virtio-pmem.c:21:10: fatal error: standard-headers/linux/virtio_pmem.h: No such file or directory
+>    21 | #include "standard-headers/linux/virtio_pmem.h"
+>       |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> compilation terminated.
+In the kernel branch I used along with ./scripts/update-linux-headers.sh
+the header was not yet there. As a consequence the
+standard-headers/linux/virtio_pmem.h was removed. I will fix that soon.
 
-In this case, start virtual machine by the command line:
-qemu-system-x86_64
--name guest=3Dubuntu,debug-threads=3Don
--machine pc,accel=3Dkvm,usb=3Doff,dump-guest-core=3Doff
--cpu host
--m 16384
--realtime mlock=3Doff
--smp 8,sockets=3D2,cores=3D4,threads=3D1
--object memory-backend-file,id=3Dram-node0,prealloc=3Dyes,mem-path=3D/dev=
-/hugepages,share=3Dyes,size=3D8589934592
--numa node,nodeid=3D0,cpus=3D0-3,memdev=3Dram-node0
--object memory-backend-file,id=3Dram-node1,prealloc=3Dyes,mem-path=3D/dev=
-/hugepages,share=3Dyes,size=3D8589934592
--numa node,nodeid=3D1,cpus=3D4-7,memdev=3Dram-node1
--no-user-config
--nodefaults
--rtc base=3Dutc
--no-shutdown
--boot strict=3Don
--device piix3-usb-uhci,id=3Dusb,bus=3Dpci.0,addr=3D0x1.0x2
--device virtio-scsi-pci,id=3Dscsi0,bus=3Dpci.0,addr=3D0x2
--device virtio-serial-pci,id=3Dvirtio-serial0,bus=3Dpci.0,addr=3D0x3
--drive file=3Dubuntu.qcow2,format=3Dqcow2,if=3Dnone,id=3Ddrive-virtio-dis=
-k0,cache=3Dnone,aio=3Dnative
--device virtio-blk-pci,scsi=3Doff,bus=3Dpci.0,addr=3D0x4,drive=3Ddrive-vi=
-rtio-disk0,id=3Dvirtio-disk0,bootindex=3D1
--chardev pty,id=3Dcharserial0
--device isa-serial,chardev=3Dcharserial0,id=3Dserial0
--device usb-tablet,id=3Dinput0,bus=3Dusb.0,port=3D1
--vnc 0.0.0.0:0
--device VGA,id=3Dvideo0,vgamem_mb=3D16,bus=3Dpci.0,addr=3D0x5
--device virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x6
--msg timestamp=3Don
+Does not block testing on ARM where the VIRTIO_PMEM device is not
+configured.
 
-And run the script in guest OS:
-while true
-do
-    setpci -s 00:06.0 04.b=3D03
-	setpci -s 00:06.0 04.b=3D07
-done
+Thanks
 
-I found the reference of node0 HostMemoryBackendFile is a big one.
-(gdb) p numa_info[0]->node_memdev->parent.ref
-$6 =3D 1636278
-(gdb)
-
-Signed-off-by: King Wang<king.wang@huawei.com>
----
- memory.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
-
-diff --git a/memory.c b/memory.c
-index 480f3d989b..d8d42bdff8 100644
---- a/memory.c
-+++ b/memory.c
-@@ -321,7 +321,7 @@ static bool can_merge(FlatRange *r1, FlatRange *r2)
- /* Attempt to simplify a view by merging adjacent ranges */
- static void flatview_simplify(FlatView *view)
- {
--    unsigned i, j;
-+    unsigned i, j, k;
-=20
-     i =3D 0;
-     while (i < view->nr) {
-@@ -332,6 +332,9 @@ static void flatview_simplify(FlatView *view)
-             ++j;
-         }
-         ++i;
-+        for (k =3D i; k < j; k++) {
-+            memory_region_unref(view->ranges[k].mr);
-+        }
-         memmove(&view->ranges[i], &view->ranges[j],
-                 (view->nr - j) * sizeof(view->ranges[j]));
-         view->nr -=3D j - i;
---=20
-2.21.0
-
-
+Eric
+> 
+> 
+> The full log is available at
+> http://patchew.org/logs/20190711173933.31203-1-eric.auger@redhat.com/testing.s390x/?type=message.
+> ---
+> Email generated automatically by Patchew [https://patchew.org/].
+> Please send your feedback to patchew-devel@redhat.com
+> 
 
