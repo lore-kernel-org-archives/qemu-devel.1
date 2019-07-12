@@ -6,57 +6,57 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E38FC742BD
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 13:40:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7604FC742BE
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 13:40:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ECABA20863
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 13:40:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECABA20863
+	by mail.kernel.org (Postfix) with ESMTPS id 5334B20863
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 13:40:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5334B20863
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49520 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49528 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlvn3-00089q-PK
-	for qemu-devel@archiver.kernel.org; Fri, 12 Jul 2019 09:40:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57594)
+	id 1hlvnD-0000i6-M3
+	for qemu-devel@archiver.kernel.org; Fri, 12 Jul 2019 09:40:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57482)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hlvmU-0005lT-OX
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 09:40:11 -0400
+ (envelope-from <philmd@redhat.com>) id 1hlvmF-0004YC-AD
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 09:39:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hlvmT-0006lJ-R5
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 09:40:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46972)
+ (envelope-from <philmd@redhat.com>) id 1hlvmE-0006QO-AE
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 09:39:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54550)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <philmd@redhat.com>)
- id 1hlvmR-0006jA-MQ; Fri, 12 Jul 2019 09:40:07 -0400
+ id 1hlvmB-0006Gr-Bb; Fri, 12 Jul 2019 09:39:51 -0400
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 051EFC057F2F;
- Fri, 12 Jul 2019 13:40:07 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 5A20630833A5;
+ Fri, 12 Jul 2019 13:39:49 +0000 (UTC)
 Received: from x1w.redhat.com (ovpn-204-150.brq.redhat.com [10.40.204.150])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 87E7019C58;
- Fri, 12 Jul 2019 13:39:58 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 861A319C58;
+ Fri, 12 Jul 2019 13:39:46 +0000 (UTC)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Fri, 12 Jul 2019 15:39:26 +0200
-Message-Id: <20190712133928.21394-6-philmd@redhat.com>
+Date: Fri, 12 Jul 2019 15:39:24 +0200
+Message-Id: <20190712133928.21394-4-philmd@redhat.com>
 In-Reply-To: <20190712133928.21394-1-philmd@redhat.com>
 References: <20190712133928.21394-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.32]); Fri, 12 Jul 2019 13:40:07 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.44]); Fri, 12 Jul 2019 13:39:49 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH-for-4.1? 5/7] vl: Use qemu_strtoi() instead of
- strtol()
+Subject: [Qemu-devel] [PATCH-for-4.1? 3/7] MAINTAINERS: Add an entry for the
+ Bluetooth devices
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,42 +76,29 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Since we'll move this code around, fix this checkpatch warning
-first:
-
-  ERROR: consider using qemu_strtol in preference to strtol
-
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- vl.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ MAINTAINERS | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/vl.c b/vl.c
-index 96de4f74b9..c7f4d01c99 100644
---- a/vl.c
-+++ b/vl.c
-@@ -978,8 +978,7 @@ static struct bt_device_s *bt_device_add(const char *=
-opt)
-     pstrcpy(devname, MIN(sizeof(devname), len), opt);
+diff --git a/MAINTAINERS b/MAINTAINERS
+index cc9636b43a..5d8f27d9bd 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1733,6 +1733,13 @@ F: hw/*/*xive*
+ F: include/hw/*/*xive*
+ F: docs/*/*xive*
 =20
-     if (endp) {
--        vlan_id =3D strtol(endp + 6, &endp, 0);
--        if (*endp) {
-+        if (qemu_strtoi(endp + 6, (const char **)&endp, 0, &vlan_id) < 0=
-) {
-             error_report("unrecognised bluetooth vlan Id");
-             return 0;
-         }
-@@ -1019,8 +1018,7 @@ static int bt_parse(const char *opt)
-         if (!*endp || *endp =3D=3D ',') {
-             if (*endp) {
-                 if (strstart(endp, ",vlan=3D", &p)) {
--                    vlan =3D strtol(p, (char **) &endp, 0);
--                    if (*endp) {
-+                    if (qemu_strtoi(p, &endp, 0, &vlan) < 0) {
-                         error_report("bad scatternet '%s'", p);
-                         return 1;
-                     }
++Bluetooth
++S: Orphan
++F: bt-*.c
++F: hw/bt/
++F: include/hw/bt.h
++F: include/sysemu/bt.h
++
+ Subsystems
+ ----------
+ Audio
 --=20
 2.20.1
 
