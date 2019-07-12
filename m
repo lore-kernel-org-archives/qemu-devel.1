@@ -6,52 +6,52 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74D08C742B3
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 11:39:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F4B1C742B3
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 11:40:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 512F72084B
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 11:39:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 512F72084B
+	by mail.kernel.org (Postfix) with ESMTPS id 280A92084B
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 11:40:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 280A92084B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48474 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48483 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hltu5-0001EH-4U
-	for qemu-devel@archiver.kernel.org; Fri, 12 Jul 2019 07:39:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53592)
+	id 1hltuK-0002WQ-Fk
+	for qemu-devel@archiver.kernel.org; Fri, 12 Jul 2019 07:40:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53639)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hlttH-0006GP-IK
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 07:39:05 -0400
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hlttJ-0006Gh-6K
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 07:39:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hlttG-00059R-8l
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 07:39:03 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:57844 helo=mail.rt-rk.com)
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hlttH-0005Bb-FX
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 07:39:05 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:59635 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1hlttF-0003ZY-TS
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 07:39:02 -0400
+ id 1hlttH-00059g-6N
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 07:39:03 -0400
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 068731A1FEB;
+ by mail.rt-rk.com (Postfix) with ESMTP id 7F15C1A1FBF;
  Fri, 12 Jul 2019 13:37:56 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
  [10.10.13.43])
- by mail.rt-rk.com (Postfix) with ESMTPSA id C871B1A1FBF;
- Fri, 12 Jul 2019 13:37:55 +0200 (CEST)
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 4B0EA1A1FE2;
+ Fri, 12 Jul 2019 13:37:56 +0200 (CEST)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Date: Fri, 12 Jul 2019 13:37:47 +0200
-Message-Id: <1562931470-3700-3-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Fri, 12 Jul 2019 13:37:50 +0200
+Message-Id: <1562931470-3700-6-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1562931470-3700-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1562931470-3700-1-git-send-email-aleksandar.markovic@rt-rk.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PATCH for 4.1 1/4] target/mips: Add 'fall through'
- comments for handling nanoMips' SHXS, SWXS
+Subject: [Qemu-devel] [PATCH for 4.1 4/4] target/mips: Add missing 'break'
+ for certain cases of MTTR handling
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -78,24 +78,25 @@ Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
  1 file changed, 2 insertions(+)
 
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index f96f141..2be5e2d 100644
+index b1cf5f0..ca62800 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -20136,12 +20136,14 @@ static void gen_p_lsx(DisasContext *ctx, int rd, int rs, int rt)
-         switch (extract32(ctx->opcode, 7, 4)) {
-         case NM_SHXS:
-             check_nms(ctx);
-+            /* fall through */
-         case NM_LHXS:
-         case NM_LHUXS:
-             tcg_gen_shli_tl(t0, t0, 1);
-             break;
-         case NM_SWXS:
-             check_nms(ctx);
-+            /* fall through */
-         case NM_LWXS:
-         case NM_LWC1XS:
-         case NM_SWC1XS:
+@@ -10055,6 +10055,7 @@ static void gen_mttr(CPUMIPSState *env, DisasContext *ctx, int rd, int rt,
+                 gen_mtc0(ctx, t0, rd, sel);
+                 break;
+             }
++            break;
+         case 12:
+             switch (sel) {
+             case 0:
+@@ -10064,6 +10065,7 @@ static void gen_mttr(CPUMIPSState *env, DisasContext *ctx, int rd, int rt,
+                 gen_mtc0(ctx, t0, rd, sel);
+                 break;
+             }
++            break;
+         case 13:
+             switch (sel) {
+             case 0:
 -- 
 2.7.4
 
