@@ -2,75 +2,80 @@ Return-Path: <SRS0=r3/N=VJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B24EC742BD
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 13:56:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39B64C742C2
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 13:56:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E7FBF208E4
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 13:56:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E7FBF208E4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arndb.de
+	by mail.kernel.org (Postfix) with ESMTPS id 13911208E4
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 13:56:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 13911208E4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49684 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49690 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlw1o-0007AN-37
-	for qemu-devel@archiver.kernel.org; Fri, 12 Jul 2019 09:56:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33494)
+	id 1hlw2L-00085d-91
+	for qemu-devel@archiver.kernel.org; Fri, 12 Jul 2019 09:56:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33585)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <arndbergmann@gmail.com>) id 1hlw1d-0006kx-Jz
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 09:55:50 -0400
+ (envelope-from <philmd@redhat.com>) id 1hlw2A-0007gZ-Kb
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 09:56:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <arndbergmann@gmail.com>) id 1hlw1b-0004HH-NQ
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 09:55:49 -0400
-Received: from mail-qt1-f193.google.com ([209.85.160.193]:39945)
+ (envelope-from <philmd@redhat.com>) id 1hlw28-0004dN-Pw
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 09:56:22 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:53176)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <arndbergmann@gmail.com>)
- id 1hlw1b-0004GN-Jj
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 09:55:47 -0400
-Received: by mail-qt1-f193.google.com with SMTP id a15so8111008qtn.7
- for <qemu-devel@nongnu.org>; Fri, 12 Jul 2019 06:55:46 -0700 (PDT)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hlw28-0004cW-JV
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 09:56:20 -0400
+Received: by mail-wm1-f67.google.com with SMTP id s3so9040337wms.2
+ for <qemu-devel@nongnu.org>; Fri, 12 Jul 2019 06:56:19 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=OIav03XMUFr78hQxMDY4yPvnZ+u+z8/xEccH0zaZ458=;
- b=IEf/v4z9zLJ3LWPnbpxiwgE3HO+s4Ca7PmC/CwH7xOq4sZkWz8eNVfel5TGCkIarZJ
- r4bWOYG2ebdl9gOavEBBNyhH/Sh4Zusm40Cfi0y9fHDRaBbY4v88PNtH8LEG+vZrlYyJ
- UkPhelHDrGWc7g5BoxBdwj3ENiyAwVdx5zU6scpeNLJhhSLJgvQ9iofuMV32Gh5ehFKJ
- 407MDnnng2kxm/9Ks7Ijg9Q1pCT5fbHjMGhskSFnCtXmXEqqj9u/sOtUkAudqntLJUsk
- Jfppti9KY8kD7OLJRfffoHEESem+/yXJs3HAw6Zgrrg3YmdxHgxI8TxPDueS5YKajNRT
- WC2Q==
-X-Gm-Message-State: APjAAAVldTX7R0GkMoJvJ9PSStY1j3S/ap3UC3fZbjWQ9ncwgw6e7ZpC
- 8+sMyBZ6OtryuzvBAAFkb3Y9TbWYUsQMrAG2Cgo=
-X-Google-Smtp-Source: APXvYqw8IzPKP31Ae5zRGuaveXLUbAyO+8tF34Tu/0NE4QMuES0IU+SuQcYjYaDtO5IWFz7TFj9oUXryGTP1CXWH5x8=
-X-Received: by 2002:aed:33a4:: with SMTP id v33mr6448691qtd.18.1562939745707; 
- Fri, 12 Jul 2019 06:55:45 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=jZDNHLGecYlYIjEtc4Y2lTIRmqdu0QRb6Bm7b/nuDac=;
+ b=IUmAZMy6KptYh2ZXHn0qTvrVz8OE2ra+eIHm3z0rYit+7S6jdt4nKGtw0AE0EuUD/O
+ JKluBB3awcIj+50XFqR/UjQqly9bz4nXTiNefVcz133bUDAAU4i07E/ZD9QGTmiW/PYm
+ uC9g4ER8AYdNjJ+8Db4oR9QKO2GQDk/jyDIMCMlbKgUQCbExQTgEbxDnJ38aLBJ/oRnm
+ O4WLdy50sVRQ8syjEaH4+H7vXwtEoCI4Yl9XTI1Yy5zSd4q4tvjR3ISBy0gbNXI8AEwH
+ 8ToFaG3goFp07Qq8CIV06psmZIHVXwcbPrLKUtL86sextyk4II/HzRiqWSl2KkE0p5MH
+ gDmA==
+X-Gm-Message-State: APjAAAVfxb8lUWaMkdLghTBxik+41A7LURnNUyNFowZXMzoE5PYf+q8K
+ XxQllqhl+D5Q+X/pnZ0IeFL6Dw==
+X-Google-Smtp-Source: APXvYqz+YBKIYeut+rV3vXEHm1w6hJYiY/8GywAbFq7y72GCLdEGnQjiwsbo71t5gAT9IV+Pa2TexQ==
+X-Received: by 2002:a1c:a6d3:: with SMTP id p202mr10263131wme.26.1562939778486; 
+ Fri, 12 Jul 2019 06:56:18 -0700 (PDT)
+Received: from [192.168.1.37] (62.red-83-42-61.dynamicip.rima-tde.net.
+ [83.42.61.62])
+ by smtp.gmail.com with ESMTPSA id o24sm13381699wmh.2.2019.07.12.06.56.17
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Fri, 12 Jul 2019 06:56:17 -0700 (PDT)
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
+References: <1562931470-3700-1-git-send-email-aleksandar.markovic@rt-rk.com>
+ <1562931470-3700-5-git-send-email-aleksandar.markovic@rt-rk.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <f8e07873-f5f9-218a-d542-daef5a1c1621@redhat.com>
+Date: Fri, 12 Jul 2019 15:56:17 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-References: <20190711173131.6347-1-laurent@vivier.eu>
- <CAK8P3a3-UaZ+RzYNZ25zFHs=1iZNrnaP_eAuHE0WAztztA4EGA@mail.gmail.com>
- <74807892-5d59-0a9a-8385-48cce361d842@vivier.eu>
- <CAK8P3a3XR=C27eYWQ+AxjZ1EEDNBz0HBB_NHh0hbrSDF5ASyqQ@mail.gmail.com>
- <e1c736b2-6f68-208e-9993-57ae143195ad@vivier.eu>
- <CAK8P3a3fZgcSR7V=NAjDa37-5j8L+n-cF1CVPiWjteV6hfHSLg@mail.gmail.com>
- <db82d6a2-8ca7-5bbb-0cf9-feecc8b2adfb@vivier.eu>
-In-Reply-To: <db82d6a2-8ca7-5bbb-0cf9-feecc8b2adfb@vivier.eu>
-From: Arnd Bergmann <arnd@arndb.de>
-Date: Fri, 12 Jul 2019 15:55:29 +0200
-Message-ID: <CAK8P3a3GwDr1wPU3hfnmN-N4kvBvSqxa2aRVLQABO70fv21YhQ@mail.gmail.com>
-To: Laurent Vivier <laurent@vivier.eu>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <1562931470-3700-5-git-send-email-aleksandar.markovic@rt-rk.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.160.193
-Subject: Re: [Qemu-devel] [PATCH v4] linux-user: fix to handle variably
- sized SIOCGSTAMP with new kernels
+X-Received-From: 209.85.128.67
+Subject: Re: [Qemu-devel] [PATCH for 4.1 3/4] target/mips: Add missing
+ 'break' for certain cases of MFTR handling
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -82,54 +87,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Daniel_P_=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- Gerhard Stenzel <gerhard.stenzel@de.ibm.com>, Riku Voipio <riku.voipio@iki.fi>,
- qemu-devel@nongnu.org, Christian Ehrhardt <christian.ehrhardt@canonical.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: arikalo@wavecomp.com, sw@weilnetz.de, amarkovic@wavecomp.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jul 12, 2019 at 3:50 PM Laurent Vivier <laurent@vivier.eu> wrote:
-> Le 12/07/2019 =C3=A0 15:36, Arnd Bergmann a =C3=A9crit :
-> >> We don't do memcopy() but we set each field one by one, so the padding=
- doesn't
-> >> seem needed if we define correctly the user structure:
-> >>
-> >> struct target_timeval64 {
-> >>     abi_llong tv_sec;
-> >>     abi_long tv_usec;
-> >> };
-> >>
-> >> and do something like:
-> >>
-> >>     struct target_timeval64 *target_tv;
-> >>     struct timeval *host_tv;
-> >> ...
-> >>     __put_user(host_tv->tv_sec, &target_tv->tv_sec);
-> >>     __put_user(host_tv->tv_usec, &target_tv->tv_usec);
-> >> ...
-> >
-> > That still seems wrong. The user application has a definition
-> > of 'timeval' that contains the padding, so your definition has
-> > to match that.
->
-> I don't find this definition with the padding. Where it is defined?
->
-> We are at the syscall level, so structures are the ones provided by the
-> target to the syscall, and they can be converted by the libc if the one
-> from the user space differs.
+On 7/12/19 1:37 PM, Aleksandar Markovic wrote:
+> From: Aleksandar Markovic <amarkovic@wavecomp.com>
+> 
+> This was found by GCC 8.3 static analysis.
+> 
 
-glibc will have to create a definition that matches the kernel, which uses
+Again, please amend:
 
-struct __kernel_timespec {
-    __s64 tv_sec;
-    __s64 tv_nsec;
-};
+Fixes: ead9360e2fb
+Reported-by: Stefan Weil <sw@weilnetz.de>
 
-As posix requires tv_nsec to be 'long', you need padding between
-tv_sec and tv_nsec to have a libc definition matching the kernel's
-binary layout.
+> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> ---
+>  target/mips/translate.c | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/target/mips/translate.c b/target/mips/translate.c
+> index 59d4acd..b1cf5f0 100644
+> --- a/target/mips/translate.c
+> +++ b/target/mips/translate.c
+> @@ -9826,6 +9826,7 @@ static void gen_mftr(CPUMIPSState *env, DisasContext *ctx, int rt, int rd,
+>                  gen_mfc0(ctx, t0, rt, sel);
+>                  break;
+>              }
+> +            break;
+>          case 12:
+>              switch (sel) {
+>              case 0:
+> @@ -9835,6 +9836,7 @@ static void gen_mftr(CPUMIPSState *env, DisasContext *ctx, int rt, int rd,
+>                  gen_mfc0(ctx, t0, rt, sel);
+>                  break;
+>              }
+> +            break;
+>          case 13:
+>              switch (sel) {
+>              case 0:
+> 
 
-      Arnd
+12 years missing...
+
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
