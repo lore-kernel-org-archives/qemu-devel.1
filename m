@@ -2,120 +2,89 @@ Return-Path: <SRS0=r3/N=VJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDC0CC742BE
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 13:31:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B69DAC742BD
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 13:34:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B7A68206B8
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 13:31:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 82A3B206B8
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 13:34:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="F+RxF3VW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7A68206B8
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amd.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Itkr6NKp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82A3B206B8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49412 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49444 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlveX-0006eo-HX
-	for qemu-devel@archiver.kernel.org; Fri, 12 Jul 2019 09:31:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55124)
+	id 1hlvhP-0007zT-Ft
+	for qemu-devel@archiver.kernel.org; Fri, 12 Jul 2019 09:34:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56038)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <brijesh.singh@amd.com>) id 1hlveJ-0006Ex-HB
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 09:31:44 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hlvhE-0007aw-Qc
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 09:34:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <brijesh.singh@amd.com>) id 1hlveI-00066G-B7
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 09:31:43 -0400
-Received: from mail-eopbgr710089.outbound.protection.outlook.com
- ([40.107.71.89]:25136 helo=NAM05-BY2-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
- id 1hlveI-00062i-0r
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 09:31:42 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=N1QqprT2O8uwr6oO0ZJke+BjZGwED/C5GCB0oqwKEnCarxXnYXp4rWfQtUI9rwy3HqREMmOib+jB8yNfy994J3l7eQi5BzbI5AFfN8DvBr6SIdiq6oxIpVwTJ9rFwrFoQHFFjY5TvwwVyWaHR7mXlObwktPRlKWJ445RMp3CZ8Yut9u/3p7m/PmimeNyK4/ptNe/1ZHs/ATfGKaJzDvLChhwNMUXdnzt2PPwQY+CoWLYp1UTMm+hdo9nzOhgCZFKdGNhcRU0CW7csC5dSUIkCnLcDHYLFROy/OKAMHUL1ZXUsmbvGCiwYLsBUC2biXPqD8u1S9P86w5+MZsXSq7a6w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5LHVMGiMEWD1ayMkkfZ7z3cEVc7uMP3pQeQ1V9EeMuU=;
- b=GR3PRh33l9O5RWxu0iyVMgZfTZgFg1WAAH3hVJlqC3HblmseEUASjv4B3rtTzra31bLisFmdxhOqDbALkstydkl2xkDnn4R0+xIRjInDNugOFFCxmHW+Ri+C8BEBgV2y48OPMfM6u59YMEcekY+jv1zrrVrd0P+qxUkyxF8cGV14YYNHeivk+fm4bU3xmEjsHpwOcysgSA3pNi97COjw5CAiMqblBTkc/SFh4/8eLYq93aKKTVJjI62Y37TQLMUfEHef1DN5YkgjYkTb0pdhcQwmPgMS6KDwrkGOLfFN00n1FRfq3/vXdY1ng70vCtltEfVI3z3MaGeHxjxNH7Wzlw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1;spf=pass
- smtp.mailfrom=amd.com;dmarc=pass action=none header.from=amd.com;dkim=pass
- header.d=amd.com;arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector1-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5LHVMGiMEWD1ayMkkfZ7z3cEVc7uMP3pQeQ1V9EeMuU=;
- b=F+RxF3VWalBiNn8Bce62YJYkbP9d84os59QcTEUOTkajAruUZfbWcHAVIpNgZs+gljxcg99Dvcb1FMzBtRgnY8a9zB8rQq/NwzF4yGIwi5osmqK5ycBh9OYRw19qB5WBYLb73LMeJiJ10XamfHGrJtV+y7FGUm0+a5D5B67JRgo=
-Received: from DM6PR12MB2682.namprd12.prod.outlook.com (20.176.116.31) by
- DM6PR12MB3162.namprd12.prod.outlook.com (20.179.104.149) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2073.14; Fri, 12 Jul 2019 13:31:36 +0000
-Received: from DM6PR12MB2682.namprd12.prod.outlook.com
- ([fe80::bc1a:a30d:9da2:1cdd]) by DM6PR12MB2682.namprd12.prod.outlook.com
- ([fe80::bc1a:a30d:9da2:1cdd%6]) with mapi id 15.20.2073.008; Fri, 12 Jul 2019
- 13:31:35 +0000
-From: "Singh, Brijesh" <brijesh.singh@amd.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Thread-Topic: [PATCH v2 05/13] doc: update AMD SEV API spec web link
-Thread-Index: AQHVN11FsCWhkaVSwkOeWx6da1F3E6bFuAGAgAFFgoA=
-Date: Fri, 12 Jul 2019 13:31:35 +0000
-Message-ID: <63da3804-07a1-7b5d-9c8f-2e211f14e311@amd.com>
-References: <20190710202219.25939-1-brijesh.singh@amd.com>
- <20190710202219.25939-6-brijesh.singh@amd.com>
- <20190711180631.GT3971@work-vm>
-In-Reply-To: <20190711180631.GT3971@work-vm>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: SN4PR0201CA0043.namprd02.prod.outlook.com
- (2603:10b6:803:2e::29) To DM6PR12MB2682.namprd12.prod.outlook.com
- (2603:10b6:5:4a::31)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=brijesh.singh@amd.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-originating-ip: [165.204.77.1]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: fc302faf-b510-4721-882f-08d706cd42cb
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0; PCL:0;
- RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);
- SRVR:DM6PR12MB3162; 
-x-ms-traffictypediagnostic: DM6PR12MB3162:
-x-ms-exchange-purlcount: 3
-x-microsoft-antispam-prvs: <DM6PR12MB31623211F8116E087B5500D3E5F20@DM6PR12MB3162.namprd12.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:6430;
-x-forefront-prvs: 00963989E5
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10009020)(4636009)(136003)(346002)(366004)(376002)(396003)(39860400002)(199004)(189003)(102836004)(8676002)(99286004)(2906002)(31686004)(386003)(6506007)(81156014)(81166006)(53546011)(305945005)(7736002)(6246003)(8936002)(6512007)(6486002)(5660300002)(71190400001)(71200400001)(76176011)(4326008)(966005)(478600001)(6436002)(6306002)(229853002)(52116002)(6916009)(53936002)(25786009)(66556008)(14454004)(54906003)(486006)(31696002)(14444005)(256004)(26005)(6116002)(3846002)(68736007)(66946007)(66476007)(64756008)(66446008)(86362001)(316002)(476003)(446003)(66066001)(186003)(36756003)(11346002)(2616005);
- DIR:OUT; SFP:1101; SCL:1; SRVR:DM6PR12MB3162;
- H:DM6PR12MB2682.namprd12.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
-received-spf: None (protection.outlook.com: amd.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: Bzc1ObKpjpvXLQ4noEczwDsycS5kM9QvKbABusowR7qkkZDy+vZQ3eB88MiCSunPLLozecYWkn4GnC268oNXd6RW6Ib4oe456ZD1uVc/m003FkGCwzW+FAffeOA3luAiRFNRJOgrs2ZoRCcyLA+KvppnqsyLGUWVlgS79XxYGfCv/79Ccjd4I1/x9OpgcXzFOJzMVPRCt9NuTmIDLtOYSIOhZFja/hnsQ5Yk9qEaW54CEMRbqCvc4ljaFCxpBl90h0PYTKbZTychbFkuu6CE1tE3nKV0hsZkUUylx2ZEUsYVrmirw66umM/js/ztS2f6gyGQRyg3ztDzXoRbXg6JltvJgtX5t7Ql11oOcTDWOyG9+2DzAstIYGiIoqZzaaobzsVGyT/TdhS1Nj6I6bqxkuWi9y6Bt0yXfbm3PPNzCB0=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <DCAF311929632743A369518EE94F12CC@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ (envelope-from <alex.bennee@linaro.org>) id 1hlvhA-0000QC-UA
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 09:34:42 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:52958)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1hlvh8-0000NE-2R
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 09:34:38 -0400
+Received: by mail-wm1-x342.google.com with SMTP id s3so8972767wms.2
+ for <qemu-devel@nongnu.org>; Fri, 12 Jul 2019 06:34:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=JQI622zWoNUOkkgeCO+n7KDF7m0CTTwFldQO013t+js=;
+ b=Itkr6NKptisEvD27C3IRpz3hJRc92BvVVBGjHunLo+ug/vmbqLI3DNTBC+NIkLHe9o
+ 1XpQUFuiGo/EJbIQHgKoKWGX1gDTNzp9YdgZ0W34cXyj67jFsH+iC2TSMVTGC2vdQkQb
+ InpfU07B6O6lcTJ9bnKWivuiWVnCY42WJrSnaOv1eWdExJ0qfCIp14MGYccjYPrMaulS
+ t+alDen3uM4ey9ruOmqk5Ukyn/VN61oEkwx8fbIK6mJ+0IuyZYgFM0qY2enMAMD1bWrM
+ CFmwV2e4GKmfx2+0hkoPYn6/wb3TC/IHqecwqGnEhQdGnOKQ7N/SAaiN/9DOeK5E2v+O
+ js5g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=JQI622zWoNUOkkgeCO+n7KDF7m0CTTwFldQO013t+js=;
+ b=GeMQoJbMnqy5AmPFYS00kwsrsFdzZa5b09/ltXfY7xQ6aBeoa45YJpnFPaD1Qx2xib
+ aM8jMOsD0EsMTaEL01qlfdyYLnBBwtOijggzAvO7KKZe83vpknz2MiNsgEWB8tVIMA71
+ +dDECmm0dshb846YFqumsiAfqwtqE9NRNWk0wU9ovtwfxpwVHeiTmc5jJziHCOshl/id
+ oJ79CTMUAJoixgWMoPnvViTRmtDjlj93CPWPsEpL5M6jOqm7dZ236DOeBj9VyOJDlTzQ
+ puHjn828oJBvvTXtByHvXr+shbMuVGeBeeNGZp+eXQwvRPQKU/3q9bZ+P4WmabFRJgEz
+ 7Bdw==
+X-Gm-Message-State: APjAAAURwTsnUTsn6DqP3L//3zdEq9kLqaGeu59b1937utwTGS7/TAcQ
+ wFINVD72vfS8e7JriotV6OHjtw==
+X-Google-Smtp-Source: APXvYqyXg3MZS3A+uqSXdr7U8O5IwTuLsSA9ARtKfWmIOk9tJb6bstBs48dMMpLT1zZ2B626uOHJSA==
+X-Received: by 2002:a1c:200a:: with SMTP id g10mr9304777wmg.160.1562938476512; 
+ Fri, 12 Jul 2019 06:34:36 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+ by smtp.gmail.com with ESMTPSA id l8sm14976194wrg.40.2019.07.12.06.34.35
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Fri, 12 Jul 2019 06:34:35 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 9667A1FF87;
+ Fri, 12 Jul 2019 14:34:35 +0100 (BST)
+References: <20190711223300.6061-1-jan.bobek@gmail.com>
+User-agent: mu4e 1.3.2; emacs 26.1
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Jan Bobek <jan.bobek@gmail.com>
+In-reply-to: <20190711223300.6061-1-jan.bobek@gmail.com>
+Date: Fri, 12 Jul 2019 14:34:35 +0100
+Message-ID: <87zhljcr6c.fsf@zen.linaroharston>
 MIME-Version: 1.0
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fc302faf-b510-4721-882f-08d706cd42cb
-X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Jul 2019 13:31:35.8599 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: sbrijesh@amd.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB3162
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.71.89
-Subject: Re: [Qemu-devel] [PATCH v2 05/13] doc: update AMD SEV API spec web
- link
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::342
+Subject: Re: [Qemu-devel] [RISU PATCH v3 00/18] Support for generating x86
+ SIMD test images
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -127,36 +96,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>, "Lendacky,
- Thomas" <Thomas.Lendacky@amd.com>, "Singh, Brijesh" <brijesh.singh@amd.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "ehabkost@redhat.com" <ehabkost@redhat.com>
+Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-DQoNCk9uIDcvMTEvMTkgMTowNiBQTSwgRHIuIERhdmlkIEFsYW4gR2lsYmVydCB3cm90ZToNCj4g
-KiBTaW5naCwgQnJpamVzaCAoYnJpamVzaC5zaW5naEBhbWQuY29tKSB3cm90ZToNCj4+IFNpZ25l
-ZC1vZmYtYnk6IEJyaWplc2ggU2luZ2ggPGJyaWplc2guc2luZ2hAYW1kLmNvbT4NCj4+IC0tLQ0K
-Pj4gICBkb2NzL2FtZC1tZW1vcnktZW5jcnlwdGlvbi50eHQgfCAyICstDQo+PiAgIDEgZmlsZSBj
-aGFuZ2VkLCAxIGluc2VydGlvbigrKSwgMSBkZWxldGlvbigtKQ0KPj4NCj4+IGRpZmYgLS1naXQg
-YS9kb2NzL2FtZC1tZW1vcnktZW5jcnlwdGlvbi50eHQgYi9kb2NzL2FtZC1tZW1vcnktZW5jcnlw
-dGlvbi50eHQNCj4+IGluZGV4IDQzYmYzZWU2YTUuLmFiYjlhOTc2ZjUgMTAwNjQ0DQo+PiAtLS0g
-YS9kb2NzL2FtZC1tZW1vcnktZW5jcnlwdGlvbi50eHQNCj4+ICsrKyBiL2RvY3MvYW1kLW1lbW9y
-eS1lbmNyeXB0aW9uLnR4dA0KPj4gQEAgLTk4LDcgKzk4LDcgQEAgQU1EIE1lbW9yeSBFbmNyeXB0
-aW9uIHdoaXRlcGFwZXI6DQo+PiAgIGh0dHA6Ly9hbWQtZGV2LndwZW5naW5lLm5ldGRuYS1jZG4u
-Y29tL3dvcmRwcmVzcy9tZWRpYS8yMDEzLzEyL0FNRF9NZW1vcnlfRW5jcnlwdGlvbl9XaGl0ZXBh
-cGVyX3Y3LVB1YmxpYy5wZGYNCj4+ICAgDQo+PiAgIFNlY3VyZSBFbmNyeXB0ZWQgVmlydHVhbGl6
-YXRpb24gS2V5IE1hbmFnZW1lbnQ6DQo+PiAtWzFdIGh0dHA6Ly9zdXBwb3J0LmFtZC5jb20vVGVj
-aERvY3MvNTU3NjZfU0VWLUtNIEFQSV9TcGVjaWZpY2F0aW9uLnBkZg0KPj4gK1sxXSBodHRwczov
-L2RldmVsb3Blci5hbWQuY29tL3Nldi8gKFNlY3VyZSBFbmNyeXB0ZWQgVmlydHVhbGl6YXRpb24g
-QVBJKQ0KPiANCj4gTm87IHRoYXQgcmVmZXJlbmNlIFsxXSBpcyB1c2VkIGEgZmV3IGxpbmVzIGhp
-cmUgdXAgZm9yOg0KPiANCj4gU2VlIFNFViBLTSBBUEkgU3BlYyBbMV0gJ0xhdW5jaGluZyBhIGd1
-ZXN0JyB1c2FnZSBmbG93IChBcHBlbmRpeCBBKSBmb3IgdGhlDQo+IGNvbXBsZXRlIGZsb3cgY2hh
-cnQuDQo+IA0KPiANCj4gc28gdGhhdCBuZWVkcyBmaXhpbmcgdXAgdG8gYWN0dWFsbHkgcG9pbnQg
-dG8gdGhhdCBmbG93Y2hhcnQgb3INCj4gZXF1aXZhbGVudC4NCj4gDQoNCk9LLCBJIHdpbGwgZml4
-IHRoZW0gaW4gbmV4dCByZXYuDQoNCj4gVGhhdCBzaXRlIGlzIHVzZWZ1bCB0byBpbmNsdWRlLCBi
-dXQgSSBndWVzcyBpdCBhbHNvIG5lZWRzIGEgcG9pbnRlcg0KPiB0byB0aGUgVm9sdW1lMiBzZWN0
-aW9uIDE1LjM0IG9yIHRoZSBsaWtlLg0KPiANCg0KU3VyZSwgSSB3aWxsIGFkZCB0aGUgVm9sdW1l
-MiBzZWN0aW9uIG5vdGUuDQoNCi1CcmlqZXNoDQo=
+
+Jan Bobek <jan.bobek@gmail.com> writes:
+
+> This is v3 of the patch series posted in [1] and [2]. Note that this
+> is the first fully-featured patch series implementing all desired
+> functionality, including (V)LDMXCSR and VSIB-based instructions like
+> VGATHER*.
+>
+> While implementing the last bits required in order to support VGATHERx
+> instructions, I ran into problems which required a larger redesign;
+> namely, there are no more !emit blocks as their functionality is now
+> implemented in regular !constraints blocks. Also, memory constraints
+> are specified in !memory blocks, similarly to other architectures.
+>
+> I tested these changes on my machine; both master and slave modes work
+> in both 32-bit and 64-bit modes.
+
+Two things I've noticed:
+
+  ./contrib/generate_all.sh -n 1 x86.risu testcases.x86
+
+takes a very long time. I wonder if this is a consequence of constantly
+needing to re-query the random number generator?
+
+The other is:
+
+  set -x RISU ./build/i686-linux-gnu/risu
+  ./contrib/record_traces.sh testcases.x86/*.risu.bin
+
+fails on the first trace when validating the playback. Might want to
+check why that is.
+
+>
+> Cheers,
+>  -Jan
+>
+> Changes since v2:
+>   Too many to be listed individually; this patch series might be
+>   better reviewed on its own.
+>
+> References:
+>   1. https://lists.nongnu.org/archive/html/qemu-devel/2019-06/msg04123.ht=
+ml
+>   2. https://lists.nongnu.org/archive/html/qemu-devel/2019-07/msg00001.ht=
+ml
+>
+> Jan Bobek (18):
+>   risugen_common: add helper functions insnv, randint
+>   risugen_common: split eval_with_fields into extract_fields and
+>     eval_block
+>   risugen_x86_asm: add module
+>   risugen_x86_constraints: add module
+>   risugen_x86_memory: add module
+>   risugen_x86: add module
+>   risugen: allow all byte-aligned instructions
+>   risugen: add command-line flag --x86_64
+>   risugen: add --xfeatures option for x86
+>   x86.risu: add MMX instructions
+>   x86.risu: add SSE instructions
+>   x86.risu: add SSE2 instructions
+>   x86.risu: add SSE3 instructions
+>   x86.risu: add SSSE3 instructions
+>   x86.risu: add SSE4.1 and SSE4.2 instructions
+>   x86.risu: add AES and PCLMULQDQ instructions
+>   x86.risu: add AVX instructions
+>   x86.risu: add AVX2 instructions
+>
+>  risugen                    |   27 +-
+>  risugen_arm.pm             |    6 +-
+>  risugen_common.pm          |  117 +-
+>  risugen_m68k.pm            |    3 +-
+>  risugen_ppc64.pm           |    6 +-
+>  risugen_x86.pm             |  518 +++++
+>  risugen_x86_asm.pm         |  918 ++++++++
+>  risugen_x86_constraints.pm |  154 ++
+>  risugen_x86_memory.pm      |   87 +
+>  x86.risu                   | 4499 ++++++++++++++++++++++++++++++++++++
+>  10 files changed, 6293 insertions(+), 42 deletions(-)
+>  create mode 100644 risugen_x86.pm
+>  create mode 100644 risugen_x86_asm.pm
+>  create mode 100644 risugen_x86_constraints.pm
+>  create mode 100644 risugen_x86_memory.pm
+>  create mode 100644 x86.risu
+
+
+--
+Alex Benn=C3=A9e
 
