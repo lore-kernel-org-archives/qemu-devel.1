@@ -2,92 +2,67 @@ Return-Path: <SRS0=r3/N=VJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00FE4C742B3
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 11:10:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 847EDC742B2
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 11:13:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D166120863
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 11:10:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D166120863
+	by mail.kernel.org (Postfix) with ESMTPS id 583EE20863
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 11:13:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 583EE20863
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48230 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48236 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hltRL-0004fk-NW
-	for qemu-devel@archiver.kernel.org; Fri, 12 Jul 2019 07:10:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44727)
+	id 1hltUa-0005tv-7M
+	for qemu-devel@archiver.kernel.org; Fri, 12 Jul 2019 07:13:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45709)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hltR9-0004At-Le
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 07:10:00 -0400
+ (envelope-from <armbru@redhat.com>) id 1hltUP-0005VV-SW
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 07:13:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hltR8-0007jx-Em
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 07:09:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58394)
+ (envelope-from <armbru@redhat.com>) id 1hltUO-0003kD-Vl
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 07:13:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60528)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hltR5-0007dO-LO; Fri, 12 Jul 2019 07:09:55 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hltUO-0003iS-Pe
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 07:13:20 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 1BCB330BC591;
- Fri, 12 Jul 2019 11:09:54 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.40.205.208])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 87BA06062A;
- Fri, 12 Jul 2019 11:09:50 +0000 (UTC)
-To: Kevin Wolf <kwolf@redhat.com>
-References: <20190711195804.30703-1-mreitz@redhat.com>
- <20190711195804.30703-2-mreitz@redhat.com>
- <20190712092419.GB4514@dhcp-200-226.str.redhat.com>
- <8ce2ce78-833e-c98f-ad3a-d44f6432ae4c@redhat.com>
- <20190712110110.GE4514@dhcp-200-226.str.redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <cd184838-6c1f-0d22-1d89-415dbd62955b@redhat.com>
-Date: Fri, 12 Jul 2019 13:09:48 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+ by mx1.redhat.com (Postfix) with ESMTPS id CCBEB81F12;
+ Fri, 12 Jul 2019 11:13:19 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-111.ams2.redhat.com
+ [10.36.116.111])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9A9FD5C26D;
+ Fri, 12 Jul 2019 11:13:19 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 0C2861138648; Fri, 12 Jul 2019 13:13:17 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+References: <20190711122827.18970-1-armbru@redhat.com>
+ <20190711122827.18970-2-armbru@redhat.com>
+ <e5139329-82e3-26dc-b72a-136f8a9c1cc0@linaro.org>
+Date: Fri, 12 Jul 2019 13:13:16 +0200
+In-Reply-To: <e5139329-82e3-26dc-b72a-136f8a9c1cc0@linaro.org> (Richard
+ Henderson's message of "Thu, 11 Jul 2019 18:56:30 +0200")
+Message-ID: <87muhjecab.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <20190712110110.GE4514@dhcp-200-226.str.redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="RYSPyJ6ZBE4IuNGtdACWNtXnzS9m4d9TU"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Fri, 12 Jul 2019 11:09:54 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.25]); Fri, 12 Jul 2019 11:13:19 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [RFC 1/5] block/nbd: Fix hang in .bdrv_close()
+Subject: Re: [Qemu-devel] [PATCH RFC v5 1/3] tests: New make target
+ check-source
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,178 +74,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org,
- qemu-block@nongnu.org
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---RYSPyJ6ZBE4IuNGtdACWNtXnzS9m4d9TU
-Content-Type: multipart/mixed; boundary="XvwttsEzYTMefCyyYjYJ4aBIjpSxm6Gmd";
- protected-headers="v1"
-From: Max Reitz <mreitz@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org,
- Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <cd184838-6c1f-0d22-1d89-415dbd62955b@redhat.com>
-Subject: Re: [RFC 1/5] block/nbd: Fix hang in .bdrv_close()
-References: <20190711195804.30703-1-mreitz@redhat.com>
- <20190711195804.30703-2-mreitz@redhat.com>
- <20190712092419.GB4514@dhcp-200-226.str.redhat.com>
- <8ce2ce78-833e-c98f-ad3a-d44f6432ae4c@redhat.com>
- <20190712110110.GE4514@dhcp-200-226.str.redhat.com>
-In-Reply-To: <20190712110110.GE4514@dhcp-200-226.str.redhat.com>
+Richard Henderson <richard.henderson@linaro.org> writes:
 
---XvwttsEzYTMefCyyYjYJ4aBIjpSxm6Gmd
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+> On 7/11/19 2:28 PM, Markus Armbruster wrote:
+>>  include/exec/cpu_ldst_template.h          |  3 +
+>>  include/exec/cpu_ldst_useronly_template.h |  3 +
+>>  include/exec/cputlb.h                     |  3 +
+>>  include/exec/exec-all.h                   |  3 +
+>>  include/exec/gen-icount.h                 |  2 +
+>>  include/exec/helper-gen.h                 |  2 +
+>>  include/exec/helper-proto.h               |  2 +
+>>  include/exec/helper-tcg.h                 |  2 +
+>>  include/exec/ioport.h                     |  2 +
+>>  include/exec/memory-internal.h            |  2 +
+>>  include/exec/memory_ldst.inc.h            |  2 +
+>>  include/exec/memory_ldst_cached.inc.h     |  2 +
+>>  include/exec/memory_ldst_phys.inc.h       |  2 +
+>
+> The pattern used should not match all *.h, but exclude *_template.h (older
+> naming style) and *.inc.h (newer naming style; we really should finish the
+> conversion).
+>
+> These headers are not standalone, and will be included multiple times by one of
+> the other headers.
 
-On 12.07.19 13:01, Kevin Wolf wrote:
-> Am 12.07.2019 um 12:47 hat Max Reitz geschrieben:
->> On 12.07.19 11:24, Kevin Wolf wrote:
->>> Am 11.07.2019 um 21:58 hat Max Reitz geschrieben:
->>>> When nbd_close() is called from a coroutine, the connection_co never=
+Yes.
 
->>>> gets to run, and thus nbd_teardown_connection() hangs.
->>>>
->>>> This is because aio_co_enter() only puts the connection_co into the =
-main
->>>> coroutine's wake-up queue, so this main coroutine needs to yield and=
+I excluded them the stupid way in this RFC, in part because I was unsure
+about the naming convention for "special .h meant to be included
+multiple times".  My cover letter should have mentioned this under
+"Known issues".
 
->>>> reschedule itself to let the connection_co run.
->>>>
->>>> Signed-off-by: Max Reitz <mreitz@redhat.com>
->>>> ---
->>>>  block/nbd.c | 12 +++++++++++-
->>>>  1 file changed, 11 insertions(+), 1 deletion(-)
->>>>
->>>> diff --git a/block/nbd.c b/block/nbd.c
->>>> index 81edabbf35..b83b6cd43e 100644
->>>> --- a/block/nbd.c
->>>> +++ b/block/nbd.c
->>>> @@ -135,7 +135,17 @@ static void nbd_teardown_connection(BlockDriver=
-State *bs)
->>>>      qio_channel_shutdown(s->ioc,
->>>>                           QIO_CHANNEL_SHUTDOWN_BOTH,
->>>>                           NULL);
->>>> -    BDRV_POLL_WHILE(bs, s->connection_co);
->>>> +
->>>> +    if (qemu_in_coroutine()) {
->>>> +        /* Let our caller poll and just yield until connection_co i=
-s done */
->>>> +        while (s->connection_co) {
->>>> +            aio_co_schedule(qemu_get_current_aio_context(),
->>>> +                            qemu_coroutine_self());
->>>> +            qemu_coroutine_yield();
->>>> +        }
->>>
->>> Isn't this busy waiting? Why not let s->connection_co wake us up when=
+For my series to shed the RFC tag, I need to eliminate the FIXMEs in
+headers that aren't actually broken.  This includes the FIXMEs marking
+"special .h meant to be included multiple times".
 
->>> it's about to terminate instead of immediately rescheduling ourselves=
-?
->>
->> Yes, it is busy waiting, but I didn=E2=80=99t find that bad.  The conn=
-ection_co
->> will be invoked in basically every iteration, and once there is no
->> pending data, it will quit.
->>
->> The answer to =E2=80=9Cwhy not...=E2=80=9D of course is because it=E2=80=
-=99d be more complicated.
->>
->> But anyway.
->>
->> Adding a new function qemu_coroutine_run_after(target) that adds
->> qemu_coroutine_self() to the given @target coroutine=E2=80=99s wake-up=
- queue and
->> then using that instead of scheduling works, too, yes.
->>
->> I don=E2=80=99t really like being responsible for coroutine code, thou=
-gh...
->>
->> (And maybe it=E2=80=99d be better to make it qemu_coroutine_yield_for(=
-target),
->> which does the above and then yields?)
->=20
-> Or just do something like this, which is arguably not only a fix for th=
-e
-> busy wait, but also a code simplification:
-
-1. Is that guaranteed to work?  What if data sneaks in, the
-connection_co handles that, and doesn=E2=80=99t wake up the teardown_co? =
- Will
-it be re-scheduled?
-
-2. I precisely didn=E2=80=99t want to do this because we have this functi=
-onality
-already in the form of Coroutine.co_queue_wakeup.  Why duplicate it here?=
-
-
-Max
-
-> diff --git a/block/nbd.c b/block/nbd.c
-> index b83b6cd43e..c061bd1bfc 100644
-> --- a/block/nbd.c
-> +++ b/block/nbd.c
-> @@ -61,6 +61,7 @@ typedef struct BDRVNBDState {
->      CoMutex send_mutex;
->      CoQueue free_sema;
->      Coroutine *connection_co;
-> +    Coroutine *teardown_co;
->      int in_flight;
->=20
->      NBDClientRequest requests[MAX_NBD_REQUESTS];
-> @@ -137,12 +138,9 @@ static void nbd_teardown_connection(BlockDriverSta=
-te *bs)
->                           NULL);
->=20
->      if (qemu_in_coroutine()) {
-> -        /* Let our caller poll and just yield until connection_co is d=
-one */
-> -        while (s->connection_co) {
-> -            aio_co_schedule(qemu_get_current_aio_context(),
-> -                            qemu_coroutine_self());
-> -            qemu_coroutine_yield();
-> -        }
-> +        /* just yield until connection_co is done */
-> +        s->teardown_co =3D qemu_coroutine_self();
-> +        qemu_coroutine_yield();
->      } else {
->          BDRV_POLL_WHILE(bs, s->connection_co);
->      }
-> @@ -217,6 +215,9 @@ static coroutine_fn void nbd_connection_entry(void =
-*opaque)
->      bdrv_dec_in_flight(s->bs);
->=20
->      s->connection_co =3D NULL;
-> +    if (s->teardown_co) {
-> +        aio_co_wake(s->teardown_co);
-> +    }
->      aio_wait_kick();
->  }
->=20
-
-
-
---XvwttsEzYTMefCyyYjYJ4aBIjpSxm6Gmd--
-
---RYSPyJ6ZBE4IuNGtdACWNtXnzS9m4d9TU
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0oanwACgkQ9AfbAGHV
-z0Di8wf/WoQYpBv9MsN2DDKqE/0Foua3Am4hDhQ6Op/UWnBxoRG0PhtNfuVHAbkp
-kN9aFVtZQgRFjfSyzv4J/GkIveJ6in1goQAC3ORGJjdFhJu940I1avJ+cyPtgjT4
-ZaH/PxwHqlRXYYaA3G4vKX6++qvNfvBHZfE9HJAaL6ikT+kVG34TFMGqHMiBJYW6
-yZIRvMrqh4qjmXKbqLrjpoMpgJz334Olf7ShLPjXX1cG9nIPPMghroy6qOUeV3p1
-UYBvXFZ5cc5ZkTunxWIzBGSyHDDfBTb9+c9k03G5HgpJrKjJ/1ba6zsG7g+WwLKp
-mekVQuMigfVYfe/aLdm6hnQ8MjqoRA==
-=Or9M
------END PGP SIGNATURE-----
-
---RYSPyJ6ZBE4IuNGtdACWNtXnzS9m4d9TU--
+Perhaps I can finish the conversion to the .inc.h convention in v6.
 
