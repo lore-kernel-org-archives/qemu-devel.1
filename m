@@ -2,63 +2,79 @@ Return-Path: <SRS0=r3/N=VJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.2 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 559A7C742D2
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 17:54:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43309C742D7
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 18:10:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2B2392054F
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 17:54:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B2392054F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E5D75205C9
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 18:10:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HLOiorYW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E5D75205C9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51634 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51704 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlzkq-0006fM-R4
-	for qemu-devel@archiver.kernel.org; Fri, 12 Jul 2019 13:54:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44608)
+	id 1hlzzg-00022m-MD
+	for qemu-devel@archiver.kernel.org; Fri, 12 Jul 2019 14:10:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49746)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgilbert@redhat.com>) id 1hlzkg-0006Fo-EQ
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 13:54:35 -0400
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1hlzzX-0001dX-1b
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 14:09:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1hlzke-000796-DS
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 13:54:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:28503)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hlzkc-00077K-I1
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 13:54:32 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 1884A3E2CD;
- Fri, 12 Jul 2019 17:54:28 +0000 (UTC)
-Received: from work-vm (ovpn-117-214.ams2.redhat.com [10.36.117.214])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A3DCF601B7;
- Fri, 12 Jul 2019 17:54:22 +0000 (UTC)
-Date: Fri, 12 Jul 2019 18:54:20 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Message-ID: <20190712175420.GO2730@work-vm>
-References: <20190712143207.4214-1-quintela@redhat.com>
- <CAFEAcA-ydNS072OH7CyGNq2+sESgonW-8QSJdNYJq6zW-rYjUQ@mail.gmail.com>
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1hlzzV-0003Fw-2w
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 14:09:53 -0400
+Received: from mail-ot1-x32c.google.com ([2607:f8b0:4864:20::32c]:33996)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1hlzzU-0003FT-UT
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 14:09:53 -0400
+Received: by mail-ot1-x32c.google.com with SMTP id n5so10344724otk.1
+ for <qemu-devel@nongnu.org>; Fri, 12 Jul 2019 11:09:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:from:date:message-id:subject:to;
+ bh=ABzziioYLWj5hBqNKqPa5SS+TDw12paohexyEV4n10g=;
+ b=HLOiorYWitEByaF4q3Bj2E/LKgKkwLQ+/eAdKMkBDk70Ej5cdBTmtM7nD7tRmn0eoI
+ nslbM4axZ5Ga5L4cK3HmyYC7SyDEbyMwgmIFhBrMQECbBswyb0mHsFAdWJg54+t+Fo8T
+ Ylsl2NimDXHJXfQSop1AV7L2UjyfmzPNGCZFz3MGya2ZPq4SI19kRZqGDiEdmbWtnsc6
+ rkhs7ki2zvNl8newUomBth6CfHwo5WZU3SOXLsBWb26KWGBIDGNoI1FRrzNWdcWflwB3
+ MFnk0XW3ee2FYJwi4fN4miZqbXVkY6zldZy5acFgjUC+J5WNC/WoTnC0XEV3E7hs3Fpf
+ idXA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+ bh=ABzziioYLWj5hBqNKqPa5SS+TDw12paohexyEV4n10g=;
+ b=rNcdWhSbRyKH6IQ/aFjCnZLYjGpRdR4Gigq96GRyCCcIuzKe+/rgQDUcBcBUrhYYf0
+ 7cIybXMYaGlp1XTOvGDQlwm5n0jq2zfHcYNOREIth0bFI2qZ9JLkWMPrerx9s555689J
+ iEIYKGbkRr9hosiUNnt39bPskQfofzbE2/PKe0h1K0lOzY9kAnKLPSAtA0O/KigjpoO7
+ 94Duj+ghTIAV07uESiKO9Zdfs1S9awof6b+QtgYvWu0tD5w5ryjx4yakjMW4fj2kRk8x
+ 7g48ABrnb8/sTQj9+eBCGxPrDO7//ank/I2X4KyB8egFFrjD9ASzx6OV/UddjcFJCD6U
+ IDUQ==
+X-Gm-Message-State: APjAAAXWCH2MS/S4q9QqzOOtIw2dlHiHcy6KEn3AcMJknRYvswKO6ZRQ
+ Bwg2oL8Jy0DAwJux48z2KVknvgkTaFBS8u+O6bU=
+X-Google-Smtp-Source: APXvYqw63lq9i9U46ijVt5TsuN8B/EZWJYTcxiyiVJsinAqru3RvtE5sNKt6AvFN5FyyTxvfR7CRoT7u6tpBD0yfNlY=
+X-Received: by 2002:a9d:5cc1:: with SMTP id r1mr1494799oti.341.1562954991352; 
+ Fri, 12 Jul 2019 11:09:51 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA-ydNS072OH7CyGNq2+sESgonW-8QSJdNYJq6zW-rYjUQ@mail.gmail.com>
-User-Agent: Mutt/1.12.0 (2019-05-25)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.30]); Fri, 12 Jul 2019 17:54:28 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PULL 00/19] Migration patches
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Fri, 12 Jul 2019 20:09:40 +0200
+Message-ID: <CAL1e-=ixrEhBeakGDW8xJVBBzRkZTR4d69w38HHmvxVUzOCkSw@mail.gmail.com>
+To: Richard Henderson <richard.henderson@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, 
+ Peter Maydell <peter.maydell@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::32c
+Subject: [Qemu-devel] [BUG] nanoMIPS support problem related to extract2
+ support for i386 TCG target
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,71 +86,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- kvm-devel <kvm@vger.kernel.org>, Juan Quintela <quintela@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Peter Maydell (peter.maydell@linaro.org) wrote:
-> On Fri, 12 Jul 2019 at 15:32, Juan Quintela <quintela@redhat.com> wrote:
-> >
-> > The following changes since commit a2a9d4adabe340617a24eb73a8b2a116d28a6b38:
-> >
-> >   Merge remote-tracking branch 'remotes/dgibson/tags/ppc-for-4.1-20190712' into staging (2019-07-12 11:06:48 +0100)
-> >
-> > are available in the Git repository at:
-> >
-> >   https://github.com/juanquintela/qemu.git tags/migration-pull-request
-> >
-> > for you to fetch changes up to a48ad5602f496236b4e1955d9e2e8228a7d0ad56:
-> >
-> >   migration: allow private destination ram with x-ignore-shared (2019-07-12 16:25:59 +0200)
-> >
-> > ----------------------------------------------------------------
-> > Migration pull request
-> >
-> > Fix the issues with the previous pull request and 32 bits.
-> >
-> > Please apply.
-> >
-> 
-> Still fails on aarch32 host, I'm afraid:
-> 
-> MALLOC_PERTURB_=${MALLOC_PERTURB_:-$(( ${RANDOM:-0} % 255 + 1))}
-> QTEST_QEMU_BINARY=aarch64-softmmu/qemu-system-aarch64
-> QTEST_QEMU_IMG=qemu-img tests/migration-test -m=quick -k --tap <
-> /dev/null | ./scripts/tap-driver.pl --test-name="migration-test"
-> PASS 1 migration-test /aarch64/migration/deprecated
-> PASS 2 migration-test /aarch64/migration/bad_dest
-> PASS 3 migration-test /aarch64/migration/fd_proto
-> PASS 4 migration-test /aarch64/migration/postcopy/unix
-> PASS 5 migration-test /aarch64/migration/postcopy/recovery
-> PASS 6 migration-test /aarch64/migration/precopy/unix
-> PASS 7 migration-test /aarch64/migration/precopy/tcp
-> PASS 8 migration-test /aarch64/migration/xbzrle/unix
-> malloc(): memory corruption
-> Broken pipe
-> qemu-system-aarch64: load of migration failed: Invalid argument
-> /home/peter.maydell/qemu/tests/libqtest.c:137: kill_qemu() tried to
-> terminate QEMU process but encountered exit status 1
-> Aborted
-> ERROR - too few tests run (expected 9, got 8)
-> /home/peter.maydell/qemu/tests/Makefile.include:899: recipe for target
-> 'check-qtest-aarch64' failed
+Hello, Richard, Peter, and others.
 
-Hmm, I think the only one to go near xbzrle specifically is
-'migration/xbzrle: update cache and current_data in one place'
+As a part of activities before 4.1 release, I tested nanoMIPS support
+in QEMU (which was officially fully integrated in 4.0, is currently
+limited to system mode only, and was tested in a similar fashion right
+prior to 4.0).
 
-it did look right to me; but that is a subtle function so hmmmm.
+This support appears to be broken now. Following command line works in
+4.0, but results in kernel panic for the current tip of the tree:
 
-Dave
+~/Build/qemu-test-revert-c6fb8c0cf704/mipsel-softmmu/qemu-system-mipsel
+-cpu I7200 -kernel generic_nano32r6el_page4k -M malta -serial stdio -m
+1G -hda nanomips32r6_le_sf_2017.05-03-59-gf5595d6.ext4 -append
+"mem=256m@0x0 rw console=ttyS0 vga=cirrus vesa=0x111 root=/dev/sda"
 
-> 
-> thanks
-> -- PMM
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+(kernel and rootfs image files used in this commend line can be
+downloaded from the locations mentioned in our user guide)
+
+The quick bisect points to the commit:
+
+commit c6fb8c0cf704c4a1a48c3e99e995ad4c58150dab
+Author: Richard Henderson <richard.henderson@linaro.org>
+Date:   Mon Feb 25 11:42:35 2019 -0800
+
+    tcg/i386: Support INDEX_op_extract2_{i32,i64}
+
+    Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+
+Please advise on further actions.
+
+Yours,
+Aleksandar
 
