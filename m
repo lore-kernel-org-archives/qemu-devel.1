@@ -2,83 +2,84 @@ Return-Path: <SRS0=r3/N=VJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40B97C742A8
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 05:38:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28B45C742A5
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 05:38:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E6397208E4
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 05:38:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C98D3208E4
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 05:38:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="t3l4fwTG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6397208E4
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="amUxNZJ3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C98D3208E4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46714 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46724 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hloGR-0001Zc-4E
-	for qemu-devel@archiver.kernel.org; Fri, 12 Jul 2019 01:38:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35114)
+	id 1hloGk-00031h-4j
+	for qemu-devel@archiver.kernel.org; Fri, 12 Jul 2019 01:38:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35109)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mrolnik@gmail.com>) id 1hloFM-0005jE-Ov
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 01:37:36 -0400
+ (envelope-from <mrolnik@gmail.com>) id 1hloFM-0005iB-Hm
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 01:37:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mrolnik@gmail.com>) id 1hloFE-0007hy-9l
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 01:37:28 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:37507)
+ (envelope-from <mrolnik@gmail.com>) id 1hloFG-0007j6-4t
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 01:37:26 -0400
+Received: from mail-wm1-x32a.google.com ([2a00:1450:4864:20::32a]:56031)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1hloFD-0007hC-QE
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 01:37:20 -0400
-Received: by mail-wr1-x441.google.com with SMTP id n9so8565056wrr.4
- for <qemu-devel@nongnu.org>; Thu, 11 Jul 2019 22:37:19 -0700 (PDT)
+ (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1hloFF-0007iT-Oj
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 01:37:22 -0400
+Received: by mail-wm1-x32a.google.com with SMTP id a15so7631206wmj.5
+ for <qemu-devel@nongnu.org>; Thu, 11 Jul 2019 22:37:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=QRVv/yFPxv+HPUb40iKmISBavNJC7O7DoPnBJh6kT5g=;
- b=t3l4fwTGUPC/ZaH4oiB2qO/e7ZL7dhWi07EWm4fZMw8chtHGl1IqFZUTcVGETczxj+
- 5FucrcFOXRmMsHC1kNHO5SgDDCzSUgkw+4OmofeIQ4JlmjaRF2oiIaCVf7AmUFqqNVTv
- XHgXjcBtGinf17MrNKYM68nInOZ5+CpARhTziLYv/7d23jY+BKBMdw2x166ETLmRN5eb
- PFcpisWOxgbx5bKcHx6Npvk8e53lFhKs2P1EZwfRTb1fhTBB8ZuqGRMqQ6EB9lDoRKGN
- K9Mu+q/cdlQMGrBq4x1Yl+Ji2Q5lTodNCbGqhhffHQGC6gdz7mNAwAC7EvRFENfJYIl3
- ivTg==
+ bh=4HJz4QwSyDrITqaCCSPLn0aGSTeN9nz5MIk6rqg1k+A=;
+ b=amUxNZJ3akEkkqRIQO8cUyLFM6G22HqAG5QUALZenr5DUE6B360Z0O/2oCsMxWsSgu
+ micTpbDvHNACDmZo3V2SLHQPgKczZ7DTtQRyoeNTLaAzrMSK1F186SudMYNoz0LwCsqp
+ O//hzo6KeK97ZmhNgWhJAhIfWT6kgqsl0wc1NadbD5ZtZU2DKMnzPA5E6g5fPwFoYdsr
+ MyeIWhndXY0GEPRqlzXWXJfggNDE7O1i9CTOQH8Ys92UyX0fVpPfNdKC6ddg5431cEF5
+ kW2toZdqVF9J7GvUWPXab41ANfY8VBfOGvW0SXuBIbtsx+Uy4kYIzwd/v9HyauVQhy/Z
+ F+Ag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=QRVv/yFPxv+HPUb40iKmISBavNJC7O7DoPnBJh6kT5g=;
- b=CbnQ1YX1AMxSSVpvpeUJ8LbiRG9Do1zoz8S5XpUB3+KNmTzvIVe93epvgJUu5Ekjmb
- E8xA5R00gf5LUgBSE0cJvQJacUgqSDoy8nKiAeQcj24yFyEEH1o/+8p3JJqyx+tzBKz2
- /JWX1mVML+RpWB4v7ORHrmXwXr+FoPyIQOZr6zI2RLXDr6Qi5SGHWyTi+CvDmhRMg1s3
- 24vpxSrbtJQfiOJBQcHzXOKYbb7Q1Xd4Etaln3v1PG5rdw223tfffG4asc4EULlVVPm0
- yfYMbh5l/QF4sbxtRq+szZQrThQs5G1SRmWShMzCFlWROhHIXIEPFvjl/iWSRV43R+jK
- vJ0A==
-X-Gm-Message-State: APjAAAUNAkbNJf1l69pZsnJVMLKeZD5Df5iV5rp/Bs9blWbARJ7pOHVt
- jQreNIH/v3GmQZOx5vHNRuKdokAOlIw=
-X-Google-Smtp-Source: APXvYqxluJDXUpCNYnOI5jnztNXGB/0soaT8SOIrh+Gco0M15Xg5qXLpbm2VxbPIUUcomvEMgpPpCw==
-X-Received: by 2002:a5d:4cc5:: with SMTP id c5mr8636020wrt.278.1562909837523; 
- Thu, 11 Jul 2019 22:37:17 -0700 (PDT)
+ bh=4HJz4QwSyDrITqaCCSPLn0aGSTeN9nz5MIk6rqg1k+A=;
+ b=bpCvC72ZQ4wOWPonkUXThj+T1yTL2U3k9fsJmwFkt+okrZCTTLMHdY7eEUF/EYyQqt
+ 5iwluy9ovOAhJiIPkJ0elHrJe/HSRco4ErJLoKCLuE1aUCvSMc5wr4FVm3ynhm/4g6LZ
+ EeH9peXCS4apmNebdjvxRpWQqBv7If6omSlsBxkK0ag0hkbOxrfIkHCtn3VmMfJyqjzk
+ nJ/lnErXkfMXdytxzquQJoqdpjbUO1fFctizTDDjbgbOvJ0F5KNUOgW/8zH6r7O96LS9
+ lL7R+Saj7fyRGP1PMEhC7zfTzDLI0Pt8ABRKvA8On1agF7Yz/G69mMO8xKj1cf69THxS
+ 7Xxw==
+X-Gm-Message-State: APjAAAV0E1f4GJrMdkOMOwpvSdG3dWZPQmAnw80xF6rlJsVKR/x0crlb
+ 8GCTZoOlpD3M0kykRhbEOp7BIJeKljYT5Q==
+X-Google-Smtp-Source: APXvYqzjiUKBaxlcdP30pWw/dtNW9YHgFXSGmUKuvwViTmoU49M9JGsebmG3iXDhW5dG0707MV0EJw==
+X-Received: by 2002:a1c:4041:: with SMTP id n62mr7660749wma.100.1562909839848; 
+ Thu, 11 Jul 2019 22:37:19 -0700 (PDT)
 Received: from 8c859074c0ff.ant.amazon.com.com
  (bzq-109-66-61-47.red.bezeqint.net. [109.66.61.47])
- by smtp.gmail.com with ESMTPSA id y6sm7824009wmd.16.2019.07.11.22.37.14
+ by smtp.gmail.com with ESMTPSA id y6sm7824009wmd.16.2019.07.11.22.37.17
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
- Thu, 11 Jul 2019 22:37:17 -0700 (PDT)
+ Thu, 11 Jul 2019 22:37:19 -0700 (PDT)
 From: Michael Rolnik <mrolnik@gmail.com>
 To: qemu-devel@nongnu.org
-Date: Fri, 12 Jul 2019 08:37:01 +0300
-Message-Id: <20190712053704.21228-5-mrolnik@gmail.com>
+Date: Fri, 12 Jul 2019 08:37:02 +0300
+Message-Id: <20190712053704.21228-6-mrolnik@gmail.com>
 X-Mailer: git-send-email 2.17.2 (Apple Git-113)
 In-Reply-To: <20190712053704.21228-1-mrolnik@gmail.com>
 References: <20190712053704.21228-1-mrolnik@gmail.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::441
-Subject: [Qemu-devel] [PATCH v26 4/7] target/avr: Add instruction translation
+X-Received-From: 2a00:1450:4864:20::32a
+Subject: [Qemu-devel] [PATCH v26 5/7] target/avr: Add limited support for
+ USART and 16 bit timer peripherals
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,2915 +91,1420 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: imammedo@redhat.com, Michael Rolnik <mrolnik@gmail.com>,
- richard.henderson@linaro.org, philmd@redhat.com
+Cc: imammedo@redhat.com, Sarah Harris <S.E.Harris@kent.ac.uk>,
+ Michael Rolnik <mrolnik@gmail.com>, richard.henderson@linaro.org,
+ philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This includes:
-- TCG translations for each instruction
+From: Sarah Harris <S.E.Harris@kent.ac.uk>
+
+These were designed to facilitate testing but should provide enough function to be useful in other contexts.
+Only a subset of the functions of each peripheral is implemented, mainly due to the lack of a standard way to handle electrical connections (like GPIO pins).
 
 Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
 ---
- target/avr/translate.c | 2888 ++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 2888 insertions(+)
- create mode 100644 target/avr/translate.c
+ hw/char/Kconfig                |   3 +
+ hw/char/Makefile.objs          |   1 +
+ hw/char/avr_usart.c            | 322 ++++++++++++++++++
+ hw/misc/Kconfig                |   3 +
+ hw/misc/Makefile.objs          |   2 +
+ hw/misc/avr_mask.c             | 110 ++++++
+ hw/timer/Kconfig               |   3 +
+ hw/timer/Makefile.objs         |   1 +
+ hw/timer/avr_timer16.c         | 603 +++++++++++++++++++++++++++++++++
+ include/hw/char/avr_usart.h    |  97 ++++++
+ include/hw/misc/avr_mask.h     |  47 +++
+ include/hw/timer/avr_timer16.h |  97 ++++++
+ 12 files changed, 1289 insertions(+)
+ create mode 100644 hw/char/avr_usart.c
+ create mode 100644 hw/misc/avr_mask.c
+ create mode 100644 hw/timer/avr_timer16.c
+ create mode 100644 include/hw/char/avr_usart.h
+ create mode 100644 include/hw/misc/avr_mask.h
+ create mode 100644 include/hw/timer/avr_timer16.h
 
-diff --git a/target/avr/translate.c b/target/avr/translate.c
+diff --git a/hw/char/Kconfig b/hw/char/Kconfig
+index 40e7a8b8bb..331b20983f 100644
+--- a/hw/char/Kconfig
++++ b/hw/char/Kconfig
+@@ -46,3 +46,6 @@ config SCLPCONSOLE
+ 
+ config TERMINAL3270
+     bool
++
++config AVR_USART
++    bool
+diff --git a/hw/char/Makefile.objs b/hw/char/Makefile.objs
+index 02d8a66925..09ed50f1d0 100644
+--- a/hw/char/Makefile.objs
++++ b/hw/char/Makefile.objs
+@@ -21,6 +21,7 @@ obj-$(CONFIG_PSERIES) += spapr_vty.o
+ obj-$(CONFIG_DIGIC) += digic-uart.o
+ obj-$(CONFIG_STM32F2XX_USART) += stm32f2xx_usart.o
+ obj-$(CONFIG_RASPI) += bcm2835_aux.o
++obj-$(CONFIG_AVR_USART) += avr_usart.o
+ 
+ common-obj-$(CONFIG_CMSDK_APB_UART) += cmsdk-apb-uart.o
+ common-obj-$(CONFIG_ETRAXFS) += etraxfs_ser.o
+diff --git a/hw/char/avr_usart.c b/hw/char/avr_usart.c
 new file mode 100644
-index 0000000000..42cb4a690c
+index 0000000000..21f533f6e6
 --- /dev/null
-+++ b/target/avr/translate.c
-@@ -0,0 +1,2888 @@
++++ b/hw/char/avr_usart.c
+@@ -0,0 +1,322 @@
 +/*
-+ * QEMU AVR CPU
++ * AVR USART
 + *
-+ * Copyright (c) 2019 Michael Rolnik
++ * Copyright (c) 2018 University of Kent
++ * Author: Sarah Harris
 + *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2.1 of the License, or (at your option) any later version.
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
 + *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
 + *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see
-+ * <http://www.gnu.org/licenses/lgpl-2.1.html>
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
 + */
 +
 +#include "qemu/osdep.h"
-+#include "qemu/qemu-print.h"
-+#include "tcg/tcg.h"
-+#include "cpu.h"
-+#include "exec/exec-all.h"
-+#include "disas/disas.h"
-+#include "tcg-op.h"
-+#include "exec/cpu_ldst.h"
-+#include "exec/helper-proto.h"
-+#include "exec/helper-gen.h"
-+#include "exec/log.h"
-+#include "exec/gdbstub.h"
-+#include "exec/translator.h"
++#include "hw/char/avr_usart.h"
++#include "qemu/log.h"
 +
-+/*
-+ *  Define if you want a BREAK instruction translated to a breakpoint
-+ *  Active debugging connection is assumed
-+ *  This is for
-+ *  https://github.com/seharris/qemu-avr-tests/tree/master/instruction-tests
-+ *  tests
-+ */
-+#undef BREAKPOINT_ON_BREAK
-+
-+static TCGv cpu_pc;
-+
-+static TCGv cpu_Cf;
-+static TCGv cpu_Zf;
-+static TCGv cpu_Nf;
-+static TCGv cpu_Vf;
-+static TCGv cpu_Sf;
-+static TCGv cpu_Hf;
-+static TCGv cpu_Tf;
-+static TCGv cpu_If;
-+
-+static TCGv cpu_rampD;
-+static TCGv cpu_rampX;
-+static TCGv cpu_rampY;
-+static TCGv cpu_rampZ;
-+
-+static TCGv cpu_r[NO_CPU_REGISTERS];
-+static TCGv cpu_eind;
-+static TCGv cpu_sp;
-+
-+static TCGv cpu_skip;
-+
-+static const char reg_names[NO_CPU_REGISTERS][8] = {
-+    "r0",  "r1",  "r2",  "r3",  "r4",  "r5",  "r6",  "r7",
-+    "r8",  "r9",  "r10", "r11", "r12", "r13", "r14", "r15",
-+    "r16", "r17", "r18", "r19", "r20", "r21", "r22", "r23",
-+    "r24", "r25", "r26", "r27", "r28", "r29", "r30", "r31",
-+};
-+#define REG(x) (cpu_r[x])
-+
-+enum {
-+    DISAS_EXIT   = DISAS_TARGET_0,  /* We want return to the cpu main loop.  */
-+    DISAS_LOOKUP = DISAS_TARGET_1,  /* We have a variable condition exit.  */
-+    DISAS_CHAIN  = DISAS_TARGET_2,  /* We have a single condition exit.  */
-+};
-+
-+typedef struct DisasContext DisasContext;
-+
-+/* This is the state at translation time. */
-+struct DisasContext {
-+    TranslationBlock *tb;
-+
-+    CPUAVRState *env;
-+    CPUState *cs;
-+
-+    target_long npc;
-+    uint32_t opcode;
-+
-+    /* Routine used to access memory */
-+    int memidx;
-+    int bstate;
-+    int singlestep;
-+
-+    TCGv skip_var0;
-+    TCGv skip_var1;
-+    TCGCond skip_cond;
-+    bool free_skip_var0;
-+};
-+
-+static int to_A(DisasContext *ctx, int indx) { return 16 + (indx % 16); }
-+static int to_B(DisasContext *ctx, int indx) { return 16 + (indx % 8); }
-+static int to_C(DisasContext *ctx, int indx) { return 24 + (indx % 4) * 2; }
-+static int to_D(DisasContext *ctx, int indx) { return (indx % 16) * 2; }
-+
-+static uint16_t next_word(DisasContext *ctx)
++static int avr_usart_can_receive(void *opaque)
 +{
-+    return cpu_lduw_code(ctx->env, ctx->npc++ * 2);
-+}
++    AVRUsartState *usart = opaque;
 +
-+static int append_16(DisasContext *ctx, int x)
-+{
-+    return x << 16 | next_word(ctx);
-+}
-+
-+static bool decode_insn(DisasContext *ctx, uint16_t insn);
-+#include "decode_insn.inc.c"
-+
-+static bool avr_have_feature(DisasContext *ctx, int feature)
-+{
-+    if (!avr_feature(ctx->env, feature)) {
-+        gen_helper_unsupported(cpu_env);
-+        ctx->bstate = DISAS_NORETURN;
-+        return false;
++    if (usart->data_valid || !(usart->csrb & USART_CSRB_RXEN)) {
++        return 0;
 +    }
-+    return true;
++    return 1;
 +}
 +
-+static void gen_goto_tb(DisasContext *ctx, int n, target_ulong dest)
++static void avr_usart_receive(void *opaque, const uint8_t *buffer, int size)
 +{
-+    TranslationBlock *tb = ctx->tb;
-+
-+    if (ctx->singlestep == 0) {
-+        tcg_gen_goto_tb(n);
-+        tcg_gen_movi_i32(cpu_pc, dest);
-+        tcg_gen_exit_tb(tb, n);
-+    } else {
-+        tcg_gen_movi_i32(cpu_pc, dest);
-+        gen_helper_debug(cpu_env);
-+        tcg_gen_exit_tb(NULL, 0);
-+    }
-+    ctx->bstate = DISAS_NORETURN;
-+}
-+
-+#include "exec/gen-icount.h"
-+
-+static void gen_add_CHf(TCGv R, TCGv Rd, TCGv Rr)
-+{
-+    TCGv t1 = tcg_temp_new_i32();
-+    TCGv t2 = tcg_temp_new_i32();
-+    TCGv t3 = tcg_temp_new_i32();
-+
-+    tcg_gen_and_tl(t1, Rd, Rr); /* t1 = Rd & Rr */
-+    tcg_gen_andc_tl(t2, Rd, R); /* t2 = Rd & ~R */
-+    tcg_gen_andc_tl(t3, Rr, R); /* t3 = Rr & ~R */
-+    tcg_gen_or_tl(t1, t1, t2); /* t1 = t1 | t2 | t3 */
-+    tcg_gen_or_tl(t1, t1, t3);
-+
-+    tcg_gen_shri_tl(cpu_Cf, t1, 7); /* Cf = t1(7) */
-+    tcg_gen_shri_tl(cpu_Hf, t1, 3); /* Hf = t1(3) */
-+    tcg_gen_andi_tl(cpu_Hf, cpu_Hf, 1);
-+
-+    tcg_temp_free_i32(t3);
-+    tcg_temp_free_i32(t2);
-+    tcg_temp_free_i32(t1);
-+}
-+
-+static void gen_add_Vf(TCGv R, TCGv Rd, TCGv Rr)
-+{
-+    TCGv t1 = tcg_temp_new_i32();
-+    TCGv t2 = tcg_temp_new_i32();
-+
-+    /* t1 = Rd & Rr & ~R | ~Rd & ~Rr & R = (Rd ^ R) & ~(Rd ^ Rr) */
-+    tcg_gen_xor_tl(t1, Rd, R);
-+    tcg_gen_xor_tl(t2, Rd, Rr);
-+    tcg_gen_andc_tl(t1, t1, t2);
-+
-+    tcg_gen_shri_tl(cpu_Vf, t1, 7); /* Vf = t1(7) */
-+
-+    tcg_temp_free_i32(t2);
-+    tcg_temp_free_i32(t1);
-+}
-+
-+static void gen_sub_CHf(TCGv R, TCGv Rd, TCGv Rr)
-+{
-+    TCGv t1 = tcg_temp_new_i32();
-+    TCGv t2 = tcg_temp_new_i32();
-+    TCGv t3 = tcg_temp_new_i32();
-+
-+    /* Cf & Hf */
-+    tcg_gen_not_tl(t1, Rd); /* t1 = ~Rd */
-+    tcg_gen_and_tl(t2, t1, Rr); /* t2 = ~Rd & Rr */
-+    tcg_gen_or_tl(t3, t1, Rr); /* t3 = (~Rd | Rr) & R */
-+    tcg_gen_and_tl(t3, t3, R);
-+    tcg_gen_or_tl(t2, t2, t3); /* t2 = ~Rd & Rr | ~Rd & R | R & Rr */
-+    tcg_gen_shri_tl(cpu_Cf, t2, 7); /* Cf = t2(7) */
-+    tcg_gen_shri_tl(cpu_Hf, t2, 3); /* Hf = t2(3) */
-+    tcg_gen_andi_tl(cpu_Hf, cpu_Hf, 1);
-+
-+    tcg_temp_free_i32(t3);
-+    tcg_temp_free_i32(t2);
-+    tcg_temp_free_i32(t1);
-+}
-+
-+static void gen_sub_Vf(TCGv R, TCGv Rd, TCGv Rr)
-+{
-+    TCGv t1 = tcg_temp_new_i32();
-+    TCGv t2 = tcg_temp_new_i32();
-+
-+    /* Vf */
-+    /* t1 = Rd & ~Rr & ~R | ~Rd & Rr & R = (Rd ^ R) & (Rd ^ R) */
-+    tcg_gen_xor_tl(t1, Rd, R);
-+    tcg_gen_xor_tl(t2, Rd, Rr);
-+    tcg_gen_and_tl(t1, t1, t2);
-+    tcg_gen_shri_tl(cpu_Vf, t1, 7); /* Vf = t1(7) */
-+
-+    tcg_temp_free_i32(t2);
-+    tcg_temp_free_i32(t1);
-+}
-+
-+static void gen_rshift_ZNVSf(TCGv R)
-+{
-+    tcg_gen_mov_tl(cpu_Zf, R); /* Zf = R */
-+    tcg_gen_shri_tl(cpu_Nf, R, 7); /* Nf = R(7) */
-+    tcg_gen_xor_tl(cpu_Vf, cpu_Nf, cpu_Cf);
-+    tcg_gen_xor_tl(cpu_Sf, cpu_Nf, cpu_Vf); /* Sf = Nf ^ Vf */
-+}
-+
-+static void gen_NSf(TCGv R)
-+{
-+    tcg_gen_shri_tl(cpu_Nf, R, 7); /* Nf = R(7) */
-+    tcg_gen_xor_tl(cpu_Sf, cpu_Nf, cpu_Vf); /* Sf = Nf ^ Vf */
-+}
-+
-+static void gen_ZNSf(TCGv R)
-+{
-+    tcg_gen_mov_tl(cpu_Zf, R); /* Zf = R */
-+    tcg_gen_shri_tl(cpu_Nf, R, 7); /* Nf = R(7) */
-+    tcg_gen_xor_tl(cpu_Sf, cpu_Nf, cpu_Vf); /* Sf = Nf ^ Vf */
-+}
-+
-+static void gen_push_ret(DisasContext *ctx, int ret)
-+{
-+    if (avr_feature(ctx->env, AVR_FEATURE_1_BYTE_PC)) {
-+
-+        TCGv t0 = tcg_const_i32((ret & 0x0000ff));
-+
-+        tcg_gen_qemu_st_tl(t0, cpu_sp, MMU_DATA_IDX, MO_UB);
-+        tcg_gen_subi_tl(cpu_sp, cpu_sp, 1);
-+
-+        tcg_temp_free_i32(t0);
-+    } else if (avr_feature(ctx->env, AVR_FEATURE_2_BYTE_PC)) {
-+
-+        TCGv t0 = tcg_const_i32((ret & 0x00ffff));
-+
-+        tcg_gen_subi_tl(cpu_sp, cpu_sp, 1);
-+        tcg_gen_qemu_st_tl(t0, cpu_sp, MMU_DATA_IDX, MO_BEUW);
-+        tcg_gen_subi_tl(cpu_sp, cpu_sp, 1);
-+
-+        tcg_temp_free_i32(t0);
-+
-+    } else if (avr_feature(ctx->env, AVR_FEATURE_3_BYTE_PC)) {
-+
-+        TCGv lo = tcg_const_i32((ret & 0x0000ff));
-+        TCGv hi = tcg_const_i32((ret & 0xffff00) >> 8);
-+
-+        tcg_gen_qemu_st_tl(lo, cpu_sp, MMU_DATA_IDX, MO_UB);
-+        tcg_gen_subi_tl(cpu_sp, cpu_sp, 2);
-+        tcg_gen_qemu_st_tl(hi, cpu_sp, MMU_DATA_IDX, MO_BEUW);
-+        tcg_gen_subi_tl(cpu_sp, cpu_sp, 1);
-+
-+        tcg_temp_free_i32(lo);
-+        tcg_temp_free_i32(hi);
++    AVRUsartState *usart = opaque;
++    assert(size == 1);
++    assert(!usart->data_valid);
++    usart->data = buffer[0];
++    usart->data_valid = true;
++    usart->csra |= USART_CSRA_RXC;
++    if (usart->csrb & USART_CSRB_RXCIE) {
++        qemu_set_irq(usart->rxc_irq, 1);
 +    }
 +}
 +
-+static void gen_pop_ret(DisasContext *ctx, TCGv ret)
++static void update_char_mask(AVRUsartState *usart)
 +{
-+    if (avr_feature(ctx->env, AVR_FEATURE_1_BYTE_PC)) {
-+        tcg_gen_addi_tl(cpu_sp, cpu_sp, 1);
-+        tcg_gen_qemu_ld_tl(ret, cpu_sp, MMU_DATA_IDX, MO_UB);
-+    } else if (avr_feature(ctx->env, AVR_FEATURE_2_BYTE_PC)) {
-+        tcg_gen_addi_tl(cpu_sp, cpu_sp, 1);
-+        tcg_gen_qemu_ld_tl(ret, cpu_sp, MMU_DATA_IDX, MO_BEUW);
-+        tcg_gen_addi_tl(cpu_sp, cpu_sp, 1);
-+    } else if (avr_feature(ctx->env, AVR_FEATURE_3_BYTE_PC)) {
-+        TCGv lo = tcg_temp_new_i32();
-+        TCGv hi = tcg_temp_new_i32();
-+
-+        tcg_gen_addi_tl(cpu_sp, cpu_sp, 1);
-+        tcg_gen_qemu_ld_tl(hi, cpu_sp, MMU_DATA_IDX, MO_BEUW);
-+
-+        tcg_gen_addi_tl(cpu_sp, cpu_sp, 2);
-+        tcg_gen_qemu_ld_tl(lo, cpu_sp, MMU_DATA_IDX, MO_UB);
-+
-+        tcg_gen_deposit_tl(ret, lo, hi, 8, 16);
-+
-+        tcg_temp_free_i32(lo);
-+        tcg_temp_free_i32(hi);
-+    }
-+}
-+
-+static void gen_jmp_ez(DisasContext *ctx)
-+{
-+    tcg_gen_deposit_tl(cpu_pc, cpu_r[30], cpu_r[31], 8, 8);
-+    tcg_gen_or_tl(cpu_pc, cpu_pc, cpu_eind);
-+    ctx->bstate = DISAS_LOOKUP;
-+}
-+
-+static void gen_jmp_z(DisasContext *ctx)
-+{
-+    tcg_gen_deposit_tl(cpu_pc, cpu_r[30], cpu_r[31], 8, 8);
-+    ctx->bstate = DISAS_LOOKUP;
-+}
-+
-+/*
-+ *  in the gen_set_addr & gen_get_addr functions
-+ *  H assumed to be in 0x00ff0000 format
-+ *  M assumed to be in 0x000000ff format
-+ *  L assumed to be in 0x000000ff format
-+ */
-+static void gen_set_addr(TCGv addr, TCGv H, TCGv M, TCGv L)
-+{
-+
-+    tcg_gen_andi_tl(L, addr, 0x000000ff);
-+
-+    tcg_gen_andi_tl(M, addr, 0x0000ff00);
-+    tcg_gen_shri_tl(M, M, 8);
-+
-+    tcg_gen_andi_tl(H, addr, 0x00ff0000);
-+}
-+
-+static void gen_set_xaddr(TCGv addr)
-+{
-+    gen_set_addr(addr, cpu_rampX, cpu_r[27], cpu_r[26]);
-+}
-+
-+static void gen_set_yaddr(TCGv addr)
-+{
-+    gen_set_addr(addr, cpu_rampY, cpu_r[29], cpu_r[28]);
-+}
-+
-+static void gen_set_zaddr(TCGv addr)
-+{
-+    gen_set_addr(addr, cpu_rampZ, cpu_r[31], cpu_r[30]);
-+}
-+
-+static TCGv gen_get_addr(TCGv H, TCGv M, TCGv L)
-+{
-+    TCGv addr = tcg_temp_new_i32();
-+
-+    tcg_gen_deposit_tl(addr, M, H, 8, 8);
-+    tcg_gen_deposit_tl(addr, L, addr, 8, 16);
-+
-+    return addr;
-+}
-+
-+static TCGv gen_get_xaddr(void)
-+{
-+    return gen_get_addr(cpu_rampX, cpu_r[27], cpu_r[26]);
-+}
-+
-+static TCGv gen_get_yaddr(void)
-+{
-+    return gen_get_addr(cpu_rampY, cpu_r[29], cpu_r[28]);
-+}
-+
-+static TCGv gen_get_zaddr(void)
-+{
-+    return gen_get_addr(cpu_rampZ, cpu_r[31], cpu_r[30]);
-+}
-+
-+/*
-+ *  Adds two registers and the contents of the C Flag and places the result in
-+ *  the destination register Rd.
-+ */
-+static bool trans_ADC(DisasContext *ctx, arg_ADC *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv Rr = cpu_r[a->rr];
-+    TCGv R = tcg_temp_new_i32();
-+
-+    /* op */
-+    tcg_gen_add_tl(R, Rd, Rr); /* R = Rd + Rr + Cf */
-+    tcg_gen_add_tl(R, R, cpu_Cf);
-+    tcg_gen_andi_tl(R, R, 0xff); /* make it 8 bits */
-+
-+    gen_add_CHf(R, Rd, Rr);
-+    gen_add_Vf(R, Rd, Rr);
-+    gen_ZNSf(R);
-+
-+    /* R */
-+    tcg_gen_mov_tl(Rd, R);
-+
-+    tcg_temp_free_i32(R);
-+
-+    return true;
-+}
-+
-+/*
-+ *  Adds two registers without the C Flag and places the result in the
-+ *  destination register Rd.
-+ */
-+static bool trans_ADD(DisasContext *ctx, arg_ADD *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv Rr = cpu_r[a->rr];
-+    TCGv R = tcg_temp_new_i32();
-+
-+    /* op */
-+    tcg_gen_add_tl(R, Rd, Rr); /* Rd = Rd + Rr */
-+    tcg_gen_andi_tl(R, R, 0xff); /* make it 8 bits */
-+
-+    gen_add_CHf(R, Rd, Rr);
-+    gen_add_Vf(R, Rd, Rr);
-+    gen_ZNSf(R);
-+
-+    /* R */
-+    tcg_gen_mov_tl(Rd, R);
-+
-+    tcg_temp_free_i32(R);
-+
-+    return true;
-+}
-+
-+/*
-+ *  Adds an immediate value (0 - 63) to a register pair and places the result
-+ *  in the register pair. This instruction operates on the upper four register
-+ *  pairs, and is well suited for operations on the pointer registers.  This
-+ *  instruction is not available in all devices. Refer to the device specific
-+ *  instruction set summary.
-+ */
-+static bool trans_ADIW(DisasContext *ctx, arg_ADIW *a)
-+{
-+    if (!avr_have_feature(ctx, AVR_FEATURE_ADIW_SBIW)) {
-+        return true;
-+    }
-+
-+    TCGv RdL = cpu_r[a->rd];
-+    TCGv RdH = cpu_r[a->rd + 1];
-+    int Imm = (a->imm);
-+    TCGv R = tcg_temp_new_i32();
-+    TCGv Rd = tcg_temp_new_i32();
-+
-+    /* op */
-+    tcg_gen_deposit_tl(Rd, RdL, RdH, 8, 8); /* Rd = RdH:RdL */
-+    tcg_gen_addi_tl(R, Rd, Imm); /* R = Rd + Imm */
-+    tcg_gen_andi_tl(R, R, 0xffff); /* make it 16 bits */
-+
-+    /* Cf */
-+    tcg_gen_andc_tl(cpu_Cf, Rd, R); /* Cf = Rd & ~R */
-+    tcg_gen_shri_tl(cpu_Cf, cpu_Cf, 15);
-+
-+    /* Vf */
-+    tcg_gen_andc_tl(cpu_Vf, R, Rd); /* Vf = R & ~Rd */
-+    tcg_gen_shri_tl(cpu_Vf, cpu_Vf, 15);
-+
-+    /* Zf */
-+    tcg_gen_mov_tl(cpu_Zf, R); /* Zf = R */
-+
-+    /* Nf */
-+    tcg_gen_shri_tl(cpu_Nf, R, 15); /* Nf = R(15) */
-+
-+    /* Sf */
-+    tcg_gen_xor_tl(cpu_Sf, cpu_Nf, cpu_Vf);/* Sf = Nf ^ Vf */
-+
-+    /* R */
-+    tcg_gen_andi_tl(RdL, R, 0xff);
-+    tcg_gen_shri_tl(RdH, R, 8);
-+
-+    tcg_temp_free_i32(Rd);
-+    tcg_temp_free_i32(R);
-+
-+    return true;
-+}
-+
-+/*
-+ *  Performs the logical AND between the contents of register Rd and register
-+ *  Rr and places the result in the destination register Rd.
-+ */
-+static bool trans_AND(DisasContext *ctx, arg_AND *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv Rr = cpu_r[a->rr];
-+    TCGv R = tcg_temp_new_i32();
-+
-+    /* op */
-+    tcg_gen_and_tl(R, Rd, Rr); /* Rd = Rd and Rr */
-+
-+    /* Vf */
-+    tcg_gen_movi_tl(cpu_Vf, 0x00); /* Vf = 0 */
-+
-+    /* Zf */
-+    tcg_gen_mov_tl(cpu_Zf, R); /* Zf = R */
-+
-+    gen_ZNSf(R);
-+
-+    /* R */
-+    tcg_gen_mov_tl(Rd, R);
-+
-+    tcg_temp_free_i32(R);
-+
-+    return true;
-+}
-+
-+/*
-+ *  Performs the logical AND between the contents of register Rd and a constant
-+ *  and places the result in the destination register Rd.
-+ */
-+static bool trans_ANDI(DisasContext *ctx, arg_ANDI *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+    int Imm = (a->imm);
-+
-+    /* op */
-+    tcg_gen_andi_tl(Rd, Rd, Imm); /* Rd = Rd & Imm */
-+
-+    tcg_gen_movi_tl(cpu_Vf, 0x00); /* Vf = 0 */
-+    gen_ZNSf(Rd);
-+
-+    return true;
-+}
-+
-+/*
-+ *  Shifts all bits in Rd one place to the right. Bit 7 is held constant. Bit 0
-+ *  is loaded into the C Flag of the SREG. This operation effectively divides a
-+ *  signed value by two without changing its sign. The Carry Flag can be used to
-+ *  round the result.
-+ */
-+static bool trans_ASR(DisasContext *ctx, arg_ASR *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv t0 = tcg_temp_new_i32();
-+
-+    /* Cf */
-+    tcg_gen_andi_tl(cpu_Cf, Rd, 1); /* Cf = Rd(0) */
-+
-+    /* op */
-+    tcg_gen_andi_tl(t0, Rd, 0x80); /* Rd = (Rd & 0x80) | (Rd >> 1) */
-+    tcg_gen_shri_tl(Rd, Rd, 1);
-+    tcg_gen_or_tl(Rd, Rd, t0);
-+
-+    gen_rshift_ZNVSf(Rd);
-+
-+    tcg_temp_free_i32(t0);
-+
-+    return true;
-+}
-+
-+/*
-+ *  Clears a single Flag in SREG.
-+ */
-+static bool trans_BCLR(DisasContext *ctx, arg_BCLR *a)
-+{
-+    switch (a->bit) {
-+    case 0x00:
-+        tcg_gen_movi_tl(cpu_Cf, 0x00);
++    uint8_t mode = ((usart->csrc & USART_CSRC_CSZ0) ? 1 : 0) |
++        ((usart->csrc & USART_CSRC_CSZ1) ? 2 : 0) |
++        ((usart->csrb & USART_CSRB_CSZ2) ? 4 : 0);
++    switch (mode) {
++    case 0:
++        usart->char_mask = 0b11111;
 +        break;
-+    case 0x01:
-+        tcg_gen_movi_tl(cpu_Zf, 0x01);
++    case 1:
++        usart->char_mask = 0b111111;
 +        break;
-+    case 0x02:
-+        tcg_gen_movi_tl(cpu_Nf, 0x00);
++    case 2:
++        usart->char_mask = 0b1111111;
 +        break;
-+    case 0x03:
-+        tcg_gen_movi_tl(cpu_Vf, 0x00);
++    case 3:
++        usart->char_mask = 0b11111111;
 +        break;
-+    case 0x04:
-+        tcg_gen_movi_tl(cpu_Sf, 0x00);
++    case 4:
++        /* Fallthrough. */
++    case 5:
++        /* Fallthrough. */
++    case 6:
++        qemu_log_mask(
++            LOG_GUEST_ERROR,
++            "%s: Reserved character size 0x%x\n",
++            __func__,
++            mode);
 +        break;
-+    case 0x05:
-+        tcg_gen_movi_tl(cpu_Hf, 0x00);
-+        break;
-+    case 0x06:
-+        tcg_gen_movi_tl(cpu_Tf, 0x00);
-+        break;
-+    case 0x07:
-+        tcg_gen_movi_tl(cpu_If, 0x00);
-+        break;
-+    }
-+
-+    return true;
-+}
-+
-+/*
-+ *  Copies the T Flag in the SREG (Status Register) to bit b in register Rd.
-+ */
-+static bool trans_BLD(DisasContext *ctx, arg_BLD *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv t1 = tcg_temp_new_i32();
-+
-+    tcg_gen_andi_tl(Rd, Rd, ~(1u << a->bit)); /* clear bit */
-+    tcg_gen_shli_tl(t1, cpu_Tf, a->bit); /* create mask */
-+    tcg_gen_or_tl(Rd, Rd, t1);
-+
-+    tcg_temp_free_i32(t1);
-+
-+    return true;
-+}
-+
-+/*
-+ *  Conditional relative branch. Tests a single bit in SREG and branches
-+ *  relatively to PC if the bit is cleared. This instruction branches relatively
-+ *  to PC in either direction (PC - 63 < = destination <= PC + 64). The
-+ *  parameter k is the offset from PC and is represented in two's complement
-+ *  form.
-+ */
-+static bool trans_BRBC(DisasContext *ctx, arg_BRBC *a)
-+{
-+    TCGLabel *not_taken = gen_new_label();
-+    TCGCond cond = TCG_COND_EQ;
-+    TCGv var;
-+
-+    switch (a->bit) {
-+    case 0x00:
-+        var = cpu_Cf;
-+        break;
-+    case 0x01:
-+        cond = TCG_COND_NE;
-+        var = cpu_Zf;
-+        break;
-+    case 0x02:
-+        var = cpu_Nf;
-+        break;
-+    case 0x03:
-+        var = cpu_Vf;
-+        break;
-+    case 0x04:
-+        var = cpu_Sf;
-+        break;
-+    case 0x05:
-+        var = cpu_Hf;
-+        break;
-+    case 0x06:
-+        var = cpu_Tf;
-+        break;
-+    case 0x07:
-+        var = cpu_If;
++    case 7:
++        qemu_log_mask(
++            LOG_GUEST_ERROR,
++            "%s: Nine bit character size not supported (forcing eight)\n",
++            __func__);
++        usart->char_mask = 0b11111111;
 +        break;
 +    default:
-+        g_assert_not_reached();
-+    }
-+
-+    tcg_gen_brcondi_i32(tcg_invert_cond(cond), var, 0, not_taken);
-+    gen_goto_tb(ctx, 0, ctx->npc + a->imm);
-+    gen_set_label(not_taken);
-+
-+    ctx->bstate = DISAS_CHAIN;
-+    return true;
-+}
-+
-+/*
-+ *  Conditional relative branch. Tests a single bit in SREG and branches
-+ *  relatively to PC if the bit is set. This instruction branches relatively to
-+ *  PC in either direction (PC - 63 < = destination <= PC + 64). The parameter k
-+ *  is the offset from PC and is represented in two's complement form.
-+ */
-+static bool trans_BRBS(DisasContext *ctx, arg_BRBS *a)
-+{
-+    TCGLabel *not_taken = gen_new_label();
-+    TCGCond cond = TCG_COND_NE;
-+    TCGv var;
-+
-+    switch (a->bit) {
-+    case 0x00:
-+        var = cpu_Cf;
-+        break;
-+    case 0x01:
-+        cond = TCG_COND_EQ;
-+        var = cpu_Zf;
-+        break;
-+    case 0x02:
-+        var = cpu_Nf;
-+        break;
-+    case 0x03:
-+        var = cpu_Vf;
-+        break;
-+    case 0x04:
-+        var = cpu_Sf;
-+        break;
-+    case 0x05:
-+        var = cpu_Hf;
-+        break;
-+    case 0x06:
-+        var = cpu_Tf;
-+        break;
-+    case 0x07:
-+        var = cpu_If;
-+        break;
-+    default:
-+        g_assert_not_reached();
-+    }
-+
-+    tcg_gen_brcondi_i32(tcg_invert_cond(cond), var, 0, not_taken);
-+    gen_goto_tb(ctx, 0, ctx->npc + a->imm);
-+    gen_set_label(not_taken);
-+
-+    ctx->bstate = DISAS_CHAIN;
-+    return true;
-+}
-+
-+/*
-+ *  Sets a single Flag or bit in SREG.
-+ */
-+static bool trans_BSET(DisasContext *ctx, arg_BSET *a)
-+{
-+    switch (a->bit) {
-+    case 0x00:
-+        tcg_gen_movi_tl(cpu_Cf, 0x01);
-+        break;
-+    case 0x01:
-+        tcg_gen_movi_tl(cpu_Zf, 0x00);
-+        break;
-+    case 0x02:
-+        tcg_gen_movi_tl(cpu_Nf, 0x01);
-+        break;
-+    case 0x03:
-+        tcg_gen_movi_tl(cpu_Vf, 0x01);
-+        break;
-+    case 0x04:
-+        tcg_gen_movi_tl(cpu_Sf, 0x01);
-+        break;
-+    case 0x05:
-+        tcg_gen_movi_tl(cpu_Hf, 0x01);
-+        break;
-+    case 0x06:
-+        tcg_gen_movi_tl(cpu_Tf, 0x01);
-+        break;
-+    case 0x07:
-+        tcg_gen_movi_tl(cpu_If, 0x01);
-+        break;
-+    }
-+
-+    return true;
-+}
-+
-+/*
-+ *  The BREAK instruction is used by the On-chip Debug system, and is
-+ *  normally not used in the application software. When the BREAK instruction is
-+ *  executed, the AVR CPU is set in the Stopped Mode. This gives the On-chip
-+ *  Debugger access to internal resources.  If any Lock bits are set, or either
-+ *  the JTAGEN or OCDEN Fuses are unprogrammed, the CPU will treat the BREAK
-+ *  instruction as a NOP and will not enter the Stopped mode.  This instruction
-+ *  is not available in all devices. Refer to the device specific instruction
-+ *  set summary.
-+ */
-+static bool trans_BREAK(DisasContext *ctx, arg_BREAK *a)
-+{
-+    if (!avr_have_feature(ctx, AVR_FEATURE_BREAK)) {
-+        return true;
-+    }
-+
-+#ifdef BREAKPOINT_ON_BREAK
-+    tcg_gen_movi_tl(cpu_pc, ctx->npc - 1);
-+    gen_helper_debug(cpu_env);
-+    ctx->bstate = DISAS_EXIT;
-+#else
-+    /* NOP */
-+#endif
-+
-+    return true;
-+}
-+
-+/*
-+ *  Stores bit b from Rd to the T Flag in SREG (Status Register).
-+ */
-+static bool trans_BST(DisasContext *ctx, arg_BST *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+
-+    tcg_gen_andi_tl(cpu_Tf, Rd, 1 << a->bit);
-+    tcg_gen_shri_tl(cpu_Tf, cpu_Tf, a->bit);
-+
-+    return true;
-+}
-+
-+/*
-+ *  Calls to a subroutine within the entire Program memory. The return
-+ *  address (to the instruction after the CALL) will be stored onto the Stack.
-+ *  (See also RCALL). The Stack Pointer uses a post-decrement scheme during
-+ *  CALL.  This instruction is not available in all devices. Refer to the device
-+ *  specific instruction set summary.
-+ */
-+static bool trans_CALL(DisasContext *ctx, arg_CALL *a)
-+{
-+    if (!avr_have_feature(ctx, AVR_FEATURE_JMP_CALL)) {
-+        return true;
-+    }
-+
-+    int Imm = a->imm;
-+    int ret = ctx->npc;
-+
-+    gen_push_ret(ctx, ret);
-+    gen_goto_tb(ctx, 0, Imm);
-+
-+    return true;
-+}
-+
-+/*
-+ *  Clears a specified bit in an I/O Register. This instruction operates on
-+ *  the lower 32 I/O Registers -- addresses 0-31.
-+ */
-+static bool trans_CBI(DisasContext *ctx, arg_CBI *a)
-+{
-+    TCGv data = tcg_temp_new_i32();
-+    TCGv port = tcg_const_i32(a->reg);
-+
-+    gen_helper_inb(data, cpu_env, port);
-+    tcg_gen_andi_tl(data, data, ~(1 << a->bit));
-+    gen_helper_outb(cpu_env, port, data);
-+
-+    tcg_temp_free_i32(data);
-+    tcg_temp_free_i32(port);
-+
-+    return true;
-+}
-+
-+/*
-+ *  Clears the specified bits in register Rd. Performs the logical AND
-+ *  between the contents of register Rd and the complement of the constant mask
-+ *  K. The result will be placed in register Rd.
-+ */
-+static bool trans_COM(DisasContext *ctx, arg_COM *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv R = tcg_temp_new_i32();
-+
-+    tcg_gen_xori_tl(Rd, Rd, 0xff);
-+
-+    tcg_gen_movi_tl(cpu_Cf, 1); /* Cf = 1 */
-+    tcg_gen_movi_tl(cpu_Vf, 0); /* Vf = 0 */
-+    gen_ZNSf(Rd);
-+
-+    tcg_temp_free_i32(R);
-+
-+    return true;
-+}
-+
-+/*
-+ *  This instruction performs a compare between two registers Rd and Rr.
-+ *  None of the registers are changed. All conditional branches can be used
-+ *  after this instruction.
-+ */
-+static bool trans_CP(DisasContext *ctx, arg_CP *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv Rr = cpu_r[a->rr];
-+    TCGv R = tcg_temp_new_i32();
-+
-+    /* op */
-+    tcg_gen_sub_tl(R, Rd, Rr); /* R = Rd - Rr */
-+    tcg_gen_andi_tl(R, R, 0xff); /* make it 8 bits */
-+
-+    gen_sub_CHf(R, Rd, Rr);
-+    gen_sub_Vf(R, Rd, Rr);
-+    gen_ZNSf(R);
-+
-+    tcg_temp_free_i32(R);
-+
-+    return true;
-+}
-+
-+/*
-+ *  This instruction performs a compare between two registers Rd and Rr and
-+ *  also takes into account the previous carry. None of the registers are
-+ *  changed. All conditional branches can be used after this instruction.
-+ */
-+static bool trans_CPC(DisasContext *ctx, arg_CPC *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv Rr = cpu_r[a->rr];
-+    TCGv R = tcg_temp_new_i32();
-+
-+    /* op */
-+    tcg_gen_sub_tl(R, Rd, Rr); /* R = Rd - Rr - Cf */
-+    tcg_gen_sub_tl(R, R, cpu_Cf);
-+    tcg_gen_andi_tl(R, R, 0xff); /* make it 8 bits */
-+
-+    gen_sub_CHf(R, Rd, Rr);
-+    gen_sub_Vf(R, Rd, Rr);
-+    gen_NSf(R);
-+
-+    /*
-+     * Previous value remains unchanged when the result is zero;
-+     * cleared otherwise.
-+     */
-+    tcg_gen_or_tl(cpu_Zf, cpu_Zf, R);
-+
-+    tcg_temp_free_i32(R);
-+
-+    return true;
-+}
-+
-+/*
-+ *  This instruction performs a compare between register Rd and a constant.
-+ *  The register is not changed. All conditional branches can be used after this
-+ *  instruction.
-+ */
-+static bool trans_CPI(DisasContext *ctx, arg_CPI *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+    int Imm = a->imm;
-+    TCGv Rr = tcg_const_i32(Imm);
-+    TCGv R = tcg_temp_new_i32();
-+
-+    /* op */
-+    tcg_gen_sub_tl(R, Rd, Rr); /* R = Rd - Rr */
-+    tcg_gen_andi_tl(R, R, 0xff); /* make it 8 bits */
-+
-+    gen_sub_CHf(R, Rd, Rr);
-+    gen_sub_Vf(R, Rd, Rr);
-+    gen_ZNSf(R);
-+
-+    tcg_temp_free_i32(R);
-+    tcg_temp_free_i32(Rr);
-+
-+    return true;
-+}
-+
-+/*
-+ *  This instruction performs a compare between two registers Rd and Rr, and
-+ *  skips the next instruction if Rd = Rr.
-+ */
-+static bool trans_CPSE(DisasContext *ctx, arg_CPSE *a)
-+{
-+    ctx->skip_cond = TCG_COND_EQ;
-+    ctx->skip_var0 = cpu_r[a->rd];
-+    ctx->skip_var1 = cpu_r[a->rr];
-+    return true;
-+}
-+
-+/*
-+ *  Subtracts one -1- from the contents of register Rd and places the result
-+ *  in the destination register Rd.  The C Flag in SREG is not affected by the
-+ *  operation, thus allowing the DEC instruction to be used on a loop counter in
-+ *  multiple-precision computations.  When operating on unsigned values, only
-+ *  BREQ and BRNE branches can be expected to perform consistently.  When
-+ *  operating on two's complement values, all signed branches are available.
-+ */
-+static bool trans_DEC(DisasContext *ctx, arg_DEC *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+
-+    tcg_gen_subi_tl(Rd, Rd, 1); /* Rd = Rd - 1 */
-+    tcg_gen_andi_tl(Rd, Rd, 0xff); /* make it 8 bits */
-+
-+    /* cpu_Vf = Rd == 0x7f */
-+    tcg_gen_setcondi_tl(TCG_COND_EQ, cpu_Vf, Rd, 0x7f);
-+    gen_ZNSf(Rd);
-+
-+    return true;
-+}
-+
-+/*
-+ *  The module is an instruction set extension to the AVR CPU, performing
-+ *  DES iterations. The 64-bit data block (plaintext or ciphertext) is placed in
-+ *  the CPU register file, registers R0-R7, where LSB of data is placed in LSB
-+ *  of R0 and MSB of data is placed in MSB of R7. The full 64-bit key (including
-+ *  parity bits) is placed in registers R8- R15, organized in the register file
-+ *  with LSB of key in LSB of R8 and MSB of key in MSB of R15. Executing one DES
-+ *  instruction performs one round in the DES algorithm. Sixteen rounds must be
-+ *  executed in increasing order to form the correct DES ciphertext or
-+ *  plaintext. Intermediate results are stored in the register file (R0-R15)
-+ *  after each DES instruction. The instruction's operand (K) determines which
-+ *  round is executed, and the half carry flag (H) determines whether encryption
-+ *  or decryption is performed.  The DES algorithm is described in
-+ *  "Specifications for the Data Encryption Standard" (Federal Information
-+ *  Processing Standards Publication 46). Intermediate results in this
-+ *  implementation differ from the standard because the initial permutation and
-+ *  the inverse initial permutation are performed each iteration. This does not
-+ *  affect the result in the final ciphertext or plaintext, but reduces
-+ *  execution time.
-+ */
-+static bool trans_DES(DisasContext *ctx, arg_DES *a)
-+{
-+    /* TODO */
-+    if (!avr_have_feature(ctx, AVR_FEATURE_DES)) {
-+        return true;
-+    }
-+
-+    return true;
-+}
-+
-+/*
-+ *  Indirect call of a subroutine pointed to by the Z (16 bits) Pointer
-+ *  Register in the Register File and the EIND Register in the I/O space. This
-+ *  instruction allows for indirect calls to the entire 4M (words) Program
-+ *  memory space. See also ICALL. The Stack Pointer uses a post-decrement scheme
-+ *  during EICALL.  This instruction is not available in all devices. Refer to
-+ *  the device specific instruction set summary.
-+ */
-+static bool trans_EICALL(DisasContext *ctx, arg_EICALL *a)
-+{
-+    if (!avr_have_feature(ctx, AVR_FEATURE_EIJMP_EICALL)) {
-+        return true;
-+    }
-+
-+    int ret = ctx->npc;
-+
-+    gen_push_ret(ctx, ret);
-+    gen_jmp_ez(ctx);
-+    return true;
-+}
-+
-+/*
-+ *  Indirect jump to the address pointed to by the Z (16 bits) Pointer
-+ *  Register in the Register File and the EIND Register in the I/O space. This
-+ *  instruction allows for indirect jumps to the entire 4M (words) Program
-+ *  memory space. See also IJMP.  This instruction is not available in all
-+ *  devices. Refer to the device specific instruction set summary.
-+ */
-+static bool trans_EIJMP(DisasContext *ctx, arg_EIJMP *a)
-+{
-+    if (!avr_have_feature(ctx, AVR_FEATURE_EIJMP_EICALL)) {
-+        return true;
-+    }
-+
-+    gen_jmp_ez(ctx);
-+    return true;
-+}
-+
-+/*
-+ *  Loads one byte pointed to by the Z-register and the RAMPZ Register in
-+ *  the I/O space, and places this byte in the destination register Rd. This
-+ *  instruction features a 100% space effective constant initialization or
-+ *  constant data fetch. The Program memory is organized in 16-bit words while
-+ *  the Z-pointer is a byte address. Thus, the least significant bit of the
-+ *  Z-pointer selects either low byte (ZLSB = 0) or high byte (ZLSB = 1). This
-+ *  instruction can address the entire Program memory space. The Z-pointer
-+ *  Register can either be left unchanged by the operation, or it can be
-+ *  incremented. The incrementation applies to the entire 24-bit concatenation
-+ *  of the RAMPZ and Z-pointer Registers.  Devices with Self-Programming
-+ *  capability can use the ELPM instruction to read the Fuse and Lock bit value.
-+ *  Refer to the device documentation for a detailed description.  This
-+ *  instruction is not available in all devices. Refer to the device specific
-+ *  instruction set summary.
-+ */
-+static bool trans_ELPM1(DisasContext *ctx, arg_ELPM1 *a)
-+{
-+    if (!avr_have_feature(ctx, AVR_FEATURE_ELPM)) {
-+        return true;
-+    }
-+
-+    TCGv Rd = cpu_r[0];
-+    TCGv addr = gen_get_zaddr();
-+
-+    tcg_gen_qemu_ld8u(Rd, addr, MMU_CODE_IDX); /* Rd = mem[addr] */
-+
-+    tcg_temp_free_i32(addr);
-+
-+    return true;
-+}
-+
-+static bool trans_ELPM2(DisasContext *ctx, arg_ELPM2 *a)
-+{
-+    if (!avr_have_feature(ctx, AVR_FEATURE_ELPM)) {
-+        return true;
-+    }
-+
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv addr = gen_get_zaddr();
-+
-+    tcg_gen_qemu_ld8u(Rd, addr, MMU_CODE_IDX); /* Rd = mem[addr] */
-+
-+    tcg_temp_free_i32(addr);
-+
-+    return true;
-+}
-+
-+static bool trans_ELPMX(DisasContext *ctx, arg_ELPMX *a)
-+{
-+    if (!avr_have_feature(ctx, AVR_FEATURE_ELPMX)) {
-+        return true;
-+    }
-+
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv addr = gen_get_zaddr();
-+
-+    tcg_gen_qemu_ld8u(Rd, addr, MMU_CODE_IDX); /* Rd = mem[addr] */
-+
-+    tcg_gen_addi_tl(addr, addr, 1); /* addr = addr + 1 */
-+
-+    gen_set_zaddr(addr);
-+
-+    tcg_temp_free_i32(addr);
-+
-+    return true;
-+}
-+
-+/*
-+ *  Performs the logical EOR between the contents of register Rd and
-+ *  register Rr and places the result in the destination register Rd.
-+ */
-+static bool trans_EOR(DisasContext *ctx, arg_EOR *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv Rr = cpu_r[a->rr];
-+
-+    tcg_gen_xor_tl(Rd, Rd, Rr);
-+
-+    tcg_gen_movi_tl(cpu_Vf, 0);
-+    gen_ZNSf(Rd);
-+
-+    return true;
-+}
-+
-+/*
-+ *  This instruction performs 8-bit x 8-bit -> 16-bit unsigned
-+ *  multiplication and shifts the result one bit left.
-+ */
-+static bool trans_FMUL(DisasContext *ctx, arg_FMUL *a)
-+{
-+    if (!avr_have_feature(ctx, AVR_FEATURE_MUL)) {
-+        return true;
-+    }
-+
-+    TCGv R0 = cpu_r[0];
-+    TCGv R1 = cpu_r[1];
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv Rr = cpu_r[a->rr];
-+    TCGv R = tcg_temp_new_i32();
-+
-+    tcg_gen_mul_tl(R, Rd, Rr); /* R = Rd *Rr */
-+    tcg_gen_shli_tl(R, R, 1);
-+
-+    tcg_gen_andi_tl(R0, R, 0xff);
-+    tcg_gen_shri_tl(R1, R, 8);
-+    tcg_gen_andi_tl(R1, R1, 0xff);
-+
-+    tcg_gen_shri_tl(cpu_Cf, R, 16); /* Cf = R(16) */
-+    tcg_gen_andi_tl(cpu_Zf, R, 0x0000ffff);
-+
-+    tcg_temp_free_i32(R);
-+
-+    return true;
-+}
-+
-+/*
-+ *  This instruction performs 8-bit x 8-bit -> 16-bit signed multiplication
-+ *  and shifts the result one bit left.
-+ */
-+static bool trans_FMULS(DisasContext *ctx, arg_FMULS *a)
-+{
-+    if (!avr_have_feature(ctx, AVR_FEATURE_MUL)) {
-+        return true;
-+    }
-+
-+    TCGv R0 = cpu_r[0];
-+    TCGv R1 = cpu_r[1];
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv Rr = cpu_r[a->rr];
-+    TCGv R = tcg_temp_new_i32();
-+    TCGv t0 = tcg_temp_new_i32();
-+    TCGv t1 = tcg_temp_new_i32();
-+
-+    tcg_gen_ext8s_tl(t0, Rd); /* make Rd full 32 bit signed */
-+    tcg_gen_ext8s_tl(t1, Rr); /* make Rr full 32 bit signed */
-+    tcg_gen_mul_tl(R, t0, t1); /* R = Rd *Rr */
-+    tcg_gen_shli_tl(R, R, 1);
-+
-+    tcg_gen_andi_tl(R0, R, 0xff);
-+    tcg_gen_shri_tl(R1, R, 8);
-+    tcg_gen_andi_tl(R1, R1, 0xff);
-+
-+    tcg_gen_shri_tl(cpu_Cf, R, 16); /* Cf = R(16) */
-+    tcg_gen_andi_tl(cpu_Zf, R, 0x0000ffff);
-+
-+    tcg_temp_free_i32(t1);
-+    tcg_temp_free_i32(t0);
-+    tcg_temp_free_i32(R);
-+
-+    return true;
-+}
-+
-+/*
-+ *  This instruction performs 8-bit x 8-bit -> 16-bit signed multiplication
-+ *  and shifts the result one bit left.
-+ */
-+static bool trans_FMULSU(DisasContext *ctx, arg_FMULSU *a)
-+{
-+    if (!avr_have_feature(ctx, AVR_FEATURE_MUL)) {
-+        return true;
-+    }
-+
-+    TCGv R0 = cpu_r[0];
-+    TCGv R1 = cpu_r[1];
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv Rr = cpu_r[a->rr];
-+    TCGv R = tcg_temp_new_i32();
-+    TCGv t0 = tcg_temp_new_i32();
-+
-+    tcg_gen_ext8s_tl(t0, Rd); /* make Rd full 32 bit signed */
-+    tcg_gen_mul_tl(R, t0, Rr); /* R = Rd *Rr */
-+    tcg_gen_shli_tl(R, R, 1);
-+
-+    tcg_gen_andi_tl(R0, R, 0xff);
-+    tcg_gen_shri_tl(R1, R, 8);
-+    tcg_gen_andi_tl(R1, R1, 0xff);
-+
-+    tcg_gen_shri_tl(cpu_Cf, R, 16); /* Cf = R(16) */
-+    tcg_gen_andi_tl(cpu_Zf, R, 0x0000ffff);
-+
-+    tcg_temp_free_i32(t0);
-+    tcg_temp_free_i32(R);
-+
-+    return true;
-+}
-+
-+/*
-+ *  Calls to a subroutine within the entire 4M (words) Program memory. The
-+ *  return address (to the instruction after the CALL) will be stored onto the
-+ *  Stack. See also RCALL. The Stack Pointer uses a post-decrement scheme during
-+ *  CALL.  This instruction is not available in all devices. Refer to the device
-+ *  specific instruction set summary.
-+ */
-+static bool trans_ICALL(DisasContext *ctx, arg_ICALL *a)
-+{
-+    if (!avr_have_feature(ctx, AVR_FEATURE_IJMP_ICALL)) {
-+        return true;
-+    }
-+
-+    int ret = ctx->npc;
-+
-+    gen_push_ret(ctx, ret);
-+    gen_jmp_z(ctx);
-+
-+    return true;
-+}
-+
-+/*
-+ *  Indirect jump to the address pointed to by the Z (16 bits) Pointer
-+ *  Register in the Register File. The Z-pointer Register is 16 bits wide and
-+ *  allows jump within the lowest 64K words (128KB) section of Program memory.
-+ *  This instruction is not available in all devices. Refer to the device
-+ *  specific instruction set summary.
-+ */
-+static bool trans_IJMP(DisasContext *ctx, arg_IJMP *a)
-+{
-+    if (!avr_have_feature(ctx, AVR_FEATURE_IJMP_ICALL)) {
-+        return true;
-+    }
-+
-+    gen_jmp_z(ctx);
-+
-+    return true;
-+}
-+
-+/*
-+ *  Loads data from the I/O Space (Ports, Timers, Configuration Registers,
-+ *  etc.) into register Rd in the Register File.
-+ */
-+static bool trans_IN(DisasContext *ctx, arg_IN *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv port = tcg_const_i32(a->imm);
-+
-+    gen_helper_inb(Rd, cpu_env, port);
-+
-+    tcg_temp_free_i32(port);
-+
-+    return true;
-+}
-+
-+/*
-+ *  Adds one -1- to the contents of register Rd and places the result in the
-+ *  destination register Rd.  The C Flag in SREG is not affected by the
-+ *  operation, thus allowing the INC instruction to be used on a loop counter in
-+ *  multiple-precision computations.  When operating on unsigned numbers, only
-+ *  BREQ and BRNE branches can be expected to perform consistently. When
-+ *  operating on two's complement values, all signed branches are available.
-+ */
-+static bool trans_INC(DisasContext *ctx, arg_INC *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+
-+    tcg_gen_addi_tl(Rd, Rd, 1);
-+    tcg_gen_andi_tl(Rd, Rd, 0xff);
-+
-+    /* cpu_Vf = Rd == 0x80 */
-+    tcg_gen_setcondi_tl(TCG_COND_EQ, cpu_Vf, Rd, 0x80);
-+    gen_ZNSf(Rd);
-+
-+    return true;
-+}
-+
-+/*
-+ *  Jump to an address within the entire 4M (words) Program memory. See also
-+ *  RJMP.  This instruction is not available in all devices. Refer to the device
-+ *  specific instruction set summary.0
-+ */
-+static bool trans_JMP(DisasContext *ctx, arg_JMP *a)
-+{
-+    if (!avr_have_feature(ctx, AVR_FEATURE_JMP_CALL)) {
-+        return true;
-+    }
-+
-+    gen_goto_tb(ctx, 0, a->imm);
-+
-+    return true;
-+}
-+
-+/*
-+ *  Load one byte indirect from data space to register and stores an clear
-+ *  the bits in data space specified by the register. The instruction can only
-+ *  be used towards internal SRAM.  The data location is pointed to by the Z (16
-+ *  bits) Pointer Register in the Register File. Memory access is limited to the
-+ *  current data segment of 64KB. To access another data segment in devices with
-+ *  more than 64KB data space, the RAMPZ in register in the I/O area has to be
-+ *  changed.  The Z-pointer Register is left unchanged by the operation. This
-+ *  instruction is especially suited for clearing status bits stored in SRAM.
-+ */
-+static void gen_data_store(DisasContext *ctx, TCGv data, TCGv addr)
-+{
-+    if (ctx->tb->flags & TB_FLAGS_FULL_ACCESS) {
-+        gen_helper_fullwr(cpu_env, data, addr);
-+    } else {
-+        tcg_gen_qemu_st8(data, addr, MMU_DATA_IDX); /* mem[addr] = data */
++        assert(0);
 +    }
 +}
 +
-+static void gen_data_load(DisasContext *ctx, TCGv data, TCGv addr)
++static void avr_usart_reset(DeviceState *dev)
 +{
-+    if (ctx->tb->flags & TB_FLAGS_FULL_ACCESS) {
-+        gen_helper_fullrd(data, cpu_env, addr);
-+    } else {
-+        tcg_gen_qemu_ld8u(data, addr, MMU_DATA_IDX); /* data = mem[addr] */
-+    }
++    AVRUsartState *usart = AVR_USART(dev);
++    usart->data_valid = false;
++    usart->csra = 0b00100000;
++    usart->csrb = 0b00000000;
++    usart->csrc = 0b00000110;
++    usart->brrl = 0;
++    usart->brrh = 0;
++    update_char_mask(usart);
++    qemu_set_irq(usart->rxc_irq, 0);
++    qemu_set_irq(usart->txc_irq, 0);
++    qemu_set_irq(usart->dre_irq, 0);
 +}
 +
-+static bool trans_LAC(DisasContext *ctx, arg_LAC *a)
++static uint64_t avr_usart_read(void *opaque, hwaddr addr, unsigned int size)
 +{
-+    if (!avr_have_feature(ctx, AVR_FEATURE_RMW)) {
-+        return true;
-+    }
++    AVRUsartState *usart = opaque;
++    uint8_t data;
++    assert(size == 1);
 +
-+    TCGv Rr = cpu_r[a->rd];
-+    TCGv addr = gen_get_zaddr();
-+    TCGv t0 = tcg_temp_new_i32();
-+    TCGv t1 = tcg_temp_new_i32();
-+
-+    gen_data_load(ctx, t0, addr); /* t0 = mem[addr] */
-+        /* t1 = t0 & (0xff - Rr) = t0 and ~Rr */
-+    tcg_gen_andc_tl(t1, t0, Rr);
-+
-+    tcg_gen_mov_tl(Rr, t0); /* Rr = t0 */
-+    gen_data_store(ctx, t1, addr); /* mem[addr] = t1 */
-+
-+    tcg_temp_free_i32(t1);
-+    tcg_temp_free_i32(t0);
-+    tcg_temp_free_i32(addr);
-+
-+    return true;
-+}
-+
-+/*
-+ *  Load one byte indirect from data space to register and set bits in data
-+ *  space specified by the register. The instruction can only be used towards
-+ *  internal SRAM.  The data location is pointed to by the Z (16 bits) Pointer
-+ *  Register in the Register File. Memory access is limited to the current data
-+ *  segment of 64KB. To access another data segment in devices with more than
-+ *  64KB data space, the RAMPZ in register in the I/O area has to be changed.
-+ *  The Z-pointer Register is left unchanged by the operation. This instruction
-+ *  is especially suited for setting status bits stored in SRAM.
-+ */
-+static bool trans_LAS(DisasContext *ctx, arg_LAS *a)
-+{
-+    if (!avr_have_feature(ctx, AVR_FEATURE_RMW)) {
-+        return true;
++    if (!usart->enabled) {
++        return 0;
 +    }
 +
-+    TCGv Rr = cpu_r[a->rd];
-+    TCGv addr = gen_get_zaddr();
-+    TCGv t0 = tcg_temp_new_i32();
-+    TCGv t1 = tcg_temp_new_i32();
-+
-+    gen_data_load(ctx, t0, addr); /* t0 = mem[addr] */
-+    tcg_gen_or_tl(t1, t0, Rr);
-+
-+    tcg_gen_mov_tl(Rr, t0); /* Rr = t0 */
-+    gen_data_store(ctx, t1, addr); /* mem[addr] = t1 */
-+
-+    tcg_temp_free_i32(t1);
-+    tcg_temp_free_i32(t0);
-+    tcg_temp_free_i32(addr);
-+
-+    return true;
-+}
-+
-+/*
-+ *  Load one byte indirect from data space to register and toggles bits in
-+ *  the data space specified by the register.  The instruction can only be used
-+ *  towards SRAM.  The data location is pointed to by the Z (16 bits) Pointer
-+ *  Register in the Register File. Memory access is limited to the current data
-+ *  segment of 64KB. To access another data segment in devices with more than
-+ *  64KB data space, the RAMPZ in register in the I/O area has to be changed.
-+ *  The Z-pointer Register is left unchanged by the operation. This instruction
-+ *  is especially suited for changing status bits stored in SRAM.
-+ */
-+static bool trans_LAT(DisasContext *ctx, arg_LAT *a)
-+{
-+    if (!avr_have_feature(ctx, AVR_FEATURE_RMW)) {
-+        return true;
-+    }
-+
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv addr = gen_get_zaddr();
-+    TCGv t0 = tcg_temp_new_i32();
-+    TCGv t1 = tcg_temp_new_i32();
-+
-+    gen_data_load(ctx, t0, addr); /* t0 = mem[addr] */
-+    tcg_gen_xor_tl(t1, t0, Rd);
-+
-+    tcg_gen_mov_tl(Rd, t0); /* Rd = t0 */
-+    gen_data_store(ctx, t1, addr); /* mem[addr] = t1 */
-+
-+    tcg_temp_free_i32(t1);
-+    tcg_temp_free_i32(t0);
-+    tcg_temp_free_i32(addr);
-+
-+    return true;
-+}
-+
-+/*
-+ *  Loads one byte indirect from the data space to a register. For parts
-+ *  with SRAM, the data space consists of the Register File, I/O memory and
-+ *  internal SRAM (and external SRAM if applicable). For parts without SRAM, the
-+ *  data space consists of the Register File only. In some parts the Flash
-+ *  Memory has been mapped to the data space and can be read using this command.
-+ *  The EEPROM has a separate address space.  The data location is pointed to by
-+ *  the X (16 bits) Pointer Register in the Register File. Memory access is
-+ *  limited to the current data segment of 64KB. To access another data segment
-+ *  in devices with more than 64KB data space, the RAMPX in register in the I/O
-+ *  area has to be changed.  The X-pointer Register can either be left unchanged
-+ *  by the operation, or it can be post-incremented or predecremented.  These
-+ *  features are especially suited for accessing arrays, tables, and Stack
-+ *  Pointer usage of the X-pointer Register. Note that only the low byte of the
-+ *  X-pointer is updated in devices with no more than 256 bytes data space. For
-+ *  such devices, the high byte of the pointer is not used by this instruction
-+ *  and can be used for other purposes. The RAMPX Register in the I/O area is
-+ *  updated in parts with more than 64KB data space or more than 64KB Program
-+ *  memory, and the increment/decrement is added to the entire 24-bit address on
-+ *  such devices.  Not all variants of this instruction is available in all
-+ *  devices. Refer to the device specific instruction set summary.  In the
-+ *  Reduced Core tinyAVR the LD instruction can be used to achieve the same
-+ *  operation as LPM since the program memory is mapped to the data memory
-+ *  space.
-+ */
-+static bool trans_LDX1(DisasContext *ctx, arg_LDX1 *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv addr = gen_get_xaddr();
-+
-+    gen_data_load(ctx, Rd, addr);
-+
-+    tcg_temp_free_i32(addr);
-+
-+    return true;
-+}
-+
-+static bool trans_LDX2(DisasContext *ctx, arg_LDX2 *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv addr = gen_get_xaddr();
-+
-+    gen_data_load(ctx, Rd, addr);
-+    tcg_gen_addi_tl(addr, addr, 1); /* addr = addr + 1 */
-+
-+    gen_set_xaddr(addr);
-+
-+    tcg_temp_free_i32(addr);
-+
-+    return true;
-+}
-+
-+static bool trans_LDX3(DisasContext *ctx, arg_LDX3 *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv addr = gen_get_xaddr();
-+
-+    tcg_gen_subi_tl(addr, addr, 1); /* addr = addr - 1 */
-+    gen_data_load(ctx, Rd, addr);
-+    gen_set_xaddr(addr);
-+
-+    tcg_temp_free_i32(addr);
-+
-+    return true;
-+}
-+
-+/*
-+ *  Loads one byte indirect with or without displacement from the data space
-+ *  to a register. For parts with SRAM, the data space consists of the Register
-+ *  File, I/O memory and internal SRAM (and external SRAM if applicable). For
-+ *  parts without SRAM, the data space consists of the Register File only. In
-+ *  some parts the Flash Memory has been mapped to the data space and can be
-+ *  read using this command. The EEPROM has a separate address space.  The data
-+ *  location is pointed to by the Y (16 bits) Pointer Register in the Register
-+ *  File. Memory access is limited to the current data segment of 64KB. To
-+ *  access another data segment in devices with more than 64KB data space, the
-+ *  RAMPY in register in the I/O area has to be changed.  The Y-pointer Register
-+ *  can either be left unchanged by the operation, or it can be post-incremented
-+ *  or predecremented.  These features are especially suited for accessing
-+ *  arrays, tables, and Stack Pointer usage of the Y-pointer Register. Note that
-+ *  only the low byte of the Y-pointer is updated in devices with no more than
-+ *  256 bytes data space. For such devices, the high byte of the pointer is not
-+ *  used by this instruction and can be used for other purposes. The RAMPY
-+ *  Register in the I/O area is updated in parts with more than 64KB data space
-+ *  or more than 64KB Program memory, and the increment/decrement/displacement
-+ *  is added to the entire 24-bit address on such devices.  Not all variants of
-+ *  this instruction is available in all devices. Refer to the device specific
-+ *  instruction set summary.  In the Reduced Core tinyAVR the LD instruction can
-+ *  be used to achieve the same operation as LPM since the program memory is
-+ *  mapped to the data memory space.
-+ */
-+static bool trans_LDY2(DisasContext *ctx, arg_LDY2 *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv addr = gen_get_yaddr();
-+
-+    gen_data_load(ctx, Rd, addr);
-+    tcg_gen_addi_tl(addr, addr, 1); /* addr = addr + 1 */
-+
-+    gen_set_yaddr(addr);
-+
-+    tcg_temp_free_i32(addr);
-+
-+    return true;
-+}
-+
-+static bool trans_LDY3(DisasContext *ctx, arg_LDY3 *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv addr = gen_get_yaddr();
-+
-+    tcg_gen_subi_tl(addr, addr, 1); /* addr = addr - 1 */
-+    gen_data_load(ctx, Rd, addr);
-+    gen_set_yaddr(addr);
-+
-+    tcg_temp_free_i32(addr);
-+
-+    return true;
-+}
-+
-+static bool trans_LDDY(DisasContext *ctx, arg_LDDY *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv addr = gen_get_yaddr();
-+
-+    tcg_gen_addi_tl(addr, addr, a->imm); /* addr = addr + q */
-+    gen_data_load(ctx, Rd, addr);
-+
-+    tcg_temp_free_i32(addr);
-+
-+    return true;
-+}
-+
-+/*
-+ *  Loads one byte indirect with or without displacement from the data space
-+ *  to a register. For parts with SRAM, the data space consists of the Register
-+ *  File, I/O memory and internal SRAM (and external SRAM if applicable). For
-+ *  parts without SRAM, the data space consists of the Register File only. In
-+ *  some parts the Flash Memory has been mapped to the data space and can be
-+ *  read using this command. The EEPROM has a separate address space.  The data
-+ *  location is pointed to by the Z (16 bits) Pointer Register in the Register
-+ *  File. Memory access is limited to the current data segment of 64KB. To
-+ *  access another data segment in devices with more than 64KB data space, the
-+ *  RAMPZ in register in the I/O area has to be changed.  The Z-pointer Register
-+ *  can either be left unchanged by the operation, or it can be post-incremented
-+ *  or predecremented.  These features are especially suited for Stack Pointer
-+ *  usage of the Z-pointer Register, however because the Z-pointer Register can
-+ *  be used for indirect subroutine calls, indirect jumps and table lookup, it
-+ *  is often more convenient to use the X or Y-pointer as a dedicated Stack
-+ *  Pointer. Note that only the low byte of the Z-pointer is updated in devices
-+ *  with no more than 256 bytes data space. For such devices, the high byte of
-+ *  the pointer is not used by this instruction and can be used for other
-+ *  purposes. The RAMPZ Register in the I/O area is updated in parts with more
-+ *  than 64KB data space or more than 64KB Program memory, and the
-+ *  increment/decrement/displacement is added to the entire 24-bit address on
-+ *  such devices.  Not all variants of this instruction is available in all
-+ *  devices. Refer to the device specific instruction set summary.  In the
-+ *  Reduced Core tinyAVR the LD instruction can be used to achieve the same
-+ *  operation as LPM since the program memory is mapped to the data memory
-+ *  space.  For using the Z-pointer for table lookup in Program memory see the
-+ *  LPM and ELPM instructions.
-+ */
-+static bool trans_LDZ2(DisasContext *ctx, arg_LDZ2 *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv addr = gen_get_zaddr();
-+
-+    gen_data_load(ctx, Rd, addr);
-+    tcg_gen_addi_tl(addr, addr, 1); /* addr = addr + 1 */
-+
-+    gen_set_zaddr(addr);
-+
-+    tcg_temp_free_i32(addr);
-+
-+    return true;
-+}
-+
-+static bool trans_LDZ3(DisasContext *ctx, arg_LDZ3 *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv addr = gen_get_zaddr();
-+
-+    tcg_gen_subi_tl(addr, addr, 1); /* addr = addr - 1 */
-+    gen_data_load(ctx, Rd, addr);
-+
-+    gen_set_zaddr(addr);
-+
-+    tcg_temp_free_i32(addr);
-+
-+    return true;
-+}
-+
-+static bool trans_LDDZ(DisasContext *ctx, arg_LDDZ *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv addr = gen_get_zaddr();
-+
-+    tcg_gen_addi_tl(addr, addr, a->imm); /* addr = addr + q */
-+    gen_data_load(ctx, Rd, addr);
-+
-+    tcg_temp_free_i32(addr);
-+
-+    return true;
-+}
-+
-+/*
-+ * Loads an 8 bit constant directly to register 16 to 31.
-+ */
-+static bool trans_LDI(DisasContext *ctx, arg_LDI *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+    int imm = a->imm;
-+
-+    tcg_gen_movi_tl(Rd, imm);
-+
-+    return true;
-+}
-+
-+/*
-+ *  Loads one byte from the data space to a register. For parts with SRAM,
-+ *  the data space consists of the Register File, I/O memory and internal SRAM
-+ *  (and external SRAM if applicable). For parts without SRAM, the data space
-+ *  consists of the register file only. The EEPROM has a separate address space.
-+ *  A 16-bit address must be supplied. Memory access is limited to the current
-+ *  data segment of 64KB. The LDS instruction uses the RAMPD Register to access
-+ *  memory above 64KB. To access another data segment in devices with more than
-+ *  64KB data space, the RAMPD in register in the I/O area has to be changed.
-+ *  This instruction is not available in all devices. Refer to the device
-+ *  specific instruction set summary.
-+ */
-+static bool trans_LDS(DisasContext *ctx, arg_LDS *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv addr = tcg_temp_new_i32();
-+    TCGv H = cpu_rampD;
-+    a->imm = next_word(ctx);
-+
-+    tcg_gen_mov_tl(addr, H); /* addr = H:M:L */
-+    tcg_gen_shli_tl(addr, addr, 16);
-+    tcg_gen_ori_tl(addr, addr, a->imm);
-+
-+    gen_data_load(ctx, Rd, addr);
-+
-+    tcg_temp_free_i32(addr);
-+
-+    return true;
-+}
-+
-+/*
-+ *  Loads one byte pointed to by the Z-register into the destination
-+ *  register Rd. This instruction features a 100% space effective constant
-+ *  initialization or constant data fetch. The Program memory is organized in
-+ *  16-bit words while the Z-pointer is a byte address. Thus, the least
-+ *  significant bit of the Z-pointer selects either low byte (ZLSB = 0) or high
-+ *  byte (ZLSB = 1). This instruction can address the first 64KB (32K words) of
-+ *  Program memory. The Zpointer Register can either be left unchanged by the
-+ *  operation, or it can be incremented. The incrementation does not apply to
-+ *  the RAMPZ Register.  Devices with Self-Programming capability can use the
-+ *  LPM instruction to read the Fuse and Lock bit values.  Refer to the device
-+ *  documentation for a detailed description.  The LPM instruction is not
-+ *  available in all devices. Refer to the device specific instruction set
-+ *  summary
-+ */
-+static bool trans_LPM1(DisasContext *ctx, arg_LPM1 *a)
-+{
-+    if (!avr_have_feature(ctx, AVR_FEATURE_LPM)) {
-+        return true;
-+    }
-+
-+    TCGv Rd = cpu_r[0];
-+    TCGv addr = tcg_temp_new_i32();
-+    TCGv H = cpu_r[31];
-+    TCGv L = cpu_r[30];
-+
-+    tcg_gen_shli_tl(addr, H, 8); /* addr = H:L */
-+    tcg_gen_or_tl(addr, addr, L);
-+
-+    tcg_gen_qemu_ld8u(Rd, addr, MMU_CODE_IDX); /* Rd = mem[addr] */
-+
-+    tcg_temp_free_i32(addr);
-+
-+    return true;
-+}
-+
-+static bool trans_LPM2(DisasContext *ctx, arg_LPM2 *a)
-+{
-+    if (!avr_have_feature(ctx, AVR_FEATURE_LPM)) {
-+        return true;
-+    }
-+
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv addr = tcg_temp_new_i32();
-+    TCGv H = cpu_r[31];
-+    TCGv L = cpu_r[30];
-+
-+    tcg_gen_shli_tl(addr, H, 8); /* addr = H:L */
-+    tcg_gen_or_tl(addr, addr, L);
-+
-+    tcg_gen_qemu_ld8u(Rd, addr, MMU_CODE_IDX); /* Rd = mem[addr] */
-+
-+    tcg_temp_free_i32(addr);
-+
-+    return true;
-+}
-+
-+static bool trans_LPMX(DisasContext *ctx, arg_LPMX *a)
-+{
-+    if (!avr_have_feature(ctx, AVR_FEATURE_LPMX)) {
-+        return true;
-+    }
-+
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv addr = tcg_temp_new_i32();
-+    TCGv H = cpu_r[31];
-+    TCGv L = cpu_r[30];
-+
-+    tcg_gen_shli_tl(addr, H, 8); /* addr = H:L */
-+    tcg_gen_or_tl(addr, addr, L);
-+
-+    tcg_gen_qemu_ld8u(Rd, addr, MMU_CODE_IDX); /* Rd = mem[addr] */
-+
-+    tcg_gen_addi_tl(addr, addr, 1); /* addr = addr + 1 */
-+
-+    tcg_gen_andi_tl(L, addr, 0xff);
-+
-+    tcg_gen_shri_tl(addr, addr, 8);
-+    tcg_gen_andi_tl(H, addr, 0xff);
-+
-+    tcg_temp_free_i32(addr);
-+
-+    return true;
-+}
-+
-+/*
-+ *  Shifts all bits in Rd one place to the right. Bit 7 is cleared. Bit 0 is
-+ *  loaded into the C Flag of the SREG. This operation effectively divides an
-+ *  unsigned value by two. The C Flag can be used to round the result.
-+ */
-+static bool trans_LSR(DisasContext *ctx, arg_LSR *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+
-+    tcg_gen_andi_tl(cpu_Cf, Rd, 1);
-+
-+    tcg_gen_shri_tl(Rd, Rd, 1);
-+
-+    tcg_gen_mov_tl(cpu_Zf, Rd);
-+    tcg_gen_movi_tl(cpu_Nf, 0);
-+    tcg_gen_mov_tl(cpu_Vf, cpu_Cf);
-+    tcg_gen_mov_tl(cpu_Sf, cpu_Vf);
-+
-+    return true;
-+}
-+
-+/*
-+ *  This instruction makes a copy of one register into another. The source
-+ *  register Rr is left unchanged, while the destination register Rd is loaded
-+ *  with a copy of Rr.
-+ */
-+static bool trans_MOV(DisasContext *ctx, arg_MOV *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv Rr = cpu_r[a->rr];
-+
-+    tcg_gen_mov_tl(Rd, Rr);
-+
-+    return true;
-+}
-+
-+/*
-+ *  This instruction makes a copy of one register pair into another register
-+ *  pair. The source register pair Rr+1:Rr is left unchanged, while the
-+ *  destination register pair Rd+1:Rd is loaded with a copy of Rr + 1:Rr.  This
-+ *  instruction is not available in all devices. Refer to the device specific
-+ *  instruction set summary.
-+ */
-+static bool trans_MOVW(DisasContext *ctx, arg_MOVW *a)
-+{
-+    if (!avr_have_feature(ctx, AVR_FEATURE_MOVW)) {
-+        return true;
-+    }
-+
-+    TCGv RdL = cpu_r[a->rd];
-+    TCGv RdH = cpu_r[a->rd + 1];
-+    TCGv RrL = cpu_r[a->rr];
-+    TCGv RrH = cpu_r[a->rr + 1];
-+
-+    tcg_gen_mov_tl(RdH, RrH);
-+    tcg_gen_mov_tl(RdL, RrL);
-+
-+    return true;
-+}
-+
-+/*
-+ *  This instruction performs 8-bit x 8-bit -> 16-bit unsigned multiplication.
-+ */
-+static bool trans_MUL(DisasContext *ctx, arg_MUL *a)
-+{
-+    if (!avr_have_feature(ctx, AVR_FEATURE_MUL)) {
-+        return true;
-+    }
-+
-+    TCGv R0 = cpu_r[0];
-+    TCGv R1 = cpu_r[1];
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv Rr = cpu_r[a->rr];
-+    TCGv R = tcg_temp_new_i32();
-+
-+    tcg_gen_mul_tl(R, Rd, Rr); /* R = Rd *Rr */
-+
-+    tcg_gen_andi_tl(R0, R, 0xff);
-+    tcg_gen_shri_tl(R1, R, 8);
-+
-+    tcg_gen_shri_tl(cpu_Cf, R, 15); /* Cf = R(16) */
-+    tcg_gen_mov_tl(cpu_Zf, R);
-+
-+    tcg_temp_free_i32(R);
-+
-+    return true;
-+}
-+
-+/*
-+ *  This instruction performs 8-bit x 8-bit -> 16-bit signed multiplication.
-+ */
-+static bool trans_MULS(DisasContext *ctx, arg_MULS *a)
-+{
-+    if (!avr_have_feature(ctx, AVR_FEATURE_MUL)) {
-+        return true;
-+    }
-+
-+    TCGv R0 = cpu_r[0];
-+    TCGv R1 = cpu_r[1];
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv Rr = cpu_r[a->rr];
-+    TCGv R = tcg_temp_new_i32();
-+    TCGv t0 = tcg_temp_new_i32();
-+    TCGv t1 = tcg_temp_new_i32();
-+
-+    tcg_gen_ext8s_tl(t0, Rd); /* make Rd full 32 bit signed */
-+    tcg_gen_ext8s_tl(t1, Rr); /* make Rr full 32 bit signed */
-+    tcg_gen_mul_tl(R, t0, t1); /* R = Rd * Rr */
-+
-+    tcg_gen_andi_tl(R0, R, 0xff);
-+    tcg_gen_shri_tl(R1, R, 8);
-+
-+    tcg_gen_shri_tl(cpu_Cf, R, 15); /* Cf = R(16) */
-+    tcg_gen_mov_tl(cpu_Zf, R);
-+
-+    tcg_temp_free_i32(t1);
-+    tcg_temp_free_i32(t0);
-+    tcg_temp_free_i32(R);
-+
-+    return true;
-+}
-+
-+/*
-+ *  This instruction performs 8-bit x 8-bit -> 16-bit multiplication of a
-+ *  signed and an unsigned number.
-+ */
-+static bool trans_MULSU(DisasContext *ctx, arg_MULSU *a)
-+{
-+    if (!avr_have_feature(ctx, AVR_FEATURE_MUL)) {
-+        return true;
-+    }
-+
-+    TCGv R0 = cpu_r[0];
-+    TCGv R1 = cpu_r[1];
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv Rr = cpu_r[a->rr];
-+    TCGv R = tcg_temp_new_i32();
-+    TCGv t0 = tcg_temp_new_i32();
-+
-+    tcg_gen_ext8s_tl(t0, Rd); /* make Rd full 32 bit signed */
-+    tcg_gen_mul_tl(R, t0, Rr); /* R = Rd *Rr */
-+
-+    tcg_gen_andi_tl(R0, R, 0xff);
-+    tcg_gen_shri_tl(R1, R, 8);
-+
-+    tcg_gen_shri_tl(cpu_Cf, R, 16); /* Cf = R(16) */
-+    tcg_gen_mov_tl(cpu_Zf, R);
-+
-+    tcg_temp_free_i32(t0);
-+    tcg_temp_free_i32(R);
-+
-+    return true;
-+}
-+
-+/*
-+ *  Replaces the contents of register Rd with its two's complement; the
-+ *  value $80 is left unchanged.
-+ */
-+static bool trans_NEG(DisasContext *ctx, arg_NEG *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv t0 = tcg_const_i32(0);
-+    TCGv R = tcg_temp_new_i32();
-+
-+    /* op */
-+    tcg_gen_sub_tl(R, t0, Rd); /* R = 0 - Rd */
-+    tcg_gen_andi_tl(R, R, 0xff); /* make it 8 bits */
-+
-+    gen_sub_CHf(R, t0, Rd);
-+    gen_sub_Vf(R, t0, Rd);
-+    gen_ZNSf(R);
-+
-+    /* R */
-+    tcg_gen_mov_tl(Rd, R);
-+
-+    tcg_temp_free_i32(t0);
-+    tcg_temp_free_i32(R);
-+
-+    return true;
-+}
-+
-+/*
-+ *  This instruction performs a single cycle No Operation.
-+ */
-+static bool trans_NOP(DisasContext *ctx, arg_NOP *a)
-+{
-+
-+    /* NOP */
-+
-+    return true;
-+}
-+
-+/*
-+ *  Performs the logical OR between the contents of register Rd and register
-+ *  Rr and places the result in the destination register Rd.
-+ */
-+static bool trans_OR(DisasContext *ctx, arg_OR *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv Rr = cpu_r[a->rr];
-+    TCGv R = tcg_temp_new_i32();
-+
-+    tcg_gen_or_tl(R, Rd, Rr);
-+
-+    tcg_gen_movi_tl(cpu_Vf, 0);
-+    gen_ZNSf(R);
-+
-+    tcg_gen_mov_tl(Rd, R);
-+
-+    tcg_temp_free_i32(R);
-+
-+    return true;
-+}
-+
-+/*
-+ *  Performs the logical OR between the contents of register Rd and a
-+ *  constant and places the result in the destination register Rd.
-+ */
-+static bool trans_ORI(DisasContext *ctx, arg_ORI *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+    int Imm = (a->imm);
-+
-+    tcg_gen_ori_tl(Rd, Rd, Imm); /* Rd = Rd | Imm */
-+
-+    tcg_gen_movi_tl(cpu_Vf, 0x00); /* Vf = 0 */
-+    gen_ZNSf(Rd);
-+
-+    return true;
-+}
-+
-+/*
-+ *  Stores data from register Rr in the Register File to I/O Space (Ports,
-+ *  Timers, Configuration Registers, etc.).
-+ */
-+static bool trans_OUT(DisasContext *ctx, arg_OUT *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv port = tcg_const_i32(a->imm);
-+
-+    gen_helper_outb(cpu_env, port, Rd);
-+
-+    tcg_temp_free_i32(port);
-+
-+    return true;
-+}
-+
-+/*
-+ *  This instruction loads register Rd with a byte from the STACK. The Stack
-+ *  Pointer is pre-incremented by 1 before the POP.  This instruction is not
-+ *  available in all devices. Refer to the device specific instruction set
-+ *  summary.
-+ */
-+static bool trans_POP(DisasContext *ctx, arg_POP *a)
-+{
-+    /*
-+     * Using a temp to work around some strange behaviour:
-+     * tcg_gen_addi_tl(cpu_sp, cpu_sp, 1);
-+     * gen_data_load(ctx, Rd, cpu_sp);
-+     * seems to cause the add to happen twice.
-+     * This doesn't happen if either the add or the load is removed.
-+     */
-+    TCGv t1 = tcg_temp_new_i32();
-+    TCGv Rd = cpu_r[a->rd];
-+
-+    tcg_gen_addi_tl(t1, cpu_sp, 1);
-+    gen_data_load(ctx, Rd, t1);
-+    tcg_gen_mov_tl(cpu_sp, t1);
-+
-+    return true;
-+}
-+
-+/*
-+ *  This instruction stores the contents of register Rr on the STACK. The
-+ *  Stack Pointer is post-decremented by 1 after the PUSH.  This instruction is
-+ *  not available in all devices. Refer to the device specific instruction set
-+ *  summary.
-+ */
-+static bool trans_PUSH(DisasContext *ctx, arg_PUSH *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+
-+    gen_data_store(ctx, Rd, cpu_sp);
-+    tcg_gen_subi_tl(cpu_sp, cpu_sp, 1);
-+
-+    return true;
-+}
-+
-+/*
-+ *  Relative call to an address within PC - 2K + 1 and PC + 2K (words). The
-+ *  return address (the instruction after the RCALL) is stored onto the Stack.
-+ *  See also CALL. For AVR microcontrollers with Program memory not exceeding 4K
-+ *  words (8KB) this instruction can address the entire memory from every
-+ *  address location. The Stack Pointer uses a post-decrement scheme during
-+ *  RCALL.
-+ */
-+static bool trans_RCALL(DisasContext *ctx, arg_RCALL *a)
-+{
-+    int ret = ctx->npc;
-+    int dst = ctx->npc + a->imm;
-+
-+    gen_push_ret(ctx, ret);
-+    gen_goto_tb(ctx, 0, dst);
-+
-+    return true;
-+}
-+
-+/*
-+ *  Returns from subroutine. The return address is loaded from the STACK.
-+ *  The Stack Pointer uses a preincrement scheme during RET.
-+ */
-+static bool trans_RET(DisasContext *ctx, arg_RET *a)
-+{
-+    gen_pop_ret(ctx, cpu_pc);
-+
-+    ctx->bstate = DISAS_LOOKUP;
-+    return true;
-+}
-+
-+/*
-+ *  Returns from interrupt. The return address is loaded from the STACK and
-+ *  the Global Interrupt Flag is set.  Note that the Status Register is not
-+ *  automatically stored when entering an interrupt routine, and it is not
-+ *  restored when returning from an interrupt routine. This must be handled by
-+ *  the application program. The Stack Pointer uses a pre-increment scheme
-+ *  during RETI.
-+ */
-+static bool trans_RETI(DisasContext *ctx, arg_RETI *a)
-+{
-+    gen_pop_ret(ctx, cpu_pc);
-+    tcg_gen_movi_tl(cpu_If, 1);
-+
-+    /* Need to return to main loop to re-evaluate interrupts.  */
-+    ctx->bstate = DISAS_EXIT;
-+    return true;
-+}
-+
-+/*
-+ *  Relative jump to an address within PC - 2K +1 and PC + 2K (words). For
-+ *  AVR microcontrollers with Program memory not exceeding 4K words (8KB) this
-+ *  instruction can address the entire memory from every address location. See
-+ *  also JMP.
-+ */
-+static bool trans_RJMP(DisasContext *ctx, arg_RJMP *a)
-+{
-+    int dst = ctx->npc + a->imm;
-+
-+    gen_goto_tb(ctx, 0, dst);
-+
-+    return true;
-+}
-+
-+/*
-+ *  Shifts all bits in Rd one place to the right. The C Flag is shifted into
-+ *  bit 7 of Rd. Bit 0 is shifted into the C Flag.  This operation, combined
-+ *  with ASR, effectively divides multi-byte signed values by two. Combined with
-+ *  LSR it effectively divides multi-byte unsigned values by two. The Carry Flag
-+ *  can be used to round the result.
-+ */
-+static bool trans_ROR(DisasContext *ctx, arg_ROR *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv t0 = tcg_temp_new_i32();
-+
-+    tcg_gen_shli_tl(t0, cpu_Cf, 7);
-+    tcg_gen_andi_tl(cpu_Cf, Rd, 1);
-+    tcg_gen_shri_tl(Rd, Rd, 1);
-+    tcg_gen_or_tl(Rd, Rd, t0);
-+
-+    gen_rshift_ZNVSf(Rd);
-+
-+    tcg_temp_free_i32(t0);
-+
-+    return true;
-+}
-+
-+/*
-+ *  Subtracts two registers and subtracts with the C Flag and places the
-+ *  result in the destination register Rd.
-+ */
-+static bool trans_SBC(DisasContext *ctx, arg_SBC *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv Rr = cpu_r[a->rr];
-+    TCGv R = tcg_temp_new_i32();
-+
-+    /* op */
-+    tcg_gen_sub_tl(R, Rd, Rr); /* R = Rd - Rr - Cf */
-+    tcg_gen_sub_tl(R, R, cpu_Cf);
-+    tcg_gen_andi_tl(R, R, 0xff); /* make it 8 bits */
-+
-+    gen_sub_CHf(R, Rd, Rr);
-+    gen_sub_Vf(R, Rd, Rr);
-+    gen_NSf(R);
-+
-+    /*
-+     * Previous value remains unchanged when the result is zero;
-+     * cleared otherwise.
-+     */
-+    tcg_gen_or_tl(cpu_Zf, cpu_Zf, R);
-+
-+    /* R */
-+    tcg_gen_mov_tl(Rd, R);
-+
-+    tcg_temp_free_i32(R);
-+
-+    return true;
-+}
-+
-+/*
-+ *  SBCI -- Subtract Immediate with Carry
-+ */
-+static bool trans_SBCI(DisasContext *ctx, arg_SBCI *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv Rr = tcg_const_i32(a->imm);
-+    TCGv R = tcg_temp_new_i32();
-+
-+    /* op */
-+    tcg_gen_sub_tl(R, Rd, Rr); /* R = Rd - Rr - Cf */
-+    tcg_gen_sub_tl(R, R, cpu_Cf);
-+    tcg_gen_andi_tl(R, R, 0xff); /* make it 8 bits */
-+
-+    gen_sub_CHf(R, Rd, Rr);
-+    gen_sub_Vf(R, Rd, Rr);
-+    gen_NSf(R);
-+
-+    /*
-+     * Previous value remains unchanged when the result is zero;
-+     * cleared otherwise.
-+     */
-+    tcg_gen_or_tl(cpu_Zf, cpu_Zf, R);
-+
-+    /* R */
-+    tcg_gen_mov_tl(Rd, R);
-+
-+    tcg_temp_free_i32(R);
-+    tcg_temp_free_i32(Rr);
-+
-+    return true;
-+}
-+
-+/*
-+ *  Sets a specified bit in an I/O Register. This instruction operates on
-+ *  the lower 32 I/O Registers -- addresses 0-31.
-+ */
-+static bool trans_SBI(DisasContext *ctx, arg_SBI *a)
-+{
-+    TCGv data = tcg_temp_new_i32();
-+    TCGv port = tcg_const_i32(a->reg);
-+
-+    gen_helper_inb(data, cpu_env, port);
-+    tcg_gen_ori_tl(data, data, 1 << a->bit);
-+    gen_helper_outb(cpu_env, port, data);
-+
-+    tcg_temp_free_i32(port);
-+    tcg_temp_free_i32(data);
-+
-+    return true;
-+}
-+
-+/*
-+ *  This instruction tests a single bit in an I/O Register and skips the
-+ *  next instruction if the bit is cleared. This instruction operates on the
-+ *  lower 32 I/O Registers -- addresses 0-31.
-+ */
-+static bool trans_SBIC(DisasContext *ctx, arg_SBIC *a)
-+{
-+    TCGv temp = tcg_const_i32(a->reg);
-+
-+    gen_helper_inb(temp, cpu_env, temp);
-+    tcg_gen_andi_tl(temp, temp, 1 << a->bit);
-+    ctx->skip_cond = TCG_COND_EQ;
-+    ctx->skip_var0 = temp;
-+    ctx->free_skip_var0 = true;
-+
-+    return true;
-+}
-+
-+/*
-+ *  This instruction tests a single bit in an I/O Register and skips the
-+ *  next instruction if the bit is set. This instruction operates on the lower
-+ *  32 I/O Registers -- addresses 0-31.
-+ */
-+static bool trans_SBIS(DisasContext *ctx, arg_SBIS *a)
-+{
-+    TCGv temp = tcg_const_i32(a->reg);
-+
-+    gen_helper_inb(temp, cpu_env, temp);
-+    tcg_gen_andi_tl(temp, temp, 1 << a->bit);
-+    ctx->skip_cond = TCG_COND_NE;
-+    ctx->skip_var0 = temp;
-+    ctx->free_skip_var0 = true;
-+
-+    return true;
-+}
-+
-+/*
-+ *  Subtracts an immediate value (0-63) from a register pair and places the
-+ *  result in the register pair. This instruction operates on the upper four
-+ *  register pairs, and is well suited for operations on the Pointer Registers.
-+ *  This instruction is not available in all devices. Refer to the device
-+ *  specific instruction set summary.
-+ */
-+static bool trans_SBIW(DisasContext *ctx, arg_SBIW *a)
-+{
-+    if (!avr_have_feature(ctx, AVR_FEATURE_ADIW_SBIW)) {
-+        return true;
-+    }
-+
-+    TCGv RdL = cpu_r[a->rd];
-+    TCGv RdH = cpu_r[a->rd + 1];
-+    int Imm = (a->imm);
-+    TCGv R = tcg_temp_new_i32();
-+    TCGv Rd = tcg_temp_new_i32();
-+
-+    /* op */
-+    tcg_gen_deposit_tl(Rd, RdL, RdH, 8, 8); /* Rd = RdH:RdL */
-+    tcg_gen_subi_tl(R, Rd, Imm); /* R = Rd - Imm */
-+    tcg_gen_andi_tl(R, R, 0xffff); /* make it 16 bits */
-+
-+    /* Cf */
-+    tcg_gen_andc_tl(cpu_Cf, R, Rd);
-+    tcg_gen_shri_tl(cpu_Cf, cpu_Cf, 15); /* Cf = R & ~Rd */
-+
-+    /* Vf */
-+    tcg_gen_andc_tl(cpu_Vf, Rd, R);
-+    tcg_gen_shri_tl(cpu_Vf, cpu_Vf, 15); /* Vf = Rd & ~R */
-+
-+    /* Zf */
-+    tcg_gen_mov_tl(cpu_Zf, R); /* Zf = R */
-+
-+    /* Nf */
-+    tcg_gen_shri_tl(cpu_Nf, R, 15); /* Nf = R(15) */
-+
-+    /* Sf */
-+    tcg_gen_xor_tl(cpu_Sf, cpu_Nf, cpu_Vf); /* Sf = Nf ^ Vf */
-+
-+    /* R */
-+    tcg_gen_andi_tl(RdL, R, 0xff);
-+    tcg_gen_shri_tl(RdH, R, 8);
-+
-+    tcg_temp_free_i32(Rd);
-+    tcg_temp_free_i32(R);
-+
-+    return true;
-+}
-+
-+/*
-+ *  This instruction tests a single bit in a register and skips the next
-+ *  instruction if the bit is cleared.
-+ */
-+static bool trans_SBRC(DisasContext *ctx, arg_SBRC *a)
-+{
-+    TCGv Rr = cpu_r[a->rr];
-+
-+    ctx->skip_cond = TCG_COND_EQ;
-+    ctx->skip_var0 = tcg_temp_new();
-+    ctx->free_skip_var0 = true;
-+
-+    tcg_gen_andi_tl(ctx->skip_var0, Rr, 1 << a->bit);
-+    return true;
-+}
-+
-+/*
-+ *  This instruction tests a single bit in a register and skips the next
-+ *  instruction if the bit is set.
-+ */
-+static bool trans_SBRS(DisasContext *ctx, arg_SBRS *a)
-+{
-+    TCGv Rr = cpu_r[a->rr];
-+
-+    ctx->skip_cond = TCG_COND_NE;
-+    ctx->skip_var0 = tcg_temp_new();
-+    ctx->free_skip_var0 = true;
-+
-+    tcg_gen_andi_tl(ctx->skip_var0, Rr, 1 << a->bit);
-+    return true;
-+}
-+
-+/*
-+ *  This instruction sets the circuit in sleep mode defined by the MCU
-+ *  Control Register.
-+ */
-+static bool trans_SLEEP(DisasContext *ctx, arg_SLEEP *a)
-+{
-+    gen_helper_sleep(cpu_env);
-+    ctx->bstate = DISAS_NORETURN;
-+    return true;
-+}
-+
-+/*
-+ *  SPM can be used to erase a page in the Program memory, to write a page
-+ *  in the Program memory (that is already erased), and to set Boot Loader Lock
-+ *  bits. In some devices, the Program memory can be written one word at a time,
-+ *  in other devices an entire page can be programmed simultaneously after first
-+ *  filling a temporary page buffer. In all cases, the Program memory must be
-+ *  erased one page at a time. When erasing the Program memory, the RAMPZ and
-+ *  Z-register are used as page address. When writing the Program memory, the
-+ *  RAMPZ and Z-register are used as page or word address, and the R1:R0
-+ *  register pair is used as data(1). When setting the Boot Loader Lock bits,
-+ *  the R1:R0 register pair is used as data. Refer to the device documentation
-+ *  for detailed description of SPM usage. This instruction can address the
-+ *  entire Program memory.  The SPM instruction is not available in all devices.
-+ *  Refer to the device specific instruction set summary.  Note: 1. R1
-+ *  determines the instruction high byte, and R0 determines the instruction low
-+ *  byte.
-+ */
-+static bool trans_SPM(DisasContext *ctx, arg_SPM *a)
-+{
-+    /* TODO */
-+    if (!avr_have_feature(ctx, AVR_FEATURE_SPM)) {
-+        return true;
-+    }
-+
-+    return true;
-+}
-+
-+static bool trans_SPMX(DisasContext *ctx, arg_SPMX *a)
-+{
-+    /* TODO */
-+    if (!avr_have_feature(ctx, AVR_FEATURE_SPMX)) {
-+        return true;
-+    }
-+
-+    return true;
-+}
-+
-+static bool trans_STX1(DisasContext *ctx, arg_STX1 *a)
-+{
-+    TCGv Rd = cpu_r[a->rr];
-+    TCGv addr = gen_get_xaddr();
-+
-+    gen_data_store(ctx, Rd, addr);
-+
-+    tcg_temp_free_i32(addr);
-+
-+    return true;
-+}
-+
-+static bool trans_STX2(DisasContext *ctx, arg_STX2 *a)
-+{
-+    TCGv Rd = cpu_r[a->rr];
-+    TCGv addr = gen_get_xaddr();
-+
-+    gen_data_store(ctx, Rd, addr);
-+    tcg_gen_addi_tl(addr, addr, 1); /* addr = addr + 1 */
-+    gen_set_xaddr(addr);
-+
-+    tcg_temp_free_i32(addr);
-+
-+    return true;
-+}
-+
-+static bool trans_STX3(DisasContext *ctx, arg_STX3 *a)
-+{
-+    TCGv Rd = cpu_r[a->rr];
-+    TCGv addr = gen_get_xaddr();
-+
-+    tcg_gen_subi_tl(addr, addr, 1); /* addr = addr - 1 */
-+    gen_data_store(ctx, Rd, addr);
-+    gen_set_xaddr(addr);
-+
-+    tcg_temp_free_i32(addr);
-+
-+    return true;
-+}
-+
-+static bool trans_STY2(DisasContext *ctx, arg_STY2 *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv addr = gen_get_yaddr();
-+
-+    gen_data_store(ctx, Rd, addr);
-+    tcg_gen_addi_tl(addr, addr, 1); /* addr = addr + 1 */
-+    gen_set_yaddr(addr);
-+
-+    tcg_temp_free_i32(addr);
-+
-+    return true;
-+}
-+
-+static bool trans_STY3(DisasContext *ctx, arg_STY3 *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv addr = gen_get_yaddr();
-+
-+    tcg_gen_subi_tl(addr, addr, 1); /* addr = addr - 1 */
-+    gen_data_store(ctx, Rd, addr);
-+    gen_set_yaddr(addr);
-+
-+    tcg_temp_free_i32(addr);
-+
-+    return true;
-+}
-+
-+static bool trans_STDY(DisasContext *ctx, arg_STDY *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv addr = gen_get_yaddr();
-+
-+    tcg_gen_addi_tl(addr, addr, a->imm); /* addr = addr + q */
-+    gen_data_store(ctx, Rd, addr);
-+
-+    tcg_temp_free_i32(addr);
-+
-+    return true;
-+}
-+
-+static bool trans_STZ2(DisasContext *ctx, arg_STZ2 *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv addr = gen_get_zaddr();
-+
-+    gen_data_store(ctx, Rd, addr);
-+    tcg_gen_addi_tl(addr, addr, 1); /* addr = addr + 1 */
-+
-+    gen_set_zaddr(addr);
-+
-+    tcg_temp_free_i32(addr);
-+
-+    return true;
-+}
-+
-+static bool trans_STZ3(DisasContext *ctx, arg_STZ3 *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv addr = gen_get_zaddr();
-+
-+    tcg_gen_subi_tl(addr, addr, 1); /* addr = addr - 1 */
-+    gen_data_store(ctx, Rd, addr);
-+
-+    gen_set_zaddr(addr);
-+
-+    tcg_temp_free_i32(addr);
-+
-+    return true;
-+}
-+
-+static bool trans_STDZ(DisasContext *ctx, arg_STDZ *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv addr = gen_get_zaddr();
-+
-+    tcg_gen_addi_tl(addr, addr, a->imm); /* addr = addr + q */
-+    gen_data_store(ctx, Rd, addr);
-+
-+    tcg_temp_free_i32(addr);
-+
-+    return true;
-+}
-+
-+/*
-+ *  Stores one byte from a Register to the data space. For parts with SRAM,
-+ *  the data space consists of the Register File, I/O memory and internal SRAM
-+ *  (and external SRAM if applicable). For parts without SRAM, the data space
-+ *  consists of the Register File only. The EEPROM has a separate address space.
-+ *  A 16-bit address must be supplied. Memory access is limited to the current
-+ *  data segment of 64KB. The STS instruction uses the RAMPD Register to access
-+ *  memory above 64KB. To access another data segment in devices with more than
-+ *  64KB data space, the RAMPD in register in the I/O area has to be changed.
-+ *  This instruction is not available in all devices. Refer to the device
-+ *  specific instruction set summary.
-+ */
-+static bool trans_STS(DisasContext *ctx, arg_STS *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv addr = tcg_temp_new_i32();
-+    TCGv H = cpu_rampD;
-+    a->imm = next_word(ctx);
-+
-+    tcg_gen_mov_tl(addr, H); /* addr = H:M:L */
-+    tcg_gen_shli_tl(addr, addr, 16);
-+    tcg_gen_ori_tl(addr, addr, a->imm);
-+
-+    gen_data_store(ctx, Rd, addr);
-+
-+    tcg_temp_free_i32(addr);
-+
-+    return true;
-+}
-+
-+/*
-+ *  Subtracts two registers and places the result in the destination
-+ *  register Rd.
-+ */
-+static bool trans_SUB(DisasContext *ctx, arg_SUB *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv Rr = cpu_r[a->rr];
-+    TCGv R = tcg_temp_new_i32();
-+
-+    /* op */
-+    tcg_gen_sub_tl(R, Rd, Rr); /* R = Rd - Rr */
-+    tcg_gen_andi_tl(R, R, 0xff); /* make it 8 bits */
-+
-+    gen_sub_CHf(R, Rd, Rr);
-+    gen_sub_Vf(R, Rd, Rr);
-+    gen_ZNSf(R);
-+
-+    /* R */
-+    tcg_gen_mov_tl(Rd, R);
-+
-+    tcg_temp_free_i32(R);
-+
-+    return true;
-+}
-+
-+/*
-+ *  Subtracts a register and a constant and places the result in the
-+ *  destination register Rd. This instruction is working on Register R16 to R31
-+ *  and is very well suited for operations on the X, Y, and Z-pointers.
-+ */
-+static bool trans_SUBI(DisasContext *ctx, arg_SUBI *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv Rr = tcg_const_i32(a->imm);
-+    TCGv R = tcg_temp_new_i32();
-+
-+    /* op */
-+    tcg_gen_sub_tl(R, Rd, Rr); /* R = Rd - Imm */
-+    tcg_gen_andi_tl(R, R, 0xff); /* make it 8 bits */
-+
-+    gen_sub_CHf(R, Rd, Rr);
-+    gen_sub_Vf(R, Rd, Rr);
-+    gen_ZNSf(R);
-+
-+    /* R */
-+    tcg_gen_mov_tl(Rd, R);
-+
-+    tcg_temp_free_i32(R);
-+    tcg_temp_free_i32(Rr);
-+
-+    return true;
-+}
-+
-+/*
-+ *  Swaps high and low nibbles in a register.
-+ */
-+static bool trans_SWAP(DisasContext *ctx, arg_SWAP *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv t0 = tcg_temp_new_i32();
-+    TCGv t1 = tcg_temp_new_i32();
-+
-+    tcg_gen_andi_tl(t0, Rd, 0x0f);
-+    tcg_gen_shli_tl(t0, t0, 4);
-+    tcg_gen_andi_tl(t1, Rd, 0xf0);
-+    tcg_gen_shri_tl(t1, t1, 4);
-+    tcg_gen_or_tl(Rd, t0, t1);
-+
-+    tcg_temp_free_i32(t1);
-+    tcg_temp_free_i32(t0);
-+
-+    return true;
-+}
-+
-+/*
-+ *  This instruction resets the Watchdog Timer. This instruction must be
-+ *  executed within a limited time given by the WD prescaler. See the Watchdog
-+ *  Timer hardware specification.
-+ */
-+static bool trans_WDR(DisasContext *ctx, arg_WDR *a)
-+{
-+    gen_helper_wdr(cpu_env);
-+
-+    return true;
-+}
-+
-+/*
-+ *  Exchanges one byte indirect between register and data space.  The data
-+ *  location is pointed to by the Z (16 bits) Pointer Register in the Register
-+ *  File. Memory access is limited to the current data segment of 64KB. To
-+ *  access another data segment in devices with more than 64KB data space, the
-+ *  RAMPZ in register in the I/O area has to be changed.  The Z-pointer Register
-+ *  is left unchanged by the operation. This instruction is especially suited
-+ *  for writing/reading status bits stored in SRAM.
-+ */
-+static bool trans_XCH(DisasContext *ctx, arg_XCH *a)
-+{
-+    if (!avr_have_feature(ctx, AVR_FEATURE_RMW)) {
-+        return true;
-+    }
-+
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv t0 = tcg_temp_new_i32();
-+    TCGv addr = gen_get_zaddr();
-+
-+    gen_data_load(ctx, t0, addr);
-+    gen_data_store(ctx, Rd, addr);
-+    tcg_gen_mov_tl(Rd, t0);
-+
-+    tcg_temp_free_i32(t0);
-+    tcg_temp_free_i32(addr);
-+
-+    return true;
-+}
-+
-+void avr_cpu_tcg_init(void)
-+{
-+    int i;
-+
-+#define AVR_REG_OFFS(x) offsetof(CPUAVRState, x)
-+    cpu_pc = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(pc_w), "pc");
-+    cpu_Cf = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(sregC), "Cf");
-+    cpu_Zf = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(sregZ), "Zf");
-+    cpu_Nf = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(sregN), "Nf");
-+    cpu_Vf = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(sregV), "Vf");
-+    cpu_Sf = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(sregS), "Sf");
-+    cpu_Hf = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(sregH), "Hf");
-+    cpu_Tf = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(sregT), "Tf");
-+    cpu_If = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(sregI), "If");
-+    cpu_rampD = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(rampD), "rampD");
-+    cpu_rampX = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(rampX), "rampX");
-+    cpu_rampY = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(rampY), "rampY");
-+    cpu_rampZ = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(rampZ), "rampZ");
-+    cpu_eind = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(eind), "eind");
-+    cpu_sp = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(sp), "sp");
-+    cpu_skip = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(skip), "skip");
-+
-+    for (i = 0; i < NO_CPU_REGISTERS; i++) {
-+        cpu_r[i] = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(r[i]),
-+                                          reg_names[i]);
-+    }
-+#undef AVR_REG_OFFS
-+}
-+
-+static void translate(DisasContext *ctx)
-+{
-+    uint32_t opcode = next_word(ctx);
-+
-+    if (!decode_insn(ctx, opcode)) {
-+        gen_helper_unsupported(cpu_env);
-+        ctx->bstate = DISAS_NORETURN;
-+    }
-+}
-+
-+/* Standardize the cpu_skip condition to NE.  */
-+static bool canonicalize_skip(DisasContext *ctx)
-+{
-+    switch (ctx->skip_cond) {
-+    case TCG_COND_NEVER:
-+        /* Normal case: cpu_skip is known to be false.  */
-+        return false;
-+
-+    case TCG_COND_ALWAYS:
-+        /*
-+         * Breakpoint case: cpu_skip is known to be true, via TB_FLAGS_SKIP.
-+         * The breakpoint is on the instruction being skipped, at the start
-+         * of the TranslationBlock.  No need to update.
-+         */
-+        return false;
-+
-+    case TCG_COND_NE:
-+        if (ctx->skip_var1 == NULL) {
-+            tcg_gen_mov_tl(cpu_skip, ctx->skip_var0);
++    switch (addr) {
++    case USART_DR:
++        if (!(usart->csrb & USART_CSRB_RXEN)) {
++            /* Receiver disabled, ignore. */
++            return 0;
++        }
++        if (usart->data_valid) {
++            data = usart->data & usart->char_mask;
++            usart->data_valid = false;
 +        } else {
-+            tcg_gen_xor_tl(cpu_skip, ctx->skip_var0, ctx->skip_var1);
-+            ctx->skip_var1 = NULL;
++            data = 0;
 +        }
-+        break;
-+
++        usart->csra &= 0xff ^ USART_CSRA_RXC;
++        qemu_set_irq(usart->rxc_irq, 0);
++        qemu_chr_fe_accept_input(&usart->chr);
++        return data;
++    case USART_CSRA:
++        return usart->csra;
++    case USART_CSRB:
++        return usart->csrb;
++    case USART_CSRC:
++        return usart->csrc;
++    case USART_BRRL:
++        return usart->brrl;
++    case USART_BRRH:
++        return usart->brrh;
 +    default:
-+        /* Convert to a NE condition vs 0. */
-+        if (ctx->skip_var1 == NULL) {
-+            tcg_gen_setcondi_tl(ctx->skip_cond, cpu_skip, ctx->skip_var0, 0);
-+        } else {
-+            tcg_gen_setcond_tl(ctx->skip_cond, cpu_skip,
-+                               ctx->skip_var0, ctx->skip_var1);
-+            ctx->skip_var1 = NULL;
-+        }
-+        ctx->skip_cond = TCG_COND_NE;
-+        break;
++        qemu_log_mask(
++            LOG_GUEST_ERROR,
++            "%s: Bad offset 0x%"HWADDR_PRIx"\n",
++            __func__,
++            addr);
 +    }
-+    if (ctx->free_skip_var0) {
-+        tcg_temp_free(ctx->skip_var0);
-+        ctx->free_skip_var0 = false;
-+    }
-+    ctx->skip_var0 = cpu_skip;
-+    return true;
++    return 0;
 +}
 +
-+void gen_intermediate_code(CPUState *cs, TranslationBlock *tb, int max_insns)
++static void avr_usart_write(void *opaque, hwaddr addr, uint64_t value,
++                                unsigned int size)
 +{
-+    CPUAVRState *env = cs->env_ptr;
-+    DisasContext ctx = {
-+        .tb = tb,
-+        .cs = cs,
-+        .env = env,
-+        .memidx = 0,
-+        .bstate = DISAS_NEXT,
-+        .skip_cond = TCG_COND_NEVER,
-+        .singlestep = cs->singlestep_enabled,
-+    };
-+    target_ulong pc_start = tb->pc / 2;
-+    int num_insns = 0;
++    AVRUsartState *usart = opaque;
++    uint8_t mask;
++    uint8_t data;
++    assert((value & 0xff) == value);
++    assert(size == 1);
 +
-+    if (tb->flags & TB_FLAGS_FULL_ACCESS) {
-+        /*
-+         * This flag is set by ST/LD instruction we will regenerate it ONLY
-+         * with mem/cpu memory access instead of mem access
-+         */
-+        max_insns = 1;
-+    }
-+    if (ctx.singlestep) {
-+        max_insns = 1;
++    if (!usart->enabled) {
++        return;
 +    }
 +
-+    gen_tb_start(tb);
-+
-+    ctx.npc = pc_start;
-+    if (tb->flags & TB_FLAGS_SKIP) {
-+        ctx.skip_cond = TCG_COND_ALWAYS;
-+        ctx.skip_var0 = cpu_skip;
-+    }
-+
-+    do {
-+        TCGLabel *skip_label = NULL;
-+
-+        /* translate current instruction */
-+        tcg_gen_insn_start(ctx.npc);
-+        num_insns++;
-+
-+        /*
-+         * this is due to some strange GDB behavior
-+         * let's assume main has address 0x100
-+         * b main   - sets breakpoint at address 0x00000100 (code)
-+         * b *0x100 - sets breakpoint at address 0x00800100 (data)
-+         */
-+        if (unlikely(!ctx.singlestep &&
-+                (cpu_breakpoint_test(cs, OFFSET_CODE + ctx.npc * 2, BP_ANY) ||
-+                 cpu_breakpoint_test(cs, OFFSET_DATA + ctx.npc * 2, BP_ANY)))) {
-+            canonicalize_skip(&ctx);
-+            tcg_gen_movi_tl(cpu_pc, ctx.npc);
-+            gen_helper_debug(cpu_env);
-+            goto done_generating;
++    switch (addr) {
++    case USART_DR:
++        if (!(usart->csrb & USART_CSRB_TXEN)) {
++            /* Transmitter disabled, ignore. */
++            return;
 +        }
-+
-+        /* Conditionally skip the next instruction, if indicated.  */
-+        if (ctx.skip_cond != TCG_COND_NEVER) {
-+            skip_label = gen_new_label();
-+            if (ctx.skip_var0 == cpu_skip) {
-+                /*
-+                 * Copy cpu_skip so that we may zero it before the branch.
-+                 * This ensures that cpu_skip is non-zero after the label
-+                 * if and only if the skipped insn itself sets a skip.
-+                 */
-+                ctx.free_skip_var0 = true;
-+                ctx.skip_var0 = tcg_temp_new();
-+                tcg_gen_mov_tl(ctx.skip_var0, cpu_skip);
-+                tcg_gen_movi_tl(cpu_skip, 0);
-+            }
-+            if (ctx.skip_var1 == NULL) {
-+                tcg_gen_brcondi_tl(ctx.skip_cond, ctx.skip_var0, 0, skip_label);
-+            } else {
-+                tcg_gen_brcond_tl(ctx.skip_cond, ctx.skip_var0,
-+                                  ctx.skip_var1, skip_label);
-+                ctx.skip_var1 = NULL;
-+            }
-+            if (ctx.free_skip_var0) {
-+                tcg_temp_free(ctx.skip_var0);
-+                ctx.free_skip_var0 = false;
-+            }
-+            ctx.skip_cond = TCG_COND_NEVER;
-+            ctx.skip_var0 = NULL;
++        usart->csra |= USART_CSRA_TXC;
++        usart->csra |= USART_CSRA_DRE;
++        if (usart->csrb & USART_CSRB_TXCIE) {
++            qemu_set_irq(usart->txc_irq, 1);
++            usart->csra &= 0xff ^ USART_CSRA_TXC;
 +        }
-+
-+        translate(&ctx);
-+
-+        if (skip_label) {
-+            canonicalize_skip(&ctx);
-+            gen_set_label(skip_label);
-+            if (ctx.bstate == DISAS_NORETURN) {
-+                ctx.bstate = DISAS_CHAIN;
-+            }
++        if (usart->csrb & USART_CSRB_DREIE) {
++            qemu_set_irq(usart->dre_irq, 1);
 +        }
-+    } while (ctx.bstate == DISAS_NEXT
-+             && num_insns < max_insns
-+             && (ctx.npc - pc_start) * 2 < TARGET_PAGE_SIZE - 4
-+             && !tcg_op_buf_full());
-+
-+    if (tb->cflags & CF_LAST_IO) {
-+        gen_io_end();
-+    }
-+
-+    bool nonconst_skip = canonicalize_skip(&ctx);
-+
-+    switch (ctx.bstate) {
-+    case DISAS_NORETURN:
-+        assert(!nonconst_skip);
++        data = value;
++        qemu_chr_fe_write_all(&usart->chr, &data, 1);
 +        break;
-+    case DISAS_NEXT:
-+    case DISAS_TOO_MANY:
-+    case DISAS_CHAIN:
-+        if (!nonconst_skip) {
-+            /* Note gen_goto_tb checks singlestep.  */
-+            gen_goto_tb(&ctx, 1, ctx.npc);
-+            break;
++    case USART_CSRA:
++        mask = 0b01000011;
++        /* Mask read-only bits. */
++        value = (value & mask) | (usart->csra & (0xff ^ mask));
++        usart->csra = value;
++        if (value & USART_CSRA_TXC) {
++            usart->csra ^= USART_CSRA_TXC;
++            qemu_set_irq(usart->txc_irq, 0);
 +        }
-+        tcg_gen_movi_tl(cpu_pc, ctx.npc);
-+        /* fall through */
-+    case DISAS_LOOKUP:
-+        if (!ctx.singlestep) {
-+            tcg_gen_lookup_and_goto_ptr();
-+            break;
++        if (value & USART_CSRA_MPCM) {
++            qemu_log_mask(
++                LOG_GUEST_ERROR,
++                "%s: MPCM not supported by USART\n",
++                __func__);
 +        }
-+        /* fall through */
-+    case DISAS_EXIT:
-+        if (ctx.singlestep) {
-+            gen_helper_debug(cpu_env);
-+        } else {
-+            tcg_gen_exit_tb(NULL, 0);
++        break;
++    case USART_CSRB:
++        mask = 0b11111101;
++        /* Mask read-only bits. */
++        value = (value & mask) | (usart->csrb & (0xff ^ mask));
++        usart->csrb = value;
++        if (!(value & USART_CSRB_RXEN)) {
++            /* Receiver disabled, flush input buffer. */
++            usart->data_valid = false;
 +        }
++        qemu_set_irq(usart->rxc_irq,
++            ((value & USART_CSRB_RXCIE) &&
++            (usart->csra & USART_CSRA_RXC)) ? 1 : 0);
++        qemu_set_irq(usart->txc_irq,
++            ((value & USART_CSRB_TXCIE) &&
++            (usart->csra & USART_CSRA_TXC)) ? 1 : 0);
++        qemu_set_irq(usart->dre_irq,
++            ((value & USART_CSRB_DREIE) &&
++            (usart->csra & USART_CSRA_DRE)) ? 1 : 0);
++        update_char_mask(usart);
++        break;
++    case USART_CSRC:
++        usart->csrc = value;
++        if ((value & USART_CSRC_MSEL1) && (value & USART_CSRC_MSEL0)) {
++            qemu_log_mask(
++                LOG_GUEST_ERROR,
++                "%s: SPI mode not supported by USART\n",
++                __func__);
++        }
++        if ((value & USART_CSRC_MSEL1) && !(value & USART_CSRC_MSEL0)) {
++            qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad USART mode\n", __func__);
++        }
++        if (!(value & USART_CSRC_PM1) && (value & USART_CSRC_PM0)) {
++            qemu_log_mask(
++                LOG_GUEST_ERROR,
++                "%s: Bad USART parity mode\n",
++                __func__);
++        }
++        update_char_mask(usart);
++        break;
++    case USART_BRRL:
++        usart->brrl = value;
++        break;
++    case USART_BRRH:
++        usart->brrh = value & 0b00001111;
 +        break;
 +    default:
-+        g_assert_not_reached();
++        qemu_log_mask(
++            LOG_GUEST_ERROR,
++            "%s: Bad offset 0x%"HWADDR_PRIx"\n",
++            __func__,
++            addr);
++    }
++}
++
++static const MemoryRegionOps avr_usart_ops = {
++    .read = avr_usart_read,
++    .write = avr_usart_write,
++    .endianness = DEVICE_NATIVE_ENDIAN,
++    .impl = {.min_access_size = 1, .max_access_size = 1}
++};
++
++static Property avr_usart_properties[] = {
++    DEFINE_PROP_CHR("chardev", AVRUsartState, chr),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void avr_usart_pr(void *opaque, int irq, int level)
++{
++    AVRUsartState *s = AVR_USART(opaque);
++
++    s->enabled = !level;
++
++    if (!s->enabled) {
++        avr_usart_reset(DEVICE(s));
++    }
++}
++
++static void avr_usart_init(Object *obj)
++{
++    AVRUsartState *s = AVR_USART(obj);
++    sysbus_init_irq(SYS_BUS_DEVICE(obj), &s->rxc_irq);
++    sysbus_init_irq(SYS_BUS_DEVICE(obj), &s->dre_irq);
++    sysbus_init_irq(SYS_BUS_DEVICE(obj), &s->txc_irq);
++    memory_region_init_io(&s->mmio, obj, &avr_usart_ops, s, TYPE_AVR_USART, 8);
++    sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->mmio);
++    qdev_init_gpio_in(DEVICE(s), avr_usart_pr, 1);
++    s->enabled = true;
++}
++
++static void avr_usart_realize(DeviceState *dev, Error **errp)
++{
++    AVRUsartState *s = AVR_USART(dev);
++    qemu_chr_fe_set_handlers(&s->chr, avr_usart_can_receive,
++                             avr_usart_receive, NULL, NULL,
++                             s, NULL, true);
++    avr_usart_reset(dev);
++}
++
++static void avr_usart_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++
++    dc->reset = avr_usart_reset;
++    dc->props = avr_usart_properties;
++    dc->realize = avr_usart_realize;
++}
++
++static const TypeInfo avr_usart_info = {
++    .name          = TYPE_AVR_USART,
++    .parent        = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(AVRUsartState),
++    .instance_init = avr_usart_init,
++    .class_init    = avr_usart_class_init,
++};
++
++static void avr_usart_register_types(void)
++{
++    type_register_static(&avr_usart_info);
++}
++
++type_init(avr_usart_register_types)
+diff --git a/hw/misc/Kconfig b/hw/misc/Kconfig
+index 385e1b0cec..ebdcf319f6 100644
+--- a/hw/misc/Kconfig
++++ b/hw/misc/Kconfig
+@@ -117,4 +117,7 @@ config AUX
+     bool
+     select I2C
+ 
++config AVR_MASK
++    bool
++
+ source macio/Kconfig
+diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
+index e9aab519a1..0806e9df9c 100644
+--- a/hw/misc/Makefile.objs
++++ b/hw/misc/Makefile.objs
+@@ -80,3 +80,5 @@ obj-$(CONFIG_MSF2) += msf2-sysreg.o
+ obj-$(CONFIG_NRF51_SOC) += nrf51_rng.o
+ 
+ obj-$(CONFIG_GRLIB) += grlib_ahb_apb_pnp.o
++
++obj-$(CONFIG_AVR_MASK) += avr_mask.o
+diff --git a/hw/misc/avr_mask.c b/hw/misc/avr_mask.c
+new file mode 100644
+index 0000000000..1d1f8e10a8
+--- /dev/null
++++ b/hw/misc/avr_mask.c
+@@ -0,0 +1,110 @@
++/*
++ * AVR Power Reduction
++ *
++ * Copyright (c) 2019 Michael Rolnik
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
++
++#include "qemu/osdep.h"
++#include "hw/misc/avr_mask.h"
++#include "qemu/log.h"
++
++#define DB_PRINT(fmt, args...) /* Nothing */
++/*#define DB_PRINT(fmt, args...) printf("%s: " fmt "\n", __func__, ## args)*/
++
++static void avr_mask_reset(DeviceState *dev)
++{
++    AVRMaskState *s = AVR_MASK(dev);
++
++    s->val = 0x00;
++
++    for (int i = 0; i < 8; i++) {
++        qemu_set_irq(s->irq[i], 0);
++    }
++}
++
++static uint64_t avr_mask_read(void *opaque, hwaddr offset, unsigned size)
++{
++    assert(size == 1);
++    assert(offset == 0);
++    AVRMaskState *s = opaque;
++
++    return (uint64_t)s->val;
++}
++
++static void avr_mask_write(void *opaque, hwaddr offset,
++                              uint64_t val64, unsigned size)
++{
++    assert(size == 1);
++    assert(offset == 0);
++    AVRMaskState *s = opaque;
++    uint8_t val8 = val64;
++
++    DB_PRINT("write %d to offset %d", val8, (uint8_t)offset);
++
++    s->val = val8;
++    for (int i = 0; i < 8; i++) {
++        qemu_set_irq(s->irq[i], (val8 & (1 << i)) != 0);
++    }
++}
++
++static const MemoryRegionOps avr_mask_ops = {
++    .read = avr_mask_read,
++    .write = avr_mask_write,
++    .endianness = DEVICE_NATIVE_ENDIAN,
++    .impl = {.max_access_size = 1}
++};
++
++static void avr_mask_init(Object *dev)
++{
++    AVRMaskState *s = AVR_MASK(dev);
++    SysBusDevice *busdev = SYS_BUS_DEVICE(dev);
++
++    memory_region_init_io(&s->iomem, dev, &avr_mask_ops, s, TYPE_AVR_MASK,
++            0x01);
++    sysbus_init_mmio(busdev, &s->iomem);
++
++    for (int i = 0; i < 8; i++) {
++        sysbus_init_irq(busdev, &s->irq[i]);
++    }
++    s->val = 0x00;
++}
++
++static void avr_mask_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++
++    dc->reset = avr_mask_reset;
++}
++
++static const TypeInfo avr_mask_info = {
++    .name          = TYPE_AVR_MASK,
++    .parent        = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(AVRMaskState),
++    .class_init    = avr_mask_class_init,
++    .instance_init = avr_mask_init,
++};
++
++static void avr_mask_register_types(void)
++{
++    type_register_static(&avr_mask_info);
++}
++
++type_init(avr_mask_register_types)
+diff --git a/hw/timer/Kconfig b/hw/timer/Kconfig
+index 51921eb63f..ad754df750 100644
+--- a/hw/timer/Kconfig
++++ b/hw/timer/Kconfig
+@@ -61,3 +61,6 @@ config CMSDK_APB_TIMER
+ config CMSDK_APB_DUALTIMER
+     bool
+     select PTIMER
++
++config AVR_TIMER16
++    bool
+diff --git a/hw/timer/Makefile.objs b/hw/timer/Makefile.objs
+index 123d92c969..4f853e265d 100644
+--- a/hw/timer/Makefile.objs
++++ b/hw/timer/Makefile.objs
+@@ -35,6 +35,7 @@ obj-$(CONFIG_PXA2XX) += pxa2xx_timer.o
+ obj-$(CONFIG_SH4) += sh_timer.o
+ obj-$(CONFIG_DIGIC) += digic-timer.o
+ obj-$(CONFIG_MIPS_CPS) += mips_gictimer.o
++obj-$(CONFIG_AVR_TIMER16) += avr_timer16.o
+ 
+ obj-$(CONFIG_MC146818RTC) += mc146818rtc.o
+ 
+diff --git a/hw/timer/avr_timer16.c b/hw/timer/avr_timer16.c
+new file mode 100644
+index 0000000000..bd13a92765
+--- /dev/null
++++ b/hw/timer/avr_timer16.c
+@@ -0,0 +1,603 @@
++/*
++ * AVR 16 bit timer
++ *
++ * Copyright (c) 2018 University of Kent
++ * Author: Ed Robbins
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
++
++/*
++ * Driver for 16 bit timers on 8 bit AVR devices.
++ * Note:
++ * ATmega640/V-1280/V-1281/V-2560/V-2561/V timers 1, 3, 4 and 5 are 16 bit
++ */
++
++/*
++ * XXX TODO: Power Reduction Register support
++ *           prescaler pause support
++ *           PWM modes, GPIO, output capture pins, input compare pin
++ */
++
++#include "qemu/osdep.h"
++#include "hw/timer/avr_timer16.h"
++#include "qemu/log.h"
++
++/* Register offsets */
++#define T16_CRA     0x0
++#define T16_CRB     0x1
++#define T16_CRC     0x2
++#define T16_CNTL    0x4
++#define T16_CNTH    0x5
++#define T16_ICRL    0x6
++#define T16_ICRH    0x7
++#define T16_OCRAL   0x8
++#define T16_OCRAH   0x9
++#define T16_OCRBL   0xa
++#define T16_OCRBH   0xb
++#define T16_OCRCL   0xc
++#define T16_OCRCH   0xd
++
++/* Field masks */
++#define T16_CRA_WGM01   0x3
++#define T16_CRA_COMC    0xc
++#define T16_CRA_COMB    0x30
++#define T16_CRA_COMA    0xc0
++#define T16_CRA_OC_CONF \
++    (T16_CRA_COMA | T16_CRA_COMB | T16_CRA_COMC)
++
++#define T16_CRB_CS      0x7
++#define T16_CRB_WGM23   0x18
++#define T16_CRB_ICES    0x40
++#define T16_CRB_ICNC    0x80
++
++#define T16_CRC_FOCC    0x20
++#define T16_CRC_FOCB    0x40
++#define T16_CRC_FOCA    0x80
++
++/* Fields masks both TIMSK and TIFR (interrupt mask/flag registers) */
++#define T16_INT_TOV    0x1 /* Timer overflow */
++#define T16_INT_OCA    0x2 /* Output compare A */
++#define T16_INT_OCB    0x4 /* Output compare B */
++#define T16_INT_OCC    0x8 /* Output compare C */
++#define T16_INT_IC     0x20 /* Input capture */
++
++/* Clock source values */
++#define T16_CLKSRC_STOPPED     0
++#define T16_CLKSRC_DIV1        1
++#define T16_CLKSRC_DIV8        2
++#define T16_CLKSRC_DIV64       3
++#define T16_CLKSRC_DIV256      4
++#define T16_CLKSRC_DIV1024     5
++#define T16_CLKSRC_EXT_FALLING 6
++#define T16_CLKSRC_EXT_RISING  7
++
++/* Timer mode values (not including PWM modes) */
++#define T16_MODE_NORMAL     0
++#define T16_MODE_CTC_OCRA   4
++#define T16_MODE_CTC_ICR    12
++
++/* Accessors */
++#define CLKSRC(t16) (t16->crb & T16_CRB_CS)
++#define MODE(t16)   (((t16->crb & T16_CRB_WGM23) >> 1) | \
++                     (t16->cra & T16_CRA_WGM01))
++#define CNT(t16)    VAL16(t16->cntl, t16->cnth)
++#define OCRA(t16)   VAL16(t16->ocral, t16->ocrah)
++#define OCRB(t16)   VAL16(t16->ocrbl, t16->ocrbh)
++#define OCRC(t16)   VAL16(t16->ocrcl, t16->ocrch)
++#define ICR(t16)    VAL16(t16->icrl, t16->icrh)
++
++/* Helper macros */
++#define VAL16(l, h) ((h << 8) | l)
++#define ERROR(fmt, args...) \
++    qemu_log_mask(LOG_GUEST_ERROR, "%s: " fmt "\n", __func__, ## args)
++#define DB_PRINT(fmt, args...) /* Nothing */
++/*#define DB_PRINT(fmt, args...) printf("%s: " fmt "\n", __func__, ## args)*/
++
++static inline int64_t avr_timer16_ns_to_ticks(AVRTimer16State *t16, int64_t t)
++{
++    if (t16->period_ns == 0) {
++        return 0;
++    }
++    return t / t16->period_ns;
++}
++
++static void avr_timer16_update_cnt(AVRTimer16State *t16)
++{
++    uint16_t cnt;
++    cnt = avr_timer16_ns_to_ticks(t16, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) -
++                                       t16->reset_time_ns);
++    t16->cntl = (uint8_t)(cnt & 0xff);
++    t16->cnth = (uint8_t)((cnt & 0xff00) >> 8);
++}
++
++static inline void avr_timer16_recalc_reset_time(AVRTimer16State *t16)
++{
++    t16->reset_time_ns = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) -
++                         CNT(t16) * t16->period_ns;
++}
++
++static void avr_timer16_clock_reset(AVRTimer16State *t16)
++{
++    t16->cntl = 0;
++    t16->cnth = 0;
++    t16->reset_time_ns = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
++}
++
++static void avr_timer16_clksrc_update(AVRTimer16State *t16)
++{
++    uint16_t divider = 0;
++    switch (CLKSRC(t16)) {
++    case T16_CLKSRC_EXT_FALLING:
++    case T16_CLKSRC_EXT_RISING:
++        ERROR("external clock source unsupported");
++        goto end;
++    case T16_CLKSRC_STOPPED:
++        goto end;
++    case T16_CLKSRC_DIV1:
++        divider = 1;
++        break;
++    case T16_CLKSRC_DIV8:
++        divider = 8;
++        break;
++    case T16_CLKSRC_DIV64:
++        divider = 64;
++        break;
++    case T16_CLKSRC_DIV256:
++        divider = 256;
++        break;
++    case T16_CLKSRC_DIV1024:
++        divider = 1024;
++        break;
++    default:
++        goto end;
++    }
++    t16->freq_hz = t16->cpu_freq_hz / divider;
++    t16->period_ns = 1000000000ULL / t16->freq_hz;
++    DB_PRINT("Timer frequency %" PRIu64 " hz, period %" PRIu64 " ns (%f s)",
++             t16->freq_hz, t16->period_ns, 1 / (double)t16->freq_hz);
++end:
++    return;
++}
++
++static void avr_timer16_set_alarm(AVRTimer16State *t16)
++{
++    if (CLKSRC(t16) == T16_CLKSRC_EXT_FALLING ||
++        CLKSRC(t16) == T16_CLKSRC_EXT_RISING ||
++        CLKSRC(t16) == T16_CLKSRC_STOPPED) {
++        /* Timer is disabled or set to external clock source (unsupported) */
++        goto end;
 +    }
 +
-+done_generating:
-+    gen_tb_end(tb, num_insns);
++    uint64_t alarm_offset = 0xffff;
++    enum NextInterrupt next_interrupt = OVERFLOW;
 +
-+    tb->size = (ctx.npc - pc_start) * 2;
-+    tb->icount = num_insns;
++    switch (MODE(t16)) {
++    case T16_MODE_NORMAL:
++        /* Normal mode */
++        if (OCRA(t16) < alarm_offset && OCRA(t16) > CNT(t16) &&
++            (t16->imsk & T16_INT_OCA)) {
++            alarm_offset = OCRA(t16);
++            next_interrupt = COMPA;
++        }
++        break;
++    case T16_MODE_CTC_OCRA:
++        /* CTC mode, top = ocra */
++        if (OCRA(t16) < alarm_offset && OCRA(t16) > CNT(t16)) {
++            alarm_offset = OCRA(t16);
++            next_interrupt = COMPA;
++        }
++       break;
++    case T16_MODE_CTC_ICR:
++        /* CTC mode, top = icr */
++        if (ICR(t16) < alarm_offset && ICR(t16) > CNT(t16)) {
++            alarm_offset = ICR(t16);
++            next_interrupt = CAPT;
++        }
++        if (OCRA(t16) < alarm_offset && OCRA(t16) > CNT(t16) &&
++            (t16->imsk & T16_INT_OCA)) {
++            alarm_offset = OCRA(t16);
++            next_interrupt = COMPA;
++        }
++        break;
++    default:
++        ERROR("pwm modes are unsupported");
++        goto end;
++    }
++    if (OCRB(t16) < alarm_offset && OCRB(t16) > CNT(t16) &&
++        (t16->imsk & T16_INT_OCB)) {
++        alarm_offset = OCRB(t16);
++        next_interrupt = COMPB;
++    }
++    if (OCRC(t16) < alarm_offset && OCRB(t16) > CNT(t16) &&
++        (t16->imsk & T16_INT_OCC)) {
++        alarm_offset = OCRB(t16);
++        next_interrupt = COMPC;
++    }
++    alarm_offset -= CNT(t16);
++
++    t16->next_interrupt = next_interrupt;
++    uint64_t alarm_ns =
++        t16->reset_time_ns + ((CNT(t16) + alarm_offset) * t16->period_ns);
++    timer_mod(t16->timer, alarm_ns);
++
++    DB_PRINT("next alarm %" PRIu64 " ns from now",
++        alarm_offset * t16->period_ns);
++
++end:
++    return;
 +}
 +
-+void restore_state_to_opc(CPUAVRState *env, TranslationBlock *tb,
-+                            target_ulong *data)
++static void avr_timer16_interrupt(void *opaque)
 +{
-+    env->pc_w = data[0];
++    AVRTimer16State *t16 = opaque;
++    uint8_t mode = MODE(t16);
++
++    avr_timer16_update_cnt(t16);
++
++    if (CLKSRC(t16) == T16_CLKSRC_EXT_FALLING ||
++        CLKSRC(t16) == T16_CLKSRC_EXT_RISING ||
++        CLKSRC(t16) == T16_CLKSRC_STOPPED) {
++        /* Timer is disabled or set to external clock source (unsupported) */
++        return;
++    }
++
++    DB_PRINT("interrupt, cnt = %d", CNT(t16));
++
++    /* Counter overflow */
++    if (t16->next_interrupt == OVERFLOW) {
++        DB_PRINT("0xffff overflow");
++        avr_timer16_clock_reset(t16);
++        if (t16->imsk & T16_INT_TOV) {
++            t16->ifr |= T16_INT_TOV;
++            qemu_set_irq(t16->ovf_irq, 1);
++        }
++    }
++    /* Check for ocra overflow in CTC mode */
++    if (mode == T16_MODE_CTC_OCRA && t16->next_interrupt == COMPA) {
++        DB_PRINT("CTC OCRA overflow");
++        avr_timer16_clock_reset(t16);
++    }
++    /* Check for icr overflow in CTC mode */
++    if (mode == T16_MODE_CTC_ICR && t16->next_interrupt == CAPT) {
++        DB_PRINT("CTC ICR overflow");
++        avr_timer16_clock_reset(t16);
++        if (t16->imsk & T16_INT_IC) {
++            t16->ifr |= T16_INT_IC;
++            qemu_set_irq(t16->capt_irq, 1);
++        }
++    }
++    /* Check for output compare interrupts */
++    if (t16->imsk & T16_INT_OCA && t16->next_interrupt == COMPA) {
++        t16->ifr |= T16_INT_OCA;
++        qemu_set_irq(t16->compa_irq, 1);
++    }
++    if (t16->imsk & T16_INT_OCB && t16->next_interrupt == COMPB) {
++        t16->ifr |= T16_INT_OCB;
++        qemu_set_irq(t16->compb_irq, 1);
++    }
++    if (t16->imsk & T16_INT_OCC && t16->next_interrupt == COMPC) {
++        t16->ifr |= T16_INT_OCC;
++        qemu_set_irq(t16->compc_irq, 1);
++    }
++    avr_timer16_set_alarm(t16);
 +}
++
++static void avr_timer16_reset(DeviceState *dev)
++{
++    AVRTimer16State *t16 = AVR_TIMER16(dev);
++
++    avr_timer16_clock_reset(t16);
++    avr_timer16_clksrc_update(t16);
++    avr_timer16_set_alarm(t16);
++
++    qemu_set_irq(t16->capt_irq, 0);
++    qemu_set_irq(t16->compa_irq, 0);
++    qemu_set_irq(t16->compb_irq, 0);
++    qemu_set_irq(t16->compc_irq, 0);
++    qemu_set_irq(t16->ovf_irq, 0);
++}
++
++static uint64_t avr_timer16_read(void *opaque, hwaddr offset, unsigned size)
++{
++    assert(size == 1);
++    AVRTimer16State *t16 = opaque;
++    uint8_t retval = 0;
++
++    switch (offset) {
++    case T16_CRA:
++        retval = t16->cra;
++        break;
++    case T16_CRB:
++        retval = t16->crb;
++        break;
++    case T16_CRC:
++        retval = t16->crc;
++        break;
++    case T16_CNTL:
++        avr_timer16_update_cnt(t16);
++        t16->rtmp = t16->cnth;
++        retval = t16->cntl;
++        break;
++    case T16_CNTH:
++        retval = t16->rtmp;
++        break;
++    case T16_ICRL:
++        /*
++         * The timer copies cnt to icr when the input capture pin changes
++         * state or when the analog comparator has a match. We don't
++         * emulate this behaviour. We do support it's use for defining a
++         * TOP value in T16_MODE_CTC_ICR
++         */
++        t16->rtmp = t16->icrh;
++        retval = t16->icrl;
++        break;
++    case T16_ICRH:
++        retval = t16->rtmp;
++        break;
++    case T16_OCRAL:
++        retval = t16->ocral;
++        break;
++    case T16_OCRAH:
++        retval = t16->ocrah;
++        break;
++    case T16_OCRBL:
++        retval = t16->ocrbl;
++        break;
++    case T16_OCRBH:
++        retval = t16->ocrbh;
++        break;
++    case T16_OCRCL:
++        retval = t16->ocrcl;
++        break;
++    case T16_OCRCH:
++        retval = t16->ocrch;
++        break;
++    default:
++        break;
++    }
++    return (uint64_t)retval;
++}
++
++static void avr_timer16_write(void *opaque, hwaddr offset,
++                              uint64_t val64, unsigned size)
++{
++    assert(size == 1);
++    AVRTimer16State *t16 = opaque;
++    uint8_t val8 = (uint8_t)val64;
++    uint8_t prev_clk_src = CLKSRC(t16);
++
++    DB_PRINT("write %d to offset %d", val8, (uint8_t)offset);
++
++    switch (offset) {
++    case T16_CRA:
++        t16->cra = val8;
++        if (t16->cra & T16_CRA_OC_CONF) {
++            ERROR("output compare pins unsupported");
++        }
++        break;
++    case T16_CRB:
++        t16->crb = val8;
++        if (t16->crb & T16_CRB_ICNC) {
++            ERROR("input capture noise canceller unsupported");
++        }
++        if (t16->crb & T16_CRB_ICES) {
++            ERROR("input capture unsupported");
++        }
++        if (CLKSRC(t16) != prev_clk_src) {
++            avr_timer16_clksrc_update(t16);
++            if (prev_clk_src == T16_CLKSRC_STOPPED) {
++                t16->reset_time_ns = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
++            }
++        }
++        break;
++    case T16_CRC:
++        t16->crc = val8;
++        ERROR("output compare pins unsupported");
++        break;
++    case T16_CNTL:
++        /*
++         * CNT is the 16-bit counter value, it must be read/written via
++         * a temporary register (rtmp) to make the read/write atomic.
++         */
++        /* ICR also has this behaviour, and shares rtmp */
++        /*
++         * Writing CNT blocks compare matches for one clock cycle.
++         * Writing CNT to TOP or to an OCR value (if in use) will
++         * skip the relevant interrupt
++         */
++        t16->cntl = val8;
++        t16->cnth = t16->rtmp;
++        avr_timer16_recalc_reset_time(t16);
++        break;
++    case T16_CNTH:
++        t16->rtmp = val8;
++        break;
++    case T16_ICRL:
++        /* ICR can only be written in mode T16_MODE_CTC_ICR */
++        if (MODE(t16) == T16_MODE_CTC_ICR) {
++            t16->icrl = val8;
++            t16->icrh = t16->rtmp;
++        }
++        break;
++    case T16_ICRH:
++        if (MODE(t16) == T16_MODE_CTC_ICR) {
++            t16->rtmp = val8;
++        }
++        break;
++    case T16_OCRAL:
++        /*
++         * OCRn cause the relevant output compare flag to be raised, and
++         * trigger an interrupt, when CNT is equal to the value here
++         */
++        t16->ocral = val8;
++        break;
++    case T16_OCRAH:
++        t16->ocrah = val8;
++        break;
++    case T16_OCRBL:
++        t16->ocrbl = val8;
++        break;
++    case T16_OCRBH:
++        t16->ocrbh = val8;
++        break;
++    case T16_OCRCL:
++        t16->ocrcl = val8;
++        break;
++    case T16_OCRCH:
++        t16->ocrch = val8;
++        break;
++    default:
++        break;
++    }
++    avr_timer16_set_alarm(t16);
++}
++
++static uint64_t avr_timer16_imsk_read(void *opaque,
++                                      hwaddr offset,
++                                      unsigned size)
++{
++    assert(size == 1);
++    AVRTimer16State *t16 = opaque;
++    if (offset != 0) {
++        return 0;
++    }
++    return t16->imsk;
++}
++
++static void avr_timer16_imsk_write(void *opaque, hwaddr offset,
++                                   uint64_t val64, unsigned size)
++{
++    assert(size == 1);
++    AVRTimer16State *t16 = opaque;
++    if (offset != 0) {
++        return;
++    }
++    t16->imsk = (uint8_t)val64;
++}
++
++static uint64_t avr_timer16_ifr_read(void *opaque,
++                                     hwaddr offset,
++                                     unsigned size)
++{
++    assert(size == 1);
++    AVRTimer16State *t16 = opaque;
++    if (offset != 0) {
++        return 0;
++    }
++    return t16->ifr;
++}
++
++static void avr_timer16_ifr_write(void *opaque, hwaddr offset,
++                                  uint64_t val64, unsigned size)
++{
++    assert(size == 1);
++    AVRTimer16State *t16 = opaque;
++    if (offset != 0) {
++        return;
++    }
++    t16->ifr = (uint8_t)val64;
++}
++
++static const MemoryRegionOps avr_timer16_ops = {
++    .read = avr_timer16_read,
++    .write = avr_timer16_write,
++    .endianness = DEVICE_NATIVE_ENDIAN,
++    .impl = {.max_access_size = 1}
++};
++
++static const MemoryRegionOps avr_timer16_imsk_ops = {
++    .read = avr_timer16_imsk_read,
++    .write = avr_timer16_imsk_write,
++    .endianness = DEVICE_NATIVE_ENDIAN,
++    .impl = {.max_access_size = 1}
++};
++
++static const MemoryRegionOps avr_timer16_ifr_ops = {
++    .read = avr_timer16_ifr_read,
++    .write = avr_timer16_ifr_write,
++    .endianness = DEVICE_NATIVE_ENDIAN,
++    .impl = {.max_access_size = 1}
++};
++
++static Property avr_timer16_properties[] = {
++    DEFINE_PROP_UINT64("cpu-frequency-hz", struct AVRTimer16State,
++                       cpu_freq_hz, 20000000),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void avr_timer16_pr(void *opaque, int irq, int level)
++{
++    AVRTimer16State *s = AVR_TIMER16(opaque);
++
++    s->enabled = !level;
++
++    if (!s->enabled) {
++        avr_timer16_reset(DEVICE(s));
++    }
++}
++
++static void avr_timer16_init(Object *obj)
++{
++    AVRTimer16State *s = AVR_TIMER16(obj);
++
++    sysbus_init_irq(SYS_BUS_DEVICE(obj), &s->capt_irq);
++    sysbus_init_irq(SYS_BUS_DEVICE(obj), &s->compa_irq);
++    sysbus_init_irq(SYS_BUS_DEVICE(obj), &s->compb_irq);
++    sysbus_init_irq(SYS_BUS_DEVICE(obj), &s->compc_irq);
++    sysbus_init_irq(SYS_BUS_DEVICE(obj), &s->ovf_irq);
++
++    memory_region_init_io(&s->iomem, obj, &avr_timer16_ops,
++                          s, TYPE_AVR_TIMER16, 0xe);
++    memory_region_init_io(&s->imsk_iomem, obj, &avr_timer16_imsk_ops,
++                          s, TYPE_AVR_TIMER16, 0x1);
++    memory_region_init_io(&s->ifr_iomem, obj, &avr_timer16_ifr_ops,
++                          s, TYPE_AVR_TIMER16, 0x1);
++
++    sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->iomem);
++    sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->imsk_iomem);
++    sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->ifr_iomem);
++    qdev_init_gpio_in(DEVICE(s), avr_timer16_pr, 1);
++
++    s->timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, avr_timer16_interrupt, s);
++    s->enabled = true;
++}
++
++static void avr_timer16_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++
++    dc->reset = avr_timer16_reset;
++    dc->props = avr_timer16_properties;
++}
++
++static const TypeInfo avr_timer16_info = {
++    .name          = TYPE_AVR_TIMER16,
++    .parent        = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(AVRTimer16State),
++    .instance_init = avr_timer16_init,
++    .class_init    = avr_timer16_class_init,
++};
++
++static void avr_timer16_register_types(void)
++{
++    type_register_static(&avr_timer16_info);
++}
++
++type_init(avr_timer16_register_types)
+diff --git a/include/hw/char/avr_usart.h b/include/hw/char/avr_usart.h
+new file mode 100644
+index 0000000000..8e9ee88bbd
+--- /dev/null
++++ b/include/hw/char/avr_usart.h
+@@ -0,0 +1,97 @@
++/*
++ * AVR USART
++ *
++ * Copyright (c) 2018 University of Kent
++ * Author: Sarah Harris
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
++
++#ifndef HW_AVR_USART_H
++#define HW_AVR_USART_H
++
++#include "hw/sysbus.h"
++#include "chardev/char-fe.h"
++#include "hw/hw.h"
++
++/* Offsets of registers. */
++#define USART_DR   0x06
++#define USART_CSRA  0x00
++#define USART_CSRB  0x01
++#define USART_CSRC  0x02
++#define USART_BRRH 0x05
++#define USART_BRRL 0x04
++
++/* Relevant bits in regiters. */
++#define USART_CSRA_RXC    (1 << 7)
++#define USART_CSRA_TXC    (1 << 6)
++#define USART_CSRA_DRE    (1 << 5)
++#define USART_CSRA_MPCM   (1 << 0)
++
++#define USART_CSRB_RXCIE  (1 << 7)
++#define USART_CSRB_TXCIE  (1 << 6)
++#define USART_CSRB_DREIE  (1 << 5)
++#define USART_CSRB_RXEN   (1 << 4)
++#define USART_CSRB_TXEN   (1 << 3)
++#define USART_CSRB_CSZ2   (1 << 2)
++#define USART_CSRB_RXB8   (1 << 1)
++#define USART_CSRB_TXB8   (1 << 0)
++
++#define USART_CSRC_MSEL1  (1 << 7)
++#define USART_CSRC_MSEL0  (1 << 6)
++#define USART_CSRC_PM1    (1 << 5)
++#define USART_CSRC_PM0    (1 << 4)
++#define USART_CSRC_CSZ1   (1 << 2)
++#define USART_CSRC_CSZ0   (1 << 1)
++
++#define TYPE_AVR_USART "avr-usart"
++#define AVR_USART(obj) \
++    OBJECT_CHECK(AVRUsartState, (obj), TYPE_AVR_USART)
++
++typedef struct {
++    /* <private> */
++    SysBusDevice parent_obj;
++
++    /* <public> */
++    MemoryRegion mmio;
++
++    CharBackend chr;
++
++    bool enabled;
++
++    uint8_t data;
++    bool data_valid;
++    uint8_t char_mask;
++    /* Control and Status Registers */
++    uint8_t csra;
++    uint8_t csrb;
++    uint8_t csrc;
++    /* Baud Rate Registers (low/high byte) */
++    uint8_t brrh;
++    uint8_t brrl;
++
++    /* Receive Complete */
++    qemu_irq rxc_irq;
++    /* Transmit Complete */
++    qemu_irq txc_irq;
++    /* Data Register Empty */
++    qemu_irq dre_irq;
++} AVRUsartState;
++
++#endif /* HW_AVR_USART_H */
+diff --git a/include/hw/misc/avr_mask.h b/include/hw/misc/avr_mask.h
+new file mode 100644
+index 0000000000..d3e21972d8
+--- /dev/null
++++ b/include/hw/misc/avr_mask.h
+@@ -0,0 +1,47 @@
++/*
++ * AVR Power Reduction
++ *
++ * Copyright (c) 2019 Michael Rolnik
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
++
++#ifndef HW_avr_mask_H
++#define HW_avr_mask_H
++
++#include "hw/sysbus.h"
++#include "chardev/char-fe.h"
++#include "hw/hw.h"
++
++
++#define TYPE_AVR_MASK "avr-mask"
++#define AVR_MASK(obj) OBJECT_CHECK(AVRMaskState, (obj), TYPE_AVR_MASK)
++
++typedef struct {
++    /* <private> */
++    SysBusDevice parent_obj;
++
++    /* <public> */
++    MemoryRegion iomem;
++
++    uint8_t val;
++    qemu_irq irq[8];
++} AVRMaskState;
++
++#endif /* HW_avr_mask_H */
+diff --git a/include/hw/timer/avr_timer16.h b/include/hw/timer/avr_timer16.h
+new file mode 100644
+index 0000000000..5639074ce5
+--- /dev/null
++++ b/include/hw/timer/avr_timer16.h
+@@ -0,0 +1,97 @@
++/*
++ * AVR 16 bit timer
++ *
++ * Copyright (c) 2018 University of Kent
++ * Author: Ed Robbins
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
++
++/*
++ * Driver for 16 bit timers on 8 bit AVR devices.
++ * Note:
++ * On ATmega640/V-1280/V-1281/V-2560/V-2561/V timers 1, 3, 4 and 5 are 16 bit
++ */
++
++#ifndef AVR_TIMER16_H
++#define AVR_TIMER16_H
++
++#include "hw/sysbus.h"
++#include "qemu/timer.h"
++#include "hw/hw.h"
++
++enum NextInterrupt {
++    OVERFLOW,
++    COMPA,
++    COMPB,
++    COMPC,
++    CAPT
++};
++
++#define TYPE_AVR_TIMER16 "avr-timer16"
++#define AVR_TIMER16(obj) \
++    OBJECT_CHECK(AVRTimer16State, (obj), TYPE_AVR_TIMER16)
++
++typedef struct AVRTimer16State {
++    /* <private> */
++    SysBusDevice parent_obj;
++
++    /* <public> */
++    MemoryRegion iomem;
++    MemoryRegion imsk_iomem;
++    MemoryRegion ifr_iomem;
++    QEMUTimer *timer;
++    qemu_irq capt_irq;
++    qemu_irq compa_irq;
++    qemu_irq compb_irq;
++    qemu_irq compc_irq;
++    qemu_irq ovf_irq;
++
++    bool enabled;
++
++    /* registers */
++    uint8_t cra;
++    uint8_t crb;
++    uint8_t crc;
++    uint8_t cntl;
++    uint8_t cnth;
++    uint8_t icrl;
++    uint8_t icrh;
++    uint8_t ocral;
++    uint8_t ocrah;
++    uint8_t ocrbl;
++    uint8_t ocrbh;
++    uint8_t ocrcl;
++    uint8_t ocrch;
++    /*
++     * Reads and writes to CNT and ICR utilise a bizarre temporary
++     * register, which we emulate
++     */
++    uint8_t rtmp;
++    uint8_t imsk;
++    uint8_t ifr;
++
++    uint64_t cpu_freq_hz;
++    uint64_t freq_hz;
++    uint64_t period_ns;
++    uint64_t reset_time_ns;
++    enum NextInterrupt next_interrupt;
++} AVRTimer16State;
++
++#endif /* AVR_TIMER16_H */
 -- 
 2.17.2 (Apple Git-113)
 
