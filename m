@@ -2,90 +2,63 @@ Return-Path: <SRS0=r3/N=VJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 627D9C742A8
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 07:55:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AC93C742A8
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 07:56:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2E1352084B
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 07:55:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 26A8D2084B
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 07:56:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OiRgYQl5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E1352084B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Yfj1FQJC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 26A8D2084B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47298 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47324 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlqOu-0007OD-8H
-	for qemu-devel@archiver.kernel.org; Fri, 12 Jul 2019 03:55:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44244)
+	id 1hlqQJ-0008Qc-Cb
+	for qemu-devel@archiver.kernel.org; Fri, 12 Jul 2019 03:56:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45004)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <marcel.apfelbaum@gmail.com>) id 1hlqOk-0006wH-Fy
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 03:55:19 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1hlqQ7-00080m-SO
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 03:56:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcel.apfelbaum@gmail.com>) id 1hlqOj-0001f2-Gu
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 03:55:18 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:39721)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
- id 1hlqOj-0001eQ-2I
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 03:55:17 -0400
-Received: by mail-wr1-x444.google.com with SMTP id x4so8896402wrt.6
- for <qemu-devel@nongnu.org>; Fri, 12 Jul 2019 00:55:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-transfer-encoding:content-language;
- bh=5KxKAEwho4J/ZngTh1mES1M/ojCXrTU9e6+TtoYyVb8=;
- b=OiRgYQl5X9qreDA49pRTac2PxR5llIO4blV3FGNLiwywJMYrM67ocLtymhUhqxvSpy
- Lb9m5ApMkZ/Ij2yX416J1a1e4oEX1sB+Vpd03EdM5JCpkpePrloceLXr0AlWzfS93ZVO
- 2EIytLLAle9rvylYBcjIEUB14y0qZaDIN/GOIfUk5l9sAbf6TpO0SJiwxdQrHZzSNGaz
- cycJA27AmRsavfjoNox/psuJUaUrh510mCGWBD2p1jKjQX61c9YabndjfprzG4r3V9u9
- T3OzuZcz2oHSGfpYZwBjPlrvoF+YyXIFkGJjioW3xPwsGaCo0h/uwG2vKKZoFrO/Zs61
- j8rQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-transfer-encoding
- :content-language;
- bh=5KxKAEwho4J/ZngTh1mES1M/ojCXrTU9e6+TtoYyVb8=;
- b=S86iinPNpLJA7VrCdNTGDh0OcDdrSmVfA+Avp0Wf2mVKo0k/o9JquXOhlFa1VLKGuY
- dgBwzzi3IwEiq5fCyynIEG4ho6E/LSZQwsbdnB3Eh+YwKPI5YMLGZ6jElAsQuoc6/3PR
- PFsLiUP2fhSTdrnQIHTPIDkkGgsh0TLwvpiKTJuZbY04EeyCX9QZJpCa5JFfxu5ZJT1v
- AZeYL1YqwEeBQAjezMcFf0HsbMJblI75GnELp5eudXUKYAQfBKLyZC0OYoabd7TBUa1/
- kXAu2CKxMMJBooT0BoRiiXRzmtV5nXx6+InSodanKRBSoziNL9paydRP61Xzg8pPGT+4
- +hOA==
-X-Gm-Message-State: APjAAAXrvwEEMcyGx7wx6/k/Jy/8pdLyipSnJURAlOR3Q1COa4U8alwt
- 7JWB/kPiH+zUGi2uFSHruhtegghz
-X-Google-Smtp-Source: APXvYqzcylkhrncvSQE+tJGJRdXK4bs5msh72avr4fgOUaMmVw6LlWfcBoOW10SCjfPrCCSCZ5Dbxg==
-X-Received: by 2002:adf:f186:: with SMTP id h6mr9798954wro.274.1562918115642; 
- Fri, 12 Jul 2019 00:55:15 -0700 (PDT)
-Received: from localhost.localdomain ([37.142.144.12])
- by smtp.gmail.com with ESMTPSA id f17sm7088375wmf.27.2019.07.12.00.55.14
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Fri, 12 Jul 2019 00:55:15 -0700 (PDT)
-To: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
-References: <20190711192512.31936-1-mst@redhat.com>
-From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Message-ID: <31f0357b-7117-45e8-230e-d13f326b202c@gmail.com>
-Date: Fri, 12 Jul 2019 10:55:30 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+ (envelope-from <dgibson@ozlabs.org>) id 1hlqQ5-0003Kj-IE
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 03:56:43 -0400
+Received: from ozlabs.org ([203.11.71.1]:55617)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1hlqQ2-00031M-QM; Fri, 12 Jul 2019 03:56:41 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 45lQGy03jWz9sBt; Fri, 12 Jul 2019 17:56:25 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1562918186;
+ bh=dVPIone1Y8eo4U070HfMNUfZc/es7yXi1ej8jegO3k4=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=Yfj1FQJC5MNZLTpdnZcvxxvQSBexukQ1JcK1I0vWmBkCdUZVgUPS4u039R/6okqc7
+ Su20bfwggs9ptNLYiblsdZBq2p/BBvJ2u904HBH0ZvD7n9Q7vDDXv9M/HuKW1vgVO7
+ 0kYwnkWnydo0DSFKPhh7591l8pAQ8ioyDvRzqwfE=
+Date: Fri, 12 Jul 2019 16:48:19 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: "Maxiwell S. Garcia" <maxiwell@linux.ibm.com>
+Message-ID: <20190712064819.GI2561@umbus.fritz.box>
+References: <20190711194702.26598-1-maxiwell@linux.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20190711192512.31936-1-mst@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::444
-Subject: Re: [Qemu-devel] [PATCH] xio3130_downstream: typo fix
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="HkMjoL2LAeBLhbFV"
+Content-Disposition: inline
+In-Reply-To: <20190711194702.26598-1-maxiwell@linux.ibm.com>
+User-Agent: Mutt/1.12.0 (2019-05-25)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 203.11.71.1
+Subject: Re: [Qemu-devel] [PATCH v2] migration: Do not re-read the clock on
+ pre_save in case of paused guest
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,39 +70,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: "open list:PowerPC TCG CPUs" <qemu-ppc@nongnu.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
+--HkMjoL2LAeBLhbFV
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 7/11/19 10:25 PM, Michael S. Tsirkin wrote:
-> slt ctl/status are passed in incorrect order.
-> Fix this up.
->
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> Reported-by: Peter Maydell <peter.maydell@linaro.org>
+On Thu, Jul 11, 2019 at 04:47:02PM -0300, Maxiwell S. Garcia wrote:
+> Re-read the timebase before migrate was ported from x86 commit:
+>    6053a86fe7bd: kvmclock: reduce kvmclock difference on migration
+>=20
+> The clock move makes the guest knows about the paused time between
+> the stop and migrate commands. This is an issue in an already-paused
+> VM because some side effects, like process stalls, could happen
+> after migration.
+>=20
+> So, this patch checks the runstate of guest in the pre_save handler and
+> do not re-reads the timebase in case of paused state (cold migration).
+>=20
+> Signed-off-by: Maxiwell S. Garcia <maxiwell@linux.ibm.com>
+
+I've applied this to ppc-for-4.2.  I think it probably is a correct
+fix, but this could have subtle impacts on things that are mostly
+working at the moment, so I don't want to risk it during hard freeze.
+
 > ---
->   hw/pci-bridge/xio3130_downstream.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/hw/pci-bridge/xio3130_downstream.c b/hw/pci-bridge/xio3130_downstream.c
-> index 899b0fd6c9..182e164f74 100644
-> --- a/hw/pci-bridge/xio3130_downstream.c
-> +++ b/hw/pci-bridge/xio3130_downstream.c
-> @@ -43,7 +43,7 @@ static void xio3130_downstream_write_config(PCIDevice *d, uint32_t address,
->   {
->       uint16_t slt_ctl, slt_sta;
->   
-> -    pcie_cap_slot_get(d, &slt_sta, &slt_ctl);
-> +    pcie_cap_slot_get(d, &slt_ctl, &slt_sta);
->       pci_bridge_write_config(d, address, val, len);
->       pcie_cap_flr_write_config(d, address, val, len);
->       pcie_cap_slot_write_config(d, slt_ctl, slt_sta, address, val, len);
+>  hw/ppc/ppc.c         | 13 +++++++++----
+>  target/ppc/cpu-qom.h |  1 +
+>  2 files changed, 10 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/hw/ppc/ppc.c b/hw/ppc/ppc.c
+> index a9e508c496..8572e45274 100644
+> --- a/hw/ppc/ppc.c
+> +++ b/hw/ppc/ppc.c
+> @@ -1008,6 +1008,8 @@ static void timebase_save(PPCTimebase *tb)
+>       * there is no need to update it from KVM here
+>       */
+>      tb->guest_timebase =3D ticks + first_ppc_cpu->env.tb_env->tb_offset;
+> +
+> +    tb->runstate_paused =3D runstate_check(RUN_STATE_PAUSED);
+>  }
+> =20
+>  static void timebase_load(PPCTimebase *tb)
+> @@ -1051,9 +1053,9 @@ void cpu_ppc_clock_vm_state_change(void *opaque, in=
+t running,
+>  }
+> =20
+>  /*
+> - * When migrating, read the clock just before migration,
+> - * so that the guest clock counts during the events
+> - * between:
+> + * When migrating a running guest, read the clock just
+> + * before migration, so that the guest clock counts
+> + * during the events between:
+>   *
+>   *  * vm_stop()
+>   *  *
+> @@ -1068,7 +1070,10 @@ static int timebase_pre_save(void *opaque)
+>  {
+>      PPCTimebase *tb =3D opaque;
+> =20
+> -    timebase_save(tb);
+> +    /* guest_timebase won't be overridden in case of paused guest */
+> +    if (!tb->runstate_paused) {
+> +        timebase_save(tb);
+> +    }
+> =20
+>      return 0;
+>  }
+> diff --git a/target/ppc/cpu-qom.h b/target/ppc/cpu-qom.h
+> index be9b4c30c3..5fbcdee9c9 100644
+> --- a/target/ppc/cpu-qom.h
+> +++ b/target/ppc/cpu-qom.h
+> @@ -201,6 +201,7 @@ typedef struct PowerPCCPUClass {
+>  typedef struct PPCTimebase {
+>      uint64_t guest_timebase;
+>      int64_t time_of_the_day_ns;
+> +    bool runstate_paused;
+>  } PPCTimebase;
+> =20
+>  extern const struct VMStateDescription vmstate_ppc_timebase;
 
-Reviewed-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-Thanks,
-Marcel
+--HkMjoL2LAeBLhbFV
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl0oLTIACgkQbDjKyiDZ
+s5KnmxAAl0vergGvnPKmM4Ymb97RF/wERk+vlfkGLWj7rfO4xJLLRciUehKwuIeb
+lQJmxAaLvfhhqi7+SiCojdBrQRQfmF5J2xeiW1CLaA2YIHcwbHiphlsYF02YRtJ/
+wcMbR7KULOpUo6zvCFh61Nsgs3/7VZ0dkWOHKWjCMw9xGeYc1pCYbEOk+EVrxEvS
+9/7xY3y3pRZijH5CrDvmdMTLIVAHGOOYTh8Y9GHWg2n2HaokiwvBi0PCKSj6CUCd
+QakAezWWFIqIoLuu5JO8qOamoQTzWhrFBJXbssQa+TPkzHkeppLhzl45FeX22uJp
+Tx1Ic+RGQP+z0kYBNz2693VAp+6nhm6DxD8D1KpK1BMVHNMuJyl7/LvAD8UpXTMB
+zDDIClcYCVuBGeVF5ns/RfNgpv2/BLTXUIyb5C3UojMppgqNYEvvXRKUn9xKuDKd
+m0NjV8A4Soh7Ko0ZO9WiVsT8IagRz7G0b+PyFj+CYo8iRGEeIC0S10JNdp/51xjZ
+VxZFJt5fMgQQr7hMZf5LPPnvXTAZjc8ljnO1wvoCSnUH/GtApr/bRoG/lYOyVJ9w
+RfJUJbJQM4lv5yYUAXiMEVJ5qy+l8+1igm1qnT7S8C8A2y8aAH62hJBv4dHiVm9W
+duNSnrNPFlxg+/rd3qARuRLDJTtnD8O5frFqbX6UBsgiTeTNgSY=
+=E9KU
+-----END PGP SIGNATURE-----
+
+--HkMjoL2LAeBLhbFV--
 
