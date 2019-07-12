@@ -2,68 +2,110 @@ Return-Path: <SRS0=r3/N=VJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D94BAC742B2
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 11:23:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98546C742B2
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 11:24:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B01FD20645
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 11:23:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B01FD20645
+	by mail.kernel.org (Postfix) with ESMTPS id 71CA6208E4
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 11:24:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71CA6208E4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48364 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48376 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlteM-000180-Uh
-	for qemu-devel@archiver.kernel.org; Fri, 12 Jul 2019 07:23:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48312)
+	id 1hlten-0002NP-Po
+	for qemu-devel@archiver.kernel.org; Fri, 12 Jul 2019 07:24:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48464)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <kwolf@redhat.com>) id 1hlteA-0000bo-VR
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 07:23:29 -0400
+ (envelope-from <thuth@redhat.com>) id 1hlted-0001xF-9X
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 07:23:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1hlte9-0003Ay-PG
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 07:23:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35508)
+ (envelope-from <thuth@redhat.com>) id 1hlteZ-0003fi-OS
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 07:23:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55238)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>)
- id 1hlte7-00035S-3V; Fri, 12 Jul 2019 07:23:23 -0400
+ (Exim 4.71) (envelope-from <thuth@redhat.com>)
+ id 1hlteS-0003XI-4C; Fri, 12 Jul 2019 07:23:45 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 6EB2DC05566C;
- Fri, 12 Jul 2019 11:23:22 +0000 (UTC)
-Received: from dhcp-200-226.str.redhat.com (dhcp-200-226.str.redhat.com
- [10.33.200.226])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5CC6860BFB;
- Fri, 12 Jul 2019 11:23:19 +0000 (UTC)
-Date: Fri, 12 Jul 2019 13:23:18 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Max Reitz <mreitz@redhat.com>
-Message-ID: <20190712112318.GG4514@dhcp-200-226.str.redhat.com>
-References: <20190711195804.30703-1-mreitz@redhat.com>
- <20190711195804.30703-2-mreitz@redhat.com>
- <20190712092419.GB4514@dhcp-200-226.str.redhat.com>
- <8ce2ce78-833e-c98f-ad3a-d44f6432ae4c@redhat.com>
- <20190712110110.GE4514@dhcp-200-226.str.redhat.com>
- <cd184838-6c1f-0d22-1d89-415dbd62955b@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 9E6BF3083391;
+ Fri, 12 Jul 2019 11:23:42 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-117-202.ams2.redhat.com [10.36.117.202])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 811AB60BFB;
+ Fri, 12 Jul 2019 11:23:40 +0000 (UTC)
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
+References: <20190712111849.9006-1-alex.bennee@linaro.org>
+ <20190712111849.9006-6-alex.bennee@linaro.org>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; keydata=
+ xsFNBFH7eUwBEACzyOXKU+5Pcs6wNpKzrlJwzRl3VGZt95VCdb+FgoU9g11m7FWcOafrVRwU
+ yYkTm9+7zBUc0sW5AuPGR/dp3pSLX/yFWsA/UB4nJsHqgDvDU7BImSeiTrnpMOTXb7Arw2a2
+ 4CflIyFqjCpfDM4MuTmzTjXq4Uov1giGE9X6viNo1pxyEpd7PanlKNnf4PqEQp06X4IgUacW
+ tSGj6Gcns1bCuHV8OPWLkf4hkRnu8hdL6i60Yxz4E6TqlrpxsfYwLXgEeswPHOA6Mn4Cso9O
+ 0lewVYfFfsmokfAVMKWzOl1Sr0KGI5T9CpmRfAiSHpthhHWnECcJFwl72NTi6kUcUzG4se81
+ O6n9d/kTj7pzTmBdfwuOZ0YUSqcqs0W+l1NcASSYZQaDoD3/SLk+nqVeCBB4OnYOGhgmIHNW
+ 0CwMRO/GK+20alxzk//V9GmIM2ACElbfF8+Uug3pqiHkVnKqM7W9/S1NH2qmxB6zMiJUHlTH
+ gnVeZX0dgH27mzstcF786uPcdEqS0KJuxh2kk5IvUSL3Qn3ZgmgdxBMyCPciD/1cb7/Ahazr
+ 3ThHQXSHXkH/aDXdfLsKVuwDzHLVSkdSnZdt5HHh75/NFHxwaTlydgfHmFFwodK8y/TjyiGZ
+ zg2Kje38xnz8zKn9iesFBCcONXS7txENTzX0z80WKBhK+XSFJwARAQABzRxUaG9tYXMgSHV0
+ aCA8dGguaHV0aEBnbXguZGU+wsF7BBMBAgAlAhsDBgsJCAcDAgYVCAIJCgsEFgIDAQIeAQIX
+ gAUCUfuWKwIZAQAKCRAu2dd0/nAttbe/EACb9hafyOb2FmhUqeAiBORSsUifFacQ7laVjcgR
+ I4um8CSHvxijYftpkM2EdAtmXIKgbNDpQoXcWLXB9lu9mLgTO4DVT00TRR65ikn3FCWcyT74
+ ENTOzRKyKLsDCjhXKPblTPIQbYAUCOWElcyAPm0ERd62fA/rKNxgIiNo/l4UODOMoOJm2/Ox
+ ZoTckW68Eqv7k9L7m7j+Hn3hoDTjAmcCBJt+j7pOhzWvCbqoNOIH8C8qvPaNlrba+R/K6jkO
+ 6jZkTbYQpGIofEQJ/TNn38IsNGpI1ALTHWFtoMxp3j2Imz0REO6dRE2fHRN8sVlHgkoeGhmY
+ NbDsDE1jFQOEObFnu0euk//7BXU7tGOHckVAZ8T1smiRPHfQU7UEH2a/grndxJ+PNeM5w7n2
+ l+FN3cf2KgPotCK2s9MjSdZA7C5e3rFYO8lqiqTJKvc62vqp3e7B0Kjyy5/QtzSOejBij2QL
+ xkKSFNtxIz4MtuxN8e3IDQNxsKry3nF7R4MDvouXlMo6wP9KuyNWb+vFJt9GtbgfDMIFVamp
+ ZfhEWzWRJH4VgksENA4K/BzjEHCcbTUb1TFsiB1VRnBPJ0SqlvifnfKk6HcpkDk6Pg8Q5FOJ
+ gbNHrdgXsm+m/9GF2zUUr+rOlhVbK23TUqKqPfwnD7uxjpakVcJnsVCFqJpZi1F/ga9IN87B
+ TQRR+3lMARAAtp831HniPHb9AuKq3wj83ujZK8lH5RLrfVsB4X1wi47bwo56BqhXpR/zxPTR
+ eOFT0gnbw9UkphVc7uk/alnXMDEmgvnuxv89PwIQX6k3qLABeV7ykJQG/WT5HQ6+2DdGtVw3
+ 2vjYAPiWQeETsgWRRQMDR0/hwp8s8tL/UodwYCScH6Vxx9pdy353L1fK4Bb9G73a+9FPjp9l
+ x+WwKTsltVqSBuSjyZQ3c3EE8qbTidXZxB38JwARH8yN3TX+t65cbBqLl/zRUUUTapHQpUEd
+ yoAsHIml32e4q+3xdLtTdlLi7FgPBItSazcqZPjEcYW73UAuLcmQmfJlQ5PkDiuqcitn+KzH
+ /1pqsTU7QFZjbmSMJyXY0TDErOFuMOjf20b6arcpEqse1V3IKrb+nqqA2azboRm3pEANLAJw
+ iVTwK3qwGRgK5ut6N/Znv20VEHkFUsRAZoOusrIRfR5HFDxlXguAdEz8M/hxXFYYXqOoaCYy
+ 6pJxTjy0Y/tIfmS/g9Bnp8qg9wsrsnk0+XRnDVPak++G3Uq9tJPwpJbyO0vcqEI3vAXkAB7X
+ VXLzvFwi66RrsPUoDkuzj+aCNumtOePDOCpXQGPpKl+l1aYRMN/+lNSk3+1sVuc2C07WnYyE
+ gV/cbEVklPmKrNwu6DeUyD0qI/bVzKMWZAiB1r56hsGeyYcAEQEAAcLBXwQYAQIACQUCUft5
+ TAIbDAAKCRAu2dd0/nAttYTwEACLAS/THRqXRKb17PQmKwZHerUvZm2klo+lwQ3wNQBHUJAT
+ p2R9ULexyXrJPqjUpy7+voz+FcKiuQBTKyieiIxO46oMxsbXGZ70o3gxjxdYdgimUD6U8PPd
+ JH8tfAL4BR5FZNjspcnscN2jgbF4OrpDeOLyBaj6HPmElNPtECHWCaf1xbIFsZxSDGMA6cUh
+ 0uX3Q8VI7JN1AR2cfiIRY7NrIlWYucJxyKjO3ivWm69nCtsHiJ0wcF8KlVo7F2eLaufo0K8A
+ ynL8SHMF3VEyxsXOP2f1UR9T2Ur30MXcTBpjUxml1TX3RWY5uH89Js/jlIugBwuAmacJ7JYh
+ lTg6sF/GNc4nPb4kk2yktNWTade+TzsllYlJPaorD2Qe8qX0iFUhFC6y9+O6mP4ZvWoYapp9
+ ezYNuebMgEr93ob1+4sFg3812wNP01WqsGtWCJHnPv/JoonFdMzD/bIkXGEJMk6ks2kxQQZq
+ g6Ik/s/vxOfao/xCn8nHt7GwvVy41795hzK6tbSl+BuyCRp0vfPRP34OnK7+jR2nvQpJu/pU
+ rCELuGwT9hsYkUPjVd4lfylN3mzEc6iAv/wwjsc0DRTSQCpXT3v2ymTAsRKrVaEZLibTXaf+
+ WslxWek3xNYRiqwwWAJuL652eAlxUgQ5ZS+fXBRTiQpJ+F26I/2lccScRd9G5w==
+Organization: Red Hat
+Message-ID: <52bd9e31-7248-2f91-e876-5ae337508d20@redhat.com>
+Date: Fri, 12 Jul 2019 13:23:39 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
- protocol="application/pgp-signature"; boundary="KDt/GgjP6HVcx58l"
-Content-Disposition: inline
-In-Reply-To: <cd184838-6c1f-0d22-1d89-415dbd62955b@redhat.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
+In-Reply-To: <20190712111849.9006-6-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.32]); Fri, 12 Jul 2019 11:23:22 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.44]); Fri, 12 Jul 2019 11:23:42 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [RFC 1/5] block/nbd: Fix hang in .bdrv_close()
+Subject: Re: [Qemu-devel] [PATCH v1 5/7] tests/migration-test: don't spam
+ the logs when we fail
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,172 +117,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org,
- qemu-block@nongnu.org
+Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ qemu-arm@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Juan Quintela <quintela@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
---KDt/GgjP6HVcx58l
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-Am 12.07.2019 um 13:09 hat Max Reitz geschrieben:
-> On 12.07.19 13:01, Kevin Wolf wrote:
-> > Am 12.07.2019 um 12:47 hat Max Reitz geschrieben:
-> >> On 12.07.19 11:24, Kevin Wolf wrote:
-> >>> Am 11.07.2019 um 21:58 hat Max Reitz geschrieben:
-> >>>> When nbd_close() is called from a coroutine, the connection_co never
-> >>>> gets to run, and thus nbd_teardown_connection() hangs.
-> >>>>
-> >>>> This is because aio_co_enter() only puts the connection_co into the =
-main
-> >>>> coroutine's wake-up queue, so this main coroutine needs to yield and
-> >>>> reschedule itself to let the connection_co run.
-> >>>>
-> >>>> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> >>>> ---
-> >>>>  block/nbd.c | 12 +++++++++++-
-> >>>>  1 file changed, 11 insertions(+), 1 deletion(-)
-> >>>>
-> >>>> diff --git a/block/nbd.c b/block/nbd.c
-> >>>> index 81edabbf35..b83b6cd43e 100644
-> >>>> --- a/block/nbd.c
-> >>>> +++ b/block/nbd.c
-> >>>> @@ -135,7 +135,17 @@ static void nbd_teardown_connection(BlockDriver=
-State *bs)
-> >>>>      qio_channel_shutdown(s->ioc,
-> >>>>                           QIO_CHANNEL_SHUTDOWN_BOTH,
-> >>>>                           NULL);
-> >>>> -    BDRV_POLL_WHILE(bs, s->connection_co);
-> >>>> +
-> >>>> +    if (qemu_in_coroutine()) {
-> >>>> +        /* Let our caller poll and just yield until connection_co i=
-s done */
-> >>>> +        while (s->connection_co) {
-> >>>> +            aio_co_schedule(qemu_get_current_aio_context(),
-> >>>> +                            qemu_coroutine_self());
-> >>>> +            qemu_coroutine_yield();
-> >>>> +        }
-> >>>
-> >>> Isn't this busy waiting? Why not let s->connection_co wake us up when
-> >>> it's about to terminate instead of immediately rescheduling ourselves?
-> >>
-> >> Yes, it is busy waiting, but I didn=E2=80=99t find that bad.  The conn=
-ection_co
-> >> will be invoked in basically every iteration, and once there is no
-> >> pending data, it will quit.
-> >>
-> >> The answer to =E2=80=9Cwhy not...=E2=80=9D of course is because it=E2=
-=80=99d be more complicated.
-> >>
-> >> But anyway.
-> >>
-> >> Adding a new function qemu_coroutine_run_after(target) that adds
-> >> qemu_coroutine_self() to the given @target coroutine=E2=80=99s wake-up=
- queue and
-> >> then using that instead of scheduling works, too, yes.
-> >>
-> >> I don=E2=80=99t really like being responsible for coroutine code, thou=
-gh...
-> >>
-> >> (And maybe it=E2=80=99d be better to make it qemu_coroutine_yield_for(=
-target),
-> >> which does the above and then yields?)
-> >=20
-> > Or just do something like this, which is arguably not only a fix for the
-> > busy wait, but also a code simplification:
+On 12/07/2019 13.18, Alex Benn=C3=A9e wrote:
+> Quite often the information about which test failed is hidden by the
+> wall of repeated failures for each page. Stop outputting the error
+> after 10 bad pages and just summarise the total damage at the end.
 >=20
-> 1. Is that guaranteed to work?  What if data sneaks in, the
-> connection_co handles that, and doesn=E2=80=99t wake up the teardown_co? =
- Will
-> it be re-scheduled?
-
-Then connection_co is buggy because we clearly requested that it
-terminate. It is possible that it does so only after handling another
-request, but this wouldn't be a problem. teardown_co would then just
-sleep for a few cycles more until connection_co is done and reaches the
-aio_co_wake() call.
-
-> 2. I precisely didn=E2=80=99t want to do this because we have this functi=
-onality
-> already in the form of Coroutine.co_queue_wakeup.  Why duplicate it here?
-
-co_queue_wakeup contains coroutines to be run at the next yield point
-(or termination), which may be when connection_co is actually done, but
-it might also be earlier. My explicit aio_co_wake() at the end of
-connection_co is guaranteed to run only when connection_co is done.
-
-Kevin
-
-> > diff --git a/block/nbd.c b/block/nbd.c
-> > index b83b6cd43e..c061bd1bfc 100644
-> > --- a/block/nbd.c
-> > +++ b/block/nbd.c
-> > @@ -61,6 +61,7 @@ typedef struct BDRVNBDState {
-> >      CoMutex send_mutex;
-> >      CoQueue free_sema;
-> >      Coroutine *connection_co;
-> > +    Coroutine *teardown_co;
-> >      int in_flight;
-> >=20
-> >      NBDClientRequest requests[MAX_NBD_REQUESTS];
-> > @@ -137,12 +138,9 @@ static void nbd_teardown_connection(BlockDriverSta=
-te *bs)
-> >                           NULL);
-> >=20
-> >      if (qemu_in_coroutine()) {
-> > -        /* Let our caller poll and just yield until connection_co is d=
-one */
-> > -        while (s->connection_co) {
-> > -            aio_co_schedule(qemu_get_current_aio_context(),
-> > -                            qemu_coroutine_self());
-> > -            qemu_coroutine_yield();
-> > -        }
-> > +        /* just yield until connection_co is done */
-> > +        s->teardown_co =3D qemu_coroutine_self();
-> > +        qemu_coroutine_yield();
-> >      } else {
-> >          BDRV_POLL_WHILE(bs, s->connection_co);
-> >      }
-> > @@ -217,6 +215,9 @@ static coroutine_fn void nbd_connection_entry(void =
-*opaque)
-> >      bdrv_dec_in_flight(s->bs);
-> >=20
-> >      s->connection_co =3D NULL;
-> > +    if (s->teardown_co) {
-> > +        aio_co_wake(s->teardown_co);
-> > +    }
-> >      aio_wait_kick();
-> >  }
-> >=20
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> ---
+>  tests/migration-test.c | 19 ++++++++++++-------
+>  1 file changed, 12 insertions(+), 7 deletions(-)
 >=20
->=20
+> diff --git a/tests/migration-test.c b/tests/migration-test.c
+> index b6434628e1c..ce041f80c2a 100644
+> --- a/tests/migration-test.c
+> +++ b/tests/migration-test.c
+> @@ -308,7 +308,7 @@ static void check_guests_ram(QTestState *who)
+>      uint8_t first_byte;
+>      uint8_t last_byte;
+>      bool hit_edge =3D false;
+> -    bool bad =3D false;
+> +    int bad =3D 0;
+> =20
+>      qtest_memread(who, start_address, &first_byte, 1);
+>      last_byte =3D first_byte;
+> @@ -327,15 +327,20 @@ static void check_guests_ram(QTestState *who)
+>                  hit_edge =3D true;
+>                  last_byte =3D b;
+>              } else {
+> -                fprintf(stderr, "Memory content inconsistency at %x"
+> -                                " first_byte =3D %x last_byte =3D %x c=
+urrent =3D %x"
+> -                                " hit_edge =3D %x\n",
+> -                                address, first_byte, last_byte, b, hit=
+_edge);
+> -                bad =3D true;
+> +                bad++;
+> +                if (bad <=3D 10) {
+> +                    fprintf(stderr, "Memory content inconsistency at %=
+x"
+> +                            " first_byte =3D %x last_byte =3D %x curre=
+nt =3D %x"
+> +                            " hit_edge =3D %x\n",
+> +                            address, first_byte, last_byte, b, hit_edg=
+e);
+> +                }
+>              }
+>          }
+>      }
+> -    g_assert_false(bad);
+> +    if (bad >=3D 10) {
+> +        fprintf(stderr, "and in another %d pages", bad);
+> +    }
+> +    g_assert(bad =3D=3D 0);
+>  }
+> =20
+>  static void cleanup(const char *filename)
 
+Good idea.
 
-
-
---KDt/GgjP6HVcx58l
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIcBAEBAgAGBQJdKG2mAAoJEH8JsnLIjy/WsGYP/j1wPsqLxGgdVsuAjWvmloF8
-39ydqT+CS/WVE3iNkBx3EpGRjMVeXA5/lZKXgR2bVKJY5GM/fy6L5/k9bPFa4gvL
-x1hamE2GNN+TyD1ILJvHN769HG9j8C1WLNPLarh3erjY9Bu5qkGPEBmy+wI5DdmW
-8I+ccB4+DEJqwwdQB3Tl3WTOOKHP/ppTvkwzyoKmfDBfPD7HGYaUj/SDgQgCc/f1
-MrVlqwey00xjToSZ8q3J5iUw+U9Z9nZdWEPm/7ZkE8ufzo3yciMHvunicuOWyINw
-Z7H1kngsNGAwESZDznMl0oPt3w+TFOaUHFy7dglHFNI8Ikbyjn5uVM637tdrSKP9
-bbX5CRbHgIBj/e59/AXNFeFQXSaOsTObLNdC6rhU8VtCthm3pOYRtIAij8vD3x2O
-ZFEuu+7kJt4MjLFbscITl4vrn8fLDOulCeRpC3tyibDF5Ic1Q8v9nXpteLVCJSBN
-smKT3X+vP6N6TADNl1OG0UObr83bgn6J1pJ37/0PXMc4Y7MR3GpO4tDPINtDfqKW
-YxqPr6WiNTGoUMyJNf0pRpA/DT1GH0zAVQjujHuf6mRckaZp64fENTf0PRSM6nN3
-nCnaZq10PF9UfD0mWnxj45fNik/z30ShNJdxGlX4zljuGwH3pUWyGYhDqE9rflUA
-gjaCvaC2LfLhUTB3JIt1
-=npG/
------END PGP SIGNATURE-----
-
---KDt/GgjP6HVcx58l--
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
