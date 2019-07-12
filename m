@@ -2,92 +2,63 @@ Return-Path: <SRS0=r3/N=VJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE6FFC742BD
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 14:25:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 722BCC742C2
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 14:30:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AB85C206B8
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 14:25:13 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OU1N490R"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB85C206B8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 485A8206B8
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 14:30:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 485A8206B8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49920 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49938 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlwU4-0007NL-Vl
-	for qemu-devel@archiver.kernel.org; Fri, 12 Jul 2019 10:25:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42451)
+	id 1hlwYj-0000WT-7m
+	for qemu-devel@archiver.kernel.org; Fri, 12 Jul 2019 10:30:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44123)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1hlwTu-0006yV-Q6
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 10:25:03 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1hlwYZ-000083-OU
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 10:29:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1hlwTt-0003KV-47
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 10:25:02 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:36662)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1hlwTs-0003IN-SF
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 10:25:01 -0400
-Received: by mail-wm1-x343.google.com with SMTP id g67so5043518wme.1
- for <qemu-devel@nongnu.org>; Fri, 12 Jul 2019 07:25:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=ZtO4n09lSDjphtjtHxvcQ8EZIpzPQRY88uQFd31Q4Hk=;
- b=OU1N490Rn5wflZtkozO+kbzzgPnWyd5xiP7OdR6x2viAQpL7WmnjHeiJvJ91y01sP1
- 3L+CdEliiAgvgMGbhqrnfQYl7ogy/w4nY1bXqW4C+Rxl7p+Toh6pq3915QnWQ7AeSQZE
- GU4QCai2SPTzBk/h/OLaaAI8ZZCMVAnZgwMqgZwuVzOvbYBieWXmW4oKeuM/yfbBX43I
- WDIiQ2cykhNie0qkrN0niPTgMCLEnXmK00ikRDcTMoifN8GRhf9wAEhVjoepILpXdwxF
- WD7XIdguVUK2hkdxxmIYBaQaMVrSPPZnyV2nwlVvpP4MNb4iA3G9+M6NAmt5cz5/MMps
- a1jw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=ZtO4n09lSDjphtjtHxvcQ8EZIpzPQRY88uQFd31Q4Hk=;
- b=udPStSnva5njWsXxs1lCx+Syb5bdeIp58MaYGlkaQ7Sv+94cze3EnC/bkLkSREhgS6
- lmms4ztFL8+O3ntsLQpI/vwFA/IpvZ6Rm3rgzKRwcGFlLnbCsuK9TjVVAdZiXNxEKnzf
- k/zpKivWxYWb4GNBiLegOa40GCbls+8eRWiM39tq82/s/CMsShgcoFY8mtfuIOplyqoH
- oU8xm0Kh01MkmdRS8t27T+WfDeh1cJpspTdQqXXQ10YQ3Xgqt5otHAiLJ1W2dk1S0Xn5
- bS6SG9cd70Wx5CevkVclsMqnbsvoZEzFLaO4AXRkFRs7MdU6g+TGUhwlXIqC9zJ6RP8K
- +3wg==
-X-Gm-Message-State: APjAAAWdfqMZ3Rap1GzV21GaSA13FTmZlBuNYM3pRtE8mmQCeuKUKDHp
- kVtWX1BOIG2VQgDKsoHkD4h13A==
-X-Google-Smtp-Source: APXvYqw7r30tWlRAYQjc/lBJ843W+hkfGr8w1tV0BnJnPj7ldjle7C2zuL60kRABjLBqBv8rGVB47w==
-X-Received: by 2002:a05:600c:206:: with SMTP id
- 6mr10033823wmi.91.1562941499432; 
- Fri, 12 Jul 2019 07:24:59 -0700 (PDT)
-Received: from [192.168.42.31] ([176.12.107.132])
- by smtp.gmail.com with ESMTPSA id e5sm9210782wro.41.2019.07.12.07.24.58
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Fri, 12 Jul 2019 07:24:58 -0700 (PDT)
-To: Jan Bobek <jan.bobek@gmail.com>, qemu-devel@nongnu.org
-References: <20190711223300.6061-1-jan.bobek@gmail.com>
- <20190711223300.6061-5-jan.bobek@gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <e64091a9-d8f4-a71c-fcbd-ac27d85d2e64@linaro.org>
-Date: Fri, 12 Jul 2019 16:24:56 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+ (envelope-from <dgilbert@redhat.com>) id 1hlwYY-0008K8-KR
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 10:29:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43848)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hlwYY-0008Ha-By
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 10:29:50 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id B459D81F0E;
+ Fri, 12 Jul 2019 14:29:47 +0000 (UTC)
+Received: from work-vm (ovpn-117-214.ams2.redhat.com [10.36.117.214])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 3CC9E5C559;
+ Fri, 12 Jul 2019 14:29:45 +0000 (UTC)
+Date: Fri, 12 Jul 2019 15:29:42 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: "Singh, Brijesh" <brijesh.singh@amd.com>
+Message-ID: <20190712142942.GL2730@work-vm>
+References: <20190710202219.25939-1-brijesh.singh@amd.com>
+ <20190710202219.25939-7-brijesh.singh@amd.com>
 MIME-Version: 1.0
-In-Reply-To: <20190711223300.6061-5-jan.bobek@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::343
-Subject: Re: [Qemu-devel] [RISU PATCH v3 04/18] risugen_x86_constraints: add
- module
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190710202219.25939-7-brijesh.singh@amd.com>
+User-Agent: Mutt/1.12.0 (2019-05-25)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.27]); Fri, 12 Jul 2019 14:29:47 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2 06/13] doc: update AMD SEV to include
+ Live migration flow
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,58 +70,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>, "Lendacky,
+ Thomas" <Thomas.Lendacky@amd.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "ehabkost@redhat.com" <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/12/19 12:32 AM, Jan Bobek wrote:
-> +sub vex($%)
-> +{
-> +    my ($insn, %vex) = @_;
-> +    my $regidw = $is_x86_64 ? 4 : 3;
+* Singh, Brijesh (brijesh.singh@amd.com) wrote:
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> ---
+>  docs/amd-memory-encryption.txt | 42 +++++++++++++++++++++++++++++++++-
+>  1 file changed, 41 insertions(+), 1 deletion(-)
+> 
+> diff --git a/docs/amd-memory-encryption.txt b/docs/amd-memory-encryption.txt
+> index abb9a976f5..374f4b0a94 100644
+> --- a/docs/amd-memory-encryption.txt
+> +++ b/docs/amd-memory-encryption.txt
+> @@ -89,7 +89,47 @@ TODO
+>  
+>  Live Migration
+>  ----------------
+> -TODO
+> +AMD SEV encrypts the memory of VMs and because a different key is used
+> +in each VM, the hypervisor will be unable to simply copy the
+> +ciphertext from one VM to another to migrate the VM. Instead the AMD SEV Key
+> +Management API provides sets of function which the hypervisor can use
+> +to package a guest page for migration, while maintaining the confidentiality
+> +provided by AMD SEV.
 > +
-> +    # There is no point in randomizing other VEX fields, since
-> +    # VEX.R/.X/.B are encoded automatically by risugen_x86_asm, and
-> +    # VEX.M/.P are opcodes.
-> +    $vex{l} = randint(width => 1) ? 256 : 128 unless defined $vex{l};
-
-VEX.L is sort-of opcode-like as well.  It certainly differentiates AVX1 vs
-AVX2, and so probably should be constrained somehow.  I can't think of what's
-the best way to do that at the moment, since our existing --xstate=foo isn't right.
-
-Perhaps just a FIXME comment for now?
-
-> +sub modrm_($%)
-> +{
-> +    my ($insn, %args) = @_;
-> +    my $regidw = $is_x86_64 ? 4 : 3;
+> +SEV guest VMs have the concept of private and shared memory. The private
+> +memory is encrypted with the guest-specific key, while shared memory may
+> +be encrypted with the hypervisor key. The migration APIs provided by the
+> +SEV API spec should be used for migrating the private pages. The
+> +KVM_GET_PAGE_ENC_BITMAP ioctl can be used to get the guest page encryption
+> +bitmap. The bitmap can be used to check if the given guest page is
+> +private or shared.
 > +
-> +    my %modrm = ();
-> +    if (defined $args{reg}) {
-> +        # This makes the config file syntax a bit more accommodating
-> +        # in cases where MODRM.REG is an opcode extension field.
-> +        $modrm{reg} = $args{reg};
-> +    } else {
-> +        $modrm{reg} = randint(width => $regidw);
-> +    }
+> +Before initiating the migration, we need to know the targets machine's public
+> +Diffie-Hellman key (PDH) and certificate chain. It can be retrieved
+> +with the 'query-sev-capabilities' QMP command or using the sev-tool. The
+> +migrate-set-sev-info object can be used to pass the target machine's PDH and
+> +certificate chain.
 > +
-> +    # There is also a displacement-only form, but we don't know
-> +    # absolute address of the memblock, so we cannot test it.
+> +e.g
+> +(QMP) migrate-sev-set-info pdh=<target_pdh> plat-cert=<target_cert_chain> \
+> +       amd-cert=<amd_cert>
+> +(QMP) migrate tcp:0:4444
+> +
+> +
+> +During the migration flow, the SEND_START is called on the source hypervisor
+> +to create outgoing encryption context. The SEV guest policy dectates whether
+            ^an outgoing                                       ^ d*i*ctates
 
-32-bit mode has displacement-only, aka absolute; 64-bit replaces that with
-rip-relative.  But agreed that the first is impossible to test and the second
-is difficult.
+> +the certificate passed through the migrate-sev-set-info command will be
+> +validate. SEND_UPDATE_DATA is called to encrypt the guest private pages.
+          ^ validate*d* ?  How does the cert get validated anyway? As a
+guest owner what rules can I set about which other host it gets migrated
+to?
 
-> +sub modrm($%)
-> +{
-> +    my ($insn, %args) = @_;
-> +    modrm_($insn, indexk => 'index', %args);
-> +}
+Actually, thinking about it, I didn't notice anything in the patchset
+that checked/gave diagnostics about the guest policy - shouldn't there
+be something that nicely says something like:
+  'Guest policy has NOSEND set, guest can not be migrated'
 
-How are you avoiding %rsp as index?
-I saw you die for that in the previous patch...
+?
 
-
-r~
+> +After migration is completed, SEND_FINISH is called to destroy the encryption
+> +context and make the VM non-runnable to protect it against the cloning.
+                                                              ^ 'the' not needed
+> +
+> +On the target machine, RECEIVE_START is called first to create an
+> +incoming encryption context. The RECEIVE_UPDATE_DATA is called to copy
+> +the receieved encrypted page into guest memory. After migration has
+> +completed, RECEIVE_FINISH is called to make the VM runnable.
+> +
+> +For more information about the migration see SEV API Appendix A
+> +Usage flow (Live migration section).
+>  
+>  References
+>  -----------------
+> -- 
+> 2.17.1
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
