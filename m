@@ -2,114 +2,73 @@ Return-Path: <SRS0=r3/N=VJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2541CC742BE
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 13:36:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D3D4C742BD
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 13:37:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 016CD206B8
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 13:36:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 016CD206B8
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 551A7206B8
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 13:37:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 551A7206B8
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arndb.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49460 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49470 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlvin-0001kM-A5
-	for qemu-devel@archiver.kernel.org; Fri, 12 Jul 2019 09:36:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56405)
+	id 1hlvjP-0002kT-AM
+	for qemu-devel@archiver.kernel.org; Fri, 12 Jul 2019 09:36:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56597)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <laurent@vivier.eu>) id 1hlvib-0001Fc-Vn
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 09:36:10 -0400
+ (envelope-from <arndbergmann@gmail.com>) id 1hlvjC-0002Cf-L7
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 09:36:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1hlvib-0002Ra-3B
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 09:36:09 -0400
-Received: from mout.kundenserver.de ([212.227.126.133]:52437)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1hlvia-0002PN-Pd; Fri, 12 Jul 2019 09:36:09 -0400
-Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue010 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1MZTVu-1i0tgc1nug-00WTYB; Fri, 12 Jul 2019 15:35:52 +0200
-To: Stefan Weil <sw@weilnetz.de>, qemu-devel@nongnu.org
-References: <20190712131927.15091-1-sw@weilnetz.de>
-From: Laurent Vivier <laurent@vivier.eu>
-Openpgp: preference=signencrypt
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <9fec3c15-a12d-2754-3950-751e09e6314d@vivier.eu>
-Date: Fri, 12 Jul 2019 15:35:50 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+ (envelope-from <arndbergmann@gmail.com>) id 1hlvjB-0003Ot-HI
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 09:36:46 -0400
+Received: from mail-qt1-f193.google.com ([209.85.160.193]:43025)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <arndbergmann@gmail.com>)
+ id 1hlvjB-0003O0-Ce
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 09:36:45 -0400
+Received: by mail-qt1-f193.google.com with SMTP id w17so8048128qto.10
+ for <qemu-devel@nongnu.org>; Fri, 12 Jul 2019 06:36:45 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=S+FsBqoJKxFjGIk4HF7CIctm7nVW+hcRsoh2fkAJb+U=;
+ b=PGtjM7dPyegjGDTB9Qecw4eNEUB/1xc0sn5jqNpOu+qz2ZQxBsPNW+7jQANnbxmtif
+ J7LUteMf6FfR3yw3FUVdsWRbV4AJtJcLnlGH7vIs1LwZoLuMTYZLiv5aBChH3zGAkae6
+ zDvVZvfgyfi5a2k3ZwF4eq/btnM5XzCENP7TV8JQsIipOL9m1J95jJ1p4WKD0E7cWMh4
+ SN4zP9wzLl1kX9yEfEiEmuosjYTW0heSEbA2ORNTa1mbukZoKZ9OGdBjusFVYcKmeIEe
+ XOe1THqdWw9IojNeRnoQR/TVABmMxYw4FKdtMOWWHCOh5Dbe8tH1JHJHiS8g2b/0BDa2
+ GcNw==
+X-Gm-Message-State: APjAAAUjoj/o7zT36WPvN5A16kWOUpZh814Di6y5dnSZMOW+3a0n1oce
+ CTbHsrJ5X7w1ed82PjQfSRLHtj/uRFWuR6EqBso=
+X-Google-Smtp-Source: APXvYqzmHuKCblevmsNRFldNOtEFfL1SLelbnJQ9lxmxG3BH3/YXGKtfSG2lDyQwwHCI1U4FuAlwieQt/33zGX+ZENM=
+X-Received: by 2002:ac8:5311:: with SMTP id t17mr6201231qtn.304.1562938604330; 
+ Fri, 12 Jul 2019 06:36:44 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190712131927.15091-1-sw@weilnetz.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:r9n8SO31lm+7LrvHC3UM+TmGs/t1PTwdhb/WcFEbLbvg046fzDi
- jMJXGNkwlyNsJbxHCf8vIe8s8LPX0HAz7EPNNUoirTmZ4L8pw0z/WhsIBLHQPf7nKZl828b
- xTvXRtaMKSkVRJdEaI5Of5z4PV7aBSCe+mCnJgz6VtJWMnOiQE9cXOK3cju54txtqsB4ybB
- PpJoG1naEUuFtZBOE4YDg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:amXZ/pH3+Rk=:gRWZtk3tB1yPbSIiORKqM+
- pRbnvzy7ujKlslk7+gaal34734iK72YEU5vr6b6LeTiQ4E3pTSStSaPMBw5ns3lPTzQFJpNV2
- KSAsyGS7c9XOGV7H0Oe+TrCdrNINnh/ZWrUAd3FubFpRxtHR1iiso+KjyNx4uMPmdaPCllMRI
- c+s2ssJ6g4fr7Ls6CVgw3nlvDUXWRBP8u5G9vkjfItKobA58oKQboIaQp0uVBnmOKN5/zE/1e
- a62lDU58wQLsV/dQl1TJBH0j0+MHgnEHT+y4J2HUxAV0oTOXKCq/6N9ACWj9L5OZk6EXNmaVG
- gzwEuZyhgLAYqee7agUQZXhURd5dga3I3n/k0IAngd4nF94rII+KTzZmvzJN7g3OEs4VXhbqb
- M/JS0n6H7vU2g2EgXkcPvObk/fRLfzkLTEwaSF2wk3aGFAy/MY7kpc/m6eqeRMcPjkLxfxLq8
- mk3Um4Bgpu234pA7Za/9mAAsx0QiYSMCJP16dfY8Jl30IPvs/CLzNujr0oUzOa6DJnjD7nP8P
- SonrVKSd6141igo0EG9DQLj7CzBP073WN2htf8sUmN3M+1Tf7lzMkbbxtkSJ8NMhRG4WbC7u9
- o8c14LL2yl96A6uPfbfjluTbh7UyJ4RmgEunYpeAnYToPVm62GYodE+aRbFqTx3k9EWTYvHNM
- hLADIw/pM6Cl5zWsQjy7dpg6zcjdDOVefaaYbMRaheV1q8i5QjbwKnBsUpx5RBpQDaCauZIL4
- linET5JnDAjEL1gqs42VGgPgQSrOay+8KYg5K6aKqFaXfgCIZyRhPvLjKcU=
+References: <20190711173131.6347-1-laurent@vivier.eu>
+ <CAK8P3a3-UaZ+RzYNZ25zFHs=1iZNrnaP_eAuHE0WAztztA4EGA@mail.gmail.com>
+ <74807892-5d59-0a9a-8385-48cce361d842@vivier.eu>
+ <CAK8P3a3XR=C27eYWQ+AxjZ1EEDNBz0HBB_NHh0hbrSDF5ASyqQ@mail.gmail.com>
+ <e1c736b2-6f68-208e-9993-57ae143195ad@vivier.eu>
+In-Reply-To: <e1c736b2-6f68-208e-9993-57ae143195ad@vivier.eu>
+From: Arnd Bergmann <arnd@arndb.de>
+Date: Fri, 12 Jul 2019 15:36:27 +0200
+Message-ID: <CAK8P3a3fZgcSR7V=NAjDa37-5j8L+n-cF1CVPiWjteV6hfHSLg@mail.gmail.com>
+To: Laurent Vivier <laurent@vivier.eu>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.133
-Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] Remove old global variable
- smp_cpus
+ [fuzzy]
+X-Received-From: 209.85.160.193
+Subject: Re: [Qemu-devel] [PATCH v4] linux-user: fix to handle variably
+ sized SIOCGSTAMP with new kernels
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -121,37 +80,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>,
- Like Xu <like.xu@linux.intel.com>
+Cc: =?UTF-8?Q?Daniel_P_=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ Gerhard Stenzel <gerhard.stenzel@de.ibm.com>, Riku Voipio <riku.voipio@iki.fi>,
+ qemu-devel@nongnu.org, Christian Ehrhardt <christian.ehrhardt@canonical.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 12/07/2019 à 15:19, Stefan Weil a écrit :
-> Signed-off-by: Stefan Weil <sw@weilnetz.de>
-> ---
->  include/sysemu/sysemu.h | 1 -
->  1 file changed, 1 deletion(-)
-> 
-> diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-> index 984c439ac9..9b849cb770 100644
-> --- a/include/sysemu/sysemu.h
-> +++ b/include/sysemu/sysemu.h
-> @@ -103,7 +103,6 @@ extern const char *keyboard_layout;
->  extern int win2k_install_hack;
->  extern int alt_grab;
->  extern int ctrl_grab;
-> -extern int smp_cpus;
->  extern unsigned int max_cpus;
->  extern int cursor_hide;
->  extern int graphic_rotate;
-> 
+On Fri, Jul 12, 2019 at 3:23 PM Laurent Vivier <laurent@vivier.eu> wrote:
+>
+> Le 12/07/2019 =C3=A0 14:47, Arnd Bergmann a =C3=A9crit :
+> > On Fri, Jul 12, 2019 at 2:17 PM Laurent Vivier <laurent@vivier.eu> wrot=
+e:
+> >>
+> >> Le 11/07/2019 =C3=A0 23:05, Arnd Bergmann a =C3=A9crit :
+> >>> On Thu, Jul 11, 2019 at 7:32 PM Laurent Vivier <laurent@vivier.eu> wr=
+ote:
+> >>>
+> >>>>
+> >>>> Notes:
+> >>>>     v4: [lv] timeval64 and timespec64 are { long long , long }
+> >>>
+> >>>>
+> >>>> +STRUCT(timeval64, TYPE_LONGLONG, TYPE_LONG)
+> >>>> +
+> >>>> +STRUCT(timespec64, TYPE_LONGLONG, TYPE_LONG)
+> >>>> +
+> >>>
+> >>> This still doesn't look right, see my earlier comment about padding
+> >>> on big-endian architectures.
+> >>>
+> >>> Note that the in-kernel 'timespec64' is different from the uapi
+> >>> '__kernel_timespec' exported by the kernel. I also still think you ma=
+y
+> >>> need to convert between SIOCGSTAMP_NEW and SIOCGSTAMP_OLD,
+> >>> e.g. when emulating a 32-bit riscv process (which only use
+> >>> SIOCGSTAMP_NEW) on a kernel that only understands
+> >>> SIOCGSTAMP_OLD.
+> >>
+> >> I agree.
+> >> I'm preparing a patch always using SIOCGSTAMP and SIOCGSTAMPNS on the
+> >> host (converting the structure when needed).
+> >
+> > That in turn would have the problem of breaking in 2038 when the
+> > timestamp overflows.
+>
+> No, because SIOCGSTAMP and SIOCGSTAMPNS are aliased to the _NEW versions
+> on system supporting them (yes, we need to rebuild the binary, but we hav=
+e 19
+> years to do that).
+>
+> #define SIOCGSTAMP      ((sizeof(struct timeval))  =3D=3D 8 ? \
+>                          SIOCGSTAMP_OLD   : SIOCGSTAMP_NEW)
+> #define SIOCGSTAMPNS    ((sizeof(struct timespec)) =3D=3D 8 ? \
+>                          SIOCGSTAMPNS_OLD : SIOCGSTAMPNS_NEW)
 
-Fixes: a5e0b331193a ("vl.c: Replace smp global variables with smp
-machine properties")
+Right, makes sense.
 
-I thin you can also remove max_cpus.
+> >
+> >> I've added the SH4 variant.> What is special about SH4?
+>
+> The definition of _OLD is different:
+>
+> #define SIOCGSTAMP_OLD  _IOR('s', 100, struct timeval) /* Get stamp (time=
+val) */
+> #define SIOCGSTAMPNS_OLD _IOR('s', 101, struct timespec) /* Get stamp (ti=
+mespec) */
 
-Thanks,
-Laurent
+Ah, that one.
+
+
+> > No, you don't need to swap. The difference is only in the padding.
+> > Since the kernel uses a 64/64 structure here, and user space
+> > may have use 'long tv_nsec', you need to add the padding on
+> > the correct side, like
+> >
+> > struct timeval64 {
+> >    long long tv_sec;
+> > #if 32bit && big-endian
+> >    long :32; /* anonymous padding */
+> > #endif
+> >    suseconds_t tv_usec;
+> > #if (32bit && little-endian) || sparc64
+> >    long :32;
+> > #endif
+> > };
+>
+> We don't do memcopy() but we set each field one by one, so the padding do=
+esn't
+> seem needed if we define correctly the user structure:
+>
+> struct target_timeval64 {
+>     abi_llong tv_sec;
+>     abi_long tv_usec;
+> };
+>
+> and do something like:
+>
+>     struct target_timeval64 *target_tv;
+>     struct timeval *host_tv;
+> ...
+>     __put_user(host_tv->tv_sec, &target_tv->tv_sec);
+>     __put_user(host_tv->tv_usec, &target_tv->tv_usec);
+> ...
+
+That still seems wrong. The user application has a definition
+of 'timeval' that contains the padding, so your definition has
+to match that.
+
+       Arnd
 
