@@ -2,79 +2,80 @@ Return-Path: <SRS0=r3/N=VJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50852C742D1
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 17:33:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E00FEC742D1
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 17:34:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 23FF820665
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 17:33:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 23FF820665
+	by mail.kernel.org (Postfix) with ESMTPS id B47C220665
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 17:34:57 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HY14Ck31"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B47C220665
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51472 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51478 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlzQZ-0004OL-An
-	for qemu-devel@archiver.kernel.org; Fri, 12 Jul 2019 13:33:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38757)
+	id 1hlzRg-0005He-Ve
+	for qemu-devel@archiver.kernel.org; Fri, 12 Jul 2019 13:34:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39191)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <pbonzini@redhat.com>) id 1hlzQI-0003Wd-F4
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 13:33:31 -0400
+ (envelope-from <paolo.bonzini@gmail.com>) id 1hlzRT-0004t7-Tx
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 13:34:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1hlzQH-0000GQ-E1
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 13:33:30 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:35436)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1hlzRR-0002Cm-As
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 13:34:43 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:56193)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hlzQH-0000F7-7r
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 13:33:29 -0400
-Received: by mail-wm1-f68.google.com with SMTP id l2so9667051wmg.0
- for <qemu-devel@nongnu.org>; Fri, 12 Jul 2019 10:33:29 -0700 (PDT)
+ (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+ id 1hlzRP-000287-QO
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 13:34:40 -0400
+Received: by mail-wm1-x342.google.com with SMTP id a15so9631595wmj.5
+ for <qemu-devel@nongnu.org>; Fri, 12 Jul 2019 10:34:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id;
+ bh=Svo3or4hCwl38TOd0ugjNwln01VejHJw1BSvbQQsvcc=;
+ b=HY14Ck31UvydvGmZ9SHYrAbRJJxGtdzdpWmXwAjGBtOFboM3dwEypdEeskHQO+7sc7
+ PKYgPobDGwkrGylJkE24ByLpFH+XK9ygGWtmxC1x1qioc/MnWrLH3SEUgrKD5NMlWk6J
+ g7DJ8fpAYWqhQ6JUqbpzzZveKxAw97AgNJBqHQbbP2yDp8t7EWZxwbFYZxzlPRxHpM9X
+ PqkUunQG5ALmWiRFOn0/KmzLhapqbhY1SRGVfIG+PMide2mAB4uKeUVdo+mUOFRt7dwg
+ FuUgq9mtgt3kTw09mBrbuK96F7IzVH7iazaUczHS7yO5sFRlLWK69xu+o65Gg5FXc5oE
+ t2zQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=e+dXWq3ONmkFK+P7ld8FJJL5tnEMaftOWkJk0k1k+dw=;
- b=CBGFZv2mojx/KnKnWGQ55QEq60J5VSUW6H2kqT3jI/ARnMpM/3bO7CeuKCW9rTZUhC
- MWU+Yh7NQxd+UHuYNfpEHo+Ja2cnPxY85Z56wXV0z+g3fNYFVdRudI0kBIbvU3RgZu0Y
- Plr1s1hjQnr/Z+GvYBoyaL12S20p3gYIFYN23zUvtvMxKTKfcBgiYn7OsPVTGsynOqVx
- s/pOGePn5OQPACPv7nGuZCl0VepNAfVrA5i/ikirzQpQJ0ujuZPI1BtfXhzhJyFtzv6i
- g3aF5JThkbV94VsDV954xPOb9O5eXGDliMwcsDdvDFhNrRNAMwt9/OgMbtsdjTJU3jSU
- 4CuQ==
-X-Gm-Message-State: APjAAAXPKguS92RUay3O+WTtxbLQ8YG50Z3GCB6Bw1Dtx4TXqJwulPiP
- 2iVDWzOlsEvFSCdszILc4wjXjv3q74Q=
-X-Google-Smtp-Source: APXvYqz6plDFuXfKLLAC+rWqblgDImlYy3FATHK0O2nuIvcyNBR30yMfnFCzHE/oX+TUTIWulZqo9Q==
-X-Received: by 2002:a7b:c7c2:: with SMTP id z2mr8055986wmk.147.1562952808009; 
- Fri, 12 Jul 2019 10:33:28 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:d066:6881:ec69:75ab?
- ([2001:b07:6468:f312:d066:6881:ec69:75ab])
- by smtp.gmail.com with ESMTPSA id b8sm8401535wrr.43.2019.07.12.10.33.27
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Fri, 12 Jul 2019 10:33:27 -0700 (PDT)
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- qemu-devel@nongnu.org
-References: <20190712172743.17632-1-marcandre.lureau@redhat.com>
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
+ bh=Svo3or4hCwl38TOd0ugjNwln01VejHJw1BSvbQQsvcc=;
+ b=lFiCpsDR+QyS06Y60tejws82riB19QE8rZpxg7/IrIGIde0vvi8vLZop2tLH08uvkn
+ i096byBEulfSZynMYSDoRAzhMODl3BuxQCKBpN0TwEzYwfUu+URU6h1TFcGOGHMB8dG5
+ PHYDxKjefAboSX67ux109GiL9QeHSjAB+LC9I7m+/e8aJpCZUFrTZ4gE5VxkLNesZIN9
+ b4Im2tHgoT/1BA+TXmKADUbsLE8zSbyI9elOG8eiknW0ZwiRo2YVPedhVoKRuNsByG0w
+ hEAhrz+h5R0yAs7or1zPfsnkTnfguE4HtFkcJ8a/oEdEUT/Mt/ns3SglboxzVvJSVpP1
+ LQag==
+X-Gm-Message-State: APjAAAXXOBxE0ei9IkRuazvra2Z/ooTCoS4aOqanFYWE6zzwAZb1WWPO
+ K245JS0A8DE6Llgou9LUQWDAYZPfsUo=
+X-Google-Smtp-Source: APXvYqxn/UHjYEakynnmk6GT+SqEscwAtJdg2yMYnC5Zp+5U9opg6ANLJfmwPxFk5JgW444m7mbkCw==
+X-Received: by 2002:a05:600c:2056:: with SMTP id
+ p22mr10443585wmg.155.1562952877334; 
+ Fri, 12 Jul 2019 10:34:37 -0700 (PDT)
+Received: from 640k.lan ([93.56.166.5])
+ by smtp.gmail.com with ESMTPSA id g19sm17265148wrb.52.2019.07.12.10.34.36
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Fri, 12 Jul 2019 10:34:36 -0700 (PDT)
 From: Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <b9d161b3-aee2-254f-b1cc-db1b72411ea3@redhat.com>
-Date: Fri, 12 Jul 2019 19:33:27 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
-MIME-Version: 1.0
-In-Reply-To: <20190712172743.17632-1-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.128.68
-Subject: Re: [Qemu-devel] [PATCH] build-sys: remove slirp cflags from
- main-loop.o
+To: qemu-devel@nongnu.org
+Date: Fri, 12 Jul 2019 19:34:35 +0200
+Message-Id: <1562952875-53702-1-git-send-email-pbonzini@redhat.com>
+X-Mailer: git-send-email 1.8.3.1
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::342
+Subject: [Qemu-devel] [PATCH] util: merge main-loop.c and iohandler.c
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,33 +87,304 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: marcandre.lureau@redhat.com, armbru@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 12/07/19 19:27, Marc-André Lureau wrote:
-> Left over from c2d63650d962612cfa1b21302782d4cd12142c74.
-> 
-> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-> ---
->  util/Makefile.objs | 1 -
->  1 file changed, 1 deletion(-)
-> 
-> diff --git a/util/Makefile.objs b/util/Makefile.objs
-> index 38178201ff..68af3cd5e9 100644
-> --- a/util/Makefile.objs
-> +++ b/util/Makefile.objs
-> @@ -3,7 +3,6 @@ util-obj-y += bufferiszero.o
->  util-obj-y += lockcnt.o
->  util-obj-y += aiocb.o async.o aio-wait.o thread-pool.o qemu-timer.o
->  util-obj-y += main-loop.o iohandler.o
-> -main-loop.o-cflags := $(SLIRP_CFLAGS)
->  util-obj-$(call lnot,$(CONFIG_ATOMIC64)) += atomic64.o
->  util-obj-$(CONFIG_POSIX) += aio-posix.o
->  util-obj-$(CONFIG_POSIX) += compatfd.o
-> 
+main-loop.c has a dependency on iohandler.c, and everything breaks
+if that dependency is instead satisfied by stubs/iohandler.c.
+Just put everything in the same file to avoid strange dependencies
+on the order of files in util-obj-y.
 
-Queued, thanks.
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ util/Makefile.objs |   2 +-
+ util/iohandler.c   | 135 -----------------------------------------------------
+ util/main-loop.c   | 110 +++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 111 insertions(+), 136 deletions(-)
+ delete mode 100644 util/iohandler.c
 
-Paolo
+diff --git a/util/Makefile.objs b/util/Makefile.objs
+index 3817820..a817ced 100644
+--- a/util/Makefile.objs
++++ b/util/Makefile.objs
+@@ -2,7 +2,7 @@ util-obj-y = osdep.o cutils.o unicode.o qemu-timer-common.o
+ util-obj-y += bufferiszero.o
+ util-obj-y += lockcnt.o
+ util-obj-y += aiocb.o async.o aio-wait.o thread-pool.o qemu-timer.o
+-util-obj-y += main-loop.o iohandler.o
++util-obj-y += main-loop.o
+ main-loop.o-cflags := $(SLIRP_CFLAGS)
+ util-obj-$(call lnot,$(CONFIG_ATOMIC64)) += atomic64.o
+ util-obj-$(CONFIG_POSIX) += aio-posix.o
+diff --git a/util/iohandler.c b/util/iohandler.c
+deleted file mode 100644
+index bece882..0000000
+--- a/util/iohandler.c
++++ /dev/null
+@@ -1,135 +0,0 @@
+-/*
+- * QEMU System Emulator - managing I/O handler
+- *
+- * Copyright (c) 2003-2008 Fabrice Bellard
+- *
+- * Permission is hereby granted, free of charge, to any person obtaining a copy
+- * of this software and associated documentation files (the "Software"), to deal
+- * in the Software without restriction, including without limitation the rights
+- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+- * copies of the Software, and to permit persons to whom the Software is
+- * furnished to do so, subject to the following conditions:
+- *
+- * The above copyright notice and this permission notice shall be included in
+- * all copies or substantial portions of the Software.
+- *
+- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+- * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+- * THE SOFTWARE.
+- */
+-
+-#include "qemu/osdep.h"
+-#include "qapi/error.h"
+-#include "qemu/queue.h"
+-#include "block/aio.h"
+-#include "qemu/main-loop.h"
+-
+-#ifndef _WIN32
+-#include <sys/wait.h>
+-#endif
+-
+-/* This context runs on top of main loop. We can't reuse qemu_aio_context
+- * because iohandlers mustn't be polled by aio_poll(qemu_aio_context). */
+-static AioContext *iohandler_ctx;
+-
+-static void iohandler_init(void)
+-{
+-    if (!iohandler_ctx) {
+-        iohandler_ctx = aio_context_new(&error_abort);
+-    }
+-}
+-
+-AioContext *iohandler_get_aio_context(void)
+-{
+-    iohandler_init();
+-    return iohandler_ctx;
+-}
+-
+-GSource *iohandler_get_g_source(void)
+-{
+-    iohandler_init();
+-    return aio_get_g_source(iohandler_ctx);
+-}
+-
+-void qemu_set_fd_handler(int fd,
+-                         IOHandler *fd_read,
+-                         IOHandler *fd_write,
+-                         void *opaque)
+-{
+-    iohandler_init();
+-    aio_set_fd_handler(iohandler_ctx, fd, false,
+-                       fd_read, fd_write, NULL, opaque);
+-}
+-
+-void event_notifier_set_handler(EventNotifier *e,
+-                                EventNotifierHandler *handler)
+-{
+-    iohandler_init();
+-    aio_set_event_notifier(iohandler_ctx, e, false,
+-                           handler, NULL);
+-}
+-
+-/* reaping of zombies.  right now we're not passing the status to
+-   anyone, but it would be possible to add a callback.  */
+-#ifndef _WIN32
+-typedef struct ChildProcessRecord {
+-    int pid;
+-    QLIST_ENTRY(ChildProcessRecord) next;
+-} ChildProcessRecord;
+-
+-static QLIST_HEAD(, ChildProcessRecord) child_watches =
+-    QLIST_HEAD_INITIALIZER(child_watches);
+-
+-static QEMUBH *sigchld_bh;
+-
+-static void sigchld_handler(int signal)
+-{
+-    qemu_bh_schedule(sigchld_bh);
+-}
+-
+-static void sigchld_bh_handler(void *opaque)
+-{
+-    ChildProcessRecord *rec, *next;
+-
+-    QLIST_FOREACH_SAFE(rec, &child_watches, next, next) {
+-        if (waitpid(rec->pid, NULL, WNOHANG) == rec->pid) {
+-            QLIST_REMOVE(rec, next);
+-            g_free(rec);
+-        }
+-    }
+-}
+-
+-static void qemu_init_child_watch(void)
+-{
+-    struct sigaction act;
+-    sigchld_bh = qemu_bh_new(sigchld_bh_handler, NULL);
+-
+-    memset(&act, 0, sizeof(act));
+-    act.sa_handler = sigchld_handler;
+-    act.sa_flags = SA_NOCLDSTOP;
+-    sigaction(SIGCHLD, &act, NULL);
+-}
+-
+-int qemu_add_child_watch(pid_t pid)
+-{
+-    ChildProcessRecord *rec;
+-
+-    if (!sigchld_bh) {
+-        qemu_init_child_watch();
+-    }
+-
+-    QLIST_FOREACH(rec, &child_watches, next) {
+-        if (rec->pid == pid) {
+-            return 1;
+-        }
+-    }
+-    rec = g_malloc0(sizeof(ChildProcessRecord));
+-    rec->pid = pid;
+-    QLIST_INSERT_HEAD(&child_watches, rec, next);
+-    return 0;
+-}
+-#endif
+diff --git a/util/main-loop.c b/util/main-loop.c
+index a9f4e8d..e3eaa55 100644
+--- a/util/main-loop.c
++++ b/util/main-loop.c
+@@ -32,6 +32,11 @@
+ #include "qemu/main-loop.h"
+ #include "block/aio.h"
+ #include "qemu/error-report.h"
++#include "qemu/queue.h"
++
++#ifndef _WIN32
++#include <sys/wait.h>
++#endif
+ 
+ #ifndef _WIN32
+ 
+@@ -525,3 +530,108 @@ QEMUBH *qemu_bh_new(QEMUBHFunc *cb, void *opaque)
+ {
+     return aio_bh_new(qemu_aio_context, cb, opaque);
+ }
++
++/*
++ * Functions to operate on the I/O handler AioContext.
++ * This context runs on top of main loop. We can't reuse qemu_aio_context
++ * because iohandlers mustn't be polled by aio_poll(qemu_aio_context).
++ */
++static AioContext *iohandler_ctx;
++
++static void iohandler_init(void)
++{
++    if (!iohandler_ctx) {
++        iohandler_ctx = aio_context_new(&error_abort);
++    }
++}
++
++AioContext *iohandler_get_aio_context(void)
++{
++    iohandler_init();
++    return iohandler_ctx;
++}
++
++GSource *iohandler_get_g_source(void)
++{
++    iohandler_init();
++    return aio_get_g_source(iohandler_ctx);
++}
++
++void qemu_set_fd_handler(int fd,
++                         IOHandler *fd_read,
++                         IOHandler *fd_write,
++                         void *opaque)
++{
++    iohandler_init();
++    aio_set_fd_handler(iohandler_ctx, fd, false,
++                       fd_read, fd_write, NULL, opaque);
++}
++
++void event_notifier_set_handler(EventNotifier *e,
++                                EventNotifierHandler *handler)
++{
++    iohandler_init();
++    aio_set_event_notifier(iohandler_ctx, e, false,
++                           handler, NULL);
++}
++
++/* reaping of zombies.  right now we're not passing the status to
++   anyone, but it would be possible to add a callback.  */
++#ifndef _WIN32
++typedef struct ChildProcessRecord {
++    int pid;
++    QLIST_ENTRY(ChildProcessRecord) next;
++} ChildProcessRecord;
++
++static QLIST_HEAD(, ChildProcessRecord) child_watches =
++    QLIST_HEAD_INITIALIZER(child_watches);
++
++static QEMUBH *sigchld_bh;
++
++static void sigchld_handler(int signal)
++{
++    qemu_bh_schedule(sigchld_bh);
++}
++
++static void sigchld_bh_handler(void *opaque)
++{
++    ChildProcessRecord *rec, *next;
++
++    QLIST_FOREACH_SAFE(rec, &child_watches, next, next) {
++        if (waitpid(rec->pid, NULL, WNOHANG) == rec->pid) {
++            QLIST_REMOVE(rec, next);
++            g_free(rec);
++        }
++    }
++}
++
++static void qemu_init_child_watch(void)
++{
++    struct sigaction act;
++    sigchld_bh = qemu_bh_new(sigchld_bh_handler, NULL);
++
++    memset(&act, 0, sizeof(act));
++    act.sa_handler = sigchld_handler;
++    act.sa_flags = SA_NOCLDSTOP;
++    sigaction(SIGCHLD, &act, NULL);
++}
++
++int qemu_add_child_watch(pid_t pid)
++{
++    ChildProcessRecord *rec;
++
++    if (!sigchld_bh) {
++        qemu_init_child_watch();
++    }
++
++    QLIST_FOREACH(rec, &child_watches, next) {
++        if (rec->pid == pid) {
++            return 1;
++        }
++    }
++    rec = g_malloc0(sizeof(ChildProcessRecord));
++    rec->pid = pid;
++    QLIST_INSERT_HEAD(&child_watches, rec, next);
++    return 0;
++}
++#endif
+-- 
+1.8.3.1
+
 
