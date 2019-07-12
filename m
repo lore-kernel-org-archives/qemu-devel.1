@@ -6,57 +6,57 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 441BBC742CA
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 15:37:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63D98C742CA
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 15:37:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1578B20863
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 15:37:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1578B20863
+	by mail.kernel.org (Postfix) with ESMTPS id 383E020863
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 15:37:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 383E020863
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50660 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50666 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlxbo-0000Pi-0U
-	for qemu-devel@archiver.kernel.org; Fri, 12 Jul 2019 11:37:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35414)
+	id 1hlxbz-0001FA-14
+	for qemu-devel@archiver.kernel.org; Fri, 12 Jul 2019 11:37:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35396)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mst@redhat.com>) id 1hlxbP-0007OJ-49
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 11:36:51 -0400
+ (envelope-from <mst@redhat.com>) id 1hlxbL-0007A6-Nn
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 11:36:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1hlxbO-0003x1-1Y
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 11:36:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53946)
+ (envelope-from <mst@redhat.com>) id 1hlxbK-0003tE-JC
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 11:36:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33270)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1hlxbN-0003vN-SC
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 11:36:49 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1hlxbK-0003sT-DJ
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 11:36:46 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 37A42C05A1D8;
- Fri, 12 Jul 2019 15:36:48 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 89E9230C62A9;
+ Fri, 12 Jul 2019 15:36:45 +0000 (UTC)
 Received: from redhat.com (ovpn-116-209.ams2.redhat.com [10.36.116.209])
- by smtp.corp.redhat.com (Postfix) with SMTP id DAB9860C64;
- Fri, 12 Jul 2019 15:36:46 +0000 (UTC)
-Date: Fri, 12 Jul 2019 11:36:45 -0400
+ by smtp.corp.redhat.com (Postfix) with SMTP id 361E85DE82;
+ Fri, 12 Jul 2019 15:36:41 +0000 (UTC)
+Date: Fri, 12 Jul 2019 11:36:41 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Message-ID: <20190712073554.21918-4-pagupta@redhat.com>
+Message-ID: <20190712073554.21918-3-pagupta@redhat.com>
 References: <20190712153504.14937-1-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Disposition: inline
 In-Reply-To: <20190712153504.14937-1-mst@redhat.com>
 X-Mutt-Fcc: =sent
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Fri, 12 Jul 2019 15:36:48 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.46]); Fri, 12 Jul 2019 15:36:45 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 8/8] virtio pmem: remove transitional names
+Subject: [Qemu-devel] [PULL 7/8] virtio pmem: remove memdev null check
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,35 +73,43 @@ Cc: Peter Maydell <peter.maydell@linaro.org>, Cornelia Huck <cohuck@redhat.com>,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190712153645.54IMCmSMjcMTLx74kIdF40D7OV35275YACnInYwyV4I@z>
+Message-ID: <20190712153641.zoK6kep8gjSxeILA76zpXVCVQpB9RsW13z630PKoMPs@z>
 
 From: Pankaj Gupta <pagupta@redhat.com>
 
-Remove transitional & non transitional names for virtio pmem.
-Only virtio 1.0 and up is supported.
+Coverity reports that when we're assigning vi->size we handle the
+"pmem->memdev is NULL" case; but we then pass it into
+object_get_canonical_path(), which unconditionally dereferences it
+and will crash if it is NULL. If this pointer can be NULL then we
+need to do something else here.
+
+We are removing 'pmem->memdev' null check here as memdev will never
+be null in this function.
 
 Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
-Message-Id: <20190712073554.21918-4-pagupta@redhat.com>
+Message-Id: <20190712073554.21918-3-pagupta@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 ---
- hw/virtio/virtio-pmem-pci.c | 2 --
- 1 file changed, 2 deletions(-)
+ hw/virtio/virtio-pmem.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/hw/virtio/virtio-pmem-pci.c b/hw/virtio/virtio-pmem-pci.c
-index 0da6627469..fe2af00fa1 100644
---- a/hw/virtio/virtio-pmem-pci.c
-+++ b/hw/virtio/virtio-pmem-pci.c
-@@ -113,8 +113,6 @@ static void virtio_pmem_pci_instance_init(Object *obj)
- static const VirtioPCIDeviceTypeInfo virtio_pmem_pci_info = {
-     .base_name             = TYPE_VIRTIO_PMEM_PCI,
-     .generic_name          = "virtio-pmem-pci",
--    .transitional_name     = "virtio-pmem-pci-transitional",
--    .non_transitional_name = "virtio-pmem-pci-non-transitional",
-     .instance_size = sizeof(VirtIOPMEMPCI),
-     .instance_init = virtio_pmem_pci_instance_init,
-     .class_init    = virtio_pmem_pci_class_init,
+diff --git a/hw/virtio/virtio-pmem.c b/hw/virtio/virtio-pmem.c
+index adbfb603ab..17c196d107 100644
+--- a/hw/virtio/virtio-pmem.c
++++ b/hw/virtio/virtio-pmem.c
+@@ -134,8 +134,8 @@ static void virtio_pmem_fill_device_info(const VirtIOPMEM *pmem,
+                                          VirtioPMEMDeviceInfo *vi)
+ {
+     vi->memaddr = pmem->start;
+-    vi->size = pmem->memdev ? memory_region_size(&pmem->memdev->mr) : 0;
+-    vi->memdev = object_get_canonical_path(OBJECT(pmem->memdev));
++    vi->size    = memory_region_size(&pmem->memdev->mr);
++    vi->memdev  = object_get_canonical_path(OBJECT(pmem->memdev));
+ }
+ 
+ static MemoryRegion *virtio_pmem_get_memory_region(VirtIOPMEM *pmem,
 -- 
 MST
 
