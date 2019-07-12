@@ -2,74 +2,63 @@ Return-Path: <SRS0=r3/N=VJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FB07C742B2
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 10:27:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42AEDC742B3
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 10:43:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7C7F32173B
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 10:27:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C7F32173B
+	by mail.kernel.org (Postfix) with ESMTPS id 0747D208E4
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 10:43:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0747D208E4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48026 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48084 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlsmN-0005Ks-GF
-	for qemu-devel@archiver.kernel.org; Fri, 12 Jul 2019 06:27:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32810)
+	id 1hlt1V-0008QN-UC
+	for qemu-devel@archiver.kernel.org; Fri, 12 Jul 2019 06:43:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37377)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <sgarzare@redhat.com>) id 1hlsmC-0004rw-RN
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 06:27:42 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1hlt1J-00082i-AK
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 06:43:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <sgarzare@redhat.com>) id 1hlsmB-0007Ck-LE
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 06:27:40 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:56064)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1hlsmB-0007CB-F7
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 06:27:39 -0400
-Received: by mail-wm1-f66.google.com with SMTP id a15so8406240wmj.5
- for <qemu-devel@nongnu.org>; Fri, 12 Jul 2019 03:27:39 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=hKAg8c7EqIuJjKHk38LxkElcLoSDr+edD1uH7E1Qd+4=;
- b=ppB9n3C7oMOCY4pwwjW/+UpcGZyHPQbDfD3O1+dYY5Z9WwRA0mUet4aJd6VLI4PJma
- wU9hFGwLXiMl2RJFslr9gX3MZAarVzzQt5v5zlfMuHIBmmLXFoQNwbZwjPtxF9z397Yj
- ustxaqyb3vXjSV5tReLOKZhDCk0OhHnOqUXWFkwP6Z53FkI/DDUl+sw8mvDj5e0NuXPP
- QK6LPtGugg/fIqcDsxRffxYNMpHSONXO0sfXmrtr0LRj2afZQIQas7JJ13k7XgxLdwtu
- 8KKwaI1CgW0SLtN7RRnw5FhvOzReI2pJ+RyGMGW326BBMRAM3emu+yY0hqiD42tyYmEM
- w9gw==
-X-Gm-Message-State: APjAAAUwLCRLXBCWP68kNFkbVpsnQYeT72+lwZQmeBOVL8iydJNRHGqj
- /A7Z76jOUd5nQzZnq9cTW9XF2g==
-X-Google-Smtp-Source: APXvYqwXjNR0l04us1WUh3dRzPr0bA1mn2Lk97AZ91jWTQcDVGDv5+yhBnmky97Ypv+dI47TRTrJCQ==
-X-Received: by 2002:a1c:e710:: with SMTP id e16mr9488178wmh.38.1562927258304; 
- Fri, 12 Jul 2019 03:27:38 -0700 (PDT)
-Received: from steredhat (host122-201-dynamic.13-79-r.retail.telecomitalia.it.
- [79.13.201.122])
- by smtp.gmail.com with ESMTPSA id o126sm6976642wmo.1.2019.07.12.03.27.37
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Fri, 12 Jul 2019 03:27:37 -0700 (PDT)
-Date: Fri, 12 Jul 2019 12:27:35 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Max Reitz <mreitz@redhat.com>
-Message-ID: <20190712102735.ea5f4aqqgok7qdxa@steredhat>
-References: <20190711132935.13070-1-mreitz@redhat.com>
+ (envelope-from <dgilbert@redhat.com>) id 1hlt1H-0003yb-HC
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 06:43:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39490)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hlt1H-0003xB-7c
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 06:43:15 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 37A772CE917;
+ Fri, 12 Jul 2019 10:43:09 +0000 (UTC)
+Received: from work-vm (ovpn-117-214.ams2.redhat.com [10.36.117.214])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C7EC260C18;
+ Fri, 12 Jul 2019 10:43:05 +0000 (UTC)
+Date: Fri, 12 Jul 2019 11:43:03 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: "Singh, Brijesh" <brijesh.singh@amd.com>
+Message-ID: <20190712104303.GD2730@work-vm>
+References: <20190710202219.25939-1-brijesh.singh@amd.com>
+ <20190710202219.25939-10-brijesh.singh@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190711132935.13070-1-mreitz@redhat.com>
-User-Agent: NeoMutt/20180716
+In-Reply-To: <20190710202219.25939-10-brijesh.singh@amd.com>
+User-Agent: Mutt/1.12.0 (2019-05-25)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.29]); Fri, 12 Jul 2019 10:43:14 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.128.66
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] doc: Preallocation does not
- require writing zeroes
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2 09/13] target/i386: sev: add support to
+ encrypt the outgoing page
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -81,92 +70,353 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Daniel P =?utf-8?B?LiBCZXJyYW5nw6k=?= <berrange@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, qemu-block@nongnu.org,
- qemu-devel@nongnu.org
+Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>, "Lendacky,
+ Thomas" <Thomas.Lendacky@amd.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "ehabkost@redhat.com" <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jul 11, 2019 at 03:29:35PM +0200, Max Reitz wrote:
-> When preallocating an encrypted qcow2 image, it just lets the protocol
-> driver write data and then does not mark the clusters as zero.
-> Therefore, reading this image will yield effectively random data.
+* Singh, Brijesh (brijesh.singh@amd.com) wrote:
+> The sev_save_outgoing_page() provide the implementation to encrypt the
+> guest private pages during the transit. The routines uses the SEND_START
+> command to create the outgoing encryption context on the first call then
+> uses the SEND_UPDATE_DATA command to encrypt the data before writing it
+> to the socket. While encrypting the data SEND_UPDATE_DATA produces some
+> metadata (e.g MAC, IV). The metadata is also sent to the target machine.
+> After migration is completed, we issue the SEND_FINISH command to transition
+> the SEV guest state from sending to unrunnable state.
 > 
-> As such, we have not fulfilled the promise of always writing zeroes when
-> preallocating an image in a while.  It seems that nobody has really
-> cared, so change the documentation to conform to qemu's actual behavior.
-> 
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 > ---
->  qapi/block-core.json         | 9 +++++----
->  docs/qemu-block-drivers.texi | 4 ++--
->  qemu-img.texi                | 4 ++--
->  3 files changed, 9 insertions(+), 8 deletions(-)
+>  accel/kvm/kvm-all.c      |   1 +
+>  target/i386/sev.c        | 229 +++++++++++++++++++++++++++++++++++++++
+>  target/i386/sev_i386.h   |   2 +
+>  target/i386/trace-events |   3 +
+>  4 files changed, 235 insertions(+)
 > 
-> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> index 0d43d4f37c..a4363b84d2 100644
-> --- a/qapi/block-core.json
-> +++ b/qapi/block-core.json
-> @@ -5167,10 +5167,11 @@
->  # @off: no preallocation
->  # @metadata: preallocate only for metadata
->  # @falloc: like @full preallocation but allocate disk space by
-> -#          posix_fallocate() rather than writing zeros.
-> -# @full: preallocate all data by writing zeros to device to ensure disk
-> -#        space is really available. @full preallocation also sets up
-> -#        metadata correctly.
-> +#          posix_fallocate() rather than writing data.
-> +# @full: preallocate all data by writing it to the device to ensure
-> +#        disk space is really available. This data may or may not be
-> +#        zero, depending on the image format and storage.
-> +#        @full preallocation also sets up metadata correctly.
->  #
->  # Since: 2.2
->  ##
-> diff --git a/docs/qemu-block-drivers.texi b/docs/qemu-block-drivers.texi
-> index 91ab0eceae..c02547e28c 100644
-> --- a/docs/qemu-block-drivers.texi
-> +++ b/docs/qemu-block-drivers.texi
-> @@ -31,8 +31,8 @@ Supported options:
->  @item preallocation
->  Preallocation mode (allowed values: @code{off}, @code{falloc}, @code{full}).
->  @code{falloc} mode preallocates space for image by calling posix_fallocate().
-> -@code{full} mode preallocates space for image by writing zeros to underlying
-> -storage.
-> +@code{full} mode preallocates space for image by writing data to underlying
-> +storage.  This data may or may not be zero, depending on the storage location.
->  @end table
+> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+> index c935e9366c..a9fb447248 100644
+> --- a/accel/kvm/kvm-all.c
+> +++ b/accel/kvm/kvm-all.c
+> @@ -1792,6 +1792,7 @@ static int kvm_init(MachineState *ms)
+>          }
 >  
->  @item qcow2
-> diff --git a/qemu-img.texi b/qemu-img.texi
-> index c8e9bba515..b5156d6316 100644
-> --- a/qemu-img.texi
-> +++ b/qemu-img.texi
-> @@ -666,8 +666,8 @@ Supported options:
->  @item preallocation
->  Preallocation mode (allowed values: @code{off}, @code{falloc}, @code{full}).
->  @code{falloc} mode preallocates space for image by calling posix_fallocate().
-> -@code{full} mode preallocates space for image by writing zeros to underlying
-> -storage.
-> +@code{full} mode preallocates space for image by writing data to underlying
-> +storage.  This data may or may not be zero, depending on the storage location.
->  @end table
+>          kvm_state->memcrypt_encrypt_data = sev_encrypt_data;
+> +        kvm_state->memcrypt_save_outgoing_page = sev_save_outgoing_page;
+>      }
 >  
->  @item qcow2
+>      ret = kvm_arch_init(ms, s);
+> diff --git a/target/i386/sev.c b/target/i386/sev.c
+> index 6c902d0be8..28b36c8035 100644
+> --- a/target/i386/sev.c
+> +++ b/target/i386/sev.c
+> @@ -27,6 +27,8 @@
+>  #include "sysemu/sysemu.h"
+>  #include "trace.h"
+>  #include "migration/blocker.h"
+> +#include "migration/qemu-file.h"
+> +#include "migration/misc.h"
+>  
+>  #define DEFAULT_GUEST_POLICY    0x1 /* disable debug */
+>  #define DEFAULT_SEV_DEVICE      "/dev/sev"
+> @@ -718,6 +720,39 @@ sev_vm_state_change(void *opaque, int running, RunState state)
+>      }
+>  }
+>  
+> +static void
+> +sev_send_finish(void)
+> +{
+> +    int ret, error;
+> +
+> +    trace_kvm_sev_send_finish();
+> +    ret = sev_ioctl(sev_state->sev_fd, KVM_SEV_SEND_FINISH, 0, &error);
+> +    if (ret) {
+> +        error_report("%s: LAUNCH_FINISH ret=%d fw_error=%d '%s'",
 
-Just a question:
-if a protocol driver returns 1 with the .bdrv_has_zero_init callback, is it
-expected that the preallocation will fill the image with zeroes?
+why LAUNCH?
 
-IIUC, for example, the qcow2 returns 1 with the .bdrv_has_zero_init. but during
-the qcow2_co_truncate() it calls bdrv_co_truncate() and, depending on the
-backend driver, it should fill the image with zeroes (or not?).
+> +                     __func__, ret, error, fw_error_to_str(error));
+> +    }
+> +
+> +    sev_set_guest_state(SEV_STATE_RUNNING);
+> +}
+> +
+> +static void
+> +sev_migration_state_notifier(Notifier *notifier, void *data)
+> +{
+> +    MigrationState *s = data;
+> +
+> +    if (migration_has_finished(s) ||
+> +        migration_in_postcopy_after_devices(s) ||
+> +        migration_has_failed(s)) {
+> +        if (sev_check_state(SEV_STATE_SEND_UPDATE)) {
+> +            sev_send_finish();
+> +        }
 
-Maybe I miss something related to the metadata...
+I don't quite understand SEV_SEND_FINISH; is it just terminating the
+migration process or is it actually making the VM unrunnable?
+I'm interested in what the behaviour is on a failed migration - do
+we lose both VMs or do we potentialyl have a memory clone?
+(Neither are pretty!)
 
+> +    }
+> +}
+> +
+> +static Notifier sev_migration_state_notify = {
+> +    .notify = sev_migration_state_notifier,
+> +};
+> +
+>  void *
+>  sev_guest_init(const char *id)
+>  {
+> @@ -804,6 +839,7 @@ sev_guest_init(const char *id)
+>      ram_block_notifier_add(&sev_ram_notifier);
+>      qemu_add_machine_init_done_notifier(&sev_machine_done_notify);
+>      qemu_add_vm_change_state_handler(sev_vm_state_change, s);
+> +    add_migration_state_change_notifier(&sev_migration_state_notify);
+>  
+>      return s;
+>  err:
+> @@ -836,6 +872,199 @@ void sev_set_migrate_info(const char *pdh, const char *plat_cert,
+>      s->amd_cert = g_base64_decode(amd_cert, &s->amd_cert_len);
+>  }
+>  
+> +static int
+> +sev_get_send_session_length(void)
+> +{
+> +    int ret, fw_err = 0;
+> +    struct kvm_sev_send_start *start;
+> +
+> +    start = g_new0(struct kvm_sev_send_start, 1);
 
-Thanks,
-Stefano
+These are tiny structures; they may as well be on the stack rather than
+allocating/freeing them.
+
+> +    ret = sev_ioctl(sev_state->sev_fd, KVM_SEV_SEND_START, start, &fw_err);
+> +    if (fw_err != SEV_RET_INVALID_LEN) {
+> +        ret = -1;
+> +        error_report("%s: failed to get session length ret=%d fw_error=%d '%s'",
+> +                     __func__, ret, fw_err, fw_error_to_str(fw_err));
+> +        goto err;
+> +    }
+> +
+> +    ret = start->session_len;
+> +err:
+> +    g_free(start);
+> +    return ret;
+> +}
+> +
+> +static int
+> +sev_send_start(SEVState *s, QEMUFile *f, uint64_t *bytes_sent)
+> +{
+> +    gsize pdh_len = 0, plat_cert_len;
+> +    int session_len, ret, fw_error;
+> +    struct kvm_sev_send_start *start;
+> +    guchar *pdh = NULL, *plat_cert = NULL, *session = NULL;
+> +
+> +    if (!s->remote_pdh || !s->remote_plat_cert) {
+> +        error_report("%s: missing remote PDH or PLAT_CERT", __func__);
+> +        return 1;
+> +    }
+> +
+> +    start = g_new0(struct kvm_sev_send_start, 1);
+> +
+> +    start->pdh_cert_uaddr = (unsigned long) s->remote_pdh;
+> +    start->pdh_cert_len = s->remote_pdh_len;
+> +
+> +    start->plat_cert_uaddr = (unsigned long)s->remote_plat_cert;
+> +    start->plat_cert_len = s->remote_plat_cert_len;
+> +
+> +    start->amd_cert_uaddr = (unsigned long)s->amd_cert;
+
+Should these actually be case via a uint64_t ? They're explicitly
+64bit - you might have to go via a uintptr_t to make some compilers
+happy?
+
+> +    start->amd_cert_len = s->amd_cert_len;
+> +
+> +    /* get the session length */
+> +    session_len = sev_get_send_session_length();
+> +    if (session_len < 0) {
+> +        ret = 1;
+> +        goto err;
+> +    }
+> +
+> +    session = g_new0(guchar, session_len);
+> +    start->session_uaddr = (unsigned long)session;
+> +    start->session_len = session_len;
+> +
+> +    /* Get our PDH certificate */
+> +    ret = sev_get_pdh_info(s->sev_fd, &pdh, &pdh_len,
+> +                           &plat_cert, &plat_cert_len);
+> +    if (ret) {
+> +        error_report("Failed to get our PDH cert");
+> +        goto err;
+> +    }
+> +
+> +    trace_kvm_sev_send_start(start->pdh_cert_uaddr, start->pdh_cert_len,
+> +                             start->plat_cert_uaddr, start->plat_cert_len,
+> +                             start->amd_cert_uaddr, start->amd_cert_len);
+> +
+> +    ret = sev_ioctl(s->sev_fd, KVM_SEV_SEND_START, start, &fw_error);
+> +    if (ret < 0) {
+> +        error_report("%s: SEND_START ret=%d fw_error=%d '%s'",
+> +                __func__, ret, fw_error, fw_error_to_str(fw_error));
+> +        goto err;
+> +    }
+> +
+> +    qemu_put_be32(f, start->policy);
+> +    qemu_put_be32(f, pdh_len);
+> +    qemu_put_buffer(f, (uint8_t *)pdh, pdh_len);
+> +    qemu_put_be32(f, start->session_len);
+> +    qemu_put_buffer(f, (uint8_t *)start->session_uaddr, start->session_len);
+> +    *bytes_sent = 12 + pdh_len + start->session_len;
+> +
+> +    sev_set_guest_state(SEV_STATE_SEND_UPDATE);
+> +
+> +err:
+> +    g_free(start);
+> +    g_free(pdh);
+> +    g_free(plat_cert);
+> +    return ret;
+> +}
+> +
+> +static int
+> +sev_send_get_packet_len(int *fw_err)
+> +{
+> +    int ret;
+> +    struct kvm_sev_send_update_data *update;
+> +
+> +    update = g_malloc0(sizeof(*update));
+> +    if (!update) {
+> +        return -1;
+> +    }
+> +
+> +    ret = sev_ioctl(sev_state->sev_fd, KVM_SEV_SEND_UPDATE_DATA, update, fw_err);
+> +    if (*fw_err != SEV_RET_INVALID_LEN) {
+> +        ret = -1;
+> +        error_report("%s: failed to get session length ret=%d fw_error=%d '%s'",
+> +                    __func__, ret, *fw_err, fw_error_to_str(*fw_err));
+> +        goto err;
+> +    }
+> +
+> +    ret = update->hdr_len;
+> +
+> +err:
+> +    g_free(update);
+> +    return ret;
+> +}
+> +
+> +static int
+> +sev_send_update_data(SEVState *s, QEMUFile *f, uint8_t *ptr, uint32_t size,
+> +                     uint64_t *bytes_sent)
+> +{
+> +    int ret, fw_error;
+> +    guchar *trans;
+> +    struct kvm_sev_send_update_data *update;
+> +
+> +    /* If this is first call then query the packet header bytes and allocate
+> +     * the packet buffer.
+> +     */
+> +    if (!s->send_packet_hdr) {
+> +        s->send_packet_hdr_len = sev_send_get_packet_len(&fw_error);
+> +        if (s->send_packet_hdr_len < 1) {
+> +            error_report("%s: SEND_UPDATE fw_error=%d '%s'",
+> +                    __func__, fw_error, fw_error_to_str(fw_error));
+> +            return 1;
+> +        }
+> +
+> +        s->send_packet_hdr = g_new(gchar, s->send_packet_hdr_len);
+
+When does this get freed?
+
+> +    }
+> +
+> +    update = g_new0(struct kvm_sev_send_update_data, 1);
+> +
+> +    /* allocate transport buffer */
+> +    trans = g_new(guchar, size);
+> +
+> +    update->hdr_uaddr = (unsigned long)s->send_packet_hdr;
+> +    update->hdr_len = s->send_packet_hdr_len;
+> +    update->guest_uaddr = (unsigned long)ptr;
+> +    update->guest_len = size;
+> +    update->trans_uaddr = (unsigned long)trans;
+> +    update->trans_len = size;
+> +
+> +    trace_kvm_sev_send_update_data(ptr, trans, size);
+> +
+> +    ret = sev_ioctl(s->sev_fd, KVM_SEV_SEND_UPDATE_DATA, update, &fw_error);
+> +    if (ret) {
+> +        error_report("%s: SEND_UPDATE_DATA ret=%d fw_error=%d '%s'",
+> +                __func__, ret, fw_error, fw_error_to_str(fw_error));
+> +        goto err;
+> +    }
+> +
+> +    qemu_put_be32(f, update->hdr_len);
+> +    qemu_put_buffer(f, (uint8_t *)update->hdr_uaddr, update->hdr_len);
+> +    *bytes_sent = 4 + update->hdr_len;
+> +
+> +    qemu_put_be32(f, update->trans_len);
+> +    qemu_put_buffer(f, (uint8_t *)update->trans_uaddr, update->trans_len);
+> +    *bytes_sent += (4 + update->trans_len);
+> +
+> +err:
+> +    g_free(trans);
+> +    g_free(update);
+> +    return ret;
+> +}
+> +
+> +int sev_save_outgoing_page(void *handle, QEMUFile *f, uint8_t *ptr,
+> +                           uint32_t sz, uint64_t *bytes_sent)
+> +{
+> +    SEVState *s = sev_state;
+> +
+> +    /*
+> +     * If this is a first buffer then create outgoing encryption context
+> +     * and write our PDH, policy and session data.
+> +     */
+> +    if (!sev_check_state(SEV_STATE_SEND_UPDATE) &&
+> +        sev_send_start(s, f, bytes_sent)) {
+> +        error_report("Failed to create outgoing context");
+> +        return 1;
+> +    }
+> +
+> +    return sev_send_update_data(s, f, ptr, sz, bytes_sent);
+> +}
+> +
+>  static void
+>  sev_register_types(void)
+>  {
+> diff --git a/target/i386/sev_i386.h b/target/i386/sev_i386.h
+> index 3f3449b346..2fdca5190d 100644
+> --- a/target/i386/sev_i386.h
+> +++ b/target/i386/sev_i386.h
+> @@ -88,6 +88,8 @@ struct SEVState {
+>      size_t remote_plat_cert_len;
+>      guchar *amd_cert;
+>      size_t amd_cert_len;
+> +    gchar *send_packet_hdr;
+> +    size_t send_packet_hdr_len;
+>  };
+>  
+>  typedef struct SEVState SEVState;
+> diff --git a/target/i386/trace-events b/target/i386/trace-events
+> index 789c700d4a..b41516cf9f 100644
+> --- a/target/i386/trace-events
+> +++ b/target/i386/trace-events
+> @@ -15,3 +15,6 @@ kvm_sev_launch_start(int policy, void *session, void *pdh) "policy 0x%x session
+>  kvm_sev_launch_update_data(void *addr, uint64_t len) "addr %p len 0x%" PRIu64
+>  kvm_sev_launch_measurement(const char *value) "data %s"
+>  kvm_sev_launch_finish(void) ""
+> +kvm_sev_send_start(uint64_t pdh, int l1, uint64_t plat, int l2, uint64_t amd, int l3) "pdh 0x%" PRIx64 " len %d plat 0x%" PRIx64 " len %d amd 0x%" PRIx64 " len %d"
+> +kvm_sev_send_update_data(void *src, void *dst, int len) "guest %p trans %p len %d"
+> +kvm_sev_send_finish(void) ""
+> -- 
+> 2.17.1
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
