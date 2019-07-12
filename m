@@ -2,66 +2,91 @@ Return-Path: <SRS0=r3/N=VJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3075BC742B9
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 12:34:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD06EC742BE
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 12:41:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 037FC20645
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 12:34:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 037FC20645
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8F92A2080A
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 12:41:35 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SfPy4czw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F92A2080A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49078 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49110 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlukl-0006kN-30
-	for qemu-devel@archiver.kernel.org; Fri, 12 Jul 2019 08:34:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39057)
+	id 1hlurm-0000Rg-5e
+	for qemu-devel@archiver.kernel.org; Fri, 12 Jul 2019 08:41:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40599)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgilbert@redhat.com>) id 1hlukZ-0006MI-Ix
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 08:34:08 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hlurd-0008Ue-7f
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 08:41:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1hlukX-00054m-Lk
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 08:34:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57618)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hlukW-00053q-Ie
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 08:34:05 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 2A67530842A0;
- Fri, 12 Jul 2019 12:34:03 +0000 (UTC)
-Received: from work-vm (ovpn-117-214.ams2.redhat.com [10.36.117.214])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 76E0B60DB7;
- Fri, 12 Jul 2019 12:34:02 +0000 (UTC)
-Date: Fri, 12 Jul 2019 13:34:00 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Lin Ma <LMa@suse.com>
-Message-ID: <20190712123400.GJ2730@work-vm>
-References: <BY5PR18MB3313E1E22A22D236D4C2680DC5F30@BY5PR18MB3313.namprd18.prod.outlook.com>
- <20190711102410.GH3971@work-vm>
- <BY5PR18MB331347C441DA068E32BFDE53C5F20@BY5PR18MB3313.namprd18.prod.outlook.com>
+ (envelope-from <alex.bennee@linaro.org>) id 1hlurb-0003XW-Of
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 08:41:25 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:44437)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1hlurX-0003Jv-7o
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 08:41:23 -0400
+Received: by mail-wr1-x443.google.com with SMTP id p17so9812452wrf.11
+ for <qemu-devel@nongnu.org>; Fri, 12 Jul 2019 05:41:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=7u0qDx/oP9t+myKj6bd2l0WMKhJMYUjtERrEkQ8ZLgI=;
+ b=SfPy4czw1PH0nQVLrXLN+gQ/odNnTR2zSODTL+yiNKtrHOuzLNE4VZLRRShNf18eFE
+ F+TCoMDuXz2gJP33k5KERhvsTfUh1YskwjI66Ss/ys5kcoULKFG1ZO5pkDoKqEeTymfg
+ O7nmYA8qsNOCdX3m0j5grxfkGXitX6V5RVfIle64fBw68p6cVPvYEzcoyvPxXeZp2IQz
+ YGT7S6DBB9E94y6gAJ5cuZowbqysnV6ndffb/8dQ4mL/Fvd0p47hnYrPTV6DgSkGLvya
+ Qn7Us4+2be8ifOyyy/O/4dHZK9whR+6y1zjwco6g0pYvSxy0PnomCx3SorPPqtRyX9cM
+ OqbA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=7u0qDx/oP9t+myKj6bd2l0WMKhJMYUjtERrEkQ8ZLgI=;
+ b=iDxS7QYnliJn6oRDKlQokia74kXeKc/DoeuwKUZ5+oVT955JEvkHF4sCORdufN7NRM
+ kSwMC52QevZbh9vhiy+7F2oW4RvPa5lr8KvgNp5euP3baNT00PR0H506+L/X+t15uLHB
+ GnR5Znjc53SMce+pGfKj7z9t8XgsWrEqLVI9CRLxERvJ+7GUPF5Bz8kDCSDtvetbX/vM
+ 85cg/Re7vetUGfYWUVLi1jPoh7gcBHizNogWzdIevz36urREGnQ96GGW3BWGlJY9oJ1l
+ +TdUrCwnwsTsDF9/2NU2po5gp0kDQZUp/B0NruRombJmeQuQ8orLPC4wSmA/LAQpPzZP
+ jTXg==
+X-Gm-Message-State: APjAAAUeJMM5hOSAJossGPVkH5HXgzLeHCi0NCJYkJ6Q7RpIrEh65Qb6
+ lYdIa6qm99Yv0VUFmu4B4VdO9Q==
+X-Google-Smtp-Source: APXvYqz72/McOu88W8SLembZQn4VRHKfjd5oi+24hV+qeCceLVbL2WKmlQCNxA61xkqHlUE7GaQvcQ==
+X-Received: by 2002:adf:ec0f:: with SMTP id x15mr11746165wrn.165.1562935276609; 
+ Fri, 12 Jul 2019 05:41:16 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+ by smtp.gmail.com with ESMTPSA id r12sm11233749wrt.95.2019.07.12.05.41.15
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Fri, 12 Jul 2019 05:41:16 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id A82041FF87;
+ Fri, 12 Jul 2019 13:41:15 +0100 (BST)
+References: <20190711223300.6061-1-jan.bobek@gmail.com>
+ <20190711223300.6061-2-jan.bobek@gmail.com>
+User-agent: mu4e 1.3.2; emacs 26.1
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Jan Bobek <jan.bobek@gmail.com>
+In-reply-to: <20190711223300.6061-2-jan.bobek@gmail.com>
+Date: Fri, 12 Jul 2019 13:41:15 +0100
+Message-ID: <871ryve87o.fsf@zen.linaroharston>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <BY5PR18MB331347C441DA068E32BFDE53C5F20@BY5PR18MB3313.namprd18.prod.outlook.com>
-User-Agent: Mutt/1.12.0 (2019-05-25)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Fri, 12 Jul 2019 12:34:03 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] 
- =?utf-8?b?562U5aSNOiAgbWlncmF0ZV9zZXRfc3BlZWQgaGFz?=
- =?utf-8?q?_no_effect_if_the_guest_is_using_hugepages=2E?=
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::443
+Subject: Re: [Qemu-devel] [RISU PATCH v3 01/18] risugen_common: add helper
+ functions insnv, randint
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,164 +98,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Lin Ma (LMa@suse.com) wrote:
->=20
->=20
-> > -----=E9=82=AE=E4=BB=B6=E5=8E=9F=E4=BB=B6-----
-> > =E5=8F=91=E4=BB=B6=E4=BA=BA: Dr. David Alan Gilbert <dgilbert@redhat.=
-com>
-> > =E5=8F=91=E9=80=81=E6=97=B6=E9=97=B4: 2019=E5=B9=B47=E6=9C=8811=E6=97=
-=A5 18:24
-> > =E6=94=B6=E4=BB=B6=E4=BA=BA: Lin Ma <LMa@suse.com>
-> > =E6=8A=84=E9=80=81: qemu-devel@nongnu.org
-> > =E4=B8=BB=E9=A2=98: Re: [Qemu-devel] migrate_set_speed has no effect =
-if the guest is using
-> > hugepages.
-> >=20
-> > * Lin Ma (LMa@suse.com) wrote:
-> > > Hi all,
-> >=20
-> > Hi Lin,
->=20
-> Hi Dave,
-> >=20
-> > > When I live migrate a qemu/kvm guest, If the guest is using huge
-> > > pages, I found that the migrate_set_speed command had no effect dur=
-ing
-> > stage 2.
-> >=20
-> > Can you explain what you mean by 'stage 2'?
-> We know that the live migration contains 3 stages:
-> Stage 1: Mark all of RAM dirty.
-> Stage 2: Keep sending dirty RAM pages since last iteration
-> Stage 3: Stop guest, transfer remaining dirty RAM, device state
-> (Please refer to https://developers.redhat.com/blog/2015/03/24/live-mig=
-rating-qemu-kvm-virtual-machines/#live-migration for further details)
 
-OK, yeh the numbering is pretty arbitrary so it's not something I
-normally think about like that.
+Jan Bobek <jan.bobek@gmail.com> writes:
 
->=20
-> > > It was caused by commit 4c011c3 postcopy: Send whole huge pages
-> > >
-> > > I'm wondering that is it by design or is it a bug waiting for fix?
-> >=20
-> > This is the first report I've seen for it.  How did you conclude that
-> > 4c011c3 caused it?  While I can see it might have some effect on the
-> > bandwidth management, I'm surprised it has this much effect.
->=20
-> While digging into the bandwidth issue, Git bisect shows that this comm=
-it was the first bad commit.
+> insnv allows emitting variable-length instructions in little-endian or
+> big-endian byte order; it subsumes functionality of former insn16()
+> and insn32() functions.
+>
+> randint can reliably generate signed or unsigned integers of arbitrary
+> width.
+>
+> Signed-off-by: Jan Bobek <jan.bobek@gmail.com>
 
-OK.
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
-> > What size huge pages are you using - 2MB or 1GB?
->=20
-> When I hit this issue I was using 1GB huge page size.
-> I tested this issue with 2MB page size today On Gigabit LAN, Although t=
-he bandwidth control looks
-> a little better than using 1GB, But not too much. Please refer to the b=
-elow test result.
+> ---
+>  risugen_common.pm | 55 +++++++++++++++++++++++++++++++++++++++++------
+>  1 file changed, 48 insertions(+), 7 deletions(-)
+>
+> diff --git a/risugen_common.pm b/risugen_common.pm
+> index 71ee996..d63250a 100644
+> --- a/risugen_common.pm
+> +++ b/risugen_common.pm
+> @@ -23,8 +23,9 @@ BEGIN {
+>      require Exporter;
+>
+>      our @ISA =3D qw(Exporter);
+> -    our @EXPORT =3D qw(open_bin close_bin set_endian insn32 insn16 $byte=
+count
+> -                   progress_start progress_update progress_end
+> +    our @EXPORT =3D qw(open_bin close_bin set_endian insn32 insn16
+> +                   $bytecount insnv randint progress_start
+> +                   progress_update progress_end
+>                     eval_with_fields is_pow_of_2 sextract ctz
+>                     dump_insn_details);
+>  }
+> @@ -37,7 +38,7 @@ my $bigendian =3D 0;
+>  # (default is little endian, 0).
+>  sub set_endian
+>  {
+> -    $bigendian =3D @_;
+> +    ($bigendian) =3D @_;
+>  }
+>
+>  sub open_bin
+> @@ -52,18 +53,58 @@ sub close_bin
+>      close(BIN) or die "can't close output file: $!";
+>  }
+>
+> +sub insnv(%)
+> +{
+> +    my (%args) =3D @_;
+> +
+> +    # Default to big-endian order, so that the instruction bytes are
+> +    # emitted in the same order as they are written in the
+> +    # configuration file.
+> +    $args{bigendian} =3D 1 unless defined $args{bigendian};
+> +
+> +    for (my $bitcur =3D 0; $bitcur < $args{width}; $bitcur +=3D 8) {
+> +        my $value =3D $args{value} >> ($args{bigendian}
+> +                                     ? $args{width} - $bitcur - 8
+> +                                     : $bitcur);
+> +
+> +        print BIN pack("C", $value & 0xff);
+> +        $bytecount +=3D 1;
+> +    }
+> +}
+> +
+>  sub insn32($)
+>  {
+>      my ($insn) =3D @_;
+> -    print BIN pack($bigendian ? "N" : "V", $insn);
+> -    $bytecount +=3D 4;
+> +    insnv(value =3D> $insn, width =3D> 32, bigendian =3D> $bigendian);
+>  }
+>
+>  sub insn16($)
+>  {
+>      my ($insn) =3D @_;
+> -    print BIN pack($bigendian ? "n" : "v", $insn);
+> -    $bytecount +=3D 2;
+> +    insnv(value =3D> $insn, width =3D> 16, bigendian =3D> $bigendian);
+> +}
+> +
+> +sub randint
+> +{
+> +    my (%args) =3D @_;
+> +    my $width =3D $args{width};
+> +
+> +    if ($width > 32) {
+> +        # Generate at most 32 bits at once; Perl's rand() does not
+> +        # behave well with ranges that are too large.
+> +        my $lower =3D randint(%args, width =3D> 32);
+> +        my $upper =3D randint(%args, width =3D> $args{width} - 32);
+> +        # Use arithmetic rather than bitwise operators, since bitwise
+> +        # ops turn signed integers into unsigned.
+> +        return $upper * (1 << 32) + $lower;
+> +    } elsif ($width > 0) {
+> +        my $halfrange =3D 1 << ($width - 1);
+> +        my $value =3D int(rand(2 * $halfrange));
+> +        $value -=3D $halfrange if defined $args{signed} && $args{signed};
+> +        return $value;
+> +    } else {
+> +        return 0;
+> +    }
+>  }
+>
+>  # Progress bar implementation
 
-OK, I can certainly see why this might happen with 1GB huge pages; I
-need to have a think about a fix.
 
-> > I can imagine we might have a problem that since we only do the sleep=
- between
-> > the hugepages, if we were using 1GB hugepages then we'd see <big chun=
-k of
-> > data>[sleep]<big chunk of data>[sleep] which isn't as smooth as it us=
-ed to be.
-> >=20
-> > Can you give me some more details of your test?
->=20
-> Live migration bandwidth management testing with 2MB hugepage size:
-> sles12sp4_i440fx is a qemu/kvm guest with 6GB memory size.
-> Note: the throughput value is approximating value.
->=20
-> Terminal 1:
-> virsh migrate-setspeed sles12sp4_i440fx $bandwidth && virsh migrate --l=
-ive sles12sp4_i440fx qemu+tcp://5810f/system
->=20
-> Terminal 2:
-> virsh qemu-monitor-command sles12sp4_i440fx --hmp "info migrate"
->=20
-> bandwidth=3D5
-> throughput: 160 mbps
->=20
-> bandwidth=3D10
-> throughput: 167 mbps
->=20
-> bandwidth=3D15
-> throughput: 168 mbps
->=20
-> bandwidth=3D20
-> throughput: 168 mbps
->=20
-> bandwidth=3D21
-> throughput: 336 mbps
->=20
-> bandwidth=3D22
-> throughput: 336 mbps
->=20
-> bandwidth=3D25
-> throughput: 335.87 mbps
->=20
-> bandwidth=3D30
-> throughput: 335 mbps
->=20
-> bandwidth=3D35
-> throughput: 335 mbps
->=20
-> bandwidth=3D40
-> throughput: 335 mbps
->=20
-> bandwidth=3D45
-> throughput: 504.00 mbps
->=20
-> bandwidth=3D50
-> throughput: 500.00 mbps
->=20
-> bandwidth=3D55
-> throughput: 500.00 mbps
->=20
-> bandwidth=3D60
-> throughput: 500.00 mbps
->=20
-> bandwidth=3D65
-> throughput: 650.00 mbps
->=20
-> bandwidth=3D70
-> throughput: 660.00 mbps
-
-OK, so migrate-setspeed takes a bandwidth in MBytes/sec and I guess
-you're throughput is in MBit/sec - so at the higher end it's about
-right, and at the lower end it's way off.
-
-Let me think about a fix for this.
-
-What are you using to measure throughput?
-
-Dave
-
->=20
-> Thanks,
-> Lin
->=20
->=20
-> > Dave
-> >=20
-> > >
-> > > Thanks,
-> > > Lin
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
->=20
 --
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Alex Benn=C3=A9e
 
