@@ -2,114 +2,93 @@ Return-Path: <SRS0=r3/N=VJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 743F8C742BE
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 13:48:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3865CC742BD
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 13:49:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4AE7420863
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 13:48:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4AE7420863
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 105CF20863
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 13:49:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 105CF20863
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49598 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49604 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlvux-0006Y0-3g
-	for qemu-devel@archiver.kernel.org; Fri, 12 Jul 2019 09:48:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59808)
+	id 1hlvvC-0007Oa-BI
+	for qemu-devel@archiver.kernel.org; Fri, 12 Jul 2019 09:49:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59876)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <laurent@vivier.eu>) id 1hlvui-0005w5-IS
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 09:48:41 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hlvur-0006LN-4N
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 09:48:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1hlvuh-0005N3-Hh
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 09:48:40 -0400
-Received: from mout.kundenserver.de ([212.227.126.187]:46679)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1hlvuh-0005LB-86; Fri, 12 Jul 2019 09:48:39 -0400
-Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue012 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1MMY9X-1i5WC80byh-00JWym; Fri, 12 Jul 2019 15:48:31 +0200
-To: Stefan Weil <sw@weilnetz.de>, qemu-devel@nongnu.org
-References: <20190712134307.31112-1-sw@weilnetz.de>
-From: Laurent Vivier <laurent@vivier.eu>
+ (envelope-from <mreitz@redhat.com>) id 1hlvup-0005W3-SS
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 09:48:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55746)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1hlvum-0005SE-2u; Fri, 12 Jul 2019 09:48:44 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id A3C8B308FC4D;
+ Fri, 12 Jul 2019 13:48:42 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.40.205.208])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2E57D5DD8D;
+ Fri, 12 Jul 2019 13:48:38 +0000 (UTC)
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+References: <20190711195804.30703-1-mreitz@redhat.com>
+ <20190711195804.30703-3-mreitz@redhat.com>
+ <20190712094919.GC4514@dhcp-200-226.str.redhat.com>
+ <e0d93b2b-21c2-3eaa-bf27-0a1c7f19f4e4@redhat.com>
+ <20190712111720.GF4514@dhcp-200-226.str.redhat.com>
+ <78d1d91b-8a13-9b9b-a891-650c6b4d417b@redhat.com>
 Openpgp: preference=signencrypt
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <2de83635-6db8-3fd6-d88c-ac16446cece5@vivier.eu>
-Date: Fri, 12 Jul 2019 15:48:28 +0200
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <6d7c64f1-079a-e50b-abcc-b290ae3f8137@redhat.com>
+Date: Fri, 12 Jul 2019 15:48:37 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <20190712134307.31112-1-sw@weilnetz.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:a6W5rjDCX5e4LJV7KFYkLCBftVUoE+lEeoM8IJFMcGrO8lDo51j
- ATt9vBAF/lY3Pgk5JrsfoOx0pxrJ1q9LIiQapElFo1eppg/6AFjs0P4EtHUbrEj8K1XPMhi
- hHeIIkKjYxDr46rNDUI0ldPjy6bjEif2CR+qlDCbR9lR9Yyo/PXgY4Y9Ma7OO/kup5Zdnxn
- FNgVNv5ddJ7o88Qsy7+pQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:E1P4O6DKngQ=:djjny+j+O72mWurD4sli+W
- SrOV0V5O20+RWVbmxA5mbv8FSXVaXgLlLgtFYpvE82Y9hTijv48e5tYGVVHuJZBd7PvVnMJ+U
- mhOVfmvmDVMZ+bQ6C+4XtBXCfeuGRSaj5LO4lKmbxg18+RymPeM5+XVdc7yryiGqzUXj2Ga7g
- ptksq7Yu1rWEkuJaVf9Dse2KrLKk1Iawj8A+Ap7385L7n8m/4sc7WO2UcgkHqxXMIHQlMKHJS
- r7vAh4mZJ1bfOXRbSOCeVGlL8p1GdObYI2AvjvJFxkZQaV6QRbZpjNEigBxde3rtGWQ8wYp9J
- wDdIJxskRcwOG5Mi8TRyTNhgOW4IBm/QvS2PEmMsz0wN4byxp7HLd4DTaMaZHl1IQjFzTdSei
- vF3sQIKWv0FEZLIuAfbr4k0+OC9Vu3c6Vy5mrgpTpSNFlLXL0XQyOol+BxIBxkB5zE65qNwWe
- lujZnuTsZiUp1V/YUdC45Ybr2bJ/3uw9Aa48aqILtuDVprTvvppUfCPDjweu99txZ5gasYZGg
- 5IpXIADEehdfayZARdayZ1rNi8FIvlxRlDBhnHbrIuw6Yyz5Xh/N0ZxjLrjIa1eIlhFfM4g3/
- cG7Oq8k5q6szmXtirXcGNyYv+7zq3JLgXy5AJ9PWCbeumStj9VMDTkoCjSWw8WE5Xq7PVKaZI
- 9/g2qq4zMyGgCyrZtqIps1OO87nAxLva4Fpo8vi86sbSP0o88tyOsDEa0f2jAgIaaVD8hao3H
- clvZ96/3UvLvc3uwnM8lM4wFxOegshf4wK2d/zBI+Kx2fnu7ZQr8y8GtX6k=
+In-Reply-To: <78d1d91b-8a13-9b9b-a891-650c6b4d417b@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="RfUUmvDztYnrcSR5xqB0UGA72GiOzHF6b"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.43]); Fri, 12 Jul 2019 13:48:42 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.187
-Subject: Re: [Qemu-devel] [PATCH v2] Remove old global variables max_cpus
- and smp_cpus
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [RFC 2/5] block: Generic truncation fallback
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -121,34 +100,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>,
- Like Xu <like.xu@linux.intel.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org,
+ qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 12/07/2019 à 15:43, Stefan Weil a écrit :
-> Signed-off-by: Stefan Weil <sw@weilnetz.de>
-> ---
-> v2: Remove also max_cpus (merci à Laurent Vivier <laurent@vivier.eu>)
-> 
->  include/sysemu/sysemu.h | 2 --
->  1 file changed, 2 deletions(-)
-> 
-> diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-> index 984c439ac9..e70edf7c1c 100644
-> --- a/include/sysemu/sysemu.h
-> +++ b/include/sysemu/sysemu.h
-> @@ -103,8 +103,6 @@ extern const char *keyboard_layout;
->  extern int win2k_install_hack;
->  extern int alt_grab;
->  extern int ctrl_grab;
-> -extern int smp_cpus;
-> -extern unsigned int max_cpus;
->  extern int cursor_hide;
->  extern int graphic_rotate;
->  extern int no_quit;
-> 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--RfUUmvDztYnrcSR5xqB0UGA72GiOzHF6b
+Content-Type: multipart/mixed; boundary="93rPAXAAzi4f8HKV8HCcjTLjJ7gN1Z63s";
+ protected-headers="v1"
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <6d7c64f1-079a-e50b-abcc-b290ae3f8137@redhat.com>
+Subject: Re: [RFC 2/5] block: Generic truncation fallback
+References: <20190711195804.30703-1-mreitz@redhat.com>
+ <20190711195804.30703-3-mreitz@redhat.com>
+ <20190712094919.GC4514@dhcp-200-226.str.redhat.com>
+ <e0d93b2b-21c2-3eaa-bf27-0a1c7f19f4e4@redhat.com>
+ <20190712111720.GF4514@dhcp-200-226.str.redhat.com>
+ <78d1d91b-8a13-9b9b-a891-650c6b4d417b@redhat.com>
+In-Reply-To: <78d1d91b-8a13-9b9b-a891-650c6b4d417b@redhat.com>
 
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+--93rPAXAAzi4f8HKV8HCcjTLjJ7gN1Z63s
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 12.07.19 13:48, Max Reitz wrote:
+> On 12.07.19 13:17, Kevin Wolf wrote:
+>> Am 12.07.2019 um 12:58 hat Max Reitz geschrieben:
+>>> On 12.07.19 11:49, Kevin Wolf wrote:
+>>>> Am 11.07.2019 um 21:58 hat Max Reitz geschrieben:
+>>>>> If a protocol driver does not support truncation, we call fall back=
+ to
+>>>>> effectively not doing anything if the new size is less than the act=
+ual
+>>>>> file size.  This is what we have been doing for some host device dr=
+ivers
+>>>>> already.
+>>>>
+>>>> Specifically, we're doing it for drivers that access a fixed-size im=
+age,
+>>>> i.e. block devices rather than regular files. We don't want to do th=
+is
+>>>> for drivers where the file size could be changed, but just didn't
+>>>> implement it.
+>>>>
+>>>> So I would suggest calling the function more specifically something =
+like
+>>>> bdrv_co_truncate_blockdev(), and not using it as an automatic fallba=
+ck
+>>>> in bdrv_co_truncate(), but just make it the BlockDriver.bdrv_co_trun=
+cate
+>>>> implementation for those drivers where it makes sense.
+>>>
+>>> I was thinking about this, but the problem is that .bdrv_co_truncate(=
+)
+>>> does not get a BdrvChild, so an implementation for it cannot generica=
+lly
+>>> zero the first sector (without bypassing the permission system, which=
+
+>>> would be wrong).
+>>
+>> Hm, I see. The next best thing would then probably having a bool in
+>> BlockDriver that enables the fallback.
+>>
+>>> So the function pointer would actually need to be set to something li=
+ke
+>>> (int (*)(BlockDriverState *, int64_t, PreallocMode, Error **))42ul, o=
+r a
+>>> dummy function that just aborts, and then bdrv_co_truncate() would
+>>> recognize this magic constant.  But that seemed so weird to me that I=
+
+>>> decided just not to do it, mostly because I was wondering what would =
+be
+>>> so bad about treating images whose size we cannot change because we
+>>> haven=E2=80=99t implemented it exactly like fixed-size images.
+>>>
+>>> (Also, =E2=80=9Cfixed-size=E2=80=9D is up to interpretation.  You can=
+ change an LVM
+>>> volume=E2=80=99s size.  qemu doesn=E2=80=99t do it, obviously.  But t=
+hat is the reason
+>>> for the warning qemu-img resize emits when it sees that the file size=
+
+>>> did not change.)
+>>>
+>>>> And of course, we only need these fake implementations because qemu-=
+img
+>>>> (or .bdrv_co_create_opts) always wants to create the protocol level.=
+ If
+>>>> we could avoid this, then we wouldn't need any of this.
+>>>
+>>> It=E2=80=99s trivial to avoid this.  I mean, patch 4 does exactly tha=
+t.
+>>>
+>>> So it isn=E2=80=99t about avoiding creating the protocol level, it=E2=
+=80=99s about
+>>> avoiding the truncation there.  But why would you do that?
+>>
+>> Because we can't actually truncate there. We can only do the fake thin=
+g
+>> and claim we have truncated even though the size didn't change.
+>=20
+> You=E2=80=99re right.  I actually didn=E2=80=99t realize that we have n=
+o drivers that
+> support truncation, but not image creation.
+>=20
+> Yes, then it=E2=80=99s stupid.
+>=20
+> I thought it was a reasonable thing to do for such drivers.
+>=20
+> So I suppose the best thing is to do what I hinted at in my reply to
+> your reply to patch 3, which is to drop patches 2 and 3 and instead mak=
+e
+> the creation fallback work around blk_truncate() failures.
+
+Oh no.  Now I remember.  The problem with that is that nowadays all
+format drivers truncate the protocol file to 0 in their
+=2Ebdrv_co_create() implementation.  Aw, man.
+
+Max
+
+
+--93rPAXAAzi4f8HKV8HCcjTLjJ7gN1Z63s--
+
+--RfUUmvDztYnrcSR5xqB0UGA72GiOzHF6b
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0oj7UACgkQ9AfbAGHV
+z0CqCQgAnjWobyO2QlDE4RwprU+Bie2tSHcGQxoFAi2/BajpozJlRyF3W3BynQW8
+qDPaYcGgdxmWH9N2uL3ReIVTWqBEc3sF7yAamerlhdgL+2mAiqltKirR4POhthaE
+l6um96BqpYD9eALpwilz7uVszJjNPpM/Nqftrae37gT+8OWpaUa0m4zO5/486Au6
+zptJIPmCMzQ09r7++aELnnl0dmDh++5L2F0aURbw0ccINWo6/eEneV95b6mFr22J
+t/w0VK+b+PAyV+Uc01OH2RyT/4pr7rtBEPrMBcpHywzraE9WugDyzS++0OsF+R7y
+DukPHbWaAs3SHK6e8kpD2b5XDsQJaw==
+=mutK
+-----END PGP SIGNATURE-----
+
+--RfUUmvDztYnrcSR5xqB0UGA72GiOzHF6b--
 
