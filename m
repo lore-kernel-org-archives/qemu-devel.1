@@ -2,63 +2,92 @@ Return-Path: <SRS0=r3/N=VJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2714C742BD
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 14:07:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C20ADC742BD
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 14:11:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CA302206B8
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 14:07:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA302206B8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8D751206B8
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 14:11:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Zqj82EOw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D751206B8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49764 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49786 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlwCf-0005SW-3G
-	for qemu-devel@archiver.kernel.org; Fri, 12 Jul 2019 10:07:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36330)
+	id 1hlwHA-0007WH-PG
+	for qemu-devel@archiver.kernel.org; Fri, 12 Jul 2019 10:11:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37741)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <quintela@redhat.com>) id 1hlwCU-00054A-IX
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 10:07:03 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1hlwH1-00077e-3b
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 10:11:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <quintela@redhat.com>) id 1hlwCT-0004yB-Df
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 10:07:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60802)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1hlwCT-0004wH-5y
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 10:07:01 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id C45D8307CDEA;
- Fri, 12 Jul 2019 14:06:58 +0000 (UTC)
-Received: from redhat.com (ovpn-117-198.ams2.redhat.com [10.36.117.198])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E62DA5DABA;
- Fri, 12 Jul 2019 14:06:57 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-In-Reply-To: <CAFEAcA8uwgmV47Dt8e=ZRLzssXKWn+1DivDFEuN5s2+N1FJX3w@mail.gmail.com>
- (Peter Maydell's message of "Thu, 11 Jul 2019 13:39:50 +0100")
-References: <20190711104412.31233-1-quintela@redhat.com>
- <CAFEAcA8uwgmV47Dt8e=ZRLzssXKWn+1DivDFEuN5s2+N1FJX3w@mail.gmail.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
-Date: Fri, 12 Jul 2019 16:06:53 +0200
-Message-ID: <878st38hz6.fsf@trasno.org>
+ (envelope-from <richard.henderson@linaro.org>) id 1hlwH0-0001Dm-7z
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 10:11:43 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:36532)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1hlwGz-0001B2-V2
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 10:11:42 -0400
+Received: by mail-wm1-x342.google.com with SMTP id g67so5002784wme.1
+ for <qemu-devel@nongnu.org>; Fri, 12 Jul 2019 07:11:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=gVJNQGFPci9HyRrvHKlpViAJlnldLr7VHGtvnbAYDGE=;
+ b=Zqj82EOwzqQO2i20gJ1sx7Wz3jiiWwrexUPc7yv/X6pNkqOhAfcQZRkCJXYSblUhku
+ 87F2xxRiaB5NH5q/O8++clWwUHq8fYGKSG0nOODhf+kVe8WGHmHah3eiDCr3LgXQlzB6
+ UjIXfEKemjl3DkQ883ZW4yB/d+Ku+iHf6rN/NDVNYcuSmKG0gH9NTsWPM/4Gq/1zvsTH
+ K6581geOtvSqSHlZrZQ0kFV8LnY3TvULQSZ18hrV8lR2cxEVQa5Opt65wjcZvIJM3hGR
+ sZClVQv32qOcYtf909osoAFynQ5ZckMQRsby+YWHxN5THv8xkrwSm6q+uy0Ggm+ULtHj
+ VJZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=gVJNQGFPci9HyRrvHKlpViAJlnldLr7VHGtvnbAYDGE=;
+ b=QJNwoKM1beapZVHQab+k1raXBPUNQozvwNeZF4zqZjRyTC0c+k+q4URBWkiZ86JbUg
+ QsHy6kNU0c7aS2CkChq21quaJ17mzU4BgYXgQFfMnOOUekzha7e+6GwDR7QzPUN/dJYz
+ Mo3upnnS6FOfqht9ElyzoYDltwaOsgb3f3swqfHBLU5rnEmdaSgBk49c0JQ4A/IR/8HR
+ rpCtYPUb6tE45+8zIZtongbGtCg7RjJtXp3dT+DQNQ2Dfy+dPcZ67Xo1on6NJQUPFzzr
+ ThkpSgfJ5k1Atw9NhmUr0xxdE1ijCgmZvO0/6kFa7gYgyDvOvhGsnBv1hv87cvuWOKTj
+ bvJA==
+X-Gm-Message-State: APjAAAUhkiKIwRMoov089Se3z/M9FbXUsIh0pavGVvCSEqmSA59iTrEx
+ LkIo1NtkPchiMwtIY9HLkoNg+g==
+X-Google-Smtp-Source: APXvYqyGJcrLvuw4b6wvKZsO6Idp6qAa9zo2MSfvxgIpZ58vIbV/ZMkkBEYSaLh937sS0qa5x62fpQ==
+X-Received: by 2002:a05:600c:da:: with SMTP id
+ u26mr9730127wmm.108.1562940699868; 
+ Fri, 12 Jul 2019 07:11:39 -0700 (PDT)
+Received: from [192.168.42.31] ([176.12.107.132])
+ by smtp.gmail.com with ESMTPSA id i18sm9545838wrp.91.2019.07.12.07.11.38
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Fri, 12 Jul 2019 07:11:39 -0700 (PDT)
+To: Jan Bobek <jan.bobek@gmail.com>, qemu-devel@nongnu.org
+References: <20190711223300.6061-1-jan.bobek@gmail.com>
+ <20190711223300.6061-4-jan.bobek@gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <0579d0d3-d067-7f4c-0a67-e3013232c85d@linaro.org>
+Date: Fri, 12 Jul 2019 16:11:35 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Fri, 12 Jul 2019 14:06:58 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PULL 00/19] Migration patches
+In-Reply-To: <20190711223300.6061-4-jan.bobek@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::342
+Subject: Re: [Qemu-devel] [RISU PATCH v3 03/18] risugen_x86_asm: add module
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,74 +99,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: quintela@redhat.com
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- kvm-devel <kvm@vger.kernel.org>, QEMU Developers <qemu-devel@nongnu.org>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Peter Maydell <peter.maydell@linaro.org> wrote:
-> On Thu, 11 Jul 2019 at 11:56, Juan Quintela <quintela@redhat.com> wrote:
->>
->> The following changes since commit 6df2cdf44a82426f7a59dcb03f0dd2181ed7fdfa:
->>
->>   Update version for v4.1.0-rc0 release (2019-07-09 17:21:53 +0100)
->>
->> are available in the Git repository at:
->>
->>   https://github.com/juanquintela/qemu.git tags/migration-pull-request
->>
->> for you to fetch changes up to 0b47e79b3d04f500b6f3490628905ec5884133df:
->>
->>   migration: allow private destination ram with x-ignore-shared
->> (2019-07-11 12:30:40 +0200)
->>
->> ----------------------------------------------------------------
->> Migration pull request
->>
->> ----------------------------------------------------------------
->
-> Hi; this fails "make check" on aarch32 host (possibly a general
-> 32-bit host issue, as this is the only 32-bit host I test on):
->
-> MALLOC_PERTURB_=${MALLOC_PERTURB_:-$(( ${RANDOM:-0} % 255 + 1))}
-> tests/test-bitmap -m=quick -k --tap < /dev/null |
-> ./scripts/tap-driver.pl --test-name="test-bitmap"
-> **
-> ERROR:/home/peter.maydell/qemu/tests/test-bitmap.c:39:check_bitmap_copy_with_offset:
-> assertion failed (bmap1 == bmap2)
-> Aborted
-> ERROR - Bail out!
-> ERROR:/home/peter.maydell/qemu/tests/test-bitmap.c:39:check_bitmap_copy_with_offset:
-> assertion failed (bmap1 == bmap2)
-> /home/peter.maydell/qemu/tests/Makefile.include:904: recipe for target
-> 'check-unit' failed
+On 7/12/19 12:32 AM, Jan Bobek wrote:
+> The module risugen_x86_asm.pm exports named register constants and
+> asm_insn_* family of functions, which greatly simplify emission of x86
+> instructions.
+> 
+> Signed-off-by: Jan Bobek <jan.bobek@gmail.com>
+> ---
+>  risugen_x86_asm.pm | 918 +++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 918 insertions(+)
+>  create mode 100644 risugen_x86_asm.pm
 
-Problem fixed, the code is right (TM), the test is wrong (also TM).
+Clever use of token lists to make sure all state is processed as expected.  Kudos!
 
-@@ -35,8 +36,8 @@ static void check_bitmap_copy_with_offset(void)
-     /* Shift back 200 bits back */
-     bitmap_copy_with_src_offset(bmap2, bmap3, 200, total);
- 
--    g_assert_cmpmem(bmap1, total / sizeof(unsigned long),
--                    bmap2, total / sizeof(unsigned long));
-+    g_assert_cmpmem(bmap1, total / BITS_PER_LONG,
-+                    bmap2, total / BITS_PER_LONG);
- 
-     bitmap_clear(bmap1, 0, BMAP_SIZE);
-     /* Set bits in bmap1 are 100-245 */
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
 
-A long has 32 or 64 bits, not 4 or 8.
-
-And why it worked in 64 bit?  Due to (bad?) luck.  64 bit is bigger, and
-then it "overwrote" everypthing, and then it ends being zero on
-destination by luck.
-
-Resending.
-
-Later, Juan.
+r~
 
