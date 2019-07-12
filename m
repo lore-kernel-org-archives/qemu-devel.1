@@ -6,44 +6,43 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63821C742D7
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 18:33:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E65E8C742D7
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 18:35:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 29557205ED
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 18:33:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 29557205ED
+	by mail.kernel.org (Postfix) with ESMTPS id C35D32064A
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 18:35:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C35D32064A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51798 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51818 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hm0Ma-0007vW-4Z
-	for qemu-devel@archiver.kernel.org; Fri, 12 Jul 2019 14:33:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57454)
+	id 1hm0OL-0001dN-Pf
+	for qemu-devel@archiver.kernel.org; Fri, 12 Jul 2019 14:35:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58067)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hm0MI-0007Jv-Te
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 14:33:28 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hm0O9-0001Ad-5Y
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 14:35:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hm0ME-0001pU-Mj
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 14:33:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50294)
+ (envelope-from <mreitz@redhat.com>) id 1hm0O7-0002y2-U5
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 14:35:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33040)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hm0MB-0001ns-3K; Fri, 12 Jul 2019 14:33:19 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ id 1hm0O5-0002vU-Bw; Fri, 12 Jul 2019 14:35:17 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 0595A8762F;
- Fri, 12 Jul 2019 18:33:18 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 0E45B30821C2;
+ Fri, 12 Jul 2019 18:35:16 +0000 (UTC)
 Received: from dresden.str.redhat.com (unknown [10.40.205.208])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 752031F8;
- Fri, 12 Jul 2019 18:33:16 +0000 (UTC)
-To: Stefano Garzarella <sgarzare@redhat.com>
-References: <20190711132935.13070-1-mreitz@redhat.com>
- <20190712102735.ea5f4aqqgok7qdxa@steredhat>
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id AA33419C58;
+ Fri, 12 Jul 2019 18:35:14 +0000 (UTC)
+To: Stefano Garzarella <sgarzare@redhat.com>, qemu-devel@nongnu.org
+References: <20190712104617.94707-1-sgarzare@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
@@ -70,22 +69,22 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <b77578d8-3da7-e0c7-75db-69f078cfcbda@redhat.com>
-Date: Fri, 12 Jul 2019 20:33:14 +0200
+Message-ID: <5017daf6-2739-d260-09fd-cfccd6c77bc1@redhat.com>
+Date: Fri, 12 Jul 2019 20:35:12 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <20190712102735.ea5f4aqqgok7qdxa@steredhat>
+In-Reply-To: <20190712104617.94707-1-sgarzare@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="7sRMgQkiwau2DWpIftrvkujfrL7HZZZco"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+ boundary="EkaMIiSTWCEbEEDJDjty2n15E6KOk3WRp"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.26]); Fri, 12 Jul 2019 18:33:18 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.47]); Fri, 12 Jul 2019 18:35:16 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] doc: Preallocation does not
- require writing zeroes
+Subject: Re: [Qemu-devel] [PATCH] gluster: fix .bdrv_reopen_prepare when
+ backing file is a JSON object
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,247 +96,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, qemu-block@nongnu.org,
- qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, integration@gluster.org,
+ qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---7sRMgQkiwau2DWpIftrvkujfrL7HZZZco
-Content-Type: multipart/mixed; boundary="n1NRKKs5uUEUqqJEv0jawCciiF1AGTEmz";
+--EkaMIiSTWCEbEEDJDjty2n15E6KOk3WRp
+Content-Type: multipart/mixed; boundary="ifxEAJ4CyqmednUgqqHNnmPy8NcHAT7ha";
  protected-headers="v1"
 From: Max Reitz <mreitz@redhat.com>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Message-ID: <b77578d8-3da7-e0c7-75db-69f078cfcbda@redhat.com>
-Subject: Re: [Qemu-block] [PATCH] doc: Preallocation does not require writing
- zeroes
-References: <20190711132935.13070-1-mreitz@redhat.com>
- <20190712102735.ea5f4aqqgok7qdxa@steredhat>
-In-Reply-To: <20190712102735.ea5f4aqqgok7qdxa@steredhat>
+To: Stefano Garzarella <sgarzare@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ integration@gluster.org
+Message-ID: <5017daf6-2739-d260-09fd-cfccd6c77bc1@redhat.com>
+Subject: Re: [PATCH] gluster: fix .bdrv_reopen_prepare when backing file is a
+ JSON object
+References: <20190712104617.94707-1-sgarzare@redhat.com>
+In-Reply-To: <20190712104617.94707-1-sgarzare@redhat.com>
 
---n1NRKKs5uUEUqqJEv0jawCciiF1AGTEmz
+--ifxEAJ4CyqmednUgqqHNnmPy8NcHAT7ha
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 12.07.19 12:27, Stefano Garzarella wrote:
-> On Thu, Jul 11, 2019 at 03:29:35PM +0200, Max Reitz wrote:
->> When preallocating an encrypted qcow2 image, it just lets the protocol=
-
->> driver write data and then does not mark the clusters as zero.
->> Therefore, reading this image will yield effectively random data.
->>
->> As such, we have not fulfilled the promise of always writing zeroes wh=
-en
->> preallocating an image in a while.  It seems that nobody has really
->> cared, so change the documentation to conform to qemu's actual behavio=
-r.
->>
->> Signed-off-by: Max Reitz <mreitz@redhat.com>
->> ---
->>  qapi/block-core.json         | 9 +++++----
->>  docs/qemu-block-drivers.texi | 4 ++--
->>  qemu-img.texi                | 4 ++--
->>  3 files changed, 9 insertions(+), 8 deletions(-)
->>
->> diff --git a/qapi/block-core.json b/qapi/block-core.json
->> index 0d43d4f37c..a4363b84d2 100644
->> --- a/qapi/block-core.json
->> +++ b/qapi/block-core.json
->> @@ -5167,10 +5167,11 @@
->>  # @off: no preallocation
->>  # @metadata: preallocate only for metadata
->>  # @falloc: like @full preallocation but allocate disk space by
->> -#          posix_fallocate() rather than writing zeros.
->> -# @full: preallocate all data by writing zeros to device to ensure di=
-sk
->> -#        space is really available. @full preallocation also sets up
->> -#        metadata correctly.
->> +#          posix_fallocate() rather than writing data.
->> +# @full: preallocate all data by writing it to the device to ensure
->> +#        disk space is really available. This data may or may not be
->> +#        zero, depending on the image format and storage.
->> +#        @full preallocation also sets up metadata correctly.
->>  #
->>  # Since: 2.2
->>  ##
->> diff --git a/docs/qemu-block-drivers.texi b/docs/qemu-block-drivers.te=
-xi
->> index 91ab0eceae..c02547e28c 100644
->> --- a/docs/qemu-block-drivers.texi
->> +++ b/docs/qemu-block-drivers.texi
->> @@ -31,8 +31,8 @@ Supported options:
->>  @item preallocation
->>  Preallocation mode (allowed values: @code{off}, @code{falloc}, @code{=
-full}).
->>  @code{falloc} mode preallocates space for image by calling posix_fall=
-ocate().
->> -@code{full} mode preallocates space for image by writing zeros to und=
-erlying
->> -storage.
->> +@code{full} mode preallocates space for image by writing data to unde=
-rlying
->> +storage.  This data may or may not be zero, depending on the storage =
-location.
->>  @end table
->> =20
->>  @item qcow2
->> diff --git a/qemu-img.texi b/qemu-img.texi
->> index c8e9bba515..b5156d6316 100644
->> --- a/qemu-img.texi
->> +++ b/qemu-img.texi
->> @@ -666,8 +666,8 @@ Supported options:
->>  @item preallocation
->>  Preallocation mode (allowed values: @code{off}, @code{falloc}, @code{=
-full}).
->>  @code{falloc} mode preallocates space for image by calling posix_fall=
-ocate().
->> -@code{full} mode preallocates space for image by writing zeros to und=
-erlying
->> -storage.
->> +@code{full} mode preallocates space for image by writing data to unde=
-rlying
->> +storage.  This data may or may not be zero, depending on the storage =
-location.
->>  @end table
->> =20
->>  @item qcow2
+On 12.07.19 12:46, Stefano Garzarella wrote:
+> When the backing_file is specified as a JSON object, the
+> qemu_gluster_reopen_prepare() fails with this message:
+>     invalid URI json:{"server.0.host": ...}
 >=20
-> Just a question:
+> In this case, we should call qemu_gluster_init() using the QDict
+> 'state->options' that contains the parameters already parsed.
+>=20
+> Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=3D1542445
+> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> ---
+>  block/gluster.c | 11 ++++++++++-
+>  1 file changed, 10 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/block/gluster.c b/block/gluster.c
+> index 62f8ff2147..26971db1ea 100644
+> --- a/block/gluster.c
+> +++ b/block/gluster.c
+> @@ -931,7 +931,16 @@ static int qemu_gluster_reopen_prepare(BDRVReopenS=
+tate *state,
+>      gconf->has_debug =3D true;
+>      gconf->logfile =3D g_strdup(s->logfile);
+>      gconf->has_logfile =3D true;
+> -    reop_s->glfs =3D qemu_gluster_init(gconf, state->bs->filename, NUL=
+L, errp);
+> +    /*
+> +     * If 'bs->filename' starts with "json:", then 'state->options' wi=
+ll
+> +     * contain the parameters already parsed.
+> +     */
+> +    if (state->bs->filename && !strstart(state->bs->filename, "json:",=
+ NULL)) {
+> +        reop_s->glfs =3D qemu_gluster_init(gconf, state->bs->filename,=
+ NULL,
+> +                                         errp);
+> +    } else {
+> +        reop_s->glfs =3D qemu_gluster_init(gconf, NULL, state->options=
+, errp);
+> +    }
 
-But a very good one, actually.
-
-> if a protocol driver returns 1 with the .bdrv_has_zero_init callback, i=
-s it
-> expected that the preallocation will fill the image with zeroes?
-
-Yes.
-
-> IIUC, for example, the qcow2 returns 1 with the .bdrv_has_zero_init. bu=
-t during
-> the qcow2_co_truncate() it calls bdrv_co_truncate() and, depending on t=
-he
-> backend driver, it should fill the image with zeroes (or not?).
-
-Yes.
-
-> Maybe I miss something related to the metadata...
-
-Well.  If the image isn=E2=80=99t preallocated, all will be well because =
-nothing
-of the added range is entered into the metadata, so it returns zero when
-read (unless there is a backing file, but that is handled independently
-of has_zero_init).
-
-But you were asking about preallocation.  As I wrote in the commit
-message, the qcow2 driver lets the protocol driver preallocate the data
-and then enters it as normal data clusters into its metadata.  If the
-image is encrypted, it will appears as random data (or if the protocol
-dirver writes non-zero data).  But then it shouldn=E2=80=99t report
-has_zero_init as 1.
-
-Let=E2=80=99s test it.
-
-$ qemu-img create -f qcow2 src.qcow2 64M
-Formatting 'src.qcow2', fmt=3Dqcow2 size=3D67108864 cluster_size=3D65536
-lazy_refcounts=3Doff refcount_bits=3D16
-$ qemu-img convert -O qcow2 \
-    -o \
-    encrypt.format=3Dluks,encrypt.key-secret=3Dpass,preallocation=3Dmetad=
-ata \
-    --object secret,id=3Dpass,data=3D123456 \
-    src.qcow2 dest.qcow2
-$ qemu-img compare --image-opts \
-    file.filename=3Dsrc.qcow2 \
-    file.filename=3Ddest.qcow2,encrypt.key-secret=3Dpass \
-    --object secret,id=3Dpass,data=3D123456
-Content mismatch at offset 0!
-
-Oops.
-
-
-So.  We can do two things here.
-
-(A) We drop this patch and actually make sure that preallocation always
-writes zeroes, and if that cannot be done efficiently, then too bad.
-
-Note that for qcow2, we cannot just mark all clusters as zero clusters
-because that would kind of defeat the purpose of metadata preallocation.
- One of its main purposes is to prevent COW when you write to a new
-image, i.e. that the qcow2 driver needs to do a read-modify-write cycle
-just to zero a new cluster.  If we kept preallocating potentially random
-data and hooked it up as preallocated zero clusters, those RMW cycles
-would remain, thus defeating the point of metadata preallocation.  So
-even for qcow2, if there is a chance that the data stored is not zero,
-it needs to explicitly store zeroes then.
-
-But the good thing here is that the protocol driver would always
-guarantee that it preallocates pure zeroes.
-
-The bad thing is that I don=E2=80=99t think we could support pure metadat=
-a or
-falloc preallocation together with encryption any longer, which would
-definitely be an incompatible change.  Well, because we wouldn=E2=80=99t =
-want to
-break this support, I suppose we would in this case (encryption) resort
-to linking the data clusters as preallocated zero clusters.  Which is
-bad because of RMW. but well.  That=E2=80=99s life.
-
-
-(B) We keep this patch and audit our use of bdrv_has_zero_init().  So
-for qcow2, we need to return 0 for encrypted images.  That is suboptimal
-for non-preallocated encrypted images, but again, that=E2=80=99s life.
-
-Also, we need to return 0 if the protocol layer does not preallocate the
-data to be zero -- which we can see from its setting of
-bdrv_has_zero_init(), I=E2=80=99d suppose.  So for preallocated unencrypt=
-ed
-images, qcow2 would need to return bdrv_has_zero_init(s->data_file->bs).
-
-But here=E2=80=99s the problem: How do we know whether an image has been
-preallocated or not?  And that is a problem.  I don=E2=80=99t know a solu=
-tion
-off the top of my head.  We could add a parameter to
-bdrv_has_zero_init() for that, but what would blockdev-mirror assume?
-It doesn=E2=80=99t know.
-
-Hm.  I suppose qcow2=E2=80=99s implementation could sift through its L2 t=
-ables
-and if there are any links to data clusters, it is by definition in some
-way preallocated.
-
-
-So I suppose B seems like the better solution if there is a way for all
-format drivers to determine whether their image has been preallocated or
-not?
+Hmmm, aren=E2=80=99t they always in state->options?
 
 Max
 
 
---n1NRKKs5uUEUqqJEv0jawCciiF1AGTEmz--
+--ifxEAJ4CyqmednUgqqHNnmPy8NcHAT7ha--
 
---7sRMgQkiwau2DWpIftrvkujfrL7HZZZco
+--EkaMIiSTWCEbEEDJDjty2n15E6KOk3WRp
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0o0moACgkQ9AfbAGHV
-z0BLrAf9GpCg1Cx9Qq1zWYOUjxW1x2f7EBsEtWet+aJm31PT1CJYmd8gNRNJyOZJ
-NHNVrcKxFX6c/xZSWOWzaGztcGipbwie9buo6N7qhmu/p3inkc+iXPDnu2XLYbzs
-xj5BU7fXku2QrooVUCOT9zA53C9/i1BOoAs5BCP0Mw95+fneyOWfstHlPCiEuEiJ
-4UIKgTsALnbcXIBlTgZHlNsbB9QJT7qEBaWVaYwfuQGdItBYOnVoKNsn4/yHphG/
-rXhIbQGL7zPZ5KPX3Mg8OfjBZ4Y+V3JSA3h3OsnI1L+z7Mq91pussO1bbTTLLUmf
-DgStZ4YN5kBPmGmtia2L1SZjLA5/cQ==
-=m4ap
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0o0uEACgkQ9AfbAGHV
+z0DVGQf/Q6xQ82Nj5mh+ssybEiL8Cno2V1CUOVZIWayYEWJ3z2tAKm8O70SLNpA7
+1HFPu2grsn6c5RO7x4ZA0M7Ic0U54WxiugTQWMkMvfyE8Zbw5wbIh0YQSz/SVwmz
+AxcAwVQ2T5qVaCjN4xHy0dDcqTr3G/okM49RljPfaJzvQ+f/p074ZKMmogWlqVT+
+L0ab6/Fy6pRdv+G0wntVLpmf8HFw04owdLg433sC7EYBBQ2ddGaMGjomOVuN0/ee
+6D6iEIxuGu/H7asqzQ+PwPMqC/LcwwEVuyW1jaFXzn9UE+zWhIbCeJX+Ktgtu0Gg
+MNPBfEYfV5zqvW8NXG6Ursr2VUvIXw==
+=2Plt
 -----END PGP SIGNATURE-----
 
---7sRMgQkiwau2DWpIftrvkujfrL7HZZZco--
+--EkaMIiSTWCEbEEDJDjty2n15E6KOk3WRp--
 
