@@ -2,81 +2,56 @@ Return-Path: <SRS0=r3/N=VJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC008C742BD
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 14:47:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F4B5C742C7
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 14:50:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A8B51208E4
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 14:47:38 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gT7i5Zsj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8B51208E4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 64DFB2080A
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 14:50:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 64DFB2080A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50226 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50232 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlwpl-0002Of-Oa
-	for qemu-devel@archiver.kernel.org; Fri, 12 Jul 2019 10:47:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49696)
+	id 1hlwsc-0003cL-FX
+	for qemu-devel@archiver.kernel.org; Fri, 12 Jul 2019 10:50:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50361)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <marcandre.lureau@gmail.com>) id 1hlwpZ-0001tX-Fn
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 10:47:26 -0400
+ (envelope-from <julio.montes@intel.com>) id 1hlwsQ-0003Cb-Rs
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 10:50:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@gmail.com>) id 1hlwpY-0004ln-FO
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 10:47:25 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:44782)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
- id 1hlwpV-0004i2-Fd; Fri, 12 Jul 2019 10:47:21 -0400
-Received: by mail-wr1-x441.google.com with SMTP id p17so10241018wrf.11;
- Fri, 12 Jul 2019 07:47:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=04IwV+TUkf32mECcVEsbSZGl4M5f9jdHOjZ03oGi6Iw=;
- b=gT7i5ZsjWXdy15NmIG7j9rCS8yAIpX7O0Ikgo6W01/b0XIWHv5yTWyY2eXyWb2SfMb
- QMEANyVdBLN+ZQBQjsaTzfR6VaPGJGxQfCGY//WJD4LqMOIFU1IeJo1gOqEmqFtaV/IV
- r5XA56Z/ftjg+1fXkYYODLe17xP1pq0EhVoQGavgiy/ZrHNCFWxsr0iANKCZq0n8PpGE
- ZdMi+i9XNdfCIlK1U+frxA5koJNTakrxQ++4tNVnBxjn8vsHbTBGIH6P1MkyeIa/sWZk
- OSpbtvGkTvijSXdpgHmYmI2q+atXMalLgp6wSsX48ooHHWQvkXEig6lUMM0Yph3slLd/
- C4hQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=04IwV+TUkf32mECcVEsbSZGl4M5f9jdHOjZ03oGi6Iw=;
- b=K6aumokdCDEddhYCiXIbCXtg7qSV1kbTRw0dE61iw5iA9bY3nLXDl5jTOcQyxjgnMD
- MtP6YwdA6qYBVuf+IKlxtJsnFKKZ3HkwpRFuDs6IgAjIOf1gyvWh39TW77WbP+waK6Y5
- TAZ9rijQhB3Lu82LdSY3YvlJyzMHcUI3fkNkMM7GXnbb9zsZ8XYet6dlMyKNSf5a9TvZ
- 6pQDsEyRqK7/qWL6CNCaxgOj9o0/1PBFOK1N5jK+2goclp2qbg9w0eUkmX/+PQUN5ptN
- Nag1+djMkxOz1E55qj9NGcJeWujgR0/6P7rCQsT2BrT16nVFmwKdE9YV+SLvSI2MQDKi
- hwLQ==
-X-Gm-Message-State: APjAAAXqd0lPMeyQxtRNm5EYbhszEz0nBsZS6bexq6reWlLPtNI0VVhm
- 7+ULe/jJdeBSymRg9DvKV2Or22Hjhmxc3KcQKmg=
-X-Google-Smtp-Source: APXvYqykVOR23LPyiBdtOvs4b7mcYSFCiCs1peUr1LfIqA03SbKrWWf/ELMNSPO9X27Mo3F4Tn6kzYAEfkl9Dg0yJ5k=
-X-Received: by 2002:adf:c70e:: with SMTP id k14mr12542106wrg.201.1562942839527; 
- Fri, 12 Jul 2019 07:47:19 -0700 (PDT)
-MIME-Version: 1.0
-References: <db150a03315a89a849ab9968e4a5a26110d41424.1562942402.git.mprivozn@redhat.com>
-In-Reply-To: <db150a03315a89a849ab9968e4a5a26110d41424.1562942402.git.mprivozn@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Fri, 12 Jul 2019 18:47:07 +0400
-Message-ID: <CAJ+F1CLm251K1ysYKMxyovRFv1KA8b=R6hEh_=Z+bCatjCvyZw@mail.gmail.com>
-To: Michal Privoznik <mprivozn@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+ (envelope-from <julio.montes@intel.com>) id 1hlwsP-0006g5-UF
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 10:50:22 -0400
+Received: from mga11.intel.com ([192.55.52.93]:19585)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <julio.montes@intel.com>)
+ id 1hlwsP-0006dU-Lk
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 10:50:21 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+ by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 12 Jul 2019 07:50:18 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.63,482,1557212400"; d="scan'208";a="186615576"
+Received: from unknown (HELO fedora.zpn.intel.com.) ([10.219.4.39])
+ by fmsmga001.fm.intel.com with ESMTP; 12 Jul 2019 07:50:17 -0700
+From: Julio Montes <julio.montes@intel.com>
+To: qemu-devel@nongnu.org
+Date: Fri, 12 Jul 2019 14:50:17 +0000
+Message-Id: <20190712145017.17879-1-julio.montes@intel.com>
+X-Mailer: git-send-email 2.17.2
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::441
-Subject: Re: [Qemu-devel] [PATCH] .gitignore: ignore some vhost-user*
- related files
+X-Received-From: 192.55.52.93
+Subject: [Qemu-devel] [PATCH] hw/i386: turn off vmport if CONFIG_VMPORT is
+ disabled
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,55 +63,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu trival <qemu-trivial@nongnu.org>, QEMU <qemu-devel@nongnu.org>,
- Laurent Vivier <laurent@vivier.eu>
+Cc: Julio Montes <julio.montes@intel.com>, pbonzini@redhat.com,
+ philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jul 12, 2019 at 6:42 PM Michal Privoznik <mprivozn@redhat.com> wrot=
-e:
->
-> Commit d52c454aadc creates
-> '/contrib/vhost-user-gpu/50-qemu-gpu.json' and '/vhost-user-gpu'
-> and commit 06914c97d3a creates '/vhost-user-input' neither of
-> which is ignored by git.
->
-> Signed-off-by: Michal Privoznik <mprivozn@redhat.com>
+vmport device is not included when CONFIG_VMPORT is disabled, hence
+QEMU fails with the following error:
 
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+`Unknown device 'vmport' for bus 'ISA': unknown.`
 
-> ---
->  .gitignore | 3 +++
->  1 file changed, 3 insertions(+)
->
-> diff --git a/.gitignore b/.gitignore
-> index fd6e6c38c7..e9bbc006d3 100644
-> --- a/.gitignore
-> +++ b/.gitignore
-> @@ -65,6 +65,8 @@
->  /scsi/qemu-pr-helper
->  /vhost-user-scsi
->  /vhost-user-blk
-> +/vhost-user-gpu
-> +/vhost-user-input
->  /fsdev/virtfs-proxy-helper
->  *.tmp
->  *.[1-9]
-> @@ -131,6 +133,7 @@
->  /docs/interop/qemu-qmp-ref.info*
->  /docs/interop/qemu-qmp-ref.txt
->  /docs/version.texi
-> +/contrib/vhost-user-gpu/50-qemu-gpu.json
->  *.tps
->  .stgit-*
->  .git-submodule-status
-> --
-> 2.21.0
->
->
+Signed-off-by: Julio Montes <julio.montes@intel.com>
+---
+ hw/i386/pc.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index c33ce47578..549c437050 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -83,6 +83,7 @@
+ #include "hw/mem/memory-device.h"
+ #include "sysemu/replay.h"
+ #include "qapi/qmp/qerror.h"
++#include "config-devices.h"
+ 
+ /* debug PC/ISA interrupts */
+ //#define DEBUG_IRQ
+@@ -2793,7 +2794,11 @@ static void pc_machine_initfn(Object *obj)
+ 
+     pcms->max_ram_below_4g = 0; /* use default */
+     pcms->smm = ON_OFF_AUTO_AUTO;
++#ifdef CONFIG_VMPORT
+     pcms->vmport = ON_OFF_AUTO_AUTO;
++#else
++    pcms->vmport = ON_OFF_AUTO_OFF;
++#endif /* CONFIG_VMPORT */
+     /* acpi build is enabled by default if machine supports it */
+     pcms->acpi_build_enabled = PC_MACHINE_GET_CLASS(pcms)->has_acpi_build;
+     pcms->smbus_enabled = true;
+-- 
+2.17.2
 
---=20
-Marc-Andr=C3=A9 Lureau
 
