@@ -2,76 +2,70 @@ Return-Path: <SRS0=r3/N=VJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 756EBC742A5
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 08:30:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DD2AC742A8
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 08:32:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4D17021019
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 08:30:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D17021019
+	by mail.kernel.org (Postfix) with ESMTPS id 4F88021019
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 08:32:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F88021019
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47530 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47552 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlqxB-0002q2-6Y
-	for qemu-devel@archiver.kernel.org; Fri, 12 Jul 2019 04:30:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55061)
+	id 1hlqyY-0003xf-43
+	for qemu-devel@archiver.kernel.org; Fri, 12 Jul 2019 04:32:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55561)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <sgarzare@redhat.com>) id 1hlqwz-0002Rh-Qi
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 04:30:42 -0400
+ (envelope-from <pagupta@redhat.com>) id 1hlqyM-0003Uq-Ce
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 04:32:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <sgarzare@redhat.com>) id 1hlqwy-0003sI-Ub
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 04:30:41 -0400
-Received: from mail-wr1-f45.google.com ([209.85.221.45]:36150)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1hlqwy-0003rJ-N5
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 04:30:40 -0400
-Received: by mail-wr1-f45.google.com with SMTP id n4so9043930wrs.3
- for <qemu-devel@nongnu.org>; Fri, 12 Jul 2019 01:30:40 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to:user-agent;
- bh=4uTnI7sG4Uw4XGW7EC95FtjEgKOMfIK5N5sjmbHcJhE=;
- b=OxPCAhlEvx6vLCWrC6NggP6526KBj4tgB/mFXvTAI3HdDgl162sz09MyHJDwFqlAkI
- +kfHPAjmnRZ99JXVI1PbdzWYzY6nW+osuMt95LNXYg84HQ1I3AoXp/msLq0c2bztbpCt
- UVHR72IUWtrdXMcDIQQlXCin26nckNbAvyFYHq0tdYa9OYluaIBaNDAxPoFfWvbk+XTz
- iIbtEOFC9xU3YTLhWYRJwjpDs7fmGiDFKDGagw/wRZrYS+CAExGzHH5Swcx9WZCeqXSF
- pOuwyFbrwT4nGOWykXdUalwjBdibL9+iGKoFWQBg2rAEJdeIikh1GMdBVMAwxaIvLUvb
- pE5Q==
-X-Gm-Message-State: APjAAAUX1dNdqAuWDn/ECNDFYKxr1YVPY6RuyguO/q/tsXs47Ux319B7
- L13B6IiyQxt7g3dgjNeT11RTxQ==
-X-Google-Smtp-Source: APXvYqxXmwyRHcGJg7ciCSXJ5iLAPnNUHMLOZ6v5UkTt3Pulyz4PwgilbX0mJQojZPCMGCoqPxiBqg==
-X-Received: by 2002:adf:e803:: with SMTP id o3mr10280130wrm.69.1562920239424; 
- Fri, 12 Jul 2019 01:30:39 -0700 (PDT)
-Received: from steredhat (host122-201-dynamic.13-79-r.retail.telecomitalia.it.
- [79.13.201.122])
- by smtp.gmail.com with ESMTPSA id m24sm4598365wmi.39.2019.07.12.01.30.38
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Fri, 12 Jul 2019 01:30:38 -0700 (PDT)
-Date: Fri, 12 Jul 2019 10:30:36 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Message-ID: <20190712083036.thxtq3zfrm3bmcvt@steredhat>
-References: <20190711120609.12773-1-philmd@redhat.com>
+ (envelope-from <pagupta@redhat.com>) id 1hlqyL-0004lW-4K
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 04:32:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35368)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <pagupta@redhat.com>)
+ id 1hlqyI-0004j4-5h; Fri, 12 Jul 2019 04:32:02 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 67379309B153;
+ Fri, 12 Jul 2019 08:32:01 +0000 (UTC)
+Received: from colo-mx.corp.redhat.com
+ (colo-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.21])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5AEA419C4F;
+ Fri, 12 Jul 2019 08:32:01 +0000 (UTC)
+Received: from zmail21.collab.prod.int.phx2.redhat.com
+ (zmail21.collab.prod.int.phx2.redhat.com [10.5.83.24])
+ by colo-mx.corp.redhat.com (Postfix) with ESMTP id 167E141F40;
+ Fri, 12 Jul 2019 08:32:01 +0000 (UTC)
+Date: Fri, 12 Jul 2019 04:32:00 -0400 (EDT)
+From: Pankaj Gupta <pagupta@redhat.com>
+To: Maxim Levitsky <mlevitsk@redhat.com>
+Message-ID: <711988058.41191683.1562920320632.JavaMail.zimbra@redhat.com>
+In-Reply-To: <20190704124342.7753-1-mlevitsk@redhat.com>
+References: <20190704124342.7753-1-mlevitsk@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20190711120609.12773-1-philmd@redhat.com>
-User-Agent: NeoMutt/20180716
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.67.116.201, 10.4.195.22]
+Thread-Topic: Don't obey the kernel block device max transfer len / max
+ segments for raw block devices
+Thread-Index: AOcLEIKBQ8mrGaVFRFMVHcZaW8B3cw==
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.49]); Fri, 12 Jul 2019 08:32:01 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.221.45
-Subject: Re: [Qemu-devel] [PATCH-for-4.1] tests/docker: Install Sphinx in
- the Ubuntu images
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2 0/1] Don't obey the kernel block device
+ max transfer len / max segments for raw block devices
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -83,29 +77,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>,
- Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ John Ferlan <jferlan@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jul 11, 2019 at 02:06:09PM +0200, Philippe Mathieu-Daudé wrote:
-> Since commit 5f71eac06e the Sphinx tool is required
-> to build the rST documentation.
-> 
-> This fixes:
-> 
->  $ ./configure --enable-docs
-> 
->  ERROR: User requested feature docs
->         configure was not able to find it.
->         Install texinfo, Perl/perl-podlators and python-sphinx
-> 
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> ---
->  tests/docker/dockerfiles/ubuntu.docker     | 1 +
->  tests/docker/dockerfiles/ubuntu1804.docker | 1 +
->  2 files changed, 2 insertions(+)
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+> Linux block devices, even in O_DIRECT mode don't have any user visible
+> limit on transfer size / number of segments, which underlying kernel block
+> device can have.
+> The kernel block layer takes care of enforcing these limits by splitting the
+> bios.
+> 
+> By limiting the transfer sizes, we force qemu to do the splitting itself
+> which
+> introduces various overheads.
+> It is especially visible in nbd server, where the low max transfer size of
+> the
+> underlying device forces us to advertise this over NBD, thus increasing the
+> traffic overhead in case of image conversion which benefits from large
+> blocks.
+> 
+> More information can be found here:
+> https://bugzilla.redhat.com/show_bug.cgi?id=1647104
+> 
+> Tested this with qemu-img convert over nbd and natively and to my surprise,Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+> even native IO performance improved a bit.
+> 
+> (The device on which it was tested is Intel Optane DC P4800X,
+> which has 128k max transfer size reported by the kernel)
+> 
+> The benchmark:
+> 
+> Images were created using:
+> 
+> Sparse image:  qemu-img create -f qcow2 /dev/nvme0n1p3 1G / 10G / 100G
+> Allocated image: qemu-img create -f qcow2 /dev/nvme0n1p3 -o
+> preallocation=metadata  1G / 10G / 100G
+> 
+> The test was:
+> 
+>  echo "convert native:"
+>  rm -rf /dev/shm/disk.img
+>  time qemu-img convert -p -f qcow2 -O raw -T none $FILE /dev/shm/disk.img >
+>  /dev/zero
+> 
+>  echo "convert via nbd:"
+>  qemu-nbd -k /tmp/nbd.sock -v  -f qcow2 $FILE -x export --cache=none
+>  --aio=native --fork
+>  rm -rf /dev/shm/disk.img
+>  time qemu-img convert -p -f raw -O raw
+>  nbd:unix:/tmp/nbd.sock:exportname=export /dev/shm/disk.img > /dev/zero
+> 
+> The results:
+> 
+> =========================================
+> 1G sparse image:
+>  native:
+> 	before: 0.027s
+> 	after: 0.027s
+>  nbd:
+> 	before: 0.287s
+> 	after: 0.035s
+> 
+> =========================================
+> 100G sparse image:
+>  native:
+> 	before: 0.028s
+> 	after: 0.028s
+>  nbd:
+> 	before: 23.796s
+> 	after: 0.109s
+> 
+> =========================================
+> 1G preallocated image:
+>  native:
+>        before: 0.454s
+>        after: 0.427s
+>  nbd:
+>        before: 0.649s
+>        after: 0.546s
+> 
+> The block limits of max transfer size/max segment size are retained
+> for the SCSI passthrough because in this case the kernel passes the userspace
+> request
+> directly to the kernel scsi driver, bypassing the block layer, and thus there
+> is no code to split
+> such requests.
+> 
+> Fam, since you was the original author of the code that added
+> these limits, could you share your opinion on that?
+> What was the reason besides SCSI passthrough?
+> 
+> V2:
+> 
+> *  Manually tested to not break the scsi passthrough with a nested VM
+> *  As Eric suggested, refactored the area around the fstat.
+> *  Spelling/grammar fixes
+> 
+> Best regards,
+> 	Maxim Levitsky
+> 
+> Maxim Levitsky (1):
+>   raw-posix.c - use max transfer length / max segement count only for
+>     SCSI passthrough
+> 
+>  block/file-posix.c | 54 ++++++++++++++++++++++++----------------------
+>  1 file changed, 28 insertions(+), 26 deletions(-)
+> 
+> --
+
+I am not familiar with SCSI passthrough special case. But overall looks good to me.
+
+Feel free to add:
+Reviewed-by: Pankaj Gupta <pagupta@redhat.com>
+
+> 2.17.2
+> 
+> 
+> 
 
