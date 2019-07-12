@@ -2,92 +2,85 @@ Return-Path: <SRS0=r3/N=VJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46199C742B3
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 11:48:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E635AC742B3
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 11:50:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 129962083B
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 11:48:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 129962083B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id B4D2D2083B
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 11:50:48 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="djpgZzB4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B4D2D2083B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48534 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48546 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlu2l-0006IQ-6p
-	for qemu-devel@archiver.kernel.org; Fri, 12 Jul 2019 07:48:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56789)
+	id 1hlu4d-0007PX-TQ
+	for qemu-devel@archiver.kernel.org; Fri, 12 Jul 2019 07:50:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57339)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hlu2a-0005pX-PC
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 07:48:41 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hlu4R-0006sl-QB
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 07:50:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hlu2Z-0006mE-L1
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 07:48:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45642)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hlu2X-0006it-2F; Fri, 12 Jul 2019 07:48:37 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 483BE3082A49;
- Fri, 12 Jul 2019 11:48:35 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.40.205.208])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D4BCC19C4F;
- Fri, 12 Jul 2019 11:48:31 +0000 (UTC)
-To: Kevin Wolf <kwolf@redhat.com>
-References: <20190711195804.30703-1-mreitz@redhat.com>
- <20190711195804.30703-3-mreitz@redhat.com>
- <20190712094919.GC4514@dhcp-200-226.str.redhat.com>
- <e0d93b2b-21c2-3eaa-bf27-0a1c7f19f4e4@redhat.com>
- <20190712111720.GF4514@dhcp-200-226.str.redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <78d1d91b-8a13-9b9b-a891-650c6b4d417b@redhat.com>
-Date: Fri, 12 Jul 2019 13:48:30 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+ (envelope-from <peter.maydell@linaro.org>) id 1hlu4Q-00007B-4k
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 07:50:35 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:39452)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hlu4P-00006J-Su
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 07:50:34 -0400
+Received: by mail-wr1-x443.google.com with SMTP id x4so9661445wrt.6
+ for <qemu-devel@nongnu.org>; Fri, 12 Jul 2019 04:50:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=VlbJbQSW8/zo5SQT5J/jriNPih0ZwCvEM2vgRhOqVIc=;
+ b=djpgZzB48OJweC1e5h4SQ6eqRHXQUrfUSDTrqDDRbeEGIUW5tN8xJExlNPH9yvWNJB
+ 2RbYHxj+kvmAF+GeTTl/3fI1am5xZYz/uraeBWCIWwXXPHlSTXF986IE9H6WiZ4WQkFw
+ M04IjTdDS2mTH5T0/1odPuYChQWO8aemW2C61syZiDqH48+y7BGM85s6nsdkPzzLveNu
+ RGll55kRFHyNcD/5l8e9OuYWGfA+Flba9VkYU8WbeyGm7QZwecpH34gag3+Q/m7WXrSo
+ 5byGfmmSPZ9Q9jBivY1uJQquwT2BhtFIoqsU+MJWOgzBo4+muf3cu6cKEb88bHlvSzmm
+ PHVg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=VlbJbQSW8/zo5SQT5J/jriNPih0ZwCvEM2vgRhOqVIc=;
+ b=kfhroriMLUI12e5Og9lbcpnV1mTDhemJHTRoOqiZY8O4BH9B3WiJ+uQiGvrr0pICUy
+ XnwgDQGfruAj3dIr46u+IGqcghw/SEm6X48XezZk9zmoW2xVbRSWmxNA7evRQd0GYc0D
+ L0V8tPSE857Vej/o7ryLj1oIREeI6+Hdj2o5NqB9SNmfQ28LPXsUu/8Cf6+Rs2gNK4Jo
+ TMuE6MVsez+6S5OMlznY2OkVpzHCGDh+Qnd6KykssRYOaph/QcQ6sw/Jq54MzKiQe3l0
+ PjWjM3kQIb1sndKUI8dKhc6BazhblmIYXgYmnSlI10u/oZh1sOsh/Ubl1Fyg+Ql3nUux
+ yy7g==
+X-Gm-Message-State: APjAAAVSZhLWYWSh4SNgvAnkre5jRvlp3N9i3pFkhHQLGkd+FEp+oqCA
+ aeNcPmZ1G7V3Kh59MQvtykPxvA==
+X-Google-Smtp-Source: APXvYqzVRmXpPsp7fwnhp/ijYBtt54HgWEzrTRqjwdWII9dSs7GMeFA1EhgdBFeD/+gKQcDmoj7jTA==
+X-Received: by 2002:adf:e708:: with SMTP id c8mr8260wrm.25.1562932232386;
+ Fri, 12 Jul 2019 04:50:32 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id v204sm7757279wma.20.2019.07.12.04.50.31
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Fri, 12 Jul 2019 04:50:31 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-arm@nongnu.org,
+	qemu-devel@nongnu.org
+Date: Fri, 12 Jul 2019 12:50:30 +0100
+Message-Id: <20190712115030.26895-1-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <20190712111720.GF4514@dhcp-200-226.str.redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="DQ105oUOcUuFFszzpfwr1n2USlarOM3dP"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Fri, 12 Jul 2019 11:48:35 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [RFC 2/5] block: Generic truncation fallback
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::443
+Subject: [Qemu-devel] [PATCH for-4.1?] hw/arm/fsl-imx6ul.c: Remove dead
+ SMP-related code
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,154 +92,163 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org,
- qemu-block@nongnu.org
+Cc: Jean-Christophe Dubois <jcd@tribudubois.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---DQ105oUOcUuFFszzpfwr1n2USlarOM3dP
-Content-Type: multipart/mixed; boundary="l9bhMtGjmJv9cuyZ1GOutFxCy3Q7wp5PW";
- protected-headers="v1"
-From: Max Reitz <mreitz@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org,
- Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <78d1d91b-8a13-9b9b-a891-650c6b4d417b@redhat.com>
-Subject: Re: [RFC 2/5] block: Generic truncation fallback
-References: <20190711195804.30703-1-mreitz@redhat.com>
- <20190711195804.30703-3-mreitz@redhat.com>
- <20190712094919.GC4514@dhcp-200-226.str.redhat.com>
- <e0d93b2b-21c2-3eaa-bf27-0a1c7f19f4e4@redhat.com>
- <20190712111720.GF4514@dhcp-200-226.str.redhat.com>
-In-Reply-To: <20190712111720.GF4514@dhcp-200-226.str.redhat.com>
+The i.MX6UL always has a single Cortex-A7 CPU (we set FSL_IMX6UL_NUM_CPUS
+to 1 in line with this). This means that all the code in fsl-imx6ul.c to
+handle multiple CPUs is dead code, and Coverity is now complaining that
+it is unreachable (CID 1403008, 1403011).
 
---l9bhMtGjmJv9cuyZ1GOutFxCy3Q7wp5PW
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Remove the unreachable code and the only-executes-once loops,
+and replace the single-entry cpu[] array in the FSLIMX6ULState
+with a simple cpu member.
 
-On 12.07.19 13:17, Kevin Wolf wrote:
-> Am 12.07.2019 um 12:58 hat Max Reitz geschrieben:
->> On 12.07.19 11:49, Kevin Wolf wrote:
->>> Am 11.07.2019 um 21:58 hat Max Reitz geschrieben:
->>>> If a protocol driver does not support truncation, we call fall back =
-to
->>>> effectively not doing anything if the new size is less than the actu=
-al
->>>> file size.  This is what we have been doing for some host device dri=
-vers
->>>> already.
->>>
->>> Specifically, we're doing it for drivers that access a fixed-size ima=
-ge,
->>> i.e. block devices rather than regular files. We don't want to do thi=
-s
->>> for drivers where the file size could be changed, but just didn't
->>> implement it.
->>>
->>> So I would suggest calling the function more specifically something l=
-ike
->>> bdrv_co_truncate_blockdev(), and not using it as an automatic fallbac=
-k
->>> in bdrv_co_truncate(), but just make it the BlockDriver.bdrv_co_trunc=
-ate
->>> implementation for those drivers where it makes sense.
->>
->> I was thinking about this, but the problem is that .bdrv_co_truncate()=
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+The only real reason to put this into 4.1 is because it fixes
+some Coverity issues, and it would be nice to be able to get
+down to no Coverity issues for the release. I think that pre-rc1
+that's a reasonable reason to put this in.
 
->> does not get a BdrvChild, so an implementation for it cannot generical=
-ly
->> zero the first sector (without bypassing the permission system, which
->> would be wrong).
->=20
-> Hm, I see. The next best thing would then probably having a bool in
-> BlockDriver that enables the fallback.
->=20
->> So the function pointer would actually need to be set to something lik=
-e
->> (int (*)(BlockDriverState *, int64_t, PreallocMode, Error **))42ul, or=
- a
->> dummy function that just aborts, and then bdrv_co_truncate() would
->> recognize this magic constant.  But that seemed so weird to me that I
->> decided just not to do it, mostly because I was wondering what would b=
-e
->> so bad about treating images whose size we cannot change because we
->> haven=E2=80=99t implemented it exactly like fixed-size images.
->>
->> (Also, =E2=80=9Cfixed-size=E2=80=9D is up to interpretation.  You can =
-change an LVM
->> volume=E2=80=99s size.  qemu doesn=E2=80=99t do it, obviously.  But th=
-at is the reason
->> for the warning qemu-img resize emits when it sees that the file size
->> did not change.)
->>
->>> And of course, we only need these fake implementations because qemu-i=
-mg
->>> (or .bdrv_co_create_opts) always wants to create the protocol level. =
-If
->>> we could avoid this, then we wouldn't need any of this.
->>
->> It=E2=80=99s trivial to avoid this.  I mean, patch 4 does exactly that=
-=2E
->>
->> So it isn=E2=80=99t about avoiding creating the protocol level, it=E2=80=
-=99s about
->> avoiding the truncation there.  But why would you do that?
->=20
-> Because we can't actually truncate there. We can only do the fake thing=
+Disclaimer: tested with "make check" as I have no test image for
+this board.
 
-> and claim we have truncated even though the size didn't change.
+ include/hw/arm/fsl-imx6ul.h |  2 +-
+ hw/arm/fsl-imx6ul.c         | 62 +++++++++++--------------------------
+ hw/arm/mcimx6ul-evk.c       |  2 +-
+ 3 files changed, 20 insertions(+), 46 deletions(-)
 
-You=E2=80=99re right.  I actually didn=E2=80=99t realize that we have no =
-drivers that
-support truncation, but not image creation.
+diff --git a/include/hw/arm/fsl-imx6ul.h b/include/hw/arm/fsl-imx6ul.h
+index 9e94e98f8ee..eda389aec7d 100644
+--- a/include/hw/arm/fsl-imx6ul.h
++++ b/include/hw/arm/fsl-imx6ul.h
+@@ -61,7 +61,7 @@ typedef struct FslIMX6ULState {
+     DeviceState    parent_obj;
+ 
+     /*< public >*/
+-    ARMCPU             cpu[FSL_IMX6UL_NUM_CPUS];
++    ARMCPU             cpu;
+     A15MPPrivState     a7mpcore;
+     IMXGPTState        gpt[FSL_IMX6UL_NUM_GPTS];
+     IMXEPITState       epit[FSL_IMX6UL_NUM_EPITS];
+diff --git a/hw/arm/fsl-imx6ul.c b/hw/arm/fsl-imx6ul.c
+index f8601654388..b074177a71d 100644
+--- a/hw/arm/fsl-imx6ul.c
++++ b/hw/arm/fsl-imx6ul.c
+@@ -29,16 +29,12 @@
+ 
+ static void fsl_imx6ul_init(Object *obj)
+ {
+-    MachineState *ms = MACHINE(qdev_get_machine());
+     FslIMX6ULState *s = FSL_IMX6UL(obj);
+     char name[NAME_SIZE];
+     int i;
+ 
+-    for (i = 0; i < MIN(ms->smp.cpus, FSL_IMX6UL_NUM_CPUS); i++) {
+-        snprintf(name, NAME_SIZE, "cpu%d", i);
+-        object_initialize_child(obj, name, &s->cpu[i], sizeof(s->cpu[i]),
+-                                "cortex-a7-" TYPE_ARM_CPU, &error_abort, NULL);
+-    }
++    object_initialize_child(obj, "cpu0", &s->cpu, sizeof(s->cpu),
++                            "cortex-a7-" TYPE_ARM_CPU, &error_abort, NULL);
+ 
+     /*
+      * A7MPCORE
+@@ -161,42 +157,25 @@ static void fsl_imx6ul_realize(DeviceState *dev, Error **errp)
+     MachineState *ms = MACHINE(qdev_get_machine());
+     FslIMX6ULState *s = FSL_IMX6UL(dev);
+     int i;
+-    qemu_irq irq;
+     char name[NAME_SIZE];
+-    unsigned int smp_cpus = ms->smp.cpus;
++    SysBusDevice *sbd;
++    DeviceState *d;
+ 
+-    if (smp_cpus > FSL_IMX6UL_NUM_CPUS) {
+-        error_setg(errp, "%s: Only %d CPUs are supported (%d requested)",
+-                   TYPE_FSL_IMX6UL, FSL_IMX6UL_NUM_CPUS, smp_cpus);
++    if (ms->smp.cpus > 1) {
++        error_setg(errp, "%s: Only a single CPU is supported (%d requested)",
++                   TYPE_FSL_IMX6UL, ms->smp.cpus);
+         return;
+     }
+ 
+-    for (i = 0; i < smp_cpus; i++) {
+-        Object *o = OBJECT(&s->cpu[i]);
+-
+-        object_property_set_int(o, QEMU_PSCI_CONDUIT_SMC,
+-                                "psci-conduit", &error_abort);
+-
+-        /* On uniprocessor, the CBAR is set to 0 */
+-        if (smp_cpus > 1) {
+-            object_property_set_int(o, FSL_IMX6UL_A7MPCORE_ADDR,
+-                                    "reset-cbar", &error_abort);
+-        }
+-
+-        if (i) {
+-            /* Secondary CPUs start in PSCI powered-down state */
+-            object_property_set_bool(o, true,
+-                                     "start-powered-off", &error_abort);
+-        }
+-
+-        object_property_set_bool(o, true, "realized", &error_abort);
+-    }
++    object_property_set_int(OBJECT(&s->cpu), QEMU_PSCI_CONDUIT_SMC,
++                            "psci-conduit", &error_abort);
++    object_property_set_bool(OBJECT(&s->cpu), true,
++                             "realized", &error_abort);
+ 
+     /*
+      * A7MPCORE
+      */
+-    object_property_set_int(OBJECT(&s->a7mpcore), smp_cpus, "num-cpu",
+-                            &error_abort);
++    object_property_set_int(OBJECT(&s->a7mpcore), 1, "num-cpu", &error_abort);
+     object_property_set_int(OBJECT(&s->a7mpcore),
+                             FSL_IMX6UL_MAX_IRQ + GIC_INTERNAL,
+                             "num-irq", &error_abort);
+@@ -204,18 +183,13 @@ static void fsl_imx6ul_realize(DeviceState *dev, Error **errp)
+                              &error_abort);
+     sysbus_mmio_map(SYS_BUS_DEVICE(&s->a7mpcore), 0, FSL_IMX6UL_A7MPCORE_ADDR);
+ 
+-    for (i = 0; i < smp_cpus; i++) {
+-        SysBusDevice *sbd = SYS_BUS_DEVICE(&s->a7mpcore);
+-        DeviceState  *d   = DEVICE(qemu_get_cpu(i));
++    sbd = SYS_BUS_DEVICE(&s->a7mpcore);
++    d = DEVICE(&s->cpu);
+ 
+-        irq = qdev_get_gpio_in(d, ARM_CPU_IRQ);
+-        sysbus_connect_irq(sbd, i, irq);
+-        sysbus_connect_irq(sbd, i + smp_cpus, qdev_get_gpio_in(d, ARM_CPU_FIQ));
+-        sysbus_connect_irq(sbd, i + 2 * smp_cpus,
+-                           qdev_get_gpio_in(d, ARM_CPU_VIRQ));
+-        sysbus_connect_irq(sbd, i + 3 * smp_cpus,
+-                           qdev_get_gpio_in(d, ARM_CPU_VFIQ));
+-    }
++    sysbus_connect_irq(sbd, 0, qdev_get_gpio_in(d, ARM_CPU_IRQ));
++    sysbus_connect_irq(sbd, 1, qdev_get_gpio_in(d, ARM_CPU_FIQ));
++    sysbus_connect_irq(sbd, 2, qdev_get_gpio_in(d, ARM_CPU_VIRQ));
++    sysbus_connect_irq(sbd, 3, qdev_get_gpio_in(d, ARM_CPU_VFIQ));
+ 
+     /*
+      * A7MPCORE DAP
+diff --git a/hw/arm/mcimx6ul-evk.c b/hw/arm/mcimx6ul-evk.c
+index bbffb11c2a8..1f6f4aed97c 100644
+--- a/hw/arm/mcimx6ul-evk.c
++++ b/hw/arm/mcimx6ul-evk.c
+@@ -71,7 +71,7 @@ static void mcimx6ul_evk_init(MachineState *machine)
+     }
+ 
+     if (!qtest_enabled()) {
+-        arm_load_kernel(&s->soc.cpu[0], &boot_info);
++        arm_load_kernel(&s->soc.cpu, &boot_info);
+     }
+ }
+ 
+-- 
+2.20.1
 
-Yes, then it=E2=80=99s stupid.
-
-I thought it was a reasonable thing to do for such drivers.
-
-So I suppose the best thing is to do what I hinted at in my reply to
-your reply to patch 3, which is to drop patches 2 and 3 and instead make
-the creation fallback work around blk_truncate() failures.
-
-Max
-
-> But actually, while avoiding the fake truncate outside of image creatio=
-n
-> would avoid confusing situations where the user requested image
-> shrinking, gets success, but nothing happened, it would also break
-> actual resizes where the volume is resized externally and block_resize
-> is only called to notify qemu to pick up the size change.
->=20
-> So after all, we probably do need to keep the hack in bdrv_co_truncate(=
-)
-> instead of moving it to image creation only.
->=20
-> Kevin
->=20
-
-
-
---l9bhMtGjmJv9cuyZ1GOutFxCy3Q7wp5PW--
-
---DQ105oUOcUuFFszzpfwr1n2USlarOM3dP
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0oc44ACgkQ9AfbAGHV
-z0Cf8Af7BTBwUbzD0i3Wbrw0gInoRHubbedLt3JFz6/4hFaudHfLtVeU/65i4Dv1
-RkF6W/DDK+K/PWgtTVsrCxb9vXVQnb35Us113jc2PYweaVOuRWgy5mPjbTtll25V
-VgsooFF9u75EXc5EjNySnmg9IlvrxbTrqHUY5bFOehY5mVOrzVckEjcc/Fp6hMi8
-Aju7OdPsUC8q/zZVSMrXMsQJp5pZ9E3U4ySyCDO7nARTZgc45GgCOA5VtEIDMs7z
-MM+nqEH9gJAgn6z+zlp1kbNrTbERt51jUAi2UwqjjpHJSo/ZHMRaHO/LC7VsakRq
-qbMqpEirNvchrR6tkURVXaQnsHgvLw==
-=Z44V
------END PGP SIGNATURE-----
-
---DQ105oUOcUuFFszzpfwr1n2USlarOM3dP--
 
