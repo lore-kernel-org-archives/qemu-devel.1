@@ -2,89 +2,104 @@ Return-Path: <SRS0=r3/N=VJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D21A0C742D7
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 19:44:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CBD60C742D7
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 20:55:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A6ADB2146E
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 19:44:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6ADB2146E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
+	by mail.kernel.org (Postfix) with ESMTPS id 8C74620989
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 20:55:19 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EhA0gQbm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C74620989
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52028 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52284 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hm1T7-0002Z7-G5
-	for qemu-devel@archiver.kernel.org; Fri, 12 Jul 2019 15:44:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49839)
+	id 1hm2Za-0001bK-5Z
+	for qemu-devel@archiver.kernel.org; Fri, 12 Jul 2019 16:55:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40150)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hm1Sx-00029n-2w
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 15:44:24 -0400
+ (envelope-from <lucienmp.qemu@gmail.com>) id 1hm2ZP-00018R-UP
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 16:55:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hm1Sw-0000z1-20
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 15:44:22 -0400
-Received: from mail.ilande.co.uk ([46.43.2.167]:59996
- helo=mail.default.ilande.uk0.bigv.io)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1hm1Sr-0000da-4K
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 15:44:18 -0400
-Received: from host86-189-155-55.range86-189.btcentralplus.com
- ([86.189.155.55] helo=[192.168.1.65])
- by mail.default.ilande.uk0.bigv.io with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
- (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1hm1Rj-00076h-94; Fri, 12 Jul 2019 20:43:07 +0100
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-References: <20190712055935.23061-1-armbru@redhat.com>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
- mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
- 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
- E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
- PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
- PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
- AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
- OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
- NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
- mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
- z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
- T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
- DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
- y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
- 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
- 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
- YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
- Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
- BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
- opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
- NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
- Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
- KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
- imgcU9TTGC5qd9g=
-Message-ID: <539320ea-50d5-b868-14fd-c84c33aa68fe@ilande.co.uk>
-Date: Fri, 12 Jul 2019 20:43:53 +0100
+ (envelope-from <lucienmp.qemu@gmail.com>) id 1hm2ZO-0007zI-7P
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 16:55:07 -0400
+Received: from mail-pg1-x529.google.com ([2607:f8b0:4864:20::529]:33453)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <lucienmp.qemu@gmail.com>)
+ id 1hm2ZN-0007wZ-Kj
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 16:55:05 -0400
+Received: by mail-pg1-x529.google.com with SMTP id m4so5061506pgk.0
+ for <qemu-devel@nongnu.org>; Fri, 12 Jul 2019 13:55:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-transfer-encoding:content-language;
+ bh=7HlLKKHYmuFXrx3WgAdAIS9C89D4ETkwShkGrwufCkE=;
+ b=EhA0gQbmG5mmZIZRy9taCQXdJEoAP0qj2V7wH/SnP0HELGgG7FREUdFYBiDGm9/lZM
+ 9oje1ZPPUdKCY9iHsXWRF6zKj7SMXwFBk2PcNIFAQX5fE9hHjp+UH1dHooXO4n3hcIwA
+ CxhtdNrl8QJ6AvdxiAIF3KkbYZ2B6TViSS2oQqoxgtket4vhkCCmCp3FNG9jXTig7dc6
+ sNp8K2p0nzchlijnb/fxOuZP7BKTLeaNeVb/xybHCP38+TNvbmRjSDLTdfniS2wg6q7N
+ LA4cXKxy4Q4GHVjsiFeciK8mkUSoZ6GU7dCBWOZnbz7e4+NtvltWPQ5BgsL93y7XDuji
+ +SjA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-transfer-encoding
+ :content-language;
+ bh=7HlLKKHYmuFXrx3WgAdAIS9C89D4ETkwShkGrwufCkE=;
+ b=dzR9yZe7ZHei+h1y78KGYTWPSI5WJI9UTZc6LJsPXvZL/1Ysqj6d4zMbpwRFdPnUxL
+ l33ehDEI6d0V202ExxFyaZ1AHhi3DuMsyH263+Gs7JKFgWrACoFTF0QoWbnoW6y8ao/j
+ om2JQvRGgjbtmZWVYnUUBMjOb5D8iE4msg16+eCwujg7RRQcwMc+7+APkRoUXbto9+VO
+ zcvHEUOVwtqbumYi8fHWJkv9jlobBKEpLdWUnh3F6TwraO0dN3CIdACqcPRNTjjvLb8s
+ VTx5qTcGYVcoXt+DQasdbCKEYqlbDeOL0LOL6Cn1SfpMvqNHkA6wuJ9VIbFTYVlXGxXr
+ x7tQ==
+X-Gm-Message-State: APjAAAV92cLK41j8QpRES3Q1Nq5B5pn2pmrWzjV+1iWoS/2WMpLjwqsi
+ 7KKkbHmKBYbgsjSlvnTJwGw=
+X-Google-Smtp-Source: APXvYqxzFUQo3RhSnpX23ectUhZWnk0sSoqiWyuMxg2etvoHwjUn7kBvFo9+9Fdi/SVfZo0RvE1N1Q==
+X-Received: by 2002:a63:4f45:: with SMTP id p5mr13461534pgl.326.1562964903394; 
+ Fri, 12 Jul 2019 13:55:03 -0700 (PDT)
+Received: from localhost.localdomain (i60-43-49-30.s30.a048.ap.plala.or.jp.
+ [60.43.49.30])
+ by smtp.gmail.com with ESMTPSA id t8sm10593885pfq.31.2019.07.12.13.55.01
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Fri, 12 Jul 2019 13:55:02 -0700 (PDT)
+To: Lucien Anti-Spam <lucienmp_antispam@yahoo.com>
+References: <2136180936.260219.1561641583358.ref@mail.yahoo.com>
+ <2136180936.260219.1561641583358@mail.yahoo.com>
+ <1079763171.281101.1561641752988@mail.yahoo.com>
+ <e4c1fbc4-3e43-5df4-a17c-527d98d9763c@linaro.org>
+ <20190628002713.GA19257@localhost.localdomain>
+ <eadb57ae-256d-0bb7-5988-f493662a5caf@linaro.org>
+ <20190628155030.GA34320@localhost.localdomain>
+ <ea16a81c-5b94-8dd0-8339-2bd82733aed2@linaro.org>
+ <20190629163621.GA111724@localhost.localdomain>
+ <CAFEAcA9sfNisAz-zAZAx=ZNFmsEpP0Ec2DeRedtZSd9KQ4fvNA@mail.gmail.com>
+ <1399218244.1210557.1561982640362@mail.yahoo.com>
+ <CAFEAcA-0vGg_1nfkbq+o6JwoDsRyP=6mnv6ADi-atV0ROX269Q@mail.gmail.com>
+ <CALvKS=GvAkNr3OKZzjGoTGG_Eys76zjcjodiN4hKXjFM5B0a4A@mail.gmail.com>
+ <d9e5602c-bb33-1812-ebc2-b533e9dd5f25@linaro.org>
+From: Lucien Murray-Pitts <lucienmp.qemu@gmail.com>
+Message-ID: <92bcc5d9-c264-85ea-543c-6b7ee2bb7662@gmail.com>
+Date: Sat, 13 Jul 2019 05:55:00 +0900
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <20190712055935.23061-1-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
+In-Reply-To: <d9e5602c-bb33-1812-ebc2-b533e9dd5f25@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 86.189.155.55
-X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
-X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.43.2.167
-Subject: Re: [Qemu-devel] [PATCH for-4.1] Makefile: Fix "make install" when
- "make all" needs work
+Content-Language: en-US
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::529
+Subject: Re: [Qemu-devel] RFC: Why does target/m68k RTE insn. use
+ gen_exception
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,54 +111,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, Guenter Roeck <linux@roeck-us.net>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 12/07/2019 06:59, Markus Armbruster wrote:
 
-> Until recently, target install used to recurse into target directories
-> in its recipe: it ran make install in a for-loop.  Since target
-> install depends on target all, this trivially ensured we run the
-> sub-make install only after completing target all.
-> 
-> Commit 1338a4b "Makefile: Reuse all's recursion machinery for clean
-> and install" moved the target recursion to dependencies.  That's good
-> (the commit message explains why), but I forgot to add dependencies to
-> ensure make runs the sub-make install only after completing target
-> all.  Do that now.
-> 
-> Fixes: 1338a4b72659ce08eacb9de0205fe16202a22d9c
-> Reported-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> Reported-by: Guenter Roeck <linux@roeck-us.net>
-> Tested-by: Guenter Roeck <linux@roeck-us.net>
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  Makefile | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/Makefile b/Makefile
-> index 1fcbaed62c..09b77e8a7b 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -522,6 +522,7 @@ $(ROM_DIRS_RULES):
->  recurse-all: $(addsuffix /all, $(TARGET_DIRS) $(ROM_DIRS))
->  recurse-clean: $(addsuffix /clean, $(TARGET_DIRS) $(ROM_DIRS))
->  recurse-install: $(addsuffix /install, $(TARGET_DIRS))
-> +$(addsuffix /install, $(TARGET_DIRS)): all
->  
->  $(BUILD_DIR)/version.o: $(SRC_PATH)/version.rc config-host.h
->  	$(call quiet-command,$(WINDRES) -I$(BUILD_DIR) -o $@ $<,"RC","version.o")
-> 
-
-I've just tried this on my faster workstation and it now works fine with all of -j2,
--j4 and -j8.
-
-Tested-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-
-
-ATB,
-
-Mark.
+On 7/10/19 4:04 AM, Richard Henderson wrote:
+> On 7/9/19 6:58 PM, Lucien Murray-Pitts wrote:
+>> Any suggestions on how to obtain pc_next from the "m68k_cpu_do_interrupt(
+>> CPUState *cs)" ?
+test
+> I did have a suggestion.  It was fairly detailed.
+>
+> https://lists.gnu.org/archive/html/qemu-devel/2019-06/msg06522.html
+>
+>
+> r~
+test
 
