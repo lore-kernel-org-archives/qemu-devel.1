@@ -7,75 +7,74 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E5C0C742B2
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 11:20:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43B36C742B3
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 11:20:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 42EDC216B7
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 11:20:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 120CB20863
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 11:20:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wkiE5R5r"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42EDC216B7
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DVwtNKvF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 120CB20863
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48322 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48332 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hltaw-0005GB-8O
-	for qemu-devel@archiver.kernel.org; Fri, 12 Jul 2019 07:20:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47200)
+	id 1hltbB-0006SN-78
+	for qemu-devel@archiver.kernel.org; Fri, 12 Jul 2019 07:20:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47155)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hltZp-0000N7-T7
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 07:18:58 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hltZo-0000NE-TM
+ (envelope-from <alex.bennee@linaro.org>) id 1hltZo-0000HP-HT
  for qemu-devel@nongnu.org; Fri, 12 Jul 2019 07:18:57 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:51055)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <alex.bennee@linaro.org>) id 1hltZn-0000M4-HH
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 07:18:56 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:33461)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hltZo-0000MQ-L5
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 07:18:56 -0400
-Received: by mail-wm1-x344.google.com with SMTP id v15so8585978wml.0
- for <qemu-devel@nongnu.org>; Fri, 12 Jul 2019 04:18:56 -0700 (PDT)
+ id 1hltZn-0000Kv-8Y
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 07:18:55 -0400
+Received: by mail-wr1-x444.google.com with SMTP id n9so9622684wru.0
+ for <qemu-devel@nongnu.org>; Fri, 12 Jul 2019 04:18:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=JcoASBExlpQtKdUtfQbzGmK9Gr4mswv4Mu9eWVCSbVE=;
- b=wkiE5R5rAiIcW9MW9Y0CAoASKoFesN5pIWItulm5xEbOp+c1II8mDqTcx/pqyM7H2B
- fG3DXp2Y6tNBOcMCHQnPkl2TImCszPWvPz/ZOm6CLZGNcJ1G+KV080ZED5BaGMIDjz5V
- zmLKtLGsi9ECvnNRlAGtsJjjDKRfny1ohe17YCZauH5a92Je+y6k7Sd4NEluHmbuNUsd
- DLEMbAwfQLDUKuH+XcXwQDgkPT60H81JNRVEKZhbnD3Dhn5dkPdNeJWBn8wNTeBX+/TH
- uH5SjeTE+uD/4c2eYxiVD5qQ8WABuY1qxguWyc4rkdjOw0jNPJmjIAd8elvb7eiHGDwa
- YJgg==
+ bh=7sHk9UapFZ1v5dGQBuJrDhUFgezgy3UNJSh8wcf07Q8=;
+ b=DVwtNKvFzebPrRo/g5NVymdU8uA9cu3+l+FFIYkwvGwH3O13X5nRrhgUWIFOb8dZ99
+ fDfD8c2XqO4LUU6+uFY47EX7Gmau9q3R0eYPb7ylAOuR4p/GJslGXrnGTGQ0qfUz5ScE
+ FRBikuTdS3frEgr0BNQhBov5vg4QO4cH3YnfkQjCVbI2zKk/b0PBZcrosiZjP8Gh8Lhq
+ Gp0BOOolA1fyTIrY1CbChelf6nIqlgPgz7kzWEV0LfOAWCHnkvHFHmVhR3cdxvvX+lIK
+ mePIhHw54UuvTH1kp+III2wjUtS8uwFqu/YixPZ1W1X7uIAVVPc4xoJdTy1Pz5ZyHO1t
+ yy7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=JcoASBExlpQtKdUtfQbzGmK9Gr4mswv4Mu9eWVCSbVE=;
- b=Kf/ouT4++6I0F5/xFzziRRZI37VS9o/qQgp7O5OpMGKYfTRsng9/tWWIylTomsaTyE
- RYj7DT+vco43f4UtloLVCRxp0dphU3oVnxdsH+HUB0Bmp5jpL1INqDNyjECqa91d7jNm
- h/F6rUAqzXloGd+ZmhbExm291JqjxrTeTwCqALrpewKLPACDcQcbrB/vnLSY7UvoqZJx
- vs273Eq4EoMvWdKvMeI14DB0HrUaI4tjH+FWBvQAKUfep1Cap9PZxPjzF4yCXRQyu/Yh
- DMRX8ALNh2WPa/Fa6Coj+yPqQXqhdAVFzusQrGkFtluZonQMCqiPJUrSgLYwTKoqyLIl
- vOzQ==
-X-Gm-Message-State: APjAAAWnVHFdfXz/MWZ1Ma3f2T5fd0KNKL7jgtfTmQCJkI6Fnznp4GqI
- YFHvSjUCaIWnCblWrH/rLYv9vhvMSUI=
-X-Google-Smtp-Source: APXvYqxlnGFsaEbt63oTXBrtS2RfNSRvDyvnPWkZ6fP980VDER2Dj+ukFA3B0xxdAKIZ7R0Z4AL0Hg==
-X-Received: by 2002:a05:600c:1008:: with SMTP id
- c8mr9475404wmc.133.1562930335373; 
- Fri, 12 Jul 2019 04:18:55 -0700 (PDT)
+ bh=7sHk9UapFZ1v5dGQBuJrDhUFgezgy3UNJSh8wcf07Q8=;
+ b=QCP/DzMm+MmJx0ipLZHn+9fUMggz1DCYlqOPqgLq1zJqdLBL0WulMZ0qZvWeyjnLj3
+ FkDGitOqU/dqwpmk45WZQZgb2P2+xSmgvflpYsWfPayDW3e3Yq+2ABYScWT29tpV8dCa
+ baZPlmFktFzR+3mC/3TMAlcHybvqfAFfjnGZ/S/Ihv4nSF4bWlsKwgdo3HjVXZCcU5SI
+ I+zcLTdWYWCflNJ+p1ZUkpns2zTcjPDeCnVK+9T8oDNXt0TKqj0cDoBvvxhJtsyd+QFd
+ JsOiOsQWxNgxv/862ucOE8hh27YLPm7bxf4w91n7iJsYGPwfAH+pm35t1PvACM+XXsXD
+ HGDQ==
+X-Gm-Message-State: APjAAAXnzWeofC80bsh/OPknBaN5RKZxD09qrwbLePXFljWQO/Xep0Rd
+ KV1n57UlEcsqNxZ6eAKH6PJU0Q==
+X-Google-Smtp-Source: APXvYqy3Fqt0mKVQDKxUbfEaZtPL7EMRA1PxSDimPG20oaZQ6so91mKWRbxtqUfbGxwlRqjpV71O1A==
+X-Received: by 2002:adf:ec49:: with SMTP id w9mr10616595wrn.303.1562930333930; 
+ Fri, 12 Jul 2019 04:18:53 -0700 (PDT)
 Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id w25sm7457764wmk.18.2019.07.12.04.18.51
+ by smtp.gmail.com with ESMTPSA id q1sm7089808wmq.25.2019.07.12.04.18.51
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Fri, 12 Jul 2019 04:18:54 -0700 (PDT)
+ Fri, 12 Jul 2019 04:18:51 -0700 (PDT)
 Received: from zen.linaroharston. (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 009251FF87;
- Fri, 12 Jul 2019 12:18:51 +0100 (BST)
+ by zen.linaroharston (Postfix) with ESMTP id 9F66B1FF92;
+ Fri, 12 Jul 2019 12:18:50 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Fri, 12 Jul 2019 12:18:49 +0100
-Message-Id: <20190712111849.9006-8-alex.bennee@linaro.org>
+Date: Fri, 12 Jul 2019 12:18:47 +0100
+Message-Id: <20190712111849.9006-6-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190712111849.9006-1-alex.bennee@linaro.org>
 References: <20190712111849.9006-1-alex.bennee@linaro.org>
@@ -84,9 +83,9 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::344
-Subject: [Qemu-devel] [PATCH v1 7/7] shippable: re-enable the windows cross
- builds
+X-Received-From: 2a00:1450:4864:20::444
+Subject: [Qemu-devel] [PATCH v1 5/7] tests/migration-test: don't spam the
+ logs when we fail
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,40 +97,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- qemu-arm@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Juan Quintela <quintela@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-arm@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The pkg.mxe.cc repo has been restored.
+Quite often the information about which test failed is hidden by the
+wall of repeated failures for each page. Stop outputting the error
+after 10 bad pages and just summarise the total damage at the end.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- .shippable.yml | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+ tests/migration-test.c | 19 ++++++++++++-------
+ 1 file changed, 12 insertions(+), 7 deletions(-)
 
-diff --git a/.shippable.yml b/.shippable.yml
-index f2ffef21d11..f74a3de3ffd 100644
---- a/.shippable.yml
-+++ b/.shippable.yml
-@@ -7,11 +7,10 @@ env:
-   matrix:
-     - IMAGE=debian-amd64
-       TARGET_LIST=x86_64-softmmu,x86_64-linux-user
--    # currently disabled as the mxe.cc repos are down
--    # - IMAGE=debian-win32-cross
--    #   TARGET_LIST=arm-softmmu,i386-softmmu,lm32-softmmu
--    # - IMAGE=debian-win64-cross
--    #   TARGET_LIST=aarch64-softmmu,sparc64-softmmu,x86_64-softmmu
-+    - IMAGE=debian-win32-cross
-+      TARGET_LIST=arm-softmmu,i386-softmmu,lm32-softmmu
-+    - IMAGE=debian-win64-cross
-+      TARGET_LIST=aarch64-softmmu,sparc64-softmmu,x86_64-softmmu
-     - IMAGE=debian-armel-cross
-       TARGET_LIST=arm-softmmu,arm-linux-user,armeb-linux-user
-     - IMAGE=debian-armhf-cross
+diff --git a/tests/migration-test.c b/tests/migration-test.c
+index b6434628e1c..ce041f80c2a 100644
+--- a/tests/migration-test.c
++++ b/tests/migration-test.c
+@@ -308,7 +308,7 @@ static void check_guests_ram(QTestState *who)
+     uint8_t first_byte;
+     uint8_t last_byte;
+     bool hit_edge = false;
+-    bool bad = false;
++    int bad = 0;
+ 
+     qtest_memread(who, start_address, &first_byte, 1);
+     last_byte = first_byte;
+@@ -327,15 +327,20 @@ static void check_guests_ram(QTestState *who)
+                 hit_edge = true;
+                 last_byte = b;
+             } else {
+-                fprintf(stderr, "Memory content inconsistency at %x"
+-                                " first_byte = %x last_byte = %x current = %x"
+-                                " hit_edge = %x\n",
+-                                address, first_byte, last_byte, b, hit_edge);
+-                bad = true;
++                bad++;
++                if (bad <= 10) {
++                    fprintf(stderr, "Memory content inconsistency at %x"
++                            " first_byte = %x last_byte = %x current = %x"
++                            " hit_edge = %x\n",
++                            address, first_byte, last_byte, b, hit_edge);
++                }
+             }
+         }
+     }
+-    g_assert_false(bad);
++    if (bad >= 10) {
++        fprintf(stderr, "and in another %d pages", bad);
++    }
++    g_assert(bad == 0);
+ }
+ 
+ static void cleanup(const char *filename)
 -- 
 2.20.1
 
