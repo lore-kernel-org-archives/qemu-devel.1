@@ -2,56 +2,60 @@ Return-Path: <SRS0=r3/N=VJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F4B5C742C7
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 14:50:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A859DC742BD
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 14:54:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 64DFB2080A
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 14:50:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 64DFB2080A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 38BE32080A
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 14:54:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38BE32080A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50232 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50064 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hlwsc-0003cL-FX
-	for qemu-devel@archiver.kernel.org; Fri, 12 Jul 2019 10:50:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50361)
+	id 1hlwdZ-0005UR-4n
+	for qemu-devel@archiver.kernel.org; Fri, 12 Jul 2019 10:35:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44915)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <julio.montes@intel.com>) id 1hlwsQ-0003Cb-Rs
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 10:50:23 -0400
+ (envelope-from <quintela@redhat.com>) id 1hlwbA-0004dU-5y
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 10:32:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <julio.montes@intel.com>) id 1hlwsP-0006g5-UF
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 10:50:22 -0400
-Received: from mga11.intel.com ([192.55.52.93]:19585)
+ (envelope-from <quintela@redhat.com>) id 1hlwb9-0001it-77
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 10:32:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51810)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <julio.montes@intel.com>)
- id 1hlwsP-0006dU-Lk
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 10:50:21 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
- by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 12 Jul 2019 07:50:18 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.63,482,1557212400"; d="scan'208";a="186615576"
-Received: from unknown (HELO fedora.zpn.intel.com.) ([10.219.4.39])
- by fmsmga001.fm.intel.com with ESMTP; 12 Jul 2019 07:50:17 -0700
-From: Julio Montes <julio.montes@intel.com>
+ (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1hlwb9-0001iQ-1d
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 10:32:31 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 5F070308FEC6;
+ Fri, 12 Jul 2019 14:32:30 +0000 (UTC)
+Received: from localhost.localdomain (unknown [10.36.118.16])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1DB3F60639;
+ Fri, 12 Jul 2019 14:32:27 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Fri, 12 Jul 2019 14:50:17 +0000
-Message-Id: <20190712145017.17879-1-julio.montes@intel.com>
-X-Mailer: git-send-email 2.17.2
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 192.55.52.93
-Subject: [Qemu-devel] [PATCH] hw/i386: turn off vmport if CONFIG_VMPORT is
- disabled
+Date: Fri, 12 Jul 2019 16:31:55 +0200
+Message-Id: <20190712143207.4214-8-quintela@redhat.com>
+In-Reply-To: <20190712143207.4214-1-quintela@redhat.com>
+References: <20190712143207.4214-1-quintela@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.49]); Fri, 12 Jul 2019 14:32:30 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PULL 07/19] migration/multifd: sync packet_num after
+ all thread are done
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -63,47 +67,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Julio Montes <julio.montes@intel.com>, pbonzini@redhat.com,
- philmd@redhat.com
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ kvm@vger.kernel.org, Juan Quintela <quintela@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Peter Xu <peterx@redhat.com>,
+ Wei Yang <richardw.yang@linux.intel.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-vmport device is not included when CONFIG_VMPORT is disabled, hence
-QEMU fails with the following error:
+From: Wei Yang <richardw.yang@linux.intel.com>
 
-`Unknown device 'vmport' for bus 'ISA': unknown.`
+Notification from recv thread is not ordered, which means we may be
+notified by one MultiFDRecvParams but adjust packet_num for another.
 
-Signed-off-by: Julio Montes <julio.montes@intel.com>
+Move the adjustment after we are sure each recv thread are sync-ed.
+
+Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+Reviewed-by: Juan Quintela <quintela@redhat.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
+Message-Id: <20190604023540.26532-1-richardw.yang@linux.intel.com>
+Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- hw/i386/pc.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ migration/ram.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index c33ce47578..549c437050 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -83,6 +83,7 @@
- #include "hw/mem/memory-device.h"
- #include "sysemu/replay.h"
- #include "qapi/qmp/qerror.h"
-+#include "config-devices.h"
- 
- /* debug PC/ISA interrupts */
- //#define DEBUG_IRQ
-@@ -2793,7 +2794,11 @@ static void pc_machine_initfn(Object *obj)
- 
-     pcms->max_ram_below_4g = 0; /* use default */
-     pcms->smm = ON_OFF_AUTO_AUTO;
-+#ifdef CONFIG_VMPORT
-     pcms->vmport = ON_OFF_AUTO_AUTO;
-+#else
-+    pcms->vmport = ON_OFF_AUTO_OFF;
-+#endif /* CONFIG_VMPORT */
-     /* acpi build is enabled by default if machine supports it */
-     pcms->acpi_build_enabled = PC_MACHINE_GET_CLASS(pcms)->has_acpi_build;
-     pcms->smbus_enabled = true;
--- 
-2.17.2
+diff --git a/migration/ram.c b/migration/ram.c
+index d3d72b6f4f..96c84f770a 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -1291,15 +1291,15 @@ static void multifd_recv_sync_main(void)
+=20
+         trace_multifd_recv_sync_main_wait(p->id);
+         qemu_sem_wait(&multifd_recv_state->sem_sync);
++    }
++    for (i =3D 0; i < migrate_multifd_channels(); i++) {
++        MultiFDRecvParams *p =3D &multifd_recv_state->params[i];
++
+         qemu_mutex_lock(&p->mutex);
+         if (multifd_recv_state->packet_num < p->packet_num) {
+             multifd_recv_state->packet_num =3D p->packet_num;
+         }
+         qemu_mutex_unlock(&p->mutex);
+-    }
+-    for (i =3D 0; i < migrate_multifd_channels(); i++) {
+-        MultiFDRecvParams *p =3D &multifd_recv_state->params[i];
+-
+         trace_multifd_recv_sync_main_signal(p->id);
+         qemu_sem_post(&p->sem_sync);
+     }
+--=20
+2.21.0
 
 
