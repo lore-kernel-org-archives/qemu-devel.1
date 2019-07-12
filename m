@@ -2,115 +2,70 @@ Return-Path: <SRS0=r3/N=VJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A12FAC742BA
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 12:17:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3F63C742BA
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 12:30:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 77B6420863
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 12:17:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 77B6420863
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id CB763208E4
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jul 2019 12:30:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB763208E4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49032 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49068 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hluUw-0002O9-KH
-	for qemu-devel@archiver.kernel.org; Fri, 12 Jul 2019 08:17:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35065)
+	id 1hluh1-0005aP-H3
+	for qemu-devel@archiver.kernel.org; Fri, 12 Jul 2019 08:30:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38087)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <laurent@vivier.eu>) id 1hluUl-0001zq-Kt
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 08:17:48 -0400
+ (envelope-from <kwolf@redhat.com>) id 1hlugo-00056W-1z
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 08:30:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1hluUk-0006EU-8g
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 08:17:47 -0400
-Received: from mout.kundenserver.de ([212.227.126.130]:47623)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hluUj-00068D-W6
- for qemu-devel@nongnu.org; Fri, 12 Jul 2019 08:17:46 -0400
-Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue012 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1M59am-1hn0x348CS-001AUS; Fri, 12 Jul 2019 14:17:22 +0200
-To: Arnd Bergmann <arnd@arndb.de>
-References: <20190711173131.6347-1-laurent@vivier.eu>
- <CAK8P3a3-UaZ+RzYNZ25zFHs=1iZNrnaP_eAuHE0WAztztA4EGA@mail.gmail.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Openpgp: preference=signencrypt
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <74807892-5d59-0a9a-8385-48cce361d842@vivier.eu>
-Date: Fri, 12 Jul 2019 14:17:16 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+ (envelope-from <kwolf@redhat.com>) id 1hlugm-0002al-Fc
+ for qemu-devel@nongnu.org; Fri, 12 Jul 2019 08:30:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46962)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>)
+ id 1hlugj-0002Wr-KH; Fri, 12 Jul 2019 08:30:09 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 80EFDC058CBD;
+ Fri, 12 Jul 2019 12:30:07 +0000 (UTC)
+Received: from dhcp-200-226.str.redhat.com (dhcp-200-226.str.redhat.com
+ [10.33.200.226])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 618D426E71;
+ Fri, 12 Jul 2019 12:30:02 +0000 (UTC)
+Date: Fri, 12 Jul 2019 14:30:00 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Max Reitz <mreitz@redhat.com>
+Message-ID: <20190712123000.GH4514@dhcp-200-226.str.redhat.com>
+References: <20190711195804.30703-1-mreitz@redhat.com>
+ <20190711195804.30703-2-mreitz@redhat.com>
+ <20190712092419.GB4514@dhcp-200-226.str.redhat.com>
+ <8ce2ce78-833e-c98f-ad3a-d44f6432ae4c@redhat.com>
+ <20190712110110.GE4514@dhcp-200-226.str.redhat.com>
+ <cd184838-6c1f-0d22-1d89-415dbd62955b@redhat.com>
+ <20190712112318.GG4514@dhcp-200-226.str.redhat.com>
+ <a05bce45-d7f7-99c4-8126-e326a5f21340@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAK8P3a3-UaZ+RzYNZ25zFHs=1iZNrnaP_eAuHE0WAztztA4EGA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:VTO0WCGvBEiTWzaDEqj6wvHE9YtB3lvbAYc+pQ3b18aZxQALhqr
- vkce6skcvIIyyS3pYM3S6Asj1GaJ4jZJYuhVMC7GjIvyQkw4FPzDpdRsTuWNjoRqMj+Mt3i
- hxHeFpRuBWU2oAkyEY3c1DnqSBFHT7LUBRZSo6TUBxfLeX1qHnSPqLeu/OgWYNx1tH5Lxeo
- 6FgpmSXYPLLM8g5sQssiw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:fvwlUoKRuvE=:vyaixjtMtHKMucpcxPVOLR
- REpazFYGH4ihL2/C8TqheBbFQvmbx0kzxn9ylOTo1Gbdr7Ai5/W5MoE3KG3Wyawj+XdMxUrm7
- JKUpq8PKEd7W6zon9N6v3SAZOyCBDcyZjGwbIwMfCcWL3/h6WLaEMmf4y1MpfjLCybx6ZzL7y
- mPvAU4ejfAR3TI6iJA2WodDj0V1mz1ubKsfChLUC20SrIqiVBJk6ZBwpo1nxS2poLxRGcva82
- 1m5bhqLt8AOjrAnj/FVQIcmvQkk2DawW8aTYUFYQB3wRxZc0qrqQiH4algzlAwSUnvdxYMd7J
- GiXmWFYJNFrE9v3cQJPx7mLiNSP9crUBR7GuJzo11BQ/gqm8S5QM4lg0sym+7JvDfyxy6CmPa
- GaW6oGmJXz6IF/Z5Yw0kvDIlB/mFhQHfvw/Erh3sFm4zhA/frg+a6R/ib/S010thNcgBPl8Rr
- z6y10i298ZY7i/DyNGw+1rYWT+OsTb3S6wjd61udXdY+kG9TBw1x17A+ZjE/y4Gim3VXwbuFL
- 4usXH++raYP3QZvbYjMsbPWd36cKAGjMfu9aHqTAGbc+umfqstd2pwaJXkcfbTpfQQGZc8ZKv
- QD+HNLeGDYS/Gupfw+833afvpVDMIUu7oz0RI153jP2/4zD8EPloACNldon8MisiRcoa0HOuA
- eVMu+BquEWBPctuSCFWazGy1ih7oiIcelB5RfEKMFeurBh1Ny3qOHkejx0/SA7sjyVozg4Qan
- 3PgyXTCuqE9fcyltJ6reFE+bhkDsUZeobmevhjKTgQHr8V19THtuHFPxKiw=
+Content-Type: multipart/signed; micalg=pgp-sha1;
+ protocol="application/pgp-signature"; boundary="qGV0fN9tzfkG3CxV"
+Content-Disposition: inline
+In-Reply-To: <a05bce45-d7f7-99c4-8126-e326a5f21340@redhat.com>
+User-Agent: Mutt/1.11.3 (2019-02-01)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.32]); Fri, 12 Jul 2019 12:30:07 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.130
-Subject: Re: [Qemu-devel] [PATCH v4] linux-user: fix to handle variably
- sized SIOCGSTAMP with new kernels
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [RFC 1/5] block/nbd: Fix hang in .bdrv_close()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -122,50 +77,161 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Gerhard Stenzel <gerhard.stenzel@de.ibm.com>, Riku Voipio <riku.voipio@iki.fi>,
- qemu-devel@nongnu.org, Christian Ehrhardt <christian.ehrhardt@canonical.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org,
+ qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 11/07/2019 à 23:05, Arnd Bergmann a écrit :
-> On Thu, Jul 11, 2019 at 7:32 PM Laurent Vivier <laurent@vivier.eu> wrote:
-> 
->>
->> Notes:
->>     v4: [lv] timeval64 and timespec64 are { long long , long }
-> 
->>
->> +STRUCT(timeval64, TYPE_LONGLONG, TYPE_LONG)
->> +
->> +STRUCT(timespec64, TYPE_LONGLONG, TYPE_LONG)
->> +
-> 
-> This still doesn't look right, see my earlier comment about padding
-> on big-endian architectures.
-> 
-> Note that the in-kernel 'timespec64' is different from the uapi
-> '__kernel_timespec' exported by the kernel. I also still think you may
-> need to convert between SIOCGSTAMP_NEW and SIOCGSTAMP_OLD,
-> e.g. when emulating a 32-bit riscv process (which only use
-> SIOCGSTAMP_NEW) on a kernel that only understands
-> SIOCGSTAMP_OLD.
 
-I agree.
-I'm preparing a patch always using SIOCGSTAMP and SIOCGSTAMPNS on the
-host (converting the structure when needed).
+--qGV0fN9tzfkG3CxV
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I've added the SH4 variant.
-I've added the sparc64 variant too: does it means sparc64 use the same
-structure internally for the OLD and NEW version?
-What about sparc 32bit?
+Am 12.07.2019 um 13:44 hat Max Reitz geschrieben:
+> On 12.07.19 13:23, Kevin Wolf wrote:
+> > Am 12.07.2019 um 13:09 hat Max Reitz geschrieben:
+> >> On 12.07.19 13:01, Kevin Wolf wrote:
+> >>> Am 12.07.2019 um 12:47 hat Max Reitz geschrieben:
+> >>>> On 12.07.19 11:24, Kevin Wolf wrote:
+> >>>>> Am 11.07.2019 um 21:58 hat Max Reitz geschrieben:
+> >>>>>> When nbd_close() is called from a coroutine, the connection_co nev=
+er
+> >>>>>> gets to run, and thus nbd_teardown_connection() hangs.
+> >>>>>>
+> >>>>>> This is because aio_co_enter() only puts the connection_co into th=
+e main
+> >>>>>> coroutine's wake-up queue, so this main coroutine needs to yield a=
+nd
+> >>>>>> reschedule itself to let the connection_co run.
+> >>>>>>
+> >>>>>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> >>>>>> ---
+> >>>>>>  block/nbd.c | 12 +++++++++++-
+> >>>>>>  1 file changed, 11 insertions(+), 1 deletion(-)
+> >>>>>>
+> >>>>>> diff --git a/block/nbd.c b/block/nbd.c
+> >>>>>> index 81edabbf35..b83b6cd43e 100644
+> >>>>>> --- a/block/nbd.c
+> >>>>>> +++ b/block/nbd.c
+> >>>>>> @@ -135,7 +135,17 @@ static void nbd_teardown_connection(BlockDriv=
+erState *bs)
+> >>>>>>      qio_channel_shutdown(s->ioc,
+> >>>>>>                           QIO_CHANNEL_SHUTDOWN_BOTH,
+> >>>>>>                           NULL);
+> >>>>>> -    BDRV_POLL_WHILE(bs, s->connection_co);
+> >>>>>> +
+> >>>>>> +    if (qemu_in_coroutine()) {
+> >>>>>> +        /* Let our caller poll and just yield until connection_co=
+ is done */
+> >>>>>> +        while (s->connection_co) {
+> >>>>>> +            aio_co_schedule(qemu_get_current_aio_context(),
+> >>>>>> +                            qemu_coroutine_self());
+> >>>>>> +            qemu_coroutine_yield();
+> >>>>>> +        }
+> >>>>>
+> >>>>> Isn't this busy waiting? Why not let s->connection_co wake us up wh=
+en
+> >>>>> it's about to terminate instead of immediately rescheduling ourselv=
+es?
+> >>>>
+> >>>> Yes, it is busy waiting, but I didn=E2=80=99t find that bad.  The co=
+nnection_co
+> >>>> will be invoked in basically every iteration, and once there is no
+> >>>> pending data, it will quit.
+> >>>>
+> >>>> The answer to =E2=80=9Cwhy not...=E2=80=9D of course is because it=
+=E2=80=99d be more complicated.
+> >>>>
+> >>>> But anyway.
+> >>>>
+> >>>> Adding a new function qemu_coroutine_run_after(target) that adds
+> >>>> qemu_coroutine_self() to the given @target coroutine=E2=80=99s wake-=
+up queue and
+> >>>> then using that instead of scheduling works, too, yes.
+> >>>>
+> >>>> I don=E2=80=99t really like being responsible for coroutine code, th=
+ough...
+> >>>>
+> >>>> (And maybe it=E2=80=99d be better to make it qemu_coroutine_yield_fo=
+r(target),
+> >>>> which does the above and then yields?)
+> >>>
+> >>> Or just do something like this, which is arguably not only a fix for =
+the
+> >>> busy wait, but also a code simplification:
+> >>
+> >> 1. Is that guaranteed to work?  What if data sneaks in, the
+> >> connection_co handles that, and doesn=E2=80=99t wake up the teardown_c=
+o?  Will
+> >> it be re-scheduled?
+> >=20
+> > Then connection_co is buggy because we clearly requested that it
+> > terminate.
+>=20
+> Did we?  This would be done by setting s->quit to true, which isn=E2=80=
+=99t
+> explicitly done here.
 
-For big-endian, I didn't find in the kernel where the difference is
-managed: a byte swapping of the 64bit value is not enough?
+*we clearly requested implicitly ;-)
 
-Thanks,
-Laurent
+> I thought it worked by just waking up the coroutine until it doesn=E2=80=
+=99t
+> receive anything anymore, because the connection is closed.  Now I don=E2=
+=80=99t
+> know whether QIO_CHANNEL_SHUTDOWN_BOTH discards data that has been
+> received before the channel is closed.  I don=E2=80=99t expect it to.
 
+It doesn't really matter, but I expect that we'll still read everything
+that was buffered and receive EOF after everything is read.
+
+> >            It is possible that it does so only after handling another
+> > request, but this wouldn't be a problem. teardown_co would then just
+> > sleep for a few cycles more until connection_co is done and reaches the
+> > aio_co_wake() call.
+>=20
+> I don=E2=80=99t quite understand, because the fact how connection_co would
+> proceed after handling another request was exactly my question.  If it
+> were to yield and not to wake up, it would never be done.
+
+But why would it not wake up? This would be a bug, every yield needs a
+corresponding place from which the coroutine is reentered later.
+
+If this were missing, it would already today mean that we hang during
+shutdown because s->connection_co would never become NULL.
+
+> But I=E2=80=99ve followed nbd_receive_reply() now, and I suppose nbd_read=
+_eof()
+> will simply never yield after we have invoked qio_channel_shutdown().
+
+If my expectation above is right, this would probably be the case at
+least for the "main" yield. Not sure if there aren't other yield points,
+though. But as I said, it doesn't matter anyway how many times the
+coroutine yields and is reentered before finally reaching the
+aio_co_wake() and terminating.
+
+Kevin
+
+--qGV0fN9tzfkG3CxV
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIcBAEBAgAGBQJdKH1IAAoJEH8JsnLIjy/WmNMQAIlVxTaFxLG1ffSKhPtbLFTj
+PNiPrKNAgudQo0BMuOPbdH4tL6j/rYOgFBdOuyqJd7T9CUjtmFQ1MPtu93Zqhuvw
+011CIqz/TesmQzs11OW4iFAm8rLlkM0bb0Ste/lOQ9VPhTX67o95PHS1vKnUuHw6
+sihpL+JY3SLeuQvvHY5Bm/LU8Xv9Wwur8NqWmm8Ca55l6bWEii2M45Wi52EQW2ab
+8c5M9VDZZcdegWs/7ujBEXcOMePu76MHKp4g5nTBpbU7VHPnh01BTPCJr08SoNbp
+QRJe9K09saJhAevlzlLfKRufSnxfqWrFaVv4/CHZKqiUHU6lLuEdDy4htifLtYKJ
+NJUOvcIOpfRxu8CoYah65KogVQ3VnnZJhoOIL+DvTpgQ/NanN6n5RhMVcenhqAId
+2SKtBDwPLaRfL4m+uUMZWIJelPsXH8ac1h+4Vp9B3/nLd5gcJc/9j8eKr3RJpdKl
+7aG42tqUdSm8kZLzfqIYjftarvCGis/NesafHWvVAsGJKIZaxX10FMMeHJl1pYzh
+9bpmyyeGns77pwszXOvpi7B3dUoDpdVKXXrqZ5kIm5ROJ7E6bw/vjU2wVjitrtpW
+1bqsY4W10zSdi+BoMRdMUD6QthNk/shk4qbmiGzn+53zoqQ6LDrIzZwQHSmzT8GV
+vG9ikR9sh3vZCtrweNba
+=O3oC
+-----END PGP SIGNATURE-----
+
+--qGV0fN9tzfkG3CxV--
 
