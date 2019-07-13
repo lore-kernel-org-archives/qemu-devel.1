@@ -2,57 +2,67 @@ Return-Path: <SRS0=hUdw=VK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51C9BC742A7
-	for <qemu-devel@archiver.kernel.org>; Sat, 13 Jul 2019 09:54:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00464C742A7
+	for <qemu-devel@archiver.kernel.org>; Sat, 13 Jul 2019 12:25:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 281C420838
-	for <qemu-devel@archiver.kernel.org>; Sat, 13 Jul 2019 09:54:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 281C420838
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id C4FA22083B
+	for <qemu-devel@archiver.kernel.org>; Sat, 13 Jul 2019 12:25:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4FA22083B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54346 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55068 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hmEjc-0001Ds-0S
-	for qemu-devel@archiver.kernel.org; Sat, 13 Jul 2019 05:54:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58277)
+	id 1hmH5d-00048K-2g
+	for qemu-devel@archiver.kernel.org; Sat, 13 Jul 2019 08:25:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36802)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <guoheyi@huawei.com>) id 1hmEjR-0000k8-MH
- for qemu-devel@nongnu.org; Sat, 13 Jul 2019 05:54:18 -0400
+ (envelope-from <no-reply@patchew.org>) id 1hmH5Q-0003fn-PO
+ for qemu-devel@nongnu.org; Sat, 13 Jul 2019 08:25:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <guoheyi@huawei.com>) id 1hmEjQ-0007Wi-Kq
- for qemu-devel@nongnu.org; Sat, 13 Jul 2019 05:54:17 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:34082 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <guoheyi@huawei.com>)
- id 1hmEjN-0007QB-PD; Sat, 13 Jul 2019 05:54:14 -0400
-Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id D921CB7764657033EA41;
- Sat, 13 Jul 2019 17:54:05 +0800 (CST)
-Received: from [127.0.0.1] (10.133.216.73) by DGGEMS407-HUB.china.huawei.com
- (10.3.19.207) with Microsoft SMTP Server id 14.3.439.0; Sat, 13 Jul 2019
- 17:53:58 +0800
-To: <qemu-arm@nongnu.org>, <qemu-devel@nongnu.org>,
- <linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.cs.columbia.edu>
-From: Guoheyi <guoheyi@huawei.com>
-Message-ID: <1b0aa6b2-80b1-a72e-6849-7323c3b9c6bc@huawei.com>
-Date: Sat, 13 Jul 2019 17:53:57 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.7.1
+ (envelope-from <no-reply@patchew.org>) id 1hmH5P-0007Tx-FW
+ for qemu-devel@nongnu.org; Sat, 13 Jul 2019 08:25:08 -0400
+Resent-Date: Sat, 13 Jul 2019 08:25:08 -0400
+Resent-Message-Id: <E1hmH5P-0007Tx-FW@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21434)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1hmH5P-0007Sh-5d
+ for qemu-devel@nongnu.org; Sat, 13 Jul 2019 08:25:07 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1563020688; cv=none; d=zoho.com; s=zohoarc; 
+ b=VkZY+/pXyOiNCEcH6rG8Lesxh6RtkSty5GWQFCWKUTsxDayvFO6d80BFnQtMJXulSmVIVWz4tExWkE5a9sQUCpNjzLrvrkdOxaL8AtNDB7gLPabuTBdTorCtO9Gno0rwdv3ak35XpBXymR6MCoNDRaeg2GBr3AYvnmaE5Rgd+8Y=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1563020688;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+ bh=h65oDD5nBFe5gQmf4LNYIUPgtBFEYio+H89rt44jsa4=; 
+ b=cm3YwNeclvmlBrZK3hkbeAi74b8UFsdm3WqzxDL5cQR8DdqOnJV6hOIqRjyRz3yw7aFsxzPVGi/Swfkjf5kND420nDCRuCtot261oh72klKA7ug28KQ/Irk4SmECLyb4n3rxdfawBN13aIY4bKJxDoYhhh65Irqmu70/ZSSPDdE=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1563020686926394.8155946908548;
+ Sat, 13 Jul 2019 05:24:46 -0700 (PDT)
+Message-ID: <156302068569.12463.17823158690472274941@c4a48874b076>
+In-Reply-To: <20190712104617.94707-1-sgarzare@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.133.216.73]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: sgarzare@redhat.com
+Date: Sat, 13 Jul 2019 05:24:46 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 45.249.212.35
-Subject: [Qemu-devel] [RFC] Add virtual SDEI support in qemu
+X-Received-From: 135.84.80.217
+Subject: Re: [Qemu-devel] [PATCH] gluster: fix .bdrv_reopen_prepare when
+ backing file is a JSON object
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -64,38 +74,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Marc Zyngier <marc.zyngier@arm.com>,
- Peter Maydell <peter.maydell@linaro.org>, James.Morse@arm.com,
- wanghaibin 00208455 <wanghaibin.wang@huawei.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, integration@gluster.org, qemu-devel@nongnu.org,
+ qemu-block@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi folks,
-
-Do it make sense to implement virtual SDEI in qemu? So that we can have 
-the standard way for guest to handle NMI watchdog, RAS events and 
-something else which involves SDEI in a physical ARM64 machine.
-
-My basic idea is like below:
-
-1. Change a few lines of code in kvm to allow unhandled SMC invocations 
-(like SDEI) to be sent to qemu, with exit reason of KVM_EXIT_HYPERCALL, 
-so we don't need to add new API.
-
-2. qemu handles supported SDEI calls just as the spec says for what a 
-hypervisor should do for a guest OS.
-
-3. For interrupts bound to hypervisor, qemu should stop injecting the 
-IRQ to guest through KVM, but jump to the registered event handler 
-directly, including context saving and restoring. Some interrupts like 
-virtual timer are handled by kvm directly, so we may refuse to bind such 
-interrupts to SDEI events.
-
-Any comment or suggestion will be really appreciated.
-
-Heyi
-
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDcxMjEwNDYxNy45NDcw
+Ny0xLXNnYXJ6YXJlQHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRoZSBh
+c2FuIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5nIGNvbW1hbmRzIGFuZAp0aGVp
+ciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0YWxsZWQsIHlvdSBjYW4gcHJv
+YmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMh
+L2Jpbi9iYXNoCm1ha2UgZG9ja2VyLWltYWdlLWZlZG9yYSBWPTEgTkVUV09SSz0xCnRpbWUgbWFr
+ZSBkb2NrZXItdGVzdC1kZWJ1Z0BmZWRvcmEgVEFSR0VUX0xJU1Q9eDg2XzY0LXNvZnRtbXUgSj0x
+NCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCiAgQ0MgICAgICBhdWRpby9ub2F1
+ZGlvLm8KICBDQyAgICAgIGF1ZGlvL3dhdmF1ZGlvLm8KICBDQyAgICAgIGF1ZGlvL21peGVuZy5v
+Ci90bXAvcWVtdS10ZXN0L3NyYy9ibG9jay9nbHVzdGVyLmM6OTM4OjIwOiBlcnJvcjogYWRkcmVz
+cyBvZiBhcnJheSAnc3RhdGUtPmJzLT5maWxlbmFtZScgd2lsbCBhbHdheXMgZXZhbHVhdGUgdG8g
+J3RydWUnIFstV2Vycm9yLC1XcG9pbnRlci1ib29sLWNvbnZlcnNpb25dCiAgICBpZiAoc3RhdGUt
+PmJzLT5maWxlbmFtZSAmJiAhc3Ryc3RhcnQoc3RhdGUtPmJzLT5maWxlbmFtZSwgImpzb246Iiwg
+TlVMTCkpIHsKICAgICAgICB+fn5+fn5+fn5+fl5+fn5+fn5+IH5+CjEgZXJyb3IgZ2VuZXJhdGVk
+LgoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3Mv
+MjAxOTA3MTIxMDQ2MTcuOTQ3MDctMS1zZ2FyemFyZUByZWRoYXQuY29tL3Rlc3RpbmcuYXNhbi8/
+dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hl
+dyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBh
+dGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
 
 
