@@ -2,72 +2,81 @@ Return-Path: <SRS0=hUdw=VK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 902A4C742A7
-	for <qemu-devel@archiver.kernel.org>; Sat, 13 Jul 2019 15:38:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8742C742D7
+	for <qemu-devel@archiver.kernel.org>; Sat, 13 Jul 2019 15:49:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6CCFD204FD
-	for <qemu-devel@archiver.kernel.org>; Sat, 13 Jul 2019 15:38:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6CCFD204FD
+	by mail.kernel.org (Postfix) with ESMTPS id B27A920651
+	for <qemu-devel@archiver.kernel.org>; Sat, 13 Jul 2019 15:49:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B27A920651
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56900 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56928 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hmK6c-0008Og-FX
-	for qemu-devel@archiver.kernel.org; Sat, 13 Jul 2019 11:38:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35501)
+	id 1hmKGm-0002ht-HO
+	for qemu-devel@archiver.kernel.org; Sat, 13 Jul 2019 11:49:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38303)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <pmathieu@redhat.com>) id 1hmK6S-0007zb-E0
- for qemu-devel@nongnu.org; Sat, 13 Jul 2019 11:38:25 -0400
+ (envelope-from <philmd@redhat.com>) id 1hmKGb-0002Dp-5O
+ for qemu-devel@nongnu.org; Sat, 13 Jul 2019 11:48:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pmathieu@redhat.com>) id 1hmK6R-0008UC-H4
- for qemu-devel@nongnu.org; Sat, 13 Jul 2019 11:38:24 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:39379)
+ (envelope-from <philmd@redhat.com>) id 1hmKGZ-0007UV-WB
+ for qemu-devel@nongnu.org; Sat, 13 Jul 2019 11:48:53 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:36851)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <pmathieu@redhat.com>) id 1hmK6R-0008TX-BN
- for qemu-devel@nongnu.org; Sat, 13 Jul 2019 11:38:23 -0400
-Received: by mail-wm1-f66.google.com with SMTP id u25so1004159wmc.4
- for <qemu-devel@nongnu.org>; Sat, 13 Jul 2019 08:38:22 -0700 (PDT)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hmKGZ-0007SZ-QH
+ for qemu-devel@nongnu.org; Sat, 13 Jul 2019 11:48:51 -0400
+Received: by mail-wm1-f68.google.com with SMTP id g67so7277850wme.1
+ for <qemu-devel@nongnu.org>; Sat, 13 Jul 2019 08:48:51 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=lg+JrveXNFGtbcf35gyENFZLG4up4GiqxiUvQ2bBtSw=;
- b=L7D1m/7X5o59UPJt62pY03MGrgUH4j6iFPUEalf29SJDd4m5XhvLzVgHj3qHTf6+PV
- OiGhu1/cspaitvcsPWUD+7HAgsYKAsFliVgZzFUAg1/Yc/qbobcH1BuJ+JVzL3XhnT4M
- ovLKQuCh6btwV1lv240Rqa7dUwnFsLGMsi+EuJ2OdELlw4ZvgRVPaOjD8asVCA5aGP8M
- IBNkUn7u+TeDhKniUk1qATpQwKTDkeHq8AYQs7d09BqcEZyPDmlyQ5N3/exf9rHumRuq
- k85pusJRuJEe67RL6ZsRmfg60lEY8J6pqFS/FvtltOSdQob4k1iTqaeUJ26EkD2Cwg3r
- JPWA==
-X-Gm-Message-State: APjAAAXFpQ/PTELrnOHKuK57LHwH95W5L9c8Fry7m/3ZFOG1++mzJaM/
- ldykOvOvzkJlWMcGf7RHdFGXtHNm4qnULKogVKgT5Q==
-X-Google-Smtp-Source: APXvYqxNTgghDcySGvTcamKVa07UZt+Jtlcnmfj3CWdcohps+rWOcDrTliIzgc8DfDPR1VG0z6IvpDh15G8kJc+yhLA=
-X-Received: by 2002:a1c:407:: with SMTP id 7mr16012252wme.113.1563032301248;
- Sat, 13 Jul 2019 08:38:21 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=lIQy/xM/lkJzHsC+uIrWgHZXPYT6lr3GMot/wp5sWa8=;
+ b=Z/ouzL0BodjR76BpB/NDpOeN9v/RFDRe8etuQdByRWjhkgv7epiFh/hslvOzrP3m+E
+ 1FQ7eaIbliTet2r4qaXu/YToQQqNCrb67wJkVFPvjQl5/Asnycz5P49U4FYQpbMskApa
+ pQEJOwjZnTathxaX2SflUKIP5hdc9FZ4IxE+3IGCPi1GpADuGt6+jDOjOqdLhZcNjhpa
+ NU4XWdZkO00FWDEFVyfzzdKzC+61PEDhmJvOX5vZAsiJUK4XqzhnqYw/X4jg0objdY1c
+ kUWCwChfluop1lzlpzRats39PVvMMg1CukXvANrD1+GPd+gGRmlzUaIXxqnWYXN7ozyb
+ qxGA==
+X-Gm-Message-State: APjAAAXd9TdKzQRpYbseQvtEhYGe+JOyCUm3OmIPauH2CNEXuPy/1Vsj
+ 0bcgJj/6TQKxdw93epghUf8/Bw==
+X-Google-Smtp-Source: APXvYqwHvxtIsPnmw/yE7JqVF5MRuvi16G2ZUMzLkFUnfxBVpy9SDmn2dgl60WSFYZO8ahw42oJ6jQ==
+X-Received: by 2002:a1c:cb0a:: with SMTP id b10mr15080885wmg.41.1563032930290; 
+ Sat, 13 Jul 2019 08:48:50 -0700 (PDT)
+Received: from [192.168.1.37] (62.red-83-42-61.dynamicip.rima-tde.net.
+ [83.42.61.62])
+ by smtp.gmail.com with ESMTPSA id o20sm28700297wrh.8.2019.07.13.08.48.49
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Sat, 13 Jul 2019 08:48:49 -0700 (PDT)
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
+References: <20190712111849.9006-1-alex.bennee@linaro.org>
+ <20190712111849.9006-2-alex.bennee@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <189b17fc-fdba-5ccc-d018-6fbd27c6babd@redhat.com>
+Date: Sat, 13 Jul 2019 17:48:48 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-References: <CAChFQ9RDi+VK_EERZsPB6UK_DpL-LDs97A6VivYSbuk=0VKP7A@mail.gmail.com>
- <CAFEAcA9gvX_9HDadd1VaC214CLDg7w1dOdCaKXuG5PXxC+-quA@mail.gmail.com>
- <20190128145642.GA3437@redhat.com>
- <CAFEAcA9cDvq3VRaQfAgEvc-sKA4TYEC9PuFX_Vofo18bSbip=Q@mail.gmail.com>
- <20190128151128.GB3437@redhat.com>
- <CAFEAcA_ZKNPd+m695jueEjoHUWLv88U_NcpVZwqiCD2HmUHsbg@mail.gmail.com>
-In-Reply-To: <CAFEAcA_ZKNPd+m695jueEjoHUWLv88U_NcpVZwqiCD2HmUHsbg@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Date: Sat, 13 Jul 2019 17:38:10 +0200
-Message-ID: <CAP+75-UuTQw1njK7W_rVeEf57L9iG+w5-KVuNHQx-AgaTU2haw@mail.gmail.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20190712111849.9006-2-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.128.66
-Subject: Re: [Qemu-devel] Building nsis installer - cross compile for Windows
+X-Received-From: 209.85.128.68
+Subject: Re: [Qemu-devel] [PATCH v1 1/7] tests/docker: add test-misc for
+ building tools & docs
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -79,31 +88,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Adam Baxter <voltagex@voltagex.org>,
- =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: Fam Zheng <fam@euphon.net>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ qemu-arm@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Jan 28, 2019 at 4:18 PM Peter Maydell <peter.maydell@linaro.org> wr=
-ote:
-> On Mon, 28 Jan 2019 at 15:11, Daniel P. Berrang=C3=A9 <berrange@redhat.co=
-m> wrote:
-> >
-> > On Mon, Jan 28, 2019 at 03:03:34PM +0000, Peter Maydell wrote:
-> > > Though something
-> > > doesn't seem quite right here, because the sdl2.c code is
-> > > looking for icon files in a hicolor/ subdirectory that
-> > > doesn't exist in the source tree.
-> >
-> > That directory is the standard icon installation directory for
-> > application icons. The QEMU icons are placed there by 'make install',
-> > but in the source dir they are in a flat layotu.
->
-> There doesn't seem to be any code to handle the flat layout,
-> though. (Contrast os_find_datadir() which looks in several
-> places for any particular file.)
+On 7/12/19 1:18 PM, Alex Bennée wrote:
+> Add yet another test type so we cna quickly exercise the miscellaneous
 
-FWIW this bug is still present in QEMU v4.1.0-rc0.
+"cna" -> "can"
+
+> build products of the build system under various docer configurations.
+> 
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> ---
+>  tests/docker/test-misc | 22 ++++++++++++++++++++++
+>  1 file changed, 22 insertions(+)
+>  create mode 100755 tests/docker/test-misc
+> 
+> diff --git a/tests/docker/test-misc b/tests/docker/test-misc
+> new file mode 100755
+> index 00000000000..d480afedca7
+> --- /dev/null
+> +++ b/tests/docker/test-misc
+> @@ -0,0 +1,22 @@
+> +#!/bin/bash -e
+> +#
+> +# Build the miscellaneous components
+> +#
+> +# Copyright (c) 2019 Linaro Ltd.
+> +#
+> +# Authors:
+> +#  Alex Bennée <alex.bennee@linaro.org>
+> +#
+> +# This work is licensed under the terms of the GNU GPL, version 2 or later.
+> +# See the COPYING file in the top-level directory.
+> +#
+> +# SPDX-License-Identifier: GPL-2.0-or-later
+> +
+> +. common.rc
+> +
+> +cd "$BUILD_DIR"
+> +
+> +# build everything else but QEMU
+> +configure_qemu --disable-user --disable-system --enable-docs --enable-tools
+> +build_qemu
+> +install_qemu
+> 
+
+I got:
+
+$ make docker-test-misc@debian-win32-cross
+  BUILD   debian9
+  GEN
+/home/phil/source/qemu/docker-src.2019-07-13-17.03.48.3829/qemu.tar
+  BUILD   debian9-mxe
+usage: git archive [<options>] <tree-ish> [<path>...]
+   or: git archive --list
+   or: git archive --remote <repo> [--exec <cmd>] [<options>] <tree-ish>
+[<path>...]
+   or: git archive --remote <repo> [--exec <cmd>] --list
+
+    --format <fmt>        archive format
+    --prefix <prefix>     prepend prefix to each pathname in the archive
+    -o, --output <file>   write the archive to this file
+    --worktree-attributes
+                          read .gitattributes in working directory
+    -v, --verbose         report archived files on stderr
+    -0                    store only
+    -1                    compress faster
+    -9                    compress better
+
+    -l, --list            list supported archive formats
+
+    --remote <repo>       retrieve the archive from remote repository <repo>
+    --exec <command>      path to the remote git-upload-archive command
+
+failed to archive qemu
+make[1]: *** [tests/docker/Makefile.include:31:
+qemu/docker-src.2019-07-13-17.03.48.3829] Error 1
+
+And remembered some script/archive patch on the list:
+https://lists.gnu.org/archive/html/qemu-devel/2019-07/msg02073.html
+
+With it amended this works correctly, so:
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
