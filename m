@@ -6,57 +6,57 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D752BC742D7
-	for <qemu-devel@archiver.kernel.org>; Sat, 13 Jul 2019 14:34:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06674C742A7
+	for <qemu-devel@archiver.kernel.org>; Sat, 13 Jul 2019 14:34:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AC87420838
-	for <qemu-devel@archiver.kernel.org>; Sat, 13 Jul 2019 14:34:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC87420838
+	by mail.kernel.org (Postfix) with ESMTPS id D7B1920838
+	for <qemu-devel@archiver.kernel.org>; Sat, 13 Jul 2019 14:34:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D7B1920838
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56576 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56578 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hmJ6P-0000VP-9z
-	for qemu-devel@archiver.kernel.org; Sat, 13 Jul 2019 10:34:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46537)
+	id 1hmJ6Q-0000d0-Nx
+	for qemu-devel@archiver.kernel.org; Sat, 13 Jul 2019 10:34:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46551)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <marcandre.lureau@redhat.com>) id 1hmJ65-0008AT-Tb
- for qemu-devel@nongnu.org; Sat, 13 Jul 2019 10:33:58 -0400
+ (envelope-from <marcandre.lureau@redhat.com>) id 1hmJ66-0008AW-MU
+ for qemu-devel@nongnu.org; Sat, 13 Jul 2019 10:34:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@redhat.com>) id 1hmJ64-0006xm-Ri
- for qemu-devel@nongnu.org; Sat, 13 Jul 2019 10:33:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33744)
+ (envelope-from <marcandre.lureau@redhat.com>) id 1hmJ64-0006xs-SZ
+ for qemu-devel@nongnu.org; Sat, 13 Jul 2019 10:33:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37888)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
- id 1hmJ64-0006bK-Lo
+ id 1hmJ64-0006mG-KV
  for qemu-devel@nongnu.org; Sat, 13 Jul 2019 10:33:56 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 5DD5E85376;
- Sat, 13 Jul 2019 14:33:36 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id E46CA3086227;
+ Sat, 13 Jul 2019 14:33:49 +0000 (UTC)
 Received: from localhost (ovpn-112-50.ams2.redhat.com [10.36.112.50])
- by smtp.corp.redhat.com (Postfix) with ESMTP id CB82E19699;
- Sat, 13 Jul 2019 14:33:28 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BB9F96012C;
+ Sat, 13 Jul 2019 14:33:41 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Sat, 13 Jul 2019 18:33:06 +0400
-Message-Id: <20190713143311.17620-2-marcandre.lureau@redhat.com>
+Date: Sat, 13 Jul 2019 18:33:07 +0400
+Message-Id: <20190713143311.17620-3-marcandre.lureau@redhat.com>
 In-Reply-To: <20190713143311.17620-1-marcandre.lureau@redhat.com>
 References: <20190713143311.17620-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.25]); Sat, 13 Jul 2019 14:33:36 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.42]); Sat, 13 Jul 2019 14:33:49 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v3 1/6] docker.py: add --run-as-current-user
+Subject: [Qemu-devel] [PATCH v3 2/6] docker.py: add podman support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,48 +77,157 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Podman will need further tweaks.
+Add a --engine option to select either docker, podman or auto.
 
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+Among other advantages, podman allows to run rootless & daemonless
+containers, fortunately sharing compatible CLI with docker.
+
+With current podman, we have to use a uidmap trick in order to be able
+to rw-share the ccache directory with the container user.
+
+With a user 1000, the default mapping is:                                =
+                                                                         =
+                                                                1000 (hos=
+t) -> 0 (container).
+So write access to /var/tmp/ccache ends will end with permission
+denied error.
+
+With "--uidmap 1000:0:1 --uidmap 0:1:1000", the mapping is:
+1000 (host) -> 0 (container, 1st namespace) -> 1000 (container, 2nd names=
+pace).
+(the rest is mumbo jumbo to avoid holes in the range of UIDs)
+
+A future podman version may have an option such as --userns-keep-uid.
+Thanks to Debarshi Ray <rishi@redhat.com> for the help!
+
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Acked-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 ---
- tests/docker/Makefile.include | 2 +-
- tests/docker/docker.py        | 5 +++++
- 2 files changed, 6 insertions(+), 1 deletion(-)
+ tests/docker/docker.py | 48 +++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 43 insertions(+), 5 deletions(-)
 
-diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.includ=
-e
-index aaf5396b85..f4226b79d0 100644
---- a/tests/docker/Makefile.include
-+++ b/tests/docker/Makefile.include
-@@ -212,7 +212,7 @@ docker-run: docker-qemu-src
- 			"  COPYING $(EXECUTABLE) to $(IMAGE)"))
- 	$(call quiet-command,						\
- 		$(DOCKER_SCRIPT) run 					\
--			$(if $(NOUSER),,-u $(shell id -u)) 		\
-+			$(if $(NOUSER),,--run-as-current-user) 		\
- 			--security-opt seccomp=3Dunconfined		\
- 			$(if $V,,--rm) 					\
- 			$(if $(DEBUG),-ti,)				\
 diff --git a/tests/docker/docker.py b/tests/docker/docker.py
-index 53a8c9c801..f15545aeea 100755
+index f15545aeea..ac5baab4ca 100755
 --- a/tests/docker/docker.py
 +++ b/tests/docker/docker.py
-@@ -333,8 +333,13 @@ class RunCommand(SubCommand):
-     def args(self, parser):
-         parser.add_argument("--keep", action=3D"store_true",
-                             help=3D"Don't remove image when command comp=
-letes")
-+        parser.add_argument("--run-as-current-user", action=3D"store_tru=
-e",
-+                            help=3D"Run container using the current user=
-'s uid")
+@@ -20,6 +20,7 @@ import hashlib
+ import atexit
+ import uuid
+ import argparse
++import enum
+ import tempfile
+ import re
+ import signal
+@@ -38,6 +39,26 @@ FILTERED_ENV_NAMES =3D ['ftp_proxy', 'http_proxy', 'ht=
+tps_proxy']
 =20
-     def run(self, args, argv):
-+        if args.run_as_current_user:
-+            uid =3D os.getuid()
-+            argv =3D [ "-u", str(uid) ] + argv
+ DEVNULL =3D open(os.devnull, 'wb')
+=20
++class EngineEnum(enum.IntEnum):
++    AUTO =3D 1
++    DOCKER =3D 2
++    PODMAN =3D 3
++
++    def __str__(self):
++        return self.name.lower()
++
++    def __repr__(self):
++        return str(self)
++
++    @staticmethod
++    def argparse(s):
++        try:
++            return EngineEnum[s.upper()]
++        except KeyError:
++            return s
++
++
++USE_ENGINE =3D EngineEnum.AUTO
+=20
+ def _text_checksum(text):
+     """Calculate a digest string unique to the text content"""
+@@ -48,9 +69,14 @@ def _file_checksum(filename):
+     return _text_checksum(open(filename, 'rb').read())
+=20
+=20
+-def _guess_docker_command():
+-    """ Guess a working docker command or raise exception if not found""=
+"
+-    commands =3D [["docker"], ["sudo", "-n", "docker"]]
++def _guess_engine_command():
++    """ Guess a working engine command or raise exception if not found""=
+"
++    commands =3D []
++
++    if USE_ENGINE in [EngineEnum.AUTO, EngineEnum.PODMAN]:
++        commands +=3D [["podman"]]
++    if USE_ENGINE in [EngineEnum.AUTO, EngineEnum.DOCKER]:
++        commands +=3D [["docker"], ["sudo", "-n", "docker"]]
+     for cmd in commands:
+         try:
+             # docker version will return the client details in stdout
+@@ -61,7 +87,7 @@ def _guess_docker_command():
+         except OSError:
+             pass
+     commands_txt =3D "\n".join(["  " + " ".join(x) for x in commands])
+-    raise Exception("Cannot find working docker command. Tried:\n%s" %
++    raise Exception("Cannot find working engine command. Tried:\n%s" %
+                     commands_txt)
+=20
+=20
+@@ -190,7 +216,7 @@ def _dockerfile_preprocess(df):
+ class Docker(object):
+     """ Running Docker commands """
+     def __init__(self):
+-        self._command =3D _guess_docker_command()
++        self._command =3D _guess_engine_command()
+         self._instances =3D []
+         atexit.register(self._kill_instances)
+         signal.signal(signal.SIGTERM, self._kill_instances)
+@@ -340,6 +366,11 @@ class RunCommand(SubCommand):
+         if args.run_as_current_user:
+             uid =3D os.getuid()
+             argv =3D [ "-u", str(uid) ] + argv
++            docker =3D Docker()
++            if docker._command[0] =3D=3D "podman":
++                argv =3D [ "--uidmap", "%d:0:1" % uid,
++                         "--uidmap", "0:1:%d" % uid,
++                         "--uidmap", "%d:%d:64536" % (uid + 1, uid + 1)]=
+ + argv
          return Docker().run(argv, args.keep, quiet=3Dargs.quiet)
+=20
+=20
+@@ -507,6 +538,8 @@ class ProbeCommand(SubCommand):
+                 print("yes")
+             elif docker._command[0] =3D=3D "sudo":
+                 print("sudo")
++            elif docker._command[0] =3D=3D "podman":
++                print("podman")
+         except Exception:
+             print("no")
+=20
+@@ -602,9 +635,13 @@ class CheckCommand(SubCommand):
+=20
+=20
+ def main():
++    global USE_ENGINE
++
+     parser =3D argparse.ArgumentParser(description=3D"A Docker helper",
+                                      usage=3D"%s <subcommand> ..." %
+                                      os.path.basename(sys.argv[0]))
++    parser.add_argument("--engine", type=3DEngineEnum.argparse, choices=3D=
+list(EngineEnum),
++                        help=3D"specify which container engine to use")
+     subparsers =3D parser.add_subparsers(title=3D"subcommands", help=3DN=
+one)
+     for cls in SubCommand.__subclasses__():
+         cmd =3D cls()
+@@ -613,6 +650,7 @@ def main():
+         cmd.args(subp)
+         subp.set_defaults(cmdobj=3Dcmd)
+     args, argv =3D parser.parse_known_args()
++    USE_ENGINE =3D args.engine
+     return args.cmdobj.run(args, argv)
 =20
 =20
 --=20
