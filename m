@@ -2,59 +2,67 @@ Return-Path: <SRS0=hUdw=VK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E576C31E40
-	for <qemu-devel@archiver.kernel.org>; Sat, 13 Jul 2019 16:59:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7ED4CC31E40
+	for <qemu-devel@archiver.kernel.org>; Sat, 13 Jul 2019 17:46:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 15AEE20830
-	for <qemu-devel@archiver.kernel.org>; Sat, 13 Jul 2019 16:59:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 15AEE20830
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4D15D20848
+	for <qemu-devel@archiver.kernel.org>; Sat, 13 Jul 2019 17:46:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D15D20848
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=weilnetz.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57388 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57522 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hmLMq-0002Ij-4n
-	for qemu-devel@archiver.kernel.org; Sat, 13 Jul 2019 12:59:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59374)
+	id 1hmM6Y-00023f-4I
+	for qemu-devel@archiver.kernel.org; Sat, 13 Jul 2019 13:46:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43361)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hmLMf-0001v1-N2
- for qemu-devel@nongnu.org; Sat, 13 Jul 2019 12:59:14 -0400
+ (envelope-from <sw@weilnetz.de>) id 1hmM6M-0001ff-SS
+ for qemu-devel@nongnu.org; Sat, 13 Jul 2019 13:46:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hmLMd-0002MW-PR
- for qemu-devel@nongnu.org; Sat, 13 Jul 2019 12:59:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58294)
+ (envelope-from <sw@weilnetz.de>) id 1hmM6L-0001FS-2f
+ for qemu-devel@nongnu.org; Sat, 13 Jul 2019 13:46:26 -0400
+Received: from mail.weilnetz.de ([37.120.169.71]:59694
+ helo=v2201612906741603.powersrv.de)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hmLMd-0002Jo-Iv
- for qemu-devel@nongnu.org; Sat, 13 Jul 2019 12:59:11 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <sw@weilnetz.de>) id 1hmM6K-0001Dk-O3
+ for qemu-devel@nongnu.org; Sat, 13 Jul 2019 13:46:24 -0400
+Received: from localhost (localhost [127.0.0.1])
+ by v2201612906741603.powersrv.de (Postfix) with ESMTP id 5704ADB85E1;
+ Sat, 13 Jul 2019 19:46:20 +0200 (CEST)
+X-Virus-Scanned: Debian amavisd-new at v2201612906741603.powersrv.de
+Received: from v2201612906741603.powersrv.de ([127.0.0.1])
+ by localhost (v2201612906741603.powersrv.de [127.0.0.1]) (amavisd-new,
+ port 10024)
+ with ESMTP id DsZvG8toFtvE; Sat, 13 Jul 2019 19:46:18 +0200 (CEST)
+Received: from edv-macbook-pro.fritz.box (p57B4293C.dip0.t-ipconnect.de
+ [87.180.41.60])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id C08C38110E;
- Sat, 13 Jul 2019 16:59:06 +0000 (UTC)
-Received: from x1w.redhat.com (ovpn-204-24.brq.redhat.com [10.40.204.24])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E02665DA34;
- Sat, 13 Jul 2019 16:58:59 +0000 (UTC)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Sat, 13 Jul 2019 18:58:56 +0200
-Message-Id: <20190713165856.29883-1-philmd@redhat.com>
+ by v2201612906741603.powersrv.de (Postfix) with ESMTPSA id 8A295DB7960;
+ Sat, 13 Jul 2019 19:46:18 +0200 (CEST)
+To: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>,
+ peter.maydell@linaro.org
+From: Stefan Weil <sw@weilnetz.de>
+Message-ID: <030a439f-bb17-8232-bd1c-3585905e8feb@weilnetz.de>
+Date: Sat, 13 Jul 2019 19:46:17 +0200
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
+ Gecko/20100101 Thunderbird/60.7.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.28]); Sat, 13 Jul 2019 16:59:06 +0000 (UTC)
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [RFC PATCH-for-4.1] Makefile: Fix the NSIS Windows
- builds
+X-Received-From: 37.120.169.71
+Subject: [Qemu-devel] [BUG] 216 Alerts reported by LGTM for QEMU (some might
+ be release critical)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,76 +74,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Adam Baxter <voltagex@voltagex.org>,
- "Daniel P . Berrange" <berrange@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Stefan Weil <sw@weilnetz.de>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The qemu-nsis.bmp file was not listed with the other blobs, thus
-not installed in the ${BINDIR} location.
+Hi,
 
-This fixes:
+LGTM reports 16 errors, 81 warnings and 119 recommendations:=20
+https://lgtm.com/projects/g/qemu/qemu/alerts/?mode=3Dlist.
 
-  $ make installer
-  [...]
-  (cd /tmp/qemu-nsis; \
-           for i in qemu-system-*.exe; do \
-             arch=3D${i%.exe}; \
-             arch=3D${arch#qemu-system-}; \
-             echo Section \"$arch\" Section_$arch; \
-             echo SetOutPath \"\$INSTDIR\"; \
-             echo File \"\${BINDIR}\\$i\"; \
-             echo SectionEnd; \
-           done \
-          ) >/tmp/qemu-nsis/system-emulations.nsh
-  makensis -V2 -NOCD \
-                  -DCONFIG_DOCUMENTATION=3D"y" \
-                   \
-                  -DBINDIR=3D"/tmp/qemu-nsis" \
-                   \
-                  -DSRCDIR=3D"/home/phil/source/qemu" \
-                  -DOUTFILE=3D"qemu-setup-4.0.90.exe" \
-                  -DDISPLAYVERSION=3D"4.0.90" \
-                  /home/phil/source/qemu/qemu.nsi
-  File: "/tmp/qemu-nsis\*.bmp" -> no files found.
-  Usage: File [/nonfatal] [/a] ([/r] [/x filespec [...]] filespec [...] |
-     /oname=3Doutfile one_file_only)
-  Error in script "/home/phil/source/qemu/qemu.nsi" on line 122 -- aborti=
-ng creation process
-  Makefile:1077: recipe for target 'qemu-setup-4.0.90.exe' failed
-  make: *** [qemu-setup-4.0.90.exe] Error 1
+Some of them are already know (wrong format strings), others look like=20
+real errors:
 
-Fixes: https://bugs.launchpad.net/bugs/1836453
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
-Based-on: 20190713163558.13204-1-philmd@redhat.com
-https://lists.gnu.org/archive/html/qemu-devel/2019-07/msg03204.html
+- several multiplication results which don't work as they should in=20
+contrib/vhost-user-gpu, block/* (m->nb_clusters * s->cluster_size only=20
+32 bit!),=C2=A0 target/i386/translate.c and other files
 
-$ file qemu-setup-4.0.90.exe
-qemu-setup-4.0.90.exe: PE32 executable (GUI) Intel 80386 (stripped to ext=
-ernal PDB), for MS Windows, Nullsoft Installer self-extracting archive
----
- Makefile | 1 +
- 1 file changed, 1 insertion(+)
+- potential buffer overflows in gdbstub.c and other files
 
-diff --git a/Makefile b/Makefile
-index 1fcbaed62c..de4dfa2214 100644
---- a/Makefile
-+++ b/Makefile
-@@ -761,6 +761,7 @@ pxe-pcnet.rom pxe-rtl8139.rom pxe-virtio.rom \
- efi-e1000.rom efi-eepro100.rom efi-ne2k_pci.rom \
- efi-pcnet.rom efi-rtl8139.rom efi-virtio.rom \
- efi-e1000e.rom efi-vmxnet3.rom \
-+qemu-nsis.bmp \
- bamboo.dtb canyonlands.dtb petalogix-s3adsp1800.dtb petalogix-ml605.dtb =
-\
- multiboot.bin linuxboot.bin linuxboot_dma.bin kvmvapic.bin pvh.bin \
- s390-ccw.img s390-netboot.img \
---=20
-2.20.1
+I am afraid that the overflows in the block code are release critical,=20
+maybe that in target/i386/translate.c and other errors, too.
+
+About half of the alerts are issues which can be fixed later.
+
+Regards
+
+Stefan
 
 
