@@ -2,61 +2,80 @@ Return-Path: <SRS0=Qpa9=VL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D6C9C73C66
-	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jul 2019 14:52:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71331C73C66
+	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jul 2019 14:53:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0507120644
-	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jul 2019 14:52:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0507120644
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 394E620644
+	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jul 2019 14:53:30 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g92aXMLS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 394E620644
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60910 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60917 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hmfrI-0003Ri-7J
-	for qemu-devel@archiver.kernel.org; Sun, 14 Jul 2019 10:52:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54981)
+	id 1hmfsX-0004Kn-Hg
+	for qemu-devel@archiver.kernel.org; Sun, 14 Jul 2019 10:53:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55238)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mlevitsk@redhat.com>) id 1hmfr7-00031R-F5
- for qemu-devel@nongnu.org; Sun, 14 Jul 2019 10:52:02 -0400
+ (envelope-from <renyime@gmail.com>) id 1hmfsO-0003wT-KU
+ for qemu-devel@nongnu.org; Sun, 14 Jul 2019 10:53:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlevitsk@redhat.com>) id 1hmfr6-0002f5-4E
- for qemu-devel@nongnu.org; Sun, 14 Jul 2019 10:52:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52844)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mlevitsk@redhat.com>)
- id 1hmfr3-0002bk-4y; Sun, 14 Jul 2019 10:51:57 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A2CBEAC2C2;
- Sun, 14 Jul 2019 14:51:54 +0000 (UTC)
-Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.66])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 08C196012D;
- Sun, 14 Jul 2019 14:51:52 +0000 (UTC)
-Message-ID: <28c82479b79d6280b598ebace4a218e7e6bfa8f4.camel@redhat.com>
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Date: Sun, 14 Jul 2019 17:51:51 +0300
-In-Reply-To: <20190711162740.5p7znt5ernlw67nx@steredhat>
-References: <20190711150940.17483-1-mlevitsk@redhat.com>
- <20190711162740.5p7znt5ernlw67nx@steredhat>
+ (envelope-from <renyime@gmail.com>) id 1hmfsN-0004PH-NK
+ for qemu-devel@nongnu.org; Sun, 14 Jul 2019 10:53:20 -0400
+Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:43604)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <renyime@gmail.com>) id 1hmfsN-0004O3-Er
+ for qemu-devel@nongnu.org; Sun, 14 Jul 2019 10:53:19 -0400
+Received: by mail-lj1-x243.google.com with SMTP id 16so13641944ljv.10
+ for <qemu-devel@nongnu.org>; Sun, 14 Jul 2019 07:53:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=dAqeL5r8KlQ2MbAqgIH356bMtfzDzTA7TkWlTL0ypME=;
+ b=g92aXMLSJKQLT/jECsfEtlwWevz5H1lU4TaoF6RI8rTRU8kfmcsIrbF75vlgNk7x3T
+ OA99+ewaogDjq+bw1DAKZfaWcXQ2o2FjPZqCIKGbnF5SNAdJOTpNi3dca+KmKK3iZ9MG
+ cYyrkSqwgI2LXw6SSyhnD5HMxJBm2+XMbKdl5ts83wiAdT7sIHRpVsLSYsVFgxs1EwdS
+ ncjZKALf7TXDnuGfzhlzwXdrKmL2niRqDCwbKKZGx3Ws+7plXEAvg6iAnNYgXVCu4+t5
+ 7pCHQRSFOZ1WkJdR9Omh5uP8V2T5/fwlLqVbiN9NYPv+x2V17Hq3cgP9KfsiHOavKT3M
+ xA7g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=dAqeL5r8KlQ2MbAqgIH356bMtfzDzTA7TkWlTL0ypME=;
+ b=nIA4p6tQ7zzXFmOylSjPZCSfLFIW2CkqgKrmcYHVoBzlfgI9SJynAPsSD1MxkHqVqt
+ P2kfcpuS1iRkdACct10K2HFq8YYZmUxntHIpBUect8gpJvRcblrTdNHy7LqHinR6Ru2E
+ 8Ef7AQbI5/5hqlAA+3lSvdu6Wh6x0OGdLPt1wobwoCcG+epY0O1PK4hEbO8z7CwzYAOL
+ sL8urQJv+HOa2oHwan4T5Q+XjF8R//SWu3basRCfWCu+3GWQ4OWe4ZoYY6DFD4jwx6E1
+ Weuas0p+BPHCFpcdP6hWpOsNmVUlxgFqDpdCJGij706amX1nxnds3nWLh1Sit+aMMeJ+
+ eZZQ==
+X-Gm-Message-State: APjAAAWnSvrqdUKPWp22dfbMXjD29ehiamB6O2j+2LvdRTEbNDNODCC1
+ w3ymztgBDU73UNSOJmvREvnYF4M3gqtOCt1KWfY=
+X-Google-Smtp-Source: APXvYqziteOREfEraZyHXf21j0YBNoKIPwCv64kwPqgEj15Mu2ZKZ1UaWIPgQ7DMoarqTBaU/pIEPdF3QwTf8scRU3M=
+X-Received: by 2002:a2e:9a49:: with SMTP id k9mr11183474ljj.78.1563115997646; 
+ Sun, 14 Jul 2019 07:53:17 -0700 (PDT)
+MIME-Version: 1.0
+References: <1561468699-9819-1-git-send-email-ivanren@tencent.com>
+In-Reply-To: <1561468699-9819-1-git-send-email-ivanren@tencent.com>
+From: Ivan Ren <renyime@gmail.com>
+Date: Sun, 14 Jul 2019 22:53:05 +0800
+Message-ID: <CA+6E1==9SCRd4aVm0_M7gHbMNPhVsBExof4+DeDCGiFDZwkpMA@mail.gmail.com>
+To: quintela@redhat.com, dgilbert@redhat.com
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::243
 Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.38]); Sun, 14 Jul 2019 14:51:54 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v3] LUKS: support preallocation
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] [PATCH 0/3] migration: fix migrate_cancel problems
+ of multifd
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,170 +87,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org,
- Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 2019-07-11 at 18:27 +0200, Stefano Garzarella wrote:
-> On Thu, Jul 11, 2019 at 06:09:40PM +0300, Maxim Levitsky wrote:
-> > preallocation=off and preallocation=metadata
-> > both allocate luks header only, and preallocation=falloc/full
-> > is passed to underlying file.
-> > 
-> > Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=1534951
-> > 
-> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> > 
-> > ---
-> > 
-> > Note that QMP support was only compile tested, since I am still learning
-> > on how to use it.
-> > 
-> > If there is some library/script/etc which makes it more high level,
-> > I would more that glad to hear about it. So far I used the qmp-shell
-> > 
-> > Also can I use qmp's blockdev-create outside a vm running?
-> > 
-> >  block/crypto.c       | 29 ++++++++++++++++++++++++++---
-> >  qapi/block-core.json |  5 ++++-
-> >  2 files changed, 30 insertions(+), 4 deletions(-)
-> > 
-> > diff --git a/block/crypto.c b/block/crypto.c
-> > index 8237424ae6..034a645652 100644
-> > --- a/block/crypto.c
-> > +++ b/block/crypto.c
-> > @@ -74,6 +74,7 @@ static ssize_t block_crypto_read_func(QCryptoBlock *block,
-> >  struct BlockCryptoCreateData {
-> >      BlockBackend *blk;
-> >      uint64_t size;
-> > +    PreallocMode prealloc;
-> >  };
-> >  
-> >  
-> > @@ -112,7 +113,7 @@ static ssize_t block_crypto_init_func(QCryptoBlock *block,
-> >       * available to the guest, so we must take account of that
-> >       * which will be used by the crypto header
-> >       */
-> > -    return blk_truncate(data->blk, data->size + headerlen, PREALLOC_MODE_OFF,
-> > +    return blk_truncate(data->blk, data->size + headerlen, data->prealloc,
-> >                          errp);
-> >  }
-> >  
-> > @@ -251,6 +252,7 @@ static int block_crypto_open_generic(QCryptoBlockFormat format,
-> >  static int block_crypto_co_create_generic(BlockDriverState *bs,
-> >                                            int64_t size,
-> >                                            QCryptoBlockCreateOptions *opts,
-> > +                                          PreallocMode prealloc,
-> >                                            Error **errp)
-> >  {
-> >      int ret;
-> > @@ -266,9 +268,14 @@ static int block_crypto_co_create_generic(BlockDriverState *bs,
-> >          goto cleanup;
-> >      }
-> >  
-> > +    if (prealloc == PREALLOC_MODE_METADATA) {
-> > +        prealloc = PREALLOC_MODE_OFF;
-> > +    }
-> > +
-> >      data = (struct BlockCryptoCreateData) {
-> >          .blk = blk,
-> >          .size = size,
-> > +        .prealloc = prealloc,
-> >      };
-> >  
-> >      crypto = qcrypto_block_create(opts, NULL,
-> > @@ -500,6 +507,7 @@ block_crypto_co_create_luks(BlockdevCreateOptions *create_options, Error **errp)
-> >      BlockdevCreateOptionsLUKS *luks_opts;
-> >      BlockDriverState *bs = NULL;
-> >      QCryptoBlockCreateOptions create_opts;
-> > +    PreallocMode preallocation = PREALLOC_MODE_OFF;
-> >      int ret;
-> >  
-> >      assert(create_options->driver == BLOCKDEV_DRIVER_LUKS);
-> > @@ -515,8 +523,11 @@ block_crypto_co_create_luks(BlockdevCreateOptions *create_options, Error **errp)
-> >          .u.luks = *qapi_BlockdevCreateOptionsLUKS_base(luks_opts),
-> >      };
-> >  
-> > +    if (luks_opts->has_preallocation)
-> > +        preallocation = luks_opts->preallocation;
-> > +
-> >      ret = block_crypto_co_create_generic(bs, luks_opts->size, &create_opts,
-> > -                                         errp);
-> > +                                         preallocation, errp);
-> >      if (ret < 0) {
-> >          goto fail;
-> >      }
-> > @@ -534,12 +545,24 @@ static int coroutine_fn block_crypto_co_create_opts_luks(const char *filename,
-> >      QCryptoBlockCreateOptions *create_opts = NULL;
-> >      BlockDriverState *bs = NULL;
-> >      QDict *cryptoopts;
-> > +    PreallocMode prealloc;
-> > +    char *buf = NULL;
-> >      int64_t size;
-> >      int ret;
-> > +    Error *local_err = NULL;
-> >  
-> >      /* Parse options */
-> >      size = qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0);
-> >  
-> > +    buf = qemu_opt_get_del(opts, BLOCK_OPT_PREALLOC);
-> > +    prealloc = qapi_enum_parse(&PreallocMode_lookup, buf,
-> > +                               PREALLOC_MODE_OFF, &local_err);
-> > +    g_free(buf);
-> > +    if (local_err) {
-> > +        error_propagate(errp, local_err);
-> > +        return -EINVAL;
-> > +    }
-> > +
-> >      cryptoopts = qemu_opts_to_qdict_filtered(opts, NULL,
-> >                                               &block_crypto_create_opts_luks,
-> >                                               true);
-> > @@ -565,7 +588,7 @@ static int coroutine_fn block_crypto_co_create_opts_luks(const char *filename,
-> >      }
-> >  
-> >      /* Create format layer */
-> > -    ret = block_crypto_co_create_generic(bs, size, create_opts, errp);
-> > +    ret = block_crypto_co_create_generic(bs, size, create_opts, prealloc, errp);
-> >      if (ret < 0) {
-> >          goto fail;
-> >      }
-> > diff --git a/qapi/block-core.json b/qapi/block-core.json
-> > index 0d43d4f37c..ebcfc9f903 100644
-> > --- a/qapi/block-core.json
-> > +++ b/qapi/block-core.json
-> > @@ -4205,13 +4205,16 @@
-> >  #
-> >  # @file             Node to create the image format on
-> >  # @size             Size of the virtual disk in bytes
-> > +# @preallocation    Preallocation mode for the new image (default: off;
-> > +#                   allowed values: off/falloc/full
-> 
-> Should we add also "metadata" to allowed values? and "since: 4.2"?
-> I'd like to have (just to have similar documentation with others
-> preallocation parameters):
+The problem still exists in mainline, Ping for review
 
-It it support but preallocation=off is the same as preallocation=metadata in luks,
-as luks only metadata is the header which is created anyway.
-In some sense I should throw a error for preallocation=off, but I suspect that
-that will break userspace api.
-What do you think?
+On Tue, Jun 25, 2019 at 9:18 PM Ivan Ren <renyime@gmail.com> wrote:
 
-I forgot to add 'since: 4.2', will do in the next revision of that patch series.
-
-> 
->   # @preallocation    Preallocation mode for the new image (default: off;
->   #                   allowed values: off, falloc, full, metadata; since: 4.2)
-> 
-> 
-> Thanks,
-> Stefano
-
-
-Best regards,
-	Maxim Levitsky
-
-
-
+> The patches fix the problems encountered in multifd migration when try
+> to cancel the migration by migrate_cancel.
+>
+> Ivan Ren (3):
+>   migration: fix migrate_cancel leads live_migration thread endless loop
+>   migration: fix migrate_cancel leads live_migration thread hung forever
+>   migration: fix migrate_cancel multifd migration leads destination hung
+>     forever
+>
+>  migration/ram.c | 62 ++++++++++++++++++++++++++++++++++++++++---------
+>  1 file changed, 51 insertions(+), 11 deletions(-)
+>
+> --
+> 2.17.2 (Apple Git-113)
+>
+>
