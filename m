@@ -2,82 +2,85 @@ Return-Path: <SRS0=Qpa9=VL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99785C73C66
-	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jul 2019 15:40:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3756CC73C66
+	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jul 2019 16:01:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 683D120896
-	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jul 2019 15:40:32 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MFMNiovO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 683D120896
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 07A182063F
+	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jul 2019 16:01:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07A182063F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32900 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33136 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hmgc3-0005Tw-2t
-	for qemu-devel@archiver.kernel.org; Sun, 14 Jul 2019 11:40:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38047)
+	id 1hmgwN-0004BA-Qk
+	for qemu-devel@archiver.kernel.org; Sun, 14 Jul 2019 12:01:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43073)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <radoslaw.biernacki@linaro.org>) id 1hmgbs-0004wO-C5
- for qemu-devel@nongnu.org; Sun, 14 Jul 2019 11:40:21 -0400
+ (envelope-from <philmd@redhat.com>) id 1hmgwA-0003h6-8U
+ for qemu-devel@nongnu.org; Sun, 14 Jul 2019 12:01:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <radoslaw.biernacki@linaro.org>) id 1hmgbr-0007dk-Bh
- for qemu-devel@nongnu.org; Sun, 14 Jul 2019 11:40:20 -0400
-Received: from mail-yb1-xb44.google.com ([2607:f8b0:4864:20::b44]:44385)
+ (envelope-from <philmd@redhat.com>) id 1hmgw9-0004Ru-DI
+ for qemu-devel@nongnu.org; Sun, 14 Jul 2019 12:01:18 -0400
+Received: from mail-wr1-f48.google.com ([209.85.221.48]:35326)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <radoslaw.biernacki@linaro.org>)
- id 1hmgbr-0007cl-4k
- for qemu-devel@nongnu.org; Sun, 14 Jul 2019 11:40:19 -0400
-Received: by mail-yb1-xb44.google.com with SMTP id a14so5388077ybm.11
- for <qemu-devel@nongnu.org>; Sun, 14 Jul 2019 08:40:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=Ze3KVudLrBGvIef9Y9ql9VL/shPv2tJVaBI50kDaR+w=;
- b=MFMNiovOpcuz0jSsG/Vi5gD9mzPTzkHeK4fGdGhA+QrHPni6ZZEeW6jCVdpL7RPKGG
- BRCDHMZvDUSO8tmurfTtPNgy2pYD947xjSUpfOpQO8t0ajsa3YUhh4FwNfoKINN3y7/B
- eB/BF/Fn5c0OfsAdVaYIo/Ng9tRIp+UEd9lMv9c8R4as2eWQFvcAx+5gsFZctEG3pCdo
- Q1IuG/DQDGjMZ+khvyXGTdw7T748ZXW0h/LtiPLedSOjdKx71mwSrK8JDlmxi9xBpEMg
- UPKxPqnLj3d10yEpYvDTsg1/ZbwKhLiHLXHYgYLAQSlLqCpwHftCiaJRdhl/AhUhz6ma
- 6TMw==
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hmgw9-0004R3-5r
+ for qemu-devel@nongnu.org; Sun, 14 Jul 2019 12:01:17 -0400
+Received: by mail-wr1-f48.google.com with SMTP id y4so14576189wrm.2
+ for <qemu-devel@nongnu.org>; Sun, 14 Jul 2019 09:01:16 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=Ze3KVudLrBGvIef9Y9ql9VL/shPv2tJVaBI50kDaR+w=;
- b=AWpP0zKcvKcqq07GXmcW9JhVg2+RwTIgTaPNk+igf+vjUow8/JjLh70AK3+Fk3zQP3
- DSGDonT+RB8RSHkQUVu96c2Ykp2KWzpKYzIadQYCjHS7Tgu1OCHFs1SiAZI3zCADBCa9
- dmv2hSbV1omfqBo4pNeSS+dTIbGkXUe41bWT3H1hxE5LaX+gQEYLO8VAU3CAzr3aNLRd
- 8TmyIG+42qNCeP4thKkUkTCaEOtghbKPwdZmqagWj1Hw0zzg1BSMMVKAss7eX0QzNgvO
- KLsI96A6V+ZNCdFtjcoFaxy9Cg7Do6oiTmRDm6JG8q5ICEi1hukzywSzavBoCeH7kqgV
- J8qg==
-X-Gm-Message-State: APjAAAUu32AYG226sD/9X7gwYfYl+7IgLL+T7iCNKIwoEZtxSIIywcLG
- LjgVdqXjqeWyCpGRAQsF82gIZQQX0bbwrXYtZgO2Xw==
-X-Google-Smtp-Source: APXvYqwniRfTs+6BP43Fssu8E+sl+M7TLDHq6J2xNAP2io49YTlI93Q1IoB52YtidQlA7h0dqAaRxvngClirV0/m4IQ=
-X-Received: by 2002:a25:5e88:: with SMTP id
- s130mr13118946ybb.134.1563118817148; 
- Sun, 14 Jul 2019 08:40:17 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=Tu0CKk/DaGf8dbDBBxibhOQehNaT7jFlyBh2+tX3JCY=;
+ b=ST62gkmVxksQPnRiB8QjZ8ynowjql9bP7oGM2EXDO8rbikkHKx0R24scV19TlQTSP8
+ aHb8upya/evr9ziBAE8ipqxE8O4NB4524ddBMg9zVyvZrmaR0t69IwdnCXRcRVWHaon2
+ DxBvTnR2P782ouIh00z9Vbjl/oJEKOjYxIAYEHg7k0xt4jgZMI3/k+doErzAKh46xaqO
+ Z+cBS9jrRla9o1cV1hh3gRlVz4lmTDO0JNWVBjhZMqoGLR5emRM4muCEeWKIUu0p55LD
+ ferd0QoCzS3Sa3+VIk9z9CIeoJccgEUZxmRsIu2rGGApmFwSfVQJR1CxByAwiJ2IT+0V
+ 9A9g==
+X-Gm-Message-State: APjAAAVyKsPjvYZ9sAyO/a8P905iCLzZyuXo71mB0c6fnuUtCx9iUH3A
+ ATG8yqoDaX/Q6dAZbRfxbkcHXA==
+X-Google-Smtp-Source: APXvYqz/1tb9ydwueEJxs2WnRfRwRi8vRnN+OjzeeOUMvnmPkY6994SWETdaDCafDfUa9Z5gmL9Zzw==
+X-Received: by 2002:a5d:66c5:: with SMTP id k5mr24551840wrw.304.1563120075572; 
+ Sun, 14 Jul 2019 09:01:15 -0700 (PDT)
+Received: from [192.168.1.37] (62.red-83-42-61.dynamicip.rima-tde.net.
+ [83.42.61.62])
+ by smtp.gmail.com with ESMTPSA id l17sm1895100wrr.94.2019.07.14.09.01.14
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Sun, 14 Jul 2019 09:01:14 -0700 (PDT)
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+References: <20190712133928.21394-1-philmd@redhat.com>
+ <20190712133928.21394-3-philmd@redhat.com>
+ <64a41af4-e635-06e3-05a2-d2cddaf02af0@redhat.com>
+ <de30351b-6747-b976-16c5-c587b51f2b7a@redhat.com>
+ <e2a6cb5d-b840-117f-728c-b5b1bf4c18d6@redhat.com>
+ <49b41c61-fce7-3b5f-980a-20007125de9f@redhat.com>
+ <993dbb9e-6813-e927-fd69-d16015ea1fc2@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <8dc2d98e-fd69-b1d5-3d60-c5457e7b363b@redhat.com>
+Date: Sun, 14 Jul 2019 18:01:14 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-References: <1561890034-15921-1-git-send-email-hongbo.zhang@linaro.org>
- <20190714152010.GA28247@roeck-us.net>
-In-Reply-To: <20190714152010.GA28247@roeck-us.net>
-From: Radoslaw Biernacki <radoslaw.biernacki@linaro.org>
-Date: Sun, 14 Jul 2019 17:40:05 +0200
-Message-ID: <CAEK-wKk+1RQRmFOy8Rp+6fsOaZvzJvXSPNnyTKFY-7c-_VYSXw@mail.gmail.com>
-To: Guenter Roeck <linux@roeck-us.net>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::b44
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: Re: [Qemu-devel] [PATCH v9 0/2] Add Arm SBSA Reference Machine
+In-Reply-To: <993dbb9e-6813-e927-fd69-d16015ea1fc2@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.85.221.48
+Subject: Re: [Qemu-devel] [PATCH-for-4.1 2/7] hw/usb: Bluetooth HCI USB
+ depends on USB & BLUETOOTH
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,38 +92,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Hongbo Zhang <hongbo.zhang@linaro.org>, ard.biesheuvel@linaro.org,
- Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
- leif.lindholm@linaro.org, qemu-arm@nongnu.org
+Cc: Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ Miroslav Rezanina <mrezanin@redhat.com>, qemu-arm@nongnu.org,
+ Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This machine is not ment for direct kernel boot. Is main purpose is
-development of FW, kernel and other HW/SW parts for SBSA. We are currently
-working on UEFI and ATF for this machine.
+Hi Paolo,
 
-It might be somehow possible to run kernel with DT but we do not support it
-at this moment. If all you want is to boot kernel directly, it is far
-more convenient to use existing virt machine.
+On 7/12/19 7:31 PM, Paolo Bonzini wrote:
+> On 12/07/19 18:45, Philippe Mathieu-Daudé wrote:
+>> On 7/12/19 4:58 PM, Paolo Bonzini wrote:
+>>> The other is whether we want to enable USB_BLUETOOTH by default.  I
+>>> wouldn't have any problem there, but if we disable it basically no one
+>>> would ship/use it and we might as well delete the whole thing.
+>>
+>> The only user is the ARM Nokia N-series board, so if we set default=n,
+>> the Bluetooth subsystem will be only be selected on arm-softmmu (and
+>> aarch64-softmmu).
 
-niedz., 14 lip 2019, 17:20 u=C5=BCytkownik Guenter Roeck <linux@roeck-us.ne=
-t>
-napisa=C5=82:
+Using (1):
 
-> Hi,
->
-> On Sun, Jun 30, 2019 at 06:20:32PM +0800, Hongbo Zhang wrote:
-> > For the Aarch64, there is one machine 'virt', it is primarily meant to
-> > run on KVM and execute virtualization workloads, but we need an
-> > environment as faithful as possible to physical hardware,  to support
-> > firmware and OS development for pysical Aarch64 machines.
-> >
->
-> I tried to boot linux on this machine with -kernel command line argument,
-> but have not been successful. Can someone point me to a working command
-> line, one that lets me load the kernel directly ?
->
-> Thanks,
-> Guenter
->
++    default y if BLUETOOTH
+     depends on USB
++    select BLUETOOTH
+
+I get:
+
+    KconfigDataError: cycle found including BLUETOOTH
+
+This works but doesn't follow kconfig.rst (2):
+
++    default y if BLUETOOTH
+     depends on USB
+
+This works (kconfig.rst compliant, 3):
+
++    default n
+     depends on USB
++    select BLUETOOTH
+
+Are you OK with (2) or you prefer (3)?
+
+>>
+>> This seems a sane cleanup. If another board wants to use the bluetooth
+>> code, it should probably move it out of the orphan status.
+> 
+> Fair! ;)
+> 
+> Paolo
+> 
+
