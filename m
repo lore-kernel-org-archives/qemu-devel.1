@@ -7,71 +7,71 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC678C742D2
-	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jul 2019 11:14:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C87FAC73C66
+	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jul 2019 11:14:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6BCBE20820
-	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jul 2019 11:14:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9222620820
+	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jul 2019 11:14:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CX0UOX1u"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6BCBE20820
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BLXCiQBr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9222620820
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59762 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59772 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hmcSG-0001vK-6D
-	for qemu-devel@archiver.kernel.org; Sun, 14 Jul 2019 07:14:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60353)
+	id 1hmcSU-0003L1-SA
+	for qemu-devel@archiver.kernel.org; Sun, 14 Jul 2019 07:14:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60397)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1hmcR8-0005he-PW
- for qemu-devel@nongnu.org; Sun, 14 Jul 2019 07:13:00 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1hmcRB-0005tm-EM
+ for qemu-devel@nongnu.org; Sun, 14 Jul 2019 07:13:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1hmcR6-0006NQ-SQ
- for qemu-devel@nongnu.org; Sun, 14 Jul 2019 07:12:58 -0400
-Received: from mail-wm1-x333.google.com ([2a00:1450:4864:20::333]:36590)
+ (envelope-from <richard.henderson@linaro.org>) id 1hmcR9-0006Oz-Sm
+ for qemu-devel@nongnu.org; Sun, 14 Jul 2019 07:13:01 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:36565)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1hmcR6-0006N8-Kj
- for qemu-devel@nongnu.org; Sun, 14 Jul 2019 07:12:56 -0400
-Received: by mail-wm1-x333.google.com with SMTP id g67so8393093wme.1
- for <qemu-devel@nongnu.org>; Sun, 14 Jul 2019 04:12:56 -0700 (PDT)
+ id 1hmcR9-0006Oe-Kl
+ for qemu-devel@nongnu.org; Sun, 14 Jul 2019 07:12:59 -0400
+Received: by mail-wm1-x344.google.com with SMTP id g67so8393185wme.1
+ for <qemu-devel@nongnu.org>; Sun, 14 Jul 2019 04:12:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=KHFpSRHm8eke5kb9WIbzFk3DWe+3YkG7SdTFpV8kP0M=;
- b=CX0UOX1uqVpfp2rjhTU1HltFf39Mebnt7EbpNmQg+pSQHEs3GPQKh8vgFVyZWXE/o9
- PC9NYuiL9HinzFoXryopKFW65ycCHr3MkrHKwuqsGxksWSagi6qy0po0S/G6t89R061U
- KXXXBv06BHl1lwTznxzHb3KerRQrDIGcUe/QTg7R8W5qRqUA+QKnRRgXHaD+ppBqNkr8
- H1jg60nu8tfeaF3Sjacso7bXR1Y/VEjV6lsNFSSjnw49l2v5QbSUB0+JiaFJKNldReZn
- pxV5TEjm0PLjvnUM/Yhtqlak+PpxxVphYI3rWsRQyOyKsOdmP5HZSYwRLI948WP8tLzL
- k+SA==
+ bh=lrFuCc5Kh7yR4Plfx6C/M8vdRg/qQANiKVV3zv9IyqE=;
+ b=BLXCiQBrVW0eEY3m+JSCMjwSUT4j+IPCcr6ebq8qdmiFVrSfrjsiN7lPU+y2JNKrLW
+ NXgpGJPnakWBUXEdw4k8mVn74Ma3nwJAsolCv6j+4UU7FJV6zREW8Sci7Ys4AzuJbYWx
+ 4zpk/Hmd2RiNBEWwVkIZN58fbGTbPpXR4PQng73mspke8KJoYBo+kQNBgSXwjdw6/emU
+ +6ERd2i0gFUK5HwwADeq1ZpQI1UUjaaNBvlQBn49VimWRtGFwXJn+rl11tG3NQyQklEy
+ qYhY8WUQHFl73tUH3jWH9dNtwHSDNMpy9m6iojyLRyuWuY3+ZA73PJ5pGIMidTqG/xN3
+ lgkQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=KHFpSRHm8eke5kb9WIbzFk3DWe+3YkG7SdTFpV8kP0M=;
- b=R7J+5KG0qs6XlOAm/MsKGAqtF+J6qVggd1Hm3pAcyvBxTIO6na/zqmNGGxNgHuM9eK
- cpNlLodF0MbQ/wXn5O2ST64LW5fdHkpTNF1C4qpm/LoRfudvqzGvUYfllStEwQruyEr9
- Rm+bj5tRpPj7gQ1eBcLGIDn6eFSvT7gLQw+F9gc37gn2l8xEI0gPMpCF7FUHX2Wde4Rb
- bv5GsmcnHQoIaSiqiKkYIH42ihYUL1eBdPmPh0pMqtg6FQ/OBu2jt6yGFB2WlKbMuVG3
- tDcFTG0ImJ16XaXk5pavi+lmZh+YjokdzpyZCS5DTAukF9WVIlWuJ+MzNKqL3QUInO6s
- jfCw==
-X-Gm-Message-State: APjAAAW4dlHMgmA7h88QDJuqYpoi7LV9k+C/onuKk/xp0HzmvxHJPVAX
- EYD4rOsH91wPr96qCdngNRRpPES2Ok69WQ==
-X-Google-Smtp-Source: APXvYqx4xc4ZEutQBY7I7tAWyxUEiUlVCLUqo8tPF3II+ad0O7ZhzmExnDNtZHi1bKBT6MLC3IY4pQ==
-X-Received: by 2002:a1c:b707:: with SMTP id h7mr18788939wmf.45.1563102775188; 
- Sun, 14 Jul 2019 04:12:55 -0700 (PDT)
+ bh=lrFuCc5Kh7yR4Plfx6C/M8vdRg/qQANiKVV3zv9IyqE=;
+ b=V2qjmBay1SLUeeM8jlsnIJ+vyHtszgW5QO/zcNpWa488KOwfpOc00Uh0Ef30ZV/g7V
+ fFh1jh+Vfy9xPV7tphBPmZxR+WsNiC6MnYB9G2owz0WU1fAlko+O/B/ts+iIUKO48PgB
+ YfEcPVrazCjLfqOReIBdCJ2C/JD1ar03YBXW/kesF9NIUZM07yjVWX1IGOYSNavg5TXE
+ 1KlR5s8Km4e6xeLbBtXmiWMXTrPVoWYhdXOwjNdFcP4+YHGy01j9MxSSqyY48+IOo308
+ DbqZQ4Qk56vfFmmrO7MZdFMrAOidu8U5steBjIjAJvPoWhmtlkGAX6/lws895u58x/wI
+ XMNw==
+X-Gm-Message-State: APjAAAXxsr7Arlb/HD0iX6Vyag80JjoWZi5mjGU/uu0EF0dTqZIvHmJq
+ eTO44ImMDI5U0cLxnRIcETdwrrQ3RiGGRA==
+X-Google-Smtp-Source: APXvYqyWNcCtjDAlrRmCrVbBMl+vywiAtfRWu9520akNdGLgfrTLf0cm9IUDcKQRciAWaBytQzLvNg==
+X-Received: by 2002:a7b:c04f:: with SMTP id u15mr18828164wmc.106.1563102778326; 
+ Sun, 14 Jul 2019 04:12:58 -0700 (PDT)
 Received: from localhost.localdomain ([194.144.248.241])
- by smtp.gmail.com with ESMTPSA id f17sm12675795wmf.27.2019.07.14.04.12.54
+ by smtp.gmail.com with ESMTPSA id f17sm12675795wmf.27.2019.07.14.04.12.57
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Sun, 14 Jul 2019 04:12:54 -0700 (PDT)
+ Sun, 14 Jul 2019 04:12:57 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Sun, 14 Jul 2019 11:12:46 +0000
-Message-Id: <20190714111249.13859-5-richard.henderson@linaro.org>
+Date: Sun, 14 Jul 2019 11:12:49 +0000
+Message-Id: <20190714111249.13859-8-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190714111249.13859-1-richard.henderson@linaro.org>
 References: <20190714111249.13859-1-richard.henderson@linaro.org>
@@ -80,9 +80,9 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::333
-Subject: [Qemu-devel] [PULL for-4.1 4/7] tcg: Introduce
- set/clear_helper_retaddr
+X-Received-From: 2a00:1450:4864:20::344
+Subject: [Qemu-devel] [PULL for-4.1 7/7] tcg: Release mmap_lock on
+ translation fault
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,351 +99,153 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-At present we have a potential error in that helper_retaddr contains
-data for handle_cpu_signal, but we have not ensured that those stores
-will be scheduled properly before the operation that may fault.
+Turn helper_retaddr into a multi-state flag that may now also
+indicate when we're performing a read on behalf of the translator.
+In this case, release the mmap_lock before the longjmp back to
+the main cpu loop, and thereby avoid a failing assert therein.
 
-It might be that these races are not in practice observable, due to
-our use of -fno-strict-aliasing, but better safe than sorry.
-
-Adjust all of the setters of helper_retaddr.
-
+Fixes: https://bugs.launchpad.net/qemu/+bug/1832353
+Tested-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- include/exec/cpu_ldst.h                   | 20 +++++++++++
- include/exec/cpu_ldst_useronly_template.h | 12 +++----
- accel/tcg/user-exec.c                     | 11 +++---
- target/arm/helper-a64.c                   |  8 ++---
- target/arm/sve_helper.c                   | 43 +++++++++++------------
- 5 files changed, 57 insertions(+), 37 deletions(-)
+ include/exec/cpu_ldst_useronly_template.h | 20 +++++--
+ accel/tcg/user-exec.c                     | 66 ++++++++++++++++-------
+ 2 files changed, 63 insertions(+), 23 deletions(-)
 
-diff --git a/include/exec/cpu_ldst.h b/include/exec/cpu_ldst.h
-index a08b11bd2c..9de8c93303 100644
---- a/include/exec/cpu_ldst.h
-+++ b/include/exec/cpu_ldst.h
-@@ -89,6 +89,26 @@ typedef target_ulong abi_ptr;
- 
- extern __thread uintptr_t helper_retaddr;
- 
-+static inline void set_helper_retaddr(uintptr_t ra)
-+{
-+    helper_retaddr = ra;
-+    /*
-+     * Ensure that this write is visible to the SIGSEGV handler that
-+     * may be invoked due to a subsequent invalid memory operation.
-+     */
-+    signal_barrier();
-+}
-+
-+static inline void clear_helper_retaddr(void)
-+{
-+    /*
-+     * Ensure that previous memory operations have succeeded before
-+     * removing the data visible to the signal handler.
-+     */
-+    signal_barrier();
-+    helper_retaddr = 0;
-+}
-+
- /* In user-only mode we provide only the _code and _data accessors. */
- 
- #define MEMSUFFIX _data
 diff --git a/include/exec/cpu_ldst_useronly_template.h b/include/exec/cpu_ldst_useronly_template.h
-index bc45e2b8d4..e65733f7e2 100644
+index d663826ac2..2378f2958c 100644
 --- a/include/exec/cpu_ldst_useronly_template.h
 +++ b/include/exec/cpu_ldst_useronly_template.h
-@@ -78,9 +78,9 @@ glue(glue(glue(cpu_ld, USUFFIX), MEMSUFFIX), _ra)(CPUArchState *env,
-                                                   uintptr_t retaddr)
+@@ -64,12 +64,18 @@
+ static inline RES_TYPE
+ glue(glue(cpu_ld, USUFFIX), MEMSUFFIX)(CPUArchState *env, abi_ptr ptr)
  {
-     RES_TYPE ret;
--    helper_retaddr = retaddr;
-+    set_helper_retaddr(retaddr);
-     ret = glue(glue(cpu_ld, USUFFIX), MEMSUFFIX)(env, ptr);
--    helper_retaddr = 0;
+-#if !defined(CODE_ACCESS)
++#ifdef CODE_ACCESS
++    RES_TYPE ret;
++    set_helper_retaddr(1);
++    ret = glue(glue(ld, USUFFIX), _p)(g2h(ptr));
 +    clear_helper_retaddr();
-     return ret;
++    return ret;
++#else
+     trace_guest_mem_before_exec(
+         env_cpu(env), ptr,
+         trace_mem_build_info(SHIFT, false, MO_TE, false));
+-#endif
+     return glue(glue(ld, USUFFIX), _p)(g2h(ptr));
++#endif
  }
  
-@@ -102,9 +102,9 @@ glue(glue(glue(cpu_lds, SUFFIX), MEMSUFFIX), _ra)(CPUArchState *env,
-                                                   uintptr_t retaddr)
+ #ifndef CODE_ACCESS
+@@ -90,12 +96,18 @@ glue(glue(glue(cpu_ld, USUFFIX), MEMSUFFIX), _ra)(CPUArchState *env,
+ static inline int
+ glue(glue(cpu_lds, SUFFIX), MEMSUFFIX)(CPUArchState *env, abi_ptr ptr)
  {
-     int ret;
--    helper_retaddr = retaddr;
-+    set_helper_retaddr(retaddr);
-     ret = glue(glue(cpu_lds, SUFFIX), MEMSUFFIX)(env, ptr);
--    helper_retaddr = 0;
+-#if !defined(CODE_ACCESS)
++#ifdef CODE_ACCESS
++    int ret;
++    set_helper_retaddr(1);
++    ret = glue(glue(lds, SUFFIX), _p)(g2h(ptr));
 +    clear_helper_retaddr();
-     return ret;
++    return ret;
++#else
+     trace_guest_mem_before_exec(
+         env_cpu(env), ptr,
+         trace_mem_build_info(SHIFT, true, MO_TE, false));
+-#endif
+     return glue(glue(lds, SUFFIX), _p)(g2h(ptr));
++#endif
  }
- #endif
-@@ -128,9 +128,9 @@ glue(glue(glue(cpu_st, SUFFIX), MEMSUFFIX), _ra)(CPUArchState *env,
-                                                   RES_TYPE v,
-                                                   uintptr_t retaddr)
- {
--    helper_retaddr = retaddr;
-+    set_helper_retaddr(retaddr);
-     glue(glue(cpu_st, SUFFIX), MEMSUFFIX)(env, ptr, v);
--    helper_retaddr = 0;
-+    clear_helper_retaddr();
- }
- #endif
  
+ #ifndef CODE_ACCESS
 diff --git a/accel/tcg/user-exec.c b/accel/tcg/user-exec.c
-index cb5f4b19c5..4384b59a4d 100644
+index 4384b59a4d..897d1571c4 100644
 --- a/accel/tcg/user-exec.c
 +++ b/accel/tcg/user-exec.c
-@@ -134,7 +134,7 @@ static inline int handle_cpu_signal(uintptr_t pc, siginfo_t *info,
-              * currently executing TB was modified and must be exited
-              * immediately.  Clear helper_retaddr for next execution.
-              */
--            helper_retaddr = 0;
-+            clear_helper_retaddr();
-             cpu_exit_tb_from_sighandler(cpu, old_set);
-             /* NORETURN */
+@@ -64,27 +64,56 @@ static inline int handle_cpu_signal(uintptr_t pc, siginfo_t *info,
+     CPUState *cpu = current_cpu;
+     CPUClass *cc;
+     unsigned long address = (unsigned long)info->si_addr;
+-    MMUAccessType access_type;
++    MMUAccessType access_type = is_write ? MMU_DATA_STORE : MMU_DATA_LOAD;
  
-@@ -152,7 +152,7 @@ static inline int handle_cpu_signal(uintptr_t pc, siginfo_t *info,
-      * an exception.  Undo signal and retaddr state prior to longjmp.
-      */
-     sigprocmask(SIG_SETMASK, old_set, NULL);
--    helper_retaddr = 0;
-+    clear_helper_retaddr();
+-    /* We must handle PC addresses from two different sources:
+-     * a call return address and a signal frame address.
+-     *
+-     * Within cpu_restore_state_from_tb we assume the former and adjust
+-     * the address by -GETPC_ADJ so that the address is within the call
+-     * insn so that addr does not accidentally match the beginning of the
+-     * next guest insn.
+-     *
+-     * However, when the PC comes from the signal frame, it points to
+-     * the actual faulting host insn and not a call insn.  Subtracting
+-     * GETPC_ADJ in that case may accidentally match the previous guest insn.
+-     *
+-     * So for the later case, adjust forward to compensate for what
+-     * will be done later by cpu_restore_state_from_tb.
+-     */
+-    if (helper_retaddr) {
++    switch (helper_retaddr) {
++    default:
++        /*
++         * Fault during host memory operation within a helper function.
++         * The helper's host return address, saved here, gives us a
++         * pointer into the generated code that will unwind to the
++         * correct guest pc.
++         */
+         pc = helper_retaddr;
+-    } else {
++        break;
++
++    case 0:
++        /*
++         * Fault during host memory operation within generated code.
++         * (Or, a unrelated bug within qemu, but we can't tell from here).
++         *
++         * We take the host pc from the signal frame.  However, we cannot
++         * use that value directly.  Within cpu_restore_state_from_tb, we
++         * assume PC comes from GETPC(), as used by the helper functions,
++         * so we adjust the address by -GETPC_ADJ to form an address that
++         * is within the call insn, so that the address does not accidentially
++         * match the beginning of the next guest insn.  However, when the
++         * pc comes from the signal frame it points to the actual faulting
++         * host memory insn and not the return from a call insn.
++         *
++         * Therefore, adjust to compensate for what will be done later
++         * by cpu_restore_state_from_tb.
++         */
+         pc += GETPC_ADJ;
++        break;
++
++    case 1:
++        /*
++         * Fault during host read for translation, or loosely, "execution".
++         *
++         * The guest pc is already pointing to the start of the TB for which
++         * code is being generated.  If the guest translator manages the
++         * page crossings correctly, this is exactly the correct address
++         * (and if the translator doesn't handle page boundaries correctly
++         * there's little we can do about that here).  Therefore, do not
++         * trigger the unwinder.
++         *
++         * Like tb_gen_code, release the memory lock before cpu_loop_exit.
++         */
++        pc = 0;
++        access_type = MMU_INST_FETCH;
++        mmap_unlock();
++        break;
+     }
+ 
+     /* For synchronous signals we expect to be coming from the vCPU
+@@ -155,7 +184,6 @@ static inline int handle_cpu_signal(uintptr_t pc, siginfo_t *info,
+     clear_helper_retaddr();
  
      cc = CPU_GET_CLASS(cpu);
-     access_type = is_write ? MMU_DATA_STORE : MMU_DATA_LOAD;
-@@ -682,14 +682,15 @@ static void *atomic_mmu_lookup(CPUArchState *env, target_ulong addr,
-     if (unlikely(addr & (size - 1))) {
-         cpu_loop_exit_atomic(env_cpu(env), retaddr);
-     }
--    helper_retaddr = retaddr;
--    return g2h(addr);
-+    void *ret = g2h(addr);
-+    set_helper_retaddr(retaddr);
-+    return ret;
+-    access_type = is_write ? MMU_DATA_STORE : MMU_DATA_LOAD;
+     cc->tlb_fill(cpu, address, 0, access_type, MMU_USER_IDX, false, pc);
+     g_assert_not_reached();
  }
- 
- /* Macro to call the above, with local variables from the use context.  */
- #define ATOMIC_MMU_DECLS do {} while (0)
- #define ATOMIC_MMU_LOOKUP  atomic_mmu_lookup(env, addr, DATA_SIZE, GETPC())
--#define ATOMIC_MMU_CLEANUP do { helper_retaddr = 0; } while (0)
-+#define ATOMIC_MMU_CLEANUP do { clear_helper_retaddr(); } while (0)
- 
- #define ATOMIC_NAME(X)   HELPER(glue(glue(atomic_ ## X, SUFFIX), END))
- #define EXTRA_ARGS
-diff --git a/target/arm/helper-a64.c b/target/arm/helper-a64.c
-index 44e45a8037..060699b901 100644
---- a/target/arm/helper-a64.c
-+++ b/target/arm/helper-a64.c
-@@ -554,7 +554,7 @@ uint64_t HELPER(paired_cmpxchg64_le)(CPUARMState *env, uint64_t addr,
-     /* ??? Enforce alignment.  */
-     uint64_t *haddr = g2h(addr);
- 
--    helper_retaddr = ra;
-+    set_helper_retaddr(ra);
-     o0 = ldq_le_p(haddr + 0);
-     o1 = ldq_le_p(haddr + 1);
-     oldv = int128_make128(o0, o1);
-@@ -564,7 +564,7 @@ uint64_t HELPER(paired_cmpxchg64_le)(CPUARMState *env, uint64_t addr,
-         stq_le_p(haddr + 0, int128_getlo(newv));
-         stq_le_p(haddr + 1, int128_gethi(newv));
-     }
--    helper_retaddr = 0;
-+    clear_helper_retaddr();
- #else
-     int mem_idx = cpu_mmu_index(env, false);
-     TCGMemOpIdx oi0 = make_memop_idx(MO_LEQ | MO_ALIGN_16, mem_idx);
-@@ -624,7 +624,7 @@ uint64_t HELPER(paired_cmpxchg64_be)(CPUARMState *env, uint64_t addr,
-     /* ??? Enforce alignment.  */
-     uint64_t *haddr = g2h(addr);
- 
--    helper_retaddr = ra;
-+    set_helper_retaddr(ra);
-     o1 = ldq_be_p(haddr + 0);
-     o0 = ldq_be_p(haddr + 1);
-     oldv = int128_make128(o0, o1);
-@@ -634,7 +634,7 @@ uint64_t HELPER(paired_cmpxchg64_be)(CPUARMState *env, uint64_t addr,
-         stq_be_p(haddr + 0, int128_gethi(newv));
-         stq_be_p(haddr + 1, int128_getlo(newv));
-     }
--    helper_retaddr = 0;
-+    clear_helper_retaddr();
- #else
-     int mem_idx = cpu_mmu_index(env, false);
-     TCGMemOpIdx oi0 = make_memop_idx(MO_BEQ | MO_ALIGN_16, mem_idx);
-diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
-index fd434c66ea..fc0c1755d2 100644
---- a/target/arm/sve_helper.c
-+++ b/target/arm/sve_helper.c
-@@ -4125,12 +4125,11 @@ static intptr_t max_for_page(target_ulong base, intptr_t mem_off,
-     return MIN(split, mem_max - mem_off) + mem_off;
- }
- 
--static inline void set_helper_retaddr(uintptr_t ra)
--{
--#ifdef CONFIG_USER_ONLY
--    helper_retaddr = ra;
-+#ifndef CONFIG_USER_ONLY
-+/* These are normally defined only for CONFIG_USER_ONLY in <exec/cpu_ldst.h> */
-+static inline void set_helper_retaddr(uintptr_t ra) { }
-+static inline void clear_helper_retaddr(void) { }
- #endif
--}
- 
- /*
-  * The result of tlb_vaddr_to_host for user-only is just g2h(x),
-@@ -4188,7 +4187,7 @@ static void sve_ld1_r(CPUARMState *env, void *vg, const target_ulong addr,
-         if (test_host_page(host)) {
-             mem_off = host_fn(vd, vg, host - mem_off, mem_off, mem_max);
-             tcg_debug_assert(mem_off == mem_max);
--            set_helper_retaddr(0);
-+            clear_helper_retaddr();
-             /* After having taken any fault, zero leading inactive elements. */
-             swap_memzero(vd, reg_off);
-             return;
-@@ -4239,7 +4238,7 @@ static void sve_ld1_r(CPUARMState *env, void *vg, const target_ulong addr,
-     }
- #endif
- 
--    set_helper_retaddr(0);
-+    clear_helper_retaddr();
-     memcpy(vd, &scratch, reg_max);
- }
- 
-@@ -4312,7 +4311,7 @@ static void sve_ld2_r(CPUARMState *env, void *vg, target_ulong addr,
-             addr += 2 * size;
-         } while (i & 15);
-     }
--    set_helper_retaddr(0);
-+    clear_helper_retaddr();
- 
-     /* Wait until all exceptions have been raised to write back.  */
-     memcpy(&env->vfp.zregs[rd], &scratch[0], oprsz);
-@@ -4341,7 +4340,7 @@ static void sve_ld3_r(CPUARMState *env, void *vg, target_ulong addr,
-             addr += 3 * size;
-         } while (i & 15);
-     }
--    set_helper_retaddr(0);
-+    clear_helper_retaddr();
- 
-     /* Wait until all exceptions have been raised to write back.  */
-     memcpy(&env->vfp.zregs[rd], &scratch[0], oprsz);
-@@ -4372,7 +4371,7 @@ static void sve_ld4_r(CPUARMState *env, void *vg, target_ulong addr,
-             addr += 4 * size;
-         } while (i & 15);
-     }
--    set_helper_retaddr(0);
-+    clear_helper_retaddr();
- 
-     /* Wait until all exceptions have been raised to write back.  */
-     memcpy(&env->vfp.zregs[rd], &scratch[0], oprsz);
-@@ -4494,7 +4493,7 @@ static void sve_ldff1_r(CPUARMState *env, void *vg, const target_ulong addr,
-         if (test_host_page(host)) {
-             mem_off = host_fn(vd, vg, host - mem_off, mem_off, mem_max);
-             tcg_debug_assert(mem_off == mem_max);
--            set_helper_retaddr(0);
-+            clear_helper_retaddr();
-             /* After any fault, zero any leading inactive elements.  */
-             swap_memzero(vd, reg_off);
-             return;
-@@ -4537,7 +4536,7 @@ static void sve_ldff1_r(CPUARMState *env, void *vg, const target_ulong addr,
-     }
- #endif
- 
--    set_helper_retaddr(0);
-+    clear_helper_retaddr();
-     record_fault(env, reg_off, reg_max);
- }
- 
-@@ -4740,7 +4739,7 @@ static void sve_st1_r(CPUARMState *env, void *vg, target_ulong addr,
-             addr += msize;
-         } while (i & 15);
-     }
--    set_helper_retaddr(0);
-+    clear_helper_retaddr();
- }
- 
- static void sve_st2_r(CPUARMState *env, void *vg, target_ulong addr,
-@@ -4766,7 +4765,7 @@ static void sve_st2_r(CPUARMState *env, void *vg, target_ulong addr,
-             addr += 2 * msize;
-         } while (i & 15);
-     }
--    set_helper_retaddr(0);
-+    clear_helper_retaddr();
- }
- 
- static void sve_st3_r(CPUARMState *env, void *vg, target_ulong addr,
-@@ -4794,7 +4793,7 @@ static void sve_st3_r(CPUARMState *env, void *vg, target_ulong addr,
-             addr += 3 * msize;
-         } while (i & 15);
-     }
--    set_helper_retaddr(0);
-+    clear_helper_retaddr();
- }
- 
- static void sve_st4_r(CPUARMState *env, void *vg, target_ulong addr,
-@@ -4824,7 +4823,7 @@ static void sve_st4_r(CPUARMState *env, void *vg, target_ulong addr,
-             addr += 4 * msize;
-         } while (i & 15);
-     }
--    set_helper_retaddr(0);
-+    clear_helper_retaddr();
- }
- 
- #define DO_STN_1(N, NAME, ESIZE) \
-@@ -4932,7 +4931,7 @@ static void sve_ld1_zs(CPUARMState *env, void *vd, void *vg, void *vm,
-             i += 4, pg >>= 4;
-         } while (i & 15);
-     }
--    set_helper_retaddr(0);
-+    clear_helper_retaddr();
- 
-     /* Wait until all exceptions have been raised to write back.  */
-     memcpy(vd, &scratch, oprsz);
-@@ -4955,7 +4954,7 @@ static void sve_ld1_zd(CPUARMState *env, void *vd, void *vg, void *vm,
-             tlb_fn(env, &scratch, i * 8, base + (off << scale), oi, ra);
-         }
-     }
--    set_helper_retaddr(0);
-+    clear_helper_retaddr();
- 
-     /* Wait until all exceptions have been raised to write back.  */
-     memcpy(vd, &scratch, oprsz * 8);
-@@ -5133,7 +5132,7 @@ static inline void sve_ldff1_zs(CPUARMState *env, void *vd, void *vg, void *vm,
-         tlb_fn(env, vd, reg_off, addr, oi, ra);
- 
-         /* The rest of the reads will be non-faulting.  */
--        set_helper_retaddr(0);
-+        clear_helper_retaddr();
-     }
- 
-     /* After any fault, zero the leading predicated false elements.  */
-@@ -5175,7 +5174,7 @@ static inline void sve_ldff1_zd(CPUARMState *env, void *vd, void *vg, void *vm,
-         tlb_fn(env, vd, reg_off, addr, oi, ra);
- 
-         /* The rest of the reads will be non-faulting.  */
--        set_helper_retaddr(0);
-+        clear_helper_retaddr();
-     }
- 
-     /* After any fault, zero the leading predicated false elements.  */
-@@ -5299,7 +5298,7 @@ static void sve_st1_zs(CPUARMState *env, void *vd, void *vg, void *vm,
-             i += 4, pg >>= 4;
-         } while (i & 15);
-     }
--    set_helper_retaddr(0);
-+    clear_helper_retaddr();
- }
- 
- static void sve_st1_zd(CPUARMState *env, void *vd, void *vg, void *vm,
-@@ -5318,7 +5317,7 @@ static void sve_st1_zd(CPUARMState *env, void *vd, void *vg, void *vm,
-             tlb_fn(env, vd, i * 8, base + (off << scale), oi, ra);
-         }
-     }
--    set_helper_retaddr(0);
-+    clear_helper_retaddr();
- }
- 
- #define DO_ST1_ZPZ_S(MEM, OFS) \
 -- 
 2.17.1
 
