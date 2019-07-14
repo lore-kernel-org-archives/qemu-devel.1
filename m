@@ -2,83 +2,61 @@ Return-Path: <SRS0=Qpa9=VL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55853C73C66
-	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jul 2019 14:51:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D6C9C73C66
+	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jul 2019 14:52:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 22E65205F4
-	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jul 2019 14:51:44 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hkJgUmfo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 22E65205F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0507120644
+	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jul 2019 14:52:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0507120644
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60902 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60910 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hmfqo-0002XZ-SF
-	for qemu-devel@archiver.kernel.org; Sun, 14 Jul 2019 10:51:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54879)
+	id 1hmfrI-0003Ri-7J
+	for qemu-devel@archiver.kernel.org; Sun, 14 Jul 2019 10:52:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54981)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <renyime@gmail.com>) id 1hmfqf-00027B-22
- for qemu-devel@nongnu.org; Sun, 14 Jul 2019 10:51:34 -0400
+ (envelope-from <mlevitsk@redhat.com>) id 1hmfr7-00031R-F5
+ for qemu-devel@nongnu.org; Sun, 14 Jul 2019 10:52:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <renyime@gmail.com>) id 1hmfqd-0002QO-7o
- for qemu-devel@nongnu.org; Sun, 14 Jul 2019 10:51:33 -0400
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:40063)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <renyime@gmail.com>) id 1hmfqc-0002PN-N7
- for qemu-devel@nongnu.org; Sun, 14 Jul 2019 10:51:31 -0400
-Received: by mail-pg1-x544.google.com with SMTP id w10so6526736pgj.7
- for <qemu-devel@nongnu.org>; Sun, 14 Jul 2019 07:51:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id;
- bh=wbXQ0ReYPaw6cL6QJZRR5dXQ3MmUpeCBsUBi8cnTKK4=;
- b=hkJgUmfoOZgPYcH7+LK7ptvnEHS1PsZDXBsP99P5OGlyL8ihIRz7gWDHmjLQc9ST5y
- m1pCC2/aNfY9SPM5BLEshpYlkocMezI3INw6ow++WE3y087m02UbplFMY/R1Ft8yHSfG
- 0XCeyvwujaWLNejQ+/k+ReivbXCG2cYIf3AgIYYR0RTDN3Nm3yQ9EMjFkb7iZ5Nt+Xw9
- toqPvnPokWnjEe8o/zSofGVAHOfIIUgVZLkms9j10pKgXGK2aAVGFiV6V32Lb2KWIbNR
- mmO36LcRTfF/tEQGsLq4U5CbBXAeC5T0ZhbyqorHCC+bT5TWoOsWq2T4JITnrMXledr+
- KQgg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id;
- bh=wbXQ0ReYPaw6cL6QJZRR5dXQ3MmUpeCBsUBi8cnTKK4=;
- b=AHyrtp3PJ0q8/HkgH1mJwHB4SoT27MvHKNu41+lKu0P9EkkmquckGBUTkQaFeIKpYW
- 79xnjKyOC9X4PI7U8IZsvAqWA0SHJ5LuXD9GbWuWkPXItY5A6vgPBD65YUD8LmvWarX5
- 4NiJ8vqQ1c+2aWYCaW08vmoFR1p2RWTTXZLoYOoRCSw7ckn0eVGExEyTq8KFq0NtKpln
- CXg6VrKyHtOcca6rDJa4btclnlZPPMwMT7V5k+mGippvIJ2amoRD0Mg+dLEp+Y4FqLQF
- UtdpEYZ+CJSSv9IWMA7qtw6KzPG60e6VQcKHCKFKqFrPRojKXD4JVnZ4vPxwblXOjIiV
- ia0A==
-X-Gm-Message-State: APjAAAV7jADwmhzuH9sBkDWqPj4AI2ggflTng9Jj6MbHKFe6UZtlMhXK
- ip/l3/xSr94qdoZKggIMkTo=
-X-Google-Smtp-Source: APXvYqxTw3eb2T9JLQtf/eG+qAGDvLG2WJzYznDn9E8KErEJPR0vMzbqk1CQZum9UksXGV9nLQ3dPg==
-X-Received: by 2002:a17:90a:7d04:: with SMTP id
- g4mr24128726pjl.41.1563115888138; 
- Sun, 14 Jul 2019 07:51:28 -0700 (PDT)
-Received: from VM_0_37_centos.localdomain ([129.226.63.251])
- by smtp.gmail.com with ESMTPSA id v27sm17216403pgn.76.2019.07.14.07.51.26
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Sun, 14 Jul 2019 07:51:27 -0700 (PDT)
-From: Ivan Ren <renyime@gmail.com>
-X-Google-Original-From: Ivan Ren <ivanren@tencent.com>
-To: quintela@redhat.com,
-	dgilbert@redhat.com
-Date: Sun, 14 Jul 2019 22:51:19 +0800
-Message-Id: <1563115879-2715-1-git-send-email-ivanren@tencent.com>
-X-Mailer: git-send-email 1.8.3.1
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::544
-Subject: [Qemu-devel] [PATCH] migration: always initial RAMBlock.bmap to 1
- for new migration
+ (envelope-from <mlevitsk@redhat.com>) id 1hmfr6-0002f5-4E
+ for qemu-devel@nongnu.org; Sun, 14 Jul 2019 10:52:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52844)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mlevitsk@redhat.com>)
+ id 1hmfr3-0002bk-4y; Sun, 14 Jul 2019 10:51:57 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id A2CBEAC2C2;
+ Sun, 14 Jul 2019 14:51:54 +0000 (UTC)
+Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.66])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 08C196012D;
+ Sun, 14 Jul 2019 14:51:52 +0000 (UTC)
+Message-ID: <28c82479b79d6280b598ebace4a218e7e6bfa8f4.camel@redhat.com>
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Date: Sun, 14 Jul 2019 17:51:51 +0300
+In-Reply-To: <20190711162740.5p7znt5ernlw67nx@steredhat>
+References: <20190711150940.17483-1-mlevitsk@redhat.com>
+ <20190711162740.5p7znt5ernlw67nx@steredhat>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.38]); Sun, 14 Jul 2019 14:51:54 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v3] LUKS: support preallocation
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,84 +68,170 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Reproduce the problem:
-migrate
-migrate_cancel
-migrate
+On Thu, 2019-07-11 at 18:27 +0200, Stefano Garzarella wrote:
+> On Thu, Jul 11, 2019 at 06:09:40PM +0300, Maxim Levitsky wrote:
+> > preallocation=off and preallocation=metadata
+> > both allocate luks header only, and preallocation=falloc/full
+> > is passed to underlying file.
+> > 
+> > Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=1534951
+> > 
+> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> > 
+> > ---
+> > 
+> > Note that QMP support was only compile tested, since I am still learning
+> > on how to use it.
+> > 
+> > If there is some library/script/etc which makes it more high level,
+> > I would more that glad to hear about it. So far I used the qmp-shell
+> > 
+> > Also can I use qmp's blockdev-create outside a vm running?
+> > 
+> >  block/crypto.c       | 29 ++++++++++++++++++++++++++---
+> >  qapi/block-core.json |  5 ++++-
+> >  2 files changed, 30 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/block/crypto.c b/block/crypto.c
+> > index 8237424ae6..034a645652 100644
+> > --- a/block/crypto.c
+> > +++ b/block/crypto.c
+> > @@ -74,6 +74,7 @@ static ssize_t block_crypto_read_func(QCryptoBlock *block,
+> >  struct BlockCryptoCreateData {
+> >      BlockBackend *blk;
+> >      uint64_t size;
+> > +    PreallocMode prealloc;
+> >  };
+> >  
+> >  
+> > @@ -112,7 +113,7 @@ static ssize_t block_crypto_init_func(QCryptoBlock *block,
+> >       * available to the guest, so we must take account of that
+> >       * which will be used by the crypto header
+> >       */
+> > -    return blk_truncate(data->blk, data->size + headerlen, PREALLOC_MODE_OFF,
+> > +    return blk_truncate(data->blk, data->size + headerlen, data->prealloc,
+> >                          errp);
+> >  }
+> >  
+> > @@ -251,6 +252,7 @@ static int block_crypto_open_generic(QCryptoBlockFormat format,
+> >  static int block_crypto_co_create_generic(BlockDriverState *bs,
+> >                                            int64_t size,
+> >                                            QCryptoBlockCreateOptions *opts,
+> > +                                          PreallocMode prealloc,
+> >                                            Error **errp)
+> >  {
+> >      int ret;
+> > @@ -266,9 +268,14 @@ static int block_crypto_co_create_generic(BlockDriverState *bs,
+> >          goto cleanup;
+> >      }
+> >  
+> > +    if (prealloc == PREALLOC_MODE_METADATA) {
+> > +        prealloc = PREALLOC_MODE_OFF;
+> > +    }
+> > +
+> >      data = (struct BlockCryptoCreateData) {
+> >          .blk = blk,
+> >          .size = size,
+> > +        .prealloc = prealloc,
+> >      };
+> >  
+> >      crypto = qcrypto_block_create(opts, NULL,
+> > @@ -500,6 +507,7 @@ block_crypto_co_create_luks(BlockdevCreateOptions *create_options, Error **errp)
+> >      BlockdevCreateOptionsLUKS *luks_opts;
+> >      BlockDriverState *bs = NULL;
+> >      QCryptoBlockCreateOptions create_opts;
+> > +    PreallocMode preallocation = PREALLOC_MODE_OFF;
+> >      int ret;
+> >  
+> >      assert(create_options->driver == BLOCKDEV_DRIVER_LUKS);
+> > @@ -515,8 +523,11 @@ block_crypto_co_create_luks(BlockdevCreateOptions *create_options, Error **errp)
+> >          .u.luks = *qapi_BlockdevCreateOptionsLUKS_base(luks_opts),
+> >      };
+> >  
+> > +    if (luks_opts->has_preallocation)
+> > +        preallocation = luks_opts->preallocation;
+> > +
+> >      ret = block_crypto_co_create_generic(bs, luks_opts->size, &create_opts,
+> > -                                         errp);
+> > +                                         preallocation, errp);
+> >      if (ret < 0) {
+> >          goto fail;
+> >      }
+> > @@ -534,12 +545,24 @@ static int coroutine_fn block_crypto_co_create_opts_luks(const char *filename,
+> >      QCryptoBlockCreateOptions *create_opts = NULL;
+> >      BlockDriverState *bs = NULL;
+> >      QDict *cryptoopts;
+> > +    PreallocMode prealloc;
+> > +    char *buf = NULL;
+> >      int64_t size;
+> >      int ret;
+> > +    Error *local_err = NULL;
+> >  
+> >      /* Parse options */
+> >      size = qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0);
+> >  
+> > +    buf = qemu_opt_get_del(opts, BLOCK_OPT_PREALLOC);
+> > +    prealloc = qapi_enum_parse(&PreallocMode_lookup, buf,
+> > +                               PREALLOC_MODE_OFF, &local_err);
+> > +    g_free(buf);
+> > +    if (local_err) {
+> > +        error_propagate(errp, local_err);
+> > +        return -EINVAL;
+> > +    }
+> > +
+> >      cryptoopts = qemu_opts_to_qdict_filtered(opts, NULL,
+> >                                               &block_crypto_create_opts_luks,
+> >                                               true);
+> > @@ -565,7 +588,7 @@ static int coroutine_fn block_crypto_co_create_opts_luks(const char *filename,
+> >      }
+> >  
+> >      /* Create format layer */
+> > -    ret = block_crypto_co_create_generic(bs, size, create_opts, errp);
+> > +    ret = block_crypto_co_create_generic(bs, size, create_opts, prealloc, errp);
+> >      if (ret < 0) {
+> >          goto fail;
+> >      }
+> > diff --git a/qapi/block-core.json b/qapi/block-core.json
+> > index 0d43d4f37c..ebcfc9f903 100644
+> > --- a/qapi/block-core.json
+> > +++ b/qapi/block-core.json
+> > @@ -4205,13 +4205,16 @@
+> >  #
+> >  # @file             Node to create the image format on
+> >  # @size             Size of the virtual disk in bytes
+> > +# @preallocation    Preallocation mode for the new image (default: off;
+> > +#                   allowed values: off/falloc/full
+> 
+> Should we add also "metadata" to allowed values? and "since: 4.2"?
+> I'd like to have (just to have similar documentation with others
+> preallocation parameters):
 
-Error happen for memory migration
+It it support but preallocation=off is the same as preallocation=metadata in luks,
+as luks only metadata is the header which is created anyway.
+In some sense I should throw a error for preallocation=off, but I suspect that
+that will break userspace api.
+What do you think?
 
-The reason as follows:
-1. qemu start, ram_list.dirty_memory[DIRTY_MEMORY_MIGRATION] all set to
-   1 by a series of cpu_physical_memory_set_dirty_range
-2. migration start:ram_init_bitmaps
-   - memory_global_dirty_log_start: begin log diry
-   - memory_global_dirty_log_sync: sync dirty bitmap to
-     ram_list.dirty_memory[DIRTY_MEMORY_MIGRATION]
-   - migration_bitmap_sync_range: sync ram_list.
-     dirty_memory[DIRTY_MEMORY_MIGRATION] to RAMBlock.bmap
-     and ram_list.dirty_memory[DIRTY_MEMORY_MIGRATION] is set to zero
-3. migration data...
-4. migrate_cancel, will stop log dirty
-5. migration start:ram_init_bitmaps
-   - memory_global_dirty_log_start: begin log diry
-   - memory_global_dirty_log_sync: sync dirty bitmap to
-     ram_list.dirty_memory[DIRTY_MEMORY_MIGRATION]
-   - migration_bitmap_sync_range: sync ram_list.
-     dirty_memory[DIRTY_MEMORY_MIGRATION] to RAMBlock.bmap
-     and ram_list.dirty_memory[DIRTY_MEMORY_MIGRATION] is set to zero
+I forgot to add 'since: 4.2', will do in the next revision of that patch series.
 
-   Here RAMBlock.bmap only have new logged dirty pages, don't contain
-   the whole guest pages.
+> 
+>   # @preallocation    Preallocation mode for the new image (default: off;
+>   #                   allowed values: off, falloc, full, metadata; since: 4.2)
+> 
+> 
+> Thanks,
+> Stefano
 
-Signed-off-by: Ivan Ren <ivanren@tencent.com>
----
- migration/ram.c | 15 ++++++++-------
- 1 file changed, 8 insertions(+), 7 deletions(-)
 
-diff --git a/migration/ram.c b/migration/ram.c
-index 908517fc2b..bbebaee0c1 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -3173,11 +3173,11 @@ static int ram_state_init(RAMState **rsp)
-     QSIMPLEQ_INIT(&(*rsp)->src_page_requests);
- 
-     /*
-+     * Count the total number of pages used by ram blocks not including any
-+     * gaps due to alignment or unplugs.
-      * This must match with the initial values of dirty bitmap.
--     * Currently we initialize the dirty bitmap to all zeros so
--     * here the total dirty page count is zero.
-      */
--    (*rsp)->migration_dirty_pages = 0;
-+    (*rsp)->migration_dirty_pages = ram_bytes_total() >> TARGET_PAGE_BITS;
-     ram_state_reset(*rsp);
- 
-     return 0;
-@@ -3196,12 +3196,13 @@ static void ram_list_init_bitmaps(void)
-              * The initial dirty bitmap for migration must be set with all
-              * ones to make sure we'll migrate every guest RAM page to
-              * destination.
--             * Here we didn't set RAMBlock.bmap simply because it is already
--             * set in ram_list.dirty_memory[DIRTY_MEMORY_MIGRATION] in
--             * ram_block_add, and that's where we'll sync the dirty bitmaps.
--             * Here setting RAMBlock.bmap would be fine too but not necessary.
-+             * Here we set RAMBlock.bmap all to 1 because when rebegin a
-+             * new migration after a failed migration, ram_list.
-+             * dirty_memory[DIRTY_MEMORY_MIGRATION] don't include the whole
-+             * guest memory.
-              */
-             block->bmap = bitmap_new(pages);
-+            bitmap_set(block->bmap, 0, pages);
-             if (migrate_postcopy_ram()) {
-                 block->unsentmap = bitmap_new(pages);
-                 bitmap_set(block->unsentmap, 0, pages);
--- 
-2.17.2 (Apple Git-113)
+Best regards,
+	Maxim Levitsky
+
 
 
