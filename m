@@ -7,71 +7,71 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4196BC73C66
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 565BAC742D2
 	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jul 2019 11:14:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0DE9120820
+	by mail.kernel.org (Postfix) with ESMTPS id 264DA20896
 	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jul 2019 11:14:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FNjk2n86"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0DE9120820
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SnjNwwFg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 264DA20896
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59758 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59760 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hmcS8-0001QO-UB
+	id 1hmcS8-0001Rq-JO
 	for qemu-devel@archiver.kernel.org; Sun, 14 Jul 2019 07:14:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60370)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60318)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1hmcR9-0005nQ-U2
- for qemu-devel@nongnu.org; Sun, 14 Jul 2019 07:13:00 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1hmcR5-0005Tg-D0
+ for qemu-devel@nongnu.org; Sun, 14 Jul 2019 07:12:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1hmcR8-0006OY-T2
- for qemu-devel@nongnu.org; Sun, 14 Jul 2019 07:12:59 -0400
-Received: from mail-wr1-x42c.google.com ([2a00:1450:4864:20::42c]:45923)
+ (envelope-from <richard.henderson@linaro.org>) id 1hmcR4-0006MU-D7
+ for qemu-devel@nongnu.org; Sun, 14 Jul 2019 07:12:55 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:44266)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1hmcR8-0006OC-N6
- for qemu-devel@nongnu.org; Sun, 14 Jul 2019 07:12:58 -0400
-Received: by mail-wr1-x42c.google.com with SMTP id f9so14098213wre.12
- for <qemu-devel@nongnu.org>; Sun, 14 Jul 2019 04:12:58 -0700 (PDT)
+ id 1hmcR4-0006MC-6a
+ for qemu-devel@nongnu.org; Sun, 14 Jul 2019 07:12:54 -0400
+Received: by mail-wr1-x442.google.com with SMTP id p17so14119335wrf.11
+ for <qemu-devel@nongnu.org>; Sun, 14 Jul 2019 04:12:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=sH3HXM90i35Znfmo2ZGAwhUVyrLtmUH4wH93sEFL2IQ=;
- b=FNjk2n86XqOV+bcaFG3i2ym7stY8kbk3QuTSCTKFYAGFtzJ9OOCK6xJluyGrcmz3dp
- 8z8Pjo9NY9M5JVT5CDvtA5DnyuTm43b/4Ru6FBLGt+62jFbsmuFyCn1tvyF08Hy6py7W
- k+HuWlUuuFiXVbTn6InvKQfBb4schKihRliARlYCbNE3Sd4GRZDnBwuvhmd/eKf5C1dr
- OGHTjHOmlbMGtaA6101E/uateFO5i0bCfHfvAOBlwwvY4bPitqDVdlZTBm7r9iotyAGx
- SQQyki+zoSmiWaaW7wf9sVJ8QBWkLJHbvPtjrLg+bQzRoJkXkp/YphPpGW2ku3OkNC+V
- toeA==
+ bh=0wQZY7BwhMGbzrEOB1c2143JMgOfq1mTVa8os+QOs8k=;
+ b=SnjNwwFgWLWo/sDnqsLQa0H3gMnaxxiVUJy1ljCTHjzYy15C7DEYkZWxwCFNs+/Cto
+ I9f2O6uftSECOxttpVsh4bm0kNG5y3Pbf5cTFG/KrTpA3llKreMJUulW1Z9FXCoW6csa
+ zT393DLvo2oLMNZ3iX9Teb9KaSV4xhjqXPbXfHzc6a4dG38/Nc4gFYQMeS7hRH2Pttcn
+ Q7BuEYZ4fnfKyN2zj5TVZoWJ/E4icvgeUknkvIgNUR1r4aq6o/33Ou3EKf/u0VnCGhz5
+ UpUOmP5DCPYIcr9CcJRi+HDQ9TykD1+P5vKMuCGU+dEDr7Yu++5NZ8dZmtatco04KhYv
+ vU9A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=sH3HXM90i35Znfmo2ZGAwhUVyrLtmUH4wH93sEFL2IQ=;
- b=dNr/3Uf1tx9E/JQpXfzQ0Y8sIdQ2nJdLBwAKcKFCW8JjwYbALprSvhUSFuop8asNEz
- XKKDcrRMyqTienDOffgDv69fm9vgQ7elATTXD79VOfYzYe+zYoj2yOgZIDTQ+Tk58Nmf
- h+hHVPUiSlfoNsiQImSd0sMumZwLwiTUXxlEUFrhN5PPS9OYFBqeXGK0ilwBg3PDX0x1
- aZjc3QA2gK5tdLZJ1oMazLyJyDZf5OdAzhKfNLtJJKs1Fmyj4XWr0tZnqj9lmhb4Cc2P
- 67aLEnMyv80q/P5nbXTn4ngUrzV4d3ck9IxQZtyL1PfpATZqj6z0BfiX6g+Iu5WLye2s
- xwYw==
-X-Gm-Message-State: APjAAAUumxIZ9kBhK9WRYFKFVmg4XlPMfZkIMvB68vKJVteNDkdRX8Yb
- nUjKAlaTU79xNUn6ZXFxzCFEGAMqPLrMlw==
-X-Google-Smtp-Source: APXvYqymTMlX2BPX2VST7yjowfRSyrq39BCwy+CORj5ciOTPhHCJ3KqSmCU3icXZYcZDa54T8WWs+g==
-X-Received: by 2002:adf:e602:: with SMTP id p2mr16142780wrm.306.1563102777433; 
- Sun, 14 Jul 2019 04:12:57 -0700 (PDT)
+ bh=0wQZY7BwhMGbzrEOB1c2143JMgOfq1mTVa8os+QOs8k=;
+ b=CaHoM9CSNLHxBOoISCaBF2Ky68ZTE3ahZl3ckM0TqwQ3UtiQXTzlgf1PZdSNIG519W
+ YtQ9o/+hUGE0fDKjHZmw1bSwimaWyk1f7NL1ZujxkK7pr7CNoJVjXlAVIrTNCW5IyYBt
+ tIXj95yyPSwjH8UI9WAPsXiZa2vokx5m67FBntC2U+yQUqpIaRor8/lAj4vwU1R6cvBF
+ /6VJicng1pOqMxTAz9QSqj+kTi0cpl6mSTysq46qm7tyAIwMQwP9ux+MI5CfUB3PBHgj
+ X6znzS3jFKDbGhBel+JkuNyP8jrQvLkxD4zHpfakNyn3jFczA5idU7A2mu7trYqrlsWp
+ 6Lmg==
+X-Gm-Message-State: APjAAAXB4w5fXU4xo2XFT9lDKYO1MOKEZCC9XRsf07H5p23kISB+ZBIQ
+ gZT4Uqp28Ki4Bdds/7xeqJ3HCiDz1A7ubg==
+X-Google-Smtp-Source: APXvYqxZkcShDOZVElySLxWxx+1XhoZelDeNjzY8uaHygzZPGXUba3Q7mO03WA00+HTQrcUEnxPylQ==
+X-Received: by 2002:adf:80e6:: with SMTP id 93mr22588812wrl.298.1563102772979; 
+ Sun, 14 Jul 2019 04:12:52 -0700 (PDT)
 Received: from localhost.localdomain ([194.144.248.241])
- by smtp.gmail.com with ESMTPSA id f17sm12675795wmf.27.2019.07.14.04.12.56
+ by smtp.gmail.com with ESMTPSA id f17sm12675795wmf.27.2019.07.14.04.12.51
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Sun, 14 Jul 2019 04:12:56 -0700 (PDT)
+ Sun, 14 Jul 2019 04:12:52 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Sun, 14 Jul 2019 11:12:48 +0000
-Message-Id: <20190714111249.13859-7-richard.henderson@linaro.org>
+Date: Sun, 14 Jul 2019 11:12:44 +0000
+Message-Id: <20190714111249.13859-3-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190714111249.13859-1-richard.henderson@linaro.org>
 References: <20190714111249.13859-1-richard.henderson@linaro.org>
@@ -80,9 +80,9 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::42c
-Subject: [Qemu-devel] [PULL for-4.1 6/7] tcg: Remove duplicate #if
- !defined(CODE_ACCESS)
+X-Received-From: 2a00:1450:4864:20::442
+Subject: [Qemu-devel] [PULL for-4.1 2/7] tcg/aarch64: Fix output of extract2
+ opcodes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,30 +99,34 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This code block is already surrounded by #ifndef CODE_ACCESS.
+This patch fixes two problems:
+(1) The inputs to the EXTR insn were reversed,
+(2) The input constraints use rZ, which means that we need to use
+    the REG0 macro in order to supply XZR for a constant 0 input.
 
+Fixes: 464c2969d5d
+Reported-by: Peter Maydell <peter.maydell@linaro.org>
+Tested-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- include/exec/cpu_ldst_useronly_template.h | 2 --
- 1 file changed, 2 deletions(-)
+ tcg/aarch64/tcg-target.inc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/include/exec/cpu_ldst_useronly_template.h b/include/exec/cpu_ldst_useronly_template.h
-index 8c7a2c6cd7..d663826ac2 100644
---- a/include/exec/cpu_ldst_useronly_template.h
-+++ b/include/exec/cpu_ldst_useronly_template.h
-@@ -118,11 +118,9 @@ static inline void
- glue(glue(cpu_st, SUFFIX), MEMSUFFIX)(CPUArchState *env, abi_ptr ptr,
-                                       RES_TYPE v)
- {
--#if !defined(CODE_ACCESS)
-     trace_guest_mem_before_exec(
-         env_cpu(env), ptr,
-         trace_mem_build_info(SHIFT, false, MO_TE, true));
--#endif
-     glue(glue(st, SUFFIX), _p)(g2h(ptr), v);
- }
+diff --git a/tcg/aarch64/tcg-target.inc.c b/tcg/aarch64/tcg-target.inc.c
+index b0f8106642..0713448bf5 100644
+--- a/tcg/aarch64/tcg-target.inc.c
++++ b/tcg/aarch64/tcg-target.inc.c
+@@ -2226,7 +2226,7 @@ static void tcg_out_op(TCGContext *s, TCGOpcode opc,
  
+     case INDEX_op_extract2_i64:
+     case INDEX_op_extract2_i32:
+-        tcg_out_extr(s, ext, a0, a1, a2, args[3]);
++        tcg_out_extr(s, ext, a0, REG0(2), REG0(1), args[3]);
+         break;
+ 
+     case INDEX_op_add2_i32:
 -- 
 2.17.1
 
