@@ -2,91 +2,84 @@ Return-Path: <SRS0=Qpa9=VL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00899C73C66
-	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jul 2019 11:04:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C2E2C73C66
+	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jul 2019 11:13:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B9A2920838
-	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jul 2019 11:04:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C09FE20820
+	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jul 2019 11:13:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YeOtU6cA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9A2920838
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Aw3YDFEo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C09FE20820
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59710 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59736 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hmcIu-0003ru-Ly
-	for qemu-devel@archiver.kernel.org; Sun, 14 Jul 2019 07:04:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58454)
+	id 1hmcRR-0006TA-CA
+	for qemu-devel@archiver.kernel.org; Sun, 14 Jul 2019 07:13:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60296)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1hmcIj-0003N8-PT
- for qemu-devel@nongnu.org; Sun, 14 Jul 2019 07:04:18 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1hmcR3-0005TX-Tw
+ for qemu-devel@nongnu.org; Sun, 14 Jul 2019 07:12:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1hmcIh-0001m1-Q8
- for qemu-devel@nongnu.org; Sun, 14 Jul 2019 07:04:17 -0400
-Received: from mail-wm1-x32f.google.com ([2a00:1450:4864:20::32f]:52914)
+ (envelope-from <richard.henderson@linaro.org>) id 1hmcR2-0006Lt-SK
+ for qemu-devel@nongnu.org; Sun, 14 Jul 2019 07:12:53 -0400
+Received: from mail-wr1-x433.google.com ([2a00:1450:4864:20::433]:38950)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1hmcIg-0001jp-5x
- for qemu-devel@nongnu.org; Sun, 14 Jul 2019 07:04:15 -0400
-Received: by mail-wm1-x32f.google.com with SMTP id s3so12484771wms.2
- for <qemu-devel@nongnu.org>; Sun, 14 Jul 2019 04:04:13 -0700 (PDT)
+ id 1hmcR2-0006Ku-Ka
+ for qemu-devel@nongnu.org; Sun, 14 Jul 2019 07:12:52 -0400
+Received: by mail-wr1-x433.google.com with SMTP id x4so14130989wrt.6
+ for <qemu-devel@nongnu.org>; Sun, 14 Jul 2019 04:12:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=IJCgDVhxiseY7XWwBmZ27J/5fYQgLDVWtvomA/EQ0K0=;
- b=YeOtU6cA2y2JOd/+5MFMZ3OiSvWVSWFClQCuY60sLh5KeS7uiHiABJiNwFzKVJm27c
- eEtcINWdkx3KbFLwbLXeDsMQ54oPnCVlkZgNTOvMHuJ4ViA0/kJ7kmVMPZP5Fo98612c
- I6Z5UNmmobSJl2odHYx42hiuyBReYvb4nTzIYYzNRz2lu9qwLldinTcEX4QmzgZwqkPs
- eBGoS4IGgMK+tcncsi2/27X+fAnGlarcHazK8YOmH/idwp08ZcXOsgCv+425+chc8aT9
- 5XuvuH2u+ItyeIzG2xEhA2tFD/tvHK9EBAdJr8asxPXC5o2qtIJcOfCkWyLVUufKXO6K
- yVsg==
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=PwAQHiL125SUFXLsSqVjmRNmmIGb7JwNhWKz70/cdKk=;
+ b=Aw3YDFEo+GhQ5wWixQMqqYCDMKq+yTYBvwfXQ0fnTZKzByF+f/qvQ+qxxrG+wC2vWk
+ YGi4010WOd//h+YPXpCGHdkjdeg4Hj2Qlibo+fnKlTYD1lySrBkM+/IFfstZIZG1k3I/
+ 19UWzOtNzMMYG0CFY4SfaSh7rTdC0RyohdtC01/j6vKhGTHyLAXLPoA+5rXJbQ47YT79
+ TAKtzFB1lu+zfIvBAHr/CBPAIaGMkC/+lzHepMmMgV4DAUXWtzRILntC6RmOdBa2D0mR
+ YMEmdDirrt32h7jzPN83nRm+GvOmtgm7GRMO9Oo14rxVQwfwW+gYK7JaAImG63r6dNvi
+ aFDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
  :content-transfer-encoding;
- bh=IJCgDVhxiseY7XWwBmZ27J/5fYQgLDVWtvomA/EQ0K0=;
- b=AnLhJ2sSUJoEoofLxOEIlBLts3wx8niQ0UpGcR1G9gyJy2lUcJB84wmxFCNfaI42Kv
- 2/M5nQk6kuyrY4B6nQ41xmCkDyBN15yPf9WSx0ssHHp7Ukbi+kuXC7AIke0zbj20l/x0
- Lkek4gp92SiIS4WkUWVGUPpMVIkWWibXr1J86/NFf62zC0NbdjjEUZfKYKa+CkiEoFRw
- ggSDJkZ1PVAW9ts45Drk+jbn32Turss2i45XhW3mMebP8B3ctyfJXOXslmKuL3eXCbqh
- u/WF7eNuAh7s62ouJeh9Q5Ry+DMeI6KXJyd5eUvMQu08UrQH8up+htJ18j9QAoRL3Z/4
- KmjQ==
-X-Gm-Message-State: APjAAAXpKmRY19QKCq0cJcM0YAbVYmIOMOWm5eAuCUoxEyslT8K8A2Hu
- E4UrRlgjRofgmobJl6Z6Ilyd+A==
-X-Google-Smtp-Source: APXvYqx+27b2WPRjVNRO0zacC3OFgyYOiSh4CZy4jXfrOI7K8Vu4oS/JZc26yo2L/t8gg1DFGnEGNg==
-X-Received: by 2002:a7b:cbcb:: with SMTP id n11mr18496347wmi.54.1563102251955; 
- Sun, 14 Jul 2019 04:04:11 -0700 (PDT)
-Received: from [10.0.7.42] ([194.144.248.241])
- by smtp.gmail.com with ESMTPSA id z19sm9925584wmi.7.2019.07.14.04.04.10
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Sun, 14 Jul 2019 04:04:11 -0700 (PDT)
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20190712133928.21394-1-philmd@redhat.com>
+ bh=PwAQHiL125SUFXLsSqVjmRNmmIGb7JwNhWKz70/cdKk=;
+ b=Se+7bTrwZz6YUiaBVREcVkgyPj2Z2EBI0wtq5mvFtvZz3e/RnobAhOej9/t7B0Y+y0
+ SJqpqMeeUFFogQjQFAvppxrcnvS6xYgzVeUBeqIZNTravumGNX/m+A6G6AO0HB4d4Knt
+ TD+w5ZNhKjv2Z2/Ofk1hhgBJiAJ5PB74wXgaxYn/V08q3w3QS6oaIYGcdnN7dltcv4wn
+ /l7AqQv7iKQpxGaW/XtdtssdXQI5bxo8NQCCSOoE9XDWR+mgdsWW4NVZwM864lpEuwj3
+ 0zz/bJjfl3iqEqisPi7VduSLGhGyiCBQimJbmvTV/lxCAJmuZSm5i2LjAEx34ziUKFED
+ 5l0g==
+X-Gm-Message-State: APjAAAWAPS8E/whh67fngRFu9ffla9bYlpzkAnsL8c/B35eDLgiGGyug
+ LGqRGZiPJ8IhTlLiDcHr9qVAqJex0vKx2g==
+X-Google-Smtp-Source: APXvYqxpbwU741wtNhNlBOP2+QVB6J5Idfd7Y2QwxJYQwYayCt0IS0Z+HKQ3ys4Ii7d+jXnMOFsVLA==
+X-Received: by 2002:adf:d4c1:: with SMTP id w1mr23504798wrk.229.1563102770857; 
+ Sun, 14 Jul 2019 04:12:50 -0700 (PDT)
+Received: from localhost.localdomain ([194.144.248.241])
+ by smtp.gmail.com with ESMTPSA id f17sm12675795wmf.27.2019.07.14.04.12.49
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Sun, 14 Jul 2019 04:12:50 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <65921981-c235-d8ca-ce26-27e7ef03585e@linaro.org>
-Date: Sun, 14 Jul 2019 13:04:08 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+To: qemu-devel@nongnu.org
+Date: Sun, 14 Jul 2019 11:12:42 +0000
+Message-Id: <20190714111249.13859-1-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-In-Reply-To: <20190712133928.21394-1-philmd@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::32f
-Subject: Re: [Qemu-devel] [PATCH-for-4.1? 0/7] vl: Allow building with
- CONFIG_BLUETOOTH disabled
+X-Received-From: 2a00:1450:4864:20::433
+Subject: [Qemu-devel] [PULL for-4.1 0/7] tcg patch queue
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,35 +91,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- qemu-arm@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Miroslav Rezanina <mrezanin@redhat.com>
+Cc: peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/12/19 3:39 PM, Philippe Mathieu-Daudé wrote:
-> A series of obvious patches to build without the deprecated
-> bluetooth devices. Still worth for 4.1 or too late?
-> It is clearly not a bugfix.
-> 
-> Regards,
-> 
-> Phil.
-> 
-> Philippe Mathieu-Daudé (7):
->   hw/arm: Nokia N-series tablet requires Bluetooth
->   hw/usb: Bluetooth HCI USB depends on USB & BLUETOOTH
->   MAINTAINERS: Add a Bluetooth entry
->   vl: Fix 'braces' coding style issues
->   vl: Use qemu_strtoi() instead of strtol()
->   vl: Extract bt_parse() into its own file
->   hw/bt: Allow building with CONFIG_BLUETOOTH disabled
 
-All of this looks plausible to me to go along with the 4.1 deprecation.
+The following changes since commit 1316b1ddc8a05e418c8134243f8bff8cccbbccb1:
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+  Merge remote-tracking branch 'remotes/kevin/tags/for-upstream' into staging (2019-07-12 15:38:22 +0100)
 
+are available in the Git repository at:
 
-r~
+  https://github.com/rth7680/qemu.git tags/pull-tcg-20190714
+
+for you to fetch changes up to 52ba13f042714c4086416973fb88e2465e0888a1:
+
+  tcg: Release mmap_lock on translation fault (2019-07-14 12:19:01 +0200)
+
+----------------------------------------------------------------
+Fixes for 3 tcg bugs
+
+----------------------------------------------------------------
+Richard Henderson (7):
+      tcg: Fix constant folding of INDEX_op_extract2_i32
+      tcg/aarch64: Fix output of extract2 opcodes
+      include/qemu/atomic.h: Add signal_barrier
+      tcg: Introduce set/clear_helper_retaddr
+      tcg: Remove cpu_ld*_code_ra
+      tcg: Remove duplicate #if !defined(CODE_ACCESS)
+      tcg: Release mmap_lock on translation fault
+
+ include/exec/cpu_ldst.h                   | 20 ++++++++
+ include/exec/cpu_ldst_useronly_template.h | 40 ++++++++++------
+ include/qemu/atomic.h                     | 11 +++++
+ accel/tcg/user-exec.c                     | 77 +++++++++++++++++++++----------
+ target/arm/helper-a64.c                   |  8 ++--
+ target/arm/sve_helper.c                   | 43 +++++++++--------
+ tcg/aarch64/tcg-target.inc.c              |  2 +-
+ tcg/optimize.c                            |  4 +-
+ 8 files changed, 139 insertions(+), 66 deletions(-)
 
