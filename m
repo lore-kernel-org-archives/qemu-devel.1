@@ -7,71 +7,71 @@ X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5605C73C66
-	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jul 2019 22:39:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9971DC73C66
+	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jul 2019 23:08:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 78E9A20C01
-	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jul 2019 22:39:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4447C2063F
+	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jul 2019 23:08:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SoL9gEGr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 78E9A20C01
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Rx0OAMn+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4447C2063F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34470 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34514 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hmn9f-0006X7-65
-	for qemu-devel@archiver.kernel.org; Sun, 14 Jul 2019 18:39:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52504)
+	id 1hmnbZ-0001ko-4P
+	for qemu-devel@archiver.kernel.org; Sun, 14 Jul 2019 19:08:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57377)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jan.bobek@gmail.com>) id 1hmn9T-000694-5O
- for qemu-devel@nongnu.org; Sun, 14 Jul 2019 18:39:28 -0400
+ (envelope-from <jan.bobek@gmail.com>) id 1hmnbN-0001Ma-Er
+ for qemu-devel@nongnu.org; Sun, 14 Jul 2019 19:08:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jan.bobek@gmail.com>) id 1hmn9S-0006Au-4A
- for qemu-devel@nongnu.org; Sun, 14 Jul 2019 18:39:27 -0400
-Received: from mail-yw1-xc42.google.com ([2607:f8b0:4864:20::c42]:34402)
+ (envelope-from <jan.bobek@gmail.com>) id 1hmnbM-0000Pq-1y
+ for qemu-devel@nongnu.org; Sun, 14 Jul 2019 19:08:17 -0400
+Received: from mail-yw1-xc42.google.com ([2607:f8b0:4864:20::c42]:40297)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <jan.bobek@gmail.com>) id 1hmn9R-0006AV-Tt
- for qemu-devel@nongnu.org; Sun, 14 Jul 2019 18:39:26 -0400
-Received: by mail-yw1-xc42.google.com with SMTP id q128so6792436ywc.1
- for <qemu-devel@nongnu.org>; Sun, 14 Jul 2019 15:39:25 -0700 (PDT)
+ (Exim 4.71) (envelope-from <jan.bobek@gmail.com>) id 1hmnbL-0000PZ-Re
+ for qemu-devel@nongnu.org; Sun, 14 Jul 2019 19:08:15 -0400
+Received: by mail-yw1-xc42.google.com with SMTP id b143so6781514ywb.7
+ for <qemu-devel@nongnu.org>; Sun, 14 Jul 2019 16:08:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=subject:to:cc:references:from:openpgp:autocrypt:message-id:date
  :user-agent:mime-version:in-reply-to;
- bh=6vpRkwwLKmEGWOnW6DOU1/rdiSBk9iVmXNTZP3XD0Hs=;
- b=SoL9gEGrURlHmy7MYtv0fsD71FIOK4/tABenMwnSQPmrasICR6VlJzZzCT2yTbRTMN
- TOfhcviDiulTkxk0RUpf+m21KrhRtlerLkPvEZe6M1ag65rHI5aP2mWhGHDMIh4okXy/
- 1FmtXDHwfXaR5slxR87ZqgelhsnQstKK+Hcj20iOHXR1jerI62w/nHCKVzGSKB/k1In6
- lum9KevA2hwRwJkQrK67xXEj9Hmo7ofQ04vtYVcUTYkw8hnVPwPQPDp2XqekpQaYk36c
- 2dy0eColmsaW+78NzKDY7NujFclebb+j0luxMVQRHzFss5PEc5eSwjt74d/zALTt5Is0
- dIZQ==
+ bh=1rwGxMv3Uy1a23u5aB89aSw0kGSZ2JwR20qoI8tj9bw=;
+ b=Rx0OAMn+zTLoiAb5Ezssi3a+s11j4B6giGCPQR/bRlmV0XNXsD6x9IYqVj4NgDEUUf
+ JXf9N7cSEjOPjT1/GtlaybYZxcqFYaS0Yo+wXSihuhzPI3L0ozWbmmzMgaQQWNJAVY6u
+ HYInzs2nQgdTjmkTV/ozR7eAqxVFigeCIoOBlVGlqqlCkzct2/Q6sFAp7tuOYSDCcD9e
+ 39cemAHax9cWvpLYGwIGFsajz7IxuCT2r94LQ9TRrIVCu9UD4PrhiQibvWuGAgwu+yzV
+ Qcj0Aw7oM3lhujw+Sfj0lGUqiknZdKuSjKNBj5AOBOcxjhS/61HV6mQ83i/M13w2rCse
+ VI/Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:openpgp:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to;
- bh=6vpRkwwLKmEGWOnW6DOU1/rdiSBk9iVmXNTZP3XD0Hs=;
- b=MzVii/BOTgvNcqHsQ8ByatEfSF9qHmafk5MnQM30b/MbiJO/7Nq4xH/cWMI2NcdL2G
- z3u7KAzQPomb8cnRdRet1IWIHiKVJ22ShpvqV7dxfdZV1G1+V66WkCpYWUA8qd+rX20z
- t+t35ZKdiiWRe+RTRuqkLi9cATKLRWFf13zA416Nva/xoK7Jf0t6Yfs0yFkejCOdK0nw
- UzEp2YPtIQaw2jMQYROs0pIPiKZ4wHY6Ht0RorKoNwH0X/5i05fjQSMzaM8zX/F46hGd
- KUE8ZpNkULMHSPY+YWYkSVdh/EtFoxASfcjpP0Bw/iwS8b9s2w9bF1jTIha41Fu0f47A
- qNmg==
-X-Gm-Message-State: APjAAAW9W8Vd2gIz7fo4iUTV/TI7Nlg1kBozv55hNWYqXLr1D2DzDpcT
- mIOQ6adm98UnsuYsJ6LWoDw=
-X-Google-Smtp-Source: APXvYqwwSBFGUxMP4d74ukuDiCwxvPp/PJCTfaUG7IS8FvcovbEB+xlCzX9Vi4P69dD3tpJkdPR8fw==
-X-Received: by 2002:a81:2e50:: with SMTP id u77mr13094317ywu.138.1563143965180; 
- Sun, 14 Jul 2019 15:39:25 -0700 (PDT)
+ bh=1rwGxMv3Uy1a23u5aB89aSw0kGSZ2JwR20qoI8tj9bw=;
+ b=s2d/O1Cka6XTAt4b+K2lk1wac81jUlXM9weZ3+mtrL3C/FPCT/Os4huRkWYMdOTkW8
+ 4ruhklsa99kOl8yof0jB2VE49bvy7arPNj2wJxPWo5ZkbE0RPmfjJB0f4nw8nQGaSOtI
+ e2QktNF/yz+7lh/mjgtEqno3YDZCbMsqZNgvUF4NhrKmDTzuxwlBYIbYmIlpqd6n+NaA
+ 9uI/iqI4KDBZRpyzSlmoZlmpvpeywb3rwslPji5gfo5//TlTR3NH2u8rQkvkfmRPIg4L
+ tQbHWpItFQvTMpEhyV44RpCcc3hAlpmEHWScwT9WAA3Zxkgr6hPwtlFVHSC8Pyf83NkT
+ OayQ==
+X-Gm-Message-State: APjAAAX4vxdP3/E8LUek66Tj21dOLBq9WXd1nj44N+L5KjBc0rbdGX+/
+ DgqxbW+G0cIGhIR8Bjp4S4A=
+X-Google-Smtp-Source: APXvYqxFU1evU1A68/+TuWuMs91C2N/zECHeHkZJNk8m+0OGmJM2On5zZDMAltX58ZuNC1dPU8XuhQ==
+X-Received: by 2002:a81:6dd6:: with SMTP id
+ i205mr13581868ywc.180.1563145695163; 
+ Sun, 14 Jul 2019 16:08:15 -0700 (PDT)
 Received: from [192.168.1.96] (69-222-133-165.lightspeed.tukrga.sbcglobal.net.
  [69.222.133.165])
- by smtp.googlemail.com with ESMTPSA id u6sm3871672ywl.10.2019.07.14.15.39.22
+ by smtp.googlemail.com with ESMTPSA id p17sm4012786ywp.96.2019.07.14.16.08.11
  (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Sun, 14 Jul 2019 15:39:24 -0700 (PDT)
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+ Sun, 14 Jul 2019 16:08:14 -0700 (PDT)
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 References: <20190711223300.6061-1-jan.bobek@gmail.com>
- <20190711223300.6061-5-jan.bobek@gmail.com>
- <e64091a9-d8f4-a71c-fcbd-ac27d85d2e64@linaro.org>
+ <87zhljcr6c.fsf@zen.linaroharston>
 From: Jan Bobek <jan.bobek@gmail.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=jan.bobek@gmail.com; prefer-encrypt=mutual; keydata=
@@ -148,20 +148,20 @@ Autocrypt: addr=jan.bobek@gmail.com; prefer-encrypt=mutual; keydata=
  uD1PmEfcmmfqPmuv037Dzpe5hYj5csGsdNLMLSK1WZqaAhBAtCnh3Rme71Je7f+eObRAHHGZ
  sftsaIi3kpdIyUnKybZhViIlXs8Cde5O2HCI0NhHnaDnxKdmHaIZVlH1hX3koaRrWCeGjts1
  WWOVGHwSUSJ3lpUXEBHBicrX3bH/vUVTNTnwzGLSf/23VC9WYAe69II=
-Message-ID: <c0598465-4283-6451-c15c-e55fcb199ced@gmail.com>
-Date: Sun, 14 Jul 2019 18:39:20 -0400
+Message-ID: <71f1ca40-9457-62c1-f585-6b3d6c523e3c@gmail.com>
+Date: Sun, 14 Jul 2019 19:08:10 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <e64091a9-d8f4-a71c-fcbd-ac27d85d2e64@linaro.org>
+In-Reply-To: <87zhljcr6c.fsf@zen.linaroharston>
 Content-Type: multipart/signed; micalg=pgp-sha512;
  protocol="application/pgp-signature";
- boundary="PMZ8qEvjNN8qnLCWnIeHB4MkpO9GkS60x"
+ boundary="0PrpGAL7MZYSmX4YK2J4W2xapL7SExsNw"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
 X-Received-From: 2607:f8b0:4864:20::c42
-Subject: Re: [Qemu-devel] [RISU PATCH v3 04/18] risugen_x86_constraints: add
- module
+Subject: Re: [Qemu-devel] [RISU PATCH v3 00/18] Support for generating x86
+ SIMD test images
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -173,129 +173,165 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---PMZ8qEvjNN8qnLCWnIeHB4MkpO9GkS60x
-Content-Type: multipart/mixed; boundary="JSdPuOZxCA78QVHwCyaFYB51OrX865b6C";
+--0PrpGAL7MZYSmX4YK2J4W2xapL7SExsNw
+Content-Type: multipart/mixed; boundary="jRX551ZtVzohgh9zonSQAbqdElnmYwR0P";
  protected-headers="v1"
 From: Jan Bobek <jan.bobek@gmail.com>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Message-ID: <c0598465-4283-6451-c15c-e55fcb199ced@gmail.com>
-Subject: Re: [RISU PATCH v3 04/18] risugen_x86_constraints: add module
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <71f1ca40-9457-62c1-f585-6b3d6c523e3c@gmail.com>
+Subject: Re: [RISU PATCH v3 00/18] Support for generating x86 SIMD test images
 References: <20190711223300.6061-1-jan.bobek@gmail.com>
- <20190711223300.6061-5-jan.bobek@gmail.com>
- <e64091a9-d8f4-a71c-fcbd-ac27d85d2e64@linaro.org>
-In-Reply-To: <e64091a9-d8f4-a71c-fcbd-ac27d85d2e64@linaro.org>
+ <87zhljcr6c.fsf@zen.linaroharston>
+In-Reply-To: <87zhljcr6c.fsf@zen.linaroharston>
 
---JSdPuOZxCA78QVHwCyaFYB51OrX865b6C
+--jRX551ZtVzohgh9zonSQAbqdElnmYwR0P
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 7/12/19 10:24 AM, Richard Henderson wrote:
-> On 7/12/19 12:32 AM, Jan Bobek wrote:
->> +sub vex($%)
->> +{
->> +    my ($insn, %vex) =3D @_;
->> +    my $regidw =3D $is_x86_64 ? 4 : 3;
->> +
->> +    # There is no point in randomizing other VEX fields, since
->> +    # VEX.R/.X/.B are encoded automatically by risugen_x86_asm, and
->> +    # VEX.M/.P are opcodes.
->> +    $vex{l} =3D randint(width =3D> 1) ? 256 : 128 unless defined $vex=
-{l};
+On 7/12/19 9:34 AM, Alex Benn=C3=A9e wrote:
 >=20
-> VEX.L is sort-of opcode-like as well.  It certainly differentiates AVX1=
- vs
-> AVX2, and so probably should be constrained somehow.  I can't think of =
-what's
-> the best way to do that at the moment, since our existing --xstate=3Dfo=
-o isn't right.
+> Jan Bobek <jan.bobek@gmail.com> writes:
 >=20
-> Perhaps just a FIXME comment for now?
+>> This is v3 of the patch series posted in [1] and [2]. Note that this
+>> is the first fully-featured patch series implementing all desired
+>> functionality, including (V)LDMXCSR and VSIB-based instructions like
+>> VGATHER*.
+>>
+>> While implementing the last bits required in order to support VGATHERx=
 
-So, the instructions that use VEX.L specify it in the !constraints
-block in the config file. Originally, I thought some instructions are
-supposed to ignore it (denoted by LIG in the Intel manual -- it's the
-scalar instructions like ADDSS), so it might be worth randomizing.
-However, when I later read the manual pages of some of these
-instructions, it said they are supposed to be encoded with VEX.L=3D0
-anyway. I didn't check every single one of them, but right now they
-are all encoded with VEX.L=3D0, so I suppose this line can be removed
-and we can rely on the caller (the !constraints block) to always
-specify it.
+>> instructions, I ran into problems which required a larger redesign;
+>> namely, there are no more !emit blocks as their functionality is now
+>> implemented in regular !constraints blocks. Also, memory constraints
+>> are specified in !memory blocks, similarly to other architectures.
+>>
+>> I tested these changes on my machine; both master and slave modes work=
 
->> +sub modrm_($%)
->> +{
->> +    my ($insn, %args) =3D @_;
->> +    my $regidw =3D $is_x86_64 ? 4 : 3;
->> +
->> +    my %modrm =3D ();
->> +    if (defined $args{reg}) {
->> +        # This makes the config file syntax a bit more accommodating
->> +        # in cases where MODRM.REG is an opcode extension field.
->> +        $modrm{reg} =3D $args{reg};
->> +    } else {
->> +        $modrm{reg} =3D randint(width =3D> $regidw);
->> +    }
->> +
->> +    # There is also a displacement-only form, but we don't know
->> +    # absolute address of the memblock, so we cannot test it.
+>> in both 32-bit and 64-bit modes.
 >=20
-> 32-bit mode has displacement-only, aka absolute; 64-bit replaces that w=
-ith
-> rip-relative.  But agreed that the first is impossible to test and the =
-second
-> is difficult.
+> Two things I've noticed:
 >=20
->> +sub modrm($%)
->> +{
->> +    my ($insn, %args) =3D @_;
->> +    modrm_($insn, indexk =3D> 'index', %args);
->> +}
+>   ./contrib/generate_all.sh -n 1 x86.risu testcases.x86
 >=20
-> How are you avoiding %rsp as index?
-> I saw you die for that in the previous patch...
+> takes a very long time. I wonder if this is a consequence of constantly=
 
-See write_mem_getoffset in risugen_x86.pm. I felt there's a better
-place for it there, since that's when we actually need to write to it,
-so the problem is more exposed.
+> needing to re-query the random number generator?
 
--Jan
+I believe so. While other architectures can be as cheap as a single rand(=
+)
+call per instruction, x86 does more like 5-10.
 
+Even worse, there are some instructions which cannot be generated in
+32-bit mode (those requiring REX.W prefix, e.g. MMX MOVQ). When I let
+the script run for a little bit, risugen would get stuck in an
+infinite loop, because it could only choose from a single instruction
+which wasn't valid for 32-bit....
+
+> The other is:
 >=20
-> r~
+>   set -x RISU ./build/i686-linux-gnu/risu
+>   ./contrib/record_traces.sh testcases.x86/*.risu.bin
+>=20
+> fails on the first trace when validating the playback. Might want to
+> check why that is.
+
+The SIMD registers aren't getting initialized; both master and
+apprentice need an --xfeatures=3DXXX parameter for that. Right now the
+default is 'none'; unless the instructions are filtered, you'd need
+--xfeatures=3Davx (or --xfeatures=3Dsse, and that only works because on m=
+y
+laptop, the upper part of ymm registers seems to be always zeroed when
+risu starts).
+
+>>
+>> Cheers,
+>>  -Jan
+>>
+>> Changes since v2:
+>>   Too many to be listed individually; this patch series might be
+>>   better reviewed on its own.
+>>
+>> References:
+>>   1. https://lists.nongnu.org/archive/html/qemu-devel/2019-06/msg04123=
+=2Ehtml
+>>   2. https://lists.nongnu.org/archive/html/qemu-devel/2019-07/msg00001=
+=2Ehtml
+>>
+>> Jan Bobek (18):
+>>   risugen_common: add helper functions insnv, randint
+>>   risugen_common: split eval_with_fields into extract_fields and
+>>     eval_block
+>>   risugen_x86_asm: add module
+>>   risugen_x86_constraints: add module
+>>   risugen_x86_memory: add module
+>>   risugen_x86: add module
+>>   risugen: allow all byte-aligned instructions
+>>   risugen: add command-line flag --x86_64
+>>   risugen: add --xfeatures option for x86
+>>   x86.risu: add MMX instructions
+>>   x86.risu: add SSE instructions
+>>   x86.risu: add SSE2 instructions
+>>   x86.risu: add SSE3 instructions
+>>   x86.risu: add SSSE3 instructions
+>>   x86.risu: add SSE4.1 and SSE4.2 instructions
+>>   x86.risu: add AES and PCLMULQDQ instructions
+>>   x86.risu: add AVX instructions
+>>   x86.risu: add AVX2 instructions
+>>
+>>  risugen                    |   27 +-
+>>  risugen_arm.pm             |    6 +-
+>>  risugen_common.pm          |  117 +-
+>>  risugen_m68k.pm            |    3 +-
+>>  risugen_ppc64.pm           |    6 +-
+>>  risugen_x86.pm             |  518 +++++
+>>  risugen_x86_asm.pm         |  918 ++++++++
+>>  risugen_x86_constraints.pm |  154 ++
+>>  risugen_x86_memory.pm      |   87 +
+>>  x86.risu                   | 4499 +++++++++++++++++++++++++++++++++++=
++
+>>  10 files changed, 6293 insertions(+), 42 deletions(-)
+>>  create mode 100644 risugen_x86.pm
+>>  create mode 100644 risugen_x86_asm.pm
+>>  create mode 100644 risugen_x86_constraints.pm
+>>  create mode 100644 risugen_x86_memory.pm
+>>  create mode 100644 x86.risu
+>=20
+>=20
+> --
+> Alex Benn=C3=A9e
 >=20
 
 
---JSdPuOZxCA78QVHwCyaFYB51OrX865b6C--
+--jRX551ZtVzohgh9zonSQAbqdElnmYwR0P--
 
---PMZ8qEvjNN8qnLCWnIeHB4MkpO9GkS60x
+--0PrpGAL7MZYSmX4YK2J4W2xapL7SExsNw
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCgAdFiEESPYOqtMR3qRZrEutZeg2ldrjNs8FAl0rrxgACgkQZeg2ldrj
-Ns9qqg/8DNHqY2o5BMJfjWjmAQVzKBF514iqclESlqNPFYOXMQoDLmog+PY6MYE/
-01nlzYOWJdbf+PcI27pHko4YB+K5rKzsHVpOgsqMRwLxx+ygQlXH4PUNNK1Wy55M
-jEm5Ge5w+uZcAhsXOBvnk6uOE5vqT/TzdZmad6KNqTEZg68Fimg7LLE2IA6mC7Ln
-8qhOEyNU1yPf6PidrzNYGCrnCrn0RIwQuznLY+0xy2i1vA30RXjI2TfATGtxu17p
-YZUxfZ1MtXkA44icPJ2C3XVtF0t4irHgLg2/k64zKuyXzlqvWORWG7TByhi7V1BW
-g14CzVu74SRwSwiODasSlgXTYYG7uxL9bUaVNALPpZ5s55EiUoHCyviX5ltzP++I
-80yTwf5CVN6FiMhiX422NDrafbNUoYGSCV6aQOac+herq6NojdXX9CD6i3a+QMNw
-FAmwScS7WOdj5oVRjMlBrJu1SAnb9kxww1vvrQHdk/QJNJHHfrU2miKMS9sKpEO+
-b++ckLQiSTRIqBfF5Iwv4CHb4dPOKhXNQLLevCv8twz3U5qzduHLan+W7DxmD3Wk
-RLFf6+CJbRWx0nOA1gCWuzmtxhfYt55ZQW3rnXvwGAqBhoORcTpY9eP5Lw6kwS4S
-b8BX7LGQMe0rkiMCyBM16LF32dFFYDpOeBFyLVvWcPqDlBaMIxw=
-=ZHYy
+iQIzBAEBCgAdFiEESPYOqtMR3qRZrEutZeg2ldrjNs8FAl0rtdoACgkQZeg2ldrj
+Ns9dXQ//fb1KhCiLm/fZ7khtddkzyEg9hf8DHkwPTCnqMV60SeFnEc/UWVbrDSfc
+6667gMTQxF4HdQKYJQG54VeMd6dccJPD74CeUVy43u1NnItISEElLFGrEQzrzhdz
+eJxxPod3LHHFKyl3Ch2TeDKrbRcWHBU841qyv4J+SxY4+gLVSN4hAnXKg/ALIJvb
+TDJoXDV+/UqnrKnLBdTgLqMD5VDFvrZ0rLB1OZwwYHIgXQVyxGWvhd0r8eoslN5H
+cyw1cXcAtjPjYgE8VBRe9HU1YMrPP8Bfhxcd9pJ+O4Cc/NTibvJXtAiZu/G0o7Ky
+tl++mqBqwhj66/7NJDVlBH12wKMdtgxWeUkqDwnsX4pcTyio4DXd8hzWqC9NCPLe
+4f2R5VQTqB2WleOxpHT2gxp0sPS39MtfnAhutyIf6hheH8kCC4WVjVyuAUkWSJIz
+fWt8G0zaz0a8ac/mYCyggHhoQ19c2CjvgLl49j4EihC4c4LB9hMjmESVgevnrDu4
+88dnGhpmBgb2ebpwj+Fwz6jWl4g3wTAyaGB970bcrqs19lnZMgzlZpRF7q8nEzI3
+6NneoK+XaEph51P5vf2gqCE+46KEapwJa6NFi9w56r47oG/mRODRJDqciDRNhlOh
+HIe+2COMPgKqCwgeYfbGrpt18yhpAqX1JkHWzgEqRTsYHoTIMkU=
+=0Cu0
 -----END PGP SIGNATURE-----
 
---PMZ8qEvjNN8qnLCWnIeHB4MkpO9GkS60x--
+--0PrpGAL7MZYSmX4YK2J4W2xapL7SExsNw--
 
