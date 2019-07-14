@@ -2,167 +2,91 @@ Return-Path: <SRS0=Qpa9=VL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93449C73C66
-	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jul 2019 21:55:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20E0BC742D2
+	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jul 2019 21:57:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4F14020C01
-	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jul 2019 21:55:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E5E00214AE
+	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jul 2019 21:57:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MV51AhID"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F14020C01
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I7kSoUHb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E5E00214AE
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34312 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34324 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hmmTK-00040g-W8
-	for qemu-devel@archiver.kernel.org; Sun, 14 Jul 2019 17:55:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44354)
+	id 1hmmUs-0004zR-16
+	for qemu-devel@archiver.kernel.org; Sun, 14 Jul 2019 17:57:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44619)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jan.bobek@gmail.com>) id 1hmmT8-0003cP-Jx
- for qemu-devel@nongnu.org; Sun, 14 Jul 2019 17:55:43 -0400
+ (envelope-from <groeck7@gmail.com>) id 1hmmUh-0004VB-S1
+ for qemu-devel@nongnu.org; Sun, 14 Jul 2019 17:57:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jan.bobek@gmail.com>) id 1hmmT7-0001aF-Iu
- for qemu-devel@nongnu.org; Sun, 14 Jul 2019 17:55:42 -0400
-Received: from mail-yw1-xc41.google.com ([2607:f8b0:4864:20::c41]:39989)
+ (envelope-from <groeck7@gmail.com>) id 1hmmUg-0002DN-QV
+ for qemu-devel@nongnu.org; Sun, 14 Jul 2019 17:57:19 -0400
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:38670)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <jan.bobek@gmail.com>) id 1hmmT7-0001Wb-CR
- for qemu-devel@nongnu.org; Sun, 14 Jul 2019 17:55:41 -0400
-Received: by mail-yw1-xc41.google.com with SMTP id b143so6750908ywb.7
- for <qemu-devel@nongnu.org>; Sun, 14 Jul 2019 14:55:40 -0700 (PDT)
+ (Exim 4.71) (envelope-from <groeck7@gmail.com>)
+ id 1hmmUe-0002Bl-Gh; Sun, 14 Jul 2019 17:57:16 -0400
+Received: by mail-pf1-x444.google.com with SMTP id y15so6509375pfn.5;
+ Sun, 14 Jul 2019 14:57:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=subject:to:cc:references:from:openpgp:autocrypt:message-id:date
- :user-agent:mime-version:in-reply-to;
- bh=iJVKPUOLNlMi5ZFqEj3Q1HaxuX9bNJuJJFxRPhlzoIY=;
- b=MV51AhIDkTdG/38CnLMTsW/DXQE0m0bAMUNkNmqKBMcgpjTyqyxaO/2MjzlqhQHvTS
- RBxrT2BXK8b46DylpIhpzY+HzYub0Tb1ub1sF2TSwTMnHl2cS01lNRysP+ktZ1OAZz2m
- owxsVW7huHHkaOABzGwanOVSwTZh/G6tYafqcdFuuFh9iL6Dt5OHQwCpFFiHFjzT7d90
- xad6LELDWwmh16h/dfl+i6A8Eg1rXUh1VTDr7U6O1cIx0TglETI2+6VyIMmlTHF6lZZu
- wqTvHfpsCxlJE4ZAQ269ngHnNzqyi3u+EnBeGYM0RoILCoKspsqky6VDPZex+NxdmLP6
- FZsQ==
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=bEKTt/XYoRgjTPiN7Hc4VsVSknUFPFM8poc/rCk3dVM=;
+ b=I7kSoUHbV9BHDOwdl0EkCwsUNu9DSyObQnqQ8kU6/Bf1/Bt9LA5OLyQKE62/R5hh4G
+ TXOgleK/1E6zI9YVaujFVFCekPQm9owXkhBau9/dZ1k0oKVPX8GifI+AbsnKLyWJurMh
+ 4+yA3JTkAD7XRoZdAOPwzDZ4lGiAdE4efR/wKKpsbSCbhmex4oU8tX9qbpFd8MJDMP63
+ jrvdWE3LFw9ekunJUUwCJnw3stnsJPKR1LfwpwdFnNNDf9K+T4dpL3lDBmIXXaMvmadd
+ GFpHLuC05dvfMygttuhPpTiu9Dy0nfBaYi8nS89g4Q0JEG5P/Vwtb0gYTrYK5R0FadWZ
+ +F3w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to;
- bh=iJVKPUOLNlMi5ZFqEj3Q1HaxuX9bNJuJJFxRPhlzoIY=;
- b=uhUETiXuc3j69fuAHBKs7j5lQMuhedtQ9kxgC0d/xBhAne4CyZunPT7sxubPRnahWs
- g9FpHeJb0A6NOXuq4KNfCeP9QJRxJjxY6Uv3oR0WQkNDSOlsO6Sp1YyLh9FbPhxLFndt
- YqRRSjXeyIjeXHsbK2V5uX8ouGCpZcJ5Vqvvabr4Cm4PwOgegWhbaFm6q8IBWNF7yGNm
- /Ru1cJH1RSLqGF6Zlw5yO9iWgm7zIKbWn99oNq3GuntAC7V4bSg9/t0FXr5O2tFeKLSo
- n/SJ5DM67GIFRSIJvIqDoNiqPDQz0bbU5smwPH5wtytiWZGhAuYm0t6CL6OxHAsWIcgQ
- O0Kg==
-X-Gm-Message-State: APjAAAV5Qb7evxOfmS13ongbMtqO1gzzC9tAwivRmUKPmDe97Gbor5jo
- Zh7sERztk1KocUoTbDq2Qsg=
-X-Google-Smtp-Source: APXvYqx3MIr+cjsNeroanrJkq9IWZ8ErdpIXwf7RDj7DoyQihusSS6sMAkw9COkh4JnHKD8E1do+BA==
-X-Received: by 2002:a81:9152:: with SMTP id i79mr10997270ywg.286.1563141339991; 
- Sun, 14 Jul 2019 14:55:39 -0700 (PDT)
-Received: from [192.168.1.96] (69-222-133-165.lightspeed.tukrga.sbcglobal.net.
- [69.222.133.165])
- by smtp.googlemail.com with ESMTPSA id d7sm4031970ywh.14.2019.07.14.14.55.36
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Sun, 14 Jul 2019 14:55:38 -0700 (PDT)
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20190711223300.6061-1-jan.bobek@gmail.com>
- <20190711223300.6061-2-jan.bobek@gmail.com>
- <bc5b92ff-cc62-103c-7216-ced33bf72114@linaro.org>
-From: Jan Bobek <jan.bobek@gmail.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=jan.bobek@gmail.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <fed9e984-49e8-9b91-9797-b182713389f3@gmail.com>
-Date: Sun, 14 Jul 2019 17:55:31 -0400
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=bEKTt/XYoRgjTPiN7Hc4VsVSknUFPFM8poc/rCk3dVM=;
+ b=fT3FUx4akzkOKUh/onYEJRrJh6dJlInRlqyJx//r7JaGlj6ZTevRkT0wzjGk0c2srS
+ cOoAeGPvm/n1hh1nUE4fuUx2DvP216C2DwTiuckdbjmsoVDXGuyJPGPFz0BbvguixVrb
+ hKnph188tYgvT2TukIVs6behKsyytdPPIEpkGvAFzzQ5z4imfobvYZjHi8sdFkfyLziu
+ +tX7/tPCw0rZGY/U3Mnrhvb24WPNf6SG3Thck4CJO4kTry8oWSLOhXgI7ONKSCNMnlhM
+ 3DLAsujyXO0Cl4ZvJD7LqjpAds9XxMdu7G+xdfxzDE7c/U2HiHqVFcGGYSP5sDmgoRjv
+ HIQQ==
+X-Gm-Message-State: APjAAAWrIJGLMmkcCBl7+0vdW8PNsU14dCMOJDAWHiBnZhtkZS59wk9p
+ PYaJqLaR/6gBI+ncoPxqnSA=
+X-Google-Smtp-Source: APXvYqwJ2f4DafjFPXe9NRTdMLoEV4orRDvJbdZDqQCL3kBiG3bssUUK5eWQSp4CKGWmrObDC8aNwg==
+X-Received: by 2002:a17:90a:3ac2:: with SMTP id
+ b60mr25903072pjc.74.1563141435344; 
+ Sun, 14 Jul 2019 14:57:15 -0700 (PDT)
+Received: from server.roeck-us.net ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
+ by smtp.gmail.com with ESMTPSA id
+ i3sm16396908pfo.138.2019.07.14.14.57.13
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Sun, 14 Jul 2019 14:57:14 -0700 (PDT)
+To: Radoslaw Biernacki <radoslaw.biernacki@linaro.org>
+References: <1561890034-15921-1-git-send-email-hongbo.zhang@linaro.org>
+ <20190714152010.GA28247@roeck-us.net>
+ <CAEK-wKk+1RQRmFOy8Rp+6fsOaZvzJvXSPNnyTKFY-7c-_VYSXw@mail.gmail.com>
+From: Guenter Roeck <linux@roeck-us.net>
+Message-ID: <bfc94fff-e84f-c07f-322d-d9430048512c@roeck-us.net>
+Date: Sun, 14 Jul 2019 14:57:12 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <bc5b92ff-cc62-103c-7216-ced33bf72114@linaro.org>
-Content-Type: multipart/signed; micalg=pgp-sha512;
- protocol="application/pgp-signature";
- boundary="7xnqnmUIXPXAUI9S6QdyNTsLv6SnORUZX"
+In-Reply-To: <CAEK-wKk+1RQRmFOy8Rp+6fsOaZvzJvXSPNnyTKFY-7c-_VYSXw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::c41
-Subject: Re: [Qemu-devel] [RISU PATCH v3 01/18] risugen_common: add helper
- functions insnv, randint
+X-Received-From: 2607:f8b0:4864:20::444
+Subject: Re: [Qemu-devel] [PATCH v9 0/2] Add Arm SBSA Reference Machine
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -174,132 +98,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: Hongbo Zhang <hongbo.zhang@linaro.org>, ard.biesheuvel@linaro.org,
+ Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
+ leif.lindholm@linaro.org, qemu-arm@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---7xnqnmUIXPXAUI9S6QdyNTsLv6SnORUZX
-Content-Type: multipart/mixed; boundary="x4f13gn8QjEhGnaFZhUClGZfGIskSL04m";
- protected-headers="v1"
-From: Jan Bobek <jan.bobek@gmail.com>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Message-ID: <fed9e984-49e8-9b91-9797-b182713389f3@gmail.com>
-Subject: Re: [RISU PATCH v3 01/18] risugen_common: add helper functions insnv,
- randint
-References: <20190711223300.6061-1-jan.bobek@gmail.com>
- <20190711223300.6061-2-jan.bobek@gmail.com>
- <bc5b92ff-cc62-103c-7216-ced33bf72114@linaro.org>
-In-Reply-To: <bc5b92ff-cc62-103c-7216-ced33bf72114@linaro.org>
+On 7/14/19 8:40 AM, Radoslaw Biernacki wrote:
+> This machine is not ment for direct kernel boot. Is main purpose is development of FW, kernel and other HW/SW parts for SBSA. We are currently working on UEFI and ATF for this machine.
+> 
+> It might be somehow possible to run kernel with DT but we do not support it at this moment. If all you want is to boot kernel directly, it is far more convenient to use existing virt machine.
+> 
 
---x4f13gn8QjEhGnaFZhUClGZfGIskSL04m
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Too bad. As you may know, I am testing the Linux kernel by running it with as many qemu
+machines as possible. I already run several boot tests with the 'virt' machine, and
+I was trying to extend test coverage with the sbsa machine.
 
-On 7/12/19 1:48 AM, Richard Henderson wrote:
-> On 7/12/19 12:32 AM, Jan Bobek wrote:
->> insnv allows emitting variable-length instructions in little-endian or=
+Guenter
 
->> big-endian byte order; it subsumes functionality of former insn16()
->> and insn32() functions.
->>
->> randint can reliably generate signed or unsigned integers of arbitrary=
+> niedz., 14 lip 2019, 17:20 użytkownik Guenter Roeck <linux@roeck-us.net <mailto:linux@roeck-us.net>> napisał:
+> 
+>     Hi,
+> 
+>     On Sun, Jun 30, 2019 at 06:20:32PM +0800, Hongbo Zhang wrote:
+>      > For the Aarch64, there is one machine 'virt', it is primarily meant to
+>      > run on KVM and execute virtualization workloads, but we need an
+>      > environment as faithful as possible to physical hardware,  to support
+>      > firmware and OS development for pysical Aarch64 machines.
+>      >
+> 
+>     I tried to boot linux on this machine with -kernel command line argument,
+>     but have not been successful. Can someone point me to a working command
+>     line, one that lets me load the kernel directly ?
+> 
+>     Thanks,
+>     Guenter
+> 
 
->> width.
->>
->> Signed-off-by: Jan Bobek <jan.bobek@gmail.com>
->> ---
->>  risugen_common.pm | 55 +++++++++++++++++++++++++++++++++++++++++-----=
--
->>  1 file changed, 48 insertions(+), 7 deletions(-)
->>
->> diff --git a/risugen_common.pm b/risugen_common.pm
->> index 71ee996..d63250a 100644
->> --- a/risugen_common.pm
->> +++ b/risugen_common.pm
->> @@ -23,8 +23,9 @@ BEGIN {
->>      require Exporter;
->> =20
->>      our @ISA =3D qw(Exporter);
->> -    our @EXPORT =3D qw(open_bin close_bin set_endian insn32 insn16 $b=
-ytecount
->> -                   progress_start progress_update progress_end
->> +    our @EXPORT =3D qw(open_bin close_bin set_endian insn32 insn16
->> +                   $bytecount insnv randint progress_start
->> +                   progress_update progress_end
->>                     eval_with_fields is_pow_of_2 sextract ctz
->>                     dump_insn_details);
->>  }
->> @@ -37,7 +38,7 @@ my $bigendian =3D 0;
->>  # (default is little endian, 0).
->>  sub set_endian
->>  {
->> -    $bigendian =3D @_;
->> +    ($bigendian) =3D @_;
->>  }
->> =20
->>  sub open_bin
->> @@ -52,18 +53,58 @@ sub close_bin
->>      close(BIN) or die "can't close output file: $!";
->>  }
->> =20
->> +sub insnv(%)
->> +{
->> +    my (%args) =3D @_;
->> +
->> +    # Default to big-endian order, so that the instruction bytes are
->> +    # emitted in the same order as they are written in the
->> +    # configuration file.
->> +    $args{bigendian} =3D 1 unless defined $args{bigendian};
->> +
->> +    for (my $bitcur =3D 0; $bitcur < $args{width}; $bitcur +=3D 8) {
->> +        my $value =3D $args{value} >> ($args{bigendian}
->> +                                     ? $args{width} - $bitcur - 8
->> +                                     : $bitcur);
->> +
->> +        print BIN pack("C", $value & 0xff);
->> +        $bytecount +=3D 1;
->> +    }
->=20
-> Looks like bytecount is no longer used?
-
-bytecount is an exported variable, a quick git grep shows that
-it's being used in risugen_arm.pm (sub thumb_align4).
-
-> Otherwise,
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
->=20
->=20
-> r~
->=20
-
-
---x4f13gn8QjEhGnaFZhUClGZfGIskSL04m--
-
---7xnqnmUIXPXAUI9S6QdyNTsLv6SnORUZX
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCgAdFiEESPYOqtMR3qRZrEutZeg2ldrjNs8FAl0rpNMACgkQZeg2ldrj
-Ns835hAAmxSSuEra4I3KXmyiP2uCIXKB45cYTyC8+mr13hhRrh+Q0OxT0HvEop5f
-U4MLgkTFw4Lw7/wHmIxdf5Uvn518bX1mXY8UKM+zFQYQwoFc5Wnm6I7gLcsT9eJv
-ws9WSh0HnhdoeGo7ZUWNCS8a1KRyczt3TUBJOPeWHIkzkZ7dOwRVwO6wczjNCpsj
-62z2s/5GLd3CmLCUNzgRNUp88KqMQK3tS9Ck8l270UtK6hzuEWLjw0/DiqdI3FMR
-PxUc3KlXVeNXiF1JnT3cqd6h4mf1drUQmbqrmPTLT+SE3vNEPZ74SuDpPSOoCHb8
-+5zzeg/6eB9WwrQmHZs00M1vgMz9cnXPqHZzVczZr4uUxuqLMVjOSWuOJRfep5v2
-nC25Hvgkrve/q8Zbm7vjo5pA0E65xB3REvnE6SwRF4LY/55YY/9Bnq7j+rp8voVW
-I59KlYwC0guLDkGGxV+2oh7ADyUbGQ/U9kGvj3NrwL/caxnAHw45kKhliRHXmwaw
-BcT56V+0aMee3y7qoAWG6MpQSTAb0z7ikyjcQVQcYyY+XiCXSfKHaT2d91cX1Bz4
-fq3dQRQthDj78Lt7NWSEyDe3OXwpyZqs5H/rXqVL/a8mbCtZCbjA7Q0DT82yFlG9
-KHp5kvVOycRE2ID5O8wASb3egeJOL69qhjULrE4HVDVKgXF9LgQ=
-=t59L
------END PGP SIGNATURE-----
-
---7xnqnmUIXPXAUI9S6QdyNTsLv6SnORUZX--
 
