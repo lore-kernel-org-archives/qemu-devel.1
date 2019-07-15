@@ -2,111 +2,90 @@ Return-Path: <SRS0=IjNW=VM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C798EC76196
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 14:37:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE50EC76191
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 14:37:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A3E66204FD
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 14:37:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A3E66204FD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 782F62184E
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 14:37:26 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="P0QR3bwX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 782F62184E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39558 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39568 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hn26F-0001tq-Re
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 10:37:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36393)
+	id 1hn26X-000363-KJ
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 10:37:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36399)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <david@redhat.com>) id 1hn265-0001RL-Tr
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 10:36:58 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hn266-0001RN-AL
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 10:36:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1hn264-0001QD-Tt
+ (envelope-from <alex.bennee@linaro.org>) id 1hn265-0001Qi-C2
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 10:36:58 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:51275)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1hn265-0001Pk-3o
  for qemu-devel@nongnu.org; Mon, 15 Jul 2019 10:36:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55924)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>)
- id 1hn264-0001Pr-Lm; Mon, 15 Jul 2019 10:36:56 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id D515E81DE9;
- Mon, 15 Jul 2019 14:36:55 +0000 (UTC)
-Received: from [10.36.118.52] (unknown [10.36.118.52])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 28EBF60C4C;
- Mon, 15 Jul 2019 14:36:53 +0000 (UTC)
-To: Christian Borntraeger <borntraeger@de.ibm.com>,
- Cornelia Huck <cohuck@redhat.com>
-References: <20190715142304.215018-1-borntraeger@de.ibm.com>
- <20190715142304.215018-3-borntraeger@de.ibm.com>
-From: David Hildenbrand <david@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- SE+xAvmumFBY
-Organization: Red Hat GmbH
-Message-ID: <d8ffaa6b-0868-f4d9-763e-be470f82725e@redhat.com>
-Date: Mon, 15 Jul 2019 16:36:53 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+Received: by mail-wm1-x342.google.com with SMTP id 207so15453620wma.1
+ for <qemu-devel@nongnu.org>; Mon, 15 Jul 2019 07:36:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=IMQnTUKKDALnIX8QU8RZollM1Y56a1BzbjmyeYYMnp0=;
+ b=P0QR3bwX/B8QK/gpriZCRr1eyeJVnKTAMYxcLrNlvOPhWxwfOaSaRuKcSBhVExjg7b
+ RevgYJ7xoTrqQbITp9FiLZO4Ru1uxIZ3unI7JGXS+lY3TnHK3SMkW8yR+SeEkmnSBqvD
+ dTgojxvmQ+7CMdJv8Y6Cc0gJZz5FPjrN8En5HOT3kua3qCGrH3jp4D7CPfBWJVJ0p1J7
+ CmmrRecsuEA2FFDwo35geJhA8FHgJSEQQu31iKE7SHU9qWumo4jF+DE65ibPtiP+oZkl
+ kRt12wj0Cv+BD79SRh17NThabHKwz2MiLPpRWLN2pTSTqrqjQS+MfsqFFeHVPoowHEq+
+ FdNA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=IMQnTUKKDALnIX8QU8RZollM1Y56a1BzbjmyeYYMnp0=;
+ b=dvfU7fYQjnXXX+ANpO8UoHBp4uDCNY/4+yX9uQGxUg7O11ZgsrblEbIN/uiyvq/lpH
+ mtmNhWInxnBsg/2jKwAuaKg5nwQ3dXzysA52UeEQGjLdPuMjMV6aSOEDhfPF5QOF0J9g
+ 048WkkuPAk5VW3IvEhkm+Ut+Oyq8K5+t1U2VTIhOnEQ7wT8IaY0b0AIIsGEsCi07WtVV
+ DAa3vDX1x9FY6MjTfWDwhui/UyDWog/A61kcDrfoI34J5kn0RwtZc0vZ1Ov+H3rzGsgS
+ neUywUhgABXqPN3CTtBtCFlxXL0vZugip4oeJdJLaVuc/w/JngGsEeKKuvey5nY+ub4R
+ EJCQ==
+X-Gm-Message-State: APjAAAXKhcRZ6zsq7CDmDzutlvBZ9F7pTc0jrbd6UZM2BrXh5+kKcdSM
+ KlV3sP0OvCx90d9EDFZ0Df0FCA==
+X-Google-Smtp-Source: APXvYqx0qftBeKwC0OFSGiHNAooroWFrT9w3whhas5zeLDyGKft7qMnwW6ccDZDFVfkS7KiYTQgQug==
+X-Received: by 2002:a05:600c:2056:: with SMTP id
+ p22mr24565915wmg.155.1563201415099; 
+ Mon, 15 Jul 2019 07:36:55 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+ by smtp.gmail.com with ESMTPSA id o20sm43826001wrh.8.2019.07.15.07.36.54
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Mon, 15 Jul 2019 07:36:54 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 1C0071FF87;
+ Mon, 15 Jul 2019 15:36:54 +0100 (BST)
+References: <20190708200250.12017-1-marcandre.lureau@redhat.com>
+User-agent: mu4e 1.3.3; emacs 26.1
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+In-reply-to: <20190708200250.12017-1-marcandre.lureau@redhat.com>
+Date: Mon, 15 Jul 2019 15:36:54 +0100
+Message-ID: <87ims3uzy1.fsf@zen.linaroharston>
 MIME-Version: 1.0
-In-Reply-To: <20190715142304.215018-3-borntraeger@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.25]); Mon, 15 Jul 2019 14:36:55 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 2/3] s390x/cpumodel: also change name of
- vxbeh
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::342
+Subject: Re: [Qemu-devel] [PATCH] archive-source: also create a stash for
+ submodules
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -118,48 +97,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Halil Pasic <pasic@linux.ibm.com>, qemu-s390x <qemu-s390x@nongnu.org>,
- qemu-devel <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
+Cc: Fam Zheng <fam@euphon.net>, thuth@redhat.com, philmd@redhat.com,
+ qemu-devel@nongnu.org, kraxel@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 15.07.19 16:23, Christian Borntraeger wrote:
-> David suggested to keep everything in sync as 4.1 is not yet released.
-> This patch fixes the name "vxbeh" into "vxp".
-> 
-> To simplify the backports this patch will not change VECTOR_BCD_ENH as
-> this is just an internal name. That will be done by an extra patch that
-> does not need to be backported.
-> 
-> Suggested-by: David Hildenbrand <david@redhat.com>
-> Fixes: d05be57ddc2e ("s390: cpumodel: fix description for the new vector facility")
-> Fixes: 54d65de0b525 ("s390x/cpumodel: vector enhancements")
-> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+
+> "git archive" fails when a submodule has a modification, because "git
+> stash create" doesn't handle submodules. Let's teach our
+> archive-source.sh to handle modifications in submodules the same way
+> as qemu tree, by creating a stash.
+>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
+Queued to testing/next, thanks.
+
 > ---
->  target/s390x/cpu_features_def.inc.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/target/s390x/cpu_features_def.inc.h b/target/s390x/cpu_features_def.inc.h
-> index 3118a9f89228..99f58a89318a 100644
-> --- a/target/s390x/cpu_features_def.inc.h
-> +++ b/target/s390x/cpu_features_def.inc.h
-> @@ -104,7 +104,7 @@ DEF_FEAT(CMM_NT, "cmmnt", STFL, 147, "CMM: ESSA-enhancement (no translate) facil
->  DEF_FEAT(VECTOR_ENH2, "vxeh2", STFL, 148, "Vector Enhancements facility 2")
->  DEF_FEAT(ESORT_BASE, "esort-base", STFL, 150, "Enhanced-sort facility (excluding subfunctions)")
->  DEF_FEAT(DEFLATE_BASE, "deflate-base", STFL, 151, "Deflate-conversion facility (excluding subfunctions)")
-> -DEF_FEAT(VECTOR_BCD_ENH, "vxbeh", STFL, 152, "Vector-Packed-Decimal-Enhancement Facility")
-> +DEF_FEAT(VECTOR_BCD_ENH, "vxp", STFL, 152, "Vector-Packed-Decimal-Enhancement Facility")
->  DEF_FEAT(MSA_EXT_9, "msa9-base", STFL, 155, "Message-security-assist-extension-9 facility (excluding subfunctions)")
->  DEF_FEAT(ETOKEN, "etoken", STFL, 156, "Etoken facility")
->  
-> 
+>  scripts/archive-source.sh | 18 ++++++++++--------
+>  1 file changed, 10 insertions(+), 8 deletions(-)
+>
+> diff --git a/scripts/archive-source.sh b/scripts/archive-source.sh
+> index ca94e49978..fb5d6b3918 100755
+> --- a/scripts/archive-source.sh
+> +++ b/scripts/archive-source.sh
+> @@ -39,14 +39,16 @@ function cleanup() {
+>  }
+>  trap "cleanup" 0 1 2 3 15
+>
+> -if git diff-index --quiet HEAD -- &>/dev/null
+> -then
+> -    HEAD=3DHEAD
+> -else
+> -    HEAD=3D$(git stash create)
+> -fi
+> +function tree_ish() {
+> +    local retval=3D'HEAD'
+> +    if ! git diff-index --quiet --ignore-submodules=3Dall HEAD -- &>/dev=
+/null
+> +    then
+> +        retval=3D$(git stash create)
+> +    fi
+> +    echo "$retval"
+> +}
+>
+> -git archive --format tar $HEAD > "$tar_file"
+> +git archive --format tar "$(tree_ish)" > "$tar_file"
+>  test $? -ne 0 && error "failed to archive qemu"
+>  for sm in $submodules; do
+>      status=3D"$(git submodule status "$sm")"
+> @@ -62,7 +64,7 @@ for sm in $submodules; do
+>              echo "WARNING: submodule $sm is out of sync"
+>              ;;
+>      esac
+> -    (cd $sm; git archive --format tar --prefix "$sm/" $smhash) > "$sub_f=
+ile"
+> +    (cd $sm; git archive --format tar --prefix "$sm/" $(tree_ish)) > "$s=
+ub_file"
+>      test $? -ne 0 && error "failed to archive submodule $sm ($smhash)"
+>      tar --concatenate --file "$tar_file" "$sub_file"
+>      test $? -ne 0 && error "failed append submodule $sm to $tar_file"
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
 
--- 
-
-Thanks,
-
-David / dhildenb
+--
+Alex Benn=C3=A9e
 
