@@ -2,91 +2,111 @@ Return-Path: <SRS0=IjNW=VM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F743C7618F
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 10:15:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 911F0C7618F
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 10:16:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 262D0206B8
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 10:15:20 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jwgKX9TC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 262D0206B8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 6906B206B8
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 10:16:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6906B206B8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36578 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36592 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hmy0t-0003G3-6I
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 06:15:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33243)
+	id 1hmy1e-0004RT-IX
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 06:16:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33425)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hmy0Z-0002YT-Do
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 06:15:00 -0400
+ (envelope-from <thuth@redhat.com>) id 1hmy1R-0003u2-BY
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 06:15:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hmy0X-0002wK-Rq
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 06:14:59 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:36119)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hmy0X-0002vS-JH
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 06:14:57 -0400
-Received: by mail-wr1-x444.google.com with SMTP id n4so16473705wrs.3
- for <qemu-devel@nongnu.org>; Mon, 15 Jul 2019 03:14:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=7dD2vWrj4ks/NqPU9zS8RRmfCqPi1PlcqtXPFTDb1D0=;
- b=jwgKX9TCI/TDEYc98o3DSQHr9pHoS/lP4ugsO9LH8QlWkj1Xu46MQ/+ML7NRKvwuDj
- RTJVJCvOyZrAzFi/0eLDYnVGvPGB2zZbIKzLV4onbiHfxaD+vfa1WNmQ1dNxgMx7PdUa
- KadlwhivRcIexlUP8+Y2CK/dwHf4pCqrvuhwlWES9RBMeW57gFtswZE9pmL/VwTZycrD
- tqVW42v5LvZugCNeTv79n8B/qVgMlRWPm/nF5JaCZvDI87WrdcXzZghdLieKtBw9AtOQ
- 12Y3nAATn0CKazp2CTwmz2tofYKzACfxGEuvoj+fLzh2b0vV4BrxAhQgRE0ltoxBz1A/
- vgKQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=7dD2vWrj4ks/NqPU9zS8RRmfCqPi1PlcqtXPFTDb1D0=;
- b=bMtsl55mhb/0TIyrP3D9MXIJ0Ho2jZOYExn3UvB6RbucWdeACO1+1BM23OFYF4EdLh
- BprxgJkZ95b9le/J0ykkpytYQG98zaUz1Dv9zro9ibdROmSkleFDSxZj47PIZRq9Zi27
- NDj+32+fEjEsQ4tKjiFQgyfnehXyjDDBwtH7FlzrOls3G3dMDOMLTcF45XolG/noNZcX
- CeIU/P+svXbCtV+bG2ufBXnT/D4QMWKBr9MTdmOHDjUpuscqoFYoMW25kg20r204vg41
- lv8cJwOGJcL9FBK8pn/eyRJkxtJALnElk1ULyaTcHPKdddjF+bSHQsovTYIBIp1Ke5lW
- Y/Mg==
-X-Gm-Message-State: APjAAAVo4T7jdOYs/D4RL/wxQJBax25EmK5YwGSP9ZW1PngTNaNCXA6M
- tuMRRIGPm3nRJ1+zze2CZm9ORw==
-X-Google-Smtp-Source: APXvYqwa0MDYbqSD96N4TPA4C4PqwwFBCRHSAbOrPCood+jCRvghhRYJFpEnePeHDq3wClH4eDogyg==
-X-Received: by 2002:adf:e2c1:: with SMTP id d1mr29692961wrj.283.1563185695463; 
- Mon, 15 Jul 2019 03:14:55 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id a64sm18341593wmf.1.2019.07.15.03.14.54
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Mon, 15 Jul 2019 03:14:54 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 14E9D1FF87;
- Mon, 15 Jul 2019 11:14:54 +0100 (BST)
-References: <20190711223300.6061-1-jan.bobek@gmail.com>
- <87zhljcr6c.fsf@zen.linaroharston>
- <71f1ca40-9457-62c1-f585-6b3d6c523e3c@gmail.com>
-User-agent: mu4e 1.3.3; emacs 26.1
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Jan Bobek <jan.bobek@gmail.com>
-In-reply-to: <71f1ca40-9457-62c1-f585-6b3d6c523e3c@gmail.com>
-Date: Mon, 15 Jul 2019 11:14:54 +0100
-Message-ID: <87pnmbvc2p.fsf@zen.linaroharston>
+ (envelope-from <thuth@redhat.com>) id 1hmy1Q-0003MK-92
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 06:15:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43022)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <thuth@redhat.com>)
+ id 1hmy1N-0003LB-ST; Mon, 15 Jul 2019 06:15:50 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 345388535D;
+ Mon, 15 Jul 2019 10:15:48 +0000 (UTC)
+Received: from thuth.remote.csb (reserved-198-198.str.redhat.com
+ [10.33.198.198])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 75DE05B681;
+ Mon, 15 Jul 2019 10:15:34 +0000 (UTC)
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20190715095545.28545-1-philmd@redhat.com>
+ <20190715095545.28545-2-philmd@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; keydata=
+ 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
+Organization: Red Hat
+Message-ID: <ca528cdc-6118-0b2f-c1b8-30b06875dde8@redhat.com>
+Date: Mon, 15 Jul 2019 12:15:33 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
+In-Reply-To: <20190715095545.28545-2-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.25]); Mon, 15 Jul 2019 10:15:48 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::444
-Subject: Re: [Qemu-devel] [RISU PATCH v3 00/18] Support for generating x86
- SIMD test images
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [RFC PATCH 1/3] hw/Kconfig: PCI bus implies
+ PCI_DEVICES
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,155 +118,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-riscv@nongnu.org,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ "Michael S. Tsirkin" <mst@redhat.com>, qemu-ppc@nongnu.org,
+ Helge Deller <deller@gmx.de>, Palmer Dabbelt <palmer@sifive.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ Artyom Tarasenko <atar4qemu@gmail.com>,
+ "open list:S390" <qemu-s390x@nongnu.org>, qemu-arm@nongnu.org,
+ Alistair Francis <Alistair.Francis@wdc.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>,
+ Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 15/07/2019 11.55, Philippe Mathieu-Daud=C3=A9 wrote:
+> If a controller device provides a PCI bus, we can plug any PCI
+> daughter card on it.
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+>  docs/devel/kconfig.rst | 1 -
+>  hw/alpha/Kconfig       | 1 -
+>  hw/arm/Kconfig         | 4 ----
+>  hw/hppa/Kconfig        | 1 -
+>  hw/i386/Kconfig        | 1 -
+>  hw/pci/Kconfig         | 1 +
+>  hw/ppc/Kconfig         | 6 ------
+>  hw/riscv/Kconfig       | 1 -
+>  hw/sh4/Kconfig         | 1 -
+>  hw/sparc64/Kconfig     | 1 -
+>  10 files changed, 1 insertion(+), 17 deletions(-)
+>=20
+> diff --git a/docs/devel/kconfig.rst b/docs/devel/kconfig.rst
+> index d6f8eb0977..6c010d38d4 100644
+> --- a/docs/devel/kconfig.rst
+> +++ b/docs/devel/kconfig.rst
+> @@ -56,7 +56,6 @@ stanza like the following::
+> =20
+>        config ARM_VIRT
+>           bool
+> -         imply PCI_DEVICES
+>           imply VFIO_AMD_XGBE
+>           imply VFIO_XGMAC
+>           select A15MPCORE
+> diff --git a/hw/alpha/Kconfig b/hw/alpha/Kconfig
+> index 15c59ff264..ddac1bf8e5 100644
+> --- a/hw/alpha/Kconfig
+> +++ b/hw/alpha/Kconfig
+> @@ -1,6 +1,5 @@
+>  config DP264
+>      bool
+> -    imply PCI_DEVICES
+>      imply TEST_DEVICES
+>      imply E1000_PCI
+>      select I82374
+> diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
+> index ab65ecd216..51db042a0a 100644
+> --- a/hw/arm/Kconfig
+> +++ b/hw/arm/Kconfig
+> @@ -1,6 +1,5 @@
+>  config ARM_VIRT
+>      bool
+> -    imply PCI_DEVICES
+>      imply TEST_DEVICES
+>      imply VFIO_AMD_XGBE
+>      imply VFIO_PLATFORM
+> @@ -159,7 +158,6 @@ config Z2
+> =20
+>  config REALVIEW
+>      bool
+> -    imply PCI_DEVICES
+>      imply PCI_TESTDEV
+>      select SMC91C111
+>      select LAN9118
+> @@ -186,7 +184,6 @@ config REALVIEW
+> =20
+>  config SBSA_REF
+>      bool
+> -    imply PCI_DEVICES
+>      select AHCI
+>      select ARM_SMMUV3
+>      select GPIO_KEY
+> @@ -365,7 +362,6 @@ config MPS2
+> =20
+>  config FSL_IMX7
+>      bool
+> -    imply PCI_DEVICES
+>      imply TEST_DEVICES
+>      select A15MPCORE
+>      select PCI
+> diff --git a/hw/hppa/Kconfig b/hw/hppa/Kconfig
+> index 6e5d74a825..13183ff243 100644
+> --- a/hw/hppa/Kconfig
+> +++ b/hw/hppa/Kconfig
+> @@ -1,6 +1,5 @@
+>  config DINO
+>      bool
+> -    imply PCI_DEVICES
+>      imply E1000_PCI
+>      imply VIRTIO_VGA
+>      select PCI
+> diff --git a/hw/i386/Kconfig b/hw/i386/Kconfig
+> index 4ddf2a9c55..4eceab2c7c 100644
+> --- a/hw/i386/Kconfig
+> +++ b/hw/i386/Kconfig
+> @@ -10,7 +10,6 @@ config PC
+>      imply ISA_IPMI_BT
+>      imply ISA_DEBUG
+>      imply PARALLEL
+> -    imply PCI_DEVICES
+>      imply PVPANIC
+>      imply QXL
+>      imply SEV
+> diff --git a/hw/pci/Kconfig b/hw/pci/Kconfig
+> index 77f8b005ff..0f7267db35 100644
+> --- a/hw/pci/Kconfig
+> +++ b/hw/pci/Kconfig
+> @@ -1,5 +1,6 @@
+>  config PCI
+>      bool
+> +    imply PCI_DEVICES
 
-Jan Bobek <jan.bobek@gmail.com> writes:
+No, please don't change this. This was done on purpose, since almost all
+PCI_DEVICES do not work on s390x (so s390x does *not* imply PCI_DEVICES).
 
-> On 7/12/19 9:34 AM, Alex Benn=C3=A9e wrote:
->>
->> Jan Bobek <jan.bobek@gmail.com> writes:
->>
->>> This is v3 of the patch series posted in [1] and [2]. Note that this
->>> is the first fully-featured patch series implementing all desired
->>> functionality, including (V)LDMXCSR and VSIB-based instructions like
->>> VGATHER*.
->>>
->>> While implementing the last bits required in order to support VGATHERx
->>> instructions, I ran into problems which required a larger redesign;
->>> namely, there are no more !emit blocks as their functionality is now
->>> implemented in regular !constraints blocks. Also, memory constraints
->>> are specified in !memory blocks, similarly to other architectures.
->>>
->>> I tested these changes on my machine; both master and slave modes work
->>> in both 32-bit and 64-bit modes.
->>
->> Two things I've noticed:
->>
->>   ./contrib/generate_all.sh -n 1 x86.risu testcases.x86
->>
->> takes a very long time. I wonder if this is a consequence of constantly
->> needing to re-query the random number generator?
->
-> I believe so. While other architectures can be as cheap as a single rand()
-> call per instruction, x86 does more like 5-10.
-
-OK
-
-> Even worse, there are some instructions which cannot be generated in
-> 32-bit mode (those requiring REX.W prefix, e.g. MMX MOVQ). When I let
-> the script run for a little bit, risugen would get stuck in an
-> infinite loop, because it could only choose from a single instruction
-> which wasn't valid for 32-bit....
-
-The first instruction I see hang is:
-
-  Running: /home/alex/lsrc/tests/risu.git/risugen --xfeatures avx  --patter=
-n CVTSD2SI_64 x86.risu testcases.x86/insn_CVTSD2SI_64__INC.risu.bin
-  Generating code using patterns: CVTSD2SI_64 SSE2...
-  [                                                                        =
-    ]
-
-I wonder if this means we should split the x86.risu by mode? Or some
-other way of filtering out patterns that are invalid for a mode?
-
-We do have the concept of classes, see the @ annotations in
-aarch64.risu. I guess the generate_all script doesn't handle that nicely
-yet though. For now I lumped them all together with:
-
-  ./risugen --pattern "MMX" --xfeatures=3Dsse x86.risu all_mmx.risu.bin
-  ./risugen --pattern "SSE" --xfeatures=3Dsse x86.risu all_sse.risu.bin
-  ./risugen --pattern "SSE2" --xfeatures=3Dsse x86.risu all_sse2.risu.bin
-  ./risugen --pattern "SSE3" --xfeatures=3Dsse x86.risu all_sse3.risu.bin
-  ./risugen --pattern "AVX" --xfeatures=3Davx x86.risu all_avx.risu.bin
-  ./risugen --pattern "AVX2" --xfeatures=3Davx x86.risu all_avx2.risu.bin
-
->
->> The other is:
->>
->>   set -x RISU ./build/i686-linux-gnu/risu
->>   ./contrib/record_traces.sh testcases.x86/*.risu.bin
->>
->> fails on the first trace when validating the playback. Might want to
->> check why that is.
->
-> The SIMD registers aren't getting initialized; both master and
-> apprentice need an --xfeatures=3DXXX parameter for that. Right now the
-> default is 'none'; unless the instructions are filtered, you'd need
-> --xfeatures=3Davx (or --xfeatures=3Dsse, and that only works because on my
-> laptop, the upper part of ymm registers seems to be always zeroed when
-> risu starts).
-
-Ahh OK, I did a lot better with:
-
-  ./contrib/generate_all.sh -n 1 x86.risu testcases.x86 -- --xfeatures avx
-  set -x RISU ./build/i686-linux-gnu/risu --xfeatures=3Davx
-  ./contrib/record_traces.sh testcases.x86-avx/*.risu.bin
-
-There are enough failures when you run those against QEMU for now that
-we don't need to worry too much about coverage yet ;-)
-
->>>
->>> Cheers,
->>>  -Jan
->>>
->>> Changes since v2:
->>>   Too many to be listed individually; this patch series might be
->>>   better reviewed on its own.
->>>
->>> References:
->>>   1. https://lists.nongnu.org/archive/html/qemu-devel/2019-06/msg04123.=
-html
->>>   2. https://lists.nongnu.org/archive/html/qemu-devel/2019-07/msg00001.=
-html
->>>
->>> Jan Bobek (18):
->>>   risugen_common: add helper functions insnv, randint
->>>   risugen_common: split eval_with_fields into extract_fields and
->>>     eval_block
->>>   risugen_x86_asm: add module
->>>   risugen_x86_constraints: add module
->>>   risugen_x86_memory: add module
->>>   risugen_x86: add module
->>>   risugen: allow all byte-aligned instructions
->>>   risugen: add command-line flag --x86_64
->>>   risugen: add --xfeatures option for x86
->>>   x86.risu: add MMX instructions
->>>   x86.risu: add SSE instructions
->>>   x86.risu: add SSE2 instructions
->>>   x86.risu: add SSE3 instructions
->>>   x86.risu: add SSSE3 instructions
->>>   x86.risu: add SSE4.1 and SSE4.2 instructions
->>>   x86.risu: add AES and PCLMULQDQ instructions
->>>   x86.risu: add AVX instructions
->>>   x86.risu: add AVX2 instructions
->>>
->>>  risugen                    |   27 +-
->>>  risugen_arm.pm             |    6 +-
->>>  risugen_common.pm          |  117 +-
->>>  risugen_m68k.pm            |    3 +-
->>>  risugen_ppc64.pm           |    6 +-
->>>  risugen_x86.pm             |  518 +++++
->>>  risugen_x86_asm.pm         |  918 ++++++++
->>>  risugen_x86_constraints.pm |  154 ++
->>>  risugen_x86_memory.pm      |   87 +
->>>  x86.risu                   | 4499 ++++++++++++++++++++++++++++++++++++
->>>  10 files changed, 6293 insertions(+), 42 deletions(-)
->>>  create mode 100644 risugen_x86.pm
->>>  create mode 100644 risugen_x86_asm.pm
->>>  create mode 100644 risugen_x86_constraints.pm
->>>  create mode 100644 risugen_x86_memory.pm
->>>  create mode 100644 x86.risu
->>
->>
->> --
->> Alex Benn=C3=A9e
->>
-
-
---
-Alex Benn=C3=A9e
+ Thomas
 
