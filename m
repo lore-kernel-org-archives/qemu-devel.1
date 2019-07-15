@@ -2,87 +2,89 @@ Return-Path: <SRS0=IjNW=VM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25B0FC76195
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 13:44:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C76F7C7618F
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 13:44:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E8E922067C
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 13:44:16 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FXrfPeEp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8E922067C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 9E4642067C
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 13:44:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E4642067C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38764 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38780 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hn1H5-0007TJ-Ll
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 09:44:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51835)
+	id 1hn1HR-0000oQ-UX
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 09:44:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52260)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hn1FK-00089k-N2
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 09:42:27 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hn1HB-0008N4-Tl
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 09:44:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hn1FI-0006DK-Uk
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 09:42:26 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:46350)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hn1FI-0006CL-O1
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 09:42:24 -0400
-Received: by mail-wr1-x443.google.com with SMTP id z1so17123348wru.13
- for <qemu-devel@nongnu.org>; Mon, 15 Jul 2019 06:42:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:in-reply-to:references:mime-version
- :content-transfer-encoding;
- bh=RbzdNTC0vW9Lf4ZRZ1X4p6Xxj5ih0UlUuNAgV7FoLIU=;
- b=FXrfPeEpNgg3OKHKq5K0dTwaVYN06LJ2be1JoD3H6ymf09RbfoSkIAF4SjS/ohrvTT
- dhVWtwFtLUHfzGPorgU+o37FDXuZ3s/9j0jadvl7+h4cj/0MIl+137i7+dOf/czPLr7C
- zMtDoR3tiN6W9nBBcdRJsD2uzR7XdXWvFieC1jVvNm8dcRXR2WJIeuS94UB2siYq4dEm
- VpeJUfnbGJI6lTDgHukYpMk2sgV3w6JGnyxvSjD9zupzT3KfaEiQQo6y0PGwVBrvo/Y0
- wkulsYpFgKbb71IWLt2pym8JnavCXK4AnKtoo6SIzI4AnCrdNntcHeMTPoZ5DVo0SaTC
- uPdg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=RbzdNTC0vW9Lf4ZRZ1X4p6Xxj5ih0UlUuNAgV7FoLIU=;
- b=MIaK1AFPGjykyBqYp00J2z6LIrLlWPYdIwwqRuTE41trB6TcntoYGS9e5YVFY6o4Jw
- sqmKLyCbLlu77iUiLSQ4uyvBy2foNf9d5l1ACZnu4KsdVv53J3JsaS2yEiBaVqiTr9Da
- 5W7durcN0wKDduy1LV1gSkiCytwcV3B5DVsp4nSQQj3+uVh2BU5Mrga8dmQ04lJRFPii
- t7uPJOtkOpfEPYxuFGX0eeqgAVJgJWB/KfRKH6Neuz7/pmkKRTXJRZhy89lapa0zowqR
- MS4ErMuHEKHnkXhZyhMtfn1RTV4Alw3ff82Phfdv3U7HmZNAlLqO8BuGTCb8T154o9+Q
- j/MA==
-X-Gm-Message-State: APjAAAXyotQW0FmXSYyB+TpJorS9pVlAPZYIM7U3mrYHhyeVAn3ru91e
- /gJh2lJl/KfBHReZIZD/wwRSnls8KpQSNg==
-X-Google-Smtp-Source: APXvYqwswnLhQSGrKgjkrZ1xrsv24Pw//8wKuAgIoxJEVedlAogpgFp74xRzb5djqivsNpg/HgPQqQ==
-X-Received: by 2002:a5d:6b07:: with SMTP id v7mr29455852wrw.169.1563198142518; 
- Mon, 15 Jul 2019 06:42:22 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id c7sm14221808wro.70.2019.07.15.06.42.21
- for <qemu-devel@nongnu.org>
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Mon, 15 Jul 2019 06:42:22 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-Date: Mon, 15 Jul 2019 14:42:11 +0100
-Message-Id: <20190715134211.23063-11-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190715134211.23063-1-peter.maydell@linaro.org>
-References: <20190715134211.23063-1-peter.maydell@linaro.org>
+ (envelope-from <mreitz@redhat.com>) id 1hn1HA-00084K-Kh
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 09:44:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34680)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1hn1H7-000833-NP; Mon, 15 Jul 2019 09:44:17 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id E3FC730C540C;
+ Mon, 15 Jul 2019 13:44:16 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.40.205.59])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 574676012C;
+ Mon, 15 Jul 2019 13:44:15 +0000 (UTC)
+To: Stefano Garzarella <sgarzare@redhat.com>, qemu-devel@nongnu.org
+References: <20190715132844.506584-1-sgarzare@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <53e61e05-00a8-31e4-3165-8e87649893d3@redhat.com>
+Date: Mon, 15 Jul 2019 15:44:13 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::443
-Subject: [Qemu-devel] [PULL 10/10] target/arm: NS BusFault on vector table
- fetch escalates to NS HardFault
+In-Reply-To: <20190715132844.506584-1-sgarzare@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="8LrwNRkr6nmbRBpLvElzPuPJb2U2SLj2f"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.46]); Mon, 15 Jul 2019 13:44:17 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2] gluster: fix .bdrv_reopen_prepare when
+ backing file is a JSON object
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,96 +96,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Kevin Wolf <kwolf@redhat.com>, integration@gluster.org,
+ qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-In the M-profile architecture, when we do a vector table fetch and it
-fails, we need to report a HardFault.  Whether this is a Secure HF or
-a NonSecure HF depends on several things.  If AIRCR.BFHFNMINS is 0
-then HF is always Secure, because there is no NonSecure HardFault.
-Otherwise, the answer depends on whether the 'underlying exception'
-(MemManage, BusFault, SecureFault) targets Secure or NonSecure.  (In
-the pseudocode, this is handled in the Vector() function: the final
-exc.isSecure is calculated by looking at the exc.isSecure from the
-exception returned from the memory access, not the isSecure input
-argument.)
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--8LrwNRkr6nmbRBpLvElzPuPJb2U2SLj2f
+Content-Type: multipart/mixed; boundary="b85GHy60rUL5hz3V6pI9S12ZwiYz4uVAe";
+ protected-headers="v1"
+From: Max Reitz <mreitz@redhat.com>
+To: Stefano Garzarella <sgarzare@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, integration@gluster.org,
+ Kevin Wolf <kwolf@redhat.com>
+Message-ID: <53e61e05-00a8-31e4-3165-8e87649893d3@redhat.com>
+Subject: Re: [PATCH v2] gluster: fix .bdrv_reopen_prepare when backing file is
+ a JSON object
+References: <20190715132844.506584-1-sgarzare@redhat.com>
+In-Reply-To: <20190715132844.506584-1-sgarzare@redhat.com>
 
-We weren't doing this correctly, because we were looking at
-the target security domain of the exception we were trying to
-load the vector table entry for. This produces errors of two kinds:
- * a load from the NS vector table which hits the "NS access
-   to S memory" SecureFault should end up as a Secure HardFault,
-   but we were raising an NS HardFault
- * a load from the S vector table which causes a BusFault
-   should raise an NS HardFault if BFHFNMINS == 1 (because
-   in that case all BusFaults are NonSecure), but we were raising
-   a Secure HardFault
+--b85GHy60rUL5hz3V6pI9S12ZwiYz4uVAe
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-Correct the logic.
+On 15.07.19 15:28, Stefano Garzarella wrote:
+> When the backing_file is specified as a JSON object, the
+> qemu_gluster_reopen_prepare() fails with this message:
+>     invalid URI json:{"server.0.host": ...}
+>=20
+> In this case, we should call qemu_gluster_init() using the QDict
+> 'state->options' that contains the JSON parameters already parsed.
+>=20
+> Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=3D1542445
+> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> ---
+> v2:
+>     - check if 'state->bs->exact_filename' is empty, instead to parse
+>       'state->bs->filename' to check if it contains "json:" [Max]
+> ---
+>  block/gluster.c | 12 +++++++++++-
+>  1 file changed, 11 insertions(+), 1 deletion(-)
 
-We also fix a comment error where we claimed that we might
-be escalating MemManage to HardFault, and forgot about SecureFault.
-(Vector loads can never hit MPU access faults, because they're
-always aligned and always use the default address map.)
+Thanks, applied to my block branch:
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Message-id: 20190705094823.28905-1-peter.maydell@linaro.org
----
- target/arm/m_helper.c | 21 +++++++++++++++++----
- 1 file changed, 17 insertions(+), 4 deletions(-)
+https://git.xanclic.moe/XanClic/qemu/commits/branch/block
 
-diff --git a/target/arm/m_helper.c b/target/arm/m_helper.c
-index 1867435db7d..84609f446e6 100644
---- a/target/arm/m_helper.c
-+++ b/target/arm/m_helper.c
-@@ -624,7 +624,11 @@ static bool arm_v7m_load_vector(ARMCPU *cpu, int exc, bool targets_secure,
-         if (sattrs.ns) {
-             attrs.secure = false;
-         } else if (!targets_secure) {
--            /* NS access to S memory */
-+            /*
-+             * NS access to S memory: the underlying exception which we escalate
-+             * to HardFault is SecureFault, which always targets Secure.
-+             */
-+            exc_secure = true;
-             goto load_fail;
-         }
-     }
-@@ -632,6 +636,11 @@ static bool arm_v7m_load_vector(ARMCPU *cpu, int exc, bool targets_secure,
-     vector_entry = address_space_ldl(arm_addressspace(cs, attrs), addr,
-                                      attrs, &result);
-     if (result != MEMTX_OK) {
-+        /*
-+         * Underlying exception is BusFault: its target security state
-+         * depends on BFHFNMINS.
-+         */
-+        exc_secure = !(cpu->env.v7m.aircr & R_V7M_AIRCR_BFHFNMINS_MASK);
-         goto load_fail;
-     }
-     *pvec = vector_entry;
-@@ -641,13 +650,17 @@ load_fail:
-     /*
-      * All vector table fetch fails are reported as HardFault, with
-      * HFSR.VECTTBL and .FORCED set. (FORCED is set because
--     * technically the underlying exception is a MemManage or BusFault
-+     * technically the underlying exception is a SecureFault or BusFault
-      * that is escalated to HardFault.) This is a terminal exception,
-      * so we will either take the HardFault immediately or else enter
-      * lockup (the latter case is handled in armv7m_nvic_set_pending_derived()).
-+     * The HardFault is Secure if BFHFNMINS is 0 (meaning that all HFs are
-+     * secure); otherwise it targets the same security state as the
-+     * underlying exception.
-      */
--    exc_secure = targets_secure ||
--        !(cpu->env.v7m.aircr & R_V7M_AIRCR_BFHFNMINS_MASK);
-+    if (!(cpu->env.v7m.aircr & R_V7M_AIRCR_BFHFNMINS_MASK)) {
-+        exc_secure = true;
-+    }
-     env->v7m.hfsr |= R_V7M_HFSR_VECTTBL_MASK | R_V7M_HFSR_FORCED_MASK;
-     armv7m_nvic_set_pending_derived(env->nvic, ARMV7M_EXCP_HARD, exc_secure);
-     return false;
--- 
-2.20.1
+Max
 
+
+--b85GHy60rUL5hz3V6pI9S12ZwiYz4uVAe--
+
+--8LrwNRkr6nmbRBpLvElzPuPJb2U2SLj2f
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0sgy0ACgkQ9AfbAGHV
+z0BB+Qf9HKQXQ+L9eCk1DssVVTPrNGdlmWx7ukIzhk4Y0nHVcu8pOtx3iLVby0a0
+RS3divd74n6BQ6xqkTrPYpCGM/GosUgNoxO6AWc3/ChefeAnqCLLHrOZtEEjREWt
+othOMEb1+wZTy+ptsC0l7EBSdqTlVrAhsKjTTgklFA1fhsC/2QlqYF5+9WZVDgPu
++0fWVCuT38skBsINvt6VMSrsBwG1QDDVwE0eu9TCYS62l9eCc4UT/eRE3toHJWy7
+cc3xuWMLg9DHl0Xp1bow/9/BW9l9lWCtgejFFIDTzD4OV5SvSN/bETv3aTbhIB3k
+jp9YI7dXPvSwRGhiB4bUYKrh212B+w==
+=CBKf
+-----END PGP SIGNATURE-----
+
+--8LrwNRkr6nmbRBpLvElzPuPJb2U2SLj2f--
 
