@@ -2,86 +2,78 @@ Return-Path: <SRS0=IjNW=VM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 279A2C7618E
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 07:38:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 946E1C7618F
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 08:01:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E451820838
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 07:38:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E451820838
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6642F214C6
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 08:01:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6642F214C6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35690 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35738 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hmvYm-0002XB-Rh
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 03:38:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56522)
+	id 1hmvvp-0005AA-BH
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 04:01:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60661)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <chen.zhang@intel.com>) id 1hmvYb-00028Y-VE
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 03:37:59 -0400
+ (envelope-from <sgarzare@redhat.com>) id 1hmvve-0004m0-N0
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 04:01:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <chen.zhang@intel.com>) id 1hmvYa-0006Lo-Iq
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 03:37:57 -0400
-Received: from mga06.intel.com ([134.134.136.31]:40287)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <chen.zhang@intel.com>)
- id 1hmvYa-0006Eb-93
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 03:37:56 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
- by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 15 Jul 2019 00:37:01 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.63,493,1557212400"; d="scan'208";a="250754479"
-Received: from fmsmsx105.amr.corp.intel.com ([10.18.124.203])
- by orsmga001.jf.intel.com with ESMTP; 15 Jul 2019 00:36:59 -0700
-Received: from fmsmsx112.amr.corp.intel.com (10.18.116.6) by
- FMSMSX105.amr.corp.intel.com (10.18.124.203) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Mon, 15 Jul 2019 00:36:57 -0700
-Received: from shsmsx104.ccr.corp.intel.com (10.239.4.70) by
- FMSMSX112.amr.corp.intel.com (10.18.116.6) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Mon, 15 Jul 2019 00:36:57 -0700
-Received: from shsmsx102.ccr.corp.intel.com ([169.254.2.3]) by
- SHSMSX104.ccr.corp.intel.com ([169.254.5.110]) with mapi id 14.03.0439.000;
- Mon, 15 Jul 2019 15:36:55 +0800
-From: "Zhang, Chen" <chen.zhang@intel.com>
-To: 'Jason Wang' <jasowang@redhat.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, 
- Peter Maydell <peter.maydell@linaro.org>, qemu-dev <qemu-devel@nongnu.org>
-Thread-Topic: [Qemu-devel] [PATCH V2] net/colo-compare.c: Fix memory leak
- and code style issue.
-Thread-Index: AQHVMkRVre1oFuzpr0u+Ffrjw6TuIabCueOAgADCIXCAASxlgIABhCUA
-Date: Mon, 15 Jul 2019 07:36:54 +0000
-Message-ID: <9CFF81C0F6B98A43A459C9EDAD400D78061C73BA@shsmsx102.ccr.corp.intel.com>
-References: <20190704083647.30614-1-chen.zhang@intel.com>
- <ad2627e3-8198-42f2-a89d-8e6a5596ef20@redhat.com>
- <9CFF81C0F6B98A43A459C9EDAD400D78061C2546@shsmsx102.ccr.corp.intel.com>
- <5cf779de-9d97-63f4-00d5-560202890af0@redhat.com>
-In-Reply-To: <5cf779de-9d97-63f4-00d5-560202890af0@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.0.600.7
-dlp-reaction: no-action
-x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiODMwNzQwMmYtOTBjZC00ZmE3LTgyYzktOTFiYWM5OTgzNmI4IiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiaWI4VkYxalhcL1ZSalRVdFZ4ZmJvMEorMXg0aHFEbkNWemJSWjZqb0dWVEE0TXZoK2lsQ043THBoamxsYWREVkwifQ==
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ (envelope-from <sgarzare@redhat.com>) id 1hmvvc-0004Zc-Op
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 04:01:46 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:50887)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1hmvvb-0004Xy-Ov
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 04:01:44 -0400
+Received: by mail-wm1-f67.google.com with SMTP id v15so14135619wml.0
+ for <qemu-devel@nongnu.org>; Mon, 15 Jul 2019 01:01:42 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to:user-agent;
+ bh=cpz6DNitm9oJtQHxBO9E2ulCRcfeE6mdPD9kHIHajXQ=;
+ b=bhVWpFfvJIk65QemySEzZ6jMs7sGKEF5Vr38pA/XkmoqDOqvPpZsn00NXXsatV8fqf
+ lzK+suMa1yBvt+nZqbZPe+uN7JiyivUgKCZbxlc0JmlmG6DjAXyP44Sp8+ZEgh+3wobh
+ EXxvXppk6wyhyXsZ3ijkPJULXH1rZv7lzn7tFaR1runK7iI9qVDQSYbagoOhzNOzNb2p
+ /H41tB02WykMnBl0M3VMOwbugJ+jOmpdI/EAYlnspwe1TJzeY7FK7ZKRVMb6nZWwffTr
+ 9LE3GxRCbFbhq5tVyoK9zt2B9WKMPcX0vCFB+Pg3fSm9/P++kQKjyfVPAuYDEzA2GWMn
+ 7ieA==
+X-Gm-Message-State: APjAAAW+28a7wKZVtx+bsngjZiyjH8OmF5Em4lw2vR8upo+JwtiuPp22
+ XTfdDF1iD6yFwFI02PWwWUc/pg==
+X-Google-Smtp-Source: APXvYqxwnn3BGnN7EsN3Ob0z96MjwQ+XjpfTKd3K4KBeyXHZqKXv8K0Ml6pAw7os0TtnIGq0A3pcNg==
+X-Received: by 2002:a7b:cc97:: with SMTP id p23mr23663404wma.120.1563177701651; 
+ Mon, 15 Jul 2019 01:01:41 -0700 (PDT)
+Received: from steredhat (host122-201-dynamic.13-79-r.retail.telecomitalia.it.
+ [79.13.201.122])
+ by smtp.gmail.com with ESMTPSA id u1sm15741583wml.14.2019.07.15.01.01.40
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Mon, 15 Jul 2019 01:01:41 -0700 (PDT)
+Date: Mon, 15 Jul 2019 10:01:38 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Max Reitz <mreitz@redhat.com>
+Message-ID: <20190715080138.lwuszn5vefyp6qig@steredhat>
+References: <20190711132935.13070-1-mreitz@redhat.com>
+ <20190712102735.ea5f4aqqgok7qdxa@steredhat>
+ <b77578d8-3da7-e0c7-75db-69f078cfcbda@redhat.com>
 MIME-Version: 1.0
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 134.134.136.31
-Subject: Re: [Qemu-devel] [PATCH V2] net/colo-compare.c: Fix memory leak and
- code style issue.
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <b77578d8-3da7-e0c7-75db-69f078cfcbda@redhat.com>
+User-Agent: NeoMutt/20180716
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.85.128.67
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] doc: Preallocation does not
+ require writing zeroes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,90 +85,202 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zhang Chen <zhangckid@gmail.com>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, qemu-block@nongnu.org,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-DQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IEphc29uIFdhbmcgW21haWx0
-bzpqYXNvd2FuZ0ByZWRoYXQuY29tXQ0KPiBTZW50OiBUaHVyc2RheSwgSnVseSAxMSwgMjAxOSA0
-OjE4IEFNDQo+IFRvOiBaaGFuZywgQ2hlbiA8Y2hlbi56aGFuZ0BpbnRlbC5jb20+OyBMaSBaaGlq
-aWFuIDxsaXpoaWppYW5AY24uZnVqaXRzdS5jb20+Ow0KPiBQZXRlciBNYXlkZWxsIDxwZXRlci5t
-YXlkZWxsQGxpbmFyby5vcmc+OyBxZW11LWRldiA8cWVtdS0NCj4gZGV2ZWxAbm9uZ251Lm9yZz4N
-Cj4gQ2M6IFpoYW5nIENoZW4gPHpoYW5nY2tpZEBnbWFpbC5jb20+DQo+IFN1YmplY3Q6IFJlOiBb
-UWVtdS1kZXZlbF0gW1BBVENIIFYyXSBuZXQvY29sby1jb21wYXJlLmM6IEZpeCBtZW1vcnkgbGVh
-aw0KPiBhbmQgY29kZSBzdHlsZSBpc3N1ZS4NCj4gDQo+IA0KPiBPbiAyMDE5LzcvMTAg5LiL5Y2I
-Mzo1MCwgWmhhbmcsIENoZW4gd3JvdGU6DQo+ID4NCj4gPj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdl
-LS0tLS0NCj4gPj4gRnJvbTogSmFzb24gV2FuZyBbbWFpbHRvOmphc293YW5nQHJlZGhhdC5jb21d
-DQo+ID4+IFNlbnQ6IFR1ZXNkYXksIEp1bHkgOSwgMjAxOSAxMDo0OCBQTQ0KPiA+PiBUbzogWmhh
-bmcsIENoZW4gPGNoZW4uemhhbmdAaW50ZWwuY29tPjsgTGkgWmhpamlhbg0KPiA+PiA8bGl6aGlq
-aWFuQGNuLmZ1aml0c3UuY29tPjsgUGV0ZXIgTWF5ZGVsbCA8cGV0ZXIubWF5ZGVsbEBsaW5hcm8u
-b3JnPjsNCj4gPj4gcWVtdS1kZXYgPHFlbXUtIGRldmVsQG5vbmdudS5vcmc+DQo+ID4+IENjOiBa
-aGFuZyBDaGVuIDx6aGFuZ2NraWRAZ21haWwuY29tPg0KPiA+PiBTdWJqZWN0OiBSZTogW1FlbXUt
-ZGV2ZWxdIFtQQVRDSCBWMl0gbmV0L2NvbG8tY29tcGFyZS5jOiBGaXggbWVtb3J5DQo+ID4+IGxl
-YWsgYW5kIGNvZGUgc3R5bGUgaXNzdWUuDQo+ID4+DQo+ID4+DQo+ID4+IE9uIDIwMTkvNy80IOS4
-i+WNiDQ6MzYsIFpoYW5nIENoZW4gd3JvdGU6DQo+ID4+PiBGcm9tOiBaaGFuZyBDaGVuIDxjaGVu
-LnpoYW5nQGludGVsLmNvbT4NCj4gPj4+DQo+ID4+PiBUaGlzIHBhdGNoIHRvIGZpeCB0aGUgb3Jp
-Z2luICJjaGFyICpkYXRhIiBtZW5vcnkgbGVhaywgY29kZSBzdHlsZQ0KPiA+Pj4gaXNzdWUgYW5k
-IGFkZCBuZWNlc3NhcnkgY2hlY2sgaGVyZS4NCj4gPj4+IFJlcG9ydGVkLWJ5OiBDb3Zlcml0eSAo
-Q0lEIDE0MDI3ODUpDQo+ID4+Pg0KPiA+Pj4gU2lnbmVkLW9mZi1ieTogWmhhbmcgQ2hlbiA8Y2hl
-bi56aGFuZ0BpbnRlbC5jb20+DQo+ID4+PiAtLS0NCj4gPj4+ICAgIG5ldC9jb2xvLWNvbXBhcmUu
-YyB8IDI4ICsrKysrKysrKysrKysrKysrKysrKy0tLS0tLS0NCj4gPj4+ICAgIDEgZmlsZSBjaGFu
-Z2VkLCAyMSBpbnNlcnRpb25zKCspLCA3IGRlbGV0aW9ucygtKQ0KPiA+Pj4NCj4gPj4+IGRpZmYg
-LS1naXQgYS9uZXQvY29sby1jb21wYXJlLmMgYi9uZXQvY29sby1jb21wYXJlLmMgaW5kZXgNCj4g
-Pj4+IDkwOWRkNmM2ZWIuLmVkMzQ5ZjVmNmEgMTAwNjQ0DQo+ID4+PiAtLS0gYS9uZXQvY29sby1j
-b21wYXJlLmMNCj4gPj4+ICsrKyBiL25ldC9jb2xvLWNvbXBhcmUuYw0KPiA+Pj4gQEAgLTEyNyw2
-ICsxMjcsMTcgQEAgc3RhdGljIGludCBjb21wYXJlX2Nocl9zZW5kKENvbXBhcmVTdGF0ZSAqcywN
-Cj4gPj4+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB1aW50MzJfdCB2bmV0X2hkcl9s
-ZW4sDQo+ID4+PiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgYm9vbCBub3RpZnlfcmVt
-b3RlX2ZyYW1lKTsNCj4gPj4+DQo+ID4+PiArc3RhdGljIGJvb2wgcGFja2V0X21hdGNoZXNfc3Ry
-KGNvbnN0IGNoYXIgKnN0ciwNCj4gPj4+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-dWludDhfdCAqYnVmLA0KPiA+Pj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB1aW50
-MzJfdCBwYWNrZXRfbGVuKSB7DQo+ID4+PiArICAgIGlmIChwYWNrZXRfbGVuIDw9IHN0cmxlbihz
-dHIpKSB7DQo+ID4+PiArICAgICAgICByZXR1cm4gZmFsc2U7DQo+ID4+PiArICAgIH0NCj4gPj4+
-ICsNCj4gPj4+ICsgICAgcmV0dXJuICFtZW1jbXAoc3RyLCBidWYsIHN0cmxlbihzdHIpICsgMSk7
-DQo+ID4+DQo+ID4+IFRoaXMgYXNzdW1lcyBidWYgaXMgTlVMTCB0ZXJtaW5hdGVkICh5b3UgcGFz
-cyBub3RpZnlfcnMtPmJ1Zikgd2hpY2gNCj4gPj4gaXMgbm90IGNvcnJlY3QgSSB0aGluaz8NCj4g
-PiBZZXMsIHlvdSBhcmUgcmlnaHQuDQo+ID4gSG93IGFib3V0IHRoaXM6DQo+ID4NCj4gPiBzdGF0
-aWMgYm9vbCBwYWNrZXRfbWF0Y2hlc19zdHIoY29uc3QgY2hhciAqc3RyLA0KPiA+ICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgdWludDhfdCAqYnVmLA0KPiA+ICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgdWludDMyX3QgcGFja2V0X2xlbikgew0KPiA+ICAgICAgaWYgKHBh
-Y2tldF9sZW4gIT0gc3RybGVuKHN0cikgfHwgIWJ1Zikgew0KPiA+ICAgICAgICAgIHJldHVybiBm
-YWxzZTsNCj4gPiAgICAgIH0NCj4gDQo+IA0KPiBXaGVuIGNhbiB3ZSBoaXQgIWJ1Zj8NCg0KSSBy
-ZS1jaGVja2VkIHRoZSBjb2RlLCBsb29rcyB0aGUgIm5ldF9maWxsX3JzdGF0ZSgpIiBjYW4gZW5z
-dXJlIGJ1ZiBpcyBub3QgZW1wdHksDQpJIHdpbGwgcmVtb3ZlIHRoZSAhYnVmIHRvIHNlbmQgbmV4
-dCB2ZXJzaW9uLg0KDQpUaGFua3MNClpoYW5nIENoZW4NCg0KPiANCj4gVGhhbmtzDQo+IA0KPiAN
-Cj4gPg0KPiA+ICAgICAgcmV0dXJuICFtZW1jbXAoc3RyLCBidWYsIHN0cmxlbihzdHIpKTsgfQ0K
-PiA+DQo+ID4gVGhhbmtzDQo+ID4gWmhhbmcgQ2hlbg0KPiA+DQo+ID4NCj4gPj4gVGhhbmtzDQo+
-ID4+DQo+ID4+DQo+ID4+PiArfQ0KPiA+Pj4gKw0KPiA+Pj4gICAgc3RhdGljIHZvaWQgbm90aWZ5
-X3JlbW90ZV9mcmFtZShDb21wYXJlU3RhdGUgKnMpDQo+ID4+PiAgICB7DQo+ID4+PiAgICAgICAg
-Y2hhciBtc2dbXSA9ICJET19DSEVDS1BPSU5UIjsgQEAgLTEwMDgsMjEgKzEwMTksMjQgQEAgc3Rh
-dGljDQo+ID4+PiB2b2lkDQo+ID4+IGNvbXBhcmVfbm90aWZ5X3JzX2ZpbmFsaXplKFNvY2tldFJl
-YWRTdGF0ZSAqbm90aWZ5X3JzKQ0KPiA+Pj4gICAgew0KPiA+Pj4gICAgICAgIENvbXBhcmVTdGF0
-ZSAqcyA9IGNvbnRhaW5lcl9vZihub3RpZnlfcnMsIENvbXBhcmVTdGF0ZSwNCj4gPj4+IG5vdGlm
-eV9ycyk7DQo+ID4+Pg0KPiA+Pj4gLSAgICAvKiBHZXQgWGVuIGNvbG8tZnJhbWUncyBub3RpZnkg
-YW5kIGhhbmRsZSB0aGUgbWVzc2FnZSAqLw0KPiA+Pj4gLSAgICBjaGFyICpkYXRhID0gZ19tZW1k
-dXAobm90aWZ5X3JzLT5idWYsIG5vdGlmeV9ycy0+cGFja2V0X2xlbik7DQo+ID4+PiAtICAgIGNo
-YXIgbXNnW10gPSAiQ09MT19DT01QQVJFX0dFVF9YRU5fSU5JVCI7DQo+ID4+PiArICAgIGNvbnN0
-IGNoYXIgbXNnW10gPSAiQ09MT19DT01QQVJFX0dFVF9YRU5fSU5JVCI7DQo+ID4+PiAgICAgICAg
-aW50IHJldDsNCj4gPj4+DQo+ID4+PiAtICAgIGlmICghc3RyY21wKGRhdGEsICJDT0xPX1VTRVJT
-UEFDRV9QUk9YWV9JTklUIikpIHsNCj4gPj4+ICsgICAgaWYgKHBhY2tldF9tYXRjaGVzX3N0cigi
-Q09MT19VU0VSU1BBQ0VfUFJPWFlfSU5JVCIsDQo+ID4+PiArICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgbm90aWZ5X3JzLT5idWYsDQo+ID4+PiArICAgICAgICAgICAgICAgICAgICAgICAgICAg
-bm90aWZ5X3JzLT5wYWNrZXRfbGVuKSkgew0KPiA+Pj4gICAgICAgICAgICByZXQgPSBjb21wYXJl
-X2Nocl9zZW5kKHMsICh1aW50OF90ICopbXNnLCBzdHJsZW4obXNnKSwgMCwgdHJ1ZSk7DQo+ID4+
-PiAgICAgICAgICAgIGlmIChyZXQgPCAwKSB7DQo+ID4+PiAgICAgICAgICAgICAgICBlcnJvcl9y
-ZXBvcnQoIk5vdGlmeSBYZW4gQ09MTy1mcmFtZSBJTklUIGZhaWxlZCIpOw0KPiA+Pj4gICAgICAg
-ICAgICB9DQo+ID4+PiAtICAgIH0NCj4gPj4+IC0NCj4gPj4+IC0gICAgaWYgKCFzdHJjbXAoZGF0
-YSwgIkNPTE9fQ0hFQ0tQT0lOVCIpKSB7DQo+ID4+PiArICAgIH0gZWxzZSBpZiAocGFja2V0X21h
-dGNoZXNfc3RyKCJDT0xPX0NIRUNLUE9JTlQiLA0KPiA+Pj4gKyAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICBub3RpZnlfcnMtPmJ1ZiwNCj4gPj4+ICsgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgbm90aWZ5X3JzLT5wYWNrZXRfbGVuKSkgew0KPiA+Pj4gICAgICAgICAg
-ICAvKiBjb2xvLWNvbXBhcmUgZG8gY2hlY2twb2ludCwgZmx1c2ggcHJpIHBhY2tldCBhbmQNCj4g
-Pj4+IHJlbW92ZSBzZWMgcGFja2V0DQo+ID4+ICovDQo+ID4+PiAgICAgICAgICAgIGdfcXVldWVf
-Zm9yZWFjaCgmcy0+Y29ubl9saXN0LCBjb2xvX2ZsdXNoX3BhY2tldHMsIHMpOw0KPiA+Pj4gKyAg
-ICB9IGVsc2Ugew0KPiA+Pj4gKyAgICAgICAgZXJyb3JfcmVwb3J0KCJDT0xPIGNvbXBhcmUgZ290
-IHVuc3VwcG9ydGVkIGluc3RydWN0aW9uICclcyciLA0KPiA+Pj4gKyAgICAgICAgICAgICAgICAg
-ICAgIChjaGFyICopbm90aWZ5X3JzLT5idWYpOw0KPiA+Pj4gICAgICAgIH0NCj4gPj4+ICAgIH0N
-Cj4gPj4+DQo=
+On Fri, Jul 12, 2019 at 08:33:14PM +0200, Max Reitz wrote:
+> On 12.07.19 12:27, Stefano Garzarella wrote:
+> > On Thu, Jul 11, 2019 at 03:29:35PM +0200, Max Reitz wrote:
+> >> When preallocating an encrypted qcow2 image, it just lets the protocol
+> >> driver write data and then does not mark the clusters as zero.
+> >> Therefore, reading this image will yield effectively random data.
+> >>
+> >> As such, we have not fulfilled the promise of always writing zeroes when
+> >> preallocating an image in a while.  It seems that nobody has really
+> >> cared, so change the documentation to conform to qemu's actual behavior.
+> >>
+> >> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> >> ---
+> >>  qapi/block-core.json         | 9 +++++----
+> >>  docs/qemu-block-drivers.texi | 4 ++--
+> >>  qemu-img.texi                | 4 ++--
+> >>  3 files changed, 9 insertions(+), 8 deletions(-)
+> >>
+> >> diff --git a/qapi/block-core.json b/qapi/block-core.json
+> >> index 0d43d4f37c..a4363b84d2 100644
+> >> --- a/qapi/block-core.json
+> >> +++ b/qapi/block-core.json
+> >> @@ -5167,10 +5167,11 @@
+> >>  # @off: no preallocation
+> >>  # @metadata: preallocate only for metadata
+> >>  # @falloc: like @full preallocation but allocate disk space by
+> >> -#          posix_fallocate() rather than writing zeros.
+> >> -# @full: preallocate all data by writing zeros to device to ensure disk
+> >> -#        space is really available. @full preallocation also sets up
+> >> -#        metadata correctly.
+> >> +#          posix_fallocate() rather than writing data.
+> >> +# @full: preallocate all data by writing it to the device to ensure
+> >> +#        disk space is really available. This data may or may not be
+> >> +#        zero, depending on the image format and storage.
+> >> +#        @full preallocation also sets up metadata correctly.
+> >>  #
+> >>  # Since: 2.2
+> >>  ##
+> >> diff --git a/docs/qemu-block-drivers.texi b/docs/qemu-block-drivers.texi
+> >> index 91ab0eceae..c02547e28c 100644
+> >> --- a/docs/qemu-block-drivers.texi
+> >> +++ b/docs/qemu-block-drivers.texi
+> >> @@ -31,8 +31,8 @@ Supported options:
+> >>  @item preallocation
+> >>  Preallocation mode (allowed values: @code{off}, @code{falloc}, @code{full}).
+> >>  @code{falloc} mode preallocates space for image by calling posix_fallocate().
+> >> -@code{full} mode preallocates space for image by writing zeros to underlying
+> >> -storage.
+> >> +@code{full} mode preallocates space for image by writing data to underlying
+> >> +storage.  This data may or may not be zero, depending on the storage location.
+> >>  @end table
+> >>  
+> >>  @item qcow2
+> >> diff --git a/qemu-img.texi b/qemu-img.texi
+> >> index c8e9bba515..b5156d6316 100644
+> >> --- a/qemu-img.texi
+> >> +++ b/qemu-img.texi
+> >> @@ -666,8 +666,8 @@ Supported options:
+> >>  @item preallocation
+> >>  Preallocation mode (allowed values: @code{off}, @code{falloc}, @code{full}).
+> >>  @code{falloc} mode preallocates space for image by calling posix_fallocate().
+> >> -@code{full} mode preallocates space for image by writing zeros to underlying
+> >> -storage.
+> >> +@code{full} mode preallocates space for image by writing data to underlying
+> >> +storage.  This data may or may not be zero, depending on the storage location.
+> >>  @end table
+> >>  
+> >>  @item qcow2
+> > 
+> > Just a question:
+> 
+> But a very good one, actually.
+
+:-)
+
+> 
+> > if a protocol driver returns 1 with the .bdrv_has_zero_init callback, is it
+> > expected that the preallocation will fill the image with zeroes?
+> 
+> Yes.
+> 
+> > IIUC, for example, the qcow2 returns 1 with the .bdrv_has_zero_init. but during
+> > the qcow2_co_truncate() it calls bdrv_co_truncate() and, depending on the
+> > backend driver, it should fill the image with zeroes (or not?).
+> 
+> Yes.
+> 
+> > Maybe I miss something related to the metadata...
+> 
+> Well.  If the image isn’t preallocated, all will be well because nothing
+> of the added range is entered into the metadata, so it returns zero when
+> read (unless there is a backing file, but that is handled independently
+> of has_zero_init).
+
+Okay, that makes sense.
+
+> 
+> But you were asking about preallocation.  As I wrote in the commit
+> message, the qcow2 driver lets the protocol driver preallocate the data
+> and then enters it as normal data clusters into its metadata.  If the
+> image is encrypted, it will appears as random data (or if the protocol
+> dirver writes non-zero data).  But then it shouldn’t report
+> has_zero_init as 1.
+> 
+> Let’s test it.
+> 
+> $ qemu-img create -f qcow2 src.qcow2 64M
+> Formatting 'src.qcow2', fmt=qcow2 size=67108864 cluster_size=65536
+> lazy_refcounts=off refcount_bits=16
+> $ qemu-img convert -O qcow2 \
+>     -o \
+>     encrypt.format=luks,encrypt.key-secret=pass,preallocation=metadata \
+>     --object secret,id=pass,data=123456 \
+>     src.qcow2 dest.qcow2
+> $ qemu-img compare --image-opts \
+>     file.filename=src.qcow2 \
+>     file.filename=dest.qcow2,encrypt.key-secret=pass \
+>     --object secret,id=pass,data=123456
+> Content mismatch at offset 0!
+> 
+> Oops.
+> 
+> 
+> So.  We can do two things here.
+> 
+> (A) We drop this patch and actually make sure that preallocation always
+> writes zeroes, and if that cannot be done efficiently, then too bad.
+> 
+> Note that for qcow2, we cannot just mark all clusters as zero clusters
+> because that would kind of defeat the purpose of metadata preallocation.
+>  One of its main purposes is to prevent COW when you write to a new
+> image, i.e. that the qcow2 driver needs to do a read-modify-write cycle
+> just to zero a new cluster.  If we kept preallocating potentially random
+> data and hooked it up as preallocated zero clusters, those RMW cycles
+> would remain, thus defeating the point of metadata preallocation.  So
+> even for qcow2, if there is a chance that the data stored is not zero,
+> it needs to explicitly store zeroes then.
+> 
+> But the good thing here is that the protocol driver would always
+> guarantee that it preallocates pure zeroes.
+> 
+> The bad thing is that I don’t think we could support pure metadata or
+> falloc preallocation together with encryption any longer, which would
+> definitely be an incompatible change.  Well, because we wouldn’t want to
+> break this support, I suppose we would in this case (encryption) resort
+> to linking the data clusters as preallocated zero clusters.  Which is
+> bad because of RMW. but well.  That’s life.
+
+Yes, I agree that it is a bad thing.
+
+> 
+> 
+> (B) We keep this patch and audit our use of bdrv_has_zero_init().  So
+> for qcow2, we need to return 0 for encrypted images.  That is suboptimal
+> for non-preallocated encrypted images, but again, that’s life.
+> 
+> Also, we need to return 0 if the protocol layer does not preallocate the
+> data to be zero -- which we can see from its setting of
+> bdrv_has_zero_init(), I’d suppose.  So for preallocated unencrypted
+> images, qcow2 would need to return bdrv_has_zero_init(s->data_file->bs).
+
+Yes, that's what I had in mind, too.
+
+> 
+> But here’s the problem: How do we know whether an image has been
+> preallocated or not?  And that is a problem.  I don’t know a solution
+> off the top of my head.  We could add a parameter to
+> bdrv_has_zero_init() for that, but what would blockdev-mirror assume?
+> It doesn’t know.
+
+Why we need to know if an image has been preallocated with zeroes or not?
+
+Maybe when we convert it, but I'm not sure.
+
+> 
+> Hm.  I suppose qcow2’s implementation could sift through its L2 tables
+> and if there are any links to data clusters, it is by definition in some
+> way preallocated.
+> 
+> 
+> So I suppose B seems like the better solution if there is a way for all
+> format drivers to determine whether their image has been preallocated or
+> not?
+
+Seems like the better solution to me, also if I miss something why we need to
+determine whether or not it's been pre-allocated. :-(
+
+
+Thanks for very detailed answer,
+Stefano
 
