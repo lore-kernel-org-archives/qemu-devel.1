@@ -2,79 +2,79 @@ Return-Path: <SRS0=IjNW=VM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4D3CC7618F
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 11:50:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CFB8C7618F
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 11:52:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7EC51206B8
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 11:50:44 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="Z5VCtMlc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7EC51206B8
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6FF33206B8
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 11:52:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6FF33206B8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37488 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37496 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hmzVD-00067D-Hb
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 07:50:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55604)
+	id 1hmzWV-0007JA-Nb
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 07:52:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55835)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <chihmin.chao@sifive.com>) id 1hmzUz-0005gd-Rg
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 07:50:31 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1hmzWK-0006ur-H6
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 07:51:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <chihmin.chao@sifive.com>) id 1hmzUx-00042Y-GF
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 07:50:29 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:54987)
+ (envelope-from <pbonzini@redhat.com>) id 1hmzWJ-0004hI-E1
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 07:51:52 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:33210)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <chihmin.chao@sifive.com>)
- id 1hmzUx-00041z-5Z
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 07:50:27 -0400
-Received: by mail-wm1-x341.google.com with SMTP id p74so14823041wme.4
- for <qemu-devel@nongnu.org>; Mon, 15 Jul 2019 04:50:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=AiIFecFOo+zXFmnTH1tvS2bU+kjZgg8zu3NTe1Yb60U=;
- b=Z5VCtMlcRMW5NxlRD2V9KbVqMcwJYTqODwSllBIM3KeXc7j6fuNleNZaV1vimABKVW
- VlCKpfTd1em+a0PN68Bj+5xEKAwQ3HCJO0XoiuHYIov+fX592mVlTZ8Uie+f6+eWOwoN
- LVWOqnJLNc8mOy6Wywi9EqjAsMH04ee/l26zlkQvNc/R1RcuPXXF+/mhUSJ4Wcln/LTT
- YOQaUHgt4gX+u4ky2YqHY4ZLNhbFwGBiMjijqMTDM7R0K0VWIIyTzHQdp2nTAK0RAFTj
- guacRgR2ODHTc13u+sYwr3r05AYoMQi8bTidy9k+ElPQdL67h+CeefxmgThEyXL6W0av
- IEjw==
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hmzWJ-0004h2-8G
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 07:51:51 -0400
+Received: by mail-wr1-f67.google.com with SMTP id n9so16819649wru.0
+ for <qemu-devel@nongnu.org>; Mon, 15 Jul 2019 04:51:51 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=AiIFecFOo+zXFmnTH1tvS2bU+kjZgg8zu3NTe1Yb60U=;
- b=tUzwfLgOkLFVVGjtmM101r9NhV/TjoE1hjISZ6PI/2ECBVd9D9LxicqBNauoKuC7Zo
- /6LA29odEEpAyN6oST+vvhn355rWpMmBTOVGsfaH/Cm55KUz1fph1mjcTtL0f9VuC+GR
- RZBRCs9pU1vxk05MJuZPLX7vlBc6bDrjnHvzfVjUoWISZtPdDsKV7UkXCUAPAZHqNuku
- r9ckvWCokrUe41NITd15/ygh8ophT51bKhpYHT6/jvly6ZgxJvwq+r6GkLm+W0rWDNC1
- fCh9zWTdS45C8YeutbbGa6Uq8QjhRgwd0KhZ7Yx3zeknWWlzlq5eOtz91Noqjf2ia8oR
- tV9w==
-X-Gm-Message-State: APjAAAVZ9Xme49BlSlVa6tqv0sb6tJmaxx8TSVD76paqKVI5jmY44zB0
- W6LBLkVF1g9P8g07d7sZ9jto/ErQN17AbnlRyoFl9Q==
-X-Google-Smtp-Source: APXvYqxxtlIqDdU9OPQzERwqhmU7mS71f6KPdoQQ3XKPRxFh+xLusD6Wjk9ip/aiue16l6ZQZ1znCsj2/QBce3z3OmM=
-X-Received: by 2002:a1c:720e:: with SMTP id n14mr24327889wmc.53.1563191425953; 
- Mon, 15 Jul 2019 04:50:25 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=l27so6Hdn0kOSN7VkdlCzk9A3tPcFCRMqx4qrgTv6ZY=;
+ b=prgnCPZ8bqGuaWh1bqechtq6nwwyw5NgSzpzCzyMFXNXcRzahoCxJpGz5MLD9FB5if
+ t9XwBOAKmVDzao3c8Mrqydn+RYiKORckEuCNHpU/bzuFuh0vA0GQ7eTpT7CbesOgyPOx
+ hSJQ+Kth7oyGFfl4YLhtjNljtIP2xznNBbbosrhJyl7x+SULV1hpbBT1Zu6+EmLEsp3v
+ uSsnTgb70vPBd8hu84r3fxIb6rs/MGyZ6+BRCwXAy6HbQRbHoxjbgsAAdlLansH4Arft
+ Ai5THJnc93aMbgmLTvl7KICkZTnAYXu+DPiztQSthxn6I7cHKUEyguXsSqv4N3OZuydH
+ W+4A==
+X-Gm-Message-State: APjAAAUYYE+XbwEdxZbPzwdMp52eAmTuBBfByqbMXxc5Zz4nMMRSpu6r
+ 7u/JGDkioWHRPvI84aYrF846Mg==
+X-Google-Smtp-Source: APXvYqwJThfjWvlRCICs1pykT3p02MIB3Iup3Dt5yCpSuAPn9EfdeRN7QT5CWQy6VNVSKjSOQ/VsWw==
+X-Received: by 2002:adf:80e1:: with SMTP id 88mr28079181wrl.127.1563191510189; 
+ Mon, 15 Jul 2019 04:51:50 -0700 (PDT)
+Received: from [192.168.178.40] ([151.20.129.151])
+ by smtp.gmail.com with ESMTPSA id z1sm18372347wrv.90.2019.07.15.04.51.48
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Mon, 15 Jul 2019 04:51:49 -0700 (PDT)
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20190714124755.14356-1-philmd@redhat.com>
+ <ebd6d5a3-4f3e-b0ef-50c7-333996375b96@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <9c3c9ba9-15bb-95cc-9b92-a9d94a37a10b@redhat.com>
+Date: Mon, 15 Jul 2019 13:51:48 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-References: <cover.1559944445.git.alistair.francis@wdc.com>
-In-Reply-To: <cover.1559944445.git.alistair.francis@wdc.com>
-From: Chih-Min Chao <chihmin.chao@sifive.com>
-Date: Mon, 15 Jul 2019 19:50:14 +0800
-Message-ID: <CAEiOBXWT=npMfc5kJ_kiRPk4LQe7Nfj13-sEYFtaJ_zHRdCxSQ@mail.gmail.com>
-To: Alistair Francis <alistair.francis@wdc.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::341
-Content-Type: text/plain; charset="UTF-8"
-X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: Re: [Qemu-devel] [PATCH v1 00/27] Add RISC-V Hypervisor Extension
+In-Reply-To: <ebd6d5a3-4f3e-b0ef-50c7-333996375b96@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.85.221.67
+Subject: Re: [Qemu-devel] [PATCH-for-4.1] hw/lm32/Kconfig: Milkymist One
+ provides a USB 1.1 Controller
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,152 +86,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alistair Francis <alistair23@gmail.com>, Palmer Dabbelt <palmer@sifive.com>,
- "open list:RISC-V" <qemu-riscv@nongnu.org>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+Cc: Thomas Huth <thuth@redhat.com>, Michael Walle <michael@walle.cc>,
+ Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, Jun 8, 2019 at 6:03 AM Alistair Francis <alistair.francis@wdc.com>
-wrote:
+On 15/07/19 13:47, Philippe Mathieu-Daudé wrote:
+> On 7/14/19 2:47 PM, Philippe Mathieu-Daudé wrote:
+>> The Milkymist SoftUSB block provides the OHCI USB standard
+>> (missed in 0858746b835).
+>>
+>> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+>> ---
+>>  hw/lm32/Kconfig | 1 +
+>>  1 file changed, 1 insertion(+)
+>>
+>> diff --git a/hw/lm32/Kconfig b/hw/lm32/Kconfig
+>> index 3d09c2dd6f..ed2e3060b0 100644
+>> --- a/hw/lm32/Kconfig
+>> +++ b/hw/lm32/Kconfig
+>> @@ -11,3 +11,4 @@ config MILKYMIST
+>>      select PFLASH_CFI01
+>>      select FRAMEBUFFER
+>>      select SD
+>> +    select USB_OHCI
+>>
+> 
+> Markus asked me how I noticed that, if it was auditing the code.
+> 
+> I ran 'qemu-system-lm32 -device help' and noticed all the USB devices
+> had disappeared.
+> 
 
-> This patch series adds the RISC-V Hypervisor extension 0.3. This is the
-> latest draft spec of the Hypervisor extension.
->
-> The Hypervisor extension is disabled by default, so this series should
-> result in no changes to anyone using QEMU unless they enable the
-> extension. The extention can be enabled with the -cpu property (see
-> below).
->
-> At the moment the spec does not include information about the mstatush
-> register. As it is not in the spec I haven't added it to QEMU. This
-> means the extension won't work correctly for 32-bit guests. This should
-> be a small fix to add the CSR once the spec is updated.
->
-> All testing of this implementation has been done by using the baremetal
-> Xvisor Hypervisor. We are able to run two Linux guests (that's all I
-> have tried) as guests.
->
-> At the moment this spec is in a draft state and is subject to change. As
-> QEMU is extreamly useful in early bring up I think it makes sense for
-> QEMU to support non-frozen extensions. I would like to decide with this
-> series how QEMU will handle all future non-frozen extensions. That is a
-> standard way that QEMU users can test future RISC-V extensions while
-> still understanding things will change. One idea is just to disable it by
-> default, another option is to maybe use the Kconfig to make it a compile
-> time option which developers can use. Should we also display a warning
-> when running non-frozen extensions?
->
-> Thanks to Anup for doing the initial port of Xvisor. The port is avaliable
-> here:
-> https://github.com/avpatel/xvisor-next and will run on QEMU.
->
-> Also thanks to Atish for implementing the SBI call support in Xvisor and
-> for lots of help debugging.
->
-> To run this yourself:
->  1. Apply this patch series to QEMU. The latest branch can be found here:
->
-> https://github.com/alistair23/qemu/tree/mainline/alistair/riscv-hyp-work.next
->  2. Get the version of OpenSBI that supports the H extension. This can
->     be found here:
->       https://github.com/riscv/opensbi/tree/hyp_ext_changes_v1
->  3. Build the next release of Xvisor. It is available here:
->       https://github.com/avpatel/xvisor-next
->  4. Make sure you build the Xvisor tests, see here for details:
->
-> https://github.com/avpatel/xvisor-next/tree/master/tests/riscv/virt64/linux
->  5. Run QEMU:
->      ./riscv64-softmmu/qemu-system-riscv64 -nographic \
->        -machine virt -cpu rv64,h=true\
->        -serial mon:stdio -serial null -m 4G \
->        -device loader,file=vmm.bin,addr=0x80200000 \
->        -kernel fw_jump.elf \
->        -initrd vmm-disk-linux.img \
->        -append "vmm.console=uart@10000000 vmm.bootcmd=\"vfs mount initrd
-> /;vfs run /boot.xscript;vfs cat /system/banner.txt\""
->
->    Once you get to the prompt you can start the geust by running:
->      guest kick guest0
->    You can then bind to the serial port using:
->      vserial bind guest0/uart0
->    Then you can start Linux using:
->      autoexec
->
->  This was all tested with the mainline 5.1 kernel. I don't know if it
->  will work on older kernels.
->
-> So far all of the QEMU work has been tested on Xvisor.
->
-> Known Issues/TODO:
->  - Add mstatush to support 32-bit Hypervisors
->  - Fix the random hang that sometimes appears when running a Hypervisor
-> guest (~5%)
->
-> There is also on going work from Anup to port KVM.
-> We have code complete implementation of RISC-V KVM kernel module and
-> RISC-V KVMTOOL. Currently, we are debugging KVM on QEMU and we will
-> send-out RFC PATCHES for KVM in June/July 2019.
-> The KVM RISC-V kernel module is available in riscv_kvm_v1
-> branch at: https://github.com/avpatel/linux.git
-> The KVMTOOL RISC-V port is available in riscv_v1 branch of
-> https://github.com/avpatel/kvmtool.git
->
-> There is very early work on a Xen port as well which is avaliable here:
-> https://github.com/alistair23/xen/tree/alistair/riscv-port
->
-> Changes from RFC:
->  - Rebase on latest master
->  - Add floating point changes from Hypervisor extension
->
-> Alistair Francis (27):
->   target/riscv: Don't set write permissions on dirty PTEs
->   target/riscv: Add the Hypervisor extension
->   target/riscv: Add the virtulisation mode
->   target/riscv: Add the force HS exception mode
->   target/riscv: Add the Hypervisor CSRs to CPUState
->   target/riscv: Dump Hypervisor registers if enabled
->   target/riscv: Remove strict perm checking for CSR R/W
->   target/riscv: Create function to test if FP is enabled
->   target/riscv: Add support for background interrupt setting
->   target/riscv: Add Hypervisor CSR access functions
->   target/riscv: Add background CSRs accesses
->   target/riscv: Add background register swapping function
->   target/ricsv: Flush the TLB on virtulisation mode changes
->   target/riscv: Generate illegal instruction on WFI when V=1
->   riscv: plic: Remove unused interrupt functions
->   riscv: plic: Always set sip.SEIP bit for HS
->   target/riscv: Add hypvervisor trap support
->   target/riscv: Add Hypervisor trap return support
->   target/riscv: Add hfence instructions
->   target/riscv: Disable guest FP support based on backgrond status
->   target/riscv: Mark both sstatus and bsstatus as dirty
->   target/riscv: Respect MPRV and SPRV for floating point ops
->   target/riscv: Allow specifying MMU stage
->   target/riscv: Allow specifying number of MMU stages
->   target/riscv: Implement second stage MMU
->   target/riscv: Call the second stage MMU in virtualisation mode
->   target/riscv: Allow enabling the Hypervisor extension
->
->  hw/riscv/sifive_plic.c                        |  24 +-
->  include/hw/riscv/sifive_plic.h                |   3 -
->  target/riscv/cpu.c                            |  31 ++
->  target/riscv/cpu.h                            |  32 +-
->  target/riscv/cpu_bits.h                       |  32 +-
->  target/riscv/cpu_helper.c                     | 443 ++++++++++++++++--
->  target/riscv/csr.c                            | 216 ++++++++-
->  target/riscv/insn32.decode                    |  23 +-
->  .../riscv/insn_trans/trans_privileged.inc.c   |  40 ++
->  target/riscv/op_helper.c                      |  71 ++-
->  target/riscv/translate.c                      |  26 +
->  11 files changed, 839 insertions(+), 102 deletions(-)
->
-> --
-> 2.21.0
->
->
-  tested with Linux kernel v5.2 and related opensbi/xvisor branches
-described above.
+Queued, thanks.
 
- Tested-by: Chih-Min Chao <chihmin.chao@sifive.com>
+Paolo
+
