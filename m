@@ -2,68 +2,62 @@ Return-Path: <SRS0=IjNW=VM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 132E1C7618F
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 11:10:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BAD92C7618F
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 11:10:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E22062081C
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 11:10:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E22062081C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8A2F22083D
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 11:10:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A2F22083D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37166 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37180 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hmysS-0001C4-6F
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 07:10:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46008)
+	id 1hmysj-0002Mz-Ku
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 07:10:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46103)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <cohuck@redhat.com>) id 1hmys4-0008D9-81
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 07:10:18 -0400
+ (envelope-from <balaton@eik.bme.hu>) id 1hmysQ-0001F4-Mk
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 07:10:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cohuck@redhat.com>) id 1hmys3-0007yP-4W
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 07:10:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48502)
+ (envelope-from <balaton@eik.bme.hu>) id 1hmysM-0008CF-QU
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 07:10:38 -0400
+Received: from zero.eik.bme.hu ([152.66.115.2]:21109)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cohuck@redhat.com>)
- id 1hmys0-0007uU-KH; Mon, 15 Jul 2019 07:10:12 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 7BA42309174E;
- Mon, 15 Jul 2019 11:10:10 +0000 (UTC)
-Received: from gondolin (dhcp-192-232.str.redhat.com [10.33.192.232])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5D8B84F81;
- Mon, 15 Jul 2019 11:09:57 +0000 (UTC)
-Date: Mon, 15 Jul 2019 13:09:55 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
-Message-ID: <20190715130955.4a117388.cohuck@redhat.com>
-In-Reply-To: <c1c68faf-0424-6c7c-e39f-42159457c3ee@redhat.com>
+ (Exim 4.71) (envelope-from <balaton@eik.bme.hu>)
+ id 1hmysJ-00088I-01; Mon, 15 Jul 2019 07:10:31 -0400
+Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
+ by localhost (Postfix) with SMTP id 44D6C7456CA;
+ Mon, 15 Jul 2019 13:10:19 +0200 (CEST)
+Received: by zero.eik.bme.hu (Postfix, from userid 432)
+ id 25A2F74569D; Mon, 15 Jul 2019 13:10:19 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+ by zero.eik.bme.hu (Postfix) with ESMTP id 212E47456CC;
+ Mon, 15 Jul 2019 13:10:19 +0200 (CEST)
+Date: Mon, 15 Jul 2019 13:10:19 +0200 (CEST)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+To: Thomas Huth <thuth@redhat.com>
+In-Reply-To: <64dd9cd5-8599-b157-3ba2-0ec565cee709@redhat.com>
+Message-ID: <alpine.BSF.2.21.9999.1907151309190.6546@zero.eik.bme.hu>
 References: <20190715095545.28545-1-philmd@redhat.com>
- <20190715095545.28545-2-philmd@redhat.com>
- <ca528cdc-6118-0b2f-c1b8-30b06875dde8@redhat.com>
- <CAFEAcA-wgTVfj0TUJ=piP0wEgLGiNpOYia5DK2GQAO4Q7gNaWg@mail.gmail.com>
- <6d69e8ad-d720-ce04-20f2-a03193903078@redhat.com>
- <20190715125653.6e65d575.cohuck@redhat.com>
- <c1c68faf-0424-6c7c-e39f-42159457c3ee@redhat.com>
-Organization: Red Hat GmbH
+ <20190715095545.28545-3-philmd@redhat.com>
+ <alpine.BSF.2.21.9999.1907151251210.6546@zero.eik.bme.hu>
+ <64dd9cd5-8599-b157-3ba2-0ec565cee709@redhat.com>
+User-Agent: Alpine 2.21.9999 (BSF 287 2018-06-16)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 152.66.115.2
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.41]); Mon, 15 Jul 2019 11:10:10 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [qemu-s390x] [RFC PATCH 1/3] hw/Kconfig: PCI bus
- implies PCI_DEVICES
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH-for-4.2 2/3] hw/usb/Kconfig: Add
+ CONFIG_USB_EHCI_PCI
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,85 +70,70 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Peter Maydell <peter.maydell@linaro.org>,
- Collin Walling <walling@linux.ibm.com>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- "Michael S. Tsirkin" <mst@redhat.com>, Palmer Dabbelt <palmer@sifive.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Alistair Francis <Alistair.Francis@wdc.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Helge Deller <deller@gmx.de>, David Gibson <david@gibson.dropbear.id.au>,
- Artyom Tarasenko <atar4qemu@gmail.com>, Thomas Huth <thuth@redhat.com>,
+ Alistair Francis <Alistair.Francis@wdc.com>, qemu-riscv@nongnu.org,
  Eduardo Habkost <ehabkost@redhat.com>,
- "open list:S390" <qemu-s390x@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
- Richard Henderson <rth@twiddle.net>, "open
- list:RISC-V" <qemu-riscv@nongnu.org>, qemu-ppc <qemu-ppc@nongnu.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Helge Deller <deller@gmx.de>, Palmer Dabbelt <palmer@sifive.com>,
+ qemu-devel@nongnu.org, qemu-arm@nongnu.org, qemu-ppc@nongnu.org,
+ Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>,
+ =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>,
+ Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 15 Jul 2019 13:04:28 +0200
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
+On Mon, 15 Jul 2019, Thomas Huth wrote:
+> On 15/07/2019 12.54, BALATON Zoltan wrote:
+>> On Mon, 15 Jul 2019, Philippe Mathieu-Daud=C3=A9 wrote:
+>>> The USB_EHCI entry currently include PCI code. Since the EHCI
+>>> implementation is already split in sysbus/PCI, add a new
+>>> USB_EHCI_PCI. There are no logical changes, but the Kconfig
+>>> dependencies tree is cleaner.
+>>>
+>>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>>> ---
+>>> hw/usb/Kconfig?????? | 9 ++++++---
+>>> hw/usb/Makefile.objs | 5 +++--
+>>> 2 files changed, 9 insertions(+), 5 deletions(-)
+>>>
+>>> diff --git a/hw/usb/Kconfig b/hw/usb/Kconfig
+>>> index 564305e283..495c6f2d48 100644
+>>> --- a/hw/usb/Kconfig
+>>> +++ b/hw/usb/Kconfig
+>>> @@ -19,13 +19,16 @@ config USB_OHCI_PCI
+>>>
+>>> config USB_EHCI
+>>> ??? bool
+>>> -??? default y if PCI_DEVICES
+>>> -??? depends on PCI
+>>> ??? select USB
+>>>
+>>> +config USB_EHCI_PCI
+>>> +??? bool
+>>> +??? default y if PCI_DEVICES
+>>> +??? select USB_EHCI
+>>> +
+>>> config USB_EHCI_SYSBUS
+>>> ??? bool
+>>> -??? select USB
+>>> +??? select USB_EHCI
+>>
+>> Isn't this making USB_EHCI effectively the same as USB so maybe you
+>> don't need to keep that around any more. Can you just add select USB t=
+o
+>> USB_EHCI_PCI and USB_EHCI_SYSBUS and delete USB_EHCI?
+>
+> If you want to compile without USB_EHCI_PCI and without USB_EHCI_SYSBUS=
+,
+> but with USB (e.g. due to XHCI), I think we should not include
+> hcd-ehci.o file in the build. So I think it's fine that we have a
+> separate config switch for this file.
 
-> On 7/15/19 12:56 PM, Cornelia Huck wrote:
-> > On Mon, 15 Jul 2019 12:48:55 +0200
-> > Thomas Huth <thuth@redhat.com> wrote:
-> >  =20
-> >> On 15/07/2019 12.19, Peter Maydell wrote: =20
-> >>> On Mon, 15 Jul 2019 at 11:15, Thomas Huth <thuth@redhat.com> wrote:  =
- =20
-> >>>>
-> >>>> On 15/07/2019 11.55, Philippe Mathieu-Daud=C3=A9 wrote:   =20
-> >>>>> If a controller device provides a PCI bus, we can plug any PCI
-> >>>>> daughter card on it.
-> >>>>>
-> >>>>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> >>>>> ---   =20
-> >>>    =20
-> >>>>> diff --git a/hw/pci/Kconfig b/hw/pci/Kconfig
-> >>>>> index 77f8b005ff..0f7267db35 100644
-> >>>>> --- a/hw/pci/Kconfig
-> >>>>> +++ b/hw/pci/Kconfig
-> >>>>> @@ -1,5 +1,6 @@
-> >>>>>  config PCI
-> >>>>>      bool
-> >>>>> +    imply PCI_DEVICES   =20
-> >>>>
-> >>>> No, please don't change this. This was done on purpose, since almost=
- all
-> >>>> PCI_DEVICES do not work on s390x (so s390x does *not* imply PCI_DEVI=
-CES).   =20
-> >>>
-> >>> But that means that every board that provides PCI has to have an
-> >>> "imply PCI_DEVICES" line, which is pretty clunky just to work
-> >>> around an s390x limitation.
-> >>>
-> >>> Is there some way in the Kconfig syntax for s390x to say
-> >>> "no PCI_DEVICES" so we can have the corner-case be handled
-> >>> by the s390x Kconfig in one place rather than in 20 places
-> >>> affecting everywhere except s390x?   =20
-> >>
-> >> IIRC the problem on s390x are the legacy IRQs. s390x has only MSIs. So=
- I
-> >> guess the correct way to fix this would be to introduce some
-> >> PCI_LEGACY_IRQ switch and let all old devices that do not work with MSI
-> >> depend on it. =20
-> >=20
-> > s/MSI/MSI-X/, IIRC. Not sure how far 'legacy' would stretch. =20
->=20
-> Maybe we can have something like PCI_LEGACY_DEVICES and PCI_MSI_DEVICES?
->=20
-> So if s390x only selects PCI_LEGACY (not PCI_MSI) bus, then it only get
-> legacy devices?
+So shouldn't build depend on either USB_EHCI_PCI or USB_EHCI_SYSBUS=20
+selected then?
 
-Wrong way around? We need MSI-X for s390x, not plain MSI or
-'legacy' (whatever that is).
-
->=20
-> Other MSI compliant should select PCI_MSI instead. PCI alone seems to
-> give troubles.
->=20
-> > cc:ing Collin in case there's something else.
-> >  =20
-
-
+Regards,
+BALATON Zoltan
