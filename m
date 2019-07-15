@@ -2,79 +2,90 @@ Return-Path: <SRS0=IjNW=VM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FC8AC76191
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 15:11:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DCEAC76195
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 15:12:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 31BD32054F
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 15:11:45 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="R4vyIkSe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 31BD32054F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 146232054F
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 15:12:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 146232054F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39936 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39954 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hn2dk-0003n9-Cf
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 11:11:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43981)
+	id 1hn2eR-0004nf-Bq
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 11:12:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44306)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hn2dS-0002ki-Ac
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 11:11:27 -0400
+ (envelope-from <eblake@redhat.com>) id 1hn2eG-0004KQ-Ef
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 11:12:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hn2dQ-0002UM-9m
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 11:11:26 -0400
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:33947)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hn2dQ-0002Tc-1M
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 11:11:24 -0400
-Received: by mail-ot1-x344.google.com with SMTP id n5so17381494otk.1
- for <qemu-devel@nongnu.org>; Mon, 15 Jul 2019 08:11:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=jA1oz0CnIFFH9xIt5PnRhMeufX8puveWqu8COvjsHCo=;
- b=R4vyIkSezVQxMUSIdsbh9Ar8bkUfVen2xIOApJ3xSiMMOpj9vexHV+77++swXwkWCw
- zInN6JHyJOheTi86ty30fH2IbYVbfa3XDghQWHFJCjs/E36588kMSU0pESphlaQ/aEZ+
- V0qeFpJpSx0Tbe7nHcvElC4s6vqb2HE0f54c18BWNLOUqlE8+DQFxKByir0OMIisI6oM
- jNW5v9pqffzFuLYdgUBT05gUVC3H/Vb2s9iSHLiFewsXsXavRqgqQ+no9oKJuYvvuMai
- BqRaVRQl3fneT2zGbUs5a2UiV/lF3xll1mlg8OVmRv+3G3m46PG+j/RYnf5fJ03ICpqa
- cOwA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=jA1oz0CnIFFH9xIt5PnRhMeufX8puveWqu8COvjsHCo=;
- b=VNwJhM7Ub+AfX1BO0mOkhygV9xA6u5Y5NbmfDHW9OViHio/Fp2nmA+o29DpjoClzw6
- cQlY2sINj9d9wivr8lrmf/Jze7DceGT8g7uyzuECsblIMc7sm4CDCz6LYyZHEY2xYSQr
- QHQLK6/O973pFZJoA//j/MbTEcBYd1oXLpc/j6GRZEph9IRgA6ZhgHnVTgNIdjmVEYbj
- T4HuhX8Av7GkAZoOfR0PZMzvRB+PSVIhnCS4thE24nCcm+OoIsUEkDjhHM5Nl6f7qm6q
- fGh3yrVEHCdteIt8QWH//f2DTQG3zarmQLH4gDRc1Tzrc+rHcYECqVonsHgw2xlvJqSp
- FE8g==
-X-Gm-Message-State: APjAAAUpMKmsniAoP2xAyMij6u9ccpM25ptGOjUGuBFi2wFPkNhTX103
- Ok30UN0yydTCb+sR+G3FLrV4YGhv6JaxqYxKpedOAQ==
-X-Google-Smtp-Source: APXvYqzfMbsXYOABV/Vi4r1uvVUtWsNdAMij2znhlmM7zPm1OegLzBDUpgPTFcEdT4qWYlw9zjboUF6ssw1sl+2FbdI=
-X-Received: by 2002:a9d:5f1a:: with SMTP id f26mr21003288oti.91.1563203482714; 
- Mon, 15 Jul 2019 08:11:22 -0700 (PDT)
+ (envelope-from <eblake@redhat.com>) id 1hn2eF-0002mv-Dg
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 11:12:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46088)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eblake@redhat.com>)
+ id 1hn2eD-0002lL-1s; Mon, 15 Jul 2019 11:12:13 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id EB41C5946F;
+ Mon, 15 Jul 2019 15:12:10 +0000 (UTC)
+Received: from [10.3.116.46] (ovpn-116-46.phx2.redhat.com [10.3.116.46])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 259635C26B;
+ Mon, 15 Jul 2019 15:12:10 +0000 (UTC)
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+References: <20190715145438.6880-1-thuth@redhat.com>
+ <20190715145438.6880-2-thuth@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=eblake@redhat.com; keydata=
+ xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
+ xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
+ TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
+ GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
+ sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
+ AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
+ CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
+ RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
+ wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
+ Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
+ gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
+ pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
+ zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
+ pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
+ 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
+ NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
+ cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
+ SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
+ I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
+ mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
+ Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
+ 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
+Organization: Red Hat, Inc.
+Message-ID: <db02273f-24ea-5c90-a206-b8203db2c819@redhat.com>
+Date: Mon, 15 Jul 2019 10:12:09 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-References: <20190715135125.17770-1-quintela@redhat.com>
-In-Reply-To: <20190715135125.17770-1-quintela@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 15 Jul 2019 16:11:11 +0100
-Message-ID: <CAFEAcA94NybRjhDhsmKjB0iT4Zw27LA_t4pqdMArGmqEvAVZRA@mail.gmail.com>
-To: Juan Quintela <quintela@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::344
-Subject: Re: [Qemu-devel] [PULL 00/21] Migration pull request
+In-Reply-To: <20190715145438.6880-2-thuth@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="axFQBAOC6rZA1EzfyOmHJi6rKWabMYa8b"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.39]); Mon, 15 Jul 2019 15:12:11 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 1/2] tests/qemu-iotests/group: Remove some
+ more tests from the "auto" group
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,41 +97,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- kvm-devel <kvm@vger.kernel.org>, QEMU Developers <qemu-devel@nongnu.org>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 15 Jul 2019 at 14:51, Juan Quintela <quintela@redhat.com> wrote:
->
-> The following changes since commit b9404bf592e7ba74180e1a54ed7a266ec6ee67f2:
->
->   Merge remote-tracking branch 'remotes/dgilbert/tags/pull-hmp-20190715' into staging (2019-07-15 12:22:07 +0100)
->
-> are available in the Git repository at:
->
->   https://github.com/juanquintela/qemu.git tags/migration-pull-request
->
-> for you to fetch changes up to 40c4d4a835453452a262f32450a0449886aa19ce:
->
->   migration: always initial RAMBlock.bmap to 1 for new migration (2019-07-15 15:47:47 +0200)
->
-> ----------------------------------------------------------------
-> Pull request:
-> - update last pull requset
-> - drop multifd test: For some reason, 32bit and a packed struct are
->   giving me too much trouble.  Still investigating.
-> - New fixes from upstream.
->
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--axFQBAOC6rZA1EzfyOmHJi6rKWabMYa8b
+Content-Type: multipart/mixed; boundary="7uKGomnc5SbLEfmycvKi1M2DU0d0OsqYF";
+ protected-headers="v1"
+From: Eric Blake <eblake@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?=
+ <alex.bennee@linaro.org>, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
+Message-ID: <db02273f-24ea-5c90-a206-b8203db2c819@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/2] tests/qemu-iotests/group: Remove some
+ more tests from the "auto" group
+References: <20190715145438.6880-1-thuth@redhat.com>
+ <20190715145438.6880-2-thuth@redhat.com>
+In-Reply-To: <20190715145438.6880-2-thuth@redhat.com>
+
+--7uKGomnc5SbLEfmycvKi1M2DU0d0OsqYF
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 7/15/19 9:54 AM, Thomas Huth wrote:
+> Remove some more tests from the "auto" group that either have issues
+> in certain environments (like macOS or FreeBSD, or on certain file syst=
+ems
+> like ZFS or tmpfs), do not work with the qcow2 format, or that are simp=
+ly
+> taking too much time.
+>=20
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  tests/qemu-iotests/group | 109 ++++++++++++++++++++-------------------=
+
+>  1 file changed, 55 insertions(+), 54 deletions(-)
+
+>  251 rw auto quick
+>  252 rw auto backing quick
+> -253 rw auto quick
+> -254 rw auto backing quick
+> -255 rw auto quick
+> -256 rw auto quick
+> +253 rw o_direct quick
+
+Where is the new 'o_direct' group documented?  Is this a typo for
+something else?
+
+> +254 rw backing quick
+> +255 rw quick
+> +256 rw quick
+>=20
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
-Applied, thanks.
+--7uKGomnc5SbLEfmycvKi1M2DU0d0OsqYF--
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.1
-for any user-visible changes.
+--axFQBAOC6rZA1EzfyOmHJi6rKWabMYa8b
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
--- PMM
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl0sl8kACgkQp6FrSiUn
+Q2rVpwf/QeLYJDJoG8c2vsRGNXZ8jlwBdZWd+AhVQrzAmkZgek0lJtHMfsvIkQpm
+wlSnQSBr9qiqqxEPj3LjuRyQE098XwJket9DOA1KSbUXNKgCGJnGD9ogafHYNC0I
+rBroVx+liuDmOZXWNH6HyBsOFL30sXR0iK9RzOZ+o2TjfRFki1rpr1EJ4lYlv0P7
+XFajAeR2/9ciRspLxIMyssoj84fPCsMXrt81RwT6MBo8FhAkMK8Z/5flUAkWzoIR
+joT2XVWHTR2nfdZBQvUokqaN8HecxggwuXiD+TpVwLGC5pGrFtfysv/39y46QRX/
+uWC8O/pLLy+ahllEczBjahSlWojmQw==
+=44gb
+-----END PGP SIGNATURE-----
+
+--axFQBAOC6rZA1EzfyOmHJi6rKWabMYa8b--
 
