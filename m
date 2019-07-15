@@ -2,103 +2,73 @@ Return-Path: <SRS0=IjNW=VM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F7C7C76190
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 09:20:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0685EC7618F
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 09:21:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F0EEB20C01
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 09:20:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="PqXlndpL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F0EEB20C01
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	by mail.kernel.org (Postfix) with ESMTPS id D281820C01
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 09:21:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D281820C01
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36146 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36157 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hmxAD-0007PI-I2
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 05:20:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49505)
+	id 1hmxAU-0008H6-55
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 05:21:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49567)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <liran.alon@oracle.com>) id 1hmx9z-0006yN-IK
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 05:20:41 -0400
+ (envelope-from <bounces@canonical.com>) id 1hmxA7-0007Hl-9y
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 05:20:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <liran.alon@oracle.com>) id 1hmx9y-0004Ak-29
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 05:20:39 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:57938)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <liran.alon@oracle.com>)
- id 1hmx9x-00047t-Oi
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 05:20:37 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
- by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6F9J9xt091826;
- Mon, 15 Jul 2019 09:20:31 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=content-type :
- mime-version : subject : from : in-reply-to : date : cc :
- content-transfer-encoding : message-id : references : to;
- s=corp-2018-07-02; bh=WPXUtUycrSFHvFoP18JTSSBusQQ0yVB9F0kKeYk4fGw=;
- b=PqXlndpL84ZCUAqV967W5ySrgCgAS9GiReOqj9l+XBpakUHC80FxIJHQutbQkGYMVXnD
- JEnvog+CgMiasJ+3MleQDCYyfIrtBz80L96HVG9dXC8U5smEmdjuYx/z9LjLJyFqn5xC
- LMvLTlmvvPMjHj7opOgTF54fBngVUrbxdsLzWTCtYiOkHyjeDMM70m5JhR7mO0Z6aa+H
- X4MlS4CpNNnwqjkJX7R2xDxwCBYXiMekdKKDubjCtnARYb6Kn31SxbTpuH2vZOb+s9lv
- qcUPULd0StmoAJkQbFX7B6D+LlXNMXshfTowlZiKf3oGm2GdJOjJNMRoL1Mrdqu34Szh Rw== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
- by userp2120.oracle.com with ESMTP id 2tq7xqn91w-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 15 Jul 2019 09:20:31 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
- by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6F9HYdK023251;
- Mon, 15 Jul 2019 09:20:30 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
- by aserp3020.oracle.com with ESMTP id 2tq742dq9e-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 15 Jul 2019 09:20:30 +0000
-Received: from abhmp0008.oracle.com (abhmp0008.oracle.com [141.146.116.14])
- by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x6F9KOuA026769;
- Mon, 15 Jul 2019 09:20:25 GMT
-Received: from [192.168.14.112] (/109.64.210.142)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Mon, 15 Jul 2019 02:20:24 -0700
-Content-Type: text/plain;
-	charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
-From: Liran Alon <liran.alon@oracle.com>
-In-Reply-To: <20190705210636.3095-5-liran.alon@oracle.com>
-Date: Mon, 15 Jul 2019 12:20:21 +0300
+ (envelope-from <bounces@canonical.com>) id 1hmxA6-0004GH-3F
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 05:20:47 -0400
+Received: from indium.canonical.com ([91.189.90.7]:34552)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1hmxA5-0004Fe-SX
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 05:20:46 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1hmxA4-0000Hu-T9
+ for <qemu-devel@nongnu.org>; Mon, 15 Jul 2019 09:20:44 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id D6FE62E806E
+ for <qemu-devel@nongnu.org>; Mon, 15 Jul 2019 09:20:44 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <8423C5FD-2F44-48B8-8E1F-A2E8D62E8F2B@oracle.com>
-References: <20190705210636.3095-1-liran.alon@oracle.com>
- <20190705210636.3095-5-liran.alon@oracle.com>
+Date: Mon, 15 Jul 2019 09:13:23 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-X-Mailer: Apple Mail (2.3445.4.7)
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9318
- signatures=668688
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=3
- malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1907150111
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9318
- signatures=668688
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
- priorityscore=1501 malwarescore=0
- suspectscore=3 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1907150111
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 156.151.31.85
-Subject: Re: [Qemu-devel] [PATCH 4/4] target/i386: kvm: Demand nested
- migration kernel capabilities only when vCPU may have enabled VMX
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: pmaydell skandal
+X-Launchpad-Bug-Reporter: Lutz (skandal)
+X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
+References: <156313770910.15255.7682693906978508241.malonedeb@soybean.canonical.com>
+Message-Id: <156318200389.15826.2973709945483446077.malone@soybean.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="19007";
+ Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: 51e5b85511b516576b271804abc3bd9504a1770f
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1836501] Re: cpu_address_space_init fails with
+ assertion
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -107,242 +77,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, Joao Martins <joao.m.martins@oracle.com>,
- ehabkost@redhat.com, kvm@vger.kernel.org
+Reply-To: Bug 1836501 <1836501@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Gentle ping.
+We do check for the incompatible option combination in hw/arm/virt.c:
+    if (vms->secure) {
+        if (kvm_enabled()) {
+            error_report("mach-virt: KVM does not support Security extensio=
+ns");
+            exit(1);
+        }
 
-Should this be considered to be merged into QEMU even though QEMU is now =
-in hard freeze?
-As it touches a mechanism which is already merged but too restricted.
+we just don't have anything equivalent in vexpress.c. We should probably
+put something in target/arm/cpu.c so we don't have to modify every
+board.
 
-Anyway, I would like this to be reviewed even if it=E2=80=99s merged is =
-delayed for early feedback.
 
-Thanks,
--Liran
+** Changed in: qemu
+       Status: New =3D> Confirmed
 
-> On 6 Jul 2019, at 0:06, Liran Alon <liran.alon@oracle.com> wrote:
->=20
-> Previous to this change, a vCPU exposed with VMX running on a kernel =
-without KVM_CAP_NESTED_STATE
-> or KVM_CAP_EXCEPTION_PAYLOAD resulted in adding a migration blocker. =
-This was because when code
-> was written it was thought there is no way to reliabely know if a vCPU =
-is utilising VMX or not
-> at runtime. However, it turns out that this can be known to some =
-extent:
->=20
-> In order for a vCPU to enter VMX operation it must have CR4.VMXE set.
-> Since it was set, CR4.VMXE must remain set as long as vCPU is in
-> VMX operation. This is because CR4.VMXE is one of the bits set
-> in MSR_IA32_VMX_CR4_FIXED1.
-> There is one exception to above statement when vCPU enters SMM mode.
-> When a vCPU enters SMM mode, it temporarily exit VMX operation and
-> may also reset CR4.VMXE during execution in SMM mode.
-> When vCPU exits SMM mode, vCPU state is restored to be in VMX =
-operation
-> and CR4.VMXE is restored to it's original value of being set.
-> Therefore, when vCPU is not in SMM mode, we can infer whether
-> VMX is being used by examining CR4.VMXE. Otherwise, we cannot
-> know for certain but assume the worse that vCPU may utilise VMX.
->=20
-> Summaring all the above, a vCPU may have enabled VMX in case
-> CR4.VMXE is set or vCPU is in SMM mode.
->=20
-> Therefore, remove migration blocker and check before migration =
-(cpu_pre_save())
-> if vCPU may have enabled VMX. If true, only then require relevant =
-kernel capabilities.
->=20
-> While at it, demand KVM_CAP_EXCEPTION_PAYLOAD only when vCPU is in =
-guest-mode and
-> there is a pending/injected exception. Otherwise, this kernel =
-capability is
-> not required for proper migration.
->=20
-> Reviewed-by: Joao Martins <joao.m.martins@oracle.com>
-> Signed-off-by: Liran Alon <liran.alon@oracle.com>
-> ---
-> target/i386/cpu.h      | 22 ++++++++++++++++++++++
-> target/i386/kvm.c      | 26 ++++++--------------------
-> target/i386/kvm_i386.h |  1 +
-> target/i386/machine.c  | 24 ++++++++++++++++++++----
-> 4 files changed, 49 insertions(+), 24 deletions(-)
->=20
-> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> index cdb0e43676a9..c752c4d936ee 100644
-> --- a/target/i386/cpu.h
-> +++ b/target/i386/cpu.h
-> @@ -1872,6 +1872,28 @@ static inline bool cpu_has_svm(CPUX86State =
-*env)
->     return env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_SVM;
-> }
->=20
-> +/*
-> + * In order for a vCPU to enter VMX operation it must have CR4.VMXE =
-set.
-> + * Since it was set, CR4.VMXE must remain set as long as vCPU is in
-> + * VMX operation. This is because CR4.VMXE is one of the bits set
-> + * in MSR_IA32_VMX_CR4_FIXED1.
-> + *
-> + * There is one exception to above statement when vCPU enters SMM =
-mode.
-> + * When a vCPU enters SMM mode, it temporarily exit VMX operation and
-> + * may also reset CR4.VMXE during execution in SMM mode.
-> + * When vCPU exits SMM mode, vCPU state is restored to be in VMX =
-operation
-> + * and CR4.VMXE is restored to it's original value of being set.
-> + *
-> + * Therefore, when vCPU is not in SMM mode, we can infer whether
-> + * VMX is being used by examining CR4.VMXE. Otherwise, we cannot
-> + * know for certain.
-> + */
-> +static inline bool cpu_vmx_maybe_enabled(CPUX86State *env)
-> +{
-> +    return cpu_has_vmx(env) &&
-> +           ((env->cr[4] & CR4_VMXE_MASK) || (env->hflags & =
-HF_SMM_MASK));
-> +}
-> +
-> /* fpu_helper.c */
-> void update_fp_status(CPUX86State *env);
-> void update_mxcsr_status(CPUX86State *env);
-> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-> index 4e2c8652168f..d3af445eeb5d 100644
-> --- a/target/i386/kvm.c
-> +++ b/target/i386/kvm.c
-> @@ -128,6 +128,11 @@ bool kvm_has_adjust_clock_stable(void)
->     return (ret =3D=3D KVM_CLOCK_TSC_STABLE);
-> }
->=20
-> +bool kvm_has_exception_payload(void)
-> +{
-> +    return has_exception_payload;
-> +}
-> +
-> bool kvm_allows_irq0_override(void)
-> {
->     return !kvm_irqchip_in_kernel() || kvm_has_gsi_routing();
-> @@ -1341,7 +1346,6 @@ static int hyperv_init_vcpu(X86CPU *cpu)
-> }
->=20
-> static Error *invtsc_mig_blocker;
-> -static Error *nested_virt_mig_blocker;
->=20
-> #define KVM_MAX_CPUID_ENTRIES  100
->=20
-> @@ -1640,22 +1644,6 @@ int kvm_arch_init_vcpu(CPUState *cs)
->                                   !!(c->ecx & CPUID_EXT_SMX);
->     }
->=20
-> -    if (cpu_has_vmx(env) && !nested_virt_mig_blocker &&
-> -        ((kvm_max_nested_state_length() <=3D 0) || =
-!has_exception_payload)) {
-> -        error_setg(&nested_virt_mig_blocker,
-> -                   "Kernel do not provide required capabilities for "
-> -                   "nested virtualization migration. "
-> -                   "(CAP_NESTED_STATE=3D%d, =
-CAP_EXCEPTION_PAYLOAD=3D%d)",
-> -                   kvm_max_nested_state_length() > 0,
-> -                   has_exception_payload);
-> -        r =3D migrate_add_blocker(nested_virt_mig_blocker, =
-&local_err);
-> -        if (local_err) {
-> -            error_report_err(local_err);
-> -            error_free(nested_virt_mig_blocker);
-> -            return r;
-> -        }
-> -    }
-> -
->     if (env->mcg_cap & MCG_LMCE_P) {
->         has_msr_mcg_ext_ctl =3D has_msr_feature_control =3D true;
->     }
-> @@ -1670,7 +1658,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
->             if (local_err) {
->                 error_report_err(local_err);
->                 error_free(invtsc_mig_blocker);
-> -                goto fail2;
-> +                return r;
->             }
->         }
->     }
-> @@ -1741,8 +1729,6 @@ int kvm_arch_init_vcpu(CPUState *cs)
->=20
->  fail:
->     migrate_del_blocker(invtsc_mig_blocker);
-> - fail2:
-> -    migrate_del_blocker(nested_virt_mig_blocker);
->=20
->     return r;
-> }
-> diff --git a/target/i386/kvm_i386.h b/target/i386/kvm_i386.h
-> index 3057ba4f7d19..06fe06bdb3d6 100644
-> --- a/target/i386/kvm_i386.h
-> +++ b/target/i386/kvm_i386.h
-> @@ -35,6 +35,7 @@
-> bool kvm_allows_irq0_override(void);
-> bool kvm_has_smm(void);
-> bool kvm_has_adjust_clock_stable(void);
-> +bool kvm_has_exception_payload(void);
-> void kvm_synchronize_all_tsc(void);
-> void kvm_arch_reset_vcpu(X86CPU *cs);
-> void kvm_arch_do_init_vcpu(X86CPU *cs);
-> diff --git a/target/i386/machine.c b/target/i386/machine.c
-> index 20bda9f80154..c04021937722 100644
-> --- a/target/i386/machine.c
-> +++ b/target/i386/machine.c
-> @@ -7,6 +7,7 @@
-> #include "hw/isa/isa.h"
-> #include "migration/cpu.h"
-> #include "hyperv.h"
-> +#include "kvm_i386.h"
->=20
-> #include "sysemu/kvm.h"
-> #include "sysemu/tcg.h"
-> @@ -232,10 +233,25 @@ static int cpu_pre_save(void *opaque)
->     }
->=20
-> #ifdef CONFIG_KVM
-> -    /* Verify we have nested virtualization state from kernel if =
-required */
-> -    if (kvm_enabled() && cpu_has_vmx(env) && !env->nested_state) {
-> -        error_report("Guest enabled nested virtualization but kernel =
-"
-> -                "does not support saving of nested state");
-> +    /*
-> +     * In case vCPU may have enabled VMX, we need to make sure kernel =
-have
-> +     * required capabilities in order to perform migration correctly:
-> +     *
-> +     * 1) We must be able to extract vCPU nested-state from KVM.
-> +     *
-> +     * 2) In case vCPU is running in guest-mode and it has a pending =
-exception,
-> +     * we must be able to determine if it's in a pending or injected =
-state.
-> +     * Note that in case KVM don't have required capability to do so,
-> +     * a pending/injected exception will always appear as an
-> +     * injected exception.
-> +     */
-> +    if (kvm_enabled() && cpu_vmx_maybe_enabled(env) &&
-> +        (!env->nested_state ||
-> +         (!kvm_has_exception_payload() && (env->hflags & =
-HF_GUEST_MASK) &&
-> +          env->exception_injected))) {
-> +        error_report("Guest maybe enabled nested virtualization but =
-kernel "
-> +                "does not support required capabilities to save vCPU =
-"
-> +                "nested state");
->         return -EINVAL;
->     }
-> #endif
-> --=20
-> 2.20.1
->=20
+-- =
 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1836501
+
+Title:
+  cpu_address_space_init fails with assertion
+
+Status in QEMU:
+  Confirmed
+
+Bug description:
+  qemu-system-arm does not start with version >=3D 2.6 and KVM enabled.
+
+    cpu_address_space_init: Assertion `asidx =3D=3D 0 || !kvm_enabled()'
+  failed.
+
+  Hardware is Odroid XU4 with Exynos with 4.9.61+ Tested with Debian
+  Stretch (9) or Buster (10).
+
+  Without KVM it is running fine but slow. I'm operating Debian Jessie
+  with qemu 2.1 for a long time with KVM virtualization working
+  flawlessly. When I upgraded to Stretch I ran into the trouble
+  described before. I tried Debian Stretch and Buster with all Kernels
+  provided by the Board manufacturer (Hardkernel).
+
+  It seems to be related to the feature introduced in Version 2.6:
+  https://wiki.qemu.org/ChangeLog/2.6
+  - Support for a separate EL3 address space
+
+  KVM is enabled, so I assume the adress space index asidx to be causing
+  the assert to fail.
+
+  dmesg | grep -i KVM
+  [    0.741714] kvm [1]: 8-bit VMID
+  [    0.741721] kvm [1]: IDMAP page: 40201000
+  [    0.741729] kvm [1]: HYP VA range: c0000000:ffffffff
+  [    0.742543] kvm [1]: Hyp mode initialized successfully
+  [    0.742600] kvm [1]: vgic-v2@10484000
+  [    0.742924] kvm [1]: vgic interrupt IRQ16
+  [    0.742943] kvm [1]: virtual timer IRQ60
+
+  Full command line is:
+  qemu-system-arm -M vexpress-a15 -smp 2 -m 512 -cpu host -enable-kvm -kern=
+el vmlinuz -initrd initrd.gz -dtb vexpress-v2p-ca15-tc1.dtb -device virtio-=
+blk-device,drive=3Dinst-blk -drive file=3DPATHTOFILE,id=3Dinst-blk,if=3Dnon=
+e,format=3Draw -append "vga=3Dnormal rw console=3DttyAMA0" -nographic
+
+  Is there anything to do to understand, if this is a hardware related
+  failure or probably just a missing parameter?
+
+  Regards
+
+  Lutz
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1836501/+subscriptions
 
