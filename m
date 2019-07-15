@@ -2,78 +2,92 @@ Return-Path: <SRS0=IjNW=VM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EAD7AC7618F
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 11:53:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71134C7618F
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 11:58:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C174420665
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 11:53:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C174420665
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3B4D220665
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 11:58:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AklWyRHj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B4D220665
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37512 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37566 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hmzXP-0008QS-Vi
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 07:52:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56033)
+	id 1hmzd6-0001Oq-AA
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 07:58:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57406)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hmzXF-00082A-1p
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 07:52:50 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hmzcv-0000zC-Pf
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 07:58:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hmzXE-0005ED-02
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 07:52:49 -0400
-Received: from mail-wm1-f54.google.com ([209.85.128.54]:36585)
+ (envelope-from <alex.bennee@linaro.org>) id 1hmzcu-00013q-NF
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 07:58:41 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:41405)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hmzXD-0005Di-PK
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 07:52:47 -0400
-Received: by mail-wm1-f54.google.com with SMTP id g67so10776246wme.1
- for <qemu-devel@nongnu.org>; Mon, 15 Jul 2019 04:52:47 -0700 (PDT)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1hmzcu-00012z-AY
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 07:58:40 -0400
+Received: by mail-wr1-x442.google.com with SMTP id c2so13585175wrm.8
+ for <qemu-devel@nongnu.org>; Mon, 15 Jul 2019 04:58:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=sZfBwA6NtXGrHLu0g6t4gncZSEl3o2NEfRySe4WJ/qw=;
+ b=AklWyRHjUkPW28QK4c4pDqRUemLAtoHvPCCQFsYTO/m4rMiXxd6DHoxq5jTpWanbTe
+ O2e4NQdauvxRWfQPRbfSoM3KgQOQm9fNIzd0VbuS5mLbWS1itqQdlgI6XY05x8GtGEVK
+ kmiTKWf05gvXQ7e+PSBjh6eeURc8HG4S6gEePkZ6doztBHmv18n0KhID/E55EPFVlhNg
+ JnOwDSSwuUGtWHsy9Dwyi3Fc1iLIP0Rr97Hmscjv/RScj6s5Kj30ULLgMn37z5PBfkTD
+ USpc5WPRh9AvZSif8OWGbp3hqxds73sNafFCOalEBfDYBkgGo0o5OFr6sPjy/IHxdY7Q
+ Trrw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=X5Zp1CgD8ClbnMdeRMQXVuyThgUxcd/r3FZac8hfqmk=;
- b=H6prDYO6bgPgyjADkcRYK32STeiSOtQF6ZyL32V+PHOITWqEJZxDXGoJP5Qkph6dEn
- 8FScZdiKd10Xq9EmV36j/hpbvpDBTUpa9iONKuLzqEXF49M9UtpT8tnsdUefMioRvgMp
- 8TwjUYV2dMx5rF+ZrIdi3p7QaGdUv8FhRjlhHWdf+anIPiPz7wHCEM8AM+UAG1gEC4EY
- /768FCRW4XZ0ovTthiCB17qiLY/4WcayXKo58T7DNZaxd8umyp5VGkS0aWpqyYNar494
- oHC/4/moz0U0vOfbUEPiQuCyj8lnWiXo1FmPI7FpDUFHAQhRAp0ojGHZMYC6AF2bYeIU
- 5ZgQ==
-X-Gm-Message-State: APjAAAUQIpbeYxoCJdHQDB5w0uQN0TntMtQ21cq0ULRGdQ+5UOJQNvR7
- cgTnL+UOFkp4NYIGphxXLGVV0Q==
-X-Google-Smtp-Source: APXvYqyELJOtwz48GtfvEvBSR2coVZgJxPH53lQGs4CP8qvicPpxRjHjwykvJCX44RRUQCxOP65RZg==
-X-Received: by 2002:a1c:be05:: with SMTP id o5mr24845573wmf.52.1563191566761; 
- Mon, 15 Jul 2019 04:52:46 -0700 (PDT)
-Received: from [192.168.1.37] (62.red-83-42-61.dynamicip.rima-tde.net.
- [83.42.61.62])
- by smtp.gmail.com with ESMTPSA id v124sm21289919wmf.23.2019.07.15.04.52.45
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Mon, 15 Jul 2019 04:52:46 -0700 (PDT)
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-References: <20190715113939.3256-1-armbru@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <d7f33364-33dc-7b95-473d-b8d91b06395c@redhat.com>
-Date: Mon, 15 Jul 2019 13:52:45 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=sZfBwA6NtXGrHLu0g6t4gncZSEl3o2NEfRySe4WJ/qw=;
+ b=o4K4npW2pxh/TJiyDPs8e3UbPwww74IIQtqdqnq6Fi74Yo5FqFejh/7j49bT+jpNXE
+ SiuhYkhwc13RVHgUXFjnZFbxPH3RFj40jn65n6A2EtIShakDTnH3FGOO67P+TaywUb7e
+ 4EYGupp6wa/cxIiFnDu8p6jniX56j99b6BDlfkmxWPSteuNh1poiP7qnPMOqQEXRTf8H
+ uSwjWaHSUbmCMdFoLqgjvg1w/1gB/oxbB/BNNkbo5ULHy29QrPL/X656S479/jMdjkzs
+ v8MHkLOAUNcDmpn8oN9k/tytnlPopi3wcNIHeFS0I1LiksiQ/xQGncyQqjAqKIGVyeYP
+ bJGg==
+X-Gm-Message-State: APjAAAUTrJHHYIi/3hU7IWaGe5eCvmrFN5jGQk1LgFlB23dnvjOCvh7C
+ x2uF1bkOFgl7DFLQA6DG6hs3cHs0kfE=
+X-Google-Smtp-Source: APXvYqxbjYTG8ZIHYNXe7faoS8x/sKzjSz25bZjy2n74JhojgV0IxIJ8nJqfhNMH2dXOTb9FUqfhpQ==
+X-Received: by 2002:adf:f28a:: with SMTP id k10mr29874618wro.343.1563191917884; 
+ Mon, 15 Jul 2019 04:58:37 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+ by smtp.gmail.com with ESMTPSA id r15sm17029197wrj.68.2019.07.15.04.58.36
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Mon, 15 Jul 2019 04:58:36 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id A3ED61FF87;
+ Mon, 15 Jul 2019 12:58:36 +0100 (BST)
+References: <20190530101603.22254-1-alex.bennee@linaro.org>
+ <20190530101603.22254-4-alex.bennee@linaro.org>
+ <87imthsps2.fsf@zen.linaroharston>
+ <f73a55a4-57c7-3234-a85b-21cf3c758ea2@redhat.com>
+User-agent: mu4e 1.3.3; emacs 26.1
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Thomas Huth <thuth@redhat.com>
+In-reply-to: <f73a55a4-57c7-3234-a85b-21cf3c758ea2@redhat.com>
+Date: Mon, 15 Jul 2019 12:58:36 +0100
+Message-ID: <87muhfv79v.fsf@zen.linaroharston>
 MIME-Version: 1.0
-In-Reply-To: <20190715113939.3256-1-armbru@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.128.54
-Subject: Re: [Qemu-devel] [PATCH] include: Make headers more self-contained
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::442
+Subject: Re: [Qemu-devel] [PATCH v1 03/26] tests: Run the iotests during
+ "make check" again
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,40 +99,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, richard.henderson@linaro.org, pbonzini@redhat.com
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/15/19 1:39 PM, Markus Armbruster wrote:
-> Back in 2016, we discussed[1] rules for headers, and these were
-> generally liked:
-> 
-> 1. Have a carefully curated header that's included everywhere first.  We
->    got that already thanks to Peter: osdep.h.
-> 
-> 2. Headers should normally include everything they need beyond osdep.h.
->    If exceptions are needed for some reason, they must be documented in
->    the header.  If all that's needed from a header is typedefs, put
->    those into qemu/typedefs.h instead of including the header.
-> 
-> 3. Cyclic inclusion is forbidden.
-> 
-> This patch gets include/ closer to obeying 2.
 
-A step forward using precompiled headers?
+Thomas Huth <thuth@redhat.com> writes:
 
-https://gcc.gnu.org/onlinedocs/gcc/Precompiled-Headers.html
+> On 07/06/2019 11.33, Alex Benn=C3=A9e wrote:
+>>
+>> Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
+>>
+>>> From: Thomas Huth <thuth@redhat.com>
+>>>
+>>> People often forget to run the iotests before submitting patches or
+>>> pull requests - this is likely due to the fact that we do not run the
+>>> tests during our mandatory "make check" tests yet. Now that we've got
+>>> a proper "auto" group of iotests that should be fine to run in every
+>>> environment, we can enable the iotests during "make check" again by
+>>> running the "auto" tests by default from the check-block.sh script.
+>>>
+>>> Some cases still need to be checked first, though: iotests need bash
+>>> and GNU sed (otherwise they fail), and if gprof is enabled, it spoils
+>>> the output of some test cases causing them to fail. So if we detect
+>>> that one of the required programs is missing or that gprof is enabled,
+>>> we still have to skip the iotests to avoid failures.
+>>
+>> Thomas,
+>>
+>> I've dropped this from the latest PR because I'm still seeing problems
+>> in some places. One of the issues is tests failing when the underlying
+>> file system doesn't support O_DIRECT. Some tests seem to have explicit
+>> feature checks for this but others just fail.
+>
+> Ok, back at the keyboard, I'm now working on a patch that removes more
+> tests from the "auto" group. Do you happen to have a list of the tests
+> that were failing for you?
 
-> 
-> It's actually extracted from my "[RFC] Baby steps towards saner
-> headers" series[2], which demonstrates a possible path towards
-> checking 2 automatically.  It passes the RFC test there.
-> 
-> [1] Message-ID: <87h9g8j57d.fsf@blackfin.pond.sub.org>
->     https://lists.nongnu.org/archive/html/qemu-devel/2016-03/msg03345.html
-> [2] Message-Id: <20190711122827.18970-1-armbru@redhat.com>
->     https://lists.nongnu.org/archive/html/qemu-devel/2019-07/msg02715.html
-> 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+  Not run: 045 059 064 070 075 077 078 081 084 088 092 094 101 106 113 116 =
+119 123 128 131 146 148 160 162 171 175 211 212 213 221 225 231 233 237 239=
+ 241 253
+  Some cases not run in: 139
+  Failures: 082 102 243 250
+  Failed 4 of 138 tests
+  /home/alex.bennee/lsrc/qemu.git/tests/Makefile.include:1095: recipe for t=
+arget 'check-tests/qemu-iotests-quick.sh' failed
+
+> Or can you tell me which file systems do not support O_DIRECT, so I can
+> check it on my own?
+
+ZFS on Linux:
+
+  hackpool-0/home/alex.bennee on /home/alex.bennee type zfs (rw,nosuid,node=
+v,noatime,xattr,noacl)
+
+>
+>  Thomas
+
+
+--
+Alex Benn=C3=A9e
 
