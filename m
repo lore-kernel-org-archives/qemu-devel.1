@@ -6,56 +6,56 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6894C7618F
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 13:54:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6198EC76195
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 13:54:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ADD75217D9
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 13:54:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ADD75217D9
+	by mail.kernel.org (Postfix) with ESMTPS id 3DC7B217D9
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 13:54:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3DC7B217D9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39006 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39004 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hn1RM-00047D-Kv
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 09:54:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54102)
+	id 1hn1RN-00045p-49
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 09:54:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54168)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <quintela@redhat.com>) id 1hn1PI-0003Eh-Cz
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 09:52:45 -0400
+ (envelope-from <quintela@redhat.com>) id 1hn1PV-0004FJ-O1
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 09:52:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <quintela@redhat.com>) id 1hn1PG-0003YY-Ti
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 09:52:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42282)
+ (envelope-from <quintela@redhat.com>) id 1hn1PU-0003fk-4R
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 09:52:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46460)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1hn1PG-0003YA-LU
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 09:52:42 -0400
+ (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1hn1PT-0003fL-Sg
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 09:52:56 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 01B39307CDD1;
- Mon, 15 Jul 2019 13:52:42 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 3A100882F2;
+ Mon, 15 Jul 2019 13:52:55 +0000 (UTC)
 Received: from localhost.localdomain (unknown [10.36.118.16])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A1ABF5B683;
- Mon, 15 Jul 2019 13:52:33 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6CC175B681;
+ Mon, 15 Jul 2019 13:52:50 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Mon, 15 Jul 2019 15:51:16 +0200
-Message-Id: <20190715135125.17770-13-quintela@redhat.com>
+Date: Mon, 15 Jul 2019 15:51:19 +0200
+Message-Id: <20190715135125.17770-16-quintela@redhat.com>
 In-Reply-To: <20190715135125.17770-1-quintela@redhat.com>
 References: <20190715135125.17770-1-quintela@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Mon, 15 Jul 2019 13:52:42 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.28]); Mon, 15 Jul 2019 13:52:55 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 12/21] memory: Introduce memory listener hook
- log_clear()
+Subject: [Qemu-devel] [PULL 15/21] kvm: Introduce slots lock for memory
+ listener
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,228 +77,250 @@ Sender: "Qemu-devel"
 
 From: Peter Xu <peterx@redhat.com>
 
-Introduce a new memory region listener hook log_clear() to allow the
-listeners to hook onto the points where the dirty bitmap is cleared by
-the bitmap users.
+Introduce KVMMemoryListener.slots_lock to protect the slots inside the
+kvm memory listener.  Currently it is close to useless because all the
+KVM code path now is always protected by the BQL.  But it'll start to
+make sense in follow up patches where we might do remote dirty bitmap
+clear and also we'll update the per-slot cached dirty bitmap even
+without the BQL.  So let's prepare for it.
 
-Previously log_sync() contains two operations:
-
-  - dirty bitmap collection, and,
-  - dirty bitmap clear on remote site.
-
-Let's take KVM as example - log_sync() for KVM will first copy the
-kernel dirty bitmap to userspace, and at the same time we'll clear the
-dirty bitmap there along with re-protecting all the guest pages again.
-
-We add this new log_clear() interface only to split the old log_sync()
-into two separated procedures:
-
-  - use log_sync() to collect the collection only, and,
-  - use log_clear() to clear the remote dirty bitmap.
-
-With the new interface, the memory listener users will still be able
-to decide how to implement the log synchronization procedure, e.g.,
-they can still only provide log_sync() method only and put all the two
-procedures within log_sync() (that's how the old KVM works before
-KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2 is introduced).  However with this
-new interface the memory listener users will start to have a chance to
-postpone the log clear operation explicitly if the module supports.
-That can really benefit users like KVM at least for host kernels that
-support KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2.
-
-There are three places that can clear dirty bits in any one of the
-dirty bitmap in the ram_list.dirty_memory[3] array:
-
-        cpu_physical_memory_snapshot_and_clear_dirty
-        cpu_physical_memory_test_and_clear_dirty
-        cpu_physical_memory_sync_dirty_bitmap
-
-Currently we hook directly into each of the functions to notify about
-the log_clear().
+We can also use per-slot lock for above reason but it seems to be an
+overkill.  Let's just use this bigger one (which covers all the slots
+of a single address space) but anyway this lock is still much smaller
+than the BQL.
 
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Juan Quintela <quintela@redhat.com>
 Signed-off-by: Peter Xu <peterx@redhat.com>
-Message-Id: <20190603065056.25211-7-peterx@redhat.com>
+Message-Id: <20190603065056.25211-10-peterx@redhat.com>
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- exec.c                  | 12 ++++++++++
- include/exec/memory.h   | 17 ++++++++++++++
- include/exec/ram_addr.h |  3 +++
- memory.c                | 51 +++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 83 insertions(+)
+ accel/kvm/kvm-all.c      | 58 +++++++++++++++++++++++++++++++---------
+ include/sysemu/kvm_int.h |  2 ++
+ 2 files changed, 48 insertions(+), 12 deletions(-)
 
-diff --git a/exec.c b/exec.c
-index 3a00698cc0..3e78de3b8f 100644
---- a/exec.c
-+++ b/exec.c
-@@ -1358,6 +1358,8 @@ bool cpu_physical_memory_test_and_clear_dirty(ram_a=
-ddr_t start,
-     DirtyMemoryBlocks *blocks;
-     unsigned long end, page;
-     bool dirty =3D false;
-+    RAMBlock *ramblock;
-+    uint64_t mr_offset, mr_size;
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index 23ace52b9e..621c9a43ab 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -138,6 +138,9 @@ static const KVMCapabilityInfo kvm_required_capabilit=
+es[] =3D {
+     KVM_CAP_LAST_INFO
+ };
 =20
-     if (length =3D=3D 0) {
-         return false;
-@@ -1369,6 +1371,10 @@ bool cpu_physical_memory_test_and_clear_dirty(ram_=
-addr_t start,
-     rcu_read_lock();
-=20
-     blocks =3D atomic_rcu_read(&ram_list.dirty_memory[client]);
-+    ramblock =3D qemu_get_ram_block(start);
-+    /* Range sanity check on the ramblock */
-+    assert(start >=3D ramblock->offset &&
-+           start + length <=3D ramblock->offset + ramblock->used_length)=
-;
-=20
-     while (page < end) {
-         unsigned long idx =3D page / DIRTY_MEMORY_BLOCK_SIZE;
-@@ -1380,6 +1386,10 @@ bool cpu_physical_memory_test_and_clear_dirty(ram_=
-addr_t start,
-         page +=3D num;
-     }
-=20
-+    mr_offset =3D (ram_addr_t)(page << TARGET_PAGE_BITS) - ramblock->off=
-set;
-+    mr_size =3D (end - page) << TARGET_PAGE_BITS;
-+    memory_region_clear_dirty_bitmap(ramblock->mr, mr_offset, mr_size);
++#define kvm_slots_lock(kml)      qemu_mutex_lock(&(kml)->slots_lock)
++#define kvm_slots_unlock(kml)    qemu_mutex_unlock(&(kml)->slots_lock)
 +
-     rcu_read_unlock();
-=20
-     if (dirty && tcg_enabled()) {
-@@ -1435,6 +1445,8 @@ DirtyBitmapSnapshot *cpu_physical_memory_snapshot_a=
-nd_clear_dirty
-         tlb_reset_dirty_range_all(start, length);
-     }
-=20
-+    memory_region_clear_dirty_bitmap(mr, offset, length);
-+
-     return snap;
+ int kvm_get_max_memslots(void)
+ {
+     KVMState *s =3D KVM_STATE(current_machine->accelerator);
+@@ -165,6 +168,7 @@ int kvm_memcrypt_encrypt_data(uint8_t *ptr, uint64_t =
+len)
+     return 1;
  }
 =20
-diff --git a/include/exec/memory.h b/include/exec/memory.h
-index 70d6f7e451..bb0961ddb9 100644
---- a/include/exec/memory.h
-+++ b/include/exec/memory.h
-@@ -416,6 +416,7 @@ struct MemoryListener {
-     void (*log_stop)(MemoryListener *listener, MemoryRegionSection *sect=
-ion,
-                      int old, int new);
-     void (*log_sync)(MemoryListener *listener, MemoryRegionSection *sect=
-ion);
-+    void (*log_clear)(MemoryListener *listener, MemoryRegionSection *sec=
-tion);
-     void (*log_global_start)(MemoryListener *listener);
-     void (*log_global_stop)(MemoryListener *listener);
-     void (*eventfd_add)(MemoryListener *listener, MemoryRegionSection *s=
-ection,
-@@ -1269,6 +1270,22 @@ void memory_region_set_log(MemoryRegion *mr, bool =
-log, unsigned client);
- void memory_region_set_dirty(MemoryRegion *mr, hwaddr addr,
-                              hwaddr size);
++/* Called with KVMMemoryListener.slots_lock held */
+ static KVMSlot *kvm_get_free_slot(KVMMemoryListener *kml)
+ {
+     KVMState *s =3D kvm_state;
+@@ -182,10 +186,17 @@ static KVMSlot *kvm_get_free_slot(KVMMemoryListener=
+ *kml)
+ bool kvm_has_free_slot(MachineState *ms)
+ {
+     KVMState *s =3D KVM_STATE(ms->accelerator);
++    bool result;
++    KVMMemoryListener *kml =3D &s->memory_listener;
 =20
-+/**
-+ * memory_region_clear_dirty_bitmap - clear dirty bitmap for memory rang=
-e
-+ *
-+ * This function is called when the caller wants to clear the remote
-+ * dirty bitmap of a memory range within the memory region.  This can
-+ * be used by e.g. KVM to manually clear dirty log when
-+ * KVM_CAP_MANUAL_DIRTY_LOG_PROTECT is declared support by the host
-+ * kernel.
-+ *
-+ * @mr:     the memory region to clear the dirty log upon
-+ * @start:  start address offset within the memory region
-+ * @len:    length of the memory region to clear dirty bitmap
-+ */
-+void memory_region_clear_dirty_bitmap(MemoryRegion *mr, hwaddr start,
-+                                      hwaddr len);
+-    return kvm_get_free_slot(&s->memory_listener);
++    kvm_slots_lock(kml);
++    result =3D !!kvm_get_free_slot(kml);
++    kvm_slots_unlock(kml);
 +
- /**
-  * memory_region_snapshot_and_clear_dirty: Get a snapshot of the dirty
-  *                                         bitmap and clear it.
-diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
-index 1843b6f2d3..222b4338fb 100644
---- a/include/exec/ram_addr.h
-+++ b/include/exec/ram_addr.h
-@@ -462,6 +462,9 @@ uint64_t cpu_physical_memory_sync_dirty_bitmap(RAMBlo=
-ck *rb,
-                 idx++;
-             }
++    return result;
+ }
+=20
++/* Called with KVMMemoryListener.slots_lock held */
+ static KVMSlot *kvm_alloc_slot(KVMMemoryListener *kml)
+ {
+     KVMSlot *slot =3D kvm_get_free_slot(kml);
+@@ -244,18 +255,21 @@ int kvm_physical_memory_addr_from_host(KVMState *s,=
+ void *ram,
+                                        hwaddr *phys_addr)
+ {
+     KVMMemoryListener *kml =3D &s->memory_listener;
+-    int i;
++    int i, ret =3D 0;
+=20
++    kvm_slots_lock(kml);
+     for (i =3D 0; i < s->nr_slots; i++) {
+         KVMSlot *mem =3D &kml->slots[i];
+=20
+         if (ram >=3D mem->ram && ram < mem->ram + mem->memory_size) {
+             *phys_addr =3D mem->start_addr + (ram - mem->ram);
+-            return 1;
++            ret =3D 1;
++            break;
          }
-+
-+        /* TODO: split the huge bitmap into smaller chunks */
-+        memory_region_clear_dirty_bitmap(rb->mr, start, length);
-     } else {
-         ram_addr_t offset =3D rb->offset;
-=20
-diff --git a/memory.c b/memory.c
-index 71fcaf2d00..beac26e173 100644
---- a/memory.c
-+++ b/memory.c
-@@ -2064,6 +2064,57 @@ static void memory_region_sync_dirty_bitmap(Memory=
-Region *mr)
      }
++    kvm_slots_unlock(kml);
+=20
+-    return 0;
++    return ret;
  }
 =20
-+void memory_region_clear_dirty_bitmap(MemoryRegion *mr, hwaddr start,
-+                                      hwaddr len)
-+{
-+    MemoryRegionSection mrs;
-+    MemoryListener *listener;
-+    AddressSpace *as;
-+    FlatView *view;
-+    FlatRange *fr;
-+    hwaddr sec_start, sec_end, sec_size;
+ static int kvm_set_user_memory_region(KVMMemoryListener *kml, KVMSlot *s=
+lot, bool new)
+@@ -396,6 +410,7 @@ static int kvm_mem_flags(MemoryRegion *mr)
+     return flags;
+ }
+=20
++/* Called with KVMMemoryListener.slots_lock held */
+ static int kvm_slot_update_flags(KVMMemoryListener *kml, KVMSlot *mem,
+                                  MemoryRegion *mr)
+ {
+@@ -414,19 +429,26 @@ static int kvm_section_update_flags(KVMMemoryListen=
+er *kml,
+ {
+     hwaddr start_addr, size;
+     KVMSlot *mem;
++    int ret =3D 0;
+=20
+     size =3D kvm_align_section(section, &start_addr);
+     if (!size) {
+         return 0;
+     }
+=20
++    kvm_slots_lock(kml);
 +
-+    QTAILQ_FOREACH(listener, &memory_listeners, link) {
-+        if (!listener->log_clear) {
-+            continue;
-+        }
-+        as =3D listener->address_space;
-+        view =3D address_space_get_flatview(as);
-+        FOR_EACH_FLAT_RANGE(fr, view) {
-+            if (!fr->dirty_log_mask || fr->mr !=3D mr) {
-+                /*
-+                 * Clear dirty bitmap operation only applies to those
-+                 * regions whose dirty logging is at least enabled
-+                 */
-+                continue;
-+            }
+     mem =3D kvm_lookup_matching_slot(kml, start_addr, size);
+     if (!mem) {
+         /* We don't have a slot if we want to trap every access. */
+-        return 0;
++        goto out;
+     }
+=20
+-    return kvm_slot_update_flags(kml, mem, section->mr);
++    ret =3D kvm_slot_update_flags(kml, mem, section->mr);
 +
-+            mrs =3D section_from_flat_range(fr, view);
++out:
++    kvm_slots_unlock(kml);
++    return ret;
+ }
+=20
+ static void kvm_log_start(MemoryListener *listener,
+@@ -483,6 +505,8 @@ static int kvm_get_dirty_pages_log_range(MemoryRegion=
+Section *section,
+  * This function will first try to fetch dirty bitmap from the kernel,
+  * and then updates qemu's dirty bitmap.
+  *
++ * NOTE: caller must be with kml->slots_lock held.
++ *
+  * @kml: the KVM memory listener object
+  * @section: the memory section to sync the dirty bitmap with
+  */
+@@ -493,13 +517,14 @@ static int kvm_physical_sync_dirty_bitmap(KVMMemory=
+Listener *kml,
+     struct kvm_dirty_log d =3D {};
+     KVMSlot *mem;
+     hwaddr start_addr, size;
++    int ret =3D 0;
+=20
+     size =3D kvm_align_section(section, &start_addr);
+     if (size) {
+         mem =3D kvm_lookup_matching_slot(kml, start_addr, size);
+         if (!mem) {
+             /* We don't have a slot if we want to trap every access. */
+-            return 0;
++            goto out;
+         }
+=20
+         /* XXX bad kernel interface alert
+@@ -525,13 +550,14 @@ static int kvm_physical_sync_dirty_bitmap(KVMMemory=
+Listener *kml,
+         d.slot =3D mem->slot | (kml->as_id << 16);
+         if (kvm_vm_ioctl(s, KVM_GET_DIRTY_LOG, &d) =3D=3D -1) {
+             DPRINTF("ioctl failed %d\n", errno);
+-            return -1;
++            ret =3D -1;
++            goto out;
+         }
+=20
+         kvm_get_dirty_pages_log_range(section, d.dirty_bitmap);
+     }
+-
+-    return 0;
++out:
++    return ret;
+ }
+=20
+ static void kvm_coalesce_mmio_region(MemoryListener *listener,
+@@ -793,10 +819,12 @@ static void kvm_set_phys_mem(KVMMemoryListener *kml=
+,
+     ram =3D memory_region_get_ram_ptr(mr) + section->offset_within_regio=
+n +
+           (start_addr - section->offset_within_address_space);
+=20
++    kvm_slots_lock(kml);
 +
-+            sec_start =3D MAX(mrs.offset_within_region, start);
-+            sec_end =3D mrs.offset_within_region + int128_get64(mrs.size=
-);
-+            sec_end =3D MIN(sec_end, start + len);
+     if (!add) {
+         mem =3D kvm_lookup_matching_slot(kml, start_addr, size);
+         if (!mem) {
+-            return;
++            goto out;
+         }
+         if (mem->flags & KVM_MEM_LOG_DIRTY_PAGES) {
+             kvm_physical_sync_dirty_bitmap(kml, section);
+@@ -813,7 +841,7 @@ static void kvm_set_phys_mem(KVMMemoryListener *kml,
+                     __func__, strerror(-err));
+             abort();
+         }
+-        return;
++        goto out;
+     }
+=20
+     /* register the new slot */
+@@ -829,6 +857,9 @@ static void kvm_set_phys_mem(KVMMemoryListener *kml,
+                 strerror(-err));
+         abort();
+     }
 +
-+            if (sec_start >=3D sec_end) {
-+                /*
-+                 * If this memory region section has no intersection
-+                 * with the requested range, skip.
-+                 */
-+                continue;
-+            }
-+
-+            /* Valid case; shrink the section if needed */
-+            mrs.offset_within_address_space +=3D
-+                sec_start - mrs.offset_within_region;
-+            mrs.offset_within_region =3D sec_start;
-+            sec_size =3D sec_end - sec_start;
-+            mrs.size =3D int128_make64(sec_size);
-+            listener->log_clear(listener, &mrs);
-+        }
-+        flatview_unref(view);
-+    }
-+}
-+
- DirtyBitmapSnapshot *memory_region_snapshot_and_clear_dirty(MemoryRegion=
- *mr,
-                                                             hwaddr addr,
-                                                             hwaddr size,
++out:
++    kvm_slots_unlock(kml);
+ }
+=20
+ static void kvm_region_add(MemoryListener *listener,
+@@ -855,7 +886,9 @@ static void kvm_log_sync(MemoryListener *listener,
+     KVMMemoryListener *kml =3D container_of(listener, KVMMemoryListener,=
+ listener);
+     int r;
+=20
++    kvm_slots_lock(kml);
+     r =3D kvm_physical_sync_dirty_bitmap(kml, section);
++    kvm_slots_unlock(kml);
+     if (r < 0) {
+         abort();
+     }
+@@ -939,6 +972,7 @@ void kvm_memory_listener_register(KVMState *s, KVMMem=
+oryListener *kml,
+ {
+     int i;
+=20
++    qemu_mutex_init(&kml->slots_lock);
+     kml->slots =3D g_malloc0(s->nr_slots * sizeof(KVMSlot));
+     kml->as_id =3D as_id;
+=20
+diff --git a/include/sysemu/kvm_int.h b/include/sysemu/kvm_int.h
+index 687a2ee423..31df465fdc 100644
+--- a/include/sysemu/kvm_int.h
++++ b/include/sysemu/kvm_int.h
+@@ -27,6 +27,8 @@ typedef struct KVMSlot
+=20
+ typedef struct KVMMemoryListener {
+     MemoryListener listener;
++    /* Protects the slots and all inside them */
++    QemuMutex slots_lock;
+     KVMSlot *slots;
+     int as_id;
+ } KVMMemoryListener;
 --=20
 2.21.0
 
