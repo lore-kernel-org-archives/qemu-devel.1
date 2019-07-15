@@ -3,48 +3,48 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C540C7618F
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 16:00:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81ADBC76191
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 16:00:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0EC56205ED
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 16:00:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0EC56205ED
+	by mail.kernel.org (Postfix) with ESMTPS id 5994D205ED
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 16:00:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5994D205ED
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40400 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40418 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hn3P0-000062-Qj
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 12:00:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55211)
+	id 1hn3P7-0000SA-US
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 12:00:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55222)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bounces@canonical.com>) id 1hn3OU-0007RD-Lu
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 12:00:03 -0400
+ (envelope-from <bounces@canonical.com>) id 1hn3OW-0007Rt-JZ
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 12:00:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1hn3OS-0003Xf-QF
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 12:00:01 -0400
-Received: from indium.canonical.com ([91.189.90.7]:42270)
+ (envelope-from <bounces@canonical.com>) id 1hn3OS-0003XZ-Pw
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 12:00:02 -0400
+Received: from indium.canonical.com ([91.189.90.7]:42262)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1hn3OS-0003We-EB
+ id 1hn3OS-0003Wd-EW
  for qemu-devel@nongnu.org; Mon, 15 Jul 2019 12:00:00 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1hn3OR-0008Nw-9E
+ id 1hn3OR-0008Nv-2r
  for <qemu-devel@nongnu.org>; Mon, 15 Jul 2019 15:59:59 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 451A02E8055
- for <qemu-devel@nongnu.org>; Mon, 15 Jul 2019 15:59:59 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id F28342E80CD
+ for <qemu-devel@nongnu.org>; Mon, 15 Jul 2019 15:59:58 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 15 Jul 2019 15:49:46 -0000
-From: Thomas Huth <1606708@bugs.launchpad.net>
+Date: Mon, 15 Jul 2019 15:46:50 -0000
+From: Thomas Huth <1606899@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
@@ -52,21 +52,21 @@ X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: josem11200 th-huth
-X-Launchpad-Bug-Reporter: =?utf-8?q?Jos=C3=A9_Miguel_=28josem11200=29?=
+X-Launchpad-Bug-Commenters: freddy77 lersek th-huth
+X-Launchpad-Bug-Reporter: Frediano Ziglio (freddy77)
 X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
-References: <20160726215226.16940.44257.malonedeb@wampee.canonical.com>
-Message-Id: <156320578666.15671.5318504744964181470.malone@soybean.canonical.com>
+References: <20160727115911.17233.55909.malonedeb@wampee.canonical.com>
+Message-Id: <156320561090.15950.10825987454305750615.malone@soybean.canonical.com>
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com); Revision="19007";
  Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 119407b4fb552c547c505f07f947bd94342a29e6
+X-Launchpad-Hash: 6848c7125f9c6708a791eb8ba23932a6fbc8d859
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1606708] Re: QEMU crashes when switching consoles
- using SDL
+Subject: [Qemu-devel] [Bug 1606899] Re: virtio-vga does not let guest
+ poweroff properly
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 List-Id: <qemu-devel.nongnu.org>
@@ -77,13 +77,12 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1606708 <1606708@bugs.launchpad.net>
+Reply-To: Bug 1606899 <1606899@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I think this should be fixed with the latest version of QEMU ... or can
-you still reproduce this issue with the latest version?
+Can you still reproduce this problem with the latest version of QEMU?
 
 ** Changed in: qemu
        Status: New =3D> Incomplete
@@ -92,43 +91,78 @@ you still reproduce this issue with the latest version?
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1606708
+https://bugs.launchpad.net/bugs/1606899
 
 Title:
-  QEMU crashes when switching consoles using SDL
+  virtio-vga does not let guest poweroff properly
 
 Status in QEMU:
   Incomplete
 
 Bug description:
-  I've trying to use QEMU with SDL, and I noticed that it doesn't behave
-  well, specially when switching from VGA to any console. Resuming,
-  switching is erratic when using SDL, and its effects go from creating
-  a new window, doing nothing, showing a window that disappears
-  inmediately or even crash.
+  I have a VM running rawhide (Fedora development) and I can't poweroff
+  the machine when I enable virtio-vga. Reboot works correctly. Using
+  QXL works also. The machine arrive to print the "Powering off" message
+  (from Linux kernel) but then hangs.
 
-  Tested with:
-  Arch Linux with all packages updated (2016/7/26)
-  TWM as window manager
-  QEMU (both stable 2.6.0-1 and latest git commit f49ee63)
-  Command: qemu-system-x86_64 -display sdl
+  The command line is
 
-  sdl2 version 2.0.4-2
+  /usr/bin/qemu-system-x86_64 -machine accel=3Dkvm -name rawhide -machine
+  pc-i440fx-2.3,accel=3Dkvm,usb=3Doff -cpu Haswell-noTSX -m 2048 -realtime
+  mlock=3Doff -smp 2,sockets=3D2,cores=3D1,threads=3D1 -uuid
+  64216421-aec4-4ce4-aa52-aed9e4e31a1c -no-user-config -nodefaults
+  -chardev
+  socket,id=3Dcharmonitor,path=3D/var/lib/libvirt/qemu/rawhide.monitor,serv=
+er,nowait
+  -mon chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol -rtc
+  base=3Dutc,driftfix=3Dslew -global kvm-pit.lost_tick_policy=3Ddiscard -no-
+  hpet -no-shutdown -global PIIX4_PM.disable_s3=3D1 -global
+  PIIX4_PM.disable_s4=3D1 -boot strict=3Don -device ich9-usb-
+  ehci1,id=3Dusb,bus=3Dpci.0,addr=3D0x6.0x7 -device ich9-usb-
+  uhci1,masterbus=3Dusb.0,firstport=3D0,bus=3Dpci.0,multifunction=3Don,addr=
+=3D0x6
+  -device ich9-usb-
+  uhci2,masterbus=3Dusb.0,firstport=3D2,bus=3Dpci.0,addr=3D0x6.0x1 -device =
+ich9
+  -usb-uhci3,masterbus=3Dusb.0,firstport=3D4,bus=3Dpci.0,addr=3D0x6.0x2 -de=
+vice
+  virtio-serial-pci,id=3Dvirtio-serial0,bus=3Dpci.0,addr=3D0x5 -drive
+  file=3D/home/rawhide.qcow2,if=3Dnone,id=3Ddrive-virtio-disk0,format=3Dqco=
+w2
+  -device virtio-blk-pci,scsi=3Doff,bus=3Dpci.0,addr=3D0x7,drive=3Ddrive-vi=
+rtio-
+  disk0,id=3Dvirtio-disk0,bootindex=3D1 -drive if=3Dnone,id=3Ddrive-
+  ide0-0-0,readonly=3Don -device ide-cd,bus=3Dide.0,unit=3D0,drive=3Ddrive-
+  ide0-0-0,id=3Dide0-0-0 -netdev user,id=3Dhostnet0 -device virtio-net-
+  pci,netdev=3Dhostnet0,id=3Dnet0,mac=3D52:54:00:fc:11:43,bus=3Dpci.0,addr=
+=3D0x3
+  -chardev pty,id=3Dcharserial0 -device isa-
+  serial,chardev=3Dcharserial0,id=3Dserial0 -chardev
+  socket,id=3Dcharchannel0,path=3D/var/lib/libvirt/qemu/channel/target/rawh=
+ide.org.qemu.guest_agent.0,server,nowait
+  -device virtserialport,bus=3Dvirtio-
+  serial0.0,nr=3D1,chardev=3Dcharchannel0,id=3Dchannel0,name=3Dorg.qemu.gue=
+st_agent.0
+  -chardev spicevmc,id=3Dcharchannel1,name=3Dvdagent -device
+  virtserialport,bus=3Dvirtio-
+  serial0.0,nr=3D2,chardev=3Dcharchannel1,id=3Dchannel1,name=3Dcom.redhat.s=
+pice.0
+  -device usb-tablet,id=3Dinput0 -spice ipv4,addr=3D0.0.0.0,port=3D5900
+  ,disable-ticketing,image-compression=3Dlz,seamless-migration=3Don
+  ,streaming-video=3Dfilter -device virtio-vga,bus=3Dpci.0,addr=3D0x2 -devi=
+ce
+  intel-hda,id=3Dsound0,bus=3Dpci.0,addr=3D0x4 -device hda-
+  duplex,id=3Dsound0-codec0,bus=3Dsound0.0,cad=3D0 -chardev
+  spicevmc,id=3Dcharredir0,name=3Dusbredir -device usb-
+  redir,chardev=3Dcharredir0,id=3Dredir0 -chardev
+  spicevmc,id=3Dcharredir1,name=3Dusbredir -device usb-
+  redir,chardev=3Dcharredir1,id=3Dredir1 -device virtio-balloon-
+  pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x8 -msg timestamp=3Don
 
-  How to reproduce:
-  1. Open QEMU with the given command
-  2. Try to switch console (Ctrl-Alt-2 for example)
+  I though was due to Virgl but disabling it does not change.
 
-  Expected behaviour:
-  As in GTK, the window should now show the desired console
-
-  Actual behaviour:
-  Here I have to say I can't explain it very well. Almost always it just cr=
-eates a new window that shows the desired console, but it is closed inmedia=
-tley. If not, it opens a new window that keeps open, and it sometimes is re=
-sponsive, but further attempts to switch consoles end causing a crash, and =
-QEMU has to be SIGKILLed
+  I'm using Qemu 2.6.0 from Fedora 24.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1606708/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1606899/+subscriptions
 
