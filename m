@@ -2,81 +2,110 @@ Return-Path: <SRS0=IjNW=VM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE364C7618F
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 09:25:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E0AFC7618F
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 09:31:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 95A842083D
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 09:25:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95A842083D
+	by mail.kernel.org (Postfix) with ESMTPS id 1C8812083D
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 09:31:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C8812083D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36192 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36240 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hmxEQ-0002sl-UZ
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 05:25:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50706)
+	id 1hmxKR-0004aH-S6
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 05:31:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51973)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <pbonzini@redhat.com>) id 1hmxEG-0002UG-Bi
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 05:25:05 -0400
+ (envelope-from <thuth@redhat.com>) id 1hmxKE-00046S-BV
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 05:31:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1hmxEF-0008QX-GQ
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 05:25:04 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:56277)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hmxEF-0008Q2-Al
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 05:25:03 -0400
-Received: by mail-wm1-f65.google.com with SMTP id a15so14373391wmj.5
- for <qemu-devel@nongnu.org>; Mon, 15 Jul 2019 02:25:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=sboa60kAGx4FM7+ZdR/J+yo2KeEdT1Mg8k+K0kVN7+8=;
- b=Q/6qr8twhtiVBKPlIZRuGjSqRo06sR6MiD+XDdYr72oN/6BreqUBoxfUvX5477HfTY
- WuhbcyG0Ebuxn8LVfh3Hyj3HvTEjIRUX3Bz1rbkP4Kv5XPIhcufQRnOT2nTt/B6EPNhA
- pfXao29NelTgW6VxOmyCpZ3fgINOF3ViSzT35yPh1aFoVhBKcPGpnkECANZkMG/4XH1o
- HhMCZrAzl3p/y8OUpywLFJFp9E4yKvJQ1G3Po5QHw17U7aX5PgP+D5FTRZhItS62CmRl
- yXz0eJTUbK7l+/4CV4o5RA4L3JekIrvBruX7CdgYX1l//lABR3bQBQkwgZ5LjYix1uMa
- Lcgg==
-X-Gm-Message-State: APjAAAXM8X60V5ExDGvvuGslKR7ElLpy9YT0OnBmQSfevWv5G5c0bKyF
- E34K3Fv5SCUVqvItW3lVDhjpaQ==
-X-Google-Smtp-Source: APXvYqxAtgnMbAOfPsZD6XPwZuy6QtYj9Aqb5hpyt5zQD9vzvm25PhbKiephOvksBnge8FUjjh8WBg==
-X-Received: by 2002:a05:600c:212:: with SMTP id
- 18mr23010974wmi.88.1563182702251; 
- Mon, 15 Jul 2019 02:25:02 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:e983:8394:d6:a612?
- ([2001:b07:6468:f312:e983:8394:d6:a612])
- by smtp.gmail.com with ESMTPSA id c11sm28105171wrq.45.2019.07.15.02.25.01
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Mon, 15 Jul 2019 02:25:01 -0700 (PDT)
-To: Liran Alon <liran.alon@oracle.com>, qemu-devel@nongnu.org
-References: <20190705210636.3095-1-liran.alon@oracle.com>
- <20190705210636.3095-5-liran.alon@oracle.com>
- <8423C5FD-2F44-48B8-8E1F-A2E8D62E8F2B@oracle.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
+ (envelope-from <thuth@redhat.com>) id 1hmxKD-0003eh-3d
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 05:31:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57738)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <thuth@redhat.com>)
+ id 1hmxKA-0003cl-7W; Mon, 15 Jul 2019 05:31:10 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 97DD081F11;
+ Mon, 15 Jul 2019 09:31:07 +0000 (UTC)
+Received: from thuth.remote.csb (reserved-198-198.str.redhat.com
+ [10.33.198.198])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A705D5D9D6;
+ Mon, 15 Jul 2019 09:31:06 +0000 (UTC)
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+References: <20190712173600.14554-1-mreitz@redhat.com>
+ <20190712173600.14554-8-mreitz@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
 Openpgp: preference=signencrypt
-Message-ID: <e1e48ece-b571-5229-589d-3525f505887f@redhat.com>
-Date: Mon, 15 Jul 2019 11:25:00 +0200
+Autocrypt: addr=thuth@redhat.com; keydata=
+ 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
+Organization: Red Hat
+Message-ID: <5c73228a-a6b2-31fa-a33d-0c65863acce5@redhat.com>
+Date: Mon, 15 Jul 2019 11:31:05 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <8423C5FD-2F44-48B8-8E1F-A2E8D62E8F2B@oracle.com>
+In-Reply-To: <20190712173600.14554-8-mreitz@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.25]); Mon, 15 Jul 2019 09:31:07 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.128.65
-Subject: Re: [Qemu-devel] [PATCH 4/4] target/i386: kvm: Demand nested
- migration kernel capabilities only when vCPU may have enabled VMX
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 7/7] iotests: Add test for image creation
+ fallback
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,25 +117,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Joao Martins <joao.m.martins@oracle.com>, ehabkost@redhat.com,
- kvm@vger.kernel.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 15/07/19 11:20, Liran Alon wrote:
-> Gentle ping.
-> 
-> Should this be considered to be merged into QEMU even though QEMU is now in hard freeze?
-> As it touches a mechanism which is already merged but too restricted.
+On 12/07/2019 19.36, Max Reitz wrote:
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+>  tests/qemu-iotests/259     | 61 ++++++++++++++++++++++++++++++++++++++
+>  tests/qemu-iotests/259.out | 14 +++++++++
+>  tests/qemu-iotests/group   |  1 +
+>  3 files changed, 76 insertions(+)
+>  create mode 100755 tests/qemu-iotests/259
+>  create mode 100644 tests/qemu-iotests/259.out
+>=20
+> diff --git a/tests/qemu-iotests/259 b/tests/qemu-iotests/259
+> new file mode 100755
+> index 0000000000..22b4c10241
+> --- /dev/null
+> +++ b/tests/qemu-iotests/259
+> @@ -0,0 +1,61 @@
+> +#!/usr/bin/env bash
+> +#
+> +# Test generic image creation fallback (by using NBD)
+> +#
+> +# Copyright (C) 2019 Red Hat, Inc.
+> +#
+> +# This program is free software; you can redistribute it and/or modify
+> +# it under the terms of the GNU General Public License as published by
+> +# the Free Software Foundation; either version 2 of the License, or
+> +# (at your option) any later version.
+> +#
+> +# This program is distributed in the hope that it will be useful,
+> +# but WITHOUT ANY WARRANTY; without even the implied warranty of
+> +# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> +# GNU General Public License for more details.
+> +#
+> +# You should have received a copy of the GNU General Public License
+> +# along with this program.  If not, see <http://www.gnu.org/licenses/>=
+.
+> +#
+> +
+> +# creator
+> +owner=3Dmreitz@redhat.com
+> +
+> +seq=3D$(basename $0)
+> +echo "QA output created by $seq"
+> +
+> +status=3D1	# failure is the default!
+> +
+> +_cleanup()
+> +{
+> +    _cleanup_test_img
+> +}
+> +trap "_cleanup; exit \$status" 0 1 2 3 15
+> +
+> +# get standard environment, filters and checks
+> +. ./common.rc
+> +. ./common.filter
+> +
+> +_supported_fmt raw
 
-Yes, I have it queued and will send the pull request later today.
+Why is this stating "raw" here...
 
-Paolo
+> +_supported_proto nbd
+> +_supported_os Linux
+> +
+> +
+> +_make_test_img 64M
+> +
+> +echo
+> +echo '--- Testing creation ---'
+> +
+> +$QEMU_IMG create -f qcow2 "$TEST_IMG" 64M | _filter_img_create
 
-> Anyway, I would like this to be reviewed even if it’s merged is delayed for early feedback.
-> 
-> Thanks,
-> -Liran
+... and using qcow2 here instead?
 
+> diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+> index b34c8e3c0c..80e7603174 100644
+> --- a/tests/qemu-iotests/group
+> +++ b/tests/qemu-iotests/group
+> @@ -269,3 +269,4 @@
+>  254 rw auto backing quick
+>  255 rw auto quick
+>  256 rw auto quick
+> +259 rw auto quick
+
+If this test only supports "raw", I think it should not be in the "auto"
+group anymore.
+
+ Thomas
 
