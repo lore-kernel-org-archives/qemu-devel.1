@@ -6,56 +6,56 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 031F1C7618F
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 15:23:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CDBCC76191
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 15:23:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CF1312067C
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 15:23:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF1312067C
+	by mail.kernel.org (Postfix) with ESMTPS id 6F6612067C
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 15:23:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F6612067C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40084 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40096 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hn2oi-0006GG-QF
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 11:23:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47234)
+	id 1hn2ow-0007Go-Dw
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 11:23:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47286)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hn2oP-0005Al-ID
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 11:22:46 -0400
+ (envelope-from <philmd@redhat.com>) id 1hn2oY-0005p9-FO
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 11:22:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hn2oO-0001Jy-CT
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 11:22:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54766)
+ (envelope-from <philmd@redhat.com>) id 1hn2oX-0001OA-7o
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 11:22:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37150)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <philmd@redhat.com>)
- id 1hn2oL-0001IM-UL; Mon, 15 Jul 2019 11:22:42 -0400
+ id 1hn2oU-0001Mo-PP; Mon, 15 Jul 2019 11:22:51 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 2C242308FED5;
- Mon, 15 Jul 2019 15:22:41 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id EE909811A9;
+ Mon, 15 Jul 2019 15:22:49 +0000 (UTC)
 Received: from x1w.redhat.com (unknown [10.40.205.87])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 68C086085B;
- Mon, 15 Jul 2019 15:22:35 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id EA52C6085B;
+ Mon, 15 Jul 2019 15:22:41 +0000 (UTC)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Mon, 15 Jul 2019 17:22:21 +0200
-Message-Id: <20190715152225.26135-2-philmd@redhat.com>
+Date: Mon, 15 Jul 2019 17:22:22 +0200
+Message-Id: <20190715152225.26135-3-philmd@redhat.com>
 In-Reply-To: <20190715152225.26135-1-philmd@redhat.com>
 References: <20190715152225.26135-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Mon, 15 Jul 2019 15:22:41 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.27]); Mon, 15 Jul 2019 15:22:50 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [RFC PATCH-for-4.1? v2 1/5] target/arm: Always enable
+Subject: [Qemu-devel] [RFC PATCH-for-4.1? v2 2/5] target/mips: Always enable
  CONFIG_SEMIHOSTING
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -80,99 +80,85 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The semihosting feature is always required on user-space, and
-is also used by system emulation.
+The semihosting feature is always required on user-space.
 
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- default-configs/aarch64-linux-user-common.mak | 4 ++++
- default-configs/aarch64-linux-user.mak        | 2 ++
- default-configs/aarch64_be-linux-user.mak     | 2 ++
- default-configs/arm-linux-user-common.mak     | 4 ++++
- default-configs/arm-linux-user.mak            | 2 ++
- default-configs/arm-softmmu.mak               | 4 +++-
- default-configs/armeb-linux-user.mak          | 2 ++
- 7 files changed, 19 insertions(+), 1 deletion(-)
- create mode 100644 default-configs/aarch64-linux-user-common.mak
- create mode 100644 default-configs/arm-linux-user-common.mak
+ default-configs/mips-linux-user-common.mak | 4 ++++
+ default-configs/mips-linux-user.mak        | 2 ++
+ default-configs/mips64-linux-user.mak      | 2 ++
+ default-configs/mips64el-linux-user.mak    | 2 ++
+ default-configs/mipsel-linux-user.mak      | 2 ++
+ default-configs/mipsn32-linux-user.mak     | 2 ++
+ default-configs/mipsn32el-linux-user.mak   | 2 ++
+ 7 files changed, 16 insertions(+)
+ create mode 100644 default-configs/mips-linux-user-common.mak
 
-diff --git a/default-configs/aarch64-linux-user-common.mak b/default-conf=
-igs/aarch64-linux-user-common.mak
+diff --git a/default-configs/mips-linux-user-common.mak b/default-configs=
+/mips-linux-user-common.mak
 new file mode 100644
-index 0000000000..94c0cdf826
+index 0000000000..04947706e8
 --- /dev/null
-+++ b/default-configs/aarch64-linux-user-common.mak
++++ b/default-configs/mips-linux-user-common.mak
 @@ -0,0 +1,4 @@
-+# Common aarch64*-linux-user CONFIG defines
++# Common mips*-linux-user CONFIG defines
 +
 +# CONFIG_SEMIHOSTING is always required on this architecture
 +CONFIG_SEMIHOSTING=3Dy
-diff --git a/default-configs/aarch64-linux-user.mak b/default-configs/aar=
-ch64-linux-user.mak
-index 0a5b08a007..d27232cbc6 100644
---- a/default-configs/aarch64-linux-user.mak
-+++ b/default-configs/aarch64-linux-user.mak
+diff --git a/default-configs/mips-linux-user.mak b/default-configs/mips-l=
+inux-user.mak
+index 31df57021e..c606e12444 100644
+--- a/default-configs/mips-linux-user.mak
++++ b/default-configs/mips-linux-user.mak
 @@ -1 +1,3 @@
- # Default configuration for aarch64-linux-user
+ # Default configuration for mips-linux-user
 +
-+include aarch64-linux-user-common.mak
-diff --git a/default-configs/aarch64_be-linux-user.mak b/default-configs/=
-aarch64_be-linux-user.mak
-index a69d9d2e41..7dee7ba4cb 100644
---- a/default-configs/aarch64_be-linux-user.mak
-+++ b/default-configs/aarch64_be-linux-user.mak
++include mips-linux-user-common.mak
+diff --git a/default-configs/mips64-linux-user.mak b/default-configs/mips=
+64-linux-user.mak
+index 1598bfcf7d..81e16ac2eb 100644
+--- a/default-configs/mips64-linux-user.mak
++++ b/default-configs/mips64-linux-user.mak
 @@ -1 +1,3 @@
- # Default configuration for aarch64_be-linux-user
+ # Default configuration for mips64-linux-user
 +
-+include aarch64-linux-user-common.mak
-diff --git a/default-configs/arm-linux-user-common.mak b/default-configs/=
-arm-linux-user-common.mak
-new file mode 100644
-index 0000000000..67acd961f3
---- /dev/null
-+++ b/default-configs/arm-linux-user-common.mak
-@@ -0,0 +1,4 @@
-+# Common arm*-linux-user CONFIG defines
-+
-+# CONFIG_SEMIHOSTING is always required on this architecture
-+CONFIG_SEMIHOSTING=3Dy
-diff --git a/default-configs/arm-linux-user.mak b/default-configs/arm-lin=
-ux-user.mak
-index 413361a022..7d45e4d20a 100644
---- a/default-configs/arm-linux-user.mak
-+++ b/default-configs/arm-linux-user.mak
++include mips-linux-user-common.mak
+diff --git a/default-configs/mips64el-linux-user.mak b/default-configs/mi=
+ps64el-linux-user.mak
+index 629f084086..6399af3fd5 100644
+--- a/default-configs/mips64el-linux-user.mak
++++ b/default-configs/mips64el-linux-user.mak
 @@ -1 +1,3 @@
- # Default configuration for arm-linux-user
+ # Default configuration for mips64el-linux-user
 +
-+include arm-linux-user-common.mak
-diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmm=
-u.mak
-index 1f2e0e7fde..ad2debf543 100644
---- a/default-configs/arm-softmmu.mak
-+++ b/default-configs/arm-softmmu.mak
-@@ -1,5 +1,8 @@
- # Default configuration for arm-softmmu
-=20
-+# CONFIG_SEMIHOSTING is always required on this architecture
-+CONFIG_SEMIHOSTING=3Dy
-+
- # TODO: ARM_V7M is currently always required - make this more flexible!
- CONFIG_ARM_V7M=3Dy
-=20
-@@ -39,4 +42,3 @@ CONFIG_MICROBIT=3Dy
- CONFIG_FSL_IMX25=3Dy
- CONFIG_FSL_IMX7=3Dy
- CONFIG_FSL_IMX6UL=3Dy
--CONFIG_SEMIHOSTING=3Dy
-diff --git a/default-configs/armeb-linux-user.mak b/default-configs/armeb=
--linux-user.mak
-index bf2ffe7038..485132f606 100644
---- a/default-configs/armeb-linux-user.mak
-+++ b/default-configs/armeb-linux-user.mak
++include mips-linux-user-common.mak
+diff --git a/default-configs/mipsel-linux-user.mak b/default-configs/mips=
+el-linux-user.mak
+index 4d0e4afb69..4a27d30b45 100644
+--- a/default-configs/mipsel-linux-user.mak
++++ b/default-configs/mipsel-linux-user.mak
 @@ -1 +1,3 @@
- # Default configuration for armeb-linux-user
+ # Default configuration for mipsel-linux-user
 +
-+include arm-linux-user-common.mak
++include mips-linux-user-common.mak
+diff --git a/default-configs/mipsn32-linux-user.mak b/default-configs/mip=
+sn32-linux-user.mak
+index 5b97919794..f3ac967463 100644
+--- a/default-configs/mipsn32-linux-user.mak
++++ b/default-configs/mipsn32-linux-user.mak
+@@ -1 +1,3 @@
+ # Default configuration for mipsn32-linux-user
++
++include mips-linux-user-common.mak
+diff --git a/default-configs/mipsn32el-linux-user.mak b/default-configs/m=
+ipsn32el-linux-user.mak
+index d6367ff987..63fe4de4fd 100644
+--- a/default-configs/mipsn32el-linux-user.mak
++++ b/default-configs/mipsn32el-linux-user.mak
+@@ -1 +1,3 @@
+ # Default configuration for mipsn32el-linux-user
++
++include mips-linux-user-common.mak
 --=20
 2.20.1
 
