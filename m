@@ -2,70 +2,74 @@ Return-Path: <SRS0=IjNW=VM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71A05C7618F
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 10:29:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96580C76191
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 10:41:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3B77820665
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 10:29:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B77820665
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6D6F12064B
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 10:41:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D6F12064B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36732 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36768 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hmyEy-0006kd-5B
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 06:29:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36484)
+	id 1hmyPq-0000jR-FW
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 06:41:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38552)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <berrange@redhat.com>) id 1hmyEn-0006KF-7O
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 06:29:42 -0400
+ (envelope-from <bounces@canonical.com>) id 1hmyPc-00007j-1a
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 06:40:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1hmyEm-0003JZ-2n
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 06:29:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47408)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hmyEl-0003J4-TU
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 06:29:40 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 08C548535D;
- Mon, 15 Jul 2019 10:29:39 +0000 (UTC)
-Received: from redhat.com (ovpn-112-60.ams2.redhat.com [10.36.112.60])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 15B4A6012C;
- Mon, 15 Jul 2019 10:29:29 +0000 (UTC)
-Date: Mon, 15 Jul 2019 11:29:27 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Message-ID: <20190715102927.GG30298@redhat.com>
-References: <20190713143311.17620-1-marcandre.lureau@redhat.com>
- <20190713143311.17620-7-marcandre.lureau@redhat.com>
- <20190715094026.GC30298@redhat.com>
- <CAMxuvawZ6nCt-6KtnzPUnX4PWbvEs1tycufZK4c4tMr1s2T0ag@mail.gmail.com>
+ (envelope-from <bounces@canonical.com>) id 1hmyPa-0008NO-Pl
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 06:40:51 -0400
+Received: from indium.canonical.com ([91.189.90.7]:47978)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1hmyPa-0008N0-K1
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 06:40:50 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1hmyPZ-0000fH-B2
+ for <qemu-devel@nongnu.org>; Mon, 15 Jul 2019 10:40:49 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 001542E80CB
+ for <qemu-devel@nongnu.org>; Mon, 15 Jul 2019 10:40:48 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAMxuvawZ6nCt-6KtnzPUnX4PWbvEs1tycufZK4c4tMr1s2T0ag@mail.gmail.com>
-User-Agent: Mutt/1.12.0 (2019-05-25)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.25]); Mon, 15 Jul 2019 10:29:39 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
+Date: Mon, 15 Jul 2019 10:31:55 -0000
+From: Lutz <1836501@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Tags: arm
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: pmaydell skandal
+X-Launchpad-Bug-Reporter: Lutz (skandal)
+X-Launchpad-Bug-Modifier: Lutz (skandal)
+References: <156313770910.15255.7682693906978508241.malonedeb@soybean.canonical.com>
+Message-Id: <156318671587.21327.1304542173465041078.malone@gac.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="19007";
+ Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: d3e0eda1602218edbb054b721bd554b57f263813
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 6/6] test: skip tests if
- socket_check_protocol_support() failed
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1836501] Re: cpu_address_space_init fails with
+ assertion
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -74,48 +78,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Fam Zheng <fam@euphon.net>,
- Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
- qemu-devel <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>,
- "Bonzini, Paolo" <pbonzini@redhat.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Reply-To: Bug 1836501 <1836501@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Jul 15, 2019 at 02:25:03PM +0400, Marc-Andr=C3=A9 Lureau wrote:
-> Hi
->=20
-> On Mon, Jul 15, 2019 at 1:40 PM Daniel P. Berrang=C3=A9 <berrange@redha=
-t.com> wrote:
-> >
-> > On Sat, Jul 13, 2019 at 06:33:11PM +0400, Marc-Andr=C3=A9 Lureau wrot=
-e:
-> > > Skip the tests if socket_check_protocol_support() failed, but do ru=
-n
-> > > g_test_run() to keep TAP harness happy.
-> >
-> > Did you actually find a scenario in which it failed, or is this just
-> > doing the change for the sake of strict correctness ?
->=20
-> It fails under podman atm (https://github.com/containers/libpod/issues/=
-3535)
+Thank you for the quick and complete investigation. I'll follow your
+suggestions and will reply any succecss in the next days. I checked the
+source of the vexpress and found the assert, but wasn't clever enough to
+compare it to another board.
 
-Oh i see. I wonder if a better strategy is to simply set
+I would support the idea of checking the incompatible parameter pairing
+in common code.
 
-  has_ipv4 =3D has_ipv6 =3D false
+-- =
 
-if getaddrinfo() returns an error and make socket_check_protocol_support
-return void.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1836501
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+Title:
+  cpu_address_space_init fails with assertion
+
+Status in QEMU:
+  Confirmed
+
+Bug description:
+  qemu-system-arm does not start with version >=3D 2.6 and KVM enabled.
+
+    cpu_address_space_init: Assertion `asidx =3D=3D 0 || !kvm_enabled()'
+  failed.
+
+  Hardware is Odroid XU4 with Exynos with 4.9.61+ Tested with Debian
+  Stretch (9) or Buster (10).
+
+  Without KVM it is running fine but slow. I'm operating Debian Jessie
+  with qemu 2.1 for a long time with KVM virtualization working
+  flawlessly. When I upgraded to Stretch I ran into the trouble
+  described before. I tried Debian Stretch and Buster with all Kernels
+  provided by the Board manufacturer (Hardkernel).
+
+  It seems to be related to the feature introduced in Version 2.6:
+  https://wiki.qemu.org/ChangeLog/2.6
+  - Support for a separate EL3 address space
+
+  KVM is enabled, so I assume the adress space index asidx to be causing
+  the assert to fail.
+
+  dmesg | grep -i KVM
+  [    0.741714] kvm [1]: 8-bit VMID
+  [    0.741721] kvm [1]: IDMAP page: 40201000
+  [    0.741729] kvm [1]: HYP VA range: c0000000:ffffffff
+  [    0.742543] kvm [1]: Hyp mode initialized successfully
+  [    0.742600] kvm [1]: vgic-v2@10484000
+  [    0.742924] kvm [1]: vgic interrupt IRQ16
+  [    0.742943] kvm [1]: virtual timer IRQ60
+
+  Full command line is:
+  qemu-system-arm -M vexpress-a15 -smp 2 -m 512 -cpu host -enable-kvm -kern=
+el vmlinuz -initrd initrd.gz -dtb vexpress-v2p-ca15-tc1.dtb -device virtio-=
+blk-device,drive=3Dinst-blk -drive file=3DPATHTOFILE,id=3Dinst-blk,if=3Dnon=
+e,format=3Draw -append "vga=3Dnormal rw console=3DttyAMA0" -nographic
+
+  Is there anything to do to understand, if this is a hardware related
+  failure or probably just a missing parameter?
+
+  Regards
+
+  Lutz
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1836501/+subscriptions
 
