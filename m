@@ -2,92 +2,67 @@ Return-Path: <SRS0=IjNW=VM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14448C76191
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 21:11:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92978C7618F
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 21:16:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B406720665
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 21:11:39 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XpeGJDBT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B406720665
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 565B420449
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 21:16:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 565B420449
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43874 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43902 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hn8G2-0004qt-VV
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 17:11:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42343)
+	id 1hn8L7-00074R-G2
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 17:16:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43973)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dirty.ice.hu@gmail.com>) id 1hn8D6-0000IW-UD
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 17:08:42 -0400
+ (envelope-from <no-reply@patchew.org>) id 1hn8Km-0006di-3n
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 17:16:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dirty.ice.hu@gmail.com>) id 1hn8D2-0004ol-JT
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 17:08:36 -0400
-Received: from mail-wr1-x431.google.com ([2a00:1450:4864:20::431]:34406)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <dirty.ice.hu@gmail.com>)
- id 1hn8D2-0004np-7R
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 17:08:32 -0400
-Received: by mail-wr1-x431.google.com with SMTP id 31so18621289wrm.1
- for <qemu-devel@nongnu.org>; Mon, 15 Jul 2019 14:08:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=aIu37KvQweuy5+WCYiKp8sjLXR2aWElS7r2AFXikGH8=;
- b=XpeGJDBTdy13SPcDGEGBq50VMjhv6iV8GmCbT+Ta6JUh6N623zxX55iilm6qFXs+Ki
- Fbh9mvha5bme5uQA4+KRz+eCs8Rr2vY2ssBtgjvoO5Njg0Ocx+OnxUPMc3rEnsbILU2X
- KiwwbBwKVpt+txjX4TgCZ/xFpf8zSV5FI+xt2CZ7qI1/aPdnDT64Tf4cncJwNYsHvVKr
- nLNHPbhtMZoydJ6uJkrSd22Dx57ZztuGjZ0+EPVVbBlE2W6r8qa5sj1M9EEcoimA9KQU
- Sxje8DTN4hdUjFueHuPxrrFfY1qt8JLuGjczjGLOpFgrlf5vxIOsp94CoshErL6epczc
- UE0A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=aIu37KvQweuy5+WCYiKp8sjLXR2aWElS7r2AFXikGH8=;
- b=pKWLfgPt0+d32RBvEEw4RpxzFAN5FsLqEeryodmlRy7XuZh5D0xPof7izxsiW9upGw
- AyiFV0wWlJqi6rOZQjkHjJ1r4A5ESPvaXPPjGUqcOgkSQa40670/Elo5Z3kNIif0YHlF
- 3oyv2BHPp3lQF4ZfTQ4goBbNhuyxEA2G6xg/UicRYoBy5JmQFS2w3s51uVS2NIo7DW2s
- K19NEWahJ//78QPQTLJPyUki8VX0Z1fdBMx32VfLQxrBHqzcThVu96IT/FOEO2wvVC7D
- UA7w0Ed2WF2xHPBU/PJshIcL1aKUAtE9ifpvYc2DnmhRTAij3VWPzenV2Iwb0SMCRmx3
- guWQ==
-X-Gm-Message-State: APjAAAWcfKJOy+2W61UmxGa3uNJaBWwHvRQGRvLd2T/baqOpv9TXo1+k
- bYq/gjsneC4n4W84CwEt8abEcHA0KGg=
-X-Google-Smtp-Source: APXvYqw4T1ZoVJ8ZISTtdlz8YuenLK7aNCHxqSS+khapXkpkwzfBuFRTO4embfTYbocQP7FG9039Bg==
-X-Received: by 2002:adf:a344:: with SMTP id d4mr30747289wrb.237.1563224909953; 
- Mon, 15 Jul 2019 14:08:29 -0700 (PDT)
-Received: from nullptr.home.dirty-ice.org
- (2a01-036c-0113-31ca-0000-0000-0000-0005.pool6.digikabel.hu.
- [2a01:36c:113:31ca::5])
- by smtp.gmail.com with ESMTPSA id n8sm11513447wro.89.2019.07.15.14.08.28
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 15 Jul 2019 14:08:29 -0700 (PDT)
-From: "=?UTF-8?q?K=C5=91v=C3=A1g=C3=B3=2C=20Zolt=C3=A1n?="
- <dirty.ice.hu@gmail.com>
-X-Google-Original-From: =?UTF-8?q?K=C5=91v=C3=A1g=C3=B3=2C=20Zolt=C3=A1n?=
- <DirtY.iCE.hu@gmail.com>
-To: qemu-devel@nongnu.org
-Date: Mon, 15 Jul 2019 23:08:15 +0200
-Message-Id: <6dd484f94fd67356595dec42156ead40ea535687.1563224628.git.DirtY.iCE.hu@gmail.com>
-X-Mailer: git-send-email 2.22.0
+ (envelope-from <no-reply@patchew.org>) id 1hn8Kj-0002p0-E8
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 17:16:32 -0400
+Resent-Date: Mon, 15 Jul 2019 17:16:32 -0400
+Resent-Message-Id: <E1hn8Kj-0002p0-E8@eggs.gnu.org>
+Received: from sender4-of-o59.zoho.com ([136.143.188.59]:21967)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1hn8Kj-0002o9-5c
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 17:16:29 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1563225380; cv=none; d=zoho.com; s=zohoarc; 
+ b=K88nb6K0UXTs+d2Kv3TZbMhnDrax/DYNlu+pfDEn3esua3gPsVE4iItiDU73TMGwuXf5u/M55Zq5YKCb5K7Y2RwyLKYPfZ7amhc2zhQnOxdvLczAUi3xA3/dgrDIXlhAupX8z0exeCj6JaYUpmk0dT9H+gpCg0Ky7LzTryzs3AY=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1563225380;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+ bh=h/cwDOugMLDhzBZpqbh5NIwao9ZLvzUOmG6SMa83b98=; 
+ b=lePiv9PtVa0Vr2eWVsEgcBB7Pgag3szoimoZam4e2ymzdfMvKR3qBFQzknyvnd7PLNk25++QKcfGZTr9Nwi4NHYN3kjhQNMXOboopTMe/ZKkmK1S2W5Zawd5RSTeVTCS9eNOsAi38c1xqNwQwK1iQBZlSBmeeT8rvYRBZNhDn80=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1563225378215882.0520652604625;
+ Mon, 15 Jul 2019 14:16:18 -0700 (PDT)
+Message-ID: <156322537724.3080.2922893025794766011@c4a48874b076>
 In-Reply-To: <cover.1563224628.git.DirtY.iCE.hu@gmail.com>
-References: <cover.1563224628.git.DirtY.iCE.hu@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::431
-Subject: [Qemu-devel] [PATCH v2 13/14] audio: use size_t where makes sense
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: dirty.ice.hu@gmail.com
+Date: Mon, 15 Jul 2019 14:16:18 -0700 (PDT)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 136.143.188.59
+Subject: Re: [Qemu-devel] [PATCH v2 00/14] Multiple simultaneous audio
+ backends
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,1300 +74,266 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+Reply-To: qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org, kraxel@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Kővágó, Zoltán <DirtY.iCE.hu@gmail.com>
----
- audio/audio.h           |   4 +-
- audio/audio_int.h       |  26 +++----
- audio/audio_template.h  |  14 ++--
- audio/mixeng.h          |   9 +--
- audio/rate_template.h   |   2 +-
- include/sysemu/replay.h |   4 +-
- audio/alsaaudio.c       |  26 +++----
- audio/audio.c           | 156 ++++++++++++++++++++--------------------
- audio/coreaudio.c       |  10 +--
- audio/dsoundaudio.c     |  11 +--
- audio/noaudio.c         |  16 ++---
- audio/ossaudio.c        |  45 ++++++------
- audio/paaudio.c         |  44 ++++++------
- audio/sdlaudio.c        |  20 +++---
- audio/spiceaudio.c      |  12 ++--
- audio/wavaudio.c        |   8 +--
- replay/replay-audio.c   |  16 ++---
- replay/replay.c         |   2 +-
- 18 files changed, 212 insertions(+), 213 deletions(-)
-
-diff --git a/audio/audio.h b/audio/audio.h
-index 4a95758516..2db27bba7b 100644
---- a/audio/audio.h
-+++ b/audio/audio.h
-@@ -112,7 +112,7 @@ SWVoiceOut *AUD_open_out (
-     );
- 
- void AUD_close_out (QEMUSoundCard *card, SWVoiceOut *sw);
--int  AUD_write (SWVoiceOut *sw, void *pcm_buf, int size);
-+size_t AUD_write (SWVoiceOut *sw, void *pcm_buf, size_t size);
- int  AUD_get_buffer_size_out (SWVoiceOut *sw);
- void AUD_set_active_out (SWVoiceOut *sw, int on);
- int  AUD_is_active_out (SWVoiceOut *sw);
-@@ -133,7 +133,7 @@ SWVoiceIn *AUD_open_in (
-     );
- 
- void AUD_close_in (QEMUSoundCard *card, SWVoiceIn *sw);
--int  AUD_read (SWVoiceIn *sw, void *pcm_buf, int size);
-+size_t AUD_read (SWVoiceIn *sw, void *pcm_buf, size_t size);
- void AUD_set_active_in (SWVoiceIn *sw, int on);
- int  AUD_is_active_in (SWVoiceIn *sw);
- 
-diff --git a/audio/audio_int.h b/audio/audio_int.h
-index 003b7ab8cc..a674c5374a 100644
---- a/audio/audio_int.h
-+++ b/audio/audio_int.h
-@@ -61,12 +61,12 @@ typedef struct HWVoiceOut {
- 
-     f_sample *clip;
- 
--    int rpos;
-+    size_t rpos;
-     uint64_t ts_helper;
- 
-     struct st_sample *mix_buf;
- 
--    int samples;
-+    size_t samples;
-     QLIST_HEAD (sw_out_listhead, SWVoiceOut) sw_head;
-     QLIST_HEAD (sw_cap_listhead, SWVoiceCap) cap_head;
-     int ctl_caps;
-@@ -82,13 +82,13 @@ typedef struct HWVoiceIn {
- 
-     t_sample *conv;
- 
--    int wpos;
--    int total_samples_captured;
-+    size_t wpos;
-+    size_t total_samples_captured;
-     uint64_t ts_helper;
- 
-     struct st_sample *conv_buf;
- 
--    int samples;
-+    size_t samples;
-     QLIST_HEAD (sw_in_listhead, SWVoiceIn) sw_head;
-     int ctl_caps;
-     struct audio_pcm_ops *pcm_ops;
-@@ -103,7 +103,7 @@ struct SWVoiceOut {
-     int64_t ratio;
-     struct st_sample *buf;
-     void *rate;
--    int total_hw_samples_mixed;
-+    size_t total_hw_samples_mixed;
-     int active;
-     int empty;
-     HWVoiceOut *hw;
-@@ -120,7 +120,7 @@ struct SWVoiceIn {
-     struct audio_pcm_info info;
-     int64_t ratio;
-     void *rate;
--    int total_hw_samples_acquired;
-+    size_t total_hw_samples_acquired;
-     struct st_sample *buf;
-     f_sample *clip;
-     HWVoiceIn *hw;
-@@ -149,12 +149,12 @@ struct audio_driver {
- struct audio_pcm_ops {
-     int  (*init_out)(HWVoiceOut *hw, struct audsettings *as, void *drv_opaque);
-     void (*fini_out)(HWVoiceOut *hw);
--    int  (*run_out) (HWVoiceOut *hw, int live);
-+    size_t (*run_out)(HWVoiceOut *hw, size_t live);
-     int  (*ctl_out) (HWVoiceOut *hw, int cmd, ...);
- 
-     int  (*init_in) (HWVoiceIn *hw, struct audsettings *as, void *drv_opaque);
-     void (*fini_in) (HWVoiceIn *hw);
--    int  (*run_in)  (HWVoiceIn *hw);
-+    size_t (*run_in)(HWVoiceIn *hw);
-     int  (*ctl_in)  (HWVoiceIn *hw, int cmd, ...);
- };
- 
-@@ -208,10 +208,10 @@ audio_driver *audio_driver_lookup(const char *name);
- void audio_pcm_init_info (struct audio_pcm_info *info, struct audsettings *as);
- void audio_pcm_info_clear_buf (struct audio_pcm_info *info, void *buf, int len);
- 
--int  audio_pcm_hw_get_live_in (HWVoiceIn *hw);
-+size_t audio_pcm_hw_get_live_in(HWVoiceIn *hw);
- 
--int audio_pcm_hw_clip_out (HWVoiceOut *hw, void *pcm_buf,
--                           int live, int pending);
-+size_t audio_pcm_hw_clip_out(HWVoiceOut *hw, void *pcm_buf,
-+                             size_t live, size_t pending);
- 
- int audio_bug (const char *funcname, int cond);
- void *audio_calloc (const char *funcname, int nmemb, size_t size);
-@@ -224,7 +224,7 @@ void audio_run(AudioState *s, const char *msg);
- 
- #define VOICE_VOLUME_CAP (1 << VOICE_VOLUME)
- 
--static inline int audio_ring_dist (int dst, int src, int len)
-+static inline size_t audio_ring_dist(size_t dst, size_t src, size_t len)
- {
-     return (dst >= src) ? (dst - src) : (len - src + dst);
- }
-diff --git a/audio/audio_template.h b/audio/audio_template.h
-index 54f07338e7..2562bf5f00 100644
---- a/audio/audio_template.h
-+++ b/audio/audio_template.h
-@@ -75,16 +75,16 @@ static void glue (audio_pcm_hw_free_resources_, TYPE) (HW *hw)
-     HWBUF = NULL;
- }
- 
--static int glue (audio_pcm_hw_alloc_resources_, TYPE) (HW *hw)
-+static bool glue(audio_pcm_hw_alloc_resources_, TYPE)(HW *hw)
- {
-     HWBUF = audio_calloc(__func__, hw->samples, sizeof(struct st_sample));
-     if (!HWBUF) {
--        dolog ("Could not allocate " NAME " buffer (%d samples)\n",
--               hw->samples);
--        return -1;
-+        dolog("Could not allocate " NAME " buffer (%zu samples)\n",
-+              hw->samples);
-+        return false;
-     }
- 
--    return 0;
-+    return true;
- }
- 
- static void glue (audio_pcm_sw_free_resources_, TYPE) (SW *sw)
-@@ -265,7 +265,7 @@ static HW *glue(audio_pcm_hw_add_new_, TYPE)(AudioState *s,
-     }
- 
-     if (audio_bug(__func__, hw->samples <= 0)) {
--        dolog ("hw->samples=%d\n", hw->samples);
-+        dolog("hw->samples=%zd\n", hw->samples);
-         goto err1;
-     }
- 
-@@ -279,7 +279,7 @@ static HW *glue(audio_pcm_hw_add_new_, TYPE)(AudioState *s,
-         [hw->info.swap_endianness]
-         [audio_bits_to_index (hw->info.bits)];
- 
--    if (glue (audio_pcm_hw_alloc_resources_, TYPE) (hw)) {
-+    if (!glue(audio_pcm_hw_alloc_resources_, TYPE)(hw)) {
-         goto err1;
-     }
- 
-diff --git a/audio/mixeng.h b/audio/mixeng.h
-index b53a5ef99a..18e62c7c49 100644
---- a/audio/mixeng.h
-+++ b/audio/mixeng.h
-@@ -33,6 +33,7 @@ struct st_sample { mixeng_real l; mixeng_real r; };
- struct mixeng_volume { int mute; int64_t r; int64_t l; };
- struct st_sample { int64_t l; int64_t r; };
- #endif
-+typedef struct st_sample st_sample;
- 
- typedef void (t_sample) (struct st_sample *dst, const void *src, int samples);
- typedef void (f_sample) (void *dst, const struct st_sample *src, int samples);
-@@ -41,10 +42,10 @@ extern t_sample *mixeng_conv[2][2][2][3];
- extern f_sample *mixeng_clip[2][2][2][3];
- 
- void *st_rate_start (int inrate, int outrate);
--void st_rate_flow (void *opaque, struct st_sample *ibuf, struct st_sample *obuf,
--                   int *isamp, int *osamp);
--void st_rate_flow_mix (void *opaque, struct st_sample *ibuf, struct st_sample *obuf,
--                       int *isamp, int *osamp);
-+void st_rate_flow(void *opaque, st_sample *ibuf, st_sample *obuf,
-+                  size_t *isamp, size_t *osamp);
-+void st_rate_flow_mix(void *opaque, st_sample *ibuf, st_sample *obuf,
-+                      size_t *isamp, size_t *osamp);
- void st_rate_stop (void *opaque);
- void mixeng_clear (struct st_sample *buf, int len);
- void mixeng_volume (struct st_sample *buf, int len, struct mixeng_volume *vol);
-diff --git a/audio/rate_template.h b/audio/rate_template.h
-index 6e93588877..f94c940c61 100644
---- a/audio/rate_template.h
-+++ b/audio/rate_template.h
-@@ -28,7 +28,7 @@
-  * Return number of samples processed.
-  */
- void NAME (void *opaque, struct st_sample *ibuf, struct st_sample *obuf,
--           int *isamp, int *osamp)
-+           size_t *isamp, size_t *osamp)
- {
-     struct rate *rate = opaque;
-     struct st_sample *istart, *iend;
-diff --git a/include/sysemu/replay.h b/include/sysemu/replay.h
-index 3a7c58e423..5c0a91e44f 100644
---- a/include/sysemu/replay.h
-+++ b/include/sysemu/replay.h
-@@ -179,9 +179,9 @@ void replay_net_packet_event(ReplayNetState *rns, unsigned flags,
- /* Audio */
- 
- /*! Saves/restores number of played samples of audio out operation. */
--void replay_audio_out(int *played);
-+void replay_audio_out(size_t *played);
- /*! Saves/restores recorded samples of audio in operation. */
--void replay_audio_in(int *recorded, void *samples, int *wpos, int size);
-+void replay_audio_in(size_t *recorded, void *samples, size_t *wpos, size_t size);
- 
- /* VM state operations */
- 
-diff --git a/audio/alsaaudio.c b/audio/alsaaudio.c
-index e9e3a4819c..591344dccd 100644
---- a/audio/alsaaudio.c
-+++ b/audio/alsaaudio.c
-@@ -681,10 +681,10 @@ static void alsa_write_pending (ALSAVoiceOut *alsa)
-     }
- }
- 
--static int alsa_run_out (HWVoiceOut *hw, int live)
-+static size_t alsa_run_out(HWVoiceOut *hw, size_t live)
- {
-     ALSAVoiceOut *alsa = (ALSAVoiceOut *) hw;
--    int decr;
-+    size_t decr;
-     snd_pcm_sframes_t avail;
- 
-     avail = alsa_get_avail (alsa->handle);
-@@ -739,8 +739,8 @@ static int alsa_init_out(HWVoiceOut *hw, struct audsettings *as,
- 
-     alsa->pcm_buf = audio_calloc(__func__, obt.samples, 1 << hw->info.shift);
-     if (!alsa->pcm_buf) {
--        dolog ("Could not allocate DAC buffer (%d samples, each %d bytes)\n",
--               hw->samples, 1 << hw->info.shift);
-+        dolog("Could not allocate DAC buffer (%zu samples, each %d bytes)\n",
-+              hw->samples, 1 << hw->info.shift);
-         alsa_anal_close1 (&handle);
-         return -1;
-     }
-@@ -841,8 +841,8 @@ static int alsa_init_in(HWVoiceIn *hw, struct audsettings *as, void *drv_opaque)
- 
-     alsa->pcm_buf = audio_calloc(__func__, hw->samples, 1 << hw->info.shift);
-     if (!alsa->pcm_buf) {
--        dolog ("Could not allocate ADC buffer (%d samples, each %d bytes)\n",
--               hw->samples, 1 << hw->info.shift);
-+        dolog("Could not allocate ADC buffer (%zu samples, each %d bytes)\n",
-+              hw->samples, 1 << hw->info.shift);
-         alsa_anal_close1 (&handle);
-         return -1;
-     }
-@@ -863,17 +863,17 @@ static void alsa_fini_in (HWVoiceIn *hw)
-     alsa->pcm_buf = NULL;
- }
- 
--static int alsa_run_in (HWVoiceIn *hw)
-+static size_t alsa_run_in(HWVoiceIn *hw)
- {
-     ALSAVoiceIn *alsa = (ALSAVoiceIn *) hw;
-     int hwshift = hw->info.shift;
-     int i;
--    int live = audio_pcm_hw_get_live_in (hw);
--    int dead = hw->samples - live;
--    int decr;
-+    size_t live = audio_pcm_hw_get_live_in (hw);
-+    size_t dead = hw->samples - live;
-+    size_t decr;
-     struct {
--        int add;
--        int len;
-+        size_t add;
-+        size_t len;
-     } bufs[2] = {
-         { .add = hw->wpos, .len = 0 },
-         { .add = 0,        .len = 0 }
-@@ -913,7 +913,7 @@ static int alsa_run_in (HWVoiceIn *hw)
-         }
-     }
- 
--    decr = MIN (dead, avail);
-+    decr = MIN(dead, avail);
-     if (!decr) {
-         return 0;
-     }
-diff --git a/audio/audio.c b/audio/audio.c
-index 254499dfa1..d3c639211d 100644
---- a/audio/audio.c
-+++ b/audio/audio.c
-@@ -526,10 +526,10 @@ static int audio_attach_capture (HWVoiceOut *hw)
- /*
-  * Hard voice (capture)
-  */
--static int audio_pcm_hw_find_min_in (HWVoiceIn *hw)
-+static size_t audio_pcm_hw_find_min_in (HWVoiceIn *hw)
- {
-     SWVoiceIn *sw;
--    int m = hw->total_samples_captured;
-+    size_t m = hw->total_samples_captured;
- 
-     for (sw = hw->sw_head.lh_first; sw; sw = sw->entries.le_next) {
-         if (sw->active) {
-@@ -539,28 +539,28 @@ static int audio_pcm_hw_find_min_in (HWVoiceIn *hw)
-     return m;
- }
- 
--int audio_pcm_hw_get_live_in (HWVoiceIn *hw)
-+size_t audio_pcm_hw_get_live_in(HWVoiceIn *hw)
- {
--    int live = hw->total_samples_captured - audio_pcm_hw_find_min_in (hw);
--    if (audio_bug(__func__, live < 0 || live > hw->samples)) {
--        dolog ("live=%d hw->samples=%d\n", live, hw->samples);
-+    size_t live = hw->total_samples_captured - audio_pcm_hw_find_min_in (hw);
-+    if (audio_bug(__func__, live > hw->samples)) {
-+        dolog("live=%zu hw->samples=%zu\n", live, hw->samples);
-         return 0;
-     }
-     return live;
- }
- 
--int audio_pcm_hw_clip_out (HWVoiceOut *hw, void *pcm_buf,
--                           int live, int pending)
-+size_t audio_pcm_hw_clip_out(HWVoiceOut *hw, void *pcm_buf,
-+                             size_t live, size_t pending)
- {
--    int left = hw->samples - pending;
--    int len = MIN (left, live);
--    int clipped = 0;
-+    size_t left = hw->samples - pending;
-+    size_t len = MIN (left, live);
-+    size_t clipped = 0;
- 
-     while (len) {
-         struct st_sample *src = hw->mix_buf + hw->rpos;
-         uint8_t *dst = advance (pcm_buf, hw->rpos << hw->info.shift);
--        int samples_till_end_of_buf = hw->samples - hw->rpos;
--        int samples_to_clip = MIN (len, samples_till_end_of_buf);
-+        size_t samples_till_end_of_buf = hw->samples - hw->rpos;
-+        size_t samples_to_clip = MIN (len, samples_till_end_of_buf);
- 
-         hw->clip (dst, src, samples_to_clip);
- 
-@@ -574,14 +574,14 @@ int audio_pcm_hw_clip_out (HWVoiceOut *hw, void *pcm_buf,
- /*
-  * Soft voice (capture)
-  */
--static int audio_pcm_sw_get_rpos_in (SWVoiceIn *sw)
-+static size_t audio_pcm_sw_get_rpos_in(SWVoiceIn *sw)
- {
-     HWVoiceIn *hw = sw->hw;
--    int live = hw->total_samples_captured - sw->total_hw_samples_acquired;
--    int rpos;
-+    ssize_t live = hw->total_samples_captured - sw->total_hw_samples_acquired;
-+    ssize_t rpos;
- 
-     if (audio_bug(__func__, live < 0 || live > hw->samples)) {
--        dolog ("live=%d hw->samples=%d\n", live, hw->samples);
-+        dolog("live=%zu hw->samples=%zu\n", live, hw->samples);
-         return 0;
-     }
- 
-@@ -594,17 +594,17 @@ static int audio_pcm_sw_get_rpos_in (SWVoiceIn *sw)
-     }
- }
- 
--static int audio_pcm_sw_read(SWVoiceIn *sw, void *buf, int size)
-+static size_t audio_pcm_sw_read(SWVoiceIn *sw, void *buf, size_t size)
- {
-     HWVoiceIn *hw = sw->hw;
--    int samples, live, ret = 0, swlim, isamp, osamp, rpos, total = 0;
-+    size_t samples, live, ret = 0, swlim, isamp, osamp, rpos, total = 0;
-     struct st_sample *src, *dst = sw->buf;
- 
-     rpos = audio_pcm_sw_get_rpos_in (sw) % hw->samples;
- 
-     live = hw->total_samples_captured - sw->total_hw_samples_acquired;
--    if (audio_bug(__func__, live < 0 || live > hw->samples)) {
--        dolog ("live_in=%d hw->samples=%d\n", live, hw->samples);
-+    if (audio_bug(__func__, live > hw->samples)) {
-+        dolog("live_in=%zu hw->samples=%zu\n", live, hw->samples);
-         return 0;
-     }
- 
-@@ -618,9 +618,9 @@ static int audio_pcm_sw_read(SWVoiceIn *sw, void *buf, int size)
- 
-     while (swlim) {
-         src = hw->conv_buf + rpos;
--        isamp = hw->wpos - rpos;
--        /* XXX: <= ? */
--        if (isamp <= 0) {
-+        if (hw->wpos > rpos) {
-+            isamp = hw->wpos - rpos;
-+        } else {
-             isamp = hw->samples - rpos;
-         }
- 
-@@ -629,11 +629,6 @@ static int audio_pcm_sw_read(SWVoiceIn *sw, void *buf, int size)
-         }
-         osamp = swlim;
- 
--        if (audio_bug(__func__, osamp < 0)) {
--            dolog ("osamp=%d\n", osamp);
--            return 0;
--        }
--
-         st_rate_flow (sw->rate, src, dst, &isamp, &osamp);
-         swlim -= osamp;
-         rpos = (rpos + isamp) % hw->samples;
-@@ -654,10 +649,10 @@ static int audio_pcm_sw_read(SWVoiceIn *sw, void *buf, int size)
- /*
-  * Hard voice (playback)
-  */
--static int audio_pcm_hw_find_min_out (HWVoiceOut *hw, int *nb_livep)
-+static size_t audio_pcm_hw_find_min_out (HWVoiceOut *hw, int *nb_livep)
- {
-     SWVoiceOut *sw;
--    int m = INT_MAX;
-+    size_t m = SIZE_MAX;
-     int nb_live = 0;
- 
-     for (sw = hw->sw_head.lh_first; sw; sw = sw->entries.le_next) {
-@@ -671,9 +666,9 @@ static int audio_pcm_hw_find_min_out (HWVoiceOut *hw, int *nb_livep)
-     return m;
- }
- 
--static int audio_pcm_hw_get_live_out (HWVoiceOut *hw, int *nb_live)
-+static size_t audio_pcm_hw_get_live_out (HWVoiceOut *hw, int *nb_live)
- {
--    int smin;
-+    size_t smin;
-     int nb_live1;
- 
-     smin = audio_pcm_hw_find_min_out (hw, &nb_live1);
-@@ -682,10 +677,10 @@ static int audio_pcm_hw_get_live_out (HWVoiceOut *hw, int *nb_live)
-     }
- 
-     if (nb_live1) {
--        int live = smin;
-+        size_t live = smin;
- 
--        if (audio_bug(__func__, live < 0 || live > hw->samples)) {
--            dolog ("live=%d hw->samples=%d\n", live, hw->samples);
-+        if (audio_bug(__func__, live > hw->samples)) {
-+            dolog("live=%zu hw->samples=%zu\n", live, hw->samples);
-             return 0;
-         }
-         return live;
-@@ -696,10 +691,10 @@ static int audio_pcm_hw_get_live_out (HWVoiceOut *hw, int *nb_live)
- /*
-  * Soft voice (playback)
-  */
--static int audio_pcm_sw_write(SWVoiceOut *sw, void *buf, int size)
-+static size_t audio_pcm_sw_write(SWVoiceOut *sw, void *buf, size_t size)
- {
--    int hwsamples, samples, isamp, osamp, wpos, live, dead, left, swlim, blck;
--    int ret = 0, pos = 0, total = 0;
-+    size_t hwsamples, samples, isamp, osamp, wpos, live, dead, left, swlim, blck;
-+    size_t ret = 0, pos = 0, total = 0;
- 
-     if (!sw) {
-         return size;
-@@ -708,8 +703,8 @@ static int audio_pcm_sw_write(SWVoiceOut *sw, void *buf, int size)
-     hwsamples = sw->hw->samples;
- 
-     live = sw->total_hw_samples_mixed;
--    if (audio_bug(__func__, live < 0 || live > hwsamples)) {
--        dolog ("live=%d hw->samples=%d\n", live, hwsamples);
-+    if (audio_bug(__func__, live > hwsamples)) {
-+        dolog("live=%zu hw->samples=%zu\n", live, hwsamples);
-         return 0;
-     }
- 
-@@ -763,7 +758,7 @@ static int audio_pcm_sw_write(SWVoiceOut *sw, void *buf, int size)
- 
- #ifdef DEBUG_OUT
-     dolog (
--        "%s: write size %d ret %d total sw %d\n",
-+        "%s: write size %zu ret %zu total sw %zu\n",
-         SW_NAME (sw),
-         size >> sw->info.shift,
-         ret,
-@@ -842,7 +837,7 @@ static void audio_timer (void *opaque)
- /*
-  * Public API
-  */
--int AUD_write (SWVoiceOut *sw, void *buf, int size)
-+size_t AUD_write(SWVoiceOut *sw, void *buf, size_t size)
- {
-     if (!sw) {
-         /* XXX: Consider options */
-@@ -857,7 +852,7 @@ int AUD_write (SWVoiceOut *sw, void *buf, int size)
-     return audio_pcm_sw_write(sw, buf, size);
- }
- 
--int AUD_read (SWVoiceIn *sw, void *buf, int size)
-+size_t AUD_read(SWVoiceIn *sw, void *buf, size_t size)
- {
-     if (!sw) {
-         /* XXX: Consider options */
-@@ -966,17 +961,17 @@ void AUD_set_active_in (SWVoiceIn *sw, int on)
-     }
- }
- 
--static int audio_get_avail (SWVoiceIn *sw)
-+static size_t audio_get_avail (SWVoiceIn *sw)
- {
--    int live;
-+    size_t live;
- 
-     if (!sw) {
-         return 0;
-     }
- 
-     live = sw->hw->total_samples_captured - sw->total_hw_samples_acquired;
--    if (audio_bug(__func__, live < 0 || live > sw->hw->samples)) {
--        dolog ("live=%d sw->hw->samples=%d\n", live, sw->hw->samples);
-+    if (audio_bug(__func__, live > sw->hw->samples)) {
-+        dolog("live=%zu sw->hw->samples=%zu\n", live, sw->hw->samples);
-         return 0;
-     }
- 
-@@ -989,9 +984,9 @@ static int audio_get_avail (SWVoiceIn *sw)
-     return (((int64_t) live << 32) / sw->ratio) << sw->info.shift;
- }
- 
--static int audio_get_free (SWVoiceOut *sw)
-+static size_t audio_get_free(SWVoiceOut *sw)
- {
--    int live, dead;
-+    size_t live, dead;
- 
-     if (!sw) {
-         return 0;
-@@ -999,8 +994,8 @@ static int audio_get_free (SWVoiceOut *sw)
- 
-     live = sw->total_hw_samples_mixed;
- 
--    if (audio_bug(__func__, live < 0 || live > sw->hw->samples)) {
--        dolog ("live=%d sw->hw->samples=%d\n", live, sw->hw->samples);
-+    if (audio_bug(__func__, live > sw->hw->samples)) {
-+        dolog("live=%zu sw->hw->samples=%zu\n", live, sw->hw->samples);
-         return 0;
-     }
- 
-@@ -1015,9 +1010,10 @@ static int audio_get_free (SWVoiceOut *sw)
-     return (((int64_t) dead << 32) / sw->ratio) << sw->info.shift;
- }
- 
--static void audio_capture_mix_and_clear (HWVoiceOut *hw, int rpos, int samples)
-+static void audio_capture_mix_and_clear(HWVoiceOut *hw, size_t rpos,
-+                                        size_t samples)
- {
--    int n;
-+    size_t n;
- 
-     if (hw->enabled) {
-         SWVoiceCap *sc;
-@@ -1028,17 +1024,17 @@ static void audio_capture_mix_and_clear (HWVoiceOut *hw, int rpos, int samples)
- 
-             n = samples;
-             while (n) {
--                int till_end_of_hw = hw->samples - rpos2;
--                int to_write = MIN (till_end_of_hw, n);
--                int bytes = to_write << hw->info.shift;
--                int written;
-+                size_t till_end_of_hw = hw->samples - rpos2;
-+                size_t to_write = MIN(till_end_of_hw, n);
-+                size_t bytes = to_write << hw->info.shift;
-+                size_t written;
- 
-                 sw->buf = hw->mix_buf + rpos2;
-                 written = audio_pcm_sw_write (sw, NULL, bytes);
-                 if (written - bytes) {
--                    dolog ("Could not mix %d bytes into a capture "
--                           "buffer, mixed %d\n",
--                           bytes, written);
-+                    dolog("Could not mix %zu bytes into a capture "
-+                          "buffer, mixed %zu\n",
-+                          bytes, written);
-                     break;
-                 }
-                 n -= to_write;
-@@ -1047,9 +1043,9 @@ static void audio_capture_mix_and_clear (HWVoiceOut *hw, int rpos, int samples)
-         }
-     }
- 
--    n = MIN (samples, hw->samples - rpos);
--    mixeng_clear (hw->mix_buf + rpos, n);
--    mixeng_clear (hw->mix_buf, samples - n);
-+    n = MIN(samples, hw->samples - rpos);
-+    mixeng_clear(hw->mix_buf + rpos, n);
-+    mixeng_clear(hw->mix_buf, samples - n);
- }
- 
- static void audio_run_out (AudioState *s)
-@@ -1058,16 +1054,16 @@ static void audio_run_out (AudioState *s)
-     SWVoiceOut *sw;
- 
-     while ((hw = audio_pcm_hw_find_any_enabled_out(s, hw))) {
--        int played;
--        int live, free, nb_live, cleanup_required, prev_rpos;
-+        size_t played, live, prev_rpos, free;
-+        int nb_live, cleanup_required;
- 
-         live = audio_pcm_hw_get_live_out (hw, &nb_live);
-         if (!nb_live) {
-             live = 0;
-         }
- 
--        if (audio_bug(__func__, live < 0 || live > hw->samples)) {
--            dolog ("live=%d hw->samples=%d\n", live, hw->samples);
-+        if (audio_bug(__func__, live > hw->samples)) {
-+            dolog ("live=%zu hw->samples=%zu\n", live, hw->samples);
-             continue;
-         }
- 
-@@ -1102,13 +1098,13 @@ static void audio_run_out (AudioState *s)
-         played = hw->pcm_ops->run_out (hw, live);
-         replay_audio_out(&played);
-         if (audio_bug(__func__, hw->rpos >= hw->samples)) {
--            dolog ("hw->rpos=%d hw->samples=%d played=%d\n",
--                   hw->rpos, hw->samples, played);
-+            dolog("hw->rpos=%zu hw->samples=%zu played=%zu\n",
-+                  hw->rpos, hw->samples, played);
-             hw->rpos = 0;
-         }
- 
- #ifdef DEBUG_OUT
--        dolog ("played=%d\n", played);
-+        dolog("played=%zu\n", played);
- #endif
- 
-         if (played) {
-@@ -1123,8 +1119,8 @@ static void audio_run_out (AudioState *s)
-             }
- 
-             if (audio_bug(__func__, played > sw->total_hw_samples_mixed)) {
--                dolog ("played=%d sw->total_hw_samples_mixed=%d\n",
--                       played, sw->total_hw_samples_mixed);
-+                dolog("played=%zu sw->total_hw_samples_mixed=%zu\n",
-+                      played, sw->total_hw_samples_mixed);
-                 played = sw->total_hw_samples_mixed;
-             }
- 
-@@ -1164,7 +1160,7 @@ static void audio_run_in (AudioState *s)
- 
-     while ((hw = audio_pcm_hw_find_any_enabled_in(s, hw))) {
-         SWVoiceIn *sw;
--        int captured = 0, min;
-+        size_t captured = 0, min;
- 
-         if (replay_mode != REPLAY_MODE_PLAY) {
-             captured = hw->pcm_ops->run_in(hw);
-@@ -1179,7 +1175,7 @@ static void audio_run_in (AudioState *s)
-             sw->total_hw_samples_acquired -= min;
- 
-             if (sw->active) {
--                int avail;
-+                size_t avail;
- 
-                 avail = audio_get_avail (sw);
-                 if (avail > 0) {
-@@ -1195,15 +1191,15 @@ static void audio_run_capture (AudioState *s)
-     CaptureVoiceOut *cap;
- 
-     for (cap = s->cap_head.lh_first; cap; cap = cap->entries.le_next) {
--        int live, rpos, captured;
-+        size_t live, rpos, captured;
-         HWVoiceOut *hw = &cap->hw;
-         SWVoiceOut *sw;
- 
-         captured = live = audio_pcm_hw_get_live_out (hw, NULL);
-         rpos = hw->rpos;
-         while (live) {
--            int left = hw->samples - rpos;
--            int to_capture = MIN (live, left);
-+            size_t left = hw->samples - rpos;
-+            size_t to_capture = MIN(live, left);
-             struct st_sample *src;
-             struct capture_callback *cb;
- 
-@@ -1226,8 +1222,8 @@ static void audio_run_capture (AudioState *s)
-             }
- 
-             if (audio_bug(__func__, captured > sw->total_hw_samples_mixed)) {
--                dolog ("captured=%d sw->total_hw_samples_mixed=%d\n",
--                       captured, sw->total_hw_samples_mixed);
-+                dolog("captured=%zu sw->total_hw_samples_mixed=%zu\n",
-+                      captured, sw->total_hw_samples_mixed);
-                 captured = sw->total_hw_samples_mixed;
-             }
- 
-diff --git a/audio/coreaudio.c b/audio/coreaudio.c
-index 091fe84a34..d1be58b40a 100644
---- a/audio/coreaudio.c
-+++ b/audio/coreaudio.c
-@@ -43,9 +43,9 @@ typedef struct coreaudioVoiceOut {
-     UInt32 audioDevicePropertyBufferFrameSize;
-     AudioStreamBasicDescription outputStreamBasicDescription;
-     AudioDeviceIOProcID ioprocid;
--    int live;
--    int decr;
--    int rpos;
-+    size_t live;
-+    size_t decr;
-+    size_t rpos;
- } coreaudioVoiceOut;
- 
- #if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6
-@@ -397,9 +397,9 @@ static int coreaudio_unlock (coreaudioVoiceOut *core, const char *fn_name)
-     return 0;
- }
- 
--static int coreaudio_run_out (HWVoiceOut *hw, int live)
-+static size_t coreaudio_run_out(HWVoiceOut *hw, size_t live)
- {
--    int decr;
-+    size_t decr;
-     coreaudioVoiceOut *core = (coreaudioVoiceOut *) hw;
- 
-     if (coreaudio_lock (core, "coreaudio_run_out")) {
-diff --git a/audio/dsoundaudio.c b/audio/dsoundaudio.c
-index 11594c3095..67aa1d0ad5 100644
---- a/audio/dsoundaudio.c
-+++ b/audio/dsoundaudio.c
-@@ -454,19 +454,20 @@ static int dsound_ctl_out (HWVoiceOut *hw, int cmd, ...)
-     return 0;
- }
- 
--static int dsound_run_out (HWVoiceOut *hw, int live)
-+static size_t dsound_run_out(HWVoiceOut *hw, size_t live)
- {
-     int err;
-     HRESULT hr;
-     DSoundVoiceOut *ds = (DSoundVoiceOut *) hw;
-     LPDIRECTSOUNDBUFFER dsb = ds->dsound_buffer;
--    int len, hwshift;
-+    size_t len;
-+    int hwshift;
-     DWORD blen1, blen2;
-     DWORD len1, len2;
-     DWORD decr;
-     DWORD wpos, ppos, old_pos;
-     LPVOID p1, p2;
--    int bufsize;
-+    size_t bufsize;
-     dsound *s = ds->s;
-     AudiodevDsoundOptions *dso = &s->dev->u.dsound;
- 
-@@ -640,13 +641,13 @@ static int dsound_ctl_in (HWVoiceIn *hw, int cmd, ...)
-     return 0;
- }
- 
--static int dsound_run_in (HWVoiceIn *hw)
-+static size_t dsound_run_in(HWVoiceIn *hw)
- {
-     int err;
-     HRESULT hr;
-     DSoundVoiceIn *ds = (DSoundVoiceIn *) hw;
-     LPDIRECTSOUNDCAPTUREBUFFER dscb = ds->dsound_capture_buffer;
--    int live, len, dead;
-+    size_t live, len, dead;
-     DWORD blen1, blen2;
-     DWORD len1, len2;
-     DWORD decr;
-diff --git a/audio/noaudio.c b/audio/noaudio.c
-index cbb02d9e49..0fb2629cf2 100644
---- a/audio/noaudio.c
-+++ b/audio/noaudio.c
-@@ -41,10 +41,10 @@ typedef struct NoVoiceIn {
-     int64_t old_ticks;
- } NoVoiceIn;
- 
--static int no_run_out (HWVoiceOut *hw, int live)
-+static size_t no_run_out(HWVoiceOut *hw, size_t live)
- {
-     NoVoiceOut *no = (NoVoiceOut *) hw;
--    int decr, samples;
-+    size_t decr, samples;
-     int64_t now;
-     int64_t ticks;
-     int64_t bytes;
-@@ -52,7 +52,7 @@ static int no_run_out (HWVoiceOut *hw, int live)
-     now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-     ticks = now - no->old_ticks;
-     bytes = muldiv64(ticks, hw->info.bytes_per_second, NANOSECONDS_PER_SECOND);
--    bytes = MIN(bytes, INT_MAX);
-+    bytes = MIN(bytes, SIZE_MAX);
-     samples = bytes >> hw->info.shift;
- 
-     no->old_ticks = now;
-@@ -92,12 +92,12 @@ static void no_fini_in (HWVoiceIn *hw)
-     (void) hw;
- }
- 
--static int no_run_in (HWVoiceIn *hw)
-+static size_t no_run_in(HWVoiceIn *hw)
- {
-     NoVoiceIn *no = (NoVoiceIn *) hw;
--    int live = audio_pcm_hw_get_live_in (hw);
--    int dead = hw->samples - live;
--    int samples = 0;
-+    size_t live = audio_pcm_hw_get_live_in(hw);
-+    size_t dead = hw->samples - live;
-+    size_t samples = 0;
- 
-     if (dead) {
-         int64_t now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-@@ -106,7 +106,7 @@ static int no_run_in (HWVoiceIn *hw)
-             muldiv64(ticks, hw->info.bytes_per_second, NANOSECONDS_PER_SECOND);
- 
-         no->old_ticks = now;
--        bytes = MIN (bytes, INT_MAX);
-+        bytes = MIN (bytes, SIZE_MAX);
-         samples = bytes >> hw->info.shift;
-         samples = MIN (samples, dead);
-     }
-diff --git a/audio/ossaudio.c b/audio/ossaudio.c
-index b99edbec17..1696933688 100644
---- a/audio/ossaudio.c
-+++ b/audio/ossaudio.c
-@@ -411,13 +411,14 @@ static void oss_write_pending (OSSVoiceOut *oss)
-     }
- }
- 
--static int oss_run_out (HWVoiceOut *hw, int live)
-+static size_t oss_run_out(HWVoiceOut *hw, size_t live)
- {
-     OSSVoiceOut *oss = (OSSVoiceOut *) hw;
--    int err, decr;
-+    int err;
-+    size_t decr;
-     struct audio_buf_info abinfo;
-     struct count_info cntinfo;
--    int bufsize;
-+    size_t bufsize;
- 
-     bufsize = hw->samples << hw->info.shift;
- 
-@@ -476,8 +477,8 @@ static void oss_fini_out (HWVoiceOut *hw)
-         if (oss->mmapped) {
-             err = munmap (oss->pcm_buf, hw->samples << hw->info.shift);
-             if (err) {
--                oss_logerr (errno, "Failed to unmap buffer %p, size %d\n",
--                            oss->pcm_buf, hw->samples << hw->info.shift);
-+                oss_logerr(errno, "Failed to unmap buffer %p, size %zu\n",
-+                           oss->pcm_buf, hw->samples << hw->info.shift);
-             }
-         }
-         else {
-@@ -543,8 +544,8 @@ static int oss_init_out(HWVoiceOut *hw, struct audsettings *as,
-             0
-             );
-         if (oss->pcm_buf == MAP_FAILED) {
--            oss_logerr (errno, "Failed to map %d bytes of DAC\n",
--                        hw->samples << hw->info.shift);
-+            oss_logerr(errno, "Failed to map %zu bytes of DAC\n",
-+                       hw->samples << hw->info.shift);
-         }
-         else {
-             int err;
-@@ -568,8 +569,8 @@ static int oss_init_out(HWVoiceOut *hw, struct audsettings *as,
-             if (!oss->mmapped) {
-                 err = munmap (oss->pcm_buf, hw->samples << hw->info.shift);
-                 if (err) {
--                    oss_logerr (errno, "Failed to unmap buffer %p size %d\n",
--                                oss->pcm_buf, hw->samples << hw->info.shift);
-+                    oss_logerr(errno, "Failed to unmap buffer %p size %zu\n",
-+                               oss->pcm_buf, hw->samples << hw->info.shift);
-                 }
-             }
-         }
-@@ -581,7 +582,7 @@ static int oss_init_out(HWVoiceOut *hw, struct audsettings *as,
-                                     1 << hw->info.shift);
-         if (!oss->pcm_buf) {
-             dolog (
--                "Could not allocate DAC buffer (%d samples, each %d bytes)\n",
-+                "Could not allocate DAC buffer (%zu samples, each %d bytes)\n",
-                 hw->samples,
-                 1 << hw->info.shift
-                 );
-@@ -693,8 +694,8 @@ static int oss_init_in(HWVoiceIn *hw, struct audsettings *as, void *drv_opaque)
-     hw->samples = (obt.nfrags * obt.fragsize) >> hw->info.shift;
-     oss->pcm_buf = audio_calloc(__func__, hw->samples, 1 << hw->info.shift);
-     if (!oss->pcm_buf) {
--        dolog ("Could not allocate ADC buffer (%d samples, each %d bytes)\n",
--               hw->samples, 1 << hw->info.shift);
-+        dolog("Could not allocate ADC buffer (%zu samples, each %d bytes)\n",
-+              hw->samples, 1 << hw->info.shift);
-         oss_anal_close (&fd);
-         return -1;
-     }
-@@ -714,17 +715,17 @@ static void oss_fini_in (HWVoiceIn *hw)
-     oss->pcm_buf = NULL;
- }
- 
--static int oss_run_in (HWVoiceIn *hw)
-+static size_t oss_run_in(HWVoiceIn *hw)
- {
-     OSSVoiceIn *oss = (OSSVoiceIn *) hw;
-     int hwshift = hw->info.shift;
-     int i;
--    int live = audio_pcm_hw_get_live_in (hw);
--    int dead = hw->samples - live;
-+    size_t live = audio_pcm_hw_get_live_in (hw);
-+    size_t dead = hw->samples - live;
-     size_t read_samples = 0;
-     struct {
--        int add;
--        int len;
-+        size_t add;
-+        size_t len;
-     } bufs[2] = {
-         { .add = hw->wpos, .len = 0 },
-         { .add = 0,        .len = 0 }
-@@ -751,9 +752,9 @@ static int oss_run_in (HWVoiceIn *hw)
- 
-             if (nread > 0) {
-                 if (nread & hw->info.align) {
--                    dolog ("warning: Misaligned read %zd (requested %d), "
--                           "alignment %d\n", nread, bufs[i].add << hwshift,
--                           hw->info.align + 1);
-+                    dolog("warning: Misaligned read %zd (requested %zu), "
-+                          "alignment %d\n", nread, bufs[i].add << hwshift,
-+                          hw->info.align + 1);
-                 }
-                 read_samples += nread >> hwshift;
-                 hw->conv (hw->conv_buf + bufs[i].add, p, nread >> hwshift);
-@@ -766,9 +767,9 @@ static int oss_run_in (HWVoiceIn *hw)
-                     case EAGAIN:
-                         break;
-                     default:
--                        oss_logerr (
-+                        oss_logerr(
-                             errno,
--                            "Failed to read %d bytes of audio (to %p)\n",
-+                            "Failed to read %zu bytes of audio (to %p)\n",
-                             bufs[i].len, p
-                             );
-                         break;
-diff --git a/audio/paaudio.c b/audio/paaudio.c
-index efb72ced30..bfef9acaad 100644
---- a/audio/paaudio.c
-+++ b/audio/paaudio.c
-@@ -30,30 +30,30 @@ typedef struct {
- 
- typedef struct {
-     HWVoiceOut hw;
--    int done;
--    int live;
--    int decr;
--    int rpos;
-+    size_t done;
-+    size_t live;
-+    size_t decr;
-+    size_t rpos;
-     pa_stream *stream;
-     void *pcm_buf;
-     struct audio_pt pt;
-     paaudio *g;
--    int samples;
-+    size_t samples;
- } PAVoiceOut;
- 
- typedef struct {
-     HWVoiceIn hw;
--    int done;
--    int dead;
--    int incr;
--    int wpos;
-+    size_t done;
-+    size_t dead;
-+    size_t incr;
-+    size_t wpos;
-     pa_stream *stream;
-     void *pcm_buf;
-     struct audio_pt pt;
-     const void *read_data;
-     size_t read_index, read_length;
-     paaudio *g;
--    int samples;
-+    size_t samples;
- } PAVoiceIn;
- 
- static void qpa_conn_fini(PAConnection *c);
-@@ -219,7 +219,7 @@ static void *qpa_thread_out (void *arg)
-     }
- 
-     for (;;) {
--        int decr, to_mix, rpos;
-+        size_t decr, to_mix, rpos;
- 
-         for (;;) {
-             if (pa->done) {
-@@ -244,7 +244,7 @@ static void *qpa_thread_out (void *arg)
- 
-         while (to_mix) {
-             int error;
--            int chunk = MIN (to_mix, hw->samples - rpos);
-+            size_t chunk = MIN (to_mix, hw->samples - rpos);
-             struct st_sample *src = hw->mix_buf + rpos;
- 
-             hw->clip (pa->pcm_buf, src, chunk);
-@@ -273,9 +273,9 @@ static void *qpa_thread_out (void *arg)
-     return NULL;
- }
- 
--static int qpa_run_out (HWVoiceOut *hw, int live)
-+static size_t qpa_run_out(HWVoiceOut *hw, size_t live)
- {
--    int decr;
-+    size_t decr;
-     PAVoiceOut *pa = (PAVoiceOut *) hw;
- 
-     if (audio_pt_lock(&pa->pt, __func__)) {
-@@ -306,7 +306,7 @@ static void *qpa_thread_in (void *arg)
-     }
- 
-     for (;;) {
--        int incr, to_grab, wpos;
-+        size_t incr, to_grab, wpos;
- 
-         for (;;) {
-             if (pa->done) {
-@@ -331,7 +331,7 @@ static void *qpa_thread_in (void *arg)
- 
-         while (to_grab) {
-             int error;
--            int chunk = MIN (to_grab, hw->samples - wpos);
-+            size_t chunk = MIN (to_grab, hw->samples - wpos);
-             void *buf = advance (pa->pcm_buf, wpos);
- 
-             if (qpa_simple_read (pa, buf,
-@@ -359,9 +359,9 @@ static void *qpa_thread_in (void *arg)
-     return NULL;
- }
- 
--static int qpa_run_in (HWVoiceIn *hw)
-+static size_t qpa_run_in(HWVoiceIn *hw)
- {
--    int live, incr, dead;
-+    size_t live, incr, dead;
-     PAVoiceIn *pa = (PAVoiceIn *) hw;
- 
-     if (audio_pt_lock(&pa->pt, __func__)) {
-@@ -582,8 +582,8 @@ static int qpa_init_out(HWVoiceOut *hw, struct audsettings *as,
-     pa->pcm_buf = audio_calloc(__func__, hw->samples, 1 << hw->info.shift);
-     pa->rpos = hw->rpos;
-     if (!pa->pcm_buf) {
--        dolog ("Could not allocate buffer (%d bytes)\n",
--               hw->samples << hw->info.shift);
-+        dolog("Could not allocate buffer (%zu bytes)\n",
-+              hw->samples << hw->info.shift);
-         goto fail2;
-     }
- 
-@@ -650,8 +650,8 @@ static int qpa_init_in(HWVoiceIn *hw, struct audsettings *as, void *drv_opaque)
-     pa->pcm_buf = audio_calloc(__func__, hw->samples, 1 << hw->info.shift);
-     pa->wpos = hw->wpos;
-     if (!pa->pcm_buf) {
--        dolog ("Could not allocate buffer (%d bytes)\n",
--               hw->samples << hw->info.shift);
-+        dolog("Could not allocate buffer (%zu bytes)\n",
-+              hw->samples << hw->info.shift);
-         goto fail2;
-     }
- 
-diff --git a/audio/sdlaudio.c b/audio/sdlaudio.c
-index c7fd487e0e..14b11f0335 100644
---- a/audio/sdlaudio.c
-+++ b/audio/sdlaudio.c
-@@ -41,8 +41,8 @@
- 
- typedef struct SDLVoiceOut {
-     HWVoiceOut hw;
--    int live;
--    int decr;
-+    size_t live;
-+    size_t decr;
- } SDLVoiceOut;
- 
- static struct SDLAudioState {
-@@ -184,22 +184,22 @@ static void sdl_callback (void *opaque, Uint8 *buf, int len)
-     SDLVoiceOut *sdl = opaque;
-     SDLAudioState *s = &glob_sdl;
-     HWVoiceOut *hw = &sdl->hw;
--    int samples = len >> hw->info.shift;
--    int to_mix, decr;
-+    size_t samples = len >> hw->info.shift;
-+    size_t to_mix, decr;
- 
-     if (s->exit || !sdl->live) {
-         return;
-     }
- 
--    /* dolog ("in callback samples=%d live=%d\n", samples, sdl->live); */
-+    /* dolog ("in callback samples=%zu live=%zu\n", samples, sdl->live); */
- 
-     to_mix = MIN(samples, sdl->live);
-     decr = to_mix;
-     while (to_mix) {
--        int chunk = MIN(to_mix, hw->samples - hw->rpos);
-+        size_t chunk = MIN(to_mix, hw->samples - hw->rpos);
-         struct st_sample *src = hw->mix_buf + hw->rpos;
- 
--        /* dolog ("in callback to_mix %d, chunk %d\n", to_mix, chunk); */
-+        /* dolog ("in callback to_mix %zu, chunk %zu\n", to_mix, chunk); */
-         hw->clip(buf, src, chunk);
-         hw->rpos = (hw->rpos + chunk) % hw->samples;
-         to_mix -= chunk;
-@@ -209,7 +209,7 @@ static void sdl_callback (void *opaque, Uint8 *buf, int len)
-     sdl->live -= decr;
-     sdl->decr += decr;
- 
--    /* dolog ("done len=%d\n", len); */
-+    /* dolog ("done len=%zu\n", len); */
- 
-     /* SDL2 does not clear the remaining buffer for us, so do it on our own */
-     if (samples) {
-@@ -217,9 +217,9 @@ static void sdl_callback (void *opaque, Uint8 *buf, int len)
-     }
- }
- 
--static int sdl_run_out (HWVoiceOut *hw, int live)
-+static size_t sdl_run_out(HWVoiceOut *hw, size_t live)
- {
--    int decr;
-+    size_t decr;
-     SDLVoiceOut *sdl = (SDLVoiceOut *) hw;
- 
-     SDL_LockAudio();
-diff --git a/audio/spiceaudio.c b/audio/spiceaudio.c
-index 6e7f13cffa..d9db1a39e6 100644
---- a/audio/spiceaudio.c
-+++ b/audio/spiceaudio.c
-@@ -153,11 +153,11 @@ static void line_out_fini (HWVoiceOut *hw)
-     spice_server_remove_interface (&out->sin.base);
- }
- 
--static int line_out_run (HWVoiceOut *hw, int live)
-+static size_t line_out_run (HWVoiceOut *hw, size_t live)
- {
-     SpiceVoiceOut *out = container_of (hw, SpiceVoiceOut, hw);
--    int rpos, decr;
--    int samples;
-+    size_t rpos, decr;
-+    size_t samples;
- 
-     if (!live) {
-         return 0;
-@@ -276,12 +276,12 @@ static void line_in_fini (HWVoiceIn *hw)
-     spice_server_remove_interface (&in->sin.base);
- }
- 
--static int line_in_run (HWVoiceIn *hw)
-+static size_t line_in_run(HWVoiceIn *hw)
- {
-     SpiceVoiceIn *in = container_of (hw, SpiceVoiceIn, hw);
--    int num_samples;
-+    size_t num_samples;
-     int ready;
--    int len[2];
-+    size_t len[2];
-     uint64_t delta_samp;
-     const uint32_t *samples;
- 
-diff --git a/audio/wavaudio.c b/audio/wavaudio.c
-index 17ab921cef..b6eeeb4e26 100644
---- a/audio/wavaudio.c
-+++ b/audio/wavaudio.c
-@@ -40,10 +40,10 @@ typedef struct WAVVoiceOut {
-     int total_samples;
- } WAVVoiceOut;
- 
--static int wav_run_out (HWVoiceOut *hw, int live)
-+static size_t wav_run_out(HWVoiceOut *hw, size_t live)
- {
-     WAVVoiceOut *wav = (WAVVoiceOut *) hw;
--    int rpos, decr, samples;
-+    size_t rpos, decr, samples;
-     uint8_t *dst;
-     struct st_sample *src;
-     int64_t now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-@@ -139,8 +139,8 @@ static int wav_init_out(HWVoiceOut *hw, struct audsettings *as,
-     hw->samples = 1024;
-     wav->pcm_buf = audio_calloc(__func__, hw->samples, 1 << hw->info.shift);
-     if (!wav->pcm_buf) {
--        dolog ("Could not allocate buffer (%d bytes)\n",
--               hw->samples << hw->info.shift);
-+        dolog("Could not allocate buffer (%zu bytes)\n",
-+              hw->samples << hw->info.shift);
-         return -1;
-     }
- 
-diff --git a/replay/replay-audio.c b/replay/replay-audio.c
-index b113836de4..efe1628727 100644
---- a/replay/replay-audio.c
-+++ b/replay/replay-audio.c
-@@ -16,18 +16,18 @@
- #include "sysemu/sysemu.h"
- #include "audio/audio.h"
- 
--void replay_audio_out(int *played)
-+void replay_audio_out(size_t *played)
- {
-     if (replay_mode == REPLAY_MODE_RECORD) {
-         g_assert(replay_mutex_locked());
-         replay_save_instructions();
-         replay_put_event(EVENT_AUDIO_OUT);
--        replay_put_dword(*played);
-+        replay_put_qword(*played);
-     } else if (replay_mode == REPLAY_MODE_PLAY) {
-         g_assert(replay_mutex_locked());
-         replay_account_executed_instructions();
-         if (replay_next_event_is(EVENT_AUDIO_OUT)) {
--            *played = replay_get_dword();
-+            *played = replay_get_qword();
-             replay_finish_event();
-         } else {
-             error_report("Missing audio out event in the replay log");
-@@ -36,7 +36,7 @@ void replay_audio_out(int *played)
-     }
- }
- 
--void replay_audio_in(int *recorded, void *samples, int *wpos, int size)
-+void replay_audio_in(size_t *recorded, void *samples, size_t *wpos, size_t size)
- {
-     int pos;
-     uint64_t left, right;
-@@ -44,8 +44,8 @@ void replay_audio_in(int *recorded, void *samples, int *wpos, int size)
-         g_assert(replay_mutex_locked());
-         replay_save_instructions();
-         replay_put_event(EVENT_AUDIO_IN);
--        replay_put_dword(*recorded);
--        replay_put_dword(*wpos);
-+        replay_put_qword(*recorded);
-+        replay_put_qword(*wpos);
-         for (pos = (*wpos - *recorded + size) % size ; pos != *wpos
-              ; pos = (pos + 1) % size) {
-             audio_sample_to_uint64(samples, pos, &left, &right);
-@@ -56,8 +56,8 @@ void replay_audio_in(int *recorded, void *samples, int *wpos, int size)
-         g_assert(replay_mutex_locked());
-         replay_account_executed_instructions();
-         if (replay_next_event_is(EVENT_AUDIO_IN)) {
--            *recorded = replay_get_dword();
--            *wpos = replay_get_dword();
-+            *recorded = replay_get_qword();
-+            *wpos = replay_get_qword();
-             for (pos = (*wpos - *recorded + size) % size ; pos != *wpos
-                  ; pos = (pos + 1) % size) {
-                 left = replay_get_qword();
-diff --git a/replay/replay.c b/replay/replay.c
-index 8b172b2d1b..a1135a9943 100644
---- a/replay/replay.c
-+++ b/replay/replay.c
-@@ -22,7 +22,7 @@
- 
- /* Current version of the replay mechanism.
-    Increase it when file format changes. */
--#define REPLAY_VERSION              0xe02007
-+#define REPLAY_VERSION              0xe02008
- /* Size of replay log header */
- #define HEADER_SIZE                 (sizeof(uint32_t) + sizeof(uint64_t))
- 
--- 
-2.22.0
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS9jb3Zlci4xNTYzMjI0NjI4Lmdp
+dC5EaXJ0WS5pQ0UuaHVAZ21haWwuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhh
+dmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUg
+aW5mb3JtYXRpb246CgpNZXNzYWdlLWlkOiBjb3Zlci4xNTYzMjI0NjI4LmdpdC5EaXJ0WS5pQ0Uu
+aHVAZ21haWwuY29tClR5cGU6IHNlcmllcwpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHYy
+IDAwLzE0XSBNdWx0aXBsZSBzaW11bHRhbmVvdXMgYXVkaW8gYmFja2VuZHMKCj09PSBURVNUIFND
+UklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxs
+IHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25m
+aWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdv
+cml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4u
+Cj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQx
+ZGVmN2Y0NGJkODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKOWJkOGJj
+NiBhdWRpbzogZml4IG1lbW9yeSBsZWFrIHJlcG9ydGVkIGJ5IEFTQU4KZThkMjNmNiBhdWRpbzog
+dXNlIHNpemVfdCB3aGVyZSBtYWtlcyBzZW5zZQo3MDM1ZDlmIGF1ZGlvOiByZW1vdmUgcmVhZCBh
+bmQgd3JpdGUgcGNtX29wcwo4MjAzOGYxIHBhYXVkaW86IGZpeCBwbGF5YmFjayBnbGl0Y2hlcwph
+ZDc3M2Y5IGF1ZGlvOiBkbyBub3QgcnVuIGVhY2ggYmFja2VuZCBpbiBhdWRpb19ydW4KZTViYWU1
+NCBhdWRpbzogcmVtb3ZlIGF1ZGlvX01JTiwgYXVkaW9fTUFYCjNmNTI1ZTQgcGFhdWRpbzogcHJv
+cGVybHkgZGlzY29ubmVjdCBzdHJlYW1zIGluIGZpbmlfKgplNzY0MjljIHBhYXVkaW86IGRvIG5v
+dCBtb3ZlIHN0cmVhbSB3aGVuIHNpbmsvc291cmNlIG5hbWUgaXMgc3BlY2lmaWVkCjIzMmY5MjUg
+YXVkaW86IGF1ZGlvZGV2PSBwYXJhbWV0ZXJzIG5vIGxvbmdlciBvcHRpb25hbCB3aGVuIC1hdWRp
+b2RldiBwcmVzZW50CjA0NzVlZjQgcGFhdWRpbzogcHJlcGFyZSBmb3IgbXVsdGlwbGUgYXVkaW9k
+ZXYKZDBjY2RiMyBhdWRpbzogYWRkIGF1ZGlvZGV2IHByb3BlcnRpZXMgdG8gZnJvbnRlbmRzCmI4
+YmJmNmIgYXVkaW86IGFkZCBhdWRpb2RldiBwcm9wZXJ0eSB0byB2bmMgYW5kIHdhdl9jYXB0dXJl
+CjQ1YmVjZTkgYXVkaW86IGJhc2ljIHN1cHBvcnQgZm9yIG11bHRpIGJhY2tlbmQgYXVkaW8KYjhl
+ZDhmYSBhdWRpbzogcmVkdWNlIGdsb2JfYXVkaW9fc3RhdGUgdXNhZ2UKCj09PSBPVVRQVVQgQkVH
+SU4gPT09CjEvMTQgQ2hlY2tpbmcgY29tbWl0IGI4ZWQ4ZmE3MmU2NCAoYXVkaW86IHJlZHVjZSBn
+bG9iX2F1ZGlvX3N0YXRlIHVzYWdlKQoyLzE0IENoZWNraW5nIGNvbW1pdCA0NWJlY2U5NDQ1ZmYg
+KGF1ZGlvOiBiYXNpYyBzdXBwb3J0IGZvciBtdWx0aSBiYWNrZW5kIGF1ZGlvKQozLzE0IENoZWNr
+aW5nIGNvbW1pdCBiOGJiZjZiMTUzNGEgKGF1ZGlvOiBhZGQgYXVkaW9kZXYgcHJvcGVydHkgdG8g
+dm5jIGFuZCB3YXZfY2FwdHVyZSkKNC8xNCBDaGVja2luZyBjb21taXQgZDBjY2RiMzE4MzFkIChh
+dWRpbzogYWRkIGF1ZGlvZGV2IHByb3BlcnRpZXMgdG8gZnJvbnRlbmRzKQo1LzE0IENoZWNraW5n
+IGNvbW1pdCAwNDc1ZWY0YWE1NTYgKHBhYXVkaW86IHByZXBhcmUgZm9yIG11bHRpcGxlIGF1ZGlv
+ZGV2KQo2LzE0IENoZWNraW5nIGNvbW1pdCAyMzJmOTI1NzAzZjQgKGF1ZGlvOiBhdWRpb2Rldj0g
+cGFyYW1ldGVycyBubyBsb25nZXIgb3B0aW9uYWwgd2hlbiAtYXVkaW9kZXYgcHJlc2VudCkKNy8x
+NCBDaGVja2luZyBjb21taXQgZTc2NDI5YzEyZGRhIChwYWF1ZGlvOiBkbyBub3QgbW92ZSBzdHJl
+YW0gd2hlbiBzaW5rL3NvdXJjZSBuYW1lIGlzIHNwZWNpZmllZCkKOC8xNCBDaGVja2luZyBjb21t
+aXQgM2Y1MjVlNDU5MDExIChwYWF1ZGlvOiBwcm9wZXJseSBkaXNjb25uZWN0IHN0cmVhbXMgaW4g
+ZmluaV8qKQo5LzE0IENoZWNraW5nIGNvbW1pdCBlNWJhZTU0ZmM3NDggKGF1ZGlvOiByZW1vdmUg
+YXVkaW9fTUlOLCBhdWRpb19NQVgpCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJldHdlZW4gZnVu
+Y3Rpb24gbmFtZSBhbmQgb3BlbiBwYXJlbnRoZXNpcyAnKCcKIzIzOiBGSUxFOiBhdWRpby9hbHNh
+YXVkaW8uYzo2Mzc6CisgICAgICAgIGludCBsZW4gPSBNSU4gKGFsc2EtPnBlbmRpbmcsIGxlZnRf
+dGlsbF9lbmRfc2FtcGxlcyk7CgpFUlJPUjogc3BhY2UgcHJvaGliaXRlZCBiZXR3ZWVuIGZ1bmN0
+aW9uIG5hbWUgYW5kIG9wZW4gcGFyZW50aGVzaXMgJygnCiMzMjogRklMRTogYXVkaW8vYWxzYWF1
+ZGlvLmM6NzAwOgorICAgIGRlY3IgPSBNSU4gKGxpdmUsIGF2YWlsKTsKCkVSUk9SOiBzcGFjZSBw
+cm9oaWJpdGVkIGJldHdlZW4gZnVuY3Rpb24gbmFtZSBhbmQgb3BlbiBwYXJlbnRoZXNpcyAnKCcK
+IzQxOiBGSUxFOiBhdWRpby9hbHNhYXVkaW8uYzo5MTg6CisgICAgZGVjciA9IE1JTiAoZGVhZCwg
+YXZhaWwpOwoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmV0d2VlbiBmdW5jdGlvbiBuYW1lIGFu
+ZCBvcGVuIHBhcmVudGhlc2lzICcoJwojNTQ6IEZJTEU6IGF1ZGlvL2F1ZGlvLmM6NTM2OgorICAg
+ICAgICAgICAgbSA9IE1JTiAobSwgc3ctPnRvdGFsX2h3X3NhbXBsZXNfYWNxdWlyZWQpOwoKRVJS
+T1I6IHNwYWNlIHByb2hpYml0ZWQgYmV0d2VlbiBmdW5jdGlvbiBuYW1lIGFuZCBvcGVuIHBhcmVu
+dGhlc2lzICcoJwojNjM6IEZJTEU6IGF1ZGlvL2F1ZGlvLmM6NTU2OgorICAgIGludCBsZW4gPSBN
+SU4gKGxlZnQsIGxpdmUpOwoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmV0d2VlbiBmdW5jdGlv
+biBuYW1lIGFuZCBvcGVuIHBhcmVudGhlc2lzICcoJwojNzE6IEZJTEU6IGF1ZGlvL2F1ZGlvLmM6
+NTYzOgorICAgICAgICBpbnQgc2FtcGxlc190b19jbGlwID0gTUlOIChsZW4sIHNhbXBsZXNfdGls
+bF9lbmRfb2ZfYnVmKTsKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJldHdlZW4gZnVuY3Rpb24g
+bmFtZSBhbmQgb3BlbiBwYXJlbnRoZXNpcyAnKCcKIzgwOiBGSUxFOiBhdWRpby9hdWRpby5jOjYx
+NzoKKyAgICBzd2xpbSA9IE1JTiAoc3dsaW0sIHNhbXBsZXMpOwoKRVJST1I6IHNwYWNlIHByb2hp
+Yml0ZWQgYmV0d2VlbiBmdW5jdGlvbiBuYW1lIGFuZCBvcGVuIHBhcmVudGhlc2lzICcoJwojODk6
+IEZJTEU6IGF1ZGlvL2F1ZGlvLmM6NjY1OgorICAgICAgICAgICAgbSA9IE1JTiAobSwgc3ctPnRv
+dGFsX2h3X3NhbXBsZXNfbWl4ZWQpOwoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmV0d2VlbiBm
+dW5jdGlvbiBuYW1lIGFuZCBvcGVuIHBhcmVudGhlc2lzICcoJwojOTg6IEZJTEU6IGF1ZGlvL2F1
+ZGlvLmM6NzI4OgorICAgIHN3bGltID0gTUlOIChzd2xpbSwgc2FtcGxlcyk7CgpFUlJPUjogc3Bh
+Y2UgcHJvaGliaXRlZCBiZXR3ZWVuIGZ1bmN0aW9uIG5hbWUgYW5kIG9wZW4gcGFyZW50aGVzaXMg
+JygnCiMxMDc6IEZJTEU6IGF1ZGlvL2F1ZGlvLmM6NzQwOgorICAgICAgICBibGNrID0gTUlOIChk
+ZWFkLCBsZWZ0KTsKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJldHdlZW4gZnVuY3Rpb24gbmFt
+ZSBhbmQgb3BlbiBwYXJlbnRoZXNpcyAnKCcKIzExNjogRklMRTogYXVkaW8vYXVkaW8uYzoxMDMy
+OgorICAgICAgICAgICAgICAgIGludCB0b193cml0ZSA9IE1JTiAodGlsbF9lbmRfb2ZfaHcsIG4p
+OwoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmV0d2VlbiBmdW5jdGlvbiBuYW1lIGFuZCBvcGVu
+IHBhcmVudGhlc2lzICcoJwojMTI1OiBGSUxFOiBhdWRpby9hdWRpby5jOjEwNTA6CisgICAgbiA9
+IE1JTiAoc2FtcGxlcywgaHctPnNhbXBsZXMgLSBycG9zKTsKCkVSUk9SOiBzcGFjZSBwcm9oaWJp
+dGVkIGJldHdlZW4gZnVuY3Rpb24gbmFtZSBhbmQgb3BlbiBwYXJlbnRoZXNpcyAnKCcKIzEzNDog
+RklMRTogYXVkaW8vYXVkaW8uYzoxMjA2OgorICAgICAgICAgICAgaW50IHRvX2NhcHR1cmUgPSBN
+SU4gKGxpdmUsIGxlZnQpOwoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmV0d2VlbiBmdW5jdGlv
+biBuYW1lIGFuZCBvcGVuIHBhcmVudGhlc2lzICcoJwojMTc1OiBGSUxFOiBhdWRpby9jb3JlYXVk
+aW8uYzo0MTY6CisgICAgZGVjciA9IE1JTiAoY29yZS0+ZGVjciwgbGl2ZSk7CgpFUlJPUjogc3Bh
+Y2UgcHJvaGliaXRlZCBiZXR3ZWVuIGZ1bmN0aW9uIG5hbWUgYW5kIG9wZW4gcGFyZW50aGVzaXMg
+JygnCiMxODg6IEZJTEU6IGF1ZGlvL2Rzb3VuZGF1ZGlvLmM6NzEwOgorICAgIGxlbiA9IE1JTiAo
+bGVuLCBkZWFkKTsKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJldHdlZW4gZnVuY3Rpb24gbmFt
+ZSBhbmQgb3BlbiBwYXJlbnRoZXNpcyAnKCcKIzIwNjogRklMRTogYXVkaW8vbm9hdWRpby5jOjU5
+OgorICAgIGRlY3IgPSBNSU4gKGxpdmUsIHNhbXBsZXMpOwoKRVJST1I6IHNwYWNlIHByb2hpYml0
+ZWQgYmV0d2VlbiBmdW5jdGlvbiBuYW1lIGFuZCBvcGVuIHBhcmVudGhlc2lzICcoJwojMjE1OiBG
+SUxFOiBhdWRpby9ub2F1ZGlvLmM6MTE0OgorICAgICAgICBieXRlcyA9IE1JTiAoYnl0ZXMsIElO
+VF9NQVgpOwoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmV0d2VlbiBmdW5jdGlvbiBuYW1lIGFu
+ZCBvcGVuIHBhcmVudGhlc2lzICcoJwojMjE4OiBGSUxFOiBhdWRpby9ub2F1ZGlvLmM6MTE2Ogor
+ICAgICAgICBzYW1wbGVzID0gTUlOIChzYW1wbGVzLCBkZWFkKTsKCkVSUk9SOiBzcGFjZSBwcm9o
+aWJpdGVkIGJldHdlZW4gZnVuY3Rpb24gbmFtZSBhbmQgb3BlbiBwYXJlbnRoZXNpcyAnKCcKIzIy
+NzogRklMRTogYXVkaW8vbm9hdWRpby5jOjEyNzoKKyAgICBpbnQgdG9fY2xlYXIgPSBNSU4gKHNh
+bXBsZXMsIHRvdGFsKTsKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJldHdlZW4gZnVuY3Rpb24g
+bmFtZSBhbmQgb3BlbiBwYXJlbnRoZXNpcyAnKCcKIzI0MDogRklMRTogYXVkaW8vb3NzYXVkaW8u
+YzozOTE6CisgICAgICAgIGludCBzYW1wbGVzX3RvX3dyaXRlID0gTUlOIChvc3MtPnBlbmRpbmcs
+IHNhbXBsZXNfdGlsbF9lbmQpOwoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmV0d2VlbiBmdW5j
+dGlvbiBuYW1lIGFuZCBvcGVuIHBhcmVudGhlc2lzICcoJwojMjQ5OiBGSUxFOiBhdWRpby9vc3Nh
+dWRpby5jOjQ0MDoKKyAgICAgICAgZGVjciA9IE1JTiAoYnl0ZXMgPj4gaHctPmluZm8uc2hpZnQs
+IGxpdmUpOwoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmV0d2VlbiBmdW5jdGlvbiBuYW1lIGFu
+ZCBvcGVuIHBhcmVudGhlc2lzICcoJwojMjU4OiBGSUxFOiBhdWRpby9vc3NhdWRpby5jOjQ1OToK
+KyAgICAgICAgZGVjciA9IE1JTiAoYWJpbmZvLmJ5dGVzID4+IGh3LT5pbmZvLnNoaWZ0LCBsaXZl
+KTsKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJldHdlZW4gZnVuY3Rpb24gbmFtZSBhbmQgb3Bl
+biBwYXJlbnRoZXNpcyAnKCcKIzI4MDogRklMRTogYXVkaW8vcGFhdWRpby5jOjI0NzoKKyAgICAg
+ICAgICAgIGludCBjaHVuayA9IE1JTiAodG9fbWl4LCBody0+c2FtcGxlcyAtIHJwb3MpOwoKRVJS
+T1I6IHNwYWNlIHByb2hpYml0ZWQgYmV0d2VlbiBmdW5jdGlvbiBuYW1lIGFuZCBvcGVuIHBhcmVu
+dGhlc2lzICcoJwojMjg5OiBGSUxFOiBhdWRpby9wYWF1ZGlvLmM6Mjg1OgorICAgIGRlY3IgPSBN
+SU4gKGxpdmUsIHBhLT5kZWNyKTsKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJldHdlZW4gZnVu
+Y3Rpb24gbmFtZSBhbmQgb3BlbiBwYXJlbnRoZXNpcyAnKCcKIzMwNzogRklMRTogYXVkaW8vcGFh
+dWRpby5jOjMzOToKKyAgICAgICAgICAgIGludCBjaHVuayA9IE1JTiAodG9fZ3JhYiwgaHctPnNh
+bXBsZXMgLSB3cG9zKTsKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJldHdlZW4gZnVuY3Rpb24g
+bmFtZSBhbmQgb3BlbiBwYXJlbnRoZXNpcyAnKCcKIzMxNjogRklMRTogYXVkaW8vcGFhdWRpby5j
+OjM3ODoKKyAgICBpbmNyID0gTUlOIChkZWFkLCBwYS0+aW5jcik7CgpFUlJPUjogc3BhY2UgcHJv
+aGliaXRlZCBiZXR3ZWVuIGZ1bmN0aW9uIG5hbWUgYW5kIG9wZW4gcGFyZW50aGVzaXMgJygnCiMz
+NDI6IEZJTEU6IGF1ZGlvL3NkbGF1ZGlvLmM6MjM5OgorICAgIGRlY3IgPSBNSU4gKHNkbC0+ZGVj
+ciwgbGl2ZSk7CgpFUlJPUjogc3BhY2UgcHJvaGliaXRlZCBiZXR3ZWVuIGZ1bmN0aW9uIG5hbWUg
+YW5kIG9wZW4gcGFyZW50aGVzaXMgJygnCiMzNTU6IEZJTEU6IGF1ZGlvL3NwaWNlYXVkaW8uYzox
+Njc6CisgICAgZGVjciA9IE1JTiAobGl2ZSwgZGVjcik7CgpFUlJPUjogc3BhY2UgcHJvaGliaXRl
+ZCBiZXR3ZWVuIGZ1bmN0aW9uIG5hbWUgYW5kIG9wZW4gcGFyZW50aGVzaXMgJygnCiMzNjI6IEZJ
+TEU6IGF1ZGlvL3NwaWNlYXVkaW8uYzoxNzM6CisgICAgICAgIGludCBsZW4gPSBNSU4gKHNhbXBs
+ZXMsIGxlZnRfdGlsbF9lbmRfc2FtcGxlcyk7CgpFUlJPUjogc3BhY2UgcHJvaGliaXRlZCBiZXR3
+ZWVuIGZ1bmN0aW9uIG5hbWUgYW5kIG9wZW4gcGFyZW50aGVzaXMgJygnCiMzNzA6IEZJTEU6IGF1
+ZGlvL3NwaWNlYXVkaW8uYzoxODA6CisgICAgICAgICAgICBsZW4gPSBNSU4gKGxlbiwgb3V0LT5m
+c2l6ZSk7CgpFUlJPUjogc3BhY2UgcHJvaGliaXRlZCBiZXR3ZWVuIGZ1bmN0aW9uIG5hbWUgYW5k
+IG9wZW4gcGFyZW50aGVzaXMgJygnCiMzNzk6IEZJTEU6IGF1ZGlvL3NwaWNlYXVkaW8uYzoyOTg6
+CisgICAgbnVtX3NhbXBsZXMgPSBNSU4gKG51bV9zYW1wbGVzLCBkZWx0YV9zYW1wKTsKCkVSUk9S
+OiBzcGFjZSBwcm9oaWJpdGVkIGJldHdlZW4gZnVuY3Rpb24gbmFtZSBhbmQgb3BlbiBwYXJlbnRo
+ZXNpcyAnKCcKIzM4ODogRklMRTogYXVkaW8vc3BpY2VhdWRpby5jOjMwODoKKyAgICBudW1fc2Ft
+cGxlcyA9IE1JTiAocmVhZHksIG51bV9zYW1wbGVzKTsKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVk
+IGJldHdlZW4gZnVuY3Rpb24gbmFtZSBhbmQgb3BlbiBwYXJlbnRoZXNpcyAnKCcKIzQwMTogRklM
+RTogYXVkaW8vd2F2YXVkaW8uYzo2MjoKKyAgICBkZWNyID0gTUlOIChsaXZlLCBzYW1wbGVzKTsK
+CkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJldHdlZW4gZnVuY3Rpb24gbmFtZSBhbmQgb3BlbiBw
+YXJlbnRoZXNpcyAnKCcKIzQwNzogRklMRTogYXVkaW8vd2F2YXVkaW8uYzo2NzoKKyAgICAgICAg
+aW50IGNvbnZlcnRfc2FtcGxlcyA9IE1JTiAoc2FtcGxlcywgbGVmdF90aWxsX2VuZF9zYW1wbGVz
+KTsKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJldHdlZW4gZnVuY3Rpb24gbmFtZSBhbmQgb3Bl
+biBwYXJlbnRoZXNpcyAnKCcKIzQyMDogRklMRTogaHcvYXVkaW8vYWM5Ny5jOjk2NzoKKyAgICB0
+ZW1wID0gTUlOICh0ZW1wLCBtYXgpOwoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmV0d2VlbiBm
+dW5jdGlvbiBuYW1lIGFuZCBvcGVuIHBhcmVudGhlc2lzICcoJwojNDI5OiBGSUxFOiBody9hdWRp
+by9hYzk3LmM6OTc2OgorICAgICAgICB0b19jb3B5ID0gTUlOICh0ZW1wLCBzaXplb2YgKHRtcGJ1
+ZikpOwoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmV0d2VlbiBmdW5jdGlvbiBuYW1lIGFuZCBv
+cGVuIHBhcmVudGhlc2lzICcoJwojNDI5OiBGSUxFOiBody9hdWRpby9hYzk3LmM6OTc2OgorICAg
+ICAgICB0b19jb3B5ID0gTUlOICh0ZW1wLCBzaXplb2YgKHRtcGJ1ZikpOwoKRVJST1I6IHNwYWNl
+IHByb2hpYml0ZWQgYmV0d2VlbiBmdW5jdGlvbiBuYW1lIGFuZCBvcGVuIHBhcmVudGhlc2lzICco
+JwojNDM4OiBGSUxFOiBody9hdWRpby9hYzk3LmM6MTAyMjoKKyAgICAgICAgaW50IHRlbXAgPSBN
+SU4gKGVsYXBzZWQsIHNpemVvZiAocy0+c2lsZW5jZSkpOwoKRVJST1I6IHNwYWNlIHByb2hpYml0
+ZWQgYmV0d2VlbiBmdW5jdGlvbiBuYW1lIGFuZCBvcGVuIHBhcmVudGhlc2lzICcoJwojNDM4OiBG
+SUxFOiBody9hdWRpby9hYzk3LmM6MTAyMjoKKyAgICAgICAgaW50IHRlbXAgPSBNSU4gKGVsYXBz
+ZWQsIHNpemVvZiAocy0+c2lsZW5jZSkpOwoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmV0d2Vl
+biBmdW5jdGlvbiBuYW1lIGFuZCBvcGVuIHBhcmVudGhlc2lzICcoJwojNDQ3OiBGSUxFOiBody9h
+dWRpby9hYzk3LmM6MTA0MzoKKyAgICB0ZW1wID0gTUlOICh0ZW1wLCBtYXgpOwoKRVJST1I6IHNw
+YWNlIHByb2hpYml0ZWQgYmV0d2VlbiBmdW5jdGlvbiBuYW1lIGFuZCBvcGVuIHBhcmVudGhlc2lz
+ICcoJwojNDU2OiBGSUxFOiBody9hdWRpby9hYzk3LmM6MTA1MjoKKyAgICAgICAgdG9fY29weSA9
+IE1JTiAodGVtcCwgc2l6ZW9mICh0bXBidWYpKTsKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJl
+dHdlZW4gZnVuY3Rpb24gbmFtZSBhbmQgb3BlbiBwYXJlbnRoZXNpcyAnKCcKIzQ1NjogRklMRTog
+aHcvYXVkaW8vYWM5Ny5jOjEwNTI6CisgICAgICAgIHRvX2NvcHkgPSBNSU4gKHRlbXAsIHNpemVv
+ZiAodG1wYnVmKSk7CgpFUlJPUjogc3BhY2UgcHJvaGliaXRlZCBiZXR3ZWVuIGZ1bmN0aW9uIG5h
+bWUgYW5kIG9wZW4gcGFyZW50aGVzaXMgJygnCiM0Njk6IEZJTEU6IGh3L2F1ZGlvL2FkbGliLmM6
+MTk4OgorICAgIHRvX3BsYXkgPSBNSU4gKHMtPmxlZnQsIHNhbXBsZXMpOwoKRVJST1I6IHNwYWNl
+IHByb2hpYml0ZWQgYmV0d2VlbiBmdW5jdGlvbiBuYW1lIGFuZCBvcGVuIHBhcmVudGhlc2lzICco
+JwojNDc4OiBGSUxFOiBody9hdWRpby9hZGxpYi5jOjIxMzoKKyAgICBzYW1wbGVzID0gTUlOIChz
+YW1wbGVzLCBzLT5zYW1wbGVzIC0gcy0+cG9zKTsKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJl
+dHdlZW4gZnVuY3Rpb24gbmFtZSBhbmQgb3BlbiBwYXJlbnRoZXNpcyAnKCcKIzQ5MTogRklMRTog
+aHcvYXVkaW8vY3M0MjMxYS5jOjUzODoKKyAgICAgICAgdG9fY29weSA9IE1JTiAodGVtcCwgbGVm
+dCk7CgpFUlJPUjogc3BhY2UgcHJvaGliaXRlZCBiZXR3ZWVuIGZ1bmN0aW9uIG5hbWUgYW5kIG9w
+ZW4gcGFyZW50aGVzaXMgJygnCiM1MDA6IEZJTEU6IGh3L2F1ZGlvL2NzNDIzMWEuYzo1ODE6Cisg
+ICAgICAgIGNvcHkgPSBNSU4gKHRpbGwsIGNvcHkpOwoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQg
+YmV0d2VlbiBmdW5jdGlvbiBuYW1lIGFuZCBvcGVuIHBhcmVudGhlc2lzICcoJwojNTEzOiBGSUxF
+OiBody9hdWRpby9lczEzNzAuYzo2NDg6CisgICAgaW50IHRlbXAgPSBNSU4gKG1heCwgTUlOIChs
+ZWZ0LCBjc2NfYnl0ZXMpKTsKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJldHdlZW4gZnVuY3Rp
+b24gbmFtZSBhbmQgb3BlbiBwYXJlbnRoZXNpcyAnKCcKIzUxMzogRklMRTogaHcvYXVkaW8vZXMx
+MzcwLmM6NjQ4OgorICAgIGludCB0ZW1wID0gTUlOIChtYXgsIE1JTiAobGVmdCwgY3NjX2J5dGVz
+KSk7CgpFUlJPUjogc3BhY2UgcHJvaGliaXRlZCBiZXR3ZWVuIGZ1bmN0aW9uIG5hbWUgYW5kIG9w
+ZW4gcGFyZW50aGVzaXMgJygnCiM1MjI6IEZJTEU6IGh3L2F1ZGlvL2VzMTM3MC5jOjY1NzoKKyAg
+ICAgICAgICAgIHRvX2NvcHkgPSBNSU4gKChzaXplX3QpIHRlbXAsIHNpemVvZiAodG1wYnVmKSk7
+CgpFUlJPUjogc3BhY2UgcHJvaGliaXRlZCBiZXR3ZWVuIGZ1bmN0aW9uIG5hbWUgYW5kIG9wZW4g
+cGFyZW50aGVzaXMgJygnCiM1MjI6IEZJTEU6IGh3L2F1ZGlvL2VzMTM3MC5jOjY1NzoKKyAgICAg
+ICAgICAgIHRvX2NvcHkgPSBNSU4gKChzaXplX3QpIHRlbXAsIHNpemVvZiAodG1wYnVmKSk7CgpF
+UlJPUjogc3BhY2UgcHJvaGliaXRlZCBiZXR3ZWVuIGZ1bmN0aW9uIG5hbWUgYW5kIG9wZW4gcGFy
+ZW50aGVzaXMgJygnCiM1MzE6IEZJTEU6IGh3L2F1ZGlvL2VzMTM3MC5jOjY3NToKKyAgICAgICAg
+ICAgIHRvX2NvcHkgPSBNSU4gKChzaXplX3QpIHRlbXAsIHNpemVvZiAodG1wYnVmKSk7CgpFUlJP
+Ujogc3BhY2UgcHJvaGliaXRlZCBiZXR3ZWVuIGZ1bmN0aW9uIG5hbWUgYW5kIG9wZW4gcGFyZW50
+aGVzaXMgJygnCiM1MzE6IEZJTEU6IGh3L2F1ZGlvL2VzMTM3MC5jOjY3NToKKyAgICAgICAgICAg
+IHRvX2NvcHkgPSBNSU4gKChzaXplX3QpIHRlbXAsIHNpemVvZiAodG1wYnVmKSk7CgpFUlJPUjog
+c3BhY2UgcHJvaGliaXRlZCBiZXR3ZWVuIGZ1bmN0aW9uIG5hbWUgYW5kIG9wZW4gcGFyZW50aGVz
+aXMgJygnCiM1NDQ6IEZJTEU6IGh3L2F1ZGlvL2d1cy5jOjEyMDoKKyAgICB0b19wbGF5ID0gTUlO
+IChzYW1wbGVzLCBzLT5sZWZ0KTsKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJldHdlZW4gZnVu
+Y3Rpb24gbmFtZSBhbmQgb3BlbiBwYXJlbnRoZXNpcyAnKCcKIzU1MzogRklMRTogaHcvYXVkaW8v
+Z3VzLmM6MTM1OgorICAgIHNhbXBsZXMgPSBNSU4gKHNhbXBsZXMsIHMtPnNhbXBsZXMpOwoKRVJS
+T1I6IHNwYWNlIHByb2hpYml0ZWQgYmV0d2VlbiBmdW5jdGlvbiBuYW1lIGFuZCBvcGVuIHBhcmVu
+dGhlc2lzICcoJwojNTYyOiBGSUxFOiBody9hdWRpby9ndXMuYzoxOTU6CisgICAgICAgIGludCB0
+b19jb3B5ID0gTUlOICgoc2l6ZV90KSBsZWZ0LCBzaXplb2YgKHRtcGJ1ZikpOwoKRVJST1I6IHNw
+YWNlIHByb2hpYml0ZWQgYmV0d2VlbiBmdW5jdGlvbiBuYW1lIGFuZCBvcGVuIHBhcmVudGhlc2lz
+ICcoJwojNTYyOiBGSUxFOiBody9hdWRpby9ndXMuYzoxOTU6CisgICAgICAgIGludCB0b19jb3B5
+ID0gTUlOICgoc2l6ZV90KSBsZWZ0LCBzaXplb2YgKHRtcGJ1ZikpOwoKRVJST1I6IHNwYWNlIHBy
+b2hpYml0ZWQgYmV0d2VlbiBmdW5jdGlvbiBuYW1lIGFuZCBvcGVuIHBhcmVudGhlc2lzICcoJwoj
+NjkyOiBGSUxFOiBody9hdWRpby9zYjE2LmM6MTE3MToKKyAgICAgICAgdG9fY29weSA9IE1JTiAo
+dGVtcCwgbGVmdCk7Cgp0b3RhbDogNTcgZXJyb3JzLCAwIHdhcm5pbmdzLCA1NTkgbGluZXMgY2hl
+Y2tlZAoKUGF0Y2ggOS8xNCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBh
+bnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhl
+IG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKMTAvMTQgQ2hlY2tp
+bmcgY29tbWl0IGFkNzczZjkwODNmZCAoYXVkaW86IGRvIG5vdCBydW4gZWFjaCBiYWNrZW5kIGlu
+IGF1ZGlvX3J1bikKMTEvMTQgQ2hlY2tpbmcgY29tbWl0IDgyMDM4ZjEzYTg3MyAocGFhdWRpbzog
+Zml4IHBsYXliYWNrIGdsaXRjaGVzKQoxMi8xNCBDaGVja2luZyBjb21taXQgNzAzNWQ5Zjc5ODAy
+IChhdWRpbzogcmVtb3ZlIHJlYWQgYW5kIHdyaXRlIHBjbV9vcHMpCjEzLzE0IENoZWNraW5nIGNv
+bW1pdCBlOGQyM2Y2NzBhMjcgKGF1ZGlvOiB1c2Ugc2l6ZV90IHdoZXJlIG1ha2VzIHNlbnNlKQpF
+UlJPUjogc3BhY2UgcHJvaGliaXRlZCBiZXR3ZWVuIGZ1bmN0aW9uIG5hbWUgYW5kIG9wZW4gcGFy
+ZW50aGVzaXMgJygnCiM2MjogRklMRTogYXVkaW8vYWxzYWF1ZGlvLmM6ODcxOgorICAgIHNpemVf
+dCBsaXZlID0gYXVkaW9fcGNtX2h3X2dldF9saXZlX2luIChodyk7CgpFUlJPUjogc3BhY2UgcHJv
+aGliaXRlZCBiZXR3ZWVuIGZ1bmN0aW9uIG5hbWUgYW5kIG9wZW4gcGFyZW50aGVzaXMgJygnCiM5
+MTogRklMRTogYXVkaW8vYXVkaW8uYzo1Mjk6CitzdGF0aWMgc2l6ZV90IGF1ZGlvX3BjbV9od19m
+aW5kX21pbl9pbiAoSFdWb2ljZUluICpodykKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJldHdl
+ZW4gZnVuY3Rpb24gbmFtZSBhbmQgb3BlbiBwYXJlbnRoZXNpcyAnKCcKIzEwOTogRklMRTogYXVk
+aW8vYXVkaW8uYzo1NDQ6CisgICAgc2l6ZV90IGxpdmUgPSBody0+dG90YWxfc2FtcGxlc19jYXB0
+dXJlZCAtIGF1ZGlvX3BjbV9od19maW5kX21pbl9pbiAoaHcpOwoKRVJST1I6IHNwYWNlIHByb2hp
+Yml0ZWQgYmV0d2VlbiBmdW5jdGlvbiBuYW1lIGFuZCBvcGVuIHBhcmVudGhlc2lzICcoJwojMTI2
+OiBGSUxFOiBhdWRpby9hdWRpby5jOjU1NjoKKyAgICBzaXplX3QgbGVuID0gTUlOIChsZWZ0LCBs
+aXZlKTsKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJldHdlZW4gZnVuY3Rpb24gbmFtZSBhbmQg
+b3BlbiBwYXJlbnRoZXNpcyAnKCcKIzEzNTogRklMRTogYXVkaW8vYXVkaW8uYzo1NjM6CisgICAg
+ICAgIHNpemVfdCBzYW1wbGVzX3RvX2NsaXAgPSBNSU4gKGxlbiwgc2FtcGxlc190aWxsX2VuZF9v
+Zl9idWYpOwoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmV0d2VlbiBmdW5jdGlvbiBuYW1lIGFu
+ZCBvcGVuIHBhcmVudGhlc2lzICcoJwojMjEwOiBGSUxFOiBhdWRpby9hdWRpby5jOjY1MjoKK3N0
+YXRpYyBzaXplX3QgYXVkaW9fcGNtX2h3X2ZpbmRfbWluX291dCAoSFdWb2ljZU91dCAqaHcsIGlu
+dCAqbmJfbGl2ZXApCgpFUlJPUjogc3BhY2UgcHJvaGliaXRlZCBiZXR3ZWVuIGZ1bmN0aW9uIG5h
+bWUgYW5kIG9wZW4gcGFyZW50aGVzaXMgJygnCiMyMjM6IEZJTEU6IGF1ZGlvL2F1ZGlvLmM6NjY5
+Ogorc3RhdGljIHNpemVfdCBhdWRpb19wY21faHdfZ2V0X2xpdmVfb3V0IChIV1ZvaWNlT3V0ICpo
+dywgaW50ICpuYl9saXZlKQoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzI1Mzog
+RklMRTogYXVkaW8vYXVkaW8uYzo2OTY6CisgICAgc2l6ZV90IGh3c2FtcGxlcywgc2FtcGxlcywg
+aXNhbXAsIG9zYW1wLCB3cG9zLCBsaXZlLCBkZWFkLCBsZWZ0LCBzd2xpbSwgYmxjazsKCkVSUk9S
+OiBzcGFjZSBwcm9oaWJpdGVkIGJldHdlZW4gZnVuY3Rpb24gbmFtZSBhbmQgb3BlbiBwYXJlbnRo
+ZXNpcyAnKCcKIzMwMTogRklMRTogYXVkaW8vYXVkaW8uYzo5NjQ6CitzdGF0aWMgc2l6ZV90IGF1
+ZGlvX2dldF9hdmFpbCAoU1dWb2ljZUluICpzdykKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJl
+dHdlZW4gZnVuY3Rpb24gbmFtZSBhbmQgb3BlbiBwYXJlbnRoZXNpcyAnKCcKIzQwOTogRklMRTog
+YXVkaW8vYXVkaW8uYzoxMDY2OgorICAgICAgICAgICAgZG9sb2cgKCJsaXZlPSV6dSBody0+c2Ft
+cGxlcz0lenVcbiIsIGxpdmUsIGh3LT5zYW1wbGVzKTsKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVk
+IGJldHdlZW4gZnVuY3Rpb24gbmFtZSBhbmQgb3BlbiBwYXJlbnRoZXNpcyAnKCcKIzc5NTogRklM
+RTogYXVkaW8vbm9hdWRpby5jOjEwOToKKyAgICAgICAgYnl0ZXMgPSBNSU4gKGJ5dGVzLCBTSVpF
+X01BWCk7CgpFUlJPUjogc3BhY2UgcHJvaGliaXRlZCBiZXR3ZWVuIGZ1bmN0aW9uIG5hbWUgYW5k
+IG9wZW4gcGFyZW50aGVzaXMgJygnCiM4ODY6IEZJTEU6IGF1ZGlvL29zc2F1ZGlvLmM6NzIzOgor
+ICAgIHNpemVfdCBsaXZlID0gYXVkaW9fcGNtX2h3X2dldF9saXZlX2luIChodyk7CgpFUlJPUjog
+c3BhY2UgcHJvaGliaXRlZCBiZXR3ZWVuIGZ1bmN0aW9uIG5hbWUgYW5kIG9wZW4gcGFyZW50aGVz
+aXMgJygnCiM5ODE6IEZJTEU6IGF1ZGlvL3BhYXVkaW8uYzoyNDc6CisgICAgICAgICAgICBzaXpl
+X3QgY2h1bmsgPSBNSU4gKHRvX21peCwgaHctPnNhbXBsZXMgLSBycG9zKTsKCkVSUk9SOiBzcGFj
+ZSBwcm9oaWJpdGVkIGJldHdlZW4gZnVuY3Rpb24gbmFtZSBhbmQgb3BlbiBwYXJlbnRoZXNpcyAn
+KCcKIzEwMTE6IEZJTEU6IGF1ZGlvL3BhYXVkaW8uYzozMzQ6CisgICAgICAgICAgICBzaXplX3Qg
+Y2h1bmsgPSBNSU4gKHRvX2dyYWIsIGh3LT5zYW1wbGVzIC0gd3Bvcyk7CgpFUlJPUjogc3BhY2Ug
+cHJvaGliaXRlZCBiZXR3ZWVuIGZ1bmN0aW9uIG5hbWUgYW5kIG9wZW4gcGFyZW50aGVzaXMgJygn
+CiMxMTM1OiBGSUxFOiBhdWRpby9zcGljZWF1ZGlvLmM6MTU2Ogorc3RhdGljIHNpemVfdCBsaW5l
+X291dF9ydW4gKEhXVm9pY2VPdXQgKmh3LCBzaXplX3QgbGl2ZSkKCldBUk5JTkc6IGxpbmUgb3Zl
+ciA4MCBjaGFyYWN0ZXJzCiMxMjAxOiBGSUxFOiBpbmNsdWRlL3N5c2VtdS9yZXBsYXkuaDoxODQ6
+Cit2b2lkIHJlcGxheV9hdWRpb19pbihzaXplX3QgKnJlY29yZGVkLCB2b2lkICpzYW1wbGVzLCBz
+aXplX3QgKndwb3MsIHNpemVfdCBzaXplKTsKCnRvdGFsOiAxNCBlcnJvcnMsIDIgd2FybmluZ3Ms
+IDExMDYgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMTMvMTQgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVh
+c2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJl
+cG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVS
+Uy4KCjE0LzE0IENoZWNraW5nIGNvbW1pdCA5YmQ4YmM2YTI4M2QgKGF1ZGlvOiBmaXggbWVtb3J5
+IGxlYWsgcmVwb3J0ZWQgYnkgQVNBTikKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQg
+ZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDov
+L3BhdGNoZXcub3JnL2xvZ3MvY292ZXIuMTU2MzIyNDYyOC5naXQuRGlydFkuaUNFLmh1QGdtYWls
+LmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRl
+ZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNl
+IHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
 
 
