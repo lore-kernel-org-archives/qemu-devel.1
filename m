@@ -2,90 +2,79 @@ Return-Path: <SRS0=IjNW=VM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D882EC7618F
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 11:45:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 346E4C7618F
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 11:47:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AB436206B8
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 11:45:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB436206B8
+	by mail.kernel.org (Postfix) with ESMTPS id 0C7FC206B8
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 11:47:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C7FC206B8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37458 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37468 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hmzQC-0003ic-NQ
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 07:45:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54505)
+	id 1hmzSW-0004vU-2c
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 07:47:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55021)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hmzPz-0003Fm-Eq
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 07:45:20 -0400
+ (envelope-from <philmd@redhat.com>) id 1hmzSK-0004Wv-Hd
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 07:47:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hmzPy-0001Wl-Ec
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 07:45:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51178)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hmzPw-0001V1-6j; Mon, 15 Jul 2019 07:45:16 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 24B7783F4C;
- Mon, 15 Jul 2019 11:45:15 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.40.205.59])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4291F6012C;
- Mon, 15 Jul 2019 11:44:56 +0000 (UTC)
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-References: <20190708220502.12977-1-jsnow@redhat.com>
- <20190708220502.12977-4-jsnow@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <bda05664-9e59-9088-0109-7e6372547c6b@redhat.com>
-Date: Mon, 15 Jul 2019 13:44:53 +0200
+ (envelope-from <philmd@redhat.com>) id 1hmzSJ-0002j1-Im
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 07:47:44 -0400
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:39862)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hmzSJ-0002g0-Cn
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 07:47:43 -0400
+Received: by mail-wm1-f66.google.com with SMTP id u25so4507371wmc.4
+ for <qemu-devel@nongnu.org>; Mon, 15 Jul 2019 04:47:43 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=Bx1Mj43e3L8tkr656L0fZ5aV1gQG/Os3tmEURzqk3Js=;
+ b=jfjy01DEv9c44wG9v0b2CoUzjF2OXXXhz7/cDSXOjfvPYtph0hO+PeOgZUR+P9U/2r
+ BZwRK0pgkP8Wd3JP1qKRwPe8VqwkI7QHcTBjhZuQJE8kJi7OFiAv01wS2yv3Rb8yM8uB
+ HstVQvbJpVsy/UfuYRNjIDZa0y1muGQHhb40cKNNlmiEtZpmJyfCPt8eXKvh6WS+fJZZ
+ 8XvX/99z1WFyolY6F60p3aIpsBvtGfRIb5HU9jVAMaH+HCiy9QiziA1BfAnk10X4jHid
+ 3ejKAwM//Q57GWY2jalCJtA/xv62sTmBLRKT1KgTvMHDLEFDb9fONt0YT3p6WIRWTAHD
+ lB4w==
+X-Gm-Message-State: APjAAAVhC+X0EiyKTdcH0mGUH7C0MUce2glUQCAjIEjrMauNZsQHPcRw
+ L58XmQgBq3vldr4FjTv3dnialg==
+X-Google-Smtp-Source: APXvYqzqegGXsRh7cKN9bHkkk62a795s6AoWdcy1E+LZLCp5zpER6cbSlywXqfmKOxQTBO1+uX5eMA==
+X-Received: by 2002:a1c:cb43:: with SMTP id b64mr23963659wmg.135.1563191262039; 
+ Mon, 15 Jul 2019 04:47:42 -0700 (PDT)
+Received: from [192.168.1.37] (62.red-83-42-61.dynamicip.rima-tde.net.
+ [83.42.61.62])
+ by smtp.gmail.com with ESMTPSA id y16sm36157376wrg.85.2019.07.15.04.47.41
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Mon, 15 Jul 2019 04:47:41 -0700 (PDT)
+To: qemu-devel@nongnu.org
+References: <20190714124755.14356-1-philmd@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <ebd6d5a3-4f3e-b0ef-50c7-333996375b96@redhat.com>
+Date: Mon, 15 Jul 2019 13:47:35 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190708220502.12977-4-jsnow@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="ccGzMyfbLL6K16pS3SvuctNBqXPaqWb38"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.27]); Mon, 15 Jul 2019 11:45:15 +0000 (UTC)
+In-Reply-To: <20190714124755.14356-1-philmd@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 3/3] iotests: test bitmap moving inside
- 254
+ [fuzzy]
+X-Received-From: 209.85.128.66
+Subject: Re: [Qemu-devel] [PATCH-for-4.1] hw/lm32/Kconfig: Milkymist One
+ provides a USB 1.1 Controller
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,114 +86,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- vsementsov@virtuozzo.com, Juan Quintela <quintela@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Michael Walle <michael@walle.cc>, Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---ccGzMyfbLL6K16pS3SvuctNBqXPaqWb38
-Content-Type: multipart/mixed; boundary="TsDN3vcpc9oSLuBcBckWe84AessbSImNn";
- protected-headers="v1"
-From: Max Reitz <mreitz@redhat.com>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: Juan Quintela <quintela@redhat.com>, Fam Zheng <fam@euphon.net>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- vsementsov@virtuozzo.com, Kevin Wolf <kwolf@redhat.com>,
- Markus Armbruster <armbru@redhat.com>
-Message-ID: <bda05664-9e59-9088-0109-7e6372547c6b@redhat.com>
-Subject: Re: [PATCH v3 3/3] iotests: test bitmap moving inside 254
-References: <20190708220502.12977-1-jsnow@redhat.com>
- <20190708220502.12977-4-jsnow@redhat.com>
-In-Reply-To: <20190708220502.12977-4-jsnow@redhat.com>
-
---TsDN3vcpc9oSLuBcBckWe84AessbSImNn
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 09.07.19 00:05, John Snow wrote:
-> From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->=20
-> Test persistent bitmap copying with and without removal of original
-> bitmap.
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> Signed-off-by: John Snow <jsnow@redhat.com>
+On 7/14/19 2:47 PM, Philippe Mathieu-Daudé wrote:
+> The Milkymist SoftUSB block provides the OHCI USB standard
+> (missed in 0858746b835).
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 > ---
->  tests/qemu-iotests/254     | 30 +++++++++++++-
->  tests/qemu-iotests/254.out | 82 ++++++++++++++++++++++++++++++++++++++=
+>  hw/lm32/Kconfig | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/hw/lm32/Kconfig b/hw/lm32/Kconfig
+> index 3d09c2dd6f..ed2e3060b0 100644
+> --- a/hw/lm32/Kconfig
+> +++ b/hw/lm32/Kconfig
+> @@ -11,3 +11,4 @@ config MILKYMIST
+>      select PFLASH_CFI01
+>      select FRAMEBUFFER
+>      select SD
+> +    select USB_OHCI
+> 
 
->  2 files changed, 110 insertions(+), 2 deletions(-)
->=20
-> diff --git a/tests/qemu-iotests/254 b/tests/qemu-iotests/254
-> index 8edba91c5d..9a57bccc26 100755
-> --- a/tests/qemu-iotests/254
-> +++ b/tests/qemu-iotests/254
+Markus asked me how I noticed that, if it was auditing the code.
 
-[...]
-
-> @@ -39,16 +43,38 @@ vm.qmp_log('transaction', indent=3D2, actions=3D[
->      {'type': 'blockdev-snapshot-sync',
->       'data': {'device': 'drive0', 'snapshot-file': top,
->                'snapshot-node-name': 'snap'}},
-> +
-> +    # copy non-persistent bitmap0
->      {'type': 'block-dirty-bitmap-add',
->       'data': {'node': 'snap', 'name': 'bitmap0'}},
->      {'type': 'block-dirty-bitmap-merge',
->       'data': {'node': 'snap', 'target': 'bitmap0',
-> -              'bitmaps': [{'node': 'base', 'name': 'bitmap0'}]}}
-> +              'bitmaps': [{'node': 'base', 'name': 'bitmap0'}]}},
-> +
-> +    # copy persistent bitmap1, original will be saved to base image
-> +    {'type': 'block-dirty-bitmap-add',
-> +     'data': {'node': 'snap', 'name': 'bitmap1', 'persistent': True}},=
-
-> +    {'type': 'block-dirty-bitmap-merge',
-> +     'data': {'node': 'snap', 'target': 'bitmap1',
-> +              'bitmaps': [{'node': 'base', 'name': 'bitmap1'}]}},
-> +
-> +    # move persistent bitmap1, original will be removed and not saved
-
-*bitmap2
-
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-
-> +    # to base image
-> +    {'type': 'block-dirty-bitmap-add',
-> +     'data': {'node': 'snap', 'name': 'bitmap2', 'persistent': True}},=
-
-> +    {'type': 'block-dirty-bitmap-merge',
-> +     'data': {'node': 'snap', 'target': 'bitmap2',
-> +              'bitmaps': [{'node': 'base', 'name': 'bitmap2'}]}},
-> +    {'type': 'block-dirty-bitmap-remove',
-> +     'data': {'node': 'base', 'name': 'bitmap2'}}
->  ], filters=3D[iotests.filter_qmp_testfiles])
-
-
---TsDN3vcpc9oSLuBcBckWe84AessbSImNn--
-
---ccGzMyfbLL6K16pS3SvuctNBqXPaqWb38
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0sZzUACgkQ9AfbAGHV
-z0CUwggAilzTF6vnNP83er0PmghEHsKe0qvy/12kMSdZ8qkpkYgE6vbTGszDKQJq
-rgCxGwyGS2IWPQE0NIEKEnzbzHaAYb7yrA+HZQwHRxjua2wSe+xauLvsSmCaP4oR
-ZXDb1hLRTqPe5mqrtAEZFnNVWZ/GCUYsUudW65AnGnNwuIKW00thZNJRl586SiyM
-wUXorAuG/TgVSUXJQwJ3kBqSWkm9kbUnB7cJsbrapEZ3mpLn2cowBZxQe71/Ki1h
-bVRA5Pn1NdX0W9/I2sSTzUlN/I+6QHWklR/9U77wwxP5yEEii+jM7MUVC7xWHB+t
-V6Xgk4nUhfNBypTiGZDR1n96niqspA==
-=4qlG
------END PGP SIGNATURE-----
-
---ccGzMyfbLL6K16pS3SvuctNBqXPaqWb38--
+I ran 'qemu-system-lm32 -device help' and noticed all the USB devices
+had disappeared.
 
