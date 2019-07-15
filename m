@@ -7,82 +7,84 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA33EC7618F
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 13:44:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4156AC7618F
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 13:44:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6E85D2067C
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 13:44:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0F3F22067C
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 13:44:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="c9/un+s6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E85D2067C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="N03UZhwW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F3F22067C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38760 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38762 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hn1Gw-0006m5-BN
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 09:44:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51834)
+	id 1hn1H5-0007QI-1g
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 09:44:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51830)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hn1FK-00089d-Nw
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 09:42:28 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hn1FK-00086m-1t
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 09:42:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hn1FI-0006DA-OQ
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 09:42:26 -0400
-Received: from mail-wr1-x42d.google.com ([2a00:1450:4864:20::42d]:38023)
+ (envelope-from <peter.maydell@linaro.org>) id 1hn1FI-0006D5-O9
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 09:42:25 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:32903)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hn1FG-0006Au-Qz
+ id 1hn1FG-0006Bd-Rh
  for qemu-devel@nongnu.org; Mon, 15 Jul 2019 09:42:23 -0400
-Received: by mail-wr1-x42d.google.com with SMTP id g17so17161809wrr.5
+Received: by mail-wm1-x342.google.com with SMTP id h19so14355384wme.0
  for <qemu-devel@nongnu.org>; Mon, 15 Jul 2019 06:42:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=cELbSeZqo/rDUDZMNhqVynDCy8syqeSGDgG78iLpC1o=;
- b=c9/un+s6r1SxgSTnxw9LI8jd/vUak5Ncqy8ZzgPPVMTB+6kG9lNKxH/cvZDdnZfVwv
- s/ml3O5hLrvdeBJiLKwJCrQU8FseTx7W8LGCIn6Z/jhIAn9YTkqZjbzMpfivj8FQXD4f
- ddOyqEAwa1Lxi9wGH/32CogzzefMmD4fAXbnGrtJh1zK1VYnn9WjY+i6/z58bii1eKgL
- e5QLUps2e4K0GyTttTHwcAzXwKKEYCB2IsTfajWyTdTlCmLViMridjlvMp5ke0wd0KXM
- ad8jQ5JmyP8zY32nWjJSzFbpEKC1mifz2YWcGKnoBl7YWRiJRwigHM3NQ1dcOMdH3UgC
- UctA==
+ bh=kmd44QPB5fQioinpnyOTPTkf7ReufwKIl1vLPJ0oHiI=;
+ b=N03UZhwWttVqwYCo8jdV55LfKwpaawjnoneiS3Doxwu5Ll+hLGfgV0ddQ0lAKE6Tw0
+ kR0WiaE+UgxrBvmAjbL9349+Ld6KyFWzoAblO2rxVuii1YUOAUmoWhfilOG1UjjySmc2
+ 8Gj5PkZAbjY6VouB6f09z5jXfHhIwlXwtFxhiQF3LRKHR/V4vRGF8h6p8uI0vSYk2RvY
+ Cchq+L6L5sesnaRZLRKbRXRWYQb4l73E0GlTox0m3/Byf4Ek5VrM86pL2qY1mIEDpdu0
+ GMpKhKhQTMw2PmZP/OFlyz9T7grdhc+QNiIbBeIl1BJ6iLVST4KrJWeEUW9jGdYSklFx
+ 57TA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=cELbSeZqo/rDUDZMNhqVynDCy8syqeSGDgG78iLpC1o=;
- b=TVlTNO+wO81PxaRVpc/78mY1W2k0K2lFeq+jZv2gNh+AMLj0PMOC40y/y/125dYTA/
- GlpF4vXQvAjtP4aG7YVAJ4CABBRp3qYi0oxo+0s7zxk6R8roN3bDRADYTMg/wUHMut+X
- RGfbq+b+f89mSJStguGuzHzfYCIpkWa0fPjP/rkM6qgNeRCGONCrMuvu3dR/ovNzYZJK
- lDuMfksM3CHzuNJkn1XLm6q9ckKOxDhik3ypWHBp1IRRZugooxKnDK/edEsZ1k/X14ZJ
- zX6dNzrHTCO/ovLOXqdmnAvthxFfJlfiLiJ9olCKopgJKALvzyiln7QtaHjWprldZ2B7
- XcOg==
-X-Gm-Message-State: APjAAAWXmqcPzuXKHyfNy45sFFjOYcRuSRZHBkVqtUWVRGTWLZA6ITrn
- V5Br9iQxb6K761aF02zNMICTR7Hp5DBDOA==
-X-Google-Smtp-Source: APXvYqzHUNPN0IBZE7Z5X8XDvHhKoXZPUNlBDUtTjk0N88n291oTkdOljOJpz4CUXqSXTdWAUaim5w==
-X-Received: by 2002:a5d:4cca:: with SMTP id c10mr27919650wrt.233.1563198140802; 
- Mon, 15 Jul 2019 06:42:20 -0700 (PDT)
+ bh=kmd44QPB5fQioinpnyOTPTkf7ReufwKIl1vLPJ0oHiI=;
+ b=aoLwKVh5IFEi7s6dw7hsrhfiQrSfGYHcykAbotR7SuHdLlIdN2/E3nXMfXEadv02WF
+ C+Vrhas72KuRBG57rTqu9J1jnHfC8ac2+HZ69Pleugl3blIwPnsoj4IyfeYZRF/KX9+/
+ KtTlaZtmT0seoyWV21LHQGV/26diJA20DuksNIuVRaCIS4SN6c5OuH/NgUc6ELA8Kt5C
+ T8aoISIEfqeSkslo4Yi9XRHWg/gdwjIh0bQUHAbWYAxtJNlTOpKTaWF4aU9llfH7qyYj
+ rNpBsgZPTo0OaeX8G3QYg5NCi3HmYMT7kZzzCN4D0in46IlPU2FjxhXtF08J9LrAodc5
+ RwIg==
+X-Gm-Message-State: APjAAAX0Ip8QKrjSQHEFYRBMue7nD/o/ruoZf6bN4i8GvyKdXS13/5UI
+ JbfQb3GFEHP7kuSgdoPLLZ/CGoMmyNdx6g==
+X-Google-Smtp-Source: APXvYqyoNM/de+xUoMoBH2YEFzEJzgeA3CZEjEq3Xwec5F00Bqle3ETqq9GUfZNE6m8eicvFh0yLDQ==
+X-Received: by 2002:a05:600c:da:: with SMTP id
+ u26mr24039839wmm.108.1563198141615; 
+ Mon, 15 Jul 2019 06:42:21 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id c7sm14221808wro.70.2019.07.15.06.42.19
+ by smtp.gmail.com with ESMTPSA id c7sm14221808wro.70.2019.07.15.06.42.20
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Mon, 15 Jul 2019 06:42:20 -0700 (PDT)
+ Mon, 15 Jul 2019 06:42:21 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Mon, 15 Jul 2019 14:42:09 +0100
-Message-Id: <20190715134211.23063-9-peter.maydell@linaro.org>
+Date: Mon, 15 Jul 2019 14:42:10 +0100
+Message-Id: <20190715134211.23063-10-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190715134211.23063-1-peter.maydell@linaro.org>
 References: <20190715134211.23063-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::42d
-Subject: [Qemu-devel] [PULL 08/10] pl031: Correctly migrate state when using
- -rtc clock=host
+X-Received-From: 2a00:1450:4864:20::342
+Subject: [Qemu-devel] [PULL 09/10] target/arm: Set VFP-related MVFR0 fields
+ for arm926 and arm1026
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,203 +100,62 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The PL031 RTC tracks the difference between the guest RTC
-and the host RTC using a tick_offset field. For migration,
-however, we currently always migrate the offset between
-the guest and the vm_clock, even if the RTC clock is not
-the same as the vm_clock; this was an attempt to retain
-migration backwards compatibility.
+The ARMv5 architecture didn't specify detailed per-feature ID
+registers. Now that we're using the MVFR0 register fields to
+gate the existence of VFP instructions, we need to set up
+the correct values in the cpu->isar structure so that we still
+provide an FPU to the guest.
 
-Unfortunately this results in the RTC behaving oddly across
-a VM state save and restore -- since the VM clock stands still
-across save-then-restore, regardless of how much real world
-time has elapsed, the guest RTC ends up out of sync with the
-host RTC in the restored VM.
+This fixes a regression in the arm926 and arm1026 CPUs, which
+are the only ones that both have VFP and are ARMv5 or earlier.
+This regression was introduced by the VFP refactoring, and more
+specifically by commits 1120827fa182f0e76 and 266bd25c485597c,
+which accidentally disabled VFP short-vector support and
+double-precision support on these CPUs.
 
-Fix this by migrating the raw tick_offset. To retain migration
-compatibility as far as possible, we have a new property
-migrate-tick-offset; by default this is 'true' and we will
-migrate the true tick offset in a new subsection; if the
-incoming data has no subsection we fall back to the old
-vm_clock-based offset information, so old->new migration
-compatibility is preserved. For complete new->old migration
-compatibility, the property is set to 'false' for 4.0 and
-earlier machine types (this will only affect 'virt-4.0'
-and below, as none of the other pl031-using machines are
-versioned).
-
-Reported-by: Russell King <rmk@armlinux.org.uk>
+Fixes: 1120827fa182f0e
+Fixes: 266bd25c485597c
+Fixes: https://bugs.launchpad.net/qemu/+bug/1836192
+Reported-by: Christophe Lyon <christophe.lyon@linaro.org>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Message-id: 20190709143912.28905-1-peter.maydell@linaro.org
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Tested-by: Christophe Lyon <christophe.lyon@linaro.org>
+Message-id: 20190711131241.22231-1-peter.maydell@linaro.org
 ---
- include/hw/timer/pl031.h |  2 +
- hw/core/machine.c        |  1 +
- hw/timer/pl031.c         | 92 ++++++++++++++++++++++++++++++++++++++--
- 3 files changed, 91 insertions(+), 4 deletions(-)
+ target/arm/cpu.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-diff --git a/include/hw/timer/pl031.h b/include/hw/timer/pl031.h
-index 8857c24ca5d..8c3f555ee28 100644
---- a/include/hw/timer/pl031.h
-+++ b/include/hw/timer/pl031.h
-@@ -33,6 +33,8 @@ typedef struct PL031State {
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index ad164a773b2..1959467fdc8 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -1666,6 +1666,12 @@ static void arm926_initfn(Object *obj)
+      * set the field to indicate Jazelle support within QEMU.
       */
-     uint32_t tick_offset_vmstate;
-     uint32_t tick_offset;
-+    bool tick_offset_migrated;
-+    bool migrate_tick_offset;
- 
-     uint32_t mr;
-     uint32_t lr;
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index c4ead160104..c58a8e594ef 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -35,6 +35,7 @@ GlobalProperty hw_compat_4_0[] = {
-     { "virtio-gpu-pci", "edid", "false" },
-     { "virtio-device", "use-started", "false" },
-     { "virtio-balloon-device", "qemu-4-0-config-size", "true" },
-+    { "pl031", "migrate-tick-offset", "false" },
- };
- const size_t hw_compat_4_0_len = G_N_ELEMENTS(hw_compat_4_0);
- 
-diff --git a/hw/timer/pl031.c b/hw/timer/pl031.c
-index 3378084f4a8..1a7e2ee06b3 100644
---- a/hw/timer/pl031.c
-+++ b/hw/timer/pl031.c
-@@ -199,29 +199,94 @@ static int pl031_pre_save(void *opaque)
- {
-     PL031State *s = opaque;
- 
--    /* tick_offset is base_time - rtc_clock base time.  Instead, we want to
--     * store the base time relative to the QEMU_CLOCK_VIRTUAL for backwards-compatibility.  */
+     cpu->isar.id_isar1 = FIELD_DP32(cpu->isar.id_isar1, ID_ISAR1, JAZELLE, 1);
 +    /*
-+     * The PL031 device model code uses the tick_offset field, which is
-+     * the offset between what the guest RTC should read and what the
-+     * QEMU rtc_clock reads:
-+     *  guest_rtc = rtc_clock + tick_offset
-+     * and so
-+     *  tick_offset = guest_rtc - rtc_clock
-+     *
-+     * We want to migrate this offset, which sounds straightforward.
-+     * Unfortunately older versions of QEMU migrated a conversion of this
-+     * offset into an offset from the vm_clock. (This was in turn an
-+     * attempt to be compatible with even older QEMU versions, but it
-+     * has incorrect behaviour if the rtc_clock is not the same as the
-+     * vm_clock.) So we put the actual tick_offset into a migration
-+     * subsection, and the backwards-compatible time-relative-to-vm_clock
-+     * in the main migration state.
-+     *
-+     * Calculate base time relative to QEMU_CLOCK_VIRTUAL:
++     * Similarly, we need to set MVFR0 fields to enable double precision
++     * and short vector support even though ARMv5 doesn't have this register.
 +     */
-     int64_t delta = qemu_clock_get_ns(rtc_clock) - qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-     s->tick_offset_vmstate = s->tick_offset + delta / NANOSECONDS_PER_SECOND;
- 
-     return 0;
++    cpu->isar.mvfr0 = FIELD_DP32(cpu->isar.mvfr0, MVFR0, FPSHVEC, 1);
++    cpu->isar.mvfr0 = FIELD_DP32(cpu->isar.mvfr0, MVFR0, FPDP, 1);
  }
  
-+static int pl031_pre_load(void *opaque)
-+{
-+    PL031State *s = opaque;
-+
-+    s->tick_offset_migrated = false;
-+    return 0;
-+}
-+
- static int pl031_post_load(void *opaque, int version_id)
- {
-     PL031State *s = opaque;
- 
--    int64_t delta = qemu_clock_get_ns(rtc_clock) - qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
--    s->tick_offset = s->tick_offset_vmstate - delta / NANOSECONDS_PER_SECOND;
+ static void arm946_initfn(Object *obj)
+@@ -1702,6 +1708,12 @@ static void arm1026_initfn(Object *obj)
+      * set the field to indicate Jazelle support within QEMU.
+      */
+     cpu->isar.id_isar1 = FIELD_DP32(cpu->isar.id_isar1, ID_ISAR1, JAZELLE, 1);
 +    /*
-+     * If we got the tick_offset subsection, then we can just use
-+     * the value in that. Otherwise the source is an older QEMU and
-+     * has given us the offset from the vm_clock; convert it back to
-+     * an offset from the rtc_clock. This will cause time to incorrectly
-+     * go backwards compared to the host RTC, but this is unavoidable.
++     * Similarly, we need to set MVFR0 fields to enable double precision
++     * and short vector support even though ARMv5 doesn't have this register.
 +     */
-+
-+    if (!s->tick_offset_migrated) {
-+        int64_t delta = qemu_clock_get_ns(rtc_clock) -
-+            qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-+        s->tick_offset = s->tick_offset_vmstate -
-+            delta / NANOSECONDS_PER_SECOND;
-+    }
-     pl031_set_alarm(s);
-     return 0;
- }
++    cpu->isar.mvfr0 = FIELD_DP32(cpu->isar.mvfr0, MVFR0, FPSHVEC, 1);
++    cpu->isar.mvfr0 = FIELD_DP32(cpu->isar.mvfr0, MVFR0, FPDP, 1);
  
-+static int pl031_tick_offset_post_load(void *opaque, int version_id)
-+{
-+    PL031State *s = opaque;
-+
-+    s->tick_offset_migrated = true;
-+    return 0;
-+}
-+
-+static bool pl031_tick_offset_needed(void *opaque)
-+{
-+    PL031State *s = opaque;
-+
-+    return s->migrate_tick_offset;
-+}
-+
-+static const VMStateDescription vmstate_pl031_tick_offset = {
-+    .name = "pl031/tick-offset",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = pl031_tick_offset_needed,
-+    .post_load = pl031_tick_offset_post_load,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT32(tick_offset, PL031State),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
- static const VMStateDescription vmstate_pl031 = {
-     .name = "pl031",
-     .version_id = 1,
-     .minimum_version_id = 1,
-     .pre_save = pl031_pre_save,
-+    .pre_load = pl031_pre_load,
-     .post_load = pl031_post_load,
-     .fields = (VMStateField[]) {
-         VMSTATE_UINT32(tick_offset_vmstate, PL031State),
-@@ -231,14 +296,33 @@ static const VMStateDescription vmstate_pl031 = {
-         VMSTATE_UINT32(im, PL031State),
-         VMSTATE_UINT32(is, PL031State),
-         VMSTATE_END_OF_LIST()
-+    },
-+    .subsections = (const VMStateDescription*[]) {
-+        &vmstate_pl031_tick_offset,
-+        NULL
-     }
- };
- 
-+static Property pl031_properties[] = {
-+    /*
-+     * True to correctly migrate the tick offset of the RTC. False to
-+     * obtain backward migration compatibility with older QEMU versions,
-+     * at the expense of the guest RTC going backwards compared with the
-+     * host RTC when the VM is saved/restored if using -rtc host.
-+     * (Even if set to 'true' older QEMU can migrate forward to newer QEMU;
-+     * 'false' also permits newer QEMU to migrate to older QEMU.)
-+     */
-+    DEFINE_PROP_BOOL("migrate-tick-offset",
-+                     PL031State, migrate_tick_offset, true),
-+    DEFINE_PROP_END_OF_LIST()
-+};
-+
- static void pl031_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(klass);
- 
-     dc->vmsd = &vmstate_pl031;
-+    dc->props = pl031_properties;
- }
- 
- static const TypeInfo pl031_info = {
+     {
+         /* The 1026 had an IFAR at c6,c0,0,1 rather than the ARMv6 c6,c0,0,2 */
 -- 
 2.20.1
 
