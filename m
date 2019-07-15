@@ -2,117 +2,89 @@ Return-Path: <SRS0=IjNW=VM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1467DC7618F
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 13:19:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CDF21C7618F
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 13:24:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DAEA8206B8
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 13:19:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DAEA8206B8
+	by mail.kernel.org (Postfix) with ESMTPS id A6A7D2081C
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 13:24:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6A7D2081C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38502 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38544 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hn0tP-0003Zq-4R
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 09:19:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47034)
+	id 1hn0y1-00069y-7H
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 09:24:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48064)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <thuth@redhat.com>) id 1hn0tB-0002vx-U1
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 09:19:35 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hn0xp-0005jX-N5
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 09:24:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1hn0tA-00017c-Pn
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 09:19:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42281)
+ (envelope-from <mreitz@redhat.com>) id 1hn0xo-0005W0-Cg
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 09:24:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60336)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>)
- id 1hn0t8-000164-De; Mon, 15 Jul 2019 09:19:30 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1hn0xl-0005KJ-ET; Mon, 15 Jul 2019 09:24:17 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 151ED3082D6C;
- Mon, 15 Jul 2019 13:19:29 +0000 (UTC)
-Received: from thuth.remote.csb (reserved-198-198.str.redhat.com
- [10.33.198.198])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1BE9F6085B;
- Mon, 15 Jul 2019 13:19:17 +0000 (UTC)
-To: Cornelia Huck <cohuck@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-References: <20190715095545.28545-1-philmd@redhat.com>
- <20190715095545.28545-2-philmd@redhat.com>
- <ca528cdc-6118-0b2f-c1b8-30b06875dde8@redhat.com>
- <CAFEAcA-wgTVfj0TUJ=piP0wEgLGiNpOYia5DK2GQAO4Q7gNaWg@mail.gmail.com>
- <6d69e8ad-d720-ce04-20f2-a03193903078@redhat.com>
- <20190715125653.6e65d575.cohuck@redhat.com>
- <c1c68faf-0424-6c7c-e39f-42159457c3ee@redhat.com>
- <20190715130955.4a117388.cohuck@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 199DD368E6;
+ Mon, 15 Jul 2019 13:24:16 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.40.205.59])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 43F845D71B;
+ Mon, 15 Jul 2019 13:24:11 +0000 (UTC)
+To: qemu-block@nongnu.org
+References: <20190619152603.5937-1-mreitz@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; keydata=
- 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
-Organization: Red Hat
-Message-ID: <13fce62f-234c-1b13-595f-5910c066bc4f@redhat.com>
-Date: Mon, 15 Jul 2019 15:19:17 +0200
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <61036af7-c4b4-6737-450c-6fc5907223a7@redhat.com>
+Date: Mon, 15 Jul 2019 15:24:09 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <20190715130955.4a117388.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <20190619152603.5937-1-mreitz@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="h8eQc92HoYqCO7FrW0H4RDchgLNnetUNd"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Mon, 15 Jul 2019 13:19:29 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ (mx1.redhat.com [10.5.110.30]); Mon, 15 Jul 2019 13:24:16 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [qemu-s390x] [RFC PATCH 1/3] hw/Kconfig: PCI bus
- implies PCI_DEVICES
+Subject: Re: [Qemu-devel] [PATCH v2 0/9] block: Delay poll when ending
+ drained sections
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -124,95 +96,185 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Collin Walling <walling@linux.ibm.com>,
- "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Eduardo Habkost <ehabkost@redhat.com>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- "Michael S. Tsirkin" <mst@redhat.com>, Helge Deller <deller@gmx.de>,
- Palmer Dabbelt <palmer@sifive.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- QEMU Developers <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>,
- "open list:S390" <qemu-s390x@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
- Alistair Francis <Alistair.Francis@wdc.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, qemu-ppc <qemu-ppc@nongnu.org>,
- Richard Henderson <rth@twiddle.net>, Artyom Tarasenko <atar4qemu@gmail.com>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
+ Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 15/07/2019 13.09, Cornelia Huck wrote:
-> On Mon, 15 Jul 2019 13:04:28 +0200
-> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--h8eQc92HoYqCO7FrW0H4RDchgLNnetUNd
+Content-Type: multipart/mixed; boundary="00b6NmIkRcHxEaRCNYdGfviIkwjoW1iMI";
+ protected-headers="v1"
+From: Max Reitz <mreitz@redhat.com>
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <61036af7-c4b4-6737-450c-6fc5907223a7@redhat.com>
+Subject: Re: [PATCH v2 0/9] block: Delay poll when ending drained sections
+References: <20190619152603.5937-1-mreitz@redhat.com>
+In-Reply-To: <20190619152603.5937-1-mreitz@redhat.com>
+
+--00b6NmIkRcHxEaRCNYdGfviIkwjoW1iMI
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+Ping =E2=80=93 as this series fixes an abort and a segfault, I would appr=
+eciate
+reviews.
+
+(Head over to =E2=80=9CFixes for concurrent block jobs=E2=80=9D for even =
+more fixes for
+aborts and segfaults.)
+
+On 19.06.19 17:25, Max Reitz wrote:
+> Hi,
 >=20
->> On 7/15/19 12:56 PM, Cornelia Huck wrote:
->>> On Mon, 15 Jul 2019 12:48:55 +0200
->>> Thomas Huth <thuth@redhat.com> wrote:
->>>  =20
->>>> On 15/07/2019 12.19, Peter Maydell wrote: =20
->>>>> On Mon, 15 Jul 2019 at 11:15, Thomas Huth <thuth@redhat.com> wrote:=
-   =20
->>>>>>
->>>>>> On 15/07/2019 11.55, Philippe Mathieu-Daud=C3=A9 wrote:   =20
->>>>>>> If a controller device provides a PCI bus, we can plug any PCI
->>>>>>> daughter card on it.
->>>>>>>
->>>>>>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->>>>>>> ---   =20
->>>>>    =20
->>>>>>> diff --git a/hw/pci/Kconfig b/hw/pci/Kconfig
->>>>>>> index 77f8b005ff..0f7267db35 100644
->>>>>>> --- a/hw/pci/Kconfig
->>>>>>> +++ b/hw/pci/Kconfig
->>>>>>> @@ -1,5 +1,6 @@
->>>>>>>  config PCI
->>>>>>>      bool
->>>>>>> +    imply PCI_DEVICES   =20
->>>>>>
->>>>>> No, please don't change this. This was done on purpose, since almo=
-st all
->>>>>> PCI_DEVICES do not work on s390x (so s390x does *not* imply PCI_DE=
-VICES).   =20
->>>>>
->>>>> But that means that every board that provides PCI has to have an
->>>>> "imply PCI_DEVICES" line, which is pretty clunky just to work
->>>>> around an s390x limitation.
->>>>>
->>>>> Is there some way in the Kconfig syntax for s390x to say
->>>>> "no PCI_DEVICES" so we can have the corner-case be handled
->>>>> by the s390x Kconfig in one place rather than in 20 places
->>>>> affecting everywhere except s390x?   =20
->>>>
->>>> IIRC the problem on s390x are the legacy IRQs. s390x has only MSIs. =
-So I
->>>> guess the correct way to fix this would be to introduce some
->>>> PCI_LEGACY_IRQ switch and let all old devices that do not work with =
-MSI
->>>> depend on it. =20
->>>
->>> s/MSI/MSI-X/, IIRC. Not sure how far 'legacy' would stretch. =20
->>
->> Maybe we can have something like PCI_LEGACY_DEVICES and PCI_MSI_DEVICE=
-S?
->>
->> So if s390x only selects PCI_LEGACY (not PCI_MSI) bus, then it only ge=
+> This is v2 to =E2=80=9Cblock: Keep track of parent quiescing=E2=80=9D.
+>=20
+> Please read this cover letter, because I=E2=80=99m very unsure about th=
+e design
+> in this series and I=E2=80=99d appreciate some comments.
+>=20
+> As Kevin wrote in his reply to that series, the actual problem is that
+> bdrv_drain_invoke() polls on every node whenever ending a drain.  This
+> may cause graph changes, which is actually forbidden.
+>=20
+> To solve that problem, this series makes the drain code construct a lis=
 t
->> legacy devices?
+> of undrain operations that have been initiated, and then polls all of
+> them on the root level once graph changes are acceptable.
 >=20
-> Wrong way around? We need MSI-X for s390x, not plain MSI or
-> 'legacy' (whatever that is).
+> Note that I don=E2=80=99t like this list concept very much, so I=E2=80=99=
+m open to
+> alternatives.
+>=20
+> Furthermore, all BdrvChildRoles with BDS parents have a broken
+> .drained_end() implementation.  The documentation clearly states that
+> this function is not allowed to poll, but it does.  So this series
+> changes it to a variant (using the new code) that does not poll.
+>=20
+> There is a catch, which may actually be a problem, I don=E2=80=99t know=
+: The new
+> variant of that .drained_end() does not poll at all, never.  As
+> described above, now every bdrv_drain_invoke() returns an object that
+> describes when it will be done and which can thus be polled for.  These=
 
-With "legacy" I meant the old level-triggered interrupts from the early
-PCI (non-express) days. Sorry for being imprecise here.
+> objects are just discarded when using BdrvChildRole.drained_end().  Tha=
+t
+> does not feel quite right.  It would probably be more correct to let
+> BdrvChildRole.drained_end() return these objects so the top level
+> bdrv_drained_end() can poll for their completion.
+>=20
+> I decided not to do this, for two reasons:
+> (1) Doing so would spill the =E2=80=9Clist of objects to poll for=E2=80=
+=9D design to
+>     places outside of block/io.c.  I don=E2=80=99t like the design very=
+ much as
+>     it is, but I can live with it as long as it=E2=80=99s constrained t=
+o the
+>     core drain code in block/io.c.
+>     This is made worse by the fact that currently, those objects are of=
 
-So maybe we need two new switches, PCI_CLASSIC (or so) and PCI_MSIX, and
-then the PCI devices should be marked with "default y if PCI_CLASSIC" if
-they do not have MSIX support, and with "default y if PCI_MSIX" if they
-have MSI-X support?
+>     type BdrvCoDrainData.  But it shouldn=E2=80=99t be a problem to add=
+ a new
+>     type that is externally visible (we only need the AioContext and
+>     whether bdrv_drain_invoke_entry() is done).
+>=20
+> (2) It seems to work as it is.
+>=20
+> The alternative would be to add the same GSList ** parameter to
+> BdrvChildRole.drained_end() that I added in the core drain code in patc=
+h
+> 2, and then let the .drained_end() implementation fill that with object=
+s
+> to poll for.  (Which would be accomplished by adding a frontend to
+> bdrv_do_drained_end() that lets bdrv_child_cb_drained_poll() pass the
+> parameter through.)
+>=20
+> Opinions?
+>=20
+>=20
+> And then we have bdrv_replace_child_noperm(), which actually wants a
+> polling BdrvChildRole.drained_end().  So this series adds
+> BdrvChildRole.drained_end_unquiesce(), which takes that role (if there
+> is any polling to do).
+>=20
+> Note that if I implemented the alternative described above
+> (.drained_end() gets said GSList ** parameter), a
+> .drained_end_unquiesce() wouldn=E2=80=99t be necessary.
+> bdrv_parent_drained_end_single() could just poll the list returned by
+> .drained_end() by itself.
+>=20
+>=20
+> Finally, patches 1, 8, and 9 are unmodified from v1.
+>=20
+>=20
+> git backport-diff against v1:
+>=20
+> Key:
+> [----] : patches are identical
+> [####] : number of functional differences between upstream/downstream p=
+atch
+> [down] : patch is downstream-only
+> The flags [FC] indicate (F)unctional and (C)ontextual differences, resp=
+ectively
+>=20
+> 001/9:[----] [--] 'block: Introduce BdrvChild.parent_quiesce_counter'
+> 002/9:[down] 'block: Add @data_objs to bdrv_drain_invoke()'
+> 003/9:[down] 'block: Add bdrv_poll_drain_data_objs()'
+> 004/9:[down] 'block: Move polling out of bdrv_drain_invoke()'
+> 005/9:[down] 'block: Add @poll to bdrv_parent_drained_end_single()'
+> 006/9:[down] 'block: Add bdrv_drained_end_no_poll()'
+> 007/9:[down] 'block: Fix BDS children's .drained_end()'
+> 008/9:[----] [--] 'iotests: Add @has_quit to vm.shutdown()'
+> 009/9:[----] [--] 'iotests: Test commit with a filter on the chain'
+>=20
+>=20
+> Max Reitz (9):
+>   block: Introduce BdrvChild.parent_quiesce_counter
+>   block: Add @data_objs to bdrv_drain_invoke()
+>   block: Add bdrv_poll_drain_data_objs()
+>   block: Move polling out of bdrv_drain_invoke()
+>   block: Add @poll to bdrv_parent_drained_end_single()
+>   block: Add bdrv_drained_end_no_poll()
+>   block: Fix BDS children's .drained_end()
+>   iotests: Add @has_quit to vm.shutdown()
+>   iotests: Test commit with a filter on the chain
+>=20
+>  include/block/block.h      |  22 +++++-
+>  include/block/block_int.h  |  23 ++++++
+>  block.c                    |  24 +++---
+>  block/io.c                 | 155 ++++++++++++++++++++++++++++++-------=
 
- Thomas
+>  python/qemu/__init__.py    |   5 +-
+>  tests/qemu-iotests/040     |  40 +++++++++-
+>  tests/qemu-iotests/040.out |   4 +-
+>  tests/qemu-iotests/255     |   2 +-
+>  8 files changed, 231 insertions(+), 44 deletions(-)
+>=20
 
 
- Thomas
+
+--00b6NmIkRcHxEaRCNYdGfviIkwjoW1iMI--
+
+--h8eQc92HoYqCO7FrW0H4RDchgLNnetUNd
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0sfnkACgkQ9AfbAGHV
+z0DBygf/Ud2iZGuljTpXLm6DwWv4G7DDOI1UQvzLbUUhbLXzYIxLn3lJyy5nce9m
+HncSfAsE2SS8JVT+dvSae70Jg/xF0l/UApptyE+LREeXKT72T86COCbFPSUpspGg
+m9vcJ2Fk9CMFWxhOUPX2GCqAEEvnsbDGIPLdTuEHUrQ6OmS9W1ZlsAH8iikFqN53
+3qzR26J+K7r+K8Wq/N0pWYJPuG6KPq+T8Bno63vE2kpwYW/GiNmWfgFTqr61RW7z
+u9z3CSGOpe82R2RIeOqPq4Kg0r2XLrWxmkLzkH1nCliZhQdMG2ktT4X+g73s/VL4
+oeGWOjAwRs9NsglIlRw1yAavjH+uPw==
+=NKNi
+-----END PGP SIGNATURE-----
+
+--h8eQc92HoYqCO7FrW0H4RDchgLNnetUNd--
 
