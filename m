@@ -7,67 +7,68 @@ X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B566C7618F
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 16:55:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63C82C7618F
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 17:01:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1C36A2080A
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 16:55:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C36A2080A
+	by mail.kernel.org (Postfix) with ESMTPS id 375892080A
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 17:01:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 375892080A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40952 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40994 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hn4GR-0005VQ-6e
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 12:55:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38030)
+	id 1hn4LY-0000pI-AC
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 13:01:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39138)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bounces@canonical.com>) id 1hn4GG-00054b-Lv
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 12:55:37 -0400
+ (envelope-from <bounces@canonical.com>) id 1hn4LF-0008SJ-Aq
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 13:00:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1hn4GF-0005Vq-GL
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 12:55:36 -0400
-Received: from indium.canonical.com ([91.189.90.7]:59550)
+ (envelope-from <bounces@canonical.com>) id 1hn4LE-0000A7-7c
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 13:00:45 -0400
+Received: from indium.canonical.com ([91.189.90.7]:60118)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1hn4GF-0005VM-A1
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 12:55:35 -0400
+ id 1hn4LE-00009e-0c
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 13:00:44 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1hn4GE-0007z4-BH
- for <qemu-devel@nongnu.org>; Mon, 15 Jul 2019 16:55:34 +0000
+ id 1hn4LD-0008Na-9X
+ for <qemu-devel@nongnu.org>; Mon, 15 Jul 2019 17:00:43 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 511132E80C7
- for <qemu-devel@nongnu.org>; Mon, 15 Jul 2019 16:55:34 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 460E62E80C7
+ for <qemu-devel@nongnu.org>; Mon, 15 Jul 2019 17:00:43 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 15 Jul 2019 16:50:06 -0000
+Date: Mon, 15 Jul 2019 16:54:03 -0000
 From: =?utf-8?q?Alex_Benn=C3=A9e?= <alex.bennee@gmail.com>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Tags: linux-user ppc
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: docs
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: alex-bennee scherft
-X-Launchpad-Bug-Reporter: Daan Scherft (scherft)
+X-Launchpad-Bug-Commenters: philmd
+X-Launchpad-Bug-Reporter: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
+ =?utf-8?q?=29?=
 X-Launchpad-Bug-Modifier: =?utf-8?q?Alex_Benn=C3=A9e_=28alex-bennee=29?=
-References: <156318593102.28533.3075291509963886255.malonedeb@chaenomeles.canonical.com>
-Message-Id: <156320940654.20514.11587554980294663291.malone@gac.canonical.com>
+References: <156303245351.28480.9481024859968233865.malonedeb@chaenomeles.canonical.com>
+Message-Id: <156320964417.15101.15246424391778112872.launchpad@soybean.canonical.com>
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com); Revision="19007";
  Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 5c4b63b0ca2db81b0b8ecf4ad5ac44643ef57af4
+X-Launchpad-Hash: 4bc7fce4d65d111cbd0f18a0815cceeedd518a82
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1836558] Re: Qemu-ppc Memory leak creating threads
+Subject: [Qemu-devel] [Bug 1836451] Re: 'make info' fails due to errors in
+ qemu-tech.texi
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 List-Id: <qemu-devel.nongnu.org>
@@ -78,93 +79,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1836558 <1836558@bugs.launchpad.net>
+Reply-To: Bug 1836451 <1836451@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Nope we think we have identified the leak. On CPU realize
-(ppc_cpu_realize) the translator sets up its tables
-(create_ppc_opcodes). This will happen for each thread created. This
-would be fine but linux_user cpu_copy function then does:
-
-    memcpy(new_env, env, sizeof(CPUArchState));
-
-which will blindly overwrite the tables in CPUArchState (CPUPPCState)
-causing the leak. The suggestion is the data should be moved to
-PowerPCCPU (as it is internal to the translator) and avoid being smashed
-by the memcpy. However longer term we should replace the memcpy with an
-arch aware smart copy.
+** Tags added: docs
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1836558
+https://bugs.launchpad.net/bugs/1836451
 
 Title:
-  Qemu-ppc Memory leak creating threads
+  'make info' fails due to errors in qemu-tech.texi
 
 Status in QEMU:
-  Confirmed
+  New
 
 Bug description:
-  When creating c++ threads (with c++ std::thread), the resulting binary
-  has memory leaks when running with qemu-ppc.
+  git tag: v4.1.0-rc0
+  host: Fedora 29, x86_64
 
-  Eg the following c++ program, when compiled with gcc, consumes more
-  and more memory while running at qemu-ppc. (does not have memory leaks
-  when compiling for Intel, when running same binary on real powerpc CPU
-  hardware also no memory leaks).
-
-  (Note I used function getCurrentRSS to show available memory, see
-  https://stackoverflow.com/questions/669438/how-to-get-memory-usage-at-
-  runtime-using-c; calls commented out here)
-
-  Compiler: powerpc-linux-gnu-g++ (Debian 8.3.0-2) 8.3.0 (but same problem =
-with older g++ compilers even 4.9)
-  Os: Debian 10.0 ( Buster) (but same problem seen on Debian 9/stetch)
-  qemu: qemu-ppc version 3.1.50
-
-
-  ---
-
-  #include <iostream>
-  #include <thread>
-  #include <chrono>
-
-  =
-
-  using namespace std::chrono_literals;
-
-  // Create/run and join a 100 threads.
-  void Fun100()
-  {
-  //    auto b4 =3D getCurrentRSS();
-  //    std::cout << getCurrentRSS() << std::endl;
-      for(int n =3D 0; n < 100; n++)
-      {
-          std::thread t([]
-          {
-              std::this_thread::sleep_for( 10ms );
-          });
-  //        std::cout << n << ' ' << getCurrentRSS() << std::endl;
-          t.join();
-      }
-      std::this_thread::sleep_for( 500ms ); // to give OS some time to wipe=
- memory...
-  //    auto after =3D getCurrentRSS();
-      std::cout << b4 << ' ' << after << std::endl;
-  }
-
-  =
-
-  int main(int, char **)
-  {
-      Fun100();
-      Fun100();  // memory used keeps increasing
-  }
+  $ make info
+  make[1]: Entering directory 'qemu/slirp'
+  make[1]: Nothing to be done for 'all'.
+  make[1]: Leaving directory 'qemu/slirp'
+    GEN     docs/version.texi
+    GEN     qemu-options.texi
+    GEN     qemu-monitor.texi
+    GEN     qemu-img-cmds.texi
+    GEN     qemu-monitor-info.texi
+    GEN     qemu-doc.info
+  qemu/qemu-tech.texi:6: @menu reference to nonexistent node `Translator In=
+ternals'
+  qemu/qemu-tech.texi:7: @menu reference to nonexistent node `QEMU compared=
+ to other emulators'
+  qemu/qemu-tech.texi:9: @menu reference to nonexistent node `Bibliography'
+  Makefile:960: recipe for target 'qemu-doc.info' failed
+  make: *** [qemu-doc.info] Error 1
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1836558/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1836451/+subscriptions
 
