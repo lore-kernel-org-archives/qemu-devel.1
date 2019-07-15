@@ -2,77 +2,66 @@ Return-Path: <SRS0=IjNW=VM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D860CC7618F
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 08:16:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E500C7618F
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 08:26:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ADED620C01
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 08:16:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ADED620C01
+	by mail.kernel.org (Postfix) with ESMTPS id 5EF7F214C6
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 08:26:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5EF7F214C6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35826 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35872 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hmw9i-0002YR-DB
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 04:16:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35592)
+	id 1hmwJM-0004ND-HK
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 04:26:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37457)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <sgarzare@redhat.com>) id 1hmw9W-00025w-CB
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 04:16:07 -0400
+ (envelope-from <kwolf@redhat.com>) id 1hmwJC-0003yu-Q9
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 04:26:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <sgarzare@redhat.com>) id 1hmw9V-0007qS-7z
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 04:16:06 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:33874)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1hmw9V-0007pk-0M
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 04:16:05 -0400
-Received: by mail-wr1-f66.google.com with SMTP id 31so16059570wrm.1
- for <qemu-devel@nongnu.org>; Mon, 15 Jul 2019 01:16:04 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to:user-agent;
- bh=ZXe1tJnzYaaCKKWbquZTx1iP6Fn8k98oY9fj7dmSc6o=;
- b=t3gW3OGmb91ShSyboyKPLpCAu75cnm5PLwUHbugZYWRfaD+N1WsUd7IP9F1DIY2TJv
- Ux97hMZOLpwKDYojLJqbbOxfb7EXtbELF+1fHCbwHuF93tHfq0SLS0l+Hl3S6BdUeVyP
- WbQ7BLpp115CgvzoJGm9EG6P7ObnEmoSFmMgskLUOGCj2fRaNu5gVGxCn0Zdots5wkQl
- aEPJoMKRCBRZH1+/th77q6juu1iEKNwrxJlC2Tvg23swgg37z/DdkXuYkqPYWq9G13aE
- ZcPVseVRx1oOMNG3V0ofgUXTSQ7C5Tg0WvP5DTzsCpjnXoPiSPyu0oTjDSMQG2WsJD+s
- 4Ncg==
-X-Gm-Message-State: APjAAAUT+Q5ick+Qs/taXe3wQwO3lFis2Mya/XxCTNv0HTEJN8e1wgwJ
- i0hc05cX2117gcPIioCiTNwpcw==
-X-Google-Smtp-Source: APXvYqzUXK9NXNEFf4NRVhB7r3C/IQTBKBaBO0PMe+/fdXH14ODy3M4QT5Xeh9jueOZIwngi2i0FjA==
-X-Received: by 2002:a5d:55c2:: with SMTP id i2mr26821428wrw.96.1563178564006; 
- Mon, 15 Jul 2019 01:16:04 -0700 (PDT)
-Received: from steredhat (host122-201-dynamic.13-79-r.retail.telecomitalia.it.
- [79.13.201.122])
- by smtp.gmail.com with ESMTPSA id r12sm19490582wrt.95.2019.07.15.01.16.03
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Mon, 15 Jul 2019 01:16:03 -0700 (PDT)
-Date: Mon, 15 Jul 2019 10:16:01 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Max Reitz <mreitz@redhat.com>
-Message-ID: <20190715081601.rpvavykcuhyr3fiw@steredhat>
-References: <20190712104617.94707-1-sgarzare@redhat.com>
- <5017daf6-2739-d260-09fd-cfccd6c77bc1@redhat.com>
+ (envelope-from <kwolf@redhat.com>) id 1hmwJB-0006Nz-Hu
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 04:26:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47798)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1hmwJB-0006ML-8e
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 04:26:05 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id AD68B3DD47;
+ Mon, 15 Jul 2019 08:26:03 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-116-249.ams2.redhat.com
+ [10.36.116.249])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E4AA25C257;
+ Mon, 15 Jul 2019 08:26:01 +0000 (UTC)
+Date: Mon, 15 Jul 2019 10:26:00 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Stefan Weil <sw@weilnetz.de>
+Message-ID: <20190715082600.GA10255@localhost.localdomain>
+References: <030a439f-bb17-8232-bd1c-3585905e8feb@weilnetz.de>
+ <f3735415-bd75-8ed6-1dc7-ff51cc7ab03f@redhat.com>
+ <0ea72a38-8359-b8d5-3405-52965cd56c62@weilnetz.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <5017daf6-2739-d260-09fd-cfccd6c77bc1@redhat.com>
-User-Agent: NeoMutt/20180716
+In-Reply-To: <0ea72a38-8359-b8d5-3405-52965cd56c62@weilnetz.de>
+User-Agent: Mutt/1.11.3 (2019-02-01)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.29]); Mon, 15 Jul 2019 08:26:03 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.221.66
-Subject: Re: [Qemu-devel] [PATCH] gluster: fix .bdrv_reopen_prepare when
- backing file is a JSON object
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [BUG] 216 Alerts reported by LGTM for QEMU (some
+ might be release critical)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,75 +73,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, integration@gluster.org,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: peter.maydell@linaro.org, Eduardo Habkost <ehabkost@redhat.com>,
+ qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jul 12, 2019 at 08:35:12PM +0200, Max Reitz wrote:
-> On 12.07.19 12:46, Stefano Garzarella wrote:
-> > When the backing_file is specified as a JSON object, the
-> > qemu_gluster_reopen_prepare() fails with this message:
-> >     invalid URI json:{"server.0.host": ...}
-> > 
-> > In this case, we should call qemu_gluster_init() using the QDict
-> > 'state->options' that contains the parameters already parsed.
-> > 
-> > Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1542445
-> > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-> > ---
-> >  block/gluster.c | 11 ++++++++++-
-> >  1 file changed, 10 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/block/gluster.c b/block/gluster.c
-> > index 62f8ff2147..26971db1ea 100644
-> > --- a/block/gluster.c
-> > +++ b/block/gluster.c
-> > @@ -931,7 +931,16 @@ static int qemu_gluster_reopen_prepare(BDRVReopenState *state,
-> >      gconf->has_debug = true;
-> >      gconf->logfile = g_strdup(s->logfile);
-> >      gconf->has_logfile = true;
-> > -    reop_s->glfs = qemu_gluster_init(gconf, state->bs->filename, NULL, errp);
-> > +    /*
-> > +     * If 'bs->filename' starts with "json:", then 'state->options' will
-> > +     * contain the parameters already parsed.
-> > +     */
-> > +    if (state->bs->filename && !strstart(state->bs->filename, "json:", NULL)) {
-> > +        reop_s->glfs = qemu_gluster_init(gconf, state->bs->filename, NULL,
-> > +                                         errp);
-> > +    } else {
-> > +        reop_s->glfs = qemu_gluster_init(gconf, NULL, state->options, errp);
-> > +    }
-> 
-> Hmmm, aren’t they always in state->options?
+Am 14.07.2019 um 15:28 hat Stefan Weil geschrieben:
+> Am 13.07.2019 um 21:42 schrieb Paolo Bonzini:
+> > On 13/07/19 19:46, Stefan Weil wrote:
+> >> LGTM reports 16 errors, 81 warnings and 119 recommendations:
+> >> https://lgtm.com/projects/g/qemu/qemu/alerts/?mode=3Dlist.
+> >>
+> >> Some of them are already known (wrong format strings), others look l=
+ike
+> >> real errors:
+> >>
+> >> - several multiplication results which don't work as they should in
+> >> contrib/vhost-user-gpu, block/* (m->nb_clusters * s->cluster_size on=
+ly
+> >> 32 bit!),=A0 target/i386/translate.c and other files
 
-Yes, you are rigth, but the qemu_gluster_parse() doesn't search for the
-'filename' in the QDict *options.
+Request sizes are limited to 32 bit in the generic block layer before
+they are even passed to the individual block drivers, so most if not all
+of these are going to be false positives.
 
-Maybe I can simply modify it in this way in order to hanlde this case,
-calling qemu_gluster_init() only with 'state->options'.
+> > m->nb_clusters here is limited by s->l2_slice_size (see for example
+> > handle_alloc) so I wouldn't be surprised if this is a false positive.=
+  I
+> > couldn't find this particular multiplication in Coverity, but it has
+> > about 250 issues marked as intentional or false positive so there's
+> > probably a lot of overlap with what LGTM found.
+> >
+> > Paolo
+>=20
+> From other projects I know that there is a certain overlap between the
+> results from Coverity Scan an LGTM, but it is good to have both
+> analyzers, and the results from LGTM are typically quite reliable.
+>=20
+> Even if we know that there is no multiplication overflow, the code coul=
+d
+> be modified. Either the assigned value should use the same data type as
+> the factors (possible when there is never an overflow, avoids a size
+> extension), or the multiplication could use the larger data type by
+> adding a type cast to one of the factors (then an overflow cannot
+> happen, static code analysers and human reviewers have an easier job,
+> but the multiplication costs more time).
 
-diff --git a/block/gluster.c b/block/gluster.c
-index 26971db1ea..91d674cd2b 100644
---- a/block/gluster.c
-+++ b/block/gluster.c
-@@ -695,6 +695,11 @@ static int qemu_gluster_parse(BlockdevOptionsGluster *gconf,
-                               QDict *options, Error **errp)
- {
-     int ret;
-+
-+    if (!filename) {
-+        filename = qdict_get_try_str(options, GLUSTER_OPT_FILENAME);
-+    }
-+
-     if (filename) {
-         ret = qemu_gluster_parse_uri(gconf, filename);
-         if (ret < 0) {
+But if you look at the code we're talking about, you see that it's
+complaining about things where being more explicit would make things
+less readable.
+
+For example, if complains about the multiplication in this line:
+
+    s->file_size +=3D n * s->header.cluster_size;
+
+We know that n * s->header.cluster_size fits in 32 bits, but
+s->file_size is 64 bits (and has to be 64 bits). Do you really think we
+should introduce another uint32_t variable to store the intermediate
+result? And if we cast n to uint64_t, not only might the multiplication
+cost more time, but also human readers would wonder why the result could
+become larger than 32 bits. So a cast would be misleading.
 
 
-Do you think it is better/cleaner?
+It also complains about this line:
 
-Thanks,
-Stefano
+    ret =3D bdrv_truncate(bs->file, (3 + l1_clusters) * s->cluster_size,
+                        PREALLOC_MODE_OFF, &local_err);
+
+Here, we don't even assign the result to a 64 bit variable, but just
+pass it to a function which takes a 64 bit parameter. Again, I don't
+think introducing additional variables for the intermediate result or
+adding casts would be an improvement of the situation.
+
+
+So I don't think this is a good enough tool to base our code on what it
+does and doesn't understand. It would have too much of a negative impact
+on our code. We'd rather need a way to mark false positives as such and
+move on without changing the code in such cases.
+
+Kevin
 
