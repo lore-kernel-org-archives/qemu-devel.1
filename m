@@ -2,51 +2,47 @@ Return-Path: <SRS0=IjNW=VM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96EE2C7618F
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 17:17:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66AE8C7618F
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 17:23:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6C1D62081C
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 17:17:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C1D62081C
+	by mail.kernel.org (Postfix) with ESMTPS id 3ED1E206B8
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 17:23:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3ED1E206B8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41146 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41178 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hn4bs-0001hX-It
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 13:17:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43478)
+	id 1hn4hS-0003kb-QW
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 13:23:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44538)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hn4bg-0001F0-VE
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 13:17:45 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hn4hE-0003A4-HN
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 13:23:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hn4bf-0003Zo-SB
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 13:17:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43568)
+ (envelope-from <mreitz@redhat.com>) id 1hn4h9-0007K1-BF
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 13:23:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47242)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hn4bd-0003W5-Hc; Mon, 15 Jul 2019 13:17:41 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1hn4h9-0007JR-1U
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 13:23:23 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A9645C057F2F;
- Mon, 15 Jul 2019 17:17:40 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 1D4A9308FBA0;
+ Mon, 15 Jul 2019 17:23:22 +0000 (UTC)
 Received: from dresden.str.redhat.com (unknown [10.40.205.59])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id ACCC45DAA4;
- Mon, 15 Jul 2019 17:17:38 +0000 (UTC)
-To: Thomas Huth <thuth@redhat.com>, Eric Blake <eblake@redhat.com>,
- qemu-devel@nongnu.org
-References: <20190715145438.6880-1-thuth@redhat.com>
- <20190715145438.6880-2-thuth@redhat.com>
- <db02273f-24ea-5c90-a206-b8203db2c819@redhat.com>
- <d8430e47-3fe6-d3f4-bdbd-529b9cf31ae5@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id BA59D6085B;
+ Mon, 15 Jul 2019 17:23:17 +0000 (UTC)
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, qemu-devel@nongnu.org
+References: <1562959033-223586-1-git-send-email-andrey.shinkevich@virtuozzo.com>
 From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
@@ -73,22 +69,22 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <d62de778-5e2a-c7c2-7dc7-4cb2f78b8552@redhat.com>
-Date: Mon, 15 Jul 2019 19:17:34 +0200
+Message-ID: <b270d0cc-2a28-8a60-ccac-45ac4de89f02@redhat.com>
+Date: Mon, 15 Jul 2019 19:23:15 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <d8430e47-3fe6-d3f4-bdbd-529b9cf31ae5@redhat.com>
+In-Reply-To: <1562959033-223586-1-git-send-email-andrey.shinkevich@virtuozzo.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="DnSk99wfBcGhZZnRcAgHrxjkUVPDKPpzf"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+ boundary="oUslCjXMzCL9Rw4XglAbDobeHwaZhxpBG"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.32]); Mon, 15 Jul 2019 17:17:40 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.43]); Mon, 15 Jul 2019 17:23:22 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 1/2] tests/qemu-iotests/group: Remove some
- more tests from the "auto" group
+Subject: Re: [Qemu-devel] [PATCH] chardev: race condition with
+ tcp_chr_disconnect
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,136 +96,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-block@nongnu.org
+Cc: den@openvz.org, pbonzini@redhat.com, vsementsov@virtuozzo.com,
+ rkagan@virtuozzo.com, marcandre.lureau@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---DnSk99wfBcGhZZnRcAgHrxjkUVPDKPpzf
-Content-Type: multipart/mixed; boundary="hyMG8OJIymLtVdDrBUMTvOO2NMmEchY9t";
+--oUslCjXMzCL9Rw4XglAbDobeHwaZhxpBG
+Content-Type: multipart/mixed; boundary="VTRtJ5opaJjtryckcyFxbeVC0udLSBca1";
  protected-headers="v1"
 From: Max Reitz <mreitz@redhat.com>
-To: Thomas Huth <thuth@redhat.com>, Eric Blake <eblake@redhat.com>,
- qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?=
- <alex.bennee@linaro.org>, qemu-block@nongnu.org
-Message-ID: <d62de778-5e2a-c7c2-7dc7-4cb2f78b8552@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/2] tests/qemu-iotests/group: Remove some
- more tests from the "auto" group
-References: <20190715145438.6880-1-thuth@redhat.com>
- <20190715145438.6880-2-thuth@redhat.com>
- <db02273f-24ea-5c90-a206-b8203db2c819@redhat.com>
- <d8430e47-3fe6-d3f4-bdbd-529b9cf31ae5@redhat.com>
-In-Reply-To: <d8430e47-3fe6-d3f4-bdbd-529b9cf31ae5@redhat.com>
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: vsementsov@virtuozzo.com, pbonzini@redhat.com, rkagan@virtuozzo.com,
+ marcandre.lureau@redhat.com, den@openvz.org
+Message-ID: <b270d0cc-2a28-8a60-ccac-45ac4de89f02@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] chardev: race condition with
+ tcp_chr_disconnect
+References: <1562959033-223586-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+In-Reply-To: <1562959033-223586-1-git-send-email-andrey.shinkevich@virtuozzo.com>
 
---hyMG8OJIymLtVdDrBUMTvOO2NMmEchY9t
+--VTRtJ5opaJjtryckcyFxbeVC0udLSBca1
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 15.07.19 17:18, Thomas Huth wrote:
-> On 15/07/2019 17.12, Eric Blake wrote:
->> On 7/15/19 9:54 AM, Thomas Huth wrote:
->>> Remove some more tests from the "auto" group that either have issues
->>> in certain environments (like macOS or FreeBSD, or on certain file sy=
-stems
->>> like ZFS or tmpfs), do not work with the qcow2 format, or that are si=
-mply
->>> taking too much time.
->>>
->>> Signed-off-by: Thomas Huth <thuth@redhat.com>
->>> ---
->>>  tests/qemu-iotests/group | 109 ++++++++++++++++++++-----------------=
---
->>>  1 file changed, 55 insertions(+), 54 deletions(-)
->>
->>>  251 rw auto quick
->>>  252 rw auto backing quick
->>> -253 rw auto quick
->>> -254 rw auto backing quick
->>> -255 rw auto quick
->>> -256 rw auto quick
->>> +253 rw o_direct quick
->>
->> Where is the new 'o_direct' group documented?  Is this a typo for
->> something else?
+On 12.07.19 21:17, Andrey Shinkevich wrote:
+> When tcp_chr_disconnect() is called, other thread may be still writing
+> to the channel. This patch protects only read operations that initiate
+> the disconnection.
 >=20
-> I needed a new group for test 142 since it would be without any group a=
-t
-> all otherwise:
->=20
-> -142 auto
-> +142 o_direct
->=20
-> Tests without a group are currently only possible if the line ends with=
+> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+> ---
 
-> a space - which is quite error prone.
+Have you looked at
+https://lists.nongnu.org/archive/html/qemu-devel/2019-02/msg06174.html
+already?  From a glance, it looks like that series supersedes this one.
 
-Why not just fix that, then?
-
-> diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
-> index f925606cc5..c24874ff4a 100755
-> --- a/tests/qemu-iotests/check
-> +++ b/tests/qemu-iotests/check
-> @@ -488,7 +488,7 @@ testlist options
->  BEGIN        { for (t=3D'$start'; t<=3D'$end'; t++) printf "%03d\n",t =
-}' \
->          | while read id
->          do
-> -            if grep -s "^$id " "$source_iotests/group" >/dev/null
-> +            if grep -s "^$id\( \|\$\)" "$source_iotests/group" >/dev/n=
-ull
->              then
->                  # in group file ... OK
->                  echo $id >>$tmp.list
-> @@ -547,7 +547,7 @@ else
->          touch $tmp.list
->      else
->          # no test numbers, do everything from group file
-> -        sed -n -e '/^[0-9][0-9][0-9]*/s/[         ].*//p' <"$source_io=
-tests/group" >$tmp.list
-> +        sed -n -e '/^[0-9][0-9][0-9]*/s/^\([0-9]*\).*/\1/p' <"$source_=
-iotests/group" >$tmp.list
->      fi
->  fi
-> =20
-
-looks to be enough for me.
+(No, I don=E2=80=99t know why the other series is delayed.  I keep remind=
+ing
+Paolo of it.)
 
 Max
 
-> So I think it's better to use a
-> new group here. Since 253 is about testing with O_DIRECT, too, I've put=
 
-> it into this group, too. Sorry, I should have mentioned it in the patch=
+--VTRtJ5opaJjtryckcyFxbeVC0udLSBca1--
 
-> description.
->=20
->  Thomas
->=20
-
-
-
---hyMG8OJIymLtVdDrBUMTvOO2NMmEchY9t--
-
---DnSk99wfBcGhZZnRcAgHrxjkUVPDKPpzf
+--oUslCjXMzCL9Rw4XglAbDobeHwaZhxpBG
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0stS4ACgkQ9AfbAGHV
-z0BoCwf/T06H8qFEjWuBDEYkWD0a9kVUtzZDKefGtIA8/Lzx+B5Vw0fqEjBN1z00
-Cfcu/DZ/bC/h6xqJGlReGd9L6FVkd+cnhUq3h+awJ3rSyRMnCOD3cEE1ZJFUq9WZ
-h4djz+Ca68IIYZN7L+1+WZQyguOF4zeA/gMGIFYOKggo+EU5ZS6s1YOfOEP29P3J
-VRxB6oYntCn2+X2YA4hzBaQ1P6PM0gDw/DOsNDhdBMfHIU/XaqtSwW0qIqOxg/lZ
-HQZITgTlfo9hoiGuPtDEyaK9R6TIrobA6UhWXGfL+EI+KSUQNpNMK2ZCPlFXHwmo
-laPiHGj4cPLQbv8gb3iiG/BAm3T+aQ==
-=ycda
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0stoMACgkQ9AfbAGHV
+z0AtoAf9GTgmqhaYyuao4Kyzqkp3bK4QZxFC4YtIP3VShIUlMSZjoh+u3INt8K/E
+i72BMs9aK6VZODudjZJTTq5u6bssJpfV/kfu43z3Y+iMdUTNEXYxd8DPVnxBx8PD
+COXsIqdk9/2tp2sh8N+X4K+Ghts9gIMIr5eNlKQdhUF0BIEVGXgHrzbesG7307fo
+Qs3Kw23Z8yAJhsZTLUDHRrAepsntArdYNeE3jXcs4lxQ5wdtGdAIcSS8Xk7hBMD2
+ClEjsBzspKCQvlCNdyQSM5vzNJMlZ+sjGQ0IOSe4JjEePVPNmVh27MT5RCy/X39k
+5H7YhFcBvU6eDQl4L/+3tWWc35zV3A==
+=K0J2
 -----END PGP SIGNATURE-----
 
---DnSk99wfBcGhZZnRcAgHrxjkUVPDKPpzf--
+--oUslCjXMzCL9Rw4XglAbDobeHwaZhxpBG--
 
