@@ -2,100 +2,67 @@ Return-Path: <SRS0=IjNW=VM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43384C76191
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 13:14:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B27D7C7618F
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 13:18:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 13A8D206B8
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 13:14:59 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Xgabz/Jf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 13A8D206B8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	by mail.kernel.org (Postfix) with ESMTPS id 89208206B8
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 13:18:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 89208206B8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38454 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38486 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hn0ok-00013A-D0
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 09:14:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45958)
+	id 1hn0sS-0002RB-Hz
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 09:18:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46729)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <yuval.shaia@oracle.com>) id 1hn0oW-0000QB-K4
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 09:14:45 -0400
+ (envelope-from <armbru@redhat.com>) id 1hn0sH-0001zT-9K
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 09:18:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yuval.shaia@oracle.com>) id 1hn0oU-0006ks-PR
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 09:14:44 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:58940)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
- id 1hn0oU-0006ig-FD
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 09:14:42 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
- by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6FDE840078249;
- Mon, 15 Jul 2019 13:14:37 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=date : from : to : cc
- : subject : message-id : references : mime-version : content-type :
- content-transfer-encoding : in-reply-to; s=corp-2018-07-02;
- bh=UvoCCl1cbLx5uLf0Qp4W9IPQas4CFFI0zmS1fhcdF4M=;
- b=Xgabz/JfQovTLBXZ8p4VUhayrHyaV4NahV/nTg35fCQsi2fNMhFMwGp9XUpT87nTUv10
- JGpWjbp55vgzU4Pmrd8EBiLKwDYKWuFF4xCtBPThkoAOcsBHCG7pAu7t+j5oufReZ+sL
- EBkrpMNKjO8h0AXklMeQZ1gJB1aNq1Bx+1ZB8IorxG7m1gfJ+/x14cdMR9y0SrWrVqsN
- FE+ANt87Tl/YrCppa832h4H2nAX6mema75/hlSI/yr/zy7Zn8cyOHeKbUv82WQ4369ge
- MEkz4fedmHe7yOeL4ej58nSuPfmSthoyFMHH6jdiJmK62tkn9FbO8KLI0ADwADSRIopy DA== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
- by userp2130.oracle.com with ESMTP id 2tq6qteegd-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 15 Jul 2019 13:14:37 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
- by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6FDCb5j044747;
- Mon, 15 Jul 2019 13:14:36 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
- by userp3030.oracle.com with ESMTP id 2tq4dta6sd-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 15 Jul 2019 13:14:36 +0000
-Received: from abhmp0020.oracle.com (abhmp0020.oracle.com [141.146.116.26])
- by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x6FDEZe6011765;
- Mon, 15 Jul 2019 13:14:35 GMT
-Received: from lap1 (/77.138.183.59) by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Mon, 15 Jul 2019 06:14:35 -0700
-Date: Mon, 15 Jul 2019 16:14:31 +0300
-From: Yuval Shaia <yuval.shaia@oracle.com>
-To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
-Message-ID: <20190715131430.GA10679@lap1>
-References: <20190712165154.11504-1-marcandre.lureau@redhat.com>
+ (envelope-from <armbru@redhat.com>) id 1hn0sG-0000YT-0s
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 09:18:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43086)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hn0sF-0000Y1-Pb
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 09:18:35 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 81CE830820EA;
+ Mon, 15 Jul 2019 13:18:34 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-111.ams2.redhat.com
+ [10.36.116.111])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id EE18E6090E;
+ Mon, 15 Jul 2019 13:18:30 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 7FE5011386A0; Mon, 15 Jul 2019 15:18:29 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+References: <20190715113939.3256-1-armbru@redhat.com>
+ <d7f33364-33dc-7b95-473d-b8d91b06395c@redhat.com>
+Date: Mon, 15 Jul 2019 15:18:29 +0200
+In-Reply-To: <d7f33364-33dc-7b95-473d-b8d91b06395c@redhat.com> ("Philippe
+ =?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Mon, 15 Jul 2019 13:52:45
+ +0200")
+Message-ID: <87ef2rv3kq.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190712165154.11504-1-marcandre.lureau@redhat.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9318
- signatures=668688
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
- malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1907150160
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9318
- signatures=668688
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
- priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1907150160
 Content-Transfer-Encoding: quoted-printable
-X-MIME-Autoconverted: from 8bit to quoted-printable by userp2130.oracle.com id
- x6FDE840078249
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 156.151.31.86
-Subject: Re: [Qemu-devel] [PATCH] rdmacm-mux: fix strcpy string warning
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.47]); Mon, 15 Jul 2019 13:18:34 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH] include: Make headers more self-contained
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,43 +74,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, richard.henderson@linaro.org,
+ qemu-devel@nongnu.org, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jul 12, 2019 at 08:51:54PM +0400, Marc-Andr=C3=A9 Lureau wrote:
-> ../contrib/rdmacm-mux/main.c: In function =E2=80=98parse_args=E2=80=99:
-> ../contrib/rdmacm-mux/main.c:118:13: error: =E2=80=98strncpy=E2=80=99 s=
-pecified bound 3835 equals destination size [-Werror=3Dstringop-truncatio=
-n]
->   118 |             strncpy(unix_socket_path, optarg, SOCKET_PATH_MAX);
->=20
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  contrib/rdmacm-mux/main.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/contrib/rdmacm-mux/main.c b/contrib/rdmacm-mux/main.c
-> index 30c7052651..de53048f06 100644
-> --- a/contrib/rdmacm-mux/main.c
-> +++ b/contrib/rdmacm-mux/main.c
-> @@ -115,7 +115,7 @@ static void parse_args(int argc, char *argv[])
-> =20
->          case 's':
->              /* This is temporary, final name will build below */
-> -            strncpy(unix_socket_path, optarg, SOCKET_PATH_MAX);
-> +            strncpy(unix_socket_path, optarg, SOCKET_PATH_MAX - 1);
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
 
-Oops,
-Thanks!
+> On 7/15/19 1:39 PM, Markus Armbruster wrote:
+>> Back in 2016, we discussed[1] rules for headers, and these were
+>> generally liked:
+>>=20
+>> 1. Have a carefully curated header that's included everywhere first.  We
+>>    got that already thanks to Peter: osdep.h.
+>>=20
+>> 2. Headers should normally include everything they need beyond osdep.h.
+>>    If exceptions are needed for some reason, they must be documented in
+>>    the header.  If all that's needed from a header is typedefs, put
+>>    those into qemu/typedefs.h instead of including the header.
+>>=20
+>> 3. Cyclic inclusion is forbidden.
+>>=20
+>> This patch gets include/ closer to obeying 2.
+>
+> A step forward using precompiled headers?
+>
+> https://gcc.gnu.org/onlinedocs/gcc/Precompiled-Headers.html
 
-Reviewed-by: Yuval Shaia <yuval.shaia@oracle.com>
+I doubt his can help a hypothetical future adoption of precompiled
+headers in QEMU much.
 
->              break;
-> =20
->          case 'p':
-> --=20
-> 2.22.0.428.g6d5b264208
->=20
+Precompiled headers are a finicky.  From the GCC manual:
+
+    A precompiled header file can be used only when these conditions
+    apply:
+
+        * Only one precompiled header can be used in a particular
+          compilation.
+
+        * A precompiled header cannot be used once the first C token is
+          seen. You can have preprocessor directives before a
+          precompiled header; you cannot include a precompiled header
+          from inside another header.
+
+        * The precompiled header file must be produced for the same
+          language as the current compilation. You cannot use a C
+          precompiled header for a C++ compilation.
+
+        * The precompiled header file must have been produced by the
+          same compiler binary as the current compilation is using.
+
+        * Any macros defined before the precompiled header is included
+          must either be defined in the same way as when the precompiled
+          header was generated, or must not affect the precompiled
+          header, which usually means that they don=E2=80=99t appear in the
+          precompiled header at all.
+
+          [Details...]
+
+        [More conditions on compiler options...]
+
+Since we always include qemu/osdep.h first, that's the header we could
+precompile.  Last time I checked, a .c file that includes nothing but
+that comes out well over half a Megabyte in ~20k lines preprocessed.
+I'd welcome build time comparisons with and without precompiling
+qemu/osdep.h.
+
+We have headers that are included from almost everywhere.  Some of them
+are due to undisciplined use of #include; that needs fixing.  But some
+may actually be needed almost everywhere.  Inluding them from a
+precompiled qemu/osdep.h might gain further build speedups.
+
+Making headers self-contained makes reordering inclusions safe.  That's
+about what this patch can contribute to precompiled header adoption.
+Nice, but not essential; we can always fix up things as they break.
+
+How widely used are precompiled headers?  I'm asking because underused
+parts of tools tend to be buggy parts.
+
+[...]
 
