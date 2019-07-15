@@ -6,58 +6,58 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BC2AC76191
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 19:11:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9ED34C76191
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 19:11:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 67EE22064B
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 19:11:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 67EE22064B
+	by mail.kernel.org (Postfix) with ESMTPS id 79C322064B
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 19:11:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 79C322064B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42026 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42036 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hn6Ni-0006Fy-LS
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 15:11:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39823)
+	id 1hn6Nw-0007CT-H9
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 15:11:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39873)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <marcandre.lureau@redhat.com>) id 1hn6NS-0005NE-VM
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 15:11:12 -0400
+ (envelope-from <marcandre.lureau@redhat.com>) id 1hn6Nh-0006OL-1B
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 15:11:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@redhat.com>) id 1hn6NR-0003G1-LG
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 15:11:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51036)
+ (envelope-from <marcandre.lureau@redhat.com>) id 1hn6Ne-0003Jf-Cu
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 15:11:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56972)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
- id 1hn6NR-0003Fa-Dd
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 15:11:09 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ id 1hn6Ne-0003JI-4U
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 15:11:22 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 9D84C882EF;
- Mon, 15 Jul 2019 19:11:08 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 5D4833082129;
+ Mon, 15 Jul 2019 19:11:21 +0000 (UTC)
 Received: from localhost (ovpn-112-18.ams2.redhat.com [10.36.112.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 807351992C;
- Mon, 15 Jul 2019 19:11:03 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 491AE5B681;
+ Mon, 15 Jul 2019 19:11:12 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Mon, 15 Jul 2019 23:09:46 +0400
-Message-Id: <20190715191001.1188-6-marcandre.lureau@redhat.com>
+Date: Mon, 15 Jul 2019 23:09:47 +0400
+Message-Id: <20190715191001.1188-7-marcandre.lureau@redhat.com>
 In-Reply-To: <20190715191001.1188-1-marcandre.lureau@redhat.com>
 References: <20190715191001.1188-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.28]); Mon, 15 Jul 2019 19:11:08 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.42]); Mon, 15 Jul 2019 19:11:21 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v5 05/20] QmpSession: add json parser and use
- it in qga
+Subject: [Qemu-devel] [PATCH v5 06/20] monitor: use qmp session to parse
+ json feed
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -78,183 +78,257 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Move JSON parser to QmpSession, and implement a simple handler to check
-the parsed tokens and call qmp_dispatch(). This is enough for a simple
-QMP client, like QGA.
+Use the QmpSession json parser introduced in previous patch to
+generalize the handling in both qemu & qemu-ga. Unfortunately, since
+the introduction of OOB, it's not as common as it was before that. We
+may want to move some of OOB logic in common qmp-dispatch.c/QmpSession
+though.
 
-The QEMU monitor has more complicated handling of dispatching which
-will be addressed in a following patch to benefit from more common
-code.
+The QEMU monitor has peculiar handling of the stream of commands, for
+OOB command processing, which can be solved by overriding the json
+emit callback.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- include/qapi/qmp/dispatch.h |  7 +++++++
- qapi/qmp-dispatch.c         | 19 +++++++++++++++++++
- qga/main.c                  | 31 +------------------------------
- 3 files changed, 27 insertions(+), 30 deletions(-)
+ include/qapi/qmp/dispatch.h    |  1 +
+ include/qapi/qmp/json-parser.h |  7 ++++---
+ monitor/monitor-internal.h     |  1 -
+ monitor/qmp.c                  | 13 +++++--------
+ qapi/qmp-dispatch.c            |  4 +++-
+ qga/main.c                     |  2 +-
+ qobject/json-streamer.c        |  3 +--
+ tests/test-qmp-cmds.c          | 11 ++++++-----
+ 8 files changed, 21 insertions(+), 21 deletions(-)
 
 diff --git a/include/qapi/qmp/dispatch.h b/include/qapi/qmp/dispatch.h
-index d1ce631a93..c84edff7d2 100644
+index c84edff7d2..b3ca6c9ff2 100644
 --- a/include/qapi/qmp/dispatch.h
 +++ b/include/qapi/qmp/dispatch.h
-@@ -15,6 +15,7 @@
- #define QAPI_QMP_DISPATCH_H
-=20
- #include "qemu/queue.h"
-+#include "qapi/qmp/json-parser.h"
-=20
- typedef void (QmpCommandFunc)(QDict *, QObject **, Error **);
-=20
-@@ -42,6 +43,7 @@ typedef void (QmpDispatchReturn) (QmpSession *session, =
-QDict *rsp);
-=20
- struct QmpSession {
-     const QmpCommandList *cmds;
-+    JSONMessageParser parser;
-     QmpDispatchReturn *return_cb;
- };
-=20
-@@ -52,6 +54,11 @@ const QmpCommand *qmp_find_command(const QmpCommandLis=
-t *cmds,
+@@ -53,6 +53,7 @@ const QmpCommand *qmp_find_command(const QmpCommandList=
+ *cmds,
+                                    const char *name);
  void qmp_session_init(QmpSession *session,
                        const QmpCommandList *cmds,
++                      JSONMessageEmit *emit,
                        QmpDispatchReturn *return_cb);
-+static inline void
-+qmp_session_feed(QmpSession *session, const char *buf, size_t count)
-+{
-+    json_message_parser_feed(&session->parser, buf, count);
-+}
- void qmp_session_destroy(QmpSession *session);
- void qmp_disable_command(QmpCommandList *cmds, const char *name);
- void qmp_enable_command(QmpCommandList *cmds, const char *name);
-diff --git a/qapi/qmp-dispatch.c b/qapi/qmp-dispatch.c
-index 37b058cf97..803ec626cd 100644
---- a/qapi/qmp-dispatch.c
-+++ b/qapi/qmp-dispatch.c
-@@ -163,6 +163,23 @@ bool qmp_is_oob(const QDict *dict)
-         && !qdict_haskey(dict, "execute");
+ static inline void
+ qmp_session_feed(QmpSession *session, const char *buf, size_t count)
+diff --git a/include/qapi/qmp/json-parser.h b/include/qapi/qmp/json-parse=
+r.h
+index 7345a9bd5c..6f168e8007 100644
+--- a/include/qapi/qmp/json-parser.h
++++ b/include/qapi/qmp/json-parser.h
+@@ -14,6 +14,8 @@
+ #ifndef QAPI_QMP_JSON_PARSER_H
+ #define QAPI_QMP_JSON_PARSER_H
+=20
++typedef void (JSONMessageEmit)(void *opaque, QObject *json, Error *err);
++
+ typedef struct JSONLexer {
+     int start_state, state;
+     GString *token;
+@@ -21,7 +23,7 @@ typedef struct JSONLexer {
+ } JSONLexer;
+=20
+ typedef struct JSONMessageParser {
+-    void (*emit)(void *opaque, QObject *json, Error *err);
++    JSONMessageEmit *emit;
+     void *opaque;
+     va_list *ap;
+     JSONLexer lexer;
+@@ -32,8 +34,7 @@ typedef struct JSONMessageParser {
+ } JSONMessageParser;
+=20
+ void json_message_parser_init(JSONMessageParser *parser,
+-                              void (*emit)(void *opaque, QObject *json,
+-                                           Error *err),
++                              JSONMessageEmit *emit,
+                               void *opaque, va_list *ap);
+=20
+ void json_message_parser_feed(JSONMessageParser *parser,
+diff --git a/monitor/monitor-internal.h b/monitor/monitor-internal.h
+index 65d587eafb..65cf668b20 100644
+--- a/monitor/monitor-internal.h
++++ b/monitor/monitor-internal.h
+@@ -125,7 +125,6 @@ struct MonitorHMP {
+=20
+ typedef struct {
+     Monitor common;
+-    JSONMessageParser parser;
+     bool pretty;
+     /*
+      * When a client connects, we're in capabilities negotiation mode.
+diff --git a/monitor/qmp.c b/monitor/qmp.c
+index b215cb70f3..cd29494e28 100644
+--- a/monitor/qmp.c
++++ b/monitor/qmp.c
+@@ -217,7 +217,7 @@ void monitor_qmp_bh_dispatcher(void *data)
+=20
+ static void handle_qmp_command(void *opaque, QObject *req, Error *err)
+ {
+-    MonitorQMP *mon =3D opaque;
++    MonitorQMP *mon =3D container_of(opaque, MonitorQMP, session);
+     QObject *id =3D NULL;
+     QDict *qdict;
+     QMPRequest *req_obj;
+@@ -279,7 +279,7 @@ static void monitor_qmp_read(void *opaque, const uint=
+8_t *buf, int size)
+ {
+     MonitorQMP *mon =3D opaque;
+=20
+-    json_message_parser_feed(&mon->parser, (const char *) buf, size);
++    qmp_session_feed(&mon->session, (const char *) buf, size);
  }
 =20
-+static void qmp_json_emit(void *opaque, QObject *obj, Error *err)
-+{
-+    QmpSession *session =3D opaque;
-+
-+    assert(!obj !=3D !err);
-+
-+    if (err) {
-+        QDict *rsp =3D qmp_error_response(err);
-+        session->return_cb(session, rsp);
-+        qobject_unref(rsp);
-+    } else {
-+        qmp_dispatch(session, obj, false);
-+    }
-+
-+    qobject_unref(obj);
-+}
-+
+ static QDict *qmp_greeting(MonitorQMP *mon)
+@@ -309,7 +309,9 @@ static void monitor_qmp_event(void *opaque, int event=
+)
+     switch (event) {
+     case CHR_EVENT_OPENED:
+         qmp_session_init(&mon->session,
+-                         &qmp_cap_negotiation_commands, dispatch_return_=
+cb);
++                         &qmp_cap_negotiation_commands,
++                         handle_qmp_command,
++                         dispatch_return_cb);
+         monitor_qmp_caps_reset(mon);
+         data =3D qmp_greeting(mon);
+         qmp_send_response(mon, data);
+@@ -325,9 +327,6 @@ static void monitor_qmp_event(void *opaque, int event=
+)
+          */
+         monitor_qmp_cleanup_queues(mon);
+         qmp_session_destroy(&mon->session);
+-        json_message_parser_destroy(&mon->parser);
+-        json_message_parser_init(&mon->parser, handle_qmp_command,
+-                                 mon, NULL);
+         mon_refcount--;
+         monitor_fdsets_cleanup();
+         break;
+@@ -337,7 +336,6 @@ static void monitor_qmp_event(void *opaque, int event=
+)
+ void monitor_data_destroy_qmp(MonitorQMP *mon)
+ {
+     qmp_session_destroy(&mon->session);
+-    json_message_parser_destroy(&mon->parser);
+     qemu_mutex_destroy(&mon->qmp_queue_lock);
+     monitor_qmp_cleanup_req_queue_locked(mon);
+     g_queue_free(mon->qmp_requests);
+@@ -373,7 +371,6 @@ void monitor_init_qmp(Chardev *chr, bool pretty)
+     qemu_chr_fe_init(&mon->common.chr, chr, &error_abort);
+     qemu_chr_fe_set_echo(&mon->common.chr, true);
+=20
+-    json_message_parser_init(&mon->parser, handle_qmp_command, mon, NULL=
+);
+     if (mon->common.use_io_thread) {
+         /*
+          * Make sure the old iowatch is gone.  It's possible when
+diff --git a/qapi/qmp-dispatch.c b/qapi/qmp-dispatch.c
+index 803ec626cd..f2c376d005 100644
+--- a/qapi/qmp-dispatch.c
++++ b/qapi/qmp-dispatch.c
+@@ -182,12 +182,14 @@ static void qmp_json_emit(void *opaque, QObject *ob=
+j, Error *err)
+=20
  void qmp_session_init(QmpSession *session,
                        const QmpCommandList *cmds,
++                      JSONMessageEmit *emit,
                        QmpDispatchReturn *return_cb)
-@@ -170,6 +187,7 @@ void qmp_session_init(QmpSession *session,
+ {
      assert(return_cb);
      assert(!session->return_cb);
 =20
-+    json_message_parser_init(&session->parser, qmp_json_emit, session, N=
+-    json_message_parser_init(&session->parser, qmp_json_emit, session, N=
 ULL);
++    json_message_parser_init(&session->parser, emit ?: qmp_json_emit,
++                             session, NULL);
      session->cmds =3D cmds;
      session->return_cb =3D return_cb;
  }
-@@ -182,6 +200,7 @@ void qmp_session_destroy(QmpSession *session)
-=20
-     session->cmds =3D NULL;
-     session->return_cb =3D NULL;
-+    json_message_parser_destroy(&session->parser);
- }
-=20
- void qmp_dispatch(QmpSession *session, QObject *request, bool allow_oob)
 diff --git a/qga/main.c b/qga/main.c
-index c291d06491..057368eb16 100644
+index 057368eb16..b005550c70 100644
 --- a/qga/main.c
 +++ b/qga/main.c
-@@ -19,7 +19,6 @@
- #include <sys/wait.h>
- #endif
- #include "qemu-common.h"
--#include "qapi/qmp/json-parser.h"
- #include "qapi/qmp/qdict.h"
- #include "qapi/qmp/qjson.h"
- #include "qapi/qmp/qstring.h"
-@@ -75,7 +74,6 @@ typedef struct GAConfig GAConfig;
-=20
- struct GAState {
-     QmpSession session;
--    JSONMessageParser parser;
-     GMainLoop *main_loop;
-     GAChannel *channel;
-     bool virtio; /* fastpath to check for virtio to deal with poll() qui=
-rks */
-@@ -567,31 +565,6 @@ static void dispatch_return_cb(QmpSession *session, =
-QDict *rsp)
-     }
- }
-=20
--/* handle requests/control events coming in over the channel */
--static void process_event(void *opaque, QObject *obj, Error *err)
--{
--    GAState *s =3D opaque;
--    int ret;
--
--    g_debug("process_event: called");
--    assert(!obj !=3D !err);
--
--    if (err) {
--        QDict *rsp =3D qmp_error_response(err);
--
--        ret =3D send_response(s, rsp);
--        if (ret < 0) {
--            g_warning("error sending error response: %s", strerror(-ret)=
-);
--        }
--        qobject_unref(rsp);
--    } else {
--        g_debug("processing command");
--        qmp_dispatch(&s->session, obj, false);
--    }
--
--    qobject_unref(obj);
--}
--
- /* false return signals GAChannel to close the current client connection=
- */
- static gboolean channel_event_cb(GIOCondition condition, gpointer data)
- {
-@@ -607,7 +580,7 @@ static gboolean channel_event_cb(GIOCondition conditi=
-on, gpointer data)
-     case G_IO_STATUS_NORMAL:
-         buf[count] =3D 0;
-         g_debug("read data, count: %d, data: %s", (int)count, buf);
--        json_message_parser_feed(&s->parser, (char *)buf, (int)count);
-+        qmp_session_feed(&s->session, (char *)buf, (int)count);
-         break;
-     case G_IO_STATUS_EOF:
-         g_debug("received EOF");
-@@ -1346,7 +1319,6 @@ static GAState *initialize_agent(GAConfig *config, =
+@@ -1319,7 +1319,7 @@ static GAState *initialize_agent(GAConfig *config, =
 int socket_activation)
      s->command_state =3D ga_command_state_new();
      ga_command_state_init(s, s->command_state);
      ga_command_state_init_all(s->command_state);
--    json_message_parser_init(&s->parser, process_event, s, NULL);
-     qmp_session_init(&s->session, &ga_commands, dispatch_return_cb);
+-    qmp_session_init(&s->session, &ga_commands, dispatch_return_cb);
++    qmp_session_init(&s->session, &ga_commands, NULL, dispatch_return_cb=
+);
 =20
  #ifndef _WIN32
-@@ -1382,7 +1354,6 @@ static void cleanup_agent(GAState *s)
-         qmp_session_destroy(&s->session);
-         ga_command_state_cleanup_all(s->command_state);
-         ga_command_state_free(s->command_state);
--        json_message_parser_destroy(&s->parser);
-     }
-     g_free(s->pstate_filepath);
-     g_free(s->state_filepath_isfrozen);
+     if (!register_signal_handlers()) {
+diff --git a/qobject/json-streamer.c b/qobject/json-streamer.c
+index 47dd7ea576..2a440f2a9e 100644
+--- a/qobject/json-streamer.c
++++ b/qobject/json-streamer.c
+@@ -100,8 +100,7 @@ out_emit:
+ }
+=20
+ void json_message_parser_init(JSONMessageParser *parser,
+-                              void (*emit)(void *opaque, QObject *json,
+-                                           Error *err),
++                              JSONMessageEmit *emit,
+                               void *opaque, va_list *ap)
+ {
+     parser->emit =3D emit;
+diff --git a/tests/test-qmp-cmds.c b/tests/test-qmp-cmds.c
+index 7b3bccc091..8e46f88f6f 100644
+--- a/tests/test-qmp-cmds.c
++++ b/tests/test-qmp-cmds.c
+@@ -127,7 +127,7 @@ static void test_dispatch_cmd(void)
+     QmpSession session =3D { 0, };
+     QDict *req =3D qdict_new();
+=20
+-    qmp_session_init(&session, &qmp_commands, dispatch_cmd_return);
++    qmp_session_init(&session, &qmp_commands, NULL, dispatch_cmd_return)=
+;
+     qdict_put_str(req, "execute", "user_def_cmd");
+=20
+     qmp_dispatch(&session, QOBJECT(req), false);
+@@ -141,7 +141,7 @@ static void test_dispatch_cmd_oob(void)
+     QmpSession session =3D { 0, };
+     QDict *req =3D qdict_new();
+=20
+-    qmp_session_init(&session, &qmp_commands, dispatch_cmd_return);
++    qmp_session_init(&session, &qmp_commands, NULL, dispatch_cmd_return)=
+;
+     qdict_put_str(req, "exec-oob", "test-flags-command");
+=20
+     qmp_dispatch(&session, QOBJECT(req), true);
+@@ -163,7 +163,8 @@ static void test_dispatch_cmd_failure(void)
+     QDict *req =3D qdict_new();
+     QDict *args =3D qdict_new();
+=20
+-    qmp_session_init(&session, &qmp_commands, dispatch_cmd_failure_retur=
+n);
++    qmp_session_init(&session, &qmp_commands, NULL,
++                     dispatch_cmd_failure_return);
+     qdict_put_str(req, "execute", "user_def_cmd2");
+=20
+     qmp_dispatch(&session, QOBJECT(req), false);
+@@ -189,7 +190,7 @@ static void test_dispatch_cmd_success_response(void)
+     QmpSession session =3D { 0, };
+     QDict *req =3D qdict_new();
+=20
+-    qmp_session_init(&session, &qmp_commands, (QmpDispatchReturn *)abort=
+);
++    qmp_session_init(&session, &qmp_commands, NULL, (QmpDispatchReturn *=
+)abort);
+     qdict_put_str(req, "execute", "cmd-success-response");
+=20
+     qmp_dispatch(&session, QOBJECT(req), false);
+@@ -210,7 +211,7 @@ static QObject *test_qmp_dispatch(QDict *req)
+     QmpSession session =3D { 0, };
+     QObject *ret;
+=20
+-    qmp_session_init(&session, &qmp_commands, dispatch_return);
++    qmp_session_init(&session, &qmp_commands, NULL, dispatch_return);
+     qmp_dispatch(&session, QOBJECT(req), false);
+     ret =3D dispatch_ret;
+     dispatch_ret =3D NULL;
 --=20
 2.22.0.428.g6d5b264208
 
