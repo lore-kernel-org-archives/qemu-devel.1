@@ -2,53 +2,58 @@ Return-Path: <SRS0=IjNW=VM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8649EC7618F
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 20:02:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA825C7618F
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 20:20:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 622EA20665
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 20:02:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 622EA20665
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
+	by mail.kernel.org (Postfix) with ESMTPS id BB87621848
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 20:20:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB87621848
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42508 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42604 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hn7BL-0000rP-L7
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 16:02:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50771)
+	id 1hn7SH-00054b-Sl
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 16:20:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55216)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hn79e-0003Nw-SS
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 16:01:01 -0400
+ (envelope-from <stefanha@redhat.com>) id 1hn7S6-0004dt-GU
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 16:20:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hn79d-0003LN-Gm
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 16:00:58 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:37414 helo=mail.rt-rk.com)
+ (envelope-from <stefanha@redhat.com>) id 1hn7S5-0007OD-Es
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 16:20:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47010)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1hn79d-0003IR-4e
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 16:00:57 -0400
-Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 505A61A20B1;
- Mon, 15 Jul 2019 22:00:53 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at rt-rk.com
-Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
- [10.10.13.43])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 2E3661A1FA4;
- Mon, 15 Jul 2019 22:00:53 +0200 (CEST)
-From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>)
+ id 1hn7S3-0007LZ-Eq; Mon, 15 Jul 2019 16:19:59 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 1BE73C036744;
+ Mon, 15 Jul 2019 20:19:57 +0000 (UTC)
+Received: from localhost (ovpn-117-120.ams2.redhat.com [10.36.117.120])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 50F21600C1;
+ Mon, 15 Jul 2019 20:19:51 +0000 (UTC)
+From: Stefan Hajnoczi <stefanha@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Mon, 15 Jul 2019 22:00:42 +0200
-Message-Id: <1563220847-14630-1-git-send-email-aleksandar.markovic@rt-rk.com>
-X-Mailer: git-send-email 2.7.4
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PATCH for 4.1 v4 0/5] target/mips: Fixes for 4.1 rc1
+Date: Mon, 15 Jul 2019 21:19:47 +0100
+Message-Id: <20190715201950.9444-1-stefanha@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.31]); Mon, 15 Jul 2019 20:19:57 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH 0/3] block/io_uring: fix EINTR and resubmit
+ short reads
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -60,43 +65,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: arikalo@wavecomp.com, sw@weilnetz.de, amarkovic@wavecomp.com
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Stefan Hajnoczi <stefan@redhat.com>, Julia Suvorova <jusual@mail.ru>,
+ Aarushi Mehta <mehta.aaru20@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Short reads are possible with cache=3Dwriteback (see Patch 3 for details)=
+.
+Handle this by resubmitting requests until the read is completed.
 
-At the moment, this includes fixes for problems in switch statements
-found by GCC 8.3 improved code analysis features, and one big endian
-host fix.
+Patch 1 adds trace events useful for debugging io_uring.
 
-v3->v4:
+Patch 2 fixes EINTR.  This lays the groundwork for resubmitting requests =
+in
+Patch 3.
 
-  - complete the last patch
+Aarushi: Feel free to squash this into your patch series if you are happy=
+ with
+the code, I don't mind if the authorship information is lost.  After appl=
+ying
+these patches I can successfully boot a Fedora 30 guest qcow2 file with
+cache=3Dwriteback.
 
-v2->v3:
+Based-on: <20190610134905.22294-1-mehta.aaru20@gmail.com>
 
-  - fix handling of MSA pack instructions on big endian host
+Stefan Hajnoczi (3):
+  block/io_uring: add submission and completion trace events
+  block/io_uring: fix EINTR request resubmission
+  block/io_uring: resubmit short buffered reads
 
-v1->v2:
+ block/io_uring.c   | 136 ++++++++++++++++++++++++++++++++++-----------
+ block/trace-events |   6 +-
+ 2 files changed, 108 insertions(+), 34 deletions(-)
 
-  - excluded the patch on "ucontext" that will go into linux user queue
-
-Aleksandar Markovic (5):
-  target/mips: Add 'fall through' comments for handling nanoMips' SHXS,
-    SWXS
-  target/mips: Add missing 'break' for a case of MTHC0 handling
-  target/mips: Add missing 'break' for certain cases of MFTR handling
-  target/mips: Add missing 'break' for certain cases of MTTR handling
-  target/mips: Fix emulation of MSA pack instructions on big endian
-    hosts
-
- target/mips/msa_helper.c | 74 ++++++++++++++++++++++++++++++++++++++++++++++++
- target/mips/translate.c  |  7 +++++
- 2 files changed, 81 insertions(+)
-
--- 
-2.7.4
+--=20
+2.21.0
 
 
