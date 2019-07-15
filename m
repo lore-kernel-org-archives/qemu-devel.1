@@ -2,76 +2,74 @@ Return-Path: <SRS0=IjNW=VM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.3 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9D4EC7618F
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 15:50:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10FE4C7618F
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 15:51:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7FF102083D
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 15:50:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7FF102083D
+	by mail.kernel.org (Postfix) with ESMTPS id DB8862081C
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 15:51:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB8862081C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40272 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40284 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hn3Fe-0008HC-6T
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 11:50:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53535)
+	id 1hn3GA-0001v0-6S
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 11:51:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53703)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <borntraeger@de.ibm.com>) id 1hn3FS-0007ZO-7b
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 11:50:43 -0400
+ (envelope-from <borntraeger@de.ibm.com>) id 1hn3Fz-0001GY-EO
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 11:51:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <borntraeger@de.ibm.com>) id 1hn3FR-0007vg-28
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 11:50:42 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41898
- helo=mx0a-001b2d01.pphosted.com)
+ (envelope-from <borntraeger@de.ibm.com>) id 1hn3Fy-0008GB-EV
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 11:51:15 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:63086)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
- id 1hn3FQ-0007ui-Sp
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 11:50:41 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x6FFloCi051586
- for <qemu-devel@nongnu.org>; Mon, 15 Jul 2019 11:50:38 -0400
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2tru9g40wm-1
+ id 1hn3Fy-0008Fa-4I
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 11:51:14 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ x6FFloMO040257
+ for <qemu-devel@nongnu.org>; Mon, 15 Jul 2019 11:51:12 -0400
+Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2trvcm0b9s-1
  (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Mon, 15 Jul 2019 11:50:38 -0400
+ for <qemu-devel@nongnu.org>; Mon, 15 Jul 2019 11:51:12 -0400
 Received: from localhost
- by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
  Violators will be prosecuted
  for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
- Mon, 15 Jul 2019 16:50:34 +0100
-Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
- by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway:
+ Mon, 15 Jul 2019 16:51:09 +0100
+Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
+ by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway:
  Authorized Use Only! Violators will be prosecuted; 
  (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Mon, 15 Jul 2019 16:50:31 +0100
+ Mon, 15 Jul 2019 16:51:07 +0100
 Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
  [9.149.105.62])
- by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
- id x6FFoUJj30605754
+ by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
+ id x6FFortG38666724
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 15 Jul 2019 15:50:30 GMT
+ Mon, 15 Jul 2019 15:50:53 GMT
 Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 8424BAE051;
- Mon, 15 Jul 2019 15:50:30 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 93CABAE055;
+ Mon, 15 Jul 2019 15:51:06 +0000 (GMT)
 Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 217FCAE045;
- Mon, 15 Jul 2019 15:50:30 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 4B0FBAE045;
+ Mon, 15 Jul 2019 15:51:06 +0000 (GMT)
 Received: from oc7455500831.ibm.com (unknown [9.145.47.109])
  by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Mon, 15 Jul 2019 15:50:30 +0000 (GMT)
-To: Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>
+ Mon, 15 Jul 2019 15:51:06 +0000 (GMT)
+To: Cornelia Huck <cohuck@redhat.com>
 References: <20190715142304.215018-1-borntraeger@de.ibm.com>
- <20190715142304.215018-3-borntraeger@de.ibm.com>
- <f7d7a281-0310-f9bf-68ce-669f730d0856@redhat.com>
+ <20190715142304.215018-4-borntraeger@de.ibm.com>
+ <20190715173533.3ecca672.cohuck@redhat.com>
 From: Christian Borntraeger <borntraeger@de.ibm.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
@@ -117,31 +115,31 @@ Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  RGIN40QWFVlZvkKIEkzlzqpAyGaRLhXJPv/6tpoQaCQQoSAc5Z9kM/wEd9e2zMeojcWjUXgg
  oWj8A/wY4UXExGBu+UCzzP/6sQRpBiPFgmqPTytrDo/gsUGqjOudLiHQcMU+uunULYQxVghC
  syiRa+UVlsKmx1hsEg==
-Date: Mon, 15 Jul 2019 17:50:29 +0200
+Date: Mon, 15 Jul 2019 17:51:06 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <f7d7a281-0310-f9bf-68ce-669f730d0856@redhat.com>
+In-Reply-To: <20190715173533.3ecca672.cohuck@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-x-cbid: 19071515-0008-0000-0000-000002FD6AD7
+x-cbid: 19071515-0012-0000-0000-00000332CD74
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19071515-0009-0000-0000-0000226ADDA2
-Message-Id: <b8a57e4b-247d-de25-2f2f-d4ccc52138e6@de.ibm.com>
+x-cbparentid: 19071515-0013-0000-0000-0000216C4432
+Message-Id: <67442644-387c-465b-28aa-c929fc062a6f@de.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
  definitions=2019-07-15_04:, , signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
  priorityscore=1501
  malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
  clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ mlxlogscore=749 adultscore=0 classifier=spam adjust=0 reason=mlx
  scancount=1 engine=8.0.1-1810050000 definitions=main-1907150186
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH 2/3] s390x/cpumodel: also
- change name of vxbeh
+X-Received-From: 148.163.156.1
+Subject: Re: [Qemu-devel] [PATCH 3/3] s390x/cpumodel: change internal name
+ of vxp to make description
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -162,47 +160,21 @@ Sender: "Qemu-devel"
 
 
 
-On 15.07.19 17:02, Thomas Huth wrote:
-> On 15/07/2019 16.23, Christian Borntraeger wrote:
->> David suggested to keep everything in sync as 4.1 is not yet released.
->> This patch fixes the name "vxbeh" into "vxp".
+On 15.07.19 17:35, Cornelia Huck wrote:
+> On Mon, 15 Jul 2019 16:23:04 +0200
+> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+> 
+>> The internal macro name VECTOR_BCD_ENH does not match the actual
+>> description. Fix this.
 >>
->> To simplify the backports this patch will not change VECTOR_BCD_ENH as
->> this is just an internal name. That will be done by an extra patch that
->> does not need to be backported.
->>
->> Suggested-by: David Hildenbrand <david@redhat.com>
->> Fixes: d05be57ddc2e ("s390: cpumodel: fix description for the new vector facility")
->> Fixes: 54d65de0b525 ("s390x/cpumodel: vector enhancements")
 >> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
 >> ---
 >>  target/s390x/cpu_features_def.inc.h | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/target/s390x/cpu_features_def.inc.h b/target/s390x/cpu_features_def.inc.h
->> index 3118a9f89228..99f58a89318a 100644
->> --- a/target/s390x/cpu_features_def.inc.h
->> +++ b/target/s390x/cpu_features_def.inc.h
->> @@ -104,7 +104,7 @@ DEF_FEAT(CMM_NT, "cmmnt", STFL, 147, "CMM: ESSA-enhancement (no translate) facil
->>  DEF_FEAT(VECTOR_ENH2, "vxeh2", STFL, 148, "Vector Enhancements facility 2")
->>  DEF_FEAT(ESORT_BASE, "esort-base", STFL, 150, "Enhanced-sort facility (excluding subfunctions)")
->>  DEF_FEAT(DEFLATE_BASE, "deflate-base", STFL, 151, "Deflate-conversion facility (excluding subfunctions)")
->> -DEF_FEAT(VECTOR_BCD_ENH, "vxbeh", STFL, 152, "Vector-Packed-Decimal-Enhancement Facility")
->> +DEF_FEAT(VECTOR_BCD_ENH, "vxp", STFL, 152, "Vector-Packed-Decimal-Enhancement Facility")
+>>  target/s390x/gen-features.c         | 4 ++--
+>>  2 files changed, 3 insertions(+), 3 deletions(-)
 > 
-> We already have:
+> s/make/match/ in $SUBJECT?
 > 
-> DEF_FEAT(VECTOR_PACKED_DECIMAL, "vxpd", STFL, 134, "Vector packed decimal facility")
-> 
-> ... so I rather expected something like "vxpde" here instead? Or is there a reason
-> 
-for just using "vxp"?
-
-Matching what the Linux kernel has.
-
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/arch/s390/kernel/processor.c?id=a8fd61688dfad6fdce95fa64cacd8a66595697b8
-> 
->  Thomas
-> 
+yep.
 
 
