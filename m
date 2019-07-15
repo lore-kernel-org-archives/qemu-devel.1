@@ -2,144 +2,120 @@ Return-Path: <SRS0=IjNW=VM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10FE4C7618F
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 15:51:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45C7EC7618F
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 15:53:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DB8862081C
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 15:51:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB8862081C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0B93F205ED
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 15:53:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="y0WE9kZA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B93F205ED
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amd.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40284 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40296 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hn3GA-0001v0-6S
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 11:51:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53703)
+	id 1hn3IX-0008Sp-AM
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 11:53:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54099)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <borntraeger@de.ibm.com>) id 1hn3Fz-0001GY-EO
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 11:51:16 -0400
+ (envelope-from <brijesh.singh@amd.com>) id 1hn3IL-0007kE-B3
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 11:53:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <borntraeger@de.ibm.com>) id 1hn3Fy-0008GB-EV
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 11:51:15 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:63086)
+ (envelope-from <brijesh.singh@amd.com>) id 1hn3IJ-0000lC-Kp
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 11:53:41 -0400
+Received: from mail-bl2nam02on062d.outbound.protection.outlook.com
+ ([2a01:111:f400:fe46::62d]:21550
+ helo=NAM02-BL2-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
- id 1hn3Fy-0008Fa-4I
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 11:51:14 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x6FFloMO040257
- for <qemu-devel@nongnu.org>; Mon, 15 Jul 2019 11:51:12 -0400
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2trvcm0b9s-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Mon, 15 Jul 2019 11:51:12 -0400
-Received: from localhost
- by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
- Mon, 15 Jul 2019 16:51:09 +0100
-Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
- by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Mon, 15 Jul 2019 16:51:07 +0100
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
- [9.149.105.62])
- by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
- id x6FFortG38666724
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 15 Jul 2019 15:50:53 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 93CABAE055;
- Mon, 15 Jul 2019 15:51:06 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 4B0FBAE045;
- Mon, 15 Jul 2019 15:51:06 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.145.47.109])
- by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Mon, 15 Jul 2019 15:51:06 +0000 (GMT)
-To: Cornelia Huck <cohuck@redhat.com>
-References: <20190715142304.215018-1-borntraeger@de.ibm.com>
- <20190715142304.215018-4-borntraeger@de.ibm.com>
- <20190715173533.3ecca672.cohuck@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- syiRa+UVlsKmx1hsEg==
-Date: Mon, 15 Jul 2019 17:51:06 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
-MIME-Version: 1.0
-In-Reply-To: <20190715173533.3ecca672.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
+ (Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
+ id 1hn3IJ-0000k4-2K
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 11:53:39 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=itY2VRDSihb5evKP/ht6oRBKlAO0ISF88pT4yeUnqBVYYOUR8q2K3npxhFG32iv25vPh2KX6zOVkFtIXm8TItzYvhIVYd+rPN5zxMtVk+aAvI9FE+3MhCiIFv+Cl5CSfb17CL3ak9l6WbjojnVTZQbSOrM+c9+rsF1xQuRi3e2qp96j+9bAd3hayx/Wox6+GplIMyakLG0n8m3ahzyTPdJ7iZNfHmYjPtrivENoTpelhNOV/im+ksG6ncd0bLcinlqRzLy8XQt+ONP2lCcRi2dHbLz2T5gW6RsUgYjn64FGX3Y+F9HLL0JLq8BWzOmcaVbTVDUeguMnvIS3KzE3JgA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=agH0OgSHbhE/pcYQYBIr2csroj6QWjDQJ13HWODu3Qc=;
+ b=QQFsFOB5kIbWqn2vyM7iSS1G7TxC074wBBrFVcyzHEev0WkjuBkkNPU69yxCsX6WPu9JAPIa9u/5z+5Ht4Eocc6kF0YQqf+6sYGyp/LZtb3TIamJUJysYpr+leo56NSwswPkG6PTHZazHTwbAMV5WaalMhtRwV31w8cUTZA88QfzZH6CMrJokY5lUPnNXhmUiAH/M0J1MV90+npFQ8ia4hbJ8WrtFstwu1F/Dvo6tdqOYOdtJHYni8ov8IVRYn0O/RHyAFjHf1OCwFb8cdE9dPjK7AhtGQLcaqVZBfj9uCKQdYLb5bAElDLZdqbyVbwApamM4tClRJ5yN2NZNfZYiQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1;spf=pass
+ smtp.mailfrom=amd.com;dmarc=pass action=none header.from=amd.com;dkim=pass
+ header.d=amd.com;arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amdcloud.onmicrosoft.com; s=selector1-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=agH0OgSHbhE/pcYQYBIr2csroj6QWjDQJ13HWODu3Qc=;
+ b=y0WE9kZABBa5brvVA+NQ2GPDsg9k+5hZLvORZTzC6daAO2D8ggh9y+ey7fH2XTNgLRf9jmYna+ffZhIyKPY3VhbfCb0V5oZoTa1/ttCre9Qh5flpFnZ32aB/Oj8R1Bm/2yiew79FIAWa4O0Rl/SU5ZBmnDq0pKG71fDffkX/qkk=
+Received: from DM6PR12MB2682.namprd12.prod.outlook.com (20.176.118.13) by
+ DM6PR12MB3866.namprd12.prod.outlook.com (10.255.173.211) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2073.14; Mon, 15 Jul 2019 15:53:35 +0000
+Received: from DM6PR12MB2682.namprd12.prod.outlook.com
+ ([fe80::7439:ea87:cc5d:71]) by DM6PR12MB2682.namprd12.prod.outlook.com
+ ([fe80::7439:ea87:cc5d:71%7]) with mapi id 15.20.2073.012; Mon, 15 Jul 2019
+ 15:53:35 +0000
+From: "Singh, Brijesh" <brijesh.singh@amd.com>
+To: Alex Williamson <alex.williamson@redhat.com>, "qemu-devel@nongnu.org"
+ <qemu-devel@nongnu.org>
+Thread-Topic: [PATCH for-4.1] target/i386: sev: Do not unpin ram device memory
+ region
+Thread-Index: AQHVOxmbrsd/BHkiqk6goTK9xVTScabL1LWA
+Date: Mon, 15 Jul 2019 15:53:34 +0000
+Message-ID: <94eb3076-c089-9155-6559-481a06d2a96b@amd.com>
+References: <156320087103.2556.10983987500488190423.stgit@gimli.home>
+In-Reply-To: <156320087103.2556.10983987500488190423.stgit@gimli.home>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19071515-0012-0000-0000-00000332CD74
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19071515-0013-0000-0000-0000216C4432
-Message-Id: <67442644-387c-465b-28aa-c929fc062a6f@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
- definitions=2019-07-15_04:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=749 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1907150186
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
-Subject: Re: [Qemu-devel] [PATCH 3/3] s390x/cpumodel: change internal name
- of vxp to make description
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: SN6PR1501CA0033.namprd15.prod.outlook.com
+ (2603:10b6:805::46) To DM6PR12MB2682.namprd12.prod.outlook.com
+ (2603:10b6:5:42::13)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=brijesh.singh@amd.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-originating-ip: [165.204.77.1]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 33689363-d591-41a9-ada5-08d7093c97ea
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0; PCL:0;
+ RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);
+ SRVR:DM6PR12MB3866; 
+x-ms-traffictypediagnostic: DM6PR12MB3866:
+x-microsoft-antispam-prvs: <DM6PR12MB38663A31A9BBEBAF041F867CE5CF0@DM6PR12MB3866.namprd12.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:125;
+x-forefront-prvs: 00997889E7
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10009020)(4636009)(136003)(366004)(396003)(39860400002)(376002)(346002)(189003)(199004)(102836004)(316002)(53936002)(76176011)(6436002)(99286004)(66066001)(81166006)(6246003)(386003)(6506007)(53546011)(6512007)(229853002)(52116002)(86362001)(5660300002)(31696002)(81156014)(68736007)(8936002)(8676002)(4326008)(4744005)(26005)(478600001)(486006)(2501003)(186003)(25786009)(31686004)(256004)(476003)(7736002)(2616005)(11346002)(446003)(305945005)(64756008)(3846002)(66446008)(6116002)(6486002)(2906002)(54906003)(110136005)(36756003)(66946007)(66556008)(71190400001)(71200400001)(66476007)(14454004);
+ DIR:OUT; SFP:1101; SCL:1; SRVR:DM6PR12MB3866;
+ H:DM6PR12MB2682.namprd12.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: amd.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: OQ85yDY6wwSDx4yEq3Y7iH9cr1OHzhBPvoovnEJXNmKQbHZtzXQKUafT9nu2ZVdmTU3zmzIGUXC7yNi9Aig1wcvez5rGN28ncqC0jLsBc4ftrIyn7rZfAeGaE/zx1OHDuktN5KB3pBSC9UxCTkpwfwHgsD+4i7B20me0rFSrEHgUvYUQgqmmfs8PMsjzE+hMYC2aK1e31IqZ3/m0HM3jzqSEThP2hJkQX6exvIJVo+4DrxGDf8LkSDiFDFu9LO7nGw3I8DuckXoMOrMEwN+EoEIfJZns/Mk4P8MnyMuF0ROOKlQ939F/RRAF11HuIR3uwV+xBc5Rtg4XAEAavdbqJgf+LByyy+YJxGiQWQZd4SvusNcX5la6e4rN6rPuH0XPoLgw1Ygkv05C/iQDtHorjp8udAvVRfLuqVACDjut0ps=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <E387A96740037242B8DF906AB478E640@namprd12.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 33689363-d591-41a9-ada5-08d7093c97ea
+X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Jul 2019 15:53:34.8971 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: sbrijesh@amd.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB3866
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 2a01:111:f400:fe46::62d
+Subject: Re: [Qemu-devel] [PATCH for-4.1] target/i386: sev: Do not unpin ram
+ device memory region
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -151,30 +127,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Halil Pasic <pasic@linux.ibm.com>, qemu-s390x <qemu-s390x@nongnu.org>,
- Richard Henderson <rth@twiddle.net>, qemu-devel <qemu-devel@nongnu.org>,
- David Hildenbrand <david@redhat.com>
+Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>, "Singh,
+ Brijesh" <brijesh.singh@amd.com>, "ehabkost@redhat.com" <ehabkost@redhat.com>,
+ "rth@twiddle.net" <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-
-On 15.07.19 17:35, Cornelia Huck wrote:
-> On Mon, 15 Jul 2019 16:23:04 +0200
-> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
-> 
->> The internal macro name VECTOR_BCD_ENH does not match the actual
->> description. Fix this.
->>
->> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
->> ---
->>  target/s390x/cpu_features_def.inc.h | 2 +-
->>  target/s390x/gen-features.c         | 4 ++--
->>  2 files changed, 3 insertions(+), 3 deletions(-)
-> 
-> s/make/match/ in $SUBJECT?
-> 
-yep.
-
+DQoNCk9uIDcvMTUvMTkgOToyOCBBTSwgQWxleCBXaWxsaWFtc29uIHdyb3RlOg0KPiBUaGUgY29t
+bWl0IHJlZmVyZW5jZWQgYmVsb3cgc2tpcHBlZCBwaW5uaW5nIHJhbSBkZXZpY2UgbWVtb3J5IHdo
+ZW4NCj4gcmFtIGJsb2NrcyBhcmUgYWRkZWQsIHdlIG5lZWQgdG8gZG8gdGhlIHNhbWUgd2hlbiB0
+aGV5J3JlIHJlbW92ZWQuDQo+IA0KPiBDYzogQnJpamVzaCBTaW5naCA8YnJpamVzaC5zaW5naEBh
+bWQuY29tPg0KPiBDYzogUGFvbG8gQm9uemluaSA8cGJvbnppbmlAcmVkaGF0LmNvbT4NCj4gRml4
+ZXM6IGNlZGMwYWQ1MzlhZiAoInRhcmdldC9pMzg2OiBzZXY6IERvIG5vdCBwaW4gdGhlIHJhbSBk
+ZXZpY2UgbWVtb3J5IHJlZ2lvbiIpDQo+IFNpZ25lZC1vZmYtYnk6IEFsZXggV2lsbGlhbXNvbiA8
+YWxleC53aWxsaWFtc29uQHJlZGhhdC5jb20+DQo+IC0tLQ0KPiAgIHRhcmdldC9pMzg2L3Nldi5j
+IHwgICAxMSArKysrKysrKysrKw0KPiAgIDEgZmlsZSBjaGFuZ2VkLCAxMSBpbnNlcnRpb25zKCsp
+DQo+IA0KDQp0aGFua3MNCg0KUmV2aWV3ZWQtYnk6IEJyaWplc2ggU2luZ2ggPGJyaWplc2guc2lu
+Z2hAYW1kLmNvbT4NCg==
 
