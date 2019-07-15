@@ -6,42 +6,41 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18E0FC76191
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 16:07:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33800C7618F
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 16:08:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D56EB2080A
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 16:07:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D56EB2080A
+	by mail.kernel.org (Postfix) with ESMTPS id ECAF1204FD
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 16:08:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECAF1204FD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40606 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40616 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hn3VU-0007lo-Qr
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 12:07:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56653)
+	id 1hn3Wg-0000Sx-79
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 12:08:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56834)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1hn3VF-0007BV-1j
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 12:07:04 -0400
+ (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1hn3WR-0008VS-Un
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 12:08:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1hn3VB-0008Mk-Ku
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 12:07:01 -0400
-Received: from relay.sw.ru ([185.231.240.75]:52186)
+ (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1hn3WO-0000QL-GF
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 12:08:15 -0400
+Received: from relay.sw.ru ([185.231.240.75]:52368)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1hn3VB-0008LJ-4Q
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 12:06:57 -0400
+ id 1hn3WO-0000Pv-4e; Mon, 15 Jul 2019 12:08:12 -0400
 Received: from [172.16.25.136] (helo=localhost.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92)
  (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1hn3V7-0003GL-Pv; Mon, 15 Jul 2019 19:06:53 +0300
+ id 1hn3WL-0003Hq-UX; Mon, 15 Jul 2019 19:08:10 +0300
 From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 To: qemu-devel@nongnu.org,
-	andrey.shinkevich@virtuozzo.com
-Date: Mon, 15 Jul 2019 19:06:44 +0300
-Message-Id: <1563206804-396512-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+	qemu-block@nongnu.org
+Date: Mon, 15 Jul 2019 19:07:59 +0300
+Message-Id: <1563206879-396579-1-git-send-email-andrey.shinkevich@virtuozzo.com>
 X-Mailer: git-send-email 1.8.3.1
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 185.231.240.75
@@ -58,6 +57,8 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, mreitz@redhat.com,
+ andrey.shinkevich@virtuozzo.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
