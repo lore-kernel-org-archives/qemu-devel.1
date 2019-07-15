@@ -6,55 +6,72 @@ X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7122C7618F
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 14:45:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9137CC76195
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 14:49:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BB96E20868
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 14:45:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB96E20868
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6BE06212F5
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 14:49:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6BE06212F5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39638 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39682 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hn2Dy-0000F0-Du
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 10:45:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38376)
+	id 1hn2I4-0004vG-8l
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 10:49:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39619)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mark.rutland@arm.com>) id 1hn2Dm-0008Br-NP
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 10:44:55 -0400
+ (envelope-from <sgarzare@redhat.com>) id 1hn2Hq-0004Sw-9H
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 10:49:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mark.rutland@arm.com>) id 1hn2Dl-0005sc-Cp
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 10:44:54 -0400
-Received: from foss.arm.com ([217.140.110.172]:49940)
- by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <mark.rutland@arm.com>)
- id 1hn2Di-0005r2-UH; Mon, 15 Jul 2019 10:44:51 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 90D3C28;
- Mon, 15 Jul 2019 07:44:49 -0700 (PDT)
-Received: from lakrids.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com
- [10.121.207.14])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 714D23F59C;
- Mon, 15 Jul 2019 07:44:48 -0700 (PDT)
-Date: Mon, 15 Jul 2019 15:44:46 +0100
-From: Mark Rutland <mark.rutland@arm.com>
-To: James Morse <james.morse@arm.com>
-Message-ID: <20190715144446.GK56232@lakrids.cambridge.arm.com>
-References: <1b0aa6b2-80b1-a72e-6849-7323c3b9c6bc@huawei.com>
- <20190715134059.GJ2790@e103592.cambridge.arm.com>
- <20190715134848.GI56232@lakrids.cambridge.arm.com>
- <4daefb19-6c15-f82c-31e9-1ae035d45bd5@arm.com>
+ (envelope-from <sgarzare@redhat.com>) id 1hn2Hp-0007zg-0k
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 10:49:06 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:42986)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1hn2Ho-0007ym-QI
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 10:49:04 -0400
+Received: by mail-wr1-f65.google.com with SMTP id x1so2418724wrr.9
+ for <qemu-devel@nongnu.org>; Mon, 15 Jul 2019 07:49:04 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to:user-agent;
+ bh=mUjDpDF41N9BmAcyyi0NYzcOIzxt8hPObUj2BTGDXtU=;
+ b=OQpvGnHo/qnxjzJ4xr8ZsmHtQtc2XP4okfvl7CkpR7dqljjPa/AdgcXfDU1iuyhjBF
+ 4clpxpAniSUn5Rc91ft1wufKe5TRy2cFNJRcYmPZl/t4yoe0xdSI3A8qK6lOWQdiu5up
+ 5w+5UPBRVerG915ycC9buR8TtwjBZXbx/Pq/l5V3rt29vjvt+LfMajC251Ud8mTeOEuB
+ 7VoSgPdBKTS7GlgzevmIcxVerPL26+jXoGcBF7eCcvyMAfPu9mU+rGutkVPKJKcdOUsA
+ fwd7CZpfXd7gu9+wxulLT25FCN5XDs+BLI/7jf9N/7Gp9/v00BnPZjCgfQmcQPjrWVMm
+ YJEQ==
+X-Gm-Message-State: APjAAAX48bUGwD5uaQUWj2qaP4kkahQDC1+YVFvT8R9UTQN6T1FWBsvn
+ wLuYOZBKyqCamCPXNk3UTa2w9Q==
+X-Google-Smtp-Source: APXvYqwTptChLlkfpeRNMwJdzAVbpGBO2nLhb5dFjK5X4Hkor6IJC+BwbRAuoCzCIK98lYFeLD+q7A==
+X-Received: by 2002:adf:f088:: with SMTP id n8mr29353290wro.58.1563202143173; 
+ Mon, 15 Jul 2019 07:49:03 -0700 (PDT)
+Received: from steredhat (host122-201-dynamic.13-79-r.retail.telecomitalia.it.
+ [79.13.201.122])
+ by smtp.gmail.com with ESMTPSA id x8sm14330668wmc.5.2019.07.15.07.49.02
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Mon, 15 Jul 2019 07:49:02 -0700 (PDT)
+Date: Mon, 15 Jul 2019 16:49:00 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Max Reitz <mreitz@redhat.com>
+Message-ID: <20190715144900.nbdlzeoga2qklgqq@steredhat>
+References: <20190715104508.7568-1-mreitz@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <4daefb19-6c15-f82c-31e9-1ae035d45bd5@arm.com>
-User-Agent: Mutt/1.11.1+11 (2f07cb52) (2018-12-01)
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190715104508.7568-1-mreitz@redhat.com>
+User-Agent: NeoMutt/20180716
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 217.140.110.172
-Subject: Re: [Qemu-devel] [RFC] Add virtual SDEI support in qemu
+ [fuzzy]
+X-Received-From: 209.85.221.65
+Subject: Re: [Qemu-devel] [PATCH for-4.1? 0/4] block: Fix three
+ .bdrv_has_zero_init()s
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,64 +83,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, qemu-devel@nongnu.org,
- Dave Martin <Dave.Martin@arm.com>, qemu-arm@nongnu.org,
- Guoheyi <guoheyi@huawei.com>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Stefan Weil <sw@weilnetz.de>,
+ Jeff Cody <codyprime@gmail.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Jul 15, 2019 at 03:26:39PM +0100, James Morse wrote:
-> On 15/07/2019 14:48, Mark Rutland wrote:
-> > On Mon, Jul 15, 2019 at 02:41:00PM +0100, Dave Martin wrote:
-> >> One option (suggested to me by James Morse) would be to allow userspace
-> >> to disable in the in-kernel PSCI implementation and provide its own
-> >> PSCI to the guest via SMC -- in which case userspace that wants to
-> >> implement SDEI would have to implement PSCI as well.
-> > 
-> > I think this would be the best approach, since it puts userspace in
-> > charge of everything.
-> > 
-> > However, this interacts poorly with FW-based mitigations that we
-> > implement in hyp. I suspect we'd probably need a mechanism to delegate
-> > that responsibility back to the kernel, and figure out if that has any
-> > interaction with thigns that got punted to userspace...
+On Mon, Jul 15, 2019 at 12:45:04PM +0200, Max Reitz wrote:
+> Hi,
 > 
-> This has come up before:
-> https://lore.kernel.org/r/59C139D0.3040507@arm.com
+> .bdrv_has_zero_init() must not return 1 if the (newly created[1]) image
+> may not return zeroes when read.
 > 
-> I agree Qemu should opt-in to this, it needs to be a feature that is enabled.
+> [1] This is guaranteed by the caller.
 > 
-> I had an early version of something like this for testing SDEI before
-> there was firmware available. The review feedback from Christoffer was
-> that it should include HVC and SMC, their immediates, and shouldn't be
-> tied to SMC-CC ranges.
+> If the image is preallocated, this generally depends on the protocol
+> layer, because the format layer will just allocate the necessary
+> metadata, make it point to data blocks and leave their initialization to
+> the protocol layer.  For example, qcow2:
 > 
-> I think this should be a catch-all as Heyi describes to deliver
-> 'unhandled SMC/HVC' to user-space as hypercall exits. We should
-> include the immediate in the struct.
+> - leaves the blocks uninitialized with preallocation=metadata,
+> - and passes preallocation=falloc and =full on to the protocol node.
 > 
-> We can allow Qemu to disable the in-kernel PSCI implementation, which
-> would let it be done in user-space via this catch-all mechanism. (PSCI
-> in user-space has come up on another thread recently). The in-kernel
-> PSCI needs to be default-on for backwards compatibility.
+> In either case, the data then stored in these blocks fully depends on
+> the protocol level.
 > 
-> As Mark points out, the piece that's left is the 'arch workaround'
-> stuff. We always need to handle these in the kernel. I don't think
-> these should be routed-back, they should be un-obtainable by
-> user-space.
+> Therefore, format drivers have to pass through .bdrv_has_zero_init() to
+> the data storage node when dealing with preallocated images.
+> 
+> Protocol drivers OTOH have to be accurate in what they return from
+> .bdrv_has_zero_init().  They are free to return 0 even for preallocated
+> images.
+> 
+> 
+> So let’s look at the existing .bdrv_has_zero_init() implementations:
+> 
+> - file-posix: Always returns 1 (for regular files).  Correct, because it
+>   makes sure the image always reads as 0, preallocated or not.
+> 
+> - file-win32: Same.  (But doesn’t even support preallocation.)
+> 
+> - gluster: Always returns 0.  Safe.
+> 
+> - nfs: Only returns 1 for regular files, similarly to file-posix.  Seems
+>   reasonable.
+> 
+> - parallels: Always returns 1.  This format does not support
+>   preallocation, but apparently ensures that it always writes out data
+>   that reads back as 0 (where necessary), because if the protocol node
+>   does not have_zero_init, it explicitly writes zeroes to it instead of
+>   just truncating it.
+>   So this driver seems OK, too.
+> 
+> - qcow2: Always returns 1.  This is wrong for preallocated images, and
+>   really wrong for preallocated encrypted images.  Addressed by patch 1.
+> 
+> - qcow: Always returns 1.  Has no preallocation support, so that seems
+>   OK.
+> 
+> - qed: Same as qcow.
+> 
+> - raw: Always forwards the value from the filtered node.  OK.
+> 
+> - rbd: Always returns 1.  This is a protocol driver, so I’ll just trust
+>   it knows what it’s doing.
+> 
+> - sheepdog: Always returns 1.  From the fact that its preallocation code
+>   simply reads the image and writes it back, this seems correct to me.
+> 
+> - ssh: Same as nfs.
+> 
+> - vdi: Always returns 1.  It does support preallocation=metadata, in
+>   which case this may be wrong.  Addressed by patch 2.
+> 
+> - vhdx: Similar to vdi, except it doesn’t support @preallocation, but
+>   has its own option “subformat=fixed”.  Addressed by patch 3.
+> 
+> - vmdk: Hey, this one is already exactly what we want.  If any of the
+>   extents is flat, it goes to the respective protocol node, and if that
+>   does not have_zero_init, it returns 0.  Great.
+>   (Added in commit da7a50f9385.)
+> 
+> - vpc: Hey, this one, too.  With subformat=fixed, it returns what the
+>   protocol node has to say about has_zero_init.
+>   (Added in commit 72c6cc94daa.)
+> 
+> So that leaves three cases to fix, which are the first three patches in
+> this series.  The final patch adds a test case for qcow2.  (It’s
+> difficult to test the other drivers, because that would require a
+> protocol driver with image creation support and has_zero_init=0, which
+> is not so easily available.)
 
-Sure; I meant that those should be handled in the kernel rather than
-going to host userspace and back.
-
-I was suggesting was that userspace would opt into taking ownership of
-all HVC calls, then explicitly opt-in to the kernel handling specific
-(sets of) calls.
-
-There are probably issues with that, but I suspect defining "all
-undandled calls" will be problematic otherwise.
+Acked-by: Stefano Garzarella <sgarzare@redhat.com>
+Tested-by: Stefano Garzarella <sgarzare@redhat.com>
 
 Thanks,
-Mark.
+Stefano
+
+> 
+> 
+> Max Reitz (4):
+>   qcow2: Fix .bdrv_has_zero_init()
+>   vdi: Fix .bdrv_has_zero_init()
+>   vhdx: Fix .bdrv_has_zero_init()
+>   iotests: Convert to preallocated encrypted qcow2
+> 
+>  block/qcow2.c              | 90 +++++++++++++++++++++++++++++++++++++-
+>  block/vdi.c                | 13 +++++-
+>  block/vhdx.c               | 21 ++++++++-
+>  tests/qemu-iotests/188     | 20 ++++++++-
+>  tests/qemu-iotests/188.out |  4 ++
+>  5 files changed, 144 insertions(+), 4 deletions(-)
+> 
 
