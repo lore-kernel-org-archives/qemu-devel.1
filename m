@@ -2,63 +2,66 @@ Return-Path: <SRS0=IjNW=VM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F8E0C7618F
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 15:36:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4805FC7618F
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 15:46:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 128FE2080A
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 15:36:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 128FE2080A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1A9482081C
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 15:46:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A9482081C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40164 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40232 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hn31E-0005rv-6S
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 11:36:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50688)
+	id 1hn3B6-0002qe-8A
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 11:46:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52603)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <cohuck@redhat.com>) id 1hn314-0005SL-86
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 11:35:51 -0400
+ (envelope-from <clg@kaod.org>) id 1hn3Al-00026G-QW
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 11:45:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cohuck@redhat.com>) id 1hn30x-00006T-Cm
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 11:35:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34838)
+ (envelope-from <clg@kaod.org>) id 1hn3Ak-0005PM-89
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 11:45:51 -0400
+Received: from 10.mo6.mail-out.ovh.net ([87.98.157.236]:47726)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cohuck@redhat.com>)
- id 1hn30x-0008VC-2D; Mon, 15 Jul 2019 11:35:43 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 780113082A98;
- Mon, 15 Jul 2019 15:35:40 +0000 (UTC)
-Received: from gondolin (dhcp-192-232.str.redhat.com [10.33.192.232])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4BEB76085B;
- Mon, 15 Jul 2019 15:35:35 +0000 (UTC)
-Date: Mon, 15 Jul 2019 17:35:33 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: Christian Borntraeger <borntraeger@de.ibm.com>
-Message-ID: <20190715173533.3ecca672.cohuck@redhat.com>
-In-Reply-To: <20190715142304.215018-4-borntraeger@de.ibm.com>
-References: <20190715142304.215018-1-borntraeger@de.ibm.com>
- <20190715142304.215018-4-borntraeger@de.ibm.com>
-Organization: Red Hat GmbH
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1hn3Ak-0005NK-1K
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 11:45:50 -0400
+Received: from player799.ha.ovh.net (unknown [10.108.42.82])
+ by mo6.mail-out.ovh.net (Postfix) with ESMTP id 1DF201D63CE
+ for <qemu-devel@nongnu.org>; Mon, 15 Jul 2019 17:45:46 +0200 (CEST)
+Received: from kaod.org (deibp9eh1--blueice1n4.emea.ibm.com [195.212.29.166])
+ (Authenticated sender: clg@kaod.org)
+ by player799.ha.ovh.net (Postfix) with ESMTPSA id C9F407EE7DAC;
+ Mon, 15 Jul 2019 15:45:39 +0000 (UTC)
+To: David Gibson <david@gibson.dropbear.id.au>
+References: <20190630204601.30574-1-clg@kaod.org>
+ <20190630204601.30574-9-clg@kaod.org> <20190703020748.GD9442@umbus.fritz.box>
+ <08faf669-72a7-8f30-d33c-2e285405005c@kaod.org>
+ <20190712011527.GB2561@umbus.fritz.box>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <4f2f24e7-28da-8f32-e1f7-721dc6533e7c@kaod.org>
+Date: Mon, 15 Jul 2019 17:45:38 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Mon, 15 Jul 2019 15:35:40 +0000 (UTC)
+In-Reply-To: <20190712011527.GB2561@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+X-Ovh-Tracer-Id: 11505008201289730899
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduvddrheekgdekkecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 3/3] s390x/cpumodel: change internal name
- of vxp to make description
+X-Received-From: 87.98.157.236
+Subject: Re: [Qemu-devel] [PATCH 08/10] ppc/xive: Extend XiveTCTX with an
+ router object pointer
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,24 +73,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Halil Pasic <pasic@linux.ibm.com>, qemu-s390x <qemu-s390x@nongnu.org>,
- Richard Henderson <rth@twiddle.net>, qemu-devel <qemu-devel@nongnu.org>,
- David Hildenbrand <david@redhat.com>
+Cc: qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>,
+ Suraj Jitindar Singh <sjitindarsingh@gmail.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 15 Jul 2019 16:23:04 +0200
-Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+On 12/07/2019 03:15, David Gibson wrote:
+> On Wed, Jul 03, 2019 at 07:54:57AM +0200, C=E9dric Le Goater wrote:
+>> On 03/07/2019 04:07, David Gibson wrote:
+>>> On Sun, Jun 30, 2019 at 10:45:59PM +0200, C=E9dric Le Goater wrote:
+>>>> This is to perform lookups in the NVT table when a vCPU is dispatche=
+d
+>>>> and possibly resend interrupts.
+>>>
+>>> I'm slightly confused by this one.  Aren't there multiple router
+>>> objects, each of which can deliver to any thread?  In which case what
+>>> router object is associated with a specific TCTX?
+>>
+>> when a vCPU is dispatched on a HW thread, the hypervisor does a store=20
+>> on the CAM line to store the VP id. At that time, it checks the IPB in=
+=20
+>> the associated NVT structure and notifies the thread if an interrupt i=
+s=20
+>> pending.=20
+>>
+>> We need to do a NVT lookup, just like the presenter in HW, hence the=20
+>> router pointer. You should look at the following patch which clarifies=
+=20
+>> the resend sequence.
+>=20
+> Hm, ok.
+>=20
+>>>> Future XIVE chip will use a different class for the model of the
+>>>> interrupt controller. So use an 'Object *' instead of a 'XiveRouter =
+*'.
+>>>
+>>> This seems odd to me, shouldn't it be an interface pointer or
+>>> something in that case?
+>>
+>> I have duplicated most of the XIVE models for P10 because the internal=
+=20
+>> structures have changed. I managed to keep the XiveSource and XiveTCTX=
+=20
+>> but we now have a Xive10Router, this is the reason why.
+>=20
+> Right, but XiveRouter and Xive10Router must have something in common
+> if they can both be used here.  Usually that's expressed as a shared
+> QOM interface - in which case you can use a pointer to the interface,
+> rathe than using Object * which kind of implies *anything* can go
+> here.
 
-> The internal macro name VECTOR_BCD_ENH does not match the actual
-> description. Fix this.
-> 
-> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> ---
->  target/s390x/cpu_features_def.inc.h | 2 +-
->  target/s390x/gen-features.c         | 4 ++--
->  2 files changed, 3 insertions(+), 3 deletions(-)
+Yeah. I also think it would be better to have a common base object but
+the class don't have much in common. Here is what I have for now :
 
-s/make/match/ in $SUBJECT?
+P9:
+
+typedef struct XiveRouterClass {
+    SysBusDeviceClass parent;
+
+    /* XIVE table accessors */
+    int (*get_eas)(XiveRouter *xrtr, uint8_t eas_blk, uint32_t eas_idx,
+                   XiveEAS *eas);
+    int (*get_end)(XiveRouter *xrtr, uint8_t end_blk, uint32_t end_idx,
+                   XiveEND *end);
+    int (*write_end)(XiveRouter *xrtr, uint8_t end_blk, uint32_t end_idx,
+                     XiveEND *end, uint8_t word_number);
+    int (*get_nvt)(XiveRouter *xrtr, uint8_t nvt_blk, uint32_t nvt_idx,
+                   XiveNVT *nvt);
+    int (*write_nvt)(XiveRouter *xrtr, uint8_t nvt_blk, uint32_t nvt_idx,
+                     XiveNVT *nvt, uint8_t word_number);
+    XiveTCTX *(*get_tctx)(XiveRouter *xrtr, CPUState *cs);
+    uint8_t (*get_block_id)(XiveRouter *xrtr);
+} XiveRouterClass;
+
+and P10:
+
+typedef struct Xive10RouterClass {
+    SysBusDeviceClass parent;
+
+    /* XIVE table accessors */
+    int (*get_eas)(Xive10Router *xrtr, uint8_t eas_blk, uint32_t eas_idx,
+                   Xive10EAS *eas);
+    int (*get_end)(Xive10Router *xrtr, uint8_t end_blk, uint32_t end_idx,
+                   Xive10END *end);
+    int (*write_end)(Xive10Router *xrtr, uint8_t end_blk, uint32_t end_id=
+x,
+                     Xive10END *end, uint8_t word_number);
+    int (*get_nvp)(Xive10Router *xrtr, uint8_t nvt_blk, uint32_t nvt_idx,
+                   Xive10NVP *nvt);
+    int (*write_nvp)(Xive10Router *xrtr, uint8_t nvt_blk, uint32_t nvt_id=
+x,
+                     Xive10NVP *nvt, uint8_t word_number);
+    XiveTCTX *(*get_tctx)(Xive10Router *xrtr, CPUState *cs);
+    uint8_t (*get_block_id)(XiveRouter *xrtr);
+    uint32_t (*get_config)(Xive10Router *xrtr);
+} Xive10RouterClass;
+
+Only get_tctx() is common.=20
+
+The XIVE structures (END, NV*) used by the routing algo have changed a lo=
+t.
+Even the presenter has changed, because all the CAM lines have a slightly=
+=20
+different format.  =20
+
+C.
+
+
 
