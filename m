@@ -2,79 +2,72 @@ Return-Path: <SRS0=IjNW=VM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3ACEBC76191
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 15:20:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB17FC7618F
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 15:21:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 036D4205ED
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 15:20:00 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="r0fTJWwW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 036D4205ED
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
+	by mail.kernel.org (Postfix) with ESMTPS id 80799205ED
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 15:21:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 80799205ED
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40038 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40048 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hn2lj-0001Us-VW
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 11:19:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46438)
+	id 1hn2mh-0002j6-Pz
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 11:20:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46725)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <antonkuchin@yandex-team.ru>) id 1hn2lO-0000YV-Q8
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 11:19:39 -0400
+ (envelope-from <bounces@canonical.com>) id 1hn2mV-0002Kl-2p
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 11:20:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <antonkuchin@yandex-team.ru>) id 1hn2lN-0007eJ-MG
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 11:19:38 -0400
-Received: from forwardcorp1j.mail.yandex.net ([5.45.199.163]:57778)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <antonkuchin@yandex-team.ru>)
- id 1hn2lN-0007cW-29
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 11:19:37 -0400
-Received: from mxbackcorp2j.mail.yandex.net (mxbackcorp2j.mail.yandex.net
- [IPv6:2a02:6b8:0:1619::119])
- by forwardcorp1j.mail.yandex.net (Yandex) with ESMTP id 1573A2E09D4;
- Mon, 15 Jul 2019 18:19:33 +0300 (MSK)
-Received: from smtpcorp1o.mail.yandex.net (smtpcorp1o.mail.yandex.net
- [2a02:6b8:0:1a2d::30])
- by mxbackcorp2j.mail.yandex.net (nwsmtp/Yandex) with ESMTP id
- Osil3jOvYq-JWU4hd4p; Mon, 15 Jul 2019 18:19:33 +0300
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
- s=default; 
- t=1563203973; bh=oHSN9tRqyQmgp6ExT34H34+6DXSTqUcC7AIO797Ooq8=;
- h=Date:Message-ID:Subject:From:To:Cc;
- b=r0fTJWwWbnpFRBvEdxlJ4IE8HX1VT53dYvoGU+mowY5cPVR2Dgyl1NO71YgXRpXoV
- T9cgnW7vfu5/93zZ6nBrZgpRduYSooFSv1Ot0BR9HTCZWGt1vitUxDnag7JUHK/ers
- DAAW1ms7mlGHE2+r2psDjJLm5xwgULMNpDBsG00Q=
-Authentication-Results: mxbackcorp2j.mail.yandex.net;
- dkim=pass header.i=@yandex-team.ru
-Received: from dynamic-red.dhcp.yndx.net (dynamic-red.dhcp.yndx.net
- [2a02:6b8:0:408:250:b6ff:fe97:2682])
- by smtpcorp1o.mail.yandex.net (nwsmtp/Yandex) with ESMTPSA id
- Yp97kkQQFk-JW9873Sf; Mon, 15 Jul 2019 18:19:32 +0300
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (Client certificate not present)
-To: qemu-devel@nongnu.org
-From: Anton Kuchin <antonkuchin@yandex-team.ru>
-Message-ID: <9f644e46-6fc5-01ea-068a-fdbf9e08b828@yandex-team.ru>
-Date: Mon, 15 Jul 2019 18:19:31 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+ (envelope-from <bounces@canonical.com>) id 1hn2mT-0000Ag-W7
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 11:20:47 -0400
+Received: from indium.canonical.com ([91.189.90.7]:34298)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1hn2mT-000089-Pw
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 11:20:45 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1hn2mP-0003fD-Ct
+ for <qemu-devel@nongnu.org>; Mon, 15 Jul 2019 15:20:41 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 54A2F2E80CB
+ for <qemu-devel@nongnu.org>; Mon, 15 Jul 2019 15:20:41 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 15 Jul 2019 15:10:18 -0000
+From: Daan Scherft <1836558@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: linux-user ppc
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: alex-bennee scherft
+X-Launchpad-Bug-Reporter: Daan Scherft (scherft)
+X-Launchpad-Bug-Modifier: Daan Scherft (scherft)
+References: <156318593102.28533.3075291509963886255.malonedeb@chaenomeles.canonical.com>
+Message-Id: <156320341879.29012.16868139443404717624.malone@chaenomeles.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="19007";
+ Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: 162101bd6b8c99267488a29cbafe964e1b4d026e
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 5.45.199.163
-Subject: [Qemu-devel] What events should be handled in iohandler context?
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1836558] Re: Qemu-ppc Memory leak creating threads
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -83,30 +76,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>
+Reply-To: Bug 1836558 <1836558@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
+The thread creating is not failing. The thread is just running the function=
+ with line: 'std::this_thread::sleep_for( 10ms );' =
 
-I'm trying to understand contexts and handlers/notifiers and a bit 
-confused about two contexts living in main loop: qemu_aio_context and 
-iohandler_ctx. It is mentioned in the iohandler_ctx comment that 
-qemu_aio_context can't be reused because "iohandlers mustn't be polled 
-by aio_poll(qemu_aio_context)" but there is no exlanation why.
+in the thread, thus waiting for 10ms. Once finished, the thread function en=
+ds, which should also end and cleanup the thread.
+(when putting some std::cout console output before the sleep it does show u=
+p).
+The main thread waits for that in in the join function.
 
-I tried to find examples and failed to understand why virtio-net 
-eventfds are registred to iohandler_ctx with generic virtio callback 
-virtio_device_start_ioeventfd_impl() but TX bottom-half and handlers of 
-back-end TAP use qemu_aio_context.
+-- =
 
-Can you explain a little bit why we need some fds to be polled and some 
-not to be polled? And how can I choose which context is right for me?
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1836558
 
-Thanks in advance for your help!
+Title:
+  Qemu-ppc Memory leak creating threads
 
-Anton
+Status in QEMU:
+  New
 
+Bug description:
+  When creating c++ threads (with c++ std::thread), the resulting binary
+  has memory leaks when running with qemu-ppc.
+
+  Eg the following c++ program, when compiled with gcc, consumes more
+  and more memory while running at qemu-ppc. (does not have memory leaks
+  when compiling for Intel, when running same binary on real powerpc CPU
+  hardware also no memory leaks).
+
+  (Note I used function getCurrentRSS to show available memory, see
+  https://stackoverflow.com/questions/669438/how-to-get-memory-usage-at-
+  runtime-using-c; calls commented out here)
+
+  Compiler: powerpc-linux-gnu-g++ (Debian 8.3.0-2) 8.3.0 (but same problem =
+with older g++ compilers even 4.9)
+  Os: Debian 10.0 ( Buster) (but same problem seen on Debian 9/stetch)
+  qemu: qemu-ppc version 3.1.50
+
+
+  ---
+
+  #include <iostream>
+  #include <thread>
+  #include <chrono>
+
+  =
+
+  using namespace std::chrono_literals;
+
+  // Create/run and join a 100 threads.
+  void Fun100()
+  {
+  //    auto b4 =3D getCurrentRSS();
+  //    std::cout << getCurrentRSS() << std::endl;
+      for(int n =3D 0; n < 100; n++)
+      {
+          std::thread t([]
+          {
+              std::this_thread::sleep_for( 10ms );
+          });
+  //        std::cout << n << ' ' << getCurrentRSS() << std::endl;
+          t.join();
+      }
+      std::this_thread::sleep_for( 500ms ); // to give OS some time to wipe=
+ memory...
+  //    auto after =3D getCurrentRSS();
+      std::cout << b4 << ' ' << after << std::endl;
+  }
+
+  =
+
+  int main(int, char **)
+  {
+      Fun100();
+      Fun100();  // memory used keeps increasing
+  }
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1836558/+subscriptions
 
