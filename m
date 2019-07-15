@@ -2,58 +2,82 @@ Return-Path: <SRS0=IjNW=VM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68967C7618F
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 10:22:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 035A0C7618F
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 10:24:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4116320665
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 10:22:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4116320665
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id C1CC220665
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 10:24:06 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bK8x2Zr8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1CC220665
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36650 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36666 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hmy7r-00088b-GQ
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 06:22:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34659)
+	id 1hmy9N-0000sz-Rw
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 06:24:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35026)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hmy7g-0007dt-7g
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 06:22:20 -0400
+ (envelope-from <elohimes@gmail.com>) id 1hmy98-0000Ig-D7
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 06:23:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hmy7f-0006sz-BM
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 06:22:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44142)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>)
- id 1hmy7f-0006rf-5B; Mon, 15 Jul 2019 06:22:19 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id D666686658;
- Mon, 15 Jul 2019 10:22:17 +0000 (UTC)
-Received: from x1w.redhat.com (unknown [10.40.205.87])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 57B134505;
- Mon, 15 Jul 2019 10:22:13 +0000 (UTC)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Mon, 15 Jul 2019 12:22:10 +0200
-Message-Id: <20190715102210.31365-1-philmd@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.26]); Mon, 15 Jul 2019 10:22:17 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH] hw/net/e1000: Fix erroneous comment
+ (envelope-from <elohimes@gmail.com>) id 1hmy97-00081p-H5
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 06:23:50 -0400
+Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:42416)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <elohimes@gmail.com>) id 1hmy97-00080i-BB
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 06:23:49 -0400
+Received: by mail-pl1-x641.google.com with SMTP id ay6so8064928plb.9
+ for <qemu-devel@nongnu.org>; Mon, 15 Jul 2019 03:23:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id;
+ bh=7p2G/91PqJ8RuOo5lhHUra5YVPwP+D+LVK4urSQ4OpA=;
+ b=bK8x2Zr8/rJFONtuAaOfrtOkNr+LN0fAHst74lyaoE/b4xJoshc32toRLNjbp7t4b+
+ fR53E6LnIEU91KEH/9bNUCIUCkFeIBLGNtI/5PlrzRNqns85E9HDpzd0D/GKUzqkRS3C
+ /2LRkWsDx9ZeZcbSGssQm7/2Jg/1xvs37r5qx9m/83+bzVu7N5aAZxf3Ma1CBaVpAYot
+ PsKkszco34qXXLlMQphUIJG0hyHboF50ZAFjCHYidCTUkd9rUE7KVaeX6V/KJ/f82Wjv
+ 3H03CVi2ZZZiWBhcztYJIDxUZIXirtXUfLxUKLfqZVxWscHLZYzXLsBkVP7X7QnILPuH
+ ooUg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id;
+ bh=7p2G/91PqJ8RuOo5lhHUra5YVPwP+D+LVK4urSQ4OpA=;
+ b=SCHnylV0bVnPnfc9VOvEO/PlyKyj2T3/DaGc4iWQaw31nybpDJO9ZFWDTAKhpcC5au
+ 4+PrlJxnOGGrZjqOJafMRk0NG5MPYoWmkKIvvw40f4FynnFNfeiVke7ZdvVyQpnEZwbG
+ 0Qcr7SMvOd0rhPJzApk6s1om+mMG01nDRv8jIKkIai+rWHvSim1VblOaJfwxyL1udcHO
+ RpzqgZNN9rrPPZjJyOZJkjdktpz7HxFHPjSWTSDDSMVW4nifwlW9JSeQGi+JDXZuDsu0
+ O0ZvMTVc+27+CnflDHLUPhWuhMx4r6lbzIj0xRpkTWec3bWdmq/t3aow/ONn9hLQOHNE
+ ny7w==
+X-Gm-Message-State: APjAAAWrJo0Pcw44sMNWujN6rSqtVWmXcoM5/tW0RlV0r3WgFfXnLmN/
+ GD0eW5QkKj6qITHS5i+u/T0=
+X-Google-Smtp-Source: APXvYqw9SB3SBYrMcDya6hs0EDVcdlmoLhSkZ6Jbt01rgAl+Zm4S0dJYhRxYG4WEYGb3zPHVuB2VHg==
+X-Received: by 2002:a17:902:6b85:: with SMTP id
+ p5mr25069625plk.225.1563186227723; 
+ Mon, 15 Jul 2019 03:23:47 -0700 (PDT)
+Received: from localhost ([116.247.112.152])
+ by smtp.gmail.com with ESMTPSA id m9sm31381908pgr.24.2019.07.15.03.23.47
+ (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+ Mon, 15 Jul 2019 03:23:47 -0700 (PDT)
+From: elohimes@gmail.com
+X-Google-Original-From: xieyongji@baidu.com
+To: mst@redhat.com, stefanha@gmail.com, pbonzini@redhat.com, fam@euphon.net
+Date: Mon, 15 Jul 2019 18:23:25 +0800
+Message-Id: <20190715102326.2805-1-xieyongji@baidu.com>
+X-Mailer: git-send-email 2.17.1
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::641
+Subject: [Qemu-devel] [PATCH 1/2] vhost-scsi: Call
+ virtio_scsi_common_unrealize() when device realize failed
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,35 +89,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Jason Wang <jasowang@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Markus Armbruster <armbru@redhat.com>
+Cc: Xie Yongji <xieyongji@baidu.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Missed during the QOM convertion in 9af21dbee14.
+From: Xie Yongji <xieyongji@baidu.com>
 
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+This avoids memory leak when device hotplug is failed.
+
+Signed-off-by: Xie Yongji <xieyongji@baidu.com>
 ---
- hw/net/e1000.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/scsi/vhost-scsi.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/hw/net/e1000.c b/hw/net/e1000.c
-index 1dc1466332..ec8ded7252 100644
---- a/hw/net/e1000.c
-+++ b/hw/net/e1000.c
-@@ -1611,7 +1611,7 @@ static const VMStateDescription vmstate_e1000 =3D {
-=20
- /*
-  * EEPROM contents documented in Tables 5-2 and 5-3, pp. 98-102.
-- * Note: A valid DevId will be inserted during pci_e1000_init().
-+ * Note: A valid DevId will be inserted during pci_e1000_realize().
-  */
- static const uint16_t e1000_eeprom_template[64] =3D {
-     0x0000, 0x0000, 0x0000, 0x0000,      0xffff, 0x0000,      0x0000, 0x=
-0000,
---=20
-2.20.1
+diff --git a/hw/scsi/vhost-scsi.c b/hw/scsi/vhost-scsi.c
+index 4090f99ee4..db4a090576 100644
+--- a/hw/scsi/vhost-scsi.c
++++ b/hw/scsi/vhost-scsi.c
+@@ -210,7 +210,7 @@ static void vhost_scsi_realize(DeviceState *dev, Error **errp)
+         if (err) {
+             error_propagate(errp, err);
+             error_free(vsc->migration_blocker);
+-            goto close_fd;
++            goto free_virtio;
+         }
+     }
+ 
+@@ -240,6 +240,8 @@ static void vhost_scsi_realize(DeviceState *dev, Error **errp)
+         migrate_del_blocker(vsc->migration_blocker);
+     }
+     g_free(vsc->dev.vqs);
++ free_virtio:
++    virtio_scsi_common_unrealize(dev, errp);
+  close_fd:
+     close(vhostfd);
+     return;
+-- 
+2.17.1
 
 
