@@ -2,50 +2,49 @@ Return-Path: <SRS0=IjNW=VM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD59EC7618F
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 13:09:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3D6EC76191
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 13:13:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 95653206B8
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 13:09:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95653206B8
+	by mail.kernel.org (Postfix) with ESMTPS id AC7AF206B8
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 13:13:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC7AF206B8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38414 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38444 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hn0j4-0005ji-R9
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 09:09:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44840)
+	id 1hn0nT-0008Ek-Og
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 09:13:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45756)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <thuth@redhat.com>) id 1hn0it-0005Dz-SK
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 09:08:56 -0400
+ (envelope-from <thuth@redhat.com>) id 1hn0nJ-0007kw-Av
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 09:13:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1hn0is-0003iP-RY
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 09:08:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57762)
+ (envelope-from <thuth@redhat.com>) id 1hn0nI-0006At-Dr
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 09:13:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46956)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <thuth@redhat.com>)
- id 1hn0iq-0003fW-GR; Mon, 15 Jul 2019 09:08:52 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ id 1hn0nG-00069c-GQ; Mon, 15 Jul 2019 09:13:26 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 7CF4783F4C;
- Mon, 15 Jul 2019 13:08:51 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 9DE7C308FB93;
+ Mon, 15 Jul 2019 13:13:25 +0000 (UTC)
 Received: from thuth.remote.csb (reserved-198-198.str.redhat.com
  [10.33.198.198])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2EEDC5B684;
- Mon, 15 Jul 2019 13:08:44 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A256A60A9A;
+ Mon, 15 Jul 2019 13:13:19 +0000 (UTC)
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
  qemu-devel@nongnu.org
 References: <20190712133928.21394-1-philmd@redhat.com>
- <20190712133928.21394-8-philmd@redhat.com>
 From: Thomas Huth <thuth@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=thuth@redhat.com; keydata=
@@ -91,21 +90,21 @@ Autocrypt: addr=thuth@redhat.com; keydata=
  rCELuGwT9hsYkUPjVd4lfylN3mzEc6iAv/wwjsc0DRTSQCpXT3v2ymTAsRKrVaEZLibTXaf+
  WslxWek3xNYRiqwwWAJuL652eAlxUgQ5ZS+fXBRTiQpJ+F26I/2lccScRd9G5w==
 Organization: Red Hat
-Message-ID: <fba3d5fc-4a5d-d967-5bb3-075159b93a0d@redhat.com>
-Date: Mon, 15 Jul 2019 15:08:43 +0200
+Message-ID: <421f2fb2-6e8d-7579-029a-e8de726c6a5e@redhat.com>
+Date: Mon, 15 Jul 2019 15:13:18 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <20190712133928.21394-8-philmd@redhat.com>
+In-Reply-To: <20190712133928.21394-1-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.27]); Mon, 15 Jul 2019 13:08:51 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.43]); Mon, 15 Jul 2019 13:13:25 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH-for-4.1? 7/7] hw/bt: Allow building with
+Subject: Re: [Qemu-devel] [PATCH-for-4.1? 0/7] vl: Allow building with
  CONFIG_BLUETOOTH disabled
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -126,66 +125,12 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 12/07/2019 15.39, Philippe Mathieu-Daud=C3=A9 wrote:
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
->  Makefile.objs       |  3 ++-
->  bt-stubs.c          | 18 ++++++++++++++++++
->  hw/bt/Makefile.objs |  4 ++--
->  3 files changed, 22 insertions(+), 3 deletions(-)
->  create mode 100644 bt-stubs.c
->=20
-> diff --git a/Makefile.objs b/Makefile.objs
-> index c2845a0efc..98269e393a 100644
-> --- a/Makefile.objs
-> +++ b/Makefile.objs
-> @@ -65,8 +65,9 @@ common-obj-y +=3D replay/
-> =20
->  common-obj-y +=3D ui/
->  common-obj-m +=3D ui/
-> -common-obj-y +=3D bt-host.o bt-vhci.o bt-opts.o
->  bt-host.o-cflags :=3D $(BLUEZ_CFLAGS)
-> +common-obj-$(CONFIG_BLUETOOTH) +=3D bt-host.o bt-vhci.o bt-opts.o
-> +common-obj-$(call lnot,$(CONFIG_BLUETOOTH)) +=3D bt-stubs.o
-> =20
->  common-obj-y +=3D dma-helpers.o
->  common-obj-y +=3D vl.o
-> diff --git a/bt-stubs.c b/bt-stubs.c
-> new file mode 100644
-> index 0000000000..d3f5158d3b
-> --- /dev/null
-> +++ b/bt-stubs.c
-> @@ -0,0 +1,18 @@
-> +/*
-> + * Bluetooth stubs.
-> + *
-> + * Copyright (c) 2019 Red Hat, Inc.
-> + *
-> + * SPDX-License-Identifier: GPL-2.0-or-later
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "qemu/error-report.h"
-> +#include "sysemu/bt.h"
-> +
-> +int bt_parse(const char *opt)
-> +{
-> +    error_report("Bluetooth support is disabled");
-> +
-> +    return 1;
-> +}
-> diff --git a/hw/bt/Makefile.objs b/hw/bt/Makefile.objs
-> index 867a7d2e8a..46aec8e38e 100644
-> --- a/hw/bt/Makefile.objs
-> +++ b/hw/bt/Makefile.objs
-> @@ -1,3 +1,3 @@
-> -common-obj-y +=3D core.o l2cap.o sdp.o hci.o hid.o
-> -common-obj-y +=3D hci-csr.o
-> +common-obj-$(CONFIG_BLUETOOTH) +=3D core.o l2cap.o sdp.o hci.o hid.o
-> +common-obj-$(CONFIG_BLUETOOTH) +=3D hci-csr.o
+> A series of obvious patches to build without the deprecated
+> bluetooth devices. Still worth for 4.1 or too late?
+> It is clearly not a bugfix.
 
-... ok, so the BLUETOOTH switch gets used here. But I wonder whether we
-should have separate switches for the backends (i.e. the files here) and
-the guest devices (i.e. the ones in hw/bt/) ?
+I wonder whether this series is worth the effort right now, or whether
+we should simply nuke the bluetooth code after 4.1 has been released?
 
  Thomas
 
