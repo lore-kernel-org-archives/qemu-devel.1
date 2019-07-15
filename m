@@ -2,90 +2,82 @@ Return-Path: <SRS0=IjNW=VM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F814C76190
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 09:08:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BFEA5C76190
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 09:09:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CEE7E20651
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 09:08:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8CE4C20838
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 09:09:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HK4kUqS4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CEE7E20651
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="Y0YaDWHJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8CE4C20838
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36084 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36095 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hmwyC-0002Kd-Px
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 05:08:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46906)
+	id 1hmwyp-0003Fh-SC
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 05:09:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47107)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <stefanha@gmail.com>) id 1hmwy3-0001wB-IO
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 05:08:20 -0400
+ (envelope-from <chihmin.chao@sifive.com>) id 1hmwye-0002pn-Lm
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 05:08:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@gmail.com>) id 1hmwy1-00048y-Fw
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 05:08:19 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:44342)
+ (envelope-from <chihmin.chao@sifive.com>) id 1hmwyd-0004ic-Bg
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 05:08:56 -0400
+Received: from mail-pf1-x433.google.com ([2607:f8b0:4864:20::433]:38467)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1hmwy1-00045z-4k
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 05:08:17 -0400
-Received: by mail-wr1-x444.google.com with SMTP id p17so16170789wrf.11
- for <qemu-devel@nongnu.org>; Mon, 15 Jul 2019 02:08:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:content-transfer-encoding:in-reply-to
- :user-agent; bh=pjSycxBHV/sHf0oPYBVquy4PLbbpkadHCa0zK8ld/VI=;
- b=HK4kUqS4QaxefWK//isqSZvmsdyG/bcL+jnu+d8G7+UfSI9v1ayV1CbzYGdKSZAi1g
- xFq1GZloHe3MK/efEjNlAuMcQ0x2byEb8gu29VaVplWhAUUoO3mYwxTvyzBGh7VPx4q9
- nQAf8EBqZ6uf0MQuuwCpB59JBTO3qGwsjrdjea2nNIeIIzfUDsplPEs3uWeABOBM8P/A
- IrwHhQx+Tb4K9nE0oiRdHX/lRp54dnGPdICz+UlCVnLe4NOhWdoFpcUwPFM8j0JLrU0e
- 14aLqLm3BrQY/IxFXf/ybnb0jXykmXDjySHXhWzwR48a196Op+7IV41FS38SjRtS/3Yd
- UrQw==
+ (Exim 4.71) (envelope-from <chihmin.chao@sifive.com>)
+ id 1hmwyd-0004ei-4n
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 05:08:55 -0400
+Received: by mail-pf1-x433.google.com with SMTP id y15so7127481pfn.5
+ for <qemu-devel@nongnu.org>; Mon, 15 Jul 2019 02:08:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
+ h=from:to:cc:subject:date:message-id;
+ bh=N+oIfyziDuwnxLpKqhY/smwRwjf6Qx0rWIQdNNXocn0=;
+ b=Y0YaDWHJx/yD1Bz8WVXGtzxynTylq1nfqpuXhwSu+Vk+vluD0EAJ/p7AYYlKvmvPlg
+ Ga8CUtxEg291DI7LpZyjaIvAaC3Kzd1Reo/usLLe2UZ6ilTgG7TaCvDwfO+lEHMHltTG
+ xk9GfePJ1GPnrEhZhSfujl8rbGEQOqdO7P+m1EBB3VfuoNacPgjCpa64ZzSTnWf88Gwt
+ 9NeFaPS/c727F6F/UeU9JJ6RBSU6lZGzKSSSjwb+ucp9BQnIBkIWZqFxzaq3DCFmLxQX
+ sFuk0vFbg0a6jILMc4vd+tDKE3EiHO6huPrRd/URjjZdOpv9Ch9h1Z7rW7nalYKBDnYI
+ LPxQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to:user-agent;
- bh=pjSycxBHV/sHf0oPYBVquy4PLbbpkadHCa0zK8ld/VI=;
- b=oYRVl8CiKylPWRAt6ItB38IqcXO+cM1FVyjKO3P1RaTb3yxK0A32IYYYt8sIN+9PVX
- E66qAI9t7fP4NVJlKQTbYySWh8qYfFXIFv9Zko9bAItssEiR4A0guhTkCnAWjPcw4L5T
- 2zfLPCC0ty1w0So5VoXlwNOQO9bm61J5slGAz5Q4mUsEIIQioTqu4t7NQHHYk20j5rzD
- qKVziXxc0FgYPUfR995Zkz2PTRWpBDcoDao5rTpRNqOH7mSmWa8pcjYKOXCeX4Oh34nj
- pGpE2ttDPXLRgC896GyPPxYb333e5aQTBMgHYMyuf50w1BoliTtEBt1jxQCRaF4xxGG3
- Cugg==
-X-Gm-Message-State: APjAAAUxWrAyFB9qNUmPK3E0kpDN8S/CUK94qcHI25++HXr0bOVX0oMk
- GkLtUT7FWG2a+kVzyFvSisQ=
-X-Google-Smtp-Source: APXvYqzls0i3bhbZyYHUYkxI8NjLR49YT785t9e+eVJaOtVzhA5dVJahZ+jsmN0vJDlUqoaoTub3hw==
-X-Received: by 2002:a5d:4403:: with SMTP id z3mr28513084wrq.29.1563181693658; 
- Mon, 15 Jul 2019 02:08:13 -0700 (PDT)
-Received: from localhost ([51.15.41.238])
- by smtp.gmail.com with ESMTPSA id p6sm14727101wrq.97.2019.07.15.02.08.12
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Mon, 15 Jul 2019 02:08:13 -0700 (PDT)
-Date: Mon, 15 Jul 2019 10:08:12 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Message-ID: <20190715090812.GD19807@stefanha-x1.localdomain>
-References: <20190708211936.8037-1-julio.montes@intel.com>
- <1eb3f75e-01b0-990b-44c2-1770982da5b5@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <1eb3f75e-01b0-990b-44c2-1770982da5b5@redhat.com>
-User-Agent: Mutt/1.12.0 (2019-05-25)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id;
+ bh=N+oIfyziDuwnxLpKqhY/smwRwjf6Qx0rWIQdNNXocn0=;
+ b=Bt6WKEjLP9CiFsH+85Jt2UTNAW6snMNvsAAcFgK7YVp1a/ASL32WTH1azMbXm/9YQC
+ tUY+GbKbLr8UWq/bk5mIMiiBy8f8M2jKF4CqkxTL/5zh3V+FJYMcxQsgiPvMZKn9metf
+ UrKbSQHbNkqvTKBcmAvwfOcIBI6XStS7nGJx6qwto3cZ1WeJ3IGOVPEy78uhQoTRkFLC
+ geM/xsek45IBJabpjdCVhKbdTZzTM6NgjjjZqzmLHLpYUVLVzMv4Z655q1NZIcDAaIXQ
+ biHQa20TaQCdnisawQUrFLONtvPcs550RJ1NaVJAVB8QN+Y1pcFyGlrVuNgoXetgtUH3
+ +BBw==
+X-Gm-Message-State: APjAAAWY2/bt61RO6OoclFPdcHEapwV6OkayKZMOx+y2GM4qrAi7oiYU
+ HwQl09+YevFEloT4NUcAQWV77BOYKO0=
+X-Google-Smtp-Source: APXvYqwWBv4K7fkwNOaYu9rcWQr1X4BmonExcr/sRL371d3/Jha+Nn2vCx+YBQGw6u2YSG5LdkTR6w==
+X-Received: by 2002:a17:90a:c596:: with SMTP id
+ l22mr28413823pjt.46.1563181733089; 
+ Mon, 15 Jul 2019 02:08:53 -0700 (PDT)
+Received: from gamma06.internal.sifive.com ([64.62.193.194])
+ by smtp.gmail.com with ESMTPSA id w197sm23458159pfd.41.2019.07.15.02.08.51
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
+ Mon, 15 Jul 2019 02:08:52 -0700 (PDT)
+From: Chih-Min Chao <chihmin.chao@sifive.com>
+To: qemu-devel@nongnu.org,
+	qemu-riscv@nongnu.org
+Date: Mon, 15 Jul 2019 02:08:36 -0700
+Message-Id: <1563181721-5055-1-git-send-email-chihmin.chao@sifive.com>
+X-Mailer: git-send-email 2.7.4
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::444
-Subject: Re: [Qemu-devel] [RFC] memory-backend-file/nvdimm: support
- read-only files as memory-backends
+X-Received-From: 2607:f8b0:4864:20::433
+Subject: [Qemu-devel] [PATCH v2] tests/boot_linux_console: add a test for
+ riscv64 + virt
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,51 +89,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Julio Montes <julio.montes@intel.com>, pbonzini@redhat.com,
- Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org,
- Xiao Guangrong <xiaoguangrong.eric@gmail.com>
+Cc: Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>, Chih-Min Chao <chihmin.chao@sifive.com>,
+ Cleber Rosa <crosa@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Jul 09, 2019 at 12:53:45PM +0200, Philippe Mathieu-Daudé wrote:
-> Cc'ing Igor & Xiao.
-> 
-> On 7/8/19 11:19 PM, Julio Montes wrote:
-> > Currently is not possible to use a file that is part of a read-only
-> > filesystem as memory backend for nvdimm devices, even if this is not modified
-> > in the guest. In order to improve the security of Virtual Machines that share
-> > and do not modify the memory-backend-file, QEMU should support
-> > read-only memory-backeds.
-> > 
-> > Use case:
-> > * Kata Containers use a memory-backed-file as read-only rootfs, and this
-> >   file is used to start all the virtual machines in the node.
-> >   It would be really bad if somehow a malicious container modified it.
-> > 
-> > Signed-off-by: Julio Montes <julio.montes@intel.com>
-> > ---
-> >  exec.c | 6 ++++++
-> >  1 file changed, 6 insertions(+)
-> > 
-> > diff --git a/exec.c b/exec.c
-> > index 50ea9c5aaa..1eb170b55a 100644
-> > --- a/exec.c
-> > +++ b/exec.c
-> > @@ -1852,6 +1852,12 @@ static int file_ram_open(const char *path,
-> >                  break;
-> >              }
-> >              g_free(filename);
-> > +        } else if (errno == EROFS) {
-> > +            fd = open(path, O_RDONLY);
-> 
-> While I can understand your use case, I'm not sure we want this silenced
-> as default. I'd expect an explicit command line option for that backend,
-> but I don't know well this area so let's wait for other to review.
+Similar to the mips + malta test, it boots a Linux kernel on a virt
+board and verify the serial is working.  Also, it relies on the serial
+device set by the machine itself.
 
-I also wonder whether read-only should be exposed to the guest (e.g.
-ACPI NFIT SPA EFI_MEMORY_WP Address Range Memory Mapping Attribute or
-ACPI NFIT NVDIMM Region Mapping Structure NVDIMM State Flags Bit 3).
+If riscv64 is a target being built, "make check-acceptance" will
+automatically include this test by the use of the "arch:riscv64" tags.
 
-Stefan
+Alternatively, this test can be run using:
+
+  $ avocado run -t arch:riscv64 tests/acceptance
+
+packages
+  debian official
+    binutils-riscv64-linux-gnu_2.32-8
+    opensbi_0.4-1_all
+    linux-image-4.19.0-5-riscv64 4.19.37-4
+  third-party
+    https://github.com/groeck/linux-build-test/rootfs/riscv64/rootfs.cpio.gz
+    (the repo is also used in mips target acceptance)
+
+Signed-off-by: Chih-Min Chao <chihmin.chao@sifive.com>
+---
+ .travis.yml                            |  2 +-
+ tests/acceptance/boot_linux_console.py | 66 ++++++++++++++++++++++++++++++++++
+ 2 files changed, 67 insertions(+), 1 deletion(-)
+
+diff --git a/.travis.yml b/.travis.yml
+index 5d3d6ee..21fcead 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -232,7 +232,7 @@ matrix:
+ 
+     # Acceptance (Functional) tests
+     - env:
+-        - CONFIG="--python=/usr/bin/python3 --target-list=x86_64-softmmu,mips-softmmu,mips64el-softmmu,aarch64-softmmu,arm-softmmu,s390x-softmmu,alpha-softmmu"
++        - CONFIG="--python=/usr/bin/python3 --target-list=x86_64-softmmu,mips-softmmu,mips64el-softmmu,aarch64-softmmu,arm-softmmu,s390x-softmmu,alpha-softmmu,riscv64-softmmu"
+         - TEST_CMD="make check-acceptance"
+       after_failure:
+         - cat tests/results/latest/job.log
+diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
+index 3215950..0f638bc 100644
+--- a/tests/acceptance/boot_linux_console.py
++++ b/tests/acceptance/boot_linux_console.py
+@@ -354,3 +354,69 @@ class BootLinuxConsole(Test):
+         self.vm.launch()
+         console_pattern = 'Kernel command line: %s' % kernel_command_line
+         self.wait_for_console_pattern(console_pattern)
++
++    def test_riscv64_virt(self):
++        """
++        :avocado: tags=arch:riscv64
++        :avocado: tags=machine:virt
++        """
++        deb_url = ('https://snapshot.debian.org/archive/debian/'
++                         '20190424T171759Z/pool/main/b/binutils/'
++                         'binutils-riscv64-linux-gnu_2.32-8_amd64.deb')
++        deb_hash = ('7fe376fd4452696c03acd508d6d613ca553ea15e')
++        deb_path = self.fetch_asset(deb_url, asset_hash=deb_hash)
++        objcopy_path = '/usr/bin/riscv64-linux-gnu-objcopy'
++        objcopy_path = self.extract_from_deb(deb_path, objcopy_path)
++        libbfd_path = '/usr/lib/x86_64-linux-gnu/libbfd-2.32-riscv64.so'
++        libbfd_path = self.extract_from_deb(deb_path, libbfd_path)
++        process.run('ls -al %s' % (objcopy_path))
++
++        deb_url = ('https://snapshot.debian.org/archive/debian/'
++                   '20190708T032337Z/pool/main/o/opensbi/'
++                   'opensbi_0.4-1_all.deb')
++        deb_hash = ('2319dcd702958291d323acf5649fd98a11d90112')
++        deb_path = self.fetch_asset(deb_url, asset_hash=deb_hash)
++        opensbi_path = ('/usr/lib/riscv64-linux-gnu/opensbi/'
++                        'qemu/virt/fw_jump.elf')
++        opensbi_path = self.extract_from_deb(deb_path, opensbi_path)
++
++        deb_url = ('https://snapshot.debian.org/archive/debian-ports/'
++                   '20190620T095935Z/pool-riscv64/main/l/linux/'
++                   'linux-image-4.19.0-5-riscv64_4.19.37-4_riscv64.deb')
++        deb_hash = ('bf5b5680c41d92134d22caef4fbd277c5217e1f0')
++        deb_path = self.fetch_asset(deb_url, asset_hash=deb_hash)
++        kernel_path = '/boot/vmlinux-4.19.0-5-riscv64'
++        kernel_path = self.extract_from_deb(deb_path, kernel_path)
++        kimage_path = self.workdir + "/Image"
++        env = os.environ
++        env['LD_LIBRARY_PATH'] = ('%s:' % (os.path.dirname(libbfd_path)) +
++                                 env.get('LD_LIBRARY_PATH', ''))
++        process.run(('%s -O binary -O binary -R'
++                     '.note -R .note.gnu.build-id -R .comment -S %s %s') %
++                     (objcopy_path, kernel_path, kimage_path))
++
++        initrd_url = ('https://github.com/groeck/linux-build-test/raw/'
++                      '8584a59ed9e5eb5ee7ca91f6d74bbb06619205b8/rootfs/'
++                      'riscv64/rootfs.cpio.gz')
++        initrd_hash = 'f4867d263754961b6f626cdcdc0cb334c47e3b49'
++        initrd_path = self.fetch_asset(initrd_url, asset_hash=initrd_hash)
++
++        self.vm.set_machine('virt')
++        self.vm.set_console()
++        kernel_command_line = (self.KERNEL_COMMON_COMMAND_LINE
++                               + 'console=ttyS0 noreboot')
++        self.vm.add_args('-bios', opensbi_path,
++                         '-kernel', kimage_path,
++                         '-initrd', initrd_path,
++                         '-append', kernel_command_line,
++                         '-no-reboot')
++
++        self.vm.launch()
++        self.wait_for_console_pattern('Boot successful.')
++
++        self.exec_command_and_wait_for_pattern('cat /proc/cpuinfo',
++                                               'isa')
++        self.exec_command_and_wait_for_pattern('uname -a',
++                                               'SMP Debian')
++        self.exec_command_and_wait_for_pattern('reboot',
++                                               'reboot: Restarting system')
+-- 
+2.7.4
+
 
