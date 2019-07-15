@@ -6,107 +6,87 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACF79C7618F
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 10:51:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F8C9C7618F
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 10:54:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 842D62086C
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 10:51:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 842D62086C
+	by mail.kernel.org (Postfix) with ESMTPS id EB66B206B8
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 10:54:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB66B206B8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36916 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36948 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hmyZo-0001BL-Ir
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 06:51:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40709)
+	id 1hmycd-0003gV-97
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 06:54:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41639)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <thuth@redhat.com>) id 1hmyZd-0000bz-6U
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 06:51:14 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hmycR-0003DX-I3
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 06:54:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1hmyZc-0004xB-5K
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 06:51:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41700)
+ (envelope-from <mreitz@redhat.com>) id 1hmycQ-0006Iv-C3
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 06:54:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41400)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>)
- id 1hmyZa-0004w8-0n; Mon, 15 Jul 2019 06:51:10 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1hmycN-0006H9-FV; Mon, 15 Jul 2019 06:54:03 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 160498553A;
- Mon, 15 Jul 2019 10:51:09 +0000 (UTC)
-Received: from thuth.remote.csb (reserved-198-198.str.redhat.com
- [10.33.198.198])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 24F125D9D6;
- Mon, 15 Jul 2019 10:50:55 +0000 (UTC)
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20190715095545.28545-1-philmd@redhat.com>
- <20190715095545.28545-4-philmd@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id C3424309174E;
+ Mon, 15 Jul 2019 10:54:02 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.40.205.59])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id CBCB75C231;
+ Mon, 15 Jul 2019 10:54:00 +0000 (UTC)
+To: Stefano Garzarella <sgarzare@redhat.com>
+References: <20190712104617.94707-1-sgarzare@redhat.com>
+ <5017daf6-2739-d260-09fd-cfccd6c77bc1@redhat.com>
+ <20190715081601.rpvavykcuhyr3fiw@steredhat>
+From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; keydata=
- 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
-Organization: Red Hat
-Message-ID: <ea8d8b49-49ac-6e1f-2134-a270e26178e6@redhat.com>
-Date: Mon, 15 Jul 2019 12:50:55 +0200
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <3f090545-0ca1-ca42-7e44-49f82e3ff760@redhat.com>
+Date: Mon, 15 Jul 2019 12:53:57 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <20190715095545.28545-4-philmd@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <20190715081601.rpvavykcuhyr3fiw@steredhat>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="VCv9ah2eqwRYL9wwFwOBTqa5SJnTNN0ZF"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.28]); Mon, 15 Jul 2019 10:51:09 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ (mx1.redhat.com [10.5.110.41]); Mon, 15 Jul 2019 10:54:02 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH-for-4.1? 3/3] hw/usb/Kconfig: USB_XHCI_NEC
- requires USB_XHCI
+Subject: Re: [Qemu-devel] [PATCH] gluster: fix .bdrv_reopen_prepare when
+ backing file is a JSON object
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -118,45 +98,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-riscv@nongnu.org,
- Eduardo Habkost <ehabkost@redhat.com>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- "Michael S. Tsirkin" <mst@redhat.com>, qemu-ppc@nongnu.org,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Palmer Dabbelt <palmer@sifive.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Artyom Tarasenko <atar4qemu@gmail.com>, QEMU Trivial <qemu-trivial@nongnu.org>,
- qemu-arm@nongnu.org, Alistair Francis <Alistair.Francis@wdc.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>,
- Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, integration@gluster.org,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 15/07/2019 11.55, Philippe Mathieu-Daud=C3=A9 wrote:
-> TYPE_NEC_XHCI is child of TYPE_XHCI. Add the missing Kconfig
-> dependency.
->=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
->  hw/usb/Kconfig | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/hw/usb/Kconfig b/hw/usb/Kconfig
-> index 495c6f2d48..555e09377b 100644
-> --- a/hw/usb/Kconfig
-> +++ b/hw/usb/Kconfig
-> @@ -40,7 +40,7 @@ config USB_XHCI_NEC
->      bool
->      default y if PCI_DEVICES
->      depends on PCI
-> -    select USB
-> +    select USB_XHCI
-> =20
->  config USB_MUSB
->      bool
->=20
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--VCv9ah2eqwRYL9wwFwOBTqa5SJnTNN0ZF
+Content-Type: multipart/mixed; boundary="QHsFAPXgIHieWXsFlKe3otLWNpP8zjRBL";
+ protected-headers="v1"
+From: Max Reitz <mreitz@redhat.com>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ qemu-block@nongnu.org, integration@gluster.org
+Message-ID: <3f090545-0ca1-ca42-7e44-49f82e3ff760@redhat.com>
+Subject: Re: [PATCH] gluster: fix .bdrv_reopen_prepare when backing file is a
+ JSON object
+References: <20190712104617.94707-1-sgarzare@redhat.com>
+ <5017daf6-2739-d260-09fd-cfccd6c77bc1@redhat.com>
+ <20190715081601.rpvavykcuhyr3fiw@steredhat>
+In-Reply-To: <20190715081601.rpvavykcuhyr3fiw@steredhat>
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+--QHsFAPXgIHieWXsFlKe3otLWNpP8zjRBL
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 15.07.19 10:16, Stefano Garzarella wrote:
+> On Fri, Jul 12, 2019 at 08:35:12PM +0200, Max Reitz wrote:
+>> On 12.07.19 12:46, Stefano Garzarella wrote:
+>>> When the backing_file is specified as a JSON object, the
+>>> qemu_gluster_reopen_prepare() fails with this message:
+>>>     invalid URI json:{"server.0.host": ...}
+>>>
+>>> In this case, we should call qemu_gluster_init() using the QDict
+>>> 'state->options' that contains the parameters already parsed.
+>>>
+>>> Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=3D1542445
+>>> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+>>> ---
+>>>  block/gluster.c | 11 ++++++++++-
+>>>  1 file changed, 10 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/block/gluster.c b/block/gluster.c
+>>> index 62f8ff2147..26971db1ea 100644
+>>> --- a/block/gluster.c
+>>> +++ b/block/gluster.c
+>>> @@ -931,7 +931,16 @@ static int qemu_gluster_reopen_prepare(BDRVReope=
+nState *state,
+>>>      gconf->has_debug =3D true;
+>>>      gconf->logfile =3D g_strdup(s->logfile);
+>>>      gconf->has_logfile =3D true;
+>>> -    reop_s->glfs =3D qemu_gluster_init(gconf, state->bs->filename, N=
+ULL, errp);
+>>> +    /*
+>>> +     * If 'bs->filename' starts with "json:", then 'state->options' =
+will
+>>> +     * contain the parameters already parsed.
+>>> +     */
+>>> +    if (state->bs->filename && !strstart(state->bs->filename, "json:=
+", NULL)) {
+>>> +        reop_s->glfs =3D qemu_gluster_init(gconf, state->bs->filenam=
+e, NULL,
+>>> +                                         errp);
+>>> +    } else {
+>>> +        reop_s->glfs =3D qemu_gluster_init(gconf, NULL, state->optio=
+ns, errp);
+>>> +    }
+>>
+>> Hmmm, aren=E2=80=99t they always in state->options?
+>=20
+> Yes, you are rigth, but the qemu_gluster_parse() doesn't search for the=
+
+> 'filename' in the QDict *options.
+>=20
+> Maybe I can simply modify it in this way in order to hanlde this case,
+> calling qemu_gluster_init() only with 'state->options'.
+>=20
+> diff --git a/block/gluster.c b/block/gluster.c
+> index 26971db1ea..91d674cd2b 100644
+> --- a/block/gluster.c
+> +++ b/block/gluster.c
+> @@ -695,6 +695,11 @@ static int qemu_gluster_parse(BlockdevOptionsGlust=
+er *gconf,
+>                                QDict *options, Error **errp)
+>  {
+>      int ret;
+> +
+> +    if (!filename) {
+> +        filename =3D qdict_get_try_str(options, GLUSTER_OPT_FILENAME);=
+
+> +    }
+> +
+>      if (filename) {
+>          ret =3D qemu_gluster_parse_uri(gconf, filename);
+>          if (ret < 0) {
+>=20
+>=20
+> Do you think it is better/cleaner?
+
+No, because the rest of the function completely ignores @options if
+@filename is set.
+
+Hm.  I can=E2=80=99t think of anything better than your original solution=
+, then.
+ Except the =E2=80=9Cstate->bs->filename=E2=80=9D should probably be a
+=E2=80=9Cstate->bs->filename[0]=E2=80=9D (as Patchew has pointed out).
+
+Max
+
+
+--QHsFAPXgIHieWXsFlKe3otLWNpP8zjRBL--
+
+--VCv9ah2eqwRYL9wwFwOBTqa5SJnTNN0ZF
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0sW0UACgkQ9AfbAGHV
+z0DHdwgAqcrKHRZ+8PklJEmeXFXGHZVw0FS301hz9YJVGpEvaXv9E+LfOmZOhVJD
+QsYNTe7WwxQCr14g2xYq8UXnkOvOfErt+NAnn7Tsey8q2oIb7KetrBYAcMRlo3w6
+BSh9DWVDCaymM4guo1+cTjYAnCOyioS7AR2D0vHLHUjyEDCZtqRP1qji3Kbd5VOy
+FyngXeyjCRI/2vwCc7QioxkjmxOp2NO/4Z38X2O7LOkV1Y2Qafu5lI9D3yFHyNNv
+bx2a1Za0tpfw15LozYceeeJj6plMtdwrJEbfeHnHWX5B/Qn0WNMCDyuFSkYSUpR/
+MKUeb0M1CQd3de8ADkS/Da/MzkzeqA==
+=+ngq
+-----END PGP SIGNATURE-----
+
+--VCv9ah2eqwRYL9wwFwOBTqa5SJnTNN0ZF--
 
