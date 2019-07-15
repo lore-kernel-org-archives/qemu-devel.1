@@ -6,55 +6,55 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A2CEC7618F
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 10:45:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA9FCC7618F
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 10:46:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5FD7B2064B
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 10:45:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5FD7B2064B
+	by mail.kernel.org (Postfix) with ESMTPS id C1F8B2083D
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 10:46:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1F8B2083D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36822 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36824 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hmyUX-0003yP-89
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 06:45:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39350)
+	id 1hmyUb-0004EO-CU
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 06:46:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39389)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hmyTy-0002L9-EO
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 06:45:23 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hmyU1-0002ZE-Qz
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 06:45:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hmyTx-0001hH-Df
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 06:45:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42280)
+ (envelope-from <mreitz@redhat.com>) id 1hmyU0-0001iw-Bd
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 06:45:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:32908)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hmyTu-0001fR-Oq; Mon, 15 Jul 2019 06:45:18 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ id 1hmyTy-0001hN-3N; Mon, 15 Jul 2019 06:45:22 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 15AC2308FC4B;
- Mon, 15 Jul 2019 10:45:18 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 52EE6C057EC6;
+ Mon, 15 Jul 2019 10:45:21 +0000 (UTC)
 Received: from localhost (unknown [10.40.205.59])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8603945C3;
- Mon, 15 Jul 2019 10:45:17 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C9D806012C;
+ Mon, 15 Jul 2019 10:45:20 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Date: Mon, 15 Jul 2019 12:45:06 +0200
-Message-Id: <20190715104508.7568-3-mreitz@redhat.com>
+Date: Mon, 15 Jul 2019 12:45:07 +0200
+Message-Id: <20190715104508.7568-4-mreitz@redhat.com>
 In-Reply-To: <20190715104508.7568-1-mreitz@redhat.com>
 References: <20190715104508.7568-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.43]); Mon, 15 Jul 2019 10:45:18 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.32]); Mon, 15 Jul 2019 10:45:21 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH for-4.1? 2/4] vdi: Fix .bdrv_has_zero_init()
+Subject: [Qemu-devel] [PATCH for-4.1? 3/4] vhdx: Fix .bdrv_has_zero_init()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,47 +73,56 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Static VDI images cannot guarantee to be zero-initialized.  If the image
-has been statically allocated, forward the call to the underlying
-storage node.
+Fixed VHDX images cannot guarantee to be zero-initialized.  If the image
+has the "fixed" subformat, forward the call to the underlying storage
+node.
 
 Reported-by: Stefano Garzarella <sgarzare@redhat.com>
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block/vdi.c | 13 ++++++++++++-
- 1 file changed, 12 insertions(+), 1 deletion(-)
+ block/vhdx.c | 21 ++++++++++++++++++++-
+ 1 file changed, 20 insertions(+), 1 deletion(-)
 
-diff --git a/block/vdi.c b/block/vdi.c
-index b9845a4cbd..0caa3f281d 100644
---- a/block/vdi.c
-+++ b/block/vdi.c
-@@ -988,6 +988,17 @@ static void vdi_close(BlockDriverState *bs)
-     error_free(s->migration_blocker);
+diff --git a/block/vhdx.c b/block/vhdx.c
+index d6070b6fa8..cc9c25d1c4 100644
+--- a/block/vhdx.c
++++ b/block/vhdx.c
+@@ -2075,6 +2075,25 @@ static int coroutine_fn vhdx_co_check(BlockDriverS=
+tate *bs,
+     return 0;
  }
 =20
-+static int vdi_has_zero_init(BlockDriverState *bs)
++static int vhdx_has_zero_init(BlockDriverState *bs)
 +{
-+    BDRVVdiState *s =3D bs->opaque;
++    BDRVVHDXState *s =3D bs->opaque;
++    uint32_t bat_i;
 +
-+    if (s->header.image_type =3D=3D VDI_TYPE_STATIC) {
-+        return bdrv_has_zero_init(bs->file->bs);
-+    } else {
-+        return 1;
++    /* Check the subformat (fixed or dynamic) */
++    for (bat_i =3D 0; bat_i < s->bat_entries; bat_i++) {
++        int state =3D s->bat[bat_i] & VHDX_BAT_STATE_BIT_MASK;
++
++        if (state =3D=3D PAYLOAD_BLOCK_FULLY_PRESENT) {
++            /* Fixed subformat */
++            return bdrv_has_zero_init(bs->file->bs);
++        }
 +    }
++
++    /* Dynamic subformat */
++    return 1;
 +}
 +
- static QemuOptsList vdi_create_opts =3D {
-     .name =3D "vdi-create-opts",
-     .head =3D QTAILQ_HEAD_INITIALIZER(vdi_create_opts.head),
-@@ -1028,7 +1039,7 @@ static BlockDriver bdrv_vdi =3D {
-     .bdrv_child_perm          =3D bdrv_format_default_perms,
-     .bdrv_co_create      =3D vdi_co_create,
-     .bdrv_co_create_opts =3D vdi_co_create_opts,
--    .bdrv_has_zero_init =3D bdrv_has_zero_init_1,
-+    .bdrv_has_zero_init  =3D vdi_has_zero_init,
-     .bdrv_co_block_status =3D vdi_co_block_status,
-     .bdrv_make_empty =3D vdi_make_empty,
+ static QemuOptsList vhdx_create_opts =3D {
+     .name =3D "vhdx-create-opts",
+     .head =3D QTAILQ_HEAD_INITIALIZER(vhdx_create_opts.head),
+@@ -2128,7 +2147,7 @@ static BlockDriver bdrv_vhdx =3D {
+     .bdrv_co_create_opts    =3D vhdx_co_create_opts,
+     .bdrv_get_info          =3D vhdx_get_info,
+     .bdrv_co_check          =3D vhdx_co_check,
+-    .bdrv_has_zero_init     =3D bdrv_has_zero_init_1,
++    .bdrv_has_zero_init     =3D vhdx_has_zero_init,
 =20
+     .create_opts            =3D &vhdx_create_opts,
+ };
 --=20
 2.21.0
 
