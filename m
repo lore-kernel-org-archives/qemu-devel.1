@@ -2,62 +2,75 @@ Return-Path: <SRS0=IjNW=VM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36B2BC76191
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 14:31:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62C3EC7618F
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 14:31:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0F43D205ED
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 14:31:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F43D205ED
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3F52920896
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 14:31:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F52920896
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39480 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39486 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hn20M-0002Fc-Ns
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 10:31:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34498)
+	id 1hn20g-0003R0-D3
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 10:31:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34917)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hn1yy-0005ar-Mj
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 10:29:38 -0400
+ (envelope-from <bounces@canonical.com>) id 1hn20D-00025z-HC
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 10:30:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hn1yx-000654-00
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 10:29:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40810)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hn1yt-00061b-01; Mon, 15 Jul 2019 10:29:31 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 3D2C085541;
- Mon, 15 Jul 2019 14:29:30 +0000 (UTC)
-Received: from localhost (unknown [10.40.205.59])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 88C365D9C8;
- Mon, 15 Jul 2019 14:29:29 +0000 (UTC)
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Date: Mon, 15 Jul 2019 16:29:01 +0200
-Message-Id: <20190715142905.9078-8-mreitz@redhat.com>
-In-Reply-To: <20190715142905.9078-1-mreitz@redhat.com>
-References: <20190715142905.9078-1-mreitz@redhat.com>
+ (envelope-from <bounces@canonical.com>) id 1hn20C-0006hX-31
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 10:30:53 -0400
+Received: from indium.canonical.com ([91.189.90.7]:53738)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1hn20B-0006gb-Ti
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 10:30:52 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1hn208-0006fb-Js
+ for <qemu-devel@nongnu.org>; Mon, 15 Jul 2019 14:30:48 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 9585D2E80CD
+ for <qemu-devel@nongnu.org>; Mon, 15 Jul 2019 14:30:48 +0000 (UTC)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.28]); Mon, 15 Jul 2019 14:29:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
+Date: Mon, 15 Jul 2019 14:16:57 -0000
+From: =?utf-8?q?Alex_Benn=C3=A9e?= <alex.bennee@gmail.com>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Fix Committed; importance=Undecided;
+ assignee=rth@twiddle.net; 
+X-Launchpad-Bug-Tags: arm testcase
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: ajbennee christophe-lyon
+X-Launchpad-Bug-Reporter: Christophe Lyon (christophe-lyon)
+X-Launchpad-Bug-Modifier: =?utf-8?q?Alex_Benn=C3=A9e_=28alex-bennee=29?=
+References: <156164884976.17804.15592866928864750515.malonedeb@wampee.canonical.com>
+Message-Id: <156320021855.15203.11712698181827067441.launchpad@soybean.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="19007";
+ Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: 413ecfe4337cdb0dadf9e2d061f102577356ebcf
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 07/11] iotests: Compare error messages in 030
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1834496] Re: Regressions on arm target with some
+ GCC tests
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -66,244 +79,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
+Reply-To: Bug 1834496 <1834496@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Currently, 030 just compares the error class, which does not say
-anything.
+** Changed in: qemu
+       Status: In Progress =3D> Fix Committed
 
-Before HEAD^ added throttling to test_overlapping_4, that test actually
-usually failed because node2 was already gone, not because it was the
-commit and stream job were not allowed to overlap.
+-- =
 
-Prevent such problems in the future by comparing the error description
-instead.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1834496
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-Tested-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Reviewed-by: Alberto Garcia <berto@igalia.com>
-Message-id: 20190703172813.6868-9-mreitz@redhat.com
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
- tests/qemu-iotests/030 | 66 +++++++++++++++++++++++++++---------------
- 1 file changed, 42 insertions(+), 24 deletions(-)
+Title:
+  Regressions on arm target with some GCC tests
 
-diff --git a/tests/qemu-iotests/030 b/tests/qemu-iotests/030
-index 2cf8d54dc5..10fe1de89d 100755
---- a/tests/qemu-iotests/030
-+++ b/tests/qemu-iotests/030
-@@ -144,11 +144,12 @@ class TestSingleDrive(iotests.QMPTestCase):
-=20
-     def test_device_not_found(self):
-         result =3D self.vm.qmp('block-stream', device=3D'nonexistent')
--        self.assert_qmp(result, 'error/class', 'GenericError')
-+        self.assert_qmp(result, 'error/desc',
-+            'Cannot find device=3Dnonexistent nor node_name=3Dnonexisten=
-t')
-=20
-     def test_job_id_missing(self):
-         result =3D self.vm.qmp('block-stream', device=3D'mid')
--        self.assert_qmp(result, 'error/class', 'GenericError')
-+        self.assert_qmp(result, 'error/desc', "Invalid job ID ''")
-=20
-=20
- class TestParallelOps(iotests.QMPTestCase):
-@@ -245,24 +246,30 @@ class TestParallelOps(iotests.QMPTestCase):
-         self.assert_qmp(result, 'return', {})
-=20
-         result =3D self.vm.qmp('block-stream', device=3D'node5', job_id=3D=
-'stream-node5', base=3Dself.imgs[2])
--        self.assert_qmp(result, 'error/class', 'GenericError')
-+        self.assert_qmp(result, 'error/desc',
-+            "Node 'node4' is busy: block device is in use by block job: =
-stream")
-=20
-         result =3D self.vm.qmp('block-stream', device=3D'node3', job_id=3D=
-'stream-node3', base=3Dself.imgs[2])
--        self.assert_qmp(result, 'error/class', 'GenericError')
-+        self.assert_qmp(result, 'error/desc',
-+            "Node 'node3' is busy: block device is in use by block job: =
-stream")
-=20
-         result =3D self.vm.qmp('block-stream', device=3D'node4', job_id=3D=
-'stream-node4-v2')
--        self.assert_qmp(result, 'error/class', 'GenericError')
-+        self.assert_qmp(result, 'error/desc',
-+            "Node 'node4' is busy: block device is in use by block job: =
-stream")
-=20
-         # block-commit should also fail if it touches nodes used by the =
-stream job
-         result =3D self.vm.qmp('block-commit', device=3D'drive0', base=3D=
-self.imgs[4], job_id=3D'commit-node4')
--        self.assert_qmp(result, 'error/class', 'GenericError')
-+        self.assert_qmp(result, 'error/desc',
-+            "Node 'node4' is busy: block device is in use by block job: =
-stream")
-=20
-         result =3D self.vm.qmp('block-commit', device=3D'drive0', base=3D=
-self.imgs[1], top=3Dself.imgs[3], job_id=3D'commit-node1')
--        self.assert_qmp(result, 'error/class', 'GenericError')
-+        self.assert_qmp(result, 'error/desc',
-+            "Node 'node3' is busy: block device is in use by block job: =
-stream")
-=20
-         # This fails because it needs to modify the backing string in no=
-de2, which is blocked
-         result =3D self.vm.qmp('block-commit', device=3D'drive0', base=3D=
-self.imgs[0], top=3Dself.imgs[1], job_id=3D'commit-node0')
--        self.assert_qmp(result, 'error/class', 'GenericError')
-+        self.assert_qmp(result, 'error/desc',
-+            "Node 'node2' is busy: block device is in use by block job: =
-stream")
-=20
-         result =3D self.vm.qmp('block-job-set-speed', device=3D'stream-n=
-ode4', speed=3D0)
-         self.assert_qmp(result, 'return', {})
-@@ -281,20 +288,25 @@ class TestParallelOps(iotests.QMPTestCase):
-         self.assert_qmp(result, 'return', {})
-=20
-         result =3D self.vm.qmp('block-stream', device=3D'node3', job_id=3D=
-'stream-node3')
--        self.assert_qmp(result, 'error/class', 'GenericError')
-+        self.assert_qmp(result, 'error/desc',
-+            "Node 'node3' is busy: block device is in use by block job: =
-commit")
-=20
-         result =3D self.vm.qmp('block-stream', device=3D'node6', base=3D=
-self.imgs[2], job_id=3D'stream-node6')
--        self.assert_qmp(result, 'error/class', 'GenericError')
-+        self.assert_qmp(result, 'error/desc',
-+            "Node 'node5' is busy: block device is in use by block job: =
-commit")
-=20
-         result =3D self.vm.qmp('block-stream', device=3D'node4', base=3D=
-self.imgs[2], job_id=3D'stream-node4')
--        self.assert_qmp(result, 'error/class', 'GenericError')
-+        self.assert_qmp(result, 'error/desc',
-+            "Node 'node4' is busy: block device is in use by block job: =
-commit")
-=20
-         result =3D self.vm.qmp('block-stream', device=3D'node6', base=3D=
-self.imgs[4], job_id=3D'stream-node6-v2')
--        self.assert_qmp(result, 'error/class', 'GenericError')
-+        self.assert_qmp(result, 'error/desc',
-+            "Node 'node5' is busy: block device is in use by block job: =
-commit")
-=20
-         # This fails because block-commit currently blocks the active la=
-yer even if it's not used
-         result =3D self.vm.qmp('block-stream', device=3D'drive0', base=3D=
-self.imgs[5], job_id=3D'stream-drive0')
--        self.assert_qmp(result, 'error/class', 'GenericError')
-+        self.assert_qmp(result, 'error/desc',
-+            "Node 'drive0' is busy: block device is in use by block job:=
- commit")
-=20
-         result =3D self.vm.qmp('block-job-set-speed', device=3D'commit-n=
-ode3', speed=3D0)
-         self.assert_qmp(result, 'return', {})
-@@ -312,7 +324,8 @@ class TestParallelOps(iotests.QMPTestCase):
-         self.assert_qmp(result, 'return', {})
-=20
-         result =3D self.vm.qmp('block-stream', device=3D'node5', base=3D=
-self.imgs[3], job_id=3D'stream-node6')
--        self.assert_qmp(result, 'error/class', 'GenericError')
-+        self.assert_qmp(result, 'error/desc',
-+            "Node 'node5' is busy: block device is in use by block job: =
-commit")
-=20
-         event =3D self.vm.event_wait(name=3D'BLOCK_JOB_READY')
-         self.assert_qmp(event, 'data/device', 'commit-drive0')
-@@ -328,20 +341,21 @@ class TestParallelOps(iotests.QMPTestCase):
-         self.wait_until_completed(drive=3D'commit-drive0')
-=20
-     # In this case the base node of the stream job is the same as the
--    # top node of commit job. Since block-commit removes the top node
--    # when it finishes, this is not allowed.
-+    # top node of commit job. Since this results in the commit filter
-+    # node being part of the stream chain, this is not allowed.
-     def test_overlapping_4(self):
-         self.assert_no_active_block_jobs()
-=20
-         # Commit from node2 into node0
-         result =3D self.vm.qmp('block-commit', device=3D'drive0',
-                              top=3Dself.imgs[2], base=3Dself.imgs[0],
--                             speed=3D1024*1024)
-+                             filter_node_name=3D'commit-filter', speed=3D=
-1024*1024)
-         self.assert_qmp(result, 'return', {})
-=20
-         # Stream from node2 into node4
-         result =3D self.vm.qmp('block-stream', device=3D'node4', base_no=
-de=3D'node2', job_id=3D'node4')
--        self.assert_qmp(result, 'error/class', 'GenericError')
-+        self.assert_qmp(result, 'error/desc',
-+            "Cannot freeze 'backing' link to 'commit-filter'")
-=20
-         result =3D self.vm.qmp('block-job-set-speed', device=3D'drive0',=
- speed=3D0)
-         self.assert_qmp(result, 'return', {})
-@@ -428,19 +442,23 @@ class TestParallelOps(iotests.QMPTestCase):
-=20
-         # Error: the base node does not exist
-         result =3D self.vm.qmp('block-stream', device=3D'node4', base_no=
-de=3D'none', job_id=3D'stream')
--        self.assert_qmp(result, 'error/class', 'GenericError')
-+        self.assert_qmp(result, 'error/desc',
-+            'Cannot find device=3D nor node_name=3Dnone')
-=20
-         # Error: the base node is not a backing file of the top node
-         result =3D self.vm.qmp('block-stream', device=3D'node4', base_no=
-de=3D'node6', job_id=3D'stream')
--        self.assert_qmp(result, 'error/class', 'GenericError')
-+        self.assert_qmp(result, 'error/desc',
-+            "Node 'node6' is not a backing image of 'node4'")
-=20
-         # Error: the base node is the same as the top node
-         result =3D self.vm.qmp('block-stream', device=3D'node4', base_no=
-de=3D'node4', job_id=3D'stream')
--        self.assert_qmp(result, 'error/class', 'GenericError')
-+        self.assert_qmp(result, 'error/desc',
-+            "Node 'node4' is not a backing image of 'node4'")
-=20
-         # Error: cannot specify 'base' and 'base-node' at the same time
-         result =3D self.vm.qmp('block-stream', device=3D'node4', base=3D=
-self.imgs[2], base_node=3D'node2', job_id=3D'stream')
--        self.assert_qmp(result, 'error/class', 'GenericError')
-+        self.assert_qmp(result, 'error/desc',
-+            "'base' and 'base-node' cannot be specified at the same time=
-")
-=20
-         # Success: the base node is a backing file of the top node
-         result =3D self.vm.qmp('block-stream', device=3D'node4', base_no=
-de=3D'node2', job_id=3D'stream')
-@@ -873,7 +891,7 @@ class TestSetSpeed(iotests.QMPTestCase):
-         self.assert_no_active_block_jobs()
-=20
-         result =3D self.vm.qmp('block-stream', device=3D'drive0', speed=3D=
--1)
--        self.assert_qmp(result, 'error/class', 'GenericError')
-+        self.assert_qmp(result, 'error/desc', "Invalid parameter 'speed'=
-")
-=20
-         self.assert_no_active_block_jobs()
-=20
-@@ -882,7 +900,7 @@ class TestSetSpeed(iotests.QMPTestCase):
-         self.assert_qmp(result, 'return', {})
-=20
-         result =3D self.vm.qmp('block-job-set-speed', device=3D'drive0',=
- speed=3D-1)
--        self.assert_qmp(result, 'error/class', 'GenericError')
-+        self.assert_qmp(result, 'error/desc', "Invalid parameter 'speed'=
-")
-=20
-         self.cancel_and_wait(resume=3DTrue)
-=20
---=20
-2.21.0
+Status in QEMU:
+  Fix Committed
 
+Bug description:
+  Hi,
+
+  After trying qemu master:
+  commit 474f3938d79ab36b9231c9ad3b5a9314c2aeacde
+  Merge: 68d7ff0 14f5d87
+  Author: Peter Maydell <peter.maydell@linaro.org>
+  Date:   Fri Jun 21 15:40:50 2019 +0100
+
+  I found several regressions compared to qemu-3.1 when running the GCC tes=
+tsuite.
+  I'm attaching a tarball containing several GCC tests (binaries), needed s=
+hared libs, and a short script to run all the tests.
+
+  All tests used to pass w/o error (one of them is verbose), but with a
+  recent qemu, all of them make qemu crash:
+
+  qemu: uncaught target signal 6 (Aborted) - core dumped
+
+  This was noticed with GCC master configured with
+  --target arm-none-linux-gnueabi
+  --with-mode arm
+  --with-cpu cortex-a9
+
+  and calling qemu with --cpu cortex-a9 (the script uses "any", this
+  makes no difference).
+
+  I have noticed other failures with arm-v8 code, but this is probably
+  the same root cause. Since it's a bit tedious to manually rebuild &
+  extract the testcases, I'd prefer to start with this subset, and I can
+  extract more if needed later.
+
+  Thanks
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1834496/+subscriptions
 
