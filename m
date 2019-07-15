@@ -2,112 +2,91 @@ Return-Path: <SRS0=IjNW=VM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31AF3C7618F
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 11:06:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA994C7618F
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 11:08:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0871C206B8
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 11:06:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0871C206B8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8817620665
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 11:08:31 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jHATq9eI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8817620665
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37120 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37136 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hmyoX-0006Fj-6O
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 07:06:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45304)
+	id 1hmyqM-0007Ui-QB
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 07:08:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45635)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <thuth@redhat.com>) id 1hmyoK-0005rP-MN
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 07:06:25 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hmyq9-00070W-QD
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 07:08:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1hmyoJ-00046X-Lc
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 07:06:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45406)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hmyoJ-00045x-Dk
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 07:06:23 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 873C030821A3;
- Mon, 15 Jul 2019 11:06:22 +0000 (UTC)
-Received: from thuth.remote.csb (reserved-198-198.str.redhat.com
- [10.33.198.198])
- by smtp.corp.redhat.com (Postfix) with ESMTP id ACAD26012C;
- Mon, 15 Jul 2019 11:06:21 +0000 (UTC)
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org
-References: <20190530101603.22254-1-alex.bennee@linaro.org>
- <20190530101603.22254-4-alex.bennee@linaro.org>
- <87imthsps2.fsf@zen.linaroharston>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; keydata=
- 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
-Organization: Red Hat
-Message-ID: <f73a55a4-57c7-3234-a85b-21cf3c758ea2@redhat.com>
-Date: Mon, 15 Jul 2019 13:06:20 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+ (envelope-from <alex.bennee@linaro.org>) id 1hmyq7-0006MZ-HI
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 07:08:17 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:40583)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1hmyq7-0006IH-73
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 07:08:15 -0400
+Received: by mail-wr1-x441.google.com with SMTP id r1so16593453wrl.7
+ for <qemu-devel@nongnu.org>; Mon, 15 Jul 2019 04:08:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=5pk3JRfO7hC2NdVIrw5XnpJc9vUbT01sn/ySJoxHsV4=;
+ b=jHATq9eIy8eQAj20MBvG8SkU9VYwwfOd7go0rAhZ2LkoT4s6czK0IuPjUNRkKuXARx
+ 7Fwis9LiMrJlX0hQu5CfryXYTO8/HDVZJN8O7+OjZA33QCNcLSYE7u+/yDelDDBlg/Wj
+ HMJvUr7GI46zBAr9fn+QBoJKDZs1CZdMKVvGw0TkGfXhbN88zW/NAwRW8k0ZANOxQYrB
+ KJG24Iu/3hFLfr2yv9HTWolMwujgDMYGFnvWW6mRWurH0+oCXeDdBLi7+tWQMSYypSoI
+ kTmAxhb7FDdzFHvhf/Q32DYu+Ft+P04P5QK2nWksvi/mCWoGdiKBYZFrdY1nkp5ERRiv
+ eagg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=5pk3JRfO7hC2NdVIrw5XnpJc9vUbT01sn/ySJoxHsV4=;
+ b=dntCmZNWpkahqvVekk9vDWQejrzEdP0mg6TEBGV21O497aaAL1be/Af/bKOEi0Vjjy
+ F6x2UqjnQoe7eEfX0eNxUsbu9cNlCKrC1HJnGSkXotDxYfHKqLBg8A4aBvx/XLcO5r5F
+ zWUjOpJbUqKlts0L/0P9wvEb6OSgrrQgkqsDc+z67e2aGDtGG1afLi5Epo9PVxSiSSNT
+ 8GaZZbym6e5BId9z2aipb0kyjScmUjk0sQvLwy5BAv+0vLnY5tiR+pOng0WBqUdFy0o2
+ cicmLkTak1aHw7aehW5wU73ziri5sNNxV6G2aj0ybLcISGXN9+IuILGzzy1oTAPNtFFH
+ Tyxg==
+X-Gm-Message-State: APjAAAVhsf4ElhurKWJuTaEHcpM6llZCO99b6tqr4BLu0a8Ga4r+jW0V
+ 52I4+S2jGTKSaeiD8kOrhFsJZw==
+X-Google-Smtp-Source: APXvYqw9mq+jN36XHGCc3yIBFQmBvJTxGsZLoAZVNOf5TFJnEj3IU87NXsEKjgdzRye+06f605PJPw==
+X-Received: by 2002:adf:e941:: with SMTP id m1mr19284072wrn.279.1563188892187; 
+ Mon, 15 Jul 2019 04:08:12 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+ by smtp.gmail.com with ESMTPSA id o7sm14162617wmc.36.2019.07.15.04.08.11
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Mon, 15 Jul 2019 04:08:11 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 3C9681FF87;
+ Mon, 15 Jul 2019 12:08:11 +0100 (BST)
+References: <20190712111849.9006-1-alex.bennee@linaro.org>
+ <20190712111849.9006-2-alex.bennee@linaro.org>
+ <189b17fc-fdba-5ccc-d018-6fbd27c6babd@redhat.com>
+User-agent: mu4e 1.3.3; emacs 26.1
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+In-reply-to: <189b17fc-fdba-5ccc-d018-6fbd27c6babd@redhat.com>
+Date: Mon, 15 Jul 2019 12:08:11 +0100
+Message-ID: <87o91vv9lw.fsf@zen.linaroharston>
 MIME-Version: 1.0
-In-Reply-To: <87imthsps2.fsf@zen.linaroharston>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Mon, 15 Jul 2019 11:06:22 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v1 03/26] tests: Run the iotests during
- "make check" again
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::441
+Subject: Re: [Qemu-devel] [PATCH v1 1/7] tests/docker: add test-misc for
+ building tools & docs
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -119,41 +98,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Fam Zheng <fam@euphon.net>,
+ =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
+ qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 07/06/2019 11.33, Alex Benn=C3=A9e wrote:
->=20
-> Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
->=20
->> From: Thomas Huth <thuth@redhat.com>
->>
->> People often forget to run the iotests before submitting patches or
->> pull requests - this is likely due to the fact that we do not run the
->> tests during our mandatory "make check" tests yet. Now that we've got
->> a proper "auto" group of iotests that should be fine to run in every
->> environment, we can enable the iotests during "make check" again by
->> running the "auto" tests by default from the check-block.sh script.
->>
->> Some cases still need to be checked first, though: iotests need bash
->> and GNU sed (otherwise they fail), and if gprof is enabled, it spoils
->> the output of some test cases causing them to fail. So if we detect
->> that one of the required programs is missing or that gprof is enabled,
->> we still have to skip the iotests to avoid failures.
->=20
-> Thomas,
->=20
-> I've dropped this from the latest PR because I'm still seeing problems
-> in some places. One of the issues is tests failing when the underlying
-> file system doesn't support O_DIRECT. Some tests seem to have explicit
-> feature checks for this but others just fail.
 
-Ok, back at the keyboard, I'm now working on a patch that removes more
-tests from the "auto" group. Do you happen to have a list of the tests
-that were failing for you?
-Or can you tell me which file systems do not support O_DIRECT, so I can
-check it on my own?
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
 
- Thomas
+> On 7/12/19 1:18 PM, Alex Benn=C3=A9e wrote:
+>> Add yet another test type so we cna quickly exercise the miscellaneous
+>
+> "cna" -> "can"
+>
+>> build products of the build system under various docer configurations.
+>>
+>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>> ---
+>>  tests/docker/test-misc | 22 ++++++++++++++++++++++
+>>  1 file changed, 22 insertions(+)
+>>  create mode 100755 tests/docker/test-misc
+>>
+>> diff --git a/tests/docker/test-misc b/tests/docker/test-misc
+>> new file mode 100755
+>> index 00000000000..d480afedca7
+>> --- /dev/null
+>> +++ b/tests/docker/test-misc
+>> @@ -0,0 +1,22 @@
+>> +#!/bin/bash -e
+>> +#
+>> +# Build the miscellaneous components
+>> +#
+>> +# Copyright (c) 2019 Linaro Ltd.
+>> +#
+>> +# Authors:
+>> +#  Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>> +#
+>> +# This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
+>> +# See the COPYING file in the top-level directory.
+>> +#
+>> +# SPDX-License-Identifier: GPL-2.0-or-later
+>> +
+>> +. common.rc
+>> +
+>> +cd "$BUILD_DIR"
+>> +
+>> +# build everything else but QEMU
+>> +configure_qemu --disable-user --disable-system --enable-docs --enable-t=
+ools
+>> +build_qemu
+>> +install_qemu
+>>
+>
+> I got:
+>
+> $ make docker-test-misc@debian-win32-cross
+>   BUILD   debian9
+>   GEN
+> /home/phil/source/qemu/docker-src.2019-07-13-17.03.48.3829/qemu.tar
+>   BUILD   debian9-mxe
+> usage: git archive [<options>] <tree-ish> [<path>...]
+>    or: git archive --list
+>    or: git archive --remote <repo> [--exec <cmd>] [<options>] <tree-ish>
+> [<path>...]
+>    or: git archive --remote <repo> [--exec <cmd>] --list
+>
+>     --format <fmt>        archive format
+>     --prefix <prefix>     prepend prefix to each pathname in the archive
+>     -o, --output <file>   write the archive to this file
+>     --worktree-attributes
+>                           read .gitattributes in working directory
+>     -v, --verbose         report archived files on stderr
+>     -0                    store only
+>     -1                    compress faster
+>     -9                    compress better
+>
+>     -l, --list            list supported archive formats
+>
+>     --remote <repo>       retrieve the archive from remote repository <re=
+po>
+>     --exec <command>      path to the remote git-upload-archive command
+>
+> failed to archive qemu
+> make[1]: *** [tests/docker/Makefile.include:31:
+> qemu/docker-src.2019-07-13-17.03.48.3829] Error 1
+
+Hmm I haven't been able to get this... does it depend on having
+uncommited changes in a subproject?
+
+>
+> And remembered some script/archive patch on the list:
+> https://lists.gnu.org/archive/html/qemu-devel/2019-07/msg02073.html
+
+I'll look at snarfing that.
+
+>
+> With it amended this works correctly, so:
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+
+
+--
+Alex Benn=C3=A9e
 
