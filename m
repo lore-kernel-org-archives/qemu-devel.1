@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 399A9C7618A
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 06:44:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F7FBC7618A
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 06:45:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 093FA20C01
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 06:44:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 093FA20C01
+	by mail.kernel.org (Postfix) with ESMTPS id 169FC20868
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 06:45:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 169FC20868
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35532 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35544 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hmujA-0001tF-PC
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 02:44:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46897)
+	id 1hmujV-0002jQ-5A
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 02:45:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46970)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <david@redhat.com>) id 1hmuj0-0001SS-PN
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 02:44:39 -0400
+ (envelope-from <david@redhat.com>) id 1hmujK-0002KS-L6
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 02:44:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1hmuiz-0006aH-UX
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 02:44:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40268)
+ (envelope-from <david@redhat.com>) id 1hmujJ-0006sk-OU
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 02:44:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39634)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1hmuiz-0006Zo-Mf
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 02:44:37 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1hmujJ-0006sG-Gl
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 02:44:57 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 2F8E93082A6C;
- Mon, 15 Jul 2019 06:44:36 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id D977D3082E57;
+ Mon, 15 Jul 2019 06:44:56 +0000 (UTC)
 Received: from [10.36.116.248] (ovpn-116-248.ams2.redhat.com [10.36.116.248])
- by smtp.corp.redhat.com (Postfix) with ESMTP id BEE045D9D2;
- Mon, 15 Jul 2019 06:44:31 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5A7DC5D772;
+ Mon, 15 Jul 2019 06:44:53 +0000 (UTC)
 To: Pankaj Gupta <pagupta@redhat.com>, mst@redhat.com
 References: <20190712073554.21918-1-pagupta@redhat.com>
- <20190712073554.21918-2-pagupta@redhat.com>
+ <20190712073554.21918-4-pagupta@redhat.com>
 From: David Hildenbrand <david@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
@@ -90,22 +90,22 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  +8Umfre0Xt4713VxMygW0PnQt5aSQdMD58jHFxTk092mU+yIHj5LeYgvwSgZN4airXk5yRXl
  SE+xAvmumFBY
 Organization: Red Hat GmbH
-Message-ID: <bff8da22-a55e-ba7b-16b7-7d1fac3f355e@redhat.com>
-Date: Mon, 15 Jul 2019 08:44:30 +0200
+Message-ID: <37ab5984-4989-8003-0624-c86f9ada5ee8@redhat.com>
+Date: Mon, 15 Jul 2019 08:44:52 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <20190712073554.21918-2-pagupta@redhat.com>
+In-Reply-To: <20190712073554.21918-4-pagupta@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Mon, 15 Jul 2019 06:44:36 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.46]); Mon, 15 Jul 2019 06:44:56 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 1/3] virtio pmem: fix wrong mem region
- condition
+Subject: Re: [Qemu-devel] [PATCH 3/3] virtio pmem: remove transational
+ device info
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -123,31 +123,32 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 12.07.19 09:35, Pankaj Gupta wrote:
-> Coverity reported memory region returns zero
-> for non-null value. This is because of wrong
-> arguments to '?:' , fixing this.
+> Remove transactional & non transactional device info
+> for virtio pmem. 
+
+Can you explain and add *why* ?
+
 > 
 > Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
 > ---
->  hw/virtio/virtio-pmem-pci.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  hw/virtio/virtio-pmem-pci.c | 2 --
+>  1 file changed, 2 deletions(-)
 > 
 > diff --git a/hw/virtio/virtio-pmem-pci.c b/hw/virtio/virtio-pmem-pci.c
-> index 8b2d0dbccc..0da6627469 100644
+> index 0da6627469..fe2af00fa1 100644
 > --- a/hw/virtio/virtio-pmem-pci.c
 > +++ b/hw/virtio/virtio-pmem-pci.c
-> @@ -57,7 +57,7 @@ static uint64_t virtio_pmem_pci_get_plugged_size(const MemoryDeviceState *md,
->      MemoryRegion *mr = vpc->get_memory_region(pmem, errp);
->  
->      /* the plugged size corresponds to the region size */
-> -    return mr ? 0 : memory_region_size(mr);
-> +    return mr ? memory_region_size(mr) : 0;
->  }
->  
->  static void virtio_pmem_pci_fill_device_info(const MemoryDeviceState *md,
+> @@ -113,8 +113,6 @@ static void virtio_pmem_pci_instance_init(Object *obj)
+>  static const VirtioPCIDeviceTypeInfo virtio_pmem_pci_info = {
+>      .base_name             = TYPE_VIRTIO_PMEM_PCI,
+>      .generic_name          = "virtio-pmem-pci",
+> -    .transitional_name     = "virtio-pmem-pci-transitional",
+> -    .non_transitional_name = "virtio-pmem-pci-non-transitional",
+>      .instance_size = sizeof(VirtIOPMEMPCI),
+>      .instance_init = virtio_pmem_pci_instance_init,
+>      .class_init    = virtio_pmem_pci_class_init,
 > 
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
 
 -- 
 
