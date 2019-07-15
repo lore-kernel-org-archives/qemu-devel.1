@@ -6,57 +6,57 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E61FDC7618F
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 19:13:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D39D1C7618F
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 19:13:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C00F22064B
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 19:13:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C00F22064B
+	by mail.kernel.org (Postfix) with ESMTPS id AF52C20665
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 19:13:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF52C20665
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42090 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42104 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hn6Pb-0006Mf-N1
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 15:13:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40209)
+	id 1hn6Q0-00086Y-DU
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 15:13:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40254)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <marcandre.lureau@redhat.com>) id 1hn6PB-0004ii-Om
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 15:12:58 -0400
+ (envelope-from <marcandre.lureau@redhat.com>) id 1hn6PP-0005ix-HD
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 15:13:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@redhat.com>) id 1hn6P9-0003nz-N4
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 15:12:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38768)
+ (envelope-from <marcandre.lureau@redhat.com>) id 1hn6PL-0003va-Jg
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 15:13:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56530)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
- id 1hn6P9-0003n7-H0
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 15:12:55 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ id 1hn6PJ-0003tv-Kc
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 15:13:07 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id D49E8308A958;
- Mon, 15 Jul 2019 19:12:52 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id BF94628DE;
+ Mon, 15 Jul 2019 19:13:03 +0000 (UTC)
 Received: from localhost (ovpn-112-18.ams2.redhat.com [10.36.112.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 49129600C4;
- Mon, 15 Jul 2019 19:12:46 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6AD755D784;
+ Mon, 15 Jul 2019 19:12:57 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Mon, 15 Jul 2019 23:09:56 +0400
-Message-Id: <20190715191001.1188-16-marcandre.lureau@redhat.com>
+Date: Mon, 15 Jul 2019 23:09:57 +0400
+Message-Id: <20190715191001.1188-17-marcandre.lureau@redhat.com>
 In-Reply-To: <20190715191001.1188-1-marcandre.lureau@redhat.com>
 References: <20190715191001.1188-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.41]); Mon, 15 Jul 2019 19:12:52 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.38]); Mon, 15 Jul 2019 19:13:03 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v5 15/20] monitor: add qmp_return_get_monitor()
+Subject: [Qemu-devel] [PATCH v5 16/20] console: add graphic_hw_update_done()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,55 +77,119 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If necessary, add an helper that can be used to retrieve the
-associated monitor. This is useful for asynchronous commands that may
-have to update cur_mon for various reasons.
+Add a function to be called when a graphic update is done.
+
+Declare the QXL renderer as async: render_update_cookie_num counts the
+number of outstanding updates, and graphic_hw_update_done() is called
+when it reaches none.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- include/monitor/monitor.h |  3 +++
- monitor/qmp.c             | 11 +++++++++++
- 2 files changed, 14 insertions(+)
+ hw/display/qxl-render.c | 9 +++++++--
+ hw/display/qxl.c        | 1 +
+ include/ui/console.h    | 2 ++
+ ui/console.c            | 9 +++++++++
+ 4 files changed, 19 insertions(+), 2 deletions(-)
 
-diff --git a/include/monitor/monitor.h b/include/monitor/monitor.h
-index a81eeff5f8..6a2907a366 100644
---- a/include/monitor/monitor.h
-+++ b/include/monitor/monitor.h
-@@ -4,6 +4,7 @@
- #include "block/block.h"
- #include "qapi/qapi-types-misc.h"
- #include "qemu/readline.h"
-+#include "qapi/qmp/dispatch.h"
+diff --git a/hw/display/qxl-render.c b/hw/display/qxl-render.c
+index 14ad2b352d..102fa0b7e9 100644
+--- a/hw/display/qxl-render.c
++++ b/hw/display/qxl-render.c
+@@ -108,7 +108,7 @@ static void qxl_render_update_area_unlocked(PCIQXLDev=
+ice *qxl)
+                                                 qxl->guest_primary.surfa=
+ce.mem,
+                                                 MEMSLOT_GROUP_GUEST);
+         if (!qxl->guest_primary.data) {
+-            return;
++            goto end;
+         }
+         qxl_set_rect_to_surface(qxl, &qxl->dirty[0]);
+         qxl->num_dirty_rects =3D 1;
+@@ -136,7 +136,7 @@ static void qxl_render_update_area_unlocked(PCIQXLDev=
+ice *qxl)
+     }
 =20
- extern __thread Monitor *cur_mon;
- typedef struct MonitorHMP MonitorHMP;
-@@ -43,4 +44,6 @@ int monitor_fdset_dup_fd_add(int64_t fdset_id, int dup_=
-fd);
- void monitor_fdset_dup_fd_remove(int dup_fd);
- int64_t monitor_fdset_dup_fd_find(int dup_fd);
-=20
-+Monitor *qmp_return_get_monitor(QmpReturn *qret);
+     if (!qxl->guest_primary.data) {
+-        return;
++        goto end;
+     }
+     for (i =3D 0; i < qxl->num_dirty_rects; i++) {
+         if (qemu_spice_rect_is_empty(qxl->dirty+i)) {
+@@ -157,6 +157,11 @@ static void qxl_render_update_area_unlocked(PCIQXLDe=
+vice *qxl)
+                        qxl->dirty[i].bottom - qxl->dirty[i].top);
+     }
+     qxl->num_dirty_rects =3D 0;
 +
- #endif /* MONITOR_H */
-diff --git a/monitor/qmp.c b/monitor/qmp.c
-index 056ad7b68b..df8b9d8d4f 100644
---- a/monitor/qmp.c
-+++ b/monitor/qmp.c
-@@ -390,3 +390,14 @@ void monitor_init_qmp(Chardev *chr, bool pretty)
-         monitor_list_append(&mon->common);
++end:
++    if (qxl->render_update_cookie_num =3D=3D 0) {
++        graphic_hw_update_done(qxl->ssd.dcl.con);
++    }
+ }
+=20
+ /*
+diff --git a/hw/display/qxl.c b/hw/display/qxl.c
+index 98c7410032..188399acd1 100644
+--- a/hw/display/qxl.c
++++ b/hw/display/qxl.c
+@@ -1178,6 +1178,7 @@ static const QXLInterface qxl_interface =3D {
+=20
+ static const GraphicHwOps qxl_ops =3D {
+     .gfx_update  =3D qxl_hw_update,
++    .gfx_update_async =3D true,
+ };
+=20
+ static void qxl_enter_vga_mode(PCIQXLDevice *d)
+diff --git a/include/ui/console.h b/include/ui/console.h
+index f981696848..281f9c145b 100644
+--- a/include/ui/console.h
++++ b/include/ui/console.h
+@@ -365,6 +365,7 @@ static inline void console_write_ch(console_ch_t *des=
+t, uint32_t ch)
+ typedef struct GraphicHwOps {
+     void (*invalidate)(void *opaque);
+     void (*gfx_update)(void *opaque);
++    bool gfx_update_async; /* if true, calls graphic_hw_update_done() */
+     void (*text_update)(void *opaque, console_ch_t *text);
+     void (*update_interval)(void *opaque, uint64_t interval);
+     int (*ui_info)(void *opaque, uint32_t head, QemuUIInfo *info);
+@@ -380,6 +381,7 @@ void graphic_console_set_hwops(QemuConsole *con,
+ void graphic_console_close(QemuConsole *con);
+=20
+ void graphic_hw_update(QemuConsole *con);
++void graphic_hw_update_done(QemuConsole *con);
+ void graphic_hw_invalidate(QemuConsole *con);
+ void graphic_hw_text_update(QemuConsole *con, console_ch_t *chardata);
+ void graphic_hw_gl_block(QemuConsole *con, bool block);
+diff --git a/ui/console.c b/ui/console.c
+index 82d1ddac9c..3c941528d2 100644
+--- a/ui/console.c
++++ b/ui/console.c
+@@ -259,13 +259,22 @@ static void gui_setup_refresh(DisplayState *ds)
+     ds->have_text =3D have_text;
+ }
+=20
++void graphic_hw_update_done(QemuConsole *con)
++{
++}
++
+ void graphic_hw_update(QemuConsole *con)
+ {
++    bool async =3D false;
+     if (!con) {
+         con =3D active_console;
+     }
+     if (con && con->hw_ops->gfx_update) {
+         con->hw_ops->gfx_update(con->hw);
++        async =3D con->hw_ops->gfx_update_async;
++    }
++    if (!async) {
++        graphic_hw_update_done(con);
      }
  }
-+
-+Monitor *qmp_return_get_monitor(QmpReturn *qret)
-+{
-+    MonitorQMP *mon;
-+
-+    if (!qret->session) {
-+        return NULL;
-+    }
-+    mon =3D container_of(qret->session, MonitorQMP, session);
-+    return &mon->common;
-+}
+=20
 --=20
 2.22.0.428.g6d5b264208
 
