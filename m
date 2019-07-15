@@ -2,98 +2,54 @@ Return-Path: <SRS0=IjNW=VM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DA5FC7618F
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 14:24:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB992C76191
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 14:24:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3A21620896
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 14:24:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A21620896
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9407821842
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 14:24:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9407821842
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39288 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39309 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hn1tc-0007uM-Go
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 10:24:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60976)
+	id 1hn1u7-0001F0-6H
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 10:24:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32832)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <borntraeger@de.ibm.com>) id 1hn1tK-0006oe-SJ
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 10:23:47 -0400
+ (envelope-from <stefan.brankovic@rt-rk.com>) id 1hn1tg-0008KA-Bs
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 10:24:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <borntraeger@de.ibm.com>) id 1hn1tJ-00029d-Ui
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 10:23:46 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:2982
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
- id 1hn1tJ-0001oh-QI
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 10:23:45 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x6FEMgak063866
- for <qemu-devel@nongnu.org>; Mon, 15 Jul 2019 10:23:11 -0400
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2trru7gtd2-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Mon, 15 Jul 2019 10:23:11 -0400
-Received: from localhost
- by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
- Mon, 15 Jul 2019 15:23:09 +0100
-Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
- by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Mon, 15 Jul 2019 15:23:07 +0100
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com
- (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
- by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
- id x6FEN55934275604
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 15 Jul 2019 14:23:05 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id CCD04A4054;
- Mon, 15 Jul 2019 14:23:05 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id C4BFBA405F;
- Mon, 15 Jul 2019 14:23:05 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
- by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
- Mon, 15 Jul 2019 14:23:05 +0000 (GMT)
-Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 25651)
- id 89945E02FA; Mon, 15 Jul 2019 16:23:05 +0200 (CEST)
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-To: Cornelia Huck <cohuck@redhat.com>
-Date: Mon, 15 Jul 2019 16:23:02 +0200
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190715142304.215018-1-borntraeger@de.ibm.com>
-References: <20190715142304.215018-1-borntraeger@de.ibm.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 19071514-0028-0000-0000-000003846ABE
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19071514-0029-0000-0000-000024448899
-Message-Id: <20190715142304.215018-2-borntraeger@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
- definitions=2019-07-15_04:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=722 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1907150172
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
-Subject: [Qemu-devel] [PATCH 1/3] s390x/cpumodel: remove esort from the
- default model
+ (envelope-from <stefan.brankovic@rt-rk.com>) id 1hn1tf-0002XL-AX
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 10:24:08 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:34274 helo=mail.rt-rk.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <stefan.brankovic@rt-rk.com>)
+ id 1hn1tf-0001jG-3u
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 10:24:07 -0400
+Received: from localhost (localhost [127.0.0.1])
+ by mail.rt-rk.com (Postfix) with ESMTP id 00AE11A2095;
+ Mon, 15 Jul 2019 16:23:02 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at rt-rk.com
+Received: from rtrkw870-lin.domain.local (rtrkw870-lin.domain.local
+ [10.10.13.132])
+ by mail.rt-rk.com (Postfix) with ESMTPSA id C2BFC1A2072;
+ Mon, 15 Jul 2019 16:23:01 +0200 (CEST)
+From: Stefan Brankovic <stefan.brankovic@rt-rk.com>
+To: qemu-devel@nongnu.org
+Date: Mon, 15 Jul 2019 16:22:46 +0200
+Message-Id: <1563200574-11098-1-git-send-email-stefan.brankovic@rt-rk.com>
+X-Mailer: git-send-email 2.7.4
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 89.216.37.149
+Subject: [Qemu-devel] [PATCH v5 0/8] target/ppc: Optimize emulation of some
+ Altivec instructions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,35 +61,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: David Hildenbrand <david@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- qemu-s390x <qemu-s390x@nongnu.org>, Richard Henderson <rth@twiddle.net>
+Cc: stefan.brankovic@rt-rk.com, richard.henderson@linaro.org,
+ david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-esort might not be available on all models.
+Optimize emulation of ten Altivec instructions: lvsl, lvsr, vsl, vsr, vpkpx,
+vgbbd, vclzb, vclzh, vclzw and vclzd.
 
-Fixes: caef62430fed6e73 ("s390x/cpumodel: add gen15 defintions")
-Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
----
- target/s390x/gen-features.c | 1 -
- 1 file changed, 1 deletion(-)
+This series buils up on and complements recent work of Thomas Murta, Mark
+Cave-Ayland and Richard Henderson in the same area. It is based on devising TCG
+translation implementation for selected instructions rather than using helpers.
+The selected instructions are most of the time idiosyncratic to ppc platform,
+so relatively complex TCG translation (without direct mapping to host
+instruction that is not possible in these cases) seems to be the best option,
+and that approach is presented in this series. The performance improvements
+are significant in all cases.
 
-diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
-index 9f216219ff53..6debfc1d217e 100644
---- a/target/s390x/gen-features.c
-+++ b/target/s390x/gen-features.c
-@@ -642,7 +642,6 @@ static uint16_t default_GEN14_GA1[] = {
- 
- static uint16_t default_GEN15_GA1[] = {
-     S390_FEAT_VECTOR_ENH2,
--    S390_FEAT_GROUP_ENH_SORT,
-     S390_FEAT_GROUP_DEFLATE_CONVERSION,
-     S390_FEAT_VECTOR_BCD_ENH,
-     S390_FEAT_GROUP_MSA_EXT_9,
+V5:
+
+Fixed vpkpx bug and added it back in patch.
+Fixed graphical distortions on OSX 10.3 and 10.4.
+Removed conversion of vmrgh and vmrgl instructions to vector operations for
+further investigation.
+
+V4:
+
+Addressed Richard's Henderson's suggestions.
+Removed vpkpx's optimization for further investigation on graphical distortions
+it caused on OSX 10.2-4 guests.
+Added opcodes for vector vmrgh(b|h|w) and vmrgl(b|h|w) in tcg.
+Implemented vector vmrgh and vmrgl instructions for i386.
+Converted vmrgh and vmrgl instructions to vector operations.
+
+V3:
+
+Fixed problem during build.
+
+V2:
+
+Addressed Richard's Henderson's suggestions.
+Fixed problem during build on patch 2/8.
+Rebased series to the latest qemu code.
+
+Stefan Brankovic (8):
+  target/ppc: Optimize emulation of lvsl and lvsr instructions
+  target/ppc: Optimize emulation of vsl and vsr instructions
+  target/ppc: Optimize emulation of vpkpx instruction
+  target/ppc: Optimize emulation of vgbbd instruction
+  target/ppc: Optimize emulation of vclzd instruction
+  target/ppc: Optimize emulation of vclzw instruction
+  target/ppc: Optimize emulation of vclzh and vclzb instructions
+  target/ppc: Refactor emulation of vmrgew and vmrgow instructions
+
+ target/ppc/helper.h                 |  10 -
+ target/ppc/int_helper.c             | 365 --------------------
+ target/ppc/translate/vmx-impl.inc.c | 656 ++++++++++++++++++++++++++++++++----
+ 3 files changed, 587 insertions(+), 444 deletions(-)
+
 -- 
-2.21.0
+2.7.4
 
 
