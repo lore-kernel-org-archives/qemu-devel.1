@@ -8,76 +8,76 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 444DCC76195
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 21:09:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ABEAAC7618F
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 21:09:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 00D8A2171F
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 21:09:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6C9AD21721
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 21:09:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uek/ckS1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00D8A2171F
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fuTZ3esQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C9AD21721
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43802 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43806 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hn8E3-0003r9-Si
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 17:09:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42241)
+	id 1hn8E5-0003yA-7d
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 17:09:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42310)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dirty.ice.hu@gmail.com>) id 1hn8Cw-00082d-K9
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 17:08:28 -0400
+ (envelope-from <dirty.ice.hu@gmail.com>) id 1hn8D2-0008Qg-5V
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 17:08:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dirty.ice.hu@gmail.com>) id 1hn8Cu-0004jK-DF
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 17:08:26 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:41104)
+ (envelope-from <dirty.ice.hu@gmail.com>) id 1hn8D0-0004n8-8X
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 17:08:32 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:44994)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <dirty.ice.hu@gmail.com>)
- id 1hn8Cu-0004ip-3b
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 17:08:24 -0400
-Received: by mail-wr1-x442.google.com with SMTP id c2so15388944wrm.8
- for <qemu-devel@nongnu.org>; Mon, 15 Jul 2019 14:08:24 -0700 (PDT)
+ id 1hn8D0-0004mb-1B
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 17:08:30 -0400
+Received: by mail-wr1-x441.google.com with SMTP id p17so18551661wrf.11
+ for <qemu-devel@nongnu.org>; Mon, 15 Jul 2019 14:08:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=7EZH5IfkX2pnYWoHFzvFapZGwW2NZseYkfCZKLdSXEg=;
- b=uek/ckS1815Tgia1joCvU/MANyISkqWVpOMaobkklqwDn75y57zn2GAq46JZu9pQtV
- ZUCKdZHrs8j/HBImt9yvUabMyRW8tcbX9KDN/ZPdpwCT8ILcMD/hbVz/bHw2lWWm1oNV
- tGsrVFejKOAuoGMjo5o5dkJfxsq7tF3RdNxiThvo0KnI1/2aFiGVoAAeRHV1VHGgHUi9
- 08EgfqZBeUOn+kR8733PXPDrlBcNfgAH8TfJg2A5DDK7wotFpF4zkJQUgW/0aCwQwjaj
- +zELpOyt3BXO7coxY3PjIdWVJ0OeUypyZXatozcNLXbXvoKHtLcmc+XgfOIdrI3MMi06
- P+sA==
+ bh=VY86o4VDQLjRZx45nc8Bf0PJBI7xJZDkLJjCJv/44bI=;
+ b=fuTZ3esQMHimJlEhJCfPgt52GyQo/UepZuqbXKZWkPu6XXaLEjO2ugAKcJPMuGZKre
+ +JxAp/tzfzklp83FUrUaPEBiYOy9SSvQ9c/3UCH5YwYfPw5pUrjNKSm6BvTmwChmcqo7
+ zebncGfD0CtNARGG8X73jHDYxNhODa+/saiZqO21bza6E71a7ATS+6U82efLoR+NGZO+
+ +f2jWWj8cjrSA08YkVhXDPSgE8jXgRzuKf0g1lJfoPG26PxbyRlBLi73s2NZfogSoN//
+ nr88/otjIyOxeen1N4B77U2ZoywD8RPs5LnWQyWQxjl+UsmTC2iHL+pxnIynhc21JDq5
+ xD7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=7EZH5IfkX2pnYWoHFzvFapZGwW2NZseYkfCZKLdSXEg=;
- b=KSsGFI59SZQUEHKToBE6mjfcEkkQ1R+Ij0gQ/0vebMYkmxtAGFtriXwyEEEOqgb0K4
- v9n/rKYuNzwDYNrryx5Jf3yb5K7+G/HsffYSKmN13XIcYs+h/NuQh+nAy9WF536Qfg6Z
- GFlN4904EH3mQH+k18BB/AFmhRG4R9HI+4EPpWSZtd9+/EMFKfCAW1v+ojMFNdCr1iZE
- tXP+0ibm5iOzqu+ck99y2fUkXnF8u613P/YwbaNFXTFlV8Gu8Fn3ogRBILmj66XghvOZ
- cuFHuZVwxnC8x8fSUJHRtFVv332bC2sXk/dW4HNorStbqs3PLz5NuyerjbLMVoiAMOpd
- DhzQ==
-X-Gm-Message-State: APjAAAXqIVxOp018lqFEvQpFf0pA/AsHXe5LhHR/2gb60nfceqpGOnlL
- tm2m6E/Lu/xCPfX17Zz5FYZf6/ql
-X-Google-Smtp-Source: APXvYqyVsyL5diTLsX6vCvGYx86ih6SdWpX1y3ooug3IdzmKLnCQm2UzdT/BBfkqFHYRscPCetioSg==
-X-Received: by 2002:a5d:528d:: with SMTP id c13mr30293702wrv.247.1563224902782; 
- Mon, 15 Jul 2019 14:08:22 -0700 (PDT)
+ bh=VY86o4VDQLjRZx45nc8Bf0PJBI7xJZDkLJjCJv/44bI=;
+ b=J1dZo68sO1SZpZb3wdJIXFsCxeGlefBKTN4F6w3BFNCx5XX8K/tps4f/2uQvd6ScUx
+ eok38YCmxpfwEpJuRhhXw4ABAiPE4BKtHNj0+iof0JV8Ze6Rw5cVy8JmhwS7gNtoM2CA
+ hldB+83WNikM7ZkO0APKA+TI5R4nsEq2xMusl/SqWEmPCaJgWImBkohiOW2N4F3ir2y+
+ tfJNdoWoOJnpsVuGxALoy9ozoIWcitQCpbY+BGsorZfW5174BKlHeqv526hnJpJldemk
+ uko1Wb0A3MO3Kz0mhiT+JoT/2TTHWuc/TeIg8nNA5n7CJfbcE2dFikx1gYJRHtQtrWWu
+ XM/A==
+X-Gm-Message-State: APjAAAVTmR01p2uI8iP7he8hfSrdJmBICPztweWbdCsg9F0hzjoUs4OL
+ Ck4k8yp/eKSMFg0ZMy3GL2HqNjC7
+X-Google-Smtp-Source: APXvYqw0zVW86Nq0MqGWyo8NfQX+r14wGYF4EFi9VHaIeufJpMSKYCWHQjryDBOdh0KU0OXFHVhUew==
+X-Received: by 2002:adf:e8cb:: with SMTP id k11mr29981902wrn.244.1563224908767; 
+ Mon, 15 Jul 2019 14:08:28 -0700 (PDT)
 Received: from nullptr.home.dirty-ice.org
  (2a01-036c-0113-31ca-0000-0000-0000-0005.pool6.digikabel.hu.
  [2a01:36c:113:31ca::5])
- by smtp.gmail.com with ESMTPSA id n8sm11513447wro.89.2019.07.15.14.08.21
+ by smtp.gmail.com with ESMTPSA id n8sm11513447wro.89.2019.07.15.14.08.28
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 15 Jul 2019 14:08:22 -0700 (PDT)
+ Mon, 15 Jul 2019 14:08:28 -0700 (PDT)
 From: "=?UTF-8?q?K=C5=91v=C3=A1g=C3=B3=2C=20Zolt=C3=A1n?="
  <dirty.ice.hu@gmail.com>
 X-Google-Original-From: =?UTF-8?q?K=C5=91v=C3=A1g=C3=B3=2C=20Zolt=C3=A1n?=
  <DirtY.iCE.hu@gmail.com>
 To: qemu-devel@nongnu.org
-Date: Mon, 15 Jul 2019 23:08:07 +0200
-Message-Id: <548bbfbc250beeec922ab1abdeda56b8ef18a247.1563224628.git.DirtY.iCE.hu@gmail.com>
+Date: Mon, 15 Jul 2019 23:08:14 +0200
+Message-Id: <b08d6a5b082f6b48647a6060663f612a51ee7b6b.1563224628.git.DirtY.iCE.hu@gmail.com>
 X-Mailer: git-send-email 2.22.0
 In-Reply-To: <cover.1563224628.git.DirtY.iCE.hu@gmail.com>
 References: <cover.1563224628.git.DirtY.iCE.hu@gmail.com>
@@ -86,8 +86,8 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::442
-Subject: [Qemu-devel] [PATCH v2 05/14] paaudio: prepare for multiple audiodev
+X-Received-From: 2a00:1450:4864:20::441
+Subject: [Qemu-devel] [PATCH v2 12/14] audio: remove read and write pcm_ops
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,610 +104,426 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Have a pool of refcounted connections per server, so if the user creates
-multiple audiodevs to the same pa server, it will use a single connection.  (It
-will still create different streams, so the user can manage those streams
-separately in pulseaudio.)
+They just called audio_pcm_sw_read/write anyway, so it makes no sense
+to have them too.  (The noaudio's read is the only exception, but it
+should work with the generic code too.)
 
 Signed-off-by: Kővágó, Zoltán <DirtY.iCE.hu@gmail.com>
 ---
- audio/paaudio.c | 329 +++++++++++++++++++++++++++---------------------
- 1 file changed, 188 insertions(+), 141 deletions(-)
+ audio/audio_int.h   |  5 -----
+ audio/alsaaudio.c   | 12 ------------
+ audio/audio.c       |  8 ++++----
+ audio/coreaudio.c   |  6 ------
+ audio/dsoundaudio.c | 12 ------------
+ audio/noaudio.c     | 19 -------------------
+ audio/ossaudio.c    | 12 ------------
+ audio/paaudio.c     | 12 ------------
+ audio/sdlaudio.c    |  6 ------
+ audio/spiceaudio.c  | 12 ------------
+ audio/wavaudio.c    |  6 ------
+ 11 files changed, 4 insertions(+), 106 deletions(-)
 
+diff --git a/audio/audio_int.h b/audio/audio_int.h
+index 7e00c1332e..003b7ab8cc 100644
+--- a/audio/audio_int.h
++++ b/audio/audio_int.h
+@@ -150,13 +150,11 @@ struct audio_pcm_ops {
+     int  (*init_out)(HWVoiceOut *hw, struct audsettings *as, void *drv_opaque);
+     void (*fini_out)(HWVoiceOut *hw);
+     int  (*run_out) (HWVoiceOut *hw, int live);
+-    int  (*write)   (SWVoiceOut *sw, void *buf, int size);
+     int  (*ctl_out) (HWVoiceOut *hw, int cmd, ...);
+ 
+     int  (*init_in) (HWVoiceIn *hw, struct audsettings *as, void *drv_opaque);
+     void (*fini_in) (HWVoiceIn *hw);
+     int  (*run_in)  (HWVoiceIn *hw);
+-    int  (*read)    (SWVoiceIn *sw, void *buf, int size);
+     int  (*ctl_in)  (HWVoiceIn *hw, int cmd, ...);
+ };
+ 
+@@ -210,11 +208,8 @@ audio_driver *audio_driver_lookup(const char *name);
+ void audio_pcm_init_info (struct audio_pcm_info *info, struct audsettings *as);
+ void audio_pcm_info_clear_buf (struct audio_pcm_info *info, void *buf, int len);
+ 
+-int  audio_pcm_sw_write (SWVoiceOut *sw, void *buf, int len);
+ int  audio_pcm_hw_get_live_in (HWVoiceIn *hw);
+ 
+-int  audio_pcm_sw_read (SWVoiceIn *sw, void *buf, int len);
+-
+ int audio_pcm_hw_clip_out (HWVoiceOut *hw, void *pcm_buf,
+                            int live, int pending);
+ 
+diff --git a/audio/alsaaudio.c b/audio/alsaaudio.c
+index 3daa7c8f8f..e9e3a4819c 100644
+--- a/audio/alsaaudio.c
++++ b/audio/alsaaudio.c
+@@ -270,11 +270,6 @@ static int alsa_poll_in (HWVoiceIn *hw)
+     return alsa_poll_helper (alsa->handle, &alsa->pollhlp, POLLIN);
+ }
+ 
+-static int alsa_write (SWVoiceOut *sw, void *buf, int len)
+-{
+-    return audio_pcm_sw_write (sw, buf, len);
+-}
+-
+ static snd_pcm_format_t aud_to_alsafmt (AudioFormat fmt, int endianness)
+ {
+     switch (fmt) {
+@@ -988,11 +983,6 @@ static int alsa_run_in (HWVoiceIn *hw)
+     return read_samples;
+ }
+ 
+-static int alsa_read (SWVoiceIn *sw, void *buf, int size)
+-{
+-    return audio_pcm_sw_read (sw, buf, size);
+-}
+-
+ static int alsa_ctl_in (HWVoiceIn *hw, int cmd, ...)
+ {
+     ALSAVoiceIn *alsa = (ALSAVoiceIn *) hw;
+@@ -1076,13 +1066,11 @@ static struct audio_pcm_ops alsa_pcm_ops = {
+     .init_out = alsa_init_out,
+     .fini_out = alsa_fini_out,
+     .run_out  = alsa_run_out,
+-    .write    = alsa_write,
+     .ctl_out  = alsa_ctl_out,
+ 
+     .init_in  = alsa_init_in,
+     .fini_in  = alsa_fini_in,
+     .run_in   = alsa_run_in,
+-    .read     = alsa_read,
+     .ctl_in   = alsa_ctl_in,
+ };
+ 
+diff --git a/audio/audio.c b/audio/audio.c
+index 07b35ffa03..254499dfa1 100644
+--- a/audio/audio.c
++++ b/audio/audio.c
+@@ -594,7 +594,7 @@ static int audio_pcm_sw_get_rpos_in (SWVoiceIn *sw)
+     }
+ }
+ 
+-int audio_pcm_sw_read (SWVoiceIn *sw, void *buf, int size)
++static int audio_pcm_sw_read(SWVoiceIn *sw, void *buf, int size)
+ {
+     HWVoiceIn *hw = sw->hw;
+     int samples, live, ret = 0, swlim, isamp, osamp, rpos, total = 0;
+@@ -696,7 +696,7 @@ static int audio_pcm_hw_get_live_out (HWVoiceOut *hw, int *nb_live)
+ /*
+  * Soft voice (playback)
+  */
+-int audio_pcm_sw_write (SWVoiceOut *sw, void *buf, int size)
++static int audio_pcm_sw_write(SWVoiceOut *sw, void *buf, int size)
+ {
+     int hwsamples, samples, isamp, osamp, wpos, live, dead, left, swlim, blck;
+     int ret = 0, pos = 0, total = 0;
+@@ -854,7 +854,7 @@ int AUD_write (SWVoiceOut *sw, void *buf, int size)
+         return 0;
+     }
+ 
+-    return sw->hw->pcm_ops->write(sw, buf, size);
++    return audio_pcm_sw_write(sw, buf, size);
+ }
+ 
+ int AUD_read (SWVoiceIn *sw, void *buf, int size)
+@@ -869,7 +869,7 @@ int AUD_read (SWVoiceIn *sw, void *buf, int size)
+         return 0;
+     }
+ 
+-    return sw->hw->pcm_ops->read(sw, buf, size);
++    return audio_pcm_sw_read(sw, buf, size);
+ }
+ 
+ int AUD_get_buffer_size_out (SWVoiceOut *sw)
+diff --git a/audio/coreaudio.c b/audio/coreaudio.c
+index f0ab4014a8..091fe84a34 100644
+--- a/audio/coreaudio.c
++++ b/audio/coreaudio.c
+@@ -489,11 +489,6 @@ static OSStatus audioDeviceIOProc(
+     return 0;
+ }
+ 
+-static int coreaudio_write (SWVoiceOut *sw, void *buf, int len)
+-{
+-    return audio_pcm_sw_write (sw, buf, len);
+-}
+-
+ static int coreaudio_init_out(HWVoiceOut *hw, struct audsettings *as,
+                               void *drv_opaque)
+ {
+@@ -692,7 +687,6 @@ static struct audio_pcm_ops coreaudio_pcm_ops = {
+     .init_out = coreaudio_init_out,
+     .fini_out = coreaudio_fini_out,
+     .run_out  = coreaudio_run_out,
+-    .write    = coreaudio_write,
+     .ctl_out  = coreaudio_ctl_out
+ };
+ 
+diff --git a/audio/dsoundaudio.c b/audio/dsoundaudio.c
+index 07260f881e..11594c3095 100644
+--- a/audio/dsoundaudio.c
++++ b/audio/dsoundaudio.c
+@@ -454,11 +454,6 @@ static int dsound_ctl_out (HWVoiceOut *hw, int cmd, ...)
+     return 0;
+ }
+ 
+-static int dsound_write (SWVoiceOut *sw, void *buf, int len)
+-{
+-    return audio_pcm_sw_write (sw, buf, len);
+-}
+-
+ static int dsound_run_out (HWVoiceOut *hw, int live)
+ {
+     int err;
+@@ -645,11 +640,6 @@ static int dsound_ctl_in (HWVoiceIn *hw, int cmd, ...)
+     return 0;
+ }
+ 
+-static int dsound_read (SWVoiceIn *sw, void *buf, int len)
+-{
+-    return audio_pcm_sw_read (sw, buf, len);
+-}
+-
+ static int dsound_run_in (HWVoiceIn *hw)
+ {
+     int err;
+@@ -856,13 +846,11 @@ static struct audio_pcm_ops dsound_pcm_ops = {
+     .init_out = dsound_init_out,
+     .fini_out = dsound_fini_out,
+     .run_out  = dsound_run_out,
+-    .write    = dsound_write,
+     .ctl_out  = dsound_ctl_out,
+ 
+     .init_in  = dsound_init_in,
+     .fini_in  = dsound_fini_in,
+     .run_in   = dsound_run_in,
+-    .read     = dsound_read,
+     .ctl_in   = dsound_ctl_in
+ };
+ 
+diff --git a/audio/noaudio.c b/audio/noaudio.c
+index 14a0e4ab29..cbb02d9e49 100644
+--- a/audio/noaudio.c
++++ b/audio/noaudio.c
+@@ -61,11 +61,6 @@ static int no_run_out (HWVoiceOut *hw, int live)
+     return decr;
+ }
+ 
+-static int no_write (SWVoiceOut *sw, void *buf, int len)
+-{
+-    return audio_pcm_sw_write(sw, buf, len);
+-}
+-
+ static int no_init_out(HWVoiceOut *hw, struct audsettings *as, void *drv_opaque)
+ {
+     audio_pcm_init_info (&hw->info, as);
+@@ -118,18 +113,6 @@ static int no_run_in (HWVoiceIn *hw)
+     return samples;
+ }
+ 
+-static int no_read (SWVoiceIn *sw, void *buf, int size)
+-{
+-    /* use custom code here instead of audio_pcm_sw_read() to avoid
+-     * useless resampling/mixing */
+-    int samples = size >> sw->info.shift;
+-    int total = sw->hw->total_samples_captured - sw->total_hw_samples_acquired;
+-    int to_clear = MIN (samples, total);
+-    sw->total_hw_samples_acquired += total;
+-    audio_pcm_info_clear_buf (&sw->info, buf, to_clear);
+-    return to_clear << sw->info.shift;
+-}
+-
+ static int no_ctl_in (HWVoiceIn *hw, int cmd, ...)
+ {
+     (void) hw;
+@@ -151,13 +134,11 @@ static struct audio_pcm_ops no_pcm_ops = {
+     .init_out = no_init_out,
+     .fini_out = no_fini_out,
+     .run_out  = no_run_out,
+-    .write    = no_write,
+     .ctl_out  = no_ctl_out,
+ 
+     .init_in  = no_init_in,
+     .fini_in  = no_fini_in,
+     .run_in   = no_run_in,
+-    .read     = no_read,
+     .ctl_in   = no_ctl_in
+ };
+ 
+diff --git a/audio/ossaudio.c b/audio/ossaudio.c
+index 456fba7480..b99edbec17 100644
+--- a/audio/ossaudio.c
++++ b/audio/ossaudio.c
+@@ -134,11 +134,6 @@ static void oss_poll_in (HWVoiceIn *hw)
+     qemu_set_fd_handler(oss->fd, oss_helper_poll_in, NULL, hw->s);
+ }
+ 
+-static int oss_write (SWVoiceOut *sw, void *buf, int len)
+-{
+-    return audio_pcm_sw_write (sw, buf, len);
+-}
+-
+ static int aud_to_ossfmt (AudioFormat fmt, int endianness)
+ {
+     switch (fmt) {
+@@ -788,11 +783,6 @@ static int oss_run_in (HWVoiceIn *hw)
+     return read_samples;
+ }
+ 
+-static int oss_read (SWVoiceIn *sw, void *buf, int size)
+-{
+-    return audio_pcm_sw_read (sw, buf, size);
+-}
+-
+ static int oss_ctl_in (HWVoiceIn *hw, int cmd, ...)
+ {
+     OSSVoiceIn *oss = (OSSVoiceIn *) hw;
+@@ -855,13 +845,11 @@ static struct audio_pcm_ops oss_pcm_ops = {
+     .init_out = oss_init_out,
+     .fini_out = oss_fini_out,
+     .run_out  = oss_run_out,
+-    .write    = oss_write,
+     .ctl_out  = oss_ctl_out,
+ 
+     .init_in  = oss_init_in,
+     .fini_in  = oss_fini_in,
+     .run_in   = oss_run_in,
+-    .read     = oss_read,
+     .ctl_in   = oss_ctl_in
+ };
+ 
 diff --git a/audio/paaudio.c b/audio/paaudio.c
-index 5fc886bb33..cc3a34c2ea 100644
+index c8ae1a6eca..efb72ced30 100644
 --- a/audio/paaudio.c
 +++ b/audio/paaudio.c
-@@ -11,10 +11,21 @@
- #include "audio_int.h"
- #include "audio_pt_int.h"
- 
--typedef struct {
--    Audiodev *dev;
-+typedef struct PAConnection {
-+    char *server;
-+    int refcount;
-+    QTAILQ_ENTRY(PAConnection) list;
-+
-     pa_threaded_mainloop *mainloop;
-     pa_context *context;
-+} PAConnection;
-+
-+static QTAILQ_HEAD(PAConnectionHead, PAConnection) pa_conns =
-+    QTAILQ_HEAD_INITIALIZER(pa_conns);
-+
-+typedef struct {
-+    Audiodev *dev;
-+    PAConnection *conn;
- } paaudio;
- 
- typedef struct {
-@@ -45,7 +56,7 @@ typedef struct {
-     int samples;
- } PAVoiceIn;
- 
--static void qpa_audio_fini(void *opaque);
-+static void qpa_conn_fini(PAConnection *c);
- 
- static void GCC_FMT_ATTR (2, 3) qpa_logerr (int err, const char *fmt, ...)
- {
-@@ -108,11 +119,11 @@ static inline int PA_STREAM_IS_GOOD(pa_stream_state_t x)
- 
- static int qpa_simple_read (PAVoiceIn *p, void *data, size_t length, int *rerror)
- {
--    paaudio *g = p->g;
-+    PAConnection *c = p->g->conn;
- 
--    pa_threaded_mainloop_lock (g->mainloop);
-+    pa_threaded_mainloop_lock(c->mainloop);
- 
--    CHECK_DEAD_GOTO (g, p->stream, rerror, unlock_and_fail);
-+    CHECK_DEAD_GOTO(c, p->stream, rerror, unlock_and_fail);
- 
-     while (length > 0) {
-         size_t l;
-@@ -121,11 +132,11 @@ static int qpa_simple_read (PAVoiceIn *p, void *data, size_t length, int *rerror
-             int r;
- 
-             r = pa_stream_peek (p->stream, &p->read_data, &p->read_length);
--            CHECK_SUCCESS_GOTO (g, rerror, r == 0, unlock_and_fail);
-+            CHECK_SUCCESS_GOTO(c, rerror, r == 0, unlock_and_fail);
- 
-             if (!p->read_data) {
--                pa_threaded_mainloop_wait (g->mainloop);
--                CHECK_DEAD_GOTO (g, p->stream, rerror, unlock_and_fail);
-+                pa_threaded_mainloop_wait(c->mainloop);
-+                CHECK_DEAD_GOTO(c, p->stream, rerror, unlock_and_fail);
-             } else {
-                 p->read_index = 0;
-             }
-@@ -148,53 +159,53 @@ static int qpa_simple_read (PAVoiceIn *p, void *data, size_t length, int *rerror
-             p->read_length = 0;
-             p->read_index = 0;
- 
--            CHECK_SUCCESS_GOTO (g, rerror, r == 0, unlock_and_fail);
-+            CHECK_SUCCESS_GOTO(c, rerror, r == 0, unlock_and_fail);
-         }
-     }
- 
--    pa_threaded_mainloop_unlock (g->mainloop);
-+    pa_threaded_mainloop_unlock(c->mainloop);
-     return 0;
- 
- unlock_and_fail:
--    pa_threaded_mainloop_unlock (g->mainloop);
-+    pa_threaded_mainloop_unlock(c->mainloop);
-     return -1;
+@@ -295,11 +295,6 @@ static int qpa_run_out (HWVoiceOut *hw, int live)
+     return decr;
  }
  
- static int qpa_simple_write (PAVoiceOut *p, const void *data, size_t length, int *rerror)
+-static int qpa_write (SWVoiceOut *sw, void *buf, int len)
+-{
+-    return audio_pcm_sw_write (sw, buf, len);
+-}
+-
+ /* capture */
+ static void *qpa_thread_in (void *arg)
  {
--    paaudio *g = p->g;
-+    PAConnection *c = p->g->conn;
- 
--    pa_threaded_mainloop_lock (g->mainloop);
-+    pa_threaded_mainloop_lock(c->mainloop);
- 
--    CHECK_DEAD_GOTO (g, p->stream, rerror, unlock_and_fail);
-+    CHECK_DEAD_GOTO(c, p->stream, rerror, unlock_and_fail);
- 
-     while (length > 0) {
-         size_t l;
-         int r;
- 
-         while (!(l = pa_stream_writable_size (p->stream))) {
--            pa_threaded_mainloop_wait (g->mainloop);
--            CHECK_DEAD_GOTO (g, p->stream, rerror, unlock_and_fail);
-+            pa_threaded_mainloop_wait(c->mainloop);
-+            CHECK_DEAD_GOTO(c, p->stream, rerror, unlock_and_fail);
-         }
- 
--        CHECK_SUCCESS_GOTO (g, rerror, l != (size_t) -1, unlock_and_fail);
-+        CHECK_SUCCESS_GOTO(c, rerror, l != (size_t) -1, unlock_and_fail);
- 
-         if (l > length) {
-             l = length;
-         }
- 
-         r = pa_stream_write (p->stream, data, l, NULL, 0LL, PA_SEEK_RELATIVE);
--        CHECK_SUCCESS_GOTO (g, rerror, r >= 0, unlock_and_fail);
-+        CHECK_SUCCESS_GOTO(c, rerror, r >= 0, unlock_and_fail);
- 
-         data = (const uint8_t *) data + l;
-         length -= l;
-     }
- 
--    pa_threaded_mainloop_unlock (g->mainloop);
-+    pa_threaded_mainloop_unlock(c->mainloop);
-     return 0;
- 
- unlock_and_fail:
--    pa_threaded_mainloop_unlock (g->mainloop);
-+    pa_threaded_mainloop_unlock(c->mainloop);
-     return -1;
+@@ -388,11 +383,6 @@ static int qpa_run_in (HWVoiceIn *hw)
+     return incr;
  }
  
-@@ -432,13 +443,13 @@ static AudioFormat pa_to_audfmt (pa_sample_format_t fmt, int *endianness)
- 
- static void context_state_cb (pa_context *c, void *userdata)
+-static int qpa_read (SWVoiceIn *sw, void *buf, int len)
+-{
+-    return audio_pcm_sw_read (sw, buf, len);
+-}
+-
+ static pa_sample_format_t audfmt_to_pa (AudioFormat afmt, int endianness)
  {
--    paaudio *g = userdata;
-+    PAConnection *conn = userdata;
+     int format;
+@@ -1016,13 +1006,11 @@ static struct audio_pcm_ops qpa_pcm_ops = {
+     .init_out = qpa_init_out,
+     .fini_out = qpa_fini_out,
+     .run_out  = qpa_run_out,
+-    .write    = qpa_write,
+     .ctl_out  = qpa_ctl_out,
  
-     switch (pa_context_get_state(c)) {
-     case PA_CONTEXT_READY:
-     case PA_CONTEXT_TERMINATED:
-     case PA_CONTEXT_FAILED:
--        pa_threaded_mainloop_signal (g->mainloop, 0);
-+        pa_threaded_mainloop_signal(conn->mainloop, 0);
-         break;
+     .init_in  = qpa_init_in,
+     .fini_in  = qpa_fini_in,
+     .run_in   = qpa_run_in,
+-    .read     = qpa_read,
+     .ctl_in   = qpa_ctl_in
+ };
  
-     case PA_CONTEXT_UNCONNECTED:
-@@ -451,14 +462,14 @@ static void context_state_cb (pa_context *c, void *userdata)
- 
- static void stream_state_cb (pa_stream *s, void * userdata)
- {
--    paaudio *g = userdata;
-+    PAConnection *c = userdata;
- 
-     switch (pa_stream_get_state (s)) {
- 
-     case PA_STREAM_READY:
-     case PA_STREAM_FAILED:
-     case PA_STREAM_TERMINATED:
--        pa_threaded_mainloop_signal (g->mainloop, 0);
-+        pa_threaded_mainloop_signal(c->mainloop, 0);
-         break;
- 
-     case PA_STREAM_UNCONNECTED:
-@@ -469,13 +480,13 @@ static void stream_state_cb (pa_stream *s, void * userdata)
- 
- static void stream_request_cb (pa_stream *s, size_t length, void *userdata)
- {
--    paaudio *g = userdata;
-+    PAConnection *c = userdata;
- 
--    pa_threaded_mainloop_signal (g->mainloop, 0);
-+    pa_threaded_mainloop_signal(c->mainloop, 0);
+diff --git a/audio/sdlaudio.c b/audio/sdlaudio.c
+index 42f7614124..c7fd487e0e 100644
+--- a/audio/sdlaudio.c
++++ b/audio/sdlaudio.c
+@@ -217,11 +217,6 @@ static void sdl_callback (void *opaque, Uint8 *buf, int len)
+     }
  }
  
- static pa_stream *qpa_simple_new (
--        paaudio *g,
-+        PAConnection *c,
-         const char *name,
-         pa_stream_direction_t dir,
-         const char *dev,
-@@ -486,50 +497,48 @@ static pa_stream *qpa_simple_new (
+-static int sdl_write_out (SWVoiceOut *sw, void *buf, int len)
+-{
+-    return audio_pcm_sw_write (sw, buf, len);
+-}
+-
+ static int sdl_run_out (HWVoiceOut *hw, int live)
  {
-     int r;
-     pa_stream *stream;
-+    pa_stream_flags_t flags;
+     int decr;
+@@ -342,7 +337,6 @@ static struct audio_pcm_ops sdl_pcm_ops = {
+     .init_out = sdl_init_out,
+     .fini_out = sdl_fini_out,
+     .run_out  = sdl_run_out,
+-    .write    = sdl_write_out,
+     .ctl_out  = sdl_ctl_out,
+ };
  
--    pa_threaded_mainloop_lock (g->mainloop);
-+    pa_threaded_mainloop_lock(c->mainloop);
- 
--    stream = pa_stream_new (g->context, name, ss, map);
-+    stream = pa_stream_new(c->context, name, ss, map);
-     if (!stream) {
-         goto fail;
-     }
- 
--    pa_stream_set_state_callback (stream, stream_state_cb, g);
--    pa_stream_set_read_callback (stream, stream_request_cb, g);
--    pa_stream_set_write_callback (stream, stream_request_cb, g);
-+    pa_stream_set_state_callback(stream, stream_state_cb, c);
-+    pa_stream_set_read_callback(stream, stream_request_cb, c);
-+    pa_stream_set_write_callback(stream, stream_request_cb, c);
-+
-+    flags =
-+        PA_STREAM_INTERPOLATE_TIMING
-+#ifdef PA_STREAM_ADJUST_LATENCY
-+        | PA_STREAM_ADJUST_LATENCY
-+#endif
-+        | PA_STREAM_AUTO_TIMING_UPDATE;
- 
-     if (dir == PA_STREAM_PLAYBACK) {
--        r = pa_stream_connect_playback (stream, dev, attr,
--                                        PA_STREAM_INTERPOLATE_TIMING
--#ifdef PA_STREAM_ADJUST_LATENCY
--                                        |PA_STREAM_ADJUST_LATENCY
--#endif
--                                        |PA_STREAM_AUTO_TIMING_UPDATE, NULL, NULL);
-+        r = pa_stream_connect_playback(stream, dev, attr, flags, NULL, NULL);
-     } else {
--        r = pa_stream_connect_record (stream, dev, attr,
--                                      PA_STREAM_INTERPOLATE_TIMING
--#ifdef PA_STREAM_ADJUST_LATENCY
--                                      |PA_STREAM_ADJUST_LATENCY
--#endif
--                                      |PA_STREAM_AUTO_TIMING_UPDATE);
-+        r = pa_stream_connect_record(stream, dev, attr, flags);
-     }
- 
-     if (r < 0) {
-       goto fail;
-     }
- 
--    pa_threaded_mainloop_unlock (g->mainloop);
-+    pa_threaded_mainloop_unlock(c->mainloop);
- 
-     return stream;
- 
- fail:
--    pa_threaded_mainloop_unlock (g->mainloop);
-+    pa_threaded_mainloop_unlock(c->mainloop);
- 
-     if (stream) {
-         pa_stream_unref (stream);
-     }
- 
--    *rerror = pa_context_errno (g->context);
-+    *rerror = pa_context_errno(c->context);
- 
-     return NULL;
- }
-@@ -545,6 +554,7 @@ static int qpa_init_out(HWVoiceOut *hw, struct audsettings *as,
-     paaudio *g = pa->g = drv_opaque;
-     AudiodevPaOptions *popts = &g->dev->u.pa;
-     AudiodevPaPerDirectionOptions *ppdo = popts->out;
-+    PAConnection *c = g->conn;
- 
-     ss.format = audfmt_to_pa (as->fmt, as->endianness);
-     ss.channels = as->nchannels;
-@@ -558,7 +568,7 @@ static int qpa_init_out(HWVoiceOut *hw, struct audsettings *as,
-     obt_as.fmt = pa_to_audfmt (ss.format, &obt_as.endianness);
- 
-     pa->stream = qpa_simple_new (
--        g,
-+        c,
-         "qemu",
-         PA_STREAM_PLAYBACK,
-         ppdo->has_name ? ppdo->name : NULL,
-@@ -612,6 +622,7 @@ static int qpa_init_in(HWVoiceIn *hw, struct audsettings *as, void *drv_opaque)
-     paaudio *g = pa->g = drv_opaque;
-     AudiodevPaOptions *popts = &g->dev->u.pa;
-     AudiodevPaPerDirectionOptions *ppdo = popts->in;
-+    PAConnection *c = g->conn;
- 
-     ss.format = audfmt_to_pa (as->fmt, as->endianness);
-     ss.channels = as->nchannels;
-@@ -625,7 +636,7 @@ static int qpa_init_in(HWVoiceIn *hw, struct audsettings *as, void *drv_opaque)
-     obt_as.fmt = pa_to_audfmt (ss.format, &obt_as.endianness);
- 
-     pa->stream = qpa_simple_new (
--        g,
-+        c,
-         "qemu",
-         PA_STREAM_RECORD,
-         ppdo->has_name ? ppdo->name : NULL,
-@@ -714,7 +725,7 @@ static int qpa_ctl_out (HWVoiceOut *hw, int cmd, ...)
-     PAVoiceOut *pa = (PAVoiceOut *) hw;
-     pa_operation *op;
-     pa_cvolume v;
--    paaudio *g = pa->g;
-+    PAConnection *c = pa->g->conn;
- 
- #ifdef PA_CHECK_VERSION    /* macro is present in 0.9.16+ */
-     pa_cvolume_init (&v);  /* function is present in 0.9.13+ */
-@@ -734,28 +745,29 @@ static int qpa_ctl_out (HWVoiceOut *hw, int cmd, ...)
-             v.values[0] = ((PA_VOLUME_NORM - PA_VOLUME_MUTED) * sw->vol.l) / UINT32_MAX;
-             v.values[1] = ((PA_VOLUME_NORM - PA_VOLUME_MUTED) * sw->vol.r) / UINT32_MAX;
- 
--            pa_threaded_mainloop_lock (g->mainloop);
-+            pa_threaded_mainloop_lock(c->mainloop);
- 
--            op = pa_context_set_sink_input_volume (g->context,
-+            op = pa_context_set_sink_input_volume(c->context,
-                 pa_stream_get_index (pa->stream),
-                 &v, NULL, NULL);
--            if (!op)
--                qpa_logerr (pa_context_errno (g->context),
--                            "set_sink_input_volume() failed\n");
--            else
--                pa_operation_unref (op);
-+            if (!op) {
-+                qpa_logerr(pa_context_errno(c->context),
-+                           "set_sink_input_volume() failed\n");
-+            } else {
-+                pa_operation_unref(op);
-+            }
- 
--            op = pa_context_set_sink_input_mute (g->context,
-+            op = pa_context_set_sink_input_mute(c->context,
-                 pa_stream_get_index (pa->stream),
-                sw->vol.mute, NULL, NULL);
-             if (!op) {
--                qpa_logerr (pa_context_errno (g->context),
--                            "set_sink_input_mute() failed\n");
-+                qpa_logerr(pa_context_errno(c->context),
-+                           "set_sink_input_mute() failed\n");
-             } else {
--                pa_operation_unref (op);
-+                pa_operation_unref(op);
-             }
- 
--            pa_threaded_mainloop_unlock (g->mainloop);
-+            pa_threaded_mainloop_unlock(c->mainloop);
-         }
-     }
-     return 0;
-@@ -766,7 +778,7 @@ static int qpa_ctl_in (HWVoiceIn *hw, int cmd, ...)
-     PAVoiceIn *pa = (PAVoiceIn *) hw;
-     pa_operation *op;
-     pa_cvolume v;
--    paaudio *g = pa->g;
-+    PAConnection *c = pa->g->conn;
- 
- #ifdef PA_CHECK_VERSION
-     pa_cvolume_init (&v);
-@@ -786,29 +798,29 @@ static int qpa_ctl_in (HWVoiceIn *hw, int cmd, ...)
-             v.values[0] = ((PA_VOLUME_NORM - PA_VOLUME_MUTED) * sw->vol.l) / UINT32_MAX;
-             v.values[1] = ((PA_VOLUME_NORM - PA_VOLUME_MUTED) * sw->vol.r) / UINT32_MAX;
- 
--            pa_threaded_mainloop_lock (g->mainloop);
-+            pa_threaded_mainloop_lock(c->mainloop);
- 
--            op = pa_context_set_source_output_volume (g->context,
--                pa_stream_get_index (pa->stream),
-+            op = pa_context_set_source_output_volume(c->context,
-+                pa_stream_get_index(pa->stream),
-                 &v, NULL, NULL);
-             if (!op) {
--                qpa_logerr (pa_context_errno (g->context),
--                            "set_source_output_volume() failed\n");
-+                qpa_logerr(pa_context_errno(c->context),
-+                           "set_source_output_volume() failed\n");
-             } else {
-                 pa_operation_unref(op);
-             }
- 
--            op = pa_context_set_source_output_mute (g->context,
-+            op = pa_context_set_source_output_mute(c->context,
-                 pa_stream_get_index (pa->stream),
-                 sw->vol.mute, NULL, NULL);
-             if (!op) {
--                qpa_logerr (pa_context_errno (g->context),
--                            "set_source_output_mute() failed\n");
-+                qpa_logerr(pa_context_errno(c->context),
-+                           "set_source_output_mute() failed\n");
-             } else {
-                 pa_operation_unref (op);
-             }
- 
--            pa_threaded_mainloop_unlock (g->mainloop);
-+            pa_threaded_mainloop_unlock(c->mainloop);
-         }
-     }
-     return 0;
-@@ -828,11 +840,75 @@ static int qpa_validate_per_direction_opts(Audiodev *dev,
-     return 1;
+diff --git a/audio/spiceaudio.c b/audio/spiceaudio.c
+index 6f4a0558f8..6e7f13cffa 100644
+--- a/audio/spiceaudio.c
++++ b/audio/spiceaudio.c
+@@ -193,11 +193,6 @@ static int line_out_run (HWVoiceOut *hw, int live)
+     return decr;
  }
  
-+/* common */
-+static void *qpa_conn_init(const char *server)
-+{
-+    PAConnection *c = g_malloc0(sizeof(PAConnection));
-+    QTAILQ_INSERT_TAIL(&pa_conns, c, list);
-+
-+    c->mainloop = pa_threaded_mainloop_new();
-+    if (!c->mainloop) {
-+        goto fail;
-+    }
-+
-+    c->context = pa_context_new(pa_threaded_mainloop_get_api(c->mainloop),
-+                                server);
-+    if (!c->context) {
-+        goto fail;
-+    }
-+
-+    pa_context_set_state_callback(c->context, context_state_cb, c);
-+
-+    if (pa_context_connect(c->context, server, 0, NULL) < 0) {
-+        qpa_logerr(pa_context_errno(c->context),
-+                   "pa_context_connect() failed\n");
-+        goto fail;
-+    }
-+
-+    pa_threaded_mainloop_lock(c->mainloop);
-+
-+    if (pa_threaded_mainloop_start(c->mainloop) < 0) {
-+        goto unlock_and_fail;
-+    }
-+
-+    for (;;) {
-+        pa_context_state_t state;
-+
-+        state = pa_context_get_state(c->context);
-+
-+        if (state == PA_CONTEXT_READY) {
-+            break;
-+        }
-+
-+        if (!PA_CONTEXT_IS_GOOD(state)) {
-+            qpa_logerr(pa_context_errno(c->context),
-+                       "Wrong context state\n");
-+            goto unlock_and_fail;
-+        }
-+
-+        /* Wait until the context is ready */
-+        pa_threaded_mainloop_wait(c->mainloop);
-+    }
-+
-+    pa_threaded_mainloop_unlock(c->mainloop);
-+    return c;
-+
-+unlock_and_fail:
-+    pa_threaded_mainloop_unlock(c->mainloop);
-+fail:
-+    AUD_log (AUDIO_CAP, "Failed to initialize PA context");
-+    qpa_conn_fini(c);
-+    return NULL;
-+}
-+
- static void *qpa_audio_init(Audiodev *dev)
+-static int line_out_write (SWVoiceOut *sw, void *buf, int len)
+-{
+-    return audio_pcm_sw_write (sw, buf, len);
+-}
+-
+ static int line_out_ctl (HWVoiceOut *hw, int cmd, ...)
  {
-     paaudio *g;
-     AudiodevPaOptions *popts = &dev->u.pa;
-     const char *server;
-+    PAConnection *c;
-+
-+    assert(dev->driver == AUDIODEV_DRIVER_PA);
- 
-     if (!popts->has_server) {
-         char pidfile[64];
-@@ -849,93 +925,64 @@ static void *qpa_audio_init(Audiodev *dev)
-         }
-     }
- 
--    assert(dev->driver == AUDIODEV_DRIVER_PA);
--
--    g = g_malloc(sizeof(paaudio));
--    server = popts->has_server ? popts->server : NULL;
--
-     if (!qpa_validate_per_direction_opts(dev, popts->in)) {
--        goto fail;
-+        return NULL;
-     }
-     if (!qpa_validate_per_direction_opts(dev, popts->out)) {
--        goto fail;
-+        return NULL;
-     }
- 
-+    g = g_malloc0(sizeof(paaudio));
-+    server = popts->has_server ? popts->server : NULL;
-+
-     g->dev = dev;
--    g->mainloop = NULL;
--    g->context = NULL;
- 
--    g->mainloop = pa_threaded_mainloop_new ();
--    if (!g->mainloop) {
--        goto fail;
--    }
--
--    g->context = pa_context_new (pa_threaded_mainloop_get_api (g->mainloop),
--                                 server);
--    if (!g->context) {
--        goto fail;
--    }
--
--    pa_context_set_state_callback (g->context, context_state_cb, g);
--
--    if (pa_context_connect(g->context, server, 0, NULL) < 0) {
--        qpa_logerr (pa_context_errno (g->context),
--                    "pa_context_connect() failed\n");
--        goto fail;
--    }
--
--    pa_threaded_mainloop_lock (g->mainloop);
--
--    if (pa_threaded_mainloop_start (g->mainloop) < 0) {
--        goto unlock_and_fail;
--    }
--
--    for (;;) {
--        pa_context_state_t state;
--
--        state = pa_context_get_state (g->context);
--
--        if (state == PA_CONTEXT_READY) {
-+    QTAILQ_FOREACH(c, &pa_conns, list) {
-+        if (server == NULL || c->server == NULL ?
-+            server == c->server :
-+            strcmp(server, c->server) == 0) {
-+            g->conn = c;
-             break;
-         }
--
--        if (!PA_CONTEXT_IS_GOOD (state)) {
--            qpa_logerr (pa_context_errno (g->context),
--                        "Wrong context state\n");
--            goto unlock_and_fail;
--        }
--
--        /* Wait until the context is ready */
--        pa_threaded_mainloop_wait (g->mainloop);
-+    }
-+    if (!g->conn) {
-+        g->conn = qpa_conn_init(server);
-+    }
-+    if (!g->conn) {
-+        g_free(g);
-+        return NULL;
-     }
- 
--    pa_threaded_mainloop_unlock (g->mainloop);
--
-+    ++g->conn->refcount;
-     return g;
-+}
- 
--unlock_and_fail:
--    pa_threaded_mainloop_unlock (g->mainloop);
--fail:
--    AUD_log (AUDIO_CAP, "Failed to initialize PA context");
--    qpa_audio_fini(g);
--    return NULL;
-+static void qpa_conn_fini(PAConnection *c)
-+{
-+    if (c->mainloop) {
-+        pa_threaded_mainloop_stop(c->mainloop);
-+    }
-+
-+    if (c->context) {
-+        pa_context_disconnect(c->context);
-+        pa_context_unref(c->context);
-+    }
-+
-+    if (c->mainloop) {
-+        pa_threaded_mainloop_free(c->mainloop);
-+    }
-+
-+    QTAILQ_REMOVE(&pa_conns, c, list);
-+    g_free(c);
+     SpiceVoiceOut *out = container_of (hw, SpiceVoiceOut, hw);
+@@ -326,11 +321,6 @@ static int line_in_run (HWVoiceIn *hw)
+     return num_samples;
  }
  
- static void qpa_audio_fini (void *opaque)
+-static int line_in_read (SWVoiceIn *sw, void *buf, int size)
+-{
+-    return audio_pcm_sw_read (sw, buf, size);
+-}
+-
+ static int line_in_ctl (HWVoiceIn *hw, int cmd, ...)
  {
-     paaudio *g = opaque;
-+    PAConnection *c = g->conn;
+     SpiceVoiceIn *in = container_of (hw, SpiceVoiceIn, hw);
+@@ -378,13 +368,11 @@ static struct audio_pcm_ops audio_callbacks = {
+     .init_out = line_out_init,
+     .fini_out = line_out_fini,
+     .run_out  = line_out_run,
+-    .write    = line_out_write,
+     .ctl_out  = line_out_ctl,
  
--    if (g->mainloop) {
--        pa_threaded_mainloop_stop (g->mainloop);
--    }
--
--    if (g->context) {
--        pa_context_disconnect (g->context);
--        pa_context_unref (g->context);
--    }
--
--    if (g->mainloop) {
--        pa_threaded_mainloop_free (g->mainloop);
-+    if (--c->refcount == 0) {
-+        qpa_conn_fini(c);
-     }
+     .init_in  = line_in_init,
+     .fini_in  = line_in_fini,
+     .run_in   = line_in_run,
+-    .read     = line_in_read,
+     .ctl_in   = line_in_ctl,
+ };
  
-     g_free(g);
+diff --git a/audio/wavaudio.c b/audio/wavaudio.c
+index bbf3f3b346..17ab921cef 100644
+--- a/audio/wavaudio.c
++++ b/audio/wavaudio.c
+@@ -84,11 +84,6 @@ static int wav_run_out (HWVoiceOut *hw, int live)
+     return decr;
+ }
+ 
+-static int wav_write_out (SWVoiceOut *sw, void *buf, int len)
+-{
+-    return audio_pcm_sw_write (sw, buf, len);
+-}
+-
+ /* VICE code: Store number as little endian. */
+ static void le_store (uint8_t *buf, uint32_t val, int len)
+ {
+@@ -240,7 +235,6 @@ static struct audio_pcm_ops wav_pcm_ops = {
+     .init_out = wav_init_out,
+     .fini_out = wav_fini_out,
+     .run_out  = wav_run_out,
+-    .write    = wav_write_out,
+     .ctl_out  = wav_ctl_out,
+ };
+ 
 -- 
 2.22.0
 
