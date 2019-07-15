@@ -2,84 +2,112 @@ Return-Path: <SRS0=IjNW=VM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD3C3C76191
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 11:04:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31AF3C7618F
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 11:06:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 84A7B206B8
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 11:04:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 84A7B206B8
+	by mail.kernel.org (Postfix) with ESMTPS id 0871C206B8
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 11:06:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0871C206B8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37112 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37120 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hmymn-0005CA-Pr
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 07:04:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44967)
+	id 1hmyoX-0006Fj-6O
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 07:06:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45304)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hmymY-0004X3-10
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 07:04:34 -0400
+ (envelope-from <thuth@redhat.com>) id 1hmyoK-0005rP-MN
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 07:06:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hmymW-0003HS-OY
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 07:04:33 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:34074)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hmymW-0003GF-Hq
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 07:04:32 -0400
-Received: by mail-wm1-f66.google.com with SMTP id w9so14039951wmd.1
- for <qemu-devel@nongnu.org>; Mon, 15 Jul 2019 04:04:32 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=3h7FJeb5FfXjJncaNSFPcAq5CrVN6sKZxo1A34lkJ90=;
- b=c2Z/RRnYFUp/F3yr8LmrSp+eGgiCGaV+G9G+fxZ2ivn0ptNLVxWROGJ3bDg4UKSMHR
- XtaGQe7ODKsq/+qk//GS8JQ1ptkUxMg6bRyPnkPMkzUMPwPWHLHm03dTYzQtyiM0MmgR
- +uxSGIP7P2+S6upwS7oiYnIxZWd+7KxGhqz2PgSXjeHRsPEobMzNfhIzGsisjSMFoSSZ
- 9B58gOh9n7K5NVPcvg01p+shOkEmyN6JWU4ANP1lihrkjqnbcqbbPGY/CsX9F8uNoT/p
- 8fzZXgqcdruiuOPauV8TsqcorKi4a60NCI+VvhBRW8F/te8/Omx/IRtjsUx1Uwe+J3DC
- /daA==
-X-Gm-Message-State: APjAAAULdUUwcKadpNX32DjE98NTX2p63zCN7aeMU8DzAFWz2nP4+1z1
- YGK+pKn/YJjUMMFho9qleIOYcQ==
-X-Google-Smtp-Source: APXvYqwREF2BzPwOB/3PP7rVeGZ+hCPNrU80TJyAVxF+ZLxX2qTHq5O5dLhhQpxeECd3+7mjBMw+Lg==
-X-Received: by 2002:a7b:c206:: with SMTP id x6mr24185721wmi.156.1563188670329; 
- Mon, 15 Jul 2019 04:04:30 -0700 (PDT)
-Received: from [192.168.1.37] (62.red-83-42-61.dynamicip.rima-tde.net.
- [83.42.61.62])
- by smtp.gmail.com with ESMTPSA id p3sm15390645wmg.15.2019.07.15.04.04.28
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Mon, 15 Jul 2019 04:04:29 -0700 (PDT)
-To: Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>
-References: <20190715095545.28545-1-philmd@redhat.com>
- <20190715095545.28545-2-philmd@redhat.com>
- <ca528cdc-6118-0b2f-c1b8-30b06875dde8@redhat.com>
- <CAFEAcA-wgTVfj0TUJ=piP0wEgLGiNpOYia5DK2GQAO4Q7gNaWg@mail.gmail.com>
- <6d69e8ad-d720-ce04-20f2-a03193903078@redhat.com>
- <20190715125653.6e65d575.cohuck@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <c1c68faf-0424-6c7c-e39f-42159457c3ee@redhat.com>
-Date: Mon, 15 Jul 2019 13:04:28 +0200
+ (envelope-from <thuth@redhat.com>) id 1hmyoJ-00046X-Lc
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 07:06:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45406)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hmyoJ-00045x-Dk
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 07:06:23 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 873C030821A3;
+ Mon, 15 Jul 2019 11:06:22 +0000 (UTC)
+Received: from thuth.remote.csb (reserved-198-198.str.redhat.com
+ [10.33.198.198])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id ACAD26012C;
+ Mon, 15 Jul 2019 11:06:21 +0000 (UTC)
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
+References: <20190530101603.22254-1-alex.bennee@linaro.org>
+ <20190530101603.22254-4-alex.bennee@linaro.org>
+ <87imthsps2.fsf@zen.linaroharston>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; keydata=
+ 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
+Organization: Red Hat
+Message-ID: <f73a55a4-57c7-3234-a85b-21cf3c758ea2@redhat.com>
+Date: Mon, 15 Jul 2019 13:06:20 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <20190715125653.6e65d575.cohuck@redhat.com>
+In-Reply-To: <87imthsps2.fsf@zen.linaroharston>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.47]); Mon, 15 Jul 2019 11:06:22 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.128.66
-Subject: Re: [Qemu-devel] [qemu-s390x] [RFC PATCH 1/3] hw/Kconfig: PCI bus
- implies PCI_DEVICES
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v1 03/26] tests: Run the iotests during
+ "make check" again
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,75 +119,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Collin Walling <walling@linux.ibm.com>,
- "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Eduardo Habkost <ehabkost@redhat.com>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- "Michael S. Tsirkin" <mst@redhat.com>, Helge Deller <deller@gmx.de>,
- Palmer Dabbelt <palmer@sifive.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- QEMU Developers <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>,
- "open list:S390" <qemu-s390x@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
- qemu-ppc <qemu-ppc@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- Richard Henderson <rth@twiddle.net>, Artyom Tarasenko <atar4qemu@gmail.com>,
- David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/15/19 12:56 PM, Cornelia Huck wrote:
-> On Mon, 15 Jul 2019 12:48:55 +0200
-> Thomas Huth <thuth@redhat.com> wrote:
-> 
->> On 15/07/2019 12.19, Peter Maydell wrote:
->>> On Mon, 15 Jul 2019 at 11:15, Thomas Huth <thuth@redhat.com> wrote:  
->>>>
->>>> On 15/07/2019 11.55, Philippe Mathieu-Daudé wrote:  
->>>>> If a controller device provides a PCI bus, we can plug any PCI
->>>>> daughter card on it.
->>>>>
->>>>> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
->>>>> ---  
->>>   
->>>>> diff --git a/hw/pci/Kconfig b/hw/pci/Kconfig
->>>>> index 77f8b005ff..0f7267db35 100644
->>>>> --- a/hw/pci/Kconfig
->>>>> +++ b/hw/pci/Kconfig
->>>>> @@ -1,5 +1,6 @@
->>>>>  config PCI
->>>>>      bool
->>>>> +    imply PCI_DEVICES  
->>>>
->>>> No, please don't change this. This was done on purpose, since almost all
->>>> PCI_DEVICES do not work on s390x (so s390x does *not* imply PCI_DEVICES).  
->>>
->>> But that means that every board that provides PCI has to have an
->>> "imply PCI_DEVICES" line, which is pretty clunky just to work
->>> around an s390x limitation.
->>>
->>> Is there some way in the Kconfig syntax for s390x to say
->>> "no PCI_DEVICES" so we can have the corner-case be handled
->>> by the s390x Kconfig in one place rather than in 20 places
->>> affecting everywhere except s390x?  
+On 07/06/2019 11.33, Alex Benn=C3=A9e wrote:
+>=20
+> Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
+>=20
+>> From: Thomas Huth <thuth@redhat.com>
 >>
->> IIRC the problem on s390x are the legacy IRQs. s390x has only MSIs. So I
->> guess the correct way to fix this would be to introduce some
->> PCI_LEGACY_IRQ switch and let all old devices that do not work with MSI
->> depend on it.
-> 
-> s/MSI/MSI-X/, IIRC. Not sure how far 'legacy' would stretch.
+>> People often forget to run the iotests before submitting patches or
+>> pull requests - this is likely due to the fact that we do not run the
+>> tests during our mandatory "make check" tests yet. Now that we've got
+>> a proper "auto" group of iotests that should be fine to run in every
+>> environment, we can enable the iotests during "make check" again by
+>> running the "auto" tests by default from the check-block.sh script.
+>>
+>> Some cases still need to be checked first, though: iotests need bash
+>> and GNU sed (otherwise they fail), and if gprof is enabled, it spoils
+>> the output of some test cases causing them to fail. So if we detect
+>> that one of the required programs is missing or that gprof is enabled,
+>> we still have to skip the iotests to avoid failures.
+>=20
+> Thomas,
+>=20
+> I've dropped this from the latest PR because I'm still seeing problems
+> in some places. One of the issues is tests failing when the underlying
+> file system doesn't support O_DIRECT. Some tests seem to have explicit
+> feature checks for this but others just fail.
 
-Maybe we can have something like PCI_LEGACY_DEVICES and PCI_MSI_DEVICES?
+Ok, back at the keyboard, I'm now working on a patch that removes more
+tests from the "auto" group. Do you happen to have a list of the tests
+that were failing for you?
+Or can you tell me which file systems do not support O_DIRECT, so I can
+check it on my own?
 
-So if s390x only selects PCI_LEGACY (not PCI_MSI) bus, then it only get
-legacy devices?
-
-Other MSI compliant should select PCI_MSI instead. PCI alone seems to
-give troubles.
-
-> cc:ing Collin in case there's something else.
-> 
+ Thomas
 
