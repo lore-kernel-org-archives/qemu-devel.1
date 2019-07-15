@@ -2,63 +2,58 @@ Return-Path: <SRS0=IjNW=VM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C28A6C76190
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 09:50:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 848D3C7618F
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 09:56:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7D63120868
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 09:50:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D63120868
+	by mail.kernel.org (Postfix) with ESMTPS id 4A13120C01
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 09:56:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A13120C01
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36409 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36438 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hmxdB-0006b7-K5
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 05:50:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56511)
+	id 1hmxij-00006o-6y
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 05:56:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57786)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgilbert@redhat.com>) id 1hmxcw-0005pG-4N
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 05:50:35 -0400
+ (envelope-from <philmd@redhat.com>) id 1hmxiU-0007y7-Ii
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 05:56:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1hmxcs-0007Rc-4J
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 05:50:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44226)
+ (envelope-from <philmd@redhat.com>) id 1hmxiT-0001oO-ND
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 05:56:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51846)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hmxco-0007O3-Dw
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 05:50:28 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ (Exim 4.71) (envelope-from <philmd@redhat.com>)
+ id 1hmxiR-0001mL-R8; Mon, 15 Jul 2019 05:56:15 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 87838307D88C;
- Mon, 15 Jul 2019 09:50:25 +0000 (UTC)
-Received: from work-vm (ovpn-117-181.ams2.redhat.com [10.36.117.181])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 879CA1001B16;
- Mon, 15 Jul 2019 09:50:24 +0000 (UTC)
-Date: Mon, 15 Jul 2019 10:50:22 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Peter Xu <zhexu@redhat.com>
-Message-ID: <20190715095022.GE2689@work-vm>
-References: <1563115879-2715-1-git-send-email-ivanren@tencent.com>
- <20190715014729.GA9050@xz-x1>
+ by mx1.redhat.com (Postfix) with ESMTPS id BBBCC3DD47;
+ Mon, 15 Jul 2019 09:56:12 +0000 (UTC)
+Received: from x1w.redhat.com (unknown [10.40.205.87])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8B00B6012C;
+ Mon, 15 Jul 2019 09:55:53 +0000 (UTC)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Mon, 15 Jul 2019 11:55:42 +0200
+Message-Id: <20190715095545.28545-1-philmd@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190715014729.GA9050@xz-x1>
-User-Agent: Mutt/1.12.0 (2019-05-25)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.48]); Mon, 15 Jul 2019 09:50:25 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.29]); Mon, 15 Jul 2019 09:56:13 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] migration: always initial RAMBlock.bmap to
- 1 for new migration
+Subject: [Qemu-devel] [PATCH 0/3] hw/Kconfig: PCI & USB fixes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,62 +65,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, Ivan Ren <renyime@gmail.com>, quintela@redhat.com
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ qemu-riscv@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ "Michael S. Tsirkin" <mst@redhat.com>, qemu-ppc@nongnu.org,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Helge Deller <deller@gmx.de>, Palmer Dabbelt <palmer@sifive.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ Artyom Tarasenko <atar4qemu@gmail.com>, qemu-arm@nongnu.org,
+ Alistair Francis <Alistair.Francis@wdc.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Peter Xu (zhexu@redhat.com) wrote:
-> On Sun, Jul 14, 2019 at 10:51:19PM +0800, Ivan Ren wrote:
-> > Reproduce the problem:
-> > migrate
-> > migrate_cancel
-> > migrate
-> > 
-> > Error happen for memory migration
-> 
-> Can mention "this mostly revert 0315851938 but with comments kept"
-> when merge...
-> 
-> > 
-> > The reason as follows:
-> > 1. qemu start, ram_list.dirty_memory[DIRTY_MEMORY_MIGRATION] all set to
-> >    1 by a series of cpu_physical_memory_set_dirty_range
-> > 2. migration start:ram_init_bitmaps
-> >    - memory_global_dirty_log_start: begin log diry
-> >    - memory_global_dirty_log_sync: sync dirty bitmap to
-> >      ram_list.dirty_memory[DIRTY_MEMORY_MIGRATION]
-> >    - migration_bitmap_sync_range: sync ram_list.
-> >      dirty_memory[DIRTY_MEMORY_MIGRATION] to RAMBlock.bmap
-> >      and ram_list.dirty_memory[DIRTY_MEMORY_MIGRATION] is set to zero
-> > 3. migration data...
-> > 4. migrate_cancel, will stop log dirty
-> > 5. migration start:ram_init_bitmaps
-> >    - memory_global_dirty_log_start: begin log diry
-> >    - memory_global_dirty_log_sync: sync dirty bitmap to
-> >      ram_list.dirty_memory[DIRTY_MEMORY_MIGRATION]
-> >    - migration_bitmap_sync_range: sync ram_list.
-> >      dirty_memory[DIRTY_MEMORY_MIGRATION] to RAMBlock.bmap
-> >      and ram_list.dirty_memory[DIRTY_MEMORY_MIGRATION] is set to zero
-> > 
-> >    Here RAMBlock.bmap only have new logged dirty pages, don't contain
-> >    the whole guest pages.
-> 
-> Fixes: 03158519384f158
-> 
-> > 
-> > Signed-off-by: Ivan Ren <ivanren@tencent.com>
-> 
-> Reviewed-by: Peter Xu <peterx@redhat.com>
-> 
-> I think this is a bit severe and should be rc2 material.  Dave/Juan?
+I actually wanted to clean the USB devices (i.e. to not have
+USB3 devices appear on OHCI buses) but this is too late for
+the next release, so let's post the patches accumulated.
 
-Yes agreed; I've added it to the planning/4.1 page.
+Philippe Mathieu-Daud=C3=A9 (3):
+  hw/Kconfig: PCI bus implies PCI_DEVICES
+  hw/usb/Kconfig: Add CONFIG_USB_EHCI_PCI
+  hw/usb/Kconfig: USB_XHCI_NEC requires USB_XHCI
 
-> Thanks,
-> 
-> -- 
-> Peter Xu
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+ docs/devel/kconfig.rst |  1 -
+ hw/alpha/Kconfig       |  1 -
+ hw/arm/Kconfig         |  4 ----
+ hw/hppa/Kconfig        |  1 -
+ hw/i386/Kconfig        |  1 -
+ hw/pci/Kconfig         |  1 +
+ hw/ppc/Kconfig         |  6 ------
+ hw/riscv/Kconfig       |  1 -
+ hw/sh4/Kconfig         |  1 -
+ hw/sparc64/Kconfig     |  1 -
+ hw/usb/Kconfig         | 11 +++++++----
+ hw/usb/Makefile.objs   |  5 +++--
+ 12 files changed, 11 insertions(+), 23 deletions(-)
+
+--=20
+2.20.1
+
 
