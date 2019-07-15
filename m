@@ -2,62 +2,80 @@ Return-Path: <SRS0=IjNW=VM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B299C7618F
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 13:44:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EDB17C76195
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 13:49:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 437222067C
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 13:44:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 437222067C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id BF54121530
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 13:49:19 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lmI7jgqw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF54121530
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38786 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38856 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hn1Hm-0001je-Hh
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 09:44:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52363)
+	id 1hn1Ly-0003kg-NW
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 09:49:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53188)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <quintela@redhat.com>) id 1hn1Hb-0001LQ-UJ
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 09:44:49 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hn1Le-0002oa-7e
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 09:48:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <quintela@redhat.com>) id 1hn1Ha-0008Cu-1H
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 09:44:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42306)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1hn1HZ-0008CC-6G
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 09:44:45 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 2A75FC058CBA;
- Mon, 15 Jul 2019 13:44:43 +0000 (UTC)
-Received: from redhat.com (ovpn-117-250.ams2.redhat.com [10.36.117.250])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 78D2060C64;
- Mon, 15 Jul 2019 13:44:42 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-In-Reply-To: <CAFEAcA9ncjtGdc8CZOJBDBRtzEU8oL7YicVg5PtyiiO2O4z51w@mail.gmail.com>
- (Peter Maydell's message of "Mon, 15 Jul 2019 12:16:57 +0100")
+ (envelope-from <peter.maydell@linaro.org>) id 1hn1Ld-0001i5-3S
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 09:48:58 -0400
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:33502)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hn1Lc-0001e7-Sg
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 09:48:57 -0400
+Received: by mail-oi1-x242.google.com with SMTP id u15so12705123oiv.0
+ for <qemu-devel@nongnu.org>; Mon, 15 Jul 2019 06:48:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=KhkyjNmkbBt2TNHskueMzItP+CrD8zBwY2BmKGOgg24=;
+ b=lmI7jgqwe/klpYvHZkRxhikM1BoM6wJfMh+JrykXLTcrQbog2aDqRwp25mzdsRqDig
+ qEAagZuqq1sGl+epF5tcN+vcB+pIyfRLI269AvgeAsIOu+4UvMu76dVtldMfmQBgVoMo
+ +vOXZq1n8y/eh70MGI83416zfyEhbBvY8cZii5YzXTapEakgID/bS3K/zM8jh5AzTPeS
+ bPlYnbBpPe7UuYYfE/h7djLWag761E1+LpGxPrSUrxycnfkKP0eZ4tPqhL/sK4vAGqrF
+ b5Td2iJ2+OhsIb4sjS/XYvJLQuMXNaLqohdbIRIoaidrSpkESo0eM7hEOkpMyYevJwpg
+ grQA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=KhkyjNmkbBt2TNHskueMzItP+CrD8zBwY2BmKGOgg24=;
+ b=Jr5jOl2ip1bMQ1tq0tu1Al05JOG0ojRgCXRqxxgWQ4V/Db4WlHDuaRAwSuBldG5u0n
+ C/Fgs6YZsMl1go2jimsu/OwX5+DmkaSGcNGsagFQ9T4BcpLy4UypuRNzAcaoVioUGu3R
+ FO3lC2jZ0ttl/Jinr+i2ZdGakR6/HoEmV7jNW1Cf5DZ0f4TwMNTtI/IU56BvD0gezVmk
+ Ejw/IZCL+0k0Ws+pYV0ffoGJIRWZ0kDun9eoK7IY4p53z6s7ugsdmVaqQU8njUZiutVm
+ gGqsisC8X4+YrCmTjLGy3k9sbF/uJumD3PKo9l5R4ectn0+GHcJNj1KQTZRCNuNSVhg7
+ qQEw==
+X-Gm-Message-State: APjAAAUDB0UmcLVAGT+rGazexLjYJAsOo97rJ2k5/y6sJ9sCqmyz8j4P
+ HLmMyIjySbLCX1gGsawURg5Rq1+ynTWM1cHQNEOgpw==
+X-Google-Smtp-Source: APXvYqxeCSv7UUCXqxX+f+jUbGXXh8dmymO3S+I1HW0faMk34f4/TcgmuVMDIIt3tGibA09eGd/lfrl/Am80fyL7O5Y=
+X-Received: by 2002:aca:ac48:: with SMTP id v69mr12743117oie.48.1563198533124; 
+ Mon, 15 Jul 2019 06:48:53 -0700 (PDT)
+MIME-Version: 1.0
 References: <20190712143207.4214-1-quintela@redhat.com>
  <CAFEAcA-ydNS072OH7CyGNq2+sESgonW-8QSJdNYJq6zW-rYjUQ@mail.gmail.com>
  <CAFEAcA9ncjtGdc8CZOJBDBRtzEU8oL7YicVg5PtyiiO2O4z51w@mail.gmail.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
-Date: Mon, 15 Jul 2019 15:44:39 +0200
-Message-ID: <87zhlf76pk.fsf@trasno.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.32]); Mon, 15 Jul 2019 13:44:43 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
+ <87zhlf76pk.fsf@trasno.org>
+In-Reply-To: <87zhlf76pk.fsf@trasno.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 15 Jul 2019 14:48:42 +0100
+Message-ID: <CAFEAcA_9tVQht7bp9_yrFEhQ74ye6LBNjEYK_nftCWsKMrOohw@mail.gmail.com>
+To: Juan Quintela <quintela@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::242
 Subject: Re: [Qemu-devel] [PULL 00/19] Migration patches
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -70,7 +88,6 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: quintela@redhat.com
 Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
  kvm-devel <kvm@vger.kernel.org>, QEMU Developers <qemu-devel@nongnu.org>,
  "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
@@ -79,173 +96,22 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Peter Maydell <peter.maydell@linaro.org> wrote:
-> On Fri, 12 Jul 2019 at 17:33, Peter Maydell <peter.maydell@linaro.org> wrote:
->> Still fails on aarch32 host, I'm afraid:
-
-Hi
-
-dropping the multifd test patch from now.  For "some" reason, having a
-packed struct and 32bits is getting ugly, not sure yet _why_.
-
-Resending the pull request.
-
-
->>
->> MALLOC_PERTURB_=${MALLOC_PERTURB_:-$(( ${RANDOM:-0} % 255 + 1))}
->> QTEST_QEMU_BINARY=aarch64-softmmu/qemu-system-aarch64
->> QTEST_QEMU_IMG=qemu-img tests/migration-test -m=quick -k --tap <
->> /dev/null | ./scripts/tap-driver.pl --test-name="migration-test"
->> PASS 1 migration-test /aarch64/migration/deprecated
->> PASS 2 migration-test /aarch64/migration/bad_dest
->> PASS 3 migration-test /aarch64/migration/fd_proto
->> PASS 4 migration-test /aarch64/migration/postcopy/unix
->> PASS 5 migration-test /aarch64/migration/postcopy/recovery
->> PASS 6 migration-test /aarch64/migration/precopy/unix
->> PASS 7 migration-test /aarch64/migration/precopy/tcp
->> PASS 8 migration-test /aarch64/migration/xbzrle/unix
->> malloc(): memory corruption
->> Broken pipe
->> qemu-system-aarch64: load of migration failed: Invalid argument
->> /home/peter.maydell/qemu/tests/libqtest.c:137: kill_qemu() tried to
->> terminate QEMU process but encountered exit status 1
->> Aborted
->> ERROR - too few tests run (expected 9, got 8)
->> /home/peter.maydell/qemu/tests/Makefile.include:899: recipe for target
->> 'check-qtest-aarch64' failed
+On Mon, 15 Jul 2019 at 14:44, Juan Quintela <quintela@redhat.com> wrote:
 >
-> A run with valgrind:
+> Peter Maydell <peter.maydell@linaro.org> wrote:
+> > On Fri, 12 Jul 2019 at 17:33, Peter Maydell <peter.maydell@linaro.org> wrote:
+> >> Still fails on aarch32 host, I'm afraid:
 >
-> (armhf)pmaydell@mustang-maydell:~/qemu/build/all-a32$
-> QTEST_QEMU_BINARY='valgrind aarch64-softmmu/qemu-system-aarch64'
-> tests/migration-test -v -p '/aarch64/migration/multifd/tcp'
-> /aarch64/migration/multifd/tcp: ==4034== Memcheck, a memory error detector
-> ==4034== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
-> ==4034== Using Valgrind-3.13.0 and LibVEX; rerun with -h for copyright info
-> ==4034== Command: aarch64-softmmu/qemu-system-aarch64 -qtest
-> unix:/tmp/qtest-4033.sock -qtest-log /dev/null -chardev
-> socket,path=/tmp/qtest-4033.qmp,id=char0 -mon
-> chardev=char0,mode=control -machine accel=qtest -display none -machine
-> virt,accel=kvm:tcg,gic-version=max -name vmsource,debug-threads=on
-> -cpu max -m 150M -serial file:/tmp/migration-test-mSLr4A/src_serial
-> -kernel /tmp/migration-test-mSLr4A/bootsect
-> ==4034==
-> ==4040== Memcheck, a memory error detector
-> ==4040== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
-> ==4040== Using Valgrind-3.13.0 and LibVEX; rerun with -h for copyright info
-> ==4040== Command: aarch64-softmmu/qemu-system-aarch64 -qtest
-> unix:/tmp/qtest-4033.sock -qtest-log /dev/null -chardev
-> socket,path=/tmp/qtest-4033.qmp,id=char0 -mon
-> chardev=char0,mode=control -machine accel=qtest -display none -machine
-> virt,accel=kvm:tcg,gic-version=max -name vmdest,debug-threads=on -cpu
-> max -m 150M -serial file:/tmp/migration-test-mSLr4A/dest_serial
-> -kernel /tmp/migration-test-mSLr4A/bootsect -incoming tcp:127.0.0.1:0
-> ==4040==
-> ==4034== Thread 5 multifdsend_0:
-> ==4034== Syscall param sendmsg(msg.msg_iov[0]) points to uninitialised byte(s)
-> ==4034==    at 0x5299F06: __libc_do_syscall (libc-do-syscall.S:47)
-> ==4034==    by 0x5298FCB: sendmsg (sendmsg.c:28)
-> ==4034==    by 0x60135D: qio_channel_socket_writev (channel-socket.c:544)
-> ==4034==    by 0x5FF995: qio_channel_writev (channel.c:207)
-> ==4034==    by 0x5FF995: qio_channel_writev_all (channel.c:171)
-> ==4034==    by 0x5FFA0F: qio_channel_write_all (channel.c:257)
-> ==4034==    by 0x26BA73: multifd_send_initial_packet (ram.c:711)
-> ==4034==    by 0x26BA73: multifd_send_thread (ram.c:1085)
-> ==4034==    by 0x63C0B1: qemu_thread_start (qemu-thread-posix.c:502)
-> ==4034==    by 0x5290613: start_thread (pthread_create.c:463)
-> ==4034==    by 0x53487FB: ??? (clone.S:73)
-> ==4034==  Address 0x2320048d is on thread 5's stack
-> ==4034==  in frame #5, created by multifd_send_thread (ram.c:1077)
-> ==4034==
-> ==4034== Thread 6 multifdsend_1:
-> ==4034== Invalid write of size 4
-> ==4034==    at 0x26BB7C: multifd_send_fill_packet (ram.c:806)
-> ==4034==    by 0x26BB7C: multifd_send_thread (ram.c:1101)
-> ==4034==    by 0x63C0B1: qemu_thread_start (qemu-thread-posix.c:502)
-> ==4034==    by 0x5290613: start_thread (pthread_create.c:463)
-> ==4034==    by 0x53487FB: ??? (clone.S:73)
-> ==4034==  Address 0x224ed668 is 0 bytes after a block of size 832 alloc'd
-> ==4034==    at 0x4841BC4: calloc (vg_replace_malloc.c:711)
-> ==4034==    by 0x5018269: g_malloc0 (in
-> /usr/lib/arm-linux-gnueabihf/libglib-2.0.so.0.5600.4)
-> ==4034==
-> ==4034== Invalid write of size 4
-> ==4034==    at 0x26BB82: multifd_send_fill_packet (ram.c:806)
-> ==4034==    by 0x26BB82: multifd_send_thread (ram.c:1101)
-> ==4034==    by 0x63C0B1: qemu_thread_start (qemu-thread-posix.c:502)
-> ==4034==    by 0x5290613: start_thread (pthread_create.c:463)
-> ==4034==    by 0x53487FB: ??? (clone.S:73)
-> ==4034==  Address 0x224ed66c is 4 bytes after a block of size 832 alloc'd
-> ==4034==    at 0x4841BC4: calloc (vg_replace_malloc.c:711)
-> ==4034==    by 0x5018269: g_malloc0 (in
-> /usr/lib/arm-linux-gnueabihf/libglib-2.0.so.0.5600.4)
-> ==4034==
-> ==4034== Invalid read of size 4
-> ==4034==    at 0x5FF1DA: qio_channel_writev_full (channel.c:86)
-> ==4034==    by 0x5FF995: qio_channel_writev (channel.c:207)
-> ==4034==    by 0x5FF995: qio_channel_writev_all (channel.c:171)
-> ==4034==    by 0x5FFA0F: qio_channel_write_all (channel.c:257)
-> ==4034==    by 0x26BBD9: multifd_send_thread (ram.c:1111)
-> ==4034==    by 0x63C0B1: qemu_thread_start (qemu-thread-posix.c:502)
-> ==4034==    by 0x5290613: start_thread (pthread_create.c:463)
-> ==4034==    by 0x53487FB: ??? (clone.S:73)
-> ==4034==  Address 0x30 is not stack'd, malloc'd or (recently) free'd
-> ==4034==
-> ==4034==
-> ==4034== Process terminating with default action of signal 11 (SIGSEGV)
-> ==4034==  Access not within mapped region at address 0x30
-> ==4034==    at 0x5FF1DA: qio_channel_writev_full (channel.c:86)
-> ==4034==    by 0x5FF995: qio_channel_writev (channel.c:207)
-> ==4034==    by 0x5FF995: qio_channel_writev_all (channel.c:171)
-> ==4034==    by 0x5FFA0F: qio_channel_write_all (channel.c:257)
-> ==4034==    by 0x26BBD9: multifd_send_thread (ram.c:1111)
-> ==4034==    by 0x63C0B1: qemu_thread_start (qemu-thread-posix.c:502)
-> ==4034==    by 0x5290613: start_thread (pthread_create.c:463)
-> ==4034==    by 0x53487FB: ??? (clone.S:73)
-> ==4034==  If you believe this happened as a result of a stack
-> ==4034==  overflow in your program's main thread (unlikely but
-> ==4034==  possible), you can try to increase the size of the
-> ==4034==  main thread stack using the --main-stacksize= flag.
-> ==4034==  The main thread stack size used in this run was 8388608.
-> ==4034==
-> ==4034== HEAP SUMMARY:
-> ==4034==     in use at exit: 5,994,911 bytes in 23,588 blocks
-> ==4034==   total heap usage: 87,487 allocs, 63,899 frees, 17,732,188
-> bytes allocated
-> ==4034==
-> ==4034== LEAK SUMMARY:
-> ==4034==    definitely lost: 56 bytes in 1 blocks
-> ==4034==    indirectly lost: 64 bytes in 2 blocks
-> ==4034==      possibly lost: 1,620 bytes in 26 blocks
-> ==4034==    still reachable: 5,993,171 bytes in 23,559 blocks
-> ==4034==         suppressed: 0 bytes in 0 blocks
-> ==4034== Rerun with --leak-check=full to see details of leaked memory
-> ==4034==
-> ==4034== For counts of detected and suppressed errors, rerun with: -v
-> ==4034== Use --track-origins=yes to see where uninitialised values come from
-> ==4034== ERROR SUMMARY: 66 errors from 4 contexts (suppressed: 6 from 3)
-> Broken pipe
-> qemu-system-aarch64: load of migration failed: Input/output error
-> ==4040==
-> ==4040== HEAP SUMMARY:
-> ==4040==     in use at exit: 4,893,269 bytes in 19,702 blocks
-> ==4040==   total heap usage: 86,196 allocs, 66,494 frees, 17,438,183
-> bytes allocated
-> ==4040==
-> ==4040== LEAK SUMMARY:
-> ==4040==    definitely lost: 0 bytes in 0 blocks
-> ==4040==    indirectly lost: 0 bytes in 0 blocks
-> ==4040==      possibly lost: 1,160 bytes in 5 blocks
-> ==4040==    still reachable: 4,892,109 bytes in 19,697 blocks
-> ==4040==         suppressed: 0 bytes in 0 blocks
-> ==4040== Rerun with --leak-check=full to see details of leaked memory
-> ==4040==
-> ==4040== For counts of detected and suppressed errors, rerun with: -v
-> ==4040== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 6 from 3)
-> /home/peter.maydell/qemu/tests/libqtest.c:137: kill_qemu() tried to
-> terminate QEMU process but encountered exit status 1
-> Aborted
+> Hi
 >
-> thanks
-> -- PMM
+> dropping the multifd test patch from now.  For "some" reason, having a
+> packed struct and 32bits is getting ugly, not sure yet _why_.
+
+IMHO 'packed' structs are usually a bad idea. They have a bunch
+of behaviours you may not be expecting (for instance they're
+also not naturally aligned, and arrays of them won't be the
+size you expect).
+
+thanks
+-- PMM
 
