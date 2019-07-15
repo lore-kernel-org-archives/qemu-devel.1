@@ -6,58 +6,58 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 758CAC76191
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB94DC7618F
 	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 17:50:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5382E205ED
+	by mail.kernel.org (Postfix) with ESMTPS id 9CCFE205ED
 	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 17:50:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5382E205ED
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9CCFE205ED
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41550 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41552 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hn57W-0003eY-A0
+	id 1hn57W-0003fq-Ke
 	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 13:50:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50820)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50865)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hn56S-0007d1-HC
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 13:49:34 -0400
+ (envelope-from <philmd@redhat.com>) id 1hn56X-00080T-PJ
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 13:49:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hn56R-0000X6-Gb
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 13:49:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35612)
+ (envelope-from <philmd@redhat.com>) id 1hn56W-0000iB-Jj
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 13:49:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34958)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <philmd@redhat.com>)
- id 1hn56P-0000KC-9d; Mon, 15 Jul 2019 13:49:31 -0400
+ id 1hn56W-0000fy-EG; Mon, 15 Jul 2019 13:49:36 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 01E2130BDE49;
- Mon, 15 Jul 2019 17:49:26 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 9C2B037EE0;
+ Mon, 15 Jul 2019 17:49:35 +0000 (UTC)
 Received: from x1w.redhat.com (unknown [10.40.205.87])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 052D55C28D;
- Mon, 15 Jul 2019 17:49:18 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 78F6A5C224;
+ Mon, 15 Jul 2019 17:49:26 +0000 (UTC)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
  qemu-devel@nongnu.org, Stefan Weil <sw@weilnetz.de>
-Date: Mon, 15 Jul 2019 19:48:13 +0200
-Message-Id: <20190715174817.18981-7-philmd@redhat.com>
+Date: Mon, 15 Jul 2019 19:48:14 +0200
+Message-Id: <20190715174817.18981-8-philmd@redhat.com>
 In-Reply-To: <20190715174817.18981-1-philmd@redhat.com>
 References: <20190715174817.18981-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Mon, 15 Jul 2019 17:49:26 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.29]); Mon, 15 Jul 2019 17:49:35 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [RFC PATCH-for-4.1 v2 6/9] buildsys: The NSIS Windows
- build requires the documentation installed
+Subject: [Qemu-devel] [PATCH-for-4.1 v2 7/9] buildsys: The NSIS Windows
+ build requires qemu-nsis.bmp installed
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -81,6 +81,9 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+The qemu-nsis.bmp file was not listed with the other blobs, thus
+not installed in the ${BINDIR} location.
+
 This fixes:
 
   $ make installer
@@ -96,42 +99,45 @@ This fixes:
            done \
           ) >/tmp/qemu-nsis/system-emulations.nsh
   makensis -V2 -NOCD \
+                  -DCONFIG_DOCUMENTATION=3D"y" \
                    \
-                  -DCONFIG_GTK=3D"y" \
                   -DBINDIR=3D"/tmp/qemu-nsis" \
                    \
-                  -DSRCDIR=3D"/source/qemu" \
+                  -DSRCDIR=3D"/home/phil/source/qemu" \
                   -DOUTFILE=3D"qemu-setup-4.0.90.exe" \
                   -DDISPLAYVERSION=3D"4.0.90" \
-                  /source/qemu/qemu.nsi
-  File: "/tmp/qemu-nsis\qemu-doc.html" -> no files found.
+                  /home/phil/source/qemu/qemu.nsi
+  File: "/tmp/qemu-nsis\*.bmp" -> no files found.
   Usage: File [/nonfatal] [/a] ([/r] [/x filespec [...]] filespec [...] |
      /oname=3Doutfile one_file_only)
-  Error in script "/source/qemu/qemu.nsi" on line 173 -- aborting creatio=
-n process
-  make: *** [Makefile:1080: qemu-setup-4.0.90.exe] Error 1
+  Error in script "/home/phil/source/qemu/qemu.nsi" on line 122 -- aborti=
+ng creation process
+  Makefile:1077: recipe for target 'qemu-setup-4.0.90.exe' failed
+  make: *** [qemu-setup-4.0.90.exe] Error 1
 
+Fixes: https://bugs.launchpad.net/bugs/1836453
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
-Not sure is this the only dependency missing, or this is the correct fix.=
-..
-
- Makefile | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+$ file qemu-setup-4.0.90.exe
+qemu-setup-4.0.90.exe: PE32 executable (GUI) Intel 80386 (stripped to ext=
+ernal PDB), for MS Windows, Nullsoft Installer self-extracting archive
+---
+ Makefile | 1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/Makefile b/Makefile
-index 1fcbaed62c..f8dac48981 100644
+index f8dac48981..f2e5fd3316 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -1073,7 +1073,7 @@ installer: $(INSTALLER)
-=20
- INSTDIR=3D/tmp/qemu-nsis
-=20
--$(INSTALLER): $(SRC_PATH)/qemu.nsi
-+$(INSTALLER): install-doc $(SRC_PATH)/qemu.nsi
- 	$(MAKE) install prefix=3D${INSTDIR}
- ifdef SIGNCODE
- 	(cd ${INSTDIR}; \
+@@ -761,6 +761,7 @@ pxe-pcnet.rom pxe-rtl8139.rom pxe-virtio.rom \
+ efi-e1000.rom efi-eepro100.rom efi-ne2k_pci.rom \
+ efi-pcnet.rom efi-rtl8139.rom efi-virtio.rom \
+ efi-e1000e.rom efi-vmxnet3.rom \
++qemu-nsis.bmp \
+ bamboo.dtb canyonlands.dtb petalogix-s3adsp1800.dtb petalogix-ml605.dtb =
+\
+ multiboot.bin linuxboot.bin linuxboot_dma.bin kvmvapic.bin pvh.bin \
+ s390-ccw.img s390-netboot.img \
 --=20
 2.20.1
 
