@@ -2,90 +2,59 @@ Return-Path: <SRS0=IjNW=VM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36E5CC7618F
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 14:27:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3B3FC76191
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 14:27:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0520E217F4
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 14:27:04 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cBacO19Q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0520E217F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 8C09420896
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 14:27:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C09420896
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39374 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39376 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hn1wU-0001SD-U6
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 10:27:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33609)
+	id 1hn1we-0002EW-PF
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 10:27:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33629)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hn1wI-0000xe-8t
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 10:26:51 -0400
+ (envelope-from <james.morse@arm.com>) id 1hn1wK-00010x-Jn
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 10:26:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hn1wH-0003uP-1d
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 10:26:50 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:44960)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hn1wG-0003tk-Oj
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 10:26:48 -0400
-Received: by mail-wr1-x444.google.com with SMTP id p17so17310001wrf.11
- for <qemu-devel@nongnu.org>; Mon, 15 Jul 2019 07:26:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=xidU/GH85Ja4Rud7Iin5N5XoJbOSfDZco9pJa91b46w=;
- b=cBacO19Q1OgjiE6t6Qb569/HleHBpXI2ZZamDFwHd6jJKeXjgQFIQ6/JbZvoohTc4l
- J9RShcia9lQ9Ox5LTUR0bok8iP2PjPQ4vFn70AE8gH0lWzOjg53UVJsGLEWsS+NnKNjj
- aBL/lQZagKB6vo0j4rJagzpIJ1Oqk0PQ5k0qrJJ4InHLzBASthB3pTCdG394qBAlAqHi
- N+W/J2m7Iddp3AnC7mJoxjXFVywi7lmVOZtCzjpRuebFNCI4A/bZm7S3bqUUwUGoiYUr
- urLEQjgTpEx0JV7hbwVANW6qAz1Mls7tZQOIvEKj8N2fTVtMFdTkA4+cmUU+6I8I41g4
- Zgyg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=xidU/GH85Ja4Rud7Iin5N5XoJbOSfDZco9pJa91b46w=;
- b=gpJ1SgGD4EsjU4mc/f/FV8ggXs+M5Zu8TUhKyneC4NqziyL2S7vzSvzZwU9k+I5Smx
- J2X0M9odAzUZrjJ3VOQGOAftoB0jDsWbd9RNo3sI6CVbjI69hRd5AoFBBNTGC/Q1Nih8
- Jr4r4m4j+lZsfybKGuSWUa0D/mj9Ib9J8VVUm70VhIRbqJv/Fb4fvaZqNYmWHqL05G0v
- bopx0HSO9Q00YSPNjEMhsxLtiNBexGcXS3PlOxRybIGwvhkHC8+Oq0EoSbaJdsfuUz28
- EaKbX+/jUJu75YIfzd5C+1vHHe+89kq49/TPW2d3HohOxbQFUdEamTktKLVxMRU7+KWO
- pwgg==
-X-Gm-Message-State: APjAAAWiWI8S/vVqT1GqMaGmx+q2//pmX/6rfbAbkQ8G+1NRNEkJ2HzM
- pYOHI/aXe0VL8vrvIFlxTGeZkA==
-X-Google-Smtp-Source: APXvYqym43iedSNGzzpJ92pMAGhJKJ8VAOOyNozAdgHDQXFryx4tq2hOT03bUSLHgC4trcADtVI0Kw==
-X-Received: by 2002:a5d:4205:: with SMTP id n5mr22041060wrq.52.1563200807364; 
- Mon, 15 Jul 2019 07:26:47 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id s10sm21287724wmf.8.2019.07.15.07.26.46
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Mon, 15 Jul 2019 07:26:46 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 680C01FF87;
- Mon, 15 Jul 2019 15:26:46 +0100 (BST)
-References: <20190713163558.13204-1-philmd@redhat.com>
- <20190713163558.13204-3-philmd@redhat.com>
-User-agent: mu4e 1.3.3; emacs 26.1
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-In-reply-to: <20190713163558.13204-3-philmd@redhat.com>
-Date: Mon, 15 Jul 2019 15:26:46 +0100
-Message-ID: <87k1cjv0ex.fsf@zen.linaroharston>
+ (envelope-from <james.morse@arm.com>) id 1hn1wJ-0003wY-3e
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 10:26:52 -0400
+Received: from foss.arm.com ([217.140.110.172]:49344)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <james.morse@arm.com>)
+ id 1hn1wG-0003sw-4f; Mon, 15 Jul 2019 10:26:48 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B204E28;
+ Mon, 15 Jul 2019 07:26:45 -0700 (PDT)
+Received: from [10.1.196.105] (eglon.cambridge.arm.com [10.1.196.105])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4E10E3F59C;
+ Mon, 15 Jul 2019 07:26:44 -0700 (PDT)
+To: Guoheyi <guoheyi@huawei.com>
+References: <1b0aa6b2-80b1-a72e-6849-7323c3b9c6bc@huawei.com>
+ <20190715134059.GJ2790@e103592.cambridge.arm.com>
+ <20190715134848.GI56232@lakrids.cambridge.arm.com>
+From: James Morse <james.morse@arm.com>
+Message-ID: <4daefb19-6c15-f82c-31e9-1ae035d45bd5@arm.com>
+Date: Mon, 15 Jul 2019 15:26:39 +0100
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
+In-Reply-To: <20190715134848.GI56232@lakrids.cambridge.arm.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::444
-Subject: Re: [Qemu-devel] [PATCH 2/3] tests/docker: Install the NSIS tools
- in the MXE images
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 217.140.110.172
+Subject: Re: [Qemu-devel] [RFC] Add virtual SDEI support in qemu
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,102 +66,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Stefan Weil <sw@weilnetz.de>,
- qemu-devel@nongnu.org
+Cc: Mark Rutland <mark.rutland@arm.com>, Marc Zyngier <marc.zyngier@arm.com>,
+ qemu-devel@nongnu.org, Dave Martin <Dave.Martin@arm.com>, qemu-arm@nongnu.org,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Hi guys,
 
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+On 15/07/2019 14:48, Mark Rutland wrote:
+> On Mon, Jul 15, 2019 at 02:41:00PM +0100, Dave Martin wrote:
+>> On Sat, Jul 13, 2019 at 05:53:57PM +0800, Guoheyi wrote:
+>>> Do it make sense to implement virtual SDEI in qemu? So that we can have the
+>>> standard way for guest to handle NMI watchdog, RAS events and something else
+>>> which involves SDEI in a physical ARM64 machine.
 
-> This fixes:
->
->   $ make installer
-
-We should probably be exercising this via test-mingw (and making it
-usable for fedora/debian based mingw build)
-
->   (cd /tmp/qemu-nsis; \
->            for i in qemu-system-*.exe; do \
->              arch=3D${i%.exe}; \
->              arch=3D${arch#qemu-system-}; \
->              echo Section \"$arch\" Section_$arch; \
->              echo SetOutPath \"\$INSTDIR\"; \
->              echo File \"\${BINDIR}\\$i\"; \
->              echo SectionEnd; \
->            done \
->           ) >/tmp/qemu-nsis/system-emulations.nsh
->   makensis -V2 -NOCD \
->                   -DCONFIG_DOCUMENTATION=3D"y" \
->                    \
->                   -DBINDIR=3D"/tmp/qemu-nsis" \
->                    \
->                   -DSRCDIR=3D"/home/phil/source/qemu" \
->                   -DOUTFILE=3D"qemu-setup-4.0.90.exe" \
->                   -DDISPLAYVERSION=3D"4.0.90" \
->                   /home/phil/source/qemu/qemu.nsi
->   /bin/sh: 1: makensis: not found
->   Makefile:1077: recipe for target 'qemu-setup-4.0.90.exe' failed
->   make: *** [qemu-setup-4.0.90.exe] Error 127
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-
-Otherwise:
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
-> ---
->  tests/docker/dockerfiles/debian-win32-cross.docker | 3 +++
->  tests/docker/dockerfiles/debian-win64-cross.docker | 3 +++
->  2 files changed, 6 insertions(+)
->
-> diff --git a/tests/docker/dockerfiles/debian-win32-cross.docker b/tests/d=
-ocker/dockerfiles/debian-win32-cross.docker
-> index c787e43245..77f5cc45e9 100644
-> --- a/tests/docker/dockerfiles/debian-win32-cross.docker
-> +++ b/tests/docker/dockerfiles/debian-win32-cross.docker
-> @@ -9,6 +9,8 @@ MAINTAINER Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->
->  ENV TARGET i686
->
-> +ENV PATH $PATH:/usr/lib/mxe/usr/$TARGET-w64-mingw32.shared/bin
-> +
->  RUN DEBIAN_FRONTEND=3Dnoninteractive eatmydata \
->      apt-get install -y --no-install-recommends \
->          mxe-$TARGET-w64-mingw32.shared-bzip2 \
-> @@ -19,6 +21,7 @@ RUN DEBIAN_FRONTEND=3Dnoninteractive eatmydata \
->          mxe-$TARGET-w64-mingw32.shared-lzo \
->          mxe-$TARGET-w64-mingw32.shared-nettle \
->          mxe-$TARGET-w64-mingw32.shared-ncurses \
-> +        mxe-$TARGET-w64-mingw32.shared-nsis \
->          mxe-$TARGET-w64-mingw32.shared-pixman \
->          mxe-$TARGET-w64-mingw32.shared-pkgconf \
->          mxe-$TARGET-w64-mingw32.shared-pthreads \
-> diff --git a/tests/docker/dockerfiles/debian-win64-cross.docker b/tests/d=
-ocker/dockerfiles/debian-win64-cross.docker
-> index a7068ed6ac..3908c5abc4 100644
-> --- a/tests/docker/dockerfiles/debian-win64-cross.docker
-> +++ b/tests/docker/dockerfiles/debian-win64-cross.docker
-> @@ -9,6 +9,8 @@ MAINTAINER Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->
->  ENV TARGET x86-64
->
-> +ENV PATH $PATH:/usr/lib/mxe/usr/$TARGET-w64-mingw32.shared/bin
-> +
->  RUN DEBIAN_FRONTEND=3Dnoninteractive eatmydata \
->      apt-get install -y --no-install-recommends \
->          mxe-$TARGET-w64-mingw32.shared-bzip2 \
-> @@ -19,6 +21,7 @@ RUN DEBIAN_FRONTEND=3Dnoninteractive eatmydata \
->          mxe-$TARGET-w64-mingw32.shared-lzo \
->          mxe-$TARGET-w64-mingw32.shared-nettle \
->          mxe-$TARGET-w64-mingw32.shared-ncurses \
-> +        mxe-$TARGET-w64-mingw32.shared-nsis \
->          mxe-$TARGET-w64-mingw32.shared-pixman \
->          mxe-$TARGET-w64-mingw32.shared-pkgconf \
->          mxe-$TARGET-w64-mingw32.shared-pthreads \
+I think so!
 
 
---
-Alex Benn=C3=A9e
+>>> My basic idea is like below:
+>>>
+>>> 1. Change a few lines of code in kvm to allow unhandled SMC invocations
+>>> (like SDEI) to be sent to qemu, with exit reason of KVM_EXIT_HYPERCALL, so
+>>> we don't need to add new API.
+>>
+>> So long as KVM_EXIT_HYPERCALL reports sufficient information so that
+>> userspace can identify the cause as an SMC and retrieve the SMC
+>> immediate field, this seems feasible.
+>>
+>> For its own SMCCC APIs, KVM exclusively uses HVC, so rerouting SMC to
+>> userspace shouldn't conflict.
+> 
+> Be _very_ careful here! In systems without EL3 (and without NV), SMC
+> UNDEFs rather than trapping to EL2. Given that, we shouldn't build a
+> hypervisor ABI that depends on SMC.
+> 
+> I am strongly of the opinion that (for !NV) we should always use HVC
+> here and have KVM appropriately forward calls to userspace, rather than
+> trying to use HVC/SMC to distinguish handled-by-kernel and
+> handled-by-userspace events.
+> 
+> For NV, the first guest hypervisor would use SMC to talk to KVM, all
+> else being the same.
+> 
+>> This bouncing of SMCs to userspace would need to be opt-in, otherwise
+>> old userspace would see exits that it doesn't know what to do with.
+>>
+>>> 2. qemu handles supported SDEI calls just as the spec says for what a
+>>> hypervisor should do for a guest OS.
+
+[pulled point 3 out to discuss separately]
+
+>> Something like that.
+>>
+>> Interactions between SDEI and PSCI would need some thought: for example,
+>> after PSCI_CPU_ON, the newly online cpu needs to have SDEs masked.
+>>
+>> One option (suggested to me by James Morse) would be to allow userspace
+>> to disable in the in-kernel PSCI implementation and provide its own
+>> PSCI to the guest via SMC -- in which case userspace that wants to
+>> implement SDEI would have to implement PSCI as well.
+> 
+> I think this would be the best approach, since it puts userspace in
+> charge of everything.
+> 
+> However, this interacts poorly with FW-based mitigations that we
+> implement in hyp. I suspect we'd probably need a mechanism to delegate
+> that responsibility back to the kernel, and figure out if that has any
+> interaction with thigns that got punted to userspace...
+
+This has come up before:
+https://lore.kernel.org/r/59C139D0.3040507@arm.com
+
+I agree Qemu should opt-in to this, it needs to be a feature that is enabled.
+
+I had an early version of something like this for testing SDEI before there was firmware
+available. The review feedback from Christoffer was that it should include HVC and SMC,
+their immediates, and shouldn't be tied to SMC-CC ranges.
+
+I think this should be a catch-all as Heyi describes to deliver 'unhandled SMC/HVC' to
+user-space as hypercall exits. We should include the immediate in the struct.
+
+We can allow Qemu to disable the in-kernel PSCI implementation, which would let it be done
+in user-space via this catch-all mechanism. (PSCI in user-space has come up on another
+thread recently). The in-kernel PSCI needs to be default-on for backwards compatibility.
+
+As Mark points out, the piece that's left is the 'arch workaround' stuff. We always need
+to handle these in the kernel. I don't think these should be routed-back, they should be
+un-obtainable by user-space.
+Ideally there would be a way for user-space to discover the immediate/x0 values that the
+kernel will not deliver via the catch-all. This could be done via some co-processor
+register... thing...
+
+
+
+>>> 3. For interrupts bound to hypervisor, qemu should stop injecting the IRQ to
+>>> guest through KVM, but jump to the registered event handler directly,
+>>> including context saving and restoring. Some interrupts like virtual timer
+>>> are handled by kvm directly, so we may refuse to bind such interrupts to
+>>> SDEI events.
+
+I don't think we'd ever need a physical interrupt to be delivered via Qemu as an SDEI event.
+The use-cases for this stuff mean it can be done 'higher-up'. For example, your timer is
+probably used as a watchdog. On a real system this may well be a device with an interrupt,
+but Qemu could happily emulate a watchdog using some other linux API. (e.g. SIGALRM).
+
+
+
+Thanks,
+
+James
 
