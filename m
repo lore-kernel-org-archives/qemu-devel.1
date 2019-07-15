@@ -6,52 +6,52 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7A04C76191
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 14:25:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2774C76191
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 14:25:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8F03621537
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 14:25:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F03621537
+	by mail.kernel.org (Postfix) with ESMTPS id BC07621537
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jul 2019 14:25:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC07621537
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39332 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39335 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hn1uk-0004Kf-82
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 10:25:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32889)
+	id 1hn1uq-0004mX-7W
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 10:25:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32909)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <stefan.brankovic@rt-rk.com>) id 1hn1ti-0008RW-4d
+ (envelope-from <stefan.brankovic@rt-rk.com>) id 1hn1ti-0008SX-In
  for qemu-devel@nongnu.org; Mon, 15 Jul 2019 10:24:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefan.brankovic@rt-rk.com>) id 1hn1tg-0002Yx-LP
+ (envelope-from <stefan.brankovic@rt-rk.com>) id 1hn1tg-0002ZH-S1
  for qemu-devel@nongnu.org; Mon, 15 Jul 2019 10:24:10 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:36901 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:36913 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <stefan.brankovic@rt-rk.com>)
- id 1hn1tg-0002Xm-BG
+ id 1hn1tg-0002YJ-FR
  for qemu-devel@nongnu.org; Mon, 15 Jul 2019 10:24:08 -0400
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 6BFEF1A2088;
+ by mail.rt-rk.com (Postfix) with ESMTP id 818691A209C;
  Mon, 15 Jul 2019 16:23:02 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw870-lin.domain.local (rtrkw870-lin.domain.local
  [10.10.13.132])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 151C81A20A1;
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 3C3891A2096;
  Mon, 15 Jul 2019 16:23:02 +0200 (CEST)
 From: Stefan Brankovic <stefan.brankovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Date: Mon, 15 Jul 2019 16:22:51 +0200
-Message-Id: <1563200574-11098-6-git-send-email-stefan.brankovic@rt-rk.com>
+Date: Mon, 15 Jul 2019 16:22:54 +0200
+Message-Id: <1563200574-11098-9-git-send-email-stefan.brankovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1563200574-11098-1-git-send-email-stefan.brankovic@rt-rk.com>
 References: <1563200574-11098-1-git-send-email-stefan.brankovic@rt-rk.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PATCH v5 5/8] target/ppc: Optimize emulation of vclzd
- instruction
+Subject: [Qemu-devel] [PATCH v5 8/8] target/ppc: Refactor emulation of
+ vmrgew and vmrgow instructions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,103 +69,125 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Optimize Altivec instruction vclzd (Vector Count Leading Zeros Doubleword).
-This instruction counts the number of leading zeros of each doubleword element
-in source register and places result in the appropriate doubleword element of
-destination register.
+Since I found this two instructions implemented with tcg, I refactored
+them so they are consistent with other similar implementations that
+I introduced in this patch.
 
-Using tcg-s count leading zeros instruction two times(once for each
-doubleword element of source register vB) and placing result in
-appropriate doubleword element of destination register vD.
+Also, a new dual macro GEN_VXFORM_TRANS_DUAL is added. This macro is
+used if one instruction is realized with direct translation, and second
+one with a helper.
 
 Signed-off-by: Stefan Brankovic <stefan.brankovic@rt-rk.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/ppc/helper.h                 |  1 -
- target/ppc/int_helper.c             |  3 ---
- target/ppc/translate/vmx-impl.inc.c | 28 +++++++++++++++++++++++++++-
- 3 files changed, 27 insertions(+), 5 deletions(-)
+ target/ppc/translate/vmx-impl.inc.c | 66 +++++++++++++++++++++----------------
+ 1 file changed, 37 insertions(+), 29 deletions(-)
 
-diff --git a/target/ppc/helper.h b/target/ppc/helper.h
-index 0aa1e05..3b92e3b 100644
---- a/target/ppc/helper.h
-+++ b/target/ppc/helper.h
-@@ -306,7 +306,6 @@ DEF_HELPER_4(vctsxs, void, env, avr, avr, i32)
- DEF_HELPER_2(vclzb, void, avr, avr)
- DEF_HELPER_2(vclzh, void, avr, avr)
- DEF_HELPER_2(vclzw, void, avr, avr)
--DEF_HELPER_2(vclzd, void, avr, avr)
- DEF_HELPER_2(vctzb, void, avr, avr)
- DEF_HELPER_2(vctzh, void, avr, avr)
- DEF_HELPER_2(vctzw, void, avr, avr)
-diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
-index 1e32549..3134798 100644
---- a/target/ppc/int_helper.c
-+++ b/target/ppc/int_helper.c
-@@ -1803,17 +1803,14 @@ VUPK(lsw, s64, s32, UPKLO)
- #define clzb(v) ((v) ? clz32((uint32_t)(v) << 24) : 8)
- #define clzh(v) ((v) ? clz32((uint32_t)(v) << 16) : 16)
- #define clzw(v) clz32((v))
--#define clzd(v) clz64((v))
- 
- VGENERIC_DO(clzb, u8)
- VGENERIC_DO(clzh, u16)
- VGENERIC_DO(clzw, u32)
--VGENERIC_DO(clzd, u64)
- 
- #undef clzb
- #undef clzh
- #undef clzw
--#undef clzd
- 
- #define ctzb(v) ((v) ? ctz32(v) : 8)
- #define ctzh(v) ((v) ? ctz32(v) : 16)
 diff --git a/target/ppc/translate/vmx-impl.inc.c b/target/ppc/translate/vmx-impl.inc.c
-index 781c866..75c5c8c 100644
+index e8a0fb6..6af9c73 100644
 --- a/target/ppc/translate/vmx-impl.inc.c
 +++ b/target/ppc/translate/vmx-impl.inc.c
-@@ -839,6 +839,32 @@ static void trans_vgbbd(DisasContext *ctx)
-     tcg_temp_free_i64(avr[1]);
+@@ -350,6 +350,28 @@ static void glue(gen_, name0##_##name1)(DisasContext *ctx)             \
+     }                                                                  \
  }
  
 +/*
-+ * vclzd VRT,VRB - Vector Count Leading Zeros Doubleword
-+ *
-+ * Counting the number of leading zero bits of each doubleword element in source
-+ * register and placing result in appropriate doubleword element of destination
-+ * register.
++ * We use this macro if one instruction is realized with direct
++ * translation, and second one with helper.
 + */
-+static void trans_vclzd(DisasContext *ctx)
-+{
-+    int VT = rD(ctx->opcode);
-+    int VB = rB(ctx->opcode);
-+    TCGv_i64 avr = tcg_temp_new_i64();
-+
-+    /* high doubleword */
-+    get_avr64(avr, VB, true);
-+    tcg_gen_clzi_i64(avr, avr, 64);
-+    set_avr64(VT, avr, true);
-+
-+    /* low doubleword */
-+    get_avr64(avr, VB, false);
-+    tcg_gen_clzi_i64(avr, avr, 64);
-+    set_avr64(VT, avr, false);
-+
-+    tcg_temp_free_i64(avr);
++#define GEN_VXFORM_TRANS_DUAL(name0, flg0, flg2_0, name1, flg1, flg2_1)\
++static void glue(gen_, name0##_##name1)(DisasContext *ctx)             \
++{                                                                      \
++    if ((Rc(ctx->opcode) == 0) &&                                      \
++        ((ctx->insns_flags & flg0) || (ctx->insns_flags2 & flg2_0))) { \
++        if (unlikely(!ctx->altivec_enabled)) {                         \
++            gen_exception(ctx, POWERPC_EXCP_VPU);                      \
++            return;                                                    \
++        }                                                              \
++        trans_##name0(ctx);                                            \
++    } else if ((Rc(ctx->opcode) == 1) &&                               \
++        ((ctx->insns_flags & flg1) || (ctx->insns_flags2 & flg2_1))) { \
++        gen_##name1(ctx);                                              \
++    } else {                                                           \
++        gen_inval_exception(ctx, POWERPC_EXCP_INVAL_INVAL);            \
++    }                                                                  \
 +}
 +
- GEN_VXFORM(vmuloub, 4, 0);
- GEN_VXFORM(vmulouh, 4, 1);
- GEN_VXFORM(vmulouw, 4, 2);
-@@ -1355,7 +1381,7 @@ GEN_VAFORM_PAIRED(vmaddfp, vnmsubfp, 23)
- GEN_VXFORM_NOA(vclzb, 1, 28)
- GEN_VXFORM_NOA(vclzh, 1, 29)
- GEN_VXFORM_NOA(vclzw, 1, 30)
--GEN_VXFORM_NOA(vclzd, 1, 31)
-+GEN_VXFORM_TRANS(vclzd, 1, 31)
- GEN_VXFORM_NOA_2(vnegw, 1, 24, 6)
- GEN_VXFORM_NOA_2(vnegd, 1, 24, 7)
- GEN_VXFORM_NOA_2(vextsb2w, 1, 24, 16)
+ /* Adds support to provide invalid mask */
+ #define GEN_VXFORM_DUAL_EXT(name0, flg0, flg2_0, inval0,                \
+                             name1, flg1, flg2_1, inval1)                \
+@@ -431,20 +453,13 @@ GEN_VXFORM(vmrglb, 6, 4);
+ GEN_VXFORM(vmrglh, 6, 5);
+ GEN_VXFORM(vmrglw, 6, 6);
+ 
+-static void gen_vmrgew(DisasContext *ctx)
++static void trans_vmrgew(DisasContext *ctx)
+ {
+-    TCGv_i64 tmp;
+-    TCGv_i64 avr;
+-    int VT, VA, VB;
+-    if (unlikely(!ctx->altivec_enabled)) {
+-        gen_exception(ctx, POWERPC_EXCP_VPU);
+-        return;
+-    }
+-    VT = rD(ctx->opcode);
+-    VA = rA(ctx->opcode);
+-    VB = rB(ctx->opcode);
+-    tmp = tcg_temp_new_i64();
+-    avr = tcg_temp_new_i64();
++    int VT = rD(ctx->opcode);
++    int VA = rA(ctx->opcode);
++    int VB = rB(ctx->opcode);
++    TCGv_i64 tmp = tcg_temp_new_i64();
++    TCGv_i64 avr = tcg_temp_new_i64();
+ 
+     get_avr64(avr, VB, true);
+     tcg_gen_shri_i64(tmp, avr, 32);
+@@ -462,21 +477,14 @@ static void gen_vmrgew(DisasContext *ctx)
+     tcg_temp_free_i64(avr);
+ }
+ 
+-static void gen_vmrgow(DisasContext *ctx)
++static void trans_vmrgow(DisasContext *ctx)
+ {
+-    TCGv_i64 t0, t1;
+-    TCGv_i64 avr;
+-    int VT, VA, VB;
+-    if (unlikely(!ctx->altivec_enabled)) {
+-        gen_exception(ctx, POWERPC_EXCP_VPU);
+-        return;
+-    }
+-    VT = rD(ctx->opcode);
+-    VA = rA(ctx->opcode);
+-    VB = rB(ctx->opcode);
+-    t0 = tcg_temp_new_i64();
+-    t1 = tcg_temp_new_i64();
+-    avr = tcg_temp_new_i64();
++    int VT = rD(ctx->opcode);
++    int VA = rA(ctx->opcode);
++    int VB = rB(ctx->opcode);
++    TCGv_i64 t0 = tcg_temp_new_i64();
++    TCGv_i64 t1 = tcg_temp_new_i64();
++    TCGv_i64 avr = tcg_temp_new_i64();
+ 
+     get_avr64(t0, VB, true);
+     get_avr64(t1, VA, true);
+@@ -1165,14 +1173,14 @@ GEN_VXFORM_ENV(vminfp, 5, 17);
+ GEN_VXFORM_HETRO(vextublx, 6, 24)
+ GEN_VXFORM_HETRO(vextuhlx, 6, 25)
+ GEN_VXFORM_HETRO(vextuwlx, 6, 26)
+-GEN_VXFORM_DUAL(vmrgow, PPC_NONE, PPC2_ALTIVEC_207,
++GEN_VXFORM_TRANS_DUAL(vmrgow, PPC_NONE, PPC2_ALTIVEC_207,
+                 vextuwlx, PPC_NONE, PPC2_ISA300)
+ GEN_VXFORM_HETRO(vextubrx, 6, 28)
+ GEN_VXFORM_HETRO(vextuhrx, 6, 29)
+ GEN_VXFORM_HETRO(vextuwrx, 6, 30)
+ GEN_VXFORM_TRANS(lvsl, 6, 31)
+ GEN_VXFORM_TRANS(lvsr, 6, 32)
+-GEN_VXFORM_DUAL(vmrgew, PPC_NONE, PPC2_ALTIVEC_207, \
++GEN_VXFORM_TRANS_DUAL(vmrgew, PPC_NONE, PPC2_ALTIVEC_207,
+                 vextuwrx, PPC_NONE, PPC2_ISA300)
+ 
+ #define GEN_VXRFORM1(opname, name, str, opc2, opc3)                     \
 -- 
 2.7.4
 
