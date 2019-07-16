@@ -6,57 +6,57 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD6D8C7618F
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 00:03:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 592C2C76191
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 00:03:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B20FF20665
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 00:03:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B20FF20665
+	by mail.kernel.org (Postfix) with ESMTPS id 3426F20665
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 00:03:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3426F20665
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44458 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44470 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnAvx-00059D-OM
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 20:03:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44646)
+	id 1hnAwF-0006Pl-Da
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 20:03:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44681)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jsnow@redhat.com>) id 1hnAuT-00077B-M5
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 20:01:34 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hnAuV-0007DN-5B
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 20:01:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hnAuR-0007YN-VO
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 20:01:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36958)
+ (envelope-from <jsnow@redhat.com>) id 1hnAuT-0007a0-Gd
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 20:01:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51574)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1hnAuP-0007VP-Ma; Mon, 15 Jul 2019 20:01:29 -0400
+ id 1hnAuQ-0007WE-JF; Mon, 15 Jul 2019 20:01:30 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id DCD2E3098576;
- Tue, 16 Jul 2019 00:01:28 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id D849CC057F30;
+ Tue, 16 Jul 2019 00:01:29 +0000 (UTC)
 Received: from probe.bos.redhat.com (dhcp-17-130.bos.redhat.com [10.18.17.130])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 048AC6085B;
- Tue, 16 Jul 2019 00:01:27 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0389A6085B;
+ Tue, 16 Jul 2019 00:01:28 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: qemu-block@nongnu.org,
 	qemu-devel@nongnu.org
-Date: Mon, 15 Jul 2019 20:01:13 -0400
-Message-Id: <20190716000117.25219-8-jsnow@redhat.com>
+Date: Mon, 15 Jul 2019 20:01:14 -0400
+Message-Id: <20190716000117.25219-9-jsnow@redhat.com>
 In-Reply-To: <20190716000117.25219-1-jsnow@redhat.com>
 References: <20190716000117.25219-1-jsnow@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Tue, 16 Jul 2019 00:01:28 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.32]); Tue, 16 Jul 2019 00:01:29 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 07/11] block/backup: centralize copy_bitmap
- initialization
+Subject: [Qemu-devel] [PATCH v2 08/11] block/backup: add
+ backup_is_cluster_allocated
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,65 +75,114 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Just a few housekeeping changes that keeps the following commit easier
-to read; perform the initial copy_bitmap initialization in one place.
+Modify the existing bdrv_is_unallocated_range to utilize the pnum return
+from bdrv_is_allocated; optionally returning a full number of clusters
+that share the same allocation status.
+
+This will be used to carefully toggle bits in the bitmap for sync=3Dtop
+initialization in the following commits.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- block/backup.c | 29 +++++++++++++++--------------
- 1 file changed, 15 insertions(+), 14 deletions(-)
+ block/backup.c | 62 +++++++++++++++++++++++++++++++++++---------------
+ 1 file changed, 44 insertions(+), 18 deletions(-)
 
 diff --git a/block/backup.c b/block/backup.c
-index 22fafbb80f..c88a70fe10 100644
+index c88a70fe10..b407d57954 100644
 --- a/block/backup.c
 +++ b/block/backup.c
-@@ -441,16 +441,22 @@ static int coroutine_fn backup_loop(BackupBlockJob =
-*job)
-     return ret;
+@@ -185,6 +185,48 @@ static int coroutine_fn backup_cow_with_offload(Back=
+upBlockJob *job,
+     return nbytes;
  }
 =20
--/* init copy_bitmap from sync_bitmap */
--static void backup_incremental_init_copy_bitmap(BackupBlockJob *job)
-+static void backup_init_copy_bitmap(BackupBlockJob *job)
- {
--    bool ret =3D bdrv_dirty_bitmap_merge_internal(job->copy_bitmap,
--                                                job->sync_bitmap,
--                                                NULL, true);
--    assert(ret);
-+    bool ret;
-+    uint64_t estimate;
-=20
--    job_progress_set_remaining(&job->common.job,
--                               bdrv_get_dirty_count(job->copy_bitmap));
-+    if (job->sync_mode =3D=3D MIRROR_SYNC_MODE_BITMAP) {
-+        ret =3D bdrv_dirty_bitmap_merge_internal(job->copy_bitmap,
-+                                               job->sync_bitmap,
-+                                               NULL, true);
-+        assert(ret);
-+    } else {
-+        bdrv_set_dirty_bitmap(job->copy_bitmap, 0, job->len);
-+    }
++/*
++ * Check if the cluster starting at offset is allocated or not.
++ * return via pnum the number of contiguous clusters sharing this alloca=
+tion.
++ */
++static int backup_is_cluster_allocated(BackupBlockJob *s, int64_t offset=
+,
++                                       int64_t *pnum)
++{
++    BlockDriverState *bs =3D blk_bs(s->common.blk);
++    int64_t count, total_count =3D 0;
++    int64_t bytes =3D s->len - offset;
++    int ret;
 +
-+    estimate =3D bdrv_get_dirty_count(job->copy_bitmap);
-+    job_progress_set_remaining(&job->common.job, estimate);
++    assert(QEMU_IS_ALIGNED(offset, s->cluster_size));
++
++    while (true) {
++        ret =3D bdrv_is_allocated(bs, offset, bytes, &count);
++        if (ret < 0) {
++            return ret;
++        }
++
++        total_count +=3D count;
++
++        if (ret || count =3D=3D 0) {
++            /*
++             * ret: partial segment(s) are considered allocated.
++             * otherwise: unallocated tail is treated as an entire segme=
+nt.
++             */
++            *pnum =3D DIV_ROUND_UP(total_count, s->cluster_size);
++            return ret;
++        }
++
++        /* Unallocated segment(s) with uncertain following segment(s) */
++        if (total_count >=3D s->cluster_size) {
++            *pnum =3D total_count / s->cluster_size;
++            return 0;
++        }
++
++        offset +=3D count;
++        bytes -=3D count;
++    }
++}
++
+ static int coroutine_fn backup_do_cow(BackupBlockJob *job,
+                                       int64_t offset, uint64_t bytes,
+                                       bool *error_is_read,
+@@ -388,34 +430,18 @@ static bool coroutine_fn yield_and_check(BackupBloc=
+kJob *job)
+     return false;
  }
 =20
- static int coroutine_fn backup_run(Job *job, Error **errp)
-@@ -462,12 +468,7 @@ static int coroutine_fn backup_run(Job *job, Error *=
-*errp)
-     QLIST_INIT(&s->inflight_reqs);
-     qemu_co_rwlock_init(&s->flush_rwlock);
-=20
--    if (s->sync_mode =3D=3D MIRROR_SYNC_MODE_BITMAP) {
--        backup_incremental_init_copy_bitmap(s);
--    } else {
--        bdrv_set_dirty_bitmap(s->copy_bitmap, 0, s->len);
--        job_progress_set_remaining(job, s->len);
+-static bool bdrv_is_unallocated_range(BlockDriverState *bs,
+-                                      int64_t offset, int64_t bytes)
+-{
+-    int64_t end =3D offset + bytes;
+-
+-    while (offset < end && !bdrv_is_allocated(bs, offset, bytes, &bytes)=
+) {
+-        if (bytes =3D=3D 0) {
+-            return true;
+-        }
+-        offset +=3D bytes;
+-        bytes =3D end - offset;
 -    }
-+    backup_init_copy_bitmap(s);
+-
+-    return offset >=3D end;
+-}
+-
+ static int coroutine_fn backup_loop(BackupBlockJob *job)
+ {
+     bool error_is_read;
+     int64_t offset;
+     BdrvDirtyBitmapIter *bdbi;
+-    BlockDriverState *bs =3D blk_bs(job->common.blk);
+     int ret =3D 0;
++    int64_t dummy;
 =20
-     s->before_write.notify =3D backup_before_write_notify;
-     bdrv_add_before_write_notifier(bs, &s->before_write);
+     bdbi =3D bdrv_dirty_iter_new(job->copy_bitmap);
+     while ((offset =3D bdrv_dirty_iter_next(bdbi)) !=3D -1) {
+         if (job->sync_mode =3D=3D MIRROR_SYNC_MODE_TOP &&
+-            bdrv_is_unallocated_range(bs, offset, job->cluster_size))
++            !backup_is_cluster_allocated(job, offset, &dummy))
+         {
+             bdrv_reset_dirty_bitmap(job->copy_bitmap, offset,
+                                     job->cluster_size);
 --=20
 2.21.0
 
