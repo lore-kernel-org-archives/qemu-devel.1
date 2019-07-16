@@ -2,58 +2,105 @@ Return-Path: <SRS0=+QfZ=VN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 671FAC7618F
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 16:31:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB815C7618F
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 16:31:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3EFC7206C2
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 16:31:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3EFC7206C2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id AD17E206C2
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 16:31:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD17E206C2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51068 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51072 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnQMV-0007SP-Qu
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 12:31:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52904)
+	id 1hnQMi-0008JP-G8
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 12:31:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53192)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mlevitsk@redhat.com>) id 1hnQLd-00047V-2Y
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 12:30:38 -0400
+ (envelope-from <mdroth@linux.vnet.ibm.com>) id 1hnQME-0006jq-8N
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 12:31:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlevitsk@redhat.com>) id 1hnQLb-00020V-UC
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 12:30:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59418)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mlevitsk@redhat.com>)
- id 1hnQLZ-0001yo-55; Tue, 16 Jul 2019 12:30:33 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 74FE53082129;
- Tue, 16 Jul 2019 16:30:32 +0000 (UTC)
-Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.67])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6C8AF5C28D;
- Tue, 16 Jul 2019 16:30:30 +0000 (UTC)
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Tue, 16 Jul 2019 19:30:19 +0300
-Message-Id: <20190716163020.13383-3-mlevitsk@redhat.com>
-In-Reply-To: <20190716163020.13383-1-mlevitsk@redhat.com>
-References: <20190716163020.13383-1-mlevitsk@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.42]); Tue, 16 Jul 2019 16:30:32 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v4 2/3] block/nvme: support larger that 512
- bytes sector devices
+ (envelope-from <mdroth@linux.vnet.ibm.com>) id 1hnQMD-0002M1-1i
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 12:31:14 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:33384
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
+ id 1hnQMC-0002Ka-Rc
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 12:31:12 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ x6GGUxve079830
+ for <qemu-devel@nongnu.org>; Tue, 16 Jul 2019 12:31:09 -0400
+Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 2tsgbrws2k-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Tue, 16 Jul 2019 12:31:06 -0400
+Received: from localhost
+ by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
+ Tue, 16 Jul 2019 17:30:37 +0100
+Received: from b03cxnp08026.gho.boulder.ibm.com (9.17.130.18)
+ by e34.co.us.ibm.com (192.168.1.134) with IBM ESMTP SMTP Gateway: Authorized
+ Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Tue, 16 Jul 2019 17:30:34 +0100
+Received: from b03ledav002.gho.boulder.ibm.com
+ (b03ledav002.gho.boulder.ibm.com [9.17.130.233])
+ by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ x6GGUXAW46268742
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 16 Jul 2019 16:30:33 GMT
+Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 9F8F6136055;
+ Tue, 16 Jul 2019 16:30:33 +0000 (GMT)
+Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 87882136059;
+ Tue, 16 Jul 2019 16:30:33 +0000 (GMT)
+Received: from localhost (unknown [9.53.179.212])
+ by b03ledav002.gho.boulder.ibm.com (Postfix) with ESMTP;
+ Tue, 16 Jul 2019 16:30:33 +0000 (GMT)
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+To: David Gibson <david@gibson.dropbear.id.au>
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+In-Reply-To: <20190715022555.GB3440@umbus.fritz.box>
+References: <20190712011934.29863-1-mdroth@linux.vnet.ibm.com>
+ <20190712011934.29863-2-mdroth@linux.vnet.ibm.com>
+ <20190712064027.GF2561@umbus.fritz.box>
+ <156294442813.22588.13951961791159970871@sif>
+ <20190715022555.GB3440@umbus.fritz.box>
+User-Agent: alot/0.7
+Date: Tue, 16 Jul 2019 11:25:34 -0500
+X-TM-AS-GCONF: 00
+x-cbid: 19071616-0016-0000-0000-000009CE47EE
+X-IBM-SpamModules-Scores: 
+X-IBM-SpamModules-Versions: BY=3.00011439; HX=3.00000242; KW=3.00000007;
+ PH=3.00000004; SC=3.00000286; SDB=6.01233065; UDB=6.00649693; IPR=6.01014376; 
+ MB=3.00027745; MTD=3.00000008; XFM=3.00000015; UTC=2019-07-16 16:30:35
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19071616-0017-0000-0000-000044097943
+Message-Id: <156329433410.5171.6918528130179183618@sif>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+ definitions=2019-07-16_04:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1907160202
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.158.5
+Subject: Re: [Qemu-devel] [PATCH 1/2] docs/specs: initial spec summary for
+ Ultravisor-related hcalls
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,126 +112,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Maxim Levitsky <mlevitsk@redhat.com>,
- John Snow <jsnow@redhat.com>
+Cc: linuxram@us.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Currently the driver hardcodes the sector size to 512,
-and doesn't check the underlying device. Fix that.
+Quoting David Gibson (2019-07-14 21:25:55)
+> On Fri, Jul 12, 2019 at 10:13:48AM -0500, Michael Roth wrote:
+> > Quoting David Gibson (2019-07-12 01:40:27)
+> > > On Thu, Jul 11, 2019 at 08:19:33PM -0500, Michael Roth wrote:
+> > > > For now this only covers hcalls relating to TPM communication since
+> > > > it's the only one particularly important from a QEMU perspective at=
+m,
+> > > > but others can be added here where it makes sense.
+> > > > =
 
-Also fail if underlying nvme device is formatted with metadata
-as this needs special support.
+> > > > The full specification for all hcalls/ucalls will eventually be made
+> > > > available in the public/OpenPower version of the PAPR specification.
+> > > > =
 
-Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
----
- block/nvme.c | 45 ++++++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 40 insertions(+), 5 deletions(-)
+> > > > Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+> > > =
 
-diff --git a/block/nvme.c b/block/nvme.c
-index 82fdefccd6..35ce10dc79 100644
---- a/block/nvme.c
-+++ b/block/nvme.c
-@@ -102,8 +102,11 @@ typedef struct {
-     size_t doorbell_scale;
-     bool write_cache_supported;
-     EventNotifier irq_notifier;
-+
-     uint64_t nsze; /* Namespace size reported by identify command */
-     int nsid;      /* The namespace id to read/write data. */
-+    size_t blkshift;
-+
-     uint64_t max_transfer;
-     bool plugged;
- 
-@@ -418,8 +421,9 @@ static void nvme_identify(BlockDriverState *bs, int namespace, Error **errp)
-     BDRVNVMeState *s = bs->opaque;
-     NvmeIdCtrl *idctrl;
-     NvmeIdNs *idns;
-+    NvmeLBAF *lbaf;
-     uint8_t *resp;
--    int r;
-+    int r, hwsect_size;
-     uint64_t iova;
-     NvmeCmd cmd = {
-         .opcode = NVME_ADM_CMD_IDENTIFY,
-@@ -466,7 +470,22 @@ static void nvme_identify(BlockDriverState *bs, int namespace, Error **errp)
-     }
- 
-     s->nsze = le64_to_cpu(idns->nsze);
-+    lbaf = &idns->lbaf[NVME_ID_NS_FLBAS_INDEX(idns->flbas)];
-+
-+    if (lbaf->ms) {
-+        error_setg(errp, "Namespaces with metadata are not yet supported");
-+        goto out;
-+    }
-+
-+    hwsect_size = 1 << lbaf->ds;
-+
-+    if (hwsect_size < BDRV_SECTOR_SIZE || hwsect_size > s->page_size) {
-+        error_setg(errp, "Namespace has unsupported block size (%d)",
-+                hwsect_size);
-+        goto out;
-+    }
- 
-+    s->blkshift = lbaf->ds;
- out:
-     qemu_vfio_dma_unmap(s->vfio, resp);
-     qemu_vfree(resp);
-@@ -785,8 +804,22 @@ fail:
- static int64_t nvme_getlength(BlockDriverState *bs)
- {
-     BDRVNVMeState *s = bs->opaque;
-+    return s->nsze << s->blkshift;
-+}
- 
--    return s->nsze << BDRV_SECTOR_BITS;
-+static int64_t nvme_get_blocksize(BlockDriverState *bs)
-+{
-+    BDRVNVMeState *s = bs->opaque;
-+    assert(s->blkshift >= BDRV_SECTOR_BITS);
-+    return 1 << s->blkshift;
-+}
-+
-+static int nvme_probe_blocksizes(BlockDriverState *bs, BlockSizes *bsz)
-+{
-+    int64_t blocksize = nvme_get_blocksize(bs);
-+    bsz->phys = blocksize;
-+    bsz->log = blocksize;
-+    return 0;
- }
- 
- /* Called with s->dma_map_lock */
-@@ -917,13 +950,14 @@ static coroutine_fn int nvme_co_prw_aligned(BlockDriverState *bs,
-     BDRVNVMeState *s = bs->opaque;
-     NVMeQueuePair *ioq = s->queues[1];
-     NVMeRequest *req;
--    uint32_t cdw12 = (((bytes >> BDRV_SECTOR_BITS) - 1) & 0xFFFF) |
-+
-+    uint32_t cdw12 = (((bytes >> s->blkshift) - 1) & 0xFFFF) |
-                        (flags & BDRV_REQ_FUA ? 1 << 30 : 0);
-     NvmeCmd cmd = {
-         .opcode = is_write ? NVME_CMD_WRITE : NVME_CMD_READ,
-         .nsid = cpu_to_le32(s->nsid),
--        .cdw10 = cpu_to_le32((offset >> BDRV_SECTOR_BITS) & 0xFFFFFFFF),
--        .cdw11 = cpu_to_le32(((offset >> BDRV_SECTOR_BITS) >> 32) & 0xFFFFFFFF),
-+        .cdw10 = cpu_to_le32((offset >> s->blkshift) & 0xFFFFFFFF),
-+        .cdw11 = cpu_to_le32(((offset >> s->blkshift) >> 32) & 0xFFFFFFFF),
-         .cdw12 = cpu_to_le32(cdw12),
-     };
-     NVMeCoData data = {
-@@ -1154,6 +1188,7 @@ static BlockDriver bdrv_nvme = {
-     .bdrv_file_open           = nvme_file_open,
-     .bdrv_close               = nvme_close,
-     .bdrv_getlength           = nvme_getlength,
-+    .bdrv_probe_blocksizes    = nvme_probe_blocksizes,
- 
-     .bdrv_co_preadv           = nvme_co_preadv,
-     .bdrv_co_pwritev          = nvme_co_pwritev,
--- 
-2.17.2
+> > > Thanks for adding this documentation.  Is there a PAPR extension
+> > > proposal which covers this, which we could cite as the source?
+> > =
+
+> > We have an internal document/repo that serves as a catch-all for the Ul=
+travisor
+> > related spec changes. We could make that available publically via githu=
+b and
+> > cite it here until it hits the full spec. Would that work?
+> =
+
+> Yes, that sounds good.
+
+Ok, we're working on getting that posted externally. If it's not up in
+time for next submission I will send a follow-up patch to add a
+reference.
+
+> =
+
+> -- =
+
+> David Gibson                    | I'll have my music baroque, and my code
+> david AT gibson.dropbear.id.au  | minimalist, thank you.  NOT _the_ _othe=
+r_
+>                                 | _way_ _around_!
+> http://www.ozlabs.org/~dgibson
 
 
