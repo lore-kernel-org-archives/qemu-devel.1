@@ -6,45 +6,45 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89F7BC7618F
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 15:42:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EEB8C7618F
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 15:43:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6694C2173C
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 15:42:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6694C2173C
+	by mail.kernel.org (Postfix) with ESMTPS id D91FE20693
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 15:43:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D91FE20693
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50250 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50270 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnPbG-0004pL-6K
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 11:42:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36652)
+	id 1hnPbk-00070d-ME
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 11:43:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36740)
  by lists.gnu.org with esmtp (Exim 4.86_2)
  (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1hnPZs-0007ev-La
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 11:41:17 -0400
+ id 1hnPZy-00080v-At
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 11:41:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1hnPZr-0004QL-B6
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 11:41:16 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:2236 helo=huawei.com)
+ id 1hnPZx-0004UR-CO
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 11:41:22 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:2176 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1hnPZl-0004A8-PX; Tue, 16 Jul 2019 11:41:12 -0400
+ id 1hnPZt-0004Np-9w; Tue, 16 Jul 2019 11:41:18 -0400
 Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id 43C9D16488DDFB0384D8;
- Tue, 16 Jul 2019 23:40:49 +0800 (CST)
+ by Forcepoint Email with ESMTP id 442E1FFDF0B8149CEB8F;
+ Tue, 16 Jul 2019 23:41:09 +0800 (CST)
 Received: from S00345302A-PC.china.huawei.com (10.202.227.237) by
  DGGEMS402-HUB.china.huawei.com (10.3.19.202) with Microsoft SMTP Server id
- 14.3.439.0; Tue, 16 Jul 2019 23:40:39 +0800
+ 14.3.439.0; Tue, 16 Jul 2019 23:41:01 +0800
 From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 To: <qemu-devel@nongnu.org>, <qemu-arm@nongnu.org>, <eric.auger@redhat.com>,
  <imammedo@redhat.com>
-Date: Tue, 16 Jul 2019 16:38:07 +0100
-Message-ID: <20190716153816.17676-2-shameerali.kolothum.thodi@huawei.com>
+Date: Tue, 16 Jul 2019 16:38:13 +0100
+Message-ID: <20190716153816.17676-8-shameerali.kolothum.thodi@huawei.com>
 X-Mailer: git-send-email 2.12.0.windows.1
 In-Reply-To: <20190716153816.17676-1-shameerali.kolothum.thodi@huawei.com>
 References: <20190716153816.17676-1-shameerali.kolothum.thodi@huawei.com>
@@ -53,9 +53,9 @@ Content-Type: text/plain
 X-Originating-IP: [10.202.227.237]
 X-CFilter-Loop: Reflected
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 45.249.212.191
-Subject: [Qemu-devel] [PATCH-for-4.2 v7 01/10] hw/acpi: Make ACPI IO address
- space configurable
+X-Received-From: 45.249.212.190
+Subject: [Qemu-devel] [PATCH-for-4.2 v7 07/10] hw/arm/virt-acpi-build: Add
+ PC-DIMM in SRAT
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,131 +74,42 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is in preparation for adding support for ARM64 platforms
-where it doesn't use port mapped IO for ACPI IO space.
-
-Also move few MEMORY_* definitions to header so that other memory
-hotplug event signalling mechanisms (eg. Generic Event Device on
-HW-reduced acpi platforms) can use the same from their respective
-event handler code.
+Generate Memory Affinity Structures for PC-DIMM ranges.
 
 Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
 Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 ---
- hw/acpi/memory_hotplug.c         | 25 ++++++++++++++-----------
- hw/i386/acpi-build.c             |  3 ++-
- include/hw/acpi/memory_hotplug.h |  9 +++++++--
- 3 files changed, 23 insertions(+), 14 deletions(-)
+ hw/arm/virt-acpi-build.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/hw/acpi/memory_hotplug.c b/hw/acpi/memory_hotplug.c
-index 297812d5f7..c724f5f1e4 100644
---- a/hw/acpi/memory_hotplug.c
-+++ b/hw/acpi/memory_hotplug.c
-@@ -29,12 +29,9 @@
- #define MEMORY_SLOT_PROXIMITY_METHOD "MPXM"
- #define MEMORY_SLOT_EJECT_METHOD     "MEJ0"
- #define MEMORY_SLOT_NOTIFY_METHOD    "MTFY"
--#define MEMORY_SLOT_SCAN_METHOD      "MSCN"
- #define MEMORY_HOTPLUG_DEVICE        "MHPD"
--#define MEMORY_HOTPLUG_IO_LEN         24
--#define MEMORY_DEVICES_CONTAINER     "\\_SB.MHPC"
+diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+index 018b1e326d..75657caa36 100644
+--- a/hw/arm/virt-acpi-build.c
++++ b/hw/arm/virt-acpi-build.c
+@@ -518,6 +518,7 @@ build_srat(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+     int i, srat_start;
+     uint64_t mem_base;
+     MachineClass *mc = MACHINE_GET_CLASS(vms);
++    MachineState *ms = MACHINE(vms);
+     const CPUArchIdList *cpu_list = mc->possible_cpu_arch_ids(MACHINE(vms));
  
--static uint16_t memhp_io_base;
-+static hwaddr memhp_io_base;
- 
- static ACPIOSTInfo *acpi_memory_device_status(int slot, MemStatus *mdev)
- {
-@@ -209,7 +206,7 @@ static const MemoryRegionOps acpi_memory_hotplug_ops = {
- };
- 
- void acpi_memory_hotplug_init(MemoryRegion *as, Object *owner,
--                              MemHotplugState *state, uint16_t io_base)
-+                              MemHotplugState *state, hwaddr io_base)
- {
-     MachineState *machine = MACHINE(qdev_get_machine());
- 
-@@ -342,7 +339,8 @@ const VMStateDescription vmstate_memory_hotplug = {
- 
- void build_memory_hotplug_aml(Aml *table, uint32_t nr_mem,
-                               const char *res_root,
--                              const char *event_handler_method)
-+                              const char *event_handler_method,
-+                              AmlRegionSpace rs)
- {
-     int i;
-     Aml *ifctx;
-@@ -365,14 +363,19 @@ void build_memory_hotplug_aml(Aml *table, uint32_t nr_mem,
-             aml_name_decl("_UID", aml_string("Memory hotplug resources")));
- 
-         crs = aml_resource_template();
--        aml_append(crs,
--            aml_io(AML_DECODE16, memhp_io_base, memhp_io_base, 0,
--                   MEMORY_HOTPLUG_IO_LEN)
--        );
-+        if (rs == AML_SYSTEM_IO) {
-+            aml_append(crs,
-+                aml_io(AML_DECODE16, memhp_io_base, memhp_io_base, 0,
-+                       MEMORY_HOTPLUG_IO_LEN)
-+            );
-+        } else {
-+            aml_append(crs, aml_memory32_fixed(memhp_io_base,
-+                            MEMORY_HOTPLUG_IO_LEN, AML_READ_WRITE));
-+        }
-         aml_append(mem_ctrl_dev, aml_name_decl("_CRS", crs));
- 
-         aml_append(mem_ctrl_dev, aml_operation_region(
--            MEMORY_HOTPLUG_IO_REGION, AML_SYSTEM_IO,
-+            MEMORY_HOTPLUG_IO_REGION, rs,
-             aml_int(memhp_io_base), MEMORY_HOTPLUG_IO_LEN)
-         );
- 
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index d281ffa89e..4aae365347 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -1865,7 +1865,8 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
-         build_cpus_aml(dsdt, machine, opts, pm->cpu_hp_io_base,
-                        "\\_SB.PCI0", "\\_GPE._E02");
+     srat_start = table_data->len;
+@@ -543,6 +544,14 @@ build_srat(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+         }
      }
--    build_memory_hotplug_aml(dsdt, nr_mem, "\\_SB.PCI0", "\\_GPE._E03");
-+    build_memory_hotplug_aml(dsdt, nr_mem, "\\_SB.PCI0",
-+                             "\\_GPE._E03", AML_SYSTEM_IO);
  
-     scope =  aml_scope("_GPE");
-     {
-diff --git a/include/hw/acpi/memory_hotplug.h b/include/hw/acpi/memory_hotplug.h
-index 77c65765d6..e3a4b89235 100644
---- a/include/hw/acpi/memory_hotplug.h
-+++ b/include/hw/acpi/memory_hotplug.h
-@@ -5,6 +5,10 @@
- #include "hw/acpi/acpi.h"
- #include "hw/acpi/aml-build.h"
- 
-+#define MEMORY_SLOT_SCAN_METHOD      "MSCN"
-+#define MEMORY_DEVICES_CONTAINER     "\\_SB.MHPC"
-+#define MEMORY_HOTPLUG_IO_LEN         24
++    if (ms->device_memory) {
++        numamem = acpi_data_push(table_data, sizeof *numamem);
++        build_srat_memory(numamem, ms->device_memory->base,
++                          memory_region_size(&ms->device_memory->mr),
++                          nb_numa_nodes - 1,
++                          MEM_AFFINITY_HOTPLUGGABLE | MEM_AFFINITY_ENABLED);
++    }
 +
- /**
-  * MemStatus:
-  * @is_removing: the memory device in slot has been requested to be ejected.
-@@ -29,7 +33,7 @@ typedef struct MemHotplugState {
- } MemHotplugState;
- 
- void acpi_memory_hotplug_init(MemoryRegion *as, Object *owner,
--                              MemHotplugState *state, uint16_t io_base);
-+                              MemHotplugState *state, hwaddr io_base);
- 
- void acpi_memory_plug_cb(HotplugHandler *hotplug_dev, MemHotplugState *mem_st,
-                          DeviceState *dev, Error **errp);
-@@ -48,5 +52,6 @@ void acpi_memory_ospm_status(MemHotplugState *mem_st, ACPIOSTInfoList ***list);
- 
- void build_memory_hotplug_aml(Aml *table, uint32_t nr_mem,
-                               const char *res_root,
--                              const char *event_handler_method);
-+                              const char *event_handler_method,
-+                              AmlRegionSpace rs);
- #endif
+     build_header(linker, table_data, (void *)(table_data->data + srat_start),
+                  "SRAT", table_data->len - srat_start, 3, NULL, NULL);
+ }
 -- 
 2.17.1
 
