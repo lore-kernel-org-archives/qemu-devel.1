@@ -6,57 +6,57 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0F1AC76192
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 13:09:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10F77C76188
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 13:09:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CC3E620880
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 13:09:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC3E620880
+	by mail.kernel.org (Postfix) with ESMTPS id DAAE220880
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 13:09:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DAAE220880
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48698 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48700 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnNCt-0000Kq-OJ
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 09:09:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45003)
+	id 1hnNCy-0000dF-Cv
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 09:09:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44931)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mlevitsk@redhat.com>) id 1hnNCT-000795-5B
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 09:08:58 -0400
+ (envelope-from <mlevitsk@redhat.com>) id 1hnNCL-0006Xx-1a
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 09:08:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlevitsk@redhat.com>) id 1hnNCS-0002i0-05
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 09:08:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59092)
+ (envelope-from <mlevitsk@redhat.com>) id 1hnNCJ-0002ag-Oo
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 09:08:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45904)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mlevitsk@redhat.com>)
- id 1hnNCP-0002fR-QC; Tue, 16 Jul 2019 09:08:53 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ id 1hnNCF-0002X2-PH; Tue, 16 Jul 2019 09:08:43 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 298AF2D1CE;
- Tue, 16 Jul 2019 13:08:53 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 1E3D283F3B;
+ Tue, 16 Jul 2019 13:08:43 +0000 (UTC)
 Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.66])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 479FE60141;
- Tue, 16 Jul 2019 13:08:50 +0000 (UTC)
-Message-ID: <2463ad923311b0249198fc251432929fd7688650.camel@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id DA8B35C257;
+ Tue, 16 Jul 2019 13:08:41 +0000 (UTC)
+Message-ID: <9d9af2d86805036334efd17baabf2ec2a0804615.camel@redhat.com>
 From: Maxim Levitsky <mlevitsk@redhat.com>
 To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Date: Tue, 16 Jul 2019 16:08:50 +0300
-In-Reply-To: <20190712173600.14554-4-mreitz@redhat.com>
+Date: Tue, 16 Jul 2019 16:08:40 +0300
+In-Reply-To: <20190712173600.14554-3-mreitz@redhat.com>
 References: <20190712173600.14554-1-mreitz@redhat.com>
- <20190712173600.14554-4-mreitz@redhat.com>
+ <20190712173600.14554-3-mreitz@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.38]); Tue, 16 Jul 2019 13:08:53 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.27]); Tue, 16 Jul 2019 13:08:43 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 3/7] block: Use
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 2/7] block: Add
  blk_truncate_for_formatting()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -77,69 +77,140 @@ Sender: "Qemu-devel"
 On Fri, 2019-07-12 at 19:35 +0200, Max Reitz wrote:
 > Signed-off-by: Max Reitz <mreitz@redhat.com>
 > ---
->  block/parallels.c | 2 +-
->  block/qcow.c      | 2 +-
->  block/qcow2.c     | 2 +-
->  block/qed.c       | 2 +-
->  4 files changed, 4 insertions(+), 4 deletions(-)
+>  include/sysemu/block-backend.h | 12 ++++++++
+>  block/block-backend.c          | 54 ++++++++++++++++++++++++++++++++++
+>  2 files changed, 66 insertions(+)
 > 
-> diff --git a/block/parallels.c b/block/parallels.c
-> index 00fae125d1..a17b2d92f2 100644
-> --- a/block/parallels.c
-> +++ b/block/parallels.c
-> @@ -563,7 +563,7 @@ static int coroutine_fn parallels_co_create(BlockdevCreateOptions* opts,
->      blk_set_allow_write_beyond_eof(blk, true);
+> diff --git a/include/sysemu/block-backend.h b/include/sysemu/block-backend.h
+> index 733c4957eb..cd9ec8bf52 100644
+> --- a/include/sysemu/block-backend.h
+> +++ b/include/sysemu/block-backend.h
+> @@ -236,6 +236,18 @@ int blk_pwrite_compressed(BlockBackend *blk, int64_t offset, const void *buf,
+>                            int bytes);
+>  int blk_truncate(BlockBackend *blk, int64_t offset, PreallocMode prealloc,
+>                   Error **errp);
+> +
+> +/**
+> + * Wrapper of blk_truncate() for format drivers that need to truncate
+> + * their protocol node before formatting it.
+> + * Invoke blk_truncate() to truncate the file to @offset; if that
+> + * fails with -ENOTSUP (and the file is already big enough), try to
+> + * overwrite the first sector with zeroes.  If that succeeds, return
+> + * success.
+> + */
+> +int blk_truncate_for_formatting(BlockBackend *blk, int64_t offset,
+> +                                Error **errp);
+> +
+>  int blk_pdiscard(BlockBackend *blk, int64_t offset, int bytes);
+>  int blk_save_vmstate(BlockBackend *blk, const uint8_t *buf,
+>                       int64_t pos, int size);
+> diff --git a/block/block-backend.c b/block/block-backend.c
+> index a8d160fd5d..c0e64b1ee1 100644
+> --- a/block/block-backend.c
+> +++ b/block/block-backend.c
+> @@ -2041,6 +2041,60 @@ int blk_truncate(BlockBackend *blk, int64_t offset, PreallocMode prealloc,
+>      return bdrv_truncate(blk->root, offset, prealloc, errp);
+>  }
 >  
->      /* Create image format */
-> -    ret = blk_truncate(blk, 0, PREALLOC_MODE_OFF, errp);
-> +    ret = blk_truncate_for_formatting(blk, 0, errp);
->      if (ret < 0) {
->          goto out;
->      }
-> diff --git a/block/qcow.c b/block/qcow.c
-> index 5bdf72ba33..86034135f9 100644
-> --- a/block/qcow.c
-> +++ b/block/qcow.c
-> @@ -858,7 +858,7 @@ static int coroutine_fn qcow_co_create(BlockdevCreateOptions *opts,
->      blk_set_allow_write_beyond_eof(qcow_blk, true);
->  
->      /* Create image format */
-> -    ret = blk_truncate(qcow_blk, 0, PREALLOC_MODE_OFF, errp);
-> +    ret = blk_truncate_for_formatting(qcow_blk, 0, errp);
->      if (ret < 0) {
->          goto exit;
->      }
-> diff --git a/block/qcow2.c b/block/qcow2.c
-> index 039bdc2f7e..f3e53c781d 100644
-> --- a/block/qcow2.c
-> +++ b/block/qcow2.c
-> @@ -3184,7 +3184,7 @@ qcow2_co_create(BlockdevCreateOptions *create_options, Error **errp)
->      blk_set_allow_write_beyond_eof(blk, true);
->  
->      /* Clear the protocol layer and preallocate it if necessary */
-> -    ret = blk_truncate(blk, 0, PREALLOC_MODE_OFF, errp);
-> +    ret = blk_truncate_for_formatting(blk, 0, errp);
->      if (ret < 0) {
->          goto out;
->      }
-> diff --git a/block/qed.c b/block/qed.c
-> index 77c7cef175..ec244158b5 100644
-> --- a/block/qed.c
-> +++ b/block/qed.c
-> @@ -673,7 +673,7 @@ static int coroutine_fn bdrv_qed_co_create(BlockdevCreateOptions *opts,
->      l1_size = header.cluster_size * header.table_size;
->  
->      /* File must start empty and grow, check truncate is supported */
-> -    ret = blk_truncate(blk, 0, PREALLOC_MODE_OFF, errp);
-> +    ret = blk_truncate_for_formatting(blk, 0, errp);
->      if (ret < 0) {
->          goto out;
->      }
+> +int blk_truncate_for_formatting(BlockBackend *blk, int64_t offset, Error **errp)
+> +{
+> +    Error *local_err = NULL;
+> +    int64_t current_size;
+> +    int bytes_to_clear;
+> +    int ret;
+> +
+> +    ret = blk_truncate(blk, offset, PREALLOC_MODE_OFF, &local_err);
+> +    if (ret < 0 && ret != -ENOTSUP) {
+> +        error_propagate(errp, local_err);
+> +        return ret;
+> +    } else if (ret >= 0) {
+> +        return ret;
+> +    }
+
+What if the truncate does succeed? For example the current implementation of raw_co_truncate,
+does return zero when you truncate to less that block device size 
+(and this is kind of wrong since you can't really change the block device size)
+
+Even more, I see is that in the later patch, you call this with offset == 0 which
+I think will always succeed on a raw block device, thus skipping the zeroing code.
+
+How about just doing the zeroing in the bdrv_create_file_fallback?
 
 
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+Another idea:
+
+blk_truncate_for_formatting would first truncate the file to 0, then
+check if the size of the file became zero in addition to the successful return value.
+
+If the file size became zero, truncate the file to the requested size - this should make sure that file is empty.
+Otherwise, zero the first sector.
+
+It might also be nice to add a check that if the size didn't became zero, that it remained the same
+to avoid strange situations of semi broken truncate.
+
+
+Also I would rename the function to something like blk_raw_format_file,
+basically a function which tries its best to erase an existing file contents
+
+
+Yet another idea would to drop the lying in the raw_co_truncate (on block devices), and fail always,
+unless asked to truncate to the exact file size, and let the callers deal with that.
+Callers where it is not critical for the truncate to work can just ignore this failure.
+That is probably hard to implement 
+
+Or we can add a truncate 'mode' to .bdrv_co_truncate, which would let the caller indicate its intention,
+that is if the caller must truncate to that size or it can accept truncate ending up in bigger file that it asked for. 
+
+As we once discussed on IRC, the fact that truncate on a block device 'succeeds',
+despite not really beeing able to change the block device size, causes other issues,
+like not beeing able to use preallocation=full when creating a qcow2 image on a block device.
 
 Best regards,
 	Maxim Levitsky
+
+> +
+> +    current_size = blk_getlength(blk);
+> +    if (current_size < 0) {
+> +        error_free(local_err);
+> +        error_setg_errno(errp, -current_size,
+> +                         "Failed to inquire new image file's current length");
+> +        return current_size;
+> +    }
+> +
+> +    if (current_size < offset) {
+> +        /* Need to grow the image, but we failed to do that */
+> +        error_propagate(errp, local_err);
+> +        return -ENOTSUP;
+> +    }
+> +
+> +    error_free(local_err);
+> +    /*
+> +     * We can deal with images that are too big.  We just need to
+> +     * clear the first sector.
+> +     */
+> +
+> +    bytes_to_clear = MIN(current_size, BDRV_SECTOR_SIZE) - offset;
+> +    if (bytes_to_clear) {
+> +        if (!(blk->root->perm & BLK_PERM_WRITE)) {
+> +            error_setg(errp, "Cannot clear first sector of new image: "
+> +                       "Write permission missing");
+> +            return -EPERM;
+> +        }
+> +
+> +        ret = blk_pwrite_zeroes(blk, offset, bytes_to_clear, 0);
+> +        if (ret < 0) {
+> +            error_setg_errno(errp, -ret, "Failed to clear the first sector of "
+> +                             "the new image");
+> +            return ret;
+> +        }
+> +    }
+> +
+> +    return 0;
+> +}
+> +
+>  static void blk_pdiscard_entry(void *opaque)
+>  {
+>      BlkRwCo *rwco = opaque;
+
 
 
