@@ -2,83 +2,64 @@ Return-Path: <SRS0=+QfZ=VN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 248CBC7618F
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 14:56:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B05DC7618F
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 14:57:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E8BD720693
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 14:56:50 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="spexxzfE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8BD720693
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
+	by mail.kernel.org (Postfix) with ESMTPS id 23EBF20693
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 14:57:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 23EBF20693
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49798 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49814 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnOsr-0005vg-OP
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 10:56:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50031)
+	id 1hnOtB-0007PE-Qy
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 10:57:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49854)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <yury-kotov@yandex-team.ru>) id 1hnOrE-0007kJ-7l
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 10:55:09 -0400
+ (envelope-from <tao3.xu@intel.com>) id 1hnOqg-0005PR-Nd
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 10:54:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yury-kotov@yandex-team.ru>) id 1hnOrB-0001M1-PN
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 10:55:07 -0400
-Received: from forwardcorp1p.mail.yandex.net ([77.88.29.217]:54264)
+ (envelope-from <tao3.xu@intel.com>) id 1hnOqe-00017h-Gq
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 10:54:34 -0400
+Received: from mga03.intel.com ([134.134.136.65]:20995)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yury-kotov@yandex-team.ru>)
- id 1hnOrA-0001Jl-Bw
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 10:55:05 -0400
-Received: from mxbackcorp1j.mail.yandex.net (mxbackcorp1j.mail.yandex.net
- [IPv6:2a02:6b8:0:1619::162])
- by forwardcorp1p.mail.yandex.net (Yandex) with ESMTP id A16312E1495;
- Tue, 16 Jul 2019 17:54:58 +0300 (MSK)
-Received: from smtpcorp1j.mail.yandex.net (smtpcorp1j.mail.yandex.net
- [2a02:6b8:0:1619::137])
- by mxbackcorp1j.mail.yandex.net (nwsmtp/Yandex) with ESMTP id
- 8MGZrCVKIU-sw4Chkx7; Tue, 16 Jul 2019 17:54:58 +0300
-Precedence: bulk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
- s=default; 
- t=1563288898; bh=JNDXgoKL65F2qbz8oiwPd7P/tXvktCtAirRQDC8fhvY=;
- h=In-Reply-To:Message-Id:References:Date:Subject:To:From:Cc;
- b=spexxzfEJYNqa068Xo1ZmmEdWjIuaivr3ogaayoTHti1MMHVzrwI5ldWRANR27sfl
- Rs3FkMYHaEhPYI7yF6c/HVKNBlxWv4l+PjXGeMGwHJepiGW8qMlpU4MWs8l81fMn1f
- 41e5sHSeUgAFxkd8Wi2n4ieSAS24GsaZ5HP70SuA=
-Authentication-Results: mxbackcorp1j.mail.yandex.net;
- dkim=pass header.i=@yandex-team.ru
-Received: from dynamic-red.dhcp.yndx.net (dynamic-red.dhcp.yndx.net
- [2a02:6b8:0:40c:68fa:19fe:5639:24b5])
- by smtpcorp1j.mail.yandex.net (nwsmtp/Yandex) with ESMTPSA id
- RzIFhwRP0o-svQip9CH; Tue, 16 Jul 2019 17:54:58 +0300
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
- (Client certificate not present)
-From: Yury Kotov <yury-kotov@yandex-team.ru>
-To: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
- Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
- Juan Quintela <quintela@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Stefan Weil <sw@weilnetz.de>
-Date: Tue, 16 Jul 2019 17:54:20 +0300
-Message-Id: <20190716145421.17645-3-yury-kotov@yandex-team.ru>
-X-Mailer: git-send-email 2.22.0
-In-Reply-To: <20190716145421.17645-1-yury-kotov@yandex-team.ru>
-References: <20190716145421.17645-1-yury-kotov@yandex-team.ru>
+ (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1hnOqe-0000za-3Y
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 10:54:32 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+ by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 16 Jul 2019 07:54:31 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.63,498,1557212400"; d="scan'208";a="319014815"
+Received: from tao-optiplex-7060.sh.intel.com ([10.239.13.104])
+ by orsmga004.jf.intel.com with ESMTP; 16 Jul 2019 07:54:30 -0700
+From: Tao Xu <tao3.xu@intel.com>
+To: imammedo@redhat.com,
+	eblake@redhat.com,
+	ehabkost@redhat.com
+Date: Tue, 16 Jul 2019 22:51:19 +0800
+Message-Id: <20190716145121.19578-10-tao3.xu@intel.com>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190716145121.19578-1-tao3.xu@intel.com>
+References: <20190716145121.19578-1-tao3.xu@intel.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 77.88.29.217
-Subject: [Qemu-devel] [PATCH v2 2/3] cpus: Fix throttling during vm_stop
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 134.134.136.65
+Subject: [Qemu-devel] [PATCH v7 09/11] numa: Extend the CLI to provide
+ memory latency and bandwidth information
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -87,87 +68,404 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, yc-core@yandex-team.ru
+Cc: jingqi.liu@intel.com, tao3.xu@intel.com, fan.du@intel.com,
+ qemu-devel@nongnu.org, jonathan.cameron@huawei.com, dan.j.williams@intel.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Throttling thread sleeps in VCPU thread. For high throttle percentage
-this sleep is more than 10ms. E.g. for 60% - 15ms, for 99% - 990ms.
-vm_stop() kicks all VCPUs and waits for them. It's called at the end of
-migration and because of the long sleep the migration downtime might be
-more than 100ms even for downtime-limit 1ms.
-Use qemu_cond_timedwait for high percentage to wake up during vm_stop.
+From: Liu Jingqi <jingqi.liu@intel.com>
 
-Signed-off-by: Yury Kotov <yury-kotov@yandex-team.ru>
+Add -numa hmat-lb option to provide System Locality Latency and
+Bandwidth Information. These memory attributes help to build
+System Locality Latency and Bandwidth Information Structure(s)
+in ACPI Heterogeneous Memory Attribute Table (HMAT).
+
+Signed-off-by: Liu Jingqi <jingqi.liu@intel.com>
+Signed-off-by: Tao Xu <tao3.xu@intel.com>
 ---
- cpus.c | 27 +++++++++++++++++++--------
- 1 file changed, 19 insertions(+), 8 deletions(-)
 
-diff --git a/cpus.c b/cpus.c
-index ffc57119ca..c8817c9da7 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -74,6 +74,8 @@
-=20
- #endif /* CONFIG_LINUX */
-=20
-+static QemuMutex qemu_global_mutex;
+Changes in v7:
+    - Drop the HMAT_LB_MEM_CACHE_LAST_LEVEL which is not used in
+      ACPI 6.3 (Jonathan)
+
+Changes in v6:
+    - Update the describes in ACPI 6.3(The entry base unit for latency is
+      in picoseconds)
+    - Update the designator to 4.2 (Eric)
+---
+ hw/core/numa.c        | 127 ++++++++++++++++++++++++++++++++++++++++++
+ include/sysemu/numa.h |   2 +
+ qapi/machine.json     | 100 ++++++++++++++++++++++++++++++++-
+ qemu-options.hx       |  45 ++++++++++++++-
+ 4 files changed, 271 insertions(+), 3 deletions(-)
+
+diff --git a/hw/core/numa.c b/hw/core/numa.c
+index cfb6339810..83ead77191 100644
+--- a/hw/core/numa.c
++++ b/hw/core/numa.c
+@@ -37,6 +37,7 @@
+ #include "qemu/option.h"
+ #include "qemu/config-file.h"
+ #include "qemu/cutils.h"
++#include "hw/acpi/hmat.h"
+ 
+ QemuOptsList qemu_numa_opts = {
+     .name = "numa",
+@@ -183,6 +184,126 @@ void parse_numa_distance(MachineState *ms, NumaDistOptions *dist, Error **errp)
+     ms->numa_state->have_numa_distance = true;
+ }
+ 
++void parse_numa_hmat_lb(MachineState *ms, NumaHmatLBOptions *node,
++                        Error **errp)
++{
++    int nb_numa_nodes = ms->numa_state->num_nodes;
++    NodeInfo *numa_info = ms->numa_state->nodes;
++    HMAT_LB_Info *hmat_lb = NULL;
 +
- int64_t max_delay;
- int64_t max_advance;
-=20
-@@ -776,7 +778,7 @@ static void cpu_throttle_thread(CPUState *cpu, run_on=
-_cpu_data opaque)
++    if (node->data_type <= HMATLB_DATA_TYPE_WRITE_LATENCY) {
++        if (!node->has_latency) {
++            error_setg(errp, "Missing 'latency' option.");
++            return;
++        }
++        if (node->has_bandwidth) {
++            error_setg(errp, "Invalid option 'bandwidth' since "
++                       "the data type is latency.");
++            return;
++        }
++        if (node->has_base_bw) {
++            error_setg(errp, "Invalid option 'base_bw' since "
++                       "the data type is latency.");
++            return;
++        }
++    }
++
++    if (node->data_type >= HMATLB_DATA_TYPE_ACCESS_BANDWIDTH) {
++        if (!node->has_bandwidth) {
++            error_setg(errp, "Missing 'bandwidth' option.");
++            return;
++        }
++        if (node->has_latency) {
++            error_setg(errp, "Invalid option 'latency' since "
++                       "the data type is bandwidth.");
++            return;
++        }
++        if (node->has_base_lat) {
++            error_setg(errp, "Invalid option 'base_lat' since "
++                       "the data type is bandwidth.");
++            return;
++        }
++    }
++
++    if (node->initiator >= nb_numa_nodes) {
++        error_setg(errp, "Invalid initiator=%"
++                   PRIu16 ", it should be less than %d.",
++                   node->initiator, nb_numa_nodes);
++        return;
++    }
++    if (!numa_info[node->initiator].has_cpu) {
++        error_setg(errp, "Invalid initiator=%"
++                   PRIu16 ", it isn't an initiator proximity domain.",
++                   node->initiator);
++        return;
++    }
++
++    if (node->target >= nb_numa_nodes) {
++        error_setg(errp, "Invalid target=%"
++                   PRIu16 ", it should be less than %d.",
++                   node->target, nb_numa_nodes);
++        return;
++    }
++    if (!numa_info[node->target].initiator_valid) {
++        error_setg(errp, "Invalid target=%"
++                   PRIu16 ", it hasn't a valid initiator proximity domain.",
++                   node->target);
++        return;
++    }
++
++    if (node->has_latency) {
++        hmat_lb = ms->numa_state->hmat_lb[node->hierarchy][node->data_type];
++
++        if (!hmat_lb) {
++            hmat_lb = g_malloc0(sizeof(*hmat_lb));
++            ms->numa_state->hmat_lb[node->hierarchy][node->data_type] = hmat_lb;
++        } else if (hmat_lb->latency[node->initiator][node->target]) {
++            error_setg(errp, "Duplicate configuration of the latency for "
++                       "initiator=%" PRIu16 " and target=%" PRIu16 ".",
++                       node->initiator, node->target);
++            return;
++        }
++
++        /* Only the first time of setting the base unit is valid. */
++        if ((hmat_lb->base_lat == 0) && (node->has_base_lat)) {
++            hmat_lb->base_lat = node->base_lat;
++        }
++
++        hmat_lb->latency[node->initiator][node->target] = node->latency;
++    }
++
++    if (node->has_bandwidth) {
++        hmat_lb = ms->numa_state->hmat_lb[node->hierarchy][node->data_type];
++
++        if (!hmat_lb) {
++            hmat_lb = g_malloc0(sizeof(*hmat_lb));
++            ms->numa_state->hmat_lb[node->hierarchy][node->data_type] = hmat_lb;
++        } else if (hmat_lb->bandwidth[node->initiator][node->target]) {
++            error_setg(errp, "Duplicate configuration of the bandwidth for "
++                       "initiator=%" PRIu16 " and target=%" PRIu16 ".",
++                       node->initiator, node->target);
++            return;
++        }
++
++        /* Only the first time of setting the base unit is valid. */
++        if (hmat_lb->base_bw == 0) {
++            if (!node->has_base_bw) {
++                error_setg(errp, "Missing 'base-bw' option");
++                return;
++            } else {
++                hmat_lb->base_bw = node->base_bw;
++            }
++        }
++
++        hmat_lb->bandwidth[node->initiator][node->target] = node->bandwidth;
++    }
++
++    if (hmat_lb) {
++        hmat_lb->hierarchy = node->hierarchy;
++        hmat_lb->data_type = node->data_type;
++    }
++}
++
+ void set_numa_options(MachineState *ms, NumaOptions *object, Error **errp)
  {
-     double pct;
-     double throttle_ratio;
--    long sleeptime_ns;
-+    int64_t sleeptime_ns;
-=20
-     if (!cpu_throttle_get_percentage()) {
-         return;
-@@ -784,11 +786,22 @@ static void cpu_throttle_thread(CPUState *cpu, run_=
-on_cpu_data opaque)
-=20
-     pct =3D (double)cpu_throttle_get_percentage()/100;
-     throttle_ratio =3D pct / (1 - pct);
--    sleeptime_ns =3D (long)(throttle_ratio * CPU_THROTTLE_TIMESLICE_NS);
--
--    qemu_mutex_unlock_iothread();
--    g_usleep(sleeptime_ns / 1000); /* Convert ns to us for usleep call *=
-/
--    qemu_mutex_lock_iothread();
-+    /* Add 1ns to fix double's rounding error (like 0.9999999...) */
-+    sleeptime_ns =3D (int64_t)(throttle_ratio * CPU_THROTTLE_TIMESLICE_N=
-S + 1);
+     Error *err = NULL;
+@@ -221,6 +342,12 @@ void set_numa_options(MachineState *ms, NumaOptions *object, Error **errp)
+         machine_set_cpu_numa_node(ms, qapi_NumaCpuOptions_base(&object->u.cpu),
+                                   &err);
+         break;
++    case NUMA_OPTIONS_TYPE_HMAT_LB:
++        parse_numa_hmat_lb(ms, &object->u.hmat_lb, &err);
++        if (err) {
++            goto end;
++        }
++        break;
+     default:
+         abort();
+     }
+diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
+index 1ed3362917..f0857b7ee6 100644
+--- a/include/sysemu/numa.h
++++ b/include/sysemu/numa.h
+@@ -41,6 +41,8 @@ typedef struct NumaState NumaState;
+ 
+ void set_numa_options(MachineState *ms, NumaOptions *object, Error **errp);
+ void parse_numa_opts(MachineState *ms);
++void parse_numa_hmat_lb(MachineState *ms, NumaHmatLBOptions *node,
++                        Error **errp);
+ void numa_complete_configuration(MachineState *ms);
+ void query_numa_node_mem(NumaNodeMem node_mem[], MachineState *ms);
+ extern QemuOptsList qemu_numa_opts;
+diff --git a/qapi/machine.json b/qapi/machine.json
+index 05e367d26a..25f5b0321d 100644
+--- a/qapi/machine.json
++++ b/qapi/machine.json
+@@ -377,10 +377,12 @@
+ #
+ # @cpu: property based CPU(s) to node mapping (Since: 2.10)
+ #
++# @hmat-lb: memory latency and bandwidth information (Since: 4.2)
++#
+ # Since: 2.1
+ ##
+ { 'enum': 'NumaOptionsType',
+-  'data': [ 'node', 'dist', 'cpu' ] }
++  'data': [ 'node', 'dist', 'cpu', 'hmat-lb' ] }
+ 
+ ##
+ # @NumaOptions:
+@@ -395,7 +397,8 @@
+   'data': {
+     'node': 'NumaNodeOptions',
+     'dist': 'NumaDistOptions',
+-    'cpu': 'NumaCpuOptions' }}
++    'cpu': 'NumaCpuOptions',
++    'hmat-lb': 'NumaHmatLBOptions' }}
+ 
+ ##
+ # @NumaNodeOptions:
+@@ -504,6 +507,99 @@
+    'base': 'CpuInstanceProperties',
+    'data' : {} }
+ 
++##
++# @HmatLBMemoryHierarchy:
++#
++# The memory hierarchy in the System Locality Latency
++# and Bandwidth Information Structure of HMAT (Heterogeneous
++# Memory Attribute Table)
++#
++# For more information of @HmatLBMemoryHierarchy see
++# the chapter 5.2.27.4: Table 5-142: Field "Flags" of ACPI 6.3 spec.
++#
++# @memory: the structure represents the memory performance
++#
++# @first-level: first level memory of memory side cached memory
++#
++# @second-level: second level memory of memory side cached memory
++#
++# @third-level: third level memory of memory side cached memory
++#
++# Since: 4.2
++##
++{ 'enum': 'HmatLBMemoryHierarchy',
++  'data': [ 'memory', 'first-level', 'second-level', 'third-level' ] }
 +
-+    while (sleeptime_ns >=3D SCALE_MS && !cpu->stop) {
-+        int64_t start, end;
-+        start =3D qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
-+        qemu_cond_timedwait(cpu->halt_cond, &qemu_global_mutex,
-+                            sleeptime_ns / SCALE_MS);
-+        end =3D qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
-+        sleeptime_ns -=3D end - start;
-+    }
-+    if (sleeptime_ns >=3D SCALE_US && !cpu->stop) {
-+        qemu_mutex_unlock_iothread();
-+        g_usleep(sleeptime_ns / SCALE_US);
-+        qemu_mutex_lock_iothread();
-+    }
-     atomic_set(&cpu->throttle_thread_scheduled, 0);
- }
-=20
-@@ -1166,8 +1179,6 @@ static void qemu_init_sigbus(void)
- }
- #endif /* !CONFIG_LINUX */
-=20
--static QemuMutex qemu_global_mutex;
--
- static QemuThread io_thread;
-=20
- /* cpu creation */
---=20
-2.22.0
++##
++# @HmatLBDataType:
++#
++# Data type in the System Locality Latency
++# and Bandwidth Information Structure of HMAT (Heterogeneous
++# Memory Attribute Table)
++#
++# For more information of @HmatLBDataType see
++# the chapter 5.2.27.4: Table 5-142:  Field "Data Type" of ACPI 6.3 spec.
++#
++# @access-latency: access latency (picoseconds)
++#
++# @read-latency: read latency (picoseconds)
++#
++# @write-latency: write latency (picoseconds)
++#
++# @access-bandwidth: access bandwidth (MB/s)
++#
++# @read-bandwidth: read bandwidth (MB/s)
++#
++# @write-bandwidth: write bandwidth (MB/s)
++#
++# Since: 4.2
++##
++{ 'enum': 'HmatLBDataType',
++  'data': [ 'access-latency', 'read-latency', 'write-latency',
++            'access-bandwidth', 'read-bandwidth', 'write-bandwidth' ] }
++
++##
++# @NumaHmatLBOptions:
++#
++# Set the system locality latency and bandwidth information
++# between Initiator and Target proximity Domains.
++#
++# For more information of @NumaHmatLBOptions see
++# the chapter 5.2.27.4: Table 5-142 of ACPI 6.3 spec.
++#
++# @initiator: the Initiator Proximity Domain.
++#
++# @target: the Target Proximity Domain.
++#
++# @hierarchy: the Memory Hierarchy. Indicates the performance
++#             of memory or side cache.
++#
++# @data-type: presents the type of data, access/read/write
++#             latency or hit latency.
++#
++# @base-lat: the base unit for latency in picoseconds.
++#
++# @base-bw: the base unit for bandwidth in megabytes per second(MB/s).
++#
++# @latency: the value of latency based on Base Unit from @initiator
++#           to @target proximity domain.
++#
++# @bandwidth: the value of bandwidth based on Base Unit between
++#             @initiator and @target proximity domain.
++#
++# Since: 4.2
++##
++{ 'struct': 'NumaHmatLBOptions',
++    'data': {
++    'initiator': 'uint16',
++    'target': 'uint16',
++    'hierarchy': 'HmatLBMemoryHierarchy',
++    'data-type': 'HmatLBDataType',
++    '*base-lat': 'uint64',
++    '*base-bw': 'uint64',
++    '*latency': 'uint16',
++    '*bandwidth': 'uint16' }}
++
+ ##
+ # @HostMemPolicy:
+ #
+diff --git a/qemu-options.hx b/qemu-options.hx
+index c480781992..609ea40086 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -164,16 +164,19 @@ DEF("numa", HAS_ARG, QEMU_OPTION_numa,
+     "-numa node[,mem=size][,cpus=firstcpu[-lastcpu]][,nodeid=node][,initiator=node]\n"
+     "-numa node[,memdev=id][,cpus=firstcpu[-lastcpu]][,nodeid=node][,initiator=node]\n"
+     "-numa dist,src=source,dst=destination,val=distance\n"
+-    "-numa cpu,node-id=node[,socket-id=x][,core-id=y][,thread-id=z]\n",
++    "-numa cpu,node-id=node[,socket-id=x][,core-id=y][,thread-id=z]\n"
++    "-numa hmat-lb,initiator=node,target=node,hierarchy=memory|first-level|second-level|third-level,data-type=access-latency|read-latency|write-latency[,base-lat=blat][,base-bw=bbw][,latency=lat][,bandwidth=bw]\n",
+     QEMU_ARCH_ALL)
+ STEXI
+ @item -numa node[,mem=@var{size}][,cpus=@var{firstcpu}[-@var{lastcpu}]][,nodeid=@var{node}][,initiator=@var{initiator}]
+ @itemx -numa node[,memdev=@var{id}][,cpus=@var{firstcpu}[-@var{lastcpu}]][,nodeid=@var{node}][,initiator=@var{initiator}]
+ @itemx -numa dist,src=@var{source},dst=@var{destination},val=@var{distance}
+ @itemx -numa cpu,node-id=@var{node}[,socket-id=@var{x}][,core-id=@var{y}][,thread-id=@var{z}]
++@itemx -numa hmat-lb,initiator=@var{node},target=@var{node},hierarchy=@var{str},data-type=@var{str}[,base-lat=@var{blat}][,base-bw=@var{bbw}][,latency=@var{lat}][,bandwidth=@var{bw}]
+ @findex -numa
+ Define a NUMA node and assign RAM and VCPUs to it.
+ Set the NUMA distance from a source node to a destination node.
++Set the ACPI Heterogeneous Memory Attributes for the given nodes.
+ 
+ Legacy VCPU assignment uses @samp{cpus} option where
+ @var{firstcpu} and @var{lastcpu} are CPU indexes. Each
+@@ -250,6 +253,46 @@ specified resources, it just assigns existing resources to NUMA
+ nodes. This means that one still has to use the @option{-m},
+ @option{-smp} options to allocate RAM and VCPUs respectively.
+ 
++Use @samp{hmat-lb} to set System Locality Latency and Bandwidth Information
++between initiator and target NUMA nodes in ACPI Heterogeneous Attribute Memory Table (HMAT).
++Initiator NUMA node can create memory requests, usually including one or more processors.
++Target NUMA node contains addressable memory.
++[,base-lat=@var{blat}][,base-bw=@var{bbw}][,latency=@var{lat}][,bandwidth=@var{bw}]
++
++In @samp{hmat-lb} option, @var{node} are NUMA node IDs. @var{str} of 'hierarchy'
++is the memory hierarchy of the target NUMA node: if @var{str} is 'memory', the structure
++represents the memory performance; if @var{str} is 'first-level|second-level|third-level',
++this structure represents aggregated performance of memory side caches for each domain.
++@var{str} of 'data-type' is type of data represented by this structure instance:
++if 'hierarchy' is 'memory', 'data-type' is 'access|read|write' latency(picoseconds)
++or 'access|read|write' bandwidth(MB/s) of the target memory; if 'hierarchy' is
++'first-level|second-level|third-level', 'data-type' is 'access|read|write' hit latency(picoseconds)
++or 'access|read|write' hit bandwidth of the target memory side cache. @var{blat}
++or @var{bbw} is Matrix Entry Values(latency or bandwidth) base unit used for normalizing
++the matrix entry values(which store the latency or bandwidth values). Base unit
++for latency in picoseconds. Base unit for bandwidth in megabytes per second(MB/s).
++Note: Due to the minimum matrix value entry value being 10, the base unit corresponds
++to a value of 10. And @var{blat} or @var{bbw} should be an integer. @var{lat} or
++@var{bw} is the latency/bandwidth value.
++
++For example, the following option assigns NUMA node 0 and 1. Node 0 has 2 cpus and
++a ram, node 1 has only a ram. The processors in node 0 access memory in node
++0 with access-latency 5 picoseconds(base latency is 10), access-bandwidth 5 MB/s(base latency is 20);
++The processors in NUMA node 0 access memory in NUMA node 1 with access-latency 10
++picoseconds(base latency is 10), access-bandwidth 10 MB/s(base latency is 20).
++@example
++-m 2G \
++-object memory-backend-ram,size=1024M,policy=bind,host-nodes=0,id=ram-node0 -numa node,nodeid=0,memdev=ram-node0 \
++-object memory-backend-ram,size=1024M,policy=bind,host-nodes=1,id=ram-node1 -numa node,nodeid=1,memdev=ram-node1 \
++-smp 2 \
++-numa cpu,node-id=0,socket-id=0 \
++-numa cpu,node-id=0,socket-id=1 \
++-numa hmat-lb,initiator=0,target=0,hierarchy=memory,data-type=access-latency,base-lat=10,latency=5 \
++-numa hmat-lb,initiator=0,target=0,hierarchy=memory,data-type=access-bandwidth,base-bw=20,bandwidth=5 \
++-numa hmat-lb,initiator=0,target=1,hierarchy=memory,data-type=access-latency,base-lat=10,latency=10 \
++-numa hmat-lb,initiator=0,target=1,hierarchy=memory,data-type=access-bandwidth,base-bw=20,bandwidth=10 \
++@end example
++
+ ETEXI
+ 
+ DEF("add-fd", HAS_ARG, QEMU_OPTION_add_fd,
+-- 
+2.20.1
 
 
