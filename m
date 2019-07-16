@@ -6,61 +6,64 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3F9FC7618F
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 16:38:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C283C7618F
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 16:51:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9A2C220449
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 16:38:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A2C220449
+	by mail.kernel.org (Postfix) with ESMTPS id 7312C2064B
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 16:51:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7312C2064B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51148 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51242 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnQT1-0007RZ-0j
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 12:38:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55343)
+	id 1hnQfZ-0007IW-M4
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 12:51:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58389)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <kwolf@redhat.com>) id 1hnQSn-0006nS-2N
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 12:38:02 -0400
+ (envelope-from <lersek@redhat.com>) id 1hnQfQ-0006sW-0o
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 12:51:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1hnQSl-0007A4-TW
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 12:38:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38976)
+ (envelope-from <lersek@redhat.com>) id 1hnQfO-0007ML-UT
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 12:51:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40460)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>)
- id 1hnQSe-00070X-Oc; Tue, 16 Jul 2019 12:37:54 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ (Exim 4.71) (envelope-from <lersek@redhat.com>) id 1hnQfO-0007LL-OI
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 12:51:02 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 25955308330C;
- Tue, 16 Jul 2019 16:37:51 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-117-24.ams2.redhat.com [10.36.117.24])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id CFADB1001B00;
- Tue, 16 Jul 2019 16:37:47 +0000 (UTC)
-Date: Tue, 16 Jul 2019 18:37:46 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Max Reitz <mreitz@redhat.com>
-Message-ID: <20190716163746.GH7297@linux.fritz.box>
-References: <20190619152603.5937-1-mreitz@redhat.com>
- <20190716144016.GE7297@linux.fritz.box>
- <82ce3044-e228-2453-5da2-9f86e4627066@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 476178E22C;
+ Tue, 16 Jul 2019 16:51:01 +0000 (UTC)
+Received: from lacos-laptop-7.usersys.redhat.com (ovpn-117-187.ams2.redhat.com
+ [10.36.117.187])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 041EF5D721;
+ Tue, 16 Jul 2019 16:50:57 +0000 (UTC)
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20181102171638.24069-1-peter.maydell@linaro.org>
+ <20181102171638.24069-9-peter.maydell@linaro.org>
+ <3e3d2018-3993-f651-8e94-5bea612bd776@redhat.com>
+ <CAFEAcA_FtoHOUv_cPgfO7GrZ8Ug9cKCvmY2z75i9DaAQ8Qx+gQ@mail.gmail.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <417cd887-aec4-d8ba-1dd2-810bc4c04977@redhat.com>
+Date: Tue, 16 Jul 2019 18:50:56 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.9.1
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
- protocol="application/pgp-signature"; boundary="7ZAtKRhVyVSsbBD2"
-Content-Disposition: inline
-In-Reply-To: <82ce3044-e228-2453-5da2-9f86e4627066@redhat.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <CAFEAcA_FtoHOUv_cPgfO7GrZ8Ug9cKCvmY2z75i9DaAQ8Qx+gQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.44]); Tue, 16 Jul 2019 16:37:51 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.26]); Tue, 16 Jul 2019 16:51:01 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 0/9] block: Delay poll when ending
- drained sections
+Subject: Re: [Qemu-devel] [PULL 08/10] target/arm: Conditionalize some
+ asserts on aarch32 support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,132 +75,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org,
- qemu-block@nongnu.org
+Cc: Richard Henderson <richard.henderson@linaro.org>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 07/16/19 14:03, Peter Maydell wrote:
+> On Fri, 24 May 2019 at 13:33, Laszlo Ersek <lersek@redhat.com> wrote:
+>> On 11/02/18 18:16, Peter Maydell wrote:
+>>> @@ -829,7 +840,7 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
+>>>           * Presence of EL2 itself is ARM_FEATURE_EL2, and of the
+>>>           * Security Extensions is ARM_FEATURE_EL3.
+>>>           */
+>>> -        assert(cpu_isar_feature(arm_div, cpu));
+>>> +        assert(no_aa32 || cpu_isar_feature(arm_div, cpu));
+>>
+>> The assertion above fails on my AArch64 host (APM Mustang A3). Meaning
+>> that my host CPU supports AArch32, but lacks "arm_div".
+> 
+> Hi; I just realized we left this assertion-failure bug report
+> unaddressed, so I had a look at it.
 
---7ZAtKRhVyVSsbBD2
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Yes, it's also tracked under LP#1830864; thanks for looking into it.
 
-Am 16.07.2019 um 18:24 hat Max Reitz geschrieben:
-> On 16.07.19 16:40, Kevin Wolf wrote:
-> > Am 19.06.2019 um 17:25 hat Max Reitz geschrieben:
-> >> Hi,
-> >>
-> >> This is v2 to =E2=80=9Cblock: Keep track of parent quiescing=E2=80=9D.
-> >>
-> >> Please read this cover letter, because I=E2=80=99m very unsure about t=
-he design
-> >> in this series and I=E2=80=99d appreciate some comments.
-> >>
-> >> As Kevin wrote in his reply to that series, the actual problem is that
-> >> bdrv_drain_invoke() polls on every node whenever ending a drain.  This
-> >> may cause graph changes, which is actually forbidden.
-> >>
-> >> To solve that problem, this series makes the drain code construct a li=
-st
-> >> of undrain operations that have been initiated, and then polls all of
-> >> them on the root level once graph changes are acceptable.
-> >>
-> >> Note that I don=E2=80=99t like this list concept very much, so I=E2=80=
-=99m open to
-> >> alternatives.
-> >=20
-> > So drain_end is different from drain_begin in that it wants to wait only
-> > for all bdrv_drain_invoke() calls to complete, but not for other
-> > requests that are in flight. Makes sense.
-> >=20
-> > Though instead of managing a whole list, wouldn't a counter suffice?
-> >=20
-> >> Furthermore, all BdrvChildRoles with BDS parents have a broken
-> >> .drained_end() implementation.  The documentation clearly states that
-> >> this function is not allowed to poll, but it does.  So this series
-> >> changes it to a variant (using the new code) that does not poll.
-> >>
-> >> There is a catch, which may actually be a problem, I don=E2=80=99t kno=
-w: The new
-> >> variant of that .drained_end() does not poll at all, never.  As
-> >> described above, now every bdrv_drain_invoke() returns an object that
-> >> describes when it will be done and which can thus be polled for.  These
-> >> objects are just discarded when using BdrvChildRole.drained_end().  Th=
-at
-> >> does not feel quite right.  It would probably be more correct to let
-> >> BdrvChildRole.drained_end() return these objects so the top level
-> >> bdrv_drained_end() can poll for their completion.
-> >>
-> >> I decided not to do this, for two reasons:
-> >> (1) Doing so would spill the =E2=80=9Clist of objects to poll for=E2=
-=80=9D design to
-> >>     places outside of block/io.c.  I don=E2=80=99t like the design ver=
-y much as
-> >>     it is, but I can live with it as long as it=E2=80=99s constrained =
-to the
-> >>     core drain code in block/io.c.
-> >>     This is made worse by the fact that currently, those objects are of
-> >>     type BdrvCoDrainData.  But it shouldn=E2=80=99t be a problem to ad=
-d a new
-> >>     type that is externally visible (we only need the AioContext and
-> >>     whether bdrv_drain_invoke_entry() is done).
-> >>
-> >> (2) It seems to work as it is.
-> >>
-> >> The alternative would be to add the same GSList ** parameter to
-> >> BdrvChildRole.drained_end() that I added in the core drain code in pat=
-ch
-> >> 2, and then let the .drained_end() implementation fill that with objec=
-ts
-> >> to poll for.  (Which would be accomplished by adding a frontend to
-> >> bdrv_do_drained_end() that lets bdrv_child_cb_drained_poll() pass the
-> >> parameter through.)
-> >>
-> >> Opinions?
-> >=20
-> > I think I would add an int* to BdrvChildRole.drained_end() so that we
-> > can just increase the counter whereever we need to.
->=20
-> So you mean just polling the @bs for which a caller gave poll=3Dtrue until
-> the counter reaches 0?  I=E2=80=99ll try, sounds good (if I can get it to=
- work).
+> 
+> I tried to repro on my Mustang, but this works for me.
+> A CPU with AArch32 but without the Arm-mode division instructions
+> would be non-compliant (and very obviously so if tested), so
+> I suspect the actual problem is not with the hardware but with
+> the kernel not correctly reporting the ID registers to QEMU.
+> What kernel version are you using?
 
-Yes, that's what I have in mind.
+So, I've just retested, with the QEMU binary I've left around from last
+time. (This QEMU binary was built at upstream commit d247c8e7f4fc, with
+Phil's v2 series applied on top, for regression testing:
 
-We expect graph changes to happen during the polling, but I think the
-caller is responsible for making sure that the top-level @bs stays
-around, so we don't need to be extra careful here.
+[PATCH v2 0/9] hw/block/pflash_cfi01: Add DeviceReset() handler
 
-Also, bdrv_drain_invoke() is always called in the same AioContext as the
-top-level drain operation, so the whole aio_context_acquire/release
-stuff from this series should become unnecessary, and we don't need
-atomics to access the counter either.
+http://mid.mail-archive.com/38281fa7-30f4-60ec-3357-3e1613c44dbe@redhat.com
+)
 
-So I think this should really simplify the series a lot.
+The issue still reproduces, so it makes sense for me to look at the host
+kernel version... Well, I'm afraid it won't help much, for an upstream
+investigation:
 
-Kevin
+  4.14.0-115.8.2.el7a.aarch64
 
---7ZAtKRhVyVSsbBD2
-Content-Type: application/pgp-signature; name="signature.asc"
+This is the latest released kernel from "Red Hat Enterprise Linux for
+ARM 64 7".
 
------BEGIN PGP SIGNATURE-----
+Thanks!
+Laszlo
 
-iQIcBAEBAgAGBQJdLf1aAAoJEH8JsnLIjy/WMWAP/jIJmeXmZ9FytP79Hf1ONlRg
-7SOP+fDUc/Y9q5Le4JaQpIov/EYpCLvyQRdRMU5/qfW8dfbQt4e4Gmd1VanHTgDI
-TBOlahc1eezy7f+VopxNWrYk6jjHf0SU2uGkafM04rLhhIRZuvZrDs8gZRUKwE97
-XRKjzlmfTxwxWDyqszTcQ4ld39SQJ7O0MZ8CaSxRGmd4c1Px1BGhK0i49Bmazaqr
-BtMySzEqVDZixWQWAYZmwz/9rLNbonWIhHSse/RmgvuqYwRHmv3ywLT0ZPYI3DV0
-aQMZz+Fi7toIy6i5MTSB5KpwxRqqU3vBgYCh3nsFq4R+DnNr0V17p58cMehwCuZ4
-kHjkypRplHBwkNGrS3kWnerpa8pjI0KtCjDHr4lVTDzjX2h6rLzh4zRsEzHIqrid
-IvooBp7Ros4ryQyUF0FXn607nFkc2ku3Qz8BpDfUXHAeuLTfnKLCbL/DKBs86s1j
-5YVzKOLc+anSUsJG3jLsmXEmHGnihXOgvdVJnFy4tdqoSjX637AazYgkMM0Pm2up
-Sqo5iVqg4RcEy0iXmdcenZryCkjpVAvKl6DFyh/EYcScTX5P607iJmBS1DV3tIua
-WtWt74HzAN6KGQYyeZzGFXsGB671edV51xZ7sWHZT6/DSUCYHlD+u5hFiHSt4Da9
-slHhGoXsjqUCwZo2XCPE
-=OdpM
------END PGP SIGNATURE-----
+>> Better yet: can we rework the code to emit a warning, rather than
+>> aborting QEMU? Assertions are not the best tool IMHO for catching
+>> unusual (or slightly non-conformant / early) hardware.)
+> 
+> The intention of the assertion really is to catch QEMU bugs
+> where we got the ID register values wrong in our emulated
+> CPUs. Perhaps we should relax all these assertions to only
+> testing if we're using TCG, not KVM ?
+> 
+> thanks
+> -- PMM
+> 
 
---7ZAtKRhVyVSsbBD2--
 
