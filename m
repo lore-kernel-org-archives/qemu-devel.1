@@ -2,63 +2,55 @@ Return-Path: <SRS0=+QfZ=VN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A44BBC7618F
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 16:30:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B47A6C7618F
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 16:30:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 79438206C2
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 16:30:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 79438206C2
+	by mail.kernel.org (Postfix) with ESMTPS id 8A243206C2
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 16:30:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A243206C2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51028 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51046 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnQLS-0003D3-OY
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 12:30:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52691)
+	id 1hnQLu-0004va-Dx
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 12:30:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52804)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <cohuck@redhat.com>) id 1hnQLH-0002lE-JU
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 12:30:16 -0400
+ (envelope-from <mlevitsk@redhat.com>) id 1hnQLW-0003gx-Ma
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 12:30:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cohuck@redhat.com>) id 1hnQLF-0001lb-Uh
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 12:30:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39850)
+ (envelope-from <mlevitsk@redhat.com>) id 1hnQLV-0001vP-PB
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 12:30:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54444)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1hnQLF-0001l2-Ki
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 12:30:13 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ (Exim 4.71) (envelope-from <mlevitsk@redhat.com>)
+ id 1hnQLS-0001qg-PC; Tue, 16 Jul 2019 12:30:26 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 129CE3082B41;
- Tue, 16 Jul 2019 16:30:12 +0000 (UTC)
-Received: from gondolin (ovpn-117-180.ams2.redhat.com [10.36.117.180])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 590AC5DA34;
- Tue, 16 Jul 2019 16:30:01 +0000 (UTC)
-Date: Tue, 16 Jul 2019 18:29:58 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: Kirti Wankhede <kwankhede@nvidia.com>
-Message-ID: <20190716182958.7428b1f9.cohuck@redhat.com>
-In-Reply-To: <1562665760-26158-3-git-send-email-kwankhede@nvidia.com>
-References: <1562665760-26158-1-git-send-email-kwankhede@nvidia.com>
- <1562665760-26158-3-git-send-email-kwankhede@nvidia.com>
-Organization: Red Hat GmbH
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+ by mx1.redhat.com (Postfix) with ESMTPS id E5F4285539;
+ Tue, 16 Jul 2019 16:30:25 +0000 (UTC)
+Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.67])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9299D5C231;
+ Tue, 16 Jul 2019 16:30:21 +0000 (UTC)
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Tue, 16 Jul 2019 19:30:17 +0300
+Message-Id: <20190716163020.13383-1-mlevitsk@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Tue, 16 Jul 2019 16:30:12 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.28]); Tue, 16 Jul 2019 16:30:26 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v7 02/13] vfio: Add function to unmap VFIO
- region
+Subject: [Qemu-devel] [PATCH v4 0/3] Few bugfixes for userspace nvme driver
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,36 +62,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kevin.tian@intel.com, yi.l.liu@intel.com, cjia@nvidia.com,
- eskultet@redhat.com, ziye.yang@intel.com, qemu-devel@nongnu.org,
- Zhengxiao.zx@Alibaba-inc.com, shuangtai.tst@alibaba-inc.com,
- dgilbert@redhat.com, zhi.a.wang@intel.com, mlevitsk@redhat.com,
- pasic@linux.ibm.com, aik@ozlabs.ru, alex.williamson@redhat.com,
- eauger@redhat.com, felipe@nutanix.com, jonathan.davies@nutanix.com,
- yan.y.zhao@intel.com, changpeng.liu@intel.com, Ken.Xue@amd.com
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Maxim Levitsky <mlevitsk@redhat.com>,
+ John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 9 Jul 2019 15:19:09 +0530
-Kirti Wankhede <kwankhede@nvidia.com> wrote:
+This is reduced version of patch series for userspace nvme driver,
+that only includes the bugfixes I made.
 
-> This function is used in follwing patch in this series.
+Best regards,
+	Maxim Levitsky
 
-"This function will be used for the migration region." ?
+Maxim Levitsky (3):
+  block/nvme: fix doorbell stride
+  block/nvme: support larger that 512 bytes sector devices
+  block/nvme: don't touch the completion entries
 
-("This series" will be a bit confusing when this has been merged :)
+ block/nvme.c | 52 ++++++++++++++++++++++++++++++++++++++++++----------
+ 1 file changed, 42 insertions(+), 10 deletions(-)
 
-> Migration region is mmaped when migration starts and will be unmapped when
-> migration is complete.
-> 
-> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> Reviewed-by: Neo Jia <cjia@nvidia.com>
-> ---
->  hw/vfio/common.c              | 20 ++++++++++++++++++++
->  hw/vfio/trace-events          |  1 +
->  include/hw/vfio/vfio-common.h |  1 +
->  3 files changed, 22 insertions(+)
+-- 
+2.17.2
 
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 
