@@ -2,66 +2,83 @@ Return-Path: <SRS0=+QfZ=VN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 296DBC7618F
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 15:20:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F4068C76197
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 15:23:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 00AEC2173B
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 15:20:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00AEC2173B
+	by mail.kernel.org (Postfix) with ESMTPS id CD7EC217F4
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 15:23:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD7EC217F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50060 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50078 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnPFm-000455-3r
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 11:20:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57969)
+	id 1hnPIQ-0005XK-PV
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 11:23:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58891)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <cohuck@redhat.com>) id 1hnPFZ-0003cI-K9
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 11:20:18 -0400
+ (envelope-from <philmd@redhat.com>) id 1hnPIG-00058L-3K
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 11:23:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cohuck@redhat.com>) id 1hnPFV-0007bj-Nc
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 11:20:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59084)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cohuck@redhat.com>)
- id 1hnPFT-0007ao-P7; Tue, 16 Jul 2019 11:20:12 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 98A4E368E3;
- Tue, 16 Jul 2019 15:20:10 +0000 (UTC)
-Received: from gondolin (ovpn-117-180.ams2.redhat.com [10.36.117.180])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A326860C44;
- Tue, 16 Jul 2019 15:20:05 +0000 (UTC)
-Date: Tue, 16 Jul 2019 17:20:02 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: Collin Walling <walling@linux.ibm.com>
-Message-ID: <20190716172002.77863317.cohuck@redhat.com>
-In-Reply-To: <20190710102041.6be31940.cohuck@redhat.com>
+ (envelope-from <philmd@redhat.com>) id 1hnPIF-0001Te-0u
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 11:23:03 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:37681)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hnPIE-0001TB-Ol
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 11:23:02 -0400
+Received: by mail-wm1-f65.google.com with SMTP id f17so19111914wme.2
+ for <qemu-devel@nongnu.org>; Tue, 16 Jul 2019 08:23:02 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=RYQ1dBThSk8JJ858ZnZHSH/umzI8P+MPP72jS8oW5Pg=;
+ b=JZNBb7XWrUquMRNz+4kbhyTLsHtlS3m5jr3cTZdXhfCx1Vy4N+N4VmaQeAdTF/tD+Q
+ Z9oQJ7dFg2fB0Ignx2ALYzhsgeN+WYh+OJAIZNoFlC0KeYDF0qFXcur3WHDsWuaSyAmE
+ 6682slaLM0Qo9GG4u477TKquEK5uvw+uPk4tYEbnEhdb9BhG8eoGRjnlaUFGlIrLnBXk
+ P2sK4Biddo0e1mMp9SsqzVWpXuoKW889+Ak31bscKMM8GZBwixuhvk3Vv4tGSwNrYeYL
+ QB6MbSQ+amSbgvxE05Np74aL9BKVP93ZKBgdMz7m91bh5TVUi6/a4EI2TVlk3gr2CmcB
+ GjdA==
+X-Gm-Message-State: APjAAAUjHJvyoZcrKUU2PD9Wbsf8u7wUF4bMqZLe72YDZgb1c/VTtf2f
+ tHPQfN1hZI/s5rTsLpWnatDWqIydelM=
+X-Google-Smtp-Source: APXvYqwro0QEHN+JSabrEO/AdGCyYUf54H+3ZTZ/PidinJmiwf9U9x8w4NFqqQ+zGvnoCBSRwb/fRw==
+X-Received: by 2002:a7b:c106:: with SMTP id w6mr32946869wmi.80.1563290581454; 
+ Tue, 16 Jul 2019 08:23:01 -0700 (PDT)
+Received: from [192.168.1.38] (62.red-83-42-61.dynamicip.rima-tde.net.
+ [83.42.61.62])
+ by smtp.gmail.com with ESMTPSA id u1sm20144983wml.14.2019.07.16.08.23.00
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Tue, 16 Jul 2019 08:23:00 -0700 (PDT)
+To: Cornelia Huck <cohuck@redhat.com>, Collin Walling
+ <walling@linux.ibm.com>, Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>
 References: <20190708125433.16927-1-cohuck@redhat.com>
- <20190708125433.16927-2-cohuck@redhat.com>
- <58b28817-58e5-1cba-6f71-a35093be5cb6@de.ibm.com>
- <0dd71cfe-a9e9-7ac3-523e-065f05479a57@linux.ibm.com>
- <20190710102041.6be31940.cohuck@redhat.com>
-Organization: Red Hat GmbH
+ <20190708125433.16927-3-cohuck@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <cfce6fc7-8459-7c04-0b57-500f3d143931@redhat.com>
+Date: Tue, 16 Jul 2019 17:22:59 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.30]); Tue, 16 Jul 2019 15:20:10 +0000 (UTC)
+In-Reply-To: <20190708125433.16927-3-cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH for-4.1 1/2] s390x/pci: add
- some fallthrough annotations
+ [fuzzy]
+X-Received-From: 209.85.128.65
+Subject: Re: [Qemu-devel] [PATCH for-4.1 2/2] s390x/tcg: move fallthrough
+ annotation
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,97 +90,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: David Hildenbrand <david@redhat.com>, Stefan Weil <sw@weilnetz.de>,
- qemu-devel@nongnu.org, Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Richard Henderson <rth@twiddle.net>
+Cc: Stefan Weil <sw@weilnetz.de>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 10 Jul 2019 10:20:41 +0200
-Cornelia Huck <cohuck@redhat.com> wrote:
+On 7/8/19 2:54 PM, Cornelia Huck wrote:
+> ...so that the compiler properly recognizes it.
+> 
+> Reported-by: Stefan Weil <sw@weilnetz.de>
+> Fixes: f180da83c039 ("s390x/tcg: Implement VECTOR LOAD LOGICAL ELEMENT AND ZERO")
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> ---
+>  target/s390x/translate_vx.inc.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/target/s390x/translate_vx.inc.c b/target/s390x/translate_vx.inc.c
+> index 7b1d31cba5cf..41d5cf869f94 100644
+> --- a/target/s390x/translate_vx.inc.c
+> +++ b/target/s390x/translate_vx.inc.c
+> @@ -577,8 +577,8 @@ static DisasJumpType op_vllez(DisasContext *s, DisasOps *o)
+>              enr = 0;
+>              break;
+>          }
+> -    default:
+>          /* fallthrough */
+> +    default:
 
-> On Tue, 9 Jul 2019 18:55:34 -0400
-> Collin Walling <walling@linux.ibm.com> wrote:
-> 
-> > On 7/8/19 9:23 AM, Christian Borntraeger wrote:  
-> > > 
-> > > 
-> > > On 08.07.19 14:54, Cornelia Huck wrote:    
-> > >> According to the comment, the bits are supposed to accumulate.
-> > >>
-> > >> Reported-by: Stefan Weil <sw@weilnetz.de>
-> > >> Fixes: 5d1abf234462 ("s390x/pci: enforce zPCI state checking")
-> > >> Signed-off-by: Cornelia Huck <cohuck@redhat.com>    
-> > > 
-> > > This patch does not change behaviour, so it is certainly not wrong.
-> > > 
-> > > So lets have a look at if the bug report was actually a real bug or
-> > > just a missing annotation.
-> > >     
-> > >> ---
-> > >>   hw/s390x/s390-pci-inst.c | 2 ++
-> > >>   1 file changed, 2 insertions(+)
-> > >>
-> > >> diff --git a/hw/s390x/s390-pci-inst.c b/hw/s390x/s390-pci-inst.c
-> > >> index 61f30b8e55d2..00235148bed7 100644
-> > >> --- a/hw/s390x/s390-pci-inst.c
-> > >> +++ b/hw/s390x/s390-pci-inst.c
-> > >> @@ -1209,8 +1209,10 @@ int stpcifc_service_call(S390CPU *cpu, uint8_t r1, uint64_t fiba, uint8_t ar,
-> > >>        * FH Enabled bit is set to one in states of ENABLED, BLOCKED or ERROR. */
-> > >>       case ZPCI_FS_ERROR:
-> > >>           fib.fc |= 0x20;
-> > >> +        /* fallthrough */    
-> > > 
-> > > This is correct, in case of an error we are also blocked.
-> > >     
-> > 
-> > Agreed. This is definitely correct based on our architecture.
-> >   
-> > >>       case ZPCI_FS_BLOCKED:
-> > >>           fib.fc |= 0x40;
-> > >> +        /* fallthrough */    
-> > > 
-> > > I think this is also correct, but  it would be good if Collin could verify.
-> > >     
-> > 
-> > I failed to find anything to support setting the function control
-> > enabled bit when the function state is in error / blocked. I'm
-> > assuming this might be some QEMU hack to get things working? I'll have
-> > to dive further to understand why this was done this way, as it doesn't
-> > align with how the s390x architecture is documented. It's confusing.  
-> 
-> Might this also be a real issue? Not matching the architecture is not a
-> good sign...
+Haha :)
 
-Friendly ping. If we still want to have this patch or a fix in 4.1, we
-need to find out soon...
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
+>          gen_program_exception(s, PGM_SPECIFICATION);
+>          return DISAS_NORETURN;
+>      }
 > 
-> > 
-> > Functionally, this doesn't change anything... so I'll at least give it
-> > an ACK for now and investigate this further.  
-> 
-> I prefer to hold off on this patch for now, unless we're really sure
-> that the code does not have a problem here. Actually documenting
-> something that might be wrong does not sound like the right thing to
-> do :/
-> 
-> >   
-> > >>       case ZPCI_FS_ENABLED:
-> > >>           fib.fc |= 0x80;
-> > >>           if (pbdev->iommu->enabled) {
-> > >>    
-> > > 
-> > >     
-> > 
-> > Acked-by: Collin Walling <walling@linux.ibm.com>
-> > 
-> > Side note: is there somewhere that I could access this bug report? :)  
-> 
-> It's the build log with the extra warnings in
-> https://qemu.weilnetz.de/results/build-20190708.txt (referenced in
-> <591d71a5-5b10-ab22-4751-01da8613d84c@weilnetz.de> on qemu-devel).
-
 
