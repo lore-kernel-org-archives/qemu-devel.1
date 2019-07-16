@@ -2,82 +2,89 @@ Return-Path: <SRS0=+QfZ=VN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 077ECC76188
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 11:02:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C523C76195
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 11:02:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C6D4E206C2
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 11:02:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3F0152173B
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 11:02:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iNmU2TJZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C6D4E206C2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Okf3mvEU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F0152173B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47218 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47242 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnLDr-00080A-IK
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 07:02:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58329)
+	id 1hnLEW-00017A-Aa
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 07:02:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58631)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <rfried.dev@gmail.com>) id 1hnLDS-0006qA-Hz
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 07:01:51 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hnLEE-0000NB-6a
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 07:02:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <rfried.dev@gmail.com>) id 1hnLDN-0006PZ-OY
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 07:01:47 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:35834)
+ (envelope-from <alex.bennee@linaro.org>) id 1hnLED-0006z2-5T
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 07:02:38 -0400
+Received: from mail-wr1-x42a.google.com ([2a00:1450:4864:20::42a]:43160)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <rfried.dev@gmail.com>)
- id 1hnLDN-0006OM-Gf; Tue, 16 Jul 2019 07:01:45 -0400
-Received: by mail-wm1-x341.google.com with SMTP id l2so18234964wmg.0;
- Tue, 16 Jul 2019 04:01:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=mLuPacixCfQL1CqAQgfCd9QBEfriLajdZzVnBsDFPn4=;
- b=iNmU2TJZyaAxRkP9j0BcWKwgxig6Ed8x7tJmb38WV7RCJk/im0DjVWIxJYdG3/TwlX
- NVKPCU080FdJZjAmRhILgGUhrlq4/O+ILvaSmmkfqTHyGpXY2q3rQG8LdSGU1M2gc49Z
- rjH9HlXPq6p287V7P+clOjHZ6FfbS/4s9YgmmBsGAS1eNFny0jXMu2r6r7dYxb7hS/YM
- IUMSbqXy+eUZuCTH+VnIi5tDEj7C+RnkYCZ59fnCVs2dT8GBRnSZ63td3ePqL8u2BTuJ
- mJQRjJSIXKbTVBpqQm6U9V8wWB6WuO/gSa7nqEqWzMNdM4nKTshfbuB3BaYh2CbJOFj9
- ewPA==
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1hnLEC-0006yE-U6
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 07:02:37 -0400
+Received: by mail-wr1-x42a.google.com with SMTP id p13so20420198wru.10
+ for <qemu-devel@nongnu.org>; Tue, 16 Jul 2019 04:02:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=uCxvwRf0zmjRkSLeCfxV8X0vFoSit2gTQJPmCMs82IM=;
+ b=Okf3mvEU9cNLis5MwkStH5924vr/c5qozsOpk3LV5xLT4ib/meNgsrD1CkLl1p3feH
+ Kyv17J8OkpRt9INXhI3pFrNx4udvZzA7Cf1s0Q0YRkN2BxRTZy7FuOdcfTt7daEbfGWM
+ 2MjbfKBD+24vOLcN4nKG3wKteYvRpoXBBzfxFWbzH4Skz0k9i87aUQ/0cwtIR2GJmz+h
+ lB16XytWvXHh+9PK8k+7w158tvVpj6BwJ+LCZvgGb4MfcMzObCPCNwyraboxADHEK6yI
+ 3tAT9IN4/QeZ/5RZdXTnN/JnC2ZhcmGKV6tm8JmcRdKtygADa21Xs9u4UZF3NbFvYvT9
+ b84w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=mLuPacixCfQL1CqAQgfCd9QBEfriLajdZzVnBsDFPn4=;
- b=eOEGxtxp4t4cbuqyJkzJPC6WPB9c0Y9aAClkZX+J+FoJG9aYCAXAl61ZyL+T1SgWVh
- GdMAz4k/lVAKRowXTYMA6Rf9cSBVrLiKPLRzmw/wwGg7YvQAGazvjQ2/mQlrLMwCDkCl
- SRYaEf2p6fiW54glEkjCpkduA3vtyxPeqiQNkFd9fzoL3g+IhrTV7qSi4NSh5Nm3W7z4
- r43vC6nM7lH5EDYtyqiG4n0B7E8g+W+6AESexzuiwT4Z0p5ICv+ZANnvL7x9fnEglbG8
- bxaJYpA8WlW07PFsEiAlTMU1HYNq0gcUhMY3Roy01mSUUHu0RhlYRLv92jQKS/kp2XW8
- EgaQ==
-X-Gm-Message-State: APjAAAWdov+jVLKDRKo1zYe1KfkChBqNYdikGfXUcoaevgSjXPX/420v
- NTunSMebcyU1Nn3MLl1YqmWhkJ6mFMZlkajjQqs=
-X-Google-Smtp-Source: APXvYqx3kRIuqKEJAuQUkLwBgzbS/D3N01GO5UhazSAMSHQ3yqv85+t+Tp/4MEX0nMGfh5tB6h3k3Ut87oVB3v++V5I=
-X-Received: by 2002:a1c:35c2:: with SMTP id c185mr29733757wma.58.1563274904137; 
- Tue, 16 Jul 2019 04:01:44 -0700 (PDT)
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=uCxvwRf0zmjRkSLeCfxV8X0vFoSit2gTQJPmCMs82IM=;
+ b=oeo8AB+BdaYsbB2Y6w5zVeTP+BS5dGwU1FmmXwHssziS53dLKLWf2j0+H8+UN6OcBv
+ NQ7JEMq5oH0JrmERVa08gv5LpvO8xDow70lVDpS+Ag6ZFY6P/HnUNb4unplhdxocA3Q8
+ r1OZFJrJOlK/pYXtCsZ+Ee/T2TfyGgMaPc/qf4g42BiDB1hqLcAz7P0Jge4vF73nduGs
+ t9pE9Ec40cBArl22nVcAtqaIr9Rf/2S7gGFz+NaYsB45FjasfChq8So/kcHJbmR5jQoR
+ 8MUI4fP/rs7yke5Oz27bboWuyK0kbfj45FtsAYJjU81bhOqAUd83g13k08+HZOHZzX+K
+ aUkw==
+X-Gm-Message-State: APjAAAWV+zyFgAormlbxbAW73QBMjDULrokRy7qTKpLLHAEs+ocClIq9
+ 71eefXDFSkuYHNXXluCG2jKxMA==
+X-Google-Smtp-Source: APXvYqymhpFy26WsrvFSXLEklx0lkkdyKuGrrrx8eGFu5Zetfhi1S9joB6cG1FVdOQUpKLFxes/Nyw==
+X-Received: by 2002:adf:ed41:: with SMTP id u1mr34014283wro.162.1563274955436; 
+ Tue, 16 Jul 2019 04:02:35 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+ by smtp.gmail.com with ESMTPSA id x11sm14759752wmi.26.2019.07.16.04.02.34
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Tue, 16 Jul 2019 04:02:34 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 2CE791FF87;
+ Tue, 16 Jul 2019 12:02:34 +0100 (BST)
+References: <20190715174817.18981-1-philmd@redhat.com>
+User-agent: mu4e 1.3.3; emacs 26.1
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+In-reply-to: <20190715174817.18981-1-philmd@redhat.com>
+Date: Tue, 16 Jul 2019 12:02:34 +0100
+Message-ID: <87d0iautrp.fsf@zen.linaroharston>
 MIME-Version: 1.0
-References: <20190615051722.13994-1-rfried.dev@gmail.com>
- <555fb9b5-361f-fc3f-ff35-38b993a29edd@redhat.com>
-In-Reply-To: <555fb9b5-361f-fc3f-ff35-38b993a29edd@redhat.com>
-From: Ramon Fried <rfried.dev@gmail.com>
-Date: Tue, 16 Jul 2019 14:01:33 +0300
-Message-ID: <CAGi-RUJPD+q8sCbRfffM2bxc7deLNY4Ewg0AOdkMKfJGQs95Aw@mail.gmail.com>
-To: Jason Wang <jasowang@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::341
-Subject: Re: [Qemu-devel] [PATCH] net: cadence_gem: clear RX control
- descriptor
+X-Received-From: 2a00:1450:4864:20::42a
+Subject: Re: [Qemu-devel] [PATCH-for-4.1 v2 0/9] tests/docker: Debian & MXE
+ fixes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,65 +96,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-trivial@nongnu.org,
- Alistair Francis <alistair@alistair23.me>, qemu-devel@nongnu.org,
- "open list:Xilinx Zynq" <qemu-arm@nongnu.org>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Cc: Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
+ Stefan Weil <sw@weilnetz.de>, Helge Deller <deller@gmx.de>,
+ Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
+ qemu-ppc@nongnu.org,
+ =?utf-8?Q?C?= =?utf-8?Q?=C3=A9dric?= Le Goater <clg@kaod.org>,
+ Richard Henderson <rth@twiddle.net>, Laszlo Ersek <lersek@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Jul 16, 2019 at 11:42 AM Jason Wang <jasowang@redhat.com> wrote:
+
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+
+> Few more patches to be able to MXE-build the NSIS installers.
 >
+> The Fedora kludge is not meant for merge, but might be useful to
+> test this series.
+
+Queued to 2-9 to testing/next, thanks.
+
 >
-> On 2019/6/15 =E4=B8=8B=E5=8D=881:17, Ramon Fried wrote:
-> > The RX ring descriptors control field is used for setting
-> > SOF and EOF (start of frame and end of frame).
-> > The SOF and EOF weren't cleared from the previous descriptors,
-> > causing inconsistencies in ring buffer.
-> > Fix that by clearing the control field of every descriptors we're
-> > processing.
-> >
-> > Signed-off-by: Ramon Fried <rfried.dev@gmail.com>
-> > ---
-> >   hw/net/cadence_gem.c | 7 +++++++
-> >   1 file changed, 7 insertions(+)
-> >
-> > diff --git a/hw/net/cadence_gem.c b/hw/net/cadence_gem.c
-> > index ecee22525c..d83a82bdb0 100644
-> > --- a/hw/net/cadence_gem.c
-> > +++ b/hw/net/cadence_gem.c
-> > @@ -406,6 +406,11 @@ static inline void rx_desc_set_sof(uint32_t *desc)
-> >       desc[1] |=3D DESC_1_RX_SOF;
-> >   }
-> >
-> > +static inline void rx_desc_clear(uint32_t *desc)
+> Based-on: 20190712111849.9006-1-alex.bennee@linaro.org
+> https://lists.gnu.org/archive/html/qemu-devel/2019-07/msg03014.html
 >
+> Philippe Mathieu-Daud=C3=A9 (9):
+>   tests/docker: Kludge to build the Fedora image
+>   tests/docker: Install Sphinx in the Debian images
+>   tests/docker: Install the NSIS tools in the MinGW capable images
+>   tests/docker: Set the correct cross-PKG_CONFIG_PATH in the MXE images
+>   tests/docker: Install texinfo in the Fedora image
+>   buildsys: The NSIS Windows build requires the documentation installed
+>   buildsys: The NSIS Windows build requires qemu-nsis.bmp installed
+>   tests/docker: Let the test-mingw test generate a NSIS installer
+>   NSIS: Add missing firmware blobs
 >
-> Nit: is this better to name this as "rx_desc_clear_control()" ?
-I agree, sent v2.
->
-> Thanks
->
->
-> > +{
-> > +    desc[1]  =3D 0;
-> > +}
-> > +
-> >   static inline void rx_desc_set_eof(uint32_t *desc)
-> >   {
-> >       desc[1] |=3D DESC_1_RX_EOF;
-> > @@ -994,6 +999,8 @@ static ssize_t gem_receive(NetClientState *nc, cons=
-t uint8_t *buf, size_t size)
-> >           bytes_to_copy -=3D MIN(bytes_to_copy, rxbufsize);
-> >
-> >           /* Update the descriptor.  */
-> > +        rx_desc_clear(s->rx_desc[q]);
-> > +
-> >           if (first_desc) {
-> >               rx_desc_set_sof(s->rx_desc[q]);
-> >               first_desc =3D false;
->
->
->
+>  Makefile                                           | 3 ++-
+>  qemu.nsi                                           | 3 +++
+>  tests/docker/dockerfiles/debian-win32-cross.docker | 6 ++++++
+>  tests/docker/dockerfiles/debian-win64-cross.docker | 6 ++++++
+>  tests/docker/dockerfiles/debian10.docker           | 1 +
+>  tests/docker/dockerfiles/debian9.docker            | 1 +
+>  tests/docker/dockerfiles/fedora.docker             | 5 ++++-
+>  tests/docker/test-mingw                            | 1 +
+>  8 files changed, 24 insertions(+), 2 deletions(-)
+
+
+--
+Alex Benn=C3=A9e
 
