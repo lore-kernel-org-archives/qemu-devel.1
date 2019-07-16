@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BEE5BC76195
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 10:09:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B93C7C76188
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 10:11:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9A6C2206C2
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 10:09:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A6C2206C2
+	by mail.kernel.org (Postfix) with ESMTPS id 90B53206C2
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 10:11:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90B53206C2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46912 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46920 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnKOW-0001EV-UT
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 06:09:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41474)
+	id 1hnKQn-0002OG-SN
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 06:11:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42176)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hnKOM-0000n8-0H
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 06:09:02 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hnKQd-0001tv-5G
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 06:11:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hnKOL-0003K1-1S
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 06:09:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58086)
+ (envelope-from <mreitz@redhat.com>) id 1hnKQc-0004pI-Aa
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 06:11:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47964)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hnKOI-0003Ho-Ey; Tue, 16 Jul 2019 06:08:58 -0400
+ id 1hnKQa-0004nP-9z; Tue, 16 Jul 2019 06:11:20 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 99ACA3082B4B;
- Tue, 16 Jul 2019 10:08:57 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 9F6A922388B;
+ Tue, 16 Jul 2019 10:11:19 +0000 (UTC)
 Received: from dresden.str.redhat.com (unknown [10.40.205.58])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E9639611DC;
- Tue, 16 Jul 2019 10:08:52 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 45EF3611DC;
+ Tue, 16 Jul 2019 10:11:15 +0000 (UTC)
 To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
 References: <20190716000117.25219-1-jsnow@redhat.com>
- <20190716000117.25219-2-jsnow@redhat.com>
+ <20190716000117.25219-3-jsnow@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
@@ -70,21 +70,22 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <5680a3dc-817f-8c26-6b41-86ea7b6b901d@redhat.com>
-Date: Tue, 16 Jul 2019 12:08:50 +0200
+Message-ID: <21c02168-91c1-8db1-9b09-a921d13f1df5@redhat.com>
+Date: Tue, 16 Jul 2019 12:11:13 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <20190716000117.25219-2-jsnow@redhat.com>
+In-Reply-To: <20190716000117.25219-3-jsnow@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="sZu2vt5ph7pjJu1dKjdvuVQxS43dtoAca"
+ boundary="FkDI4UY8HXeEe1GlACSbOYpSy2eKEKdD6"
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Tue, 16 Jul 2019 10:08:57 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.39]); Tue, 16 Jul 2019 10:11:19 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 01/11] iotests/257: add Pattern class
+Subject: Re: [Qemu-devel] [PATCH v2 02/11] iotests/257: add EmulatedBitmap
+ class
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,55 +104,56 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---sZu2vt5ph7pjJu1dKjdvuVQxS43dtoAca
-Content-Type: multipart/mixed; boundary="5K4pKZDdILxe87HK3NWojIWF6DnUI5gF9";
+--FkDI4UY8HXeEe1GlACSbOYpSy2eKEKdD6
+Content-Type: multipart/mixed; boundary="caTYbXB3OinEf52MA6aoR1dpVJLdfE7OO";
  protected-headers="v1"
 From: Max Reitz <mreitz@redhat.com>
 To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
  vsementsov@virtuozzo.com, Markus Armbruster <armbru@redhat.com>
-Message-ID: <5680a3dc-817f-8c26-6b41-86ea7b6b901d@redhat.com>
-Subject: Re: [PATCH v2 01/11] iotests/257: add Pattern class
+Message-ID: <21c02168-91c1-8db1-9b09-a921d13f1df5@redhat.com>
+Subject: Re: [PATCH v2 02/11] iotests/257: add EmulatedBitmap class
 References: <20190716000117.25219-1-jsnow@redhat.com>
- <20190716000117.25219-2-jsnow@redhat.com>
-In-Reply-To: <20190716000117.25219-2-jsnow@redhat.com>
+ <20190716000117.25219-3-jsnow@redhat.com>
+In-Reply-To: <20190716000117.25219-3-jsnow@redhat.com>
 
---5K4pKZDdILxe87HK3NWojIWF6DnUI5gF9
+--caTYbXB3OinEf52MA6aoR1dpVJLdfE7OO
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
 On 16.07.19 02:01, John Snow wrote:
-> Just kidding, this is easier to manage with a full class instead of a
-> namedtuple.
+> Represent a bitmap with an object that we can mark and clear bits in.
+> This makes it easier to manage partial writes when we don't write a
+> full group's worth of patterns before an error.
 >=20
 > Signed-off-by: John Snow <jsnow@redhat.com>
 > ---
->  tests/qemu-iotests/257 | 58 +++++++++++++++++++++++-------------------=
+>  tests/qemu-iotests/257 | 124 +++++++++++++++++++++++++----------------=
 
->  1 file changed, 32 insertions(+), 26 deletions(-)
+>  1 file changed, 75 insertions(+), 49 deletions(-)
 
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 
---5K4pKZDdILxe87HK3NWojIWF6DnUI5gF9--
+--caTYbXB3OinEf52MA6aoR1dpVJLdfE7OO--
 
---sZu2vt5ph7pjJu1dKjdvuVQxS43dtoAca
+--FkDI4UY8HXeEe1GlACSbOYpSy2eKEKdD6
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0tojIACgkQ9AfbAGHV
-z0Ch2gf/cLD7SNJSa6w52PkCreNzKyN9+yYQ/m/isC2Rk2kj7S69S56IRbz6Zucx
-qtFHt+KHlaAoxRPUKVxQAaaDZN9gguDlY8TYE9sIdjPJbbUZVBCLJUBw4DEOgLPW
-6/t16k20Db/rzhiO472/vnGslVqIJXIoh0yOUlcRRewgodlpRZuyU6lrCr0oOxU8
-rEMqhTPxt+tB8qcNvRtHrTg70dDY2s+qM4DHaD36S4Hw3f3zd42gI3v96/HCca+f
-qCZNAKyx3ZXWTinw2tNUCRT60FGULaX8dEa5f23+Jskaqiq1PlPaOMB/68Dqo+bf
-rkaHxSfb5sUazNIig2JAlcTvlfLBng==
-=OIt9
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0tosEACgkQ9AfbAGHV
+z0BVSgf8C07kGsvr6UdSW402gJJGT+rt4V1bk3lP9mTQ2RBMuqAREuUTHROerbMr
+wAUxZcOO+1mOfY5/q3ADpkiasaBc6Me5jaJuelzn4QQ1uDfnV7szlQGSsmqbADRs
+YtXj60L5KdcnYWTfetWCxN1Aeu+S1SJyF0D10XAJ2ZfNeweRV1rLuEsaezUJ0Y7d
+lJ88AIZwdcd2GHFtCL6bIwV/iRYZm4Z1fRzBswxSsW5O6hqrVrQj2nmHPfPgL8Be
+42CuB2E0T7zUOXOcjvyP0C8icsF0wQrYJMYyvo0ZCzraXF7kTrGdakG4I4jgvf2E
+ZZ8hAo6hxaYGfAtDTbkPGVtbbYDMDg==
+=NzUU
 -----END PGP SIGNATURE-----
 
---sZu2vt5ph7pjJu1dKjdvuVQxS43dtoAca--
+--FkDI4UY8HXeEe1GlACSbOYpSy2eKEKdD6--
 
