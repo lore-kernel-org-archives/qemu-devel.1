@@ -2,66 +2,83 @@ Return-Path: <SRS0=+QfZ=VN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39D00C76192
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 08:04:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 017F5C76196
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 08:11:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1665F21721
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 08:04:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1665F21721
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id BD14D21738
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 08:11:56 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IImjpVp5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD14D21738
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46082 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46126 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnIRa-0005kk-SC
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 04:04:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56583)
+	id 1hnIZ1-0000ua-Am
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 04:11:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59760)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <yan.y.zhao@intel.com>) id 1hnIRO-0005MC-Vx
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 04:04:03 -0400
+ (envelope-from <paolo.bonzini@gmail.com>) id 1hnIYV-0007sJ-Ms
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 04:11:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yan.y.zhao@intel.com>) id 1hnIRN-0005tX-1m
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 04:04:02 -0400
-Received: from mga03.intel.com ([134.134.136.65]:59507)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yan.y.zhao@intel.com>)
- id 1hnIRL-0005oh-9x
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 04:04:00 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
- by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 16 Jul 2019 01:03:53 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.63,497,1557212400"; d="scan'208";a="187290508"
-Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
- ([10.239.13.9])
- by fmsmga001.fm.intel.com with ESMTP; 16 Jul 2019 01:03:51 -0700
-Date: Tue, 16 Jul 2019 03:57:49 -0400
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: Peter Xu <zhexu@redhat.com>
-Message-ID: <20190716075749.GB8912@joy-OptiPlex-7040>
-References: <1563261042-15974-1-git-send-email-yan.y.zhao@intel.com>
- <20190716072315.GA30980@xz-x1>
- <20190716072919.GA8912@joy-OptiPlex-7040>
- <20190716075025.GB30980@xz-x1>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190716075025.GB30980@xz-x1>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1hnIYU-00038L-Dn
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 04:11:23 -0400
+Received: from mail-wm1-x336.google.com ([2a00:1450:4864:20::336]:53999)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+ id 1hnIYU-00037i-6x
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 04:11:22 -0400
+Received: by mail-wm1-x336.google.com with SMTP id x15so17659935wmj.3
+ for <qemu-devel@nongnu.org>; Tue, 16 Jul 2019 01:11:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=s2VORvYpXzDmq+pVd9Zwp8LUzbuylAos0sk8Od+qroI=;
+ b=IImjpVp53nxxXA496kh9MAUu6SKssJAonAL8l/Lzb/7TPPiCgG8LRYZ8HdCSUzKTaf
+ 4OqRd8FMzQIopyIElB3V6wRArsHSrp9qE2Et5K6emylBjpD5IrTZbTGNGm2NUxbsYpMZ
+ OtQej6WzNg6BHJkapPHnl22q5JRYLH0oV9eSnAkJyEtsD35Pko1zfVj04c9UfjkMzcdT
+ aZtGyjvMXmSqO1sf+8vxKYs6Ll/+WmS97loqXl9Toan8AZLu9qkhQbQQ4AAH3IXml9Xe
+ FvKV0IcTjD1SVewkR0yZFPz6g5cAdYF/+NEvS82FtaZZKxCO1TcKYwp9BOjcRV+8aBxO
+ XILA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references;
+ bh=s2VORvYpXzDmq+pVd9Zwp8LUzbuylAos0sk8Od+qroI=;
+ b=KSDn8ZmIl5gZXE8Up2eut432wUnfQ9M4tR62ni9He77WVJhJc8AYsQs97ASRVQ/1nB
+ EdoKgm2gf+DhOC/T2HIe/37I/+flxW9q7rShvubJLHuhE91JuhUBXUuz6KocpWWt+ffj
+ E0J1UQ9pVY0doWIqJWoOz193bsyrBiUkqXM2GG1YvEaT9DQKCan7TljBmlxYeluCD4pl
+ FL45IxSqknJ/n1Ckzb3qo+dq/u4jAn6rcytv+XpfrdQC8ICU+Qf0bBvw5y2XqVYUs3Jh
+ 5WAjfmPoGOOQuoYk+dsosuaTlnLr5zAS0I/hpiIh4a24Y2S/3nRGycSkp4oc9xLvHHyc
+ Hydg==
+X-Gm-Message-State: APjAAAVUao9c8Q+e0SLJNKNUYA9ljyCK27xoyHvMlTy6hGZv+tosOpxY
+ K1bV9fy0BGnUddYHDCfe6G36imfrAMI=
+X-Google-Smtp-Source: APXvYqwzQ97h5vi3QX8wv3yRppLlNVLVp4LXyJMr5t8LmW7ae/maxVSn28qefUu325KJ96LNXOQSFw==
+X-Received: by 2002:a1c:d108:: with SMTP id i8mr30585909wmg.28.1563264680696; 
+ Tue, 16 Jul 2019 01:11:20 -0700 (PDT)
+Received: from 640k.lan ([93.56.166.5])
+ by smtp.gmail.com with ESMTPSA id c1sm37723879wrh.1.2019.07.16.01.11.19
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Tue, 16 Jul 2019 01:11:19 -0700 (PDT)
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Tue, 16 Jul 2019 10:10:59 +0200
+Message-Id: <1563264677-39718-2-git-send-email-pbonzini@redhat.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1563264677-39718-1-git-send-email-pbonzini@redhat.com>
+References: <1563264677-39718-1-git-send-email-pbonzini@redhat.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 134.134.136.65
-Subject: Re: [Qemu-devel] [PATCH] migration: notify runstate immediately
- before vcpu stops
+X-Received-From: 2a00:1450:4864:20::336
+Subject: [Qemu-devel] [PULL 01/19] scsi-disk: pass sense correctly for
+ guest-recoverable errors
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,60 +90,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: "Tian, Kevin" <kevin.tian@intel.com>,
- "crosthwaite.peter@gmail.com" <crosthwaite.peter@gmail.com>,
- "cohuck@redhat.com" <cohuck@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "dgilbert@redhat.com" <dgilbert@redhat.com>,
- "quintela@redhat.com" <quintela@redhat.com>,
- "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "rth@twiddle.net" <rth@twiddle.net>
+Cc: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Jul 16, 2019 at 03:50:25PM +0800, Peter Xu wrote:
-> On Tue, Jul 16, 2019 at 03:29:19AM -0400, Yan Zhao wrote:
-> > On Tue, Jul 16, 2019 at 03:23:16PM +0800, Peter Xu wrote:
-> > > On Tue, Jul 16, 2019 at 03:10:42PM +0800, Yan Zhao wrote:
-> > > > for some devices to do live migration, it is needed to do something
-> > > > immediately before vcpu stops. add a notification here.
-> > > 
-> > > Hi, Yan,
-> > > 
-> > > Could I ask for a more detailed commit message here?  E.g., what is
-> > > "some devices"?  And, what's the problem behind?
-> > >
-> > hi Peter,
-> > 
-> > Some devices refer to assigned devices, like NICs.
-> > For assigned devices to do live migration, it is sometimes required that
-> > source device is stopped before stopping source vcpus. vcpus can do some
-> > final cleanups (like handling interrupt) in that case.
-> 
-> I see, so this is a prerequisite of another work?
+From: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 
-Yes.
-> 
-> IMHO it would make more sense to have this patch to be with that
-> patchset, then it'll justify itself with reasoning.  Unless I
-> misunderstood - this single patch seems to help nothing if as a
-> standalone one.
+When an error was passed down to the guest because it was recoverable,
+the sense length was not copied from the SG_IO data.  As a result,
+the guest saw the CHECK CONDITION status but not the sense data.
 
-It would be better. but this patch alone is also somewhat general,
-as it only adds an extra notification and wouldn't impact others.
+Signed-off-by: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ hw/scsi/scsi-disk.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-Only after this patch is upstreamed, can VFIO live migration have a
-second choice for those devices of special requirements.
+diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
+index ed7295b..5d3fb3c 100644
+--- a/hw/scsi/scsi-disk.c
++++ b/hw/scsi/scsi-disk.c
+@@ -62,6 +62,7 @@ typedef struct SCSIDiskClass {
+     DMAIOFunc       *dma_readv;
+     DMAIOFunc       *dma_writev;
+     bool            (*need_fua_emulation)(SCSICommand *cmd);
++    void            (*update_sense)(SCSIRequest *r);
+ } SCSIDiskClass;
+ 
+ typedef struct SCSIDiskReq {
+@@ -438,6 +439,7 @@ static bool scsi_handle_rw_error(SCSIDiskReq *r, int error, bool acct_failed)
+ {
+     bool is_read = (r->req.cmd.mode == SCSI_XFER_FROM_DEV);
+     SCSIDiskState *s = DO_UPCAST(SCSIDiskState, qdev, r->req.dev);
++    SCSIDiskClass *sdc = (SCSIDiskClass *) object_get_class(OBJECT(s));
+     BlockErrorAction action = blk_get_error_action(s->qdev.conf.blk,
+                                                    is_read, error);
+ 
+@@ -456,6 +458,7 @@ static bool scsi_handle_rw_error(SCSIDiskReq *r, int error, bool acct_failed)
+             if (error == ECANCELED || error == EAGAIN || error == ENOTCONN ||
+                 error == 0)  {
+                 /* These errors are handled by guest. */
++                sdc->update_sense(&r->req);
+                 scsi_req_complete(&r->req, *r->status);
+                 return true;
+             }
+@@ -2894,6 +2897,12 @@ static int scsi_block_parse_cdb(SCSIDevice *d, SCSICommand *cmd,
+     }
+ }
+ 
++static void scsi_block_update_sense(SCSIRequest *req)
++{
++    SCSIDiskReq *r = DO_UPCAST(SCSIDiskReq, req, req);
++    SCSIBlockReq *br = DO_UPCAST(SCSIBlockReq, req, r);
++    r->req.sense_len = MIN(br->io_header.sb_len_wr, sizeof(r->req.sense));
++}
+ #endif
+ 
+ static
+@@ -3059,6 +3068,7 @@ static void scsi_block_class_initfn(ObjectClass *klass, void *data)
+     sc->parse_cdb    = scsi_block_parse_cdb;
+     sdc->dma_readv   = scsi_block_dma_readv;
+     sdc->dma_writev  = scsi_block_dma_writev;
++    sdc->update_sense = scsi_block_update_sense;
+     sdc->need_fua_emulation = scsi_block_no_fua;
+     dc->desc = "SCSI block device passthrough";
+     dc->props = scsi_block_properties;
+-- 
+1.8.3.1
 
-Hope it can get understanding from you:)
-
-Or do you think I need to change the commit message a little to unbind
-from migration?
-
-Thanks
-Yan
 
 
