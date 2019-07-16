@@ -6,137 +6,88 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01BD5C7618F
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 16:03:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D474DC7618F
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 16:03:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C8FB420880
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 16:03:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8FB420880
+	by mail.kernel.org (Postfix) with ESMTPS id 9C2A720880
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 16:03:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C2A720880
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50812 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50822 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnPvC-0000Lp-50
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 12:03:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44375)
+	id 1hnPvo-0001Rv-Ud
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 12:03:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44484)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jsnow@redhat.com>) id 1hnPv0-0008Hs-N5
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 12:03:07 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hnPvc-0000w9-G8
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 12:03:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hnPuz-00010S-HM
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 12:03:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:31355)
+ (envelope-from <mreitz@redhat.com>) id 1hnPva-0001I9-Vb
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 12:03:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39336)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1hnPuw-0000zA-VR; Tue, 16 Jul 2019 12:03:03 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1hnPvX-0001GI-Nm; Tue, 16 Jul 2019 12:03:39 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 483B681F1B;
- Tue, 16 Jul 2019 16:03:01 +0000 (UTC)
-Received: from [10.18.17.130] (dhcp-17-130.bos.redhat.com [10.18.17.130])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9EB5C60C05;
- Tue, 16 Jul 2019 16:02:58 +0000 (UTC)
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-References: <20190716000117.25219-1-jsnow@redhat.com>
- <20190716000117.25219-10-jsnow@redhat.com>
- <1e0e9638-6d60-7343-e6db-a1e77b5da932@redhat.com>
-From: John Snow <jsnow@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 16C778553A;
+ Tue, 16 Jul 2019 16:03:39 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.40.205.58])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 618315DA34;
+ Tue, 16 Jul 2019 16:03:37 +0000 (UTC)
+To: Maxim Levitsky <mlevitsk@redhat.com>, qemu-block@nongnu.org
+References: <20190712173600.14554-1-mreitz@redhat.com>
+ <20190712173600.14554-3-mreitz@redhat.com>
+ <9d9af2d86805036334efd17baabf2ec2a0804615.camel@redhat.com>
+ <8dddcc60d9eac5535af9390e054dbfca9c08db2f.camel@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <4045c084-572a-b274-3acb-f634162e8605@redhat.com>
-Date: Tue, 16 Jul 2019 12:02:58 -0400
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <8887bb70-7e09-4d05-cbd1-5f972a4dc1a6@redhat.com>
+Date: Tue, 16 Jul 2019 18:03:34 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <1e0e9638-6d60-7343-e6db-a1e77b5da932@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <8dddcc60d9eac5535af9390e054dbfca9c08db2f.camel@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="nUsbF8kRt3OHz8qKm3PaX8FWM2kE0oVP0"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.27]); Tue, 16 Jul 2019 16:03:01 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ (mx1.redhat.com [10.5.110.28]); Tue, 16 Jul 2019 16:03:39 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 09/11] block/backup: teach TOP to never
- copy unallocated regions
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 2/7] block: Add
+ blk_truncate_for_formatting()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -148,102 +99,267 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com,
- Markus Armbruster <armbru@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--nUsbF8kRt3OHz8qKm3PaX8FWM2kE0oVP0
+Content-Type: multipart/mixed; boundary="3C4YpYbe6zqJV2Edu6IYHrmqNUfNqH44D";
+ protected-headers="v1"
+From: Max Reitz <mreitz@redhat.com>
+To: Maxim Levitsky <mlevitsk@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+Message-ID: <8887bb70-7e09-4d05-cbd1-5f972a4dc1a6@redhat.com>
+Subject: Re: [Qemu-block] [PATCH 2/7] block: Add blk_truncate_for_formatting()
+References: <20190712173600.14554-1-mreitz@redhat.com>
+ <20190712173600.14554-3-mreitz@redhat.com>
+ <9d9af2d86805036334efd17baabf2ec2a0804615.camel@redhat.com>
+ <8dddcc60d9eac5535af9390e054dbfca9c08db2f.camel@redhat.com>
+In-Reply-To: <8dddcc60d9eac5535af9390e054dbfca9c08db2f.camel@redhat.com>
 
+--3C4YpYbe6zqJV2Edu6IYHrmqNUfNqH44D
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-On 7/16/19 7:43 AM, Max Reitz wrote:
-> On 16.07.19 02:01, John Snow wrote:
->> Presently, If sync=3DTOP is selected, we mark the entire bitmap as dir=
-ty.
->> In the write notifier handler, we dutifully copy out such regions.
+On 16.07.19 17:45, Maxim Levitsky wrote:
+> On Tue, 2019-07-16 at 16:08 +0300, Maxim Levitsky wrote:
+>> On Fri, 2019-07-12 at 19:35 +0200, Max Reitz wrote:
+>>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>>> ---
+>>>  include/sysemu/block-backend.h | 12 ++++++++
+>>>  block/block-backend.c          | 54 ++++++++++++++++++++++++++++++++=
+++
+>>>  2 files changed, 66 insertions(+)
+>>>
+>>> diff --git a/include/sysemu/block-backend.h b/include/sysemu/block-ba=
+ckend.h
+>>> index 733c4957eb..cd9ec8bf52 100644
+>>> --- a/include/sysemu/block-backend.h
+>>> +++ b/include/sysemu/block-backend.h
+>>> @@ -236,6 +236,18 @@ int blk_pwrite_compressed(BlockBackend *blk, int=
+64_t offset, const void *buf,
+>>>                            int bytes);
+>>>  int blk_truncate(BlockBackend *blk, int64_t offset, PreallocMode pre=
+alloc,
+>>>                   Error **errp);
+>>> +
+>>> +/**
+>>> + * Wrapper of blk_truncate() for format drivers that need to truncat=
+e
+>>> + * their protocol node before formatting it.
+>>> + * Invoke blk_truncate() to truncate the file to @offset; if that
+>>> + * fails with -ENOTSUP (and the file is already big enough), try to
+>>> + * overwrite the first sector with zeroes.  If that succeeds, return=
+
+>>> + * success.
+>>> + */
+>>> +int blk_truncate_for_formatting(BlockBackend *blk, int64_t offset,
+>>> +                                Error **errp);
+>>> +
+>>>  int blk_pdiscard(BlockBackend *blk, int64_t offset, int bytes);
+>>>  int blk_save_vmstate(BlockBackend *blk, const uint8_t *buf,
+>>>                       int64_t pos, int size);
+>>> diff --git a/block/block-backend.c b/block/block-backend.c
+>>> index a8d160fd5d..c0e64b1ee1 100644
+>>> --- a/block/block-backend.c
+>>> +++ b/block/block-backend.c
+>>> @@ -2041,6 +2041,60 @@ int blk_truncate(BlockBackend *blk, int64_t of=
+fset, PreallocMode prealloc,
+>>>      return bdrv_truncate(blk->root, offset, prealloc, errp);
+>>>  }
+>>> =20
+>>> +int blk_truncate_for_formatting(BlockBackend *blk, int64_t offset, E=
+rror **errp)
+>>> +{
+>>> +    Error *local_err =3D NULL;
+>>> +    int64_t current_size;
+>>> +    int bytes_to_clear;
+>>> +    int ret;
+>>> +
+>>> +    ret =3D blk_truncate(blk, offset, PREALLOC_MODE_OFF, &local_err)=
+;
+>>> +    if (ret < 0 && ret !=3D -ENOTSUP) {
+>>> +        error_propagate(errp, local_err);
+>>> +        return ret;
+>>> +    } else if (ret >=3D 0) {
+>>> +        return ret;
+>>> +    }
 >>
->> Fix this in three parts:
+>> What if the truncate does succeed? For example the current implementat=
+ion of raw_co_truncate,
+>> does return zero when you truncate to less that block device size=20
+>> (and this is kind of wrong since you can't really change the block dev=
+ice size)
+
+Ah, yes, stupid me.
+
+>> Even more, I see is that in the later patch, you call this with offset=
+ =3D=3D 0 which
+>> I think will always succeed on a raw block device, thus skipping the z=
+eroing code.
 >>
->> 1. Mark the bitmap as being initialized before the first yield.
->> 2. After the first yield but before the backup loop, interrogate the
->> allocation status asynchronously and initialize the bitmap.
->> 3. Teach the write notifier to interrogate allocation status if it is
->> invoked during bitmap initialization.
+>> How about just doing the zeroing in the bdrv_create_file_fallback?
+
+Hm.  I can try.  The block drivers that use
+blk_truncate_for_formatting() write a full header to the image file, so
+they don=E2=80=99t need the sector be zero.
+
+Alternatively, I could just treat ret =3D=3D 0 the same as -ENOTSUP.  The=
+n
+the code would just go on to invoke blk_getlength() and see for itself
+what to do.
+
+>> Another idea:
 >>
->> As an effect of this patch, the job progress for TOP backups
->> now behaves like this:
+>> blk_truncate_for_formatting would first truncate the file to 0, then
+>> check if the size of the file became zero in addition to the successfu=
+l return value.
 >>
->> - total progress starts at bdrv_length.
->> - As allocation status is interrogated, total progress decreases.
->> - As blocks are copied, current progress increases.
+>> If the file size became zero, truncate the file to the requested size =
+- this should make sure that file is empty.
+>> Otherwise, zero the first sector.
 >>
->> Taken together, the floor and ceiling move to meet each other.
+>> It might also be nice to add a check that if the size didn't became ze=
+ro, that it remained the same
+>> to avoid strange situations of semi broken truncate.
+
+Hm, I would expect the block device to handle that.  A state between
+=E2=80=9Csuccessful resize=E2=80=9D and =E2=80=9Cdid not change at all, a=
+s intended for this
+device=E2=80=9D should always be an error.
+
+But the device should zero the first cluster like we do here.
+
+>> Also I would rename the function to something like blk_raw_format_file=
+,
+>> basically a function which tries its best to erase an existing file co=
+ntents
 >>
->> Signed-off-by: John Snow <jsnow@redhat.com>
->> ---
->>  block/backup.c     | 78 ++++++++++++++++++++++++++++++++++++++++-----=
--
->>  block/trace-events |  1 +
->>  2 files changed, 70 insertions(+), 9 deletions(-)
->=20
-> Looks good to me but for a seemingly unrelated change:
->=20
->> diff --git a/block/backup.c b/block/backup.c
->> index b407d57954..e28fd23f6a 100644
->> --- a/block/backup.c
->> +++ b/block/backup.c
->=20
-> [...]
->=20
->> @@ -507,10 +565,12 @@ static int coroutine_fn backup_run(Job *job, Err=
-or **errp)
->>               * notify callback service CoW requests. */
->>              job_yield(job);
->>          }
->> +        ret =3D -ECANCELED;
->=20
-> This one.  This doesn=E2=80=99t look like it belongs in this patch, and=
- I=E2=80=99m not
-> even sure it=E2=80=99s correct.  Being cancelled is the normal state fo=
-r
-> sync=3Dnone, so I suppose it is correct to just return 0 then.
->=20
-> Max
->=20
-Yeah, this is wiggly, so... yes, we can return 0 here. The job
-infrastructure machinery is going to change it to an ECANCELED for us
-anyway:
+>>
+>> Yet another idea would to drop the lying in the raw_co_truncate (on bl=
+ock devices), and fail always,
+>> unless asked to truncate to the exact file size, and let the callers d=
+eal with that.
+>> Callers where it is not critical for the truncate to work can just ign=
+ore this failure.
+>> That is probably hard to implement=20
+>>
+>> Or we can add a truncate 'mode' to .bdrv_co_truncate, which would let =
+the caller indicate its intention,
+>> that is if the caller must truncate to that size or it can accept trun=
+cate ending up in bigger file that it asked for.
 
-job_completed
-  job_update_rc
-    if (!job->ret && job_is_cancelled(job)) {
-        job->ret =3D -ECANCELED;
-    }
+Hm.  That sounds interesting.  Currently, qemu-img resize tries to
+inquire whether the truncate did anything useful by checking the length
+post-truncate.  It prints a warning if the size didn=E2=80=99t change.
 
-So in this case I just figured that I might as well make it explicit;
-this is an error exit.
+Adding a flag would simplify that and probably this, so that sounds
+useful indeed.
 
-(I guess just leaving it at 0 means "whatever the job machinery thinks"
-too, which is probably also fine. The job machinery does not distinguish
-between "canceled and 0" or "canceled and < 0".)
+>> As we once discussed on IRC, the fact that truncate on a block device =
+'succeeds',
+>> despite not really beeing able to change the block device size, causes=
+ other issues,
+>> like not beeing able to use preallocation=3Dfull when creating a qcow2=
+ image on a block device.
+>>
+>> Best regards,
+>> 	Maxim Levitsky
+>>
+>>> +
+>>> +    current_size =3D blk_getlength(blk);
+>>> +    if (current_size < 0) {
+>>> +        error_free(local_err);
+>>> +        error_setg_errno(errp, -current_size,
+>>> +                         "Failed to inquire new image file's current=
+ length");
+>>> +        return current_size;
+>>> +    }
+>>> +
+>>> +    if (current_size < offset) {
+>>> +        /* Need to grow the image, but we failed to do that */
+>>> +        error_propagate(errp, local_err);
+>>> +        return -ENOTSUP;
+>>> +    }
+>>> +
+>>> +    error_free(local_err);
+>>> +    /*
+>>> +     * We can deal with images that are too big.  We just need to
+>>> +     * clear the first sector.
+>>> +     */
+>>> +
+>>> +    bytes_to_clear =3D MIN(current_size, BDRV_SECTOR_SIZE) - offset;=
 
+> Also this I think is wrong when offset !=3D0, since assuming real world=
+ device, the
+> MIN will be just BDRV_SECTOR_SIZE, so the result of this statement is n=
+egative number.
 
-Since we're here, though... I was wondering if it shouldn't be the case
-that "canceling" a sync=3Dnone job should actually result in success,
-unless you force-cancel. OR, allow sync=3Dnone jobs to receive "COMPLETE"
-verbs to finish successfully, or "CANCEL" verbs to terminate with error.
+Oh, damn, yes.  Thanks!
 
-(I don't like what mirror does and don't wish to mimic it. I continue to
-dislike the idea that canceling a ready mirror job allows it to complete
-with a successful error code.)
+> I think you want just
+> bytes_to_clear =3D MIN(current_size, BDRV_SECTOR_SIZE);
 
->>      } else {
->>          ret =3D backup_loop(s);
->>      }
->> =20
->> + out:
->>      notifier_with_return_remove(&s->before_write);
->> =20
->>      /* wait until pending backup_do_cow() calls have completed */
+I don=E2=80=99t think I want that because I want to start clearing from @=
+offset,
+so I do need to subtract it.
+
+But of course I don=E2=80=99t need to do anything if @offset >=3D
+BDRV_SECTOR_SIZE, so there should just be an additional if () block.
+
+Max
+
+>>> +    if (bytes_to_clear) {
+>>> +        if (!(blk->root->perm & BLK_PERM_WRITE)) {
+>>> +            error_setg(errp, "Cannot clear first sector of new image=
+: "
+>>> +                       "Write permission missing");
+>>> +            return -EPERM;
+>>> +        }
+>>> +
+>>> +        ret =3D blk_pwrite_zeroes(blk, offset, bytes_to_clear, 0);
+>>> +        if (ret < 0) {
+>>> +            error_setg_errno(errp, -ret, "Failed to clear the first =
+sector of "
+>>> +                             "the new image");
+>>> +            return ret;
+>>> +        }
+>>> +    }
+>>> +
+>>> +    return 0;
+>>> +}
+>>> +
+>>>  static void blk_pdiscard_entry(void *opaque)
+>>>  {
+>>>      BlkRwCo *rwco =3D opaque;
+>>
+>>
 >=20
+>=20
+
+
+
+--3C4YpYbe6zqJV2Edu6IYHrmqNUfNqH44D--
+
+--nUsbF8kRt3OHz8qKm3PaX8FWM2kE0oVP0
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0t9VcACgkQ9AfbAGHV
+z0Bt3AgAg7Wh+WteE0ZBtnSMczyn7ae8csgBlaW1c7Q6+43UkAXjBxoFGgfynTOj
+d6fAQKu0t90HhvFhqidRqzN4llFyIH3/VSoJmrdjByedhZQ9Ey8TIbG/siyzQygQ
+tbATxWW/fwu3mJLxvj3hDd9er3+82iwiCrtD/KCbiaUZQ8r61joDMBLImzE4JPme
+rdjB1Fq7DXbkQ2CTl5qTQQ11TsAPpuPmG2WU0ANPLzqvhj9b6Jvyx5m9ENrA147n
+7V7I0Afr2aLN+2iKTPAVOmTA7YFC0mE1JYjrlPq7ZohbuNFhdFF7DANTP7VbqLJQ
+VZ05QAjWb0Hu7xuv9gTuntkQGEyIOw==
+=SH6l
+-----END PGP SIGNATURE-----
+
+--nUsbF8kRt3OHz8qKm3PaX8FWM2kE0oVP0--
 
