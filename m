@@ -2,82 +2,74 @@ Return-Path: <SRS0=+QfZ=VN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54E90C7618F
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 14:29:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 505C4C7618F
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 14:31:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2092D2173B
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 14:29:08 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kZHO91/+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2092D2173B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2C5452173B
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 14:31:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C5452173B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=twiddle.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49566 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49582 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnOS3-0007vR-86
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 10:29:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41885)
+	id 1hnOU7-0000nf-5l
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 10:31:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42475)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <stefanha@gmail.com>) id 1hnORs-0007Wo-DG
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 10:28:57 -0400
+ (envelope-from <bounces@canonical.com>) id 1hnOTv-0000On-8f
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 10:31:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@gmail.com>) id 1hnORr-0006FC-HG
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 10:28:56 -0400
-Received: from mail-wr1-x42c.google.com ([2a00:1450:4864:20::42c]:37468)
+ (envelope-from <bounces@canonical.com>) id 1hnOTt-0007NJ-3I
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 10:31:03 -0400
+Received: from indium.canonical.com ([91.189.90.7]:43954)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1hnORr-0006Et-BS
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 10:28:55 -0400
-Received: by mail-wr1-x42c.google.com with SMTP id n9so21209381wrr.4
- for <qemu-devel@nongnu.org>; Tue, 16 Jul 2019 07:28:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=Lzj/yiNDFh4JW84RkK4BcDNLtWpH3d5QATkJFn3L+HM=;
- b=kZHO91/+O50GEaBwI8eudoz2SosSPR4YrfSfxlq7+aBoScaaXupgwirD2tybU7Y4FW
- QiDyrtL0TPQ7vAMVoUfdH6P0DI3UNqjM38BCWC/kOJKMsllX2dHnCbkM1tdbklu5xPQh
- iWND+Zu3u4Rdvbw/hefYLJNbFgR/Vr/mlKTqN94GvOi9VtC2mCfJUcq3+/OI3hiJCZtn
- CFktSndspoEsSFyQ6+sDJGHmcEKndv2tPSM2EGzrGemC+udF1jAh27UNaPgBAPr/wCk6
- Fg74Ydxat1YzSM4KK7hWFJeciFyaOXXlvPPKUDP4yhLZMpjZKXKspfjgQwPfTmewMHlI
- 6hfg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=Lzj/yiNDFh4JW84RkK4BcDNLtWpH3d5QATkJFn3L+HM=;
- b=LV6OpckEoEGnljPpHvUNvJloAA7RcqIQhxC4DxuqAdb5IJ00BlyqAXAdJeLzZ0B5TB
- AcXx5AgekZsnv0b3QfJHoVMUN/ZYPoGMJwu5kacTa5ehuHZvhKIZDSELRYBoRW/xSrtW
- ZI9caPwh1pDjdX/vVb9hfhxSEK4bYBTUyt11m7O1yjxSr3sy+ErIxKz79jnaugdojp6H
- X1UQaVV6KOXNdRT5JriT8/FuF9+0ML6jak5JU/1Mb5heo1whLG75oPCKbK6dWjeTPvxw
- adu+AAGW08D5mCxnHRowhFGJhoU8zZ/RCNODykqu/tW/1sXQQ8EOYmX6iMvcVX5OkRkU
- oY+A==
-X-Gm-Message-State: APjAAAVVSNChwtA9wnb+52aTbhqvy4BvDfPqPHcyWUwoBpjrQJUULkqJ
- d2LFsgMQ+GSpF4ISpQE5Da9D2IZiokNoh2HY5Nw=
-X-Google-Smtp-Source: APXvYqxq2KYweQ8J1Yho7vX0Fb1WD5C+bM9sbO3pckTvX4NKIkR6MK+SU8jOPn7W1KvGy5+v0/TrjjfjaeohfS5tZGQ=
-X-Received: by 2002:adf:f3cc:: with SMTP id g12mr1665916wrp.149.1563287334174; 
- Tue, 16 Jul 2019 07:28:54 -0700 (PDT)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1hnOTs-0007MN-TZ
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 10:31:01 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1hnOTp-0007w0-9b
+ for <qemu-devel@nongnu.org>; Tue, 16 Jul 2019 14:30:57 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 6959F2E80DC
+ for <qemu-devel@nongnu.org>; Tue, 16 Jul 2019 14:30:56 +0000 (UTC)
 MIME-Version: 1.0
-References: <20190712115024.2659-1-sw@weilnetz.de>
-In-Reply-To: <20190712115024.2659-1-sw@weilnetz.de>
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Tue, 16 Jul 2019 15:28:43 +0100
-Message-ID: <CAJSP0QWM6=iPyCkQDC58ZPQ-Dp2EhGokyW5oLFAdZ+LBRMDtXA@mail.gmail.com>
-To: Stefan Weil <sw@weilnetz.de>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::42c
-Subject: Re: [Qemu-devel] [PATCH v2] libvhost-user: Add missing GCC_FMT_ATTR
- and fix three format errors
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 16 Jul 2019 14:20:41 -0000
+From: Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Fix Committed; importance=Undecided;
+ assignee=rth@twiddle.net; 
+X-Launchpad-Bug-Tags: arm tcg testcase
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: ajbennee christophe-lyon pmaydell rth
+X-Launchpad-Bug-Reporter: Christophe Lyon (christophe-lyon)
+X-Launchpad-Bug-Modifier: Richard Henderson (rth)
+References: <156025884763.18155.9614824235777300144.malonedeb@wampee.canonical.com>
+Message-Id: <156328684158.21433.12514526949088094440.launchpad@gac.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="19007";
+ Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: cd106f9e30f1d74c1f88106c155adf6c21ede608
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1832353] Re: cpu_exec: Assertion
+ !have_mmap_lock() failed
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -86,12 +78,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- qemu-devel <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
+Reply-To: Bug 1832353 <1832353@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+** Changed in: qemu
+       Status: In Progress =3D> Fix Committed
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1832353
+
+Title:
+  cpu_exec: Assertion !have_mmap_lock() failed
+
+Status in QEMU:
+  Fix Committed
+
+Bug description:
+  Hi,
+
+  I have isolated a testcase from the GCC testsuite (actually gfortran,
+  test proc_ptr_51.f90) which produces tons of:
+
+  qemu-arm: /home/christophe.lyon/src/qemu/accel/tcg/cpu-exec.c:701:
+  cpu_exec: Assertion `!have_mmap_lock()' failed.
+
+  including with master qemu as of today.
+
+  I'm attaching a tarball containing:
+  qemu-assert:
+  cmd  lib  proc_ptr_51.exe
+
+  qemu-assert/lib:
+  ld-linux-armhf.so.3  libc.so.6  libgcc_s.so.1  libgfortran.so.5  libm.so.6
+
+  where cmd is the basic command used to launch the test & reproduce the
+  failure.
+
+  Note that the test or the generated may actually be buggy: I have
+  reported failures on native aarch64 and arm machines. Yet, qemu should
+  not fail with a loop of asserts.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1832353/+subscriptions
 
