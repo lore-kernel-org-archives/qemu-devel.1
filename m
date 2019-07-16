@@ -2,50 +2,53 @@ Return-Path: <SRS0=+QfZ=VN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD8C2C7618F
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 15:57:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8054CC76192
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 15:58:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8303420880
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 15:57:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8303420880
+	by mail.kernel.org (Postfix) with ESMTPS id 5C48D20880
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 15:58:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C48D20880
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50414 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50424 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnPpg-0005NG-Pr
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 11:57:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41750)
+	id 1hnPr0-0006mx-MA
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 11:58:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42187)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hnPpW-0004yU-2i
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 11:57:27 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hnPqp-0006HV-Aa
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 11:58:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hnPpS-0005jY-LA
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 11:57:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57490)
+ (envelope-from <mreitz@redhat.com>) id 1hnPqo-0006OO-3A
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 11:58:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57144)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hnPpG-0005f0-8d; Tue, 16 Jul 2019 11:57:15 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ id 1hnPql-0006Mh-Fz; Tue, 16 Jul 2019 11:58:43 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 19E7330BA077;
- Tue, 16 Jul 2019 15:57:07 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id C666830C34C2;
+ Tue, 16 Jul 2019 15:58:42 +0000 (UTC)
 Received: from dresden.str.redhat.com (unknown [10.40.205.58])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A8915600C4;
- Tue, 16 Jul 2019 15:57:05 +0000 (UTC)
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B3FA81001B0D;
+ Tue, 16 Jul 2019 15:58:40 +0000 (UTC)
+To: Eric Blake <eblake@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ qemu-devel@nongnu.org
 References: <20190716122836.31187-1-thuth@redhat.com>
- <20190716122836.31187-5-thuth@redhat.com>
- <b9abc916-59b1-3edb-16c4-2b817393ae9d@redhat.com>
- <8b63564b-bfb4-38e9-8368-119a0a7a1c84@redhat.com>
+ <20190716122836.31187-3-thuth@redhat.com>
+ <1832e90b-0fd2-19ac-f90e-572147e51f53@redhat.com>
+ <62ec1243-3bb9-c18d-0ff6-4c4ad193620c@redhat.com>
+ <03b260f7-b108-f035-2974-17b5ef74e4e6@redhat.com>
+ <99ee850e-d9e0-1079-7fb2-64a1901009e6@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
@@ -72,22 +75,22 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <621a49be-7374-8e2f-03a2-4f07c4c5429e@redhat.com>
-Date: Tue, 16 Jul 2019 17:57:03 +0200
+Message-ID: <cc4c609e-d8e6-bdeb-8c15-c7617ee09fdc@redhat.com>
+Date: Tue, 16 Jul 2019 17:58:38 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <8b63564b-bfb4-38e9-8368-119a0a7a1c84@redhat.com>
+In-Reply-To: <99ee850e-d9e0-1079-7fb2-64a1901009e6@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="AlwTuge3xVuF3RVaPgEv9XCctNCdwTT6q"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+ boundary="OLJHF4i1aQvciCf8gcNqyS37GRspwAEsN"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Tue, 16 Jul 2019 15:57:07 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.40]); Tue, 16 Jul 2019 15:58:42 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 4/4] gitlab-ci: Remove qcow2 tests that
- are handled by "make check" already
+Subject: Re: [Qemu-devel] [PATCH v2 2/4] tests/qemu-iotests/group: Remove
+ some more tests from the "auto" group
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,110 +109,112 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---AlwTuge3xVuF3RVaPgEv9XCctNCdwTT6q
-Content-Type: multipart/mixed; boundary="ogg8SrYHYHetG29CaKmZoXYnPo8kKFBDx";
+--OLJHF4i1aQvciCf8gcNqyS37GRspwAEsN
+Content-Type: multipart/mixed; boundary="3VldiOMoviXIV4uFH6iM42N2ZO2pmLGgQ";
  protected-headers="v1"
 From: Max Reitz <mreitz@redhat.com>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Message-ID: <621a49be-7374-8e2f-03a2-4f07c4c5429e@redhat.com>
-Subject: Re: [PATCH v2 4/4] gitlab-ci: Remove qcow2 tests that are handled by
- "make check" already
+To: Eric Blake <eblake@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?=
+ <alex.bennee@linaro.org>, qemu-block@nongnu.org
+Message-ID: <cc4c609e-d8e6-bdeb-8c15-c7617ee09fdc@redhat.com>
+Subject: Re: [PATCH v2 2/4] tests/qemu-iotests/group: Remove some more tests
+ from the "auto" group
 References: <20190716122836.31187-1-thuth@redhat.com>
- <20190716122836.31187-5-thuth@redhat.com>
- <b9abc916-59b1-3edb-16c4-2b817393ae9d@redhat.com>
- <8b63564b-bfb4-38e9-8368-119a0a7a1c84@redhat.com>
-In-Reply-To: <8b63564b-bfb4-38e9-8368-119a0a7a1c84@redhat.com>
+ <20190716122836.31187-3-thuth@redhat.com>
+ <1832e90b-0fd2-19ac-f90e-572147e51f53@redhat.com>
+ <62ec1243-3bb9-c18d-0ff6-4c4ad193620c@redhat.com>
+ <03b260f7-b108-f035-2974-17b5ef74e4e6@redhat.com>
+ <99ee850e-d9e0-1079-7fb2-64a1901009e6@redhat.com>
+In-Reply-To: <99ee850e-d9e0-1079-7fb2-64a1901009e6@redhat.com>
 
---ogg8SrYHYHetG29CaKmZoXYnPo8kKFBDx
+--3VldiOMoviXIV4uFH6iM42N2ZO2pmLGgQ
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 16.07.19 17:51, Thomas Huth wrote:
-> On 16/07/2019 17.41, Max Reitz wrote:
->> On 16.07.19 14:28, Thomas Huth wrote:
->>> Since most iotests are now run during "make check" already, we do not=
-
->>> need to test them explicitly from the gitlab-ci.yml script anymore.
->>> And while we're at it, add some of the new non-auto tests >=3D 248 in=
-stead.
+On 16.07.19 17:56, Eric Blake wrote:
+> On 7/16/19 10:44 AM, Max Reitz wrote:
+>> On 16.07.19 17:31, Thomas Huth wrote:
+>>> On 16/07/2019 17.26, Max Reitz wrote:
+>>>> On 16.07.19 14:28, Thomas Huth wrote:
+>>>>> Remove some more tests from the "auto" group that either have issue=
+s
+>>>>> in certain environments (like macOS or FreeBSD, or on certain file =
+systems
+>>>>> like ZFS or tmpfs), do not work with the qcow2 format, or that are =
+simply
+>>>>> taking too much time.
+>>>>>
+>>>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>>>>> ---
+>>>>>  tests/qemu-iotests/group | 114 ++++++++++++++++++++---------------=
+----
+>>>>>  1 file changed, 58 insertions(+), 56 deletions(-)
+>>>>
+>>>> I just looked through the list to see whether any of the test seems =
+like
+>>>> we=E2=80=99d want to keep it even though it is a bit slow.  Mostly I=
+ was looking
+>>>> for tests that cover complex cases.
+>>>>
+>>>> 255 is the only one that seemed to fit that bill to me.  So why do y=
+ou
+>>>> remove it?  Is it because it takes two seconds?
 >>>
->>> Signed-off-by: Thomas Huth <thuth@redhat.com>
->>> ---
->>>  .gitlab-ci.yml | 12 +++---------
->>>  1 file changed, 3 insertions(+), 9 deletions(-)
+>>> No, I removed it because it was failing on macOS:
 >>>
->>> diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
->>> index c63bf2f822..fa5d094453 100644
->>> --- a/.gitlab-ci.yml
->>> +++ b/.gitlab-ci.yml
->>> @@ -45,15 +45,9 @@ build-tcg-disabled:
->>>   - ./check -raw 001 002 003 004 005 008 009 010 011 012 021 025 032 =
-033 048
->>>              052 063 077 086 101 104 106 113 147 148 150 151 152 157 =
-159 160
->>>              163 170 171 183 184 192 194 197 205 208 215 221 222 226 =
-227 236
->>> - - ./check -qcow2 001 002 003 004 005 007 008 009 010 011 012 013 01=
-7 018 019
->>> -            020 021 022 024 025 027 028 029 031 032 033 034 035 036 =
-037 038
->>> -            039 040 042 043 046 047 048 049 050 051 052 053 054 056 =
-057 058
->>> -            060 061 062 063 065 066 067 068 069 071 072 073 074 079 =
-080 082
->>> -            085 086 089 090 091 095 096 097 098 099 102 103 104 105 =
-107 108
->>> -            110 111 114 117 120 122 124 126 127 129 130 132 133 134 =
-137 138
->>> -            139 140 141 142 143 144 145 147 150 151 152 154 155 156 =
-157 158
->>> -            161 165 170 172 174 176 177 179 184 186 187 190 192 194 =
-195 196
->>> -            197 200 202 203 205 208 209 214 215 216 217 218 222 226 =
-227 229 234
->>> + - ./check -qcow2 028 040 051 056 057 058 065 067 068 082 085 091 09=
-5 096 102
->>> +            124 127 129 132 139 142 144 145 147 151 152 155 157 165 =
-194 196
->>> +            200 202 203 205 208 209 216 218 222 227 234 248 250 254 =
-255 256
+>>>  https://cirrus-ci.com/task/4860239294234624
+>>>
+>>> ("OSError: AF_UNIX path too long" is the error, if I got that right)
 >>
->> This removes 197 and 215.  Why?
+>> Ah, OK.  So, uh, we effectively can=E2=80=99t run any Python tests on =
+macOS?
 >=20
-> As mentioned in the cover letter, I've seen problems with 197 and 215 i=
-n
-> the gitlab CI pipelines (since the two tests apparently cause a lot of
-> memory pressure). At least they were causing trouble when "make check"
-> was running with other tests in parallel. Maybe they still work fine
-> when they run alone here. I'll give it another try...
+> Not when our CI is set up to use super-long file names:
+>=20
+> +  File
+> "/private/var/folders/sy/2x5qvs0n4lg18fry9jz4y21m0000gn/T/cirrus-ci-bui=
+ld/tests/qemu-iotests/../../python/qemu/machine.py",
+> line 294, in launch
 
-OK.  Shouldn=E2=80=99t this be mentioned in the commit message here, too?=
- ;-)
+That isn=E2=80=99t really long.
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+> Is there any way to create our sockets somewhere under /tmp instead of
+> inside tests/qemu-iotests, so that we have a shorter filename for
+> sockets no matter how deep in the file hierarchy the tests themselves l=
+ive?
+>=20
+> Also, at one point, we tossed around the idea of
+> s/qemu-iotests/iotests/, to shave off 5 characters that don't really ad=
+d
+> anything.
+
+I=E2=80=99d personally rather just skip the iotests if we detect such a s=
+illy
+OS, but maybe that=E2=80=99s just me.
+
+Max
 
 
---ogg8SrYHYHetG29CaKmZoXYnPo8kKFBDx--
+--3VldiOMoviXIV4uFH6iM42N2ZO2pmLGgQ--
 
---AlwTuge3xVuF3RVaPgEv9XCctNCdwTT6q
+--OLJHF4i1aQvciCf8gcNqyS37GRspwAEsN
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0t89AACgkQ9AfbAGHV
-z0DlYgf+P2rDrg4KihcbO60yXHb8D+QYP1eNe5RByEG+6ntObgfwu7HE/eJ6XrmZ
-1jH4dSmg28AQc4RKaA4IiejpxG/PP3jJHDxAyQGl8vEiK+VSbfnDQa+pWsf+o/Re
-uyZNqvwAvexBOsU0glmQSo+IoEuv9kcf8oclNsX3lUkwoSAaRNjMzPESX92oJwzH
-OskKwgl13W3Sa68nmKn+/hdhzo8rndEdgIwM3hrKa7XTFIJJ8uMU4XF54Cj06kB6
-6An6VEnpjEnqJEGccsnS9darhSpTYgLDIh8tijrjf00GpAUW/v728xJhkKGWu3r3
-dIhljn5Ij03dPSCfSLBec7/JXiqoWA==
-=voAZ
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0t9C4ACgkQ9AfbAGHV
+z0CddggAqLVfgFqSHflAtoAallWy5MIxgEKkHiVMVSkQlJGCl9YK/rWqVRdp/K+b
+SFmhaWuCh4uUXSUhcXsNCBtx1pBqj7PS6xUNq2Z/y++Tjkuu2vrqXEZTq/oAqYyT
+odTllxgQPVWN7hXcBcXolTdfbNvuVjRzbsexfAfVx6xhag9DWl/RaFFBVA8cJl1o
+t0pSnvTQvhzgR1GjI3Hxq97EpAulP1eWGjrsbDHCZWx41ZLZxCCzVEOikb3mapx6
+DsfdVSKukSS0elWC7/hE+yGwVQ4W5ZPghkyvq31SksIQuNEOqjRHw7TrVPfrmCOD
+RU4yVA0+kqCO195b69JjhtUTstLCdw==
+=Z91V
 -----END PGP SIGNATURE-----
 
---AlwTuge3xVuF3RVaPgEv9XCctNCdwTT6q--
+--OLJHF4i1aQvciCf8gcNqyS37GRspwAEsN--
 
