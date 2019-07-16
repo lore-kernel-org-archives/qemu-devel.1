@@ -2,79 +2,60 @@ Return-Path: <SRS0=+QfZ=VN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90D61C76192
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 15:38:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C3F2C7618F
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 15:41:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 636582173E
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 15:38:28 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="smR7lA7I"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 636582173E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 247C820693
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 15:41:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 247C820693
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50182 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50212 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnPX8-0006iY-AP
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 11:38:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35683)
+	id 1hnPaM-0000lm-NQ
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 11:41:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36599)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hnPWy-0006Je-Rq
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 11:38:17 -0400
+ (envelope-from <shameerali.kolothum.thodi@huawei.com>)
+ id 1hnPZq-0007Se-6L
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 11:41:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hnPWx-0002RW-Rx
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 11:38:16 -0400
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:43730)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hnPWx-0002R3-KD
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 11:38:15 -0400
-Received: by mail-ot1-x343.google.com with SMTP id h59so17647650otb.10
- for <qemu-devel@nongnu.org>; Tue, 16 Jul 2019 08:38:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=xb495cKI1PWB9TFV3HJZKvlHlDh/Wxj2/mXj/cNCt4s=;
- b=smR7lA7I38I3/iV2m2WEj1BblSuLgPKpofs38HHEfWDtR/WBKX8+gH+5Nwu9siIC8k
- fo+r1aKQelnrPx77krmt7tpRNq4T/C//hDfW8BiO3W02fCG7YCPKKClLi/kdtsEoxZgW
- sbhJ5XGGRWOv7pri84rtnBaR6XE5FborXfPGlo4UO4/v1qGh29m2SxMdzWv0yfv65XWf
- V0jfq3lvF102joMItj93+087uKwZaf4li5chGF99Q92pPNSg81YLzjBrQmaFbcJm2D2z
- iOBPKeGMhEIiI030fSAYPuP9y35UX4aWruQk215r+94VX1K8x4I3NNMWz9ZMMSpLHjsG
- jwZw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=xb495cKI1PWB9TFV3HJZKvlHlDh/Wxj2/mXj/cNCt4s=;
- b=PXE+xLo7sBGDcGKKWFqc1+v6TwLT+iZKYAgGX4t60XX2niEtQ4qMmM69ueaUQSWfh3
- CaTLKIWgpoLao2/1BQfns/CpBE0u+tkyjckPVpjvxc4TzJfCzES0yfZfkicvtmC+wTT9
- DUNnMHIOjEMu8WQ8vwgDGXWAn9yovRL8DyPGuirBUCvJ71Xtc8rTQjExyra6yuXBPQE4
- 1RR0yoyoZjD73CS3HAoqPHqyL9mfJysKRH/mVVZIkG00cronoTqj2poE++WRNo/73WAT
- oVZAh6vGjjxjLbEhWbgFlpOoXn3x+Kiag0RJeramETrLVGmxYMkpGPgBdJzHOLr1BzKP
- 6rgA==
-X-Gm-Message-State: APjAAAUz+Xdc5bXkYPOxQFdH0YW1jvEfomfm8uBZjShHruKwHe7xLPqT
- bG2luQHxvEbNddfnPPDUN0CE8tefB5Yr8tBcGe2SHqDzkWY=
-X-Google-Smtp-Source: APXvYqx2DzEviJmkPsTFVZAd/6PmDmrM5FkjerBHJBUMMX+qKHa3Bs/5ZPSPcrBbG35x9w0MGsnPLwowQNZNlt7uifo=
-X-Received: by 2002:a9d:5f1a:: with SMTP id f26mr3935727oti.91.1563291494702; 
- Tue, 16 Jul 2019 08:38:14 -0700 (PDT)
+ (envelope-from <shameerali.kolothum.thodi@huawei.com>)
+ id 1hnPZp-0004Oh-06
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 11:41:14 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:2175 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <shameerali.kolothum.thodi@huawei.com>)
+ id 1hnPZl-0004ES-Pc; Tue, 16 Jul 2019 11:41:10 -0400
+Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id 3BA8317A01BE4BF1A2A8;
+ Tue, 16 Jul 2019 23:40:59 +0800 (CST)
+Received: from S00345302A-PC.china.huawei.com (10.202.227.237) by
+ DGGEMS402-HUB.china.huawei.com (10.3.19.202) with Microsoft SMTP Server id
+ 14.3.439.0; Tue, 16 Jul 2019 23:40:50 +0800
+From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+To: <qemu-devel@nongnu.org>, <qemu-arm@nongnu.org>, <eric.auger@redhat.com>,
+ <imammedo@redhat.com>
+Date: Tue, 16 Jul 2019 16:38:10 +0100
+Message-ID: <20190716153816.17676-5-shameerali.kolothum.thodi@huawei.com>
+X-Mailer: git-send-email 2.12.0.windows.1
+In-Reply-To: <20190716153816.17676-1-shameerali.kolothum.thodi@huawei.com>
+References: <20190716153816.17676-1-shameerali.kolothum.thodi@huawei.com>
 MIME-Version: 1.0
-References: <20190716140546.6661-1-cohuck@redhat.com>
-In-Reply-To: <20190716140546.6661-1-cohuck@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 16 Jul 2019 16:38:03 +0100
-Message-ID: <CAFEAcA-kiWu9jcZ=wjSwoYFCYzXehbYLZPOzVo5BmhyX=zmAhg@mail.gmail.com>
-To: Cornelia Huck <cohuck@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::343
-Subject: Re: [Qemu-devel] [PULL for-4.1 0/3] s390x cpumodel fixes
+Content-Type: text/plain
+X-Originating-IP: [10.202.227.237]
+X-CFilter-Loop: Reflected
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 45.249.212.190
+Subject: [Qemu-devel] [PATCH-for-4.2 v7 04/10] hw/arm/virt: Add memory
+ hotplug framework
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,44 +67,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x <qemu-s390x@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: peter.maydell@linaro.org, sameo@linux.intel.com, ard.biesheuvel@linaro.org,
+ linuxarm@huawei.com, xuwei5@hisilicon.com, shannon.zhaosl@gmail.com,
+ sebastien.boeuf@intel.com, lersek@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 16 Jul 2019 at 15:05, Cornelia Huck <cohuck@redhat.com> wrote:
->
-> The following changes since commit 5ea8ec2fcf57cb9af24ad2cf17b4d64adb03afdf:
->
->   Merge remote-tracking branch 'remotes/maxreitz/tags/pull-block-2019-07-15' into staging (2019-07-15 16:11:47 +0100)
->
-> are available in the Git repository at:
->
->   https://github.com/cohuck/qemu tags/s390x-20190716
->
-> for you to fetch changes up to 5d8866c89817998a3d9c3055d5dc2b5a8e78658a:
->
->   s390x/cpumodel: change internal name of vxpdeh to match description (2019-07-16 11:29:38 +0200)
->
-> ----------------------------------------------------------------
-> straighten out some things in the gen15 cpu model
->
-> ----------------------------------------------------------------
->
-> Christian Borntraeger (3):
->   s390x/cpumodel: remove esort from the default model
->   s390x/cpumodel: also change name of vxbeh
->   s390x/cpumodel: change internal name of vxpdeh to match description
->
->  target/s390x/cpu_features_def.inc.h | 2 +-
->  target/s390x/gen-features.c         | 5 ++---
->  2 files changed, 3 insertions(+), 4 deletions(-)
+From: Eric Auger <eric.auger@redhat.com>
+
+This patch adds the memory hot-plug/hot-unplug infrastructure
+in machvirt. The device memory is not yet exposed to the Guest
+either through DT or ACPI and hence both cold/hot plug of memory
+is explicitly disabled for now.
+
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Signed-off-by: Kwangwoo Lee <kwangwoo.lee@sk.com>
+Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ hw/arm/Kconfig |  2 ++
+ hw/arm/virt.c  | 51 +++++++++++++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 52 insertions(+), 1 deletion(-)
+
+diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
+index ab65ecd216..84961c17ab 100644
+--- a/hw/arm/Kconfig
++++ b/hw/arm/Kconfig
+@@ -20,6 +20,8 @@ config ARM_VIRT
+     select SMBIOS
+     select VIRTIO_MMIO
+     select ACPI_PCI
++    select MEM_DEVICE
++    select DIMM
+ 
+ config CHEETAH
+     bool
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index d9496c9363..907fb64bb9 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -64,6 +64,8 @@
+ #include "hw/arm/smmuv3.h"
+ #include "hw/acpi/acpi.h"
+ #include "target/arm/internals.h"
++#include "hw/mem/pc-dimm.h"
++#include "hw/mem/nvdimm.h"
+ 
+ #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
+     static void virt_##major##_##minor##_class_init(ObjectClass *oc, \
+@@ -1871,6 +1873,40 @@ static const CPUArchIdList *virt_possible_cpu_arch_ids(MachineState *ms)
+     return ms->possible_cpus;
+ }
+ 
++static void virt_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
++                                 Error **errp)
++{
++
++    /*
++     * The device memory is not yet exposed to the Guest either through
++     * DT or ACPI and hence both cold/hot plug of memory is explicitly
++     * disabled for now.
++     */
++    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
++        error_setg(errp, "memory cold/hot plug is not yet supported");
++        return;
++    }
++
++    pc_dimm_pre_plug(PC_DIMM(dev), MACHINE(hotplug_dev), NULL, errp);
++}
++
++static void virt_memory_plug(HotplugHandler *hotplug_dev,
++                             DeviceState *dev, Error **errp)
++{
++    VirtMachineState *vms = VIRT_MACHINE(hotplug_dev);
++
++    pc_dimm_plug(PC_DIMM(dev), MACHINE(vms), NULL);
++
++}
++
++static void virt_machine_device_pre_plug_cb(HotplugHandler *hotplug_dev,
++                                            DeviceState *dev, Error **errp)
++{
++    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
++        virt_memory_pre_plug(hotplug_dev, dev, errp);
++    }
++}
++
+ static void virt_machine_device_plug_cb(HotplugHandler *hotplug_dev,
+                                         DeviceState *dev, Error **errp)
+ {
+@@ -1882,12 +1918,23 @@ static void virt_machine_device_plug_cb(HotplugHandler *hotplug_dev,
+                                      SYS_BUS_DEVICE(dev));
+         }
+     }
++    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
++        virt_memory_plug(hotplug_dev, dev, errp);
++    }
++}
++
++static void virt_machine_device_unplug_request_cb(HotplugHandler *hotplug_dev,
++                                          DeviceState *dev, Error **errp)
++{
++    error_setg(errp, "device unplug request for unsupported device"
++               " type: %s", object_get_typename(OBJECT(dev)));
+ }
+ 
+ static HotplugHandler *virt_machine_get_hotplug_handler(MachineState *machine,
+                                                         DeviceState *dev)
+ {
+-    if (object_dynamic_cast(OBJECT(dev), TYPE_SYS_BUS_DEVICE)) {
++    if (object_dynamic_cast(OBJECT(dev), TYPE_SYS_BUS_DEVICE) ||
++       (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM))) {
+         return HOTPLUG_HANDLER(machine);
+     }
+ 
+@@ -1951,7 +1998,9 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
+     mc->kvm_type = virt_kvm_type;
+     assert(!mc->get_hotplug_handler);
+     mc->get_hotplug_handler = virt_machine_get_hotplug_handler;
++    hc->pre_plug = virt_machine_device_pre_plug_cb;
+     hc->plug = virt_machine_device_plug_cb;
++    hc->unplug_request = virt_machine_device_unplug_request_cb;
+     mc->numa_mem_supported = true;
+ }
+ 
+-- 
+2.17.1
 
 
-Applied, thanks.
-
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.1
-for any user-visible changes.
-
--- PMM
 
