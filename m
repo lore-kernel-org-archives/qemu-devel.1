@@ -6,57 +6,57 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84411C76192
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 12:29:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2A64C76192
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 12:29:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5695D20880
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 12:29:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5695D20880
+	by mail.kernel.org (Postfix) with ESMTPS id B33B520880
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 12:29:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B33B520880
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48304 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48312 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnMaO-0003i7-KY
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 08:29:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56929)
+	id 1hnMab-0004cy-Vq
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 08:29:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56994)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <thuth@redhat.com>) id 1hnMZe-0000Za-D5
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 08:28:51 -0400
+ (envelope-from <thuth@redhat.com>) id 1hnMZi-0000rG-E5
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 08:28:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1hnMZd-00031l-Dt
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 08:28:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37614)
+ (envelope-from <thuth@redhat.com>) id 1hnMZh-00034W-Bi
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 08:28:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56252)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <thuth@redhat.com>)
- id 1hnMZb-0002zy-6S; Tue, 16 Jul 2019 08:28:47 -0400
+ id 1hnMZf-00032S-7g; Tue, 16 Jul 2019 08:28:51 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 83C1DC034DF3;
- Tue, 16 Jul 2019 12:28:46 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 82089C034DF3;
+ Tue, 16 Jul 2019 12:28:50 +0000 (UTC)
 Received: from thuth.com (dhcp-200-228.str.redhat.com [10.33.200.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7E9A960C05;
- Tue, 16 Jul 2019 12:28:44 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 725E960C05;
+ Tue, 16 Jul 2019 12:28:49 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
 To: qemu-devel@nongnu.org,
 	Max Reitz <mreitz@redhat.com>
-Date: Tue, 16 Jul 2019 14:28:33 +0200
-Message-Id: <20190716122836.31187-2-thuth@redhat.com>
+Date: Tue, 16 Jul 2019 14:28:36 +0200
+Message-Id: <20190716122836.31187-5-thuth@redhat.com>
 In-Reply-To: <20190716122836.31187-1-thuth@redhat.com>
 References: <20190716122836.31187-1-thuth@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Tue, 16 Jul 2019 12:28:46 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.31]); Tue, 16 Jul 2019 12:28:50 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 1/4] tests/qemu-iotests/check: Allow tests
- without groups
+Subject: [Qemu-devel] [PATCH v2 4/4] gitlab-ci: Remove qcow2 tests that are
+ handled by "make check" already
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,46 +74,54 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The regular expressions in the "check" script currently expect that there
-is always a space after the test number in the group file, so you can't
-have a test in there without a group unless the line still ends with a
-space - which is quite error prone since some editors might remove spaces
-at the end of lines automatically.
-Thus let's fix the regular expressions so that it is also possible to
-have lines with one test number only in the group file.
+Since most iotests are now run during "make check" already, we do not
+need to test them explicitly from the gitlab-ci.yml script anymore.
+And while we're at it, add some of the new non-auto tests >=3D 248 instea=
+d.
 
-Suggested-by: Max Reitz <mreitz@redhat.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- tests/qemu-iotests/check | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ .gitlab-ci.yml | 12 +++---------
+ 1 file changed, 3 insertions(+), 9 deletions(-)
 
-diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
-index f925606cc5..c24874ff4a 100755
---- a/tests/qemu-iotests/check
-+++ b/tests/qemu-iotests/check
-@@ -488,7 +488,7 @@ testlist options
- BEGIN        { for (t=3D'$start'; t<=3D'$end'; t++) printf "%03d\n",t }'=
- \
-         | while read id
-         do
--            if grep -s "^$id " "$source_iotests/group" >/dev/null
-+            if grep -s "^$id\( \|\$\)" "$source_iotests/group" >/dev/nul=
-l
-             then
-                 # in group file ... OK
-                 echo $id >>$tmp.list
-@@ -547,7 +547,7 @@ else
-         touch $tmp.list
-     else
-         # no test numbers, do everything from group file
--        sed -n -e '/^[0-9][0-9][0-9]*/s/[         ].*//p' <"$source_iote=
-sts/group" >$tmp.list
-+        sed -n -e '/^[0-9][0-9][0-9]*/s/^\([0-9]*\).*/\1/p' <"$source_io=
-tests/group" >$tmp.list
-     fi
- fi
+diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
+index c63bf2f822..fa5d094453 100644
+--- a/.gitlab-ci.yml
++++ b/.gitlab-ci.yml
+@@ -45,15 +45,9 @@ build-tcg-disabled:
+  - ./check -raw 001 002 003 004 005 008 009 010 011 012 021 025 032 033 =
+048
+             052 063 077 086 101 104 106 113 147 148 150 151 152 157 159 =
+160
+             163 170 171 183 184 192 194 197 205 208 215 221 222 226 227 =
+236
+- - ./check -qcow2 001 002 003 004 005 007 008 009 010 011 012 013 017 01=
+8 019
+-            020 021 022 024 025 027 028 029 031 032 033 034 035 036 037 =
+038
+-            039 040 042 043 046 047 048 049 050 051 052 053 054 056 057 =
+058
+-            060 061 062 063 065 066 067 068 069 071 072 073 074 079 080 =
+082
+-            085 086 089 090 091 095 096 097 098 099 102 103 104 105 107 =
+108
+-            110 111 114 117 120 122 124 126 127 129 130 132 133 134 137 =
+138
+-            139 140 141 142 143 144 145 147 150 151 152 154 155 156 157 =
+158
+-            161 165 170 172 174 176 177 179 184 186 187 190 192 194 195 =
+196
+-            197 200 202 203 205 208 209 214 215 216 217 218 222 226 227 =
+229 234
++ - ./check -qcow2 028 040 051 056 057 058 065 067 068 082 085 091 095 09=
+6 102
++            124 127 129 132 139 142 144 145 147 151 152 155 157 165 194 =
+196
++            200 202 203 205 208 209 216 218 222 227 234 248 250 254 255 =
+256
 =20
+ build-user:
+  script:
 --=20
 2.21.0
 
