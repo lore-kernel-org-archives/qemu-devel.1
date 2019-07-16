@@ -6,45 +6,45 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56353C76188
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 09:24:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3538BC76188
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 09:26:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2445821721
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 09:24:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2445821721
+	by mail.kernel.org (Postfix) with ESMTPS id 0BB1921721
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 09:26:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0BB1921721
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46728 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46736 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnJhX-0008PZ-4k
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 05:24:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55445)
+	id 1hnJiq-00012v-62
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 05:26:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55929)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <thuth@redhat.com>) id 1hnJhM-0007zS-Qh
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 05:24:37 -0400
+ (envelope-from <thuth@redhat.com>) id 1hnJif-0000bB-II
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 05:25:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1hnJhK-0004nO-Od
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 05:24:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56922)
+ (envelope-from <thuth@redhat.com>) id 1hnJie-0005XY-G4
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 05:25:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42532)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <thuth@redhat.com>)
- id 1hnJhG-0004ku-Rz; Tue, 16 Jul 2019 05:24:32 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ id 1hnJie-0005X5-63; Tue, 16 Jul 2019 05:25:56 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 0E85759451;
- Tue, 16 Jul 2019 09:24:28 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 6BA143082B3F;
+ Tue, 16 Jul 2019 09:25:55 +0000 (UTC)
 Received: from thuth.remote.csb (dhcp-200-228.str.redhat.com [10.33.200.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 788A45D784;
- Tue, 16 Jul 2019 09:24:24 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C88CC19C59;
+ Tue, 16 Jul 2019 09:25:47 +0000 (UTC)
 To: Christian Borntraeger <borntraeger@de.ibm.com>,
  Cornelia Huck <cohuck@redhat.com>
 References: <20190715142304.215018-1-borntraeger@de.ibm.com>
- <20190715142304.215018-2-borntraeger@de.ibm.com>
+ <20190715142304.215018-4-borntraeger@de.ibm.com>
 From: Thomas Huth <thuth@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=thuth@redhat.com; keydata=
@@ -90,22 +90,22 @@ Autocrypt: addr=thuth@redhat.com; keydata=
  rCELuGwT9hsYkUPjVd4lfylN3mzEc6iAv/wwjsc0DRTSQCpXT3v2ymTAsRKrVaEZLibTXaf+
  WslxWek3xNYRiqwwWAJuL652eAlxUgQ5ZS+fXBRTiQpJ+F26I/2lccScRd9G5w==
 Organization: Red Hat
-Message-ID: <b1d89d68-6e76-63a5-73f6-092ee075d738@redhat.com>
-Date: Tue, 16 Jul 2019 11:24:23 +0200
+Message-ID: <ecc74f8c-7f70-c9ae-e9c5-cbd1cc46dc54@redhat.com>
+Date: Tue, 16 Jul 2019 11:25:47 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <20190715142304.215018-2-borntraeger@de.ibm.com>
+In-Reply-To: <20190715142304.215018-4-borntraeger@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.39]); Tue, 16 Jul 2019 09:24:28 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.45]); Tue, 16 Jul 2019 09:25:55 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH 1/3] s390x/cpumodel: remove
- esort from the default model
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH 3/3] s390x/cpumodel: change
+ internal name of vxp to make description
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -125,29 +125,56 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 15/07/2019 16.23, Christian Borntraeger wrote:
-> esort might not be available on all models.
+> The internal macro name VECTOR_BCD_ENH does not match the actual
+> description. Fix this.
 > 
-> Fixes: caef62430fed6e73 ("s390x/cpumodel: add gen15 defintions")
 > Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
 > ---
->  target/s390x/gen-features.c | 1 -
->  1 file changed, 1 deletion(-)
+>  target/s390x/cpu_features_def.inc.h | 2 +-
+>  target/s390x/gen-features.c         | 4 ++--
+>  2 files changed, 3 insertions(+), 3 deletions(-)
 > 
-> diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
-> index 9f216219ff53..6debfc1d217e 100644
-> --- a/target/s390x/gen-features.c
-> +++ b/target/s390x/gen-features.c
-> @@ -642,7 +642,6 @@ static uint16_t default_GEN14_GA1[] = {
->  
->  static uint16_t default_GEN15_GA1[] = {
->      S390_FEAT_VECTOR_ENH2,
-> -    S390_FEAT_GROUP_ENH_SORT,
->      S390_FEAT_GROUP_DEFLATE_CONVERSION,
->      S390_FEAT_VECTOR_BCD_ENH,
->      S390_FEAT_GROUP_MSA_EXT_9,
-> 
+> diff --git a/target/s390x/cpu_features_def.inc.h b/target/s390x/cpu_features_def.inc.h
+> index 99f58a89318a..f7c52bc17c2e 100644
+> --- a/target/s390x/cpu_features_def.inc.h
+> +++ b/target/s390x/cpu_features_def.inc.h
+> @@ -104,7 +104,7 @@ DEF_FEAT(CMM_NT, "cmmnt", STFL, 147, "CMM: ESSA-enhancement (no translate) facil
+>  DEF_FEAT(VECTOR_ENH2, "vxeh2", STFL, 148, "Vector Enhancements facility 2")
+>  DEF_FEAT(ESORT_BASE, "esort-base", STFL, 150, "Enhanced-sort facility (excluding subfunctions)")
+>  DEF_FEAT(DEFLATE_BASE, "deflate-base", STFL, 151, "Deflate-conversion facility (excluding subfunctions)")
+> -DEF_FEAT(VECTOR_BCD_ENH, "vxp", STFL, 152, "Vector-Packed-Decimal-Enhancement Facility")
+> +DEF_FEAT(VECTOR_PACKED_DECIMAL_ENH, "vxp", STFL, 152, "Vector-Packed-Decimal-Enhancement Facility")
 
-FWIW,
+With "vxpdeh" instead of "vxp":
 
 Reviewed-by: Thomas Huth <thuth@redhat.com>
+
+
+>  DEF_FEAT(MSA_EXT_9, "msa9-base", STFL, 155, "Message-security-assist-extension-9 facility (excluding subfunctions)")
+>  DEF_FEAT(ETOKEN, "etoken", STFL, 156, "Etoken facility")
+>  
+> diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
+> index 6debfc1d217e..49a650ac52d0 100644
+> --- a/target/s390x/gen-features.c
+> +++ b/target/s390x/gen-features.c
+> @@ -558,7 +558,7 @@ static uint16_t full_GEN15_GA1[] = {
+>      S390_FEAT_VECTOR_ENH2,
+>      S390_FEAT_GROUP_ENH_SORT,
+>      S390_FEAT_GROUP_DEFLATE_CONVERSION,
+> -    S390_FEAT_VECTOR_BCD_ENH,
+> +    S390_FEAT_VECTOR_PACKED_DECIMAL_ENH,
+>      S390_FEAT_GROUP_MSA_EXT_9,
+>      S390_FEAT_GROUP_MSA_EXT_9_PCKMO,
+>      S390_FEAT_ETOKEN,
+> @@ -643,7 +643,7 @@ static uint16_t default_GEN14_GA1[] = {
+>  static uint16_t default_GEN15_GA1[] = {
+>      S390_FEAT_VECTOR_ENH2,
+>      S390_FEAT_GROUP_DEFLATE_CONVERSION,
+> -    S390_FEAT_VECTOR_BCD_ENH,
+> +    S390_FEAT_VECTOR_PACKED_DECIMAL_ENH,
+>      S390_FEAT_GROUP_MSA_EXT_9,
+>      S390_FEAT_GROUP_MSA_EXT_9_PCKMO,
+>      S390_FEAT_ETOKEN,
+> 
+
 
