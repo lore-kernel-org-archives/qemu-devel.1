@@ -2,80 +2,64 @@ Return-Path: <SRS0=+QfZ=VN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B648C76192
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 14:56:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA99AC7618F
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 14:56:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0802220693
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 14:56:16 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="tnK9X8gT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0802220693
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
+	by mail.kernel.org (Postfix) with ESMTPS id 8388C20693
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 14:56:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8388C20693
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49783 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49794 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnOsI-0003Xd-Qe
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 10:56:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50007)
+	id 1hnOsb-0004qY-FY
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 10:56:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49883)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <yury-kotov@yandex-team.ru>) id 1hnOrB-0007ac-Ug
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 10:55:06 -0400
+ (envelope-from <tao3.xu@intel.com>) id 1hnOqj-0005Zy-Hh
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 10:54:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yury-kotov@yandex-team.ru>) id 1hnOrA-0001L7-Ca
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 10:55:05 -0400
-Received: from forwardcorp1o.mail.yandex.net ([95.108.205.193]:48168)
+ (envelope-from <tao3.xu@intel.com>) id 1hnOqi-00019F-AU
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 10:54:37 -0400
+Received: from mga03.intel.com ([134.134.136.65]:20995)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yury-kotov@yandex-team.ru>)
- id 1hnOr9-0001Jp-Ps
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 10:55:04 -0400
-Received: from mxbackcorp2j.mail.yandex.net (mxbackcorp2j.mail.yandex.net
- [IPv6:2a02:6b8:0:1619::119])
- by forwardcorp1o.mail.yandex.net (Yandex) with ESMTP id DB5EF2E0A2C;
- Tue, 16 Jul 2019 17:54:56 +0300 (MSK)
-Received: from smtpcorp1j.mail.yandex.net (smtpcorp1j.mail.yandex.net
- [2a02:6b8:0:1619::137])
- by mxbackcorp2j.mail.yandex.net (nwsmtp/Yandex) with ESMTP id
- aPqPlABj9T-stUSOoaf; Tue, 16 Jul 2019 17:54:56 +0300
-Precedence: bulk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
- s=default; 
- t=1563288896; bh=KFO5oG2Nm1dwR2QfkRer46qbSk588/2/p2CI7n5RCj0=;
- h=Message-Id:Date:Subject:To:From:Cc;
- b=tnK9X8gTaPF4vFQvPGzPi/gRbScCY14JEdO5CO/8lD50tCoxDeP6sYQIaTMvAPZ9s
- ODGp/TsnMmq7bn4MYYlj1wxaSXVCZSN72kWcepYmUqUQHTnslPVGMnaI3oy5/sD2ZJ
- GAiTe1pFF1KNbifI/YdZiLdf/tX6fDOYEK6LeBuI=
-Authentication-Results: mxbackcorp2j.mail.yandex.net;
- dkim=pass header.i=@yandex-team.ru
-Received: from dynamic-red.dhcp.yndx.net (dynamic-red.dhcp.yndx.net
- [2a02:6b8:0:40c:68fa:19fe:5639:24b5])
- by smtpcorp1j.mail.yandex.net (nwsmtp/Yandex) with ESMTPSA id
- RzIFhwRP0o-stQiIRJr; Tue, 16 Jul 2019 17:54:55 +0300
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
- (Client certificate not present)
-From: Yury Kotov <yury-kotov@yandex-team.ru>
-To: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
- Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
- Juan Quintela <quintela@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Stefan Weil <sw@weilnetz.de>
-Date: Tue, 16 Jul 2019 17:54:18 +0300
-Message-Id: <20190716145421.17645-1-yury-kotov@yandex-team.ru>
-X-Mailer: git-send-email 2.22.0
+ (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1hnOqi-0000za-2Y
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 10:54:36 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+ by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 16 Jul 2019 07:54:35 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.63,498,1557212400"; d="scan'208";a="319014823"
+Received: from tao-optiplex-7060.sh.intel.com ([10.239.13.104])
+ by orsmga004.jf.intel.com with ESMTP; 16 Jul 2019 07:54:33 -0700
+From: Tao Xu <tao3.xu@intel.com>
+To: imammedo@redhat.com,
+	eblake@redhat.com,
+	ehabkost@redhat.com
+Date: Tue, 16 Jul 2019 22:51:21 +0800
+Message-Id: <20190716145121.19578-12-tao3.xu@intel.com>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190716145121.19578-1-tao3.xu@intel.com>
+References: <20190716145121.19578-1-tao3.xu@intel.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 95.108.205.193
-Subject: [Qemu-devel] [PATCH v2 0/3] High downtime with 95+ throttle pct
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 134.134.136.65
+Subject: [Qemu-devel] [PATCH v7 11/11] tests/bios-tables-test: add test
+ cases for ACPI HMAT
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -84,52 +68,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, yc-core@yandex-team.ru
+Cc: jingqi.liu@intel.com, tao3.xu@intel.com, fan.du@intel.com,
+ qemu-devel@nongnu.org, jonathan.cameron@huawei.com, dan.j.williams@intel.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
+ACPI table HMAT has been introduced, QEMU now builds HMAT tables for
+Heterogeneous Memory with boot option '-numa node'.
 
-V2:
-* Added a test
-* Fixed qemu_cond_timedwait for qsp
+Add test cases on PC and Q35 machines with 2 numa nodes.
+Because HMAT is generated when system enable numa, the
+following tables need to be added for this test:
+  tests/acpi-test-data/pc/*.acpihmat
+  tests/acpi-test-data/pc/HMAT.*
+  tests/acpi-test-data/q35/*.acpihmat
+  tests/acpi-test-data/q35/HMAT.*
 
-I wrote a test for migration auto converge and found out a strange thing:
-1. Enable auto converge
-2. Set max-bandwidth 1Gb/s
-3. Set downtime-limit 1ms
-4. Run standard test (just writes a byte per page)
-5. Wait for converge
-6. It's converged with 99% throttle percentage
-7. The result downtime was about 300-600ms   <<<<
+Suggested-by: Igor Mammedov <imammedo@redhat.com>
+Signed-off-by: Tao Xu <tao3.xu@intel.com>
+---
 
-It's much higher than expected 1ms. I figured out that cpu_throttle_threa=
-d()
-function sleeps for 100ms+ for high throttle percentage (>=3D95%) in VCPU=
- thread.
-And it sleeps even after a cpu kick.
+No changes in v7.
+---
+ tests/bios-tables-test.c | 43 ++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 43 insertions(+)
 
-I tried to fix it by using timedwait for ms part of sleep.
-E.g timedwait(halt_cond, 1ms) + usleep(500).
-
-Regards,
-Yury
-
-Yury Kotov (3):
-  qemu-thread: Add qemu_cond_timedwait
-  cpus: Fix throttling during vm_stop
-  tests/migration: Add a test for auto converge
-
- cpus.c                   |  27 ++++++---
- include/qemu/thread.h    |  18 ++++++
- tests/migration-test.c   | 119 +++++++++++++++++++++++++++++++++++----
- util/qemu-thread-posix.c |  40 +++++++++----
- util/qemu-thread-win32.c |  16 ++++++
- util/qsp.c               |  18 ++++++
- 6 files changed, 207 insertions(+), 31 deletions(-)
-
---=20
-2.22.0
+diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
+index d863233fe9..27a17921f2 100644
+--- a/tests/bios-tables-test.c
++++ b/tests/bios-tables-test.c
+@@ -860,6 +860,47 @@ static void test_acpi_piix4_tcg_dimm_pxm(void)
+     test_acpi_tcg_dimm_pxm(MACHINE_PC);
+ }
+ 
++static void test_acpi_tcg_acpi_hmat(const char *machine)
++{
++    test_data data;
++
++    memset(&data, 0, sizeof(data));
++    data.machine = machine;
++    data.variant = ".acpihmat";
++    test_acpi_one(" -smp 2,sockets=2"
++                  " -m 128M,slots=2,maxmem=1G"
++                  " -object memory-backend-ram,size=64M,id=m0"
++                  " -object memory-backend-ram,size=64M,id=m1"
++                  " -numa node,nodeid=0,memdev=m0"
++                  " -numa node,nodeid=1,memdev=m1,initiator=0"
++                  " -numa cpu,node-id=0,socket-id=0"
++                  " -numa cpu,node-id=0,socket-id=1"
++                  " -numa hmat-lb,initiator=0,target=0,hierarchy=memory,"
++                  "data-type=access-latency,base-lat=10,latency=5"
++                  " -numa hmat-lb,initiator=0,target=0,hierarchy=memory,"
++                  "data-type=access-bandwidth,base-bw=20,bandwidth=5"
++                  " -numa hmat-lb,initiator=0,target=1,hierarchy=memory,"
++                  "data-type=access-latency,base-lat=10,latency=10"
++                  " -numa hmat-lb,initiator=0,target=1,hierarchy=memory,"
++                  "data-type=access-bandwidth,base-bw=20,bandwidth=10"
++                  " -numa hmat-cache,node-id=0,size=0x20000,total=1,level=1"
++                  ",assoc=direct,policy=write-back,line=8"
++                  " -numa hmat-cache,node-id=1,size=0x20000,total=1,level=1"
++                  ",assoc=direct,policy=write-back,line=8",
++                  &data);
++    free_test_data(&data);
++}
++
++static void test_acpi_q35_tcg_acpi_hmat(void)
++{
++    test_acpi_tcg_acpi_hmat(MACHINE_Q35);
++}
++
++static void test_acpi_piix4_tcg_acpi_hmat(void)
++{
++    test_acpi_tcg_acpi_hmat(MACHINE_PC);
++}
++
+ static void test_acpi_virt_tcg(void)
+ {
+     test_data data = {
+@@ -904,6 +945,8 @@ int main(int argc, char *argv[])
+         qtest_add_func("acpi/q35/numamem", test_acpi_q35_tcg_numamem);
+         qtest_add_func("acpi/piix4/dimmpxm", test_acpi_piix4_tcg_dimm_pxm);
+         qtest_add_func("acpi/q35/dimmpxm", test_acpi_q35_tcg_dimm_pxm);
++        qtest_add_func("acpi/piix4/acpihmat", test_acpi_piix4_tcg_acpi_hmat);
++        qtest_add_func("acpi/q35/acpihmat", test_acpi_q35_tcg_acpi_hmat);
+     } else if (strcmp(arch, "aarch64") == 0) {
+         qtest_add_func("acpi/virt", test_acpi_virt_tcg);
+     }
+-- 
+2.20.1
 
 
