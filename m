@@ -2,102 +2,62 @@ Return-Path: <SRS0=+QfZ=VN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71963C76188
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 07:53:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50059C76188
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 08:01:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 487E6206C2
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 07:53:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 487E6206C2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 201F621721
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 08:01:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 201F621721
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46014 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46060 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnIHI-0002JY-Is
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 03:53:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53647)
+	id 1hnIP8-0004UJ-4v
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 04:01:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55658)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <sbhat@linux.ibm.com>) id 1hnIH7-0001oN-AD
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 03:53:26 -0400
+ (envelope-from <mst@redhat.com>) id 1hnIOs-00045v-VZ
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 04:01:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <sbhat@linux.ibm.com>) id 1hnIH6-0004XA-Bt
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 03:53:25 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:13962
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <sbhat@linux.ibm.com>) id 1hnIH6-0004Vf-6M
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 03:53:24 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x6G7rEQn107599
- for <qemu-devel@nongnu.org>; Tue, 16 Jul 2019 03:53:21 -0400
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2ts9a5k59q-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Tue, 16 Jul 2019 03:53:20 -0400
-Received: from localhost
- by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <sbhat@linux.ibm.com>;
- Tue, 16 Jul 2019 08:53:18 +0100
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
- by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Tue, 16 Jul 2019 08:53:15 +0100
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
- [9.149.105.58])
- by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- x6G7rEqQ57606364
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 16 Jul 2019 07:53:15 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id DEABF4C04A;
- Tue, 16 Jul 2019 07:53:14 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 0E7BC4C046;
- Tue, 16 Jul 2019 07:53:13 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.85.75.211])
- by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Tue, 16 Jul 2019 07:53:12 +0000 (GMT)
-To: Fabiano Rosas <farosas@linux.ibm.com>, imammedo@redhat.com,
- david@gibson.dropbear.id.au, xiaoguangrong.eric@gmail.com, mst@redhat.com
-References: <155773946961.49142.5208084426066783536.stgit@lep8c.aus.stglabs.ibm.com>
- <155773963257.49142.17067912880307967487.stgit@lep8c.aus.stglabs.ibm.com>
- <878suy5v7y.fsf@linux.ibm.com>
-From: Shivaprasad G Bhat <sbhat@linux.ibm.com>
-Date: Tue, 16 Jul 2019 13:23:12 +0530
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.5.2
+ (envelope-from <mst@redhat.com>) id 1hnIOo-0004LI-4S
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 04:01:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33636)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1hnIOn-0004KI-Db
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 04:01:21 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id A2A6CB2DCE;
+ Tue, 16 Jul 2019 08:01:19 +0000 (UTC)
+Received: from redhat.com (ovpn-117-158.ams2.redhat.com [10.36.117.158])
+ by smtp.corp.redhat.com (Postfix) with SMTP id 862F15C21A;
+ Tue, 16 Jul 2019 08:01:12 +0000 (UTC)
+Date: Tue, 16 Jul 2019 04:01:11 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: "Oleinik, Alexander" <alxndr@bu.edu>
+Message-ID: <20190716035715-mutt-send-email-mst@kernel.org>
+References: <20190716033719.2866-1-alxndr@bu.edu>
+ <20190716033719.2866-2-alxndr@bu.edu>
 MIME-Version: 1.0
-In-Reply-To: <878suy5v7y.fsf@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-x-cbid: 19071607-0020-0000-0000-00000353F5B3
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19071607-0021-0000-0000-000021A7C06E
-Message-Id: <0cbf52ee-5ba2-5851-0ae3-cc9d699b41ab@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
- definitions=2019-07-16_02:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501
- malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1907160100
-Content-Transfer-Encoding: quoted-printable
-X-MIME-Autoconverted: from 8bit to quoted-printable by
- mx0b-001b2d01.pphosted.com id x6G7rEQn107599
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
-Subject: Re: [Qemu-devel] [RFC v2 PATCH 2/3] spapr: Add NVDIMM device support
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190716033719.2866-2-alxndr@bu.edu>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.26]); Tue, 16 Jul 2019 08:01:19 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 1/1] virtio-net: check guest header length
+ is valid
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -109,37 +69,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Cc: "bsd@redhat.com" <bsd@redhat.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "jasowang@redhat.com" <jasowang@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "stefanha@redhat.com" <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Fabiano,
+On Tue, Jul 16, 2019 at 03:38:09AM +0000, Oleinik, Alexander wrote:
+> virtio-net checks that the "out" sg is longer than the guest header, but
+> this check can be skipped if has_net_hdr is 0. Also perform this check
+> if host_hdr_len != guest_hdr_len
+
+This explanation is way less clear than what you have in 0/1.
+I suggest you just move the log here.
+
+> 
+> Signed-off-by: Alexander Oleinik <alxndr@bu.edu>
+> ---
+>  hw/net/virtio-net.c | 13 ++++++++++++-
+>  1 file changed, 12 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+> index b9e1cd71cf..46d715b4f5 100644
+> --- a/hw/net/virtio-net.c
+> +++ b/hw/net/virtio-net.c
+> @@ -2064,7 +2064,18 @@ static int32_t virtio_net_flush_tx(VirtIONetQueue *q)
+>           */
+>          assert(n->host_hdr_len <= n->guest_hdr_len);
+>          if (n->host_hdr_len != n->guest_hdr_len) {
+> -            unsigned sg_num = iov_copy(sg, ARRAY_SIZE(sg),
+> +            unsigned sg_num;
+> +
+> +            if (!n->has_vnet_hdr) {
+> +                if (iov_to_buf(out_sg, out_num, 0, &mhdr, n->guest_hdr_len) <
+> +                    n->guest_hdr_len) {
+> +                    virtio_error(vdev, "virtio-net header incorrect");
+> +                    virtqueue_detach_element(q->tx_vq, elem, 0);
+> +                    g_free(elem);
+> +                    return -EINVAL;
+> +                }
+> +            }
+
+This code is duplicated from above. I also suspect some parts are missing
+here (such as header endian-ness swap).
+Pls find a way not to duplicate the code.
 
 
-On 05/22/2019 09:37 PM, Fabiano Rosas wrote:
-> Shivaprasad G Bhat <sbhat@linux.ibm.com> writes:
->
->> +    /* Create DT entries for cold plugged NVDIMM devices */
->> +    dimms =3D nvdimm_get_device_list();
->> +    for (; dimms; dimms =3D dimms->next) {
->> +        NVDIMMDevice *nvdimm =3D dimms->data;
->> +
->> +        spapr_populate_nvdimm_node(fdt, offset, nvdimm);
->> +    }
->> +    g_slist_free(dimms);
-> To free the whole list you'll need another variable in the loop above,
-> right?
-
-Nope. The=C2=A0 g_slist_free() takes care of freeing the list node pointe=
-rs.
-
-As I am iterating using the original dimms variable, I would still not
-be freeing the list here though, fixing that in next version.
-
-Valgrind pointed out few more leaks in many places, will fix them all.
-
->
-> Cheers
-
+> +            sg_num = iov_copy(sg, ARRAY_SIZE(sg),
+>                                         out_sg, out_num,
+>                                         0, n->host_hdr_len);
+>              sg_num += iov_copy(sg + sg_num, ARRAY_SIZE(sg) - sg_num,
+> -- 
+> 2.20.1
 
