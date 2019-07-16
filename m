@@ -7,82 +7,79 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89A9EC76188
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 08:15:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BB23C76188
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 08:15:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5C13721721
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 08:15:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 157802145D
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 08:15:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I1GYy5rS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C13721721
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uudvgFcL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 157802145D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46254 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46262 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnIcZ-0008Jo-V8
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 04:15:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60111)
+	id 1hnIcr-0001Ci-6D
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 04:15:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60157)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <paolo.bonzini@gmail.com>) id 1hnIYk-0000Ji-Hi
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 04:11:39 -0400
+ (envelope-from <paolo.bonzini@gmail.com>) id 1hnIYl-0000QQ-SE
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 04:11:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1hnIYj-0003My-CK
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 04:11:38 -0400
-Received: from mail-wr1-x435.google.com ([2a00:1450:4864:20::435]:42484)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1hnIYk-0003Og-Je
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 04:11:39 -0400
+Received: from mail-wr1-x42b.google.com ([2a00:1450:4864:20::42b]:36915)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1hnIYj-0003M4-4l
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 04:11:37 -0400
-Received: by mail-wr1-x435.google.com with SMTP id x1so4842042wrr.9
- for <qemu-devel@nongnu.org>; Tue, 16 Jul 2019 01:11:37 -0700 (PDT)
+ id 1hnIYk-0003NO-Ay
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 04:11:38 -0400
+Received: by mail-wr1-x42b.google.com with SMTP id n9so19863628wrr.4
+ for <qemu-devel@nongnu.org>; Tue, 16 Jul 2019 01:11:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=M6lsGMl+nf2V5Rsu715+jo/F0NLVYFfe6LEKAl/IYr0=;
- b=I1GYy5rS1/RgdW1mKn+ddrtlAJ6e25MD2A6560TtYHDv1sVMVHcy3Ximv2SGQHaXaF
- Ren6b9kmYY8dj6b6dyAtNJcpSCvD/qDRHzoAItgOSyv29RxeJVoN8l+ysZs5j9f5Evpy
- 8xwP9tcbDzIf1eg4jBSbgWnbucgtmO0S1YrI/Aqqs6m8UudyJASkuH8rhfOiwoUvTfV4
- AnF/vZC312CTAmH4Ik5Fbg9nf0Y4t//NmsnXwQwINnueTyrC4G/YcALXl0nYtrT1EwAW
- o58eX7Pi/9BoLFRzh24Lc2ql5Po9TLf4wcK3Y6ZPEyQYPAvvObVZmBFiTSQIa/nOnaVi
- Bx4g==
+ h=sender:from:to:subject:date:message-id:in-reply-to:references;
+ bh=tshHt4G4q3ui9I+sSPWIHYaUh996kXUQlnNfLEsgFxI=;
+ b=uudvgFcLoiJhMg66r/ipDm2wNJ8LS5780ZUojRKsbhyeCTzzvrLvleKtzkJkRnTpuo
+ leVZn2Du4MrtQUuARq+wCW4h3KQ0+kS6ZvSPLUwR6cEI8sISIyH4RWbH4ALWiivfGWgP
+ KmQWOhGInXsCmx5i48QW2sKJX/iLf+DK5H+fuMCV+JDI1FKL7qKiqtbdClzAYtr1TZbz
+ xy/DXxBXsMQeDWEPnTPTgRdrskrbR3YtZseyLkYhKxEcOqI2YQmcZGvlPVZar/v+6TeS
+ mU9J7TWmlkRMhpC/ibEQ064tY/cwDWtsn8/bWHOTsz8opKz6kECTqvRXLTnvHt2MycVm
+ QoHA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=M6lsGMl+nf2V5Rsu715+jo/F0NLVYFfe6LEKAl/IYr0=;
- b=iebRbngW8RxnvFkCld0ooaxSjIUr2LylEBpigZm+6DQ0/WIvDp+6lU6SPIBtD1CccM
- oIXPk5ZNZFrGYTsWMiV1+j5ettxewJ0js21u2pxvTdqKs3uCuKmc5SFAveaagQ8BLmmM
- yH6GXsxwguvd1Le5TIR6Tws2MCAxFMrRnqaZovfRiB6V4cd0h05Ce3uRxQtSqzSkVmDv
- b2Og/osqd/YPAPACff4m3aMTrPeviWCPTNAO7Wz5rOJVMrQoaSNl+H0qsu2RYB9j8BDH
- Wha46WFQAbhFIQPo0L0nP16J/kDpeKh0UHInH+0joUas9NossceOF9sG8KDL/LgC1cGu
- PqDw==
-X-Gm-Message-State: APjAAAWN5RPja9aBp5eAYsvR8AuI40Wa1ZsfpW/dMfnGke/jzZkVluCp
- NDCZRKiK/SXfn3laivENVqKtA1NpIRI=
-X-Google-Smtp-Source: APXvYqz4VCrSaQiaJ/T+kXJ9ZTamS+hhncOzdCedJoONSn2EDmj84M1UwTRq9wgrxoxv9Xby8d1ihA==
-X-Received: by 2002:adf:f046:: with SMTP id t6mr36367130wro.307.1563264695955; 
- Tue, 16 Jul 2019 01:11:35 -0700 (PDT)
+ h=x-gm-message-state:sender:from:to:subject:date:message-id
+ :in-reply-to:references;
+ bh=tshHt4G4q3ui9I+sSPWIHYaUh996kXUQlnNfLEsgFxI=;
+ b=iY/FEozESIl2CyjL2AVQ0jTrnrxFAfGdJFh5xCPtrlyWVlxpynA0DbY42aAro3SGwy
+ 0Tcjs+pI3/+s73gJeb486osOorL6SrbGc4Z6N0DwP1L8MkgsGqEOk13MTXJR8ISvSuP7
+ anfzynJPNC/f1QpVejv+MWpcbr/jprG4OrZdE3gli7UR33ZLiJkFmNrpOLGw1/hStk5h
+ S/JVeh59kXdyi5JPm4hUZ1LL75Am1SOoWVEPJO2Ihhv8vuzMBNYJJ9LYa/hVCGDEqasp
+ vjIAjEhiqTEboSemV07JLzgFtGqDLru2kqiqAC1PZSccHnhB0hkYhhJ7esrNiArFUj5/
+ PElw==
+X-Gm-Message-State: APjAAAWAAkIUiZWsXUGmgw9dMYQzD8JmAZ/yY3VmG6RqPG4A/a2UireF
+ wQEBd3Gdri9J0HtyBva6Gp1AxcvZ+D0=
+X-Google-Smtp-Source: APXvYqyify96jxUU6RUYUOnHZ2DlBSpp0zWcDdZ1v5YeOMnpv6KNRYh26/iayet3J9NiPvwMVDuYLA==
+X-Received: by 2002:adf:df10:: with SMTP id y16mr9909120wrl.302.1563264697043; 
+ Tue, 16 Jul 2019 01:11:37 -0700 (PDT)
 Received: from 640k.lan ([93.56.166.5])
  by smtp.gmail.com with ESMTPSA id c1sm37723879wrh.1.2019.07.16.01.11.35
+ for <qemu-devel@nongnu.org>
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 16 Jul 2019 01:11:35 -0700 (PDT)
+ Tue, 16 Jul 2019 01:11:36 -0700 (PDT)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Tue, 16 Jul 2019 10:11:14 +0200
-Message-Id: <1563264677-39718-17-git-send-email-pbonzini@redhat.com>
+Date: Tue, 16 Jul 2019 10:11:15 +0200
+Message-Id: <1563264677-39718-18-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1563264677-39718-1-git-send-email-pbonzini@redhat.com>
 References: <1563264677-39718-1-git-send-email-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::435
-Subject: [Qemu-devel] [PULL 16/19] hw/usb/Kconfig: USB_XHCI_NEC requires
- USB_XHCI
+X-Received-From: 2a00:1450:4864:20::42b
+Subject: [Qemu-devel] [PULL 17/19] Makefile: do not repeat $(CONFIG_SOFTMMU)
+ in hw/Makefile.objs
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,35 +91,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
+The device directories must be included only for softmmu builds.
+Instead of repeating $(CONFIG_SOFTMMU), use an "if".
 
-TYPE_NEC_XHCI is child of TYPE_XHCI. Add the missing Kconfig
-dependency.
-
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/usb/Kconfig | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/Makefile.objs | 61 +++++++++++++++++++++++++++++---------------------------
+ 1 file changed, 32 insertions(+), 29 deletions(-)
 
-diff --git a/hw/usb/Kconfig b/hw/usb/Kconfig
-index 495c6f2..555e093 100644
---- a/hw/usb/Kconfig
-+++ b/hw/usb/Kconfig
-@@ -40,7 +40,7 @@ config USB_XHCI_NEC
-     bool
-     default y if PCI_DEVICES
-     depends on PCI
--    select USB
-+    select USB_XHCI
- 
- config USB_MUSB
-     bool
+diff --git a/hw/Makefile.objs b/hw/Makefile.objs
+index d770926..ece6cc3 100644
+--- a/hw/Makefile.objs
++++ b/hw/Makefile.objs
+@@ -1,42 +1,45 @@
++devices-dirs-y = core/
++ifeq ($(CONFIG_SOFTMMU), y)
+ devices-dirs-$(call lor,$(CONFIG_VIRTIO_9P),$(call land,$(CONFIG_VIRTFS),$(CONFIG_XEN))) += 9pfs/
+-devices-dirs-$(CONFIG_SOFTMMU) += acpi/
+-devices-dirs-$(CONFIG_SOFTMMU) += adc/
+-devices-dirs-$(CONFIG_SOFTMMU) += audio/
+-devices-dirs-$(CONFIG_SOFTMMU) += block/
+-devices-dirs-$(CONFIG_SOFTMMU) += bt/
+-devices-dirs-$(CONFIG_SOFTMMU) += char/
+-devices-dirs-$(CONFIG_SOFTMMU) += cpu/
+-devices-dirs-$(CONFIG_SOFTMMU) += display/
+-devices-dirs-$(CONFIG_SOFTMMU) += dma/
+-devices-dirs-$(CONFIG_SOFTMMU) += gpio/
++devices-dirs-y += acpi/
++devices-dirs-y += adc/
++devices-dirs-y += audio/
++devices-dirs-y += block/
++devices-dirs-y += bt/
++devices-dirs-y += char/
++devices-dirs-y += cpu/
++devices-dirs-y += display/
++devices-dirs-y += dma/
++devices-dirs-y += gpio/
+ devices-dirs-$(CONFIG_HYPERV) += hyperv/
+ devices-dirs-$(CONFIG_I2C) += i2c/
+-devices-dirs-$(CONFIG_SOFTMMU) += ide/
+-devices-dirs-$(CONFIG_SOFTMMU) += input/
+-devices-dirs-$(CONFIG_SOFTMMU) += intc/
++devices-dirs-y += ide/
++devices-dirs-y += input/
++devices-dirs-y += intc/
+ devices-dirs-$(CONFIG_IPACK) += ipack/
+ devices-dirs-$(CONFIG_IPMI) += ipmi/
+-devices-dirs-$(CONFIG_SOFTMMU) += isa/
+-devices-dirs-$(CONFIG_SOFTMMU) += misc/
+-devices-dirs-$(CONFIG_SOFTMMU) += net/
+-devices-dirs-$(CONFIG_SOFTMMU) += rdma/
+-devices-dirs-$(CONFIG_SOFTMMU) += nvram/
+-devices-dirs-$(CONFIG_SOFTMMU) += pci/
++devices-dirs-y += isa/
++devices-dirs-y += misc/
++devices-dirs-y += net/
++devices-dirs-y += rdma/
++devices-dirs-y += nvram/
++devices-dirs-y += pci/
+ devices-dirs-$(CONFIG_PCI) += pci-bridge/ pci-host/
+-devices-dirs-$(CONFIG_SOFTMMU) += pcmcia/
++devices-dirs-y += pcmcia/
+ devices-dirs-$(CONFIG_SCSI) += scsi/
+-devices-dirs-$(CONFIG_SOFTMMU) += sd/
+-devices-dirs-$(CONFIG_SOFTMMU) += ssi/
+-devices-dirs-$(CONFIG_SOFTMMU) += timer/
++devices-dirs-y += sd/
++devices-dirs-y += ssi/
++devices-dirs-y += timer/
+ devices-dirs-$(CONFIG_TPM) += tpm/
+-devices-dirs-$(CONFIG_SOFTMMU) += usb/
++devices-dirs-y += usb/
+ devices-dirs-$(CONFIG_VFIO) += vfio/
+-devices-dirs-$(CONFIG_SOFTMMU) += virtio/
+-devices-dirs-$(CONFIG_SOFTMMU) += watchdog/
+-devices-dirs-$(CONFIG_SOFTMMU) += xen/
++devices-dirs-y += virtio/
++devices-dirs-y += watchdog/
++devices-dirs-y += xen/
+ devices-dirs-$(CONFIG_MEM_DEVICE) += mem/
+-devices-dirs-$(CONFIG_SOFTMMU) += smbios/
+ devices-dirs-y += semihosting/
+-devices-dirs-y += core/
++devices-dirs-y += smbios/
++endif
++
+ common-obj-y += $(devices-dirs-y)
+ obj-y += $(devices-dirs-y)
 -- 
 1.8.3.1
 
