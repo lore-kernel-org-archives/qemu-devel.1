@@ -2,68 +2,70 @@ Return-Path: <SRS0=+QfZ=VN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A0E7C76192
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 06:24:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 886F9C76188
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 06:32:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1C31820880
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 06:24:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C31820880
+	by mail.kernel.org (Postfix) with ESMTPS id 5FBC520880
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 06:32:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5FBC520880
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45542 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45578 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnGsm-0001Nq-W0
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 02:24:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56529)
+	id 1hnH19-0003Av-Dp
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 02:32:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58842)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <armbru@redhat.com>) id 1hnGsc-0000zc-9Q
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 02:24:03 -0400
+ (envelope-from <armbru@redhat.com>) id 1hnH0x-0002hb-MJ
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 02:32:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1hnGsa-0002Lu-LT
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 02:24:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40954)
+ (envelope-from <armbru@redhat.com>) id 1hnH0w-0006vy-Az
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 02:32:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60224)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hnGsa-0002KL-Bs
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 02:24:00 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ (Exim 4.71) (envelope-from <armbru@redhat.com>)
+ id 1hnH0t-0006tW-DW; Tue, 16 Jul 2019 02:32:35 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 09FFC83F42;
- Tue, 16 Jul 2019 06:23:58 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 70600307D848;
+ Tue, 16 Jul 2019 06:32:34 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-111.ams2.redhat.com
  [10.36.116.111])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4613A19C59;
- Tue, 16 Jul 2019 06:23:55 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 969A95C221;
+ Tue, 16 Jul 2019 06:32:30 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id C683B11386A0; Tue, 16 Jul 2019 08:23:53 +0200 (CEST)
+ id EC4D411386A0; Tue, 16 Jul 2019 08:32:28 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
-To: =?utf-8?B?S8WRdsOhZ8OzLCBab2x0w6Fu?= <dirty.ice.hu@gmail.com>
-References: <cover.1563224628.git.DirtY.iCE.hu@gmail.com>
- <8245dab2e59b99b55f3f7773fd39dc920ae48951.1563224628.git.DirtY.iCE.hu@gmail.com>
-Date: Tue, 16 Jul 2019 08:23:53 +0200
-In-Reply-To: <8245dab2e59b99b55f3f7773fd39dc920ae48951.1563224628.git.DirtY.iCE.hu@gmail.com>
- (=?utf-8?B?IkvFkXbDoWfDsywgWm9sdMOhbiIncw==?= message of "Mon, 15 Jul 2019
- 23:08:05 +0200")
-Message-ID: <878ssyqyyu.fsf@dusky.pond.sub.org>
+To: John Snow <jsnow@redhat.com>
+References: <20190530143941.241963-1-vsementsov@virtuozzo.com>
+ <c7ef8501-0c9f-f21b-1b60-dcd7dba03557@redhat.com>
+ <f9af022a-7acf-bb1c-3d2c-b095bff2e251@redhat.com>
+ <2a9f6327-1cb6-78eb-ad10-93a33c6e754c@redhat.com>
+ <87a7ew9p3o.fsf@dusky.pond.sub.org>
+ <4ee9736d-4e49-6572-e6e8-94739d155323@redhat.com>
+Date: Tue, 16 Jul 2019 08:32:28 +0200
+In-Reply-To: <4ee9736d-4e49-6572-e6e8-94739d155323@redhat.com> (John Snow's
+ message of "Mon, 15 Jul 2019 20:13:13 -0400")
+Message-ID: <874l3mqykj.fsf@dusky.pond.sub.org>
 User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.27]); Tue, 16 Jul 2019 06:23:58 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.48]); Tue, 16 Jul 2019 06:32:34 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 03/14] audio: add audiodev property to
- vnc and wav_capture
+Subject: Re: [Qemu-devel] [PATCH] qapi: add dirty-bitmaps to
+ query-named-block-nodes result
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,224 +77,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>
+Cc: kwolf@redhat.com, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com,
+ nshirokovskiy@virtuozzo.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-"K=C5=91v=C3=A1g=C3=B3, Zolt=C3=A1n" <dirty.ice.hu@gmail.com> writes:
+John Snow <jsnow@redhat.com> writes:
 
-> Signed-off-by: K=C5=91v=C3=A1g=C3=B3, Zolt=C3=A1n <DirtY.iCE.hu@gmail.com>
-> ---
->  ui/vnc.h        |  2 ++
->  monitor/misc.c  | 12 +++++++++++-
->  ui/vnc.c        | 15 ++++++++++++++-
->  hmp-commands.hx | 13 ++++++++-----
->  qemu-options.hx |  6 ++++++
->  5 files changed, 41 insertions(+), 7 deletions(-)
+> On 6/5/19 8:46 AM, Markus Armbruster wrote:
+>> John Snow <jsnow@redhat.com> writes:
+>> 
+>>> On 5/31/19 10:55 AM, Eric Blake wrote:
+>>>> On 5/30/19 11:26 AM, John Snow wrote:
+>>>>>
+>>>>>
+>>>>> On 5/30/19 10:39 AM, Vladimir Sementsov-Ogievskiy wrote:
+>>>>>> Let's add a possibility to query dirty-bitmaps not only on root nodes.
+>>>>>> It is useful when dealing both with snapshots and incremental backups.
+>>>>>>
+>>>>
+>>>>>> +++ b/block/qapi.c
+>>>>>> @@ -78,6 +78,11 @@ BlockDeviceInfo *bdrv_block_device_info(BlockBackend *blk,
+>>>>>>          info->backing_file = g_strdup(bs->backing_file);
+>>>>>>      }
+>>>>>>  
+>>>>>> +    if (!QLIST_EMPTY(&bs->dirty_bitmaps)) {
+>>>>>> +        info->has_dirty_bitmaps = true;
+>>>>>> +        info->dirty_bitmaps = bdrv_query_dirty_bitmaps(bs);
+>>>>>> +    }
+>>>>>> +
+>>>>>>      info->detect_zeroes = bs->detect_zeroes;
+>>>>>>  
+>>>>>>      if (blk && blk_get_public(blk)->throttle_group_member.throttle_state) {
+>>>>>>
+>>>>>
+>>>>> So query-block uses bdrv_query_info, which calls bdrv_block_device_info,
+>>>>> so we'll duplicate the bitmap output when doing the old-fashioned block
+>>>>> query, but that's probably harmless overall.
+>>>>
+>>>> We already know that none of our existing query- interfaces are sane
+>>>> (either too little information, or too much).  Duplication starts to
+>>>> push an interface towards too much (it takes processor time to bundle up
+>>>> the extra JSON, especially if the other end is not going to care if it
+>>>> was present). I know Kevin still has somewhere on his to-do list the
+>>>> implementation of a saner query- command for the information we really
+>>>> want (about each block, without redundant information, and where we
+>>>> don't repeat information in a nested manner, but where we also don't
+>>>> omit information that would otherwise require multiple existing query-
+>>>> to reconstruct).
+>>>>
+>>>>>
+>>>>> We can continue to support the output in both places, or we could opt to
+>>>>> deprecate the older interface; I think this is one of the last chances
+>>>>> we'd get to do so before libvirt and wider adoption.
+>>>>>
+>>>>> I think that's probably Eric's choice.
+>>>>
+>>>> If you want to try to deprecate the old location, introspection at least
+>>>> works to allow libvirt to know which place to look for it on a given
+>>>> qemu. If you don't think deprecation is necessary, the duplication is
+>>>> probably tolerable for now (as ideally we'd be deprecating ALL of our
+>>>> not-quite-perfect query- block interfaces in favor of whatever sane
+>>>> interface Kevin comes up with).
+>>>>
+>>>
+>>> It sounds like it's probably the right move to deprecate the entire
+>>> legacy interface, but still... If you have 20 or 30 bitmaps on a root
+>>> node, you will see 40 or 60 entries.
+>>>
+>>> What's the smart way to deprecate it? We're not adding new flags or
+>>> showing new arguments or anything. There might not be bitmaps, so you
+>>> can't rely on that field being present or absent.
+>>>
+>>> Recommendations?
+>> 
+>> Kevin's "[PATCH v4 0/6] file-posix: Add dynamic-auto-read-only QAPI
+>> feature" adds "feature flags" to the QAPI schema language, limited to
+>> struct types, because that's what he needs.  They're visible in
+>> introspection.  I intend to complete his work, so we can tack
+>> "deprecated" feature flags to pretty much anything
+>> 
+>> Could that address your need?
+>> 
 >
-> diff --git a/ui/vnc.h b/ui/vnc.h
-> index 2f84db3142..6f54653455 100644
-> --- a/ui/vnc.h
-> +++ b/ui/vnc.h
-> @@ -183,6 +183,8 @@ struct VncDisplay
->  #ifdef CONFIG_VNC_SASL
->      VncDisplaySASL sasl;
->  #endif
-> +
-> +    AudioState *audio_state;
->  };
->=20=20
->  typedef struct VncTight {
-> diff --git a/monitor/misc.c b/monitor/misc.c
-> index e393333a0e..f97810d370 100644
-> --- a/monitor/misc.c
-> +++ b/monitor/misc.c
-> @@ -1148,7 +1148,17 @@ static void hmp_wavcapture(Monitor *mon, const QDi=
-ct *qdict)
->      int bits =3D qdict_get_try_int(qdict, "bits", -1);
->      int has_channels =3D qdict_haskey(qdict, "nchannels");
->      int nchannels =3D qdict_get_try_int(qdict, "nchannels", -1);
-> +    const char *audiodev =3D qdict_get_try_str(qdict, "audiodev");
->      CaptureState *s;
-> +    AudioState *as =3D NULL;
-> +
-> +    if (audiodev) {
-> +        as =3D audio_state_by_name(audiodev);
-> +        if (!as) {
-> +            monitor_printf(mon, "Invalid audiodev specified\n");
-> +            return;
-> +        }
-> +    }
+> Hi Markus, digging this up again.
+>
+> In brief, we are displaying bitmap info in the "wrong" part of the query
+> result (attached to drive instead of node) and would like to change it.
 
-Note for later: if "audiodev" is specified, it must name an existing
-AudioState.
+I lack context: which query command, which part of its result?
 
->=20=20
->      s =3D g_malloc0 (sizeof (*s));
->=20=20
-> @@ -1156,7 +1166,7 @@ static void hmp_wavcapture(Monitor *mon, const QDic=
-t *qdict)
->      bits =3D has_bits ? bits : 16;
->      nchannels =3D has_channels ? nchannels : 2;
->=20=20
-> -    if (wav_start_capture(NULL, s, path, freq, bits, nchannels)) {
-> +    if (wav_start_capture(as, s, path, freq, bits, nchannels)) {
->          monitor_printf(mon, "Failed to add wave capture\n");
->          g_free (s);
->          return;
+> I'd like to avoid reporting bitmaps in both locations permanently, so if
+> we have a plan to deprecate reporting bitmaps in the old location, I
+> will tolerate the duplicated output temporarily.
 
-Note for later: this is the only other failure mode.
+How bulky is the bitmap report?
 
-> diff --git a/ui/vnc.c b/ui/vnc.c
-> index 140f364dda..24f9be5b5d 100644
-> --- a/ui/vnc.c
-> +++ b/ui/vnc.c
-> @@ -1222,7 +1222,7 @@ static void audio_add(VncState *vs)
->      ops.destroy =3D audio_capture_destroy;
->      ops.capture =3D audio_capture;
->=20=20
-> -    vs->audio_cap =3D AUD_add_capture(NULL, &vs->as, &ops, vs);
-> +    vs->audio_cap =3D AUD_add_capture(vs->vd->audio_state, &vs->as, &ops=
-, vs);
->      if (!vs->audio_cap) {
->          error_report("Failed to add audio capture");
->      }
-> @@ -3369,6 +3369,9 @@ static QemuOptsList qemu_vnc_opts =3D {
->          },{
->              .name =3D "non-adaptive",
->              .type =3D QEMU_OPT_BOOL,
-> +        },{
-> +            .name =3D "audiodev",
-> +            .type =3D QEMU_OPT_STRING,
->          },
->          { /* end of list */ }
->      },
-> @@ -3806,6 +3809,7 @@ void vnc_display_open(const char *id, Error **errp)
->      const char *saslauthz;
->      int lock_key_sync =3D 1;
->      int key_delay_ms;
-> +    const char *audiodev;
->=20=20
->      if (!vd) {
->          error_setg(errp, "VNC display not active");
-> @@ -3991,6 +3995,15 @@ void vnc_display_open(const char *id, Error **errp)
->      }
->      vd->ledstate =3D 0;
->=20=20
-> +    audiodev =3D qemu_opt_get(opts, "audiodev");
-> +    if (audiodev) {
-> +        vd->audio_state =3D audio_state_by_name(audiodev);
-> +        if (!vd->audio_state) {
-> +            error_setg(errp, "Audiodev '%s' not found", audiodev);
-> +            goto fail;
-> +        }
-> +    }
+> Keeping in mind the bitmap fields are optional (so they can be absent
+> from both the new and old locations), what plan can we implement?
 
-Note for later: if "audiodev" is specified, it must name an existing
-AudioState.
+"Optional" is a syntactic thing, which ought to be backed by a semantic
+"present iff" condition.  Have we specified such conditions?
 
-I like this error message better than the one in hmp_wavcapture().  Use
-it there, too?
+> Perhaps I can add a feature flag "has-node-bitmaps" for 4.2. Then, for
+> the next three versions, I will report bitmaps from both locations.
+> Then, in 5.2+ I will remove the old location.
 
-Move it into audio_state_by_name() by giving it an Error **errp
-parameter?  Matter of taste, up to you.
+For how long has the bitmap been in the "wrong" place?  Any known
+consumers?
 
-> +
->      device_id =3D qemu_opt_get(opts, "display");
->      if (device_id) {
->          int head =3D qemu_opt_get_number(opts, "head", 0);
-> diff --git a/hmp-commands.hx b/hmp-commands.hx
-> index bfa5681dd2..fa7f009268 100644
-> --- a/hmp-commands.hx
-> +++ b/hmp-commands.hx
-> @@ -819,16 +819,19 @@ ETEXI
->=20=20
->      {
->          .name       =3D "wavcapture",
-> -        .args_type  =3D "path:F,freq:i?,bits:i?,nchannels:i?",
-> -        .params     =3D "path [frequency [bits [channels]]]",
-> +        .args_type  =3D "path:F,freq:i?,bits:i?,nchannels:i?,audiodev:s?=
-",
-> +        .params     =3D "path [frequency [bits [channels [audiodev]]]]",
->          .help       =3D "capture audio to a wave file (default frequency=
-=3D44100 bits=3D16 channels=3D2)",
->          .cmd        =3D hmp_wavcapture,
->      },
->  STEXI
-> -@item wavcapture @var{filename} [@var{frequency} [@var{bits} [@var{chann=
-els}]]]
-> +@item wavcapture @var{filename} [@var{frequency} [@var{bits} [@var{chann=
-els} [@var{audiodev}]]]]
->  @findex wavcapture
-> -Capture audio into @var{filename}. Using sample rate @var{frequency}
-> -bits per sample @var{bits} and number of channels @var{channels}.
-> +Capture audio into @var{filename} from @var{audiodev}, using sample rate
-> +@var{frequency} bits per sample @var{bits} and number of channels
-> +@var{channels}. When not using an -audiodev argument on command line,
-> +@var{audiodev} must be omitted, otherwise is must specify a valid
-> +audiodev.
+> A client knows it can find bitmaps (if there are any) in the new
+> location if the feature flag is set. Otherwise, it should look in the
+> old location.
+>
+> I think I've convinced myself that this is correct, so correct me if I
+> am wrong.
 
-I can see the code for "must specify a valid audiodev" in
-hmp_wavcapture().  Where is "must be omitted" checked?
-
-Preexisting: the list "sample rate @var{frequency} bits per sample
-@var{bits} and number of channels @var{channels}" lacks a comma after
-@var{frequency}, please fix that.  I'd put one after @var{bits} as well,
-but that's a matter of taste[*]
-
-The sentence is of the form "if not COND then A else B".  The
-less-negated form "if COND then B else A" is commonly easier to read.
-
-Documentation says "from @var{audiodev}".  But when "not using an
--audiodev argument on command line, +@var{audiodev} must be omitted".
-Where does it sample from then?  I figure from some default audio
-device.  Where is that default audio device explained?  I skimmed the
--audiodev documentation in qemu-options.hx, but couldn't see it there.
-
-Suggest to say "an -audiodev command line option" instead of "an
--audiodev argument on command line".
-
-Double-checking:
-
-* -audiodev is the only way to create an audio backend.
-
-* If the user creates no audio backend, QEMU supplies a default audio
-  backend.
-
-Correct?
-
-Other kinds of backends can also be created at run-time with the
-monitor.  I'm not asking you provide that for audio.  I'm just wondering
-whether it could conceivably be useful.
-
-If yes, you might want to avoid the narrow "if using -audiodev", and
-instead say "if the default audio device is in use".
-
->=20=20
->  Defaults:
->  @itemize @minus
-> diff --git a/qemu-options.hx b/qemu-options.hx
-> index 9621e934c0..a308e5f5aa 100644
-> --- a/qemu-options.hx
-> +++ b/qemu-options.hx
-> @@ -1978,6 +1978,12 @@ can help the device and guest to keep up and not l=
-ose events in case
->  events are arriving in bulk.  Possible causes for the latter are flaky
->  network connections, or scripts for automated testing.
->=20=20
-> +@item audiodev=3D@var{audiodev}
-> +
-> +Use the specified @var{audiodev} when the VNC client requests audio
-> +transmission. When not using an -audiodev argument, this option must
-> +be omitted, otherwise is must be present and specify a valid audiodev.
-> +
->  @end table
->  ETEXI
-
-Same as for wavcapture, basically.
-
-
-[*] https://en.wikipedia.org/wiki/Serial_comma
+Sounds like a valid use of feature flags to me.  However, feature flags
+are best used as a last resort.  With answers to my questions, I should
+be able to compare the feature flags solution to possible alternatives.
 
