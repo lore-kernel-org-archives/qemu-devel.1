@@ -2,60 +2,92 @@ Return-Path: <SRS0=+QfZ=VN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DEF9C76192
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 15:44:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 821C3C7618F
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 15:44:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1BE7620693
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 15:44:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BE7620693
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5892D20693
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 15:44:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5892D20693
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50296 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50314 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnPcV-0001si-Ch
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 11:43:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36977)
+	id 1hnPd0-00034e-Gb
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 11:44:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37920)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1hnPaa-0002J8-If
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 11:42:02 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hnPcn-0002eO-TH
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 11:44:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1hnPaY-0004uA-Ax
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 11:42:00 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:33896 helo=huawei.com)
+ (envelope-from <mreitz@redhat.com>) id 1hnPcl-0006Rm-GN
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 11:44:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44967)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1hnPaP-0004Qr-VQ; Tue, 16 Jul 2019 11:41:54 -0400
-Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id 44124BB2F01CDF89B1B3;
- Tue, 16 Jul 2019 23:41:14 +0800 (CST)
-Received: from S00345302A-PC.china.huawei.com (10.202.227.237) by
- DGGEMS402-HUB.china.huawei.com (10.3.19.202) with Microsoft SMTP Server id
- 14.3.439.0; Tue, 16 Jul 2019 23:41:05 +0800
-From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-To: <qemu-devel@nongnu.org>, <qemu-arm@nongnu.org>, <eric.auger@redhat.com>,
- <imammedo@redhat.com>
-Date: Tue, 16 Jul 2019 16:38:14 +0100
-Message-ID: <20190716153816.17676-9-shameerali.kolothum.thodi@huawei.com>
-X-Mailer: git-send-email 2.12.0.windows.1
-In-Reply-To: <20190716153816.17676-1-shameerali.kolothum.thodi@huawei.com>
-References: <20190716153816.17676-1-shameerali.kolothum.thodi@huawei.com>
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1hnPci-0006Po-N8; Tue, 16 Jul 2019 11:44:12 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id F240B30832DA;
+ Tue, 16 Jul 2019 15:44:11 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.40.205.58])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4122A5D784;
+ Tue, 16 Jul 2019 15:44:08 +0000 (UTC)
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+References: <20190716122836.31187-1-thuth@redhat.com>
+ <20190716122836.31187-3-thuth@redhat.com>
+ <1832e90b-0fd2-19ac-f90e-572147e51f53@redhat.com>
+ <62ec1243-3bb9-c18d-0ff6-4c4ad193620c@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <03b260f7-b108-f035-2974-17b5ef74e4e6@redhat.com>
+Date: Tue, 16 Jul 2019 17:44:06 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.202.227.237]
-X-CFilter-Loop: Reflected
+In-Reply-To: <62ec1243-3bb9-c18d-0ff6-4c4ad193620c@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="fBd3v86y2wgJr9w03TCLhPQC9LLx2Hc1u"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.44]); Tue, 16 Jul 2019 15:44:12 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 45.249.212.32
-Subject: [Qemu-devel] [PATCH-for-4.2 v7 08/10] hw/acpi: Add system power
- down support to GED
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2 2/4] tests/qemu-iotests/group: Remove
+ some more tests from the "auto" group
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,101 +99,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, sameo@linux.intel.com, ard.biesheuvel@linaro.org,
- linuxarm@huawei.com, xuwei5@hisilicon.com, shannon.zhaosl@gmail.com,
- sebastien.boeuf@intel.com, lersek@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This adds support to use GED for system power down event.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--fBd3v86y2wgJr9w03TCLhPQC9LLx2Hc1u
+Content-Type: multipart/mixed; boundary="AKll5aYQba5lA7dCRKNQ30R2s6qVRZbLE";
+ protected-headers="v1"
+From: Max Reitz <mreitz@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Message-ID: <03b260f7-b108-f035-2974-17b5ef74e4e6@redhat.com>
+Subject: Re: [PATCH v2 2/4] tests/qemu-iotests/group: Remove some more tests
+ from the "auto" group
+References: <20190716122836.31187-1-thuth@redhat.com>
+ <20190716122836.31187-3-thuth@redhat.com>
+ <1832e90b-0fd2-19ac-f90e-572147e51f53@redhat.com>
+ <62ec1243-3bb9-c18d-0ff6-4c4ad193620c@redhat.com>
+In-Reply-To: <62ec1243-3bb9-c18d-0ff6-4c4ad193620c@redhat.com>
 
-Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
----
- hw/acpi/generic_event_device.c         | 16 ++++++++++++++++
- include/hw/acpi/generic_event_device.h |  4 ++++
- 2 files changed, 20 insertions(+)
+--AKll5aYQba5lA7dCRKNQ30R2s6qVRZbLE
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/hw/acpi/generic_event_device.c b/hw/acpi/generic_event_device.c
-index 2a83d68e82..2bd786b7ab 100644
---- a/hw/acpi/generic_event_device.c
-+++ b/hw/acpi/generic_event_device.c
-@@ -19,6 +19,7 @@
- 
- static const uint32_t ged_supported_events[] = {
-     ACPI_GED_MEM_HOTPLUG_EVT,
-+    ACPI_GED_PWR_DOWN_EVT,
- };
- 
- /*
-@@ -103,6 +104,11 @@ void build_ged_aml(Aml *table, const char *name, HotplugHandler *hotplug_dev,
-                 aml_append(if_ctx, aml_call0(MEMORY_DEVICES_CONTAINER "."
-                                              MEMORY_SLOT_SCAN_METHOD));
-                 break;
-+            case ACPI_GED_PWR_DOWN_EVT:
-+                aml_append(if_ctx,
-+                           aml_notify(aml_name(ACPI_POWER_BUTTON_DEVICE),
-+                                      aml_int(0x80)));
-+                break;
-             default:
-                 /*
-                  * Please make sure all the events in ged_supported_events[]
-@@ -232,6 +238,13 @@ static void acpi_ged_send_event(AcpiDeviceIf *adev, AcpiEventStatusBits ev)
-     acpi_ged_event(s, sel);
- }
- 
-+static void acpi_ged_pm_powerdown_req(Notifier *n, void *opaque)
-+{
-+    AcpiGedState *s = container_of(n, AcpiGedState, powerdown_notifier);
-+
-+    acpi_ged_event(s, ACPI_GED_PWR_DOWN_EVT);
-+}
-+
- static void acpi_ged_device_realize(DeviceState *dev, Error **errp)
- {
-     AcpiGedState *s = ACPI_GED(dev);
-@@ -243,6 +256,9 @@ static void acpi_ged_device_realize(DeviceState *dev, Error **errp)
-     }
- 
-     acpi_ged_init(get_system_memory(), dev, &s->ged_state);
-+
-+    s->powerdown_notifier.notify = acpi_ged_pm_powerdown_req;
-+    qemu_register_powerdown_notifier(&s->powerdown_notifier);
- }
- 
- static Property acpi_ged_properties[] = {
-diff --git a/include/hw/acpi/generic_event_device.h b/include/hw/acpi/generic_event_device.h
-index f69d084c89..9e63b72cb9 100644
---- a/include/hw/acpi/generic_event_device.h
-+++ b/include/hw/acpi/generic_event_device.h
-@@ -61,6 +61,8 @@
- 
- #include "hw/acpi/memory_hotplug.h"
- 
-+#define ACPI_POWER_BUTTON_DEVICE "PWRB"
-+
- #define TYPE_ACPI_GED "acpi-ged"
- #define ACPI_GED(obj) \
-     OBJECT_CHECK(AcpiGedState, (obj), TYPE_ACPI_GED)
-@@ -79,6 +81,7 @@
-  * through GED.
-  */
- #define ACPI_GED_MEM_HOTPLUG_EVT   0x1
-+#define ACPI_GED_PWR_DOWN_EVT      0x2
- 
- typedef struct GEDState {
-     MemoryRegion io;
-@@ -88,6 +91,7 @@ typedef struct GEDState {
- 
- typedef struct AcpiGedState {
-     DeviceClass parent_obj;
-+    Notifier powerdown_notifier;
-     MemHotplugState memhp_state;
-     hwaddr memhp_base;
-     hwaddr ged_base;
--- 
-2.17.1
+On 16.07.19 17:31, Thomas Huth wrote:
+> On 16/07/2019 17.26, Max Reitz wrote:
+>> On 16.07.19 14:28, Thomas Huth wrote:
+>>> Remove some more tests from the "auto" group that either have issues
+>>> in certain environments (like macOS or FreeBSD, or on certain file sy=
+stems
+>>> like ZFS or tmpfs), do not work with the qcow2 format, or that are si=
+mply
+>>> taking too much time.
+>>>
+>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>>> ---
+>>>  tests/qemu-iotests/group | 114 ++++++++++++++++++++-----------------=
+--
+>>>  1 file changed, 58 insertions(+), 56 deletions(-)
+>>
+>> I just looked through the list to see whether any of the test seems li=
+ke
+>> we=E2=80=99d want to keep it even though it is a bit slow.  Mostly I w=
+as looking
+>> for tests that cover complex cases.
+>>
+>> 255 is the only one that seemed to fit that bill to me.  So why do you=
+
+>> remove it?  Is it because it takes two seconds?
+>=20
+> No, I removed it because it was failing on macOS:
+>=20
+>  https://cirrus-ci.com/task/4860239294234624
+>=20
+> ("OSError: AF_UNIX path too long" is the error, if I got that right)
+
+Ah, OK.  So, uh, we effectively can=E2=80=99t run any Python tests on mac=
+OS?
+
+Max
 
 
+--AKll5aYQba5lA7dCRKNQ30R2s6qVRZbLE--
+
+--fBd3v86y2wgJr9w03TCLhPQC9LLx2Hc1u
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0t8MYACgkQ9AfbAGHV
+z0BFgwf/UowakTIdFGoxvB8USeu2uBz/R30O/RoiBAGUd+8j4uyMPGphJF2o6usg
+ViYtad/QF8a2foz8Vd2zUwK/kY1m49B+wTwld1icZ47rx5t0BfgAWj0PWRzTVwH2
+bbLZcBa4TY9VPr0kF1vfM54l1tLpG/a4EgL0mg9P6RvbUfW8GmXC/wyZocUHOVBh
+V3fRQst/xzi9ThHszARkjruiInsM0fWKZW7pAe/4fMsC7vYFS2Zgzgwx8aWOVwSt
+xl6GLvOZC6SifJeOZB9esJBtO8BiaKN9RlCc3Sa3ryazPw2DW0UzsygkjJZMdtyo
+dFZUASpBtksp5Md1m52MSuz17pY0xA==
+=6IUg
+-----END PGP SIGNATURE-----
+
+--fBd3v86y2wgJr9w03TCLhPQC9LLx2Hc1u--
 
