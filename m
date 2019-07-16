@@ -6,98 +6,53 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 304A3C76188
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 08:47:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E284AC76188
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 08:47:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0C8632173B
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 08:47:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C8632173B
+	by mail.kernel.org (Postfix) with ESMTPS id BB2482173B
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 08:47:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB2482173B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46486 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46502 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnJ7S-0006a5-Fj
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 04:47:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42933)
+	id 1hnJ7p-0007YE-KY
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 04:47:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43153)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <marc.zyngier@arm.com>) id 1hnJ7G-00065W-Ov
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 04:47:19 -0400
+ (envelope-from <Dave.Martin@arm.com>) id 1hnJ7f-00074f-0r
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 04:47:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marc.zyngier@arm.com>) id 1hnJ7F-0002SZ-FS
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 04:47:18 -0400
-Received: from foss.arm.com ([217.140.110.172]:58290)
+ (envelope-from <Dave.Martin@arm.com>) id 1hnJ7d-0002j1-Pr
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 04:47:42 -0400
+Received: from foss.arm.com ([217.140.110.172]:58306)
  by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <marc.zyngier@arm.com>)
- id 1hnJ7A-0002Ij-Om; Tue, 16 Jul 2019 04:47:14 -0400
+ (envelope-from <Dave.Martin@arm.com>)
+ id 1hnJ7b-0002ge-2v; Tue, 16 Jul 2019 04:47:39 -0400
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 59DFA2B;
- Tue, 16 Jul 2019 01:46:55 -0700 (PDT)
-Received: from [10.1.197.61] (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id
- 66B973F59C; Tue, 16 Jul 2019 01:46:54 -0700 (PDT)
-To: Dave Martin <Dave.Martin@arm.com>, Mark Rutland <mark.rutland@arm.com>
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 13D242B;
+ Tue, 16 Jul 2019 01:47:38 -0700 (PDT)
+Received: from e103592.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com
+ [10.121.207.14])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E94343F59C;
+ Tue, 16 Jul 2019 01:47:36 -0700 (PDT)
+Date: Tue, 16 Jul 2019 09:47:34 +0100
+From: Dave Martin <Dave.Martin@arm.com>
+To: Mark Rutland <mark.rutland@arm.com>
+Message-ID: <20190716084734.GL2790@e103592.cambridge.arm.com>
 References: <1b0aa6b2-80b1-a72e-6849-7323c3b9c6bc@huawei.com>
  <20190715134059.GJ2790@e103592.cambridge.arm.com>
  <20190715134848.GI56232@lakrids.cambridge.arm.com>
- <20190716083050.GK2790@e103592.cambridge.arm.com>
-From: Marc Zyngier <marc.zyngier@arm.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=marc.zyngier@arm.com; prefer-encrypt=mutual; keydata=
- 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
- Z46HaNmN2hZS/oJ69c1DI5Rcww==
-Organization: ARM Ltd
-Message-ID: <c2de59be-eded-b846-fc4d-24348732016c@arm.com>
-Date: Tue, 16 Jul 2019 09:46:52 +0100
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+ <4daefb19-6c15-f82c-31e9-1ae035d45bd5@arm.com>
+ <20190715144446.GK56232@lakrids.cambridge.arm.com>
 MIME-Version: 1.0
-In-Reply-To: <20190716083050.GK2790@e103592.cambridge.arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190715144446.GK56232@lakrids.cambridge.arm.com>
+User-Agent: Mutt/1.5.23 (2014-03-12)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 217.140.110.172
 Subject: Re: [Qemu-devel] [RFC] Add virtual SDEI support in qemu
@@ -112,35 +67,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Guoheyi <guoheyi@huawei.com>, qemu-arm@nongnu.org, qemu-devel@nongnu.org,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Cc: Marc Zyngier <marc.zyngier@arm.com>, qemu-devel@nongnu.org,
+ qemu-arm@nongnu.org, James Morse <james.morse@arm.com>,
+ Guoheyi <guoheyi@huawei.com>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 16/07/2019 09:30, Dave Martin wrote:
-> On Mon, Jul 15, 2019 at 02:48:49PM +0100, Mark Rutland wrote:
->> On Mon, Jul 15, 2019 at 02:41:00PM +0100, Dave Martin wrote:
+On Mon, Jul 15, 2019 at 03:44:46PM +0100, Mark Rutland wrote:
+> On Mon, Jul 15, 2019 at 03:26:39PM +0100, James Morse wrote:
+> > On 15/07/2019 14:48, Mark Rutland wrote:
+> > > On Mon, Jul 15, 2019 at 02:41:00PM +0100, Dave Martin wrote:
+> > >> One option (suggested to me by James Morse) would be to allow userspace
+> > >> to disable in the in-kernel PSCI implementation and provide its own
+> > >> PSCI to the guest via SMC -- in which case userspace that wants to
+> > >> implement SDEI would have to implement PSCI as well.
+> > > 
+> > > I think this would be the best approach, since it puts userspace in
+> > > charge of everything.
+> > > 
+> > > However, this interacts poorly with FW-based mitigations that we
+> > > implement in hyp. I suspect we'd probably need a mechanism to delegate
+> > > that responsibility back to the kernel, and figure out if that has any
+> > > interaction with thigns that got punted to userspace...
+> > 
+> > This has come up before:
+> > https://lore.kernel.org/r/59C139D0.3040507@arm.com
+> > 
+> > I agree Qemu should opt-in to this, it needs to be a feature that is enabled.
+> > 
+> > I had an early version of something like this for testing SDEI before
+> > there was firmware available. The review feedback from Christoffer was
+> > that it should include HVC and SMC, their immediates, and shouldn't be
+> > tied to SMC-CC ranges.
+> > 
+> > I think this should be a catch-all as Heyi describes to deliver
+> > 'unhandled SMC/HVC' to user-space as hypercall exits. We should
+> > include the immediate in the struct.
+> > 
+> > We can allow Qemu to disable the in-kernel PSCI implementation, which
+> > would let it be done in user-space via this catch-all mechanism. (PSCI
+> > in user-space has come up on another thread recently). The in-kernel
+> > PSCI needs to be default-on for backwards compatibility.
+> > 
+> > As Mark points out, the piece that's left is the 'arch workaround'
+> > stuff. We always need to handle these in the kernel. I don't think
+> > these should be routed-back, they should be un-obtainable by
+> > user-space.
 > 
-> [...]
+> Sure; I meant that those should be handled in the kernel rather than
+> going to host userspace and back.
 > 
->>> So long as KVM_EXIT_HYPERCALL reports sufficient information so that
->>> userspace can identify the cause as an SMC and retrieve the SMC
->>> immediate field, this seems feasible.
->>>
->>> For its own SMCCC APIs, KVM exclusively uses HVC, so rerouting SMC to
->>> userspace shouldn't conflict.
->>
->> Be _very_ careful here! In systems without EL3 (and without NV), SMC
->> UNDEFs rather than trapping to EL2. Given that, we shouldn't build a
->> hypervisor ABI that depends on SMC.
-> 
-> Good point.  I was hoping that was all ancient history by now, but if
-> not...
+> I was suggesting was that userspace would opt into taking ownership of
+> all HVC calls, then explicitly opt-in to the kernel handling specific
+> (sets of) calls.
 
-Unfortunately, XGene-1 is still a thing...
+The most logical thing to do would be to have userspace handle all
+calls, but add an ioctl to forward a call to KVM.  This puts userspace
+in charge of the SMCCC interface, with KVM handling only those things
+that userspace can't do for itself, on request.
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+If the performance overhead is unacceptable for certain calls, we could
+have a way to delegate specific function IDs to KVM.  I suspect that
+will be the exception rather than the rule.
+
+> There are probably issues with that, but I suspect defining "all
+> undandled calls" will be problematic otherwise.
+
+Agreed: the set of calls not handled by KVM will mutate over time.
+
+Cheers
+---Dave
 
