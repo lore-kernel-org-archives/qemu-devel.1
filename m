@@ -6,106 +6,84 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29824C76188
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 12:41:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23242C76188
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 12:42:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F355620693
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 12:41:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F355620693
+	by mail.kernel.org (Postfix) with ESMTPS id ECFD920693
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 12:42:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECFD920693
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48370 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48380 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnMlv-0008IG-7r
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 08:41:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33291)
+	id 1hnMmY-0000rH-9q
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 08:42:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33606)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <david@redhat.com>) id 1hnMlg-0007gp-A9
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 08:41:17 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hnMmN-0000N1-Q7
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 08:42:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1hnMlf-0004fO-1t
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 08:41:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51856)
+ (envelope-from <mreitz@redhat.com>) id 1hnMmM-0005Dr-Kw
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 08:41:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52478)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>)
- id 1hnMlY-0004a4-T8; Tue, 16 Jul 2019 08:41:10 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1hnMmK-0005AG-2E; Tue, 16 Jul 2019 08:41:56 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 17A2E307CDD1;
- Tue, 16 Jul 2019 12:41:06 +0000 (UTC)
-Received: from [10.36.116.218] (ovpn-116-218.ams2.redhat.com [10.36.116.218])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 542C560C70;
- Tue, 16 Jul 2019 12:41:04 +0000 (UTC)
-To: Ilya Leoshkevich <iii@linux.ibm.com>, qemu-devel@nongnu.org,
- qemu-s390x@nongnu.org, rth@twiddle.net, cohuck@redhat.com
-References: <20190716123446.24039-1-iii@linux.ibm.com>
-From: David Hildenbrand <david@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 5456B307CDD1;
+ Tue, 16 Jul 2019 12:41:55 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.40.205.58])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id AECE95D9D6;
+ Tue, 16 Jul 2019 12:41:50 +0000 (UTC)
+To: Maxim Levitsky <mlevitsk@redhat.com>, qemu-devel@nongnu.org
+References: <20190716081516.27374-1-mlevitsk@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- SE+xAvmumFBY
-Organization: Red Hat GmbH
-Message-ID: <f3989d45-5451-db13-c5d7-f4601bfff55c@redhat.com>
-Date: Tue, 16 Jul 2019 14:41:03 +0200
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <ace970e5-7f1a-d693-952e-3d16da1d0bfe@redhat.com>
+Date: Tue, 16 Jul 2019 14:41:48 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <20190716123446.24039-1-iii@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <20190716081516.27374-1-mlevitsk@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="HDfXSxB8bv60fOaxYXn2z9TdLrQkTHcRD"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Tue, 16 Jul 2019 12:41:06 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.49]); Tue, 16 Jul 2019 12:41:55 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] s390: support EDAT-2 in
- mmu_translate_region
+Subject: Re: [Qemu-devel] [PATCH v4] LUKS: support preallocation
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -117,120 +95,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: borntraeger@de.ibm.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 16.07.19 14:34, Ilya Leoshkevich wrote:
-> When debugging s390 linux kernel with qemu kvm gdbstub, dumping memory
-> contents at addresses in range 0x80000000-0x100000000 results in an
-> error or all zeroes being returned.
-> 
-> The problem appears to be that linux puts 2G page at that location,
-> which qemu currently does not know about.
-> 
-> Check FC bit of Region-Third-Table Entry in mmu_translate_region, just
-> like it's already done for FC bit of Segment-Table Entry in
-> mmu_translate_segment.
-> 
-> Signed-off-by: Ilya Leoshkevich <iii@linux.ibm.com>
-> Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--HDfXSxB8bv60fOaxYXn2z9TdLrQkTHcRD
+Content-Type: multipart/mixed; boundary="uUFPYqmzK3YdsvMmi5B1fFVC0zr5etQq6";
+ protected-headers="v1"
+From: Max Reitz <mreitz@redhat.com>
+To: Maxim Levitsky <mlevitsk@redhat.com>, qemu-devel@nongnu.org
+Cc: Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
+ qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>
+Message-ID: <ace970e5-7f1a-d693-952e-3d16da1d0bfe@redhat.com>
+Subject: Re: [PATCH v4] LUKS: support preallocation
+References: <20190716081516.27374-1-mlevitsk@redhat.com>
+In-Reply-To: <20190716081516.27374-1-mlevitsk@redhat.com>
+
+--uUFPYqmzK3YdsvMmi5B1fFVC0zr5etQq6
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 16.07.19 10:15, Maxim Levitsky wrote:
+> preallocation=3Doff and preallocation=3Dmetadata
+> both allocate luks header only, and preallocation=3Dfalloc/full
+> is passed to underlying file.
+>=20
+> Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=3D1534951
+>=20
+> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 > ---
->  target/s390x/cpu.h        | 1 +
->  target/s390x/mmu_helper.c | 8 ++++++++
->  2 files changed, 9 insertions(+)
-> 
-> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-> index a606547b4d..947553386f 100644
-> --- a/target/s390x/cpu.h
-> +++ b/target/s390x/cpu.h
-> @@ -548,6 +548,7 @@ QEMU_BUILD_BUG_ON(sizeof(SysIB) != 4096);
->  #define ASCE_TABLE_LENGTH     0x03        /* region table length              */
->  
->  #define REGION_ENTRY_ORIGIN   (~0xfffULL) /* region/segment table origin    */
-> +#define REGION_ENTRY_FC       0x400       /* region format control          */
->  #define REGION_ENTRY_RO       0x200       /* region/segment protection bit  */
->  #define REGION_ENTRY_TF       0xc0        /* region/segment table offset    */
->  #define REGION_ENTRY_INV      0x20        /* invalid region table entry     */
-> diff --git a/target/s390x/mmu_helper.c b/target/s390x/mmu_helper.c
-> index 6e9c4d6151..76cf920cd2 100644
-> --- a/target/s390x/mmu_helper.c
-> +++ b/target/s390x/mmu_helper.c
-> @@ -242,6 +242,14 @@ static int mmu_translate_region(CPUS390XState *env, target_ulong vaddr,
->          return -1;
->      }
->  
-> +    if (level == ASCE_TYPE_REGION3
-> +        && (new_entry & REGION_ENTRY_FC) && (env->cregs[0] & CR0_EDAT)) {
-> +        /* Decode EDAT-2 region frame absolute address (2GB page) */
-> +        *raddr = (new_entry & 0xffffffff80000000ULL) | (vaddr & 0x7fffffff);
-> +        PTE_DPRINTF("%s: REG=0x%" PRIx64 "\n", __func__, new_entry);
-> +        return 0;
-> +    }
+>  block/crypto.c       | 29 ++++++++++++++++++++++++++---
+>  qapi/block-core.json |  5 ++++-
+>  2 files changed, 30 insertions(+), 4 deletions(-)
+>=20
+>=20
+> Changes from V3: updated the blockdev-create description
+
+Looks good functionally, but there is a syntax problem:
+
+> diff --git a/block/crypto.c b/block/crypto.c
+> index 8237424ae6..034a645652 100644
+> --- a/block/crypto.c
+> +++ b/block/crypto.c
+
+[...]
+
+> @@ -515,8 +523,11 @@ block_crypto_co_create_luks(BlockdevCreateOptions =
+*create_options, Error **errp)
+>          .u.luks =3D *qapi_BlockdevCreateOptionsLUKS_base(luks_opts),
+>      };
+> =20
+> +    if (luks_opts->has_preallocation)
+> +        preallocation =3D luks_opts->preallocation;
+
+This lacks curly brackets.
+
 > +
->      if (level == ASCE_TYPE_SEGMENT) {
->          return mmu_translate_segment(env, vaddr, asc, new_entry, raddr, flags,
->                                       rw, exc);
-> 
+>      ret =3D block_crypto_co_create_generic(bs, luks_opts->size, &creat=
+e_opts,
+> -                                         errp);
+> +                                         preallocation, errp);
+>      if (ret < 0) {
+>          goto fail;
+>      }
 
-I have a patch series lying around that rewrites the whole mmu code in a non-recusrive
-fasion and implements a set of features. There, I have
+[...]
 
+> diff --git a/qapi/block-core.json b/qapi/block-core.json
+> index 0d43d4f37c..9c04d83fa2 100644
+> --- a/qapi/block-core.json
+> +++ b/qapi/block-core.json
+> @@ -4205,13 +4205,16 @@
+>  #
+>  # @file             Node to create the image format on
+>  # @size             Size of the virtual disk in bytes
+> +# @preallocation    Preallocation mode for the new image (default: off=
+;
+> +#                   allowed values: off/metadata/falloc/full (since: 4=
+=2E2)
 
-commit b3ae14d99a648fec3e503efa2f547886d40ab8c1
-Author: David Hildenbrand <david@redhat.com>
-Date:   Mon Jan 15 00:04:07 2018 +0100
+Also, this lacks a closing parenthesis somewhere.
 
-    s390x/mmu: add EDAT2 translation support
-    
-    This only adds basic support to the MMU, but no EDAT2 support  for TCG
-    guests.
-    
-    Signed-off-by: David Hildenbrand <david@redhat.com>
+Max
 
-diff --git a/target/s390x/mmu_helper.c b/target/s390x/mmu_helper.c
-index a294cd16f1..72025c4437 100644
---- a/target/s390x/mmu_helper.c
-+++ b/target/s390x/mmu_helper.c
-@@ -139,6 +139,7 @@ static int mmu_translate_asce(CPUS390XState *env, target_ulong vaddr,
- {
-     const bool edat1 = (env->cregs[0] & CR0_EDAT) &&
-                        s390_has_feat(S390_FEAT_EDAT);
-+    const bool edat2 = edat1 && s390_has_feat(S390_FEAT_EDAT_2);
-     const int asce_tl = asce & _ASCE_TABLE_LENGTH;
-     const int asce_p = asce & _ASCE_PRIVATE_SPACE;
-     uintptr_t ptr = asce & _ASCE_ORIGIN;
-@@ -234,9 +235,16 @@ static int mmu_translate_asce(CPUS390XState *env, target_ulong vaddr,
-         if ((entry & REGION_ENTRY_TT) != REGION_ENTRY_TT_REGION3) {
-             return PGM_TRANS_SPEC;
-         }
-+        if (edat2 && (entry & REGION3_ENTRY_CR) && asce_p) {
-+            return PGM_TRANS_SPEC;
-+        }
-         if (edat1 && (entry & REGION_ENTRY_P)) {
-             *flags &= ~PAGE_WRITE;
-         }
-+        if (edat2 && (entry & REGION3_ENTRY_FC)) {
-+            *raddr = entry & REGION3_ENTRY_RFAA;
-+            return 0;
-+        }
-         if (VADDR_SEGMENT_TL(vaddr) < (entry & REGION_ENTRY_TF) >> 6 ||
-             VADDR_SEGMENT_TL(vaddr) > (entry & REGION_ENTRY_TL)) {
-             return PGM_SEGMENT_TRANS;
+>  #
+>  # Since: 2.12
+>  ##
+>  { 'struct': 'BlockdevCreateOptionsLUKS',
+>    'base': 'QCryptoBlockCreateOptionsLUKS',
+>    'data': { 'file':             'BlockdevRef',
+> -            'size':             'size' } }
+> +            'size':             'size',
+> +            '*preallocation':   'PreallocMode' } }
+> =20
+>  ##
+>  # @BlockdevCreateOptionsNfs:
+>=20
 
 
-So I think this patch is at least missing something.
 
-How urgent is this? If this can wait, I can polish and send my series I have here
-instead, which also implents
-- IEP support
-- access-exception-fetch/store-indication facility
-- ESOP-1, ESOP-2
+--uUFPYqmzK3YdsvMmi5B1fFVC0zr5etQq6--
 
--- 
+--HDfXSxB8bv60fOaxYXn2z9TdLrQkTHcRD
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Thanks,
+-----BEGIN PGP SIGNATURE-----
 
-David / dhildenb
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0txgwACgkQ9AfbAGHV
+z0DJjwgAoJaImOLlaiUtU8QMR2AUDSmEOWR4ePo/bGX6Oz3gcni7EYIeWdofe6Hc
+e46OVlWylYHwKFSo3afXwoatTT5a0kr5aklA2Ux9/+rMQdhhCmdLz5HmXd21BzTe
+Tvcw+WEcifY5ehwE4K1/qPFqSE3PE9gJY+0QE9DHdUIp78uLWNbMqCO8+8bOl4Tz
+lvj8TK5a8NsmvK2UrrCJQYHvFxZgm1cUyfzY2ZILHlgJB6nBQt/rXrE3hk0DRxa0
+Trvm7AF6eT5K83rlKS+P8msdwFvf9rnT7EVcizBJFJjBuAEeOlEoVSIoHOwBBtel
+9hEaGl9ekwiJzOMpt/UvgIxAVOKPgQ==
+=zuKJ
+-----END PGP SIGNATURE-----
+
+--HDfXSxB8bv60fOaxYXn2z9TdLrQkTHcRD--
 
