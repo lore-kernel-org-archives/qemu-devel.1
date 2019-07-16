@@ -2,87 +2,87 @@ Return-Path: <SRS0=+QfZ=VN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5006C76188
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 10:25:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C741AC76188
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 10:26:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B1ED120880
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 10:25:49 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TKLuT42T"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1ED120880
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id A011920880
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 10:26:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A011920880
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46994 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47014 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnKeb-0007Pa-0X
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 06:25:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46712)
+	id 1hnKf4-00008o-TK
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 06:26:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47015)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <npiggin@gmail.com>) id 1hnKeQ-00070I-C8
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 06:25:39 -0400
+ (envelope-from <yi.l.liu@intel.com>) id 1hnKet-00087t-6o
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 06:26:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <npiggin@gmail.com>) id 1hnKeP-0000pB-86
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 06:25:38 -0400
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:39588)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <npiggin@gmail.com>)
- id 1hnKeO-0000oK-RI; Tue, 16 Jul 2019 06:25:37 -0400
-Received: by mail-pf1-x444.google.com with SMTP id f17so4909604pfn.6;
- Tue, 16 Jul 2019 03:25:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:subject:to:cc:references:in-reply-to:mime-version
- :user-agent:message-id:content-transfer-encoding;
- bh=Tc6Idvwui/7wmFfw9jkBeUnqWHmPxtueUDA7u++3TPE=;
- b=TKLuT42ToE72u2uDb3MnjqpqBaXQn+MSbxpj6YobeYi/2OfCxEQMvvE874Lc5TrTbA
- +wgXcb6WfVZ4y4HXbnHqG0m+Yf1YcoQ/56M0ly4a9+Iy0QjY5ro+8aQCHyRlmGzE5/Lx
- OIcBFyWzxEtJNl2nHewhAho+/eun3UALNXnfv0jguOzMUc2DuOEahvnRvDND+DrNFtwm
- E4xt/6zAe9NHc1yUTZO9xVe2PtOUCsrl5sKDhEqVjf8H/O8pWlESNR+3RJ7jf9rFy6l+
- n/q1XyrfB2/l7WOF4xmDdXRCNVMGDXl3NpMOrHZfa66gjxmxcNsH5MOXI7VlJyPDqvDA
- PkNg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:subject:to:cc:references:in-reply-to
- :mime-version:user-agent:message-id:content-transfer-encoding;
- bh=Tc6Idvwui/7wmFfw9jkBeUnqWHmPxtueUDA7u++3TPE=;
- b=Vry07ev1AM8QhB9J8It8Wgn/8Qo7Pwkkql/i8MGn1Wbxq/xhGfkNmNyKGkFFvhNCmy
- 5h5vmZ87zljwFZX8f2Bqyw9b8d4/KA7QACVLBQsq1qlNkCIuCtYGklBfjglSnzL/rRhd
- tR5pJw/jJLc6hWYIjrtKSEn2/8dbjtQVaqu4EiCLmLzr6zdAki/qXVsTbTqWFx1PfRUo
- GInhsRrRdmyjYJte6YO5Rx3Hd5JWtVlx9/0rj3OacnXfamW0hPX1rOPdkOPh90ZzwSfp
- abcckvPqWcmTv4dBbpKhmLhw5ZOzgQmGjkNXp0B/lvqQI/8T+Ptr6vAvG+Ev2nt68Obe
- Q0Pw==
-X-Gm-Message-State: APjAAAUM1eRYF0u0HQneakoBGfbTh34rKw4/yp0Fe8EgnVIYfcHZfly2
- qos060anSvNfeuzf3CTQ+7Q=
-X-Google-Smtp-Source: APXvYqw0iil28kMsDC/bFh+qrvmsb/AFq66UrgWoVUYR9J7DwUu0vEtllt5VLukX905QsKjTVwQjgg==
-X-Received: by 2002:a63:1310:: with SMTP id i16mr32092228pgl.187.1563272735437; 
- Tue, 16 Jul 2019 03:25:35 -0700 (PDT)
-Received: from localhost ([203.220.8.141])
- by smtp.gmail.com with ESMTPSA id s20sm22702272pfe.169.2019.07.16.03.25.33
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Tue, 16 Jul 2019 03:25:34 -0700 (PDT)
-Date: Tue, 16 Jul 2019 20:25:28 +1000
-From: Nicholas Piggin <npiggin@gmail.com>
+ (envelope-from <yi.l.liu@intel.com>) id 1hnKer-0001EF-QR
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 06:26:07 -0400
+Received: from mga09.intel.com ([134.134.136.24]:19623)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1hnKer-0001BM-Fc
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 06:26:05 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+ by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 16 Jul 2019 03:26:01 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.63,498,1557212400"; d="scan'208";a="194841602"
+Received: from fmsmsx105.amr.corp.intel.com ([10.18.124.203])
+ by fmsmga002.fm.intel.com with ESMTP; 16 Jul 2019 03:26:00 -0700
+Received: from fmsmsx604.amr.corp.intel.com (10.18.126.84) by
+ FMSMSX105.amr.corp.intel.com (10.18.124.203) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Tue, 16 Jul 2019 03:26:00 -0700
+Received: from fmsmsx604.amr.corp.intel.com (10.18.126.84) by
+ fmsmsx604.amr.corp.intel.com (10.18.126.84) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Tue, 16 Jul 2019 03:25:57 -0700
+Received: from shsmsx102.ccr.corp.intel.com (10.239.4.154) by
+ fmsmsx604.amr.corp.intel.com (10.18.126.84) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1713.5
+ via Frontend Transport; Tue, 16 Jul 2019 03:25:56 -0700
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.110]) by
+ shsmsx102.ccr.corp.intel.com ([169.254.2.3]) with mapi id 14.03.0439.000;
+ Tue, 16 Jul 2019 18:25:55 +0800
+From: "Liu, Yi L" <yi.l.liu@intel.com>
 To: David Gibson <david@gibson.dropbear.id.au>
-References: <20190716024726.17864-1-npiggin@gmail.com>
- <20190716024726.17864-4-npiggin@gmail.com>
- <20190716082549.GE7525@umbus.fritz.box>
-In-Reply-To: <20190716082549.GE7525@umbus.fritz.box>
-MIME-Version: 1.0
-User-Agent: astroid/0.14.0 (https://github.com/astroidmail/astroid)
-Message-Id: <1563270152.eyfvtns0jc.astroid@bobo.none>
-Content-Type: text/plain; charset=utf-8
+Thread-Topic: [RFC v1 05/18] vfio/pci: add pasid alloc/free implementation
+Thread-Index: AQHVM+ylZdJ7a+KBXU2HFFh5qj+Ya6bKg4OAgAJ3NWA=
+Date: Tue, 16 Jul 2019 10:25:55 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C25743A00D8BB@SHSMSX104.ccr.corp.intel.com>
+References: <1562324511-2910-1-git-send-email-yi.l.liu@intel.com>
+ <1562324511-2910-6-git-send-email-yi.l.liu@intel.com>
+ <20190715025519.GE3440@umbus.fritz.box>
+In-Reply-To: <20190715025519.GE3440@umbus.fritz.box>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.0.600.7
+dlp-reaction: no-action
+x-ctpclassification: CTP_NT
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiNjY5YTdiNTgtOGIxMi00ZmRlLWFiNDktYTNmZWZkOTAwYWFiIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiZ21mRWlwNUcxbVFkSXlkczZmdjRnMlRKZlhTSCtqcGRna3hsaVdiQTgydVhkRk9pMFpxSUJLdElGXC83ZjBFMkgifQ==
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::444
-Subject: Re: [Qemu-devel] [PATCH v4 3/5] spapr: Implement H_CONFER
+X-Received-From: 134.134.136.24
+Subject: Re: [Qemu-devel] [RFC v1 05/18] vfio/pci: add pasid alloc/free
+ implementation
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,73 +94,148 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org,
- =?iso-8859-1?q?C=E9dric?= Le Goater <clg@kaod.org>, Greg Kurz <groug@kaod.org>
+Cc: "Tian, Kevin" <kevin.tian@intel.com>,
+ Jacob Pan <jacob.jun.pan@linux.intel.com>, Yi Sun <yi.y.sun@linux.intel.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mst@redhat.com" <mst@redhat.com>,
+ "Tian, Jun J" <jun.j.tian@intel.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "peterx@redhat.com" <peterx@redhat.com>,
+ "eric.auger@redhat.com" <eric.auger@redhat.com>,
+ "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>, "Sun, Yi Y" <yi.y.sun@intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-David Gibson's on July 16, 2019 6:25 pm:
-> On Tue, Jul 16, 2019 at 12:47:24PM +1000, Nicholas Piggin wrote:
->> This does not do directed yielding and is not quite as strict as PAPR
->> specifies in terms of precise dispatch behaviour. This generally will
->> mean suboptimal performance, rather than guest misbehaviour. Linux
->> does not rely on exact dispatch behaviour.
->>=20
->> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
->> ---
->>  hw/ppc/spapr_hcall.c | 48 ++++++++++++++++++++++++++++++++++++++++++++
->>  1 file changed, 48 insertions(+)
->>=20
->> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
->> index 8b208ab259..28d58113be 100644
->> --- a/hw/ppc/spapr_hcall.c
->> +++ b/hw/ppc/spapr_hcall.c
->> @@ -1069,6 +1069,53 @@ static target_ulong h_cede(PowerPCCPU *cpu, Spapr=
-MachineState *spapr,
->>      return H_SUCCESS;
->>  }
->> =20
->> +static target_ulong h_confer(PowerPCCPU *cpu, SpaprMachineState *spapr,
->> +                           target_ulong opcode, target_ulong *args)
->> +{
->> +    target_long target =3D args[0];
->> +    uint32_t dispatch =3D args[1];
->> +    PowerPCCPU *target_cpu =3D spapr_find_cpu(target);
->> +    CPUState *target_cs =3D CPU(target_cpu);
->> +    CPUState *cs =3D CPU(cpu);
->> +    SpaprCpuState *spapr_cpu;
->> +
->> +    /*
->> +     * This does not do a targeted yield or confer, but check the param=
-eter
->> +     * anyway. -1 means confer to all/any other CPUs.
->> +     */
->> +    if (target !=3D -1 && !target_cs) {
->> +        return H_PARAMETER;
->> +    }
+> From: kvm-owner@vger.kernel.org [mailto:kvm-owner@vger.kernel.org] On Beh=
+alf
+> Of David Gibson
+> Sent: Monday, July 15, 2019 10:55 AM
+> To: Liu, Yi L <yi.l.liu@intel.com>
+> Subject: Re: [RFC v1 05/18] vfio/pci: add pasid alloc/free implementation
 >=20
-> Should we return an error if a targeted yield is attempted, rather
-> than pretend we've done it?
+> On Fri, Jul 05, 2019 at 07:01:38PM +0800, Liu Yi L wrote:
+> > This patch adds vfio implementation PCIPASIDOps.alloc_pasid/free_pasid(=
+).
+> > These two functions are used to propagate guest pasid allocation and
+> > free requests to host via vfio container ioctl.
+>=20
+> As I said in an earlier comment, I think doing this on the device is
+> conceptually incorrect.  I think we need an explcit notion of an SVM
+> context (i.e. the namespace in which all the PASIDs live) - which will
+> IIUC usually be shared amongst multiple devices.  The create and free
+> PASID requests should be on that object.
 
-I don't think so, because we do _some_ kind of yield for the directed
-case which is probably better than nothing, and Linux won't fall back.
-
-PAPR is much more strict about dispatching. The H_CONFERing vCPU must=20
-not run until the target(s) has been dispatched (if runnable), for
-example. So we don't really implement it to the letter, we just do
-"some kind of yield, whatever generic tcg code has implemented".
-
-For single threaded tcg it seems a signifcant complication to the
-round robin algorithm to add a directed yield, yet simply yielding
-to the next vCPU is a good idea here because useful work will get
-done including by the lock holder before we run again.
-
-If multi threaded tcg performance with lot of vCPUs and lock contention
-starts becoming more important I guess directed yielding might be
-something to look at.
+Actually, the allocation is not doing on this device. System wide, it is
+done on a container. So not sure if it is the API interface gives you a
+sense that this is done on device. Also, curious on the SVM context
+concept, do you mean it a per-VM context or a per-SVM usage context?
+May you elaborate a little more. :-)
 
 Thanks,
-Nick
-=
+Yi Liu
+
+> >
+> > Cc: Kevin Tian <kevin.tian@intel.com>
+> > Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> > Cc: Peter Xu <peterx@redhat.com>
+> > Cc: Eric Auger <eric.auger@redhat.com>
+> > Cc: Yi Sun <yi.y.sun@linux.intel.com>
+> > Cc: David Gibson <david@gibson.dropbear.id.au>
+> > Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
+> > Signed-off-by: Yi Sun <yi.y.sun@linux.intel.com>
+> > ---
+> >  hw/vfio/pci.c | 61
+> +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+> >  1 file changed, 61 insertions(+)
+> >
+> > diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+> > index ce3fe96..ab184ad 100644
+> > --- a/hw/vfio/pci.c
+> > +++ b/hw/vfio/pci.c
+> > @@ -2690,6 +2690,65 @@ static void vfio_unregister_req_notifier(VFIOPCI=
+Device
+> *vdev)
+> >      vdev->req_enabled =3D false;
+> >  }
+> >
+> > +static int vfio_pci_device_request_pasid_alloc(PCIBus *bus,
+> > +                                               int32_t devfn,
+> > +                                               uint32_t min_pasid,
+> > +                                               uint32_t max_pasid)
+> > +{
+> > +    PCIDevice *pdev =3D bus->devices[devfn];
+> > +    VFIOPCIDevice *vdev =3D DO_UPCAST(VFIOPCIDevice, pdev, pdev);
+> > +    VFIOContainer *container =3D vdev->vbasedev.group->container;
+> > +    struct vfio_iommu_type1_pasid_request req;
+> > +    unsigned long argsz;
+> > +    int pasid;
+> > +
+> > +    argsz =3D sizeof(req);
+> > +    req.argsz =3D argsz;
+> > +    req.flag =3D VFIO_IOMMU_PASID_ALLOC;
+> > +    req.min_pasid =3D min_pasid;
+> > +    req.max_pasid =3D max_pasid;
+> > +
+> > +    rcu_read_lock();
+> > +    pasid =3D ioctl(container->fd, VFIO_IOMMU_PASID_REQUEST, &req);
+> > +    if (pasid < 0) {
+> > +        error_report("vfio_pci_device_request_pasid_alloc:"
+> > +                     " request failed, contanier: %p", container);
+> > +    }
+> > +    rcu_read_unlock();
+> > +    return pasid;
+> > +}
+> > +
+> > +static int vfio_pci_device_request_pasid_free(PCIBus *bus,
+> > +                                              int32_t devfn,
+> > +                                              uint32_t pasid)
+> > +{
+> > +    PCIDevice *pdev =3D bus->devices[devfn];
+> > +    VFIOPCIDevice *vdev =3D DO_UPCAST(VFIOPCIDevice, pdev, pdev);
+> > +    VFIOContainer *container =3D vdev->vbasedev.group->container;
+> > +    struct vfio_iommu_type1_pasid_request req;
+> > +    unsigned long argsz;
+> > +    int ret =3D 0;
+> > +
+> > +    argsz =3D sizeof(req);
+> > +    req.argsz =3D argsz;
+> > +    req.flag =3D VFIO_IOMMU_PASID_FREE;
+> > +    req.pasid =3D pasid;
+> > +
+> > +    rcu_read_lock();
+> > +    ret =3D ioctl(container->fd, VFIO_IOMMU_PASID_REQUEST, &req);
+> > +    if (ret !=3D 0) {
+> > +        error_report("vfio_pci_device_request_pasid_free:"
+> > +                     " request failed, contanier: %p", container);
+> > +    }
+> > +    rcu_read_unlock();
+> > +    return ret;
+> > +}
+> > +
+> > +static PCIPASIDOps vfio_pci_pasid_ops =3D {
+> > +    .alloc_pasid =3D vfio_pci_device_request_pasid_alloc,
+> > +    .free_pasid =3D vfio_pci_device_request_pasid_free,
+> > +};
+> > +
+> >  static void vfio_realize(PCIDevice *pdev, Error **errp)
+> >  {
+> >      VFIOPCIDevice *vdev =3D PCI_VFIO(pdev);
+> > @@ -2991,6 +3050,8 @@ static void vfio_realize(PCIDevice *pdev, Error *=
+*errp)
+> >      vfio_register_req_notifier(vdev);
+> >      vfio_setup_resetfn_quirk(vdev);
+> >
+> > +    pci_setup_pasid_ops(pdev, &vfio_pci_pasid_ops);
+> > +
+> >      return;
+> >
+> >  out_teardown:
+>=20
+> --
+> David Gibson			| I'll have my music baroque, and my code
+> david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other=
+_
+> 				| _way_ _around_!
+> http://www.ozlabs.org/~dgibson
 
