@@ -2,64 +2,83 @@ Return-Path: <SRS0=+QfZ=VN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB5C3C76192
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 14:57:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6FC7C76192
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 14:57:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B8C3720693
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 14:57:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8C3720693
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id A61D420693
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 14:57:24 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="FGO4dM/I"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A61D420693
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49812 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49816 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnOtC-0007N1-Je
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 10:57:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49868)
+	id 1hnOtP-0008OW-It
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 10:57:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50034)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <tao3.xu@intel.com>) id 1hnOqi-0005WD-GP
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 10:54:38 -0400
+ (envelope-from <yury-kotov@yandex-team.ru>) id 1hnOrE-0007kK-7l
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 10:55:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tao3.xu@intel.com>) id 1hnOqg-000189-Cy
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 10:54:36 -0400
-Received: from mga03.intel.com ([134.134.136.65]:20995)
+ (envelope-from <yury-kotov@yandex-team.ru>) id 1hnOrB-0001Ln-MZ
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 10:55:07 -0400
+Received: from forwardcorp1j.mail.yandex.net ([5.45.199.163]:41860)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1hnOqg-0000za-1V
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 10:54:34 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
- by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 16 Jul 2019 07:54:33 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.63,498,1557212400"; d="scan'208";a="319014819"
-Received: from tao-optiplex-7060.sh.intel.com ([10.239.13.104])
- by orsmga004.jf.intel.com with ESMTP; 16 Jul 2019 07:54:31 -0700
-From: Tao Xu <tao3.xu@intel.com>
-To: imammedo@redhat.com,
-	eblake@redhat.com,
-	ehabkost@redhat.com
-Date: Tue, 16 Jul 2019 22:51:20 +0800
-Message-Id: <20190716145121.19578-11-tao3.xu@intel.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190716145121.19578-1-tao3.xu@intel.com>
-References: <20190716145121.19578-1-tao3.xu@intel.com>
+ (Exim 4.71) (envelope-from <yury-kotov@yandex-team.ru>)
+ id 1hnOr9-0001Ie-PQ
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 10:55:04 -0400
+Received: from mxbackcorp1g.mail.yandex.net (mxbackcorp1g.mail.yandex.net
+ [IPv6:2a02:6b8:0:1402::301])
+ by forwardcorp1j.mail.yandex.net (Yandex) with ESMTP id CAB1C2E14C3;
+ Tue, 16 Jul 2019 17:54:57 +0300 (MSK)
+Received: from smtpcorp1j.mail.yandex.net (smtpcorp1j.mail.yandex.net
+ [2a02:6b8:0:1619::137])
+ by mxbackcorp1g.mail.yandex.net (nwsmtp/Yandex) with ESMTP id
+ hpdpF5Z1gr-svtOs3Tt; Tue, 16 Jul 2019 17:54:57 +0300
+Precedence: bulk
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
+ s=default; 
+ t=1563288897; bh=pdYBsi4yOtIzET/6XmZ1Glh9q8tSBBe6AsJssWPKHrM=;
+ h=In-Reply-To:Message-Id:References:Date:Subject:To:From:Cc;
+ b=FGO4dM/IFWVIGO7Age6ACTc1NTw/aExENMO2uUzY4Ic4Hoz71vMkJnzIc4HYtF74X
+ Is9PirL46Elnb3CWblRgLJjqbOvcTHp8HiDTcqLmlNN2garieTrCIla0TSZdRBKzNp
+ +ncq3Oy6R9iPfbyKInuIhF6y3ha7bNum17K6/ykE=
+Authentication-Results: mxbackcorp1g.mail.yandex.net;
+ dkim=pass header.i=@yandex-team.ru
+Received: from dynamic-red.dhcp.yndx.net (dynamic-red.dhcp.yndx.net
+ [2a02:6b8:0:40c:68fa:19fe:5639:24b5])
+ by smtpcorp1j.mail.yandex.net (nwsmtp/Yandex) with ESMTPSA id
+ RzIFhwRP0o-suQicNfH; Tue, 16 Jul 2019 17:54:57 +0300
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
+ (Client certificate not present)
+From: Yury Kotov <yury-kotov@yandex-team.ru>
+To: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
+ Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
+ Juan Quintela <quintela@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Stefan Weil <sw@weilnetz.de>
+Date: Tue, 16 Jul 2019 17:54:19 +0300
+Message-Id: <20190716145421.17645-2-yury-kotov@yandex-team.ru>
+X-Mailer: git-send-email 2.22.0
+In-Reply-To: <20190716145421.17645-1-yury-kotov@yandex-team.ru>
+References: <20190716145421.17645-1-yury-kotov@yandex-team.ru>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 134.134.136.65
-Subject: [Qemu-devel] [PATCH v7 10/11] numa: Extend the CLI to provide
- memory side cache information
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 5.45.199.163
+Subject: [Qemu-devel] [PATCH v2 1/3] qemu-thread: Add qemu_cond_timedwait
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -68,293 +87,246 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jingqi.liu@intel.com, tao3.xu@intel.com, fan.du@intel.com,
- qemu-devel@nongnu.org, jonathan.cameron@huawei.com, dan.j.williams@intel.com
+Cc: qemu-devel@nongnu.org, yc-core@yandex-team.ru
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Liu Jingqi <jingqi.liu@intel.com>
-
-Add -numa hmat-cache option to provide Memory Side Cache Information.
-These memory attributes help to build Memory Side Cache Information
-Structure(s) in ACPI Heterogeneous Memory Attribute Table (HMAT).
-
-Signed-off-by: Liu Jingqi <jingqi.liu@intel.com>
-Signed-off-by: Tao Xu <tao3.xu@intel.com>
+Signed-off-by: Yury Kotov <yury-kotov@yandex-team.ru>
 ---
+ include/qemu/thread.h    | 18 ++++++++++++++++++
+ util/qemu-thread-posix.c | 40 ++++++++++++++++++++++++++++------------
+ util/qemu-thread-win32.c | 16 ++++++++++++++++
+ util/qsp.c               | 18 ++++++++++++++++++
+ 4 files changed, 80 insertions(+), 12 deletions(-)
 
-No changes in v7.
-
-Changes in v6:
-    - Add add reference to ACPI 6.3 spec (Igor)
-    - Update the designator to 4.2 (Eric)
----
- hw/core/numa.c        | 67 +++++++++++++++++++++++++++++++++++
- include/sysemu/numa.h |  2 ++
- qapi/machine.json     | 81 +++++++++++++++++++++++++++++++++++++++++--
- qemu-options.hx       | 14 +++++++-
- 4 files changed, 161 insertions(+), 3 deletions(-)
-
-diff --git a/hw/core/numa.c b/hw/core/numa.c
-index 83ead77191..75db35ac19 100644
---- a/hw/core/numa.c
-+++ b/hw/core/numa.c
-@@ -304,6 +304,67 @@ void parse_numa_hmat_lb(MachineState *ms, NumaHmatLBOptions *node,
-     }
+diff --git a/include/qemu/thread.h b/include/qemu/thread.h
+index 55d83a907c..d0cd7b9ae0 100644
+--- a/include/qemu/thread.h
++++ b/include/qemu/thread.h
+@@ -34,6 +34,8 @@ typedef void (*QemuRecMutexLockFunc)(QemuRecMutex *m, c=
+onst char *f, int l);
+ typedef int (*QemuRecMutexTrylockFunc)(QemuRecMutex *m, const char *f, i=
+nt l);
+ typedef void (*QemuCondWaitFunc)(QemuCond *c, QemuMutex *m, const char *=
+f,
+                                  int l);
++typedef void (*QemuCondTimedWaitFunc)(QemuCond *c, QemuMutex *m, int ms,
++                                      const char *f, int l);
+=20
+ extern QemuMutexLockFunc qemu_bql_mutex_lock_func;
+ extern QemuMutexLockFunc qemu_mutex_lock_func;
+@@ -41,6 +43,7 @@ extern QemuMutexTrylockFunc qemu_mutex_trylock_func;
+ extern QemuRecMutexLockFunc qemu_rec_mutex_lock_func;
+ extern QemuRecMutexTrylockFunc qemu_rec_mutex_trylock_func;
+ extern QemuCondWaitFunc qemu_cond_wait_func;
++extern QemuCondTimedWaitFunc qemu_cond_timedwait_func;
+=20
+ /* convenience macros to bypass the profiler */
+ #define qemu_mutex_lock__raw(m)                         \
+@@ -63,6 +66,8 @@ extern QemuCondWaitFunc qemu_cond_wait_func;
+             qemu_rec_mutex_trylock_impl(m, __FILE__, __LINE__);
+ #define qemu_cond_wait(c, m)                                            =
+\
+             qemu_cond_wait_impl(c, m, __FILE__, __LINE__);
++#define qemu_cond_timedwait(c, m, ms)                                   =
+\
++            qemu_cond_wait_impl(c, m, ms, __FILE__, __LINE__);
+ #else
+ #define qemu_mutex_lock(m) ({                                           =
+\
+             QemuMutexLockFunc _f =3D atomic_read(&qemu_mutex_lock_func);=
+  \
+@@ -89,6 +94,11 @@ extern QemuCondWaitFunc qemu_cond_wait_func;
+             QemuCondWaitFunc _f =3D atomic_read(&qemu_cond_wait_func);  =
+  \
+             _f(c, m, __FILE__, __LINE__);                               =
+\
+         })
++
++#define qemu_cond_timedwait(c, m, ms) ({                                =
+       \
++            QemuCondTimedWaitFunc _f =3D atomic_read(&qemu_cond_timedwai=
+t_func); \
++            _f(c, m, ms, __FILE__, __LINE__);                           =
+       \
++        })
+ #endif
+=20
+ #define qemu_mutex_unlock(mutex) \
+@@ -134,12 +144,20 @@ void qemu_cond_signal(QemuCond *cond);
+ void qemu_cond_broadcast(QemuCond *cond);
+ void qemu_cond_wait_impl(QemuCond *cond, QemuMutex *mutex,
+                          const char *file, const int line);
++void qemu_cond_timedwait_impl(QemuCond *cond, QemuMutex *mutex, int ms,
++                              const char *file, const int line);
+=20
+ static inline void (qemu_cond_wait)(QemuCond *cond, QemuMutex *mutex)
+ {
+     qemu_cond_wait(cond, mutex);
  }
- 
-+void parse_numa_hmat_cache(MachineState *ms, NumaHmatCacheOptions *node,
-+                           Error **errp)
+=20
++static inline void (qemu_cond_timedwait)(QemuCond *cond, QemuMutex *mute=
+x,
++                                         int ms)
 +{
-+    int nb_numa_nodes = ms->numa_state->num_nodes;
-+    HMAT_Cache_Info *hmat_cache = NULL;
-+
-+    if (node->node_id >= nb_numa_nodes) {
-+        error_setg(errp, "Invalid node-id=%" PRIu32
-+                   ", it should be less than %d.",
-+                   node->node_id, nb_numa_nodes);
-+        return;
-+    }
-+
-+    if (node->total > MAX_HMAT_CACHE_LEVEL) {
-+        error_setg(errp, "Invalid total=%" PRIu8
-+                   ", it should be less than or equal to %d.",
-+                   node->total, MAX_HMAT_CACHE_LEVEL);
-+        return;
-+    }
-+    if (node->level > node->total) {
-+        error_setg(errp, "Invalid level=%" PRIu8
-+                   ", it should be less than or equal to"
-+                   " total=%" PRIu8 ".",
-+                   node->level, node->total);
-+        return;
-+    }
-+    if (ms->numa_state->hmat_cache[node->node_id][node->level]) {
-+        error_setg(errp, "Duplicate configuration of the side cache for "
-+                   "node-id=%" PRIu32 " and level=%" PRIu8 ".",
-+                   node->node_id, node->level);
-+        return;
-+    }
-+
-+    if ((node->level > 1) &&
-+        ms->numa_state->hmat_cache[node->node_id][node->level - 1] &&
-+        (node->size >=
-+            ms->numa_state->hmat_cache[node->node_id][node->level - 1]->size)) {
-+        error_setg(errp, "Invalid size=0x%" PRIx64
-+                   ", the size of level=%" PRIu8
-+                   " should be less than the size(0x%" PRIx64
-+                   ") of level=%" PRIu8 ".",
-+                   node->size, node->level,
-+                   ms->numa_state->hmat_cache[node->node_id]
-+                                             [node->level - 1]->size,
-+                   node->level - 1);
-+        return;
-+    }
-+
-+    hmat_cache = g_malloc0(sizeof(*hmat_cache));
-+
-+    hmat_cache->mem_proximity = node->node_id;
-+    hmat_cache->size = node->size;
-+    hmat_cache->total_levels = node->total;
-+    hmat_cache->level = node->level;
-+    hmat_cache->associativity = node->assoc;
-+    hmat_cache->write_policy = node->policy;
-+    hmat_cache->line_size = node->line;
-+
-+    ms->numa_state->hmat_cache[node->node_id][node->level] = hmat_cache;
++    qemu_cond_timedwait(cond, mutex, ms);
 +}
 +
- void set_numa_options(MachineState *ms, NumaOptions *object, Error **errp)
+ void qemu_sem_init(QemuSemaphore *sem, int init);
+ void qemu_sem_post(QemuSemaphore *sem);
+ void qemu_sem_wait(QemuSemaphore *sem);
+diff --git a/util/qemu-thread-posix.c b/util/qemu-thread-posix.c
+index 1bf5e65dea..eed777d9ec 100644
+--- a/util/qemu-thread-posix.c
++++ b/util/qemu-thread-posix.c
+@@ -36,6 +36,18 @@ static void error_exit(int err, const char *msg)
+     abort();
+ }
+=20
++static void compute_abs_deadline(struct timespec *ts, int ms)
++{
++    struct timeval tv;
++    gettimeofday(&tv, NULL);
++    ts->tv_nsec =3D tv.tv_usec * 1000 + (ms % 1000) * 1000000;
++    ts->tv_sec =3D tv.tv_sec + ms / 1000;
++    if (ts->tv_nsec >=3D 1000000000) {
++        ts->tv_sec++;
++        ts->tv_nsec -=3D 1000000000;
++    }
++}
++
+ void qemu_mutex_init(QemuMutex *mutex)
  {
-     Error *err = NULL;
-@@ -348,6 +409,12 @@ void set_numa_options(MachineState *ms, NumaOptions *object, Error **errp)
-             goto end;
-         }
-         break;
-+    case NUMA_OPTIONS_TYPE_HMAT_CACHE:
-+        parse_numa_hmat_cache(ms, &object->u.hmat_cache, &err);
-+        if (err) {
-+            goto end;
-+        }
-+        break;
-     default:
-         abort();
-     }
-diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
-index f0857b7ee6..9009bbdee3 100644
---- a/include/sysemu/numa.h
-+++ b/include/sysemu/numa.h
-@@ -43,6 +43,8 @@ void set_numa_options(MachineState *ms, NumaOptions *object, Error **errp);
- void parse_numa_opts(MachineState *ms);
- void parse_numa_hmat_lb(MachineState *ms, NumaHmatLBOptions *node,
-                         Error **errp);
-+void parse_numa_hmat_cache(MachineState *ms, NumaHmatCacheOptions *node,
-+                           Error **errp);
- void numa_complete_configuration(MachineState *ms);
- void query_numa_node_mem(NumaNodeMem node_mem[], MachineState *ms);
- extern QemuOptsList qemu_numa_opts;
-diff --git a/qapi/machine.json b/qapi/machine.json
-index 25f5b0321d..65a3584b92 100644
---- a/qapi/machine.json
-+++ b/qapi/machine.json
-@@ -379,10 +379,12 @@
- #
- # @hmat-lb: memory latency and bandwidth information (Since: 4.2)
- #
-+# @hmat-cache: memory side cache information (Since: 4.2)
-+#
- # Since: 2.1
- ##
- { 'enum': 'NumaOptionsType',
--  'data': [ 'node', 'dist', 'cpu', 'hmat-lb' ] }
-+  'data': [ 'node', 'dist', 'cpu', 'hmat-lb', 'hmat-cache' ] }
- 
- ##
- # @NumaOptions:
-@@ -398,7 +400,8 @@
-     'node': 'NumaNodeOptions',
-     'dist': 'NumaDistOptions',
-     'cpu': 'NumaCpuOptions',
--    'hmat-lb': 'NumaHmatLBOptions' }}
-+    'hmat-lb': 'NumaHmatLBOptions',
-+    'hmat-cache': 'NumaHmatCacheOptions' }}
- 
- ##
- # @NumaNodeOptions:
-@@ -600,6 +603,80 @@
-     '*latency': 'uint16',
-     '*bandwidth': 'uint16' }}
- 
-+##
-+# @HmatCacheAssociativity:
-+#
-+# Cache associativity in the Memory Side Cache
-+# Information Structure of HMAT
-+#
-+# For more information of @HmatCacheAssociativity see
-+# the chapter 5.2.27.5: Table 5-143 of ACPI 6.3 spec.
-+#
-+# @none: None
-+#
-+# @direct: Direct Mapped
-+#
-+# @complex: Complex Cache Indexing (implementation specific)
-+#
-+# Since: 4.2
-+##
-+{ 'enum': 'HmatCacheAssociativity',
-+  'data': [ 'none', 'direct', 'complex' ] }
+     int err;
+@@ -164,6 +176,22 @@ void qemu_cond_wait_impl(QemuCond *cond, QemuMutex *=
+mutex, const char *file, con
+         error_exit(err, __func__);
+ }
+=20
++void qemu_cond_timedwait_impl(QemuCond *cond, QemuMutex *mutex, int ms,
++                              const char *file, const int line)
++{
++    int err;
++    struct timespec ts;
 +
-+##
-+# @HmatCacheWritePolicy:
-+#
-+# Cache write policy in the Memory Side Cache
-+# Information Structure of HMAT
-+#
-+# For more information of @HmatCacheWritePolicy see
-+# the chapter 5.2.27.5: Table 5-143: Field "Cache Attributes" of ACPI 6.3 spec.
-+#
-+# @none: None
-+#
-+# @write-back: Write Back (WB)
-+#
-+# @write-through: Write Through (WT)
-+#
-+# Since: 4.2
-+##
-+{ 'enum': 'HmatCacheWritePolicy',
-+  'data': [ 'none', 'write-back', 'write-through' ] }
++    assert(cond->initialized);
++    trace_qemu_mutex_unlock(mutex, file, line);
++    compute_abs_deadline(&ts, ms);
++    err =3D pthread_cond_timedwait(&cond->cond, &mutex->lock, &ts);
++    trace_qemu_mutex_locked(mutex, file, line);
++    if (err && err !=3D ETIMEDOUT) {
++        error_exit(err, __func__);
++    }
++}
 +
-+##
-+# @NumaHmatCacheOptions:
-+#
-+# Set the memory side cache information for a given memory domain.
-+#
-+# For more information of @NumaHmatCacheOptions see
-+# the chapter 5.2.27.5: Table 5-143: Field "Cache Attributes" of ACPI 6.3 spec.
-+#
-+# @node-id: the memory proximity domain to which the memory belongs.
-+#
-+# @size: the size of memory side cache in bytes.
-+#
-+# @total: the total cache levels for this memory proximity domain.
-+#
-+# @level: the cache level described in this structure.
-+#
-+# @assoc: the cache associativity, none/direct-mapped/complex(complex cache indexing).
-+#
-+# @policy: the write policy, none/write-back/write-through.
-+#
-+# @line: the cache Line size in bytes.
-+#
-+# Since: 4.2
-+##
-+{ 'struct': 'NumaHmatCacheOptions',
-+  'data': {
-+   'node-id': 'uint32',
-+   'size': 'size',
-+   'total': 'uint8',
-+   'level': 'uint8',
-+   'assoc': 'HmatCacheAssociativity',
-+   'policy': 'HmatCacheWritePolicy',
-+   'line': 'uint16' }}
+ void qemu_sem_init(QemuSemaphore *sem, int init)
+ {
+     int rc;
+@@ -238,18 +266,6 @@ void qemu_sem_post(QemuSemaphore *sem)
+ #endif
+ }
+=20
+-static void compute_abs_deadline(struct timespec *ts, int ms)
+-{
+-    struct timeval tv;
+-    gettimeofday(&tv, NULL);
+-    ts->tv_nsec =3D tv.tv_usec * 1000 + (ms % 1000) * 1000000;
+-    ts->tv_sec =3D tv.tv_sec + ms / 1000;
+-    if (ts->tv_nsec >=3D 1000000000) {
+-        ts->tv_sec++;
+-        ts->tv_nsec -=3D 1000000000;
+-    }
+-}
+-
+ int qemu_sem_timedwait(QemuSemaphore *sem, int ms)
+ {
+     int rc;
+diff --git a/util/qemu-thread-win32.c b/util/qemu-thread-win32.c
+index 572f88535d..5faa01cb61 100644
+--- a/util/qemu-thread-win32.c
++++ b/util/qemu-thread-win32.c
+@@ -145,6 +145,22 @@ void qemu_cond_wait_impl(QemuCond *cond, QemuMutex *=
+mutex, const char *file, con
+     qemu_mutex_post_lock(mutex, file, line);
+ }
+=20
++void qemu_cond_timedwait_impl(QemuCond *cond, QemuMutex *mutex, int ms,
++                              const char *file, const int line)
++{
++    int rc =3D 0;
 +
- ##
- # @HostMemPolicy:
- #
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 609ea40086..5f3b2fd234 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -165,7 +165,8 @@ DEF("numa", HAS_ARG, QEMU_OPTION_numa,
-     "-numa node[,memdev=id][,cpus=firstcpu[-lastcpu]][,nodeid=node][,initiator=node]\n"
-     "-numa dist,src=source,dst=destination,val=distance\n"
-     "-numa cpu,node-id=node[,socket-id=x][,core-id=y][,thread-id=z]\n"
--    "-numa hmat-lb,initiator=node,target=node,hierarchy=memory|first-level|second-level|third-level,data-type=access-latency|read-latency|write-latency[,base-lat=blat][,base-bw=bbw][,latency=lat][,bandwidth=bw]\n",
-+    "-numa hmat-lb,initiator=node,target=node,hierarchy=memory|first-level|second-level|third-level,data-type=access-latency|read-latency|write-latency[,base-lat=blat][,base-bw=bbw][,latency=lat][,bandwidth=bw]\n"
-+    "-numa hmat-cache,node-id=node,size=size,total=total,level=level[,assoc=none|direct|complex][,policy=none|write-back|write-through][,line=size]\n",
-     QEMU_ARCH_ALL)
- STEXI
- @item -numa node[,mem=@var{size}][,cpus=@var{firstcpu}[-@var{lastcpu}]][,nodeid=@var{node}][,initiator=@var{initiator}]
-@@ -173,6 +174,7 @@ STEXI
- @itemx -numa dist,src=@var{source},dst=@var{destination},val=@var{distance}
- @itemx -numa cpu,node-id=@var{node}[,socket-id=@var{x}][,core-id=@var{y}][,thread-id=@var{z}]
- @itemx -numa hmat-lb,initiator=@var{node},target=@var{node},hierarchy=@var{str},data-type=@var{str}[,base-lat=@var{blat}][,base-bw=@var{bbw}][,latency=@var{lat}][,bandwidth=@var{bw}]
-+@itemx -numa hmat-cache,node-id=@var{node},size=@var{size},total=@var{total},level=@var{level}[,assoc=@var{str}][,policy=@var{str}][,line=@var{size}]
- @findex -numa
- Define a NUMA node and assign RAM and VCPUs to it.
- Set the NUMA distance from a source node to a destination node.
-@@ -275,11 +277,19 @@ Note: Due to the minimum matrix value entry value being 10, the base unit corres
- to a value of 10. And @var{blat} or @var{bbw} should be an integer. @var{lat} or
- @var{bw} is the latency/bandwidth value.
- 
-+In @samp{hmat-cache} option, @var{node-id} is the NUMA-id of the memory belongs.
-+@var{size} is the size of memory side cache in bytes. @var{total} is the total cache levels.
-+@var{level} is the cache level described in this structure. @var{assoc} is the cache associativity.
-+"none/direct-mapped/complex(complex cache indexing). @var{policy} is the write policy.
-+@var{line} is the cache Line size in bytes.
++    assert(cond->initialized);
++    trace_qemu_mutex_unlock(mutex, file, line);
++    if (!SleepConditionVariableSRW(&cond->var, &mutex->lock, ms, 0)) {
++        rc =3D GetLastError();
++    }
++    trace_qemu_mutex_locked(mutex, file, line);
++    if (rc && rc !=3D ERROR_TIMEOUT) {
++        error_exit(rc, __func__);
++    }
++}
 +
- For example, the following option assigns NUMA node 0 and 1. Node 0 has 2 cpus and
- a ram, node 1 has only a ram. The processors in node 0 access memory in node
- 0 with access-latency 5 picoseconds(base latency is 10), access-bandwidth 5 MB/s(base latency is 20);
- The processors in NUMA node 0 access memory in NUMA node 1 with access-latency 10
- picoseconds(base latency is 10), access-bandwidth 10 MB/s(base latency is 20).
-+And for memory side cache information, NUMA node 0 and 1 both have 1 level memory
-+cache, size is 0x20000 bytes, policy is write-back, the cache Line size is 8 bytes:
- @example
- -m 2G \
- -object memory-backend-ram,size=1024M,policy=bind,host-nodes=0,id=ram-node0 -numa node,nodeid=0,memdev=ram-node0 \
-@@ -291,6 +301,8 @@ picoseconds(base latency is 10), access-bandwidth 10 MB/s(base latency is 20).
- -numa hmat-lb,initiator=0,target=0,hierarchy=memory,data-type=access-bandwidth,base-bw=20,bandwidth=5 \
- -numa hmat-lb,initiator=0,target=1,hierarchy=memory,data-type=access-latency,base-lat=10,latency=10 \
- -numa hmat-lb,initiator=0,target=1,hierarchy=memory,data-type=access-bandwidth,base-bw=20,bandwidth=10 \
-+-numa hmat-cache,node-id=0,size=0x20000,total=1,level=1,assoc=direct,policy=write-back,line=8 \
-+-numa hmat-cache,node-id=1,size=0x20000,total=1,level=1,assoc=direct,policy=write-back,line=8 \
- @end example
- 
- ETEXI
--- 
-2.20.1
+ void qemu_sem_init(QemuSemaphore *sem, int init)
+ {
+     /* Manual reset.  */
+diff --git a/util/qsp.c b/util/qsp.c
+index 5264c97342..904dcb7436 100644
+--- a/util/qsp.c
++++ b/util/qsp.c
+@@ -131,6 +131,7 @@ QemuRecMutexLockFunc qemu_rec_mutex_lock_func =3D qem=
+u_rec_mutex_lock_impl;
+ QemuRecMutexTrylockFunc qemu_rec_mutex_trylock_func =3D
+     qemu_rec_mutex_trylock_impl;
+ QemuCondWaitFunc qemu_cond_wait_func =3D qemu_cond_wait_impl;
++QemuCondTimedWaitFunc qemu_cond_timedwait_func =3D qemu_cond_timedwait_i=
+mpl;
+=20
+ /*
+  * It pays off to _not_ hash callsite->file; hashing a string is slow, a=
+nd
+@@ -412,6 +413,21 @@ qsp_cond_wait(QemuCond *cond, QemuMutex *mutex, cons=
+t char *file, int line)
+     qsp_entry_record(e, t1 - t0);
+ }
+=20
++static void
++qsp_cond_timedwait(QemuCond *cond, QemuMutex *mutex, int ms,
++                   const char *file, int line)
++{
++    QSPEntry *e;
++    int64_t t0, t1;
++
++    t0 =3D get_clock();
++    qemu_cond_timedwait_impl(cond, mutex, ms, file, line);
++    t1 =3D get_clock();
++
++    e =3D qsp_entry_get(cond, file, line, QSP_CONDVAR);
++    qsp_entry_record(e, t1 - t0);
++}
++
+ bool qsp_is_enabled(void)
+ {
+     return atomic_read(&qemu_mutex_lock_func) =3D=3D qsp_mutex_lock;
+@@ -425,6 +441,7 @@ void qsp_enable(void)
+     atomic_set(&qemu_rec_mutex_lock_func, qsp_rec_mutex_lock);
+     atomic_set(&qemu_rec_mutex_trylock_func, qsp_rec_mutex_trylock);
+     atomic_set(&qemu_cond_wait_func, qsp_cond_wait);
++    atomic_set(&qemu_cond_timedwait_func, qsp_cond_timedwait);
+ }
+=20
+ void qsp_disable(void)
+@@ -435,6 +452,7 @@ void qsp_disable(void)
+     atomic_set(&qemu_rec_mutex_lock_func, qemu_rec_mutex_lock_impl);
+     atomic_set(&qemu_rec_mutex_trylock_func, qemu_rec_mutex_trylock_impl=
+);
+     atomic_set(&qemu_cond_wait_func, qemu_cond_wait_impl);
++    atomic_set(&qemu_cond_timedwait_func, qemu_cond_timedwait_impl);
+ }
+=20
+ static gint qsp_tree_cmp(gconstpointer ap, gconstpointer bp, gpointer up=
+)
+--=20
+2.22.0
 
 
