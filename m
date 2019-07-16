@@ -2,60 +2,80 @@ Return-Path: <SRS0=+QfZ=VN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB442C7618F
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 14:06:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BF4EC7618F
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 14:08:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 936A720880
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 14:06:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 936A720880
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5B9E820693
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 14:08:34 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ELN4wu/s"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B9E820693
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49416 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49432 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnO6W-0005JF-KD
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 10:06:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35200)
+	id 1hnO89-0006MJ-Mk
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 10:08:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35897)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <cohuck@redhat.com>) id 1hnO5v-0002pB-W9
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 10:06:16 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hnO80-0005xa-2c
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 10:08:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cohuck@redhat.com>) id 1hnO5r-0000Nt-4r
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 10:06:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46154)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cohuck@redhat.com>)
- id 1hnO5n-0000Lo-Eq; Tue, 16 Jul 2019 10:06:09 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A2687300CB0B;
- Tue, 16 Jul 2019 14:06:06 +0000 (UTC)
-Received: from localhost (ovpn-117-180.ams2.redhat.com [10.36.117.180])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 18C265C221;
- Tue, 16 Jul 2019 14:06:02 +0000 (UTC)
-From: Cornelia Huck <cohuck@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 16 Jul 2019 16:05:46 +0200
-Message-Id: <20190716140546.6661-4-cohuck@redhat.com>
-In-Reply-To: <20190716140546.6661-1-cohuck@redhat.com>
-References: <20190716140546.6661-1-cohuck@redhat.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1hnO7z-0001WT-2y
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 10:08:24 -0400
+Received: from mail-ot1-x333.google.com ([2607:f8b0:4864:20::333]:37017)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hnO7y-0001W0-Tf
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 10:08:23 -0400
+Received: by mail-ot1-x333.google.com with SMTP id s20so21195615otp.4
+ for <qemu-devel@nongnu.org>; Tue, 16 Jul 2019 07:08:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=nHMPPhphvwsZvMd4/2q9JvxTSMEyvXwDVB2Boelqu8k=;
+ b=ELN4wu/sffC822kFowGebrNTo8lAjg5tUTDfmRmoGrmHIFXV4l2dQJ6UqEZaCWbenC
+ bolaolPvAEhE0vo+XRC8urIrvTmbpApJfd+wcUzZtuZjb7YkgQG45E0ygdJbwRvA9AIy
+ w6mNPaC95Dt3C7bhDwBJBRisRGPB+YKcspe2A9wj1DyIboIyfR5T5kwZTbvhyq01ebjl
+ salckazNIQ3BCgpYuCBHdIprp9wk8FwRl2Jj/Fw8plooBRlkFYwYKDUa/6UIcZ4SIlGm
+ Ac/RskJ75/L4/5BsI1zTaI9qN3u4eTDc/1AgTNBBxEg5w0yvFOMiHligDMhT6ftz0NDt
+ rWQQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=nHMPPhphvwsZvMd4/2q9JvxTSMEyvXwDVB2Boelqu8k=;
+ b=XsiiqdeaIdbws8BQZqr6FgkJancEuawbgmS7ZX34KS/2ALvn5G69QO/59ykabWJUOH
+ qzaXhEoSXnZ/QVQsz6LJvguLKCjFcTf9yZJYxX4f/AoOsA4JndUvOcC/S1BDrqH4oAne
+ rbl0oD9D3JmSQP5uSRef2Cyo7bTXE/J3tm/HmIsSmb3vIypBRpX7Aydg2qEPVuUVw57e
+ XgoqrGSlYNQjPY/ET0Q/pBBz0qiuBgoiPNaUDnHgrOLR7QvBFCJLz/6U986v0UHQD4zA
+ kKfVPiJPGFjQFONOcPAbSXQSMNvKwnlLKYVgiyMD28Df4jKq1wHNBfSYwmKzchkldUaS
+ cVYw==
+X-Gm-Message-State: APjAAAWWQL3beXHkhn+0qqGzges1RaNSedccxKxTT0V5CCaHSk9WiySa
+ Yz1h81OT0+XCZIk0PnrcHCc2DhYAhZrcgU9WxDq3cA==
+X-Google-Smtp-Source: APXvYqz1BomGnURzrvBkRPezDFJ33fLTPZSBCQuWnkN4jNXdP8mfUdOUJB6/aJeqHmpcoWyjkz4QIV9R1yzzxAfTU2Q=
+X-Received: by 2002:a9d:6a0f:: with SMTP id g15mr20148790otn.135.1563286101780; 
+ Tue, 16 Jul 2019 07:08:21 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Tue, 16 Jul 2019 14:06:06 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL for-4.1 3/3] s390x/cpumodel: change internal
- name of vxpdeh to match description
+References: <20190716045141.21383-1-armbru@redhat.com>
+In-Reply-To: <20190716045141.21383-1-armbru@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 16 Jul 2019 15:08:10 +0100
+Message-ID: <CAFEAcA9Fn6n3MTH5PNwF2HNOP2Yc1AHMP-sEe9EKdffxMwVTOA@mail.gmail.com>
+To: Markus Armbruster <armbru@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::333
+Subject: Re: [Qemu-devel] [PULL 0/3] Build system and documentation patches
+ for 2019-07-15
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,73 +87,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Christian Borntraeger <borntraeger@de.ibm.com>
+On Tue, 16 Jul 2019 at 05:52, Markus Armbruster <armbru@redhat.com> wrote:
+>
+> The following changes since commit 5ea8ec2fcf57cb9af24ad2cf17b4d64adb03afdf:
+>
+>   Merge remote-tracking branch 'remotes/maxreitz/tags/pull-block-2019-07-15' into staging (2019-07-15 16:11:47 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://repo.or.cz/qemu/armbru.git tags/pull-build-2019-07-15
+>
+> for you to fetch changes up to 32481687e1a262a9ca0083f8e938d7b0614d823b:
+>
+>   qemu-tech: Fix dangling @menu entries (2019-07-15 21:10:29 +0200)
+>
+> ----------------------------------------------------------------
+> Build system and documentation patches for 2019-07-15
+>
+> ----------------------------------------------------------------
+> Markus Armbruster (3):
+>       Makefile: Fix "make install" when "make all" needs work
+>       Makefile: Fix missing dependency of on qemu-tech.texi
+>       qemu-tech: Fix dangling @menu entries
 
-The internal macro name VECTOR_BCD_ENH does not match the actual
-description. Fix this.
 
-Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-Message-Id: <20190715142304.215018-4-borntraeger@de.ibm.com>
-[CH: vxp->vxpdeh, as discussed]
-Reviewed-by: David Hildenbrand <david@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: Cornelia Huck <cohuck@redhat.com>
----
- target/s390x/cpu_features_def.inc.h | 2 +-
- target/s390x/gen-features.c         | 4 ++--
- 2 files changed, 3 insertions(+), 3 deletions(-)
+Applied, thanks.
 
-diff --git a/target/s390x/cpu_features_def.inc.h b/target/s390x/cpu_featu=
-res_def.inc.h
-index 05b7674affe6..31dff0d84e97 100644
---- a/target/s390x/cpu_features_def.inc.h
-+++ b/target/s390x/cpu_features_def.inc.h
-@@ -104,7 +104,7 @@ DEF_FEAT(CMM_NT, "cmmnt", STFL, 147, "CMM: ESSA-enhan=
-cement (no translate) facil
- DEF_FEAT(VECTOR_ENH2, "vxeh2", STFL, 148, "Vector Enhancements facility =
-2")
- DEF_FEAT(ESORT_BASE, "esort-base", STFL, 150, "Enhanced-sort facility (e=
-xcluding subfunctions)")
- DEF_FEAT(DEFLATE_BASE, "deflate-base", STFL, 151, "Deflate-conversion fa=
-cility (excluding subfunctions)")
--DEF_FEAT(VECTOR_BCD_ENH, "vxpdeh", STFL, 152, "Vector-Packed-Decimal-Enh=
-ancement Facility")
-+DEF_FEAT(VECTOR_PACKED_DECIMAL_ENH, "vxpdeh", STFL, 152, "Vector-Packed-=
-Decimal-Enhancement Facility")
- DEF_FEAT(MSA_EXT_9, "msa9-base", STFL, 155, "Message-security-assist-ext=
-ension-9 facility (excluding subfunctions)")
- DEF_FEAT(ETOKEN, "etoken", STFL, 156, "Etoken facility")
-=20
-diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
-index 6debfc1d217e..49a650ac52d0 100644
---- a/target/s390x/gen-features.c
-+++ b/target/s390x/gen-features.c
-@@ -558,7 +558,7 @@ static uint16_t full_GEN15_GA1[] =3D {
-     S390_FEAT_VECTOR_ENH2,
-     S390_FEAT_GROUP_ENH_SORT,
-     S390_FEAT_GROUP_DEFLATE_CONVERSION,
--    S390_FEAT_VECTOR_BCD_ENH,
-+    S390_FEAT_VECTOR_PACKED_DECIMAL_ENH,
-     S390_FEAT_GROUP_MSA_EXT_9,
-     S390_FEAT_GROUP_MSA_EXT_9_PCKMO,
-     S390_FEAT_ETOKEN,
-@@ -643,7 +643,7 @@ static uint16_t default_GEN14_GA1[] =3D {
- static uint16_t default_GEN15_GA1[] =3D {
-     S390_FEAT_VECTOR_ENH2,
-     S390_FEAT_GROUP_DEFLATE_CONVERSION,
--    S390_FEAT_VECTOR_BCD_ENH,
-+    S390_FEAT_VECTOR_PACKED_DECIMAL_ENH,
-     S390_FEAT_GROUP_MSA_EXT_9,
-     S390_FEAT_GROUP_MSA_EXT_9_PCKMO,
-     S390_FEAT_ETOKEN,
---=20
-2.20.1
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.1
+for any user-visible changes.
 
+-- PMM
 
