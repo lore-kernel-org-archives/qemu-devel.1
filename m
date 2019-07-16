@@ -2,83 +2,83 @@ Return-Path: <SRS0=+QfZ=VN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F09E5C7618F
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 14:19:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D151CC7618F
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 14:25:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B814D20693
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 14:19:23 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="oCAyFIA4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B814D20693
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id A23E02173B
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 14:25:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A23E02173B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49516 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49550 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnOIb-0004VF-KY
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 10:19:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39067)
+	id 1hnOOB-0006I9-IV
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 10:25:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40778)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hnOIP-00046n-NH
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 10:19:10 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1hnOO1-0005tX-4A
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 10:24:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hnOIO-00087m-Qn
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 10:19:09 -0400
-Received: from mail-ot1-x335.google.com ([2607:f8b0:4864:20::335]:32867)
+ (envelope-from <pbonzini@redhat.com>) id 1hnONy-000400-Kp
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 10:24:57 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:45825)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hnOIO-00087H-Jz
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 10:19:08 -0400
-Received: by mail-ot1-x335.google.com with SMTP id q20so21212594otl.0
- for <qemu-devel@nongnu.org>; Tue, 16 Jul 2019 07:19:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=l93+VBOGcQ9LQ52GkiOn6n1LnYNq/3vm7XdKvaTzrpg=;
- b=oCAyFIA4lu9vW0JQT+X6rZkqEQHry7MnggEq9IA7+s5EqlCGtQmgAypm8VAG2Ch71s
- rfTszrVsV3tfrL6Z0oMTRH2zke1u7fob1zUmhRYU7NFgtU4f6SetE+atOq6uNymxhNAv
- v6Esbitr3nvKFnbxHxDUPG0QuFNUaAgcsTkzPk0IqjYqLIgDYrUtkyELTDdFafTA97bv
- vH5NZij5KuvtPyGTnZdRLkbtUzTOsLZDYVzhEB5FINw72cU2Tr7hE+ik23CpOuJj0/Wj
- 56jUWlbcMzHmaEwjNwzChOmQ59VtVe4GW8iQuGPAyKA4iAEbiAnTauQ2xzNM+oeEn+Gg
- sd9Q==
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hnONy-0003xp-DA
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 10:24:54 -0400
+Received: by mail-wr1-f66.google.com with SMTP id f9so21152410wre.12
+ for <qemu-devel@nongnu.org>; Tue, 16 Jul 2019 07:24:52 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=l93+VBOGcQ9LQ52GkiOn6n1LnYNq/3vm7XdKvaTzrpg=;
- b=B7iB6Cs3kTpbXWfqkSTUpI9B9ITstIKEVMetcMBnGk/ZUi4cwGxHxmzexQ2kjvdahJ
- lOLAIO+gt+rwa3KYgo5RGPj/7DzccykLF/nP1caphdvxNjP1uAqa+1v5BnK7K+yoloLf
- HAWYqC+SSyM4suVfJUKm58KtuvSG+o+/3woZ9kEYWAmM4JGx5mhVEd+aoXhM5wX1IjFb
- AhA4qNPOOf2D+JGsTHekSXVPbqAydDPmx9QX9we2yGbavgckEBdl0yCbg2SURsemUNqC
- Tdv5/OOucbc4bH32Ca69zBsyzOKRHysziweUUscLn3TGdnba7npU/VqbTVGqTc+JnPzk
- 4RQg==
-X-Gm-Message-State: APjAAAUNVMzlRBU/0xWwF8TobmTcvIjgdUdFe27USSkpmKdsaPfkpC6+
- UAzYuTf37l4t0N/Ix5hY/BG1Md3O33gV4cohy0BNGw==
-X-Google-Smtp-Source: APXvYqyByxqdk6B5NjIQSthcc+jtK2Cv/Y+1R6LtzIKUsFUfIcf4+ARds/ZT/loroCGVhx7Ys5u6idF0FCLcgYU2R3A=
-X-Received: by 2002:a9d:4d81:: with SMTP id u1mr23607596otk.221.1563286747279; 
- Tue, 16 Jul 2019 07:19:07 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=Su5ymIHZjANx7dP+Xu3TZIJ4pkb9fa/N/UhL+cR/+iA=;
+ b=RICqHbYO9DdsSEAf/tYBCXxDvORUavbmlTPwGg3fhC6hWly/QbcNfmW8QEMAz9j7sE
+ 7TfuGH14ojgAR/hJViWj4eMff72/26eXschN0TbEDeW6tqHo1k05YmLnUo+wI6kzeO6D
+ gKYxw7UyPbNQE/Kv80Png4zvCwvZ3vSuEXcZzVCjB41gvUfSEePMDOMqzwvj56ITo44h
+ JBsIr5GPufJrH6d/G3qoqKaEsNR0NjMYItz9x3E4zxW7DRrh7bF7FH5o+DbDRqiWpeC1
+ JuA+d36HvqomtOFclAcqJW7/240g5FX1SYhaUECNujh2e50cwMU/LDWMyhmIcGRBtggj
+ GPNA==
+X-Gm-Message-State: APjAAAXvJd5esr96alDcG9twq2L+jqqkwXIzBRT/EgnzL660ynrfVjeA
+ 6WtMbo/UYW7ASQOsjm+SgoXEUQ==
+X-Google-Smtp-Source: APXvYqyRLROz53EB1grQSY399QHeq+KdeGBTVBFFZzc6Ds6vGzwfRN9a8JEJ9SFVyqk1Bs5Kvy7NeQ==
+X-Received: by 2002:adf:f646:: with SMTP id x6mr38757512wrp.18.1563287091956; 
+ Tue, 16 Jul 2019 07:24:51 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:bca4:e0e3:13b4:ec4?
+ ([2001:b07:6468:f312:bca4:e0e3:13b4:ec4])
+ by smtp.gmail.com with ESMTPSA id a81sm19777040wmh.3.2019.07.16.07.24.51
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Tue, 16 Jul 2019 07:24:51 -0700 (PDT)
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
+ Max Reitz <mreitz@redhat.com>, "qemu-devel@nongnu.org"
+ <qemu-devel@nongnu.org>
+References: <1562959033-223586-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <b270d0cc-2a28-8a60-ccac-45ac4de89f02@redhat.com>
+ <a55d4518-734e-9dd1-296f-473600eacbf7@redhat.com>
+ <5832b3c6-c014-eef2-50bb-f25d70d65678@virtuozzo.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <ac5aefc4-b1e4-9465-c3f0-88f180f6fa14@redhat.com>
+Date: Tue, 16 Jul 2019 16:24:50 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-References: <20181102171638.24069-1-peter.maydell@linaro.org>
- <20181102171638.24069-9-peter.maydell@linaro.org>
- <3e3d2018-3993-f651-8e94-5bea612bd776@redhat.com>
- <CAFEAcA_FtoHOUv_cPgfO7GrZ8Ug9cKCvmY2z75i9DaAQ8Qx+gQ@mail.gmail.com>
- <2745eb9d-c2a2-30a8-c1d0-b8cb3ee43705@linaro.org>
-In-Reply-To: <2745eb9d-c2a2-30a8-c1d0-b8cb3ee43705@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 16 Jul 2019 15:18:55 +0100
-Message-ID: <CAFEAcA-EqXU3vM63bK4+Yo1j07fZpD_=gapB_5_ygrJFk2-Rsw@mail.gmail.com>
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::335
-Subject: Re: [Qemu-devel] [PULL 08/10] target/arm: Conditionalize some
- asserts on aarch32 support
+In-Reply-To: <5832b3c6-c014-eef2-50bb-f25d70d65678@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.85.221.66
+Subject: Re: [Qemu-devel] [PATCH] chardev: race condition with
+ tcp_chr_disconnect
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,29 +90,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- Laszlo Ersek <lersek@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Cc: "marcandre.lureau@redhat.com" <marcandre.lureau@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Roman Kagan <rkagan@virtuozzo.com>, Denis Lunev <den@virtuozzo.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 16 Jul 2019 at 15:02, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> On 7/16/19 12:03 PM, Peter Maydell wrote:
-> > The intention of the assertion really is to catch QEMU bugs
-> > where we got the ID register values wrong in our emulated
-> > CPUs. Perhaps we should relax all these assertions to only
-> > testing if we're using TCG, not KVM ?
->
-> Perhaps.  In some instances if ID register values are wrong we would then not
-> migrate properly, but none of the checks we're currently doing of this sort
-> would catch those particular cases.
+On 16/07/19 15:08, Andrey Shinkevich wrote:
+> The test check-qtest-x86_64: tests/qos-test hangs with the 
+> QTEST_VHOST_USER_FIXME set even without applying the series:
 
-In those cases we should probably print a warning and install
-a migration-blocker, rather than asserting...
+Hmm it must have bitrot. :((  I hope I can look at it on Thursday.
 
-thanks
--- PMM
+Paolo
 
