@@ -2,58 +2,60 @@ Return-Path: <SRS0=+QfZ=VN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2263C7618F
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 15:41:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 109BDC7618F
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 15:42:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7893320693
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 15:41:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7893320693
+	by mail.kernel.org (Postfix) with ESMTPS id E178320693
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 15:42:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E178320693
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50216 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50218 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnPaY-0001Yr-6u
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 11:41:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36711)
+	id 1hnPaZ-0001cl-HY
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 11:41:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36602)
  by lists.gnu.org with esmtp (Exim 4.86_2)
  (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1hnPZv-0007rS-Vw
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 11:41:21 -0400
+ id 1hnPZq-0007Sr-AQ
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 11:41:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1hnPZu-0004SQ-Fk
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 11:41:19 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:33296 helo=huawei.com)
+ id 1hnPZp-0004Oo-7M
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 11:41:14 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:2235 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1hnPZl-00045n-PW; Tue, 16 Jul 2019 11:41:14 -0400
-Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id 41B1FFA22C875A88A5D4;
- Tue, 16 Jul 2019 23:40:44 +0800 (CST)
+ id 1hnPZl-0004B7-PU; Tue, 16 Jul 2019 11:41:11 -0400
+Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id 3D8A3E59FF59AFEC0BBD;
+ Tue, 16 Jul 2019 23:40:49 +0800 (CST)
 Received: from S00345302A-PC.china.huawei.com (10.202.227.237) by
  DGGEMS402-HUB.china.huawei.com (10.3.19.202) with Microsoft SMTP Server id
- 14.3.439.0; Tue, 16 Jul 2019 23:40:36 +0800
+ 14.3.439.0; Tue, 16 Jul 2019 23:40:43 +0800
 From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 To: <qemu-devel@nongnu.org>, <qemu-arm@nongnu.org>, <eric.auger@redhat.com>,
  <imammedo@redhat.com>
-Date: Tue, 16 Jul 2019 16:38:06 +0100
-Message-ID: <20190716153816.17676-1-shameerali.kolothum.thodi@huawei.com>
+Date: Tue, 16 Jul 2019 16:38:08 +0100
+Message-ID: <20190716153816.17676-3-shameerali.kolothum.thodi@huawei.com>
 X-Mailer: git-send-email 2.12.0.windows.1
+In-Reply-To: <20190716153816.17676-1-shameerali.kolothum.thodi@huawei.com>
+References: <20190716153816.17676-1-shameerali.kolothum.thodi@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 X-Originating-IP: [10.202.227.237]
 X-CFilter-Loop: Reflected
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 45.249.212.32
-Subject: [Qemu-devel] [PATCH-for-4.2 v7 00/10] ARM virt: ACPI memory hotplug
- support
+X-Received-From: 45.249.212.191
+Subject: [Qemu-devel] [PATCH-for-4.2 v7 02/10] hw/acpi: Do not create memory
+ hotplug method when handler is not defined
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,113 +74,42 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This series is an attempt to provide device memory hotplug support 
-on ARM virt platform. This is based on Eric's recent works here[1]
-and carries some of the pc-dimm related patches dropped from his
-series.
+From: Samuel Ortiz <sameo@linux.intel.com>
 
-The kernel support for arm64 memory hot add was added recently by
-Robin and hence the guest kernel should be => 5.0-rc1.
+With Hardware-reduced ACPI, the GED device will manage ACPI
+hotplug entirely. As a consequence, make the memory specific
+events AML generation optional. The code will only be added
+when the method name is not NULL.
 
-NVDIM support is not included currently as we still have an unresolved
-issue while hot adding NVDIMM[2]. However NVDIMM cold plug patches
-can be included, but not done for now, for keeping it simple.
+Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
+Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+---
+ hw/acpi/memory_hotplug.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-This makes use of GED device to sent hotplug ACPI events to the
-Guest. GED code is based on Nemu. Thanks to the efforts of Samuel and
-Sebastien to add the hardware-reduced support to Nemu using GED
-device[3]. (Please shout if I got the author/signed-off wrong for
-those patches or missed any names).
-
-This is sanity tested on a HiSilicon ARM64 platform and appreciate
-any further testing.
-
-Thanks,
-Shameer
-
-[1] https://patchwork.kernel.org/cover/10837565/
-[2] https://patchwork.kernel.org/cover/10783589/
-[3] https://github.com/intel/nemu/blob/topic/virt-x86/hw/acpi/ged.c
-[4] http://lists.infradead.org/pipermail/linux-arm-kernel/2019-May/651763.html
-
-v6 --> v7
-- Added 4.2 machine support and restricted GED creation for < 4.2
-  This is to address the migration test fail reported by Eric.
-- Included "tests: Update DSDT ACPI table.." patch(#10) from Eric
-  to fix the "make check" bios-tables-test failure.
-  
-v5 --> v6
-
--Addressed comments from Eric.
--Added R-by from Eric and Igor.
-
-v4 --> v5
--Removed gsi/ged-irq routing in virt.
--Added Migration support.
--Dropped support for DT coldplug case based on the discussions
- here[4]
--Added system_powerdown support through GED.
-
-v3 --> v4
-Addressed comments from Igor and Eric,
--Renamed "virt-acpi" to "acpi-ged".
--Changed ged device parent to TYPE_DEVICE.
--Introduced DT memory node property "hotpluggable" to resolve device
- memory being treated as early boot memory issue(patch #7).
--Combined patches #3 and #9 from v3 into #3.
-
-v2 --> v3
-
-Addressed comments from Igor and Eric,
--Made virt acpi device platform independent and moved
- to hw/acpi/generic_event_device.c
--Moved ged specific code into hw/acpi/generic_event_device.c
--Introduced an opt-in feature "fdt" to resolve device-memory being
- treated as early boot memory.
--Dropped patch #1 from v2.
-
-RFC --> v2
-
--Use GED device instead of GPIO for ACPI hotplug events.
--Removed NVDIMM support for now.
--Includes dropped patches from Eric's v9 series.
-
-Eric Auger (2):
-  hw/arm/virt: Add memory hotplug framework
-  tests: Update DSDT ACPI table for arm/virt board with PCDIMM related
-    changes
-
-Samuel Ortiz (2):
-  hw/acpi: Do not create memory hotplug method when handler is not
-    defined
-  hw/acpi: Add ACPI Generic Event Device Support
-
-Shameer Kolothum (6):
-  hw/acpi: Make ACPI IO address space configurable
-  hw/arm/virt: Add 4.2 machine type
-  hw/arm/virt: Enable device memory cold/hot plug with ACPI boot
-  hw/arm/virt-acpi-build: Add PC-DIMM in SRAT
-  hw/acpi: Add system power down support to GED
-  hw/arm: Use GED for system_powerdown event
-
- hw/acpi/Kconfig                        |   4 +
- hw/acpi/Makefile.objs                  |   1 +
- hw/acpi/generic_event_device.c         | 352 +++++++++++++++++++++++++
- hw/acpi/memory_hotplug.c               |  35 +--
- hw/arm/Kconfig                         |   4 +
- hw/arm/virt-acpi-build.c               |  58 ++--
- hw/arm/virt.c                          |  99 ++++++-
- hw/core/machine.c                      |   3 +
- hw/i386/acpi-build.c                   |   3 +-
- include/hw/acpi/generic_event_device.h | 106 ++++++++
- include/hw/acpi/memory_hotplug.h       |   9 +-
- include/hw/arm/virt.h                  |   4 +
- include/hw/boards.h                    |   3 +
- tests/data/acpi/virt/DSDT              | Bin 18476 -> 18493 bytes
- 14 files changed, 625 insertions(+), 56 deletions(-)
- create mode 100644 hw/acpi/generic_event_device.c
- create mode 100644 include/hw/acpi/generic_event_device.h
-
+diff --git a/hw/acpi/memory_hotplug.c b/hw/acpi/memory_hotplug.c
+index c724f5f1e4..7e30e6f886 100644
+--- a/hw/acpi/memory_hotplug.c
++++ b/hw/acpi/memory_hotplug.c
+@@ -719,10 +719,12 @@ void build_memory_hotplug_aml(Aml *table, uint32_t nr_mem,
+     }
+     aml_append(table, dev_container);
+ 
+-    method = aml_method(event_handler_method, 0, AML_NOTSERIALIZED);
+-    aml_append(method,
+-        aml_call0(MEMORY_DEVICES_CONTAINER "." MEMORY_SLOT_SCAN_METHOD));
+-    aml_append(table, method);
++    if (event_handler_method) {
++        method = aml_method(event_handler_method, 0, AML_NOTSERIALIZED);
++        aml_append(method, aml_call0(MEMORY_DEVICES_CONTAINER "."
++                                     MEMORY_SLOT_SCAN_METHOD));
++        aml_append(table, method);
++    }
+ 
+     g_free(mhp_res_path);
+ }
 -- 
 2.17.1
 
