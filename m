@@ -2,63 +2,79 @@ Return-Path: <SRS0=+QfZ=VN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9516CC76192
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 11:26:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7896BC76192
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 11:42:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 70DA4205C9
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 11:26:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 70DA4205C9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 42ED6206C2
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 11:42:06 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VdcdGATK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42ED6206C2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47360 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47410 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnLas-0000zB-BT
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 07:26:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37606)
+	id 1hnLqP-00042G-Ik
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 07:42:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41801)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <kwolf@redhat.com>) id 1hnLah-0000XA-Pw
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 07:25:52 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hnLqF-0003dk-QU
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 07:41:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1hnLag-00019O-Rb
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 07:25:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55914)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>)
- id 1hnLae-00016p-RM; Tue, 16 Jul 2019 07:25:48 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E5BF283F42;
- Tue, 16 Jul 2019 11:25:47 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-117-24.ams2.redhat.com [10.36.117.24])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 04F99600C1;
- Tue, 16 Jul 2019 11:25:36 +0000 (UTC)
-Date: Tue, 16 Jul 2019 13:25:35 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Alexander Popov <alex.popov@linux.com>
-Message-ID: <20190716112535.GB7297@linux.fritz.box>
-References: <1562335669-10127-1-git-send-email-alex.popov@linux.com>
- <0bce1e99-fb98-6354-9426-391a3e9363f1@linux.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1hnLqE-00039g-NN
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 07:41:55 -0400
+Received: from mail-ot1-x32d.google.com ([2607:f8b0:4864:20::32d]:43458)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hnLqE-00031z-F4
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 07:41:54 -0400
+Received: by mail-ot1-x32d.google.com with SMTP id h59so16802756otb.10
+ for <qemu-devel@nongnu.org>; Tue, 16 Jul 2019 04:41:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=Esv5MXQFuvTN61B+ot5W13bdZbX2F4yNdpqQuNZ+SBA=;
+ b=VdcdGATKvwaQOJO+Cq7RXEoG5ntVg7YYkaPjDyKqwtwor9oOs7VT0u+OHBrsBc5l2H
+ zKvyL2yNirBhuo5Ziqzppm6bs1nBifqohpWwNmv6eEOWQFvkn2PsOND1M74QUiz07ryR
+ +ZRggS16BOSTFert2WlhuHAGPiG+5jEgLsMQ/92SFZMBnhx+aXA1y1/HaLuAneGNySVX
+ rxB0XW7MkRB1CNEM/LRxJKjNUyjT7XKWTQZz3cmcd5F8483MAReH8tJBMzJTzVJokODY
+ damd57HoVSjSd9jqtCDbm1UGpk9uqUzWvr8jAhfzujA3WK2kWmOFpo81T/m0NFObIkva
+ +6cg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=Esv5MXQFuvTN61B+ot5W13bdZbX2F4yNdpqQuNZ+SBA=;
+ b=eDYMRA6UXRLT5SY2sKfSzAziLs0MJEDS0r4Y6l7zwR02OPtiMRebc9MU5au8hW+W8c
+ Xd5ebaGmFI3X1vfyy8YL71Ia1Gj8MIo1gnG4ucRZJvJFHpj9btbkBZF+v8V0SGV1tclE
+ 3IBR8Q/YxwxuwR+1CGBhdS5Ol9Dp2OPx/h4OizBI4yfUBVsatBQYmM1JAsawJIl2TVos
+ oZh9Dk+Gu9GCgtQ046VsugeV2WjZE282a2iF4ac/B2u9TKHLdGBdLAP8KKqbwXCEpIu8
+ 7lBzD7b/B7hZ+3i+Z6ctp4TZtQay7pVWBm2tIlqOoB4Aj/Pbcr9EE52FSRoF72J+eInf
+ 5X/Q==
+X-Gm-Message-State: APjAAAWaCLIMIzd21C128eerte+2KheY0a8y7fe7CXlaW7e+DvIKuHVq
+ N6rTF/qErjeQ2fxEjoCUq6c6+L9h46zooUy02Qs4Qw==
+X-Google-Smtp-Source: APXvYqz74ypFI/jtr+JOmrhvclOxBITov87OVChWV6ikUAtsstLXkEWUvs9C0aSkQGMgPbKpT3CCBMLqTJFTEXc6ksM=
+X-Received: by 2002:a05:6830:1653:: with SMTP id
+ h19mr17165969otr.232.1563277297474; 
+ Tue, 16 Jul 2019 04:41:37 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0bce1e99-fb98-6354-9426-391a3e9363f1@linux.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.27]); Tue, 16 Jul 2019 11:25:48 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [Qemu-block] [QEMU-SECURITY] ide: fix assertion in
- ide_dma_cb() to prevent qemu DoS from quest
+References: <CAL1e-=jiySpoypabXMkUsO=2pqgUrRxUhac=JM_V=2sn2LPhWA@mail.gmail.com>
+In-Reply-To: <CAL1e-=jiySpoypabXMkUsO=2pqgUrRxUhac=JM_V=2sn2LPhWA@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 16 Jul 2019 12:41:26 +0100
+Message-ID: <CAFEAcA9D9-LmOxoSHyibqprKofAWAvthCYYRe==e=F_ZjjpZ5w@mail.gmail.com>
+To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::32d
+Subject: Re: [Qemu-devel] [QUESTION] SDL 1.2 support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,34 +86,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: sstabellini@kernel.org, pmatouse@redhat.com, mdroth@linux.vnet.ibm.com,
- qemu-block@nongnu.org, mst@redhat.com, qemu-devel@nongnu.org,
- qemu-stable@nongnu.org, John Snow <jsnow@redhat.com>, pjp@redhat.com
+Cc: "berrange@redhat.com" <berrange@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 15.07.2019 um 13:24 hat Alexander Popov geschrieben:
-> On 05.07.2019 17:07, Alexander Popov wrote:
-> > This assertion was introduced in the commit a718978ed58a in July 2015.
-> > It implies that the size of successful DMA transfers handled in
-> > ide_dma_cb() should be multiple of 512 (the size of a sector).
-> > 
-> > But guest systems can initiate DMA transfers that don't fit this
-> > requirement. Let's improve the assertion to prevent qemu DoS from quests.
-> 
-> Hello!
-> 
-> Just a friendly ping.
-> 
-> Could you have a look at this patch?
+On Tue, 16 Jul 2019 at 12:17, Aleksandar Markovic
+<aleksandar.m.mail@gmail.com> wrote:
+>
+> Hello, Gerd, Daniel, and others involved.
+>
+> I have multiple reports from end users that say that transition from
+> SDL 1.2 to SDL 2.0 was difficult, or even impossible for their hosts.
+> In that light, they don't appreciate removing SDL 1.2 support from
+> QEMU. The most notable example is Ubutnu 16.04, where it looks there
+> is no way of installing SDL 2.0 that does not involve complete OS
+> upgrade, which, for various reasons, many are not willing to do.
 
-John, I think this is for you.
+One of my build test machines is an Ubuntu 16.04 system
+(specifically 16.04.6 LTS), and it has SDL2 installed
+and the built test includes compiling the SDL2 UI. So I'm
+not sure what's happening with your end users -- do you have
+more detail on what their setup is and what isn't working for them ?
 
-I haven't reviewed this yet, but if we put an assertion there that the
-request is aligned, we probably rely on this fact somewhere in the code.
-So I suspect that just changing the assertion without changing other
-code, too, might not be enough.
+> It looks to me that depreciation of SDL 1.2 was a little premature. My
+> humble opinion is that we should not look at release dates of
+> libraries when we deprecate them, but release dates and end-of-support
+> dates of major Linux distribution that include them.
 
-Kevin
+That is indeed the way our deprecation policy is supposed to
+work -- we care about the versions of libraries that distros
+have shipped in their LTS, not what the upstream library
+release schedule is.
+
+thanks
+-- PMM
 
