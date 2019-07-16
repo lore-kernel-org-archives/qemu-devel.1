@@ -7,77 +7,78 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EEDE9C76192
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 08:14:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB015C76188
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 08:14:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B691A2145D
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 08:14:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 752A22145D
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 08:14:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nRn8ESDn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B691A2145D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uLP6Nq5R"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 752A22145D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46204 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46222 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnIbF-0002eI-Kh
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 04:14:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59947)
+	id 1hnIbj-0004mu-5a
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 04:14:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60105)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <paolo.bonzini@gmail.com>) id 1hnIYe-0008Kq-OY
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 04:11:33 -0400
+ (envelope-from <paolo.bonzini@gmail.com>) id 1hnIYk-0000IZ-AE
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 04:11:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1hnIYd-0003Gw-8v
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 04:11:32 -0400
-Received: from mail-wr1-x434.google.com ([2a00:1450:4864:20::434]:36922)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1hnIYi-0003Ls-GX
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 04:11:38 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:38900)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1hnIYd-0003GQ-2W
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 04:11:31 -0400
-Received: by mail-wr1-x434.google.com with SMTP id n9so19863188wrr.4
- for <qemu-devel@nongnu.org>; Tue, 16 Jul 2019 01:11:30 -0700 (PDT)
+ id 1hnIYi-0003Kl-8f
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 04:11:36 -0400
+Received: by mail-wm1-x344.google.com with SMTP id s15so17666721wmj.3
+ for <qemu-devel@nongnu.org>; Tue, 16 Jul 2019 01:11:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=KaySmgI0vFG3f8nxtwM3Mu8yasXrk6fOBut/kewGAmc=;
- b=nRn8ESDnqePtSElQ3Nb2VF4u2UZDuqSh8zBpMK2Hat/ONmlIcoiXlAdQBuxAdMEZFx
- +3BBE7MNGIiz7XpGX/J8f8d10WTQ9RI1PYHr7rwU46Iiej0SyQPSJSzBDWDeZ+sXA0/Z
- gzCRmyNYm0XDqXFoY+IOdgbLdAo6XbbSmLaTQjyVwqBJ43n25b91z3kxRmL2rr+IurUL
- 0PVtc16HDleLWdfLaVBnWxhCA8vB8Wyoh2Zr+mUOrb7dvq6WMQBwpPeTUXdHAxM2nezf
- X+V8nwMhyrQPF2HMuJEKFerJEBnk0Mmgr2Lwd2ZIclQMc7QHIyRXjsMKKKMsxl8eAYa1
- W6lQ==
+ bh=8Qfy8a0GAVN3cZj53fYSGM9mBcfsB1yLOHRsBKNqTiU=;
+ b=uLP6Nq5R+E+B5kGnDaycxGgK6koWwtR7zCMbDFrQp+hz/diqzJ3Vd3/3x6u5Npfs61
+ y0eO2GwyMBvri266zyD6YavIVgzWasl6n+5ZenTjJvTExrMRgHeFN0LQo7Y+NyxornfB
+ GfuSID8nymaniWexvBomqdLYbZ3AWUwutevRdgx0R6yMw9Z3i5xyQe9Qqyl98m1RPYfc
+ v74uo0s4egHPiiW3Dk3thmoKiUWvHTSb6NF8ZSDiIyuRYnJwxpFzOVOt/JCFfMmNdp9g
+ yt4iCjFl3vSAiV7r8TOIccxveiWfKruweGIUnrFbDAMnyafKR0tH/T3YimeAjD7MoH4e
+ 29BA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references;
- bh=KaySmgI0vFG3f8nxtwM3Mu8yasXrk6fOBut/kewGAmc=;
- b=QaolWuP26KyI6WYhLzAMxuYPOHFG42zD8NqW1f2LshbehYikISJssqYVSoAB3Du+Cq
- xcONrK+B0vwW602mntxTPIjGfjzM7vEPwED9PBPvXieDD6a/8ylxfDb+kRS3CtippBG3
- 7qZpQ7EfR1OQ3em00DOd/ZTOI3a6vzUrbyxqQKSrLdwAra9wJO/sIu0LPX+WI7OT/4xE
- YS2AMk0ILoAENu9x1NfwNnnA/U1QFg9GAvTzVB6gQsKHTFKbwL/QtpQd21lbX50Vriqv
- 5gGz/s72o45u8s/O16Yi6Sl2kKkGKxSn6BZXBX3+SLke4ZR6iAowuaQEHnrYXCUksR/i
- 4Psw==
-X-Gm-Message-State: APjAAAXcW1s/h0aQ/yNMNw71rYBVtgypv2OTLz7DXlK3DjKp5r4ux7ou
- QlEsITz1sODPFf8wl4pNOWscEKK+pkg=
-X-Google-Smtp-Source: APXvYqwLoXgk9zyx0VvuTplgvTkUHIuYxE9wrSEipffh1JiDdXkatkgJAx+ah2RUFJgEVVSFA5U0Qg==
-X-Received: by 2002:a5d:498a:: with SMTP id r10mr34548306wrq.28.1563264689819; 
- Tue, 16 Jul 2019 01:11:29 -0700 (PDT)
+ bh=8Qfy8a0GAVN3cZj53fYSGM9mBcfsB1yLOHRsBKNqTiU=;
+ b=d2qs/9oSU1S75MyqhZWFm8jP7VaF/dZ0lJ8i1o11e7EkJ6vatKPw1itPINSHK+zpgA
+ 5OatpDllWVBXr1SY0f7vw95RU3n2AvxVwpmZQaB9MkCOzxlaV9wIOVh7WFY73S8OssDy
+ 5zfXL63p4ohVl9PB+ZpMCTHGl4iCuBXouCfsXGadV1DAunXgJ+Qvz1+UQ50I0krrMzO5
+ AKr4H9sVYCpX9d4N68CPmwIGa9Yi/LHDB7ZbsAl/3XhQKWsrh4mvRuUcSTFLFAIFVB44
+ yH6FQdxutReVs9JmMRSJc3qDtZ8q4Qmnwk8FUokp7yyM7NX450TA5tT32e8VTI+QRSMp
+ WVgg==
+X-Gm-Message-State: APjAAAWidZl8sBLGhUecUYypGtx0RH06ddkn6mnY8VcI9yY1i01m+IVH
+ pC3BTAoDoQr1GEjlAXKiE28p2zE/Geo=
+X-Google-Smtp-Source: APXvYqz6oZIlQl9LCX+0+0LTUTSf5jMUydYg88xTmfhY/l2MmjknCsaWw03bdPVPD8yxCmwqNYhpug==
+X-Received: by 2002:a1c:20c3:: with SMTP id g186mr17436015wmg.15.1563264694251; 
+ Tue, 16 Jul 2019 01:11:34 -0700 (PDT)
 Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id c1sm37723879wrh.1.2019.07.16.01.11.28
+ by smtp.gmail.com with ESMTPSA id c1sm37723879wrh.1.2019.07.16.01.11.33
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 16 Jul 2019 01:11:29 -0700 (PDT)
+ Tue, 16 Jul 2019 01:11:33 -0700 (PDT)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Tue, 16 Jul 2019 10:11:08 +0200
-Message-Id: <1563264677-39718-11-git-send-email-pbonzini@redhat.com>
+Date: Tue, 16 Jul 2019 10:11:12 +0200
+Message-Id: <1563264677-39718-15-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1563264677-39718-1-git-send-email-pbonzini@redhat.com>
 References: <1563264677-39718-1-git-send-email-pbonzini@redhat.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::434
-Subject: [Qemu-devel] [PULL 10/19] Fix broken build with WHPX enabled
+X-Received-From: 2a00:1450:4864:20::344
+Subject: [Qemu-devel] [PULL 14/19] target/i386: sev: Do not unpin ram device
+ memory region
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,42 +90,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefan Weil <sw@weilnetz.de>
+Cc: Alex Williamson <alex.williamson@redhat.com>,
+ Brijesh Singh <brijesh.singh@amd.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Stefan Weil <sw@weilnetz.de>
+From: Alex Williamson <alex.williamson@redhat.com>
 
-Signed-off-by: Stefan Weil <sw@weilnetz.de>
-Message-Id: <20190712132611.20411-1-sw@weilnetz.de>
+The commit referenced below skipped pinning ram device memory when
+ram blocks are added, we need to do the same when they're removed.
+
+Cc: Brijesh Singh <brijesh.singh@amd.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Fixes: cedc0ad539af ("target/i386: sev: Do not pin the ram device memory region")
+Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+Message-Id: <156320087103.2556.10983987500488190423.stgit@gimli.home>
+Reviewed-by: Singh, Brijesh <brijesh.singh@amd.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- target/i386/whpx-all.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ target/i386/sev.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/target/i386/whpx-all.c b/target/i386/whpx-all.c
-index 31d4732..ed95105 100644
---- a/target/i386/whpx-all.c
-+++ b/target/i386/whpx-all.c
-@@ -1396,7 +1396,7 @@ static int whpx_accel_init(MachineState *ms)
-     }
+diff --git a/target/i386/sev.c b/target/i386/sev.c
+index 6dbdc3c..5ba1384 100644
+--- a/target/i386/sev.c
++++ b/target/i386/sev.c
+@@ -161,6 +161,17 @@ sev_ram_block_removed(RAMBlockNotifier *n, void *host, size_t size)
+ {
+     int r;
+     struct kvm_enc_region range;
++    ram_addr_t offset;
++    MemoryRegion *mr;
++
++    /*
++     * The RAM device presents a memory region that should be treated
++     * as IO region and should not have been pinned.
++     */
++    mr = memory_region_from_host(host, &offset);
++    if (mr && memory_region_is_ram_device(mr)) {
++        return;
++    }
  
-     memset(&prop, 0, sizeof(WHV_PARTITION_PROPERTY));
--    prop.ProcessorCount = smp_cpus;
-+    prop.ProcessorCount = ms->smp.cpus;
-     hr = whp_dispatch.WHvSetPartitionProperty(
-         whpx->partition,
-         WHvPartitionPropertyCodeProcessorCount,
-@@ -1405,7 +1405,7 @@ static int whpx_accel_init(MachineState *ms)
- 
-     if (FAILED(hr)) {
-         error_report("WHPX: Failed to set partition core count to %d,"
--                     " hr=%08lx", smp_cores, hr);
-+                     " hr=%08lx", ms->smp.cores, hr);
-         ret = -EINVAL;
-         goto error;
-     }
+     range.addr = (__u64)(unsigned long)host;
+     range.size = size;
 -- 
 1.8.3.1
 
