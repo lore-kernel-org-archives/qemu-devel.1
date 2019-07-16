@@ -2,90 +2,88 @@ Return-Path: <SRS0=+QfZ=VN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E2A3C76188
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 11:08:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2F24C76188
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 11:15:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 037242145D
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 11:08:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 037242145D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4F12C2173B
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 11:15:48 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S1D+MsrE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F12C2173B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47272 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47326 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnLJg-0003Wz-TK
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 07:08:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60316)
+	id 1hnLQx-0005Zl-Cf
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 07:15:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34308)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hnLJW-00034I-L9
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 07:08:07 -0400
+ (envelope-from <npiggin@gmail.com>) id 1hnLQj-00055D-Ut
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 07:15:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hnLJV-0003cx-Ob
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 07:08:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42096)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hnLJT-0003aM-Md; Tue, 16 Jul 2019 07:08:03 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 88E50308FED5;
- Tue, 16 Jul 2019 11:08:02 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.40.205.58])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id CFD5E1001925;
- Tue, 16 Jul 2019 11:07:55 +0000 (UTC)
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-References: <20190716000117.25219-1-jsnow@redhat.com>
- <20190716000117.25219-9-jsnow@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <68559e1e-e13b-efa9-1eb9-80004213774d@redhat.com>
-Date: Tue, 16 Jul 2019 13:07:53 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+ (envelope-from <npiggin@gmail.com>) id 1hnLQi-0000L1-KK
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 07:15:33 -0400
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:42214)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <npiggin@gmail.com>)
+ id 1hnLQi-0000KU-DU; Tue, 16 Jul 2019 07:15:32 -0400
+Received: by mail-pl1-x644.google.com with SMTP id ay6so9945234plb.9;
+ Tue, 16 Jul 2019 04:15:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:subject:to:cc:references:in-reply-to:mime-version
+ :user-agent:message-id:content-transfer-encoding;
+ bh=ei71zWO0pidwn+m9jKxK1nlgtuxyuyRxzmNG4G7BjBA=;
+ b=S1D+MsrEwCr/ieu3ZRndnSnEu7SfZXXHTyBAHJTnd1mQyRg7MqU/O9sd6AaYcg6mXK
+ 4oZahVSn6BtQzgjYLBbgyqso10jF1QPt34IWnjFhiUWbgad9pztRyaKuA5FmRDDZsYVl
+ uGjXMIQscIn0QkqA5NZTPSno2RrmeCI/Etpa6jvuSDRkpQrlDKYjcLAB/Cn5ILeMvpc4
+ 3ZNf+Eifq5zzMLBf3wCQtqXxGSQVN7X78zroI8SVG4tpEaCP452BqNS43mKvPPqSuVRl
+ zyV8tE6zSLcuSt4WCM6y5tqHTdioJ9CIVzmxqWmbOhY50zdf4+BtiZWypXXC0Xk15z4+
+ ds/A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:subject:to:cc:references:in-reply-to
+ :mime-version:user-agent:message-id:content-transfer-encoding;
+ bh=ei71zWO0pidwn+m9jKxK1nlgtuxyuyRxzmNG4G7BjBA=;
+ b=Wjcz9w5JSdgr5Asyb1/k5CtoX4sEOIwYFMIhm+bJ/s2gqiAmOJVbMW14QodLpaR6C0
+ Bi/amUe32s+Bx3s5AKMv5Z0ywMdJDqynrTGy9lmyyUomzxn0gpw+Gv4CGxvDlUnvgG5b
+ oWYdl75Hc72EGf7A2QhQBoXW0DmG1M479GBonoa9iUgbF2yGsUxu0uWFmqFaJ3RZ5C1u
+ lDY59zGH2eFlD2ts/l3gBEhCeDVAyCxLKJZuZDYX1j+6vdclmIxY7p/MYm+OOQ+CxQ6X
+ L9cCcXz+S1niAkOF+5/fpuKsC7NVMzdAJS0xuc05+G+xqSwE5FPCL4jA6KqNc2DcQH6l
+ F1Aw==
+X-Gm-Message-State: APjAAAWp0FY3vjNzlvDZ1snsSBUVr6RzqvfmuEoBC7U+8/3Mw3M2WpUs
+ UBsSCmHlRhF67ISSvrxyfCQ=
+X-Google-Smtp-Source: APXvYqyUyyD2vPZ65j1fjhOz7b6ZzgP94sZS4BYoiONlRE29I4ETJLF3ekeojA5AQlDGbzVm9V6Knw==
+X-Received: by 2002:a17:902:e582:: with SMTP id
+ cl2mr34741143plb.60.1563275730584; 
+ Tue, 16 Jul 2019 04:15:30 -0700 (PDT)
+Received: from localhost ([203.220.8.141])
+ by smtp.gmail.com with ESMTPSA id r9sm28465842pjq.3.2019.07.16.04.15.29
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Tue, 16 Jul 2019 04:15:29 -0700 (PDT)
+Date: Tue, 16 Jul 2019 21:15:23 +1000
+From: Nicholas Piggin <npiggin@gmail.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+References: <20190716024726.17864-1-npiggin@gmail.com>
+ <20190716024726.17864-6-npiggin@gmail.com>
+ <20190716083047.GG7525@umbus.fritz.box>
+In-Reply-To: <20190716083047.GG7525@umbus.fritz.box>
 MIME-Version: 1.0
-In-Reply-To: <20190716000117.25219-9-jsnow@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="wNY0vRpI4oyjD6D67Tg8MrXdvpG4or3Zh"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Tue, 16 Jul 2019 11:08:02 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 08/11] block/backup: add
- backup_is_cluster_allocated
+User-Agent: astroid/0.14.0 (https://github.com/astroidmail/astroid)
+Message-Id: <1563272743.gip4xrq099.astroid@bobo.none>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::644
+Subject: Re: [Qemu-devel] [PATCH v4 5/5] spapr: Implement ibm,suspend-me
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,68 +95,177 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com,
- Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org,
+ =?iso-8859-1?q?C=E9dric?= Le Goater <clg@kaod.org>, Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---wNY0vRpI4oyjD6D67Tg8MrXdvpG4or3Zh
-Content-Type: multipart/mixed; boundary="2cFIu7pIdUWOoAC2fZl0I7NHoMfozWZe7";
- protected-headers="v1"
-From: Max Reitz <mreitz@redhat.com>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
- vsementsov@virtuozzo.com, Markus Armbruster <armbru@redhat.com>
-Message-ID: <68559e1e-e13b-efa9-1eb9-80004213774d@redhat.com>
-Subject: Re: [PATCH v2 08/11] block/backup: add backup_is_cluster_allocated
-References: <20190716000117.25219-1-jsnow@redhat.com>
- <20190716000117.25219-9-jsnow@redhat.com>
-In-Reply-To: <20190716000117.25219-9-jsnow@redhat.com>
-
---2cFIu7pIdUWOoAC2fZl0I7NHoMfozWZe7
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 16.07.19 02:01, John Snow wrote:
-> Modify the existing bdrv_is_unallocated_range to utilize the pnum retur=
-n
-> from bdrv_is_allocated; optionally returning a full number of clusters
-> that share the same allocation status.
+David Gibson's on July 16, 2019 6:30 pm:
+> On Tue, Jul 16, 2019 at 12:47:26PM +1000, Nicholas Piggin wrote:
+>> This has been useful to modify and test the Linux pseries suspend
+>> code but it requires modification to the guest to call it (due to
+>> being gated by other unimplemented features). It is not otherwise
+>> used by Linux yet, but work is slowly progressing there.
+>>=20
+>> This allows a (lightly modified) guest kernel to suspend with
+>> `echo mem > /sys/power/state` and be resumed with system_wakeup
+>> monitor command.
+>>=20
+>> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+>> ---
+>>  hw/ppc/spapr.c         | 26 ++++++++++++++++++++++++++
+>>  hw/ppc/spapr_rtas.c    | 32 ++++++++++++++++++++++++++++++++
+>>  include/hw/ppc/spapr.h |  7 ++++++-
+>>  3 files changed, 64 insertions(+), 1 deletion(-)
+>>=20
+>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+>> index 5c54e1cb9a..b85d41bb1e 100644
+>> --- a/hw/ppc/spapr.c
+>> +++ b/hw/ppc/spapr.c
+>> @@ -1710,6 +1710,11 @@ static void spapr_machine_reset(MachineState *mac=
+hine)
+>>      void *fdt;
+>>      int rc;
+>> =20
+>> +    if (spapr->suspend_reset) {
+>> +        spapr->suspend_reset =3D false;
 >=20
-> This will be used to carefully toggle bits in the bitmap for sync=3Dtop=
+> Do we need to migrate this value?
 
-> initialization in the following commits.
+I suppose we do if we can migrate a suspended machine?
+
 >=20
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> ---
->  block/backup.c | 62 +++++++++++++++++++++++++++++++++++---------------=
+>> +        return;
+>> +    }
+>> +
+>>      spapr_caps_apply(spapr);
+>> =20
+>>      first_ppc_cpu =3D POWERPC_CPU(first_cpu);
+>> @@ -2721,6 +2726,23 @@ static PCIHostState *spapr_create_default_phb(voi=
+d)
+>>      return PCI_HOST_BRIDGE(dev);
+>>  }
+>> =20
+>> +static Notifier wakeup;
+>=20
+> I think this should be in sPAPRMachineState rather than global.
 
->  1 file changed, 44 insertions(+), 18 deletions(-)
+Sure.
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+>=20
+>> +static void spapr_notify_wakeup(Notifier *notifier, void *data)
+>> +{
+>> +    WakeupReason *reason =3D data;
+>> +
+>> +    switch (*reason) {
+>> +    case QEMU_WAKEUP_REASON_RTC:
+>> +        break;
+>> +    case QEMU_WAKEUP_REASON_PMTIMER:
+>> +        break;
+>> +    case QEMU_WAKEUP_REASON_OTHER:
+>> +        break;
+>> +    default:
+>> +        break;
+>> +    }
+>=20
+> So.. you have a bunch of switch cases, all of which ignore the input..
 
+Yeah I kind of just copy and pasted I think. This part of the patch
+may not have been quite as cooked as I remembered :\
 
---2cFIu7pIdUWOoAC2fZl0I7NHoMfozWZe7--
+>> +}
+>> +
+>>  /* pSeries LPAR / sPAPR hardware init */
+>>  static void spapr_machine_init(MachineState *machine)
+>>  {
+>> @@ -3078,6 +3100,10 @@ static void spapr_machine_init(MachineState *mach=
+ine)
+>> =20
+>>      qemu_register_boot_set(spapr_boot_set, spapr);
+>> =20
+>> +    wakeup.notify =3D spapr_notify_wakeup;
+>> +    qemu_register_wakeup_notifier(&wakeup);
+>> +    qemu_register_wakeup_support();
+>> +
+>>      if (kvm_enabled()) {
+>>          /* to stop and start vmclock */
+>>          qemu_add_vm_change_state_handler(cpu_ppc_clock_vm_state_change,
+>> diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
+>> index a618a2ac0f..60a007ec38 100644
+>> --- a/hw/ppc/spapr_rtas.c
+>> +++ b/hw/ppc/spapr_rtas.c
+>> @@ -216,6 +216,36 @@ static void rtas_stop_self(PowerPCCPU *cpu, SpaprMa=
+chineState *spapr,
+>>      qemu_cpu_kick(cs);
+>>  }
+>> =20
+>> +static void rtas_ibm_suspend_me(PowerPCCPU *cpu, SpaprMachineState *spa=
+pr,
+>> +                           uint32_t token, uint32_t nargs,
+>> +                           target_ulong args,
+>> +                           uint32_t nret, target_ulong rets)
+>> +{
+>> +    CPUState *cs;
+>> +
+>> +    if (nargs !=3D 0 || nret !=3D 1) {
+>> +        rtas_st(rets, 0, RTAS_OUT_PARAM_ERROR);
+>> +        return;
+>> +    }
+>> +
+>> +    CPU_FOREACH(cs) {
+>> +        PowerPCCPU *c =3D POWERPC_CPU(cs);
+>> +        CPUPPCState *e =3D &c->env;
+>> +        if (c =3D=3D cpu)
+>> +            continue;
+>> +
+>> +	/* See h_join */
+>> +        if (!cs->halted || (e->msr & (1ULL << MSR_EE))) {
+>> +            rtas_st(rets, 0, H_MULTI_THREADS_ACTIVE);
+>> +            return;
+>> +        }
+>> +    }
+>> +
+>> +    spapr->suspend_reset =3D true;
+>> +    qemu_system_suspend_request();
+>> +    rtas_st(rets, 0, RTAS_OUT_SUCCESS);
+>> +}
+>> +
+>>  static inline int sysparm_st(target_ulong addr, target_ulong len,
+>>                               const void *val, uint16_t vallen)
+>>  {
+>> @@ -483,6 +513,8 @@ static void core_rtas_register_types(void)
+>>                          rtas_query_cpu_stopped_state);
+>>      spapr_rtas_register(RTAS_START_CPU, "start-cpu", rtas_start_cpu);
+>>      spapr_rtas_register(RTAS_STOP_SELF, "stop-self", rtas_stop_self);
+>> +    spapr_rtas_register(RTAS_IBM_SUSPEND_ME, "ibm,suspend-me",
+>> +                        rtas_ibm_suspend_me);
+>>      spapr_rtas_register(RTAS_IBM_GET_SYSTEM_PARAMETER,
+>>                          "ibm,get-system-parameter",
+>>                          rtas_ibm_get_system_parameter);
+>> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+>> index 5d36eec9d0..df0b0c15da 100644
+>> --- a/include/hw/ppc/spapr.h
+>> +++ b/include/hw/ppc/spapr.h
+>> @@ -171,6 +171,10 @@ struct SpaprMachineState {
+>>      bool use_hotplug_event_source;
+>>      SpaprEventSource *event_sources;
+>> =20
+>> +    /* Machine has been suspended, so the next machine_reset should not
+>> +     * reset state, but just return and allow execution to resume. */
+>> +    bool suspend_reset;
+>=20
+> Hrm, this seems odd, but maybe it's part of the existing suspend
+> design.  Why would system_reset resume a suspend, rather than having a
+> specific operation for that.
 
---wNY0vRpI4oyjD6D67Tg8MrXdvpG4or3Zh
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+It is where `system_wakeup` cmd pops out, via qemu_system_reset,
+main_loop_should_exit. I'm not sure if we have any existing state
+we can use. runstate_is_running() doesn't seem to work because of
+CAS I guess (maybe CAS is what makes spapr so much different from
+x86 in terms of resetting the world here?)
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0tsAkACgkQ9AfbAGHV
-z0Cl3Qf9H9F43l3YDXD92BgnCVCu3tWBccGb3JwtEgVzLae+A8V4872FEpB8G22D
-vQ6C9ISIpRdHsnNqddCm1UnW6ov+u1IXGBCBxoj9eEZg39X2OJuLDOqXGyHK3H4e
-G7FMPvITTT3uexYmJpUj4jnV0xadxkcWLIJ/0uM7gtmZ+0e8XD0QseYQIwqA3BZf
-73ZNNJhIKfuuOGijdMskzir5Z+xM1EjbYs9w0mYv7M+lKkcBAtBiQpXaC+PhZv3E
-49JEUxo3qCl3QQ4n6CgaWR4wvpn1omulxGgiYeWGYTdoOK6SkWsqafpixagg6R4T
-UZJfzUAZ2iD2AiFJC0MINt4ZWU35aQ==
-=vlHu
------END PGP SIGNATURE-----
-
---wNY0vRpI4oyjD6D67Tg8MrXdvpG4or3Zh--
+Thanks,
+Nick
+=
 
