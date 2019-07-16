@@ -2,87 +2,90 @@ Return-Path: <SRS0=+QfZ=VN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C741AC76188
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 10:26:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80E8AC76188
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 10:33:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A011920880
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 10:26:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A011920880
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 54F4A2145D
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 10:33:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54F4A2145D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47014 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47074 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnKf4-00008o-TK
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 06:26:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47015)
+	id 1hnKmD-0002QZ-Bk
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 06:33:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49355)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <yi.l.liu@intel.com>) id 1hnKet-00087t-6o
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 06:26:08 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hnKm1-00021W-NZ
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 06:33:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yi.l.liu@intel.com>) id 1hnKer-0001EF-QR
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 06:26:07 -0400
-Received: from mga09.intel.com ([134.134.136.24]:19623)
+ (envelope-from <mreitz@redhat.com>) id 1hnKlz-0007NJ-Ab
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 06:33:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48504)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1hnKer-0001BM-Fc
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 06:26:05 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
- by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 16 Jul 2019 03:26:01 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.63,498,1557212400"; d="scan'208";a="194841602"
-Received: from fmsmsx105.amr.corp.intel.com ([10.18.124.203])
- by fmsmga002.fm.intel.com with ESMTP; 16 Jul 2019 03:26:00 -0700
-Received: from fmsmsx604.amr.corp.intel.com (10.18.126.84) by
- FMSMSX105.amr.corp.intel.com (10.18.124.203) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Tue, 16 Jul 2019 03:26:00 -0700
-Received: from fmsmsx604.amr.corp.intel.com (10.18.126.84) by
- fmsmsx604.amr.corp.intel.com (10.18.126.84) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Tue, 16 Jul 2019 03:25:57 -0700
-Received: from shsmsx102.ccr.corp.intel.com (10.239.4.154) by
- fmsmsx604.amr.corp.intel.com (10.18.126.84) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1713.5
- via Frontend Transport; Tue, 16 Jul 2019 03:25:56 -0700
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.110]) by
- shsmsx102.ccr.corp.intel.com ([169.254.2.3]) with mapi id 14.03.0439.000;
- Tue, 16 Jul 2019 18:25:55 +0800
-From: "Liu, Yi L" <yi.l.liu@intel.com>
-To: David Gibson <david@gibson.dropbear.id.au>
-Thread-Topic: [RFC v1 05/18] vfio/pci: add pasid alloc/free implementation
-Thread-Index: AQHVM+ylZdJ7a+KBXU2HFFh5qj+Ya6bKg4OAgAJ3NWA=
-Date: Tue, 16 Jul 2019 10:25:55 +0000
-Message-ID: <A2975661238FB949B60364EF0F2C25743A00D8BB@SHSMSX104.ccr.corp.intel.com>
-References: <1562324511-2910-1-git-send-email-yi.l.liu@intel.com>
- <1562324511-2910-6-git-send-email-yi.l.liu@intel.com>
- <20190715025519.GE3440@umbus.fritz.box>
-In-Reply-To: <20190715025519.GE3440@umbus.fritz.box>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.0.600.7
-dlp-reaction: no-action
-x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiNjY5YTdiNTgtOGIxMi00ZmRlLWFiNDktYTNmZWZkOTAwYWFiIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiZ21mRWlwNUcxbVFkSXlkczZmdjRnMlRKZlhTSCtqcGRna3hsaVdiQTgydVhkRk9pMFpxSUJLdElGXC83ZjBFMkgifQ==
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1hnKlq-0007FA-IG; Tue, 16 Jul 2019 06:33:19 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 709043001757;
+ Tue, 16 Jul 2019 10:33:17 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.40.205.58])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8A73860C05;
+ Tue, 16 Jul 2019 10:33:11 +0000 (UTC)
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+References: <20190716000117.25219-1-jsnow@redhat.com>
+ <20190716000117.25219-4-jsnow@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <750c55d7-0a9e-a6d5-4ed3-5350174e5e5f@redhat.com>
+Date: Tue, 16 Jul 2019 12:33:09 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 134.134.136.24
-Subject: Re: [Qemu-devel] [RFC v1 05/18] vfio/pci: add pasid alloc/free
- implementation
+In-Reply-To: <20190716000117.25219-4-jsnow@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="R8nGpkfYg8GPCnS0S23JPuLWDVEekgOr2"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.46]); Tue, 16 Jul 2019 10:33:17 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2 03/11] iotests/257: Refactor backup
+ helpers
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,148 +97,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Tian, Kevin" <kevin.tian@intel.com>,
- Jacob Pan <jacob.jun.pan@linux.intel.com>, Yi Sun <yi.y.sun@linux.intel.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mst@redhat.com" <mst@redhat.com>,
- "Tian, Jun J" <jun.j.tian@intel.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "peterx@redhat.com" <peterx@redhat.com>,
- "eric.auger@redhat.com" <eric.auger@redhat.com>,
- "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>, "Sun, Yi Y" <yi.y.sun@intel.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com,
+ Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> From: kvm-owner@vger.kernel.org [mailto:kvm-owner@vger.kernel.org] On Beh=
-alf
-> Of David Gibson
-> Sent: Monday, July 15, 2019 10:55 AM
-> To: Liu, Yi L <yi.l.liu@intel.com>
-> Subject: Re: [RFC v1 05/18] vfio/pci: add pasid alloc/free implementation
->=20
-> On Fri, Jul 05, 2019 at 07:01:38PM +0800, Liu Yi L wrote:
-> > This patch adds vfio implementation PCIPASIDOps.alloc_pasid/free_pasid(=
-).
-> > These two functions are used to propagate guest pasid allocation and
-> > free requests to host via vfio container ioctl.
->=20
-> As I said in an earlier comment, I think doing this on the device is
-> conceptually incorrect.  I think we need an explcit notion of an SVM
-> context (i.e. the namespace in which all the PASIDs live) - which will
-> IIUC usually be shared amongst multiple devices.  The create and free
-> PASID requests should be on that object.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--R8nGpkfYg8GPCnS0S23JPuLWDVEekgOr2
+Content-Type: multipart/mixed; boundary="7yWS5VriEsYFZ3qvKNQ8QP2s6JcsEyYji";
+ protected-headers="v1"
+From: Max Reitz <mreitz@redhat.com>
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
+ vsementsov@virtuozzo.com, Markus Armbruster <armbru@redhat.com>
+Message-ID: <750c55d7-0a9e-a6d5-4ed3-5350174e5e5f@redhat.com>
+Subject: Re: [PATCH v2 03/11] iotests/257: Refactor backup helpers
+References: <20190716000117.25219-1-jsnow@redhat.com>
+ <20190716000117.25219-4-jsnow@redhat.com>
+In-Reply-To: <20190716000117.25219-4-jsnow@redhat.com>
 
-Actually, the allocation is not doing on this device. System wide, it is
-done on a container. So not sure if it is the API interface gives you a
-sense that this is done on device. Also, curious on the SVM context
-concept, do you mean it a per-VM context or a per-SVM usage context?
-May you elaborate a little more. :-)
+--7yWS5VriEsYFZ3qvKNQ8QP2s6JcsEyYji
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-Thanks,
-Yi Liu
-
-> >
-> > Cc: Kevin Tian <kevin.tian@intel.com>
-> > Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> > Cc: Peter Xu <peterx@redhat.com>
-> > Cc: Eric Auger <eric.auger@redhat.com>
-> > Cc: Yi Sun <yi.y.sun@linux.intel.com>
-> > Cc: David Gibson <david@gibson.dropbear.id.au>
-> > Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
-> > Signed-off-by: Yi Sun <yi.y.sun@linux.intel.com>
-> > ---
-> >  hw/vfio/pci.c | 61
-> +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-> >  1 file changed, 61 insertions(+)
-> >
-> > diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-> > index ce3fe96..ab184ad 100644
-> > --- a/hw/vfio/pci.c
-> > +++ b/hw/vfio/pci.c
-> > @@ -2690,6 +2690,65 @@ static void vfio_unregister_req_notifier(VFIOPCI=
-Device
-> *vdev)
-> >      vdev->req_enabled =3D false;
-> >  }
-> >
-> > +static int vfio_pci_device_request_pasid_alloc(PCIBus *bus,
-> > +                                               int32_t devfn,
-> > +                                               uint32_t min_pasid,
-> > +                                               uint32_t max_pasid)
-> > +{
-> > +    PCIDevice *pdev =3D bus->devices[devfn];
-> > +    VFIOPCIDevice *vdev =3D DO_UPCAST(VFIOPCIDevice, pdev, pdev);
-> > +    VFIOContainer *container =3D vdev->vbasedev.group->container;
-> > +    struct vfio_iommu_type1_pasid_request req;
-> > +    unsigned long argsz;
-> > +    int pasid;
-> > +
-> > +    argsz =3D sizeof(req);
-> > +    req.argsz =3D argsz;
-> > +    req.flag =3D VFIO_IOMMU_PASID_ALLOC;
-> > +    req.min_pasid =3D min_pasid;
-> > +    req.max_pasid =3D max_pasid;
-> > +
-> > +    rcu_read_lock();
-> > +    pasid =3D ioctl(container->fd, VFIO_IOMMU_PASID_REQUEST, &req);
-> > +    if (pasid < 0) {
-> > +        error_report("vfio_pci_device_request_pasid_alloc:"
-> > +                     " request failed, contanier: %p", container);
-> > +    }
-> > +    rcu_read_unlock();
-> > +    return pasid;
-> > +}
-> > +
-> > +static int vfio_pci_device_request_pasid_free(PCIBus *bus,
-> > +                                              int32_t devfn,
-> > +                                              uint32_t pasid)
-> > +{
-> > +    PCIDevice *pdev =3D bus->devices[devfn];
-> > +    VFIOPCIDevice *vdev =3D DO_UPCAST(VFIOPCIDevice, pdev, pdev);
-> > +    VFIOContainer *container =3D vdev->vbasedev.group->container;
-> > +    struct vfio_iommu_type1_pasid_request req;
-> > +    unsigned long argsz;
-> > +    int ret =3D 0;
-> > +
-> > +    argsz =3D sizeof(req);
-> > +    req.argsz =3D argsz;
-> > +    req.flag =3D VFIO_IOMMU_PASID_FREE;
-> > +    req.pasid =3D pasid;
-> > +
-> > +    rcu_read_lock();
-> > +    ret =3D ioctl(container->fd, VFIO_IOMMU_PASID_REQUEST, &req);
-> > +    if (ret !=3D 0) {
-> > +        error_report("vfio_pci_device_request_pasid_free:"
-> > +                     " request failed, contanier: %p", container);
-> > +    }
-> > +    rcu_read_unlock();
-> > +    return ret;
-> > +}
-> > +
-> > +static PCIPASIDOps vfio_pci_pasid_ops =3D {
-> > +    .alloc_pasid =3D vfio_pci_device_request_pasid_alloc,
-> > +    .free_pasid =3D vfio_pci_device_request_pasid_free,
-> > +};
-> > +
-> >  static void vfio_realize(PCIDevice *pdev, Error **errp)
-> >  {
-> >      VFIOPCIDevice *vdev =3D PCI_VFIO(pdev);
-> > @@ -2991,6 +3050,8 @@ static void vfio_realize(PCIDevice *pdev, Error *=
-*errp)
-> >      vfio_register_req_notifier(vdev);
-> >      vfio_setup_resetfn_quirk(vdev);
-> >
-> > +    pci_setup_pasid_ops(pdev, &vfio_pci_pasid_ops);
-> > +
-> >      return;
-> >
-> >  out_teardown:
+On 16.07.19 02:01, John Snow wrote:
+> This test needs support for non-bitmap backups and missing or
+> unspecified bitmap sync modes, so rewrite the helpers to be a little
+> more generic.
 >=20
-> --
-> David Gibson			| I'll have my music baroque, and my code
-> david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other=
-_
-> 				| _way_ _around_!
-> http://www.ozlabs.org/~dgibson
+> Signed-off-by: John Snow <jsnow@redhat.com>
+> ---
+>  tests/qemu-iotests/257     |  56 ++++++-----
+>  tests/qemu-iotests/257.out | 192 ++++++++++++++++++-------------------=
+
+>  2 files changed, 128 insertions(+), 120 deletions(-)
+
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+
+
+--7yWS5VriEsYFZ3qvKNQ8QP2s6JcsEyYji--
+
+--R8nGpkfYg8GPCnS0S23JPuLWDVEekgOr2
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0tp+UACgkQ9AfbAGHV
+z0B/GAf8CSb1Kg3r98qlWiLctaJ7+fHnuEweVyUPFjqq8OtNk1qzmz6IXIiuDMJB
+kxJ6W16lljqt7nQIhUgKVoCuFDftKw7r0h3Gp+BpdxaGBxookbOWL5t2JqniD9Cp
+IQf7oSZqaqfDg2xaZ+gzc0UCKztKvGFoeC1pHN/f6jLyt3vGxJN7vYk1mO0TAQnz
+TbV/guN2VOKWeTRiMczeEeMZvYYhCJOQx54wBa18VoHdQCkREdeQiK8POUWIfpjL
+6kMLOEQLwVemybdfBmpQ5Al8jJSymH2P+cGkCqp8+aDb/uZxriFwRzLODZ+ESWsk
+6K8yzkuDq3LB8CHNrncjRo51ns2uJw==
+=ppy6
+-----END PGP SIGNATURE-----
+
+--R8nGpkfYg8GPCnS0S23JPuLWDVEekgOr2--
 
