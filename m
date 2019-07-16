@@ -2,89 +2,90 @@ Return-Path: <SRS0=+QfZ=VN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C523C76195
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 11:02:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E2A3C76188
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 11:08:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3F0152173B
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 11:02:57 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Okf3mvEU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F0152173B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 037242145D
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 11:08:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 037242145D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47242 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47272 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnLEW-00017A-Aa
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 07:02:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58631)
+	id 1hnLJg-0003Wz-TK
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 07:08:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60316)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hnLEE-0000NB-6a
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 07:02:39 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hnLJW-00034I-L9
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 07:08:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hnLED-0006z2-5T
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 07:02:38 -0400
-Received: from mail-wr1-x42a.google.com ([2a00:1450:4864:20::42a]:43160)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hnLEC-0006yE-U6
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 07:02:37 -0400
-Received: by mail-wr1-x42a.google.com with SMTP id p13so20420198wru.10
- for <qemu-devel@nongnu.org>; Tue, 16 Jul 2019 04:02:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=uCxvwRf0zmjRkSLeCfxV8X0vFoSit2gTQJPmCMs82IM=;
- b=Okf3mvEU9cNLis5MwkStH5924vr/c5qozsOpk3LV5xLT4ib/meNgsrD1CkLl1p3feH
- Kyv17J8OkpRt9INXhI3pFrNx4udvZzA7Cf1s0Q0YRkN2BxRTZy7FuOdcfTt7daEbfGWM
- 2MjbfKBD+24vOLcN4nKG3wKteYvRpoXBBzfxFWbzH4Skz0k9i87aUQ/0cwtIR2GJmz+h
- lB16XytWvXHh+9PK8k+7w158tvVpj6BwJ+LCZvgGb4MfcMzObCPCNwyraboxADHEK6yI
- 3tAT9IN4/QeZ/5RZdXTnN/JnC2ZhcmGKV6tm8JmcRdKtygADa21Xs9u4UZF3NbFvYvT9
- b84w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=uCxvwRf0zmjRkSLeCfxV8X0vFoSit2gTQJPmCMs82IM=;
- b=oeo8AB+BdaYsbB2Y6w5zVeTP+BS5dGwU1FmmXwHssziS53dLKLWf2j0+H8+UN6OcBv
- NQ7JEMq5oH0JrmERVa08gv5LpvO8xDow70lVDpS+Ag6ZFY6P/HnUNb4unplhdxocA3Q8
- r1OZFJrJOlK/pYXtCsZ+Ee/T2TfyGgMaPc/qf4g42BiDB1hqLcAz7P0Jge4vF73nduGs
- t9pE9Ec40cBArl22nVcAtqaIr9Rf/2S7gGFz+NaYsB45FjasfChq8So/kcHJbmR5jQoR
- 8MUI4fP/rs7yke5Oz27bboWuyK0kbfj45FtsAYJjU81bhOqAUd83g13k08+HZOHZzX+K
- aUkw==
-X-Gm-Message-State: APjAAAWV+zyFgAormlbxbAW73QBMjDULrokRy7qTKpLLHAEs+ocClIq9
- 71eefXDFSkuYHNXXluCG2jKxMA==
-X-Google-Smtp-Source: APXvYqymhpFy26WsrvFSXLEklx0lkkdyKuGrrrx8eGFu5Zetfhi1S9joB6cG1FVdOQUpKLFxes/Nyw==
-X-Received: by 2002:adf:ed41:: with SMTP id u1mr34014283wro.162.1563274955436; 
- Tue, 16 Jul 2019 04:02:35 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id x11sm14759752wmi.26.2019.07.16.04.02.34
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Tue, 16 Jul 2019 04:02:34 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 2CE791FF87;
- Tue, 16 Jul 2019 12:02:34 +0100 (BST)
-References: <20190715174817.18981-1-philmd@redhat.com>
-User-agent: mu4e 1.3.3; emacs 26.1
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-In-reply-to: <20190715174817.18981-1-philmd@redhat.com>
-Date: Tue, 16 Jul 2019 12:02:34 +0100
-Message-ID: <87d0iautrp.fsf@zen.linaroharston>
+ (envelope-from <mreitz@redhat.com>) id 1hnLJV-0003cx-Ob
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 07:08:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42096)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1hnLJT-0003aM-Md; Tue, 16 Jul 2019 07:08:03 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 88E50308FED5;
+ Tue, 16 Jul 2019 11:08:02 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.40.205.58])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id CFD5E1001925;
+ Tue, 16 Jul 2019 11:07:55 +0000 (UTC)
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+References: <20190716000117.25219-1-jsnow@redhat.com>
+ <20190716000117.25219-9-jsnow@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <68559e1e-e13b-efa9-1eb9-80004213774d@redhat.com>
+Date: Tue, 16 Jul 2019 13:07:53 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::42a
-Subject: Re: [Qemu-devel] [PATCH-for-4.1 v2 0/9] tests/docker: Debian & MXE
- fixes
+In-Reply-To: <20190716000117.25219-9-jsnow@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="wNY0vRpI4oyjD6D67Tg8MrXdvpG4or3Zh"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.49]); Tue, 16 Jul 2019 11:08:02 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2 08/11] block/backup: add
+ backup_is_cluster_allocated
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,54 +97,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
- Stefan Weil <sw@weilnetz.de>, Helge Deller <deller@gmx.de>,
- Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- qemu-ppc@nongnu.org,
- =?utf-8?Q?C?= =?utf-8?Q?=C3=A9dric?= Le Goater <clg@kaod.org>,
- Richard Henderson <rth@twiddle.net>, Laszlo Ersek <lersek@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com,
+ Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--wNY0vRpI4oyjD6D67Tg8MrXdvpG4or3Zh
+Content-Type: multipart/mixed; boundary="2cFIu7pIdUWOoAC2fZl0I7NHoMfozWZe7";
+ protected-headers="v1"
+From: Max Reitz <mreitz@redhat.com>
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
+ vsementsov@virtuozzo.com, Markus Armbruster <armbru@redhat.com>
+Message-ID: <68559e1e-e13b-efa9-1eb9-80004213774d@redhat.com>
+Subject: Re: [PATCH v2 08/11] block/backup: add backup_is_cluster_allocated
+References: <20190716000117.25219-1-jsnow@redhat.com>
+ <20190716000117.25219-9-jsnow@redhat.com>
+In-Reply-To: <20190716000117.25219-9-jsnow@redhat.com>
 
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+--2cFIu7pIdUWOoAC2fZl0I7NHoMfozWZe7
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-> Few more patches to be able to MXE-build the NSIS installers.
->
-> The Fedora kludge is not meant for merge, but might be useful to
-> test this series.
+On 16.07.19 02:01, John Snow wrote:
+> Modify the existing bdrv_is_unallocated_range to utilize the pnum retur=
+n
+> from bdrv_is_allocated; optionally returning a full number of clusters
+> that share the same allocation status.
+>=20
+> This will be used to carefully toggle bits in the bitmap for sync=3Dtop=
 
-Queued to 2-9 to testing/next, thanks.
+> initialization in the following commits.
+>=20
+> Signed-off-by: John Snow <jsnow@redhat.com>
+> ---
+>  block/backup.c | 62 +++++++++++++++++++++++++++++++++++---------------=
 
->
-> Based-on: 20190712111849.9006-1-alex.bennee@linaro.org
-> https://lists.gnu.org/archive/html/qemu-devel/2019-07/msg03014.html
->
-> Philippe Mathieu-Daud=C3=A9 (9):
->   tests/docker: Kludge to build the Fedora image
->   tests/docker: Install Sphinx in the Debian images
->   tests/docker: Install the NSIS tools in the MinGW capable images
->   tests/docker: Set the correct cross-PKG_CONFIG_PATH in the MXE images
->   tests/docker: Install texinfo in the Fedora image
->   buildsys: The NSIS Windows build requires the documentation installed
->   buildsys: The NSIS Windows build requires qemu-nsis.bmp installed
->   tests/docker: Let the test-mingw test generate a NSIS installer
->   NSIS: Add missing firmware blobs
->
->  Makefile                                           | 3 ++-
->  qemu.nsi                                           | 3 +++
->  tests/docker/dockerfiles/debian-win32-cross.docker | 6 ++++++
->  tests/docker/dockerfiles/debian-win64-cross.docker | 6 ++++++
->  tests/docker/dockerfiles/debian10.docker           | 1 +
->  tests/docker/dockerfiles/debian9.docker            | 1 +
->  tests/docker/dockerfiles/fedora.docker             | 5 ++++-
->  tests/docker/test-mingw                            | 1 +
->  8 files changed, 24 insertions(+), 2 deletions(-)
+>  1 file changed, 44 insertions(+), 18 deletions(-)
+
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 
---
-Alex Benn=C3=A9e
+--2cFIu7pIdUWOoAC2fZl0I7NHoMfozWZe7--
+
+--wNY0vRpI4oyjD6D67Tg8MrXdvpG4or3Zh
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0tsAkACgkQ9AfbAGHV
+z0Cl3Qf9H9F43l3YDXD92BgnCVCu3tWBccGb3JwtEgVzLae+A8V4872FEpB8G22D
+vQ6C9ISIpRdHsnNqddCm1UnW6ov+u1IXGBCBxoj9eEZg39X2OJuLDOqXGyHK3H4e
+G7FMPvITTT3uexYmJpUj4jnV0xadxkcWLIJ/0uM7gtmZ+0e8XD0QseYQIwqA3BZf
+73ZNNJhIKfuuOGijdMskzir5Z+xM1EjbYs9w0mYv7M+lKkcBAtBiQpXaC+PhZv3E
+49JEUxo3qCl3QQ4n6CgaWR4wvpn1omulxGgiYeWGYTdoOK6SkWsqafpixagg6R4T
+UZJfzUAZ2iD2AiFJC0MINt4ZWU35aQ==
+=vlHu
+-----END PGP SIGNATURE-----
+
+--wNY0vRpI4oyjD6D67Tg8MrXdvpG4or3Zh--
 
