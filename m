@@ -7,78 +7,81 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97974C76192
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 08:12:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EFDE9C76195
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 08:12:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 662E82145D
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 08:12:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BE26C2145D
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 08:12:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WUIUjWob"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 662E82145D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G7G7Vr+1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE26C2145D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46152 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46156 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnIZo-0004NA-1x
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 04:12:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60102)
+	id 1hnIZv-0004zy-Fb
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 04:12:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59894)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <paolo.bonzini@gmail.com>) id 1hnIYk-0000IG-81
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 04:11:39 -0400
+ (envelope-from <paolo.bonzini@gmail.com>) id 1hnIYc-0008AM-6D
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 04:11:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1hnIYi-0003MC-MP
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 04:11:38 -0400
-Received: from mail-wm1-x334.google.com ([2a00:1450:4864:20::334]:40710)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1hnIYa-0003F8-TD
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 04:11:30 -0400
+Received: from mail-wr1-x433.google.com ([2a00:1450:4864:20::433]:46510)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1hnIYi-0003Jh-D7
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 04:11:36 -0400
-Received: by mail-wm1-x334.google.com with SMTP id v19so17670155wmj.5
- for <qemu-devel@nongnu.org>; Tue, 16 Jul 2019 01:11:36 -0700 (PDT)
+ id 1hnIYa-0003Dr-Iy
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 04:11:28 -0400
+Received: by mail-wr1-x433.google.com with SMTP id z1so19805354wru.13
+ for <qemu-devel@nongnu.org>; Tue, 16 Jul 2019 01:11:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:subject:date:message-id:in-reply-to:references;
- bh=KIJAmLbllmYJ3+/5atxAnv6JwBGCasb1tyGUjSZJRAI=;
- b=WUIUjWobFWPjdMXAG844rOO9ELRCyAlMZbq2nq2qN4/NtmCl/pVVP6HQ2xWi48FvaY
- 87mgputi8vcvt15JtSVQdNObZtjFBNBob+tjmJMg2WGeghrQ2TDutgYT9UdeYiS9xwfj
- MEXub1Sr/NUfTXwWZCZlpjNrZRXAlK6RXst4KkLZulFnZ6QWVNAYaEd6zZyDm9jWD/BF
- S40kB32h96R5D5bV/ToI/iWGdQADcMr17Hs67ZlEcqAYvy++INOljNZUPlaEsi087qUC
- uSjOl8FWG8bLBxkdf718tQH7uljfKUWAVVwLOLe4Imsl5tdz5W/9R5jxCbDww6aZgZgq
- 5s1A==
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=Uzf2A9RIPGCOKfkWZQp0qQsgDZ85Q4jENmEVZz/U6uE=;
+ b=G7G7Vr+1TGUVJbCd3aYKeTfbPQv/GD4WFbonGf8+VxcKVRTWLSWMvUruKojcl/FM4R
+ +qB+VlIqRIG2+Ur0qxVjpTjLrmFwWjPtkhOxvyxJVaA7iC1Svs4pyp/BxgKCQFCT1Lf5
+ m8J9Vt69Nr+iMfm/PwGLrvq7PymgQo7RLLHmH33ik77wa/Z8Tn5qrMRe8CUdBiQoHXxl
+ V8LtCA1OSVque5vj7Vhiey/MsIBeUTwW1+fURxOwFGb8GMPH3rY3pAIr8mVLmnKE7jxb
+ DQ4PUzn7Vf0jchg/HGqpwp7+zRpKR9cPPp45RzhpTf4wMSTHeCjD5drwCKUzvehegbpQ
+ c2eQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:subject:date:message-id
- :in-reply-to:references;
- bh=KIJAmLbllmYJ3+/5atxAnv6JwBGCasb1tyGUjSZJRAI=;
- b=rDb8Ci6Qb0ocT2ZvpVrLzVcUBCXTBImPryutQ4fbMh3s2rKs9Qqj+2Ml9l9UfJuTQ0
- 5S0xJ5a6aHMFDNP5s0Afqm2eXm2Vya9IrCcbuLUbHD3img0rH8mVg9Vmo3EuWZqAvHk/
- Xo5XJz9R0RnPRKoGejUqxb3QsyIdUIbUFnwunPBWSIwSkDNAezxi0jSfeG3q3jRXbnSS
- LsqHCLe45Sn/IlUu00Yg7tJaNxH2JHG6r54A9zXyPsugsPb7ctue3EIgzdQln2hJCJsS
- N2kMDRI6+KPZAw3Kt2H9uQk42ZCXvfIUqtCZrT9dClI/omesfRN+XtOtLGboR77FXZ9M
- L5IQ==
-X-Gm-Message-State: APjAAAUMZChlqIv2eOhZW2LIL1zduFqSNgyUgquFZFuSPYQtuf9bhVPx
- 5Qvwagt7ekTdoi039/UmljsvUVlmVNw=
-X-Google-Smtp-Source: APXvYqz4bqiP/CMEMBtqgqbGL1b5TlG1SKKmAlthyM5kmj6xKAR7/IEo6ld1aV8j90HntX7TD6iFOQ==
-X-Received: by 2002:a7b:c7d8:: with SMTP id z24mr29407803wmk.10.1563264693198; 
- Tue, 16 Jul 2019 01:11:33 -0700 (PDT)
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=Uzf2A9RIPGCOKfkWZQp0qQsgDZ85Q4jENmEVZz/U6uE=;
+ b=sAwgdrFxfr4aYFmDD6RTXPaFySyvqaYFrzRB4k4EUEUS6fVchff8VnIjDLrp3yMSub
+ iLXtwV3cRz3BcioqpmdtfbpgMAPOR6zYfnsyLwH7UqJJydKzNENWJKsD70A2STWa48g5
+ /GwOmNC54jf/VhJwMTzBrE3HWuAFJaLlSib85sNy8KqzBGr+EvtxrQYldwW8paA/nGOQ
+ 4SweZCXDVlZgDz2nPeCRSakSC+tXj9/ANQeQW+aweHMHqPBXLV1Sf65CSjHlA/k016VF
+ zuJLMbK0vyNptEB0pCNJd8Q0Jm+Ee+28TI6NmazkZluFU2F/7A2Dx2BWLG4vFhX1GCub
+ I56g==
+X-Gm-Message-State: APjAAAWQN9FLXm8p2C/X5xYoBFtlXRiOfL7hn6+KFoLgnr72XivnbqlL
+ V2tICtnhZ7GaEM2Uu84L2JXxHKkKBio=
+X-Google-Smtp-Source: APXvYqwhcLaOnj8WcBudDA4aNk3/isetR7YFIDpEDTjZaEXY5qKLlIVYWuRkNjrdSggUUv6rKEOg5Q==
+X-Received: by 2002:adf:c803:: with SMTP id d3mr10741302wrh.130.1563264687081; 
+ Tue, 16 Jul 2019 01:11:27 -0700 (PDT)
 Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id c1sm37723879wrh.1.2019.07.16.01.11.32
- for <qemu-devel@nongnu.org>
+ by smtp.gmail.com with ESMTPSA id c1sm37723879wrh.1.2019.07.16.01.11.26
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 16 Jul 2019 01:11:32 -0700 (PDT)
+ Tue, 16 Jul 2019 01:11:26 -0700 (PDT)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Tue, 16 Jul 2019 10:11:11 +0200
-Message-Id: <1563264677-39718-14-git-send-email-pbonzini@redhat.com>
+Date: Tue, 16 Jul 2019 10:11:05 +0200
+Message-Id: <1563264677-39718-8-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1563264677-39718-1-git-send-email-pbonzini@redhat.com>
 References: <1563264677-39718-1-git-send-email-pbonzini@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::334
-Subject: [Qemu-devel] [PULL 13/19] checkpatch: detect doubly-encoded UTF-8
+X-Received-From: 2a00:1450:4864:20::433
+Subject: [Qemu-devel] [PULL 07/19] rdmacm-mux: fix strcpy string warning
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,60 +93,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Copy and pasting from Thunderbird's "view source" window results in double
-encoding of multibyte UTF-8 sequences.  The appearance of those sequences is
-very peculiar, so detect it and give an error despite the (low) possibility
-of false positives.
+From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
-As the major offender, I am also adding the same check to my applypatch-msg
-and commit-msg hooks, but this will also cause patchew to croak loudly when
-this mistake happens.
+../contrib/rdmacm-mux/main.c: In function ‘parse_args’:
+../contrib/rdmacm-mux/main.c:118:13: error: ‘strncpy’ specified bound 3835 equals destination size [-Werror=stringop-truncation]
+  118 |             strncpy(unix_socket_path, optarg, SOCKET_PATH_MAX);
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-Id: <1558099140-53240-1-git-send-email-pbonzini@redhat.com>
+Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+Message-Id: <20190712165154.11504-1-marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- scripts/checkpatch.pl | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ contrib/rdmacm-mux/main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
-index 2f81371..d24c944 100755
---- a/scripts/checkpatch.pl
-+++ b/scripts/checkpatch.pl
-@@ -262,6 +262,19 @@ our $UTF8	= qr{
- 	| $NON_ASCII_UTF8
- }x;
+diff --git a/contrib/rdmacm-mux/main.c b/contrib/rdmacm-mux/main.c
+index 30c7052..de53048 100644
+--- a/contrib/rdmacm-mux/main.c
++++ b/contrib/rdmacm-mux/main.c
+@@ -115,7 +115,7 @@ static void parse_args(int argc, char *argv[])
  
-+# some readers default to ISO-8859-1 when showing email source. detect
-+# when UTF-8 is incorrectly interpreted as ISO-8859-1 and reencoded back.
-+# False positives are possible but very unlikely.
-+our $UTF8_MOJIBAKE = qr{
-+	\xC3[\x82-\x9F] \xC2[\x80-\xBF]                    # c2-df 80-bf
-+	| \xC3\xA0 \xC2[\xA0-\xBF] \xC2[\x80-\xBF]         # e0 a0-bf 80-bf
-+	| \xC3[\xA1-\xAC\xAE\xAF] (?: \xC2[\x80-\xBF]){2}  # e1-ec/ee/ef 80-bf 80-bf
-+	| \xC3\xAD \xC2[\x80-\x9F] \xC2[\x80-\xBF]         # ed 80-9f 80-bf
-+	| \xC3\xB0 \xC2[\x90-\xBF] (?: \xC2[\x80-\xBF]){2} # f0 90-bf 80-bf 80-bf
-+	| \xC3[\xB1-\xB3] (?: \xC2[\x80-\xBF]){3}          # f1-f3 80-bf 80-bf 80-bf
-+	| \xC3\xB4 \xC2[\x80-\x8F] (?: \xC2[\x80-\xBF]){2} # f4 80-b8 80-bf 80-bf
-+}x;
-+
- # There are still some false positives, but this catches most
- # common cases.
- our $typeTypedefs = qr{(?x:
-@@ -1506,6 +1519,9 @@ sub process {
- 			ERROR("Invalid UTF-8, patch and commit message should be encoded in UTF-8\n" . $hereptr);
- 		}
+         case 's':
+             /* This is temporary, final name will build below */
+-            strncpy(unix_socket_path, optarg, SOCKET_PATH_MAX);
++            strncpy(unix_socket_path, optarg, SOCKET_PATH_MAX - 1);
+             break;
  
-+		if ($rawline =~ m/$UTF8_MOJIBAKE/) {
-+			ERROR("Doubly-encoded UTF-8\n" . $herecurr);
-+		}
- # Check if it's the start of a commit log
- # (not a header line and we haven't seen the patch filename)
- 		if ($in_header_lines && $realfile =~ /^$/ &&
+         case 'p':
 -- 
 1.8.3.1
 
