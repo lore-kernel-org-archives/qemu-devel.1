@@ -8,70 +8,70 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E76E4C76191
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 02:48:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 711EAC76191
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 02:48:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BA37C20880
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 02:48:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3FD7F20880
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 02:48:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Clsy1lqv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA37C20880
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="majXZKOd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3FD7F20880
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44964 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44968 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnDVw-0003rK-Ix
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 22:48:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44275)
+	id 1hnDWB-0005BN-6n
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 22:48:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44428)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <npiggin@gmail.com>) id 1hnDVQ-0002Ao-GC
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 22:47:53 -0400
+ (envelope-from <npiggin@gmail.com>) id 1hnDVd-00035F-BL
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 22:48:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <npiggin@gmail.com>) id 1hnDVP-0004Tm-4F
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 22:47:52 -0400
-Received: from mail-pg1-x533.google.com ([2607:f8b0:4864:20::533]:38216)
+ (envelope-from <npiggin@gmail.com>) id 1hnDVb-0004df-Vm
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 22:48:05 -0400
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:38770)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <npiggin@gmail.com>)
- id 1hnDVM-0004P8-8F; Mon, 15 Jul 2019 22:47:48 -0400
-Received: by mail-pg1-x533.google.com with SMTP id z75so8654541pgz.5;
- Mon, 15 Jul 2019 19:47:44 -0700 (PDT)
+ id 1hnDVY-0004be-S1; Mon, 15 Jul 2019 22:48:01 -0400
+Received: by mail-pf1-x442.google.com with SMTP id y15so8347672pfn.5;
+ Mon, 15 Jul 2019 19:48:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=PzwK4vtv/PDyhfXpJbiQNfSLcteSs1hAR52r+MzvdUY=;
- b=Clsy1lqvQ+brPUaCagfqXzIwQJaFkktO9aUTxPdv9UhYJbfFsOdQtX9kioO06xuHVO
- tIx/VKgzOeCyD0YkYQdlk4x5GAr75YC4evYSM7bZKxJvZlzAzTd9riEKTs9BSayP2agi
- QOADGyoE+sCxnA6h9TwB+I+Y8ZsLvMIbXUYxiEjdyvdUfUrpTtQqyIu2qX+l/FFrqVMi
- qmUyWqW0PVb2u+sdksZ2C5DtanuFrrU+G16QtPnorzTn3eWdIBPXTWxCTSbWzmUpbQIT
- CKw68X3NB1gBjkFazZT27t9EyrHuBt8cYibGxyw0bpdCpd52srVZxANC/hQ2j9xLKGo0
- XgAg==
+ bh=e2dPud5PCxHxMG9QDmjQcp4vS6NKyFk8d+yIr1hiXRY=;
+ b=majXZKOd789jiH8CvODQrazuiZotMNH4anIlPhsXdMnJSMFKeYBndaHINWFjhvveC5
+ wGldN1idZc0fzjCTflgOajT9lyINsx0/UiGteY/kyqr9Y6X+0r5qdx0rgEPivz03phM9
+ dVSwdqUhfdzvBMK3eWjurVStvrAuSUgLSsSaHOL7pmMHLLQ95Ot5+9GnSybFdIPsh6b9
+ 121dWZwnW9xQKSj7Xt6EyY9P0Vxrp7f7pDYd3BASXE8UJQaZ+b/mW1tF6V0YsUnapOWQ
+ 5FiM/L5D6mCN62+Mi8HG02lQbB2uZdHxhNWsAHRJPNnQbQ0QSx+K1UPtlNNZbgn7F/BP
+ 1E1g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=PzwK4vtv/PDyhfXpJbiQNfSLcteSs1hAR52r+MzvdUY=;
- b=oQSOG2BnWjX2lcNslt3krlBvsdRpX4Q6mQgr55JCW2H+dLR/ikSUPyAyH7RT+aesdg
- HTULwIMYlPyFR7ZvW5vlXjhfPscrZn+skww8FIQeNww7UXoI/OOYWE2eXsmEKPpEELFe
- uKOGHfa00q3CsqD2cLpYxd3q2HiDpuHQd4v6vcDXQmh/jpopjS4kyaIFZFN1n1wmd8bK
- 4tqvzXI1VDVF6F7VAc1CGoyD7McYiVkvXkATGipTGE4Dvvt3odSi1SbEz5++misyicKH
- t2WFJ61IF1YHPViE6JMUVZTQDjE0CyHXU83XQIwfN88XC7UxGphCIgXy001O8QWcyvb5
- RJow==
-X-Gm-Message-State: APjAAAW1125NhwEvp+D+eX+xYOVuU2kSuN9zF0ZXvjPOvMJjPi77iHpv
- f1y3p0HWKlUiFUTnUDmSDlA=
-X-Google-Smtp-Source: APXvYqz4FtsMJsXeoozSjP+Sm7fdcXk32s8SfYRkIKSI8idPKlU0d54sZ+YB/T87XeW3K67tlf33Zw==
-X-Received: by 2002:a63:5550:: with SMTP id f16mr11661981pgm.426.1563245263688; 
- Mon, 15 Jul 2019 19:47:43 -0700 (PDT)
+ bh=e2dPud5PCxHxMG9QDmjQcp4vS6NKyFk8d+yIr1hiXRY=;
+ b=oDMD6Q46hZ/YtA2Vfkrg8+ylhXgba2abxRwDraDH0dbF33neCUHDWS42Y3pFtbheO9
+ MDw6WhI/xmdfRO6wecW8un3Ene4OtsNeC4O6WKIuO7Mb5T/47U/wVwMy1rSFhnCM8SrH
+ ZJ5e33i0IVWhPda75+MUB6IM6mg12iyn7kF7YhTl+tSIY5x5PA66lZBus7GvEoDAy7Br
+ q4oiYmH1Cm0V+ryck+hYlMMyX5A8kj4xaIXzmQktCgi9ti9VBxUrganhggEUNM1kJUKO
+ OysbrBorK2vnc9D+AwW9GNMswwfNBcsfbMaLYQMxVDimbv6QH5icQkqa0iUaL89HVtps
+ FPLA==
+X-Gm-Message-State: APjAAAU4fH2WE5Mn/BXctSkjQKSyNxYwIcyef2BqohaRd5k1zlgc3Tlv
+ 3ocTtTUcBoApaDMdNy81EKE=
+X-Google-Smtp-Source: APXvYqxsepVTxOnFpMTLu8zaAj4mzscjX+tukDPBMiz9uecGaonsbAmyelq7glsgRf7VH9qAB+nCrA==
+X-Received: by 2002:a63:4e60:: with SMTP id o32mr31065659pgl.68.1563245279762; 
+ Mon, 15 Jul 2019 19:47:59 -0700 (PDT)
 Received: from bobo.local0.net ([203.220.8.141])
- by smtp.gmail.com with ESMTPSA id x8sm16557837pfa.46.2019.07.15.19.47.39
+ by smtp.gmail.com with ESMTPSA id x8sm16557837pfa.46.2019.07.15.19.47.56
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Mon, 15 Jul 2019 19:47:43 -0700 (PDT)
+ Mon, 15 Jul 2019 19:47:59 -0700 (PDT)
 From: Nicholas Piggin <npiggin@gmail.com>
 To: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue, 16 Jul 2019 12:47:22 +1000
-Message-Id: <20190716024726.17864-2-npiggin@gmail.com>
+Date: Tue, 16 Jul 2019 12:47:26 +1000
+Message-Id: <20190716024726.17864-6-npiggin@gmail.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190716024726.17864-1-npiggin@gmail.com>
 References: <20190716024726.17864-1-npiggin@gmail.com>
@@ -79,9 +79,8 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::533
-Subject: [Qemu-devel] [PATCH v4 1/5] spapr: Implement dispatch counter and
- prod bit on tcg
+X-Received-From: 2607:f8b0:4864:20::442
+Subject: [Qemu-devel] [PATCH v4 5/5] spapr: Implement ibm,suspend-me
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,190 +99,149 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Implement cpu_exec_enter/exit on ppc which calls into new methods of
-the same name in PPCVirtualHypervisorClass. These are used by spapr
-to implement these splpar elements, used in subsequent changes.
+This has been useful to modify and test the Linux pseries suspend
+code but it requires modification to the guest to call it (due to
+being gated by other unimplemented features). It is not otherwise
+used by Linux yet, but work is slowly progressing there.
+
+This allows a (lightly modified) guest kernel to suspend with
+`echo mem > /sys/power/state` and be resumed with system_wakeup
+monitor command.
 
 Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 ---
- hw/ppc/spapr.c                  | 25 +++++++++++++++++++++++++
- hw/ppc/spapr_cpu_core.c         |  5 ++++-
- hw/ppc/spapr_hcall.c            |  5 -----
- include/hw/ppc/spapr.h          |  7 +++++++
- include/hw/ppc/spapr_cpu_core.h |  2 ++
- target/ppc/cpu.h                |  2 ++
- target/ppc/translate_init.inc.c | 25 +++++++++++++++++++++++++
- 7 files changed, 65 insertions(+), 6 deletions(-)
+ hw/ppc/spapr.c         | 26 ++++++++++++++++++++++++++
+ hw/ppc/spapr_rtas.c    | 32 ++++++++++++++++++++++++++++++++
+ include/hw/ppc/spapr.h |  7 ++++++-
+ 3 files changed, 64 insertions(+), 1 deletion(-)
 
 diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 821f0d4a49..87b11e2484 100644
+index 5c54e1cb9a..b85d41bb1e 100644
 --- a/hw/ppc/spapr.c
 +++ b/hw/ppc/spapr.c
-@@ -4302,6 +4302,29 @@ PowerPCCPU *spapr_find_cpu(int vcpu_id)
-     return NULL;
+@@ -1710,6 +1710,11 @@ static void spapr_machine_reset(MachineState *machine)
+     void *fdt;
+     int rc;
+ 
++    if (spapr->suspend_reset) {
++        spapr->suspend_reset = false;
++        return;
++    }
++
+     spapr_caps_apply(spapr);
+ 
+     first_ppc_cpu = POWERPC_CPU(first_cpu);
+@@ -2721,6 +2726,23 @@ static PCIHostState *spapr_create_default_phb(void)
+     return PCI_HOST_BRIDGE(dev);
  }
  
-+static void spapr_cpu_exec_enter(PPCVirtualHypervisor *vhyp, PowerPCCPU *cpu)
++static Notifier wakeup;
++static void spapr_notify_wakeup(Notifier *notifier, void *data)
 +{
-+    SpaprCpuState *spapr_cpu = spapr_cpu_state(cpu);
++    WakeupReason *reason = data;
 +
-+    /* These are only called by TCG, KVM maintains dispatch state */
-+
-+    spapr_cpu->prod = false;
-+    spapr_cpu->dispatch_counter++;
-+    assert((spapr_cpu->dispatch_counter & 1) == 0);
-+    if (spapr_cpu->vpa_addr) {
-+        CPUState *cs = CPU(cpu);
-+        stl_be_phys(cs->as, spapr_cpu->vpa_addr + VPA_DISPATCH_COUNTER, spapr_cpu->dispatch_counter);
++    switch (*reason) {
++    case QEMU_WAKEUP_REASON_RTC:
++        break;
++    case QEMU_WAKEUP_REASON_PMTIMER:
++        break;
++    case QEMU_WAKEUP_REASON_OTHER:
++        break;
++    default:
++        break;
 +    }
 +}
 +
-+static void spapr_cpu_exec_exit(PPCVirtualHypervisor *vhyp, PowerPCCPU *cpu)
-+{
-+    SpaprCpuState *spapr_cpu = spapr_cpu_state(cpu);
+ /* pSeries LPAR / sPAPR hardware init */
+ static void spapr_machine_init(MachineState *machine)
+ {
+@@ -3078,6 +3100,10 @@ static void spapr_machine_init(MachineState *machine)
+ 
+     qemu_register_boot_set(spapr_boot_set, spapr);
+ 
++    wakeup.notify = spapr_notify_wakeup;
++    qemu_register_wakeup_notifier(&wakeup);
++    qemu_register_wakeup_support();
 +
-+    spapr_cpu->dispatch_counter++;
-+    assert((spapr_cpu->dispatch_counter & 1) == 1);
+     if (kvm_enabled()) {
+         /* to stop and start vmclock */
+         qemu_add_vm_change_state_handler(cpu_ppc_clock_vm_state_change,
+diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
+index a618a2ac0f..60a007ec38 100644
+--- a/hw/ppc/spapr_rtas.c
++++ b/hw/ppc/spapr_rtas.c
+@@ -216,6 +216,36 @@ static void rtas_stop_self(PowerPCCPU *cpu, SpaprMachineState *spapr,
+     qemu_cpu_kick(cs);
+ }
+ 
++static void rtas_ibm_suspend_me(PowerPCCPU *cpu, SpaprMachineState *spapr,
++                           uint32_t token, uint32_t nargs,
++                           target_ulong args,
++                           uint32_t nret, target_ulong rets)
++{
++    CPUState *cs;
++
++    if (nargs != 0 || nret != 1) {
++        rtas_st(rets, 0, RTAS_OUT_PARAM_ERROR);
++        return;
++    }
++
++    CPU_FOREACH(cs) {
++        PowerPCCPU *c = POWERPC_CPU(cs);
++        CPUPPCState *e = &c->env;
++        if (c == cpu)
++            continue;
++
++	/* See h_join */
++        if (!cs->halted || (e->msr & (1ULL << MSR_EE))) {
++            rtas_st(rets, 0, H_MULTI_THREADS_ACTIVE);
++            return;
++        }
++    }
++
++    spapr->suspend_reset = true;
++    qemu_system_suspend_request();
++    rtas_st(rets, 0, RTAS_OUT_SUCCESS);
 +}
 +
- static void spapr_machine_class_init(ObjectClass *oc, void *data)
+ static inline int sysparm_st(target_ulong addr, target_ulong len,
+                              const void *val, uint16_t vallen)
  {
-     MachineClass *mc = MACHINE_CLASS(oc);
-@@ -4358,6 +4381,8 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
-     vhc->hpte_set_r = spapr_hpte_set_r;
-     vhc->get_pate = spapr_get_pate;
-     vhc->encode_hpt_for_kvm_pr = spapr_encode_hpt_for_kvm_pr;
-+    vhc->cpu_exec_enter = spapr_cpu_exec_enter;
-+    vhc->cpu_exec_exit = spapr_cpu_exec_exit;
-     xic->ics_get = spapr_ics_get;
-     xic->ics_resend = spapr_ics_resend;
-     xic->icp_get = spapr_icp_get;
-diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-index 5621fb9a3d..fb2ed9e95d 100644
---- a/hw/ppc/spapr_cpu_core.c
-+++ b/hw/ppc/spapr_cpu_core.c
-@@ -261,6 +261,7 @@ error:
- static PowerPCCPU *spapr_create_vcpu(SpaprCpuCore *sc, int i, Error **errp)
- {
-     SpaprCpuCoreClass *scc = SPAPR_CPU_CORE_GET_CLASS(sc);
-+    SpaprCpuState *spapr_cpu;
-     CPUCore *cc = CPU_CORE(sc);
-     Object *obj;
-     char *id;
-@@ -287,7 +288,9 @@ static PowerPCCPU *spapr_create_vcpu(SpaprCpuCore *sc, int i, Error **errp)
-         goto err;
-     }
- 
--    cpu->machine_data = g_new0(SpaprCpuState, 1);
-+    spapr_cpu = g_new0(SpaprCpuState, 1);
-+    spapr_cpu->dispatch_counter = 1;
-+    cpu->machine_data = spapr_cpu;
- 
-     object_unref(obj);
-     return cpu;
-diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-index 6808d4cda8..e615881ac4 100644
---- a/hw/ppc/spapr_hcall.c
-+++ b/hw/ppc/spapr_hcall.c
-@@ -874,11 +874,6 @@ unmap_out:
- #define FLAGS_DEREGISTER_DTL       0x0000c00000000000ULL
- #define FLAGS_DEREGISTER_SLBSHADOW 0x0000e00000000000ULL
- 
--#define VPA_MIN_SIZE           640
--#define VPA_SIZE_OFFSET        0x4
--#define VPA_SHARED_PROC_OFFSET 0x9
--#define VPA_SHARED_PROC_VAL    0x2
--
- static target_ulong register_vpa(PowerPCCPU *cpu, target_ulong vpa)
- {
-     CPUState *cs = CPU(cpu);
+@@ -483,6 +513,8 @@ static void core_rtas_register_types(void)
+                         rtas_query_cpu_stopped_state);
+     spapr_rtas_register(RTAS_START_CPU, "start-cpu", rtas_start_cpu);
+     spapr_rtas_register(RTAS_STOP_SELF, "stop-self", rtas_stop_self);
++    spapr_rtas_register(RTAS_IBM_SUSPEND_ME, "ibm,suspend-me",
++                        rtas_ibm_suspend_me);
+     spapr_rtas_register(RTAS_IBM_GET_SYSTEM_PARAMETER,
+                         "ibm,get-system-parameter",
+                         rtas_ibm_get_system_parameter);
 diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index 60553d32c4..5d36eec9d0 100644
+index 5d36eec9d0..df0b0c15da 100644
 --- a/include/hw/ppc/spapr.h
 +++ b/include/hw/ppc/spapr.h
-@@ -525,6 +525,13 @@ void spapr_register_hypercall(target_ulong opcode, spapr_hcall_fn fn);
- target_ulong spapr_hypercall(PowerPCCPU *cpu, target_ulong opcode,
-                              target_ulong *args);
+@@ -171,6 +171,10 @@ struct SpaprMachineState {
+     bool use_hotplug_event_source;
+     SpaprEventSource *event_sources;
  
-+/* Virtual Processor Area structure constants */
-+#define VPA_MIN_SIZE           640
-+#define VPA_SIZE_OFFSET        0x4
-+#define VPA_SHARED_PROC_OFFSET 0x9
-+#define VPA_SHARED_PROC_VAL    0x2
-+#define VPA_DISPATCH_COUNTER   0x100
++    /* Machine has been suspended, so the next machine_reset should not
++     * reset state, but just return and allow execution to resume. */
++    bool suspend_reset;
 +
- /* ibm,set-eeh-option */
- #define RTAS_EEH_DISABLE                 0
- #define RTAS_EEH_ENABLE                  1
-diff --git a/include/hw/ppc/spapr_cpu_core.h b/include/hw/ppc/spapr_cpu_core.h
-index f9645a7290..3032dfa7ee 100644
---- a/include/hw/ppc/spapr_cpu_core.h
-+++ b/include/hw/ppc/spapr_cpu_core.h
-@@ -46,6 +46,8 @@ typedef struct SpaprCpuState {
-     uint64_t vpa_addr;
-     uint64_t slb_shadow_addr, slb_shadow_size;
-     uint64_t dtl_addr, dtl_size;
-+    uint32_t dispatch_counter;
-+    bool prod;
-     struct ICPState *icp;
-     struct XiveTCTX *tctx;
- } SpaprCpuState;
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index c9beba2a5c..78d6504acb 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -1224,6 +1224,8 @@ struct PPCVirtualHypervisorClass {
-     void (*hpte_set_r)(PPCVirtualHypervisor *vhyp, hwaddr ptex, uint64_t pte1);
-     void (*get_pate)(PPCVirtualHypervisor *vhyp, ppc_v3_pate_t *entry);
-     target_ulong (*encode_hpt_for_kvm_pr)(PPCVirtualHypervisor *vhyp);
-+    void (*cpu_exec_enter)(PPCVirtualHypervisor *vhyp, PowerPCCPU *cpu);
-+    void (*cpu_exec_exit)(PPCVirtualHypervisor *vhyp, PowerPCCPU *cpu);
- };
+     /* ibm,client-architecture-support option negotiation */
+     bool cas_reboot;
+     bool cas_legacy_guest_workaround;
+@@ -631,8 +635,9 @@ target_ulong spapr_hypercall(PowerPCCPU *cpu, target_ulong opcode,
+ #define RTAS_IBM_CREATE_PE_DMA_WINDOW           (RTAS_TOKEN_BASE + 0x27)
+ #define RTAS_IBM_REMOVE_PE_DMA_WINDOW           (RTAS_TOKEN_BASE + 0x28)
+ #define RTAS_IBM_RESET_PE_DMA_WINDOW            (RTAS_TOKEN_BASE + 0x29)
++#define RTAS_IBM_SUSPEND_ME                     (RTAS_TOKEN_BASE + 0x2A)
  
- #define TYPE_PPC_VIRTUAL_HYPERVISOR "ppc-virtual-hypervisor"
-diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.inc.c
-index 86fc8f2e31..58d4a93b23 100644
---- a/target/ppc/translate_init.inc.c
-+++ b/target/ppc/translate_init.inc.c
-@@ -10473,6 +10473,28 @@ static bool ppc_cpu_is_big_endian(CPUState *cs)
- }
- #endif
+-#define RTAS_TOKEN_MAX                          (RTAS_TOKEN_BASE + 0x2A)
++#define RTAS_TOKEN_MAX                          (RTAS_TOKEN_BASE + 0x2B)
  
-+static void ppc_cpu_exec_enter(CPUState *cs)
-+{
-+    PowerPCCPU *cpu = POWERPC_CPU(cs);
-+
-+    if (cpu->vhyp) {
-+        PPCVirtualHypervisorClass *vhc =
-+            PPC_VIRTUAL_HYPERVISOR_GET_CLASS(cpu->vhyp);
-+        vhc->cpu_exec_enter(cpu->vhyp, cpu);
-+    }
-+}
-+
-+static void ppc_cpu_exec_exit(CPUState *cs)
-+{
-+    PowerPCCPU *cpu = POWERPC_CPU(cs);
-+
-+    if (cpu->vhyp) {
-+        PPCVirtualHypervisorClass *vhc =
-+            PPC_VIRTUAL_HYPERVISOR_GET_CLASS(cpu->vhyp);
-+        vhc->cpu_exec_exit(cpu->vhyp, cpu);
-+    }
-+}
-+
- static void ppc_cpu_instance_init(Object *obj)
- {
-     PowerPCCPU *cpu = POWERPC_CPU(obj);
-@@ -10624,6 +10646,9 @@ static void ppc_cpu_class_init(ObjectClass *oc, void *data)
-     cc->tcg_initialize = ppc_translate_init;
-     cc->tlb_fill = ppc_cpu_tlb_fill;
- #endif
-+    cc->cpu_exec_enter = ppc_cpu_exec_enter;
-+    cc->cpu_exec_exit = ppc_cpu_exec_exit;
-+
-     cc->disas_set_info = ppc_disas_set_info;
- 
-     dc->fw_name = "PowerPC,UNKNOWN";
+ /* RTAS ibm,get-system-parameter token values */
+ #define RTAS_SYSPARM_SPLPAR_CHARACTERISTICS      20
 -- 
 2.20.1
 
