@@ -2,63 +2,93 @@ Return-Path: <SRS0=+QfZ=VN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89B8DC7618F
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 14:50:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AE8FC76192
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 14:50:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4E00220880
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 14:50:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E00220880
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0807C2173C
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 14:50:37 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="okBQK4nm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0807C2173C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49694 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49702 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnOmO-0000dO-9m
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 10:50:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48437)
+	id 1hnOmq-0001fT-7m
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 10:50:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48678)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <kwolf@redhat.com>) id 1hnOmA-0008Sx-Kg
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 10:49:56 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1hnOmc-00017y-5G
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 10:50:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1hnOm0-0006y9-8F
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 10:49:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56516)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>)
- id 1hnOlx-0006wa-Q6; Tue, 16 Jul 2019 10:49:42 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 126F730872FD;
- Tue, 16 Jul 2019 14:49:41 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-117-24.ams2.redhat.com [10.36.117.24])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4FB925ED40;
- Tue, 16 Jul 2019 14:49:38 +0000 (UTC)
-Date: Tue, 16 Jul 2019 16:49:37 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Max Reitz <mreitz@redhat.com>
-Message-ID: <20190716144937.GF7297@linux.fritz.box>
-References: <20190716081516.27374-1-mlevitsk@redhat.com>
- <ace970e5-7f1a-d693-952e-3d16da1d0bfe@redhat.com>
+ (envelope-from <richard.henderson@linaro.org>) id 1hnOma-0007Ld-PQ
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 10:50:22 -0400
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:36899)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1hnOma-0007Jo-2m
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 10:50:20 -0400
+Received: by mail-pl1-x644.google.com with SMTP id b3so10242044plr.4
+ for <qemu-devel@nongnu.org>; Tue, 16 Jul 2019 07:50:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=vRcmmmidZBO1sdzPHIFCAIh9wKUQjMlDgQeKKeUIXy8=;
+ b=okBQK4nm2zcPSiaxpxrASKtyQJ/END1Yq26bg9KvFb/YDZkzsCrxjTD7kfq9jnWLQS
+ AEqhA31Jp6r8fFptekuOXv9wRJsl4DAYTzbgZPtVOET3fVSN3kxvGaQImLztpxc3CrHe
+ fo2zC4esP/7DWnFiy8C0a9d2Bxk5+AdXd+zTbw4GO51LS8HE/p8/txE7mRBsMWbTaOe1
+ xOp4jE69L1EMw4QMRUxnRdW6Y/Rw01CBWVODYjSvzGw8bQxbygO+JkBi5K070lhq9eb8
+ SsuGMBdrPV1V0U0AfHjb4uFejjhow9U2zqjobGsMyqAp1h45lrL/QdI/ZQWmkAj+/Cc2
+ pD1g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=vRcmmmidZBO1sdzPHIFCAIh9wKUQjMlDgQeKKeUIXy8=;
+ b=L1eHI+ozpD6clI5/lWtJVFXNosjPpQ1MYx7XMcH//e/ufMryfwv+OO8XpawRVAHLdo
+ yG7w/Py+RAOEu7rYN3gONY4causCFN/xl+t3VwMEnnwOgZKTdnEN3gBdGaewa8rhHAGt
+ GRZ+LFuROJRpFtTeQo6X5mqkNcD+E6iOh9hANVQYosm08bcG58pN2WEvL21GRnQZ2p0r
+ zSnAfPrD9JOB/uKmha43pU5CWjuEZRpSKkJEEjiaCWh69YhqfwDsBpT5F3UpJhuAXV2U
+ bforlpbqUtTzRTWoXYcYptAjiwdVoyXVt+VwIys8g6cJMJYBzVt+A4j4AiM/VBRmqQCN
+ g3SA==
+X-Gm-Message-State: APjAAAX2jsP6bhb7QRBQ+h5zF7NefmgYS966YobXn7VlZCQYYeYfHkeS
+ 4+hx1TkDJig1SDfDjsRHA8V4mQ==
+X-Google-Smtp-Source: APXvYqzha3i3u/8m5/pGw7dradxalM7V2ONS2WR7lBAE66fjkYIKeE1JomQpdXsHE8VR7gpiHgjJtQ==
+X-Received: by 2002:a17:902:7088:: with SMTP id
+ z8mr36656722plk.125.1563288617710; 
+ Tue, 16 Jul 2019 07:50:17 -0700 (PDT)
+Received: from [192.168.1.11] (97-113-176-6.tukw.qwest.net. [97.113.176.6])
+ by smtp.gmail.com with ESMTPSA id f88sm21747331pjg.5.2019.07.16.07.50.16
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Tue, 16 Jul 2019 07:50:17 -0700 (PDT)
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
+References: <20190716121352.302-1-alex.bennee@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <c3a0e0ba-285f-48e6-17d2-fc68f170645f@linaro.org>
+Date: Tue, 16 Jul 2019 07:50:15 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
- protocol="application/pgp-signature"; boundary="mYCpIKhGyMATD0i+"
-Content-Disposition: inline
-In-Reply-To: <ace970e5-7f1a-d693-952e-3d16da1d0bfe@redhat.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Tue, 16 Jul 2019 14:49:41 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v4] LUKS: support preallocation
+In-Reply-To: <20190716121352.302-1-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::644
+Subject: Re: [Qemu-devel] [RFC PATCH for 4.1?] target/ppc: move opcode
+ decode tables to PowerPCCPU
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,103 +100,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
- qemu-block@nongnu.org, Maxim Levitsky <mlevitsk@redhat.com>
+Cc: 1836558@bugs.launchpad.net,
+ "open list:PowerPC TCG CPUs" <qemu-ppc@nongnu.org>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 7/16/19 12:13 PM, Alex Bennée wrote:
+> The opcode decode tables aren't really part of the CPUPPCState but an
+> internal implementation detail for the translator. This can cause
+> problems with memcpy in cpu_copy as any table created during
+> ppc_cpu_realize get written over causing a memory leak. To avoid this
+> move the tables into PowerPCCPU which is better suited to hold
+> internal implementation details.
+> 
+> Attempts to fix: https://bugs.launchpad.net/qemu/+bug/1836558
+> Cc: 1836558@bugs.launchpad.net
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> ---
+>  target/ppc/cpu.h                |  8 ++++----
+>  target/ppc/translate.c          |  3 ++-
+>  target/ppc/translate_init.inc.c | 16 +++++++---------
+>  3 files changed, 13 insertions(+), 14 deletions(-)
 
---mYCpIKhGyMATD0i+
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-Am 16.07.2019 um 14:41 hat Max Reitz geschrieben:
-> On 16.07.19 10:15, Maxim Levitsky wrote:
-> > preallocation=3Doff and preallocation=3Dmetadata
-> > both allocate luks header only, and preallocation=3Dfalloc/full
-> > is passed to underlying file.
-> >=20
-> > Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=3D1534951
-> >=20
-> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> > ---
-> >  block/crypto.c       | 29 ++++++++++++++++++++++++++---
-> >  qapi/block-core.json |  5 ++++-
-> >  2 files changed, 30 insertions(+), 4 deletions(-)
-> >=20
-> >=20
-> > Changes from V3: updated the blockdev-create description
->=20
-> Looks good functionally, but there is a syntax problem:
->=20
-> > diff --git a/block/crypto.c b/block/crypto.c
-> > index 8237424ae6..034a645652 100644
-> > --- a/block/crypto.c
-> > +++ b/block/crypto.c
->=20
-> [...]
->=20
-> > @@ -515,8 +523,11 @@ block_crypto_co_create_luks(BlockdevCreateOptions =
-*create_options, Error **errp)
-> >          .u.luks =3D *qapi_BlockdevCreateOptionsLUKS_base(luks_opts),
-> >      };
-> > =20
-> > +    if (luks_opts->has_preallocation)
-> > +        preallocation =3D luks_opts->preallocation;
->=20
-> This lacks curly brackets.
->=20
-> > +
-> >      ret =3D block_crypto_co_create_generic(bs, luks_opts->size, &creat=
-e_opts,
-> > -                                         errp);
-> > +                                         preallocation, errp);
-> >      if (ret < 0) {
-> >          goto fail;
-> >      }
->=20
-> [...]
->=20
-> > diff --git a/qapi/block-core.json b/qapi/block-core.json
-> > index 0d43d4f37c..9c04d83fa2 100644
-> > --- a/qapi/block-core.json
-> > +++ b/qapi/block-core.json
-> > @@ -4205,13 +4205,16 @@
-> >  #
-> >  # @file             Node to create the image format on
-> >  # @size             Size of the virtual disk in bytes
-> > +# @preallocation    Preallocation mode for the new image (default: off;
-> > +#                   allowed values: off/metadata/falloc/full (since: 4=
-=2E2)
->=20
-> Also, this lacks a closing parenthesis somewhere.
 
-You could also view it as having an opening parenthesis where there
-should be another semicolon.
-
-Kevin
-
---mYCpIKhGyMATD0i+
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIcBAEBAgAGBQJdLeQBAAoJEH8JsnLIjy/WTkIP/ipKHXnt1nwZCOOk1yKyNkM4
-oixhPlOGq5PfewGcBx1Tpk4mNXJ0TrLB043mO5/OUxGseK4VdilY7xmgBOuYcdzl
-bk27vswnsRJsPdGJgqNYsfzSE98ajcunQDcjXWLeH7scTWVn4WS8ZogqxUVOXa0R
-r5kA7Nx9o9+xcDGaCQEZoLp+6Dx9iwhCH9jCm4/2s1LmBPCLKsH1qz2JdF6rWM8r
-NA802jZmck2uJaZkNDFpIpi2Nor91MnAUcBxhmt4Zd8WAYNyfZLnbyIdCPhcsbYH
-+5pwoHiecUeCYtdxVsKZe/2a+f6GgkK5Fp2U4LwDyFggM0zd9M554gu4wLmL0Kuj
-tUN9dnpsUZtKX9VKLiysUh+8If+kYzcx9iP31++5Hbj/dVSUd73InxdMu6m4wYxW
-CNrYYr756AaZttMI/SLaD5I9E1BoWcZsxWqHqwGCMg79cleEBh1k63qTxBwSYAYn
-CdBckkmxe7aVbPHz51Nd7jvThAEVKW6pIr2ypQbfMdNW1N68LYySQrPcBv7IBqeS
-0lXDOpEixys3qqnH9FGgk2kL+xxpNHlybd0FLGiPN6DD0E7BTX8YuF1/NyTObmVC
-QW5pYH11GUpAAowFzJggwxl6G2EE73jkbHA7UsuDMO4AEDerE7W57XaPmijbyzeu
-S91U/f4hwKlbYp8fnTcv
-=5FHR
------END PGP SIGNATURE-----
-
---mYCpIKhGyMATD0i+--
+r~
 
