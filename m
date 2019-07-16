@@ -2,66 +2,112 @@ Return-Path: <SRS0=+QfZ=VN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,HK_RANDOM_FROM,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19917C76191
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 02:55:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0E66C76191
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 03:38:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D70CD2080A
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 02:55:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D70CD2080A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id A66B12080A
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 03:38:21 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=bushare.onmicrosoft.com header.i=@bushare.onmicrosoft.com header.b="BFqjYZjt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A66B12080A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45000 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45110 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnDd8-0006TS-VA
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 22:55:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45945)
+	id 1hnEIG-000605-Hs
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 23:38:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53534)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <no-reply@patchew.org>) id 1hnDcv-0005tT-Hj
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 22:55:38 -0400
+ (envelope-from <alxndr@bu.edu>) id 1hnEI5-0005an-4w
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 23:38:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1hnDcu-00017u-0v
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 22:55:37 -0400
-Resent-Date: Mon, 15 Jul 2019 22:55:37 -0400
-Resent-Message-Id: <E1hnDcu-00017u-0v@eggs.gnu.org>
-Received: from sender4-of-o59.zoho.com ([136.143.188.59]:21992)
+ (envelope-from <alxndr@bu.edu>) id 1hnEI2-0005xJ-76
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 23:38:09 -0400
+Received: from mail-eopbgr710124.outbound.protection.outlook.com
+ ([40.107.71.124]:56288 helo=NAM05-BY2-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1hnDct-00016v-Rl; Mon, 15 Jul 2019 22:55:35 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1563245709; cv=none; d=zoho.com; s=zohoarc; 
- b=XGiQMGAVCh9qp1StoBJFEI5nbHReH3tlFwVqK9eF2O98JV76t2VGP2cT/tqISyWybzTP2qgGIR5/8ORrelP0TYfaVbzngLD55Bn3wZxD/xKIRIqwXY22+imx/JF8TpJyTCLiQOCVcP2qh6VMls4Rf8i3TAHwthpV4PBH4f+j0VA=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1563245709;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
- bh=fGX9gKPnjcXHH+jfGTyzX2X4iQ2F12HqcL616mfh1A0=; 
- b=hDUbD1eXAswrYdPTaZ4xern9c53Gr0UabrCjfAwBqpCL2PKvXUJ+BWw+CMc8bR7yct7AG43OilPtF0lIC0s84YFIw+IoLSLntdHCmsv4XXgVbfvxvJsOfhuzzaf8uv+YChuGYqln4Qq0McVPUz0vJxPel4+JBClpe/Gv0NOxgbE=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1563245708487938.0773765165999;
- Mon, 15 Jul 2019 19:55:08 -0700 (PDT)
-Message-ID: <156324570724.3080.11793860183357238123@c4a48874b076>
-In-Reply-To: <20190716024726.17864-1-npiggin@gmail.com>
+ (Exim 4.71) (envelope-from <alxndr@bu.edu>) id 1hnEI1-0005ss-PX
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 23:38:06 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=KyRC6FQt4CGl/uskI/kCrNqBZQgVcj9YvBJJpI8JvPGZukEn1Rr/+PyUmoaFW2g3NJ23Y1f11S8eF+UGKyW7oMl6dTkI/xiR0StMeT0fqUnLNpgodiKr0PT2u6Ujr9QsKXEjDnaos7jLGscuDo0r3058j/E0rzstTAHU91nNUY5RXnn6VtNs8wvBe7GNeXOxGFFG0kHQKA3MFbNy4ZE/N2QhY4AGz/jV7Bg273oxOLQEm9peRiXz/bJoZFusNFwroEKB7kaP7axBY09nt3FKEFsQZfq+fveMwoE/hiAxG7EBrI5des8WyT+KK75GHwq0d8Am/pk/vnXzxCGNBIx9qg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=bDv7V9H/vIYvBguK42QlNDjoL2PDYZaa1q/VAzrVOIw=;
+ b=U/vB89TP+uOmSLq9glRQ8carseObKYanqXWlrbzKclA8VD5iFmqEfOnyqohwhDP6ESUrchEVjd9T8g9LucozB+8amABsRQkC40thdV8uXABqc0ol7u0yvWCcFz6diGDBabta3CsHfVJqHjk5DiFXipKdzEv4T3S5mNz3WvYE57kqJq5JR2DrPfowiOWMD904pZEdRCFWDuMPFwulhjcdgu/3vPe4GiPuVuh18+/8lK2KCK2TBekCrSPAphpwrbpytrLc2GaYUBlbul85ztoOvparVuSs2W/ZM+2sCbl0BQ0Jz9uFQu33Gv49S6nCAX/697b1LVE4LgasK663e35wlw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1;spf=pass
+ smtp.mailfrom=bu.edu;dmarc=pass action=none header.from=bu.edu;dkim=pass
+ header.d=bu.edu;arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=bushare.onmicrosoft.com; s=selector1-bushare-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=bDv7V9H/vIYvBguK42QlNDjoL2PDYZaa1q/VAzrVOIw=;
+ b=BFqjYZjti7I33k/yTigVCjBIrT/ZY+VUnmBHwYgH3IQhUtxjnvhFb+yk3DVwOw901DDp+ZOZ1wC4lsdmioycnvNV3ndmFFULr2FRPRXww1d3/VvFc+twGy3s1o8cYsAWxSK8XOb/dce2NrJutZTN4tCyRKTrqBgSADwbiA2s8Ko=
+Received: from CY4PR03MB2872.namprd03.prod.outlook.com (10.175.118.17) by
+ CY4PR03MB2775.namprd03.prod.outlook.com (10.173.39.22) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2073.14; Tue, 16 Jul 2019 03:38:00 +0000
+Received: from CY4PR03MB2872.namprd03.prod.outlook.com
+ ([fe80::25e1:d1e3:2ad8:e6b5]) by CY4PR03MB2872.namprd03.prod.outlook.com
+ ([fe80::25e1:d1e3:2ad8:e6b5%5]) with mapi id 15.20.2073.012; Tue, 16 Jul 2019
+ 03:38:00 +0000
+From: "Oleinik, Alexander" <alxndr@bu.edu>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Thread-Topic: [PATCH 0/1] Add check for header length in virtio-net-tx
+Thread-Index: AQHVO4fdu4nw1gRFdE6dP+OPrW6gnA==
+Date: Tue, 16 Jul 2019 03:38:00 +0000
+Message-ID: <20190716033719.2866-1-alxndr@bu.edu>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-mailer: git-send-email 2.20.1
+x-originating-ip: [128.197.127.33]
+x-clientproxiedby: BL0PR02CA0144.namprd02.prod.outlook.com
+ (2603:10b6:208:35::49) To CY4PR03MB2872.namprd03.prod.outlook.com
+ (2603:10b6:903:134::17)
+authentication-results: spf=none (sender IP is ) smtp.mailfrom=alxndr@bu.edu; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 5eff2c9f-13c3-451a-c547-08d7099effdb
+x-microsoft-antispam: BCL:0; PCL:0;
+ RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);
+ SRVR:CY4PR03MB2775; 
+x-ms-traffictypediagnostic: CY4PR03MB2775:
+x-microsoft-antispam-prvs: <CY4PR03MB27757785E15784F982180B29BACE0@CY4PR03MB2775.namprd03.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:8882;
+x-forefront-prvs: 0100732B76
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(4636009)(366004)(346002)(39860400002)(136003)(376002)(396003)(199004)(189003)(71200400001)(4744005)(71190400001)(2906002)(88552002)(50226002)(14454004)(36756003)(52116002)(66556008)(68736007)(25786009)(66476007)(6506007)(66446008)(64756008)(8936002)(6916009)(81156014)(81166006)(478600001)(99286004)(53936002)(75432002)(1076003)(6486002)(305945005)(66066001)(5660300002)(54906003)(316002)(26005)(5640700003)(486006)(6512007)(7736002)(386003)(3846002)(86362001)(786003)(6116002)(2501003)(8676002)(66946007)(256004)(6436002)(4326008)(14444005)(102836004)(186003)(2351001)(476003)(2616005)(42522002);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:CY4PR03MB2775;
+ H:CY4PR03MB2872.namprd03.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
+received-spf: None (protection.outlook.com: bu.edu does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: jEwYZA66H2jqYg0rOFysp/u9kMFDZimqp7Ule7p+qadV+Q3UmmIoOqTY32Q3cQx31rhaatAVGluV4p5pRahbY+99RMO9uH/EYy2M4E9ogiDbmv8/nHjeUyeua0Jd9/AU6YsvL19SOx6OBD6WoRryNT/2sawGJqm0YGSt32pYbKrPlRXBH0bl0ic09nj2qtCg6/uIQuCfxmUB+UkjrB8aTmsL6zRVapcsBY7T5XW+gsV6KwXr5obkOhHGuqxWYWxjyF1Au9/EcuFqDSS02/Lyw6wzbL3Y8M98jgquusefu9RkjVMbIed4kHGNVWJkDrSV2/QjTO5CS9ejeiRgU8nPljyEtMOB/W2/6jcnroBdhDxVKf1oZJWDiUFSeN6G990XofCdO5pj88fArQYckns5DKQT2aEdGBuCsFSvFyZFe4k=
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: npiggin@gmail.com
-Date: Mon, 15 Jul 2019 19:55:08 -0700 (PDT)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 136.143.188.59
-Subject: Re: [Qemu-devel] [PATCH v4 0/5] spapr: implement dispatch and
- suspend calls
+X-OriginatorOrg: bu.edu
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5eff2c9f-13c3-451a-c547-08d7099effdb
+X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Jul 2019 03:38:00.1658 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: d57d32cc-c121-488f-b07b-dfe705680c71
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: alxndr@bu.edu
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR03MB2775
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.71.124
+Subject: [Qemu-devel] [PATCH 0/1] Add check for header length in
+ virtio-net-tx
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,67 +119,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: qemu-devel@nongnu.org, npiggin@gmail.com, groug@kaod.org,
- qemu-ppc@nongnu.org, clg@kaod.org, david@gibson.dropbear.id.au
+Cc: "mst@redhat.com" <mst@redhat.com>,
+ "jasowang@redhat.com" <jasowang@redhat.com>, "Oleinik,
+ Alexander" <alxndr@bu.edu>, "bsd@redhat.com" <bsd@redhat.com>,
+ "stefanha@redhat.com" <stefanha@redhat.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDcxNjAyNDcyNi4xNzg2
-NC0xLW5waWdnaW5AZ21haWwuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
-c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
-b3JtYXRpb246CgpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHY0IDAvNV0gc3BhcHI6IGlt
-cGxlbWVudCBkaXNwYXRjaCBhbmQgc3VzcGVuZCBjYWxscwpNZXNzYWdlLWlkOiAyMDE5MDcxNjAy
-NDcyNi4xNzg2NC0xLW5waWdnaW5AZ21haWwuY29tClR5cGU6IHNlcmllcwoKPT09IFRFU1QgU0NS
-SVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJhc2UgPiAvZGV2L251bGwg
-fHwgZXhpdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZp
-ZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29y
-aXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4K
-PT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcK
-YzQzMmRlYSBzcGFwcjogSW1wbGVtZW50IGlibSxzdXNwZW5kLW1lCjA5YmFlNmIgc3BhcHI6IElt
-cGxlbWVudCBIX0pPSU4KMDMxYmQzZiBzcGFwcjogSW1wbGVtZW50IEhfQ09ORkVSCmEzZDhiYzIg
-c3BhcHI6IEltcGxlbWVudCBIX1BST0QKZWQyM2U2NyBzcGFwcjogSW1wbGVtZW50IGRpc3BhdGNo
-IGNvdW50ZXIgYW5kIHByb2QgYml0IG9uIHRjZwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS81IENo
-ZWNraW5nIGNvbW1pdCBlZDIzZTY3OThmMTggKHNwYXByOiBJbXBsZW1lbnQgZGlzcGF0Y2ggY291
-bnRlciBhbmQgcHJvZCBiaXQgb24gdGNnKQpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMK
-IzMzOiBGSUxFOiBody9wcGMvc3BhcHIuYzo0MzE2OgorICAgICAgICBzdGxfYmVfcGh5cyhjcy0+
-YXMsIHNwYXByX2NwdS0+dnBhX2FkZHIgKyBWUEFfRElTUEFUQ0hfQ09VTlRFUiwgc3BhcHJfY3B1
-LT5kaXNwYXRjaF9jb3VudGVyKTsKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMTMxIGxp
-bmVzIGNoZWNrZWQKClBhdGNoIDEvNSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcu
-ICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0g
-dG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKMi81IENo
-ZWNraW5nIGNvbW1pdCBhM2Q4YmMyNTEwY2MgKHNwYXByOiBJbXBsZW1lbnQgSF9QUk9EKQozLzUg
-Q2hlY2tpbmcgY29tbWl0IDAzMWJkM2Y2OTg2YiAoc3BhcHI6IEltcGxlbWVudCBIX0NPTkZFUikK
-NC81IENoZWNraW5nIGNvbW1pdCAwOWJhZTZiZWMwYzEgKHNwYXByOiBJbXBsZW1lbnQgSF9KT0lO
-KQpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3Rh
-dGVtZW50CiM1NTogRklMRTogaHcvcHBjL3NwYXByX2hjYWxsLmM6MTA5MjoKKyAgICAgICAgaWYg
-KGMgPT0gY3B1KQpbLi4uXQoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFi
-cwojNTg6IEZJTEU6IGh3L3BwYy9zcGFwcl9oY2FsbC5jOjEwOTU6CiteSS8qIERvbid0IGhhdmUg
-YSB3YXkgdG8gaW5kaWNhdGUgam9pbmVkLCBzbyB1c2UgaGFsdGVkICYmIE1TUltFRV09MCAqLyQK
-CnRvdGFsOiAyIGVycm9ycywgMCB3YXJuaW5ncywgNjMgbGluZXMgY2hlY2tlZAoKUGF0Y2ggNC81
-IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJv
-cnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2Vl
-CkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo1LzUgQ2hlY2tpbmcgY29tbWl0IGM0MzJkZWFl
-NTQ4MCAoc3BhcHI6IEltcGxlbWVudCBpYm0sc3VzcGVuZC1tZSkKRVJST1I6IGJyYWNlcyB7fSBh
-cmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojOTM6IEZJTEU6IGh3
-L3BwYy9zcGFwcl9ydGFzLmM6MjM0OgorICAgICAgICBpZiAoYyA9PSBjcHUpClsuLi5dCgpFUlJP
-UjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM5NjogRklMRTogaHcvcHBjL3Nw
-YXByX3J0YXMuYzoyMzc6CiteSS8qIFNlZSBoX2pvaW4gKi8kCgpXQVJOSU5HOiBCbG9jayBjb21t
-ZW50cyB1c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQojMTI4OiBGSUxFOiBpbmNs
-dWRlL2h3L3BwYy9zcGFwci5oOjE3NDoKKyAgICAvKiBNYWNoaW5lIGhhcyBiZWVuIHN1c3BlbmRl
-ZCwgc28gdGhlIG5leHQgbWFjaGluZV9yZXNldCBzaG91bGQgbm90CgpXQVJOSU5HOiBCbG9jayBj
-b21tZW50cyB1c2UgYSB0cmFpbGluZyAqLyBvbiBhIHNlcGFyYXRlIGxpbmUKIzEyOTogRklMRTog
-aW5jbHVkZS9ody9wcGMvc3BhcHIuaDoxNzU6CisgICAgICogcmVzZXQgc3RhdGUsIGJ1dCBqdXN0
-IHJldHVybiBhbmQgYWxsb3cgZXhlY3V0aW9uIHRvIHJlc3VtZS4gKi8KCnRvdGFsOiAyIGVycm9y
-cywgMiB3YXJuaW5ncywgMTA4IGxpbmVzIGNoZWNrZWQKClBhdGNoIDUvNSBoYXMgc3R5bGUgcHJv
-YmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBw
-b3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGlu
-IE1BSU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdp
-dGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcu
-b3JnL2xvZ3MvMjAxOTA3MTYwMjQ3MjYuMTc4NjQtMS1ucGlnZ2luQGdtYWlsLmNvbS90ZXN0aW5n
-LmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNh
-bGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBm
-ZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+While fuzzing the virtio-net tx vq, I ran into an assertion failure due
+to iov_copy offsets larger than the total iov size. Though there is
+a check to cover this, it does not execute when !n->has_vnet_hdr. This
+patch tries to fix this.=20
+
+The call stack for the assertion failure:
+
+#8 in __assert_fail (libc.so.6+0x300f1)
+#9 in iov_copy iov.c:266:5
+#10 in virtio_net_flush_tx virtio-net.c:2073:23
+#11 in virtio_net_tx_bh virtio-net.c:2197:11
+#12 in aio_bh_poll async.c:118:13
+#13 in aio_dispatch aio-posix.c:460:5
+#14 in aio_ctx_dispatch async.c:261:5
+#15 in g_main_context_dispatch (libglib-2.0.so.0+0x4df2d)
+#16 in glib_pollfds_poll main-loop.c:213:9
+#17 in os_host_main_loop_wait main-loop.c:236
+#18 in main_loop_wait main-loop.c:512
+#19 in virtio_net_tx_fuzz virtio-net-fuzz.c:160:3
+
+Thanks
+-Alex
+
+Alexander Oleinik (1):
+  virtio-net: check guest header length is valid
+
+ hw/net/virtio-net.c | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
+
+--=20
+2.20.1
 
 
