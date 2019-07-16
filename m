@@ -2,64 +2,59 @@ Return-Path: <SRS0=+QfZ=VN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EFC3BC7618F
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 22:03:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C8CCC7618F
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 22:16:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BF1D52173B
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 22:03:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF1D52173B
+	by mail.kernel.org (Postfix) with ESMTPS id 3E81A2173B
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 22:16:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E81A2173B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52590 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52616 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnVXm-0002PB-TO
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 18:03:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37885)
+	id 1hnVkG-00060V-Ne
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 18:16:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41479)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.williamson@redhat.com>) id 1hnVXX-0001zm-By
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 18:03:16 -0400
+ (envelope-from <philmd@redhat.com>) id 1hnVk4-0005Xe-PS
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 18:16:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.williamson@redhat.com>) id 1hnVXT-0001bC-11
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 18:03:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38034)
+ (envelope-from <philmd@redhat.com>) id 1hnVk3-0002Cc-Kk
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 18:16:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41202)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
- id 1hnVXQ-0001X8-LA
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 18:03:10 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ (Exim 4.71) (envelope-from <philmd@redhat.com>)
+ id 1hnVk1-00029y-4I; Tue, 16 Jul 2019 18:16:09 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id B50A85C3;
- Tue, 16 Jul 2019 22:03:06 +0000 (UTC)
-Received: from x1.home (ovpn-116-35.phx2.redhat.com [10.3.116.35])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D05355D720;
- Tue, 16 Jul 2019 22:03:02 +0000 (UTC)
-Date: Tue, 16 Jul 2019 16:03:02 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Kirti Wankhede <kwankhede@nvidia.com>
-Message-ID: <20190716160302.09ef66e7@x1.home>
-In-Reply-To: <1562665760-26158-7-git-send-email-kwankhede@nvidia.com>
-References: <1562665760-26158-1-git-send-email-kwankhede@nvidia.com>
- <1562665760-26158-7-git-send-email-kwankhede@nvidia.com>
-Organization: Red Hat
+ by mx1.redhat.com (Postfix) with ESMTPS id 1BAFF368E3;
+ Tue, 16 Jul 2019 22:16:08 +0000 (UTC)
+Received: from x1w.redhat.com (ovpn-204-58.brq.redhat.com [10.40.204.58])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id CCB305E7A5;
+ Tue, 16 Jul 2019 22:15:58 +0000 (UTC)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Wed, 17 Jul 2019 00:15:50 +0200
+Message-Id: <20190716221555.11145-1-philmd@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.30]); Tue, 16 Jul 2019 22:03:06 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.30]); Tue, 16 Jul 2019 22:16:08 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v7 06/13] vfio: Add VM state change handler
- to know state of VM
+Subject: [Qemu-devel] [PATCH-for-4.1 v6 0/5] hw/block/pflash_cfi01: Add
+ DeviceReset() handler
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,168 +66,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zhengxiao.zx@Alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com,
- cjia@nvidia.com, eskultet@redhat.com, ziye.yang@intel.com,
- qemu-devel@nongnu.org, cohuck@redhat.com, shuangtai.tst@alibaba-inc.com,
- dgilbert@redhat.com, zhi.a.wang@intel.com, mlevitsk@redhat.com,
- pasic@linux.ibm.com, aik@ozlabs.ru, eauger@redhat.com, felipe@nutanix.com,
- jonathan.davies@nutanix.com, yan.y.zhao@intel.com, changpeng.liu@intel.com,
- Ken.Xue@amd.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ Laszlo Ersek <lersek@redhat.com>, qemu-block@nongnu.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Alistair Francis <alistair.francis@wdc.com>, John Snow <jsnow@redhat.com>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 9 Jul 2019 15:19:13 +0530
-Kirti Wankhede <kwankhede@nvidia.com> wrote:
+Hello it's me again, insisting with this series because there are at
+least 2 different report of guests bricked on reset due to the bug
+fixed by patch #5:
+https://bugzilla.redhat.com/show_bug.cgi?id=3D1678713
+https://bugzilla.redhat.com/show_bug.cgi?id=3D1704584
 
-> VM state change handler gets called on change in VM's state. This is used to set
-> VFIO device state to _RUNNING.
-> VM state change handler, migration state change handler and log_sync listener
-> are called asynchronously, which sometimes lead to data corruption in migration
-> region. Initialised mutex that is used to serialize operations on migration data
-> region during saving state.
-> 
-> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> Reviewed-by: Neo Jia <cjia@nvidia.com>
-> ---
->  hw/vfio/migration.c           | 64 +++++++++++++++++++++++++++++++++++++++++++
->  hw/vfio/trace-events          |  2 ++
->  include/hw/vfio/vfio-common.h |  4 +++
->  3 files changed, 70 insertions(+)
-> 
-> diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
-> index a2cfbd5af2e1..c01f08b659d0 100644
-> --- a/hw/vfio/migration.c
-> +++ b/hw/vfio/migration.c
-> @@ -78,6 +78,60 @@ err:
->      return ret;
->  }
->  
-> +static int vfio_migration_set_state(VFIODevice *vbasedev, uint32_t state)
-> +{
-> +    VFIOMigration *migration = vbasedev->migration;
-> +    VFIORegion *region = &migration->region.buffer;
-> +    uint32_t device_state;
-> +    int ret = 0;
-> +
-> +    device_state = (state & VFIO_DEVICE_STATE_MASK) |
-> +                   (vbasedev->device_state & ~VFIO_DEVICE_STATE_MASK);
-> +
-> +    if ((device_state & VFIO_DEVICE_STATE_MASK) == VFIO_DEVICE_STATE_INVALID) {
-> +        return -EINVAL;
-> +    }
-> +
-> +    ret = pwrite(vbasedev->fd, &device_state, sizeof(device_state),
-> +                 region->fd_offset + offsetof(struct vfio_device_migration_info,
-> +                                              device_state));
-> +    if (ret < 0) {
-> +        error_report("%s: Failed to set device state %d %s",
-> +                     vbasedev->name, ret, strerror(errno));
-> +        return ret;
-> +    }
-> +
-> +    vbasedev->device_state = device_state;
+Patches missing review: 2 and 3
 
-Do we need to re-read device_state after error?  We defined _SAVING |
-_RESUMING as STATE_INVALID, is that only for user writes, ie. the
-device can never transition to that state to indicate a fault?  I was
-thinking that was one if its use cases.  Thanks,
+The pflash device lacks a reset() function.
+When a machine is resetted, the flash might be in an
+inconsistent state, leading to unexpected behavior.
+Resolve this issue by adding a DeviceReset() handler.
 
-Alex
+Since v1: https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg00962.=
+html
+- addressed Laszlo review comments
 
-> +    trace_vfio_migration_set_state(vbasedev->name, device_state);
-> +    return 0;
-> +}
-> +
-> +static void vfio_vmstate_change(void *opaque, int running, RunState state)
-> +{
-> +    VFIODevice *vbasedev = opaque;
-> +
-> +    if ((vbasedev->vm_running != running)) {
-> +        int ret;
-> +        uint32_t dev_state;
-> +
-> +        if (running) {
-> +            dev_state = VFIO_DEVICE_STATE_RUNNING;
-> +        } else {
-> +            dev_state = (vbasedev->device_state & VFIO_DEVICE_STATE_MASK) &
-> +                     ~VFIO_DEVICE_STATE_RUNNING;
-> +        }
-> +
-> +        ret = vfio_migration_set_state(vbasedev, dev_state);
-> +        if (ret) {
-> +            error_report("%s: Failed to set device state 0x%x",
-> +                         vbasedev->name, dev_state);
-> +        }
-> +        vbasedev->vm_running = running;
-> +        trace_vfio_vmstate_change(vbasedev->name, running, RunState_str(state),
-> +                                  dev_state);
-> +    }
-> +}
-> +
->  static int vfio_migration_init(VFIODevice *vbasedev,
->                                 struct vfio_region_info *info)
->  {
-> @@ -93,6 +147,11 @@ static int vfio_migration_init(VFIODevice *vbasedev,
->          return ret;
->      }
->  
-> +    qemu_mutex_init(&vbasedev->migration->lock);
-> +
-> +    vbasedev->vm_state = qemu_add_vm_change_state_handler(vfio_vmstate_change,
-> +                                                          vbasedev);
-> +
->      return 0;
->  }
->  
-> @@ -135,11 +194,16 @@ void vfio_migration_finalize(VFIODevice *vbasedev)
->          return;
->      }
->  
-> +    if (vbasedev->vm_state) {
-> +        qemu_del_vm_change_state_handler(vbasedev->vm_state);
-> +    }
-> +
->      if (vbasedev->migration_blocker) {
->          migrate_del_blocker(vbasedev->migration_blocker);
->          error_free(vbasedev->migration_blocker);
->      }
->  
-> +    qemu_mutex_destroy(&vbasedev->migration->lock);
->      vfio_migration_region_exit(vbasedev);
->      g_free(vbasedev->migration);
->  }
-> diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
-> index 191a726a1312..3d15bacd031a 100644
-> --- a/hw/vfio/trace-events
-> +++ b/hw/vfio/trace-events
-> @@ -146,3 +146,5 @@ vfio_display_edid_write_error(void) ""
->  
->  # migration.c
->  vfio_migration_probe(char *name, uint32_t index) " (%s) Region %d"
-> +vfio_migration_set_state(char *name, uint32_t state) " (%s) state %d"
-> +vfio_vmstate_change(char *name, int running, const char *reason, uint32_t dev_state) " (%s) running %d reason %s device state %d"
-> diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-> index 152da3f8d6f3..f6c70db3a9c1 100644
-> --- a/include/hw/vfio/vfio-common.h
-> +++ b/include/hw/vfio/vfio-common.h
-> @@ -29,6 +29,7 @@
->  #ifdef CONFIG_LINUX
->  #include <linux/vfio.h>
->  #endif
-> +#include "sysemu/sysemu.h"
->  
->  #define VFIO_MSG_PREFIX "vfio %s: "
->  
-> @@ -124,6 +125,9 @@ typedef struct VFIODevice {
->      unsigned int flags;
->      VFIOMigration *migration;
->      Error *migration_blocker;
-> +    uint32_t device_state;
-> +    VMChangeStateEntry *vm_state;
-> +    int vm_running;
->  } VFIODevice;
->  
->  struct VFIODeviceOps {
+Since v2: https://lists.gnu.org/archive/html/qemu-devel/2019-07/msg00395.=
+html
+- consider migration (Laszlo, Peter)
+
+Since v3: https://lists.gnu.org/archive/html/qemu-devel/2019-07/msg01668.=
+html
+- more reliable migration (Dave)
+- dropped patches 6-9 not required for next release
+
+Since v4: https://lists.gnu.org/archive/html/qemu-devel/2019-07/msg02785.=
+html
+- document why using READ_ARRAY value 0x00 for migration is safe
+
+Since v5: https://lists.gnu.org/archive/html/qemu-devel/2019-07/msg03366.=
+html
+- avoid trying to be spec-compliant and messing with migration. KISS.
+  review/test tags reset, sorry.
+
+$ git backport-diff -u v5
+Key:
+[----] : patches are identical
+[####] : number of functional differences between upstream/downstream pat=
+ch
+[down] : patch is downstream-only
+The flags [FC] indicate (F)unctional and (C)ontextual differences, respec=
+tively
+
+001/5:[----] [-C] 'hw/block/pflash_cfi01: Removed an unused timer'
+002/5:[down] 'hw/block/pflash_cfi01: Document use of non-CFI compliant co=
+mmand '0x00''
+003/5:[0031] [FC] 'hw/block/pflash_cfi01: Extract pflash_mode_read_array(=
+)'
+004/5:[down] 'hw/block/pflash_cfi01: Rename 'reset_flash' label as 'mode_=
+read_array''
+005/5:[----] [--] 'hw/block/pflash_cfi01: Add the DeviceReset() handler'
+
+Regards,
+
+Phil.
+
+Philippe Mathieu-Daud=C3=A9 (5):
+  hw/block/pflash_cfi01: Removed an unused timer
+  hw/block/pflash_cfi01: Document use of non-CFI compliant command
+    '0x00'
+  hw/block/pflash_cfi01: Extract pflash_mode_read_array()
+  hw/block/pflash_cfi01: Rename 'reset_flash' label as 'mode_read_array'
+  hw/block/pflash_cfi01: Add the DeviceReset() handler
+
+ hw/block/pflash_cfi01.c | 77 +++++++++++++++++++++--------------------
+ hw/block/trace-events   |  1 +
+ 2 files changed, 41 insertions(+), 37 deletions(-)
+
+--=20
+2.20.1
 
 
