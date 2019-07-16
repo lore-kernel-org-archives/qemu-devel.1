@@ -2,51 +2,50 @@ Return-Path: <SRS0=+QfZ=VN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FC7BC7618F
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 14:11:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B403C7618F
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 14:15:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 54E482173C
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 14:11:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54E482173C
+	by mail.kernel.org (Postfix) with ESMTPS id 2920720693
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 14:15:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2920720693
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49452 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49486 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnOAi-0007qT-I1
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 10:11:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36715)
+	id 1hnOEW-0000jB-28
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 10:15:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38014)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <eblake@redhat.com>) id 1hnOAX-0007Qi-Bq
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 10:11:02 -0400
+ (envelope-from <eblake@redhat.com>) id 1hnOEJ-0000G3-L1
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 10:14:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1hnOAV-0003Bl-7p
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 10:11:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58820)
+ (envelope-from <eblake@redhat.com>) id 1hnOEH-0005b2-Ix
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 10:14:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55694)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1hnOAO-00036c-EL; Tue, 16 Jul 2019 10:10:53 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ id 1hnOEF-0005ZN-Bd; Tue, 16 Jul 2019 10:14:51 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 5E8BFC024AF6;
- Tue, 16 Jul 2019 14:10:51 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 9A97481F1B;
+ Tue, 16 Jul 2019 14:14:50 +0000 (UTC)
 Received: from [10.3.116.46] (ovpn-116-46.phx2.redhat.com [10.3.116.46])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id BDD455ED2D;
- Tue, 16 Jul 2019 14:10:50 +0000 (UTC)
-To: Max Reitz <mreitz@redhat.com>, Thomas Huth <thuth@redhat.com>,
- qemu-block@nongnu.org
-References: <20190712173600.14554-1-mreitz@redhat.com>
- <20190712173600.14554-8-mreitz@redhat.com>
- <5c73228a-a6b2-31fa-a33d-0c65863acce5@redhat.com>
- <734f491b-9393-d380-0425-278901774723@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 34FA7608A6;
+ Tue, 16 Jul 2019 14:14:42 +0000 (UTC)
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20190716100731.29843-1-marcandre.lureau@redhat.com>
+ <c3e74283-5050-ec15-6f19-84b5e013e5bf@redhat.com>
 From: Eric Blake <eblake@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=eblake@redhat.com; keydata=
@@ -73,22 +72,21 @@ Autocrypt: addr=eblake@redhat.com; keydata=
  Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
  2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
 Organization: Red Hat, Inc.
-Message-ID: <6773c19f-d639-db08-a1e7-0ef0f2047942@redhat.com>
-Date: Tue, 16 Jul 2019 09:10:49 -0500
+Message-ID: <56aff8eb-d94f-eb98-e8cd-8f5c962330ed@redhat.com>
+Date: Tue, 16 Jul 2019 09:14:36 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <734f491b-9393-d380-0425-278901774723@redhat.com>
+In-Reply-To: <c3e74283-5050-ec15-6f19-84b5e013e5bf@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="0Jxk8DgKlIiMmbYtetcCmyXoTs95B7PWt"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+ boundary="XxJfObK7pY5c6oJtficR17YgT8PYTiMA3"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.32]); Tue, 16 Jul 2019 14:10:51 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.25]); Tue, 16 Jul 2019 14:14:50 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 7/7] iotests: Add test for image creation
- fallback
+Subject: Re: [Qemu-devel] [PATCH v2] nbd: fix uninitialized variable warning
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,71 +98,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ "open list:Network Block Dev..." <qemu-block@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---0Jxk8DgKlIiMmbYtetcCmyXoTs95B7PWt
-Content-Type: multipart/mixed; boundary="04o5Yrz6gFoAGzuEuZ4PFVh3WWpaPyM06";
+--XxJfObK7pY5c6oJtficR17YgT8PYTiMA3
+Content-Type: multipart/mixed; boundary="YH5rNSYMxBqOwh8a9AXTT7dSClANOtYLT";
  protected-headers="v1"
 From: Eric Blake <eblake@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, Thomas Huth <thuth@redhat.com>,
- qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
-Message-ID: <6773c19f-d639-db08-a1e7-0ef0f2047942@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 7/7] iotests: Add test for image creation
- fallback
-References: <20190712173600.14554-1-mreitz@redhat.com>
- <20190712173600.14554-8-mreitz@redhat.com>
- <5c73228a-a6b2-31fa-a33d-0c65863acce5@redhat.com>
- <734f491b-9393-d380-0425-278901774723@redhat.com>
-In-Reply-To: <734f491b-9393-d380-0425-278901774723@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ "open list:Network Block Dev..." <qemu-block@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>
+Message-ID: <56aff8eb-d94f-eb98-e8cd-8f5c962330ed@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2] nbd: fix uninitialized variable warning
+References: <20190716100731.29843-1-marcandre.lureau@redhat.com>
+ <c3e74283-5050-ec15-6f19-84b5e013e5bf@redhat.com>
+In-Reply-To: <c3e74283-5050-ec15-6f19-84b5e013e5bf@redhat.com>
 
---04o5Yrz6gFoAGzuEuZ4PFVh3WWpaPyM06
+--YH5rNSYMxBqOwh8a9AXTT7dSClANOtYLT
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 7/15/19 4:48 AM, Max Reitz wrote:
+On 7/16/19 5:21 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+> I was writing on your v1 "it might be worth commenting this is when
+> building with -O3"
+>=20
+> This might be as easy as having the subject modified (by maintainer
+> taking this patch?) as:
+>=20
+> "fix uninitialized variable warning [when building with -O3]"
+>=20
 
->>> +
->>> +_supported_fmt raw
->>
->> Why is this stating "raw" here...
->>
->>> +_supported_proto nbd
->=20
-> Because it=E2=80=99s an NBD test.
->=20
->>> +_supported_os Linux
->>> +
->>> +
->>> +_make_test_img 64M
->=20
-> Also, because I don=E2=80=98t want this to create a qcow2 image.  This =
-should
-> just set up a raw NBD node.
->=20
->>> +echo
->>> +echo '--- Testing creation ---'
->>> +
->>> +$QEMU_IMG create -f qcow2 "$TEST_IMG" 64M | _filter_img_create
->>
->> ... and using qcow2 here instead?
->=20
-> Practical answer: Nobody tests qcow2+nbd.  Ever.  Because it is
-> generally a stupid combination.  We need it for this test, though,
-> because NBD is the simplest way to get a fixed-size block device.
+I can do a touchup (probably to the commit body, rather than the subject)=
+=2E
 
-There are definitely some broken things if you try qcow2+nbd. However, I
-someday hope to implement a proposed NBD_CMD_RESIZE extension to the
-protocol, at which point, it will be a lot easier to run qcow2+nbd
-(where qcow2 can then advantage of automatic resizes of the protocol
-layer, the same as it does for regular files), so part of that effort
-may be figuring out how to make iotests cleanly support qcow2+nbd in
-more situations.
+
+>> cc1: all warnings being treated as errors
+>>
+>> Reported-by: Thomas Huth <thuth@redhat.com>
+>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+
+Thanks; will queue through my NBD tree.
+
+>> ---
+>>  block/nbd.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/block/nbd.c b/block/nbd.c
+>> index 81edabbf35..0f74c1e455 100644
+>> --- a/block/nbd.c
+>> +++ b/block/nbd.c
+>> @@ -707,7 +707,7 @@ static bool nbd_reply_chunk_iter_receive(BDRVNBDSt=
+ate *s,
+>>                                           void **payload)
+>>  {
+>>      int ret, request_ret;
+>> -    NBDReply local_reply;
+>> +    NBDReply local_reply =3D {};
+
+Relies on the gcc extension rather than the idiomatic C spelling of {0}
+(but we rely on it elsewhere, in part because some versions of clang are
+buggy on incorrectly warning about the idiomatic spelling, so nothing new=
+)
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -172,24 +176,24 @@ Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
 
 
---04o5Yrz6gFoAGzuEuZ4PFVh3WWpaPyM06--
+--YH5rNSYMxBqOwh8a9AXTT7dSClANOtYLT--
 
---0Jxk8DgKlIiMmbYtetcCmyXoTs95B7PWt
+--XxJfObK7pY5c6oJtficR17YgT8PYTiMA3
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl0t2ukACgkQp6FrSiUn
-Q2qnsAgAlfdJcsY1HygVV3Eb8QtC4mtAYrscDPlXYi1Z/gwH8TdK25LgvpuuA0UE
-K9ftlZ745sCizvmDYJhL1fC7i9KkvLx2p8Z+oz/Hmw6c0lLjS51TW9DvGzAmbk7S
-l6eVU1c4PMnwOO+dWmseYfXdsqhGiahl2FCFlE2j77mlSzJubq9ehoUCPsVlYr8M
-LmZ7T8+r0bRUFmJrbRf0NzCNEosxIZkuIoog+1tt3kt7qceCqS0koSQwolTAGYCJ
-bIZbUtKMEfwF7RcgXmmsiM/pe+hYncAKxkexa4NjEfy4u0KBgTTHu4cPnRyfENEv
-kAoI3Nb5ORMxH7lD1oTvfZBH+CUA1A==
-=VnN4
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl0t28wACgkQp6FrSiUn
+Q2qsPAf/eyiZulgFD0r7xSL98ACEDlSpgrCZqCuQ+vh6MvHOiU08NHQyDIZyZzI1
+IHoCmF5y344IhJh55S/u/HQeglzkxxYwD3Ii556TwOOYEHT23Of+/dsAp8taglbP
+Qz/Fv4kUO6Rhz4f2B8rqIlS7d76kOydIihXe+zUe6yvE1ju9Y+bZ71IC4KG3mzVc
+BehyczO1URDhgA9g80GX5gKoFhHh+sXFV12BCD54XFXaLMSESAT0fkAGROVMYtKj
+3jgtDiaMSSWAxfynu02KLMfIUtBg3OsnQ3H1HrCk/BUU8bz+dyEJAD0NRw0bowMr
+VA8fXs0hYrbD9/hKWW/UgiHWfWH8ng==
+=mKgn
 -----END PGP SIGNATURE-----
 
---0Jxk8DgKlIiMmbYtetcCmyXoTs95B7PWt--
+--XxJfObK7pY5c6oJtficR17YgT8PYTiMA3--
 
