@@ -6,74 +6,60 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36617C76188
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 07:27:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EF01C76188
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 07:35:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0C0DF206C2
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 07:27:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C0DF206C2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 20492206C2
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 07:35:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20492206C2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45880 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45908 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnHsG-0008Df-3c
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 03:27:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45872)
+	id 1hnHzx-00027N-Gd
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 03:35:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48554)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <pbonzini@redhat.com>) id 1hnHs5-0007pP-3M
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 03:27:33 -0400
+ (envelope-from <yan.y.zhao@intel.com>) id 1hnHzl-0001bD-1L
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 03:35:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1hnHs4-0002Oq-21
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 03:27:33 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:40816)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hnHs3-0002Nl-RF
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 03:27:32 -0400
-Received: by mail-wr1-f66.google.com with SMTP id r1so19679468wrl.7
- for <qemu-devel@nongnu.org>; Tue, 16 Jul 2019 00:27:31 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=zdZuA734CWiIh2pm5IsgJa21qyg/gIdm0iv06XhXuEg=;
- b=IyvUZnk2L0+ZYQy5VPKKPCxkY6R6gRVHbsu2mq7dpa8kvUFMdrfIEJ+dBUdIvGZ1iS
- +qTTGtt3Tnc15Z4lBZLwUjfPuy4G+nIOLrSOeTt/07EfE9B3VzfbJ7d5I+N10HYlK04U
- LuQCAA3BQqc5Iv+ltl9+YnHP8xiC/IZi/WRZMIvSQwyCSowC7nhAzQ0F6zrPv7TXn23X
- C9gRRxjwujOfU2bT575e9hWuZKD0deyBDzJ2CPNOLoAYsV4Uu4FvuBuj3VhT0aApPaxf
- LGrPAd31Bgrpc/8SMN1EDG9uJrnqiAAL3aLE3iZF8W2aVGSn7Ab96wOir4j87Gq1whXS
- pXYw==
-X-Gm-Message-State: APjAAAW0pSbMAYU+gq+OA17OjBYGEzdM3T7GbfFjuKlteM/zHNJos+yF
- xZE4MigKtQAZQwLZUR3sncaykw==
-X-Google-Smtp-Source: APXvYqziy/ysknyic+EzPoLgbzJznNnAx0t+f6xCAOHDLjtFTlCFY8De5sdH6MxB5KETWRc87kSi6g==
-X-Received: by 2002:a5d:494d:: with SMTP id r13mr35267221wrs.152.1563262050748; 
- Tue, 16 Jul 2019 00:27:30 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:b159:8d52:3041:ae0d?
- ([2001:b07:6468:f312:b159:8d52:3041:ae0d])
- by smtp.gmail.com with ESMTPSA id f3sm4544968wrt.56.2019.07.16.00.27.29
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Tue, 16 Jul 2019 00:27:30 -0700 (PDT)
-To: Wei Yang <richardw.yang@linux.intel.com>, qemu-devel@nongnu.org
-References: <20190716072127.2000-1-richardw.yang@linux.intel.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <e5169a0a-327a-df29-9a07-0055cd0a73f3@redhat.com>
-Date: Tue, 16 Jul 2019 09:27:29 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+ (envelope-from <yan.y.zhao@intel.com>) id 1hnHzk-0000ob-4H
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 03:35:28 -0400
+Received: from mga02.intel.com ([134.134.136.20]:2676)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <yan.y.zhao@intel.com>)
+ id 1hnHzj-0000jO-Sa
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 03:35:28 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+ by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 16 Jul 2019 00:35:23 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.63,497,1557212400"; d="scan'208";a="187285150"
+Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
+ ([10.239.13.9])
+ by fmsmga001.fm.intel.com with ESMTP; 16 Jul 2019 00:35:20 -0700
+Date: Tue, 16 Jul 2019 03:29:19 -0400
+From: Yan Zhao <yan.y.zhao@intel.com>
+To: Peter Xu <zhexu@redhat.com>
+Message-ID: <20190716072919.GA8912@joy-OptiPlex-7040>
+References: <1563261042-15974-1-git-send-email-yan.y.zhao@intel.com>
+ <20190716072315.GA30980@xz-x1>
 MIME-Version: 1.0
-In-Reply-To: <20190716072127.2000-1-richardw.yang@linux.intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.221.66
-Subject: Re: [Qemu-devel] [PATCH] vl: make sure char-pty message displayed
- by moving setbuf to the beginning
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190716072315.GA30980@xz-x1>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 134.134.136.20
+Subject: Re: [Qemu-devel] [PATCH] migration: notify runstate immediately
+ before vcpu stops
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,53 +71,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: armbru@redhat.com
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: "Tian, Kevin" <kevin.tian@intel.com>,
+ "crosthwaite.peter@gmail.com" <crosthwaite.peter@gmail.com>,
+ "cohuck@redhat.com" <cohuck@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "dgilbert@redhat.com" <dgilbert@redhat.com>,
+ "quintela@redhat.com" <quintela@redhat.com>,
+ "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "rth@twiddle.net" <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 16/07/19 09:21, Wei Yang wrote:
-> Recently we found a behavior change after commit 6ade45f2ac93611
-> ('char-pty: Print "char device redirected" message to stdout').
+On Tue, Jul 16, 2019 at 03:23:16PM +0800, Peter Xu wrote:
+> On Tue, Jul 16, 2019 at 03:10:42PM +0800, Yan Zhao wrote:
+> > for some devices to do live migration, it is needed to do something
+> > immediately before vcpu stops. add a notification here.
 > 
-> When we redirect output to a file, the message "char device redirected
-> to PTY_NAME (label LABEL)" would not be seen at the beginning of the
-> file. Instead, the message is displayed after QEMU quit. This will block
-> test automation.
+> Hi, Yan,
 > 
-> The reason is this message is printed after we set line buffer mode. So
-> move this to the beginning.
-> 
-> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
-> ---
->  vl.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/vl.c b/vl.c
-> index 5089fce6c5..a5808f9a02 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -2890,6 +2890,8 @@ int main(int argc, char **argv, char **envp)
->      char *dir, **dirs;
->      BlockdevOptionsQueue bdo_queue = QSIMPLEQ_HEAD_INITIALIZER(bdo_queue);
->  
-> +    os_set_line_buffering();
-> +
->      error_init(argv[0]);
->      module_call_init(MODULE_INIT_TRACE);
->  
-> @@ -4246,8 +4248,6 @@ int main(int argc, char **argv, char **envp)
->          semihosting_arg_fallback(kernel_filename, kernel_cmdline);
->      }
->  
-> -    os_set_line_buffering();
-> -
->      /* spice needs the timers to be initialized by this point */
->      qemu_spice_init();
->  
-> 
+> Could I ask for a more detailed commit message here?  E.g., what is
+> "some devices"?  And, what's the problem behind?
+>
+hi Peter,
 
-Queued, thanks.
+Some devices refer to assigned devices, like NICs.
+For assigned devices to do live migration, it is sometimes required that
+source device is stopped before stopping source vcpus. vcpus can do some
+final cleanups (like handling interrupt) in that case.
 
-Paolo
+Thanks
+Yan
+
+> Thanks,
+> 
+> > 
+> > Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
+> > ---
+> >  cpus.c | 1 +
+> >  1 file changed, 1 insertion(+)
+> > 
+> > diff --git a/cpus.c b/cpus.c
+> > index b09b702..d5d4abe 100644
+> > --- a/cpus.c
+> > +++ b/cpus.c
+> > @@ -1068,6 +1068,7 @@ static int do_vm_stop(RunState state, bool send_stop)
+> >      int ret = 0;
+> >  
+> >      if (runstate_is_running()) {
+> > +        vm_state_notify(1, state);
+> >          cpu_disable_ticks();
+> >          pause_all_vcpus();
+> >          runstate_set(state);
+> > -- 
+> > 2.7.4
+> > 
+> > 
+> 
+> -- 
+> Peter Xu
 
