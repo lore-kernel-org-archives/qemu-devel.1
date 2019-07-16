@@ -2,70 +2,59 @@ Return-Path: <SRS0=+QfZ=VN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78C47C76188
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 10:07:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E323C76188
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 10:07:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 49A7820665
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 10:07:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49A7820665
+	by mail.kernel.org (Postfix) with ESMTPS id 754A220659
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 10:07:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 754A220659
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46880 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46886 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnKMT-00067s-Gn
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 06:07:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40853)
+	id 1hnKMz-0006xD-Lr
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 06:07:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41035)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mlureau@redhat.com>) id 1hnKMI-0005ey-2n
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 06:06:55 -0400
+ (envelope-from <marcandre.lureau@redhat.com>) id 1hnKMp-0006Yi-VC
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 06:07:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlureau@redhat.com>) id 1hnKMG-0001cm-Rj
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 06:06:54 -0400
-Received: from mail-ot1-f65.google.com ([209.85.210.65]:41325)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1hnKMG-0001bh-MC
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 06:06:52 -0400
-Received: by mail-ot1-f65.google.com with SMTP id o101so20420666ota.8
- for <qemu-devel@nongnu.org>; Tue, 16 Jul 2019 03:06:52 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=dx3CdELmDXsET7wy8Jp4hI2LmL4Kww1Q6vEpM5r+8nM=;
- b=FZsBaoq4/938iiYQqxr63DVgDBcl6/cUwUfx7YoIpuSJTb21cDYkIsTbx4/+mAzD1N
- mtlQ5xiq4fFZeqFc3xYm58FkgA3k3OKvfYhy9wfuZv6MBDMRTQLWMha6hrNLN3lkEvEv
- 8zjmebJBUYoy0R829hJS1HW6agrluk0sRaEcAbVbzDsYbuEuequZqF4AmSy/bcNnZGY4
- IhwdYB9w4umbyylTzHf49QQcnzy2p7pqHPuJccOMUcEzV3E8wg2TN86AaL36mh/LdPzR
- 5JROc1EVlausam2MaPUCoACLBjbuLUBhvkWT+k+WW9hgU7QuMsPoN9wzMoKlJZzgRFGk
- dqEw==
-X-Gm-Message-State: APjAAAULBsF8eqmbfzA3y6ejB5JgYaY8mhPdYThdxqfO/rY5NxEQFnE9
- hTE3fBwrtr++Jv6vopX99TiUtLt0iHDv5V1VhNAKGw==
-X-Google-Smtp-Source: APXvYqy1KGCXj+Hc6NkOw2KuSaATaurJuyjkPr7P2pUzz8qhrWScmGPcd39jN5YEMXfdrceafy1ut1gJop+yJfXqwi0=
-X-Received: by 2002:a05:6830:1009:: with SMTP id
- a9mr14585944otp.331.1563271611751; 
- Tue, 16 Jul 2019 03:06:51 -0700 (PDT)
+ (envelope-from <marcandre.lureau@redhat.com>) id 1hnKMp-00026a-2e
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 06:07:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39356)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+ id 1hnKMo-000264-TU
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 06:07:27 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id DA1AC44BCD;
+ Tue, 16 Jul 2019 10:07:25 +0000 (UTC)
+Received: from localhost (ovpn-112-54.ams2.redhat.com [10.36.112.54])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B993E611DC;
+ Tue, 16 Jul 2019 10:07:22 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Tue, 16 Jul 2019 14:07:18 +0400
+Message-Id: <20190716100719.29722-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-References: <20190716084240.17594-1-marcandre.lureau@redhat.com>
- <fe523ffd-43fb-3b9d-b4e1-ea11d1c63de7@redhat.com>
-In-Reply-To: <fe523ffd-43fb-3b9d-b4e1-ea11d1c63de7@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Date: Tue, 16 Jul 2019 14:06:40 +0400
-Message-ID: <CAMxuvay3shknbiruw88pV9A0=AiWo=ttJgsNwnz-jaM_F8Hpxg@mail.gmail.com>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.30]); Tue, 16 Jul 2019 10:07:25 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.210.65
-Subject: Re: [Qemu-devel] [PATCH] nbd: fix uninitialized variable warning
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH 1/2] rdmacm-mux: fix strcpy string warning
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,92 +66,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>,
- qemu-devel <qemu-devel@nongnu.org>,
- "open list:Network Block Dev..." <qemu-block@nongnu.org>,
- Max Reitz <mreitz@redhat.com>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ Yuval Shaia <yuval.shaia@oracle.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi
+../contrib/rdmacm-mux/main.c: In function =E2=80=98parse_args=E2=80=99:
+../contrib/rdmacm-mux/main.c:118:13: error: =E2=80=98strncpy=E2=80=99 spe=
+cified bound 3835 equals destination size [-Werror=3Dstringop-truncation]
+  118 |             strncpy(unix_socket_path, optarg, SOCKET_PATH_MAX);
 
-On Tue, Jul 16, 2019 at 1:19 PM Philippe Mathieu-Daud=C3=A9
-<philmd@redhat.com> wrote:
->
-> Hi Marc-Andr=C3=A9,
->
-> On 7/16/19 10:42 AM, Marc-Andr=C3=A9 Lureau wrote:
-> > ../block/nbd.c: In function 'nbd_co_request':
-> > ../block/nbd.c:745:8: error: 'local_reply.type' may be used uninitializ=
-ed in this function [-Werror=3Dmaybe-uninitialized]
-> >      if (chunk->type =3D=3D NBD_REPLY_TYPE_NONE) {
-> >         ^
-> > ../block/nbd.c:710:14: note: 'local_reply.type' was declared here
-> >      NBDReply local_reply;
-> >               ^~~~~~~~~~~
-> > ../block/nbd.c:710:14: error: 'local_reply.flags' may be used uninitial=
-ized in this function [-Werror=3Dmaybe-uninitialized]
-> > ../block/nbd.c:738:8: error: 'local_reply.<U4be0>.magic' may be used un=
-initialized in this function [-Werror=3Dmaybe-uninitialized]
-> >      if (nbd_reply_is_simple(reply) || s->quit) {
-> >         ^
-> > ../block/nbd.c:710:14: note: 'local_reply.<U4be0>.magic' was declared h=
-ere
-> >      NBDReply local_reply;
-> >               ^~~~~~~~~~~
-> > cc1: all warnings being treated as errors
->
-> Thomas reported this error when compiling with -O3 few months ago [1].
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ contrib/rdmacm-mux/main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Thanks, I couldn't find a previous report.
+diff --git a/contrib/rdmacm-mux/main.c b/contrib/rdmacm-mux/main.c
+index 30c7052651..de53048f06 100644
+--- a/contrib/rdmacm-mux/main.c
++++ b/contrib/rdmacm-mux/main.c
+@@ -115,7 +115,7 @@ static void parse_args(int argc, char *argv[])
+=20
+         case 's':
+             /* This is temporary, final name will build below */
+-            strncpy(unix_socket_path, optarg, SOCKET_PATH_MAX);
++            strncpy(unix_socket_path, optarg, SOCKET_PATH_MAX - 1);
+             break;
+=20
+         case 'p':
+--=20
+2.22.0.428.g6d5b264208
 
-> Are you using that, or the latest GCC emit a warning even with no -O3?
-
-Right, the warning seems to appear with -O3 (I happen to have it with
-mingw64-gcc-8.3.0-2.fc30.x86_64)
-
->
-> Personally I'd add:
->
-> Fixes: 86f8cdf3db8
-
-Actually, it was there before, so I'll skip that.
-
-> Reported-by: Thomas Huth <thuth@redhat.com>
->
-> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> > ---
-> >  block/nbd.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >
-> > diff --git a/block/nbd.c b/block/nbd.c
-> > index 81edabbf35..02eef09728 100644
-> > --- a/block/nbd.c
-> > +++ b/block/nbd.c
-> > @@ -707,7 +707,7 @@ static bool nbd_reply_chunk_iter_receive(BDRVNBDSta=
-te *s,
-> >                                           void **payload)
-> >  {
-> >      int ret, request_ret;
-> > -    NBDReply local_reply;
-> > +    NBDReply local_reply =3D { 0, };
->
-> Yesterday [2] Peter said: "=3D {}" is our standard struct-zero-initialize=
-r
-> so we should prefer that.
->
-> With {}:
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-
-ok, thanks
-
->
-> >      NBDStructuredReplyChunk *chunk;
-> >      Error *local_err =3D NULL;
-> >      if (s->quit) {
-> >
->
-> [1] https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg07007.html
-> [2] https://lists.gnu.org/archive/html/qemu-devel/2019-07/msg03431.html
 
