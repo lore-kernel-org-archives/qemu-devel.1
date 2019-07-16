@@ -2,76 +2,62 @@ Return-Path: <SRS0=+QfZ=VN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93B99C76192
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 14:51:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2C41C7618F
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 14:54:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6CF642173C
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 14:51:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6CF642173C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id A7BDA20693
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 14:54:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A7BDA20693
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49712 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49738 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnOnY-00030E-Hh
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 10:51:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48811)
+	id 1hnOqn-0005Gg-Gl
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 10:54:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49695)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bounces@canonical.com>) id 1hnOnG-0002A2-8v
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 10:51:03 -0400
+ (envelope-from <tao3.xu@intel.com>) id 1hnOqQ-0004WK-TB
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 10:54:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1hnOnB-0007ep-Sl
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 10:50:59 -0400
-Received: from indium.canonical.com ([91.189.90.7]:52444)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1hnOnA-0007bO-Dv
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 10:50:57 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1hnOn4-00033A-Sl
- for <qemu-devel@nongnu.org>; Tue, 16 Jul 2019 14:50:50 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 1EA432E80D2
- for <qemu-devel@nongnu.org>; Tue, 16 Jul 2019 14:50:50 +0000 (UTC)
+ (envelope-from <tao3.xu@intel.com>) id 1hnOqP-0000z7-Cq
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 10:54:18 -0400
+Received: from mga03.intel.com ([134.134.136.65]:20977)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1hnOqP-0000xO-1u
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 10:54:17 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+ by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 16 Jul 2019 07:54:13 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.63,498,1557212400"; d="scan'208";a="319014742"
+Received: from tao-optiplex-7060.sh.intel.com ([10.239.13.104])
+ by orsmga004.jf.intel.com with ESMTP; 16 Jul 2019 07:54:11 -0700
+From: Tao Xu <tao3.xu@intel.com>
+To: imammedo@redhat.com,
+	eblake@redhat.com,
+	ehabkost@redhat.com
+Date: Tue, 16 Jul 2019 22:51:10 +0800
+Message-Id: <20190716145121.19578-1-tao3.xu@intel.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 16 Jul 2019 14:43:56 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Tags: linux-user ppc
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: ajbennee alex-bennee pmaydell scherft
-X-Launchpad-Bug-Reporter: Daan Scherft (scherft)
-X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
-References: <156318593102.28533.3075291509963886255.malonedeb@chaenomeles.canonical.com>
- <20190716140133.8578-1-alex.bennee@linaro.org>
-Message-Id:
- <CAFEAcA8V2h3pqC_g5aaD2gsv08c18YZKRcxLM+hDNuMv_C55=Q@mail.gmail.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="19007";
- Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 32df8da1136858759348dacdd3c4b2a4949a9471
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1836558] Re: [RFC PATCH for 4.1] linux-user:
- unparent CPU object before unref
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 134.134.136.65
+Subject: [Qemu-devel] [PATCH v7 00/11] Build ACPI Heterogeneous Memory
+ Attribute Table (HMAT)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -80,124 +66,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1836558 <1836558@bugs.launchpad.net>
+Cc: jingqi.liu@intel.com, tao3.xu@intel.com, fan.du@intel.com,
+ qemu-devel@nongnu.org, jonathan.cameron@huawei.com, dan.j.williams@intel.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190716144356.o4B9dM9QYb8aYDlaA85yabt2X1kJlewP7l1htzpJvwA@z>
 
-Ccing the QOM maintainers to make sure we have the
-QOM lifecycle operations right here...
+This series of patches will build Heterogeneous Memory Attribute Table (HMAT)
+according to the command line. The ACPI HMAT describes the memory attributes,
+such as memory side cache attributes and bandwidth and latency details,
+related to the Memory Proximity Domain.
+The software is expected to use HMAT information as hint for optimization.
 
-On Tue, 16 Jul 2019 at 15:02, Alex Benn=C3=A9e <alex.bennee@linaro.org> wro=
-te:
->
-> When a CPU object is created it is parented during it's realize stage.
-> If we don't unparent before the "final" unref we will never finzalize
-> the object leading to a memory leak. For most setups you probably
-> won't notice but with anything that creates and destroys a lot of
-> threads this will add up. This goes especially for architectures which
-> allocate a lot of memory in their CPU structures.
->
-> Fixes: https://bugs.launchpad.net/qemu/+bug/1836558
-> Cc: 1836558@bugs.launchpad.net
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> ---
->  linux-user/syscall.c | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> index 39a37496fed..4c9313fd9d0 100644
-> --- a/linux-user/syscall.c
-> +++ b/linux-user/syscall.c
-> @@ -7183,6 +7183,7 @@ static abi_long do_syscall1(void *cpu_env, int num,=
- abi_long arg1,
->                            NULL, NULL, 0);
->              }
->              thread_cpu =3D NULL;
-> +            object_unparent(OBJECT(cpu));
->              object_unref(OBJECT(cpu));
->              g_free(ts);
->              rcu_unregister_thread();
+In the linux kernel, the codes in drivers/acpi/hmat/hmat.c parse and report
+the platform's HMAT tables.
 
-I think (as I mentioned on IRC) that we also need to unrealize
-the CPU object, because target/ppc at least does some freeing
-of memory in its unrealize method. I think we do that by
-setting the QOM "realize" property back to "false" -- but that
-might barf if we try it on a CPU that isn't hotpluggable...
+The V6 RESEND patches link:
+https://patchwork.kernel.org/cover/11036461/
 
-thanks
--- PMM
+Changelog:
+v7:
+    - Defer 11-13 of patch v6, because the driver of _HMA hasn't been
+      implemented in kernel driver
+    - Drop the HMAT_LB_MEM_CACHE_LAST_LEVEL which is not used in
+      ACPI 6.3 (Jonathan)
+    - Add bit mask in flags of hmat-lb (Jonathan)
+    - Add a marco to indicate the type is latency or bandwidth (Jonathan)
+v6:
+    - Rebase to upstream, move numa globals in arm/sbsa-ref
+    - When used once or twice in the function, use
+      ms->numa_state->num_nodes(numa_info) directly (Igor)
+    - Correct some mistakes
+    - Use once monitor_printf in hmp_info_numa (Igor)
+    - Add new patch to extend CLI of "-numa node" option to indicate the
+      initiator numa node-id (Dan)
+    - Update to ACPI 6.3 (Jonathan)
+    - Add QMP interface to update HMAT at runtime (Igor)
+    - Add test cases for ACPI HMAT
 
--- =
+Liu Jingqi (5):
+  hmat acpi: Build Memory Proximity Domain Attributes Structure(s)
+  hmat acpi: Build System Locality Latency and Bandwidth Information
+    Structure(s)
+  hmat acpi: Build Memory Side Cache Information Structure(s)
+  numa: Extend the CLI to provide memory latency and bandwidth
+    information
+  numa: Extend the CLI to provide memory side cache information
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1836558
+Tao Xu (6):
+  hw/arm: simplify arm_load_dtb
+  numa: move numa global variable nb_numa_nodes into MachineState
+  numa: move numa global variable have_numa_distance into MachineState
+  numa: move numa global variable numa_info into MachineState
+  numa: Extend CLI to provide initiator information for numa nodes
+  tests/bios-tables-test: add test cases for ACPI HMAT
 
-Title:
-  Qemu-ppc Memory leak creating threads
+ exec.c                              |   5 +-
+ hw/acpi/Kconfig                     |   5 +
+ hw/acpi/Makefile.objs               |   1 +
+ hw/acpi/aml-build.c                 |   9 +-
+ hw/acpi/hmat.c                      | 256 +++++++++++++++++++++++++
+ hw/acpi/hmat.h                      | 103 ++++++++++
+ hw/arm/aspeed.c                     |   5 +-
+ hw/arm/boot.c                       |  20 +-
+ hw/arm/collie.c                     |   8 +-
+ hw/arm/cubieboard.c                 |   5 +-
+ hw/arm/exynos4_boards.c             |   7 +-
+ hw/arm/highbank.c                   |   8 +-
+ hw/arm/imx25_pdk.c                  |   5 +-
+ hw/arm/integratorcp.c               |   8 +-
+ hw/arm/kzm.c                        |   5 +-
+ hw/arm/mainstone.c                  |   5 +-
+ hw/arm/mcimx6ul-evk.c               |   5 +-
+ hw/arm/mcimx7d-sabre.c              |   5 +-
+ hw/arm/musicpal.c                   |   8 +-
+ hw/arm/nseries.c                    |   5 +-
+ hw/arm/omap_sx1.c                   |   5 +-
+ hw/arm/palm.c                       |  10 +-
+ hw/arm/raspi.c                      |   6 +-
+ hw/arm/realview.c                   |   5 +-
+ hw/arm/sabrelite.c                  |   5 +-
+ hw/arm/sbsa-ref.c                   |  12 +-
+ hw/arm/spitz.c                      |   5 +-
+ hw/arm/tosa.c                       |   8 +-
+ hw/arm/versatilepb.c                |   5 +-
+ hw/arm/vexpress.c                   |   5 +-
+ hw/arm/virt-acpi-build.c            |  19 +-
+ hw/arm/virt.c                       |  17 +-
+ hw/arm/xilinx_zynq.c                |   8 +-
+ hw/arm/xlnx-versal-virt.c           |   7 +-
+ hw/arm/xlnx-zcu102.c                |   5 +-
+ hw/arm/z2.c                         |   8 +-
+ hw/core/machine-hmp-cmds.c          |  12 +-
+ hw/core/machine.c                   |  38 +++-
+ hw/core/numa.c                      | 287 ++++++++++++++++++++++++----
+ hw/i386/acpi-build.c                |   7 +-
+ hw/i386/pc.c                        |  13 +-
+ hw/mem/pc-dimm.c                    |   2 +
+ hw/pci-bridge/pci_expander_bridge.c |   3 +-
+ hw/ppc/spapr.c                      |  33 ++--
+ hw/ppc/spapr_pci.c                  |   4 +-
+ include/hw/acpi/aml-build.h         |   2 +-
+ include/hw/arm/boot.h               |   4 +-
+ include/hw/boards.h                 |   1 +
+ include/qemu/typedefs.h             |   2 +
+ include/sysemu/numa.h               |  30 ++-
+ include/sysemu/sysemu.h             |  23 +++
+ qapi/machine.json                   | 183 +++++++++++++++++-
+ qemu-options.hx                     |  84 +++++++-
+ tests/bios-tables-test.c            |  43 +++++
+ 54 files changed, 1131 insertions(+), 248 deletions(-)
+ create mode 100644 hw/acpi/hmat.c
+ create mode 100644 hw/acpi/hmat.h
 
-Status in QEMU:
-  Confirmed
+-- 
+2.20.1
 
-Bug description:
-  When creating c++ threads (with c++ std::thread), the resulting binary
-  has memory leaks when running with qemu-ppc.
-
-  Eg the following c++ program, when compiled with gcc, consumes more
-  and more memory while running at qemu-ppc. (does not have memory leaks
-  when compiling for Intel, when running same binary on real powerpc CPU
-  hardware also no memory leaks).
-
-  (Note I used function getCurrentRSS to show available memory, see
-  https://stackoverflow.com/questions/669438/how-to-get-memory-usage-at-
-  runtime-using-c; calls commented out here)
-
-  Compiler: powerpc-linux-gnu-g++ (Debian 8.3.0-2) 8.3.0 (but same problem =
-with older g++ compilers even 4.9)
-  Os: Debian 10.0 ( Buster) (but same problem seen on Debian 9/stetch)
-  qemu: qemu-ppc version 3.1.50
-
-
-  ---
-
-  #include <iostream>
-  #include <thread>
-  #include <chrono>
-
-  =
-
-  using namespace std::chrono_literals;
-
-  // Create/run and join a 100 threads.
-  void Fun100()
-  {
-  //    auto b4 =3D getCurrentRSS();
-  //    std::cout << getCurrentRSS() << std::endl;
-      for(int n =3D 0; n < 100; n++)
-      {
-          std::thread t([]
-          {
-              std::this_thread::sleep_for( 10ms );
-          });
-  //        std::cout << n << ' ' << getCurrentRSS() << std::endl;
-          t.join();
-      }
-      std::this_thread::sleep_for( 500ms ); // to give OS some time to wipe=
- memory...
-  //    auto after =3D getCurrentRSS();
-      std::cout << b4 << ' ' << after << std::endl;
-  }
-
-  =
-
-  int main(int, char **)
-  {
-      Fun100();
-      Fun100();  // memory used keeps increasing
-  }
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1836558/+subscriptions
 
