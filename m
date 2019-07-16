@@ -2,84 +2,62 @@ Return-Path: <SRS0=+QfZ=VN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D77E8C7618F
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 17:00:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A102C7618F
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 17:02:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A209C205ED
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 17:00:14 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Wd/UmHv9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A209C205ED
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id D23A5205ED
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 17:02:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D23A5205ED
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51312 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51332 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnQoH-0004Iy-PD
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 13:00:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33336)
+	id 1hnQqD-0006mX-Kr
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 13:02:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34010)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hnQo6-0003sz-Ny
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 13:00:03 -0400
+ (envelope-from <kwolf@redhat.com>) id 1hnQq2-0006JZ-E2
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 13:02:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hnQo5-0005h4-Qi
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 13:00:02 -0400
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:42266)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hnQo5-0005dm-HP
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 13:00:01 -0400
-Received: by mail-oi1-x242.google.com with SMTP id s184so16118591oie.9
- for <qemu-devel@nongnu.org>; Tue, 16 Jul 2019 10:00:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=ao0uqHHBTz4qaUS7QqvQ/t4Rvg3gvvAgwu364zBMAtc=;
- b=Wd/UmHv9gwG7dQXr2Q/0FEzKNArfC38cC6gTaQBPGZoLrQ0QrqUCC44L5BPtj50D4b
- SWS424z2mj/p+YPHsDkJWmMP9w8re0tqxEE4jXi53U7wirV9/ZnCvWdgau9iEKE5giO5
- 9q/ZbjiN8jCk96alTT9Nrzv2TuLjXrt4m0ZeJ1wI4aeQEnEG3o1IqaavbiqoNLJ4SzPa
- TSLvjjDA7FL7QGM76r5MizBkvh3gTwH7ziye9yzo3VId+K1cGb3gLXrp5CpXay/8ckKI
- FTVJGKLKqiwSKqvdacvh2GDKMSg3X9xhQJNor7F37v6wyeRH7XVAVFFNgRSqsLu9NvVX
- q3gA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=ao0uqHHBTz4qaUS7QqvQ/t4Rvg3gvvAgwu364zBMAtc=;
- b=atWMJ10NHFPAuBlxWNEY3wnlHhooL6iYHLgJh7956o8p3HI/5GRuo5SBCkrxZmhJYa
- R9ObFQ5mkA5MR9k6CIh+e58dsaNEUVkVr9QMsl+Gfm+1VHXT7l21xLRuXf+qErfnfmZs
- 6nw5panJI/AFxskMgpU+DkGJucQmQD85wznfpdb//hX3BRZbdm+cTil/kv/PZO82trpO
- n4arZWpwpAHbjlWiPlrP0sFObg6Qszsy6jdEtieoti2uD0Z855I2RXztTdz9bHFsj4Fm
- AVWukAnxj15NmVoW2CZcedG0UfmUI0CcmXHLlyGCGcZp8DWf6D6ByHGT0x1cZAoDN0CA
- 6d9A==
-X-Gm-Message-State: APjAAAWnCzsGxq9ZSiH1U8YVKwjcrcQKAY+pHjYx8YKvA0rgi/IlYskr
- aXSB8YbdcWvzPmRfQQL2HeuucwvsVK+7PyC8zAMzUA==
-X-Google-Smtp-Source: APXvYqxEMc/Td0uGfaU/WM8M8dYWXihnhNpRIWyXw1hnFO8Y2jLVgYd0yxH0JyQJO7mece5vgxFhPIpgKhY81sfo4/k=
-X-Received: by 2002:a05:6808:8c2:: with SMTP id
- k2mr16513411oij.98.1563296400374; 
- Tue, 16 Jul 2019 10:00:00 -0700 (PDT)
+ (envelope-from <kwolf@redhat.com>) id 1hnQq1-0007M1-EG
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 13:02:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53622)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>)
+ id 1hnQpz-0007Iz-4P; Tue, 16 Jul 2019 13:01:59 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 7663DC034DF3;
+ Tue, 16 Jul 2019 17:01:58 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-117-24.ams2.redhat.com [10.36.117.24])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 947201001B04;
+ Tue, 16 Jul 2019 17:01:57 +0000 (UTC)
+Date: Tue, 16 Jul 2019 19:01:56 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Max Reitz <mreitz@redhat.com>
+Message-ID: <20190716170156.GJ7297@linux.fritz.box>
+References: <20190703172813.6868-1-mreitz@redhat.com>
+ <20190703172813.6868-7-mreitz@redhat.com>
 MIME-Version: 1.0
-References: <20181102171638.24069-1-peter.maydell@linaro.org>
- <20181102171638.24069-9-peter.maydell@linaro.org>
- <3e3d2018-3993-f651-8e94-5bea612bd776@redhat.com>
- <CAFEAcA_FtoHOUv_cPgfO7GrZ8Ug9cKCvmY2z75i9DaAQ8Qx+gQ@mail.gmail.com>
- <417cd887-aec4-d8ba-1dd2-810bc4c04977@redhat.com>
-In-Reply-To: <417cd887-aec4-d8ba-1dd2-810bc4c04977@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 16 Jul 2019 17:59:49 +0100
-Message-ID: <CAFEAcA_JntiaOOWisqLVqAV6jc=wk4nR548KbbUcG0XLabcNpA@mail.gmail.com>
-To: Laszlo Ersek <lersek@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::242
-Subject: Re: [Qemu-devel] [PULL 08/10] target/arm: Conditionalize some
- asserts on aarch32 support
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190703172813.6868-7-mreitz@redhat.com>
+User-Agent: Mutt/1.11.3 (2019-02-01)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.31]); Tue, 16 Jul 2019 17:01:58 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2 06/12] block: Deep-clear inherits_from
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,33 +69,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 16 Jul 2019 at 17:51, Laszlo Ersek <lersek@redhat.com> wrote:
-> The issue still reproduces, so it makes sense for me to look at the host
-> kernel version... Well, I'm afraid it won't help much, for an upstream
-> investigation:
->
->   4.14.0-115.8.2.el7a.aarch64
->
-> This is the latest released kernel from "Red Hat Enterprise Linux for
-> ARM 64 7".
+Am 03.07.2019 um 19:28 hat Max Reitz geschrieben:
+> BDS.inherits_from does not always point to an immediate parent node.
+> When launching a block job with a filter node, for example, the node
+> directly below the filter will not point to the filter, but keep its old
+> pointee (above the filter).
+> 
+> If that pointee goes away while the job is still running, the node's
+> inherits_from will not be updated and thus point to garbage.  To fix
+> this, bdrv_unref_child() has to check not only the parent node's
+> immediate children for nodes whose inherits_from needs to be cleared,
+> but its whole subtree.
+> 
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
 
-OK. (I'm using 4.15.0-51-generic from ubuntu).
+Isn't the real bug that we keep pointing to a node that isn't a parent
+of the node any more? I think this will effectively disable option
+inheritance in bdrv_reopen() as long as the filter node is present,
+which is certainly not what we intended.
 
-Could you run with QEMU under gdb, and when it hits the
-assertion go back up a stack frame to the arm_cpu_realizefn()
-frame, and then "print /x cpu->isar" ? That should show us
-what we think we've got as ID registers from the kernel.
-(You might need to build QEMU with --enable-debug to get
-useful enough debug info to do that, not sure.)
+The intuitive thing would be that after inserting a filter, the image
+now inherits from the filter node, and when the filter is removed, it
+inherits from the filter's bs->inherit_from if that becomes a parent of
+the node. (Though I'm not necessarily saying that my intuition is to be
+trusted here.)
 
-thanks
--- PMM
+Kevin
 
