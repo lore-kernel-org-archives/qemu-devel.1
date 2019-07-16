@@ -2,65 +2,90 @@ Return-Path: <SRS0=+QfZ=VN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59D48C76192
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 10:51:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43A23C76188
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 10:53:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2FA9E2053B
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 10:51:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FA9E2053B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 1AA44206C2
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 10:53:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1AA44206C2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47150 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47160 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnL3d-0001E4-Kw
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 06:51:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55335)
+	id 1hnL5Y-0002Gf-BZ
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 06:53:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55859)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <no-reply@patchew.org>) id 1hnL3S-0000oV-FX
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 06:51:31 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hnL5N-0001ms-PB
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 06:53:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1hnL3R-0006Xs-8s
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 06:51:30 -0400
-Resent-Date: Tue, 16 Jul 2019 06:51:30 -0400
-Resent-Message-Id: <E1hnL3R-0006Xs-8s@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21865)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1hnL3R-0006TM-0i; Tue, 16 Jul 2019 06:51:29 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1563274273; cv=none; d=zoho.com; s=zohoarc; 
- b=ktC6XGE5A3CKwJO8EIFKmrrctiDw9G0DGQ6uerNqXj/ROStsewCjI87DXRv90BAiTvCyJRC11GNqU7Em7qaYB8mzRyVsLGdpIh1yHW8r4t94KcscZIxy8T7fClypLFcNOo9eQs/iIyks+WXsonpVWWxfGumF5LGQF1SPctHpLgM=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1563274273;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
- bh=qlF8OI/G5DIuUscA9IDvT8i0dF594GVXtsPsxW5XHS4=; 
- b=WAVbYuFjOcWHD3pvZ9jTB6tYG4cqBdx+apTxPdmxqwSOEBmh1D8ScfghfXqIVp1XWV53kMcqNLW3Hkyd7uUBgmyhzgrfP7CkbgMEpXBB3YWCo84fgzxSstKy6xEfWNmSt4EKTqwivnNaX/VJn1d4rw28oaQ0ycTUSd6YySbRUvY=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1563274271673576.6774481441985;
- Tue, 16 Jul 2019 03:51:11 -0700 (PDT)
-Message-ID: <156327427033.3080.4007866092680967266@c4a48874b076>
-In-Reply-To: <20190715142304.215018-1-borntraeger@de.ibm.com>
+ (envelope-from <mreitz@redhat.com>) id 1hnL5M-0007zP-Tw
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 06:53:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34320)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1hnL5K-0007w2-Q6; Tue, 16 Jul 2019 06:53:27 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 7D014C057EC0;
+ Tue, 16 Jul 2019 10:53:25 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.40.205.58])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A419619C71;
+ Tue, 16 Jul 2019 10:53:18 +0000 (UTC)
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+References: <20190716000117.25219-1-jsnow@redhat.com>
+ <20190716000117.25219-7-jsnow@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <65c200ee-b9de-a937-520e-440ec6413cf3@redhat.com>
+Date: Tue, 16 Jul 2019 12:53:16 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: borntraeger@de.ibm.com
-Date: Tue, 16 Jul 2019 03:51:11 -0700 (PDT)
-X-ZohoMailClient: External
+In-Reply-To: <20190716000117.25219-7-jsnow@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="veDFHM9ddjbdgE3GlyN7is6lik5rNQgmA"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.32]); Tue, 16 Jul 2019 10:53:25 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 135.84.80.218
-Subject: Re: [Qemu-devel] [PATCH 0/3] s390x/cpumodel fixes for 4.1
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2 06/11] block/backup: improve sync=bitmap
+ work estimates
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,55 +97,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: david@redhat.com, cohuck@redhat.com, qemu-devel@nongnu.org,
- pasic@linux.ibm.com, borntraeger@de.ibm.com, qemu-s390x@nongnu.org,
- rth@twiddle.net
+Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com,
+ Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDcxNTE0MjMwNC4yMTUw
-MTgtMS1ib3JudHJhZWdlckBkZS5pYm0uY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRv
-IGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1v
-cmUgaW5mb3JtYXRpb246CgpNZXNzYWdlLWlkOiAyMDE5MDcxNTE0MjMwNC4yMTUwMTgtMS1ib3Ju
-dHJhZWdlckBkZS5pYm0uY29tClR5cGU6IHNlcmllcwpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BB
-VENIIDAvM10gczM5MHgvY3B1bW9kZWwgZml4ZXMgZm9yIDQuMQoKPT09IFRFU1QgU0NSSVBUIEJF
-R0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJhc2UgPiAvZGV2L251bGwgfHwgZXhp
-dCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxv
-Y2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBo
-aXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4KPT09IFRF
-U1QgU0NSSVBUIEVORCA9PT0KCkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVj
-dC9xZW11CiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAxOTA3MTUxNDIzMDQu
-MjE1MDE4LTEtYm9ybnRyYWVnZXJAZGUuaWJtLmNvbSAtPiBwYXRjaGV3LzIwMTkwNzE1MTQyMzA0
-LjIxNTAxOC0xLWJvcm50cmFlZ2VyQGRlLmlibS5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNo
-ICd0ZXN0Jwo3YmM0MzZkM2VkIHMzOTB4L2NwdW1vZGVsOiBjaGFuZ2UgaW50ZXJuYWwgbmFtZSBv
-ZiB2eHAgdG8gbWFrZSBkZXNjcmlwdGlvbgo2YjA0NzRiYmIzIHMzOTB4L2NwdW1vZGVsOiBhbHNv
-IGNoYW5nZSBuYW1lIG9mIHZ4YmVoCjJhMzQ0NTU1NWEgczM5MHgvY3B1bW9kZWw6IHJlbW92ZSBl
-c29ydCBmcm9tIHRoZSBkZWZhdWx0IG1vZGVsCgo9PT0gT1VUUFVUIEJFR0lOID09PQoxLzMgQ2hl
-Y2tpbmcgY29tbWl0IDJhMzQ0NTU1NWE1NSAoczM5MHgvY3B1bW9kZWw6IHJlbW92ZSBlc29ydCBm
-cm9tIHRoZSBkZWZhdWx0IG1vZGVsKQoyLzMgQ2hlY2tpbmcgY29tbWl0IDZiMDQ3NGJiYjNlYyAo
-czM5MHgvY3B1bW9kZWw6IGFsc28gY2hhbmdlIG5hbWUgb2YgdnhiZWgpCldBUk5JTkc6IGxpbmUg
-b3ZlciA4MCBjaGFyYWN0ZXJzCiMyOTogRklMRTogdGFyZ2V0L3MzOTB4L2NwdV9mZWF0dXJlc19k
-ZWYuaW5jLmg6MTA3OgorREVGX0ZFQVQoVkVDVE9SX0JDRF9FTkgsICJ2eHAiLCBTVEZMLCAxNTIs
-ICJWZWN0b3ItUGFja2VkLURlY2ltYWwtRW5oYW5jZW1lbnQgRmFjaWxpdHkiKQoKdG90YWw6IDAg
-ZXJyb3JzLCAxIHdhcm5pbmdzLCA4IGxpbmVzIGNoZWNrZWQKClBhdGNoIDIvMyBoYXMgc3R5bGUg
-cHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxz
-ZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENI
-IGluIE1BSU5UQUlORVJTLgozLzMgQ2hlY2tpbmcgY29tbWl0IDdiYzQzNmQzZWRhNCAoczM5MHgv
-Y3B1bW9kZWw6IGNoYW5nZSBpbnRlcm5hbCBuYW1lIG9mIHZ4cCB0byBtYWtlIGRlc2NyaXB0aW9u
-KQpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzIyOiBGSUxFOiB0YXJnZXQvczM5MHgv
-Y3B1X2ZlYXR1cmVzX2RlZi5pbmMuaDoxMDc6CitERUZfRkVBVChWRUNUT1JfUEFDS0VEX0RFQ0lN
-QUxfRU5ILCAidnhwIiwgU1RGTCwgMTUyLCAiVmVjdG9yLVBhY2tlZC1EZWNpbWFsLUVuaGFuY2Vt
-ZW50IEZhY2lsaXR5IikKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMjQgbGluZXMgY2hl
-Y2tlZAoKUGF0Y2ggMy8zIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFu
-eSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUg
-bWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVO
-RCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlz
-IGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MDcxNTE0MjMwNC4yMTUw
-MTgtMS1ib3JudHJhZWdlckBkZS5pYm0uY29tL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNz
-YWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6
-Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2
-ZWxAcmVkaGF0LmNvbQ==
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--veDFHM9ddjbdgE3GlyN7is6lik5rNQgmA
+Content-Type: multipart/mixed; boundary="OJwU9QAJFN3uigjr46TagpNlEltbrSzeS";
+ protected-headers="v1"
+From: Max Reitz <mreitz@redhat.com>
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
+ vsementsov@virtuozzo.com, Markus Armbruster <armbru@redhat.com>
+Message-ID: <65c200ee-b9de-a937-520e-440ec6413cf3@redhat.com>
+Subject: Re: [PATCH v2 06/11] block/backup: improve sync=bitmap work estimates
+References: <20190716000117.25219-1-jsnow@redhat.com>
+ <20190716000117.25219-7-jsnow@redhat.com>
+In-Reply-To: <20190716000117.25219-7-jsnow@redhat.com>
 
+--OJwU9QAJFN3uigjr46TagpNlEltbrSzeS
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 16.07.19 02:01, John Snow wrote:
+> When making backups based on bitmaps, the work estimate can be more
+> accurate. Update iotests to reflect the new strategy.
+>=20
+> TOP work estimates are broken, but do not get worse with this commit.
+> That issue is addressed in the following commits instead.
+>=20
+> Signed-off-by: John Snow <jsnow@redhat.com>
+> ---
+>  block/backup.c             |  8 +++-----
+>  tests/qemu-iotests/256.out |  4 ++--
+>  tests/qemu-iotests/257.out | 36 ++++++++++++++++++------------------
+>  3 files changed, 23 insertions(+), 25 deletions(-)
+
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+
+
+--OJwU9QAJFN3uigjr46TagpNlEltbrSzeS--
+
+--veDFHM9ddjbdgE3GlyN7is6lik5rNQgmA
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0trJwACgkQ9AfbAGHV
+z0C1OwgAp6EbQudcYibUU3NFqWOuJ8/YIg9lz5ZtzlVOICLMze4FdGppf46fphTa
+/yHYPwYH3unkHJdJMBe4k/C/uajMrnW+s6NOYLBvucewkd9DFjjjHq/+NZcQVHj/
+GgRv1EmecBZkTQHtPcjTfyG/VKsOf10d8DGyClgoZtxWXcy47jwCrjkjqnyv9k/d
+sA2SbipCSZGx6W3ms6oT4rgwbCGQR3ZGCuhWDd+9Hug67fiGLJlqT041zkqZjtnk
+bHBqni/N/HmaTmQXGFrQjXFbM9SfHjRhLFcn2ut7Z1y89lgJq8kxC0ZNeOdBfoRB
+rON9LAtMdSOnFGjcRf1SKkgkz/DM/A==
+=FSiU
+-----END PGP SIGNATURE-----
+
+--veDFHM9ddjbdgE3GlyN7is6lik5rNQgmA--
 
