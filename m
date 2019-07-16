@@ -6,57 +6,56 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C04BC7618F
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 00:02:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06026C7618F
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 00:02:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5792420880
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 00:02:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5792420880
+	by mail.kernel.org (Postfix) with ESMTPS id D22BA20880
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 00:02:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D22BA20880
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44422 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44436 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnAvD-0001Fc-5m
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 20:02:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44789)
+	id 1hnAvX-00033m-Ub
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 20:02:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44548)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jsnow@redhat.com>) id 1hnAua-0007az-FW
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 20:01:43 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hnAuO-0006lR-Gf
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 20:01:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hnAuX-0007dD-6X
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 20:01:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36972)
+ (envelope-from <jsnow@redhat.com>) id 1hnAuM-0007SA-4W
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 20:01:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44572)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1hnAuR-0007XO-IV; Mon, 15 Jul 2019 20:01:31 -0400
+ id 1hnAuJ-0007OV-Ex; Mon, 15 Jul 2019 20:01:23 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id D9C3A309B15B;
- Tue, 16 Jul 2019 00:01:30 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 9D14D308427C;
+ Tue, 16 Jul 2019 00:01:22 +0000 (UTC)
 Received: from probe.bos.redhat.com (dhcp-17-130.bos.redhat.com [10.18.17.130])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0529C6085B;
- Tue, 16 Jul 2019 00:01:29 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BBE3F608E4;
+ Tue, 16 Jul 2019 00:01:21 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: qemu-block@nongnu.org,
 	qemu-devel@nongnu.org
-Date: Mon, 15 Jul 2019 20:01:15 -0400
-Message-Id: <20190716000117.25219-10-jsnow@redhat.com>
+Date: Mon, 15 Jul 2019 20:01:07 -0400
+Message-Id: <20190716000117.25219-2-jsnow@redhat.com>
 In-Reply-To: <20190716000117.25219-1-jsnow@redhat.com>
 References: <20190716000117.25219-1-jsnow@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Tue, 16 Jul 2019 00:01:30 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.40]); Tue, 16 Jul 2019 00:01:22 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 09/11] block/backup: teach TOP to never copy
- unallocated regions
+Subject: [Qemu-devel] [PATCH v2 01/11] iotests/257: add Pattern class
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,207 +74,113 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Presently, If sync=3DTOP is selected, we mark the entire bitmap as dirty.
-In the write notifier handler, we dutifully copy out such regions.
-
-Fix this in three parts:
-
-1. Mark the bitmap as being initialized before the first yield.
-2. After the first yield but before the backup loop, interrogate the
-allocation status asynchronously and initialize the bitmap.
-3. Teach the write notifier to interrogate allocation status if it is
-invoked during bitmap initialization.
-
-As an effect of this patch, the job progress for TOP backups
-now behaves like this:
-
-- total progress starts at bdrv_length.
-- As allocation status is interrogated, total progress decreases.
-- As blocks are copied, current progress increases.
-
-Taken together, the floor and ceiling move to meet each other.
+Just kidding, this is easier to manage with a full class instead of a
+namedtuple.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- block/backup.c     | 78 ++++++++++++++++++++++++++++++++++++++++------
- block/trace-events |  1 +
- 2 files changed, 70 insertions(+), 9 deletions(-)
+ tests/qemu-iotests/257 | 58 +++++++++++++++++++++++-------------------
+ 1 file changed, 32 insertions(+), 26 deletions(-)
 
-diff --git a/block/backup.c b/block/backup.c
-index b407d57954..e28fd23f6a 100644
---- a/block/backup.c
-+++ b/block/backup.c
-@@ -58,6 +58,7 @@ typedef struct BackupBlockJob {
-     int64_t copy_range_size;
+diff --git a/tests/qemu-iotests/257 b/tests/qemu-iotests/257
+index 3952683749..02f9ae0649 100755
+--- a/tests/qemu-iotests/257
++++ b/tests/qemu-iotests/257
+@@ -19,7 +19,6 @@
+ #
+ # owner=3Djsnow@redhat.com
 =20
-     bool serialize_target_writes;
-+    bool initializing_bitmap;
- } BackupBlockJob;
+-from collections import namedtuple
+ import math
+ import os
 =20
- static const BlockJobDriver backup_job_driver;
-@@ -227,6 +228,35 @@ static int backup_is_cluster_allocated(BackupBlockJo=
-b *s, int64_t offset,
-     }
- }
+@@ -29,10 +28,18 @@ from iotests import log, qemu_img
+ SIZE =3D 64 * 1024 * 1024
+ GRANULARITY =3D 64 * 1024
 =20
-+/**
-+ * Reset bits in copy_bitmap starting at offset if they represent unallo=
-cated
-+ * data in the image. May reset subsequent contiguous bits.
-+ * @return 0 when the cluster at @offset was unallocated,
-+ *         1 otherwise, and -ret on error.
-+ */
-+static int64_t backup_bitmap_reset_unallocated(BackupBlockJob *s,
-+                                               int64_t offset, int64_t *=
-count)
-+{
-+    int ret;
-+    int64_t clusters, bytes, estimate;
+-Pattern =3D namedtuple('Pattern', ['byte', 'offset', 'size'])
+-def mkpattern(byte, offset, size=3DGRANULARITY):
+-    """Constructor for Pattern() with default size"""
+-    return Pattern(byte, offset, size)
 +
-+    ret =3D backup_is_cluster_allocated(s, offset, &clusters);
-+    if (ret < 0) {
-+        return ret;
-+    }
++class Pattern:
++    def __init__(self, byte, offset, size=3DGRANULARITY):
++        self.byte =3D byte
++        self.offset =3D offset
++        self.size =3D size
 +
-+    bytes =3D clusters * s->cluster_size;
++    def bits(self, granularity):
++        lower =3D self.offset // granularity
++        upper =3D (self.offset + self.size - 1) // granularity
++        return set(range(lower, upper + 1))
 +
-+    if (!ret) {
-+        bdrv_reset_dirty_bitmap(s->copy_bitmap, offset, bytes);
-+        estimate =3D bdrv_get_dirty_count(s->copy_bitmap);
-+        job_progress_set_remaining(&s->common.job, estimate);
-+    }
+=20
+ class PatternGroup:
+     """Grouping of Pattern objects. Initialize with an iterable of Patte=
+rns."""
+@@ -43,40 +50,39 @@ class PatternGroup:
+         """Calculate the unique bits dirtied by this pattern grouping"""
+         res =3D set()
+         for pattern in self.patterns:
+-            lower =3D pattern.offset // granularity
+-            upper =3D (pattern.offset + pattern.size - 1) // granularity
+-            res =3D res | set(range(lower, upper + 1))
++            res |=3D pattern.bits(granularity)
+         return res
+=20
 +
-+    *count =3D bytes;
-+    return ret;
-+}
-+
- static int coroutine_fn backup_do_cow(BackupBlockJob *job,
-                                       int64_t offset, uint64_t bytes,
-                                       bool *error_is_read,
-@@ -236,6 +266,7 @@ static int coroutine_fn backup_do_cow(BackupBlockJob =
-*job,
-     int ret =3D 0;
-     int64_t start, end; /* bytes */
-     void *bounce_buffer =3D NULL;
-+    int64_t skip_bytes;
+ GROUPS =3D [
+     PatternGroup([
+         # Batch 0: 4 clusters
+-        mkpattern('0x49', 0x0000000),
+-        mkpattern('0x6c', 0x0100000),   # 1M
+-        mkpattern('0x6f', 0x2000000),   # 32M
+-        mkpattern('0x76', 0x3ff0000)]), # 64M - 64K
++        Pattern('0x49', 0x0000000),
++        Pattern('0x6c', 0x0100000),   # 1M
++        Pattern('0x6f', 0x2000000),   # 32M
++        Pattern('0x76', 0x3ff0000)]), # 64M - 64K
+     PatternGroup([
+         # Batch 1: 6 clusters (3 new)
+-        mkpattern('0x65', 0x0000000),   # Full overwrite
+-        mkpattern('0x77', 0x00f8000),   # Partial-left (1M-32K)
+-        mkpattern('0x72', 0x2008000),   # Partial-right (32M+32K)
+-        mkpattern('0x69', 0x3fe0000)]), # Adjacent-left (64M - 128K)
++        Pattern('0x65', 0x0000000),   # Full overwrite
++        Pattern('0x77', 0x00f8000),   # Partial-left (1M-32K)
++        Pattern('0x72', 0x2008000),   # Partial-right (32M+32K)
++        Pattern('0x69', 0x3fe0000)]), # Adjacent-left (64M - 128K)
+     PatternGroup([
+         # Batch 2: 7 clusters (3 new)
+-        mkpattern('0x74', 0x0010000),   # Adjacent-right
+-        mkpattern('0x69', 0x00e8000),   # Partial-left  (1M-96K)
+-        mkpattern('0x6e', 0x2018000),   # Partial-right (32M+96K)
+-        mkpattern('0x67', 0x3fe0000,
+-                  2*GRANULARITY)]),     # Overwrite [(64M-128K)-64M)
++        Pattern('0x74', 0x0010000),   # Adjacent-right
++        Pattern('0x69', 0x00e8000),   # Partial-left  (1M-96K)
++        Pattern('0x6e', 0x2018000),   # Partial-right (32M+96K)
++        Pattern('0x67', 0x3fe0000,
++                2*GRANULARITY)]),     # Overwrite [(64M-128K)-64M)
+     PatternGroup([
+         # Batch 3: 8 clusters (5 new)
+         # Carefully chosen such that nothing re-dirties the one cluster
+         # that copies out successfully before failure in Group #1.
+-        mkpattern('0xaa', 0x0010000,
+-                  3*GRANULARITY),       # Overwrite and 2x Adjacent-righ=
+t
+-        mkpattern('0xbb', 0x00d8000),   # Partial-left (1M-160K)
+-        mkpattern('0xcc', 0x2028000),   # Partial-right (32M+160K)
+-        mkpattern('0xdd', 0x3fc0000)]), # New; leaving a gap to the righ=
+t
++        Pattern('0xaa', 0x0010000,
++                3*GRANULARITY),       # Overwrite and 2x Adjacent-right
++        Pattern('0xbb', 0x00d8000),   # Partial-left (1M-160K)
++        Pattern('0xcc', 0x2028000),   # Partial-right (32M+160K)
++        Pattern('0xdd', 0x3fc0000)]), # New; leaving a gap to the right
+ ]
 =20
-     qemu_co_rwlock_rdlock(&job->flush_rwlock);
-=20
-@@ -254,6 +285,15 @@ static int coroutine_fn backup_do_cow(BackupBlockJob=
- *job,
-             continue; /* already copied */
-         }
-=20
-+        if (job->initializing_bitmap) {
-+            ret =3D backup_bitmap_reset_unallocated(job, start, &skip_by=
-tes);
-+            if (ret =3D=3D 0) {
-+                trace_backup_do_cow_skip_range(job, start, skip_bytes);
-+                start +=3D skip_bytes;
-+                continue;
-+            }
-+        }
-+
-         trace_backup_do_cow_process(job, start);
-=20
-         if (job->use_copy_range) {
-@@ -436,18 +476,9 @@ static int coroutine_fn backup_loop(BackupBlockJob *=
-job)
-     int64_t offset;
-     BdrvDirtyBitmapIter *bdbi;
-     int ret =3D 0;
--    int64_t dummy;
-=20
-     bdbi =3D bdrv_dirty_iter_new(job->copy_bitmap);
-     while ((offset =3D bdrv_dirty_iter_next(bdbi)) !=3D -1) {
--        if (job->sync_mode =3D=3D MIRROR_SYNC_MODE_TOP &&
--            !backup_is_cluster_allocated(job, offset, &dummy))
--        {
--            bdrv_reset_dirty_bitmap(job->copy_bitmap, offset,
--                                    job->cluster_size);
--            continue;
--        }
--
-         do {
-             if (yield_and_check(job)) {
-                 goto out;
-@@ -478,6 +509,13 @@ static void backup_init_copy_bitmap(BackupBlockJob *=
-job)
-                                                NULL, true);
-         assert(ret);
-     } else {
-+        if (job->sync_mode =3D=3D MIRROR_SYNC_MODE_TOP) {
-+            /*
-+             * We can't hog the coroutine to initialize this thoroughly.
-+             * Set a flag and resume work when we are able to yield safe=
-ly.
-+             */
-+            job->initializing_bitmap =3D true;
-+        }
-         bdrv_set_dirty_bitmap(job->copy_bitmap, 0, job->len);
-     }
-=20
-@@ -499,6 +537,26 @@ static int coroutine_fn backup_run(Job *job, Error *=
-*errp)
-     s->before_write.notify =3D backup_before_write_notify;
-     bdrv_add_before_write_notifier(bs, &s->before_write);
-=20
-+    if (s->sync_mode =3D=3D MIRROR_SYNC_MODE_TOP) {
-+        int64_t offset =3D 0;
-+        int64_t count;
-+
-+        for (offset =3D 0; offset < s->len; ) {
-+            if (yield_and_check(s)) {
-+                ret =3D -ECANCELED;
-+                goto out;
-+            }
-+
-+            ret =3D backup_bitmap_reset_unallocated(s, offset, &count);
-+            if (ret < 0) {
-+                goto out;
-+            }
-+
-+            offset +=3D count;
-+        }
-+        s->initializing_bitmap =3D false;
-+    }
-+
-     if (s->sync_mode =3D=3D MIRROR_SYNC_MODE_NONE) {
-         /* All bits are set in copy_bitmap to allow any cluster to be co=
-pied.
-          * This does not actually require them to be copied. */
-@@ -507,10 +565,12 @@ static int coroutine_fn backup_run(Job *job, Error =
-**errp)
-              * notify callback service CoW requests. */
-             job_yield(job);
-         }
-+        ret =3D -ECANCELED;
-     } else {
-         ret =3D backup_loop(s);
-     }
-=20
-+ out:
-     notifier_with_return_remove(&s->before_write);
-=20
-     /* wait until pending backup_do_cow() calls have completed */
-diff --git a/block/trace-events b/block/trace-events
-index d724df0117..04209f058d 100644
---- a/block/trace-events
-+++ b/block/trace-events
-@@ -41,6 +41,7 @@ mirror_yield_in_flight(void *s, int64_t offset, int in_=
-flight) "s %p offset %" P
- backup_do_cow_enter(void *job, int64_t start, int64_t offset, uint64_t b=
-ytes) "job %p start %" PRId64 " offset %" PRId64 " bytes %" PRIu64
- backup_do_cow_return(void *job, int64_t offset, uint64_t bytes, int ret)=
- "job %p offset %" PRId64 " bytes %" PRIu64 " ret %d"
- backup_do_cow_skip(void *job, int64_t start) "job %p start %"PRId64
-+backup_do_cow_skip_range(void *job, int64_t start, uint64_t bytes) "job =
-%p start %"PRId64" bytes %"PRId64
- backup_do_cow_process(void *job, int64_t start) "job %p start %"PRId64
- backup_do_cow_read_fail(void *job, int64_t start, int ret) "job %p start=
- %"PRId64" ret %d"
- backup_do_cow_write_fail(void *job, int64_t start, int ret) "job %p star=
-t %"PRId64" ret %d"
+ class Drive:
 --=20
 2.21.0
 
