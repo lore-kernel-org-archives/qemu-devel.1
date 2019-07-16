@@ -6,57 +6,56 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9A90C76195
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 00:02:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EBCA9C7618F
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 00:03:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C504A20880
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 00:02:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C504A20880
+	by mail.kernel.org (Postfix) with ESMTPS id 9621020665
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 00:03:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9621020665
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44440 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44454 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnAvY-00039v-Kg
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 20:02:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44571)
+	id 1hnAvu-0004ik-Iz
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 20:03:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44757)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jsnow@redhat.com>) id 1hnAuP-0006qf-Rx
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 20:01:30 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hnAuZ-0007Xj-Qc
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 20:01:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hnAuO-0007Uw-Oz
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 20:01:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56772)
+ (envelope-from <jsnow@redhat.com>) id 1hnAuV-0007bg-1i
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 20:01:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56768)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1hnAuM-0007S2-Ic; Mon, 15 Jul 2019 20:01:26 -0400
+ id 1hnAuL-0007R6-Iv; Mon, 15 Jul 2019 20:01:25 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id D49ED308FB93;
- Tue, 16 Jul 2019 00:01:25 +0000 (UTC)
-Received: from probe.bos.redhat.com (dhcp-17-130.bos.redhat.com [10.18.17.130])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 022416085B;
+ by mx1.redhat.com (Postfix) with ESMTPS id D581B308FBA9;
  Tue, 16 Jul 2019 00:01:24 +0000 (UTC)
+Received: from probe.bos.redhat.com (dhcp-17-130.bos.redhat.com [10.18.17.130])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id EDDAA6085B;
+ Tue, 16 Jul 2019 00:01:23 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: qemu-block@nongnu.org,
 	qemu-devel@nongnu.org
-Date: Mon, 15 Jul 2019 20:01:10 -0400
-Message-Id: <20190716000117.25219-5-jsnow@redhat.com>
+Date: Mon, 15 Jul 2019 20:01:09 -0400
+Message-Id: <20190716000117.25219-4-jsnow@redhat.com>
 In-Reply-To: <20190716000117.25219-1-jsnow@redhat.com>
 References: <20190716000117.25219-1-jsnow@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.43]); Tue, 16 Jul 2019 00:01:25 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.43]); Tue, 16 Jul 2019 00:01:24 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 04/11] block/backup: hoist bitmap check into
- QMP interface
+Subject: [Qemu-devel] [PATCH v2 03/11] iotests/257: Refactor backup helpers
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,76 +74,957 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is nicer to do in the unified QMP interface that we have now,
-because it lets us use the right terminology back at the user.
+This test needs support for non-bitmap backups and missing or
+unspecified bitmap sync modes, so rewrite the helpers to be a little
+more generic.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- block/backup.c | 13 ++++---------
- blockdev.c     | 10 ++++++++++
- 2 files changed, 14 insertions(+), 9 deletions(-)
+ tests/qemu-iotests/257     |  56 ++++++-----
+ tests/qemu-iotests/257.out | 192 ++++++++++++++++++-------------------
+ 2 files changed, 128 insertions(+), 120 deletions(-)
 
-diff --git a/block/backup.c b/block/backup.c
-index e2729cf6fa..a64b768e24 100644
---- a/block/backup.c
-+++ b/block/backup.c
-@@ -566,6 +566,10 @@ BlockJob *backup_job_create(const char *job_id, Bloc=
-kDriverState *bs,
-     assert(bs);
-     assert(target);
+diff --git a/tests/qemu-iotests/257 b/tests/qemu-iotests/257
+index bc66ea03b2..aaa8f59504 100755
+--- a/tests/qemu-iotests/257
++++ b/tests/qemu-iotests/257
+@@ -207,31 +207,37 @@ def get_bitmap(bitmaps, drivename, name, recording=3D=
+None):
+                 return bitmap
+     return None
 =20
-+    /* QMP interface protects us from these cases */
-+    assert(sync_mode !=3D MIRROR_SYNC_MODE_INCREMENTAL);
-+    assert(sync_bitmap || sync_mode !=3D MIRROR_SYNC_MODE_BITMAP);
++def blockdev_backup(vm, device, target, sync, **kwargs):
++    # Strip any arguments explicitly nulled by the caller:
++    kwargs =3D {key: val for key, val in kwargs.items() if val is not No=
+ne}
++    result =3D vm.qmp_log('blockdev-backup',
++                        device=3Ddevice,
++                        target=3Dtarget,
++                        sync=3Dsync,
++                        **kwargs)
++    return result
 +
-     if (bs =3D=3D target) {
-         error_setg(errp, "Source and target cannot be the same");
-         return NULL;
-@@ -597,16 +601,7 @@ BlockJob *backup_job_create(const char *job_id, Bloc=
-kDriverState *bs,
-         return NULL;
-     }
-=20
--    /* QMP interface should have handled translating this to bitmap mode=
- */
--    assert(sync_mode !=3D MIRROR_SYNC_MODE_INCREMENTAL);
--
-     if (sync_mode =3D=3D MIRROR_SYNC_MODE_BITMAP) {
--        if (!sync_bitmap) {
--            error_setg(errp, "must provide a valid bitmap name for "
--                       "'%s' sync mode", MirrorSyncMode_str(sync_mode));
--            return NULL;
--        }
--
-         /* If we need to write to this bitmap, check that we can: */
-         if (bitmap_mode !=3D BITMAP_SYNC_MODE_NEVER &&
-             bdrv_dirty_bitmap_check(sync_bitmap, BDRV_BITMAP_DEFAULT, er=
-rp)) {
-diff --git a/blockdev.c b/blockdev.c
-index 020d566c1b..3c76c85cb5 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -3527,6 +3527,16 @@ static BlockJob *do_backup_common(BackupCommon *ba=
-ckup,
-         return NULL;
-     }
-=20
-+    if ((backup->sync =3D=3D MIRROR_SYNC_MODE_BITMAP) ||
-+        (backup->sync =3D=3D MIRROR_SYNC_MODE_INCREMENTAL)) {
-+        /* done before desugaring 'incremental' to print the right messa=
-ge */
-+        if (!backup->has_bitmap) {
-+            error_setg(errp, "must provide a valid bitmap name for "
-+                       "'%s' sync mode", MirrorSyncMode_str(backup->sync=
-));
-+            return NULL;
-+        }
-+    }
++def blockdev_backup_mktarget(drive, target_id, filepath, sync, **kwargs)=
+:
++    target_drive =3D Drive(filepath, vm=3Ddrive.vm)
++    target_drive.create_target(target_id, drive.fmt, drive.size)
++    blockdev_backup(drive.vm, drive.name, target_id, sync, **kwargs)
 +
-     if (backup->sync =3D=3D MIRROR_SYNC_MODE_INCREMENTAL) {
-         if (backup->has_bitmap_mode &&
-             backup->bitmap_mode !=3D BITMAP_SYNC_MODE_ON_SUCCESS) {
+ def reference_backup(drive, n, filepath):
+     log("--- Reference Backup #{:d} ---\n".format(n))
+     target_id =3D "ref_target_{:d}".format(n)
+     job_id =3D "ref_backup_{:d}".format(n)
+-    target_drive =3D Drive(filepath, vm=3Ddrive.vm)
+-
+-    target_drive.create_target(target_id, drive.fmt, drive.size)
+-    drive.vm.qmp_log("blockdev-backup",
+-                     job_id=3Djob_id, device=3Ddrive.name,
+-                     target=3Dtarget_id, sync=3D"full")
++    blockdev_backup_mktarget(drive, target_id, filepath, "full",
++                             job_id=3Djob_id)
+     drive.vm.run_job(job_id, auto_dismiss=3DTrue)
+     log('')
+=20
+-def bitmap_backup(drive, n, filepath, bitmap, bitmap_mode):
+-    log("--- Bitmap Backup #{:d} ---\n".format(n))
+-    target_id =3D "bitmap_target_{:d}".format(n)
+-    job_id =3D "bitmap_backup_{:d}".format(n)
+-    target_drive =3D Drive(filepath, vm=3Ddrive.vm)
+-
+-    target_drive.create_target(target_id, drive.fmt, drive.size)
+-    drive.vm.qmp_log("blockdev-backup", job_id=3Djob_id, device=3Ddrive.=
+name,
+-                     target=3Dtarget_id, sync=3D"bitmap",
+-                     bitmap_mode=3Dbitmap_mode,
+-                     bitmap=3Dbitmap,
+-                     auto_finalize=3DFalse)
++def backup(drive, n, filepath, sync, **kwargs):
++    log("--- Test Backup #{:d} ---\n".format(n))
++    target_id =3D "backup_target_{:d}".format(n)
++    job_id =3D "backup_{:d}".format(n)
++    kwargs.setdefault('auto-finalize', False)
++    blockdev_backup_mktarget(drive, target_id, filepath, sync,
++                             job_id=3Djob_id, **kwargs)
+     return job_id
+=20
+ def perform_writes(drive, n):
+@@ -263,7 +269,7 @@ def compare_images(image, reference, baseimg=3DNone, =
+expected_match=3DTrue):
+         "OK!" if ret =3D=3D expected_ret else "ERROR!"),
+         filters=3D[iotests.filter_testfiles])
+=20
+-def test_bitmap_sync(bsync_mode, failure=3DNone):
++def test_bitmap_sync(bsync_mode, msync_mode=3D'bitmap', failure=3DNone):
+     """
+     Test bitmap backup routines.
+=20
+@@ -291,7 +297,7 @@ def test_bitmap_sync(bsync_mode, failure=3DNone):
+                              fbackup0, fbackup1, fbackup2), \
+          iotests.VM() as vm:
+=20
+-        mode =3D "Bitmap Sync Mode {:s}".format(bsync_mode)
++        mode =3D "Mode {:s}; Bitmap Sync {:s}".format(msync_mode, bsync_=
+mode)
+         preposition =3D "with" if failure else "without"
+         cond =3D "{:s} {:s}".format(preposition,
+                                   "{:s} failure".format(failure) if fail=
+ure
+@@ -362,12 +368,13 @@ def test_bitmap_sync(bsync_mode, failure=3DNone):
+         ebitmap.compare(bitmap)
+         reference_backup(drive0, 1, fbackup1)
+=20
+-        # 1 - Bitmap Backup (Optional induced failure)
++        # 1 - Test Backup (w/ Optional induced failure)
+         if failure =3D=3D 'intermediate':
+             # Activate blkdebug induced failure for second-to-next read
+             log(vm.hmp_qemu_io(drive0.name, 'flush'))
+             log('')
+-        job =3D bitmap_backup(drive0, 1, bsync1, "bitmap0", bsync_mode)
++        job =3D backup(drive0, 1, bsync1, msync_mode,
++                     bitmap=3D"bitmap0", bitmap_mode=3Dbsync_mode)
+=20
+         def _callback():
+             """Issue writes while the job is open to test bitmap diverge=
+nce."""
+@@ -408,7 +415,8 @@ def test_bitmap_sync(bsync_mode, failure=3DNone):
+         reference_backup(drive0, 2, fbackup2)
+=20
+         # 2 - Bitmap Backup (In failure modes, this is a recovery.)
+-        job =3D bitmap_backup(drive0, 2, bsync2, "bitmap0", bsync_mode)
++        job =3D backup(drive0, 2, bsync2, "bitmap",
++                     bitmap=3D"bitmap0", bitmap_mode=3Dbsync_mode)
+         vm.run_job(job, auto_dismiss=3DTrue, auto_finalize=3DFalse)
+         bitmaps =3D query_bitmaps(vm)
+         log(bitmaps, indent=3D2)
+@@ -442,7 +450,7 @@ def test_bitmap_sync(bsync_mode, failure=3DNone):
+ def main():
+     for bsync_mode in ("never", "on-success", "always"):
+         for failure in ("simulated", "intermediate", None):
+-            test_bitmap_sync(bsync_mode, failure)
++            test_bitmap_sync(bsync_mode, "bitmap", failure)
+=20
+ if __name__ =3D=3D '__main__':
+     iotests.script_main(main, supported_fmts=3D['qcow2'])
+diff --git a/tests/qemu-iotests/257.out b/tests/qemu-iotests/257.out
+index e0775d4815..0abc96acd3 100644
+--- a/tests/qemu-iotests/257.out
++++ b/tests/qemu-iotests/257.out
+@@ -1,5 +1,5 @@
+=20
+-=3D=3D=3D Bitmap Sync Mode never with simulated failure =3D=3D=3D
++=3D=3D=3D Mode bitmap; Bitmap Sync never with simulated failure =3D=3D=3D
+=20
+ --- Preparing image & VM ---
+=20
+@@ -86,7 +86,7 @@ expecting 6 dirty sectors; have 6. OK!
+ {"return": {}}
+ {"data": {"device": "ref_backup_1", "len": 67108864, "offset": 67108864,=
+ "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestam=
+p": {"microseconds": "USECS", "seconds": "SECS"}}
+=20
+---- Bitmap Backup #1 ---
++--- Test Backup #1 ---
+=20
+ {}
+ {"execute": "job-dismiss", "arguments": {"id": "bdc-file-job"}}
+@@ -96,7 +96,7 @@ expecting 6 dirty sectors; have 6. OK!
+ {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
+ {"return": {}}
+ {}
+-{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bi=
+tmap": "bitmap0", "bitmap-mode": "never", "device": "drive0", "job-id": "=
+bitmap_backup_1", "sync": "bitmap", "target": "bitmap_target_1"}}
++{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bi=
+tmap": "bitmap0", "bitmap-mode": "never", "device": "drive0", "job-id": "=
+backup_1", "sync": "bitmap", "target": "backup_target_1"}}
+ {"return": {}}
+=20
+ --- Write #2 ---
+@@ -147,10 +147,10 @@ expecting 6 dirty sectors; have 6. OK!
+ =3D Checking Bitmap (anonymous) =3D
+ expecting 7 dirty sectors; have 7. OK!
+=20
+-{"execute": "job-cancel", "arguments": {"id": "bitmap_backup_1"}}
++{"execute": "job-cancel", "arguments": {"id": "backup_1"}}
+ {"return": {}}
+-{"data": {"id": "bitmap_backup_1", "type": "backup"}, "event": "BLOCK_JO=
+B_PENDING", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+-{"data": {"device": "bitmap_backup_1", "len": 67108864, "offset": 671088=
+64, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_CANCELLED", "times=
+tamp": {"microseconds": "USECS", "seconds": "SECS"}}
++{"data": {"id": "backup_1", "type": "backup"}, "event": "BLOCK_JOB_PENDI=
+NG", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
++{"data": {"device": "backup_1", "len": 67108864, "offset": 67108864, "sp=
+eed": 0, "type": "backup"}, "event": "BLOCK_JOB_CANCELLED", "timestamp": =
+{"microseconds": "USECS", "seconds": "SECS"}}
+ {
+   "bitmaps": {
+     "device0": [
+@@ -213,7 +213,7 @@ expecting 15 dirty sectors; have 15. OK!
+ {"return": {}}
+ {"data": {"device": "ref_backup_2", "len": 67108864, "offset": 67108864,=
+ "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestam=
+p": {"microseconds": "USECS", "seconds": "SECS"}}
+=20
+---- Bitmap Backup #2 ---
++--- Test Backup #2 ---
+=20
+ {}
+ {"execute": "job-dismiss", "arguments": {"id": "bdc-file-job"}}
+@@ -223,12 +223,12 @@ expecting 15 dirty sectors; have 15. OK!
+ {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
+ {"return": {}}
+ {}
+-{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bi=
+tmap": "bitmap0", "bitmap-mode": "never", "device": "drive0", "job-id": "=
+bitmap_backup_2", "sync": "bitmap", "target": "bitmap_target_2"}}
++{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bi=
+tmap": "bitmap0", "bitmap-mode": "never", "device": "drive0", "job-id": "=
+backup_2", "sync": "bitmap", "target": "backup_target_2"}}
+ {"return": {}}
+-{"execute": "job-finalize", "arguments": {"id": "bitmap_backup_2"}}
++{"execute": "job-finalize", "arguments": {"id": "backup_2"}}
+ {"return": {}}
+-{"data": {"id": "bitmap_backup_2", "type": "backup"}, "event": "BLOCK_JO=
+B_PENDING", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+-{"data": {"device": "bitmap_backup_2", "len": 67108864, "offset": 671088=
+64, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "times=
+tamp": {"microseconds": "USECS", "seconds": "SECS"}}
++{"data": {"id": "backup_2", "type": "backup"}, "event": "BLOCK_JOB_PENDI=
+NG", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
++{"data": {"device": "backup_2", "len": 67108864, "offset": 67108864, "sp=
+eed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": =
+{"microseconds": "USECS", "seconds": "SECS"}}
+ {
+   "bitmaps": {
+     "device0": [
+@@ -265,7 +265,7 @@ qemu_img compare "TEST_DIR/PID-bsync2" "TEST_DIR/PID-=
+fbackup2" =3D=3D> Identical, OK
+ qemu_img compare "TEST_DIR/PID-img" "TEST_DIR/PID-fbackup2" =3D=3D> Iden=
+tical, OK!
+=20
+=20
+-=3D=3D=3D Bitmap Sync Mode never with intermediate failure =3D=3D=3D
++=3D=3D=3D Mode bitmap; Bitmap Sync never with intermediate failure =3D=3D=
+=3D
+=20
+ --- Preparing image & VM ---
+=20
+@@ -354,7 +354,7 @@ expecting 6 dirty sectors; have 6. OK!
+=20
+ {"return": ""}
+=20
+---- Bitmap Backup #1 ---
++--- Test Backup #1 ---
+=20
+ {}
+ {"execute": "job-dismiss", "arguments": {"id": "bdc-file-job"}}
+@@ -364,10 +364,10 @@ expecting 6 dirty sectors; have 6. OK!
+ {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
+ {"return": {}}
+ {}
+-{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bi=
+tmap": "bitmap0", "bitmap-mode": "never", "device": "drive0", "job-id": "=
+bitmap_backup_1", "sync": "bitmap", "target": "bitmap_target_1"}}
++{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bi=
+tmap": "bitmap0", "bitmap-mode": "never", "device": "drive0", "job-id": "=
+backup_1", "sync": "bitmap", "target": "backup_target_1"}}
+ {"return": {}}
+-{"data": {"action": "report", "device": "bitmap_backup_1", "operation": =
+"read"}, "event": "BLOCK_JOB_ERROR", "timestamp": {"microseconds": "USECS=
+", "seconds": "SECS"}}
+-{"data": {"device": "bitmap_backup_1", "error": "Input/output error", "l=
+en": 67108864, "offset": 66781184, "speed": 0, "type": "backup"}, "event"=
+: "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds"=
+: "SECS"}}
++{"data": {"action": "report", "device": "backup_1", "operation": "read"}=
+, "event": "BLOCK_JOB_ERROR", "timestamp": {"microseconds": "USECS", "sec=
+onds": "SECS"}}
++{"data": {"device": "backup_1", "error": "Input/output error", "len": 67=
+108864, "offset": 66781184, "speed": 0, "type": "backup"}, "event": "BLOC=
+K_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS=
+"}}
+ {
+   "bitmaps": {
+     "device0": [
+@@ -430,7 +430,7 @@ expecting 14 dirty sectors; have 14. OK!
+ {"return": {}}
+ {"data": {"device": "ref_backup_2", "len": 67108864, "offset": 67108864,=
+ "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestam=
+p": {"microseconds": "USECS", "seconds": "SECS"}}
+=20
+---- Bitmap Backup #2 ---
++--- Test Backup #2 ---
+=20
+ {}
+ {"execute": "job-dismiss", "arguments": {"id": "bdc-file-job"}}
+@@ -440,12 +440,12 @@ expecting 14 dirty sectors; have 14. OK!
+ {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
+ {"return": {}}
+ {}
+-{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bi=
+tmap": "bitmap0", "bitmap-mode": "never", "device": "drive0", "job-id": "=
+bitmap_backup_2", "sync": "bitmap", "target": "bitmap_target_2"}}
++{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bi=
+tmap": "bitmap0", "bitmap-mode": "never", "device": "drive0", "job-id": "=
+backup_2", "sync": "bitmap", "target": "backup_target_2"}}
+ {"return": {}}
+-{"execute": "job-finalize", "arguments": {"id": "bitmap_backup_2"}}
++{"execute": "job-finalize", "arguments": {"id": "backup_2"}}
+ {"return": {}}
+-{"data": {"id": "bitmap_backup_2", "type": "backup"}, "event": "BLOCK_JO=
+B_PENDING", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+-{"data": {"device": "bitmap_backup_2", "len": 67108864, "offset": 671088=
+64, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "times=
+tamp": {"microseconds": "USECS", "seconds": "SECS"}}
++{"data": {"id": "backup_2", "type": "backup"}, "event": "BLOCK_JOB_PENDI=
+NG", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
++{"data": {"device": "backup_2", "len": 67108864, "offset": 67108864, "sp=
+eed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": =
+{"microseconds": "USECS", "seconds": "SECS"}}
+ {
+   "bitmaps": {
+     "device0": [
+@@ -482,7 +482,7 @@ qemu_img compare "TEST_DIR/PID-bsync2" "TEST_DIR/PID-=
+fbackup2" =3D=3D> Identical, OK
+ qemu_img compare "TEST_DIR/PID-img" "TEST_DIR/PID-fbackup2" =3D=3D> Iden=
+tical, OK!
+=20
+=20
+-=3D=3D=3D Bitmap Sync Mode never without failure =3D=3D=3D
++=3D=3D=3D Mode bitmap; Bitmap Sync never without failure =3D=3D=3D
+=20
+ --- Preparing image & VM ---
+=20
+@@ -569,7 +569,7 @@ expecting 6 dirty sectors; have 6. OK!
+ {"return": {}}
+ {"data": {"device": "ref_backup_1", "len": 67108864, "offset": 67108864,=
+ "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestam=
+p": {"microseconds": "USECS", "seconds": "SECS"}}
+=20
+---- Bitmap Backup #1 ---
++--- Test Backup #1 ---
+=20
+ {}
+ {"execute": "job-dismiss", "arguments": {"id": "bdc-file-job"}}
+@@ -579,7 +579,7 @@ expecting 6 dirty sectors; have 6. OK!
+ {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
+ {"return": {}}
+ {}
+-{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bi=
+tmap": "bitmap0", "bitmap-mode": "never", "device": "drive0", "job-id": "=
+bitmap_backup_1", "sync": "bitmap", "target": "bitmap_target_1"}}
++{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bi=
+tmap": "bitmap0", "bitmap-mode": "never", "device": "drive0", "job-id": "=
+backup_1", "sync": "bitmap", "target": "backup_target_1"}}
+ {"return": {}}
+=20
+ --- Write #2 ---
+@@ -630,10 +630,10 @@ expecting 6 dirty sectors; have 6. OK!
+ =3D Checking Bitmap (anonymous) =3D
+ expecting 7 dirty sectors; have 7. OK!
+=20
+-{"execute": "job-finalize", "arguments": {"id": "bitmap_backup_1"}}
++{"execute": "job-finalize", "arguments": {"id": "backup_1"}}
+ {"return": {}}
+-{"data": {"id": "bitmap_backup_1", "type": "backup"}, "event": "BLOCK_JO=
+B_PENDING", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+-{"data": {"device": "bitmap_backup_1", "len": 67108864, "offset": 671088=
+64, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "times=
+tamp": {"microseconds": "USECS", "seconds": "SECS"}}
++{"data": {"id": "backup_1", "type": "backup"}, "event": "BLOCK_JOB_PENDI=
+NG", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
++{"data": {"device": "backup_1", "len": 67108864, "offset": 67108864, "sp=
+eed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": =
+{"microseconds": "USECS", "seconds": "SECS"}}
+ {
+   "bitmaps": {
+     "device0": [
+@@ -696,7 +696,7 @@ expecting 15 dirty sectors; have 15. OK!
+ {"return": {}}
+ {"data": {"device": "ref_backup_2", "len": 67108864, "offset": 67108864,=
+ "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestam=
+p": {"microseconds": "USECS", "seconds": "SECS"}}
+=20
+---- Bitmap Backup #2 ---
++--- Test Backup #2 ---
+=20
+ {}
+ {"execute": "job-dismiss", "arguments": {"id": "bdc-file-job"}}
+@@ -706,12 +706,12 @@ expecting 15 dirty sectors; have 15. OK!
+ {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
+ {"return": {}}
+ {}
+-{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bi=
+tmap": "bitmap0", "bitmap-mode": "never", "device": "drive0", "job-id": "=
+bitmap_backup_2", "sync": "bitmap", "target": "bitmap_target_2"}}
++{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bi=
+tmap": "bitmap0", "bitmap-mode": "never", "device": "drive0", "job-id": "=
+backup_2", "sync": "bitmap", "target": "backup_target_2"}}
+ {"return": {}}
+-{"execute": "job-finalize", "arguments": {"id": "bitmap_backup_2"}}
++{"execute": "job-finalize", "arguments": {"id": "backup_2"}}
+ {"return": {}}
+-{"data": {"id": "bitmap_backup_2", "type": "backup"}, "event": "BLOCK_JO=
+B_PENDING", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+-{"data": {"device": "bitmap_backup_2", "len": 67108864, "offset": 671088=
+64, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "times=
+tamp": {"microseconds": "USECS", "seconds": "SECS"}}
++{"data": {"id": "backup_2", "type": "backup"}, "event": "BLOCK_JOB_PENDI=
+NG", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
++{"data": {"device": "backup_2", "len": 67108864, "offset": 67108864, "sp=
+eed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": =
+{"microseconds": "USECS", "seconds": "SECS"}}
+ {
+   "bitmaps": {
+     "device0": [
+@@ -748,7 +748,7 @@ qemu_img compare "TEST_DIR/PID-bsync2" "TEST_DIR/PID-=
+fbackup2" =3D=3D> Identical, OK
+ qemu_img compare "TEST_DIR/PID-img" "TEST_DIR/PID-fbackup2" =3D=3D> Iden=
+tical, OK!
+=20
+=20
+-=3D=3D=3D Bitmap Sync Mode on-success with simulated failure =3D=3D=3D
++=3D=3D=3D Mode bitmap; Bitmap Sync on-success with simulated failure =3D=
+=3D=3D
+=20
+ --- Preparing image & VM ---
+=20
+@@ -835,7 +835,7 @@ expecting 6 dirty sectors; have 6. OK!
+ {"return": {}}
+ {"data": {"device": "ref_backup_1", "len": 67108864, "offset": 67108864,=
+ "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestam=
+p": {"microseconds": "USECS", "seconds": "SECS"}}
+=20
+---- Bitmap Backup #1 ---
++--- Test Backup #1 ---
+=20
+ {}
+ {"execute": "job-dismiss", "arguments": {"id": "bdc-file-job"}}
+@@ -845,7 +845,7 @@ expecting 6 dirty sectors; have 6. OK!
+ {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
+ {"return": {}}
+ {}
+-{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bi=
+tmap": "bitmap0", "bitmap-mode": "on-success", "device": "drive0", "job-i=
+d": "bitmap_backup_1", "sync": "bitmap", "target": "bitmap_target_1"}}
++{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bi=
+tmap": "bitmap0", "bitmap-mode": "on-success", "device": "drive0", "job-i=
+d": "backup_1", "sync": "bitmap", "target": "backup_target_1"}}
+ {"return": {}}
+=20
+ --- Write #2 ---
+@@ -896,10 +896,10 @@ expecting 6 dirty sectors; have 6. OK!
+ =3D Checking Bitmap (anonymous) =3D
+ expecting 7 dirty sectors; have 7. OK!
+=20
+-{"execute": "job-cancel", "arguments": {"id": "bitmap_backup_1"}}
++{"execute": "job-cancel", "arguments": {"id": "backup_1"}}
+ {"return": {}}
+-{"data": {"id": "bitmap_backup_1", "type": "backup"}, "event": "BLOCK_JO=
+B_PENDING", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+-{"data": {"device": "bitmap_backup_1", "len": 67108864, "offset": 671088=
+64, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_CANCELLED", "times=
+tamp": {"microseconds": "USECS", "seconds": "SECS"}}
++{"data": {"id": "backup_1", "type": "backup"}, "event": "BLOCK_JOB_PENDI=
+NG", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
++{"data": {"device": "backup_1", "len": 67108864, "offset": 67108864, "sp=
+eed": 0, "type": "backup"}, "event": "BLOCK_JOB_CANCELLED", "timestamp": =
+{"microseconds": "USECS", "seconds": "SECS"}}
+ {
+   "bitmaps": {
+     "device0": [
+@@ -962,7 +962,7 @@ expecting 15 dirty sectors; have 15. OK!
+ {"return": {}}
+ {"data": {"device": "ref_backup_2", "len": 67108864, "offset": 67108864,=
+ "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestam=
+p": {"microseconds": "USECS", "seconds": "SECS"}}
+=20
+---- Bitmap Backup #2 ---
++--- Test Backup #2 ---
+=20
+ {}
+ {"execute": "job-dismiss", "arguments": {"id": "bdc-file-job"}}
+@@ -972,12 +972,12 @@ expecting 15 dirty sectors; have 15. OK!
+ {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
+ {"return": {}}
+ {}
+-{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bi=
+tmap": "bitmap0", "bitmap-mode": "on-success", "device": "drive0", "job-i=
+d": "bitmap_backup_2", "sync": "bitmap", "target": "bitmap_target_2"}}
++{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bi=
+tmap": "bitmap0", "bitmap-mode": "on-success", "device": "drive0", "job-i=
+d": "backup_2", "sync": "bitmap", "target": "backup_target_2"}}
+ {"return": {}}
+-{"execute": "job-finalize", "arguments": {"id": "bitmap_backup_2"}}
++{"execute": "job-finalize", "arguments": {"id": "backup_2"}}
+ {"return": {}}
+-{"data": {"id": "bitmap_backup_2", "type": "backup"}, "event": "BLOCK_JO=
+B_PENDING", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+-{"data": {"device": "bitmap_backup_2", "len": 67108864, "offset": 671088=
+64, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "times=
+tamp": {"microseconds": "USECS", "seconds": "SECS"}}
++{"data": {"id": "backup_2", "type": "backup"}, "event": "BLOCK_JOB_PENDI=
+NG", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
++{"data": {"device": "backup_2", "len": 67108864, "offset": 67108864, "sp=
+eed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": =
+{"microseconds": "USECS", "seconds": "SECS"}}
+ {
+   "bitmaps": {
+     "device0": [
+@@ -1014,7 +1014,7 @@ qemu_img compare "TEST_DIR/PID-bsync2" "TEST_DIR/PI=
+D-fbackup2" =3D=3D> Identical, OK
+ qemu_img compare "TEST_DIR/PID-img" "TEST_DIR/PID-fbackup2" =3D=3D> Iden=
+tical, OK!
+=20
+=20
+-=3D=3D=3D Bitmap Sync Mode on-success with intermediate failure =3D=3D=3D
++=3D=3D=3D Mode bitmap; Bitmap Sync on-success with intermediate failure =
+=3D=3D=3D
+=20
+ --- Preparing image & VM ---
+=20
+@@ -1103,7 +1103,7 @@ expecting 6 dirty sectors; have 6. OK!
+=20
+ {"return": ""}
+=20
+---- Bitmap Backup #1 ---
++--- Test Backup #1 ---
+=20
+ {}
+ {"execute": "job-dismiss", "arguments": {"id": "bdc-file-job"}}
+@@ -1113,10 +1113,10 @@ expecting 6 dirty sectors; have 6. OK!
+ {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
+ {"return": {}}
+ {}
+-{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bi=
+tmap": "bitmap0", "bitmap-mode": "on-success", "device": "drive0", "job-i=
+d": "bitmap_backup_1", "sync": "bitmap", "target": "bitmap_target_1"}}
++{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bi=
+tmap": "bitmap0", "bitmap-mode": "on-success", "device": "drive0", "job-i=
+d": "backup_1", "sync": "bitmap", "target": "backup_target_1"}}
+ {"return": {}}
+-{"data": {"action": "report", "device": "bitmap_backup_1", "operation": =
+"read"}, "event": "BLOCK_JOB_ERROR", "timestamp": {"microseconds": "USECS=
+", "seconds": "SECS"}}
+-{"data": {"device": "bitmap_backup_1", "error": "Input/output error", "l=
+en": 67108864, "offset": 66781184, "speed": 0, "type": "backup"}, "event"=
+: "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds"=
+: "SECS"}}
++{"data": {"action": "report", "device": "backup_1", "operation": "read"}=
+, "event": "BLOCK_JOB_ERROR", "timestamp": {"microseconds": "USECS", "sec=
+onds": "SECS"}}
++{"data": {"device": "backup_1", "error": "Input/output error", "len": 67=
+108864, "offset": 66781184, "speed": 0, "type": "backup"}, "event": "BLOC=
+K_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS=
+"}}
+ {
+   "bitmaps": {
+     "device0": [
+@@ -1179,7 +1179,7 @@ expecting 14 dirty sectors; have 14. OK!
+ {"return": {}}
+ {"data": {"device": "ref_backup_2", "len": 67108864, "offset": 67108864,=
+ "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestam=
+p": {"microseconds": "USECS", "seconds": "SECS"}}
+=20
+---- Bitmap Backup #2 ---
++--- Test Backup #2 ---
+=20
+ {}
+ {"execute": "job-dismiss", "arguments": {"id": "bdc-file-job"}}
+@@ -1189,12 +1189,12 @@ expecting 14 dirty sectors; have 14. OK!
+ {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
+ {"return": {}}
+ {}
+-{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bi=
+tmap": "bitmap0", "bitmap-mode": "on-success", "device": "drive0", "job-i=
+d": "bitmap_backup_2", "sync": "bitmap", "target": "bitmap_target_2"}}
++{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bi=
+tmap": "bitmap0", "bitmap-mode": "on-success", "device": "drive0", "job-i=
+d": "backup_2", "sync": "bitmap", "target": "backup_target_2"}}
+ {"return": {}}
+-{"execute": "job-finalize", "arguments": {"id": "bitmap_backup_2"}}
++{"execute": "job-finalize", "arguments": {"id": "backup_2"}}
+ {"return": {}}
+-{"data": {"id": "bitmap_backup_2", "type": "backup"}, "event": "BLOCK_JO=
+B_PENDING", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+-{"data": {"device": "bitmap_backup_2", "len": 67108864, "offset": 671088=
+64, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "times=
+tamp": {"microseconds": "USECS", "seconds": "SECS"}}
++{"data": {"id": "backup_2", "type": "backup"}, "event": "BLOCK_JOB_PENDI=
+NG", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
++{"data": {"device": "backup_2", "len": 67108864, "offset": 67108864, "sp=
+eed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": =
+{"microseconds": "USECS", "seconds": "SECS"}}
+ {
+   "bitmaps": {
+     "device0": [
+@@ -1231,7 +1231,7 @@ qemu_img compare "TEST_DIR/PID-bsync2" "TEST_DIR/PI=
+D-fbackup2" =3D=3D> Identical, OK
+ qemu_img compare "TEST_DIR/PID-img" "TEST_DIR/PID-fbackup2" =3D=3D> Iden=
+tical, OK!
+=20
+=20
+-=3D=3D=3D Bitmap Sync Mode on-success without failure =3D=3D=3D
++=3D=3D=3D Mode bitmap; Bitmap Sync on-success without failure =3D=3D=3D
+=20
+ --- Preparing image & VM ---
+=20
+@@ -1318,7 +1318,7 @@ expecting 6 dirty sectors; have 6. OK!
+ {"return": {}}
+ {"data": {"device": "ref_backup_1", "len": 67108864, "offset": 67108864,=
+ "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestam=
+p": {"microseconds": "USECS", "seconds": "SECS"}}
+=20
+---- Bitmap Backup #1 ---
++--- Test Backup #1 ---
+=20
+ {}
+ {"execute": "job-dismiss", "arguments": {"id": "bdc-file-job"}}
+@@ -1328,7 +1328,7 @@ expecting 6 dirty sectors; have 6. OK!
+ {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
+ {"return": {}}
+ {}
+-{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bi=
+tmap": "bitmap0", "bitmap-mode": "on-success", "device": "drive0", "job-i=
+d": "bitmap_backup_1", "sync": "bitmap", "target": "bitmap_target_1"}}
++{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bi=
+tmap": "bitmap0", "bitmap-mode": "on-success", "device": "drive0", "job-i=
+d": "backup_1", "sync": "bitmap", "target": "backup_target_1"}}
+ {"return": {}}
+=20
+ --- Write #2 ---
+@@ -1379,10 +1379,10 @@ expecting 6 dirty sectors; have 6. OK!
+ =3D Checking Bitmap (anonymous) =3D
+ expecting 7 dirty sectors; have 7. OK!
+=20
+-{"execute": "job-finalize", "arguments": {"id": "bitmap_backup_1"}}
++{"execute": "job-finalize", "arguments": {"id": "backup_1"}}
+ {"return": {}}
+-{"data": {"id": "bitmap_backup_1", "type": "backup"}, "event": "BLOCK_JO=
+B_PENDING", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+-{"data": {"device": "bitmap_backup_1", "len": 67108864, "offset": 671088=
+64, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "times=
+tamp": {"microseconds": "USECS", "seconds": "SECS"}}
++{"data": {"id": "backup_1", "type": "backup"}, "event": "BLOCK_JOB_PENDI=
+NG", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
++{"data": {"device": "backup_1", "len": 67108864, "offset": 67108864, "sp=
+eed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": =
+{"microseconds": "USECS", "seconds": "SECS"}}
+ {
+   "bitmaps": {
+     "device0": [
+@@ -1445,7 +1445,7 @@ expecting 12 dirty sectors; have 12. OK!
+ {"return": {}}
+ {"data": {"device": "ref_backup_2", "len": 67108864, "offset": 67108864,=
+ "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestam=
+p": {"microseconds": "USECS", "seconds": "SECS"}}
+=20
+---- Bitmap Backup #2 ---
++--- Test Backup #2 ---
+=20
+ {}
+ {"execute": "job-dismiss", "arguments": {"id": "bdc-file-job"}}
+@@ -1455,12 +1455,12 @@ expecting 12 dirty sectors; have 12. OK!
+ {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
+ {"return": {}}
+ {}
+-{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bi=
+tmap": "bitmap0", "bitmap-mode": "on-success", "device": "drive0", "job-i=
+d": "bitmap_backup_2", "sync": "bitmap", "target": "bitmap_target_2"}}
++{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bi=
+tmap": "bitmap0", "bitmap-mode": "on-success", "device": "drive0", "job-i=
+d": "backup_2", "sync": "bitmap", "target": "backup_target_2"}}
+ {"return": {}}
+-{"execute": "job-finalize", "arguments": {"id": "bitmap_backup_2"}}
++{"execute": "job-finalize", "arguments": {"id": "backup_2"}}
+ {"return": {}}
+-{"data": {"id": "bitmap_backup_2", "type": "backup"}, "event": "BLOCK_JO=
+B_PENDING", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+-{"data": {"device": "bitmap_backup_2", "len": 67108864, "offset": 671088=
+64, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "times=
+tamp": {"microseconds": "USECS", "seconds": "SECS"}}
++{"data": {"id": "backup_2", "type": "backup"}, "event": "BLOCK_JOB_PENDI=
+NG", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
++{"data": {"device": "backup_2", "len": 67108864, "offset": 67108864, "sp=
+eed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": =
+{"microseconds": "USECS", "seconds": "SECS"}}
+ {
+   "bitmaps": {
+     "device0": [
+@@ -1497,7 +1497,7 @@ qemu_img compare "TEST_DIR/PID-bsync2" "TEST_DIR/PI=
+D-fbackup2" =3D=3D> Identical, OK
+ qemu_img compare "TEST_DIR/PID-img" "TEST_DIR/PID-fbackup2" =3D=3D> Iden=
+tical, OK!
+=20
+=20
+-=3D=3D=3D Bitmap Sync Mode always with simulated failure =3D=3D=3D
++=3D=3D=3D Mode bitmap; Bitmap Sync always with simulated failure =3D=3D=3D
+=20
+ --- Preparing image & VM ---
+=20
+@@ -1584,7 +1584,7 @@ expecting 6 dirty sectors; have 6. OK!
+ {"return": {}}
+ {"data": {"device": "ref_backup_1", "len": 67108864, "offset": 67108864,=
+ "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestam=
+p": {"microseconds": "USECS", "seconds": "SECS"}}
+=20
+---- Bitmap Backup #1 ---
++--- Test Backup #1 ---
+=20
+ {}
+ {"execute": "job-dismiss", "arguments": {"id": "bdc-file-job"}}
+@@ -1594,7 +1594,7 @@ expecting 6 dirty sectors; have 6. OK!
+ {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
+ {"return": {}}
+ {}
+-{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bi=
+tmap": "bitmap0", "bitmap-mode": "always", "device": "drive0", "job-id": =
+"bitmap_backup_1", "sync": "bitmap", "target": "bitmap_target_1"}}
++{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bi=
+tmap": "bitmap0", "bitmap-mode": "always", "device": "drive0", "job-id": =
+"backup_1", "sync": "bitmap", "target": "backup_target_1"}}
+ {"return": {}}
+=20
+ --- Write #2 ---
+@@ -1645,10 +1645,10 @@ expecting 6 dirty sectors; have 6. OK!
+ =3D Checking Bitmap (anonymous) =3D
+ expecting 7 dirty sectors; have 7. OK!
+=20
+-{"execute": "job-cancel", "arguments": {"id": "bitmap_backup_1"}}
++{"execute": "job-cancel", "arguments": {"id": "backup_1"}}
+ {"return": {}}
+-{"data": {"id": "bitmap_backup_1", "type": "backup"}, "event": "BLOCK_JO=
+B_PENDING", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+-{"data": {"device": "bitmap_backup_1", "len": 67108864, "offset": 671088=
+64, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_CANCELLED", "times=
+tamp": {"microseconds": "USECS", "seconds": "SECS"}}
++{"data": {"id": "backup_1", "type": "backup"}, "event": "BLOCK_JOB_PENDI=
+NG", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
++{"data": {"device": "backup_1", "len": 67108864, "offset": 67108864, "sp=
+eed": 0, "type": "backup"}, "event": "BLOCK_JOB_CANCELLED", "timestamp": =
+{"microseconds": "USECS", "seconds": "SECS"}}
+ {
+   "bitmaps": {
+     "device0": [
+@@ -1711,7 +1711,7 @@ expecting 12 dirty sectors; have 12. OK!
+ {"return": {}}
+ {"data": {"device": "ref_backup_2", "len": 67108864, "offset": 67108864,=
+ "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestam=
+p": {"microseconds": "USECS", "seconds": "SECS"}}
+=20
+---- Bitmap Backup #2 ---
++--- Test Backup #2 ---
+=20
+ {}
+ {"execute": "job-dismiss", "arguments": {"id": "bdc-file-job"}}
+@@ -1721,12 +1721,12 @@ expecting 12 dirty sectors; have 12. OK!
+ {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
+ {"return": {}}
+ {}
+-{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bi=
+tmap": "bitmap0", "bitmap-mode": "always", "device": "drive0", "job-id": =
+"bitmap_backup_2", "sync": "bitmap", "target": "bitmap_target_2"}}
++{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bi=
+tmap": "bitmap0", "bitmap-mode": "always", "device": "drive0", "job-id": =
+"backup_2", "sync": "bitmap", "target": "backup_target_2"}}
+ {"return": {}}
+-{"execute": "job-finalize", "arguments": {"id": "bitmap_backup_2"}}
++{"execute": "job-finalize", "arguments": {"id": "backup_2"}}
+ {"return": {}}
+-{"data": {"id": "bitmap_backup_2", "type": "backup"}, "event": "BLOCK_JO=
+B_PENDING", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+-{"data": {"device": "bitmap_backup_2", "len": 67108864, "offset": 671088=
+64, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "times=
+tamp": {"microseconds": "USECS", "seconds": "SECS"}}
++{"data": {"id": "backup_2", "type": "backup"}, "event": "BLOCK_JOB_PENDI=
+NG", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
++{"data": {"device": "backup_2", "len": 67108864, "offset": 67108864, "sp=
+eed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": =
+{"microseconds": "USECS", "seconds": "SECS"}}
+ {
+   "bitmaps": {
+     "device0": [
+@@ -1763,7 +1763,7 @@ qemu_img compare "TEST_DIR/PID-bsync2" "TEST_DIR/PI=
+D-fbackup2" =3D=3D> Identical, OK
+ qemu_img compare "TEST_DIR/PID-img" "TEST_DIR/PID-fbackup2" =3D=3D> Iden=
+tical, OK!
+=20
+=20
+-=3D=3D=3D Bitmap Sync Mode always with intermediate failure =3D=3D=3D
++=3D=3D=3D Mode bitmap; Bitmap Sync always with intermediate failure =3D=3D=
+=3D
+=20
+ --- Preparing image & VM ---
+=20
+@@ -1852,7 +1852,7 @@ expecting 6 dirty sectors; have 6. OK!
+=20
+ {"return": ""}
+=20
+---- Bitmap Backup #1 ---
++--- Test Backup #1 ---
+=20
+ {}
+ {"execute": "job-dismiss", "arguments": {"id": "bdc-file-job"}}
+@@ -1862,10 +1862,10 @@ expecting 6 dirty sectors; have 6. OK!
+ {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
+ {"return": {}}
+ {}
+-{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bi=
+tmap": "bitmap0", "bitmap-mode": "always", "device": "drive0", "job-id": =
+"bitmap_backup_1", "sync": "bitmap", "target": "bitmap_target_1"}}
++{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bi=
+tmap": "bitmap0", "bitmap-mode": "always", "device": "drive0", "job-id": =
+"backup_1", "sync": "bitmap", "target": "backup_target_1"}}
+ {"return": {}}
+-{"data": {"action": "report", "device": "bitmap_backup_1", "operation": =
+"read"}, "event": "BLOCK_JOB_ERROR", "timestamp": {"microseconds": "USECS=
+", "seconds": "SECS"}}
+-{"data": {"device": "bitmap_backup_1", "error": "Input/output error", "l=
+en": 67108864, "offset": 66781184, "speed": 0, "type": "backup"}, "event"=
+: "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds"=
+: "SECS"}}
++{"data": {"action": "report", "device": "backup_1", "operation": "read"}=
+, "event": "BLOCK_JOB_ERROR", "timestamp": {"microseconds": "USECS", "sec=
+onds": "SECS"}}
++{"data": {"device": "backup_1", "error": "Input/output error", "len": 67=
+108864, "offset": 66781184, "speed": 0, "type": "backup"}, "event": "BLOC=
+K_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS=
+"}}
+ {
+   "bitmaps": {
+     "device0": [
+@@ -1928,7 +1928,7 @@ expecting 13 dirty sectors; have 13. OK!
+ {"return": {}}
+ {"data": {"device": "ref_backup_2", "len": 67108864, "offset": 67108864,=
+ "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestam=
+p": {"microseconds": "USECS", "seconds": "SECS"}}
+=20
+---- Bitmap Backup #2 ---
++--- Test Backup #2 ---
+=20
+ {}
+ {"execute": "job-dismiss", "arguments": {"id": "bdc-file-job"}}
+@@ -1938,12 +1938,12 @@ expecting 13 dirty sectors; have 13. OK!
+ {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
+ {"return": {}}
+ {}
+-{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bi=
+tmap": "bitmap0", "bitmap-mode": "always", "device": "drive0", "job-id": =
+"bitmap_backup_2", "sync": "bitmap", "target": "bitmap_target_2"}}
++{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bi=
+tmap": "bitmap0", "bitmap-mode": "always", "device": "drive0", "job-id": =
+"backup_2", "sync": "bitmap", "target": "backup_target_2"}}
+ {"return": {}}
+-{"execute": "job-finalize", "arguments": {"id": "bitmap_backup_2"}}
++{"execute": "job-finalize", "arguments": {"id": "backup_2"}}
+ {"return": {}}
+-{"data": {"id": "bitmap_backup_2", "type": "backup"}, "event": "BLOCK_JO=
+B_PENDING", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+-{"data": {"device": "bitmap_backup_2", "len": 67108864, "offset": 671088=
+64, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "times=
+tamp": {"microseconds": "USECS", "seconds": "SECS"}}
++{"data": {"id": "backup_2", "type": "backup"}, "event": "BLOCK_JOB_PENDI=
+NG", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
++{"data": {"device": "backup_2", "len": 67108864, "offset": 67108864, "sp=
+eed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": =
+{"microseconds": "USECS", "seconds": "SECS"}}
+ {
+   "bitmaps": {
+     "device0": [
+@@ -1980,7 +1980,7 @@ qemu_img compare "TEST_DIR/PID-bsync2" "TEST_DIR/PI=
+D-fbackup2" =3D=3D> Identical, OK
+ qemu_img compare "TEST_DIR/PID-img" "TEST_DIR/PID-fbackup2" =3D=3D> Iden=
+tical, OK!
+=20
+=20
+-=3D=3D=3D Bitmap Sync Mode always without failure =3D=3D=3D
++=3D=3D=3D Mode bitmap; Bitmap Sync always without failure =3D=3D=3D
+=20
+ --- Preparing image & VM ---
+=20
+@@ -2067,7 +2067,7 @@ expecting 6 dirty sectors; have 6. OK!
+ {"return": {}}
+ {"data": {"device": "ref_backup_1", "len": 67108864, "offset": 67108864,=
+ "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestam=
+p": {"microseconds": "USECS", "seconds": "SECS"}}
+=20
+---- Bitmap Backup #1 ---
++--- Test Backup #1 ---
+=20
+ {}
+ {"execute": "job-dismiss", "arguments": {"id": "bdc-file-job"}}
+@@ -2077,7 +2077,7 @@ expecting 6 dirty sectors; have 6. OK!
+ {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
+ {"return": {}}
+ {}
+-{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bi=
+tmap": "bitmap0", "bitmap-mode": "always", "device": "drive0", "job-id": =
+"bitmap_backup_1", "sync": "bitmap", "target": "bitmap_target_1"}}
++{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bi=
+tmap": "bitmap0", "bitmap-mode": "always", "device": "drive0", "job-id": =
+"backup_1", "sync": "bitmap", "target": "backup_target_1"}}
+ {"return": {}}
+=20
+ --- Write #2 ---
+@@ -2128,10 +2128,10 @@ expecting 6 dirty sectors; have 6. OK!
+ =3D Checking Bitmap (anonymous) =3D
+ expecting 7 dirty sectors; have 7. OK!
+=20
+-{"execute": "job-finalize", "arguments": {"id": "bitmap_backup_1"}}
++{"execute": "job-finalize", "arguments": {"id": "backup_1"}}
+ {"return": {}}
+-{"data": {"id": "bitmap_backup_1", "type": "backup"}, "event": "BLOCK_JO=
+B_PENDING", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+-{"data": {"device": "bitmap_backup_1", "len": 67108864, "offset": 671088=
+64, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "times=
+tamp": {"microseconds": "USECS", "seconds": "SECS"}}
++{"data": {"id": "backup_1", "type": "backup"}, "event": "BLOCK_JOB_PENDI=
+NG", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
++{"data": {"device": "backup_1", "len": 67108864, "offset": 67108864, "sp=
+eed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": =
+{"microseconds": "USECS", "seconds": "SECS"}}
+ {
+   "bitmaps": {
+     "device0": [
+@@ -2194,7 +2194,7 @@ expecting 12 dirty sectors; have 12. OK!
+ {"return": {}}
+ {"data": {"device": "ref_backup_2", "len": 67108864, "offset": 67108864,=
+ "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestam=
+p": {"microseconds": "USECS", "seconds": "SECS"}}
+=20
+---- Bitmap Backup #2 ---
++--- Test Backup #2 ---
+=20
+ {}
+ {"execute": "job-dismiss", "arguments": {"id": "bdc-file-job"}}
+@@ -2204,12 +2204,12 @@ expecting 12 dirty sectors; have 12. OK!
+ {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
+ {"return": {}}
+ {}
+-{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bi=
+tmap": "bitmap0", "bitmap-mode": "always", "device": "drive0", "job-id": =
+"bitmap_backup_2", "sync": "bitmap", "target": "bitmap_target_2"}}
++{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bi=
+tmap": "bitmap0", "bitmap-mode": "always", "device": "drive0", "job-id": =
+"backup_2", "sync": "bitmap", "target": "backup_target_2"}}
+ {"return": {}}
+-{"execute": "job-finalize", "arguments": {"id": "bitmap_backup_2"}}
++{"execute": "job-finalize", "arguments": {"id": "backup_2"}}
+ {"return": {}}
+-{"data": {"id": "bitmap_backup_2", "type": "backup"}, "event": "BLOCK_JO=
+B_PENDING", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+-{"data": {"device": "bitmap_backup_2", "len": 67108864, "offset": 671088=
+64, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "times=
+tamp": {"microseconds": "USECS", "seconds": "SECS"}}
++{"data": {"id": "backup_2", "type": "backup"}, "event": "BLOCK_JOB_PENDI=
+NG", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
++{"data": {"device": "backup_2", "len": 67108864, "offset": 67108864, "sp=
+eed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": =
+{"microseconds": "USECS", "seconds": "SECS"}}
+ {
+   "bitmaps": {
+     "device0": [
 --=20
 2.21.0
 
