@@ -2,61 +2,67 @@ Return-Path: <SRS0=+QfZ=VN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B5FCC76191
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 02:07:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88DECC76191
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 02:30:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5D90220880
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 02:07:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D90220880
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 50A7720659
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 02:30:32 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="ciuTuNJ3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 50A7720659
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44810 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44896 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnCs1-00055H-PU
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 22:07:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37464)
+	id 1hnDEd-0008Sa-2E
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jul 2019 22:30:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40899)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <lizhengui@huawei.com>) id 1hnCrp-0004YZ-Tt
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 22:06:59 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1hnDEP-0007ts-Du
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 22:30:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lizhengui@huawei.com>) id 1hnCro-0003cu-Cx
- for qemu-devel@nongnu.org; Mon, 15 Jul 2019 22:06:57 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:2173 helo=huawei.com)
+ (envelope-from <dgibson@ozlabs.org>) id 1hnDEO-0002e5-4T
+ for qemu-devel@nongnu.org; Mon, 15 Jul 2019 22:30:17 -0400
+Received: from ozlabs.org ([203.11.71.1]:39969)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <lizhengui@huawei.com>)
- id 1hnCrk-0003WE-3u; Mon, 15 Jul 2019 22:06:52 -0400
-Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id 463F96D914E309D2DAF4;
- Tue, 16 Jul 2019 10:06:43 +0800 (CST)
-Received: from [127.0.0.1] (10.177.251.193) by DGGEMS404-HUB.china.huawei.com
- (10.3.19.204) with Microsoft SMTP Server id 14.3.439.0;
- Tue, 16 Jul 2019 10:06:38 +0800
-References: <687efc8c-e081-7cca-cf69-8db9903d0f7f@huawei.com>
-To: <qemu-block@nongnu.org>, <qemu-devel@nongnu.org>
-From: l00284672 <lizhengui@huawei.com>
-X-Forwarded-Message-Id: <687efc8c-e081-7cca-cf69-8db9903d0f7f@huawei.com>
-Message-ID: <cf6d17e2-142f-ffd3-78df-da47e2c25fec@huawei.com>
-Date: Tue, 16 Jul 2019 10:06:30 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.4.0
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1hnDEL-0002aP-UQ; Mon, 15 Jul 2019 22:30:16 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 45nkrb6lK8z9sDQ; Tue, 16 Jul 2019 12:30:07 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1563244207;
+ bh=yudIgHkGMRouSOHQLS/4yy0tAdfF8Go7JUy5dVhIPPQ=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=ciuTuNJ3iP/XYw8B+W1cwzGKK2fMkNhl1mAKYYQZlvJ6MOOelraIv3SRXQSD/bptc
+ ofI0YplGtAPM8DY8kTw12tLixHHHom2JEEo9XXETMbXzsB2M42DQPt9I8iwNxcyIIF
+ SNr+ZHqNI2WY8c9ZkGsA5p5NoE19R7zZ7KWsNIds=
+Date: Tue, 16 Jul 2019 12:14:44 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Message-ID: <20190716021444.GA7525@umbus.fritz.box>
+References: <20190529065017.15149-1-david@gibson.dropbear.id.au>
+ <20190529065017.15149-42-david@gibson.dropbear.id.au>
+ <a5139cdc-7175-1747-f18f-e5fcf6926d44@redhat.com>
+ <20190711012613.GA13271@umbus.fritz.box>
+ <cd2e72a2-c252-2305-b070-95c6f3d39d5c@kaod.org>
 MIME-Version: 1.0
-In-Reply-To: <687efc8c-e081-7cca-cf69-8db9903d0f7f@huawei.com>
-Content-Type: multipart/mixed; boundary="------------A38EC4ED9770E6CCC7A23409"
-Content-Language: en-US
-X-Originating-IP: [10.177.251.193]
-X-CFilter-Loop: Reflected
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="Nq2Wo0NMKNjxTN9z"
+Content-Disposition: inline
+In-Reply-To: <cd2e72a2-c252-2305-b070-95c6f3d39d5c@kaod.org>
+User-Agent: Mutt/1.12.0 (2019-05-25)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 45.249.212.190
-X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: [Qemu-devel] Fwd: virtio_scsi_ctx_check failed when detach
- virtio_scsi disk
+X-Received-From: 203.11.71.1
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PULL 41/44] spapr: change default
+ interrupt mode to 'dual'
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,89 +74,136 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Laurent Vivier <lvivier@redhat.com>, peter.maydell@linaro.org,
+ qemu-devel@nongnu.org, groug@kaod.org, qemu-ppc@nongnu.org, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---------------A38EC4ED9770E6CCC7A23409
-Content-Type: text/plain; charset="utf-8"; format=flowed
+
+--Nq2Wo0NMKNjxTN9z
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
+On Mon, Jul 15, 2019 at 12:19:03PM +0200, C=E9dric Le Goater wrote:
+> On 11/07/2019 03:26, David Gibson wrote:
+> > On Wed, Jul 10, 2019 at 06:26:09PM +0200, Laurent Vivier wrote:
+> >> On 29/05/2019 08:50, David Gibson wrote:
+> >>> From: C=E9dric Le Goater <clg@kaod.org>
+> >>>
+> >>> Now that XIVE support is complete (QEMU emulated and KVM devices),
+> >>> change the pseries machine to advertise both interrupt modes: XICS
+> >>> (P7/P8) and XIVE (P9).
+> >>>
+> >>> The machine default interrupt modes depends on the version. Current
+> >>> settings are:
+> >>>
+> >>>     pseries   default interrupt mode
+> >>>
+> >>>     4.1       dual
+> >>>     4.0       xics
+> >>>     3.1       xics
+> >>>     3.0       legacy xics (different IRQ number space layout)
+> >>>
+> >>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+> >>> Message-Id: <20190522074016.10521-3-clg@kaod.org>
+> >>> Reviewed-by: Greg Kurz <groug@kaod.org>
+> >>> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> >>> ---
+> >>>  hw/ppc/spapr.c | 3 ++-
+> >>>  1 file changed, 2 insertions(+), 1 deletion(-)
+> >>>
+> >>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> >>> index 39e698e9b0..4fd16b43f0 100644
+> >>> --- a/hw/ppc/spapr.c
+> >>> +++ b/hw/ppc/spapr.c
+> >>> @@ -4352,7 +4352,7 @@ static void spapr_machine_class_init(ObjectClas=
+s *oc, void *data)
+> >>>      smc->default_caps.caps[SPAPR_CAP_LARGE_DECREMENTER] =3D SPAPR_CA=
+P_ON;
+> >>>      smc->default_caps.caps[SPAPR_CAP_CCF_ASSIST] =3D SPAPR_CAP_OFF;
+> >>>      spapr_caps_add_properties(smc, &error_abort);
+> >>> -    smc->irq =3D &spapr_irq_xics;
+> >>> +    smc->irq =3D &spapr_irq_dual;
+> >>>      smc->dr_phb_enabled =3D true;
+> >>>  }
+> >>> =20
+> >>> @@ -4430,6 +4430,7 @@ static void spapr_machine_4_0_class_options(Mac=
+hineClass *mc)
+> >>>      spapr_machine_4_1_class_options(mc);
+> >>>      compat_props_add(mc->compat_props, hw_compat_4_0, hw_compat_4_0_=
+len);
+> >>>      smc->phb_placement =3D phb_placement_4_0;
+> >>> +    smc->irq =3D &spapr_irq_xics;
+> >>>  }
+> >>> =20
+> >>>  DEFINE_SPAPR_MACHINE(4_0, "4.0", false);
+> >>>
+> >>
+> >> This patch breaks the '-no-reboot' parameter (I think the "dual" mode
+> >> breaks the -no-reboot parameter)
+> >>
+> >> After grub loads the kernel and starts it, the kernel aborts:
+> >>
+> >> OF stdout device is: /vdevice/vty@71000000
+> >> Preparing to boot Linux version 4.18.0-112.el8.ppc64le
+> >> (mockbuild@ppc-061.build.eng.bos.redhat.com) (gcc version 8.3.1 201905=
+07
+> >> (Red Hat 8.3.1-4) (GCC)) #1 SMP Fri Jul 5 11:21:28 UTC 2019
+> >> Detected machine type: 0000000000000101
+> >> command line: BOOT_IMAGE=3D/vmlinuz-4.18.0-112.el8.ppc64le
+> >> root=3D/dev/mapper/rhel_ibm--p8--kvm--03--guest--02-root ro
+> >> crashkernel=3Dauto rd.lvm.lv=3Drhel_ibm-p8-kvm-03-guest-02/root
+> >> rd.lvm.lv=3Drhel_ibm-p8-kvm-03-guest-02/swap
+> >> Max number of cores passed to firmware: 256 (NR_CPUS =3D 2048)
+> >> Calling ibm,client-architecture-support...[lvivier@localhost ~]$
+> >>
+> >> I bisected to this patch, and then after I understood the problem is
+> >> with the -no-reboot parameter as the machine is reset by the CAS
+> >> negotiation... and the -no-reboot prevents this reset.
+> >>
+> >> I don't know if it's a real problem or not.
+> >=20
+> > Ah, bother.  I didn't think of the interaction between the CAS reboot
+> > and -no-reboot.  I guess that's more reason to work out a way to do
+> > the xics/xive switch without a full reset.  People were already not
+> > thrilled with the extra reboots here.
+>=20
+> QEMU builds a device tree depending on the interrupt mode negotiated=20
+> at CAS time. Can we dynamically add/remove nodes ?
 
+I believe we can make essentially arbitrary change to the device tree
+as part of the CAS process without a reboot.
 
+Re-doing this is kind of awkward with the current structure, but it's
+probably what we're going to want.
 
--------- Forwarded Message --------
-Subject: 	virtio_scsi_ctx_check failed when detach virtio_scsi disk
-Date: 	Mon, 15 Jul 2019 23:34:24 +0800
-From: 	l00284672 <lizhengui@huawei.com>
-To: 	kwolf@redhat.com, berto@igalia.com, Stefan Hajnoczi=20
-<stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-CC: 	lizhengui@huawei.com
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
+--Nq2Wo0NMKNjxTN9z
+Content-Type: application/pgp-signature; name="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
 
-I found a problem=C2=A0 that virtio_scsi_ctx_check=C2=A0 failed when deta=
-ching=20
-virtio_scsi disk.=C2=A0 The=C2=A0 bt is below:
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl0tMxIACgkQbDjKyiDZ
+s5IkzQ/+OJlHY/MKP+2ETObrjqvbHbk8VV+cQRTgIxvBAVWjYfJlAuwilMw2/GBR
+Q37Urt2Iw//Z3B0QtYhNN4ak0Qg50H4NSqfy0+Gp2xxDT9m1DEkxukXuyaEtQUXf
+cibuYxivTF3g1kOvM5dqHM8Gq0KwZVh3snzFNovLqN5FJBWHPvoF58/L026+gcK2
+Ce5D82yCu4U8aQ3Hz5j09YmkDOI+13NNTpuhtCCUfMedubOWcSmVFxu5vqHQYKJT
+xTgjGf4nadIP1+NgKFUq2tQsfL5Ms05DDUsVHSIjWEzoc1HwxI6J3uEDixwHEUSt
+7sGBWeWKk2BqMtrm11saPwZLukB1J/YEDuOyHgDFEcsGZ1h1dBDpUEXh3nT9vn9y
+r+2lm4ZHfKyRiVGB47AxOGwHccNEsNwPdq2IjYzNzY7T8z0aW89vhYr+bEhNykO1
+y+F2AJEgSjBuqAJYx+LzSBUnVv8rgbIajIHIGJ1kwPblXxMKKrk4rdKSpwFs4kl4
+/uzLfrlscv/HMT/U3NYw0YtRCkVTzneWzAI8jhKbXyoud5YIhrQkb95DDbYRZsln
+hFK7ya7OpbVK7j8K8y95HCK0Zg0DoY8MsNQE1v8FlwMGy84kwkMtLfvjnYRvHUo2
+mUy9lIecrFfXiMAE9PRVV4xfgWpDho2G764Oj4lJ3GD8Oyzh688=
+=DTAB
+-----END PGP SIGNATURE-----
 
-(gdb) bt
-#0=C2=A0 0x0000ffffb02e1bd0 in raise () from /lib64/libc.so.6
-#1=C2=A0 0x0000ffffb02e2f7c in abort () from /lib64/libc.so.6
-#2=C2=A0 0x0000ffffb02db124 in __assert_fail_base () from /lib64/libc.so.=
-6
-#3=C2=A0 0x0000ffffb02db1a4 in __assert_fail () from /lib64/libc.so.6
-#4=C2=A0 0x00000000004eb9a8 invirtio_scsi_ctx_check (d=3Dd@entry=3D0xc70d=
-790,=20
-s=3D<optimized out>, s=3D<optimized out>)
- =C2=A0=C2=A0=C2=A0 at /Images/lzg/code/710/qemu-2.8.1/hw/scsi/virtio-scs=
-i.c:243
-#5=C2=A0 0x00000000004ec87c in virtio_scsi_handle_cmd_req_prepare=20
-(s=3Ds@entry=3D0xd27a7a0, req=3Dreq@entry=3D0xafc4b90)
- =C2=A0=C2=A0=C2=A0 at /Images/lzg/code/710/qemu-2.8.1/hw/scsi/virtio-scs=
-i.c:553
-#6=C2=A0 0x00000000004ecc20 in virtio_scsi_handle_cmd_vq (s=3D0xd27a7a0,=20
-vq=3D0xd283410)
- =C2=A0=C2=A0=C2=A0 at /Images/lzg/code/710/qemu-2.8.1/hw/scsi/virtio-scs=
-i.c:588
-#7=C2=A0 0x00000000004eda20 in virtio_scsi_data_plane_handle_cmd (vdev=3D=
-0x0,=20
-vq=3D0xffffae7a6f98)
- =C2=A0=C2=A0=C2=A0 at /Images/lzg/code/710/qemu-2.8.1/hw/scsi/virtio-scs=
-i-dataplane.c:57
-#8=C2=A0 0x0000000000877254 in aio_dispatch (ctx=3D0xac61010) at=20
-util/aio-posix.c:323
-#9=C2=A0 0x00000000008773ec in aio_poll (ctx=3D0xac61010, blocking=3Dtrue=
-) at=20
-util/aio-posix.c:472
-#10 0x00000000005cd7cc in iothread_run (opaque=3D0xac5e4b0) at iothread.c=
-:49
-#11 0x000000000087a8b8 in qemu_thread_start (args=3D0xac61360) at=20
-util/qemu-thread-posix.c:495
-#12 0x00000000008a04e8 in thread_entry_for_hotfix (pthread_cb=3D0x0) at=20
-uvp/hotpatch/qemu_hotpatch_helper.c:579
-#13 0x0000ffffb041c8bc in start_thread () from /lib64/libpthread.so.0
-#14 0x0000ffffb0382f8c in thread_start () from /lib64/libc.so.6
-
-assert(blk_get_aio_context(d->conf.blk) =3D=3D s->ctx) failed.
-
-I think this patch=20
-(https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3Da6f230c8d13a7ff3a0=
-c7f1097412f44bfd9eff0b)=20
-introduce this problem.
-
-commit a6f230c8d13a7ff3a0c7f1097412f44bfd9eff0b=C2=A0 move blockbackend b=
-ack=20
-to main AioContext on unplug. It set the AioContext of
-
-SCSIDevice=C2=A0 to the main AioContex, but s->ctx is still the iothread=20
-AioContext.=C2=A0 Is this a bug?
-
-
---------------A38EC4ED9770E6CCC7A23409
-Content-Type: text/x-vcard; name="lizhengui.vcf"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="lizhengui.vcf"
-
-bnVsbA==
---------------A38EC4ED9770E6CCC7A23409--
+--Nq2Wo0NMKNjxTN9z--
 
