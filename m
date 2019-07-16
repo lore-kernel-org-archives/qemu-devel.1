@@ -7,79 +7,82 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B04F2C76188
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 08:15:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89A9EC76188
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 08:15:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7DF742145D
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 08:15:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5C13721721
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 08:15:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P38yAFSv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7DF742145D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I1GYy5rS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C13721721
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46248 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46254 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnIcV-00085S-Bc
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 04:15:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60180)
+	id 1hnIcZ-0008Jo-V8
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 04:15:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60111)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <paolo.bonzini@gmail.com>) id 1hnIYm-0000Te-OZ
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 04:11:42 -0400
+ (envelope-from <paolo.bonzini@gmail.com>) id 1hnIYk-0000Ji-Hi
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 04:11:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1hnIYl-0003PS-IJ
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 04:11:40 -0400
-Received: from mail-wr1-x436.google.com ([2a00:1450:4864:20::436]:36710)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1hnIYj-0003My-CK
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 04:11:38 -0400
+Received: from mail-wr1-x435.google.com ([2a00:1450:4864:20::435]:42484)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1hnIYl-0003Om-AK
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 04:11:39 -0400
-Received: by mail-wr1-x436.google.com with SMTP id n4so19889071wrs.3
- for <qemu-devel@nongnu.org>; Tue, 16 Jul 2019 01:11:39 -0700 (PDT)
+ id 1hnIYj-0003M4-4l
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 04:11:37 -0400
+Received: by mail-wr1-x435.google.com with SMTP id x1so4842042wrr.9
+ for <qemu-devel@nongnu.org>; Tue, 16 Jul 2019 01:11:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:subject:date:message-id:in-reply-to:references;
- bh=RxYfAEyw36ihWSXQYKfqSMDy1K9OXWQsSR7Cb5/oOMk=;
- b=P38yAFSv5K/JbiR8xVivWxMeA0VBNqFwpnB4XxjB79eT8JIOjFjnEjcj/hK6pHlzB8
- 33IH9kRkduh76GBphjHvSswlV8Z3pyMc7al7k7T9Gx1yMRyu16wumUxiVjfNRT3JNxi1
- avx9Nvv1dVpLtwhWei8jGeYh4Hw8n6xLESk5jifPKD3f4D510buvNAOgJz7RoDkt/UXm
- qkryCOfcfpiVc/2P5ZOUkEWVrLWp8PLp5dU/Qlq+evSmfWJ7/fdCnbrMFGHWKW6tusF0
- yfYsc/FdqDLMF6MxsFW0ExJqcIS4TGEMInwgwEToEjLqbetHMAJvzSkRZmOeT6k2CoZn
- Nl2A==
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=M6lsGMl+nf2V5Rsu715+jo/F0NLVYFfe6LEKAl/IYr0=;
+ b=I1GYy5rS1/RgdW1mKn+ddrtlAJ6e25MD2A6560TtYHDv1sVMVHcy3Ximv2SGQHaXaF
+ Ren6b9kmYY8dj6b6dyAtNJcpSCvD/qDRHzoAItgOSyv29RxeJVoN8l+ysZs5j9f5Evpy
+ 8xwP9tcbDzIf1eg4jBSbgWnbucgtmO0S1YrI/Aqqs6m8UudyJASkuH8rhfOiwoUvTfV4
+ AnF/vZC312CTAmH4Ik5Fbg9nf0Y4t//NmsnXwQwINnueTyrC4G/YcALXl0nYtrT1EwAW
+ o58eX7Pi/9BoLFRzh24Lc2ql5Po9TLf4wcK3Y6ZPEyQYPAvvObVZmBFiTSQIa/nOnaVi
+ Bx4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:subject:date:message-id
- :in-reply-to:references;
- bh=RxYfAEyw36ihWSXQYKfqSMDy1K9OXWQsSR7Cb5/oOMk=;
- b=mu6P+tfK8qmSQRYdxymbJ4Iii+0LndFJM6aLlY0XPN6tmWHA02hhPxzRQJzQ7tDPEC
- 1NB9io4i1nzZKG56y/fgqCT27vUuld6tOigSHL3Pot5FtMsd3rwRG4tS5DUbjfCNOagy
- eEyx0qpcjdD1ugsf8L5JkLtjqEqHlnHkRcbwzP23kFWh/cGDorIb1WVwJx5W2lsyMAWA
- dfPhRjiZDo8rsX6PR7XoZR0Io6fX3JuDwRlHfGougqAj6YY2LTllixwe5vba7fq/8XQT
- A2FpXFIbKZvhoE9j4Sp20G175/M2Cbth83j8GWG5xNezD6eFGjSMnsFa/1aVXdi614JW
- xR/w==
-X-Gm-Message-State: APjAAAVbazQAuZIlH+10qAFHgMJ5ZrcKs5DEcPfAQ3pIWpwYfkClqqIB
- LUJQeysCRYZUfqwnuaxlP1kwa+Xc+t4=
-X-Google-Smtp-Source: APXvYqyaA3zXsqo2WJY9n1bQWzk7u/tJap957e/mlY9Q0Pfms836SlRK3likuMcw6mlZGH6VZLisxQ==
-X-Received: by 2002:adf:c803:: with SMTP id d3mr10742907wrh.130.1563264697972; 
- Tue, 16 Jul 2019 01:11:37 -0700 (PDT)
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=M6lsGMl+nf2V5Rsu715+jo/F0NLVYFfe6LEKAl/IYr0=;
+ b=iebRbngW8RxnvFkCld0ooaxSjIUr2LylEBpigZm+6DQ0/WIvDp+6lU6SPIBtD1CccM
+ oIXPk5ZNZFrGYTsWMiV1+j5ettxewJ0js21u2pxvTdqKs3uCuKmc5SFAveaagQ8BLmmM
+ yH6GXsxwguvd1Le5TIR6Tws2MCAxFMrRnqaZovfRiB6V4cd0h05Ce3uRxQtSqzSkVmDv
+ b2Og/osqd/YPAPACff4m3aMTrPeviWCPTNAO7Wz5rOJVMrQoaSNl+H0qsu2RYB9j8BDH
+ Wha46WFQAbhFIQPo0L0nP16J/kDpeKh0UHInH+0joUas9NossceOF9sG8KDL/LgC1cGu
+ PqDw==
+X-Gm-Message-State: APjAAAWN5RPja9aBp5eAYsvR8AuI40Wa1ZsfpW/dMfnGke/jzZkVluCp
+ NDCZRKiK/SXfn3laivENVqKtA1NpIRI=
+X-Google-Smtp-Source: APXvYqz4VCrSaQiaJ/T+kXJ9ZTamS+hhncOzdCedJoONSn2EDmj84M1UwTRq9wgrxoxv9Xby8d1ihA==
+X-Received: by 2002:adf:f046:: with SMTP id t6mr36367130wro.307.1563264695955; 
+ Tue, 16 Jul 2019 01:11:35 -0700 (PDT)
 Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id c1sm37723879wrh.1.2019.07.16.01.11.37
- for <qemu-devel@nongnu.org>
+ by smtp.gmail.com with ESMTPSA id c1sm37723879wrh.1.2019.07.16.01.11.35
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 16 Jul 2019 01:11:37 -0700 (PDT)
+ Tue, 16 Jul 2019 01:11:35 -0700 (PDT)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Tue, 16 Jul 2019 10:11:16 +0200
-Message-Id: <1563264677-39718-19-git-send-email-pbonzini@redhat.com>
+Date: Tue, 16 Jul 2019 10:11:14 +0200
+Message-Id: <1563264677-39718-17-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1563264677-39718-1-git-send-email-pbonzini@redhat.com>
 References: <1563264677-39718-1-git-send-email-pbonzini@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::436
-Subject: [Qemu-devel] [PULL 18/19] create_config: remove $(CONFIG_SOFTMMU)
- hack
+X-Received-From: 2a00:1450:4864:20::435
+Subject: [Qemu-devel] [PULL 16/19] hw/usb/Kconfig: USB_XHCI_NEC requires
+ USB_XHCI
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,47 +94,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-CONFIG_TPM is defined to a rather weird $(CONFIG_SOFTMMU) so that it
-expands to the right thing in hw/Makefile.objs.  This however is not
-needed anymore and it has a corresponding hack in create_config
-to turn it into "#define CONFIG_TPM 1".  Clean up.
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
+TYPE_NEC_XHCI is child of TYPE_XHCI. Add the missing Kconfig
+dependency.
+
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- configure             | 2 +-
- scripts/create_config | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ hw/usb/Kconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/configure b/configure
-index 4983c8b..eb635c3 100755
---- a/configure
-+++ b/configure
-@@ -7159,7 +7159,7 @@ if test "$live_block_migration" = "yes" ; then
- fi
+diff --git a/hw/usb/Kconfig b/hw/usb/Kconfig
+index 495c6f2..555e093 100644
+--- a/hw/usb/Kconfig
++++ b/hw/usb/Kconfig
+@@ -40,7 +40,7 @@ config USB_XHCI_NEC
+     bool
+     default y if PCI_DEVICES
+     depends on PCI
+-    select USB
++    select USB_XHCI
  
- if test "$tpm" = "yes"; then
--  echo 'CONFIG_TPM=$(CONFIG_SOFTMMU)' >> $config_host_mak
-+  echo 'CONFIG_TPM=y' >> $config_host_mak
- fi
- 
- echo "TRACE_BACKENDS=$trace_backends" >> $config_host_mak
-diff --git a/scripts/create_config b/scripts/create_config
-index 00e86c8..6d8f08b 100755
---- a/scripts/create_config
-+++ b/scripts/create_config
-@@ -54,7 +54,7 @@ case $line in
-     done
-     echo "    NULL"
-     ;;
-- CONFIG_*='$(CONFIG_SOFTMMU)'|CONFIG_*=y) # configuration
-+ CONFIG_*=y) # configuration
-     name=${line%=*}
-     echo "#define $name 1"
-     ;;
+ config USB_MUSB
+     bool
 -- 
 1.8.3.1
 
