@@ -2,84 +2,144 @@ Return-Path: <SRS0=+QfZ=VN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC0EEC7618F
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 14:57:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDBE1C7618F
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 14:58:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BF55920693
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 14:57:39 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="MvcNGG+Z"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF55920693
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
+	by mail.kernel.org (Postfix) with ESMTPS id B6D7C205C9
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 14:58:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B6D7C205C9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49832 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49844 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnOte-000176-Q8
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 10:57:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50035)
+	id 1hnOu3-0002lu-O9
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 10:58:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50781)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <yury-kotov@yandex-team.ru>) id 1hnOrE-0007kL-7l
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 10:55:09 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hnOtX-0000tJ-PJ
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 10:57:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yury-kotov@yandex-team.ru>) id 1hnOrB-0001Lt-Nk
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 10:55:07 -0400
-Received: from forwardcorp1j.mail.yandex.net ([5.45.199.163]:41894)
+ (envelope-from <jsnow@redhat.com>) id 1hnOtW-0002kA-PY
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 10:57:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35554)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yury-kotov@yandex-team.ru>)
- id 1hnOr9-0001JM-Oy
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 10:55:05 -0400
-Received: from mxbackcorp1o.mail.yandex.net (mxbackcorp1o.mail.yandex.net
- [IPv6:2a02:6b8:0:1a2d::301])
- by forwardcorp1j.mail.yandex.net (Yandex) with ESMTP id 495A62E14CB;
- Tue, 16 Jul 2019 17:54:59 +0300 (MSK)
-Received: from smtpcorp1j.mail.yandex.net (smtpcorp1j.mail.yandex.net
- [2a02:6b8:0:1619::137])
- by mxbackcorp1o.mail.yandex.net (nwsmtp/Yandex) with ESMTP id
- rBKl0R8qAI-sxi8aH1M; Tue, 16 Jul 2019 17:54:59 +0300
-Precedence: bulk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
- s=default; 
- t=1563288899; bh=xRh29Dw9Cfd0xEIMjZVO3dh4OdPRUBmM+9AVkE70jm0=;
- h=In-Reply-To:Message-Id:References:Date:Subject:To:From:Cc;
- b=MvcNGG+Z9QSUzcV1V3s3XjjSBKVCaFC9d2TOR7uRgwnTx4mLv5eO7+SADaRbUOg5l
- 3EwNErqrShRtuJ2bseJypibCwuh3QbYzRbz3/XpFi4F3GDknc5rBdhRfIdLbzd63PN
- Pd0F+/pE7j1KFTUzP+ysBMuxTEAT0Mr0lViSvlwk=
-Authentication-Results: mxbackcorp1o.mail.yandex.net;
- dkim=pass header.i=@yandex-team.ru
-Received: from dynamic-red.dhcp.yndx.net (dynamic-red.dhcp.yndx.net
- [2a02:6b8:0:40c:68fa:19fe:5639:24b5])
- by smtpcorp1j.mail.yandex.net (nwsmtp/Yandex) with ESMTPSA id
- RzIFhwRP0o-swQiWvsR; Tue, 16 Jul 2019 17:54:58 +0300
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
- (Client certificate not present)
-From: Yury Kotov <yury-kotov@yandex-team.ru>
-To: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
- Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
- Juan Quintela <quintela@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Stefan Weil <sw@weilnetz.de>
-Date: Tue, 16 Jul 2019 17:54:21 +0300
-Message-Id: <20190716145421.17645-4-yury-kotov@yandex-team.ru>
-X-Mailer: git-send-email 2.22.0
-In-Reply-To: <20190716145421.17645-1-yury-kotov@yandex-team.ru>
-References: <20190716145421.17645-1-yury-kotov@yandex-team.ru>
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>)
+ id 1hnOtT-0002du-BZ; Tue, 16 Jul 2019 10:57:27 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 2755F3082B07;
+ Tue, 16 Jul 2019 14:57:23 +0000 (UTC)
+Received: from [10.18.17.130] (dhcp-17-130.bos.redhat.com [10.18.17.130])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D8CD96012C;
+ Tue, 16 Jul 2019 14:57:15 +0000 (UTC)
+To: Kevin Wolf <kwolf@redhat.com>, Alexander Popov <alex.popov@linux.com>
+References: <1562335669-10127-1-git-send-email-alex.popov@linux.com>
+ <0bce1e99-fb98-6354-9426-391a3e9363f1@linux.com>
+ <20190716112535.GB7297@linux.fritz.box>
+From: John Snow <jsnow@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <52979901-15a7-ee2c-80d7-4cbbc99f461c@redhat.com>
+Date: Tue, 16 Jul 2019 10:57:14 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20190716112535.GB7297@linux.fritz.box>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.45]); Tue, 16 Jul 2019 14:57:23 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 5.45.199.163
-Subject: [Qemu-devel] [PATCH v2 3/3] tests/migration: Add a test for auto
- converge
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [Qemu-block] [QEMU-SECURITY] ide: fix assertion in
+ ide_dma_cb() to prevent qemu DoS from quest
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -88,181 +148,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, yc-core@yandex-team.ru
+Cc: sstabellini@kernel.org, pmatouse@redhat.com, mdroth@linux.vnet.ibm.com,
+ qemu-block@nongnu.org, mst@redhat.com, qemu-devel@nongnu.org,
+ qemu-stable@nongnu.org, pjp@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Yury Kotov <yury-kotov@yandex-team.ru>
----
- tests/migration-test.c | 119 +++++++++++++++++++++++++++++++++++++----
- 1 file changed, 108 insertions(+), 11 deletions(-)
 
-diff --git a/tests/migration-test.c b/tests/migration-test.c
-index e0407576cb..8a755dfaf2 100644
---- a/tests/migration-test.c
-+++ b/tests/migration-test.c
-@@ -250,6 +250,17 @@ static int64_t read_ram_property_int(QTestState *who=
-, const char *property)
-     return result;
- }
-=20
-+static int64_t read_migrate_property_int(QTestState *who, const char *pr=
-operty)
-+{
-+    QDict *rsp_return;
-+    int64_t result;
-+
-+    rsp_return =3D migrate_query(who);
-+    result =3D qdict_get_try_int(rsp_return, property, 0);
-+    qobject_unref(rsp_return);
-+    return result;
-+}
-+
- static uint64_t get_migration_pass(QTestState *who)
- {
-     return read_ram_property_int(who, "dirty-sync-count");
-@@ -264,20 +275,22 @@ static void read_blocktime(QTestState *who)
-     qobject_unref(rsp_return);
- }
-=20
-+static bool check_migration_status(QTestState *who, const char *status)
-+{
-+    bool completed;
-+    char *current_status;
-+
-+    current_status =3D migrate_query_status(who);
-+    completed =3D strcmp(current_status, status) =3D=3D 0;
-+    g_assert_cmpstr(current_status, !=3D, "failed");
-+    g_free(current_status);
-+    return completed;
-+}
-+
- static void wait_for_migration_status(QTestState *who,
-                                       const char *goal)
- {
--    while (true) {
--        bool completed;
--        char *status;
--
--        status =3D migrate_query_status(who);
--        completed =3D strcmp(status, goal) =3D=3D 0;
--        g_assert_cmpstr(status, !=3D,  "failed");
--        g_free(status);
--        if (completed) {
--            return;
--        }
-+    while (!check_migration_status(who, goal)) {
-         usleep(1000);
-     }
- }
-@@ -1127,6 +1140,89 @@ static void test_migrate_fd_proto(void)
-     test_migrate_end(from, to, true);
- }
-=20
-+static void test_migrate_auto_converge(void)
-+{
-+    char *uri =3D g_strdup_printf("unix:%s/migsocket", tmpfs);
-+    QTestState *from, *to;
-+    int i;
-+    int64_t remaining, downtime;
-+
-+    /*
-+     * We want the test to be fast enough, but stable.
-+     * Throttle percentages are chosen to cover all cases (init, increme=
-nt, max)
-+     */
-+    static const int64_t expected_pcts[] =3D { 0, 1, 51, 98 };
-+    const int64_t max_bandwidth =3D 200000000; /* ~200Mb/s */
-+    const int64_t downtime_limit =3D 50; /* 50ms */
-+    /*
-+     * We migrate through unix-socket (> 500Mb/s).
-+     * Thus, expected migration speed ~=3D bandwidth limit (< 500Mb/s).
-+     * So, we can predict expected_threshold
-+     */
-+    const int64_t expected_threshold =3D max_bandwidth * downtime_limit =
-/ 1000;
-+
-+    if (test_migrate_start(&from, &to, uri, false, false)) {
-+        return;
-+    }
-+
-+    migrate_set_capability(from, "auto-converge", true);
-+    migrate_set_parameter(from, "cpu-throttle-initial", expected_pcts[1]=
-);
-+    migrate_set_parameter(from, "cpu-throttle-increment",
-+                          expected_pcts[2] - expected_pcts[1]);
-+    migrate_set_parameter(from, "max-cpu-throttle", expected_pcts[3]);
-+
-+    migrate_set_parameter(from, "max-bandwidth", max_bandwidth);
-+    migrate_set_parameter(from, "downtime-limit", downtime_limit);
-+
-+    /* To check remaining size after precopy */
-+    migrate_set_capability(from, "pause-before-switchover", true);
-+
-+    /* Wait for the first serial output from the source */
-+    wait_for_serial("src_serial");
-+
-+    migrate(from, uri, "{}");
-+
-+    for (i =3D 0; i < ARRAY_SIZE(expected_pcts); i++) {
-+        int64_t pct;
-+        pct =3D read_migrate_property_int(from, "cpu-throttle-percentage=
-");
-+        g_assert_cmpint(pct, =3D=3D, expected_pcts[i]);
-+        while (pct =3D=3D expected_pcts[i] && !got_stop) {
-+            usleep(1000);
-+            pct =3D read_migrate_property_int(from, "cpu-throttle-percen=
-tage");
-+        }
-+        /* We break out of this loop only in paused state */
-+        if (got_stop || i + 1 =3D=3D ARRAY_SIZE(expected_pcts)) {
-+            /* Check unexpected throttle percentage change */
-+            g_assert_true(got_stop);
-+            /* Check unexpected converge */
-+            g_assert_cmpint(i + 1, =3D=3D, ARRAY_SIZE(expected_pcts));
-+            g_assert_true(check_migration_status(from, "pre-switchover")=
-);
-+        }
-+    }
-+
-+    remaining =3D read_ram_property_int(from, "remaining");
-+    g_assert_cmpint(remaining, <, expected_threshold);
-+
-+    wait_command(from, "{ 'execute': 'migrate-continue' , 'arguments':"
-+                       "  { 'state': 'pre-switchover' } }");
-+
-+    qtest_qmp_eventwait(to, "RESUME");
-+
-+    wait_for_serial("dest_serial");
-+    wait_for_migration_complete(from);
-+
-+    downtime =3D read_migrate_property_int(from, "downtime");
-+    /*
-+     * Actual downtime may be greater than downtime limit,
-+     * but the difference should be small enough (~20ms)
-+     */
-+    g_assert_cmpint(downtime, <, downtime_limit + 20);
-+
-+    g_free(uri);
-+
-+    test_migrate_end(from, to, true);
-+}
-+
- int main(int argc, char **argv)
- {
-     char template[] =3D "/tmp/migration-test-XXXXXX";
-@@ -1182,6 +1278,7 @@ int main(int argc, char **argv)
-     /* qtest_add_func("/migration/ignore_shared", test_ignore_shared); *=
-/
-     qtest_add_func("/migration/xbzrle/unix", test_xbzrle_unix);
-     qtest_add_func("/migration/fd_proto", test_migrate_fd_proto);
-+    qtest_add_func("/migration/auto_converge", test_migrate_auto_converg=
-e);
-=20
-     ret =3D g_test_run();
-=20
---=20
-2.22.0
 
+On 7/16/19 7:25 AM, Kevin Wolf wrote:
+> Am 15.07.2019 um 13:24 hat Alexander Popov geschrieben:
+>> On 05.07.2019 17:07, Alexander Popov wrote:
+>>> This assertion was introduced in the commit a718978ed58a in July 2015.
+>>> It implies that the size of successful DMA transfers handled in
+>>> ide_dma_cb() should be multiple of 512 (the size of a sector).
+>>>
+>>> But guest systems can initiate DMA transfers that don't fit this
+>>> requirement. Let's improve the assertion to prevent qemu DoS from quests.
+>>
+>> Hello!
+>>
+>> Just a friendly ping.
+>>
+>> Could you have a look at this patch?
+> 
+> John, I think this is for you.
+> 
+> I haven't reviewed this yet, but if we put an assertion there that the
+> request is aligned, we probably rely on this fact somewhere in the code.
+> So I suspect that just changing the assertion without changing other
+> code, too, might not be enough.
+> 
+> Kevin
+> 
+
+Right; I'm aware of the patch. It's on the list to investigate today.
+
+I have the same concern that the assertion intuits a bug elsewhere, so I
+wanted to give this one a thorough investigation before inclusion for rc1.
+
+Sorry for the delay, it IS on my list, but I also feel that a privileged
+DOS by a guest of a legacy device is actually low priority
+security-wise, unless we can demonstrate that there are side effects
+that can be exploited.
+
+--js
 
