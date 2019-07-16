@@ -2,91 +2,96 @@ Return-Path: <SRS0=+QfZ=VN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A4F8C7618F
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 15:03:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6198EC76195
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 15:04:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 07A4820693
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 15:03:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2DF2B20693
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jul 2019 15:04:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dYWRb8Lt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07A4820693
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BgTTYZxp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2DF2B20693
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49896 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49906 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnOyz-0007BQ-2X
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 11:03:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52583)
+	id 1hnP0A-0008Ay-8R
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 11:04:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53077)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hnOym-0006ly-Tt
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 11:02:58 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1hnOzw-0007mC-IN
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 11:04:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hnOyl-0006AK-L2
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 11:02:56 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:37374)
+ (envelope-from <richard.henderson@linaro.org>) id 1hnOzv-00071V-ID
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 11:04:08 -0400
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:45725)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hnOyl-00069S-CK
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 11:02:55 -0400
-Received: by mail-wm1-x342.google.com with SMTP id f17so19044541wme.2
- for <qemu-devel@nongnu.org>; Tue, 16 Jul 2019 08:02:55 -0700 (PDT)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1hnOzv-00070K-A5
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 11:04:07 -0400
+Received: by mail-pg1-x543.google.com with SMTP id o13so9566438pgp.12
+ for <qemu-devel@nongnu.org>; Tue, 16 Jul 2019 08:04:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=Q6C40gmUPp2FOjOrOQTCS+TKYW7nnu7DgidqIYP3odY=;
- b=dYWRb8Lt163Z65oZMZyes+bEUeu97KP8hoji3n24WrQTUm9NXwoNrbi0TbRzG1H4l1
- vjG5f77ac+LBNM3JYeei1DxLixJFLwLlMkcQX8sYkNWZBEawyZISqWKe4r4DnHALUcTh
- YH+Z/pwqMs4Cv12Vii7MKDQoNkgi9aXBKd86E7QJlKWmMVlwZDtNoTFiCLb9CNtErIqZ
- M5TLzXi6yw56yBlppMJkWGv/NXer8RmUfnekWUrRRmLwxqspH2fN2rJvlIFaLk3X5ngt
- W+VBZ7NLqZkXmIgIhO0GsYhPS+5isC/CC+/LyoKKKyAh4NN61nNl13Ma6wC+h7KqQtw6
- FoEQ==
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=Vami3kb1fVj6KrU0Qjqblj6q7FXkXTv9IfpO2z270F4=;
+ b=BgTTYZxpRPBFR7vekZvvZIcz7mY7CXRH1EbWS2HzrjqWVDjpgHDyN2OTaycbzCAfjS
+ IK7c1IIZatcFusJMyPwukY513fiGd8EickMKojnJXK/v/jY9/GIb1UweRJKXN55jERgi
+ 0wkIN5F/nr17weisy2nBDyKoIpU0c5a0f/rQRKMWRnR0mTAwuVMpVJ3d3yj7OANt78Gk
+ G3m48e2szdOl7lsAccxxSm8lepElNrLbApkRfG6Wd10GKlS4SitEUjpgxoNA1U+tMafH
+ R0P4rbAGMki4kg8cRwiFGG/I/fpgmcZ+wRdpcV8/lvLxyPF9qu4I0kn9CfHaXFLJ41RN
+ ZnCg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=Q6C40gmUPp2FOjOrOQTCS+TKYW7nnu7DgidqIYP3odY=;
- b=b7/VLjvzHFD4MdJrYByY+NERQ5JQYQfPZIKW/LNdkcnZFVyxGnyLrUCKZ+B0N42+Ej
- 2biqI1KVUvxXz7Z2OComEIWrg2ai35NOxvPvQUrUe1/5VWhyBmow6WsZvLzytGkphfH7
- HMejUctkO27AsEGKe6CsxhGLluIg1A3PeDNGqksVNdoGbhryvZfc6AeGaZZrb94Rqjxv
- dkde5+cBisy8SYYGIPd0pk4Z80i3jpibsYXtU2aKf+d6kss+jyS4YdfYM2ZGqHk7Bjhg
- saDHx/9/0WzSV7oyxjT+PEHtQOiRMZ3CKAbapgPAnzxOIp38C8vFPn7IYiXizYWDvqxH
- LPbA==
-X-Gm-Message-State: APjAAAXRhRQaSHR0zPqcjabAzlGhM1Sq3h2YdDajGM0pxrPJUSEEpeoV
- 6HhZsTXWK1hweKTABRMV1MYaGg==
-X-Google-Smtp-Source: APXvYqx/FExO65na/omAZzdgtZnccT905n5u+KA/I6wvhuXvt2ZRSXs1j75xnkuec5NfRFzirgzDjA==
-X-Received: by 2002:a7b:c3d7:: with SMTP id t23mr30311805wmj.94.1563289373663; 
- Tue, 16 Jul 2019 08:02:53 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id t24sm19397847wmj.14.2019.07.16.08.02.53
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Tue, 16 Jul 2019 08:02:53 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id A76621FF87;
- Tue, 16 Jul 2019 16:02:52 +0100 (BST)
-References: <20190716140133.8578-1-alex.bennee@linaro.org>
- <CAFEAcA8V2h3pqC_g5aaD2gsv08c18YZKRcxLM+hDNuMv_C55=Q@mail.gmail.com>
-User-agent: mu4e 1.3.3; emacs 26.1
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=Vami3kb1fVj6KrU0Qjqblj6q7FXkXTv9IfpO2z270F4=;
+ b=Ms816lRdy1Zm2tXfn6xiBK3NlRI/A9hoEeXE5vlKf1s3uj04Q14FSibIkU+X2DjFL/
+ GS3CejwK3XObX+WAm8KgE6U7AXRaQ+ra7RskImzNarHxM7vL4u2J4Ai/tnUqJUU7V9PQ
+ v3AJdhrwK6oPPsKPWBfRMvtk0DO8v0f+u/SB8jzQPRvtycZRNbKWbkZvFZok7Ucnzhwa
+ CRnEnpsKnIMJ1CHqXUwPbH2Q77GSZS4QiDvnK0rNI3QELw592IJsRJ9q13GE9QUHIsH7
+ J5HmXKe6MU4aIgbbLR/hZDrrGFBTagY7rXfnhj3Tn9Qu0dpEDNcSyICmH4B3ck9kIu0i
+ UaAQ==
+X-Gm-Message-State: APjAAAVWvgSXa/GDjdUchkCAChzU+/FU76Wr1RSU2kv0USbvq2wIFDo7
+ FUkyb0sE+2kZfptn4S0o4S73mg==
+X-Google-Smtp-Source: APXvYqzUeZURg1boD9c+DQZcHZttDBq6g8gJDOeIYkenFLo7+G504UTR4Gy0iB1KEKhQ1X0kKaat8w==
+X-Received: by 2002:a17:90a:1a45:: with SMTP id
+ 5mr37966710pjl.43.1563289446056; 
+ Tue, 16 Jul 2019 08:04:06 -0700 (PDT)
+Received: from [192.168.1.11] (97-113-176-6.tukw.qwest.net. [97.113.176.6])
+ by smtp.gmail.com with ESMTPSA id v10sm20921045pfe.163.2019.07.16.08.04.04
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Tue, 16 Jul 2019 08:04:05 -0700 (PDT)
 To: Peter Maydell <peter.maydell@linaro.org>
-In-reply-to: <CAFEAcA8V2h3pqC_g5aaD2gsv08c18YZKRcxLM+hDNuMv_C55=Q@mail.gmail.com>
-Date: Tue, 16 Jul 2019 16:02:52 +0100
-Message-ID: <87blxuuin7.fsf@zen.linaroharston>
+References: <20181102171638.24069-1-peter.maydell@linaro.org>
+ <20181102171638.24069-9-peter.maydell@linaro.org>
+ <3e3d2018-3993-f651-8e94-5bea612bd776@redhat.com>
+ <CAFEAcA_FtoHOUv_cPgfO7GrZ8Ug9cKCvmY2z75i9DaAQ8Qx+gQ@mail.gmail.com>
+ <2745eb9d-c2a2-30a8-c1d0-b8cb3ee43705@linaro.org>
+ <CAFEAcA-EqXU3vM63bK4+Yo1j07fZpD_=gapB_5_ygrJFk2-Rsw@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <c15bcb9c-170a-380e-0ec5-4681b641e130@linaro.org>
+Date: Tue, 16 Jul 2019 08:04:03 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
+In-Reply-To: <CAFEAcA-EqXU3vM63bK4+Yo1j07fZpD_=gapB_5_ygrJFk2-Rsw@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::342
-Subject: Re: [Qemu-devel] [RFC PATCH for 4.1] linux-user: unparent CPU
- object before unref
+X-Received-From: 2607:f8b0:4864:20::543
+Subject: Re: [Qemu-devel] [PULL 08/10] target/arm: Conditionalize some
+ asserts on aarch32 support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,92 +103,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>, 1836558@bugs.launchpad.net,
- QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <laurent@vivier.eu>
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Laszlo Ersek <lersek@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-Peter Maydell <peter.maydell@linaro.org> writes:
-
-> Ccing the QOM maintainers to make sure we have the
-> QOM lifecycle operations right here...
->
-> On Tue, 16 Jul 2019 at 15:02, Alex Benn=C3=A9e <alex.bennee@linaro.org> w=
-rote:
+On 7/16/19 2:18 PM, Peter Maydell wrote:
+> On Tue, 16 Jul 2019 at 15:02, Richard Henderson
+> <richard.henderson@linaro.org> wrote:
 >>
->> When a CPU object is created it is parented during it's realize stage.
->> If we don't unparent before the "final" unref we will never finzalize
->> the object leading to a memory leak. For most setups you probably
->> won't notice but with anything that creates and destroys a lot of
->> threads this will add up. This goes especially for architectures which
->> allocate a lot of memory in their CPU structures.
+>> On 7/16/19 12:03 PM, Peter Maydell wrote:
+>>> The intention of the assertion really is to catch QEMU bugs
+>>> where we got the ID register values wrong in our emulated
+>>> CPUs. Perhaps we should relax all these assertions to only
+>>> testing if we're using TCG, not KVM ?
 >>
->> Fixes: https://bugs.launchpad.net/qemu/+bug/1836558
->> Cc: 1836558@bugs.launchpad.net
->> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->> ---
->>  linux-user/syscall.c | 1 +
->>  1 file changed, 1 insertion(+)
->>
->> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
->> index 39a37496fed..4c9313fd9d0 100644
->> --- a/linux-user/syscall.c
->> +++ b/linux-user/syscall.c
->> @@ -7183,6 +7183,7 @@ static abi_long do_syscall1(void *cpu_env, int num=
-, abi_long arg1,
->>                            NULL, NULL, 0);
->>              }
->>              thread_cpu =3D NULL;
->> +            object_unparent(OBJECT(cpu));
->>              object_unref(OBJECT(cpu));
->>              g_free(ts);
->>              rcu_unregister_thread();
->
-> I think (as I mentioned on IRC) that we also need to unrealize
-> the CPU object, because target/ppc at least does some freeing
-> of memory in its unrealize method. I think we do that by
-> setting the QOM "realize" property back to "false" -- but that
-> might barf if we try it on a CPU that isn't hotpluggable...
+>> Perhaps.  In some instances if ID register values are wrong we would then not
+>> migrate properly, but none of the checks we're currently doing of this sort
+>> would catch those particular cases.
+> 
+> In those cases we should probably print a warning and install
+> a migration-blocker, rather than asserting...
 
-I have tried:
+Ok, but I'm saying we don't assert for those either, at the moment.
 
-             thread_cpu =3D NULL;
-+            object_unparent(OBJECT(cpu));
-+            object_property_set_bool(OBJECT(cpu), false, "realized", NULL);
-             object_unref(OBJECT(cpu));
 
-but it didn't manifestly change anything (i.e. both with and without
-setting realized the thread allocated stuff is freed). Valgrind still
-complains about:
-
-=3D=3D22483=3D=3D 6,656 bytes in 26 blocks are possibly lost in loss record=
- 1,639 of 1,654
-=3D=3D22483=3D=3D    at 0x483577F: malloc (vg_replace_malloc.c:299)
-=3D=3D22483=3D=3D    by 0x4D7F8D0: g_malloc (in /usr/lib/x86_64-linux-gnu/l=
-ibglib-2.0.so.0.5800.3)
-=3D=3D22483=3D=3D    by 0x27D692: create_new_table (translate_init.inc.c:92=
-52)
-=3D=3D22483=3D=3D    by 0x27D7CD: register_ind_in_table (translate_init.inc=
-.c:9291)
-=3D=3D22483=3D=3D    by 0x27D975: register_dblind_insn (translate_init.inc.=
-c:9337)
-=3D=3D22483=3D=3D    by 0x27DBBB: register_insn (translate_init.inc.c:9384)
-=3D=3D22483=3D=3D    by 0x27DE4E: create_ppc_opcodes (translate_init.inc.c:=
-9449)
-=3D=3D22483=3D=3D    by 0x27E79C: ppc_cpu_realize (translate_init.inc.c:981=
-8)
-=3D=3D22483=3D=3D    by 0x2C6FE8: device_set_realized (qdev.c:834)
-=3D=3D22483=3D=3D    by 0x2D1E3D: property_set_bool (object.c:2076)
-=3D=3D22483=3D=3D    by 0x2D00B3: object_property_set (object.c:1268)
-=3D=3D22483=3D=3D    by 0x2D3185: object_property_set_qobject (qom-qobject.=
-c:26)
-
-But I don't know if that is just because the final exit_group of the
-main CPU just exits without attempting to clean-up. However it is better
-than it was.
-
---
-Alex Benn=C3=A9e
+r~
 
