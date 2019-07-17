@@ -2,84 +2,92 @@ Return-Path: <SRS0=PWhW=VO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DC6EC76192
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 09:48:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0283CC76186
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 09:50:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EF2D620880
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 09:47:59 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TESzvAxJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF2D620880
+	by mail.kernel.org (Postfix) with ESMTPS id CCB6A20880
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 09:50:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CCB6A20880
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55456 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55474 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hngXX-00073H-65
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 05:47:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42211)
+	id 1hnga3-0008PC-M3
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 05:50:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43046)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <paolo.bonzini@gmail.com>) id 1hngXD-00063H-OL
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 05:47:40 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hngZq-0007qn-5R
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 05:50:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1hngXC-0004Tl-Nb
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 05:47:39 -0400
-Received: from mail-wr1-x430.google.com ([2a00:1450:4864:20::430]:45495)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1hngXC-0004TU-HM
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 05:47:38 -0400
-Received: by mail-wr1-x430.google.com with SMTP id f9so24015978wre.12
- for <qemu-devel@nongnu.org>; Wed, 17 Jul 2019 02:47:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=NjI+HmyxGNKghok4nOlp66yM1BjstXg68u+D7oUdNEc=;
- b=TESzvAxJEltSse3Qs1grm+2ivvCGvT5m8QSEsHFCKtBDRl3veA70lPTI7NsDG5Wjjg
- +7yRXZZgOPgG4UgD+TR+C6+Zz9oyZVALoaQxM8rSdM6fsBbTWNarCKkjxNkXjhMJflZ8
- 4nl5pL9yWOt/oR5isHurGWBN//4WKm9yat3ZsJdeSEXDEvZfcKFZvvZL/jTNXsHwhTAV
- Y+ertceD7rtG+o/qB/C8/OXYZ1tgL/o3kh/jIWMLlTZzbE2qB0UezHJoG7ikjNMR29EP
- koSxw+BLGmpNT/Xs5T3b2FhWlHPbf5UPTaNuJ8KSYTBkigdH2jNXpTv2yRCG5p4KR9N1
- l9pA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :mime-version:content-transfer-encoding;
- bh=NjI+HmyxGNKghok4nOlp66yM1BjstXg68u+D7oUdNEc=;
- b=neVIOAEsxxyfynkfytUxHe1vLVvB8KAwdOlLTNcK6rkKXLBal2DhnnXjSNHXImkhDa
- wkwS0z5LaxLcaddZav5kuqZkTIAxv9KKtb+mZNPwLMzBNBm7gjHd/B2+/n30B+uSHYc+
- aaRDhwE08bqXT5qz8eWldXDuCRQ/7DwznqB0QEkSMSoCkbaECq7P5zMF0YahYVV5LgAM
- W+2AhkERzIFQXlt2wlx+4baiZ9TjxA8HKpvpNTi7k+uE8dbbXp15PXuevTACjBvaE5wz
- LZkmqJaTZbWeTu8MBzTprytZsyyZBiy/9nRRgIKwwuASyjpiJthGl9OZaXc2OUIHzBT+
- Szdg==
-X-Gm-Message-State: APjAAAXOk6C6ORtHESDdFtd7U7/ilYhIxYd7JZRSB9MBbp+MzHKVWqtp
- eJrgbIc9w6sTtIIkJF3esG6I9M9wJVs=
-X-Google-Smtp-Source: APXvYqxrfniimrHvc8NUjiOLAb2h3gZNJG6RmqQuAcRpEoU9MvnJ8BtjuFgobiDQUpeKLLX1qr8l+Q==
-X-Received: by 2002:adf:deca:: with SMTP id i10mr30730025wrn.313.1563356857248; 
- Wed, 17 Jul 2019 02:47:37 -0700 (PDT)
-Received: from donizetti.lan ([2001:b07:6468:f312:e427:3beb:1110:dda2])
- by smtp.gmail.com with ESMTPSA id y12sm2037249wru.30.2019.07.17.02.47.36
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Wed, 17 Jul 2019 02:47:36 -0700 (PDT)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Wed, 17 Jul 2019 11:47:35 +0200
-Message-Id: <20190717094735.31151-1-pbonzini@redhat.com>
-X-Mailer: git-send-email 2.21.0
+ (envelope-from <mreitz@redhat.com>) id 1hngZo-0006Gg-UC
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 05:50:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40654)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1hngZm-0006D2-3Q; Wed, 17 Jul 2019 05:50:18 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id BB203307D91E;
+ Wed, 17 Jul 2019 09:50:16 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.40.205.16])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E0F1C608A6;
+ Wed, 17 Jul 2019 09:50:11 +0000 (UTC)
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+References: <20190716000117.25219-1-jsnow@redhat.com>
+ <20190716000117.25219-12-jsnow@redhat.com>
+ <9cf9c85d-c41e-123c-07cb-81c453363aea@redhat.com>
+ <91af10c4-e4ff-df49-d1e9-31ea210fc637@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <0f773100-ecba-2d2a-8526-9fe980c6830a@redhat.com>
+Date: Wed, 17 Jul 2019 11:50:09 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::430
-Subject: [Qemu-devel] [PATCH] vhost-user-scsi: Call
- virtio_scsi_common_unrealize() when device realize failed
+In-Reply-To: <91af10c4-e4ff-df49-d1e9-31ea210fc637@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="NEVl8ziVwRmU0CO05KAvrWFSNI8U9EXWQ"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.48]); Wed, 17 Jul 2019 09:50:16 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2 11/11] iotests/257: test traditional
+ sync modes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,63 +99,178 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Xie Yongji <xieyongji@baidu.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com,
+ Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Xie Yongji <xieyongji@baidu.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--NEVl8ziVwRmU0CO05KAvrWFSNI8U9EXWQ
+Content-Type: multipart/mixed; boundary="tO2hyOmUcKGubr40RMYw3g7kuNPGfACgn";
+ protected-headers="v1"
+From: Max Reitz <mreitz@redhat.com>
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com,
+ Markus Armbruster <armbru@redhat.com>
+Message-ID: <0f773100-ecba-2d2a-8526-9fe980c6830a@redhat.com>
+Subject: Re: [PATCH v2 11/11] iotests/257: test traditional sync modes
+References: <20190716000117.25219-1-jsnow@redhat.com>
+ <20190716000117.25219-12-jsnow@redhat.com>
+ <9cf9c85d-c41e-123c-07cb-81c453363aea@redhat.com>
+ <91af10c4-e4ff-df49-d1e9-31ea210fc637@redhat.com>
+In-Reply-To: <91af10c4-e4ff-df49-d1e9-31ea210fc637@redhat.com>
 
-This avoids memory leak when device hotplug is failed.
+--tO2hyOmUcKGubr40RMYw3g7kuNPGfACgn
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Xie Yongji <xieyongji@baidu.com>
-Message-Id: <20190717004606.12444-2-xieyongji@baidu.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- hw/scsi/vhost-user-scsi.c | 16 ++++++++++++----
- 1 file changed, 12 insertions(+), 4 deletions(-)
+On 16.07.19 18:58, John Snow wrote:
+>=20
+>=20
+> On 7/16/19 8:04 AM, Max Reitz wrote:
+>> On 16.07.19 02:01, John Snow wrote:
+>>> Signed-off-by: John Snow <jsnow@redhat.com>
+>>> ---
+>>>  tests/qemu-iotests/257     |   41 +-
+>>>  tests/qemu-iotests/257.out | 3089 ++++++++++++++++++++++++++++++++++=
+++
+>>>  2 files changed, 3128 insertions(+), 2 deletions(-)
+>>
+>> This needs a %s/specify Bitmap sync mode/specify bitmap sync mode/.
+>>
+>>> diff --git a/tests/qemu-iotests/257 b/tests/qemu-iotests/257
+>>> index 53ab31c92e..c2a72c577a 100755
+>>> --- a/tests/qemu-iotests/257
+>>> +++ b/tests/qemu-iotests/257
+>>
+>> [...]
+>>
+>>> @@ -393,7 +399,7 @@ def test_bitmap_sync(bsync_mode, msync_mode=3D'bi=
+tmap', failure=3DNone):
+>>>              # group 1 gets cleared first, then group two gets writte=
+n.
+>>>              if ((bsync_mode =3D=3D 'on-success' and not failure) or
+>>>                  (bsync_mode =3D=3D 'always')):
+>>> -                ebitmap.clear_group(1)
+>>> +                ebitmap.clear()
+>>
+>> Hmmm...  Why?
+>>
+>=20
+> From an order of operations standpoint, if we are here, we are expectin=
+g
+> the bitmap to be synchronized. We can clear any existing data it holds,=
 
-diff --git a/hw/scsi/vhost-user-scsi.c b/hw/scsi/vhost-user-scsi.c
-index a0b69fbc0f..665939df19 100644
---- a/hw/scsi/vhost-user-scsi.c
-+++ b/hw/scsi/vhost-user-scsi.c
-@@ -87,7 +87,7 @@ static void vhost_user_scsi_realize(DeviceState *dev, Error **errp)
-     }
- 
-     if (!vhost_user_init(&s->vhost_user, &vs->conf.chardev, errp)) {
--        return;
-+        goto free_virtio;
-     }
- 
-     vsc->dev.nvqs = 2 + vs->conf.num_queues;
-@@ -101,15 +101,23 @@ static void vhost_user_scsi_realize(DeviceState *dev, Error **errp)
-     if (ret < 0) {
-         error_setg(errp, "vhost-user-scsi: vhost initialization failed: %s",
-                    strerror(-ret));
--        vhost_user_cleanup(&s->vhost_user);
--        g_free(vqs);
--        return;
-+        goto free_vhost;
-     }
- 
-     /* Channel and lun both are 0 for bootable vhost-user-scsi disk */
-     vsc->channel = 0;
-     vsc->lun = 0;
-     vsc->target = vs->conf.boot_tpgt;
-+
-+    return;
-+
-+free_vhost:
-+    vhost_user_cleanup(&s->vhost_user);
-+    g_free(vqs);
-+free_virtio:
-+    err = NULL;
-+    virtio_scsi_common_unrealize(dev, &err);
-+    error_propagate(errp, err);
- }
- 
- static void vhost_user_scsi_unrealize(DeviceState *dev, Error **errp)
--- 
-2.21.0
+> and then:
+>=20
+>>>              ebitmap.dirty_group(2)
+>>> =20
+>=20
+> Add new writes that occurred during the job; which only happen here in
+> this callback.
+>=20
+> (The old code cleared specifically only group 1, the new code is just
+> more general. I wound up changing it for a version that didn't make it
+> to the list, but this is still correct.)
+>=20
+>>>          vm.run_job(job, auto_dismiss=3DTrue, auto_finalize=3DFalse,
+>>> @@ -404,8 +410,19 @@ def test_bitmap_sync(bsync_mode, msync_mode=3D'b=
+itmap', failure=3DNone):
+>>>          log('')
+>>> =20
+>>>          if bsync_mode =3D=3D 'always' and failure =3D=3D 'intermedia=
+te':
+>>> +            # TOP treats anything allocated as dirty, expect to see:=
 
+>>> +            if msync_mode =3D=3D 'top':
+>>> +                ebitmap.dirty_group(0)
+>>> +
+>=20
+> Sorry, this code is definitely in the "cute" category...
+>=20
+> If the failure was intermediate, we never call the pre-finalize callbac=
+k
+> above. So we know that the allocated regions of the file are only from
+> groups 0 and 1.
+>=20
+> So, HERE, we can mark the emulated bitmap's group 0 as dirty, to mimic
+> what the copy_bitmap is going to have started the operation with.
+>=20
+>>>              # We manage to copy one sector (one bit) before the erro=
+r.
+>>>              ebitmap.clear_bit(ebitmap.first_bit)
+>=20
+> And then right here, we clear the first bit which we did copy out
+> successfully. The emulated bitmap is now correct for sync=3Dtop.
+>=20
+>>> +
+>>> +            # Full returns all bits set except what was copied/skipp=
+ed
+>>> +            if msync_mode =3D=3D 'full':
+>>> +                fail_bit =3D ebitmap.first_bit
+>>> +                ebitmap.clear()
+>>> +                ebitmap.dirty_bits(range(fail_bit, SIZE // GRANULARI=
+TY))
+>>> +
+>=20
+> The full mode, though, is special. We cleared the first allocated bit
+> just like for sync=3Dtop, but we take note of the second bit which is t=
+he
+> one that caused the injected failure.
+>=20
+> For both 'top' and 'full' modes here we're really using the ebitmap as
+> an allocation record to inform what the output bitmap is going to look =
+like.
+>=20
+>>
+>> So sync=3Dtop didn=E2=80=98t copy anything?  Is that because it now er=
+rors out
+>> before getting to copy something?
+>>
+>=20
+> The ebitmap.clear_bit(ebitmap.first_bit) triggers for top, too. The tes=
+t
+> output should hopefully make sense here.
+
+I...   I have no idea how I missed the ebitmap.clear_bit().
+
+So with the test output fixed:
+
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+
+>> (The rest looks good to me.)
+>>
+>> Max
+>>
+>>>          ebitmap.compare(get_bitmap(bitmaps, drive0.device, 'bitmap0'=
+))
+>>> =20
+>>>          # 2 - Writes and Reference Backup
+>>
+>=20
+
+
+
+--tO2hyOmUcKGubr40RMYw3g7kuNPGfACgn--
+
+--NEVl8ziVwRmU0CO05KAvrWFSNI8U9EXWQ
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0u71EACgkQ9AfbAGHV
+z0CPIAf/SZpGGK6h7+okxPu7BHFtM8QjFB+LgKaFqwjsR2A+8kAMfSLZ0ZOrR1mb
+8NjfOPjSdXBlyA9yqom1xuZaDzGE7SRIZrd7O2WppkK9hbpN/cNlbVXxakIsGCwy
+ZpBzwfpNZPXJNZd6dNodVfgPP+icf9HKVaxhwQmdH9n3aKN30Ks3TagetSwRxvAd
+YuhHtKx/enrSoRUz17C+sknLG/NfRWeSQ9hrNKLQKzIv/vXnShPAV/vs3rghcwpE
+49VJZtVBESJuy4nMo4YQ4WOxjCCoHYEV9mSURv+fSOJjfUFEo8l6hDbLBdFdd8L6
+1obzQ6tGKexCTKxeyWz/Gk/JOWM+HQ==
+=LbHy
+-----END PGP SIGNATURE-----
+
+--NEVl8ziVwRmU0CO05KAvrWFSNI8U9EXWQ--
 
