@@ -2,49 +2,47 @@ Return-Path: <SRS0=PWhW=VO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D68DC76196
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 19:21:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DBBFDC7618F
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 19:36:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6A3C4217F4
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 19:21:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A3C4217F4
+	by mail.kernel.org (Postfix) with ESMTPS id B465A218C5
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 19:36:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B465A218C5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60078 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60128 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnpUq-0003BW-OG
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 15:21:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46692)
+	id 1hnpic-0000oW-O6
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 15:36:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50446)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jsnow@redhat.com>) id 1hnpUg-0002hR-7j
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 15:21:39 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hnpiR-0000N2-NV
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 15:35:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hnpUf-0007Vb-1O
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 15:21:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55512)
+ (envelope-from <jsnow@redhat.com>) id 1hnpiQ-0007lu-0j
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 15:35:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35470)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1hnpUc-0007UU-E1; Wed, 17 Jul 2019 15:21:34 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ id 1hnpiN-0007ji-6E; Wed, 17 Jul 2019 15:35:47 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id C3250811DC;
- Wed, 17 Jul 2019 19:21:32 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 7E4537FDCA;
+ Wed, 17 Jul 2019 19:35:45 +0000 (UTC)
 Received: from [10.18.17.203] (dhcp-17-203.bos.redhat.com [10.18.17.203])
- by smtp.corp.redhat.com (Postfix) with ESMTP id BFB9519C68;
- Wed, 17 Jul 2019 19:21:29 +0000 (UTC)
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org,
- qemu-block@nongnu.org
-References: <20190717173937.18747-1-jsnow@redhat.com>
- <bb1a8168-6a62-547e-15d4-aed72093dcb5@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 341115B697;
+ Wed, 17 Jul 2019 19:35:42 +0000 (UTC)
+To: qemu-block@nongnu.org, qemu-devel@nongnu.org
+References: <20190716000117.25219-1-jsnow@redhat.com>
 From: John Snow <jsnow@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
@@ -121,22 +119,22 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <c2bbf3a0-c7f0-263c-a191-ebe54c784349@redhat.com>
-Date: Wed, 17 Jul 2019 15:21:29 -0400
+Message-ID: <1d0f3fb9-d566-721f-45c4-edac263eb450@redhat.com>
+Date: Wed, 17 Jul 2019 15:35:42 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <bb1a8168-6a62-547e-15d4-aed72093dcb5@redhat.com>
+In-Reply-To: <20190716000117.25219-1-jsnow@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.27]); Wed, 17 Jul 2019 19:21:32 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.27]); Wed, 17 Jul 2019 19:35:45 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3] qapi: add dirty-bitmaps to
- query-named-block-nodes result
+Subject: Re: [Qemu-devel] [PATCH v2 00/11] bitmaps: allow bitmaps to be used
+ with full and top
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -148,8 +146,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: libvir-list@redhat.com, Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com,
  Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
@@ -157,70 +154,99 @@ Sender: "Qemu-devel"
 
 
 
-On 7/17/19 3:13 PM, Eric Blake wrote:
-> On 7/17/19 12:39 PM, John Snow wrote:
->> From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>
->> Let's add a possibility to query dirty-bitmaps not only on root nodes.
->> It is useful when dealing both with snapshots and incremental backups.
->>
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> [Added deprecation information. --js]
->> Signed-off-by: John Snow <jsnow@redhat.com>
->> ---
->>  block/qapi.c         |  5 +++++
->>  qapi/block-core.json |  6 +++++-
->>  qemu-deprecated.texi | 12 ++++++++++++
->>  3 files changed, 22 insertions(+), 1 deletion(-)
+On 7/15/19 8:01 PM, John Snow wrote:
+> Based-on: https://github.com/jnsnow/qemu/tree/bitmaps
 > 
->> +++ b/qapi/block-core.json
->> @@ -360,6 +360,9 @@
->>  # @write_threshold: configured write threshold for the device.
->>  #                   0 if disabled. (Since 2.3)
->>  #
->> +# @dirty-bitmaps: dirty bitmaps information (only present if node
->> +#                 has one or more dirty bitmaps) (Since 4.2)
->> +#
+> This follows the previous series which adds the 'bitmap' sync mode
+> and uses it to add interactions with bitmaps to the 'full' and 'top'
+> modes to blockdev-backup and drive-backup.
 > 
-> Naming-wise, everything else in this struct uses 'foo_bar' while your
-> addition uses 'foo-bar'.  But at this point, I don't know if it's worth
-> uglifying this addition just to fit in.
+> Why?
+>  on-success: Can conveniently synchronize a bitmap to a full backup.
+>              Allows for transactionless anchor backups.
+>              Allows us to attempt an anchor backup without damaging
+>                our bitmap until the backup is successful.
+>              Allows for transactional, ungrouped anchor backups.
+>  always: Allows us to resume full/top style backups with a later
+>          invocation to sync=bitmap. Neat!
 > 
->>  # Since: 0.14.0
->>  #
->>  ##
->> @@ -378,7 +381,7 @@
->>              '*bps_wr_max_length': 'int', '*iops_max_length': 'int',
->>              '*iops_rd_max_length': 'int', '*iops_wr_max_length': 'int',
->>              '*iops_size': 'int', '*group': 'str', 'cache': 'BlockdevCacheInfo',
->> -            'write_threshold': 'int' } }
->> +            'write_threshold': 'int', '*dirty-bitmaps': ['BlockDirtyInfo'] } }
->>  
->>  ##
->>  # @BlockDeviceIoStatus:
->> @@ -656,6 +659,7 @@
->>  #
->>  # @dirty-bitmaps: dirty bitmaps information (only present if the
->>  #                 driver has one or more dirty bitmaps) (Since 2.0)
->> +#                 Deprecated in 4.2; see BlockDirtyInfo instead.
+> Summary:
+> 1-3: Refactor iotest 257 to accommodate this;
+> 4-5: Augment 257 to test trivial failure cases
+> 6-9: Refactor sync=top for block/backup
+> 10: Implement feature
+> 11: Test feature
 > 
-> s/BlockDirtyInfo/BlockDeviceInfo/
+> ===
+> V2:
+> ===
 > 
-> With the spelling fix,
+> Key:
+> [----] : patches are identical
+> [####] : number of functional differences between upstream/downstream patch
+> [down] : patch is downstream-only
+> The flags [FC] indicate (F)unctional and (C)ontextual differences, respectively
+> 
+> 001/11:[0010] [FC] 'iotests/257: add Pattern class'
+> 002/11:[0003] [FC] 'iotests/257: add EmulatedBitmap class'
+> 003/11:[0042] [FC] 'iotests/257: Refactor backup helpers'
+> 004/11:[----] [--] 'block/backup: hoist bitmap check into QMP interface'
+> 005/11:[0016] [FC] 'iotests/257: test API failures'
+> 006/11:[down] 'block/backup: improve sync=bitmap work estimates'
+> 007/11:[down] 'block/backup: centralize copy_bitmap initialization'
+> 008/11:[down] 'block/backup: add backup_is_cluster_allocated'
+> 009/11:[down] 'block/backup: teach TOP to never copy unallocated regions'
+> 010/11:[0002] [FC] 'block/backup: support bitmap sync modes for non-bitmap backups'
+> 011/11:[0058] [FC] 'iotests/257: test traditional sync modes'
+> 
+> 001: Fallout from changing floor(x / y) to x // y.
+>      Fallout from changing x = x | y to x |= y.
+>      (Decided not to keep RB.)
+> 002: Removed dead variable
+>      Change x = x - y to x -= y in clear_bits()
+> 003: Substantially reorganize patch. Hopefully 10% more clever and 10% less cute.
+> 004: (Added RB.)
+> 005: Added docstring to test_backup_api
+>      Fixed test matrix enumeration to have consistent order in python2/3
+>      (Declined RB.)
+> ---: What was patch 006 was dropped, and became patches 6-9.
+> 6-9: New!
+> 010: Was 007;
+>      Formatting fix.
+>      (Added RB.)
+> 011: Was 008;
+>      Adjust bitmap clearing/expected code as a consequence of #9.
+>      Fallout from changes to 005.
+> 
+> John Snow (11):
+>   iotests/257: add Pattern class
+>   iotests/257: add EmulatedBitmap class
+>   iotests/257: Refactor backup helpers
+>   block/backup: hoist bitmap check into QMP interface
+>   iotests/257: test API failures
+>   block/backup: improve sync=bitmap work estimates
+>   block/backup: centralize copy_bitmap initialization
+>   block/backup: add backup_is_cluster_allocated
+>   block/backup: teach TOP to never copy unallocated regions
+>   block/backup: support bitmap sync modes for non-bitmap backups
+>   iotests/257: test traditional sync modes
+> 
+>  block/backup.c             |  188 +-
+>  block/trace-events         |    1 +
+>  blockdev.c                 |   32 +
+>  qapi/block-core.json       |    6 +-
+>  tests/qemu-iotests/256.out |    4 +-
+>  tests/qemu-iotests/257     |  342 ++--
+>  tests/qemu-iotests/257.out | 3366 +++++++++++++++++++++++++++++++++++-
+>  7 files changed, 3683 insertions(+), 256 deletions(-)
 > 
 
-Sigh, oops.
+[Applied small edits to 9 and 11, and:]
 
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> 
-> Is this worth squeezing into 4.1, to start the deprecation clock one
-> cycle earlier (on the grounds that the missing information for anonymous
-> nodes is a bug)?  Or am I pushing the boundaries too far, where keeping
-> this as 4.2 material remains the best course of action?
-> 
+Thanks, applied to my bitmaps tree:
 
-Appealing option. If you think the deprecation plan is actionable enough
-for libvirt, I'm in favor.
+https://github.com/jnsnow/qemu/commits/bitmaps
+https://github.com/jnsnow/qemu.git
 
 --js
 
