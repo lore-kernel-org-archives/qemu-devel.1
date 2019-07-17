@@ -2,66 +2,67 @@ Return-Path: <SRS0=PWhW=VO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78B45C76192
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 02:02:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A48ADC7618F
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 02:03:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 47CA8217D9
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 02:02:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 72C3D217D9
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 02:03:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="b5aJHJKW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47CA8217D9
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="WlcwwrhQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 72C3D217D9
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53506 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53546 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnZGt-0002zh-CS
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 22:02:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44964)
+	id 1hnZHY-0005nK-DU
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 22:03:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44997)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgibson@ozlabs.org>) id 1hnZG8-00011N-2W
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 22:01:33 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1hnZG9-00011a-SW
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 22:01:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1hnZG6-0008CJ-Er
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 22:01:32 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:40061)
+ (envelope-from <dgibson@ozlabs.org>) id 1hnZG7-0008D6-L1
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 22:01:33 -0400
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:50637 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1hnZG5-00087I-90; Tue, 16 Jul 2019 22:01:30 -0400
+ id 1hnZG5-000878-CE; Tue, 16 Jul 2019 22:01:31 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 45pL904B2dz9sNT; Wed, 17 Jul 2019 12:01:24 +1000 (AEST)
+ id 45pL901xnwz9sNF; Wed, 17 Jul 2019 12:01:24 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1563328884;
- bh=jvLVswi7c2/MltPFD8LtQpZkiFp5usMNH5XC87fnFIw=;
+ bh=2ftxnbDHmzUoQ2yf6EO2KtlTfbVmVOQ0t5hEdw5fkbE=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=b5aJHJKWgcM/uWMapYmq4g1fwdjbLDY/zgB6jtMbSCmyJL70xZ4vQbzCy7tIbowP7
- ZpFAPuxPZitOwbwr55g1cflf7ioTH2cSz20ypJOtgXv88MOL9LIr/MtYqxRgf1HT7f
- eHouyytGA5gZtLrT+RPWY6lALofY8vKy18yFUwIs=
-Date: Wed, 17 Jul 2019 11:54:02 +1000
+ b=WlcwwrhQcK9wmaWcGrPLnfI/JTL16hFvKnUrnPNJQ8Ojl+nbsshCC533NBrfeGhub
+ Tm8N8Pu7SPvTbq8fYz+HHxKzhGtrR7rNA2htpvcW7a/CMVBGUT11qzpr68qiWXP/8Y
+ l1F6rHMUYaPOfepYVpUQbOKzTM1NP4Kv64T+6ajw=
+Date: Wed, 17 Jul 2019 11:51:15 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
 To: Nicholas Piggin <npiggin@gmail.com>
-Message-ID: <20190717015402.GC9123@umbus.fritz.box>
+Message-ID: <20190717015115.GA9123@umbus.fritz.box>
 References: <20190716024726.17864-1-npiggin@gmail.com>
- <20190716024726.17864-6-npiggin@gmail.com>
- <20190716083047.GG7525@umbus.fritz.box>
- <1563272743.gip4xrq099.astroid@bobo.none>
+ <20190716024726.17864-2-npiggin@gmail.com>
+ <20190716073433.GC7525@umbus.fritz.box>
+ <1563269012.r4tmfz9h7z.astroid@bobo.none>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="ncSAzJYg3Aa9+CRW"
+ protocol="application/pgp-signature"; boundary="a8Wt8u1KmwUX3Y2C"
 Content-Disposition: inline
-In-Reply-To: <1563272743.gip4xrq099.astroid@bobo.none>
+In-Reply-To: <1563269012.r4tmfz9h7z.astroid@bobo.none>
 User-Agent: Mutt/1.12.0 (2019-05-25)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
 X-Received-From: 2401:3900:2:1::2
-Subject: Re: [Qemu-devel] [PATCH v4 5/5] spapr: Implement ibm,suspend-me
+Subject: Re: [Qemu-devel] [PATCH v4 1/5] spapr: Implement dispatch counter
+ and prod bit on tcg
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -80,183 +81,50 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---ncSAzJYg3Aa9+CRW
+--a8Wt8u1KmwUX3Y2C
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jul 16, 2019 at 09:15:23PM +1000, Nicholas Piggin wrote:
-65;5603;1c> David Gibson's on July 16, 2019 6:30 pm:
-> > On Tue, Jul 16, 2019 at 12:47:26PM +1000, Nicholas Piggin wrote:
-> >> This has been useful to modify and test the Linux pseries suspend
-> >> code but it requires modification to the guest to call it (due to
-> >> being gated by other unimplemented features). It is not otherwise
-> >> used by Linux yet, but work is slowly progressing there.
-> >>=20
-> >> This allows a (lightly modified) guest kernel to suspend with
-> >> `echo mem > /sys/power/state` and be resumed with system_wakeup
-> >> monitor command.
+On Tue, Jul 16, 2019 at 07:27:22PM +1000, Nicholas Piggin wrote:
+> David Gibson's on July 16, 2019 5:34 pm:
+> > On Tue, Jul 16, 2019 at 12:47:22PM +1000, Nicholas Piggin wrote:
+> >> Implement cpu_exec_enter/exit on ppc which calls into new methods of
+> >> the same name in PPCVirtualHypervisorClass. These are used by spapr
+> >> to implement these splpar elements, used in subsequent changes.
 > >>=20
 > >> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 > >> ---
-> >>  hw/ppc/spapr.c         | 26 ++++++++++++++++++++++++++
-> >>  hw/ppc/spapr_rtas.c    | 32 ++++++++++++++++++++++++++++++++
-> >>  include/hw/ppc/spapr.h |  7 ++++++-
-> >>  3 files changed, 64 insertions(+), 1 deletion(-)
-> >>=20
-> >> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> >> index 5c54e1cb9a..b85d41bb1e 100644
-> >> --- a/hw/ppc/spapr.c
-> >> +++ b/hw/ppc/spapr.c
-> >> @@ -1710,6 +1710,11 @@ static void spapr_machine_reset(MachineState *m=
-achine)
-> >>      void *fdt;
-> >>      int rc;
-> >> =20
-> >> +    if (spapr->suspend_reset) {
-> >> +        spapr->suspend_reset =3D false;
+> >>  hw/ppc/spapr.c                  | 25 +++++++++++++++++++++++++
+> >>  hw/ppc/spapr_cpu_core.c         |  5 ++++-
+> >>  hw/ppc/spapr_hcall.c            |  5 -----
+> >>  include/hw/ppc/spapr.h          |  7 +++++++
+> >>  include/hw/ppc/spapr_cpu_core.h |  2 ++
+> >>  target/ppc/cpu.h                |  2 ++
+> >>  target/ppc/translate_init.inc.c | 25 +++++++++++++++++++++++++
+> >>  7 files changed, 65 insertions(+), 6 deletions(-)
 > >=20
-> > Do we need to migrate this value?
+> > Mostly LGTM.  Please do address the style issues that the bot
+> > reported.
 >=20
-> I suppose we do if we can migrate a suspended machine?
-
-I don't see why we couldn't.  And it might not happen because of
-explicit user choice in a managed environment like RHV or openstack.
-
-> >> +        return;
-> >> +    }
-> >> +
-> >>      spapr_caps_apply(spapr);
-> >> =20
-> >>      first_ppc_cpu =3D POWERPC_CPU(first_cpu);
-> >> @@ -2721,6 +2726,23 @@ static PCIHostState *spapr_create_default_phb(v=
-oid)
-> >>      return PCI_HOST_BRIDGE(dev);
-> >>  }
-> >> =20
-> >> +static Notifier wakeup;
-> >=20
-> > I think this should be in sPAPRMachineState rather than global.
+> Will do.
 >=20
-> Sure.
+> > In addition, do the dispatch_counter and prod values need to be
+> > migrated?
 >=20
-> >=20
-> >> +static void spapr_notify_wakeup(Notifier *notifier, void *data)
-> >> +{
-> >> +    WakeupReason *reason =3D data;
-> >> +
-> >> +    switch (*reason) {
-> >> +    case QEMU_WAKEUP_REASON_RTC:
-> >> +        break;
-> >> +    case QEMU_WAKEUP_REASON_PMTIMER:
-> >> +        break;
-> >> +    case QEMU_WAKEUP_REASON_OTHER:
-> >> +        break;
-> >> +    default:
-> >> +        break;
-> >> +    }
-> >=20
-> > So.. you have a bunch of switch cases, all of which ignore the input..
->=20
-> Yeah I kind of just copy and pasted I think. This part of the patch
-> may not have been quite as cooked as I remembered :\
+> I was thinking no, it should be just a blip. But could the guest
+> be reading the dispatch counter in the vpa for some other reason?
+> There are other (unimplemented) dispatch statistics in there AFAIKS.
+> Linux doesn't, but others might.
 
-Heh :).
+Right, I guess it's a question of whether a guest would get confused
+if the dispatch count suddenly resets.
 
-> >> +}
-> >> +
-> >>  /* pSeries LPAR / sPAPR hardware init */
-> >>  static void spapr_machine_init(MachineState *machine)
-> >>  {
-> >> @@ -3078,6 +3100,10 @@ static void spapr_machine_init(MachineState *ma=
-chine)
-> >> =20
-> >>      qemu_register_boot_set(spapr_boot_set, spapr);
-> >> =20
-> >> +    wakeup.notify =3D spapr_notify_wakeup;
-> >> +    qemu_register_wakeup_notifier(&wakeup);
-> >> +    qemu_register_wakeup_support();
-> >> +
-> >>      if (kvm_enabled()) {
-> >>          /* to stop and start vmclock */
-> >>          qemu_add_vm_change_state_handler(cpu_ppc_clock_vm_state_chang=
-e,
-> >> diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
-> >> index a618a2ac0f..60a007ec38 100644
-> >> --- a/hw/ppc/spapr_rtas.c
-> >> +++ b/hw/ppc/spapr_rtas.c
-> >> @@ -216,6 +216,36 @@ static void rtas_stop_self(PowerPCCPU *cpu, Spapr=
-MachineState *spapr,
-> >>      qemu_cpu_kick(cs);
-> >>  }
-> >> =20
-> >> +static void rtas_ibm_suspend_me(PowerPCCPU *cpu, SpaprMachineState *s=
-papr,
-> >> +                           uint32_t token, uint32_t nargs,
-> >> +                           target_ulong args,
-> >> +                           uint32_t nret, target_ulong rets)
-> >> +{
-> >> +    CPUState *cs;
-> >> +
-> >> +    if (nargs !=3D 0 || nret !=3D 1) {
-> >> +        rtas_st(rets, 0, RTAS_OUT_PARAM_ERROR);
-> >> +        return;
-> >> +    }
-> >> +
-> >> +    CPU_FOREACH(cs) {
-> >> +        PowerPCCPU *c =3D POWERPC_CPU(cs);
-> >> +        CPUPPCState *e =3D &c->env;
-> >> +        if (c =3D=3D cpu)
-> >> +            continue;
-> >> +
-> >> +	/* See h_join */
-> >> +        if (!cs->halted || (e->msr & (1ULL << MSR_EE))) {
-> >> +            rtas_st(rets, 0, H_MULTI_THREADS_ACTIVE);
-> >> +            return;
-> >> +        }
-> >> +    }
-> >> +
-> >> +    spapr->suspend_reset =3D true;
-> >> +    qemu_system_suspend_request();
-> >> +    rtas_st(rets, 0, RTAS_OUT_SUCCESS);
-> >> +}
-> >> +
-> >>  static inline int sysparm_st(target_ulong addr, target_ulong len,
-> >>                               const void *val, uint16_t vallen)
-> >>  {
-> >> @@ -483,6 +513,8 @@ static void core_rtas_register_types(void)
-> >>                          rtas_query_cpu_stopped_state);
-> >>      spapr_rtas_register(RTAS_START_CPU, "start-cpu", rtas_start_cpu);
-> >>      spapr_rtas_register(RTAS_STOP_SELF, "stop-self", rtas_stop_self);
-> >> +    spapr_rtas_register(RTAS_IBM_SUSPEND_ME, "ibm,suspend-me",
-> >> +                        rtas_ibm_suspend_me);
-> >>      spapr_rtas_register(RTAS_IBM_GET_SYSTEM_PARAMETER,
-> >>                          "ibm,get-system-parameter",
-> >>                          rtas_ibm_get_system_parameter);
-> >> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> >> index 5d36eec9d0..df0b0c15da 100644
-> >> --- a/include/hw/ppc/spapr.h
-> >> +++ b/include/hw/ppc/spapr.h
-> >> @@ -171,6 +171,10 @@ struct SpaprMachineState {
-> >>      bool use_hotplug_event_source;
-> >>      SpaprEventSource *event_sources;
-> >> =20
-> >> +    /* Machine has been suspended, so the next machine_reset should n=
-ot
-> >> +     * reset state, but just return and allow execution to resume. */
-> >> +    bool suspend_reset;
-> >=20
-> > Hrm, this seems odd, but maybe it's part of the existing suspend
-> > design.  Why would system_reset resume a suspend, rather than having a
-> > specific operation for that.
->=20
-> It is where `system_wakeup` cmd pops out, via qemu_system_reset,
-> main_loop_should_exit. I'm not sure if we have any existing state
-> we can use. runstate_is_running() doesn't seem to work because of
-> CAS I guess (maybe CAS is what makes spapr so much different from
-> x86 in terms of resetting the world here?)
+> And what about KVM, does any of the VPA data get migrated for=20
+> KVM guests?
 
-CAS certainly complicates things.
+Well, the stuff that's actually written into the VPA is implicitly
+migrated, since it's part of guest memory.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -264,25 +132,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---ncSAzJYg3Aa9+CRW
+--a8Wt8u1KmwUX3Y2C
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl0uf7oACgkQbDjKyiDZ
-s5JLBg//a+cpUe5NBYrNkDTGGq3Q3Yy5tTjZe2KQvoAYI/zvc51+cgzAdTnZmY1P
-YcxVUdG1HT0mR+GgmMqLHFOpwEB2E5RYtdUPx/ANP+KZ8vqO/djpgiLmEiOVGoCr
-2C0F5ZmsWsEbn/rNDbYehUEGmF2/KNVckjkXGpjn5qThrjO5L8Kw4ybpBLiHU3nR
-UB9I+XlNfnHMEtcxqF5dpJydv7YfA4O62nB+rmLI1w9ges51oSv7jxuJcNlaPIvh
-N3eozuKvJgPgqTlF+VKDNbbyM12PC7q/DJ1qq7hEuOgiFBVs5Q1gPtg1gLlic8MD
-BTa3idVpd+ET4eWSigZ8/ndPKrfmf/41kJtXRLiFMrFTr1WPyqrhaD38AAINM0Mj
-8kk5JCfxq8osxqy1ycIh6hVjUd/RgVISuhTmhgOO9B3CT1i8eh5hkrEDMmG+gfYe
-o0Sb3WoPBKQMgJ99aY8PCR5kYoRwC9BLBiI25f7FI/+Lszpo3wyd2oQIk/mDmlFn
-q0LDRgk6EgictCeN/UAfi8vnPun+x7u8dkvVWH2RQfAuuAmJjG4kgFoDP55XGgLv
-PobdJaNvExKVv+gnSlvBP0uyotqHNUV9b6GBrW34EI8P6nBNxoYzjZ5KCAD0nUW9
-ZHrSr9ZRedIOFVCiyriVRV3KCXX478B5BS4yB0osNBDWMxZRPMM=
-=lM1z
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl0ufxAACgkQbDjKyiDZ
+s5JwjxAAnVciuzwbuZjexZo+qX942oDIT/NNhzXgj9APyhcVJFN2A/YYhVrIzBWV
+UY30kKY4HXPDGbHUedAMAqFc4XkjmPpbgTJkL7f0KvXtfh3JMrpejxD036MrpJMm
+UINxRPSsIuRPgxYwzDnc89Jg3sz9EWb0rBgVM6VcVGSVbAskFVICIcpixMclwq7Y
+21q2ZcJOnaCaE+cU3WvoeUalI2iOQAZ/5X09/uJv4eeA7Y1pt8h289DCuGW2ph20
+6JunlVNrdN1j9fkhzmB98mK2b6xgtbfTp0Qg0z0ackpkpQguzKArsebylGTgNz1e
+cVtEmHpAH6uzy1BuNtovr8AEmOVCjSWvsMJr3zVw54L9xBsmg721wTgbIISGmom7
+6qXtZXl7nLrLCj1rGWmzjYtnx2pOyp6DNPbKGvfJmc+3ubhnuVZrMji4HCmVn6v7
+6Y8cehyUBvN9mTeD7CSbXLpi2Lx5RifKIL/BCGBHb/J4N4EhPqn+U9Uq5Cw8Gv66
+q/CumtGunTNqgkKiXdB0gQQSnoFG0y82VCqgQOsEaJzAxMf+fYay6ZtPceRS49xd
+RAt5chy7VOsPcjLmQkMRiEhzUskLxhVRiwigNS9fNq5OYntjAtPazTvKoizrPey9
+ZxwMORYtq570q2oqvx2jLPb9s9dsOr9suZvGEXyoRfJcfBfQFFs=
+=zIUt
 -----END PGP SIGNATURE-----
 
---ncSAzJYg3Aa9+CRW--
+--a8Wt8u1KmwUX3Y2C--
 
