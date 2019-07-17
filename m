@@ -2,85 +2,56 @@ Return-Path: <SRS0=PWhW=VO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EFB90C7618F
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 00:47:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2DE1C7618F
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 00:54:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BCDDE2182B
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 00:47:01 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jBFmTC7P"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BCDDE2182B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 907F120818
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 00:54:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 907F120818
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53246 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53256 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnY60-0002YO-Vv
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 20:47:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53627)
+	id 1hnYD8-0005ke-K1
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 20:54:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55810)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <elohimes@gmail.com>) id 1hnY5Y-0001g5-16
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 20:46:32 -0400
+ (envelope-from <richardw.yang@linux.intel.com>) id 1hnYCy-0005G7-4j
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 20:54:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <elohimes@gmail.com>) id 1hnY5W-0001pj-Sw
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 20:46:31 -0400
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:44694)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <elohimes@gmail.com>) id 1hnY5W-0001pW-Mk
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 20:46:30 -0400
-Received: by mail-pl1-x641.google.com with SMTP id t14so10968910plr.11
- for <qemu-devel@nongnu.org>; Tue, 16 Jul 2019 17:46:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=y7FSocOkMHVg4UK5VR546jFApa/3IjN0xth3/ynVktM=;
- b=jBFmTC7P9uml8WriUrIub0rQoyzoinEaCYneySCOTh5GI+AklZf58PZeo4A3lqTGZp
- pPr7KJDKUj8+rJbmxnH55/Bi6CwT8rX0yZZDmbBdQKEO+3jTJW0SDtvmGauM2Cd+Ql62
- I8Fy/gMjz0YlHZKtoOEvWME4g6TDiZ7CoA8r9w63O/tLcJiWbZAD3k6XahiVgc1OENic
- qB1oZiRnrifJYdLAsNqzZPsifUqepwdzZheowIGX2NM+fzkJ4/tfRz5g5xk0SHlZuARm
- ZpmEM3OzhQou731mHvtRn1h8cNd6gd6JCXI1S+DBy1aFXuDVGXuVofon3ByYw1vN3Bk6
- 4VWQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=y7FSocOkMHVg4UK5VR546jFApa/3IjN0xth3/ynVktM=;
- b=jGMxNDALjWPUa8wtlq7MuArQ5cKaOmpkyG5hBH2CmUod0VwbEPqrggP9E68apx2I2h
- rz7p1T1pAfcXCrRGCz23NBUOesTNRWUyoiMOx/xopp8NAAvs4FwEdP+BH1SSLqv1ke+A
- XOZR2PwUZf0yGYffbQRD2N6HBQgUI/6GSly6WenMVqRS7Zk8/lhpMp3mh/S0/xBbupUK
- o7qXah2qijeV0kEs07JRDKrGuHlSFg70QcckCsIDlOz+JTDXiu+udAMU0V9RTVrVUu8N
- /ParORkxAZidlMSzoooIsv2N/ABoG1FtHljI+6wK52VjvChokRXLK5StjneMzeckyZLi
- i4Pw==
-X-Gm-Message-State: APjAAAU5xC1yJzVzf7Kj0ICtpbHNp7NCCoxB6GTDJ7LLQpBGBxdmM8U1
- KbRz4+KeRh0nbnKwA+MFrbU=
-X-Google-Smtp-Source: APXvYqwoP6+7MVErkrozIlhhfQI80VYrXQFzbRs5mXb36qIYCgdvoKdO5FGFpnuKl9jU4BUpgV44yw==
-X-Received: by 2002:a17:902:1003:: with SMTP id
- b3mr39875866pla.172.1563324389858; 
- Tue, 16 Jul 2019 17:46:29 -0700 (PDT)
-Received: from localhost ([116.247.112.152])
- by smtp.gmail.com with ESMTPSA id e5sm26290303pfd.56.2019.07.16.17.46.29
- (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
- Tue, 16 Jul 2019 17:46:29 -0700 (PDT)
-From: elohimes@gmail.com
-X-Google-Original-From: xieyongji@baidu.com
-To: mst@redhat.com, stefanha@gmail.com, pbonzini@redhat.com, fam@euphon.net
-Date: Wed, 17 Jul 2019 08:46:06 +0800
-Message-Id: <20190717004606.12444-2-xieyongji@baidu.com>
+ (envelope-from <richardw.yang@linux.intel.com>) id 1hnYCw-0007sq-Sz
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 20:54:12 -0400
+Received: from mga04.intel.com ([192.55.52.120]:51834)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
+ id 1hnYCw-0007rY-IG
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 20:54:10 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+ by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 16 Jul 2019 17:54:08 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,272,1559545200"; d="scan'208";a="178728614"
+Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
+ by orsmga002.jf.intel.com with ESMTP; 16 Jul 2019 17:54:06 -0700
+From: Wei Yang <richardw.yang@linux.intel.com>
+To: qemu-devel@nongnu.org
+Date: Wed, 17 Jul 2019 08:53:41 +0800
+Message-Id: <20190717005341.14140-1-richardw.yang@linux.intel.com>
 X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190717004606.12444-1-xieyongji@baidu.com>
-References: <20190717004606.12444-1-xieyongji@baidu.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::641
-Subject: [Qemu-devel] [PATCH v2 2/2] vhost-user-scsi: Call
- virtio_scsi_common_unrealize() when device realize failed
+X-Received-From: 192.55.52.120
+Subject: [Qemu-devel] [PATCH] migration: use migration_is_active to
+ represent active state
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,60 +63,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Xie Yongji <xieyongji@baidu.com>, qemu-devel@nongnu.org
+Cc: Wei Yang <richardw.yang@linux.intel.com>, dgilbert@redhat.com,
+ quintela@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Xie Yongji <xieyongji@baidu.com>
+Wrap the check into a function to make it easy to read.
 
-This avoids memory leak when device hotplug is failed.
-
-Signed-off-by: Xie Yongji <xieyongji@baidu.com>
+Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
 ---
- hw/scsi/vhost-user-scsi.c | 16 ++++++++++++----
- 1 file changed, 12 insertions(+), 4 deletions(-)
+ include/migration/misc.h |  1 +
+ migration/migration.c    | 12 ++++++++----
+ 2 files changed, 9 insertions(+), 4 deletions(-)
 
-diff --git a/hw/scsi/vhost-user-scsi.c b/hw/scsi/vhost-user-scsi.c
-index a9fd8ea305..17826ef8e2 100644
---- a/hw/scsi/vhost-user-scsi.c
-+++ b/hw/scsi/vhost-user-scsi.c
-@@ -87,7 +87,7 @@ static void vhost_user_scsi_realize(DeviceState *dev, Error **errp)
+diff --git a/include/migration/misc.h b/include/migration/misc.h
+index 5cdbabd094..42d6abc920 100644
+--- a/include/migration/misc.h
++++ b/include/migration/misc.h
+@@ -61,6 +61,7 @@ void migration_object_init(void);
+ void migration_shutdown(void);
+ void qemu_start_incoming_migration(const char *uri, Error **errp);
+ bool migration_is_idle(void);
++bool migration_is_active(MigrationState *);
+ void add_migration_state_change_notifier(Notifier *notify);
+ void remove_migration_state_change_notifier(Notifier *notify);
+ bool migration_in_setup(MigrationState *);
+diff --git a/migration/migration.c b/migration/migration.c
+index 43fd8297ef..4c066fc85c 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -1529,8 +1529,7 @@ static void migrate_fd_cleanup(MigrationState *s)
+         qemu_fclose(tmp);
      }
  
-     if (!vhost_user_init(&s->vhost_user, &vs->conf.chardev, errp)) {
--        return;
-+        goto free_virtio;
-     }
+-    assert((s->state != MIGRATION_STATUS_ACTIVE) &&
+-           (s->state != MIGRATION_STATUS_POSTCOPY_ACTIVE));
++    assert(!migration_is_active(s));
  
-     vsc->dev.nvqs = 2 + vs->conf.num_queues;
-@@ -101,15 +101,23 @@ static void vhost_user_scsi_realize(DeviceState *dev, Error **errp)
-     if (ret < 0) {
-         error_setg(errp, "vhost-user-scsi: vhost initialization failed: %s",
-                    strerror(-ret));
--        vhost_user_cleanup(&s->vhost_user);
--        g_free(vqs);
--        return;
-+        goto free_vhost;
-     }
- 
-     /* Channel and lun both are 0 for bootable vhost-user-scsi disk */
-     vsc->channel = 0;
-     vsc->lun = 0;
-     vsc->target = vs->conf.boot_tpgt;
-+
-+    return;
-+
-+free_vhost:
-+    vhost_user_cleanup(&s->vhost_user);
-+    g_free(vqs);
-+free_virtio:
-+    err = NULL;
-+    virtio_scsi_common_unrealize(dev, &err);
-+    error_propagate(errp, err);
+     if (s->state == MIGRATION_STATUS_CANCELLING) {
+         migrate_set_state(&s->state, MIGRATION_STATUS_CANCELLING,
+@@ -1690,6 +1689,12 @@ bool migration_is_idle(void)
+     return false;
  }
  
- static void vhost_user_scsi_unrealize(DeviceState *dev, Error **errp)
++bool migration_is_active(MigrationState *s)
++{
++    return (s->state == MIGRATION_STATUS_ACTIVE ||
++            s->state == MIGRATION_STATUS_POSTCOPY_ACTIVE);
++}
++
+ void migrate_init(MigrationState *s)
+ {
+     /*
+@@ -3226,8 +3231,7 @@ static void *migration_thread(void *opaque)
+ 
+     trace_migration_thread_setup_complete();
+ 
+-    while (s->state == MIGRATION_STATUS_ACTIVE ||
+-           s->state == MIGRATION_STATUS_POSTCOPY_ACTIVE) {
++    while (migration_is_active(s)) {
+         int64_t current_time;
+ 
+         if (urgent || !qemu_file_rate_limit(s->to_dst_file)) {
 -- 
 2.17.1
 
