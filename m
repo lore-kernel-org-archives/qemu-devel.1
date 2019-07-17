@@ -2,84 +2,62 @@ Return-Path: <SRS0=PWhW=VO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DEE0AC7618F
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 18:35:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0971C7618F
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 18:38:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 93B3B217F4
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 18:35:11 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a636FA+B"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 93B3B217F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7C39421743
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 18:38:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C39421743
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59664 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59784 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnoli-0007wV-9x
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 14:35:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57887)
+	id 1hnop3-000456-He
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 14:38:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59907)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1hnolW-0007SU-6J
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 14:34:59 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1hnoor-0003an-KJ
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 14:38:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1hnolV-0000bK-3x
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 14:34:58 -0400
-Received: from mail-oi1-x22e.google.com ([2607:f8b0:4864:20::22e]:35653)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1hnolU-0000aH-Us
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 14:34:57 -0400
-Received: by mail-oi1-x22e.google.com with SMTP id a127so19331629oii.2
- for <qemu-devel@nongnu.org>; Wed, 17 Jul 2019 11:34:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=0wzWxhrNkfmvJ/tb8Uc/YxvAYodWT+ssXQ6FTAGlKf4=;
- b=a636FA+B/jXoJs4PwqcUiol4L5WblI8N8QaX3g/eU8TVot02WZAg42OR/k1/vLhRxb
- eGe68H2v0ldR9Ns9HFXWckRtAPVkx0VVu5uUjJm7W7pseAXNKdmERUzLpEBluU+cJQjM
- otXgYvGdChoOX0I0olaQl18+4+I0Nxko9gkjmodk/BoR2T7BNJOp9xrntaIP/ywS76jR
- HzYQ6Y34GDzNtu81UHFodQSSuRuEkCKOsLvbLC0hBoCBx6L9sOLnZAshZ3A34pogTpVO
- GL44/aH9sF0lsC+wMTWDiYvAoYGbN/s4Vnb4F8NM18EKiY+Y34SGJuiFfQcXDeuiGUgU
- ZqWA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=0wzWxhrNkfmvJ/tb8Uc/YxvAYodWT+ssXQ6FTAGlKf4=;
- b=EwsB1yRYnmUf/y/n4EE/JCtBC+BvsnlTTCqHky6PDJo4M1fBXi1+Z+QRAn92lIbXae
- VF28BAAhkVhqnzFfMESx3HQKbl5PVYlwdP7+LcSKG+FjOutYMN2t8cA1hyJF6jhuB7bO
- KrsfHvGzPG5SISZnCp4ejN53IOQeh4TtgnELIo6g3RhYqsJGIrCsnFBgxjYNHrfty9tn
- GPupi4W9wwExh4bdCfk48HbQXR88v6tn0ZBtNkEhKcvPzkHxHtFiw/hHvTWRr3HJSSeN
- NY+BAdpF5B8w4PwVVRPm7PsuqQnAeCBg4aDUL/fncUz+nz9ogDAvTm4J+k8bBnBEjaua
- aaOQ==
-X-Gm-Message-State: APjAAAWv3pXQYdp5WyfnbXjjJ0Sg8EpXBAUQLvjvAc1aQiG1Kxmk97eh
- Cp5Pcbz1v1mNld+NUQEj1Ez7Os6VK++6julHTYU=
-X-Google-Smtp-Source: APXvYqwI3fyR3DWRvhf2/k+YfSekclOM5XjMe+VSNCDON5JRHZBxrdwAYOjJQ8ucsZuU2QdNBiANnkCwKPznoKVZeGM=
-X-Received: by 2002:aca:4588:: with SMTP id s130mr19912292oia.79.1563388495538; 
- Wed, 17 Jul 2019 11:34:55 -0700 (PDT)
+ (envelope-from <ehabkost@redhat.com>) id 1hnooq-0003Kq-Cn
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 14:38:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34538)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hnooq-0003JI-3L
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 14:38:24 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 2B7768553A;
+ Wed, 17 Jul 2019 18:38:22 +0000 (UTC)
+Received: from localhost (ovpn-116-109.gru2.redhat.com [10.97.116.109])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A2EC95DAA4;
+ Wed, 17 Jul 2019 18:38:21 +0000 (UTC)
+Date: Wed, 17 Jul 2019 15:38:19 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Tao Xu <tao3.xu@intel.com>
+Message-ID: <20190717183819.GW26800@habkost.net>
+References: <20190717045731.19303-1-tao3.xu@intel.com>
+ <54351c2d-0b8a-6877-6fda-dedec8372d00@intel.com>
 MIME-Version: 1.0
-References: <CAL1e-=jiySpoypabXMkUsO=2pqgUrRxUhac=JM_V=2sn2LPhWA@mail.gmail.com>
- <054d5b29-6482-1d71-3866-057dd00cb021@redhat.com>
- <CAL1e-=ikCpJO1bn=AKYSLWb8QNYkf6062ojxn+UN3svXCEQvFA@mail.gmail.com>
- <20190716174420.GA857@redhat.com>
-In-Reply-To: <20190716174420.GA857@redhat.com>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Wed, 17 Jul 2019 20:34:44 +0200
-Message-ID: <CAL1e-=jvRnp9NBzuMjOjP_WgCxhDSUf4qCkswRvyrpGFPK6cHg@mail.gmail.com>
-To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::22e
-Subject: Re: [Qemu-devel] [QUESTION] SDL 1.2 support
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <54351c2d-0b8a-6877-6fda-dedec8372d00@intel.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.28]); Wed, 17 Jul 2019 18:38:22 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2] target/i386: Introduce Denverton CPU
+ model
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,54 +69,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Xiaoyao Li <xiaoyao.li@linux.intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Jul 16, 2019 at 7:44 PM Daniel P. Berrang=C3=A9 <berrange@redhat.co=
-m> wrote:
->
-> On Tue, Jul 16, 2019 at 07:09:37PM +0200, Aleksandar Markovic wrote:
-> > On Tue, Jul 16, 2019 at 1:54 PM Thomas Huth <thuth@redhat.com> wrote:
-> > >
-> > > On 16/07/2019 13.17, Aleksandar Markovic wrote:
-> > > > Hello, Gerd, Daniel, and others involved.
-> > > >
-> > > > I have multiple reports from end users that say that transition fro=
-m
-> > > > SDL 1.2 to SDL 2.0 was difficult, or even impossible for their host=
-s.
-> > > > In that light, they don't appreciate removing SDL 1.2 support from
-> > > > QEMU. The most notable example is Ubutnu 16.04, where it looks ther=
-e
-> > > > is no way of installing SDL 2.0 that does not involve complete OS
-> > > > upgrade, which, for various reasons, many are not willing to do.
-> > >
-> > > What's the problem here? According to
-> > > https://packages.ubuntu.com/xenial/libsdl2-2.0-0 the library should b=
-e
-> > > available there.
-> > >
-> >
-> > Yes, we, as developers, are good at upgrading, we like flexibility in
-> > our development systems, and naturally want to try latest and greatest
-> > tools and libraries.
->
-> We were actually very conservative in requiring use of SDL 2. We shipped
-> QEMU with both SDL 1.2 & 2.0 support for many releases, and have only
-> dropped SDL 1.2 support *5* years after SDL 2.0 was shipped.
->
+On Wed, Jul 17, 2019 at 01:39:01PM +0800, Tao Xu wrote:
+> Hi Eduardo,
+> 
+> Could I ask a question about introducing a old CPU model? Maybe not so old
+> because it was launched in 2017. It is the former generation (Atom Server)
+> of Snowridge and if this cpu model be added, qemu may can migrate guest
+> between Denverton CPU and Snowridge CPU.
+> 
+> I am wondering which way is more appropriate, because maybe there are a few
+> Denverton machines using old microcodes:
+> 
+> 1. Just like this patch, introduce one version cpu cpu model.
+> 
+> 2. Introduce multi versions of cpu model, cover old microcodes, may be 3
+> versions.
 
-Daniel, that is fine, I don't question that, I basically wanted to start a =
-talk
-between us to clarify some things. Related to our situation in the field,
-I have a sub-question to you:
+What exactly are the differences between the old and new
+microcodes?  Is it always possible to install a new microcode on
+machines that are not up to date?
 
-Let's say there is a build system with SDL 1.2, and not SDL 2.0. Should
-QEMU refuse to build?
+Both options look good to me.  I think it's OK to just declare
+old microcode versions as not supported by QEMU, but I won't
+complain if you decide to add multiple versions.
 
-Yours,
-Aleksandar
+> 
+> On 7/17/2019 12:57 PM, Tao Xu wrote:
+> > Denverton is the Atom Processor of Intel Harrisonville platform.
+> > 
+> > For more information:
+> > https://ark.intel.com/content/www/us/en/ark/products/\
+> > codename/63508/denverton.html
+> > 
+> > Signed-off-by: Tao Xu <tao3.xu@intel.com>
+> > ---
+> > 
+> > Changes in v2:
+> > 
+> >      - Renamed as Denverton instead of Denverton-Server, because there
+> >        is only server for Denverton
+> >      - Remove vmx from cpu model
+> > ---
+> >   target/i386/cpu.c | 45 +++++++++++++++++++++++++++++++++++++++++++++
+> >   1 file changed, 45 insertions(+)
+> > 
+> > diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> > index 805ce95247..38000dd975 100644
+> > --- a/target/i386/cpu.c
+> > +++ b/target/i386/cpu.c
+> > @@ -2471,6 +2471,51 @@ static X86CPUDefinition builtin_x86_defs[] = {
+> >           .xlevel = 0x80000008,
+> >           .model_id = "Intel Xeon Processor (Icelake)",
+> >       },
+> > +    {
+> > +        .name = "Denverton",
+> > +        .level = 21,
+> > +        .vendor = CPUID_VENDOR_INTEL,
+> > +        .family = 6,
+> > +        .model = 95,
+> > +        .stepping = 1,
+> > +        .features[FEAT_1_EDX] =
+> > +            CPUID_FP87 | CPUID_VME | CPUID_DE | CPUID_PSE | CPUID_TSC |
+> > +            CPUID_MSR | CPUID_PAE | CPUID_MCE | CPUID_CX8 | CPUID_APIC |
+> > +            CPUID_SEP | CPUID_MTRR | CPUID_PGE | CPUID_MCA | CPUID_CMOV |
+> > +            CPUID_PAT | CPUID_PSE36 | CPUID_CLFLUSH | CPUID_MMX | CPUID_FXSR |
+> > +            CPUID_SSE | CPUID_SSE2,
+> > +        .features[FEAT_1_ECX] =
+> > +            CPUID_EXT_SSE3 | CPUID_EXT_PCLMULQDQ | CPUID_EXT_MONITOR |
+> > +            CPUID_EXT_SSSE3 | CPUID_EXT_CX16 | CPUID_EXT_SSE41 |
+> > +            CPUID_EXT_SSE42 | CPUID_EXT_X2APIC | CPUID_EXT_MOVBE |
+> > +            CPUID_EXT_POPCNT | CPUID_EXT_TSC_DEADLINE_TIMER |
+> > +            CPUID_EXT_AES | CPUID_EXT_XSAVE | CPUID_EXT_RDRAND,
+> > +        .features[FEAT_8000_0001_EDX] =
+> > +            CPUID_EXT2_SYSCALL | CPUID_EXT2_NX | CPUID_EXT2_PDPE1GB |
+> > +            CPUID_EXT2_RDTSCP | CPUID_EXT2_LM,
+> > +        .features[FEAT_8000_0001_ECX] =
+> > +            CPUID_EXT3_LAHF_LM | CPUID_EXT3_3DNOWPREFETCH,
+> > +        .features[FEAT_7_0_EBX] =
+> > +            CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_SMEP | CPUID_7_0_EBX_ERMS |
+> > +            CPUID_7_0_EBX_MPX | CPUID_7_0_EBX_RDSEED | CPUID_7_0_EBX_SMAP |
+> > +            CPUID_7_0_EBX_CLFLUSHOPT | CPUID_7_0_EBX_SHA_NI,
+> > +        .features[FEAT_7_0_EDX] =
+> > +            CPUID_7_0_EDX_SPEC_CTRL | CPUID_7_0_EDX_ARCH_CAPABILITIES |
+> > +            CPUID_7_0_EDX_SPEC_CTRL_SSBD,
+> > +        /*
+> > +         * Missing: XSAVES (not supported by some Linux versions,
+> > +         * including v4.1 to v4.12).
+> > +         * KVM doesn't yet expose any XSAVES state save component,
+> > +         * and the only one defined in Skylake (processor tracing)
+> > +         * probably will block migration anyway.
+> > +         */
+> > +        .features[FEAT_XSAVE] =
+> > +            CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XSAVEC | CPUID_XSAVE_XGETBV1,
+> > +        .features[FEAT_6_EAX] =
+> > +            CPUID_6_EAX_ARAT,
+> > +        .xlevel = 0x80000008,
+> > +        .model_id = "Intel Atom Processor (Denverton)",
+> > +    },
+> >       {
+> >           .name = "SnowRidge-Server",
+> >           .level = 27,
+> > --
+> > 2.20.1
+> > 
+> > 
+> 
+
+-- 
+Eduardo
 
