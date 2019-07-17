@@ -2,80 +2,90 @@ Return-Path: <SRS0=PWhW=VO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C8A4C76186
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 09:41:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E861CC76186
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 09:41:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 03A7C20880
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 09:41:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03A7C20880
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id B184A20880
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 09:41:36 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="uvnWzkW5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B184A20880
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55398 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55406 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hngQz-0007B6-TK
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 05:41:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39954)
+	id 1hngRL-00086Z-Vb
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 05:41:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40027)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <pbonzini@redhat.com>) id 1hngQp-0006mm-5S
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 05:41:04 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hngRA-0007cB-DG
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 05:41:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1hngQo-0000ym-3f
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 05:41:03 -0400
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:53819)
+ (envelope-from <alex.bennee@linaro.org>) id 1hngR9-00017j-5a
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 05:41:24 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:43664)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hngQn-0000yL-Sk
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 05:41:02 -0400
-Received: by mail-wm1-f67.google.com with SMTP id x15so21444643wmj.3
- for <qemu-devel@nongnu.org>; Wed, 17 Jul 2019 02:41:01 -0700 (PDT)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1hngR5-000160-Qt
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 05:41:21 -0400
+Received: by mail-wr1-x444.google.com with SMTP id p13so24003490wru.10
+ for <qemu-devel@nongnu.org>; Wed, 17 Jul 2019 02:41:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=68cXQfTQHWpmkjIKGO8JQl5O2KmJd897j6dOCcHcJNQ=;
+ b=uvnWzkW5PftszUCCJpc13xt0CellFUSPUUil66SYDmRn/cdS+7NYr+xhJItz368WfD
+ KxTNvM50ef3Wz8SgEtTHyhCpyN2Qg7PMEAD0HLAQBVDRl8bCoJBl0E71Bg6Ei8imWrEE
+ mouZTYlK4txDf983vyd6dqM4GULbJS9NUHFoypn/QvsVcmTfuE+VwgZr/0KUBltW1qOw
+ Ta042I+BmpKOt/YPo+SkDxM1WDuzfZgBEdccGbUlBuNWYpwNJYLWHv9vwqxP86PRO330
+ +NlEdssJRrf1reW1/MAHSCic1hz5D+FA9CX953bh7YDfXTVTZiV4VDvIdAK0SNsQT/25
+ q1/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=kaYgjRiYZdZJ50mocqHXkEiexatRolziE7a5qVryLHw=;
- b=ailwZj1W+5GHwG1IilCuj0k/jtNmGVykNtn21bfFrlDIe9UmItwi8ou38s6FGFdq7j
- WwEu+6pAqXzxVKCVrXGxZgI+BS6gQ3c3cD8uugoEp9ExFBvXMuNTS0vXYUJIe5JWMOUY
- VMBt5RwfCUnXaxyNGsxEYx0k2orA3GVMpPIvhHYo83eUqufOPy2iNFvjigjRVue3eGMv
- sqBTNAGJ41K5sO3cVQA3lzo/eH6pDeqF4ZQMQ9ocGbnfTu4EbSx51t6t2793ng+l3PXS
- E4zpAiQmuLIX4Y3aaq6aMONQSrjLgABVlaXx2l2Hj9acnditsnwgtJV9OoN5dKWLCZ8m
- fqYQ==
-X-Gm-Message-State: APjAAAW+HO6qTn17kwWgiuXmpR2ltN1D2wCzlnc0BNrva9gSIVtnZnOR
- eBBthweIz03PNpWKHCIncRJusw==
-X-Google-Smtp-Source: APXvYqyZp5j638BK+Tla5RTHT5srQJUuE4IERJbTvBWr3asN2jJky8EtotPshUVJxCaYtgh/ikc3Xw==
-X-Received: by 2002:a05:600c:10ce:: with SMTP id
- l14mr34822957wmd.118.1563356460607; 
- Wed, 17 Jul 2019 02:41:00 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:e427:3beb:1110:dda2?
- ([2001:b07:6468:f312:e427:3beb:1110:dda2])
- by smtp.gmail.com with ESMTPSA id b203sm25705283wmd.41.2019.07.17.02.40.59
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Wed, 17 Jul 2019 02:40:59 -0700 (PDT)
-To: Mark Kanda <mark.kanda@oracle.com>, qemu-devel@nongnu.org
-References: <1563313451-19861-1-git-send-email-mark.kanda@oracle.com>
- <1563313451-19861-2-git-send-email-mark.kanda@oracle.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <1c441297-bf3b-7b0b-465a-dbb12b31280f@redhat.com>
-Date: Wed, 17 Jul 2019 11:40:58 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=68cXQfTQHWpmkjIKGO8JQl5O2KmJd897j6dOCcHcJNQ=;
+ b=IR80z0UyIVmf2um4j/ucOLnvSWNpRGtPnIrsKqMPrFBX4YCQ3SevJZ1BDe6zipXQaz
+ gXhSrMzEYgvho6AKC2PqnVN6irwhhuTiwQyGFrpAj0OBEmsmyyJ4x07EwHmaz6IeKzXV
+ RtlClsQx2C7IW1Wa60XlXmyymtrzMue9roOD2bQRFc3pRoIuwFAfslws6oGJWggWaJhp
+ 1UZn15N3Gh5BK1VEvkfuwatjTtl/z9W92P+pWIw10WQCddWmoMvJ37a4lXhqAYsUUNDq
+ hjUVdBLHnqV9VXfwaLuenebmM7UVw93l5zs+auN/3UpDtLX7yJ66Oo8HvlkURR0yYqqB
+ 5tcg==
+X-Gm-Message-State: APjAAAXMBlsw6Di18GxB/Q31xdYgdD48VrivS8ARiZf3gHWi0NTdw6sP
+ durJd9UqJdooa3Jak5w+PjmmPw==
+X-Google-Smtp-Source: APXvYqwcNXnWg1Y6kIMwi90UKNBHRIdo+4X31mcm7Me/gERLiFS+Y+d3WEZ8ZfGuuV2nX7UHdmEQwg==
+X-Received: by 2002:a5d:69c4:: with SMTP id s4mr11117898wrw.163.1563356478412; 
+ Wed, 17 Jul 2019 02:41:18 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+ by smtp.gmail.com with ESMTPSA id b15sm37956872wrt.77.2019.07.17.02.41.17
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Wed, 17 Jul 2019 02:41:17 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 0806F1FF87;
+ Wed, 17 Jul 2019 10:41:17 +0100 (BST)
+References: <20190716121352.302-1-alex.bennee@linaro.org>
+ <20190717013346.GB2217@umbus.fritz.box>
+User-agent: mu4e 1.3.3; emacs 26.1
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+In-reply-to: <20190717013346.GB2217@umbus.fritz.box>
+Date: Wed, 17 Jul 2019 10:41:16 +0100
+Message-ID: <878ssxuhfn.fsf@zen.linaroharston>
 MIME-Version: 1.0
-In-Reply-To: <1563313451-19861-2-git-send-email-mark.kanda@oracle.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.128.67
-Subject: Re: [Qemu-devel] [PATCH-for-4.2 1/1] Only enable the halt poll
- control MSR if it is supported by the host
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::444
+Subject: Re: [Qemu-devel] [RFC PATCH for 4.1?] target/ppc: move opcode
+ decode tables to PowerPCCPU
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,77 +97,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: mtosatti@redhat.com
+Cc: "open list:PowerPC TCG CPUs" <qemu-ppc@nongnu.org>,
+ 1836558@bugs.launchpad.net, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 16/07/19 23:44, Mark Kanda wrote:
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index a8bafdb8b9..dacbf7a9fe 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -2838,7 +2838,6 @@ static PropValue kvm_default_props[] = {
->      { "kvm-asyncpf", "on" },
->      { "kvm-steal-time", "on" },
->      { "kvm-pv-eoi", "on" },
-> -    { "kvm-poll-control", "on" },
->      { "kvmclock-stable-bit", "on" },
->      { "x2apic", "on" },
->      { "acpi", "off" },
-> @@ -5109,6 +5108,13 @@ static void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
->          env->cpuid_xlevel2 = env->cpuid_min_xlevel2;
->      }
->  
-> +    /* Enable the halt poll control MSR if it is supported by the host */
-> +    if (x86_cpu_get_supported_feature_word(FEAT_KVM, cpu->migratable) &
-> +        (1 << KVM_FEATURE_POLL_CONTROL)) {
-> +        env->features[FEAT_KVM] |= 1 << KVM_FEATURE_POLL_CONTROL;
 
-This is already done by the "if (cpu->max_features)" block (and should
-not be done if !cpu->max_features, or you break migration to older hosts).
+David Gibson <david@gibson.dropbear.id.au> writes:
 
-> +        env->poll_control_msr = 1;
-> +    }
+> On Tue, Jul 16, 2019 at 01:13:52PM +0100, Alex Benn=C3=A9e wrote:
+>> The opcode decode tables aren't really part of the CPUPPCState but an
+>> internal implementation detail for the translator. This can cause
+>> problems with memcpy in cpu_copy as any table created during
+>> ppc_cpu_realize get written over causing a memory leak. To avoid this
+>> move the tables into PowerPCCPU which is better suited to hold
+>> internal implementation details.
+>>
+>> Attempts to fix: https://bugs.launchpad.net/qemu/+bug/1836558
+>> Cc: 1836558@bugs.launchpad.net
+>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>
+> I've applied this now to ppc-for-4.2.  If there's an argument for
+> including it in 4.1 during hard freeze, you'll need to spell it out
+> for me.
 
+Well without:
 
-> +
->  out:
->      if (local_err != NULL) {
->          error_propagate(errp, local_err);
-> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-> index cb22684139..81dd5d2c1b 100644
-> --- a/target/i386/kvm.c
-> +++ b/target/i386/kvm.c
-> @@ -1796,8 +1796,6 @@ void kvm_arch_reset_vcpu(X86CPU *cpu)
->  
->          hyperv_x86_synic_reset(cpu);
->      }
-> -    /* enabled by default */
-> -    env->poll_control_msr = 1;
->  }
->  
->  void kvm_arch_do_init_vcpu(X86CPU *cpu)
-> diff --git a/target/i386/machine.c b/target/i386/machine.c
-> index 20077a8a5a..9d6095b264 100644
-> --- a/target/i386/machine.c
-> +++ b/target/i386/machine.c
-> @@ -394,7 +394,6 @@ static bool steal_time_msr_needed(void *opaque)
->      return cpu->env.steal_time_msr != 0;
->  }
->  
-> -/* Poll control MSR enabled by default */
->  static bool poll_control_msr_needed(void *opaque)
->  {
->      X86CPU *cpu = opaque;
-> 
+  Subject: [RFC PATCH for 4.1] linux-user: unparent CPU object before unref
+  Date: Tue, 16 Jul 2019 15:01:33 +0100
+  Message-Id: <20190716140133.8578-1-alex.bennee@linaro.org>
 
-This will cause the migration subsection to be sent always on old hosts,
-thus breaking migration to older QEMU.  I think leaving in the "/*
-enabled by default */" hunk is fine, because indeed on hosts that lack
-the MSR you have the same behavior as if it were 1.
+it doesn't matter as we never attempt to free the memory once a thread
+is destroyed. This causes all linux-user guests that create and destroy
+threads quickly to slowly leak memory. However due to the dynamic opcode
+table ppc/ppc64-linux-user guests leak a lot faster than most, in the
+order of ~50k each time a thread is created and destroyed.
 
-So all in all only the first hunk is needed.
+However I'm happy to defer to you as the maintainer :-)
 
-Paolo
+--
+Alex Benn=C3=A9e
 
