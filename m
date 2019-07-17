@@ -2,84 +2,64 @@ Return-Path: <SRS0=PWhW=VO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6CD7C76192
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 05:47:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5B26C76192
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 05:47:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 95DE22173E
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 05:47:27 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G5U+ctfY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95DE22173E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7CC872173E
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 05:47:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7CC872173E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54216 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54218 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hncmj-0000BA-6j
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 01:47:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52133)
+	id 1hncmt-0000vM-Gz
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 01:47:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52184)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <npiggin@gmail.com>) id 1hncmV-00087Z-6J
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 01:47:12 -0400
+ (envelope-from <richardw.yang@linux.intel.com>) id 1hncmZ-0008Lm-TJ
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 01:47:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <npiggin@gmail.com>) id 1hncmU-0001ZK-23
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 01:47:11 -0400
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:36655)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <npiggin@gmail.com>)
- id 1hncmR-0001Xj-PA; Wed, 17 Jul 2019 01:47:07 -0400
-Received: by mail-pl1-x641.google.com with SMTP id k8so11359865plt.3;
- Tue, 16 Jul 2019 22:47:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=d6z/VFzkc+E+tzTM4giE0MZX0TDQpyGL1Wz1LFCmAss=;
- b=G5U+ctfYpc04Oet4Stpr8F6vFjeP+LxpWMq4p5ZAfhfBr2jRZGTrA5Yw9l8+Mfighd
- taobcPlBzw2RsOt+AY98+lK/Y0LesqBlcxsJqj/hK3GocD7jRpLjSs9DkoZLIPutSsN9
- 9dl7AD7WuaRksseTzcbKaHo97uRbrgICFVFL+kcRrcVippETaZnUGp7qus+4uV6WJFN6
- 5bLudQfwQnG2iH4SJFeB1kP5Lz7EBzqvL5uU46fB+NZrZBGRY7/mXRomZ1Ee/PMpZmhE
- 820WNu9t1KeLSh9Vn2YLJq/IJApXo4YqohLcx9+xMx0nmXqVvglWNMd/Jfs9w4D7Thbx
- YEdQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=d6z/VFzkc+E+tzTM4giE0MZX0TDQpyGL1Wz1LFCmAss=;
- b=iHOd1QRbAbGKG2FcHDueVrB/6r8dxFX4rRrT8it3X7D8shYRi7fRO87eIBnpu4Q2pd
- 5UldRnp1wI2YxvxNDw4RZpJ/S/BRv07V5/gFNqWdHWx9qeeb/xCq0WFUnRVI4544fs1i
- 5Pd1+S00tMpu8fedi4WMxI44hKd8Pvc55UMG89jJpUW4R9BEbWQ7g68rvqPkI8hP0gvU
- +/pedQvzAumhMGog7+68PxlOK8euvDYTqpzE75VBgCuymmKtZ8uaIXIAcGtLKdupwP2C
- 2deSnRiQf88m2rgqx3mjZPLIiqcyXvtGSpAyYbPjjVF2UjalgHsmiQkO9pGIXnZ77OjK
- BHeg==
-X-Gm-Message-State: APjAAAX68X2JEd6n4Wr1cqK1MJQcybG3EPrq4TfaHGXfQhfqGZs0ZCZ/
- GvHNbkwxLwktXKIg4+cwS+g=
-X-Google-Smtp-Source: APXvYqx17i0Rz0TxdUrFmrmgxQR4qtPZGFQMUiFnrcXoEg1pYDAYTqWEdHeYrxwcy6w6l+km/PGf/w==
-X-Received: by 2002:a17:902:1566:: with SMTP id
- b35mr42000558plh.147.1563342426748; 
- Tue, 16 Jul 2019 22:47:06 -0700 (PDT)
-Received: from bobo.local0.net ([203.220.8.141])
- by smtp.gmail.com with ESMTPSA id q69sm32573165pjb.0.2019.07.16.22.47.02
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Tue, 16 Jul 2019 22:47:06 -0700 (PDT)
-From: Nicholas Piggin <npiggin@gmail.com>
-To: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed, 17 Jul 2019 15:46:55 +1000
-Message-Id: <20190717054655.14104-1-npiggin@gmail.com>
-X-Mailer: git-send-email 2.20.1
+ (envelope-from <richardw.yang@linux.intel.com>) id 1hncmY-0001br-SF
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 01:47:15 -0400
+Received: from mga11.intel.com ([192.55.52.93]:57666)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
+ id 1hncmY-0001ak-J1
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 01:47:14 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+ by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 16 Jul 2019 22:47:13 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,273,1559545200"; d="scan'208";a="191153885"
+Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
+ by fmsmga004.fm.intel.com with ESMTP; 16 Jul 2019 22:47:12 -0700
+Date: Wed, 17 Jul 2019 13:46:47 +0800
+From: Wei Yang <richardw.yang@linux.intel.com>
+To: Peter Xu <zhexu@redhat.com>
+Message-ID: <20190717054647.GA19479@richard>
+References: <20190717012902.23958-1-richardw.yang@linux.intel.com>
+ <20190717015910.GD30980@xz-x1> <20190717024637.GA17163@richard>
+ <20190717031155.GE30980@xz-x1>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190717031155.GE30980@xz-x1>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::641
-Subject: [Qemu-devel] [RFC PATCH] Implement qemu_thread_yield for posix,
- use it in mttcg to handle EXCP_YIELD
+X-Received-From: 192.55.52.93
+Subject: Re: [Qemu-devel] [RESEND][PATCH] bitmap: get last word mask from nr
+ directly
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,113 +71,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Greg Kurz <groug@kaod.org>, Nicholas Piggin <npiggin@gmail.com>,
- qemu-devel@nongnu.org, qemu-ppc@nongnu.org,
- =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+Reply-To: Wei Yang <richardw.yang@linux.intel.com>
+Cc: quintela@redhat.com, corentincj@iksaif.net, pl@kamp.de,
+ qemu-devel@nongnu.org, kraxel@redhat.com, pbonzini@redhat.com,
+ Wei Yang <richardw.yang@linux.intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is a bit of proof of concept in case mttcg becomes more important
-yield could be handled like this. You can have by accident or deliberately
-force vCPUs onto the same physical CPU and cause inversion issues when the
-lock holder was preempted by the waiter. This is lightly tested but not
-to the point of measuring performance difference.
+On Wed, Jul 17, 2019 at 11:11:55AM +0800, Peter Xu wrote:
+>On Wed, Jul 17, 2019 at 10:46:37AM +0800, Wei Yang wrote:
+>> On Wed, Jul 17, 2019 at 09:59:10AM +0800, Peter Xu wrote:
+>> >On Wed, Jul 17, 2019 at 09:29:02AM +0800, Wei Yang wrote:
+>> >> The value left in nr is the number of bits for the last word, which
+>> >> could be calculate the last word mask directly.
+>> >
+>> >Is it true even if start does not align to BITS_PER_LONG?
+>> >
+>> 
+>> Yes. Let me see how to explain this.
+>> 
+>> When you look into the definition of BITMAP_LAST_WORD_MASK, it takes the
+>> number of total bits and give the number of bits in last word. While the value
+>> matters for the input is the number of last word. This means the following
+>> equation stands
+>> 
+>>   BITMAP_LAST_WORD_MASK(size) == BITMAP_FIRST_WORD_MASK(size % BITS_PER_LONG)
+>> 
+>> Now let look at the calculation for nr. In each iteration, nr will be
+>> truncated to be aligned to BITS_PER_LONG. So when we exit the loop, nr keeps
+>> the number of bits in last word.
+>> 
+>> So we can leverage the result, no matter the start is aligned or not.
+>
+>Yes, you are right.
+>
+>Do you have plan to write some unit tests for these functions? :)
+>
+>It'll be tests/test-bitmap.c.  IMHO the test cases could be even more
+>helpful to the QEMU project as a whole comparing to this patch to
+>guarantee changes like your patch won't break.
 
-I really consider the previous confer/prod patches more important just to
-provide a more complete guest environment and better test coverage, than
-performance, but maybe someone wants to persue this.
+Let me have a try. :-)
 
-Thanks,
-Nick
----
- cpus.c                   |  6 ++++++
- hw/ppc/spapr_hcall.c     | 14 +++++++-------
- include/qemu/thread.h    |  1 +
- util/qemu-thread-posix.c |  5 +++++
- util/qemu-thread-win32.c |  4 ++++
- 5 files changed, 23 insertions(+), 7 deletions(-)
+>
+>At the meantime I think you can also do that to bitmap_set_atomic.
+>
+>Thanks,
+>
+>-- 
+>Peter Xu
 
-diff --git a/cpus.c b/cpus.c
-index 927a00aa90..f036e062d9 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -1760,6 +1760,12 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
-                 qemu_mutex_unlock_iothread();
-                 cpu_exec_step_atomic(cpu);
-                 qemu_mutex_lock_iothread();
-+                break;
-+            case EXCP_YIELD:
-+                qemu_mutex_unlock_iothread();
-+                qemu_thread_yield();
-+                qemu_mutex_lock_iothread();
-+                break;
-             default:
-                 /* Ignore everything else? */
-                 break;
-diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-index 57c1ee0fe1..9c24a64dfe 100644
---- a/hw/ppc/spapr_hcall.c
-+++ b/hw/ppc/spapr_hcall.c
-@@ -1162,13 +1162,13 @@ static target_ulong h_confer(PowerPCCPU *cpu, SpaprMachineState *spapr,
-             return H_SUCCESS;
-         }
- 
--        /*
--         * The targeted confer does not do anything special beyond yielding
--         * the current vCPU, but even this should be better than nothing.
--         * At least for single-threaded tcg, it gives the target a chance to
--         * run before we run again. Multi-threaded tcg does not really do
--         * anything with EXCP_YIELD yet.
--         */
-+       /*
-+        * The targeted confer does not do anything special beyond yielding
-+        * the current vCPU, but even this should be better than nothing.
-+        * For single-threaded tcg, it gives the target a chance to run
-+        * before we run again, multi-threaded tcg will yield the CPU to
-+        * another vCPU.
-+        */
-     }
- 
-     cs->exception_index = EXCP_YIELD;
-diff --git a/include/qemu/thread.h b/include/qemu/thread.h
-index 55d83a907c..8525b0a70a 100644
---- a/include/qemu/thread.h
-+++ b/include/qemu/thread.h
-@@ -160,6 +160,7 @@ void qemu_thread_get_self(QemuThread *thread);
- bool qemu_thread_is_self(QemuThread *thread);
- void qemu_thread_exit(void *retval);
- void qemu_thread_naming(bool enable);
-+void qemu_thread_yield(void);
- 
- struct Notifier;
- /**
-diff --git a/util/qemu-thread-posix.c b/util/qemu-thread-posix.c
-index 1bf5e65dea..91b12a1082 100644
---- a/util/qemu-thread-posix.c
-+++ b/util/qemu-thread-posix.c
-@@ -573,3 +573,8 @@ void *qemu_thread_join(QemuThread *thread)
-     }
-     return ret;
- }
-+
-+void qemu_thread_yield(void)
-+{
-+    pthread_yield();
-+}
-diff --git a/util/qemu-thread-win32.c b/util/qemu-thread-win32.c
-index 572f88535d..72fe406bef 100644
---- a/util/qemu-thread-win32.c
-+++ b/util/qemu-thread-win32.c
-@@ -442,3 +442,7 @@ bool qemu_thread_is_self(QemuThread *thread)
- {
-     return GetCurrentThreadId() == thread->tid;
- }
-+
-+void qemu_thread_yield(void)
-+{
-+}
 -- 
-2.20.1
-
+Wei Yang
+Help you, Help me
 
