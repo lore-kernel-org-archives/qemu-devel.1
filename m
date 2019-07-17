@@ -6,65 +6,65 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C57BC7618F
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 14:55:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92E38C76192
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 14:55:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4445C2173E
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 14:55:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4445C2173E
+	by mail.kernel.org (Postfix) with ESMTPS id 598FF2173E
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 14:55:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 598FF2173E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58114 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58125 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnlLL-00050p-Iy
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 10:55:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48126)
+	id 1hnlLY-0005tD-Lq
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 10:55:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48137)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <laurent@vivier.eu>) id 1hnlL6-00047v-De
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 10:55:29 -0400
+ (envelope-from <laurent@vivier.eu>) id 1hnlL6-00048h-LH
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 10:55:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1hnlL5-0000mZ-07
+ (envelope-from <laurent@vivier.eu>) id 1hnlL4-0000mK-NA
  for qemu-devel@nongnu.org; Wed, 17 Jul 2019 10:55:28 -0400
-Received: from mout.kundenserver.de ([212.227.126.134]:51777)
+Received: from mout.kundenserver.de ([212.227.126.187]:50325)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hnlL4-0000ke-Mb
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hnlL4-0000gT-Af
  for qemu-devel@nongnu.org; Wed, 17 Jul 2019 10:55:26 -0400
 Received: from localhost.localdomain ([78.238.229.36]) by
  mrelayeu.kundenserver.de (mreue009 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1MYvTs-1i0ykD2oVs-00UugK; Wed, 17 Jul 2019 16:54:42 +0200
+ id 1MBUuV-1hao5I2cRT-00Cyit; Wed, 17 Jul 2019 16:54:40 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Date: Wed, 17 Jul 2019 16:54:18 +0200
-Message-Id: <20190717145418.23883-4-laurent@vivier.eu>
+Date: Wed, 17 Jul 2019 16:54:17 +0200
+Message-Id: <20190717145418.23883-3-laurent@vivier.eu>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190717145418.23883-1-laurent@vivier.eu>
 References: <20190717145418.23883-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:A1dtiap+W9ArKGUiGFoPWfgdbKR0TaRnA8I/ucKaEI367OjylTj
- zDo5OFQF42f54vixZUFZirebTu3GW4L5IS2ZDn82alLEYv6JXpR1TDsx5+6oGx1I9fi8hkI
- ovSw2mx2fLw+wgyfv/DikXOQcY3WYV3zCespUDO0H1RY5y+zDnMUyJ38QE/XABIYsfHnTYb
- 8+40zEWSLYpR22NwACLew==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:0UtVY4qcQPg=:5QAURPSnC8pb4fAsNQLHnU
- MsyoR6lEnjqylK+b8fOLi4LogLQFYG/EN65E+FPVxLYGT2gfbNVz+/b1Z4Ak60zXXn7rGM7Rs
- g3FMMHwNJcFEqjoDpV1M5nnHm/TNhFqv2hkSUF20GeG4MFeZjH7X5iGtleMIkywgUUta8pm9s
- vzc8AaJoEgTH4d9XHhuVtsHxnkquKzx8apfFMp4HkFiE6JJEGoG+w4z5fIaNSJNnapU5dUQph
- O/up9f5YSlIO3Ow+bsTQX/yDwDSWt017USx9NQLYf3ma03Gwre5twgciDySGeyLwDyq1YxBwz
- M7vWJKmBm5xTtdPQF1NUbZpRBSuvp6yoBX5BLhqMVbF3XkLslN6U1SljStIYreHUCVAlyZfV1
- EAI99AMNST36Cxz7+5NHdY04V/BBb6qlhnMYdRjy1tTTjsvLRwtbZ+TCHxqNpNBLnZzw7gAmD
- ZoDyQ6Kc6NgpaZdNUs5g6lxCAqrUhBIAf/8z5+5Uo+w7RJ4hDQfHlZ6v5i2erSk5dOB+okGjN
- 5/xEtMbZLwn3PB2KrKA9mtbBcfUxLjZN9EGdAOVPzmanUCatEY5G8uBAb47wsff3NR1QobMZx
- hD3jVnbcbPqcLaTtZnk9iRHuqAYDPDXbGRQQ2QDs8LFLwupE7rfUA2AbYp85biicSUOo4Ug/r
- awSrM/iV7+uDgK5A7sbJnChjCEEiuwj/E+IJ16cHcDZppSeyLPtR8/Li0rMIVV8lWRdzdoIJc
- +I8OGZlGcTBruNRIyokfHMdzPu5mIq2GJ/aUEdx+hwqnUmmZlgWnS+qBeos=
+X-Provags-ID: V03:K1:AsnCKoZWY20fwQZVAGyf46INCrxxv52sh05yeEeozj/wDSXriOV
+ 0je6caW2OC5oYRP2xhhNu8Wup6rl/cCfAYKEMfZM56Jjzafq+5tgL/VcHKzd+hbpK2Dqhc9
+ qw+HknWdUMhyVMrpM6OGHjkz8JTQhPZH7EozRtLOiXSsvOcotFtVL0JH6WVrpXAvDq1Nuj6
+ /B8lMi/l2PD4vMatsu/rw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:GXsZzXj+5GU=:mbcVg92YA6NA/iE/mW62Eb
+ cEk8jKsxV0nlvXpbvkMPRWewh3mFnEJvR3SBmR167C57tnM4nLr7u1wqH/PMwLGgvheRr6sQc
+ LZ32/nTj0NJ3tHb2rD8e7a/RxGJR15cVDdUtswyA180cbALEFIQ8bdXJNCBpckZCMOd4GYrjN
+ 25PXLKiwaRF22cA+FJkNyFc6WG7U2l9fh9tcYRGui14uEtTSeN4S5yQ9BcRnTep2rsRIXWTFm
+ uoNw0G/M9neOFxXwC1BQS59h1hYFfwqgVZtOE+wrQ/Ol2mLjmeZtbw/AD27pUz8KeoHO2B3Kp
+ cPpjL24V/Q+fBAALIPI0MbTGjSoQ7cVVXez7NQidytGox1F3hfBCZz/kye7uFSp96wpORbI59
+ RglTuj/xHNPeGGte7YwOnPYWjIfldYe8o4DNKmUZtDX8UtGbuOMHoCeuTIxqGRY9vjxzBs8Kk
+ P4/xxEK6+2zO1VjJKcC3qdtQRHQs+jy0Zu6g/G9iCdBNLUXZqQdEgeQiKR+BmeGvVmnNCk3C4
+ 8TZmk9ZTI9NjUrUYyVhkweoE38blolfZeib6OELODcb3iuigv6esfpkDXJd+LhRk0OTll8mRZ
+ 8GCi6mi29O1VBbSdJtQ6ufIa4sItsnCPDpLCsJcWNtP7eYaqcAbvlAflUKv78NvI2cH8cWTJ+
+ 0W1nsjDgDM6joMzynCB5qzmmNTTpC/UST34Zj2MMTHrNHJFoSEdpuaQKbfeYDs3l5LDFPhnzT
+ YXh6hzIPEDToosO2UuUFj3zBGwmNRyu2ynVd4i3uGNyzROOXzLlK/qAikEA=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.134
-Subject: [Qemu-devel] [PULL 3/3] linux-user: check valid address in
- access_ok()
+X-Received-From: 212.227.126.187
+Subject: [Qemu-devel] [PULL 2/3] linux-user: fix to handle variably sized
+ SIOCGSTAMP with new kernels
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,10 +76,9 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>,
- =?UTF-8?q?R=C3=A9mi=20Denis-Courmont?= <remi@remlab.net>,
- Aleksandar Rikalo <arikalo@wavecomp.com>, Riku Voipio <riku.voipio@iki.fi>,
- Laurent Vivier <laurent@vivier.eu>,
+Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ Arnd Bergmann <arnd@arndb.de>, Aleksandar Rikalo <arikalo@wavecomp.com>,
+ Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>,
  Aleksandar Markovic <amarkovic@wavecomp.com>,
  Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>,
  Richard Henderson <rth@twiddle.net>
@@ -87,59 +86,322 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Rémi Denis-Courmont <remi@remlab.net>
+From: Daniel P. Berrangé <berrange@redhat.com>
 
-Fix a crash with LTP testsuite and aarch64:
+The SIOCGSTAMP symbol was previously defined in the
+asm-generic/sockios.h header file. QEMU sees that header
+indirectly via sys/socket.h
 
-  tst_test.c:1015: INFO: Timeout per run is 0h 05m 00s
-  qemu-aarch64: .../qemu/accel/tcg/translate-all.c:2522: page_check_range: Assertion `start < ((target_ulong)1 << L1_MAP_ADDR_SPACE_BITS)' failed.
-  qemu:handle_cpu_signal received signal outside vCPU context @ pc=0x60001554
+In linux kernel commit 0768e17073dc527ccd18ed5f96ce85f9985e9115
+the asm-generic/sockios.h header no longer defines SIOCGSTAMP.
+Instead it provides only SIOCGSTAMP_OLD, which only uses a
+32-bit time_t on 32-bit architectures.
 
-page_check_range() should never be called with address outside the guest
-address space. This patch adds a guest_addr_valid() check in access_ok()
-to only call page_check_range() with a valid address.
+The linux/sockios.h header then defines SIOCGSTAMP using
+either SIOCGSTAMP_OLD or SIOCGSTAMP_NEW as appropriate. If
+SIOCGSTAMP_NEW is used, then the tv_sec field is 64-bit even
+on 32-bit architectures
 
-Fixes: f6768aa1b4c6 ("target/arm: fix AArch64 virtual address space size")
-Signed-off-by: Rémi Denis-Courmont <remi@remlab.net>
-Signed-off-by: Laurent Vivier <lvivier@redhat.com>
-Message-Id: <20190704084115.24713-1-lvivier@redhat.com>
+To cope with this we must now convert the old and new type from
+the target to the host one.
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+Reviewed-by: Arnd Bergmann <arnd@arndb.de>
+Message-Id: <20190714135423.1274-1-laurent@vivier.eu>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- include/exec/cpu_ldst.h | 4 ++++
- linux-user/qemu.h       | 4 +++-
- 2 files changed, 7 insertions(+), 1 deletion(-)
+ linux-user/ioctls.h        |  11 ++-
+ linux-user/syscall.c       | 140 +++++++++++++++++++++++++++++--------
+ linux-user/syscall_defs.h  |  30 +++++++-
+ linux-user/syscall_types.h |   6 --
+ 4 files changed, 149 insertions(+), 38 deletions(-)
 
-diff --git a/include/exec/cpu_ldst.h b/include/exec/cpu_ldst.h
-index 9de8c933031b..9151fdb042c4 100644
---- a/include/exec/cpu_ldst.h
-+++ b/include/exec/cpu_ldst.h
-@@ -62,7 +62,11 @@ typedef uint64_t abi_ptr;
- /* All direct uses of g2h and h2g need to go away for usermode softmmu.  */
- #define g2h(x) ((void *)((unsigned long)(abi_ptr)(x) + guest_base))
+diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
+index 5e84dc7c3a77..9a4957840ac4 100644
+--- a/linux-user/ioctls.h
++++ b/linux-user/ioctls.h
+@@ -222,8 +222,15 @@
+   IOCTL(SIOCGIWNAME, IOC_W | IOC_R, MK_PTR(MK_STRUCT(STRUCT_char_ifreq)))
+   IOCTL(SIOCSPGRP, IOC_W, MK_PTR(TYPE_INT)) /* pid_t */
+   IOCTL(SIOCGPGRP, IOC_R, MK_PTR(TYPE_INT)) /* pid_t */
+-  IOCTL(SIOCGSTAMP, IOC_R, MK_PTR(MK_STRUCT(STRUCT_timeval)))
+-  IOCTL(SIOCGSTAMPNS, IOC_R, MK_PTR(MK_STRUCT(STRUCT_timespec)))
++
++  { TARGET_SIOCGSTAMP_OLD, SIOCGSTAMP, "IOCGSTAMP_OLD", IOC_R, \
++    do_ioctl_SIOCGSTAMP },
++  { TARGET_SIOCGSTAMPNS_OLD, SIOCGSTAMPNS, "IOCGSTAMPNS_OLD", IOC_R, \
++    do_ioctl_SIOCGSTAMPNS },
++  { TARGET_SIOCGSTAMP_NEW, SIOCGSTAMP, "IOCGSTAMP_NEW", IOC_R, \
++    do_ioctl_SIOCGSTAMP },
++  { TARGET_SIOCGSTAMPNS_NEW, SIOCGSTAMPNS, "IOCGSTAMPNS_NEW", IOC_R, \
++    do_ioctl_SIOCGSTAMPNS },
  
-+#if HOST_LONG_BITS <= TARGET_VIRT_ADDR_SPACE_BITS
-+#define guest_addr_valid(x) (1)
-+#else
- #define guest_addr_valid(x) ((x) <= GUEST_ADDR_MAX)
-+#endif
- #define h2g_valid(x) guest_addr_valid((unsigned long)(x) - guest_base)
- 
- static inline int guest_range_valid(unsigned long start, unsigned long len)
-diff --git a/linux-user/qemu.h b/linux-user/qemu.h
-index fab287b7ec50..4258e4162d26 100644
---- a/linux-user/qemu.h
-+++ b/linux-user/qemu.h
-@@ -456,7 +456,9 @@ extern unsigned long guest_stack_size;
- 
- static inline int access_ok(int type, abi_ulong addr, abi_ulong size)
+   IOCTL(RNDGETENTCNT, IOC_R, MK_PTR(TYPE_INT))
+   IOCTL(RNDADDTOENTCNT, IOC_W, MK_PTR(TYPE_INT))
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 39a37496fed5..8367cb138dfe 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -37,6 +37,7 @@
+ #include <sched.h>
+ #include <sys/timex.h>
+ #include <sys/socket.h>
++#include <linux/sockios.h>
+ #include <sys/un.h>
+ #include <sys/uio.h>
+ #include <poll.h>
+@@ -1126,8 +1127,9 @@ static inline abi_long copy_from_user_timeval(struct timeval *tv,
  {
--    return page_check_range((target_ulong)addr, size,
-+    return guest_addr_valid(addr) &&
-+           (size == 0 || guest_addr_valid(addr + size - 1)) &&
-+           page_check_range((target_ulong)addr, size,
-                             (type == VERIFY_READ) ? PAGE_READ : (PAGE_READ | PAGE_WRITE)) == 0;
+     struct target_timeval *target_tv;
+ 
+-    if (!lock_user_struct(VERIFY_READ, target_tv, target_tv_addr, 1))
++    if (!lock_user_struct(VERIFY_READ, target_tv, target_tv_addr, 1)) {
+         return -TARGET_EFAULT;
++    }
+ 
+     __get_user(tv->tv_sec, &target_tv->tv_sec);
+     __get_user(tv->tv_usec, &target_tv->tv_usec);
+@@ -1142,8 +1144,26 @@ static inline abi_long copy_to_user_timeval(abi_ulong target_tv_addr,
+ {
+     struct target_timeval *target_tv;
+ 
+-    if (!lock_user_struct(VERIFY_WRITE, target_tv, target_tv_addr, 0))
++    if (!lock_user_struct(VERIFY_WRITE, target_tv, target_tv_addr, 0)) {
++        return -TARGET_EFAULT;
++    }
++
++    __put_user(tv->tv_sec, &target_tv->tv_sec);
++    __put_user(tv->tv_usec, &target_tv->tv_usec);
++
++    unlock_user_struct(target_tv, target_tv_addr, 1);
++
++    return 0;
++}
++
++static inline abi_long copy_to_user_timeval64(abi_ulong target_tv_addr,
++                                             const struct timeval *tv)
++{
++    struct target__kernel_sock_timeval *target_tv;
++
++    if (!lock_user_struct(VERIFY_WRITE, target_tv, target_tv_addr, 0)) {
+         return -TARGET_EFAULT;
++    }
+ 
+     __put_user(tv->tv_sec, &target_tv->tv_sec);
+     __put_user(tv->tv_usec, &target_tv->tv_usec);
+@@ -1153,6 +1173,48 @@ static inline abi_long copy_to_user_timeval(abi_ulong target_tv_addr,
+     return 0;
  }
  
++static inline abi_long target_to_host_timespec(struct timespec *host_ts,
++                                               abi_ulong target_addr)
++{
++    struct target_timespec *target_ts;
++
++    if (!lock_user_struct(VERIFY_READ, target_ts, target_addr, 1)) {
++        return -TARGET_EFAULT;
++    }
++    __get_user(host_ts->tv_sec, &target_ts->tv_sec);
++    __get_user(host_ts->tv_nsec, &target_ts->tv_nsec);
++    unlock_user_struct(target_ts, target_addr, 0);
++    return 0;
++}
++
++static inline abi_long host_to_target_timespec(abi_ulong target_addr,
++                                               struct timespec *host_ts)
++{
++    struct target_timespec *target_ts;
++
++    if (!lock_user_struct(VERIFY_WRITE, target_ts, target_addr, 0)) {
++        return -TARGET_EFAULT;
++    }
++    __put_user(host_ts->tv_sec, &target_ts->tv_sec);
++    __put_user(host_ts->tv_nsec, &target_ts->tv_nsec);
++    unlock_user_struct(target_ts, target_addr, 1);
++    return 0;
++}
++
++static inline abi_long host_to_target_timespec64(abi_ulong target_addr,
++                                                 struct timespec *host_ts)
++{
++    struct target__kernel_timespec *target_ts;
++
++    if (!lock_user_struct(VERIFY_WRITE, target_ts, target_addr, 0)) {
++        return -TARGET_EFAULT;
++    }
++    __put_user(host_ts->tv_sec, &target_ts->tv_sec);
++    __put_user(host_ts->tv_nsec, &target_ts->tv_nsec);
++    unlock_user_struct(target_ts, target_addr, 1);
++    return 0;
++}
++
+ static inline abi_long copy_from_user_timezone(struct timezone *tz,
+                                                abi_ulong target_tz_addr)
+ {
+@@ -4899,6 +4961,54 @@ static abi_long do_ioctl_kdsigaccept(const IOCTLEntry *ie, uint8_t *buf_temp,
+     return get_errno(safe_ioctl(fd, ie->host_cmd, sig));
+ }
+ 
++static abi_long do_ioctl_SIOCGSTAMP(const IOCTLEntry *ie, uint8_t *buf_temp,
++                                    int fd, int cmd, abi_long arg)
++{
++    struct timeval tv;
++    abi_long ret;
++
++    ret = get_errno(safe_ioctl(fd, SIOCGSTAMP, &tv));
++    if (is_error(ret)) {
++        return ret;
++    }
++
++    if (cmd == (int)TARGET_SIOCGSTAMP_OLD) {
++        if (copy_to_user_timeval(arg, &tv)) {
++            return -TARGET_EFAULT;
++        }
++    } else {
++        if (copy_to_user_timeval64(arg, &tv)) {
++            return -TARGET_EFAULT;
++        }
++    }
++
++    return ret;
++}
++
++static abi_long do_ioctl_SIOCGSTAMPNS(const IOCTLEntry *ie, uint8_t *buf_temp,
++                                      int fd, int cmd, abi_long arg)
++{
++    struct timespec ts;
++    abi_long ret;
++
++    ret = get_errno(safe_ioctl(fd, SIOCGSTAMPNS, &ts));
++    if (is_error(ret)) {
++        return ret;
++    }
++
++    if (cmd == (int)TARGET_SIOCGSTAMPNS_OLD) {
++        if (host_to_target_timespec(arg, &ts)) {
++            return -TARGET_EFAULT;
++        }
++    } else{
++        if (host_to_target_timespec64(arg, &ts)) {
++            return -TARGET_EFAULT;
++        }
++    }
++
++    return ret;
++}
++
+ #ifdef TIOCGPTPEER
+ static abi_long do_ioctl_tiocgptpeer(const IOCTLEntry *ie, uint8_t *buf_temp,
+                                      int fd, int cmd, abi_long arg)
+@@ -6271,32 +6381,6 @@ static inline abi_long target_ftruncate64(void *cpu_env, abi_long arg1,
+ }
+ #endif
+ 
+-static inline abi_long target_to_host_timespec(struct timespec *host_ts,
+-                                               abi_ulong target_addr)
+-{
+-    struct target_timespec *target_ts;
+-
+-    if (!lock_user_struct(VERIFY_READ, target_ts, target_addr, 1))
+-        return -TARGET_EFAULT;
+-    __get_user(host_ts->tv_sec, &target_ts->tv_sec);
+-    __get_user(host_ts->tv_nsec, &target_ts->tv_nsec);
+-    unlock_user_struct(target_ts, target_addr, 0);
+-    return 0;
+-}
+-
+-static inline abi_long host_to_target_timespec(abi_ulong target_addr,
+-                                               struct timespec *host_ts)
+-{
+-    struct target_timespec *target_ts;
+-
+-    if (!lock_user_struct(VERIFY_WRITE, target_ts, target_addr, 0))
+-        return -TARGET_EFAULT;
+-    __put_user(host_ts->tv_sec, &target_ts->tv_sec);
+-    __put_user(host_ts->tv_nsec, &target_ts->tv_nsec);
+-    unlock_user_struct(target_ts, target_addr, 1);
+-    return 0;
+-}
+-
+ static inline abi_long target_to_host_itimerspec(struct itimerspec *host_itspec,
+                                                  abi_ulong target_addr)
+ {
+diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
+index fffa89f2564b..06622703008a 100644
+--- a/linux-user/syscall_defs.h
++++ b/linux-user/syscall_defs.h
+@@ -209,16 +209,34 @@ struct target_linger {
+     abi_int l_linger;       /* How long to linger for       */
+ };
+ 
++#if defined(TARGET_SPARC64) && !defined(TARGET_ABI32)
++struct target_timeval {
++    abi_long tv_sec;
++    abi_int tv_usec;
++};
++#define target__kernel_sock_timeval target_timeval
++#else
+ struct target_timeval {
+     abi_long tv_sec;
+     abi_long tv_usec;
+ };
+ 
++struct target__kernel_sock_timeval {
++    abi_llong tv_sec;
++    abi_llong tv_usec;
++};
++#endif
++
+ struct target_timespec {
+     abi_long tv_sec;
+     abi_long tv_nsec;
+ };
+ 
++struct target__kernel_timespec {
++    abi_llong tv_sec;
++    abi_llong tv_nsec;
++};
++
+ struct target_timezone {
+     abi_int tz_minuteswest;
+     abi_int tz_dsttime;
+@@ -749,8 +767,16 @@ struct target_pollfd {
+ #define TARGET_SIOCGPGRP       0x8904
+ #endif
+ 
+-#define TARGET_SIOCGSTAMP      0x8906          /* Get stamp (timeval) */
+-#define TARGET_SIOCGSTAMPNS    0x8907          /* Get stamp (timespec) */
++#if defined(TARGET_SH4)
++#define TARGET_SIOCGSTAMP_OLD   TARGET_IOR('s', 100, struct target_timeval)
++#define TARGET_SIOCGSTAMPNS_OLD TARGET_IOR('s', 101, struct target_timespec)
++#else
++#define TARGET_SIOCGSTAMP_OLD   0x8906
++#define TARGET_SIOCGSTAMPNS_OLD 0x8907
++#endif
++
++#define TARGET_SIOCGSTAMP_NEW   TARGET_IOR(0x89, 0x06, abi_llong[2])
++#define TARGET_SIOCGSTAMPNS_NEW TARGET_IOR(0x89, 0x07, abi_llong[2])
+ 
+ /* Networking ioctls */
+ #define TARGET_SIOCADDRT       0x890B          /* add routing table entry */
+diff --git a/linux-user/syscall_types.h b/linux-user/syscall_types.h
+index b98a23b0f1b0..4e3698382629 100644
+--- a/linux-user/syscall_types.h
++++ b/linux-user/syscall_types.h
+@@ -14,12 +14,6 @@ STRUCT(serial_icounter_struct,
+ STRUCT(sockaddr,
+        TYPE_SHORT, MK_ARRAY(TYPE_CHAR, 14))
+ 
+-STRUCT(timeval,
+-       MK_ARRAY(TYPE_LONG, 2))
+-
+-STRUCT(timespec,
+-       MK_ARRAY(TYPE_LONG, 2))
+-
+ STRUCT(rtentry,
+        TYPE_ULONG, MK_STRUCT(STRUCT_sockaddr), MK_STRUCT(STRUCT_sockaddr), MK_STRUCT(STRUCT_sockaddr),
+        TYPE_SHORT, TYPE_SHORT, TYPE_ULONG, TYPE_PTRVOID, TYPE_SHORT, TYPE_PTRVOID,
 -- 
 2.21.0
 
