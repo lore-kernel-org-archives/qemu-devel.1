@@ -2,140 +2,89 @@ Return-Path: <SRS0=PWhW=VO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.2 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AED18C7618F
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 21:13:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5423C7618F
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 21:27:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8408521783
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 21:13:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8408521783
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8F0E32145D
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 21:27:35 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="LxF799K2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F0E32145D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60514 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60552 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnrEZ-0002yG-VT
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 17:13:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46141)
+	id 1hnrSY-00081I-8g
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 17:27:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49567)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jsnow@redhat.com>) id 1hnrEP-0002XY-Ig
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 17:12:58 -0400
+ (envelope-from <prvs=09475cf9f=dmitry.fomichev@wdc.com>)
+ id 1hnrSA-0006ot-2N
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 17:27:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hnrEO-0006gw-7R
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 17:12:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:4497)
+ (envelope-from <prvs=09475cf9f=dmitry.fomichev@wdc.com>)
+ id 1hnrS8-0006yk-SP
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 17:27:10 -0400
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:14129)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1hnrEL-0006fK-KH; Wed, 17 Jul 2019 17:12:53 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E9C1F30C1324;
- Wed, 17 Jul 2019 21:12:51 +0000 (UTC)
-Received: from [10.18.17.203] (dhcp-17-203.bos.redhat.com [10.18.17.203])
- by smtp.corp.redhat.com (Postfix) with ESMTP id BF6465C257;
- Wed, 17 Jul 2019 21:12:48 +0000 (UTC)
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-References: <20190717173937.18747-1-jsnow@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <d180aebd-a614-9927-9ae6-c99973b7e669@redhat.com>
-Date: Wed, 17 Jul 2019 17:12:48 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+ (Exim 4.71) (envelope-from <prvs=09475cf9f=dmitry.fomichev@wdc.com>)
+ id 1hnrS8-0006xf-7q; Wed, 17 Jul 2019 17:27:08 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+ t=1563398828; x=1594934828;
+ h=from:to:cc:subject:date:message-id:in-reply-to:
+ references:mime-version:content-transfer-encoding;
+ bh=y/EIjQAMc7p+xmtVB2kq6kXWCPJCIc15sNxmhUJdXBw=;
+ b=LxF799K2G9tX624OQHOZHRn6pP2MF/9CYJ05aYpAhzTLK6d/M7Bwp+Az
+ B1/Jy9OhCi6EZcxIzlJ4QF5eQ/FFMkW0zjBzjre7OM7HB3aOjdX+iUJ95
+ 28VtHPWz9hmm7Skfv5lb8bg6E8f6C45SdMZMD/zsLs/DSwjQw+S/yNi5M
+ tMl4QKvYvN8DacOqI5SwPSY85VYEuEc4X1T3UaF+CV3HqyWtlhlxG/3kM
+ prAOqC6wZxeAYS5yGhdddW9iGU3PfZzz+wR+v38dAyKA2C18kRxcBt9nW
+ yUKwTb4KUVvkyHBcS/OcLUmy+cx39LuC3rNY8LWPOV0ZgHWb7E5xWY+bC w==;
+IronPort-SDR: CD1fLuV1OXkO2ePSTczag5ZnOeYuEfx0tOfXtwPwBmVIo5IOAgGEONPHBnEJ1IZM1GaaiK0wCI
+ 7NLVBgOmmLCb1XqdZI+hGkBftxGWdg7u7FWUjZn//KuXJnwds4UhNBrHjdIRi2Kcd4JLWgYxSo
+ SuySKBxMj1ahP9FMzjDr9AjvNuMUj7ZpYx+kHa3P/8cI8SlWvpZc2+o4y+ThxSNS5PvzZVZxso
+ bwTZ2gmG1kuFwmhE7eFbewBLPDIijImqQJmw4mnmyeDuof2Juu975oFhNTXeiPgzFxRhT/HdPd
+ NK4=
+X-IronPort-AV: E=Sophos;i="5.64,275,1559491200"; d="scan'208";a="113319440"
+Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com)
+ ([199.255.45.15])
+ by ob1.hgst.iphmx.com with ESMTP; 18 Jul 2019 05:27:05 +0800
+IronPort-SDR: QEOXAHrAzymdaDBgTh5AnlejiZU0Q/6OR0kiCP1Y0KH2sO/0r5YRdQuqgQ4oQca4bkEOB6i7wb
+ WjJ+ZN+Tzw1rLKsHLM72qypC2fISIF1iEr+UZoVbhMU7P569b9aV+DGUz3FIs3LPIP9tN8fENB
+ XBascCoe9KrLfErdT0Y7WFoSumYlFpV+CmQETaOTxx8qM5kLcrig9FP63tqr2K4A/ABTKtlm7R
+ vvcNmbP0Wirn0kcvcO/uX1ASxoGnQy7QQk0eN7GQcImI5Z6sv5rS6fal/tMfAelkEpI/coAI2k
+ fjJHAEcTKSpNSzvjvUNtMG9q
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+ by uls-op-cesaep02.wdc.com with ESMTP; 17 Jul 2019 14:25:32 -0700
+IronPort-SDR: J8jzJWqiLDoYijTMj4gXGuPVu8UgDNT6SoXXzkMiskDqzG2MAu4deHRjmEJi0zq5PdyRdiHBjO
+ SFO1H75bK93LKYqCM2/ZJUKghlw162QxMD7HTdp5+a+gOJXe3XOqCiOplsRRTZy3YWkTRR7IJS
+ 44GkmxG64Ke9F7L5L1LAFNi/jRKyx6EfDBSD4KdncgRXYybmOz2tnC9xoy2B1Ssa0TZ6XEkK5h
+ G89iYUFIlaXkkci98N9+0zazWenDuwmnSPUL9zu1VKcM8T0BQkHvwiPuuYxlEb5Gox08bPsZ7Z
+ 4qs=
+Received: from dhcp-10-88-173-43.hgst.com ([10.88.173.43])
+ by uls-op-cesaip01.wdc.com with ESMTP; 17 Jul 2019 14:27:05 -0700
+From: Dmitry Fomichev <dmitry.fomichev@wdc.com>
+To: qemu-devel@nongnu.org,
+	qemu-block@nongnu.org
+Date: Wed, 17 Jul 2019 17:26:59 -0400
+Message-Id: <20190717212703.10205-2-dmitry.fomichev@wdc.com>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20190717212703.10205-1-dmitry.fomichev@wdc.com>
+References: <20190717212703.10205-1-dmitry.fomichev@wdc.com>
 MIME-Version: 1.0
-In-Reply-To: <20190717173937.18747-1-jsnow@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Wed, 17 Jul 2019 21:12:51 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3] qapi: add dirty-bitmaps to
- query-named-block-nodes result
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x
+X-Received-From: 216.71.154.42
+Subject: [Qemu-devel] [PATCH v2 1/5] block: Add zoned device model property
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -147,31 +96,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, libvir-list@redhat.com,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This commit adds Zoned Device Model (as defined in T10 ZBC and
+T13 ZAC standards) as a block driver property, along with some
+useful access functions.
 
+A new backend driver permission, BLK_PERM_SUPPORT_ZONED, is also
+introduced. Only the drivers having this permission will be allowed
+to open zoned block devices.
 
-On 7/17/19 1:39 PM, John Snow wrote:
-> From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> 
-> Let's add a possibility to query dirty-bitmaps not only on root nodes.
-> It is useful when dealing both with snapshots and incremental backups.
-> 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> [Added deprecation information. --js]
-> Signed-off-by: John Snow <jsnow@redhat.com>
+No code is added yet to initialize or check the value of this new
+property, therefore this commit doesn't change any functionality.
 
-Made spelling edit suggested by Eric, and queued for 4.2.
+Signed-off-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
+---
+ block.c                   | 19 +++++++++++++++++++
+ include/block/block.h     | 21 ++++++++++++++++++++-
+ include/block/block_int.h |  4 ++++
+ 3 files changed, 43 insertions(+), 1 deletion(-)
 
-Thanks, applied to my bitmaps tree:
+diff --git a/block.c b/block.c
+index 29e931e217..cbdf044d43 100644
+--- a/block.c
++++ b/block.c
+@@ -4671,6 +4671,25 @@ void bdrv_get_geometry(BlockDriverState *bs, uint64_t *nb_sectors_ptr)
+     *nb_sectors_ptr = nb_sectors < 0 ? 0 : nb_sectors;
+ }
+ 
++uint8_t bdrv_get_zoned_model(BlockDriverState *bs)
++{
++    if (bs->drv->bdrv_get_zoned_info) {
++        bs->drv->bdrv_get_zoned_info(bs);
++    }
++
++    return bs->bl.zoned_model;
++}
++
++uint8_t bdrv_is_zoned(BlockDriverState *bs)
++{
++    /*
++     * Host Aware zone devices are supposed to be able to work
++     * just like regular block devices. Thus, we only consider
++     * Host Managed devices to be zoned here.
++     */
++    return bdrv_get_zoned_model(bs) == BLK_ZONED_MODEL_HM;
++}
++
+ bool bdrv_is_sg(BlockDriverState *bs)
+ {
+     return bs->sg;
+diff --git a/include/block/block.h b/include/block/block.h
+index 734c9d2f76..a465da31b8 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -266,18 +266,35 @@ enum {
+      */
+     BLK_PERM_GRAPH_MOD          = 0x10,
+ 
++    /** This permission is required to open zoned block devices. */
++    BLK_PERM_SUPPORT_ZONED      = 0x20,
++
+     BLK_PERM_ALL                = 0x1f,
+ 
+     DEFAULT_PERM_PASSTHROUGH    = BLK_PERM_CONSISTENT_READ
+                                  | BLK_PERM_WRITE
+                                  | BLK_PERM_WRITE_UNCHANGED
+-                                 | BLK_PERM_RESIZE,
++                                 | BLK_PERM_RESIZE
++                                 | BLK_PERM_SUPPORT_ZONED,
+ 
+     DEFAULT_PERM_UNCHANGED      = BLK_PERM_ALL & ~DEFAULT_PERM_PASSTHROUGH,
+ };
+ 
+ char *bdrv_perm_names(uint64_t perm);
+ 
++/*
++ * Known zoned device models.
++ *
++ * TODO For a Linux host, it could be preferrable to include
++ * /usr/include/linux/blkzoned.h instead of defining ZBD-specific
++ * values here.
++ */
++enum blk_zoned_model {
++    BLK_ZONED_MODEL_NONE, /* Regular block device */
++    BLK_ZONED_MODEL_HA,   /* Host-aware zoned block device */
++    BLK_ZONED_MODEL_HM,   /* Host-managed zoned block device */
++};
++
+ /* disk I/O throttling */
+ void bdrv_init(void);
+ void bdrv_init_with_whitelist(void);
+@@ -354,6 +371,8 @@ int64_t bdrv_get_allocated_file_size(BlockDriverState *bs);
+ BlockMeasureInfo *bdrv_measure(BlockDriver *drv, QemuOpts *opts,
+                                BlockDriverState *in_bs, Error **errp);
+ void bdrv_get_geometry(BlockDriverState *bs, uint64_t *nb_sectors_ptr);
++uint8_t bdrv_get_zoned_model(BlockDriverState *bs);
++uint8_t bdrv_is_zoned(BlockDriverState *bs);
+ void bdrv_refresh_limits(BlockDriverState *bs, Error **errp);
+ int bdrv_commit(BlockDriverState *bs);
+ int bdrv_change_backing_file(BlockDriverState *bs,
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index 50902531b7..73fbccbe8a 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -416,6 +416,7 @@ struct BlockDriver {
+     bool (*bdrv_debug_is_suspended)(BlockDriverState *bs, const char *tag);
+ 
+     void (*bdrv_refresh_limits)(BlockDriverState *bs, Error **errp);
++    void (*bdrv_get_zoned_info)(BlockDriverState *bs);
+ 
+     /*
+      * Returns 1 if newly created images are guaranteed to contain only
+@@ -614,6 +615,9 @@ typedef struct BlockLimits {
+ 
+     /* maximum number of iovec elements */
+     int max_iov;
++
++    /* Zoned device model. Zero value indicates a regular block device */
++    uint8_t zoned_model;
+ } BlockLimits;
+ 
+ typedef struct BdrvOpBlocker BdrvOpBlocker;
+-- 
+2.21.0
 
-https://github.com/jnsnow/qemu/commits/bitmaps
-https://github.com/jnsnow/qemu.git
-
---js
 
