@@ -2,68 +2,62 @@ Return-Path: <SRS0=PWhW=VO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6B7DC7618F
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 14:56:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F35DAC7618F
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 14:58:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 870862173E
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 14:56:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 870862173E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id C1AA42173E
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 14:58:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1AA42173E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58130 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58163 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnlLk-0006jY-Q0
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 10:56:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48179)
+	id 1hnlNw-00019d-VN
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 10:58:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49169)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <laurent@vivier.eu>) id 1hnlL8-0004Hp-Qw
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 10:55:31 -0400
+ (envelope-from <groug@kaod.org>) id 1hnlNl-0000Z8-D0
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 10:58:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1hnlL4-0000mB-Jf
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 10:55:30 -0400
-Received: from mout.kundenserver.de ([212.227.126.135]:32921)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hnlL4-0000hI-8o
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 10:55:26 -0400
-Received: from localhost.localdomain ([78.238.229.36]) by
- mrelayeu.kundenserver.de (mreue009 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1MlfCk-1iDi8q3HQg-00ikdO; Wed, 17 Jul 2019 16:54:38 +0200
-From: Laurent Vivier <laurent@vivier.eu>
-To: qemu-devel@nongnu.org
-Date: Wed, 17 Jul 2019 16:54:16 +0200
-Message-Id: <20190717145418.23883-2-laurent@vivier.eu>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190717145418.23883-1-laurent@vivier.eu>
-References: <20190717145418.23883-1-laurent@vivier.eu>
+ (envelope-from <groug@kaod.org>) id 1hnlNk-0002Ud-Cp
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 10:58:13 -0400
+Received: from 1.mo173.mail-out.ovh.net ([178.33.111.180]:52623)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1hnlNk-0002TU-6B
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 10:58:12 -0400
+Received: from player772.ha.ovh.net (unknown [10.108.35.197])
+ by mo173.mail-out.ovh.net (Postfix) with ESMTP id 8039810F102
+ for <qemu-devel@nongnu.org>; Wed, 17 Jul 2019 16:58:09 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player772.ha.ovh.net (Postfix) with ESMTPSA id 8D4828039468;
+ Wed, 17 Jul 2019 14:58:04 +0000 (UTC)
+Date: Wed, 17 Jul 2019 16:58:02 +0200
+From: Greg Kurz <groug@kaod.org>
+To: Shivaprasad G Bhat <sbhat@linux.ibm.com>
+Message-ID: <20190717165802.7798c2e8@bahia.lab.toulouse-stg.fr.ibm.com>
+In-Reply-To: <156335163818.82682.7196904841379833409.stgit@lep8c.aus.stglabs.ibm.com>
+References: <156335150620.82682.9535735857478533420.stgit@lep8c.aus.stglabs.ibm.com>
+ <156335163818.82682.7196904841379833409.stgit@lep8c.aus.stglabs.ibm.com>
+X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:/uU3Iw6FRkYlIr/YSJIBPhpggc9tLECLeDfacBj1X6GtMOXvI2J
- 7uc6i/JqcxopF3YG9yby5J5R47On3cLqHSCEN8Xo5Puln7/apPCPdTJPe3nur2NZSqMMh0l
- OppuH2pS08gJoWH96+OaSHEebGR3w5Zwtefbo/ROw/Z9wuO0VM+MY5SJU7PYGmUAZILQ3vx
- xhZbqgpoCxaMYi76167Kg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:tjIhIcauqoE=:xvlqiaOOeahjicl8gbn8eO
- i0bJrjnb3crBQiE46CtkgEuG1RC28lkLXsGw/ikntGMn8UX6qxiNsUCwW96CsNt/n6EL/mYHO
- 0VNpw5Ape5J4QI5bBhse1pcMn+7LL4n2nmWqEDHIFtQiz6U6Wa7VX4LTc/RAxNYcQBnd72AbW
- SEvwLpV7+1fGY4LERJ0e94GSdHyPRxbVAJAi/Rj9Hu0hvycET+FidbsoFrbAvTbacq0HB/W7u
- BbCzgRJeNDVdgKhAkorNdWRdwOcvd0Z500xlDyPBkJtoG/HZy0l4VSCG3mbSiqfqqYBJfe44Z
- UUuzDZX4WtTdRb4PYlkaIeOassdH7oCeF9+nvexD+y9bpnrnGNFdQa5yiF8hu8wivYEC//5Pk
- 1hzmF8oCdwIfRIE6dcbN0B9VqnEn67auDqmDZMYFDuifK3KGpabs8UTEiREOqBFq9D/PEyLjt
- mdHuCNka56tLgYJNCv++mNl/O1pYusVT01IMY2bSAGHMjSaG3RAOloIZWhOkp8qujSuKu1G/7
- wC/eGVQlrxOgAz/2ZYM7xsHhWSLaUamU5w2R29IJkDJo1tfZnv/2BTHlsv5n64mCVFFfyZuKf
- 2pzf44XxNovU0EMV2CFpzLI5J5hQaKGbb1JUeLKnFinMf2ozoKdrS103lrHKbKPLvIrjbS883
- u9yNWkOXrXqPIGI5fdfZswb9nUvAGYIF3XQyQAJkoCLYbANlqqdWOVpg+NfVmnDZoHwuHYtLh
- 60Orvy7cmUsHGxVIkMlyqy4a7+GK6FwgdFbr7g==
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 3999196471792933205
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduvddrieefgdehlecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.135
-Subject: [Qemu-devel] [PULL 1/3] linux-user: Fix structure target_ucontext
- for MIPS
+X-Received-From: 178.33.111.180
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v2 4/4] ppc: dont overwrite
+ initialized idle_timer
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,68 +69,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Dragan Mladjenovic <dmladjenovic@wavecomp.com>,
- Aleksandar Rikalo <arikalo@wavecomp.com>, Riku Voipio <riku.voipio@iki.fi>,
- Laurent Vivier <laurent@vivier.eu>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>,
- Richard Henderson <rth@twiddle.net>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
+On Wed, 17 Jul 2019 03:20:55 -0500
+Shivaprasad G Bhat <sbhat@linux.ibm.com> wrote:
 
-Structure ucontext for MIPS is defined in the following way in
-Linux kernel:
+> The check to see if the idle_timer is already initialized is
+> missing. Every vcpu thread would call kvm_arch_init_vcpu()
+> and overwrite the idle_timer resulting in a memory leak.
+> Patch fixes that.
+> 
+> Signed-off-by: Shivaprasad G Bhat <sbhat@linux.ibm.com>
+> ---
+>  target/ppc/kvm.c |    3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+> index 8a06d3171e..498ca6d53b 100644
+> --- a/target/ppc/kvm.c
+> +++ b/target/ppc/kvm.c
+> @@ -491,7 +491,8 @@ int kvm_arch_init_vcpu(CPUState *cs)
+>          return ret;
+>      }
+>  
+> -    idle_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, kvm_kick_cpu, cpu);
+> +    if (!idle_timer)
+> +        idle_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, kvm_kick_cpu, cpu);
+>  
 
-(arch/mips/include/uapi/asm/ucontext.h, lines 54-64)
+This timer is a per-cpu thingy, but it is stored in a global :-\ which
+means it is broken if there's more than one vcpu.
 
-struct ucontext {
-    /* Historic fields matching asm-generic */
-    unsigned long       uc_flags;
-    struct ucontext     *uc_link;
-    stack_t             uc_stack;
-    struct sigcontext   uc_mcontext;
-    sigset_t            uc_sigmask;
+Also timer_new_*() aren't the preferred way to create timers as stated
+in the header of timer_new_full():
 
-    /* Extended context structures may follow ucontext */
-    unsigned long long	uc_extcontext[0];
-};
+/*
+...
+ * This is not the preferred interface unless you know you
+ * are going to call timer_free. Use timer_init or timer_init_full instead.
+...
+*/
 
-Fix the structure target_ucontext for MIPS to reflect the definition
-above, except the correction for field uc_extcontext, which will
-follow at some later time.
+I think you'd rather add a QEMUTimer idle_timer field to PowerPCCPU and
+call initialize it with timer_init() instead.
 
-Fixes: 94c5495d
-
-Reported-by: Dragan Mladjenovic <dmladjenovic@wavecomp.com>
-Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <1562931470-3700-2-git-send-email-aleksandar.markovic@rt-rk.com>
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
----
- linux-user/mips/signal.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
-
-diff --git a/linux-user/mips/signal.c b/linux-user/mips/signal.c
-index 6aa303ec9c16..455a8a229a83 100644
---- a/linux-user/mips/signal.c
-+++ b/linux-user/mips/signal.c
-@@ -71,10 +71,9 @@ struct sigframe {
- };
- 
- struct target_ucontext {
--    target_ulong tuc_flags;
--    target_ulong tuc_link;
-+    abi_ulong tuc_flags;
-+    abi_ulong tuc_link;
-     target_stack_t tuc_stack;
--    target_ulong pad0;
-     struct target_sigcontext tuc_mcontext;
-     target_sigset_t tuc_sigmask;
- };
--- 
-2.21.0
+>      switch (cenv->mmu_model) {
+>      case POWERPC_MMU_BOOKE206:
+> 
+> 
 
 
