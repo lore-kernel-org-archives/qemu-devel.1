@@ -2,79 +2,81 @@ Return-Path: <SRS0=PWhW=VO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73591C7618F
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 00:17:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64A71C76192
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 00:46:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 350942184E
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 00:17:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 329342182B
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 00:46:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c2dA8701"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 350942184E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lVd5azNW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 329342182B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53104 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53240 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnXdm-00026N-Bz
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 20:17:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45139)
+	id 1hnY5a-0001fS-2W
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 20:46:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53609)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alistair23@gmail.com>) id 1hnXdb-0001eB-Kl
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 20:17:40 -0400
+ (envelope-from <elohimes@gmail.com>) id 1hnY5Q-0001HI-06
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 20:46:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1hnXda-00084l-K1
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 20:17:39 -0400
-Received: from mail-lf1-x142.google.com ([2a00:1450:4864:20::142]:46084)
+ (envelope-from <elohimes@gmail.com>) id 1hnY5P-0001l7-4P
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 20:46:23 -0400
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:37239)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1hnXda-00084a-An; Tue, 16 Jul 2019 20:17:38 -0400
-Received: by mail-lf1-x142.google.com with SMTP id z15so10737633lfh.13;
- Tue, 16 Jul 2019 17:17:38 -0700 (PDT)
+ (Exim 4.71) (envelope-from <elohimes@gmail.com>) id 1hnY5N-0001jm-94
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 20:46:23 -0400
+Received: by mail-pf1-x443.google.com with SMTP id 19so9930176pfa.4
+ for <qemu-devel@nongnu.org>; Tue, 16 Jul 2019 17:46:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=9QZgh22M+ts7wnAbDENlpUJosc80GCJNMZ0pBHax8eo=;
- b=c2dA8701kQn0EekbAY01J+yXbXh/aboG0LWQK36XQQioVFkTingJnOA14inTctiIUs
- 0/yaoJzjUWn98aeFAs6XkSnHPMDufjel6pCcCRaK+mVbJ6gLHwg63UeQxPsDPQ/AQ2+O
- hdjReAXZhsSjtfgypkdKXvXV3iEsejBOWobrW6rGLV55RQLAZQuG44b7m+dsbUBwriRN
- fjw9Hd1Cg52w1oGjtJvQ6utTHQnPWDTYFTgCDl6KeJYeCQnQGFQsg5EG52ZaRFx8Xl+H
- L5261LmYDSCPs21tHJydWXQszR49sb3HoRuGplNw1cZSK9jsNq961i/LpkQ1qXyKNj3X
- h7Yw==
+ h=from:to:cc:subject:date:message-id;
+ bh=bKSblPx9MgZD4RtFAKIXTYOFpN5+W8v5wIvWZqdsNl8=;
+ b=lVd5azNWDFud+sgga6wbB2HPlW5D7t2POQQDx3gsiR4nbrqwKhqUBeu5sjT/uahoj2
+ Wkx4zaCmXGX8hv0gDBxNlEOKSdCMRLbNcP9jmTTwCDjKxG2nEKRGzVfGY5bjDgzraq+I
+ O9xQqyldTe2I8XNgUvAFz78BJGlrFy7cblq8p2QYzYmYYq63lcqLVswdXipdFpA9bwF9
+ PtQ41+CTW3qx6BaHvSYWYLZ63T6aZV/QfupWGIv+csvNODyFYUUFY4EIU4r1GZa+43K/
+ OwyVdTQw5KZfNDlybSt4if+alMdG+bA5uo1k7SiyqJwk68tcBtpJ7KNXGfrb7i6JXUVK
+ cSiw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=9QZgh22M+ts7wnAbDENlpUJosc80GCJNMZ0pBHax8eo=;
- b=JohE8/+cp5RWQf+7VJ+1m82C0tzrII+FeAoJSkeIW1mySKRWufM9P3FWJ0tIo6qshV
- 2rsqTbXmvIlk3W9SF2AQEtONOQV+xJCnYzXJKYz8l2X+hb/gsvPEqbCkgdFyPrIVMC0+
- 5whm9E97pEdcxBJbvm3KL9EUhDmf3lcQ1k1lKTfaUHUoMyZlSy7PnaAjcoCYQQedydo3
- k9wrqeHv/eDdwww8IeDw0XxLXRgNzGm6VIoebzSPGtcqWZ+vRUOh3OEg28+ycpnLoxIQ
- LYMDw/lfvrGyzQfBHLkAgZgxkM0W1k2emYGD52sPxxC69QSp3Oayubauz8pMQOfRU3Ws
- 7v3w==
-X-Gm-Message-State: APjAAAVXsYfzjjItJXWuf61iLD/qFHNVo1HgJULBnREXJg43PyvKGKsw
- 9N7xG5/ZPxi4ZW62F4l5v0EHihdNqeVQ4vx1K4M=
-X-Google-Smtp-Source: APXvYqxzfkqUOIdzwY9KPSNiAhGUAHkFiE7yoOUqg1CGC3tfVS4eX5Q3pQSifAWW5jgTMCVyAAbulK6lJFhdCtyMmAk=
-X-Received: by 2002:a19:7709:: with SMTP id s9mr15246531lfc.86.1563322657174; 
- Tue, 16 Jul 2019 17:17:37 -0700 (PDT)
-MIME-Version: 1.0
-References: <cover.1559944445.git.alistair.francis@wdc.com>
- <CAFEAcA95grVBoiCbMAeZYTXYxc6nhjx1EM6=05G_3Qqpp8obNQ@mail.gmail.com>
-In-Reply-To: <CAFEAcA95grVBoiCbMAeZYTXYxc6nhjx1EM6=05G_3Qqpp8obNQ@mail.gmail.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Tue, 16 Jul 2019 17:14:19 -0700
-Message-ID: <CAKmqyKPPtSHSBMvrVxwi1aX=oPSEfxxpD-QQ=ym2ymvcvk5z0w@mail.gmail.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
+ h=x-gm-message-state:from:to:cc:subject:date:message-id;
+ bh=bKSblPx9MgZD4RtFAKIXTYOFpN5+W8v5wIvWZqdsNl8=;
+ b=Ek6+h4EfWT752++SMa7SwxonTD7WhL5+LiVCflrHCSD2AbQNx8+TWjD6MOvBIuYo+Y
+ lWoboQfOnhT8ey+Q9lRdQ/xrsHlkoCoZFjXsP9KGkjHm9RS7rVq71eDF8Q6U5Q2dEJlY
+ kGXOHqJAptWMPgtw+7QdFqqS6I9Ewbs6pPzDj/s2ljKKI5QmfJ8Ev/B3KxncLlGLqLgB
+ o6bTdkrT1nrVSMP+UE7ta3P/rLjrLw6DncwSQdefNA/6TLd/3x+F1Rc3zXyE7DUHC024
+ xsHjNfpYNJ82LJTRTZSLVby05mcQy3B35CNh+NXWnQDUV60qZGXfAuhxoUKSkLqY0NtI
+ HcIg==
+X-Gm-Message-State: APjAAAUD30ESSACSIEtfyeSTgLFmoRdUUymAkP9a7iauD+qvJXoayAVK
+ hKsO2vgMdsih46qshzec2Jw=
+X-Google-Smtp-Source: APXvYqwVWwee6HKE6fK1pHQoBZBQjr2gs53SHMjhh5MxLmrXeuhKS3pWoRnpcu9h490RK9iPNvGbBg==
+X-Received: by 2002:a63:bd0a:: with SMTP id a10mr36894992pgf.55.1563324379595; 
+ Tue, 16 Jul 2019 17:46:19 -0700 (PDT)
+Received: from localhost ([116.247.112.152])
+ by smtp.gmail.com with ESMTPSA id g62sm22132880pje.11.2019.07.16.17.46.18
+ (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+ Tue, 16 Jul 2019 17:46:19 -0700 (PDT)
+From: elohimes@gmail.com
+X-Google-Original-From: xieyongji@baidu.com
+To: mst@redhat.com, stefanha@gmail.com, pbonzini@redhat.com, fam@euphon.net
+Date: Wed, 17 Jul 2019 08:46:05 +0800
+Message-Id: <20190717004606.12444-1-xieyongji@baidu.com>
+X-Mailer: git-send-email 2.17.1
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::142
-Subject: Re: [Qemu-devel] [PATCH v1 00/27] Add RISC-V Hypervisor Extension
+X-Received-From: 2607:f8b0:4864:20::443
+Subject: [Qemu-devel] [PATCH v2 1/2] vhost-scsi: Call
+ virtio_scsi_common_unrealize() when device realize failed
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,52 +88,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Palmer Dabbelt <palmer@sifive.com>,
- Alistair Francis <alistair.francis@wdc.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: Xie Yongji <xieyongji@baidu.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Jul 15, 2019 at 5:00 AM Peter Maydell <peter.maydell@linaro.org> wrote:
->
-> On Fri, 7 Jun 2019 at 23:03, Alistair Francis <alistair.francis@wdc.com> wrote:
-> > At the moment this spec is in a draft state and is subject to change. As
-> > QEMU is extreamly useful in early bring up I think it makes sense for
-> > QEMU to support non-frozen extensions. I would like to decide with this
-> > series how QEMU will handle all future non-frozen extensions. That is a
-> > standard way that QEMU users can test future RISC-V extensions while
-> > still understanding things will change. One idea is just to disable it by
-> > default, another option is to maybe use the Kconfig to make it a compile
-> > time option which developers can use. Should we also display a warning
-> > when running non-frozen extensions?
->
-> We had an instance of this for Arm (though in fact the
-> relevant patches to QEMU didn't end up getting into master
-> before the spec was finalized in the end). My suggestion
-> would be at minimum:
->  * by default non-frozen extensions should not be provided
+From: Xie Yongji <xieyongji@baidu.com>
 
-Yep, these are off by default.
+This avoids memory leak when device hotplug is failed.
 
->  * they should be enabled via a command line option (cpu
->    property) whose name starts with "x-", which is our standard
->    way of flagging properties that are experimental and subject
->    to change or removal in future QEMU versions
+Signed-off-by: Xie Yongji <xieyongji@baidu.com>
+---
+ hw/scsi/vhost-scsi.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-Sounds good, I'll rename the property in the next version.
+diff --git a/hw/scsi/vhost-scsi.c b/hw/scsi/vhost-scsi.c
+index 4090f99ee4..c0dd9bdf89 100644
+--- a/hw/scsi/vhost-scsi.c
++++ b/hw/scsi/vhost-scsi.c
+@@ -210,7 +210,7 @@ static void vhost_scsi_realize(DeviceState *dev, Error **errp)
+         if (err) {
+             error_propagate(errp, err);
+             error_free(vsc->migration_blocker);
+-            goto close_fd;
++            goto free_virtio;
+         }
+     }
+ 
+@@ -240,6 +240,10 @@ static void vhost_scsi_realize(DeviceState *dev, Error **errp)
+         migrate_del_blocker(vsc->migration_blocker);
+     }
+     g_free(vsc->dev.vqs);
++ free_virtio:
++    err = NULL;
++    virtio_scsi_common_unrealize(dev, &err);
++    error_propagate(errp, err);
+  close_fd:
+     close(vhostfd);
+     return;
+-- 
+2.17.1
 
-Alistair
-
->
-> That way end-users know they're doing something non-standard
-> that won't necessarily be supported in future by newer versions
-> of QEMU, and if people copy recipes/commandlines/random guest
-> images off old blog posts there'll be a hint that there's a
-> reason why they don't work on newer QEMU that adheres to the
-> final spec.
->
-> thanks
-> -- PMM
 
