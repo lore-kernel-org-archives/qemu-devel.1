@@ -2,49 +2,62 @@ Return-Path: <SRS0=PWhW=VO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.8 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F1BEC76186
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 07:07:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47867C76186
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 07:11:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E17212173E
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 07:07:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E17212173E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ozlabs.ru
+	by mail.kernel.org (Postfix) with ESMTPS id 2059B20665
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 07:11:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2059B20665
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54600 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54610 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hne2C-00029x-K6
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 03:07:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50312)
+	id 1hne6Q-0004DK-4h
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 03:11:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51438)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <aik@ozlabs.ru>) id 1hne21-0001er-Ej
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 03:07:18 -0400
+ (envelope-from <lizhengui@huawei.com>) id 1hne6C-0003fy-6p
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 03:11:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aik@ozlabs.ru>) id 1hne1z-0006Il-HC
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 03:07:17 -0400
-Received: from ozlabs.ru ([107.173.13.209]:33884)
- by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <aik@ozlabs.ru>)
- id 1hne1z-0006GN-9Q; Wed, 17 Jul 2019 03:07:15 -0400
-Received: from fstn1-p1.ozlabs.ibm.com (localhost [IPv6:::1])
- by ozlabs.ru (Postfix) with ESMTP id 69042AE800AC;
- Wed, 17 Jul 2019 03:06:37 -0400 (EDT)
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-To: qemu-devel@nongnu.org
-Date: Wed, 17 Jul 2019 17:06:36 +1000
-Message-Id: <20190717070637.101776-1-aik@ozlabs.ru>
-X-Mailer: git-send-email 2.17.1
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 107.173.13.209
-Subject: [Qemu-devel] [PATCH qemu v2] spapr_pci: Advertise BAR reallocation
- capability
+ (envelope-from <lizhengui@huawei.com>) id 1hne6A-0003dh-RD
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 03:11:36 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:32972 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <lizhengui@huawei.com>)
+ id 1hne66-0003Rc-Ll; Wed, 17 Jul 2019 03:11:31 -0400
+Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id C471491D3108C600A716;
+ Wed, 17 Jul 2019 15:11:17 +0800 (CST)
+Received: from [127.0.0.1] (10.177.251.193) by DGGEMS404-HUB.china.huawei.com
+ (10.3.19.204) with Microsoft SMTP Server id 14.3.439.0;
+ Wed, 17 Jul 2019 15:11:07 +0800
+From: l00284672 <lizhengui@huawei.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi
+ <stefanha@redhat.com>, <berto@igalia.com>, <kwolf@redhat.com>
+References: <687efc8c-e081-7cca-cf69-8db9903d0f7f@huawei.com>
+ <cf6d17e2-142f-ffd3-78df-da47e2c25fec@huawei.com>
+Message-ID: <217e14f3-1e0d-bd52-76c4-c2af0a1f2180@huawei.com>
+Date: Wed, 17 Jul 2019 15:10:59 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.4.0
+MIME-Version: 1.0
+In-Reply-To: <cf6d17e2-142f-ffd3-78df-da47e2c25fec@huawei.com>
+Content-Type: multipart/mixed; boundary="------------A95E4C3587AFAEBB5B77E302"
+Content-Language: en-US
+X-Originating-IP: [10.177.251.193]
+X-CFilter-Loop: Reflected
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 45.249.212.32
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] Fwd: virtio_scsi_ctx_check failed when detach
+ virtio_scsi disk
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -56,109 +69,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-ppc@nongnu.org,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: lizhengui@huawei.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The pseries guests do not normally allocate PCI resources and rely on
-the system firmware doing so. Furthermore at least at some point in
-the past the pseries guests won't even allowed to change BARs, probably
-it is still the case for phyp. So since the initial commit we have [1]
-which prevents resource reallocation.
+--------------A95E4C3587AFAEBB5B77E302
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: quoted-printable
 
-This is not a problem until we want specific BAR alignments, for example,
-PAGE_SIZE==64k to make sure we can still map MMIO BARs directly. For
-the boot time devices we handle this in SLOF [2] but since QEMU's RTAS
-does not allocate BARs, the guest does this instead and does not align
-BARs even if Linux is given pci=resource_alignment=16@pci:0:0 as
-PCI_PROBE_ONLY makes Linux ignore alignment requests.
+ping?
 
-ARM folks added a dial to control PCI_PROBE_ONLY via the device tree [3].
-This makes use of the dial to advertise to the guest that we can handle
-BAR reassignments. This limits the change to the latest pseries machine
-to avoid old guests explosion.
 
-We do not remove the flag from [1] as pseries guests are still supported
-under phyp so having that removed may cause problems.
+On 2019/7/16 10:06, l00284672 wrote:
+>
+>
+>
+>
+> -------- Forwarded Message --------
+> Subject: 	virtio_scsi_ctx_check failed when detach virtio_scsi disk
+> Date: 	Mon, 15 Jul 2019 23:34:24 +0800
+> From: 	l00284672 <lizhengui@huawei.com>
+> To: 	kwolf@redhat.com, berto@igalia.com, Stefan Hajnoczi=20
+> <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+> CC: 	lizhengui@huawei.com
+>
+>
+>
+> I found a problem=C2=A0 that virtio_scsi_ctx_check=C2=A0 failed when de=
+taching=20
+> virtio_scsi disk.=C2=A0 The=C2=A0 bt is below:
+>
+> (gdb) bt
+> #0=C2=A0 0x0000ffffb02e1bd0 in raise () from /lib64/libc.so.6
+> #1=C2=A0 0x0000ffffb02e2f7c in abort () from /lib64/libc.so.6
+> #2=C2=A0 0x0000ffffb02db124 in __assert_fail_base () from /lib64/libc.s=
+o.6
+> #3=C2=A0 0x0000ffffb02db1a4 in __assert_fail () from /lib64/libc.so.6
+> #4=C2=A0 0x00000000004eb9a8 invirtio_scsi_ctx_check (d=3Dd@entry=3D0xc7=
+0d790,=20
+> s=3D<optimized out>, s=3D<optimized out>)
+> =C2=A0=C2=A0=C2=A0 at /Images/lzg/code/710/qemu-2.8.1/hw/scsi/virtio-sc=
+si.c:243
+> #5=C2=A0 0x00000000004ec87c in virtio_scsi_handle_cmd_req_prepare=20
+> (s=3Ds@entry=3D0xd27a7a0, req=3Dreq@entry=3D0xafc4b90)
+> =C2=A0=C2=A0=C2=A0 at /Images/lzg/code/710/qemu-2.8.1/hw/scsi/virtio-sc=
+si.c:553
+> #6=C2=A0 0x00000000004ecc20 in virtio_scsi_handle_cmd_vq (s=3D0xd27a7a0=
+,=20
+> vq=3D0xd283410)
+> =C2=A0=C2=A0=C2=A0 at /Images/lzg/code/710/qemu-2.8.1/hw/scsi/virtio-sc=
+si.c:588
+> #7=C2=A0 0x00000000004eda20 in virtio_scsi_data_plane_handle_cmd (vdev=3D=
+0x0,=20
+> vq=3D0xffffae7a6f98)
+> =C2=A0=C2=A0=C2=A0 at /Images/lzg/code/710/qemu-2.8.1/hw/scsi/virtio-sc=
+si-dataplane.c:57
+> #8=C2=A0 0x0000000000877254 in aio_dispatch (ctx=3D0xac61010) at=20
+> util/aio-posix.c:323
+> #9=C2=A0 0x00000000008773ec in aio_poll (ctx=3D0xac61010, blocking=3Dtr=
+ue) at=20
+> util/aio-posix.c:472
+> #10 0x00000000005cd7cc in iothread_run (opaque=3D0xac5e4b0) at iothread=
+.c:49
+> #11 0x000000000087a8b8 in qemu_thread_start (args=3D0xac61360) at=20
+> util/qemu-thread-posix.c:495
+> #12 0x00000000008a04e8 in thread_entry_for_hotfix (pthread_cb=3D0x0) at=
+=20
+> uvp/hotpatch/qemu_hotpatch_helper.c:579
+> #13 0x0000ffffb041c8bc in start_thread () from /lib64/libpthread.so.0
+> #14 0x0000ffffb0382f8c in thread_start () from /lib64/libc.so.6
+>
+> assert(blk_get_aio_context(d->conf.blk) =3D=3D s->ctx) failed.
+>
+> I think this patch=20
+> (https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3Da6f230c8d13a7ff3=
+a0c7f1097412f44bfd9eff0b)=20
+> introduce this problem.
+>
+> commit a6f230c8d13a7ff3a0c7f1097412f44bfd9eff0b=C2=A0 move blockbackend=
+=20
+> back to main AioContext on unplug. It set the AioContext of
+>
+> SCSIDevice=C2=A0 to the main AioContex, but s->ctx is still the iothrea=
+d=20
+> AioContext.=C2=A0 Is this a bug?
+>
 
-[1] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/arch/powerpc/platforms/pseries/setup.c?h=v5.1#n773
-[2] https://git.qemu.org/?p=SLOF.git;a=blob;f=board-qemu/slof/pci-phb.fs;h=06729bcf77a0d4e900c527adcd9befe2a269f65d;hb=HEAD#l338
-[3] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=f81c11af
-Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
----
-Changes:
-v2:
-* limited the change by a machine version
 
----
- include/hw/ppc/spapr.h |  1 +
- hw/ppc/spapr.c         | 11 +++++++++++
- 2 files changed, 12 insertions(+)
+--------------A95E4C3587AFAEBB5B77E302
+Content-Type: text/x-vcard; name="lizhengui.vcf"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="lizhengui.vcf"
 
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index 60553d32c4fa..11c8185b94a1 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -120,6 +120,7 @@ struct SpaprMachineClass {
-     bool legacy_irq_allocation;
-     bool broken_host_serial_model; /* present real host info to the guest */
-     bool pre_4_1_migration; /* don't migrate hpt-max-page-size */
-+    bool linux_pci_probe;
- 
-     void (*phb_placement)(SpaprMachineState *spapr, uint32_t index,
-                           uint64_t *buid, hwaddr *pio, 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 8783b433960c..734d759d65b3 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -1162,6 +1162,7 @@ static void spapr_dt_ov5_platform_support(SpaprMachineState *spapr, void *fdt,
- static void spapr_dt_chosen(SpaprMachineState *spapr, void *fdt)
- {
-     MachineState *machine = MACHINE(spapr);
-+    SpaprMachineClass *smc = SPAPR_MACHINE_GET_CLASS(machine);
-     int chosen;
-     const char *boot_device = machine->boot_order;
-     char *stdout_path = spapr_vio_stdout_path(spapr->vio_bus);
-@@ -1219,6 +1220,11 @@ static void spapr_dt_chosen(SpaprMachineState *spapr, void *fdt)
-         _FDT(fdt_setprop_string(fdt, chosen, "stdout-path", stdout_path));
-     }
- 
-+    /* We can deal with BAR reallocation just fine, advertise it to the guest */
-+    if (smc->linux_pci_probe) {
-+        _FDT(fdt_setprop_cell(fdt, chosen, "linux,pci-probe-only", 0));
-+    }
-+
-     spapr_dt_ov5_platform_support(spapr, fdt, chosen);
- 
-     g_free(stdout_path);
-@@ -4432,6 +4438,9 @@ static const TypeInfo spapr_machine_info = {
- static void spapr_machine_4_2_class_options(MachineClass *mc)
- {
-     /* Defaults for the latest behaviour inherited from the base class */
-+    SpaprMachineClass *smc = SPAPR_MACHINE_CLASS(mc);
-+
-+    smc->linux_pci_probe = true;
- }
- 
- DEFINE_SPAPR_MACHINE(4_2, "4.2", true);
-@@ -4441,12 +4450,14 @@ DEFINE_SPAPR_MACHINE(4_2, "4.2", true);
-  */
- static void spapr_machine_4_1_class_options(MachineClass *mc)
- {
-+    SpaprMachineClass *smc = SPAPR_MACHINE_CLASS(mc);
-     static GlobalProperty compat[] = {
-         /* Only allow 4kiB and 64kiB IOMMU pagesizes */
-         { TYPE_SPAPR_PCI_HOST_BRIDGE, "pgsz", "0x11000" },
-     };
- 
-     spapr_machine_4_2_class_options(mc);
-+    smc->linux_pci_probe = false;
-     compat_props_add(mc->compat_props, compat, G_N_ELEMENTS(compat));
- }
- 
--- 
-2.17.1
-
+bnVsbA==
+--------------A95E4C3587AFAEBB5B77E302--
 
