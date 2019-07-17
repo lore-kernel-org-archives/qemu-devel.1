@@ -2,66 +2,63 @@ Return-Path: <SRS0=PWhW=VO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5181C76186
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 11:22:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24CF3C76186
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 11:24:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7ECC420880
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 11:22:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7ECC420880
+	by mail.kernel.org (Postfix) with ESMTPS id EFC7F20880
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 11:24:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFC7F20880
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56094 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56102 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hni1S-0006CE-Rm
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 07:22:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42862)
+	id 1hni2x-0007BB-Vk
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 07:24:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43473)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mst@redhat.com>) id 1hni1D-0005Fi-DD
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 07:22:44 -0400
+ (envelope-from <mst@redhat.com>) id 1hni2n-0006mG-Ci
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 07:24:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1hni1C-0001YN-3U
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 07:22:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54756)
+ (envelope-from <mst@redhat.com>) id 1hni2m-0002Ui-Gq
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 07:24:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54940)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>)
- id 1hni1B-0001Xi-Rk; Wed, 17 Jul 2019 07:22:42 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1hni2m-0002UJ-B2
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 07:24:20 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id F02DE81F1B;
- Wed, 17 Jul 2019 11:22:40 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id AAA318553B;
+ Wed, 17 Jul 2019 11:24:19 +0000 (UTC)
 Received: from redhat.com (ovpn-120-247.rdu2.redhat.com [10.10.120.247])
- by smtp.corp.redhat.com (Postfix) with SMTP id 4A3675C26B;
- Wed, 17 Jul 2019 11:22:31 +0000 (UTC)
-Date: Wed, 17 Jul 2019 07:22:30 -0400
+ by smtp.corp.redhat.com (Postfix) with SMTP id 0D6C21001B18;
+ Wed, 17 Jul 2019 11:24:15 +0000 (UTC)
+Date: Wed, 17 Jul 2019 07:24:14 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
-To: David Hildenbrand <david@redhat.com>
-Message-ID: <20190717072053-mutt-send-email-mst@kernel.org>
-References: <20190717084255.17173-1-david@redhat.com>
- <20190717054727-mutt-send-email-mst@kernel.org>
- <5a5d6f86-04f2-4e61-473c-d8a4b0ed5045@redhat.com>
- <5d50ddb0-b1ac-0bd1-6466-6e605b804809@redhat.com>
- <20190717070323-mutt-send-email-mst@kernel.org>
- <737c3d80-b9e1-6280-a6e6-f7aee139a3b9@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <20190717072246-mutt-send-email-mst@kernel.org>
+References: <20190624090200.5383-1-imammedo@redhat.com>
+ <20190717063733-mutt-send-email-mst@kernel.org>
+ <e9f59e59-e436-ee83-a04a-9408494fb4e3@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <737c3d80-b9e1-6280-a6e6-f7aee139a3b9@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <e9f59e59-e436-ee83-a04a-9408494fb4e3@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.25]); Wed, 17 Jul 2019 11:22:41 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.28]); Wed, 17 Jul 2019 11:24:19 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH-for-4.1] virtio-balloon: fix QEMU crashes
- on pagesize > BALLOON_PAGE_SIZE
+Subject: Re: [Qemu-devel] [PATCH v2] pc: fix possible NULL pointer
+ dereference in pc_machine_get_device_memory_region_size()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,122 +70,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Igor Mammedov <imammedo@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org,
- Stefan Hajnoczi <stefanha@redhat.com>, qemu-stable@nongnu.org
+Cc: Igor Mammedov <imammedo@redhat.com>, rth@twiddle.net, qemu-devel@nongnu.org,
+ armbru@redhat.com, ehabkost@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jul 17, 2019 at 01:10:21PM +0200, David Hildenbrand wrote:
-> On 17.07.19 13:06, Michael S. Tsirkin wrote:
-> > On Wed, Jul 17, 2019 at 12:17:57PM +0200, David Hildenbrand wrote:
-> >> On 17.07.19 12:04, David Hildenbrand wrote:
-> >>> On 17.07.19 11:57, Michael S. Tsirkin wrote:
-> >>>> On Wed, Jul 17, 2019 at 10:42:55AM +0200, David Hildenbrand wrote:
-> >>>>> We are using the wrong functions to set/clear bits, effectively touching
-> >>>>> multiple bits, writing out of range of the bitmap, resulting in memory
-> >>>>> corruptions. We have to use set_bit()/clear_bit() instead.
-> >>>>>
-> >>>>> Can easily be reproduced by starting a qemu guest on hugetlbfs memory,
-> >>>>> inflating the balloon. QEMU crashes. This never could have worked
-> >>>>> properly - especially, also pages would have been discarded when the
-> >>>>> first sub-page would be inflated (the whole bitmap would be set).
-> >>>>>
-> >>>>> While testing I realized, that on hugetlbfs it is pretty much impossible
-> >>>>> to discard a page - the guest just frees the 4k sub-pages in random order
-> >>>>> most of the time. I was only able to discard a hugepage a handful of
-> >>>>> times - so I hope that now works correctly.
-> >>>>>
-> >>>>> Fixes: ed48c59875b6 ("virtio-balloon: Safely handle BALLOON_PAGE_SIZE <
-> >>>>>                      host page size")
-> >>>>> Fixes: b27b32391404 ("virtio-balloon: Fix possible guest memory corruption
-> >>>>>                      with inflates & deflates")
-> >>>>> Cc: qemu-stable@nongnu.org #v4.0.0
-> >>>>> Cc: Stefan Hajnoczi <stefanha@redhat.com>
-> >>>>> Cc: David Gibson <david@gibson.dropbear.id.au>
-> >>>>> Cc: Michael S. Tsirkin <mst@redhat.com>
-> >>>>> Cc: Igor Mammedov <imammedo@redhat.com>
-> >>>>> Signed-off-by: David Hildenbrand <david@redhat.com>
-> >>>>> ---
-> >>>>>  hw/virtio/virtio-balloon.c | 10 ++++------
-> >>>>>  1 file changed, 4 insertions(+), 6 deletions(-)
-> >>>>>
-> >>>>> diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
-> >>>>> index e85d1c0d5c..669067d661 100644
-> >>>>> --- a/hw/virtio/virtio-balloon.c
-> >>>>> +++ b/hw/virtio/virtio-balloon.c
-> >>>>> @@ -94,9 +94,8 @@ static void balloon_inflate_page(VirtIOBalloon *balloon,
-> >>>>>          balloon->pbp->base = host_page_base;
-> >>>>>      }
-> >>>>>  
-> >>>>> -    bitmap_set(balloon->pbp->bitmap,
-> >>>>> -               (ram_offset - balloon->pbp->base) / BALLOON_PAGE_SIZE,
-> >>>>> -               subpages);
-> >>>>> +    set_bit((ram_offset - balloon->pbp->base) / BALLOON_PAGE_SIZE,
-> >>>>> +            balloon->pbp->bitmap);
-> >>>>>  
-> >>>>>      if (bitmap_full(balloon->pbp->bitmap, subpages)) {
-> >>>>>          /* We've accumulated a full host page, we can actually discard
-> >>>>> @@ -140,9 +139,8 @@ static void balloon_deflate_page(VirtIOBalloon *balloon,
-> >>>>>           * for a guest to do this in practice, but handle it anyway,
-> >>>>>           * since getting it wrong could mean discarding memory the
-> >>>>>           * guest is still using. */
-> >>>>> -        bitmap_clear(balloon->pbp->bitmap,
-> >>>>> -                     (ram_offset - balloon->pbp->base) / BALLOON_PAGE_SIZE,
-> >>>>> -                     subpages);
-> >>>>> +        clear_bit((ram_offset - balloon->pbp->base) / BALLOON_PAGE_SIZE,
-> >>>>> +                  balloon->pbp->bitmap);
-> >>>>>  
-> >>>>>          if (bitmap_empty(balloon->pbp->bitmap, subpages)) {
-> >>>>>              g_free(balloon->pbp);
-> >>>>
-> >>>> I also started to wonder about this:
-> >>>>
-> >>>>     if (!balloon->pbp) {
-> >>>>         /* Starting on a new host page */
-> >>>>         size_t bitlen = BITS_TO_LONGS(subpages) * sizeof(unsigned long);
-> >>>>         balloon->pbp = g_malloc0(sizeof(PartiallyBalloonedPage) + bitlen);
-> >>>>         balloon->pbp->rb = rb;
-> >>>>         balloon->pbp->base = host_page_base;
-> >>>>     }
-> >>>>
-> >>>> Is keeping a pointer to a ram block like this safe? what if the ramblock
-> >>>> gets removed?
-> >>>>
-> >>>
-> >>> David added
-> >>>
-> >>> if (balloon->pbp
-> >>>     && (rb != balloon->pbp->rb ) ...
-> >>>
-> >>> So in case the rb changes (IOW replaced - delete old one, new one
-> >>> added), we reset the data.
-> >>>
-> >>> After a ram block was deleted, there will be no more deflation requests
-> >>> coming in for it. This should be fine I guess.
+On Wed, Jul 17, 2019 at 01:22:27PM +0200, Paolo Bonzini wrote:
+> On 17/07/19 12:37, Michael S. Tsirkin wrote:
+> > On Mon, Jun 24, 2019 at 05:02:00AM -0400, Igor Mammedov wrote:
+> >> QEMU will crash when device-memory-region-size property is read if ms->device_memory
+> >> wasn't initialized yet.
+> >>
+> >> Crash can be reproduced with:
+> >>  $QEMU -preconfig -qmp unix:qmp_socket,server,nowait &
+> >>  ./scripts/qmp/qom-get -s qmp_socket /machine.device-memory-region-size
+> >>
+> >> Instead of crashing return 0 if ms->device_memory hasn't been initialized.
+> >>
+> >> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 > > 
-> > I think it might happen that an old dangling pointer happens
-> > to match a newly allocated one.
-> > I think we really should just cache all data we want to take into account
-> > and compare that.
+> > queued, thanks!
 > 
-> That's true. I think just remembering and comparing the GPA base address
-> would be sufficient.
-
-Well we need to know the bitmap size allocated, too.
-And I guess when we are ready to free we should
-re-check it just in case.
-
-> However, I don't consider this here to trigger easily. We would need
-> some crazy memory unplug+replug going on while using the balloon. So I
-> assume we can just rework this part after 4.1
-
-Dangling pointers are just a recipe for CVEs. I'd rather rework it now.
-
-> -- 
+> This is already commit 58164eaff530a1e804f5710936dd37518ab5a90e.
 > 
-> Thanks,
-> 
-> David / dhildenb
+> Paolo
+
+In fact yes, git am just silently ignores a patch.
+Donnu why did it not get dropped from the review inbox, weird.
+
+Thanks!
+
+-- 
+MST
 
