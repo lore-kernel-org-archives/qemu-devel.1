@@ -2,95 +2,74 @@ Return-Path: <SRS0=PWhW=VO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0283CC76186
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 09:50:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 562E7C76186
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 09:55:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CCB6A20880
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 09:50:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CCB6A20880
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2A67120818
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 09:55:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A67120818
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55474 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55502 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnga3-0008PC-M3
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 05:50:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43046)
+	id 1hngfB-0003DH-EB
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 05:55:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44426)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hngZq-0007qn-5R
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 05:50:23 -0400
+ (envelope-from <bounces@canonical.com>) id 1hngez-0002mm-O6
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 05:55:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hngZo-0006Gg-UC
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 05:50:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40654)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hngZm-0006D2-3Q; Wed, 17 Jul 2019 05:50:18 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id BB203307D91E;
- Wed, 17 Jul 2019 09:50:16 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.40.205.16])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E0F1C608A6;
- Wed, 17 Jul 2019 09:50:11 +0000 (UTC)
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-References: <20190716000117.25219-1-jsnow@redhat.com>
- <20190716000117.25219-12-jsnow@redhat.com>
- <9cf9c85d-c41e-123c-07cb-81c453363aea@redhat.com>
- <91af10c4-e4ff-df49-d1e9-31ea210fc637@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <0f773100-ecba-2d2a-8526-9fe980c6830a@redhat.com>
-Date: Wed, 17 Jul 2019 11:50:09 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+ (envelope-from <bounces@canonical.com>) id 1hngex-0001Ah-Uu
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 05:55:41 -0400
+Received: from indium.canonical.com ([91.189.90.7]:52686)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1hngex-00019j-OT
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 05:55:39 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1hngeu-0007UT-O6
+ for <qemu-devel@nongnu.org>; Wed, 17 Jul 2019 09:55:36 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 8C87D2E80CC
+ for <qemu-devel@nongnu.org>; Wed, 17 Jul 2019 09:55:36 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <91af10c4-e4ff-df49-d1e9-31ea210fc637@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="NEVl8ziVwRmU0CO05KAvrWFSNI8U9EXWQ"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.48]); Wed, 17 Jul 2019 09:50:16 +0000 (UTC)
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 17 Jul 2019 09:41:16 -0000
+From: =?utf-8?q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Tags: linux-user ppc
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: ajbennee alex-bennee pmaydell scherft
+X-Launchpad-Bug-Reporter: Daan Scherft (scherft)
+X-Launchpad-Bug-Modifier: =?utf-8?q?Alex_Benn=C3=A9e_=28ajbennee=29?=
+References: <156318593102.28533.3075291509963886255.malonedeb@chaenomeles.canonical.com>
+Message-Id: <878ssxuhfn.fsf@zen.linaroharston>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="19009";
+ Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: d29e339a838ad56ecc8d502df2727fd036433b5a
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 11/11] iotests/257: test traditional
- sync modes
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1836558] Re: [RFC PATCH for 4.1?] target/ppc:
+ move opcode decode tables to PowerPCCPU
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -99,178 +78,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com,
- Markus Armbruster <armbru@redhat.com>
+Reply-To: Bug 1836558 <1836558@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Message-ID: <20190717094116.GDVe-y5qlL0re-bOqn1x-KfL_VGK7wxo5IbAYmjxd78@z>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---NEVl8ziVwRmU0CO05KAvrWFSNI8U9EXWQ
-Content-Type: multipart/mixed; boundary="tO2hyOmUcKGubr40RMYw3g7kuNPGfACgn";
- protected-headers="v1"
-From: Max Reitz <mreitz@redhat.com>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com,
- Markus Armbruster <armbru@redhat.com>
-Message-ID: <0f773100-ecba-2d2a-8526-9fe980c6830a@redhat.com>
-Subject: Re: [PATCH v2 11/11] iotests/257: test traditional sync modes
-References: <20190716000117.25219-1-jsnow@redhat.com>
- <20190716000117.25219-12-jsnow@redhat.com>
- <9cf9c85d-c41e-123c-07cb-81c453363aea@redhat.com>
- <91af10c4-e4ff-df49-d1e9-31ea210fc637@redhat.com>
-In-Reply-To: <91af10c4-e4ff-df49-d1e9-31ea210fc637@redhat.com>
+David Gibson <david@gibson.dropbear.id.au> writes:
 
---tO2hyOmUcKGubr40RMYw3g7kuNPGfACgn
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 16.07.19 18:58, John Snow wrote:
->=20
->=20
-> On 7/16/19 8:04 AM, Max Reitz wrote:
->> On 16.07.19 02:01, John Snow wrote:
->>> Signed-off-by: John Snow <jsnow@redhat.com>
->>> ---
->>>  tests/qemu-iotests/257     |   41 +-
->>>  tests/qemu-iotests/257.out | 3089 ++++++++++++++++++++++++++++++++++=
-++
->>>  2 files changed, 3128 insertions(+), 2 deletions(-)
+> On Tue, Jul 16, 2019 at 01:13:52PM +0100, Alex Benn=C3=A9e wrote:
+>> The opcode decode tables aren't really part of the CPUPPCState but an
+>> internal implementation detail for the translator. This can cause
+>> problems with memcpy in cpu_copy as any table created during
+>> ppc_cpu_realize get written over causing a memory leak. To avoid this
+>> move the tables into PowerPCCPU which is better suited to hold
+>> internal implementation details.
 >>
->> This needs a %s/specify Bitmap sync mode/specify bitmap sync mode/.
->>
->>> diff --git a/tests/qemu-iotests/257 b/tests/qemu-iotests/257
->>> index 53ab31c92e..c2a72c577a 100755
->>> --- a/tests/qemu-iotests/257
->>> +++ b/tests/qemu-iotests/257
->>
->> [...]
->>
->>> @@ -393,7 +399,7 @@ def test_bitmap_sync(bsync_mode, msync_mode=3D'bi=
-tmap', failure=3DNone):
->>>              # group 1 gets cleared first, then group two gets writte=
-n.
->>>              if ((bsync_mode =3D=3D 'on-success' and not failure) or
->>>                  (bsync_mode =3D=3D 'always')):
->>> -                ebitmap.clear_group(1)
->>> +                ebitmap.clear()
->>
->> Hmmm...  Why?
->>
->=20
-> From an order of operations standpoint, if we are here, we are expectin=
-g
-> the bitmap to be synchronized. We can clear any existing data it holds,=
+>> Attempts to fix: https://bugs.launchpad.net/qemu/+bug/1836558
+>> Cc: 1836558@bugs.launchpad.net
+>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>
+> I've applied this now to ppc-for-4.2.  If there's an argument for
+> including it in 4.1 during hard freeze, you'll need to spell it out
+> for me.
 
-> and then:
->=20
->>>              ebitmap.dirty_group(2)
->>> =20
->=20
-> Add new writes that occurred during the job; which only happen here in
-> this callback.
->=20
-> (The old code cleared specifically only group 1, the new code is just
-> more general. I wound up changing it for a version that didn't make it
-> to the list, but this is still correct.)
->=20
->>>          vm.run_job(job, auto_dismiss=3DTrue, auto_finalize=3DFalse,
->>> @@ -404,8 +410,19 @@ def test_bitmap_sync(bsync_mode, msync_mode=3D'b=
-itmap', failure=3DNone):
->>>          log('')
->>> =20
->>>          if bsync_mode =3D=3D 'always' and failure =3D=3D 'intermedia=
-te':
->>> +            # TOP treats anything allocated as dirty, expect to see:=
+Well without:
 
->>> +            if msync_mode =3D=3D 'top':
->>> +                ebitmap.dirty_group(0)
->>> +
->=20
-> Sorry, this code is definitely in the "cute" category...
->=20
-> If the failure was intermediate, we never call the pre-finalize callbac=
-k
-> above. So we know that the allocated regions of the file are only from
-> groups 0 and 1.
->=20
-> So, HERE, we can mark the emulated bitmap's group 0 as dirty, to mimic
-> what the copy_bitmap is going to have started the operation with.
->=20
->>>              # We manage to copy one sector (one bit) before the erro=
-r.
->>>              ebitmap.clear_bit(ebitmap.first_bit)
->=20
-> And then right here, we clear the first bit which we did copy out
-> successfully. The emulated bitmap is now correct for sync=3Dtop.
->=20
->>> +
->>> +            # Full returns all bits set except what was copied/skipp=
-ed
->>> +            if msync_mode =3D=3D 'full':
->>> +                fail_bit =3D ebitmap.first_bit
->>> +                ebitmap.clear()
->>> +                ebitmap.dirty_bits(range(fail_bit, SIZE // GRANULARI=
-TY))
->>> +
->=20
-> The full mode, though, is special. We cleared the first allocated bit
-> just like for sync=3Dtop, but we take note of the second bit which is t=
-he
-> one that caused the injected failure.
->=20
-> For both 'top' and 'full' modes here we're really using the ebitmap as
-> an allocation record to inform what the output bitmap is going to look =
-like.
->=20
->>
->> So sync=3Dtop didn=E2=80=98t copy anything?  Is that because it now er=
-rors out
->> before getting to copy something?
->>
->=20
-> The ebitmap.clear_bit(ebitmap.first_bit) triggers for top, too. The tes=
-t
-> output should hopefully make sense here.
+  Subject: [RFC PATCH for 4.1] linux-user: unparent CPU object before unref
+  Date: Tue, 16 Jul 2019 15:01:33 +0100
+  Message-Id: <20190716140133.8578-1-alex.bennee@linaro.org>
 
-I...   I have no idea how I missed the ebitmap.clear_bit().
+it doesn't matter as we never attempt to free the memory once a thread
+is destroyed. This causes all linux-user guests that create and destroy
+threads quickly to slowly leak memory. However due to the dynamic opcode
+table ppc/ppc64-linux-user guests leak a lot faster than most, in the
+order of ~50k each time a thread is created and destroyed.
 
-So with the test output fixed:
+However I'm happy to defer to you as the maintainer :-)
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+--
+Alex Benn=C3=A9e
 
->> (The rest looks good to me.)
->>
->> Max
->>
->>>          ebitmap.compare(get_bitmap(bitmaps, drive0.device, 'bitmap0'=
-))
->>> =20
->>>          # 2 - Writes and Reference Backup
->>
->=20
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1836558
+
+Title:
+  Qemu-ppc Memory leak creating threads
+
+Status in QEMU:
+  Confirmed
+
+Bug description:
+  When creating c++ threads (with c++ std::thread), the resulting binary
+  has memory leaks when running with qemu-ppc.
+
+  Eg the following c++ program, when compiled with gcc, consumes more
+  and more memory while running at qemu-ppc. (does not have memory leaks
+  when compiling for Intel, when running same binary on real powerpc CPU
+  hardware also no memory leaks).
+
+  (Note I used function getCurrentRSS to show available memory, see
+  https://stackoverflow.com/questions/669438/how-to-get-memory-usage-at-
+  runtime-using-c; calls commented out here)
+
+  Compiler: powerpc-linux-gnu-g++ (Debian 8.3.0-2) 8.3.0 (but same problem =
+with older g++ compilers even 4.9)
+  Os: Debian 10.0 ( Buster) (but same problem seen on Debian 9/stetch)
+  qemu: qemu-ppc version 3.1.50
 
 
+  ---
 
---tO2hyOmUcKGubr40RMYw3g7kuNPGfACgn--
+  #include <iostream>
+  #include <thread>
+  #include <chrono>
 
---NEVl8ziVwRmU0CO05KAvrWFSNI8U9EXWQ
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+  =
 
------BEGIN PGP SIGNATURE-----
+  using namespace std::chrono_literals;
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0u71EACgkQ9AfbAGHV
-z0CPIAf/SZpGGK6h7+okxPu7BHFtM8QjFB+LgKaFqwjsR2A+8kAMfSLZ0ZOrR1mb
-8NjfOPjSdXBlyA9yqom1xuZaDzGE7SRIZrd7O2WppkK9hbpN/cNlbVXxakIsGCwy
-ZpBzwfpNZPXJNZd6dNodVfgPP+icf9HKVaxhwQmdH9n3aKN30Ks3TagetSwRxvAd
-YuhHtKx/enrSoRUz17C+sknLG/NfRWeSQ9hrNKLQKzIv/vXnShPAV/vs3rghcwpE
-49VJZtVBESJuy4nMo4YQ4WOxjCCoHYEV9mSURv+fSOJjfUFEo8l6hDbLBdFdd8L6
-1obzQ6tGKexCTKxeyWz/Gk/JOWM+HQ==
-=LbHy
------END PGP SIGNATURE-----
+  // Create/run and join a 100 threads.
+  void Fun100()
+  {
+  //    auto b4 =3D getCurrentRSS();
+  //    std::cout << getCurrentRSS() << std::endl;
+      for(int n =3D 0; n < 100; n++)
+      {
+          std::thread t([]
+          {
+              std::this_thread::sleep_for( 10ms );
+          });
+  //        std::cout << n << ' ' << getCurrentRSS() << std::endl;
+          t.join();
+      }
+      std::this_thread::sleep_for( 500ms ); // to give OS some time to wipe=
+ memory...
+  //    auto after =3D getCurrentRSS();
+      std::cout << b4 << ' ' << after << std::endl;
+  }
 
---NEVl8ziVwRmU0CO05KAvrWFSNI8U9EXWQ--
+  =
+
+  int main(int, char **)
+  {
+      Fun100();
+      Fun100();  // memory used keeps increasing
+  }
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1836558/+subscriptions
 
