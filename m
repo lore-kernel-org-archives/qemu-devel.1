@@ -6,69 +6,68 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DCD6C76192
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 08:20:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69DF2C76192
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 08:20:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 330B62077C
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 08:20:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 330B62077C
+	by mail.kernel.org (Postfix) with ESMTPS id 41C7F2077C
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 08:20:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 41C7F2077C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54928 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54942 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnfAl-0002pD-Cd
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 04:20:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42584)
+	id 1hnfBE-0003vy-I1
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 04:20:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42835)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <sbhat@linux.ibm.com>) id 1hnfAX-000263-Ao
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 04:20:10 -0400
+ (envelope-from <sbhat@linux.ibm.com>) id 1hnfB3-0003My-Kq
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 04:20:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <sbhat@linux.ibm.com>) id 1hnfAW-0003Cd-AP
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 04:20:09 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:3480
- helo=mx0a-001b2d01.pphosted.com)
+ (envelope-from <sbhat@linux.ibm.com>) id 1hnfB2-0003kN-Hm
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 04:20:41 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57878)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <sbhat@linux.ibm.com>) id 1hnfAW-0003CJ-2h
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 04:20:08 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x6H8JBdV021094
- for <qemu-devel@nongnu.org>; Wed, 17 Jul 2019 04:20:07 -0400
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2tswb5fn5m-1
+ (Exim 4.71) (envelope-from <sbhat@linux.ibm.com>) id 1hnfB2-0003hm-6C
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 04:20:40 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ x6H8IEV4106049
+ for <qemu-devel@nongnu.org>; Wed, 17 Jul 2019 04:20:39 -0400
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2tsyrr8kpt-1
  (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Wed, 17 Jul 2019 04:20:07 -0400
+ for <qemu-devel@nongnu.org>; Wed, 17 Jul 2019 04:20:38 -0400
 Received: from localhost
- by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
  Violators will be prosecuted
  for <qemu-devel@nongnu.org> from <sbhat@linux.ibm.com>;
- Wed, 17 Jul 2019 09:20:05 +0100
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
- by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway:
+ Wed, 17 Jul 2019 09:20:36 +0100
+Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
+ by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway:
  Authorized Use Only! Violators will be prosecuted; 
  (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Wed, 17 Jul 2019 09:20:03 +0100
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com
- [9.149.105.61])
- by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- x6H8K2W654067394
+ Wed, 17 Jul 2019 09:20:34 +0100
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com
+ (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+ by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
+ id x6H8KJYr40567106
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 17 Jul 2019 08:20:02 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 7877511C058;
- Wed, 17 Jul 2019 08:20:02 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id EB77D11C06C;
- Wed, 17 Jul 2019 08:20:01 +0000 (GMT)
+ Wed, 17 Jul 2019 08:20:19 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 0E2C4A405C;
+ Wed, 17 Jul 2019 08:20:33 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 80511A405B;
+ Wed, 17 Jul 2019 08:20:32 +0000 (GMT)
 Received: from lep8c.aus.stglabs.ibm.com (unknown [9.40.192.207])
- by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Wed, 17 Jul 2019 08:20:01 +0000 (GMT)
+ by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Wed, 17 Jul 2019 08:20:32 +0000 (GMT)
 From: Shivaprasad G Bhat <sbhat@linux.ibm.com>
 To: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
-Date: Wed, 17 Jul 2019 03:20:01 -0500
+Date: Wed, 17 Jul 2019 03:20:31 -0500
 In-Reply-To: <156335150620.82682.9535735857478533420.stgit@lep8c.aus.stglabs.ibm.com>
 References: <156335150620.82682.9535735857478533420.stgit@lep8c.aus.stglabs.ibm.com>
 User-Agent: StGit/0.17.1-dirty
@@ -76,10 +75,10 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-x-cbid: 19071708-4275-0000-0000-0000034E0516
+x-cbid: 19071708-0020-0000-0000-000003549E6A
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19071708-4276-0000-0000-0000385E19A4
-Message-Id: <156335159028.82682.5404622104535818162.stgit@lep8c.aus.stglabs.ibm.com>
+x-cbparentid: 19071708-0021-0000-0000-000021A86F0E
+Message-Id: <156335160761.82682.11912058325777251614.stgit@lep8c.aus.stglabs.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
  definitions=2019-07-17_02:, , signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
@@ -89,8 +88,9 @@ X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
  mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
  scancount=1 engine=8.0.1-1810050000 definitions=main-1907170099
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
-Subject: [Qemu-devel] [PATCH v2 2/4] ppc: fix memory leak in spapr_dt_drc()
+X-Received-From: 148.163.156.1
+Subject: [Qemu-devel] [PATCH v2 3/4] ppc: fix leak in
+ h_client_architecture_support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,48 +107,32 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Leaking the drc_name while preparing the DT properties.
-Fixing that.
-
-Also, remove the const qualifier from spapr_drc_name().
+Free all SpaprOptionVector local pointers after use.
 
 Signed-off-by: Shivaprasad G Bhat <sbhat@linux.ibm.com>
 ---
- hw/ppc/spapr_drc.c |    7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ hw/ppc/spapr_hcall.c |    2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
-index bacadfcac5..695a0b2285 100644
---- a/hw/ppc/spapr_drc.c
-+++ b/hw/ppc/spapr_drc.c
-@@ -226,7 +226,7 @@ static uint32_t drc_set_unusable(SpaprDrc *drc)
-     return RTAS_OUT_SUCCESS;
- }
- 
--static const char *spapr_drc_name(SpaprDrc *drc)
-+static char *spapr_drc_name(SpaprDrc *drc)
- {
-     SpaprDrcClass *drck = SPAPR_DR_CONNECTOR_GET_CLASS(drc);
- 
-@@ -827,6 +827,7 @@ int spapr_dt_drc(void *fdt, int offset, Object *owner, uint32_t drc_type_mask)
-         Object *obj;
-         SpaprDrc *drc;
-         SpaprDrcClass *drck;
-+        char *drc_name = NULL;
-         uint32_t drc_index, drc_power_domain;
- 
-         if (!strstart(prop->type, "link<", NULL)) {
-@@ -856,8 +857,10 @@ int spapr_dt_drc(void *fdt, int offset, Object *owner, uint32_t drc_type_mask)
-         g_array_append_val(drc_power_domains, drc_power_domain);
- 
-         /* ibm,drc-names */
--        drc_names = g_string_append(drc_names, spapr_drc_name(drc));
-+        drc_name = spapr_drc_name(drc);
-+        drc_names = g_string_append(drc_names, drc_name);
-         drc_names = g_string_insert_len(drc_names, -1, "\0", 1);
-+        g_free(drc_name);
- 
-         /* ibm,drc-types */
-         drc_types = g_string_append(drc_types, drck->typename);
+diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+index 6808d4cda8..71cfe7c41d 100644
+--- a/hw/ppc/spapr_hcall.c
++++ b/hw/ppc/spapr_hcall.c
+@@ -1612,6 +1612,7 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
+     ov5_updates = spapr_ovec_new();
+     spapr->cas_reboot = spapr_ovec_diff(ov5_updates,
+                                         ov5_cas_old, spapr->ov5_cas);
++    spapr_ovec_cleanup(ov5_cas_old);
+     /* Now that processing is finished, set the radix/hash bit for the
+      * guest if it requested a valid mode; otherwise terminate the boot. */
+     if (guest_radix) {
+@@ -1629,6 +1630,7 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
+     }
+     spapr->cas_legacy_guest_workaround = !spapr_ovec_test(ov1_guest,
+                                                           OV1_PPC_3_00);
++    spapr_ovec_cleanup(ov1_guest);
+     if (!spapr->cas_reboot) {
+         /* If spapr_machine_reset() did not set up a HPT but one is necessary
+          * (because the guest isn't going to use radix) then set it up here. */
 
 
