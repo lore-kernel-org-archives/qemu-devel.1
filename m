@@ -2,80 +2,116 @@ Return-Path: <SRS0=PWhW=VO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98E1AC76186
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 14:00:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0B39C76186
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 14:04:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6827A208C0
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 14:00:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6827A208C0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8D37B2173B
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 14:04:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N4T1bnCr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D37B2173B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=twiddle.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57532 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57590 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnkTs-0001ky-II
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 10:00:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60071)
+	id 1hnkXt-0004BG-I0
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 10:04:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33163)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hnkTf-0001IL-EE
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 10:00:16 -0400
+ (envelope-from <rth7680@gmail.com>) id 1hnkXg-0003dO-8Q
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 10:04:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hnkTa-0007AU-0q
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 10:00:15 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:37072)
+ (envelope-from <rth7680@gmail.com>) id 1hnkXf-0004MY-8p
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 10:04:24 -0400
+Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:43160)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hnkTZ-00076b-QS
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 10:00:09 -0400
-Received: by mail-wm1-f65.google.com with SMTP id f17so22276240wme.2
- for <qemu-devel@nongnu.org>; Wed, 17 Jul 2019 07:00:09 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ (Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1hnkXf-0004Ld-1m
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 10:04:23 -0400
+Received: by mail-pl1-x643.google.com with SMTP id 4so5069262pld.10
+ for <qemu-devel@nongnu.org>; Wed, 17 Jul 2019 07:04:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:openpgp:autocrypt:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=anIiPly3Laa6zJaJDv5DB+OM70pYOQJzvDrDXM9w8to=;
- b=LPHrNI2/+DppfazxQp3L8s0xbqzLdPR3KdeW4mPzYoMY5vsT4P2tAKYCorrvQqIDDx
- AMuEekT09AVhf/iN58fu5eRUSvTjMTszBCukfK2UUMeRJp/1tpqWCWTjeTWQStt6Runq
- mE/oPMlznaeqy7hF+WMs6z+Ycy7L4HYx+TtXsm8jzVD8UZvyZVeP5DGEPE20l4pq77s1
- yyd48Gk1vOLiLbn+KTxBnKSjP69tafXTzO4so0VN8mKYLJ/Yv9GbHXmmsv+6Jz4Lqzw+
- ropR1iTAYkykr8F23DWJrtwLi5kt65CaQc3ld6w7zrI1A16sCXOtz2UqmffAkK/ZXVDz
- j6dQ==
-X-Gm-Message-State: APjAAAVCTr/3Ycayx9kZiB9d9+DVdYjONJY1RBRgYPls2BGuD5AnoANm
- AfXUuyKsnmy2/A2cO2/EHCFqHw==
-X-Google-Smtp-Source: APXvYqye6TK8bjyVSdutQSj7zHggCBy4T8YXwsASRdCLeYNUX9EcPdJimPwxBoQeX0EZyU7DE1gLrA==
-X-Received: by 2002:a1c:720e:: with SMTP id n14mr36789635wmc.53.1563372008697; 
- Wed, 17 Jul 2019 07:00:08 -0700 (PDT)
-Received: from [10.32.224.209] (red-hat-inc.vlan560.asr1.mad1.gblx.net.
- [159.63.51.90])
- by smtp.gmail.com with ESMTPSA id w67sm27299046wma.24.2019.07.17.07.00.07
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Wed, 17 Jul 2019 07:00:08 -0700 (PDT)
-To: Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org
-References: <20190716221555.11145-1-philmd@redhat.com>
- <7f45fc26-4063-5b8d-d103-a0ac6e873bef@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <2c58bae8-7a9c-4827-109f-741dc8461a2b@redhat.com>
-Date: Wed, 17 Jul 2019 16:00:06 +0200
+ bh=OL5ngl/Sv6DdhHBujaTDK24WU3xlyry3KhV2DP43ni4=;
+ b=N4T1bnCrppnsi7nAWMTjlfCCXzebf7XPteiCGMkifWa2O5t5v+5fp2nQJU/rXOSxfh
+ wr/MeEDDTp+Sjvr4cTN494y6jxQYP+x1PrQH+Oy7BnhLerz5oDpgZkhd/nVGBCyZxaTv
+ eWWCk9DmdnfB1j0u4l+ZRxzWeT3BgOxJhEpV/1qWT5uR9Xb1TNKJNNcFAy4XZfYnWJsJ
+ HLGoyj4KybdjFX3cmnRAN0Q97btOIOYS6qaZB7YjcsGMfuTCj2bmusjHl2eYCAMMZRjO
+ gNd163I/m4fBdh937OlfW7eqUqqp00u6BU/Td6HsIl5GN7YuzRJX6k2uX6lSCFc4X0Wf
+ yYzQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:openpgp
+ :autocrypt:message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=OL5ngl/Sv6DdhHBujaTDK24WU3xlyry3KhV2DP43ni4=;
+ b=Trck6pmH0oHcnv6X4FD6hP80Ie4han/Tqq5wiq91dxlbfp4VylkSfUTOptqYRctGov
+ 22t2BUCEzuplKWoXToxF1uCXtp+oBwPCJFSG/xJkaHsKc3VfukfXOLuYUejU6R5Hw9F3
+ bTmNIj3aInf6DfU7g2Q85++k4S8u5dHiMdDTPJ/QohdYjCCZiq/vuCIrrAS77zBqd/zT
+ wRlTBKcD2RzTH/YdcGuYYLuTQvdtmARaaLpIloHB/NL6WLZtipdEfM3+sZwHkYtPhlF4
+ wj5fh2Qr8gCaeiPuCybblhq/ggqbGFheRcMwxsWIM/bpC7BYR4tnPYKqQ/g/xoJtVqcm
+ 36Tw==
+X-Gm-Message-State: APjAAAUNFhj/oSoni4uj1t3b/M4c17NEa/yOoNnvFkxtcC40XDL4HPUN
+ zoCyDCh4qp2X2J8Cv8NpkTU=
+X-Google-Smtp-Source: APXvYqzatpkRZNv6roaPtSr73L8JXKV7MkSDhjOV3bxuHBy/IPiHzc+GhotjbrKhP3iHTIf+24uYGw==
+X-Received: by 2002:a17:902:124:: with SMTP id
+ 33mr44289240plb.145.1563372260938; 
+ Wed, 17 Jul 2019 07:04:20 -0700 (PDT)
+Received: from [192.168.1.11] (97-113-176-6.tukw.qwest.net. [97.113.176.6])
+ by smtp.googlemail.com with ESMTPSA id a15sm18723314pgw.3.2019.07.17.07.04.18
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Wed, 17 Jul 2019 07:04:19 -0700 (PDT)
+To: tony.nguyen@bt.com, qemu-devel@nongnu.org
+References: <a5f7f8854af046c18c6342035662a193@tpw09926dag18e.domain1.systemhost.net>
+ <1563343465306.78816@bt.com>
+From: Richard Henderson <rth@twiddle.net>
+Openpgp: preference=signencrypt
+Autocrypt: addr=rth@twiddle.net; prefer-encrypt=mutual; keydata=
+ mQENBFGuLC8BCADcAoWcnW9lTsDMzbO3MBU+KbiGaj5JPatEUscRDkQYM2fyNjJp2tIWDK5a
+ n4yngeXB3eX61WbYR3QraRK8mlYLGxyAdHMEQfPipbqf3TmN043fssT2bc82ApJcs1zvLYgI
+ rhMht7Dck7A0wNC1jo+ZjVVFig5gDTN7gOzaAdBtV8tVNUddwkLzzaGpfihhSD6U46NdqKOG
+ Wlnn6TrkMy0QGdQ5NaXHkRlUjnnUTSW/nKfoxD+EI+A9V4sYOd8mc/TL4aJh/i/AiU57eLbo
+ n17uQI6/VTWDUWl8USiz4x9c8vmqlywLx00tAFxxoRWqk4KVJlj+Sh0up/D/sJ+vPpgBABEB
+ AAG0I1JpY2hhcmQgSGVuZGVyc29uIDxydGhAdHdpZGRsZS5uZXQ+iQFBBBMBAgArAhsDBgsJ
+ CAcDAgYVCAIJCgsEFgIDAQIeAQIXgAUJC7UHogUCWaDNVgIZAQAKCRCtEnDMTdAnm9N5CADO
+ cB8F/SudJ72IupxQf40hbJdBK176+gb3sHMsixyLtrU59lee+lIM1OZmlNjsnCYmiSnbA5ks
+ Q7p0HfO7DgdmfLzcK6xsHZukqSZy5LByw348Y913ZyjOrJZFdPP7kDg1MnqRqH4+3ZdzxV4y
+ eYBWFU9GYMIF06JbUubossOOO4ArNVZbnIPu8Vn2tDZVVqsCBqkoCSBMj519xrvyOu5z4mHS
+ LkCglXmVDOXMbqLuNAC3rfNXSnyM4hYkLUyfALJlAAy1Ro+jUqYhu7XUFV/MiwRuFMh5GbtY
+ Urkx7tqsWQXLT3GeDk/LqvpWJQwk4cHHckYjRih+70CHIenm81PVuQENBFGuLC8BCACyEx3x
+ 94HIkTX0CHu2sA0w75+h9wuoA8ggJ7+S4ri0y2YsijWad5TTt6z6MMiqxk9kSA5bppaj4HXh
+ 86hBF/dWCtMpNr3Rb8FNOKyeA/qkYHVD6HiAiw9c6D8Dr9hWmOk3/HSmGrNURxeUFOckDXsv
+ I+yGGKBNshj59j7QZr7ZiuIi2rWlBL8dFN/OWa/o3x7HKsE4k6K8ngwvCKP/QbDLwLLBOWH+
+ VEUtpyeyxTr3OJ47ECTxdYvXoAV2iJaKr+6doVQiiR5eVFiMYrUPUECJeolOCwqc/JlWE18L
+ +PCAFaW1H+/mpPVfSpN4wnkJ5cQiQVB41IaCM4p20iRzx7ZJABEBAAGJASUEGAECAA8CGwwF
+ AlmgzYEFCQu1CEoACgkQrRJwzE3QJ5s7rggAwABzDAGrZ6uWsMxg5PeiiAYPy6LBnCBJSpB5
+ Tfy5jH8QTmLfXW+u4Ib4sWXG7PYNR7sIrtqUHjRqXLVXrSnBX9ASGcYw/Xil45khW6LsRpO1
+ prHv9gkwQfa6fTiWXVfSfm2Nant6u02q+MaYtQpCVTiz/9ki4FfftUwUHFLU0MhIQogjd11y
+ /E08RJsqBwaHQdt14PwU1HphDOzSkhOXRXQLSd3ysyeGUXvL+gqQoXl5XYdvk8IId4PoJRo4
+ jcyJ4VbnldvXh5gdGhFA/f9JgkLk9tPW+C3wNtNWyRUq8azR9hF2fg2HJUf4IXQlIu8OOgh1
+ VcROBqvtH3ecaIL9iw==
+Message-ID: <090594bd-9970-3c07-c859-75e43133dee1@twiddle.net>
+Date: Wed, 17 Jul 2019 07:04:17 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <7f45fc26-4063-5b8d-d103-a0ac6e873bef@redhat.com>
+In-Reply-To: <1563343465306.78816@bt.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.128.65
-Subject: Re: [Qemu-devel] [PATCH-for-4.1 v6 0/5] hw/block/pflash_cfi01: Add
- DeviceReset() handler
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::643
+Subject: Re: [Qemu-devel] [PATCH 1/4] tcg: TCGMemOp is now accelerator
+ independent MemOp
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,162 +123,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>,
- Max Reitz <mreitz@redhat.com>, Alistair Francis <alistair.francis@wdc.com>,
- John Snow <jsnow@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+Cc: pbonzini@redhat.com, mark.cave-ayland@ilande.co.uk, atar4qemu@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Laszlo,
+On 7/16/19 11:04 PM, tony.nguyen@bt.com wrote:
+> +    MO_ASHIFT = 4,
+> +    MO_AMASK = 7 << MO_ASHIFT,
+> +#ifdef ALIGNED_ONLY
+> +    MO_ALIGN = 0,
+> +    MO_UNALN = MO_AMASK,
+> +#else
+> +    MO_ALIGN = MO_AMASK,
+> +    MO_UNALN = 0,
+> +#endif
 
-On 7/17/19 2:24 PM, Laszlo Ersek wrote:
-> Hi Phil,
-> 
-> On 07/17/19 00:15, Philippe Mathieu-Daudé wrote:
->> Hello it's me again, insisting with this series because there are at
->> least 2 different report of guests bricked on reset due to the bug
->> fixed by patch #5:
->> https://bugzilla.redhat.com/show_bug.cgi?id=1678713
->> https://bugzilla.redhat.com/show_bug.cgi?id=1704584
->>
->> Patches missing review: 2 and 3
->>
->> The pflash device lacks a reset() function.
->> When a machine is resetted, the flash might be in an
->> inconsistent state, leading to unexpected behavior.
->> Resolve this issue by adding a DeviceReset() handler.
->>
->> Since v1: https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg00962.html
->> - addressed Laszlo review comments
->>
->> Since v2: https://lists.gnu.org/archive/html/qemu-devel/2019-07/msg00395.html
->> - consider migration (Laszlo, Peter)
->>
->> Since v3: https://lists.gnu.org/archive/html/qemu-devel/2019-07/msg01668.html
->> - more reliable migration (Dave)
->> - dropped patches 6-9 not required for next release
->>
->> Since v4: https://lists.gnu.org/archive/html/qemu-devel/2019-07/msg02785.html
->> - document why using READ_ARRAY value 0x00 for migration is safe
->>
->> Since v5: https://lists.gnu.org/archive/html/qemu-devel/2019-07/msg03366.html
->> - avoid trying to be spec-compliant and messing with migration. KISS.
->>   review/test tags reset, sorry.
-> 
-> I have a number of questions / requests.
-> 
-> 
-> (1) The last I recall from the v5 discussion is Markus asking about some
-> risky cases (corner cases?) related to migration.
-> 
-> So what is the new avenue taken in v6? What does "continue ignoring spec
-> compliance" mean, with regard to migration?
-> 
-> My vague understanding is that we're not trying to answer Markus's
-> questions; instead, we're side-stepping them, by doing something else.
+I'm not sure you can move this portion as-is.
 
-I'd love to keep the v5 series and address Markus issues, but as shown
-by the quantity of respins, I don't understand the migration feature
-enough to fix it in time for the next release. I plan to address them
-(and other issues reported by Markus in other reviews) during the next
-dev cycle.
+I think ALIGNED_ONLY needs to be moved out of target/foo/cpu.h into configure,
+as we do with TARGET_WORDS_BIGENDIAN, so that it's always defined early.  Also,
+poison the symbol in include/exec/poison.h.
 
-> That works for me, but can we please summarize in a bit more detail?
-> Like, "in v6, we're not mapping 0x00 vs. 0xff across migration because..."
 
-Since it is very late in the release process and this series intend to
-fix a guest corruption bug worthwhile for release, the approch taken by
-v6 is "try to change the strict minimum regarding to migration, do not
-worry about spec issues". I even tried to make no migration change at
-all, but as explained in patch 6 "Extract pflash_mode_read_array" there
-is still one.
-
-I could make no migration change, and in patch 6 not call
-memory_region_rom_device_set_romd() in pflash_mode_read_array() [and
-call it in other places instead], but then we still have the undefined
-behavior described in the patch. We always lived with this UNDEF, so...
-I could work on a simpler v7.
-
-> Yes, I could inter-diff v5 vs. v6, but I know way too little about
-> pflash. I'd miss how our *dropping* of the special 0xff mapping impacts
-> our conformance to the data sheet.
-
-To reassure you, it never worked well but nobody cared, I noticed while
-converting DPRINTF to trace-events and adding more, then follow the
-model state machine. While it's probably not worth fixing, it makes
-debugging slighly harder when looking at the CFI spec workflow. Now I'm
-used to it.
-
-> I'm not asking for commit message updates, just a bit more explanation
-> in this free-form discussion. (I looked for it under v5, and couldn't
-> find it.)
-
-I tried to be verbose in the patch description, so for reference:
-
-0xff on v5:
-https://lists.gnu.org/archive/html/qemu-devel/2019-07/msg03368.html
-
-not 0xff on v6:
-https://lists.gnu.org/archive/html/qemu-devel/2019-07/msg03931.html
-
-migration impact on v6 [1]:
-https://lists.gnu.org/archive/html/qemu-devel/2019-07/msg03932.html
-
-> (2) Has someone regression-tested v6 for migration specifically?
-
-No, neither were tested the previous versions.
-
-> 
-> Or, is v6 not "risky" wrt. migration any longer?
-
-v6 should be way less risky than previous versions (still one issue
-noted in [1]).
-
-> (3) I'm fine regression testing v6 too (without migration, again).
-> Please ping me separately once the reviews have converged and the series
-> is otherwise ready for merging.
-
-Yes, I know your testing takes very long, so let's wait first.
-
-Thanks for having a look.
-
-Phil.
-
-> 
-> Thanks!
-> Laszlo
-> 
-> 
->> $ git backport-diff -u v5
->> Key:
->> [----] : patches are identical
->> [####] : number of functional differences between upstream/downstream patch
->> [down] : patch is downstream-only
->> The flags [FC] indicate (F)unctional and (C)ontextual differences, respectively
->>
->> 001/5:[----] [-C] 'hw/block/pflash_cfi01: Removed an unused timer'
->> 002/5:[down] 'hw/block/pflash_cfi01: Document use of non-CFI compliant command '0x00''
->> 003/5:[0031] [FC] 'hw/block/pflash_cfi01: Extract pflash_mode_read_array()'
->> 004/5:[down] 'hw/block/pflash_cfi01: Rename 'reset_flash' label as 'mode_read_array''
->> 005/5:[----] [--] 'hw/block/pflash_cfi01: Add the DeviceReset() handler'
->>
->> Regards,
->>
->> Phil.
->>
->> Philippe Mathieu-Daudé (5):
->>   hw/block/pflash_cfi01: Removed an unused timer
->>   hw/block/pflash_cfi01: Document use of non-CFI compliant command
->>     '0x00'
->>   hw/block/pflash_cfi01: Extract pflash_mode_read_array()
->>   hw/block/pflash_cfi01: Rename 'reset_flash' label as 'mode_read_array'
->>   hw/block/pflash_cfi01: Add the DeviceReset() handler
->>
->>  hw/block/pflash_cfi01.c | 77 +++++++++++++++++++++--------------------
->>  hw/block/trace-events   |  1 +
->>  2 files changed, 41 insertions(+), 37 deletions(-)
->>
-> 
+r~
 
