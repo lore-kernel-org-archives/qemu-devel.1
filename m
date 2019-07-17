@@ -2,74 +2,94 @@ Return-Path: <SRS0=PWhW=VO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C62EC76186
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 05:50:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5097C76186
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 05:52:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EFA962173E
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 05:50:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFA962173E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 4E80B208C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 05:52:20 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kGknuMyd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E80B208C0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54238 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54248 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hncq3-00032B-7n
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 01:50:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53074)
+	id 1hncrT-0004Ks-5G
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 01:52:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53557)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bounces@canonical.com>) id 1hncps-0002b2-Le
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 01:50:41 -0400
+ (envelope-from <npiggin@gmail.com>) id 1hncrH-0003qo-Of
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 01:52:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1hncpr-0003Zi-Ji
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 01:50:40 -0400
-Received: from indium.canonical.com ([91.189.90.7]:35296)
+ (envelope-from <npiggin@gmail.com>) id 1hncrG-0004SN-OA
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 01:52:07 -0400
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:45057)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1hncpr-0003Z3-AY
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 01:50:39 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1hncpp-0005oY-OX
- for <qemu-devel@nongnu.org>; Wed, 17 Jul 2019 05:50:37 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id B813F2E80BA
- for <qemu-devel@nongnu.org>; Wed, 17 Jul 2019 05:50:37 +0000 (UTC)
+ (Exim 4.71) (envelope-from <npiggin@gmail.com>)
+ id 1hncrG-0004Rf-GH; Wed, 17 Jul 2019 01:52:06 -0400
+Received: by mail-pl1-x644.google.com with SMTP id y8so11341133plr.12;
+ Tue, 16 Jul 2019 22:52:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:subject:to:cc:references:in-reply-to:mime-version
+ :user-agent:message-id:content-transfer-encoding;
+ bh=dyii7OzM9BEAQWAHGWXgY3eBnqGqjuUvvPm9UTOyZUU=;
+ b=kGknuMydzu7b0sYF3N8EWkl50T2ZaW4XURYaAxdDWhxgIxGtB7nBaXk6QBQL60Wjuj
+ GRhPgr//G+gNspvAzgZ5QVlhB44i28+o6gUvuuCtXY6BBcwRMF/kShnFXHaKEs/vPIjN
+ 2XrGkf2iLFkLedbm4rhYVSKYO5nas8Yol1jcEaHCz11Cko6pxZGhWxoGCDD6ti32kR+L
+ 2ZHphgQLRhEpsy+Z5LSovqsLW645FuyNVLrbRvctkAGwgTc66WwdlCqGMUOSeMuCgqOz
+ RM5R/WN1xl/UMGAYMrdpmH17U7E/Q1Hs0+zzbhi4f9gNWASAFQs6ZxpXp4y/r3C+GLNF
+ KmZA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:subject:to:cc:references:in-reply-to
+ :mime-version:user-agent:message-id:content-transfer-encoding;
+ bh=dyii7OzM9BEAQWAHGWXgY3eBnqGqjuUvvPm9UTOyZUU=;
+ b=VwMSDn2qViKTVqq4VRMrZ2eB9rh2jR4MuGnkYza+42OSHd0WHyZYhzpWiBwuyypF3o
+ Ysh9mIicrwESTO8rZJoxWLUR3ozh1Jh7JcsC33XB4sKPI8Eed93xyIsDBrIOvJ+i/QvV
+ lbtoEjhsy1VyUtMHCYJiUztFaYmoI3aij2NDGAnsoE8D8Zyd/s3OvEW1mA6mluA0+8vz
+ n+/udd+tGC3FCfGSZURQXKBP0SOOXiC+OxImwNIJ/0ZAVSKh3W7HKn7piYamtr7OFOHB
+ ZwLP0XYJ63aD3W5WdAr9PEmXEjx+ksxk9d9LuRb6EEyRF+ZiE3PE/Pu0VivfZ8rfaWGp
+ /2Vg==
+X-Gm-Message-State: APjAAAVufvy1B1H9o2sCkaO1W+F0ukn/9XTzdZn797XSiKf4kF6/5Pr0
+ dceAP7efFj4noe+QxA/18go=
+X-Google-Smtp-Source: APXvYqzZ/jRNSGANBqVzekjXbjSQ1O2nj14Mw9KW3i6DFPx+ULE0HvN9MbVwLzFiFQDFmwrMB9blMw==
+X-Received: by 2002:a17:902:8d97:: with SMTP id
+ v23mr39846796plo.157.1563342725023; 
+ Tue, 16 Jul 2019 22:52:05 -0700 (PDT)
+Received: from localhost ([203.220.8.141])
+ by smtp.gmail.com with ESMTPSA id g4sm30254347pfo.93.2019.07.16.22.52.03
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Tue, 16 Jul 2019 22:52:04 -0700 (PDT)
+Date: Wed, 17 Jul 2019 15:51:58 +1000
+From: Nicholas Piggin <npiggin@gmail.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+References: <20190716024726.17864-1-npiggin@gmail.com>
+ <20190716024726.17864-2-npiggin@gmail.com>
+ <20190716073433.GC7525@umbus.fritz.box>
+ <1563269012.r4tmfz9h7z.astroid@bobo.none>
+ <20190717015115.GA9123@umbus.fritz.box>
+In-Reply-To: <20190717015115.GA9123@umbus.fritz.box>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: astroid/0.14.0 (https://github.com/astroidmail/astroid)
+Message-Id: <1563342619.r5pqecq8gt.astroid@bobo.none>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 17 Jul 2019 05:44:18 -0000
-From: Lutz <1836501@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Tags: arm
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: pmaydell skandal
-X-Launchpad-Bug-Reporter: Lutz (skandal)
-X-Launchpad-Bug-Modifier: Lutz (skandal)
-References: <156313770910.15255.7682693906978508241.malonedeb@soybean.canonical.com>
-Message-Id: <156334225841.840.12435363074113321111.malone@gac.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="19009";
- Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: f4162c77086f1bbc2e0c18b86e310c87a6ebf4f1
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1836501] Re: cpu_address_space_init fails with
- assertion
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::644
+Subject: Re: [Qemu-devel] [PATCH v4 1/5] spapr: Implement dispatch counter
+ and prod bit on tcg
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -78,71 +98,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1836501 <1836501@bugs.launchpad.net>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org,
+ =?iso-8859-1?q?C=E9dric?= Le Goater <clg@kaod.org>, Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UPDATE: Kernel page handling seems to be related to the -smp 2
-parameter. Any number > 1 leads to the paging error while omitting the
-parameter lead to a running system (without KVM).
+David Gibson's on July 17, 2019 11:51 am:
+> On Tue, Jul 16, 2019 at 07:27:22PM +1000, Nicholas Piggin wrote:
+>> David Gibson's on July 16, 2019 5:34 pm:
+>> > On Tue, Jul 16, 2019 at 12:47:22PM +1000, Nicholas Piggin wrote:
+>> >> Implement cpu_exec_enter/exit on ppc which calls into new methods of
+>> >> the same name in PPCVirtualHypervisorClass. These are used by spapr
+>> >> to implement these splpar elements, used in subsequent changes.
+>> >>=20
+>> >> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+>> >> ---
+>> >>  hw/ppc/spapr.c                  | 25 +++++++++++++++++++++++++
+>> >>  hw/ppc/spapr_cpu_core.c         |  5 ++++-
+>> >>  hw/ppc/spapr_hcall.c            |  5 -----
+>> >>  include/hw/ppc/spapr.h          |  7 +++++++
+>> >>  include/hw/ppc/spapr_cpu_core.h |  2 ++
+>> >>  target/ppc/cpu.h                |  2 ++
+>> >>  target/ppc/translate_init.inc.c | 25 +++++++++++++++++++++++++
+>> >>  7 files changed, 65 insertions(+), 6 deletions(-)
+>> >=20
+>> > Mostly LGTM.  Please do address the style issues that the bot
+>> > reported.
+>>=20
+>> Will do.
+>>=20
+>> > In addition, do the dispatch_counter and prod values need to be
+>> > migrated?
+>>=20
+>> I was thinking no, it should be just a blip. But could the guest
+>> be reading the dispatch counter in the vpa for some other reason?
+>> There are other (unimplemented) dispatch statistics in there AFAIKS.
+>> Linux doesn't, but others might.
+>=20
+> Right, I guess it's a question of whether a guest would get confused
+> if the dispatch count suddenly resets.
 
--- =
+Linux wouldn't AFAIKS, but...
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1836501
+>> And what about KVM, does any of the VPA data get migrated for=20
+>> KVM guests?
+>=20
+> Well, the stuff that's actually written into the VPA is implicitly
+> migrated, since it's part of guest memory.
 
-Title:
-  cpu_address_space_init fails with assertion
+Yeah I just sent a patch which uses the VPA directly, so it matches
+KVM and should get migrated.
 
-Status in QEMU:
-  Confirmed
-
-Bug description:
-  qemu-system-arm does not start with version >=3D 2.6 and KVM enabled.
-
-    cpu_address_space_init: Assertion `asidx =3D=3D 0 || !kvm_enabled()'
-  failed.
-
-  Hardware is Odroid XU4 with Exynos with 4.9.61+ Tested with Debian
-  Stretch (9) or Buster (10).
-
-  Without KVM it is running fine but slow. I'm operating Debian Jessie
-  with qemu 2.1 for a long time with KVM virtualization working
-  flawlessly. When I upgraded to Stretch I ran into the trouble
-  described before. I tried Debian Stretch and Buster with all Kernels
-  provided by the Board manufacturer (Hardkernel).
-
-  It seems to be related to the feature introduced in Version 2.6:
-  https://wiki.qemu.org/ChangeLog/2.6
-  - Support for a separate EL3 address space
-
-  KVM is enabled, so I assume the adress space index asidx to be causing
-  the assert to fail.
-
-  dmesg | grep -i KVM
-  [    0.741714] kvm [1]: 8-bit VMID
-  [    0.741721] kvm [1]: IDMAP page: 40201000
-  [    0.741729] kvm [1]: HYP VA range: c0000000:ffffffff
-  [    0.742543] kvm [1]: Hyp mode initialized successfully
-  [    0.742600] kvm [1]: vgic-v2@10484000
-  [    0.742924] kvm [1]: vgic interrupt IRQ16
-  [    0.742943] kvm [1]: virtual timer IRQ60
-
-  Full command line is:
-  qemu-system-arm -M vexpress-a15 -smp 2 -m 512 -cpu host -enable-kvm -kern=
-el vmlinuz -initrd initrd.gz -dtb vexpress-v2p-ca15-tc1.dtb -device virtio-=
-blk-device,drive=3Dinst-blk -drive file=3DPATHTOFILE,id=3Dinst-blk,if=3Dnon=
-e,format=3Draw -append "vga=3Dnormal rw console=3DttyAMA0" -nographic
-
-  Is there anything to do to understand, if this is a hardware related
-  failure or probably just a missing parameter?
-
-  Regards
-
-  Lutz
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1836501/+subscriptions
+Thanks,
+Nick
+=
 
