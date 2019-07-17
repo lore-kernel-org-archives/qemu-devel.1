@@ -2,92 +2,91 @@ Return-Path: <SRS0=PWhW=VO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D59BFC76186
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 13:46:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66921C76195
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 13:51:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A1574208C0
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 13:46:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 37937208C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 13:51:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qEff6ZID"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A1574208C0
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="h0TMBYau"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 37937208C0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57375 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57402 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnkGo-0001jS-Q0
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 09:46:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56780)
+	id 1hnkL3-0005lb-Qc
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 09:51:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57773)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hnkGX-0000kK-OA
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 09:46:42 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hnkKe-0004X4-2t
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 09:50:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hnkGV-0006Nd-QK
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 09:46:41 -0400
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:44647)
+ (envelope-from <alex.bennee@linaro.org>) id 1hnkKd-00010l-3c
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 09:50:56 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:32997)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hnkGU-0006Mm-M3
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 09:46:38 -0400
-Received: by mail-oi1-x241.google.com with SMTP id e189so18471809oib.11
- for <qemu-devel@nongnu.org>; Wed, 17 Jul 2019 06:46:38 -0700 (PDT)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1hnkKc-000101-S6
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 09:50:55 -0400
+Received: by mail-wm1-x344.google.com with SMTP id h19so19232466wme.0
+ for <qemu-devel@nongnu.org>; Wed, 17 Jul 2019 06:50:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=SAU1A+yF3GKBYG0AfK5rJ7p5mbeKqtl5MdzvF/YdnIk=;
- b=qEff6ZID3kZxLlhM8vC4JLtyBoUCZQPCnWLinQHIPXeFwfH3zO1YaEtZXgygggW/ZD
- BItQotLZLJJlklENnesZuJ2+G9CHTeVzVDkxnnB+vRltS2bzn5lhlblEG1FfE2Nr9enC
- VO9khYMrKABebxFLJVUPseM6UAok1KmopA0jSaqxUDUlxWrVWNr5A0ejNGXnDLGMWS7A
- eBrbgXe750LnTjKc78MTsfCuVVprBzC9Vjm5es+aPbH3bi1xKNXTqIeXv7DfDSXBBCuh
- FA6UtK9DPLddBu+Gy+HSB2z9sSJ/XmaPkPX7ZPBKFhRbFNPtw29gLW/oqpOBwl9T4z2M
- uRLQ==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=m27wikNUV2ioSIIaNiDI3xIBu0qKgf8kwe98LNTGUc4=;
+ b=h0TMBYauQel7RhclqI/KijPgCYbscH7rFEJNoFAhX9/PlG1Ud4STUrLFwWppXuyzkj
+ L66e3Mag2hYO3Q7X5gjdlgz3HEFISkzFTsgn7OYodtN0+01IlMZ28LKU2cl6R0jfzCxU
+ Pn1n+qYaVxf4NAbvjsyslzcYuRuE3ZgIggWgzy2EJSBkmxlUw15RyNnSG3p1QEKHoRKy
+ iVyEOCloon0wMQN+78IBYQrbQIDYcwbMeD/iudED8t1u/AvhASwrigh+bWgL2rCLOdJo
+ 7bLJD2YpaAGVwI3HrrZSFHu0zEiusCJwjE7CeLfYdX1mXVQi/m+QkDdzRgDS3vliYiG8
+ vCPw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=SAU1A+yF3GKBYG0AfK5rJ7p5mbeKqtl5MdzvF/YdnIk=;
- b=l9zvUnM7rxhBL2UfUnm49yU2Fh7QQNIrkk+G5jVQ5WQwNHKRlJoyC5VA8qVeYNKr2Q
- WzoDRiJEwEOe2UXR5VBFA5U53y8cOGZmRcAHa7imuFVDX9AMxkwbGODkza80E5r8YMgv
- QvgkAmf+xZRPm3XlT8mXiArP9vzM+hCv9yJ04Xyjxxso33XQ0CSzIksBn8iws8MuRiWh
- kSdWQijb2NOWxlYBQUeuITFU5isHqLLfWnSCJsawnLl3OMI6q8ldasXs6lZSeTU9bX4k
- 8QJNXzcHKPUni/MwK8Iv7ecxc39HEEEXVb2dQwyhdgps4u1HiLIY3y5xrMSzBuUwxKqF
- u9IA==
-X-Gm-Message-State: APjAAAWabAmBQPDOrZZFyKOsYxXCbfTljDcn+YKf92dqjhfAqwaDUPyl
- Oufcjh2YGY0HrdvWcaFri3p/cwvww5ouVRiYf4a+0g==
-X-Google-Smtp-Source: APXvYqwarKtZS0SfF0bKxwCaikw+J5FoZ8478txdhTGmIuoEhPE+PmPKG06j02di0W1Uv0z8ejexxj1r7mZIXIkWW7Y=
-X-Received: by 2002:aca:5cd7:: with SMTP id
- q206mr18082455oib.146.1563371196665; 
- Wed, 17 Jul 2019 06:46:36 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=m27wikNUV2ioSIIaNiDI3xIBu0qKgf8kwe98LNTGUc4=;
+ b=N/L3j6cDpO4HyuR8j7d/fMORPUuEpafobISEk4BWVJLiOv47n7QwzQ2wILA842NMiA
+ v7Q4ENrNZc1MzrPmhwIvReBMM9I0bGznHaVwZTPp8G9dnS8BYd/As7JU3SrVtK1wl5UB
+ w1tt27jv65kfRhp6si8tCyrAwPGbdXJOaWTaE1taxSpQOxchUI633uwpM2dO3WcoZ8R0
+ LfRZ7ED5WfbkoGGu3tnqOc5aSPDWxwU5FksYnK8UkdLr35uYy6EX4dSuC6XOWUrfDj2Y
+ 1ixyUtPAHR/WDPbDUuGPBLkOxhkRJ9iOYI9YqaSD9mIJ/QOiPQHF7IOKTDSrWl4lJNFP
+ 21fw==
+X-Gm-Message-State: APjAAAXix53p1hexljezGrgRYxa51eGtlmbeDlLfwa28dt2pUvnIQtL/
+ 0Gln0zdNxgSqBeX8eubTGNA8lg==
+X-Google-Smtp-Source: APXvYqy0LzzCO8j5dEiC3LzhIE3CwWGr1/D/7GVh/ZzX5epVZqVYaMM49ffmncKhNiduOXTvF3xSbw==
+X-Received: by 2002:a05:600c:23d2:: with SMTP id
+ p18mr34702879wmb.160.1563371453405; 
+ Wed, 17 Jul 2019 06:50:53 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+ by smtp.gmail.com with ESMTPSA id v18sm24932786wrs.80.2019.07.17.06.50.52
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Wed, 17 Jul 2019 06:50:52 -0700 (PDT)
+Received: from zen.linaroharston. (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 5ADBD1FF87;
+ Wed, 17 Jul 2019 14:43:37 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Date: Wed, 17 Jul 2019 14:43:29 +0100
+Message-Id: <20190717134335.15351-18-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190717134335.15351-1-alex.bennee@linaro.org>
+References: <20190717134335.15351-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-References: <20181102171638.24069-1-peter.maydell@linaro.org>
- <20181102171638.24069-9-peter.maydell@linaro.org>
- <3e3d2018-3993-f651-8e94-5bea612bd776@redhat.com>
- <CAFEAcA_FtoHOUv_cPgfO7GrZ8Ug9cKCvmY2z75i9DaAQ8Qx+gQ@mail.gmail.com>
- <417cd887-aec4-d8ba-1dd2-810bc4c04977@redhat.com>
- <CAFEAcA_JntiaOOWisqLVqAV6jc=wk4nR548KbbUcG0XLabcNpA@mail.gmail.com>
- <8d06b8f2-7ee8-a77a-81d7-3219d5e43c45@redhat.com>
- <dfeab9fd-7ee1-01f2-dd38-cba449b1de63@redhat.com>
- <f625f1f1-ad97-1c75-e44d-3b0c015312b3@redhat.com>
- <cf9156f6-c3fa-ec7e-c51a-8b8d2fd1e6d6@redhat.com>
- <7b45c073-8653-28e0-9d06-9e3aaa6dc460@redhat.com>
-In-Reply-To: <7b45c073-8653-28e0-9d06-9e3aaa6dc460@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 17 Jul 2019 14:46:25 +0100
-Message-ID: <CAFEAcA8RZuzv=KkATMozxfp8MTsCOPPsK7mN6oCJq_TfwWiPMA@mail.gmail.com>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::241
-Subject: Re: [Qemu-devel] [PULL 08/10] target/arm: Conditionalize some
- asserts on aarch32 support
+X-Received-From: 2a00:1450:4864:20::344
+Subject: [Qemu-devel] [PATCH v2 17/23] hw/i386: also turn off VMMOUSE is
+ VMPORT is disabled
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,23 +98,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- Richard Henderson <richard.henderson@linaro.org>,
- Laszlo Ersek <lersek@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 17 Jul 2019 at 14:36, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
-m> wrote:
-> I still wonder why this didn't assert on Peter's setup.
+Commit 97fd1ea8c1 broke the build for --without-default-devices as
+VMMOUSE depends on VMPORT.
 
-My setup does not assert because my host kernel correctly
-provides the ID register values to QEMU. Laszlo's appears
-to be providing all-zeroes, which then obviously breaks
-assertions being made about the sanity of those ID register
-values...
+Fixes: 97fd1ea8c1
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+---
+ hw/i386/Kconfig | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-thanks
--- PMM
+diff --git a/hw/i386/Kconfig b/hw/i386/Kconfig
+index b9c96ac361e..6350438036f 100644
+--- a/hw/i386/Kconfig
++++ b/hw/i386/Kconfig
+@@ -52,6 +52,7 @@ config I440FX
+     bool
+     imply E1000_PCI
+     imply VMPORT
++    imply VMMOUSE
+     select PC_PCI
+     select PC_ACPI
+     select ACPI_SMBUS
+@@ -59,7 +60,6 @@ config I440FX
+     select IDE_PIIX
+     select DIMM
+     select SMBIOS
+-    select VMMOUSE
+     select FW_CFG_DMA
+ 
+ config ISAPC
+@@ -78,6 +78,7 @@ config Q35
+     imply AMD_IOMMU
+     imply E1000E_PCI_EXPRESS
+     imply VMPORT
++    imply VMMOUSE
+     select PC_PCI
+     select PC_ACPI
+     select PCI_EXPRESS_Q35
+@@ -85,7 +86,6 @@ config Q35
+     select AHCI_ICH9
+     select DIMM
+     select SMBIOS
+-    select VMMOUSE
+     select FW_CFG_DMA
+ 
+ config VTD
+-- 
+2.20.1
+
 
