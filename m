@@ -2,65 +2,66 @@ Return-Path: <SRS0=PWhW=VO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72365C76186
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 08:09:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B007EC76192
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 08:14:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 487462077C
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 08:09:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 487462077C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 86F2F2077C
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 08:14:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86F2F2077C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54826 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54836 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnf02-0002gh-AS
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 04:09:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39393)
+	id 1hnf4r-0005ed-QU
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 04:14:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40837)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <no-reply@patchew.org>) id 1hnezq-0002DT-NR
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 04:09:07 -0400
+ (envelope-from <drjones@redhat.com>) id 1hnf4g-00058d-EN
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 04:14:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1hnezp-00037B-GM
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 04:09:06 -0400
-Resent-Date: Wed, 17 Jul 2019 04:09:06 -0400
-Resent-Message-Id: <E1hnezp-00037B-GM@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21446)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1hnezp-00034u-8Y; Wed, 17 Jul 2019 04:09:05 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1563350937; cv=none; d=zoho.com; s=zohoarc; 
- b=QDrxC0JWAZEI4t3f6VQNtz13K5KH4ybmjaF1kLZUg0ZAD6q1/WbtO+fnii68nPWq7pu7pwv8BW8ijgZ05/iOHVFXWoXcYA2XwzKx3c4AjHSGrv3Qr5xxhzp5AiXRW3hDVuU84aFKGp/KlN90z9A7lu+0e48/m5KdvLklnIMNeDU=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1563350937;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
- bh=nlbJJRCp6OV+BjOdkmUhN775Vs1Io6E3qmUlJJfJJwA=; 
- b=Rn7yNNliK4/2vIyFwkY+7rIMLCHO2nhXmFazyn5DyV6bfkOGw0uQb3hTFoF9ETTqgG5e2ryR9gumWZkR3Rml7A9HD8WDPYP4UaCXN8+MObpRRKoAwOk664ATmX3U8rNvBlnJeMWyZCjvhKD6+O89B9GHc7rwHS7Lbki5jMVUtJ8=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1563350936599542.9323617370496;
- Wed, 17 Jul 2019 01:08:56 -0700 (PDT)
-Message-ID: <156335093528.10055.12894271416870560792@c4a48874b076>
-In-Reply-To: <20190716084240.17594-1-marcandre.lureau@redhat.com>
+ (envelope-from <drjones@redhat.com>) id 1hnf4f-0006t3-FO
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 04:14:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47848)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <drjones@redhat.com>)
+ id 1hnf4d-0006lu-2W; Wed, 17 Jul 2019 04:14:03 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 2A5C1308338E;
+ Wed, 17 Jul 2019 08:14:01 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 152EB5C232;
+ Wed, 17 Jul 2019 08:13:56 +0000 (UTC)
+Date: Wed, 17 Jul 2019 10:13:54 +0200
+From: Andrew Jones <drjones@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <20190717081354.adoflwxpvxxt7iwi@kamzik.brq.redhat.com>
+References: <20190621163422.6127-1-drjones@redhat.com>
+ <20190621163422.6127-8-drjones@redhat.com>
+ <be805987-250d-93a7-7d11-5204f0e16e7b@linaro.org>
+ <20190628072739.5t2o2yqaejn6pyd5@kamzik.brq.redhat.com>
+ <4e7e78a6-1e6f-4190-4b15-12f443d9be78@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: marcandre.lureau@redhat.com
-Date: Wed, 17 Jul 2019 01:08:56 -0700 (PDT)
-X-ZohoMailClient: External
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4e7e78a6-1e6f-4190-4b15-12f443d9be78@linaro.org>
+User-Agent: NeoMutt/20180716
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.44]); Wed, 17 Jul 2019 08:14:01 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 135.84.80.217
-Subject: Re: [Qemu-devel] [PATCH] nbd: fix uninitialized variable warning
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2 07/14] target/arm/cpu64: max cpu:
+ Introduce sve<vl-bits> properties
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,30 +73,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, marcandre.lureau@redhat.com, qemu-devel@nongnu.org,
- qemu-block@nongnu.org, mreitz@redhat.com
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, armbru@redhat.com,
+ eric.auger@redhat.com, qemu-arm@nongnu.org, imammedo@redhat.com,
+ alex.bennee@linaro.org, Dave.Martin@arm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDcxNjA4NDI0MC4xNzU5
-NC0xLW1hcmNhbmRyZS5sdXJlYXVAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWls
-ZWQgdGhlIGFzYW4gYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3RpbmcgY29tbWFuZHMg
-YW5kCnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGluc3RhbGxlZCwgeW91
-IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNUIFNDUklQVCBCRUdJ
-TiA9PT0KIyEvYmluL2Jhc2gKbWFrZSBkb2NrZXItaW1hZ2UtZmVkb3JhIFY9MSBORVRXT1JLPTEK
-dGltZSBtYWtlIGRvY2tlci10ZXN0LWRlYnVnQGZlZG9yYSBUQVJHRVRfTElTVD14ODZfNjQtc29m
-dG1tdSBKPTE0IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKICBDQyAgICAgIGF1
-ZGlvL25vYXVkaW8ubwogIENDICAgICAgYXVkaW8vd2F2YXVkaW8ubwogIENDICAgICAgYXVkaW8v
-bWl4ZW5nLm8KL3RtcC9xZW11LXRlc3Qvc3JjL2Jsb2NrL25iZC5jOjcxMDozMDogZXJyb3I6IHN1
-Z2dlc3QgYnJhY2VzIGFyb3VuZCBpbml0aWFsaXphdGlvbiBvZiBzdWJvYmplY3QgWy1XZXJyb3Is
-LVdtaXNzaW5nLWJyYWNlc10KICAgIE5CRFJlcGx5IGxvY2FsX3JlcGx5ID0geyAwLCB9OwogICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgIF4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICB7
-fQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3Mv
-MjAxOTA3MTYwODQyNDAuMTc1OTQtMS1tYXJjYW5kcmUubHVyZWF1QHJlZGhhdC5jb20vdGVzdGlu
-Zy5hc2FuLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBi
-eSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJh
-Y2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+On Sat, Jun 29, 2019 at 02:10:28AM +0200, Richard Henderson wrote:
+> On 6/28/19 9:27 AM, Andrew Jones wrote:
+> > Also, while it's true we can always
+> > get the max vq with next-smaller(ARM_MAX_VQ + 1), having it cached in
+> > cpu->sve_max_vq is convenient. That said, I think we'd rather keep it.
+> 
+> When is it convenient, and for what?
 
+It's used for the upper boundary in several loops in target/arm/kvm64.c
+
+> 
+> Certainly the only thing that we check after boot is the largest enabled vq not
+> larger than x.  And for that I don't see that sve_max_vq is relevant at all.
+> 
+> Oh, something that we should also think about is -cpu foo, where foo is one of
+> the Fujitsu thingumies.  We should be able to default sve_vq_map to that which
+> a real bit of hw actually supports.  I, for one, welcome our typedef long
+> overlords.  ;-)
+
+I don't think we need to implement an A64FX cpu model with this series,
+although that's a nice idea for people that focus on TCG to do as a
+follow-up series. This series fully enables the guest to use SVE on the
+A64FX when KVM is enabled, without the need to special case it in any way.
+
+Thanks,
+drew
 
