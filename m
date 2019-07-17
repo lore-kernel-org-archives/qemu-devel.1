@@ -4,74 +4,74 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0B39C76186
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 14:04:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D5DCC76192
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 14:24:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8D37B2173B
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 14:04:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4639721743
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 14:24:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N4T1bnCr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D37B2173B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EDqoTqpl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4639721743
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=twiddle.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57590 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57832 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnkXt-0004BG-I0
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 10:04:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33163)
+	id 1hnkrB-0005N5-CK
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 10:24:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39520)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <rth7680@gmail.com>) id 1hnkXg-0003dO-8Q
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 10:04:25 -0400
+ (envelope-from <rth7680@gmail.com>) id 1hnkr1-0004yb-FO
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 10:24:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <rth7680@gmail.com>) id 1hnkXf-0004MY-8p
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 10:04:24 -0400
-Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:43160)
+ (envelope-from <rth7680@gmail.com>) id 1hnkr0-00005P-I3
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 10:24:23 -0400
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:41127)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1hnkXf-0004Ld-1m
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 10:04:23 -0400
-Received: by mail-pl1-x643.google.com with SMTP id 4so5069262pld.10
- for <qemu-devel@nongnu.org>; Wed, 17 Jul 2019 07:04:22 -0700 (PDT)
+ (Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1hnkr0-0008W9-7k
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 10:24:22 -0400
+Received: by mail-pf1-x441.google.com with SMTP id m30so10925933pff.8
+ for <qemu-devel@nongnu.org>; Wed, 17 Jul 2019 07:24:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:subject:to:cc:references:from:openpgp:autocrypt:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=OL5ngl/Sv6DdhHBujaTDK24WU3xlyry3KhV2DP43ni4=;
- b=N4T1bnCrppnsi7nAWMTjlfCCXzebf7XPteiCGMkifWa2O5t5v+5fp2nQJU/rXOSxfh
- wr/MeEDDTp+Sjvr4cTN494y6jxQYP+x1PrQH+Oy7BnhLerz5oDpgZkhd/nVGBCyZxaTv
- eWWCk9DmdnfB1j0u4l+ZRxzWeT3BgOxJhEpV/1qWT5uR9Xb1TNKJNNcFAy4XZfYnWJsJ
- HLGoyj4KybdjFX3cmnRAN0Q97btOIOYS6qaZB7YjcsGMfuTCj2bmusjHl2eYCAMMZRjO
- gNd163I/m4fBdh937OlfW7eqUqqp00u6BU/Td6HsIl5GN7YuzRJX6k2uX6lSCFc4X0Wf
- yYzQ==
+ bh=rchX0GTC5iLpvxpy7WDPVay6hO/LLhvHka4wOV8cxxc=;
+ b=EDqoTqplzVogaCcDa0i7UJyUTv5vso8qDJ7NsRTsEanc5RMvvhogurVbrlH0DeBO4j
+ nMhivB4Iz4S+ncw0BDrk+FUUuE4tLPpc9pqd4Jeor+FJ8U8wpbFSdKsbtCXlB4nZzwnn
+ KgI7NwKmDmzbuDZ5U3yc5hlqC/MgJ2kFCdSVPsME+IHE8vSTcV3N4jDFWunoOmz8nJE4
+ Ss/m5hi2VgKmt0toIKLlwOreZMBFPGOPItHTujFembpqV18dJjV/1xEj2nrRI6TCY7xV
+ omkdYhYjG4Idh3J6IO2Ax0VGH4pVPmEAWDoTYdRgseLuiocBiT8RW1mQUm0wyp9bHgJn
+ Dm7Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:subject:to:cc:references:from:openpgp
  :autocrypt:message-id:date:user-agent:mime-version:in-reply-to
  :content-language:content-transfer-encoding;
- bh=OL5ngl/Sv6DdhHBujaTDK24WU3xlyry3KhV2DP43ni4=;
- b=Trck6pmH0oHcnv6X4FD6hP80Ie4han/Tqq5wiq91dxlbfp4VylkSfUTOptqYRctGov
- 22t2BUCEzuplKWoXToxF1uCXtp+oBwPCJFSG/xJkaHsKc3VfukfXOLuYUejU6R5Hw9F3
- bTmNIj3aInf6DfU7g2Q85++k4S8u5dHiMdDTPJ/QohdYjCCZiq/vuCIrrAS77zBqd/zT
- wRlTBKcD2RzTH/YdcGuYYLuTQvdtmARaaLpIloHB/NL6WLZtipdEfM3+sZwHkYtPhlF4
- wj5fh2Qr8gCaeiPuCybblhq/ggqbGFheRcMwxsWIM/bpC7BYR4tnPYKqQ/g/xoJtVqcm
- 36Tw==
-X-Gm-Message-State: APjAAAUNFhj/oSoni4uj1t3b/M4c17NEa/yOoNnvFkxtcC40XDL4HPUN
- zoCyDCh4qp2X2J8Cv8NpkTU=
-X-Google-Smtp-Source: APXvYqzatpkRZNv6roaPtSr73L8JXKV7MkSDhjOV3bxuHBy/IPiHzc+GhotjbrKhP3iHTIf+24uYGw==
-X-Received: by 2002:a17:902:124:: with SMTP id
- 33mr44289240plb.145.1563372260938; 
- Wed, 17 Jul 2019 07:04:20 -0700 (PDT)
+ bh=rchX0GTC5iLpvxpy7WDPVay6hO/LLhvHka4wOV8cxxc=;
+ b=cvXeiFIBFzUY2NTIKNtdtyTLx6HnO6shcSmFSUN1kZjcQFtVKzCpnMSVV8vMHOUMy+
+ 6xId4WYv68UTquJEP+HWZPnzVkGrGLAZ718YbPrGUBZTwtetyCXGbZqLZ2N3T3L5Qkf3
+ D6isxRw4shVTRQM2EYt92cTtuyZIc4FQDdgWrTfOnE0rDn2m+kPfbLmWwSAR+Yf/8XDR
+ CEZ38fL70A3TBGHzRM8rIFxtL6VEmJ1ftfUvL1BL3+2NjfRA4zcHT0aCwdAGXSkUvQCK
+ yX7NVzyMWFOQ9/svQCYSGzBSD1+NjT26OYiXn+ger+FsubN4pgCcl2/gvWmfxTv/l0bC
+ gO4g==
+X-Gm-Message-State: APjAAAWdJic+l1luePtcasZbP6g/XKzFTwWMFi7NoEe7nI37XrrbGWr7
+ LFtGJv9W5cNC1eZ+xyszxaE=
+X-Google-Smtp-Source: APXvYqyUVm2AKgr6rcEvWCZV7DI/Ikp1YnyT9NVc/8O02dNy2nGTUUFFn6HEq3Hfish7ZVXaSH3U9Q==
+X-Received: by 2002:a17:90a:9905:: with SMTP id
+ b5mr45253473pjp.70.1563373460656; 
+ Wed, 17 Jul 2019 07:24:20 -0700 (PDT)
 Received: from [192.168.1.11] (97-113-176-6.tukw.qwest.net. [97.113.176.6])
- by smtp.googlemail.com with ESMTPSA id a15sm18723314pgw.3.2019.07.17.07.04.18
+ by smtp.googlemail.com with ESMTPSA id z19sm20719638pgv.35.2019.07.17.07.24.19
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 17 Jul 2019 07:04:19 -0700 (PDT)
+ Wed, 17 Jul 2019 07:24:20 -0700 (PDT)
 To: tony.nguyen@bt.com, qemu-devel@nongnu.org
 References: <a5f7f8854af046c18c6342035662a193@tpw09926dag18e.domain1.systemhost.net>
- <1563343465306.78816@bt.com>
+ <1563343596429.3033@bt.com>
 From: Richard Henderson <rth@twiddle.net>
 Openpgp: preference=signencrypt
 Autocrypt: addr=rth@twiddle.net; prefer-encrypt=mutual; keydata=
@@ -98,20 +98,20 @@ Autocrypt: addr=rth@twiddle.net; prefer-encrypt=mutual; keydata=
  /E08RJsqBwaHQdt14PwU1HphDOzSkhOXRXQLSd3ysyeGUXvL+gqQoXl5XYdvk8IId4PoJRo4
  jcyJ4VbnldvXh5gdGhFA/f9JgkLk9tPW+C3wNtNWyRUq8azR9hF2fg2HJUf4IXQlIu8OOgh1
  VcROBqvtH3ecaIL9iw==
-Message-ID: <090594bd-9970-3c07-c859-75e43133dee1@twiddle.net>
-Date: Wed, 17 Jul 2019 07:04:17 -0700
+Message-ID: <06dca0ee-a556-d09b-7f13-6938b5a1f74f@twiddle.net>
+Date: Wed, 17 Jul 2019 07:24:18 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <1563343465306.78816@bt.com>
+In-Reply-To: <1563343596429.3033@bt.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::643
-Subject: Re: [Qemu-devel] [PATCH 1/4] tcg: TCGMemOp is now accelerator
- independent MemOp
+X-Received-From: 2607:f8b0:4864:20::441
+Subject: Re: [Qemu-devel] [PATCH 2/4] memory: Single byte swap along the I/O
+ path
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -128,22 +128,23 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/16/19 11:04 PM, tony.nguyen@bt.com wrote:
-> +    MO_ASHIFT = 4,
-> +    MO_AMASK = 7 << MO_ASHIFT,
-> +#ifdef ALIGNED_ONLY
-> +    MO_ALIGN = 0,
-> +    MO_UNALN = MO_AMASK,
-> +#else
-> +    MO_ALIGN = MO_AMASK,
-> +    MO_UNALN = 0,
-> +#endif
+On 7/16/19 11:06 PM, tony.nguyen@bt.com wrote:
+> +++ b/include/exec/poison.h
+> @@ -38,7 +38,6 @@
+>  #pragma GCC poison TARGET_HAS_BFLT
+>  #pragma GCC poison TARGET_NAME
+>  #pragma GCC poison TARGET_SUPPORTS_MTTCG
+> -#pragma GCC poison TARGET_WORDS_BIGENDIAN
 
-I'm not sure you can move this portion as-is.
+You can't do this.  This is here for a very good reason, to avoid letting
+target-specific values creep into code that is compiled once, for all targets.
 
-I think ALIGNED_ONLY needs to be moved out of target/foo/cpu.h into configure,
-as we do with TARGET_WORDS_BIGENDIAN, so that it's always defined early.  Also,
-poison the symbol in include/exec/poison.h.
+This means that you'll need to either move MO_TE out of memop.h or perhaps
+conditionalize it upon NEED_CPU_H.
+
+I would like to see this patch broken up into smaller bits.  Convert one
+interface at a time, pushing the use of MemOp further down the stack.  At
+present it's hard to review.
 
 
 r~
