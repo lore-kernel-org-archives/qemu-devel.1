@@ -6,60 +6,77 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F0F7C76186
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 09:10:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F33BCC76192
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 09:16:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 210EC2077C
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 09:10:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 210EC2077C
+	by mail.kernel.org (Postfix) with ESMTPS id CB58B2077C
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 09:16:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB58B2077C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55228 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55272 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnfxK-0007py-Av
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 05:10:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58411)
+	id 1hng39-0002E8-Uk
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 05:16:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60317)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgilbert@redhat.com>) id 1hnfx8-0007JZ-IR
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 05:10:23 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1hng2y-0001nH-03
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 05:16:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1hnfx7-0000sE-42
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 05:10:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34744)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hnfx6-0000qr-RN
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 05:10:21 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 77E5F30821AE;
- Wed, 17 Jul 2019 09:10:19 +0000 (UTC)
-Received: from work-vm (ovpn-116-172.ams2.redhat.com [10.36.116.172])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9DEB5600C8;
- Wed, 17 Jul 2019 09:10:12 +0000 (UTC)
-Date: Wed, 17 Jul 2019 10:10:09 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20190717091009.GB3627@work-vm>
-References: <1562665760-26158-1-git-send-email-kwankhede@nvidia.com>
- <1562665760-26158-5-git-send-email-kwankhede@nvidia.com>
- <20190716151401.0eeabdb6@x1.home>
+ (envelope-from <pbonzini@redhat.com>) id 1hng2w-0004Yb-Kd
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 05:16:23 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:36503)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hng2w-0004Xw-Cz
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 05:16:22 -0400
+Received: by mail-wr1-f67.google.com with SMTP id n4so23983892wrs.3
+ for <qemu-devel@nongnu.org>; Wed, 17 Jul 2019 02:16:22 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=ZIGN2xGPJAdNWykr/HOrV6M2Jud6vnToh4Hx+LGik/U=;
+ b=nySwEK6VUz5c3E762t4d3oNkdixExuQsEE3tmzUO8sFL88iAP/WLKw4Jkm7bEabD4G
+ 4MmgLdPw406NUdM6oyLrz9r4EElMlwPEO7OqRegLxn43EPS56zNLSXyvhUvi5xMTs0J/
+ CZd+uqyVLOtOnWQxxp4Jn7qKEY/0gz6QQhlRFOq33f7d62fwCbjRAXnqJiJqMAsHNIGh
+ J7fCOB7CmnTShTCK88w8vJGcJgdydFL/eNSEc6DdiHwS8vJgOy3mtmxqtJesiAjmnGYA
+ FS02JEDDjo3H2VB1MysqAN3aQovq+tgxlSSJ3H9MNGKs2Dh3ALUG0ojxHIDAiQCNafb3
+ JgZw==
+X-Gm-Message-State: APjAAAUKZ8RFHhZoVQwlo4D1Z52GC1EWfgO0Kt+ag9TC11+ZnKhHT9zs
+ vSVRBtrg1oOQQJg79p9eTb8t2A==
+X-Google-Smtp-Source: APXvYqy5wfzWrGySZnmv8zLX0cFKbb7TB4s8Df6tSyYEntLN71jccVGVLivF0LIDw8W0Y5Rz1G6zOA==
+X-Received: by 2002:adf:a299:: with SMTP id s25mr34335068wra.74.1563354981230; 
+ Wed, 17 Jul 2019 02:16:21 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:e427:3beb:1110:dda2?
+ ([2001:b07:6468:f312:e427:3beb:1110:dda2])
+ by smtp.gmail.com with ESMTPSA id k124sm36507584wmk.47.2019.07.17.02.16.20
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Wed, 17 Jul 2019 02:16:20 -0700 (PDT)
+To: Wei Yang <richardw.yang@linux.intel.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+References: <20190430034412.12935-1-richardw.yang@linux.intel.com>
+ <20190430034412.12935-3-richardw.yang@linux.intel.com>
+ <20190514142108.GG2753@work-vm> <20190717011337.GA14233@richard>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <4b3016cd-de7b-3ab7-76b8-8608cb1239b6@redhat.com>
+Date: Wed, 17 Jul 2019 11:16:19 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190716151401.0eeabdb6@x1.home>
-User-Agent: Mutt/1.12.0 (2019-05-25)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Wed, 17 Jul 2019 09:10:19 +0000 (UTC)
+In-Reply-To: <20190717011337.GA14233@richard>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v7 04/13] vfio: Add save and load functions
- for VFIO PCI devices
+ [fuzzy]
+X-Received-From: 209.85.221.67
+Subject: Re: [Qemu-devel] [PATCH 2/3] migration/ram.c: start of
+ cpu_physical_memory_sync_dirty_bitmap is always 0
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,189 +88,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zhengxiao.zx@alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com,
- cjia@nvidia.com, eskultet@redhat.com, ziye.yang@intel.com, cohuck@redhat.com,
- shuangtai.tst@alibaba-inc.com, qemu-devel@nongnu.org, zhi.a.wang@intel.com,
- mlevitsk@redhat.com, pasic@linux.ibm.com, aik@ozlabs.ru,
- Kirti Wankhede <kwankhede@nvidia.com>, eauger@redhat.com, felipe@nutanix.com,
- jonathan.davies@nutanix.com, yan.y.zhao@intel.com, changpeng.liu@intel.com,
- Ken.Xue@amd.com
+Cc: qemu-devel@nongnu.org, quintela@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Alex Williamson (alex.williamson@redhat.com) wrote:
-> On Tue, 9 Jul 2019 15:19:11 +0530
-> Kirti Wankhede <kwankhede@nvidia.com> wrote:
+On 17/07/19 03:13, Wei Yang wrote:
+> On Tue, May 14, 2019 at 03:21:08PM +0100, Dr. David Alan Gilbert wrote:
+>> * Wei Yang (richardw.yang@linux.intel.com) wrote:
+>>> Since start of cpu_physical_memory_sync_dirty_bitmap is always 0, we can
+>>> remove this parameter and simplify the calculation a bit.
+>>>
+>>> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+>>
+>> So I think you're right it's currently unused; however, lets ask
+>> Paolo: Do we need to keep this parameter for flexiblity?
+>>
 > 
-> > These functions save and restore PCI device specific data - config
-> > space of PCI device.
-> > Tested save and restore with MSI and MSIX type.
-> > 
-> > Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> > Reviewed-by: Neo Jia <cjia@nvidia.com>
-> > ---
-> >  hw/vfio/pci.c                 | 114 ++++++++++++++++++++++++++++++++++++++++++
-> >  include/hw/vfio/vfio-common.h |   2 +
-> >  2 files changed, 116 insertions(+)
-> > 
-> > diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-> > index de0d286fc9dd..5fe4f8076cac 100644
-> > --- a/hw/vfio/pci.c
-> > +++ b/hw/vfio/pci.c
-> > @@ -2395,11 +2395,125 @@ static Object *vfio_pci_get_object(VFIODevice *vbasedev)
-> >      return OBJECT(vdev);
-> >  }
-> >  
-> > +static void vfio_pci_save_config(VFIODevice *vbasedev, QEMUFile *f)
-> > +{
-> > +    VFIOPCIDevice *vdev = container_of(vbasedev, VFIOPCIDevice, vbasedev);
-> > +    PCIDevice *pdev = &vdev->pdev;
-> > +    uint16_t pci_cmd;
-> > +    int i;
-> > +
-> > +    for (i = 0; i < PCI_ROM_SLOT; i++) {
-> > +        uint32_t bar;
-> > +
-> > +        bar = pci_default_read_config(pdev, PCI_BASE_ADDRESS_0 + i * 4, 4);
-> > +        qemu_put_be32(f, bar);
-> > +    }
-> > +
-> > +    qemu_put_be32(f, vdev->interrupt);
-> > +    if (vdev->interrupt == VFIO_INT_MSI) {
-> > +        uint32_t msi_flags, msi_addr_lo, msi_addr_hi = 0, msi_data;
-> > +        bool msi_64bit;
-> > +
-> > +        msi_flags = pci_default_read_config(pdev, pdev->msi_cap + PCI_MSI_FLAGS,
-> > +                                            2);
-> > +        msi_64bit = (msi_flags & PCI_MSI_FLAGS_64BIT);
-> > +
-> > +        msi_addr_lo = pci_default_read_config(pdev,
-> > +                                         pdev->msi_cap + PCI_MSI_ADDRESS_LO, 4);
-> > +        qemu_put_be32(f, msi_addr_lo);
-> > +
-> > +        if (msi_64bit) {
-> > +            msi_addr_hi = pci_default_read_config(pdev,
-> > +                                             pdev->msi_cap + PCI_MSI_ADDRESS_HI,
-> > +                                             4);
-> > +        }
-> > +        qemu_put_be32(f, msi_addr_hi);
-> > +
-> > +        msi_data = pci_default_read_config(pdev,
-> > +                pdev->msi_cap + (msi_64bit ? PCI_MSI_DATA_64 : PCI_MSI_DATA_32),
-> > +                2);
-> > +        qemu_put_be32(f, msi_data);
-> > +    } else if (vdev->interrupt == VFIO_INT_MSIX) {
-> > +        uint16_t offset;
-> > +
-> > +        /* save enable bit and maskall bit */
-> > +        offset = pci_default_read_config(pdev,
-> > +                                       pdev->msix_cap + PCI_MSIX_FLAGS + 1, 2);
-> > +        qemu_put_be16(f, offset);
-> > +        msix_save(pdev, f);
-> > +    }
-> > +    pci_cmd = pci_default_read_config(pdev, PCI_COMMAND, 2);
-> > +    qemu_put_be16(f, pci_cmd);
-> > +}
-> > +
-> > +static void vfio_pci_load_config(VFIODevice *vbasedev, QEMUFile *f)
-> > +{
-> > +    VFIOPCIDevice *vdev = container_of(vbasedev, VFIOPCIDevice, vbasedev);
-> > +    PCIDevice *pdev = &vdev->pdev;
-> > +    uint32_t interrupt_type;
-> > +    uint32_t msi_flags, msi_addr_lo, msi_addr_hi = 0, msi_data;
-> > +    uint16_t pci_cmd;
-> > +    bool msi_64bit;
-> > +    int i;
-> > +
-> > +    /* retore pci bar configuration */
-> > +    pci_cmd = pci_default_read_config(pdev, PCI_COMMAND, 2);
-> > +    vfio_pci_write_config(pdev, PCI_COMMAND,
-> > +                        pci_cmd & (!(PCI_COMMAND_IO | PCI_COMMAND_MEMORY)), 2);
-> > +    for (i = 0; i < PCI_ROM_SLOT; i++) {
-> > +        uint32_t bar = qemu_get_be32(f);
-> > +
-> > +        vfio_pci_write_config(pdev, PCI_BASE_ADDRESS_0 + i * 4, bar, 4);
-> > +    }
-> > +    vfio_pci_write_config(pdev, PCI_COMMAND,
-> > +                          pci_cmd | PCI_COMMAND_IO | PCI_COMMAND_MEMORY, 2);
-> > +
-> > +    interrupt_type = qemu_get_be32(f);
-> > +
-> > +    if (interrupt_type == VFIO_INT_MSI) {
-> > +        /* restore msi configuration */
-> > +        msi_flags = pci_default_read_config(pdev,
-> > +                                            pdev->msi_cap + PCI_MSI_FLAGS, 2);
-> > +        msi_64bit = (msi_flags & PCI_MSI_FLAGS_64BIT);
-> > +
-> > +        vfio_pci_write_config(pdev, pdev->msi_cap + PCI_MSI_FLAGS,
-> > +                              msi_flags & (!PCI_MSI_FLAGS_ENABLE), 2);
-> > +
-> > +        msi_addr_lo = qemu_get_be32(f);
-> > +        vfio_pci_write_config(pdev, pdev->msi_cap + PCI_MSI_ADDRESS_LO,
-> > +                              msi_addr_lo, 4);
-> > +
-> > +        msi_addr_hi = qemu_get_be32(f);
-> > +        if (msi_64bit) {
-> > +            vfio_pci_write_config(pdev, pdev->msi_cap + PCI_MSI_ADDRESS_HI,
-> > +                                  msi_addr_hi, 4);
-> > +        }
-> > +        msi_data = qemu_get_be32(f);
-> > +        vfio_pci_write_config(pdev,
-> > +                pdev->msi_cap + (msi_64bit ? PCI_MSI_DATA_64 : PCI_MSI_DATA_32),
-> > +                msi_data, 2);
-> > +
-> > +        vfio_pci_write_config(pdev, pdev->msi_cap + PCI_MSI_FLAGS,
-> > +                              msi_flags | PCI_MSI_FLAGS_ENABLE, 2);
-> > +    } else if (interrupt_type == VFIO_INT_MSIX) {
-> > +        uint16_t offset = qemu_get_be16(f);
-> > +
-> > +        /* load enable bit and maskall bit */
-> > +        vfio_pci_write_config(pdev, pdev->msix_cap + PCI_MSIX_FLAGS + 1,
-> > +                              offset, 2);
-> > +        msix_load(pdev, f);
-> > +    }
-> > +    pci_cmd = qemu_get_be16(f);
-> > +    vfio_pci_write_config(pdev, PCI_COMMAND, pci_cmd, 2);
-> > +}
+> Hey, Paolo
 > 
-> Pardon my migration ignorance, but there are bound to be more fields
-> and capabilities that get migrated over time.  How does this get
-> extended to support that and maintain backwards compatibility?  Thanks,
+> Do you have some spare time to give some insight?
 
-You normally tie those fields to a property on your device and set the
-property in the machine type so that newer machine types send the extra
-fields.
+I think it's cleaner to leave the start argument in place.  However,
+I'll note that in migration_bitmap_sync_range the length argument is
+always block->used_length so that's also unnecessary (you already have
+block).
 
-Dave
+Paolo
 
-> Alex
+>> Dave
+>>
+>>> ---
+>>>  include/exec/ram_addr.h | 15 ++++++---------
+>>>  migration/ram.c         |  2 +-
+>>>  2 files changed, 7 insertions(+), 10 deletions(-)
+>>>
+>>> diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
+>>> index 9ecd911c3e..3dfb2d52fb 100644
+>>> --- a/include/exec/ram_addr.h
+>>> +++ b/include/exec/ram_addr.h
+>>> @@ -409,18 +409,16 @@ static inline void cpu_physical_memory_clear_dirty_range(ram_addr_t start,
+>>>  
+>>>  static inline
+>>>  uint64_t cpu_physical_memory_sync_dirty_bitmap(RAMBlock *rb,
+>>> -                                               ram_addr_t start,
+>>>                                                 ram_addr_t length,
+>>>                                                 uint64_t *real_dirty_pages)
+>>>  {
+>>>      ram_addr_t addr;
+>>> -    unsigned long word = BIT_WORD((start + rb->offset) >> TARGET_PAGE_BITS);
+>>> +    unsigned long word = BIT_WORD(rb->offset >> TARGET_PAGE_BITS);
+>>>      uint64_t num_dirty = 0;
+>>>      unsigned long *dest = rb->bmap;
+>>>  
+>>> -    /* start address and length is aligned at the start of a word? */
+>>> -    if (((word * BITS_PER_LONG) << TARGET_PAGE_BITS) ==
+>>> -         (start + rb->offset) &&
+>>> +    /* offset and length is aligned at the start of a word? */
+>>> +    if (((word * BITS_PER_LONG) << TARGET_PAGE_BITS) == (rb->offset) &&
+>>>          !(length & ((BITS_PER_LONG << TARGET_PAGE_BITS) - 1))) {
+>>>          int k;
+>>>          int nr = BITS_TO_LONGS(length >> TARGET_PAGE_BITS);
+>>> @@ -428,14 +426,13 @@ uint64_t cpu_physical_memory_sync_dirty_bitmap(RAMBlock *rb,
+>>>          unsigned long idx = (word * BITS_PER_LONG) / DIRTY_MEMORY_BLOCK_SIZE;
+>>>          unsigned long offset = BIT_WORD((word * BITS_PER_LONG) %
+>>>                                          DIRTY_MEMORY_BLOCK_SIZE);
+>>> -        unsigned long page = BIT_WORD(start >> TARGET_PAGE_BITS);
+>>>  
+>>>          rcu_read_lock();
+>>>  
+>>>          src = atomic_rcu_read(
+>>>                  &ram_list.dirty_memory[DIRTY_MEMORY_MIGRATION])->blocks;
+>>>  
+>>> -        for (k = page; k < page + nr; k++) {
+>>> +        for (k = 0; k < nr; k++) {
+>>>              if (src[idx][offset]) {
+>>>                  unsigned long bits = atomic_xchg(&src[idx][offset], 0);
+>>>                  unsigned long new_dirty;
+>>> @@ -458,11 +455,11 @@ uint64_t cpu_physical_memory_sync_dirty_bitmap(RAMBlock *rb,
+>>>  
+>>>          for (addr = 0; addr < length; addr += TARGET_PAGE_SIZE) {
+>>>              if (cpu_physical_memory_test_and_clear_dirty(
+>>> -                        start + addr + offset,
+>>> +                        addr + offset,
+>>>                          TARGET_PAGE_SIZE,
+>>>                          DIRTY_MEMORY_MIGRATION)) {
+>>>                  *real_dirty_pages += 1;
+>>> -                long k = (start + addr) >> TARGET_PAGE_BITS;
+>>> +                long k = addr >> TARGET_PAGE_BITS;
+>>>                  if (!test_and_set_bit(k, dest)) {
+>>>                      num_dirty++;
+>>>                  }
+>>> diff --git a/migration/ram.c b/migration/ram.c
+>>> index 9948b2d021..1def8122e9 100644
+>>> --- a/migration/ram.c
+>>> +++ b/migration/ram.c
+>>> @@ -1646,7 +1646,7 @@ static void migration_bitmap_sync_range(RAMState *rs, RAMBlock *rb,
+>>>                                          ram_addr_t length)
+>>>  {
+>>>      rs->migration_dirty_pages +=
+>>> -        cpu_physical_memory_sync_dirty_bitmap(rb, 0, length,
+>>> +        cpu_physical_memory_sync_dirty_bitmap(rb, length,
+>>>                                                &rs->num_dirty_pages_period);
+>>>  }
+>>>  
+>>> -- 
+>>> 2.19.1
+>>>
+>> --
+>> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 > 
-> > +
-> >  static VFIODeviceOps vfio_pci_ops = {
-> >      .vfio_compute_needs_reset = vfio_pci_compute_needs_reset,
-> >      .vfio_hot_reset_multi = vfio_pci_hot_reset_multi,
-> >      .vfio_eoi = vfio_intx_eoi,
-> >      .vfio_get_object = vfio_pci_get_object,
-> > +    .vfio_save_config = vfio_pci_save_config,
-> > +    .vfio_load_config = vfio_pci_load_config,
-> >  };
-> >  
-> >  int vfio_populate_vga(VFIOPCIDevice *vdev, Error **errp)
-> > diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-> > index 771b6d59a3db..ee72bd984a36 100644
-> > --- a/include/hw/vfio/vfio-common.h
-> > +++ b/include/hw/vfio/vfio-common.h
-> > @@ -120,6 +120,8 @@ struct VFIODeviceOps {
-> >      int (*vfio_hot_reset_multi)(VFIODevice *vdev);
-> >      void (*vfio_eoi)(VFIODevice *vdev);
-> >      Object *(*vfio_get_object)(VFIODevice *vdev);
-> > +    void (*vfio_save_config)(VFIODevice *vdev, QEMUFile *f);
-> > +    void (*vfio_load_config)(VFIODevice *vdev, QEMUFile *f);
-> >  };
-> >  
-> >  typedef struct VFIOGroup {
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
 
