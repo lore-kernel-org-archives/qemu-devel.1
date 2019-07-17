@@ -2,62 +2,62 @@ Return-Path: <SRS0=PWhW=VO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EBD5BC76186
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 10:48:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DEB04C76186
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 10:49:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C390920665
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 10:48:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C390920665
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id A2EC620880
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 10:49:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2EC620880
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55850 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55858 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnhU1-00052V-1p
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 06:48:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59721)
+	id 1hnhUc-0005yc-P0
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 06:49:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59931)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <groug@kaod.org>) id 1hnhTo-0004UD-62
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 06:48:13 -0400
+ (envelope-from <mst@redhat.com>) id 1hnhUO-0005WF-B1
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 06:48:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1hnhTk-0000v3-CQ
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 06:48:10 -0400
-Received: from 12.mo6.mail-out.ovh.net ([178.32.125.228]:36612)
+ (envelope-from <mst@redhat.com>) id 1hnhUM-0001My-AA
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 06:48:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55340)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1hnhTh-0000rP-5x
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 06:48:06 -0400
-Received: from player762.ha.ovh.net (unknown [10.108.54.52])
- by mo6.mail-out.ovh.net (Postfix) with ESMTP id 701791D5FF5
- for <qemu-devel@nongnu.org>; Wed, 17 Jul 2019 12:48:01 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player762.ha.ovh.net (Postfix) with ESMTPSA id CEA6D8082F72;
- Wed, 17 Jul 2019 10:47:56 +0000 (UTC)
-Date: Wed, 17 Jul 2019 12:47:55 +0200
-From: Greg Kurz <groug@kaod.org>
-To: Shivaprasad G Bhat <sbhat@linux.ibm.com>
-Message-ID: <20190717124755.2bb38834@bahia.lab.toulouse-stg.fr.ibm.com>
-In-Reply-To: <156335160761.82682.11912058325777251614.stgit@lep8c.aus.stglabs.ibm.com>
-References: <156335150620.82682.9535735857478533420.stgit@lep8c.aus.stglabs.ibm.com>
- <156335160761.82682.11912058325777251614.stgit@lep8c.aus.stglabs.ibm.com>
-X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.71) (envelope-from <mst@redhat.com>)
+ id 1hnhUI-0001Hr-UW; Wed, 17 Jul 2019 06:48:44 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 1F34A3092651;
+ Wed, 17 Jul 2019 10:48:40 +0000 (UTC)
+Received: from redhat.com (ovpn-120-247.rdu2.redhat.com [10.10.120.247])
+ by smtp.corp.redhat.com (Postfix) with SMTP id CA6EC611DC;
+ Wed, 17 Jul 2019 10:48:29 +0000 (UTC)
+Date: Wed, 17 Jul 2019 06:48:28 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Message-ID: <20190717063902-mutt-send-email-mst@kernel.org>
+References: <20190717103550.24657-1-david@redhat.com>
+ <20190717103550.24657-4-david@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 18221845571207403861
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduvddrieefgddtlecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190717103550.24657-4-david@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.43]); Wed, 17 Jul 2019 10:48:40 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 178.32.125.228
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v2 3/4] ppc: fix leak in
- h_client_architecture_support
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH-for-4.1 v2 3/3] virtio-balloon: reset pbp
+ on device resets
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,45 +69,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
+Cc: Igor Mammedov <imammedo@redhat.com>, qemu-stable@nongnu.org,
+ qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 17 Jul 2019 03:20:31 -0500
-Shivaprasad G Bhat <sbhat@linux.ibm.com> wrote:
-
-> Free all SpaprOptionVector local pointers after use.
+On Wed, Jul 17, 2019 at 12:35:50PM +0200, David Hildenbrand wrote:
+> When a guest reboots (ordinary reboots, but also via kexec), it will
+> happily reuse any system memory, including previously inflated memory.
 > 
-> Signed-off-by: Shivaprasad G Bhat <sbhat@linux.ibm.com>
+> We could have tracking data for a pbp (PartiallyBalloonedPage). It could
+> happen that a new inflation request from the guest will result in a
+> discard of such a pbp, although the guest is (again) reusing some
+> memory.
+> 
+> We should reset the pbp on any device resets.
+> 
+> Fixes: ed48c59875b6 ("virtio-balloon: Safely handle BALLOON_PAGE_SIZE <
+>                      host page size")
+> Cc: qemu-stable@nongnu.org #v4.0.0
+> Cc: Stefan Hajnoczi <stefanha@redhat.com>
+> Cc: David Gibson <david@gibson.dropbear.id.au>
+> Cc: Michael S. Tsirkin <mst@redhat.com>
+> Cc: Igor Mammedov <imammedo@redhat.com>
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+
+Can't something else remove a ramblock besides a reset?
+
+
 > ---
-
-Reviewed-by: Greg Kurz <groug@kaod.org>
-
->  hw/ppc/spapr_hcall.c |    2 ++
->  1 file changed, 2 insertions(+)
+>  hw/virtio/virtio-balloon.c | 1 +
+>  1 file changed, 1 insertion(+)
 > 
-> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-> index 6808d4cda8..71cfe7c41d 100644
-> --- a/hw/ppc/spapr_hcall.c
-> +++ b/hw/ppc/spapr_hcall.c
-> @@ -1612,6 +1612,7 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
->      ov5_updates = spapr_ovec_new();
->      spapr->cas_reboot = spapr_ovec_diff(ov5_updates,
->                                          ov5_cas_old, spapr->ov5_cas);
-> +    spapr_ovec_cleanup(ov5_cas_old);
->      /* Now that processing is finished, set the radix/hash bit for the
->       * guest if it requested a valid mode; otherwise terminate the boot. */
->      if (guest_radix) {
-> @@ -1629,6 +1630,7 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
+> diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
+> index 84d01bceb3..9de3c030bf 100644
+> --- a/hw/virtio/virtio-balloon.c
+> +++ b/hw/virtio/virtio-balloon.c
+> @@ -847,6 +847,7 @@ static void virtio_balloon_device_reset(VirtIODevice *vdev)
+>      if (virtio_balloon_free_page_support(s)) {
+>          virtio_balloon_free_page_stop(s);
 >      }
->      spapr->cas_legacy_guest_workaround = !spapr_ovec_test(ov1_guest,
->                                                            OV1_PPC_3_00);
-> +    spapr_ovec_cleanup(ov1_guest);
->      if (!spapr->cas_reboot) {
->          /* If spapr_machine_reset() did not set up a HPT but one is necessary
->           * (because the guest isn't going to use radix) then set it up here. */
-> 
-> 
-
+> +    virtio_balloon_reset_pbp(s);
+>  
+>      if (s->stats_vq_elem != NULL) {
+>          virtqueue_unpop(s->svq, s->stats_vq_elem, 0);
+> -- 
+> 2.21.0
 
