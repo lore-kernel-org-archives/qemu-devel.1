@@ -6,47 +6,47 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38F4EC7618F
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 17:54:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 110EFC7618F
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 18:11:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F414A21743
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 17:54:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F414A21743
+	by mail.kernel.org (Postfix) with ESMTPS id BB8B4208C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 18:11:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB8B4208C0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59434 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59512 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hno8I-000863-49
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 13:54:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46599)
+	id 1hnoOe-0005Fa-Ao
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 14:11:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51201)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jsnow@redhat.com>) id 1hno82-0007QS-Ec
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 13:54:12 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hnoOQ-0004RD-Iu
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 14:11:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hno80-00029h-U2
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 13:54:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36768)
+ (envelope-from <jsnow@redhat.com>) id 1hnoOO-0006KJ-FA
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 14:11:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35120)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1hno7y-00027A-4S; Wed, 17 Jul 2019 13:54:06 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ id 1hnoOL-0006H9-Tr; Wed, 17 Jul 2019 14:11:02 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 02DDA30832DA;
- Wed, 17 Jul 2019 17:54:05 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id CDE4EC06512C;
+ Wed, 17 Jul 2019 18:11:00 +0000 (UTC)
 Received: from [10.18.17.203] (dhcp-17-203.bos.redhat.com [10.18.17.203])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DC50919D7F;
- Wed, 17 Jul 2019 17:54:03 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3A3C61001B21;
+ Wed, 17 Jul 2019 18:10:59 +0000 (UTC)
 To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
 References: <20190716000117.25219-1-jsnow@redhat.com>
- <20190716000117.25219-12-jsnow@redhat.com>
- <9cf9c85d-c41e-123c-07cb-81c453363aea@redhat.com>
- <91af10c4-e4ff-df49-d1e9-31ea210fc637@redhat.com>
- <0f773100-ecba-2d2a-8526-9fe980c6830a@redhat.com>
+ <20190716000117.25219-10-jsnow@redhat.com>
+ <1e0e9638-6d60-7343-e6db-a1e77b5da932@redhat.com>
+ <4045c084-572a-b274-3acb-f634162e8605@redhat.com>
+ <79271f37-fb1e-96d5-ead1-bb7b441fceea@redhat.com>
 From: John Snow <jsnow@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
@@ -123,22 +123,22 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <18285c3a-a9d2-b449-e075-cbbd5d391e58@redhat.com>
-Date: Wed, 17 Jul 2019 13:53:59 -0400
+Message-ID: <b7b2586d-0e14-48d8-27e5-22df9fcad11b@redhat.com>
+Date: Wed, 17 Jul 2019 14:10:58 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <0f773100-ecba-2d2a-8526-9fe980c6830a@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="aBK0NBTtzziirhaYzFq4Z8HJlYVb6kcm8"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <79271f37-fb1e-96d5-ead1-bb7b441fceea@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.44]); Wed, 17 Jul 2019 17:54:05 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.31]); Wed, 17 Jul 2019 18:11:01 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 11/11] iotests/257: test traditional
- sync modes
+Subject: Re: [Qemu-devel] [PATCH v2 09/11] block/backup: teach TOP to never
+ copy unallocated regions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -156,189 +156,94 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---aBK0NBTtzziirhaYzFq4Z8HJlYVb6kcm8
-Content-Type: multipart/mixed; boundary="lqSvD6JVKfMStgcEEJccfspnSOKb9T1us";
- protected-headers="v1"
-From: John Snow <jsnow@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org,
- qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com,
- Markus Armbruster <armbru@redhat.com>
-Message-ID: <18285c3a-a9d2-b449-e075-cbbd5d391e58@redhat.com>
-Subject: Re: [PATCH v2 11/11] iotests/257: test traditional sync modes
-References: <20190716000117.25219-1-jsnow@redhat.com>
- <20190716000117.25219-12-jsnow@redhat.com>
- <9cf9c85d-c41e-123c-07cb-81c453363aea@redhat.com>
- <91af10c4-e4ff-df49-d1e9-31ea210fc637@redhat.com>
- <0f773100-ecba-2d2a-8526-9fe980c6830a@redhat.com>
-In-Reply-To: <0f773100-ecba-2d2a-8526-9fe980c6830a@redhat.com>
-
---lqSvD6JVKfMStgcEEJccfspnSOKb9T1us
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
 
 
-
-On 7/17/19 5:50 AM, Max Reitz wrote:
-> On 16.07.19 18:58, John Snow wrote:
+On 7/16/19 12:11 PM, Max Reitz wrote:
+> On 16.07.19 18:02, John Snow wrote:
 >>
 >>
->> On 7/16/19 8:04 AM, Max Reitz wrote:
+>> On 7/16/19 7:43 AM, Max Reitz wrote:
 >>> On 16.07.19 02:01, John Snow wrote:
+>>>> Presently, If sync=3DTOP is selected, we mark the entire bitmap as d=
+irty.
+>>>> In the write notifier handler, we dutifully copy out such regions.
+>>>>
+>>>> Fix this in three parts:
+>>>>
+>>>> 1. Mark the bitmap as being initialized before the first yield.
+>>>> 2. After the first yield but before the backup loop, interrogate the
+>>>> allocation status asynchronously and initialize the bitmap.
+>>>> 3. Teach the write notifier to interrogate allocation status if it i=
+s
+>>>> invoked during bitmap initialization.
+>>>>
+>>>> As an effect of this patch, the job progress for TOP backups
+>>>> now behaves like this:
+>>>>
+>>>> - total progress starts at bdrv_length.
+>>>> - As allocation status is interrogated, total progress decreases.
+>>>> - As blocks are copied, current progress increases.
+>>>>
+>>>> Taken together, the floor and ceiling move to meet each other.
+>>>>
 >>>> Signed-off-by: John Snow <jsnow@redhat.com>
 >>>> ---
->>>>  tests/qemu-iotests/257     |   41 +-
->>>>  tests/qemu-iotests/257.out | 3089 +++++++++++++++++++++++++++++++++=
-+++
->>>>  2 files changed, 3128 insertions(+), 2 deletions(-)
+>>>>  block/backup.c     | 78 ++++++++++++++++++++++++++++++++++++++++---=
+---
+>>>>  block/trace-events |  1 +
+>>>>  2 files changed, 70 insertions(+), 9 deletions(-)
 >>>
->>> This needs a %s/specify Bitmap sync mode/specify bitmap sync mode/.
+>>> Looks good to me but for a seemingly unrelated change:
 >>>
->>>> diff --git a/tests/qemu-iotests/257 b/tests/qemu-iotests/257
->>>> index 53ab31c92e..c2a72c577a 100755
->>>> --- a/tests/qemu-iotests/257
->>>> +++ b/tests/qemu-iotests/257
+>>>> diff --git a/block/backup.c b/block/backup.c
+>>>> index b407d57954..e28fd23f6a 100644
+>>>> --- a/block/backup.c
+>>>> +++ b/block/backup.c
 >>>
 >>> [...]
 >>>
->>>> @@ -393,7 +399,7 @@ def test_bitmap_sync(bsync_mode, msync_mode=3D'b=
-itmap', failure=3DNone):
->>>>              # group 1 gets cleared first, then group two gets writt=
-en.
->>>>              if ((bsync_mode =3D=3D 'on-success' and not failure) or=
-
->>>>                  (bsync_mode =3D=3D 'always')):
->>>> -                ebitmap.clear_group(1)
->>>> +                ebitmap.clear()
+>>>> @@ -507,10 +565,12 @@ static int coroutine_fn backup_run(Job *job, E=
+rror **errp)
+>>>>               * notify callback service CoW requests. */
+>>>>              job_yield(job);
+>>>>          }
+>>>> +        ret =3D -ECANCELED;
 >>>
->>> Hmmm...  Why?
->>>
->>
->> From an order of operations standpoint, if we are here, we are expecti=
-ng
->> the bitmap to be synchronized. We can clear any existing data it holds=
-,
->> and then:
->>
->>>>              ebitmap.dirty_group(2)
->>>> =20
->>
->> Add new writes that occurred during the job; which only happen here in=
-
->> this callback.
->>
->> (The old code cleared specifically only group 1, the new code is just
->> more general. I wound up changing it for a version that didn't make it=
-
->> to the list, but this is still correct.)
->>
->>>>          vm.run_job(job, auto_dismiss=3DTrue, auto_finalize=3DFalse,=
-
->>>> @@ -404,8 +410,19 @@ def test_bitmap_sync(bsync_mode, msync_mode=3D'=
-bitmap', failure=3DNone):
->>>>          log('')
->>>> =20
->>>>          if bsync_mode =3D=3D 'always' and failure =3D=3D 'intermedi=
-ate':
->>>> +            # TOP treats anything allocated as dirty, expect to see=
-:
->>>> +            if msync_mode =3D=3D 'top':
->>>> +                ebitmap.dirty_group(0)
->>>> +
->>
->> Sorry, this code is definitely in the "cute" category...
->>
->> If the failure was intermediate, we never call the pre-finalize callba=
-ck
->> above. So we know that the allocated regions of the file are only from=
-
->> groups 0 and 1.
->>
->> So, HERE, we can mark the emulated bitmap's group 0 as dirty, to mimic=
-
->> what the copy_bitmap is going to have started the operation with.
->>
->>>>              # We manage to copy one sector (one bit) before the err=
-or.
->>>>              ebitmap.clear_bit(ebitmap.first_bit)
->>
->> And then right here, we clear the first bit which we did copy out
->> successfully. The emulated bitmap is now correct for sync=3Dtop.
->>
->>>> +
->>>> +            # Full returns all bits set except what was copied/skip=
-ped
->>>> +            if msync_mode =3D=3D 'full':
->>>> +                fail_bit =3D ebitmap.first_bit
->>>> +                ebitmap.clear()
->>>> +                ebitmap.dirty_bits(range(fail_bit, SIZE // GRANULAR=
-ITY))
->>>> +
->>
->> The full mode, though, is special. We cleared the first allocated bit
->> just like for sync=3Dtop, but we take note of the second bit which is =
-the
->> one that caused the injected failure.
->>
->> For both 'top' and 'full' modes here we're really using the ebitmap as=
-
->> an allocation record to inform what the output bitmap is going to look=
- like.
->>
->>>
->>> So sync=3Dtop didn=E2=80=98t copy anything?  Is that because it now e=
-rrors out
->>> before getting to copy something?
->>>
->>
->> The ebitmap.clear_bit(ebitmap.first_bit) triggers for top, too. The te=
-st
->> output should hopefully make sense here.
->=20
-> I...   I have no idea how I missed the ebitmap.clear_bit().
->=20
-> So with the test output fixed:
->=20
-> Reviewed-by: Max Reitz <mreitz@redhat.com>
->=20
-
-Whoops. I definitely fixed that typo *after* I ran my tests and didn't
-re-run them.
-
->>> (The rest looks good to me.)
+>>> This one.  This doesn=E2=80=99t look like it belongs in this patch, a=
+nd I=E2=80=99m not
+>>> even sure it=E2=80=99s correct.  Being cancelled is the normal state =
+for
+>>> sync=3Dnone, so I suppose it is correct to just return 0 then.
 >>>
 >>> Max
 >>>
+>> Yeah, this is wiggly, so... yes, we can return 0 here. The job
+>> infrastructure machinery is going to change it to an ECANCELED for us
+>> anyway:
+>>
+>> job_completed
+>>   job_update_rc
+>>     if (!job->ret && job_is_cancelled(job)) {
+>>         job->ret =3D -ECANCELED;
+>>     }
+>>
+>> So in this case I just figured that I might as well make it explicit;
+>> this is an error exit.
+>>
+>> (I guess just leaving it at 0 means "whatever the job machinery thinks=
+"
+>> too, which is probably also fine. The job machinery does not distingui=
+sh
+>> between "canceled and 0" or "canceled and < 0".)
+>=20
+> Hm, OK.  I think it should be an own patch, though.
+>=20
 
-Thank you for your reviews!
+Path of least edits.
 
+I'm removing this one change (since it doesn't change anything anyway),
+making the error message capitalization fix in the reference output, and
+staging the series.
 
-
---lqSvD6JVKfMStgcEEJccfspnSOKb9T1us--
-
---aBK0NBTtzziirhaYzFq4Z8HJlYVb6kcm8
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEE+ber27ys35W+dsvQfe+BBqr8OQ4FAl0vYLcACgkQfe+BBqr8
-OQ6F3w/+LWBjmFGbpve0iXn6c2Y1Ghw1MEoH79eH60TzAXBqZRGZHtBYEaIDLXd+
-nrZ2KITrDMZpuNi0JS7HNR9n+L2fMO0Pg5xfwmKG0mACcC7CxPc/31JhiQdKaaYB
-v9SXmeF390Lv2lsH/QXze+cwGjhlVXjztLSQHzZYWss4QQp+qNQZ5nNd4E9xXqsc
-v96XzyuULGf9X+tiEcjHzBsIGZNg8lXauyp9yOdohXa5xqWocZZBnmjmxWux3FQd
-1+oaZNfD35r2QiIghcsuDhFMz0kAQJdZ0l8fgMGpQvnTjZdVYLlhDrmt3B2xvh/H
-5n2ncVRdJf6FvueQDB6Cs664teIVFeV9zrsmnRF40ufeCT50oo3zg8GsvN7PEwrA
-DvqWLLxztMTtkRcX6o671+R/FVdNIp8JNbKNyEbeMJ1QDDCKisWRwGfOgTev3g6H
-2y2Qyxy+FL6iWmeLeXR5EcdKaSKuDKmje7uZwnXm4RDZi12/6zuUH0u4h6PQEhbG
-Z/FYEpKQ60pHOVtfftuUfULNDyJp+YaKq803XDmvTVg/JXaKq5NgGOhmf/FSKgom
-sdb4uNQiUoh4z81YJ3Z/dSfaEta/Y7IGAqGoy4RjXQV1RyMN5BW8hJcgL+h4v6LM
-mVMz/ai8yTENT20VIlEj1S+GrKnP7UCIfzsAK8P86hx9tIJb3do=
-=gsWk
------END PGP SIGNATURE-----
-
---aBK0NBTtzziirhaYzFq4Z8HJlYVb6kcm8--
+--js
 
