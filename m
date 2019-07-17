@@ -2,63 +2,66 @@ Return-Path: <SRS0=PWhW=VO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA149C76186
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 13:24:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E9FFC76192
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 13:26:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9238320659
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 13:24:22 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="aphceDyt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9238320659
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id 59E1320659
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 13:26:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 59E1320659
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57084 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57094 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnjuv-0002Cb-K2
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 09:24:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50168)
+	id 1hnjwi-0003oB-J8
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 09:26:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50536)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgibson@ozlabs.org>) id 1hnjuj-0001ht-Ie
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 09:24:10 -0400
+ (envelope-from <no-reply@patchew.org>) id 1hnjwW-00035D-S7
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 09:26:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1hnjug-0000Hl-Gk
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 09:24:09 -0400
-Received: from ozlabs.org ([203.11.71.1]:54025)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1hnjud-00006z-Pd; Wed, 17 Jul 2019 09:24:06 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 45pdJG31kwz9sDB; Wed, 17 Jul 2019 23:23:42 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1563369822;
- bh=WTNV/IQBTZ9yT85QOrEPtbwfMFFiKrgTRU3cXr8ruuE=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=aphceDyt01FwUdDgXZJ7+qCz7R5rB6MrtiCrDvKBSWwLwx3USyQFrWblDXvuXbUyl
- k5xUGZZ2H6J0WJjZsg/mDMMaiEqN3WBqoUp5f8PLrs3nry63moWvRYivA7WmBNHSS0
- eKAiNbdaq5B2Qgahrt/re3G7bGiPtW1JyjozV9OI=
-Date: Wed, 17 Jul 2019 21:48:54 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Nicholas Piggin <npiggin@gmail.com>
-Message-ID: <20190717114854.GA8468@umbus.fritz.box>
-References: <20190717054655.14104-1-npiggin@gmail.com>
+ (envelope-from <no-reply@patchew.org>) id 1hnjwV-00019Y-8h
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 09:26:00 -0400
+Resent-Date: Wed, 17 Jul 2019 09:26:00 -0400
+Resent-Message-Id: <E1hnjwV-00019Y-8h@eggs.gnu.org>
+Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21582)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1hnjwV-00018e-00
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 09:25:59 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1563369942; cv=none; d=zoho.com; s=zohoarc; 
+ b=T9TpsXyXFkBkLfGgs1QCWCvDKlICW7j5vfW3svNZy/xrFds3IrAnzvgauRwKCk1VIbFxAAX94phPB7hPLGHlYbROcgp/++FjAn68xgNkrS1fCLR/v9FSNE5lU3rvpOcr1TdEbyud1hKMYBclRNEPDIJTa9ZG9WfnqGN9JsJOOyc=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1563369942;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+ bh=iGxbY8QPbhv1VaCGZ6FBcId8NQPm4r3rCZd7wF65bzU=; 
+ b=g65JKoc8LZUi1kzQFJLs6a+CiDMR320CrlKkZknwcJLq70FBCZyElQ/8R5iX7BbpeAdcKhbaFEHAW03rjqxI/7aVGtSnL7D2zjIl6p2kHjsDUUEg1CDEeyPl+5KMJbWcvGBw2UCOj8EX8O/vndF6uaOLv2fjg9K6nGA+Adn+QqM=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1563369941246589.8099122795194;
+ Wed, 17 Jul 2019 06:25:41 -0700 (PDT)
+Message-ID: <156336993969.10055.11383316596769508622@c4a48874b076>
+In-Reply-To: <20190716145421.17645-1-yury-kotov@yandex-team.ru>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="sdtB3X0nJg68CQEu"
-Content-Disposition: inline
-In-Reply-To: <20190717054655.14104-1-npiggin@gmail.com>
-User-Agent: Mutt/1.12.0 (2019-05-25)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: yury-kotov@yandex-team.ru
+Date: Wed, 17 Jul 2019 06:25:41 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 203.11.71.1
-Subject: Re: [Qemu-devel] [RFC PATCH] Implement qemu_thread_yield for posix,
- use it in mttcg to handle EXCP_YIELD
+X-Received-From: 136.143.188.55
+Subject: Re: [Qemu-devel] [PATCH v2 0/3] High downtime with 95+ throttle pct
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,151 +73,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Greg Kurz <groug@kaod.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
- =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Reply-To: qemu-devel@nongnu.org
+Cc: lvivier@redhat.com, thuth@redhat.com, quintela@redhat.com, sw@weilnetz.de,
+ dgilbert@redhat.com, qemu-devel@nongnu.org, yc-core@yandex-team.ru,
+ pbonzini@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDcxNjE0NTQyMS4xNzY0
+NS0xLXl1cnkta290b3ZAeWFuZGV4LXRlYW0ucnUvCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVk
+IHRoZSBhc2FuIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5nIGNvbW1hbmRzIGFu
+ZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0YWxsZWQsIHlvdSBj
+YW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4g
+PT09CiMhL2Jpbi9iYXNoCm1ha2UgZG9ja2VyLWltYWdlLWZlZG9yYSBWPTEgTkVUV09SSz0xCnRp
+bWUgbWFrZSBkb2NrZXItdGVzdC1kZWJ1Z0BmZWRvcmEgVEFSR0VUX0xJU1Q9eDg2XzY0LXNvZnRt
+bXUgSj0xNCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCmNsYW5nIC1pcXVvdGUg
+L3RtcC9xZW11LXRlc3QvYnVpbGQvdGVzdHMvbGlicW9zIC1pcXVvdGUgdGVzdHMvbGlicW9zIC1p
+cXVvdGUgL3RtcC9xZW11LXRlc3Qvc3JjL3RjZyAtaXF1b3RlIC90bXAvcWVtdS10ZXN0L3NyYy90
+Y2cvaTM4NiAtSS90bXAvcWVtdS10ZXN0L3NyYy9saW51eC1oZWFkZXJzIC1JL3RtcC9xZW11LXRl
+c3QvYnVpbGQvbGludXgtaGVhZGVycyAtaXF1b3RlIC4gLWlxdW90ZSAvdG1wL3FlbXUtdGVzdC9z
+cmMgLWlxdW90ZSAvdG1wL3FlbXUtdGVzdC9zcmMvYWNjZWwvdGNnIC1pcXVvdGUgL3RtcC9xZW11
+LXRlc3Qvc3JjL2luY2x1ZGUgLUkvdXNyL2luY2x1ZGUvcGl4bWFuLTEgIC1JL3RtcC9xZW11LXRl
+c3Qvc3JjL2R0Yy9saWJmZHQgLVdlcnJvciAgLXB0aHJlYWQgLUkvdXNyL2luY2x1ZGUvZ2xpYi0y
+LjAgLUkvdXNyL2xpYjY0L2dsaWItMi4wL2luY2x1ZGUgIC1mUElFIC1EUElFIC1tNjQgLW1jeDE2
+IC1EX0dOVV9TT1VSQ0UgLURfRklMRV9PRkZTRVRfQklUUz02NCAtRF9MQVJHRUZJTEVfU09VUkNF
+IC1Xc3RyaWN0LXByb3RvdHlwZXMgLVdyZWR1bmRhbnQtZGVjbHMgLVdhbGwgLVd1bmRlZiAtV3dy
+aXRlLXN0cmluZ3MgLVdtaXNzaW5nLXByb3RvdHlwZXMgLWZuby1zdHJpY3QtYWxpYXNpbmcgLWZu
+by1jb21tb24gLWZ3cmFwdiAtc3RkPWdudTk5ICAtV25vLXN0cmluZy1wbHVzLWludCAtV25vLXR5
+cGVkZWYtcmVkZWZpbml0aW9uIC1Xbm8taW5pdGlhbGl6ZXItb3ZlcnJpZGVzIC1XZXhwYW5zaW9u
+LXRvLWRlZmluZWQgLVdlbmRpZi1sYWJlbHMgLVduby1zaGlmdC1uZWdhdGl2ZS12YWx1ZSAtV25v
+LW1pc3NpbmctaW5jbHVkZS1kaXJzIC1XZW1wdHktYm9keSAtV25lc3RlZC1leHRlcm5zIC1XZm9y
+bWF0LXNlY3VyaXR5IC1XZm9ybWF0LXkyayAtV2luaXQtc2VsZiAtV2lnbm9yZWQtcXVhbGlmaWVy
+cyAtV29sZC1zdHlsZS1kZWZpbml0aW9uIC1XdHlwZS1saW1pdHMgLWZzdGFjay1wcm90ZWN0b3It
+c3Ryb25nICAtSS91c3IvaW5jbHVkZS9wMTEta2l0LTEgICAgIC1JL3Vzci9pbmNsdWRlL2xpYnBu
+ZzE2ICAtSS91c3IvaW5jbHVkZS9zcGljZS0xIC1JL3Vzci9pbmNsdWRlL3NwaWNlLXNlcnZlciAt
+SS91c3IvaW5jbHVkZS9jYWNhcmQgLUkvdXNyL2luY2x1ZGUvZ2xpYi0yLjAgLUkvdXNyL2xpYjY0
+L2dsaWItMi4wL2luY2x1ZGUgLUkvdXNyL2luY2x1ZGUvbnNzMyAtSS91c3IvaW5jbHVkZS9uc3By
+NCAtcHRocmVhZCAtSS91c3IvaW5jbHVkZS9saWJtb3VudCAtSS91c3IvaW5jbHVkZS9ibGtpZCAt
+SS91c3IvaW5jbHVkZS91dWlkIC1JL3Vzci9pbmNsdWRlL3BpeG1hbi0xICAgLUkvdG1wL3FlbXUt
+dGVzdC9zcmMvdGVzdHMgLU1NRCAtTVAgLU1UIHRlc3RzL2xpYnFvcy92aXJ0aW8tc2VyaWFsLm8g
+LU1GIHRlc3RzL2xpYnFvcy92aXJ0aW8tc2VyaWFsLmQgLWZzYW5pdGl6ZT11bmRlZmluZWQgLWZz
+YW5pdGl6ZT1hZGRyZXNzIC1nICAgLWMgLW8gdGVzdHMvbGlicW9zL3ZpcnRpby1zZXJpYWwubyAv
+dG1wL3FlbXUtdGVzdC9zcmMvdGVzdHMvbGlicW9zL3ZpcnRpby1zZXJpYWwuYwpjbGFuZyAtaXF1
+b3RlIC90bXAvcWVtdS10ZXN0L2J1aWxkL3Rlc3RzL2xpYnFvcyAtaXF1b3RlIHRlc3RzL2xpYnFv
+cyAtaXF1b3RlIC90bXAvcWVtdS10ZXN0L3NyYy90Y2cgLWlxdW90ZSAvdG1wL3FlbXUtdGVzdC9z
+cmMvdGNnL2kzODYgLUkvdG1wL3FlbXUtdGVzdC9zcmMvbGludXgtaGVhZGVycyAtSS90bXAvcWVt
+dS10ZXN0L2J1aWxkL2xpbnV4LWhlYWRlcnMgLWlxdW90ZSAuIC1pcXVvdGUgL3RtcC9xZW11LXRl
+c3Qvc3JjIC1pcXVvdGUgL3RtcC9xZW11LXRlc3Qvc3JjL2FjY2VsL3RjZyAtaXF1b3RlIC90bXAv
+cWVtdS10ZXN0L3NyYy9pbmNsdWRlIC1JL3Vzci9pbmNsdWRlL3BpeG1hbi0xICAtSS90bXAvcWVt
+dS10ZXN0L3NyYy9kdGMvbGliZmR0IC1XZXJyb3IgIC1wdGhyZWFkIC1JL3Vzci9pbmNsdWRlL2ds
+aWItMi4wIC1JL3Vzci9saWI2NC9nbGliLTIuMC9pbmNsdWRlICAtZlBJRSAtRFBJRSAtbTY0IC1t
+Y3gxNiAtRF9HTlVfU09VUkNFIC1EX0ZJTEVfT0ZGU0VUX0JJVFM9NjQgLURfTEFSR0VGSUxFX1NP
+VVJDRSAtV3N0cmljdC1wcm90b3R5cGVzIC1XcmVkdW5kYW50LWRlY2xzIC1XYWxsIC1XdW5kZWYg
+LVd3cml0ZS1zdHJpbmdzIC1XbWlzc2luZy1wcm90b3R5cGVzIC1mbm8tc3RyaWN0LWFsaWFzaW5n
+IC1mbm8tY29tbW9uIC1md3JhcHYgLXN0ZD1nbnU5OSAgLVduby1zdHJpbmctcGx1cy1pbnQgLVdu
+by10eXBlZGVmLXJlZGVmaW5pdGlvbiAtV25vLWluaXRpYWxpemVyLW92ZXJyaWRlcyAtV2V4cGFu
+c2lvbi10by1kZWZpbmVkIC1XZW5kaWYtbGFiZWxzIC1Xbm8tc2hpZnQtbmVnYXRpdmUtdmFsdWUg
+LVduby1taXNzaW5nLWluY2x1ZGUtZGlycyAtV2VtcHR5LWJvZHkgLVduZXN0ZWQtZXh0ZXJucyAt
+V2Zvcm1hdC1zZWN1cml0eSAtV2Zvcm1hdC15MmsgLVdpbml0LXNlbGYgLVdpZ25vcmVkLXF1YWxp
+ZmllcnMgLVdvbGQtc3R5bGUtZGVmaW5pdGlvbiAtV3R5cGUtbGltaXRzIC1mc3RhY2stcHJvdGVj
+dG9yLXN0cm9uZyAgLUkvdXNyL2luY2x1ZGUvcDExLWtpdC0xICAgICAtSS91c3IvaW5jbHVkZS9s
+aWJwbmcxNiAgLUkvdXNyL2luY2x1ZGUvc3BpY2UtMSAtSS91c3IvaW5jbHVkZS9zcGljZS1zZXJ2
+ZXIgLUkvdXNyL2luY2x1ZGUvY2FjYXJkIC1JL3Vzci9pbmNsdWRlL2dsaWItMi4wIC1JL3Vzci9s
+aWI2NC9nbGliLTIuMC9pbmNsdWRlIC1JL3Vzci9pbmNsdWRlL25zczMgLUkvdXNyL2luY2x1ZGUv
+bnNwcjQgLXB0aHJlYWQgLUkvdXNyL2luY2x1ZGUvbGlibW91bnQgLUkvdXNyL2luY2x1ZGUvYmxr
+aWQgLUkvdXNyL2luY2x1ZGUvdXVpZCAtSS91c3IvaW5jbHVkZS9waXhtYW4tMSAgIC1JL3RtcC9x
+ZW11LXRlc3Qvc3JjL3Rlc3RzIC1NTUQgLU1QIC1NVCB0ZXN0cy9saWJxb3MvYWFyY2g2NC14bG54
+LXpjdTEwMi1tYWNoaW5lLm8gLU1GIHRlc3RzL2xpYnFvcy9hYXJjaDY0LXhsbngtemN1MTAyLW1h
+Y2hpbmUuZCAtZnNhbml0aXplPXVuZGVmaW5lZCAtZnNhbml0aXplPWFkZHJlc3MgLWcgICAtYyAt
+byB0ZXN0cy9saWJxb3MvYWFyY2g2NC14bG54LXpjdTEwMi1tYWNoaW5lLm8gL3RtcC9xZW11LXRl
+c3Qvc3JjL3Rlc3RzL2xpYnFvcy9hYXJjaDY0LXhsbngtemN1MTAyLW1hY2hpbmUuYwpjbGFuZyAt
+aXF1b3RlIC90bXAvcWVtdS10ZXN0L2J1aWxkLy4gLWlxdW90ZSAuIC1pcXVvdGUgL3RtcC9xZW11
+LXRlc3Qvc3JjL3RjZyAtaXF1b3RlIC90bXAvcWVtdS10ZXN0L3NyYy90Y2cvaTM4NiAtSS90bXAv
+cWVtdS10ZXN0L3NyYy9saW51eC1oZWFkZXJzIC1JL3RtcC9xZW11LXRlc3QvYnVpbGQvbGludXgt
+aGVhZGVycyAtaXF1b3RlIC4gLWlxdW90ZSAvdG1wL3FlbXUtdGVzdC9zcmMgLWlxdW90ZSAvdG1w
+L3FlbXUtdGVzdC9zcmMvYWNjZWwvdGNnIC1pcXVvdGUgL3RtcC9xZW11LXRlc3Qvc3JjL2luY2x1
+ZGUgLUkvdG1wL3FlbXUtdGVzdC9zcmMvdGVzdHMvZnAgLUkvdG1wL3FlbXUtdGVzdC9zcmMvdGVz
+dHMvZnAvYmVya2VsZXktc29mdGZsb2F0LTMvc291cmNlL2luY2x1ZGUgLUkvdG1wL3FlbXUtdGVz
+dC9zcmMvdGVzdHMvZnAvYmVya2VsZXktc29mdGZsb2F0LTMvc291cmNlLzgwODYtU1NFIC1JL3Rt
+cC9xZW11LXRlc3Qvc3JjL3Rlc3RzL2ZwL2JlcmtlbGV5LXRlc3RmbG9hdC0zL3NvdXJjZSAtSS91
+c3IvaW5jbHVkZS9waXhtYW4tMSAtSS90bXAvcWVtdS10ZXN0L3NyYy9kdGMvbGliZmR0IC1XZXJy
+b3IgLXB0aHJlYWQgLUkvdXNyL2luY2x1ZGUvZ2xpYi0yLjAgLUkvdXNyL2xpYjY0L2dsaWItMi4w
+L2luY2x1ZGUgLWZQSUUgLURQSUUgLW02NCAtbWN4MTYgLURfR05VX1NPVVJDRSAtRF9GSUxFX09G
+RlNFVF9CSVRTPTY0IC1EX0xBUkdFRklMRV9TT1VSQ0UgLVdzdHJpY3QtcHJvdG90eXBlcyAtV3Jl
+ZHVuZGFudC1kZWNscyAtV2FsbCAtV3VuZGVmIC1Xd3JpdGUtc3RyaW5ncyAtV21pc3NpbmctcHJv
+dG90eXBlcyAtZm5vLXN0cmljdC1hbGlhc2luZyAtZm5vLWNvbW1vbiAtZndyYXB2IC1zdGQ9Z251
+OTkgLVduby1zdHJpbmctcGx1cy1pbnQgLVduby10eXBlZGVmLXJlZGVmaW5pdGlvbiAtV25vLWlu
+aXRpYWxpemVyLW92ZXJyaWRlcyAtV2V4cGFuc2lvbi10by1kZWZpbmVkIC1XZW5kaWYtbGFiZWxz
+IC1Xbm8tc2hpZnQtbmVnYXRpdmUtdmFsdWUgLVduby1taXNzaW5nLWluY2x1ZGUtZGlycyAtV2Vt
+cHR5LWJvZHkgLVduZXN0ZWQtZXh0ZXJucyAtV2Zvcm1hdC1zZWN1cml0eSAtV2Zvcm1hdC15Mmsg
+LVdpbml0LXNlbGYgLVdpZ25vcmVkLXF1YWxpZmllcnMgLVdvbGQtc3R5bGUtZGVmaW5pdGlvbiAt
+V3R5cGUtbGltaXRzIC1mc3RhY2stcHJvdGVjdG9yLXN0cm9uZyAtSS91c3IvaW5jbHVkZS9wMTEt
+a2l0LTEgLUkvdXNyL2luY2x1ZGUvbGlicG5nMTYgLUkvdXNyL2luY2x1ZGUvc3BpY2UtMSAtSS91
+c3IvaW5jbHVkZS9zcGljZS1zZXJ2ZXIgLUkvdXNyL2luY2x1ZGUvY2FjYXJkIC1JL3Vzci9pbmNs
+dWRlL2dsaWItMi4wIC1JL3Vzci9saWI2NC9nbGliLTIuMC9pbmNsdWRlIC1JL3Vzci9pbmNsdWRl
+L25zczMgLUkvdXNyL2luY2x1ZGUvbnNwcjQgLXB0aHJlYWQgLUkvdXNyL2luY2x1ZGUvbGlibW91
+bnQgLUkvdXNyL2luY2x1ZGUvYmxraWQgLUkvdXNyL2luY2x1ZGUvdXVpZCAtSS91c3IvaW5jbHVk
+ZS9waXhtYW4tMSAtREhXX1BPSVNPTl9IIC1EVEFSR0VUX0FSTSAgLURTT0ZURkxPQVRfUk9VTkRf
+T0REIC1ESU5MSU5FX0xFVkVMPTUgLURTT0ZURkxPQVRfRkFTVF9ESVYzMlRPMTYgLURTT0ZURkxP
+QVRfRkFTVF9ESVY2NFRPMzIgLURTT0ZURkxPQVRfRkFTVF9JTlQ2NCAgLURGTE9BVDE2IC1ERkxP
+QVQ2NCAtREVYVEZMT0FUODAgLURGTE9BVDEyOCAtREZMT0FUX1JPVU5EX09ERCAtRExPTkdfRE9V
+QkxFX0lTX0VYVEZMT0FUODAgIC1Xbm8tc3RyaWN0LXByb3RvdHlwZXMgLVduby11bmtub3duLXBy
+YWdtYXMgLVduby11bmluaXRpYWxpemVkIC1Xbm8tbWlzc2luZy1wcm90b3R5cGVzIC1Xbm8tcmV0
+dXJuLXR5cGUgLVduby11bnVzZWQtZnVuY3Rpb24gLVduby1lcnJvciAtTU1EIC1NUCAtTVQgdGVz
+dF9hX2V4dEY4MF96X2YxMjgubyAtTUYgLi90ZXN0X2FfZXh0RjgwX3pfZjEyOC5kIC1mc2FuaXRp
+emU9dW5kZWZpbmVkIC1mc2FuaXRpemU9YWRkcmVzcyAtZyAgIC1jIC1vIHRlc3RfYV9leHRGODBf
+el9mMTI4Lm8gL3RtcC9xZW11LXRlc3Qvc3JjL3Rlc3RzL2ZwL2JlcmtlbGV5LXRlc3RmbG9hdC0z
+L3NvdXJjZS90ZXN0X2FfZXh0RjgwX3pfZjEyOC5jCi90bXAvcWVtdS10ZXN0L3NyYy90ZXN0cy9t
+aWdyYXRpb24tdGVzdC5jOjExNjM6NTogZXJyb3I6IGltcGxpY2l0IGRlY2xhcmF0aW9uIG9mIGZ1
+bmN0aW9uICdtaWdyYXRlX3NldF9wYXJhbWV0ZXInIGlzIGludmFsaWQgaW4gQzk5IFstV2Vycm9y
+LC1XaW1wbGljaXQtZnVuY3Rpb24tZGVjbGFyYXRpb25dCiAgICBtaWdyYXRlX3NldF9wYXJhbWV0
+ZXIoZnJvbSwgImNwdS10aHJvdHRsZS1pbml0aWFsIiwgZXhwZWN0ZWRfcGN0c1sxXSk7CiAgICBe
+Ci90bXAvcWVtdS10ZXN0L3NyYy90ZXN0cy9taWdyYXRpb24tdGVzdC5jOjExNjM6NTogbm90ZTog
+ZGlkIHlvdSBtZWFuICdtaWdyYXRlX3NldF9wYXJhbWV0ZXJfaW50Jz8KL3RtcC9xZW11LXRlc3Qv
+c3JjL3Rlc3RzL21pZ3JhdGlvbi10ZXN0LmM6NDM1OjEzOiBub3RlOiAnbWlncmF0ZV9zZXRfcGFy
+YW1ldGVyX2ludCcgZGVjbGFyZWQgaGVyZQpzdGF0aWMgdm9pZCBtaWdyYXRlX3NldF9wYXJhbWV0
+ZXJfaW50KFFUZXN0U3RhdGUgKndobywgY29uc3QgY2hhciAqcGFyYW1ldGVyLAogICAgICAgICAg
+ICBeCi90bXAvcWVtdS10ZXN0L3NyYy90ZXN0cy9taWdyYXRpb24tdGVzdC5jOjExNjM6NTogZXJy
+b3I6IHRoaXMgZnVuY3Rpb24gZGVjbGFyYXRpb24gaXMgbm90IGEgcHJvdG90eXBlIFstV2Vycm9y
+LC1Xc3RyaWN0LXByb3RvdHlwZXNdCiAgICBtaWdyYXRlX3NldF9wYXJhbWV0ZXIoZnJvbSwgImNw
+dS10aHJvdHRsZS1pbml0aWFsIiwgZXhwZWN0ZWRfcGN0c1sxXSk7CiAgICBeCjIgZXJyb3JzIGdl
+bmVyYXRlZC4KCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9y
+Zy9sb2dzLzIwMTkwNzE2MTQ1NDIxLjE3NjQ1LTEteXVyeS1rb3RvdkB5YW5kZXgtdGVhbS5ydS90
+ZXN0aW5nLmFzYW4vP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNh
+bGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBm
+ZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
 
---sdtB3X0nJg68CQEu
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, Jul 17, 2019 at 03:46:55PM +1000, Nicholas Piggin wrote:
-> This is a bit of proof of concept in case mttcg becomes more important
-> yield could be handled like this. You can have by accident or deliberately
-> force vCPUs onto the same physical CPU and cause inversion issues when the
-> lock holder was preempted by the waiter. This is lightly tested but not
-> to the point of measuring performance difference.
->=20
-> I really consider the previous confer/prod patches more important just to
-> provide a more complete guest environment and better test coverage, than
-> performance, but maybe someone wants to persue this.
->=20
-> Thanks,
-> Nick
-> ---
->  cpus.c                   |  6 ++++++
->  hw/ppc/spapr_hcall.c     | 14 +++++++-------
->  include/qemu/thread.h    |  1 +
->  util/qemu-thread-posix.c |  5 +++++
->  util/qemu-thread-win32.c |  4 ++++
->  5 files changed, 23 insertions(+), 7 deletions(-)
->=20
-> diff --git a/cpus.c b/cpus.c
-> index 927a00aa90..f036e062d9 100644
-> --- a/cpus.c
-> +++ b/cpus.c
-> @@ -1760,6 +1760,12 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
->                  qemu_mutex_unlock_iothread();
->                  cpu_exec_step_atomic(cpu);
->                  qemu_mutex_lock_iothread();
-> +                break;
-> +            case EXCP_YIELD:
-> +                qemu_mutex_unlock_iothread();
-> +                qemu_thread_yield();
-> +                qemu_mutex_lock_iothread();
-> +                break;
->              default:
->                  /* Ignore everything else? */
->                  break;
-> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-> index 57c1ee0fe1..9c24a64dfe 100644
-> --- a/hw/ppc/spapr_hcall.c
-> +++ b/hw/ppc/spapr_hcall.c
-> @@ -1162,13 +1162,13 @@ static target_ulong h_confer(PowerPCCPU *cpu, Spa=
-prMachineState *spapr,
->              return H_SUCCESS;
->          }
-> =20
-> -        /*
-> -         * The targeted confer does not do anything special beyond yield=
-ing
-> -         * the current vCPU, but even this should be better than nothing.
-> -         * At least for single-threaded tcg, it gives the target a chanc=
-e to
-> -         * run before we run again. Multi-threaded tcg does not really do
-> -         * anything with EXCP_YIELD yet.
-> -         */
-> +       /*
-> +        * The targeted confer does not do anything special beyond yieldi=
-ng
-> +        * the current vCPU, but even this should be better than nothing.
-> +        * For single-threaded tcg, it gives the target a chance to run
-> +        * before we run again, multi-threaded tcg will yield the CPU to
-> +        * another vCPU.
-> +        */
-
-Uh.. this looks like a whitespace fixup leaked in from your other patches.
-
->      }
-> =20
->      cs->exception_index =3D EXCP_YIELD;
-> diff --git a/include/qemu/thread.h b/include/qemu/thread.h
-> index 55d83a907c..8525b0a70a 100644
-> --- a/include/qemu/thread.h
-> +++ b/include/qemu/thread.h
-> @@ -160,6 +160,7 @@ void qemu_thread_get_self(QemuThread *thread);
->  bool qemu_thread_is_self(QemuThread *thread);
->  void qemu_thread_exit(void *retval);
->  void qemu_thread_naming(bool enable);
-> +void qemu_thread_yield(void);
-> =20
->  struct Notifier;
->  /**
-> diff --git a/util/qemu-thread-posix.c b/util/qemu-thread-posix.c
-> index 1bf5e65dea..91b12a1082 100644
-> --- a/util/qemu-thread-posix.c
-> +++ b/util/qemu-thread-posix.c
-> @@ -573,3 +573,8 @@ void *qemu_thread_join(QemuThread *thread)
->      }
->      return ret;
->  }
-> +
-> +void qemu_thread_yield(void)
-> +{
-> +    pthread_yield();
-> +}
-> diff --git a/util/qemu-thread-win32.c b/util/qemu-thread-win32.c
-> index 572f88535d..72fe406bef 100644
-> --- a/util/qemu-thread-win32.c
-> +++ b/util/qemu-thread-win32.c
-> @@ -442,3 +442,7 @@ bool qemu_thread_is_self(QemuThread *thread)
->  {
->      return GetCurrentThreadId() =3D=3D thread->tid;
->  }
-> +
-> +void qemu_thread_yield(void)
-> +{
-> +}
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---sdtB3X0nJg68CQEu
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl0vCyQACgkQbDjKyiDZ
-s5KhnBAAzQam8G/fRlMgDHLeAtWJajb1fc5HemVbXPLBVMvxyg5tDbYqG0Z+mwM8
-a91iwmMcbw6fj7pPau+fI2iRHrpEyhdjWF0J+MxjfVRD2QSmiWHdnxpuvtrZu4nP
-AtUi5mS3AsVy5wKI5SKgq4AQETTRRf04XkBSNOEQN4+IXrJxguYUW6s0xaljGgwf
-R2LORV3lHTUhFkl/dlh67U5M48hghHfp+ZcnnrV3N291aVvt0oeFT6hIcyAfjbg7
-jeNlQn4Em4O69K5u/PclPxoq418K95lBSOYS6Tp2A5zyGIHAe85OLrQZzbAmnDpP
-QwP32shAmGjgFcgj8lxn9Ez22h83vditHavZ4oVYbYdYEfAKcejTRMU8zFbxJjas
-Fz2267cCaNSVufcp+2NMAv7rXC5mctJ9yYNSAdzSB9IWF7b1aSnV7NMbSDkGf/3g
-mqKqdwPv18Q0A/sZJ839pn/Xlmjztv2/SgcTKNL7a0s1VeCcp6JeaKvPJTO2yTIw
-qzg//qOEPAA+fqd5VE/JkAtsTAiwBXPHRZfV2LNubnDLST975C5JyxaI8vmKynZA
-0TL/iPK5HQdLEDS3i2DWuFRsXwDORz+TdFMNIHfz9y3DwA0ZX06WDlA7FguG6C2C
-pg5maOZidpKjgR6nFiszHfH4DxKkzkY+26iB/aQDNBEMgkVLHTU=
-=BCao
------END PGP SIGNATURE-----
-
---sdtB3X0nJg68CQEu--
 
