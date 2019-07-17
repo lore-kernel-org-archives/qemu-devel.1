@@ -2,67 +2,116 @@ Return-Path: <SRS0=PWhW=VO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7F93C7618F
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 14:55:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17670C7618F
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 14:55:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8FDC62173E
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 14:55:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FDC62173E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id DFDC42173E
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 14:55:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DFDC42173E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58098 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58100 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnlKz-0003Mg-Jf
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 10:55:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47934)
+	id 1hnlL7-0003st-21
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 10:55:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47967)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <laurent@vivier.eu>) id 1hnlKj-0002cZ-9B
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 10:55:06 -0400
+ (envelope-from <walling@linux.ibm.com>) id 1hnlKm-0002hg-Pd
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 10:55:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1hnlKi-0000VY-CO
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 10:55:05 -0400
-Received: from mout.kundenserver.de ([212.227.126.187]:60161)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hnlKi-0000Ts-2j
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 10:55:04 -0400
-Received: from localhost.localdomain ([78.238.229.36]) by
- mrelayeu.kundenserver.de (mreue009 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1MhUDj-1iQeaM33Zb-00eZlb; Wed, 17 Jul 2019 16:54:38 +0200
-From: Laurent Vivier <laurent@vivier.eu>
-To: qemu-devel@nongnu.org
-Date: Wed, 17 Jul 2019 16:54:15 +0200
-Message-Id: <20190717145418.23883-1-laurent@vivier.eu>
-X-Mailer: git-send-email 2.21.0
+ (envelope-from <walling@linux.ibm.com>) id 1hnlKl-0000Xb-Pl
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 10:55:08 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:42910)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <walling@linux.ibm.com>)
+ id 1hnlKj-0000VO-6l; Wed, 17 Jul 2019 10:55:05 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ x6HEsGSY054452; Wed, 17 Jul 2019 10:54:34 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2tt5p08jqp-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Wed, 17 Jul 2019 10:54:34 -0400
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.27/8.16.0.27) with SMTP id x6HEsX65055510;
+ Wed, 17 Jul 2019 10:54:33 -0400
+Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com
+ [169.62.189.11])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2tt5p08jq0-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Wed, 17 Jul 2019 10:54:33 -0400
+Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
+ by ppma03dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x6HEodJb018144;
+ Wed, 17 Jul 2019 14:54:32 GMT
+Received: from b03cxnp08026.gho.boulder.ibm.com
+ (b03cxnp08026.gho.boulder.ibm.com [9.17.130.18])
+ by ppma03dal.us.ibm.com with ESMTP id 2tq6x7ga8b-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Wed, 17 Jul 2019 14:54:32 +0000
+Received: from b03ledav003.gho.boulder.ibm.com
+ (b03ledav003.gho.boulder.ibm.com [9.17.130.234])
+ by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ x6HEsVDx57016782
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 17 Jul 2019 14:54:31 GMT
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 4A4966A04D;
+ Wed, 17 Jul 2019 14:54:31 +0000 (GMT)
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id ED2CB6A057;
+ Wed, 17 Jul 2019 14:54:29 +0000 (GMT)
+Received: from [9.60.89.78] (unknown [9.60.89.78])
+ by b03ledav003.gho.boulder.ibm.com (Postfix) with ESMTP;
+ Wed, 17 Jul 2019 14:54:29 +0000 (GMT)
+To: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>
+References: <20190715095545.28545-1-philmd@redhat.com>
+ <20190715095545.28545-2-philmd@redhat.com>
+ <ca528cdc-6118-0b2f-c1b8-30b06875dde8@redhat.com>
+ <CAFEAcA-wgTVfj0TUJ=piP0wEgLGiNpOYia5DK2GQAO4Q7gNaWg@mail.gmail.com>
+ <6d69e8ad-d720-ce04-20f2-a03193903078@redhat.com>
+ <20190715125653.6e65d575.cohuck@redhat.com>
+ <c1c68faf-0424-6c7c-e39f-42159457c3ee@redhat.com>
+ <20190715130955.4a117388.cohuck@redhat.com>
+ <13fce62f-234c-1b13-595f-5910c066bc4f@redhat.com>
+ <6c39a198-e951-c0bd-1ddc-5d227afe72ff@redhat.com>
+ <87a7dfth4i.fsf@dusky.pond.sub.org>
+ <20190715181206.3cb1db93.cohuck@redhat.com>
+ <799aa0f5-8850-5caa-5103-e1cf3cdb018f@redhat.com>
+ <87h87m2knh.fsf@dusky.pond.sub.org>
+ <beb5fe93-991d-ba2b-d2c1-51e01b912dbe@redhat.com>
+ <50befb09-d381-4362-9cd1-6fb11c96a719@linux.ibm.com>
+ <633cc3f7-eb20-1bfe-03d2-e481be188eb1@redhat.com>
+From: Collin Walling <walling@linux.ibm.com>
+Message-ID: <87f07cd0-ebbc-3569-9070-5700e47d4af8@linux.ibm.com>
+Date: Wed, 17 Jul 2019 10:54:29 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:iJUMQWmn/IU+W3uizwrVdTgIfbJhN6jkXX8hV9D2L4xOianp89o
- SLMFuJ/2YI4n9xbB3ITeyywN8SZRZwB9eqqqbPC/7rE9um0v4L2BRhrud1638dHRvwxqyGX
- 2SAIU6lqw6CnLInnuHDAgeGHMKRaDVqJVSRYowDSKJOxAlnMG7aNGaOFjGoTzXu0O0KunWz
- WCNVZk50OM8O+z/YfpO0A==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:wKO8LhpXoEM=:saoikWuItXgJWSku06K+PJ
- X98vXRpeRU7OAIejHOhjf1Nnvb/Hhnqhgftoymjp0SgsPOn/IxgPofhz704nMuOQqZwbTwKYN
- ID9UgmQ3hfR+R9e0hSQZDslANNWzvl8RT9IZd9Ib1epAZePwL12Szp/ybDdYxZbUC8/pyeqwQ
- 2T2VgC6r5KNFJXCOsyybuAF8uhehaChXy2XAeP5HWwPxZC5uW20CfqXkYrOKurMKdpWd/HAre
- z9Qtk/0RJrrQ6PzRqYoSUji22cK0F7elNhfo6UJJit/79WmI9Bmk3o2i4sl48W1f6l45i4/z8
- zGK7RE38QzpRQrJSXmTCS1jUKJdCE4NuaHmIlvVBQMEx1sQyepzNfd3UbD9GuJ03ufo1YmHB5
- s87ZB3iAU3ddg6YLJi7JZsTWq+KhDXSndPEQxDcq9FmyaXQH1HiRFI1UoNFvT6lbtk2UzKL9R
- BKZuCoW5qj6O4vMxhojuUDAXLfJPB9SBjxsBWQaaUzrnZWE6Eh5W3BMtpoRaLiDAdssoyaroi
- 4uiuK4A1yboWCEwu3WXzoHJ9l72aR0k4kxxPIaJY90vxQwmCHqn/fgX/Kf5Hm0zGqojZseOP1
- rqagUPFXpzrikSl51G4WpsZTEJDzoCwcSdbj7OW2smFsrNP8iT7MdWhHTNbUZcRPNgkNp8tM8
- MWjmJ6OeWrlyNqVk28NLsxRetGC9c0BGG+RN6ZeyKnwEai68SsQyinFMTTC5EH9jOdu1wnhzc
- mVjlD/WnpBqEKuTN9yXn8qg7PeWKkFcHLboM+PySf45KH3pop9At7W3Q5Q4=
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.187
-Subject: [Qemu-devel] [PULL 0/3] Linux user for 4.1 patches
+In-Reply-To: <633cc3f7-eb20-1bfe-03d2-e481be188eb1@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+ definitions=2019-07-17_07:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1907170174
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.156.1
+Subject: Re: [Qemu-devel] [qemu-s390x] [RFC PATCH 1/3] hw/Kconfig: PCI bus
+ implies PCI_DEVICES
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,53 +123,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Rikalo <arikalo@wavecomp.com>, Riku Voipio <riku.voipio@iki.fi>,
- Laurent Vivier <laurent@vivier.eu>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>,
- Richard Henderson <rth@twiddle.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Cornelia Huck <cohuck@redhat.com>,
+ "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Helge Deller <deller@gmx.de>,
+ Palmer Dabbelt <palmer@sifive.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Artyom Tarasenko <atar4qemu@gmail.com>,
+ "open list:S390" <qemu-s390x@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
+ Alistair Francis <Alistair.Francis@wdc.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ qemu-ppc <qemu-ppc@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit a1a4d49f60d2b899620ee2be4ebb991c4a90a026:
+On 7/17/19 9:52 AM, Paolo Bonzini wrote:
+> On 17/07/19 14:59, Collin Walling wrote:
+>> On 7/16/19 11:04 AM, Thomas Huth wrote:
+>>> On 16/07/2019 15.06, Markus Armbruster wrote:
+>>>> Paolo Bonzini <pbonzini@redhat.com> writes:
+>>>>
+>>>>> On 15/07/19 18:12, Cornelia Huck wrote:
+>>>>>>> Is it INTx vs. MSI vs. MSI-X?
+>>>>>>
+>>>>>> I think for s390x we need (INTx || MSI) vs MSI-X...
+>>>>>
+>>>>> I think MSI vs MSI-X is just how it's configured, not the actual
+>>>>> behavior, so it should be irrelevant.
+>>>>
+>>>> My best guesses from confusing information, please correct
+>>>> misunderstandings:
+>>>>
+>>>> 1. PCI devices need to support MSI or MSI-X to work with s390x.
+>>>
+>>> I think Cornelia mentioned that we might even require MSI-X there ...
+>>> Collin (being listed as "S390 PCI" maintainer), can you confirm?
+>>
+>> MSI-X is mandatory for PCI devices in the s390 architecture.
+> 
+> How are MSI and MSI-X distinguished?
+> 
+> Paolo
+> 
 
-  Merge remote-tracking branch 'remotes/philmd-gitlab/tags/pflash-next-20190716' into staging (2019-07-16 17:02:44 +0100)
+PCI host plugging will check for the MSI-X capability on the
+PCI device. If the MSI-X cap is missing, we fail device plugging.
+We do not check for MSI. Only MSI-X.
 
-are available in the Git repository at:
-
-  git://github.com/vivier/qemu.git tags/linux-user-for-4.1-pull-request
-
-for you to fetch changes up to ad0bcf5d59f120d546be7a2c3590afc66eea0b01:
-
-  linux-user: check valid address in access_ok() (2019-07-17 09:02:51 +0200)
-
-----------------------------------------------------------------
-fix access_ok() to allow to run LTP on AARCH64,
-fix SIOCGSTAMP with 5.2 kernel headers,
-fix structure target_ucontext for MIPS
-
-----------------------------------------------------------------
-
-Aleksandar Markovic (1):
-  linux-user: Fix structure target_ucontext for MIPS
-
-Daniel P. Berrangé (1):
-  linux-user: fix to handle variably sized SIOCGSTAMP with new kernels
-
-Rémi Denis-Courmont (1):
-  linux-user: check valid address in access_ok()
-
- include/exec/cpu_ldst.h    |   4 ++
- linux-user/ioctls.h        |  11 ++-
- linux-user/mips/signal.c   |   5 +-
- linux-user/qemu.h          |   4 +-
- linux-user/syscall.c       | 140 +++++++++++++++++++++++++++++--------
- linux-user/syscall_defs.h  |  30 +++++++-
- linux-user/syscall_types.h |   6 --
- 7 files changed, 158 insertions(+), 42 deletions(-)
-
--- 
-2.21.0
-
+Specifically, the capability is represented by PCI_CAP_ID_MSIX
+in pci_regs.h
 
