@@ -2,62 +2,66 @@ Return-Path: <SRS0=PWhW=VO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23AB2C7618F
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 02:02:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 203B4C7618F
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 02:02:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CDB1F217D9
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 02:02:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E3A222182B
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 02:02:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="a0QM/M6B"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CDB1F217D9
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="ZuRc/nQ6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3A222182B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53502 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53511 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnZGZ-0001rn-Im
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 22:01:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44955)
+	id 1hnZGs-00030T-NM
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 22:02:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45020)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgibson@ozlabs.org>) id 1hnZG7-00011M-Ks
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 22:01:33 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1hnZGA-00011b-IZ
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 22:01:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1hnZG6-0008C9-B0
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 22:01:31 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:37101 helo=ozlabs.org)
+ (envelope-from <dgibson@ozlabs.org>) id 1hnZG9-0008Ds-7w
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 22:01:34 -0400
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:57375 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1hnZG5-000870-MQ; Tue, 16 Jul 2019 22:01:30 -0400
+ id 1hnZG8-0008CV-J0; Tue, 16 Jul 2019 22:01:33 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 45pL900jgRz9sN4; Wed, 17 Jul 2019 12:01:23 +1000 (AEST)
+ id 45pL905ZR0z9sNq; Wed, 17 Jul 2019 12:01:24 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1563328884;
- bh=SWy7mB1m41APMBolYwQLY/j1EDSpQVFv99JPkyPdRDo=;
+ bh=q6UzWaLPvEiEIhiNKkSs5QmIRbeg/sFKGRR6qGcoNjE=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=a0QM/M6B/g8kTC7x+GkT4IqUR3cgswFq2X9+yBFBwtNXkd7j3bn89bUBojtzOKgG5
- EpI8Vvkd2/H85g8p5nmAlGjHHihR8cf5AZa++DDi769DSPeg/22GmNvfxKlFzkYWRU
- GrtikDNr2G2mKZsVCjg0UsF5pyefSLyM7J/QbVcY=
-Date: Wed, 17 Jul 2019 11:39:09 +1000
+ b=ZuRc/nQ6QvXCd/h+qG+xLpoqjnZN0MVv8fbz9m3m6y8YTWSBtmW0kQ75pulyNHswg
+ xbpBHd+3pLnV07aMLGJFN35hgSrMmSzvydPsEK2nKZniW76awJ3sjQq/KSeempzLVL
+ mcsNrdyXfJjfNkstp1Z4TK2yuKXEKRdNxr6YBjtk=
+Date: Wed, 17 Jul 2019 11:51:53 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-To: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <20190717013909.GC2217@umbus.fritz.box>
-References: <156326547324.51324.17260886524634041718.stgit@lep8c.aus.stglabs.ibm.com>
- <58500cfb-cacb-17e9-f993-4107289a5f44@linaro.org>
+To: Nicholas Piggin <npiggin@gmail.com>
+Message-ID: <20190717015153.GB9123@umbus.fritz.box>
+References: <20190716024726.17864-1-npiggin@gmail.com>
+ <20190716024726.17864-4-npiggin@gmail.com>
+ <20190716082549.GE7525@umbus.fritz.box>
+ <1563270152.eyfvtns0jc.astroid@bobo.none>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="da4uJneut+ArUgXk"
+ protocol="application/pgp-signature"; boundary="v9Ux+11Zm5mwPlX6"
 Content-Disposition: inline
-In-Reply-To: <58500cfb-cacb-17e9-f993-4107289a5f44@linaro.org>
+In-Reply-To: <1563270152.eyfvtns0jc.astroid@bobo.none>
 User-Agent: Mutt/1.12.0 (2019-05-25)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 203.11.71.1
-Subject: Re: [Qemu-devel] [PATCH] ppc: Fix some memory leaks
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2401:3900:2:1::2
+Subject: Re: [Qemu-devel] [PATCH v4 3/5] spapr: Implement H_CONFER
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,44 +73,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
- Shivaprasad G Bhat <sbhat@linux.ibm.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org,
+ =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---da4uJneut+ArUgXk
+--v9Ux+11Zm5mwPlX6
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jul 16, 2019 at 07:44:24AM -0700, Richard Henderson wrote:
-> On 7/16/19 8:24 AM, Shivaprasad G Bhat wrote:
-> > @@ -827,6 +827,7 @@ int spapr_dt_drc(void *fdt, int offset, Object *own=
-er, uint32_t drc_type_mask)
-> >          Object *obj;
-> >          SpaprDrc *drc;
-> >          SpaprDrcClass *drck;
-> > +        const char *drc_name =3D NULL;
-> >          uint32_t drc_index, drc_power_domain;
-> > =20
-> >          if (!strstart(prop->type, "link<", NULL)) {
-> > @@ -856,8 +857,10 @@ int spapr_dt_drc(void *fdt, int offset, Object *ow=
-ner, uint32_t drc_type_mask)
-> >          g_array_append_val(drc_power_domains, drc_power_domain);
-> > =20
-> >          /* ibm,drc-names */
-> > -        drc_names =3D g_string_append(drc_names, spapr_drc_name(drc));
-> > +        drc_name =3D spapr_drc_name(drc);
-> > +        drc_names =3D g_string_append(drc_names, drc_name);
-> >          drc_names =3D g_string_insert_len(drc_names, -1, "\0", 1);
-> > +        g_free((char *)drc_name);
+On Tue, Jul 16, 2019 at 08:25:28PM +1000, Nicholas Piggin wrote:
+> David Gibson's on July 16, 2019 6:25 pm:
+> > On Tue, Jul 16, 2019 at 12:47:24PM +1000, Nicholas Piggin wrote:
+> >> This does not do directed yielding and is not quite as strict as PAPR
+> >> specifies in terms of precise dispatch behaviour. This generally will
+> >> mean suboptimal performance, rather than guest misbehaviour. Linux
+> >> does not rely on exact dispatch behaviour.
+> >>=20
+> >> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+> >> ---
+> >>  hw/ppc/spapr_hcall.c | 48 ++++++++++++++++++++++++++++++++++++++++++++
+> >>  1 file changed, 48 insertions(+)
+> >>=20
+> >> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+> >> index 8b208ab259..28d58113be 100644
+> >> --- a/hw/ppc/spapr_hcall.c
+> >> +++ b/hw/ppc/spapr_hcall.c
+> >> @@ -1069,6 +1069,53 @@ static target_ulong h_cede(PowerPCCPU *cpu, Spa=
+prMachineState *spapr,
+> >>      return H_SUCCESS;
+> >>  }
+> >> =20
+> >> +static target_ulong h_confer(PowerPCCPU *cpu, SpaprMachineState *spap=
+r,
+> >> +                           target_ulong opcode, target_ulong *args)
+> >> +{
+> >> +    target_long target =3D args[0];
+> >> +    uint32_t dispatch =3D args[1];
+> >> +    PowerPCCPU *target_cpu =3D spapr_find_cpu(target);
+> >> +    CPUState *target_cs =3D CPU(target_cpu);
+> >> +    CPUState *cs =3D CPU(cpu);
+> >> +    SpaprCpuState *spapr_cpu;
+> >> +
+> >> +    /*
+> >> +     * This does not do a targeted yield or confer, but check the par=
+ameter
+> >> +     * anyway. -1 means confer to all/any other CPUs.
+> >> +     */
+> >> +    if (target !=3D -1 && !target_cs) {
+> >> +        return H_PARAMETER;
+> >> +    }
+> >=20
+> > Should we return an error if a targeted yield is attempted, rather
+> > than pretend we've done it?
 >=20
-> This sort of casting means that you got the original type wrong.
+> I don't think so, because we do _some_ kind of yield for the directed
+> case which is probably better than nothing, and Linux won't fall back.
+>=20
+> PAPR is much more strict about dispatching. The H_CONFERing vCPU must=20
+> not run until the target(s) has been dispatched (if runnable), for
+> example. So we don't really implement it to the letter, we just do
+> "some kind of yield, whatever generic tcg code has implemented".
+>=20
+> For single threaded tcg it seems a signifcant complication to the
+> round robin algorithm to add a directed yield, yet simply yielding
+> to the next vCPU is a good idea here because useful work will get
+> done including by the lock holder before we run again.
+>=20
+> If multi threaded tcg performance with lot of vCPUs and lock contention
+> starts becoming more important I guess directed yielding might be
+> something to look at.
 
-Ah, good point.  And spapr_drc_name() has the wrong type also.  I've
-pulled this patch out of my ppc-for-4.2 tree until this is fixed up.
+Ok, makes sense to me.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -114,25 +155,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---da4uJneut+ArUgXk
+--v9Ux+11Zm5mwPlX6
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl0ufD0ACgkQbDjKyiDZ
-s5L2pA//boVquQGSDKSM6xVqwHnYHIcsdtP5N8zSZfTKo9/nwuT3iiD6m+NBVJf7
-ixgTx4OCsE7fCj6VXhbKbPFqoytYc+RoMDxMAPeA5098pV9GZ/VyI8hNxYnj7JKX
-ZCUAJ+5EciNeHS3/jjHh4VwrjX10GI4bojqHLbBVi8gGbKxs5AlTU6LMJ+MDzGCj
-nK9OYv9htb3/rqGyHblXnkXnwF3OSEJf8tPBZIYsREmeZllS1SIGXKaYUcpp0t7p
-a/YDFXBGcKn4lVWquecJqFcX1sfgixzSkoZTPO9AkJr2S3W3U2Rc2IS5UintMO8z
-dNf2FxqQLqA8SPw2NKGznl2MkBMsQ7kdupCcCtCxR7lFM45F+1VF26oyKBaux4Uq
-V5TWMEuOnLFte3vfnVTyk0NCXP8bcW4oSQme42qsXfh0WG/06DqZB3ZCkUsa9ThS
-uMh6voHleObR0rs3AUFl840nq9JDOKZRgIpSuJjZ0RFj6HXPcmulAR/aVv3KkbuP
-KHOx9aizn6dvg1/0G03YpbdlMOTFOhFEonFyA4nKgMHNHwL6PnRr5GD/9IelpErq
-SJnryIhpRpmcXXvCR3J7EzH0cx2QhOJJvEAuPRJ/It5OwmR4/kT+kQzyN8rOmBWG
-zI2BHMupXd4NbsH+Bw7i1IGxtIA2hmU5aMtLTKONjeEQ8OsRTc8=
-=X/wT
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl0ufzkACgkQbDjKyiDZ
+s5IwJQ/5AchWldMf3+8LTgVobwwLpNOFFXqDC6ywOgREmAeQyGWOFaQOHVGnDx4/
+/cfzvFehWMuQNoNtBB7a8aHr8Z612XJBU9lNV0tGS/ZyhjhAAVH1exdQSHl/IXWh
+J1AbTP2trU5IcPT5DmkE8lazZCIX1y55t7kTT1akf+iwkNU9FWhkblMahEzHEkXx
+AlO+KvMM0mvCbc7D6wO/7aBwqfwoOTkap0GXjb9CakbdNv7aBAsYwX6TFao8dh0p
+H41q7wo8wsK51EkLE2+MctvJ3GDu169AJ3NLsXQLZu3S1iH0CBQcMrPufNG4LiLm
+iHcmYbtBZHM6GNkPpgDKR1M0mVXLDrjpnMFmY9RKHXJClSGw0yO/sT+tEf3/Vyd3
+qyLTWVOr2poCHwH5+6j1MeEaRjf0KPihi05Ysml90a1n6USAQtSgQCINNJFgLNeI
+h8HPYxpY0QlNslKVsjig+cYT53X4DMPBixWUzRthaAL7Bk1QqJCWLJw+LIMW/rPv
+r8FSqf54cfFzOiX55Ux7ZHWCNIM3ugm9E9D5/DsTXHOqrcXEc2+Wu+MX/A1x+nAX
+B3PXX0rcWpoRcDPapUg5jGEBDTSVEy/fCHwKk5xLfz5TWPPi3gXxfMxHqK+bFZQG
+mVjG6nPHbB12Btmvzhy/RxrLbpnPsCka4DTgBsZatkCaFXqzTWg=
+=S7Sd
 -----END PGP SIGNATURE-----
 
---da4uJneut+ArUgXk--
+--v9Ux+11Zm5mwPlX6--
 
