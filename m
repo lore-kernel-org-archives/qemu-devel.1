@@ -2,110 +2,116 @@ Return-Path: <SRS0=PWhW=VO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C12D0C76186
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 10:04:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA917C76186
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 10:07:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 97A7F2077C
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 10:04:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 97A7F2077C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id BE4062173E
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 10:07:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE4062173E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55572 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55582 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hngnf-00080l-NC
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 06:04:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46716)
+	id 1hngqU-0001il-US
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 06:07:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47762)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <david@redhat.com>) id 1hngnS-0007cB-Ty
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 06:04:28 -0400
+ (envelope-from <laurent@vivier.eu>) id 1hngqK-0001KE-Hs
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 06:07:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1hngnR-0006lR-4B
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 06:04:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36804)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>)
- id 1hngnQ-0006kd-SZ; Wed, 17 Jul 2019 06:04:25 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 5386E308FE8D;
- Wed, 17 Jul 2019 10:04:22 +0000 (UTC)
-Received: from [10.36.117.65] (ovpn-117-65.ams2.redhat.com [10.36.117.65])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 46D435DA34;
- Wed, 17 Jul 2019 10:04:16 +0000 (UTC)
-To: "Michael S. Tsirkin" <mst@redhat.com>
-References: <20190717084255.17173-1-david@redhat.com>
- <20190717054727-mutt-send-email-mst@kernel.org>
-From: David Hildenbrand <david@redhat.com>
+ (envelope-from <laurent@vivier.eu>) id 1hngqJ-0000BF-6C
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 06:07:24 -0400
+Received: from mout.kundenserver.de ([212.227.126.133]:49687)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hngqI-00008y-T9
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 06:07:23 -0400
+Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
+ (mreue010 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1N3KgE-1iUtXe0IuA-010IQv; Wed, 17 Jul 2019 12:07:12 +0200
+To: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
+References: <20190714134028.315-1-laurent@vivier.eu>
+ <20190714134028.315-2-laurent@vivier.eu>
+ <1F76A574-2A97-4070-8EE0-0EE83A4241E9@physik.fu-berlin.de>
+From: Laurent Vivier <laurent@vivier.eu>
 Openpgp: preference=signencrypt
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- SE+xAvmumFBY
-Organization: Red Hat GmbH
-Message-ID: <5a5d6f86-04f2-4e61-473c-d8a4b0ed5045@redhat.com>
-Date: Wed, 17 Jul 2019 12:04:15 +0200
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <13f6aa89-e3f3-61e8-fa05-cde20b55daa0@vivier.eu>
+Date: Wed, 17 Jul 2019 12:07:09 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <20190717054727-mutt-send-email-mst@kernel.org>
+In-Reply-To: <1F76A574-2A97-4070-8EE0-0EE83A4241E9@physik.fu-berlin.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Wed, 17 Jul 2019 10:04:22 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:O8Cvytf3g0vZA+dwlWXhprxFtyt/lTjG3BkaS4yMGEZi24HX6/b
+ mUaK38Jl8yAv/4XsFyIc4ucmgSD5b2L8UfmP64wdojYYONcNs/WS8ji/0djWAYYs+3OjL+L
+ O5cXe16xroVbAQ8do+C4r7gP7pm3YgblgRsiRCDiAKtzJK3gwhvbxWpU7Znb2aKUksgIkbs
+ AYEk9ImLtvc1grZdF8Dpw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:yjumI6c0Gjo=:UJina9qYHjOE7aJ7O9VIRl
+ aFU7bWu8aZZZG4aUF7FqDJD97BMIJCWWNpVEO2LHyks1R+p1rNhqeC27fVvoBp8aY3f5zhYWm
+ aOvEs/7L75xN00ODDxrjtqTO7Wddqn/myJvFiMIxPdHbU0qWPffFUMI2mQZYR572MTG2U5k7u
+ xfxkjcmnzWrH/ocnhZD6+wUc6EKSoWs/m9IVo1ukRS8RV4lAGa5apCAH0NkPNIzWKCHzxg1C2
+ luXaHuKQ7tKN0tmj5Gh0A+gZcD1L/ajTgAFhjEMYwPf2MlnS8LBd3+lQzW3bonFGrtMeIsR9k
+ hTv5Ftm6eju+YdiiLPch6c7ZAHr1v9lZGTbSQzZqWqT0BqUKTp+wQQKw24202WWceb//39vlb
+ +lZAw8UCZSPNeAWMM795smYpBb37GJaSS0ZhvipzGbBjLzCPf8yOrMnw1TRdyfBRc8Nl5+21E
+ 28w4eszwZttFjlfD7OexRWqioG773AdcPpHNMjJBs9WyyVZVXUCqRataTV3TQfDxWhl1Ld6sW
+ inyZ+awQCWljLHazUrqDOtldn4jC/MPOtN1xHjqJdj97adsite1KYy34caa6sjRVrwfeIXpkI
+ H7UT7jZVZbkflYw9469oLxQcXjdXBDQixSzD1flnNEc0/0Ao0TGRb6gHNbz//E5zWrC4bKb/r
+ Bep+oqv+GSwJyPZX82bmYG4eAnNWpyb1UWaLwQc6+/ZboScmhng12zmfKGKM+//lSmWjW/sL3
+ V8erBcNpwvr5zC+lbrQzmZ3zD706NqWUx60RJ+TEaePYsbJnRXXVkgj5u4I=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH-for-4.1] virtio-balloon: fix QEMU crashes
- on pagesize > BALLOON_PAGE_SIZE
+X-Received-From: 212.227.126.133
+Subject: Re: [Qemu-devel] [PATCH 2/2] linux-user: manage binfmt-misc
+ preserve-arg[0] flag
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -117,125 +123,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Igor Mammedov <imammedo@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org,
- Stefan Hajnoczi <stefanha@redhat.com>, qemu-stable@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Riku Voipio <riku.voipio@iki.fi>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 17.07.19 11:57, Michael S. Tsirkin wrote:
-> On Wed, Jul 17, 2019 at 10:42:55AM +0200, David Hildenbrand wrote:
->> We are using the wrong functions to set/clear bits, effectively touchi=
-ng
->> multiple bits, writing out of range of the bitmap, resulting in memory
->> corruptions. We have to use set_bit()/clear_bit() instead.
+Le 14/07/2019 à 18:19, John Paul Adrian Glaubitz a écrit :
+> Hi!
+> 
+>> On Jul 14, 2019, at 3:40 PM, Laurent Vivier <laurent@vivier.eu> wrote:
 >>
->> Can easily be reproduced by starting a qemu guest on hugetlbfs memory,
->> inflating the balloon. QEMU crashes. This never could have worked
->> properly - especially, also pages would have been discarded when the
->> first sub-page would be inflated (the whole bitmap would be set).
+>> Add --preserve-arg0 in qemu-binfmt-conf.sh to configure the preserve-arg0
+>> flag.
 >>
->> While testing I realized, that on hugetlbfs it is pretty much impossib=
-le
->> to discard a page - the guest just frees the 4k sub-pages in random or=
-der
->> most of the time. I was only able to discard a hugepage a handful of
->> times - so I hope that now works correctly.
+>> Now, if QEMU is started with -0 or QEMU_ARGV0 and an empty parameter
+>> argv[0] (the full pathname provided by binfmt-misc) is removed and
+>> replaced by argv[1] (the original argv[0] provided by binfmt-misc when
+>> 'P'/preserve-arg[0] is set)
 >>
->> Fixes: ed48c59875b6 ("virtio-balloon: Safely handle BALLOON_PAGE_SIZE =
-<
->>                      host page size")
->> Fixes: b27b32391404 ("virtio-balloon: Fix possible guest memory corrup=
-tion
->>                      with inflates & deflates")
->> Cc: qemu-stable@nongnu.org #v4.0.0
->> Cc: Stefan Hajnoczi <stefanha@redhat.com>
->> Cc: David Gibson <david@gibson.dropbear.id.au>
->> Cc: Michael S. Tsirkin <mst@redhat.com>
->> Cc: Igor Mammedov <imammedo@redhat.com>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
->> ---
->>  hw/virtio/virtio-balloon.c | 10 ++++------
->>  1 file changed, 4 insertions(+), 6 deletions(-)
+>> For instance:
 >>
->> diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
->> index e85d1c0d5c..669067d661 100644
->> --- a/hw/virtio/virtio-balloon.c
->> +++ b/hw/virtio/virtio-balloon.c
->> @@ -94,9 +94,8 @@ static void balloon_inflate_page(VirtIOBalloon *ball=
-oon,
->>          balloon->pbp->base =3D host_page_base;
->>      }
->> =20
->> -    bitmap_set(balloon->pbp->bitmap,
->> -               (ram_offset - balloon->pbp->base) / BALLOON_PAGE_SIZE,
->> -               subpages);
->> +    set_bit((ram_offset - balloon->pbp->base) / BALLOON_PAGE_SIZE,
->> +            balloon->pbp->bitmap);
->> =20
->>      if (bitmap_full(balloon->pbp->bitmap, subpages)) {
->>          /* We've accumulated a full host page, we can actually discar=
-d
->> @@ -140,9 +139,8 @@ static void balloon_deflate_page(VirtIOBalloon *ba=
-lloon,
->>           * for a guest to do this in practice, but handle it anyway,
->>           * since getting it wrong could mean discarding memory the
->>           * guest is still using. */
->> -        bitmap_clear(balloon->pbp->bitmap,
->> -                     (ram_offset - balloon->pbp->base) / BALLOON_PAGE=
-_SIZE,
->> -                     subpages);
->> +        clear_bit((ram_offset - balloon->pbp->base) / BALLOON_PAGE_SI=
-ZE,
->> +                  balloon->pbp->bitmap);
->> =20
->>          if (bitmap_empty(balloon->pbp->bitmap, subpages)) {
->>              g_free(balloon->pbp);
->=20
-> I also started to wonder about this:
->=20
->     if (!balloon->pbp) {
->         /* Starting on a new host page */
->         size_t bitlen =3D BITS_TO_LONGS(subpages) * sizeof(unsigned lon=
-g);
->         balloon->pbp =3D g_malloc0(sizeof(PartiallyBalloonedPage) + bit=
-len);
->         balloon->pbp->rb =3D rb;
->         balloon->pbp->base =3D host_page_base;
->     }
->=20
-> Is keeping a pointer to a ram block like this safe? what if the rambloc=
-k
-> gets removed?
->=20
+>>  $ sudo QEMU_ARGV0= chroot m68k-chroot sh -c 'echo $0'
+>>  sh
+>>
+>> without this patch:
+>>
+>>  $ sudo chroot m68k-chroot sh -c 'echo $0'
+>>  /usr/bin/sh
+> 
+> As a regular user of qemu-user (we’re using qemu-user to run Debian’s buildds for m68k and sh4), I would like to add that the idea of having to pass additional environment variables to make qemu behave as expected, i.e. as the real hardware, is sub-optimal.
+> 
+> I would prefer that enabling the preserve flag with the qemu-binfmt.sh script would make qemu-user behave correctly.
 
-David added
+QEMU is not able to detect if it has been started by binfmt_misc with
+the preserve-arg[0] enabled or not, so it can't adapt the args analysis
+to get the correct list.
 
-if (balloon->pbp
-    && (rb !=3D balloon->pbp->rb ) ...
+> 
+> If I understand correctly, the current design with the environment variable was chosen because my preferred approach would break compatibility in certain cases. However, I think that correct emulation is more important than compatibility to an old broken behavior and I would therefore be in favor to make the correct behavior default.
+> 
+> This will also be necessary when using qemu-user with Debian’s sbuild to “cross”-build packages with qemu-user. This particular bug was actually discovered while building Debian packages for m68k and sh4 using qemu-user.
 
-So in case the rb changes (IOW replaced - delete old one, new one
-added), we reset the data.
+The problem we have here is we don't know how qemu-user is used in the
+wild. In my knowledge you are the most involved user, but you're not the
+only one reporting problem via launchpad. Moreover, distros provide
+qemu-user statically linked and binfmt configuration files, so we can
+guess we have other users.
 
-After a ram block was deleted, there will be no more deflation requests
-coming in for it. This should be fine I guess.
+And I don't like to break existing things...
 
+What I can propose:
 
-However, there is another possible issue: Resets.
+1- modify this patch to add a configure option:
 
-If the balloon was inflated and we reboot, the old balloon->pbp will
-remain intact. The guest will continue using all memory until
-virtio-balloon guest driver comes up. If the stars align, it could
-happen that new inflation requests by the guests will result in a
-discard of a big chunk, although the guest is re-using some parts
-already again.
+   by default qemu will need the QEMU_ARGV0 but we will be able to
+define at configure time it always runs with preserve-arg[0] flag
+enabled (something like "--enable-preserve-arg0")
 
-We would have to reset balloon->pbp during virtio_balloon_device_reset().
+[So debian will be able to provide qemu-user-static with this enabled by
+default if you're not afraid to break debian users environment]
 
---=20
+2- try (again) to push in the kernel the binfmt_misc namespace that
+allows to have per chroot basis binfmt configuration
+
+3- once 3 done, enable preserve-arg[0] by default
 
 Thanks,
-
-David / dhildenb
+Laurent
 
