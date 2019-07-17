@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A43AC7618F
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 15:21:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05619C7618F
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 15:21:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3D50421743
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 15:21:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D50421743
+	by mail.kernel.org (Postfix) with ESMTPS id D2B6421743
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 15:21:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2B6421743
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58420 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58422 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnlk1-0000w7-3l
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 11:21:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57390)
+	id 1hnlk2-0000xX-H2
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 11:21:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57388)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bounces@canonical.com>) id 1hnljj-0008Tv-Ms
+ (envelope-from <bounces@canonical.com>) id 1hnljj-0008Ta-JT
  for qemu-devel@nongnu.org; Wed, 17 Jul 2019 11:20:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1hnlji-0001Vx-Ig
+ (envelope-from <bounces@canonical.com>) id 1hnlji-0001Vs-IK
  for qemu-devel@nongnu.org; Wed, 17 Jul 2019 11:20:55 -0400
-Received: from indium.canonical.com ([91.189.90.7]:34468)
+Received: from indium.canonical.com ([91.189.90.7]:34460)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1hnlji-0001V5-C2
+ id 1hnlji-0001Uv-Bt
  for qemu-devel@nongnu.org; Wed, 17 Jul 2019 11:20:54 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1hnljg-000869-5R
- for <qemu-devel@nongnu.org>; Wed, 17 Jul 2019 15:20:52 +0000
+ id 1hnljf-0007uz-On
+ for <qemu-devel@nongnu.org>; Wed, 17 Jul 2019 15:20:51 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 1A46C2E80CB
- for <qemu-devel@nongnu.org>; Wed, 17 Jul 2019 15:20:52 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id B9F4B2E80CB
+ for <qemu-devel@nongnu.org>; Wed, 17 Jul 2019 15:20:51 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 17 Jul 2019 15:10:46 -0000
+Date: Wed, 17 Jul 2019 15:08:11 -0000
 From: =?utf-8?q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -56,13 +56,13 @@ X-Launchpad-Bug-Commenters: ajbennee moschny philmd
 X-Launchpad-Bug-Reporter: Thomas Moschny (moschny)
 X-Launchpad-Bug-Modifier: =?utf-8?q?Alex_Benn=C3=A9e_=28ajbennee=29?=
 References: <155766144999.15801.8727893741494500797.malonedeb@wampee.canonical.com>
-Message-Id: <156337624609.495.11421948550659635647.malone@gac.canonical.com>
+Message-Id: <156337609204.7142.17681294799321042717.malone@soybean.canonical.com>
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com); Revision="19009";
  Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: f79d04307a8e5bf056be8044bc056023900242c6
+X-Launchpad-Hash: d8581551aee7775211482e6e60573a38660eec71
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
 Subject: [Qemu-devel] [Bug 1828723] Re: [RFE] option to suppress gemu_log()
@@ -82,16 +82,9 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Although arguably the line:
-
-  gemu_log("Unsupported setsockopt level=3D%d optname=3D%d\n", level,
-optname);
-
-Could be
-
-  qemu_log_mask(LOG_UNIMP,....)
-
-Not sure where gemu_log is used, it seems to be strace related.
+The -d/-D options should work in linux-user as well. You can also set
+QEMU_LOG_FILENAME and QEMU_LOG environment variables. Do these not work
+for you?
 
 -- =
 
