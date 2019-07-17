@@ -2,77 +2,63 @@ Return-Path: <SRS0=PWhW=VO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A795C76186
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 10:09:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87BB8C76192
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 10:15:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E64CA21743
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 10:09:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E64CA21743
+	by mail.kernel.org (Postfix) with ESMTPS id 606A821743
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 10:15:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 606A821743
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55596 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55612 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hngsP-0003U0-T6
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 06:09:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48283)
+	id 1hngxu-0006TO-Fp
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 06:15:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49963)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <pbonzini@redhat.com>) id 1hngsF-000362-6u
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 06:09:24 -0400
+ (envelope-from <stefanha@redhat.com>) id 1hngxi-0005t3-9b
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 06:15:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1hngsE-0001K9-92
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 06:09:23 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:37039)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hngsE-0001JD-1l
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 06:09:22 -0400
-Received: by mail-wr1-f67.google.com with SMTP id n9so24140100wrr.4
- for <qemu-devel@nongnu.org>; Wed, 17 Jul 2019 03:09:21 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=sBelC1IJe9XNbdmsMt1UhNhhysTd8hW3FZZ//QE04vk=;
- b=anWSxPb4CJ8z22tZVfo6gUSDYrBf6i4mKM0NdojJwNEwtOLzOYnnsZYxlloED7XHXl
- +7FmEHmfmxAo4c3qhbDg9ZN8RqffllXlnwlbbKdCBY2VaMXHm7jLnhbCV59C4RS4RRc6
- m02bMTqPmFy5wjf0jfD5cn+vGK8ZKEkgsPAen11IpCW142jUsLmGiCX8CG198w8ZBmWR
- 9GFNdcQlGfKgK1ocKbifWV4uQa/UCEXvNCS6dvTWjDBMfP0qVBW4aANs2Kj7HJjx/8D4
- jqIU4PmC6b9eKZwm8JfZbXnN5g2dtqneG91zYQmMroA5+0rYjz80R2miXs9P8pPuPywt
- yhuA==
-X-Gm-Message-State: APjAAAWBIaWzItfmYSVJbXOrcNPFldrJIwdC4HfyTYCjtgxklsv+pms9
- 49m3yRkfblgTiYwTYmOqbHXEoA==
-X-Google-Smtp-Source: APXvYqzODTh9QVDY9RZ8Inn4uVRfg/JZ8DwxM8sDGv1VPX3WCaFrP+2zFaU0K8SZzwP4ChOKV9oH0A==
-X-Received: by 2002:adf:ea87:: with SMTP id s7mr42752434wrm.24.1563358160846; 
- Wed, 17 Jul 2019 03:09:20 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:e427:3beb:1110:dda2?
- ([2001:b07:6468:f312:e427:3beb:1110:dda2])
- by smtp.gmail.com with ESMTPSA id w24sm19477116wmc.30.2019.07.17.03.09.19
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Wed, 17 Jul 2019 03:09:20 -0700 (PDT)
-To: tony.nguyen@bt.com, qemu-devel@nongnu.org
-References: <a5f7f8854af046c18c6342035662a193@tpw09926dag18e.domain1.systemhost.net>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <521daf39-6984-f20d-9436-e79f23a071ff@redhat.com>
-Date: Wed, 17 Jul 2019 12:09:18 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+ (envelope-from <stefanha@redhat.com>) id 1hngxh-0005Em-7S
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 06:15:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40354)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1hngxg-0005Co-VP
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 06:15:01 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id DED1F3093385;
+ Wed, 17 Jul 2019 10:14:59 +0000 (UTC)
+Received: from localhost (ovpn-117-7.ams2.redhat.com [10.36.117.7])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9BA135D71D;
+ Wed, 17 Jul 2019 10:14:54 +0000 (UTC)
+Date: Wed, 17 Jul 2019 11:14:53 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
+Message-ID: <20190717101453.GE7341@stefanha-x1.localdomain>
+References: <20190624091304.666-1-stefanha@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <a5f7f8854af046c18c6342035662a193@tpw09926dag18e.domain1.systemhost.net>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="2hMgfIw2X+zgXrFs"
+Content-Disposition: inline
+In-Reply-To: <20190624091304.666-1-stefanha@redhat.com>
+User-Agent: Mutt/1.12.0 (2019-05-25)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.45]); Wed, 17 Jul 2019 10:14:59 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.221.67
-Subject: Re: [Qemu-devel] [PATCH 0/4] Invert Endian bit in SPARCv9 MMU TTE
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH] docs: clarify multiqueue vs multiple
+ virtqueues
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,23 +70,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: mark.cave-ayland@ilande.co.uk, atar4qemu@gmail.com, rth@twiddle.net
+Cc: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
+ Sebastien Boeuf <sebastien.boeuf@intel.com>,
+ Cathy Zhang <cathy.zhang@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 17/07/19 07:57, tony.nguyen@bt.com wrote:
-> This patchset implements the IE (Invert Endian) bit in SPARCv9 MMU TTE.
-> 
-> It is an attempt of the instructions outlined by Richard Henderson to Mark
-> Cave-Ayland.
-> 
-> Tested with OpenBSD on sun4u. Solaris 10 is my actual goal, but unfortunately a
-> separate keyboard issue remains in the way.
 
-It's very good, I'm just a bit worried that the meaning of MemOp is
-slightly different between memory API and TCG.  I've replied to patch 2
-with the details.
+--2hMgfIw2X+zgXrFs
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Paolo
+On Mon, Jun 24, 2019 at 10:13:04AM +0100, Stefan Hajnoczi wrote:
+> The vhost-user specification does not explain when
+> VHOST_USER_PROTOCOL_F_MQ must be implemented.  This may lead
+> implementors of vhost-user masters to believe that this protocol feature
+> is required for any device that has multiple virtqueues.  That would be
+> a mistake since existing vhost-user slaves offer multiple virtqueues but
+> do not advertise VHOST_USER_PROTOCOL_F_MQ.
+>=20
+> For example, a vhost-net device with one rx/tx queue pair is not
+> multiqueue.  The slave does not need to advertise
+> VHOST_USER_PROTOCOL_F_MQ.  Therefore the master must assume it has these
+> virtqueues and cannot rely on askingt the slave how many virtqueues
+> exist.
+>=20
+> Extend the specification to explain the different between true
+> multiqueue and regular devices with a fixed virtqueue layout.
+>=20
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+> Based-on: <20190621094005.4134-1-stefanha@redhat.com>
+> ---
+>  docs/interop/vhost-user.rst | 17 +++++++++++++++++
+>  1 file changed, 17 insertions(+)
+
+Ping?
+
+>=20
+> diff --git a/docs/interop/vhost-user.rst b/docs/interop/vhost-user.rst
+> index 5750668aba..7827b710aa 100644
+> --- a/docs/interop/vhost-user.rst
+> +++ b/docs/interop/vhost-user.rst
+> @@ -324,6 +324,15 @@ must support changing some configuration aspects on =
+the fly.
+>  Multiple queue support
+>  ----------------------
+> =20
+> +Many devices have a fixed number of virtqueues.  In this case the master
+> +already knows the number of available virtqueues without communicating w=
+ith the
+> +slave.
+> +
+> +Some devices do not have a fixed number of virtqueues.  Instead the maxi=
+mum
+> +number of virtqueues is chosen by the slave.  The number can depend on h=
+ost
+> +resource availability or slave implementation details.  Such devices are=
+ called
+> +multiple queue devices.
+> +
+>  Multiple queue support allows the slave to advertise the maximum number =
+of
+>  queues.  This is treated as a protocol extension, hence the slave has to
+>  implement protocol features first. The multiple queues feature is suppor=
+ted
+> @@ -339,6 +348,14 @@ queue in the sent message to identify a specified qu=
+eue.
+>  The master enables queues by sending message ``VHOST_USER_SET_VRING_ENAB=
+LE``.
+>  vhost-user-net has historically automatically enabled the first queue pa=
+ir.
+> =20
+> +Slaves should always implement the ``VHOST_USER_PROTOCOL_F_MQ`` protocol
+> +feature, even for devices with a fixed number of virtqueues, since it is=
+ simple
+> +to implement and offers a degree of introspection.
+> +
+> +Masters must not rely on the ``VHOST_USER_PROTOCOL_F_MQ`` protocol featu=
+re for
+> +devices with a fixed number of virtqueues.  Only true multiqueue devices
+> +require this protocol feature.
+> +
+>  Migration
+>  ---------
+> =20
+> --=20
+> 2.21.0
+>=20
+
+--2hMgfIw2X+zgXrFs
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl0u9R0ACgkQnKSrs4Gr
+c8hhTgf/cxAraawJ9czUhD+pNdIyemF2qJ5YGKEBwq9XcA6lyyN2tixv0FMF9bFq
+UWTRNZHUZuu2qbE2U43JG0pumQdLDYSZ03SSyWx4vXLSy1zRHC5tSX73njsjPG18
+OlppSoUT+TfPPnG5Gvj6t3Egt0UL8Oowbop8XADNtUUjAo7VMpw3fWl1MmJv0Tbp
+71LvYw4FGl8dDZ6xLb7WBRAs7pDneRYj2UfTUYVDP0fVJjCfsMNvCoLaGR81NB1f
+1gRKC8VuFyXS4ExYmXE3EXKlYd7CB9DRnPnjUCxPVICukQZ4TAq8JcQzJADCxSVJ
+qR3DlmDWhONIOYndjvDuLRoTdrksrQ==
+=w2ar
+-----END PGP SIGNATURE-----
+
+--2hMgfIw2X+zgXrFs--
 
