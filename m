@@ -2,85 +2,49 @@ Return-Path: <SRS0=PWhW=VO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.8 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03C5CC76186
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 06:58:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F1BEC76186
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 07:07:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C5D9A20818
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 06:58:25 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Vzi3QxDD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C5D9A20818
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id E17212173E
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 07:07:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E17212173E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ozlabs.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54576 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54600 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hndtQ-0006pC-Um
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 02:58:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47851)
+	id 1hne2C-00029x-K6
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 03:07:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50312)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <sjitindarsingh@gmail.com>) id 1hndtG-0006OZ-10
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 02:58:14 -0400
+ (envelope-from <aik@ozlabs.ru>) id 1hne21-0001er-Ej
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 03:07:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <sjitindarsingh@gmail.com>) id 1hndtF-0003A3-5T
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 02:58:13 -0400
-Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:46683)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <sjitindarsingh@gmail.com>)
- id 1hndtE-00038O-S7; Wed, 17 Jul 2019 02:58:13 -0400
-Received: by mail-pl1-x642.google.com with SMTP id c2so11413832plz.13;
- Tue, 16 Jul 2019 23:58:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=message-id:subject:from:to:cc:date:mime-version
- :content-transfer-encoding;
- bh=bE10wn8R+tZGo4bBS0Mh+WZFVs9IUUVPFPjEiZ/u47s=;
- b=Vzi3QxDDopQqRQcQtV34tUCAnA+zadiU5m7OGYEH47z9rDu+BTXMfCTRiXIi8L06em
- 5ZI2PywDZc/wtXEZxSMHqB+3Knk2a3wl+eU4K0zwXVMDrJ94M3Y7Kzky08oJJ6R+GhsF
- 0OTDb3v2+sQ2Udb48ehJPwRoXNsAjnZ+YofhOsF1cCOilJaGvUr91Afoo2KGAklluq8o
- eUrVq8Dog0he5Y1VE4t55r5XRpD1T5nk6NhQIOzf+zXtzKnV4mOg+spCuDhOkwA9CfbE
- RKstfH3TwSy4M3Z5O5Fn6vsKPUDu26wcayuypAJ6i6AK9fKmAwOig3ZYFE5gAoFxULUH
- yibw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:message-id:subject:from:to:cc:date:mime-version
- :content-transfer-encoding;
- bh=bE10wn8R+tZGo4bBS0Mh+WZFVs9IUUVPFPjEiZ/u47s=;
- b=UmuHpMuoNrx74g/l5tVVXwvTIgQMbpl5wOQv9dx4eAO6nLbVq/ruI0v+fkfAoGzRDB
- hFox+HWRs45G0VQcQHlVwxMIq3+vnmCqWCo8q2gYR0fB8akcG9pyszIImoqg5DdUXu5A
- HqcVrbKlskjpZPUfB9zwaiVCojGI4sJVb0Wd2OAGNZk4y6HEKj6ZDDyKOXfZ85JwxYYk
- VSO6MHd1aV+UegHT4i9Z41x7ifAjyBFIwwYxiIWvAPDGOQFAr8yJ0WbpY60QxSfbCF+d
- G2UDkXYf7MtNgwjk7QYbe5qYNYUGgKHi6JazjWFXqlx1FLae5U7CqAcZeVgD28Z/QehQ
- 77ug==
-X-Gm-Message-State: APjAAAUTR5XhKCAH5wdXOopw8xr8qJRjUJ4k/wcdmjwnaRaVZG1/QPyS
- 0J4wiR77CHv2VIw+90h3F7vcx2K9
-X-Google-Smtp-Source: APXvYqzbdjzqyvyBJZsDgGKk78TeAPuZaioS/VzLdlD1HmZM2Sf+EFWW7GsL7ViyrBQ/xHdHPZWUOA==
-X-Received: by 2002:a17:902:b08a:: with SMTP id
- p10mr41644160plr.83.1563346690967; 
- Tue, 16 Jul 2019 23:58:10 -0700 (PDT)
-Received: from surajjs2.ozlabs.ibm.com ([122.99.82.10])
- by smtp.googlemail.com with ESMTPSA id 35sm19136143pgw.91.2019.07.16.23.58.08
- (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
- Tue, 16 Jul 2019 23:58:10 -0700 (PDT)
-Message-ID: <1563346686.2145.11.camel@gmail.com>
-From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+ (envelope-from <aik@ozlabs.ru>) id 1hne1z-0006Il-HC
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 03:07:17 -0400
+Received: from ozlabs.ru ([107.173.13.209]:33884)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <aik@ozlabs.ru>)
+ id 1hne1z-0006GN-9Q; Wed, 17 Jul 2019 03:07:15 -0400
+Received: from fstn1-p1.ozlabs.ibm.com (localhost [IPv6:::1])
+ by ozlabs.ru (Postfix) with ESMTP id 69042AE800AC;
+ Wed, 17 Jul 2019 03:06:37 -0400 (EDT)
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
 To: qemu-devel@nongnu.org
-Date: Wed, 17 Jul 2019 16:58:06 +1000
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.24.6 (3.24.6-1.fc26) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::642
-Subject: [Qemu-devel] [QEMU] crypto/random: Fall back to /dev/random when
- getrandom returns EAGAIN
+Date: Wed, 17 Jul 2019 17:06:36 +1000
+Message-Id: <20190717070637.101776-1-aik@ozlabs.ru>
+X-Mailer: git-send-email 2.17.1
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 107.173.13.209
+Subject: [Qemu-devel] [PATCH qemu v2] spapr_pci: Advertise BAR reallocation
+ capability
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,33 +56,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, richard.henderson@linaro.org, qemu-ppc@nongnu.org,
- berrange@redhat.com
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-ppc@nongnu.org,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
+The pseries guests do not normally allocate PCI resources and rely on
+the system firmware doing so. Furthermore at least at some point in
+the past the pseries guests won't even allowed to change BARs, probably
+it is still the case for phyp. So since the initial commit we have [1]
+which prevents resource reallocation.
 
-I'm trying to use qemu inside a a guest, however since there isn't
-enough entropy for the rng getrandom() blocks. This means I am unable
-to even get output from 'qemu --help' for example. This is annoying at
-best.
+This is not a problem until we want specific BAR alignments, for example,
+PAGE_SIZE==64k to make sure we can still map MMIO BARs directly. For
+the boot time devices we handle this in SLOF [2] but since QEMU's RTAS
+does not allocate BARs, the guest does this instead and does not align
+BARs even if Linux is given pci=resource_alignment=16@pci:0:0 as
+PCI_PROBE_ONLY makes Linux ignore alignment requests.
 
-Thinking about ways to work around this obviously the major one is to
-have an entropy source for the guest.
+ARM folks added a dial to control PCI_PROBE_ONLY via the device tree [3].
+This makes use of the dial to advertise to the guest that we can handle
+BAR reassignments. This limits the change to the latest pseries machine
+to avoid old guests explosion.
 
-In cases where this isn't possible I think it would make sense to fall
-back to the old /dev/random source when the getrandom() syscall returns
-EAGAIN indicating that it would block.
+We do not remove the flag from [1] as pseries guests are still supported
+under phyp so having that removed may cause problems.
 
-Alternatively it would be nice to have a config option to disable the
-new getrandom interface, along the lines of --disable-getrandom.
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/arch/powerpc/platforms/pseries/setup.c?h=v5.1#n773
+[2] https://git.qemu.org/?p=SLOF.git;a=blob;f=board-qemu/slof/pci-phb.fs;h=06729bcf77a0d4e900c527adcd9befe2a269f65d;hb=HEAD#l338
+[3] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=f81c11af
+Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+---
+Changes:
+v2:
+* limited the change by a machine version
 
-If you feel that either of the approaches would be statisfactory I'd be
-happy to send a patch. Otherwise if we can have a discussion here with
-regards to how to progress.
+---
+ include/hw/ppc/spapr.h |  1 +
+ hw/ppc/spapr.c         | 11 +++++++++++
+ 2 files changed, 12 insertions(+)
 
-Kind Regards,
-Suraj
+diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+index 60553d32c4fa..11c8185b94a1 100644
+--- a/include/hw/ppc/spapr.h
++++ b/include/hw/ppc/spapr.h
+@@ -120,6 +120,7 @@ struct SpaprMachineClass {
+     bool legacy_irq_allocation;
+     bool broken_host_serial_model; /* present real host info to the guest */
+     bool pre_4_1_migration; /* don't migrate hpt-max-page-size */
++    bool linux_pci_probe;
+ 
+     void (*phb_placement)(SpaprMachineState *spapr, uint32_t index,
+                           uint64_t *buid, hwaddr *pio, 
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 8783b433960c..734d759d65b3 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -1162,6 +1162,7 @@ static void spapr_dt_ov5_platform_support(SpaprMachineState *spapr, void *fdt,
+ static void spapr_dt_chosen(SpaprMachineState *spapr, void *fdt)
+ {
+     MachineState *machine = MACHINE(spapr);
++    SpaprMachineClass *smc = SPAPR_MACHINE_GET_CLASS(machine);
+     int chosen;
+     const char *boot_device = machine->boot_order;
+     char *stdout_path = spapr_vio_stdout_path(spapr->vio_bus);
+@@ -1219,6 +1220,11 @@ static void spapr_dt_chosen(SpaprMachineState *spapr, void *fdt)
+         _FDT(fdt_setprop_string(fdt, chosen, "stdout-path", stdout_path));
+     }
+ 
++    /* We can deal with BAR reallocation just fine, advertise it to the guest */
++    if (smc->linux_pci_probe) {
++        _FDT(fdt_setprop_cell(fdt, chosen, "linux,pci-probe-only", 0));
++    }
++
+     spapr_dt_ov5_platform_support(spapr, fdt, chosen);
+ 
+     g_free(stdout_path);
+@@ -4432,6 +4438,9 @@ static const TypeInfo spapr_machine_info = {
+ static void spapr_machine_4_2_class_options(MachineClass *mc)
+ {
+     /* Defaults for the latest behaviour inherited from the base class */
++    SpaprMachineClass *smc = SPAPR_MACHINE_CLASS(mc);
++
++    smc->linux_pci_probe = true;
+ }
+ 
+ DEFINE_SPAPR_MACHINE(4_2, "4.2", true);
+@@ -4441,12 +4450,14 @@ DEFINE_SPAPR_MACHINE(4_2, "4.2", true);
+  */
+ static void spapr_machine_4_1_class_options(MachineClass *mc)
+ {
++    SpaprMachineClass *smc = SPAPR_MACHINE_CLASS(mc);
+     static GlobalProperty compat[] = {
+         /* Only allow 4kiB and 64kiB IOMMU pagesizes */
+         { TYPE_SPAPR_PCI_HOST_BRIDGE, "pgsz", "0x11000" },
+     };
+ 
+     spapr_machine_4_2_class_options(mc);
++    smc->linux_pci_probe = false;
+     compat_props_add(mc->compat_props, compat, G_N_ELEMENTS(compat));
+ }
+ 
+-- 
+2.17.1
+
 
