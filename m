@@ -7,62 +7,60 @@ X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C371DC76192
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 06:34:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24805C76192
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 06:34:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 85D462173E
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 06:34:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D24C02173E
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 06:34:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="eKguB47m"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85D462173E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="a1C+bHHo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D24C02173E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54482 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54484 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hndWF-0005Fn-12
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 02:34:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39999)
+	id 1hndWK-0005YV-2s
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 02:34:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40009)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgibson@ozlabs.org>) id 1hndVw-0004QZ-HK
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 02:34:10 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1hndVw-0004Qi-NZ
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 02:34:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1hndVt-0004mO-EN
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 02:34:07 -0400
-Received: from ozlabs.org ([203.11.71.1]:46143)
+ (envelope-from <dgibson@ozlabs.org>) id 1hndVs-0004kw-Ai
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 02:34:08 -0400
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:44119 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1hndVr-0004fH-5v; Wed, 17 Jul 2019 02:34:05 -0400
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1hndVr-0004gN-8N
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 02:34:04 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 45pSCR5xPVz9sMQ; Wed, 17 Jul 2019 16:33:55 +1000 (AEST)
+ id 45pSCR6X0xz9sBF; Wed, 17 Jul 2019 16:33:55 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1563345235;
- bh=vVsAQCGIeCoEgmT4kAYYby+Of1vlswZUdyAo4QeaN08=;
+ bh=RBqKxFVB2FpYDBseoSn8iFveBevAESKdqKD+ZE+v5lg=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=eKguB47mzucuEwajzkDInYHiBrutYvky6J1h9HglXFoNqE40tleeXBZ+jtPZz5yrx
- aSF2Zx7TN2mEKbu4mhttBM7OeI4R3U6OTwWuvLH/7tE1hMQYbksRuCa3nPoth7JqSo
- mLiPtLxSnpqdcp0uJu2Ak+qK+T/z99I/2Zjhe2kM=
-Date: Wed, 17 Jul 2019 15:46:05 +1000
+ b=a1C+bHHo885CSIveAn0u375PfGfKy6r1Efdx/ziOROucOO4Y59RRzhPQOqvaDWXWr
+ rzcU3bcvW/K6UB8Vog3rX5YBprUQkvHFXmJbm7w0nBaIHhlWROdPYZSXddVV8XLkyN
+ lK1P0UzR0UhSRL7FInwAhXxBf1XL47+wXpLLnXgA=
+Date: Wed, 17 Jul 2019 15:53:08 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-To: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Message-ID: <20190717054605.GA2663@umbus.fritz.box>
-References: <20190701061946.32636-1-sjitindarsingh@gmail.com>
- <20190703061239.GK9442@umbus.fritz.box>
- <1562211719.10832.15.camel@gmail.com>
- <20190704045954.GV9442@umbus.fritz.box>
- <1562644804.2073.7.camel@gmail.com>
+To: Fei Li <shirley17fei@gmail.com>
+Message-ID: <20190717055308.GB2663@umbus.fritz.box>
+References: <20190717023310.197246-1-shirley17fei@gmail.com>
+ <20190717023310.197246-2-shirley17fei@gmail.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="/9DWx/yDrRhgMJTb"
+ protocol="application/pgp-signature"; boundary="U+BazGySraz5kW0T"
 Content-Disposition: inline
-In-Reply-To: <1562644804.2073.7.camel@gmail.com>
+In-Reply-To: <20190717023310.197246-2-shirley17fei@gmail.com>
 User-Agent: Mutt/1.12.0 (2019-05-25)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 203.11.71.1
-Subject: Re: [Qemu-devel] [QEMU-PPC] [PATCH v3] powerpc/spapr: Add host
- threads parameter to ibm, get_system_parameter
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2401:3900:2:1::2
+Subject: Re: [Qemu-devel] [PATCH v14 01/11] qemu_thread: make
+ qemu_thread_create() take Error ** argument
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,287 +72,867 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, groug@kaod.org
+Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
+ Peter Xu <peterx@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+ Fei Li <fli@suse.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---/9DWx/yDrRhgMJTb
+--U+BazGySraz5kW0T
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jul 09, 2019 at 02:00:04PM +1000, Suraj Jitindar Singh wrote:
-> On Thu, 2019-07-04 at 14:59 +1000, David Gibson wrote:
-> > On Thu, Jul 04, 2019 at 01:41:59PM +1000, Suraj Jitindar Singh wrote:
-> > > On Wed, 2019-07-03 at 16:12 +1000, David Gibson wrote:
-> > > > On Mon, Jul 01, 2019 at 04:19:46PM +1000, Suraj Jitindar Singh
-> > > > wrote:
-> > > > > The ibm,get_system_parameter rtas call is used by the guest to
-> > > > > retrieve
-> > > > > data relating to certain parameters of the system. The SPLPAR
-> > > > > characteristics option (token 20) is used to determin
-> > > > > characteristics of
-> > > > > the environment in which the lpar will run.
-> > > > >=20
-> > > > > It may be useful for a guest to know the number of physical
-> > > > > host
-> > > > > threads
-> > > > > present on the underlying system where it is being run. Add the
-> > > > > characteristic "HostThrs" to the SPLPAR Characteristics
-> > > > > ibm,get_system_parameter rtas call to expose this information
-> > > > > to a
-> > > > > guest and provide an implementation which determines this
-> > > > > information
-> > > > > based on the number of interrupt servers present in the device
-> > > > > tree.
-> > > > >=20
-> > > > > Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-> > > >=20
-> > > > Hrm, as I said on our call, I have some misgivings about this.
-> > > >=20
-> > > > Starting with the most general: this again publishes host
-> > > > information
-> > > > to the guest without filtering, which has caused us problems
-> > > > before
-> > > > (e.g. security issues with publishing the host serial and model
-> > > > information).  Now, I can't immediately see what harm a guest
-> > > > could
-> > > > do
-> > > > with the host # threads (especially since it could in theory
-> > > > deduce
-> > > > it
-> > > > from the PVR, I think) but it still makes me uneasy.
-> > >=20
-> > > Correct, a guest could pretty reliably determine this information
-> > > anyway based on the PVR. It can't account for a POWER8 operating in
-> > > split core mode, but I don't know any harm that could be done by
-> > > introducing this information.
-> > >=20
-> > > Additionally it doesn't really tell you anything about how you're
-> > > going
-> > > to be scheduled (at least on POWER9) since vcpus are scheduled on a
-> > > per
-> > > thread, not per core basis.
-> >=20
-> > Hmm.
-> >=20
-> > > > Secondly, the "HostThrs" tag doesn't seem to be documented in
-> > > > PAPR as
-> > > > something that this system-parameter will include.  I don't much
-> > > > like
-> > > > the idea of adding ad-hoc bits of information here without some
-> > > > thought going into designing and specifying it first.
-> > >=20
-> > > This isn't documented in papr, it has been decided that this is how
-> > > the
-> > > information will be communicated to a guest. This is the most
-> > > appropriate place to put this information and the HostThrs name is
-> > > consistent with the naming of other information in this property.
-> >=20
-> > Grr.  If someone can decide this, they can bloody well document it
-> > somewhere.
-> >=20
-> > > We have other non-papr information in qemu, for example hcall
-> > > numbers,
-> > > so this isn't exactly a precedent.
-> >=20
-> > I suppose
-> >=20
-> > > > > ---
-> > > > >=20
-> > > > > V1 -> V2:
-> > > > > - Take into account that the core may be operating in split
-> > > > > core
-> > > > > mode
-> > > > >   meaning a single core may be split into multiple subcores.
-> > > > > V2 -> V3:
-> > > > > - Add curly braces for single line if statements
-> > > > > ---
-> > > > >  hw/ppc/spapr_rtas.c | 62
-> > > > > +++++++++++++++++++++++++++++++++++++++++++++++++++++
-> > > > >  1 file changed, 62 insertions(+)
-> > > > >=20
-> > > > > diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
-> > > > > index 5bc1a93271..1bab71c90c 100644
-> > > > > --- a/hw/ppc/spapr_rtas.c
-> > > > > +++ b/hw/ppc/spapr_rtas.c
-> > > > > @@ -229,6 +229,58 @@ static inline int sysparm_st(target_ulong
-> > > > > addr, target_ulong len,
-> > > > >      return RTAS_OUT_SUCCESS;
-> > > > >  }
-> > > > > =20
-> > > > > +#define CPUS_PATH       "/proc/device-tree/cpus/"
-> > > > > +#define
-> > > > > SUBCORE_PATH    "/sys/devices/system/cpu/subcores_per_core"
-> > > > > +
-> > > > > +static int rtas_get_num_host_threads(void)
-> > > > > +{
-> > > > > +    int num_threads =3D -1;
-> > > > > +    unsigned long len;
-> > > > > +    const char *entry;
-> > > > > +    char *buf;
-> > > > > +    GDir *dir;
-> > > > > +
-> > > > > +    if (!kvm_enabled()) {
-> > > > > +        return 1;
-> > > > > +    }
-> > > > > +
-> > > > > +    /* Read interrupt servers to determine number of threads
-> > > > > per
-> > > > > core */
-> > > > > +    dir =3D g_dir_open(CPUS_PATH, 0, NULL);
-> > > > > +    if (!dir) {
-> > > > > +        return -1;
-> > > > > +    }
-> > > > > +
-> > > > > +    while ((entry =3D g_dir_read_name(dir))) {
-> > > > > +        if (!strncmp(entry, "PowerPC,POWER",
-> > > > > strlen("PowerPC,POWER"))) {
-> > > > > +            char *path;
-> > > > > +
-> > > > > +            path =3D g_strconcat(CPUS_PATH, entry, "/ibm,ppc-
-> > > > > interrupt-server#s",
-> > > > > +                               NULL);
-> > > > > +            if (g_file_get_contents(path, &buf, &len, NULL)) {
-> > > > > +                num_threads =3D len / sizeof(int);
-> > > > > +                g_free(buf);
-> > > > > +            }
-> > > > > +
-> > > > > +            g_free(path);
-> > > > > +            break;
-> > > > > +        }
-> > > > > +    }
-> > > > > +
-> > > > > +    g_dir_close(dir);
-> > > > > +
-> > > > > +    /* Check if split core mode in use */
-> > > > > +    if (g_file_get_contents(SUBCORE_PATH, &buf, &len, NULL)) {
-> > > > > +        int subcores =3D g_ascii_strtoll(buf, NULL, 10);
-> > > > > +
-> > > > > +        if (subcores) {
-> > > > > +            num_threads /=3D subcores;
-> > > > > +        }
-> > > > > +        g_free(buf);
-> > > > > +    }
-> > > >=20
-> > > > Finally, all the logic above is built on the assumption of a ppc
-> > > > host
-> > > > - and not just that but an IBM POWER host...
-> > >=20
-> > > RTAS services are defined as being provided by a papr platform, and
-> > > the
-> > > existence of the ibm,ppc-interrupt-server#s device tree property is
-> > > a
-> > > requirement of a papr platform. So I don't see this being an issue.
-> >=20
-> > The *guest* is a PAPR platform, there's no guarantee the host has to
-> > be a PAPR platform (in fact it usually won't be, it's just that
-> > powernv has a lot of the same device tree properties).
+On Wed, Jul 17, 2019 at 10:33:00AM +0800, Fei Li wrote:
+> From: Fei Li <fli@suse.com>
 >=20
-> Well I think technically the host is a papr platform which supplies an
-> environment to the papr guest partition. But the terminology isn't
-> really important here.
-
-My point is that host userspace does not necessarily live in a PAPR
-environment.
-
-> > > > > +    return num_threads;
-> > > > > +}
-> > > > > +
-> > > > >  static void rtas_ibm_get_system_parameter(PowerPCCPU *cpu,
-> > > > >                                            SpaprMachineState
-> > > > > *spapr,
-> > > > >                                            uint32_t token,
-> > > > > uint32_t
-> > > > > nargs,
-> > > > > @@ -250,6 +302,16 @@ static void
-> > > > > rtas_ibm_get_system_parameter(PowerPCCPU *cpu,
-> > > > >                                            current_machine-
-> > > > > > ram_size / MiB,
-> > > > >=20
-> > > > >                                            smp_cpus,
-> > > > >                                            max_cpus);
-> > > > > +        int num_host_threads =3D rtas_get_num_host_threads();
-> > > > > +
-> > > > > +        if (num_host_threads > 0) {
-> > > >=20
-> > > > ... this sort of implements a fallback in other cases (KVM PR
-> > > > with a
-> > > > non-IBM host, TCG, but the boundary conditions are not really
-> > > > well
-> > > > defined.
-> > >=20
-> > > This is essentially catching the error case of
-> > > rtas_get_num_host_threads() returning a negative number or not
-> > > finding
-> > > the required properties (which as mentioned above are required).
-> > > The
-> > > KVM-PR case will work the same as the KVM-HV case where the host
-> > > device
-> > > tree will be queried.
-> >=20
-> > Not if you're using PR on, say, an embedded ppc or an old Apple
-> > machine that doesn't have the PAPR-ish properties in the host device
-> > tree.
+> qemu_thread_create() abort()s on error. Not nice. Give it a return
+> value and an Error ** argument, so it can return success/failure.
 >=20
-> In which case we won't find the device tree property and so we don't
-> have a reliable way to determine the number of host threads, so we will
-> omit the property.
+> Considering qemu_thread_create() is quite widely used in qemu, split
+> this into two steps: this patch passes the &error_abort to
+> qemu_thread_create() everywhere, and the next 10 patches will improve
+> on &error_abort for callers who need.  To differentiate callers who
+> need the improvement, temporarily add the "TODO:" comment for them.
 >=20
-> >=20
-> > > For TCG we just default to 1 since this
-> > > information shouldn't be relevant to a TCG guest.
-> >=20
-> > Uh.. it doesn't though, it omits it entirely.
+> Cc: Markus Armbruster <armbru@redhat.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Fei Li <fli@suse.com>
+> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+
+> ---
+>  cpus.c                        | 23 +++++++++++++++--------
+>  dump/dump.c                   |  3 ++-
+>  hw/misc/edu.c                 |  4 +++-
+>  hw/ppc/spapr_hcall.c          |  4 +++-
+>  hw/rdma/rdma_backend.c        |  3 ++-
+>  hw/usb/ccid-card-emulated.c   |  5 +++--
+>  include/qemu/thread.h         |  6 +++---
+>  io/task.c                     |  3 ++-
+>  iothread.c                    |  3 ++-
+>  migration/migration.c         | 11 ++++++++---
+>  migration/postcopy-ram.c      |  4 +++-
+>  migration/ram.c               | 12 ++++++++----
+>  migration/savevm.c            |  3 ++-
+>  tests/atomic64-bench.c        |  3 ++-
+>  tests/atomic_add-bench.c      |  3 ++-
+>  tests/iothread.c              |  2 +-
+>  tests/qht-bench.c             |  3 ++-
+>  tests/rcutorture.c            |  3 ++-
+>  tests/test-aio.c              |  2 +-
+>  tests/test-char.c             |  6 +++---
+>  tests/test-rcu-list.c         |  3 ++-
+>  tests/test-util-filemonitor.c |  2 +-
+>  ui/cocoa.m                    |  2 +-
+>  ui/vnc-jobs.c                 |  6 ++++--
+>  util/compatfd.c               |  6 ++++--
+>  util/oslib-posix.c            |  3 ++-
+>  util/qemu-thread-posix.c      | 30 +++++++++++++++++++++++-------
+>  util/qemu-thread-win32.c      | 13 ++++++++++---
+>  util/rcu.c                    |  3 ++-
+>  util/thread-pool.c            |  4 +++-
+>  30 files changed, 121 insertions(+), 57 deletions(-)
 >=20
-> No,
-> if (!kvm_enabled()) return 1;
-> above
->=20
-> >=20
-> > Also I don't really understand how it's relevant to a KVM guest in
-> > the
-> > first place.
->=20
-> There are registers which were previously scaled based on the threads
-> per core, for example the PURR, but which aren't on POWER9 when running
-> in lpar per thread mode and instead count per thread. This will look
-> different to a guest OS, and so for whatever reason the guest might
-> want to scale these registers based on the host threading mode.
-
-Since apparently POWER's version of "compatibility" is "close but not
-quite".
-
-Anyway, after our discussion on Monday, I'm more or less resigned to
-the need for HostThrs here.  Still some changes I'd like to see here.
-
-First, I'd like an explanatory comment in get_system_parameter,
-explaining what the value is used for.  Mention that it's not in PAPR
-and say what little you can about who decided on this representation.
-
-Second, I still really dislike directly grovelling around in the host
-device tree.  THe fallbacks you have will probably work in practice,
-but I really think it assumes too much about what the host environment
-will look like.  Plus it, again, makes a guest visible difference
-based on host properties which we want to avoid.  We'd probably get
-away with this one (the worst is you'd have messed up PURR scaling
-after migration), but still.
-
-I was thinking we could use kvmppc_smt_threads(), but that will be
-wrong for POWER9, I think.  Plus it still means guest visible
-differences between TCG and KVM (or even different KVM types).
-
-I actually think the right way to do this is to have qemu base it on
-the PVR (i.e. look up the information in its internal cpu table).
-That way it should give sensible and identical results for KVM and TCG
-- with the only KVM dependence being that KVM and -cpu host selects
-the exact cpu model for you.
-
-That may give non-1 values for TCG and KVM PR, which could result in
-bogus scaling... but AFAICT PURR values will be kind of bogus in those
-situations anyway, so I don't know that it matters.
+> diff --git a/cpus.c b/cpus.c
+> index 927a00aa90..28a241a936 100644
+> --- a/cpus.c
+> +++ b/cpus.c
+> @@ -1971,15 +1971,17 @@ static void qemu_tcg_init_vcpu(CPUState *cpu)
+>              snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "CPU %d/TCG",
+>                   cpu->cpu_index);
+> =20
+> +            /* TODO: let the callers handle the error instead of abort()=
+ here */
+>              qemu_thread_create(cpu->thread, thread_name, qemu_tcg_cpu_th=
+read_fn,
+> -                               cpu, QEMU_THREAD_JOINABLE);
+> +                               cpu, QEMU_THREAD_JOINABLE, &error_abort);
+> =20
+>          } else {
+>              /* share a single thread for all cpus with TCG */
+>              snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "ALL CPUs/TCG");
+> +            /* TODO: let the callers handle the error instead of abort()=
+ here */
+>              qemu_thread_create(cpu->thread, thread_name,
+>                                 qemu_tcg_rr_cpu_thread_fn,
+> -                               cpu, QEMU_THREAD_JOINABLE);
+> +                               cpu, QEMU_THREAD_JOINABLE, &error_abort);
+> =20
+>              single_tcg_halt_cond =3D cpu->halt_cond;
+>              single_tcg_cpu_thread =3D cpu->thread;
+> @@ -2007,8 +2009,9 @@ static void qemu_hax_start_vcpu(CPUState *cpu)
+> =20
+>      snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "CPU %d/HAX",
+>               cpu->cpu_index);
+> +    /* TODO: let the further caller handle the error instead of abort() =
+here */
+>      qemu_thread_create(cpu->thread, thread_name, qemu_hax_cpu_thread_fn,
+> -                       cpu, QEMU_THREAD_JOINABLE);
+> +                       cpu, QEMU_THREAD_JOINABLE, &error_abort);
+>  #ifdef _WIN32
+>      cpu->hThread =3D qemu_thread_get_handle(cpu->thread);
+>  #endif
+> @@ -2023,8 +2026,9 @@ static void qemu_kvm_start_vcpu(CPUState *cpu)
+>      qemu_cond_init(cpu->halt_cond);
+>      snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "CPU %d/KVM",
+>               cpu->cpu_index);
+> +    /* TODO: let the further caller handle the error instead of abort() =
+here */
+>      qemu_thread_create(cpu->thread, thread_name, qemu_kvm_cpu_thread_fn,
+> -                       cpu, QEMU_THREAD_JOINABLE);
+> +                       cpu, QEMU_THREAD_JOINABLE, &error_abort);
+>  }
+> =20
+>  static void qemu_hvf_start_vcpu(CPUState *cpu)
+> @@ -2041,8 +2045,9 @@ static void qemu_hvf_start_vcpu(CPUState *cpu)
+> =20
+>      snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "CPU %d/HVF",
+>               cpu->cpu_index);
+> +    /* TODO: let the further caller handle the error instead of abort() =
+here */
+>      qemu_thread_create(cpu->thread, thread_name, qemu_hvf_cpu_thread_fn,
+> -                       cpu, QEMU_THREAD_JOINABLE);
+> +                       cpu, QEMU_THREAD_JOINABLE, &error_abort);
+>  }
+> =20
+>  static void qemu_whpx_start_vcpu(CPUState *cpu)
+> @@ -2054,8 +2059,9 @@ static void qemu_whpx_start_vcpu(CPUState *cpu)
+>      qemu_cond_init(cpu->halt_cond);
+>      snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "CPU %d/WHPX",
+>               cpu->cpu_index);
+> +    /* TODO: let the further caller handle the error instead of abort() =
+here */
+>      qemu_thread_create(cpu->thread, thread_name, qemu_whpx_cpu_thread_fn,
+> -                       cpu, QEMU_THREAD_JOINABLE);
+> +                       cpu, QEMU_THREAD_JOINABLE, &error_abort);
+>  #ifdef _WIN32
+>      cpu->hThread =3D qemu_thread_get_handle(cpu->thread);
+>  #endif
+> @@ -2070,8 +2076,9 @@ static void qemu_dummy_start_vcpu(CPUState *cpu)
+>      qemu_cond_init(cpu->halt_cond);
+>      snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "CPU %d/DUMMY",
+>               cpu->cpu_index);
+> -    qemu_thread_create(cpu->thread, thread_name, qemu_dummy_cpu_thread_f=
+n, cpu,
+> -                       QEMU_THREAD_JOINABLE);
+> +    /* TODO: let the further caller handle the error instead of abort() =
+here */
+> +    qemu_thread_create(cpu->thread, thread_name, qemu_dummy_cpu_thread_f=
+n,
+> +                       cpu, QEMU_THREAD_JOINABLE, &error_abort);
+>  }
+> =20
+>  void qemu_init_vcpu(CPUState *cpu)
+> diff --git a/dump/dump.c b/dump/dump.c
+> index c7b2301652..1358e62fb7 100644
+> --- a/dump/dump.c
+> +++ b/dump/dump.c
+> @@ -2022,8 +2022,9 @@ void qmp_dump_guest_memory(bool paging, const char =
+*file,
+>      if (detach_p) {
+>          /* detached dump */
+>          s->detached =3D true;
+> +        /* TODO: let the further caller handle the error instead of abor=
+t() */
+>          qemu_thread_create(&s->dump_thread, "dump_thread", dump_thread,
+> -                           s, QEMU_THREAD_DETACHED);
+> +                           s, QEMU_THREAD_DETACHED, &error_abort);
+>      } else {
+>          /* sync dump */
+>          dump_process(s, errp);
+> diff --git a/hw/misc/edu.c b/hw/misc/edu.c
+> index 3b6dba2c72..1edc66955a 100644
+> --- a/hw/misc/edu.c
+> +++ b/hw/misc/edu.c
+> @@ -29,6 +29,7 @@
+>  #include "qemu/timer.h"
+>  #include "qemu/main-loop.h" /* iothread mutex */
+>  #include "qemu/module.h"
+> +#include "qapi/error.h"
+>  #include "qapi/visitor.h"
+> =20
+>  #define TYPE_PCI_EDU_DEVICE "edu"
+> @@ -370,8 +371,9 @@ static void pci_edu_realize(PCIDevice *pdev, Error **=
+errp)
+> =20
+>      qemu_mutex_init(&edu->thr_mutex);
+>      qemu_cond_init(&edu->thr_cond);
+> +    /* TODO: let the further caller handle the error instead of abort() =
+here */
+>      qemu_thread_create(&edu->thread, "edu", edu_fact_thread,
+> -                       edu, QEMU_THREAD_JOINABLE);
+> +                       edu, QEMU_THREAD_JOINABLE, &error_abort);
+> =20
+>      memory_region_init_io(&edu->mmio, OBJECT(edu), &edu_mmio_ops, edu,
+>                      "edu-mmio", 1 * MiB);
+> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+> index 6808d4cda8..d64b634526 100644
+> --- a/hw/ppc/spapr_hcall.c
+> +++ b/hw/ppc/spapr_hcall.c
+> @@ -508,8 +508,10 @@ static target_ulong h_resize_hpt_prepare(PowerPCCPU =
+*cpu,
+>      pending->shift =3D shift;
+>      pending->ret =3D H_HARDWARE;
+> =20
+> +    /* TODO: let the further caller handle the error instead of abort() =
+here */
+>      qemu_thread_create(&pending->thread, "sPAPR HPT prepare",
+> -                       hpt_prepare_thread, pending, QEMU_THREAD_DETACHED=
+);
+> +                       hpt_prepare_thread, pending,
+> +                       QEMU_THREAD_DETACHED, &error_abort);
+> =20
+>      spapr->pending_hpt =3D pending;
+> =20
+> diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
+> index c39051068d..29f52955d0 100644
+> --- a/hw/rdma/rdma_backend.c
+> +++ b/hw/rdma/rdma_backend.c
+> @@ -281,7 +281,8 @@ static void start_comp_thread(RdmaBackendDev *backend=
+_dev)
+>               ibv_get_device_name(backend_dev->ib_dev));
+>      backend_dev->comp_thread.run =3D true;
+>      qemu_thread_create(&backend_dev->comp_thread.thread, thread_name,
+> -                       comp_handler_thread, backend_dev, QEMU_THREAD_DET=
+ACHED);
+> +                       comp_handler_thread, backend_dev,
+> +                       QEMU_THREAD_DETACHED, &error_abort);
+>  }
+> =20
+>  void rdma_backend_register_comp_handler(void (*handler)(void *ctx,
+> diff --git a/hw/usb/ccid-card-emulated.c b/hw/usb/ccid-card-emulated.c
+> index e20f8ed293..4d95ee07aa 100644
+> --- a/hw/usb/ccid-card-emulated.c
+> +++ b/hw/usb/ccid-card-emulated.c
+> @@ -545,10 +545,11 @@ static void emulated_realize(CCIDCardState *base, E=
+rror **errp)
+>          error_setg(errp, "%s: failed to initialize vcard", TYPE_EMULATED=
+_CCID);
+>          goto out2;
+>      }
+> +    /* TODO: let the further caller handle the error instead of abort() =
+here */
+>      qemu_thread_create(&card->event_thread_id, "ccid/event", event_threa=
+d,
+> -                       card, QEMU_THREAD_JOINABLE);
+> +                       card, QEMU_THREAD_JOINABLE, &error_abort);
+>      qemu_thread_create(&card->apdu_thread_id, "ccid/apdu", handle_apdu_t=
+hread,
+> -                       card, QEMU_THREAD_JOINABLE);
+> +                       card, QEMU_THREAD_JOINABLE, &error_abort);
+> =20
+>      return;
+> =20
+> diff --git a/include/qemu/thread.h b/include/qemu/thread.h
+> index 55d83a907c..ec18d8b171 100644
+> --- a/include/qemu/thread.h
+> +++ b/include/qemu/thread.h
+> @@ -152,9 +152,9 @@ void qemu_event_reset(QemuEvent *ev);
+>  void qemu_event_wait(QemuEvent *ev);
+>  void qemu_event_destroy(QemuEvent *ev);
+> =20
+> -void qemu_thread_create(QemuThread *thread, const char *name,
+> -                        void *(*start_routine)(void *),
+> -                        void *arg, int mode);
+> +int qemu_thread_create(QemuThread *thread, const char *name,
+> +                       void *(*start_routine)(void *),
+> +                       void *arg, int mode, Error **errp);
+>  void *qemu_thread_join(QemuThread *thread);
+>  void qemu_thread_get_self(QemuThread *thread);
+>  bool qemu_thread_is_self(QemuThread *thread);
+> diff --git a/io/task.c b/io/task.c
+> index 64c4c7126a..1499540cdf 100644
+> --- a/io/task.c
+> +++ b/io/task.c
+> @@ -170,7 +170,8 @@ void qio_task_run_in_thread(QIOTask *task,
+>                         "io-task-worker",
+>                         qio_task_thread_worker,
+>                         task,
+> -                       QEMU_THREAD_DETACHED);
+> +                       QEMU_THREAD_DETACHED,
+> +                       &error_abort);
+>  }
+> =20
+> =20
+> diff --git a/iothread.c b/iothread.c
+> index 7130be58e3..2d5a5bfe6c 100644
+> --- a/iothread.c
+> +++ b/iothread.c
+> @@ -198,8 +198,9 @@ static void iothread_complete(UserCreatable *obj, Err=
+or **errp)
+>       */
+>      name =3D object_get_canonical_path_component(OBJECT(obj));
+>      thread_name =3D g_strdup_printf("IO %s", name);
+> +    /* TODO: let the further caller handle the error instead of abort() =
+here */
+>      qemu_thread_create(&iothread->thread, thread_name, iothread_run,
+> -                       iothread, QEMU_THREAD_JOINABLE);
+> +                       iothread, QEMU_THREAD_JOINABLE, &error_abort);
+>      g_free(thread_name);
+>      g_free(name);
+> =20
+> diff --git a/migration/migration.c b/migration/migration.c
+> index 8a607fe1e2..1786afb63d 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -483,8 +483,10 @@ static void process_incoming_migration_co(void *opaq=
+ue)
+>              goto fail;
+>          }
+> =20
+> +        /* TODO: let the further caller handle the error instead of abor=
+t() */
+>          qemu_thread_create(&mis->colo_incoming_thread, "COLO incoming",
+> -             colo_process_incoming_thread, mis, QEMU_THREAD_JOINABLE);
+> +                           colo_process_incoming_thread, mis,
+> +                           QEMU_THREAD_JOINABLE, &error_abort);
+>          mis->have_colo_incoming_thread =3D true;
+>          qemu_coroutine_yield();
+> =20
+> @@ -2496,8 +2498,10 @@ static int open_return_path_on_source(MigrationSta=
+te *ms,
+>          return 0;
+>      }
+> =20
+> +    /* TODO: let the further caller handle the error instead of abort() =
+here */
+>      qemu_thread_create(&ms->rp_state.rp_thread, "return path",
+> -                       source_return_path_thread, ms, QEMU_THREAD_JOINAB=
+LE);
+> +                       source_return_path_thread, ms,
+> +                       QEMU_THREAD_JOINABLE, &error_abort);
+> =20
+>      trace_open_return_path_on_source_continue();
+> =20
+> @@ -3342,8 +3346,9 @@ void migrate_fd_connect(MigrationState *s, Error *e=
+rror_in)
+>          migrate_fd_cleanup(s);
+>          return;
+>      }
+> +    /* TODO: let the further caller handle the error instead of abort() =
+here */
+>      qemu_thread_create(&s->thread, "live_migration", migration_thread, s,
+> -                       QEMU_THREAD_JOINABLE);
+> +                       QEMU_THREAD_JOINABLE, &error_abort);
+>      s->migration_thread_running =3D true;
+>  }
+> =20
+> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+> index 9faacacc9e..135e9cd746 100644
+> --- a/migration/postcopy-ram.c
+> +++ b/migration/postcopy-ram.c
+> @@ -1121,8 +1121,10 @@ int postcopy_ram_enable_notify(MigrationIncomingSt=
+ate *mis)
+>      }
+> =20
+>      qemu_sem_init(&mis->fault_thread_sem, 0);
+> +    /* TODO: let the further caller handle the error instead of abort() =
+here */
+>      qemu_thread_create(&mis->fault_thread, "postcopy/fault",
+> -                       postcopy_ram_fault_thread, mis, QEMU_THREAD_JOINA=
+BLE);
+> +                       postcopy_ram_fault_thread, mis,
+> +                       QEMU_THREAD_JOINABLE, &error_abort);
+>      qemu_sem_wait(&mis->fault_thread_sem);
+>      qemu_sem_destroy(&mis->fault_thread_sem);
+>      mis->have_fault_thread =3D true;
+> diff --git a/migration/ram.c b/migration/ram.c
+> index 2b0774c2bf..0f677f2d27 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -565,9 +565,10 @@ static int compress_threads_save_setup(void)
+>          comp_param[i].quit =3D false;
+>          qemu_mutex_init(&comp_param[i].mutex);
+>          qemu_cond_init(&comp_param[i].cond);
+> +        /* TODO: let the further caller handle the error instead of abor=
+t() */
+>          qemu_thread_create(compress_threads + i, "compress",
+>                             do_data_compress, comp_param + i,
+> -                           QEMU_THREAD_JOINABLE);
+> +                           QEMU_THREAD_JOINABLE, &error_abort);
+>      }
+>      return 0;
+> =20
+> @@ -1167,8 +1168,9 @@ static void multifd_new_send_channel_async(QIOTask =
+*task, gpointer opaque)
+>          p->c =3D QIO_CHANNEL(sioc);
+>          qio_channel_set_delay(p->c, false);
+>          p->running =3D true;
+> +        /* TODO: let the further caller handle the error instead of abor=
+t() */
+>          qemu_thread_create(&p->thread, p->name, multifd_send_thread, p,
+> -                           QEMU_THREAD_JOINABLE);
+> +                           QEMU_THREAD_JOINABLE, &error_abort);
+>      }
+>  }
+> =20
+> @@ -1447,8 +1449,9 @@ bool multifd_recv_new_channel(QIOChannel *ioc, Erro=
+r **errp)
+>      p->num_packets =3D 1;
+> =20
+>      p->running =3D true;
+> +    /* TODO: let the further caller handle the error instead of abort() =
+here */
+>      qemu_thread_create(&p->thread, p->name, multifd_recv_thread, p,
+> -                       QEMU_THREAD_JOINABLE);
+> +                       QEMU_THREAD_JOINABLE, &error_abort);
+>      atomic_inc(&multifd_recv_state->count);
+>      return atomic_read(&multifd_recv_state->count) =3D=3D
+>             migrate_multifd_channels();
+> @@ -3891,9 +3894,10 @@ static int compress_threads_load_setup(QEMUFile *f)
+>          qemu_cond_init(&decomp_param[i].cond);
+>          decomp_param[i].done =3D true;
+>          decomp_param[i].quit =3D false;
+> +        /* TODO: let the further caller handle the error instead of abor=
+t() */
+>          qemu_thread_create(decompress_threads + i, "decompress",
+>                             do_data_decompress, decomp_param + i,
+> -                           QEMU_THREAD_JOINABLE);
+> +                           QEMU_THREAD_JOINABLE, &error_abort);
+>      }
+>      return 0;
+>  exit:
+> diff --git a/migration/savevm.c b/migration/savevm.c
+> index 79ed44d475..c792dee8aa 100644
+> --- a/migration/savevm.c
+> +++ b/migration/savevm.c
+> @@ -1826,9 +1826,10 @@ static int loadvm_postcopy_handle_listen(Migration=
+IncomingState *mis)
+>      mis->have_listen_thread =3D true;
+>      /* Start up the listening thread and wait for it to signal ready */
+>      qemu_sem_init(&mis->listen_thread_sem, 0);
+> +    /* TODO: let the further caller handle the error instead of abort() =
+here */
+>      qemu_thread_create(&mis->listen_thread, "postcopy/listen",
+>                         postcopy_ram_listen_thread, NULL,
+> -                       QEMU_THREAD_DETACHED);
+> +                       QEMU_THREAD_DETACHED, &error_abort);
+>      qemu_sem_wait(&mis->listen_thread_sem);
+>      qemu_sem_destroy(&mis->listen_thread_sem);
+> =20
+> diff --git a/tests/atomic64-bench.c b/tests/atomic64-bench.c
+> index 121a8c14f4..08ec753582 100644
+> --- a/tests/atomic64-bench.c
+> +++ b/tests/atomic64-bench.c
+> @@ -8,6 +8,7 @@
+>  #include "qemu/thread.h"
+>  #include "qemu/host-utils.h"
+>  #include "qemu/processor.h"
+> +#include "qapi/error.h"
+> =20
+>  struct thread_info {
+>      uint64_t r;
+> @@ -103,7 +104,7 @@ static void create_threads(void)
+>          info->r =3D (i + 1) ^ time(NULL);
+>          info->accesses =3D 0;
+>          qemu_thread_create(&threads[i], NULL, thread_func, info,
+> -                           QEMU_THREAD_JOINABLE);
+> +                           QEMU_THREAD_JOINABLE, &error_abort);
+>      }
+>  }
+> =20
+> diff --git a/tests/atomic_add-bench.c b/tests/atomic_add-bench.c
+> index 5666f6bbff..52071585a9 100644
+> --- a/tests/atomic_add-bench.c
+> +++ b/tests/atomic_add-bench.c
+> @@ -2,6 +2,7 @@
+>  #include "qemu/thread.h"
+>  #include "qemu/host-utils.h"
+>  #include "qemu/processor.h"
+> +#include "qapi/error.h"
+> =20
+>  struct thread_info {
+>      uint64_t r;
+> @@ -108,7 +109,7 @@ static void create_threads(void)
+> =20
+>          info->r =3D (i + 1) ^ time(NULL);
+>          qemu_thread_create(&threads[i], NULL, thread_func, info,
+> -                           QEMU_THREAD_JOINABLE);
+> +                           QEMU_THREAD_JOINABLE, &error_abort);
+>      }
+>  }
+> =20
+> diff --git a/tests/iothread.c b/tests/iothread.c
+> index 777d9eea46..f4ad992e61 100644
+> --- a/tests/iothread.c
+> +++ b/tests/iothread.c
+> @@ -73,7 +73,7 @@ IOThread *iothread_new(void)
+>      qemu_mutex_init(&iothread->init_done_lock);
+>      qemu_cond_init(&iothread->init_done_cond);
+>      qemu_thread_create(&iothread->thread, NULL, iothread_run,
+> -                       iothread, QEMU_THREAD_JOINABLE);
+> +                       iothread, QEMU_THREAD_JOINABLE, &error_abort);
+> =20
+>      /* Wait for initialization to complete */
+>      qemu_mutex_lock(&iothread->init_done_lock);
+> diff --git a/tests/qht-bench.c b/tests/qht-bench.c
+> index e3b512f26f..728c2e06c7 100644
+> --- a/tests/qht-bench.c
+> +++ b/tests/qht-bench.c
+> @@ -10,6 +10,7 @@
+>  #include "qemu/qht.h"
+>  #include "qemu/rcu.h"
+>  #include "qemu/xxhash.h"
+> +#include "qapi/error.h"
+> =20
+>  struct thread_stats {
+>      size_t rd;
+> @@ -248,7 +249,7 @@ th_create_n(QemuThread **threads, struct thread_info =
+**infos, const char *name,
+>          prepare_thread_info(&info[i], offset + i);
+>          info[i].func =3D func;
+>          qemu_thread_create(&th[i], name, thread_func, &info[i],
+> -                           QEMU_THREAD_JOINABLE);
+> +                           QEMU_THREAD_JOINABLE, &error_abort);
+>      }
+>  }
+> =20
+> diff --git a/tests/rcutorture.c b/tests/rcutorture.c
+> index 49311c82ea..0e799ff256 100644
+> --- a/tests/rcutorture.c
+> +++ b/tests/rcutorture.c
+> @@ -64,6 +64,7 @@
+>  #include "qemu/atomic.h"
+>  #include "qemu/rcu.h"
+>  #include "qemu/thread.h"
+> +#include "qapi/error.h"
+> =20
+>  long long n_reads =3D 0LL;
+>  long n_updates =3D 0L;
+> @@ -90,7 +91,7 @@ static void create_thread(void *(*func)(void *))
+>          exit(-1);
+>      }
+>      qemu_thread_create(&threads[n_threads], "test", func, &data[n_thread=
+s],
+> -                       QEMU_THREAD_JOINABLE);
+> +                       QEMU_THREAD_JOINABLE, &error_abort);
+>      n_threads++;
+>  }
+> =20
+> diff --git a/tests/test-aio.c b/tests/test-aio.c
+> index 86fb73b3d5..b3ac261724 100644
+> --- a/tests/test-aio.c
+> +++ b/tests/test-aio.c
+> @@ -154,7 +154,7 @@ static void test_acquire(void)
+> =20
+>      qemu_thread_create(&thread, "test_acquire_thread",
+>                         test_acquire_thread,
+> -                       &data, QEMU_THREAD_JOINABLE);
+> +                       &data, QEMU_THREAD_JOINABLE, &error_abort);
+> =20
+>      /* Block in aio_poll(), let other thread kick us and acquire context=
+ */
+>      aio_context_acquire(ctx);
+> diff --git a/tests/test-char.c b/tests/test-char.c
+> index f9440cdcfd..093e26e333 100644
+> --- a/tests/test-char.c
+> +++ b/tests/test-char.c
+> @@ -793,7 +793,7 @@ static void char_socket_server_test(gconstpointer opa=
+que)
+>       */
+>      qemu_thread_create(&thread, "client",
+>                         char_socket_server_client_thread,
+> -                       addr, QEMU_THREAD_JOINABLE);
+> +                       addr, QEMU_THREAD_JOINABLE, &error_abort);
+>      g_assert(data.event =3D=3D -1);
+> =20
+>      if (config->wait_connected) {
+> @@ -901,7 +901,7 @@ static void char_socket_client_test(gconstpointer opa=
+que)
+>       */
+>      qemu_thread_create(&thread, "client",
+>                         char_socket_client_server_thread,
+> -                       ioc, QEMU_THREAD_JOINABLE);
+> +                       ioc, QEMU_THREAD_JOINABLE, &error_abort);
+> =20
+>      /*
+>       * Populate the chardev address based on what the server
+> @@ -994,7 +994,7 @@ static void char_socket_client_test(gconstpointer opa=
+que)
+>          reconnected =3D true;
+>          qemu_thread_create(&thread, "client",
+>                             char_socket_client_server_thread,
+> -                           ioc, QEMU_THREAD_JOINABLE);
+> +                           ioc, QEMU_THREAD_JOINABLE, &error_abort);
+>          goto reconnect;
+>      }
+> =20
+> diff --git a/tests/test-rcu-list.c b/tests/test-rcu-list.c
+> index 6f076473e0..399744f03c 100644
+> --- a/tests/test-rcu-list.c
+> +++ b/tests/test-rcu-list.c
+> @@ -25,6 +25,7 @@
+>  #include "qemu/rcu.h"
+>  #include "qemu/thread.h"
+>  #include "qemu/rcu_queue.h"
+> +#include "qapi/error.h"
+> =20
+>  /*
+>   * Test variables.
+> @@ -68,7 +69,7 @@ static void create_thread(void *(*func)(void *))
+>          exit(-1);
+>      }
+>      qemu_thread_create(&threads[n_threads], "test", func, &data[n_thread=
+s],
+> -                       QEMU_THREAD_JOINABLE);
+> +                       QEMU_THREAD_JOINABLE, &error_abort);
+>      n_threads++;
+>  }
+> =20
+> diff --git a/tests/test-util-filemonitor.c b/tests/test-util-filemonitor.c
+> index 46e781c022..a7a7c1eeeb 100644
+> --- a/tests/test-util-filemonitor.c
+> +++ b/tests/test-util-filemonitor.c
+> @@ -397,7 +397,7 @@ test_file_monitor_events(void)
+>      evstopping =3D 0;
+>      qemu_thread_create(&th, "event-loop",
+>                         qemu_file_monitor_test_event_loop, NULL,
+> -                       QEMU_THREAD_JOINABLE);
+> +                       QEMU_THREAD_JOINABLE, &error_abort);
+> =20
+>      if (local_err) {
+>          g_printerr("File monitoring not available: %s",
+> diff --git a/ui/cocoa.m b/ui/cocoa.m
+> index c2984028c5..d8cf1484d9 100644
+> --- a/ui/cocoa.m
+> +++ b/ui/cocoa.m
+> @@ -1766,7 +1766,7 @@ int main (int argc, const char * argv[]) {
+>      qemu_sem_init(&app_started_sem, 0);
+> =20
+>      qemu_thread_create(&thread, "qemu_main", call_qemu_main,
+> -                       NULL, QEMU_THREAD_DETACHED);
+> +                       NULL, QEMU_THREAD_DETACHED, &error_abort);
+> =20
+>      COCOA_DEBUG("Main thread: waiting for display_init_sem\n");
+>      qemu_sem_wait(&display_init_sem);
+> diff --git a/ui/vnc-jobs.c b/ui/vnc-jobs.c
+> index 929391f85d..5712f1f501 100644
+> --- a/ui/vnc-jobs.c
+> +++ b/ui/vnc-jobs.c
+> @@ -31,6 +31,7 @@
+>  #include "vnc-jobs.h"
+>  #include "qemu/sockets.h"
+>  #include "qemu/main-loop.h"
+> +#include "qapi/error.h"
+>  #include "block/aio.h"
+> =20
+>  /*
+> @@ -339,7 +340,8 @@ void vnc_start_worker_thread(void)
+>          return ;
+> =20
+>      q =3D vnc_queue_init();
+> -    qemu_thread_create(&q->thread, "vnc_worker", vnc_worker_thread, q,
+> -                       QEMU_THREAD_DETACHED);
+> +    /* TODO: let the further caller handle the error instead of abort() =
+here */
+> +    qemu_thread_create(&q->thread, "vnc_worker", vnc_worker_thread,
+> +                       q, QEMU_THREAD_DETACHED, &error_abort);
+>      queue =3D q; /* Set global queue */
+>  }
+> diff --git a/util/compatfd.c b/util/compatfd.c
+> index c296f55d14..caad10ae56 100644
+> --- a/util/compatfd.c
+> +++ b/util/compatfd.c
+> @@ -15,6 +15,7 @@
+> =20
+>  #include "qemu/osdep.h"
+>  #include "qemu/thread.h"
+> +#include "qapi/error.h"
+> =20
+>  #include <sys/syscall.h>
+> =20
+> @@ -87,8 +88,9 @@ static int qemu_signalfd_compat(const sigset_t *mask)
+>      memcpy(&info->mask, mask, sizeof(*mask));
+>      info->fd =3D fds[1];
+> =20
+> -    qemu_thread_create(&thread, "signalfd_compat", sigwait_compat, info,
+> -                       QEMU_THREAD_DETACHED);
+> +    /* TODO: let the further caller handle the error instead of abort() =
+here */
+> +    qemu_thread_create(&thread, "signalfd_compat", sigwait_compat,
+> +                       info, QEMU_THREAD_DETACHED, &error_abort);
+> =20
+>      return fds[0];
+>  }
+> diff --git a/util/oslib-posix.c b/util/oslib-posix.c
+> index fe0309ce7a..55c1b9c098 100644
+> --- a/util/oslib-posix.c
+> +++ b/util/oslib-posix.c
+> @@ -465,9 +465,10 @@ static bool touch_all_pages(char *area, size_t hpage=
+size, size_t numpages,
+>          memset_thread[i].numpages =3D (i =3D=3D (memset_num_threads - 1)=
+) ?
+>                                      numpages : numpages_per_thread;
+>          memset_thread[i].hpagesize =3D hpagesize;
+> +        /* TODO: let the callers handle the error instead of abort() her=
+e */
+>          qemu_thread_create(&memset_thread[i].pgthread, "touch_pages",
+>                             do_touch_pages, &memset_thread[i],
+> -                           QEMU_THREAD_JOINABLE);
+> +                           QEMU_THREAD_JOINABLE, &error_abort);
+>          addr +=3D size_per_thread;
+>          numpages -=3D numpages_per_thread;
+>      }
+> diff --git a/util/qemu-thread-posix.c b/util/qemu-thread-posix.c
+> index 1bf5e65dea..06a9e78ba8 100644
+> --- a/util/qemu-thread-posix.c
+> +++ b/util/qemu-thread-posix.c
+> @@ -15,6 +15,7 @@
+>  #include "qemu/atomic.h"
+>  #include "qemu/notify.h"
+>  #include "qemu-thread-common.h"
+> +#include "qapi/error.h"
+> =20
+>  static bool name_threads;
+> =20
+> @@ -504,9 +505,18 @@ static void *qemu_thread_start(void *args)
+>      return r;
+>  }
+> =20
+> -void qemu_thread_create(QemuThread *thread, const char *name,
+> -                       void *(*start_routine)(void*),
+> -                       void *arg, int mode)
+> +/*
+> + * Create a new thread with name @name
+> + * The thread executes @start_routine() with argument @arg.
+> + * The thread will be created in a detached state if @mode is
+> + * QEMU_THREAD_DETACHED, and in a jounable state if it's
+> + * QEMU_THREAD_JOINABLE.
+> + * On success, return 0.
+> + * On failure, store an error through @errp and return negative errno.
+> + */
+> +int qemu_thread_create(QemuThread *thread, const char *name,
+> +                       void *(*start_routine)(void *),
+> +                       void *arg, int mode, Error **errp)
+>  {
+>      sigset_t set, oldset;
+>      int err;
+> @@ -515,7 +525,8 @@ void qemu_thread_create(QemuThread *thread, const cha=
+r *name,
+> =20
+>      err =3D pthread_attr_init(&attr);
+>      if (err) {
+> -        error_exit(err, __func__);
+> +        error_setg(errp, "pthread_attr_init failed");
+> +        return -err;
+>      }
+> =20
+>      if (mode =3D=3D QEMU_THREAD_DETACHED) {
+> @@ -538,13 +549,18 @@ void qemu_thread_create(QemuThread *thread, const c=
+har *name,
+> =20
+>      err =3D pthread_create(&thread->thread, &attr,
+>                           qemu_thread_start, qemu_thread_args);
+> -
+> -    if (err)
+> -        error_exit(err, __func__);
+> +    if (err) {
+> +        error_setg(errp, "pthread_create failed");
+> +        pthread_attr_destroy(&attr);
+> +        g_free(qemu_thread_args->name);
+> +        g_free(qemu_thread_args);
+> +        return -err;
+> +    }
+> =20
+>      pthread_sigmask(SIG_SETMASK, &oldset, NULL);
+> =20
+>      pthread_attr_destroy(&attr);
+> +    return 0;
+>  }
+> =20
+>  void qemu_thread_get_self(QemuThread *thread)
+> diff --git a/util/qemu-thread-win32.c b/util/qemu-thread-win32.c
+> index 572f88535d..f2deea5250 100644
+> --- a/util/qemu-thread-win32.c
+> +++ b/util/qemu-thread-win32.c
+> @@ -16,6 +16,7 @@
+>  #include "qemu/thread.h"
+>  #include "qemu/notify.h"
+>  #include "qemu-thread-common.h"
+> +#include "qapi/error.h"
+>  #include <process.h>
+> =20
+>  static bool name_threads;
+> @@ -384,9 +385,9 @@ void *qemu_thread_join(QemuThread *thread)
+>      return ret;
+>  }
+> =20
+> -void qemu_thread_create(QemuThread *thread, const char *name,
+> +int qemu_thread_create(QemuThread *thread, const char *name,
+>                         void *(*start_routine)(void *),
+> -                       void *arg, int mode)
+> +                       void *arg, int mode, Error **errp)
+>  {
+>      HANDLE hThread;
+>      struct QemuThreadData *data;
+> @@ -405,10 +406,16 @@ void qemu_thread_create(QemuThread *thread, const c=
+har *name,
+>      hThread =3D (HANDLE) _beginthreadex(NULL, 0, win32_start_routine,
+>                                        data, 0, &thread->tid);
+>      if (!hThread) {
+> -        error_exit(GetLastError(), __func__);
+> +        if (data->mode !=3D QEMU_THREAD_DETACHED) {
+> +            DeleteCriticalSection(&data->cs);
+> +        }
+> +        error_setg(errp, "failed to create win32_start_routine");
+> +        g_free(data);
+> +        return -errno;
+>      }
+>      CloseHandle(hThread);
+>      thread->data =3D data;
+> +    return 0;
+>  }
+> =20
+>  void qemu_thread_get_self(QemuThread *thread)
+> diff --git a/util/rcu.c b/util/rcu.c
+> index 177a675619..ff11837b47 100644
+> --- a/util/rcu.c
+> +++ b/util/rcu.c
+> @@ -31,6 +31,7 @@
+>  #include "qemu/atomic.h"
+>  #include "qemu/thread.h"
+>  #include "qemu/main-loop.h"
+> +#include "qapi/error.h"
+>  #if defined(CONFIG_MALLOC_TRIM)
+>  #include <malloc.h>
+>  #endif
+> @@ -324,7 +325,7 @@ static void rcu_init_complete(void)
+>       * must have been quiescent even after forking, just recreate it.
+>       */
+>      qemu_thread_create(&thread, "call_rcu", call_rcu_thread,
+> -                       NULL, QEMU_THREAD_DETACHED);
+> +                       NULL, QEMU_THREAD_DETACHED, &error_abort);
+> =20
+>      rcu_register_thread();
+>  }
+> diff --git a/util/thread-pool.c b/util/thread-pool.c
+> index 4ed9b89ab2..9a867776f9 100644
+> --- a/util/thread-pool.c
+> +++ b/util/thread-pool.c
+> @@ -21,6 +21,7 @@
+>  #include "trace.h"
+>  #include "block/thread-pool.h"
+>  #include "qemu/main-loop.h"
+> +#include "qapi/error.h"
+> =20
+>  static void do_spawn_thread(ThreadPool *pool);
+> =20
+> @@ -131,7 +132,8 @@ static void do_spawn_thread(ThreadPool *pool)
+>      pool->new_threads--;
+>      pool->pending_threads++;
+> =20
+> -    qemu_thread_create(&t, "worker", worker_thread, pool, QEMU_THREAD_DE=
+TACHED);
+> +    qemu_thread_create(&t, "worker", worker_thread, pool,
+> +                       QEMU_THREAD_DETACHED, &error_abort);
+>  }
+> =20
+>  static void spawn_thread_bh_fn(void *opaque)
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -362,25 +940,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---/9DWx/yDrRhgMJTb
+--U+BazGySraz5kW0T
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl0uthoACgkQbDjKyiDZ
-s5LvsQ//fh0mNFirh+Sh+9f6JmRJtbQwL/O2lV17tAeArUn8H0Uq5fYluvkXdrd8
-yfCo5lHSu+ML6nnBSK7ca+nfMndA4o8HREpzClQ2oWfzh1lpLPo3BUk7/Mr/BN0S
-REpJV3kdj8ZHJgL3e7YSnvfvrx6CnWHLqFtE+CMC/jY3S+qEWZsabKp7NfTBHTKo
-E0J97NFQyR2+IqyS3pAB5A+07v969hX2wNhnzzIQrcjOftwaBKZxjsFc3dlDexg1
-iNvWZpC/FBRGN8HyywjYvsKp3LsD9M+EXNvyOmFlOqMad+KvJzOAikJOWgWLARCM
-NsK/pI0FGpmNCwf2y5Od/ooZW7I1zud512rXMaEKCkrKVQ9ISBNnlAK4uyhWi/yv
-IVb4jvZ9PToYWDxsDXqjrO7Du0RbmYmJBsgdKY/7aQK0VRjM6QwIvmnVy5AFoI3d
-PeG8s4AfhrZJI5e2ofNMYRfxNvNDnh2kCKlaattufwl2Ay0242QJcCk9vVW+Gfv7
-Tfdjp4RlpllBAy3XxZB92NA8+CUXuZmDa1cGakDJnMawBeiBsgPnB2/YCrzK6POa
-ISn2CRx+nod/1riHDNAm5X1v9H2pmRTCvsus1jIKEXy/kGPQJfWtfeYU9TZfl2hD
-VACnz/hTdeno0BzxVA4wiWl9ZDxgFGabu+kdsaNJAptCrOyaSPQ=
-=oqFr
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl0ut8QACgkQbDjKyiDZ
+s5L5zg//ZqmJCc15IcxI/soxVTb1fP67TMKEzWgixsaPej5lCHT+fh6UWqU0YORW
+POZs9ijK5jdFK/82Na+DsLn/aZi+xWN0A7kHM5HF8N+OXb4BJTK5eN0/PSwutHeO
+ibBI3FwIlxpFN5hjfJ3xLUStEIDLf5R1vvWyJ7ZMrBCGnOlqrahoiTVXcLw1T7g+
+XYJVCoH40aEBgldBDG3be1sfgzpju4d7iRXeSjJXu5vHDbxZBBsjFzoqNaVKQDgO
+OXnaCaM1mMoBkbV34Iv2pSv7cq+bDXnUihpuiNdknQoNvJf2twv4tVzoK5rDrEJH
+JLyWYs/L81G12tGnhvKk4NvuADXwtEYU12wQ07mbSg1vAg2yNlf/LwyHFf47fYzg
+Jxd7SC5CnBTccK7qamrwr9/LImyl2CpKIN5Yf3TS7k8x5IAOr+WYU+UzwTS7dO0G
+A8Ga3G7zt8bxsGzYzy55G6cJONGAu6VYciVVYAtonhq50Y8R+kXe9yC4KP+3cZG7
+/yLxSYA7GnS0BBzao8KEp1o9RDT/GS+mTezP4HCDn5Za13oRnkJwsidsAvy7VPrX
+FpwOQdm2dl6CLk1N0el3tXcnE2G+QSYnd6EeptX8n0LQj4Upx4ljoqqaAfd8r3Bt
+7Arfm5/6OlCnirhvBwl6GFtnb6RU41lftOCQ87zHcJxzp7fU6IA=
+=6BOS
 -----END PGP SIGNATURE-----
 
---/9DWx/yDrRhgMJTb--
+--U+BazGySraz5kW0T--
 
