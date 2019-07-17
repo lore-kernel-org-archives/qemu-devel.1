@@ -2,93 +2,101 @@ Return-Path: <SRS0=PWhW=VO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07182C7618F
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 18:58:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95503C7618F
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 19:03:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D6F1C21849
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 18:58:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D6F1C21849
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 60EF021849
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 19:03:47 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="YKdSaTnT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60EF021849
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59962 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59998 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnp7o-0001F9-68
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 14:58:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40699)
+	id 1hnpDO-0003SN-Cj
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 15:03:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42182)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <eblake@redhat.com>) id 1hnp7d-0000qS-Fm
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 14:57:50 -0400
+ (envelope-from <shmuel.eiderman@oracle.com>) id 1hnpDD-0002yV-K9
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 15:03:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1hnp7c-0002ye-8G
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 14:57:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55202)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1hnp7b-0002t7-VM
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 14:57:48 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id BA843C04AC70;
- Wed, 17 Jul 2019 18:57:45 +0000 (UTC)
-Received: from [10.3.116.46] (ovpn-116-46.phx2.redhat.com [10.3.116.46])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7E80E19C68;
- Wed, 17 Jul 2019 18:57:42 +0000 (UTC)
-To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-References: <CAL1e-=jiySpoypabXMkUsO=2pqgUrRxUhac=JM_V=2sn2LPhWA@mail.gmail.com>
- <054d5b29-6482-1d71-3866-057dd00cb021@redhat.com>
- <CAL1e-=ikCpJO1bn=AKYSLWb8QNYkf6062ojxn+UN3svXCEQvFA@mail.gmail.com>
- <20190716174420.GA857@redhat.com>
- <CAL1e-=jvRnp9NBzuMjOjP_WgCxhDSUf4qCkswRvyrpGFPK6cHg@mail.gmail.com>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
- xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
- xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
- TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
- GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
- sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
- AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
- CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
- RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
- wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
- Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
- gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
- pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
- zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
- pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
- 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
- NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
- cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
- SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
- I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
- mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
- Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
- 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <5b6d1130-73fd-b7c7-28ef-f553d33972e0@redhat.com>
-Date: Wed, 17 Jul 2019 13:57:41 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
-MIME-Version: 1.0
-In-Reply-To: <CAL1e-=jvRnp9NBzuMjOjP_WgCxhDSUf4qCkswRvyrpGFPK6cHg@mail.gmail.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="Kn5kxIVeyyRBiUILLrWhZdDpBMJT9h4cK"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Wed, 17 Jul 2019 18:57:45 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [QUESTION] SDL 1.2 support
+ (envelope-from <shmuel.eiderman@oracle.com>) id 1hnpDC-0006xJ-Jj
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 15:03:35 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:46148)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <shmuel.eiderman@oracle.com>)
+ id 1hnpDA-0006uk-Ai; Wed, 17 Jul 2019 15:03:32 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+ by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6HIxI3t026358;
+ Wed, 17 Jul 2019 19:03:28 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=content-type :
+ mime-version : subject : from : in-reply-to : date : cc :
+ content-transfer-encoding : message-id : references : to;
+ s=corp-2018-07-02; bh=V7e+XXFzPW5WszOwkN7h3+PDc4pc9hf50+KV6NIc37c=;
+ b=YKdSaTnTi5LUMkXZRXofxamLoyf/ffqhANReP8b7MjPAMvGb6eAcXfZB5M1czJ5wR2vr
+ 7XSgP6x2TxL+JEh3YylSQU6CkuvY6Iz/Hvcl+Cp7m5QC2aP1tr2L7ZIsBMKNpQ7zC4OW
+ 5cy2PuIV0vcw4tI49AxuXNnIbevoLLSKgYYrrzr1huAtzRzuslLcCrCGO0WxJFzh55q5
+ Ulpd70Zb5+3VX4uHFsB+RAj5hIKev2JhtS7CxJCOuCQvnqECI/opj0tRMp9wPLEJcOjD
+ 98XhH+mQQPZYGSGrCvT2MH1IP0QTKk4wrddc2ovuTofuZvlApiOsk2XJqcyx3rDDP8G/ qg== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+ by aserp2120.oracle.com with ESMTP id 2tq78pvrqh-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 17 Jul 2019 19:03:28 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+ by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6HJ2Xxs186883;
+ Wed, 17 Jul 2019 19:03:27 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+ by userp3020.oracle.com with ESMTP id 2tsmcckddf-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 17 Jul 2019 19:03:27 +0000
+Received: from abhmp0005.oracle.com (abhmp0005.oracle.com [141.146.116.11])
+ by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x6HJ3PKF024125;
+ Wed, 17 Jul 2019 19:03:26 GMT
+Received: from [10.0.0.38] (/79.181.134.95)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Wed, 17 Jul 2019 19:03:25 +0000
+Content-Type: text/plain;
+	charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
+From: Sam Eiderman <shmuel.eiderman@oracle.com>
+In-Reply-To: <424BE97C-7EAF-4B28-B580-AC2B5261197C@oracle.com>
+Date: Wed, 17 Jul 2019 22:03:19 +0300
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <EB5E5E3C-CCA1-4138-9623-89ECA7335F88@oracle.com>
+References: <20190626123948.10199-1-shmuel.eiderman@oracle.com>
+ <20190701074117.pkmzhon6v7nafq2p@sirius.home.kraxel.org>
+ <424BE97C-7EAF-4B28-B580-AC2B5261197C@oracle.com>
+To: Gerd Hoffmann <kraxel@redhat.com>, QEMU <qemu-devel@nongnu.org>,
+ qemu-block@nongnu.org
+X-Mailer: Apple Mail (2.3445.104.11)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9321
+ signatures=668688
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
+ malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1907170216
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9321
+ signatures=668688
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+ priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1907170216
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 141.146.126.78
+Subject: Re: [Qemu-devel] [QEMU] [PATCH v5 0/8] Add Qemu to SeaBIOS LCHS
+ interface
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,102 +108,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: kwolf@redhat.com, Arbel Moshe <arbel.moshe@oracle.com>, seabios@seabios.org,
+ Max Reitz <mreitz@redhat.com>, Kevin O'Connor <kevin@koconnor.net>,
+ Liran Alon <liran.alon@oracle.com>, Karl Heubaum <karl.heubaum@oracle.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Kn5kxIVeyyRBiUILLrWhZdDpBMJT9h4cK
-Content-Type: multipart/mixed; boundary="3ILktAOSg5gH72tcYtwGd1I8aWdaH9lCf";
- protected-headers="v1"
-From: Eric Blake <eblake@redhat.com>
-To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>
-Message-ID: <5b6d1130-73fd-b7c7-28ef-f553d33972e0@redhat.com>
-Subject: Re: [Qemu-devel] [QUESTION] SDL 1.2 support
-References: <CAL1e-=jiySpoypabXMkUsO=2pqgUrRxUhac=JM_V=2sn2LPhWA@mail.gmail.com>
- <054d5b29-6482-1d71-3866-057dd00cb021@redhat.com>
- <CAL1e-=ikCpJO1bn=AKYSLWb8QNYkf6062ojxn+UN3svXCEQvFA@mail.gmail.com>
- <20190716174420.GA857@redhat.com>
- <CAL1e-=jvRnp9NBzuMjOjP_WgCxhDSUf4qCkswRvyrpGFPK6cHg@mail.gmail.com>
-In-Reply-To: <CAL1e-=jvRnp9NBzuMjOjP_WgCxhDSUf4qCkswRvyrpGFPK6cHg@mail.gmail.com>
+Gentle ping.
 
---3ILktAOSg5gH72tcYtwGd1I8aWdaH9lCf
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Sam
 
-On 7/17/19 1:34 PM, Aleksandar Markovic wrote:
-
+> On 8 Jul 2019, at 20:30, Sam Eiderman <shmuel.eiderman@oracle.com> =
+wrote:
 >=20
-> Daniel, that is fine, I don't question that, I basically wanted to star=
-t a talk
-> between us to clarify some things. Related to our situation in the fiel=
-d,
-> I have a sub-question to you:
+> Thanks Gerd,
 >=20
-> Let's say there is a build system with SDL 1.2, and not SDL 2.0. Should=
+> Gentle ping on this.
+>=20
+> Sam
+>=20
+>> On 1 Jul 2019, at 10:41, Gerd Hoffmann <kraxel@redhat.com> wrote:
+>>=20
+>> On Wed, Jun 26, 2019 at 03:39:40PM +0300, Sam Eiderman wrote:
+>>> v1:
+>>>=20
+>>> Non-standard logical geometries break under QEMU.
+>>>=20
+>>> A virtual disk which contains an operating system which depends on
+>>> logical geometries (consistent values being reported from BIOS INT13
+>>> AH=3D08) will most likely break under QEMU/SeaBIOS if it has =
+non-standard
+>>> logical geometries - for example 56 SPT (sectors per track).
+>>> No matter what QEMU will guess - SeaBIOS, for large enough disks - =
+will
+>>> use LBA translation, which will report 63 SPT instead.
+>>>=20
+>>> In addition we can not enforce SeaBIOS to rely on phyiscal =
+geometries at
+>>> all. A virtio-blk-pci virtual disk with 255 phyiscal heads can not
+>>> report more than 16 physical heads when moved to an IDE controller, =
+the
+>>> ATA spec allows a maximum of 16 heads - this is an artifact of
+>>> virtualization.
+>>>=20
+>>> By supplying the logical geometies directly we are able to support =
+such
+>>> "exotic" disks.
+>>>=20
+>>> We will use fw_cfg to do just that.
+>>>=20
+>>> v2:
+>>>=20
+>>> Fix missing parenthesis check in
+>>>   "hd-geo-test: Add tests for lchs override"
+>>>=20
+>>> v3:
+>>>=20
+>>> * Rename fw_cfg key to "bios-geometry".
+>>> * Remove "extendible" interface.
+>>> * Add cpu_to_le32 fix as Laszlo suggested or big endian hosts
+>>> * Fix last qtest commit - automatic docker tester for some reason =
+does not have qemu-img set
+>>>=20
+>>> v4:
+>>>=20
+>>> * Change fw_cfg interface from mixed textual/binary to textual only
+>>>=20
+>>> v5:
+>>>=20
+>>> * Fix line > 80 chars in tests/hd-geo-test.c
+>>=20
+>> Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
+>>=20
+>> cheers,
+>> Gerd
+>>=20
+>=20
 
-> QEMU refuse to build?
-
-If the dependency is soft (when SDL 2.0 is available, we can compile
-more things than when it is not), then the build shouldn't fail, but
-your resulting binaries will not use SDL.  For example, we treat librbd
-as a soft dependency: if it is available, you can build in Ceph support;
-if it is not, you lose out on that particular block format, but can
-still run guests locally.
-
-If the dependency is hard (when SDL 2.0 is unavailable, we cannot
-perform our job), then the build should fail.  For example, we treat
-glib2 as a hard dependency: if it is unavailable, we can't implement our
-main loop, and there's really nothing left worth compiling.
-
-Some qemu dependencies are hard, some are soft. And your choice of
-configure options may further influence things (our KConfig setup may
-mean that some libraries are hard dependencies for one board type, but
-soft dependencies for others).  Off-hand, I'd guess that SDL 2.0 should
-be a soft dependency (but if it is a hard dependency, patches to make it
-a soft dependency are welcome); if I'm right, then building when only
-SDL 1.2 is available should not fail, but also will not use SDL.
-
-But the presence or absence of SDL 1.2 on a build machine has no bearing
-on the real question of whether SDL 2.0 is a hard or soft dependency,
-now that the project has decided that SDL 2.0 is easy enough to obtain
-across all of the set of systems included in our documented list of
-minimum development setups.  In short, if you want to build with SDL,
-you need to have SDL 2.0 available because we are not going to support
-builds against SDL 1.2 as a reasonable development target any longer;
-but having SDL 2.0 development libraries available does not preclude
-also keeping SDL 1.2 on the same machine for other reasons.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---3ILktAOSg5gH72tcYtwGd1I8aWdaH9lCf--
-
---Kn5kxIVeyyRBiUILLrWhZdDpBMJT9h4cK
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl0vb6UACgkQp6FrSiUn
-Q2r9YggAnjFKt/nz4l/opXchhQaIbFEiwbW4vbMYAv6EcpFMFY/8JzHaNI7HZYtt
-8Qd2icokEpk1Ruwmc1G/2FGt7OPpY6lu1NggNvbJ9FucZvbnvsOWNTZd77D5t0JZ
-8EJmDDrdJcKc7duJi/n1QjUhfaebmCDWaBc6clYtUUvZUiG8k+ZE9ulQxlRNV7ff
-Kos/mm1dVV5M9lmjX7WpWKIXqESTw2pH5aGdzY5BFT8nZzDDBmDTZ0ZQWMeaAa6d
-eouqlTpy/BlT3OkI2rafD93eKnK4lo2VUKQij5uAVgjgw7KHYDjIN+HanypPAfNP
-EyrtkiefxmvoQVeGi5K3Qht1wa5P7A==
-=Dabc
------END PGP SIGNATURE-----
-
---Kn5kxIVeyyRBiUILLrWhZdDpBMJT9h4cK--
 
