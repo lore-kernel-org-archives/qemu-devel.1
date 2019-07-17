@@ -7,74 +7,74 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1917C76192
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 13:45:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B31BC76186
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 13:45:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9F486208C0
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 13:45:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CA0872182B
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 13:45:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MJwu6qJg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F486208C0
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NkgeUcLd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA0872182B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57310 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57312 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnkF9-00036g-DM
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 09:45:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55345)
+	id 1hnkFK-0003q0-8q
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 09:45:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55414)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hnkDf-00055R-H1
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 09:43:44 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hnkDj-0005M8-HO
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 09:43:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hnkDe-0004Vu-Bz
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 09:43:43 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:54336)
+ (envelope-from <alex.bennee@linaro.org>) id 1hnkDi-0004ZG-3U
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 09:43:47 -0400
+Received: from mail-wm1-x336.google.com ([2a00:1450:4864:20::336]:35100)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hnkDe-0004VC-3v
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 09:43:42 -0400
-Received: by mail-wm1-x342.google.com with SMTP id p74so22209326wme.4
- for <qemu-devel@nongnu.org>; Wed, 17 Jul 2019 06:43:42 -0700 (PDT)
+ id 1hnkDh-0004Yr-TC
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 09:43:46 -0400
+Received: by mail-wm1-x336.google.com with SMTP id l2so22244366wmg.0
+ for <qemu-devel@nongnu.org>; Wed, 17 Jul 2019 06:43:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=aCN/y1vsGbgbK8fKqVDDN8KS7NPTkiPqg0ffapBOPKw=;
- b=MJwu6qJgJqg4/4reyh4JQu/jD/L9r9VoL8l96xNyFsbf5CKefgC+WRHRwbRGb/9S/l
- biwDlVy1AdUORKeVBTY/4jTyBXB0KHMtRXHbdjlDFtIGbximWiShdenkLh4EIYLwxcXx
- SyOAQ9Zp80W6NW40rYpH7dxvG/XY0h7vk6Hkweh3RAZWYj5ExEPX98WrO+Tru/SZsws/
- K3Am7U+mbt9SYmvonyxyk1PxrdEZ2zVdmo2d+dOwzhJSmtOAcMr3XWWlnRnLpAUGxUDa
- lkUm4gC3N+sxfk39b9v1UGqWDmRY2XhMprWp7nYYk7Hamv7tuu1YmotPlKIhdod4jrI1
- yoeA==
+ bh=Uwej0osFkVecc1FOdZr4jnm39hj3PGH7mOMeiSpdwWM=;
+ b=NkgeUcLd9uUdCX/FyNkApLdMESHm9tNZOxvrWMTdgEISNWBBNkShUayPe5gIRcnGOK
+ hfb61tzDVlPzmL1vZc7D4vi90fksC+1Pbl4vQTVaKdfL9IViE7uqitVj/vhut9vTn8SN
+ PiRaCK3UBvooNDLdAWZzB+IjAa1L2YU8vXmLexKwrnj+7wH/lRpcmIzODgj98nY/GBDO
+ +w5LCsaRMZVm6s7qnLXx2tXKN6KR+7K3GfSwKC4y6OvYk7vI52RWRVQ4oWUScevIaaY0
+ 2cYMqTm5kexrdfMkPOeG79TZ61XgRXKPdSyqzR1Bc652++/PDkRT7rUwPdOehK4PqG9j
+ 7qfw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=aCN/y1vsGbgbK8fKqVDDN8KS7NPTkiPqg0ffapBOPKw=;
- b=qmeMX7RDTFYx2QTm7kFCrxHZ+LE4sE+gR80BAHTfIPYshFvkZybgB2Wcs/vN7ZH0MW
- 4XKTXXHMUEtAUpFu0UOB+H1vCHR/FD6Tu4Q6ibIyl0OnW+hd0r6qLUljLrA2qrDIL9Sd
- eA8631VtQwn5foA41oc/v8ecSY8A0w9TxHhe3x9Q9blK9Zs0DnFijMTqC3p3G/UyLrdU
- +r1D9iqUptuVV2/W7hGPgerZY69tGJEwLqdJYPvHZOs+mzQT2+NdNz2AXST1Xsv1Cruo
- edb2j+LUmEEbBbCLtdVpzpI9rAyThaBfP2bMU6wqiEzs8k4Mxg4TnDiw4cFhfQegS/+5
- QmeQ==
-X-Gm-Message-State: APjAAAVrhiuPs5QvoqPnHdngCxRe/HpeWorRwVEKoZE2cW3dGWALw3mM
- DU5rIu4zTv0SyNw/MyCuWNjuRA==
-X-Google-Smtp-Source: APXvYqwvQRNWe1WIOWIlr0gEFgCsiFjBg2cBORFw5uuKDTutaavKkrv4kmNsyxwsGX0Zcx3EsfWoCw==
-X-Received: by 2002:a7b:c1c1:: with SMTP id a1mr38759324wmj.31.1563371020915; 
- Wed, 17 Jul 2019 06:43:40 -0700 (PDT)
+ bh=Uwej0osFkVecc1FOdZr4jnm39hj3PGH7mOMeiSpdwWM=;
+ b=RCA+jm/sfQyRycj1+e1Brz5EihB5UqPLvDDu9CR43y1MGQ168nU21dJNIBMofXgWTS
+ e+NBGQofWJGu0PrlmrPa3nZNIK6WfWZ10ONn4RtGG7AQRVhJW6/1ZZC0g8OghFlNMA+R
+ Mp4lCOS7Kd0bgOiqzEBLX65uMaD+Lg7C2MyeYtyXG/5kgre/Q3Sm3F0f6nbkbkEZ1uBi
+ lwgqKG6o77FjWxqrvMxOMsJwXhXhMtzz9GnuDcb04jiqs9xDZmJNfbfURnYoMo1zT9Zs
+ +++r5/htrl0Lt+k+q4Lw9E/iCli34E7pgOUtHSPzTvGfDh9TZZZYjjUNIsAfgWrWHCij
+ vX2g==
+X-Gm-Message-State: APjAAAW0pnA/Witr+so+ehRAEjVwcuZWav37eJeeo8zmcsxkzxioaaH6
+ wmYOnTYiOEdx2QQytueYq3U6Gg==
+X-Google-Smtp-Source: APXvYqy0QePNfFzRsN8E7WOpsIjIurvSx40reTgjHa7CgQR3EYVVWEQ/P2Tqzzlkzdo6r4Om6OdW4w==
+X-Received: by 2002:a7b:c0c6:: with SMTP id s6mr39064273wmh.115.1563371024740; 
+ Wed, 17 Jul 2019 06:43:44 -0700 (PDT)
 Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id u18sm20148321wmd.19.2019.07.17.06.43.37
+ by smtp.gmail.com with ESMTPSA id e7sm23480488wmd.0.2019.07.17.06.43.38
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Wed, 17 Jul 2019 06:43:37 -0700 (PDT)
+ Wed, 17 Jul 2019 06:43:40 -0700 (PDT)
 Received: from zen.linaroharston. (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 642E81FF93;
+ by zen.linaroharston (Postfix) with ESMTP id BF2B31FF9A;
  Wed, 17 Jul 2019 14:43:36 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Wed, 17 Jul 2019 14:43:18 +0100
-Message-Id: <20190717134335.15351-7-alex.bennee@linaro.org>
+Date: Wed, 17 Jul 2019 14:43:22 +0100
+Message-Id: <20190717134335.15351-11-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190717134335.15351-1-alex.bennee@linaro.org>
 References: <20190717134335.15351-1-alex.bennee@linaro.org>
@@ -83,9 +83,9 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::342
-Subject: [Qemu-devel] [PATCH v2 06/23] tests/migration-test: don't spam the
- logs when we fail
+X-Received-From: 2a00:1450:4864:20::336
+Subject: [Qemu-devel] [PATCH v2 10/23] tests/docker: Install the NSIS tools
+ in the MinGW capable images
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,70 +97,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Juan Quintela <quintela@redhat.com>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: Fam Zheng <fam@euphon.net>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Quite often the information about which test failed is hidden by the
-wall of repeated failures for each page. Stop outputting the error
-after 10 bad pages and just summarise the total damage at the end.
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
+This fixes:
+
+  $ make installer
+  (cd /tmp/qemu-nsis; \
+           for i in qemu-system-*.exe; do \
+             arch=${i%.exe}; \
+             arch=${arch#qemu-system-}; \
+             echo Section \"$arch\" Section_$arch; \
+             echo SetOutPath \"\$INSTDIR\"; \
+             echo File \"\${BINDIR}\\$i\"; \
+             echo SectionEnd; \
+           done \
+          ) >/tmp/qemu-nsis/system-emulations.nsh
+  makensis -V2 -NOCD \
+                  -DCONFIG_DOCUMENTATION="y" \
+                   \
+                  -DBINDIR="/tmp/qemu-nsis" \
+                   \
+                  -DSRCDIR="/home/phil/source/qemu" \
+                  -DOUTFILE="qemu-setup-4.0.90.exe" \
+                  -DDISPLAYVERSION="4.0.90" \
+                  /home/phil/source/qemu/qemu.nsi
+  /bin/sh: 1: makensis: not found
+  Makefile:1077: recipe for target 'qemu-setup-4.0.90.exe' failed
+  make: *** [qemu-setup-4.0.90.exe] Error 127
+
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-Id: <20190715174817.18981-4-philmd@redhat.com>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Laurent Vivier <lvivier@redhat.com>
 ---
-v2
-  - bad - 10
----
- tests/migration-test.c | 19 ++++++++++++-------
- 1 file changed, 12 insertions(+), 7 deletions(-)
+ tests/docker/dockerfiles/debian-win32-cross.docker | 3 +++
+ tests/docker/dockerfiles/debian-win64-cross.docker | 3 +++
+ tests/docker/dockerfiles/fedora.docker             | 1 +
+ 3 files changed, 7 insertions(+)
 
-diff --git a/tests/migration-test.c b/tests/migration-test.c
-index a4feb9545d9..c1968740abe 100644
---- a/tests/migration-test.c
-+++ b/tests/migration-test.c
-@@ -308,7 +308,7 @@ static void check_guests_ram(QTestState *who)
-     uint8_t first_byte;
-     uint8_t last_byte;
-     bool hit_edge = false;
--    bool bad = false;
-+    int bad = 0;
+diff --git a/tests/docker/dockerfiles/debian-win32-cross.docker b/tests/docker/dockerfiles/debian-win32-cross.docker
+index c787e432454..77f5cc45e92 100644
+--- a/tests/docker/dockerfiles/debian-win32-cross.docker
++++ b/tests/docker/dockerfiles/debian-win32-cross.docker
+@@ -9,6 +9,8 @@ MAINTAINER Philippe Mathieu-Daudé <f4bug@amsat.org>
  
-     qtest_memread(who, start_address, &first_byte, 1);
-     last_byte = first_byte;
-@@ -327,15 +327,20 @@ static void check_guests_ram(QTestState *who)
-                 hit_edge = true;
-                 last_byte = b;
-             } else {
--                fprintf(stderr, "Memory content inconsistency at %x"
--                                " first_byte = %x last_byte = %x current = %x"
--                                " hit_edge = %x\n",
--                                address, first_byte, last_byte, b, hit_edge);
--                bad = true;
-+                bad++;
-+                if (bad <= 10) {
-+                    fprintf(stderr, "Memory content inconsistency at %x"
-+                            " first_byte = %x last_byte = %x current = %x"
-+                            " hit_edge = %x\n",
-+                            address, first_byte, last_byte, b, hit_edge);
-+                }
-             }
-         }
-     }
--    g_assert_false(bad);
-+    if (bad >= 10) {
-+        fprintf(stderr, "and in another %d pages", bad - 10);
-+    }
-+    g_assert(bad == 0);
- }
+ ENV TARGET i686
  
- static void cleanup(const char *filename)
++ENV PATH $PATH:/usr/lib/mxe/usr/$TARGET-w64-mingw32.shared/bin
++
+ RUN DEBIAN_FRONTEND=noninteractive eatmydata \
+     apt-get install -y --no-install-recommends \
+         mxe-$TARGET-w64-mingw32.shared-bzip2 \
+@@ -19,6 +21,7 @@ RUN DEBIAN_FRONTEND=noninteractive eatmydata \
+         mxe-$TARGET-w64-mingw32.shared-lzo \
+         mxe-$TARGET-w64-mingw32.shared-nettle \
+         mxe-$TARGET-w64-mingw32.shared-ncurses \
++        mxe-$TARGET-w64-mingw32.shared-nsis \
+         mxe-$TARGET-w64-mingw32.shared-pixman \
+         mxe-$TARGET-w64-mingw32.shared-pkgconf \
+         mxe-$TARGET-w64-mingw32.shared-pthreads \
+diff --git a/tests/docker/dockerfiles/debian-win64-cross.docker b/tests/docker/dockerfiles/debian-win64-cross.docker
+index a7068ed6ac6..3908c5abc42 100644
+--- a/tests/docker/dockerfiles/debian-win64-cross.docker
++++ b/tests/docker/dockerfiles/debian-win64-cross.docker
+@@ -9,6 +9,8 @@ MAINTAINER Philippe Mathieu-Daudé <f4bug@amsat.org>
+ 
+ ENV TARGET x86-64
+ 
++ENV PATH $PATH:/usr/lib/mxe/usr/$TARGET-w64-mingw32.shared/bin
++
+ RUN DEBIAN_FRONTEND=noninteractive eatmydata \
+     apt-get install -y --no-install-recommends \
+         mxe-$TARGET-w64-mingw32.shared-bzip2 \
+@@ -19,6 +21,7 @@ RUN DEBIAN_FRONTEND=noninteractive eatmydata \
+         mxe-$TARGET-w64-mingw32.shared-lzo \
+         mxe-$TARGET-w64-mingw32.shared-nettle \
+         mxe-$TARGET-w64-mingw32.shared-ncurses \
++        mxe-$TARGET-w64-mingw32.shared-nsis \
+         mxe-$TARGET-w64-mingw32.shared-pixman \
+         mxe-$TARGET-w64-mingw32.shared-pkgconf \
+         mxe-$TARGET-w64-mingw32.shared-pthreads \
+diff --git a/tests/docker/dockerfiles/fedora.docker b/tests/docker/dockerfiles/fedora.docker
+index 2350d494d9a..226ac1026fa 100644
+--- a/tests/docker/dockerfiles/fedora.docker
++++ b/tests/docker/dockerfiles/fedora.docker
+@@ -52,6 +52,7 @@ ENV PACKAGES \
+     mingw32-libpng \
+     mingw32-libtasn1 \
+     mingw32-nettle \
++    mingw32-nsis \
+     mingw32-pixman \
+     mingw32-pkg-config \
+     mingw32-SDL2 \
 -- 
 2.20.1
 
