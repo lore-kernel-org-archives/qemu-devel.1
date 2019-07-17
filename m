@@ -2,88 +2,87 @@ Return-Path: <SRS0=PWhW=VO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3688BC76186
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 13:36:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D78ADC76192
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 13:44:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0E37220818
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 13:36:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E37220818
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id A4B01208C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 13:44:04 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CPP5cG6C"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A4B01208C0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57194 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57262 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnk6u-0001h0-9J
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 09:36:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53276)
+	id 1hnkDy-0005yh-LJ
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 09:44:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55256)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hnk6j-0001IY-Ax
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 09:36:34 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hnkDc-0004w4-12
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 09:43:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hnk6h-0006lu-TT
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 09:36:33 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:45479)
+ (envelope-from <alex.bennee@linaro.org>) id 1hnkDa-0004Sw-Px
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 09:43:39 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:54337)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hnk6h-0006kW-MU
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 09:36:31 -0400
-Received: by mail-wr1-f65.google.com with SMTP id f9so24829462wre.12
- for <qemu-devel@nongnu.org>; Wed, 17 Jul 2019 06:36:30 -0700 (PDT)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1hnkDa-0004SQ-Im
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 09:43:38 -0400
+Received: by mail-wm1-x344.google.com with SMTP id p74so22209164wme.4
+ for <qemu-devel@nongnu.org>; Wed, 17 Jul 2019 06:43:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=H6TUokZ8kcSbW7C3KySOq9tB4s1u4+MlccQhokaZu1Q=;
+ b=CPP5cG6CiPjIi6HY5aa5TOR+/AiHdj84mfafcqZnCK63AnHwFLTty19WL8Za2407Px
+ JZkVYUkvwsl3HLdyrfXSSr1PpKKUwxZdL+2eYabQ7eha9sHONoiCj1S4PA3qWvdO+DRE
+ zx9YaJQ9Y/S1XTItSjOtLtIkTvOKvr4nohK7nRamFjDgQbeqYz7FMJMb5r5Buu6leOmb
+ QLa3MsE7mlauZt8mOkHPTBTalhCSMw4GEFD6Ti0X8LINeWPCBAlgD9xBUIMk9IEfGRcM
+ zxw8j/2QB4BT+Eoh29D2fDNegKyE1z5FM73qlhHk958AfBsEz0BNG38ze2A46SAzONqY
+ ISbQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
  :content-transfer-encoding;
- bh=jVyWZzT5xbbh9xSi0zPVvUNKh6xVFDhmt5uT7Yzax0Q=;
- b=lkQUuCir2UJZRsYpShnwDiqNhYO7ZwXFNySjbnw2h6G5YMBEvS5L9bxEYbSQnSPetO
- mA/B4tUUZjQeUfU2Q8UtxYeXxMO2cD5KVBG2HI/h+LsG9tol2L4oJqFxsymLS4Uls/ns
- tvliGzLoWgNvj4ItWSuqHAr5R6FrK7D78Q5fDeQzyfv/sRsI8CKM33GAAVIOkmvAto1S
- fB6md6DsXzuSktS3N0GVSOAC90yeBnE0h7x4lmgELv3iaqx166d1V56LpZer+m0Hbfqr
- alSsUVDFMImePTlC1DrVR4AVrPXQmYFeosPDJ+y4rnEs9N19cj5PpGO3NkxLRU/MlhOj
- S08A==
-X-Gm-Message-State: APjAAAVdJAhEuAtanAIPP789Rqcf+3wm7eebBdqQrtaLOBFEHyv9Goq7
- zMGrdL17wgAqVzsmI8UIr7YFdg==
-X-Google-Smtp-Source: APXvYqzun/1GysH+JAOIxoFC+pkD06eCc2ekuSWfc2F3pxK4tRI84eGEqTY5Cj1mDEjkbz/IN+6Wwg==
-X-Received: by 2002:adf:f851:: with SMTP id d17mr43448874wrq.77.1563370588839; 
- Wed, 17 Jul 2019 06:36:28 -0700 (PDT)
-Received: from [10.32.224.209] (red-hat-inc.vlan560.asr1.mad1.gblx.net.
- [159.63.51.90])
- by smtp.gmail.com with ESMTPSA id b8sm28169289wmh.46.2019.07.17.06.36.27
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Wed, 17 Jul 2019 06:36:28 -0700 (PDT)
-To: Laszlo Ersek <lersek@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-References: <20181102171638.24069-1-peter.maydell@linaro.org>
- <20181102171638.24069-9-peter.maydell@linaro.org>
- <3e3d2018-3993-f651-8e94-5bea612bd776@redhat.com>
- <CAFEAcA_FtoHOUv_cPgfO7GrZ8Ug9cKCvmY2z75i9DaAQ8Qx+gQ@mail.gmail.com>
- <417cd887-aec4-d8ba-1dd2-810bc4c04977@redhat.com>
- <CAFEAcA_JntiaOOWisqLVqAV6jc=wk4nR548KbbUcG0XLabcNpA@mail.gmail.com>
- <8d06b8f2-7ee8-a77a-81d7-3219d5e43c45@redhat.com>
- <dfeab9fd-7ee1-01f2-dd38-cba449b1de63@redhat.com>
- <f625f1f1-ad97-1c75-e44d-3b0c015312b3@redhat.com>
- <cf9156f6-c3fa-ec7e-c51a-8b8d2fd1e6d6@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <7b45c073-8653-28e0-9d06-9e3aaa6dc460@redhat.com>
-Date: Wed, 17 Jul 2019 15:36:27 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ bh=H6TUokZ8kcSbW7C3KySOq9tB4s1u4+MlccQhokaZu1Q=;
+ b=JNh1Xm45tqOAPJhYQVyI+q0zcjKaov3Pc9exWDqRrQn/lPwvEVhJPyRInIaNSUPcaI
+ MuSH35Yi29rqiHTZ7TItMhkR0np5TdS4Kwvr5R/82jQEmzwUh6mZSFV0/Bfn6qow2FcD
+ OzQ/Xm/TuwM1VPe30/kOe2FywDsEekyAqbU7AGE0uaKpz8KUbCYRPV/sbXez2eYDE1XR
+ wK0hRxMlbgiRsNsFCLWaLh25goP+8FzWARpghATYJjxQoLXYrQTdzX+UkGUk9SJltliG
+ 1mubo0ahjfgPKe9BRgsN9JE8sKnepjnSliMR9FUrpw7npPMntVh7qr9CWlVIatqvMFpj
+ ElhQ==
+X-Gm-Message-State: APjAAAXM6D3Nzi7XxhOT5kWqx37crGbzDjeSQyQrm5YAOm2SLb3/E7S/
+ JEQBl7GJAGSD97LcWMpUpo5/lQ==
+X-Google-Smtp-Source: APXvYqxljRWt5rt8QuApzA4g9c0DNHSdkrqESIVveLgjJmi1snTt1nOK+cmSrJLGuZ+1qP1NBEkl/A==
+X-Received: by 2002:a7b:cbcb:: with SMTP id n11mr35740060wmi.54.1563371017289; 
+ Wed, 17 Jul 2019 06:43:37 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+ by smtp.gmail.com with ESMTPSA id r11sm27475253wre.14.2019.07.17.06.43.36
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Wed, 17 Jul 2019 06:43:36 -0700 (PDT)
+Received: from zen.linaroharston. (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id D53611FF87;
+ Wed, 17 Jul 2019 14:43:35 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Date: Wed, 17 Jul 2019 14:43:12 +0100
+Message-Id: <20190717134335.15351-1-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <cf9156f6-c3fa-ec7e-c51a-8b8d2fd1e6d6@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.221.65
-Subject: Re: [Qemu-devel] [PULL 08/10] target/arm: Conditionalize some
- asserts on aarch32 support
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::344
+Subject: [Qemu-devel] [PATCH  v2 00/23] testing/next for 4.1-rc2 (win, travis,
+ iotests)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,181 +94,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/17/19 11:22 AM, Laszlo Ersek wrote:
-> On 07/17/19 10:36, Laszlo Ersek wrote:
->> On 07/16/19 22:10, Philippe Mathieu-Daudé wrote:
->>> On 7/16/19 8:42 PM, Laszlo Ersek wrote:
->>>> On 07/16/19 18:59, Peter Maydell wrote:
->>>>> On Tue, 16 Jul 2019 at 17:51, Laszlo Ersek <lersek@redhat.com>
->>>>> wrote:
->>>>>> The issue still reproduces, so it makes sense for me to look at
->>>>>> the host kernel version... Well, I'm afraid it won't help much,
->>>>>> for an upstream investigation:
->>>>>>
->>>>>>   4.14.0-115.8.2.el7a.aarch64
->>>>>>
->>>>>> This is the latest released kernel from "Red Hat Enterprise Linux
->>>>>> for ARM 64 7".
->>>>>
->>>>> OK. (I'm using 4.15.0-51-generic from ubuntu).
->>>>>
->>>>> Could you run with QEMU under gdb, and when it hits the
->>>>> assertion go back up a stack frame to the arm_cpu_realizefn()
->>>>> frame, and then "print /x cpu->isar" ? That should show us
->>>>> what we think we've got as ID registers from the kernel.
->>>>> (You might need to build QEMU with --enable-debug to get
->>>>> useful enough debug info to do that, not sure.)
->>>>
->>>> (My qemu build script always builds QEMU in two configs, the
->>>> difference being --prefix and --enable-debug.)
->>>>
->>>> This is what I got:
->>>>
->>>> (gdb) frame 4
->>>> #4  0x00000000006a063c in arm_cpu_realizefn (dev=0x1761140,
->>>>     errp=0xffffffffe540)
->>>>     at .../qemu/target/arm/cpu.c:1159
->>>> 1159            assert(no_aa32 || cpu_isar_feature(arm_div, cpu));
->>>> (gdb) print /x cpu->isar
->>>> $1 = {id_isar0 = 0x0, id_isar1 = 0x0, id_isar2 = 0x0, id_isar3 = 0x0,
->>>>   id_isar4 = 0x0, id_isar5 = 0x0, id_isar6 = 0x0, mvfr0 = 0x0,
->>>>   mvfr1 = 0x0, mvfr2 = 0x0, id_aa64isar0 = 0x0, id_aa64isar1 = 0x0,
->>>>   id_aa64pfr0 = 0x11, id_aa64pfr1 = 0x0, id_aa64mmfr0 = 0x0,
->>>>   id_aa64mmfr1 = 0x0}
->>>
->>> For ISAR0, DIVIDE=0
->>>
->>> so cpu_isar_feature(arm_div, cpu)=false
->>>
->>> For AA64PFR0, EL0=1, EL1=1.
->>>
->>> EL0 = 1: EL0 can be executed in AArch64 state only.
->>> EL1 = 1: EL1 can be executed in AArch64 state only.
->>>
->>> so cpu_isar_feature(aa64_aa32, cpu)=false
->>> then no_aa32=true
->>>
->>> The commit description is "on a host that doesn't support aarch32
->>> mode at all, neither arm_div nor jazelle will be supported either."
->>>
->>> Shouldn't we use a slighly different logic? Such:
->>>
->>> -    assert(no_aa32 || cpu_isar_feature(arm_div, cpu));
->>> +    assert(no_aa32 && !cpu_isar_feature(arm_div, cpu));
->>>
->>
->> I'm unsure. The current formula seems to match the commit description.
->> Implication -- that is, "A implies B", (A-->B) -- is equivalent to (!A
->> || B).
->>
->> We have "no_aa32 || arm_div", which corresponds to "aa32 implies
->> arm_div" (aa32-->arm_div). And that seems to match exactly what Peter
->> said.
->>
->> The assert you suggest would fire on a host that supports at least one
->> of aa32 and arm_div (= the assertion would fail if (aa32 || arm_div)).
->> That would break on my host (hw+kernel) just the same, in the end. To
->> substitute the boolean values:
->>
->> -    assert(false || false)
->> +    assert(false && true)
-> 
-> Hmmm wait a second. The ARMv8 ARM says, about ID_ISAR0_EL1:
-> 
->> Divide, bits [27:24]
->>
->>     Indicates the implemented Divide instructions. Permitted values
->>     are:
->>     0000 None implemented.
->>     0001 Adds SDIV and UDIV in the T32 instruction set.
->>     0010 As for 0b0001, and adds SDIV and UDIV in the A32 instruction
->>          set.
->>     All other values are reserved.
-> 
-> So this means that (aa32 && !arm_div) *does* conform to the architecture
-> manual! And then, I understand where the bug is.
-> 
-> As I wrote above, the current C expression stands for:
-> 
->   aa32 --> arm_div
-> 
-> which -- we see from the ARMv8 ARM -- is wrong.
-> 
-> Upon re-reading the commit message more carefully:
-> 
->     on a host that doesn't support aarch32 mode at all, neither arm_div
->     nor jazelle will be supported either
-> 
-> it's clear that the intent was *not* the implication encoded in the
-> source. Instead, the intent was the *reverse* implication, namely:
-> 
->   !aa32 --> !arm_div    [1]
-> 
-> Or, equivalently (because, (A --> B) === (!A --> !B)):
+Hi,
 
-[Laszlo corrected this as:   (A --> B) === (!B --> !A)]
+This is my current queue for testing/next which I shall submit a PR
+for on Tuesday in time for rc2. This update adds:
 
->   arm_div --> aa32      [2]
-> 
-> Now, if you encode any one of these (equivalent) formulae in C, with the
-> logical OR operator, you get:
-> 
-> - Starting from [1]:
-> 
->   (A     --> B)        === (!A   || B)
->   (!aa32 --> !arm_div) === (aa32 || !arm_div) === (!no_aa32 || !arm_div)
-> 
-> - Starting from [2]:
-> 
->   (A       --> B)    === (!A       || B)
->   (arm_div --> aa32) === (!arm_div || aa32) === (!arm_div || !no_aa32)
-> 
-> You can see that, regardless of whether we start with [1], or
-> equivalently, [2], we end up with the exact same predicate, logically
-> speaking. The final expressions only differ in C with regard to the
-> order of evaluation / shortcut behavior. We can pick whichever we prefer
-> (for whatever other reason).
+  - fixes for Windows builds under docker (+installer)
+  - build fix for --no-default-devices
+  - tweak to docker DEBUG behaviour
+  - run iotests in make check
+  - use travis_retry to deal with flaky tests
 
-This makes sense.
+Rather than just disabling flaky tests I've enabled travis_retry on
+the check phase. This basically avoids me manually triggering rebuilds
+to turn the build green again. I think this is OK because actual
+breakages will just fail again and we want the CI status to be a
+reliable indicator of something gone wrong rather than being ignored
+as probably a flaky test. There is a danger that we might be missing
+the introduction of flakiness into the build but I suspect we wouldn't
+have picked it up those cases anyway. I think soak/stress tests are
+probably best handled by maintainers anyway.
 
-I still wonder why this didn't assert on Peter's setup.
+The following patches need review
+ patch 0017/hw i386 also turn off VMMOUSE is VMPORT is disabl.patch
+ patch 0018/travis enable travis_retry for check phase.patch
+ patch 0019/tests docker invoke the DEBUG shell with noprofil.patch
 
-> 
-> FWIW, the language of the original commit message corresponds to [1].
-> So, if we want to stick with that, then the patch we need is:
-> 
->> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
->> index e75a64a25a4b..ea84a3e11abb 100644
->> --- a/target/arm/cpu.c
->> +++ b/target/arm/cpu.c
->> @@ -1382,8 +1382,13 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
->>           * include the various other features that V7VE implies.
->>           * Presence of EL2 itself is ARM_FEATURE_EL2, and of the
->>           * Security Extensions is ARM_FEATURE_EL3.
->> +         *
->> +         * Lack of aa32 support excludes arm_div support:
->> +         *   no_aa32 --> !arm_div
->> +         * Using the logical OR operator, the same is expressed as:
->> +         *   !no_aa32 || !arm_div
->>           */
->> -        assert(no_aa32 || cpu_isar_feature(arm_div, cpu));
->> +        assert(!no_aa32 || !cpu_isar_feature(arm_div, cpu));
->>          set_feature(env, ARM_FEATURE_LPAE);
->>          set_feature(env, ARM_FEATURE_V7);
->>      }
-> 
-> If you guys agree, I can formally submit this patch.
+Alex Bennée (7):
+  tests/docker: add test-misc for building tools & docs
+  tests/migration-test: don't spam the logs when we fail
+  tests/dockerfiles: update the win cross builds to stretch
+  shippable: re-enable the windows cross builds
+  hw/i386: also turn off VMMOUSE is VMPORT is disabled
+  travis: enable travis_retry for check phase
+  tests/docker: invoke the DEBUG shell with --noprofile/--norc
 
-Worthwhile, so it could get in for the next release.
+Marc-André Lureau (1):
+  archive-source: also create a stash for submodules
 
-Regards,
+Philippe Mathieu-Daudé (11):
+  tests/docker: Install Sphinx in the Ubuntu images
+  tests/docker: Install Sphinx in the Fedora image
+  tests/docker: Install Ubuntu images noninteractively
+  tests/docker: Install Sphinx in the Debian images
+  tests/docker: Install the NSIS tools in the MinGW capable images
+  tests/docker: Set the correct cross-PKG_CONFIG_PATH in the MXE images
+  tests/docker: Install texinfo in the Fedora image
+  buildsys: The NSIS Windows build requires the documentation installed
+  buildsys: The NSIS Windows build requires qemu-nsis.bmp installed
+  tests/docker: Let the test-mingw test generate a NSIS installer
+  NSIS: Add missing firmware blobs
 
-Phil.
+Thomas Huth (4):
+  tests/qemu-iotests/check: Allow tests without groups
+  tests/qemu-iotests/group: Remove some more tests from the "auto" group
+  tests: Run the iotests during "make check" again
+  gitlab-ci: Remove qcow2 tests that are handled by "make check" already
+
+ .gitlab-ci.yml                                |  13 +-
+ .shippable.yml                                |   9 +-
+ .travis.yml                                   |   2 +-
+ Makefile                                      |   3 +-
+ hw/i386/Kconfig                               |   4 +-
+ qemu.nsi                                      |   3 +
+ scripts/archive-source.sh                     |  18 +--
+ tests/Makefile.include                        |  10 +-
+ tests/check-block.sh                          |  44 +++++--
+ tests/docker/Makefile.include                 |   6 +-
+ .../dockerfiles/debian-win32-cross.docker     |  10 +-
+ .../dockerfiles/debian-win64-cross.docker     |  10 +-
+ tests/docker/dockerfiles/debian10.docker      |   1 +
+ ...{debian8-mxe.docker => debian9-mxe.docker} |  11 +-
+ tests/docker/dockerfiles/debian9.docker       |   1 +
+ tests/docker/dockerfiles/fedora.docker        |   4 +
+ tests/docker/dockerfiles/ubuntu.docker        |   3 +-
+ tests/docker/dockerfiles/ubuntu1804.docker    |   3 +-
+ tests/docker/run                              |   4 +-
+ tests/docker/test-mingw                       |   4 +-
+ tests/docker/test-misc                        |  22 ++++
+ tests/migration-test.c                        |  19 ++-
+ tests/qemu-iotests-quick.sh                   |   8 --
+ tests/qemu-iotests/check                      |   4 +-
+ tests/qemu-iotests/group                      | 120 +++++++++---------
+ 25 files changed, 204 insertions(+), 132 deletions(-)
+ rename tests/docker/dockerfiles/{debian8-mxe.docker => debian9-mxe.docker} (56%)
+ create mode 100755 tests/docker/test-misc
+ delete mode 100755 tests/qemu-iotests-quick.sh
+
+-- 
+2.20.1
+
 
