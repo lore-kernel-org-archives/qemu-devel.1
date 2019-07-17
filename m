@@ -2,95 +2,90 @@ Return-Path: <SRS0=PWhW=VO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 689B7C76186
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 13:53:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81BF8C76186
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 13:53:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3F2BF208C0
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 13:53:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F2BF208C0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4DD74208C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 13:53:08 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vfgGfA+0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4DD74208C0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57474 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57476 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnkMd-0004na-7P
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 09:52:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58316)
+	id 1hnkMl-0005Pg-Hb
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 09:53:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57892)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <pbonzini@redhat.com>) id 1hnkMC-00034Z-At
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 09:52:33 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hnkKl-0004wN-HE
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 09:51:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1hnkMB-0002Mk-7Q
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 09:52:32 -0400
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:38991)
+ (envelope-from <alex.bennee@linaro.org>) id 1hnkKi-00016t-Jv
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 09:51:02 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:50859)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hnkMB-0002Lb-16
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 09:52:31 -0400
-Received: by mail-wm1-f67.google.com with SMTP id u25so11893425wmc.4
- for <qemu-devel@nongnu.org>; Wed, 17 Jul 2019 06:52:30 -0700 (PDT)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1hnkKi-00015c-Bz
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 09:51:00 -0400
+Received: by mail-wm1-x343.google.com with SMTP id v15so22273056wml.0
+ for <qemu-devel@nongnu.org>; Wed, 17 Jul 2019 06:51:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=r0APmCoUIG/w2qLEz3oEEruxZ1VMqL8sI7RlOiUMs8k=;
+ b=vfgGfA+0cUbAZ8WOL5VGfN7Yn+KIvSpudPq/bQyO0Y1foDZrOpJnmE24fG68US1ShK
+ IW9uitMI/Bc0oQW9JltinHJgpNKQh9GRidGwXdZxe0dH8oSDDGpWSoNooEaiDl7tPWNx
+ VqsP/BK0n2IvD+ijPxJzx/i1/1lA3VGTpBPkgKtecJp6EJXFu7+BPffnm9Ti2AMZs7CC
+ ZGIplavUxCxnPXcznEANH3tJn1n86/CRrSlV6Kbq/DSlt6Bx7od+TNzPhJCQtyCSfV6s
+ +1miIL2Zv7IQPv3VU6Emvo9XE81haDkgjok7Av48DrQCMxOaa4VsBFJ5OMY9enYDXXUx
+ iyLg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=lcPKlikHVw0UKOu5w7sujRIctLFD92nRZ7VhRKeyegM=;
- b=pza0iLM4Lp0mXrQsWV0x6yPwg7iFc5lIA9isPu+mLB++2asPbv0ziSjk+QTMkriOuD
- x9gVwK8OhxjJwE2O/UHpgfkZA9yC3DbfzjbfoSUMVeCbC2CBqh4YrRGa6/3ql0/Jl73f
- X0sWWoc18cWDJ+O+at6zcxUpw6pfMRudRGWgttO1AWDRhvUw6oHZH4FYq2VpEDVOD5ab
- 6/sNOVb+z+mzXd1E0lCu8j1045DinB1gUdGFdrn9vkv2G8rAA6F1TLKAcgyImdVJGBLj
- x+tRd+3R2eGe6xXwm60b7LWR+fmn8HGMTqtiRJ8hL81e2/m3UALGi5r3q/j6FU62i07B
- JLCA==
-X-Gm-Message-State: APjAAAWje4QqB8wm3BHl3gujtfJkmjARbybUYaU6CPI1aIUp90b1seve
- HAC5yDqyC4S+Ktp2zWFxUBqZXw==
-X-Google-Smtp-Source: APXvYqziNvMjIbDvojBWsg3svqTFETmwdKblqqmdyZ7n+h7uLvEKvMQxIpRMQJAodFwJVcZlcBVJWA==
-X-Received: by 2002:a05:600c:2388:: with SMTP id
- m8mr35524465wma.23.1563371549409; 
- Wed, 17 Jul 2019 06:52:29 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:e427:3beb:1110:dda2?
- ([2001:b07:6468:f312:e427:3beb:1110:dda2])
- by smtp.gmail.com with ESMTPSA id h133sm24905915wme.28.2019.07.17.06.52.28
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Wed, 17 Jul 2019 06:52:28 -0700 (PDT)
-To: Collin Walling <walling@linux.ibm.com>, Thomas Huth <thuth@redhat.com>,
- Markus Armbruster <armbru@redhat.com>
-References: <20190715095545.28545-1-philmd@redhat.com>
- <20190715095545.28545-2-philmd@redhat.com>
- <ca528cdc-6118-0b2f-c1b8-30b06875dde8@redhat.com>
- <CAFEAcA-wgTVfj0TUJ=piP0wEgLGiNpOYia5DK2GQAO4Q7gNaWg@mail.gmail.com>
- <6d69e8ad-d720-ce04-20f2-a03193903078@redhat.com>
- <20190715125653.6e65d575.cohuck@redhat.com>
- <c1c68faf-0424-6c7c-e39f-42159457c3ee@redhat.com>
- <20190715130955.4a117388.cohuck@redhat.com>
- <13fce62f-234c-1b13-595f-5910c066bc4f@redhat.com>
- <6c39a198-e951-c0bd-1ddc-5d227afe72ff@redhat.com>
- <87a7dfth4i.fsf@dusky.pond.sub.org>
- <20190715181206.3cb1db93.cohuck@redhat.com>
- <799aa0f5-8850-5caa-5103-e1cf3cdb018f@redhat.com>
- <87h87m2knh.fsf@dusky.pond.sub.org>
- <beb5fe93-991d-ba2b-d2c1-51e01b912dbe@redhat.com>
- <50befb09-d381-4362-9cd1-6fb11c96a719@linux.ibm.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <633cc3f7-eb20-1bfe-03d2-e481be188eb1@redhat.com>
-Date: Wed, 17 Jul 2019 15:52:27 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=r0APmCoUIG/w2qLEz3oEEruxZ1VMqL8sI7RlOiUMs8k=;
+ b=aup7bAYOi8Rsiy41ZAtmvi0ZhRfxfk0gWXk3yliTD70UKlcSvtkRSqpdICqKGpZARH
+ Uquq3bxHXGvyoHjVpKEpX3lGaPByapWtlQ2KE6luHLlKybV1sbMYv9DjfRUYAJGz/g3g
+ hY5+tU99pbq40dQYscrpGgjSig2GW+rt0GPKXVy35AWL/7TaL67NiqzUH74hBh5yYvoi
+ 1UZ1eoCNtNdX4NNmvipzKvroir7CRk2xYptd7V6WNMga1q/VcEHX9GNpuuGFSQ8C38y/
+ rveDV+UqalSaZjmP+fQqMR9WZDnzF4/tNrkQdtqBybKQbKNgbdXAD+aoZ+75+JvOsjt4
+ jU7w==
+X-Gm-Message-State: APjAAAX8w2aG/TqH5vIqwB9K3e7BXen2MyCD72zYZmEi6tISpI2sW6Rx
+ 8y6QIPUDf6u8rLbnhHdU5IgI6s6GOwA=
+X-Google-Smtp-Source: APXvYqy5SooGQiYPcSCkJYQdvhobVUX/EClRJs9hluw60EKV35LcJkOw+OBbdPKCGrTD4YMZyYufHA==
+X-Received: by 2002:a1c:f90f:: with SMTP id x15mr35821393wmh.69.1563371459136; 
+ Wed, 17 Jul 2019 06:50:59 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+ by smtp.gmail.com with ESMTPSA id 4sm53933619wro.78.2019.07.17.06.50.54
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Wed, 17 Jul 2019 06:50:55 -0700 (PDT)
+Received: from zen.linaroharston. (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id C11881FFAA;
+ Wed, 17 Jul 2019 14:43:37 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Date: Wed, 17 Jul 2019 14:43:34 +0100
+Message-Id: <20190717134335.15351-23-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190717134335.15351-1-alex.bennee@linaro.org>
+References: <20190717134335.15351-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <50befb09-d381-4362-9cd1-6fb11c96a719@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.128.67
-Subject: Re: [Qemu-devel] [qemu-s390x] [RFC PATCH 1/3] hw/Kconfig: PCI bus
- implies PCI_DEVICES
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::343
+Subject: [Qemu-devel] [PATCH v2 22/23] tests: Run the iotests during "make
+ check" again
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,48 +97,157 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Palmer Dabbelt <palmer@sifive.com>, "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Eduardo Habkost <ehabkost@redhat.com>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- "Michael S. Tsirkin" <mst@redhat.com>, Helge Deller <deller@gmx.de>,
- Cornelia Huck <cohuck@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- QEMU Developers <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>,
- "open list:S390" <qemu-s390x@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
- Alistair Francis <Alistair.Francis@wdc.com>, Gerd Hoffmann <kraxel@redhat.com>,
- qemu-ppc <qemu-ppc@nongnu.org>, Richard Henderson <rth@twiddle.net>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Artyom Tarasenko <atar4qemu@gmail.com>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Thomas Huth <thuth@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 17/07/19 14:59, Collin Walling wrote:
-> On 7/16/19 11:04 AM, Thomas Huth wrote:
->> On 16/07/2019 15.06, Markus Armbruster wrote:
->>> Paolo Bonzini <pbonzini@redhat.com> writes:
->>>
->>>> On 15/07/19 18:12, Cornelia Huck wrote:
->>>>>> Is it INTx vs. MSI vs. MSI-X?
->>>>>
->>>>> I think for s390x we need (INTx || MSI) vs MSI-X...
->>>>
->>>> I think MSI vs MSI-X is just how it's configured, not the actual
->>>> behavior, so it should be irrelevant.
->>>
->>> My best guesses from confusing information, please correct
->>> misunderstandings:
->>>
->>> 1. PCI devices need to support MSI or MSI-X to work with s390x.
->>
->> I think Cornelia mentioned that we might even require MSI-X there ...
->> Collin (being listed as "S390 PCI" maintainer), can you confirm?
-> 
-> MSI-X is mandatory for PCI devices in the s390 architecture.
+From: Thomas Huth <thuth@redhat.com>
 
-How are MSI and MSI-X distinguished?
+People often forget to run the iotests before submitting patches or pull
+requests - this is likely due to the fact that we do not run the tests
+during our mandatory "make check" tests yet. Now that we've got a proper
+"auto" group of iotests that should be fine to run in every environment,
+we can enable the iotests during "make check" again by running the "auto"
+tests by default from the check-block.sh script.
 
-Paolo
+Some cases still need to be checked first, though: iotests need bash and
+GNU sed (otherwise they fail), and if gprof is enabled, it spoils the
+output of some test cases causing them to fail. So if we detect that one
+of the required programs is missing or that gprof is enabled, we still
+have to skip the iotests to avoid failures.
+
+And finally, since we are using check-block.sh now again, this patch also
+removes the qemu-iotests-quick.sh script since we do not need that anymore
+(and having two shell wrapper scripts around the block tests seems rather
+confusing than helpful).
+
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+[AJB: -makecheck to check-block.sh, move check-block to start and gate it]
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Message-Id: <20190717111947.30356-4-thuth@redhat.com>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+---
+ tests/Makefile.include      | 10 +++++----
+ tests/check-block.sh        | 44 ++++++++++++++++++++++++++++---------
+ tests/qemu-iotests-quick.sh |  8 -------
+ 3 files changed, 40 insertions(+), 22 deletions(-)
+ delete mode 100755 tests/qemu-iotests-quick.sh
+
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index fd7fdb86586..6f02dfcc019 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -142,7 +142,7 @@ check-unit-y += tests/test-uuid$(EXESUF)
+ check-unit-y += tests/ptimer-test$(EXESUF)
+ check-unit-y += tests/test-qapi-util$(EXESUF)
+ 
+-check-block-$(CONFIG_POSIX) += tests/qemu-iotests-quick.sh
++check-block-$(call land,$(CONFIG_POSIX),$(CONFIG_SOFTMMU)) += tests/check-block.sh
+ 
+ # All QTests for now are POSIX-only, but the dependencies are
+ # really in libqtest, not in the testcases themselves.
+@@ -1092,8 +1092,10 @@ clean-tcg: $(CLEAN_TCG_TARGET_RULES)
+ 
+ QEMU_IOTESTS_HELPERS-$(call land,$(CONFIG_SOFTMMU),$(CONFIG_LINUX)) = tests/qemu-iotests/socket_scm_helper$(EXESUF)
+ 
+-.PHONY: check-tests/qemu-iotests-quick.sh
+-check-tests/qemu-iotests-quick.sh: tests/qemu-iotests-quick.sh qemu-img$(EXESUF) qemu-io$(EXESUF) qemu-nbd$(EXESUF) $(QEMU_IOTESTS_HELPERS-y)
++.PHONY: check-tests/check-block.sh
++check-tests/check-block.sh: tests/check-block.sh qemu-img$(EXESUF) \
++		qemu-io$(EXESUF) qemu-nbd$(EXESUF) $(QEMU_IOTESTS_HELPERS-y) \
++		$(patsubst %,%/all,$(filter %-softmmu,$(TARGET_DIRS)))
+ 	$<
+ 
+ .PHONY: $(patsubst %, check-%, $(check-qapi-schema-y))
+@@ -1167,7 +1169,7 @@ check-acceptance: check-venv $(TESTS_RESULTS_DIR)
+ check-qapi-schema: $(patsubst %,check-%, $(check-qapi-schema-y)) check-tests/qapi-schema/doc-good.texi
+ check-qtest: $(patsubst %,check-qtest-%, $(QTEST_TARGETS))
+ check-block: $(patsubst %,check-%, $(check-block-y))
+-check: check-qapi-schema check-unit check-softfloat check-qtest check-decodetree
++check: check-block check-qapi-schema check-unit check-softfloat check-qtest check-decodetree
+ check-clean:
+ 	rm -rf $(check-unit-y) tests/*.o $(QEMU_IOTESTS_HELPERS-y)
+ 	rm -rf $(sort $(foreach target,$(SYSEMU_TARGET_LIST), $(check-qtest-$(target)-y)) $(check-qtest-generic-y))
+diff --git a/tests/check-block.sh b/tests/check-block.sh
+index f3d12fd602d..c8b6cec3f68 100755
+--- a/tests/check-block.sh
++++ b/tests/check-block.sh
+@@ -1,24 +1,48 @@
+ #!/bin/sh
+ 
+-FORMAT_LIST="raw qcow2 qed vmdk vpc"
++# Honor the SPEED environment variable, just like we do it for the qtests.
++if [ "$SPEED" = "slow" ]; then
++    format_list="raw qcow2"
++    group=
++elif [ "$SPEED" = "thorough" ]; then
++    format_list="raw qcow2 qed vmdk vpc"
++    group=
++else
++    format_list=qcow2
++    group="-g auto"
++fi
++
+ if [ "$#" -ne 0 ]; then
+-    FORMAT_LIST="$@"
++    format_list="$@"
++fi
++
++if grep -q "TARGET_GPROF=y" *-softmmu/config-target.mak 2>/dev/null ; then
++    echo "GPROF is enabled ==> Not running the qemu-iotests."
++    exit 0
+ fi
+ 
+-export QEMU_PROG="$PWD/x86_64-softmmu/qemu-system-x86_64"
+-export QEMU_IMG_PROG="$PWD/qemu-img"
+-export QEMU_IO_PROG="$PWD/qemu-io"
++if [ -z "$(find . -name 'qemu-system-*' -print)" ]; then
++    echo "No qemu-system binary available ==> Not running the qemu-iotests."
++    exit 0
++fi
++
++if ! command -v bash >/dev/null 2>&1 ; then
++    echo "bash not available ==> Not running the qemu-iotests."
++    exit 0
++fi
+ 
+-if [ ! -x $QEMU_PROG ]; then
+-    echo "'make check-block' requires qemu-system-x86_64"
+-    exit 1
++if ! (sed --version | grep 'GNU sed') > /dev/null 2>&1 ; then
++    if ! command -v gsed >/dev/null 2>&1; then
++        echo "GNU sed not available ==> Not running the qemu-iotests."
++        exit 0
++    fi
+ fi
+ 
+ cd tests/qemu-iotests
+ 
+ ret=0
+-for FMT in $FORMAT_LIST ; do
+-    ./check -T -nocache -$FMT || ret=1
++for fmt in $format_list ; do
++    ./check -makecheck -$fmt $group || ret=1
+ done
+ 
+ exit $ret
+diff --git a/tests/qemu-iotests-quick.sh b/tests/qemu-iotests-quick.sh
+deleted file mode 100755
+index 0e554bb9724..00000000000
+--- a/tests/qemu-iotests-quick.sh
++++ /dev/null
+@@ -1,8 +0,0 @@
+-#!/bin/sh
+-
+-cd tests/qemu-iotests
+-
+-ret=0
+-TEST_DIR=${TEST_DIR:-/tmp/qemu-iotests-quick-$$} ./check -T -qcow2 -g quick || ret=1
+-
+-exit $ret
+-- 
+2.20.1
+
 
