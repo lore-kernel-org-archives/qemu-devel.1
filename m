@@ -2,87 +2,91 @@ Return-Path: <SRS0=PWhW=VO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D78ADC76192
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 13:44:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB25DC76186
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 13:44:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A4B01208C0
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 13:44:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9CB25208C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 13:44:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CPP5cG6C"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A4B01208C0
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="A56w0WBT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9CB25208C0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57262 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57264 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnkDy-0005yh-LJ
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 09:44:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55256)
+	id 1hnkE0-00067z-2r
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 09:44:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55252)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hnkDc-0004w4-12
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 09:43:41 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hnkDb-0004w3-Ol
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 09:43:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hnkDa-0004Sw-Px
+ (envelope-from <alex.bennee@linaro.org>) id 1hnkDa-0004So-Lb
  for qemu-devel@nongnu.org; Wed, 17 Jul 2019 09:43:39 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:54337)
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:35520)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hnkDa-0004SQ-Im
+ id 1hnkDa-0004SC-CA
  for qemu-devel@nongnu.org; Wed, 17 Jul 2019 09:43:38 -0400
-Received: by mail-wm1-x344.google.com with SMTP id p74so22209164wme.4
+Received: by mail-wr1-x444.google.com with SMTP id y4so24909492wrm.2
  for <qemu-devel@nongnu.org>; Wed, 17 Jul 2019 06:43:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=H6TUokZ8kcSbW7C3KySOq9tB4s1u4+MlccQhokaZu1Q=;
- b=CPP5cG6CiPjIi6HY5aa5TOR+/AiHdj84mfafcqZnCK63AnHwFLTty19WL8Za2407Px
- JZkVYUkvwsl3HLdyrfXSSr1PpKKUwxZdL+2eYabQ7eha9sHONoiCj1S4PA3qWvdO+DRE
- zx9YaJQ9Y/S1XTItSjOtLtIkTvOKvr4nohK7nRamFjDgQbeqYz7FMJMb5r5Buu6leOmb
- QLa3MsE7mlauZt8mOkHPTBTalhCSMw4GEFD6Ti0X8LINeWPCBAlgD9xBUIMk9IEfGRcM
- zxw8j/2QB4BT+Eoh29D2fDNegKyE1z5FM73qlhHk958AfBsEz0BNG38ze2A46SAzONqY
- ISbQ==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=KXyc4gTTAJaNXf6dtEqbxh/PAibemTFL8L8bZEMcnns=;
+ b=A56w0WBTwgshw6Om7Y2cfUU80UEmSFZ0UoHQKNF9MESrLucdnM4yVB1S3yokjNjdZp
+ FASVdG3kb0JM8ftwcHR4rllm13aHqQ1NrzThD79o4OY17AxzD6mW9oyd64Xxg1KE7Pi3
+ Nqdqc+pV0hP6Fd8K44DITEXX0dehsjvMpHMU6EA22njjjketYCKWX00MbY0NjHi39zNG
+ 6VwfA4hJXKbWrQGx14GvO1zJelVnAv6gX25y1KP7u2/CxtL6cNbUpK/UnD7y4D5mzlCj
+ ie3ZDB8OxQ/rjrHGAP+RebmKiBL96oNCK3Mf9K10nwMo/oRQAppDLTi8t/q7C6xbP3YW
+ XhTw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=H6TUokZ8kcSbW7C3KySOq9tB4s1u4+MlccQhokaZu1Q=;
- b=JNh1Xm45tqOAPJhYQVyI+q0zcjKaov3Pc9exWDqRrQn/lPwvEVhJPyRInIaNSUPcaI
- MuSH35Yi29rqiHTZ7TItMhkR0np5TdS4Kwvr5R/82jQEmzwUh6mZSFV0/Bfn6qow2FcD
- OzQ/Xm/TuwM1VPe30/kOe2FywDsEekyAqbU7AGE0uaKpz8KUbCYRPV/sbXez2eYDE1XR
- wK0hRxMlbgiRsNsFCLWaLh25goP+8FzWARpghATYJjxQoLXYrQTdzX+UkGUk9SJltliG
- 1mubo0ahjfgPKe9BRgsN9JE8sKnepjnSliMR9FUrpw7npPMntVh7qr9CWlVIatqvMFpj
- ElhQ==
-X-Gm-Message-State: APjAAAXM6D3Nzi7XxhOT5kWqx37crGbzDjeSQyQrm5YAOm2SLb3/E7S/
- JEQBl7GJAGSD97LcWMpUpo5/lQ==
-X-Google-Smtp-Source: APXvYqxljRWt5rt8QuApzA4g9c0DNHSdkrqESIVveLgjJmi1snTt1nOK+cmSrJLGuZ+1qP1NBEkl/A==
-X-Received: by 2002:a7b:cbcb:: with SMTP id n11mr35740060wmi.54.1563371017289; 
- Wed, 17 Jul 2019 06:43:37 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=KXyc4gTTAJaNXf6dtEqbxh/PAibemTFL8L8bZEMcnns=;
+ b=IWh9slc9trZdW7d0oqQRpeH5Jcs+tKWrKgv6RXLhgh8iGqZZLLqUXdcgxoCgf8m1qB
+ SmQXuuvjHnpiUBIRPsQge4UWgFuUEevAnFnjtt3IQ6UL09FyC+/dUZgunRZXvuZs/Nu5
+ m1NoH3bgGsTUzuGnQqeiTTvSPCWeJEFLaXVXUIzEsI7OaTngHAfLahpctpG6nU+G6ixj
+ fBt/C8OqrnRwB+KpJ/ktgwHR99S2R/zpIa0/nEyAZqKKiURdAna11B52GTe1D1O7uQRk
+ bWW5q2gY94sO8zKIEjkzBZQAq7kAFTlflCTqrxByTbxgI3H0Mp7eCoXiLXxYDnBJpjME
+ l0Kg==
+X-Gm-Message-State: APjAAAVJ8yb51Dh+ObqBfWjnGQsTXO4yMuS5UEt0O0IYJy8dsUpw9dLR
+ Gi5V+QG8tQATbCavHspKEKbBYA==
+X-Google-Smtp-Source: APXvYqxCQSa5fCA9MuB4CmD3f4iweRuOnJoJ+/TzIYxrH7TTumh0QKBwdmi/7AylGxora6DaAOd1bA==
+X-Received: by 2002:a05:6000:12c8:: with SMTP id
+ l8mr44708060wrx.72.1563371016856; 
+ Wed, 17 Jul 2019 06:43:36 -0700 (PDT)
 Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id r11sm27475253wre.14.2019.07.17.06.43.36
+ by smtp.gmail.com with ESMTPSA id b15sm38821810wrt.77.2019.07.17.06.43.36
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
  Wed, 17 Jul 2019 06:43:36 -0700 (PDT)
 Received: from zen.linaroharston. (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id D53611FF87;
+ by zen.linaroharston (Postfix) with ESMTP id EB31A1FF8C;
  Wed, 17 Jul 2019 14:43:35 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Wed, 17 Jul 2019 14:43:12 +0100
-Message-Id: <20190717134335.15351-1-alex.bennee@linaro.org>
+Date: Wed, 17 Jul 2019 14:43:13 +0100
+Message-Id: <20190717134335.15351-2-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190717134335.15351-1-alex.bennee@linaro.org>
+References: <20190717134335.15351-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::344
-Subject: [Qemu-devel] [PATCH  v2 00/23] testing/next for 4.1-rc2 (win, travis,
- iotests)
+X-Received-From: 2a00:1450:4864:20::444
+Subject: [Qemu-devel] [PATCH v2 01/23] archive-source: also create a stash
+ for submodules
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,98 +98,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ Fam Zheng <fam@euphon.net>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
+From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
-This is my current queue for testing/next which I shall submit a PR
-for on Tuesday in time for rc2. This update adds:
+"git archive" fails when a submodule has a modification, because "git
+stash create" doesn't handle submodules. Let's teach our
+archive-source.sh to handle modifications in submodules the same way
+as qemu tree, by creating a stash.
 
-  - fixes for Windows builds under docker (+installer)
-  - build fix for --no-default-devices
-  - tweak to docker DEBUG behaviour
-  - run iotests in make check
-  - use travis_retry to deal with flaky tests
+Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+Message-Id: <20190708200250.12017-1-marcandre.lureau@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+---
+ scripts/archive-source.sh | 18 ++++++++++--------
+ 1 file changed, 10 insertions(+), 8 deletions(-)
 
-Rather than just disabling flaky tests I've enabled travis_retry on
-the check phase. This basically avoids me manually triggering rebuilds
-to turn the build green again. I think this is OK because actual
-breakages will just fail again and we want the CI status to be a
-reliable indicator of something gone wrong rather than being ignored
-as probably a flaky test. There is a danger that we might be missing
-the introduction of flakiness into the build but I suspect we wouldn't
-have picked it up those cases anyway. I think soak/stress tests are
-probably best handled by maintainers anyway.
-
-The following patches need review
- patch 0017/hw i386 also turn off VMMOUSE is VMPORT is disabl.patch
- patch 0018/travis enable travis_retry for check phase.patch
- patch 0019/tests docker invoke the DEBUG shell with noprofil.patch
-
-Alex Bennée (7):
-  tests/docker: add test-misc for building tools & docs
-  tests/migration-test: don't spam the logs when we fail
-  tests/dockerfiles: update the win cross builds to stretch
-  shippable: re-enable the windows cross builds
-  hw/i386: also turn off VMMOUSE is VMPORT is disabled
-  travis: enable travis_retry for check phase
-  tests/docker: invoke the DEBUG shell with --noprofile/--norc
-
-Marc-André Lureau (1):
-  archive-source: also create a stash for submodules
-
-Philippe Mathieu-Daudé (11):
-  tests/docker: Install Sphinx in the Ubuntu images
-  tests/docker: Install Sphinx in the Fedora image
-  tests/docker: Install Ubuntu images noninteractively
-  tests/docker: Install Sphinx in the Debian images
-  tests/docker: Install the NSIS tools in the MinGW capable images
-  tests/docker: Set the correct cross-PKG_CONFIG_PATH in the MXE images
-  tests/docker: Install texinfo in the Fedora image
-  buildsys: The NSIS Windows build requires the documentation installed
-  buildsys: The NSIS Windows build requires qemu-nsis.bmp installed
-  tests/docker: Let the test-mingw test generate a NSIS installer
-  NSIS: Add missing firmware blobs
-
-Thomas Huth (4):
-  tests/qemu-iotests/check: Allow tests without groups
-  tests/qemu-iotests/group: Remove some more tests from the "auto" group
-  tests: Run the iotests during "make check" again
-  gitlab-ci: Remove qcow2 tests that are handled by "make check" already
-
- .gitlab-ci.yml                                |  13 +-
- .shippable.yml                                |   9 +-
- .travis.yml                                   |   2 +-
- Makefile                                      |   3 +-
- hw/i386/Kconfig                               |   4 +-
- qemu.nsi                                      |   3 +
- scripts/archive-source.sh                     |  18 +--
- tests/Makefile.include                        |  10 +-
- tests/check-block.sh                          |  44 +++++--
- tests/docker/Makefile.include                 |   6 +-
- .../dockerfiles/debian-win32-cross.docker     |  10 +-
- .../dockerfiles/debian-win64-cross.docker     |  10 +-
- tests/docker/dockerfiles/debian10.docker      |   1 +
- ...{debian8-mxe.docker => debian9-mxe.docker} |  11 +-
- tests/docker/dockerfiles/debian9.docker       |   1 +
- tests/docker/dockerfiles/fedora.docker        |   4 +
- tests/docker/dockerfiles/ubuntu.docker        |   3 +-
- tests/docker/dockerfiles/ubuntu1804.docker    |   3 +-
- tests/docker/run                              |   4 +-
- tests/docker/test-mingw                       |   4 +-
- tests/docker/test-misc                        |  22 ++++
- tests/migration-test.c                        |  19 ++-
- tests/qemu-iotests-quick.sh                   |   8 --
- tests/qemu-iotests/check                      |   4 +-
- tests/qemu-iotests/group                      | 120 +++++++++---------
- 25 files changed, 204 insertions(+), 132 deletions(-)
- rename tests/docker/dockerfiles/{debian8-mxe.docker => debian9-mxe.docker} (56%)
- create mode 100755 tests/docker/test-misc
- delete mode 100755 tests/qemu-iotests-quick.sh
-
+diff --git a/scripts/archive-source.sh b/scripts/archive-source.sh
+index ca94e49978f..fb5d6b3918d 100755
+--- a/scripts/archive-source.sh
++++ b/scripts/archive-source.sh
+@@ -39,14 +39,16 @@ function cleanup() {
+ }
+ trap "cleanup" 0 1 2 3 15
+ 
+-if git diff-index --quiet HEAD -- &>/dev/null
+-then
+-    HEAD=HEAD
+-else
+-    HEAD=$(git stash create)
+-fi
++function tree_ish() {
++    local retval='HEAD'
++    if ! git diff-index --quiet --ignore-submodules=all HEAD -- &>/dev/null
++    then
++        retval=$(git stash create)
++    fi
++    echo "$retval"
++}
+ 
+-git archive --format tar $HEAD > "$tar_file"
++git archive --format tar "$(tree_ish)" > "$tar_file"
+ test $? -ne 0 && error "failed to archive qemu"
+ for sm in $submodules; do
+     status="$(git submodule status "$sm")"
+@@ -62,7 +64,7 @@ for sm in $submodules; do
+             echo "WARNING: submodule $sm is out of sync"
+             ;;
+     esac
+-    (cd $sm; git archive --format tar --prefix "$sm/" $smhash) > "$sub_file"
++    (cd $sm; git archive --format tar --prefix "$sm/" $(tree_ish)) > "$sub_file"
+     test $? -ne 0 && error "failed to archive submodule $sm ($smhash)"
+     tar --concatenate --file "$tar_file" "$sub_file"
+     test $? -ne 0 && error "failed append submodule $sm to $tar_file"
 -- 
 2.20.1
 
