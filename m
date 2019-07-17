@@ -2,64 +2,87 @@ Return-Path: <SRS0=PWhW=VO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18A8AC76188
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 02:31:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E344AC76192
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 02:33:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DFD4A20818
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 02:31:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DFD4A20818
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id B002A20818
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 02:33:44 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="n6UpGncc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B002A20818
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53606 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53616 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnZjF-0007s6-2G
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 22:31:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52407)
+	id 1hnZlH-0000WW-MV
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 22:33:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52891)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <yan.y.zhao@intel.com>) id 1hnZj4-0007Ti-HY
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 22:31:27 -0400
+ (envelope-from <shirley17fei@gmail.com>) id 1hnZl4-00007F-VL
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 22:33:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yan.y.zhao@intel.com>) id 1hnZj3-0004YF-Ak
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 22:31:26 -0400
-Received: from mga02.intel.com ([134.134.136.20]:15309)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yan.y.zhao@intel.com>)
- id 1hnZj3-0004Vn-13
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 22:31:25 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
- by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 16 Jul 2019 19:31:20 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,272,1559545200"; d="scan'208";a="170114774"
-Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
- ([10.239.13.9])
- by orsmga003.jf.intel.com with ESMTP; 16 Jul 2019 19:31:15 -0700
-Date: Tue, 16 Jul 2019 22:25:13 -0400
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: Kirti Wankhede <kwankhede@nvidia.com>
-Message-ID: <20190717022513.GD8912@joy-OptiPlex-7040>
-References: <1562665760-26158-1-git-send-email-kwankhede@nvidia.com>
- <1562665760-26158-8-git-send-email-kwankhede@nvidia.com>
+ (envelope-from <shirley17fei@gmail.com>) id 1hnZl3-0005zu-Hm
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 22:33:30 -0400
+Received: from mail-pl1-x635.google.com ([2607:f8b0:4864:20::635]:46516)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <shirley17fei@gmail.com>)
+ id 1hnZl3-0005xi-82
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 22:33:29 -0400
+Received: by mail-pl1-x635.google.com with SMTP id c2so11086081plz.13
+ for <qemu-devel@nongnu.org>; Tue, 16 Jul 2019 19:33:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=Mpanv0GkI1qUuScVTMz+GrOkxn/egYEtKNugwHi11io=;
+ b=n6UpGncc1ao8AqP08b2Do4YCKVVfs3CdAN/hzn33d6BoLH8JWqrRmNXzXpty03aRGI
+ mk/GoDwTScaHdOcdkl6ivXz2PZkfFJorFG1djRsNhJpujkMLcgkS+rUrQm1evb0KVRQy
+ wI0I6Aj1OuOvnX+L0cmVLrIU+v23k5HHPdM66gaHc/8bUyY5UF9FR+EtLHRs5YB/8W7j
+ uagJRxjAWJ0zEhkPlcR/MPcMzr0scyWgY84sYMUxmjiuRr70c7TRQm03bqZWQGfP4/CI
+ lWJmlzrYcDmLZgUFT5ORvmun3QSnuLeuPsm7FtBhgKXeN9e6l8dehl6UNJfmo5rncIhM
+ hS1A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=Mpanv0GkI1qUuScVTMz+GrOkxn/egYEtKNugwHi11io=;
+ b=LY+WTYyGkkKTo4CI6jQIkRtp4CvkDIBFvDheCMDpP3QTuoyfmwXSCfsfnzqNoeFdx6
+ OI0+JFp0noUuA6T1YUmkDik1tnmVn7IlHODgDbnjunP4KHG5O7zg1som4pj7dUpVvr6v
+ +lrCG0FgU6ESBDE3CS2G6trY7j8FzKpqzwrZlMKgRTcXpznda7698/r6MTyxVMQ6UY8H
+ tHKBhd5XPw25MzbPtxUS5rHOElKb/KRYquFPoWVBzp3s2I11F7ogLiohbKe0ZdJJ6msP
+ wYPZ1Ao/jLwuUnQEWTIy+JgZHvOLoq9X4dGFn/DBTTxaJqRgnejd3gp+VdYkT58ezTpi
+ HO6g==
+X-Gm-Message-State: APjAAAVr0hCJJRrp7/RvoO4W/53mC0kQDo36uFuq1llvsojNYZSiq6QF
+ O6FCe1jn+0jIxGqU3gfWVZ/bTngw
+X-Google-Smtp-Source: APXvYqyxTqGJddCQZEgdUlou7WMkw6QUmT/B8kAP1YGxp4xzu6Qa1uJ9bCMAp1F3c1z9bv0FGG88BQ==
+X-Received: by 2002:a17:902:8547:: with SMTP id
+ d7mr40432783plo.171.1563330806454; 
+ Tue, 16 Jul 2019 19:33:26 -0700 (PDT)
+Received: from n3-021-211.byted.org ([49.7.44.72])
+ by smtp.gmail.com with ESMTPSA id b1sm20986530pfi.91.2019.07.16.19.33.23
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Tue, 16 Jul 2019 19:33:25 -0700 (PDT)
+From: Fei Li <shirley17fei@gmail.com>
+To: qemu-devel@nongnu.org,
+	shirley17fei@gmail.com
+Date: Wed, 17 Jul 2019 10:32:59 +0800
+Message-Id: <20190717023310.197246-1-shirley17fei@gmail.com>
+X-Mailer: git-send-email 2.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1562665760-26158-8-git-send-email-kwankhede@nvidia.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 134.134.136.20
-Subject: Re: [Qemu-devel] [PATCH v7 07/13] vfio: Add migration state change
- notifier
+X-Received-From: 2607:f8b0:4864:20::635
+Subject: [Qemu-devel] [PATCH v14 00/11] qemu_thread_create: propagate the
+ error to callers to handle
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,149 +94,179 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>, "Tian,
- Kevin" <kevin.tian@intel.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
- "cjia@nvidia.com" <cjia@nvidia.com>,
- "eskultet@redhat.com" <eskultet@redhat.com>, "Yang,
- Ziye" <ziye.yang@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "cohuck@redhat.com" <cohuck@redhat.com>,
- "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
- "dgilbert@redhat.com" <dgilbert@redhat.com>, "Wang,
- Zhi A" <zhi.a.wang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
- "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>,
- "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
- "eauger@redhat.com" <eauger@redhat.com>,
- "felipe@nutanix.com" <felipe@nutanix.com>,
- "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "Liu,
- Changpeng" <changpeng.liu@intel.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>
+Cc: Markus Armbruster <armbru@redhat.com>, Peter Xu <peterx@redhat.com>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Jul 09, 2019 at 05:49:14PM +0800, Kirti Wankhede wrote:
-> Added migration state change notifier to get notification on migration state
-> change. These states are translated to VFIO device state and conveyed to vendor
-> driver.
-> 
-> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> Reviewed-by: Neo Jia <cjia@nvidia.com>
-> ---
->  hw/vfio/migration.c           | 54 +++++++++++++++++++++++++++++++++++++++++++
->  hw/vfio/trace-events          |  1 +
->  include/hw/vfio/vfio-common.h |  1 +
->  3 files changed, 56 insertions(+)
-> 
-> diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
-> index c01f08b659d0..e4a89a6f9bc7 100644
-> --- a/hw/vfio/migration.c
-> +++ b/hw/vfio/migration.c
-> @@ -132,6 +132,53 @@ static void vfio_vmstate_change(void *opaque, int running, RunState state)
->      }
->  }
->  
-> +static void vfio_migration_state_notifier(Notifier *notifier, void *data)
-> +{
-> +    MigrationState *s = data;
-> +    VFIODevice *vbasedev = container_of(notifier, VFIODevice, migration_state);
-> +    int ret;
-> +
-> +    trace_vfio_migration_state_notifier(vbasedev->name, s->state);
-> +
-> +    switch (s->state) {
-> +    case MIGRATION_STATUS_ACTIVE:
-> +        if (vbasedev->device_state & VFIO_DEVICE_STATE_RUNNING) {
-> +            if (vbasedev->vm_running) {
-> +                ret = vfio_migration_set_state(vbasedev,
-> +                          VFIO_DEVICE_STATE_RUNNING | VFIO_DEVICE_STATE_SAVING);
-> +                if (ret) {
-> +                    error_report("%s: Failed to set state RUNNING and SAVING",
-> +                                  vbasedev->name);
-> +                }
-> +            } else {
-> +                ret = vfio_migration_set_state(vbasedev,
-> +                                               VFIO_DEVICE_STATE_SAVING);
-> +                if (ret) {
-> +                    error_report("%s: Failed to set state STOP and SAVING",
-> +                                 vbasedev->name);
-> +                }
-> +            }
-> +        } else {
-> +            ret = vfio_migration_set_state(vbasedev,
-> +                                           VFIO_DEVICE_STATE_RESUMING);
-> +            if (ret) {
-> +                error_report("%s: Failed to set state RESUMING",
-> +                             vbasedev->name);
-> +            }
-> +        }
-> +        return;
-> +
-hi Kirti
-currently, migration state notifiers are only notified in below 3 interfaces:
-migrate_fd_connect, migrate_fd_cleanup, postcopy_start, where
-MIGRATION_STATUS_ACTIVE is not an valid state.
-Have you tested the above code? what's the purpose of the code?
+Hi,
 
-Thanks
-Yan
+This idea comes from BiteSizedTasks, and this patch series implement
+the error checking of qemu_thread_create: make qemu_thread_create
+return a flag to indicate if it succeeded rather than failing with
+an error; make all callers check it.
 
-> +    case MIGRATION_STATUS_CANCELLING:
-> +    case MIGRATION_STATUS_CANCELLED:
-> +    case MIGRATION_STATUS_FAILED:
-> +        ret = vfio_migration_set_state(vbasedev, VFIO_DEVICE_STATE_RUNNING);
-> +        if (ret) {
-> +            error_report("%s: Failed to set state RUNNING", vbasedev->name);
-> +        }
-> +        return;
-> +    }
-> +}
-> +
->  static int vfio_migration_init(VFIODevice *vbasedev,
->                                 struct vfio_region_info *info)
->  {
-> @@ -152,6 +199,9 @@ static int vfio_migration_init(VFIODevice *vbasedev,
->      vbasedev->vm_state = qemu_add_vm_change_state_handler(vfio_vmstate_change,
->                                                            vbasedev);
->  
-> +    vbasedev->migration_state.notify = vfio_migration_state_notifier;
-> +    add_migration_state_change_notifier(&vbasedev->migration_state);
-> +
->      return 0;
->  }
->  
-> @@ -194,6 +244,10 @@ void vfio_migration_finalize(VFIODevice *vbasedev)
->          return;
->      }
->  
-> +    if (vbasedev->migration_state.notify) {
-> +        remove_migration_state_change_notifier(&vbasedev->migration_state);
-> +    }
-> +
->      if (vbasedev->vm_state) {
->          qemu_del_vm_change_state_handler(vbasedev->vm_state);
->      }
-> diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
-> index 3d15bacd031a..69503228f20e 100644
-> --- a/hw/vfio/trace-events
-> +++ b/hw/vfio/trace-events
-> @@ -148,3 +148,4 @@ vfio_display_edid_write_error(void) ""
->  vfio_migration_probe(char *name, uint32_t index) " (%s) Region %d"
->  vfio_migration_set_state(char *name, uint32_t state) " (%s) state %d"
->  vfio_vmstate_change(char *name, int running, const char *reason, uint32_t dev_state) " (%s) running %d reason %s device state %d"
-> +vfio_migration_state_notifier(char *name, int state) " (%s) state %d"
-> diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-> index f6c70db3a9c1..a022484d2636 100644
-> --- a/include/hw/vfio/vfio-common.h
-> +++ b/include/hw/vfio/vfio-common.h
-> @@ -128,6 +128,7 @@ typedef struct VFIODevice {
->      uint32_t device_state;
->      VMChangeStateEntry *vm_state;
->      int vm_running;
-> +    Notifier migration_state;
->  } VFIODevice;
->  
->  struct VFIODeviceOps {
-> -- 
-> 2.7.0
-> 
+The first patch modifies the qemu_thread_create() by passing
+&error_abort and returing a value to indicate if it succeeds. The next
+10 patches will improve on &error_abort for callers who could handle
+more properly.
+
+Please help to review, thanks a lot! 
+
+v14:
+- For patch 1/11, complement qemu_thread_create(xxx, &error_abort) for all 
+  corresponding files, esp for files under tests/.
+
+v13:
+- Add one Acked-by for patch 2/11.
+- Resend as the last version was divided into several parts. 
+
+v12:
+- For patch 6/11, make event_thread terminate by stopping vevent
+  thread when failing to create handle_apdu_thread.
+- Rectify the commit message for patch 7/11, 8/11.
+- For patch 9/11, change two cleanup sentences' order when failing
+  to create multifd_recv_thread.
+- For patch 11/11, fix the SIGBUS conflict for touch_all_pages().
+
+v11:
+- Resend as I sent the last version in a mess..
+
+v10:
+- Make qemu_thread_create() return -errno instead of a Boolean.
+- Add more cleanup for pci_edu_realize()/emulated_realize(). 
+- Polish for iothread_complete()/compress_threads_save_cleanup()/
+  vnc_start_worker_thread()/touch_all_pages.
+- Change to return H_HARDWARE for h_resize_hpt_prepare().
+- Remove five derivative patches as they have been merged.
+
+v9:
+- To ease the review and involve the appropriate maintainers, split
+  the previous 6/7 patch into 10 patches: the 6/16 patch passes
+  the &error_abort to qemu_thread_create() everywhere, and the next
+  9 patches will improve on &error_abort for callers who need.
+- Add a new patch 5/7 to unify error handling for 
+  process_incoming_migration_co().
+- Merge the previous 2/7 to current 7/16 to collaboratively handle
+  for qemu_X_start_vcpu and for the qemu_init_vpcu in each arch.
+- Add comment for multifd_recv_new_channel() in current patch 2/7.
+
+v8:
+- Remove previous two patches trying to fix the multifd issue on the
+  source side, as we are still waiting for maintainer's opinions.
+- Use atomic_read to get multifd_recv_state->count in patch 3/7.
+- Get three more "Reviewed-by:".
+
+v7:
+- Split the previous multifd-migration into two patches: the src and
+  the dst. For the dst, only dump the error instead of quitting.
+- Safely do the cleanup for postcopy_ram_enable_notify().
+- Split the previous migration-error-handling patch into two patches.
+
+v6:
+- Add a new migration-multifd related patch. BTW, delete the previous
+  vnc related patch as it has been upstreamed.
+- Use error_setg_errno() to set the errno when qemu_thread_create()
+  fails for both Linux and Windows implementation.
+- Optimize the first patch, less codes are needed
+
+v5:
+- Remove `errno = err` in qemu_thread_create() for Linux, and change
+  `return errno` to `return -1` in qemu_signal_init() to indicate
+  the error in case qemu_thread_create() fails.
+- Delete the v4-added qemu_cond/mutex_destroy() in iothread_complete()
+  as the destroy() will be done by its callers' object_unref().
+
+v4:
+- Separate the migration compression patch from this series
+- Add one more error handling patch related with migration
+- Add more cleaning up code for touched functions
+
+v3:
+- Add two migration related patches to fix the segmentaion fault
+- Extract the segmentation fault fix from v2's last patch to be a
+  separate patch
+
+v2:
+- Pass errp straightly instead of using a local_err & error_propagate
+- Return a bool: false/true to indicate if one function succeeds
+- Merge v1's last two patches into one to avoid the compile error
+- Fix one omitted error in patch1 and update some error messages
+
+
+Fei Li (11):
+  qemu_thread: make qemu_thread_create() take Error ** argument
+  qemu_thread: supplement error handling for qemu_X_start_vcpu
+  qemu_thread: supplement error handling for qmp_dump_guest_memory
+  qemu_thread: supplement error handling for pci_edu_realize
+  qemu_thread: supplement error handling for h_resize_hpt_prepare
+  qemu_thread: supplement error handling for emulated_realize
+  qemu_thread: supplement error handling for iothread_complete
+  qemu_thread: supplement error handling for qemu_signalfd_compat
+  qemu_thread: supplement error handling for migration
+  qemu_thread: supplement error handling for vnc_start_worker_thread
+  qemu_thread: supplement error handling for touch_all_pages
+
+ accel/tcg/user-exec-stub.c      |  3 +-
+ cpus.c                          | 69 +++++++++++++++++++++++++----------------
+ dump/dump.c                     |  2 +-
+ hw/misc/edu.c                   | 11 +++++--
+ hw/ppc/spapr_hcall.c            | 10 ++++--
+ hw/rdma/rdma_backend.c          |  3 +-
+ hw/usb/ccid-card-emulated.c     | 16 +++++++---
+ include/qemu/thread.h           |  6 ++--
+ include/qom/cpu.h               |  2 +-
+ io/task.c                       |  3 +-
+ iothread.c                      | 17 +++++++---
+ migration/migration.c           | 30 ++++++++++++++----
+ migration/postcopy-ram.c        | 14 +++++++--
+ migration/ram.c                 | 66 ++++++++++++++++++++++++++-------------
+ migration/savevm.c              | 11 +++++--
+ target/alpha/cpu.c              |  4 ++-
+ target/arm/cpu.c                |  4 ++-
+ target/cris/cpu.c               |  4 ++-
+ target/hppa/cpu.c               |  4 ++-
+ target/i386/cpu.c               |  4 ++-
+ target/lm32/cpu.c               |  4 ++-
+ target/m68k/cpu.c               |  4 ++-
+ target/microblaze/cpu.c         |  4 ++-
+ target/mips/cpu.c               |  4 ++-
+ target/moxie/cpu.c              |  4 ++-
+ target/nios2/cpu.c              |  4 ++-
+ target/openrisc/cpu.c           |  4 ++-
+ target/ppc/translate_init.inc.c |  4 ++-
+ target/riscv/cpu.c              |  4 ++-
+ target/s390x/cpu.c              |  4 ++-
+ target/sh4/cpu.c                |  4 ++-
+ target/sparc/cpu.c              |  4 ++-
+ target/tilegx/cpu.c             |  4 ++-
+ target/tricore/cpu.c            |  4 ++-
+ target/unicore32/cpu.c          |  4 ++-
+ target/xtensa/cpu.c             |  4 ++-
+ tests/atomic64-bench.c          |  3 +-
+ tests/atomic_add-bench.c        |  3 +-
+ tests/iothread.c                |  2 +-
+ tests/qht-bench.c               |  3 +-
+ tests/rcutorture.c              |  3 +-
+ tests/test-aio.c                |  2 +-
+ tests/test-char.c               |  6 ++--
+ tests/test-rcu-list.c           |  3 +-
+ tests/test-util-filemonitor.c   |  2 +-
+ ui/cocoa.m                      |  2 +-
+ ui/vnc-jobs.c                   | 17 +++++++---
+ ui/vnc-jobs.h                   |  2 +-
+ ui/vnc.c                        |  4 ++-
+ util/compatfd.c                 | 13 ++++++--
+ util/oslib-posix.c              | 34 +++++++++++++-------
+ util/qemu-thread-posix.c        | 30 +++++++++++++-----
+ util/qemu-thread-win32.c        | 13 ++++++--
+ util/rcu.c                      |  3 +-
+ util/thread-pool.c              |  4 ++-
+ 55 files changed, 351 insertions(+), 145 deletions(-)
+
+-- 
+2.11.0
+
 
