@@ -2,61 +2,59 @@ Return-Path: <SRS0=PWhW=VO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14CF1C7618F
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 17:30:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C17BC76192
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 17:40:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E471221743
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 17:30:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E471221743
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 1E0C421848
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 17:40:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E0C421848
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59306 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59358 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnnlT-00068M-KO
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 13:30:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40466)
+	id 1hnnuK-0001Nn-UG
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 13:40:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42568)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <groug@kaod.org>) id 1hnnlH-0005bM-Qp
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 13:30:40 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hnnu9-0000yW-Qz
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 13:39:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1hnnlG-0002ir-Mu
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 13:30:39 -0400
-Received: from 9.mo179.mail-out.ovh.net ([46.105.76.148]:42783)
+ (envelope-from <jsnow@redhat.com>) id 1hnnu8-0000Tp-HH
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 13:39:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51428)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1hnnlG-0002h4-F8
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 13:30:38 -0400
-Received: from player728.ha.ovh.net (unknown [10.108.57.38])
- by mo179.mail-out.ovh.net (Postfix) with ESMTP id CC51613AF0C
- for <qemu-devel@nongnu.org>; Wed, 17 Jul 2019 19:30:35 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player728.ha.ovh.net (Postfix) with ESMTPSA id 07F987F693B3;
- Wed, 17 Jul 2019 17:30:28 +0000 (UTC)
-Date: Wed, 17 Jul 2019 19:30:27 +0200
-From: Greg Kurz <groug@kaod.org>
-To: Nicholas Piggin <npiggin@gmail.com>
-Message-ID: <20190717193027.0fce5b06@bahia.lab.toulouse-stg.fr.ibm.com>
-In-Reply-To: <20190717053952.13729-5-npiggin@gmail.com>
-References: <20190717053952.13729-1-npiggin@gmail.com>
- <20190717053952.13729-5-npiggin@gmail.com>
-X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>)
+ id 1hnnu6-0000Sh-1c; Wed, 17 Jul 2019 13:39:46 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 59F74C024AF6;
+ Wed, 17 Jul 2019 17:39:45 +0000 (UTC)
+Received: from probe.bos.redhat.com (dhcp-17-203.bos.redhat.com [10.18.17.203])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id EB77D19C68;
+ Wed, 17 Jul 2019 17:39:37 +0000 (UTC)
+From: John Snow <jsnow@redhat.com>
+To: qemu-devel@nongnu.org,
+	qemu-block@nongnu.org
+Date: Wed, 17 Jul 2019 13:39:37 -0400
+Message-Id: <20190717173937.18747-1-jsnow@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 6573848084541446595
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduvddrieefgdelvdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.32]); Wed, 17 Jul 2019 17:39:45 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.105.76.148
-Subject: Re: [Qemu-devel] [PATCH v5 4/4] spapr: Implement H_JOIN
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH v3] qapi: add dirty-bitmaps to
+ query-named-block-nodes result
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,114 +66,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>, qemu-ppc@nongnu.org,
- qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ libvir-list@redhat.com, John Snow <jsnow@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 17 Jul 2019 15:39:52 +1000
-Nicholas Piggin <npiggin@gmail.com> wrote:
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-> This has been useful to modify and test the Linux pseries suspend
-> code but it requires modification to the guest to call it (due to
-> being gated by other unimplemented features). It is not otherwise
-> used by Linux yet, but work is slowly progressing there.
-> 
-> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
-> ---
-> Changes since v4:
-> - Style
-> 
->  hw/ppc/spapr.c       |  1 +
->  hw/ppc/spapr_hcall.c | 45 ++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 46 insertions(+)
-> 
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 13c423347e..59cd24f9c3 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -1066,6 +1066,7 @@ static void spapr_dt_rtas(SpaprMachineState *spapr, void *fdt)
->      add_str(hypertas, "hcall-tce");
->      add_str(hypertas, "hcall-vio");
->      add_str(hypertas, "hcall-splpar");
-> +    add_str(hypertas, "hcall-join");
->      add_str(hypertas, "hcall-bulk");
->      add_str(hypertas, "hcall-set-mode");
->      add_str(hypertas, "hcall-sprg0");
-> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-> index 5e655172b2..57c1ee0fe1 100644
-> --- a/hw/ppc/spapr_hcall.c
-> +++ b/hw/ppc/spapr_hcall.c
-> @@ -1069,6 +1069,48 @@ static target_ulong h_cede(PowerPCCPU *cpu, SpaprMachineState *spapr,
->      return H_SUCCESS;
->  }
->  
-> +static target_ulong h_join(PowerPCCPU *cpu, SpaprMachineState *spapr,
-> +                           target_ulong opcode, target_ulong *args)
-> +{
-> +    CPUPPCState *env = &cpu->env;
-> +    CPUState *cs;
-> +    SpaprCpuState *spapr_cpu = spapr_cpu_state(cpu);
-> +    bool last_unjoined = true;
-> +
-> +    if (env->msr & (1ULL << MSR_EE)) {
-> +        return H_BAD_MODE;
-> +    }
-> +
-> +    if (spapr_cpu->prod) {
-> +        spapr_cpu->prod = false;
-> +        return H_SUCCESS;
-> +    }
-> +
+Let's add a possibility to query dirty-bitmaps not only on root nodes.
+It is useful when dealing both with snapshots and incremental backups.
 
-PAPR says that H_JOIN "performs the equivalent of a H_CONFER (proc=self)",
-unless called by the last unjoined thread, in which case H_CONTINUE
-should be returned. It thus seems that the spapr_cpu->prod check should
-be done after the loop below otherwise if the last active thread was
-just prodded (can happen?), it won't return the expected value, and...
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+[Added deprecation information. --js]
+Signed-off-by: John Snow <jsnow@redhat.com>
+---
+ block/qapi.c         |  5 +++++
+ qapi/block-core.json |  6 +++++-
+ qemu-deprecated.texi | 12 ++++++++++++
+ 3 files changed, 22 insertions(+), 1 deletion(-)
 
-> +    CPU_FOREACH(cs) {
-> +        PowerPCCPU *c = POWERPC_CPU(cs);
-> +        CPUPPCState *e = &c->env;
-> +        if (c == cpu) {
-> +            continue;
-> +        }
-> +
-> +        /* Don't have a way to indicate joined, so use halted && MSR[EE]=0 */
-> +        if (!cs->halted || (e->msr & (1ULL << MSR_EE))) {
-> +            last_unjoined = false;
-> +            break;
-> +        }
-> +    }
-> +    if (last_unjoined) {
-> +        return H_CONTINUE;
-> +    }
-> +
-> +    cs = CPU(cpu);
-> +    cs->halted = 1;
-> +    cs->exception_index = EXCP_HALTED;
-> +    cs->exit_request = 1;
-> +
-> +    return H_SUCCESS;
-
-... then, you can maybe factor out this code to an h_confer_self()
-helper to be called by h_join() and h_confer() ?
-
-> +}
-> +
->  static target_ulong h_confer(PowerPCCPU *cpu, SpaprMachineState *spapr,
->                             target_ulong opcode, target_ulong *args)
->  {
-> @@ -1979,6 +2021,9 @@ static void hypercall_register_types(void)
->      spapr_register_hypercall(H_CONFER, h_confer);
->      spapr_register_hypercall(H_PROD, h_prod);
->  
-> +    /* hcall-join */
-> +    spapr_register_hypercall(H_JOIN, h_join);
-> +
->      spapr_register_hypercall(H_SIGNAL_SYS_RESET, h_signal_sys_reset);
->  
->      /* processor register resource access h-calls */
+diff --git a/block/qapi.c b/block/qapi.c
+index 917435f022..15f1030264 100644
+--- a/block/qapi.c
++++ b/block/qapi.c
+@@ -79,6 +79,11 @@ BlockDeviceInfo *bdrv_block_device_info(BlockBackend *=
+blk,
+         info->backing_file =3D g_strdup(bs->backing_file);
+     }
+=20
++    if (!QLIST_EMPTY(&bs->dirty_bitmaps)) {
++        info->has_dirty_bitmaps =3D true;
++        info->dirty_bitmaps =3D bdrv_query_dirty_bitmaps(bs);
++    }
++
+     info->detect_zeroes =3D bs->detect_zeroes;
+=20
+     if (blk && blk_get_public(blk)->throttle_group_member.throttle_state=
+) {
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 0d43d4f37c..9210ae233d 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -360,6 +360,9 @@
+ # @write_threshold: configured write threshold for the device.
+ #                   0 if disabled. (Since 2.3)
+ #
++# @dirty-bitmaps: dirty bitmaps information (only present if node
++#                 has one or more dirty bitmaps) (Since 4.2)
++#
+ # Since: 0.14.0
+ #
+ ##
+@@ -378,7 +381,7 @@
+             '*bps_wr_max_length': 'int', '*iops_max_length': 'int',
+             '*iops_rd_max_length': 'int', '*iops_wr_max_length': 'int',
+             '*iops_size': 'int', '*group': 'str', 'cache': 'BlockdevCach=
+eInfo',
+-            'write_threshold': 'int' } }
++            'write_threshold': 'int', '*dirty-bitmaps': ['BlockDirtyInfo=
+'] } }
+=20
+ ##
+ # @BlockDeviceIoStatus:
+@@ -656,6 +659,7 @@
+ #
+ # @dirty-bitmaps: dirty bitmaps information (only present if the
+ #                 driver has one or more dirty bitmaps) (Since 2.0)
++#                 Deprecated in 4.2; see BlockDirtyInfo instead.
+ #
+ # @io-status: @BlockDeviceIoStatus. Only present if the device
+ #             supports it and the VM is configured to stop on errors
+diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
+index c90b08d553..6374b66546 100644
+--- a/qemu-deprecated.texi
++++ b/qemu-deprecated.texi
+@@ -134,6 +134,18 @@ The ``status'' field of the ``BlockDirtyInfo'' struc=
+ture, returned by
+ the query-block command is deprecated. Two new boolean fields,
+ ``recording'' and ``busy'' effectively replace it.
+=20
++@subsection query-block result field dirty-bitmaps (Since 4.2)
++
++The ``dirty-bitmaps`` field of the ``BlockInfo`` structure, returned by
++the query-block command is itself now deprecated. The ``dirty-bitmaps``
++field of the ``BlockDeviceInfo`` struct should be used instead, which is=
+ the
++type of the ``inserted`` field in query-block replies, as well as the
++type of array items in query-named-block-nodes.
++
++Since the ``dirty-bitmaps`` field is optionally present in both the old =
+and
++new locations, clients must use introspection to learn where to anticipa=
+te
++the field if/when it does appear in command output.
++
+ @subsection query-cpus (since 2.12.0)
+=20
+ The ``query-cpus'' command is replaced by the ``query-cpus-fast'' comman=
+d.
+--=20
+2.21.0
 
 
