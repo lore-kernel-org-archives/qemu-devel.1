@@ -2,50 +2,89 @@ Return-Path: <SRS0=PWhW=VO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 616C2C7618F
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 19:07:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED264C7618F
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 19:14:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 34617217F4
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 19:07:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 34617217F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id C0D5F217F4
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 19:14:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0D5F217F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60016 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60046 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnpGs-00055g-HD
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 15:07:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43259)
+	id 1hnpNm-00085s-T1
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 15:14:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44885)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1hnpGi-0004gk-VC
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 15:07:13 -0400
+ (envelope-from <eblake@redhat.com>) id 1hnpNb-0007cD-TL
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 15:14:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1hnpGh-0000cB-Sf
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 15:07:12 -0400
-Received: from relay.sw.ru ([185.231.240.75]:40462)
+ (envelope-from <eblake@redhat.com>) id 1hnpNa-0004C9-Sh
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 15:14:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40958)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1hnpGh-0000Xx-Lg
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 15:07:11 -0400
-Received: from [172.16.25.136] (helo=localhost.sw.ru)
- by relay.sw.ru with esmtp (Exim 4.92)
- (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1hnpGd-0002Un-CF; Wed, 17 Jul 2019 22:07:07 +0300
-From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-To: qemu-devel@nongnu.org
-Date: Wed, 17 Jul 2019 22:06:56 +0300
-Message-Id: <1563390416-751339-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-X-Mailer: git-send-email 1.8.3.1
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 185.231.240.75
-Subject: [Qemu-devel] [PATCH] make check-unit: use after free in
- test-opts-visitor
+ (Exim 4.71) (envelope-from <eblake@redhat.com>)
+ id 1hnpNY-0004AW-HM; Wed, 17 Jul 2019 15:14:16 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id EA580B0CCB;
+ Wed, 17 Jul 2019 19:14:14 +0000 (UTC)
+Received: from [10.3.116.46] (ovpn-116-46.phx2.redhat.com [10.3.116.46])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 43BA76017E;
+ Wed, 17 Jul 2019 19:14:05 +0000 (UTC)
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+References: <20190717173937.18747-1-jsnow@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=eblake@redhat.com; keydata=
+ xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
+ xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
+ TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
+ GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
+ sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
+ AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
+ CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
+ RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
+ wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
+ Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
+ gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
+ pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
+ zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
+ pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
+ 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
+ NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
+ cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
+ SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
+ I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
+ mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
+ Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
+ 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
+Organization: Red Hat, Inc.
+Message-ID: <bb1a8168-6a62-547e-15d4-aed72093dcb5@redhat.com>
+Date: Wed, 17 Jul 2019 14:13:59 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
+MIME-Version: 1.0
+In-Reply-To: <20190717173937.18747-1-jsnow@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="QCjZshHlXgYzqZS7GKUUAf6qygpyHqs7A"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.26]); Wed, 17 Jul 2019 19:14:15 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v3] qapi: add dirty-bitmaps to
+ query-named-block-nodes result
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -57,83 +96,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: den@openvz.org, vsementsov@virtuozzo.com, andrey.shinkevich@virtuozzo.com,
- mdroth@linux.vnet.ibm.com, armbru@redhat.com
+Cc: libvir-list@redhat.com, Kevin Wolf <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-In struct OptsVisitor, repeated_opts member points to a list in the
-unprocessed_opts hash table after the list has been destroyed. A
-subsequent call to visit_type_int() references the deleted list. It
-results in use-after-free issue. Also, the Visitor object call back
-functions are supposed to set the Error parameter in case of failure.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--QCjZshHlXgYzqZS7GKUUAf6qygpyHqs7A
+Content-Type: multipart/mixed; boundary="I7XhQSERMltPVtqdtKUJliGMhT2PG9n9d";
+ protected-headers="v1"
+From: Eric Blake <eblake@redhat.com>
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: Max Reitz <mreitz@redhat.com>, libvir-list@redhat.com,
+ Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <bb1a8168-6a62-547e-15d4-aed72093dcb5@redhat.com>
+Subject: Re: [PATCH v3] qapi: add dirty-bitmaps to query-named-block-nodes
+ result
+References: <20190717173937.18747-1-jsnow@redhat.com>
+In-Reply-To: <20190717173937.18747-1-jsnow@redhat.com>
 
-Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
----
+--I7XhQSERMltPVtqdtKUJliGMhT2PG9n9d
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-The issue was detected after running tests/test-opts-visitor under the Valgrind tool:
+On 7/17/19 12:39 PM, John Snow wrote:
+> From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>=20
+> Let's add a possibility to query dirty-bitmaps not only on root nodes.
+> It is useful when dealing both with snapshots and incremental backups.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> [Added deprecation information. --js]
+> Signed-off-by: John Snow <jsnow@redhat.com>
+> ---
+>  block/qapi.c         |  5 +++++
+>  qapi/block-core.json |  6 +++++-
+>  qemu-deprecated.texi | 12 ++++++++++++
+>  3 files changed, 22 insertions(+), 1 deletion(-)
 
- Invalid read of size 8
-   at 0x55ADB95: g_queue_peek_head (in /usr/lib64/libglib-2.0.so.0.5600.1)
-   by 0x12FD97: lookup_scalar (opts-visitor.c:310)
-   by 0x13008A: opts_type_int64 (opts-visitor.c:395)
-   by 0x1299C8: visit_type_int (qapi-visit-core.c:149)
-   by 0x119389: test_opts_range_beyond (test-opts-visitor.c:240)
+> +++ b/qapi/block-core.json
+> @@ -360,6 +360,9 @@
+>  # @write_threshold: configured write threshold for the device.
+>  #                   0 if disabled. (Since 2.3)
+>  #
+> +# @dirty-bitmaps: dirty bitmaps information (only present if node
+> +#                 has one or more dirty bitmaps) (Since 4.2)
+> +#
 
-after
- Address 0x9563b30 is 0 bytes inside a block of size 24 free'd
-   at 0x4C2ACBD: free (vg_replace_malloc.c:530)
-   by 0x55A179D: g_free (in /usr/lib64/libglib-2.0.so.0.5600.1)
-   by 0x55B92BF: g_slice_free1 (in /usr/lib64/libglib-2.0.so.0.5600.1)
-   by 0x12F615: destroy_list (opts-visitor.c:102)
-   by 0x558A859: ??? (in /usr/lib64/libglib-2.0.so.0.5600.1)
-   by 0x12FC37: opts_next_list (opts-visitor.c:260)
-   by 0x1296B1: visit_next_list (qapi-visit-core.c:88)
-   by 0x119341: test_opts_range_beyond (test-opts-visitor.c:238)
+Naming-wise, everything else in this struct uses 'foo_bar' while your
+addition uses 'foo-bar'.  But at this point, I don't know if it's worth
+uglifying this addition just to fit in.
 
- qapi/opts-visitor.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+>  # Since: 0.14.0
+>  #
+>  ##
+> @@ -378,7 +381,7 @@
+>              '*bps_wr_max_length': 'int', '*iops_max_length': 'int',
+>              '*iops_rd_max_length': 'int', '*iops_wr_max_length': 'int'=
+,
+>              '*iops_size': 'int', '*group': 'str', 'cache': 'BlockdevCa=
+cheInfo',
+> -            'write_threshold': 'int' } }
+> +            'write_threshold': 'int', '*dirty-bitmaps': ['BlockDirtyIn=
+fo'] } }
+> =20
+>  ##
+>  # @BlockDeviceIoStatus:
+> @@ -656,6 +659,7 @@
+>  #
+>  # @dirty-bitmaps: dirty bitmaps information (only present if the
+>  #                 driver has one or more dirty bitmaps) (Since 2.0)
+> +#                 Deprecated in 4.2; see BlockDirtyInfo instead.
 
-diff --git a/qapi/opts-visitor.c b/qapi/opts-visitor.c
-index 324b197..e95f766 100644
---- a/qapi/opts-visitor.c
-+++ b/qapi/opts-visitor.c
-@@ -228,6 +228,7 @@ opts_start_list(Visitor *v, const char *name, GenericList **list, size_t size,
-         *list = g_malloc0(size);
-     } else {
-         *list = NULL;
-+        error_setg(errp, QERR_MISSING_PARAMETER, name);
-     }
- }
- 
-@@ -255,9 +256,14 @@ opts_next_list(Visitor *v, GenericList *tail, size_t size)
-     case LM_IN_PROGRESS: {
-         const QemuOpt *opt;
- 
-+        if (!ov->repeated_opts) {
-+            return NULL;
-+        }
-+
-         opt = g_queue_pop_head(ov->repeated_opts);
-         if (g_queue_is_empty(ov->repeated_opts)) {
-             g_hash_table_remove(ov->unprocessed_opts, opt->name);
-+            ov->repeated_opts = NULL;
-             return NULL;
-         }
-         break;
-@@ -307,6 +313,10 @@ lookup_scalar(const OptsVisitor *ov, const char *name, Error **errp)
-         return list ? g_queue_peek_tail(list) : NULL;
-     }
-     assert(ov->list_mode == LM_IN_PROGRESS);
-+    if (!ov->repeated_opts) {
-+        error_setg(errp, QERR_INVALID_PARAMETER, name);
-+        return NULL;
-+    }
-     return g_queue_peek_head(ov->repeated_opts);
- }
- 
--- 
-1.8.3.1
+s/BlockDirtyInfo/BlockDeviceInfo/
 
+With the spelling fix,
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+Is this worth squeezing into 4.1, to start the deprecation clock one
+cycle earlier (on the grounds that the missing information for anonymous
+nodes is a bug)?  Or am I pushing the boundaries too far, where keeping
+this as 4.2 material remains the best course of action?
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--I7XhQSERMltPVtqdtKUJliGMhT2PG9n9d--
+
+--QCjZshHlXgYzqZS7GKUUAf6qygpyHqs7A
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl0vc3cACgkQp6FrSiUn
+Q2oWiwf/XfLxkD+JNEtGimk1y3TcKczj8/gbNq2BDvxylC7ZSPU92XGC51+TxI7t
+gyMlPY5uRUPjzYgXqgL6FPq6h+whbgtu4bLBecEJZQaBn6oeEdbZGxLIBz9HtrLk
+8J1HEDN65pwH8yRLUfLd/HtmbMF0jSq3O+vNClnQU7nw2mP50gsLyePnbI94axP+
+AKjgrfzAkfmNvu/9Ml0evJFdBbu8wfePHgsrhv46MAb6XzGfaq5eSGOgzHtn+VQB
+TRmy8s3jsfTlXbqmnTnzso4wJYQYDDLI1eIWYTNjcBEPLu9aSe5ZOY+jyhJSHHJL
+rYVHL3W9fVoQ0uG4G9MhmZH52XG+4A==
+=86SC
+-----END PGP SIGNATURE-----
+
+--QCjZshHlXgYzqZS7GKUUAf6qygpyHqs7A--
 
