@@ -2,84 +2,141 @@ Return-Path: <SRS0=PWhW=VO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FC40C7618F
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 19:21:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D68DC76196
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 19:21:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5A93A217F4
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 19:21:19 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JJYzX7hW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A93A217F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6A3C4217F4
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 19:21:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A3C4217F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60068 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60078 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnpUM-0002Fi-Iy
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 15:21:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46556)
+	id 1hnpUq-0003BW-OG
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 15:21:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46692)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1hnpUC-0001pd-JS
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 15:21:09 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hnpUg-0002hR-7j
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 15:21:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1hnpUB-0007Im-D2
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 15:21:08 -0400
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:39382)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1hnpUB-0007I5-7e
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 15:21:07 -0400
-Received: by mail-ot1-x341.google.com with SMTP id r21so20225747otq.6
- for <qemu-devel@nongnu.org>; Wed, 17 Jul 2019 12:21:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=6lWVMStwuI15jFl2YwqxLoUkSzhpAJOlQIP5pUQ9X6c=;
- b=JJYzX7hWH+nv0JaY5fHiYRyNi/n0Zdncxz5gN4dmD/7jGn4VyWMy4DGhS1Lm8lv5Ft
- HLDtSemNLcak00PuAMsHfFl2yVW4L546QxTzJ2DjMzkL+w0eGob99bnzdWDo1L622RA2
- BROa517iHbNkhUT9Ascno4ryb7XR2YKPbTUwkL5Llj1NhkRIRpGixn7Cdx1TARuAL1GK
- 4Uz2wZS/QARqLH+Ak3/P6Dw8SBIrGPb3lIzACwzV+gQbJpCJWx5zqIU/RUPjQZW9mRzm
- QeMNC1WOEKCrZbXNEgIAgfzP9mWckkyoiPMAdcJzH18XreFCYlqjwTzeV45jFw9ci6Pm
- EOSw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=6lWVMStwuI15jFl2YwqxLoUkSzhpAJOlQIP5pUQ9X6c=;
- b=YXRXlJ18Ruoo3/1fwGdjqW1pJ0MiWJCDPZVN9dJLxJuUWszfLTiWTAvRDcaX8kjFtl
- 53cL1i1oz7TM4ckq01LWKrztlt++st0vabiRR06A+rubMNdOpZ1T4s4WMJQ9FbcLBfuy
- 0fRkUSvyI3kBnpLZ5G6Q+B9wMuCGPbE1H4tLDKI9nX5tRlQYUOAOG5Lb8C/pC8D2b8L5
- rjnRImdhXru2tHoGD0aRr9ge++fHCM/3md8xa2/YDY4VbQlwYGSRxlPzg0rsl0sG9yl+
- CCGZMH8Gn1eFjdVemx2Hcm+cfmyo78iWKamXx0aRNjFUD81dfR8ZTFkyAUn2Rb7PNd26
- SnFw==
-X-Gm-Message-State: APjAAAVIy9qiumP6pR/AWE2UTeRMjsNYkjqvch0d5PbfuOAZj7lwKsnY
- f0uesyLLJ9q+K8Xs+CNVF/JELV3lzbk+abJjfb1tRVs2
-X-Google-Smtp-Source: APXvYqy8zLsjepKMa7p7VgvkOBU5EB3gXDgsv3sKIMiLaxwfKubbODMd8pg7SQVkTsDqM+pvxm0qB474O0PvEadb4WE=
-X-Received: by 2002:a9d:6e8a:: with SMTP id a10mr6718316otr.295.1563391265617; 
- Wed, 17 Jul 2019 12:21:05 -0700 (PDT)
+ (envelope-from <jsnow@redhat.com>) id 1hnpUf-0007Vb-1O
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 15:21:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55512)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>)
+ id 1hnpUc-0007UU-E1; Wed, 17 Jul 2019 15:21:34 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id C3250811DC;
+ Wed, 17 Jul 2019 19:21:32 +0000 (UTC)
+Received: from [10.18.17.203] (dhcp-17-203.bos.redhat.com [10.18.17.203])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BFB9519C68;
+ Wed, 17 Jul 2019 19:21:29 +0000 (UTC)
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org,
+ qemu-block@nongnu.org
+References: <20190717173937.18747-1-jsnow@redhat.com>
+ <bb1a8168-6a62-547e-15d4-aed72093dcb5@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <c2bbf3a0-c7f0-263c-a191-ebe54c784349@redhat.com>
+Date: Wed, 17 Jul 2019 15:21:29 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-References: <CAL1e-=jiySpoypabXMkUsO=2pqgUrRxUhac=JM_V=2sn2LPhWA@mail.gmail.com>
- <054d5b29-6482-1d71-3866-057dd00cb021@redhat.com>
- <CAL1e-=ikCpJO1bn=AKYSLWb8QNYkf6062ojxn+UN3svXCEQvFA@mail.gmail.com>
- <20190716174420.GA857@redhat.com>
- <CAL1e-=jvRnp9NBzuMjOjP_WgCxhDSUf4qCkswRvyrpGFPK6cHg@mail.gmail.com>
- <5b6d1130-73fd-b7c7-28ef-f553d33972e0@redhat.com>
-In-Reply-To: <5b6d1130-73fd-b7c7-28ef-f553d33972e0@redhat.com>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Wed, 17 Jul 2019 21:20:54 +0200
-Message-ID: <CAL1e-=iJwVGfX-fbHkpYmVFH+YxvDr6LG9ZJXesgmog5q_JhPA@mail.gmail.com>
-To: Eric Blake <eblake@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::341
-Subject: Re: [Qemu-devel] [QUESTION] SDL 1.2 support
+In-Reply-To: <bb1a8168-6a62-547e-15d4-aed72093dcb5@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.27]); Wed, 17 Jul 2019 19:21:32 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v3] qapi: add dirty-bitmaps to
+ query-named-block-nodes result
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,77 +148,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>,
- =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: libvir-list@redhat.com, Kevin Wolf <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jul 17, 2019 at 8:57 PM Eric Blake <eblake@redhat.com> wrote:
->
-> On 7/17/19 1:34 PM, Aleksandar Markovic wrote:
->
-> >
-> > Daniel, that is fine, I don't question that, I basically wanted to start a talk
-> > between us to clarify some things. Related to our situation in the field,
-> > I have a sub-question to you:
-> >
-> > Let's say there is a build system with SDL 1.2, and not SDL 2.0. Should
-> > QEMU refuse to build?
->
-> If the dependency is soft (when SDL 2.0 is available, we can compile
-> more things than when it is not), then the build shouldn't fail, but
-> your resulting binaries will not use SDL.  For example, we treat librbd
-> as a soft dependency: if it is available, you can build in Ceph support;
-> if it is not, you lose out on that particular block format, but can
-> still run guests locally.
->
-> If the dependency is hard (when SDL 2.0 is unavailable, we cannot
-> perform our job), then the build should fail.  For example, we treat
-> glib2 as a hard dependency: if it is unavailable, we can't implement our
-> main loop, and there's really nothing left worth compiling.
->
 
-Eric, I truly appreciate your clarification.
 
-But, does "configure" list somewhere unmet soft dependencies? (the
-question is general, not looking at SDL only) Is there any other way for
-an end user to have info on unmet dependencies (whether soft or hard),
-other than see QEMU is not building, or something is not working in
-QEMU run-time?
+On 7/17/19 3:13 PM, Eric Blake wrote:
+> On 7/17/19 12:39 PM, John Snow wrote:
+>> From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>>
+>> Let's add a possibility to query dirty-bitmaps not only on root nodes.
+>> It is useful when dealing both with snapshots and incremental backups.
+>>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> [Added deprecation information. --js]
+>> Signed-off-by: John Snow <jsnow@redhat.com>
+>> ---
+>>  block/qapi.c         |  5 +++++
+>>  qapi/block-core.json |  6 +++++-
+>>  qemu-deprecated.texi | 12 ++++++++++++
+>>  3 files changed, 22 insertions(+), 1 deletion(-)
+> 
+>> +++ b/qapi/block-core.json
+>> @@ -360,6 +360,9 @@
+>>  # @write_threshold: configured write threshold for the device.
+>>  #                   0 if disabled. (Since 2.3)
+>>  #
+>> +# @dirty-bitmaps: dirty bitmaps information (only present if node
+>> +#                 has one or more dirty bitmaps) (Since 4.2)
+>> +#
+> 
+> Naming-wise, everything else in this struct uses 'foo_bar' while your
+> addition uses 'foo-bar'.  But at this point, I don't know if it's worth
+> uglifying this addition just to fit in.
+> 
+>>  # Since: 0.14.0
+>>  #
+>>  ##
+>> @@ -378,7 +381,7 @@
+>>              '*bps_wr_max_length': 'int', '*iops_max_length': 'int',
+>>              '*iops_rd_max_length': 'int', '*iops_wr_max_length': 'int',
+>>              '*iops_size': 'int', '*group': 'str', 'cache': 'BlockdevCacheInfo',
+>> -            'write_threshold': 'int' } }
+>> +            'write_threshold': 'int', '*dirty-bitmaps': ['BlockDirtyInfo'] } }
+>>  
+>>  ##
+>>  # @BlockDeviceIoStatus:
+>> @@ -656,6 +659,7 @@
+>>  #
+>>  # @dirty-bitmaps: dirty bitmaps information (only present if the
+>>  #                 driver has one or more dirty bitmaps) (Since 2.0)
+>> +#                 Deprecated in 4.2; see BlockDirtyInfo instead.
+> 
+> s/BlockDirtyInfo/BlockDeviceInfo/
+> 
+> With the spelling fix,
+> 
 
-Daniel,
+Sigh, oops.
 
-We had message "SDL 1.2 is going to be deprecated" in QEMU 3.0
-"configure" and, if I remember well, in QEMU 3.1 as well. And now,
-when we finally deprecated it, is it true that there is no message
-whatsoever on systems with SDL 1.2 only?
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> 
+> Is this worth squeezing into 4.1, to start the deprecation clock one
+> cycle earlier (on the grounds that the missing information for anonymous
+> nodes is a bug)?  Or am I pushing the boundaries too far, where keeping
+> this as 4.2 material remains the best course of action?
+> 
 
-Yours,
-Aleksandar
+Appealing option. If you think the deprecation plan is actionable enough
+for libvirt, I'm in favor.
 
-> Some qemu dependencies are hard, some are soft. And your choice of
-> configure options may further influence things (our KConfig setup may
-> mean that some libraries are hard dependencies for one board type, but
-> soft dependencies for others).  Off-hand, I'd guess that SDL 2.0 should
-> be a soft dependency (but if it is a hard dependency, patches to make it
-> a soft dependency are welcome); if I'm right, then building when only
-> SDL 1.2 is available should not fail, but also will not use SDL.
->
-> But the presence or absence of SDL 1.2 on a build machine has no bearing
-> on the real question of whether SDL 2.0 is a hard or soft dependency,
-> now that the project has decided that SDL 2.0 is easy enough to obtain
-> across all of the set of systems included in our documented list of
-> minimum development setups.  In short, if you want to build with SDL,
-> you need to have SDL 2.0 available because we are not going to support
-> builds against SDL 1.2 as a reasonable development target any longer;
-> but having SDL 2.0 development libraries available does not preclude
-> also keeping SDL 1.2 on the same machine for other reasons.
->
-> --
-> Eric Blake, Principal Software Engineer
-> Red Hat, Inc.           +1-919-301-3226
-> Virtualization:  qemu.org | libvirt.org
->
+--js
 
