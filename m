@@ -2,89 +2,84 @@ Return-Path: <SRS0=PWhW=VO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED264C7618F
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 19:14:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FC40C7618F
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 19:21:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C0D5F217F4
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 19:14:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0D5F217F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5A93A217F4
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 19:21:19 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JJYzX7hW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A93A217F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60046 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60068 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnpNm-00085s-T1
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 15:14:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44885)
+	id 1hnpUM-0002Fi-Iy
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 15:21:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46556)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <eblake@redhat.com>) id 1hnpNb-0007cD-TL
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 15:14:20 -0400
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1hnpUC-0001pd-JS
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 15:21:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1hnpNa-0004C9-Sh
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 15:14:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40958)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1hnpNY-0004AW-HM; Wed, 17 Jul 2019 15:14:16 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id EA580B0CCB;
- Wed, 17 Jul 2019 19:14:14 +0000 (UTC)
-Received: from [10.3.116.46] (ovpn-116-46.phx2.redhat.com [10.3.116.46])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 43BA76017E;
- Wed, 17 Jul 2019 19:14:05 +0000 (UTC)
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-References: <20190717173937.18747-1-jsnow@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
- xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
- xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
- TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
- GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
- sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
- AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
- CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
- RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
- wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
- Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
- gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
- pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
- zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
- pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
- 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
- NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
- cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
- SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
- I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
- mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
- Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
- 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <bb1a8168-6a62-547e-15d4-aed72093dcb5@redhat.com>
-Date: Wed, 17 Jul 2019 14:13:59 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1hnpUB-0007Im-D2
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 15:21:08 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:39382)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1hnpUB-0007I5-7e
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 15:21:07 -0400
+Received: by mail-ot1-x341.google.com with SMTP id r21so20225747otq.6
+ for <qemu-devel@nongnu.org>; Wed, 17 Jul 2019 12:21:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=6lWVMStwuI15jFl2YwqxLoUkSzhpAJOlQIP5pUQ9X6c=;
+ b=JJYzX7hWH+nv0JaY5fHiYRyNi/n0Zdncxz5gN4dmD/7jGn4VyWMy4DGhS1Lm8lv5Ft
+ HLDtSemNLcak00PuAMsHfFl2yVW4L546QxTzJ2DjMzkL+w0eGob99bnzdWDo1L622RA2
+ BROa517iHbNkhUT9Ascno4ryb7XR2YKPbTUwkL5Llj1NhkRIRpGixn7Cdx1TARuAL1GK
+ 4Uz2wZS/QARqLH+Ak3/P6Dw8SBIrGPb3lIzACwzV+gQbJpCJWx5zqIU/RUPjQZW9mRzm
+ QeMNC1WOEKCrZbXNEgIAgfzP9mWckkyoiPMAdcJzH18XreFCYlqjwTzeV45jFw9ci6Pm
+ EOSw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=6lWVMStwuI15jFl2YwqxLoUkSzhpAJOlQIP5pUQ9X6c=;
+ b=YXRXlJ18Ruoo3/1fwGdjqW1pJ0MiWJCDPZVN9dJLxJuUWszfLTiWTAvRDcaX8kjFtl
+ 53cL1i1oz7TM4ckq01LWKrztlt++st0vabiRR06A+rubMNdOpZ1T4s4WMJQ9FbcLBfuy
+ 0fRkUSvyI3kBnpLZ5G6Q+B9wMuCGPbE1H4tLDKI9nX5tRlQYUOAOG5Lb8C/pC8D2b8L5
+ rjnRImdhXru2tHoGD0aRr9ge++fHCM/3md8xa2/YDY4VbQlwYGSRxlPzg0rsl0sG9yl+
+ CCGZMH8Gn1eFjdVemx2Hcm+cfmyo78iWKamXx0aRNjFUD81dfR8ZTFkyAUn2Rb7PNd26
+ SnFw==
+X-Gm-Message-State: APjAAAVIy9qiumP6pR/AWE2UTeRMjsNYkjqvch0d5PbfuOAZj7lwKsnY
+ f0uesyLLJ9q+K8Xs+CNVF/JELV3lzbk+abJjfb1tRVs2
+X-Google-Smtp-Source: APXvYqy8zLsjepKMa7p7VgvkOBU5EB3gXDgsv3sKIMiLaxwfKubbODMd8pg7SQVkTsDqM+pvxm0qB474O0PvEadb4WE=
+X-Received: by 2002:a9d:6e8a:: with SMTP id a10mr6718316otr.295.1563391265617; 
+ Wed, 17 Jul 2019 12:21:05 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190717173937.18747-1-jsnow@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="QCjZshHlXgYzqZS7GKUUAf6qygpyHqs7A"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.26]); Wed, 17 Jul 2019 19:14:15 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3] qapi: add dirty-bitmaps to
- query-named-block-nodes result
+References: <CAL1e-=jiySpoypabXMkUsO=2pqgUrRxUhac=JM_V=2sn2LPhWA@mail.gmail.com>
+ <054d5b29-6482-1d71-3866-057dd00cb021@redhat.com>
+ <CAL1e-=ikCpJO1bn=AKYSLWb8QNYkf6062ojxn+UN3svXCEQvFA@mail.gmail.com>
+ <20190716174420.GA857@redhat.com>
+ <CAL1e-=jvRnp9NBzuMjOjP_WgCxhDSUf4qCkswRvyrpGFPK6cHg@mail.gmail.com>
+ <5b6d1130-73fd-b7c7-28ef-f553d33972e0@redhat.com>
+In-Reply-To: <5b6d1130-73fd-b7c7-28ef-f553d33972e0@redhat.com>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Wed, 17 Jul 2019 21:20:54 +0200
+Message-ID: <CAL1e-=iJwVGfX-fbHkpYmVFH+YxvDr6LG9ZJXesgmog5q_JhPA@mail.gmail.com>
+To: Eric Blake <eblake@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::341
+Subject: Re: [Qemu-devel] [QUESTION] SDL 1.2 support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,117 +91,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: libvir-list@redhat.com, Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>,
+ =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---QCjZshHlXgYzqZS7GKUUAf6qygpyHqs7A
-Content-Type: multipart/mixed; boundary="I7XhQSERMltPVtqdtKUJliGMhT2PG9n9d";
- protected-headers="v1"
-From: Eric Blake <eblake@redhat.com>
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: Max Reitz <mreitz@redhat.com>, libvir-list@redhat.com,
- Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <bb1a8168-6a62-547e-15d4-aed72093dcb5@redhat.com>
-Subject: Re: [PATCH v3] qapi: add dirty-bitmaps to query-named-block-nodes
- result
-References: <20190717173937.18747-1-jsnow@redhat.com>
-In-Reply-To: <20190717173937.18747-1-jsnow@redhat.com>
+On Wed, Jul 17, 2019 at 8:57 PM Eric Blake <eblake@redhat.com> wrote:
+>
+> On 7/17/19 1:34 PM, Aleksandar Markovic wrote:
+>
+> >
+> > Daniel, that is fine, I don't question that, I basically wanted to start a talk
+> > between us to clarify some things. Related to our situation in the field,
+> > I have a sub-question to you:
+> >
+> > Let's say there is a build system with SDL 1.2, and not SDL 2.0. Should
+> > QEMU refuse to build?
+>
+> If the dependency is soft (when SDL 2.0 is available, we can compile
+> more things than when it is not), then the build shouldn't fail, but
+> your resulting binaries will not use SDL.  For example, we treat librbd
+> as a soft dependency: if it is available, you can build in Ceph support;
+> if it is not, you lose out on that particular block format, but can
+> still run guests locally.
+>
+> If the dependency is hard (when SDL 2.0 is unavailable, we cannot
+> perform our job), then the build should fail.  For example, we treat
+> glib2 as a hard dependency: if it is unavailable, we can't implement our
+> main loop, and there's really nothing left worth compiling.
+>
 
---I7XhQSERMltPVtqdtKUJliGMhT2PG9n9d
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Eric, I truly appreciate your clarification.
 
-On 7/17/19 12:39 PM, John Snow wrote:
-> From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->=20
-> Let's add a possibility to query dirty-bitmaps not only on root nodes.
-> It is useful when dealing both with snapshots and incremental backups.
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> [Added deprecation information. --js]
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> ---
->  block/qapi.c         |  5 +++++
->  qapi/block-core.json |  6 +++++-
->  qemu-deprecated.texi | 12 ++++++++++++
->  3 files changed, 22 insertions(+), 1 deletion(-)
+But, does "configure" list somewhere unmet soft dependencies? (the
+question is general, not looking at SDL only) Is there any other way for
+an end user to have info on unmet dependencies (whether soft or hard),
+other than see QEMU is not building, or something is not working in
+QEMU run-time?
 
-> +++ b/qapi/block-core.json
-> @@ -360,6 +360,9 @@
->  # @write_threshold: configured write threshold for the device.
->  #                   0 if disabled. (Since 2.3)
->  #
-> +# @dirty-bitmaps: dirty bitmaps information (only present if node
-> +#                 has one or more dirty bitmaps) (Since 4.2)
-> +#
+Daniel,
 
-Naming-wise, everything else in this struct uses 'foo_bar' while your
-addition uses 'foo-bar'.  But at this point, I don't know if it's worth
-uglifying this addition just to fit in.
+We had message "SDL 1.2 is going to be deprecated" in QEMU 3.0
+"configure" and, if I remember well, in QEMU 3.1 as well. And now,
+when we finally deprecated it, is it true that there is no message
+whatsoever on systems with SDL 1.2 only?
 
->  # Since: 0.14.0
->  #
->  ##
-> @@ -378,7 +381,7 @@
->              '*bps_wr_max_length': 'int', '*iops_max_length': 'int',
->              '*iops_rd_max_length': 'int', '*iops_wr_max_length': 'int'=
-,
->              '*iops_size': 'int', '*group': 'str', 'cache': 'BlockdevCa=
-cheInfo',
-> -            'write_threshold': 'int' } }
-> +            'write_threshold': 'int', '*dirty-bitmaps': ['BlockDirtyIn=
-fo'] } }
-> =20
->  ##
->  # @BlockDeviceIoStatus:
-> @@ -656,6 +659,7 @@
->  #
->  # @dirty-bitmaps: dirty bitmaps information (only present if the
->  #                 driver has one or more dirty bitmaps) (Since 2.0)
-> +#                 Deprecated in 4.2; see BlockDirtyInfo instead.
+Yours,
+Aleksandar
 
-s/BlockDirtyInfo/BlockDeviceInfo/
-
-With the spelling fix,
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
-Is this worth squeezing into 4.1, to start the deprecation clock one
-cycle earlier (on the grounds that the missing information for anonymous
-nodes is a bug)?  Or am I pushing the boundaries too far, where keeping
-this as 4.2 material remains the best course of action?
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---I7XhQSERMltPVtqdtKUJliGMhT2PG9n9d--
-
---QCjZshHlXgYzqZS7GKUUAf6qygpyHqs7A
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl0vc3cACgkQp6FrSiUn
-Q2oWiwf/XfLxkD+JNEtGimk1y3TcKczj8/gbNq2BDvxylC7ZSPU92XGC51+TxI7t
-gyMlPY5uRUPjzYgXqgL6FPq6h+whbgtu4bLBecEJZQaBn6oeEdbZGxLIBz9HtrLk
-8J1HEDN65pwH8yRLUfLd/HtmbMF0jSq3O+vNClnQU7nw2mP50gsLyePnbI94axP+
-AKjgrfzAkfmNvu/9Ml0evJFdBbu8wfePHgsrhv46MAb6XzGfaq5eSGOgzHtn+VQB
-TRmy8s3jsfTlXbqmnTnzso4wJYQYDDLI1eIWYTNjcBEPLu9aSe5ZOY+jyhJSHHJL
-rYVHL3W9fVoQ0uG4G9MhmZH52XG+4A==
-=86SC
------END PGP SIGNATURE-----
-
---QCjZshHlXgYzqZS7GKUUAf6qygpyHqs7A--
+> Some qemu dependencies are hard, some are soft. And your choice of
+> configure options may further influence things (our KConfig setup may
+> mean that some libraries are hard dependencies for one board type, but
+> soft dependencies for others).  Off-hand, I'd guess that SDL 2.0 should
+> be a soft dependency (but if it is a hard dependency, patches to make it
+> a soft dependency are welcome); if I'm right, then building when only
+> SDL 1.2 is available should not fail, but also will not use SDL.
+>
+> But the presence or absence of SDL 1.2 on a build machine has no bearing
+> on the real question of whether SDL 2.0 is a hard or soft dependency,
+> now that the project has decided that SDL 2.0 is easy enough to obtain
+> across all of the set of systems included in our documented list of
+> minimum development setups.  In short, if you want to build with SDL,
+> you need to have SDL 2.0 available because we are not going to support
+> builds against SDL 1.2 as a reasonable development target any longer;
+> but having SDL 2.0 development libraries available does not preclude
+> also keeping SDL 1.2 on the same machine for other reasons.
+>
+> --
+> Eric Blake, Principal Software Engineer
+> Red Hat, Inc.           +1-919-301-3226
+> Virtualization:  qemu.org | libvirt.org
+>
 
