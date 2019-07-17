@@ -2,74 +2,62 @@ Return-Path: <SRS0=PWhW=VO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8C8AC7618F
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 01:59:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23AB2C7618F
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 02:02:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8DC2D217D9
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 01:59:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DC2D217D9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id CDB1F217D9
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 02:02:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="a0QM/M6B"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CDB1F217D9
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53484 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53502 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnZED-0000Ov-Bs
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 21:59:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44458)
+	id 1hnZGZ-0001rn-Im
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 22:01:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44955)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <zhexu@redhat.com>) id 1hnZE2-0008S5-PV
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 21:59:24 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1hnZG7-00011M-Ks
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 22:01:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <zhexu@redhat.com>) id 1hnZE1-0006ZU-Pv
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 21:59:22 -0400
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:40427)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <zhexu@redhat.com>) id 1hnZE1-0006Z3-Ja
- for qemu-devel@nongnu.org; Tue, 16 Jul 2019 21:59:21 -0400
-Received: by mail-pg1-f194.google.com with SMTP id w10so10331670pgj.7
- for <qemu-devel@nongnu.org>; Tue, 16 Jul 2019 18:59:21 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:date:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=ME6RWmLiEpaQuVUC4H1pG1wHoLbyFOxeqXZXn5FhvOE=;
- b=hcN3aBdIwd+ulV7Ex10fRzPtiJNByzkneUgMViwELQpMpHrVD3at9svp5viuGlYa5T
- AZAcOo7CFurtj7GEnXUOwCjpJFPkIJ356J7OevSy7K+7FOEWBO6NX43ypKNXTQlO4c/J
- JvziweqlEGBQsLDGXUmYo1T/POX819hs58zbxVci4rUZwHMu6WIKivaPka/V2o8Wl5Sl
- 55LKb45RPpZZj4O1itJ087pQeXNdXBI1H9o8MlSMLoFHVFu1Cx4CLVmokQOTJ8y24gJI
- jbVUWOX6MtiM/CNukmdq4qH9Ti36ObOmshMLwQc+x8OGRrvq42v1lSg9BXooHx9TNNUG
- g0pA==
-X-Gm-Message-State: APjAAAWSraDD5ydQ6yV7H+jzdfjigm2CqDsoRW665bywxJaekTkXOLo7
- nwAXzIDUUYQKsTzCQj7Mle6xfw==
-X-Google-Smtp-Source: APXvYqwQKTRI85+vVecATM5ygiaS3F9rZ3znI+af9jsP0s3VAhiOwDeKrUEaWqth5eUuvCiSH584HQ==
-X-Received: by 2002:a63:9a51:: with SMTP id e17mr38162818pgo.212.1563328760539; 
- Tue, 16 Jul 2019 18:59:20 -0700 (PDT)
-Received: from xz-x1 ([209.132.188.80])
- by smtp.gmail.com with ESMTPSA id m4sm31702397pgs.71.2019.07.16.18.59.17
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Tue, 16 Jul 2019 18:59:19 -0700 (PDT)
-From: Peter Xu <zhexu@redhat.com>
-X-Google-Original-From: Peter Xu <peterx@redhat.com>
-Date: Wed, 17 Jul 2019 09:59:10 +0800
-To: Wei Yang <richardw.yang@linux.intel.com>
-Message-ID: <20190717015910.GD30980@xz-x1>
-References: <20190717012902.23958-1-richardw.yang@linux.intel.com>
+ (envelope-from <dgibson@ozlabs.org>) id 1hnZG6-0008C9-B0
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 22:01:31 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:37101 helo=ozlabs.org)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1hnZG5-000870-MQ; Tue, 16 Jul 2019 22:01:30 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 45pL900jgRz9sN4; Wed, 17 Jul 2019 12:01:23 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1563328884;
+ bh=SWy7mB1m41APMBolYwQLY/j1EDSpQVFv99JPkyPdRDo=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=a0QM/M6B/g8kTC7x+GkT4IqUR3cgswFq2X9+yBFBwtNXkd7j3bn89bUBojtzOKgG5
+ EpI8Vvkd2/H85g8p5nmAlGjHHihR8cf5AZa++DDi769DSPeg/22GmNvfxKlFzkYWRU
+ GrtikDNr2G2mKZsVCjg0UsF5pyefSLyM7J/QbVcY=
+Date: Wed, 17 Jul 2019 11:39:09 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <20190717013909.GC2217@umbus.fritz.box>
+References: <156326547324.51324.17260886524634041718.stgit@lep8c.aus.stglabs.ibm.com>
+ <58500cfb-cacb-17e9-f993-4107289a5f44@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="da4uJneut+ArUgXk"
 Content-Disposition: inline
-In-Reply-To: <20190717012902.23958-1-richardw.yang@linux.intel.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
+In-Reply-To: <58500cfb-cacb-17e9-f993-4107289a5f44@linaro.org>
+User-Agent: Mutt/1.12.0 (2019-05-25)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.215.194
-Subject: Re: [Qemu-devel] [RESEND][PATCH] bitmap: get last word mask from nr
- directly
+X-Received-From: 203.11.71.1
+Subject: Re: [Qemu-devel] [PATCH] ppc: Fix some memory leaks
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -81,72 +69,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: quintela@redhat.com, corentincj@iksaif.net, pl@kamp.de,
- qemu-devel@nongnu.org, kraxel@redhat.com, pbonzini@redhat.com
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
+ Shivaprasad G Bhat <sbhat@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jul 17, 2019 at 09:29:02AM +0800, Wei Yang wrote:
-> The value left in nr is the number of bits for the last word, which
-> could be calculate the last word mask directly.
 
-Is it true even if start does not align to BITS_PER_LONG?
+--da4uJneut+ArUgXk
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> 
-> Remove the unnecessary size.
-> 
-> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
-> ---
-> resend with wider audience
-> ---
->  util/bitmap.c | 6 ++----
->  1 file changed, 2 insertions(+), 4 deletions(-)
-> 
-> diff --git a/util/bitmap.c b/util/bitmap.c
-> index cb618c65a5..5aa60b8717 100644
-> --- a/util/bitmap.c
-> +++ b/util/bitmap.c
-> @@ -160,7 +160,6 @@ int slow_bitmap_andnot(unsigned long *dst, const unsigned long *bitmap1,
->  void bitmap_set(unsigned long *map, long start, long nr)
->  {
->      unsigned long *p = map + BIT_WORD(start);
-> -    const long size = start + nr;
->      int bits_to_set = BITS_PER_LONG - (start % BITS_PER_LONG);
->      unsigned long mask_to_set = BITMAP_FIRST_WORD_MASK(start);
->  
-> @@ -174,7 +173,7 @@ void bitmap_set(unsigned long *map, long start, long nr)
->          p++;
->      }
->      if (nr) {
-> -        mask_to_set &= BITMAP_LAST_WORD_MASK(size);
-> +        mask_to_set &= BITMAP_LAST_WORD_MASK(nr);
->          *p |= mask_to_set;
->      }
->  }
-> @@ -221,7 +220,6 @@ void bitmap_set_atomic(unsigned long *map, long start, long nr)
->  void bitmap_clear(unsigned long *map, long start, long nr)
->  {
->      unsigned long *p = map + BIT_WORD(start);
-> -    const long size = start + nr;
->      int bits_to_clear = BITS_PER_LONG - (start % BITS_PER_LONG);
->      unsigned long mask_to_clear = BITMAP_FIRST_WORD_MASK(start);
->  
-> @@ -235,7 +233,7 @@ void bitmap_clear(unsigned long *map, long start, long nr)
->          p++;
->      }
->      if (nr) {
-> -        mask_to_clear &= BITMAP_LAST_WORD_MASK(size);
-> +        mask_to_clear &= BITMAP_LAST_WORD_MASK(nr);
->          *p &= ~mask_to_clear;
->      }
->  }
-> -- 
-> 2.17.1
-> 
+On Tue, Jul 16, 2019 at 07:44:24AM -0700, Richard Henderson wrote:
+> On 7/16/19 8:24 AM, Shivaprasad G Bhat wrote:
+> > @@ -827,6 +827,7 @@ int spapr_dt_drc(void *fdt, int offset, Object *own=
+er, uint32_t drc_type_mask)
+> >          Object *obj;
+> >          SpaprDrc *drc;
+> >          SpaprDrcClass *drck;
+> > +        const char *drc_name =3D NULL;
+> >          uint32_t drc_index, drc_power_domain;
+> > =20
+> >          if (!strstart(prop->type, "link<", NULL)) {
+> > @@ -856,8 +857,10 @@ int spapr_dt_drc(void *fdt, int offset, Object *ow=
+ner, uint32_t drc_type_mask)
+> >          g_array_append_val(drc_power_domains, drc_power_domain);
+> > =20
+> >          /* ibm,drc-names */
+> > -        drc_names =3D g_string_append(drc_names, spapr_drc_name(drc));
+> > +        drc_name =3D spapr_drc_name(drc);
+> > +        drc_names =3D g_string_append(drc_names, drc_name);
+> >          drc_names =3D g_string_insert_len(drc_names, -1, "\0", 1);
+> > +        g_free((char *)drc_name);
+>=20
+> This sort of casting means that you got the original type wrong.
 
-Regards,
+Ah, good point.  And spapr_drc_name() has the wrong type also.  I've
+pulled this patch out of my ppc-for-4.2 tree until this is fixed up.
 
--- 
-Peter Xu
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--da4uJneut+ArUgXk
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl0ufD0ACgkQbDjKyiDZ
+s5L2pA//boVquQGSDKSM6xVqwHnYHIcsdtP5N8zSZfTKo9/nwuT3iiD6m+NBVJf7
+ixgTx4OCsE7fCj6VXhbKbPFqoytYc+RoMDxMAPeA5098pV9GZ/VyI8hNxYnj7JKX
+ZCUAJ+5EciNeHS3/jjHh4VwrjX10GI4bojqHLbBVi8gGbKxs5AlTU6LMJ+MDzGCj
+nK9OYv9htb3/rqGyHblXnkXnwF3OSEJf8tPBZIYsREmeZllS1SIGXKaYUcpp0t7p
+a/YDFXBGcKn4lVWquecJqFcX1sfgixzSkoZTPO9AkJr2S3W3U2Rc2IS5UintMO8z
+dNf2FxqQLqA8SPw2NKGznl2MkBMsQ7kdupCcCtCxR7lFM45F+1VF26oyKBaux4Uq
+V5TWMEuOnLFte3vfnVTyk0NCXP8bcW4oSQme42qsXfh0WG/06DqZB3ZCkUsa9ThS
+uMh6voHleObR0rs3AUFl840nq9JDOKZRgIpSuJjZ0RFj6HXPcmulAR/aVv3KkbuP
+KHOx9aizn6dvg1/0G03YpbdlMOTFOhFEonFyA4nKgMHNHwL6PnRr5GD/9IelpErq
+SJnryIhpRpmcXXvCR3J7EzH0cx2QhOJJvEAuPRJ/It5OwmR4/kT+kQzyN8rOmBWG
+zI2BHMupXd4NbsH+Bw7i1IGxtIA2hmU5aMtLTKONjeEQ8OsRTc8=
+=X/wT
+-----END PGP SIGNATURE-----
+
+--da4uJneut+ArUgXk--
 
