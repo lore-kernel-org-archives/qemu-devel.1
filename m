@@ -2,71 +2,71 @@ Return-Path: <SRS0=PWhW=VO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A2BAC76186
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 08:31:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4B59C76192
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 08:35:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0C25920818
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 08:31:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C25920818
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 8AE0020818
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 08:35:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8AE0020818
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55008 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55036 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnfL3-00025M-7k
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 04:31:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45461)
+	id 1hnfPU-0003uJ-Rk
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 04:35:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47065)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bounces@canonical.com>) id 1hnfKr-0001gM-3j
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 04:30:50 -0400
+ (envelope-from <clg@kaod.org>) id 1hnfPJ-0003Q1-Ha
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 04:35:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1hnfKp-0003lN-JB
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 04:30:49 -0400
-Received: from indium.canonical.com ([91.189.90.7]:57496)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1hnfKp-0003j1-Cu
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 04:30:47 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1hnfKm-000408-8h
- for <qemu-devel@nongnu.org>; Wed, 17 Jul 2019 08:30:44 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 3CDBC2E80BA
- for <qemu-devel@nongnu.org>; Wed, 17 Jul 2019 08:30:44 +0000 (UTC)
+ (envelope-from <clg@kaod.org>) id 1hnfPI-0007os-8i
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 04:35:25 -0400
+Received: from 9.mo178.mail-out.ovh.net ([46.105.75.45]:43301)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1hnfPI-0007fC-2r
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 04:35:24 -0400
+Received: from player693.ha.ovh.net (unknown [10.109.146.137])
+ by mo178.mail-out.ovh.net (Postfix) with ESMTP id 1CD1371D70
+ for <qemu-devel@nongnu.org>; Wed, 17 Jul 2019 10:35:11 +0200 (CEST)
+Received: from kaod.org (lfbn-1-2240-157.w90-76.abo.wanadoo.fr [90.76.60.157])
+ (Authenticated sender: clg@kaod.org)
+ by player693.ha.ovh.net (Postfix) with ESMTPSA id E29937FDF2D8;
+ Wed, 17 Jul 2019 08:35:06 +0000 (UTC)
+To: David Gibson <david@gibson.dropbear.id.au>
+References: <20190630204601.30574-1-clg@kaod.org>
+ <20190630204601.30574-9-clg@kaod.org> <20190703020748.GD9442@umbus.fritz.box>
+ <08faf669-72a7-8f30-d33c-2e285405005c@kaod.org>
+ <20190712011527.GB2561@umbus.fritz.box>
+ <4f2f24e7-28da-8f32-e1f7-721dc6533e7c@kaod.org>
+ <20190717020809.GE9123@umbus.fritz.box>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <671315c7-c47a-f86d-3cce-0478a264645e@kaod.org>
+Date: Wed, 17 Jul 2019 10:35:03 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20190717020809.GE9123@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+X-Ovh-Tracer-Id: 15978490005418380115
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduvddriedvgddtjecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 17 Jul 2019 08:20:35 -0000
-From: =?utf-8?b?6LSe6LS15p2O?= <1836855@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: lizhengui
-X-Launchpad-Bug-Reporter: =?utf-8?b?6LSe6LS15p2OIChsaXpoZW5ndWkp?=
-X-Launchpad-Bug-Modifier: =?utf-8?b?6LSe6LS15p2OIChsaXpoZW5ndWkp?=
-Message-Id: <156335163555.1137.2433837611161042870.malonedeb@gac.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="19009";
- Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 4f1d3b65b9c9b8c678cd4db1b8612c40c7261c3a
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1836855] [NEW] virtio_scsi_ctx_check failed when
- detach virtio_scsi disk
+X-Received-From: 46.105.75.45
+Subject: Re: [Qemu-devel] [PATCH 08/10] ppc/xive: Extend XiveTCTX with an
+ router object pointer
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -75,121 +75,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1836855 <1836855@bugs.launchpad.net>
+Cc: qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>,
+ Suraj Jitindar Singh <sjitindarsingh@gmail.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+On 17/07/2019 04:08, David Gibson wrote:
+> On Mon, Jul 15, 2019 at 05:45:38PM +0200, C=E9dric Le Goater wrote:
+>> On 12/07/2019 03:15, David Gibson wrote:
+>>> On Wed, Jul 03, 2019 at 07:54:57AM +0200, C=E9dric Le Goater wrote:
+>>>> On 03/07/2019 04:07, David Gibson wrote:
+>>>>> On Sun, Jun 30, 2019 at 10:45:59PM +0200, C=E9dric Le Goater wrote:
+>>>>>> This is to perform lookups in the NVT table when a vCPU is dispatc=
+hed
+>>>>>> and possibly resend interrupts.
+>>>>>
+>>>>> I'm slightly confused by this one.  Aren't there multiple router
+>>>>> objects, each of which can deliver to any thread?  In which case wh=
+at
+>>>>> router object is associated with a specific TCTX?
+>>>>
+>>>> when a vCPU is dispatched on a HW thread, the hypervisor does a stor=
+e=20
+>>>> on the CAM line to store the VP id. At that time, it checks the IPB =
+in=20
+>>>> the associated NVT structure and notifies the thread if an interrupt=
+ is=20
+>>>> pending.=20
+>>>>
+>>>> We need to do a NVT lookup, just like the presenter in HW, hence the=
+=20
+>>>> router pointer. You should look at the following patch which clarifi=
+es=20
+>>>> the resend sequence.
+>>>
+>>> Hm, ok.
+>>>
+>>>>>> Future XIVE chip will use a different class for the model of the
+>>>>>> interrupt controller. So use an 'Object *' instead of a 'XiveRoute=
+r *'.
+>>>>>
+>>>>> This seems odd to me, shouldn't it be an interface pointer or
+>>>>> something in that case?
+>>>>
+>>>> I have duplicated most of the XIVE models for P10 because the intern=
+al=20
+>>>> structures have changed. I managed to keep the XiveSource and XiveTC=
+TX=20
+>>>> but we now have a Xive10Router, this is the reason why.
+>>>
+>>> Right, but XiveRouter and Xive10Router must have something in common
+>>> if they can both be used here.  Usually that's expressed as a shared
+>>> QOM interface - in which case you can use a pointer to the interface,
+>>> rathe than using Object * which kind of implies *anything* can go
+>>> here.
+>>
+>> Yeah. I also think it would be better to have a common base object but
+>> the class don't have much in common. Here is what I have for now :
+>=20
+> Uh.. QOM interfaces don't require there to be a common base object,
+> only common methods.
 
-I found a problem  that virtio_scsi_ctx_check  failed when detaching
-virtio_scsi disk.  The  bt is below:
+It's not a QOM interface today because it already uses an interface.=20
 
-(gdb) bt
-#0  0x0000ffffb02e1bd0 in raise () from /lib64/libc.so.6
-#1  0x0000ffffb02e2f7c in abort () from /lib64/libc.so.6
-#2  0x0000ffffb02db124 in __assert_fail_base () from /lib64/libc.so.6
-#3  0x0000ffffb02db1a4 in __assert_fail () from /lib64/libc.so.6
-#4  0x00000000004eb9a8 in virtio_scsi_ctx_check (d=3Dd@entry=3D0xc70d790, s=
-=3D<optimized out>, s=3D<optimized out>)
-    at /Images/lzg/code/710/qemu-2.8.1/hw/scsi/virtio-scsi.c:243
-#5  0x00000000004ec87c in virtio_scsi_handle_cmd_req_prepare (s=3Ds@entry=
-=3D0xd27a7a0, req=3Dreq@entry=3D0xafc4b90)
-    at /Images/lzg/code/710/qemu-2.8.1/hw/scsi/virtio-scsi.c:553
-#6  0x00000000004ecc20 in virtio_scsi_handle_cmd_vq (s=3D0xd27a7a0, vq=3D0x=
-d283410)
-    at /Images/lzg/code/710/qemu-2.8.1/hw/scsi/virtio-scsi.c:588
-#7  0x00000000004eda20 in virtio_scsi_data_plane_handle_cmd (vdev=3D0x0, vq=
-=3D0xffffae7a6f98)
-    at /Images/lzg/code/710/qemu-2.8.1/hw/scsi/virtio-scsi-dataplane.c:57
-#8  0x0000000000877254 in aio_dispatch (ctx=3D0xac61010) at util/aio-posix.=
-c:323
-#9  0x00000000008773ec in aio_poll (ctx=3D0xac61010, blocking=3Dtrue) at ut=
-il/aio-posix.c:472
-#10 0x00000000005cd7cc in iothread_run (opaque=3D0xac5e4b0) at iothread.c:49
-#11 0x000000000087a8b8 in qemu_thread_start (args=3D0xac61360) at util/qemu=
--thread-posix.c:495
-#12 0x00000000008a04e8 in thread_entry_for_hotfix (pthread_cb=3D0x0) at uvp=
-/hotpatch/qemu_hotpatch_helper.c:579
-#13 0x0000ffffb041c8bc in start_thread () from /lib64/libpthread.so.0
-#14 0x0000ffffb0382f8c in thread_start () from /lib64/libc.so.6
+>>
+>> P9:
+>>
+>> typedef struct XiveRouterClass {
+>>     SysBusDeviceClass parent;
+>>
+>>     /* XIVE table accessors */
+>>     int (*get_eas)(XiveRouter *xrtr, uint8_t eas_blk, uint32_t eas_idx=
+,
+>>                    XiveEAS *eas);
+>>     int (*get_end)(XiveRouter *xrtr, uint8_t end_blk, uint32_t end_idx=
+,
+>>                    XiveEND *end);
+>>     int (*write_end)(XiveRouter *xrtr, uint8_t end_blk, uint32_t end_i=
+dx,
+>>                      XiveEND *end, uint8_t word_number);
+>>     int (*get_nvt)(XiveRouter *xrtr, uint8_t nvt_blk, uint32_t nvt_idx=
+,
+>>                    XiveNVT *nvt);
+>>     int (*write_nvt)(XiveRouter *xrtr, uint8_t nvt_blk, uint32_t nvt_i=
+dx,
+>>                      XiveNVT *nvt, uint8_t word_number);
+>>     XiveTCTX *(*get_tctx)(XiveRouter *xrtr, CPUState *cs);
+>>     uint8_t (*get_block_id)(XiveRouter *xrtr);
+>> } XiveRouterClass;
+>>
+>> and P10:
+>>
+>> typedef struct Xive10RouterClass {
+>>     SysBusDeviceClass parent;
+>>
+>>     /* XIVE table accessors */
+>>     int (*get_eas)(Xive10Router *xrtr, uint8_t eas_blk, uint32_t eas_i=
+dx,
+>>                    Xive10EAS *eas);
+>>     int (*get_end)(Xive10Router *xrtr, uint8_t end_blk, uint32_t end_i=
+dx,
+>>                    Xive10END *end);
+>>     int (*write_end)(Xive10Router *xrtr, uint8_t end_blk, uint32_t end=
+_idx,
+>>                      Xive10END *end, uint8_t word_number);
+>>     int (*get_nvp)(Xive10Router *xrtr, uint8_t nvt_blk, uint32_t nvt_i=
+dx,
+>>                    Xive10NVP *nvt);
+>>     int (*write_nvp)(Xive10Router *xrtr, uint8_t nvt_blk, uint32_t nvt=
+_idx,
+>>                      Xive10NVP *nvt, uint8_t word_number);
+>>     XiveTCTX *(*get_tctx)(Xive10Router *xrtr, CPUState *cs);
+>>     uint8_t (*get_block_id)(XiveRouter *xrtr);
+>>     uint32_t (*get_config)(Xive10Router *xrtr);
+>> } Xive10RouterClass;
+>>
+>> Only get_tctx() is common.=20
+>>
+>> The XIVE structures (END, NV*) used by the routing algo have changed a=
+ lot.
+>> Even the presenter has changed, because all the CAM lines have a sligh=
+tly=20
+>> different format.  =20
+>>
+>> C.
+>>
+>>
+>=20
 
-assert(blk_get_aio_context(d->conf.blk) =3D=3D s->ctx)  failed.
-
-I think this patch
-(https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3Da6f230c8d13a7ff3a0c7=
-f1097412f44bfd9eff0b)
-introduce this problem.
-
-commit a6f230c8d13a7ff3a0c7f1097412f44bfd9eff0b  move blockbackend back
-to main AioContext on unplug. It set the AioContext of
-
-SCSIDevice  to the main AioContex, but s->ctx is still the iothread
-AioContext.  Is this a bug?
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1836855
-
-Title:
-  virtio_scsi_ctx_check failed when detach virtio_scsi disk
-
-Status in QEMU:
-  New
-
-Bug description:
-  I found a problem  that virtio_scsi_ctx_check  failed when detaching
-  virtio_scsi disk.  The  bt is below:
-
-  (gdb) bt
-  #0  0x0000ffffb02e1bd0 in raise () from /lib64/libc.so.6
-  #1  0x0000ffffb02e2f7c in abort () from /lib64/libc.so.6
-  #2  0x0000ffffb02db124 in __assert_fail_base () from /lib64/libc.so.6
-  #3  0x0000ffffb02db1a4 in __assert_fail () from /lib64/libc.so.6
-  #4  0x00000000004eb9a8 in virtio_scsi_ctx_check (d=3Dd@entry=3D0xc70d790,=
- s=3D<optimized out>, s=3D<optimized out>)
-      at /Images/lzg/code/710/qemu-2.8.1/hw/scsi/virtio-scsi.c:243
-  #5  0x00000000004ec87c in virtio_scsi_handle_cmd_req_prepare (s=3Ds@entry=
-=3D0xd27a7a0, req=3Dreq@entry=3D0xafc4b90)
-      at /Images/lzg/code/710/qemu-2.8.1/hw/scsi/virtio-scsi.c:553
-  #6  0x00000000004ecc20 in virtio_scsi_handle_cmd_vq (s=3D0xd27a7a0, vq=3D=
-0xd283410)
-      at /Images/lzg/code/710/qemu-2.8.1/hw/scsi/virtio-scsi.c:588
-  #7  0x00000000004eda20 in virtio_scsi_data_plane_handle_cmd (vdev=3D0x0, =
-vq=3D0xffffae7a6f98)
-      at /Images/lzg/code/710/qemu-2.8.1/hw/scsi/virtio-scsi-dataplane.c:57
-  #8  0x0000000000877254 in aio_dispatch (ctx=3D0xac61010) at util/aio-posi=
-x.c:323
-  #9  0x00000000008773ec in aio_poll (ctx=3D0xac61010, blocking=3Dtrue) at =
-util/aio-posix.c:472
-  #10 0x00000000005cd7cc in iothread_run (opaque=3D0xac5e4b0) at iothread.c=
-:49
-  #11 0x000000000087a8b8 in qemu_thread_start (args=3D0xac61360) at util/qe=
-mu-thread-posix.c:495
-  #12 0x00000000008a04e8 in thread_entry_for_hotfix (pthread_cb=3D0x0) at u=
-vp/hotpatch/qemu_hotpatch_helper.c:579
-  #13 0x0000ffffb041c8bc in start_thread () from /lib64/libpthread.so.0
-  #14 0x0000ffffb0382f8c in thread_start () from /lib64/libc.so.6
-
-  assert(blk_get_aio_context(d->conf.blk) =3D=3D s->ctx)  failed.
-
-  I think this patch
-  (https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3Da6f230c8d13a7ff3a0=
-c7f1097412f44bfd9eff0b)
-  introduce this problem.
-
-  commit a6f230c8d13a7ff3a0c7f1097412f44bfd9eff0b  move blockbackend
-  back to main AioContext on unplug. It set the AioContext of
-
-  SCSIDevice  to the main AioContex, but s->ctx is still the iothread
-  AioContext.  Is this a bug?
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1836855/+subscriptions
 
