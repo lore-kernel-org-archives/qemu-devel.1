@@ -2,79 +2,61 @@ Return-Path: <SRS0=PWhW=VO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25B77C76186
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 09:42:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14126C76186
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 09:46:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F2A9F20880
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 09:42:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F2A9F20880
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id DDCC020880
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 09:46:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DDCC020880
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55420 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55446 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hngSC-00033y-8Z
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 05:42:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40310)
+	id 1hngWF-0004XJ-1Q
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 05:46:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41952)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <pbonzini@redhat.com>) id 1hngS1-0002IG-C4
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 05:42:18 -0400
+ (envelope-from <lizhengui@huawei.com>) id 1hngW1-00047i-M6
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 05:46:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1hngRz-0001aW-D3
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 05:42:17 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:39570)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hngRz-0001aG-6F
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 05:42:15 -0400
-Received: by mail-wr1-f68.google.com with SMTP id x4so24008876wrt.6
- for <qemu-devel@nongnu.org>; Wed, 17 Jul 2019 02:42:15 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=1TzcnS+UXqdXJLiq/ir1G9+qN9TTnUPCIfu3LwRg2qY=;
- b=oUeeOJiaz8NM7REVl2ibs0rN0Y5PRssD/Qxezi5LwKB4Lb8GAwKH/hVwkGMvFG4D4j
- 3BMTqcJkGjaykORkfIajZaK81yaXnYu8zHQOyDzrVBQOaIyf7IfVAw3U+LT9TYoMI8bH
- iflHXMJ62Xy0UxiPsedrvXQ2D8NSz9AvfwhJtEdi6Put7Q8sMUTkTDcZZMVs1aU3mUnj
- KuwkwVln0mVp+FTXYg0+hlKSi+BMIQ8Hd1NJuR3HeR58dpBB147Xh4YfNcUnYb0qQS3v
- tzBpUf1Klve0zCrlPj3A5vtcnWo2jfG3WT2uj8hbowEIiE23gBaO8YwWs0quga9X1M/a
- MWCA==
-X-Gm-Message-State: APjAAAUv1Hj5vYmS4pyaBwtMkmwvyf47ZEaCfnWIPjb9dMJNlSkX9QWo
- ltLU9Xf/CVNbm9HWp6r5UFUTqjD7mxMaOg==
-X-Google-Smtp-Source: APXvYqydXbMZrFvcSdNBO9uJFTP0yS5DghldRpBiHCVPwPk2HJ6QOghzNf5YnzLEqHRczhOqvjUMlQ==
-X-Received: by 2002:a5d:4090:: with SMTP id o16mr43113003wrp.292.1563356534066; 
- Wed, 17 Jul 2019 02:42:14 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:e427:3beb:1110:dda2?
- ([2001:b07:6468:f312:e427:3beb:1110:dda2])
- by smtp.gmail.com with ESMTPSA id 91sm48362041wrp.3.2019.07.17.02.42.13
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Wed, 17 Jul 2019 02:42:13 -0700 (PDT)
-To: elohimes@gmail.com, mst@redhat.com, stefanha@gmail.com, fam@euphon.net
-References: <20190717004606.12444-1-xieyongji@baidu.com>
- <20190717004606.12444-2-xieyongji@baidu.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <40851745-e228-4837-63fc-afd68455fb55@redhat.com>
-Date: Wed, 17 Jul 2019 11:42:12 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+ (envelope-from <lizhengui@huawei.com>) id 1hngW0-0003pl-8i
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 05:46:25 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:55060 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <lizhengui@huawei.com>)
+ id 1hngVv-0003lx-Pb; Wed, 17 Jul 2019 05:46:20 -0400
+Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id C8DB0417D9736613299C;
+ Wed, 17 Jul 2019 17:46:12 +0800 (CST)
+Received: from [127.0.0.1] (10.177.251.193) by DGGEMS413-HUB.china.huawei.com
+ (10.3.19.213) with Microsoft SMTP Server id 14.3.439.0;
+ Wed, 17 Jul 2019 17:46:09 +0800
+To: Kevin Wolf <kwolf@redhat.com>
+References: <687efc8c-e081-7cca-cf69-8db9903d0f7f@huawei.com>
+ <cf6d17e2-142f-ffd3-78df-da47e2c25fec@huawei.com>
+ <20190717084154.GB6471@localhost.localdomain>
+From: l00284672 <lizhengui@huawei.com>
+Message-ID: <f01d71fe-c26e-a606-5601-d88aacac1bc8@huawei.com>
+Date: Wed, 17 Jul 2019 17:45:42 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.4.0
 MIME-Version: 1.0
-In-Reply-To: <20190717004606.12444-2-xieyongji@baidu.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20190717084154.GB6471@localhost.localdomain>
+Content-Type: multipart/mixed; boundary="------------9DCB2A7CBCD7F61F73861F23"
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.177.251.193]
+X-CFilter-Loop: Reflected
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.221.68
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] vhost-user-scsi: Call
- virtio_scsi_common_unrealize() when device realize failed
+X-Received-From: 45.249.212.35
+Subject: Re: [Qemu-devel] [Qemu-block] Fwd: virtio_scsi_ctx_check failed
+ when detach virtio_scsi disk
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,64 +68,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Xie Yongji <xieyongji@baidu.com>, qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 17/07/19 02:46, elohimes@gmail.com wrote:
-> From: Xie Yongji <xieyongji@baidu.com>
-> 
-> This avoids memory leak when device hotplug is failed.
-> 
-> Signed-off-by: Xie Yongji <xieyongji@baidu.com>
-> ---
->  hw/scsi/vhost-user-scsi.c | 16 ++++++++++++----
->  1 file changed, 12 insertions(+), 4 deletions(-)
-> 
-> diff --git a/hw/scsi/vhost-user-scsi.c b/hw/scsi/vhost-user-scsi.c
-> index a9fd8ea305..17826ef8e2 100644
-> --- a/hw/scsi/vhost-user-scsi.c
-> +++ b/hw/scsi/vhost-user-scsi.c
-> @@ -87,7 +87,7 @@ static void vhost_user_scsi_realize(DeviceState *dev, Error **errp)
->      }
->  
->      if (!vhost_user_init(&s->vhost_user, &vs->conf.chardev, errp)) {
-> -        return;
-> +        goto free_virtio;
->      }
->  
->      vsc->dev.nvqs = 2 + vs->conf.num_queues;
-> @@ -101,15 +101,23 @@ static void vhost_user_scsi_realize(DeviceState *dev, Error **errp)
->      if (ret < 0) {
->          error_setg(errp, "vhost-user-scsi: vhost initialization failed: %s",
->                     strerror(-ret));
-> -        vhost_user_cleanup(&s->vhost_user);
-> -        g_free(vqs);
-> -        return;
-> +        goto free_vhost;
->      }
->  
->      /* Channel and lun both are 0 for bootable vhost-user-scsi disk */
->      vsc->channel = 0;
->      vsc->lun = 0;
->      vsc->target = vs->conf.boot_tpgt;
-> +
-> +    return;
-> +
-> +free_vhost:
-> +    vhost_user_cleanup(&s->vhost_user);
-> +    g_free(vqs);
-> +free_virtio:
-> +    err = NULL;
-> +    virtio_scsi_common_unrealize(dev, &err);
-> +    error_propagate(errp, err);
->  }
->  
->  static void vhost_user_scsi_unrealize(DeviceState *dev, Error **errp)
-> 
+--------------9DCB2A7CBCD7F61F73861F23
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: quoted-printable
 
-Queued both patches, thanks.
+I reproduce it on qemu4.0.0 version again.=C2=A0 The bt is below:
 
-Paolo
+(gdb) bt
+#0=C2=A0 0x0000ffff86aacbd0 in raise () from /lib64/libc.so.6
+#1=C2=A0 0x0000ffff86aadf7c in abort () from /lib64/libc.so.6
+#2=C2=A0 0x0000ffff86aa6124 in __assert_fail_base () from /lib64/libc.so.=
+6
+#3=C2=A0 0x0000ffff86aa61a4 in __assert_fail () from /lib64/libc.so.6
+#4=C2=A0 0x0000000000529118 in virtio_scsi_ctx_check (d=3D<optimized out>=
+,=20
+s=3D<optimized out>, s=3D<optimized out>) at=20
+/home/qemu-4.0.0/hw/scsi/virtio-scsi.c:246
+#5=C2=A0 0x0000000000529ec4 in virtio_scsi_handle_cmd_req_prepare=20
+(s=3D0x2779ec00, req=3D0xffff740397d0) at=20
+/home/qemu-4.0.0/hw/scsi/virtio-scsi.c:559
+#6=C2=A0 0x000000000052a228 in virtio_scsi_handle_cmd_vq (s=3D0x2779ec00,=
+=20
+vq=3D0xffff7c6d7110) at /home/qemu-4.0.0/hw/scsi/virtio-scsi.c:603
+#7=C2=A0 0x000000000052afa8 in virtio_scsi_data_plane_handle_cmd=20
+(vdev=3D<optimized out>, vq=3D0xffff7c6d7110) at=20
+/home/qemu-4.0.0/hw/scsi/virtio-scsi-dataplane.c:59
+#8=C2=A0 0x000000000054d94c in virtio_queue_host_notifier_aio_poll=20
+(opaque=3D<optimized out>) at /home/qemu-4.0.0/hw/virtio/virtio.c:2452
+Backtrace stopped: previous frame identical to this frame (corrupt stack?=
+)
+(gdb)
+
+The scsi controller is configured with iothread.=C2=A0 Hot unpluging the =
+scsi=20
+disk may cause this problem if the disk is processing IO because the=20
+main thread and the iothread are in parallel.
+
+
+On 2019/7/17 16:41, Kevin Wolf wrote:
+> Am 16.07.2019 um 04:06 hat l00284672 geschrieben:
+>> -------- Forwarded Message --------
+>> Subject: 	virtio_scsi_ctx_check failed when detach virtio_scsi disk
+>> Date: 	Mon, 15 Jul 2019 23:34:24 +0800
+>> From: 	l00284672 <lizhengui@huawei.com>
+>> To: 	kwolf@redhat.com, berto@igalia.com, Stefan Hajnoczi
+>> <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+>> CC: 	lizhengui@huawei.com
+>>
+>>
+>>
+>> I found a problem=C2=A0 that virtio_scsi_ctx_check=C2=A0 failed when d=
+etaching
+>> virtio_scsi disk.=C2=A0 The=C2=A0 bt is below:
+>>
+>> (gdb) bt
+>> #0=C2=A0 0x0000ffffb02e1bd0 in raise () from /lib64/libc.so.6
+>> #1=C2=A0 0x0000ffffb02e2f7c in abort () from /lib64/libc.so.6
+>> #2=C2=A0 0x0000ffffb02db124 in __assert_fail_base () from /lib64/libc.=
+so.6
+>> #3=C2=A0 0x0000ffffb02db1a4 in __assert_fail () from /lib64/libc.so.6
+>> #4=C2=A0 0x00000000004eb9a8 invirtio_scsi_ctx_check (d=3Dd@entry=3D0xc=
+70d790,
+>> s=3D<optimized out>, s=3D<optimized out>)
+>>  =C2=A0=C2=A0=C2=A0 at /Images/lzg/code/710/qemu-2.8.1/hw/scsi/virtio-=
+scsi.c:243
+>> #5=C2=A0 0x00000000004ec87c in virtio_scsi_handle_cmd_req_prepare
+>> (s=3Ds@entry=3D0xd27a7a0, req=3Dreq@entry=3D0xafc4b90)
+>>  =C2=A0=C2=A0=C2=A0 at /Images/lzg/code/710/qemu-2.8.1/hw/scsi/virtio-=
+scsi.c:553
+>> #6=C2=A0 0x00000000004ecc20 in virtio_scsi_handle_cmd_vq (s=3D0xd27a7a=
+0,
+>> vq=3D0xd283410)
+>>  =C2=A0=C2=A0=C2=A0 at /Images/lzg/code/710/qemu-2.8.1/hw/scsi/virtio-=
+scsi.c:588
+>> #7=C2=A0 0x00000000004eda20 in virtio_scsi_data_plane_handle_cmd (vdev=
+=3D0x0,
+>> vq=3D0xffffae7a6f98)
+>>  =C2=A0=C2=A0=C2=A0 at /Images/lzg/code/710/qemu-2.8.1/hw/scsi/virtio-=
+scsi-dataplane.c:57
+>> #8=C2=A0 0x0000000000877254 in aio_dispatch (ctx=3D0xac61010) at
+>> util/aio-posix.c:323
+>> #9=C2=A0 0x00000000008773ec in aio_poll (ctx=3D0xac61010, blocking=3Dt=
+rue) at
+>> util/aio-posix.c:472
+>> #10 0x00000000005cd7cc in iothread_run (opaque=3D0xac5e4b0) at iothrea=
+d.c:49
+>> #11 0x000000000087a8b8 in qemu_thread_start (args=3D0xac61360) at
+>> util/qemu-thread-posix.c:495
+>> #12 0x00000000008a04e8 in thread_entry_for_hotfix (pthread_cb=3D0x0) a=
+t
+>> uvp/hotpatch/qemu_hotpatch_helper.c:579
+>> #13 0x0000ffffb041c8bc in start_thread () from /lib64/libpthread.so.0
+>> #14 0x0000ffffb0382f8c in thread_start () from /lib64/libc.so.6
+>>
+>> assert(blk_get_aio_context(d->conf.blk) =3D=3D s->ctx) failed.
+>>
+>> I think this patch (https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;=
+h=3Da6f230c8d13a7ff3a0c7f1097412f44bfd9eff0b)
+>> introduce this problem.
+>>
+>> commit a6f230c8d13a7ff3a0c7f1097412f44bfd9eff0b=C2=A0 move blockbacken=
+d back to
+>> main AioContext on unplug. It set the AioContext of SCSIDevice=C2=A0 t=
+o the
+>> main AioContex, but s->ctx is still the iothread AioContext.=C2=A0 Is =
+this
+>> a bug?
+> Yes, a failing assertion is always a bug.
+>
+> The commit you mention doesn't really do anything wrong, because when
+> the device is unplugged, there shouldn't be any more requests that coul=
+d
+> fail an assertion later. If anything, we could have a bug in making sur=
+e
+> that no requests are in flight any more during unplug, but this would b=
+e
+> a separate issue.
+>
+> We fixed some AioContext related bugs recently. Which QEMU version did
+> you use when you ran into the bug? Can you try on current git master?
+>
+> Kevin
+>
+> .
+>
+
+
+--------------9DCB2A7CBCD7F61F73861F23
+Content-Type: text/x-vcard; name="lizhengui.vcf"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="lizhengui.vcf"
+
+bnVsbA==
+--------------9DCB2A7CBCD7F61F73861F23--
 
