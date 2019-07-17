@@ -2,68 +2,67 @@ Return-Path: <SRS0=PWhW=VO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AD0BC76192
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 03:41:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1655EC76192
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 03:41:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 29FB6206C2
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 03:41:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D3177206C2
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 03:41:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Vp5UMm2n"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 29FB6206C2
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="oUJy9PWa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D3177206C2
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53834 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53842 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnaoR-0006SP-2z
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 23:41:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42578)
+	id 1hnaog-0007bW-1m
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jul 2019 23:41:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42579)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgibson@ozlabs.org>) id 1hnao6-0005Pg-2p
+ (envelope-from <dgibson@ozlabs.org>) id 1hnao6-0005Ph-2q
  for qemu-devel@nongnu.org; Tue, 16 Jul 2019 23:40:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1hnao4-0003ia-17
+ (envelope-from <dgibson@ozlabs.org>) id 1hnao4-0003il-1h
  for qemu-devel@nongnu.org; Tue, 16 Jul 2019 23:40:41 -0400
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:59465 helo=ozlabs.org)
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:39391 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1hnao0-0003eV-Qd; Tue, 16 Jul 2019 23:40:38 -0400
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1hnao0-0003fp-9u
+ for qemu-devel@nongnu.org; Tue, 16 Jul 2019 23:40:39 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 45pNMJ1qtPz9sMQ; Wed, 17 Jul 2019 13:40:28 +1000 (AEST)
+ id 45pNMJ382Vz9sMr; Wed, 17 Jul 2019 13:40:28 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1563334828;
- bh=Mot6s3cntKQklRydT6w8OUE1iO9T4fzZfyzEaYW6BOo=;
+ bh=Ret0oPXowbQTaOVdrvg5u5rp5U7wsx0cuSJ0v6EuZtc=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=Vp5UMm2nGJ2e21/DNFFQEQNEt0q4aUQL5PSvKDrmfo0rHoVBM8jL7vjC8+rgjyCDL
- +J+fy/I1QYAlcLy1lAi1QI3olZb4V7BKSnh+oJJjFUiKmhjgr/oxI7bKRikyv6CkYd
- 2927NSnFVWjmF3AtyFNXJDCFcQ7OB4Fqf7eMcVA4=
-Date: Wed, 17 Jul 2019 12:08:09 +1000
+ b=oUJy9PWaaF09mgy0Vh4rs7naRZOj8bsbVncQa/uLEToD/GOqK+oiaT9XuEFl/vPcE
+ zU1M94rl95Ym8iad1SvEKrHwrc5gH3deHT7rAGTHP9TGRNCrryX+7sdEjTgxEalMaU
+ 2Q/XyTnPaxUQzgl5FyqXh9ejEtcIybCLUzpUkEpY=
+Date: Wed, 17 Jul 2019 13:06:40 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Message-ID: <20190717020809.GE9123@umbus.fritz.box>
-References: <20190630204601.30574-1-clg@kaod.org>
- <20190630204601.30574-9-clg@kaod.org>
- <20190703020748.GD9442@umbus.fritz.box>
- <08faf669-72a7-8f30-d33c-2e285405005c@kaod.org>
- <20190712011527.GB2561@umbus.fritz.box>
- <4f2f24e7-28da-8f32-e1f7-721dc6533e7c@kaod.org>
+To: "Liu, Yi L" <yi.l.liu@intel.com>
+Message-ID: <20190717030640.GG9123@umbus.fritz.box>
+References: <1562324511-2910-1-git-send-email-yi.l.liu@intel.com>
+ <1562324511-2910-6-git-send-email-yi.l.liu@intel.com>
+ <20190715025519.GE3440@umbus.fritz.box>
+ <A2975661238FB949B60364EF0F2C25743A00D8BB@SHSMSX104.ccr.corp.intel.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="2qXFWqzzG3v1+95a"
+ protocol="application/pgp-signature"; boundary="5L6AZ1aJH5mDrqCQ"
 Content-Disposition: inline
-In-Reply-To: <4f2f24e7-28da-8f32-e1f7-721dc6533e7c@kaod.org>
+In-Reply-To: <A2975661238FB949B60364EF0F2C25743A00D8BB@SHSMSX104.ccr.corp.intel.com>
 User-Agent: Mutt/1.12.0 (2019-05-25)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
 X-Received-From: 2401:3900:2:1::2
-Subject: Re: [Qemu-devel] [PATCH 08/10] ppc/xive: Extend XiveTCTX with an
- router object pointer
+Subject: Re: [Qemu-devel] [RFC v1 05/18] vfio/pci: add pasid alloc/free
+ implementation
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,125 +74,164 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>,
- Suraj Jitindar Singh <sjitindarsingh@gmail.com>, qemu-devel@nongnu.org
+Cc: "Tian, Kevin" <kevin.tian@intel.com>,
+ Jacob Pan <jacob.jun.pan@linux.intel.com>, Yi Sun <yi.y.sun@linux.intel.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mst@redhat.com" <mst@redhat.com>,
+ "Tian, Jun J" <jun.j.tian@intel.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "peterx@redhat.com" <peterx@redhat.com>,
+ "eric.auger@redhat.com" <eric.auger@redhat.com>,
+ "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>, "Sun, Yi Y" <yi.y.sun@intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---2qXFWqzzG3v1+95a
-Content-Type: text/plain; charset=iso-8859-1
+--5L6AZ1aJH5mDrqCQ
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jul 15, 2019 at 05:45:38PM +0200, C=E9dric Le Goater wrote:
-> On 12/07/2019 03:15, David Gibson wrote:
-> > On Wed, Jul 03, 2019 at 07:54:57AM +0200, C=E9dric Le Goater wrote:
-> >> On 03/07/2019 04:07, David Gibson wrote:
-> >>> On Sun, Jun 30, 2019 at 10:45:59PM +0200, C=E9dric Le Goater wrote:
-> >>>> This is to perform lookups in the NVT table when a vCPU is dispatched
-> >>>> and possibly resend interrupts.
-> >>>
-> >>> I'm slightly confused by this one.  Aren't there multiple router
-> >>> objects, each of which can deliver to any thread?  In which case what
-> >>> router object is associated with a specific TCTX?
-> >>
-> >> when a vCPU is dispatched on a HW thread, the hypervisor does a store=
-=20
-> >> on the CAM line to store the VP id. At that time, it checks the IPB in=
-=20
-> >> the associated NVT structure and notifies the thread if an interrupt i=
-s=20
-> >> pending.=20
-> >>
-> >> We need to do a NVT lookup, just like the presenter in HW, hence the=
-=20
-> >> router pointer. You should look at the following patch which clarifies=
-=20
-> >> the resend sequence.
+On Tue, Jul 16, 2019 at 10:25:55AM +0000, Liu, Yi L wrote:
+> > From: kvm-owner@vger.kernel.org [mailto:kvm-owner@vger.kernel.org] On B=
+ehalf
+> > Of David Gibson
+> > Sent: Monday, July 15, 2019 10:55 AM
+> > To: Liu, Yi L <yi.l.liu@intel.com>
+> > Subject: Re: [RFC v1 05/18] vfio/pci: add pasid alloc/free implementati=
+on
 > >=20
-> > Hm, ok.
+> > On Fri, Jul 05, 2019 at 07:01:38PM +0800, Liu Yi L wrote:
+> > > This patch adds vfio implementation PCIPASIDOps.alloc_pasid/free_pasi=
+d().
+> > > These two functions are used to propagate guest pasid allocation and
+> > > free requests to host via vfio container ioctl.
 > >=20
-> >>>> Future XIVE chip will use a different class for the model of the
-> >>>> interrupt controller. So use an 'Object *' instead of a 'XiveRouter =
-*'.
-> >>>
-> >>> This seems odd to me, shouldn't it be an interface pointer or
-> >>> something in that case?
-> >>
-> >> I have duplicated most of the XIVE models for P10 because the internal=
-=20
-> >> structures have changed. I managed to keep the XiveSource and XiveTCTX=
-=20
-> >> but we now have a Xive10Router, this is the reason why.
-> >=20
-> > Right, but XiveRouter and Xive10Router must have something in common
-> > if they can both be used here.  Usually that's expressed as a shared
-> > QOM interface - in which case you can use a pointer to the interface,
-> > rathe than using Object * which kind of implies *anything* can go
-> > here.
+> > As I said in an earlier comment, I think doing this on the device is
+> > conceptually incorrect.  I think we need an explcit notion of an SVM
+> > context (i.e. the namespace in which all the PASIDs live) - which will
+> > IIUC usually be shared amongst multiple devices.  The create and free
+> > PASID requests should be on that object.
 >=20
-> Yeah. I also think it would be better to have a common base object but
-> the class don't have much in common. Here is what I have for now :
+> Actually, the allocation is not doing on this device. System wide, it is
+> done on a container. So not sure if it is the API interface gives you a
+> sense that this is done on device.
 
-Uh.. QOM interfaces don't require there to be a common base object,
-only common methods.
+Sorry, I should have been clearer.  I can see that at the VFIO level
+it is done on the container.  However the function here takes a bus
+and devfn, so this qemu internal interface is per-device, which
+doesn't really make sense.
+
+> Also, curious on the SVM context
+> concept, do you mean it a per-VM context or a per-SVM usage context?
+> May you elaborate a little more. :-)
+
+Sorry, I'm struggling to find a good term for this.  By "context" I
+mean a namespace containing a bunch of PASID address spaces, those
+PASIDs are then visible to some group of devices.
 
 >=20
-> P9:
+> Thanks,
+> Yi Liu
 >=20
-> typedef struct XiveRouterClass {
->     SysBusDeviceClass parent;
->=20
->     /* XIVE table accessors */
->     int (*get_eas)(XiveRouter *xrtr, uint8_t eas_blk, uint32_t eas_idx,
->                    XiveEAS *eas);
->     int (*get_end)(XiveRouter *xrtr, uint8_t end_blk, uint32_t end_idx,
->                    XiveEND *end);
->     int (*write_end)(XiveRouter *xrtr, uint8_t end_blk, uint32_t end_idx,
->                      XiveEND *end, uint8_t word_number);
->     int (*get_nvt)(XiveRouter *xrtr, uint8_t nvt_blk, uint32_t nvt_idx,
->                    XiveNVT *nvt);
->     int (*write_nvt)(XiveRouter *xrtr, uint8_t nvt_blk, uint32_t nvt_idx,
->                      XiveNVT *nvt, uint8_t word_number);
->     XiveTCTX *(*get_tctx)(XiveRouter *xrtr, CPUState *cs);
->     uint8_t (*get_block_id)(XiveRouter *xrtr);
-> } XiveRouterClass;
->=20
-> and P10:
->=20
-> typedef struct Xive10RouterClass {
->     SysBusDeviceClass parent;
->=20
->     /* XIVE table accessors */
->     int (*get_eas)(Xive10Router *xrtr, uint8_t eas_blk, uint32_t eas_idx,
->                    Xive10EAS *eas);
->     int (*get_end)(Xive10Router *xrtr, uint8_t end_blk, uint32_t end_idx,
->                    Xive10END *end);
->     int (*write_end)(Xive10Router *xrtr, uint8_t end_blk, uint32_t end_id=
-x,
->                      Xive10END *end, uint8_t word_number);
->     int (*get_nvp)(Xive10Router *xrtr, uint8_t nvt_blk, uint32_t nvt_idx,
->                    Xive10NVP *nvt);
->     int (*write_nvp)(Xive10Router *xrtr, uint8_t nvt_blk, uint32_t nvt_id=
-x,
->                      Xive10NVP *nvt, uint8_t word_number);
->     XiveTCTX *(*get_tctx)(Xive10Router *xrtr, CPUState *cs);
->     uint8_t (*get_block_id)(XiveRouter *xrtr);
->     uint32_t (*get_config)(Xive10Router *xrtr);
-> } Xive10RouterClass;
->=20
-> Only get_tctx() is common.=20
->=20
-> The XIVE structures (END, NV*) used by the routing algo have changed a lo=
-t.
-> Even the presenter has changed, because all the CAM lines have a slightly=
-=20
-> different format.  =20
->=20
-> C.
->=20
+> > >
+> > > Cc: Kevin Tian <kevin.tian@intel.com>
+> > > Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> > > Cc: Peter Xu <peterx@redhat.com>
+> > > Cc: Eric Auger <eric.auger@redhat.com>
+> > > Cc: Yi Sun <yi.y.sun@linux.intel.com>
+> > > Cc: David Gibson <david@gibson.dropbear.id.au>
+> > > Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
+> > > Signed-off-by: Yi Sun <yi.y.sun@linux.intel.com>
+> > > ---
+> > >  hw/vfio/pci.c | 61
+> > +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+> > >  1 file changed, 61 insertions(+)
+> > >
+> > > diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+> > > index ce3fe96..ab184ad 100644
+> > > --- a/hw/vfio/pci.c
+> > > +++ b/hw/vfio/pci.c
+> > > @@ -2690,6 +2690,65 @@ static void vfio_unregister_req_notifier(VFIOP=
+CIDevice
+> > *vdev)
+> > >      vdev->req_enabled =3D false;
+> > >  }
+> > >
+> > > +static int vfio_pci_device_request_pasid_alloc(PCIBus *bus,
+> > > +                                               int32_t devfn,
+> > > +                                               uint32_t min_pasid,
+> > > +                                               uint32_t max_pasid)
+> > > +{
+> > > +    PCIDevice *pdev =3D bus->devices[devfn];
+> > > +    VFIOPCIDevice *vdev =3D DO_UPCAST(VFIOPCIDevice, pdev, pdev);
+> > > +    VFIOContainer *container =3D vdev->vbasedev.group->container;
+> > > +    struct vfio_iommu_type1_pasid_request req;
+> > > +    unsigned long argsz;
+> > > +    int pasid;
+> > > +
+> > > +    argsz =3D sizeof(req);
+> > > +    req.argsz =3D argsz;
+> > > +    req.flag =3D VFIO_IOMMU_PASID_ALLOC;
+> > > +    req.min_pasid =3D min_pasid;
+> > > +    req.max_pasid =3D max_pasid;
+> > > +
+> > > +    rcu_read_lock();
+> > > +    pasid =3D ioctl(container->fd, VFIO_IOMMU_PASID_REQUEST, &req);
+> > > +    if (pasid < 0) {
+> > > +        error_report("vfio_pci_device_request_pasid_alloc:"
+> > > +                     " request failed, contanier: %p", container);
+> > > +    }
+> > > +    rcu_read_unlock();
+> > > +    return pasid;
+> > > +}
+> > > +
+> > > +static int vfio_pci_device_request_pasid_free(PCIBus *bus,
+> > > +                                              int32_t devfn,
+> > > +                                              uint32_t pasid)
+> > > +{
+> > > +    PCIDevice *pdev =3D bus->devices[devfn];
+> > > +    VFIOPCIDevice *vdev =3D DO_UPCAST(VFIOPCIDevice, pdev, pdev);
+> > > +    VFIOContainer *container =3D vdev->vbasedev.group->container;
+> > > +    struct vfio_iommu_type1_pasid_request req;
+> > > +    unsigned long argsz;
+> > > +    int ret =3D 0;
+> > > +
+> > > +    argsz =3D sizeof(req);
+> > > +    req.argsz =3D argsz;
+> > > +    req.flag =3D VFIO_IOMMU_PASID_FREE;
+> > > +    req.pasid =3D pasid;
+> > > +
+> > > +    rcu_read_lock();
+> > > +    ret =3D ioctl(container->fd, VFIO_IOMMU_PASID_REQUEST, &req);
+> > > +    if (ret !=3D 0) {
+> > > +        error_report("vfio_pci_device_request_pasid_free:"
+> > > +                     " request failed, contanier: %p", container);
+> > > +    }
+> > > +    rcu_read_unlock();
+> > > +    return ret;
+> > > +}
+> > > +
+> > > +static PCIPASIDOps vfio_pci_pasid_ops =3D {
+> > > +    .alloc_pasid =3D vfio_pci_device_request_pasid_alloc,
+> > > +    .free_pasid =3D vfio_pci_device_request_pasid_free,
+> > > +};
+> > > +
+> > >  static void vfio_realize(PCIDevice *pdev, Error **errp)
+> > >  {
+> > >      VFIOPCIDevice *vdev =3D PCI_VFIO(pdev);
+> > > @@ -2991,6 +3050,8 @@ static void vfio_realize(PCIDevice *pdev, Error=
+ **errp)
+> > >      vfio_register_req_notifier(vdev);
+> > >      vfio_setup_resetfn_quirk(vdev);
+> > >
+> > > +    pci_setup_pasid_ops(pdev, &vfio_pci_pasid_ops);
+> > > +
+> > >      return;
+> > >
+> > >  out_teardown:
+> >=20
 >=20
 
 --=20
@@ -202,25 +240,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---2qXFWqzzG3v1+95a
+--5L6AZ1aJH5mDrqCQ
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl0ugwkACgkQbDjKyiDZ
-s5Kl7hAAvrrfxXT0sAsAe/fBH3g1q7JOyV8PHdUxp7RLFcGk7eDETzSzyVxWKwAc
-s08F4GxSEBheBbyYySfyhmjjyDvHW3ze1E8T5SadeNhhypdXyW0mhbNTZQ558DeN
-NGE/u9nIXKpv+/LjkmIsy7vhzvcLMqKj2CY8yRqmajRrb9MeirKyRsYNXSr2aKTq
-B1mig0bY4ZsSNSaN7f46t7qan0oTMOjEdjl2S3SCctZssA3ee2euzEmd5qz91Vzh
-qrK/K2Ugr3fQj0e6zaPq0t18VvutXT1++nf7Z9/1sn3zgpGCKEavwCfFiBY66l53
-yiSXV2Q4Ah7xPdxEGq2l2k7OBiubZY8Ntkl7pEtXJkAeh37swXYvu8OcOtwV8tzC
-ib9vZdDw1KJPmTz7orMkIgiIYLYWdy3GY5InT+lp3IasFL/dQOWjuCfa29LHxp3z
-iHJY5XX337PRY2u+4HHPj6I7lI5D3wLUSPfWzSb9QsoexdTYvisQoSPjYqiygKtH
-5mX9PqHSBl1NOJKUqkxrl1VWE0I+3fHNSv3Ep5hXj409wqQLo1vUjAikJT//BoGl
-Wz/Jr9/+jQ+lgmJd25fkqPUL210VWhOuNxAW/O7Wbx+V9uKyqrwDG0dc/iIorzcV
-QGysmHOp7XFAc65XZ6KvsbvoYqU8bhZUCgeNMuxL7OV6isGeAkM=
-=0MvI
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl0ukMAACgkQbDjKyiDZ
+s5K34xAAmqhUewLnsaIj9CxX94TPF0CzL2TySUArJZLx37EtqqlkrjBWWdfZCo0L
+hfd0311Ml5s77eWdfWgMyjklgCxddh8HrxMCvKa9LqRC+kw5ApfNsrBFwovec1E8
+hQOfGltnU23vpiTnedG5l7/4wHe6clNp3DwJL6wbhOSu7PXdd5FWkBqog2qPxa+8
+oGor4s6TCYmJoR2GAE2OiLERZmemB9erNkxuPfguQq0wCSYSK7H6G7tuvretrn1r
+6NijxvkVXPKR3xOpPbGU2UKjoEs9gPSy6NXaMlx4LkHJqI/K9f1ak7yXeXVHkNCc
+UpVVfskMlJFZfXsP97pd6xaCWr83Gb8ip87dAxkVSfvxsVuqe4WtcD6pexkb9zch
+9CvQKtt1LsfAOJHv3LfKLY0Visz6u0rEuVll591XbRzw0nkzrmMKS7pS6SdNhrSP
+wBRN0A/I+SkeVNFYToiJ7+MZNzta9HFIc9b4UVgvMU96f9KdAp7YuBS33a1gNUlm
+DKfKz6COIgxoJUje0WzzeYx4nMycD3vnQ4wZ6fCpVt/vFwK+Ajber3OnRHnCQ0rK
+iT+aen+w2Jo8cZ87pz87tCnsg8QvTgjYcUOG9mhJv7miwVqds+M+4H6gyGs6yF4x
+rJQvLiiM/lRKUHR6lKnJp2v2mSTeTwHMnHiLxf8X0qymsHc2dis=
+=HZho
 -----END PGP SIGNATURE-----
 
---2qXFWqzzG3v1+95a--
+--5L6AZ1aJH5mDrqCQ--
 
