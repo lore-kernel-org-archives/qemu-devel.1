@@ -2,63 +2,84 @@ Return-Path: <SRS0=PWhW=VO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9705AC76186
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 05:39:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA1DAC76186
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 05:40:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6DCDC2173E
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 05:39:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6DCDC2173E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 930F32173E
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 05:40:25 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RJRHsDil"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 930F32173E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54144 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54156 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnces-0000yp-ND
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 01:39:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49618)
+	id 1hncfw-0002ED-DK
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 01:40:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50022)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <tao3.xu@intel.com>) id 1hncei-0000a3-D1
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 01:39:09 -0400
+ (envelope-from <npiggin@gmail.com>) id 1hncfh-0001Uy-T4
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 01:40:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tao3.xu@intel.com>) id 1hnceh-0004CZ-42
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 01:39:08 -0400
-Received: from mga05.intel.com ([192.55.52.43]:13421)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1hnceg-0004B8-RX
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 01:39:07 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
- by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 16 Jul 2019 22:39:03 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,273,1559545200"; d="scan'208";a="161651876"
-Received: from txu2-mobl.ccr.corp.intel.com (HELO [10.239.196.165])
- ([10.239.196.165])
- by orsmga008.jf.intel.com with ESMTP; 16 Jul 2019 22:39:02 -0700
-From: Tao Xu <tao3.xu@intel.com>
-To: "ehabkost@redhat.com" <ehabkost@redhat.com>
-References: <20190717045731.19303-1-tao3.xu@intel.com>
-Message-ID: <54351c2d-0b8a-6877-6fda-dedec8372d00@intel.com>
-Date: Wed, 17 Jul 2019 13:39:01 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <npiggin@gmail.com>) id 1hncfh-00057N-1n
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 01:40:09 -0400
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:45649)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <npiggin@gmail.com>)
+ id 1hncff-000536-50; Wed, 17 Jul 2019 01:40:07 -0400
+Received: by mail-pf1-x442.google.com with SMTP id r1so10237443pfq.12;
+ Tue, 16 Jul 2019 22:40:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=W0rA03HU631KZnI2JAXN5qkOfvFkjS2UXdBozSlCk4c=;
+ b=RJRHsDilUsK6WE5c7qo4xFYWty4rI37zbDWC8Z6fI+h1FL1O8Zcy8uZiBp5wU4h5qi
+ adSZbwVxU51LJG++4M+MC3ZVPH+Jhd4Nfy6W5FIniHLkOp/+or5h1VdQvQGDLwhc2iZD
+ Rk+G0y6lyH9if572Z9Sw4pnJosceQVIxkPbHK7Pbvtc28vxfa+nNrx8Q50mI36/ufnSm
+ coUNlI9xXyIPbcCg59Cxs2MBHey/z1DbmyQNsPyDs7hbUt/UPOISrZRq6kQFUKSh9YFX
+ eT5DLI+xr1dpVa8Ia8BD8S5WL9Zi4+7CGl8030FKPTIzTZdjEiKuDALre9ZU5gf2AOzQ
+ 3Zng==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=W0rA03HU631KZnI2JAXN5qkOfvFkjS2UXdBozSlCk4c=;
+ b=eLWvteB+4mzRLW8tgmteon2ZVb08WxqDh7BscZExwmr+8yOcd6/TBUZvdKG8kKOsCC
+ oo8PZJvAdxGnjeBNBfPEawIXPwjO2RGLeC1P89Ltq9/RNR1kiNFnLzJcF3/NFd7FG3Wa
+ 7L9+hcTOznL0Y4QUxmFJ8d6SC09OwKxLglpf7NrxbCtlezw4Xd2JcZN1/qJDOFSv3r/9
+ PEUfyhwOcKhFBX/VWh/PFF05DnzKmLSDnEMaKTYpOHr9lDMVGKuwlTTsIT49tIiHavCf
+ ZLoJ/7hthJ6zpkJQhZCl/egjrN6ka2HGLIRu6oenGoVf85uCH/I3GB3cI4xXoBZhn11/
+ S/tw==
+X-Gm-Message-State: APjAAAUqbRMAvDxLlXw2Q7HL3eBdJHd3cMzC0Yl3SIycnF/Jn6XeDZC7
+ ihxn34TJBwBZIUsy8qCL+ao=
+X-Google-Smtp-Source: APXvYqwPl1Vr7QDBE8z4PwjO/QHN+TsBs/okze/r9JOrsrAW7LrGaVfIEPKVwB41AR0+laLsSxOyNg==
+X-Received: by 2002:a65:50cb:: with SMTP id s11mr38830414pgp.371.1563342004824; 
+ Tue, 16 Jul 2019 22:40:04 -0700 (PDT)
+Received: from bobo.local0.net ([203.220.8.141])
+ by smtp.gmail.com with ESMTPSA id g18sm39322656pgm.9.2019.07.16.22.40.00
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Tue, 16 Jul 2019 22:40:03 -0700 (PDT)
+From: Nicholas Piggin <npiggin@gmail.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Date: Wed, 17 Jul 2019 15:39:48 +1000
+Message-Id: <20190717053952.13729-1-npiggin@gmail.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <20190717045731.19303-1-tao3.xu@intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 192.55.52.43
-Subject: Re: [Qemu-devel] [PATCH v2] target/i386: Introduce Denverton CPU
- model
+X-Received-From: 2607:f8b0:4864:20::442
+Subject: [Qemu-devel] [PATCH v5 0/4] spapr: implement dispatch and suspend
+ calls
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,105 +91,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Xiaoyao Li <xiaoyao.li@linux.intel.com>
+Cc: Greg Kurz <groug@kaod.org>, Nicholas Piggin <npiggin@gmail.com>,
+ qemu-devel@nongnu.org, qemu-ppc@nongnu.org,
+ =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Eduardo,
+Since the last post I tried to account for feedback, fix style, add
+comments, fixed a bug or two in migration etc, more testing, and
+dropped the rtas ibm,suspend-me patch for now pending some reworking.
 
-Could I ask a question about introducing a old CPU model? Maybe not so 
-old because it was launched in 2017. It is the former generation (Atom 
-Server) of Snowridge and if this cpu model be added, qemu may can 
-migrate guest between Denverton CPU and Snowridge CPU.
+Thanks,
+Nick
 
-I am wondering which way is more appropriate, because maybe there are a 
-few Denverton machines using old microcodes:
+Nicholas Piggin (4):
+  spapr: Implement VPA dispatch counter and prod bit on tcg
+  spapr: Implement H_PROD
+  spapr: Implement H_CONFER
+  spapr: Implement H_JOIN
 
-1. Just like this patch, introduce one version cpu cpu model.
+ hw/ppc/spapr.c                  |  42 +++++++++
+ hw/ppc/spapr_cpu_core.c         |   4 +-
+ hw/ppc/spapr_hcall.c            | 147 ++++++++++++++++++++++++++++++--
+ include/hw/ppc/spapr.h          |   7 ++
+ include/hw/ppc/spapr_cpu_core.h |   1 +
+ target/ppc/cpu.h                |   2 +
+ target/ppc/translate_init.inc.c |  25 ++++++
+ 7 files changed, 222 insertions(+), 6 deletions(-)
 
-2. Introduce multi versions of cpu model, cover old microcodes, may be 3 
-versions.
-
-On 7/17/2019 12:57 PM, Tao Xu wrote:
-> Denverton is the Atom Processor of Intel Harrisonville platform.
-> 
-> For more information:
-> https://ark.intel.com/content/www/us/en/ark/products/\
-> codename/63508/denverton.html
-> 
-> Signed-off-by: Tao Xu <tao3.xu@intel.com>
-> ---
-> 
-> Changes in v2:
-> 
->      - Renamed as Denverton instead of Denverton-Server, because there
->        is only server for Denverton
->      - Remove vmx from cpu model
-> ---
->   target/i386/cpu.c | 45 +++++++++++++++++++++++++++++++++++++++++++++
->   1 file changed, 45 insertions(+)
-> 
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index 805ce95247..38000dd975 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -2471,6 +2471,51 @@ static X86CPUDefinition builtin_x86_defs[] = {
->           .xlevel = 0x80000008,
->           .model_id = "Intel Xeon Processor (Icelake)",
->       },
-> +    {
-> +        .name = "Denverton",
-> +        .level = 21,
-> +        .vendor = CPUID_VENDOR_INTEL,
-> +        .family = 6,
-> +        .model = 95,
-> +        .stepping = 1,
-> +        .features[FEAT_1_EDX] =
-> +            CPUID_FP87 | CPUID_VME | CPUID_DE | CPUID_PSE | CPUID_TSC |
-> +            CPUID_MSR | CPUID_PAE | CPUID_MCE | CPUID_CX8 | CPUID_APIC |
-> +            CPUID_SEP | CPUID_MTRR | CPUID_PGE | CPUID_MCA | CPUID_CMOV |
-> +            CPUID_PAT | CPUID_PSE36 | CPUID_CLFLUSH | CPUID_MMX | CPUID_FXSR |
-> +            CPUID_SSE | CPUID_SSE2,
-> +        .features[FEAT_1_ECX] =
-> +            CPUID_EXT_SSE3 | CPUID_EXT_PCLMULQDQ | CPUID_EXT_MONITOR |
-> +            CPUID_EXT_SSSE3 | CPUID_EXT_CX16 | CPUID_EXT_SSE41 |
-> +            CPUID_EXT_SSE42 | CPUID_EXT_X2APIC | CPUID_EXT_MOVBE |
-> +            CPUID_EXT_POPCNT | CPUID_EXT_TSC_DEADLINE_TIMER |
-> +            CPUID_EXT_AES | CPUID_EXT_XSAVE | CPUID_EXT_RDRAND,
-> +        .features[FEAT_8000_0001_EDX] =
-> +            CPUID_EXT2_SYSCALL | CPUID_EXT2_NX | CPUID_EXT2_PDPE1GB |
-> +            CPUID_EXT2_RDTSCP | CPUID_EXT2_LM,
-> +        .features[FEAT_8000_0001_ECX] =
-> +            CPUID_EXT3_LAHF_LM | CPUID_EXT3_3DNOWPREFETCH,
-> +        .features[FEAT_7_0_EBX] =
-> +            CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_SMEP | CPUID_7_0_EBX_ERMS |
-> +            CPUID_7_0_EBX_MPX | CPUID_7_0_EBX_RDSEED | CPUID_7_0_EBX_SMAP |
-> +            CPUID_7_0_EBX_CLFLUSHOPT | CPUID_7_0_EBX_SHA_NI,
-> +        .features[FEAT_7_0_EDX] =
-> +            CPUID_7_0_EDX_SPEC_CTRL | CPUID_7_0_EDX_ARCH_CAPABILITIES |
-> +            CPUID_7_0_EDX_SPEC_CTRL_SSBD,
-> +        /*
-> +         * Missing: XSAVES (not supported by some Linux versions,
-> +         * including v4.1 to v4.12).
-> +         * KVM doesn't yet expose any XSAVES state save component,
-> +         * and the only one defined in Skylake (processor tracing)
-> +         * probably will block migration anyway.
-> +         */
-> +        .features[FEAT_XSAVE] =
-> +            CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XSAVEC | CPUID_XSAVE_XGETBV1,
-> +        .features[FEAT_6_EAX] =
-> +            CPUID_6_EAX_ARAT,
-> +        .xlevel = 0x80000008,
-> +        .model_id = "Intel Atom Processor (Denverton)",
-> +    },
->       {
->           .name = "SnowRidge-Server",
->           .level = 27,
-> --
-> 2.20.1
-> 
-> 
+-- 
+2.20.1
 
 
