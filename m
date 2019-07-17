@@ -7,74 +7,75 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1260CC76186
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 13:51:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9716C76186
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 13:52:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D3BF6208C0
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 13:51:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A6C95208C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 13:52:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AtB0JyaC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D3BF6208C0
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VpcDjBsO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6C95208C0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57423 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57424 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnkLc-0008HX-FG
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 09:51:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57809)
+	id 1hnkLk-0000Q4-8k
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 09:52:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57916)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hnkKf-0004XG-J3
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 09:50:58 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hnkKo-00055b-2u
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 09:51:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hnkKe-00011s-E0
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 09:50:57 -0400
-Received: from mail-wm1-x336.google.com ([2a00:1450:4864:20::336]:53856)
+ (envelope-from <alex.bennee@linaro.org>) id 1hnkKk-0001AO-9K
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 09:51:05 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:34364)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hnkKe-00011F-7K
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 09:50:56 -0400
-Received: by mail-wm1-x336.google.com with SMTP id x15so22257009wmj.3
- for <qemu-devel@nongnu.org>; Wed, 17 Jul 2019 06:50:56 -0700 (PDT)
+ id 1hnkKj-00017Y-P0
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 09:51:01 -0400
+Received: by mail-wm1-x341.google.com with SMTP id w9so19231456wmd.1
+ for <qemu-devel@nongnu.org>; Wed, 17 Jul 2019 06:51:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=RSO5DITZZu7ifSyqioTQb5c3MVCyKp0cisQVozONBJA=;
- b=AtB0JyaCda6TltsaRVl4uiyveUz/np9FIz9Kkze+bxXbieJz09WCSrmb3sc7pcNpTc
- 0rm8YGivuX6mfhNTRmy6HVy2tGWAGj6YwWpVYY2ECunl2g1q8Xv2V1xzCTpBgbmLXZK8
- HXOqk/e5PCKVp4y1yG7pRI5nsnbpkzoQVyah61X4k3Bcr45LiZwmoJKSanYzhbY/IY7r
- +o2qYQxw71pfftvEt8mulujnsdA1bhjML4kxSn6Jkt+IOPtKL6PwwpPahYfHEMOK+Lew
- wITRiG9iBk2J84yakUIbziwbmXNiy6SNR6TJorlr86pXT1nFp3VzdhqikID7wknh57hV
- smiw==
+ bh=FueVvrQyl+4oa+yjvU/y1NHtb38qdErvOQQrhe5Tnk0=;
+ b=VpcDjBsOqJYKhdBQLS0DZMi1MYane0Nl3uIxl/o/JZn4y1P7SkMx6ectxStRknUxgo
+ J7kpeAgqeGL+LOuXiPK3X3Thm6qFymgOzeEJoau10yjia7Ss0enaT64jQwnDEtbA//Ak
+ jFl/e2O+l9f024HdjrJBEq36YFZ2Sw43LYWiRA2p+180Maq1a1h9Axwri5365VUSUdLg
+ yoTQ0fNqG3GFg5DaX69TceTjaQciOclP7b38D9VtThYFslmaGxK+H577kRog7xKek0kA
+ ZRyM9bKfdLkk4I0WQoceU7uSx6vW5M+ToGaaN00iMyISJU8udDcwEbfzZNen7TgfOtmi
+ /ZZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=RSO5DITZZu7ifSyqioTQb5c3MVCyKp0cisQVozONBJA=;
- b=fmnAC4A6l6leBqbvczi+iF+VCmm4F6hjLL2QLblbDIMZiCU2dKo0hQdjJwb8OuzqvW
- Du+vRYRflyVO1y9yCz1A9rYB6DoU6mC5PQSoSaxTkEkBsEtGEXG/jPlH1Nh9cLtNgDH+
- /syIwV1ruTZ3y/KiqEzhJXBLwld/JPSDPGnB4V3xJX8p7s7k/S6KvjiMAIa6g6INRjad
- DF5/XFgZfQzH0tGElNIP4fKzUFxQLF5lZb2w0XOXqMoAqrur56U55+njvtQOyQGW2D83
- zcYnAEfMeUdg7FgPzDpmLQ2IPIh52zwOnmANO6IxjmtotcOa2305QHtsid+a4I7ka5qU
- E/lQ==
-X-Gm-Message-State: APjAAAU75QMHbkW5i2681+ktlpG54+V5rQ9Db8Rjbx0d0jtGEMbXxJ8F
- jGJ4X2hZ6O4pjbeaPC7hBJqYZQ==
-X-Google-Smtp-Source: APXvYqzAFh6mpeaqda2W1x6xaMyniAllARZY7HwIWLgD2WEEq3mvClcd+RbDaX+AFkhN/8P/sAi+7A==
-X-Received: by 2002:a1c:cb0a:: with SMTP id b10mr36500299wmg.41.1563371455051; 
- Wed, 17 Jul 2019 06:50:55 -0700 (PDT)
+ bh=FueVvrQyl+4oa+yjvU/y1NHtb38qdErvOQQrhe5Tnk0=;
+ b=CIbnuKmqNO7H2nVImiC9Eg30qRTdTaWduLHoxGZCgg1wNEqPiDWohT06SZrGp2lkqB
+ xoRwIMqGeJWDJj4Ka1VLjh8w7ksUUoWeh+CYJ5JdxFdL6RTi2ks8vpueo+Q6G3rwBoG5
+ hiFE/O2ycQX9epvOqDZiyPdq/zQOTvm2xXrDVxIn0MsjCJURlOWA28HnZWmN6l6v6t9O
+ 06q1kuq0C4JRWc2zdicoyuE8xSYYvUC7ct7UWkbU2N5IMxKtB7/77ItsPZ2DW1BstTk5
+ 6vevOMKU7wp5ZXjRQz4sier7FiVlHneLRU+WFz2sXSLOKuwbmSfHI5za9nV1oP4YgQT3
+ ozwA==
+X-Gm-Message-State: APjAAAUomd5ihVaXTfGVUyq1uRDOYGYx/7Zj08sD5rFFM/Lq1P+S372J
+ pYmnZMdB4Xvh22oh3t9ZKWee2A==
+X-Google-Smtp-Source: APXvYqxAuNpQRMgB6s6CcB7GC473zDzcnW/Wtodghlc3/oQxIMRVGQu7jNf6/FB13HRigtp9Z75b8A==
+X-Received: by 2002:a05:600c:c6:: with SMTP id
+ u6mr37937523wmm.153.1563371460558; 
+ Wed, 17 Jul 2019 06:51:00 -0700 (PDT)
 Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id s2sm20145925wmj.33.2019.07.17.06.50.52
+ by smtp.gmail.com with ESMTPSA id y12sm2959416wru.30.2019.07.17.06.50.54
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Wed, 17 Jul 2019 06:50:52 -0700 (PDT)
+ Wed, 17 Jul 2019 06:50:56 -0700 (PDT)
 Received: from zen.linaroharston. (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 1F6BA1FF9D;
+ by zen.linaroharston (Postfix) with ESMTP id 807561FFA5;
  Wed, 17 Jul 2019 14:43:37 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Wed, 17 Jul 2019 14:43:26 +0100
-Message-Id: <20190717134335.15351-15-alex.bennee@linaro.org>
+Date: Wed, 17 Jul 2019 14:43:31 +0100
+Message-Id: <20190717134335.15351-20-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190717134335.15351-1-alex.bennee@linaro.org>
 References: <20190717134335.15351-1-alex.bennee@linaro.org>
@@ -83,9 +84,9 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::336
-Subject: [Qemu-devel] [PATCH v2 14/23] buildsys: The NSIS Windows build
- requires qemu-nsis.bmp installed
+X-Received-From: 2a00:1450:4864:20::341
+Subject: [Qemu-devel] [PATCH v2 19/23] tests/docker: invoke the DEBUG shell
+ with --noprofile/--norc
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,67 +98,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
+It's very confusing when things work in the debug shell because the
+environment is different from what the test is running. Fix this by
+ensuring we only have the inherited environment from the run shell.
 
-The qemu-nsis.bmp file was not listed with the other blobs, thus
-not installed in the ${BINDIR} location.
-
-This fixes:
-
-  $ make installer
-  [...]
-  (cd /tmp/qemu-nsis; \
-           for i in qemu-system-*.exe; do \
-             arch=${i%.exe}; \
-             arch=${arch#qemu-system-}; \
-             echo Section \"$arch\" Section_$arch; \
-             echo SetOutPath \"\$INSTDIR\"; \
-             echo File \"\${BINDIR}\\$i\"; \
-             echo SectionEnd; \
-           done \
-          ) >/tmp/qemu-nsis/system-emulations.nsh
-  makensis -V2 -NOCD \
-                  -DCONFIG_DOCUMENTATION="y" \
-                   \
-                  -DBINDIR="/tmp/qemu-nsis" \
-                   \
-                  -DSRCDIR="/home/phil/source/qemu" \
-                  -DOUTFILE="qemu-setup-4.0.90.exe" \
-                  -DDISPLAYVERSION="4.0.90" \
-                  /home/phil/source/qemu/qemu.nsi
-  File: "/tmp/qemu-nsis\*.bmp" -> no files found.
-  Usage: File [/nonfatal] [/a] ([/r] [/x filespec [...]] filespec [...] |
-     /oname=outfile one_file_only)
-  Error in script "/home/phil/source/qemu/qemu.nsi" on line 122 -- aborting creation process
-  Makefile:1077: recipe for target 'qemu-setup-4.0.90.exe' failed
-  make: *** [qemu-setup-4.0.90.exe] Error 1
-
-Fixes: https://bugs.launchpad.net/bugs/1836453
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20190715174817.18981-8-philmd@redhat.com>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- Makefile | 1 +
- 1 file changed, 1 insertion(+)
+ tests/docker/run | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index 5a462629370..f3866ee084c 100644
---- a/Makefile
-+++ b/Makefile
-@@ -762,6 +762,7 @@ pxe-pcnet.rom pxe-rtl8139.rom pxe-virtio.rom \
- efi-e1000.rom efi-eepro100.rom efi-ne2k_pci.rom \
- efi-pcnet.rom efi-rtl8139.rom efi-virtio.rom \
- efi-e1000e.rom efi-vmxnet3.rom \
-+qemu-nsis.bmp \
- bamboo.dtb canyonlands.dtb petalogix-s3adsp1800.dtb petalogix-ml605.dtb \
- multiboot.bin linuxboot.bin linuxboot_dma.bin kvmvapic.bin pvh.bin \
- s390-ccw.img s390-netboot.img \
+diff --git a/tests/docker/run b/tests/docker/run
+index 7aebf4b5698..1014871fec0 100755
+--- a/tests/docker/run
++++ b/tests/docker/run
+@@ -62,7 +62,7 @@ echo "* Prepared to run command:"
+ echo "  $CMD"
+ echo "* Hit Ctrl-D to continue, or type 'exit 1' to abort"
+ echo
+-$SHELL
++$SHELL --noprofile --norc
+ 
+ if "$CMD"; then
+     exit 0
+@@ -72,7 +72,7 @@ elif test -n "$DEBUG"; then
+     echo "* Hit Ctrl-D to exit"
+     echo
+     # Force error after shell exits
+-    $SHELL && exit 1
++    $SHELL --noprofile --norc && exit 1
+ else
+     exit 1
+ fi
 -- 
 2.20.1
 
