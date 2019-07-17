@@ -2,90 +2,67 @@ Return-Path: <SRS0=PWhW=VO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1224C76186
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 05:21:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67CB9C76186
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 05:37:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8C1B8208C0
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 05:21:42 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="ZcSMLAkG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C1B8208C0
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
+	by mail.kernel.org (Postfix) with ESMTPS id 20D072173E
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 05:37:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20D072173E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54102 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54136 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hncNp-00037e-Q2
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 01:21:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44375)
+	id 1hncdB-0007nn-4K
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 01:37:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49061)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <chihmin.chao@sifive.com>) id 1hncNZ-0002Um-GG
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 01:21:28 -0400
+ (envelope-from <no-reply@patchew.org>) id 1hnccy-0007PQ-VT
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 01:37:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <chihmin.chao@sifive.com>) id 1hncNW-0008JF-NO
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 01:21:25 -0400
-Received: from mail-wr1-x42c.google.com ([2a00:1450:4864:20::42c]:34178)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <chihmin.chao@sifive.com>)
- id 1hncNW-0008Hx-AJ
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 01:21:22 -0400
-Received: by mail-wr1-x42c.google.com with SMTP id 31so23285385wrm.1
- for <qemu-devel@nongnu.org>; Tue, 16 Jul 2019 22:21:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=PCImjgRifn1SwvlGL4zX8B1ThX4Nq2Y5ZjmlRwejJc4=;
- b=ZcSMLAkGw9vXo9BtPe4q5fsJziHFRvnelcEGMKvebb9mX2lmiNYbBaZ/+UGb3MqCI8
- lQFFUbeiHWKtkj/v3L2QCyUgSp+oY25pIKCcS8/elqO3BYndCffMKw7WwO4CLzXyvxXn
- 7slqbdxfCfDnHcd8qs+drujtJOzoLqr61XQdcglI1iV8iI97M6Y182tJltBJkaSQSKNC
- lvtou4KE01rixxyrYJz1JfvXdNQWmDjEKs7cFAxSzWnpGmX6SFRqMjlUqnpvMA/E+pOh
- IG+4OfOqBJFpr7hcO2/hSAxPy0YWS8EZ5LJNr4PnoznPaU39dMyFJ/xLMLttEnhzCccR
- H+/A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=PCImjgRifn1SwvlGL4zX8B1ThX4Nq2Y5ZjmlRwejJc4=;
- b=kHHCmd8wWDVxI4ljJmGc8sILcLVlNwFOPPjdJGiFxDK2so0FZ70HG//Z8sxE1WG9ls
- d3jhcIGV+4bzwFqRMm7iWx8JUc6kzgI/85HdiSGftE8Z8gVMUIhI2gO67h77bSoGztMK
- 13W1DdtqR9HqGbzHPtWDF3XOYg98fmRgR86ds6tZv2Mdo12HWMHG+ZGZa4/Wj4zQKt4Q
- b/pZkw79HZ3H2l2i1RZFbLhIrS0AUhL7bDgtn+DNCuoTV7CYGhSauaO6+VQlN+Tlz7mj
- hJlw7zZIDsabOJgGT0psj3sXsJ6UuyCazyK2Giknx355x8BM01enQAR5IvPTPve4kFed
- a/cg==
-X-Gm-Message-State: APjAAAVpli3WJX1o/583LPei+fTF4hN/Sy9NHCeWwmwWm9j8w0Qs7xGQ
- 9L9h508lxBA9IFaKGqmju28lrvQd0z12vG9wxQRDOQ==
-X-Google-Smtp-Source: APXvYqw8irZ3ilOI07OTOdfPjxrOuMagT6v8TvaXAK4Kvqd9yPhhc4fwAa/1hBP3RIlnrHu7Bqk9AcDSzqr0CmSDXiQ=
-X-Received: by 2002:adf:ecd0:: with SMTP id s16mr39619637wro.324.1563340880285; 
- Tue, 16 Jul 2019 22:21:20 -0700 (PDT)
+ (envelope-from <no-reply@patchew.org>) id 1hnccx-0003AU-1T
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 01:37:20 -0400
+Resent-Date: Wed, 17 Jul 2019 01:37:20 -0400
+Resent-Message-Id: <E1hnccx-0003AU-1T@eggs.gnu.org>
+Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21570)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1hnccw-00039e-PZ
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 01:37:18 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1563341815; cv=none; d=zoho.com; s=zohoarc; 
+ b=iRa7ce6hO9dCK4vc2RQOuevXi2AVzvVGDhxvlaOopO7DyhbhYfZOe8FWV+JSIydnMpK1xSgJrIS90fKa8BHfIlkdKu+Dknd279dprGvnZX7hjTsEeD2UCWCeo5zHMfjNrizMXxvyGVIhVOlM8/K/vTmXieKrpBD72wtKwgEuJR4=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1563341815;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+ bh=EOUtP8JbnkGTpnKiYGjKlapOPNjbEFzyITfttNfoHfY=; 
+ b=XzqNgzNaJlO9SfNnFbDs8yS6ECy/syKTg/fiDMvBa/j4rrlq3/+LOQZ2Mvt7358AGRPrGuNVL76Q+17EtQa3sSjnrmHXMPAAUtQ6LeIs0FClCUb9gdCm2pmELCJ3IYkJMl0wJTxZlLNALwvJ1FyZkqnXhopZDpk2mnTZ+0kYpAM=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 156334181365294.95769293115814;
+ Tue, 16 Jul 2019 22:36:53 -0700 (PDT)
+Message-ID: <156334181186.10055.10039515189156496544@c4a48874b076>
+In-Reply-To: <1563261042-15974-1-git-send-email-yan.y.zhao@intel.com>
 MIME-Version: 1.0
-References: <1563181721-5055-1-git-send-email-chihmin.chao@sifive.com>
- <93b35a5e-c40a-535b-2a91-2c210b4a5928@redhat.com>
- <CAEiOBXXxS-93rTAQuvY_Tkxi1pYc1YfJenpBC_8gG2ou9uUZMg@mail.gmail.com>
- <7eb239bc-32aa-b5fc-ab2e-a741b005aad7@redhat.com>
- <CAKmqyKOZSz4f1-kLDhn=+imCvKHcZJVgqgqWbQ6qxD3K1n17GA@mail.gmail.com>
- <CAEiOBXUBPFx5__wOLvLD0qQ7dzV2XVpHfiOoBZpXpu-SZsMiUg@mail.gmail.com>
- <CAKmqyKNOiRYqZgiWT+LUKkOv+Bew3djOqc9vHpmSqZ-1Gfjd8Q@mail.gmail.com>
- <d2c7e6c6-4d4a-d47e-e496-4f4cfe466fe1@redhat.com>
- <CAKmqyKPiDHrPVuz2P1n9_j170k2bSm=7uDKrQg-fAUhL1FQm9g@mail.gmail.com>
-In-Reply-To: <CAKmqyKPiDHrPVuz2P1n9_j170k2bSm=7uDKrQg-fAUhL1FQm9g@mail.gmail.com>
-From: Chih-Min Chao <chihmin.chao@sifive.com>
-Date: Wed, 17 Jul 2019 13:21:07 +0800
-Message-ID: <CAEiOBXUXdyntjnt-bi9-wiO2mmpgVC8WpD9KnxWoDdP__71XXQ@mail.gmail.com>
-To: Alistair Francis <alistair23@gmail.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::42c
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: Re: [Qemu-devel] [PATCH v2] tests/boot_linux_console: add a test
- for riscv64 + virt
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: yan.y.zhao@intel.com
+Date: Tue, 16 Jul 2019 22:36:53 -0700 (PDT)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 136.143.188.55
+Subject: Re: [Qemu-devel] [PATCH] migration: notify runstate immediately
+ before vcpu stops
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,313 +74,215 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Cornelia Huck <cohuck@redhat.com>,
- "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Eduardo Habkost <ehabkost@redhat.com>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- Alistair Francis <alistair@alistair23.me>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Cleber Rosa <crosa@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: kevin.tian@intel.com, yan.y.zhao@intel.com, crosthwaite.peter@gmail.com,
+ cohuck@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com,
+ quintela@redhat.com, alex.williamson@redhat.com, pbonzini@redhat.com,
+ rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jul 17, 2019 at 6:59 AM Alistair Francis <alistair23@gmail.com>
-wrote:
-
-> On Tue, Jul 16, 2019 at 2:50 PM Philippe Mathieu-Daud=C3=A9
-> <philmd@redhat.com> wrote:
-> >
-> > On 7/16/19 10:43 PM, Alistair Francis wrote:
-> > > On Tue, Jul 16, 2019 at 6:56 AM Chih-Min Chao <chihmin.chao@sifive.co=
-m>
-> wrote:
-> > >>
-> > >>
-> > >> On Tue, Jul 16, 2019 at 12:34 AM Alistair Francis <
-> alistair23@gmail.com> wrote:
-> > >>>
-> > >>> On Mon, Jul 15, 2019 at 6:02 AM Philippe Mathieu-Daud=C3=A9
-> > >>> <philmd@redhat.com> wrote:
-> > >>>>
-> > >>>> On 7/15/19 1:09 PM, Chih-Min Chao wrote:
-> > >>>>> On Mon, Jul 15, 2019 at 5:15 PM Philippe Mathieu-Daud=C3=A9
-> > >>>>> <philmd@redhat.com <mailto:philmd@redhat.com>> wrote:
-> > >>>>>
-> > >>>>>     On 7/15/19 11:08 AM, Chih-Min Chao wrote:
-> > >>>>>     > Similar to the mips + malta test, it boots a Linux kernel o=
-n
-> a virt
-> > >>>>>     > board and verify the serial is working.  Also, it relies on
-> the serial
-> > >>>>>     > device set by the machine itself.
-> > >>>>>     >
-> > >>>>>     > If riscv64 is a target being built, "make check-acceptance"
-> will
-> > >>>>>     > automatically include this test by the use of the
-> "arch:riscv64" tags.
-> > >>>>>     >
-> > >>>>>     > Alternatively, this test can be run using:
-> > >>>>>     >
-> > >>>>>     >   $ avocado run -t arch:riscv64 tests/acceptance
-> > >>>>>     >
-> > >>>>>     > packages
-> > >>>>>     >   debian official
-> > >>>>>     >     binutils-riscv64-linux-gnu_2.32-8
-> > >>>>>     >     opensbi_0.4-1_all
-> > >>>>>     >     linux-image-4.19.0-5-riscv64 4.19.37-4
-> > >>>>>     >   third-party
-> > >>>>>     >
-> > >>>>>
-> https://github.com/groeck/linux-build-test/rootfs/riscv64/rootfs.cpio.gz
-> > >>>>>     >     (the repo is also used in mips target acceptance)
-> > >>>>>     >
-> > >>>>>     > Signed-off-by: Chih-Min Chao <chihmin.chao@sifive.com
-> > >>>>>     <mailto:chihmin.chao@sifive.com>>
-> > >>>>>     > ---
-> > >>>>>     >  .travis.yml                            |  2 +-
-> > >>>>>     >  tests/acceptance/boot_linux_console.py | 66
-> > >>>>>     ++++++++++++++++++++++++++++++++++
-> > >>>>>     >  2 files changed, 67 insertions(+), 1 deletion(-)
-> > >>>>>     >
-> > >>>>>     > diff --git a/.travis.yml b/.travis.yml
-> > >>>>>     > index 5d3d6ee..21fcead 100644
-> > >>>>>     > --- a/.travis.yml
-> > >>>>>     > +++ b/.travis.yml
-> > >>>>>     > @@ -232,7 +232,7 @@ matrix:
-> > >>>>>     >
-> > >>>>>     >      # Acceptance (Functional) tests
-> > >>>>>     >      - env:
-> > >>>>>     > -        - CONFIG=3D"--python=3D/usr/bin/python3
-> > >>>>>
->  --target-list=3Dx86_64-softmmu,mips-softmmu,mips64el-softmmu,aarch64-sof=
-tmmu,arm-softmmu,s390x-softmmu,alpha-softmmu"
-> > >>>>>     > +        - CONFIG=3D"--python=3D/usr/bin/python3
-> > >>>>>
->  --target-list=3Dx86_64-softmmu,mips-softmmu,mips64el-softmmu,aarch64-sof=
-tmmu,arm-softmmu,s390x-softmmu,alpha-softmmu,riscv64-softmmu"
-> > >>>>>     >          - TEST_CMD=3D"make check-acceptance"
-> > >>>>>     >        after_failure:
-> > >>>>>     >          - cat tests/results/latest/job.log
-> > >>>>>     > diff --git a/tests/acceptance/boot_linux_console.py
-> > >>>>>     b/tests/acceptance/boot_linux_console.py
-> > >>>>>     > index 3215950..0f638bc 100644
-> > >>>>>     > --- a/tests/acceptance/boot_linux_console.py
-> > >>>>>     > +++ b/tests/acceptance/boot_linux_console.py
-> > >>>>>     > @@ -354,3 +354,69 @@ class BootLinuxConsole(Test):
-> > >>>>>     >          self.vm.launch()
-> > >>>>>     >          console_pattern =3D 'Kernel command line: %s' %
-> > >>>>>     kernel_command_line
-> > >>>>>     >          self.wait_for_console_pattern(console_pattern)
-> > >>>>>     > +
-> > >>>>>     > +    def test_riscv64_virt(self):
-> > >>>>>     > +        """
-> > >>>>>     > +        :avocado: tags=3Darch:riscv64
-> > >>>>>     > +        :avocado: tags=3Dmachine:virt
-> > >>>>>     > +        """
-> > >>>>>     > +        deb_url =3D ('
-> https://snapshot.debian.org/archive/debian/'
-> > >>>>>     > +
->  '20190424T171759Z/pool/main/b/binutils/'
-> > >>>>>     > +
-> > >>>>>      'binutils-riscv64-linux-gnu_2.32-8_amd64.deb')
-> > >>>>>     > +        deb_hash =3D
-> ('7fe376fd4452696c03acd508d6d613ca553ea15e')
-> > >>>>>     > +        deb_path =3D self.fetch_asset(deb_url,
-> asset_hash=3Ddeb_hash)
-> > >>>>>     > +        objcopy_path =3D '/usr/bin/riscv64-linux-gnu-objco=
-py'
-> > >>>>>     > +        objcopy_path =3D self.extract_from_deb(deb_path,
-> objcopy_path)
-> > >>>>>     > +        libbfd_path =3D
-> > >>>>>     '/usr/lib/x86_64-linux-gnu/libbfd-2.32-riscv64.so
-> > >>>>>     <http://libbfd-2.32-riscv64.so>'
-> > >>>>>     > +        libbfd_path =3D self.extract_from_deb(deb_path,
-> libbfd_path)
-> > >>>>>     > +        process.run('ls -al %s' % (objcopy_path))
-> > >>>>>     > +
-> > >>>>>     > +        deb_url =3D ('
-> https://snapshot.debian.org/archive/debian/'
-> > >>>>>     > +                   '20190708T032337Z/pool/main/o/opensbi/'
-> > >>>>>     > +                   'opensbi_0.4-1_all.deb')
-> > >>>>>     > +        deb_hash =3D
-> ('2319dcd702958291d323acf5649fd98a11d90112')
-> > >>>>>     > +        deb_path =3D self.fetch_asset(deb_url,
-> asset_hash=3Ddeb_hash)
-> > >>>>>     > +        opensbi_path =3D
-> ('/usr/lib/riscv64-linux-gnu/opensbi/'
-> > >>>>>     > +                        'qemu/virt/fw_jump.elf')
-> > >>>>>     > +        opensbi_path =3D self.extract_from_deb(deb_path,
-> opensbi_path)
-> > >>>>>     > +
-> > >>>>>     > +        deb_url =3D
-> > >>>>>     ('https://snapshot.debian.org/archive/debian-ports/'
-> > >>>>>     > +
->  '20190620T095935Z/pool-riscv64/main/l/linux/'
-> > >>>>>     > +
-> > >>>>>      'linux-image-4.19.0-5-riscv64_4.19.37-4_riscv64.deb')
-> > >>>>>     > +        deb_hash =3D
-> ('bf5b5680c41d92134d22caef4fbd277c5217e1f0')
-> > >>>>>     > +        deb_path =3D self.fetch_asset(deb_url,
-> asset_hash=3Ddeb_hash)
-> > >>>>>     > +        kernel_path =3D '/boot/vmlinux-4.19.0-5-riscv64'
-> > >>>>>     > +        kernel_path =3D self.extract_from_deb(deb_path,
-> kernel_path)
-> > >>>>>     > +        kimage_path =3D self.workdir + "/Image"
-> > >>>>>     > +        env =3D os.environ
-> > >>>>>     > +        env['LD_LIBRARY_PATH'] =3D ('%s:' %
-> > >>>>>     (os.path.dirname(libbfd_path)) +
-> > >>>>>     > +                                 env.get('LD_LIBRARY_PATH'=
-,
-> ''))
-> > >>>>>     > +        process.run(('%s -O binary -O binary -R'
-> > >>>>>     > +                     '.note -R .note.gnu.build-id -R
-> .comment -S
-> > >>>>>     %s %s') %
-> > >>>>>     > +                     (objcopy_path, kernel_path,
-> kimage_path))
-> > >>>>>
-> > >>>>>     Please explain why you need to do that...
-> > >>>>>
-> > >>>>>     Also note these tests are run on other host architecture than
-> x86, at
-> > >>>>>     least ppc64/s390x (so this won't work there).
-> > >>>>>
-> > >>>>> it is because riscv64 vmlinux doesn't have physical loading addre=
-ss
-> > >>>>> information and
-> > >>>>> depends on certain stage bootloader to move kernel raw data to
-> specific
-> > >>>>> physical address (0x8020_0000)
-> > >>>>>
-> > >>>>> The vmlinux program headers are
-> > >>>>>   Type             Offset       VirtAddr                  PhysAdd=
-r
-> > >>>>>     FileSiz  MemSiz   Flg Align
-> > >>>>>   LOAD           0x001000 0xffffffe000000000 0x0000000000000000
-> 0x0303a6
-> > >>>>> 0x0303a6 R E 0x1000
-> > >>>>>   LOAD           0x032000 0xffffffe000031000 0x0000000000031000
-> 0x828f0c
-> > >>>>> 0x828f0c RWE 0x1000
-> > >>>>>   NOTE           0x85aec0 0xffffffe000859ec0 0x0000000000859ec0
-> 0x00004c
-> > >>>>> 0x00004c R   0x4
-> > >>>>>
-> > >>>>> For legacy bootloader, bbl, It can handle payload in ELF format.
-> > >>>>> However, for the newer OpenSBI, it can only handle raw data and
-> > >>>>> debian doesn't provide linux image in raw data format.
-> > >>>
-> > >>> This doesn't sound right. You should just be able to say -kernel
-> > >>> <anything> and it should work. It has worked for me with vmlinux an=
-d
-> > >>> Image files when using master (not the 4.0 release but master/4.1).
-> > >>> Although all of my testing was with the 5.1 kernel, so maybe there =
-is
-> > >>> a difference there?
-> > >>>
-> > >>> What isn't working for you? Can you include the errors and output o=
-f
-> -d in_asm?
-> > >>>
-> > >>>
-> > >>> Alistair
-> > >>
-> > >>
-> > >> Hi Alistair,
-> > >>    I have come across error before starting target simulation.  What
-> I means is to execute
-> > >>             qemu-system-riscv64 -M virt -m 256M -nographic -bios
-> ./opensbi/build/platform/qemu/virt/firmware/fw_jump.elf -kernel vmlinux
-> > >>    then get the error message
-> > >>             rom: requested regions overlap (rom mrom.reset.
-> free=3D0x000000000001eb7c, addr=3D0x0000000000001000)
-> > >>             qemu-system-riscv64: rom check and register reset failed
-> > >
-> > > Hmmm.... I don't remember seeing this problem in my testing, but it
-> > > does seem to make sense.
-> > >
-> > > We have two options here:
-> > > 1. Use the Image file from Linux 5.0+ (my preferred option as 4.19 is
-> > > getting old)
->
- I choose 4.19 version rather than 5.0+  because 4.19 is stable branch
-maintained by Greg.
- But it is ok to use 5.0 trunk, the latest version provided by debian.
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTYzMjYxMDQyLTE1OTc0LTEt
+Z2l0LXNlbmQtZW1haWwteWFuLnkuemhhb0BpbnRlbC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMg
+ZmFpbGVkIHRoZSBhc2FuIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5nIGNvbW1h
+bmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0YWxsZWQs
+IHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBTQ1JJUFQg
+QkVHSU4gPT09CiMhL2Jpbi9iYXNoCm1ha2UgZG9ja2VyLWltYWdlLWZlZG9yYSBWPTEgTkVUV09S
+Sz0xCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1kZWJ1Z0BmZWRvcmEgVEFSR0VUX0xJU1Q9eDg2XzY0
+LXNvZnRtbXUgSj0xNCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClBBU1MgMSBm
+ZGMtdGVzdCAveDg2XzY0L2ZkYy9jbW9zClBBU1MgMiBmZGMtdGVzdCAveDg2XzY0L2ZkYy9ub19t
+ZWRpYV9vbl9zdGFydApQQVNTIDMgZmRjLXRlc3QgL3g4Nl82NC9mZGMvcmVhZF93aXRob3V0X21l
+ZGlhCj09Nzg1Mj09V0FSTklORzogQVNhbiBkb2Vzbid0IGZ1bGx5IHN1cHBvcnQgbWFrZWNvbnRl
+eHQvc3dhcGNvbnRleHQgZnVuY3Rpb25zIGFuZCBtYXkgcHJvZHVjZSBmYWxzZSBwb3NpdGl2ZXMg
+aW4gc29tZSBjYXNlcyEKUEFTUyA0IGZkYy10ZXN0IC94ODZfNjQvZmRjL21lZGlhX2NoYW5nZQpQ
+QVNTIDUgZmRjLXRlc3QgL3g4Nl82NC9mZGMvc2Vuc2VfaW50ZXJydXB0ClBBU1MgNiBmZGMtdGVz
+dCAveDg2XzY0L2ZkYy9yZWxhdGl2ZV9zZWVrCi0tLQpQQVNTIDMyIHRlc3Qtb3B0cy12aXNpdG9y
+IC92aXNpdG9yL29wdHMvcmFuZ2UvYmV5b25kClBBU1MgMzMgdGVzdC1vcHRzLXZpc2l0b3IgL3Zp
+c2l0b3Ivb3B0cy9kaWN0L3VudmlzaXRlZApNQUxMT0NfUEVSVFVSQl89JHtNQUxMT0NfUEVSVFVS
+Ql86LSQoKCAke1JBTkRPTTotMH0gJSAyNTUgKyAxKSl9ICB0ZXN0cy90ZXN0LWNvcm91dGluZSAt
+bT1xdWljayAtayAtLXRhcCA8IC9kZXYvbnVsbCB8IC4vc2NyaXB0cy90YXAtZHJpdmVyLnBsIC0t
+dGVzdC1uYW1lPSJ0ZXN0LWNvcm91dGluZSIgCj09Nzg4Mj09V0FSTklORzogQVNhbiBkb2Vzbid0
+IGZ1bGx5IHN1cHBvcnQgbWFrZWNvbnRleHQvc3dhcGNvbnRleHQgZnVuY3Rpb25zIGFuZCBtYXkg
+cHJvZHVjZSBmYWxzZSBwb3NpdGl2ZXMgaW4gc29tZSBjYXNlcyEKPT03ODgyPT1XQVJOSU5HOiBB
+U2FuIGlzIGlnbm9yaW5nIHJlcXVlc3RlZCBfX2FzYW5faGFuZGxlX25vX3JldHVybjogc3RhY2sg
+dG9wOiAweDdmZmZlOTAzZTAwMDsgYm90dG9tIDB4N2ZkYjY5MmY4MDAwOyBzaXplOiAweDAwMjQ3
+ZmQ0NjAwMCAoMTU2NzYzNDQ3Mjk2KQpGYWxzZSBwb3NpdGl2ZSBlcnJvciByZXBvcnRzIG1heSBm
+b2xsb3cKRm9yIGRldGFpbHMgc2VlIGh0dHBzOi8vZ2l0aHViLmNvbS9nb29nbGUvc2FuaXRpemVy
+cy9pc3N1ZXMvMTg5ClBBU1MgMSB0ZXN0LWNvcm91dGluZSAvYmFzaWMvbm8tZGFuZ2xpbmctYWNj
+ZXNzCi0tLQpQQVNTIDEzIHRlc3QtYWlvIC9haW8vZXZlbnQvd2FpdC9uby1mbHVzaC1jYgpQQVNT
+IDEyIGZkYy10ZXN0IC94ODZfNjQvZmRjL3JlYWRfbm9fZG1hXzE5ClBBU1MgMTMgZmRjLXRlc3Qg
+L3g4Nl82NC9mZGMvZnV6ei1yZWdpc3RlcnMKPT03OTAxPT1XQVJOSU5HOiBBU2FuIGRvZXNuJ3Qg
+ZnVsbHkgc3VwcG9ydCBtYWtlY29udGV4dC9zd2FwY29udGV4dCBmdW5jdGlvbnMgYW5kIG1heSBw
+cm9kdWNlIGZhbHNlIHBvc2l0aXZlcyBpbiBzb21lIGNhc2VzIQpQQVNTIDE0IHRlc3QtYWlvIC9h
+aW8vdGltZXIvc2NoZWR1bGUKUEFTUyAxNSB0ZXN0LWFpbyAvYWlvL2Nvcm91dGluZS9xdWV1ZS1j
+aGFpbmluZwpQQVNTIDE2IHRlc3QtYWlvIC9haW8tZ3NvdXJjZS9mbHVzaAotLS0KUEFTUyAyNiB0
+ZXN0LWFpbyAvYWlvLWdzb3VyY2UvZXZlbnQvZmx1c2gKUEFTUyAyNyB0ZXN0LWFpbyAvYWlvLWdz
+b3VyY2UvZXZlbnQvd2FpdC9uby1mbHVzaC1jYgpNQUxMT0NfUEVSVFVSQl89JHtNQUxMT0NfUEVS
+VFVSQl86LSQoKCAke1JBTkRPTTotMH0gJSAyNTUgKyAxKSl9ICBRVEVTVF9RRU1VX0JJTkFSWT14
+ODZfNjQtc29mdG1tdS9xZW11LXN5c3RlbS14ODZfNjQgUVRFU1RfUUVNVV9JTUc9cWVtdS1pbWcg
+dGVzdHMvaWRlLXRlc3QgLW09cXVpY2sgLWsgLS10YXAgPCAvZGV2L251bGwgfCAuL3NjcmlwdHMv
+dGFwLWRyaXZlci5wbCAtLXRlc3QtbmFtZT0iaWRlLXRlc3QiIAo9PTc5MTA9PVdBUk5JTkc6IEFT
+YW4gZG9lc24ndCBmdWxseSBzdXBwb3J0IG1ha2Vjb250ZXh0L3N3YXBjb250ZXh0IGZ1bmN0aW9u
+cyBhbmQgbWF5IHByb2R1Y2UgZmFsc2UgcG9zaXRpdmVzIGluIHNvbWUgY2FzZXMhClBBU1MgMjgg
+dGVzdC1haW8gL2Fpby1nc291cmNlL3RpbWVyL3NjaGVkdWxlClBBU1MgMSBpZGUtdGVzdCAveDg2
+XzY0L2lkZS9pZGVudGlmeQpNQUxMT0NfUEVSVFVSQl89JHtNQUxMT0NfUEVSVFVSQl86LSQoKCAk
+e1JBTkRPTTotMH0gJSAyNTUgKyAxKSl9ICB0ZXN0cy90ZXN0LWFpby1tdWx0aXRocmVhZCAtbT1x
+dWljayAtayAtLXRhcCA8IC9kZXYvbnVsbCB8IC4vc2NyaXB0cy90YXAtZHJpdmVyLnBsIC0tdGVz
+dC1uYW1lPSJ0ZXN0LWFpby1tdWx0aXRocmVhZCIgCj09NzkxNz09V0FSTklORzogQVNhbiBkb2Vz
+bid0IGZ1bGx5IHN1cHBvcnQgbWFrZWNvbnRleHQvc3dhcGNvbnRleHQgZnVuY3Rpb25zIGFuZCBt
+YXkgcHJvZHVjZSBmYWxzZSBwb3NpdGl2ZXMgaW4gc29tZSBjYXNlcyEKPT03OTE5PT1XQVJOSU5H
+OiBBU2FuIGRvZXNuJ3QgZnVsbHkgc3VwcG9ydCBtYWtlY29udGV4dC9zd2FwY29udGV4dCBmdW5j
+dGlvbnMgYW5kIG1heSBwcm9kdWNlIGZhbHNlIHBvc2l0aXZlcyBpbiBzb21lIGNhc2VzIQpQQVNT
+IDEgdGVzdC1haW8tbXVsdGl0aHJlYWQgL2Fpby9tdWx0aS9saWZlY3ljbGUKUEFTUyAyIGlkZS10
+ZXN0IC94ODZfNjQvaWRlL2ZsdXNoClBBU1MgMiB0ZXN0LWFpby1tdWx0aXRocmVhZCAvYWlvL211
+bHRpL3NjaGVkdWxlCj09NzkzNz09V0FSTklORzogQVNhbiBkb2Vzbid0IGZ1bGx5IHN1cHBvcnQg
+bWFrZWNvbnRleHQvc3dhcGNvbnRleHQgZnVuY3Rpb25zIGFuZCBtYXkgcHJvZHVjZSBmYWxzZSBw
+b3NpdGl2ZXMgaW4gc29tZSBjYXNlcyEKUEFTUyAzIGlkZS10ZXN0IC94ODZfNjQvaWRlL2JtZG1h
+L3NpbXBsZV9ydwpQQVNTIDMgdGVzdC1haW8tbXVsdGl0aHJlYWQgL2Fpby9tdWx0aS9tdXRleC9j
+b250ZW5kZWQKPT03OTQ4PT1XQVJOSU5HOiBBU2FuIGRvZXNuJ3QgZnVsbHkgc3VwcG9ydCBtYWtl
+Y29udGV4dC9zd2FwY29udGV4dCBmdW5jdGlvbnMgYW5kIG1heSBwcm9kdWNlIGZhbHNlIHBvc2l0
+aXZlcyBpbiBzb21lIGNhc2VzIQpQQVNTIDQgaWRlLXRlc3QgL3g4Nl82NC9pZGUvYm1kbWEvdHJp
+bQo9PTc5NTk9PVdBUk5JTkc6IEFTYW4gZG9lc24ndCBmdWxseSBzdXBwb3J0IG1ha2Vjb250ZXh0
+L3N3YXBjb250ZXh0IGZ1bmN0aW9ucyBhbmQgbWF5IHByb2R1Y2UgZmFsc2UgcG9zaXRpdmVzIGlu
+IHNvbWUgY2FzZXMhClBBU1MgNSBpZGUtdGVzdCAveDg2XzY0L2lkZS9ibWRtYS9zaG9ydF9wcmR0
+Cj09Nzk2NT09V0FSTklORzogQVNhbiBkb2Vzbid0IGZ1bGx5IHN1cHBvcnQgbWFrZWNvbnRleHQv
+c3dhcGNvbnRleHQgZnVuY3Rpb25zIGFuZCBtYXkgcHJvZHVjZSBmYWxzZSBwb3NpdGl2ZXMgaW4g
+c29tZSBjYXNlcyEKUEFTUyA0IHRlc3QtYWlvLW11bHRpdGhyZWFkIC9haW8vbXVsdGkvbXV0ZXgv
+aGFuZG9mZgpQQVNTIDYgaWRlLXRlc3QgL3g4Nl82NC9pZGUvYm1kbWEvb25lX3NlY3Rvcl9zaG9y
+dF9wcmR0ClBBU1MgNSB0ZXN0LWFpby1tdWx0aXRocmVhZCAvYWlvL211bHRpL211dGV4L21jcwo9
+PTc5NzY9PVdBUk5JTkc6IEFTYW4gZG9lc24ndCBmdWxseSBzdXBwb3J0IG1ha2Vjb250ZXh0L3N3
+YXBjb250ZXh0IGZ1bmN0aW9ucyBhbmQgbWF5IHByb2R1Y2UgZmFsc2UgcG9zaXRpdmVzIGluIHNv
+bWUgY2FzZXMhClBBU1MgNyBpZGUtdGVzdCAveDg2XzY0L2lkZS9ibWRtYS9sb25nX3ByZHQKUEFT
+UyA2IHRlc3QtYWlvLW11bHRpdGhyZWFkIC9haW8vbXVsdGkvbXV0ZXgvcHRocmVhZApNQUxMT0Nf
+UEVSVFVSQl89JHtNQUxMT0NfUEVSVFVSQl86LSQoKCAke1JBTkRPTTotMH0gJSAyNTUgKyAxKSl9
+ICB0ZXN0cy90ZXN0LXRocm90dGxlIC1tPXF1aWNrIC1rIC0tdGFwIDwgL2Rldi9udWxsIHwgLi9z
+Y3JpcHRzL3RhcC1kcml2ZXIucGwgLS10ZXN0LW5hbWU9InRlc3QtdGhyb3R0bGUiIAo9PTc5ODg9
+PVdBUk5JTkc6IEFTYW4gZG9lc24ndCBmdWxseSBzdXBwb3J0IG1ha2Vjb250ZXh0L3N3YXBjb250
+ZXh0IGZ1bmN0aW9ucyBhbmQgbWF5IHByb2R1Y2UgZmFsc2UgcG9zaXRpdmVzIGluIHNvbWUgY2Fz
+ZXMhCj09Nzk5ND09V0FSTklORzogQVNhbiBkb2Vzbid0IGZ1bGx5IHN1cHBvcnQgbWFrZWNvbnRl
+eHQvc3dhcGNvbnRleHQgZnVuY3Rpb25zIGFuZCBtYXkgcHJvZHVjZSBmYWxzZSBwb3NpdGl2ZXMg
+aW4gc29tZSBjYXNlcyEKUEFTUyAxIHRlc3QtdGhyb3R0bGUgL3Rocm90dGxlL2xlYWtfYnVja2V0
+ClBBU1MgMiB0ZXN0LXRocm90dGxlIC90aHJvdHRsZS9jb21wdXRlX3dhaXQKUEFTUyAzIHRlc3Qt
+dGhyb3R0bGUgL3Rocm90dGxlL2luaXQKLS0tClBBU1MgMTMgdGVzdC10aHJvdHRsZSAvdGhyb3R0
+bGUvY29uZmlnL3JhbmdlcwpQQVNTIDE0IHRlc3QtdGhyb3R0bGUgL3Rocm90dGxlL2NvbmZpZy9t
+YXgKUEFTUyAxNSB0ZXN0LXRocm90dGxlIC90aHJvdHRsZS9jb25maWcvaW9wc19zaXplCj09Nzk4
+OD09V0FSTklORzogQVNhbiBpcyBpZ25vcmluZyByZXF1ZXN0ZWQgX19hc2FuX2hhbmRsZV9ub19y
+ZXR1cm46IHN0YWNrIHRvcDogMHg3ZmZkYWIzNTQwMDA7IGJvdHRvbSAweDdmYWI2YzlhYTAwMDsg
+c2l6ZTogMHgwMDUyM2U5YWEwMDAgKDM1MzIzNzYzOTE2OCkKRmFsc2UgcG9zaXRpdmUgZXJyb3Ig
+cmVwb3J0cyBtYXkgZm9sbG93CkZvciBkZXRhaWxzIHNlZSBodHRwczovL2dpdGh1Yi5jb20vZ29v
+Z2xlL3Nhbml0aXplcnMvaXNzdWVzLzE4OQpNQUxMT0NfUEVSVFVSQl89JHtNQUxMT0NfUEVSVFVS
+Ql86LSQoKCAke1JBTkRPTTotMH0gJSAyNTUgKyAxKSl9ICB0ZXN0cy90ZXN0LXRocmVhZC1wb29s
+IC1tPXF1aWNrIC1rIC0tdGFwIDwgL2Rldi9udWxsIHwgLi9zY3JpcHRzL3RhcC1kcml2ZXIucGwg
+LS10ZXN0LW5hbWU9InRlc3QtdGhyZWFkLXBvb2wiIApQQVNTIDggaWRlLXRlc3QgL3g4Nl82NC9p
+ZGUvYm1kbWEvbm9fYnVzbWFzdGVyCj09ODAwMT09V0FSTklORzogQVNhbiBkb2Vzbid0IGZ1bGx5
+IHN1cHBvcnQgbWFrZWNvbnRleHQvc3dhcGNvbnRleHQgZnVuY3Rpb25zIGFuZCBtYXkgcHJvZHVj
+ZSBmYWxzZSBwb3NpdGl2ZXMgaW4gc29tZSBjYXNlcyEKUEFTUyAxIHRlc3QtdGhyZWFkLXBvb2wg
+L3RocmVhZC1wb29sL3N1Ym1pdApQQVNTIDIgdGVzdC10aHJlYWQtcG9vbCAvdGhyZWFkLXBvb2wv
+c3VibWl0LWFpbwpQQVNTIDMgdGVzdC10aHJlYWQtcG9vbCAvdGhyZWFkLXBvb2wvc3VibWl0LWNv
+ClBBU1MgNCB0ZXN0LXRocmVhZC1wb29sIC90aHJlYWQtcG9vbC9zdWJtaXQtbWFueQpQQVNTIDkg
+aWRlLXRlc3QgL3g4Nl82NC9pZGUvZmx1c2gvbm9kZXYKUEFTUyA1IHRlc3QtdGhyZWFkLXBvb2wg
+L3RocmVhZC1wb29sL2NhbmNlbAo9PTgwNzM9PVdBUk5JTkc6IEFTYW4gZG9lc24ndCBmdWxseSBz
+dXBwb3J0IG1ha2Vjb250ZXh0L3N3YXBjb250ZXh0IGZ1bmN0aW9ucyBhbmQgbWF5IHByb2R1Y2Ug
+ZmFsc2UgcG9zaXRpdmVzIGluIHNvbWUgY2FzZXMhClBBU1MgMTAgaWRlLXRlc3QgL3g4Nl82NC9p
+ZGUvZmx1c2gvZW1wdHlfZHJpdmUKPT04MDc4PT1XQVJOSU5HOiBBU2FuIGRvZXNuJ3QgZnVsbHkg
+c3VwcG9ydCBtYWtlY29udGV4dC9zd2FwY29udGV4dCBmdW5jdGlvbnMgYW5kIG1heSBwcm9kdWNl
+IGZhbHNlIHBvc2l0aXZlcyBpbiBzb21lIGNhc2VzIQoqKgpFUlJPUjovdG1wL3FlbXUtdGVzdC9z
+cmMvdGVzdHMvaWRlLXRlc3QuYzo3NTQ6dGVzdF9yZXRyeV9mbHVzaDogYXNzZXJ0aW9uIGZhaWxl
+ZCAoKGRhdGEpICYgKEJTWSB8IERSRFkpID09IChCU1kgfCBEUkRZKSk6ICgweDAwMDAwMDQwID09
+IDB4MDAwMDAwYzApCkVSUk9SIC0gQmFpbCBvdXQhIEVSUk9SOi90bXAvcWVtdS10ZXN0L3NyYy90
+ZXN0cy9pZGUtdGVzdC5jOjc1NDp0ZXN0X3JldHJ5X2ZsdXNoOiBhc3NlcnRpb24gZmFpbGVkICgo
+ZGF0YSkgJiAoQlNZIHwgRFJEWSkgPT0gKEJTWSB8IERSRFkpKTogKDB4MDAwMDAwNDAgPT0gMHgw
+MDAwMDBjMCkKUEFTUyA2IHRlc3QtdGhyZWFkLXBvb2wgL3RocmVhZC1wb29sL2NhbmNlbC1hc3lu
+YwptYWtlOiAqKiogWy90bXAvcWVtdS10ZXN0L3NyYy90ZXN0cy9NYWtlZmlsZS5pbmNsdWRlOjg5
+OTogY2hlY2stcXRlc3QteDg2XzY0XSBFcnJvciAxCm1ha2U6ICoqKiBXYWl0aW5nIGZvciB1bmZp
+bmlzaGVkIGpvYnMuLi4uCi0tLQpQQVNTIDQyIHRlc3QtaGJpdG1hcCAvaGJpdG1hcC9uZXh0X2Rp
+cnR5X2FyZWEvbmV4dF9kaXJ0eV9hcmVhXzEKUEFTUyA0MyB0ZXN0LWhiaXRtYXAgL2hiaXRtYXAv
+bmV4dF9kaXJ0eV9hcmVhL25leHRfZGlydHlfYXJlYV80Ck1BTExPQ19QRVJUVVJCXz0ke01BTExP
+Q19QRVJUVVJCXzotJCgoICR7UkFORE9NOi0wfSAlIDI1NSArIDEpKX0gIHRlc3RzL3Rlc3QtYmRy
+di1kcmFpbiAtbT1xdWljayAtayAtLXRhcCA8IC9kZXYvbnVsbCB8IC4vc2NyaXB0cy90YXAtZHJp
+dmVyLnBsIC0tdGVzdC1uYW1lPSJ0ZXN0LWJkcnYtZHJhaW4iIAo9PTgwOTE9PVdBUk5JTkc6IEFT
+YW4gZG9lc24ndCBmdWxseSBzdXBwb3J0IG1ha2Vjb250ZXh0L3N3YXBjb250ZXh0IGZ1bmN0aW9u
+cyBhbmQgbWF5IHByb2R1Y2UgZmFsc2UgcG9zaXRpdmVzIGluIHNvbWUgY2FzZXMhClBBU1MgMSB0
+ZXN0LWJkcnYtZHJhaW4gL2JkcnYtZHJhaW4vbmVzdGVkClBBU1MgMiB0ZXN0LWJkcnYtZHJhaW4g
+L2JkcnYtZHJhaW4vbXVsdGlwYXJlbnQKUEFTUyAzIHRlc3QtYmRydi1kcmFpbiAvYmRydi1kcmFp
+bi9zZXRfYWlvX2NvbnRleHQKLS0tClBBU1MgMzggdGVzdC1iZHJ2LWRyYWluIC9iZHJ2LWRyYWlu
+L2RldGFjaC9kcml2ZXJfY2IKUEFTUyAzOSB0ZXN0LWJkcnYtZHJhaW4gL2JkcnYtZHJhaW4vYXR0
+YWNoL2RyYWluCk1BTExPQ19QRVJUVVJCXz0ke01BTExPQ19QRVJUVVJCXzotJCgoICR7UkFORE9N
+Oi0wfSAlIDI1NSArIDEpKX0gIHRlc3RzL3Rlc3QtYmRydi1ncmFwaC1tb2QgLW09cXVpY2sgLWsg
+LS10YXAgPCAvZGV2L251bGwgfCAuL3NjcmlwdHMvdGFwLWRyaXZlci5wbCAtLXRlc3QtbmFtZT0i
+dGVzdC1iZHJ2LWdyYXBoLW1vZCIgCj09ODEzMT09V0FSTklORzogQVNhbiBkb2Vzbid0IGZ1bGx5
+IHN1cHBvcnQgbWFrZWNvbnRleHQvc3dhcGNvbnRleHQgZnVuY3Rpb25zIGFuZCBtYXkgcHJvZHVj
+ZSBmYWxzZSBwb3NpdGl2ZXMgaW4gc29tZSBjYXNlcyEKUEFTUyAxIHRlc3QtYmRydi1ncmFwaC1t
+b2QgL2JkcnYtZ3JhcGgtbW9kL3VwZGF0ZS1wZXJtLXRyZWUKUEFTUyAyIHRlc3QtYmRydi1ncmFw
+aC1tb2QgL2JkcnYtZ3JhcGgtbW9kL3Nob3VsZC11cGRhdGUtY2hpbGQKTUFMTE9DX1BFUlRVUkJf
+PSR7TUFMTE9DX1BFUlRVUkJfOi0kKCggJHtSQU5ET006LTB9ICUgMjU1ICsgMSkpfSAgdGVzdHMv
+dGVzdC1ibG9ja2pvYiAtbT1xdWljayAtayAtLXRhcCA8IC9kZXYvbnVsbCB8IC4vc2NyaXB0cy90
+YXAtZHJpdmVyLnBsIC0tdGVzdC1uYW1lPSJ0ZXN0LWJsb2Nram9iIiAKPT04MTM2PT1XQVJOSU5H
+OiBBU2FuIGRvZXNuJ3QgZnVsbHkgc3VwcG9ydCBtYWtlY29udGV4dC9zd2FwY29udGV4dCBmdW5j
+dGlvbnMgYW5kIG1heSBwcm9kdWNlIGZhbHNlIHBvc2l0aXZlcyBpbiBzb21lIGNhc2VzIQpQQVNT
+IDEgdGVzdC1ibG9ja2pvYiAvYmxvY2tqb2IvaWRzClBBU1MgMiB0ZXN0LWJsb2Nram9iIC9ibG9j
+a2pvYi9jYW5jZWwvY3JlYXRlZApQQVNTIDMgdGVzdC1ibG9ja2pvYiAvYmxvY2tqb2IvY2FuY2Vs
+L3J1bm5pbmcKLS0tClBBU1MgNyB0ZXN0LWJsb2Nram9iIC9ibG9ja2pvYi9jYW5jZWwvcGVuZGlu
+ZwpQQVNTIDggdGVzdC1ibG9ja2pvYiAvYmxvY2tqb2IvY2FuY2VsL2NvbmNsdWRlZApNQUxMT0Nf
+UEVSVFVSQl89JHtNQUxMT0NfUEVSVFVSQl86LSQoKCAke1JBTkRPTTotMH0gJSAyNTUgKyAxKSl9
+ICB0ZXN0cy90ZXN0LWJsb2Nram9iLXR4biAtbT1xdWljayAtayAtLXRhcCA8IC9kZXYvbnVsbCB8
+IC4vc2NyaXB0cy90YXAtZHJpdmVyLnBsIC0tdGVzdC1uYW1lPSJ0ZXN0LWJsb2Nram9iLXR4biIg
+Cj09ODE0MT09V0FSTklORzogQVNhbiBkb2Vzbid0IGZ1bGx5IHN1cHBvcnQgbWFrZWNvbnRleHQv
+c3dhcGNvbnRleHQgZnVuY3Rpb25zIGFuZCBtYXkgcHJvZHVjZSBmYWxzZSBwb3NpdGl2ZXMgaW4g
+c29tZSBjYXNlcyEKUEFTUyAxIHRlc3QtYmxvY2tqb2ItdHhuIC9zaW5nbGUvc3VjY2VzcwpQQVNT
+IDIgdGVzdC1ibG9ja2pvYi10eG4gL3NpbmdsZS9mYWlsdXJlClBBU1MgMyB0ZXN0LWJsb2Nram9i
+LXR4biAvc2luZ2xlL2NhbmNlbAotLS0KUEFTUyA2IHRlc3QtYmxvY2tqb2ItdHhuIC9wYWlyL2Nh
+bmNlbApQQVNTIDcgdGVzdC1ibG9ja2pvYi10eG4gL3BhaXIvZmFpbC1jYW5jZWwtcmFjZQpNQUxM
+T0NfUEVSVFVSQl89JHtNQUxMT0NfUEVSVFVSQl86LSQoKCAke1JBTkRPTTotMH0gJSAyNTUgKyAx
+KSl9ICB0ZXN0cy90ZXN0LWJsb2NrLWJhY2tlbmQgLW09cXVpY2sgLWsgLS10YXAgPCAvZGV2L251
+bGwgfCAuL3NjcmlwdHMvdGFwLWRyaXZlci5wbCAtLXRlc3QtbmFtZT0idGVzdC1ibG9jay1iYWNr
+ZW5kIiAKPT04MTQ2PT1XQVJOSU5HOiBBU2FuIGRvZXNuJ3QgZnVsbHkgc3VwcG9ydCBtYWtlY29u
+dGV4dC9zd2FwY29udGV4dCBmdW5jdGlvbnMgYW5kIG1heSBwcm9kdWNlIGZhbHNlIHBvc2l0aXZl
+cyBpbiBzb21lIGNhc2VzIQpQQVNTIDEgdGVzdC1ibG9jay1iYWNrZW5kIC9ibG9jay1iYWNrZW5k
+L2RyYWluX2Fpb19lcnJvcgpQQVNTIDIgdGVzdC1ibG9jay1iYWNrZW5kIC9ibG9jay1iYWNrZW5k
+L2RyYWluX2FsbF9haW9fZXJyb3IKTUFMTE9DX1BFUlRVUkJfPSR7TUFMTE9DX1BFUlRVUkJfOi0k
+KCggJHtSQU5ET006LTB9ICUgMjU1ICsgMSkpfSAgdGVzdHMvdGVzdC1ibG9jay1pb3RocmVhZCAt
+bT1xdWljayAtayAtLXRhcCA8IC9kZXYvbnVsbCB8IC4vc2NyaXB0cy90YXAtZHJpdmVyLnBsIC0t
+dGVzdC1uYW1lPSJ0ZXN0LWJsb2NrLWlvdGhyZWFkIiAKPT04MTUxPT1XQVJOSU5HOiBBU2FuIGRv
+ZXNuJ3QgZnVsbHkgc3VwcG9ydCBtYWtlY29udGV4dC9zd2FwY29udGV4dCBmdW5jdGlvbnMgYW5k
+IG1heSBwcm9kdWNlIGZhbHNlIHBvc2l0aXZlcyBpbiBzb21lIGNhc2VzIQpQQVNTIDEgdGVzdC1i
+bG9jay1pb3RocmVhZCAvc3luYy1vcC9wcmVhZApQQVNTIDIgdGVzdC1ibG9jay1pb3RocmVhZCAv
+c3luYy1vcC9wd3JpdGUKUEFTUyAzIHRlc3QtYmxvY2staW90aHJlYWQgL3N5bmMtb3AvbG9hZF92
+bXN0YXRlCi0tLQpQQVNTIDE1IHRlc3QtYmxvY2staW90aHJlYWQgL3Byb3BhZ2F0ZS9kaWFtb25k
+ClBBU1MgMTYgdGVzdC1ibG9jay1pb3RocmVhZCAvcHJvcGFnYXRlL21pcnJvcgpNQUxMT0NfUEVS
+VFVSQl89JHtNQUxMT0NfUEVSVFVSQl86LSQoKCAke1JBTkRPTTotMH0gJSAyNTUgKyAxKSl9ICB0
+ZXN0cy90ZXN0LWltYWdlLWxvY2tpbmcgLW09cXVpY2sgLWsgLS10YXAgPCAvZGV2L251bGwgfCAu
+L3NjcmlwdHMvdGFwLWRyaXZlci5wbCAtLXRlc3QtbmFtZT0idGVzdC1pbWFnZS1sb2NraW5nIiAK
+PT04MTcyPT1XQVJOSU5HOiBBU2FuIGRvZXNuJ3QgZnVsbHkgc3VwcG9ydCBtYWtlY29udGV4dC9z
+d2FwY29udGV4dCBmdW5jdGlvbnMgYW5kIG1heSBwcm9kdWNlIGZhbHNlIHBvc2l0aXZlcyBpbiBz
+b21lIGNhc2VzIQpQQVNTIDEgdGVzdC1pbWFnZS1sb2NraW5nIC9pbWFnZS1sb2NraW5nL2Jhc2lj
+ClBBU1MgMiB0ZXN0LWltYWdlLWxvY2tpbmcgL2ltYWdlLWxvY2tpbmcvc2V0LXBlcm0tYWJvcnQK
+TUFMTE9DX1BFUlRVUkJfPSR7TUFMTE9DX1BFUlRVUkJfOi0kKCggJHtSQU5ET006LTB9ICUgMjU1
+ICsgMSkpfSAgdGVzdHMvdGVzdC14ODYtY3B1aWQgLW09cXVpY2sgLWsgLS10YXAgPCAvZGV2L251
+bGwgfCAuL3NjcmlwdHMvdGFwLWRyaXZlci5wbCAtLXRlc3QtbmFtZT0idGVzdC14ODYtY3B1aWQi
+IAotLS0KUEFTUyAxIHRlc3QtbG9nZ2luZyAvbG9nZ2luZy9wYXJzZV9yYW5nZQpQQVNTIDIgdGVz
+dC1sb2dnaW5nIC9sb2dnaW5nL3BhcnNlX3BhdGgKTUFMTE9DX1BFUlRVUkJfPSR7TUFMTE9DX1BF
+UlRVUkJfOi0kKCggJHtSQU5ET006LTB9ICUgMjU1ICsgMSkpfSAgdGVzdHMvdGVzdC1yZXBsaWNh
+dGlvbiAtbT1xdWljayAtayAtLXRhcCA8IC9kZXYvbnVsbCB8IC4vc2NyaXB0cy90YXAtZHJpdmVy
+LnBsIC0tdGVzdC1uYW1lPSJ0ZXN0LXJlcGxpY2F0aW9uIiAKPT04NTg5PT1XQVJOSU5HOiBBU2Fu
+IGRvZXNuJ3QgZnVsbHkgc3VwcG9ydCBtYWtlY29udGV4dC9zd2FwY29udGV4dCBmdW5jdGlvbnMg
+YW5kIG1heSBwcm9kdWNlIGZhbHNlIHBvc2l0aXZlcyBpbiBzb21lIGNhc2VzIQpQQVNTIDEgdGVz
+dC1yZXBsaWNhdGlvbiAvcmVwbGljYXRpb24vcHJpbWFyeS9yZWFkClBBU1MgMiB0ZXN0LXJlcGxp
+Y2F0aW9uIC9yZXBsaWNhdGlvbi9wcmltYXJ5L3dyaXRlClBBU1MgMyB0ZXN0LXJlcGxpY2F0aW9u
+IC9yZXBsaWNhdGlvbi9wcmltYXJ5L3N0YXJ0Ci0tLQpQQVNTIDYgdGVzdC1yZXBsaWNhdGlvbiAv
+cmVwbGljYXRpb24vcHJpbWFyeS9nZXRfZXJyb3JfYWxsClBBU1MgNyB0ZXN0LXJlcGxpY2F0aW9u
+IC9yZXBsaWNhdGlvbi9zZWNvbmRhcnkvcmVhZApQQVNTIDggdGVzdC1yZXBsaWNhdGlvbiAvcmVw
+bGljYXRpb24vc2Vjb25kYXJ5L3dyaXRlCj09ODU4OT09V0FSTklORzogQVNhbiBpcyBpZ25vcmlu
+ZyByZXF1ZXN0ZWQgX19hc2FuX2hhbmRsZV9ub19yZXR1cm46IHN0YWNrIHRvcDogMHg3ZmZlNWUy
+YzkwMDA7IGJvdHRvbSAweDdmNjE1OWFmYzAwMDsgc2l6ZTogMHgwMDlkMDQ3Y2QwMDAgKDY3NDM4
+NTE1NDA0OCkKRmFsc2UgcG9zaXRpdmUgZXJyb3IgcmVwb3J0cyBtYXkgZm9sbG93CkZvciBkZXRh
+aWxzIHNlZSBodHRwczovL2dpdGh1Yi5jb20vZ29vZ2xlL3Nhbml0aXplcnMvaXNzdWVzLzE4OQpQ
+QVNTIDkgdGVzdC1yZXBsaWNhdGlvbiAvcmVwbGljYXRpb24vc2Vjb25kYXJ5L3N0YXJ0CgoKVGhl
+IGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8xNTYzMjYx
+MDQyLTE1OTc0LTEtZ2l0LXNlbmQtZW1haWwteWFuLnkuemhhb0BpbnRlbC5jb20vdGVzdGluZy5h
+c2FuLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQ
+YXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sg
+dG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
 
 
-> > > 2. Use the device loader (documented here:
-> > >
-> https://github.com/riscv/opensbi/blob/master/docs/platform/qemu_virt.md)
->
-
-The document describes two user cases
-  1. fw_payload.elf
-      a. include the Image (raw data file, not elf)  into data section
-      b. -kernel load the each part to the correct address
-
-     the program header of  fw_payload.elf are
-     Type           Offset   VirtAddr           PhysAddr           FileSiz
- MemSiz   Flg Align
-    LOAD           0x0000b0 0x0000000080000000 0x0000000080000000 0x00a008
-0x00b0b8 RWE 0x10               <-  fw_payload  main program
-    LOAD           0x00a0b8 0x0000000080200000 0x0000000080200000 0x8dbe20
-0x8dbe20 R E 0x1                    <-  arch/riscv/boot/Image   or
-u-boot.bin
-
-  2. fw_jump.elf
-      a. use  "-kernel <raw image> or -device  loader,file=3D<raw
-Image>,addr=3D0x80200000" to load correct address
-      b. fw_jump.elf just jump to the entry address 0x80200000
-
-
- The issues are
-   a. debian linux-image package only provides vmlinux.
-       so I use objcopy in acceptance test
-   b. riscv64 vmlinux doesn't have correct PhysAddr and -kernel can't move
-data to expected address
-       explicit load the Image to specific
-           -kernel raw_image   (if file is not elf or uImage,
-riscv_kerner_loader treat it is as raw image and place it at 0x8020_0000)
-           -device loader,file=3D<raw_image>,0x80200000  (do the same thing=
-)
-
-  ELF should work only if it has correct loading information.
-
-  chihmin.chao
-
-> >
-> > Nice doc, this example is exactly what I had in mind:
-> >
-> >   qemu-system-riscv64 -M virt -m 256M -nographic \
-> >         -kernel build/platform/qemu/virt/firmware/fw_jump.elf \
-> >         -device
-> >
-> loader,file=3D<linux_build_directory>/arch/riscv/boot/Image,addr=3D0x8020=
-0000 \
-> >         -drive file=3D<path_to_linux_rootfs>,format=3Draw,id=3Dhd0 \
-> >         -device virtio-blk-device,drive=3Dhd0 \
-> >         -append "root=3D/dev/vda rw console=3DttyS0"
-> >
-> > If the Image is an ELF, I assume we don't need to specify the address,
-> > because the device loader knows how to parse this format. Again,
-> > Alistair is the expert ;)
->
-> Yep, an elf should just work.
->
->  describe the issue above
-
-
-> >
-> > If for some reason it only works with Linux 5.0+, let's use these!
->
-> Only 5.0+ builds an elf.
->
-> Alistair
->
-> >
-> > Regards,
-> >
-> > Phil.
->
