@@ -6,64 +6,66 @@ X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69D89C7618F
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 21:54:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DC9CC7618F
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 21:55:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3DAD721849
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 21:54:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3DAD721849
+	by mail.kernel.org (Postfix) with ESMTPS id CC84C21849
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jul 2019 21:54:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC84C21849
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60706 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60708 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnrt3-00045v-1D
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 17:54:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56623)
+	id 1hnrt4-0004Iy-Mn
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 17:54:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34996)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dray@redhat.com>) id 1hnlh2-00074q-PX
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 11:18:09 -0400
+ (envelope-from <dray@redhat.com>) id 1hnm7B-0004zm-EX
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 11:45:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dray@redhat.com>) id 1hnlh1-0007fb-P6
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 11:18:08 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:36969)
+ (envelope-from <dray@redhat.com>) id 1hnm79-0000Pp-RW
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 11:45:09 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:44794)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <dray@redhat.com>) id 1hnlh1-0007dQ-Iz
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 11:18:07 -0400
-Received: by mail-wm1-f65.google.com with SMTP id f17so22565014wme.2
- for <qemu-devel@nongnu.org>; Wed, 17 Jul 2019 08:18:06 -0700 (PDT)
+ (Exim 4.71) (envelope-from <dray@redhat.com>) id 1hnm79-0000O0-Kx
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 11:45:07 -0400
+Received: by mail-wr1-f65.google.com with SMTP id p17so25335913wrf.11
+ for <qemu-devel@nongnu.org>; Wed, 17 Jul 2019 08:45:06 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=o50Mwg1Y1mDbKxrHHfq/0CW5EviszAvkc2BP4jNdftI=;
- b=AkSyOtOkZ+NP6TDBfqQUOx8qFBeDWZ3sYA811O3jUXTYjJHNdsk4zg+FZsnF5L6jAH
- nPMicejFplrYbAMC4kAmJkXPFy+7F8+m5fkAi2t6T/nnPXNrYF2nBefpc2aZAIW7GLQC
- RkcdxZjt451A+EKBm7TFEgV1Nt94pcZqPssZEnk6185JQwJQM9y6TwOvy1l+1rahWs5E
- /2513xdDHiUCRg+EPPUdqKrDSZoYLRd5alDlrlLFWC3GcjiOYi30yFt4vGRZF952PnMj
- cbECl4y/TQsfEroFyBHFUdHtmMNO2QUWrcYd6W7SRt1oUx1zHC68IzpFTrDD8uuH0kiz
- ymLQ==
-X-Gm-Message-State: APjAAAWW95TnNbjRAxPaHnLkwEQV5uiwuhmd4NM/ccox0fSKTLbuxo2o
- mScdXSSxGm8Sxcn4aoa7Ijl/tQy8e5tYDr3LY/o20A==
-X-Google-Smtp-Source: APXvYqzmNyhtGvzFzN4NxVFAXytvCF4y/lR9hvM0XbAO66a7yneaFfDHyQP+q4u7aG1lqGv53WvPOKBtq1csVyQnemo=
-X-Received: by 2002:a7b:cbcb:: with SMTP id n11mr35957425wmi.146.1563376685565; 
- Wed, 17 Jul 2019 08:18:05 -0700 (PDT)
+ bh=kMbwVeKNZVnC7UvuBHdjSvTubP/nHVtVLTFl+5VLlW8=;
+ b=UWLyu9zZqr04PVhFbnNN1ZGOHdXeU9nlI44YL00/6OKtp6opDgX9EW3Ryjju1WLplp
+ EpUCSHfuVSajHZw1U5kCcVnUHgLyjWIO4Z+3YEFexmNvCDni+T7nBPFWihzo5CjVyb9M
+ FiwY4uX5veXYuR/R58F6lhKWE5lkluDhDzaguB5CYOhD2T5j7qQFl9bFWFn/fSRGk/sc
+ /GKkAxiOk7dIr9Ul0TM6zBPTtrWzD/hOuAVahT9nhzKNvAbAQyXOQi5Snub1KQH4zACt
+ 5J8yKhgnVAUdD+Nx2AQhQYwXhL0cDPY+TqaM39AQmpJiC7rdS+KLW3XuQQJSCRT07MMG
+ K02Q==
+X-Gm-Message-State: APjAAAU1C39WB89X9InaUrjd9z7etfXIujf/InL5xfU5D9nRa7ZUnkWI
+ zrupNOrSLH5sjW2GNGZ+iB1RZ1tXKoi0NDLcmGx2Aw==
+X-Google-Smtp-Source: APXvYqzwUfdVo2DcnVAxTCQMWoYSp9X23Gi/OdV6cr5lNtAUrFrZ4gidq4AY5ibS7lixVTCPCnYbhGp822HSB0aFtKY=
+X-Received: by 2002:a5d:65c5:: with SMTP id e5mr10022871wrw.266.1563378305090; 
+ Wed, 17 Jul 2019 08:45:05 -0700 (PDT)
 MIME-Version: 1.0
 References: <20190709194330.837-1-marcandre.lureau@redhat.com>
  <20190709194330.837-3-marcandre.lureau@redhat.com>
-In-Reply-To: <20190709194330.837-3-marcandre.lureau@redhat.com>
+ <b6823a5f-658e-19c9-6bb4-559a12517a66@redhat.com>
+ <CAMxuvay5jPM6AnsZtLYvVB+nb4nopGnRP=BWxUctA1aZNaMdog@mail.gmail.com>
+In-Reply-To: <CAMxuvay5jPM6AnsZtLYvVB+nb4nopGnRP=BWxUctA1aZNaMdog@mail.gmail.com>
 From: Debarshi Ray <dray@redhat.com>
-Date: Wed, 17 Jul 2019 17:17:54 +0200
-Message-ID: <CADVaYxbhJX2Fp-nNYqLN4fY+A7pAW5wTTfkg3iNgM9p5BJASNA@mail.gmail.com>
+Date: Wed, 17 Jul 2019 17:44:54 +0200
+Message-ID: <CADVaYxabY2avyFQZy1gN4nyj=9mQD7n=WD5CYszhHOjOiXoq9w@mail.gmail.com>
 To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.128.65
-X-Mailman-Approved-At: Wed, 17 Jul 2019 17:54:35 -0400
+X-Received-From: 209.85.221.65
+X-Mailman-Approved-At: Wed, 17 Jul 2019 17:54:36 -0400
 Subject: Re: [Qemu-devel] [PATCH v2 2/5] tests/docker: add podman support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -76,44 +78,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, berrange@redhat.com,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
+Cc: Fam Zheng <fam@euphon.net>, "P. Berrange, Daniel" <berrange@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ qemu-devel <qemu-devel@nongnu.org>, debarshi@redhat.com,
  Gerd Hoffmann <kraxel@redhat.com>, Debarshi Ray <rishi@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hey,
-
-Sorry for the late response. I was on vacation and away from my keyboard.
-
-On Tue, Jul 9, 2019 at 9:44 PM Marc-Andr=C3=A9 Lureau
+On Wed, Jul 10, 2019 at 10:40 AM Marc-Andr=C3=A9 Lureau
 <marcandre.lureau@redhat.com> wrote:
-> With current podman, we have to use a uidmap trick in order to be able
-> to rw-share the ccache directory with the container user.
->
-> With a user 1000, the default mapping is:
-> 1000 (host) -> 0 (container).
->
-> So write access to /var/tmp/ccache ends will end with permission
-> denied error.
->
-> With "--uidmap 1000:0:1 --uidmap 0:1:1000", the mapping is:
-> 1000 (host) -> 0 (container, 1st namespace) -> 1000 (container, 2nd names=
-pace).
->
-> (the rest is mumbo jumbo to avoid holes in the range of UIDs)
->
-> A future podman version may have an option such as --userns-keep-uid.
+> I am not very familiar with podman or docker, so I am not able to tell
+> you why docker does work by default.  @Debarshi Ray might know, as he
+> helped me finding a workaround.
 
-The future is here! :)
+You need to mention the UID mapping via --uidmap arguments (or
+--userns=3Dkeep-id) because you are using Podman without involving root
+on the host anywhere. With Docker the daemon always runs as root. You
+either run the user-facing client also as root (with sudo and such) or
+you add your user to the special 'docker' group.
 
-Since Podman 1.4.0, released on 7th June 2019, you can use
---userns=3Dkeep-id instead of typing out the entire UID mapping. The
-relevant Podman pull request is:
-https://github.com/containers/libpod/pull/3196
+These days, very recently, rootless Docker is a thing too:
+https://engineering.docker.com/2019/02/experimenting-with-rootless-docker/
 
-Cheers,
-Rishi
+However, I don't think that's what the QEMU test suite has been using. :)
+
+When running rootless, you can only map your current UID from the host
+into the new user namespace, and usually that gets mapped to UID 0
+inside the namespace. Hence the need to override the UID mapping. This
+limitation isn't present when root is involved on the host.
+
+Read this commit message for some more details on exactly what happens
+when you specify the UID mapping like that:
+https://github.com/debarshiray/toolbox/commit/cfcf4eb31e14b3a3
 
