@@ -2,94 +2,62 @@ Return-Path: <SRS0=9jkQ=VP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.2 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFCBAC7618F
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 17:11:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72376C7618F
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 17:19:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8D930208C0
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 17:11:27 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="m/yWC2vy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D930208C0
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
+	by mail.kernel.org (Postfix) with ESMTPS id 488E0208C0
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 17:19:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 488E0208C0
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39910 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39968 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ho9wD-0000Ze-PK
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jul 2019 13:11:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49710)
+	id 1hoA4C-0005Cm-7L
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jul 2019 13:19:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52240)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <chihmin.chao@sifive.com>) id 1ho9vt-0007u1-Fa
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 13:11:08 -0400
+ (envelope-from <groug@kaod.org>) id 1hoA3z-0004iJ-8Z
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 13:19:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <chihmin.chao@sifive.com>) id 1ho9vp-00075x-RA
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 13:11:05 -0400
-Received: from mail-wr1-x42a.google.com ([2a00:1450:4864:20::42a]:41690)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <chihmin.chao@sifive.com>)
- id 1ho9vp-00074P-Co
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 13:11:01 -0400
-Received: by mail-wr1-x42a.google.com with SMTP id c2so26322922wrm.8
- for <qemu-devel@nongnu.org>; Thu, 18 Jul 2019 10:11:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=Yve9q6kG1WafFci2C5jbq9bEgYy7depfKs+qbBM2eQk=;
- b=m/yWC2vyUCRYITZHdTNskUKqLGJ08V3ojj5BMXmuBm9vNCQF7QikLckrrK+FipP3iU
- wSwdff1OwXb1FCmwES6l2zIk1cJ6TPhKrch7jm83C4KIX/24GnlQdKSh/frjDyXcloPf
- decSToARfjJAsU77fw8wR2nSz+HxTAPhOIIXiOVvhHz8I0LX79ORHZNmHK163UpF/tI5
- xQtdKmcGLPr78mh5r2ctrQd30geefRJo43wHc5cJG9RPRf2xp3kVh8waLWdlhZEoc+kS
- fn+Xv5WKJ4xJOlMSK9UE8DT5yBu3vmQe/6TfVokMJoUSxo5MfQqMbXeYwCnaER+A83lT
- mk3A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=Yve9q6kG1WafFci2C5jbq9bEgYy7depfKs+qbBM2eQk=;
- b=FnUe41+UWkiWL3m7hVMD0tN0q1ZCsf9UjSiUo56VYnQnOm3KijdRVyR+M4GJiGScGg
- 6z3uxdWBwffDtAxdnEouFFBb5MpxdBnYeMVEUUCQ9Dow5ASbs0MiEVzf9vNoa1pDWMqW
- M2hbNkYoVB2I9xODqQQi/8nwPJfFuK4dWbJ9Tx6sCGFiYvtni79yvl7my/+WlwzX6pWx
- v6pBUb74pZ5Pu5pRx9a6a4ylUlPMvStovhfNYZaw7f+VgL3DW0tx/R5V8cH8Uho2bONR
- sAMLHvWrTB06orA0u5rMXRV7u5TI8GE9FNPzu48OKJ54PqkKTpUi0GrHMQzDpLCewfm4
- q2nw==
-X-Gm-Message-State: APjAAAUO5ojqnlUe34+o0sVI1QoLlkiZliGrAF1poZxHN/vk61Fch3YX
- BWg3CRCKG+gsclfQbzfMsBu3ytUOqv6I1DdmgyYM6w==
-X-Google-Smtp-Source: APXvYqyHfSg8IhYCzgKL3EQbx5hBWhysqeOsCWpfYdTCkz6ia4Bx8fNFzGVOlm9VKltmoWwQVZiuybVEgCxPSsjIMMQ=
-X-Received: by 2002:adf:de90:: with SMTP id w16mr15282005wrl.217.1563469859904; 
- Thu, 18 Jul 2019 10:10:59 -0700 (PDT)
+ (envelope-from <groug@kaod.org>) id 1hoA3x-0004al-Vl
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 13:19:27 -0400
+Received: from 9.mo68.mail-out.ovh.net ([46.105.78.111]:56428)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1hoA3x-0004Vd-PB
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 13:19:25 -0400
+Received: from player755.ha.ovh.net (unknown [10.109.160.217])
+ by mo68.mail-out.ovh.net (Postfix) with ESMTP id E1D2613CE59
+ for <qemu-devel@nongnu.org>; Thu, 18 Jul 2019 19:19:16 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player755.ha.ovh.net (Postfix) with ESMTPSA id 0FA3682DA5E6;
+ Thu, 18 Jul 2019 17:19:12 +0000 (UTC)
+Date: Thu, 18 Jul 2019 19:19:11 +0200
+From: Greg Kurz <groug@kaod.org>
+To: Ivan Warren <ivan@vmfacility.fr>
+Message-ID: <20190718191911.3dcb39cb@bahia.lab.toulouse-stg.fr.ibm.com>
+In-Reply-To: <c3466869-e259-fe38-c974-b3ccd349345f@vmfacility.fr>
+References: <c3466869-e259-fe38-c974-b3ccd349345f@vmfacility.fr>
+X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-References: <1563181721-5055-1-git-send-email-chihmin.chao@sifive.com>
- <93b35a5e-c40a-535b-2a91-2c210b4a5928@redhat.com>
- <CAEiOBXXxS-93rTAQuvY_Tkxi1pYc1YfJenpBC_8gG2ou9uUZMg@mail.gmail.com>
- <7eb239bc-32aa-b5fc-ab2e-a741b005aad7@redhat.com>
- <CAKmqyKOZSz4f1-kLDhn=+imCvKHcZJVgqgqWbQ6qxD3K1n17GA@mail.gmail.com>
- <CAEiOBXUBPFx5__wOLvLD0qQ7dzV2XVpHfiOoBZpXpu-SZsMiUg@mail.gmail.com>
- <CAKmqyKNOiRYqZgiWT+LUKkOv+Bew3djOqc9vHpmSqZ-1Gfjd8Q@mail.gmail.com>
- <d2c7e6c6-4d4a-d47e-e496-4f4cfe466fe1@redhat.com>
- <CAKmqyKPiDHrPVuz2P1n9_j170k2bSm=7uDKrQg-fAUhL1FQm9g@mail.gmail.com>
- <CAEiOBXUXdyntjnt-bi9-wiO2mmpgVC8WpD9KnxWoDdP__71XXQ@mail.gmail.com>
- <CAKmqyKOHfx+h8=x2OnvyDD5LnqO09Uk56doqnkBY0VDcEbxQpA@mail.gmail.com>
- <CAEiOBXXMRXEEdp27c0C6RpxLQFW7BYdTDsoR5pRyxf=m74A5Kg@mail.gmail.com>
- <CAKmqyKPP8Y9SP8xHgA2N1n5wLmmaoXuK1GBBA7_G90rZJP5x8A@mail.gmail.com>
-In-Reply-To: <CAKmqyKPP8Y9SP8xHgA2N1n5wLmmaoXuK1GBBA7_G90rZJP5x8A@mail.gmail.com>
-From: Chih-Min Chao <chihmin.chao@sifive.com>
-Date: Fri, 19 Jul 2019 01:10:48 +0800
-Message-ID: <CAEiOBXXsEkXEDsv8pUQM8_mNfAm=6xOeODca+gLrKUYKv+Zqag@mail.gmail.com>
-To: Alistair Francis <alistair23@gmail.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::42a
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: Re: [Qemu-devel] [PATCH v2] tests/boot_linux_console: add a test
- for riscv64 + virt
+X-Ovh-Tracer-Id: 12255420489552795980
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduvddrieehgdduudegucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 46.105.78.111
+Subject: Re: [Qemu-devel] [PATCH] Allow bit 15 to be set to 1 on slbmfee and
+ slbmfev
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,391 +69,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Cornelia Huck <cohuck@redhat.com>,
- "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Eduardo Habkost <ehabkost@redhat.com>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- Alistair Francis <alistair@alistair23.me>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Cleber Rosa <crosa@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jul 18, 2019 at 11:34 PM Alistair Francis <alistair23@gmail.com>
-wrote:
+We usually mention the subsystem name in the subject, ie.
 
-> On Thu, Jul 18, 2019 at 8:00 AM Chih-Min Chao <chihmin.chao@sifive.com>
-> wrote:
-> >
-> >
-> >
-> > On Thu, Jul 18, 2019 at 6:47 AM Alistair Francis <alistair23@gmail.com>
-> wrote:
-> >>
-> >> On Tue, Jul 16, 2019 at 10:21 PM Chih-Min Chao <chihmin.chao@sifive.co=
-m>
-> wrote:
-> >> >
-> >> >
-> >> >
-> >> > On Wed, Jul 17, 2019 at 6:59 AM Alistair Francis <
-> alistair23@gmail.com> wrote:
-> >> >>
-> >> >> On Tue, Jul 16, 2019 at 2:50 PM Philippe Mathieu-Daud=C3=A9
-> >> >> <philmd@redhat.com> wrote:
-> >> >> >
-> >> >> > On 7/16/19 10:43 PM, Alistair Francis wrote:
-> >> >> > > On Tue, Jul 16, 2019 at 6:56 AM Chih-Min Chao <
-> chihmin.chao@sifive.com> wrote:
-> >> >> > >>
-> >> >> > >>
-> >> >> > >> On Tue, Jul 16, 2019 at 12:34 AM Alistair Francis <
-> alistair23@gmail.com> wrote:
-> >> >> > >>>
-> >> >> > >>> On Mon, Jul 15, 2019 at 6:02 AM Philippe Mathieu-Daud=C3=A9
-> >> >> > >>> <philmd@redhat.com> wrote:
-> >> >> > >>>>
-> >> >> > >>>> On 7/15/19 1:09 PM, Chih-Min Chao wrote:
-> >> >> > >>>>> On Mon, Jul 15, 2019 at 5:15 PM Philippe Mathieu-Daud=C3=A9
-> >> >> > >>>>> <philmd@redhat.com <mailto:philmd@redhat.com>> wrote:
-> >> >> > >>>>>
-> >> >> > >>>>>     On 7/15/19 11:08 AM, Chih-Min Chao wrote:
-> >> >> > >>>>>     > Similar to the mips + malta test, it boots a Linux
-> kernel on a virt
-> >> >> > >>>>>     > board and verify the serial is working.  Also, it
-> relies on the serial
-> >> >> > >>>>>     > device set by the machine itself.
-> >> >> > >>>>>     >
-> >> >> > >>>>>     > If riscv64 is a target being built, "make
-> check-acceptance" will
-> >> >> > >>>>>     > automatically include this test by the use of the
-> "arch:riscv64" tags.
-> >> >> > >>>>>     >
-> >> >> > >>>>>     > Alternatively, this test can be run using:
-> >> >> > >>>>>     >
-> >> >> > >>>>>     >   $ avocado run -t arch:riscv64 tests/acceptance
-> >> >> > >>>>>     >
-> >> >> > >>>>>     > packages
-> >> >> > >>>>>     >   debian official
-> >> >> > >>>>>     >     binutils-riscv64-linux-gnu_2.32-8
-> >> >> > >>>>>     >     opensbi_0.4-1_all
-> >> >> > >>>>>     >     linux-image-4.19.0-5-riscv64 4.19.37-4
-> >> >> > >>>>>     >   third-party
-> >> >> > >>>>>     >
-> >> >> > >>>>>
-> https://github.com/groeck/linux-build-test/rootfs/riscv64/rootfs.cpio.gz
-> >> >> > >>>>>     >     (the repo is also used in mips target acceptance)
-> >> >> > >>>>>     >
-> >> >> > >>>>>     > Signed-off-by: Chih-Min Chao <chihmin.chao@sifive.com
-> >> >> > >>>>>     <mailto:chihmin.chao@sifive.com>>
-> >> >> > >>>>>     > ---
-> >> >> > >>>>>     >  .travis.yml                            |  2 +-
-> >> >> > >>>>>     >  tests/acceptance/boot_linux_console.py | 66
-> >> >> > >>>>>     ++++++++++++++++++++++++++++++++++
-> >> >> > >>>>>     >  2 files changed, 67 insertions(+), 1 deletion(-)
-> >> >> > >>>>>     >
-> >> >> > >>>>>     > diff --git a/.travis.yml b/.travis.yml
-> >> >> > >>>>>     > index 5d3d6ee..21fcead 100644
-> >> >> > >>>>>     > --- a/.travis.yml
-> >> >> > >>>>>     > +++ b/.travis.yml
-> >> >> > >>>>>     > @@ -232,7 +232,7 @@ matrix:
-> >> >> > >>>>>     >
-> >> >> > >>>>>     >      # Acceptance (Functional) tests
-> >> >> > >>>>>     >      - env:
-> >> >> > >>>>>     > -        - CONFIG=3D"--python=3D/usr/bin/python3
-> >> >> > >>>>>
->  --target-list=3Dx86_64-softmmu,mips-softmmu,mips64el-softmmu,aarch64-sof=
-tmmu,arm-softmmu,s390x-softmmu,alpha-softmmu"
-> >> >> > >>>>>     > +        - CONFIG=3D"--python=3D/usr/bin/python3
-> >> >> > >>>>>
->  --target-list=3Dx86_64-softmmu,mips-softmmu,mips64el-softmmu,aarch64-sof=
-tmmu,arm-softmmu,s390x-softmmu,alpha-softmmu,riscv64-softmmu"
-> >> >> > >>>>>     >          - TEST_CMD=3D"make check-acceptance"
-> >> >> > >>>>>     >        after_failure:
-> >> >> > >>>>>     >          - cat tests/results/latest/job.log
-> >> >> > >>>>>     > diff --git a/tests/acceptance/boot_linux_console.py
-> >> >> > >>>>>     b/tests/acceptance/boot_linux_console.py
-> >> >> > >>>>>     > index 3215950..0f638bc 100644
-> >> >> > >>>>>     > --- a/tests/acceptance/boot_linux_console.py
-> >> >> > >>>>>     > +++ b/tests/acceptance/boot_linux_console.py
-> >> >> > >>>>>     > @@ -354,3 +354,69 @@ class BootLinuxConsole(Test):
-> >> >> > >>>>>     >          self.vm.launch()
-> >> >> > >>>>>     >          console_pattern =3D 'Kernel command line: %s=
-' %
-> >> >> > >>>>>     kernel_command_line
-> >> >> > >>>>>     >          self.wait_for_console_pattern(console_patter=
-n)
-> >> >> > >>>>>     > +
-> >> >> > >>>>>     > +    def test_riscv64_virt(self):
-> >> >> > >>>>>     > +        """
-> >> >> > >>>>>     > +        :avocado: tags=3Darch:riscv64
-> >> >> > >>>>>     > +        :avocado: tags=3Dmachine:virt
-> >> >> > >>>>>     > +        """
-> >> >> > >>>>>     > +        deb_url =3D ('
-> https://snapshot.debian.org/archive/debian/'
-> >> >> > >>>>>     > +
->  '20190424T171759Z/pool/main/b/binutils/'
-> >> >> > >>>>>     > +
-> >> >> > >>>>>      'binutils-riscv64-linux-gnu_2.32-8_amd64.deb')
-> >> >> > >>>>>     > +        deb_hash =3D
-> ('7fe376fd4452696c03acd508d6d613ca553ea15e')
-> >> >> > >>>>>     > +        deb_path =3D self.fetch_asset(deb_url,
-> asset_hash=3Ddeb_hash)
-> >> >> > >>>>>     > +        objcopy_path =3D
-> '/usr/bin/riscv64-linux-gnu-objcopy'
-> >> >> > >>>>>     > +        objcopy_path =3D
-> self.extract_from_deb(deb_path, objcopy_path)
-> >> >> > >>>>>     > +        libbfd_path =3D
-> >> >> > >>>>>     '/usr/lib/x86_64-linux-gnu/libbfd-2.32-riscv64.so
-> >> >> > >>>>>     <http://libbfd-2.32-riscv64.so>'
-> >> >> > >>>>>     > +        libbfd_path =3D self.extract_from_deb(deb_pa=
-th,
-> libbfd_path)
-> >> >> > >>>>>     > +        process.run('ls -al %s' % (objcopy_path))
-> >> >> > >>>>>     > +
-> >> >> > >>>>>     > +        deb_url =3D ('
-> https://snapshot.debian.org/archive/debian/'
-> >> >> > >>>>>     > +
->  '20190708T032337Z/pool/main/o/opensbi/'
-> >> >> > >>>>>     > +                   'opensbi_0.4-1_all.deb')
-> >> >> > >>>>>     > +        deb_hash =3D
-> ('2319dcd702958291d323acf5649fd98a11d90112')
-> >> >> > >>>>>     > +        deb_path =3D self.fetch_asset(deb_url,
-> asset_hash=3Ddeb_hash)
-> >> >> > >>>>>     > +        opensbi_path =3D
-> ('/usr/lib/riscv64-linux-gnu/opensbi/'
-> >> >> > >>>>>     > +                        'qemu/virt/fw_jump.elf')
-> >> >> > >>>>>     > +        opensbi_path =3D
-> self.extract_from_deb(deb_path, opensbi_path)
-> >> >> > >>>>>     > +
-> >> >> > >>>>>     > +        deb_url =3D
-> >> >> > >>>>>     ('https://snapshot.debian.org/archive/debian-ports/'
-> >> >> > >>>>>     > +
->  '20190620T095935Z/pool-riscv64/main/l/linux/'
-> >> >> > >>>>>     > +
-> >> >> > >>>>>      'linux-image-4.19.0-5-riscv64_4.19.37-4_riscv64.deb')
-> >> >> > >>>>>     > +        deb_hash =3D
-> ('bf5b5680c41d92134d22caef4fbd277c5217e1f0')
-> >> >> > >>>>>     > +        deb_path =3D self.fetch_asset(deb_url,
-> asset_hash=3Ddeb_hash)
-> >> >> > >>>>>     > +        kernel_path =3D '/boot/vmlinux-4.19.0-5-risc=
-v64'
-> >> >> > >>>>>     > +        kernel_path =3D self.extract_from_deb(deb_pa=
-th,
-> kernel_path)
-> >> >> > >>>>>     > +        kimage_path =3D self.workdir + "/Image"
-> >> >> > >>>>>     > +        env =3D os.environ
-> >> >> > >>>>>     > +        env['LD_LIBRARY_PATH'] =3D ('%s:' %
-> >> >> > >>>>>     (os.path.dirname(libbfd_path)) +
-> >> >> > >>>>>     > +
->  env.get('LD_LIBRARY_PATH', ''))
-> >> >> > >>>>>     > +        process.run(('%s -O binary -O binary -R'
-> >> >> > >>>>>     > +                     '.note -R .note.gnu.build-id -R
-> .comment -S
-> >> >> > >>>>>     %s %s') %
-> >> >> > >>>>>     > +                     (objcopy_path, kernel_path,
-> kimage_path))
-> >> >> > >>>>>
-> >> >> > >>>>>     Please explain why you need to do that...
-> >> >> > >>>>>
-> >> >> > >>>>>     Also note these tests are run on other host architectur=
-e
-> than x86, at
-> >> >> > >>>>>     least ppc64/s390x (so this won't work there).
-> >> >> > >>>>>
-> >> >> > >>>>> it is because riscv64 vmlinux doesn't have physical loading
-> address
-> >> >> > >>>>> information and
-> >> >> > >>>>> depends on certain stage bootloader to move kernel raw data
-> to specific
-> >> >> > >>>>> physical address (0x8020_0000)
-> >> >> > >>>>>
-> >> >> > >>>>> The vmlinux program headers are
-> >> >> > >>>>>   Type             Offset       VirtAddr
-> PhysAddr
-> >> >> > >>>>>     FileSiz  MemSiz   Flg Align
-> >> >> > >>>>>   LOAD           0x001000 0xffffffe000000000
-> 0x0000000000000000 0x0303a6
-> >> >> > >>>>> 0x0303a6 R E 0x1000
-> >> >> > >>>>>   LOAD           0x032000 0xffffffe000031000
-> 0x0000000000031000 0x828f0c
-> >> >> > >>>>> 0x828f0c RWE 0x1000
-> >> >> > >>>>>   NOTE           0x85aec0 0xffffffe000859ec0
-> 0x0000000000859ec0 0x00004c
-> >> >> > >>>>> 0x00004c R   0x4
-> >> >> > >>>>>
-> >> >> > >>>>> For legacy bootloader, bbl, It can handle payload in ELF
-> format.
-> >> >> > >>>>> However, for the newer OpenSBI, it can only handle raw data
-> and
-> >> >> > >>>>> debian doesn't provide linux image in raw data format.
-> >> >> > >>>
-> >> >> > >>> This doesn't sound right. You should just be able to say
-> -kernel
-> >> >> > >>> <anything> and it should work. It has worked for me with
-> vmlinux and
-> >> >> > >>> Image files when using master (not the 4.0 release but
-> master/4.1).
-> >> >> > >>> Although all of my testing was with the 5.1 kernel, so maybe
-> there is
-> >> >> > >>> a difference there?
-> >> >> > >>>
-> >> >> > >>> What isn't working for you? Can you include the errors and
-> output of -d in_asm?
-> >> >> > >>>
-> >> >> > >>>
-> >> >> > >>> Alistair
-> >> >> > >>
-> >> >> > >>
-> >> >> > >> Hi Alistair,
-> >> >> > >>    I have come across error before starting target simulation.
-> What I means is to execute
-> >> >> > >>             qemu-system-riscv64 -M virt -m 256M -nographic
-> -bios ./opensbi/build/platform/qemu/virt/firmware/fw_jump.elf -kernel
-> vmlinux
-> >> >> > >>    then get the error message
-> >> >> > >>             rom: requested regions overlap (rom mrom.reset.
-> free=3D0x000000000001eb7c, addr=3D0x0000000000001000)
-> >> >> > >>             qemu-system-riscv64: rom check and register reset
-> failed
-> >> >> > >
-> >> >> > > Hmmm.... I don't remember seeing this problem in my testing, bu=
-t
-> it
-> >> >> > > does seem to make sense.
-> >> >> > >
-> >> >> > > We have two options here:
-> >> >> > > 1. Use the Image file from Linux 5.0+ (my preferred option as
-> 4.19 is
-> >> >> > > getting old)
-> >> >
-> >> >  I choose 4.19 version rather than 5.0+  because 4.19 is stable
-> branch maintained by Greg.
-> >> >  But it is ok to use 5.0 trunk, the latest version provided by debia=
-n.
-> >> >
-> >> >>
-> >> >> > > 2. Use the device loader (documented here:
-> >> >> > >
-> https://github.com/riscv/opensbi/blob/master/docs/platform/qemu_virt.md)
-> >> >
-> >> >
-> >> > The document describes two user cases
-> >> >   1. fw_payload.elf
-> >> >       a. include the Image (raw data file, not elf)  into data secti=
-on
-> >> >       b. -kernel load the each part to the correct address
-> >> >
-> >> >      the program header of  fw_payload.elf are
-> >> >      Type           Offset   VirtAddr           PhysAddr
->  FileSiz  MemSiz   Flg Align
-> >> >     LOAD           0x0000b0 0x0000000080000000 0x0000000080000000
-> 0x00a008 0x00b0b8 RWE 0x10               <-  fw_payload  main program
-> >> >     LOAD           0x00a0b8 0x0000000080200000 0x0000000080200000
-> 0x8dbe20 0x8dbe20 R E 0x1                    <-  arch/riscv/boot/Image   =
-or
-> u-boot.bin
-> >> >
-> >> >   2. fw_jump.elf
-> >> >       a. use  "-kernel <raw image> or -device  loader,file=3D<raw
-> Image>,addr=3D0x80200000" to load correct address
-> >> >       b. fw_jump.elf just jump to the entry address 0x80200000
-> >> >
-> >> >
-> >> >  The issues are
-> >> >    a. debian linux-image package only provides vmlinux.
-> >>
-> >> This can be fixed by upgrading the kernel version. Fedora should have
-> >> a 5.2 kernel that you can use instead of Debian.
-> >>
-> >> >        so I use objcopy in acceptance test
-> >> >    b. riscv64 vmlinux doesn't have correct PhysAddr and -kernel can'=
-t
-> move data to expected address
-> >> >        explicit load the Image to specific
-> >> >            -kernel raw_image   (if file is not elf or uImage,
-> riscv_kerner_loader treat it is as raw image and place it at 0x8020_0000)
-> >> >            -device loader,file=3D<raw_image>,0x80200000  (do the sam=
-e
-> thing)
-> >>
-> >> Does the device loader not work?
-> >>
-> >> Alistair
-> >
-> >
-> >   The device loader works for "Image" case (raw data)
-> >   If the data is raw image,  for riscv_load_kernel implementation,
->  "-kernel <raw_image>" and  -device loader,file=3D<raw_image>,0x80200000 =
- are
-> the same.
-> >   They finally call "load_image_targphys_as"
-> >   The only difference is that target address is hardcoded or feed from
-> command line option.
-> >
-> >   I don't prefe one than the other.  Both of them are Ok to me.  I coul=
-d
-> refine that if one of them is more preferable.
->
-> I'm a little confused with what you mean, so if you have something
-> that will work just send a new version and we can discuss it there.
->
-> PS: I'm still in favour of just using a newer kernel and a Image file.
->
-> Alistair
->
->  ok, I will use the latest kernel available in Debian package and refine
-the command in next version.
+target/ppc: Allow bit 15 to be set to 1 on slbmfee and slbmfev
 
-chihmin.chao
+On Thu, 18 Jul 2019 14:44:49 +0200
+Ivan Warren <ivan@vmfacility.fr> wrote:
+
+> Allow bit 15 to be 1 in the slbmfee and slbmfev in TCG
+> as per Power ISA 3.0B (Power 9) Book III pages 1029 and 1030.
+> Per this specification, bit 15 is implementation specific
+> so it may be 1, but can probably ne safely ignored.
+>=20
+> Power ISA 2.07B (Power 7/Power 8) indicates the bit is
+> reserved but some none Linux operating systems do set
+
+s/none Linux/non-Linux
+
+> this bit to 1 when entering the debugger.
+> So it is likely it is implemented on those systems
+> but wasn't yet documented.
+>=20
+
+ISA describes things that are common to several processor types,
+but each implementation may do some extra stuff... like giving
+a special meaning to an invalid instruction form for example (see
+commit fa200c95f7f99ce14b8af25ea0be478c722d3cec). This is supposed
+to be documented in the user manual.
+
+Maybe something similar was done with the reserved bit 15, even if I
+could fine no trace of that in the Power8 UM... of course. I'll try
+to find clues within IBM.
+
+https://openpowerfoundation.org/?resource_lib=3Dpower8-processor-users-manu=
+al
+
+but it is indeed mentioned in the Power9 UM:
+
+https://openpowerfoundation.org/?resource_lib=3Dpower-processor-users-manual
+
+4.10.7.2 SLB Management Instructions
+
+The POWER9 core implements the SLB management instructions as defined in the
+Power ISA (Version 3.0B). Specifically, the following instruction details a=
+re
+noteworthy:
+=E2=80=A2 The slbmfee and slbmfev instructions can read any SLB entry when =
+UPRT =3D =E2=80=981=E2=80=99,
+  if the L-bit in the instruction image is set to a =E2=80=981=E2=80=99. Th=
+is is an
+  implementation-specific feature that will only be used in the future if a=
+nd
+  when the POWER9 processor core supports UPRT =3D =E2=80=981=E2=80=99 for =
+HPT translation.
+
+Not sure if we support that in TCG, but it doesn't hurt to relax the check
+if that's enough to make AIX's debugger happy.
+
+Reviewed-by: Greg Kurz <groug@kaod.org>
+
+> Signed-off-by: Ivan Warren <ivan@vmfacility.fr>
+> ---
+>=20
+> The original creator of the patch is "Zhuowei Zhang"=20
+> (https://twitter.com/zhuowei) but I couldn't find any e-mail address.
+>=20
+
+This is the original patch, correct ?
+
+https://github.com/zhuowei/qemu/commit/c5f305c5d0cd336b2bb31cab8a70f90b7290=
+5a1e
+
+After speaking with some QEMU folks on irc, it is okay to ignore the lack
+of S-o-b because the patch is trivial. But the general rule is to always
+require an S-o-b when posting someone else's patch.
+
+>  =C2=A0target/ppc/translate.c | 4 ++--
+>  =C2=A01 file changed, 2 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+> index 4a5de28036..85f8b147ba 100644
+> --- a/target/ppc/translate.c
+> +++ b/target/ppc/translate.c
+> @@ -7064,8 +7064,8 @@ GEN_HANDLER2(mtsr_64b, "mtsr", 0x1F, 0x12, 0x06,=20
+> 0x0010F801, PPC_SEGMENT_64B),
+>  =C2=A0GEN_HANDLER2(mtsrin_64b, "mtsrin", 0x1F, 0x12, 0x07, 0x001F0001,
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 PPC_SEGMENT_64B),
+>  =C2=A0GEN_HANDLER2(slbmte, "slbmte", 0x1F, 0x12, 0x0C, 0x001F0001,=20
+> PPC_SEGMENT_64B),
+> -GEN_HANDLER2(slbmfee, "slbmfee", 0x1F, 0x13, 0x1C, 0x001F0001,=20
+> PPC_SEGMENT_64B),
+> -GEN_HANDLER2(slbmfev, "slbmfev", 0x1F, 0x13, 0x1A, 0x001F0001,=20
+> PPC_SEGMENT_64B),
+> +GEN_HANDLER2(slbmfee, "slbmfee", 0x1F, 0x13, 0x1C, 0x001E0001,=20
+> PPC_SEGMENT_64B),
+> +GEN_HANDLER2(slbmfev, "slbmfev", 0x1F, 0x13, 0x1A, 0x001E0001,=20
+> PPC_SEGMENT_64B),
+>  =C2=A0GEN_HANDLER2(slbfee_, "slbfee.", 0x1F, 0x13, 0x1E, 0x001F0000,=20
+> PPC_SEGMENT_64B),
+>  =C2=A0#endif
+>  =C2=A0GEN_HANDLER(tlbia, 0x1F, 0x12, 0x0B, 0x03FFFC01, PPC_MEM_TLBIA),
+> --
+> 2.20.1
+>=20
+>=20
 
 
-> >
-> >
-> >  chihmin.chao
-> >>
-> >>
-> >> >
-> >> >   ELF should work only if it has correct loading information.
-> >> >
-> >> >   chihmin.chao
-> >> >>
-> >> >> >
-> >> >> > Nice doc, this example is exactly what I had in mind:
-> >> >> >
-> >> >> >   qemu-system-riscv64 -M virt -m 256M -nographic \
-> >> >> >         -kernel build/platform/qemu/virt/firmware/fw_jump.elf \
-> >> >> >         -device
-> >> >> >
-> loader,file=3D<linux_build_directory>/arch/riscv/boot/Image,addr=3D0x8020=
-0000 \
-> >> >> >         -drive file=3D<path_to_linux_rootfs>,format=3Draw,id=3Dhd=
-0 \
-> >> >> >         -device virtio-blk-device,drive=3Dhd0 \
-> >> >> >         -append "root=3D/dev/vda rw console=3DttyS0"
-> >> >> >
-> >> >> > If the Image is an ELF, I assume we don't need to specify the
-> address,
-> >> >> > because the device loader knows how to parse this format. Again,
-> >> >> > Alistair is the expert ;)
-> >> >>
-> >> >> Yep, an elf should just work.
-> >> >>
-> >> >  describe the issue above
-> >> >
-> >> >>
-> >> >> >
-> >> >> > If for some reason it only works with Linux 5.0+, let's use these=
-!
-> >> >>
-> >> >> Only 5.0+ builds an elf.
-> >> >>
-> >> >> Alistair
-> >> >>
-> >> >> >
-> >> >> > Regards,
-> >> >> >
-> >> >> > Phil.
->
