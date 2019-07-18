@@ -2,83 +2,74 @@ Return-Path: <SRS0=9jkQ=VP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	URIBL_SBL,URIBL_SBL_A autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D6C7C76191
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 14:35:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C17B3C76191
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 14:35:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2433720873
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 14:35:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2433720873
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9225120873
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 14:35:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9225120873
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38640 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38654 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ho7Ur-0003Sf-8C
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jul 2019 10:35:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58380)
+	id 1ho7Vg-0004lI-UQ
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jul 2019 10:35:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58849)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <slp@redhat.com>) id 1ho7Uf-0002ug-Pm
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 10:34:51 -0400
+ (envelope-from <bounces@canonical.com>) id 1ho7VW-0004JC-BT
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 10:35:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <slp@redhat.com>) id 1ho7Ue-0005Yb-5u
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 10:34:49 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:35934)
+ (envelope-from <bounces@canonical.com>) id 1ho7VV-0006OI-1p
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 10:35:42 -0400
+Received: from indium.canonical.com ([91.189.90.7]:56472)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <slp@redhat.com>) id 1ho7Ud-0005Xe-Ua
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 10:34:48 -0400
-Received: by mail-wm1-f65.google.com with SMTP id g67so21839781wme.1
- for <qemu-devel@nongnu.org>; Thu, 18 Jul 2019 07:34:46 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version;
- bh=VVww2PUhz0TYhbHq0wbDlRnenW+BPclid6VB0pJ2fsg=;
- b=BcC4/xj4u3DTUgT1hk7E0U0v4P6xvughN0pkI+ix/9B3Q/3NO/Uz6yzer4cO+PWa5r
- b8z860FZjHHA1+F5u8qpANGLUgqtcU+mOhoOV19MsJqUS7ihborvYgKG8oCV9A1z9AFQ
- y8WOmdLs/O7e3yEimN+KPcN+CA1eicO15KpTlcJZjFat0WjDlKLKZDz1bAnXSKBb51M8
- KAu6HbyL0z+TSDCBSnp9XMATwO56pxyP/QH7VETdvPx4lJzQ6u6mABhciQNKBBXk7tyF
- Ph59+f9FUTT88hUtxlk5U70TjuN5I4LmEzjuOOQ+/cpemUKUdCe1lQiU35db/KaZiMiM
- oN8Q==
-X-Gm-Message-State: APjAAAUEiudTZNEY0NuKxYrpWclIVGHLUFpdFchRl8JMSch2b7M1DYqm
- fHZ4HymNZxvfXRz54XCSd6B12/xFHX4=
-X-Google-Smtp-Source: APXvYqyovrJVstxOsGsXmGvYGcMpXlS9+VDR0y5kr1dvDPeyxgTxVCbumVcMKoDrJOxQCE5kqwaXBg==
-X-Received: by 2002:a1c:9c8a:: with SMTP id f132mr43036206wme.29.1563460485326; 
- Thu, 18 Jul 2019 07:34:45 -0700 (PDT)
-Received: from dritchie.redhat.com (18.red-83-35-20.dynamicip.rima-tde.net.
- [83.35.20.18])
- by smtp.gmail.com with ESMTPSA id f204sm36914386wme.18.2019.07.18.07.34.43
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Thu, 18 Jul 2019 07:34:44 -0700 (PDT)
-References: <20190701144705.102615-1-slp@redhat.com>
- <20190701144705.102615-5-slp@redhat.com>
- <20190702081733.ff6cboiddln5wmti@sirius.home.kraxel.org>
- <878stgygiu.fsf@redhat.com>
- <20190702101625.trsg5dnnf2a4woqs@sirius.home.kraxel.org>
- <875zokyahg.fsf@redhat.com> <8c3b4619-f779-fb0c-7a53-b67150036a07@redhat.com>
- <8736joxzv4.fsf@redhat.com>
-User-agent: mu4e 1.2.0; emacs 26.2
-From: Sergio Lopez <slp@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-In-reply-to: <8736joxzv4.fsf@redhat.com>
-Date: Thu, 18 Jul 2019 16:34:42 +0200
-Message-ID: <87ef2ntnr1.fsf@redhat.com>
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1ho7VU-0006NS-Ru
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 10:35:40 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1ho7VT-0005nm-1S
+ for <qemu-devel@nongnu.org>; Thu, 18 Jul 2019 14:35:39 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 094392E80C9
+ for <qemu-devel@nongnu.org>; Thu, 18 Jul 2019 14:35:39 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
- micalg=pgp-sha256; protocol="application/pgp-signature"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 18 Jul 2019 14:25:58 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Tags: arm
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: pmaydell skandal
+X-Launchpad-Bug-Reporter: Lutz (skandal)
+X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
+References: <156313770910.15255.7682693906978508241.malonedeb@soybean.canonical.com>
+Message-Id: <156345995851.9066.17624776341988830344.malone@chaenomeles.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="19010";
+ Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: 96fd82f79ecdd5ad7fea86d52155431b20230b0c
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.128.65
-Subject: Re: [Qemu-devel] [PATCH v2 4/4] hw/i386: Introduce the microvm
- machine type
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1836501] Re: cpu_address_space_init fails with
+ assertion
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -87,187 +78,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, maran.wilson@oracle.com, mst@redhat.com,
- Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org,
- Gerd Hoffmann <kraxel@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>,
- rth@twiddle.net
+Reply-To: Bug 1836501 <1836501@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---=-=-=
-Content-Type: text/plain
+I can boot a KVM guest (either with the debian stretch qemu-system-arm
+2.8.1, or with a head-of-upstream-git QEMU), which wouldn't work with
+EL3 enabled, so I'm not sure what is going wrong for you. To try to
+debug this further you'd need to build QEMU from source and start
+running it under the debugger to see what exactly is going on and why
+it's hitting that assertion.
 
+I would be tempted to try a newer kernel to see if that helped. (My
+working setup is using the debian stretch stock "4.9.0-0.bpo.9-armmp-
+lpae #1 SMP Debian 4.9.168-1+deb9u3~deb8u1 (2019-06-17)", but in general
+4.9 is fairly elderly now.)
 
-Sergio Lopez <slp@redhat.com> writes:
+For forums to talk about this kind of thing you might also try the qemu-
+arm mailing list (https://lists.nongnu.org/mailman/listinfo/qemu-arm) or
+qemu-devel itself (generally best to cc qemu-devel on qemu-arm emails
+anyway, lots of people don't subscribe to the per-architecture lists).
 
-> Paolo Bonzini <pbonzini@redhat.com> writes:
->
->> On 02/07/19 12:52, Sergio Lopez wrote:
->>> As I said, I'm also in favor of microvm supporting booting from
->>> firmware in the future, as long we keep the simple mode too.
->>
->> The simple mode adds code to QEMU's x86 target that only exists to
->> support microvm.  It should be motivated by a clear win in boot times.
->
-> OK. When I'm back from my PTO, I'll work on adding the firmware
-> support to microvm. I'll run and share some numbers to see whether the
-> simple mode makes sense or we can just rely on qboot for lower boot
-> times plus SeaBIOS for compatibility.
+-- =
 
-I've just added support for starting the machine from SeaBIOS (Stefan
-Hajnoczi pointed in another thread that it can be as fast as qboot, and
-given that the latter doesn't support mptables, I just tested this
-one). I tried to keep it as minimalistic as possible, but it still
-required an RTC (mc146818), which dragged in an ISA BUS, and this one a
-KVM PIT.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1836501
 
-I ran some numbers using Stefano Garzarella's qemu-boot-time scripts
-[1] on a server with 2xIntel Xeon Silver 4114 2.20GHz, using the
-upstream QEMU (474f3938d79ab36b9231c9ad3b5a9314c2aeacde) built with
-minimal features [2]. The VM boots a minimal kernel [3] without initrd,
-using a kata container image as root via virtio-blk (though this isn't
-really relevant, as we're just taking measurements until the kernel is
-about to exec init).
+Title:
+  cpu_address_space_init fails with assertion
 
- ---------------------
- | QEMU with SeaBIOS |
- ---------------------
+Status in QEMU:
+  Confirmed
 
-Command line:
+Bug description:
+  qemu-system-arm does not start with version >=3D 2.6 and KVM enabled.
 
-./x86_64-softmmu/qemu-system-x86_64 -m 512m -enable-kvm -M microvm,legacy -kernel /root/src/images/vmlinux-5.2 -append "console=hvc0 reboot=k panic=1 root=/dev/vda quiet virtio_mmio.device=512@0xd0000600:15 virtio_mmio.device=512@0xd0000400:14" -smp 1 -nodefaults -no-user-config -chardev pty,id=virtiocon0,server -device virtio-serial-device -device virtconsole,chardev=virtiocon0 -drive id=test,file=/usr/share/kata-containers/kata-containers.img,format=raw,if=none -device virtio-blk-device,drive=test -monitor stdio
+    cpu_address_space_init: Assertion `asidx =3D=3D 0 || !kvm_enabled()'
+  failed.
 
-Average boot times after 10 consecutive runs:
+  Hardware is Odroid XU4 with Exynos with 4.9.61+ Tested with Debian
+  Stretch (9) or Buster (10).
 
- qemu_init_end: 65.958714
- linux_start_kernel: 77.735803 (+11.777089)
- linux_start_user: 127.360739 (+49.624936)
+  Without KVM it is running fine but slow. I'm operating Debian Jessie
+  with qemu 2.1 for a long time with KVM virtualization working
+  flawlessly. When I upgraded to Stretch I ran into the trouble
+  described before. I tried Debian Stretch and Buster with all Kernels
+  provided by the Board manufacturer (Hardkernel).
 
-Exposed I/O ports and MMIOs:
+  It seems to be related to the feature introduced in Version 2.6:
+  https://wiki.qemu.org/ChangeLog/2.6
+  - Support for a separate EL3 address space
 
- address-space: memory
-  0000000000000000-ffffffffffffffff (prio 0, i/o): system
-    0000000000000000-000000001fffffff (prio 0, i/o): alias ram-below-4g @microvm.ram 0000000000000000-000000001fffffff
-    00000000000e0000-00000000000fffff (prio 1, i/o): alias isa-bios @pc.bios 0000000000000000-000000000001ffff
-    00000000d0000000-00000000d00001ff (prio 0, i/o): virtio-mmio
-    00000000d0000200-00000000d00003ff (prio 0, i/o): virtio-mmio
-    00000000d0000400-00000000d00005ff (prio 0, i/o): virtio-mmio
-    00000000d0000600-00000000d00007ff (prio 0, i/o): virtio-mmio
-    00000000fee00000-00000000feefffff (prio 4096, i/o): kvm-apic-msi
-    00000000fffe0000-00000000ffffffff (prio 0, ram): pc.bios
+  KVM is enabled, so I assume the adress space index asidx to be causing
+  the assert to fail.
 
- address-space: I/O
-  0000000000000000-000000000000ffff (prio 0, i/o): io
-    0000000000000020-0000000000000021 (prio 0, i/o): kvm-pic
-    0000000000000040-0000000000000043 (prio 0, i/o): kvm-pit
-    0000000000000070-0000000000000071 (prio 0, i/o): rtc
-      0000000000000070-0000000000000070 (prio 0, i/o): rtc-index
-    000000000000007e-000000000000007f (prio 0, i/o): kvmvapic
-    00000000000000a0-00000000000000a1 (prio 0, i/o): kvm-pic
-    00000000000004d0-00000000000004d0 (prio 0, i/o): kvm-elcr
-    00000000000004d1-00000000000004d1 (prio 0, i/o): kvm-elcr
-    0000000000000510-0000000000000511 (prio 0, i/o): fwcfg
-    0000000000000514-000000000000051b (prio 0, i/o): fwcfg.dma
+  dmesg | grep -i KVM
+  [    0.741714] kvm [1]: 8-bit VMID
+  [    0.741721] kvm [1]: IDMAP page: 40201000
+  [    0.741729] kvm [1]: HYP VA range: c0000000:ffffffff
+  [    0.742543] kvm [1]: Hyp mode initialized successfully
+  [    0.742600] kvm [1]: vgic-v2@10484000
+  [    0.742924] kvm [1]: vgic interrupt IRQ16
+  [    0.742943] kvm [1]: virtual timer IRQ60
 
+  Full command line is:
+  qemu-system-arm -M vexpress-a15 -smp 2 -m 512 -cpu host -enable-kvm -kern=
+el vmlinuz -initrd initrd.gz -dtb vexpress-v2p-ca15-tc1.dtb -device virtio-=
+blk-device,drive=3Dinst-blk -drive file=3DPATHTOFILE,id=3Dinst-blk,if=3Dnon=
+e,format=3Draw -append "vga=3Dnormal rw console=3DttyAMA0" -nographic
 
- -------------------
- | QEMU direct PVH |
- -------------------
+  Is there anything to do to understand, if this is a hardware related
+  failure or probably just a missing parameter?
 
-Command line:
+  Regards
 
- ./x86_64-softmmu/qemu-system-x86_64 -m 512m -enable-kvm -M microvm -kernel /root/src/images/vmlinux-5.2 -append "console=hvc0 reboot=k panic=1 root=/dev/vda quiet" -smp 1 -nodefaults -no-user-config -chardev pty,id=virtiocon0,server -device virtio-serial-device -device virtconsole,chardev=virtiocon0 -drive id=test,file=/usr/share/kata-containers/kata-containers.img,format=raw,if=none -device virtio-blk-device,drive=test -monitor stdio
+  Lutz
 
-Average boot times after 10 consecutive runs:
-
- qemu_init_end: 64.043264
- linux_start_kernel: 65.481782 (+1.438518)
- linux_start_user: 114.938353 (+49.456571)
-
-Exposed I/O ports and MMIOs:
-
- address-space: memory
-  0000000000000000-ffffffffffffffff (prio 0, i/o): system
-    0000000000000000-000000001fffffff (prio 0, i/o): alias ram-below-4g @microvm.ram 0000000000000000-000000001fffffff
-    00000000d0000000-00000000d00001ff (prio 0, i/o): virtio-mmio
-    00000000d0000200-00000000d00003ff (prio 0, i/o): virtio-mmio
-    00000000d0000400-00000000d00005ff (prio 0, i/o): virtio-mmio
-    00000000d0000600-00000000d00007ff (prio 0, i/o): virtio-mmio
-    00000000fec00000-00000000fec00fff (prio 0, i/o): kvm-ioapic
-    00000000fee00000-00000000feefffff (prio 4096, i/o): kvm-apic-msi
-
- address-space: I/O
-  0000000000000000-000000000000ffff (prio 0, i/o): io
-    000000000000007e-000000000000007f (prio 0, i/o): kvmvapic
-
-
- --------------
- | Comparison |
- --------------
-
-Average boot time:
-
- * Relying on SeaBIOS, when compared with direct PVH boot, as a total
-   average overhead of ~12ms. The cost of initializing QEMU increases in
-   ~2ms (probably due to need to instantiate more devices), while the
-   other ~10ms is the SeaBIOS overhead.
-
-Exposed I/O ports and MMIOs:
-
- * The following 8 I/O ports are only present in the version relying on SeaBIOS:
-
-    0000000000000020-0000000000000021 (prio 0, i/o): kvm-pic
-    0000000000000040-0000000000000043 (prio 0, i/o): kvm-pit
-    0000000000000070-0000000000000071 (prio 0, i/o): rtc
-      0000000000000070-0000000000000070 (prio 0, i/o): rtc-index
-    00000000000000a0-00000000000000a1 (prio 0, i/o): kvm-pic
-    00000000000004d0-00000000000004d0 (prio 0, i/o): kvm-elcr
-    00000000000004d1-00000000000004d1 (prio 0, i/o): kvm-elcr
-    0000000000000510-0000000000000511 (prio 0, i/o): fwcfg
-    0000000000000514-000000000000051b (prio 0, i/o): fwcfg.dma
-
- * The following MMIO region is only present in the direct boot version:
-
-    00000000fec00000-00000000fec00fff (prio 0, i/o): kvm-ioapic
-
-
- ---------------
- | Conclusions |
- ---------------
-
-Objectively, the version that boots directly the kernel using PVH is 10%
-faster and has a slightly larger exposed surface. Whether this is enough
-to justify its existence is quite subjective.
-
-In my opinion, not only I think it makes sense to have it, but I also
-think there's little reason to have the firmware reliant version, given
-the nature and purpose of microvm.
-
-Sergio.
-
-[1] https://github.com/stefano-garzarella/qemu-boot-time
-[2] https://paste.fedoraproject.org/paste/YZ9Ok-dJtQrc0xxctFm-nw
-[3] https://paste.fedoraproject.org/paste/sck0jfioAJdMq51HH6wkmA
-
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEvtX891EthoCRQuii9GknjS8MAjUFAl0wg4IACgkQ9GknjS8M
-AjXTBhAAjE9PxMC0LIX5WIF0KPCrsPn7+hi+/I+xjESU9WfjSII9unntynxSvyz2
-DyghYU+TFYiqlNGVN1jYM6Rn2YL1uy3MVN6xS3dSByab+9RilsocTKUCMkKMmJwI
-NmjyVByKAwBpL5FhmKs9jECc6on+6Tj3nF3ynKSBAUZMOICaAOxYL4c4UxUsYkP+
-YEn+bpE1fmRjtr8TkCaB+OTwPuuhrutur8UD/vJIupj7tYntKYSoPGaY4HlUCyKG
-KkMQP8Ukmm1a90gLgQvmIj6hdJbV90y2e9W8sbFA1uwTdXwoAW/+VnGSE+G+roU/
-+U8bn0ykieloZ55AUmXgC3/zqMo52BWA5fQGqYy5jYho0Mb0fz4QvO4K6k4YA1Fw
-uLy+0cs9ja5m02+tX8whPKWUAhRixRg9Egfen2pd76EOLhnLn1qlfLgtNlpDZ738
-5cfQz+/FmLgVp6dgQvPBVNY2JcS8Ksedyj9A8Hpi7SjgynzFJzLA6aE9XXxbzD1Z
-B4MgoY+kreXtkG9JGMnZa1PpVI3o/2tmdWjh4zsdukGdMVt363aHNt11R4bOjI0E
-ho8SAbUfUlI4fCJY4UPgIQmp319hCYIJ4PzobGRGMqIOYSO4VhspQxyNUdQvQvEc
-Yb2Ahm1F5nwKAkPbelh+LTMB0QbXqgEod0J3a+TyRw/Fkx62iVg=
-=DMRo
------END PGP SIGNATURE-----
---=-=-=--
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1836501/+subscriptions
 
