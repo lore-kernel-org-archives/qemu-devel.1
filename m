@@ -4,76 +4,60 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92092C76191
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 09:55:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01DF5C76191
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 10:13:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 63C292173E
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 09:55:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 63C292173E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id CD7132173B
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 10:13:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD7132173B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35952 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36020 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ho38G-0003qr-MJ
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jul 2019 05:55:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49992)
+	id 1ho3Q3-0000k0-Kp
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jul 2019 06:13:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55070)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <pbonzini@redhat.com>) id 1ho385-0003RV-Um
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 05:55:15 -0400
+ (envelope-from <groug@kaod.org>) id 1ho3Pr-0000E3-Is
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 06:13:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1ho384-0000p4-6x
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 05:55:13 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:36234)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ho382-0000lT-3Z
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 05:55:10 -0400
-Received: by mail-wr1-f67.google.com with SMTP id n4so28013716wrs.3
- for <qemu-devel@nongnu.org>; Thu, 18 Jul 2019 02:55:06 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=wIJuN/MeTlXeGdZHR0j+OA+M90V2kbIfqi4VBI86MCk=;
- b=jZqejBWrlF0AbpPrdqLUg/zvI6eSudCZoGrm3BVrECC8SBO3k8mbzT4yT27t6cqmRW
- /BjPkmB/rWQUJBHlBSZmzLxgFXaafrnTr9/D1DDm2eOnk9ikFzkvmb+B2EgEwBVF09e5
- IKy5FHByBSFlxUL71deFKEif8fI4OJe+nADLUM/YLgvLWBKn2mWRYf5LxkQplmGqRRl9
- HbsBBmw78xsRwM0ePg1JtF+xHKfGRbkmoy1Ky7by3J450MJqCCAmq+4p1N4nCG34KwPz
- YvK9DR2Ouh7t5197HG8ncwZUxMmLwVV5cinxoDFcuyjDjdQMyXTCWkc8EeAG2vAeYA+P
- GIYQ==
-X-Gm-Message-State: APjAAAUmbMzEC2wUUSMcBRsPiV1iFa7fSkWPCjLMpr46LtPrj56l24YP
- 5OwFdqUIjEELpcXlju5DEka1qg==
-X-Google-Smtp-Source: APXvYqwQRFXY82z5xKzjUVOALFR1faQ5/C1VwAFyAUQI2Nt+Xkjf3IfA8i3ewC/bw0zomwUxnZQxQQ==
-X-Received: by 2002:a5d:6144:: with SMTP id y4mr49679004wrt.84.1563443704826; 
- Thu, 18 Jul 2019 02:55:04 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:e427:3beb:1110:dda2?
- ([2001:b07:6468:f312:e427:3beb:1110:dda2])
- by smtp.gmail.com with ESMTPSA id z6sm22344394wrw.2.2019.07.18.02.55.04
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Thu, 18 Jul 2019 02:55:04 -0700 (PDT)
-To: tony.nguyen@bt.com, qemu-devel@nongnu.org
-References: <11e818d38ebc40e986cfa62dd7d0afdc@tpw09926dag18e.domain1.systemhost.net>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <8c3440d1-7333-5b0c-2271-450c555e9f52@redhat.com>
-Date: Thu, 18 Jul 2019 11:55:03 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+ (envelope-from <groug@kaod.org>) id 1ho3Pq-0005Dz-3x
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 06:13:35 -0400
+Received: from 8.mo68.mail-out.ovh.net ([46.105.74.219]:41438)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1ho3Pp-0005Cg-Oc
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 06:13:34 -0400
+Received: from player698.ha.ovh.net (unknown [10.109.160.62])
+ by mo68.mail-out.ovh.net (Postfix) with ESMTP id AFA3C13CD65
+ for <qemu-devel@nongnu.org>; Thu, 18 Jul 2019 12:13:30 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player698.ha.ovh.net (Postfix) with ESMTPSA id 041F980DAEF8;
+ Thu, 18 Jul 2019 10:13:23 +0000 (UTC)
+Date: Thu, 18 Jul 2019 12:13:22 +0200
+From: Greg Kurz <groug@kaod.org>
+To: Nicholas Piggin <npiggin@gmail.com>
+Message-ID: <20190718121322.663cb5ec@bahia.lab.toulouse-stg.fr.ibm.com>
+In-Reply-To: <20190718034214.14948-2-npiggin@gmail.com>
+References: <20190718034214.14948-1-npiggin@gmail.com>
+ <20190718034214.14948-2-npiggin@gmail.com>
+X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <11e818d38ebc40e986cfa62dd7d0afdc@tpw09926dag18e.domain1.systemhost.net>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 5064860734042315203
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduvddrieehgddvjecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.221.67
-Subject: Re: [Qemu-devel] [PATCH] configure: Define target access alignment
- in configure
+X-Received-From: 46.105.74.219
+Subject: Re: [Qemu-devel] [PATCH v6 1/4] spapr: Implement dispatch tracking
+ for tcg
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,212 +69,211 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: rth@twiddle.net
+Cc: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>, qemu-ppc@nongnu.org,
+ qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 18/07/19 08:01, tony.nguyen@bt.com wrote:
-> This patch moves the define of target access alignment earlier from
-> target/foo/cpu.h to configure.
+On Thu, 18 Jul 2019 13:42:11 +1000
+Nicholas Piggin <npiggin@gmail.com> wrote:
+
+> Implement cpu_exec_enter/exit on ppc which calls into new methods of
+> the same name in PPCVirtualHypervisorClass. These are used by spapr
+> to implement the splpar VPA dispatch counter initially.
 > 
-> Suggested in Richard Henderson's reply to "[PATCH 1/4] tcg: TCGMemOp is now
-> accelerator independent MemOp"
-> 
-> Signed-off-by: Tony Nguyen <tony.nguyen@bt.com>
+> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 > ---
->  configure             | 12 ++++++++++--
->  include/exec/poison.h |  1 +
->  include/qom/cpu.h     |  2 +-
->  target/alpha/cpu.h    |  2 --
->  target/hppa/cpu.h     |  1 -
->  target/mips/cpu.h     |  2 --
->  target/sh4/cpu.h      |  2 --
->  target/sparc/cpu.h    |  2 --
->  target/xtensa/cpu.h   |  2 --
->  tcg/tcg.c             |  2 +-
->  tcg/tcg.h             |  8 +++++---
->  11 files changed, 18 insertions(+), 18 deletions(-)
+> Changes since v5:
+> - Move 'prod' into next patch.
+> - Use uint32_t type for dispatch counter.
+> - Add guest error message for incorrect dispatch counter.
+> - Conditionally compile away if CONFIG_USER_ONLY
+> - Small cleanups
 > 
-> diff --git a/configure b/configure
-> index eb635c3b9a..c07687c656 100755
-> --- a/configure
-> +++ b/configure
-> @@ -7424,11 +7424,16 @@ for target in $target_list; do
->  target_dir="$target"
->  config_target_mak=$target_dir/config-target.mak
->  target_name=$(echo $target | cut -d '-' -f 1)
-> +target_aligned_only="no"
-> +case "$target_name" in
-> +  alpha|hppa|mips64el|mips64|mipsel|mips|mipsn32|mipsn32el|sh4|sh4eb|sparc|sparc64|sparc32plus|xtensa|xtensaeb)
-> +  target_aligned_only="yes"
-> +  ;;
-> +esac
->  target_bigendian="no"
+> Changes since v4:
+> - Store to VPA on the way out as well.
+> - Increment the dispatch counter directly in the VPA, which means it will
+>   migrate with guest memory the same as KVM.
+> - Prod need not be migrated, add a comment.
+> 
+>  hw/ppc/spapr.c                  | 52 +++++++++++++++++++++++++++++++++
+>  hw/ppc/spapr_hcall.c            |  5 ----
+>  include/hw/ppc/spapr.h          |  7 +++++
+>  target/ppc/cpu.h                |  4 +++
+>  target/ppc/translate_init.inc.c | 27 +++++++++++++++++
+>  5 files changed, 90 insertions(+), 5 deletions(-)
+> 
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 821f0d4a49..3e5678d467 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -4302,6 +4302,54 @@ PowerPCCPU *spapr_find_cpu(int vcpu_id)
+>      return NULL;
+>  }
+>  
+> +#ifndef CONFIG_USER_ONLY
+
+This file is for system emulation only, no need to guard here.
+
+This is minor and rest looks good.
+
+Reviewed-by: Greg Kurz <groug@kaod.org>
+
+> +static void spapr_cpu_exec_enter(PPCVirtualHypervisor *vhyp, PowerPCCPU *cpu)
+> +{
+> +    SpaprCpuState *spapr_cpu = spapr_cpu_state(cpu);
+> +
+> +    /* These are only called by TCG, KVM maintains dispatch state */
+> +
+> +    if (spapr_cpu->vpa_addr) {
+> +        CPUState *cs = CPU(cpu);
+> +        uint32_t dispatch;
+> +
+> +        dispatch = ldl_be_phys(cs->as,
+> +                               spapr_cpu->vpa_addr + VPA_DISPATCH_COUNTER);
+> +        dispatch++;
+> +        if ((dispatch & 1) != 0) {
+> +            qemu_log_mask(LOG_GUEST_ERROR,
+> +                          "VPA: incorrect dispatch counter value for "
+> +                          "dispatched partition %u, correcting.\n", dispatch);
+> +            dispatch++;
+> +        }
+> +        stl_be_phys(cs->as,
+> +                    spapr_cpu->vpa_addr + VPA_DISPATCH_COUNTER, dispatch);
+> +    }
+> +}
+> +
+> +static void spapr_cpu_exec_exit(PPCVirtualHypervisor *vhyp, PowerPCCPU *cpu)
+> +{
+> +    SpaprCpuState *spapr_cpu = spapr_cpu_state(cpu);
+> +
+> +    if (spapr_cpu->vpa_addr) {
+> +        CPUState *cs = CPU(cpu);
+> +        uint32_t dispatch;
+> +
+> +        dispatch = ldl_be_phys(cs->as,
+> +                               spapr_cpu->vpa_addr + VPA_DISPATCH_COUNTER);
+> +        dispatch++;
+> +        if ((dispatch & 1) != 1) {
+> +            qemu_log_mask(LOG_GUEST_ERROR,
+> +                          "VPA: incorrect dispatch counter value for "
+> +                          "preempted partition %u, correcting.\n", dispatch);
+> +            dispatch++;
+> +        }
+> +        stl_be_phys(cs->as,
+> +                    spapr_cpu->vpa_addr + VPA_DISPATCH_COUNTER, dispatch);
+> +    }
+> +}
+> +#endif
+> +
+>  static void spapr_machine_class_init(ObjectClass *oc, void *data)
+>  {
+>      MachineClass *mc = MACHINE_CLASS(oc);
+> @@ -4358,6 +4406,10 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
+>      vhc->hpte_set_r = spapr_hpte_set_r;
+>      vhc->get_pate = spapr_get_pate;
+>      vhc->encode_hpt_for_kvm_pr = spapr_encode_hpt_for_kvm_pr;
+> +#ifndef CONFIG_USER_ONLY
+> +    vhc->cpu_exec_enter = spapr_cpu_exec_enter;
+> +    vhc->cpu_exec_exit = spapr_cpu_exec_exit;
+> +#endif
+>      xic->ics_get = spapr_ics_get;
+>      xic->ics_resend = spapr_ics_resend;
+>      xic->icp_get = spapr_icp_get;
+> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+> index 6808d4cda8..e615881ac4 100644
+> --- a/hw/ppc/spapr_hcall.c
+> +++ b/hw/ppc/spapr_hcall.c
+> @@ -874,11 +874,6 @@ unmap_out:
+>  #define FLAGS_DEREGISTER_DTL       0x0000c00000000000ULL
+>  #define FLAGS_DEREGISTER_SLBSHADOW 0x0000e00000000000ULL
+>  
+> -#define VPA_MIN_SIZE           640
+> -#define VPA_SIZE_OFFSET        0x4
+> -#define VPA_SHARED_PROC_OFFSET 0x9
+> -#define VPA_SHARED_PROC_VAL    0x2
 > -
->  case "$target_name" in
->    armeb|aarch64_be|hppa|lm32|m68k|microblaze|mips|mipsn32|mips64|moxie|or1k|ppc|ppc64|ppc64abi32|s390x|sh4eb|sparc|sparc64|sparc32plus|xtensaeb)
-> -  target_bigendian=yes
-> +  target_bigendian="yes"
->    ;;
->  esac
->  target_softmmu="no"
-> @@ -7710,6 +7715,9 @@ fi
->  if supported_whpx_target $target; then
->      echo "CONFIG_WHPX=y" >> $config_target_mak
->  fi
-> +if test "$target_aligned_only" = "yes" ; then
-> +  echo "TARGET_ALIGNED_ONLY=y" >> $config_target_mak
-> +fi
->  if test "$target_bigendian" = "yes" ; then
->    echo "TARGET_WORDS_BIGENDIAN=y" >> $config_target_mak
->  fi
-> diff --git a/include/exec/poison.h b/include/exec/poison.h
-> index b862320fa6..955eb863ab 100644
-> --- a/include/exec/poison.h
-> +++ b/include/exec/poison.h
-> @@ -35,6 +35,7 @@
->  #pragma GCC poison TARGET_UNICORE32
->  #pragma GCC poison TARGET_XTENSA
+>  static target_ulong register_vpa(PowerPCCPU *cpu, target_ulong vpa)
+>  {
+>      CPUState *cs = CPU(cpu);
+> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> index 60553d32c4..5d36eec9d0 100644
+> --- a/include/hw/ppc/spapr.h
+> +++ b/include/hw/ppc/spapr.h
+> @@ -525,6 +525,13 @@ void spapr_register_hypercall(target_ulong opcode, spapr_hcall_fn fn);
+>  target_ulong spapr_hypercall(PowerPCCPU *cpu, target_ulong opcode,
+>                               target_ulong *args);
 >  
-> +#pragma GCC poison TARGET_ALIGNED_ONLY
->  #pragma GCC poison TARGET_HAS_BFLT
->  #pragma GCC poison TARGET_NAME
->  #pragma GCC poison TARGET_SUPPORTS_MTTCG
-> diff --git a/include/qom/cpu.h b/include/qom/cpu.h
-> index 5ee0046b62..9b50b73339 100644
-> --- a/include/qom/cpu.h
-> +++ b/include/qom/cpu.h
-> @@ -89,7 +89,7 @@ struct TranslationBlock;
->   * @do_unassigned_access: Callback for unassigned access handling.
->   * (this is deprecated: new targets should use do_transaction_failed instead)
->   * @do_unaligned_access: Callback for unaligned access handling, if
-> - * the target defines #ALIGNED_ONLY.
-> + * the target defines #TARGET_ALIGNED_ONLY.
->   * @do_transaction_failed: Callback for handling failed memory transactions
->   * (ie bus faults or external aborts; not MMU faults)
->   * @virtio_is_big_endian: Callback to return %true if a CPU which supports
-> diff --git a/target/alpha/cpu.h b/target/alpha/cpu.h
-> index b3e8a823e1..16eb8047cf 100644
-> --- a/target/alpha/cpu.h
-> +++ b/target/alpha/cpu.h
-> @@ -23,8 +23,6 @@
->  #include "cpu-qom.h"
->  #include "exec/cpu-defs.h"
->  
-> -#define ALIGNED_ONLY
-> -
->  /* Alpha processors have a weak memory model */
->  #define TCG_GUEST_DEFAULT_MO      (0)
->  
-> diff --git a/target/hppa/cpu.h b/target/hppa/cpu.h
-> index aab251bc4b..2be67c289a 100644
-> --- a/target/hppa/cpu.h
-> +++ b/target/hppa/cpu.h
-> @@ -30,7 +30,6 @@
->     basis.  It's probably easier to fall back to a strong memory model.  */
->  #define TCG_GUEST_DEFAULT_MO        TCG_MO_ALL
->  
-> -#define ALIGNED_ONLY
->  #define MMU_KERNEL_IDX   0
->  #define MMU_USER_IDX     3
->  #define MMU_PHYS_IDX     4
-> diff --git a/target/mips/cpu.h b/target/mips/cpu.h
-> index 21c0615e02..c13cd4eb31 100644
-> --- a/target/mips/cpu.h
-> +++ b/target/mips/cpu.h
-> @@ -1,8 +1,6 @@
->  #ifndef MIPS_CPU_H
->  #define MIPS_CPU_H
->  
-> -#define ALIGNED_ONLY
-> -
->  #include "cpu-qom.h"
->  #include "exec/cpu-defs.h"
->  #include "fpu/softfloat.h"
-> diff --git a/target/sh4/cpu.h b/target/sh4/cpu.h
-> index aee733eaaa..ecaa7a18a9 100644
-> --- a/target/sh4/cpu.h
-> +++ b/target/sh4/cpu.h
-> @@ -23,8 +23,6 @@
->  #include "cpu-qom.h"
->  #include "exec/cpu-defs.h"
->  
-> -#define ALIGNED_ONLY
-> -
->  /* CPU Subtypes */
->  #define SH_CPU_SH7750  (1 << 0)
->  #define SH_CPU_SH7750S (1 << 1)
-> diff --git a/target/sparc/cpu.h b/target/sparc/cpu.h
-> index 8ed2250cd0..1406f0ba2e 100644
-> --- a/target/sparc/cpu.h
-> +++ b/target/sparc/cpu.h
-> @@ -5,8 +5,6 @@
->  #include "cpu-qom.h"
->  #include "exec/cpu-defs.h"
->  
-> -#define ALIGNED_ONLY
-> -
->  #if !defined(TARGET_SPARC64)
->  #define TARGET_DPREGS 16
->  #else
-> diff --git a/target/xtensa/cpu.h b/target/xtensa/cpu.h
-> index 2c277134f1..0459243e6b 100644
-> --- a/target/xtensa/cpu.h
-> +++ b/target/xtensa/cpu.h
-> @@ -32,8 +32,6 @@
->  #include "exec/cpu-defs.h"
->  #include "xtensa-isa.h"
->  
-> -#define ALIGNED_ONLY
-> -
->  /* Xtensa processors have a weak memory model */
->  #define TCG_GUEST_DEFAULT_MO      (0)
->  
-> diff --git a/tcg/tcg.c b/tcg/tcg.c
-> index be2c33c400..8d23fb0592 100644
-> --- a/tcg/tcg.c
-> +++ b/tcg/tcg.c
-> @@ -1926,7 +1926,7 @@ static const char * const ldst_name[] =
+> +/* Virtual Processor Area structure constants */
+> +#define VPA_MIN_SIZE           640
+> +#define VPA_SIZE_OFFSET        0x4
+> +#define VPA_SHARED_PROC_OFFSET 0x9
+> +#define VPA_SHARED_PROC_VAL    0x2
+> +#define VPA_DISPATCH_COUNTER   0x100
+> +
+>  /* ibm,set-eeh-option */
+>  #define RTAS_EEH_DISABLE                 0
+>  #define RTAS_EEH_ENABLE                  1
+> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+> index c9beba2a5c..9e8fd3c621 100644
+> --- a/target/ppc/cpu.h
+> +++ b/target/ppc/cpu.h
+> @@ -1224,6 +1224,10 @@ struct PPCVirtualHypervisorClass {
+>      void (*hpte_set_r)(PPCVirtualHypervisor *vhyp, hwaddr ptex, uint64_t pte1);
+>      void (*get_pate)(PPCVirtualHypervisor *vhyp, ppc_v3_pate_t *entry);
+>      target_ulong (*encode_hpt_for_kvm_pr)(PPCVirtualHypervisor *vhyp);
+> +#ifndef CONFIG_USER_ONLY
+> +    void (*cpu_exec_enter)(PPCVirtualHypervisor *vhyp, PowerPCCPU *cpu);
+> +    void (*cpu_exec_exit)(PPCVirtualHypervisor *vhyp, PowerPCCPU *cpu);
+> +#endif
 >  };
 >  
->  static const char * const alignment_name[(MO_AMASK >> MO_ASHIFT) + 1] = {
-> -#ifdef ALIGNED_ONLY
-> +#ifdef TARGET_ALIGNED_ONLY
->      [MO_UNALN >> MO_ASHIFT]    = "un+",
->      [MO_ALIGN >> MO_ASHIFT]    = "",
->  #else
-> diff --git a/tcg/tcg.h b/tcg/tcg.h
-> index b411e17a28..529acb2ed8 100644
-> --- a/tcg/tcg.h
-> +++ b/tcg/tcg.h
-> @@ -333,10 +333,12 @@ typedef enum TCGMemOp {
->      MO_TE    = MO_LE,
+>  #define TYPE_PPC_VIRTUAL_HYPERVISOR "ppc-virtual-hypervisor"
+> diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.inc.c
+> index 86fc8f2e31..bae4820503 100644
+> --- a/target/ppc/translate_init.inc.c
+> +++ b/target/ppc/translate_init.inc.c
+> @@ -10471,6 +10471,28 @@ static bool ppc_cpu_is_big_endian(CPUState *cs)
+>  
+>      return !msr_le;
+>  }
+> +
+> +static void ppc_cpu_exec_enter(CPUState *cs)
+> +{
+> +    PowerPCCPU *cpu = POWERPC_CPU(cs);
+> +
+> +    if (cpu->vhyp) {
+> +        PPCVirtualHypervisorClass *vhc =
+> +            PPC_VIRTUAL_HYPERVISOR_GET_CLASS(cpu->vhyp);
+> +        vhc->cpu_exec_enter(cpu->vhyp, cpu);
+> +    }
+> +}
+> +
+> +static void ppc_cpu_exec_exit(CPUState *cs)
+> +{
+> +    PowerPCCPU *cpu = POWERPC_CPU(cs);
+> +
+> +    if (cpu->vhyp) {
+> +        PPCVirtualHypervisorClass *vhc =
+> +            PPC_VIRTUAL_HYPERVISOR_GET_CLASS(cpu->vhyp);
+> +        vhc->cpu_exec_exit(cpu->vhyp, cpu);
+> +    }
+> +}
 >  #endif
 >  
-> -    /* MO_UNALN accesses are never checked for alignment.
-> +    /*
-> +     * MO_UNALN accesses are never checked for alignment.
->       * MO_ALIGN accesses will result in a call to the CPU's
->       * do_unaligned_access hook if the guest address is not aligned.
-> -     * The default depends on whether the target CPU defines ALIGNED_ONLY.
-> +     * The default depends on whether the target CPU defines
-> +     * TARGET_ALIGNED_ONLY.
->       *
->       * Some architectures (e.g. ARMv8) need the address which is aligned
->       * to a size more than the size of the memory access.
-> @@ -353,7 +355,7 @@ typedef enum TCGMemOp {
->       */
->      MO_ASHIFT = 4,
->      MO_AMASK = 7 << MO_ASHIFT,
-> -#ifdef ALIGNED_ONLY
-> +#ifdef TARGET_ALIGNED_ONLY
->      MO_ALIGN = 0,
->      MO_UNALN = MO_AMASK,
->  #else
-> 
+>  static void ppc_cpu_instance_init(Object *obj)
+> @@ -10624,6 +10646,11 @@ static void ppc_cpu_class_init(ObjectClass *oc, void *data)
+>      cc->tcg_initialize = ppc_translate_init;
+>      cc->tlb_fill = ppc_cpu_tlb_fill;
+>  #endif
+> +#ifndef CONFIG_USER_ONLY
+> +    cc->cpu_exec_enter = ppc_cpu_exec_enter;
+> +    cc->cpu_exec_exit = ppc_cpu_exec_exit;
+> +#endif
+> +
+>      cc->disas_set_info = ppc_disas_set_info;
+>  
+>      dc->fw_name = "PowerPC,UNKNOWN";
 
-Queued for 4.2, thanks.
-
-Paolo
 
