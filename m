@@ -2,74 +2,70 @@ Return-Path: <SRS0=9jkQ=VP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36756C7618F
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 15:01:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF01FC7618F
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 15:04:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DD9D62080D
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 15:01:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD9D62080D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 838122080D
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 15:04:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 838122080D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38896 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38928 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ho7ud-00005j-Sl
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jul 2019 11:01:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39023)
+	id 1ho7x6-00038o-H0
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jul 2019 11:04:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40071)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bounces@canonical.com>) id 1ho7uG-0007Pr-25
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 11:01:22 -0400
+ (envelope-from <lersek@redhat.com>) id 1ho7wq-0002Vq-OD
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 11:03:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1ho7u9-0007rX-TS
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 11:01:15 -0400
-Received: from indium.canonical.com ([91.189.90.7]:33260)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1ho7u9-0007qt-Jf
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 11:01:09 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1ho7u8-0000Ee-PW
- for <qemu-devel@nongnu.org>; Thu, 18 Jul 2019 15:01:08 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id BEC4C2E80CC
- for <qemu-devel@nongnu.org>; Thu, 18 Jul 2019 15:01:08 +0000 (UTC)
+ (envelope-from <lersek@redhat.com>) id 1ho7wp-0001Pn-E5
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 11:03:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37034)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <lersek@redhat.com>)
+ id 1ho7wm-0001Mr-DW; Thu, 18 Jul 2019 11:03:52 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id AAE5530C1E34;
+ Thu, 18 Jul 2019 15:03:50 +0000 (UTC)
+Received: from lacos-laptop-7.usersys.redhat.com (ovpn-116-84.ams2.redhat.com
+ [10.36.116.84])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1FD7A63C20;
+ Thu, 18 Jul 2019 15:03:25 +0000 (UTC)
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20190718104837.13905-1-philmd@redhat.com>
+ <20190718104837.13905-2-philmd@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <5e6b8a67-8f8a-3e3b-4f42-db2a31c03ad1@redhat.com>
+Date: Thu, 18 Jul 2019 17:03:24 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.9.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20190718104837.13905-2-philmd@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.47]); Thu, 18 Jul 2019 15:03:50 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 18 Jul 2019 14:55:07 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Fix Committed; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Tags: linux-user mips
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: daniel-santos philmd pmaydell th-huth
-X-Launchpad-Bug-Reporter: Daniel Santos (daniel-santos)
-X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
-References: <155542675846.7866.6509809085972568558.malonedeb@wampee.canonical.com>
-Message-Id: <156346170759.18485.10533293168862597121.malone@gac.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="19010";
- Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: d398a7e59ad7ce9c19306e6ce7515e372b1c2b2e
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1825002] Re: "qemu: Unexpected FPU mode" since
- 0c1bbedc10e86ea9366b6af8c5520fafa3266b2f
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH-for-4.1 v7 1/1] hw/block/pflash_cfi01: Add
+ missing DeviceReset() handler
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -78,265 +74,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1825002 <1825002@bugs.launchpad.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Alistair Francis <alistair.francis@wdc.com>, John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-A fix for this was committed as abcac736c1505254ec3 and will be in the
-upcoming 4.1 release.
+On 07/18/19 12:48, Philippe Mathieu-Daud=C3=A9 wrote:
+> To avoid incoherent states when the machine resets (see but report
 
-** Changed in: qemu
-       Status: In Progress =3D> Fix Committed
+(1) For the PULL request, please fix the typo: s/but/bug/
 
--- =
+> below), add the device reset callback.
+>=20
+> A "system reset" sets the device state machine in READ_ARRAY mode
+> and, after some delay, set the SR.7 READY bit.
+>=20
+> Since we do not model timings, we set the SR.7 bit directly.
+>=20
+> Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=3D1678713
+> Reported-by: Laszlo Ersek <lersek@redhat.com>
+> Reviewed-by: John Snow <jsnow@redhat.com>
+> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+>  hw/block/pflash_cfi01.c | 19 +++++++++++++++++++
+>  1 file changed, 19 insertions(+)
+>=20
+> diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
+> index 435be1e35c..a1ec1faae5 100644
+> --- a/hw/block/pflash_cfi01.c
+> +++ b/hw/block/pflash_cfi01.c
+> @@ -865,6 +865,24 @@ static void pflash_cfi01_realize(DeviceState *dev,=
+ Error **errp)
+>      pfl->cfi_table[0x3f] =3D 0x01; /* Number of protection fields */
+>  }
+> =20
+> +static void pflash_cfi01_system_reset(DeviceState *dev)
+> +{
+> +    PFlashCFI01 *pfl =3D PFLASH_CFI01(dev);
+> +
+> +    /*
+> +     * The command 0x00 is not assigned by the CFI open standard,
+> +     * but QEMU historically uses it for the READ_ARRAY command (0xff)=
+.
+> +     */
+> +    pfl->cmd =3D 0x00;
+> +    pfl->wcycle =3D 0;
+> +    memory_region_rom_device_set_romd(&pfl->mem, true);
+> +    /*
+> +     * The WSM ready timer occurs at most 150ns after system reset.
+> +     * This model deliberately ignores this delay.
+> +     */
+> +    pfl->status =3D 0x80;
+> +}
+> +
+>  static Property pflash_cfi01_properties[] =3D {
+>      DEFINE_PROP_DRIVE("drive", PFlashCFI01, blk),
+>      /* num-blocks is the number of blocks actually visible to the gues=
+t,
+> @@ -909,6 +927,7 @@ static void pflash_cfi01_class_init(ObjectClass *kl=
+ass, void *data)
+>  {
+>      DeviceClass *dc =3D DEVICE_CLASS(klass);
+> =20
+> +    dc->reset =3D pflash_cfi01_system_reset;
+>      dc->realize =3D pflash_cfi01_realize;
+>      dc->props =3D pflash_cfi01_properties;
+>      dc->vmsd =3D &vmstate_pflash;
+>=20
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1825002
+(2) Reviewed-by: Laszlo Ersek <lersek@redhat.com>
 
-Title:
-  "qemu: Unexpected FPU mode" since
-  0c1bbedc10e86ea9366b6af8c5520fafa3266b2f
+A *future* improvement (meant just for this surgical reset handler --
+not meaning any large cfi01 overhaul!) could be the addition of a trace
+point, at the top of pflash_cfi01_system_reset().
 
-Status in QEMU:
-  Fix Committed
-
-Bug description:
-  This happens every time I attempt to chroot into a gentoo-mips image
-  unless I load the executable via ld.so
-
-  /home (root)# chroot gentoo-mips32r2el /bin/sh
-  qemu: Unexpected FPU mode
-  /home (root)# chroot gentoo-mips32r2el /lib/ld-2.19.so /bin/sh
-  sh-4.2# exit
-  /home (root)# =
+But that is strictly "nice to have", and not necessary to include in the
+present bugfix.
 
 
-  I don't know the underlying cause, but keep in mind that we may lie
-  and claim to have an FPU when our CPU doesn't because of kernel
-  emulation that may not be present in the host kernel.  Don't know if
-  that's related.
+(3) Using OVMF IA32X64 (including the edk2 SMM stack), I've
+regression-tested this patch, on top of v4.1.0-rc1, with KVM. As follows:
 
-  I get this with various gentoo-mips stage3 tarballs, but not with
-  OpenWRT.  (e.g.,
-  https://gentoo.osuosl.org/experimental/mips/stages/mips32r2el/2014)
+(3a) Normal reboot from the UEFI shell ("reset -c" command)
+
+(3b) Normal reboot from the Linux guest prompt ("reboot" command)
+
+(3c1) Reset as part of ACPI S3 suspend/resume
+(3c2) then use "efibootmgr -n / -N" to write to pflash (by virtue of
+setting / deleting the standardized BootNext UEFI variable)
+
+(3d1) Boot to setup TUI with SB enabled
+(3d2) erase Platform Key in setup TUI (disables SB)
+(3d3) reboot from within setup TUI
+(3d4) proceed to UEFI shell
+(3d5) enable SB with EnrollDefaultKeys.efi
+(3d6) reboot from UEFI shell
+(3d7) proceeed to Linux guest
+(3d8) verify SB enablement (dmesg, "mokutil --sb-state")
+
+(As an added exercise, step (3d4) triggered an "FTW" (fault tolerant
+write) "reclaim" (basically a defragmentation of the journaled
+"filesystem" that the firmware keeps in the flash, as a logical "middle
+layer"), and that worked fine too.)
+
+Regression-tested-by: Laszlo Ersek <lersek@redhat.com>
 
 
-  # emerge --info app-emulation/qemu
-  Portage 2.3.51 (python 3.6.5-final-0, default/linux/amd64/17.0/desktop/pl=
-asma, gcc-8.2.0, glibc-2.27-r6, 4.14.96-gentoo x86_64)
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-                           System Settings
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-  System uname: Linux-4.14.96-gentoo-x86_64-AMD_Ryzen_7_2700X_Eight-Core_Pr=
-ocessor-with-gentoo-2.6
-  KiB Mem:    32890732 total,   3480024 free
-  KiB Swap:   16777212 total,  10575592 free
-  Timestamp of repository gentoo: Thu, 11 Apr 2019 06:00:01 +0000
-  Head commit of repository gentoo: 66eaaa28926103e690db0699466a274a17ab1979
-  sh bash 4.4_p23-r1
-  ld GNU ld (Gentoo 2.30 p5) 2.30.0
-  distcc 3.3.2 x86_64-pc-linux-gnu [disabled]
-  ccache version 3.3.4 [disabled]
-  app-shells/bash:          4.4_p23-r1::gentoo
-  dev-java/java-config:     2.2.0-r4::gentoo
-  dev-lang/perl:            5.26.2::gentoo
-  dev-lang/python:          2.7.15::gentoo, 3.6.5::gentoo
-  dev-util/ccache:          3.3.4-r1::gentoo
-  dev-util/cmake:           3.9.6::gentoo
-  dev-util/pkgconfig:       0.29.2::gentoo
-  sys-apps/baselayout:      2.6-r1::gentoo
-  sys-apps/openrc:          0.38.3-r1::gentoo
-  sys-apps/sandbox:         2.13::gentoo
-  sys-devel/autoconf:       2.13-r1::gentoo, 2.64-r1::gentoo, 2.69-r4::gent=
-oo
-  sys-devel/automake:       1.11.6-r3::gentoo, 1.13.4-r2::gentoo, 1.15.1-r2=
-::gentoo, 1.16.1-r1::gentoo
-  sys-devel/binutils:       2.30-r4::gentoo
-  sys-devel/gcc:            4.9.4::gentoo, 5.4.0-r6::gentoo, 6.4.0-r5::gent=
-oo, 7.3.0-r6::gentoo, 8.1.0-r3::gentoo, 8.2.0-r6::gentoo, 8.3.0::gentoo
-  sys-devel/gcc-config:     2.0::gentoo
-  sys-devel/libtool:        2.4.6-r3::gentoo
-  sys-devel/make:           4.2.1-r4::gentoo
-  sys-kernel/linux-headers: 4.14-r1::gentoo (virtual/os-headers)
-  sys-libs/glibc:           2.27-r6::gentoo
-  Repositories:
+(4) I plan to provide R-t-b in the evening from aarch64 KVM too, using
+the edk2 ArmVirtQemu firmware. Only the first two steps from (3) will be
+covered (no ACPI S3, no SB).
 
-  gentoo
-      location: /usr/portage
-      sync-type: rsync
-      sync-uri: rsync://rsync.gentoo.org/gentoo-portage
-      priority: -1000
-      sync-rsync-verify-jobs: 1
-      sync-rsync-extra-opts: =
-
-      sync-rsync-verify-metamanifest: yes
-      sync-rsync-verify-max-age: 24
-
-  love-local
-      location: /usr/local/portage
-      masters: gentoo
-      priority: 0
-
-  chaoslab
-      location: /var/lib/layman/chaoslab
-      masters: gentoo
-      priority: 50
-
-  java
-      location: /var/lib/layman/java
-      masters: gentoo
-      priority: 50
-
-  steam-overlay
-      location: /var/lib/layman/steam-overlay
-      masters: gentoo
-      priority: 50
-
-  zugaina
-      location: /var/lib/layman/zugaina
-      masters: gentoo
-      priority: 50
-
-  ACCEPT_KEYWORDS=3D"amd64"
-  ACCEPT_LICENSE=3D"* -@EULA"
-  CBUILD=3D"x86_64-pc-linux-gnu"
-  CFLAGS=3D"-march=3Dnative -O2 -ggdb3 -pipe"
-  CHOST=3D"x86_64-pc-linux-gnu"
-  CONFIG_PROTECT=3D"/etc /usr/lib64/libreoffice/program/sofficerc /usr/shar=
-e/config /usr/share/gnupg/qualified.txt"
-  CONFIG_PROTECT_MASK=3D"/etc/ca-certificates.conf /etc/dconf /etc/env.d /e=
-tc/fonts/fonts.conf /etc/gconf /etc/gentoo-release /etc/revdep-rebuild /etc=
-/sandbox.d /etc/splash /etc/terminfo /etc/texmf/language.dat.d /etc/texmf/l=
-anguage.def.d /etc/texmf/updmap.d /etc/texmf/web2c"
-  CXXFLAGS=3D"-march=3Dnative -O2 -ggdb3 -pipe"
-  DISTDIR=3D"/mnt/large/distfiles"
-  EMERGE_DEFAULT_OPTS=3D"-j3 --load-average=3D17.5 --with-bdeps=3Dy --autou=
-nmask=3Dn"
-  ENV_UNSET=3D"DBUS_SESSION_BUS_ADDRESS DISPLAY GOBIN PERL5LIB PERL5OPT PER=
-LPREFIX PERL_CORE PERL_MB_OPT PERL_MM_OPT XAUTHORITY XDG_CACHE_HOME XDG_CON=
-FIG_HOME XDG_DATA_HOME XDG_RUNTIME_DIR"
-  FCFLAGS=3D"-O2 -pipe"
-  FEATURES=3D"assume-digests binpkg-logs buildpkg candy cgroup compress-bui=
-ld-logs compressdebug config-protect-if-modified distlocks ebuild-locks fix=
-lafiles installsources ipc-sandbox merge-sync multilib-strict network-sandb=
-ox news parallel-fetch preserve-libs protect-owned sandbox sfperms split-el=
-og split-log splitdebug strict strict-keepdir unknown-features-warn unmerge=
--logs unmerge-orphans userfetch userpriv usersandbox usersync xattr"
-  FFLAGS=3D"-O2 -pipe"
-  GENTOO_MIRRORS=3D"http://gentoo.mirrors.tds.net/gentoo http://gentoo.mirr=
-ors.easynews.com/linux/gentoo/ http://gentoo.osuosl.org/ http://mirrors.rit=
-.edu/gentoo/ http://gentoo.cs.uni.edu/ http://gentoo.osuosl.org/ "
-  LANG=3D"en_US.utf8"
-  LDFLAGS=3D"-Wl,-O1 -Wl,--as-needed"
-  LINGUAS=3D"en en-US en_US"
-  MAKEOPTS=3D"-j15 --load-average=3D17"
-  PKGDIR=3D"/mnt/large/packages"
-  PORTAGE_COMPRESS=3D"pxz"
-  PORTAGE_COMPRESS_FLAGS=3D"-9e"
-  PORTAGE_CONFIGROOT=3D"/"
-  PORTAGE_RSYNC_OPTS=3D"--recursive --links --safe-links --perms --times --=
-omit-dir-times --compress --force --whole-file --delete --stats --human-rea=
-dable --timeout=3D180 --exclude=3D/distfiles --exclude=3D/local --exclude=
-=3D/packages --exclude=3D/.git"
-  PORTAGE_TMPDIR=3D"/tmp"
-  USE=3D"X a52 aac aacs acl acpi activities aes aio alsa amd64 amr avx avx2=
- bcache berkdb bluetooth bluray branding bzip2 cairo cdda cddb cdio cdr cel=
-t cli consolekit crypt cups cxx d3d9 dbus declarative designer device-mappe=
-r dirac directfb dot dri dts dvd dvdr emboss encode exif f16c fam ffmpeg ff=
-tw flac fluidsynth fma3 fontconfig fortran fuse gdbm geolocation gif git gl=
-amor go gphoto2 gpm gps graphite graphviz gsm gstreamer gtk hardened hddtem=
-p highlight iconv icu ipv6 jpeg jpeg2k kde kerberos kipi kwallet lame latex=
- lcms ldap libass libcaca libnotify libsamplerate libtirpc lm_sensors lto l=
-vm lz4 lzma lzo mad matroska midi mjpeg mmx mmxext mng mono mp3 mp4 mpeg mt=
-p multicall multilib multitarget musepack natspec ncurses netlink networkma=
-nager nfs nls nptl nsplugin ogg openal openexr opengl openh264 openmp opens=
-sl opus osmesa pam pango pcap pch pclmul pcre pdf perl pgo phonon plasma pl=
-aylist png policykit popcnt postgres postproc ppds pulseaudio python qml qt=
-5 rar raw readline samba sasl savedconfig scanner schroedinger sdl seccomp =
-sensors sid smp snappy speex spell spice sqlite sqlite3 squashfs sse sse2 s=
-se3 sse4_1 sse4_2 sse4a ssh ssl ssse3 startup-notification static-libs subv=
-ersion svg syslog systemtap taglib tcpd theora threads tiff timidity tools =
-tremor truetype tty-helpers twolame udev udisks unicode upnp-av upower usb =
-usbredir utils v4l vaapi valgrind vcdx vdpau vim-syntax virt-network virtio=
- vlc vorbis vpx webdav webp widgets wxwidgets x264 x265 xattr xcb xcomposit=
-e xen xine xml xspice xv xvid xvmc zeroconf zlib" ABI_X86=3D"64 32" ALSA_CA=
-RDS=3D"ali5451 als4000 atiixp atiixp-modem bt87x ca0106 cmipci emu10k1x ens=
-1370 ens1371 es1938 es1968 fm801 hda-intel intel8x0 intel8x0m maestro3 trid=
-ent usb-audio via82xx via82xx-modem ymfpci" APACHE2_MODULES=3D"authn_core a=
-uthz_core socache_shmcb unixd actions alias auth_basic authn_alias authn_an=
-on authn_dbm authn_default authn_file authz_dbm authz_default authz_groupfi=
-le authz_host authz_owner authz_user autoindex cache cgi cgid dav dav_fs da=
-v_lock deflate dir disk_cache env expires ext_filter file_cache filter head=
-ers include info log_config logio mem_cache mime mime_magic negotiation rew=
-rite setenvif speling status unique_id userdir usertrack vhost_alias" CALLI=
-GRA_FEATURES=3D"karbon sheets words" COLLECTD_PLUGINS=3D"df interface irq l=
-oad memory rrdtool swap syslog" CPU_FLAGS_X86=3D"aes avx avx2 f16c fma3 mmx=
- mmxext pclmul popcnt sse sse2 sse3 sse4_1 sse4_2 sse4a ssse3" CURL_SSL=3D"=
-openssl" ELIBC=3D"glibc" GPSD_PROTOCOLS=3D"ashtech aivdm earthmate evermore=
- fv18 garmin garmintxt gpsclock isync itrax mtk3301 nmea ntrip navcom ocean=
-server oldstyle oncore rtcm104v2 rtcm104v3 sirf skytraq superstar2 timing t=
-sip tripmate tnt ublox ubx" GRUB_PLATFORMS=3D"efi-64 pc coreboot emu multib=
-oot qemu xen" INPUT_DEVICES=3D"keyboard mouse joystick evdev wacom vmmouse"=
- KERNEL=3D"linux" L10N=3D"en en-US en_US" LCD_DEVICES=3D"bayrad cfontz cfon=
-tz633 glk hd44780 lb216 lcdm001 mtxorb ncurses text" LIBREOFFICE_EXTENSIONS=
-=3D"presenter-console presenter-minimizer" LLVM_TARGETS=3D"AMDGPU ARM BPF N=
-VPTX Mips X86" NETBEANS_MODULES=3D"apisupport cnd groovy gsf harness ide id=
-entity j2ee java mobility nb php profiler soa visualweb webcommon websvccom=
-mon xml" OFFICE_IMPLEMENTATION=3D"libreoffice" PHP_TARGETS=3D"php5-6 php7-1=
-" POSTGRES_TARGETS=3D"postgres9_5 postgres10" PYTHON_SINGLE_TARGET=3D"pytho=
-n3_6" PYTHON_TARGETS=3D"python2_7 python3_6" QEMU_SOFTMMU_TARGETS=3D"aarch6=
-4 arm armeb i386 hppa m68k microblaze microblazeel mips mips64 mips64el mip=
-sel mipsn32 mipsn32el ppc ppc64 ppc64abi32 ppc64le s390x sparc sparc32plus =
-sparc64 x86_64" QEMU_USER_TARGETS=3D"aarch64 arm armeb i386 hppa m68k micro=
-blaze microblazeel mips mips64 mips64el mipsel mipsn32 mipsn32el ppc ppc64 =
-ppc64abi32 ppc64le s390x sparc sparc32plus sparc64 x86_64" RUBY_TARGETS=3D"=
-ruby24" USERLAND=3D"GNU" VIDEO_CARDS=3D"radeon radeonsi vesa qxl vmware amd=
-gpu" XTABLES_ADDONS=3D"quota2 psd pknock lscan length2 ipv4options ipset ip=
-p2p iface geoip fuzzy condition tee tarpit sysrq steal rawnat logmark ipmar=
-k dhcpmac delude chaos account"
-  Unset:  CC, CPPFLAGS, CTARGET, CXX, INSTALL_MASK, LC_ALL, PORTAGE_BINHOST=
-, PORTAGE_BUNZIP2_COMMAND, PORTAGE_RSYNC_EXTRA_OPTS
-
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-                          Package Settings
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-  app-emulation/qemu-3.1.0-r4::gentoo was built with the following:
-  USE=3D"aio alsa bzip2 caps curl fdt filecaps gtk jpeg lzo ncurses nfs nls=
- opengl pin-upstream-blobs png pulseaudio python sasl sdl seccomp snappy sp=
-ice ssh static-user systemtap usb usbredir vde vhost-net virtfs vnc vte xat=
-tr xen -accessibility (-capstone) -debug (-glusterfs) -gnutls -infiniband -=
-iscsi -numa -rbd (-selinux) -smartcard (-static) -tci -test -virgl -xfs" AB=
-I_X86=3D"(64)" PYTHON_TARGETS=3D"python2_7 python3_6 -python3_5 (-python3_7=
-)" QEMU_SOFTMMU_TARGETS=3D"aarch64 arm hppa i386 m68k microblaze microblaze=
-el mips mips64 mips64el mipsel ppc ppc64 s390x sparc sparc64 x86_64 -alpha =
--cris -lm32 -moxie -nios2 -or1k -riscv32 -riscv64 -sh4 -sh4eb -tricore -uni=
-core32 -xtensa -xtensaeb" QEMU_USER_TARGETS=3D"aarch64 arm armeb hppa i386 =
-m68k microblaze microblazeel mips mips64 mips64el mipsel mipsn32 mipsn32el =
-ppc ppc64 ppc64abi32 ppc64le s390x sparc sparc32plus sparc64 x86_64 -aarch6=
-4_be -alpha -cris -nios2 -or1k -riscv32 -riscv64 -sh4 -sh4eb -tilegx -xtens=
-a -xtensaeb"
-
-  >>> Attempting to run pkg_info() for 'app-emulation/qemu-3.1.0-r4'
-  Using:
-    app-emulation/spice-protocol-0.12.14
-    sys-firmware/edk2-ovmf-2017_p20180211
-      USE=3Dbinary
-    sys-firmware/ipxe-1.0.0_p20180211
-    sys-firmware/seabios-1.11.0
-      USE=3Dbinary
-    sys-firmware/sgabios-0.1_pre8-r1
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1825002/+subscriptions
+Thanks!
+Laszlo
 
