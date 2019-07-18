@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6933AC7618F
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 17:55:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2EC8C7618F
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 18:05:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 42D8E20873
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 17:55:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42D8E20873
+	by mail.kernel.org (Postfix) with ESMTPS id 8DD0320873
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 18:05:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DD0320873
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40124 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40168 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hoAdD-00084D-MQ
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jul 2019 13:55:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34996)
+	id 1hoAmw-0004BL-Hv
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jul 2019 14:05:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38302)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bounces@canonical.com>) id 1hoAd2-0007fj-Kl
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 13:55:41 -0400
+ (envelope-from <bounces@canonical.com>) id 1hoAmm-0003kB-5u
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 14:05:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1hoAd0-00065B-FB
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 13:55:40 -0400
-Received: from indium.canonical.com ([91.189.90.7]:35070)
+ (envelope-from <bounces@canonical.com>) id 1hoAmk-0005QU-TA
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 14:05:44 -0400
+Received: from indium.canonical.com ([91.189.90.7]:36762)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1hoAcy-00062g-GE
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 13:55:38 -0400
+ id 1hoAmk-0005Q3-Kq
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 14:05:42 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1hoAcw-0002JY-29
- for <qemu-devel@nongnu.org>; Thu, 18 Jul 2019 17:55:34 +0000
+ id 1hoAmj-0003Q6-7C
+ for <qemu-devel@nongnu.org>; Thu, 18 Jul 2019 18:05:41 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 9754E2E80D3
- for <qemu-devel@nongnu.org>; Thu, 18 Jul 2019 17:55:33 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 341FE2E8041
+ for <qemu-devel@nongnu.org>; Thu, 18 Jul 2019 18:05:41 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 18 Jul 2019 17:47:39 -0000
+Date: Thu, 18 Jul 2019 17:58:55 -0000
 From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <1837094@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -57,16 +57,17 @@ X-Launchpad-Bug-Reporter: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
  =?utf-8?q?=29?=
 X-Launchpad-Bug-Modifier: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
  =?utf-8?q?=29?=
-Message-Id: <156347205992.30489.16276823737610194084.malonedeb@soybean.canonical.com>
+References: <156347205992.30489.16276823737610194084.malonedeb@soybean.canonical.com>
+Message-Id: <156347273572.17826.9232171391242011623.launchpad@gac.canonical.com>
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com); Revision="19010";
  Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: e5d20805552f5e80ca51af093f1b9517d6d647ce
+X-Launchpad-Hash: 0a80f75274b4f969512dbc2bcf8f56194140f8a3
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1837094] [NEW] UndefinedBehaviorSanitizer crash
+Subject: [Qemu-devel] [Bug 1837094] Re: UndefinedBehaviorSanitizer crash
  around slirp::ip_reass()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -83,31 +84,36 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+** Description changed:
 
-tag: v4.1.0-rc1
+  tag: v4.1.0-rc1
+  =
 
-./configure --enable-sanitizers --extra-cflags=3D-O1
+  ./configure --enable-sanitizers --extra-cflags=3D-O1
+  =
 
-=3D=3D26130=3D=3DERROR: UndefinedBehaviorSanitizer: SEGV on unknown address=
- 0x000000000008 (pc 0x00000046d588 bp 0x7fff6ee9f940 sp 0x7fff6ee9f8e8 T261=
-30)
-=3D=3D26130=3D=3DThe signal is caused by a WRITE memory access.
-=3D=3D26130=3D=3DHint: address points to the zero page.
-    #0 0x0000561ad346d587 in ip_deq() at slirp/src/ip_input.c:411:55
-    #1 0x0000561ad346cffb in ip_reass() at slirp/src/ip_input.c:304:9
-    #2 0x0000561ad346cb6f in ip_input() at slirp/src/ip_input.c:184:18
+- =3D=3D26130=3D=3DERROR: UndefinedBehaviorSanitizer: SEGV on unknown addre=
+ss 0x000000000008 (pc 0x00000046d588 bp 0x7fff6ee9f940 sp 0x7fff6ee9f8e8 T2=
+6130)
++ =3D=3D26130=3D=3DERROR: UndefinedBehaviorSanitizer: SEGV on unknown addre=
+ss 0x000000000008 (pc 0x0000561ad346d588 bp 0x7fff6ee9f940 sp 0x7fff6ee9f8e=
+8 T26130)
+  =3D=3D26130=3D=3DThe signal is caused by a WRITE memory access.
+  =3D=3D26130=3D=3DHint: address points to the zero page.
+-     #0 0x0000561ad346d587 in ip_deq() at slirp/src/ip_input.c:411:55
+-     #1 0x0000561ad346cffb in ip_reass() at slirp/src/ip_input.c:304:9
+-     #2 0x0000561ad346cb6f in ip_input() at slirp/src/ip_input.c:184:18
++ =C2=A0=C2=A0=C2=A0=C2=A0#0 0x0000561ad346d587 in ip_deq() at slirp/src/ip=
+_input.c:411:55
++ =C2=A0=C2=A0=C2=A0=C2=A0#1 0x0000561ad346cffb in ip_reass() at slirp/src/=
+ip_input.c:304:9
++ =C2=A0=C2=A0=C2=A0=C2=A0#2 0x0000561ad346cb6f in ip_input() at slirp/src/=
+ip_input.c:184:18
+  =
 
-I only had access to the last packet which isn't the culprit, I'm now
-seeing how to log the network traffic of the guest to provide more
-useful information.
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
-
-** Tags: slirp
+  I only had access to the last packet which isn't the culprit, I'm now
+  seeing how to log the network traffic of the guest to provide more
+  useful information.
 
 -- =
 
@@ -127,13 +133,16 @@ Bug description:
   ./configure --enable-sanitizers --extra-cflags=3D-O1
 
   =3D=3D26130=3D=3DERROR: UndefinedBehaviorSanitizer: SEGV on unknown addre=
-ss 0x000000000008 (pc 0x00000046d588 bp 0x7fff6ee9f940 sp 0x7fff6ee9f8e8 T2=
-6130)
+ss 0x000000000008 (pc 0x0000561ad346d588 bp 0x7fff6ee9f940 sp 0x7fff6ee9f8e=
+8 T26130)
   =3D=3D26130=3D=3DThe signal is caused by a WRITE memory access.
   =3D=3D26130=3D=3DHint: address points to the zero page.
-      #0 0x0000561ad346d587 in ip_deq() at slirp/src/ip_input.c:411:55
-      #1 0x0000561ad346cffb in ip_reass() at slirp/src/ip_input.c:304:9
-      #2 0x0000561ad346cb6f in ip_input() at slirp/src/ip_input.c:184:18
+  =C2=A0=C2=A0=C2=A0=C2=A0#0 0x0000561ad346d587 in ip_deq() at slirp/src/ip=
+_input.c:411:55
+  =C2=A0=C2=A0=C2=A0=C2=A0#1 0x0000561ad346cffb in ip_reass() at slirp/src/=
+ip_input.c:304:9
+  =C2=A0=C2=A0=C2=A0=C2=A0#2 0x0000561ad346cb6f in ip_input() at slirp/src/=
+ip_input.c:184:18
 
   I only had access to the last packet which isn't the culprit, I'm now
   seeing how to log the network traffic of the guest to provide more
