@@ -2,78 +2,82 @@ Return-Path: <SRS0=9jkQ=VP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59F26C7618F
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 19:07:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5E6CC7618F
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 22:06:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3230421019
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 19:07:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3230421019
+	by mail.kernel.org (Postfix) with ESMTPS id 34345208C0
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 22:06:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 34345208C0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40566 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40764 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hoBku-00045v-CF
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jul 2019 15:07:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58351)
+	id 1hoDwE-0003Bu-9M
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jul 2019 17:27:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40588)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <lersek@redhat.com>) id 1hoBki-0003h4-PZ
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 15:07:42 -0400
+ (envelope-from <philmd@redhat.com>) id 1hoDvv-0002ph-3k
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 17:27:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lersek@redhat.com>) id 1hoBkh-00028B-7g
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 15:07:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37918)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <lersek@redhat.com>) id 1hoBkh-00027O-04
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 15:07:39 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id B604930E7184;
- Thu, 18 Jul 2019 19:07:37 +0000 (UTC)
-Received: from lacos-laptop-7.usersys.redhat.com (ovpn-116-25.ams2.redhat.com
- [10.36.116.25])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1CB7318A7D;
- Thu, 18 Jul 2019 19:07:32 +0000 (UTC)
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20181102171638.24069-1-peter.maydell@linaro.org>
- <20181102171638.24069-9-peter.maydell@linaro.org>
- <3e3d2018-3993-f651-8e94-5bea612bd776@redhat.com>
- <CAFEAcA_FtoHOUv_cPgfO7GrZ8Ug9cKCvmY2z75i9DaAQ8Qx+gQ@mail.gmail.com>
- <417cd887-aec4-d8ba-1dd2-810bc4c04977@redhat.com>
- <CAFEAcA_JntiaOOWisqLVqAV6jc=wk4nR548KbbUcG0XLabcNpA@mail.gmail.com>
- <8d06b8f2-7ee8-a77a-81d7-3219d5e43c45@redhat.com>
- <dfeab9fd-7ee1-01f2-dd38-cba449b1de63@redhat.com>
- <f625f1f1-ad97-1c75-e44d-3b0c015312b3@redhat.com>
- <cf9156f6-c3fa-ec7e-c51a-8b8d2fd1e6d6@redhat.com>
- <7b45c073-8653-28e0-9d06-9e3aaa6dc460@redhat.com>
- <CAFEAcA8RZuzv=KkATMozxfp8MTsCOPPsK7mN6oCJq_TfwWiPMA@mail.gmail.com>
- <97ca4042-a224-7480-cc94-b58c687c353a@redhat.com>
- <CAFEAcA_jasrCne5=iLGuciJmf9FSQTduQD8xfnzbES6527mbgQ@mail.gmail.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <3f443103-782f-736d-f72a-a3e148d21aef@redhat.com>
-Date: Thu, 18 Jul 2019 21:07:32 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.9.1
+ (envelope-from <philmd@redhat.com>) id 1hoDvj-0007nW-IV
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 17:27:22 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:37335)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hoDvh-0007n3-Sa
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 17:27:11 -0400
+Received: by mail-wm1-x341.google.com with SMTP id f17so27026471wme.2
+ for <qemu-devel@nongnu.org>; Thu, 18 Jul 2019 14:27:09 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=0m3j8nby2BCuV/i2845lU08nvIWXgmSLe5ZumLgIS+c=;
+ b=hcCGCVILE65blMHoED9Kja1KDafmi8yl6VtGoE4Nwiv6chKaOWOklEODQs6eaVpSfp
+ 3SHZgEomI2/LXHZFwvIWlm0+xhqUUihiNNQ1u40/PdKYOktgnGFtVdBMjx3RIZPoQou7
+ mlFLplwjiDUaHhgSdPi0AfzeUCPNFPzPa1anwSgEzaNkFnB/HovjiwXn+AlardRgD84o
+ kempGvuD736y4cJCytTXUK6yhVTO5z+kLZS5Ea/oA2RXf1IhiAcu2roIVVblCDlkBXz0
+ vv88xxLvmostbeTpS24w/LOuz5qzvQROCk3vJncQSyi8k01NNWfFOBSrA8tl1Ar885C5
+ 29iw==
+X-Gm-Message-State: APjAAAVHKmCFkPX+csCa+9QHxAi7FSOimDeJhGLwso5Lh//TskZcF21Q
+ ridsIYtJay2Dbikgp5yKLIU7FREouQU=
+X-Google-Smtp-Source: APXvYqx0aedLBBEOxbgNFY/ZjQ6QsLfLeNkYuU972Ogi9iyiaSyvKm8u1MZ+Wj54HwX9cCg/VPO8Gw==
+X-Received: by 2002:a7b:c4c1:: with SMTP id g1mr45174236wmk.14.1563478521212; 
+ Thu, 18 Jul 2019 12:35:21 -0700 (PDT)
+Received: from [192.168.1.37] (62.red-83-42-61.dynamicip.rima-tde.net.
+ [83.42.61.62])
+ by smtp.gmail.com with ESMTPSA id c1sm54437286wrh.1.2019.07.18.12.35.20
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Thu, 18 Jul 2019 12:35:20 -0700 (PDT)
+To: Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org
+References: <20190718104837.13905-1-philmd@redhat.com>
+ <20190718104837.13905-2-philmd@redhat.com>
+ <5e6b8a67-8f8a-3e3b-4f42-db2a31c03ad1@redhat.com>
+ <d4d20337-b504-0610-8aaf-c8b0b13f0953@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <053eeafe-4e93-aa96-f544-ea0606e244b6@redhat.com>
+Date: Thu, 18 Jul 2019 21:35:19 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_jasrCne5=iLGuciJmf9FSQTduQD8xfnzbES6527mbgQ@mail.gmail.com>
+In-Reply-To: <d4d20337-b504-0610-8aaf-c8b0b13f0953@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Thu, 18 Jul 2019 19:07:37 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PULL 08/10] target/arm: Conditionalize some
- asserts on aarch32 support
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::341
+Subject: Re: [Qemu-devel] [PATCH-for-4.1 v7 1/1] hw/block/pflash_cfi01: Add
+ missing DeviceReset() handler
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,143 +89,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Richard Henderson <richard.henderson@linaro.org>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Alistair Francis <alistair.francis@wdc.com>, John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 07/18/19 14:30, Peter Maydell wrote:
-> On Wed, 17 Jul 2019 at 16:08, Laszlo Ersek <lersek@redhat.com> wrote:
+On 7/18/19 8:38 PM, Laszlo Ersek wrote:
+> On 07/18/19 17:03, Laszlo Ersek wrote:
+>> On 07/18/19 12:48, Philippe Mathieu-Daudé wrote:
+>>> To avoid incoherent states when the machine resets (see but report
 >>
->> On 07/17/19 15:46, Peter Maydell wrote:
->>> On Wed, 17 Jul 2019 at 14:36, Philippe Mathieu-Daud=C3=A9 <philmd@red=
-hat.com> wrote:
->>>> I still wonder why this didn't assert on Peter's setup.
+>> (1) For the PULL request, please fix the typo: s/but/bug/
+>>
+>>> below), add the device reset callback.
 >>>
->>> My setup does not assert because my host kernel correctly
->>> provides the ID register values to QEMU. Laszlo's appears
->>> to be providing all-zeroes, which then obviously breaks
->>> assertions being made about the sanity of those ID register
->>> values...
+>>> A "system reset" sets the device state machine in READ_ARRAY mode
+>>> and, after some delay, set the SR.7 READY bit.
+>>>
+>>> Since we do not model timings, we set the SR.7 bit directly.
+>>>
+>>> Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=1678713
+>>> Reported-by: Laszlo Ersek <lersek@redhat.com>
+>>> Reviewed-by: John Snow <jsnow@redhat.com>
+>>> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+>>> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+>>> ---
+>>>  hw/block/pflash_cfi01.c | 19 +++++++++++++++++++
+>>>  1 file changed, 19 insertions(+)
+>>>
+>>> diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
+>>> index 435be1e35c..a1ec1faae5 100644
+>>> --- a/hw/block/pflash_cfi01.c
+>>> +++ b/hw/block/pflash_cfi01.c
+>>> @@ -865,6 +865,24 @@ static void pflash_cfi01_realize(DeviceState *dev, Error **errp)
+>>>      pfl->cfi_table[0x3f] = 0x01; /* Number of protection fields */
+>>>  }
+>>>  
+>>> +static void pflash_cfi01_system_reset(DeviceState *dev)
+>>> +{
+>>> +    PFlashCFI01 *pfl = PFLASH_CFI01(dev);
+>>> +
+>>> +    /*
+>>> +     * The command 0x00 is not assigned by the CFI open standard,
+>>> +     * but QEMU historically uses it for the READ_ARRAY command (0xff).
+>>> +     */
+>>> +    pfl->cmd = 0x00;
+>>> +    pfl->wcycle = 0;
+>>> +    memory_region_rom_device_set_romd(&pfl->mem, true);
+>>> +    /*
+>>> +     * The WSM ready timer occurs at most 150ns after system reset.
+>>> +     * This model deliberately ignores this delay.
+>>> +     */
+>>> +    pfl->status = 0x80;
+>>> +}
+>>> +
+>>>  static Property pflash_cfi01_properties[] = {
+>>>      DEFINE_PROP_DRIVE("drive", PFlashCFI01, blk),
+>>>      /* num-blocks is the number of blocks actually visible to the guest,
+>>> @@ -909,6 +927,7 @@ static void pflash_cfi01_class_init(ObjectClass *klass, void *data)
+>>>  {
+>>>      DeviceClass *dc = DEVICE_CLASS(klass);
+>>>  
+>>> +    dc->reset = pflash_cfi01_system_reset;
+>>>      dc->realize = pflash_cfi01_realize;
+>>>      dc->props = pflash_cfi01_properties;
+>>>      dc->vmsd = &vmstate_pflash;
+>>>
 >>
->> OK. Can you suggest a location that I should check in the host kernel?
->=20
-> I was about to write out the process of how we get these values
-> from the kernel, but as the first step of that I read through
-> QEMU's target/arm/kvm64.c:kvm_arm_get_host_cpu_features(),
-> which is the function which reads these values using the
-> KVM_GET_ONE_REG ioctl. It starts with an attempt to read
-> ID_AA64PFR0, and has a comment for the error-handling case:
->=20
->         /*
->          * Before v4.15, the kernel only exposed a limited number of sy=
-stem
->          * registers, not including any of the interesting AArch64 ID r=
-egs.
->          * For the most part we could leave these fields as zero with m=
-inimal
->          * effect, since this does not affect the values seen by the gu=
-est.
->          *
->          * However, it could cause problems down the line for QEMU,
->          * so provide a minimal v8.0 default.
->          *
->          * ??? Could read MIDR and use knowledge from cpu64.c.
->          * ??? Could map a page of memory into our temp guest and
->          *     run the tiniest of hand-crafted kernels to extract
->          *     the values seen by the guest.
->          * ??? Either of these sounds like too much effort just
->          *     to work around running a modern host kernel.
->          */
->=20
-> I have 4.15, and don't hit this assert; you have 4.14 and do,
-> so I think you're going to be going through this codepath which
-> currently sets only ahcf->isar.id_aa64pfr0 and none of the other
-> ID register fields in the isar struct.
->=20
-> I'm not sure exactly which kernel commits added the ID register
-> reading support. (The relevant kernel code is in
-> arch/arm64/kvm/sys_regs.c I think.)
 
-I compared that file between the downstream kernel source and upstream v4=
-.15, and it looks like the following series (indeed released as part of v=
-4.15) is what's missing down-stream, for this particular use case:
+s/but/bug/ typo fixed.
 
-     1  27e64b4be4b8 regset: Add support for dynamically sized regsets
-     2  94ef7ecbdf6f arm64: fpsimd: Correctly annotate exception helpers =
-called from asm
-     3  abf73988a7c2 arm64: signal: Verify extra data is user-readable in=
- sys_rt_sigreturn
-     4  93390c0a1b20 arm64: KVM: Hide unsupported AArch64 CPU features fr=
-om guests
-     5  b472db6cf8c6 arm64: efi: Add missing Kconfig dependency on KERNEL=
-_MODE_NEON
-     6  38b9aeb32fa7 arm64: Port deprecated instruction emulation to new =
-sysctl interface
-     7  9cf5b54fafed arm64: fpsimd: Simplify uses of {set,clear}_ti_threa=
-d_flag()
-     8  672365649cca arm64/sve: System register and exception syndrome de=
-finitions
-     9  1fc5dce78ad1 arm64/sve: Low-level SVE architectural state manipul=
-ation functions
-    10  ddd25ad1fde8 arm64/sve: Kconfig update and conditional compilatio=
-n support
-    11  d0b8cd318788 arm64/sve: Signal frame and context structure defini=
-tion
-    12  22043a3c082a arm64/sve: Low-level CPU setup
-    13  bc0ee4760364 arm64/sve: Core task context handling
-    14  79ab047c75d6 arm64/sve: Support vector length resetting for new p=
-rocesses
-    15  8cd969d28fd2 arm64/sve: Signal handling support
-    16  7582e22038a2 arm64/sve: Backend logic for setting the vector leng=
-th
-    17  8f1eec57cdcc arm64: cpufeature: Move sys_caps_initialised declara=
-tions
-    18  2e0f2478ea37 arm64/sve: Probe SVE capabilities and usable vector =
-lengths
-    19  1bd3f93641ec arm64/sve: Preserve SVE registers around kernel-mode=
- NEON use
-    20  fdfa976cae5c arm64/sve: Preserve SVE registers around EFI runtime=
- service calls
-    21  43d4da2c45b2 arm64/sve: ptrace and ELF coredump support
-    22  2d2123bc7c7f arm64/sve: Add prctl controls for userspace vector l=
-ength management
-    23  4ffa09a939ab arm64/sve: Add sysctl to set the default vector leng=
-th for new processes
-    24  17eed27b02da arm64/sve: KVM: Prevent guests from using SVE
-    25  aac45ffd1f8e arm64/sve: KVM: Treat guest SVE use as undefined ins=
-truction execution
-    26  07d79fe7c223 arm64/sve: KVM: Hide SVE from CPU features exposed t=
-o guests
-    27  43994d824e84 arm64/sve: Detect SVE and activate runtime support
-    28  ce6990813f15 arm64/sve: Add documentation
-
-The differences found by the simple "diff" that I mention above are mainl=
-y due to commit #4 (93390c0a1b20, "arm64: KVM: Hide unsupported AArch64 C=
-PU features from guests", 2017-11-03).
-
-I found a (likely non-final) version of the cover letter too, here: https=
-://www.spinics.net/lists/arm-kernel/msg599528.html
-
-I guess I should convince myself to install RHEL8 on the Mustang sometime=
-...
+>> (2) Reviewed-by: Laszlo Ersek <lersek@redhat.com>
 
 Thanks!
-Laszlo
 
-> Anyway, I think we need to do at least one of:
->  * enhance the "provide a minimal v8.0 default" code in this
->    condition in kvm_arm_get_host_cpu_features() so that it
->    populates the ID registers sufficiently to avoid asserts
->    and other bad things
->  * make the asserts on ID register oddnesses be only for TCG
->    (ie where QEMU controls the values) and not for KVM
->=20
-> thanks
-> -- PMM
->=20
+>>
+>> A *future* improvement (meant just for this surgical reset handler --
+>> not meaning any large cfi01 overhaul!) could be the addition of a trace
+>> point, at the top of pflash_cfi01_system_reset().
+>>
+>> But that is strictly "nice to have", and not necessary to include in the
+>> present bugfix.
+>>
+>>
+>> (3) Using OVMF IA32X64 (including the edk2 SMM stack), I've
+>> regression-tested this patch, on top of v4.1.0-rc1, with KVM. As follows:
+>>
+>> (3a) Normal reboot from the UEFI shell ("reset -c" command)
+>>
+>> (3b) Normal reboot from the Linux guest prompt ("reboot" command)
+>>
+>> (3c1) Reset as part of ACPI S3 suspend/resume
+>> (3c2) then use "efibootmgr -n / -N" to write to pflash (by virtue of
+>> setting / deleting the standardized BootNext UEFI variable)
+>>
+>> (3d1) Boot to setup TUI with SB enabled
+>> (3d2) erase Platform Key in setup TUI (disables SB)
+>> (3d3) reboot from within setup TUI
+>> (3d4) proceed to UEFI shell
+>> (3d5) enable SB with EnrollDefaultKeys.efi
+>> (3d6) reboot from UEFI shell
+>> (3d7) proceeed to Linux guest
+>> (3d8) verify SB enablement (dmesg, "mokutil --sb-state")
+>>
+>> (As an added exercise, step (3d4) triggered an "FTW" (fault tolerant
+>> write) "reclaim" (basically a defragmentation of the journaled
+>> "filesystem" that the firmware keeps in the flash, as a logical "middle
+>> layer"), and that worked fine too.)
+>>
+>> Regression-tested-by: Laszlo Ersek <lersek@redhat.com>
+>>
+>>
+>> (4) I plan to provide R-t-b in the evening from aarch64 KVM too, using
+>> the edk2 ArmVirtQemu firmware. Only the first two steps from (3) will be
+>> covered (no ACPI S3, no SB).
+> 
+> Regression-tested-by: Laszlo Ersek <lersek@redhat.com>
 
+Thank you a lot again for all your testing, I also noted your steps and
+will try to automate them.
+
+Best regards,
+
+Phil.
 
