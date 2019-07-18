@@ -2,81 +2,83 @@ Return-Path: <SRS0=9jkQ=VP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	FROM_EXCESS_BASE64,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BB9EC76191
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 13:52:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18A4BC76191
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 13:55:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D58BF21019
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 13:52:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D58BF21019
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id D51782173E
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 13:55:23 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="G4+nOqmU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D51782173E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38196 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38250 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ho6pn-0008B5-01
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jul 2019 09:52:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41463)
+	id 1ho6sV-0004Dz-3Y
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jul 2019 09:55:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41809)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <pbonzini@redhat.com>) id 1ho6pN-0007Ut-NG
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 09:52:10 -0400
+ (envelope-from <wrfsh@yandex-team.ru>) id 1ho6qS-0001On-7O
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 09:53:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1ho6pL-0006V9-FU
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 09:52:09 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:33885)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ho6pJ-0006SZ-G2
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 09:52:07 -0400
-Received: by mail-wr1-f67.google.com with SMTP id 31so28839278wrm.1
- for <qemu-devel@nongnu.org>; Thu, 18 Jul 2019 06:52:04 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=9QAP+zuB4VlhBuAFrMWQBaK/7c9xoMqOvnQXoCtu7J4=;
- b=ga76ujqryovKGudRANitiuS6whr5wDuwW4LrANAodNtQRiiDCX96/w7XwpD7xyn6D6
- 9SbOP16AMA+2HqhWRpG/EAuUea5AP9vzKNJ4rQQqkgepLM7GB50S11da9D2OkUDy/Tx8
- 6eE/G+Z0jFWQKr2x6hqnFVbdsyAhlxDimZDHuSi/w1jgYPhqAbAVTKOuzMiLg6O+0z/J
- iJrP2IkefVY6DM5w/bcXWkRLvRW7cOHOUz3KgVZHyLI8pDIUhqXw6NSMR82umhW06yNF
- IfjZFyElzVetqM0qOOtpYA96X3CpzcWp8CKeMQ1Z8uspFC3hyW1+/65BIlpnGU9rDU7E
- ioAg==
-X-Gm-Message-State: APjAAAUDIwhFndk7w0cCo1MgFpVMIJirUMdbDy7x3zeqFB5ITgo3p2L1
- ajWUOLqk5f9EIqyP5QgrA027Fg==
-X-Google-Smtp-Source: APXvYqwZS1eBOhfUGcmC1NoDw7IwROg5e1gALVO2PCA3sAWkDXZN2T3zNvIG6J8vSRm7M0dXDoyyYA==
-X-Received: by 2002:a5d:6144:: with SMTP id y4mr51028807wrt.84.1563457922730; 
- Thu, 18 Jul 2019 06:52:02 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:e427:3beb:1110:dda2?
- ([2001:b07:6468:f312:e427:3beb:1110:dda2])
- by smtp.gmail.com with ESMTPSA id z6sm23117310wrw.2.2019.07.18.06.52.01
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Thu, 18 Jul 2019 06:52:02 -0700 (PDT)
-To: "Denis V. Lunev" <den@openvz.org>, qemu-devel@nongnu.org
-References: <20190718134537.22356-1-den@openvz.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <4620eddd-e500-25d2-a8b2-5c47eefc74ab@redhat.com>
-Date: Thu, 18 Jul 2019 15:52:01 +0200
+ (envelope-from <wrfsh@yandex-team.ru>) id 1ho6qP-00079b-Hq
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 09:53:16 -0400
+Received: from forwardcorp1p.mail.yandex.net
+ ([2a02:6b8:0:1472:2741:0:8b6:217]:37858)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <wrfsh@yandex-team.ru>)
+ id 1ho6q9-0006wn-Am; Thu, 18 Jul 2019 09:52:59 -0400
+Received: from mxbackcorp1j.mail.yandex.net (mxbackcorp1j.mail.yandex.net
+ [IPv6:2a02:6b8:0:1619::162])
+ by forwardcorp1p.mail.yandex.net (Yandex) with ESMTP id 1774A2E14F6;
+ Thu, 18 Jul 2019 16:52:48 +0300 (MSK)
+Received: from smtpcorp1o.mail.yandex.net (smtpcorp1o.mail.yandex.net
+ [2a02:6b8:0:1a2d::30])
+ by mxbackcorp1j.mail.yandex.net (nwsmtp/Yandex) with ESMTP id
+ JNPBS9jU3l-ql4CC4F0; Thu, 18 Jul 2019 16:52:48 +0300
+Precedence: bulk
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
+ s=default; 
+ t=1563457968; bh=clbv3hqUgtWA7taEznd4pBUuMZx8g+WhNtLgelDTaL4=;
+ h=Date:Message-ID:To:Subject:From:Cc;
+ b=G4+nOqmUtUp6LsorjkbcsM0H4twEVuUomfKZT06+hYgjGf29ktVj/jfMzPH7KecsO
+ jJOTEtxgVEg08WZpsOOsSvl2kivyOUzZD1fGlLh8oWjaYSZYwAnvEP2KACGhQ/jLt8
+ 0+LcWcWDJkGp086xylURq4eJlZWaPPyNaP+myRpk=
+Authentication-Results: mxbackcorp1j.mail.yandex.net;
+ dkim=pass header.i=@yandex-team.ru
+Received: from dynamic-red.dhcp.yndx.net (dynamic-red.dhcp.yndx.net
+ [2a02:6b8:0:40c:f68c:50ff:fee9:44bd])
+ by smtpcorp1o.mail.yandex.net (nwsmtp/Yandex) with ESMTPSA id
+ MjGOyz9VRt-qk9aNgJA; Thu, 18 Jul 2019 16:52:47 +0300
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (Client certificate not present)
+From: =?UTF-8?B?0JXQstCz0LXQvdC40Lkg0K/QutC+0LLQu9C10LI=?=
+ <wrfsh@yandex-team.ru>
+To: qemu-devel@nongnu.org, stefanha@redhat.com, kwolf@redhat.com,
+ mreitz@redhat.com
+Message-ID: <ad4c52a9-e848-e3fd-3c1b-046d2670c025@yandex-team.ru>
+Date: Thu, 18 Jul 2019 16:52:46 +0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <20190718134537.22356-1-den@openvz.org>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.221.67
-Subject: Re: [Qemu-devel] [PATCH 1/1] x86: add CPU flags supported inside
- libvirt
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a02:6b8:0:1472:2741:0:8b6:217
+Subject: [Qemu-devel] BDRV request fragmentation and virtio-blk write
+ submission guarantees (2nd try)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -85,63 +87,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Nikolay Shirokovskiy <nshirokovskiy@virtuozzo.com>,
- Peter Krempa <pkrempa@redhat.com>,
- =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: qemu-block@nongnu.org, yc-core@yandex-team.ru
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 18/07/19 15:45, Denis V. Lunev wrote:
-> There are the following flags available in libvirt inside cpu_map.xm
->     <feature name='cvt16'>
->       <cpuid function='0x80000001' ecx='0x00040000'/>
->     </feature>
->     <feature name='cmt'> <!-- cqm -->
->       <cpuid eax_in='0x07' ecx_in='0x00' ebx='0x00001000'/>
->     </feature>
-> We have faced the problem that QEMU does not start once these flags are
-> present in the domain.xml.
-> 
-> This patch just adds proper names into the map.
-> 
-> Signed-off-by: Denis V. Lunev <den@openvz.org>
-> CC: Paolo Bonzini <pbonzini@redhat.com>
-> CC: Richard Henderson <rth@twiddle.net>
-> CC: Eduardo Habkost <ehabkost@redhat.com>
-> CC: Nikolay Shirokovskiy <nshirokovskiy@virtuozzo.com>
-> CC: Peter Krempa <pkrempa@redhat.com>
-> CC: Daniel P. Berrangé <berrange@redhat.com>
-> ---
->  target/i386/cpu.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index 805ce95247..88ba4dad47 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -870,7 +870,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
->              "lahf-lm", "cmp-legacy", "svm", "extapic",
->              "cr8legacy", "abm", "sse4a", "misalignsse",
->              "3dnowprefetch", "osvw", "ibs", "xop",
-> -            "skinit", "wdt", NULL, "lwp",
-> +            "skinit", "wdt", "cvt16", "lwp",
->              "fma4", "tce", NULL, "nodeid-msr",
->              NULL, "tbm", "topoext", "perfctr-core",
->              "perfctr-nb", NULL, NULL, NULL,
-> @@ -1044,7 +1044,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
->              "fsgsbase", "tsc-adjust", NULL, "bmi1",
->              "hle", "avx2", NULL, "smep",
->              "bmi2", "erms", "invpcid", "rtm",
-> -            NULL, NULL, "mpx", NULL,
-> +            "cmt", NULL, "mpx", NULL,
->              "avx512f", "avx512dq", "rdseed", "adx",
->              "smap", "avx512ifma", "pcommit", "clflushopt",
->              "clwb", "intel-pt", "avx512pf", "avx512er",
-> 
+Hi everyone,
 
-Oops, nice catch!  I've queued the patch for 4.1.
+My previous message was misformatted, so here's another one. Sorry about 
+that.
 
-Paolo
+We're currently working on implementing a qemu BDRV format driver which 
+we are using with virtio-blk devices.
+
+I have a question concerning BDRV request fragmentation and virtio-blk 
+write request submission which is not entirely clear to me by only 
+reading virtio spec. Could you please consider the following case and 
+give some additional guidance?
+
+1. Our BDRV format driver has a notion of max supported transfer size. 
+So we implement BlockDriver::bdrv_refresh_limits where we fill out 
+BlockLimits::max_transfer and opt_transfer fields.
+
+2. virtio-blk exposes max_transfer as a virtio_blk_config::opt_io_size 
+field, which (according to spec 1.1) is a **suggested** maximum. We read 
+"suggested" as "guest driver may still send requests that don't fit into 
+opt_io_size and we should handle those"...
+
+3. ... and judging by code in block/io.c qemu block layer handles such 
+requests by fragmenting them into several BDRV requests if request size 
+is > max_transfer
+
+4. Guest will see request completion only after all fragments are 
+handled. However each fragment submission path can call 
+qemu_coroutine_yield and move on to submitting next request available in 
+virtq before completely submitting the rest of the fragments. Which 
+means the following situation is possible where BDRV sees 2 write 
+requests in virtq, both of which are larger than max_transfer:
+
+Blocks: -----------------------------
+
+Write1: ------xxxxxxxx
+
+Write2: ------yyyyyyyy
+
+Write1Chunk1: xxxx
+
+Write2Chunk1: yyyy
+
+Write2Chunk2: ----yyyy
+
+Write1Chunk1: ----xxxx
+
+Blocks: ------yyyyxxxx-----------------
+
+
+In above scenario guest virtio-blk driver decided to submit 2 
+intersecting write requests, both of which are larger than 
+||max_transfer, and then call hypervisor.
+
+I understand that virtio-blk may handle requests out of order, so guest 
+must not make any assumptions on relative order in which those requests 
+will be handled.
+
+However, can guest driver expect that whatever the submission order will 
+be, the actual intersecting writes will be atomic?
+
+In other words, will it be correct for conforming virtio-blk driver to 
+expect only "xxxxxxxx" or "yyyyyyyy" but not anything else in between, 
+after both requests are reported as completed?
+
+Because i think that is something that may happen in qemu right now, if 
+i understood correctly.
+
+
+
+Thanks!
+
+
 
