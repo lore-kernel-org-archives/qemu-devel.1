@@ -2,81 +2,81 @@ Return-Path: <SRS0=9jkQ=VP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05FA1C76191
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 10:54:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 230AFC76191
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 11:00:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CFEE72173B
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 10:53:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CFEE72173B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id DE928217F4
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 11:00:51 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Yl8O3/Wj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE928217F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36326 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36410 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ho42x-0002gm-4y
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jul 2019 06:53:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39533)
+	id 1ho49a-00088y-6z
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jul 2019 07:00:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42033)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1ho42m-0002Ht-8Z
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 06:53:49 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1ho49K-0007Om-Py
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 07:00:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1ho42l-0004HU-6S
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 06:53:48 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:36499)
+ (envelope-from <peter.maydell@linaro.org>) id 1ho49J-0004BU-KR
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 07:00:34 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:35479)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ho42l-0004GA-08
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 06:53:47 -0400
-Received: by mail-wr1-f66.google.com with SMTP id n4so28211276wrs.3
- for <qemu-devel@nongnu.org>; Thu, 18 Jul 2019 03:53:46 -0700 (PDT)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1ho49J-00049r-E4
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 07:00:33 -0400
+Received: by mail-ot1-x342.google.com with SMTP id j19so28554289otq.2
+ for <qemu-devel@nongnu.org>; Thu, 18 Jul 2019 04:00:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=yT9crJu5E3LwSFN+JTYNzKLoBncuuOSYGS+xJ71gc70=;
+ b=Yl8O3/Wj9z9RHr0NMRo+GJhz+9+Nv16XTypVsKMfvgHb/2zNgE8dcWH74Zg5/pRPIb
+ GABtFU/RlflvfoeRrscvREn7aQNVIoX23EYrjAvc7elKZhGWwtSngZlaQtJrI6i3QwpU
+ k1uGBzfdjQlyhPi3podHsAahn9sIndIaHXQYIxcgpPnx4XVF5Qa0rDqnH2RmjQQcKoMl
+ jyAv5v/rL7CA9QougGodVgv+NpoLfAMRG/cUigRG0liKdM+CL5vQWfKo8N+MPXktGkXX
+ LF1yv57uxRSkw30tgJb3ozYpyaBdoZsmUmS/l60Zjv0175JPbvZZxFuYEqPOjyKvduXS
+ AqGg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=ToRJX8G3o8jVtFMgWuqRlhiFW8xDM8Rl2W9LzjNECmo=;
- b=WulXVzwdFvF+6fRVWZyihxZNneIgHOXgfIXR028rl4T3dkVBVgfCiyQ8qlWSrhyRBM
- crI/vRgHFORM3hwGZNOI0fJIB2iZyvyH0lh44oa3qLsJ2DfqbcvWwln5mTQbmJGdEXT6
- ayw9pBG7+t/oWaIDrTklukzcBen8wFB1yS/pIqc8XSYGSapk22onTWYPBFAX2dlqtn72
- HKN18vFG5XEfxqs4NMWSweGFUhI223CuOVjrUCFJxicI2CcZW19H7h3npVUyBNOrhbtB
- WDTGpHLhBEqSY3apDyuxcSTkm1N0JQp/jbfJ8LICK/PNsG/BYVkgvRJK5MKMmYRDSPm1
- RGvg==
-X-Gm-Message-State: APjAAAWO/EOAO1rdZmODnoHe14/qgZUvwEOU/BFqZJS1v/p++9s/71Bq
- hpX6OAF5VJdo7vZrtXCZkjoUMw==
-X-Google-Smtp-Source: APXvYqwyCJ5ptOHeLmfabJZD6/FShRfEl4lzkHolzXqmMmCuf3oC6Z5rWu2TEHyE2/csGvclvxk8Ww==
-X-Received: by 2002:adf:de10:: with SMTP id b16mr17345333wrm.296.1563447225895; 
- Thu, 18 Jul 2019 03:53:45 -0700 (PDT)
-Received: from [192.168.1.37] (62.red-83-42-61.dynamicip.rima-tde.net.
- [83.42.61.62])
- by smtp.gmail.com with ESMTPSA id c11sm46102417wrq.45.2019.07.18.03.53.44
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Thu, 18 Jul 2019 03:53:45 -0700 (PDT)
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20190718092219.20081-1-chen.zhang@intel.com>
- <375615d7-7cdf-4711-68fb-47ce3c8cb308@redhat.com>
- <CAFEAcA8oQ0buYaOAXsjzUecDjrsk+=BAtM3bW3skKkTEZ5Ngtg@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <664c3b23-4d19-cda6-dbd7-4a7195a96ec3@redhat.com>
-Date: Thu, 18 Jul 2019 12:53:44 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=yT9crJu5E3LwSFN+JTYNzKLoBncuuOSYGS+xJ71gc70=;
+ b=PJoM5hfpaSltZqYS1KFBQRcxM2O7z2rCvu8MWcgGBS1ro2hmmgUfzNoEk/io0y/S8n
+ mBbyNbnEC0hcZJRXaxXsmi9oMjTbHjUxAkcAlkKwmZWqZL5fm29K2HIMDtnhmYiV8sEm
+ fB5vumpkYCZT1oM7VIMZttiWoO8Z+288/pC9TA+64GQjVmA/0M6nUyhqQsJnvOQx/bAx
+ eXnRuLBGjhLLmoIrWtZc7DqJqcdTGgXa9wv+6rKmJ2r7x85Dsijs/7MflbWYYykbf1ht
+ AT1AZ1dQkUrdIZoy52bUEh7qw0QOQhMkYEjTfxiqSz4OBi5Iu2gRZvWg5wJOrRCvsR89
+ tkXg==
+X-Gm-Message-State: APjAAAWruG9zCQLAAALhIHFRO2mcX5bz4qIIJG4A/BbJanVEkzy7nk0/
+ sX6WQf3Ur4RD5rsiBnyQz0JgO6SswxYBs+pElhYIRQ==
+X-Google-Smtp-Source: APXvYqx40Vpors/lfoAMKCRNK2LJEDrgMiWN8BFyJX2gbtTISxo+eKeixPV6Q+hiy6azQ8BeMfZqjYI2P5GBCU0GGUE=
+X-Received: by 2002:a05:6830:1653:: with SMTP id
+ h19mr26612216otr.232.1563447632371; 
+ Thu, 18 Jul 2019 04:00:32 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8oQ0buYaOAXsjzUecDjrsk+=BAtM3bW3skKkTEZ5Ngtg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.221.66
-Subject: Re: [Qemu-devel] [PATCH V3] net/colo-compare.c: Fix memory leak and
- code style issue.
+References: <20190717145418.23883-1-laurent@vivier.eu>
+ <CAFEAcA8kMkRuqWt4_tv+ZH5NJ0-kidJ==2A_JdFbPhjYuS+XCQ@mail.gmail.com>
+ <a1c7dda7-8a20-c712-686f-5648014ce643@vivier.eu>
+In-Reply-To: <a1c7dda7-8a20-c712-686f-5648014ce643@vivier.eu>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 18 Jul 2019 12:00:21 +0100
+Message-ID: <CAFEAcA86Ev+-m5hYTyUDZMcfzYUcmmaSxhq05k1OACgcZFj40w@mail.gmail.com>
+To: Laurent Vivier <laurent@vivier.eu>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::342
+Subject: Re: [Qemu-devel] [PULL 0/3] Linux user for 4.1 patches
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,72 +88,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zhang Chen <chen.zhang@intel.com>, Jason Wang <jasowang@redhat.com>,
- qemu-dev <qemu-devel@nongnu.org>, Li Zhijian <lizhijian@cn.fujitsu.com>,
- Zhang Chen <zhangckid@gmail.com>
+Cc: Aleksandar Rikalo <arikalo@wavecomp.com>, Riku Voipio <riku.voipio@iki.fi>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/18/19 12:37 PM, Peter Maydell wrote:
-> On Thu, 18 Jul 2019 at 11:28, Philippe Mathieu-Daudé <philmd@redhat.com> wrote:
->>
->> On 7/18/19 11:22 AM, Zhang Chen wrote:
->>> From: Zhang Chen <chen.zhang@intel.com>
->>>
->>> This patch to fix the origin "char *data" menory leak, code style issue
->>
->> "memory"
->>
->>> and add necessary check here.
->>> Reported-by: Coverity (CID 1402785)
->>>
->>> Signed-off-by: Zhang Chen <chen.zhang@intel.com>
->>> ---
->>>  net/colo-compare.c | 28 +++++++++++++++++++++-------
->>>  1 file changed, 21 insertions(+), 7 deletions(-)
->>>
->>> diff --git a/net/colo-compare.c b/net/colo-compare.c
->>> index 909dd6c6eb..fcccb4c6f6 100644
->>> --- a/net/colo-compare.c
->>> +++ b/net/colo-compare.c
->>> @@ -127,6 +127,17 @@ static int compare_chr_send(CompareState *s,
->>>                              uint32_t vnet_hdr_len,
->>>                              bool notify_remote_frame);
->>>
->>> +static bool packet_matches_str(const char *str,
->>> +                               uint8_t *buf,
->>
->> You can use 'uint8_t *buf'.
-> 
-> ?? that seems to be the same as what is written...
+On Thu, 18 Jul 2019 at 11:40, Laurent Vivier <laurent@vivier.eu> wrote:
+> It comes from linux-user/syscall.c:
+>
+>  6328         /* automatic consistency check if same arch */
+>  6329 #if (defined(__i386__) && defined(TARGET_I386) && defined(TARGET_ABI32)) || \
+>  6330     (defined(__x86_64__) && defined(TARGET_X86_64))
+>  6331         if (unlikely(ie->target_cmd != ie->host_cmd)) {
+>  6332             fprintf(stderr, "ERROR: ioctl(%s): target=0x%x host=0x%x\n",
+>  6333                     ie->name, ie->target_cmd, ie->host_cmd);
+>  6334         }
+>  6335 #endif
+>
+> because of:
+>
+> +  { TARGET_SIOCGSTAMP_OLD, SIOCGSTAMP, "IOCGSTAMP_OLD", IOC_R, \
+> +    do_ioctl_SIOCGSTAMP },
+> +  { TARGET_SIOCGSTAMPNS_OLD, SIOCGSTAMPNS, "IOCGSTAMPNS_OLD", IOC_R, \
+> +    do_ioctl_SIOCGSTAMPNS },
+> +  { TARGET_SIOCGSTAMP_NEW, SIOCGSTAMP, "IOCGSTAMP_NEW", IOC_R, \
+> +    do_ioctl_SIOCGSTAMP },
+> +  { TARGET_SIOCGSTAMPNS_NEW, SIOCGSTAMPNS, "IOCGSTAMPNS_NEW", IOC_R, \
+> +    do_ioctl_SIOCGSTAMPNS },
+>
+> As the host_cmd is not used, the simplest way to fix that is
+>
+> +  { TARGET_SIOCGSTAMP_OLD, TARGET_SIOCGSTAMP_OLD, "IOCGSTAMP_OLD", IOC_R, \
+> +    do_ioctl_SIOCGSTAMP },
+> +  { TARGET_SIOCGSTAMPNS_OLD, TARGET_SIOCGSTAMPNS_OLD, "IOCGSTAMPNS_OLD", IOC_R, \
+> +    do_ioctl_SIOCGSTAMPNS },
+> +  { TARGET_SIOCGSTAMP_NEW, TARGET_SIOCGSTAMP_NEW, "IOCGSTAMP_NEW", IOC_R, \
+> +    do_ioctl_SIOCGSTAMP },
+> +  { TARGET_SIOCGSTAMPNS_NEW, TARGET_SIOCGSTAMPNS_NEW, "IOCGSTAMPNS_NEW", IOC_R, \
+> +    do_ioctl_SIOCGSTAMPNS },
+>
+> As SIOCGSTAMP_OLD and SIOCGSTAMP_NEW can be undefined on the host (and not needed
+> because we always use SIOCGSTAMP and SIOCGSTAMPNS)
 
-Oops sorry, I copy/pasted and  did not noticed I removed the 'const'
-word. So I meant: You can use 'const uint8_t *buf'
+So we don't use the host_cmd because we have a custom do_ioctl_foo
+function which doesn't look at that field?
 
->>
->>> +                               uint32_t packet_len)
->>> +{
->>> +    if (packet_len != strlen(str)) {
->>> +        return false;
->>> +    }
->>> +
->>> +    return !memcmp(str, buf, strlen(str));
->>
->> If you don't want to use a local variable to hold strlen(str), you can
->> reuse packet_len since it is the same value:
->>
->>        return !memcmp(str, buf, packet_len);
->>
->> However it makes the review harder, so I'd prefer using a str_len local var.
-> 
-> I'm pretty sure the compiler is going to optimise the
-> strlen() away into a compile time constant anyway, so
-> this is somewhat unnecessary micro-optimisation I think.
+Sounds OK, but please include a comment explaining why.
 
-I was not sure, I'm glad to learn that :)
+PS: why didn't you use IOCTL_SPECIAL() rather than hand-written
+array entries? None of the other ioctls.h entries do that.
+Of course now we're trying to sidestep the consistency check
+we can't use the macro, but it wolud have been fine otherwise.
+It also would get the names of the ioctls in the string form
+right -- they are all missing the initial "S" here.
 
-Thanks,
+Perhaps for 4.2 it might be worth considering having a
+macro for "IOCTL_SPECIAL but skip the consistency check"
+to be a bit less hacky here.
 
-Phil.
+thanks
+-- PMM
 
