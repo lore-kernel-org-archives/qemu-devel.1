@@ -2,67 +2,62 @@ Return-Path: <SRS0=9jkQ=VP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AAE7C76195
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 06:03:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1AF5C76191
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 06:09:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D6AE120693
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 06:03:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D6AE120693
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=bt.com
+	by mail.kernel.org (Postfix) with ESMTPS id 781A121019
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 06:09:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 781A121019
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34506 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34528 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnzVP-00071t-TQ
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jul 2019 02:03:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42096)
+	id 1hnzc2-0001NN-Od
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jul 2019 02:09:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43710)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <tony.nguyen@bt.com>) id 1hnzU9-0002M6-AL
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 02:01:47 -0400
+ (envelope-from <clg@kaod.org>) id 1hnzbs-0000q5-2H
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 02:09:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tony.nguyen@bt.com>) id 1hnzU3-0004uy-Mp
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 02:01:43 -0400
-Received: from smtpe1.intersmtp.com ([213.121.35.80]:26234)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tony.nguyen@bt.com>) id 1hnzU1-0004s9-48
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 02:01:39 -0400
-Received: from tpw09926dag18e.domain1.systemhost.net (10.9.212.18) by
- BWP09926085.bt.com (10.36.82.116) with Microsoft SMTP Server (version=TLS1_2, 
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P256) id 15.1.1713.5; Thu, 18
- Jul 2019 07:01:41 +0100
-Received: from tpw09926dag18e.domain1.systemhost.net (10.9.212.18) by
- tpw09926dag18e.domain1.systemhost.net (10.9.212.18) with Microsoft SMTP
- Server (TLS) id 15.0.1395.4; Thu, 18 Jul 2019 07:01:31 +0100
-Received: from tpw09926dag18e.domain1.systemhost.net
- ([fe80::a946:6348:ccf4:fa6c]) by tpw09926dag18e.domain1.systemhost.net
- ([fe80::a946:6348:ccf4:fa6c%12]) with mapi id 15.00.1395.000; Thu, 18 Jul
- 2019 07:01:31 +0100
-From: <tony.nguyen@bt.com>
-To: <qemu-devel@nongnu.org>
-Thread-Topic: [Qemu-devel] [PATCH] configure: Define target access alignment
- in configure
-Thread-Index: AQHVPS4/W4amfRivg0WZqWA+8xdBLw==
-Date: Thu, 18 Jul 2019 06:01:31 +0000
-Message-ID: <11e818d38ebc40e986cfa62dd7d0afdc@tpw09926dag18e.domain1.systemhost.net>
-Accept-Language: en-AU, en-GB, en-US
-Content-Language: en-AU
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.187.101.36]
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+ (envelope-from <clg@kaod.org>) id 1hnzbq-0001Ts-Hw
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 02:09:44 -0400
+Received: from 4.mo173.mail-out.ovh.net ([46.105.34.219]:46404)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1hnzbq-0001T6-Aw
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 02:09:42 -0400
+Received: from player739.ha.ovh.net (unknown [10.108.57.18])
+ by mo173.mail-out.ovh.net (Postfix) with ESMTP id C523D1130A7
+ for <qemu-devel@nongnu.org>; Thu, 18 Jul 2019 08:09:39 +0200 (CEST)
+Received: from kaod.org (lfbn-1-2240-157.w90-76.abo.wanadoo.fr [90.76.60.157])
+ (Authenticated sender: clg@kaod.org)
+ by player739.ha.ovh.net (Postfix) with ESMTPSA id A9BBB82BF627;
+ Thu, 18 Jul 2019 06:09:34 +0000 (UTC)
+To: Joel Stanley <joel@jms.id.au>, David Gibson <david@gibson.dropbear.id.au>
+References: <20190718053236.6721-1-joel@jms.id.au>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <5b84b792-379d-b9cf-0b25-0cb47858e62e@kaod.org>
+Date: Thu, 18 Jul 2019 08:09:34 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 213.121.35.80
-Subject: [Qemu-devel] [PATCH] configure: Define target access alignment in
- configure
+In-Reply-To: <20190718053236.6721-1-joel@jms.id.au>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Ovh-Tracer-Id: 946600350507109184
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduvddrieeggddutdefucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 46.105.34.219
+Subject: Re: [Qemu-devel] [PATCH] ppc/pnv: Set default ram size to 2GB
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,219 +69,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, rth@twiddle.net
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch moves the define of target access alignment earlier from=0A=
-target/foo/cpu.h to configure.=0A=
-=0A=
-Suggested in Richard Henderson's reply to "[PATCH 1/4] tcg: TCGMemOp is now=
-=0A=
-accelerator independent MemOp"=0A=
-=0A=
-Signed-off-by: Tony Nguyen <tony.nguyen@bt.com>=0A=
----=0A=
- configure             | 12 ++++++++++--=0A=
- include/exec/poison.h |  1 +=0A=
- include/qom/cpu.h     |  2 +-=0A=
- target/alpha/cpu.h    |  2 --=0A=
- target/hppa/cpu.h     |  1 -=0A=
- target/mips/cpu.h     |  2 --=0A=
- target/sh4/cpu.h      |  2 --=0A=
- target/sparc/cpu.h    |  2 --=0A=
- target/xtensa/cpu.h   |  2 --=0A=
- tcg/tcg.c             |  2 +-=0A=
- tcg/tcg.h             |  8 +++++---=0A=
- 11 files changed, 18 insertions(+), 18 deletions(-)=0A=
-=0A=
-diff --git a/configure b/configure=0A=
-index eb635c3b9a..c07687c656 100755=0A=
---- a/configure=0A=
-+++ b/configure=0A=
-@@ -7424,11 +7424,16 @@ for target in $target_list; do=0A=
- target_dir=3D"$target"=0A=
- config_target_mak=3D$target_dir/config-target.mak=0A=
- target_name=3D$(echo $target | cut -d '-' -f 1)=0A=
-+target_aligned_only=3D"no"=0A=
-+case "$target_name" in=0A=
-+  alpha|hppa|mips64el|mips64|mipsel|mips|mipsn32|mipsn32el|sh4|sh4eb|sparc=
-|sparc64|sparc32plus|xtensa|xtensaeb)=0A=
-+  target_aligned_only=3D"yes"=0A=
-+  ;;=0A=
-+esac=0A=
- target_bigendian=3D"no"=0A=
--=0A=
- case "$target_name" in=0A=
-   armeb|aarch64_be|hppa|lm32|m68k|microblaze|mips|mipsn32|mips64|moxie|or1=
-k|ppc|ppc64|ppc64abi32|s390x|sh4eb|sparc|sparc64|sparc32plus|xtensaeb)=0A=
--  target_bigendian=3Dyes=0A=
-+  target_bigendian=3D"yes"=0A=
-   ;;=0A=
- esac=0A=
- target_softmmu=3D"no"=0A=
-@@ -7710,6 +7715,9 @@ fi=0A=
- if supported_whpx_target $target; then=0A=
-     echo "CONFIG_WHPX=3Dy" >> $config_target_mak=0A=
- fi=0A=
-+if test "$target_aligned_only" =3D "yes" ; then=0A=
-+  echo "TARGET_ALIGNED_ONLY=3Dy" >> $config_target_mak=0A=
-+fi=0A=
- if test "$target_bigendian" =3D "yes" ; then=0A=
-   echo "TARGET_WORDS_BIGENDIAN=3Dy" >> $config_target_mak=0A=
- fi=0A=
-diff --git a/include/exec/poison.h b/include/exec/poison.h=0A=
-index b862320fa6..955eb863ab 100644=0A=
---- a/include/exec/poison.h=0A=
-+++ b/include/exec/poison.h=0A=
-@@ -35,6 +35,7 @@=0A=
- #pragma GCC poison TARGET_UNICORE32=0A=
- #pragma GCC poison TARGET_XTENSA=0A=
- =0A=
-+#pragma GCC poison TARGET_ALIGNED_ONLY=0A=
- #pragma GCC poison TARGET_HAS_BFLT=0A=
- #pragma GCC poison TARGET_NAME=0A=
- #pragma GCC poison TARGET_SUPPORTS_MTTCG=0A=
-diff --git a/include/qom/cpu.h b/include/qom/cpu.h=0A=
-index 5ee0046b62..9b50b73339 100644=0A=
---- a/include/qom/cpu.h=0A=
-+++ b/include/qom/cpu.h=0A=
-@@ -89,7 +89,7 @@ struct TranslationBlock;=0A=
-  * @do_unassigned_access: Callback for unassigned access handling.=0A=
-  * (this is deprecated: new targets should use do_transaction_failed inste=
-ad)=0A=
-  * @do_unaligned_access: Callback for unaligned access handling, if=0A=
-- * the target defines #ALIGNED_ONLY.=0A=
-+ * the target defines #TARGET_ALIGNED_ONLY.=0A=
-  * @do_transaction_failed: Callback for handling failed memory transaction=
-s=0A=
-  * (ie bus faults or external aborts; not MMU faults)=0A=
-  * @virtio_is_big_endian: Callback to return %true if a CPU which supports=
-=0A=
-diff --git a/target/alpha/cpu.h b/target/alpha/cpu.h=0A=
-index b3e8a823e1..16eb8047cf 100644=0A=
---- a/target/alpha/cpu.h=0A=
-+++ b/target/alpha/cpu.h=0A=
-@@ -23,8 +23,6 @@=0A=
- #include "cpu-qom.h"=0A=
- #include "exec/cpu-defs.h"=0A=
- =0A=
--#define ALIGNED_ONLY=0A=
--=0A=
- /* Alpha processors have a weak memory model */=0A=
- #define TCG_GUEST_DEFAULT_MO      (0)=0A=
- =0A=
-diff --git a/target/hppa/cpu.h b/target/hppa/cpu.h=0A=
-index aab251bc4b..2be67c289a 100644=0A=
---- a/target/hppa/cpu.h=0A=
-+++ b/target/hppa/cpu.h=0A=
-@@ -30,7 +30,6 @@=0A=
-    basis.  It's probably easier to fall back to a strong memory model.  */=
-=0A=
- #define TCG_GUEST_DEFAULT_MO        TCG_MO_ALL=0A=
- =0A=
--#define ALIGNED_ONLY=0A=
- #define MMU_KERNEL_IDX   0=0A=
- #define MMU_USER_IDX     3=0A=
- #define MMU_PHYS_IDX     4=0A=
-diff --git a/target/mips/cpu.h b/target/mips/cpu.h=0A=
-index 21c0615e02..c13cd4eb31 100644=0A=
---- a/target/mips/cpu.h=0A=
-+++ b/target/mips/cpu.h=0A=
-@@ -1,8 +1,6 @@=0A=
- #ifndef MIPS_CPU_H=0A=
- #define MIPS_CPU_H=0A=
- =0A=
--#define ALIGNED_ONLY=0A=
--=0A=
- #include "cpu-qom.h"=0A=
- #include "exec/cpu-defs.h"=0A=
- #include "fpu/softfloat.h"=0A=
-diff --git a/target/sh4/cpu.h b/target/sh4/cpu.h=0A=
-index aee733eaaa..ecaa7a18a9 100644=0A=
---- a/target/sh4/cpu.h=0A=
-+++ b/target/sh4/cpu.h=0A=
-@@ -23,8 +23,6 @@=0A=
- #include "cpu-qom.h"=0A=
- #include "exec/cpu-defs.h"=0A=
- =0A=
--#define ALIGNED_ONLY=0A=
--=0A=
- /* CPU Subtypes */=0A=
- #define SH_CPU_SH7750  (1 << 0)=0A=
- #define SH_CPU_SH7750S (1 << 1)=0A=
-diff --git a/target/sparc/cpu.h b/target/sparc/cpu.h=0A=
-index 8ed2250cd0..1406f0ba2e 100644=0A=
---- a/target/sparc/cpu.h=0A=
-+++ b/target/sparc/cpu.h=0A=
-@@ -5,8 +5,6 @@=0A=
- #include "cpu-qom.h"=0A=
- #include "exec/cpu-defs.h"=0A=
- =0A=
--#define ALIGNED_ONLY=0A=
--=0A=
- #if !defined(TARGET_SPARC64)=0A=
- #define TARGET_DPREGS 16=0A=
- #else=0A=
-diff --git a/target/xtensa/cpu.h b/target/xtensa/cpu.h=0A=
-index 2c277134f1..0459243e6b 100644=0A=
---- a/target/xtensa/cpu.h=0A=
-+++ b/target/xtensa/cpu.h=0A=
-@@ -32,8 +32,6 @@=0A=
- #include "exec/cpu-defs.h"=0A=
- #include "xtensa-isa.h"=0A=
- =0A=
--#define ALIGNED_ONLY=0A=
--=0A=
- /* Xtensa processors have a weak memory model */=0A=
- #define TCG_GUEST_DEFAULT_MO      (0)=0A=
- =0A=
-diff --git a/tcg/tcg.c b/tcg/tcg.c=0A=
-index be2c33c400..8d23fb0592 100644=0A=
---- a/tcg/tcg.c=0A=
-+++ b/tcg/tcg.c=0A=
-@@ -1926,7 +1926,7 @@ static const char * const ldst_name[] =3D=0A=
- };=0A=
- =0A=
- static const char * const alignment_name[(MO_AMASK >> MO_ASHIFT) + 1] =3D =
-{=0A=
--#ifdef ALIGNED_ONLY=0A=
-+#ifdef TARGET_ALIGNED_ONLY=0A=
-     [MO_UNALN >> MO_ASHIFT]    =3D "un+",=0A=
-     [MO_ALIGN >> MO_ASHIFT]    =3D "",=0A=
- #else=0A=
-diff --git a/tcg/tcg.h b/tcg/tcg.h=0A=
-index b411e17a28..529acb2ed8 100644=0A=
---- a/tcg/tcg.h=0A=
-+++ b/tcg/tcg.h=0A=
-@@ -333,10 +333,12 @@ typedef enum TCGMemOp {=0A=
-     MO_TE    =3D MO_LE,=0A=
- #endif=0A=
- =0A=
--    /* MO_UNALN accesses are never checked for alignment.=0A=
-+    /*=0A=
-+     * MO_UNALN accesses are never checked for alignment.=0A=
-      * MO_ALIGN accesses will result in a call to the CPU's=0A=
-      * do_unaligned_access hook if the guest address is not aligned.=0A=
--     * The default depends on whether the target CPU defines ALIGNED_ONLY.=
-=0A=
-+     * The default depends on whether the target CPU defines=0A=
-+     * TARGET_ALIGNED_ONLY.=0A=
-      *=0A=
-      * Some architectures (e.g. ARMv8) need the address which is aligned=
-=0A=
-      * to a size more than the size of the memory access.=0A=
-@@ -353,7 +355,7 @@ typedef enum TCGMemOp {=0A=
-      */=0A=
-     MO_ASHIFT =3D 4,=0A=
-     MO_AMASK =3D 7 << MO_ASHIFT,=0A=
--#ifdef ALIGNED_ONLY=0A=
-+#ifdef TARGET_ALIGNED_ONLY=0A=
-     MO_ALIGN =3D 0,=0A=
-     MO_UNALN =3D MO_AMASK,=0A=
- #else=0A=
--- =0A=
-2.17.2=0A=
-=0A=
+On 18/07/2019 07:32, Joel Stanley wrote:
+> This makes the powernv machine easier for end users as the default
+> initrd address is now within RAM.
+>=20
+> Signed-off-by: Joel Stanley <joel@jms.id.au>
+
+
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+
+Thanks,
+
+C.
+
+> --
+> This replaces https://patchwork.ozlabs.org/patch/1132438/
+>=20
+>  hw/ppc/pnv.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+> index bd4531c82260..8cef6d17f111 100644
+> --- a/hw/ppc/pnv.c
+> +++ b/hw/ppc/pnv.c
+> @@ -1358,7 +1358,7 @@ static void pnv_machine_class_init(ObjectClass *o=
+c, void *data)
+>                                        * storage */
+>      mc->no_parallel =3D 1;
+>      mc->default_boot_order =3D NULL;
+> -    mc->default_ram_size =3D 1 * GiB;
+> +    mc->default_ram_size =3D 2 * GiB;
+>      xic->icp_get =3D pnv_icp_get;
+>      xic->ics_get =3D pnv_ics_get;
+>      xic->ics_resend =3D pnv_ics_resend;
+>=20
+
 
