@@ -7,57 +7,58 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D789C76191
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DABAEC76196
 	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 09:18:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5E6042173B
+	by mail.kernel.org (Postfix) with ESMTPS id A95E52173B
 	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 09:18:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="rUyMfSn3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E6042173B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="TNY7hs5h"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A95E52173B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35750 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35752 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ho2Yy-000143-EI
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jul 2019 05:18:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38999)
+	id 1ho2Yz-00018v-Hb
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jul 2019 05:18:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39021)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <yury-kotov@yandex-team.ru>) id 1ho2Y5-0005ki-IZ
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 05:18:02 -0400
+ (envelope-from <yury-kotov@yandex-team.ru>) id 1ho2Y6-0005ob-Or
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 05:18:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yury-kotov@yandex-team.ru>) id 1ho2Y4-00084u-5L
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 05:18:01 -0400
-Received: from forwardcorp1o.mail.yandex.net ([2a02:6b8:0:1a2d::193]:43464)
+ (envelope-from <yury-kotov@yandex-team.ru>) id 1ho2Y5-00085d-9Q
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 05:18:02 -0400
+Received: from forwardcorp1p.mail.yandex.net
+ ([2a02:6b8:0:1472:2741:0:8b6:217]:51956)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <yury-kotov@yandex-team.ru>)
- id 1ho2Y3-00081y-Cx
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 05:18:00 -0400
+ id 1ho2Y4-000837-UP
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 05:18:01 -0400
 Received: from mxbackcorp1o.mail.yandex.net (mxbackcorp1o.mail.yandex.net
  [IPv6:2a02:6b8:0:1a2d::301])
- by forwardcorp1o.mail.yandex.net (Yandex) with ESMTP id A7DD52E12B0;
- Thu, 18 Jul 2019 12:17:53 +0300 (MSK)
+ by forwardcorp1p.mail.yandex.net (Yandex) with ESMTP id AB5F02E14F8;
+ Thu, 18 Jul 2019 12:17:54 +0300 (MSK)
 Received: from smtpcorp1p.mail.yandex.net (smtpcorp1p.mail.yandex.net
  [2a02:6b8:0:1472:2741:0:8b6:10])
  by mxbackcorp1o.mail.yandex.net (nwsmtp/Yandex) with ESMTP id
- vNo3OBwvUM-HriODf4s; Thu, 18 Jul 2019 12:17:53 +0300
+ 2cMVtDaFeh-HsiC4AGQ; Thu, 18 Jul 2019 12:17:54 +0300
 Precedence: bulk
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
  s=default; 
- t=1563441473; bh=pdYBsi4yOtIzET/6XmZ1Glh9q8tSBBe6AsJssWPKHrM=;
+ t=1563441474; bh=fYOwcXEbBy6vGylv6H//Q0M1NS+gNLncjXaC3ENv/qQ=;
  h=In-Reply-To:Message-Id:References:Date:Subject:To:From:Cc;
- b=rUyMfSn3ht1o6mwQSyIkDnHG4Rni5F2Ms/WdxG50B7DYBrufy0V8/wS1cFJQJ3bF6
- gEHvyjeyJ2fHfxfCG0qpimyaTKcRZzqEXirw9byX/meC/HNx6uIlAwx+T6y/K/kq7P
- rErICUQtf5GE2RIQzrdP8a0Mh7oxuIJc3BJny6FQ=
+ b=TNY7hs5htr6P+5kjNdXbG4lCaTnNVVnEHD6eKQNd8/BXPXJD/Z8ML8I7khkEMI6Ok
+ uXHad6lLb/BLML0WM1fsvRsBBmdK3tRFJRB6bHdeg8vfAVEHobnueju55UXX6clujv
+ NMzG6l2rMwsk8P2dU7yzLGwAraieu7r0FJn6fXRs=
 Authentication-Results: mxbackcorp1o.mail.yandex.net;
  dkim=pass header.i=@yandex-team.ru
 Received: from dynamic-red.dhcp.yndx.net (dynamic-red.dhcp.yndx.net
  [2a02:6b8:0:40c:9028:49c4:6359:9be1])
  by smtpcorp1p.mail.yandex.net (nwsmtp/Yandex) with ESMTPSA id
- JhNdbP5MZj-HrwqmOHI; Thu, 18 Jul 2019 12:17:53 +0300
+ JhNdbP5MZj-HswqdSGn; Thu, 18 Jul 2019 12:17:54 +0300
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
  (Client certificate not present)
 From: Yury Kotov <yury-kotov@yandex-team.ru>
@@ -66,8 +67,8 @@ To: Paolo Bonzini <pbonzini@redhat.com>,
  Richard Henderson <rth@twiddle.net>, Juan Quintela <quintela@redhat.com>,
  "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
  Stefan Weil <sw@weilnetz.de>
-Date: Thu, 18 Jul 2019 12:17:24 +0300
-Message-Id: <20190718091726.9874-2-yury-kotov@yandex-team.ru>
+Date: Thu, 18 Jul 2019 12:17:26 +0300
+Message-Id: <20190718091726.9874-4-yury-kotov@yandex-team.ru>
 X-Mailer: git-send-email 2.22.0
 In-Reply-To: <20190718091726.9874-1-yury-kotov@yandex-team.ru>
 References: <20190718091726.9874-1-yury-kotov@yandex-team.ru>
@@ -75,8 +76,9 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a02:6b8:0:1a2d::193
-Subject: [Qemu-devel] [PATCH v3 1/3] qemu-thread: Add qemu_cond_timedwait
+X-Received-From: 2a02:6b8:0:1472:2741:0:8b6:217
+Subject: [Qemu-devel] [PATCH v3 3/3] tests/migration: Add a test for auto
+ converge
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 List-Id: <qemu-devel.nongnu.org>
@@ -94,238 +96,174 @@ Sender: "Qemu-devel"
 
 Signed-off-by: Yury Kotov <yury-kotov@yandex-team.ru>
 ---
- include/qemu/thread.h    | 18 ++++++++++++++++++
- util/qemu-thread-posix.c | 40 ++++++++++++++++++++++++++++------------
- util/qemu-thread-win32.c | 16 ++++++++++++++++
- util/qsp.c               | 18 ++++++++++++++++++
- 4 files changed, 80 insertions(+), 12 deletions(-)
+ tests/migration-test.c | 119 +++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 108 insertions(+), 11 deletions(-)
 
-diff --git a/include/qemu/thread.h b/include/qemu/thread.h
-index 55d83a907c..d0cd7b9ae0 100644
---- a/include/qemu/thread.h
-+++ b/include/qemu/thread.h
-@@ -34,6 +34,8 @@ typedef void (*QemuRecMutexLockFunc)(QemuRecMutex *m, c=
-onst char *f, int l);
- typedef int (*QemuRecMutexTrylockFunc)(QemuRecMutex *m, const char *f, i=
-nt l);
- typedef void (*QemuCondWaitFunc)(QemuCond *c, QemuMutex *m, const char *=
-f,
-                                  int l);
-+typedef void (*QemuCondTimedWaitFunc)(QemuCond *c, QemuMutex *m, int ms,
-+                                      const char *f, int l);
-=20
- extern QemuMutexLockFunc qemu_bql_mutex_lock_func;
- extern QemuMutexLockFunc qemu_mutex_lock_func;
-@@ -41,6 +43,7 @@ extern QemuMutexTrylockFunc qemu_mutex_trylock_func;
- extern QemuRecMutexLockFunc qemu_rec_mutex_lock_func;
- extern QemuRecMutexTrylockFunc qemu_rec_mutex_trylock_func;
- extern QemuCondWaitFunc qemu_cond_wait_func;
-+extern QemuCondTimedWaitFunc qemu_cond_timedwait_func;
-=20
- /* convenience macros to bypass the profiler */
- #define qemu_mutex_lock__raw(m)                         \
-@@ -63,6 +66,8 @@ extern QemuCondWaitFunc qemu_cond_wait_func;
-             qemu_rec_mutex_trylock_impl(m, __FILE__, __LINE__);
- #define qemu_cond_wait(c, m)                                            =
-\
-             qemu_cond_wait_impl(c, m, __FILE__, __LINE__);
-+#define qemu_cond_timedwait(c, m, ms)                                   =
-\
-+            qemu_cond_wait_impl(c, m, ms, __FILE__, __LINE__);
- #else
- #define qemu_mutex_lock(m) ({                                           =
-\
-             QemuMutexLockFunc _f =3D atomic_read(&qemu_mutex_lock_func);=
-  \
-@@ -89,6 +94,11 @@ extern QemuCondWaitFunc qemu_cond_wait_func;
-             QemuCondWaitFunc _f =3D atomic_read(&qemu_cond_wait_func);  =
-  \
-             _f(c, m, __FILE__, __LINE__);                               =
-\
-         })
-+
-+#define qemu_cond_timedwait(c, m, ms) ({                                =
-       \
-+            QemuCondTimedWaitFunc _f =3D atomic_read(&qemu_cond_timedwai=
-t_func); \
-+            _f(c, m, ms, __FILE__, __LINE__);                           =
-       \
-+        })
- #endif
-=20
- #define qemu_mutex_unlock(mutex) \
-@@ -134,12 +144,20 @@ void qemu_cond_signal(QemuCond *cond);
- void qemu_cond_broadcast(QemuCond *cond);
- void qemu_cond_wait_impl(QemuCond *cond, QemuMutex *mutex,
-                          const char *file, const int line);
-+void qemu_cond_timedwait_impl(QemuCond *cond, QemuMutex *mutex, int ms,
-+                              const char *file, const int line);
-=20
- static inline void (qemu_cond_wait)(QemuCond *cond, QemuMutex *mutex)
- {
-     qemu_cond_wait(cond, mutex);
+diff --git a/tests/migration-test.c b/tests/migration-test.c
+index a4feb9545d..bb69517fc8 100644
+--- a/tests/migration-test.c
++++ b/tests/migration-test.c
+@@ -241,6 +241,17 @@ static int64_t read_ram_property_int(QTestState *who=
+, const char *property)
+     return result;
  }
 =20
-+static inline void (qemu_cond_timedwait)(QemuCond *cond, QemuMutex *mute=
-x,
-+                                         int ms)
++static int64_t read_migrate_property_int(QTestState *who, const char *pr=
+operty)
 +{
-+    qemu_cond_timedwait(cond, mutex, ms);
++    QDict *rsp_return;
++    int64_t result;
++
++    rsp_return =3D migrate_query(who);
++    result =3D qdict_get_try_int(rsp_return, property, 0);
++    qobject_unref(rsp_return);
++    return result;
 +}
 +
- void qemu_sem_init(QemuSemaphore *sem, int init);
- void qemu_sem_post(QemuSemaphore *sem);
- void qemu_sem_wait(QemuSemaphore *sem);
-diff --git a/util/qemu-thread-posix.c b/util/qemu-thread-posix.c
-index 1bf5e65dea..eed777d9ec 100644
---- a/util/qemu-thread-posix.c
-+++ b/util/qemu-thread-posix.c
-@@ -36,6 +36,18 @@ static void error_exit(int err, const char *msg)
-     abort();
+ static uint64_t get_migration_pass(QTestState *who)
+ {
+     return read_ram_property_int(who, "dirty-sync-count");
+@@ -255,20 +266,22 @@ static void read_blocktime(QTestState *who)
+     qobject_unref(rsp_return);
  }
 =20
-+static void compute_abs_deadline(struct timespec *ts, int ms)
++static bool check_migration_status(QTestState *who, const char *status)
 +{
-+    struct timeval tv;
-+    gettimeofday(&tv, NULL);
-+    ts->tv_nsec =3D tv.tv_usec * 1000 + (ms % 1000) * 1000000;
-+    ts->tv_sec =3D tv.tv_sec + ms / 1000;
-+    if (ts->tv_nsec >=3D 1000000000) {
-+        ts->tv_sec++;
-+        ts->tv_nsec -=3D 1000000000;
-+    }
++    bool completed;
++    char *current_status;
++
++    current_status =3D migrate_query_status(who);
++    completed =3D strcmp(current_status, status) =3D=3D 0;
++    g_assert_cmpstr(current_status, !=3D, "failed");
++    g_free(current_status);
++    return completed;
 +}
 +
- void qemu_mutex_init(QemuMutex *mutex)
+ static void wait_for_migration_status(QTestState *who,
+                                       const char *goal)
  {
-     int err;
-@@ -164,6 +176,22 @@ void qemu_cond_wait_impl(QemuCond *cond, QemuMutex *=
-mutex, const char *file, con
-         error_exit(err, __func__);
- }
-=20
-+void qemu_cond_timedwait_impl(QemuCond *cond, QemuMutex *mutex, int ms,
-+                              const char *file, const int line)
-+{
-+    int err;
-+    struct timespec ts;
-+
-+    assert(cond->initialized);
-+    trace_qemu_mutex_unlock(mutex, file, line);
-+    compute_abs_deadline(&ts, ms);
-+    err =3D pthread_cond_timedwait(&cond->cond, &mutex->lock, &ts);
-+    trace_qemu_mutex_locked(mutex, file, line);
-+    if (err && err !=3D ETIMEDOUT) {
-+        error_exit(err, __func__);
-+    }
-+}
-+
- void qemu_sem_init(QemuSemaphore *sem, int init)
- {
-     int rc;
-@@ -238,18 +266,6 @@ void qemu_sem_post(QemuSemaphore *sem)
- #endif
- }
-=20
--static void compute_abs_deadline(struct timespec *ts, int ms)
--{
--    struct timeval tv;
--    gettimeofday(&tv, NULL);
--    ts->tv_nsec =3D tv.tv_usec * 1000 + (ms % 1000) * 1000000;
--    ts->tv_sec =3D tv.tv_sec + ms / 1000;
--    if (ts->tv_nsec >=3D 1000000000) {
--        ts->tv_sec++;
--        ts->tv_nsec -=3D 1000000000;
--    }
--}
+-    while (true) {
+-        bool completed;
+-        char *status;
 -
- int qemu_sem_timedwait(QemuSemaphore *sem, int ms)
- {
-     int rc;
-diff --git a/util/qemu-thread-win32.c b/util/qemu-thread-win32.c
-index 572f88535d..5faa01cb61 100644
---- a/util/qemu-thread-win32.c
-+++ b/util/qemu-thread-win32.c
-@@ -145,6 +145,22 @@ void qemu_cond_wait_impl(QemuCond *cond, QemuMutex *=
-mutex, const char *file, con
-     qemu_mutex_post_lock(mutex, file, line);
+-        status =3D migrate_query_status(who);
+-        completed =3D strcmp(status, goal) =3D=3D 0;
+-        g_assert_cmpstr(status, !=3D,  "failed");
+-        g_free(status);
+-        if (completed) {
+-            return;
+-        }
++    while (!check_migration_status(who, goal)) {
+         usleep(1000);
+     }
+ }
+@@ -1121,6 +1134,89 @@ static void test_migrate_fd_proto(void)
+     test_migrate_end(from, to, true);
  }
 =20
-+void qemu_cond_timedwait_impl(QemuCond *cond, QemuMutex *mutex, int ms,
-+                              const char *file, const int line)
++static void test_migrate_auto_converge(void)
 +{
-+    int rc =3D 0;
++    char *uri =3D g_strdup_printf("unix:%s/migsocket", tmpfs);
++    QTestState *from, *to;
++    int i;
++    int64_t remaining, downtime;
 +
-+    assert(cond->initialized);
-+    trace_qemu_mutex_unlock(mutex, file, line);
-+    if (!SleepConditionVariableSRW(&cond->var, &mutex->lock, ms, 0)) {
-+        rc =3D GetLastError();
++    /*
++     * We want the test to be fast enough, but stable.
++     * Throttle percentages are chosen to cover all cases (init, increme=
+nt, max)
++     */
++    static const int64_t expected_pcts[] =3D { 0, 1, 51, 98 };
++    const int64_t max_bandwidth =3D 200000000; /* ~200Mb/s */
++    const int64_t downtime_limit =3D 50; /* 50ms */
++    /*
++     * We migrate through unix-socket (> 500Mb/s).
++     * Thus, expected migration speed ~=3D bandwidth limit (< 500Mb/s).
++     * So, we can predict expected_threshold
++     */
++    const int64_t expected_threshold =3D max_bandwidth * downtime_limit =
+/ 1000;
++
++    if (test_migrate_start(&from, &to, uri, false, false)) {
++        return;
 +    }
-+    trace_qemu_mutex_locked(mutex, file, line);
-+    if (rc && rc !=3D ERROR_TIMEOUT) {
-+        error_exit(rc, __func__);
-+    }
-+}
 +
- void qemu_sem_init(QemuSemaphore *sem, int init)
- {
-     /* Manual reset.  */
-diff --git a/util/qsp.c b/util/qsp.c
-index 5264c97342..904dcb7436 100644
---- a/util/qsp.c
-+++ b/util/qsp.c
-@@ -131,6 +131,7 @@ QemuRecMutexLockFunc qemu_rec_mutex_lock_func =3D qem=
-u_rec_mutex_lock_impl;
- QemuRecMutexTrylockFunc qemu_rec_mutex_trylock_func =3D
-     qemu_rec_mutex_trylock_impl;
- QemuCondWaitFunc qemu_cond_wait_func =3D qemu_cond_wait_impl;
-+QemuCondTimedWaitFunc qemu_cond_timedwait_func =3D qemu_cond_timedwait_i=
-mpl;
-=20
- /*
-  * It pays off to _not_ hash callsite->file; hashing a string is slow, a=
-nd
-@@ -412,6 +413,21 @@ qsp_cond_wait(QemuCond *cond, QemuMutex *mutex, cons=
-t char *file, int line)
-     qsp_entry_record(e, t1 - t0);
- }
-=20
-+static void
-+qsp_cond_timedwait(QemuCond *cond, QemuMutex *mutex, int ms,
-+                   const char *file, int line)
-+{
-+    QSPEntry *e;
-+    int64_t t0, t1;
-+
-+    t0 =3D get_clock();
-+    qemu_cond_timedwait_impl(cond, mutex, ms, file, line);
-+    t1 =3D get_clock();
-+
-+    e =3D qsp_entry_get(cond, file, line, QSP_CONDVAR);
-+    qsp_entry_record(e, t1 - t0);
-+}
-+
- bool qsp_is_enabled(void)
- {
-     return atomic_read(&qemu_mutex_lock_func) =3D=3D qsp_mutex_lock;
-@@ -425,6 +441,7 @@ void qsp_enable(void)
-     atomic_set(&qemu_rec_mutex_lock_func, qsp_rec_mutex_lock);
-     atomic_set(&qemu_rec_mutex_trylock_func, qsp_rec_mutex_trylock);
-     atomic_set(&qemu_cond_wait_func, qsp_cond_wait);
-+    atomic_set(&qemu_cond_timedwait_func, qsp_cond_timedwait);
- }
-=20
- void qsp_disable(void)
-@@ -435,6 +452,7 @@ void qsp_disable(void)
-     atomic_set(&qemu_rec_mutex_lock_func, qemu_rec_mutex_lock_impl);
-     atomic_set(&qemu_rec_mutex_trylock_func, qemu_rec_mutex_trylock_impl=
++    migrate_set_capability(from, "auto-converge", true);
++    migrate_set_parameter_int(from, "cpu-throttle-initial", expected_pct=
+s[1]);
++    migrate_set_parameter_int(from, "cpu-throttle-increment",
++                              expected_pcts[2] - expected_pcts[1]);
++    migrate_set_parameter_int(from, "max-cpu-throttle", expected_pcts[3]=
 );
-     atomic_set(&qemu_cond_wait_func, qemu_cond_wait_impl);
-+    atomic_set(&qemu_cond_timedwait_func, qemu_cond_timedwait_impl);
- }
++
++    migrate_set_parameter_int(from, "max-bandwidth", max_bandwidth);
++    migrate_set_parameter_int(from, "downtime-limit", downtime_limit);
++
++    /* To check remaining size after precopy */
++    migrate_set_capability(from, "pause-before-switchover", true);
++
++    /* Wait for the first serial output from the source */
++    wait_for_serial("src_serial");
++
++    migrate(from, uri, "{}");
++
++    for (i =3D 0; i < ARRAY_SIZE(expected_pcts); i++) {
++        int64_t pct;
++        pct =3D read_migrate_property_int(from, "cpu-throttle-percentage=
+");
++        g_assert_cmpint(pct, =3D=3D, expected_pcts[i]);
++        while (pct =3D=3D expected_pcts[i] && !got_stop) {
++            usleep(1000);
++            pct =3D read_migrate_property_int(from, "cpu-throttle-percen=
+tage");
++        }
++        /* We break out of this loop only in paused state */
++        if (got_stop || i + 1 =3D=3D ARRAY_SIZE(expected_pcts)) {
++            /* Check unexpected throttle percentage change */
++            g_assert_true(got_stop);
++            /* Check unexpected converge */
++            g_assert_cmpint(i + 1, =3D=3D, ARRAY_SIZE(expected_pcts));
++            g_assert_true(check_migration_status(from, "pre-switchover")=
+);
++        }
++    }
++
++    remaining =3D read_ram_property_int(from, "remaining");
++    g_assert_cmpint(remaining, <, expected_threshold);
++
++    wait_command(from, "{ 'execute': 'migrate-continue' , 'arguments':"
++                       "  { 'state': 'pre-switchover' } }");
++
++    qtest_qmp_eventwait(to, "RESUME");
++
++    wait_for_serial("dest_serial");
++    wait_for_migration_complete(from);
++
++    downtime =3D read_migrate_property_int(from, "downtime");
++    /*
++     * Actual downtime may be greater than downtime limit,
++     * but the difference should be small enough (~20ms)
++     */
++    g_assert_cmpint(downtime, <, downtime_limit + 20);
++
++    g_free(uri);
++
++    test_migrate_end(from, to, true);
++}
++
+ int main(int argc, char **argv)
+ {
+     char template[] =3D "/tmp/migration-test-XXXXXX";
+@@ -1176,6 +1272,7 @@ int main(int argc, char **argv)
+     /* qtest_add_func("/migration/ignore_shared", test_ignore_shared); *=
+/
+     qtest_add_func("/migration/xbzrle/unix", test_xbzrle_unix);
+     qtest_add_func("/migration/fd_proto", test_migrate_fd_proto);
++    qtest_add_func("/migration/auto_converge", test_migrate_auto_converg=
+e);
 =20
- static gint qsp_tree_cmp(gconstpointer ap, gconstpointer bp, gpointer up=
-)
+     ret =3D g_test_run();
+=20
 --=20
 2.22.0
 
