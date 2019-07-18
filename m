@@ -7,84 +7,86 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 037C1C76195
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 23:12:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A6D1C7618F
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 23:24:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C6A7221019
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 23:12:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1616220873
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 23:24:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YlgQvZsC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C6A7221019
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MLt5lD0r"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1616220873
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41342 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41382 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hoFZl-0004iA-0D
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jul 2019 19:12:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40763)
+	id 1hoFlT-0000E1-VN
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jul 2019 19:24:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45084)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <npiggin@gmail.com>) id 1hoFZb-0004IX-0R
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 19:12:27 -0400
+ (envelope-from <npiggin@gmail.com>) id 1hoFlH-0008Aa-Vv
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 19:24:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <npiggin@gmail.com>) id 1hoFZZ-0005eI-Tt
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 19:12:26 -0400
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:45666)
+ (envelope-from <npiggin@gmail.com>) id 1hoFlF-0004YN-EK
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 19:24:31 -0400
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:44107)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <npiggin@gmail.com>)
- id 1hoFZZ-0005cX-LC; Thu, 18 Jul 2019 19:12:25 -0400
-Received: by mail-pg1-x542.google.com with SMTP id o13so13546885pgp.12;
- Thu, 18 Jul 2019 16:12:25 -0700 (PDT)
+ id 1hoFlF-0004X7-5Y; Thu, 18 Jul 2019 19:24:29 -0400
+Received: by mail-pf1-x443.google.com with SMTP id t16so13284061pfe.11;
+ Thu, 18 Jul 2019 16:24:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=date:from:subject:to:cc:references:in-reply-to:mime-version
  :user-agent:message-id:content-transfer-encoding;
- bh=xn9RkSJGX6yRqrisuG3RfzBrN6ycPBNkd+uWxqXR7CM=;
- b=YlgQvZsCAUCJkLoIDhamwC+Fz0A9cDMcA/daeSi54Zm/Fyn7N7/dqW6WRk4U1GUSIv
- zqNEwU9ZK1NUXXojrundQmm5lmec/KHlZUdJ/q/D4dHTYyzFc4ZucFP3OLGft902q/Ew
- LOLAikYNqvh5WP5SxWujKCEsMtS2oR8H6ISed6VckvGzePtngfOcW3fJh3JV6CX2Vtoh
- ViL1w2n+m069wFDuRVDA7pW5U8p6//31h7lQ8RQyue7RCZtq1+MPo/u1jAPe2/JnQhbd
- H3/w309EDDRQJkGUQ4kUoX/WFDfgnF53IV9eZc+o2k57F4hpjlmfcKIBnootqL85BAzu
- klYg==
+ bh=LnHu9wBel+Ug9aKfH7DnMihz3LvZmzDAd/pQJE2NSYw=;
+ b=MLt5lD0r+/eFXuak7kNL3kkDKrgts4mBWckBbtD1ozj+k4XWmj1MCBDvUx9YG9iBEo
+ GFWQkZ6OpmNu0k1jlVkBQiACV2sC2+YEOPpoYzEN0/YrIcHnhzteu2xAHOAbHltT8KG6
+ IM1h92Q91tviR4MzUgvORyVJDdiw+Gob+TTSuFiCAXnz9S8MdTLLvkCcH8mqSqRHaO/M
+ T6VeKmi7iqXZbkAPc3iqff+GDRTd7ZoZwMhUw9FvQOcBmsmnOE4eemXuIeaFQjPPGxCo
+ M47VNaQyMbJEZb7CDWM7ZOkBsyO++HIZGy7PpBX42skTjFge6Tx3tRhBG1sKu4byTP4M
+ C/Gg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:subject:to:cc:references:in-reply-to
  :mime-version:user-agent:message-id:content-transfer-encoding;
- bh=xn9RkSJGX6yRqrisuG3RfzBrN6ycPBNkd+uWxqXR7CM=;
- b=KuDIhYyZ/vN35sf7vCtqevrWiY3K8B5Vzvw29Q0C2Q2CSVB4SxYL7niwIcBCeR48gu
- D8tvkfGjfcR6nNVIMBbWc8BdCXaKP6vNSOpnpkMaVFmAjxDMyLqmQ/sVbRoFS8afhPyp
- fVoSEkpbXmZ7v8IExl0Kg4t+MX39i2+yZ6LjXbxxdhV1gqbk5dDAXYc5K+nIXyICzvAH
- 6J2uMIs46P9jT9y01TBu1No9CjT5WZMqvueWiTR1fE4gy4lgpaiWBkc86NYriXZPbdh8
- LE7Hp4dUtMloCK+UoDEuKtxWLjB40czx9U40TMPq6sFd/j+k1Cu3wfaBW2A102Evt20G
- jdXA==
-X-Gm-Message-State: APjAAAULSADafQDSlweHl1p7qaRu+Sa7o6t9F1SzLFdyGB4fuoccO9f9
- MItxfz+StYAs3xuEDrWEYeA=
-X-Google-Smtp-Source: APXvYqw+Vh0X4uCSX6AIdeLC+ZCsPIVr2EDnsZKp0qOtzpC9jXsxE5TXE8lq/pMZm2/X0O4gKenobg==
-X-Received: by 2002:a17:90a:26a1:: with SMTP id
- m30mr54963596pje.59.1563491544452; 
- Thu, 18 Jul 2019 16:12:24 -0700 (PDT)
+ bh=LnHu9wBel+Ug9aKfH7DnMihz3LvZmzDAd/pQJE2NSYw=;
+ b=kFksRez6ZuiJpte36A7XjkbOPp+lR5O5X8yY0smtsFy1EXdsx8MhUuUkOxGItXPmXg
+ OafS8SiwdAOg8Qlju+5ANDHgvFgl9NvIdU/J8CVGSiVsM2oMaZEUH8ff2zZWm9TNUudz
+ JNxBGrctqjST9zGji+rC8GacUNZks4PtakwkwDy+7dDVkm+L5ZpRIM88XfpCoKZJhNb5
+ H64uS02sHOVT7HXX8CcmUnWWkV8UCCq/zX85FX9JT5SQ2Ok4yZnXNT1gvLNafFKPZW6N
+ kIocWY9S7T5cnXqLb+vSmBkaQ9jefvUyApnxIuAlU0UUCrkT2WEmzedfZ35CMOOf5Ngl
+ pt6w==
+X-Gm-Message-State: APjAAAVUOHSRpMlmzMeMRxjF6yaWY1vHoVqpOmHGulrYbBPBACsKXdLv
+ xSrk+zqu9ynUAOm5LAVSAxo=
+X-Google-Smtp-Source: APXvYqxj7rxKTyEd6DAM8gho9zfoMIawzDKPjw0WPHdbQV1UE9A8pIQ54+Mnd3xN5X+ArH0FIoHUgg==
+X-Received: by 2002:a17:90a:1b0c:: with SMTP id
+ q12mr54405042pjq.76.1563492267270; 
+ Thu, 18 Jul 2019 16:24:27 -0700 (PDT)
 Received: from localhost (61-68-63-89.tpgi.com.au. [61.68.63.89])
- by smtp.gmail.com with ESMTPSA id g11sm14815036pgu.11.2019.07.18.16.12.21
+ by smtp.gmail.com with ESMTPSA id s20sm31970366pfe.169.2019.07.18.16.24.25
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Thu, 18 Jul 2019 16:12:22 -0700 (PDT)
-Date: Fri, 19 Jul 2019 09:12:16 +1000
+ Thu, 18 Jul 2019 16:24:26 -0700 (PDT)
+Date: Fri, 19 Jul 2019 09:24:20 +1000
 From: Nicholas Piggin <npiggin@gmail.com>
-To: Greg Kurz <groug@kaod.org>
-References: <20190718034214.14948-1-npiggin@gmail.com>
- <20190718034214.14948-2-npiggin@gmail.com>
- <20190718121322.663cb5ec@bahia.lab.toulouse-stg.fr.ibm.com>
-In-Reply-To: <20190718121322.663cb5ec@bahia.lab.toulouse-stg.fr.ibm.com>
+To: Christian Borntraeger <borntraeger@de.ibm.com>, Paolo Bonzini
+ <pbonzini@redhat.com>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+References: <20190718103951.10027-1-npiggin@gmail.com>
+ <20190718103951.10027-2-npiggin@gmail.com>
+ <c5e19e51-3a46-c56d-c555-691ec63dcf6e@redhat.com>
+ <c697d1c9-b54a-ba0c-0952-7338b76ef01b@de.ibm.com>
+In-Reply-To: <c697d1c9-b54a-ba0c-0952-7338b76ef01b@de.ibm.com>
 MIME-Version: 1.0
 User-Agent: astroid/0.14.0 (https://github.com/astroidmail/astroid)
-Message-Id: <1563491322.dlreynwzv6.astroid@bobo.none>
+Message-Id: <1563491554.u6nwg4s25n.astroid@bobo.none>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::542
-Subject: Re: [Qemu-devel] [PATCH v6 1/4] spapr: Implement dispatch tracking
- for tcg
+X-Received-From: 2607:f8b0:4864:20::443
+Subject: Re: [Qemu-devel] [PATCH 1/3] qmp: don't emit the RESET event on
+ wakeup
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,67 +98,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org,
- =?iso-8859-1?q?C=E9dric?= Le Goater <clg@kaod.org>,
+Cc: Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>, Luiz Capitulino <lcapitulino@redhat.com>,
+ qemu-s390x <qemu-s390x@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>,
  David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Greg Kurz's on July 18, 2019 8:13 pm:
-> On Thu, 18 Jul 2019 13:42:11 +1000
-> Nicholas Piggin <npiggin@gmail.com> wrote:
+Christian Borntraeger's on July 18, 2019 9:27 pm:
 >=20
->> Implement cpu_exec_enter/exit on ppc which calls into new methods of
->> the same name in PPCVirtualHypervisorClass. These are used by spapr
->> to implement the splpar VPA dispatch counter initially.
->>=20
->> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
->> ---
->> Changes since v5:
->> - Move 'prod' into next patch.
->> - Use uint32_t type for dispatch counter.
->> - Add guest error message for incorrect dispatch counter.
->> - Conditionally compile away if CONFIG_USER_ONLY
->> - Small cleanups
->>=20
->> Changes since v4:
->> - Store to VPA on the way out as well.
->> - Increment the dispatch counter directly in the VPA, which means it wil=
-l
->>   migrate with guest memory the same as KVM.
->> - Prod need not be migrated, add a comment.
->>=20
->>  hw/ppc/spapr.c                  | 52 +++++++++++++++++++++++++++++++++
->>  hw/ppc/spapr_hcall.c            |  5 ----
->>  include/hw/ppc/spapr.h          |  7 +++++
->>  target/ppc/cpu.h                |  4 +++
->>  target/ppc/translate_init.inc.c | 27 +++++++++++++++++
->>  5 files changed, 90 insertions(+), 5 deletions(-)
->>=20
->> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
->> index 821f0d4a49..3e5678d467 100644
->> --- a/hw/ppc/spapr.c
->> +++ b/hw/ppc/spapr.c
->> @@ -4302,6 +4302,54 @@ PowerPCCPU *spapr_find_cpu(int vcpu_id)
->>      return NULL;
->>  }
->> =20
->> +#ifndef CONFIG_USER_ONLY
 >=20
-> This file is for system emulation only, no need to guard here.
+> On 18.07.19 13:06, Paolo Bonzini wrote:
+>> On 18/07/19 12:39, Nicholas Piggin wrote:
+>>> Commit 1405819637f53 ("qmp: don't emit the RESET event on wakeup from
+>>> S3") changed system wakeup to avoid calling qapi_event_send_reset.
+>>> Commit 76ed4b18debfe ("s390/ipl: fix ipl with -no-reboot") appears to
+>>> have inadvertently broken that logic.
+>>>
+>>> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+>>> ---
+>>> I'm not quite sure if this patch is correct and haven't tested it, I
+>>> found it by inspection. If this patch is incorrect, I will have to
+>>> adjust patch 2.
+>>>
+>>>  vl.c | 2 +-
+>>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>>
+>>> diff --git a/vl.c b/vl.c
+>>> index 5089fce6c5..ef3c7ab8b8 100644
+>>> --- a/vl.c
+>>> +++ b/vl.c
+>>> @@ -1550,7 +1550,7 @@ void qemu_system_reset(ShutdownCause reason)
+>>>      } else {
+>>>          qemu_devices_reset();
+>>>      }
+>>> -    if (reason !=3D SHUTDOWN_CAUSE_SUBSYSTEM_RESET) {
+>>> +    if (reason && reason !=3D SHUTDOWN_CAUSE_SUBSYSTEM_RESET) {
+>>>          qapi_event_send_reset(shutdown_caused_by_guest(reason), reason=
+);
+>>>      }
+>>>      cpu_synchronize_all_post_reset();
+>>>
+>>=20
+>> Yes, it seems correct and I've queued it for 4.1.
 >=20
-> This is minor and rest looks good.
->=20
-> Reviewed-by: Greg Kurz <groug@kaod.org>
+> Yes makes sense.=20
+> Would it be better to write out if(reason) e.g. replace "reason" with "re=
+ason !=3D SHUTDOWN_CAUSE_NONE" ?
 
-Thanks for all the reviews Greg (and others), they made significant=20
-improvements. David I'm not sure how you like to work with merging
-patches, but if you can add the Reviewed-by tags and this issue, then
-I won't have to resend.
+I guess it's a matter of preference so I won't weigh in :) My patch
+did try to revert back to the previous form but I'm happy to change
+it.
 
-Or if you prefer I can fix it up and send to you privately to reduce
-list spam.
+> Going even further, I am asking myself if something like
+>=20
+> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
+> index 60bd081d3ef3..406743566869 100644
+> --- a/hw/s390x/ipl.c
+> +++ b/hw/s390x/ipl.c
+> @@ -577,7 +577,7 @@ void s390_ipl_reset_request(CPUState *cs, enum s390_r=
+eset reset_type)
+>      if (reset_type =3D=3D S390_RESET_MODIFIED_CLEAR ||
+>          reset_type =3D=3D S390_RESET_LOAD_NORMAL) {
+>          /* ignore -no-reboot, send no event  */
+> -        qemu_system_reset_request(SHUTDOWN_CAUSE_SUBSYSTEM_RESET);
+> +        qemu_system_reset_request(SHUTDOWN_CAUSE_NONE);
+>      } else {
+>          qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
+>      }
+>=20
+> would also work.
+
+If that works for you, then you could take out the test in the reset
+code. You would have to modify qemu_system_reset_request too of course.
+
+But it seems a bit unsatisfactory to change the reason for the request
+so as to influence behaviour. Either the requests should ask for=20
+particular behaviour, or the logic for determining how to handle
+the type of request should remain in the reset logic, I would say.
 
 Thanks,
 Nick
