@@ -2,111 +2,68 @@ Return-Path: <SRS0=9jkQ=VP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37785C76191
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 10:50:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F39BC76195
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 10:52:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1062B217F4
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 10:50:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1062B217F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 373CB2173B
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 10:52:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 373CB2173B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36286 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36320 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ho3zJ-00007m-D7
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jul 2019 06:50:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38165)
+	id 1ho41m-0001lc-82
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jul 2019 06:52:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39238)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <thuth@redhat.com>) id 1ho3z5-0007x7-QC
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 06:50:01 -0400
+ (envelope-from <shameerali.kolothum.thodi@huawei.com>)
+ id 1ho41Z-0001Gx-G5
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 06:52:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1ho3z3-00011p-SS
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 06:49:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54396)
+ (envelope-from <shameerali.kolothum.thodi@huawei.com>)
+ id 1ho41X-0003NV-If
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 06:52:33 -0400
+Received: from lhrrgout.huawei.com ([185.176.76.210]:45424 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>)
- id 1ho3z1-0000xO-TE; Thu, 18 Jul 2019 06:49:57 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 5F1A930B1AC9;
- Thu, 18 Jul 2019 10:49:54 +0000 (UTC)
-Received: from thuth.remote.csb (dhcp-200-228.str.redhat.com [10.33.200.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 44F785D719;
- Thu, 18 Jul 2019 10:49:52 +0000 (UTC)
-To: Greg Kurz <groug@kaod.org>, Alexey Kardashevskiy <aik@ozlabs.ru>
-References: <20190716053522.78813-1-aik@ozlabs.ru>
- <8b727864-1634-0a5d-c557-fcaa52c49434@redhat.com>
- <9587706e-d53c-5490-cb4a-4c89eadfc497@ozlabs.ru>
- <20190718124042.4dd7b132@bahia.lab.toulouse-stg.fr.ibm.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; keydata=
- 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
-Organization: Red Hat
-Message-ID: <8ed62115-29a2-c742-f309-0eb92a159803@redhat.com>
-Date: Thu, 18 Jul 2019 12:49:52 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
-MIME-Version: 1.0
-In-Reply-To: <20190718124042.4dd7b132@bahia.lab.toulouse-stg.fr.ibm.com>
-Content-Type: text/plain; charset=utf-8
+ (Exim 4.71) (envelope-from <shameerali.kolothum.thodi@huawei.com>)
+ id 1ho41T-0003Er-Gy; Thu, 18 Jul 2019 06:52:27 -0400
+Received: from LHREML711-CAH.china.huawei.com (unknown [172.18.7.108])
+ by Forcepoint Email with ESMTP id 3C652CADC0FD9FC0C606;
+ Thu, 18 Jul 2019 11:52:18 +0100 (IST)
+Received: from LHREML524-MBS.china.huawei.com ([169.254.2.132]) by
+ LHREML711-CAH.china.huawei.com ([10.201.108.34]) with mapi id 14.03.0415.000; 
+ Thu, 18 Jul 2019 11:52:10 +0100
+From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Thread-Topic: [Qemu-devel] [PATCH-for-4.2 v7 03/10] hw/acpi: Add ACPI
+ Generic Event Device Support
+Thread-Index: AQHVPKyeUuREoR+k9k210mjLR3EAGabQLoLQ
+Date: Thu, 18 Jul 2019 10:52:10 +0000
+Message-ID: <5FC3163CFD30C246ABAA99954A238FA83F30B621@lhreml524-mbs.china.huawei.com>
+References: <20190716153816.17676-1-shameerali.kolothum.thodi@huawei.com>
+ <20190716153816.17676-4-shameerali.kolothum.thodi@huawei.com>
+ <20190717163245.78880d55@redhat.com>
+In-Reply-To: <20190717163245.78880d55@redhat.com>
+Accept-Language: en-GB, en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.41]); Thu, 18 Jul 2019 10:49:54 +0000 (UTC)
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.202.227.237]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-CFilter-Loop: Reflected
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [Qemu-ppc] [RFC PATCH qemu] spapr: Stop providing
- RTAS blob
+X-Received-From: 185.176.76.210
+Subject: Re: [Qemu-devel] [PATCH-for-4.2 v7 03/10] hw/acpi: Add ACPI Generic
+ Event Device Support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -118,48 +75,383 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+ "sameo@linux.intel.com" <sameo@linux.intel.com>,
+ "ard.biesheuvel@linaro.org" <ard.biesheuvel@linaro.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Linuxarm <linuxarm@huawei.com>,
+ "shannon.zhaosl@gmail.com" <shannon.zhaosl@gmail.com>,
+ "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "xuwei \(O\)" <xuwei5@huawei.com>,
+ "sebastien.boeuf@intel.com" <sebastien.boeuf@intel.com>,
+ "lersek@redhat.com" <lersek@redhat.com>,
+ "eric.auger@redhat.com" <eric.auger@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 18/07/2019 12.40, Greg Kurz wrote:
-> On Thu, 18 Jul 2019 17:55:12 +1000
-> Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
-> 
->>
->>
->> On 18/07/2019 17:20, Thomas Huth wrote:
->>> On 16/07/2019 07.35, Alexey Kardashevskiy wrote:
->>>> SLOF implements one itself so let's remove it from QEMU. It is one less
->>>> image and simpler setup as the RTAS blob never stays in its initial place
->>>> anyway as the guest OS always decides where to put it.
->>>>
->>>> This totally depends on https://patchwork.ozlabs.org/patch/1132440/ ,
->>>> hence RFC.
->>>
->>> Patch looks basically fine for me, but I wonder whether we should wait
->>> for one or two releases until we really remove it from QEMU, so that it
->>> is still possible to test the latest QEMU with older SLOF releases for a
->>> while (which is sometimes useful when hunting bugs). Or should this
->>> maybe even go through the official deprecation process (i.e. with an
->>> entry in qemu-deprecated.texi)?
->>
->> I worry more about slof being distributed as a separate package in RHEL, 
->> easy enough to get qemu/slof out of sync.
->>
-> 
-> Then it seems to call for keeping the code around in QEMU in case RHEL's
-> slof doesn't implement the RTAS blob. Following the official deprecation
-> process looks like a good option IMHO.
+Hi Igor,
 
-We can of course make the qemu rpm depend on the new SLOF rpm, so that
-you can not install an older SLOF with a newer QEMU.
+> -----Original Message-----
+> From: Qemu-devel
+> [mailto:qemu-devel-bounces+shameerali.kolothum.thodi=3Dhuawei.com@nongn
+> u.org] On Behalf Of Igor Mammedov
+> Sent: 17 July 2019 15:33
+> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+> Cc: peter.maydell@linaro.org; sameo@linux.intel.com;
+> shannon.zhaosl@gmail.com; ard.biesheuvel@linaro.org;
+> qemu-devel@nongnu.org; xuwei (O) <xuwei5@huawei.com>; Linuxarm
+> <linuxarm@huawei.com>; eric.auger@redhat.com; qemu-arm@nongnu.org;
+> sebastien.boeuf@intel.com; lersek@redhat.com
+> Subject: Re: [Qemu-devel] [PATCH-for-4.2 v7 03/10] hw/acpi: Add ACPI Gene=
+ric
+> Event Device Support
+>=20
+> On Tue, 16 Jul 2019 16:38:09 +0100
+> Shameer Kolothum <shameerali.kolothum.thodi@huawei.com> wrote:
 
-But anyway, to avoid confusion and ease debugging, I'd also rather vote
-for the official deprecation process here, and remove the RTAS blob from
-QEMU after the official deprecation period.
+[...]
 
- Thomas
+> > +static void acpi_ged_event(AcpiGedState *s, uint32_t sel)
+> > +{
+> > +    GEDState *ged_st =3D &s->ged_state;
+> > +    /*
+> > +     * Set the GED IRQ selector to the expected device type value. Thi=
+s
+> > +     * way, the ACPI method will be able to trigger the right code bas=
+ed
+> > +     * on a unique IRQ.
+> comment isn't correct anymore, pls fix it
+
+True.
+
+>=20
+> > +     */
+> > +    qemu_mutex_lock(&ged_st->lock);
+> Is this lock really necessary?
+> (I thought that MMIO and monitor access is guarded by BQL)
+
+Hmm..I am not sure. This is to synchronize with the ged_st->sel update insi=
+de
+ged_read(). And also acpi_ged_event() gets called through _power_down_notif=
+ier()
+as well. BQL guard is in place for all the paths here?=20
+
+>=20
+> > +    ged_st->sel |=3D sel;
+> > +    qemu_mutex_unlock(&ged_st->lock);
+> > +
+> > +    /* Trigger the event by sending an interrupt to the guest. */
+> > +    qemu_irq_pulse(s->irq);
+> > +}
+> > +
+> > +static void acpi_ged_init(MemoryRegion *as, DeviceState *dev, GEDState
+> *ged_st)
+> > +{
+> > +    AcpiGedState *s =3D ACPI_GED(dev);
+> > +
+> > +    assert(s->ged_base);
+> > +
+> > +    qemu_mutex_init(&ged_st->lock);
+> > +    memory_region_init_io(&ged_st->io, OBJECT(dev), &ged_ops, ged_st,
+> > +                          TYPE_ACPI_GED, ACPI_GED_REG_LEN);
+> > +    memory_region_add_subregion(as, s->ged_base, &ged_st->io);
+> > +    qdev_init_gpio_out_named(DEVICE(s), &s->irq, "ged-irq", 1);
+> > +}
+> > +
+> > +static void acpi_ged_device_plug_cb(HotplugHandler *hotplug_dev,
+> > +                                    DeviceState *dev, Error **errp)
+> > +{
+> > +    AcpiGedState *s =3D ACPI_GED(hotplug_dev);
+> > +
+> > +    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
+> > +        if (s->memhp_state.is_enabled) {
+> > +            acpi_memory_plug_cb(hotplug_dev, &s->memhp_state, dev,
+> errp);
+> > +        } else {
+> > +            error_setg(errp,
+> > +                 "memory hotplug is not
+> enabled: %s.memory-hotplug-support "
+> > +                 "is not set", object_get_typename(OBJECT(s)));
+> > +        }
+> > +    } else {
+> > +        error_setg(errp, "virt: device plug request for unsupported
+> device"
+> > +                   " type: %s", object_get_typename(OBJECT(dev)));
+> > +    }
+> > +}
+> > +
+> > +static void acpi_ged_send_event(AcpiDeviceIf *adev, AcpiEventStatusBit=
+s
+> ev)
+> > +{
+> > +    AcpiGedState *s =3D ACPI_GED(adev);
+> > +    uint32_t sel;
+> > +
+> > +    if (ev & ACPI_MEMORY_HOTPLUG_STATUS) {
+> > +        sel =3D ACPI_GED_MEM_HOTPLUG_EVT;
+> > +    } else {
+> > +        /* Unknown event. Return without generating interrupt. */
+> > +        warn_report("GED: Unsupported event %d. No irq injected", ev);
+> > +        return;
+> > +    }
+> > +
+> > +    /*
+> > +     * We inject the hotplug interrupt. The IRQ selector will make
+> > +     * the difference from the ACPI table.
+> I don't get comment at all, pls rephrase/
+
+Ok. I think better to get rid of this comment here and update the one in ac=
+pi_ged_event()
+appropriately.
+
+>=20
+> > +     */
+> > +    acpi_ged_event(s, sel);
+> it seems to used only once and only here, suggest to drop acpi_ged_event(=
+)
+> and move it's code here.
+
+But patch #10 makes use of it from acpi_ged_pm_powerdown_req().
+
+> > +}
+> > +
+> > +static void acpi_ged_device_realize(DeviceState *dev, Error **errp)
+> > +{
+> > +    AcpiGedState *s =3D ACPI_GED(dev);
+> > +
+> > +    if (s->memhp_state.is_enabled) {
+> > +        acpi_memory_hotplug_init(get_system_memory(), OBJECT(dev),
+> > +                                 &s->memhp_state,
+> > +                                 s->memhp_base);
+> > +    }
+> > +
+> > +    acpi_ged_init(get_system_memory(), dev, &s->ged_state);
+> > +}
+> > +
+> > +static Property acpi_ged_properties[] =3D {
+> > +    /*
+> > +     * Memory hotplug base address is a property of GED here,
+> > +     * because GED handles memory hotplug event and acpi-mem-hotplug
+> > +     * memory region gets initialized when GED device is realized.
+> > +     */
+> > +    DEFINE_PROP_UINT64("memhp-base", AcpiGedState, memhp_base,
+> 0),
+> > +    DEFINE_PROP_BOOL("memory-hotplug-support", AcpiGedState,
+> > +                     memhp_state.is_enabled, true),
+> > +    DEFINE_PROP_UINT64("ged-base", AcpiGedState, ged_base, 0),
+>=20
+> I'd add checks to realize() to ensure that both foo_base are not left
+> uninitialized (i.e. at default values)
+
+Ok. ged_base has a check in acpi_ged_init(). I will add check for memhp_bas=
+e
+and move the ged_base one to realize().
+
+>=20
+> > +    DEFINE_PROP_UINT32("ged-event", AcpiGedState, ged_event_bitmap,
+> 0),
+> > +    DEFINE_PROP_END_OF_LIST(),
+> > +};
+> > +
+> > +static bool vmstate_test_use_memhp(void *opaque)
+> > +{
+> > +    AcpiGedState *s =3D opaque;
+> > +    return s->memhp_state.is_enabled;
+> > +}
+> > +
+> > +static const VMStateDescription vmstate_memhp_state =3D {
+> > +    .name =3D "acpi-ged/memhp",
+> > +    .version_id =3D 1,
+> > +    .minimum_version_id =3D 1,
+> > +    .needed =3D vmstate_test_use_memhp,
+> > +    .fields      =3D (VMStateField[]) {
+> > +        VMSTATE_MEMORY_HOTPLUG(memhp_state, AcpiGedState),
+> > +        VMSTATE_END_OF_LIST()
+> > +    }
+> > +};
+> > +
+> > +static const VMStateDescription vmstate_ged_state =3D {
+> > +    .name =3D "acpi-ged-state",
+> > +    .version_id =3D 1,
+> > +    .minimum_version_id =3D 1,
+> > +    .fields      =3D (VMStateField[]) {
+> > +        VMSTATE_UINT32(sel, GEDState),
+> > +        VMSTATE_END_OF_LIST()
+> > +    }
+> > +};
+> > +
+> > +static const VMStateDescription vmstate_acpi_ged =3D {
+> > +    .name =3D "acpi-ged",
+> > +    .version_id =3D 1,
+> > +    .minimum_version_id =3D 1,
+> > +    .fields =3D (VMStateField[]) {
+> > +        VMSTATE_STRUCT(ged_state, AcpiGedState, 1,
+> vmstate_ged_state, GEDState),
+> > +        VMSTATE_END_OF_LIST(),
+> > +    },
+> > +    .subsections =3D (const VMStateDescription * []) {
+> > +        &vmstate_memhp_state,
+> > +        NULL
+> > +    }
+> > +};
+> > +
+> > +static void acpi_ged_class_init(ObjectClass *class, void *data)
+> > +{
+> > +    DeviceClass *dc =3D DEVICE_CLASS(class);
+> > +    HotplugHandlerClass *hc =3D HOTPLUG_HANDLER_CLASS(class);
+> > +    AcpiDeviceIfClass *adevc =3D ACPI_DEVICE_IF_CLASS(class);
+> > +
+> > +    dc->desc =3D "ACPI Generic Event Device";
+> > +    dc->props =3D acpi_ged_properties;
+> > +    dc->realize =3D acpi_ged_device_realize;
+> > +    dc->vmsd =3D &vmstate_acpi_ged;
+> > +
+> > +    hc->plug =3D acpi_ged_device_plug_cb;
+> > +
+> > +    adevc->send_event =3D acpi_ged_send_event;
+> > +}
+> > +
+> > +static const TypeInfo acpi_ged_info =3D {
+> > +    .name          =3D TYPE_ACPI_GED,
+> > +    .parent        =3D TYPE_DEVICE,
+> > +    .instance_size =3D sizeof(AcpiGedState),
+> > +    .class_init    =3D acpi_ged_class_init,
+> > +    .interfaces =3D (InterfaceInfo[]) {
+> > +        { TYPE_HOTPLUG_HANDLER },
+> > +        { TYPE_ACPI_DEVICE_IF },
+> > +        { }
+> > +    }
+> > +};
+> > +
+> > +static void acpi_ged_register_types(void)
+> > +{
+> > +    type_register_static(&acpi_ged_info);
+> > +}
+> > +
+> > +type_init(acpi_ged_register_types)
+> > diff --git a/include/hw/acpi/generic_event_device.h
+> b/include/hw/acpi/generic_event_device.h
+> > new file mode 100644
+> > index 0000000000..f69d084c89
+> > --- /dev/null
+> > +++ b/include/hw/acpi/generic_event_device.h
+> > @@ -0,0 +1,102 @@
+> > +/*
+> > + *
+> > + * Copyright (c) 2018 Intel Corporation
+> > + * Copyright (c) 2019 Huawei Technologies R & D (UK) Ltd
+> > + * Written by Samuel Ortiz, Shameer Kolothum
+> > + *
+> > + * This program is free software; you can redistribute it and/or modif=
+y it
+> > + * under the terms and conditions of the GNU General Public License,
+> > + * version 2 or later, as published by the Free Software Foundation.
+> > + *
+> > + * The ACPI Generic Event Device (GED) is a hardware-reduced specific
+> > + * device[ACPI v6.1 Section 5.6.9] that handles all platform events,
+> > + * including the hotplug ones. Generic Event Device allows platforms
+> > + * to handle interrupts in ACPI ASL statements. It follows a very
+> > + * similar approach like the _EVT method from GPIO events. All
+> > + * interrupts are listed in  _CRS and the handler is written in _EVT
+> > + * method. Here, we use a single interrupt for the GED device, relying
+> > + * on IO memory region to communicate the type of device affected by
+> > + * the interrupt. This way, we can support up to 32 events with a
+> > + * unique interrupt.
+> > + *
+> > + * Here is an example.
+> > + *
+> > + * Device (\_SB.GED)
+> > + * {
+> > + *     Name (_HID, "ACPI0013")
+> > + *     Name (_UID, Zero)
+> > + *     Name (_CRS, ResourceTemplate ()
+> > + *     {
+> > + *         Interrupt (ResourceConsumer, Edge, ActiveHigh, Exclusive, ,=
+, )
+> > + *         {
+> > + *              0x00000029,
+> > + *         }
+> > + *     })
+> > + *     OperationRegion (EREG, SystemMemory, 0x09080000, 0x04)
+> > + *     Field (EREG, DWordAcc, NoLock, WriteAsZeros)
+> > + *     {
+> > + *         ESEL,   32
+> > + *     }
+> > + *
+> > + *     Method (_EVT, 1, Serialized)  // _EVT: Event
+> > + *     {
+> > + *         Local0 =3D ESEL // ESEL =3D IO memory region which specifie=
+s the
+> > + *                       // device type.
+> > + *         If (((Local0 & One) =3D=3D One))
+> > + *         {
+> > + *             MethodEvent1()
+> > + *         }
+> > + *         If ((Local0 & 0x2) =3D=3D 0x2)
+> > + *         {
+> > + *             MethodEvent2()
+> > + *         }
+> > + *         ...
+> > + *     }
+> > + * }
+> > + *
+> > + */
+> > +
+> > +#ifndef HW_ACPI_GED_H
+> > +#define HW_ACPI_GED_H
+> > +
+> > +#include "hw/acpi/memory_hotplug.h"
+> > +
+> > +#define TYPE_ACPI_GED "acpi-ged"
+> > +#define ACPI_GED(obj) \
+> > +    OBJECT_CHECK(AcpiGedState, (obj), TYPE_ACPI_GED)
+> > +
+> > +#define ACPI_GED_EVT_SEL_OFFSET    0x0
+>=20
+> > +#define ACPI_GED_EVT_SEL_LEN       0x4
+> > +#define ACPI_GED_REG_LEN           0x4
+> Didn't both macros refer to the same thing?
+> Why not use the same one in AML and in QEMU MMIO handler?
+
+Ok.
+
+Thanks,
+Shameer
+
+>=20
+> > +
+> > +#define GED_DEVICE      "GED"
+> > +#define AML_GED_EVT_REG "EREG"
+> > +#define AML_GED_EVT_SEL "ESEL"
+> > +
+> > +/*
+> > + * Platforms need to specify the GED event bitmap
+> > + * to describe what kind of events they want to support
+> > + * through GED.
+> > + */
+> > +#define ACPI_GED_MEM_HOTPLUG_EVT   0x1
+> > +
+> > +typedef struct GEDState {
+> > +    MemoryRegion io;
+> > +    uint32_t     sel;
+> > +    QemuMutex    lock;
+> > +} GEDState;
+> > +
+> > +typedef struct AcpiGedState {
+> > +    DeviceClass parent_obj;
+> > +    MemHotplugState memhp_state;
+> > +    hwaddr memhp_base;
+> > +    hwaddr ged_base;
+> > +    GEDState ged_state;
+> > +    uint32_t ged_event_bitmap;
+> > +    qemu_irq irq;
+> > +} AcpiGedState;
+> > +
+> > +void build_ged_aml(Aml *table, const char* name, HotplugHandler
+> *hotplug_dev,
+> > +                   uint32_t ged_irq, AmlRegionSpace rs);
+> > +
+> > +#endif
+>=20
+
 
