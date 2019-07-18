@@ -6,54 +6,53 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 894D0C76192
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 01:06:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 702E4C7618F
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 01:06:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6585A21841
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 01:06:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6585A21841
+	by mail.kernel.org (Postfix) with ESMTPS id 47C542173B
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 01:06:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47C542173B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33520 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33530 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnus1-0004hA-DH
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 21:06:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51906)
+	id 1hnusK-0006Cb-Fi
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 21:06:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51921)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richardw.yang@linux.intel.com>) id 1hnurk-0003kd-HS
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 21:05:49 -0400
+ (envelope-from <richardw.yang@linux.intel.com>) id 1hnuro-00040b-4n
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 21:05:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richardw.yang@linux.intel.com>) id 1hnurj-0003jv-Jd
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 21:05:48 -0400
+ (envelope-from <richardw.yang@linux.intel.com>) id 1hnurn-0003m4-45
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 21:05:52 -0400
 Received: from mga02.intel.com ([134.134.136.20]:12087)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
- id 1hnurj-0003j4-Bm
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 21:05:47 -0400
+ id 1hnurm-0003j4-ST
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 21:05:51 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga004.jf.intel.com ([10.7.209.38])
  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 17 Jul 2019 18:05:45 -0700
+ 17 Jul 2019 18:05:50 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,276,1559545200"; d="scan'208";a="319489324"
+X-IronPort-AV: E=Sophos;i="5.64,276,1559545200"; d="scan'208";a="319489334"
 Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
- by orsmga004.jf.intel.com with ESMTP; 17 Jul 2019 18:05:44 -0700
+ by orsmga004.jf.intel.com with ESMTP; 17 Jul 2019 18:05:47 -0700
 From: Wei Yang <richardw.yang@linux.intel.com>
 To: qemu-devel@nongnu.org
-Date: Thu, 18 Jul 2019 09:04:55 +0800
-Message-Id: <20190718010456.4234-2-richardw.yang@linux.intel.com>
+Date: Thu, 18 Jul 2019 09:04:56 +0800
+Message-Id: <20190718010456.4234-3-richardw.yang@linux.intel.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190718010456.4234-1-richardw.yang@linux.intel.com>
 References: <20190718010456.4234-1-richardw.yang@linux.intel.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
 X-Received-From: 134.134.136.20
-Subject: [Qemu-devel] [PATCH v3 1/2] bitmap: get last word mask from nr
- directly
+Subject: [Qemu-devel] [PATCH v3 2/2] test-bitmap: add test for bitmap_set
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,74 +71,97 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The value left in nr is the number of bits for the last word, which
-could be calculate the last word mask directly.
+Add a test for bitmap_set. There are three cases:
 
-Remove the unnecessary size.
+  * Both start and end is BITS_PER_LONG aligned
+  * Only start is BITS_PER_LONG aligned
+  * Only end is BITS_PER_LONG aligned
 
 Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
 
 ---
-v2: refine bitmap_set_atomic too, suggested from Peter
+v3:
+  * free bmap
+  * all 1's set correctly
+  * expand range to 2 long
+  * check each possible of offset
+  * add a skeleton to test both bitmap_set and bitmap_set_atomic
 ---
- util/bitmap.c | 9 +++------
- 1 file changed, 3 insertions(+), 6 deletions(-)
+ tests/test-bitmap.c | 55 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 55 insertions(+)
 
-diff --git a/util/bitmap.c b/util/bitmap.c
-index 1753ff7f5b..5b15249796 100644
---- a/util/bitmap.c
-+++ b/util/bitmap.c
-@@ -160,7 +160,6 @@ int slow_bitmap_andnot(unsigned long *dst, const unsigned long *bitmap1,
- void bitmap_set(unsigned long *map, long start, long nr)
- {
-     unsigned long *p = map + BIT_WORD(start);
--    const long size = start + nr;
-     int bits_to_set = BITS_PER_LONG - (start % BITS_PER_LONG);
-     unsigned long mask_to_set = BITMAP_FIRST_WORD_MASK(start);
- 
-@@ -174,7 +173,7 @@ void bitmap_set(unsigned long *map, long start, long nr)
-         p++;
-     }
-     if (nr) {
--        mask_to_set &= BITMAP_LAST_WORD_MASK(size);
-+        mask_to_set &= BITMAP_LAST_WORD_MASK(nr);
-         *p |= mask_to_set;
-     }
+diff --git a/tests/test-bitmap.c b/tests/test-bitmap.c
+index cb7c5e462d..18aa584591 100644
+--- a/tests/test-bitmap.c
++++ b/tests/test-bitmap.c
+@@ -59,12 +59,67 @@ static void check_bitmap_copy_with_offset(void)
+     g_free(bmap3);
  }
-@@ -182,7 +181,6 @@ void bitmap_set(unsigned long *map, long start, long nr)
- void bitmap_set_atomic(unsigned long *map, long start, long nr)
+ 
++typedef void (*bmap_set_func)(unsigned long *map, long i, long len);
++static void bitmap_set_case(bmap_set_func set_func)
++{
++    unsigned long *bmap;
++    int offset;
++
++    bmap = bitmap_new(BMAP_SIZE);
++
++    /* Both Aligned, set bits [BITS_PER_LONG, 3*BITS_PER_LONG] */
++    set_func(bmap, BITS_PER_LONG, 2 * BITS_PER_LONG);
++    g_assert_cmpuint(bmap[1], ==, -1ul);
++    g_assert_cmpuint(bmap[2], ==, -1ul);
++    g_assert_cmpint(find_first_bit(bmap, BITS_PER_LONG), ==, BITS_PER_LONG);
++    g_assert_cmpint(find_next_zero_bit(bmap, 3 * BITS_PER_LONG, BITS_PER_LONG),
++                    ==, 3 * BITS_PER_LONG);
++
++    for (offset = 0; offset <= BITS_PER_LONG; offset++) {
++        bitmap_clear(bmap, 0, BMAP_SIZE);
++        /* End Aligned, set bits [BITS_PER_LONG - offset, 3*BITS_PER_LONG] */
++        set_func(bmap, BITS_PER_LONG - offset, 2 * BITS_PER_LONG + offset);
++        g_assert_cmpuint(bmap[1], ==, -1ul);
++        g_assert_cmpuint(bmap[2], ==, -1ul);
++        g_assert_cmpint(find_first_bit(bmap, BITS_PER_LONG),
++                        ==, BITS_PER_LONG - offset);
++        g_assert_cmpint(find_next_zero_bit(bmap,
++                                           3 * BITS_PER_LONG,
++                                           BITS_PER_LONG - offset),
++                        ==, 3 * BITS_PER_LONG);
++    }
++
++    for (offset = 0; offset <= BITS_PER_LONG; offset++) {
++        bitmap_clear(bmap, 0, BMAP_SIZE);
++        /* Start Aligned, set bits [BITS_PER_LONG, 3*BITS_PER_LONG + offset] */
++        set_func(bmap, BITS_PER_LONG, 2 * BITS_PER_LONG + offset);
++        g_assert_cmpuint(bmap[1], ==, -1ul);
++        g_assert_cmpuint(bmap[2], ==, -1ul);
++        g_assert_cmpint(find_first_bit(bmap, BITS_PER_LONG),
++                        ==, BITS_PER_LONG);
++        g_assert_cmpint(find_next_zero_bit(bmap,
++                                           3 * BITS_PER_LONG + offset,
++                                           BITS_PER_LONG),
++                        ==, 3 * BITS_PER_LONG + offset);
++    }
++
++    g_free(bmap);
++}
++
++static void check_bitmap_set(void)
++{
++    bitmap_set_case(bitmap_set);
++    bitmap_set_case(bitmap_set_atomic);
++}
++
+ int main(int argc, char **argv)
  {
-     unsigned long *p = map + BIT_WORD(start);
--    const long size = start + nr;
-     int bits_to_set = BITS_PER_LONG - (start % BITS_PER_LONG);
-     unsigned long mask_to_set = BITMAP_FIRST_WORD_MASK(start);
+     g_test_init(&argc, &argv, NULL);
  
-@@ -208,7 +206,7 @@ void bitmap_set_atomic(unsigned long *map, long start, long nr)
+     g_test_add_func("/bitmap/bitmap_copy_with_offset",
+                     check_bitmap_copy_with_offset);
++    g_test_add_func("/bitmap/bitmap_set",
++                    check_bitmap_set);
  
-     /* Last word */
-     if (nr) {
--        mask_to_set &= BITMAP_LAST_WORD_MASK(size);
-+        mask_to_set &= BITMAP_LAST_WORD_MASK(nr);
-         atomic_or(p, mask_to_set);
-     } else {
-         /* If we avoided the full barrier in atomic_or(), issue a
-@@ -221,7 +219,6 @@ void bitmap_set_atomic(unsigned long *map, long start, long nr)
- void bitmap_clear(unsigned long *map, long start, long nr)
- {
-     unsigned long *p = map + BIT_WORD(start);
--    const long size = start + nr;
-     int bits_to_clear = BITS_PER_LONG - (start % BITS_PER_LONG);
-     unsigned long mask_to_clear = BITMAP_FIRST_WORD_MASK(start);
+     g_test_run();
  
-@@ -235,7 +232,7 @@ void bitmap_clear(unsigned long *map, long start, long nr)
-         p++;
-     }
-     if (nr) {
--        mask_to_clear &= BITMAP_LAST_WORD_MASK(size);
-+        mask_to_clear &= BITMAP_LAST_WORD_MASK(nr);
-         *p &= ~mask_to_clear;
-     }
- }
 -- 
 2.17.1
 
