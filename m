@@ -2,61 +2,61 @@ Return-Path: <SRS0=9jkQ=VP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8F9AC76191
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 10:49:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 956CDC76191
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 10:49:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BF79B21783
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 10:49:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF79B21783
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 700DB21783
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 10:49:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 700DB21783
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36266 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36268 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ho3yf-0005u2-Nd
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jul 2019 06:49:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37878)
+	id 1ho3yj-0006Jt-Bu
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jul 2019 06:49:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37905)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <groug@kaod.org>) id 1ho3yK-00057s-SE
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 06:49:14 -0400
+ (envelope-from <philmd@redhat.com>) id 1ho3yN-0005CY-KP
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 06:49:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1ho3yG-0008L3-LN
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 06:49:11 -0400
-Received: from 4.mo3.mail-out.ovh.net ([178.33.46.10]:60492)
+ (envelope-from <philmd@redhat.com>) id 1ho3yK-0008Or-I6
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 06:49:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48464)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1ho3yB-00088K-3q
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 06:49:04 -0400
-Received: from player788.ha.ovh.net (unknown [10.109.143.249])
- by mo3.mail-out.ovh.net (Postfix) with ESMTP id 874E021FBF0
- for <qemu-devel@nongnu.org>; Thu, 18 Jul 2019 12:48:58 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player788.ha.ovh.net (Postfix) with ESMTPSA id 8A4D6809C33B;
- Thu, 18 Jul 2019 10:48:51 +0000 (UTC)
-Date: Thu, 18 Jul 2019 12:48:50 +0200
-From: Greg Kurz <groug@kaod.org>
-To: Nicholas Piggin <npiggin@gmail.com>
-Message-ID: <20190718124850.77af2f44@bahia.lab.toulouse-stg.fr.ibm.com>
-In-Reply-To: <20190718034214.14948-5-npiggin@gmail.com>
-References: <20190718034214.14948-1-npiggin@gmail.com>
- <20190718034214.14948-5-npiggin@gmail.com>
-X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>)
+ id 1ho3yA-00087s-6g; Thu, 18 Jul 2019 06:49:02 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 166CA8E22B;
+ Thu, 18 Jul 2019 10:48:58 +0000 (UTC)
+Received: from x1w.redhat.com (unknown [10.40.205.153])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5879F61465;
+ Thu, 18 Jul 2019 10:48:53 +0000 (UTC)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Thu, 18 Jul 2019 12:48:37 +0200
+Message-Id: <20190718104837.13905-2-philmd@redhat.com>
+In-Reply-To: <20190718104837.13905-1-philmd@redhat.com>
+References: <20190718104837.13905-1-philmd@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 5663839484174244291
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduvddrieehgdefgecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.26]); Thu, 18 Jul 2019 10:48:58 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 178.33.46.10
-Subject: Re: [Qemu-devel] [PATCH v6 4/4] spapr: Implement H_JOIN
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH-for-4.1 v7 1/1] hw/block/pflash_cfi01: Add
+ missing DeviceReset() handler
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,153 +68,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>, qemu-ppc@nongnu.org,
- qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ qemu-block@nongnu.org, Laszlo Ersek <lersek@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Alistair Francis <alistair.francis@wdc.com>, John Snow <jsnow@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 18 Jul 2019 13:42:14 +1000
-Nicholas Piggin <npiggin@gmail.com> wrote:
+To avoid incoherent states when the machine resets (see but report
+below), add the device reset callback.
 
-> This has been useful to modify and test the Linux pseries suspend
-> code but it requires modification to the guest to call it (due to
-> being gated by other unimplemented features). It is not otherwise
-> used by Linux yet, but work is slowly progressing there.
-> 
-> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
-> ---
+A "system reset" sets the device state machine in READ_ARRAY mode
+and, after some delay, set the SR.7 READY bit.
 
-Reviewed-by: Greg Kurz <groug@kaod.org>
+Since we do not model timings, we set the SR.7 bit directly.
 
-> Changes since v5:
-> - Fix prod bit semantics.
-> - Factor out the h_confer_self common code
-> 
-> Changes since v4:
-> - Style
-> 
->  hw/ppc/spapr.c       |  1 +
->  hw/ppc/spapr_hcall.c | 74 ++++++++++++++++++++++++++++++++++++--------
->  2 files changed, 62 insertions(+), 13 deletions(-)
-> 
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 68341c128d..00f7735a31 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -1066,6 +1066,7 @@ static void spapr_dt_rtas(SpaprMachineState *spapr, void *fdt)
->      add_str(hypertas, "hcall-tce");
->      add_str(hypertas, "hcall-vio");
->      add_str(hypertas, "hcall-splpar");
-> +    add_str(hypertas, "hcall-join");
->      add_str(hypertas, "hcall-bulk");
->      add_str(hypertas, "hcall-set-mode");
->      add_str(hypertas, "hcall-sprg0");
-> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-> index 7c659dc75c..9b72ea8b68 100644
-> --- a/hw/ppc/spapr_hcall.c
-> +++ b/hw/ppc/spapr_hcall.c
-> @@ -1069,6 +1069,62 @@ static target_ulong h_cede(PowerPCCPU *cpu, SpaprMachineState *spapr,
->      return H_SUCCESS;
->  }
->  
-> +/*
-> + * Confer to self, aka join. Cede could use the same pattern as well, if
-> + * EXCP_HLT can be changed to ECXP_HALTED.
-> + */
-> +static target_ulong h_confer_self(PowerPCCPU *cpu)
-> +{
-> +    CPUState *cs = CPU(cpu);
-> +    SpaprCpuState *spapr_cpu = spapr_cpu_state(cpu);
-> +
-> +    if (spapr_cpu->prod) {
-> +        spapr_cpu->prod = false;
-> +        return H_SUCCESS;
-> +    }
-> +    cs->halted = 1;
-> +    cs->exception_index = EXCP_HALTED;
-> +    cs->exit_request = 1;
-> +
-> +    return H_SUCCESS;
-> +}
-> +
-> +static target_ulong h_join(PowerPCCPU *cpu, SpaprMachineState *spapr,
-> +                           target_ulong opcode, target_ulong *args)
-> +{
-> +    CPUPPCState *env = &cpu->env;
-> +    CPUState *cs;
-> +    bool last_unjoined = true;
-> +
-> +    if (env->msr & (1ULL << MSR_EE)) {
-> +        return H_BAD_MODE;
-> +    }
-> +
-> +    /*
-> +     * Must not join the last CPU running. Interestingly, no such restriction
-> +     * for H_CONFER-to-self, but that is probably not intended to be used
-> +     * when H_JOIN is available.
-> +     */
-> +    CPU_FOREACH(cs) {
-> +        PowerPCCPU *c = POWERPC_CPU(cs);
-> +        CPUPPCState *e = &c->env;
-> +        if (c == cpu) {
-> +            continue;
-> +        }
-> +
-> +        /* Don't have a way to indicate joined, so use halted && MSR[EE]=0 */
-> +        if (!cs->halted || (e->msr & (1ULL << MSR_EE))) {
-> +            last_unjoined = false;
-> +            break;
-> +        }
-> +    }
-> +    if (last_unjoined) {
-> +        return H_CONTINUE;
-> +    }
-> +
-> +    return h_confer_self(cpu);
-> +}
-> +
->  static target_ulong h_confer(PowerPCCPU *cpu, SpaprMachineState *spapr,
->                             target_ulong opcode, target_ulong *args)
->  {
-> @@ -1089,26 +1145,15 @@ static target_ulong h_confer(PowerPCCPU *cpu, SpaprMachineState *spapr,
->              return H_PARAMETER;
->          }
->  
-> -        spapr_cpu = spapr_cpu_state(target_cpu);
-> -
->          /*
->           * target == self is a special case, we wait until prodded, without
->           * dispatch counter check.
->           */
->          if (cpu == target_cpu) {
-> -            if (spapr_cpu->prod) {
-> -                spapr_cpu->prod = false;
-> -
-> -                return H_SUCCESS;
-> -            }
-> -
-> -            cs->halted = 1;
-> -            cs->exception_index = EXCP_HALTED;
-> -            cs->exit_request = 1;
-> -
-> -            return H_SUCCESS;
-> +            return h_confer_self(cpu);
->          }
->  
-> +        spapr_cpu = spapr_cpu_state(target_cpu);
->          if (!spapr_cpu->vpa_addr || ((dispatch & 1) == 0)) {
->              return H_SUCCESS;
->          }
-> @@ -1981,6 +2026,9 @@ static void hypercall_register_types(void)
->      spapr_register_hypercall(H_CONFER, h_confer);
->      spapr_register_hypercall(H_PROD, h_prod);
->  
-> +    /* hcall-join */
-> +    spapr_register_hypercall(H_JOIN, h_join);
-> +
->      spapr_register_hypercall(H_SIGNAL_SYS_RESET, h_signal_sys_reset);
->  
->      /* processor register resource access h-calls */
+Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=3D1678713
+Reported-by: Laszlo Ersek <lersek@redhat.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+ hw/block/pflash_cfi01.c | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
+
+diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
+index 435be1e35c..a1ec1faae5 100644
+--- a/hw/block/pflash_cfi01.c
++++ b/hw/block/pflash_cfi01.c
+@@ -865,6 +865,24 @@ static void pflash_cfi01_realize(DeviceState *dev, E=
+rror **errp)
+     pfl->cfi_table[0x3f] =3D 0x01; /* Number of protection fields */
+ }
+=20
++static void pflash_cfi01_system_reset(DeviceState *dev)
++{
++    PFlashCFI01 *pfl =3D PFLASH_CFI01(dev);
++
++    /*
++     * The command 0x00 is not assigned by the CFI open standard,
++     * but QEMU historically uses it for the READ_ARRAY command (0xff).
++     */
++    pfl->cmd =3D 0x00;
++    pfl->wcycle =3D 0;
++    memory_region_rom_device_set_romd(&pfl->mem, true);
++    /*
++     * The WSM ready timer occurs at most 150ns after system reset.
++     * This model deliberately ignores this delay.
++     */
++    pfl->status =3D 0x80;
++}
++
+ static Property pflash_cfi01_properties[] =3D {
+     DEFINE_PROP_DRIVE("drive", PFlashCFI01, blk),
+     /* num-blocks is the number of blocks actually visible to the guest,
+@@ -909,6 +927,7 @@ static void pflash_cfi01_class_init(ObjectClass *klas=
+s, void *data)
+ {
+     DeviceClass *dc =3D DEVICE_CLASS(klass);
+=20
++    dc->reset =3D pflash_cfi01_system_reset;
+     dc->realize =3D pflash_cfi01_realize;
+     dc->props =3D pflash_cfi01_properties;
+     dc->vmsd =3D &vmstate_pflash;
+--=20
+2.20.1
 
 
