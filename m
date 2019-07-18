@@ -7,84 +7,82 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CFD3C76186
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 02:24:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21134C76186
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 02:25:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3679B20659
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 02:24:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D040420659
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 02:25:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fZbEAEd9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3679B20659
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QJB1g6D6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D040420659
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33764 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33772 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnw5q-0002uY-FG
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 22:24:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45587)
+	id 1hnw79-0003xg-4E
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jul 2019 22:25:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46014)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <npiggin@gmail.com>) id 1hnw5f-0002Oi-3F
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 22:24:15 -0400
+ (envelope-from <npiggin@gmail.com>) id 1hnw6x-0003Us-Bl
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 22:25:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <npiggin@gmail.com>) id 1hnw5e-0003ae-4H
- for qemu-devel@nongnu.org; Wed, 17 Jul 2019 22:24:15 -0400
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:44025)
+ (envelope-from <npiggin@gmail.com>) id 1hnw6v-0004fk-AJ
+ for qemu-devel@nongnu.org; Wed, 17 Jul 2019 22:25:35 -0400
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:33460)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <npiggin@gmail.com>)
- id 1hnw5d-0003Zy-Se; Wed, 17 Jul 2019 22:24:14 -0400
-Received: by mail-pl1-x644.google.com with SMTP id 4so6043270pld.10;
- Wed, 17 Jul 2019 19:24:13 -0700 (PDT)
+ id 1hnw6t-0004e9-Bb; Wed, 17 Jul 2019 22:25:33 -0400
+Received: by mail-pf1-x441.google.com with SMTP id g2so11829661pfq.0;
+ Wed, 17 Jul 2019 19:25:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=date:from:subject:to:cc:references:in-reply-to:mime-version
  :user-agent:message-id:content-transfer-encoding;
- bh=bIvLasevc7hsK0P8G7iuj8R/u6TWMR3LCLCh3qs3YWo=;
- b=fZbEAEd9jXcySzmxIGKr86E334noJNZ6lI7xW+RgOzF+0M1rvaHOaJLLu914O3nlxs
- 8dWFx7GpYo8lCvfH3C9cBTIHKVqohqc0Jtldb8Hg9UiG2G4YMPLcmtasjj+3Ed6Kihdq
- p5gb73NoWKErODYyh+PkX9k+x//FW3DxQwngatx4p9h/+sVfezFhHAzJE8+1FBnz/+63
- 9dB2MMQQEe7vmNBNkYP+oCV2M0D59oSuaG/dB3yAZ+lv8SCI/IcWm9vNs4TaNusutF72
- hfby1A40HSVbF7Z41bg6W0t/7hXT39TFD0H3NCbvyLgB+G6BXz9ni8OBRZ0jhu1VmtlI
- QATw==
+ bh=jpRLIB5bbcxlc12lCFKBhRwuCEYasQr0dYctopZI8zk=;
+ b=QJB1g6D6u38IvHWE25IC4NwUgxlsI2iX6eBUfgy44EquGeEm9XyWBfTuqzwxg6T2hN
+ Z4aGOlDh5xk5LgMTa1Hj5dLjZKaZpvxZK6nITXeG0EFCWOp1ofgDhKgtNlN8QDwSCQCm
+ vlC0li5l/FAtEhMfQIlwBPkhD79COJj5jVSZr8iitJIeSGEva4fUTXkMUEkjNdPB89l5
+ klXJCtdurKoMPFqt5A19pKoX4icTivWxhHZcB0Of63AkEQ7RGKok5Qv4Xz/5fqoKxs5/
+ WH+isLD370FoUqdbSQ2itgrR3kQszA4SZCBM33FjuP03QZ1WixmTRq3eybV6M0pZM31s
+ YsWQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:subject:to:cc:references:in-reply-to
  :mime-version:user-agent:message-id:content-transfer-encoding;
- bh=bIvLasevc7hsK0P8G7iuj8R/u6TWMR3LCLCh3qs3YWo=;
- b=tuYpw3AGE0kdAeHwo9DD0tI9d4bKMihwIv94WjPJ97BsmnU9T/Y97Ui1KkB5jP/G3F
- s0jBSfbN00sIJ991V3NNrqdAiInpdBdLvcW0rhK7V1UCxbd5VpyhEWBCZCNsquPZmLnk
- mC29ixGX8nZhCs3atilgu21t84b6dr0A1yjAePzlTEfIAxsmn6DmNDhsPLWJNzOjHbaf
- 3yRF1CwCCG6BFFstAx9Xw5BvA5ZHO24aJUnN54+m8U2D7A604VfhG8+cCUJMZxmuWV06
- n/WDPU1RWGxwOy9i403F8DtQqRgoJQhhwh3hBF99KyVCg1Y9zkwymtHptXpiNje0JuR7
- pxZg==
-X-Gm-Message-State: APjAAAWYb4NGi7uRVXhmayG0nLJKs2s0WuJWGzfg/f3bTb1n2BIYguR9
- rgVhv70PU6NcXDrOvF2d0ZM=
-X-Google-Smtp-Source: APXvYqwx8f4J/FS7PEAKOhFRvSRIBQj/w168H+OsdutwiUsUcTDBxwjPHug26+k7yvayIto1Lkbp6Q==
-X-Received: by 2002:a17:902:f204:: with SMTP id
- gn4mr47615059plb.3.1563416653111; 
- Wed, 17 Jul 2019 19:24:13 -0700 (PDT)
+ bh=jpRLIB5bbcxlc12lCFKBhRwuCEYasQr0dYctopZI8zk=;
+ b=cfqZaIs7jfjrlNFQSA00/8/kz53IL0bhrlO/z9q72oGMh6fInqICCabMw1kxV9GfIC
+ EGvhEuTG1X2R8tIaVGIefocxK+lYhzsxBqpAn8yTXtHnJ/q4bP9OHljKybrdDFTynI/p
+ eFg4+FZmP/fyQgoOKuAMR/8mJVqkaihnBQxGu6fVS8PW6diGwBo5M4FA0TCGNpBqXfuQ
+ UVbBxi/WieihAkZdh8RiUZDF/xy1GEwAaL7X5PNpvbvjYawj74oERYS7H3f2wILCf0w3
+ 8exYTujG23CsnYL21/lD2jGMIVg6gvTaU2EMW0eIBcPuwUbj13jL/KI2uloPW5Iulpug
+ tGnw==
+X-Gm-Message-State: APjAAAXMvaTX3+pqWiqatzxcq9mHWnvIf6JA/gySoaXxh+R5BkOPV1WI
+ OISoyXdDCf26P6bMVdybfH8=
+X-Google-Smtp-Source: APXvYqyxlwUT/FbslywFMbiKGTBleanwUSgfsvdVTcHMvDnHfmkHp0FA2JN/aYwCsAhJLgGc2mfm1g==
+X-Received: by 2002:a63:d555:: with SMTP id v21mr23296134pgi.179.1563416730135; 
+ Wed, 17 Jul 2019 19:25:30 -0700 (PDT)
 Received: from localhost ([203.220.8.141])
- by smtp.gmail.com with ESMTPSA id u6sm22089922pjx.23.2019.07.17.19.24.11
+ by smtp.gmail.com with ESMTPSA id 4sm30414416pfc.92.2019.07.17.19.25.28
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Wed, 17 Jul 2019 19:24:12 -0700 (PDT)
-Date: Thu, 18 Jul 2019 12:24:05 +1000
+ Wed, 17 Jul 2019 19:25:29 -0700 (PDT)
+Date: Thu, 18 Jul 2019 12:25:23 +1000
 From: Nicholas Piggin <npiggin@gmail.com>
-To: =?iso-8859-1?q?C=E9dric?= Le Goater <clg@kaod.org>, David Gibson
- <david@gibson.dropbear.id.au>
+To: Greg Kurz <groug@kaod.org>
 References: <20190717053952.13729-1-npiggin@gmail.com>
- <20190717053952.13729-3-npiggin@gmail.com>
- <87ead8b1-45a6-28ff-2ba6-d1afc5326ec0@kaod.org>
-In-Reply-To: <87ead8b1-45a6-28ff-2ba6-d1afc5326ec0@kaod.org>
+ <20190717053952.13729-5-npiggin@gmail.com>
+ <20190717193027.0fce5b06@bahia.lab.toulouse-stg.fr.ibm.com>
+In-Reply-To: <20190717193027.0fce5b06@bahia.lab.toulouse-stg.fr.ibm.com>
 MIME-Version: 1.0
 User-Agent: astroid/0.14.0 (https://github.com/astroidmail/astroid)
-Message-Id: <1563416548.4hlzxhm7x8.astroid@bobo.none>
+Message-Id: <1563416658.j7i8htfx03.astroid@bobo.none>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::644
-Subject: Re: [Qemu-devel] [PATCH v5 2/4] spapr: Implement H_PROD
+X-Received-From: 2607:f8b0:4864:20::441
+Subject: Re: [Qemu-devel] [PATCH v5 4/4] spapr: Implement H_JOIN
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,48 +94,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org,
+ =?iso-8859-1?q?C=E9dric?= Le Goater <clg@kaod.org>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-C=C3=A9dric Le Goater's on July 17, 2019 11:33 pm:
-> On 17/07/2019 07:39, Nicholas Piggin wrote:
->> H_PROD is added, and H_CEDE is modified to test the prod bit
->> according to PAPR.
+Greg Kurz's on July 18, 2019 3:30 am:
+> On Wed, 17 Jul 2019 15:39:52 +1000
+> Nicholas Piggin <npiggin@gmail.com> wrote:
+>=20
+>> This has been useful to modify and test the Linux pseries suspend
+>> code but it requires modification to the guest to call it (due to
+>> being gated by other unimplemented features). It is not otherwise
+>> used by Linux yet, but work is slowly progressing there.
 >>=20
 >> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 >> ---
->>  hw/ppc/spapr_hcall.c | 29 +++++++++++++++++++++++++++++
->>  1 file changed, 29 insertions(+)
+>> Changes since v4:
+>> - Style
 >>=20
+>>  hw/ppc/spapr.c       |  1 +
+>>  hw/ppc/spapr_hcall.c | 45 ++++++++++++++++++++++++++++++++++++++++++++
+>>  2 files changed, 46 insertions(+)
+>>=20
+>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+>> index 13c423347e..59cd24f9c3 100644
+>> --- a/hw/ppc/spapr.c
+>> +++ b/hw/ppc/spapr.c
+>> @@ -1066,6 +1066,7 @@ static void spapr_dt_rtas(SpaprMachineState *spapr=
+, void *fdt)
+>>      add_str(hypertas, "hcall-tce");
+>>      add_str(hypertas, "hcall-vio");
+>>      add_str(hypertas, "hcall-splpar");
+>> +    add_str(hypertas, "hcall-join");
+>>      add_str(hypertas, "hcall-bulk");
+>>      add_str(hypertas, "hcall-set-mode");
+>>      add_str(hypertas, "hcall-sprg0");
 >> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
->> index e615881ac4..8b208ab259 100644
+>> index 5e655172b2..57c1ee0fe1 100644
 >> --- a/hw/ppc/spapr_hcall.c
 >> +++ b/hw/ppc/spapr_hcall.c
->> @@ -1050,14 +1050,41 @@ static target_ulong h_cede(PowerPCCPU *cpu, Spap=
-rMachineState *spapr,
->>  {
->>      CPUPPCState *env =3D &cpu->env;
->>      CPUState *cs =3D CPU(cpu);
->> +    SpaprCpuState *spapr_cpu =3D spapr_cpu_state(cpu);
+>> @@ -1069,6 +1069,48 @@ static target_ulong h_cede(PowerPCCPU *cpu, Spapr=
+MachineState *spapr,
+>>      return H_SUCCESS;
+>>  }
 >> =20
->>      env->msr |=3D (1ULL << MSR_EE);
->>      hreg_compute_hflags(env);
+>> +static target_ulong h_join(PowerPCCPU *cpu, SpaprMachineState *spapr,
+>> +                           target_ulong opcode, target_ulong *args)
+>> +{
+>> +    CPUPPCState *env =3D &cpu->env;
+>> +    CPUState *cs;
+>> +    SpaprCpuState *spapr_cpu =3D spapr_cpu_state(cpu);
+>> +    bool last_unjoined =3D true;
+>> +
+>> +    if (env->msr & (1ULL << MSR_EE)) {
+>> +        return H_BAD_MODE;
+>> +    }
 >> +
 >> +    if (spapr_cpu->prod) {
 >> +        spapr_cpu->prod =3D false;
 >> +        return H_SUCCESS;
 >> +    }
 >> +
->>      if (!cpu_has_work(cs)) {
->>          cs->halted =3D 1;
->>          cs->exception_index =3D EXCP_HLT;
 >=20
-> Shouldn't that be EXCP_HALTED instead ?=20
+> PAPR says that H_JOIN "performs the equivalent of a H_CONFER (proc=3Dself=
+)",
+> unless called by the last unjoined thread, in which case H_CONTINUE
+> should be returned. It thus seems that the spapr_cpu->prod check should
+> be done after the loop below otherwise if the last active thread was
+> just prodded (can happen?), it won't return the expected value, and...
 
-Possibly, I'm not sure. I don't know if it even makes a difference in
-ppc code?
+Good lawyering, I would say you are right.
+
+>> +    CPU_FOREACH(cs) {
+>> +        PowerPCCPU *c =3D POWERPC_CPU(cs);
+>> +        CPUPPCState *e =3D &c->env;
+>> +        if (c =3D=3D cpu) {
+>> +            continue;
+>> +        }
+>> +
+>> +        /* Don't have a way to indicate joined, so use halted && MSR[EE=
+]=3D0 */
+>> +        if (!cs->halted || (e->msr & (1ULL << MSR_EE))) {
+>> +            last_unjoined =3D false;
+>> +            break;
+>> +        }
+>> +    }
+>> +    if (last_unjoined) {
+>> +        return H_CONTINUE;
+>> +    }
+>> +
+>> +    cs =3D CPU(cpu);
+>> +    cs->halted =3D 1;
+>> +    cs->exception_index =3D EXCP_HALTED;
+>> +    cs->exit_request =3D 1;
+>> +
+>> +    return H_SUCCESS;
+>=20
+> ... then, you can maybe factor out this code to an h_confer_self()
+> helper to be called by h_join() and h_confer() ?
+
+I'll take a look.
 
 Thanks,
 Nick
