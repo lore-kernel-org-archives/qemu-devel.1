@@ -2,68 +2,82 @@ Return-Path: <SRS0=9jkQ=VP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52BE9C7618F
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 18:38:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29496C7618F
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 18:39:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2C0532173B
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 18:38:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C0532173B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E1F2720873
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 18:39:45 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="pX9LNe3Y"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1F2720873
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40360 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40368 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hoBIq-0007cW-5x
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jul 2019 14:38:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48954)
+	id 1hoBJh-0000J9-3K
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jul 2019 14:39:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49290)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <lersek@redhat.com>) id 1hoBIf-0007B7-8h
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 14:38:42 -0400
+ (envelope-from <kwankhede@nvidia.com>) id 1hoBJW-0008LG-UE
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 14:39:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lersek@redhat.com>) id 1hoBIb-0004sf-GE
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 14:38:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39490)
+ (envelope-from <kwankhede@nvidia.com>) id 1hoBJU-0005NF-9n
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 14:39:33 -0400
+Received: from hqemgate16.nvidia.com ([216.228.121.65]:17799)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <lersek@redhat.com>)
- id 1hoBIW-0004pI-5e; Thu, 18 Jul 2019 14:38:33 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id EF55730C31BD;
- Thu, 18 Jul 2019 18:38:29 +0000 (UTC)
-Received: from lacos-laptop-7.usersys.redhat.com (ovpn-116-25.ams2.redhat.com
- [10.36.116.25])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4A08F600CC;
- Thu, 18 Jul 2019 18:38:21 +0000 (UTC)
-From: Laszlo Ersek <lersek@redhat.com>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20190718104837.13905-1-philmd@redhat.com>
- <20190718104837.13905-2-philmd@redhat.com>
- <5e6b8a67-8f8a-3e3b-4f42-db2a31c03ad1@redhat.com>
-Message-ID: <d4d20337-b504-0610-8aaf-c8b0b13f0953@redhat.com>
-Date: Thu, 18 Jul 2019 20:38:20 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.9.1
+ (Exim 4.71) (envelope-from <kwankhede@nvidia.com>)
+ id 1hoBJT-0005JZ-UD
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 14:39:32 -0400
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by
+ hqemgate16.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+ id <B5d30bcdb0000>; Thu, 18 Jul 2019 11:39:23 -0700
+Received: from hqmail.nvidia.com ([172.20.161.6])
+ by hqpgpgate101.nvidia.com (PGP Universal service);
+ Thu, 18 Jul 2019 11:39:25 -0700
+X-PGP-Universal: processed;
+ by hqpgpgate101.nvidia.com on Thu, 18 Jul 2019 11:39:25 -0700
+Received: from [10.24.71.22] (10.124.1.5) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Thu, 18 Jul
+ 2019 18:39:15 +0000
+To: Yan Zhao <yan.y.zhao@intel.com>
+References: <1562665760-26158-1-git-send-email-kwankhede@nvidia.com>
+ <1562665760-26158-12-git-send-email-kwankhede@nvidia.com>
+ <20190712003328.GF9176@joy-OptiPlex-7040>
+X-Nvconfidentiality: public
+From: Kirti Wankhede <kwankhede@nvidia.com>
+Message-ID: <70fd135d-4719-e39c-09fe-d5a012520ea8@nvidia.com>
+Date: Fri, 19 Jul 2019 00:09:10 +0530
 MIME-Version: 1.0
-In-Reply-To: <5e6b8a67-8f8a-3e3b-4f42-db2a31c03ad1@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20190712003328.GF9176@joy-OptiPlex-7040>
+X-Originating-IP: [10.124.1.5]
+X-ClientProxiedBy: HQMAIL101.nvidia.com (172.20.187.10) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Thu, 18 Jul 2019 18:38:30 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH-for-4.1 v7 1/1] hw/block/pflash_cfi01: Add
- missing DeviceReset() handler
+Content-Transfer-Encoding: 7bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+ t=1563475163; bh=Gn4WfeXvu6SUkQBC1l0oWEpF93ImAxfmWuT5lYddvzQ=;
+ h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
+ Message-ID:Date:MIME-Version:In-Reply-To:X-Originating-IP:
+ X-ClientProxiedBy:Content-Type:Content-Language:
+ Content-Transfer-Encoding;
+ b=pX9LNe3YkllehhbAG/oSRd3pzMPS81eRbATS3luNXwYZ0jAtSPcuCShMvDFFnP1aK
+ saMGxqBODpuYmibZZoDf0LfJGR4sB/99MXT9GW2r4MzORyTveGCHMWxELzdkBKRRc+
+ 0PFdsUbnE5scNx1qua0lwI7JXsuLSPjak1vHHIU/w33JP1K5v1hMjRH9+IfO7anbcG
+ /jt4Y8XSOfTWpveo5VzFev6mlGNeLlOwJ4nfqEkdgZbNO+UTwo1N7VM85WUoolqlcF
+ s7+7HwXgmTWZhvm+SVwfDM1e65Dqm2AH/vRW+AbGDgSfem7qnFGzpY72RVUAgPcDJf
+ yJlvl3wmJP76w==
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8
+X-Received-From: 216.228.121.65
+Subject: Re: [Qemu-devel] [PATCH v7 11/13] vfio: Add function to get dirty
+ page list
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,124 +89,215 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Alistair Francis <alistair.francis@wdc.com>, John Snow <jsnow@redhat.com>
+Cc: "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>, "Tian,
+ Kevin" <kevin.tian@intel.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
+ "cjia@nvidia.com" <cjia@nvidia.com>,
+ "eskultet@redhat.com" <eskultet@redhat.com>, "Yang,
+ Ziye" <ziye.yang@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "cohuck@redhat.com" <cohuck@redhat.com>,
+ "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
+ "dgilbert@redhat.com" <dgilbert@redhat.com>, "Wang, 
+ Zhi A" <zhi.a.wang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
+ "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>,
+ "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+ "eauger@redhat.com" <eauger@redhat.com>,
+ "felipe@nutanix.com" <felipe@nutanix.com>,
+ "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "Liu,
+ Changpeng" <changpeng.liu@intel.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 07/18/19 17:03, Laszlo Ersek wrote:
-> On 07/18/19 12:48, Philippe Mathieu-Daud=C3=A9 wrote:
->> To avoid incoherent states when the machine resets (see but report
->=20
-> (1) For the PULL request, please fix the typo: s/but/bug/
->=20
->> below), add the device reset callback.
+
+
+On 7/12/2019 6:03 AM, Yan Zhao wrote:
+> On Tue, Jul 09, 2019 at 05:49:18PM +0800, Kirti Wankhede wrote:
+>> Dirty page tracking (.log_sync) is part of RAM copying state, where
+>> vendor driver provides the bitmap of pages which are dirtied by vendor
+>> driver through migration region and as part of RAM copy, those pages
+>> gets copied to file stream.
 >>
->> A "system reset" sets the device state machine in READ_ARRAY mode
->> and, after some delay, set the SR.7 READY bit.
+>> To get dirty page bitmap:
+>> - write start address, page_size and pfn count.
+>> - read count of pfns copied.
+>>     - Vendor driver should return 0 if driver doesn't have any page to
+>>       report dirty in given range.
+>>     - Vendor driver should return -1 to mark all pages dirty for given range.
+>> - read data_offset, where vendor driver has written bitmap.
+>> - read bitmap from the region or mmaped part of the region.
+>> - Iterate above steps till page bitmap for all requested pfns are copied.
 >>
->> Since we do not model timings, we set the SR.7 bit directly.
->>
->> Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=3D1678713
->> Reported-by: Laszlo Ersek <lersek@redhat.com>
->> Reviewed-by: John Snow <jsnow@redhat.com>
->> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
->> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+>> Reviewed-by: Neo Jia <cjia@nvidia.com>
 >> ---
->>  hw/block/pflash_cfi01.c | 19 +++++++++++++++++++
->>  1 file changed, 19 insertions(+)
+>>  hw/vfio/migration.c           | 123 ++++++++++++++++++++++++++++++++++++++++++
+>>  hw/vfio/trace-events          |   1 +
+>>  include/hw/vfio/vfio-common.h |   2 +
+>>  3 files changed, 126 insertions(+)
 >>
->> diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
->> index 435be1e35c..a1ec1faae5 100644
->> --- a/hw/block/pflash_cfi01.c
->> +++ b/hw/block/pflash_cfi01.c
->> @@ -865,6 +865,24 @@ static void pflash_cfi01_realize(DeviceState *dev=
-, Error **errp)
->>      pfl->cfi_table[0x3f] =3D 0x01; /* Number of protection fields */
+>> diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
+>> index 5fb4c5329ede..ca1a8c0f5f1f 100644
+>> --- a/hw/vfio/migration.c
+>> +++ b/hw/vfio/migration.c
+>> @@ -269,6 +269,129 @@ static int vfio_load_device_config_state(QEMUFile *f, void *opaque)
+>>      return qemu_file_get_error(f);
 >>  }
->> =20
->> +static void pflash_cfi01_system_reset(DeviceState *dev)
+>>  
+>> +void vfio_get_dirty_page_list(VFIODevice *vbasedev,
+>> +                              uint64_t start_pfn,
+>> +                              uint64_t pfn_count,
+>> +                              uint64_t page_size)
 >> +{
->> +    PFlashCFI01 *pfl =3D PFLASH_CFI01(dev);
+>> +    VFIOMigration *migration = vbasedev->migration;
+>> +    VFIORegion *region = &migration->region.buffer;
+>> +    uint64_t count = 0;
+>> +    int64_t copied_pfns = 0;
+>> +    int64_t total_pfns = pfn_count;
+>> +    int ret;
 >> +
->> +    /*
->> +     * The command 0x00 is not assigned by the CFI open standard,
->> +     * but QEMU historically uses it for the READ_ARRAY command (0xff=
-).
->> +     */
->> +    pfl->cmd =3D 0x00;
->> +    pfl->wcycle =3D 0;
->> +    memory_region_rom_device_set_romd(&pfl->mem, true);
->> +    /*
->> +     * The WSM ready timer occurs at most 150ns after system reset.
->> +     * This model deliberately ignores this delay.
->> +     */
->> +    pfl->status =3D 0x80;
+>> +    qemu_mutex_lock(&migration->lock);
+>> +
+>> +    while (total_pfns > 0) {
+>> +        uint64_t bitmap_size, data_offset = 0;
+>> +        uint64_t start = start_pfn + count;
+>> +        void *buf = NULL;
+>> +        bool buffer_mmaped = false;
+>> +
+>> +        ret = pwrite(vbasedev->fd, &start, sizeof(start),
+>> +                 region->fd_offset + offsetof(struct vfio_device_migration_info,
+>> +                                              start_pfn));
+>> +        if (ret < 0) {
+>> +            error_report("%s: Failed to set dirty pages start address %d %s",
+>> +                         vbasedev->name, ret, strerror(errno));
+>> +            goto dpl_unlock;
+>> +        }
+>> +
+>> +        ret = pwrite(vbasedev->fd, &page_size, sizeof(page_size),
+>> +                 region->fd_offset + offsetof(struct vfio_device_migration_info,
+>> +                                              page_size));
+>> +        if (ret < 0) {
+>> +            error_report("%s: Failed to set dirty page size %d %s",
+>> +                         vbasedev->name, ret, strerror(errno));
+>> +            goto dpl_unlock;
+>> +        }
+>> +
+>> +        ret = pwrite(vbasedev->fd, &total_pfns, sizeof(total_pfns),
+>> +                 region->fd_offset + offsetof(struct vfio_device_migration_info,
+>> +                                              total_pfns));
+>> +        if (ret < 0) {
+>> +            error_report("%s: Failed to set dirty page total pfns %d %s",
+>> +                         vbasedev->name, ret, strerror(errno));
+>> +            goto dpl_unlock;
+>> +        }
+>> +
+>> +        /* Read copied dirty pfns */
+>> +        ret = pread(vbasedev->fd, &copied_pfns, sizeof(copied_pfns),
+>> +                region->fd_offset + offsetof(struct vfio_device_migration_info,
+>> +                                             copied_pfns));
+>> +        if (ret < 0) {
+>> +            error_report("%s: Failed to get dirty pages bitmap count %d %s",
+>> +                         vbasedev->name, ret, strerror(errno));
+>> +            goto dpl_unlock;
+>> +        }
+>> +
+>> +        if (copied_pfns == VFIO_DEVICE_DIRTY_PFNS_NONE) {
+>> +            /*
+>> +             * copied_pfns could be 0 if driver doesn't have any page to
+>> +             * report dirty in given range
+>> +             */
+>> +            break;
+>> +        } else if (copied_pfns == VFIO_DEVICE_DIRTY_PFNS_ALL) {
+>> +            /* Mark all pages dirty for this range */
+>> +            cpu_physical_memory_set_dirty_range(start_pfn * page_size,
+>> +                                                pfn_count * page_size,
+>> +                                                DIRTY_MEMORY_MIGRATION);
+> seesm pfn_count here is not right
+
+Changing it to total_pfns in next version
+
+Thanks,
+Kirti
+
+>> +            break;
+>> +        }
+>> +
+>> +        bitmap_size = (BITS_TO_LONGS(copied_pfns) + 1) * sizeof(unsigned long);
+>> +
+>> +        ret = pread(vbasedev->fd, &data_offset, sizeof(data_offset),
+>> +                region->fd_offset + offsetof(struct vfio_device_migration_info,
+>> +                                             data_offset));
+>> +        if (ret != sizeof(data_offset)) {
+>> +            error_report("%s: Failed to get migration buffer data offset %d",
+>> +                         vbasedev->name, ret);
+>> +            goto dpl_unlock;
+>> +        }
+>> +
+>> +        if (region->mmaps) {
+>> +            buf = find_data_region(region, data_offset, bitmap_size);
+>> +        }
+>> +
+>> +        buffer_mmaped = (buf != NULL) ? true : false;
+>> +
+>> +        if (!buffer_mmaped) {
+>> +            buf = g_try_malloc0(bitmap_size);
+>> +            if (!buf) {
+>> +                error_report("%s: Error allocating buffer ", __func__);
+>> +                goto dpl_unlock;
+>> +            }
+>> +
+>> +            ret = pread(vbasedev->fd, buf, bitmap_size,
+>> +                        region->fd_offset + data_offset);
+>> +            if (ret != bitmap_size) {
+>> +                error_report("%s: Failed to get dirty pages bitmap %d",
+>> +                             vbasedev->name, ret);
+>> +                g_free(buf);
+>> +                goto dpl_unlock;
+>> +            }
+>> +        }
+>> +
+>> +        cpu_physical_memory_set_dirty_lebitmap((unsigned long *)buf,
+>> +                                               (start_pfn + count) * page_size,
+>> +                                                copied_pfns);
+>> +        count      += copied_pfns;
+>> +        total_pfns -= copied_pfns;
+>> +
+>> +        if (!buffer_mmaped) {
+>> +            g_free(buf);
+>> +        }
+>> +    }
+>> +
+>> +    trace_vfio_get_dirty_page_list(vbasedev->name, start_pfn, pfn_count,
+>> +                                   page_size);
+>> +
+>> +dpl_unlock:
+>> +    qemu_mutex_unlock(&migration->lock);
 >> +}
 >> +
->>  static Property pflash_cfi01_properties[] =3D {
->>      DEFINE_PROP_DRIVE("drive", PFlashCFI01, blk),
->>      /* num-blocks is the number of blocks actually visible to the gue=
-st,
->> @@ -909,6 +927,7 @@ static void pflash_cfi01_class_init(ObjectClass *k=
-lass, void *data)
->>  {
->>      DeviceClass *dc =3D DEVICE_CLASS(klass);
->> =20
->> +    dc->reset =3D pflash_cfi01_system_reset;
->>      dc->realize =3D pflash_cfi01_realize;
->>      dc->props =3D pflash_cfi01_properties;
->>      dc->vmsd =3D &vmstate_pflash;
+>>  /* ---------------------------------------------------------------------- */
+>>  
+>>  static int vfio_save_setup(QEMUFile *f, void *opaque)
+>> diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
+>> index ac065b559f4e..414a5e69ec5e 100644
+>> --- a/hw/vfio/trace-events
+>> +++ b/hw/vfio/trace-events
+>> @@ -160,3 +160,4 @@ vfio_save_complete_precopy(char *name) " (%s)"
+>>  vfio_load_device_config_state(char *name) " (%s)"
+>>  vfio_load_state(char *name, uint64_t data) " (%s) data 0x%"PRIx64
+>>  vfio_load_state_device_data(char *name, uint64_t data_offset, uint64_t data_size) " (%s) Offset 0x%"PRIx64" size 0x%"PRIx64
+>> +vfio_get_dirty_page_list(char *name, uint64_t start, uint64_t pfn_count, uint64_t page_size) " (%s) start 0x%"PRIx64" pfn_count 0x%"PRIx64 " page size 0x%"PRIx64
+>> diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
+>> index a022484d2636..dc1b83a0b4ef 100644
+>> --- a/include/hw/vfio/vfio-common.h
+>> +++ b/include/hw/vfio/vfio-common.h
+>> @@ -222,5 +222,7 @@ int vfio_spapr_remove_window(VFIOContainer *container,
+>>  
+>>  int vfio_migration_probe(VFIODevice *vbasedev, Error **errp);
+>>  void vfio_migration_finalize(VFIODevice *vbasedev);
+>> +void vfio_get_dirty_page_list(VFIODevice *vbasedev, uint64_t start_pfn,
+>> +                               uint64_t pfn_count, uint64_t page_size);
+>>  
+>>  #endif /* HW_VFIO_VFIO_COMMON_H */
+>> -- 
+>> 2.7.0
 >>
->=20
-> (2) Reviewed-by: Laszlo Ersek <lersek@redhat.com>
->=20
-> A *future* improvement (meant just for this surgical reset handler --
-> not meaning any large cfi01 overhaul!) could be the addition of a trace
-> point, at the top of pflash_cfi01_system_reset().
->=20
-> But that is strictly "nice to have", and not necessary to include in th=
-e
-> present bugfix.
->=20
->=20
-> (3) Using OVMF IA32X64 (including the edk2 SMM stack), I've
-> regression-tested this patch, on top of v4.1.0-rc1, with KVM. As follow=
-s:
->=20
-> (3a) Normal reboot from the UEFI shell ("reset -c" command)
->=20
-> (3b) Normal reboot from the Linux guest prompt ("reboot" command)
->=20
-> (3c1) Reset as part of ACPI S3 suspend/resume
-> (3c2) then use "efibootmgr -n / -N" to write to pflash (by virtue of
-> setting / deleting the standardized BootNext UEFI variable)
->=20
-> (3d1) Boot to setup TUI with SB enabled
-> (3d2) erase Platform Key in setup TUI (disables SB)
-> (3d3) reboot from within setup TUI
-> (3d4) proceed to UEFI shell
-> (3d5) enable SB with EnrollDefaultKeys.efi
-> (3d6) reboot from UEFI shell
-> (3d7) proceeed to Linux guest
-> (3d8) verify SB enablement (dmesg, "mokutil --sb-state")
->=20
-> (As an added exercise, step (3d4) triggered an "FTW" (fault tolerant
-> write) "reclaim" (basically a defragmentation of the journaled
-> "filesystem" that the firmware keeps in the flash, as a logical "middle
-> layer"), and that worked fine too.)
->=20
-> Regression-tested-by: Laszlo Ersek <lersek@redhat.com>
->=20
->=20
-> (4) I plan to provide R-t-b in the evening from aarch64 KVM too, using
-> the edk2 ArmVirtQemu firmware. Only the first two steps from (3) will b=
-e
-> covered (no ACPI S3, no SB).
-
-Regression-tested-by: Laszlo Ersek <lersek@redhat.com>
-
 
