@@ -2,60 +2,86 @@ Return-Path: <SRS0=9jkQ=VP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56CF9C76191
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 12:19:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 428F2C76191
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 12:21:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DF0BE21783
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 12:19:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF0BE21783
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 0D34A21783
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 12:21:14 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gh4DhHQl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D34A21783
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36792 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37434 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ho517-0000WG-4h
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jul 2019 07:56:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59030)
+	id 1ho5PO-0007Mf-45
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jul 2019 08:21:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39775)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <clg@kaod.org>) id 1ho50L-0006E5-Qe
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 07:55:23 -0400
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1ho5PC-0006wq-PW
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 08:21:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1ho50K-00023Z-8r
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 07:55:21 -0400
-Received: from 19.mo3.mail-out.ovh.net ([178.32.98.231]:48599)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1ho50K-00022W-3P
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 07:55:20 -0400
-Received: from player778.ha.ovh.net (unknown [10.108.35.122])
- by mo3.mail-out.ovh.net (Postfix) with ESMTP id 82A3721FF56
- for <qemu-devel@nongnu.org>; Thu, 18 Jul 2019 13:55:18 +0200 (CEST)
-Received: from kaod.org (lfbn-1-2240-157.w90-76.abo.wanadoo.fr [90.76.60.157])
- (Authenticated sender: clg@kaod.org)
- by player778.ha.ovh.net (Postfix) with ESMTPSA id 009B3801F403;
- Thu, 18 Jul 2019 11:55:12 +0000 (UTC)
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu, 18 Jul 2019 13:54:11 +0200
-Message-Id: <20190718115420.19919-9-clg@kaod.org>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190718115420.19919-1-clg@kaod.org>
-References: <20190718115420.19919-1-clg@kaod.org>
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1ho5PB-0007DU-CJ
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 08:21:02 -0400
+Received: from mail-ot1-x331.google.com ([2607:f8b0:4864:20::331]:45222)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1ho5PB-0007Cu-6s
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 08:21:01 -0400
+Received: by mail-ot1-x331.google.com with SMTP id x21so28735961otq.12
+ for <qemu-devel@nongnu.org>; Thu, 18 Jul 2019 05:21:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=ZOJH/EM+Tk04eB/8jhZDpK4FyUlykMb5XF5LeaJ/zbo=;
+ b=gh4DhHQlCjl6x156rzRNBzYFJPmJd7ylSDrbVpmSoMAV7hjHTn1O2QyufwG9qdJp0o
+ YB39VX0dTf4XJY5cr4UHrOsCShjT1VvVIa1ELKPax9MjkUAI7U0NQMEIafK+bjTxl+gD
+ eR3QVS2G/Vno1Mca5BmVnvD1mA5SHjOecAuIYNTJPGRL6yM0wkqjuFA35VosTcM5I+2o
+ wc+8i6/qNOtk6rqeGPWBAWJM4/3bOUkbFns85SOohDaMuusCj3KRrHHFObihwJkLi465
+ DAySgN9ig1O4hDjbNkNQM1SwBJ65YmrjoK8aVrfAM4TsVD9dmxx5XTBFahuw7+6KHoM2
+ lLtw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=ZOJH/EM+Tk04eB/8jhZDpK4FyUlykMb5XF5LeaJ/zbo=;
+ b=Byk2Kbdqo+GHOWipYdKyl+mWQvAd4leQzokIISHzeTWHymZVCLWlJhK/utOqc8zfIB
+ y1vIxExoliLiKXKwfW9yArLvG03RQGB8sjuFr1PucOUkvkoRx8YgB2zSu1O0yxlgIrCo
+ CAONp01H2D9cmp0EqaZpcydiY4ooyeODKf3jYB83YXYkaOxIOo2CRNqDE8sXuOCbTW6W
+ 79+kieLkZgV11w+q0oWxdM/mBF4MC1N4k3tOaqGCNYpKxxbs70X+0edQSSnZv0mYEevm
+ qjHmELIJvmVJ8DHybqD8bCP9n8os089DOxHNc0gz/ApfqPx5Z2KJ45mbzYiK2pWGdMhl
+ 0T1Q==
+X-Gm-Message-State: APjAAAURCg0FznI9Z8reihw2omxNQ9bJEjyVYAaKspm0k7WrAhjoB4ah
+ 6WAZMZ1Z1E9+Slx2vA3RbXsD9FQ8r4/WASynPCA=
+X-Google-Smtp-Source: APXvYqxxVJVI1DF91ZwYnugSdDdCsTpyVRYeL2uIuOcmw2NtIBC6vpheyHQabuTW08MelVXgcVWhEvc4WQbUb5rKtd4=
+X-Received: by 2002:a9d:5cc1:: with SMTP id r1mr27187511oti.341.1563452459751; 
+ Thu, 18 Jul 2019 05:20:59 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Ovh-Tracer-Id: 6784109892959505382
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduvddrieehgdegkecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+References: <cb727b5d-683f-115d-f3c0-06f5a6761aea@redhat.com>
+ <126a3ec4-f5e3-0590-011a-9c2a10d07b24@redhat.com>
+ <bf5da6c7-74c1-8950-2869-2d94419f1820@redhat.com>
+ <CAL1e-=iLLQfAdfFrKpAT9k48X0sEMevBXFWAmny7PRPwtBMiEQ@mail.gmail.com>
+ <4367860f-5226-ec42-6407-f50dfd96270b@redhat.com>
+ <20190718114352.GE15411@redhat.com>
+In-Reply-To: <20190718114352.GE15411@redhat.com>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Thu, 18 Jul 2019 14:20:48 +0200
+Message-ID: <CAL1e-=hXg6HpAjtsxC+qaHMBXKU7-PKHf0QL+3mRKOh8ojNpOA@mail.gmail.com>
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::331
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 178.32.98.231
-Subject: [Qemu-devel] [PATCH v2 08/17] ppc/xive: Improve 'info pic' support
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] No archives to download from www.qemu.org/download/
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,206 +93,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-ppc@nongnu.org,
- Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+Cc: Stefan Weil <sw@weilnetz.de>, Thomas Huth <thuth@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Provide a better output of the XIVE END structures including the
-escalation information and extend the PowerNV machine 'info pic'
-command with a dump of the END EAS table used for escalations.
+On Thu, Jul 18, 2019 at 1:43 PM Daniel P. Berrang=C3=A9 <berrange@redhat.co=
+m>
+wrote:
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
----
- include/hw/ppc/xive.h      |  5 ----
- include/hw/ppc/xive_regs.h |  6 +++++
- hw/intc/pnv_xive.c         |  9 +++++++
- hw/intc/spapr_xive.c       |  1 -
- hw/intc/xive.c             | 48 +++++++++++++++++++++++++++++++++-----
- 5 files changed, 57 insertions(+), 12 deletions(-)
+> On Thu, Jul 18, 2019 at 01:29:02PM +0200, Thomas Huth wrote:
+> > On 18/07/2019 12.55, Aleksandar Markovic wrote:
+> > > On Thu, Jul 18, 2019 at 10:58 AM Philippe Mathieu-Daud=C3=A9 <
+> philmd@redhat.com>
+> > > wrote:
+> > >>
+> > >> On 7/18/19 9:10 AM, Thomas Huth wrote:
+> > >>> On 18/07/2019 08.25, Philippe Mathieu-Daud=C3=A9 wrote:
+> > >
+> > >>>> ...
+> > >
+> > >>>> Now there are no archive to download at this url...
+> > >>>
+> > >>> You just have to click on the "Source code" tab ... is that too har=
+d?
+> > >>
+> > >> Argh it has been a rough night, now I feel ashamed. I scrolled but
+> > >> missed that tab. Really sorry for crying wolf here :/
+> > >>
+> > >
+> > > Download QEMU page <https://www.qemu.org/download/>
+> > >
+> > > In all fairness to Philippe, this page could be better in terms of
+> > > human-computer interaction... If one presses 'Download', one
+> > > expects to get to the download links directly or obviously easily.
+> >
+> > I guess we should simply re-arrange the order of the tabs ... the
+> > OS-agnostic source code tab should come first (since this is about what
+> > we provide for download on our site), and then the others with
+> > references to the distros etc.
+>
+> I'm not sure it is clear cut. I think its reasonable to say that users
+> coming to QEMU are best served by using distro provided packages. Only
+> those wishing to actually hack on QEMU, or who need newer than the
+> distro provides, should prefer the source. Building from source has many
+> more potential hurdles / failure points than installing distro packages,
+> which can leave users with a worse first experience of QEMU.
+>
+>
+Yes, Daniel, but here we blend two visitor activities onto a single page:
+download source (and build), and install QEMU (from prebuilt binaries).
+Now wonder a confusion arises.
 
-diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
-index 085e468ea69a..4851ff87e795 100644
---- a/include/hw/ppc/xive.h
-+++ b/include/hw/ppc/xive.h
-@@ -355,8 +355,6 @@ typedef struct XiveRouterClass {
-     XiveTCTX *(*get_tctx)(XiveRouter *xrtr, CPUState *cs);
- } XiveRouterClass;
-=20
--void xive_eas_pic_print_info(XiveEAS *eas, uint32_t lisn, Monitor *mon);
--
- int xive_router_get_eas(XiveRouter *xrtr, uint8_t eas_blk, uint32_t eas_=
-idx,
-                         XiveEAS *eas);
- int xive_router_get_end(XiveRouter *xrtr, uint8_t end_blk, uint32_t end_=
-idx,
-@@ -398,9 +396,6 @@ typedef struct XiveENDSource {
-  */
- #define XIVE_PRIORITY_MAX  7
-=20
--void xive_end_pic_print_info(XiveEND *end, uint32_t end_idx, Monitor *mo=
-n);
--void xive_end_queue_pic_print_info(XiveEND *end, uint32_t width, Monitor=
- *mon);
--
- /*
-  * XIVE Thread Interrupt Management Aera (TIMA)
-  *
-diff --git a/include/hw/ppc/xive_regs.h b/include/hw/ppc/xive_regs.h
-index 69af326ebf2c..3fdf1a83b9b6 100644
---- a/include/hw/ppc/xive_regs.h
-+++ b/include/hw/ppc/xive_regs.h
-@@ -128,6 +128,8 @@ typedef struct XiveEAS {
- #define xive_eas_is_valid(eas)   (be64_to_cpu((eas)->w) & EAS_VALID)
- #define xive_eas_is_masked(eas)  (be64_to_cpu((eas)->w) & EAS_MASKED)
-=20
-+void xive_eas_pic_print_info(XiveEAS *eas, uint32_t lisn, Monitor *mon);
-+
- static inline uint64_t xive_get_field64(uint64_t mask, uint64_t word)
- {
-     return (be64_to_cpu(word) & mask) >> ctz64(mask);
-@@ -218,6 +220,10 @@ static inline uint64_t xive_end_qaddr(XiveEND *end)
-         be32_to_cpu(end->w3);
- }
-=20
-+void xive_end_pic_print_info(XiveEND *end, uint32_t end_idx, Monitor *mo=
-n);
-+void xive_end_queue_pic_print_info(XiveEND *end, uint32_t width, Monitor=
- *mon);
-+void xive_end_eas_pic_print_info(XiveEND *end, uint32_t end_idx, Monitor=
- *mon);
-+
- /* Notification Virtual Target (NVT) */
- typedef struct XiveNVT {
-         uint32_t        w0;
-diff --git a/hw/intc/pnv_xive.c b/hw/intc/pnv_xive.c
-index 4dc92ef1e372..ff1226485983 100644
---- a/hw/intc/pnv_xive.c
-+++ b/hw/intc/pnv_xive.c
-@@ -1593,6 +1593,15 @@ void pnv_xive_pic_print_info(PnvXive *xive, Monito=
-r *mon)
-         }
-         xive_end_pic_print_info(&end, i, mon);
-     }
-+
-+    monitor_printf(mon, "XIVE[%x] END Escalation %08x .. %08x\n", blk, 0=
-,
-+                   nr_ends - 1);
-+    for (i =3D 0; i < nr_ends; i++) {
-+        if (xive_router_get_end(xrtr, blk, i, &end)) {
-+            break;
-+        }
-+        xive_end_eas_pic_print_info(&end, i, mon);
-+    }
- }
-=20
- static void pnv_xive_reset(void *dev)
-diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-index 3ae311d9ff7f..ba012c7b0fdc 100644
---- a/hw/intc/spapr_xive.c
-+++ b/hw/intc/spapr_xive.c
-@@ -143,7 +143,6 @@ static void spapr_xive_end_pic_print_info(SpaprXive *=
-xive, XiveEND *end,
-                    priority, qindex, qentries, qaddr_base, qgen);
-=20
-     xive_end_queue_pic_print_info(end, 6, mon);
--    monitor_printf(mon, "]");
- }
-=20
- void spapr_xive_pic_print_info(SpaprXive *xive, Monitor *mon)
-diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-index 8ea97ac231a4..88f2e560db0f 100644
---- a/hw/intc/xive.c
-+++ b/hw/intc/xive.c
-@@ -1136,6 +1136,7 @@ void xive_end_queue_pic_print_info(XiveEND *end, ui=
-nt32_t width, Monitor *mon)
-                        be32_to_cpu(qdata));
-         qindex =3D (qindex + 1) & (qentries - 1);
-     }
-+    monitor_printf(mon, "]");
- }
-=20
- void xive_end_pic_print_info(XiveEND *end, uint32_t end_idx, Monitor *mo=
-n)
-@@ -1146,24 +1147,36 @@ void xive_end_pic_print_info(XiveEND *end, uint32=
-_t end_idx, Monitor *mon)
-     uint32_t qsize =3D xive_get_field32(END_W0_QSIZE, end->w0);
-     uint32_t qentries =3D 1 << (qsize + 10);
-=20
--    uint32_t nvt =3D xive_get_field32(END_W6_NVT_INDEX, end->w6);
-+    uint32_t nvt_blk =3D xive_get_field32(END_W6_NVT_BLOCK, end->w6);
-+    uint32_t nvt_idx =3D xive_get_field32(END_W6_NVT_INDEX, end->w6);
-     uint8_t priority =3D xive_get_field32(END_W7_F0_PRIORITY, end->w7);
-+    uint8_t pq;
-=20
-     if (!xive_end_is_valid(end)) {
-         return;
-     }
-=20
--    monitor_printf(mon, "  %08x %c%c%c%c%c prio:%d nvt:%04x eq:@%08"PRIx=
-64
--                   "% 6d/%5d ^%d", end_idx,
-+    pq =3D xive_get_field32(END_W1_ESn, end->w1);
-+
-+    monitor_printf(mon, "  %08x %c%c %c%c%c%c%c%c%c prio:%d nvt:%02x/%04=
-x",
-+                   end_idx,
-+                   pq & XIVE_ESB_VAL_P ? 'P' : '-',
-+                   pq & XIVE_ESB_VAL_Q ? 'Q' : '-',
-                    xive_end_is_valid(end)    ? 'v' : '-',
-                    xive_end_is_enqueue(end)  ? 'q' : '-',
-                    xive_end_is_notify(end)   ? 'n' : '-',
-                    xive_end_is_backlog(end)  ? 'b' : '-',
-                    xive_end_is_escalate(end) ? 'e' : '-',
--                   priority, nvt, qaddr_base, qindex, qentries, qgen);
-+                   xive_end_is_uncond_escalation(end)   ? 'u' : '-',
-+                   xive_end_is_silent_escalation(end)   ? 's' : '-',
-+                   priority, nvt_blk, nvt_idx);
-=20
--    xive_end_queue_pic_print_info(end, 6, mon);
--    monitor_printf(mon, "]\n");
-+    if (qaddr_base) {
-+        monitor_printf(mon, " eq:@%08"PRIx64"% 6d/%5d ^%d",
-+                       qaddr_base, qindex, qentries, qgen);
-+        xive_end_queue_pic_print_info(end, 6, mon);
-+    }
-+    monitor_printf(mon, "\n");
- }
-=20
- static void xive_end_enqueue(XiveEND *end, uint32_t data)
-@@ -1191,6 +1204,29 @@ static void xive_end_enqueue(XiveEND *end, uint32_=
-t data)
-     end->w1 =3D xive_set_field32(END_W1_PAGE_OFF, end->w1, qindex);
- }
-=20
-+void xive_end_eas_pic_print_info(XiveEND *end, uint32_t end_idx,
-+                                   Monitor *mon)
-+{
-+    XiveEAS *eas =3D (XiveEAS *) &end->w4;
-+    uint8_t pq;
-+
-+    if (!xive_end_is_escalate(end)) {
-+        return;
-+    }
-+
-+    pq =3D xive_get_field32(END_W1_ESe, end->w1);
-+
-+    monitor_printf(mon, "  %08x %c%c %c%c end:%02x/%04x data:%08x\n",
-+                   end_idx,
-+                   pq & XIVE_ESB_VAL_P ? 'P' : '-',
-+                   pq & XIVE_ESB_VAL_Q ? 'Q' : '-',
-+                   xive_eas_is_valid(eas) ? 'V' : ' ',
-+                   xive_eas_is_masked(eas) ? 'M' : ' ',
-+                   (uint8_t)  xive_get_field64(EAS_END_BLOCK, eas->w),
-+                   (uint32_t) xive_get_field64(EAS_END_INDEX, eas->w),
-+                   (uint32_t) xive_get_field64(EAS_END_DATA, eas->w));
-+}
-+
- /*
-  * XIVE Router (aka. Virtualization Controller or IVRE)
-  */
---=20
-2.21.0
+Yours,
+Aleksandar
 
 
+
+> Regards,
+> Daniel
+> --
+> |: https://berrange.com      -o-
+> https://www.flickr.com/photos/dberrange :|
+> |: https://libvirt.org         -o-
+> https://fstop138.berrange.com :|
+> |: https://entangle-photo.org    -o-
+> https://www.instagram.com/dberrange :|
+>
