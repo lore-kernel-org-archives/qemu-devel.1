@@ -2,63 +2,81 @@ Return-Path: <SRS0=9jkQ=VP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC819C76191
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 04:57:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 526D7C76191
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 05:00:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8A6C92173B
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 04:57:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A6C92173B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2261B2173B
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 05:00:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2261B2173B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34176 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34204 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnyTZ-0003VZ-DC
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jul 2019 00:57:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54822)
+	id 1hnyXK-0005By-6L
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jul 2019 01:00:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55718)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jing2.liu@linux.intel.com>) id 1hnyTO-00036z-W9
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 00:56:56 -0400
+ (envelope-from <philmd@redhat.com>) id 1hnyX3-0004fT-Kz
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 01:00:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jing2.liu@linux.intel.com>) id 1hnyTM-0006jA-G1
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 00:56:54 -0400
-Received: from mga06.intel.com ([134.134.136.31]:41842)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jing2.liu@linux.intel.com>)
- id 1hnyTM-0005nl-7P
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 00:56:52 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
- by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 17 Jul 2019 21:55:45 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,276,1559545200"; d="scan'208";a="179130612"
-Received: from liujing-mobl.ccr.corp.intel.com (HELO [10.238.129.4])
- ([10.238.129.4])
- by orsmga002.jf.intel.com with ESMTP; 17 Jul 2019 21:55:44 -0700
-To: qemu-devel@nongnu.org
-References: <1562823509-13072-1-git-send-email-jing2.liu@linux.intel.com>
-From: Jing Liu <jing2.liu@linux.intel.com>
-Message-ID: <c572cdd2-d0f4-2e06-99f8-302b798a04dd@linux.intel.com>
-Date: Thu, 18 Jul 2019 12:55:43 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <philmd@redhat.com>) id 1hnyX2-0001TL-G8
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 01:00:41 -0400
+Received: from mail-wr1-f54.google.com ([209.85.221.54]:46971)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hnyX2-0001S3-AT
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 01:00:40 -0400
+Received: by mail-wr1-f54.google.com with SMTP id z1so27064601wru.13
+ for <qemu-devel@nongnu.org>; Wed, 17 Jul 2019 22:00:40 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=RhYmwq8h3xMbcd3OR4BevgWqshekCyMwdGzVAgyQOZQ=;
+ b=qk8iJuHu1KlqCpc9a69PZBuEMoNEQi6rH4odglYn2g8VgzTtrf57waT+DEZOea6zHU
+ pl/CDrHnbpdihbpzblXfH6smv+ZoDMjzEWsB/Jmsk6VzcJqPJM2IrWhO51wbqZzrw6lD
+ NMyW5ABeMONbqlabgZwTMRAhfCDnLLYscRZ9llaEchPey6fs2Yf3LK5xPascognF42lO
+ swSfQi7+xbVFYHrnwixEQKZjLO0/HV0yHzqjI6PvqquztLCUMZe7xHROaueOzwx0qzo0
+ A7wrJMcoS8dbLANs+7tOXg9RqMgHavjJRYA9ZvZGDWYY3S8nn1sTCpmiR5unWxQLnjaa
+ /Aow==
+X-Gm-Message-State: APjAAAVjG22BImARPxhm7j7WfSpPaXfYo/FXwVI65Y1FGtbdjpLbBUBJ
+ bgR7lZSzI0m+GrxrLWFL5rl/sw==
+X-Google-Smtp-Source: APXvYqwLv07se88UI5zVemH31RG9YGCo+1/X3vY9UdXheC5lLvwlBs3JIvTa1YGylEH4ifEJn8VDPg==
+X-Received: by 2002:adf:c613:: with SMTP id n19mr46572036wrg.109.1563426038974; 
+ Wed, 17 Jul 2019 22:00:38 -0700 (PDT)
+Received: from [192.168.1.37] (62.red-83-42-61.dynamicip.rima-tde.net.
+ [83.42.61.62])
+ by smtp.gmail.com with ESMTPSA id o24sm31172467wmh.2.2019.07.17.22.00.37
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Wed, 17 Jul 2019 22:00:38 -0700 (PDT)
+To: qemu-devel@nongnu.org, no-reply@patchew.org, pbonzini@redhat.com,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+ Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+References: <156342034915.10055.15996927583486522727@c4a48874b076>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <413e6326-159c-f84a-ed5c-0918f8dd359c@redhat.com>
+Date: Thu, 18 Jul 2019 07:00:37 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <1562823509-13072-1-git-send-email-jing2.liu@linux.intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <156342034915.10055.15996927583486522727@c4a48874b076>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 134.134.136.31
-Subject: Re: [Qemu-devel] [PATCH v1] x86: Intel AVX512_BF16 feature enabling
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.85.221.54
+Subject: Re: [Qemu-devel] [PATCH] virtio-scsi: remove unused argument to
+ virtio_scsi_common_realize
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,148 +88,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Cc'ing qemu-block@
 
-
-On 7/11/2019 1:38 PM, Jing Liu wrote:
-> Intel CooperLake cpu adds AVX512_BF16 instruction, defining as
-> CPUID.(EAX=7,ECX=1):EAX[bit 05].
-> 
-> The release spec link as follows,
-> https://software.intel.com/sites/default/files/managed/c5/15/\
-> architecture-instruction-set-extensions-programming-reference.pdf
-> 
-> Signed-off-by: Jing Liu <jing2.liu@linux.intel.com>
+On 7/18/19 5:25 AM, no-reply@patchew.org wrote:
+> Patchew URL: https://patchew.org/QEMU/20190717094728.31006-1-pbonzini@redhat.com/
+[...]> time make docker-test-debug@fedora TARGET_LIST=x86_64-softmmu
+J=14 NETWORK=1
+[...]
+> PASS 18 test-bdrv-drain /bdrv-drain/iothread/drain_all
+> =================================================================
+> ==8106==ERROR: AddressSanitizer: heap-use-after-free on address 0x61200002c7f0 at pc 0x5622ea95c8b6 bp 0x7f174fdb8680 sp 0x7f174fdb8678
+> WRITE of size 1 at 0x61200002c7f0 thread T9
+> ==8108==WARNING: ASan doesn't fully support makecontext/swapcontext functions and may produce false positives in some cases!
+>     #0 0x5622ea95c8b5 in aio_notify /tmp/qemu-test/src/util/async.c:351:9
+>     #1 0x5622ea95e4eb in qemu_bh_schedule /tmp/qemu-test/src/util/async.c:167:9
+>     #2 0x5622ea9616f0 in aio_co_schedule /tmp/qemu-test/src/util/async.c:464:5
 > ---
->   target/i386/cpu.c | 29 ++++++++++++++++++++++++++++-
->   target/i386/cpu.h |  3 +++
->   target/i386/kvm.c |  3 ++-
->   3 files changed, 33 insertions(+), 2 deletions(-)
-> 
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index c1ab86d..de3daf5 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -767,6 +767,7 @@ static void x86_cpu_vendor_words2str(char *dst, uint32_t vendor1,
->             /* CPUID_7_0_ECX_OSPKE is dynamic */ \
->             CPUID_7_0_ECX_LA57)
->   #define TCG_7_0_EDX_FEATURES 0
-> +#define TCG_7_1_EAX_FEATURES 0
->   #define TCG_APM_FEATURES 0
->   #define TCG_6_EAX_FEATURES CPUID_6_EAX_ARAT
->   #define TCG_XSAVE_FEATURES (CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XGETBV1)
-> @@ -1092,6 +1093,25 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
->           },
->           .tcg_features = TCG_7_0_EDX_FEATURES,
->       },
-> +    [FEAT_7_1_EAX] = {
-> +        .type = CPUID_FEATURE_WORD,
-> +        .feat_names = {
-> +            NULL, NULL, NULL, NULL,
-> +            NULL, "avx512-bf16", NULL, NULL,
-> +            NULL, NULL, NULL, NULL,
-> +            NULL, NULL, NULL, NULL,
-> +            NULL, NULL, NULL, NULL,
-> +            NULL, NULL, NULL, NULL,
-> +            NULL, NULL, NULL, NULL,
-> +            NULL, NULL, NULL, NULL,
-> +        },
-> +        .cpuid = {
-> +            .eax = 7,
-> +            .needs_ecx = true, .ecx = 1,
-> +            .reg = R_EAX,
-> +        },
-> +        .tcg_features = TCG_7_1_EAX_FEATURES,
-> +    },
->       [FEAT_8000_0007_EDX] = {
->           .type = CPUID_FEATURE_WORD,
->           .feat_names = {
-> @@ -4344,13 +4364,20 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
->       case 7:
->           /* Structured Extended Feature Flags Enumeration Leaf */
->           if (count == 0) {
-> -            *eax = 0; /* Maximum ECX value for sub-leaves */
-> +            /* Maximum ECX value for sub-leaves */
-> +            *eax = kvm_arch_get_supported_cpuid(cs->kvm_state, 0x7,
-> +                                                count, R_EAX);
-This needs to be firstly checked as follows, otherwise some 
-architectures would fail to compile.
-
-What about hvf and tcg CPUID 07 EAX value?
-
-+            /* Maximum ECX value for sub-leaves */
-+            if (kvm_enabled()) {
-+                *eax = kvm_arch_get_supported_cpuid(cs->kvm_state, 0x7,
-+                                                    count, R_EAX);
-+            } else if (hvf_enabled()) {
-+                *eax = hvf_get_supported_cpuid(0x7, count, R_EAX);
-+            } else {
-+                *eax = 0;
-+            }
-
-
-Thanks,
-Jing
-
->               *ebx = env->features[FEAT_7_0_EBX]; /* Feature flags */
->               *ecx = env->features[FEAT_7_0_ECX]; /* Feature flags */
->               if ((*ecx & CPUID_7_0_ECX_PKU) && env->cr[4] & CR4_PKE_MASK) {
->                   *ecx |= CPUID_7_0_ECX_OSPKE;
->               }
->               *edx = env->features[FEAT_7_0_EDX]; /* Feature flags */
-> +        } else if (count == 1) {
-> +            *eax = env->features[FEAT_7_1_EAX];
-> +            *ebx = 0;
-> +            *ecx = 0;
-> +            *edx = 0;
->           } else {
->               *eax = 0;
->               *ebx = 0;
-> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> index bd06523..40594a1 100644
-> --- a/target/i386/cpu.h
-> +++ b/target/i386/cpu.h
-> @@ -488,6 +488,7 @@ typedef enum FeatureWord {
->       FEAT_7_0_EBX,       /* CPUID[EAX=7,ECX=0].EBX */
->       FEAT_7_0_ECX,       /* CPUID[EAX=7,ECX=0].ECX */
->       FEAT_7_0_EDX,       /* CPUID[EAX=7,ECX=0].EDX */
-> +    FEAT_7_1_EAX,       /* CPUID[EAX=7,ECX=1].EAX */
->       FEAT_8000_0001_EDX, /* CPUID[8000_0001].EDX */
->       FEAT_8000_0001_ECX, /* CPUID[8000_0001].ECX */
->       FEAT_8000_0007_EDX, /* CPUID[8000_0007].EDX */
-> @@ -699,6 +700,8 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
->   #define CPUID_7_0_EDX_ARCH_CAPABILITIES (1U << 29)  /*Arch Capabilities*/
->   #define CPUID_7_0_EDX_SPEC_CTRL_SSBD  (1U << 31) /* Speculative Store Bypass Disable */
->   
-> +#define CPUID_7_1_EAX_AVX512_BF16 (1U << 5) /* AVX512 BFloat16 Instruction */
-> +
->   #define CPUID_8000_0008_EBX_WBNOINVD  (1U << 9)  /* Write back and
->                                                                                do not invalidate cache */
->   #define CPUID_8000_0008_EBX_IBPB    (1U << 12) /* Indirect Branch Prediction Barrier */
-> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-> index 3b29ce5..977aaa5 100644
-> --- a/target/i386/kvm.c
-> +++ b/target/i386/kvm.c
-> @@ -1110,6 +1110,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
->                   c = &cpuid_data.entries[cpuid_i++];
->               }
->               break;
-> +        case 0x7:
->           case 0x14: {
->               uint32_t times;
->   
-> @@ -1122,7 +1123,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
->               for (j = 1; j <= times; ++j) {
->                   if (cpuid_i == KVM_MAX_CPUID_ENTRIES) {
->                       fprintf(stderr, "cpuid_data is full, no space for "
-> -                                "cpuid(eax:0x14,ecx:0x%x)\n", j);
-> +                                "cpuid(eax:0x%x,ecx:0x%x)\n", i, j);
->                       abort();
->                   }
->                   c = &cpuid_data.entries[cpuid_i++];
-> 
+>   Right alloca redzone:    cb
+>   Shadow gap:              cc
+> ==8106==ABORTING
+> ERROR - too few tests run (expected 39, got 18)
+> make: *** [/tmp/qemu-test/src/tests/Makefile.include:904: check-unit] Error 1
+> make: *** Waiting for unfinished jobs....
+[...]
+> The full log is available at
+> http://patchew.org/logs/20190717094728.31006-1-pbonzini@redhat.com/testing.asan/?type=message.
 
