@@ -2,90 +2,79 @@ Return-Path: <SRS0=9jkQ=VP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E2ACC76195
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 07:55:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB76DC76195
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 08:16:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 23CEA20880
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 07:55:33 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=ozlabs-ru.20150623.gappssmtp.com header.i=@ozlabs-ru.20150623.gappssmtp.com header.b="N0h16r78"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 23CEA20880
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ozlabs.ru
+	by mail.kernel.org (Postfix) with ESMTPS id C0CF32173B
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 08:16:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0CF32173B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35208 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35388 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ho1GG-00063b-Eu
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jul 2019 03:55:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40879)
+	id 1ho1aB-0003kM-Vg
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jul 2019 04:16:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47602)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <aik@ozlabs.ru>) id 1ho1G4-0005U7-24
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 03:55:21 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1ho1a0-0003Kd-IZ
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 04:15:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aik@ozlabs.ru>) id 1ho1G2-0002FZ-Qf
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 03:55:20 -0400
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:45590)
+ (envelope-from <pbonzini@redhat.com>) id 1ho1Zz-0007xJ-Ld
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 04:15:56 -0400
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:50856)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1ho1G2-0002En-Bv
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 03:55:18 -0400
-Received: by mail-pg1-x544.google.com with SMTP id o13so12485281pgp.12
- for <qemu-devel@nongnu.org>; Thu, 18 Jul 2019 00:55:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=6l+BaGNpVfBZL988gX1Uk/8JYFgoehkxg6UYZmWhSrA=;
- b=N0h16r78RNk7fJM1AMAHtvnAkojmn43MU+zyK60GYYbvLK1LvHqYQTgldWDR3apu2k
- aIoIFNsUvyqzW7g581e/MXIykE0hbh0yVGra8AcUe33S126PczxDNQBoi4nlbOZWMIxk
- utUk12QXUK+ynyfRVrdt5Z8t8b+7Ymulnruhsrj2LDbZ0VHlkGReUvyds7J8PH02psZq
- DTFlkM8JqrkZBxSdBfphttRlv0ItHvnmLeRBkxo0bXqD5bLGZJB+fT5DixoACICBwCr4
- trD/YpST1YJzpKMahj4Uxt+IfgJr3Vma8abzuGzGM/Irr/tirInyEhZObH6mSnDV+Fr6
- l6jQ==
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ho1Zz-0007wt-FT
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 04:15:55 -0400
+Received: by mail-wm1-f66.google.com with SMTP id v15so24642221wml.0
+ for <qemu-devel@nongnu.org>; Thu, 18 Jul 2019 01:15:55 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
+ h=x-gm-message-state:subject:to:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=6l+BaGNpVfBZL988gX1Uk/8JYFgoehkxg6UYZmWhSrA=;
- b=TNy8IaDE5zgA2QxbKa4oUCcTlPYKcAiNWEb1KZVfjcWF8Sd2UUiK5o8ROOmhz1YORh
- ib7pf9NNGF/gkjisuW2rmVMWBRPDtrJrEwCvzh9MswAIhe0Yu8Crq9wAImA9npSSBPis
- BQEv9rgdmvd2ATsca4ZAp0QN7icQwCK0wMJhLcQhQCiikxmrSSG4aNwIYNopOd1Nx+D8
- O2LQH6p4OXrltEX4pkxpT8W8irTF/7N6twXbwwr0ggkETsN6cksmqydGWc1T5Urmt6rz
- 546ZpMztJnbXoNwfYgm6ANtu1SjWrE+SYmMSWNwzZmfOZdZoxYKl3kn/aOJOgAYuHMkg
- rhIg==
-X-Gm-Message-State: APjAAAUBs7PtjWvIvcf7O6DCZi6zkbb76a0JBzNZMyBDBa+GtRcLwPQa
- ED0wqxfwQAvNQIv1o12ll2E=
-X-Google-Smtp-Source: APXvYqw4nU4vYXHtjFFHbZ6utgKu1r6JSke1eBCiLyA70gplTAYksA3W5aGRM5CUFej/iJtbhOWmZQ==
-X-Received: by 2002:a17:90a:ac14:: with SMTP id
- o20mr50066325pjq.114.1563436516605; 
- Thu, 18 Jul 2019 00:55:16 -0700 (PDT)
-Received: from [10.61.2.175] ([122.99.82.10])
- by smtp.gmail.com with ESMTPSA id a128sm25177344pfb.185.2019.07.18.00.55.14
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 18 Jul 2019 00:55:15 -0700 (PDT)
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-References: <20190716053522.78813-1-aik@ozlabs.ru>
- <8b727864-1634-0a5d-c557-fcaa52c49434@redhat.com>
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Message-ID: <9587706e-d53c-5490-cb4a-4c89eadfc497@ozlabs.ru>
-Date: Thu, 18 Jul 2019 17:55:12 +1000
+ bh=xWs7V3RxGyT2Vuc7+UbrPqGzllPy9wuHJrwmhfs1UQU=;
+ b=jZBGUqy5g5gsaCHTlZre1ubfoXuV/llCvRh34a2u3HW3AzYDhNjv0iusXHVgWDzWzk
+ f9bQ9lRpvBMDYaGhjVCAJXDwPdjIpy5gHnbHIBQrmXhlBMvI6Uk1Jw9UGy880FiLCfcZ
+ HgUHQVtBGzb2zQ2uh8/aWb3PWsjAR9UHNqEFnl9ZmfDOTrqgEj7c0XCWL3kcnDGytC5h
+ 8Uvge7uwCTmvWjDbvHB6DOLBroCZ2ZA2cLEp/7biPnVNybHhHcLO7+OXlV0MU0wz9vGS
+ vaJzzQbeyOJMLGRf/9X8w21j9ZwvXCCmwKkBnlAboUpw1wWn7VoUpTiR2FHfjV0WrdeJ
+ wWTA==
+X-Gm-Message-State: APjAAAXtH1OBbL4iAwivSULwiQpmdCvR3Yc7GRBD+GA+4KOt3qQwJimc
+ zO3JFwmYbk7S6zY+yaFLUvEwlaza4p6aUQ==
+X-Google-Smtp-Source: APXvYqwaXFm9L5JVmMRe6sjfM92KVvw8P4Lnk3UfI7c4/3ZhJwM5j6TvOQnWY303Y4xqRnbtE0PHuw==
+X-Received: by 2002:a05:600c:2245:: with SMTP id
+ a5mr40757638wmm.121.1563437754219; 
+ Thu, 18 Jul 2019 01:15:54 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:e427:3beb:1110:dda2?
+ ([2001:b07:6468:f312:e427:3beb:1110:dda2])
+ by smtp.gmail.com with ESMTPSA id t13sm31846908wrr.0.2019.07.18.01.15.53
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Thu, 18 Jul 2019 01:15:53 -0700 (PDT)
+To: Jing Liu <jing2.liu@linux.intel.com>, qemu-devel@nongnu.org
+References: <1562823509-13072-1-git-send-email-jing2.liu@linux.intel.com>
+ <c572cdd2-d0f4-2e06-99f8-302b798a04dd@linux.intel.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <0f9763fe-af69-e057-9fb1-00527e636fe4@redhat.com>
+Date: Thu, 18 Jul 2019 10:15:53 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <8b727864-1634-0a5d-c557-fcaa52c49434@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <c572cdd2-d0f4-2e06-99f8-302b798a04dd@linux.intel.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::544
-Subject: Re: [Qemu-devel] [RFC PATCH qemu] spapr: Stop providing RTAS blob
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.85.128.66
+Subject: Re: [Qemu-devel] [PATCH v1] x86: Intel AVX512_BF16 feature enabling
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,33 +86,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-
-On 18/07/2019 17:20, Thomas Huth wrote:
-> On 16/07/2019 07.35, Alexey Kardashevskiy wrote:
->> SLOF implements one itself so let's remove it from QEMU. It is one less
->> image and simpler setup as the RTAS blob never stays in its initial place
->> anyway as the guest OS always decides where to put it.
+On 18/07/19 06:55, Jing Liu wrote:
 >>
->> This totally depends on https://patchwork.ozlabs.org/patch/1132440/ ,
->> hence RFC.
+>> +            *eax = kvm_arch_get_supported_cpuid(cs->kvm_state, 0x7,
+>> +                                                count, R_EAX);
+> This needs to be firstly checked as follows, otherwise some
+> architectures would fail to compile.
 > 
-> Patch looks basically fine for me, but I wonder whether we should wait
-> for one or two releases until we really remove it from QEMU, so that it
-> is still possible to test the latest QEMU with older SLOF releases for a
-> while (which is sometimes useful when hunting bugs). Or should this
-> maybe even go through the official deprecation process (i.e. with an
-> entry in qemu-deprecated.texi)?
+> What about hvf and tcg CPUID 07 EAX value?
+> 
+> +            /* Maximum ECX value for sub-leaves */
+> +            if (kvm_enabled()) {
+> +                *eax = kvm_arch_get_supported_cpuid(cs->kvm_state, 0x7,
+> +                                                    count, R_EAX);
+> +            } else if (hvf_enabled()) {
+> +                *eax = hvf_get_supported_cpuid(0x7, count, R_EAX);
+> +            } else {
+> +                *eax = 0;
+> +            }
+> 
 
-I worry more about slof being distributed as a separate package in RHEL, 
-easy enough to get qemu/slof out of sync.
+Good question.  You need to add a new property, for example
+cpuid_level_func7, whose code would be modeled around cpuid_level (and a
+field cpuid_min_level_func7 whose code would be modeled around
+cpuid_min_level).
 
+Then CPUID[7,0].EAX is set automatically to 0 or 1 depending on whether
+BF16 is enabled or not.
 
--- 
-Alexey
+Paolo
 
