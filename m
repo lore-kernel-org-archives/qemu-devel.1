@@ -2,71 +2,80 @@ Return-Path: <SRS0=9jkQ=VP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22DE0C76191
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 09:41:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE416C76191
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 09:42:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ED0BB20693
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 09:41:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED0BB20693
+	by mail.kernel.org (Postfix) with ESMTPS id B3FDA20693
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 09:42:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3FDA20693
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35870 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35885 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ho2uv-0004RO-1P
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jul 2019 05:41:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45831)
+	id 1ho2vk-0005dI-U1
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jul 2019 05:42:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46166)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <cohuck@redhat.com>) id 1ho2uk-00040x-AH
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 05:41:27 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1ho2vZ-00053n-HE
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 05:42:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cohuck@redhat.com>) id 1ho2ui-0007Fa-DS
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 05:41:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56202)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cohuck@redhat.com>)
- id 1ho2ui-0007CY-4y; Thu, 18 Jul 2019 05:41:24 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 9D35330872DA;
- Thu, 18 Jul 2019 09:41:20 +0000 (UTC)
-Received: from gondolin (dhcp-192-232.str.redhat.com [10.33.192.232])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 03A9E19C5B;
- Thu, 18 Jul 2019 09:41:15 +0000 (UTC)
-Date: Thu, 18 Jul 2019 11:41:13 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: Collin Walling <walling@linux.ibm.com>
-Message-ID: <20190718114113.68da7bca.cohuck@redhat.com>
-In-Reply-To: <60169464-240f-d5e3-209f-9c5371ee3e6f@linux.ibm.com>
-References: <20190708125433.16927-1-cohuck@redhat.com>
- <20190708125433.16927-2-cohuck@redhat.com>
- <58b28817-58e5-1cba-6f71-a35093be5cb6@de.ibm.com>
- <0dd71cfe-a9e9-7ac3-523e-065f05479a57@linux.ibm.com>
- <20190710102041.6be31940.cohuck@redhat.com>
- <20190716172002.77863317.cohuck@redhat.com>
- <f72fb90b-8383-a2f8-b768-b09be5845fb5@linux.ibm.com>
- <20190717105435.64047ca3.cohuck@redhat.com>
- <e0bd4df3-4f25-ee02-ecdd-7306b3b14250@de.ibm.com>
- <60169464-240f-d5e3-209f-9c5371ee3e6f@linux.ibm.com>
-Organization: Red Hat GmbH
+ (envelope-from <pbonzini@redhat.com>) id 1ho2vY-0008L4-CR
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 05:42:17 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:45177)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ho2vY-0008Jf-4u
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 05:42:16 -0400
+Received: by mail-wr1-f68.google.com with SMTP id f9so27888406wre.12
+ for <qemu-devel@nongnu.org>; Thu, 18 Jul 2019 02:42:16 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=nTorg+LsFbfhGP1VnBx1NiqIynBWL16WoIpeexEc/9U=;
+ b=rTNRlU/xSceaHg0+GGzWryr3nppqmMqIS/w/+XxbJFd52SPwIZ56mIlyvcAj/HCjKy
+ MZqynHUiQLDQJI2NXXfmzycycPH+LF8iqk89d91FtB+ZBlBQeE0jkPss0c4EPBJADnTE
+ U62lQNdXSbVZUgIBX3+kbWbKw63DbUm3kxg2QZBZOXCP5RyBVcL8W94B6EtopSh7+PFf
+ CCDDKlceRLPwdyKYXTIBBgJSYTw8qeUOjq81WxVZxaKZC6FgTt+4/hFXbP/v7vCKmixS
+ krCO+iS5poBdnCbCLf+4+Gsne6PbrfXH6cHWtCtAdFXTkc/epbP0wRKlbVSsrc8K0UOt
+ uXZQ==
+X-Gm-Message-State: APjAAAVEQ2kdsh3a1KQacgCIGUuMK/ZAxrTfxMaobo6pLEKUY17hr2dq
+ Q1mikrQsYis/3xBFRB34vl1rnA==
+X-Google-Smtp-Source: APXvYqzORqKmjOe/HvULTbu5k/TZgmgwpMr3QGDzs7E1fv2a5iwXkZfeqoy+rhLqYJylabUUkdfgRA==
+X-Received: by 2002:a5d:4087:: with SMTP id o7mr5497043wrp.277.1563442935019; 
+ Thu, 18 Jul 2019 02:42:15 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:e427:3beb:1110:dda2?
+ ([2001:b07:6468:f312:e427:3beb:1110:dda2])
+ by smtp.gmail.com with ESMTPSA id v65sm27819499wme.31.2019.07.18.02.42.14
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Thu, 18 Jul 2019 02:42:14 -0700 (PDT)
+To: Dmitry Fomichev <dmitry.fomichev@wdc.com>, qemu-devel@nongnu.org,
+ qemu-block@nongnu.org
+References: <20190717212703.10205-1-dmitry.fomichev@wdc.com>
+ <20190717212703.10205-6-dmitry.fomichev@wdc.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <ad5f8529-59da-0fa3-09eb-7fe1066ec83f@redhat.com>
+Date: Thu, 18 Jul 2019 11:42:10 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20190717212703.10205-6-dmitry.fomichev@wdc.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Thu, 18 Jul 2019 09:41:20 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH for-4.1 1/2] s390x/pci: add
- some fallthrough annotations
+ [fuzzy]
+X-Received-From: 209.85.221.68
+Subject: Re: [Qemu-devel] [PATCH v2 5/5] hw/scsi: Check sense key before
+ READ CAPACITY output snoop
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -78,102 +87,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: David Hildenbrand <david@redhat.com>, Stefan Weil <sw@weilnetz.de>,
- qemu-devel@nongnu.org, Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Richard Henderson <rth@twiddle.net>
+Cc: Fam Zheng <fam@euphon.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 17 Jul 2019 08:52:54 -0400
-Collin Walling <walling@linux.ibm.com> wrote:
+On 17/07/19 23:27, Dmitry Fomichev wrote:
+> diff --git a/hw/scsi/scsi-generic.c b/hw/scsi/scsi-generic.c
+> index a43efe39ec..e38d3160fa 100644
+> --- a/hw/scsi/scsi-generic.c
+> +++ b/hw/scsi/scsi-generic.c
+> @@ -238,6 +238,7 @@ static void scsi_read_complete(void * opaque, int ret)
+>      SCSIGenericReq *r = (SCSIGenericReq *)opaque;
+>      SCSIDevice *s = r->req.dev;
+>      int len;
+> +    uint8_t sense_key = NO_SENSE;
+>  
+>      assert(r->req.aiocb != NULL);
+>      r->req.aiocb = NULL;
+> @@ -254,6 +255,12 @@ static void scsi_read_complete(void * opaque, int ret)
+>  
+>      r->len = -1;
+>  
+> +    if (r->io_header.driver_status & SG_ERR_DRIVER_SENSE) {
+> +        SCSISense sense =
+> +            scsi_parse_sense_buf(r->req.sense, r->io_header.sb_len_wr);
+> +        sense_key = sense.key;
+> +    }
+> +
+>      /*
+>       * Check if this is a VPD Block Limits request that
+>       * resulted in sense error but would need emulation.
+> @@ -264,9 +271,7 @@ static void scsi_read_complete(void * opaque, int ret)
+>          r->req.cmd.buf[0] == INQUIRY &&
+>          (r->req.cmd.buf[1] & 0x01) &&
+>          r->req.cmd.buf[2] == 0xb0) {
+> -        SCSISense sense =
+> -            scsi_parse_sense_buf(r->req.sense, r->io_header.sb_len_wr);
+> -        if (sense.key == ILLEGAL_REQUEST) {
+> +        if (sense_key == ILLEGAL_REQUEST) {
+>              len = scsi_generic_emulate_block_limits(r, s);
+>              /*
+>               * No need to let scsi_read_complete go on and handle an
+> @@ -281,15 +286,17 @@ static void scsi_read_complete(void * opaque, int ret)
+>          goto done;
+>      }
+>  
+> -    /* Snoop READ CAPACITY output to set the blocksize.  */
+> -    if (r->req.cmd.buf[0] == READ_CAPACITY_10 &&
+> -        (ldl_be_p(&r->buf[0]) != 0xffffffffU || s->max_lba == 0)) {
+> -        s->blocksize = ldl_be_p(&r->buf[4]);
+> -        s->max_lba = ldl_be_p(&r->buf[0]) & 0xffffffffULL;
+> -    } else if (r->req.cmd.buf[0] == SERVICE_ACTION_IN_16 &&
+> -               (r->req.cmd.buf[1] & 31) == SAI_READ_CAPACITY_16) {
+> -        s->blocksize = ldl_be_p(&r->buf[8]);
+> -        s->max_lba = ldq_be_p(&r->buf[0]);
+> +    /* Snoop READ CAPACITY output to set the blocksize. */
+> +    if (sense_key == NO_SENSE) {
 
-> On 7/17/19 5:27 AM, Christian Borntraeger wrote:
-> > 
-> > 
-> > On 17.07.19 10:54, Cornelia Huck wrote:  
-> >> On Tue, 16 Jul 2019 14:34:22 -0400
-> >> Collin Walling <walling@linux.ibm.com> wrote:
-> >>  
-> >>> On 7/16/19 11:20 AM, Cornelia Huck wrote:  
-> >>>> On Wed, 10 Jul 2019 10:20:41 +0200
-> >>>> Cornelia Huck <cohuck@redhat.com> wrote:
-> >>>>      
-> >>>>> On Tue, 9 Jul 2019 18:55:34 -0400
-> >>>>> Collin Walling <walling@linux.ibm.com> wrote:
-> >>>>>     
-> >>>>>> On 7/8/19 9:23 AM, Christian Borntraeger wrote:  
-> >>>>>>>
-> >>>>>>>
-> >>>>>>> On 08.07.19 14:54, Cornelia Huck wrote:  
-> >>>>>>>> According to the comment, the bits are supposed to accumulate.
-> >>>>>>>>
-> >>>>>>>> Reported-by: Stefan Weil <sw@weilnetz.de>
-> >>>>>>>> Fixes: 5d1abf234462 ("s390x/pci: enforce zPCI state checking")
-> >>>>>>>> Signed-off-by: Cornelia Huck <cohuck@redhat.com>  
-> >>>>>>>
-> >>>>>>> This patch does not change behaviour, so it is certainly not wrong.
-> >>>>>>>
-> >>>>>>> So lets have a look at if the bug report was actually a real bug or
-> >>>>>>> just a missing annotation.
-> >>>>>>>           
-> >>>>>>>> ---
-> >>>>>>>>     hw/s390x/s390-pci-inst.c | 2 ++
-> >>>>>>>>     1 file changed, 2 insertions(+)
-> >>>>>>>>
-> >>>>>>>> diff --git a/hw/s390x/s390-pci-inst.c b/hw/s390x/s390-pci-inst.c
-> >>>>>>>> index 61f30b8e55d2..00235148bed7 100644
-> >>>>>>>> --- a/hw/s390x/s390-pci-inst.c
-> >>>>>>>> +++ b/hw/s390x/s390-pci-inst.c
-> >>>>>>>> @@ -1209,8 +1209,10 @@ int stpcifc_service_call(S390CPU *cpu, uint8_t r1, uint64_t fiba, uint8_t ar,
-> >>>>>>>>          * FH Enabled bit is set to one in states of ENABLED, BLOCKED or ERROR. */
-> >>>>>>>>         case ZPCI_FS_ERROR:
-> >>>>>>>>             fib.fc |= 0x20;
-> >>>>>>>> +        /* fallthrough */  
-> >>>>>>>
-> >>>>>>> This is correct, in case of an error we are also blocked.
-> >>>>>>>           
-> >>>>>>
-> >>>>>> Agreed. This is definitely correct based on our architecture.
-> >>>>>>         
-> >>>>>>>>         case ZPCI_FS_BLOCKED:
-> >>>>>>>>             fib.fc |= 0x40;
-> >>>>>>>> +        /* fallthrough */  
-> >>>>>>>
-> >>>>>>> I think this is also correct, but  it would be good if Collin could verify.
-> >>>>>>>           
-> >>>>>>
-> >>>>>> I failed to find anything to support setting the function control
-> >>>>>> enabled bit when the function state is in error / blocked. I'm
-> >>>>>> assuming this might be some QEMU hack to get things working? I'll have
-> >>>>>> to dive further to understand why this was done this way, as it doesn't
-> >>>>>> align with how the s390x architecture is documented. It's confusing.  
-> >>>>>
-> >>>>> Might this also be a real issue? Not matching the architecture is not a
-> >>>>> good sign...  
-> >>>>
-> >>>> Friendly ping. If we still want to have this patch or a fix in 4.1, we
-> >>>> need to find out soon...
-> >>>>      
-> >>>
-> >>> Let's take it for now.
-> >>>
-> >>> Acked-by: Collin Walling <walling@linux.ibm.com>
-> >>>  
-> >>
-> >> Just to be clear: You think that the current code is correct AFAYCS?  
-> >   
-> > I also looked into this again.
-> > There is a possibility to also be in disabled state.
-> >  From what I can see, it makes sense that blocked and error belong to the enable state
-> > so the patch seems correct.
-> >   
-> 
-> Yes I agree. The material I referenced required me to look over a few
-> times and ask around a bit. The patch is good. Apologies for my
-> ambiguous response.
-> 
+I think we can do better and skip all this snooping and patching if 
+sense_key != 0.
 
-Ok, thanks for the clarification. Queued now.
+In fact, the check for "r->io_header.driver_status & 
+SG_ERR_DRIVER_SENSE" where we handle block limits is now duplicate with 
+the one we do before setting sense_key.  With the extra cleanup that
+ret == 0 has already been checked before, you get:
+
+diff --git a/hw/scsi/scsi-generic.c b/hw/scsi/scsi-generic.c
+index ccb632c476..7f066d4198 100644
+--- a/hw/scsi/scsi-generic.c
++++ b/hw/scsi/scsi-generic.c
+@@ -254,24 +254,28 @@ static void scsi_read_complete(void * opaque, int ret)
+ 
+     r->len = -1;
+ 
+-    /*
+-     * Check if this is a VPD Block Limits request that
+-     * resulted in sense error but would need emulation.
+-     * In this case, emulate a valid VPD response.
+-     */
+-    if (s->needs_vpd_bl_emulation && ret == 0 &&
+-        (r->io_header.driver_status & SG_ERR_DRIVER_SENSE) &&
+-        r->req.cmd.buf[0] == INQUIRY &&
+-        (r->req.cmd.buf[1] & 0x01) &&
+-        r->req.cmd.buf[2] == 0xb0) {
++    if (r->io_header.driver_status & SG_ERR_DRIVER_SENSE) {
+         SCSISense sense =
+             scsi_parse_sense_buf(r->req.sense, r->io_header.sb_len_wr);
+-        if (sense.key == ILLEGAL_REQUEST) {
++
++        /*
++         * Check if this is a VPD Block Limits request that
++         * resulted in sense error but would need emulation.
++         * In this case, emulate a valid VPD response.
++         */
++        if (sense.key == ILLEGAL_REQUEST &&
++            s->needs_vpd_bl_emulation &&
++            r->req.cmd.buf[0] == INQUIRY &&
++            (r->req.cmd.buf[1] & 0x01) &&
++            r->req.cmd.buf[2] == 0xb0) {
+             len = scsi_generic_emulate_block_limits(r, s);
+             /*
+-             * No need to let scsi_read_complete go on and handle an
++             * It's okay to jump to req_complete: no need to
++             * let scsi_handle_inquiry_reply handle an
+              * INQUIRY VPD BL request we created manually.
+              */
++        }
++        if (sense.key) {
+             goto req_complete;
+         }
+     }
+
+It is essentially swapping the two "if"s in the existing block limits
+emulation code, which makes sense.  Looks good?
+
+Paolo
 
