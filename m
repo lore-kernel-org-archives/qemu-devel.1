@@ -6,75 +6,74 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00131C76191
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 13:47:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BB9EC76191
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 13:52:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8FBB520873
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 13:47:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FBB520873
+	by mail.kernel.org (Postfix) with ESMTPS id D58BF21019
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 13:52:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D58BF21019
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38122 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38196 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ho6km-0002Dx-Gx
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jul 2019 09:47:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39488)
+	id 1ho6pn-0008B5-01
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jul 2019 09:52:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41463)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1ho6kZ-0001in-K4
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 09:47:12 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1ho6pN-0007Ut-NG
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 09:52:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1ho6kY-0002pR-Ci
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 09:47:11 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:46185)
+ (envelope-from <pbonzini@redhat.com>) id 1ho6pL-0006V9-FU
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 09:52:09 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:33885)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ho6kY-0002oE-6o
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 09:47:10 -0400
-Received: by mail-wr1-f68.google.com with SMTP id z1so28746018wru.13
- for <qemu-devel@nongnu.org>; Thu, 18 Jul 2019 06:47:09 -0700 (PDT)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ho6pJ-0006SZ-G2
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 09:52:07 -0400
+Received: by mail-wr1-f67.google.com with SMTP id 31so28839278wrm.1
+ for <qemu-devel@nongnu.org>; Thu, 18 Jul 2019 06:52:04 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=VUVqJcLkdQAFwJf0ncQ8+RqxpyqcKtdhNjv6pfiCUzo=;
- b=FVKLazc/4YwxdlW5ao83Z8dZ9aq1a42WW9pGYaekHIcqMsRatF4MpjyQalIWLYDG4u
- xWba/If2BooV/xcoQfwOwxwATcINOMfzuepwJ7LQ84nI0HP7sBE3BfL9vq9MT5r/fCrm
- Egf0g+GdSOG5ozVpzd9wLwfmAbVKZgSAZGuMLwc43TarPQ1V56YBmUQ3mbeUuGiu6wrJ
- zKvrw/V2a2yyeGhJMJZ3BS/I6aAxkkQHGSWsfui/0EtmHyADdhckFmJFYiqlvIipQNBw
- nJmJYD+pFo2hu30R+px8GsgEXiIyuihVie+OXGNAAMr2fQnAGGQPps6oOkF8J9bSBDli
- i1Qg==
-X-Gm-Message-State: APjAAAWQItm2QCxf2Pyi8ue0NmKjJI5V7hSXtBZ0u26bWCfssGX318xA
- fb6m7Kri8Vvh0HbGmxOw20zDng==
-X-Google-Smtp-Source: APXvYqxsAMnMwSuiQorkfEDqskSnUsDirchHwJjbxgQ3Rh+vE//ztvpXuFu9akj3rnvVFezD2ZtmwQ==
-X-Received: by 2002:adf:dfc4:: with SMTP id q4mr49092814wrn.54.1563457628092; 
- Thu, 18 Jul 2019 06:47:08 -0700 (PDT)
-Received: from [192.168.1.37] (62.red-83-42-61.dynamicip.rima-tde.net.
- [83.42.61.62])
- by smtp.gmail.com with ESMTPSA id y12sm6836342wru.30.2019.07.18.06.47.07
+ bh=9QAP+zuB4VlhBuAFrMWQBaK/7c9xoMqOvnQXoCtu7J4=;
+ b=ga76ujqryovKGudRANitiuS6whr5wDuwW4LrANAodNtQRiiDCX96/w7XwpD7xyn6D6
+ 9SbOP16AMA+2HqhWRpG/EAuUea5AP9vzKNJ4rQQqkgepLM7GB50S11da9D2OkUDy/Tx8
+ 6eE/G+Z0jFWQKr2x6hqnFVbdsyAhlxDimZDHuSi/w1jgYPhqAbAVTKOuzMiLg6O+0z/J
+ iJrP2IkefVY6DM5w/bcXWkRLvRW7cOHOUz3KgVZHyLI8pDIUhqXw6NSMR82umhW06yNF
+ IfjZFyElzVetqM0qOOtpYA96X3CpzcWp8CKeMQ1Z8uspFC3hyW1+/65BIlpnGU9rDU7E
+ ioAg==
+X-Gm-Message-State: APjAAAUDIwhFndk7w0cCo1MgFpVMIJirUMdbDy7x3zeqFB5ITgo3p2L1
+ ajWUOLqk5f9EIqyP5QgrA027Fg==
+X-Google-Smtp-Source: APXvYqwZS1eBOhfUGcmC1NoDw7IwROg5e1gALVO2PCA3sAWkDXZN2T3zNvIG6J8vSRm7M0dXDoyyYA==
+X-Received: by 2002:a5d:6144:: with SMTP id y4mr51028807wrt.84.1563457922730; 
+ Thu, 18 Jul 2019 06:52:02 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:e427:3beb:1110:dda2?
+ ([2001:b07:6468:f312:e427:3beb:1110:dda2])
+ by smtp.gmail.com with ESMTPSA id z6sm23117310wrw.2.2019.07.18.06.52.01
  (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Thu, 18 Jul 2019 06:47:07 -0700 (PDT)
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-References: <20190718131659.20783-1-peter.maydell@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <14686032-d601-8a8a-ce41-e3537e91f4aa@redhat.com>
-Date: Thu, 18 Jul 2019 15:47:06 +0200
+ Thu, 18 Jul 2019 06:52:02 -0700 (PDT)
+To: "Denis V. Lunev" <den@openvz.org>, qemu-devel@nongnu.org
+References: <20190718134537.22356-1-den@openvz.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <4620eddd-e500-25d2-a8b2-5c47eefc74ab@redhat.com>
+Date: Thu, 18 Jul 2019 15:52:01 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <20190718131659.20783-1-peter.maydell@linaro.org>
+In-Reply-To: <20190718134537.22356-1-den@openvz.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.221.68
-Subject: Re: [Qemu-devel] [PATCH for-4.1] configure: Clarify URL to source
- downloads
+X-Received-From: 209.85.221.67
+Subject: Re: [Qemu-devel] [PATCH 1/1] x86: add CPU flags supported inside
+ libvirt
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,48 +85,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefan Weil <sw@weilnetz.de>, Thomas Huth <thuth@redhat.com>,
+Cc: Nikolay Shirokovskiy <nshirokovskiy@virtuozzo.com>,
+ Peter Krempa <pkrempa@redhat.com>,
  =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+ Eduardo Habkost <ehabkost@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/18/19 3:16 PM, Peter Maydell wrote:
-> If configure detects that it's being run on a source tree which
-> is missing git modules, it prints an error messages suggesting
-> that the user downloads a correct source archive from the project
-> website. However https://www.qemu.org/download/ is a link to a
-> page with multiple tabs, with the default being the one telling
-> users how to get binaries from their distro. Clarify the URL
-> we print to include the #source anchor, so that the browser will
-> go directly to the source-tarball instructions.
+On 18/07/19 15:45, Denis V. Lunev wrote:
+> There are the following flags available in libvirt inside cpu_map.xm
+>     <feature name='cvt16'>
+>       <cpuid function='0x80000001' ecx='0x00040000'/>
+>     </feature>
+>     <feature name='cmt'> <!-- cqm -->
+>       <cpuid eax_in='0x07' ecx_in='0x00' ebx='0x00001000'/>
+>     </feature>
+> We have faced the problem that QEMU does not start once these flags are
+> present in the domain.xml.
 > 
-> Reported-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> Suggested-by: Stefan Weil <sw@weilnetz.de>
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> This patch just adds proper names into the map.
+> 
+> Signed-off-by: Denis V. Lunev <den@openvz.org>
+> CC: Paolo Bonzini <pbonzini@redhat.com>
+> CC: Richard Henderson <rth@twiddle.net>
+> CC: Eduardo Habkost <ehabkost@redhat.com>
+> CC: Nikolay Shirokovskiy <nshirokovskiy@virtuozzo.com>
+> CC: Peter Krempa <pkrempa@redhat.com>
+> CC: Daniel P. Berrangé <berrange@redhat.com>
 > ---
->  configure | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  target/i386/cpu.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 > 
-> diff --git a/configure b/configure
-> index eb635c3b9a5..bf79bbd0e8d 100755
-> --- a/configure
-> +++ b/configure
-> @@ -322,7 +322,7 @@ else
->          echo "to acquire QEMU source archives. Non-GIT builds are only"
->          echo "supported with source archives linked from:"
->          echo
-> -        echo "  https://www.qemu.org/download/"
-> +        echo "  https://www.qemu.org/download/#source"
-
-Thanks Peter and Stefan.
-
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-
->          echo
->          echo "Developers working with GIT can use scripts/archive-source.sh"
->          echo "if they need to create valid source archives."
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index 805ce95247..88ba4dad47 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -870,7 +870,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
+>              "lahf-lm", "cmp-legacy", "svm", "extapic",
+>              "cr8legacy", "abm", "sse4a", "misalignsse",
+>              "3dnowprefetch", "osvw", "ibs", "xop",
+> -            "skinit", "wdt", NULL, "lwp",
+> +            "skinit", "wdt", "cvt16", "lwp",
+>              "fma4", "tce", NULL, "nodeid-msr",
+>              NULL, "tbm", "topoext", "perfctr-core",
+>              "perfctr-nb", NULL, NULL, NULL,
+> @@ -1044,7 +1044,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
+>              "fsgsbase", "tsc-adjust", NULL, "bmi1",
+>              "hle", "avx2", NULL, "smep",
+>              "bmi2", "erms", "invpcid", "rtm",
+> -            NULL, NULL, "mpx", NULL,
+> +            "cmt", NULL, "mpx", NULL,
+>              "avx512f", "avx512dq", "rdseed", "adx",
+>              "smap", "avx512ifma", "pcommit", "clflushopt",
+>              "clwb", "intel-pt", "avx512pf", "avx512er",
 > 
+
+Oops, nice catch!  I've queued the patch for 4.1.
+
+Paolo
 
