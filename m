@@ -2,80 +2,79 @@ Return-Path: <SRS0=9jkQ=VP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CFF1C76191
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 05:09:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EC30C76191
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 05:19:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 17AE22173E
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 05:09:53 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=jms.id.au header.i=@jms.id.au header.b="Se0LiN4l"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 17AE22173E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=jms.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id 15FBD2173E
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 05:19:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 15FBD2173E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34238 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34256 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnyfw-0000JM-9b
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jul 2019 01:09:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57965)
+	id 1hnyp0-0003jc-Cn
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jul 2019 01:19:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59723)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <joel.stan@gmail.com>) id 1hnyfm-0008Cu-Cf
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 01:09:43 -0400
+ (envelope-from <philmd@redhat.com>) id 1hnyop-0003Ki-Nn
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 01:19:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <joel.stan@gmail.com>) id 1hnyfl-0000ey-B1
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 01:09:42 -0400
-Received: from mail-qk1-x744.google.com ([2607:f8b0:4864:20::744]:39809)
+ (envelope-from <philmd@redhat.com>) id 1hnyoo-0000QQ-Fs
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 01:19:03 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:43680)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <joel.stan@gmail.com>)
- id 1hnyfi-0000XM-Kx; Thu, 18 Jul 2019 01:09:39 -0400
-Received: by mail-qk1-x744.google.com with SMTP id w190so19424686qkc.6;
- Wed, 17 Jul 2019 22:09:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jms.id.au; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=Q9INugv/mrNV+sxANYdBEZEl1STGB828wsUqN4bmxkk=;
- b=Se0LiN4l+DvAOn3DDSrBbd06YiZJZNp3ggr4t1tricJqTzqOUMmPtFzTP9uNawhgCs
- n0QHD0Eb4+4Pt0ZUEi4j7eu1JUopG8JSK1BX5+B2u4Pm2Ajf3010IHHwSh1Z/PL2vuyZ
- ay1npOgWgUpLy76f/2LMrqyf+fsqGt7cVBCC0=
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hnyoo-0000Pb-9H
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 01:19:02 -0400
+Received: by mail-wr1-f65.google.com with SMTP id p13so27102523wru.10
+ for <qemu-devel@nongnu.org>; Wed, 17 Jul 2019 22:19:02 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=Q9INugv/mrNV+sxANYdBEZEl1STGB828wsUqN4bmxkk=;
- b=hnt9wWOxlcmcnzTHvFU5umbDgLa8UO2bD85L/i4/vc1hizaqD376J24Z4lv7YcIkI2
- 8rObr4PfJ8es61AiF0awd7bYjfqJ3EqEKpRww8VyZTM5itox1ZUnd/A4zMAMMVEQxfDN
- Rmj2xx24iNcIl+Q/0s4u8AOViMh7Jtla1gt4TpjMUcThmOEnBYG2gRVsWefpXbapeA7k
- TKrT+nXkzWpXgDFB2ywCm8D2AIIeTaRCR1Ld/1llXV0+Kus03urNQuqVPSkUPIaYTtAL
- Afl2jkO5Qwr0T38u2aK5AMQA5e64PLBTWfgNn3xW1XpyST32itHWtGkUboDNke9Atp+o
- wSsg==
-X-Gm-Message-State: APjAAAVZyVCXjFchshwSh/9Jqap7pztwtz9K9KzKusp8pMdBssTVIdGO
- DVkAIeLxnO8LRVOEBGqum9/j/bbNKcFSGjzNRRllPg==
-X-Google-Smtp-Source: APXvYqys/fDmjvcS4A/Z12MwWGpxAtgzvnfzLbewDvpUZZun0QT50Tz3iA5yeSu+vft28EfzEyrgh0g5LKjjtbq6jM8=
-X-Received: by 2002:a37:a2d1:: with SMTP id
- l200mr29422410qke.330.1563426575762; 
- Wed, 17 Jul 2019 22:09:35 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=7DPOcpX14NROkrxLKukkowrmyXVqjiEIGmyC7xGPKmI=;
+ b=D6jdnmm4PZK0eQrO94maGnSczO6gSUygJZ2dxFrTybro9zXJOSzItMMmht9GivrK8C
+ QhyTPzhYYOVyR9ntCboKuL2+kZROaxjIwsoVz5r/oKP0VbKuaJfrJL7Lv7ZIhhR3lydG
+ CNzbtdu3F2cYpg+MXpHEUlIZnkH7zLuBKLB+gMh8kYyp3EqNQQAS0rMemVgoa+nhpFkU
+ /5g3hUyFwNaYx510BHqOsI8NGtFGLUG2gI0hU4A6gH2dch4Fh3wSzueOiN70BhxL1HAv
+ s9AGpE5xCpoz+WxX0VtbPBWaDDehX6iVbc0NJW8ocCszD667d33i7KNrDKLozI+cZFcW
+ dGtg==
+X-Gm-Message-State: APjAAAWrd6LOStlW/D9w7JnBq6ng6hXfsJsjynhm7KZjoyIX91OQmc8w
+ lBqpaWKi+bp6PI0aWpVn9cktQA==
+X-Google-Smtp-Source: APXvYqxXWP6FViW6LfURhClRoyvS10lczUBv/xaYWd2WFj/nIgp51Q3gPEc/Pq33OxqzWh5/7EuxXA==
+X-Received: by 2002:a5d:54c7:: with SMTP id x7mr17593056wrv.39.1563427141079; 
+ Wed, 17 Jul 2019 22:19:01 -0700 (PDT)
+Received: from [192.168.1.37] (62.red-83-42-61.dynamicip.rima-tde.net.
+ [83.42.61.62])
+ by smtp.gmail.com with ESMTPSA id g19sm27028385wmg.10.2019.07.17.22.19.00
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Wed, 17 Jul 2019 22:19:00 -0700 (PDT)
+To: Michael Rolnik <mrolnik@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>
+References: <20190712053704.21228-1-mrolnik@gmail.com>
+ <CAK4993h_VjHbg-BSbuH469fEZYy9zTz8Uh2o080vySNeopiHQQ@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <7c7dda7e-0a3a-dfb8-eae1-a4ae36c002cc@redhat.com>
+Date: Thu, 18 Jul 2019 07:18:59 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-References: <20190716045633.15319-1-joel@jms.id.au>
- <6e98fffb-2642-3835-d3ba-f06b73ca2fdc@kaod.org>
- <20190716085236.GH7525@umbus.fritz.box>
-In-Reply-To: <20190716085236.GH7525@umbus.fritz.box>
-From: Joel Stanley <joel@jms.id.au>
-Date: Thu, 18 Jul 2019 05:09:23 +0000
-Message-ID: <CACPK8XfTv2z=3UGHyS=AdtXfeBjZkS6UkUZhyXO-Q9YNq==FuA@mail.gmail.com>
-To: David Gibson <david@gibson.dropbear.id.au>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::744
-Subject: Re: [Qemu-devel] [PATCH] ppc/pnv: Warn when using -initrd and low
- ram
+In-Reply-To: <CAK4993h_VjHbg-BSbuH469fEZYy9zTz8Uh2o080vySNeopiHQQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.85.221.65
+Subject: Re: [Qemu-devel] [PATCH v26 0/7] QEMU AVR 8 bit cores
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,55 +86,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: Igor Mammedov <imammedo@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Yoshinori Sato <ysato@users.sourceforge.jp>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 16 Jul 2019 at 08:53, David Gibson <david@gibson.dropbear.id.au> wr=
-ote:
->
-> On Tue, Jul 16, 2019 at 09:39:36AM +0200, C=C3=A9dric Le Goater wrote:
-> > > Provide a helpful message for users so they don't go reporting bugs t=
-o
-> > > kernel developers.
-> > >
-> > > Signed-off-by: Joel Stanley <joel@jms.id.au>
-> > > ---
-> > > We could solve this in other ways, such as warn when loading the init=
-rd
-> > > outside of RAM, or load it within the known boundaries or RAM, but af=
-ter
-> > > hitting this myself I wanted to start the discussion.
-> >
-> > We should also increase :
-> >
-> >     mc->default_ram_size =3D 1 * GiB;
-> >
-> > to 2 or 4 GiB. I always use 4.
->
-> It seems to be increasing the default addresses the real problem in
-> practice.  Putting in a warning but still letting you do it, rather
-> than relocating where we load the image based on the ram size seems
-> kind of roundabout.
+Hi Michael,
 
-I agree. I'll send a patch to do that.
+On 7/17/19 5:46 PM, Michael Rolnik wrote:
+> ping.
 
-> > at the beginning of this routine we have :
-> >
-> >     /* allocate RAM */
-> >     if (machine->ram_size < (1 * GiB)) {
-> >         warn_report("skiboot may not work with < 1GB of RAM");
-> >     }
-> >
-> > and we should exit instead.
+QEMU is currently preparing for the next release (4.1) and we entered
+the "freezed" period where no new features are accepted.
 
-Yeah, perhaps. If someone is playing with some other bit of firmware
-code then there's no reason not to continue. I'll leave this one alone
-for now.
+This does not mean people are not allowed to post new features to the
+list, but most volunteering reviewers will focus on bug-fixing patches
+and testing.
+(This is why I hadn't reply to your questions on v25).
 
-Cheers,
+You can see the schedule here:
+https://wiki.qemu.org/Planning/4.1
 
-Joel
+Meanwhile, could you have a look at adding a test for your work?
+(suggested in reply v24 cover).
+
+Cc'ing Yoshinori which series is in the same case than your.
+
+Regard,
+
+Phil.
 
