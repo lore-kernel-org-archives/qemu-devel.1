@@ -2,83 +2,85 @@ Return-Path: <SRS0=9jkQ=VP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EEFB6C76191
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 13:14:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CC65C76191
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 13:17:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C062020880
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 13:14:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DC90620880
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 13:17:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="N94sDWbj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C062020880
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qkWJYFEh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC90620880
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37924 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37936 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ho6FJ-00022t-1B
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jul 2019 09:14:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57845)
+	id 1ho6Hd-0003Xd-0K
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jul 2019 09:17:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58878)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1ho6F1-00017B-Ea
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 09:14:36 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1ho6HR-00038j-1J
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 09:17:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1ho6Ez-0007W8-VU
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 09:14:35 -0400
-Received: from mail-ot1-x32b.google.com ([2607:f8b0:4864:20::32b]:45686)
+ (envelope-from <peter.maydell@linaro.org>) id 1ho6HP-0000aK-TT
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 09:17:04 -0400
+Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:46084)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1ho6Ez-0007Vd-M5
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 09:14:33 -0400
-Received: by mail-ot1-x32b.google.com with SMTP id x21so28911567otq.12
- for <qemu-devel@nongnu.org>; Thu, 18 Jul 2019 06:14:33 -0700 (PDT)
+ id 1ho6HP-0000Zx-MD
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 09:17:03 -0400
+Received: by mail-wr1-x42e.google.com with SMTP id z1so28632727wru.13
+ for <qemu-devel@nongnu.org>; Thu, 18 Jul 2019 06:17:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=s2M4q1miMVDXBz/MxmYzRapFJfzZRtVLjz/Y3n7hJiE=;
- b=N94sDWbjCBi9q8AJ5AM3E9mi76baJg1kHA9w1UmIm+xd1FTYaKaYcvAuHRYfNhDqVC
- gcesPLQrhnhrvB0p52s8QfDiHcrHJ5Dv5umHxu11S8KXyzWvQk+5F44a+bf3t40X/aUr
- smQlg/cHVBSg8RroYrOnNx7Y2tK6u8OcGkOxEh3Pngpwsj1RKrQzskhJxxkX0Ed/DLXi
- jCmbODhD1LHZWZ7LJbDaqfBxd9ILXRCQt2Rp/rOgQTpgpoh5QrbR3MT34uqamzE+bUlA
- gt8/5NUy3UlGNJ9zIx7ZJ6J3Zj9/H1Nw9jC55OoPz05SyiAI6rMxdUP5zHvk7A/fPLTD
- jEOA==
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=6H+4HaROlQ1ydOvZvdvguPC8aRdkbSwRP+bc3alnVIc=;
+ b=qkWJYFEhLiXaZwnibMVkOtdZZyN2mQlWoPKM7DZioAF5bUwPTFRSEhFEJVLpW4p9FU
+ ho8bpj17lIaLxQmD8OTi9a0OR8RCQ7hB/pwNAqCd0ZipvKGs7vyns3Xzbo35BULn7e6a
+ 3mM76h3xMYeeDYIUITJwAvWAvYObSag2Bz2ek7kVxkOpg+fiF3uxrNe+KipliVVdbKnA
+ AARtlDKQX0EPBMAnI4jNm19lHCgKtlfQPNITNKLeim0Q1HLvMbDTwjOq6AnbXp3K52qu
+ MQ7R8fJKsaYf0kFPWyuLd9AkCJF5Wy+ZC02iHoLu6mb29H5wFXBY4z5agMCS77tSCPdK
+ KiKg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=s2M4q1miMVDXBz/MxmYzRapFJfzZRtVLjz/Y3n7hJiE=;
- b=oMW1R/u/r6baIlc6luTpYntwXM8KUV30M767ZVmaztyEC31Gq4z3QkM5vJTAREk40+
- LvSkjzqCgAVhCJd/W8O7gBNm+mYLo79I52B6joN6lCc6d8vcxYhY8tys7AnCPYhz1gbN
- zvpxU3WHcC4HP8o260X8NHKhqQlP548tjQTshZ/yoiQxzesKbZFRzSPYkE2TMTuzipOB
- eMMawzyeLa88PUdCakKDxXJCVVn5IquBUwBBb8P3hpVGvjN3/VMSz4w4rvZ6YHp89xlq
- Ni/tEuHgKzbwgoYLicqH/9x46ZiVxP81FSuFG0Tr2YA5zZwOuSu0IEptvR6FNyBCU7Vd
- ieow==
-X-Gm-Message-State: APjAAAUIf11OxiQ1sKhb88K1TOXC97E+yYb87MDG1LoqBzwBXTSrURSO
- o3xYwvwHi3prbLS7Y9ZWuZwTfQ6DGYL5tQgTaqRCUQ==
-X-Google-Smtp-Source: APXvYqyjBDkxuE7HKDlQ7L9p49/gVXWYIcKppBWMdvC/FF9jKdLpNIY5b7V+RKO6u6j0idDJY+jPCWBnZIARLx9/aRQ=
-X-Received: by 2002:a9d:5f1a:: with SMTP id f26mr13204563oti.91.1563455672642; 
- Thu, 18 Jul 2019 06:14:32 -0700 (PDT)
-MIME-Version: 1.0
-References: <cb727b5d-683f-115d-f3c0-06f5a6761aea@redhat.com>
- <126a3ec4-f5e3-0590-011a-9c2a10d07b24@redhat.com>
- <bf5da6c7-74c1-8950-2869-2d94419f1820@redhat.com>
- <CAL1e-=iLLQfAdfFrKpAT9k48X0sEMevBXFWAmny7PRPwtBMiEQ@mail.gmail.com>
- <4367860f-5226-ec42-6407-f50dfd96270b@redhat.com>
- <120c0218-293e-b70a-0853-ea2907e72007@weilnetz.de>
-In-Reply-To: <120c0218-293e-b70a-0853-ea2907e72007@weilnetz.de>
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=6H+4HaROlQ1ydOvZvdvguPC8aRdkbSwRP+bc3alnVIc=;
+ b=jsTBHw6TKorhdM0C11Pp5SQjYOUmi+uvlCXG/KBBsPHd7JbxJXJhPNnBv8w4KEe13u
+ phG+tS2rTfE4bXgyIZxQCSR96B62tzhZd8sIB0WgcB5Vz697kryC/7x/4TvHSYfZHXrH
+ MZ7eKAWnSni6vA5KFh+4KyaYzqFKdSi33twbyn5n7ZgXrA0kv1HjFItSX7DhcIN13TIr
+ cXkQRV9isyH9aIalCbb61f4Mjn8HHLgHk8UVNb4EMODjxH5uCozFC2AkQbW6QZkoVsk+
+ mNHsdH2j5NlQbZP5CvVjQoNl5UNDdmwGDiA9P8CScNNg5a8SxYO+bCAeD4cneZ7qxbwV
+ R3wA==
+X-Gm-Message-State: APjAAAUHNlD5VRI98nqE0e4EbUrsHMUZekX6kgt5GzuuqFT0NAB1mT/f
+ BvFMa97npgqnAAX2kz8rOcSHYud3/8fAMA==
+X-Google-Smtp-Source: APXvYqzktGusyrRjcJMXe3GErBp+qawMF7aWmgSLcmSd3cODHMooh0HufOWTT+SOWrUSCMluayZHLw==
+X-Received: by 2002:a5d:5450:: with SMTP id w16mr51855809wrv.128.1563455821891; 
+ Thu, 18 Jul 2019 06:17:01 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id 15sm19480213wmk.34.2019.07.18.06.17.00
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Thu, 18 Jul 2019 06:17:01 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 18 Jul 2019 14:14:21 +0100
-Message-ID: <CAFEAcA_XMs1QcD-8FbvuzGEi7QrfK++p-aKoG6-45Pm1e_o6-g@mail.gmail.com>
-To: Stefan Weil <sw@weilnetz.de>
-Content-Type: text/plain; charset="UTF-8"
+To: qemu-devel@nongnu.org
+Date: Thu, 18 Jul 2019 14:16:59 +0100
+Message-Id: <20190718131659.20783-1-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::32b
-Subject: Re: [Qemu-devel] No archives to download from www.qemu.org/download/
+X-Received-From: 2a00:1450:4864:20::42e
+Subject: [Qemu-devel] [PATCH for-4.1] configure: Clarify URL to source
+ downloads
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,30 +92,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, Thomas Huth <thuth@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
+Cc: Stefan Weil <sw@weilnetz.de>, Thomas Huth <thuth@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
  Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 18 Jul 2019 at 12:50, Stefan Weil <sw@weilnetz.de> wrote:
->
-> Am 18.07.2019 um 13:29 schrieb Thomas Huth:
-> > I guess we should simply re-arrange the order of the tabs ... the
-> > OS-agnostic source code tab should come first (since this is about what
-> > we provide for download on our site), and then the others with
-> > references to the distros etc.
-> >
-> > Does someone care to send a patch?
->
->
-> Wouldn't changing the link to https://www.qemu.org/download/#source be
-> even simpler?
+If configure detects that it's being run on a source tree which
+is missing git modules, it prints an error messages suggesting
+that the user downloads a correct source archive from the project
+website. However https://www.qemu.org/download/ is a link to a
+page with multiple tabs, with the default being the one telling
+users how to get binaries from their distro. Clarify the URL
+we print to include the #source anchor, so that the browser will
+go directly to the source-tarball instructions.
 
-This gets my vote -- I'll send a configure patch...
+Reported-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Suggested-by: Stefan Weil <sw@weilnetz.de>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ configure | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-thanks
--- PMM
+diff --git a/configure b/configure
+index eb635c3b9a5..bf79bbd0e8d 100755
+--- a/configure
++++ b/configure
+@@ -322,7 +322,7 @@ else
+         echo "to acquire QEMU source archives. Non-GIT builds are only"
+         echo "supported with source archives linked from:"
+         echo
+-        echo "  https://www.qemu.org/download/"
++        echo "  https://www.qemu.org/download/#source"
+         echo
+         echo "Developers working with GIT can use scripts/archive-source.sh"
+         echo "if they need to create valid source archives."
+-- 
+2.20.1
+
 
