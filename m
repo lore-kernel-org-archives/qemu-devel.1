@@ -2,49 +2,47 @@ Return-Path: <SRS0=9jkQ=VP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE896C76191
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 07:10:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77684C76191
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 07:21:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BBFB620880
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 07:10:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BBFB620880
+	by mail.kernel.org (Postfix) with ESMTPS id 45E2E20880
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 07:21:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 45E2E20880
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34958 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35052 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ho0Yh-0006dl-Pc
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jul 2019 03:10:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58789)
+	id 1ho0j4-0000wV-8Q
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jul 2019 03:21:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33428)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <thuth@redhat.com>) id 1ho0YW-0006Ej-HJ
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 03:10:21 -0400
+ (envelope-from <thuth@redhat.com>) id 1ho0is-0000Qv-6U
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 03:21:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1ho0YV-0002E5-AV
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 03:10:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54906)
+ (envelope-from <thuth@redhat.com>) id 1ho0iq-000073-UK
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 03:21:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44048)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1ho0YV-0002Dt-2R
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 03:10:19 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ (Exim 4.71) (envelope-from <thuth@redhat.com>)
+ id 1ho0iq-00006M-MN; Thu, 18 Jul 2019 03:21:00 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 39A4D30821C2;
- Thu, 18 Jul 2019 07:10:18 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 8EF2E30BA078;
+ Thu, 18 Jul 2019 07:20:58 +0000 (UTC)
 Received: from thuth.remote.csb (dhcp-200-228.str.redhat.com [10.33.200.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D937919C65;
- Thu, 18 Jul 2019 07:10:14 +0000 (UTC)
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- "Daniel P. Berrange" <berrange@redhat.com>, Stefan Weil <sw@weilnetz.de>
-References: <cb727b5d-683f-115d-f3c0-06f5a6761aea@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8B04910246E1;
+ Thu, 18 Jul 2019 07:20:57 +0000 (UTC)
+To: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org
+References: <20190716053522.78813-1-aik@ozlabs.ru>
 From: Thomas Huth <thuth@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=thuth@redhat.com; keydata=
@@ -90,21 +88,21 @@ Autocrypt: addr=thuth@redhat.com; keydata=
  rCELuGwT9hsYkUPjVd4lfylN3mzEc6iAv/wwjsc0DRTSQCpXT3v2ymTAsRKrVaEZLibTXaf+
  WslxWek3xNYRiqwwWAJuL652eAlxUgQ5ZS+fXBRTiQpJ+F26I/2lccScRd9G5w==
 Organization: Red Hat
-Message-ID: <126a3ec4-f5e3-0590-011a-9c2a10d07b24@redhat.com>
-Date: Thu, 18 Jul 2019 09:10:14 +0200
+Message-ID: <8b727864-1634-0a5d-c557-fcaa52c49434@redhat.com>
+Date: Thu, 18 Jul 2019 09:20:56 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <cb727b5d-683f-115d-f3c0-06f5a6761aea@redhat.com>
+In-Reply-To: <20190716053522.78813-1-aik@ozlabs.ru>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Thu, 18 Jul 2019 07:10:18 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ (mx1.redhat.com [10.5.110.46]); Thu, 18 Jul 2019 07:20:59 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] No archives to download from www.qemu.org/download/
+Subject: Re: [Qemu-devel] [RFC PATCH qemu] spapr: Stop providing RTAS blob
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -116,34 +114,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 18/07/2019 08.25, Philippe Mathieu-Daud=C3=A9 wrote:
-> When building from the GitHub generated archive
-> (https://github.com/qemu/qemu/archive/v4.1.0-rc0.tar.gz)
-> we get:
->=20
-> ---
-> $ ./configure
->=20
-> ERROR: missing file /tmp/qemu-4.1.0-rc0/ui/keycodemapdb/README
->=20
-> This is not a GIT checkout but module content appears to
-> be missing. Do not use 'git archive' or GitHub download links
-> to acquire QEMU source archives. Non-GIT builds are only
-> supported with source archives linked from:
->=20
->   https://www.qemu.org/download/
->=20
-> Developers working with GIT can use scripts/archive-source.sh
-> if they need to create valid source archives.
-> ---
->=20
-> Now there are no archive to download at this url...
+On 16/07/2019 07.35, Alexey Kardashevskiy wrote:
+> SLOF implements one itself so let's remove it from QEMU. It is one less
+> image and simpler setup as the RTAS blob never stays in its initial place
+> anyway as the guest OS always decides where to put it.
+> 
+> This totally depends on https://patchwork.ozlabs.org/patch/1132440/ ,
+> hence RFC.
 
-You just have to click on the "Source code" tab ... is that too hard?
+Patch looks basically fine for me, but I wonder whether we should wait
+for one or two releases until we really remove it from QEMU, so that it
+is still possible to test the latest QEMU with older SLOF releases for a
+while (which is sometimes useful when hunting bugs). Or should this
+maybe even go through the official deprecation process (i.e. with an
+entry in qemu-deprecated.texi)?
 
  Thomas
 
