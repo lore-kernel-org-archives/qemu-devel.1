@@ -2,79 +2,80 @@ Return-Path: <SRS0=9jkQ=VP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E19F5C76191
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 05:06:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CFF1C76191
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 05:09:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AEA5A2173B
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 05:06:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AEA5A2173B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 17AE22173E
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 05:09:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=jms.id.au header.i=@jms.id.au header.b="Se0LiN4l"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 17AE22173E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=jms.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34224 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34238 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hnycV-00079j-Pp
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jul 2019 01:06:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57105)
+	id 1hnyfw-0000JM-9b
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jul 2019 01:09:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57965)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hnycK-0006kr-UY
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 01:06:09 -0400
+ (envelope-from <joel.stan@gmail.com>) id 1hnyfm-0008Cu-Cf
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 01:09:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hnycJ-0005tb-KW
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 01:06:08 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:55905)
+ (envelope-from <joel.stan@gmail.com>) id 1hnyfl-0000ey-B1
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 01:09:42 -0400
+Received: from mail-qk1-x744.google.com ([2607:f8b0:4864:20::744]:39809)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hnycJ-0005sz-ER
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 01:06:07 -0400
-Received: by mail-wm1-f65.google.com with SMTP id a15so24143274wmj.5
- for <qemu-devel@nongnu.org>; Wed, 17 Jul 2019 22:06:07 -0700 (PDT)
+ (Exim 4.71) (envelope-from <joel.stan@gmail.com>)
+ id 1hnyfi-0000XM-Kx; Thu, 18 Jul 2019 01:09:39 -0400
+Received: by mail-qk1-x744.google.com with SMTP id w190so19424686qkc.6;
+ Wed, 17 Jul 2019 22:09:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jms.id.au; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=Q9INugv/mrNV+sxANYdBEZEl1STGB828wsUqN4bmxkk=;
+ b=Se0LiN4l+DvAOn3DDSrBbd06YiZJZNp3ggr4t1tricJqTzqOUMmPtFzTP9uNawhgCs
+ n0QHD0Eb4+4Pt0ZUEi4j7eu1JUopG8JSK1BX5+B2u4Pm2Ajf3010IHHwSh1Z/PL2vuyZ
+ ay1npOgWgUpLy76f/2LMrqyf+fsqGt7cVBCC0=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=p0eSR1v4ahHm0bbH4IuGIHbsROp8ZUIJu5XfdWgcBso=;
- b=BymUdqft8O7PDly0dUiDKvvKW9oBPk9kulaeobUoMb+jeabxetPVudO6UYEqQf2V3I
- AkPJ7Ur2yMGJjtwmk+E17P8tY3K+FDbZNXBhJBVRhfPTknmOuaytUI/+bJL0lV/FLBEV
- YTT9XmV1hZXbGKdma1qAJbX/Ht0rWQ176rAGFynyDvj4Z7JkwlKcrdGOz0MvlSmKeohh
- 6YDhvTWVRh/FdbS+fHjHEnBTxL1VzbuJDVG0csvWoX/sWuj5CojC+k/jdXAKlGhHP5P8
- Yq99vEPxD7Ndm5E0lMPqMxhAob3nKZ5m5iYGEOmZmFZXDapoDe//TxFW3oc+MmJjQx8T
- n6FQ==
-X-Gm-Message-State: APjAAAXUBVjePvc27D7ymcYGYWBNzjW73m5EgkROc1pdsxtYCpvDpqcx
- NGP+L2wVHLAeZ+FaIStpmtO2zpaEyhQ=
-X-Google-Smtp-Source: APXvYqwzEkHnJpMq66HzAX6xX+dskxpg/TloA49xlEGKnGJZvv+zlBeHFUgA15HtZhPASWEojxze9A==
-X-Received: by 2002:a1c:b189:: with SMTP id a131mr41225098wmf.7.1563426366195; 
- Wed, 17 Jul 2019 22:06:06 -0700 (PDT)
-Received: from [192.168.1.37] (62.red-83-42-61.dynamicip.rima-tde.net.
- [83.42.61.62])
- by smtp.gmail.com with ESMTPSA id n5sm21624470wmi.21.2019.07.17.22.06.05
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Wed, 17 Jul 2019 22:06:05 -0700 (PDT)
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-References: <20190717094728.31006-1-pbonzini@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <e46d7dbe-10a8-c786-05aa-d396d8bbb6ea@redhat.com>
-Date: Thu, 18 Jul 2019 07:06:05 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=Q9INugv/mrNV+sxANYdBEZEl1STGB828wsUqN4bmxkk=;
+ b=hnt9wWOxlcmcnzTHvFU5umbDgLa8UO2bD85L/i4/vc1hizaqD376J24Z4lv7YcIkI2
+ 8rObr4PfJ8es61AiF0awd7bYjfqJ3EqEKpRww8VyZTM5itox1ZUnd/A4zMAMMVEQxfDN
+ Rmj2xx24iNcIl+Q/0s4u8AOViMh7Jtla1gt4TpjMUcThmOEnBYG2gRVsWefpXbapeA7k
+ TKrT+nXkzWpXgDFB2ywCm8D2AIIeTaRCR1Ld/1llXV0+Kus03urNQuqVPSkUPIaYTtAL
+ Afl2jkO5Qwr0T38u2aK5AMQA5e64PLBTWfgNn3xW1XpyST32itHWtGkUboDNke9Atp+o
+ wSsg==
+X-Gm-Message-State: APjAAAVZyVCXjFchshwSh/9Jqap7pztwtz9K9KzKusp8pMdBssTVIdGO
+ DVkAIeLxnO8LRVOEBGqum9/j/bbNKcFSGjzNRRllPg==
+X-Google-Smtp-Source: APXvYqys/fDmjvcS4A/Z12MwWGpxAtgzvnfzLbewDvpUZZun0QT50Tz3iA5yeSu+vft28EfzEyrgh0g5LKjjtbq6jM8=
+X-Received: by 2002:a37:a2d1:: with SMTP id
+ l200mr29422410qke.330.1563426575762; 
+ Wed, 17 Jul 2019 22:09:35 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190717094728.31006-1-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.128.65
-Subject: Re: [Qemu-devel] [PATCH] virtio-scsi: remove unused argument to
- virtio_scsi_common_realize
+References: <20190716045633.15319-1-joel@jms.id.au>
+ <6e98fffb-2642-3835-d3ba-f06b73ca2fdc@kaod.org>
+ <20190716085236.GH7525@umbus.fritz.box>
+In-Reply-To: <20190716085236.GH7525@umbus.fritz.box>
+From: Joel Stanley <joel@jms.id.au>
+Date: Thu, 18 Jul 2019 05:09:23 +0000
+Message-ID: <CACPK8XfTv2z=3UGHyS=AdtXfeBjZkS6UkUZhyXO-Q9YNq==FuA@mail.gmail.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::744
+Subject: Re: [Qemu-devel] [PATCH] ppc/pnv: Warn when using -initrd and low
+ ram
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,85 +87,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: qemu-ppc@nongnu.org, =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/17/19 11:47 AM, Paolo Bonzini wrote:
-> The argument is not used and passing it clutters error propagation in the
-> callers.  So, get rid of it.
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  hw/scsi/vhost-scsi.c            | 2 +-
->  hw/scsi/vhost-user-scsi.c       | 2 +-
->  hw/scsi/virtio-scsi.c           | 4 ++--
->  include/hw/virtio/virtio-scsi.h | 2 +-
->  4 files changed, 5 insertions(+), 5 deletions(-)
-> 
-> diff --git a/hw/scsi/vhost-scsi.c b/hw/scsi/vhost-scsi.c
-> index 4090f99ee4..76bb875ca6 100644
-> --- a/hw/scsi/vhost-scsi.c
-> +++ b/hw/scsi/vhost-scsi.c
-> @@ -262,7 +262,7 @@ static void vhost_scsi_unrealize(DeviceState *dev, Error **errp)
->      vhost_dev_cleanup(&vsc->dev);
->      g_free(vqs);
->  
-> -    virtio_scsi_common_unrealize(dev, errp);
-> +    virtio_scsi_common_unrealize(dev);
->  }
->  
->  static Property vhost_scsi_properties[] = {
-> diff --git a/hw/scsi/vhost-user-scsi.c b/hw/scsi/vhost-user-scsi.c
-> index a9fd8ea305..a0b69fbc0f 100644
-> --- a/hw/scsi/vhost-user-scsi.c
-> +++ b/hw/scsi/vhost-user-scsi.c
-> @@ -125,7 +125,7 @@ static void vhost_user_scsi_unrealize(DeviceState *dev, Error **errp)
->      vhost_dev_cleanup(&vsc->dev);
->      g_free(vqs);
->  
-> -    virtio_scsi_common_unrealize(dev, errp);
-> +    virtio_scsi_common_unrealize(dev);
->      vhost_user_cleanup(&s->vhost_user);
->  }
->  
-> diff --git a/hw/scsi/virtio-scsi.c b/hw/scsi/virtio-scsi.c
-> index 61ce365fe9..d0bdbff090 100644
-> --- a/hw/scsi/virtio-scsi.c
-> +++ b/hw/scsi/virtio-scsi.c
-> @@ -922,7 +922,7 @@ static void virtio_scsi_device_realize(DeviceState *dev, Error **errp)
->      virtio_scsi_dataplane_setup(s, errp);
->  }
->  
-> -void virtio_scsi_common_unrealize(DeviceState *dev, Error **errp)
-> +void virtio_scsi_common_unrealize(DeviceState *dev)
->  {
->      VirtIODevice *vdev = VIRTIO_DEVICE(dev);
->      VirtIOSCSICommon *vs = VIRTIO_SCSI_COMMON(dev);
-> @@ -936,7 +936,7 @@ static void virtio_scsi_device_unrealize(DeviceState *dev, Error **errp)
->      VirtIOSCSI *s = VIRTIO_SCSI(dev);
->  
->      qbus_set_hotplug_handler(BUS(&s->bus), NULL, &error_abort);
-> -    virtio_scsi_common_unrealize(dev, errp);
-> +    virtio_scsi_common_unrealize(dev);
->  }
->  
->  static Property virtio_scsi_properties[] = {
-> diff --git a/include/hw/virtio/virtio-scsi.h b/include/hw/virtio/virtio-scsi.h
-> index 4c0bcdb788..122f7c4b6f 100644
-> --- a/include/hw/virtio/virtio-scsi.h
-> +++ b/include/hw/virtio/virtio-scsi.h
-> @@ -145,7 +145,7 @@ void virtio_scsi_common_realize(DeviceState *dev,
->                                  VirtIOHandleOutput cmd,
->                                  Error **errp);
->  
-> -void virtio_scsi_common_unrealize(DeviceState *dev, Error **errp);
-> +void virtio_scsi_common_unrealize(DeviceState *dev);
->  bool virtio_scsi_handle_event_vq(VirtIOSCSI *s, VirtQueue *vq);
->  bool virtio_scsi_handle_cmd_vq(VirtIOSCSI *s, VirtQueue *vq);
->  bool virtio_scsi_handle_ctrl_vq(VirtIOSCSI *s, VirtQueue *vq);
-> 
+On Tue, 16 Jul 2019 at 08:53, David Gibson <david@gibson.dropbear.id.au> wr=
+ote:
+>
+> On Tue, Jul 16, 2019 at 09:39:36AM +0200, C=C3=A9dric Le Goater wrote:
+> > > Provide a helpful message for users so they don't go reporting bugs t=
+o
+> > > kernel developers.
+> > >
+> > > Signed-off-by: Joel Stanley <joel@jms.id.au>
+> > > ---
+> > > We could solve this in other ways, such as warn when loading the init=
+rd
+> > > outside of RAM, or load it within the known boundaries or RAM, but af=
+ter
+> > > hitting this myself I wanted to start the discussion.
+> >
+> > We should also increase :
+> >
+> >     mc->default_ram_size =3D 1 * GiB;
+> >
+> > to 2 or 4 GiB. I always use 4.
+>
+> It seems to be increasing the default addresses the real problem in
+> practice.  Putting in a warning but still letting you do it, rather
+> than relocating where we load the image based on the ram size seems
+> kind of roundabout.
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+I agree. I'll send a patch to do that.
+
+> > at the beginning of this routine we have :
+> >
+> >     /* allocate RAM */
+> >     if (machine->ram_size < (1 * GiB)) {
+> >         warn_report("skiboot may not work with < 1GB of RAM");
+> >     }
+> >
+> > and we should exit instead.
+
+Yeah, perhaps. If someone is playing with some other bit of firmware
+code then there's no reason not to continue. I'll leave this one alone
+for now.
+
+Cheers,
+
+Joel
 
