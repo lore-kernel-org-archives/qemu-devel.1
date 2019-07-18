@@ -2,99 +2,90 @@ Return-Path: <SRS0=9jkQ=VP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6D4BC76191
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 07:54:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E2ACC76195
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 07:55:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A62E320880
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 07:54:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A62E320880
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=citrix.com
+	by mail.kernel.org (Postfix) with ESMTPS id 23CEA20880
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 07:55:33 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=ozlabs-ru.20150623.gappssmtp.com header.i=@ozlabs-ru.20150623.gappssmtp.com header.b="N0h16r78"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 23CEA20880
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ozlabs.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35200 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35208 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ho1Fi-000526-JA
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jul 2019 03:54:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40686)
+	id 1ho1GG-00063b-Eu
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jul 2019 03:55:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40879)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <Paul.Durrant@citrix.com>) id 1ho1FX-0004ZU-Kb
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 03:54:48 -0400
+ (envelope-from <aik@ozlabs.ru>) id 1ho1G4-0005U7-24
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 03:55:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <Paul.Durrant@citrix.com>) id 1ho1FW-0001r9-Jf
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 03:54:47 -0400
-Received: from esa5.hc3370-68.iphmx.com ([216.71.155.168]:3319)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <Paul.Durrant@citrix.com>)
- id 1ho1FT-0001oj-UY; Thu, 18 Jul 2019 03:54:44 -0400
-Authentication-Results: esa5.hc3370-68.iphmx.com;
- dkim=none (message not signed) header.i=none;
- spf=None smtp.pra=Paul.Durrant@citrix.com;
- spf=Pass smtp.mailfrom=Paul.Durrant@citrix.com;
- spf=None smtp.helo=postmaster@mail.citrix.com
-Received-SPF: None (esa5.hc3370-68.iphmx.com: no sender
- authenticity information available from domain of
- Paul.Durrant@citrix.com) identity=pra;
- client-ip=162.221.158.21; receiver=esa5.hc3370-68.iphmx.com;
- envelope-from="Paul.Durrant@citrix.com";
- x-sender="Paul.Durrant@citrix.com"; x-conformance=sidf_compatible
-Received-SPF: Pass (esa5.hc3370-68.iphmx.com: domain of
- Paul.Durrant@citrix.com designates 162.221.158.21 as
- permitted sender) identity=mailfrom;
- client-ip=162.221.158.21; receiver=esa5.hc3370-68.iphmx.com;
- envelope-from="Paul.Durrant@citrix.com";
- x-sender="Paul.Durrant@citrix.com";
- x-conformance=sidf_compatible; x-record-type="v=spf1";
- x-record-text="v=spf1 ip4:209.167.231.154 ip4:178.63.86.133
- ip4:195.66.111.40/30 ip4:85.115.9.32/28 ip4:199.102.83.4
- ip4:192.28.146.160 ip4:192.28.146.107 ip4:216.52.6.88
- ip4:216.52.6.188 ip4:162.221.158.21 ip4:162.221.156.83 ~all"
-Received-SPF: None (esa5.hc3370-68.iphmx.com: no sender
- authenticity information available from domain of
- postmaster@mail.citrix.com) identity=helo;
- client-ip=162.221.158.21; receiver=esa5.hc3370-68.iphmx.com;
- envelope-from="Paul.Durrant@citrix.com";
- x-sender="postmaster@mail.citrix.com";
- x-conformance=sidf_compatible
-IronPort-SDR: FuQTMbYT/aqFizTqXMr3/InikRSeosiqKwLiBuFOxEUqp7tTI8nazPlxtlGs0yz3eUNshTCyab
- LCs4VRT+3hktVYSjeWkqCClCRrugjMOd37Lqe0LWTWUa0MaSr0MNQaTaydPsTG+QjgOAGp7xPQ
- SDNco3nQ5Nr2Un1G6z61B13skvTlIqJZKqfx3wUNiU3ELJ4S8fipCl8KwsEMYvdIty6f0+qCxx
- Y7Rnka+0OAsOfLnPyH/tfNN5fui+Maw8TlTpKCIxP/OwboRC8q5gjBzsBhRuwU15r+/RTzRU2U
- 4OM=
-X-SBRS: 2.7
-X-MesageID: 3182844
-X-Ironport-Server: esa5.hc3370-68.iphmx.com
-X-Remote-IP: 162.221.158.21
-X-Policy: $RELAYED
-X-IronPort-AV: E=Sophos;i="5.64,276,1559534400"; 
-   d="scan'208";a="3182844"
-From: Paul Durrant <Paul.Durrant@citrix.com>
-To: 'Dmitry Fomichev' <dmitry.fomichev@wdc.com>, "qemu-devel@nongnu.org"
- <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Thread-Topic: [PATCH v2 3/5] block/ide/scsi: Set BLK_PERM_SUPPORT_ZONED
-Thread-Index: AQHVPOZluYnwMKVTxECLZbcsASFm/KbP//7Q
-Date: Thu, 18 Jul 2019 07:47:28 +0000
-Message-ID: <7120926e258f4024bdc85928ab0e031c@AMSPEX02CL03.citrite.net>
-References: <20190717212703.10205-1-dmitry.fomichev@wdc.com>
- <20190717212703.10205-4-dmitry.fomichev@wdc.com>
-In-Reply-To: <20190717212703.10205-4-dmitry.fomichev@wdc.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ (envelope-from <aik@ozlabs.ru>) id 1ho1G2-0002FZ-Qf
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 03:55:20 -0400
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:45590)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1ho1G2-0002En-Bv
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 03:55:18 -0400
+Received: by mail-pg1-x544.google.com with SMTP id o13so12485281pgp.12
+ for <qemu-devel@nongnu.org>; Thu, 18 Jul 2019 00:55:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=6l+BaGNpVfBZL988gX1Uk/8JYFgoehkxg6UYZmWhSrA=;
+ b=N0h16r78RNk7fJM1AMAHtvnAkojmn43MU+zyK60GYYbvLK1LvHqYQTgldWDR3apu2k
+ aIoIFNsUvyqzW7g581e/MXIykE0hbh0yVGra8AcUe33S126PczxDNQBoi4nlbOZWMIxk
+ utUk12QXUK+ynyfRVrdt5Z8t8b+7Ymulnruhsrj2LDbZ0VHlkGReUvyds7J8PH02psZq
+ DTFlkM8JqrkZBxSdBfphttRlv0ItHvnmLeRBkxo0bXqD5bLGZJB+fT5DixoACICBwCr4
+ trD/YpST1YJzpKMahj4Uxt+IfgJr3Vma8abzuGzGM/Irr/tirInyEhZObH6mSnDV+Fr6
+ l6jQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=6l+BaGNpVfBZL988gX1Uk/8JYFgoehkxg6UYZmWhSrA=;
+ b=TNy8IaDE5zgA2QxbKa4oUCcTlPYKcAiNWEb1KZVfjcWF8Sd2UUiK5o8ROOmhz1YORh
+ ib7pf9NNGF/gkjisuW2rmVMWBRPDtrJrEwCvzh9MswAIhe0Yu8Crq9wAImA9npSSBPis
+ BQEv9rgdmvd2ATsca4ZAp0QN7icQwCK0wMJhLcQhQCiikxmrSSG4aNwIYNopOd1Nx+D8
+ O2LQH6p4OXrltEX4pkxpT8W8irTF/7N6twXbwwr0ggkETsN6cksmqydGWc1T5Urmt6rz
+ 546ZpMztJnbXoNwfYgm6ANtu1SjWrE+SYmMSWNwzZmfOZdZoxYKl3kn/aOJOgAYuHMkg
+ rhIg==
+X-Gm-Message-State: APjAAAUBs7PtjWvIvcf7O6DCZi6zkbb76a0JBzNZMyBDBa+GtRcLwPQa
+ ED0wqxfwQAvNQIv1o12ll2E=
+X-Google-Smtp-Source: APXvYqw4nU4vYXHtjFFHbZ6utgKu1r6JSke1eBCiLyA70gplTAYksA3W5aGRM5CUFej/iJtbhOWmZQ==
+X-Received: by 2002:a17:90a:ac14:: with SMTP id
+ o20mr50066325pjq.114.1563436516605; 
+ Thu, 18 Jul 2019 00:55:16 -0700 (PDT)
+Received: from [10.61.2.175] ([122.99.82.10])
+ by smtp.gmail.com with ESMTPSA id a128sm25177344pfb.185.2019.07.18.00.55.14
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Thu, 18 Jul 2019 00:55:15 -0700 (PDT)
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+References: <20190716053522.78813-1-aik@ozlabs.ru>
+ <8b727864-1634-0a5d-c557-fcaa52c49434@redhat.com>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <9587706e-d53c-5490-cb4a-4c89eadfc497@ozlabs.ru>
+Date: Thu, 18 Jul 2019 17:55:12 +1000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x
-X-Received-From: 216.71.155.168
-Subject: Re: [Qemu-devel] [PATCH v2 3/5] block/ide/scsi: Set
- BLK_PERM_SUPPORT_ZONED
+In-Reply-To: <8b727864-1634-0a5d-c557-fcaa52c49434@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::544
+Subject: Re: [Qemu-devel] [RFC PATCH qemu] spapr: Stop providing RTAS blob
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,44 +97,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>, Stefano
- Stabellini <sstabellini@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>,
- Max Reitz <mreitz@redhat.com>, Keith Busch <keith.busch@intel.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Anthony Perard <anthony.perard@citrix.com>,
- Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>
+Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> -----Original Message-----
-> From: Dmitry Fomichev <dmitry.fomichev@wdc.com>
-> Sent: 17 July 2019 22:27
-> To: qemu-devel@nongnu.org; qemu-block@nongnu.org
-> Cc: John Snow <jsnow@redhat.com>; Kevin Wolf <kwolf@redhat.com>; Max Reit=
-z <mreitz@redhat.com>; Keith
-> Busch <keith.busch@intel.com>; Stefan Hajnoczi <stefanha@redhat.com>; Mic=
-hael S. Tsirkin
-> <mst@redhat.com>; Stefano Stabellini <sstabellini@kernel.org>; Anthony Pe=
-rard
-> <anthony.perard@citrix.com>; Paul Durrant <Paul.Durrant@citrix.com>; Paol=
-o Bonzini
-> <pbonzini@redhat.com>; Fam Zheng <fam@euphon.net>; Gerd Hoffmann <kraxel@=
-redhat.com>
-> Subject: [PATCH v2 3/5] block/ide/scsi: Set BLK_PERM_SUPPORT_ZONED
->=20
-> Added a new boolean argument to blkconf_apply_backend_options()
-> to let the common block code know whether the chosen block
-> backend can handle zoned block devices or not.
->=20
-> blkconf_apply_backend_options() then sets BLK_PERM_SUPPORT_ZONED
-> permission accordingly. The raw code can then use this permission
-> to allow or deny opening a zone device by a particular block driver.
->=20
-> Signed-off-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
 
-Xen part...
 
-Acked-by: Paul Durrant <paul.durrant@citrix.com>
+On 18/07/2019 17:20, Thomas Huth wrote:
+> On 16/07/2019 07.35, Alexey Kardashevskiy wrote:
+>> SLOF implements one itself so let's remove it from QEMU. It is one less
+>> image and simpler setup as the RTAS blob never stays in its initial place
+>> anyway as the guest OS always decides where to put it.
+>>
+>> This totally depends on https://patchwork.ozlabs.org/patch/1132440/ ,
+>> hence RFC.
+> 
+> Patch looks basically fine for me, but I wonder whether we should wait
+> for one or two releases until we really remove it from QEMU, so that it
+> is still possible to test the latest QEMU with older SLOF releases for a
+> while (which is sometimes useful when hunting bugs). Or should this
+> maybe even go through the official deprecation process (i.e. with an
+> entry in qemu-deprecated.texi)?
 
+I worry more about slof being distributed as a separate package in RHEL, 
+easy enough to get qemu/slof out of sync.
+
+
+-- 
+Alexey
 
