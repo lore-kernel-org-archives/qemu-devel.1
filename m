@@ -2,62 +2,83 @@ Return-Path: <SRS0=9jkQ=VP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5228BC76191
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 09:18:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D789C76191
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 09:18:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2DBBA2173B
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 09:18:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2DBBA2173B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5E6042173B
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 09:18:58 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="rUyMfSn3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E6042173B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35736 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35750 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ho2YV-0007Ey-P3
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jul 2019 05:18:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38983)
+	id 1ho2Yy-000143-EI
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jul 2019 05:18:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38999)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1ho2Y4-0005hs-Uw
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 05:18:01 -0400
+ (envelope-from <yury-kotov@yandex-team.ru>) id 1ho2Y5-0005ki-IZ
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 05:18:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1ho2Y3-00084d-U9
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 05:18:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48068)
+ (envelope-from <yury-kotov@yandex-team.ru>) id 1ho2Y4-00084u-5L
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 05:18:01 -0400
+Received: from forwardcorp1o.mail.yandex.net ([2a02:6b8:0:1a2d::193]:43464)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>)
- id 1ho2Y1-00082q-Vt; Thu, 18 Jul 2019 05:17:58 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 9916830872DA;
- Thu, 18 Jul 2019 09:17:56 +0000 (UTC)
-Received: from x1w.redhat.com (unknown [10.40.205.153])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 631F15D6A9;
- Thu, 18 Jul 2019 09:17:43 +0000 (UTC)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Thu, 18 Jul 2019 11:17:40 +0200
-Message-Id: <20190718091740.6834-1-philmd@redhat.com>
+ (Exim 4.71) (envelope-from <yury-kotov@yandex-team.ru>)
+ id 1ho2Y3-00081y-Cx
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 05:18:00 -0400
+Received: from mxbackcorp1o.mail.yandex.net (mxbackcorp1o.mail.yandex.net
+ [IPv6:2a02:6b8:0:1a2d::301])
+ by forwardcorp1o.mail.yandex.net (Yandex) with ESMTP id A7DD52E12B0;
+ Thu, 18 Jul 2019 12:17:53 +0300 (MSK)
+Received: from smtpcorp1p.mail.yandex.net (smtpcorp1p.mail.yandex.net
+ [2a02:6b8:0:1472:2741:0:8b6:10])
+ by mxbackcorp1o.mail.yandex.net (nwsmtp/Yandex) with ESMTP id
+ vNo3OBwvUM-HriODf4s; Thu, 18 Jul 2019 12:17:53 +0300
+Precedence: bulk
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
+ s=default; 
+ t=1563441473; bh=pdYBsi4yOtIzET/6XmZ1Glh9q8tSBBe6AsJssWPKHrM=;
+ h=In-Reply-To:Message-Id:References:Date:Subject:To:From:Cc;
+ b=rUyMfSn3ht1o6mwQSyIkDnHG4Rni5F2Ms/WdxG50B7DYBrufy0V8/wS1cFJQJ3bF6
+ gEHvyjeyJ2fHfxfCG0qpimyaTKcRZzqEXirw9byX/meC/HNx6uIlAwx+T6y/K/kq7P
+ rErICUQtf5GE2RIQzrdP8a0Mh7oxuIJc3BJny6FQ=
+Authentication-Results: mxbackcorp1o.mail.yandex.net;
+ dkim=pass header.i=@yandex-team.ru
+Received: from dynamic-red.dhcp.yndx.net (dynamic-red.dhcp.yndx.net
+ [2a02:6b8:0:40c:9028:49c4:6359:9be1])
+ by smtpcorp1p.mail.yandex.net (nwsmtp/Yandex) with ESMTPSA id
+ JhNdbP5MZj-HrwqmOHI; Thu, 18 Jul 2019 12:17:53 +0300
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
+ (Client certificate not present)
+From: Yury Kotov <yury-kotov@yandex-team.ru>
+To: Paolo Bonzini <pbonzini@redhat.com>,
+ Peter Crosthwaite <crosthwaite.peter@gmail.com>,
+ Richard Henderson <rth@twiddle.net>, Juan Quintela <quintela@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Stefan Weil <sw@weilnetz.de>
+Date: Thu, 18 Jul 2019 12:17:24 +0300
+Message-Id: <20190718091726.9874-2-yury-kotov@yandex-team.ru>
+X-Mailer: git-send-email 2.22.0
+In-Reply-To: <20190718091726.9874-1-yury-kotov@yandex-team.ru>
+References: <20190718091726.9874-1-yury-kotov@yandex-team.ru>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Thu, 18 Jul 2019 09:17:56 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH-for-4.1] hw/ide/piix: Mark the PIIX IDE
- interfaces as not user_creatable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a02:6b8:0:1a2d::193
+Subject: [Qemu-devel] [PATCH v3 1/3] qemu-thread: Add qemu_cond_timedwait
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -66,54 +87,246 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org,
- "Michael S . Tsirkin" <mst@redhat.com>, John Snow <jsnow@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: "open list:Overall" <qemu-devel@nongnu.org>, yc-core@yandex-team.ru
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The 'piix3-ide' (and 'piix3-ide-xen') devices are part of the
-PIIX3 chipset modelled as TYPE_PIIX3_PCI_DEVICE (respectivelly
-TYPE_PIIX3_XEN_DEVICE). The PIIX3 chipset can not be created
-in part, it has to be created and used as a whole.
-
-Similarly with the 'piix4-ide' device and the PIIX4 chipset
-modelled as TYPE_PIIX4_PCI_DEVICE.
-
-Disable the 'user_creatable' flag.
-
-part of TYPE_PIIX3_PCI_DEVICE (TYPE_PIIX3_XEN_DEVICE)
-
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Signed-off-by: Yury Kotov <yury-kotov@yandex-team.ru>
 ---
- hw/ide/piix.c | 2 ++
- 1 file changed, 2 insertions(+)
+ include/qemu/thread.h    | 18 ++++++++++++++++++
+ util/qemu-thread-posix.c | 40 ++++++++++++++++++++++++++++------------
+ util/qemu-thread-win32.c | 16 ++++++++++++++++
+ util/qsp.c               | 18 ++++++++++++++++++
+ 4 files changed, 80 insertions(+), 12 deletions(-)
 
-diff --git a/hw/ide/piix.c b/hw/ide/piix.c
-index b97e555072..c02e768668 100644
---- a/hw/ide/piix.c
-+++ b/hw/ide/piix.c
-@@ -253,6 +253,7 @@ static void piix3_ide_class_init(ObjectClass *klass, =
-void *data)
-     k->device_id =3D PCI_DEVICE_ID_INTEL_82371SB_1;
-     k->class_id =3D PCI_CLASS_STORAGE_IDE;
-     set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
-+    dc->user_creatable =3D false;
-     dc->hotpluggable =3D false;
+diff --git a/include/qemu/thread.h b/include/qemu/thread.h
+index 55d83a907c..d0cd7b9ae0 100644
+--- a/include/qemu/thread.h
++++ b/include/qemu/thread.h
+@@ -34,6 +34,8 @@ typedef void (*QemuRecMutexLockFunc)(QemuRecMutex *m, c=
+onst char *f, int l);
+ typedef int (*QemuRecMutexTrylockFunc)(QemuRecMutex *m, const char *f, i=
+nt l);
+ typedef void (*QemuCondWaitFunc)(QemuCond *c, QemuMutex *m, const char *=
+f,
+                                  int l);
++typedef void (*QemuCondTimedWaitFunc)(QemuCond *c, QemuMutex *m, int ms,
++                                      const char *f, int l);
+=20
+ extern QemuMutexLockFunc qemu_bql_mutex_lock_func;
+ extern QemuMutexLockFunc qemu_mutex_lock_func;
+@@ -41,6 +43,7 @@ extern QemuMutexTrylockFunc qemu_mutex_trylock_func;
+ extern QemuRecMutexLockFunc qemu_rec_mutex_lock_func;
+ extern QemuRecMutexTrylockFunc qemu_rec_mutex_trylock_func;
+ extern QemuCondWaitFunc qemu_cond_wait_func;
++extern QemuCondTimedWaitFunc qemu_cond_timedwait_func;
+=20
+ /* convenience macros to bypass the profiler */
+ #define qemu_mutex_lock__raw(m)                         \
+@@ -63,6 +66,8 @@ extern QemuCondWaitFunc qemu_cond_wait_func;
+             qemu_rec_mutex_trylock_impl(m, __FILE__, __LINE__);
+ #define qemu_cond_wait(c, m)                                            =
+\
+             qemu_cond_wait_impl(c, m, __FILE__, __LINE__);
++#define qemu_cond_timedwait(c, m, ms)                                   =
+\
++            qemu_cond_wait_impl(c, m, ms, __FILE__, __LINE__);
+ #else
+ #define qemu_mutex_lock(m) ({                                           =
+\
+             QemuMutexLockFunc _f =3D atomic_read(&qemu_mutex_lock_func);=
+  \
+@@ -89,6 +94,11 @@ extern QemuCondWaitFunc qemu_cond_wait_func;
+             QemuCondWaitFunc _f =3D atomic_read(&qemu_cond_wait_func);  =
+  \
+             _f(c, m, __FILE__, __LINE__);                               =
+\
+         })
++
++#define qemu_cond_timedwait(c, m, ms) ({                                =
+       \
++            QemuCondTimedWaitFunc _f =3D atomic_read(&qemu_cond_timedwai=
+t_func); \
++            _f(c, m, ms, __FILE__, __LINE__);                           =
+       \
++        })
+ #endif
+=20
+ #define qemu_mutex_unlock(mutex) \
+@@ -134,12 +144,20 @@ void qemu_cond_signal(QemuCond *cond);
+ void qemu_cond_broadcast(QemuCond *cond);
+ void qemu_cond_wait_impl(QemuCond *cond, QemuMutex *mutex,
+                          const char *file, const int line);
++void qemu_cond_timedwait_impl(QemuCond *cond, QemuMutex *mutex, int ms,
++                              const char *file, const int line);
+=20
+ static inline void (qemu_cond_wait)(QemuCond *cond, QemuMutex *mutex)
+ {
+     qemu_cond_wait(cond, mutex);
  }
 =20
-@@ -279,6 +280,7 @@ static void piix4_ide_class_init(ObjectClass *klass, =
-void *data)
-     k->device_id =3D PCI_DEVICE_ID_INTEL_82371AB;
-     k->class_id =3D PCI_CLASS_STORAGE_IDE;
-     set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
-+    dc->user_creatable =3D false;
-     dc->hotpluggable =3D false;
++static inline void (qemu_cond_timedwait)(QemuCond *cond, QemuMutex *mute=
+x,
++                                         int ms)
++{
++    qemu_cond_timedwait(cond, mutex, ms);
++}
++
+ void qemu_sem_init(QemuSemaphore *sem, int init);
+ void qemu_sem_post(QemuSemaphore *sem);
+ void qemu_sem_wait(QemuSemaphore *sem);
+diff --git a/util/qemu-thread-posix.c b/util/qemu-thread-posix.c
+index 1bf5e65dea..eed777d9ec 100644
+--- a/util/qemu-thread-posix.c
++++ b/util/qemu-thread-posix.c
+@@ -36,6 +36,18 @@ static void error_exit(int err, const char *msg)
+     abort();
  }
 =20
++static void compute_abs_deadline(struct timespec *ts, int ms)
++{
++    struct timeval tv;
++    gettimeofday(&tv, NULL);
++    ts->tv_nsec =3D tv.tv_usec * 1000 + (ms % 1000) * 1000000;
++    ts->tv_sec =3D tv.tv_sec + ms / 1000;
++    if (ts->tv_nsec >=3D 1000000000) {
++        ts->tv_sec++;
++        ts->tv_nsec -=3D 1000000000;
++    }
++}
++
+ void qemu_mutex_init(QemuMutex *mutex)
+ {
+     int err;
+@@ -164,6 +176,22 @@ void qemu_cond_wait_impl(QemuCond *cond, QemuMutex *=
+mutex, const char *file, con
+         error_exit(err, __func__);
+ }
+=20
++void qemu_cond_timedwait_impl(QemuCond *cond, QemuMutex *mutex, int ms,
++                              const char *file, const int line)
++{
++    int err;
++    struct timespec ts;
++
++    assert(cond->initialized);
++    trace_qemu_mutex_unlock(mutex, file, line);
++    compute_abs_deadline(&ts, ms);
++    err =3D pthread_cond_timedwait(&cond->cond, &mutex->lock, &ts);
++    trace_qemu_mutex_locked(mutex, file, line);
++    if (err && err !=3D ETIMEDOUT) {
++        error_exit(err, __func__);
++    }
++}
++
+ void qemu_sem_init(QemuSemaphore *sem, int init)
+ {
+     int rc;
+@@ -238,18 +266,6 @@ void qemu_sem_post(QemuSemaphore *sem)
+ #endif
+ }
+=20
+-static void compute_abs_deadline(struct timespec *ts, int ms)
+-{
+-    struct timeval tv;
+-    gettimeofday(&tv, NULL);
+-    ts->tv_nsec =3D tv.tv_usec * 1000 + (ms % 1000) * 1000000;
+-    ts->tv_sec =3D tv.tv_sec + ms / 1000;
+-    if (ts->tv_nsec >=3D 1000000000) {
+-        ts->tv_sec++;
+-        ts->tv_nsec -=3D 1000000000;
+-    }
+-}
+-
+ int qemu_sem_timedwait(QemuSemaphore *sem, int ms)
+ {
+     int rc;
+diff --git a/util/qemu-thread-win32.c b/util/qemu-thread-win32.c
+index 572f88535d..5faa01cb61 100644
+--- a/util/qemu-thread-win32.c
++++ b/util/qemu-thread-win32.c
+@@ -145,6 +145,22 @@ void qemu_cond_wait_impl(QemuCond *cond, QemuMutex *=
+mutex, const char *file, con
+     qemu_mutex_post_lock(mutex, file, line);
+ }
+=20
++void qemu_cond_timedwait_impl(QemuCond *cond, QemuMutex *mutex, int ms,
++                              const char *file, const int line)
++{
++    int rc =3D 0;
++
++    assert(cond->initialized);
++    trace_qemu_mutex_unlock(mutex, file, line);
++    if (!SleepConditionVariableSRW(&cond->var, &mutex->lock, ms, 0)) {
++        rc =3D GetLastError();
++    }
++    trace_qemu_mutex_locked(mutex, file, line);
++    if (rc && rc !=3D ERROR_TIMEOUT) {
++        error_exit(rc, __func__);
++    }
++}
++
+ void qemu_sem_init(QemuSemaphore *sem, int init)
+ {
+     /* Manual reset.  */
+diff --git a/util/qsp.c b/util/qsp.c
+index 5264c97342..904dcb7436 100644
+--- a/util/qsp.c
++++ b/util/qsp.c
+@@ -131,6 +131,7 @@ QemuRecMutexLockFunc qemu_rec_mutex_lock_func =3D qem=
+u_rec_mutex_lock_impl;
+ QemuRecMutexTrylockFunc qemu_rec_mutex_trylock_func =3D
+     qemu_rec_mutex_trylock_impl;
+ QemuCondWaitFunc qemu_cond_wait_func =3D qemu_cond_wait_impl;
++QemuCondTimedWaitFunc qemu_cond_timedwait_func =3D qemu_cond_timedwait_i=
+mpl;
+=20
+ /*
+  * It pays off to _not_ hash callsite->file; hashing a string is slow, a=
+nd
+@@ -412,6 +413,21 @@ qsp_cond_wait(QemuCond *cond, QemuMutex *mutex, cons=
+t char *file, int line)
+     qsp_entry_record(e, t1 - t0);
+ }
+=20
++static void
++qsp_cond_timedwait(QemuCond *cond, QemuMutex *mutex, int ms,
++                   const char *file, int line)
++{
++    QSPEntry *e;
++    int64_t t0, t1;
++
++    t0 =3D get_clock();
++    qemu_cond_timedwait_impl(cond, mutex, ms, file, line);
++    t1 =3D get_clock();
++
++    e =3D qsp_entry_get(cond, file, line, QSP_CONDVAR);
++    qsp_entry_record(e, t1 - t0);
++}
++
+ bool qsp_is_enabled(void)
+ {
+     return atomic_read(&qemu_mutex_lock_func) =3D=3D qsp_mutex_lock;
+@@ -425,6 +441,7 @@ void qsp_enable(void)
+     atomic_set(&qemu_rec_mutex_lock_func, qsp_rec_mutex_lock);
+     atomic_set(&qemu_rec_mutex_trylock_func, qsp_rec_mutex_trylock);
+     atomic_set(&qemu_cond_wait_func, qsp_cond_wait);
++    atomic_set(&qemu_cond_timedwait_func, qsp_cond_timedwait);
+ }
+=20
+ void qsp_disable(void)
+@@ -435,6 +452,7 @@ void qsp_disable(void)
+     atomic_set(&qemu_rec_mutex_lock_func, qemu_rec_mutex_lock_impl);
+     atomic_set(&qemu_rec_mutex_trylock_func, qemu_rec_mutex_trylock_impl=
+);
+     atomic_set(&qemu_cond_wait_func, qemu_cond_wait_impl);
++    atomic_set(&qemu_cond_timedwait_func, qemu_cond_timedwait_impl);
+ }
+=20
+ static gint qsp_tree_cmp(gconstpointer ap, gconstpointer bp, gpointer up=
+)
 --=20
-2.20.1
+2.22.0
 
 
