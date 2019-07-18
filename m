@@ -2,92 +2,64 @@ Return-Path: <SRS0=9jkQ=VP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AE50C7618F
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 14:58:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C72CFC7618F
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 14:59:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 60F482080D
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 14:58:44 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Gk+9bV+u"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60F482080D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 9EA232080D
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jul 2019 14:59:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9EA232080D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38840 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38850 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ho7rn-0003nl-LA
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jul 2019 10:58:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38295)
+	id 1ho7su-0005GW-TH
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jul 2019 10:59:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38549)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1ho7rb-0003JA-K6
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 10:58:32 -0400
+ (envelope-from <kwolf@redhat.com>) id 1ho7sk-0004kh-DR
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 10:59:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1ho7ra-0006L1-Gi
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 10:58:31 -0400
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:37388)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1ho7ra-0006Kc-8e
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 10:58:30 -0400
-Received: by mail-pl1-x641.google.com with SMTP id b3so14026864plr.4
- for <qemu-devel@nongnu.org>; Thu, 18 Jul 2019 07:58:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=TgjiWKnYVhNow5aXdsbc/uRaAI4MYXerKql/FbghhWU=;
- b=Gk+9bV+upaQ1YgstmeYjiwhK8OJvM2Q68ZuapcDbLc4iEOXb9mr3npR4P59nxWi+zE
- sNLk9bRrFA2clzQJmOWgWYfkN34RQnGNumpgU5Y0d7bAbiCGxJ3YMaYaMaOpnLmhhQvG
- hiFjp9NeqkxpcfyA+zvTEGN4u3DTcGPJLcBLhAq0CG9610V8GJbdIMNfNXEVFOJaWly8
- HP7zzsYdxp6X/4zyf/OLvNdORRdBpsPJNj4jFTKVSiOm4D0AcrLVHvEXgDB793ZokSf4
- aDVj84bnzXyI2+KpuZ58r2fmNvyAR4jGmnh8V2XEjSG7Y/+DC6ZXgyX9dCnNIZc/ENpD
- d7gQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=TgjiWKnYVhNow5aXdsbc/uRaAI4MYXerKql/FbghhWU=;
- b=eqORMpE7LK33TsvntGkjuvqyijbQlnqysn29OTA6WkOjrupIS94+tQChM1V4uHalVE
- uPW2y4JbkKzt0nZIozDqMFMQX76bQ5XCgzkDuEeiYmiUgZoi+S4q4ltGvXt1BoqCg1oZ
- wCHO/CQjR+lsB1/FAnoxMXRwVGqbNlGAgr0sCRTRvlzYi6ya1Trmp/G756lof55Szx3L
- VdCRqUd/p7MkmZ8bg65boYcbfOxKVwiQQqWbBYaib6SOXhRK2XqNgucVHpX/gh4xW2eA
- QHSyE3qzNfAs97HLAOuF1+wRuMcjghIpvlIEbo1ybsSY0qT5pVaVnBouUx2BeAP6zWZE
- /5sg==
-X-Gm-Message-State: APjAAAXYPev2ipxDH2vWEmrBGgHQ6e7YIg5fDkK+ar9VGJjOaiYYvKGq
- ofXlTmfG8YzinM6u7Vzv5TKdVg==
-X-Google-Smtp-Source: APXvYqxTBR2lbuJeeNk0ACGX2TgvYzf9zUcFi4VAYQKmXcMZSptDP1Sb1aVngks/y1+7tqEpIUkaog==
-X-Received: by 2002:a17:902:a607:: with SMTP id
- u7mr50899107plq.43.1563461908878; 
- Thu, 18 Jul 2019 07:58:28 -0700 (PDT)
-Received: from [192.168.1.11] (97-113-176-6.tukw.qwest.net. [97.113.176.6])
- by smtp.gmail.com with ESMTPSA id c130sm26785693pfc.184.2019.07.18.07.58.27
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 18 Jul 2019 07:58:28 -0700 (PDT)
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
- qemu-devel@nongnu.org
-References: <20190718125928.20147-1-peter.maydell@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <3b7e18bf-5450-3246-137f-9bc694edc17b@linaro.org>
-Date: Thu, 18 Jul 2019 07:58:26 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+ (envelope-from <kwolf@redhat.com>) id 1ho7sj-0006tf-BC
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 10:59:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43971)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>)
+ id 1ho7sg-0006rY-5z; Thu, 18 Jul 2019 10:59:38 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 55B7C335CF;
+ Thu, 18 Jul 2019 14:59:37 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-117-130.ams2.redhat.com
+ [10.36.117.130])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id ACCFB19D7A;
+ Thu, 18 Jul 2019 14:59:32 +0000 (UTC)
+Date: Thu, 18 Jul 2019 16:59:31 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: =?utf-8?B?0JXQstCz0LXQvdC40Lkg0K/QutC+0LLQu9C10LI=?= <wrfsh@yandex-team.ru>
+Message-ID: <20190718145931.GD5454@localhost.localdomain>
+References: <ad4c52a9-e848-e3fd-3c1b-046d2670c025@yandex-team.ru>
 MIME-Version: 1.0
-In-Reply-To: <20190718125928.20147-1-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::641
-Subject: Re: [Qemu-devel] [PATCH for-4.1] target/arm: Limit ID register
- assertions to TCG
+Content-Disposition: inline
+In-Reply-To: <ad4c52a9-e848-e3fd-3c1b-046d2670c025@yandex-team.ru>
+User-Agent: Mutt/1.11.3 (2019-02-01)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.38]); Thu, 18 Jul 2019 14:59:37 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] BDRV request fragmentation and virtio-blk write
+ submission guarantees (2nd try)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,53 +71,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Laszlo Ersek <lersek@redhat.com>
+Cc: qemu-block@nongnu.org, yc-core@yandex-team.ru, qemu-devel@nongnu.org,
+ stefanha@redhat.com, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/18/19 5:59 AM, Peter Maydell wrote:
-> In arm_cpu_realizefn() we make several assertions about the values of
-> guest ID registers:
->  * if the CPU provides AArch32 v7VE or better it must advertise the
->    ARM_DIV feature
->  * if the CPU provides AArch32 A-profile v6 or better it must
->    advertise the Jazelle feature
-> 
-> These are essentially consistency checks that our ID register
-> specifications in cpu.c didn't accidentally miss out a feature,
-> because increasingly the TCG emulation gates features on the values
-> in ID registers rather than using old-style checks of ARM_FEATURE_FOO
-> bits.
-> 
-> Unfortunately, these asserts can cause problems if we're running KVM,
-> because in that case we don't control the values of the ID registers
-> -- we read them from the host kernel.  In particular, if the host
-> kernel is older than 4.15 then it doesn't expose the ID registers via
-> the KVM_GET_ONE_REG ioctl, and we set up dummy values for some
-> registers and leave the rest at zero.  (See the comment in
-> target/arm/kvm64.c kvm_arm_get_host_cpu_features().) This set of
-> dummy values is not sufficient to pass our assertions, and so on
-> those kernels running an AArch32 guest on AArch64 will assert.
-> 
-> We could provide a more sophisticated set of dummy ID registers in
-> this case, but that still leaves the possibility of a host CPU which
-> reports bogus ID register values that would cause us to assert.  It's
-> more robust to only do these ID register checks if we're using TCG,
-> as that is the only case where this is truly a QEMU code bug.
-> 
-> Reported-by: Laszlo Ersek <lersek@redhat.com>
-> Fixes: https://bugs.launchpad.net/qemu/+bug/1830864
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
-> Laszlo, would you mind testing this on your setup? I don't have
-> a system with an old enough kernel to trigger the assert. (The
-> change is pretty much a "has to work" one though :-))
+Am 18.07.2019 um 15:52 hat =D0=95=D0=B2=D0=B3=D0=B5=D0=BD=D0=B8=D0=B9 =D0=
+=AF=D0=BA=D0=BE=D0=B2=D0=BB=D0=B5=D0=B2 geschrieben:
+> Hi everyone,
+>=20
+> My previous message was misformatted, so here's another one. Sorry abou=
+t
+> that.
+>=20
+> We're currently working on implementing a qemu BDRV format driver which=
+ we
+> are using with virtio-blk devices.
+>=20
+> I have a question concerning BDRV request fragmentation and virtio-blk =
+write
+> request submission which is not entirely clear to me by only reading vi=
+rtio
+> spec. Could you please consider the following case and give some additi=
+onal
+> guidance?
+>=20
+> 1. Our BDRV format driver has a notion of max supported transfer size. =
+So we
+> implement BlockDriver::bdrv_refresh_limits where we fill out
+> BlockLimits::max_transfer and opt_transfer fields.
+>=20
+> 2. virtio-blk exposes max_transfer as a virtio_blk_config::opt_io_size
+> field, which (according to spec 1.1) is a **suggested** maximum. We rea=
+d
+> "suggested" as "guest driver may still send requests that don't fit int=
+o
+> opt_io_size and we should handle those"...
+>=20
+> 3. ... and judging by code in block/io.c qemu block layer handles such
+> requests by fragmenting them into several BDRV requests if request size=
+ is >
+> max_transfer
+>=20
+> 4. Guest will see request completion only after all fragments are handl=
+ed.
+> However each fragment submission path can call qemu_coroutine_yield and=
+ move
+> on to submitting next request available in virtq before completely
+> submitting the rest of the fragments. Which means the following situati=
+on is
+> possible where BDRV sees 2 write requests in virtq, both of which are l=
+arger
+> than max_transfer:
+>=20
+> Blocks: -----------------------------
+>=20
+> Write1: ------xxxxxxxx
+>=20
+> Write2: ------yyyyyyyy
+>=20
+> Write1Chunk1: xxxx
+>=20
+> Write2Chunk1: yyyy
+>=20
+> Write2Chunk2: ----yyyy
+>=20
+> Write1Chunk1: ----xxxx
+>=20
+> Blocks: ------yyyyxxxx-----------------
+>=20
+>=20
+> In above scenario guest virtio-blk driver decided to submit 2 intersect=
+ing
+> write requests, both of which are larger than ||max_transfer, and then =
+call
+> hypervisor.
+>=20
+> I understand that virtio-blk may handle requests out of order, so guest=
+ must
+> not make any assumptions on relative order in which those requests will=
+ be
+> handled.
+>=20
+> However, can guest driver expect that whatever the submission order wil=
+l be,
+> the actual intersecting writes will be atomic?
+>=20
+> In other words, will it be correct for conforming virtio-blk driver to
+> expect only "xxxxxxxx" or "yyyyyyyy" but not anything else in between, =
+after
+> both requests are reported as completed?
+>=20
+> Because i think that is something that may happen in qemu right now, if=
+ i
+> understood correctly.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+I don't think atomicity is promised anywhere in the virtio
+specification, and I agree with you that this case can happen (it
+probably happens much more frequently when you use image formats instead
+of raw files).
 
+On the other hand, there is no good reason for a guest OS to submit two
+write request to the same blocks in parallel. Even if it could expect
+that one of the requests wins, the end result would still be undefined,
+so I don't think this could ever be a useful thing to do. (Well, I guess
+it could replace flipping a coin...)
 
-r~
+Kevin
 
