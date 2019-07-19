@@ -2,59 +2,60 @@ Return-Path: <SRS0=mHy3=VQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BFBAC76188
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 09:26:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D759C76188
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 09:26:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 192F62084D
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 09:26:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 192F62084D
+	by mail.kernel.org (Postfix) with ESMTPS id 215622084D
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 09:26:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 215622084D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43302 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43306 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hoPAE-0002wI-63
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 05:26:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37585)
+	id 1hoPAG-0003DQ-Mg
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 05:26:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37638)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hoP9r-0001ts-O6
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 05:26:32 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hoP9u-00022z-Ie
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 05:26:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hoP9q-0005pE-NK
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 05:26:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51280)
+ (envelope-from <mreitz@redhat.com>) id 1hoP9t-0005ru-Bt
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 05:26:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58336)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hoP9o-0005jC-5I; Fri, 19 Jul 2019 05:26:28 -0400
+ id 1hoP9q-0005om-M3; Fri, 19 Jul 2019 05:26:30 -0400
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id B9E9CB2CD;
- Fri, 19 Jul 2019 09:26:23 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 01A4D3022468;
+ Fri, 19 Jul 2019 09:26:30 +0000 (UTC)
 Received: from localhost (unknown [10.40.205.128])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E875B1001B14;
- Fri, 19 Jul 2019 09:26:20 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 68BAD10190C8;
+ Fri, 19 Jul 2019 09:26:29 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Date: Fri, 19 Jul 2019 11:26:08 +0200
-Message-Id: <20190719092618.24891-1-mreitz@redhat.com>
+Date: Fri, 19 Jul 2019 11:26:10 +0200
+Message-Id: <20190719092618.24891-3-mreitz@redhat.com>
+In-Reply-To: <20190719092618.24891-1-mreitz@redhat.com>
+References: <20190719092618.24891-1-mreitz@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.26]); Fri, 19 Jul 2019 09:26:23 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.49]); Fri, 19 Jul 2019 09:26:30 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v3 00/10] block: Delay poll when ending drained
- sections
+Subject: [Qemu-devel] [PATCH v3 02/10] tests: Add job commit by drained_end
+ test
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,76 +73,153 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+---
+ tests/test-bdrv-drain.c | 119 ++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 119 insertions(+)
 
-This series:
-
-(1) Keeps patch 1, as the previous series, and
-
-(2) Decides whether all *drained_end* functions should poll or not; as
-    proposed by Kevin, all that should not poll now get a
-    @drained_end_counter pointer, whose pointee they have to increment
-    once for every background operation scheduled, and that background
-    operation will decrement it once it settles.
-    This allows functions that should poll to do so until the counter
-    reaches 0, so they don=E2=80=99t have to poll after scheduling every =
-single
-    operation but can do so once in a place where it=E2=80=99s safe.
-
-v3:
-- Change the design as described above (drained_end_counter instead of a
-  list of BdrvCoDrainData objects to poll)
-- Added a test to test-bdrv-drain
-
-
-git-backport-diff against v2:
-
-Key:
-[----] : patches are identical
-[####] : number of functional differences between upstream/downstream pat=
-ch
-[down] : patch is downstream-only
-The flags [FC] indicate (F)unctional and (C)ontextual differences, respec=
-tively
-
-001/10:[----] [--] 'block: Introduce BdrvChild.parent_quiesce_counter'
-002/10:[down] 'tests: Add job commit by drained_end test'
-003/10:[down] 'block: Add @drained_end_counter to bdrv_drain_invoke()'
-004/10:[down] 'block: Make bdrv_parent_drained_[^_]*() static'
-005/10:[down] 'tests: Lock AioContexts in test-block-iothread'
-006/10:[down] 'block: Only poll once in bdrv_drained_end()'
-007/10:[down] 'tests: Extend commit by drained_end test'
-008/10:[down] 'block: Loop unsafely in bdrv*drained_end()'
-009/10:[----] [--] 'iotests: Add @has_quit to vm.shutdown()'
-010/10:[----] [--] 'iotests: Test commit with a filter on the chain'
-
-
-Max Reitz (10):
-  block: Introduce BdrvChild.parent_quiesce_counter
-  tests: Add job commit by drained_end test
-  block: Add @drained_end_counter
-  block: Make bdrv_parent_drained_[^_]*() static
-  tests: Lock AioContexts in test-block-iothread
-  block: Do not poll in bdrv_do_drained_end()
-  tests: Extend commit by drained_end test
-  block: Loop unsafely in bdrv*drained_end()
-  iotests: Add @has_quit to vm.shutdown()
-  iotests: Test commit with a filter on the chain
-
- include/block/block.h       |  42 +++++++----
- include/block/block_int.h   |  15 +++-
- block.c                     |  52 ++++++++-----
- block/block-backend.c       |   6 +-
- block/io.c                  | 134 +++++++++++++++++++++++---------
- blockjob.c                  |   2 +-
- tests/test-bdrv-drain.c     | 147 ++++++++++++++++++++++++++++++++++++
- tests/test-block-iothread.c |  40 ++++++----
- python/qemu/machine.py      |   5 +-
- tests/qemu-iotests/040      |  40 +++++++++-
- tests/qemu-iotests/040.out  |   4 +-
- tests/qemu-iotests/255      |   2 +-
- 12 files changed, 397 insertions(+), 92 deletions(-)
-
+diff --git a/tests/test-bdrv-drain.c b/tests/test-bdrv-drain.c
+index 12e2ecf517..3503ce3b69 100644
+--- a/tests/test-bdrv-drain.c
++++ b/tests/test-bdrv-drain.c
+@@ -1527,6 +1527,122 @@ static void test_set_aio_context(void)
+     iothread_join(b);
+ }
+=20
++
++typedef struct TestDropBackingBlockJob {
++    BlockJob common;
++    bool should_complete;
++    bool *did_complete;
++} TestDropBackingBlockJob;
++
++static int coroutine_fn test_drop_backing_job_run(Job *job, Error **errp=
+)
++{
++    TestDropBackingBlockJob *s =3D
++        container_of(job, TestDropBackingBlockJob, common.job);
++
++    while (!s->should_complete) {
++        job_sleep_ns(job, 0);
++    }
++
++    return 0;
++}
++
++static void test_drop_backing_job_commit(Job *job)
++{
++    TestDropBackingBlockJob *s =3D
++        container_of(job, TestDropBackingBlockJob, common.job);
++
++    bdrv_set_backing_hd(blk_bs(s->common.blk), NULL, &error_abort);
++
++    *s->did_complete =3D true;
++}
++
++static const BlockJobDriver test_drop_backing_job_driver =3D {
++    .job_driver =3D {
++        .instance_size  =3D sizeof(TestDropBackingBlockJob),
++        .free           =3D block_job_free,
++        .user_resume    =3D block_job_user_resume,
++        .drain          =3D block_job_drain,
++        .run            =3D test_drop_backing_job_run,
++        .commit         =3D test_drop_backing_job_commit,
++    }
++};
++
++/**
++ * Creates a child node with three parent nodes on it, and then runs a
++ * block job on the final one, parent-node-2.
++ *
++ * (TODO: parent-node-0 currently serves no purpose, but will as of a
++ * follow-up patch.)
++ *
++ * The job is then asked to complete before a section where the child
++ * is drained.
++ *
++ * Ending this section will undrain the child's parents, first
++ * parent-node-2, then parent-node-1, then parent-node-0 -- the parent
++ * list is in reverse order of how they were added.  Ending the drain
++ * on parent-node-2 will resume the job, thus completing it and
++ * scheduling job_exit().
++ *
++ * Ending the drain on parent-node-1 will poll the AioContext, which
++ * lets job_exit() and thus test_drop_backing_job_commit() run.  That
++ * function removes the child as parent-node-2's backing file.
++ *
++ * In old (and buggy) implementations, there are two problems with
++ * that:
++ * (A) bdrv_drain_invoke() polls for every node that leaves the
++ *     drained section.  This means that job_exit() is scheduled
++ *     before the child has left the drained section.  Its
++ *     quiesce_counter is therefore still 1 when it is removed from
++ *     parent-node-2.
++ *
++ * (B) bdrv_replace_child_noperm() calls drained_end() on the old
++ *     child's parents as many times as the child is quiesced.  This
++ *     means it will call drained_end() on parent-node-2 once.
++ *     Because parent-node-2 is no longer quiesced at this point, this
++ *     will fail.
++ *
++ * bdrv_replace_child_noperm() therefore must call drained_end() on
++ * the parent only if it really is still drained because the child is
++ * drained.
++ */
++static void test_blockjob_commit_by_drained_end(void)
++{
++    BlockDriverState *bs_child, *bs_parents[3];
++    TestDropBackingBlockJob *job;
++    bool job_has_completed =3D false;
++    int i;
++
++    bs_child =3D bdrv_new_open_driver(&bdrv_test, "child-node", BDRV_O_R=
+DWR,
++                                    &error_abort);
++
++    for (i =3D 0; i < 3; i++) {
++        char name[32];
++        snprintf(name, sizeof(name), "parent-node-%i", i);
++        bs_parents[i] =3D bdrv_new_open_driver(&bdrv_test, name, BDRV_O_=
+RDWR,
++                                             &error_abort);
++        bdrv_set_backing_hd(bs_parents[i], bs_child, &error_abort);
++    }
++
++    job =3D block_job_create("job", &test_drop_backing_job_driver, NULL,
++                           bs_parents[2], 0, BLK_PERM_ALL, 0, 0, NULL, N=
+ULL,
++                           &error_abort);
++
++    job->did_complete =3D &job_has_completed;
++
++    job_start(&job->common.job);
++
++    job->should_complete =3D true;
++    bdrv_drained_begin(bs_child);
++    g_assert(!job_has_completed);
++    bdrv_drained_end(bs_child);
++    g_assert(job_has_completed);
++
++    bdrv_unref(bs_parents[0]);
++    bdrv_unref(bs_parents[1]);
++    bdrv_unref(bs_parents[2]);
++    bdrv_unref(bs_child);
++}
++
+ int main(int argc, char **argv)
+ {
+     int ret;
+@@ -1610,6 +1726,9 @@ int main(int argc, char **argv)
+=20
+     g_test_add_func("/bdrv-drain/set_aio_context", test_set_aio_context)=
+;
+=20
++    g_test_add_func("/bdrv-drain/blockjob/commit_by_drained_end",
++                    test_blockjob_commit_by_drained_end);
++
+     ret =3D g_test_run();
+     qemu_event_destroy(&done_event);
+     return ret;
 --=20
 2.21.0
 
