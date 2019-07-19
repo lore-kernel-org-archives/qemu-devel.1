@@ -2,90 +2,82 @@ Return-Path: <SRS0=mHy3=VQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8305DC7618F
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 16:10:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E406C7618F
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 16:15:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5B60B2184E
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 16:10:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B60B2184E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 08FBE2184E
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 16:15:43 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BWi6fyS3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08FBE2184E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46888 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46922 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hoVSV-0007qL-H4
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 12:10:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39255)
+	id 1hoVXr-0004E7-64
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 12:15:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40484)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <eblake@redhat.com>) id 1hoVSK-0007J4-Lg
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 12:10:01 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hoVXg-0003pP-HW
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 12:15:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1hoVSF-00015U-7t
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 12:09:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60274)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1hoVRp-00050L-Sc; Fri, 19 Jul 2019 12:09:32 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 242213012FF1;
- Fri, 19 Jul 2019 16:03:36 +0000 (UTC)
-Received: from [10.3.116.46] (ovpn-116-46.phx2.redhat.com [10.3.116.46])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7A24217F88;
- Fri, 19 Jul 2019 16:03:31 +0000 (UTC)
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20190719150313.29198-1-eblake@redhat.com>
- <fd58019b-7317-4d0c-8632-75e30979eedb@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
- xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
- xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
- TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
- GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
- sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
- AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
- CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
- RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
- wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
- Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
- gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
- pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
- zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
- pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
- 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
- NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
- cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
- SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
- I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
- mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
- Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
- 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <2776b453-6c36-2196-b97e-261c2e04fe58@redhat.com>
-Date: Fri, 19 Jul 2019 11:03:29 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ (envelope-from <peter.maydell@linaro.org>) id 1hoVXd-0003xT-1g
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 12:15:31 -0400
+Received: from mail-oi1-x231.google.com ([2607:f8b0:4864:20::231]:41404)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hoVXb-0003uC-79
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 12:15:28 -0400
+Received: by mail-oi1-x231.google.com with SMTP id g7so24663581oia.8
+ for <qemu-devel@nongnu.org>; Fri, 19 Jul 2019 09:15:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=1UeMxkq7t8QRKwKpCfqvz9Kzp5g1GEHGFFjvidCOKXQ=;
+ b=BWi6fyS3fXkmRZ5zJT/oCT3tMmG6NjeVeIhUs08MnUhnKQSDE+FcIHFBz4RWZBHwsv
+ 2WyqoPdak2ub3qmWWIUYjaxFbo0F23EPwbsEPY1oK2lq36UGLxTjpfTOwyfaR8pOQhJL
+ O1kgquggc4BPGHmEO1pty9grVT46i0H76I4fJYGVY3UzkZXsrtD47qNfECN+Ueqa62jM
+ 1IUJtsKLLaC9/nZxk5lLPuhOZ4H51dWBc8zAi8B2G1j6VeOdLiEMR/Ad4ld/K6x+hwOl
+ SahntkDLem29Qn/EvddKHfcfOXvYflAdZnG+UZUoOaeyEODUjuq6WDjRwz6M3XszLNZ9
+ nKyg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=1UeMxkq7t8QRKwKpCfqvz9Kzp5g1GEHGFFjvidCOKXQ=;
+ b=F2U7bQ8/hJB0sbIoBL28UF93yEgYpx/dM2QzhsqL8lPIQ58JM5LY90RK3Fz+5ADVXl
+ /mOINrbDMI3VUfwYlfbsaERxPqPiCJsrwVi9CSzKn5C6HntDHWGrotWERjS0a9H8VwrX
+ Kw+ay9jbmLY1h1PmMt/NQQ1G+Zw5VEgn7o+Zn+6+5OxMFFAsOZ5m38rVwTAna+Da12MI
+ DkZr3JH+qXSOq+BBzp0zijVjIQ+oDDcM6pykKEMNpnUs4L+WRi7iofT74bFfQ7bl2LTC
+ 1Y2tnQKFMRKrmSUExUouKg4kB7rA9vJEM3QcoFx5Qcy0/6y+5+kj/cSKgwl/8BWKohjX
+ v9mw==
+X-Gm-Message-State: APjAAAVqMt6GmAuBUkXGLEsPNAsqelaFPd+W6X2BDegDIaG1XOK4Psed
+ WCC2CslkAiaCXIoMU8txWNlFowQn/fYBoWBmvOHDmQ==
+X-Google-Smtp-Source: APXvYqw/qhB4Pk1RBXFg7o+ZtCqOx0bB9pzYifsGVtCTYyvXK+14GkAOVjxAQxefqLZcLJWDmJbvPwB7H78d3K/+Cz8=
+X-Received: by 2002:a05:6808:8c2:: with SMTP id
+ k2mr26106671oij.98.1563552919444; 
+ Fri, 19 Jul 2019 09:15:19 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <fd58019b-7317-4d0c-8632-75e30979eedb@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="IM8ERsOynv7p6rnB3kQTtz0br9JhLwfwm"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.43]); Fri, 19 Jul 2019 16:03:36 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] nbd: Initialize reply on failure
+References: <1563264677-39718-1-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <1563264677-39718-1-git-send-email-pbonzini@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 19 Jul 2019 17:15:08 +0100
+Message-ID: <CAFEAcA-Q6siS3gTRdq7+f0vx-Vd7-DmX1rW6+cS1yR7OqLHYyw@mail.gmail.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::231
+Subject: Re: [Qemu-devel] [PULL 00/19] Bugfix/cleanup patches for 2019-07-16
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,95 +89,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
- Thomas Huth <thuth@redhat.com>,
- "open list:Network Block Dev..." <qemu-block@nongnu.org>,
- Max Reitz <mreitz@redhat.com>
+Cc: Julio Montes <julio.montes@intel.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---IM8ERsOynv7p6rnB3kQTtz0br9JhLwfwm
-Content-Type: multipart/mixed; boundary="KCQ18bUt7IfuMbYk7GUBdn4ABn7LpQnYv";
- protected-headers="v1"
-From: Eric Blake <eblake@redhat.com>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
- Thomas Huth <thuth@redhat.com>,
- "open list:Network Block Dev..." <qemu-block@nongnu.org>,
- Max Reitz <mreitz@redhat.com>
-Message-ID: <2776b453-6c36-2196-b97e-261c2e04fe58@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] nbd: Initialize reply on failure
-References: <20190719150313.29198-1-eblake@redhat.com>
- <fd58019b-7317-4d0c-8632-75e30979eedb@redhat.com>
-In-Reply-To: <fd58019b-7317-4d0c-8632-75e30979eedb@redhat.com>
+On Tue, 16 Jul 2019 at 09:11, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> The following changes since commit 46cd24e7ed38191b5ab5c40a836d6c5b6b604f=
+8a:
+>
+>   Merge remote-tracking branch 'remotes/mst/tags/for_upstream' into stagi=
+ng (2019-07-12 17:34:13 +0100)
+>
+> are available in the git repository at:
+>
+>
+>   git://github.com/bonzini/qemu.git tags/for-upstream
+>
+> for you to fetch changes up to 45d8bc3adedeceaf449d758aee1810bfbe6feff4:
+>
+>   vl: make sure char-pty message displayed by moving setbuf to the beginn=
+ing (2019-07-16 09:27:16 +0200)
+>
+> ----------------------------------------------------------------
+> * VFIO bugfix for AMD SEV (Alex)
+> * Kconfig improvements (Julio, Philippe)
+> * MemoryRegion reference counting bugfix (King Wang)
+> * Build system cleanups (Marc-Andr=C3=A9, myself)
+> * rdmacm-mux off-by-one (Marc-Andr=C3=A9)
+> * ZBC passthrough fixes (Shinichiro, myself)
+> * WHPX build fix (Stefan)
+> * char-pty fix (Wei Yang)
 
---KCQ18bUt7IfuMbYk7GUBdn4ABn7LpQnYv
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Hi Paolo -- it looks like this may have broken the
+travis config "--without-default-devices":
 
-On 7/19/19 10:53 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+Here's a sample failing build:
+https://travis-ci.org/qemu/qemu/jobs/559509325
 
->>      if (ret < 0) {
->> +        memset(reply, 0, sizeof *reply);
->=20
-> I never had problem with sizeof without parenthesis, but here I find it=
+minikconf barfs with "contradiction between clauses"
 
-> not easy to review.
-
-Holdover from my work on GNU coding style projects: the rationale is
-that you can tell 'sizeof(type)' apart from 'sizeof expr' if you always
-omit the () in the latter case, which further makes it possible to tell
-at a glance when you are using the expr form (preferred, because the
-type of the expression can change and the sizeof is still correct) or a
-type name (harder to audit, since changing a variable's type means you
-also have to change any associated sizeof in later code using that
-variable).  But I will readily admit qemu is not GNU style:
-
-$ git grep 'sizeof ' | wc
-    394    2500   29756
-$ git grep 'sizeof(' | wc
-   8899   46172  671537
-
-so I've fixed it to use ().
-
->=20
-> Anyhow, this definitively looks like 4.1 material.
->=20
-> Preferently with sizeof(), but I don't mind, so:
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-
-Thanks.  Queued on my NBD tree for -rc2.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+Traceback (most recent call last):
+  File "/home/travis/build/qemu/qemu/scripts/minikconf.py", line 703,
+in <module>
+    config =3D data.compute_config()
+  File "/home/travis/build/qemu/qemu/scripts/minikconf.py", line 253,
+in compute_config
+    clause.process()
+  File "/home/travis/build/qemu/qemu/scripts/minikconf.py", line 188, in pr=
+ocess
+    self.dest.set_value(False, self)
+  File "/home/travis/build/qemu/qemu/scripts/minikconf.py", line 118,
+in set_value
+    raise KconfigDataError('contradiction between clauses when setting
+%s' % self)
+__main__.KconfigDataError: contradiction between clauses when setting VMMOU=
+SE
 
 
---KCQ18bUt7IfuMbYk7GUBdn4ABn7LpQnYv--
+I guess this is Julio's commit 97fd1ea8c10658?
 
---IM8ERsOynv7p6rnB3kQTtz0br9JhLwfwm
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl0x6dIACgkQp6FrSiUn
-Q2oLlggAgzoT6BFE61oXH3wMI/W7D18YbxG4B9k4DM53tQeZ2EKrSsGKw1PMvEBd
-5mKE45DD85rR152hdkLr+jQSdS6+SwUllnevqCHxc0SD32Ns8lMF2/XEEtGKVx26
-+m+8J1aQXKm03+nh1hCKf0BKQl1WFACQ5lYG7lWQUQ5R73SewMaXfjjpPDCzc3m3
-y0iFLGJ0PsZ7qw4SDDlukJQb1VLyCy+TEZoZ8A0rLagJuKhemKUIDDQXapgfacw5
-f6X8hskAo3haIQXdDGezKKWn1fcrz4BgZ9zkdVbOu7pGIZidRRzvFY45OKFc9cnr
-CNF6JyTlC/iHsIf+CvnJQgBrZKyE0g==
-=FKbK
------END PGP SIGNATURE-----
-
---IM8ERsOynv7p6rnB3kQTtz0br9JhLwfwm--
+thanks
+-- PMM
 
