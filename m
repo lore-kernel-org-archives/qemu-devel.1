@@ -2,89 +2,87 @@ Return-Path: <SRS0=mHy3=VQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1489C76195
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 09:51:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AEC9BC76188
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 09:53:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BD78921849
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 09:51:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD78921849
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7CCA820659
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 09:53:18 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h0+cBAw7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7CCA820659
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43620 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43626 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hoPYT-0005tQ-45
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 05:51:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44305)
+	id 1hoPZl-0006mA-Pq
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 05:53:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44657)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hoPYI-0005Q2-9h
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 05:51:47 -0400
+ (envelope-from <stefanha@gmail.com>) id 1hoPZb-0006NL-Rl
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 05:53:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hoPYH-0002tp-5g
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 05:51:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52302)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hoPYE-0002sO-TG; Fri, 19 Jul 2019 05:51:43 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E693530C1E28;
- Fri, 19 Jul 2019 09:51:41 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.40.205.128])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A557B610CA;
- Fri, 19 Jul 2019 09:51:37 +0000 (UTC)
-To: Maxim Levitsky <mlevitsk@redhat.com>, qemu-devel@nongnu.org
-References: <20190716163020.13383-1-mlevitsk@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <e410dc4e-0d43-dc89-4935-fba9ce164cdf@redhat.com>
-Date: Fri, 19 Jul 2019 11:51:33 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+ (envelope-from <stefanha@gmail.com>) id 1hoPZa-00047s-Vh
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 05:53:07 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:33944)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1hoPZa-00047L-PD
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 05:53:06 -0400
+Received: by mail-wr1-x444.google.com with SMTP id 31so31674003wrm.1
+ for <qemu-devel@nongnu.org>; Fri, 19 Jul 2019 02:53:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to:user-agent;
+ bh=8+KPqrdd5y+hZ8cy2ZQCNMKykvgbnoxqopZ4QThecp8=;
+ b=h0+cBAw76TWVIqk3geVeafL3DpnqZZXufetfCo6amc5N17ybf1sAUTjfagnaYnyNMY
+ D5FO9fJ6IoxDTVdh9y+F972FpaPO5aDR9YtBpnlhRlacjxYtFoq/BvD0yc9Uc7CDrmBB
+ lpID42uyxnxT0RX0mMV2ztwlhUkGd4l/a8QZG+FGrj9qcTJ+pi3BwN7M0gM3r9J/7XNG
+ kV6zUY5ASwFhJ7+bzdUMbUDhm2cWYOW3rsykbDe2fjgi2uffFo8CNGfrRrKxGy6kFzoP
+ 6m5x15T+OVRkx4oM1KBFd/w3piE4kSF8nykR/8HOHHaUW869Tzl+Pk79nF3bdXgGMB8c
+ EaPQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to:user-agent;
+ bh=8+KPqrdd5y+hZ8cy2ZQCNMKykvgbnoxqopZ4QThecp8=;
+ b=rkF2o5GXVxaU4aAQ9VvTkaMke0iuo8zGp2sjlLd9NImr7gwQwzjKt3L7VS1nY46V0m
+ rRveqroPQEg1oMZXv0O7zERW8Ke9AP5bKSKNW6ZQyVS9UZcJVOlw1DqdNaLgOT6EFbL1
+ LeDDNdt2UUOwNPsnhpLWA9h6SJul1gQFFmdtq+HQi+olr9gu2yvV1VRtzfWLhCk4v64k
+ 9a96rTTqfEWvS3QWigh0e0fb9nNbrVbdri63eIJ5gVEMyVYCFgLz3stMzEYJGyWKSQJG
+ ZX1eCcROJJbp0kg4pFJu6DA6K3mWbPVDVfJrjeQBztI93MIUupdjfts1GPZTI87CkvCZ
+ hzEA==
+X-Gm-Message-State: APjAAAU3BVx78tXrBA8te5hasQcroEqRBOpIYQ3TePKHvcIkDp9q9zOP
+ CcbQ9Jm1lFLS9ra6T13AoZtl2NHewyraUg==
+X-Google-Smtp-Source: APXvYqyJyGmM6cmYUwnJzv7sqmOM4lIdEtUUw1th9d3ShqckJ4wvPILjgAKxAm2OXzkGZtip5JcOSQ==
+X-Received: by 2002:a5d:6ccd:: with SMTP id c13mr51472721wrc.4.1563529985679; 
+ Fri, 19 Jul 2019 02:53:05 -0700 (PDT)
+Received: from localhost ([51.15.41.238])
+ by smtp.gmail.com with ESMTPSA id m7sm24910841wrx.65.2019.07.19.02.53.04
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Fri, 19 Jul 2019 02:53:04 -0700 (PDT)
+Date: Fri, 19 Jul 2019 10:53:03 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <20190719095303.GE18585@stefanha-x1.localdomain>
+References: <20190717094728.31006-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190716163020.13383-1-mlevitsk@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="RWtJh3mxzpgDJMvhqDD3QzS9mIwlr7DVu"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Fri, 19 Jul 2019 09:51:42 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v4 0/3] Few bugfixes for userspace nvme
- driver
+ protocol="application/pgp-signature"; boundary="0QFb0wBpEddLcDHQ"
+Content-Disposition: inline
+In-Reply-To: <20190717094728.31006-1-pbonzini@redhat.com>
+User-Agent: Mutt/1.12.0 (2019-05-25)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::444
+Subject: Re: [Qemu-devel] [PATCH] virtio-scsi: remove unused argument to
+ virtio_scsi_common_realize
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,73 +94,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- John Snow <jsnow@redhat.com>, qemu-block@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---RWtJh3mxzpgDJMvhqDD3QzS9mIwlr7DVu
-Content-Type: multipart/mixed; boundary="ylMvsyUJWiiQJjl1IPiRW05d4NN0oGLr3";
- protected-headers="v1"
-From: Max Reitz <mreitz@redhat.com>
-To: Maxim Levitsky <mlevitsk@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Fam Zheng <fam@euphon.net>,
- Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- John Snow <jsnow@redhat.com>
-Message-ID: <e410dc4e-0d43-dc89-4935-fba9ce164cdf@redhat.com>
-Subject: Re: [PATCH v4 0/3] Few bugfixes for userspace nvme driver
-References: <20190716163020.13383-1-mlevitsk@redhat.com>
-In-Reply-To: <20190716163020.13383-1-mlevitsk@redhat.com>
 
---ylMvsyUJWiiQJjl1IPiRW05d4NN0oGLr3
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+--0QFb0wBpEddLcDHQ
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On 16.07.19 18:30, Maxim Levitsky wrote:
-> This is reduced version of patch series for userspace nvme driver,
-> that only includes the bugfixes I made.
+On Wed, Jul 17, 2019 at 11:47:28AM +0200, Paolo Bonzini wrote:
+> The argument is not used and passing it clutters error propagation in the
+> callers.  So, get rid of it.
 >=20
-> Best regards,
-> 	Maxim Levitsky
->=20
-> Maxim Levitsky (3):
->   block/nvme: fix doorbell stride
->   block/nvme: support larger that 512 bytes sector devices
->   block/nvme: don't touch the completion entries
->=20
->  block/nvme.c | 52 ++++++++++++++++++++++++++++++++++++++++++----------=
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  hw/scsi/vhost-scsi.c            | 2 +-
+>  hw/scsi/vhost-user-scsi.c       | 2 +-
+>  hw/scsi/virtio-scsi.c           | 4 ++--
+>  include/hw/virtio/virtio-scsi.h | 2 +-
+>  4 files changed, 5 insertions(+), 5 deletions(-)
 
->  1 file changed, 42 insertions(+), 10 deletions(-)
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-Thanks, applied to my block branch:
-
-https://git.xanclic.moe/XanClic/qemu/commits/branch/block
-
-Max
-
-
---ylMvsyUJWiiQJjl1IPiRW05d4NN0oGLr3--
-
---RWtJh3mxzpgDJMvhqDD3QzS9mIwlr7DVu
+--0QFb0wBpEddLcDHQ
 Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0xkqUACgkQ9AfbAGHV
-z0CURwf/cOtmoHOs1amCVtVKJJwBaArml94/SBgIdxxSrnfhwywcBbZ6yw2p0apM
-k9ouPxDvJfqytoHtUj+MKULNG+OCUsF4nJpxY3zI/rJpyyysRKLj0N9ZkiHMSgo7
-HCIE60LSLGcFql7s9g6jPAHIPz7nY8kbo/+L0Fx6JwkP60/eKo7AUBn7YiX+aeSC
-eWhA+CFO3UL8LOgB/EgbDmYgmaVXvtGzzSSEFPGKkLui9mRadZia5TJJ7odj/TyN
-x8M9Aa81hgxgcCyu+OnKzQY/uEYj49KOWIXoDjtkam4ufSB5q66k9h6pS8ZuYdti
-U6PMRkfuynHl9RsWquGGkKkKCUH79A==
-=HJJ1
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl0xkv8ACgkQnKSrs4Gr
+c8g2OggAtNBFYt+EK5fSvBt4sGhQyZVfiLzAtT6HxoI3hkB4yX2CY6GIiRvTyqod
+bURtmAzIH1QRS29b/3hMTNU7Q593iPeHEfkKx0HoQJM+EJ+lTYvgO3FJaccTdsGO
+rFOYu3kPec9Yj7CND5xZZ1qVykPqZoN3ymAcSOxfEfXVpfWw8gfm/4akIrvmkyCT
+6CFgXvK94oI/5QUOWkAidKlWgoEe+EViqcDTegord8ocauprK9aI+VF5cbHb+7w9
+1GblX72jD9RVgRJi+QGQ2aLDQ/YvDRmIXItzXfvkT4iqhBth5Ps3YrCEu3k4pxL6
+FSSdksee0Eu+rpCxcWx7AzjEWm3VzQ==
+=Fy24
 -----END PGP SIGNATURE-----
 
---RWtJh3mxzpgDJMvhqDD3QzS9mIwlr7DVu--
+--0QFb0wBpEddLcDHQ--
 
