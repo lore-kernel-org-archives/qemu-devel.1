@@ -8,71 +8,70 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E219FC76188
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 13:38:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EFCFC76188
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 13:38:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B3EEE2173B
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 13:38:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6CC4B2173B
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 13:38:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tS4v0DwI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3EEE2173B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="r/QYJuDj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6CC4B2173B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45516 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45528 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hoT5k-0004uP-NJ
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 09:38:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38321)
+	id 1hoT5z-0006DM-PC
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 09:38:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38107)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mehta.aaru20@gmail.com>) id 1hoT4u-00017u-Al
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 09:37:41 -0400
+ (envelope-from <mehta.aaru20@gmail.com>) id 1hoT4Q-0007CY-6r
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 09:37:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mehta.aaru20@gmail.com>) id 1hoT4t-0008SS-7D
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 09:37:40 -0400
-Received: from mail-pf1-x430.google.com ([2607:f8b0:4864:20::430]:40282)
+ (envelope-from <mehta.aaru20@gmail.com>) id 1hoT4P-00089J-9b
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 09:37:10 -0400
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:37383)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <mehta.aaru20@gmail.com>)
- id 1hoT4t-0008SC-1c; Fri, 19 Jul 2019 09:37:39 -0400
-Received: by mail-pf1-x430.google.com with SMTP id p184so14199538pfp.7;
- Fri, 19 Jul 2019 06:37:38 -0700 (PDT)
+ id 1hoT4P-00088u-3f; Fri, 19 Jul 2019 09:37:09 -0400
+Received: by mail-pg1-x543.google.com with SMTP id i70so3746666pgd.4;
+ Fri, 19 Jul 2019 06:37:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=KoETR8gbApZFB6Kf1iN1u5XLfMfWWkdp70lAnElXhFE=;
- b=tS4v0DwIrfckzCnKQhKODmlgbm9yI+OnX4k0xAkb9F37S1WciI8RjE54iLsFanH9yz
- v1aeGP8ND5yZ6G52EEEEmiVbyLNlaXfqEJmcyGJQmxoMyBKIGxd6FX1hqk4rjKeGz7WM
- RJx2bgYZs2WV0GbExGJXSj0TEw5A9sr9C8yIrUbeIYKxz8DUvSbVigRX8Mm9DIN9G6ie
- +W78S0wAYZxOmGDYXZSVoJhVMG/YrZwOFaZQh6dWBOMiMRu7VWvT6FZcWDbW+CIsxkH8
- 7mHehJZxosiQtvkDvhT1Zfn4lPItX4ic0cHaK/wy2j4owi1A+3IuYs3Ud1RfNtj6WR99
- CLOA==
+ bh=K0d0PCOxvKT348YcfiEgoxDIJrmae1+DAY9ThSTRtEQ=;
+ b=r/QYJuDj0YIXBPsXgJuy9Aw3F1BUydqk4wwADtMiGNE6TLNLV4bR8NHkY53ngd2lzy
+ vpe+F0EEvnXPlkKGs3kS4d/TUtWD7iX+29/kPzwvVc81MGjeFjgXdh8s8jvx0MWUpPxP
+ uo1z+Amb8KNpFgRQ8WtQbb54M5zoW9xkeCOlFCgRkW9L2Eph0YT6MivRfxabuYrLhW0R
+ TQXYg47XPgmPmfkyUGegglb44Y1teUmRS1gnv4ukHoRSVwUypWIxad4xTLKG8vyo/bQV
+ +/tl3pL17tlRKsZIT0Yc2ORFlSa6Cfq0m42N4T19MWkwXMEfWmjylNdZecjfb94rjkaW
+ q7HA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=KoETR8gbApZFB6Kf1iN1u5XLfMfWWkdp70lAnElXhFE=;
- b=uAg6lKPYiEwAAxL2OKuZE4YJ/BdLgyT+qWdB3V6eUBRXUlwzJA4DRylNMW4R8s8G3C
- 4hm6+Ic166LKcfq7l7+3h89oe4Uw25egleYHxyN0inA/QHk4NF7s0rALQKBvJOiR+UoB
- L2KmOZUByqaDyxslP6O/7NeJDuwdYCY8qGrYsSMX42Iy3gaLsBUcgvhhcpE7kpUyc2wm
- nEslIzKgU6rt3EGrwKd0D0Lo8u03FoQiwpvqERhjl/k2cUsuivKAJ3tZhS/Ssks0D79w
- KF9V0FyE4bpFJ9zQ2WuYzZ1mL+AJT3nY7lGFgLkj1WE2l9t2oTnSuZtqwLHziMIFcIn6
- q79g==
-X-Gm-Message-State: APjAAAXT245hkMg/RFO4KpEJ6NNLnxBIIG+MxeIgnDRSGbo6NsSSnMl+
- zCobag5sW5AFrROoEw/7zbjeesWYioA=
-X-Google-Smtp-Source: APXvYqw5yPGWPRUDnVgNShffPjJypAR5ePskvPixEBVLEKOW8OWXZUwj1glJPxqHYLaaAGgKvXPddw==
-X-Received: by 2002:a17:90b:28f:: with SMTP id
- az15mr57151975pjb.18.1563543457774; 
- Fri, 19 Jul 2019 06:37:37 -0700 (PDT)
+ bh=K0d0PCOxvKT348YcfiEgoxDIJrmae1+DAY9ThSTRtEQ=;
+ b=I4hhh8C7tSIm7T9bHfi1/swozx9HbBbWv8NjiDfZgBU8ZjV3TsoR+r3/U8HLfpVgsy
+ VFYwkpYI9KqeuaJtitf2VHxvtGfTyPiFCkbPusbZSRqw/E2bTWgRWZUiutQpDHi3sWz4
+ rplofubDW2KxF7e/2/3JIa/UaW53SOTkum9KIdX5V4voXNadHpaRDuId0DC2a/icXldq
+ PjK5ePKp56jUVgNfVj9cIWBYybXV8sX1UjbTC3mMVCtcCKfF6GSLwmPPeofI2v0j9RTH
+ 4p0qaE9yUGUwvJYdJ+uItlSmdFkXOAb67HZ3h89DxGIT4gR8abtiLy/vPpUFYqHe9wz7
+ v2mw==
+X-Gm-Message-State: APjAAAWHghuZK9SMzDiplTJSoBkzCVScm5fLqV/9OMgpRAYjQ2S4E11S
+ TJ6EBN1jjnUDYQY5uDqbKjpeIu9go1A=
+X-Google-Smtp-Source: APXvYqzpV8fgokXY1y1thuPBE+F1iSLIIxgoSWFVE5AwUyW1pJTSqG+tOOyZZuiBJV/Bxt9IRc5igw==
+X-Received: by 2002:a17:90a:1c1:: with SMTP id 1mr58096780pjd.72.1563543427845; 
+ Fri, 19 Jul 2019 06:37:07 -0700 (PDT)
 Received: from localhost.localdomain ([2402:3a80:433:31a4:f2fb:dab8:3a89:c056])
- by smtp.gmail.com with ESMTPSA id 11sm31895369pfw.33.2019.07.19.06.37.31
+ by smtp.gmail.com with ESMTPSA id 11sm31895369pfw.33.2019.07.19.06.37.01
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Fri, 19 Jul 2019 06:37:37 -0700 (PDT)
+ Fri, 19 Jul 2019 06:37:07 -0700 (PDT)
 From: Aarushi Mehta <mehta.aaru20@gmail.com>
 To: qemu-devel@nongnu.org
-Date: Fri, 19 Jul 2019 19:05:30 +0530
-Message-Id: <20190719133530.28688-15-mehta.aaru20@gmail.com>
+Date: Fri, 19 Jul 2019 19:05:26 +0530
+Message-Id: <20190719133530.28688-11-mehta.aaru20@gmail.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190719133530.28688-1-mehta.aaru20@gmail.com>
 References: <20190719133530.28688-1-mehta.aaru20@gmail.com>
@@ -80,9 +79,9 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::430
-Subject: [Qemu-devel] [PATCH v6 14/14] qemu-iotest: enable testing with
- qemu-io aio options
+X-Received-From: 2607:f8b0:4864:20::543
+Subject: [Qemu-devel] [PATCH v6 10/14] block/io_uring: adds userspace
+ completion polling
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,94 +106,44 @@ Sender: "Qemu-devel"
 
 Signed-off-by: Aarushi Mehta <mehta.aaru20@gmail.com>
 ---
- tests/qemu-iotests/check     | 14 +++++++++++++-
- tests/qemu-iotests/common.rc | 10 ++++++++++
- 2 files changed, 23 insertions(+), 1 deletion(-)
+ block/io_uring.c | 17 ++++++++++++++++-
+ 1 file changed, 16 insertions(+), 1 deletion(-)
 
-diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
-index f925606cc5..2bc5bc62e2 100755
---- a/tests/qemu-iotests/check
-+++ b/tests/qemu-iotests/check
-@@ -132,6 +132,7 @@ sortme=false
- expunge=true
- have_test_arg=false
- cachemode=false
-+aiomode=false
- 
- tmp="${TEST_DIR}"/$$
- rm -f $tmp.list $tmp.tmp $tmp.sed
-@@ -141,6 +142,7 @@ export IMGFMT_GENERIC=true
- export IMGPROTO=file
- export IMGOPTS=""
- export CACHEMODE="writeback"
-+export AIOMODE="threads"
- export QEMU_IO_OPTIONS=""
- export QEMU_IO_OPTIONS_NO_FMT=""
- export CACHEMODE_IS_DEFAULT=true
-@@ -225,6 +227,10 @@ s/ .*//p
-         CACHEMODE_IS_DEFAULT=false
-         cachemode=false
-         continue
-+    elif $aiomode
-+    then
-+        AIOMODE="$r"
-+        aiomode=false
-     fi
- 
-     xpand=true
-@@ -269,6 +275,7 @@ other options
-     -n                  show me, do not run tests
-     -o options          -o options to pass to qemu-img create/convert
-     -c mode             cache mode
-+    -i mode             AIO mode
-     -makecheck          pretty print output for make check
- 
- testlist options
-@@ -433,10 +440,13 @@ testlist options
-             cachemode=true
-             xpand=false
-             ;;
-+        -i)
-+            aiomode=true
-+            xpand=false
-+            ;;
-         -T)        # deprecated timestamp option
-             xpand=false
-             ;;
--
-         -v)
-             verbose=true
-             xpand=false
-@@ -515,6 +525,8 @@ done
- 
- # Set qemu-io cache mode with $CACHEMODE we have
- QEMU_IO_OPTIONS="$QEMU_IO_OPTIONS --cache $CACHEMODE"
-+# Set qemu-io aio mode with $AIOMODE we have
-+QEMU_IO_OPTIONS="$QEMU_IO_OPTIONS --aio $AIOMODE"
- 
- QEMU_IO_OPTIONS_NO_FMT="$QEMU_IO_OPTIONS"
- if [ "$IMGOPTSSYNTAX" != "true" ]; then
-diff --git a/tests/qemu-iotests/common.rc b/tests/qemu-iotests/common.rc
-index 5502c3da2f..39c04cc169 100644
---- a/tests/qemu-iotests/common.rc
-+++ b/tests/qemu-iotests/common.rc
-@@ -482,6 +482,16 @@ _supported_cache_modes()
-     _notrun "not suitable for cache mode: $CACHEMODE"
+diff --git a/block/io_uring.c b/block/io_uring.c
+index e9c1dc1dc7..de2a037151 100644
+--- a/block/io_uring.c
++++ b/block/io_uring.c
+@@ -237,6 +237,21 @@ static void qemu_luring_completion_cb(void *opaque)
+     luring_process_completions_and_submit(s);
  }
  
-+_supported_aio_modes()
++static bool qemu_luring_poll_cb(void *opaque)
 +{
-+    for mode; do
-+        if [ "$mode" = "$AIOMODE" ]; then
-+            return
-+        fi
-+    done
-+    _notrun "not suitable for aio mode: $AIOMODE"
++    LuringState *s = opaque;
++    struct io_uring_cqe *cqes;
++
++    if (io_uring_peek_cqe(&s->ring, &cqes) == 0) {
++        if (cqes) {
++            luring_process_completions_and_submit(s);
++            return true;
++        }
++    }
++
++    return false;
 +}
 +
- _default_cache_mode()
+ static void ioq_init(LuringQueue *io_q)
  {
-     if $CACHEMODE_IS_DEFAULT; then
+     QSIMPLEQ_INIT(&io_q->sq_overflow);
+@@ -394,7 +409,7 @@ void luring_attach_aio_context(LuringState *s, AioContext *new_context)
+     s->aio_context = new_context;
+     s->completion_bh = aio_bh_new(new_context, qemu_luring_completion_bh, s);
+     aio_set_fd_handler(s->aio_context, s->ring.ring_fd, false,
+-                       qemu_luring_completion_cb, NULL, NULL, s);
++                       qemu_luring_completion_cb, NULL, qemu_luring_poll_cb, s);
+ }
+ 
+ LuringState *luring_init(Error **errp)
 -- 
 2.21.0
 
