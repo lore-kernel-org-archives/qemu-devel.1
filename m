@@ -2,80 +2,59 @@ Return-Path: <SRS0=mHy3=VQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36E62C76188
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 12:23:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E48DEC76196
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 12:37:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F1D8520873
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 12:23:00 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KgAdRnuF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1D8520873
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id BFD3720873
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 12:37:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BFD3720873
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44732 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44796 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hoRue-00031E-5J
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 08:23:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49096)
+	id 1hoS8O-0007WI-V8
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 08:37:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51447)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hoRuT-0002ae-9G
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 08:22:50 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1hoS8D-00077S-3S
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 08:37:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hoRuS-0003EA-Ap
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 08:22:49 -0400
-Received: from mail-oi1-x235.google.com ([2607:f8b0:4864:20::235]:42794)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hoRuS-0003Dj-4h
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 08:22:48 -0400
-Received: by mail-oi1-x235.google.com with SMTP id s184so24105509oie.9
- for <qemu-devel@nongnu.org>; Fri, 19 Jul 2019 05:22:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=p7M5q5F7MxIa/r2jjKkheseBpte21hWoZc4a2t8a9EA=;
- b=KgAdRnuFIUicQCHi7on4sFCrKLGCHsMEHu9a3Uwp5uvL3XV/QRnacSPo6R96wnNyCt
- EeEc0Osl0PKuzJGc8+/NOYUmUJHTbQAjrBBIGPMeDAUnMhGDmutMXafyfKSeMzYs5yJr
- dDbaANxUT31/9OiTLpBkB4QzS3DfPkRjyyILp6kCKG+yeX2r1yQaogcq3tt51nVLs8vz
- dTCgPUC1ILzrDerljX2CiiO9EpYNRNeptZrnJcqwekMK9sFL0T6ed8jXYVYlyCy1onsM
- woto+lMEnEk62Jg/bW/9usCjcen7ctqa1TKOZQ9J+Wjy91r9Ii4GVTey0wrQy5gyG9Es
- qKLg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=p7M5q5F7MxIa/r2jjKkheseBpte21hWoZc4a2t8a9EA=;
- b=WivPOv5rDSGE/X5ry/Pbzre9cAzOsc0efGaJXMJg+htKGNt+F2WeIhR/jOzVRHSDPt
- UogWeHuzJkJTXc/+MYQ4m/LwDtvIBRIBbmNhuroFiMuxfNQLOXbgsgNdykW9tKNLkRYo
- 7L949d/XyR1OM+qeHDluZKDog1/ZYzq5k2oK6sXjn7SZPEHMUHYaR718uN2km2TpS+CX
- 9r+NPrHk3ycpcb3I9A68thLNmOdEo7iT5Ac6xgUP+4WliTPjS9gSPto4r7UN+5rGsinN
- pR2NOliuz6HphHQRFBJn3gsoIq7q6aCBkAGyn9Nl6yeI54TC+DhQnvUmrj4Suwx1pFSg
- DX5w==
-X-Gm-Message-State: APjAAAWld1KJjtIUT7lIZzeR1t4Yg3urxeCXjzDwV9wAzJNa5rKKnQAM
- sEBShhlN9xt84dHvDav7nq0wrXWr+Geqg7zR/k1xnQ==
-X-Google-Smtp-Source: APXvYqzTUlla9FDfQ1xfQkR9sIDQOtPHeWqZ+oO7417ERtMjiuwNeKQH4bijCLJVTIpnHArtwh/fJqSJQA2GDpGfc6Q=
-X-Received: by 2002:aca:5cd7:: with SMTP id
- q206mr23919833oib.146.1563538967085; 
- Fri, 19 Jul 2019 05:22:47 -0700 (PDT)
+ (envelope-from <dgilbert@redhat.com>) id 1hoS8B-0004SX-9J
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 08:37:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42148)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hoS8B-0004Q8-3t
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 08:36:59 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 9BE0530C1352;
+ Fri, 19 Jul 2019 12:36:55 +0000 (UTC)
+Received: from work-vm (ovpn-117-245.ams2.redhat.com [10.36.117.245])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B331117F88;
+ Fri, 19 Jul 2019 12:36:54 +0000 (UTC)
+Date: Fri, 19 Jul 2019 13:36:52 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org, pbonzini@redhat.com
+Message-ID: <20190719123652.GA3000@work-vm>
 MIME-Version: 1.0
-References: <20190719115031.16331-1-cohuck@redhat.com>
-In-Reply-To: <20190719115031.16331-1-cohuck@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 19 Jul 2019 13:22:36 +0100
-Message-ID: <CAFEAcA_kUhVRF0WS2y_05DVstFA4xha2xyf+WRzkmJSOy7eNnA@mail.gmail.com>
-To: Cornelia Huck <cohuck@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::235
-Subject: Re: [Qemu-devel] [PULL for-4.1 0/1] one s390x fix/annotation
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.12.0 (2019-05-25)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.45]); Fri, 19 Jul 2019 12:36:55 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] -rtc base=, migration and time jumps
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,36 +66,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x <qemu-s390x@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: jan.kiszka@siemens.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 19 Jul 2019 at 12:50, Cornelia Huck <cohuck@redhat.com> wrote:
->
-> The following changes since commit 0b18cfb8f1828c905139b54c8644b0d8f4aad879:
->
->   Update version for v4.1.0-rc1 release (2019-07-16 18:01:28 +0100)
->
-> are available in the Git repository at:
->
->   https://github.com/cohuck/qemu tags/s390x-20190719
->
-> for you to fetch changes up to efac5ae420ca0644db9360861a1bf02d040afd18:
->
->   s390x/pci: add some fallthrough annotations (2019-07-18 11:29:50 +0200)
->
-> ----------------------------------------------------------------
-> Add missing fallthrough annotations.
->
-> ----------------------------------------------------------------
->
+Hi,
+  I've just spent an unreasonable amount of time debugging
+an rtc issue and come to the conclusion it's probably more
+of a documentation problem than actual code - but I wondered if
+anyone disagrees.
 
+(ref: https://bugzilla.redhat.com/show_bug.cgi?id=1714143 )
 
-Applied, thanks.
+The question revolves around -rtc base=    and what the base=
+passed to a destination qemu after migration should be.
+(partcicularly with 'host' clock)
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.1
-for any user-visible changes.
+At startup, QEMU (vl.c) calculates offsets from the host clock
+to the base - that value isn't migrated.
 
--- PMM
+Most rtc calculations done afterwards don't reference it - they're
+all based on the time since we last read the clock and a rolling time
+since then.
+
+There's code to detect host clock jumps, and trigger a notifier
+- the only use of that is the mc146818rtc used on the x86.
+It then reuses the base offset to reset the rtc to the current host
+clock time.
+
+a) If you start a destination qemu with the same base= value
+as the source then the internal offset value will be different
+by how much later you started the destination.
+
+b) If you can trigger the host clock jump update, then on x86
+that difference from (a) will become visible in reading the rtc
+(hwclock) and thus the rtc will appear to have fallen behind.
+
+c) libvirt (when using an 'adjustment' as oVirt does) recalculates
+the base on the destination; so the base passed to the destination
+qemu is different from the source; so even when (b) happens
+you get a consistent value.  This may be an accident!
+
+d) The host clock jump detection (b) is broken - it correctly detects
+backwards jumps; but it's detection of a forward jump is based
+on two readings of the host clock being more than 60s apart - but
+often ona q emu running a Linux guest the host clock isn't read at all;
+so reading hwclock, waiting a minute and reading it again will trigger
+the jump code.
+
+So what to do?
+
+1) Tell people to do what libvirt does and specify base= differently
+on the dest.
+
+2) Migrate the offset value such that the base= on the destination
+is ignored
+
+3) Fix the host clock jump detection
+
+(3) is probably independent - the easiest fix would seem to be just
+to set a timer to read the host clock at say 20 second intervals
+which is wasteful but would avoid the false trigger.
+
+Is (2) worth it or do we just go with (1) - I'm tempted to just
+specify the behaviour.
+
+Mind you, we could kill the host clock jump detection code - only
+the mc148618 registers on the notifier for it - so presumably
+aarch/ppc/s390 etc dont see it.
+
+Thoughts?
+
+Dave
+
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
