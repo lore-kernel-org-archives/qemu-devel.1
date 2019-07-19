@@ -2,89 +2,81 @@ Return-Path: <SRS0=mHy3=VQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D463C76188
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 14:47:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5337CC7618F
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 15:13:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3A7F62184E
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 14:47:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A7F62184E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1A04C2173B
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 15:13:41 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PhAlfqen"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A04C2173B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46078 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46180 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hoUAS-0003qb-CK
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 10:47:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54042)
+	id 1hoUZo-0004ts-C0
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 11:13:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57888)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <eblake@redhat.com>) id 1hoUAD-0003Kl-GG
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 10:47:17 -0400
+ (envelope-from <stefanha@gmail.com>) id 1hoUZf-0004VQ-3q
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 11:13:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1hoUAA-0005B0-Uj
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 10:47:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52354)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1hoUA3-00056R-OL; Fri, 19 Jul 2019 10:47:05 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 8B0B5300D1C7;
- Fri, 19 Jul 2019 14:47:01 +0000 (UTC)
-Received: from [10.3.116.46] (ovpn-116-46.phx2.redhat.com [10.3.116.46])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A8E325D97A;
- Fri, 19 Jul 2019 14:46:58 +0000 (UTC)
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- qemu-devel@nongnu.org
-References: <20190716100731.29843-1-marcandre.lureau@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
- xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
- xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
- TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
- GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
- sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
- AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
- CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
- RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
- wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
- Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
- gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
- pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
- zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
- pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
- 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
- NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
- cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
- SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
- I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
- mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
- Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
- 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <bcad5a90-6588-79c8-1ed1-02b75fa17be6@redhat.com>
-Date: Fri, 19 Jul 2019 09:46:57 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ (envelope-from <stefanha@gmail.com>) id 1hoUZP-0005Pw-Th
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 11:13:19 -0400
+Received: from mail-qt1-x843.google.com ([2607:f8b0:4864:20::843]:37826)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1hoUZF-0003Km-W6
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 11:13:12 -0400
+Received: by mail-qt1-x843.google.com with SMTP id y26so31308130qto.4
+ for <qemu-devel@nongnu.org>; Fri, 19 Jul 2019 08:09:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=FWhoowb9WO83N3KJLf1rStI9k2VbrsEscqF3/WJDFSk=;
+ b=PhAlfqenqNlGOxq3Y5Y9/oaReq3AlNwPqTYlPbiz/nB2BLQHYtgOd7wE8OvoSg7Xc1
+ XCcKVb5V0wLYZnGK4jqI0Ipq+knQgBBNN2Ky8+dRte1IEKeCEpTF7sA/UU8wvfrv2N2v
+ V4iCm5HpojbnRtZu2msKliHTcPsL/rvoCpxOFF9XpCvvs/1Jl3RwzHeofGRJeehLzNWF
+ FaGSgyzSARM0oJHC3pywTfk8trCWHZxnld4+y/htdgX6yNQ6y81PXl2CuzHN7w2RcnfJ
+ VN1xuV+GcqgzKGbo4hu7NxlYS87Hexdbqa+v8Um+UA2Vjy1CnETe7akkpztRNIJb77An
+ 6jUg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=FWhoowb9WO83N3KJLf1rStI9k2VbrsEscqF3/WJDFSk=;
+ b=lxGiBbs4pRpN1trSrFQEyPzfAX3GW9Nrdz8RfHjx8dhfkhsz1T5FqbGypJNlnDZC10
+ 0nGZ56YTV1JAjpyczrDvjXZuzU+PGDLNWrBmWCTkYMM2WEhEXne1XwLuEe+8p6jXlnPm
+ Ty/1fV225+l/LLus/SR2fd/ukEmR2FnM1WHhg1rQeeZu13QnNuHyc6l4A/zabc3u2Hnb
+ R1qgNNzQagzMaaPLqRtCfBbNzybd2fFXTUqvi/VNbZh8Ppguda821ALxOhoJWrANhzUe
+ ToyDO6WGDk8h5DLKXh94NEcIZPzGXov48wHjB7Hbb8Aijqw+d5/eZm29i38lxAFTdxgK
+ LwFw==
+X-Gm-Message-State: APjAAAXDPmXpiGn3jjm2gxQImH8IAzahCKSzrjKkuX1wwSiCqfRifkns
+ HLGZwdhb2ayIMyL2hYjqGHBKM3QVyzzEK1ilJ60=
+X-Google-Smtp-Source: APXvYqwh45SfchrJ93eldqJ8mAg2Q9MJNCT/1w5HcX8D/orJN195bsNab76lPco4rRaPDD7CTtiYEEaUj2SpYXhrfBE=
+X-Received: by 2002:ac8:525a:: with SMTP id y26mr37423506qtn.378.1563548981015; 
+ Fri, 19 Jul 2019 08:09:41 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190716100731.29843-1-marcandre.lureau@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="huqZKFto3jaiLbruIxdMHErBnnWn1QV6k"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Fri, 19 Jul 2019 14:47:01 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2] nbd: fix uninitialized variable warning
+References: <20190702121106.28374-1-slp@redhat.com>
+ <20190703095825.GE11844@stefanha-x1.localdomain>
+ <87d0i7tlkl.fsf@redhat.com> <20190719102915.GG18585@stefanha-x1.localdomain>
+ <8736j2p22w.fsf@redhat.com>
+In-Reply-To: <8736j2p22w.fsf@redhat.com>
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Date: Fri, 19 Jul 2019 16:09:29 +0100
+Message-ID: <CAJSP0QXTSwk4eJteC0wTB7LGoHY3=7t4G-eNfgREQ6k+GzV2_w@mail.gmail.com>
+To: Sergio Lopez <slp@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::843
+Subject: Re: [Qemu-devel] [PATCH v3 0/4] Introduce the microvm machine type
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,104 +88,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- "open list:Network Block Dev..." <qemu-block@nongnu.org>,
- Max Reitz <mreitz@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ Maran Wilson <maran.wilson@oracle.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ qemu-devel <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---huqZKFto3jaiLbruIxdMHErBnnWn1QV6k
-Content-Type: multipart/mixed; boundary="hoY9ze68Q2Ebv005dwzddoq1aMsGGUsBW";
- protected-headers="v1"
-From: Eric Blake <eblake@redhat.com>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>,
- "open list:Network Block Dev..." <qemu-block@nongnu.org>
-Message-ID: <bcad5a90-6588-79c8-1ed1-02b75fa17be6@redhat.com>
-Subject: Re: [PATCH v2] nbd: fix uninitialized variable warning
-References: <20190716100731.29843-1-marcandre.lureau@redhat.com>
-In-Reply-To: <20190716100731.29843-1-marcandre.lureau@redhat.com>
+On Fri, Jul 19, 2019 at 2:48 PM Sergio Lopez <slp@redhat.com> wrote:
+> Stefan Hajnoczi <stefanha@gmail.com> writes:
+> > On Thu, Jul 18, 2019 at 05:21:46PM +0200, Sergio Lopez wrote:
+> >>
+> >> Stefan Hajnoczi <stefanha@gmail.com> writes:
+> >>
+> >> > On Tue, Jul 02, 2019 at 02:11:02PM +0200, Sergio Lopez wrote:
+> >>  --------------
+> >>  | Conclusion |
+> >>  --------------
+> >>
+> >> The average boot time of microvm is a third of Q35's (115ms vs. 363ms),
+> >> and is smaller on all sections (QEMU initialization, firmware overhead
+> >> and kernel start-to-user).
+> >>
+> >> Microvm's memory tree is also visibly simpler, significantly reducing
+> >> the exposed surface to the guest.
+> >>
+> >> While we can certainly work on making Q35 smaller, I definitely think
+> >> it's better (and way safer!) having a specialized machine type for a
+> >> specific use case, than a minimal Q35 whose behavior significantly
+> >> diverges from a conventional Q35.
+> >
+> > Interesting, so not a 10x difference!  This might be amenable to
+> > optimization.
+> >
+> > My concern with microvm is that it's so limited that few users will be
+> > able to benefit from the reduced attack surface and faster startup time.
+> > I think it's worth investigating slimming down Q35 further first.
+> >
+> > In terms of startup time the first step would be profiling Q35 kernel
+> > startup to find out what's taking so long (firmware initialization, PCI
+> > probing, etc)?
+>
+> Some findings:
+>
+>  1. Exposing the TSC_DEADLINE CPU flag (i.e. using "-cpu host") saves a
+>     whooping 120ms by avoiding the APIC timer calibration at
+>     arch/x86/kernel/apic/apic.c:calibrate_APIC_clock
+>
+> Average boot time with "-cpu host"
+>  qemu_init_end: 76.408950
+>  linux_start_kernel: 116.166142 (+39.757192)
+>  linux_start_user: 242.954347 (+126.788205)
+>
+> Average boot time with default "cpu"
+>  qemu_init_end: 77.467852
+>  linux_start_kernel: 116.688472 (+39.22062)
+>  linux_start_user: 363.033365 (+246.344893)
 
---hoY9ze68Q2Ebv005dwzddoq1aMsGGUsBW
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+\o/
 
-On 7/16/19 5:07 AM, Marc-Andr=C3=A9 Lureau wrote:
-> ../block/nbd.c: In function 'nbd_co_request':
-> ../block/nbd.c:745:8: error: 'local_reply.type' may be used uninitializ=
-ed in this function [-Werror=3Dmaybe-uninitialized]
->      if (chunk->type =3D=3D NBD_REPLY_TYPE_NONE) {
->         ^
-> ../block/nbd.c:710:14: note: 'local_reply.type' was declared here
->      NBDReply local_reply;
->               ^~~~~~~~~~~
-> ../block/nbd.c:710:14: error: 'local_reply.flags' may be used uninitial=
-ized in this function [-Werror=3Dmaybe-uninitialized]
-> ../block/nbd.c:738:8: error: 'local_reply.<U4be0>.magic' may be used un=
-initialized in this function [-Werror=3Dmaybe-uninitialized]
->      if (nbd_reply_is_simple(reply) || s->quit) {
->         ^
-> ../block/nbd.c:710:14: note: 'local_reply.<U4be0>.magic' was declared h=
-ere
->      NBDReply local_reply;
->               ^~~~~~~~~~~
-> cc1: all warnings being treated as errors
->=20
-> Reported-by: Thomas Huth <thuth@redhat.com>
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
->  block/nbd.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  2. The other 130ms are a direct result of PCI and ACPI presence (tested
+>     with a kernel without support for those elements). I'll publish some
+>     detailed numbers next week.
 
-Actually, since this patch didn't fix all the cases of use of an uninit
-variable, I'm wondering if this one-liner would be a better patch for
-the issue (that is, fix it so that nbd_co_receive_one_chunk never leaves
-reply uninit, rather than chasing down which callers might need init),
-and with a perk of not relying on a gcc extension:
+Here are the Kata Containers kernel parameters:
 
-diff --git i/block/nbd.c w/block/nbd.c
-index 8d565cc624ec..f751a8e633e5 100644
---- i/block/nbd.c
-+++ w/block/nbd.c
-@@ -640,6 +640,7 @@ static coroutine_fn int nbd_co_receive_one_chunk(
-                                           request_ret, qiov, payload,
-errp);
+var kernelParams = []Param{
+        {"tsc", "reliable"},
+        {"no_timer_check", ""},
+        {"rcupdate.rcu_expedited", "1"},
+        {"i8042.direct", "1"},
+        {"i8042.dumbkbd", "1"},
+        {"i8042.nopnp", "1"},
+        {"i8042.noaux", "1"},
+        {"noreplace-smp", ""},
+        {"reboot", "k"},
+        {"console", "hvc0"},
+        {"console", "hvc1"},
+        {"iommu", "off"},
+        {"cryptomgr.notests", ""},
+        {"net.ifnames", "0"},
+        {"pci", "lastbus=0"},
+}
 
-     if (ret < 0) {
-+        memset(reply, 0, sizeof *reply);
-         s->quit =3D true;
-     } else {
-         /* For assert at loop start in nbd_connection_entry */
+pci lastbus=0 looks interesting and so do some of the others :).
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---hoY9ze68Q2Ebv005dwzddoq1aMsGGUsBW--
-
---huqZKFto3jaiLbruIxdMHErBnnWn1QV6k
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl0x1+EACgkQp6FrSiUn
-Q2rcbQf/UM/msUNIH992F/evK0MyO7iDxJDhue39H9HrRxawFIIx6m8jnL1mLDZw
-ARL9IauaZaeTabzuFxpVlaOiBUrY6DnSRdlYQDxYfxlDDMAfySea611kfNwyE497
-z+pUFaiMuO5KEWbJNPrEg9iO/JmiaJwJFOeOmBbesBk9rihIxB7uqP9/xxhfCucb
-nvghx7fo3lBoWg0wCbrDUhRlSDLaBOnmGxqeH4lw802qApcxqvYJhfdkvYBEvkQP
-GAnlos+zeu+ufalObdunBEA5jvXtp6HtsLwbw6DajW4zm12VsanhYYyJ8tfVbMqZ
-mGahSOhnCjJLWrQYyh2AVyQlwDbyrA==
-=O2A2
------END PGP SIGNATURE-----
-
---huqZKFto3jaiLbruIxdMHErBnnWn1QV6k--
+Stefan
 
