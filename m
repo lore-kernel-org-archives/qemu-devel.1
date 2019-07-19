@@ -2,70 +2,65 @@ Return-Path: <SRS0=mHy3=VQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A97B7C7618F
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 01:29:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59B01C7618F
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 01:31:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6DB8C2173B
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 01:29:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6DB8C2173B
+	by mail.kernel.org (Postfix) with ESMTPS id 2C20F2173B
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 01:31:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C20F2173B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41812 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41824 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hoHig-000342-LZ
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jul 2019 21:29:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52387)
+	id 1hoHk1-0004BA-Ek
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jul 2019 21:31:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52733)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <yan.y.zhao@intel.com>) id 1hoHiU-0002ec-C2
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 21:29:48 -0400
+ (envelope-from <yan.y.zhao@intel.com>) id 1hoHjl-0003jF-Jp
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 21:31:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yan.y.zhao@intel.com>) id 1hoHiR-00011l-Bg
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 21:29:46 -0400
-Received: from mga18.intel.com ([134.134.136.126]:23076)
+ (envelope-from <yan.y.zhao@intel.com>) id 1hoHjk-0001wy-3r
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 21:31:05 -0400
+Received: from mga09.intel.com ([134.134.136.24]:65119)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <yan.y.zhao@intel.com>)
- id 1hoHiQ-0000x6-0l
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 21:29:42 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
+ id 1hoHjj-0001wL-RS
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 21:31:04 -0400
+X-Amp-Result: UNSCANNABLE
 X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
- by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 18 Jul 2019 18:29:34 -0700
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+ by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 18 Jul 2019 18:31:02 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,280,1559545200"; d="scan'208";a="170759359"
+X-IronPort-AV: E=Sophos;i="5.64,280,1559545200"; d="scan'208";a="343552153"
 Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
  ([10.239.13.9])
- by orsmga003.jf.intel.com with ESMTP; 18 Jul 2019 18:29:30 -0700
-Date: Thu, 18 Jul 2019 21:23:28 -0400
+ by orsmga005.jf.intel.com with ESMTP; 18 Jul 2019 18:30:58 -0700
+Date: Thu, 18 Jul 2019 21:24:56 -0400
 From: Yan Zhao <yan.y.zhao@intel.com>
 To: Kirti Wankhede <kwankhede@nvidia.com>
-Message-ID: <20190719012328.GF8912@joy-OptiPlex-7040>
+Message-ID: <20190719012456.GG8912@joy-OptiPlex-7040>
 References: <1562665760-26158-1-git-send-email-kwankhede@nvidia.com>
- <20190711025524.GB9176@joy-OptiPlex-7040>
- <20190711105012.GI3971@work-vm>
- <20190711114715.GC9176@joy-OptiPlex-7040>
- <20190711162315.GP3971@work-vm>
- <2dd65778-8661-929d-392f-4db25cf7162b@nvidia.com>
- <20190712003201.GE9176@joy-OptiPlex-7040>
- <f368b367-e355-cf04-2824-3384f4ea6e33@nvidia.com>
+ <1562665760-26158-12-git-send-email-kwankhede@nvidia.com>
+ <20190712003328.GF9176@joy-OptiPlex-7040>
+ <70fd135d-4719-e39c-09fe-d5a012520ea8@nvidia.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <f368b367-e355-cf04-2824-3384f4ea6e33@nvidia.com>
+In-Reply-To: <70fd135d-4719-e39c-09fe-d5a012520ea8@nvidia.com>
 User-Agent: Mutt/1.9.4 (2018-02-28)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 134.134.136.126
-Subject: Re: [Qemu-devel] [PATCH v7 00/13] Add migration support for VFIO
- device
+X-Received-From: 134.134.136.24
+Subject: Re: [Qemu-devel] [PATCH v7 11/13] vfio: Add function to get dirty
+ page list
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -78,363 +73,221 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: "Tian, Kevin" <kevin.tian@intel.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
+Cc: "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>, "Tian,
+ Kevin" <kevin.tian@intel.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
  "cjia@nvidia.com" <cjia@nvidia.com>,
  "eskultet@redhat.com" <eskultet@redhat.com>, "Yang,
- Ziye" <ziye.yang@intel.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>,
- "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@alibaba-inc.com>,
+ Ziye" <ziye.yang@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "cohuck@redhat.com" <cohuck@redhat.com>,
  "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ "dgilbert@redhat.com" <dgilbert@redhat.com>, "Wang,
+ Zhi A" <zhi.a.wang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
  "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>,
  "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
  "eauger@redhat.com" <eauger@redhat.com>,
- "cohuck@redhat.com" <cohuck@redhat.com>,
- "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>,
  "felipe@nutanix.com" <felipe@nutanix.com>,
- "mlevitsk@redhat.com" <mlevitsk@redhat.com>, "Liu,
- Changpeng" <changpeng.liu@intel.com>, "Wang, Zhi A" <zhi.a.wang@intel.com>
+ "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "Liu,
+ Changpeng" <changpeng.liu@intel.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jul 19, 2019 at 02:32:33AM +0800, Kirti Wankhede wrote:
+On Fri, Jul 19, 2019 at 02:39:10AM +0800, Kirti Wankhede wrote:
 > 
-> On 7/12/2019 6:02 AM, Yan Zhao wrote:
-> > On Fri, Jul 12, 2019 at 03:08:31AM +0800, Kirti Wankhede wrote:
-> >>
-> >>
-> >> On 7/11/2019 9:53 PM, Dr. David Alan Gilbert wrote:
-> >>> * Yan Zhao (yan.y.zhao@intel.com) wrote:
-> >>>> On Thu, Jul 11, 2019 at 06:50:12PM +0800, Dr. David Alan Gilbert wrote:
-> >>>>> * Yan Zhao (yan.y.zhao@intel.com) wrote:
-> >>>>>> Hi Kirti,
-> >>>>>> There are still unaddressed comments to your patches v4.
-> >>>>>> Would you mind addressing them?
-> >>>>>>
-> >>>>>> 1. should we register two migration interfaces simultaneously
-> >>>>>> (https://lists.gnu.org/archive/html/qemu-devel/2019-06/msg04750.html)
-> >>>>>
-> >>>>> Please don't do this.
-> >>>>> As far as I'm aware we currently only have one device that does that
-> >>>>> (vmxnet3) and a patch has just been posted that fixes/removes that.
-> >>>>>
-> >>>>> Dave
-> >>>>>
-> >>>> hi Dave,
-> >>>> Thanks for notifying this. but if we want to support postcopy in future,
-> >>>> after device stops, what interface could we use to transfer data of
-> >>>> device state only?
-> >>>> for postcopy, when source device stops, we need to transfer only
-> >>>> necessary device state to target vm before target vm starts, and we
-> >>>> don't want to transfer device memory as we'll do that after target vm
-> >>>> resuming.
-> >>>
-> >>> Hmm ok, lets see; that's got to happen in the call to:
-> >>>     qemu_savevm_state_complete_precopy(fb, false, false);
-> >>> that's made from postcopy_start.
-> >>>  (the false's are iterable_only and inactivate_disks)
-> >>>
-> >>> and at that time I believe the state is POSTCOPY_ACTIVE, so in_postcopy
-> >>> is true.
-> >>>
-> >>> If you're doing postcopy, then you'll probably define a has_postcopy()
-> >>> function, so qemu_savevm_state_complete_precopy will skip the
-> >>> save_live_complete_precopy call from it's loop for at least two of the
-> >>> reasons in it's big if.
-> >>>
-> >>> So you're right; you need the VMSD for this to happen in the second
-> >>> loop in qemu_savevm_state_complete_precopy.  Hmm.
-> >>>
-> >>> Now, what worries me, and I don't know the answer, is how the section
-> >>> header for the vmstate and the section header for an iteration look
-> >>> on the stream; how are they different?
-> >>>
-> >>
-> >> I don't have way to test postcopy migration - is one of the major reason
-> >> I had not included postcopy support in this patchset and clearly called
-> >> out in cover letter.
-> >> This patchset is thoroughly tested for precopy migration.
-> >> If anyone have hardware that supports fault, then I would prefer to add
-> >> postcopy support as incremental change later which can be tested before
-> >> submitting.
-> >>
-> >> Just a suggestion, instead of using VMSD, is it possible to have some
-> >> additional check to call save_live_complete_precopy from
-> >> qemu_savevm_state_complete_precopy?
-> >>
-> >>
-> >>>>
-> >>>>>> 2. in each save iteration, how much data is to be saved
-> >>>>>> (https://lists.gnu.org/archive/html/qemu-devel/2019-06/msg04683.html)
-> >>
-> >>> how big is the data_size ?
-> >>> if this size is too big, it may take too much time and block others.
-> >>
-> >> I do had mentioned this in the comment about the structure in vfio.h
-> >> header. data_size will be provided by vendor driver and obviously will
-> >> not be greater that migration region size. Vendor driver should be
-> >> responsible to keep its solution optimized.
-> >>
-> > if the data_size is no big than migration region size, and each
-> > iteration only saves data of data_size, i'm afraid it will cause
-> > prolonged down time. after all, the migration region size cannot be very
-> > big.
 > 
-> As I mentioned above, its vendor driver responsibility to keep its
-> solution optimized.
-> A good behaving vendor driver should not cause unnecessary prolonged
-> down time.
+> On 7/12/2019 6:03 AM, Yan Zhao wrote:
+> > On Tue, Jul 09, 2019 at 05:49:18PM +0800, Kirti Wankhede wrote:
+> >> Dirty page tracking (.log_sync) is part of RAM copying state, where
+> >> vendor driver provides the bitmap of pages which are dirtied by vendor
+> >> driver through migration region and as part of RAM copy, those pages
+> >> gets copied to file stream.
+> >>
+> >> To get dirty page bitmap:
+> >> - write start address, page_size and pfn count.
+> >> - read count of pfns copied.
+> >>     - Vendor driver should return 0 if driver doesn't have any page to
+> >>       report dirty in given range.
+> >>     - Vendor driver should return -1 to mark all pages dirty for given range.
+> >> - read data_offset, where vendor driver has written bitmap.
+> >> - read bitmap from the region or mmaped part of the region.
+> >> - Iterate above steps till page bitmap for all requested pfns are copied.
+> >>
+> >> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+> >> Reviewed-by: Neo Jia <cjia@nvidia.com>
+> >> ---
+> >>  hw/vfio/migration.c           | 123 ++++++++++++++++++++++++++++++++++++++++++
+> >>  hw/vfio/trace-events          |   1 +
+> >>  include/hw/vfio/vfio-common.h |   2 +
+> >>  3 files changed, 126 insertions(+)
+> >>
+> >> diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
+> >> index 5fb4c5329ede..ca1a8c0f5f1f 100644
+> >> --- a/hw/vfio/migration.c
+> >> +++ b/hw/vfio/migration.c
+> >> @@ -269,6 +269,129 @@ static int vfio_load_device_config_state(QEMUFile *f, void *opaque)
+> >>      return qemu_file_get_error(f);
+> >>  }
+> >>  
+> >> +void vfio_get_dirty_page_list(VFIODevice *vbasedev,
+> >> +                              uint64_t start_pfn,
+> >> +                              uint64_t pfn_count,
+> >> +                              uint64_t page_size)
+> >> +{
+> >> +    VFIOMigration *migration = vbasedev->migration;
+> >> +    VFIORegion *region = &migration->region.buffer;
+> >> +    uint64_t count = 0;
+> >> +    int64_t copied_pfns = 0;
+> >> +    int64_t total_pfns = pfn_count;
+> >> +    int ret;
+> >> +
+> >> +    qemu_mutex_lock(&migration->lock);
+> >> +
+> >> +    while (total_pfns > 0) {
+> >> +        uint64_t bitmap_size, data_offset = 0;
+> >> +        uint64_t start = start_pfn + count;
+> >> +        void *buf = NULL;
+> >> +        bool buffer_mmaped = false;
+> >> +
+> >> +        ret = pwrite(vbasedev->fd, &start, sizeof(start),
+> >> +                 region->fd_offset + offsetof(struct vfio_device_migration_info,
+> >> +                                              start_pfn));
+> >> +        if (ret < 0) {
+> >> +            error_report("%s: Failed to set dirty pages start address %d %s",
+> >> +                         vbasedev->name, ret, strerror(errno));
+> >> +            goto dpl_unlock;
+> >> +        }
+> >> +
+> >> +        ret = pwrite(vbasedev->fd, &page_size, sizeof(page_size),
+> >> +                 region->fd_offset + offsetof(struct vfio_device_migration_info,
+> >> +                                              page_size));
+> >> +        if (ret < 0) {
+> >> +            error_report("%s: Failed to set dirty page size %d %s",
+> >> +                         vbasedev->name, ret, strerror(errno));
+> >> +            goto dpl_unlock;
+> >> +        }
+> >> +
+> >> +        ret = pwrite(vbasedev->fd, &total_pfns, sizeof(total_pfns),
+> >> +                 region->fd_offset + offsetof(struct vfio_device_migration_info,
+> >> +                                              total_pfns));
+> >> +        if (ret < 0) {
+> >> +            error_report("%s: Failed to set dirty page total pfns %d %s",
+> >> +                         vbasedev->name, ret, strerror(errno));
+> >> +            goto dpl_unlock;
+> >> +        }
+> >> +
+> >> +        /* Read copied dirty pfns */
+> >> +        ret = pread(vbasedev->fd, &copied_pfns, sizeof(copied_pfns),
+> >> +                region->fd_offset + offsetof(struct vfio_device_migration_info,
+> >> +                                             copied_pfns));
+> >> +        if (ret < 0) {
+> >> +            error_report("%s: Failed to get dirty pages bitmap count %d %s",
+> >> +                         vbasedev->name, ret, strerror(errno));
+> >> +            goto dpl_unlock;
+> >> +        }
+> >> +
+> >> +        if (copied_pfns == VFIO_DEVICE_DIRTY_PFNS_NONE) {
+> >> +            /*
+> >> +             * copied_pfns could be 0 if driver doesn't have any page to
+> >> +             * report dirty in given range
+> >> +             */
+> >> +            break;
+> >> +        } else if (copied_pfns == VFIO_DEVICE_DIRTY_PFNS_ALL) {
+> >> +            /* Mark all pages dirty for this range */
+> >> +            cpu_physical_memory_set_dirty_range(start_pfn * page_size,
+> >> +                                                pfn_count * page_size,
+> >> +                                                DIRTY_MEMORY_MIGRATION);
+> > seesm pfn_count here is not right
+> 
+> Changing it to total_pfns in next version
 >
-I think vendor data can determine the data_size, but qemu has to decide
-how much data to transmit according to the actual transmitting time (or
-transmitting speed). when transmitting speed is high, transmit more data
-a iteration, and low speed small data a iteration. This transmitting
-time knowledge is not available to vendor driver, and even it has this
-knowledge, can it dynamically change data region size?
-maybe you can say vendor driver can register a big enough region and
-dynamically use part of it, but what is big enough and it really costs
-memory.
-
-> > Also, if vendor driver determines how much data to save in each
-> > iteration alone, and no checks in qemu, it may cause other devices'
-> > migration time be squeezed.
-> > 
-> 
-> Sorry, how will that squeeze other device's migration time?
-> 
-if a vendor driver has extremely big data to transmit, other devices
-have to wait until it finishes to transmit their own data. In a given
-time period, it can be considered as their time slot being squeezed.
-not sure whether it's a good practice.
-
-> >>
-> >>>>>> 3. do we need extra interface to get data for device state only
-> >>>>>> (https://lists.gnu.org/archive/html/qemu-devel/2019-06/msg04812.html)
-> >>
-> >> I don't think so. Opaque Device data from vendor driver can include
-> >> device state and device memory. Vendor driver who is managing his device
-> >> can decide how to place data over the stream.
-> >>
-> > I know current design is opaque device data. then to support postcopy,
-> > we may have to add extra device state like in-postcopy. but postcopy is
-> > more like a qemu state and is not a device state.
-> 
-> One bit from device_state can be used to inform vendor driver about
-> postcopy, when postcopy support will be added.
->
-ok. if you insist on that, one bit in devie_state is also good, as long
-as everyone agrees on it:)
-
-> > to address it elegantly, may we add an extra interface besides
-> > vfio_save_buffer() to get data for device state only?
-> > 
-> 
-> When in postcopy state, based on device_state flag, vendor driver can
-> copy device state first in migration region, I still think there is no
-> need to separate device state and device memory.
->
-it's the difference between more device_state flags and more interfaces.
-
-> >>>>>> 4. definition of dirty page copied_pfn
-> >>>>>> (https://lists.gnu.org/archive/html/qemu-devel/2019-06/msg05592.html)
-> >>>>>>
-> >>
-> >> This was inline to discussion going with Alex. I addressed the concern
-> >> there. Please check current patchset, which addresses the concerns raised.
-> >>
-> > ok. I saw you also updated the flow in the part. please check my comment
-> > in that patch for detail. but as a suggestion, I think processed_pfns is
-> > a better name compared to copied_pfns :)
-> > 
-> 
-> Vendor driver can process total_pfns, but can copy only some pfns bitmap
-> to migration region. One of the reason could be the size of migration
-> region is not able to accommodate bitmap of total_pfns size. So it could
-> be like: 0 < copied_pfns < total_pfns. That's why the name
-> 'copied_pfns'. I'll continue with 'copied_pfns'.
->
-so it's bitmap's pfn count, right? 
-besides VFIO_DEVICE_DIRTY_PFNS_NONE, and VFIO_DEVICE_DIRTY_PFNS_ALL to
-indicate no dirty and all dirty in total_pfns, why not add two more
-flags, e.g.
-VFIO_DEVICE_DIRTY_PFNS_ONE_ITERATION,
-VFIO_DEVICE_DIRTY_PFNS_ALL_ONE_ITERATION, to skip copying bitmap from
-kernel if the copied bitmap in one iteration is all 0 or all 1?
+if it's total_pfns, then it cannot be in the loop, right?
 
 Thanks
 Yan
+
+> Thanks,
+> Kirti
 > 
-> >>>>>> Also, I'm glad to see that you updated code by following my comments below,
-> >>>>>> but please don't forget to reply my comments next time:)
+> >> +            break;
+> >> +        }
+> >> +
+> >> +        bitmap_size = (BITS_TO_LONGS(copied_pfns) + 1) * sizeof(unsigned long);
+> >> +
+> >> +        ret = pread(vbasedev->fd, &data_offset, sizeof(data_offset),
+> >> +                region->fd_offset + offsetof(struct vfio_device_migration_info,
+> >> +                                             data_offset));
+> >> +        if (ret != sizeof(data_offset)) {
+> >> +            error_report("%s: Failed to get migration buffer data offset %d",
+> >> +                         vbasedev->name, ret);
+> >> +            goto dpl_unlock;
+> >> +        }
+> >> +
+> >> +        if (region->mmaps) {
+> >> +            buf = find_data_region(region, data_offset, bitmap_size);
+> >> +        }
+> >> +
+> >> +        buffer_mmaped = (buf != NULL) ? true : false;
+> >> +
+> >> +        if (!buffer_mmaped) {
+> >> +            buf = g_try_malloc0(bitmap_size);
+> >> +            if (!buf) {
+> >> +                error_report("%s: Error allocating buffer ", __func__);
+> >> +                goto dpl_unlock;
+> >> +            }
+> >> +
+> >> +            ret = pread(vbasedev->fd, buf, bitmap_size,
+> >> +                        region->fd_offset + data_offset);
+> >> +            if (ret != bitmap_size) {
+> >> +                error_report("%s: Failed to get dirty pages bitmap %d",
+> >> +                             vbasedev->name, ret);
+> >> +                g_free(buf);
+> >> +                goto dpl_unlock;
+> >> +            }
+> >> +        }
+> >> +
+> >> +        cpu_physical_memory_set_dirty_lebitmap((unsigned long *)buf,
+> >> +                                               (start_pfn + count) * page_size,
+> >> +                                                copied_pfns);
+> >> +        count      += copied_pfns;
+> >> +        total_pfns -= copied_pfns;
+> >> +
+> >> +        if (!buffer_mmaped) {
+> >> +            g_free(buf);
+> >> +        }
+> >> +    }
+> >> +
+> >> +    trace_vfio_get_dirty_page_list(vbasedev->name, start_pfn, pfn_count,
+> >> +                                   page_size);
+> >> +
+> >> +dpl_unlock:
+> >> +    qemu_mutex_unlock(&migration->lock);
+> >> +}
+> >> +
+> >>  /* ---------------------------------------------------------------------- */
+> >>  
+> >>  static int vfio_save_setup(QEMUFile *f, void *opaque)
+> >> diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
+> >> index ac065b559f4e..414a5e69ec5e 100644
+> >> --- a/hw/vfio/trace-events
+> >> +++ b/hw/vfio/trace-events
+> >> @@ -160,3 +160,4 @@ vfio_save_complete_precopy(char *name) " (%s)"
+> >>  vfio_load_device_config_state(char *name) " (%s)"
+> >>  vfio_load_state(char *name, uint64_t data) " (%s) data 0x%"PRIx64
+> >>  vfio_load_state_device_data(char *name, uint64_t data_offset, uint64_t data_size) " (%s) Offset 0x%"PRIx64" size 0x%"PRIx64
+> >> +vfio_get_dirty_page_list(char *name, uint64_t start, uint64_t pfn_count, uint64_t page_size) " (%s) start 0x%"PRIx64" pfn_count 0x%"PRIx64 " page size 0x%"PRIx64
+> >> diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
+> >> index a022484d2636..dc1b83a0b4ef 100644
+> >> --- a/include/hw/vfio/vfio-common.h
+> >> +++ b/include/hw/vfio/vfio-common.h
+> >> @@ -222,5 +222,7 @@ int vfio_spapr_remove_window(VFIOContainer *container,
+> >>  
+> >>  int vfio_migration_probe(VFIODevice *vbasedev, Error **errp);
+> >>  void vfio_migration_finalize(VFIODevice *vbasedev);
+> >> +void vfio_get_dirty_page_list(VFIODevice *vbasedev, uint64_t start_pfn,
+> >> +                               uint64_t pfn_count, uint64_t page_size);
+> >>  
+> >>  #endif /* HW_VFIO_VFIO_COMMON_H */
+> >> -- 
+> >> 2.7.0
 > >>
-> >> I tried to reply top of threads and addressed common concerns raised in
-> >> that. Sorry If I missed any, I'll make sure to point you to my replies
-> >> going ahead.
-> >>
-> > ok. let's cooperate:)
-> > 
-> > Thanks
-> > Yan
-> > 
-> >> Thanks,
-> >> Kirti
-> >>
-> >>>>>> https://lists.gnu.org/archive/html/qemu-devel/2019-06/msg05357.html
-> >>>>>> https://lists.gnu.org/archive/html/qemu-devel/2019-06/msg06454.html
-> >>>>>>
-> >>>>>> Thanks
-> >>>>>> Yan
-> >>>>>>
-> >>>>>> On Tue, Jul 09, 2019 at 05:49:07PM +0800, Kirti Wankhede wrote:
-> >>>>>>> Add migration support for VFIO device
-> >>>>>>>
-> >>>>>>> This Patch set include patches as below:
-> >>>>>>> - Define KABI for VFIO device for migration support.
-> >>>>>>> - Added save and restore functions for PCI configuration space
-> >>>>>>> - Generic migration functionality for VFIO device.
-> >>>>>>>   * This patch set adds functionality only for PCI devices, but can be
-> >>>>>>>     extended to other VFIO devices.
-> >>>>>>>   * Added all the basic functions required for pre-copy, stop-and-copy and
-> >>>>>>>     resume phases of migration.
-> >>>>>>>   * Added state change notifier and from that notifier function, VFIO
-> >>>>>>>     device's state changed is conveyed to VFIO device driver.
-> >>>>>>>   * During save setup phase and resume/load setup phase, migration region
-> >>>>>>>     is queried and is used to read/write VFIO device data.
-> >>>>>>>   * .save_live_pending and .save_live_iterate are implemented to use QEMU's
-> >>>>>>>     functionality of iteration during pre-copy phase.
-> >>>>>>>   * In .save_live_complete_precopy, that is in stop-and-copy phase,
-> >>>>>>>     iteration to read data from VFIO device driver is implemented till pending
-> >>>>>>>     bytes returned by driver are not zero.
-> >>>>>>>   * Added function to get dirty pages bitmap for the pages which are used by
-> >>>>>>>     driver.
-> >>>>>>> - Add vfio_listerner_log_sync to mark dirty pages.
-> >>>>>>> - Make VFIO PCI device migration capable. If migration region is not provided by
-> >>>>>>>   driver, migration is blocked.
-> >>>>>>>
-> >>>>>>> Below is the flow of state change for live migration where states in brackets
-> >>>>>>> represent VM state, migration state and VFIO device state as:
-> >>>>>>>     (VM state, MIGRATION_STATUS, VFIO_DEVICE_STATE)
-> >>>>>>>
-> >>>>>>> Live migration save path:
-> >>>>>>>         QEMU normal running state
-> >>>>>>>         (RUNNING, _NONE, _RUNNING)
-> >>>>>>>                         |
-> >>>>>>>     migrate_init spawns migration_thread.
-> >>>>>>>     (RUNNING, _SETUP, _RUNNING|_SAVING)
-> >>>>>>>     Migration thread then calls each device's .save_setup()
-> >>>>>>>                         |
-> >>>>>>>     (RUNNING, _ACTIVE, _RUNNING|_SAVING)
-> >>>>>>>     If device is active, get pending bytes by .save_live_pending()
-> >>>>>>>     if pending bytes >= threshold_size,  call save_live_iterate()
-> >>>>>>>     Data of VFIO device for pre-copy phase is copied.
-> >>>>>>>     Iterate till pending bytes converge and are less than threshold
-> >>>>>>>                         |
-> >>>>>>>     On migration completion, vCPUs stops and calls .save_live_complete_precopy
-> >>>>>>>     for each active device. VFIO device is then transitioned in
-> >>>>>>>      _SAVING state.
-> >>>>>>>     (FINISH_MIGRATE, _DEVICE, _SAVING)
-> >>>>>>>     For VFIO device, iterate in  .save_live_complete_precopy  until
-> >>>>>>>     pending data is 0.
-> >>>>>>>     (FINISH_MIGRATE, _DEVICE, _STOPPED)
-> >>>>>>>                         |
-> >>>>>>>     (FINISH_MIGRATE, _COMPLETED, STOPPED)
-> >>>>>>>     Migraton thread schedule cleanup bottom half and exit
-> >>>>>>>
-> >>>>>>> Live migration resume path:
-> >>>>>>>     Incomming migration calls .load_setup for each device
-> >>>>>>>     (RESTORE_VM, _ACTIVE, STOPPED)
-> >>>>>>>                         |
-> >>>>>>>     For each device, .load_state is called for that device section data
-> >>>>>>>                         |
-> >>>>>>>     At the end, called .load_cleanup for each device and vCPUs are started.
-> >>>>>>>                         |
-> >>>>>>>         (RUNNING, _NONE, _RUNNING)
-> >>>>>>>
-> >>>>>>> Note that:
-> >>>>>>> - Migration post copy is not supported.
-> >>>>>>>
-> >>>>>>> v6 -> v7:
-> >>>>>>> - Fix build failures.
-> >>>>>>>
-> >>>>>>> v5 -> v6:
-> >>>>>>> - Fix build failure.
-> >>>>>>>
-> >>>>>>> v4 -> v5:
-> >>>>>>> - Added decriptive comment about the sequence of access of members of structure
-> >>>>>>>   vfio_device_migration_info to be followed based on Alex's suggestion
-> >>>>>>> - Updated get dirty pages sequence.
-> >>>>>>> - As per Cornelia Huck's suggestion, added callbacks to VFIODeviceOps to
-> >>>>>>>   get_object, save_config and load_config.
-> >>>>>>> - Fixed multiple nit picks.
-> >>>>>>> - Tested live migration with multiple vfio device assigned to a VM.
-> >>>>>>>
-> >>>>>>> v3 -> v4:
-> >>>>>>> - Added one more bit for _RESUMING flag to be set explicitly.
-> >>>>>>> - data_offset field is read-only for user space application.
-> >>>>>>> - data_size is read for every iteration before reading data from migration, that
-> >>>>>>>   is removed assumption that data will be till end of migration region.
-> >>>>>>> - If vendor driver supports mappable sparsed region, map those region during
-> >>>>>>>   setup state of save/load, similarly unmap those from cleanup routines.
-> >>>>>>> - Handles race condition that causes data corruption in migration region during
-> >>>>>>>   save device state by adding mutex and serialiaing save_buffer and
-> >>>>>>>   get_dirty_pages routines.
-> >>>>>>> - Skip called get_dirty_pages routine for mapped MMIO region of device.
-> >>>>>>> - Added trace events.
-> >>>>>>> - Splitted into multiple functional patches.
-> >>>>>>>
-> >>>>>>> v2 -> v3:
-> >>>>>>> - Removed enum of VFIO device states. Defined VFIO device state with 2 bits.
-> >>>>>>> - Re-structured vfio_device_migration_info to keep it minimal and defined action
-> >>>>>>>   on read and write access on its members.
-> >>>>>>>
-> >>>>>>> v1 -> v2:
-> >>>>>>> - Defined MIGRATION region type and sub-type which should be used with region
-> >>>>>>>   type capability.
-> >>>>>>> - Re-structured vfio_device_migration_info. This structure will be placed at 0th
-> >>>>>>>   offset of migration region.
-> >>>>>>> - Replaced ioctl with read/write for trapped part of migration region.
-> >>>>>>> - Added both type of access support, trapped or mmapped, for data section of the
-> >>>>>>>   region.
-> >>>>>>> - Moved PCI device functions to pci file.
-> >>>>>>> - Added iteration to get dirty page bitmap until bitmap for all requested pages
-> >>>>>>>   are copied.
-> >>>>>>>
-> >>>>>>> Thanks,
-> >>>>>>> Kirti
-> >>>>>>>
-> >>>>>>> Kirti Wankhede (13):
-> >>>>>>>   vfio: KABI for migration interface
-> >>>>>>>   vfio: Add function to unmap VFIO region
-> >>>>>>>   vfio: Add vfio_get_object callback to VFIODeviceOps
-> >>>>>>>   vfio: Add save and load functions for VFIO PCI devices
-> >>>>>>>   vfio: Add migration region initialization and finalize function
-> >>>>>>>   vfio: Add VM state change handler to know state of VM
-> >>>>>>>   vfio: Add migration state change notifier
-> >>>>>>>   vfio: Register SaveVMHandlers for VFIO device
-> >>>>>>>   vfio: Add save state functions to SaveVMHandlers
-> >>>>>>>   vfio: Add load state functions to SaveVMHandlers
-> >>>>>>>   vfio: Add function to get dirty page list
-> >>>>>>>   vfio: Add vfio_listerner_log_sync to mark dirty pages
-> >>>>>>>   vfio: Make vfio-pci device migration capable.
-> >>>>>>>
-> >>>>>>>  hw/vfio/Makefile.objs         |   2 +-
-> >>>>>>>  hw/vfio/common.c              |  55 +++
-> >>>>>>>  hw/vfio/migration.c           | 874 ++++++++++++++++++++++++++++++++++++++++++
-> >>>>>>>  hw/vfio/pci.c                 | 137 ++++++-
-> >>>>>>>  hw/vfio/trace-events          |  19 +
-> >>>>>>>  include/hw/vfio/vfio-common.h |  25 ++
-> >>>>>>>  linux-headers/linux/vfio.h    | 166 ++++++++
-> >>>>>>>  7 files changed, 1271 insertions(+), 7 deletions(-)
-> >>>>>>>  create mode 100644 hw/vfio/migration.c
-> >>>>>>>
-> >>>>>>> -- 
-> >>>>>>> 2.7.0
-> >>>>>>>
-> >>>>> --
-> >>>>> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> >>> --
-> >>> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> >>>
-> > 
 
