@@ -6,56 +6,56 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D759C76188
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 09:26:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC489C76195
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 09:27:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 215622084D
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 09:26:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 215622084D
+	by mail.kernel.org (Postfix) with ESMTPS id 95A6F20880
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 09:27:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95A6F20880
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43306 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43324 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hoPAG-0003DQ-Mg
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 05:26:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37638)
+	id 1hoPAj-000543-Hy
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 05:27:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37777)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hoP9u-00022z-Ie
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 05:26:35 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hoPAB-0003CE-4o
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 05:26:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hoP9t-0005ru-Bt
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 05:26:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58336)
+ (envelope-from <mreitz@redhat.com>) id 1hoPA9-00065r-U6
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 05:26:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42480)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hoP9q-0005om-M3; Fri, 19 Jul 2019 05:26:30 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ id 1hoPA7-00063Z-6s; Fri, 19 Jul 2019 05:26:47 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 01A4D3022468;
- Fri, 19 Jul 2019 09:26:30 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 8DF79307D85B;
+ Fri, 19 Jul 2019 09:26:46 +0000 (UTC)
 Received: from localhost (unknown [10.40.205.128])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 68BAD10190C8;
- Fri, 19 Jul 2019 09:26:29 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 0742461B6A;
+ Fri, 19 Jul 2019 09:26:45 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Date: Fri, 19 Jul 2019 11:26:10 +0200
-Message-Id: <20190719092618.24891-3-mreitz@redhat.com>
+Date: Fri, 19 Jul 2019 11:26:13 +0200
+Message-Id: <20190719092618.24891-6-mreitz@redhat.com>
 In-Reply-To: <20190719092618.24891-1-mreitz@redhat.com>
 References: <20190719092618.24891-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Fri, 19 Jul 2019 09:26:30 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.48]); Fri, 19 Jul 2019 09:26:46 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v3 02/10] tests: Add job commit by drained_end
- test
+Subject: [Qemu-devel] [PATCH v3 05/10] tests: Lock AioContexts in
+ test-block-iothread
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,153 +73,121 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+When changing a node's AioContext, the caller must acquire the old
+AioContext (unless it currently runs in that old context).  Therefore,
+unless the node currently is in the main context, we always have to
+acquire the old context around calls that may change a node's
+AioContext.
+
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- tests/test-bdrv-drain.c | 119 ++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 119 insertions(+)
+ tests/test-block-iothread.c | 40 ++++++++++++++++++++++++-------------
+ 1 file changed, 26 insertions(+), 14 deletions(-)
 
-diff --git a/tests/test-bdrv-drain.c b/tests/test-bdrv-drain.c
-index 12e2ecf517..3503ce3b69 100644
---- a/tests/test-bdrv-drain.c
-+++ b/tests/test-bdrv-drain.c
-@@ -1527,6 +1527,122 @@ static void test_set_aio_context(void)
-     iothread_join(b);
- }
+diff --git a/tests/test-block-iothread.c b/tests/test-block-iothread.c
+index 79d9cf8a57..1949d5e61a 100644
+--- a/tests/test-block-iothread.c
++++ b/tests/test-block-iothread.c
+@@ -348,8 +348,8 @@ static void test_sync_op(const void *opaque)
+     if (t->blkfn) {
+         t->blkfn(blk);
+     }
+-    aio_context_release(ctx);
+     blk_set_aio_context(blk, qemu_get_aio_context(), &error_abort);
++    aio_context_release(ctx);
 =20
-+
-+typedef struct TestDropBackingBlockJob {
-+    BlockJob common;
-+    bool should_complete;
-+    bool *did_complete;
-+} TestDropBackingBlockJob;
-+
-+static int coroutine_fn test_drop_backing_job_run(Job *job, Error **errp=
-)
-+{
-+    TestDropBackingBlockJob *s =3D
-+        container_of(job, TestDropBackingBlockJob, common.job);
-+
-+    while (!s->should_complete) {
-+        job_sleep_ns(job, 0);
-+    }
-+
-+    return 0;
-+}
-+
-+static void test_drop_backing_job_commit(Job *job)
-+{
-+    TestDropBackingBlockJob *s =3D
-+        container_of(job, TestDropBackingBlockJob, common.job);
-+
-+    bdrv_set_backing_hd(blk_bs(s->common.blk), NULL, &error_abort);
-+
-+    *s->did_complete =3D true;
-+}
-+
-+static const BlockJobDriver test_drop_backing_job_driver =3D {
-+    .job_driver =3D {
-+        .instance_size  =3D sizeof(TestDropBackingBlockJob),
-+        .free           =3D block_job_free,
-+        .user_resume    =3D block_job_user_resume,
-+        .drain          =3D block_job_drain,
-+        .run            =3D test_drop_backing_job_run,
-+        .commit         =3D test_drop_backing_job_commit,
-+    }
-+};
-+
-+/**
-+ * Creates a child node with three parent nodes on it, and then runs a
-+ * block job on the final one, parent-node-2.
-+ *
-+ * (TODO: parent-node-0 currently serves no purpose, but will as of a
-+ * follow-up patch.)
-+ *
-+ * The job is then asked to complete before a section where the child
-+ * is drained.
-+ *
-+ * Ending this section will undrain the child's parents, first
-+ * parent-node-2, then parent-node-1, then parent-node-0 -- the parent
-+ * list is in reverse order of how they were added.  Ending the drain
-+ * on parent-node-2 will resume the job, thus completing it and
-+ * scheduling job_exit().
-+ *
-+ * Ending the drain on parent-node-1 will poll the AioContext, which
-+ * lets job_exit() and thus test_drop_backing_job_commit() run.  That
-+ * function removes the child as parent-node-2's backing file.
-+ *
-+ * In old (and buggy) implementations, there are two problems with
-+ * that:
-+ * (A) bdrv_drain_invoke() polls for every node that leaves the
-+ *     drained section.  This means that job_exit() is scheduled
-+ *     before the child has left the drained section.  Its
-+ *     quiesce_counter is therefore still 1 when it is removed from
-+ *     parent-node-2.
-+ *
-+ * (B) bdrv_replace_child_noperm() calls drained_end() on the old
-+ *     child's parents as many times as the child is quiesced.  This
-+ *     means it will call drained_end() on parent-node-2 once.
-+ *     Because parent-node-2 is no longer quiesced at this point, this
-+ *     will fail.
-+ *
-+ * bdrv_replace_child_noperm() therefore must call drained_end() on
-+ * the parent only if it really is still drained because the child is
-+ * drained.
-+ */
-+static void test_blockjob_commit_by_drained_end(void)
-+{
-+    BlockDriverState *bs_child, *bs_parents[3];
-+    TestDropBackingBlockJob *job;
-+    bool job_has_completed =3D false;
-+    int i;
-+
-+    bs_child =3D bdrv_new_open_driver(&bdrv_test, "child-node", BDRV_O_R=
-DWR,
-+                                    &error_abort);
-+
-+    for (i =3D 0; i < 3; i++) {
-+        char name[32];
-+        snprintf(name, sizeof(name), "parent-node-%i", i);
-+        bs_parents[i] =3D bdrv_new_open_driver(&bdrv_test, name, BDRV_O_=
-RDWR,
-+                                             &error_abort);
-+        bdrv_set_backing_hd(bs_parents[i], bs_child, &error_abort);
-+    }
-+
-+    job =3D block_job_create("job", &test_drop_backing_job_driver, NULL,
-+                           bs_parents[2], 0, BLK_PERM_ALL, 0, 0, NULL, N=
-ULL,
-+                           &error_abort);
-+
-+    job->did_complete =3D &job_has_completed;
-+
-+    job_start(&job->common.job);
-+
-+    job->should_complete =3D true;
-+    bdrv_drained_begin(bs_child);
-+    g_assert(!job_has_completed);
-+    bdrv_drained_end(bs_child);
-+    g_assert(job_has_completed);
-+
-+    bdrv_unref(bs_parents[0]);
-+    bdrv_unref(bs_parents[1]);
-+    bdrv_unref(bs_parents[2]);
-+    bdrv_unref(bs_child);
-+}
-+
- int main(int argc, char **argv)
+     bdrv_unref(bs);
+     blk_unref(blk);
+@@ -476,6 +476,7 @@ static void test_propagate_basic(void)
  {
-     int ret;
-@@ -1610,6 +1726,9 @@ int main(int argc, char **argv)
+     IOThread *iothread =3D iothread_new();
+     AioContext *ctx =3D iothread_get_aio_context(iothread);
++    AioContext *main_ctx;
+     BlockBackend *blk;
+     BlockDriverState *bs_a, *bs_b, *bs_verify;
+     QDict *options;
+@@ -504,12 +505,14 @@ static void test_propagate_basic(void)
+     g_assert(bdrv_get_aio_context(bs_b) =3D=3D ctx);
 =20
-     g_test_add_func("/bdrv-drain/set_aio_context", test_set_aio_context)=
-;
+     /* Switch the AioContext back */
+-    ctx =3D qemu_get_aio_context();
+-    blk_set_aio_context(blk, ctx, &error_abort);
+-    g_assert(blk_get_aio_context(blk) =3D=3D ctx);
+-    g_assert(bdrv_get_aio_context(bs_a) =3D=3D ctx);
+-    g_assert(bdrv_get_aio_context(bs_verify) =3D=3D ctx);
+-    g_assert(bdrv_get_aio_context(bs_b) =3D=3D ctx);
++    main_ctx =3D qemu_get_aio_context();
++    aio_context_acquire(ctx);
++    blk_set_aio_context(blk, main_ctx, &error_abort);
++    aio_context_release(ctx);
++    g_assert(blk_get_aio_context(blk) =3D=3D main_ctx);
++    g_assert(bdrv_get_aio_context(bs_a) =3D=3D main_ctx);
++    g_assert(bdrv_get_aio_context(bs_verify) =3D=3D main_ctx);
++    g_assert(bdrv_get_aio_context(bs_b) =3D=3D main_ctx);
 =20
-+    g_test_add_func("/bdrv-drain/blockjob/commit_by_drained_end",
-+                    test_blockjob_commit_by_drained_end);
-+
-     ret =3D g_test_run();
-     qemu_event_destroy(&done_event);
-     return ret;
+     bdrv_unref(bs_verify);
+     bdrv_unref(bs_b);
+@@ -534,6 +537,7 @@ static void test_propagate_diamond(void)
+ {
+     IOThread *iothread =3D iothread_new();
+     AioContext *ctx =3D iothread_get_aio_context(iothread);
++    AioContext *main_ctx;
+     BlockBackend *blk;
+     BlockDriverState *bs_a, *bs_b, *bs_c, *bs_verify;
+     QDict *options;
+@@ -573,13 +577,15 @@ static void test_propagate_diamond(void)
+     g_assert(bdrv_get_aio_context(bs_c) =3D=3D ctx);
+=20
+     /* Switch the AioContext back */
+-    ctx =3D qemu_get_aio_context();
+-    blk_set_aio_context(blk, ctx, &error_abort);
+-    g_assert(blk_get_aio_context(blk) =3D=3D ctx);
+-    g_assert(bdrv_get_aio_context(bs_verify) =3D=3D ctx);
+-    g_assert(bdrv_get_aio_context(bs_a) =3D=3D ctx);
+-    g_assert(bdrv_get_aio_context(bs_b) =3D=3D ctx);
+-    g_assert(bdrv_get_aio_context(bs_c) =3D=3D ctx);
++    main_ctx =3D qemu_get_aio_context();
++    aio_context_acquire(ctx);
++    blk_set_aio_context(blk, main_ctx, &error_abort);
++    aio_context_release(ctx);
++    g_assert(blk_get_aio_context(blk) =3D=3D main_ctx);
++    g_assert(bdrv_get_aio_context(bs_verify) =3D=3D main_ctx);
++    g_assert(bdrv_get_aio_context(bs_a) =3D=3D main_ctx);
++    g_assert(bdrv_get_aio_context(bs_b) =3D=3D main_ctx);
++    g_assert(bdrv_get_aio_context(bs_c) =3D=3D main_ctx);
+=20
+     blk_unref(blk);
+     bdrv_unref(bs_verify);
+@@ -685,7 +691,9 @@ static void test_attach_second_node(void)
+     g_assert(bdrv_get_aio_context(bs) =3D=3D ctx);
+     g_assert(bdrv_get_aio_context(filter) =3D=3D ctx);
+=20
++    aio_context_acquire(ctx);
+     blk_set_aio_context(blk, main_ctx, &error_abort);
++    aio_context_release(ctx);
+     g_assert(blk_get_aio_context(blk) =3D=3D main_ctx);
+     g_assert(bdrv_get_aio_context(bs) =3D=3D main_ctx);
+     g_assert(bdrv_get_aio_context(filter) =3D=3D main_ctx);
+@@ -712,7 +720,9 @@ static void test_attach_preserve_blk_ctx(void)
+     g_assert(bdrv_get_aio_context(bs) =3D=3D ctx);
+=20
+     /* Remove the node again */
++    aio_context_acquire(ctx);
+     blk_remove_bs(blk);
++    aio_context_release(ctx);
+     g_assert(blk_get_aio_context(blk) =3D=3D ctx);
+     g_assert(bdrv_get_aio_context(bs) =3D=3D qemu_get_aio_context());
+=20
+@@ -721,7 +731,9 @@ static void test_attach_preserve_blk_ctx(void)
+     g_assert(blk_get_aio_context(blk) =3D=3D ctx);
+     g_assert(bdrv_get_aio_context(bs) =3D=3D ctx);
+=20
++    aio_context_acquire(ctx);
+     blk_set_aio_context(blk, qemu_get_aio_context(), &error_abort);
++    aio_context_release(ctx);
+     bdrv_unref(bs);
+     blk_unref(blk);
+ }
 --=20
 2.21.0
 
