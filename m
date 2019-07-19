@@ -2,65 +2,82 @@ Return-Path: <SRS0=mHy3=VQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2937C76188
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 10:46:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 447E1C76188
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 10:49:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BFFB92173B
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 10:46:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BFFB92173B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 11C742173B
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 10:49:24 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="PlHyvZLe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 11C742173B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43944 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43960 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hoQPB-0007Tw-Sc
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 06:46:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57795)
+	id 1hoQS3-0000i4-Cz
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 06:49:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58466)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mst@redhat.com>) id 1hoQP0-0006uO-BD
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 06:46:15 -0400
+ (envelope-from <wrfsh@yandex-team.ru>) id 1hoQRq-0000BW-TA
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 06:49:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1hoQOz-00072y-Bh
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 06:46:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34448)
+ (envelope-from <wrfsh@yandex-team.ru>) id 1hoQRp-0001Os-MS
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 06:49:10 -0400
+Received: from forwardcorp1o.mail.yandex.net ([2a02:6b8:0:1a2d::193]:55410)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>)
- id 1hoQOx-0006zv-63; Fri, 19 Jul 2019 06:46:11 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 2EAE730832C8;
- Fri, 19 Jul 2019 10:46:09 +0000 (UTC)
-Received: from redhat.com (ovpn-121-25.rdu2.redhat.com [10.10.121.25])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 261C35D719;
- Fri, 19 Jul 2019 10:46:05 +0000 (UTC)
-Date: Fri, 19 Jul 2019 06:46:04 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: "Zhangbo (Oscar)" <oscar.zhangbo@huawei.com>
-Message-ID: <20190719064229-mutt-send-email-mst@kernel.org>
-References: <0259E1C966E8C54AA93AA2B1240828E672DE0920@DGGEML529-MBS.china.huawei.com>
+ (Exim 4.71) (envelope-from <wrfsh@yandex-team.ru>)
+ id 1hoQRh-0000I7-Kx; Fri, 19 Jul 2019 06:49:02 -0400
+Received: from mxbackcorp1o.mail.yandex.net (mxbackcorp1o.mail.yandex.net
+ [IPv6:2a02:6b8:0:1a2d::301])
+ by forwardcorp1o.mail.yandex.net (Yandex) with ESMTP id 4440D2E14F9;
+ Fri, 19 Jul 2019 13:48:10 +0300 (MSK)
+Received: from smtpcorp1p.mail.yandex.net (smtpcorp1p.mail.yandex.net
+ [2a02:6b8:0:1472:2741:0:8b6:10])
+ by mxbackcorp1o.mail.yandex.net (nwsmtp/Yandex) with ESMTP id
+ Hjudyt7ELw-m9BWQXCt; Fri, 19 Jul 2019 13:48:10 +0300
+Precedence: bulk
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
+ s=default; 
+ t=1563533290; bh=ifcbJ5mCnRTc9HPTtjguN2q7pIUHbvFkIUvRVNI7duE=;
+ h=In-Reply-To:Message-ID:From:Date:References:To:Subject:Cc;
+ b=PlHyvZLeZb5BpHmgBqXkGiSnS1GVFHHxCUJHQcPQa/Zk8CuZ4L9OZSMMIRizWVED3
+ 8NdIQe+KfYEPhhxXW8pCpeTKpSIHxwpOfssN1JJGO0r7jJ8pVASEqtyDSwvmkn5anw
+ aArrq6bozqGyJOXgSbZGe50xNHN22IIN9berPbyg=
+Authentication-Results: mxbackcorp1o.mail.yandex.net;
+ dkim=pass header.i=@yandex-team.ru
+Received: from dynamic-red.dhcp.yndx.net (dynamic-red.dhcp.yndx.net
+ [2a02:6b8:0:40c:f68c:50ff:fee9:44bd])
+ by smtpcorp1p.mail.yandex.net (nwsmtp/Yandex) with ESMTPSA id
+ DhWMkB8CPG-m96SYqK7; Fri, 19 Jul 2019 13:48:09 +0300
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (Client certificate not present)
+To: Stefan Hajnoczi <stefanha@gmail.com>
+References: <8146312c-8a9c-3c4e-ab80-a3f42cc1d6ce@yandex-team.ru>
+ <20190719101757.GF18585@stefanha-x1.localdomain>
+From: Evgeny Yakovlev <wrfsh@yandex-team.ru>
+Message-ID: <77df2959-c5d1-5cf6-304a-7f9ad6af8a51@yandex-team.ru>
+Date: Fri, 19 Jul 2019 13:48:09 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <0259E1C966E8C54AA93AA2B1240828E672DE0920@DGGEML529-MBS.china.huawei.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.44]); Fri, 19 Jul 2019 10:46:09 +0000 (UTC)
+In-Reply-To: <20190719101757.GF18585@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] Discussion: redundant process during hotplug and
- missed process during unplug
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a02:6b8:0:1a2d::193
+Subject: Re: [Qemu-devel] BDRV request fragmentation and vitio-blk write
+ submission guarantees
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -69,62 +86,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- "limingwang \(A\)" <limingwang@huawei.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Jiangyifei <jiangyifei@huawei.com>, fangying <fangying1@huawei.com>,
- "dengkai \(A\)" <dengkai1@huawei.com>
+Cc: kwolf@redhat.com, stefanha@redhat.com, qemu-block@nongnu.org,
+ qemu-devel@nongnu.org, mreitz@redhat.com,
+ "yc-core@yandex-team.ru" <yc-core@yandex-team.ru>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jul 19, 2019 at 02:35:14AM +0000, Zhangbo (Oscar) wrote:
-> Hi All:
-> I have 2 questions about (un)hotplug on pcie-root-port.
-> First Question (hotplug failure because of redundant PCI_EXP_LNKSTA_DLL=
-LA bit set):
->     during VM boot, qemu sets PCI_EXP_LNKSTA_DLLLA according to this pr=
-ocess:
->         pcie_cap_init() -> pcie_cap_v1_fill(),=20
->     even if there's no pcie device added to the VM.
->     I noticed that during hotplug, qemu also sets PCI_EXP_LNKSTA_DLLLA =
-in pcie_cap_slot_hotplug_cb().
->     It means that the bit PCI_EXP_LNKSTA_DLLLA is set TWICE.
->     why set this bit during initializing pcie-root-port? It seems unnec=
-essary.
+On 19.07.2019 13:17, Stefan Hajnoczi wrote:
+> On Thu, Jul 18, 2019 at 04:44:17PM +0300, =D0=95=D0=B2=D0=B3=D0=B5=D0=BD=
+=D0=B8=D0=B9 =D0=AF=D0=BA=D0=BE=D0=B2=D0=BB=D0=B5=D0=B2 wrote:
+>> Hi everyone,
+>>
+>> We're currently working on implementing a qemu BDRV format driver whic=
+h we
+>> are using with virtio-blk devices.
+>>
+>> I have a question concerning BDRV request fragmentation and virtio-blk=
+ write
+>> request submission which is not entirely clear to me by only reading v=
+irtio
+>> spec. Could you please consider the following case and give some addit=
+ional
+>> guidance?
+>>
+>> 1. Our BDRV format driver has a notion of max supported transfer size.=
+ So we
+>> implement BlockDriver::bdrv_refresh_limits where we fill out
+>> BlockLimits::max_transfer and opt_transfer fields.
+>>
+>> 2. virtio-blk exposes max_transfer as a virtio_blk_config::opt_io_size
+>> field, which (according to spec 1.1) is a **suggested** maximum. We re=
+ad
+>> "suggested" as "guest driver may still send requests that don't fit in=
+to
+>> opt_io_size and we should handle those"...
+>>
+>> 3. ... and judging by code in block/io.c qemu block layer handles such
+>> requests by fragmenting them into several BDRV requests if request siz=
+e is >
+>> max_transfer
+>>
+>> 4. Guest will see request completion only after all fragments are hand=
+led.
+>> However each fragment submission path can call qemu_coroutine_yield an=
+d move
+>> on to submitting next request available in virtq before completely
+>> submitting the rest of the fragments. Which means the following situat=
+ion is
+>> possible where BDRV sees 2 write requests in virtq, both of which are =
+larger
+>> than max_transfer:
+>>
+>> ||
+>>
+>> |Blocks: |-------------------------------------> Write1: xxxxxxxx Writ=
+e2:
+>> yyyyyyyy Write1Chunk1: xxxx Write2Chunk1: yyyy Write2Chunk2: yyyy
+>> Write1Chunk1: xxxx Blocks: |------------yyyyxxxx----------------->|
+>>
+>> ||
+>>
+>> |In above scenario guest virtio-blk driver decided to submit 2 interse=
+cting
+>> write requests, both of which are larger than ||max_transfer, and then=
+ call
+>> hypervisor.|
+>>
+>> |I understand that virtio-blk may handle requests out of order, so gue=
+st
+>> must not make any assumptions on relative order in which those request=
+s will
+>> be handled.|
+>>
+>> |However, can guest driver expect that whatever the submission order w=
+ill
+>> be, the actual intersecting writes will be atomic?|
+>>
+>> |In other words, will it be correct for conforming virtio-blk driver t=
+o
+>> expect only "|||xxxxxxxx" or "||||yyyyyyyy" but not anything else in
+>> between, after both requests are reported as completed?||
+>>
+>> ||Because i think that is something that may happen in qemu right now,=
+ if i
+>> understood correctly. ||
+> Write requests are not atomic in general.  Specific storage technologie=
+s
+> support atomic writes via special commands with certain restrictions bu=
+t
+> applications using this feature aren't portable.
+>
+> Portable applications either don't submit intersecting write requests o=
+r
+> they do not depend on atomicity.
+>
+> Out of curiousity I took a quick look at Linux device-mapper.  The same
+> issue applies in device-mapper when intersecting write requests cross
+> device-mapper targets.  I think Linux submits split bios in parallel an=
+d
+> without serialization.
+>
+> Stefan
 
-Makes sense.
 
->     The bad side of this is it causes HOTPLUG FAILURE if we boot the VM=
- and hotplug a pcie device at the same time:
-> 	In VM kernel=EF=BC=8Caccording to this bit set, it senses a PDC event,=
- the process is:=20
->         pciehp_probe -> pcie_init -> pcie_init_slot -> pciehp_queue_pus=
-hbutton_work.=20
->     If the 2 PDC events get too close, the VM kernel will wrongly unplu=
-g the device.
-> Suggestion to the 1st problem:
-> 	Can I remove the PCI_EXP_LNKSTA_DLLLA bit set process during pcie_cap_=
-init().
->=20
-> Second Question (time cost too much during pcie device unplug):
->     qemu only send ABP event to VM kernel during unpluging pcie devices=
-, VM kernel receives the
->     ABP event then sleep 5s to expect a PDC event, which causes unplugi=
-ng devices takes too long.=20
-> Suggestion to the 2nd problem:
-> 	Can I send ABP and *PDC* events to kernet when unplug devices.
+Thanks, Stefan!
 
-I think we should not only set PDC but also try clearing presence bit,
-even though the device is actually still there and mapped into guest
-memory.
-Maybe we should also not send the ABP event at all.
-
-In both cases it's necessary to test with a non-linux guest
-(e.g. a couple of versions of windows) to be sure we are not breaking
-anything.
+(By the way, there is a v2 of this message without all the formatting bug=
+s)
 
 
---=20
-MST
+Evgeny
+
+
 
