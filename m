@@ -6,65 +6,64 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B48D7C76188
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 08:06:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32D97C76195
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 08:07:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 839D620665
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 08:06:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 839D620665
+	by mail.kernel.org (Postfix) with ESMTPS id 0F19A2084D
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 08:07:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F19A2084D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42898 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42908 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hoNus-0005av-Pz
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 04:06:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44539)
+	id 1hoNvG-000744-37
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 04:07:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44652)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <laurent@vivier.eu>) id 1hoNui-0005C2-L1
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 04:06:49 -0400
+ (envelope-from <laurent@vivier.eu>) id 1hoNut-0005kA-01
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 04:06:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1hoNuh-0004Vw-I7
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 04:06:48 -0400
-Received: from mout.kundenserver.de ([212.227.126.187]:57363)
+ (envelope-from <laurent@vivier.eu>) id 1hoNuq-0004fE-Q9
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 04:06:58 -0400
+Received: from mout.kundenserver.de ([212.227.126.135]:59065)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hoNuh-0004UU-8v
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 04:06:47 -0400
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hoNuq-0004eY-HR
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 04:06:56 -0400
 Received: from localhost.localdomain ([78.238.229.36]) by
  mrelayeu.kundenserver.de (mreue012 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1M2gt5-1hrxLC3wgJ-004CiN; Fri, 19 Jul 2019 10:06:18 +0200
+ id 1MIyiY-1i8eqQ3Xek-00KMeY; Fri, 19 Jul 2019 10:06:17 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Date: Fri, 19 Jul 2019 10:06:09 +0200
-Message-Id: <20190719080610.1607-3-laurent@vivier.eu>
+Date: Fri, 19 Jul 2019 10:06:08 +0200
+Message-Id: <20190719080610.1607-2-laurent@vivier.eu>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190719080610.1607-1-laurent@vivier.eu>
 References: <20190719080610.1607-1-laurent@vivier.eu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:3vZTmkp2CIU/uLb9dj5H0NYmh6QWxpKuuZCCkAw/sEStKXXk1RQ
- wojVnpv63+pcyzFgvI/reAUcF8xlKbpgfVBI74hCJYKG0RokUBeJ5HQg4Dl+ZPxg2xJRTC1
- zDItbQQiWgTTNLxwn9UBa0MX7wMhtPXn0llHaoR0BTFZOQBsj38fmuDj8IlaPobeqrRWQ8T
- Zdx9M59D9FY7I78UDV+3Q==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:90PKw+tmUqM=:oNjPxE2Kx1sPLSjFtj5TL4
- NaMnlUjQrEHn5JhD3FPDwrDbiXd9SNmmktBvy7clYJ9YLKde90Jh5jYtOv/CxqaZ3R231miG/
- D/B6NzU/MiOKg1hs6GDYXhM2lR7uyZtnnCFi70lRsS6v/IH/VCT5vR20YiiGytNqZfKQHg4xs
- sal/Fk0iJ7rz0IVD9KhdW5AsmqTIFvR+uRFnHnTO9UgOdZrDfbhbAO7jBXWWaCqDSXMAjOZjN
- E05H0FQl6VJknOL0Ytdx3Rr1u/welGKo+xamMDZf1FpbpL1kz6c+QmNZykTHhIyfGPBDneJlH
- XijY9tVJoYTI8JxMT1rubMa4kMYf+1WrYYiUui8cXfN7SXO1M71oiTMVVePWHFAZt0MDpeyR0
- Rxt7vRo/SG1W1w9uNP5CFVfbV2cnFM0IZO1zIougHyIbrYHVOPJaPNYD/PbzYx0/1qPW4M4/R
- S7fGtRxl7QZxdLF06Nf+bc9JLwI7+Lv0mtPpcUQm1Ntuc0/V0WgMWnkCVELnu8EkkNCQ5HoMt
- ioIH5LKZogAy8BC3nTDefaHpqQUqiJlZ7xoB5/NQgVXUx/Pjtqc/VEnaaMphSkXKGRd5ldytm
- QBn2oxKVlwQdMlVeqbA9izPrgHvQZDAV5s+M+8x/1DMkjaxso8IAnZjhn2/8AwFFfmQY0OFMs
- 89ULtCBtatzrOUY07JycAaWKUeBKCGCAl3uGXULIqkAsuP8aaeDYZXO/JGFGKvKP1tkipDSU2
- UasXO6fQanJNbxWnpLJafJ56qArdFz0ltNx3Hjp8D3Mk/x2hqWZf9LAnDfM=
+X-Provags-ID: V03:K1:dgqKW6Sk5FAX+oktD3tKuBxMmTxCzDZxjHuVtFqncFeX+B4aiq+
+ IojO3Rs9hWGDAY/m39nIHgw1hD+YFnZM8gfA+a7qbC9m2Aoj1pgwZ9Ex14RLa0Sdo6C64rw
+ ZSgP6IQ9p+6fQ3OhprukR3o/lQaByQ4F1nByIIlTSSQr30dfQWd8+B4H/3qyD0beZfnm1x7
+ vxtQYCPqbZMZW+Hmo8YGg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:jVbdCNNlpwY=:y+Cb/4BYXugQsbWqNfiCM/
+ mglNFxPLmJjqo9t6yWn7FLd+jaN7shR02kho/YCRXQqA27AeWCqP6V5QXNBWx4/rFPTnEVa1X
+ YCiRKH+Y7GD+bN8Z6MtlQ7uUkxPSSoZOj7szgJvmUpa+QHTGA47IdWFXuMlg2H2x7fHGE5AiR
+ +/1KBSnXRGaILk59IFdD3fEDgYFNzYPwS9O6PD5dgDXPJgWQg9KIa1yj/pq5a8vFzE8p8Iwfc
+ Ntqu8OO9uijtsfEc0tVmpqPGUYo+5PO+sFVGo1gBJWLD78uwcdEjp9ot/YAAKYh+0UQhGsFcB
+ qnx349puyVZ06SHXsNJvoL7583JVZYPDtUkOawRDVe87/13AXJN2jIJgBHRyj/6spy2atld62
+ 3pe/rc5uCA38cQNTjBj6Po77AKYUIuWUrL1Bgt+DGmglPA7cg3ZZriWOTO4Ja6Fvv9wvfsnA7
+ AWC655wX+4rcMuqSfmhykFdwCLzhzT0hIJASwdaOzyvcaeB8z00plGuPKctlLUlCAxxxCe8BW
+ MVE7y82yLPimvycdMZM2W95DqJSKhZX0260/g1SCVzqM8FFSDkWpXnC1KXPlC56NAduQ/xlvq
+ eUG6Osmw5ZzIowYIiJOkWNfBg0w/hMhFu/VFqjRjkHwRy7Td5EYdXBOVQm4Z+a+UvT/5RJyjT
+ ljigyDAedheAnlR3RI23VbXaGpL8XDih0c7VgWDJ83pjE5L5hNU6bVYSo68ipSTFE9cMROdBr
+ oVbfuZXPQkWYL/zBfv9gHQsLLHWaw3KiRpKr2w==
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.187
-Subject: [Qemu-devel] [PULL v2 2/3] linux-user: check valid address in
- access_ok()
+X-Received-From: 212.227.126.135
+Subject: [Qemu-devel] [PULL v2 1/3] linux-user: Fix structure
+ target_ucontext for MIPS
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,8 +75,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>,
- =?UTF-8?q?R=C3=A9mi=20Denis-Courmont?= <remi@remlab.net>,
+Cc: Dragan Mladjenovic <dmladjenovic@wavecomp.com>,
  Aleksandar Rikalo <arikalo@wavecomp.com>, Riku Voipio <riku.voipio@iki.fi>,
  Laurent Vivier <laurent@vivier.eu>,
  Aleksandar Markovic <amarkovic@wavecomp.com>,
@@ -87,59 +85,57 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Rémi Denis-Courmont <remi@remlab.net>
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Fix a crash with LTP testsuite and aarch64:
+Structure ucontext for MIPS is defined in the following way in
+Linux kernel:
 
-  tst_test.c:1015: INFO: Timeout per run is 0h 05m 00s
-  qemu-aarch64: .../qemu/accel/tcg/translate-all.c:2522: page_check_range: Assertion `start < ((target_ulong)1 << L1_MAP_ADDR_SPACE_BITS)' failed.
-  qemu:handle_cpu_signal received signal outside vCPU context @ pc=0x60001554
+(arch/mips/include/uapi/asm/ucontext.h, lines 54-64)
 
-page_check_range() should never be called with address outside the guest
-address space. This patch adds a guest_addr_valid() check in access_ok()
-to only call page_check_range() with a valid address.
+struct ucontext {
+    /* Historic fields matching asm-generic */
+    unsigned long       uc_flags;
+    struct ucontext     *uc_link;
+    stack_t             uc_stack;
+    struct sigcontext   uc_mcontext;
+    sigset_t            uc_sigmask;
 
-Fixes: f6768aa1b4c6 ("target/arm: fix AArch64 virtual address space size")
-Signed-off-by: Rémi Denis-Courmont <remi@remlab.net>
-Signed-off-by: Laurent Vivier <lvivier@redhat.com>
-Message-Id: <20190704084115.24713-1-lvivier@redhat.com>
+    /* Extended context structures may follow ucontext */
+    unsigned long long	uc_extcontext[0];
+};
+
+Fix the structure target_ucontext for MIPS to reflect the definition
+above, except the correction for field uc_extcontext, which will
+follow at some later time.
+
+Fixes: 94c5495d
+
+Reported-by: Dragan Mladjenovic <dmladjenovic@wavecomp.com>
+Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+Message-Id: <1562931470-3700-2-git-send-email-aleksandar.markovic@rt-rk.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- include/exec/cpu_ldst.h | 4 ++++
- linux-user/qemu.h       | 4 +++-
- 2 files changed, 7 insertions(+), 1 deletion(-)
+ linux-user/mips/signal.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/include/exec/cpu_ldst.h b/include/exec/cpu_ldst.h
-index 9de8c933031b..9151fdb042c4 100644
---- a/include/exec/cpu_ldst.h
-+++ b/include/exec/cpu_ldst.h
-@@ -62,7 +62,11 @@ typedef uint64_t abi_ptr;
- /* All direct uses of g2h and h2g need to go away for usermode softmmu.  */
- #define g2h(x) ((void *)((unsigned long)(abi_ptr)(x) + guest_base))
+diff --git a/linux-user/mips/signal.c b/linux-user/mips/signal.c
+index 6aa303ec9c16..455a8a229a83 100644
+--- a/linux-user/mips/signal.c
++++ b/linux-user/mips/signal.c
+@@ -71,10 +71,9 @@ struct sigframe {
+ };
  
-+#if HOST_LONG_BITS <= TARGET_VIRT_ADDR_SPACE_BITS
-+#define guest_addr_valid(x) (1)
-+#else
- #define guest_addr_valid(x) ((x) <= GUEST_ADDR_MAX)
-+#endif
- #define h2g_valid(x) guest_addr_valid((unsigned long)(x) - guest_base)
- 
- static inline int guest_range_valid(unsigned long start, unsigned long len)
-diff --git a/linux-user/qemu.h b/linux-user/qemu.h
-index fab287b7ec50..4258e4162d26 100644
---- a/linux-user/qemu.h
-+++ b/linux-user/qemu.h
-@@ -456,7 +456,9 @@ extern unsigned long guest_stack_size;
- 
- static inline int access_ok(int type, abi_ulong addr, abi_ulong size)
- {
--    return page_check_range((target_ulong)addr, size,
-+    return guest_addr_valid(addr) &&
-+           (size == 0 || guest_addr_valid(addr + size - 1)) &&
-+           page_check_range((target_ulong)addr, size,
-                             (type == VERIFY_READ) ? PAGE_READ : (PAGE_READ | PAGE_WRITE)) == 0;
- }
- 
+ struct target_ucontext {
+-    target_ulong tuc_flags;
+-    target_ulong tuc_link;
++    abi_ulong tuc_flags;
++    abi_ulong tuc_link;
+     target_stack_t tuc_stack;
+-    target_ulong pad0;
+     struct target_sigcontext tuc_mcontext;
+     target_sigset_t tuc_sigmask;
+ };
 -- 
 2.21.0
 
