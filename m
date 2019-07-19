@@ -2,81 +2,88 @@ Return-Path: <SRS0=mHy3=VQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8531C76188
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 10:21:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3BC3C76188
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 10:28:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BE23420873
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 10:21:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE23420873
+	by mail.kernel.org (Postfix) with ESMTPS id A8EA721849
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 10:28:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8EA721849
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43802 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43836 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hoQ16-0003l9-VQ
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 06:21:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51708)
+	id 1hoQ7u-00077S-UT
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 06:28:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53570)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hoQ0u-0003F2-L9
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 06:21:21 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hoQ7j-0006eI-A6
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 06:28:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hoQ0t-0000Oy-L5
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 06:21:20 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:35036)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hoQ0t-0000O8-Ft
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 06:21:19 -0400
-Received: by mail-wm1-f68.google.com with SMTP id l2so28504089wmg.0
- for <qemu-devel@nongnu.org>; Fri, 19 Jul 2019 03:21:18 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=RILE1iZpMYXfF8OwS6dKminfjIGlAG6jhJeAundloEM=;
- b=pcjGIQz9NVXks7Zvud70FgP2ukX/CpSYwOyl/4rebOWQFwHxKTvuhMK8KZATlRQMtA
- PpjTIBlLIm6ZGzhUTMr8/h7g4F9naWb2hAyz/vtYrfx0h01zDFf24vSnVUVwYFYepp5i
- FutBSbPhR29x+e2Qh1WYPFQZlmkafEwVHUgglQ/xStbss8dWOKYJT4si9zpjjURiXFSq
- gH8btH5ww9q7nMNc+gpm7YjRvLdAqgT5zEd2bZUrQ6bzN2rSWzQW6lZXyS9E8SQFjaMi
- Ts9fterKHNPPwXES2hfsfIYOBi7xBKpDzHYnuXjPrqH0rwjij9ofBUr+YqzLgP4zbhlV
- 8cxA==
-X-Gm-Message-State: APjAAAXdA5yPTYJbap3D6HMGXBZgFgg0P4yRjXBsBnV+M0MOY2iPSy38
- EFgTUigwL1Ow/qNiqW7gYXdmBQ==
-X-Google-Smtp-Source: APXvYqw+LEsLriVeCMSW4dh3XgT/gokUV0pAoIyjS923gO8qn4nZpvIyoByaVNq8pfgLG/+yhirfog==
-X-Received: by 2002:a05:600c:2503:: with SMTP id
- d3mr48978539wma.41.1563531677915; 
- Fri, 19 Jul 2019 03:21:17 -0700 (PDT)
-Received: from [192.168.1.37] (62.red-83-42-61.dynamicip.rima-tde.net.
- [83.42.61.62])
- by smtp.gmail.com with ESMTPSA id c1sm59315666wrh.1.2019.07.19.03.21.16
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Fri, 19 Jul 2019 03:21:17 -0700 (PDT)
-To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-References: <20190718193441.12490-1-sw@weilnetz.de>
- <6241fd95-789f-f560-2170-0544cded1720@redhat.com>
- <CAL1e-=h01=ouAuTiPK7mGqCJVX4C-WQUEVZngFBG5nthDQ936g@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <da7e8484-246b-45e6-3790-7d3e8407bf37@redhat.com>
-Date: Fri, 19 Jul 2019 12:21:16 +0200
+ (envelope-from <mreitz@redhat.com>) id 1hoQ7i-0007BL-97
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 06:28:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37582)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1hoQ7f-00076q-W3; Fri, 19 Jul 2019 06:28:20 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 09119C18B2D9;
+ Fri, 19 Jul 2019 10:28:19 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.40.205.128])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2C3FB61984;
+ Fri, 19 Jul 2019 10:28:16 +0000 (UTC)
+To: Maxim Levitsky <mlevitsk@redhat.com>, qemu-devel@nongnu.org
+References: <20190716161901.1430-1-mlevitsk@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <cbff0508-834b-3c52-bbe7-35046485c1e9@redhat.com>
+Date: Fri, 19 Jul 2019 12:28:14 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <CAL1e-=h01=ouAuTiPK7mGqCJVX4C-WQUEVZngFBG5nthDQ936g@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190716161901.1430-1-mlevitsk@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="8CeiWoizYg8FghRB6EOGeLbkyOXEe8YDq"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.31]); Fri, 19 Jul 2019 10:28:19 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.128.68
-Subject: Re: [Qemu-devel] [PATCH] audio: Add missing fall through comments
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v5] LUKS: support preallocation
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,90 +95,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Stefan Weil <sw@weilnetz.de>,
- qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/19/19 9:43 AM, Aleksandar Markovic wrote:
-> 
-> On Jul 19, 2019 9:30 AM, "Philippe Mathieu-Daudé" <philmd@redhat.com
-> <mailto:philmd@redhat.com>> wrote:
->>
->> On 7/18/19 9:34 PM, Stefan Weil wrote:
->> > Signed-off-by: Stefan Weil <sw@weilnetz.de <mailto:sw@weilnetz.de>>
->>
->> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com
-> <mailto:philmd@redhat.com>>
->> Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com
-> <mailto:philmd@redhat.com>>
->>
-> 
-> Philippe, how do you test these comments?
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--8CeiWoizYg8FghRB6EOGeLbkyOXEe8YDq
+Content-Type: multipart/mixed; boundary="8KenFg11Mn6rW6xnMrIQdRTZ4VjHSHg0K";
+ protected-headers="v1"
+From: Max Reitz <mreitz@redhat.com>
+To: Maxim Levitsky <mlevitsk@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
+Message-ID: <cbff0508-834b-3c52-bbe7-35046485c1e9@redhat.com>
+Subject: Re: [PATCH v5] LUKS: support preallocation
+References: <20190716161901.1430-1-mlevitsk@redhat.com>
+In-Reply-To: <20190716161901.1430-1-mlevitsk@redhat.com>
 
-The testing is quite easy since it doesn't build with
-'-Wimplicit-fallthrough=2':
+--8KenFg11Mn6rW6xnMrIQdRTZ4VjHSHg0K
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-  CC      audio/audio.o
-/home/phil/source/qemu/audio/audio.c: In function ‘audio_pcm_init_info’:
-/home/phil/source/qemu/audio/audio.c:308:14: error: this statement may
-fall through [-Werror=implicit-fallthrough=]
-  308 |         sign = 1;
-      |         ~~~~~^~~
-/home/phil/source/qemu/audio/audio.c:309:5: note: here
-  309 |     case AUDIO_FORMAT_U16:
-      |     ^~~~
-/home/phil/source/qemu/audio/audio.c:315:14: error: this statement may
-fall through [-Werror=implicit-fallthrough=]
-  315 |         sign = 1;
-      |         ~~~~~^~~
-/home/phil/source/qemu/audio/audio.c:316:5: note: here
-  316 |     case AUDIO_FORMAT_U32:
-      |     ^~~~
-cc1: all warnings being treated as errors
+On 16.07.19 18:19, Maxim Levitsky wrote:
+> preallocation=3Doff and preallocation=3Dmetadata
+> both allocate luks header only, and preallocation=3Dfalloc/full
+> is passed to underlying file.
+>=20
+> Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=3D1534951
+>=20
+> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> ---
+>=20
+> This is hopefully a revision without coding style violations.
+>=20
+> Note that I still haven't tested the blockdev-create code, other that
+> compile testing it.
+>=20
+> Best regards,
+> 	Maxim Levitsky
+>=20
+>=20
+>  block/crypto.c       | 30 +++++++++++++++++++++++++++---
+>  qapi/block-core.json |  6 +++++-
+>  2 files changed, 32 insertions(+), 4 deletions(-)
 
-With Stefan patch applied:
+Thanks, applied to my block-next branch for 4.2:
 
-  CC      audio/audio.o
-  CC      audio/audio_legacy.o
-  CC      audio/noaudio.o
-  CC      audio/wavaudio.o
-  CC      audio/mixeng.o
-  CC      audio/spiceaudio.o
-  CC      audio/wavcapture.o
-[...]
+https://git.xanclic.moe/XanClic/qemu/commits/branch/block-next
 
-> 
-> Yours, Aleksandar
-> 
->> > ---
->> >  audio/audio.c | 2 ++
->> >  1 file changed, 2 insertions(+)
->> >
->> > diff --git a/audio/audio.c b/audio/audio.c
->> > index 5fd9a58a80..a7a13e900a 100644
->> > --- a/audio/audio.c
->> > +++ b/audio/audio.c
->> > @@ -304,6 +304,7 @@ void audio_pcm_init_info (struct audio_pcm_info
-> *info, struct audsettings *as)
->> > 
->> >      case AUDIO_FORMAT_S16:
->> >          sign = 1;
->> > +        /* fall through */
->> >      case AUDIO_FORMAT_U16:
->> >          bits = 16;
->> >          shift = 1;
->> > @@ -311,6 +312,7 @@ void audio_pcm_init_info (struct audio_pcm_info
-> *info, struct audsettings *as)
->> > 
->> >      case AUDIO_FORMAT_S32:
->> >          sign = 1;
->> > +        /* fall through */
->> >      case AUDIO_FORMAT_U32:
->> >          bits = 32;
->> >          shift = 2;
->> >
->>
-> 
+Max
+
+(The Patchew warning doesn=E2=80=99t look like it=E2=80=99s caused by thi=
+s patch.)
+
+
+--8KenFg11Mn6rW6xnMrIQdRTZ4VjHSHg0K--
+
+--8CeiWoizYg8FghRB6EOGeLbkyOXEe8YDq
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0xmz4ACgkQ9AfbAGHV
+z0BuwAf/eE9WH71MIBczqcrP7Yt5nWY2oUykGCPbE/tu+pnWPSQ0ga1UhSZTBfyr
+sXPd5WX/g5hQFF8mdNyBBvAhopaZQiouQZbV8Y9EzMYFeGbBefoJ/7XvfJA1GZxO
+FJH4xGk0eU7mqT25kn8PVBBipBp6JbgIFjvIEAPM0KjCx92MM191WdHtybanSZRn
+qdnu0FK1xAHcWScn4qsIrOYnsSy/2AEqDWpdzyTmlL0x6/RADcyBB9I2gtTf8GrY
+w3d7XDCKzFC9Yyth0S8jx7w9zJlkkYJ1jAGENI4czzTWSLwcbyjEEdur03aiFJV5
+hlEe/suHariJExYMmGQmaZDRZd7nfw==
+=XmJJ
+-----END PGP SIGNATURE-----
+
+--8CeiWoizYg8FghRB6EOGeLbkyOXEe8YDq--
 
