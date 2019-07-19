@@ -2,63 +2,52 @@ Return-Path: <SRS0=mHy3=VQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 206FBC76195
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 16:25:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BAAA9C7618F
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 16:30:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EF97C21872
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 16:25:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF97C21872
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 92E5B21872
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 16:30:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 92E5B21872
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46990 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47006 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hoVhc-0004xJ-6d
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 12:25:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42834)
+	id 1hoVmc-0006ot-ST
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 12:30:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43377)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <berrange@redhat.com>) id 1hoVhT-0004YP-2J
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 12:25:40 -0400
+ (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1hoVmP-0006Ny-1H
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 12:30:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1hoVhL-0000Qu-Dg
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 12:25:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36970)
+ (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1hoVmN-000334-IY
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 12:30:44 -0400
+Received: from relay.sw.ru ([185.231.240.75]:44212)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hoVhK-0000HJ-Bp
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 12:25:30 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 9A8F430A8847;
- Fri, 19 Jul 2019 16:25:10 +0000 (UTC)
-Received: from redhat.com (ovpn-112-48.ams2.redhat.com [10.36.112.48])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C229E12A68;
- Fri, 19 Jul 2019 16:25:09 +0000 (UTC)
-Date: Fri, 19 Jul 2019 17:25:06 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Stefan Weil <sw@weilnetz.de>
-Message-ID: <20190719162506.GG4057@redhat.com>
-References: <20190718195123.13064-1-sw@weilnetz.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190718195123.13064-1-sw@weilnetz.de>
-User-Agent: Mutt/1.12.0 (2019-05-25)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.42]); Fri, 19 Jul 2019 16:25:10 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH-for-4.1] crypto: Fix data type for len
- parameter in two typedefs
+ (Exim 4.71) (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1hoVmK-0002sJ-SS; Fri, 19 Jul 2019 12:30:43 -0400
+Received: from [172.16.25.136] (helo=localhost.sw.ru)
+ by relay.sw.ru with esmtp (Exim 4.92)
+ (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1hoVm8-0006pa-Cu; Fri, 19 Jul 2019 19:30:28 +0300
+From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+To: qemu-devel@nongnu.org,
+	qemu-block@nongnu.org
+Date: Fri, 19 Jul 2019 19:30:12 +0300
+Message-Id: <1563553816-148827-3-git-send-email-andrey.shinkevich@virtuozzo.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1563553816-148827-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+References: <1563553816-148827-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 185.231.240.75
+Subject: [Qemu-devel] [PATCH v5 2/6] iotests: exclude killed processes from
+ running under Valgrind
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,25 +59,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, mreitz@redhat.com,
+ andrey.shinkevich@virtuozzo.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jul 18, 2019 at 09:51:23PM +0200, Stefan Weil wrote:
-> Signed-off-by: Stefan Weil <sw@weilnetz.de>
-> ---
->  crypto/hash-nettle.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+ The Valgrind tool fails to manage its termination when QEMU raises the
+ signal SIGKILL in the multi-threaded process. The bug has been
+ reported to the Valgrind maintainers and was registered as Bug 409141.
+ Let's exclude such test cases from running under the Valgrind until
+ new release of it because checking for the memory issues is covered by
+ other test cases.
 
-FYI, A different fix for this problem is now merged.
+Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+---
+ tests/qemu-iotests/039 | 5 +++++
+ tests/qemu-iotests/061 | 2 ++
+ tests/qemu-iotests/137 | 1 +
+ 3 files changed, 8 insertions(+)
 
-
-Regards,
-Daniel
+diff --git a/tests/qemu-iotests/039 b/tests/qemu-iotests/039
+index 0d4e963..95115e2 100755
+--- a/tests/qemu-iotests/039
++++ b/tests/qemu-iotests/039
+@@ -65,6 +65,7 @@ echo "== Creating a dirty image file =="
+ IMGOPTS="compat=1.1,lazy_refcounts=on"
+ _make_test_img $size
+ 
++VALGRIND_QEMU="" \
+ $QEMU_IO -c "write -P 0x5a 0 512" \
+          -c "sigraise $(kill -l KILL)" "$TEST_IMG" 2>&1 \
+     | _filter_qemu_io
+@@ -100,6 +101,7 @@ echo "== Opening a dirty image read/write should repair it =="
+ IMGOPTS="compat=1.1,lazy_refcounts=on"
+ _make_test_img $size
+ 
++VALGRIND_QEMU="" \
+ $QEMU_IO -c "write -P 0x5a 0 512" \
+          -c "sigraise $(kill -l KILL)" "$TEST_IMG" 2>&1 \
+     | _filter_qemu_io
+@@ -118,6 +120,7 @@ echo "== Creating an image file with lazy_refcounts=off =="
+ IMGOPTS="compat=1.1,lazy_refcounts=off"
+ _make_test_img $size
+ 
++VALGRIND_QEMU="" \
+ $QEMU_IO -c "write -P 0x5a 0 512" \
+          -c "sigraise $(kill -l KILL)" "$TEST_IMG" 2>&1 \
+     | _filter_qemu_io
+@@ -151,6 +154,7 @@ echo "== Changing lazy_refcounts setting at runtime =="
+ IMGOPTS="compat=1.1,lazy_refcounts=off"
+ _make_test_img $size
+ 
++VALGRIND_QEMU="" \
+ $QEMU_IO -c "reopen -o lazy-refcounts=on" \
+          -c "write -P 0x5a 0 512" \
+          -c "sigraise $(kill -l KILL)" "$TEST_IMG" 2>&1 \
+@@ -163,6 +167,7 @@ _check_test_img
+ IMGOPTS="compat=1.1,lazy_refcounts=on"
+ _make_test_img $size
+ 
++VALGRIND_QEMU="" \
+ $QEMU_IO -c "reopen -o lazy-refcounts=off" \
+          -c "write -P 0x5a 0 512" \
+          -c "sigraise $(kill -l KILL)" "$TEST_IMG" 2>&1 \
+diff --git a/tests/qemu-iotests/061 b/tests/qemu-iotests/061
+index d7dbd7e..5d0724c 100755
+--- a/tests/qemu-iotests/061
++++ b/tests/qemu-iotests/061
+@@ -73,6 +73,7 @@ echo
+ echo "=== Testing dirty version downgrade ==="
+ echo
+ IMGOPTS="compat=1.1,lazy_refcounts=on" _make_test_img 64M
++VALGRIND_QEMU="" \
+ $QEMU_IO -c "write -P 0x2a 0 128k" -c flush \
+          -c "sigraise $(kill -l KILL)" "$TEST_IMG" 2>&1 | _filter_qemu_io
+ $PYTHON qcow2.py "$TEST_IMG" dump-header
+@@ -107,6 +108,7 @@ echo
+ echo "=== Testing dirty lazy_refcounts=off ==="
+ echo
+ IMGOPTS="compat=1.1,lazy_refcounts=on" _make_test_img 64M
++VALGRIND_QEMU="" \
+ $QEMU_IO -c "write -P 0x2a 0 128k" -c flush \
+          -c "sigraise $(kill -l KILL)" "$TEST_IMG" 2>&1 | _filter_qemu_io
+ $PYTHON qcow2.py "$TEST_IMG" dump-header
+diff --git a/tests/qemu-iotests/137 b/tests/qemu-iotests/137
+index 0c3d2a1..a442fc8 100755
+--- a/tests/qemu-iotests/137
++++ b/tests/qemu-iotests/137
+@@ -130,6 +130,7 @@ echo
+ 
+ # Whether lazy-refcounts was actually enabled can easily be tested: Check if
+ # the dirty bit is set after a crash
++VALGRIND_QEMU="" \
+ $QEMU_IO \
+     -c "reopen -o lazy-refcounts=on,overlap-check=blubb" \
+     -c "write -P 0x5a 0 512" \
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+1.8.3.1
+
 
