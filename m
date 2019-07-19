@@ -2,82 +2,83 @@ Return-Path: <SRS0=mHy3=VQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 447E1C76188
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 10:49:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E657AC76188
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 11:04:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 11C742173B
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 10:49:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A81A920873
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 11:04:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="PlHyvZLe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 11C742173B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YsYUmOPj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A81A920873
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43960 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44002 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hoQS3-0000i4-Cz
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 06:49:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58466)
+	id 1hoQgR-0006Ae-NV
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 07:04:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33011)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <wrfsh@yandex-team.ru>) id 1hoQRq-0000BW-TA
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 06:49:11 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hoQgF-0005kZ-AX
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 07:04:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <wrfsh@yandex-team.ru>) id 1hoQRp-0001Os-MS
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 06:49:10 -0400
-Received: from forwardcorp1o.mail.yandex.net ([2a02:6b8:0:1a2d::193]:55410)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <wrfsh@yandex-team.ru>)
- id 1hoQRh-0000I7-Kx; Fri, 19 Jul 2019 06:49:02 -0400
-Received: from mxbackcorp1o.mail.yandex.net (mxbackcorp1o.mail.yandex.net
- [IPv6:2a02:6b8:0:1a2d::301])
- by forwardcorp1o.mail.yandex.net (Yandex) with ESMTP id 4440D2E14F9;
- Fri, 19 Jul 2019 13:48:10 +0300 (MSK)
-Received: from smtpcorp1p.mail.yandex.net (smtpcorp1p.mail.yandex.net
- [2a02:6b8:0:1472:2741:0:8b6:10])
- by mxbackcorp1o.mail.yandex.net (nwsmtp/Yandex) with ESMTP id
- Hjudyt7ELw-m9BWQXCt; Fri, 19 Jul 2019 13:48:10 +0300
-Precedence: bulk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
- s=default; 
- t=1563533290; bh=ifcbJ5mCnRTc9HPTtjguN2q7pIUHbvFkIUvRVNI7duE=;
- h=In-Reply-To:Message-ID:From:Date:References:To:Subject:Cc;
- b=PlHyvZLeZb5BpHmgBqXkGiSnS1GVFHHxCUJHQcPQa/Zk8CuZ4L9OZSMMIRizWVED3
- 8NdIQe+KfYEPhhxXW8pCpeTKpSIHxwpOfssN1JJGO0r7jJ8pVASEqtyDSwvmkn5anw
- aArrq6bozqGyJOXgSbZGe50xNHN22IIN9berPbyg=
-Authentication-Results: mxbackcorp1o.mail.yandex.net;
- dkim=pass header.i=@yandex-team.ru
-Received: from dynamic-red.dhcp.yndx.net (dynamic-red.dhcp.yndx.net
- [2a02:6b8:0:40c:f68c:50ff:fee9:44bd])
- by smtpcorp1p.mail.yandex.net (nwsmtp/Yandex) with ESMTPSA id
- DhWMkB8CPG-m96SYqK7; Fri, 19 Jul 2019 13:48:09 +0300
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (Client certificate not present)
-To: Stefan Hajnoczi <stefanha@gmail.com>
-References: <8146312c-8a9c-3c4e-ab80-a3f42cc1d6ce@yandex-team.ru>
- <20190719101757.GF18585@stefanha-x1.localdomain>
-From: Evgeny Yakovlev <wrfsh@yandex-team.ru>
-Message-ID: <77df2959-c5d1-5cf6-304a-7f9ad6af8a51@yandex-team.ru>
-Date: Fri, 19 Jul 2019 13:48:09 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <peter.maydell@linaro.org>) id 1hoQgE-0006Vy-4S
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 07:04:03 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:41690)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hoQgD-0006V5-Uo
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 07:04:02 -0400
+Received: by mail-ot1-x344.google.com with SMTP id o101so32322687ota.8
+ for <qemu-devel@nongnu.org>; Fri, 19 Jul 2019 04:04:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=JYrtC1sSkkGJUCsJSw98vNNWQqy30ZKlBnj9ldQDtvE=;
+ b=YsYUmOPjTbRloqTeYwyO6HietMOeOscuycmD2wkmEJMxlPry3kDa9VHQGgXNNDQyj1
+ X0/A4jPDdFQwmMX4XDhZWyDFL7mxa1yg3A5/hBogZcWWYm9JtALkINhfYscANtTjfgUa
+ QfbibwaMpyRBsAn8eSRCUURRYeWrxrkuJCsUapqTL3LUuufINy2EaubfdwGEFRnz+M0n
+ MkCV0wOOsYgz4sWlTFG1hJ7myR4+e0t+vkENuoHJtMjcEANlONPniOoovGh41PSzgzuV
+ /YPHHj6Z6YKCPkgeh4b7OJPJ+ZnCQUQtB/s7/FQvUo9Tz3QAPg2D4T5s5/gp0pNRkVWc
+ v4ag==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=JYrtC1sSkkGJUCsJSw98vNNWQqy30ZKlBnj9ldQDtvE=;
+ b=orAjg0gwL3U7weLmLXy7Mg/tGJebuySJyCEouCSb1iTPadCYiPC1er/5BBod3wZFGs
+ b04fdeV1nzZU0fRMnVioGXBjQ9E2DQawK6MjH7lCUZeyGDfvK9+kji4fateN8oRR7k6M
+ b3NeLjhmWYEDHXboSHMcvnwx8jlc51Is0zCuJcW44MZClyMbwDC1m8yfwJrbHwRUrjdl
+ gAvq6t8ZqI5GcO/fyehTGp3Hu9FadSMnmzAYXMz51DPidvTDcUW/6p9qMd7ZTqzDC8H5
+ IVPpMct4cdaCQzS483XW0ujlpIKQBHGztTbzJhZSe24/wlf8E7IUAThu6F/RuBoNJDQr
+ HhzQ==
+X-Gm-Message-State: APjAAAWwQ16za7fl5WypBrnTiU8eqgXNNaFExk93nW6K3I0+KKO8Gz93
+ bj4/Fakb7DTKPFrmhYKwZ/qbOY2ZcLClU+l/jMKEkg==
+X-Google-Smtp-Source: APXvYqwhPb9r98y+RxxkxVsLb3W9dnlyHMUTTxyQ/WsylE1BNlDEhjr6XcZKTERctSvrac9le/dgauJrKuErdkF5KH8=
+X-Received: by 2002:a05:6830:1653:: with SMTP id
+ h19mr31506347otr.232.1563534239837; 
+ Fri, 19 Jul 2019 04:03:59 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190719101757.GF18585@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+References: <20190719015811.14776-1-palmer@sifive.com>
+In-Reply-To: <20190719015811.14776-1-palmer@sifive.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 19 Jul 2019 12:03:49 +0100
+Message-ID: <CAFEAcA_MGz=EvH67twNoM-SMXZ8_pE6FhO+JuLN=0Z1H6sfRnw@mail.gmail.com>
+To: Palmer Dabbelt <palmer@sifive.com>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a02:6b8:0:1a2d::193
-Subject: Re: [Qemu-devel] BDRV request fragmentation and vitio-blk write
- submission guarantees
+X-Received-From: 2607:f8b0:4864:20::344
+Subject: Re: [Qemu-devel] [PULL] RISC-V Patches for 4.2-rc2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -86,117 +87,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, stefanha@redhat.com, qemu-block@nongnu.org,
- qemu-devel@nongnu.org, mreitz@redhat.com,
- "yc-core@yandex-team.ru" <yc-core@yandex-team.ru>
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 19.07.2019 13:17, Stefan Hajnoczi wrote:
-> On Thu, Jul 18, 2019 at 04:44:17PM +0300, =D0=95=D0=B2=D0=B3=D0=B5=D0=BD=
-=D0=B8=D0=B9 =D0=AF=D0=BA=D0=BE=D0=B2=D0=BB=D0=B5=D0=B2 wrote:
->> Hi everyone,
->>
->> We're currently working on implementing a qemu BDRV format driver whic=
-h we
->> are using with virtio-blk devices.
->>
->> I have a question concerning BDRV request fragmentation and virtio-blk=
- write
->> request submission which is not entirely clear to me by only reading v=
-irtio
->> spec. Could you please consider the following case and give some addit=
-ional
->> guidance?
->>
->> 1. Our BDRV format driver has a notion of max supported transfer size.=
- So we
->> implement BlockDriver::bdrv_refresh_limits where we fill out
->> BlockLimits::max_transfer and opt_transfer fields.
->>
->> 2. virtio-blk exposes max_transfer as a virtio_blk_config::opt_io_size
->> field, which (according to spec 1.1) is a **suggested** maximum. We re=
-ad
->> "suggested" as "guest driver may still send requests that don't fit in=
-to
->> opt_io_size and we should handle those"...
->>
->> 3. ... and judging by code in block/io.c qemu block layer handles such
->> requests by fragmenting them into several BDRV requests if request siz=
-e is >
->> max_transfer
->>
->> 4. Guest will see request completion only after all fragments are hand=
-led.
->> However each fragment submission path can call qemu_coroutine_yield an=
-d move
->> on to submitting next request available in virtq before completely
->> submitting the rest of the fragments. Which means the following situat=
-ion is
->> possible where BDRV sees 2 write requests in virtq, both of which are =
-larger
->> than max_transfer:
->>
->> ||
->>
->> |Blocks: |-------------------------------------> Write1: xxxxxxxx Writ=
-e2:
->> yyyyyyyy Write1Chunk1: xxxx Write2Chunk1: yyyy Write2Chunk2: yyyy
->> Write1Chunk1: xxxx Blocks: |------------yyyyxxxx----------------->|
->>
->> ||
->>
->> |In above scenario guest virtio-blk driver decided to submit 2 interse=
-cting
->> write requests, both of which are larger than ||max_transfer, and then=
- call
->> hypervisor.|
->>
->> |I understand that virtio-blk may handle requests out of order, so gue=
-st
->> must not make any assumptions on relative order in which those request=
-s will
->> be handled.|
->>
->> |However, can guest driver expect that whatever the submission order w=
-ill
->> be, the actual intersecting writes will be atomic?|
->>
->> |In other words, will it be correct for conforming virtio-blk driver t=
-o
->> expect only "|||xxxxxxxx" or "||||yyyyyyyy" but not anything else in
->> between, after both requests are reported as completed?||
->>
->> ||Because i think that is something that may happen in qemu right now,=
- if i
->> understood correctly. ||
-> Write requests are not atomic in general.  Specific storage technologie=
-s
-> support atomic writes via special commands with certain restrictions bu=
-t
-> applications using this feature aren't portable.
+On Fri, 19 Jul 2019 at 02:58, Palmer Dabbelt <palmer@sifive.com> wrote:
 >
-> Portable applications either don't submit intersecting write requests o=
-r
-> they do not depend on atomicity.
+> The following changes since commit 0b18cfb8f1828c905139b54c8644b0d8f4aad879:
 >
-> Out of curiousity I took a quick look at Linux device-mapper.  The same
-> issue applies in device-mapper when intersecting write requests cross
-> device-mapper targets.  I think Linux submits split bios in parallel an=
-d
-> without serialization.
+>   Update version for v4.1.0-rc1 release (2019-07-16 18:01:28 +0100)
 >
-> Stefan
+> are available in the Git repository at:
+>
+>   git://github.com/palmer-dabbelt/qemu.git tags/riscv-for-master-4.1-rc2
+>
+> for you to fetch changes up to fdd1bda4b47cfbec61d0e63a516c614feea0b00b:
+>
+>   hw/riscv: Load OpenSBI as the default firmware (2019-07-18 14:18:45 -0700)
+>
+> ----------------------------------------------------------------
+> RISC-V Patches for 4.2-rc2
+>
+> This contains a pair of patches that add OpenSBI support to QEMU on
+> RISC-V targets.  The patches have been floating around for a bit, but
+> everything seems solid now.  These pass my standard test of booting
+> OpenEmbedded, and also works when I swap around the various command-line
+> arguments to use the new boot method.
+>
+> ----------------------------------------------------------------
+> Alistair Francis (2):
+>       roms: Add OpenSBI version 0.4
+>       hw/riscv: Load OpenSBI as the default firmware
 
+This passes the 'make check' tests but it prints out a lot
+of warnings as it does so:
 
-Thanks, Stefan!
+qemu-system-riscv64: warning: No -bios option specified. Not loading a firmware.
+qemu-system-riscv64: warning: This default will change in QEMU 4.3.
+Please use the -bios option to aviod breakages when this happens.
+qemu-system-riscv64: warning: See QEMU's deprecation documentation for details
 
-(By the way, there is a v2 of this message without all the formatting bug=
-s)
+(repeated 7 or 8 times during the course of a test run)
 
+Can we make the tests not trigger warnings, please?
+(I have a filter where I search through for strings like
+"warning" because warnings that shouldn't happen often don't
+actually cause the tests to fail.)
 
-Evgeny
+Also, I notice that you have a typo: "aviod" should be "avoid".
 
+PS: something in your pull-request creation process seems to
+add this junk at the bottom of the pullreq emails, though
+since it doesn't appear in the merge commit it's harmless:
 
+> From Palmer Dabbelt <palmer@sifive.com> # This line is ignored.
+> From: Palmer Dabbelt <palmer@sifive.com>
+> Reply-To:
+> Subject:
+> In-Reply-To:
+
+thanks
+-- PMM
 
