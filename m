@@ -6,74 +6,84 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60921C7618F
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 17:01:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C327C7618F
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 17:07:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 337BF2184E
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 17:01:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 337BF2184E
+	by mail.kernel.org (Postfix) with ESMTPS id 53F592084D
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 17:07:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53F592084D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47168 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47182 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hoWFz-0000xO-8m
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 13:01:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49584)
+	id 1hoWLV-0003jJ-KD
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 13:07:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50574)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <pbonzini@redhat.com>) id 1hoWFo-0000YJ-5Y
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 13:01:09 -0400
+ (envelope-from <eblake@redhat.com>) id 1hoWLL-0003Hi-9F
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 13:06:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1hoWFm-0001Ky-Qn
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 13:01:08 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:37620)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hoWFm-0001Hd-KA
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 13:01:06 -0400
-Received: by mail-wr1-f67.google.com with SMTP id n9so7862719wrr.4
- for <qemu-devel@nongnu.org>; Fri, 19 Jul 2019 10:00:57 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=6n4mntf8cfY8Tx6EZGo4AbYkeEYpwnTY74TbSgJ0IQs=;
- b=ELGp2yoCfOHUfVAFOvLZ5wc9wgI6DCBjqD5gqAhWNz7OqrruFupT64JoKAY/8PfZio
- 0w08FtVtBqer8qYSiWFl/UtD11/i+Wumd2gZ77GM++d+gtW6JgmCIuwM5BF0CvEzhU1K
- wzJO/bLR8LIKw32vaUS1aP+5jSX/5FP8QVPWhT1IYOclzCaV+o3bstYE/Mylsic3ZJ83
- g335EiAdR0/RM/AgLBVqNQdLML2cRn87ICwA2kY3Pm81syvmoE9iWWwf18N3AzonRtbW
- JaAs4Vh+4E6M3TBsy0RUT+CSzUKtiLxcrI0dQD2W8CvEivX68NT42Ungr7q/oqfmDHnD
- LG7g==
-X-Gm-Message-State: APjAAAXpJt5yGqaHTM6ynLqJ4qOZctRDl+Q+aTNJDUwgd3vM2hhJyWRV
- mJlaU/lo3XX0ay/LEifV/2FSTw==
-X-Google-Smtp-Source: APXvYqz8L0mCX7VYzgxyQ0FmUSM7Ekz5Jt+i4830ERItt2GTvqyW70jW6NF8MTwVBLlJO+c18fs8Gw==
-X-Received: by 2002:adf:f281:: with SMTP id k1mr21393359wro.154.1563555656787; 
- Fri, 19 Jul 2019 10:00:56 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:8501:6b03:f18c:74f8?
- ([2001:b07:6468:f312:8501:6b03:f18c:74f8])
- by smtp.gmail.com with ESMTPSA id f12sm34268609wrg.5.2019.07.19.10.00.55
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Fri, 19 Jul 2019 10:00:56 -0700 (PDT)
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <1563264677-39718-1-git-send-email-pbonzini@redhat.com>
- <CAFEAcA-Q6siS3gTRdq7+f0vx-Vd7-DmX1rW6+cS1yR7OqLHYyw@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
+ (envelope-from <eblake@redhat.com>) id 1hoWLI-0005Eb-Rv
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 13:06:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39934)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eblake@redhat.com>)
+ id 1hoWLE-0005C4-Fq; Fri, 19 Jul 2019 13:06:45 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 081F63001443;
+ Fri, 19 Jul 2019 17:06:42 +0000 (UTC)
+Received: from [10.3.116.46] (ovpn-116-46.phx2.redhat.com [10.3.116.46])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 43C1461369;
+ Fri, 19 Jul 2019 17:06:41 +0000 (UTC)
+To: qemu-devel@nongnu.org
+References: <20190719150313.29198-1-eblake@redhat.com>
+From: Eric Blake <eblake@redhat.com>
 Openpgp: preference=signencrypt
-Message-ID: <5010dfd7-7608-8640-8767-85a57a0a0b85@redhat.com>
-Date: Fri, 19 Jul 2019 19:00:55 +0200
+Autocrypt: addr=eblake@redhat.com; keydata=
+ xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
+ xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
+ TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
+ GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
+ sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
+ AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
+ CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
+ RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
+ wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
+ Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
+ gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
+ pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
+ zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
+ pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
+ 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
+ NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
+ cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
+ SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
+ I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
+ mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
+ Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
+ 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
+Organization: Red Hat, Inc.
+Message-ID: <364e140d-9860-6b6e-672b-5765f668ac47@redhat.com>
+Date: Fri, 19 Jul 2019 12:06:40 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-Q6siS3gTRdq7+f0vx-Vd7-DmX1rW6+cS1yR7OqLHYyw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190719150313.29198-1-eblake@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="7OkKolVctZPZCrrj2OSc0X9uYwLr5h1us"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.43]); Fri, 19 Jul 2019 17:06:42 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.221.67
-Subject: Re: [Qemu-devel] [PULL 00/19] Bugfix/cleanup patches for 2019-07-16
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH] nbd: Initialize reply on failure
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,48 +95,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Julio Montes <julio.montes@intel.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
+ Thomas Huth <thuth@redhat.com>,
+ "open list:Network Block Dev..." <qemu-block@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 19/07/19 18:15, Peter Maydell wrote:
-> Hi Paolo -- it looks like this may have broken the
-> travis config "--without-default-devices":
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--7OkKolVctZPZCrrj2OSc0X9uYwLr5h1us
+Content-Type: multipart/mixed; boundary="TD0KOCgGZcwQsk6UpxrViG9wlCdR9fqXt";
+ protected-headers="v1"
+From: Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
+ Thomas Huth <thuth@redhat.com>,
+ "open list:Network Block Dev..." <qemu-block@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>
+Message-ID: <364e140d-9860-6b6e-672b-5765f668ac47@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] nbd: Initialize reply on failure
+References: <20190719150313.29198-1-eblake@redhat.com>
+In-Reply-To: <20190719150313.29198-1-eblake@redhat.com>
 
-Alex Bennée already has a queued patch for this (and I did too but I
-removed it in favor of his).  You can apply it directly from message-id
-<20190717134335.15351-18-alex.bennee@linaro.org>.
+--TD0KOCgGZcwQsk6UpxrViG9wlCdR9fqXt
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-Paolo
+On 7/19/19 10:03 AM, Eric Blake wrote:
+> We've had two separate reports of a caller running into use of
+> uninitialized data if s->quit is set (one detected by gcc -O3, another
+> by valgrind), due to checking 'nbd_reply_is_simple(reply) || s->quit'
+> in the wrong order. Rather than chasing down which callers need to
+> pre-initialize reply, it's easier to guarantee that reply will always
+> be set by nbd_co_receive_one_chunk() even on failure.
+>=20
 
-> Here's a sample failing build:
-> https://travis-ci.org/qemu/qemu/jobs/559509325
-> 
-> minikconf barfs with "contradiction between clauses"
-> 
-> Traceback (most recent call last):
->   File "/home/travis/build/qemu/qemu/scripts/minikconf.py", line 703,
-> in <module>
->     config = data.compute_config()
->   File "/home/travis/build/qemu/qemu/scripts/minikconf.py", line 253,
-> in compute_config
->     clause.process()
->   File "/home/travis/build/qemu/qemu/scripts/minikconf.py", line 188, in process
->     self.dest.set_value(False, self)
->   File "/home/travis/build/qemu/qemu/scripts/minikconf.py", line 118,
-> in set_value
->     raise KconfigDataError('contradiction between clauses when setting
-> %s' % self)
-> __main__.KconfigDataError: contradiction between clauses when setting VMMOUSE
-> 
-> 
-> I guess this is Julio's commit 97fd1ea8c10658?
-> 
-> thanks
-> -- PMM
-> 
+I'm adding:
 
+The bug is harmless (the only time uninitialized use is possible is if
+s->quit is set, so the conditional resolves to the same branch
+regardless of the contents of reply), but was introduced in commit 65e01d=
+47.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--TD0KOCgGZcwQsk6UpxrViG9wlCdR9fqXt--
+
+--7OkKolVctZPZCrrj2OSc0X9uYwLr5h1us
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl0x+KAACgkQp6FrSiUn
+Q2oTMwgAlRVMkDzLrnBk/aCslKeWwOZ7G2pNcPDkkLQkjk2StkK/ymahCzk1BY/v
+R1HY6oBD3lWdl14jxqoBCjyae/VZNUgaf8cFZSgYVjeVHsjIfOcjVdsQam7SPu0F
+N25q8L4SbNI4GPKl58cD5zdGe7FpnG7i+kqd8h6AOtHN9UFy04elT+QxrdeKfRzz
+bplgWSfMNF4dkEJ/EmgCoIIjyZRPx7sUcuUaCk7TNPWIni+7S/a7EkdiUcfWcRGo
+IrJHXauvEYVY7RkVQyihTiCQ3hDqJEzof3xxIvv2giSTjtpUTnWoiCqAd699Ce8S
+b23b9ApL8ky0smyyq4ukZTrqUrAk0A==
+=U+uE
+-----END PGP SIGNATURE-----
+
+--7OkKolVctZPZCrrj2OSc0X9uYwLr5h1us--
 
