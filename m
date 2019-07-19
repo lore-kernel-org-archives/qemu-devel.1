@@ -2,81 +2,63 @@ Return-Path: <SRS0=mHy3=VQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	FROM_EXCESS_BASE64,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DDBC2C76188
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 06:11:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E58A8C76188
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 06:33:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A949321849
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 06:11:37 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OYfNyQ7U"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A949321849
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id BE6EE2084C
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 06:33:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE6EE2084C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42524 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42604 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hoM7E-0001gq-Uc
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 02:11:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41010)
+	id 1hoMRy-0007Yh-S7
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 02:33:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46808)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <marcandre.lureau@gmail.com>) id 1hoM75-0001Ci-PG
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 02:11:28 -0400
+ (envelope-from <tao3.xu@intel.com>) id 1hoMRo-0007AF-D4
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 02:32:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@gmail.com>) id 1hoM74-00052S-Su
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 02:11:27 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:43407)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
- id 1hoM72-0004yD-Ti; Fri, 19 Jul 2019 02:11:25 -0400
-Received: by mail-wr1-x441.google.com with SMTP id p13so30962446wru.10;
- Thu, 18 Jul 2019 23:11:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=IMqib2Iv3NJCilmqP7Ijnt10gqm1wO7UAAQ2K/wwMYE=;
- b=OYfNyQ7U6w/2uUg26nEmux16sSF3D8cSFsOmKwz9gfCBs03Cy+TXA+fvHCEFF3Q+Bc
- RGeJmrfhDx0Wwjvtn1IOQBR8KMQxIAeWr9ulo4eelE/rOssMG5BcsBMYhxtzfiSVZ0hk
- 1yozmyTdX4bC2CEpoplqdrgF8awblefhU/tGY8hWV4EkDdut8Q0Z0rSjx5sx9dQOAqvb
- nst6kRT5GLCFH89kmgbXfpnXDKtH3SG3dEWvgj5ax5DmoP2UfEBcLpYDu3ZU2v2WGckt
- OWknTGNpinwdR1woiCC17Ljc3UFAENmIelTXnskHK+8Uz6MOUWHxfsuuvn2WXTCUbxGA
- 4vgg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=IMqib2Iv3NJCilmqP7Ijnt10gqm1wO7UAAQ2K/wwMYE=;
- b=FzCbA1Xr7JTKrtONJS11c4Q+u+86BhiICB5l1iYrvSUxyRxcKuHoLMzGB/1axVFscM
- hga2Y+946sZiGZ6r80fbmKSPWpJ0v6Z8WzXf0pHdaGVayoFIp1vyTrOmfmdY8q3iPFaw
- hPr7BB5My043Qv/gJmZmMx0sDXU9yv4Y/3n3oo8ydU544CkXOVUEB6pmc1Q4fCiZ7m1J
- BZGt152QPUMKoKDjmmnY3lTh/ZecU18nd0DCRic1likvxIJBV2e3ylmdbTOmZWIpBaqC
- gBmI6HrpIlNhymeJ1kg3+9ywRqAt47wYL3E4s/2cjy9TaLKd6eLCZkRsmYi8l4oxb5w8
- w19Q==
-X-Gm-Message-State: APjAAAWhHye6+OlIDqdDF4TLi+2rLifTVGR0d0zODqAf5z2HN9j8IaTM
- I4B3vIWruumxhfBILTO1myjZXDkftf0eNSkr4bE=
-X-Google-Smtp-Source: APXvYqx9CQhzKv9t80+cFDd3sOkbTrt090XUBwCS6MVs4gj4+0iMQvQ62AInMJwCv2ndbJEpSFrnoCJbIRUBIWf41eo=
-X-Received: by 2002:adf:ea8b:: with SMTP id s11mr52949925wrm.100.1563516683116; 
- Thu, 18 Jul 2019 23:11:23 -0700 (PDT)
+ (envelope-from <tao3.xu@intel.com>) id 1hoMRn-0006WM-4k
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 02:32:52 -0400
+Received: from mga02.intel.com ([134.134.136.20]:51877)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1hoMRm-0006T7-Su
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 02:32:51 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+ by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 18 Jul 2019 23:32:46 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,281,1559545200"; d="scan'208";a="168469822"
+Received: from txu2-mobl.ccr.corp.intel.com (HELO [10.239.198.19])
+ ([10.239.198.19])
+ by fmsmga008.fm.intel.com with ESMTP; 18 Jul 2019 23:32:44 -0700
+To: imammedo@redhat.com, eblake@redhat.com, ehabkost@redhat.com
+References: <20190716145121.19578-1-tao3.xu@intel.com>
+From: Tao Xu <tao3.xu@intel.com>
+Message-ID: <dad4bc8b-05fb-bab2-0707-7051b8c5ebb6@intel.com>
+Date: Fri, 19 Jul 2019 14:32:43 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-References: <20190718193441.12490-1-sw@weilnetz.de>
-In-Reply-To: <20190718193441.12490-1-sw@weilnetz.de>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Fri, 19 Jul 2019 10:11:09 +0400
-Message-ID: <CAJ+F1C+0YbsigM9A9k=4=fDHBJONRxFaOuZhRcMGFY8h=-UCBA@mail.gmail.com>
-To: Stefan Weil <sw@weilnetz.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20190716145121.19578-1-tao3.xu@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::441
-Subject: Re: [Qemu-devel] [PATCH] audio: Add missing fall through comments
+X-Received-From: 134.134.136.20
+Subject: Re: [Qemu-devel] [PATCH v7 00/11] Build ACPI Heterogeneous Memory
+ Attribute Table (HMAT)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,50 +70,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu trival <qemu-trivial@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>,
- QEMU <qemu-devel@nongnu.org>
+Cc: jingqi.liu@intel.com, dan.j.williams@intel.com, fan.du@intel.com,
+ qemu-devel@nongnu.org, jonathan.cameron@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jul 19, 2019 at 2:12 AM Stefan Weil <sw@weilnetz.de> wrote:
->
-> Signed-off-by: Stefan Weil <sw@weilnetz.de>
+Ping for comments :)
 
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+On 7/16/2019 10:51 PM, Tao Xu wrote:
+> This series of patches will build Heterogeneous Memory Attribute Table (HMAT)
+> according to the command line. The ACPI HMAT describes the memory attributes,
+> such as memory side cache attributes and bandwidth and latency details,
+> related to the Memory Proximity Domain.
+> The software is expected to use HMAT information as hint for optimization.
+> 
+> In the linux kernel, the codes in drivers/acpi/hmat/hmat.c parse and report
+> the platform's HMAT tables.
+> 
+> The V6 RESEND patches link:
+> https://patchwork.kernel.org/cover/11036461/
+> 
+> Changelog:
+> v7:
+>      - Defer 11-13 of patch v6, because the driver of _HMA hasn't been
+>        implemented in kernel driver
+>      - Drop the HMAT_LB_MEM_CACHE_LAST_LEVEL which is not used in
+>        ACPI 6.3 (Jonathan)
+>      - Add bit mask in flags of hmat-lb (Jonathan)
+>      - Add a marco to indicate the type is latency or bandwidth (Jonathan)
+> v6:
+>      - Rebase to upstream, move numa globals in arm/sbsa-ref
+>      - When used once or twice in the function, use
+>        ms->numa_state->num_nodes(numa_info) directly (Igor)
+>      - Correct some mistakes
+>      - Use once monitor_printf in hmp_info_numa (Igor)
+>      - Add new patch to extend CLI of "-numa node" option to indicate the
+>        initiator numa node-id (Dan)
+>      - Update to ACPI 6.3 (Jonathan)
+>      - Add QMP interface to update HMAT at runtime (Igor)
+>      - Add test cases for ACPI HMAT
+> 
+> Liu Jingqi (5):
+>    hmat acpi: Build Memory Proximity Domain Attributes Structure(s)
+>    hmat acpi: Build System Locality Latency and Bandwidth Information
+>      Structure(s)
+>    hmat acpi: Build Memory Side Cache Information Structure(s)
+>    numa: Extend the CLI to provide memory latency and bandwidth
+>      information
+>    numa: Extend the CLI to provide memory side cache information
+> 
+> Tao Xu (6):
+>    hw/arm: simplify arm_load_dtb
+>    numa: move numa global variable nb_numa_nodes into MachineState
+>    numa: move numa global variable have_numa_distance into MachineState
+>    numa: move numa global variable numa_info into MachineState
+>    numa: Extend CLI to provide initiator information for numa nodes
+>    tests/bios-tables-test: add test cases for ACPI HMAT
+> 
+>   exec.c                              |   5 +-
+>   hw/acpi/Kconfig                     |   5 +
+>   hw/acpi/Makefile.objs               |   1 +
+>   hw/acpi/aml-build.c                 |   9 +-
+>   hw/acpi/hmat.c                      | 256 +++++++++++++++++++++++++
+>   hw/acpi/hmat.h                      | 103 ++++++++++
+>   hw/arm/aspeed.c                     |   5 +-
+>   hw/arm/boot.c                       |  20 +-
+>   hw/arm/collie.c                     |   8 +-
+>   hw/arm/cubieboard.c                 |   5 +-
+>   hw/arm/exynos4_boards.c             |   7 +-
+>   hw/arm/highbank.c                   |   8 +-
+>   hw/arm/imx25_pdk.c                  |   5 +-
+>   hw/arm/integratorcp.c               |   8 +-
+>   hw/arm/kzm.c                        |   5 +-
+>   hw/arm/mainstone.c                  |   5 +-
+>   hw/arm/mcimx6ul-evk.c               |   5 +-
+>   hw/arm/mcimx7d-sabre.c              |   5 +-
+>   hw/arm/musicpal.c                   |   8 +-
+>   hw/arm/nseries.c                    |   5 +-
+>   hw/arm/omap_sx1.c                   |   5 +-
+>   hw/arm/palm.c                       |  10 +-
+>   hw/arm/raspi.c                      |   6 +-
+>   hw/arm/realview.c                   |   5 +-
+>   hw/arm/sabrelite.c                  |   5 +-
+>   hw/arm/sbsa-ref.c                   |  12 +-
+>   hw/arm/spitz.c                      |   5 +-
+>   hw/arm/tosa.c                       |   8 +-
+>   hw/arm/versatilepb.c                |   5 +-
+>   hw/arm/vexpress.c                   |   5 +-
+>   hw/arm/virt-acpi-build.c            |  19 +-
+>   hw/arm/virt.c                       |  17 +-
+>   hw/arm/xilinx_zynq.c                |   8 +-
+>   hw/arm/xlnx-versal-virt.c           |   7 +-
+>   hw/arm/xlnx-zcu102.c                |   5 +-
+>   hw/arm/z2.c                         |   8 +-
+>   hw/core/machine-hmp-cmds.c          |  12 +-
+>   hw/core/machine.c                   |  38 +++-
+>   hw/core/numa.c                      | 287 ++++++++++++++++++++++++----
+>   hw/i386/acpi-build.c                |   7 +-
+>   hw/i386/pc.c                        |  13 +-
+>   hw/mem/pc-dimm.c                    |   2 +
+>   hw/pci-bridge/pci_expander_bridge.c |   3 +-
+>   hw/ppc/spapr.c                      |  33 ++--
+>   hw/ppc/spapr_pci.c                  |   4 +-
+>   include/hw/acpi/aml-build.h         |   2 +-
+>   include/hw/arm/boot.h               |   4 +-
+>   include/hw/boards.h                 |   1 +
+>   include/qemu/typedefs.h             |   2 +
+>   include/sysemu/numa.h               |  30 ++-
+>   include/sysemu/sysemu.h             |  23 +++
+>   qapi/machine.json                   | 183 +++++++++++++++++-
+>   qemu-options.hx                     |  84 +++++++-
+>   tests/bios-tables-test.c            |  43 +++++
+>   54 files changed, 1131 insertions(+), 248 deletions(-)
+>   create mode 100644 hw/acpi/hmat.c
+>   create mode 100644 hw/acpi/hmat.h
+> 
 
-> ---
->  audio/audio.c | 2 ++
->  1 file changed, 2 insertions(+)
->
-> diff --git a/audio/audio.c b/audio/audio.c
-> index 5fd9a58a80..a7a13e900a 100644
-> --- a/audio/audio.c
-> +++ b/audio/audio.c
-> @@ -304,6 +304,7 @@ void audio_pcm_init_info (struct audio_pcm_info *info=
-, struct audsettings *as)
->
->      case AUDIO_FORMAT_S16:
->          sign =3D 1;
-> +        /* fall through */
->      case AUDIO_FORMAT_U16:
->          bits =3D 16;
->          shift =3D 1;
-> @@ -311,6 +312,7 @@ void audio_pcm_init_info (struct audio_pcm_info *info=
-, struct audsettings *as)
->
->      case AUDIO_FORMAT_S32:
->          sign =3D 1;
-> +        /* fall through */
->      case AUDIO_FORMAT_U32:
->          bits =3D 32;
->          shift =3D 2;
-> --
-> 2.20.1
->
->
-
-
---=20
-Marc-Andr=C3=A9 Lureau
 
