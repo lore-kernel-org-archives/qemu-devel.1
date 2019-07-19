@@ -6,46 +6,44 @@ X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B026DC76188
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 14:44:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D463C76188
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 14:47:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 80F532184E
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 14:44:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 80F532184E
+	by mail.kernel.org (Postfix) with ESMTPS id 3A7F62184E
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 14:47:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A7F62184E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46056 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46078 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hoU82-0002Hm-Ra
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 10:44:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53417)
+	id 1hoUAS-0003qb-CK
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 10:47:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54042)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <eblake@redhat.com>) id 1hoU7s-0001qK-UA
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 10:44:50 -0400
+ (envelope-from <eblake@redhat.com>) id 1hoUAD-0003Kl-GG
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 10:47:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1hoU7r-0003Ki-FM
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 10:44:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:62771)
+ (envelope-from <eblake@redhat.com>) id 1hoUAA-0005B0-Uj
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 10:47:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52354)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1hoU7o-0003Iq-Ru; Fri, 19 Jul 2019 10:44:45 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ id 1hoUA3-00056R-OL; Fri, 19 Jul 2019 10:47:05 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 19A6430C34E1;
- Fri, 19 Jul 2019 14:44:44 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 8B0B5300D1C7;
+ Fri, 19 Jul 2019 14:47:01 +0000 (UTC)
 Received: from [10.3.116.46] (ovpn-116-46.phx2.redhat.com [10.3.116.46])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 52B7C2FC56;
- Fri, 19 Jul 2019 14:44:37 +0000 (UTC)
-To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
-References: <1563529204-3368-1-git-send-email-andrey.shinkevich@virtuozzo.com>
- <1563529204-3368-8-git-send-email-andrey.shinkevich@virtuozzo.com>
- <a4214009-e9ba-2f67-138b-30ce31f7905f@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A8E325D97A;
+ Fri, 19 Jul 2019 14:46:58 +0000 (UTC)
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20190716100731.29843-1-marcandre.lureau@redhat.com>
 From: Eric Blake <eblake@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=eblake@redhat.com; keydata=
@@ -72,22 +70,21 @@ Autocrypt: addr=eblake@redhat.com; keydata=
  Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
  2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
 Organization: Red Hat, Inc.
-Message-ID: <e12c0aa2-6757-856a-bbe0-717895453986@redhat.com>
-Date: Fri, 19 Jul 2019 09:44:36 -0500
+Message-ID: <bcad5a90-6588-79c8-1ed1-02b75fa17be6@redhat.com>
+Date: Fri, 19 Jul 2019 09:46:57 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <a4214009-e9ba-2f67-138b-30ce31f7905f@redhat.com>
+In-Reply-To: <20190716100731.29843-1-marcandre.lureau@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="t5i7T5gl4uKmsUMpkv1nrgbtorX4IA6uf"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+ boundary="huqZKFto3jaiLbruIxdMHErBnnWn1QV6k"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Fri, 19 Jul 2019 14:44:44 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.40]); Fri, 19 Jul 2019 14:47:01 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v4 7/7] block/nbd: NBDReply is used being
- uninitialized
+Subject: Re: [Qemu-devel] [PATCH v2] nbd: fix uninitialized variable warning
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,61 +96,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, mreitz@redhat.com,
- den@openvz.org,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ "open list:Network Block Dev..." <qemu-block@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---t5i7T5gl4uKmsUMpkv1nrgbtorX4IA6uf
-Content-Type: multipart/mixed; boundary="2M0HI25gO1UarywKsXUhzUysaN4z9a3wc";
+--huqZKFto3jaiLbruIxdMHErBnnWn1QV6k
+Content-Type: multipart/mixed; boundary="hoY9ze68Q2Ebv005dwzddoq1aMsGGUsBW";
  protected-headers="v1"
 From: Eric Blake <eblake@redhat.com>
-To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, mreitz@redhat.com,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- den@openvz.org, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <e12c0aa2-6757-856a-bbe0-717895453986@redhat.com>
-Subject: Re: [PATCH v4 7/7] block/nbd: NBDReply is used being uninitialized
-References: <1563529204-3368-1-git-send-email-andrey.shinkevich@virtuozzo.com>
- <1563529204-3368-8-git-send-email-andrey.shinkevich@virtuozzo.com>
- <a4214009-e9ba-2f67-138b-30ce31f7905f@redhat.com>
-In-Reply-To: <a4214009-e9ba-2f67-138b-30ce31f7905f@redhat.com>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ "open list:Network Block Dev..." <qemu-block@nongnu.org>
+Message-ID: <bcad5a90-6588-79c8-1ed1-02b75fa17be6@redhat.com>
+Subject: Re: [PATCH v2] nbd: fix uninitialized variable warning
+References: <20190716100731.29843-1-marcandre.lureau@redhat.com>
+In-Reply-To: <20190716100731.29843-1-marcandre.lureau@redhat.com>
 
---2M0HI25gO1UarywKsXUhzUysaN4z9a3wc
+--hoY9ze68Q2Ebv005dwzddoq1aMsGGUsBW
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 7/19/19 9:34 AM, Eric Blake wrote:
-> On 7/19/19 4:40 AM, Andrey Shinkevich wrote:
->> In case nbd_co_receive_one_chunk() fails in
->> nbd_reply_chunk_iter_receive(), 'NBDReply reply' parameter is used in
->> the check nbd_reply_is_simple() without being initialized. The iotest
->> 083 does not pass under the Valgrind: $./check -nbd -valgrind 083.
->> The alternative solution is to swap the operands in the condition:
->> 'if (s->quit || nbd_reply_is_simple(reply))'
->>
->> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
->> ---
->>  block/nbd.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
+On 7/16/19 5:07 AM, Marc-Andr=C3=A9 Lureau wrote:
+> ../block/nbd.c: In function 'nbd_co_request':
+> ../block/nbd.c:745:8: error: 'local_reply.type' may be used uninitializ=
+ed in this function [-Werror=3Dmaybe-uninitialized]
+>      if (chunk->type =3D=3D NBD_REPLY_TYPE_NONE) {
+>         ^
+> ../block/nbd.c:710:14: note: 'local_reply.type' was declared here
+>      NBDReply local_reply;
+>               ^~~~~~~~~~~
+> ../block/nbd.c:710:14: error: 'local_reply.flags' may be used uninitial=
+ized in this function [-Werror=3Dmaybe-uninitialized]
+> ../block/nbd.c:738:8: error: 'local_reply.<U4be0>.magic' may be used un=
+initialized in this function [-Werror=3Dmaybe-uninitialized]
+>      if (nbd_reply_is_simple(reply) || s->quit) {
+>         ^
+> ../block/nbd.c:710:14: note: 'local_reply.<U4be0>.magic' was declared h=
+ere
+>      NBDReply local_reply;
+>               ^~~~~~~~~~~
+> cc1: all warnings being treated as errors
 >=20
-> Huh. Very similar to
-> https://lists.gnu.org/archive/html/qemu-devel/2019-07/msg03712.html, bu=
-t
-> affects a different function. I can queue this one through my NBD tree
-> to get both in my rc2 pull request.
->=20
-> Reviewed-by: Eric Blake <eblake@redhat.com>
+> Reported-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+>  block/nbd.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Actually, since this is the second patch on the same topic, I'm
-wondering if it's better to use the following one-liner to fix BOTH
-issues and without relying on a gcc extension:
+Actually, since this patch didn't fix all the cases of use of an uninit
+variable, I'm wondering if this one-liner would be a better patch for
+the issue (that is, fix it so that nbd_co_receive_one_chunk never leaves
+reply uninit, rather than chasing down which callers might need init),
+and with a perk of not relying on a gcc extension:
 
 diff --git i/block/nbd.c w/block/nbd.c
 index 8d565cc624ec..f751a8e633e5 100644
@@ -175,24 +176,24 @@ Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
 
 
---2M0HI25gO1UarywKsXUhzUysaN4z9a3wc--
+--hoY9ze68Q2Ebv005dwzddoq1aMsGGUsBW--
 
---t5i7T5gl4uKmsUMpkv1nrgbtorX4IA6uf
+--huqZKFto3jaiLbruIxdMHErBnnWn1QV6k
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl0x11QACgkQp6FrSiUn
-Q2pCcAgAhYrSNs1IDUfOYN6PQ8UWMOy5c0FaO0W+VLIxk8/IDAPEj+I6uhza787C
-9aqOcrhnrQudFs+caWCYknHaaZNHuwk5XXKgF2AA0sESfS52HvFV+OR9a7NoZYFv
-HIYH/y61JFNMzkzTpOMGMmjHB5P76UJE7w9hT9JD9RZAy50ssJmnKNs+Z/Wmsvue
-pbBOwB792xchIdBQI0RbgKzoLl1d1N9wcgYRmI80Qp9istK5Rj1nl2UhzrPfI2lU
-OjvwEIceMMuIfZFR9Xj3ibIs37T0BwDhJjFoRZLGeiPl02U2t1M+UykAXrzbeQF0
-+guVUVZPVM8DE+iUswoAggmkEtK7WQ==
-=Qeur
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl0x1+EACgkQp6FrSiUn
+Q2rcbQf/UM/msUNIH992F/evK0MyO7iDxJDhue39H9HrRxawFIIx6m8jnL1mLDZw
+ARL9IauaZaeTabzuFxpVlaOiBUrY6DnSRdlYQDxYfxlDDMAfySea611kfNwyE497
+z+pUFaiMuO5KEWbJNPrEg9iO/JmiaJwJFOeOmBbesBk9rihIxB7uqP9/xxhfCucb
+nvghx7fo3lBoWg0wCbrDUhRlSDLaBOnmGxqeH4lw802qApcxqvYJhfdkvYBEvkQP
+GAnlos+zeu+ufalObdunBEA5jvXtp6HtsLwbw6DajW4zm12VsanhYYyJ8tfVbMqZ
+mGahSOhnCjJLWrQYyh2AVyQlwDbyrA==
+=O2A2
 -----END PGP SIGNATURE-----
 
---t5i7T5gl4uKmsUMpkv1nrgbtorX4IA6uf--
+--huqZKFto3jaiLbruIxdMHErBnnWn1QV6k--
 
