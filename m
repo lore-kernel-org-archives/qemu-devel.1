@@ -6,57 +6,57 @@ X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 506ECC76195
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 13:15:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EDD56C76195
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 13:15:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2810120873
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 13:15:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2810120873
+	by mail.kernel.org (Postfix) with ESMTPS id C6CF420873
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 13:15:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C6CF420873
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45082 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45096 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hoSjQ-0001Ly-TZ
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 09:15:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60690)
+	id 1hoSjm-0002kl-Ov
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 09:15:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60862)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hoSir-0007yN-SE
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 09:14:54 -0400
+ (envelope-from <philmd@redhat.com>) id 1hoSj5-0000VB-Cc
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 09:15:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hoSiq-0000VB-KA
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 09:14:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33526)
+ (envelope-from <philmd@redhat.com>) id 1hoSj4-0000jU-90
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 09:15:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:29825)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <philmd@redhat.com>)
- id 1hoSio-0000T3-H7; Fri, 19 Jul 2019 09:14:50 -0400
+ id 1hoSj2-0000fC-8f; Fri, 19 Jul 2019 09:15:04 -0400
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id BA87F2ED2E0;
- Fri, 19 Jul 2019 13:14:49 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 65891308620E;
+ Fri, 19 Jul 2019 13:15:03 +0000 (UTC)
 Received: from x1w.redhat.com (unknown [10.40.205.153])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id EB69426E5A;
- Fri, 19 Jul 2019 13:14:43 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6B0462657C;
+ Fri, 19 Jul 2019 13:14:58 +0000 (UTC)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Fri, 19 Jul 2019 15:14:20 +0200
-Message-Id: <20190719131425.10835-3-philmd@redhat.com>
+Date: Fri, 19 Jul 2019 15:14:22 +0200
+Message-Id: <20190719131425.10835-5-philmd@redhat.com>
 In-Reply-To: <20190719131425.10835-1-philmd@redhat.com>
 References: <20190719131425.10835-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.29]); Fri, 19 Jul 2019 13:14:49 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.42]); Fri, 19 Jul 2019 13:15:03 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH-for-4.1? 2/7] hw/dma/omap_dma: Move switch
- 'fall through' comment to correct place
+Subject: [Qemu-devel] [PATCH-for-4.1? 4/7] hw/ipmi: Rewrite a fall through
+ comment
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -80,42 +80,44 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Reported by GCC9 when building with CFLAG -Wimplicit-fallthrough=3D2:
+GCC9 is confused by this comment when building with CFLAG
+-Wimplicit-fallthrough=3D2:
 
-    CC      hw/dma/omap_dma.o
-  hw/dma/omap_dma.c: In function =E2=80=98omap_dma_write=E2=80=99:
-  hw/dma/omap_dma.c:1532:12: error: this statement may fall through [-Wer=
-ror=3Dimplicit-fallthrough=3D]
-   1532 |         if (s->model <=3D omap_dma_3_1)
-        |            ^
-  hw/dma/omap_dma.c:1534:5: note: here
-   1534 |     case 0x400:
-        |     ^~~~
+  hw/ipmi/ipmi_bmc_extern.c: In function =E2=80=98addchar=E2=80=99:
+  hw/ipmi/ipmi_bmc_extern.c:178:12: error: this statement may fall throug=
+h [-Werror=3Dimplicit-fallthrough=3D]
+    178 |         ch |=3D 0x10;
+        |         ~~~^~~~~~~
+  hw/ipmi/ipmi_bmc_extern.c:181:5: note: here
+    181 |     default:
+        |     ^~~~~~~
   cc1: all warnings being treated as errors
+  make: *** [rules.mak:69: hw/ipmi/ipmi_bmc_extern.o] Error 1
 
-Correctly place the 'fall through' comment.
+Rewrite the comment using 'fall through' which is recognized by
+GCC and static analyzers.
 
 Reported-by: Stefan Weil <sw@weilnetz.de>
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- hw/dma/omap_dma.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/ipmi/ipmi_bmc_extern.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/hw/dma/omap_dma.c b/hw/dma/omap_dma.c
-index eab83c5c3a..6677237d42 100644
---- a/hw/dma/omap_dma.c
-+++ b/hw/dma/omap_dma.c
-@@ -1531,8 +1531,8 @@ static void omap_dma_write(void *opaque, hwaddr add=
-r,
-     case 0x404 ... 0x4fe:
-         if (s->model <=3D omap_dma_3_1)
-             break;
+diff --git a/hw/ipmi/ipmi_bmc_extern.c b/hw/ipmi/ipmi_bmc_extern.c
+index c0a8dac346..d4cbd210c4 100644
+--- a/hw/ipmi/ipmi_bmc_extern.c
++++ b/hw/ipmi/ipmi_bmc_extern.c
+@@ -176,8 +176,7 @@ static void addchar(IPMIBmcExtern *ibe, unsigned char=
+ ch)
+         ibe->outbuf[ibe->outlen] =3D VM_ESCAPE_CHAR;
+         ibe->outlen++;
+         ch |=3D 0x10;
+-        /* No break */
+-
 +        /* fall through */
-     case 0x400:
--        /* Fall through. */
-         if (omap_dma_sys_write(s, addr, value))
-             break;
-         return;
+     default:
+         ibe->outbuf[ibe->outlen] =3D ch;
+         ibe->outlen++;
 --=20
 2.20.1
 
