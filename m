@@ -2,117 +2,91 @@ Return-Path: <SRS0=mHy3=VQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39284C7618F
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 15:34:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E0FCC7618F
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 15:34:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 03B3E2184E
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 15:34:11 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="g2iTFexc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03B3E2184E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 672B52184E
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 15:34:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 672B52184E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46330 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46334 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hoUte-00024w-5y
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 11:34:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33053)
+	id 1hoUtt-000366-Nr
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 11:34:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33070)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1hoUtO-0001be-8V
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 11:33:55 -0400
+ (envelope-from <eblake@redhat.com>) id 1hoUtU-0001qm-8H
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 11:34:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1hoUtG-0000GZ-5I
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 11:33:50 -0400
-Received: from mail-eopbgr140098.outbound.protection.outlook.com
- ([40.107.14.98]:13892 helo=EUR01-VE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1hoUst-0007gl-SU; Fri, 19 Jul 2019 11:33:27 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=VtCOAzExG1Lu6LnGcXocwECHcB4U4IFNv0jpkoI3eEu0AeS22Xg2sKM/36w1VITHemeGu78j7t+jI7qCv+Ji8gPaNnhhlsp8tSG795J3spqf7nxpUZxKjTBIS15ReJQl4L2Xj8W7NwG/D+87QfPwW2S79WbBJ5OHwugHB7pBxAWhH08SHRax9hJkxnwpNz15EVG6LPrIvJNSzeCoacPJXtnvmyPOx71Ui1AbjQ57b7kp6TBTD41+//Q5I5qwC6Yl7uWb29+TcerLa4jCJfpmE5R2LKtwl7Lpfnl1qo7wFjL1lN8YWlDV+Oqa9kCFAC5QA6YQbVm1faR4bjh7QMK8Dg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/9YtRh4XFdEaEjHZrOoyj+i/zbC+vj40luhF9ZgD888=;
- b=BFAZ0PWxMLEBKaUB7SnQimd5NAt/bBXOWgWzyNCwQwTif5q08mAG41szbohWmY2oSerkimFmTkIApn/3JthjSQodaa4gtoo8B+7MYTDzFnNDmIWHDATGexaVLEDZvkMwYIJnaPhHKw3hVj7bof5wKAGvN3IaNTSW3wyOzbwP2FDofQ+aHpEJKp/eOyPjHNeQoN7uzpn9TVexzYn4sjU3EleJs4pY8ysZq3IEhPQgIkgzuhfb45Fjgw4UcXFbrjJXUKan1eElHHIEK4vMAf69uDIxJB51E5Tsw4/r2HlrwWxRA3/4lL65j0xlYJ9I+moiHbYnBTyFylZU7SUwbe6WOw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1;spf=pass
- smtp.mailfrom=virtuozzo.com;dmarc=pass action=none
- header.from=virtuozzo.com;dkim=pass header.d=virtuozzo.com;arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/9YtRh4XFdEaEjHZrOoyj+i/zbC+vj40luhF9ZgD888=;
- b=g2iTFexc/ZhKxSNWtVUfFb56aZwhxCeBJDZQ4DAER9zmGD54MFtuuLgL42Pf9gjTp/OfczhpwnA+VGFFNA1c5PjMvQrXkhauqiU7uYcMKrcIuuzCbu6U5CWSCJ0IJRyX8nsmb4DII2q48PEBjyYniK71PCNPgZGA+uqGZ0micII=
-Received: from VI1PR08MB4399.eurprd08.prod.outlook.com (20.179.28.141) by
- VI1PR08MB3615.eurprd08.prod.outlook.com (20.177.61.78) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2073.14; Fri, 19 Jul 2019 15:17:01 +0000
-Received: from VI1PR08MB4399.eurprd08.prod.outlook.com
- ([fe80::4c3d:79b3:a884:18c4]) by VI1PR08MB4399.eurprd08.prod.outlook.com
- ([fe80::4c3d:79b3:a884:18c4%3]) with mapi id 15.20.2073.012; Fri, 19 Jul 2019
- 15:17:01 +0000
-From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org"
- <qemu-devel@nongnu.org>
-Thread-Topic: [PATCH] nbd: Initialize reply on failure
-Thread-Index: AQHVPkMcqbEGg55jt0ajtBYbBEe416bSDX6A
-Date: Fri, 19 Jul 2019 15:17:01 +0000
-Message-ID: <3bde6a55-0d6e-01e2-c15b-4eebfb274e5e@virtuozzo.com>
-References: <20190719150313.29198-1-eblake@redhat.com>
-In-Reply-To: <20190719150313.29198-1-eblake@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR0402CA0003.eurprd04.prod.outlook.com
- (2603:10a6:3:d0::13) To VI1PR08MB4399.eurprd08.prod.outlook.com
- (2603:10a6:803:102::13)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=andrey.shinkevich@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: c2e1bc17-ad64-4ec7-f5ca-08d70c5c261b
-x-microsoft-antispam: BCL:0; PCL:0;
- RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);
- SRVR:VI1PR08MB3615; 
-x-ms-traffictypediagnostic: VI1PR08MB3615:
-x-ms-exchange-purlcount: 2
-x-microsoft-antispam-prvs: <VI1PR08MB361593D5C0A0FA5A10C3F298F4CB0@VI1PR08MB3615.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:431;
-x-forefront-prvs: 01039C93E4
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(979002)(39850400004)(396003)(366004)(136003)(346002)(376002)(189003)(199004)(6486002)(2906002)(54906003)(66556008)(2616005)(110136005)(66066001)(64756008)(36756003)(66446008)(66476007)(6506007)(316002)(53546011)(386003)(102836004)(6512007)(99286004)(305945005)(486006)(478600001)(68736007)(53936002)(7736002)(31696002)(6436002)(5660300002)(6116002)(66946007)(86362001)(44832011)(26005)(81156014)(71190400001)(71200400001)(8676002)(966005)(186003)(14454004)(31686004)(25786009)(8936002)(229853002)(3846002)(6306002)(446003)(6246003)(2501003)(11346002)(4326008)(256004)(14444005)(52116002)(476003)(76176011)(81166006)(969003)(989001)(999001)(1009001)(1019001);
- DIR:OUT; SFP:1102; SCL:1; SRVR:VI1PR08MB3615;
- H:VI1PR08MB4399.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: C69MHou85BX+HekVdKhacM5paWbrTeyG97e8q3QOQh85L2kqdKv2mHleCvFFmlaJF2v34boCWBIsRNSo91kw6+VxovuRZCHYpY6GRzcIMUeEqJdmJzWXKLWoC/HcJeF8vFLY5OywSZbgDAl2upbQottSMgnJjLgOVFLfnJQs6aET5aCGIg3vSiivQ1n6L8zjUM4JRYkVcIDTrndGBffwUiMUgc1Y10jcTjbiKlqpQKF3MM7dMU8XtX4LYGKg0FjXXUhwmYxUbXhL1OJVJ+sp/rUqtNE608S0jKTXpZs0D7qkf7B7DiGrAUv/nVBtXeRPAC2/mnUDMPXeTM7x7pf8z+0FO0GOmBntqYQ4MUf7J4MHsrbmY8YIwIFtw2oH6ZWV9iYUrlqwGg79zITmr449LDfXrwxMMBudjfNuvjRwbF4=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <0FC8B436667A77499F2E19CC555A141A@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ (envelope-from <eblake@redhat.com>) id 1hoUtN-0000KP-Uw
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 11:33:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60590)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eblake@redhat.com>)
+ id 1hoUt0-0007Ul-9w; Fri, 19 Jul 2019 11:33:31 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 24000DF26;
+ Fri, 19 Jul 2019 15:31:47 +0000 (UTC)
+Received: from [10.3.116.46] (ovpn-116-46.phx2.redhat.com [10.3.116.46])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B15F810190C8;
+ Fri, 19 Jul 2019 15:31:40 +0000 (UTC)
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20190719131425.10835-1-philmd@redhat.com>
+ <20190719131425.10835-2-philmd@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=eblake@redhat.com; keydata=
+ xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
+ xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
+ TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
+ GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
+ sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
+ AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
+ CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
+ RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
+ wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
+ Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
+ gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
+ pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
+ zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
+ pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
+ 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
+ NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
+ cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
+ SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
+ I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
+ mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
+ Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
+ 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
+Organization: Red Hat, Inc.
+Message-ID: <4f37ed84-c903-ed4d-8ed1-8085cdd96273@redhat.com>
+Date: Fri, 19 Jul 2019 10:31:39 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c2e1bc17-ad64-4ec7-f5ca-08d70c5c261b
-X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Jul 2019 15:17:01.4104 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: andrey.shinkevich@virtuozzo.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR08MB3615
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.14.98
-Subject: Re: [Qemu-devel] [PATCH] nbd: Initialize reply on failure
+In-Reply-To: <20190719131425.10835-2-philmd@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="VXE49yeQo3o9BATBKez5RMoMFDEDguaoi"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.30]); Fri, 19 Jul 2019 15:31:47 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH-for-4.1? 1/7] json: Move switch 'fall
+ through' comment to correct place
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -124,37 +98,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>,
- "open list:Network Block Dev..." <qemu-block@nongnu.org>,
- Max Reitz <mreitz@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ Corey Minyard <minyard@acm.org>, qemu-block@nongnu.org,
+ qemu-trivial@nongnu.org, Stefan Weil <sw@weilnetz.de>,
+ Michael Tokarev <mjt@tls.msk.ru>, Laurent Vivier <laurent@vivier.eu>,
+ Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-DQoNCk9uIDE5LzA3LzIwMTkgMTg6MDMsIEVyaWMgQmxha2Ugd3JvdGU6DQo+IFdlJ3ZlIGhhZCB0
-d28gc2VwYXJhdGUgcmVwb3J0cyBvZiBhIGNhbGxlciBydW5uaW5nIGludG8gdXNlIG9mDQo+IHVu
-aW5pdGlhbGl6ZWQgZGF0YSBpZiBzLT5xdWl0IGlzIHNldCAob25lIGRldGVjdGVkIGJ5IGdjYyAt
-TzMsIGFub3RoZXINCj4gYnkgdmFsZ3JpbmQpLCBkdWUgdG8gY2hlY2tpbmcgJ25iZF9yZXBseV9p
-c19zaW1wbGUocmVwbHkpIHx8IHMtPnF1aXQnDQo+IGluIHRoZSB3cm9uZyBvcmRlci4gUmF0aGVy
-IHRoYW4gY2hhc2luZyBkb3duIHdoaWNoIGNhbGxlcnMgbmVlZCB0bw0KPiBwcmUtaW5pdGlhbGl6
-ZSByZXBseSwgaXQncyBlYXNpZXIgdG8gZ3VhcmFudGVlIHRoYXQgcmVwbHkgd2lsbCBhbHdheXMN
-Cj4gYmUgc2V0IGJ5IG5iZF9jb19yZWNlaXZlX29uZV9jaHVuaygpIGV2ZW4gb24gZmFpbHVyZS4N
-Cj4gDQo+IFJlcG9ydGVkLWJ5OiBUaG9tYXMgSHV0aCA8dGh1dGhAcmVkaGF0LmNvbT4NCj4gUmVw
-b3J0ZWQtYnk6IEFuZHJleSBTaGlua2V2aWNoIDxhbmRyZXkuc2hpbmtldmljaEB2aXJ0dW96em8u
-Y29tPg0KPiBTaWduZWQtb2ZmLWJ5OiBFcmljIEJsYWtlIDxlYmxha2VAcmVkaGF0LmNvbT4NCj4g
-LS0tDQo+IA0KPiBSZXBsYWNlczogaHR0cHM6Ly9saXN0cy5nbnUub3JnL2FyY2hpdmUvaHRtbC9x
-ZW11LWRldmVsLzIwMTktMDcvbXNnMDQ0NzcuaHRtbA0KPiBSZXBsYWNlczogaHR0cHM6Ly9saXN0
-cy5nbnUub3JnL2FyY2hpdmUvaHRtbC9xZW11LWRldmVsLzIwMTktMDcvbXNnMDM3MTIuaHRtbA0K
-PiANCj4gICBibG9jay9uYmQuYyB8IDEgKw0KPiAgIDEgZmlsZSBjaGFuZ2VkLCAxIGluc2VydGlv
-bigrKQ0KPiANCj4gZGlmZiAtLWdpdCBhL2Jsb2NrL25iZC5jIGIvYmxvY2svbmJkLmMNCj4gaW5k
-ZXggOGQ1NjVjYzYyNGVjLi5mNzUxYThlNjMzZTUgMTAwNjQ0DQo+IC0tLSBhL2Jsb2NrL25iZC5j
-DQo+ICsrKyBiL2Jsb2NrL25iZC5jDQo+IEBAIC02NDAsNiArNjQwLDcgQEAgc3RhdGljIGNvcm91
-dGluZV9mbiBpbnQgbmJkX2NvX3JlY2VpdmVfb25lX2NodW5rKA0KPiAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgIHJlcXVlc3RfcmV0LCBxaW92LCBwYXlsb2FkLCBl
-cnJwKTsNCj4gDQo+ICAgICAgIGlmIChyZXQgPCAwKSB7DQo+ICsgICAgICAgIG1lbXNldChyZXBs
-eSwgMCwgc2l6ZW9mICpyZXBseSk7DQo+ICAgICAgICAgICBzLT5xdWl0ID0gdHJ1ZTsNCj4gICAg
-ICAgfSBlbHNlIHsNCj4gICAgICAgICAgIC8qIEZvciBhc3NlcnQgYXQgbG9vcCBzdGFydCBpbiBu
-YmRfY29ubmVjdGlvbl9lbnRyeSAqLw0KPiANCg0KUmV2aWV3ZWQtYnk6IEFuZHJleSBTaGlua2V2
-aWNoIDxhbmRyZXkuc2hpbmtldmljaEB2aXJ0dW96em8uY29tPg0KLS0gDQpXaXRoIHRoZSBiZXN0
-IHJlZ2FyZHMsDQpBbmRyZXkgU2hpbmtldmljaA0K
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--VXE49yeQo3o9BATBKez5RMoMFDEDguaoi
+Content-Type: multipart/mixed; boundary="xnOqt4pSHiZMBW3DS9AF3Z6QqJVkO0P1K";
+ protected-headers="v1"
+From: Eric Blake <eblake@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Laurent Vivier <laurent@vivier.eu>,
+ qemu-block@nongnu.org, Corey Minyard <minyard@acm.org>,
+ Peter Maydell <peter.maydell@linaro.org>, qemu-trivial@nongnu.org,
+ Stefan Weil <sw@weilnetz.de>, Michael Tokarev <mjt@tls.msk.ru>,
+ Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <4f37ed84-c903-ed4d-8ed1-8085cdd96273@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH-for-4.1? 1/7] json: Move switch 'fall
+ through' comment to correct place
+References: <20190719131425.10835-1-philmd@redhat.com>
+ <20190719131425.10835-2-philmd@redhat.com>
+In-Reply-To: <20190719131425.10835-2-philmd@redhat.com>
+
+--xnOqt4pSHiZMBW3DS9AF3Z6QqJVkO0P1K
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 7/19/19 8:14 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+> Reported by GCC9 when building with CFLAG -Wimplicit-fallthrough=3D2:
+>=20
+>   qobject/json-parser.c: In function =E2=80=98parse_literal=E2=80=99:
+>   qobject/json-parser.c:492:24: error: this statement may fall through =
+[-Werror=3Dimplicit-fallthrough=3D]
+>     492 |     case JSON_INTEGER: {
+>         |                        ^
+>   qobject/json-parser.c:524:5: note: here
+>     524 |     case JSON_FLOAT:
+>         |     ^~~~
+>=20
+> Correctly place the 'fall through' comment.
+>=20
+> Reported-by: Stefan Weil <sw@weilnetz.de>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+>  qobject/json-parser.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--xnOqt4pSHiZMBW3DS9AF3Z6QqJVkO0P1K--
+
+--VXE49yeQo3o9BATBKez5RMoMFDEDguaoi
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl0x4lsACgkQp6FrSiUn
+Q2pQSAf9H7Fc9TMPVRFykyFJq4yDUOM/pd8MFLCScU65UXH81DlxpZ6MzlNn5kCo
+Sdhbfv4ervPzNIbXiGkXlrm0RYvuRkZrtH4H67mrKtp/sL5wUVYSxet6ufPjpYiy
+GpzAe9z/EyOt3hEu8eMTF/Ev3qKukWRCCLhLMnw/fERogmnoC/md/xP2dAadSe0H
+7G5Eb2QfBgQUQWgZgCmZ68nFYMFypBi7XyrY0FXg+ZCv2jctbHEBFD8X4fTq9Qte
+Pkg7Fj6YDXKJE7FAPLSCAG4O1LfIyVj9Tns34fSNI7jZZCkYsb2PLtN3Wely3iMp
+xVg5abcMNz9xNt0VsT34EJVR7wpL5Q==
+=D/ge
+-----END PGP SIGNATURE-----
+
+--VXE49yeQo3o9BATBKez5RMoMFDEDguaoi--
 
