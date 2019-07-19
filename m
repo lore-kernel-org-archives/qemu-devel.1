@@ -2,83 +2,117 @@ Return-Path: <SRS0=mHy3=VQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1893C7618F
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 15:32:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39284C7618F
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 15:34:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 87B0D2184E
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 15:32:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87B0D2184E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 03B3E2184E
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 15:34:11 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="g2iTFexc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03B3E2184E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46310 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46330 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hoUrx-0000nI-EL
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 11:32:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60966)
+	id 1hoUte-00024w-5y
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 11:34:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33053)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hoUrc-00008a-MD
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 11:32:07 -0400
+ (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1hoUtO-0001be-8V
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 11:33:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hoUrJ-0007TK-0J
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 11:31:52 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:41917)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hoUr0-00060t-OX
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 11:31:30 -0400
-Received: by mail-wr1-f66.google.com with SMTP id c2so29469366wrm.8
- for <qemu-devel@nongnu.org>; Fri, 19 Jul 2019 08:29:14 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=IOqUU7EXYVkWILUBsns8NzX2Simg2u5C0+5NNrNW2Rg=;
- b=NUWztv5hLDvEWe/P12Rr54iHXLUCiR2h45DXG/8nydwBSD/GOeXvatVuNfZ8J23/fw
- NN3ZSK58FAek3THwEMdgHjake8sic2xZ90seHnGzQxx5swODREIO2uYwEKMjS5YC3wXk
- +f6ZzNvV0dLeGbFrEpXxCp+gE54saMKblbLSE9eRdg/dVAhARr+Um6Ynh+uShRvirdoH
- iONyNR4GJnTs7gzA/XGxW9UsPAePY2n3VtRIDpbONUGT3QNuqUmxgEGPSvwedQyw00/f
- qRVpW8yMx75CU9SxGMRgsujyU6c6EaiZaT3U/qxLAH7BH9PhrKv+iDh29fq6ERrqzzdy
- hBDA==
-X-Gm-Message-State: APjAAAWEZmvnicxgseds01R15zWQBGsb/Gi7EKSFZnwSvqU81XL7xOPC
- 1pbH8xzNpaogLHDFatpy6HIicw==
-X-Google-Smtp-Source: APXvYqyffbZYDZV0AbCl1aYa2XfbfZd/WHZSc7GjGKcRmyMRBPn4Jjgd9vsJPk6rxSFbvmB2MR78Hw==
-X-Received: by 2002:a5d:514f:: with SMTP id u15mr57660455wrt.183.1563550153046; 
- Fri, 19 Jul 2019 08:29:13 -0700 (PDT)
-Received: from [192.168.1.37] (62.red-83-42-61.dynamicip.rima-tde.net.
- [83.42.61.62])
- by smtp.gmail.com with ESMTPSA id w7sm38257861wrn.11.2019.07.19.08.29.11
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Fri, 19 Jul 2019 08:29:12 -0700 (PDT)
-To: Michael Rolnik <mrolnik@gmail.com>
-References: <20190719082647.18113-1-mrolnik@gmail.com>
- <20190719082647.18113-7-mrolnik@gmail.com>
- <e2d6724c-2a5a-a1bf-9ab0-29a8a71c1a9c@redhat.com>
- <CAK4993jvKdsT-8mFs253=t1EqZCs12rdab1tYdid4SvBBdpFBw@mail.gmail.com>
- <CAK4993i_807dJ5Gi88mKSgXpz80sncWt_O6yOc6TmmD1O_S_tA@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <7cfe2d41-ca07-d959-c5e8-2542524fe5cb@redhat.com>
-Date: Fri, 19 Jul 2019 17:29:11 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
-MIME-Version: 1.0
-In-Reply-To: <CAK4993i_807dJ5Gi88mKSgXpz80sncWt_O6yOc6TmmD1O_S_tA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+ (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1hoUtG-0000GZ-5I
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 11:33:50 -0400
+Received: from mail-eopbgr140098.outbound.protection.outlook.com
+ ([40.107.14.98]:13892 helo=EUR01-VE1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1hoUst-0007gl-SU; Fri, 19 Jul 2019 11:33:27 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=VtCOAzExG1Lu6LnGcXocwECHcB4U4IFNv0jpkoI3eEu0AeS22Xg2sKM/36w1VITHemeGu78j7t+jI7qCv+Ji8gPaNnhhlsp8tSG795J3spqf7nxpUZxKjTBIS15ReJQl4L2Xj8W7NwG/D+87QfPwW2S79WbBJ5OHwugHB7pBxAWhH08SHRax9hJkxnwpNz15EVG6LPrIvJNSzeCoacPJXtnvmyPOx71Ui1AbjQ57b7kp6TBTD41+//Q5I5qwC6Yl7uWb29+TcerLa4jCJfpmE5R2LKtwl7Lpfnl1qo7wFjL1lN8YWlDV+Oqa9kCFAC5QA6YQbVm1faR4bjh7QMK8Dg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=/9YtRh4XFdEaEjHZrOoyj+i/zbC+vj40luhF9ZgD888=;
+ b=BFAZ0PWxMLEBKaUB7SnQimd5NAt/bBXOWgWzyNCwQwTif5q08mAG41szbohWmY2oSerkimFmTkIApn/3JthjSQodaa4gtoo8B+7MYTDzFnNDmIWHDATGexaVLEDZvkMwYIJnaPhHKw3hVj7bof5wKAGvN3IaNTSW3wyOzbwP2FDofQ+aHpEJKp/eOyPjHNeQoN7uzpn9TVexzYn4sjU3EleJs4pY8ysZq3IEhPQgIkgzuhfb45Fjgw4UcXFbrjJXUKan1eElHHIEK4vMAf69uDIxJB51E5Tsw4/r2HlrwWxRA3/4lL65j0xlYJ9I+moiHbYnBTyFylZU7SUwbe6WOw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1;spf=pass
+ smtp.mailfrom=virtuozzo.com;dmarc=pass action=none
+ header.from=virtuozzo.com;dkim=pass header.d=virtuozzo.com;arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=/9YtRh4XFdEaEjHZrOoyj+i/zbC+vj40luhF9ZgD888=;
+ b=g2iTFexc/ZhKxSNWtVUfFb56aZwhxCeBJDZQ4DAER9zmGD54MFtuuLgL42Pf9gjTp/OfczhpwnA+VGFFNA1c5PjMvQrXkhauqiU7uYcMKrcIuuzCbu6U5CWSCJ0IJRyX8nsmb4DII2q48PEBjyYniK71PCNPgZGA+uqGZ0micII=
+Received: from VI1PR08MB4399.eurprd08.prod.outlook.com (20.179.28.141) by
+ VI1PR08MB3615.eurprd08.prod.outlook.com (20.177.61.78) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2073.14; Fri, 19 Jul 2019 15:17:01 +0000
+Received: from VI1PR08MB4399.eurprd08.prod.outlook.com
+ ([fe80::4c3d:79b3:a884:18c4]) by VI1PR08MB4399.eurprd08.prod.outlook.com
+ ([fe80::4c3d:79b3:a884:18c4%3]) with mapi id 15.20.2073.012; Fri, 19 Jul 2019
+ 15:17:01 +0000
+From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org"
+ <qemu-devel@nongnu.org>
+Thread-Topic: [PATCH] nbd: Initialize reply on failure
+Thread-Index: AQHVPkMcqbEGg55jt0ajtBYbBEe416bSDX6A
+Date: Fri, 19 Jul 2019 15:17:01 +0000
+Message-ID: <3bde6a55-0d6e-01e2-c15b-4eebfb274e5e@virtuozzo.com>
+References: <20190719150313.29198-1-eblake@redhat.com>
+In-Reply-To: <20190719150313.29198-1-eblake@redhat.com>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.221.66
-Subject: Re: [Qemu-devel] [PATCH v27 6/8] target/avr: Add example board
- configuration
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1PR0402CA0003.eurprd04.prod.outlook.com
+ (2603:10a6:3:d0::13) To VI1PR08MB4399.eurprd08.prod.outlook.com
+ (2603:10a6:803:102::13)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=andrey.shinkevich@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: c2e1bc17-ad64-4ec7-f5ca-08d70c5c261b
+x-microsoft-antispam: BCL:0; PCL:0;
+ RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);
+ SRVR:VI1PR08MB3615; 
+x-ms-traffictypediagnostic: VI1PR08MB3615:
+x-ms-exchange-purlcount: 2
+x-microsoft-antispam-prvs: <VI1PR08MB361593D5C0A0FA5A10C3F298F4CB0@VI1PR08MB3615.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:431;
+x-forefront-prvs: 01039C93E4
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(979002)(39850400004)(396003)(366004)(136003)(346002)(376002)(189003)(199004)(6486002)(2906002)(54906003)(66556008)(2616005)(110136005)(66066001)(64756008)(36756003)(66446008)(66476007)(6506007)(316002)(53546011)(386003)(102836004)(6512007)(99286004)(305945005)(486006)(478600001)(68736007)(53936002)(7736002)(31696002)(6436002)(5660300002)(6116002)(66946007)(86362001)(44832011)(26005)(81156014)(71190400001)(71200400001)(8676002)(966005)(186003)(14454004)(31686004)(25786009)(8936002)(229853002)(3846002)(6306002)(446003)(6246003)(2501003)(11346002)(4326008)(256004)(14444005)(52116002)(476003)(76176011)(81166006)(969003)(989001)(999001)(1009001)(1019001);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:VI1PR08MB3615;
+ H:VI1PR08MB4399.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: C69MHou85BX+HekVdKhacM5paWbrTeyG97e8q3QOQh85L2kqdKv2mHleCvFFmlaJF2v34boCWBIsRNSo91kw6+VxovuRZCHYpY6GRzcIMUeEqJdmJzWXKLWoC/HcJeF8vFLY5OywSZbgDAl2upbQottSMgnJjLgOVFLfnJQs6aET5aCGIg3vSiivQ1n6L8zjUM4JRYkVcIDTrndGBffwUiMUgc1Y10jcTjbiKlqpQKF3MM7dMU8XtX4LYGKg0FjXXUhwmYxUbXhL1OJVJ+sp/rUqtNE608S0jKTXpZs0D7qkf7B7DiGrAUv/nVBtXeRPAC2/mnUDMPXeTM7x7pf8z+0FO0GOmBntqYQ4MUf7J4MHsrbmY8YIwIFtw2oH6ZWV9iYUrlqwGg79zITmr449LDfXrwxMMBudjfNuvjRwbF4=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <0FC8B436667A77499F2E19CC555A141A@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c2e1bc17-ad64-4ec7-f5ca-08d70c5c261b
+X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Jul 2019 15:17:01.4104 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: andrey.shinkevich@virtuozzo.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR08MB3615
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.14.98
+Subject: Re: [Qemu-devel] [PATCH] nbd: Initialize reply on failure
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,579 +124,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Sarah Harris <S.E.Harris@kent.ac.uk>,
- Richard Henderson <richard.henderson@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ "open list:Network Block Dev..." <qemu-block@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/19/19 5:14 PM, Michael Rolnik wrote:
-> I should have started the RAM at 0x200 (instead of 0) and make it of
-> size 0x2000. right?
-> 
-> On Fri, Jul 19, 2019 at 6:04 PM Michael Rolnik <mrolnik@gmail.com
-> <mailto:mrolnik@gmail.com>> wrote:
-> 
-> 
-> 
->     On Fri, Jul 19, 2019 at 5:02 PM Philippe Mathieu-Daudé
->     <philmd@redhat.com <mailto:philmd@redhat.com>> wrote:
-> 
->         Hi Michael,
-> 
->         On 7/19/19 10:26 AM, Michael Rolnik wrote:
->         > From: Sarah Harris <S.E.Harris@kent.ac.uk
->         <mailto:S.E.Harris@kent.ac.uk>>
->         >
->         > A simple board setup that configures an AVR CPU to run a given
->         firmware image.
->         > This is all that's useful to implement without peripheral
->         emulation as AVR CPUs include a lot of on-board peripherals.
->         >
->         > Signed-off-by: Michael Rolnik <mrolnik@gmail.com
->         <mailto:mrolnik@gmail.com>>
->         > ---
->         >  hw/Kconfig           |   1 +
->         >  hw/avr/Kconfig       |   5 +
->         >  hw/avr/Makefile.objs |   1 +
->         >  hw/avr/sample.c      | 237
->         +++++++++++++++++++++++++++++++++++++++++++
->         >  4 files changed, 244 insertions(+)
->         >  create mode 100644 hw/avr/Kconfig
->         >  create mode 100644 hw/avr/Makefile.objs
->         >  create mode 100644 hw/avr/sample.c
->         >
->         > diff --git a/hw/Kconfig b/hw/Kconfig
->         > index 195f541e50..1f25636855 100644
->         > --- a/hw/Kconfig
->         > +++ b/hw/Kconfig
->         > @@ -42,6 +42,7 @@ source watchdog/Kconfig
->         >  # arch Kconfig
->         >  source arm/Kconfig
->         >  source alpha/Kconfig
->         > +source avr/Kconfig
->         >  source cris/Kconfig
->         >  source hppa/Kconfig
->         >  source i386/Kconfig
->         > diff --git a/hw/avr/Kconfig b/hw/avr/Kconfig
->         > new file mode 100644
->         > index 0000000000..dd02a4c37a
->         > --- /dev/null
->         > +++ b/hw/avr/Kconfig
->         > @@ -0,0 +1,5 @@
->         > +config AVR_SAMPLE
->         > +    bool
->         > +    select AVR_TIMER16
->         > +    select AVR_USART
->         > +    select AVR_MASK
->         > diff --git a/hw/avr/Makefile.objs b/hw/avr/Makefile.objs
->         > new file mode 100644
->         > index 0000000000..626b7064b3
->         > --- /dev/null
->         > +++ b/hw/avr/Makefile.objs
->         > @@ -0,0 +1 @@
->         > +obj-y += sample.o
->         > diff --git a/hw/avr/sample.c b/hw/avr/sample.c
->         > new file mode 100644
->         > index 0000000000..563edbd417
->         > --- /dev/null
->         > +++ b/hw/avr/sample.c
->         > @@ -0,0 +1,237 @@
->         > +/*
->         > + * QEMU AVR CPU
->         > + *
->         > + * Copyright (c) 2019 Michael Rolnik
->         > + *
->         > + * This library is free software; you can redistribute it and/or
->         > + * modify it under the terms of the GNU Lesser General Public
->         > + * License as published by the Free Software Foundation; either
->         > + * version 2.1 of the License, or (at your option) any later
->         version.
->         > + *
->         > + * This library is distributed in the hope that it will be
->         useful,
->         > + * but WITHOUT ANY WARRANTY; without even the implied warranty of
->         > + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
->         the GNU
->         > + * Lesser General Public License for more details.
->         > + *
->         > + * You should have received a copy of the GNU Lesser General
->         Public
->         > + * License along with this library; if not, see
->         > + * <http://www.gnu.org/licenses/lgpl-2.1.html>
->         > + */
->         > +
->         > +/*
->         > + *  NOTE:
->         > + *      This is not a real AVR board, this is an example!
->         > + *      The CPU is an approximation of an ATmega2560, but is
->         missing various
->         > + *      built-in peripherals.
->         > + *
->         > + *      This example board loads provided binary file into
->         flash memory and
->         > + *      executes it from 0x00000000 address in the code
->         memory space.
->         > + *
->         > + *      Currently used for AVR CPU validation
->         > + *
->         > + */
->         > +
->         > +#include "qemu/osdep.h"
->         > +#include "qapi/error.h"
->         > +#include "qemu-common.h"
->         > +#include "cpu.h"
->         > +#include "hw/hw.h"
->         > +#include "sysemu/sysemu.h"
->         > +#include "sysemu/qtest.h"
->         > +#include "ui/console.h"
->         > +#include "hw/boards.h"
->         > +#include "hw/loader.h"
->         > +#include "qemu/error-report.h"
->         > +#include "exec/address-spaces.h"
->         > +#include "include/hw/sysbus.h"
->         > +#include "include/hw/char/avr_usart.h"
->         > +#include "include/hw/timer/avr_timer16.h"
->         > +#include "include/hw/misc/avr_mask.h"
->         > +#include "elf.h"
->         > +
->         > +#define SIZE_FLASH 0x00040000
->         > +#define SIZE_SRAM 0x00002200
->         > +/*
->         > + * Size of additional "external" memory, as if the AVR were
->         configured to use
->         > + * an external RAM chip.
->         > + * Note that the configuration registers that normally enable
->         this feature are
->         > + * unimplemented.
->         > + */
->         > +#define SIZE_EXMEM 0x00000000
->         > +
->         > +/* Offsets of periphals in emulated memory space (i.e. not
->         host addresses)  */
->         > +#define PRR0_BASE 0x64
->         > +#define PRR1_BASE 0x65
->         > +#define USART_BASE 0xc0
->         > +#define TIMER1_BASE 0x80
->         > +#define TIMER1_IMSK_BASE 0x6f
->         > +#define TIMER1_IFR_BASE 0x36
->         > +
->         > +/* Interrupt numbers used by peripherals */
->         > +#define USART_RXC_IRQ 24
->         > +#define USART_DRE_IRQ 25
->         > +#define USART_TXC_IRQ 26
->         > +
->         > +#define TIMER1_CAPT_IRQ 15
->         > +#define TIMER1_COMPA_IRQ 16
->         > +#define TIMER1_COMPB_IRQ 17
->         > +#define TIMER1_COMPC_IRQ 18
->         > +#define TIMER1_OVF_IRQ 19
->         > +
->         > +/*  Power reduction     */
->         > +#define PRR1_BIT_PRTIM5     0x05    /*  Timer/Counter5  */
->         > +#define PRR1_BIT_PRTIM4     0x04    /*  Timer/Counter4  */
->         > +#define PRR1_BIT_PRTIM3     0x03    /*  Timer/Counter3  */
->         > +#define PRR1_BIT_PRUSART3   0x02    /*  USART3  */
->         > +#define PRR1_BIT_PRUSART2   0x01    /*  USART2  */
->         > +#define PRR1_BIT_PRUSART1   0x00    /*  USART1  */
->         > +
->         > +#define PRR0_BIT_PRTWI      0x06    /*  TWI */
->         > +#define PRR0_BIT_PRTIM2     0x05    /*  Timer/Counter2  */
->         > +#define PRR0_BIT_PRTIM0     0x04    /*  Timer/Counter0  */
->         > +#define PRR0_BIT_PRTIM1     0x03    /*  Timer/Counter1  */
->         > +#define PRR0_BIT_PRSPI      0x02    /*  Serial Peripheral
->         Interface */
->         > +#define PRR0_BIT_PRUSART0   0x01    /*  USART0  */
->         > +#define PRR0_BIT_PRADC      0x00    /*  ADC */
->         > +
->         > +typedef struct {
->         > +    MachineClass parent;
->         > +} SampleMachineClass;
->         > +
->         > +typedef struct {
->         > +    MachineState parent;
->         > +    MemoryRegion *ram;
->         > +    MemoryRegion *flash;
->         > +    AVRUsartState *usart0;
->         > +    AVRTimer16State *timer1;
->         > +    AVRMaskState *prr[2];
->         > +} SampleMachineState;
->         > +
->         > +#define TYPE_SAMPLE_MACHINE MACHINE_TYPE_NAME("sample")
->         > +
->         > +#define SAMPLE_MACHINE(obj) \
->         > +    OBJECT_CHECK(SampleMachineState, obj, TYPE_SAMPLE_MACHINE)
->         > +#define SAMPLE_MACHINE_GET_CLASS(obj) \
->         > +    OBJECT_GET_CLASS(SampleMachineClass, obj,
->         TYPE_SAMPLE_MACHINE)
->         > +#define SAMPLE_MACHINE_CLASS(klass) \
->         > +    OBJECT_CLASS_CHECK(SampleMachineClass, klass,
->         TYPE_SAMPLE_MACHINE)
->         > +
->         > +static void sample_init(MachineState *machine)
->         > +{
->         > +    SampleMachineState *sms = SAMPLE_MACHINE(machine);
->         > +    MemoryRegion *system_memory = get_system_memory();
->         > +    AVRCPU *cpu;
->         > +    const char *firmware = NULL;
->         > +    const char *filename;
->         > +    int bytes_loaded;
->         > +    SysBusDevice *busdev;
->         > +    DeviceState *cpudev;
->         > +
->         > +    system_memory = get_system_memory();
->         > +    sms->ram = g_new(MemoryRegion, 1);
->         > +    sms->flash = g_new(MemoryRegion, 1);
->         > +
->         > +    cpu = AVR_CPU(cpu_create(machine->cpu_type));
->         > +    cpudev = DEVICE(cpu);
->         > +
->         > +    memory_region_allocate_system_memory(
->         > +        sms->ram, NULL, "avr.ram", SIZE_SRAM + SIZE_EXMEM);
->         > +    memory_region_add_subregion(system_memory, OFFSET_DATA,
->         sms->ram);
-> 
->         Not sure this is correct, you are filling an area of 0x1e0 I/O
->         registers
->         with RAM...
-> 
->     Please explain. 
-
-The DATA range 0x000..0x1ff is an I/O range.
-The DATA range 0x200..0x2200 is the SRAM range. (8K * 8-bit)
-
-You mapped the sms->ram over:
-
-(qemu) info mtree
-address-space: memory
-  0000000000000000-ffffffffffffffff (prio 0, i/o): system
-    0000000000000000-000000000003ffff (prio 0, rom): avr.flash
-    0000000000800000-00000000008021ff (prio 0, ram): avr.ram
-    0000000000800036-0000000000800036 (prio 0, i/o): avr-timer16
-    0000000000800064-0000000000800064 (prio 0, i/o): avr-mask
-    0000000000800065-0000000000800065 (prio 0, i/o): avr-mask
-    000000000080006f-000000000080006f (prio 0, i/o): avr-timer16
-    0000000000800080-000000000080008d (prio 0, i/o): avr-timer16
-    00000000008000c0-00000000008000c7 (prio 0, i/o): avr-usart
-
->      
-> 
-> 
->         So you use system_memory to model the first registers, I wonder
->         if QEMU
->         supports a such small area. Well, I won't test it, I'll try a
->         quicker hack:
-> 
->         -- >8 --
->         diff --git a/hw/avr/sample.c b/hw/avr/sample.c
->         index 563edbd417..cc60a6ca8d 100644
->         --- a/hw/avr/sample.c
->         +++ b/hw/avr/sample.c
->         @@ -48,6 +48,7 @@
->          #include "include/hw/timer/avr_timer16.h"
->          #include "include/hw/misc/avr_mask.h"
->          #include "elf.h"
->         +#include "hw/misc/unimp.h"
-> 
->          #define SIZE_FLASH 0x00040000
->          #define SIZE_SRAM 0x00002200
->         @@ -136,12 +137,29 @@ static void sample_init(MachineState *machine)
-> 
->              memory_region_allocate_system_memory(
->                  sms->ram, NULL, "avr.ram", SIZE_SRAM + SIZE_EXMEM);
->         -    memory_region_add_subregion(system_memory, OFFSET_DATA,
->         sms->ram);
->         +    memory_region_add_subregion_overlap(system_memory, OFFSET_DATA,
->         sms->ram,
->         +                                        -2000);
-> 
->              memory_region_init_rom(sms->flash, NULL, "avr.flash",
->         SIZE_FLASH,
->                      &error_fatal);
->              memory_region_add_subregion(system_memory, OFFSET_CODE,
->         sms->flash);
-> 
->         +    create_unimplemented_device("io", 0x800000 + 0x20, 0x40);
->         +    create_unimplemented_device("data", 0x800000 + 0x20 + 0x40,
->         0x1a0);
->         +
->         +    create_unimplemented_device("gpio", 0x800000 + 0x20 + 0, 0x14);
->         +    create_unimplemented_device("intc", 0x800000 + 0x20 + 0x1c,
->         0x2);
->         +    create_unimplemented_device("tmr0", 0x800000 + 0x20 + 0x26,
->         0x3);
->         +    create_unimplemented_device("adc", 0x800000 + 0x20 + 0x78,
->         0x8);
->         +    create_unimplemented_device("tmr2", 0x800000 + 0x20 + 0x84,
->         0xa);
->         +    create_unimplemented_device("tmr3", 0x800000 + 0x20 + 0x94,
->         0xa);
->         +    create_unimplemented_device("tmr4", 0x800000 + 0x20 + 0xa4,
->         0xa);
->         +    create_unimplemented_device("uart0", 0x800000 + 0x20 +
->         0xc0, 0x8);
->         +    create_unimplemented_device("uart1", 0x800000 + 0x20 +
->         0xc8, 0x8);
->         +    create_unimplemented_device("uart2", 0x800000 + 0x20 +
->         0xd0, 0x8);
->         +    create_unimplemented_device("tmr5", 0x800000 + 0x20 +
->         0x124, 0xa);
->         +    create_unimplemented_device("uart3", 0x800000 + 0x20 +
->         0x130, 0x8);
->         +
->              /* Power Reduction built-in peripheral */
->              sms->prr[0] = AVR_MASK(sysbus_create_simple(TYPE_AVR_MASK,
->                              OFFSET_DATA + PRR0_BASE, NULL));
->         ---
-> 
->         So instead of using a small RAM region for registers, I use the same
->         amount you used, but with lower priority (-2000). Then I create
->         'UnimplementedDevice' for the most common blocks and map them
->         (they'll
->         be mapped at prio -1000).
-> 
->         Now we have this memory map:
-> 
->         (qemu) info mtree
->         address-space: memory
->           0000000000000000-ffffffffffffffff (prio 0, i/o): system
->             0000000000000000-000000000003ffff (prio 0, rom): avr.flash
->             0000000000800000-00000000008021ff (prio -2000, ram): avr.ram
->             0000000000800020-0000000000800033 (prio -1000, i/o): gpio
->             0000000000800020-000000000080005f (prio -1000, i/o): io
->             0000000000800036-0000000000800036 (prio 0, i/o): avr-timer16
->             000000000080003c-000000000080003d (prio -1000, i/o): intc
->             0000000000800046-0000000000800048 (prio -1000, i/o): tmr0
->             0000000000800060-00000000008001ff (prio -1000, i/o): data
->             0000000000800064-0000000000800064 (prio 0, i/o): avr-mask
->             0000000000800065-0000000000800065 (prio 0, i/o): avr-mask
->             000000000080006f-000000000080006f (prio 0, i/o): avr-timer16
->             0000000000800080-000000000080008d (prio 0, i/o): avr-timer16
->             0000000000800098-000000000080009f (prio -1000, i/o): adc
->             00000000008000a4-00000000008000ad (prio -1000, i/o): tmr2
->             00000000008000b4-00000000008000bd (prio -1000, i/o): tmr3
->             00000000008000c0-00000000008000c7 (prio 0, i/o): avr-usart
->             00000000008000c4-00000000008000cd (prio -1000, i/o): tmr4
->             00000000008000e0-00000000008000e7 (prio -1000, i/o): uart0
->             00000000008000e8-00000000008000ef (prio -1000, i/o): uart1
->             00000000008000f0-00000000008000f7 (prio -1000, i/o): uart2
->             0000000000800144-000000000080014d (prio -1000, i/o): tmr5
->             0000000000800150-0000000000800157 (prio -1000, i/o): uart3
-> 
->         The UnimplementedDevice is useful to quickly trace accesses from
->         firmware, you can see:
-> 
->         $ avr-softmmu/qemu-system-avr -bios demo.elf -d unimp
->         gpio: unimplemented device write (size 1, value 0xff, offset 0x1)
->         gpio: unimplemented device write (size 1, value 0xff, offset 0x2)
->         gpio: unimplemented device write (size 1, value 0xef, offset 0x2)
->         gpio: unimplemented device write (size 1, value 0xff, offset 0x2)
->         gpio: unimplemented device write (size 1, value 0xef, offset 0x2)
->         gpio: unimplemented device write (size 1, value 0xff, offset 0x2)
->         gpio: unimplemented device write (size 1, value 0xef, offset 0x2)
->         gpio: unimplemented device write (size 1, value 0xff, offset 0x2)
->         gpio: unimplemented device write (size 1, value 0xef, offset 0x2)
->         gpio: unimplemented device write (size 1, value 0xff, offset 0x2)
-> 
->         So the Demo code first initialize the GPIO direction, then toggle it
->         (LED blink).
-> 
->         > +
->         > +    memory_region_init_rom(sms->flash, NULL, "avr.flash",
->         SIZE_FLASH,
->         > +            &error_fatal);
->         > +    memory_region_add_subregion(system_memory, OFFSET_CODE,
->         sms->flash);
->         > +
->         > +    /* Power Reduction built-in peripheral */
->         > +    sms->prr[0] = AVR_MASK(sysbus_create_simple(TYPE_AVR_MASK,
->         > +                    OFFSET_DATA + PRR0_BASE, NULL));
->         > +    sms->prr[1] = AVR_MASK(sysbus_create_simple(TYPE_AVR_MASK,
->         > +                    OFFSET_DATA + PRR1_BASE, NULL));
->         > +
->         > +    /* USART 0 built-in peripheral */
->         > +    sms->usart0 = AVR_USART(object_new(TYPE_AVR_USART));
->         > +    busdev = SYS_BUS_DEVICE(sms->usart0);
->         > +    qdev_prop_set_chr(DEVICE(sms->usart0), "chardev",
->         serial_hd(0));
->         > +    object_property_set_bool(OBJECT(sms->usart0), true,
->         "realized",
->         > +            &error_fatal);
->         > +    sysbus_mmio_map(busdev, 0, OFFSET_DATA + USART_BASE);
-> 
->         This OFFSET_DATA makes me wonder... These are I/O devices, it
->         would be
->         cleaner to map them on the I/O bus, and remap the I/O bus to
->         OFFSET_DATA.
-> 
->     Please look here
->     (https://www.avr-tutorials.com/general/avr-memory-map) some io
->     registers are accessible as if they are memory.  
-
-This show the ATMega8515 memory map, you choosed to model the ATmega2560
-which is more complex.
-
-I'm reading the 2549Q–AVR–02/2014 datasheet
-"ATmega640/V-1280/V-1281/V-2560/V-2561/V [DATASHEET]".
-
-Please have a look at Figure 8-2, "Data Memory Map"
-
-> 
-> 
->         Something like this I guess:
-> 
->         (qemu) info mtree
->         address-space: memory
->           0000000000000000-ffffffffffffffff (prio 0, i/o): system
->             0000000000000000-000000000003ffff (prio 0, rom): avr.flash
->             0000000000800000-00000000008021ff (prio -2000, ram): avr.ram
->             0000000000800020-00000000008001ff (prio -1000, i/o): avr.io
->         <http://avr.io>
-> 
->         address-space: I/O
->           0000000000000000-00000000000001ff (prio 0, i/o): avr.io
->         <http://avr.io>
-
-
-This part ...
-
->             0000000000000000-0000000000000033 (prio -1000, i/o): gpio
->             0000000000000016-0000000000000016 (prio 0, i/o): avr-timer16
->             000000000000001c-000000000000001d (prio -1000, i/o): intc
->             0000000000000026-0000000000000028 (prio -1000, i/o): tmr0
-
-are the 64 base I/O register, mapped in 0x20..0x5f.
-
----
-
-This part ...
-
->             0000000000000044-0000000000000044 (prio 0, i/o): avr-mask
->             0000000000000045-0000000000000045 (prio 0, i/o): avr-mask
->             000000000000004f-000000000000004f (prio 0, i/o): avr-timer16
->             0000000000000060-000000000000006d (prio 0, i/o): avr-timer16
->             0000000000000078-000000000000007f (prio -1000, i/o): adc
->             0000000000000084-000000000000008d (prio -1000, i/o): tmr2
->             0000000000000094-000000000000009d (prio -1000, i/o): tmr3
->             00000000000000a0-00000000000000a7 (prio 0, i/o): avr-usart
->             00000000000000a4-00000000000000ad (prio -1000, i/o): tmr4
->             00000000000000c0-00000000000000c7 (prio -1000, i/o): uart0
->             00000000000000c8-00000000000000cf (prio -1000, i/o): uart1
->             00000000000000d0-00000000000000d7 (prio -1000, i/o): uart2
->             0000000000000124-000000000000012d (prio -1000, i/o): tmr5
->             0000000000000130-0000000000000127 (prio -1000, i/o): uart3
-
-... are the 416 External I/O registers, mapped in 0x60..0x1ff
-
-> 
->         > +    /*
->         > +     * These IRQ numbers don't match the datasheet because
->         we're counting from
->         > +     * zero and not including reset.
->         > +     */
->         > +    sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(cpudev,
->         USART_RXC_IRQ));
->         > +    sysbus_connect_irq(busdev, 1, qdev_get_gpio_in(cpudev,
->         USART_DRE_IRQ));
->         > +    sysbus_connect_irq(busdev, 2, qdev_get_gpio_in(cpudev,
->         USART_TXC_IRQ));
->         > +    sysbus_connect_irq(SYS_BUS_DEVICE(sms->prr[1]),
->         PRR1_BIT_PRUSART1,
->         > +            qdev_get_gpio_in(DEVICE(sms->usart0), 0));
->         > +
->         > +    /* Timer 1 built-in periphal */
->         > +    sms->timer1 = AVR_TIMER16(object_new(TYPE_AVR_TIMER16));
->         > +    object_property_set_bool(OBJECT(sms->timer1), true,
->         "realized",
->         > +            &error_fatal);
->         > +    busdev = SYS_BUS_DEVICE(sms->timer1);
->         > +    sysbus_mmio_map(busdev, 0, OFFSET_DATA + TIMER1_BASE);
->         > +    sysbus_mmio_map(busdev, 1, OFFSET_DATA + TIMER1_IMSK_BASE);
->         > +    sysbus_mmio_map(busdev, 2, OFFSET_DATA + TIMER1_IFR_BASE);
->         > +    sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(cpudev,
->         TIMER1_CAPT_IRQ));
->         > +    sysbus_connect_irq(busdev, 1, qdev_get_gpio_in(cpudev,
->         TIMER1_COMPA_IRQ));
->         > +    sysbus_connect_irq(busdev, 2, qdev_get_gpio_in(cpudev,
->         TIMER1_COMPB_IRQ));
->         > +    sysbus_connect_irq(busdev, 3, qdev_get_gpio_in(cpudev,
->         TIMER1_COMPC_IRQ));
->         > +    sysbus_connect_irq(busdev, 4, qdev_get_gpio_in(cpudev,
->         TIMER1_OVF_IRQ));
->         > +    sysbus_connect_irq(SYS_BUS_DEVICE(sms->prr[0]),
->         PRR0_BIT_PRTIM1,
->         > +            qdev_get_gpio_in(DEVICE(sms->timer1), 0));
->         > +
->         > +    /* Load firmware (contents of flash) trying to
->         auto-detect format */
->         > +    firmware = machine->firmware;
->         > +    if (firmware != NULL) {
->         > +        filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, firmware);
->         > +        if (filename == NULL) {
->         > +            error_report("Unable to find %s", firmware);
->         > +            exit(1);
->         > +        }
->         > +
->         > +        bytes_loaded = load_elf(
->         > +            filename, NULL, NULL, NULL, NULL, NULL, NULL, 0,
->         EM_NONE, 0, 0);
->         > +        if (bytes_loaded < 0) {
->         > +            error_report(
->         > +                "Unable to load %s as ELF, trying again as
->         raw binary",
->         > +                firmware);
->         > +            bytes_loaded = load_image_targphys(
->         > +                filename, OFFSET_CODE, SIZE_FLASH);
->         > +        }
->         > +        if (bytes_loaded < 0) {
->         > +            error_report(
->         > +                "Unable to load firmware image %s as ELF or
->         raw binary",
->         > +                firmware);
->         > +            exit(1);
->         > +        }
->         > +    }
->         > +}
->         > +
->         > +static void sample_class_init(ObjectClass *oc, void *data)
->         > +{
->         > +    MachineClass *mc = MACHINE_CLASS(oc);
->         > +
->         > +    mc->desc = "AVR sample/example board (ATmega2560)";
->         > +    mc->init = sample_init;
->         > +    mc->default_cpus = 1;
->         > +    mc->min_cpus = mc->default_cpus;
->         > +    mc->max_cpus = mc->default_cpus;
->         > +    mc->default_cpu_type = "avr6-avr-cpu"; /* ATmega2560. */
->         > +    mc->is_default = 1;
->         > +}
->         > +
->         > +static const TypeInfo sample_info = {
->         > +    .name = TYPE_SAMPLE_MACHINE,
->         > +    .parent = TYPE_MACHINE,
->         > +    .instance_size = sizeof(SampleMachineState),
->         > +    .class_size = sizeof(SampleMachineClass),
->         > +    .class_init = sample_class_init,
->         > +};
->         > +
->         > +static void sample_machine_init(void)
->         > +{
->         > +    type_register_static(&sample_info);
->         > +}
->         > +
->         > +type_init(sample_machine_init);
->         >
-> 
-> 
-> 
->     -- 
->     Best Regards,
->     Michael Rolnik
-> 
-> 
-> 
-> -- 
-> Best Regards,
-> Michael Rolnik
+DQoNCk9uIDE5LzA3LzIwMTkgMTg6MDMsIEVyaWMgQmxha2Ugd3JvdGU6DQo+IFdlJ3ZlIGhhZCB0
+d28gc2VwYXJhdGUgcmVwb3J0cyBvZiBhIGNhbGxlciBydW5uaW5nIGludG8gdXNlIG9mDQo+IHVu
+aW5pdGlhbGl6ZWQgZGF0YSBpZiBzLT5xdWl0IGlzIHNldCAob25lIGRldGVjdGVkIGJ5IGdjYyAt
+TzMsIGFub3RoZXINCj4gYnkgdmFsZ3JpbmQpLCBkdWUgdG8gY2hlY2tpbmcgJ25iZF9yZXBseV9p
+c19zaW1wbGUocmVwbHkpIHx8IHMtPnF1aXQnDQo+IGluIHRoZSB3cm9uZyBvcmRlci4gUmF0aGVy
+IHRoYW4gY2hhc2luZyBkb3duIHdoaWNoIGNhbGxlcnMgbmVlZCB0bw0KPiBwcmUtaW5pdGlhbGl6
+ZSByZXBseSwgaXQncyBlYXNpZXIgdG8gZ3VhcmFudGVlIHRoYXQgcmVwbHkgd2lsbCBhbHdheXMN
+Cj4gYmUgc2V0IGJ5IG5iZF9jb19yZWNlaXZlX29uZV9jaHVuaygpIGV2ZW4gb24gZmFpbHVyZS4N
+Cj4gDQo+IFJlcG9ydGVkLWJ5OiBUaG9tYXMgSHV0aCA8dGh1dGhAcmVkaGF0LmNvbT4NCj4gUmVw
+b3J0ZWQtYnk6IEFuZHJleSBTaGlua2V2aWNoIDxhbmRyZXkuc2hpbmtldmljaEB2aXJ0dW96em8u
+Y29tPg0KPiBTaWduZWQtb2ZmLWJ5OiBFcmljIEJsYWtlIDxlYmxha2VAcmVkaGF0LmNvbT4NCj4g
+LS0tDQo+IA0KPiBSZXBsYWNlczogaHR0cHM6Ly9saXN0cy5nbnUub3JnL2FyY2hpdmUvaHRtbC9x
+ZW11LWRldmVsLzIwMTktMDcvbXNnMDQ0NzcuaHRtbA0KPiBSZXBsYWNlczogaHR0cHM6Ly9saXN0
+cy5nbnUub3JnL2FyY2hpdmUvaHRtbC9xZW11LWRldmVsLzIwMTktMDcvbXNnMDM3MTIuaHRtbA0K
+PiANCj4gICBibG9jay9uYmQuYyB8IDEgKw0KPiAgIDEgZmlsZSBjaGFuZ2VkLCAxIGluc2VydGlv
+bigrKQ0KPiANCj4gZGlmZiAtLWdpdCBhL2Jsb2NrL25iZC5jIGIvYmxvY2svbmJkLmMNCj4gaW5k
+ZXggOGQ1NjVjYzYyNGVjLi5mNzUxYThlNjMzZTUgMTAwNjQ0DQo+IC0tLSBhL2Jsb2NrL25iZC5j
+DQo+ICsrKyBiL2Jsb2NrL25iZC5jDQo+IEBAIC02NDAsNiArNjQwLDcgQEAgc3RhdGljIGNvcm91
+dGluZV9mbiBpbnQgbmJkX2NvX3JlY2VpdmVfb25lX2NodW5rKA0KPiAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgIHJlcXVlc3RfcmV0LCBxaW92LCBwYXlsb2FkLCBl
+cnJwKTsNCj4gDQo+ICAgICAgIGlmIChyZXQgPCAwKSB7DQo+ICsgICAgICAgIG1lbXNldChyZXBs
+eSwgMCwgc2l6ZW9mICpyZXBseSk7DQo+ICAgICAgICAgICBzLT5xdWl0ID0gdHJ1ZTsNCj4gICAg
+ICAgfSBlbHNlIHsNCj4gICAgICAgICAgIC8qIEZvciBhc3NlcnQgYXQgbG9vcCBzdGFydCBpbiBu
+YmRfY29ubmVjdGlvbl9lbnRyeSAqLw0KPiANCg0KUmV2aWV3ZWQtYnk6IEFuZHJleSBTaGlua2V2
+aWNoIDxhbmRyZXkuc2hpbmtldmljaEB2aXJ0dW96em8uY29tPg0KLS0gDQpXaXRoIHRoZSBiZXN0
+IHJlZ2FyZHMsDQpBbmRyZXkgU2hpbmtldmljaA0K
 
