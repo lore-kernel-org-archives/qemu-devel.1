@@ -2,62 +2,85 @@ Return-Path: <SRS0=mHy3=VQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,MISSING_HEADERS,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE0E3C7618F
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 20:54:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF1DDC7618F
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 21:03:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8E26821849
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 20:54:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E26821849
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id A9D2F2184E
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 21:03:44 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Gty7Py4F"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9D2F2184E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48098 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48140 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hoZtV-0006ti-7e
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 16:54:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53178)
+	id 1hoa2Z-0003e3-IZ
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 17:03:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54872)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <ehabkost@redhat.com>) id 1hoZtE-0006A9-Di
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 16:54:05 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1hoa2O-0003Ep-VV
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 17:03:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1hoZtD-0000DM-2m
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 16:54:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49202)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hoZtC-0000Ch-Qj
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 16:54:03 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 11675308C418;
- Fri, 19 Jul 2019 20:54:01 +0000 (UTC)
-Received: from localhost (ovpn-116-109.gru2.redhat.com [10.97.116.109])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B71915C226;
- Fri, 19 Jul 2019 20:53:59 +0000 (UTC)
-Date: Fri, 19 Jul 2019 17:53:58 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>,
- To: "Denis V. Lunev" <den@openvz.org>
-Message-ID: <20190719205358.GB26800@habkost.net>
-References: <20190718134537.22356-1-den@openvz.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20190718134537.22356-1-den@openvz.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.48]); Fri, 19 Jul 2019 20:54:01 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 1/1] x86: add CPU flags supported inside
- libvirt
+ (envelope-from <richard.henderson@linaro.org>) id 1hoa2N-00055N-GI
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 17:03:32 -0400
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:37903)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1hoa2N-00054h-6x
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 17:03:31 -0400
+Received: by mail-pg1-x542.google.com with SMTP id f5so6143368pgu.5
+ for <qemu-devel@nongnu.org>; Fri, 19 Jul 2019 14:03:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=uNqQ9lhJM4Cw6pjXD4tcjNYk/0atel4QP7/6xSx+c1w=;
+ b=Gty7Py4FM4Nsvd3jQBFJqDSQcOAjlbFD2IJZxj2B+rmYnb7PgsR5ubdG7dmPuvDbi5
+ ibwpK8dI9V3spLzHMwiBj2zPDuWQEUkKpGaVroazWfpNfbC+WJYelBz1MZHQdloccLIP
+ ZXV4zwpkPkdUnXYnnhTr3JZy6NIRtQBOv8CNtiKefiEAxD4PYmn7mlfgZKxjkw3XQcew
+ rNeZbiaIRKXm54wnHf0dQW41TpagJu5HBgnlF7Ym4kXtax3KrLfe0nUZbzVaLiTa5ODk
+ /O/pkHQkJ7FaUvSqrJf1nxBwagnTg7wZe61AgHznBE6RCTbcXWKxu87nBPUyDp+dK+4Y
+ VRdQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references;
+ bh=uNqQ9lhJM4Cw6pjXD4tcjNYk/0atel4QP7/6xSx+c1w=;
+ b=ekwsdgCIp8SgGR5dRSaY40wxhYUG4fo8SKUtTiXa8niER6YXUknmiEpjbowS2CHRhm
+ oZeJUIR7CKcViai+JWAEGoUQrT330pRQKhN0S7QFNf1hpo7IjWxQ1nKCC/ILzyO37nDh
+ mFL0HFkguxdxy+bVz4OufIPxS2Z17cRu6HDO1OMiBnwtNyZ2gal2wUpgKUTimmYTza15
+ fXduldIDcTFFeui5mszgd6rEe7eS+ZCBUM/+485umycioDwiAmWVRvJbixtgdOr5y8oT
+ Hy8ds3F7y/59a0agkN1yZ6ppEgD0Aab3tgkuKrSQeKHvZJA7m5BBUX7yBHoBlpmSVUHc
+ ZuiQ==
+X-Gm-Message-State: APjAAAUK5pMrP//WLZqukB7nWI2PWxTldq7V0Q5ECdlB/XgxSxviiR77
+ G4Vu61pZqIjL75slPMjiaBje9ahStt0=
+X-Google-Smtp-Source: APXvYqww+GhM8TFvzkeyjkCsxT45cumUAro9ZB6CRFGyNYOaFgsbCeCWp1Ba9ZGdgpVhSZX2H/Niuw==
+X-Received: by 2002:a17:90a:a116:: with SMTP id
+ s22mr59569583pjp.47.1563570209719; 
+ Fri, 19 Jul 2019 14:03:29 -0700 (PDT)
+Received: from localhost.localdomain (97-126-117-207.tukw.qwest.net.
+ [97.126.117.207])
+ by smtp.gmail.com with ESMTPSA id i6sm32724751pgi.40.2019.07.19.14.03.28
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Fri, 19 Jul 2019 14:03:29 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Date: Fri, 19 Jul 2019 14:03:03 -0700
+Message-Id: <20190719210326.15466-2-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190719210326.15466-1-richard.henderson@linaro.org>
+References: <20190719210326.15466-1-richard.henderson@linaro.org>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::542
+Subject: [Qemu-devel] [PATCH for-4.2 01/24] cputlb: Add
+ tlb_set_asid_for_mmuidx
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,91 +92,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Krempa <pkrempa@redhat.com>,
- Daniel P =?iso-8859-1?Q?=2E_Berrang=E9?= <berrange@redhat.com>,
- qemu-devel@nongnu.org, Nikolay Shirokovskiy <nshirokovskiy@virtuozzo.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Jiri Denemark <jdenemar@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: peter.maydell@linaro.org, beata.michalska@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jul 18, 2019 at 04:45:37PM +0300, Denis V. Lunev wrote:
-> There are the following flags available in libvirt inside cpu_map.xm
->     <feature name=3D'cvt16'>
->       <cpuid function=3D'0x80000001' ecx=3D'0x00040000'/>
+Although we can't do much with ASIDs except remember them, this
+will allow cleanups within target/ that should make things clearer.
 
-This is bit 18...
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
->     </feature>
->     <feature name=3D'cmt'> <!-- cqm -->
->       <cpuid eax_in=3D'0x07' ecx_in=3D'0x00' ebx=3D'0x00001000'/>
->     </feature>
-> We have faced the problem that QEMU does not start once these flags are
-> present in the domain.xml.
->=20
-> This patch just adds proper names into the map.
->=20
-> Signed-off-by: Denis V. Lunev <den@openvz.org>
-> CC: Paolo Bonzini <pbonzini@redhat.com>
-> CC: Richard Henderson <rth@twiddle.net>
-> CC: Eduardo Habkost <ehabkost@redhat.com>
-> CC: Nikolay Shirokovskiy <nshirokovskiy@virtuozzo.com>
-> CC: Peter Krempa <pkrempa@redhat.com>
-> CC: Daniel P. Berrang=E9 <berrange@redhat.com>
-> ---
->  target/i386/cpu.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->=20
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index 805ce95247..88ba4dad47 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -870,7 +870,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WO=
-RDS] =3D {
->              "lahf-lm", "cmp-legacy", "svm", "extapic",
->              "cr8legacy", "abm", "sse4a", "misalignsse",
->              "3dnowprefetch", "osvw", "ibs", "xop",
-> -            "skinit", "wdt", NULL, "lwp",
-> +            "skinit", "wdt", "cvt16", "lwp",
+---
+v2: Assert cpu_is_self; only flush idx w/ asid mismatch.
+---
+ include/exec/cpu-all.h  | 11 +++++++++++
+ include/exec/cpu-defs.h |  2 ++
+ include/exec/exec-all.h | 19 +++++++++++++++++++
+ accel/tcg/cputlb.c      | 26 ++++++++++++++++++++++++++
+ 4 files changed, 58 insertions(+)
 
-...this is bit 14.
+diff --git a/include/exec/cpu-all.h b/include/exec/cpu-all.h
+index 536ea58f81..40b140cbba 100644
+--- a/include/exec/cpu-all.h
++++ b/include/exec/cpu-all.h
+@@ -439,4 +439,15 @@ static inline CPUTLB *env_tlb(CPUArchState *env)
+     return &env_neg(env)->tlb;
+ }
+ 
++/**
++ * cpu_tlb(env)
++ * @cpu: The generic CPUState
++ *
++ * Return the CPUTLB state associated with the cpu.
++ */
++static inline CPUTLB *cpu_tlb(CPUState *cpu)
++{
++    return &cpu_neg(cpu)->tlb;
++}
++
+ #endif /* CPU_ALL_H */
+diff --git a/include/exec/cpu-defs.h b/include/exec/cpu-defs.h
+index 9bc713a70b..73584841c0 100644
+--- a/include/exec/cpu-defs.h
++++ b/include/exec/cpu-defs.h
+@@ -169,6 +169,8 @@ typedef struct CPUTLBDesc {
+     size_t n_used_entries;
+     /* The next index to use in the tlb victim table.  */
+     size_t vindex;
++    /* The current ASID for this tlb.  */
++    uint32_t asid;
+     /* The tlb victim table, in two parts.  */
+     CPUTLBEntry vtable[CPU_VTLB_SIZE];
+     CPUIOTLBEntry viotlb[CPU_VTLB_SIZE];
+diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
+index 16034ee651..9c77aa5bf9 100644
+--- a/include/exec/exec-all.h
++++ b/include/exec/exec-all.h
+@@ -225,6 +225,21 @@ void tlb_flush_by_mmuidx_all_cpus(CPUState *cpu, uint16_t idxmap);
+  * depend on when the guests translation ends the TB.
+  */
+ void tlb_flush_by_mmuidx_all_cpus_synced(CPUState *cpu, uint16_t idxmap);
++/**
++ * tlb_set_asid_for_mmuidx:
++ * @cpu: Originating cpu
++ * @asid: Address Space Identifier
++ * @idxmap: bitmap of MMU indexes to set to @asid
++ * @depmap: bitmap of dependent MMU indexes
++ *
++ * Set an ASID for all of @idxmap.  If any previous ASID was different,
++ * then we will flush the mmu idx.  If a flush is required, then also flush
++ * all dependent mmu indicies in @depmap.  This latter is typically used
++ * for secondary page resolution, for implementing virtualization within
++ * the guest.
++ */
++void tlb_set_asid_for_mmuidx(CPUState *cpu, uint32_t asid,
++                             uint16_t idxmap, uint16_t dep_idxmap);
+ /**
+  * tlb_set_page_with_attrs:
+  * @cpu: CPU to add this TLB entry for
+@@ -310,6 +325,10 @@ static inline void tlb_flush_by_mmuidx_all_cpus_synced(CPUState *cpu,
+                                                        uint16_t idxmap)
+ {
+ }
++static inline void tlb_set_asid_for_mmuidx(CPUState *cpu, uint32_t asid,
++                                           uint16_t idxmap, uint16_t depmap)
++{
++}
+ #endif
+ 
+ #define CODE_GEN_ALIGN           16 /* must be >= of the size of a icache line */
+diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
+index bb9897b25a..c68f57755b 100644
+--- a/accel/tcg/cputlb.c
++++ b/accel/tcg/cputlb.c
+@@ -540,6 +540,32 @@ void tlb_flush_page_all_cpus_synced(CPUState *src, target_ulong addr)
+     tlb_flush_page_by_mmuidx_all_cpus_synced(src, addr, ALL_MMUIDX_BITS);
+ }
+ 
++void tlb_set_asid_for_mmuidx(CPUState *cpu, uint32_t asid, uint16_t idxmap,
++                             uint16_t depmap)
++{
++    CPUTLB *tlb = cpu_tlb(cpu);
++    uint16_t work, to_flush = 0;
++
++    /* It doesn't make sense to set context across cpus.  */
++    assert_cpu_is_self(cpu);
++
++    /*
++     * We don't support ASIDs except for trivially.
++     * If there is any change, then we must flush the TLB.
++     */
++    for (work = idxmap; work != 0; work &= work - 1) {
++        int mmu_idx = ctz32(work);
++        if (tlb->d[mmu_idx].asid != asid) {
++            tlb->d[mmu_idx].asid = asid;
++            to_flush |= 1 << mmu_idx;
++        }
++    }
++    if (to_flush) {
++        to_flush |= depmap;
++        tlb_flush_by_mmuidx_async_work(cpu, RUN_ON_CPU_HOST_INT(to_flush));
++    }
++}
++
+ /* update the TLBs so that writes to code in the virtual page 'addr'
+    can be detected */
+ void tlb_protect_code(ram_addr_t ram_addr)
+-- 
+2.17.1
 
-Anyway, the cvt16 bit was removed on purpose, and was never
-supported.  See:
-http://mid.mail-archive.com/508091FB.1030705@amd.com
-
->              "fma4", "tce", NULL, "nodeid-msr",
->              NULL, "tbm", "topoext", "perfctr-core",
->              "perfctr-nb", NULL, NULL, NULL,
-> @@ -1044,7 +1044,7 @@ static FeatureWordInfo feature_word_info[FEATURE_=
-WORDS] =3D {
->              "fsgsbase", "tsc-adjust", NULL, "bmi1",
->              "hle", "avx2", NULL, "smep",
->              "bmi2", "erms", "invpcid", "rtm",
-> -            NULL, NULL, "mpx", NULL,
-> +            "cmt", NULL, "mpx", NULL,
-
-This is one is named "cqm" on Linux (X86_FEATURE_CQM).  I prefer
-to keep consistency with the name already in use by Linux than
-the one in libvirt that was never used.
-
-You can still add a "cmt" alias property if you think it would be
-useful.
-
-Also, I see no code implementing migration of MSR_IA32_QM_EVTSEL,
-MSR_IA32_QM_CTR, or other RDT-M state.  If the feature is not
-safe for migration yet, you need to explicitly add the feature to
-.unmigratable_flags.
-
-
->              "avx512f", "avx512dq", "rdseed", "adx",
->              "smap", "avx512ifma", "pcommit", "clflushopt",
->              "clwb", "intel-pt", "avx512pf", "avx512er",
-> --=20
-> 2.17.1
->=20
-
---=20
-Eduardo
 
