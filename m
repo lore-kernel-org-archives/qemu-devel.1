@@ -8,70 +8,70 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BDEAC76188
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 13:36:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14D2DC76188
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 13:36:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0706F21849
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 13:36:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D797D21849
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 13:36:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TIsxcVkZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0706F21849
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j6p0JB2m"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D797D21849
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45392 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45400 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hoT3a-00033m-1G
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 09:36:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37688)
+	id 1hoT3o-0003xS-Lp
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 09:36:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37747)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mehta.aaru20@gmail.com>) id 1hoT3I-000252-Lj
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 09:36:01 -0400
+ (envelope-from <mehta.aaru20@gmail.com>) id 1hoT3P-0002ad-T0
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 09:36:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mehta.aaru20@gmail.com>) id 1hoT3H-0007Z7-F2
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 09:36:00 -0400
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:37754)
+ (envelope-from <mehta.aaru20@gmail.com>) id 1hoT3O-0007cw-Rl
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 09:36:07 -0400
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:37376)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <mehta.aaru20@gmail.com>)
- id 1hoT3H-0007YV-7L; Fri, 19 Jul 2019 09:35:59 -0400
-Received: by mail-pf1-x441.google.com with SMTP id 19so14206352pfa.4;
- Fri, 19 Jul 2019 06:35:59 -0700 (PDT)
+ id 1hoT3O-0007cU-MB; Fri, 19 Jul 2019 09:36:06 -0400
+Received: by mail-pg1-x541.google.com with SMTP id i70so3745290pgd.4;
+ Fri, 19 Jul 2019 06:36:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=Qlyo3dCk5IgBiAF31m6kZYE7s+bKfa6dvhE/A9REX7I=;
- b=TIsxcVkZeqtSkRWuL76KqVWQ2Kc+iYDWhApUj2UD/1qBuI/T1NsIsElRbqio6kyew0
- 835nQ5q/QW2HX+29pXS3yPDGyOr2zXmrSzKE4dS8HhrI59jjPjxSG8dSnLXI0PezaVXq
- nr3Su6tM5Tx9VNHawmaAflak6h7UNVplrTyNtLTjtJc9uJp0y/rL5KOKbUHSE5yUb9uY
- 2mHex+gg5BDLbORTTijALCF1zIU65ueR9+qIHRCW6YL0bVYT9lZ1bCDArLTVOkXCdtSX
- V5yHvrQqWwNo3zpa/kYLT0S7mHnUocJ0QQsnZGuauzOsAw8Z8kVXMIp4aYnM8bDYmgoj
- ohbg==
+ bh=d/2bUWcNzFxcpnKI7+ugh8PRZBa+/iFU8UDy66IrG/E=;
+ b=j6p0JB2mIYzALaHGp+rXetNIKQbE+IUCYAwyvRmie+krxpy7FQNz/MpGEJnbjAXyop
+ yLTsgIorHcVBOPkD5WrskRKABlv5YV92SH/lTFUvtLvWnh++TUifek8ewJjTKvFGQhKE
+ nfhso8CQiguYg1XqyDip0F0VaIwusuT5bpd4j9gFoy4d4DkUzvmX99KfUsKDwmKVYBgZ
+ QvBRFDGOOA4qgcKzasWF8ItyagEQwZmDYBUiB1GPEBRQ8oCXvunEoIcCK/c8xEm3z7M9
+ 4kz2vVwqQ4pT2Mawi4kHbkNbcwzqwsn4JgVnbpdd94wptYsIwD38Bz11FytIPY8n+WBf
+ i5sQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=Qlyo3dCk5IgBiAF31m6kZYE7s+bKfa6dvhE/A9REX7I=;
- b=DbAdsnJ56mQ9YECryiTKc8tOzcdZlOiPr0TbIhxV48vD6RJ4BeeRzv02/iX6Yw/GfN
- Ekeu6LLjiEymRchdmB1vGdBFX5REQDTfcTBn4FkWnVlFYdiBYslBnWF0N4egdzdTWh3D
- p69wZE9XXjxfpTYq6np225CNpXzyyJybkndintry9Zcd51jF6YF3bGmNVSE+GFd5jgFo
- 9fwMXHW1ymdD0eiFLodctgL/3yqrc+0X5n9GMpXh22r4gj6RTqjBF8H59aaJuuFdnfhR
- W44DgPcytsaCGLCr4jc2mCkXXxjmsMkGD0/B3efmfLC2zvRW+sTbs5Qtyl8/nzMbDDCU
- 6BNg==
-X-Gm-Message-State: APjAAAV8Sba34yx3GL/iZx/+UosxOX9EnhTVQFXyYB3emx7wpqd1upcm
- +Z6lr0FitUzFsn8xbzwQymwDn8FtdE0=
-X-Google-Smtp-Source: APXvYqzn/s3RzvAocfbh4IPpwtKiOlUZ29hLVvMX/B3aCKcwufexLOdJj6gCEmpdyeW/oFgxLu/sFw==
-X-Received: by 2002:a63:505a:: with SMTP id q26mr52764546pgl.18.1563543357747; 
- Fri, 19 Jul 2019 06:35:57 -0700 (PDT)
+ bh=d/2bUWcNzFxcpnKI7+ugh8PRZBa+/iFU8UDy66IrG/E=;
+ b=pGLhbcVhBUgpZMajV6Ha/WL34z5fatIVs31atJMDHOuXX9FVARsPMzld7aDzzsITsU
+ looKwMlAASoIGfxgnLh4S4voEQIdYdkZGLBFNh9JKY4MiQAYm6yTMTryt0Q968Zodzfd
+ RrYky2vIIuECdd20yfmnDd67JflFUyU6keSdCsP2OA6lXK+AF4Cx+8rugREl1uR7ADRR
+ jJ7hQ2Z4F3MPxgucN0wSvXaL3K72hOtwVwRh+/TxkDiF7OCHZG+BwJggtHZCIiiAIweO
+ rX4HEsIx5BF1QOp9TI3YdsJVoT3AeOKTYs+SGcpj5DjDSCNG0/0ahsTfTXoqNnqciO5o
+ Tqfg==
+X-Gm-Message-State: APjAAAWaVh8TOEavtIk427cGqlzw2CRBq7j0yLAQyPoER3d/Xm0cv+ap
+ dFCVoyXr5pBuefvDmu6pk2SHsJvbFn0=
+X-Google-Smtp-Source: APXvYqw8yTYJEwz8H3UxIJeMJriQ/VGKoyOT1mj8Dmo4hqBc65yC2yQu3GG79qWE1ZbN4wInFAvMjA==
+X-Received: by 2002:a63:5a4d:: with SMTP id k13mr52588802pgm.174.1563543365460; 
+ Fri, 19 Jul 2019 06:36:05 -0700 (PDT)
 Received: from localhost.localdomain ([2402:3a80:433:31a4:f2fb:dab8:3a89:c056])
- by smtp.gmail.com with ESMTPSA id 11sm31895369pfw.33.2019.07.19.06.35.49
+ by smtp.gmail.com with ESMTPSA id 11sm31895369pfw.33.2019.07.19.06.35.58
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Fri, 19 Jul 2019 06:35:57 -0700 (PDT)
+ Fri, 19 Jul 2019 06:36:04 -0700 (PDT)
 From: Aarushi Mehta <mehta.aaru20@gmail.com>
 To: qemu-devel@nongnu.org
-Date: Fri, 19 Jul 2019 19:05:17 +0530
-Message-Id: <20190719133530.28688-2-mehta.aaru20@gmail.com>
+Date: Fri, 19 Jul 2019 19:05:18 +0530
+Message-Id: <20190719133530.28688-3-mehta.aaru20@gmail.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190719133530.28688-1-mehta.aaru20@gmail.com>
 References: <20190719133530.28688-1-mehta.aaru20@gmail.com>
@@ -79,8 +79,9 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::441
-Subject: [Qemu-devel] [PATCH v6 01/14] configure: permit use of io_uring
+X-Received-From: 2607:f8b0:4864:20::541
+Subject: [Qemu-devel] [PATCH v6 02/14] qapi/block-core: add option for
+ io_uring
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,92 +99,38 @@ Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
  saket.sinha89@gmail.com, Max Reitz <mreitz@redhat.com>,
  Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
  Stefan Hajnoczi <stefan@redhat.com>, Julia Suvorova <jusual@mail.ru>,
- Aarushi Mehta <mehta.aaru20@gmail.com>,
- Maxim Levitsky <maximlevitsky@gmail.com>
+ Aarushi Mehta <mehta.aaru20@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Only enumerates option for devices that support it
+
 Signed-off-by: Aarushi Mehta <mehta.aaru20@gmail.com>
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: Maxim Levitsky <maximlevitsky@gmail.com>
 ---
- configure | 27 +++++++++++++++++++++++++++
- 1 file changed, 27 insertions(+)
+ qapi/block-core.json | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/configure b/configure
-index eb635c3b9a..b0e2e2158e 100755
---- a/configure
-+++ b/configure
-@@ -370,6 +370,7 @@ xen=""
- xen_ctrl_version=""
- xen_pci_passthrough=""
- linux_aio=""
-+linux_io_uring=""
- cap_ng=""
- attr=""
- libattr=""
-@@ -1271,6 +1272,10 @@ for opt do
-   ;;
-   --enable-linux-aio) linux_aio="yes"
-   ;;
-+  --disable-linux-io-uring) linux_io_uring="no"
-+  ;;
-+  --enable-linux-io-uring) linux_io_uring="yes"
-+  ;;
-   --disable-attr) attr="no"
-   ;;
-   --enable-attr) attr="yes"
-@@ -1789,6 +1794,7 @@ disabled with --disable-FEATURE, default is enabled if available:
-   vde             support for vde network
-   netmap          support for netmap network
-   linux-aio       Linux AIO support
-+  linux-io-uring  Linux io_uring support
-   cap-ng          libcap-ng support
-   attr            attr and xattr support
-   vhost-net       vhost-net kernel acceleration support
-@@ -3969,6 +3975,21 @@ EOF
-     linux_aio=no
-   fi
- fi
-+##########################################
-+# linux-io-uring probe
-+
-+if test "$linux_io_uring" != "no" ; then
-+  if $pkg_config liburing; then
-+    linux_io_uring_cflags=$($pkg_config --cflags liburing)
-+    linux_io_uring_libs=$($pkg_config --libs liburing)
-+    linux_io_uring=yes
-+  else
-+    if test "$linux_io_uring" = "yes" ; then
-+      feature_not_found "linux io_uring" "Install liburing devel"
-+    fi
-+    linux_io_uring=no
-+  fi
-+fi
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 0d43d4f37c..0a3d4ae7d2 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -2792,11 +2792,13 @@
+ #
+ # @threads:     Use qemu's thread pool
+ # @native:      Use native AIO backend (only Linux and Windows)
++# @io_uring:    Use linux io_uring (since 4.1)
+ #
+ # Since: 2.9
+ ##
+ { 'enum': 'BlockdevAioOptions',
+-  'data': [ 'threads', 'native' ] }
++  'data': [ 'threads', 'native',
++            { 'name': 'io_uring', 'if': 'defined(CONFIG_LINUX_IO_URING)' } ] }
  
- ##########################################
- # TPM emulation is only on POSIX
-@@ -6392,6 +6413,7 @@ echo "PIE               $pie"
- echo "vde support       $vde"
- echo "netmap support    $netmap"
- echo "Linux AIO support $linux_aio"
-+echo "Linux io_uring support $linux_io_uring"
- echo "ATTR/XATTR support $attr"
- echo "Install blobs     $blobs"
- echo "KVM support       $kvm"
-@@ -6878,6 +6900,11 @@ fi
- if test "$linux_aio" = "yes" ; then
-   echo "CONFIG_LINUX_AIO=y" >> $config_host_mak
- fi
-+if test "$linux_io_uring" = "yes" ; then
-+  echo "CONFIG_LINUX_IO_URING=y" >> $config_host_mak
-+  echo "LINUX_IO_URING_CFLAGS=$linux_io_uring_cflags" >> $config_host_mak
-+  echo "LINUX_IO_URING_LIBS=$linux_io_uring_libs" >> $config_host_mak
-+fi
- if test "$attr" = "yes" ; then
-   echo "CONFIG_ATTR=y" >> $config_host_mak
- fi
+ ##
+ # @BlockdevCacheOptions:
 -- 
 2.21.0
 
