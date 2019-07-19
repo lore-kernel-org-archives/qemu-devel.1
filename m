@@ -2,70 +2,73 @@ Return-Path: <SRS0=mHy3=VQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64E7EC7618F
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 01:55:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91E47C7618F
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 01:56:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 39703208C0
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 01:55:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 39703208C0
+	by mail.kernel.org (Postfix) with ESMTPS id 68B1D208C0
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 01:56:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 68B1D208C0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41910 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41925 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hoI7C-0004kR-6X
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jul 2019 21:55:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59777)
+	id 1hoI8U-0006Jq-OP
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jul 2019 21:56:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60100)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <chen.zhang@intel.com>) id 1hoI6y-000490-12
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 21:55:04 -0400
+ (envelope-from <chen.zhang@intel.com>) id 1hoI8K-0005tw-2b
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 21:56:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <chen.zhang@intel.com>) id 1hoI6w-0002Pn-US
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 21:55:03 -0400
-Received: from mga11.intel.com ([192.55.52.93]:30338)
+ (envelope-from <chen.zhang@intel.com>) id 1hoI8I-00037E-Us
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 21:56:28 -0400
+Received: from mga06.intel.com ([134.134.136.31]:36904)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <chen.zhang@intel.com>)
- id 1hoI6w-0002NK-Le
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 21:55:02 -0400
+ id 1hoI8I-00036m-Li
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 21:56:26 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga004.jf.intel.com ([10.7.209.38])
- by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 18 Jul 2019 18:54:57 -0700
+ by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 18 Jul 2019 18:56:25 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,280,1559545200"; d="scan'208";a="319831734"
+X-IronPort-AV: E=Sophos;i="5.64,280,1559545200"; d="scan'208";a="319832140"
 Received: from fmsmsx105.amr.corp.intel.com ([10.18.124.203])
- by orsmga004.jf.intel.com with ESMTP; 18 Jul 2019 18:54:56 -0700
-Received: from fmsmsx602.amr.corp.intel.com (10.18.126.82) by
+ by orsmga004.jf.intel.com with ESMTP; 18 Jul 2019 18:56:24 -0700
+Received: from fmsmsx606.amr.corp.intel.com (10.18.126.86) by
  FMSMSX105.amr.corp.intel.com (10.18.124.203) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Thu, 18 Jul 2019 18:54:57 -0700
-Received: from fmsmsx602.amr.corp.intel.com (10.18.126.82) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ id 14.3.439.0; Thu, 18 Jul 2019 18:56:24 -0700
+Received: from fmsmsx606.amr.corp.intel.com (10.18.126.86) by
+ fmsmsx606.amr.corp.intel.com (10.18.126.86) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Thu, 18 Jul 2019 18:54:57 -0700
-Received: from shsmsx107.ccr.corp.intel.com (10.239.4.96) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ 15.1.1713.5; Thu, 18 Jul 2019 18:56:24 -0700
+Received: from shsmsx154.ccr.corp.intel.com (10.239.6.54) by
+ fmsmsx606.amr.corp.intel.com (10.18.126.86) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1713.5
- via Frontend Transport; Thu, 18 Jul 2019 18:54:56 -0700
+ via Frontend Transport; Thu, 18 Jul 2019 18:56:24 -0700
 Received: from shsmsx102.ccr.corp.intel.com ([169.254.2.3]) by
- SHSMSX107.ccr.corp.intel.com ([169.254.9.162]) with mapi id 14.03.0439.000;
- Fri, 19 Jul 2019 09:54:55 +0800
+ SHSMSX154.ccr.corp.intel.com ([169.254.7.240]) with mapi id 14.03.0439.000;
+ Fri, 19 Jul 2019 09:56:22 +0800
 From: "Zhang, Chen" <chen.zhang@intel.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Thread-Topic: [PATCH V3] net/colo-compare.c: Fix memory leak and code style
- issue.
-Thread-Index: AQHVPUsLqGBEGDJMrk2Ek2iZfotKjqbP3HSAgAFRaVA=
-Date: Fri, 19 Jul 2019 01:54:55 +0000
-Message-ID: <9CFF81C0F6B98A43A459C9EDAD400D78061D0413@shsmsx102.ccr.corp.intel.com>
+To: =?utf-8?B?UGhpbGlwcGUgTWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>, "Peter
+ Maydell" <peter.maydell@linaro.org>
+Thread-Topic: [Qemu-devel] [PATCH V3] net/colo-compare.c: Fix memory leak
+ and code style issue.
+Thread-Index: AQHVPUsLqGBEGDJMrk2Ek2iZfotKjqbPpoOAgAACXQCAAASQAIABgfOw
+Date: Fri, 19 Jul 2019 01:56:21 +0000
+Message-ID: <9CFF81C0F6B98A43A459C9EDAD400D78061D0429@shsmsx102.ccr.corp.intel.com>
 References: <20190718092219.20081-1-chen.zhang@intel.com>
- <CAFEAcA-HK_aSynZ2bEvg1W64L3U7amuDRLGr+8DVqcGujiOkgg@mail.gmail.com>
-In-Reply-To: <CAFEAcA-HK_aSynZ2bEvg1W64L3U7amuDRLGr+8DVqcGujiOkgg@mail.gmail.com>
+ <375615d7-7cdf-4711-68fb-47ce3c8cb308@redhat.com>
+ <CAFEAcA8oQ0buYaOAXsjzUecDjrsk+=BAtM3bW3skKkTEZ5Ngtg@mail.gmail.com>
+ <664c3b23-4d19-cda6-dbd7-4a7195a96ec3@redhat.com>
+In-Reply-To: <664c3b23-4d19-cda6-dbd7-4a7195a96ec3@redhat.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
@@ -74,14 +77,14 @@ dlp-product: dlpe-windows
 dlp-version: 11.0.600.7
 dlp-reaction: no-action
 x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiYjBjYjQzYzgtMDNiMC00OWU4LWE5YTEtYzhkOGRmYjU1Njc1IiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoicFRTS29aODg0YkJOandjSk93U2FBMWlUejltWTZEekF6ZVc2VzJwVGg2N1lBWnI2dWFmNW9vd0lsMG1aSFNoRyJ9
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiZjBlOWU0ZTYtYWU0ZC00MjYwLTllNjYtZGNlODBmODM5OGQ5IiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoieEY3SXk1RjYyZzNLRDgrRGQ5SUlGZ1ZCYVVzWTF2dnUyZHZzdVhBZHFudXFWN3VDTm04c0VBTTM0YXBBUWU5MSJ9
 x-originating-ip: [10.239.127.40]
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: base64
 MIME-Version: 1.0
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 192.55.52.93
+X-Received-From: 134.134.136.31
 Subject: Re: [Qemu-devel] [PATCH V3] net/colo-compare.c: Fix memory leak and
  code style issue.
 X-BeenThere: qemu-devel@nongnu.org
@@ -101,39 +104,51 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-DQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IFBldGVyIE1heWRlbGwgW21h
-aWx0bzpwZXRlci5tYXlkZWxsQGxpbmFyby5vcmddDQo+IFNlbnQ6IFRodXJzZGF5LCBKdWx5IDE4
-LCAyMDE5IDk6NDIgUE0NCj4gVG86IFpoYW5nLCBDaGVuIDxjaGVuLnpoYW5nQGludGVsLmNvbT4N
-Cj4gQ2M6IExpIFpoaWppYW4gPGxpemhpamlhbkBjbi5mdWppdHN1LmNvbT47IEphc29uIFdhbmcg
-PGphc293YW5nQHJlZGhhdC5jb20+Ow0KPiBxZW11LWRldiA8cWVtdS1kZXZlbEBub25nbnUub3Jn
-PjsgWmhhbmcgQ2hlbiA8emhhbmdja2lkQGdtYWlsLmNvbT4NCj4gU3ViamVjdDogUmU6IFtQQVRD
-SCBWM10gbmV0L2NvbG8tY29tcGFyZS5jOiBGaXggbWVtb3J5IGxlYWsgYW5kIGNvZGUgc3R5bGUN
-Cj4gaXNzdWUuDQo+IA0KPiBPbiBUaHUsIDE4IEp1bCAyMDE5IGF0IDEwOjI3LCBaaGFuZyBDaGVu
-IDxjaGVuLnpoYW5nQGludGVsLmNvbT4gd3JvdGU6DQo+ID4NCj4gPiBGcm9tOiBaaGFuZyBDaGVu
-IDxjaGVuLnpoYW5nQGludGVsLmNvbT4NCj4gPg0KPiA+IFRoaXMgcGF0Y2ggdG8gZml4IHRoZSBv
-cmlnaW4gImNoYXIgKmRhdGEiIG1lbm9yeSBsZWFrLCBjb2RlIHN0eWxlDQo+ID4gaXNzdWUgYW5k
-IGFkZCBuZWNlc3NhcnkgY2hlY2sgaGVyZS4NCj4gPiBSZXBvcnRlZC1ieTogQ292ZXJpdHkgKENJ
-RCAxNDAyNzg1KQ0KPiA+DQo+ID4gU2lnbmVkLW9mZi1ieTogWmhhbmcgQ2hlbiA8Y2hlbi56aGFu
-Z0BpbnRlbC5jb20+DQo+ID4gLS0tDQo+ID4gIG5ldC9jb2xvLWNvbXBhcmUuYyB8IDI4ICsrKysr
-KysrKysrKysrKysrKysrKy0tLS0tLS0NCj4gPiAgMSBmaWxlIGNoYW5nZWQsIDIxIGluc2VydGlv
-bnMoKyksIDcgZGVsZXRpb25zKC0pDQo+ID4NCj4gPiBkaWZmIC0tZ2l0IGEvbmV0L2NvbG8tY29t
-cGFyZS5jIGIvbmV0L2NvbG8tY29tcGFyZS5jIGluZGV4DQo+ID4gOTA5ZGQ2YzZlYi4uZmNjY2I0
-YzZmNiAxMDA2NDQNCj4gPiAtLS0gYS9uZXQvY29sby1jb21wYXJlLmMNCj4gPiArKysgYi9uZXQv
-Y29sby1jb21wYXJlLmMNCj4gPiBAQCAtMTI3LDYgKzEyNywxNyBAQCBzdGF0aWMgaW50IGNvbXBh
-cmVfY2hyX3NlbmQoQ29tcGFyZVN0YXRlICpzLA0KPiA+ICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgdWludDMyX3Qgdm5ldF9oZHJfbGVuLA0KPiA+ICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgYm9vbCBub3RpZnlfcmVtb3RlX2ZyYW1lKTsNCj4gPg0KPiA+ICtzdGF0aWMgYm9vbCBw
-YWNrZXRfbWF0Y2hlc19zdHIoY29uc3QgY2hhciAqc3RyLA0KPiA+ICsgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgdWludDhfdCAqYnVmLA0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgdWludDMyX3QgcGFja2V0X2xlbikgew0KPiA+ICsgICAgaWYgKHBhY2tldF9sZW4g
-IT0gc3RybGVuKHN0cikpIHsNCj4gDQo+IElzICchPScgZGVmaW5pdGVseSBjb3JyZWN0PyAoaWUg
-dGhlIGluY29taW5nIHBhY2tldCBtdXN0DQo+ICpub3QqIGNvbnRhaW4gYSB0cmFpbGluZyAnXDAn
-IG9yIGFueSBvdGhlciB0cmFpbGluZyBkYXRhKSA/DQoNClllcywgdGhlIHBhY2tldCBub3QgY29u
-dGFpbiBhIHRyYWlsLg0KQXMgSmFzb24gY29tbWVudHMgYmVmb3JlLCB5b3UgY2FuIHNlZSB0aGUg
-bmV0L25ldC5jICAibmV0X2ZpbGxfcnN0YXRlKCkiLg0KV2UganVzdCBnb3QgdGhlIGxlbmd0aCBh
-bmQgZGF0YS4NCg0KVGhhbmtzDQpaaGFuZyBDaGVuDQoNCj4gDQo+IElzIHRoZXJlIGEgc3BlY2lm
-aWNhdGlvbiBvZiB0aGUgcHJvdG9jb2wgc29tZXdoZXJlPyBJZiBzbywgdGhhdCBwcmVzdW1hYmx5
-DQo+IHNob3VsZCBzYXkgb25lIHdheSBvciB0aGUgb3RoZXIuDQo+IA0KPiA+ICsgICAgICAgIHJl
-dHVybiBmYWxzZTsNCj4gPiArICAgIH0NCj4gPiArDQo+ID4gKyAgICByZXR1cm4gIW1lbWNtcChz
-dHIsIGJ1Ziwgc3RybGVuKHN0cikpOyB9DQo+IA0KPiB0aGFua3MNCj4gLS0gUE1NDQo=
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogUGhpbGlwcGUgTWF0aGll
+dS1EYXVkw6kgW21haWx0bzpwaGlsbWRAcmVkaGF0LmNvbV0NCj4gU2VudDogVGh1cnNkYXksIEp1
+bHkgMTgsIDIwMTkgNjo1NCBQTQ0KPiBUbzogUGV0ZXIgTWF5ZGVsbCA8cGV0ZXIubWF5ZGVsbEBs
+aW5hcm8ub3JnPg0KPiBDYzogWmhhbmcsIENoZW4gPGNoZW4uemhhbmdAaW50ZWwuY29tPjsgTGkg
+WmhpamlhbiA8bGl6aGlqaWFuQGNuLmZ1aml0c3UuY29tPjsNCj4gSmFzb24gV2FuZyA8amFzb3dh
+bmdAcmVkaGF0LmNvbT47IHFlbXUtZGV2IDxxZW11LWRldmVsQG5vbmdudS5vcmc+Ow0KPiBaaGFu
+ZyBDaGVuIDx6aGFuZ2NraWRAZ21haWwuY29tPg0KPiBTdWJqZWN0OiBSZTogW1FlbXUtZGV2ZWxd
+IFtQQVRDSCBWM10gbmV0L2NvbG8tY29tcGFyZS5jOiBGaXggbWVtb3J5IGxlYWsNCj4gYW5kIGNv
+ZGUgc3R5bGUgaXNzdWUuDQo+IA0KPiBPbiA3LzE4LzE5IDEyOjM3IFBNLCBQZXRlciBNYXlkZWxs
+IHdyb3RlOg0KPiA+IE9uIFRodSwgMTggSnVsIDIwMTkgYXQgMTE6MjgsIFBoaWxpcHBlIE1hdGhp
+ZXUtRGF1ZMOpIDxwaGlsbWRAcmVkaGF0LmNvbT4NCj4gd3JvdGU6DQo+ID4+DQo+ID4+IE9uIDcv
+MTgvMTkgMTE6MjIgQU0sIFpoYW5nIENoZW4gd3JvdGU6DQo+ID4+PiBGcm9tOiBaaGFuZyBDaGVu
+IDxjaGVuLnpoYW5nQGludGVsLmNvbT4NCj4gPj4+DQo+ID4+PiBUaGlzIHBhdGNoIHRvIGZpeCB0
+aGUgb3JpZ2luICJjaGFyICpkYXRhIiBtZW5vcnkgbGVhaywgY29kZSBzdHlsZQ0KPiA+Pj4gaXNz
+dWUNCj4gPj4NCj4gPj4gIm1lbW9yeSINCg0KT2gsIEkgd2lsbCBmaXggdGhpcyB0eXBvIGluIG5l
+eHQgdmVyc2lvbi4NCg0KPiA+Pg0KPiA+Pj4gYW5kIGFkZCBuZWNlc3NhcnkgY2hlY2sgaGVyZS4N
+Cj4gPj4+IFJlcG9ydGVkLWJ5OiBDb3Zlcml0eSAoQ0lEIDE0MDI3ODUpDQo+ID4+Pg0KPiA+Pj4g
+U2lnbmVkLW9mZi1ieTogWmhhbmcgQ2hlbiA8Y2hlbi56aGFuZ0BpbnRlbC5jb20+DQo+ID4+PiAt
+LS0NCj4gPj4+ICBuZXQvY29sby1jb21wYXJlLmMgfCAyOCArKysrKysrKysrKysrKysrKysrKyst
+LS0tLS0tDQo+ID4+PiAgMSBmaWxlIGNoYW5nZWQsIDIxIGluc2VydGlvbnMoKyksIDcgZGVsZXRp
+b25zKC0pDQo+ID4+Pg0KPiA+Pj4gZGlmZiAtLWdpdCBhL25ldC9jb2xvLWNvbXBhcmUuYyBiL25l
+dC9jb2xvLWNvbXBhcmUuYyBpbmRleA0KPiA+Pj4gOTA5ZGQ2YzZlYi4uZmNjY2I0YzZmNiAxMDA2
+NDQNCj4gPj4+IC0tLSBhL25ldC9jb2xvLWNvbXBhcmUuYw0KPiA+Pj4gKysrIGIvbmV0L2NvbG8t
+Y29tcGFyZS5jDQo+ID4+PiBAQCAtMTI3LDYgKzEyNywxNyBAQCBzdGF0aWMgaW50IGNvbXBhcmVf
+Y2hyX3NlbmQoQ29tcGFyZVN0YXRlICpzLA0KPiA+Pj4gICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICB1aW50MzJfdCB2bmV0X2hkcl9sZW4sDQo+ID4+PiAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgIGJvb2wgbm90aWZ5X3JlbW90ZV9mcmFtZSk7DQo+ID4+Pg0KPiA+Pj4gK3N0YXRpYyBi
+b29sIHBhY2tldF9tYXRjaGVzX3N0cihjb25zdCBjaGFyICpzdHIsDQo+ID4+PiArICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgIHVpbnQ4X3QgKmJ1ZiwNCj4gPj4NCj4gPj4gWW91IGNhbiB1
+c2UgJ3VpbnQ4X3QgKmJ1ZicuDQo+ID4NCj4gPiA/PyB0aGF0IHNlZW1zIHRvIGJlIHRoZSBzYW1l
+IGFzIHdoYXQgaXMgd3JpdHRlbi4uLg0KPiANCj4gT29wcyBzb3JyeSwgSSBjb3B5L3Bhc3RlZCBh
+bmQgIGRpZCBub3Qgbm90aWNlZCBJIHJlbW92ZWQgdGhlICdjb25zdCcNCj4gd29yZC4gU28gSSBt
+ZWFudDogWW91IGNhbiB1c2UgJ2NvbnN0IHVpbnQ4X3QgKmJ1ZicNCg0KT0suDQoNClRoYW5rcw0K
+WmhhbmcgQ2hlbg0KDQo+IA0KPiA+Pg0KPiA+Pj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICB1aW50MzJfdCBwYWNrZXRfbGVuKSB7DQo+ID4+PiArICAgIGlmIChwYWNrZXRfbGVuICE9
+IHN0cmxlbihzdHIpKSB7DQo+ID4+PiArICAgICAgICByZXR1cm4gZmFsc2U7DQo+ID4+PiArICAg
+IH0NCj4gPj4+ICsNCj4gPj4+ICsgICAgcmV0dXJuICFtZW1jbXAoc3RyLCBidWYsIHN0cmxlbihz
+dHIpKTsNCj4gPj4NCj4gPj4gSWYgeW91IGRvbid0IHdhbnQgdG8gdXNlIGEgbG9jYWwgdmFyaWFi
+bGUgdG8gaG9sZCBzdHJsZW4oc3RyKSwgeW91DQo+ID4+IGNhbiByZXVzZSBwYWNrZXRfbGVuIHNp
+bmNlIGl0IGlzIHRoZSBzYW1lIHZhbHVlOg0KPiA+Pg0KPiA+PiAgICAgICAgcmV0dXJuICFtZW1j
+bXAoc3RyLCBidWYsIHBhY2tldF9sZW4pOw0KPiA+Pg0KPiA+PiBIb3dldmVyIGl0IG1ha2VzIHRo
+ZSByZXZpZXcgaGFyZGVyLCBzbyBJJ2QgcHJlZmVyIHVzaW5nIGEgc3RyX2xlbiBsb2NhbCB2YXIu
+DQo+ID4NCj4gPiBJJ20gcHJldHR5IHN1cmUgdGhlIGNvbXBpbGVyIGlzIGdvaW5nIHRvIG9wdGlt
+aXNlIHRoZQ0KPiA+IHN0cmxlbigpIGF3YXkgaW50byBhIGNvbXBpbGUgdGltZSBjb25zdGFudCBh
+bnl3YXksIHNvIHRoaXMgaXMgc29tZXdoYXQNCj4gPiB1bm5lY2Vzc2FyeSBtaWNyby1vcHRpbWlz
+YXRpb24gSSB0aGluay4NCj4gDQo+IEkgd2FzIG5vdCBzdXJlLCBJJ20gZ2xhZCB0byBsZWFybiB0
+aGF0IDopDQo+IA0KPiBUaGFua3MsDQo+IA0KPiBQaGlsLg0K
 
