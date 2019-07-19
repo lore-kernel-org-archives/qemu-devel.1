@@ -2,87 +2,83 @@ Return-Path: <SRS0=mHy3=VQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05493C76195
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 10:18:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B764C76188
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 10:19:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C838320873
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 10:18:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C9C312184E
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 10:19:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FknPawL/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C838320873
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ot98mWv9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C9C312184E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43768 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43776 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hoPxv-0001Kj-UG
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 06:18:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50131)
+	id 1hoPyi-0002Ku-Ry
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 06:19:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50475)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <stefanha@gmail.com>) id 1hoPxi-0000vP-96
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 06:18:03 -0400
+ (envelope-from <marcandre.lureau@gmail.com>) id 1hoPyV-0001vD-Jv
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 06:18:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@gmail.com>) id 1hoPxh-0005N7-6K
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 06:18:02 -0400
-Received: from mail-wr1-x429.google.com ([2a00:1450:4864:20::429]:42975)
+ (envelope-from <marcandre.lureau@gmail.com>) id 1hoPyU-00060n-F5
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 06:18:51 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:38155)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <stefanha@gmail.com>)
- id 1hoPxg-0005MQ-R3; Fri, 19 Jul 2019 06:18:01 -0400
-Received: by mail-wr1-x429.google.com with SMTP id x1so16710361wrr.9;
- Fri, 19 Jul 2019 03:18:00 -0700 (PDT)
+ (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1hoPyU-00060E-8n
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 06:18:50 -0400
+Received: by mail-wr1-x444.google.com with SMTP id g17so31720681wrr.5
+ for <qemu-devel@nongnu.org>; Fri, 19 Jul 2019 03:18:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to:user-agent;
- bh=3lRiD31d29uPAV0gYtO208/DdcFup1VMFsYcMzfmML8=;
- b=FknPawL/1yvGwIbaUWw/H2Q5iN7QUfl4i+jJ3I9Sc+ghm+JF5Y4C3mixZn0kazs3Ui
- C6opEpON01VnXfJxPob78wLLsy5gIT138YPX2YiqSurF0AbE54SK2/rYdjZgq5kdh1UH
- NX017db6BBMIzhYVsXtByWoK4rFpOpA9vKqSZ6Zzxf+4zjw/2q15w78sbMIu49Hmmq8+
- 6dN/WjXhf/ite3Wch+fZHXuQR7fFLeqK5nEdlzrmYnyqo/1wXuC/TT45W2F7eak685ts
- eHizHwsn6kxvOy/ieucmE1FJkcCNwgTzRIOQm6EziFSm9yG7MIJbVMlZS8Zce6qTGGwd
- Eoxw==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=BwSiYvLfQJwpLMZzOwfesRK7Rfnj2MXMjHbhjfCONh4=;
+ b=ot98mWv9K8ihEJRWwA+G2wPopS1YbKGxH4QlDRhCx03Gp/6032HrlazINKk6SQztAV
+ hhGqmRTBaYP8bxwc2IW+MkOgBC0s7ZLm3W67q8dtQ3nTs+Fwt2T8eyQMOVObZFaD6dR+
+ We0uShJv85hImb8yvF7GL5sBwchEvysBhLi87+U0mnH4F0c9ilMSiueO/pQpkIzP0Y8t
+ jsbIxossXXXy/xuHT2OoHAvybo/8F/0n9yI+OpXpqewzWuLZZ9H8BvKA7OU9S1/tw+F0
+ JgJp2amRzTlmzzBNziuJ4lKTkpET/AZ9X3blbyOLEXy57iUZKFz+t0jP1BekOZhGuoG2
+ GuMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=3lRiD31d29uPAV0gYtO208/DdcFup1VMFsYcMzfmML8=;
- b=eT0goRewfHWcnf6VfbBHQ+9CT0I8TEYwUQoKoVAlmXPLymhi/Rsa3ewphUhVieK8BV
- eIummHrUEAlOjKEgtv3l8zs/eaP6Glc1T6cbA+DJQc4HalRwcH7kIZsDTH7QYb4Ldkkk
- dtmyB2dkYKHguN1TS/sWnKAmoRZheXbwlAzQv+TL9BFyMZzvAs2dnk4hKakVA8z/Qtl+
- rt+S+X0W/6sUDozpYJt+2RD6zz1CmvNptfjSAFRpXIG+CyQWPmwCJfNHEsxKIYlPyMYC
- rFT1DkM7R4HeDOsJ0b1mS0IyQshhhHhFnv4FQ8DPPKaUrmmm/Sot1+ffVCRoTU2nahhU
- l6zQ==
-X-Gm-Message-State: APjAAAU7MP7UEL/fYdGV/lRwInCgEXS+zsIXXopsM7M6OQaBTNMZfdkn
- sf3/3CoPyBW9jihTNnEcGvQ=
-X-Google-Smtp-Source: APXvYqyUwl0qo3BMyeZR7kpbwDHxOMdYi5KKtmDJzwqPuNfny6/mnCxrYq1rz9D0AOxDFmc1EA9GSw==
-X-Received: by 2002:adf:e2c1:: with SMTP id d1mr58299189wrj.283.1563531479551; 
- Fri, 19 Jul 2019 03:17:59 -0700 (PDT)
-Received: from localhost ([51.15.41.238])
- by smtp.gmail.com with ESMTPSA id b203sm34179067wmd.41.2019.07.19.03.17.58
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Fri, 19 Jul 2019 03:17:58 -0700 (PDT)
-Date: Fri, 19 Jul 2019 11:17:57 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: =?utf-8?B?0JXQstCz0LXQvdC40Lkg0K/QutC+0LLQu9C10LI=?= <wrfsh@yandex-team.ru>
-Message-ID: <20190719101757.GF18585@stefanha-x1.localdomain>
-References: <8146312c-8a9c-3c4e-ab80-a3f42cc1d6ce@yandex-team.ru>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=BwSiYvLfQJwpLMZzOwfesRK7Rfnj2MXMjHbhjfCONh4=;
+ b=le3dowUtKBvBtr4CCmFpbwmQ9u2KxkeUjdneegWEZVG0+abCwt1cu2lGr5K5MMkgHq
+ gsxohlpVGbfvVkdsZWGD78vT8g9A+BzovhT6UwlviG5+/MSK+nn9tWpJt7gUE+7Il6Ty
+ JAsKsGkaT7dAxk23zCC+jz1QWgZ+NloLWKvwYSGKiqUQXISD9p3FMWTnJwndP53mqfgf
+ cAjxKwVG0OXd87cFxXMlOMVr/6L2Dbu0J7tMPg3ieDQalWYgYtrsRoZKE2szMF9jWx/1
+ EN+OAv3iIK5SDDasmaWLGUq4KxoR/SKL7vAYGJwLKQNKe8ME4bpPItGTD6YwtAV9NtGX
+ PoDA==
+X-Gm-Message-State: APjAAAXOo4bXMuzvvivb8FQ5pQxeR6/P8IhjA78+cNcR6n3wVJ4tngBM
+ JQcJrptPvhs/7VErbjf8sitfPzNp80TQBP5rJuDJGX0erQxPpA==
+X-Google-Smtp-Source: APXvYqwuK4f3Patm3jH8bpfq+0iDmVHwari18OxORXb1SphgDVaVjYlnMJdLNRvOhCt7apkxdcIgWf3u97XcR0GvkAQ=
+X-Received: by 2002:adf:eac4:: with SMTP id o4mr54129942wrn.290.1563531529118; 
+ Fri, 19 Jul 2019 03:18:49 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="3oCie2+XPXTnK5a5"
-Content-Disposition: inline
-In-Reply-To: <8146312c-8a9c-3c4e-ab80-a3f42cc1d6ce@yandex-team.ru>
-User-Agent: Mutt/1.12.0 (2019-05-25)
+References: <20190719100955.17180-1-peter.maydell@linaro.org>
+In-Reply-To: <20190719100955.17180-1-peter.maydell@linaro.org>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Fri, 19 Jul 2019 14:18:36 +0400
+Message-ID: <CAJ+F1CJU5iUDa_W2Vj0WMBEht3eVJ9xsUWt4nCE4-eC14ei4hA@mail.gmail.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::429
-Subject: Re: [Qemu-devel] BDRV request fragmentation and vitio-blk write
- submission guarantees
+X-Received-From: 2a00:1450:4864:20::444
+Subject: Re: [Qemu-devel] [PATCH for-4.1] contrib/elf2dmp: Build download.o
+ with CURL_CFLAGS
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,117 +90,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, stefanha@redhat.com, qemu-block@nongnu.org,
- qemu-devel@nongnu.org, mreitz@redhat.com,
- "yc-core@yandex-team.ru" <yc-core@yandex-team.ru>
+Cc: QEMU <qemu-devel@nongnu.org>,
+ Viktor Prutyanov <viktor.prutyanov@phystech.edu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Hi
 
---3oCie2+XPXTnK5a5
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Fri, Jul 19, 2019 at 2:10 PM Peter Maydell <peter.maydell@linaro.org> wr=
+ote:
+>
+> contrib/elf2dmp has a source file which uses curl/curl.h;
+> although we link the final executable with CURL_LIBS, we
+> forgot to build this source file with CURL_CFLAGS, so if
+> the curl header is in a place that's not already on the
+> system include path then it will fail to build.
+>
+> Add a line specifying the cflags needed for download.o;
+> while we are here, bring the specification of the libs
+> into line with this, since using a per-object variable
+> setting is preferred over adding them to the final
+> executable link line.
+>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-On Thu, Jul 18, 2019 at 04:44:17PM +0300, =D0=95=D0=B2=D0=B3=D0=B5=D0=BD=D0=
-=B8=D0=B9 =D0=AF=D0=BA=D0=BE=D0=B2=D0=BB=D0=B5=D0=B2 wrote:
-> Hi everyone,
->=20
-> We're currently working on implementing a qemu BDRV format driver which we
-> are using with virtio-blk devices.
->=20
-> I have a question concerning BDRV request fragmentation and virtio-blk wr=
-ite
-> request submission which is not entirely clear to me by only reading virt=
-io
-> spec. Could you please consider the following case and give some addition=
-al
-> guidance?
->=20
-> 1. Our BDRV format driver has a notion of max supported transfer size. So=
- we
-> implement BlockDriver::bdrv_refresh_limits where we fill out
-> BlockLimits::max_transfer and opt_transfer fields.
->=20
-> 2. virtio-blk exposes max_transfer as a virtio_blk_config::opt_io_size
-> field, which (according to spec 1.1) is a **suggested** maximum. We read
-> "suggested" as "guest driver may still send requests that don't fit into
-> opt_io_size and we should handle those"...
->=20
-> 3. ... and judging by code in block/io.c qemu block layer handles such
-> requests by fragmenting them into several BDRV requests if request size i=
-s >
-> max_transfer
->=20
-> 4. Guest will see request completion only after all fragments are handled.
-> However each fragment submission path can call qemu_coroutine_yield and m=
-ove
-> on to submitting next request available in virtq before completely
-> submitting the rest of the fragments. Which means the following situation=
- is
-> possible where BDRV sees 2 write requests in virtq, both of which are lar=
-ger
-> than max_transfer:
->=20
-> ||
->=20
-> |Blocks: |-------------------------------------> Write1: xxxxxxxx Write2:
-> yyyyyyyy Write1Chunk1: xxxx Write2Chunk1: yyyy Write2Chunk2: yyyy
-> Write1Chunk1: xxxx Blocks: |------------yyyyxxxx----------------->|
->=20
-> ||
->=20
-> |In above scenario guest virtio-blk driver decided to submit 2 intersecti=
-ng
-> write requests, both of which are larger than ||max_transfer, and then ca=
-ll
-> hypervisor.|
->=20
-> |I understand that virtio-blk may handle requests out of order, so guest
-> must not make any assumptions on relative order in which those requests w=
-ill
-> be handled.|
->=20
-> |However, can guest driver expect that whatever the submission order will
-> be, the actual intersecting writes will be atomic?|
->=20
-> |In other words, will it be correct for conforming virtio-blk driver to
-> expect only "|||xxxxxxxx" or "||||yyyyyyyy" but not anything else in
-> between, after both requests are reported as completed?||
->=20
-> ||Because i think that is something that may happen in qemu right now, if=
- i
-> understood correctly. ||
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Write requests are not atomic in general.  Specific storage technologies
-support atomic writes via special commands with certain restrictions but
-applications using this feature aren't portable.
+> ---
+> I'm pretty sure this is what's causing the compile
+> failure described at:
+> https://stackoverflow.com/questions/57102476/qemu-recipe-for-target-contr=
+ib-elf2dmp-download-o-failed
+> I haven't actually got a setup that reproduces the error,
+> though, so this is tested by looking at the command lines
+> run on an Ubuntu setup that compiles even without the fix.
+>
+> There's an argument for splitting this into two patches,
+> I suppose, one which just fixes the CURL_CFLAGS bug and
+> one which tidies the CURL_LIBS handling. But it didn't
+> seem worth it to me. Let me know if you'd prefer it split.
+> ---
+>  Makefile                      | 1 -
+>  contrib/elf2dmp/Makefile.objs | 3 +++
+>  2 files changed, 3 insertions(+), 1 deletion(-)
+>
+> diff --git a/Makefile b/Makefile
+> index f9791dcb827..27dabb9b1a0 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -626,7 +626,6 @@ ifneq ($(EXESUF),)
+>  qemu-ga: qemu-ga$(EXESUF) $(QGA_VSS_PROVIDER) $(QEMU_GA_MSI)
+>  endif
+>
+> -elf2dmp$(EXESUF): LIBS +=3D $(CURL_LIBS)
+>  elf2dmp$(EXESUF): $(elf2dmp-obj-y)
+>         $(call LINK, $^)
+>
+> diff --git a/contrib/elf2dmp/Makefile.objs b/contrib/elf2dmp/Makefile.obj=
+s
+> index e3140f58cf7..15057169160 100644
+> --- a/contrib/elf2dmp/Makefile.objs
+> +++ b/contrib/elf2dmp/Makefile.objs
+> @@ -1 +1,4 @@
+>  elf2dmp-obj-y =3D main.o addrspace.o download.o pdb.o qemu_elf.o
+> +
+> +download.o-cflags :=3D $(CURL_CFLAGS)
+> +download.o-libs   :=3D $(CURL_LIBS)
+> --
+> 2.20.1
+>
+>
 
-Portable applications either don't submit intersecting write requests or
-they do not depend on atomicity.
 
-Out of curiousity I took a quick look at Linux device-mapper.  The same
-issue applies in device-mapper when intersecting write requests cross
-device-mapper targets.  I think Linux submits split bios in parallel and
-without serialization.
-
-Stefan
-
---3oCie2+XPXTnK5a5
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl0xmNUACgkQnKSrs4Gr
-c8iBfAf+MrNAsr5xREcbHz1WWK1XGHLp8hGV5Nu8J0J6XUl2lHw8gTmcKpnkhWHw
-X6gaSzQ4ZQ2KRK1sCsn0J7UsprvybA2IUO9lLya7NLGdoSRpBoZk6juZbSWoR5jZ
-twcCaSnYSf/5fod4fHF8zSsuKuj+Fz1Dxs/umUUHGSEIrWX/s5N+eju2ZvT9t6AH
-/ZKv541kgoPfeq7aLyls7OcR3ExJgRSRV6p5iHmg07AsL4ttcYvAwNZDARhzVgTW
-rdsqpUiqmPXBgnXGm7NYutnP7lptfsyrjjuoKCfrNU81yxDTs6BIrcgtnXwKI0x2
-3TZcGXiKEQ2F4VPLLI8l/Igys5CrKQ==
-=7pUu
------END PGP SIGNATURE-----
-
---3oCie2+XPXTnK5a5--
+--=20
+Marc-Andr=C3=A9 Lureau
 
