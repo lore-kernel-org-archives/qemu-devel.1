@@ -2,82 +2,64 @@ Return-Path: <SRS0=lwXe=VR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=DATE_IN_PAST_12_24,
+	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C10AC76188
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jul 2019 09:50:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BC38C76188
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jul 2019 14:08:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 249382084D
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jul 2019 09:50:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 249382084D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id CF2B2217F5
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jul 2019 14:08:10 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="FPvLmmmH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF2B2217F5
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50298 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51322 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hom0V-0001lq-De
-	for qemu-devel@archiver.kernel.org; Sat, 20 Jul 2019 05:50:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34148)
+	id 1hoq1x-0008MZ-R8
+	for qemu-devel@archiver.kernel.org; Sat, 20 Jul 2019 10:08:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53765)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hom0K-0001LO-GD
- for qemu-devel@nongnu.org; Sat, 20 Jul 2019 05:50:13 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1hoq1g-0007Sk-QY
+ for qemu-devel@nongnu.org; Sat, 20 Jul 2019 10:07:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hom0J-0000lB-BN
- for qemu-devel@nongnu.org; Sat, 20 Jul 2019 05:50:12 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:37079)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hom0J-0000j1-3q
- for qemu-devel@nongnu.org; Sat, 20 Jul 2019 05:50:11 -0400
-Received: by mail-wm1-f68.google.com with SMTP id f17so31030093wme.2
- for <qemu-devel@nongnu.org>; Sat, 20 Jul 2019 02:50:11 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:from:to:cc:references:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=NBvvIds/Inv1c8yRvQ7ogbqHxT3QbeRbtueGqhCyP5E=;
- b=F1SpnyCeBmlovDL/rpg/+fCwB0ZAwk/et0zBULTiiVpzbBAGSpUXFAeTrDCGZuHvyu
- IThwixQsRJbwQclFKnnFWF7WwrywVPz0v/8Zlk9qEfVAO7f061cfRMeQ2ntfnSwup/oW
- 42uLvJUJv6qB47ASujk2sLzrG7XnWQfjCoUcuL3DYjJS811qmcnWQz5IHmfJ2217MQGs
- bBPHDzKKpFM87kyOGgDNGGd/x82SyU8ElOANB/L7BjXeUJiP9TqBK5cEJQVb1WDsPZhS
- JDrqYYx/EH/XrU7JmSrvuGwnNOMnLc58097bE3F5pZxsVjOk2pKM0EPifjFJhvZqM5AL
- pERg==
-X-Gm-Message-State: APjAAAWZBh5STqKbz2py4b8RFtsoU2MluZt7onpNSPhniAY8usg3GnDm
- ktWlJ2QMg+LZoIes4q82AWA+vQ==
-X-Google-Smtp-Source: APXvYqzMOQvveAK9wTAklGUsxeXLKzTVp8p1UpdEokqR9f8a6LHe6vbd4OLFED1Jb8LZUYmdCbhYSg==
-X-Received: by 2002:a1c:acc8:: with SMTP id
- v191mr54335691wme.177.1563616209999; 
- Sat, 20 Jul 2019 02:50:09 -0700 (PDT)
-Received: from [192.168.1.37] (62.red-83-42-61.dynamicip.rima-tde.net.
- [83.42.61.62])
- by smtp.gmail.com with ESMTPSA id o26sm56631152wro.53.2019.07.20.02.50.08
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Sat, 20 Jul 2019 02:50:09 -0700 (PDT)
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-To: KONRAD Frederic <frederic.konrad@adacore.com>, qemu-devel@nongnu.org,
- qemu-riscv@nongnu.org
-References: <1563603512-5914-1-git-send-email-frederic.konrad@adacore.com>
- <70060fbc-b79f-6385-2b1e-0cebb45ca03e@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <1f427dc9-deb9-f900-470a-84b79ab32a2a@redhat.com>
-Date: Sat, 20 Jul 2019 11:50:07 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ (envelope-from <dgibson@ozlabs.org>) id 1hoq1f-0002hj-Kx
+ for qemu-devel@nongnu.org; Sat, 20 Jul 2019 10:07:52 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:37337 helo=ozlabs.org)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1hoq1b-0002Yf-TR; Sat, 20 Jul 2019 10:07:49 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 45rV7Z1lSnz9sNC; Sun, 21 Jul 2019 00:07:38 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1563631658;
+ bh=GIs8XKwl06uRHQ/l1PcTQRA8mzVA6skBTsqI/zdaF8M=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=FPvLmmmHZBlLaaXgusaUwse8JwUp2mxihgxR3ziSHYwABH5eyezdzlDumW0NzWqpW
+ pcp2RJBCFgxcEXhdx6RqDnvvhUe1lrS5VVY4sa1aXTjtLxsK3GlWoW+VI1CcT0Z+he
+ RRGbzMmQPyAsck+B8wAIfZe8RQD9bNxKJ0Ha8Bpo=
+Date: Sat, 20 Jul 2019 00:20:38 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Message-ID: <20190719142038.GB4174@umbus.fritz.box>
+References: <20190719131425.10835-1-philmd@redhat.com>
+ <20190719131425.10835-8-philmd@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <70060fbc-b79f-6385-2b1e-0cebb45ca03e@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="3uo+9/B/ebqu+fSQ"
+Content-Disposition: inline
+In-Reply-To: <20190719131425.10835-8-philmd@redhat.com>
+User-Agent: Mutt/1.12.0 (2019-05-25)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.128.68
-Subject: Re: [Qemu-devel] [PATCH] riscv: htif: use qemu_log_mask instead of
- qemu_log
+X-Received-From: 203.11.71.1
+Subject: Re: [Qemu-devel] [PATCH-for-4.1? 7/7] spapr_events: Rewrite a fall
+ through comment
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,118 +71,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kbastian@mail.uni-paderborn.de, palmer@sifive.com, Alistair.Francis@wdc.com,
- Stefan Hajnoczi <stefanha@redhat.com>, sagark@eecs.berkeley.edu
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ qemu-block@nongnu.org, Corey Minyard <minyard@acm.org>,
+ qemu-trivial@nongnu.org, Stefan Weil <sw@weilnetz.de>,
+ Michael Tokarev <mjt@tls.msk.ru>, qemu-devel@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Cc'ing Stefan
 
-On 7/20/19 11:44 AM, Philippe Mathieu-Daudé wrote:
-> Hi Frederic,
-> 
-> On 7/20/19 8:18 AM, KONRAD Frederic wrote:
->> There are some debug trace appearing when using GDB with the HTIF mapped @0:
->>  Invalid htif read: address 0000000000000002
->>  Invalid htif read: address 0000000000000006
->>  Invalid htif read: address 000000000000000a
->>  Invalid htif read: address 000000000000000e
->>
->> So don't show them unconditionally.
->>
->> Signed-off-by: KONRAD Frederic <frederic.konrad@adacore.com>
->> ---
->>  hw/riscv/riscv_htif.c | 21 ++++++++++++---------
->>  1 file changed, 12 insertions(+), 9 deletions(-)
->>
->> diff --git a/hw/riscv/riscv_htif.c b/hw/riscv/riscv_htif.c
->> index 4f7b11d..6a8f0c2 100644
->> --- a/hw/riscv/riscv_htif.c
->> +++ b/hw/riscv/riscv_htif.c
->> @@ -119,7 +119,8 @@ static void htif_handle_tohost_write(HTIFState *htifstate, uint64_t val_written)
->>      int resp = 0;
->>  
->>      HTIF_DEBUG("mtohost write: device: %d cmd: %d what: %02" PRIx64
->> -        " -payload: %016" PRIx64 "\n", device, cmd, payload & 0xFF, payload);
->> +               " -payload: %016" PRIx64 "\n", device, cmd, payload & 0xFF,
->> +               payload);
->>  
->>      /*
->>       * Currently, there is a fixed mapping of devices:
->> @@ -137,7 +138,7 @@ static void htif_handle_tohost_write(HTIFState *htifstate, uint64_t val_written)
->>                  qemu_log_mask(LOG_UNIMP, "pk syscall proxy not supported\n");
->>              }
->>          } else {
->> -            qemu_log("HTIF device %d: unknown command\n", device);
->> +            HTIF_DEBUG("HTIF device %d: unknown command\n", device);
-> 
-> Generally, please don't go back to using DPRINTF() but use trace-events
-> instead.
+--3uo+9/B/ebqu+fSQ
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Oh, now I see that HTIF_DEBUG() is just an obscure way to report
-crippled log trace-events, not portable to all trace backends.
+On Fri, Jul 19, 2019 at 03:14:25PM +0200, Philippe Mathieu-Daud=C3=A9 wrote:
+> GCC9 is confused by this comment when building with CFLAG
+> -Wimplicit-fallthrough=3D2:
+>=20
+>     CC      ppc64-softmmu/hw/ppc/spapr_rtc.o
+>   hw/ppc/spapr_events.c: In function =E2=80=98rtas_event_log_to_source=E2=
+=80=99:
+>   hw/ppc/spapr_events.c:312:12: error: this statement may fall through [-=
+Werror=3Dimplicit-fallthrough=3D]
+>     312 |         if (spapr_ovec_test(spapr->ov5_cas, OV5_HP_EVT)) {
+>         |            ^
+>   hw/ppc/spapr_events.c:317:5: note: here
+>     317 |     case RTAS_LOG_TYPE_EPOW:
+>         |     ^~~~
+>   cc1: all warnings being treated as errors
+>=20
+> Rewrite the comment using 'fall through' which is recognized by
+> GCC and static analyzers.
+>=20
+> Reported-by: Stefan Weil <sw@weilnetz.de>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-It is only used in 2 files:
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
 
-- hw/riscv/riscv_htif.c
-- target/riscv/pmp.c as PMP_DEBUG()
+> ---
+>  hw/ppc/spapr_events.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
+> index ae0f093f59..0a98894ad6 100644
+> --- a/hw/ppc/spapr_events.c
+> +++ b/hw/ppc/spapr_events.c
+> @@ -313,7 +313,7 @@ rtas_event_log_to_source(SpaprMachineState *spapr, in=
+t log_type)
+>              g_assert(source->enabled);
+>              break;
+>          }
+> -        /* fall back to epow for legacy hotplug interrupt source */
+> +        /* fall through back to epow for legacy hotplug interrupt source=
+ */
+>      case RTAS_LOG_TYPE_EPOW:
+>          source =3D spapr_event_sources_get_source(spapr->event_sources,
+>                                                  EVENT_CLASS_EPOW);
 
-I'd rather remove these macros and use trace-events the same way the
-rest of the codebase use them, usable by all backends.
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-> However in this calls it seems using qemu_log_mask(LOG_UNIMP) or
-> qemu_log_mask(LOG_GUEST_ERROR) is appropriate.
-> 
->>          }
->>      } else if (likely(device == 0x1)) {
->>          /* HTIF Console */
->> @@ -150,12 +151,13 @@ static void htif_handle_tohost_write(HTIFState *htifstate, uint64_t val_written)
->>              qemu_chr_fe_write(&htifstate->chr, (uint8_t *)&payload, 1);
->>              resp = 0x100 | (uint8_t)payload;
->>          } else {
->> -            qemu_log("HTIF device %d: unknown command\n", device);
->> +            HTIF_DEBUG("HTIF device %d: unknown command\n", device);
->>          }
->>      } else {
->> -        qemu_log("HTIF unknown device or command\n");
->> +        HTIF_DEBUG("HTIF unknown device or command\n");
->>          HTIF_DEBUG("device: %d cmd: %d what: %02" PRIx64
->> -            " payload: %016" PRIx64, device, cmd, payload & 0xFF, payload);
->> +                   " payload: %016" PRIx64, device, cmd, payload & 0xFF,
->> +                   payload);
->>      }
->>      /*
->>       * - latest bbl does not set fromhost to 0 if there is a value in tohost
->> @@ -180,6 +182,7 @@ static void htif_handle_tohost_write(HTIFState *htifstate, uint64_t val_written)
->>  static uint64_t htif_mm_read(void *opaque, hwaddr addr, unsigned size)
->>  {
->>      HTIFState *htifstate = opaque;
->> +
->>      if (addr == TOHOST_OFFSET1) {
->>          return htifstate->env->mtohost & 0xFFFFFFFF;
->>      } else if (addr == TOHOST_OFFSET2) {
->> @@ -189,8 +192,8 @@ static uint64_t htif_mm_read(void *opaque, hwaddr addr, unsigned size)
->>      } else if (addr == FROMHOST_OFFSET2) {
->>          return (htifstate->env->mfromhost >> 32) & 0xFFFFFFFF;
->>      } else {
->> -        qemu_log("Invalid htif read: address %016" PRIx64 "\n",
->> -            (uint64_t)addr);
->> +        HTIF_DEBUG("Invalid htif read: address %016" PRIx64 "\n",
->> +                   (uint64_t)addr);
->>          return 0;
->>      }
->>  }
->> @@ -219,8 +222,8 @@ static void htif_mm_write(void *opaque, hwaddr addr,
->>          htifstate->env->mfromhost |= value << 32;
->>          htifstate->fromhost_inprogress = 0;
->>      } else {
->> -        qemu_log("Invalid htif write: address %016" PRIx64 "\n",
->> -            (uint64_t)addr);
->> +        HTIF_DEBUG("Invalid htif write: address %016" PRIx64 "\n",
->> +                   (uint64_t)addr);
->>      }
->>  }
->>  
->>
+--3uo+9/B/ebqu+fSQ
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl0x0bYACgkQbDjKyiDZ
+s5I9vxAA0lXp2UY09O/eG6yHIgCAcvXl11ODbYnTahJ3Wu5LGLfj2UeOrj/wg+9+
+CVd90uAGBr4qglgwtf8uIDYPgfCvLpr/Gj8RbnoYtOW4yZXI4dpbM7km/HWqHfxk
+tumdLZTCEwWYHExhSalWcAroFyPwH04hqgrt9CXijyjfrgQttf4l8qJ7xXbJnuh4
++MTSUuSfTscfpXWUa/yBhNfzdHXLEs0EE6v1+jIbXGnuxxQwwMZ0VDUBL5uqpcPs
+FeYQ94FHNnARf3wapU8T4U+Onkqf9AJESXYNGmJR9/rENRI47g3DmLg/EYqIf83G
+2wwFxF07goup9Hc8eM2Zj8tO7Pg9CO8G++yTe1t9BTcXCgf+3xyz0UlAVGRNXRUT
+OkfTHl2PsMowATemj0fZ6qdyCT/dbySUYTKbO6kNAt6KJcMVV5spKpH3nDTMuYKw
+CghZorlnUImR+/QsNLqNaJlQi9eW0LuJdS2NYvRVOo4R4E4Baf3rKG1CKLISE2xF
+HydYrUYTNYgZIeaAZK1U+ZMJRPtWnyTmNdqA3aOmVbfUA9D352d+K6k1HbEeWQRh
+IR366wn4QRdAbdXPAu+F7UsrtVCkMwnrAu0Hrm6Vqn/xL9fEhli0krx9rciwwi7m
+2tbq7Km4XdCoH6VTbuUi7R63GuofwTAeDhubO1nBQvOLwBamV+M=
+=TTyo
+-----END PGP SIGNATURE-----
+
+--3uo+9/B/ebqu+fSQ--
 
