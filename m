@@ -6,56 +6,56 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1980DC76188
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 09:27:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47203C76195
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 09:27:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E740A2084D
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 09:27:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E740A2084D
+	by mail.kernel.org (Postfix) with ESMTPS id 0CC452084D
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 09:27:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0CC452084D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43332 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43340 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hoPB1-0006Lb-LB
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 05:27:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37612)
+	id 1hoPBD-0007ED-Nz
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 05:27:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37888)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hoP9s-0001xU-RD
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 05:26:34 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hoPAL-0003wH-CU
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 05:27:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hoP9r-0005pw-EF
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 05:26:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47340)
+ (envelope-from <mreitz@redhat.com>) id 1hoPAJ-0006Cs-2V
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 05:27:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34704)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hoP9o-0005lW-7a; Fri, 19 Jul 2019 05:26:28 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ id 1hoPAE-00068G-3q; Fri, 19 Jul 2019 05:26:54 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id DA54159474;
- Fri, 19 Jul 2019 09:26:26 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 6FA8481F22;
+ Fri, 19 Jul 2019 09:26:53 +0000 (UTC)
 Received: from localhost (unknown [10.40.205.128])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4173C1001B14;
- Fri, 19 Jul 2019 09:26:26 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1345A62660;
+ Fri, 19 Jul 2019 09:26:48 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Date: Fri, 19 Jul 2019 11:26:09 +0200
-Message-Id: <20190719092618.24891-2-mreitz@redhat.com>
+Date: Fri, 19 Jul 2019 11:26:14 +0200
+Message-Id: <20190719092618.24891-7-mreitz@redhat.com>
 In-Reply-To: <20190719092618.24891-1-mreitz@redhat.com>
 References: <20190719092618.24891-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.39]); Fri, 19 Jul 2019 09:26:26 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.25]); Fri, 19 Jul 2019 09:26:53 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v3 01/10] block: Introduce
- BdrvChild.parent_quiesce_counter
+Subject: [Qemu-devel] [PATCH v3 06/10] block: Do not poll in
+ bdrv_do_drained_end()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,190 +73,477 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Commit 5cb2737e925042e6c7cd3fb0b01313950b03cddf laid out why
-bdrv_do_drained_end() must decrement the quiesce_counter after
-bdrv_drain_invoke().  It did not give a very good reason why it has to
-happen after bdrv_parent_drained_end(), instead only claiming symmetry
-to bdrv_do_drained_begin().
+We should never poll anywhere in bdrv_do_drained_end() (including its
+recursive callees like bdrv_drain_invoke()), because it does not cope
+well with graph changes.  In fact, it has been written based on the
+postulation that no graph changes will happen in it.
 
-It turns out that delaying it for so long is wrong.
+Instead, the callers that want to poll must poll, i.e. all currently
+globally available wrappers: bdrv_drained_end(),
+bdrv_subtree_drained_end(), bdrv_unapply_subtree_drain(), and
+bdrv_drain_all_end().  Graph changes there do not matter.
 
-Situation: We have an active commit job (i.e. a mirror job) from top to
-base for the following graph:
+They can poll simply by passing a pointer to a drained_end_counter and
+wait until it reaches 0.
 
-                  filter
-                    |
-                  [file]
-                    |
-                    v
-top --[backing]--> base
+This patch also adds a non-polling global wrapper for
+bdrv_do_drained_end() that takes a drained_end_counter pointer.  We need
+such a variant because now no function called anywhere from
+bdrv_do_drained_end() must poll.  This includes
+BdrvChildRole.drained_end(), which already must not poll according to
+its interface documentation, but bdrv_child_cb_drained_end() just
+violates that by invoking bdrv_drained_end() (which does poll).
+Therefore, BdrvChildRole.drained_end() must take a *drained_end_counter
+parameter, which bdrv_child_cb_drained_end() can pass on to the new
+bdrv_drained_end_no_poll() function.
 
-Now the VM is closed, which results in the job being cancelled and a
-bdrv_drain_all() happening pretty much simultaneously.
+Note that we now have a pattern of all drained_end-related functions
+either polling or receiving a *drained_end_counter to let the caller
+poll based on that.
 
-Beginning the drain means the job is paused once whenever one of its
-nodes is quiesced.  This is reversed when the drain ends.
+A problem with a single poll loop is that when the drained section in
+bdrv_set_aio_context_ignore() ends, some nodes in the subgraph may be in
+the old contexts, while others are in the new context already.  To let
+the collective poll in bdrv_drained_end() work correctly, we must not
+hold a lock to the old context, so that the old context can make
+progress in case it is different from the current context.
 
-With how the code currently is, after base's drain ends (which means
-that it will have unpaused the job once), its quiesce_counter remains at
-1 while it goes to undrain its parents (bdrv_parent_drained_end()).  For
-some reason or another, undraining filter causes the job to be kicked
-and enter mirror_exit_common(), where it proceeds to invoke
-block_job_remove_all_bdrv().
+(In the process, remove the comment saying that the current context is
+always the old context, because it is wrong.)
 
-Now base will be detached from the job.  Because its quiesce_counter is
-still 1, it will unpause the job once more.  So in total, undraining
-base will unpause the job twice.  Eventually, this will lead to the
-job's pause_count going negative -- well, it would, were there not an
-assertion against this, which crashes qemu.
-
-The general problem is that if in bdrv_parent_drained_end() we undrain
-parent A, and then undrain parent B, which then leads to A detaching the
-child, bdrv_replace_child_noperm() will undrain A as if we had not done
-so yet; that is, one time too many.
-
-It follows that we cannot decrement the quiesce_counter after invoking
-bdrv_parent_drained_end().
-
-Unfortunately, decrementing it before bdrv_parent_drained_end() would be
-wrong, too.  Imagine the above situation in reverse: Undraining A leads
-to B detaching the child.  If we had already decremented the
-quiesce_counter by that point, bdrv_replace_child_noperm() would undrain
-B one time too little; because it expects bdrv_parent_drained_end() to
-issue this undrain.  But bdrv_parent_drained_end() won't do that,
-because B is no longer a parent.
-
-Therefore, we have to do something else.  This patch opts for
-introducing a second quiesce_counter that counts how many times a
-child's parent has been quiesced (though c->role->drained_*).  With
-that, bdrv_replace_child_noperm() just has to undrain the parent exactly
-that many times when removing a child, and it will always be right.
+In all other places, all nodes in a subtree must be in the same context,
+so we can just poll that.  The exception of course is
+bdrv_drain_all_end(), but that always runs in the main context, so we
+can just poll NULL (like bdrv_drain_all_begin() does).
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- include/block/block.h     |  7 +++++++
- include/block/block_int.h |  9 +++++++++
- block.c                   | 15 +++++----------
- block/io.c                | 14 +++++++++++---
- 4 files changed, 32 insertions(+), 13 deletions(-)
+ include/block/block.h     | 25 ++++++++++++
+ include/block/block_int.h |  6 ++-
+ block.c                   | 37 ++++++++++++++----
+ block/block-backend.c     |  6 +--
+ block/io.c                | 80 ++++++++++++++++++++++++++++-----------
+ blockjob.c                |  2 +-
+ 6 files changed, 120 insertions(+), 36 deletions(-)
 
 diff --git a/include/block/block.h b/include/block/block.h
-index 734c9d2f76..bff3317696 100644
+index a81645e8a3..60f00479e0 100644
 --- a/include/block/block.h
 +++ b/include/block/block.h
-@@ -617,6 +617,13 @@ void bdrv_parent_drained_begin(BlockDriverState *bs,=
- BdrvChild *ignore,
+@@ -612,6 +612,9 @@ void bdrv_parent_drained_begin_single(BdrvChild *c, b=
+ool poll);
+  * bdrv_parent_drained_end_single:
+  *
+  * End a quiesced section for the parent of @c.
++ *
++ * This polls @bs's AioContext until all scheduled sub-drained_ends
++ * have settled, which may result in graph changes.
   */
- void bdrv_parent_drained_begin_single(BdrvChild *c, bool poll);
+ void bdrv_parent_drained_end_single(BdrvChild *c);
+=20
+@@ -661,9 +664,31 @@ void bdrv_subtree_drained_begin(BlockDriverState *bs=
+);
+  * bdrv_drained_end:
+  *
+  * End a quiescent section started by bdrv_drained_begin().
++ *
++ * This polls @bs's AioContext until all scheduled sub-drained_ends
++ * have settled.  On one hand, that may result in graph changes.  On
++ * the other, this requires that all involved nodes (@bs and all of
++ * its parents) are in the same AioContext, and that the caller has
++ * acquired it.
++ * If there are any nodes that are in different contexts from @bs,
++ * these contexts must not be acquired.
+  */
+ void bdrv_drained_end(BlockDriverState *bs);
 =20
 +/**
-+ * bdrv_parent_drained_end_single:
++ * bdrv_drained_end_no_poll:
 + *
-+ * End a quiesced section for the parent of @c.
++ * Same as bdrv_drained_end(), but do not poll for the subgraph to
++ * actually become unquiesced.  Therefore, no graph changes will occur
++ * with this function.
++ *
++ * *drained_end_counter is incremented for every background operation
++ * that is scheduled, and will be decremented for every operation once
++ * it settles.  The caller must poll until it reaches 0.  The counter
++ * should be accessed using atomic operations only.
 + */
-+void bdrv_parent_drained_end_single(BdrvChild *c);
++void bdrv_drained_end_no_poll(BlockDriverState *bs, int *drained_end_cou=
+nter);
 +
  /**
-  * bdrv_parent_drained_end:
-  *
+  * End a quiescent section started by bdrv_subtree_drained_begin().
+  */
 diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 50902531b7..f5b044fcdb 100644
+index f5b044fcdb..3aa1e832a8 100644
 --- a/include/block/block_int.h
 +++ b/include/block/block_int.h
-@@ -729,6 +729,15 @@ struct BdrvChild {
+@@ -664,11 +664,15 @@ struct BdrvChildRole {
+      * These functions must not change the graph (and therefore also mus=
+t not
+      * call aio_poll(), which could change the graph indirectly).
+      *
++     * If drained_end() schedules background operations, it must atomica=
+lly
++     * increment *drained_end_counter for each such operation and atomic=
+ally
++     * decrement it once the operation has settled.
++     *
+      * Note that this can be nested. If drained_begin() was called twice=
+, new
+      * I/O is allowed only after drained_end() was called twice, too.
       */
-     bool frozen;
+     void (*drained_begin)(BdrvChild *child);
+-    void (*drained_end)(BdrvChild *child);
++    void (*drained_end)(BdrvChild *child, int *drained_end_counter);
 =20
-+    /*
-+     * How many times the parent of this child has been drained
-+     * (through role->drained_*).
-+     * Usually, this is equal to bs->quiesce_counter (potentially
-+     * reduced by bdrv_drain_all_count).  It may differ while the
-+     * child is entering or leaving a drained section.
-+     */
-+    int parent_quiesce_counter;
-+
-     QLIST_ENTRY(BdrvChild) next;
-     QLIST_ENTRY(BdrvChild) next_parent;
- };
+     /*
+      * Returns whether the parent has pending requests for the child. Th=
+is
 diff --git a/block.c b/block.c
-index 29e931e217..8440712ca0 100644
+index 8440712ca0..9c94f7f28a 100644
 --- a/block.c
 +++ b/block.c
-@@ -2251,24 +2251,19 @@ static void bdrv_replace_child_noperm(BdrvChild *=
-child,
-         if (child->role->detach) {
-             child->role->detach(child);
-         }
--        if (old_bs->quiesce_counter && child->role->drained_end) {
--            int num =3D old_bs->quiesce_counter;
--            if (child->role->parent_is_bds) {
--                num -=3D bdrv_drain_all_count;
--            }
--            assert(num >=3D 0);
--            for (i =3D 0; i < num; i++) {
--                child->role->drained_end(child);
--            }
-+        while (child->parent_quiesce_counter) {
-+            bdrv_parent_drained_end_single(child);
-         }
-         QLIST_REMOVE(child, next_parent);
-+    } else {
-+        assert(child->parent_quiesce_counter =3D=3D 0);
+@@ -911,10 +911,11 @@ static bool bdrv_child_cb_drained_poll(BdrvChild *c=
+hild)
+     return bdrv_drain_poll(bs, false, NULL, false);
+ }
+=20
+-static void bdrv_child_cb_drained_end(BdrvChild *child)
++static void bdrv_child_cb_drained_end(BdrvChild *child,
++                                      int *drained_end_counter)
+ {
+     BlockDriverState *bs =3D child->opaque;
+-    bdrv_drained_end(bs);
++    bdrv_drained_end_no_poll(bs, drained_end_counter);
+ }
+=20
+ static void bdrv_child_cb_attach(BdrvChild *child)
+@@ -5923,9 +5924,11 @@ static void bdrv_attach_aio_context(BlockDriverSta=
+te *bs,
+ void bdrv_set_aio_context_ignore(BlockDriverState *bs,
+                                  AioContext *new_context, GSList **ignor=
+e)
+ {
++    AioContext *old_context =3D bdrv_get_aio_context(bs);
++    AioContext *current_context =3D qemu_get_current_aio_context();
+     BdrvChild *child;
+=20
+-    if (bdrv_get_aio_context(bs) =3D=3D new_context) {
++    if (old_context =3D=3D new_context) {
+         return;
      }
 =20
-     child->bs =3D new_bs;
+@@ -5949,13 +5952,31 @@ void bdrv_set_aio_context_ignore(BlockDriverState=
+ *bs,
 =20
-     if (new_bs) {
-         QLIST_INSERT_HEAD(&new_bs->parents, child, next_parent);
--        if (new_bs->quiesce_counter && child->role->drained_begin) {
-+        if (new_bs->quiesce_counter) {
-             int num =3D new_bs->quiesce_counter;
-             if (child->role->parent_is_bds) {
-                 num -=3D bdrv_drain_all_count;
+     bdrv_detach_aio_context(bs);
+=20
+-    /* This function executes in the old AioContext so acquire the new o=
+ne in
+-     * case it runs in a different thread.
+-     */
+-    aio_context_acquire(new_context);
++    /* Acquire the new context, if necessary */
++    if (current_context !=3D new_context) {
++        aio_context_acquire(new_context);
++    }
++
+     bdrv_attach_aio_context(bs, new_context);
++
++    /*
++     * If this function was recursively called from
++     * bdrv_set_aio_context_ignore(), there may be nodes in the
++     * subtree that have not yet been moved to the new AioContext.
++     * Release the old one so bdrv_drained_end() can poll them.
++     */
++    if (current_context !=3D old_context) {
++        aio_context_release(old_context);
++    }
++
+     bdrv_drained_end(bs);
+-    aio_context_release(new_context);
++
++    if (current_context !=3D old_context) {
++        aio_context_acquire(old_context);
++    }
++    if (current_context !=3D new_context) {
++        aio_context_release(new_context);
++    }
+ }
+=20
+ static bool bdrv_parent_can_set_aio_context(BdrvChild *c, AioContext *ct=
+x,
+diff --git a/block/block-backend.c b/block/block-backend.c
+index a8d160fd5d..0056b526b8 100644
+--- a/block/block-backend.c
++++ b/block/block-backend.c
+@@ -121,7 +121,7 @@ static void blk_root_inherit_options(int *child_flags=
+, QDict *child_options,
+ }
+ static void blk_root_drained_begin(BdrvChild *child);
+ static bool blk_root_drained_poll(BdrvChild *child);
+-static void blk_root_drained_end(BdrvChild *child);
++static void blk_root_drained_end(BdrvChild *child, int *drained_end_coun=
+ter);
+=20
+ static void blk_root_change_media(BdrvChild *child, bool load);
+ static void blk_root_resize(BdrvChild *child);
+@@ -1249,7 +1249,7 @@ int blk_pread_unthrottled(BlockBackend *blk, int64_=
+t offset, uint8_t *buf,
+=20
+     blk_root_drained_begin(blk->root);
+     ret =3D blk_pread(blk, offset, buf, count);
+-    blk_root_drained_end(blk->root);
++    blk_root_drained_end(blk->root, NULL);
+     return ret;
+ }
+=20
+@@ -2236,7 +2236,7 @@ static bool blk_root_drained_poll(BdrvChild *child)
+     return !!blk->in_flight;
+ }
+=20
+-static void blk_root_drained_end(BdrvChild *child)
++static void blk_root_drained_end(BdrvChild *child, int *drained_end_coun=
+ter)
+ {
+     BlockBackend *blk =3D child->opaque;
+     assert(blk->quiesce_counter);
 diff --git a/block/io.c b/block/io.c
-index 24a18759fd..1e618f9a37 100644
+index b0b33174d3..8f23cab82e 100644
 --- a/block/io.c
 +++ b/block/io.c
-@@ -55,6 +55,15 @@ void bdrv_parent_drained_begin(BlockDriverState *bs, B=
-drvChild *ignore,
+@@ -55,17 +55,26 @@ static void bdrv_parent_drained_begin(BlockDriverStat=
+e *bs, BdrvChild *ignore,
+     }
+ }
+=20
+-void bdrv_parent_drained_end_single(BdrvChild *c)
++static void bdrv_parent_drained_end_single_no_poll(BdrvChild *c,
++                                                   int *drained_end_coun=
+ter)
+ {
+     assert(c->parent_quiesce_counter > 0);
+     c->parent_quiesce_counter--;
+     if (c->role->drained_end) {
+-        c->role->drained_end(c);
++        c->role->drained_end(c, drained_end_counter);
      }
  }
 =20
 +void bdrv_parent_drained_end_single(BdrvChild *c)
 +{
-+    assert(c->parent_quiesce_counter > 0);
-+    c->parent_quiesce_counter--;
-+    if (c->role->drained_end) {
-+        c->role->drained_end(c);
-+    }
++    int drained_end_counter =3D 0;
++    bdrv_parent_drained_end_single_no_poll(c, &drained_end_counter);
++    BDRV_POLL_WHILE(c->bs, atomic_read(&drained_end_counter) > 0);
 +}
 +
- void bdrv_parent_drained_end(BlockDriverState *bs, BdrvChild *ignore,
-                              bool ignore_bds_parents)
+ static void bdrv_parent_drained_end(BlockDriverState *bs, BdrvChild *ign=
+ore,
+-                                    bool ignore_bds_parents)
++                                    bool ignore_bds_parents,
++                                    int *drained_end_counter)
  {
-@@ -64,9 +73,7 @@ void bdrv_parent_drained_end(BlockDriverState *bs, Bdrv=
-Child *ignore,
+     BdrvChild *c, *next;
+=20
+@@ -73,7 +82,7 @@ static void bdrv_parent_drained_end(BlockDriverState *b=
+s, BdrvChild *ignore,
          if (c =3D=3D ignore || (ignore_bds_parents && c->role->parent_is=
 _bds)) {
              continue;
          }
--        if (c->role->drained_end) {
--            c->role->drained_end(c);
--        }
-+        bdrv_parent_drained_end_single(c);
+-        bdrv_parent_drained_end_single(c);
++        bdrv_parent_drained_end_single_no_poll(c, drained_end_counter);
      }
  }
 =20
-@@ -96,6 +103,7 @@ static bool bdrv_parent_drained_poll(BlockDriverState =
-*bs, BdrvChild *ignore,
+@@ -212,13 +221,11 @@ static void coroutine_fn bdrv_drain_invoke_entry(vo=
+id *opaque)
+     atomic_mb_set(&data->done, true);
+     bdrv_dec_in_flight(bs);
 =20
- void bdrv_parent_drained_begin_single(BdrvChild *c, bool poll)
- {
-+    c->parent_quiesce_counter++;
-     if (c->role->drained_begin) {
-         c->role->drained_begin(c);
+-    if (data->drained_end_counter) {
++    if (!data->begin) {
+         atomic_dec(data->drained_end_counter);
      }
+=20
+-    if (data->begin || data->drained_end_counter) {
+-        g_free(data);
+-    }
++    g_free(data);
+ }
+=20
+ /* Recursively call BlockDriver.bdrv_co_drain_begin/end callbacks */
+@@ -240,7 +247,7 @@ static void bdrv_drain_invoke(BlockDriverState *bs, b=
+ool begin,
+         .drained_end_counter =3D drained_end_counter,
+     };
+=20
+-    if (!begin && drained_end_counter) {
++    if (!begin) {
+         atomic_inc(drained_end_counter);
+     }
+=20
+@@ -249,15 +256,6 @@ static void bdrv_drain_invoke(BlockDriverState *bs, =
+bool begin,
+     bdrv_inc_in_flight(bs);
+     data->co =3D qemu_coroutine_create(bdrv_drain_invoke_entry, data);
+     aio_co_schedule(bdrv_get_aio_context(bs), data->co);
+-
+-    /*
+-     * TODO: Drop this and make callers pass @drained_end_counter and po=
+ll
+-     * themselves
+-     */
+-    if (!begin && !drained_end_counter) {
+-        BDRV_POLL_WHILE(bs, !data->done);
+-        g_free(data);
+-    }
+ }
+=20
+ /* Returns true if BDRV_POLL_WHILE() should go into a blocking aio_poll(=
+) */
+@@ -320,9 +318,11 @@ static void bdrv_co_drain_bh_cb(void *opaque)
+         }
+         bdrv_dec_in_flight(bs);
+         if (data->begin) {
++            assert(!data->drained_end_counter);
+             bdrv_do_drained_begin(bs, data->recursive, data->parent,
+                                   data->ignore_bds_parents, data->poll);
+         } else {
++            assert(!data->poll);
+             bdrv_do_drained_end(bs, data->recursive, data->parent,
+                                 data->ignore_bds_parents,
+                                 data->drained_end_counter);
+@@ -438,6 +438,20 @@ void bdrv_subtree_drained_begin(BlockDriverState *bs=
+)
+     bdrv_do_drained_begin(bs, true, NULL, false, true);
+ }
+=20
++/**
++ * This function does not poll, nor must any of its recursively called
++ * functions.  The *drained_end_counter pointee will be incremented
++ * once for every background operation scheduled, and decremented once
++ * the operation settles.  Therefore, the pointer must remain valid
++ * until the pointee reaches 0.  That implies that whoever sets up the
++ * pointee has to poll until it is 0.
++ *
++ * We use atomic operations to access *drained_end_counter, because
++ * (1) when called from bdrv_set_aio_context_ignore(), the subgraph of
++ *     @bs may contain nodes in different AioContexts,
++ * (2) bdrv_drain_all_end() uses the same counter for all nodes,
++ *     regardless of which AioContext they are in.
++ */
+ static void bdrv_do_drained_end(BlockDriverState *bs, bool recursive,
+                                 BdrvChild *parent, bool ignore_bds_paren=
+ts,
+                                 int *drained_end_counter)
+@@ -445,6 +459,8 @@ static void bdrv_do_drained_end(BlockDriverState *bs,=
+ bool recursive,
+     BdrvChild *child, *next;
+     int old_quiesce_counter;
+=20
++    assert(drained_end_counter !=3D NULL);
++
+     if (qemu_in_coroutine()) {
+         bdrv_co_yield_to_drain(bs, false, recursive, parent, ignore_bds_=
+parents,
+                                false, drained_end_counter);
+@@ -454,7 +470,8 @@ static void bdrv_do_drained_end(BlockDriverState *bs,=
+ bool recursive,
+=20
+     /* Re-enable things in child-to-parent order */
+     bdrv_drain_invoke(bs, false, drained_end_counter);
+-    bdrv_parent_drained_end(bs, parent, ignore_bds_parents);
++    bdrv_parent_drained_end(bs, parent, ignore_bds_parents,
++                            drained_end_counter);
+=20
+     old_quiesce_counter =3D atomic_fetch_dec(&bs->quiesce_counter);
+     if (old_quiesce_counter =3D=3D 1) {
+@@ -473,12 +490,21 @@ static void bdrv_do_drained_end(BlockDriverState *b=
+s, bool recursive,
+=20
+ void bdrv_drained_end(BlockDriverState *bs)
+ {
+-    bdrv_do_drained_end(bs, false, NULL, false, NULL);
++    int drained_end_counter =3D 0;
++    bdrv_do_drained_end(bs, false, NULL, false, &drained_end_counter);
++    BDRV_POLL_WHILE(bs, atomic_read(&drained_end_counter) > 0);
++}
++
++void bdrv_drained_end_no_poll(BlockDriverState *bs, int *drained_end_cou=
+nter)
++{
++    bdrv_do_drained_end(bs, false, NULL, false, drained_end_counter);
+ }
+=20
+ void bdrv_subtree_drained_end(BlockDriverState *bs)
+ {
+-    bdrv_do_drained_end(bs, true, NULL, false, NULL);
++    int drained_end_counter =3D 0;
++    bdrv_do_drained_end(bs, true, NULL, false, &drained_end_counter);
++    BDRV_POLL_WHILE(bs, atomic_read(&drained_end_counter) > 0);
+ }
+=20
+ void bdrv_apply_subtree_drain(BdrvChild *child, BlockDriverState *new_pa=
+rent)
+@@ -492,11 +518,15 @@ void bdrv_apply_subtree_drain(BdrvChild *child, Blo=
+ckDriverState *new_parent)
+=20
+ void bdrv_unapply_subtree_drain(BdrvChild *child, BlockDriverState *old_=
+parent)
+ {
++    int drained_end_counter =3D 0;
+     int i;
+=20
+     for (i =3D 0; i < old_parent->recursive_quiesce_counter; i++) {
+-        bdrv_do_drained_end(child->bs, true, child, false, NULL);
++        bdrv_do_drained_end(child->bs, true, child, false,
++                            &drained_end_counter);
+     }
++
++    BDRV_POLL_WHILE(child->bs, atomic_read(&drained_end_counter) > 0);
+ }
+=20
+ /*
+@@ -596,15 +626,19 @@ void bdrv_drain_all_begin(void)
+ void bdrv_drain_all_end(void)
+ {
+     BlockDriverState *bs =3D NULL;
++    int drained_end_counter =3D 0;
+=20
+     while ((bs =3D bdrv_next_all_states(bs))) {
+         AioContext *aio_context =3D bdrv_get_aio_context(bs);
+=20
+         aio_context_acquire(aio_context);
+-        bdrv_do_drained_end(bs, false, NULL, true, NULL);
++        bdrv_do_drained_end(bs, false, NULL, true, &drained_end_counter)=
+;
+         aio_context_release(aio_context);
+     }
+=20
++    assert(qemu_get_current_aio_context() =3D=3D qemu_get_aio_context())=
+;
++    AIO_WAIT_WHILE(NULL, atomic_read(&drained_end_counter) > 0);
++
+     assert(bdrv_drain_all_count > 0);
+     bdrv_drain_all_count--;
+ }
+diff --git a/blockjob.c b/blockjob.c
+index 458ae76f51..20b7f557da 100644
+--- a/blockjob.c
++++ b/blockjob.c
+@@ -135,7 +135,7 @@ static bool child_job_drained_poll(BdrvChild *c)
+     }
+ }
+=20
+-static void child_job_drained_end(BdrvChild *c)
++static void child_job_drained_end(BdrvChild *c, int *drained_end_counter=
+)
+ {
+     BlockJob *job =3D c->opaque;
+     job_resume(&job->job);
 --=20
 2.21.0
 
