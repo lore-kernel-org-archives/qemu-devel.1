@@ -6,48 +6,48 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29353C7618F
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 16:31:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 190ECC76195
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 16:31:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F1A8121872
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 16:31:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1A8121872
+	by mail.kernel.org (Postfix) with ESMTPS id E650821872
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 16:31:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E650821872
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47026 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47028 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hoVnC-0008LV-Ru
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 12:31:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43471)
+	id 1hoVnL-0000Yt-V9
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 12:31:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43572)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1hoVmv-0007dI-OT
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 12:31:19 -0400
+ (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1hoVn3-000807-FN
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 12:31:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1hoVmp-0003HL-7m
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 12:31:15 -0400
-Received: from relay.sw.ru ([185.231.240.75]:44204)
+ (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1hoVn1-0003PQ-Bm
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 12:31:24 -0400
+Received: from relay.sw.ru ([185.231.240.75]:44208)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1hoVme-0002sH-2n; Fri, 19 Jul 2019 12:31:02 -0400
+ id 1hoVn0-0002sE-Rf; Fri, 19 Jul 2019 12:31:23 -0400
 Received: from [172.16.25.136] (helo=localhost.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92)
  (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1hoVm8-0006pa-6o; Fri, 19 Jul 2019 19:30:28 +0300
+ id 1hoVm8-0006pa-OT; Fri, 19 Jul 2019 19:30:28 +0300
 From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 To: qemu-devel@nongnu.org,
 	qemu-block@nongnu.org
-Date: Fri, 19 Jul 2019 19:30:11 +0300
-Message-Id: <1563553816-148827-2-git-send-email-andrey.shinkevich@virtuozzo.com>
+Date: Fri, 19 Jul 2019 19:30:14 +0300
+Message-Id: <1563553816-148827-5-git-send-email-andrey.shinkevich@virtuozzo.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1563553816-148827-1-git-send-email-andrey.shinkevich@virtuozzo.com>
 References: <1563553816-148827-1-git-send-email-andrey.shinkevich@virtuozzo.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 185.231.240.75
-Subject: [Qemu-devel] [PATCH v5 1/6] iotests: allow Valgrind checking all
- QEMU processes
+Subject: [Qemu-devel] [PATCH v5 4/6] iotests: Valgrind fails with
+ nonexistent directory
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,255 +65,31 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-With the '-valgrind' option, let all the QEMU processes be run under
-the Valgrind tool. The Valgrind own parameters may be set with its
-environment variable VALGRIND_OPTS, e.g.
-VALGRIND_OPTS="--leak-check=yes" ./check -qcow2 -valgrind <test#>
-or they may be listed in the Valgrind checked file ./.valgrindrc or
-~/.valgrindrc like
---memcheck:leak-check=no
---memcheck:track-origins=yes
-When QEMU-IO process is being killed, the shell report refers to the
-text of the command in _qemu_io_wrapper(), which was modified with this
-patch. So, the benchmark output for the tests 039, 061 and 137 is to be
-changed also.
+The Valgrind uses the exported variable TMPDIR and fails if the
+directory does not exist. Let us exclude such a test case from
+being run under the Valgrind and notify the user of it.
 
+Suggested-by: Kevin Wolf <kwolf@redhat.com>
 Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 ---
- tests/qemu-iotests/039.out   | 30 ++++---------------
- tests/qemu-iotests/061.out   | 12 ++------
- tests/qemu-iotests/137.out   |  6 +---
- tests/qemu-iotests/common.rc | 69 ++++++++++++++++++++++++++++++++------------
- 4 files changed, 59 insertions(+), 58 deletions(-)
+ tests/qemu-iotests/051 | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/tests/qemu-iotests/039.out b/tests/qemu-iotests/039.out
-index 724d7b2..972c6c0 100644
---- a/tests/qemu-iotests/039.out
-+++ b/tests/qemu-iotests/039.out
-@@ -11,11 +11,7 @@ No errors were found on the image.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
- wrote 512/512 bytes at offset 0
- 512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
--./common.rc: Killed                  ( if [ "${VALGRIND_QEMU}" == "y" ]; then
--    exec valgrind --log-file="${VALGRIND_LOGFILE}" --error-exitcode=99 "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
--else
--    exec "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
--fi )
-+./common.rc: Killed                  ( _qemu_proc_wrapper "${VALGRIND_LOGFILE}" "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@" )
- incompatible_features     0x1
- ERROR cluster 5 refcount=0 reference=1
- ERROR OFLAG_COPIED data cluster: l2_entry=8000000000050000 refcount=0
-@@ -50,11 +46,7 @@ read 512/512 bytes at offset 0
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
- wrote 512/512 bytes at offset 0
- 512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
--./common.rc: Killed                  ( if [ "${VALGRIND_QEMU}" == "y" ]; then
--    exec valgrind --log-file="${VALGRIND_LOGFILE}" --error-exitcode=99 "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
--else
--    exec "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
--fi )
-+./common.rc: Killed                  ( _qemu_proc_wrapper "${VALGRIND_LOGFILE}" "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@" )
- incompatible_features     0x1
- ERROR cluster 5 refcount=0 reference=1
- Rebuilding refcount structure
-@@ -68,11 +60,7 @@ incompatible_features     0x0
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
- wrote 512/512 bytes at offset 0
- 512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
--./common.rc: Killed                  ( if [ "${VALGRIND_QEMU}" == "y" ]; then
--    exec valgrind --log-file="${VALGRIND_LOGFILE}" --error-exitcode=99 "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
--else
--    exec "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
--fi )
-+./common.rc: Killed                  ( _qemu_proc_wrapper "${VALGRIND_LOGFILE}" "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@" )
- incompatible_features     0x0
- No errors were found on the image.
+diff --git a/tests/qemu-iotests/051 b/tests/qemu-iotests/051
+index ce942a5..f8141ca 100755
+--- a/tests/qemu-iotests/051
++++ b/tests/qemu-iotests/051
+@@ -377,6 +377,10 @@ printf %b "qemu-io $device_id \"write -P 0x33 0 4k\"\ncommit $device_id\n" |
+ $QEMU_IO -c "read -P 0x33 0 4k" "$TEST_IMG" | _filter_qemu_io
  
-@@ -91,11 +79,7 @@ No errors were found on the image.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
- wrote 512/512 bytes at offset 0
- 512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
--./common.rc: Killed                  ( if [ "${VALGRIND_QEMU}" == "y" ]; then
--    exec valgrind --log-file="${VALGRIND_LOGFILE}" --error-exitcode=99 "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
--else
--    exec "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
--fi )
-+./common.rc: Killed                  ( _qemu_proc_wrapper "${VALGRIND_LOGFILE}" "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@" )
- incompatible_features     0x1
- ERROR cluster 5 refcount=0 reference=1
- ERROR OFLAG_COPIED data cluster: l2_entry=8000000000050000 refcount=0
-@@ -105,11 +89,7 @@ Data may be corrupted, or further writes to the image may corrupt it.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
- wrote 512/512 bytes at offset 0
- 512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
--./common.rc: Killed                  ( if [ "${VALGRIND_QEMU}" == "y" ]; then
--    exec valgrind --log-file="${VALGRIND_LOGFILE}" --error-exitcode=99 "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
--else
--    exec "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
--fi )
-+./common.rc: Killed                  ( _qemu_proc_wrapper "${VALGRIND_LOGFILE}" "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@" )
- incompatible_features     0x0
- No errors were found on the image.
- *** done
-diff --git a/tests/qemu-iotests/061.out b/tests/qemu-iotests/061.out
-index 1aa7d37..8cb57eb 100644
---- a/tests/qemu-iotests/061.out
-+++ b/tests/qemu-iotests/061.out
-@@ -118,11 +118,7 @@ No errors were found on the image.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
- wrote 131072/131072 bytes at offset 0
- 128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
--./common.rc: Killed                  ( if [ "${VALGRIND_QEMU}" == "y" ]; then
--    exec valgrind --log-file="${VALGRIND_LOGFILE}" --error-exitcode=99 "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
--else
--    exec "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
--fi )
-+./common.rc: Killed                  ( _qemu_proc_wrapper "${VALGRIND_LOGFILE}" "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@" )
- magic                     0x514649fb
- version                   3
- backing_file_offset       0x0
-@@ -280,11 +276,7 @@ No errors were found on the image.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
- wrote 131072/131072 bytes at offset 0
- 128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
--./common.rc: Killed                  ( if [ "${VALGRIND_QEMU}" == "y" ]; then
--    exec valgrind --log-file="${VALGRIND_LOGFILE}" --error-exitcode=99 "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
--else
--    exec "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
--fi )
-+./common.rc: Killed                  ( _qemu_proc_wrapper "${VALGRIND_LOGFILE}" "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@" )
- magic                     0x514649fb
- version                   3
- backing_file_offset       0x0
-diff --git a/tests/qemu-iotests/137.out b/tests/qemu-iotests/137.out
-index 22d59df..7fed5e6 100644
---- a/tests/qemu-iotests/137.out
-+++ b/tests/qemu-iotests/137.out
-@@ -35,11 +35,7 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
- qemu-io: Unsupported value 'blubb' for qcow2 option 'overlap-check'. Allowed are any of the following: none, constant, cached, all
- wrote 512/512 bytes at offset 0
- 512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
--./common.rc: Killed                  ( if [ "${VALGRIND_QEMU}" == "y" ]; then
--    exec valgrind --log-file="${VALGRIND_LOGFILE}" --error-exitcode=99 "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
--else
--    exec "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
--fi )
-+./common.rc: Killed                  ( _qemu_proc_wrapper "${VALGRIND_LOGFILE}" "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@" )
- incompatible_features     0x0
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
- wrote 65536/65536 bytes at offset 0
-diff --git a/tests/qemu-iotests/common.rc b/tests/qemu-iotests/common.rc
-index 5502c3d..6e461a1 100644
---- a/tests/qemu-iotests/common.rc
-+++ b/tests/qemu-iotests/common.rc
-@@ -60,19 +60,52 @@ if ! . ./common.config
-     exit 1
- fi
+ # Using snapshot=on with a non-existent TMPDIR
++if [ "${VALGRIND_QEMU}" == "y" ]; then
++    _casenotrun "Valgrind needs a valid TMPDIR for itself"
++fi
++VALGRIND_QEMU="" \
+ TMPDIR=/nonexistent run_qemu -drive driver=null-co,snapshot=on
  
-+_qemu_proc_wrapper()
-+{
-+    local VALGRIND_LOGFILE="$1"
-+    shift
-+    if [ "${VALGRIND_QEMU}" == "y" ]; then
-+        exec valgrind --log-file="${VALGRIND_LOGFILE}" --error-exitcode=99 "$@"
-+    else
-+        exec "$@"
-+    fi
-+}
-+
-+_qemu_proc_valgrind_log()
-+{
-+    local VALGRIND_LOGFILE="$1"
-+    local RETVAL="$2"
-+    if [ "${VALGRIND_QEMU}" == "y" ]; then
-+        if [ $RETVAL == 99 ]; then
-+            cat "${VALGRIND_LOGFILE}"
-+        fi
-+        rm -f "${VALGRIND_LOGFILE}"
-+    fi
-+}
-+
- _qemu_wrapper()
- {
-+    local VALGRIND_LOGFILE="${TEST_DIR}"/$$.valgrind
-     (
-         if [ -n "${QEMU_NEED_PID}" ]; then
-             echo $BASHPID > "${QEMU_TEST_DIR}/qemu-${_QEMU_HANDLE}.pid"
-         fi
--        exec "$QEMU_PROG" $QEMU_OPTIONS "$@"
-+        _qemu_proc_wrapper "${VALGRIND_LOGFILE}" "$QEMU_PROG" $QEMU_OPTIONS "$@"
-     )
-+    RETVAL=$?
-+    _qemu_proc_valgrind_log "${VALGRIND_LOGFILE}" $RETVAL
-+    return $RETVAL
- }
- 
- _qemu_img_wrapper()
- {
--    (exec "$QEMU_IMG_PROG" $QEMU_IMG_OPTIONS "$@")
-+    local VALGRIND_LOGFILE="${TEST_DIR}"/$$.valgrind
-+    (
-+        _qemu_proc_wrapper "${VALGRIND_LOGFILE}" "$QEMU_IMG_PROG" $QEMU_IMG_OPTIONS "$@"
-+    )
-+    RETVAL=$?
-+    _qemu_proc_valgrind_log "${VALGRIND_LOGFILE}" $RETVAL
-+    return $RETVAL
- }
- 
- _qemu_io_wrapper()
-@@ -85,36 +118,36 @@ _qemu_io_wrapper()
-             QEMU_IO_ARGS="--object secret,id=keysec0,data=$IMGKEYSECRET $QEMU_IO_ARGS"
-         fi
-     fi
--    local RETVAL
-     (
--        if [ "${VALGRIND_QEMU}" == "y" ]; then
--            exec valgrind --log-file="${VALGRIND_LOGFILE}" --error-exitcode=99 "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@"
--        else
--            exec "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@"
--        fi
-+        _qemu_proc_wrapper "${VALGRIND_LOGFILE}" "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@"
-     )
-     RETVAL=$?
--    if [ "${VALGRIND_QEMU}" == "y" ]; then
--        if [ $RETVAL == 99 ]; then
--            cat "${VALGRIND_LOGFILE}"
--        fi
--        rm -f "${VALGRIND_LOGFILE}"
--    fi
--    (exit $RETVAL)
-+    _qemu_proc_valgrind_log "${VALGRIND_LOGFILE}" $RETVAL
-+    return $RETVAL
- }
- 
- _qemu_nbd_wrapper()
- {
--    "$QEMU_NBD_PROG" --pid-file="${QEMU_TEST_DIR}/qemu-nbd.pid" \
--                     $QEMU_NBD_OPTIONS "$@"
-+    local VALGRIND_LOGFILE="${TEST_DIR}"/$$.valgrind
-+    (
-+        _qemu_proc_wrapper "${VALGRIND_LOGFILE}" "$QEMU_NBD_PROG" \
-+            --pid-file="${QEMU_TEST_DIR}/qemu-nbd.pid" $QEMU_NBD_OPTIONS "$@"
-+    )
-+    RETVAL=$?
-+    _qemu_proc_valgrind_log "${VALGRIND_LOGFILE}" $RETVAL
-+    return $RETVAL
- }
- 
- _qemu_vxhs_wrapper()
- {
-+    local VALGRIND_LOGFILE="${TEST_DIR}"/$$.valgrind
-     (
-         echo $BASHPID > "${TEST_DIR}/qemu-vxhs.pid"
--        exec "$QEMU_VXHS_PROG" $QEMU_VXHS_OPTIONS "$@"
-+        _qemu_proc_wrapper "${VALGRIND_LOGFILE}" "$QEMU_VXHS_PROG" $QEMU_VXHS_OPTIONS "$@"
-     )
-+    RETVAL=$?
-+    _qemu_proc_valgrind_log "${VALGRIND_LOGFILE}" $RETVAL
-+    return $RETVAL
- }
- 
- export QEMU=_qemu_wrapper
+ # Using snapshot=on together with read-only=on
 -- 
 1.8.3.1
 
