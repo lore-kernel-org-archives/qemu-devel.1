@@ -4,78 +4,76 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39BF4C76188
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 11:45:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AEF8EC76188
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 11:46:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 041DC20873
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 11:45:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 041DC20873
+	by mail.kernel.org (Postfix) with ESMTPS id 870A620873
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 11:46:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 870A620873
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44172 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44182 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hoRKW-0006sh-7o
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 07:45:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41093)
+	id 1hoRKw-0007s2-Ir
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 07:46:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41215)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <pbonzini@redhat.com>) id 1hoRKL-0006U4-Lv
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 07:45:30 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1hoRKj-0007K5-Cg
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 07:45:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1hoRKK-0000r7-OC
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 07:45:29 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:34263)
+ (envelope-from <pbonzini@redhat.com>) id 1hoRKi-000172-Cm
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 07:45:53 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:38962)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hoRKK-0000oo-IN
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 07:45:28 -0400
-Received: by mail-wm1-f66.google.com with SMTP id w9so23548662wmd.1
- for <qemu-devel@nongnu.org>; Fri, 19 Jul 2019 04:45:28 -0700 (PDT)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hoRKi-00016R-5x
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 07:45:52 -0400
+Received: by mail-wm1-f67.google.com with SMTP id u25so18380661wmc.4
+ for <qemu-devel@nongnu.org>; Fri, 19 Jul 2019 04:45:52 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=jSIQ1t6pUoKe0wLYlN85oMJsWpQGfI0C6f44vHE/H2Y=;
- b=mMz+2ZBg1K+9xnDmvBr3cETUK6sXJV0hafJSGfX17IZPIdpRybBRH1ufWAoKdgkJb2
- zORAHJI+fpDl84/zaxcnLeXwol7s+OoIhMOoaFaek2IsBdV9020/0wDUkTKug0oKh7P7
- f/OwYXWQ3efzds7obY/IQauHmDpe5NbSY7AIxsKUmZ5Acj5zwBh0xJc/kOz1ttnXw6Wv
- aVUADsJXDp2819Lv15RlbDyq1SLM2lyJ1ljofO3vbtDeTeMIHa+mZQ7qXbIoieMDMlJY
- SpX4J3vHRdawDETihCoX48mqu1giGNPXHz6qlWY2eNZFPUdA4+Rx9xltYpCRDd9gDzWA
- MBGw==
-X-Gm-Message-State: APjAAAWrMqxw5r/Klt5kAOtK127yuAk0JtoVbjJvFPTldzMTUjmJJmJO
- grNlMSa/cJVaj4OGfvc/ntMSlw==
-X-Google-Smtp-Source: APXvYqwMRDIXznGrzat00PvxaJY3nFQp3NaFE0X3qVc8BhTZzF9pHiroOH+l/HBx276WFA21RmF7KA==
-X-Received: by 2002:a1c:968c:: with SMTP id
- y134mr45271871wmd.122.1563536727295; 
- Fri, 19 Jul 2019 04:45:27 -0700 (PDT)
+ bh=ic/Zh/DiGrt51Nn2Kyvkv205FonItVi+cVwsMddKFrE=;
+ b=T2GK8/FSqbYBpLqJ7QIYfPLj/1Xi5e1EBAebKhb8HOLCO0E2TTDUrETLBE+e0idF0w
+ MFv+Bq7ROkWMVXydapQ6Ld3umfLwmO95Hm14NUPad66VCIK8QrZLCW7dH4SQaF2o+MMC
+ FISA/qcPw48MKWDNag0MQX9AKWQTEDtJYXfRCM2xeWlTcmXKuG7vfaj0fOCjkCoiGcDN
+ AV8yna3cac+AETyO2RmhlV1mwVWJrNENkqCZl3bJ2gsaj2/EL3HP6CKjZ0Inx6n9CtFp
+ PLeJFgaIRlafHtTrpvtwZVQZOAOCsCmIrKnFIeUVjB80Y5y6hGwDOh0qnZsQcyoK30rc
+ hU3Q==
+X-Gm-Message-State: APjAAAVqi/U3xNxQGLOG4T8OZj0oysXSXCfeGdQ2aFLPl6fYTvqWB9RE
+ lqr5r34hq+92b/iJSCUTzw+5rg==
+X-Google-Smtp-Source: APXvYqwsLveD9UIUX/Ov9HgKXcrJUGRX5n+falgajfqCNtDq5M+gO3IWOpu2Jk5Pv85yvT6qcVevtQ==
+X-Received: by 2002:a05:600c:214e:: with SMTP id
+ v14mr49363175wml.96.1563536751122; 
+ Fri, 19 Jul 2019 04:45:51 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:8501:6b03:f18c:74f8?
  ([2001:b07:6468:f312:8501:6b03:f18c:74f8])
- by smtp.gmail.com with ESMTPSA id 2sm37086038wrn.29.2019.07.19.04.45.26
+ by smtp.gmail.com with ESMTPSA id v5sm32485452wre.50.2019.07.19.04.45.50
  (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Fri, 19 Jul 2019 04:45:26 -0700 (PDT)
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20190719112315.14432-1-philmd@redhat.com>
+ Fri, 19 Jul 2019 04:45:50 -0700 (PDT)
+To: Jiri Slaby <jslaby@suse.cz>, qemu-trivial@nongnu.org
+References: <20190719104118.17735-1-jslaby@suse.cz>
 From: Paolo Bonzini <pbonzini@redhat.com>
 Openpgp: preference=signencrypt
-Message-ID: <1f5ee7a6-d78c-8d60-40ef-68032d7ef923@redhat.com>
-Date: Fri, 19 Jul 2019 13:45:26 +0200
+Message-ID: <c5487d32-f3b8-8534-fe19-3c7aef7188eb@redhat.com>
+Date: Fri, 19 Jul 2019 13:45:50 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190719112315.14432-1-philmd@redhat.com>
+In-Reply-To: <20190719104118.17735-1-jslaby@suse.cz>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.128.66
-Subject: Re: [Qemu-devel] [RFC PATCH-for-4.1] target/i386: Correct misplaced
- break statement in gen_shiftd_rm_T1()
+X-Received-From: 209.85.128.67
+Subject: Re: [Qemu-devel] [PATCH] target/i386: sev: fix failed message typos
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,51 +85,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: Tom Lendacky <thomas.lendacky@amd.com>,
+ Brijesh Singh <brijesh.singh@amd.com>, qemu-devel@nongnu.org,
+ Eduardo Habkost <ehabkost@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 19/07/19 13:23, Philippe Mathieu-Daudé wrote:
-> Reported by GCC9 when building with CFLAG -Wimplicit-fallthrough=2:
+On 19/07/19 12:41, Jiri Slaby wrote:
+> In these multiline messages, there were typos. Fix them -- add a missing
+> space and remove a superfluous apostrophe.
 > 
->     CC      target/i386/translate.o
->   target/i386/translate.c: In function ‘gen_shiftd_rm_T1’:
->   target/i386/translate.c:1785:12: error: this statement may fall through [-Werror=implicit-fallthrough=]
->    1785 |         if (is_right) {
->         |            ^
->   target/i386/translate.c:1810:5: note: here
->    1810 |     default:
->         |     ^~~~~~~
->   cc1: all warnings being treated as errors
+> Inspired by Tom's patch.
 > 
-> Fixes: f437d0a3c24
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> Signed-off-by: Jiri Slaby <jslaby@suse.cz>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Richard Henderson <rth@twiddle.net>
+> Cc: Eduardo Habkost <ehabkost@redhat.com>
+> Cc: qemu-trivial@nongnu.org
+> Cc: Brijesh Singh <brijesh.singh@amd.com>
+> Cc: Tom Lendacky <thomas.lendacky@amd.com>
 > ---
->  target/i386/translate.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  target/i386/sev.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 > 
-> diff --git a/target/i386/translate.c b/target/i386/translate.c
-> index 03150a86e2..4b2b5937ca 100644
-> --- a/target/i386/translate.c
-> +++ b/target/i386/translate.c
-> @@ -1805,8 +1805,8 @@ static void gen_shiftd_rm_T1(DisasContext *s, TCGMemOp ot, int op1,
->              tcg_gen_shri_i64(s->tmp0, s->tmp0, 32);
->              tcg_gen_shri_i64(s->T0, s->T0, 32);
->          }
-> -        break;
->  #endif
-> +        break;
->      default:
->          tcg_gen_subi_tl(s->tmp0, count, 1);
->          if (is_right) {
+> diff --git a/target/i386/sev.c b/target/i386/sev.c
+> index 5ba1384ea1f6..f1423cb0c0d1 100644
+> --- a/target/i386/sev.c
+> +++ b/target/i386/sev.c
+> @@ -763,7 +763,7 @@ sev_guest_init(const char *id)
+>                                          "reduced-phys-bits", NULL);
+>      if (s->reduced_phys_bits < 1) {
+>          error_report("%s: reduced_phys_bits check failed, it should be >=1,"
+> -                     "' requested '%d'", __func__, s->reduced_phys_bits);
+> +                     " requested '%d'", __func__, s->reduced_phys_bits);
+>          goto err;
+>      }
+>  
+> @@ -783,7 +783,7 @@ sev_guest_init(const char *id)
+>      ret = sev_platform_ioctl(s->sev_fd, SEV_PLATFORM_STATUS, &status,
+>                               &fw_error);
+>      if (ret) {
+> -        error_report("%s: failed to get platform status ret=%d"
+> +        error_report("%s: failed to get platform status ret=%d "
+>                       "fw_error='%d: %s'", __func__, ret, fw_error,
+>                       fw_error_to_str(fw_error));
+>          goto err;
 > 
 
-I haven't looked closely at the code but I would guess that the
-fallthrough is intended, because the default label has an "ot == MO_16"
-condition.
-
-It certainly needs more comments... :(
+Queued, thanks.
 
 Paolo
 
