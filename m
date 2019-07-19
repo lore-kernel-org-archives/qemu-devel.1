@@ -2,59 +2,78 @@ Return-Path: <SRS0=mHy3=VQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BAAFC76188
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 11:23:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3E9EC76188
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 11:41:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 52DD72173B
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 11:23:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 52DD72173B
+	by mail.kernel.org (Postfix) with ESMTPS id A9F0D20873
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 11:41:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9F0D20873
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44110 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44152 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hoQz8-0007mR-5R
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 07:23:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37117)
+	id 1hoRGd-0004xH-Qz
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 07:41:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40459)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hoQyy-0007Nj-Kp
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 07:23:25 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1hoRGS-0004YY-Kz
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 07:41:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hoQyx-0006v4-MA
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 07:23:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40426)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hoQyx-0006uI-HE
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 07:23:23 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A39AF308620E;
- Fri, 19 Jul 2019 11:23:22 +0000 (UTC)
-Received: from x1w.redhat.com (unknown [10.40.205.153])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 6640564037;
- Fri, 19 Jul 2019 11:23:18 +0000 (UTC)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Fri, 19 Jul 2019 13:23:15 +0200
-Message-Id: <20190719112315.14432-1-philmd@redhat.com>
+ (envelope-from <pbonzini@redhat.com>) id 1hoRGR-0006Wj-9o
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 07:41:28 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:39496)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hoRGR-0006W6-3V
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 07:41:27 -0400
+Received: by mail-wm1-f67.google.com with SMTP id u25so18368268wmc.4
+ for <qemu-devel@nongnu.org>; Fri, 19 Jul 2019 04:41:26 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=2scEJYKpuY9wEwtDzlbHd5bZy8XbHD8Qvjd8QA6omHw=;
+ b=QCqe0++tkpvCa2mwV40cwXIu4n95v/jsAx0B9nKPVisilTYtg2/c7V0/B/BGMrTXks
+ fqLZW07mZeR1AHWM0mEpyz5hPQBCiODXWheEasvvxMj7bQdD/vVWrpALvKRW+F3Nv8nt
+ rU4TX3nutG+/TZ7T7LbBu4QeKHzVdzhOvj7Jh+/iT1rNZAub4oLh7BqAWWGTeOMgQ4Dq
+ xZNTfpTlihEilGZ435AIrTZLZWREupdx1JL8xnNSOH2KO5U7weLjmljnqG5cOyJsoW3H
+ aswRPLeqJ+7jSHK7d7Dn32xdjDAC00ajZtUFu/lLdOyHMgjmJm7qgnm6y9ZnV+XINxcK
+ Sytw==
+X-Gm-Message-State: APjAAAUe/CRLCdz9d7ZSFVWVkYUsqdfFU/A/xTdD1sWVL26dcat27BA/
+ y9G5VEMW5Z/LOk52sm8YUv46dA==
+X-Google-Smtp-Source: APXvYqxMHH6msKbBzM1AW3wRXscDuml3xKA446Ih1+E/0fKPhYmXYRV3H0eQycVcxuA6Uauz4bpEmQ==
+X-Received: by 2002:a1c:a8d7:: with SMTP id r206mr48215988wme.47.1563536485991; 
+ Fri, 19 Jul 2019 04:41:25 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:8501:6b03:f18c:74f8?
+ ([2001:b07:6468:f312:8501:6b03:f18c:74f8])
+ by smtp.gmail.com with ESMTPSA id y10sm26094328wmj.2.2019.07.19.04.41.24
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Fri, 19 Jul 2019 04:41:24 -0700 (PDT)
+To: "Denis V. Lunev" <den@openvz.org>, qemu-devel@nongnu.org
+References: <20190719111222.14943-1-den@openvz.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <065e5788-3dc5-4ec9-237b-60541baf8a3a@redhat.com>
+Date: Fri, 19 Jul 2019 13:41:23 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.42]); Fri, 19 Jul 2019 11:23:22 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20190719111222.14943-1-den@openvz.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [RFC PATCH-for-4.1] target/i386: Correct misplaced
- break statement in gen_shiftd_rm_T1()
+ [fuzzy]
+X-Received-From: 209.85.128.67
+Subject: Re: [Qemu-devel] [PATCH 1/1] i386: indicate that 'pconfig' feature
+ was removed intentionally
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,49 +85,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Reported by GCC9 when building with CFLAG -Wimplicit-fallthrough=3D2:
+On 19/07/19 13:12, Denis V. Lunev wrote:
+> pconfig feature was added in 5131dc433df and removed in 712f807e196.
+> This patch mark this feature as known to QEMU and removed by
+> intentinally. This follows the convention of 9ccb9784b57 and f1a23522b03
+> dealing with 'osxsave' and 'ospke'.
+> 
+> Signed-off-by: Denis V. Lunev <den@openvz.org>
+> CC: Paolo Bonzini <pbonzini@redhat.com>
+> CC: Richard Henderson <rth@twiddle.net>
+> CC: Eduardo Habkost <ehabkost@redhat.com>
+> ---
+>  target/i386/cpu.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index 88ba4dad47..b801f56354 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -1083,7 +1083,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
+>              NULL, NULL, NULL, NULL,
+>              NULL, NULL, "md-clear", NULL,
+>              NULL, NULL, NULL, NULL,
+> -            NULL, NULL, NULL, NULL,
+> +            NULL, NULL, NULL /* pconfig */, NULL,
+>              NULL, NULL, NULL, NULL,
+>              NULL, NULL, "spec-ctrl", "stibp",
+>              NULL, "arch-capabilities", "core-capability", "ssbd",
+> 
 
-    CC      target/i386/translate.o
-  target/i386/translate.c: In function =E2=80=98gen_shiftd_rm_T1=E2=80=99=
-:
-  target/i386/translate.c:1785:12: error: this statement may fall through=
- [-Werror=3Dimplicit-fallthrough=3D]
-   1785 |         if (is_right) {
-        |            ^
-  target/i386/translate.c:1810:5: note: here
-   1810 |     default:
-        |     ^~~~~~~
-  cc1: all warnings being treated as errors
+Queued, thanks.
 
-Fixes: f437d0a3c24
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- target/i386/translate.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/target/i386/translate.c b/target/i386/translate.c
-index 03150a86e2..4b2b5937ca 100644
---- a/target/i386/translate.c
-+++ b/target/i386/translate.c
-@@ -1805,8 +1805,8 @@ static void gen_shiftd_rm_T1(DisasContext *s, TCGMe=
-mOp ot, int op1,
-             tcg_gen_shri_i64(s->tmp0, s->tmp0, 32);
-             tcg_gen_shri_i64(s->T0, s->T0, 32);
-         }
--        break;
- #endif
-+        break;
-     default:
-         tcg_gen_subi_tl(s->tmp0, count, 1);
-         if (is_right) {
---=20
-2.20.1
-
+Paolo
 
