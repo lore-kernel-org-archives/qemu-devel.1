@@ -2,65 +2,63 @@ Return-Path: <SRS0=mHy3=VQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59B01C7618F
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 01:31:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD104C76195
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 01:49:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2C20F2173B
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 01:31:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C20F2173B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 851442085A
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 01:49:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 851442085A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41824 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41880 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hoHk1-0004BA-Ek
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jul 2019 21:31:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52733)
+	id 1hoI1w-00014z-OP
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jul 2019 21:49:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57912)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <yan.y.zhao@intel.com>) id 1hoHjl-0003jF-Jp
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 21:31:07 -0400
+ (envelope-from <guoheyi@huawei.com>) id 1hoI1m-0000bM-0B
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 21:49:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yan.y.zhao@intel.com>) id 1hoHjk-0001wy-3r
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 21:31:05 -0400
-Received: from mga09.intel.com ([134.134.136.24]:65119)
+ (envelope-from <guoheyi@huawei.com>) id 1hoI1k-0006fD-NG
+ for qemu-devel@nongnu.org; Thu, 18 Jul 2019 21:49:41 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:58568 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yan.y.zhao@intel.com>)
- id 1hoHjj-0001wL-RS
- for qemu-devel@nongnu.org; Thu, 18 Jul 2019 21:31:04 -0400
-X-Amp-Result: UNSCANNABLE
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
- by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 18 Jul 2019 18:31:02 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,280,1559545200"; d="scan'208";a="343552153"
-Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
- ([10.239.13.9])
- by orsmga005.jf.intel.com with ESMTP; 18 Jul 2019 18:30:58 -0700
-Date: Thu, 18 Jul 2019 21:24:56 -0400
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: Kirti Wankhede <kwankhede@nvidia.com>
-Message-ID: <20190719012456.GG8912@joy-OptiPlex-7040>
-References: <1562665760-26158-1-git-send-email-kwankhede@nvidia.com>
- <1562665760-26158-12-git-send-email-kwankhede@nvidia.com>
- <20190712003328.GF9176@joy-OptiPlex-7040>
- <70fd135d-4719-e39c-09fe-d5a012520ea8@nvidia.com>
+ (Exim 4.71) (envelope-from <guoheyi@huawei.com>)
+ id 1hoI1h-0006Wv-O1; Thu, 18 Jul 2019 21:49:38 -0400
+Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.58])
+ by Forcepoint Email with ESMTP id 946D830309C0A785A41F;
+ Fri, 19 Jul 2019 09:49:28 +0800 (CST)
+Received: from [127.0.0.1] (10.133.216.73) by DGGEMS401-HUB.china.huawei.com
+ (10.3.19.201) with Microsoft SMTP Server id 14.3.439.0; Fri, 19 Jul 2019
+ 09:49:22 +0800
+To: Dave Martin <Dave.Martin@arm.com>, Mark Rutland <mark.rutland@arm.com>
+References: <1b0aa6b2-80b1-a72e-6849-7323c3b9c6bc@huawei.com>
+ <20190715134059.GJ2790@e103592.cambridge.arm.com>
+ <20190715134848.GI56232@lakrids.cambridge.arm.com>
+ <4daefb19-6c15-f82c-31e9-1ae035d45bd5@arm.com>
+ <20190715144446.GK56232@lakrids.cambridge.arm.com>
+ <20190716084734.GL2790@e103592.cambridge.arm.com>
+From: Guoheyi <guoheyi@huawei.com>
+Message-ID: <287f566e-7697-3763-56b8-eb4821bd8347@huawei.com>
+Date: Fri, 19 Jul 2019 09:49:22 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <70fd135d-4719-e39c-09fe-d5a012520ea8@nvidia.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 134.134.136.24
-Subject: Re: [Qemu-devel] [PATCH v7 11/13] vfio: Add function to get dirty
- page list
+In-Reply-To: <20190716084734.GL2790@e103592.cambridge.arm.com>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.133.216.73]
+X-CFilter-Loop: Reflected
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 45.249.212.32
+Subject: Re: [Qemu-devel] [RFC] Add virtual SDEI support in qemu
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,222 +70,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>, "Tian,
- Kevin" <kevin.tian@intel.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
- "cjia@nvidia.com" <cjia@nvidia.com>,
- "eskultet@redhat.com" <eskultet@redhat.com>, "Yang,
- Ziye" <ziye.yang@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "cohuck@redhat.com" <cohuck@redhat.com>,
- "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
- "dgilbert@redhat.com" <dgilbert@redhat.com>, "Wang,
- Zhi A" <zhi.a.wang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
- "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>,
- "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
- "eauger@redhat.com" <eauger@redhat.com>,
- "felipe@nutanix.com" <felipe@nutanix.com>,
- "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "Liu,
- Changpeng" <changpeng.liu@intel.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, qemu-devel@nongnu.org,
+ qemu-arm@nongnu.org, James Morse <james.morse@arm.com>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jul 19, 2019 at 02:39:10AM +0800, Kirti Wankhede wrote:
-> 
-> 
-> On 7/12/2019 6:03 AM, Yan Zhao wrote:
-> > On Tue, Jul 09, 2019 at 05:49:18PM +0800, Kirti Wankhede wrote:
-> >> Dirty page tracking (.log_sync) is part of RAM copying state, where
-> >> vendor driver provides the bitmap of pages which are dirtied by vendor
-> >> driver through migration region and as part of RAM copy, those pages
-> >> gets copied to file stream.
-> >>
-> >> To get dirty page bitmap:
-> >> - write start address, page_size and pfn count.
-> >> - read count of pfns copied.
-> >>     - Vendor driver should return 0 if driver doesn't have any page to
-> >>       report dirty in given range.
-> >>     - Vendor driver should return -1 to mark all pages dirty for given range.
-> >> - read data_offset, where vendor driver has written bitmap.
-> >> - read bitmap from the region or mmaped part of the region.
-> >> - Iterate above steps till page bitmap for all requested pfns are copied.
-> >>
-> >> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> >> Reviewed-by: Neo Jia <cjia@nvidia.com>
-> >> ---
-> >>  hw/vfio/migration.c           | 123 ++++++++++++++++++++++++++++++++++++++++++
-> >>  hw/vfio/trace-events          |   1 +
-> >>  include/hw/vfio/vfio-common.h |   2 +
-> >>  3 files changed, 126 insertions(+)
-> >>
-> >> diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
-> >> index 5fb4c5329ede..ca1a8c0f5f1f 100644
-> >> --- a/hw/vfio/migration.c
-> >> +++ b/hw/vfio/migration.c
-> >> @@ -269,6 +269,129 @@ static int vfio_load_device_config_state(QEMUFile *f, void *opaque)
-> >>      return qemu_file_get_error(f);
-> >>  }
-> >>  
-> >> +void vfio_get_dirty_page_list(VFIODevice *vbasedev,
-> >> +                              uint64_t start_pfn,
-> >> +                              uint64_t pfn_count,
-> >> +                              uint64_t page_size)
-> >> +{
-> >> +    VFIOMigration *migration = vbasedev->migration;
-> >> +    VFIORegion *region = &migration->region.buffer;
-> >> +    uint64_t count = 0;
-> >> +    int64_t copied_pfns = 0;
-> >> +    int64_t total_pfns = pfn_count;
-> >> +    int ret;
-> >> +
-> >> +    qemu_mutex_lock(&migration->lock);
-> >> +
-> >> +    while (total_pfns > 0) {
-> >> +        uint64_t bitmap_size, data_offset = 0;
-> >> +        uint64_t start = start_pfn + count;
-> >> +        void *buf = NULL;
-> >> +        bool buffer_mmaped = false;
-> >> +
-> >> +        ret = pwrite(vbasedev->fd, &start, sizeof(start),
-> >> +                 region->fd_offset + offsetof(struct vfio_device_migration_info,
-> >> +                                              start_pfn));
-> >> +        if (ret < 0) {
-> >> +            error_report("%s: Failed to set dirty pages start address %d %s",
-> >> +                         vbasedev->name, ret, strerror(errno));
-> >> +            goto dpl_unlock;
-> >> +        }
-> >> +
-> >> +        ret = pwrite(vbasedev->fd, &page_size, sizeof(page_size),
-> >> +                 region->fd_offset + offsetof(struct vfio_device_migration_info,
-> >> +                                              page_size));
-> >> +        if (ret < 0) {
-> >> +            error_report("%s: Failed to set dirty page size %d %s",
-> >> +                         vbasedev->name, ret, strerror(errno));
-> >> +            goto dpl_unlock;
-> >> +        }
-> >> +
-> >> +        ret = pwrite(vbasedev->fd, &total_pfns, sizeof(total_pfns),
-> >> +                 region->fd_offset + offsetof(struct vfio_device_migration_info,
-> >> +                                              total_pfns));
-> >> +        if (ret < 0) {
-> >> +            error_report("%s: Failed to set dirty page total pfns %d %s",
-> >> +                         vbasedev->name, ret, strerror(errno));
-> >> +            goto dpl_unlock;
-> >> +        }
-> >> +
-> >> +        /* Read copied dirty pfns */
-> >> +        ret = pread(vbasedev->fd, &copied_pfns, sizeof(copied_pfns),
-> >> +                region->fd_offset + offsetof(struct vfio_device_migration_info,
-> >> +                                             copied_pfns));
-> >> +        if (ret < 0) {
-> >> +            error_report("%s: Failed to get dirty pages bitmap count %d %s",
-> >> +                         vbasedev->name, ret, strerror(errno));
-> >> +            goto dpl_unlock;
-> >> +        }
-> >> +
-> >> +        if (copied_pfns == VFIO_DEVICE_DIRTY_PFNS_NONE) {
-> >> +            /*
-> >> +             * copied_pfns could be 0 if driver doesn't have any page to
-> >> +             * report dirty in given range
-> >> +             */
-> >> +            break;
-> >> +        } else if (copied_pfns == VFIO_DEVICE_DIRTY_PFNS_ALL) {
-> >> +            /* Mark all pages dirty for this range */
-> >> +            cpu_physical_memory_set_dirty_range(start_pfn * page_size,
-> >> +                                                pfn_count * page_size,
-> >> +                                                DIRTY_MEMORY_MIGRATION);
-> > seesm pfn_count here is not right
-> 
-> Changing it to total_pfns in next version
+Thanks for all your comments. I'm going to write a simple demo to go 
+through the whole workflow first, and then adjust the policies following 
+the conclusions of our discussion.
+
+Heyi
+
+
+On 2019/7/16 16:47, Dave Martin wrote:
+> On Mon, Jul 15, 2019 at 03:44:46PM +0100, Mark Rutland wrote:
+>> On Mon, Jul 15, 2019 at 03:26:39PM +0100, James Morse wrote:
+>>> On 15/07/2019 14:48, Mark Rutland wrote:
+>>>> On Mon, Jul 15, 2019 at 02:41:00PM +0100, Dave Martin wrote:
+>>>>> One option (suggested to me by James Morse) would be to allow userspace
+>>>>> to disable in the in-kernel PSCI implementation and provide its own
+>>>>> PSCI to the guest via SMC -- in which case userspace that wants to
+>>>>> implement SDEI would have to implement PSCI as well.
+>>>> I think this would be the best approach, since it puts userspace in
+>>>> charge of everything.
+>>>>
+>>>> However, this interacts poorly with FW-based mitigations that we
+>>>> implement in hyp. I suspect we'd probably need a mechanism to delegate
+>>>> that responsibility back to the kernel, and figure out if that has any
+>>>> interaction with thigns that got punted to userspace...
+>>> This has come up before:
+>>> https://lore.kernel.org/r/59C139D0.3040507@arm.com
+>>>
+>>> I agree Qemu should opt-in to this, it needs to be a feature that is enabled.
+>>>
+>>> I had an early version of something like this for testing SDEI before
+>>> there was firmware available. The review feedback from Christoffer was
+>>> that it should include HVC and SMC, their immediates, and shouldn't be
+>>> tied to SMC-CC ranges.
+>>>
+>>> I think this should be a catch-all as Heyi describes to deliver
+>>> 'unhandled SMC/HVC' to user-space as hypercall exits. We should
+>>> include the immediate in the struct.
+>>>
+>>> We can allow Qemu to disable the in-kernel PSCI implementation, which
+>>> would let it be done in user-space via this catch-all mechanism. (PSCI
+>>> in user-space has come up on another thread recently). The in-kernel
+>>> PSCI needs to be default-on for backwards compatibility.
+>>>
+>>> As Mark points out, the piece that's left is the 'arch workaround'
+>>> stuff. We always need to handle these in the kernel. I don't think
+>>> these should be routed-back, they should be un-obtainable by
+>>> user-space.
+>> Sure; I meant that those should be handled in the kernel rather than
+>> going to host userspace and back.
+>>
+>> I was suggesting was that userspace would opt into taking ownership of
+>> all HVC calls, then explicitly opt-in to the kernel handling specific
+>> (sets of) calls.
+> The most logical thing to do would be to have userspace handle all
+> calls, but add an ioctl to forward a call to KVM.  This puts userspace
+> in charge of the SMCCC interface, with KVM handling only those things
+> that userspace can't do for itself, on request.
 >
-if it's total_pfns, then it cannot be in the loop, right?
+> If the performance overhead is unacceptable for certain calls, we could
+> have a way to delegate specific function IDs to KVM.  I suspect that
+> will be the exception rather than the rule.
+>
+>> There are probably issues with that, but I suspect defining "all
+>> undandled calls" will be problematic otherwise.
+> Agreed: the set of calls not handled by KVM will mutate over time.
+>
+> Cheers
+> ---Dave
+>
+> .
+>
 
-Thanks
-Yan
 
-> Thanks,
-> Kirti
-> 
-> >> +            break;
-> >> +        }
-> >> +
-> >> +        bitmap_size = (BITS_TO_LONGS(copied_pfns) + 1) * sizeof(unsigned long);
-> >> +
-> >> +        ret = pread(vbasedev->fd, &data_offset, sizeof(data_offset),
-> >> +                region->fd_offset + offsetof(struct vfio_device_migration_info,
-> >> +                                             data_offset));
-> >> +        if (ret != sizeof(data_offset)) {
-> >> +            error_report("%s: Failed to get migration buffer data offset %d",
-> >> +                         vbasedev->name, ret);
-> >> +            goto dpl_unlock;
-> >> +        }
-> >> +
-> >> +        if (region->mmaps) {
-> >> +            buf = find_data_region(region, data_offset, bitmap_size);
-> >> +        }
-> >> +
-> >> +        buffer_mmaped = (buf != NULL) ? true : false;
-> >> +
-> >> +        if (!buffer_mmaped) {
-> >> +            buf = g_try_malloc0(bitmap_size);
-> >> +            if (!buf) {
-> >> +                error_report("%s: Error allocating buffer ", __func__);
-> >> +                goto dpl_unlock;
-> >> +            }
-> >> +
-> >> +            ret = pread(vbasedev->fd, buf, bitmap_size,
-> >> +                        region->fd_offset + data_offset);
-> >> +            if (ret != bitmap_size) {
-> >> +                error_report("%s: Failed to get dirty pages bitmap %d",
-> >> +                             vbasedev->name, ret);
-> >> +                g_free(buf);
-> >> +                goto dpl_unlock;
-> >> +            }
-> >> +        }
-> >> +
-> >> +        cpu_physical_memory_set_dirty_lebitmap((unsigned long *)buf,
-> >> +                                               (start_pfn + count) * page_size,
-> >> +                                                copied_pfns);
-> >> +        count      += copied_pfns;
-> >> +        total_pfns -= copied_pfns;
-> >> +
-> >> +        if (!buffer_mmaped) {
-> >> +            g_free(buf);
-> >> +        }
-> >> +    }
-> >> +
-> >> +    trace_vfio_get_dirty_page_list(vbasedev->name, start_pfn, pfn_count,
-> >> +                                   page_size);
-> >> +
-> >> +dpl_unlock:
-> >> +    qemu_mutex_unlock(&migration->lock);
-> >> +}
-> >> +
-> >>  /* ---------------------------------------------------------------------- */
-> >>  
-> >>  static int vfio_save_setup(QEMUFile *f, void *opaque)
-> >> diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
-> >> index ac065b559f4e..414a5e69ec5e 100644
-> >> --- a/hw/vfio/trace-events
-> >> +++ b/hw/vfio/trace-events
-> >> @@ -160,3 +160,4 @@ vfio_save_complete_precopy(char *name) " (%s)"
-> >>  vfio_load_device_config_state(char *name) " (%s)"
-> >>  vfio_load_state(char *name, uint64_t data) " (%s) data 0x%"PRIx64
-> >>  vfio_load_state_device_data(char *name, uint64_t data_offset, uint64_t data_size) " (%s) Offset 0x%"PRIx64" size 0x%"PRIx64
-> >> +vfio_get_dirty_page_list(char *name, uint64_t start, uint64_t pfn_count, uint64_t page_size) " (%s) start 0x%"PRIx64" pfn_count 0x%"PRIx64 " page size 0x%"PRIx64
-> >> diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-> >> index a022484d2636..dc1b83a0b4ef 100644
-> >> --- a/include/hw/vfio/vfio-common.h
-> >> +++ b/include/hw/vfio/vfio-common.h
-> >> @@ -222,5 +222,7 @@ int vfio_spapr_remove_window(VFIOContainer *container,
-> >>  
-> >>  int vfio_migration_probe(VFIODevice *vbasedev, Error **errp);
-> >>  void vfio_migration_finalize(VFIODevice *vbasedev);
-> >> +void vfio_get_dirty_page_list(VFIODevice *vbasedev, uint64_t start_pfn,
-> >> +                               uint64_t pfn_count, uint64_t page_size);
-> >>  
-> >>  #endif /* HW_VFIO_VFIO_COMMON_H */
-> >> -- 
-> >> 2.7.0
-> >>
 
