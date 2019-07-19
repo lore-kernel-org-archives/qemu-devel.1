@@ -7,80 +7,79 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF1DDC7618F
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 21:03:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2916DC76195
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 21:04:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A9D2F2184E
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 21:03:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E634A21873
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 21:04:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Gty7Py4F"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9D2F2184E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LwrPwGfV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E634A21873
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48140 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48150 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hoa2Z-0003e3-IZ
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 17:03:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54872)
+	id 1hoa2x-00051g-MF
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 17:04:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54917)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1hoa2O-0003Ep-VV
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 17:03:34 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1hoa2b-0003sl-28
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 17:03:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1hoa2N-00055N-GI
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 17:03:32 -0400
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:37903)
+ (envelope-from <richard.henderson@linaro.org>) id 1hoa2T-00057Q-3J
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 17:03:40 -0400
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:33017)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1hoa2N-00054h-6x
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 17:03:31 -0400
-Received: by mail-pg1-x542.google.com with SMTP id f5so6143368pgu.5
- for <qemu-devel@nongnu.org>; Fri, 19 Jul 2019 14:03:30 -0700 (PDT)
+ id 1hoa2P-00056B-JJ
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 17:03:36 -0400
+Received: by mail-pg1-x541.google.com with SMTP id f20so5741421pgj.0
+ for <qemu-devel@nongnu.org>; Fri, 19 Jul 2019 14:03:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=uNqQ9lhJM4Cw6pjXD4tcjNYk/0atel4QP7/6xSx+c1w=;
- b=Gty7Py4FM4Nsvd3jQBFJqDSQcOAjlbFD2IJZxj2B+rmYnb7PgsR5ubdG7dmPuvDbi5
- ibwpK8dI9V3spLzHMwiBj2zPDuWQEUkKpGaVroazWfpNfbC+WJYelBz1MZHQdloccLIP
- ZXV4zwpkPkdUnXYnnhTr3JZy6NIRtQBOv8CNtiKefiEAxD4PYmn7mlfgZKxjkw3XQcew
- rNeZbiaIRKXm54wnHf0dQW41TpagJu5HBgnlF7Ym4kXtax3KrLfe0nUZbzVaLiTa5ODk
- /O/pkHQkJ7FaUvSqrJf1nxBwagnTg7wZe61AgHznBE6RCTbcXWKxu87nBPUyDp+dK+4Y
- VRdQ==
+ bh=zxhBjUulQ9FFgklbf9F4cLZlo9yovsz2XVLX6+vkXRQ=;
+ b=LwrPwGfVpePr7CnrTaBZmKz4f/6rDQP/wL82oeyt+1i2SpnEJce8y8/q5rSbPTxhh/
+ 7eNit/fM3tSNgTqva4gKob/vFe2fKQDzzKUP8wc29tKptrP+bWnx96EILlzVP0Pz3FPT
+ j30xzgbPlH50CMF0a3pN+WRMCDDORt9qb6gQUjOVNZ3qFQrImM7NQqm49PQDFohGsvw0
+ GjZTwyYUQmyHeKiXWCrOrFBkpj+GNQfLmrwpTUbZzLNQIS1Qd3okftXJnaxSSHk26kog
+ cB1OItj0TvXUHM7akuVJhuRoa0xd+7aorbpwYv81L1qU6huAY5XgL3r+kpRegbKmPOqP
+ pOGA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=uNqQ9lhJM4Cw6pjXD4tcjNYk/0atel4QP7/6xSx+c1w=;
- b=ekwsdgCIp8SgGR5dRSaY40wxhYUG4fo8SKUtTiXa8niER6YXUknmiEpjbowS2CHRhm
- oZeJUIR7CKcViai+JWAEGoUQrT330pRQKhN0S7QFNf1hpo7IjWxQ1nKCC/ILzyO37nDh
- mFL0HFkguxdxy+bVz4OufIPxS2Z17cRu6HDO1OMiBnwtNyZ2gal2wUpgKUTimmYTza15
- fXduldIDcTFFeui5mszgd6rEe7eS+ZCBUM/+485umycioDwiAmWVRvJbixtgdOr5y8oT
- Hy8ds3F7y/59a0agkN1yZ6ppEgD0Aab3tgkuKrSQeKHvZJA7m5BBUX7yBHoBlpmSVUHc
- ZuiQ==
-X-Gm-Message-State: APjAAAUK5pMrP//WLZqukB7nWI2PWxTldq7V0Q5ECdlB/XgxSxviiR77
- G4Vu61pZqIjL75slPMjiaBje9ahStt0=
-X-Google-Smtp-Source: APXvYqww+GhM8TFvzkeyjkCsxT45cumUAro9ZB6CRFGyNYOaFgsbCeCWp1Ba9ZGdgpVhSZX2H/Niuw==
-X-Received: by 2002:a17:90a:a116:: with SMTP id
- s22mr59569583pjp.47.1563570209719; 
- Fri, 19 Jul 2019 14:03:29 -0700 (PDT)
+ bh=zxhBjUulQ9FFgklbf9F4cLZlo9yovsz2XVLX6+vkXRQ=;
+ b=BXrDVzokP2fmR3qMtvgGhhYTf3+UcUePuj6YwbLBOClt761TGvAIt+cHlXh3K43Pno
+ 1zFq0xB00jaEhnC1ckepdb7vuguLy7+RhOaqzYJJ+bPJBxWxbd76FMRheq2A1MZ02uCa
+ vfy90jYLKMRElH7BZvNqzgw4Ltky4fjbCynb9m9lc6CJ4N7ftlqSpBIt0Q9w5xH+6+nu
+ FsTYKjyTpqBZ7np4d/xA/MLO/vDMV1zFYqfAX2A3B3Wmo23/HneAIMTeWY9KMh0AHAiO
+ OqT/wgAlvU5qmE8MhZ8Awj/gyXZKsQwqQrhxp4JCxTwz/qLn3UmFwSPz/Dxqm2RM5NJ/
+ mhZA==
+X-Gm-Message-State: APjAAAU8zl6NIJNaw8BTx0N6CQyN5sjHWnPjQgdOYRStLe1Ej1fxjRJw
+ 8gas2gjphlrosGXibEI5qEFajVfj9jo=
+X-Google-Smtp-Source: APXvYqyhN6kIscumBmerT6cQUwNXbjwcP1H//mzYXObdyK2H9PH0fnAuM2gWL8ENjtH9kKn/qdo4IQ==
+X-Received: by 2002:a63:3009:: with SMTP id w9mr57576659pgw.260.1563570212151; 
+ Fri, 19 Jul 2019 14:03:32 -0700 (PDT)
 Received: from localhost.localdomain (97-126-117-207.tukw.qwest.net.
  [97.126.117.207])
- by smtp.gmail.com with ESMTPSA id i6sm32724751pgi.40.2019.07.19.14.03.28
+ by smtp.gmail.com with ESMTPSA id i6sm32724751pgi.40.2019.07.19.14.03.31
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Fri, 19 Jul 2019 14:03:29 -0700 (PDT)
+ Fri, 19 Jul 2019 14:03:31 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Fri, 19 Jul 2019 14:03:03 -0700
-Message-Id: <20190719210326.15466-2-richard.henderson@linaro.org>
+Date: Fri, 19 Jul 2019 14:03:05 -0700
+Message-Id: <20190719210326.15466-4-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190719210326.15466-1-richard.henderson@linaro.org>
 References: <20190719210326.15466-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::542
-Subject: [Qemu-devel] [PATCH for-4.2 01/24] cputlb: Add
- tlb_set_asid_for_mmuidx
+X-Received-From: 2607:f8b0:4864:20::541
+Subject: [Qemu-devel] [PATCH for-4.2 03/24] target/arm: Install ASIDs for
+ long-form from EL1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,127 +96,148 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Although we can't do much with ASIDs except remember them, this
-will allow cleanups within target/ that should make things clearer.
+In addition to providing the core with the current ASID, this minimizes
+both the number of flushes due to non-changing ASID as well as the set
+of mmu_idx that are affected by each flush.
+
+In particular, updates to the secure mode registers flushes only the
+relevant secure mode mmu_idx's, and similarly non-secure updates only
+affect non-secure mmu_idx's.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-
 ---
-v2: Assert cpu_is_self; only flush idx w/ asid mismatch.
----
- include/exec/cpu-all.h  | 11 +++++++++++
- include/exec/cpu-defs.h |  2 ++
- include/exec/exec-all.h | 19 +++++++++++++++++++
- accel/tcg/cputlb.c      | 26 ++++++++++++++++++++++++++
- 4 files changed, 58 insertions(+)
+ target/arm/helper.c | 73 +++++++++++++++++++++++++++++----------------
+ 1 file changed, 48 insertions(+), 25 deletions(-)
 
-diff --git a/include/exec/cpu-all.h b/include/exec/cpu-all.h
-index 536ea58f81..40b140cbba 100644
---- a/include/exec/cpu-all.h
-+++ b/include/exec/cpu-all.h
-@@ -439,4 +439,15 @@ static inline CPUTLB *env_tlb(CPUArchState *env)
-     return &env_neg(env)->tlb;
- }
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 20f8728be1..0f21a077de 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -3327,6 +3327,36 @@ static const ARMCPRegInfo pmsav5_cp_reginfo[] = {
+     REGINFO_SENTINEL
+ };
  
-+/**
-+ * cpu_tlb(env)
-+ * @cpu: The generic CPUState
-+ *
-+ * Return the CPUTLB state associated with the cpu.
-+ */
-+static inline CPUTLB *cpu_tlb(CPUState *cpu)
++/* Called after a change to any of TTBR*_EL1 or TTBCR_EL1.  */
++static void update_lpae_el1_asid(CPUARMState *env, int secure)
 +{
-+    return &cpu_neg(cpu)->tlb;
++    CPUState *cs = env_cpu(env);
++    uint64_t ttbr0, ttbr1, ttcr;
++    int asid, idxmask;
++
++    switch (secure) {
++    case ARM_CP_SECSTATE_S:
++        ttbr0 = env->cp15.ttbr0_s;
++        ttbr1 = env->cp15.ttbr1_s;
++        ttcr = env->cp15.tcr_el[3].raw_tcr;
++        /* Note that cp15.ttbr0_s == cp15.ttbr0_el[3], so S1E3 is affected.  */
++        /* ??? Secure EL3 really using the ASID field?  Doesn't make sense.  */
++        idxmask = ARMMMUIdxBit_S1SE1 | ARMMMUIdxBit_S1SE0 | ARMMMUIdxBit_S1E3;
++        break;
++    case ARM_CP_SECSTATE_NS:
++        ttbr0 = env->cp15.ttbr0_ns;
++        ttbr1 = env->cp15.ttbr1_ns;
++        ttcr = env->cp15.tcr_el[1].raw_tcr;
++        idxmask = ARMMMUIdxBit_S12NSE1 | ARMMMUIdxBit_S12NSE0;
++        break;
++    default:
++        g_assert_not_reached();
++    }
++    asid = extract64(ttcr & TTBCR_A1 ? ttbr1 : ttbr0, 48, 16);
++
++    tlb_set_asid_for_mmuidx(cs, asid, idxmask, 0);
 +}
 +
- #endif /* CPU_ALL_H */
-diff --git a/include/exec/cpu-defs.h b/include/exec/cpu-defs.h
-index 9bc713a70b..73584841c0 100644
---- a/include/exec/cpu-defs.h
-+++ b/include/exec/cpu-defs.h
-@@ -169,6 +169,8 @@ typedef struct CPUTLBDesc {
-     size_t n_used_entries;
-     /* The next index to use in the tlb victim table.  */
-     size_t vindex;
-+    /* The current ASID for this tlb.  */
-+    uint32_t asid;
-     /* The tlb victim table, in two parts.  */
-     CPUTLBEntry vtable[CPU_VTLB_SIZE];
-     CPUIOTLBEntry viotlb[CPU_VTLB_SIZE];
-diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
-index 16034ee651..9c77aa5bf9 100644
---- a/include/exec/exec-all.h
-+++ b/include/exec/exec-all.h
-@@ -225,6 +225,21 @@ void tlb_flush_by_mmuidx_all_cpus(CPUState *cpu, uint16_t idxmap);
-  * depend on when the guests translation ends the TB.
-  */
- void tlb_flush_by_mmuidx_all_cpus_synced(CPUState *cpu, uint16_t idxmap);
-+/**
-+ * tlb_set_asid_for_mmuidx:
-+ * @cpu: Originating cpu
-+ * @asid: Address Space Identifier
-+ * @idxmap: bitmap of MMU indexes to set to @asid
-+ * @depmap: bitmap of dependent MMU indexes
-+ *
-+ * Set an ASID for all of @idxmap.  If any previous ASID was different,
-+ * then we will flush the mmu idx.  If a flush is required, then also flush
-+ * all dependent mmu indicies in @depmap.  This latter is typically used
-+ * for secondary page resolution, for implementing virtualization within
-+ * the guest.
-+ */
-+void tlb_set_asid_for_mmuidx(CPUState *cpu, uint32_t asid,
-+                             uint16_t idxmap, uint16_t dep_idxmap);
- /**
-  * tlb_set_page_with_attrs:
-  * @cpu: CPU to add this TLB entry for
-@@ -310,6 +325,10 @@ static inline void tlb_flush_by_mmuidx_all_cpus_synced(CPUState *cpu,
-                                                        uint16_t idxmap)
+ static void vmsa_ttbcr_raw_write(CPUARMState *env, const ARMCPRegInfo *ri,
+                                  uint64_t value)
  {
- }
-+static inline void tlb_set_asid_for_mmuidx(CPUState *cpu, uint32_t asid,
-+                                           uint16_t idxmap, uint16_t depmap)
-+{
-+}
- #endif
+@@ -3363,18 +3393,16 @@ static void vmsa_ttbcr_raw_write(CPUARMState *env, const ARMCPRegInfo *ri,
+ static void vmsa_ttbcr_write(CPUARMState *env, const ARMCPRegInfo *ri,
+                              uint64_t value)
+ {
+-    ARMCPU *cpu = env_archcpu(env);
+     TCR *tcr = raw_ptr(env, ri);
  
- #define CODE_GEN_ALIGN           16 /* must be >= of the size of a icache line */
-diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
-index bb9897b25a..c68f57755b 100644
---- a/accel/tcg/cputlb.c
-+++ b/accel/tcg/cputlb.c
-@@ -540,6 +540,32 @@ void tlb_flush_page_all_cpus_synced(CPUState *src, target_ulong addr)
-     tlb_flush_page_by_mmuidx_all_cpus_synced(src, addr, ALL_MMUIDX_BITS);
+-    if (arm_feature(env, ARM_FEATURE_LPAE)) {
+-        /* With LPAE the TTBCR could result in a change of ASID
+-         * via the TTBCR.A1 bit, so do a TLB flush.
+-         */
+-        tlb_flush(CPU(cpu));
+-    }
+     /* Preserve the high half of TCR_EL1, set via TTBCR2.  */
+     value = deposit64(tcr->raw_tcr, 0, 32, value);
+     vmsa_ttbcr_raw_write(env, ri, value);
++
++    if (arm_feature(env, ARM_FEATURE_LPAE)) {
++        /* The A1 bit controls which ASID is active.  */
++        update_lpae_el1_asid(env, ri->secure);
++    }
  }
  
-+void tlb_set_asid_for_mmuidx(CPUState *cpu, uint32_t asid, uint16_t idxmap,
-+                             uint16_t depmap)
-+{
-+    CPUTLB *tlb = cpu_tlb(cpu);
-+    uint16_t work, to_flush = 0;
-+
-+    /* It doesn't make sense to set context across cpus.  */
-+    assert_cpu_is_self(cpu);
-+
-+    /*
-+     * We don't support ASIDs except for trivially.
-+     * If there is any change, then we must flush the TLB.
-+     */
-+    for (work = idxmap; work != 0; work &= work - 1) {
-+        int mmu_idx = ctz32(work);
-+        if (tlb->d[mmu_idx].asid != asid) {
-+            tlb->d[mmu_idx].asid = asid;
-+            to_flush |= 1 << mmu_idx;
-+        }
+ static void vmsa_ttbcr_reset(CPUARMState *env, const ARMCPRegInfo *ri)
+@@ -3392,24 +3420,19 @@ static void vmsa_ttbcr_reset(CPUARMState *env, const ARMCPRegInfo *ri)
+ static void vmsa_tcr_el1_write(CPUARMState *env, const ARMCPRegInfo *ri,
+                                uint64_t value)
+ {
+-    ARMCPU *cpu = env_archcpu(env);
+-    TCR *tcr = raw_ptr(env, ri);
+-
+-    /* For AArch64 the A1 bit could result in a change of ASID, so TLB flush. */
+-    tlb_flush(CPU(cpu));
+-    tcr->raw_tcr = value;
++    raw_write(env, ri, value);
++    /* The A1 bit controls which ASID is active.  */
++    update_lpae_el1_asid(env, ri->secure);
+ }
+ 
+-static void vmsa_ttbr_write(CPUARMState *env, const ARMCPRegInfo *ri,
+-                            uint64_t value)
++static void vmsa_ttbr_el1_write(CPUARMState *env, const ARMCPRegInfo *ri,
++                                uint64_t value)
+ {
+-    /* If the ASID changes (with a 64-bit write), we must flush the TLB.  */
+-    if (cpreg_field_is_64bit(ri) &&
+-        extract64(raw_read(env, ri) ^ value, 48, 16) != 0) {
+-        ARMCPU *cpu = env_archcpu(env);
+-        tlb_flush(CPU(cpu));
+-    }
+     raw_write(env, ri, value);
++    if (cpreg_field_is_64bit(ri)) {
++        /* The LPAE format (64-bit write) contains an ASID field.  */
++        update_lpae_el1_asid(env, ri->secure);
 +    }
-+    if (to_flush) {
-+        to_flush |= depmap;
-+        tlb_flush_by_mmuidx_async_work(cpu, RUN_ON_CPU_HOST_INT(to_flush));
-+    }
-+}
-+
- /* update the TLBs so that writes to code in the virtual page 'addr'
-    can be detected */
- void tlb_protect_code(ram_addr_t ram_addr)
+ }
+ 
+ static void vttbr_write(CPUARMState *env, const ARMCPRegInfo *ri,
+@@ -3455,12 +3478,12 @@ static const ARMCPRegInfo vmsa_cp_reginfo[] = {
+       .fieldoffset = offsetof(CPUARMState, cp15.esr_el[1]), .resetvalue = 0, },
+     { .name = "TTBR0_EL1", .state = ARM_CP_STATE_BOTH,
+       .opc0 = 3, .opc1 = 0, .crn = 2, .crm = 0, .opc2 = 0,
+-      .access = PL1_RW, .writefn = vmsa_ttbr_write, .resetvalue = 0,
++      .access = PL1_RW, .writefn = vmsa_ttbr_el1_write, .resetvalue = 0,
+       .bank_fieldoffsets = { offsetof(CPUARMState, cp15.ttbr0_s),
+                              offsetof(CPUARMState, cp15.ttbr0_ns) } },
+     { .name = "TTBR1_EL1", .state = ARM_CP_STATE_BOTH,
+       .opc0 = 3, .opc1 = 0, .crn = 2, .crm = 0, .opc2 = 1,
+-      .access = PL1_RW, .writefn = vmsa_ttbr_write, .resetvalue = 0,
++      .access = PL1_RW, .writefn = vmsa_ttbr_el1_write, .resetvalue = 0,
+       .bank_fieldoffsets = { offsetof(CPUARMState, cp15.ttbr1_s),
+                              offsetof(CPUARMState, cp15.ttbr1_ns) } },
+     { .name = "TCR_EL1", .state = ARM_CP_STATE_AA64,
+@@ -3715,12 +3738,12 @@ static const ARMCPRegInfo lpae_cp_reginfo[] = {
+       .access = PL1_RW, .type = ARM_CP_64BIT | ARM_CP_ALIAS,
+       .bank_fieldoffsets = { offsetof(CPUARMState, cp15.ttbr0_s),
+                              offsetof(CPUARMState, cp15.ttbr0_ns) },
+-      .writefn = vmsa_ttbr_write, },
++      .writefn = vmsa_ttbr_el1_write, },
+     { .name = "TTBR1", .cp = 15, .crm = 2, .opc1 = 1,
+       .access = PL1_RW, .type = ARM_CP_64BIT | ARM_CP_ALIAS,
+       .bank_fieldoffsets = { offsetof(CPUARMState, cp15.ttbr1_s),
+                              offsetof(CPUARMState, cp15.ttbr1_ns) },
+-      .writefn = vmsa_ttbr_write, },
++      .writefn = vmsa_ttbr_el1_write, },
+     REGINFO_SENTINEL
+ };
+ 
 -- 
 2.17.1
 
