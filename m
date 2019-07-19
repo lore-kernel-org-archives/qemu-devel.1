@@ -2,52 +2,50 @@ Return-Path: <SRS0=mHy3=VQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12FC5C76195
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 09:41:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 726ECC76188
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 09:42:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DEEA121849
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 09:41:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DEEA121849
+	by mail.kernel.org (Postfix) with ESMTPS id 4ADEF21849
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 09:42:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4ADEF21849
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43544 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43550 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hoPOo-0007d8-6q
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 05:41:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41243)
+	id 1hoPOz-0008Uq-K6
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 05:42:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41245)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1hoPND-0000PY-NE
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 05:40:20 -0400
+ (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1hoPND-0000PZ-OA
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 05:40:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1hoPNC-00085l-CV
+ (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1hoPNC-00085g-Ce
  for qemu-devel@nongnu.org; Fri, 19 Jul 2019 05:40:19 -0400
-Received: from relay.sw.ru ([185.231.240.75]:57176)
+Received: from relay.sw.ru ([185.231.240.75]:57164)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1hoPNA-0007vj-CG; Fri, 19 Jul 2019 05:40:18 -0400
+ id 1hoPNA-0007vg-Bl; Fri, 19 Jul 2019 05:40:18 -0400
 Received: from [172.16.25.136] (helo=localhost.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92)
  (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1hoPN5-0004GH-Fl; Fri, 19 Jul 2019 12:40:11 +0300
+ id 1hoPN4-0004GH-JB; Fri, 19 Jul 2019 12:40:10 +0300
 From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 To: qemu-devel@nongnu.org,
 	qemu-block@nongnu.org
-Date: Fri, 19 Jul 2019 12:39:59 +0300
-Message-Id: <1563529204-3368-3-git-send-email-andrey.shinkevich@virtuozzo.com>
+Date: Fri, 19 Jul 2019 12:39:57 +0300
+Message-Id: <1563529204-3368-1-git-send-email-andrey.shinkevich@virtuozzo.com>
 X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1563529204-3368-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-References: <1563529204-3368-1-git-send-email-andrey.shinkevich@virtuozzo.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 185.231.240.75
-Subject: [Qemu-devel] [PATCH v4 2/7] iotests: exclude killed processes from
- running under Valgrind
+Subject: [Qemu-devel] [PATCH v4 0/7] Allow Valgrind checking all QEMU
+ processes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,96 +63,68 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
- The Valgrind tool fails to manage its termination when QEMU raises the
- signal SIGKILL in the multi-threaded process. The bug has been
- reported to the Valgrind maintainers and was registered as Bug 409141.
- Let's exclude such test cases from running under the Valgrind until
- new release of it because checking for the memory issues is covered by
- other test cases.
+In the current implementation of the QEMU bash iotests, only qemu-io
+processes may be run under the Valgrind, which is a useful tool for
+finding memory usage issues. Let's allow the common.rc bash script
+runing all the QEMU processes, such as qemu-kvm, qemu-img, qemu-ndb
+and qemu-vxhs, under the Valgrind tool.
 
-Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
----
- tests/qemu-iotests/039 | 5 +++++
- tests/qemu-iotests/061 | 2 ++
- tests/qemu-iotests/137 | 1 +
- 3 files changed, 8 insertions(+)
+v4:
+  01: The patch "iotests: Set read-zeroes on in null block driver for Valgrind"
+      was extended with new cases and issued as a separate series.
+  02: The new patch "block/nbd: NBDReply is used being uninitialized" was
+      added to resolve the failure of the iotest 083 run under Valgrind.
 
-diff --git a/tests/qemu-iotests/039 b/tests/qemu-iotests/039
-index 0d4e963..95115e2 100755
---- a/tests/qemu-iotests/039
-+++ b/tests/qemu-iotests/039
-@@ -65,6 +65,7 @@ echo "== Creating a dirty image file =="
- IMGOPTS="compat=1.1,lazy_refcounts=on"
- _make_test_img $size
- 
-+VALGRIND_QEMU="" \
- $QEMU_IO -c "write -P 0x5a 0 512" \
-          -c "sigraise $(kill -l KILL)" "$TEST_IMG" 2>&1 \
-     | _filter_qemu_io
-@@ -100,6 +101,7 @@ echo "== Opening a dirty image read/write should repair it =="
- IMGOPTS="compat=1.1,lazy_refcounts=on"
- _make_test_img $size
- 
-+VALGRIND_QEMU="" \
- $QEMU_IO -c "write -P 0x5a 0 512" \
-          -c "sigraise $(kill -l KILL)" "$TEST_IMG" 2>&1 \
-     | _filter_qemu_io
-@@ -118,6 +120,7 @@ echo "== Creating an image file with lazy_refcounts=off =="
- IMGOPTS="compat=1.1,lazy_refcounts=off"
- _make_test_img $size
- 
-+VALGRIND_QEMU="" \
- $QEMU_IO -c "write -P 0x5a 0 512" \
-          -c "sigraise $(kill -l KILL)" "$TEST_IMG" 2>&1 \
-     | _filter_qemu_io
-@@ -151,6 +154,7 @@ echo "== Changing lazy_refcounts setting at runtime =="
- IMGOPTS="compat=1.1,lazy_refcounts=off"
- _make_test_img $size
- 
-+VALGRIND_QEMU="" \
- $QEMU_IO -c "reopen -o lazy-refcounts=on" \
-          -c "write -P 0x5a 0 512" \
-          -c "sigraise $(kill -l KILL)" "$TEST_IMG" 2>&1 \
-@@ -163,6 +167,7 @@ _check_test_img
- IMGOPTS="compat=1.1,lazy_refcounts=on"
- _make_test_img $size
- 
-+VALGRIND_QEMU="" \
- $QEMU_IO -c "reopen -o lazy-refcounts=off" \
-          -c "write -P 0x5a 0 512" \
-          -c "sigraise $(kill -l KILL)" "$TEST_IMG" 2>&1 \
-diff --git a/tests/qemu-iotests/061 b/tests/qemu-iotests/061
-index d7dbd7e..5d0724c 100755
---- a/tests/qemu-iotests/061
-+++ b/tests/qemu-iotests/061
-@@ -73,6 +73,7 @@ echo
- echo "=== Testing dirty version downgrade ==="
- echo
- IMGOPTS="compat=1.1,lazy_refcounts=on" _make_test_img 64M
-+VALGRIND_QEMU="" \
- $QEMU_IO -c "write -P 0x2a 0 128k" -c flush \
-          -c "sigraise $(kill -l KILL)" "$TEST_IMG" 2>&1 | _filter_qemu_io
- $PYTHON qcow2.py "$TEST_IMG" dump-header
-@@ -107,6 +108,7 @@ echo
- echo "=== Testing dirty lazy_refcounts=off ==="
- echo
- IMGOPTS="compat=1.1,lazy_refcounts=on" _make_test_img 64M
-+VALGRIND_QEMU="" \
- $QEMU_IO -c "write -P 0x2a 0 128k" -c flush \
-          -c "sigraise $(kill -l KILL)" "$TEST_IMG" 2>&1 | _filter_qemu_io
- $PYTHON qcow2.py "$TEST_IMG" dump-header
-diff --git a/tests/qemu-iotests/137 b/tests/qemu-iotests/137
-index 0c3d2a1..a442fc8 100755
---- a/tests/qemu-iotests/137
-+++ b/tests/qemu-iotests/137
-@@ -130,6 +130,7 @@ echo
- 
- # Whether lazy-refcounts was actually enabled can easily be tested: Check if
- # the dirty bit is set after a crash
-+VALGRIND_QEMU="" \
- $QEMU_IO \
-     -c "reopen -o lazy-refcounts=on,overlap-check=blubb" \
-     -c "write -P 0x5a 0 512" \
+v3:
+  01: The new function _casenotrun() was added to the common.rc bash
+      script to notify the user of test cases dropped for some reason.
+      Suggested by Kevin.
+      Particularly, the notification about the nonexistent TMPDIR in
+      the test 051 was added (noticed by Vladimir).
+  02: The timeout in some test cases was extended for Valgrind because
+      it differs when running on the ramdisk.
+  03: Due to the common.nbd script has been changed with the commit
+      b28f582c, the patch "iotests: amend QEMU NBD process synchronization"
+      is actual no more. Note that QEMU_NBD is launched in the bash nested
+      shell in the _qemu_nbd_wrapper() as it was before in common.rc.
+  04: The patch "iotests: new file to suppress Valgrind errors" was dropped
+      due to my superficial understanding of the work of the function
+      blk_pread_unthrottled(). Special thanks to Kevin who shed the light
+      on the null block driver involved. Now, the parameter 'read-zeroes=on'
+      is passed to the null block driver to initialize the buffer in the
+      function guess_disk_lchs() that the Valgrind was complaining to.
+
+v2:
+  01: The patch 2/7 of v1 was merged into the patch 1/7, suggested by Daniel.
+  02: Another patch 7/7 was added to introduce the Valgrind error suppression
+      file into the QEMU project.
+  Discussed in the email thread with the message ID:
+  <1560276131-683243-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+
+Andrey Shinkevich (7):
+  iotests: allow Valgrind checking all QEMU processes
+  iotests: exclude killed processes from running under Valgrind
+  iotests: Add casenotrun report to bash tests
+  iotests: Valgrind fails with nonexistent directory
+  iotests: extended timeout under Valgrind
+  iotests: extend sleeping time under Valgrind
+  block/nbd: NBDReply is used being uninitialized
+
+ block/nbd.c                  |  2 +-
+ tests/qemu-iotests/028       |  6 +++-
+ tests/qemu-iotests/039       |  5 +++
+ tests/qemu-iotests/039.out   | 30 +++--------------
+ tests/qemu-iotests/051       |  4 +++
+ tests/qemu-iotests/061       |  2 ++
+ tests/qemu-iotests/061.out   | 12 ++-----
+ tests/qemu-iotests/137       |  1 +
+ tests/qemu-iotests/137.out   |  6 +---
+ tests/qemu-iotests/183       |  9 +++++-
+ tests/qemu-iotests/192       |  6 +++-
+ tests/qemu-iotests/247       |  6 +++-
+ tests/qemu-iotests/common.rc | 76 +++++++++++++++++++++++++++++++++-----------
+ 13 files changed, 102 insertions(+), 63 deletions(-)
+
 -- 
 1.8.3.1
 
