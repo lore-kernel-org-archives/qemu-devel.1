@@ -8,71 +8,71 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4837C76188
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 13:38:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E219FC76188
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 13:38:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AEFDC2173B
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 13:38:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B3EEE2173B
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 13:38:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YtfmgL6E"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AEFDC2173B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tS4v0DwI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3EEE2173B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45514 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45516 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hoT5i-0004m0-Mx
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 09:38:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37983)
+	id 1hoT5k-0004uP-NJ
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 09:38:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38321)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mehta.aaru20@gmail.com>) id 1hoT44-0005WX-CB
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 09:36:49 -0400
+ (envelope-from <mehta.aaru20@gmail.com>) id 1hoT4u-00017u-Al
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 09:37:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mehta.aaru20@gmail.com>) id 1hoT43-0007yf-AG
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 09:36:48 -0400
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:43668)
+ (envelope-from <mehta.aaru20@gmail.com>) id 1hoT4t-0008SS-7D
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 09:37:40 -0400
+Received: from mail-pf1-x430.google.com ([2607:f8b0:4864:20::430]:40282)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <mehta.aaru20@gmail.com>)
- id 1hoT43-0007xZ-50; Fri, 19 Jul 2019 09:36:47 -0400
-Received: by mail-pg1-x544.google.com with SMTP id f25so14478922pgv.10;
- Fri, 19 Jul 2019 06:36:47 -0700 (PDT)
+ id 1hoT4t-0008SC-1c; Fri, 19 Jul 2019 09:37:39 -0400
+Received: by mail-pf1-x430.google.com with SMTP id p184so14199538pfp.7;
+ Fri, 19 Jul 2019 06:37:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=bjo2OWZfzDM9JJnmfjwrjNDcJFN5qjeOYd8x/VH9dn4=;
- b=YtfmgL6EVs4cIdUfApLpU9UVJmn/kViasswwuBr5/mCCBMVCxBgDesYII6g+CelUI1
- E105mcJc/wnPAnRscwLPzdyf4S0XLkoG5w2AKTZnoF24cXzPlOk+c2deFhnf0Vh5p/1l
- VqZU62PRrd/uKwPyrFZcICPXPU9mOYAm93ng1kUJo41wC0kaWPT1B1Gm/7rU9cNrzwWG
- 5u93qIpiIwRo7ht+1iCz9eZJUHMNFvxVV1LqmAUh/v3y99OV96zEq/L2Fx9V0+F9mkSn
- 6T0aoMijRwV6g67XEVcXVpvJv/iNMT+TnVV3gVzXKQ4bDNOBfffQXlK3hUhcqj13VNK6
- rZ/w==
+ bh=KoETR8gbApZFB6Kf1iN1u5XLfMfWWkdp70lAnElXhFE=;
+ b=tS4v0DwIrfckzCnKQhKODmlgbm9yI+OnX4k0xAkb9F37S1WciI8RjE54iLsFanH9yz
+ v1aeGP8ND5yZ6G52EEEEmiVbyLNlaXfqEJmcyGJQmxoMyBKIGxd6FX1hqk4rjKeGz7WM
+ RJx2bgYZs2WV0GbExGJXSj0TEw5A9sr9C8yIrUbeIYKxz8DUvSbVigRX8Mm9DIN9G6ie
+ +W78S0wAYZxOmGDYXZSVoJhVMG/YrZwOFaZQh6dWBOMiMRu7VWvT6FZcWDbW+CIsxkH8
+ 7mHehJZxosiQtvkDvhT1Zfn4lPItX4ic0cHaK/wy2j4owi1A+3IuYs3Ud1RfNtj6WR99
+ CLOA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=bjo2OWZfzDM9JJnmfjwrjNDcJFN5qjeOYd8x/VH9dn4=;
- b=SJWSZ/v9mWwzW1CQ9I9x5AQt/VU/NB5ywWYB4+SE03L76K5+W9cnJajoSGL3roxGxI
- UrW83whDKNsib3lKs4lApQgLLAPFSYDePdDd7vR3kUtiM6rbX+4V250OtsvHv9HkYzbm
- 32Sh0ZlwCu/QAi8/B/T7Dws6wUJ9S9vsJfEMNa4tYBQJG6PI4qtjk4e3P231Mp7QOs2w
- fJMKKq5puYyTTr+LPwBy8PcEIsRhWXNpdT0OVz7jnOxVoC/6KIYlIYWXOkM7xXiGJbLm
- 5htI7lTm4fYNjKC8Ls4zCKfWL+IYNsJqyHX1reePn+eTjhRMqNo/1p91bxIKCAAi7fUM
- LHFw==
-X-Gm-Message-State: APjAAAVEHbNAUDpxNBrtK7GeJr4zud9DqWe8Zy8GMiukhSaUIaTpB6QV
- fT+gzPdOUB9n1gyOOHxkdhRgcJSe6XY=
-X-Google-Smtp-Source: APXvYqyUfa9pMF6XOkSiy63obYqEWrnFYKRKn+5h7bjYRH6kBfbCRRXqY0teZvL/ZhIH9U+JLDc/8A==
-X-Received: by 2002:a17:90a:a407:: with SMTP id
- y7mr58002370pjp.97.1563543404186; 
- Fri, 19 Jul 2019 06:36:44 -0700 (PDT)
+ bh=KoETR8gbApZFB6Kf1iN1u5XLfMfWWkdp70lAnElXhFE=;
+ b=uAg6lKPYiEwAAxL2OKuZE4YJ/BdLgyT+qWdB3V6eUBRXUlwzJA4DRylNMW4R8s8G3C
+ 4hm6+Ic166LKcfq7l7+3h89oe4Uw25egleYHxyN0inA/QHk4NF7s0rALQKBvJOiR+UoB
+ L2KmOZUByqaDyxslP6O/7NeJDuwdYCY8qGrYsSMX42Iy3gaLsBUcgvhhcpE7kpUyc2wm
+ nEslIzKgU6rt3EGrwKd0D0Lo8u03FoQiwpvqERhjl/k2cUsuivKAJ3tZhS/Ssks0D79w
+ KF9V0FyE4bpFJ9zQ2WuYzZ1mL+AJT3nY7lGFgLkj1WE2l9t2oTnSuZtqwLHziMIFcIn6
+ q79g==
+X-Gm-Message-State: APjAAAXT245hkMg/RFO4KpEJ6NNLnxBIIG+MxeIgnDRSGbo6NsSSnMl+
+ zCobag5sW5AFrROoEw/7zbjeesWYioA=
+X-Google-Smtp-Source: APXvYqw5yPGWPRUDnVgNShffPjJypAR5ePskvPixEBVLEKOW8OWXZUwj1glJPxqHYLaaAGgKvXPddw==
+X-Received: by 2002:a17:90b:28f:: with SMTP id
+ az15mr57151975pjb.18.1563543457774; 
+ Fri, 19 Jul 2019 06:37:37 -0700 (PDT)
 Received: from localhost.localdomain ([2402:3a80:433:31a4:f2fb:dab8:3a89:c056])
- by smtp.gmail.com with ESMTPSA id 11sm31895369pfw.33.2019.07.19.06.36.37
+ by smtp.gmail.com with ESMTPSA id 11sm31895369pfw.33.2019.07.19.06.37.31
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Fri, 19 Jul 2019 06:36:43 -0700 (PDT)
+ Fri, 19 Jul 2019 06:37:37 -0700 (PDT)
 From: Aarushi Mehta <mehta.aaru20@gmail.com>
 To: qemu-devel@nongnu.org
-Date: Fri, 19 Jul 2019 19:05:23 +0530
-Message-Id: <20190719133530.28688-8-mehta.aaru20@gmail.com>
+Date: Fri, 19 Jul 2019 19:05:30 +0530
+Message-Id: <20190719133530.28688-15-mehta.aaru20@gmail.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190719133530.28688-1-mehta.aaru20@gmail.com>
 References: <20190719133530.28688-1-mehta.aaru20@gmail.com>
@@ -80,8 +80,9 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::544
-Subject: [Qemu-devel] [PATCH v6 07/14] blockdev: accept io_uring as option
+X-Received-From: 2607:f8b0:4864:20::430
+Subject: [Qemu-devel] [PATCH v6 14/14] qemu-iotest: enable testing with
+ qemu-io aio options
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,39 +107,94 @@ Sender: "Qemu-devel"
 
 Signed-off-by: Aarushi Mehta <mehta.aaru20@gmail.com>
 ---
- blockdev.c | 12 ++++--------
- 1 file changed, 4 insertions(+), 8 deletions(-)
+ tests/qemu-iotests/check     | 14 +++++++++++++-
+ tests/qemu-iotests/common.rc | 10 ++++++++++
+ 2 files changed, 23 insertions(+), 1 deletion(-)
 
-diff --git a/blockdev.c b/blockdev.c
-index 4d141e9a1f..695b3a803b 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -383,13 +383,9 @@ static void extract_common_blockdev_options(QemuOpts *opts, int *bdrv_flags,
-         }
+diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
+index f925606cc5..2bc5bc62e2 100755
+--- a/tests/qemu-iotests/check
++++ b/tests/qemu-iotests/check
+@@ -132,6 +132,7 @@ sortme=false
+ expunge=true
+ have_test_arg=false
+ cachemode=false
++aiomode=false
  
-         if ((aio = qemu_opt_get(opts, "aio")) != NULL) {
--            if (!strcmp(aio, "native")) {
--                *bdrv_flags |= BDRV_O_NATIVE_AIO;
--            } else if (!strcmp(aio, "threads")) {
--                /* this is the default */
--            } else {
--               error_setg(errp, "invalid aio option");
--               return;
-+            if (bdrv_parse_aio(aio, bdrv_flags) < 0) {
-+                error_setg(errp, "invalid aio option");
-+                return;
-             }
-         }
-     }
-@@ -4574,7 +4570,7 @@ QemuOptsList qemu_common_drive_opts = {
-         },{
-             .name = "aio",
-             .type = QEMU_OPT_STRING,
--            .help = "host AIO implementation (threads, native)",
-+            .help = "host AIO implementation (threads, native, io_uring)",
-         },{
-             .name = BDRV_OPT_CACHE_WB,
-             .type = QEMU_OPT_BOOL,
+ tmp="${TEST_DIR}"/$$
+ rm -f $tmp.list $tmp.tmp $tmp.sed
+@@ -141,6 +142,7 @@ export IMGFMT_GENERIC=true
+ export IMGPROTO=file
+ export IMGOPTS=""
+ export CACHEMODE="writeback"
++export AIOMODE="threads"
+ export QEMU_IO_OPTIONS=""
+ export QEMU_IO_OPTIONS_NO_FMT=""
+ export CACHEMODE_IS_DEFAULT=true
+@@ -225,6 +227,10 @@ s/ .*//p
+         CACHEMODE_IS_DEFAULT=false
+         cachemode=false
+         continue
++    elif $aiomode
++    then
++        AIOMODE="$r"
++        aiomode=false
+     fi
+ 
+     xpand=true
+@@ -269,6 +275,7 @@ other options
+     -n                  show me, do not run tests
+     -o options          -o options to pass to qemu-img create/convert
+     -c mode             cache mode
++    -i mode             AIO mode
+     -makecheck          pretty print output for make check
+ 
+ testlist options
+@@ -433,10 +440,13 @@ testlist options
+             cachemode=true
+             xpand=false
+             ;;
++        -i)
++            aiomode=true
++            xpand=false
++            ;;
+         -T)        # deprecated timestamp option
+             xpand=false
+             ;;
+-
+         -v)
+             verbose=true
+             xpand=false
+@@ -515,6 +525,8 @@ done
+ 
+ # Set qemu-io cache mode with $CACHEMODE we have
+ QEMU_IO_OPTIONS="$QEMU_IO_OPTIONS --cache $CACHEMODE"
++# Set qemu-io aio mode with $AIOMODE we have
++QEMU_IO_OPTIONS="$QEMU_IO_OPTIONS --aio $AIOMODE"
+ 
+ QEMU_IO_OPTIONS_NO_FMT="$QEMU_IO_OPTIONS"
+ if [ "$IMGOPTSSYNTAX" != "true" ]; then
+diff --git a/tests/qemu-iotests/common.rc b/tests/qemu-iotests/common.rc
+index 5502c3da2f..39c04cc169 100644
+--- a/tests/qemu-iotests/common.rc
++++ b/tests/qemu-iotests/common.rc
+@@ -482,6 +482,16 @@ _supported_cache_modes()
+     _notrun "not suitable for cache mode: $CACHEMODE"
+ }
+ 
++_supported_aio_modes()
++{
++    for mode; do
++        if [ "$mode" = "$AIOMODE" ]; then
++            return
++        fi
++    done
++    _notrun "not suitable for aio mode: $AIOMODE"
++}
++
+ _default_cache_mode()
+ {
+     if $CACHEMODE_IS_DEFAULT; then
 -- 
 2.21.0
 
