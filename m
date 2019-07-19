@@ -4,60 +4,60 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94CF8C7618F
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 18:33:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49016C7618F
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 19:36:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 712662085A
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 18:33:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 712662085A
+	by mail.kernel.org (Postfix) with ESMTPS id 1D26621849
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 19:36:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D26621849
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47554 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47644 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hoXhB-00089X-Iu
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 14:33:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38464)
+	id 1hoYgQ-0007a3-Rr
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 15:36:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42641)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgilbert@redhat.com>) id 1hoXgm-0007pm-8a
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 14:33:10 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1hoYgF-0007BN-QY
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 15:36:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1hoXga-000434-Ro
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 14:32:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38716)
+ (envelope-from <dgilbert@redhat.com>) id 1hoYgE-0007zU-E0
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 15:36:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47854)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hoXgX-0003wB-AE
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 14:32:50 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hoYgD-0007uB-Qu
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 15:36:34 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A67303082120;
- Fri, 19 Jul 2019 18:32:39 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id C8DB18F91B;
+ Fri, 19 Jul 2019 18:41:31 +0000 (UTC)
 Received: from work-vm (ovpn-117-245.ams2.redhat.com [10.36.117.245])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B075A5B6A5;
- Fri, 19 Jul 2019 18:32:38 +0000 (UTC)
-Date: Fri, 19 Jul 2019 19:32:36 +0100
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id F044D4FFDF;
+ Fri, 19 Jul 2019 18:41:30 +0000 (UTC)
+Date: Fri, 19 Jul 2019 19:41:28 +0100
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 To: Wei Yang <richardw.yang@linux.intel.com>
-Message-ID: <20190719183236.GN3000@work-vm>
-References: <20190719071129.11880-1-richardw.yang@linux.intel.com>
+Message-ID: <20190719184128.GO3000@work-vm>
+References: <20190718064257.29218-1-richardw.yang@linux.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190719071129.11880-1-richardw.yang@linux.intel.com>
+In-Reply-To: <20190718064257.29218-1-richardw.yang@linux.intel.com>
 User-Agent: Mutt/1.12.0 (2019-05-25)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.42]); Fri, 19 Jul 2019 18:32:39 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.26]); Fri, 19 Jul 2019 18:41:31 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] migration: use migration_in_postcopy() to
- check POSTCOPY_ACTIVE
+Subject: Re: [Qemu-devel] [PATCH] migration: equation is more proper than
+ and to check LOADVM_QUIT
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,47 +75,41 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 * Wei Yang (richardw.yang@linux.intel.com) wrote:
-> Use common helper function to check the state.
+> LOADVM_QUIT allows a command to quit all layers of nested loadvm loops,
+> while current return value check is not that proper even it works now.
 > 
+> Current return value check "ret & LOADVM_QUIT" would return true if
+> bit[0] is 1. This would be true when ret is -1 which is used to indicate
+> an error of handling a command.
+> 
+> Since there is only one place return LOADVM_QUIT and no other
+> combination of return value, use "ret == LOADVM_QUIT" would be more
+> proper.
+
+Yes, when I first wrote this it was more complex with a few flags, and
+they all got removed.
+
 > Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
 
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
 > ---
->  migration/rdma.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+>  migration/savevm.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/migration/rdma.c b/migration/rdma.c
-> index 3036221ee8..0e73e759ca 100644
-> --- a/migration/rdma.c
-> +++ b/migration/rdma.c
-> @@ -3140,7 +3140,7 @@ static size_t qemu_rdma_save_page(QEMUFile *f, void *opaque,
->  
->      CHECK_ERROR_STATE();
->  
-> -    if (migrate_get_current()->state == MIGRATION_STATUS_POSTCOPY_ACTIVE) {
-> +    if (migration_in_postcopy()) {
->          rcu_read_unlock();
->          return RAM_SAVE_CONTROL_NOT_SUPP;
->      }
-> @@ -3775,7 +3775,7 @@ static int qemu_rdma_registration_start(QEMUFile *f, void *opaque,
->  
->      CHECK_ERROR_STATE();
->  
-> -    if (migrate_get_current()->state == MIGRATION_STATUS_POSTCOPY_ACTIVE) {
-> +    if (migration_in_postcopy()) {
->          rcu_read_unlock();
->          return 0;
->      }
-> @@ -3810,7 +3810,7 @@ static int qemu_rdma_registration_stop(QEMUFile *f, void *opaque,
->  
->      CHECK_ERROR_STATE();
->  
-> -    if (migrate_get_current()->state == MIGRATION_STATUS_POSTCOPY_ACTIVE) {
-> +    if (migration_in_postcopy()) {
->          rcu_read_unlock();
->          return 0;
->      }
+> diff --git a/migration/savevm.c b/migration/savevm.c
+> index 1a9b1f411e..25fe7ea05a 100644
+> --- a/migration/savevm.c
+> +++ b/migration/savevm.c
+> @@ -2429,7 +2429,7 @@ retry:
+>          case QEMU_VM_COMMAND:
+>              ret = loadvm_process_command(f);
+>              trace_qemu_loadvm_state_section_command(ret);
+> -            if ((ret < 0) || (ret & LOADVM_QUIT)) {
+> +            if ((ret < 0) || (ret == LOADVM_QUIT)) {
+>                  goto out;
+>              }
+>              break;
 > -- 
 > 2.17.1
 > 
