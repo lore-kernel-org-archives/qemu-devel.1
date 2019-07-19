@@ -6,56 +6,56 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4CE7C76188
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 13:46:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CDC2C76195
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 13:46:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ADD372184E
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 13:46:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ADD372184E
+	by mail.kernel.org (Postfix) with ESMTPS id 359AA2184E
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 13:46:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 359AA2184E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45682 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45684 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hoTDe-0004y9-Jh
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 09:46:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40502)
+	id 1hoTDk-0005Jn-32
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 09:46:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40482)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <kwolf@redhat.com>) id 1hoTBI-00046P-9P
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 09:44:17 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1hoTBG-0003cV-Mr
+ (envelope-from <kwolf@redhat.com>) id 1hoTBH-00044o-Qk
  for qemu-devel@nongnu.org; Fri, 19 Jul 2019 09:44:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50450)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <kwolf@redhat.com>) id 1hoTBG-0003cD-Iz
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 09:44:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53296)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <kwolf@redhat.com>)
- id 1hoTB9-0003WI-GB; Fri, 19 Jul 2019 09:44:07 -0400
+ id 1hoTBB-0003Y0-GW; Fri, 19 Jul 2019 09:44:11 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 69DF43022466;
- Fri, 19 Jul 2019 13:44:05 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 16A0237F46;
+ Fri, 19 Jul 2019 13:44:08 +0000 (UTC)
 Received: from dhcp-200-226.str.redhat.com (dhcp-200-226.str.redhat.com
  [10.33.200.226])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8103E608A4;
- Fri, 19 Jul 2019 13:44:04 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id AD561608A4;
+ Fri, 19 Jul 2019 13:44:05 +0000 (UTC)
 From: Kevin Wolf <kwolf@redhat.com>
 To: qemu-block@nongnu.org
-Date: Fri, 19 Jul 2019 15:43:40 +0200
-Message-Id: <20190719134345.23526-9-kwolf@redhat.com>
+Date: Fri, 19 Jul 2019 15:43:41 +0200
+Message-Id: <20190719134345.23526-10-kwolf@redhat.com>
 In-Reply-To: <20190719134345.23526-1-kwolf@redhat.com>
 References: <20190719134345.23526-1-kwolf@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Fri, 19 Jul 2019 13:44:05 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.29]); Fri, 19 Jul 2019 13:44:08 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 08/13] tests: Extend commit by drained_end test
+Subject: [Qemu-devel] [PULL 09/13] block: Loop unsafely in bdrv*drained_end()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,100 +74,57 @@ Sender: "Qemu-devel"
 
 From: Max Reitz <mreitz@redhat.com>
 
+The graph must not change in these loops (or a QLIST_FOREACH_SAFE would
+not even be enough).  We now ensure this by only polling once in the
+root bdrv_drained_end() call, so we can drop the _SAFE suffix.  Doing so
+makes it clear that the graph must not change.
+
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- tests/test-bdrv-drain.c | 36 ++++++++++++++++++++++++++++++++----
- 1 file changed, 32 insertions(+), 4 deletions(-)
+ block/io.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/tests/test-bdrv-drain.c b/tests/test-bdrv-drain.c
-index 3503ce3b69..03fa1142a1 100644
---- a/tests/test-bdrv-drain.c
-+++ b/tests/test-bdrv-drain.c
-@@ -1532,6 +1532,7 @@ typedef struct TestDropBackingBlockJob {
-     BlockJob common;
-     bool should_complete;
-     bool *did_complete;
-+    BlockDriverState *detach_also;
- } TestDropBackingBlockJob;
-=20
- static int coroutine_fn test_drop_backing_job_run(Job *job, Error **errp=
-)
-@@ -1552,6 +1553,7 @@ static void test_drop_backing_job_commit(Job *job)
-         container_of(job, TestDropBackingBlockJob, common.job);
-=20
-     bdrv_set_backing_hd(blk_bs(s->common.blk), NULL, &error_abort);
-+    bdrv_set_backing_hd(s->detach_also, NULL, &error_abort);
-=20
-     *s->did_complete =3D true;
- }
-@@ -1571,9 +1573,6 @@ static const BlockJobDriver test_drop_backing_job_d=
-river =3D {
-  * Creates a child node with three parent nodes on it, and then runs a
-  * block job on the final one, parent-node-2.
-  *
-- * (TODO: parent-node-0 currently serves no purpose, but will as of a
-- * follow-up patch.)
-- *
-  * The job is then asked to complete before a section where the child
-  * is drained.
-  *
-@@ -1585,7 +1584,7 @@ static const BlockJobDriver test_drop_backing_job_d=
-river =3D {
-  *
-  * Ending the drain on parent-node-1 will poll the AioContext, which
-  * lets job_exit() and thus test_drop_backing_job_commit() run.  That
-- * function removes the child as parent-node-2's backing file.
-+ * function first removes the child as parent-node-2's backing file.
-  *
-  * In old (and buggy) implementations, there are two problems with
-  * that:
-@@ -1604,6 +1603,34 @@ static const BlockJobDriver test_drop_backing_job_=
-driver =3D {
-  * bdrv_replace_child_noperm() therefore must call drained_end() on
-  * the parent only if it really is still drained because the child is
-  * drained.
-+ *
-+ * If removing child from parent-node-2 was successful (as it should
-+ * be), test_drop_backing_job_commit() will then also remove the child
-+ * from parent-node-0.
-+ *
-+ * With an old version of our drain infrastructure ((A) above), that
-+ * resulted in the following flow:
-+ *
-+ * 1. child attempts to leave its drained section.  The call recurses
-+ *    to its parents.
-+ *
-+ * 2. parent-node-2 leaves the drained section.  Polling in
-+ *    bdrv_drain_invoke() will schedule job_exit().
-+ *
-+ * 3. parent-node-1 leaves the drained section.  Polling in
-+ *    bdrv_drain_invoke() will run job_exit(), thus disconnecting
-+ *    parent-node-0 from the child node.
-+ *
-+ * 4. bdrv_parent_drained_end() uses a QLIST_FOREACH_SAFE() loop to
-+ *    iterate over the parents.  Thus, it now accesses the BdrvChild
-+ *    object that used to connect parent-node-0 and the child node.
-+ *    However, that object no longer exists, so it accesses a dangling
-+ *    pointer.
-+ *
-+ * The solution is to only poll once when running a bdrv_drained_end()
-+ * operation, specifically at the end when all drained_end()
-+ * operations for all involved nodes have been scheduled.
-+ * Note that this also solves (A) above, thus hiding (B).
-  */
- static void test_blockjob_commit_by_drained_end(void)
+diff --git a/block/io.c b/block/io.c
+index 8f23cab82e..b89e155d21 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -76,9 +76,9 @@ static void bdrv_parent_drained_end(BlockDriverState *b=
+s, BdrvChild *ignore,
+                                     bool ignore_bds_parents,
+                                     int *drained_end_counter)
  {
-@@ -1627,6 +1654,7 @@ static void test_blockjob_commit_by_drained_end(voi=
-d)
-                            bs_parents[2], 0, BLK_PERM_ALL, 0, 0, NULL, N=
-ULL,
-                            &error_abort);
+-    BdrvChild *c, *next;
++    BdrvChild *c;
 =20
-+    job->detach_also =3D bs_parents[0];
-     job->did_complete =3D &job_has_completed;
+-    QLIST_FOREACH_SAFE(c, &bs->parents, next_parent, next) {
++    QLIST_FOREACH(c, &bs->parents, next_parent) {
+         if (c =3D=3D ignore || (ignore_bds_parents && c->role->parent_is=
+_bds)) {
+             continue;
+         }
+@@ -456,7 +456,7 @@ static void bdrv_do_drained_end(BlockDriverState *bs,=
+ bool recursive,
+                                 BdrvChild *parent, bool ignore_bds_paren=
+ts,
+                                 int *drained_end_counter)
+ {
+-    BdrvChild *child, *next;
++    BdrvChild *child;
+     int old_quiesce_counter;
 =20
-     job_start(&job->common.job);
+     assert(drained_end_counter !=3D NULL);
+@@ -481,7 +481,7 @@ static void bdrv_do_drained_end(BlockDriverState *bs,=
+ bool recursive,
+     if (recursive) {
+         assert(!ignore_bds_parents);
+         bs->recursive_quiesce_counter--;
+-        QLIST_FOREACH_SAFE(child, &bs->children, next, next) {
++        QLIST_FOREACH(child, &bs->children, next) {
+             bdrv_do_drained_end(child->bs, true, child, ignore_bds_paren=
+ts,
+                                 drained_end_counter);
+         }
 --=20
 2.20.1
 
