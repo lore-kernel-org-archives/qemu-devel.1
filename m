@@ -2,85 +2,89 @@ Return-Path: <SRS0=mHy3=VQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A34D9C76188
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 09:51:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1489C76195
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 09:51:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6EEB521849
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 09:51:33 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lKJYwYTD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6EEB521849
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id BD78921849
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 09:51:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD78921849
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43610 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43620 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hoPY4-0004z1-N8
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 05:51:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44223)
+	id 1hoPYT-0005tQ-45
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 05:51:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44305)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1hoPXt-0004aA-In
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 05:51:23 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hoPYI-0005Q2-9h
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 05:51:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1hoPXr-0002fe-S2
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 05:51:21 -0400
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:45394)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1hoPXr-0002fG-Mh
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 05:51:19 -0400
-Received: by mail-ot1-x341.google.com with SMTP id x21so32110824otq.12
- for <qemu-devel@nongnu.org>; Fri, 19 Jul 2019 02:51:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=uN5hThdb58kw3px4SK/kn5XOhMGpugt1cxH9MOy558k=;
- b=lKJYwYTD4Gt63l5B9JdpvOC7U8oEjkg1eTHTTtJQyVQ+Tg1DVNKpQkPyXtn7s+3FSM
- bvytURBxA/DlgGJI/2uC/nYZ68Nj/Pu4UDWit78jD19K71Dzl6BYRTVAjEfOkM2Z0VGC
- ikuaLLwKCAUorD5+cVuEhYclrCQvBEPnqRVm3B4fd+FOUkX8x3B9Bkm4fsCxQrxIAj1b
- cbqxMyMj1H2dUZTq95BZ4Iu7nvWqIdFawmJ0/ovKTL5mcEgWI20bhkBWAYKSuc8PZbaV
- fKdHphXWUgyNJ8rP0yz2hEn05qA3vCWaZ8XDTuccY7r0xhW9C2rmKtccTMqt+g8fY1eu
- 942Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:in-reply-to:references:from:date
- :message-id:subject:to:cc;
- bh=uN5hThdb58kw3px4SK/kn5XOhMGpugt1cxH9MOy558k=;
- b=lCjKb7mCGzk6OFitzXPwaFnCeRSH5ThNggNJFsRxWAXPFhtTXBgfDih+fHtVjsaOLN
- A7QysCOjiTJN51L8ztKljh04F1d5Cdo+4i1CSHfrhA9gEWobiyZoZhzjEa++w4ztRhnC
- n6tkBx8oUiDEJFNGAOTX4P83J7/4lhxSUtu+lSk/peQ03VHLrbGjrTP5NpJPlkOgSPSf
- o2kFeRJmJ98JjyuRW+NP5lSvZ47pNqmhKLkj5plcq7tuk5OYg9UnNDe1ZHx5lTO4W06x
- bX/EyngsNCudZJnTECkL4bKN9puJNYaIxIh0iAJJkpeHugcNf/iPI/9Tz+oJp5zFFb8M
- thsA==
-X-Gm-Message-State: APjAAAXkJE/uQ8hslyHAb5s2eNUINmXTTmHlV1NE481u5nn6RPQbnHXQ
- VasoMHoide+s0wkXd8UdevcYJO39nigziaJo9+4=
-X-Google-Smtp-Source: APXvYqxfp2mgdx8kQBTabAmptHCJ99WfeRgFd19tOE28MhvMZIOHaLyRbsvMqbIcj5/NEIZtew7XPJ+HLBfHmFAFVNY=
-X-Received: by 2002:a9d:6e8a:: with SMTP id a10mr14511782otr.295.1563529878774; 
- Fri, 19 Jul 2019 02:51:18 -0700 (PDT)
+ (envelope-from <mreitz@redhat.com>) id 1hoPYH-0002tp-5g
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 05:51:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52302)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1hoPYE-0002sO-TG; Fri, 19 Jul 2019 05:51:43 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id E693530C1E28;
+ Fri, 19 Jul 2019 09:51:41 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.40.205.128])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A557B610CA;
+ Fri, 19 Jul 2019 09:51:37 +0000 (UTC)
+To: Maxim Levitsky <mlevitsk@redhat.com>, qemu-devel@nongnu.org
+References: <20190716163020.13383-1-mlevitsk@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <e410dc4e-0d43-dc89-4935-fba9ce164cdf@redhat.com>
+Date: Fri, 19 Jul 2019 11:51:33 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-Received: by 2002:a9d:4798:0:0:0:0:0 with HTTP; Fri, 19 Jul 2019 02:51:18
- -0700 (PDT)
-Received: by 2002:a9d:4798:0:0:0:0:0 with HTTP; Fri, 19 Jul 2019 02:51:18
- -0700 (PDT)
-In-Reply-To: <20190531104432.29379-1-david@redhat.com>
-References: <20190531104432.29379-1-david@redhat.com>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Fri, 19 Jul 2019 11:51:18 +0200
-Message-ID: <CAL1e-=g=8t+rvVisn2bXxir0ezZRZAybAFiNzV6M89Q9qvyRAw@mail.gmail.com>
-To: David Hildenbrand <david@redhat.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::341
-Content-Type: text/plain; charset="UTF-8"
-X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: Re: [Qemu-devel] [PATCH v1 00/23] s390x/tcg: Vector Instruction
- Support Part 4
+In-Reply-To: <20190716163020.13383-1-mlevitsk@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="RWtJh3mxzpgDJMvhqDD3QzS9mIwlr7DVu"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.47]); Fri, 19 Jul 2019 09:51:42 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v4 0/3] Few bugfixes for userspace nvme
+ driver
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,108 +96,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>,
- Denys Vlasenko <dvlasenk@redhat.com>, qemu-devel@nongnu.org
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ John Snow <jsnow@redhat.com>, qemu-block@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On May 31, 2019 12:48 PM, "David Hildenbrand" <david@redhat.com> wrote:
->
-> This is the final part of vector instruction support for s390x. It is
-based
-> on part 2, which is will send a pull-request for to Conny soon.
->
-> Part 1: Vector Support Instructions
-> Part 2: Vector Integer Instructions
-> Part 3: Vector String Instructions
-> Part 4: Vector Floating-Point Instructions
->
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--RWtJh3mxzpgDJMvhqDD3QzS9mIwlr7DVu
+Content-Type: multipart/mixed; boundary="ylMvsyUJWiiQJjl1IPiRW05d4NN0oGLr3";
+ protected-headers="v1"
+From: Max Reitz <mreitz@redhat.com>
+To: Maxim Levitsky <mlevitsk@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Fam Zheng <fam@euphon.net>,
+ Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ John Snow <jsnow@redhat.com>
+Message-ID: <e410dc4e-0d43-dc89-4935-fba9ce164cdf@redhat.com>
+Subject: Re: [PATCH v4 0/3] Few bugfixes for userspace nvme driver
+References: <20190716163020.13383-1-mlevitsk@redhat.com>
+In-Reply-To: <20190716163020.13383-1-mlevitsk@redhat.com>
 
-Congratulations on completing this complex task!
+--ylMvsyUJWiiQJjl1IPiRW05d4NN0oGLr3
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-I followed your series (even though I did not make any comment), and I
-salute this addition to QEMU.
+On 16.07.19 18:30, Maxim Levitsky wrote:
+> This is reduced version of patch series for userspace nvme driver,
+> that only includes the bugfixes I made.
+>=20
+> Best regards,
+> 	Maxim Levitsky
+>=20
+> Maxim Levitsky (3):
+>   block/nvme: fix doorbell stride
+>   block/nvme: support larger that 512 bytes sector devices
+>   block/nvme: don't touch the completion entries
+>=20
+>  block/nvme.c | 52 ++++++++++++++++++++++++++++++++++++++++++----------=
 
-I would just ask you to provide me and others with the link to the detailed
-documentation on this matter - I had the hardest time trying to find it
-online.
+>  1 file changed, 42 insertions(+), 10 deletions(-)
 
-Thanks in advance!
+Thanks, applied to my block branch:
 
-Aleksandar
+https://git.xanclic.moe/XanClic/qemu/commits/branch/block
 
-> The current state can be found at (kept updated):
->     https://github.com/davidhildenbrand/qemu/tree/vx
->
-> It is based on:
-> - [PATCH v2 0/5] s390x/tcg: Vector Instruction Support Part 3
-> - [PATCH v1 0/2] s390x: Fix vector register alignment
->
-> With the current state I can boot Linux kernel + user space compiled with
-> SIMD support. This allows to boot distributions compiled exclusively for
-> z13, requiring SIMD support. Also, it is now possible to build a complete
-> kernel using rpmbuild as quite some issues have been sorted out.
->
-> While the current state works fine for me with RHEL 8, I am experiencing
-> some issues with newer userspace versions (I suspect glibc). I'll have
-> to look into the details first - could be a BUG in !vector
-> instruction or a BUG in a vector instruction that was until now unused.
->
-> In this part, all Vector Floating-Point Instructions introduced with the
-> "Vector Facility" are added. Also, the "qemu" model is changed to a
-> z13 machine.
->
-> David Hildenbrand (23):
->   s390x: Use uint64_t for vector registers
->   s390x/tcg: Introduce tcg_s390_vector_exception()
->   s390x/tcg: Export float_comp_to_cc() and float(32|64|128)_dcmask()
->   s390x/tcg: Implement VECTOR FP ADD
->   s390x/tcg: Implement VECTOR FP COMPARE (AND SIGNAL) SCALAR
->   s390x/tcg: Implement VECTOR FP COMPARE (EQUAL|HIGH|HIGH OR EQUAL)
->   s390x/tcg: Implement VECTOR FP CONVERT FROM FIXED 64-BIT
->   s390x/tcg: Implement VECTOR FP CONVERT FROM LOGICAL 64-BIT
->   s390x/tcg: Implement VECTOR FP CONVERT TO FIXED 64-BIT
->   s390x/tcg: Implement VECTOR FP CONVERT TO LOGICAL 64-BIT
->   s390x/tcg: Implement VECTOR FP DIVIDE
->   s390x/tcg: Implement VECTOR LOAD FP INTEGER
->   s390x/tcg: Implement VECTOR LOAD LENGTHENED
->   s390x/tcg: Implement VECTOR LOAD ROUNDED
->   s390x/tcg: Implement VECTOR FP MULTIPLY
->   s390x/tcg: Implement VECTOR FP MULTIPLY AND (ADD|SUBTRACT)
->   s390x/tcg: Implement VECTOR FP PERFORM SIGN OPERATION
->   s390x/tcg: Implement VECTOR FP SQUARE ROOT
->   s390x/tcg: Implement VECTOR FP SUBTRACT
->   s390x/tcg: Implement VECTOR FP TEST DATA CLASS IMMEDIATE
->   s390x/tcg: Allow linux-user to use vector instructions
->   s390x/tcg: We support the Vector Facility
->   s390x: Bump the "qemu" CPU model up to a stripped-down z13
->
->  hw/s390x/s390-virtio-ccw.c      |   2 +
->  linux-user/s390x/signal.c       |   4 +-
->  target/s390x/Makefile.objs      |   1 +
->  target/s390x/arch_dump.c        |   8 +-
->  target/s390x/cpu.c              |   3 +
->  target/s390x/cpu.h              |   5 +-
->  target/s390x/cpu_models.c       |   4 +-
->  target/s390x/excp_helper.c      |  21 +-
->  target/s390x/fpu_helper.c       |   4 +-
->  target/s390x/gdbstub.c          |  16 +-
->  target/s390x/gen-features.c     |  10 +-
->  target/s390x/helper.c           |  10 +-
->  target/s390x/helper.h           |  46 +++
->  target/s390x/insn-data.def      |  45 +++
->  target/s390x/internal.h         |   4 +
->  target/s390x/kvm.c              |  16 +-
->  target/s390x/machine.c          | 128 +++----
->  target/s390x/tcg_s390x.h        |   2 +
->  target/s390x/translate.c        |   2 +-
->  target/s390x/translate_vx.inc.c | 274 ++++++++++++++
->  target/s390x/vec_fpu_helper.c   | 644 ++++++++++++++++++++++++++++++++
->  21 files changed, 1145 insertions(+), 104 deletions(-)
->  create mode 100644 target/s390x/vec_fpu_helper.c
->
-> --
-> 2.20.1
->
->
+Max
+
+
+--ylMvsyUJWiiQJjl1IPiRW05d4NN0oGLr3--
+
+--RWtJh3mxzpgDJMvhqDD3QzS9mIwlr7DVu
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0xkqUACgkQ9AfbAGHV
+z0CURwf/cOtmoHOs1amCVtVKJJwBaArml94/SBgIdxxSrnfhwywcBbZ6yw2p0apM
+k9ouPxDvJfqytoHtUj+MKULNG+OCUsF4nJpxY3zI/rJpyyysRKLj0N9ZkiHMSgo7
+HCIE60LSLGcFql7s9g6jPAHIPz7nY8kbo/+L0Fx6JwkP60/eKo7AUBn7YiX+aeSC
+eWhA+CFO3UL8LOgB/EgbDmYgmaVXvtGzzSSEFPGKkLui9mRadZia5TJJ7odj/TyN
+x8M9Aa81hgxgcCyu+OnKzQY/uEYj49KOWIXoDjtkam4ufSB5q66k9h6pS8ZuYdti
+U6PMRkfuynHl9RsWquGGkKkKCUH79A==
+=HJJ1
+-----END PGP SIGNATURE-----
+
+--RWtJh3mxzpgDJMvhqDD3QzS9mIwlr7DVu--
+
