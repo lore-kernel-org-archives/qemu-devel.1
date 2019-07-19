@@ -2,61 +2,80 @@ Return-Path: <SRS0=mHy3=VQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 529E9C76195
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 12:15:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36E62C76188
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 12:23:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 282702173B
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 12:15:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 282702173B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id F1D8520873
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 12:23:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KgAdRnuF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1D8520873
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44680 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44732 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hoRn3-0007JW-Du
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 08:15:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47553)
+	id 1hoRue-00031E-5J
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 08:23:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49096)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <imammedo@redhat.com>) id 1hoRmp-0006pZ-Pg
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 08:14:56 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hoRuT-0002ae-9G
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 08:22:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1hoRmo-0006IC-U2
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 08:14:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60882)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hoRmo-0006Ha-OY
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 08:14:54 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id D246C30A7C52;
- Fri, 19 Jul 2019 12:14:52 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.182])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C5A651A8EA;
- Fri, 19 Jul 2019 12:14:49 +0000 (UTC)
-Date: Fri, 19 Jul 2019 14:14:48 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Evgeny Yakovlev <wrfsh@yandex-team.ru>
-Message-ID: <20190719141448.3e1f334c@redhat.com>
-In-Reply-To: <1563526469-15588-1-git-send-email-wrfsh@yandex-team.ru>
-References: <1563526469-15588-1-git-send-email-wrfsh@yandex-team.ru>
+ (envelope-from <peter.maydell@linaro.org>) id 1hoRuS-0003EA-Ap
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 08:22:49 -0400
+Received: from mail-oi1-x235.google.com ([2607:f8b0:4864:20::235]:42794)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hoRuS-0003Dj-4h
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 08:22:48 -0400
+Received: by mail-oi1-x235.google.com with SMTP id s184so24105509oie.9
+ for <qemu-devel@nongnu.org>; Fri, 19 Jul 2019 05:22:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=p7M5q5F7MxIa/r2jjKkheseBpte21hWoZc4a2t8a9EA=;
+ b=KgAdRnuFIUicQCHi7on4sFCrKLGCHsMEHu9a3Uwp5uvL3XV/QRnacSPo6R96wnNyCt
+ EeEc0Osl0PKuzJGc8+/NOYUmUJHTbQAjrBBIGPMeDAUnMhGDmutMXafyfKSeMzYs5yJr
+ dDbaANxUT31/9OiTLpBkB4QzS3DfPkRjyyILp6kCKG+yeX2r1yQaogcq3tt51nVLs8vz
+ dTCgPUC1ILzrDerljX2CiiO9EpYNRNeptZrnJcqwekMK9sFL0T6ed8jXYVYlyCy1onsM
+ woto+lMEnEk62Jg/bW/9usCjcen7ctqa1TKOZQ9J+Wjy91r9Ii4GVTey0wrQy5gyG9Es
+ qKLg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=p7M5q5F7MxIa/r2jjKkheseBpte21hWoZc4a2t8a9EA=;
+ b=WivPOv5rDSGE/X5ry/Pbzre9cAzOsc0efGaJXMJg+htKGNt+F2WeIhR/jOzVRHSDPt
+ UogWeHuzJkJTXc/+MYQ4m/LwDtvIBRIBbmNhuroFiMuxfNQLOXbgsgNdykW9tKNLkRYo
+ 7L949d/XyR1OM+qeHDluZKDog1/ZYzq5k2oK6sXjn7SZPEHMUHYaR718uN2km2TpS+CX
+ 9r+NPrHk3ycpcb3I9A68thLNmOdEo7iT5Ac6xgUP+4WliTPjS9gSPto4r7UN+5rGsinN
+ pR2NOliuz6HphHQRFBJn3gsoIq7q6aCBkAGyn9Nl6yeI54TC+DhQnvUmrj4Suwx1pFSg
+ DX5w==
+X-Gm-Message-State: APjAAAWld1KJjtIUT7lIZzeR1t4Yg3urxeCXjzDwV9wAzJNa5rKKnQAM
+ sEBShhlN9xt84dHvDav7nq0wrXWr+Geqg7zR/k1xnQ==
+X-Google-Smtp-Source: APXvYqzTUlla9FDfQ1xfQkR9sIDQOtPHeWqZ+oO7417ERtMjiuwNeKQH4bijCLJVTIpnHArtwh/fJqSJQA2GDpGfc6Q=
+X-Received: by 2002:aca:5cd7:: with SMTP id
+ q206mr23919833oib.146.1563538967085; 
+ Fri, 19 Jul 2019 05:22:47 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.42]); Fri, 19 Jul 2019 12:14:53 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] i386/acpi: show PCI Express bus on
- pxb-pcie expanders
+References: <20190719115031.16331-1-cohuck@redhat.com>
+In-Reply-To: <20190719115031.16331-1-cohuck@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 19 Jul 2019 13:22:36 +0100
+Message-ID: <CAFEAcA_kUhVRF0WS2y_05DVstFA4xha2xyf+WRzkmJSOy7eNnA@mail.gmail.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::235
+Subject: Re: [Qemu-devel] [PULL for-4.1 0/1] one s390x fix/annotation
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,43 +87,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, yc-core@yandex-team.ru, mst@redhat.com
+Cc: qemu-s390x <qemu-s390x@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 19 Jul 2019 11:54:29 +0300
-Evgeny Yakovlev <wrfsh@yandex-team.ru> wrote:
+On Fri, 19 Jul 2019 at 12:50, Cornelia Huck <cohuck@redhat.com> wrote:
+>
+> The following changes since commit 0b18cfb8f1828c905139b54c8644b0d8f4aad879:
+>
+>   Update version for v4.1.0-rc1 release (2019-07-16 18:01:28 +0100)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/cohuck/qemu tags/s390x-20190719
+>
+> for you to fetch changes up to efac5ae420ca0644db9360861a1bf02d040afd18:
+>
+>   s390x/pci: add some fallthrough annotations (2019-07-18 11:29:50 +0200)
+>
+> ----------------------------------------------------------------
+> Add missing fallthrough annotations.
+>
+> ----------------------------------------------------------------
+>
 
-> Show PCIe host bridge PNP id with PCI host bridge as a compatible id
-> when expanding a pcie bus.
-> 
-> Signed-off-by: Evgeny Yakovlev <wrfsh@yandex-team.ru>
 
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Applied, thanks.
 
-> ---
->  hw/i386/acpi-build.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> index d281ffa..0675952 100644
-> --- a/hw/i386/acpi-build.c
-> +++ b/hw/i386/acpi-build.c
-> @@ -1908,10 +1908,13 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
->              scope = aml_scope("\\_SB");
->              dev = aml_device("PC%.02X", bus_num);
->              aml_append(dev, aml_name_decl("_UID", aml_int(bus_num)));
-> -            aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0A03")));
->              aml_append(dev, aml_name_decl("_BBN", aml_int(bus_num)));
->              if (pci_bus_is_express(bus)) {
-> +                aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0A08")));
-> +                aml_append(dev, aml_name_decl("_CID", aml_eisaid("PNP0A03")));
->                  aml_append(dev, build_q35_osc_method());
-> +            } else {
-> +                aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0A03")));
->              }
->  
->              if (numa_node != NUMA_NODE_UNASSIGNED) {
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.1
+for any user-visible changes.
 
+-- PMM
 
