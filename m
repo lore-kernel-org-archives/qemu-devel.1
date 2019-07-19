@@ -2,62 +2,61 @@ Return-Path: <SRS0=mHy3=VQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_SBL,URIBL_SBL_A autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77F5CC76188
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 13:26:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0D07C76195
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 13:26:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 51D9121849
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 13:26:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51D9121849
+	by mail.kernel.org (Postfix) with ESMTPS id 7928021849
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 13:26:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7928021849
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45208 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45214 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hoSuG-0005WQ-9g
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 09:26:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35222)
+	id 1hoSuP-0006EP-8t
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 09:26:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35159)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <berrange@redhat.com>) id 1hoStj-0003bw-2c
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 09:26:08 -0400
+ (envelope-from <berrange@redhat.com>) id 1hoStY-0002wj-Q3
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 09:25:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1hoSth-00081H-Kh
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 09:26:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38154)
+ (envelope-from <berrange@redhat.com>) id 1hoStW-0007vH-VK
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 09:25:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48552)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hoSth-00080t-DC
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 09:26:05 -0400
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hoStW-0007uM-Nm
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 09:25:54 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id B32763022466;
- Fri, 19 Jul 2019 13:26:04 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 129593DBC5;
+ Fri, 19 Jul 2019 13:25:54 +0000 (UTC)
 Received: from localhost.localdomain.com (ovpn-112-48.ams2.redhat.com
  [10.36.112.48])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8BA675D704;
- Fri, 19 Jul 2019 13:26:00 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9EA995D719;
+ Fri, 19 Jul 2019 13:25:52 +0000 (UTC)
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Fri, 19 Jul 2019 14:25:48 +0100
-Message-Id: <20190719132549.14726-5-berrange@redhat.com>
+Date: Fri, 19 Jul 2019 14:25:45 +0100
+Message-Id: <20190719132549.14726-2-berrange@redhat.com>
 In-Reply-To: <20190719132549.14726-1-berrange@redhat.com>
 References: <20190719132549.14726-1-berrange@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Fri, 19 Jul 2019 13:26:04 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.30]); Fri, 19 Jul 2019 13:25:54 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 4/5] doc: document that the monitor console is a
- privileged control interface
+Subject: [Qemu-devel] [PULL 1/5] crypto: switch to modern nettle AES APIs
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,113 +68,325 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Prasad J Pandit <pjp@fedoraproject.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-A supposed exploit of QEMU was recently announced as CVE-2019-12928
-claiming that the monitor console was insecure because the "migrate"
-command enabled arbitrary command execution for a remote attacker.
+The aes_ctx struct and aes_* functions have been deprecated in nettle
+3.5, in favour of keysize specific functions which were introduced
+first in nettle 3.0.
 
-To be a security risk the user launching QEMU must have configured
-the monitor in a way that allows for other users to access it. The
-exploit report quoted use of the "tcp" character device backend for
-QMP.
+Switch QEMU code to use the new APIs and add some backcompat defines
+such that it still builds on nettle 2.7
 
-This would indeed allow any network user to connect to QEMU and
-execute arbitrary commands, however, this is not a flaw in QEMU.
-It is the normal expected behaviour of the monitor console and the
-commands it supports. Given a monitor connection, there are many
-ways to access host file system content besides the migrate command.
-
-The reality is that the monitor console (whether QMP or HMP) is
-considered a privileged interface to QEMU and as such must only
-be made available to trusted users. IOW, making it available with
-no authentication over TCP is simply a, very serious, user
-configuration error not a security flaw in QEMU itself.
-
-The one thing this bogus security report highlights though is that
-we have not clearly documented the security implications around the
-use of the monitor. Add a few paragraphs of text to the security
-docs explaining why the monitor is a privileged interface and making
-a recommendation to only use the UNIX socket character device backend.
-
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Prasad J Pandit <pjp@fedoraproject.org>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Tested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 ---
- docs/security.texi | 36 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 36 insertions(+)
+ crypto/cipher-nettle.c | 218 ++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 183 insertions(+), 35 deletions(-)
 
-diff --git a/docs/security.texi b/docs/security.texi
-index 927764f1e6..0d6b30edfc 100644
---- a/docs/security.texi
-+++ b/docs/security.texi
-@@ -129,3 +129,39 @@ those resources that were granted to it.
- system calls that are not needed by QEMU, thereby reducing the host kern=
-el
- attack surface.
- @end itemize
+diff --git a/crypto/cipher-nettle.c b/crypto/cipher-nettle.c
+index 3848cb3b3a..115d16dd7b 100644
+--- a/crypto/cipher-nettle.c
++++ b/crypto/cipher-nettle.c
+@@ -42,29 +42,89 @@ typedef void *       cipher_ctx_t;
+ typedef unsigned     cipher_length_t;
+=20
+ #define cast5_set_key cast128_set_key
 +
-+@section Sensitive configurations
++#define aes128_ctx aes_ctx
++#define aes192_ctx aes_ctx
++#define aes256_ctx aes_ctx
++#define aes128_set_encrypt_key(c, k) \
++    aes_set_encrypt_key(c, 16, k)
++#define aes192_set_encrypt_key(c, k) \
++    aes_set_encrypt_key(c, 24, k)
++#define aes256_set_encrypt_key(c, k) \
++    aes_set_encrypt_key(c, 32, k)
++#define aes128_set_decrypt_key(c, k) \
++    aes_set_decrypt_key(c, 16, k)
++#define aes192_set_decrypt_key(c, k) \
++    aes_set_decrypt_key(c, 24, k)
++#define aes256_set_decrypt_key(c, k) \
++    aes_set_decrypt_key(c, 32, k)
++#define aes128_encrypt aes_encrypt
++#define aes192_encrypt aes_encrypt
++#define aes256_encrypt aes_encrypt
++#define aes128_decrypt aes_decrypt
++#define aes192_decrypt aes_decrypt
++#define aes256_decrypt aes_decrypt
+ #else
+ typedef nettle_cipher_func * QCryptoCipherNettleFuncNative;
+ typedef const void * cipher_ctx_t;
+ typedef size_t       cipher_length_t;
+ #endif
+=20
+-typedef struct QCryptoNettleAES {
+-    struct aes_ctx enc;
+-    struct aes_ctx dec;
+-} QCryptoNettleAES;
++typedef struct QCryptoNettleAES128 {
++    struct aes128_ctx enc;
++    struct aes128_ctx dec;
++} QCryptoNettleAES128;
 +
-+There are aspects of QEMU that can have security implications which user=
-s &
-+management applications must be aware of.
++typedef struct QCryptoNettleAES192 {
++    struct aes192_ctx enc;
++    struct aes192_ctx dec;
++} QCryptoNettleAES192;
 +
-+@subsection Monitor console (QMP and HMP)
++typedef struct QCryptoNettleAES256 {
++    struct aes256_ctx enc;
++    struct aes256_ctx dec;
++} QCryptoNettleAES256;
 +
-+The monitor console (whether used with QMP or HMP) provides an interface
-+to dynamically control many aspects of QEMU's runtime operation. Many of=
- the
-+commands exposed will instruct QEMU to access content on the host file s=
-ystem
-+and/or trigger spawning of external processes.
++static void aes128_encrypt_native(cipher_ctx_t ctx, cipher_length_t leng=
+th,
++                                  uint8_t *dst, const uint8_t *src)
++{
++    const QCryptoNettleAES128 *aesctx =3D ctx;
++    aes128_encrypt(&aesctx->enc, length, dst, src);
++}
 +
-+For example, the @code{migrate} command allows for the spawning of arbit=
-rary
-+processes for the purpose of tunnelling the migration data stream. The
-+@code{blockdev-add} command instructs QEMU to open arbitrary files, expo=
-sing
-+their content to the guest as a virtual disk.
++static void aes128_decrypt_native(cipher_ctx_t ctx, cipher_length_t leng=
+th,
++                                  uint8_t *dst, const uint8_t *src)
++{
++    const QCryptoNettleAES128 *aesctx =3D ctx;
++    aes128_decrypt(&aesctx->dec, length, dst, src);
++}
 +
-+Unless QEMU is otherwise confined using technologies such as SELinux, Ap=
-pArmor,
-+or Linux namespaces, the monitor console should be considered to have pr=
-ivileges
-+equivalent to those of the user account QEMU is running under.
++static void aes192_encrypt_native(cipher_ctx_t ctx, cipher_length_t leng=
+th,
++                               uint8_t *dst, const uint8_t *src)
++{
++    const QCryptoNettleAES192 *aesctx =3D ctx;
++    aes192_encrypt(&aesctx->enc, length, dst, src);
++}
 +
-+It is further important to consider the security of the character device=
- backend
-+over which the monitor console is exposed. It needs to have protection a=
-gainst
-+malicious third parties which might try to make unauthorized connections=
-, or
-+perform man-in-the-middle attacks. Many of the character device backends=
- do not
-+satisfy this requirement and so must not be used for the monitor console=
-.
++static void aes192_decrypt_native(cipher_ctx_t ctx, cipher_length_t leng=
+th,
++                               uint8_t *dst, const uint8_t *src)
++{
++    const QCryptoNettleAES192 *aesctx =3D ctx;
++    aes192_decrypt(&aesctx->dec, length, dst, src);
++}
+=20
+-static void aes_encrypt_native(cipher_ctx_t ctx, cipher_length_t length,
++static void aes256_encrypt_native(cipher_ctx_t ctx, cipher_length_t leng=
+th,
+                                uint8_t *dst, const uint8_t *src)
+ {
+-    const QCryptoNettleAES *aesctx =3D ctx;
+-    aes_encrypt(&aesctx->enc, length, dst, src);
++    const QCryptoNettleAES256 *aesctx =3D ctx;
++    aes256_encrypt(&aesctx->enc, length, dst, src);
+ }
+=20
+-static void aes_decrypt_native(cipher_ctx_t ctx, cipher_length_t length,
++static void aes256_decrypt_native(cipher_ctx_t ctx, cipher_length_t leng=
+th,
+                                uint8_t *dst, const uint8_t *src)
+ {
+-    const QCryptoNettleAES *aesctx =3D ctx;
+-    aes_decrypt(&aesctx->dec, length, dst, src);
++    const QCryptoNettleAES256 *aesctx =3D ctx;
++    aes256_decrypt(&aesctx->dec, length, dst, src);
+ }
+=20
+ static void des_encrypt_native(cipher_ctx_t ctx, cipher_length_t length,
+@@ -127,18 +187,46 @@ static void twofish_decrypt_native(cipher_ctx_t ctx=
+, cipher_length_t length,
+     twofish_decrypt(ctx, length, dst, src);
+ }
+=20
+-static void aes_encrypt_wrapper(const void *ctx, size_t length,
++static void aes128_encrypt_wrapper(const void *ctx, size_t length,
++                                uint8_t *dst, const uint8_t *src)
++{
++    const QCryptoNettleAES128 *aesctx =3D ctx;
++    aes128_encrypt(&aesctx->enc, length, dst, src);
++}
 +
-+The general recommendation is that the monitor console should be exposed=
- over
-+a UNIX domain socket backend to the local host only. Use of the TCP base=
-d
-+character device backend is inappropriate unless configured to use both =
-TLS
-+encryption and authorization control policy on client connections.
++static void aes128_decrypt_wrapper(const void *ctx, size_t length,
+                                 uint8_t *dst, const uint8_t *src)
+ {
+-    const QCryptoNettleAES *aesctx =3D ctx;
+-    aes_encrypt(&aesctx->enc, length, dst, src);
++    const QCryptoNettleAES128 *aesctx =3D ctx;
++    aes128_decrypt(&aesctx->dec, length, dst, src);
+ }
+=20
+-static void aes_decrypt_wrapper(const void *ctx, size_t length,
++static void aes192_encrypt_wrapper(const void *ctx, size_t length,
+                                 uint8_t *dst, const uint8_t *src)
+ {
+-    const QCryptoNettleAES *aesctx =3D ctx;
+-    aes_decrypt(&aesctx->dec, length, dst, src);
++    const QCryptoNettleAES192 *aesctx =3D ctx;
++    aes192_encrypt(&aesctx->enc, length, dst, src);
++}
 +
-+In summary, the monitor console is considered a privileged control inter=
-face to
-+QEMU and as such should only be made accessible to a trusted management
-+application or user.
++static void aes192_decrypt_wrapper(const void *ctx, size_t length,
++                                uint8_t *dst, const uint8_t *src)
++{
++    const QCryptoNettleAES192 *aesctx =3D ctx;
++    aes192_decrypt(&aesctx->dec, length, dst, src);
++}
++
++static void aes256_encrypt_wrapper(const void *ctx, size_t length,
++                                uint8_t *dst, const uint8_t *src)
++{
++    const QCryptoNettleAES256 *aesctx =3D ctx;
++    aes256_encrypt(&aesctx->enc, length, dst, src);
++}
++
++static void aes256_decrypt_wrapper(const void *ctx, size_t length,
++                                uint8_t *dst, const uint8_t *src)
++{
++    const QCryptoNettleAES256 *aesctx =3D ctx;
++    aes256_decrypt(&aesctx->dec, length, dst, src);
+ }
+=20
+ static void des_encrypt_wrapper(const void *ctx, size_t length,
+@@ -319,34 +407,94 @@ static QCryptoCipherNettle *qcrypto_cipher_ctx_new(=
+QCryptoCipherAlgorithm alg,
+         break;
+=20
+     case QCRYPTO_CIPHER_ALG_AES_128:
++        ctx->ctx =3D g_new0(QCryptoNettleAES128, 1);
++
++        if (mode =3D=3D QCRYPTO_CIPHER_MODE_XTS) {
++            ctx->ctx_tweak =3D g_new0(QCryptoNettleAES128, 1);
++
++            nkey /=3D 2;
++            aes128_set_encrypt_key(&((QCryptoNettleAES128 *)ctx->ctx)->e=
+nc,
++                                   key);
++            aes128_set_decrypt_key(&((QCryptoNettleAES128 *)ctx->ctx)->d=
+ec,
++                                   key);
++
++            aes128_set_encrypt_key(&((QCryptoNettleAES128 *)ctx->ctx_twe=
+ak)->
++                                   enc, key + nkey);
++            aes128_set_decrypt_key(&((QCryptoNettleAES128 *)ctx->ctx_twe=
+ak)->
++                                   dec, key + nkey);
++        } else {
++            aes128_set_encrypt_key(&((QCryptoNettleAES128 *)ctx->ctx)->e=
+nc,
++                                   key);
++            aes128_set_decrypt_key(&((QCryptoNettleAES128 *)ctx->ctx)->d=
+ec,
++                                   key);
++        }
++
++        ctx->alg_encrypt_native =3D aes128_encrypt_native;
++        ctx->alg_decrypt_native =3D aes128_decrypt_native;
++        ctx->alg_encrypt_wrapper =3D aes128_encrypt_wrapper;
++        ctx->alg_decrypt_wrapper =3D aes128_decrypt_wrapper;
++
++        ctx->blocksize =3D AES_BLOCK_SIZE;
++        break;
++
+     case QCRYPTO_CIPHER_ALG_AES_192:
++        ctx->ctx =3D g_new0(QCryptoNettleAES192, 1);
++
++        if (mode =3D=3D QCRYPTO_CIPHER_MODE_XTS) {
++            ctx->ctx_tweak =3D g_new0(QCryptoNettleAES192, 1);
++
++            nkey /=3D 2;
++            aes192_set_encrypt_key(&((QCryptoNettleAES192 *)ctx->ctx)->e=
+nc,
++                                   key);
++            aes192_set_decrypt_key(&((QCryptoNettleAES192 *)ctx->ctx)->d=
+ec,
++                                   key);
++
++            aes192_set_encrypt_key(&((QCryptoNettleAES192 *)ctx->ctx_twe=
+ak)->
++                                   enc, key + nkey);
++            aes192_set_decrypt_key(&((QCryptoNettleAES192 *)ctx->ctx_twe=
+ak)->
++                                   dec, key + nkey);
++        } else {
++            aes192_set_encrypt_key(&((QCryptoNettleAES192 *)ctx->ctx)->e=
+nc,
++                                   key);
++            aes192_set_decrypt_key(&((QCryptoNettleAES192 *)ctx->ctx)->d=
+ec,
++                                   key);
++        }
++
++        ctx->alg_encrypt_native =3D aes192_encrypt_native;
++        ctx->alg_decrypt_native =3D aes192_decrypt_native;
++        ctx->alg_encrypt_wrapper =3D aes192_encrypt_wrapper;
++        ctx->alg_decrypt_wrapper =3D aes192_decrypt_wrapper;
++
++        ctx->blocksize =3D AES_BLOCK_SIZE;
++        break;
++
+     case QCRYPTO_CIPHER_ALG_AES_256:
+-        ctx->ctx =3D g_new0(QCryptoNettleAES, 1);
++        ctx->ctx =3D g_new0(QCryptoNettleAES256, 1);
+=20
+         if (mode =3D=3D QCRYPTO_CIPHER_MODE_XTS) {
+-            ctx->ctx_tweak =3D g_new0(QCryptoNettleAES, 1);
++            ctx->ctx_tweak =3D g_new0(QCryptoNettleAES256, 1);
+=20
+             nkey /=3D 2;
+-            aes_set_encrypt_key(&((QCryptoNettleAES *)ctx->ctx)->enc,
+-                                nkey, key);
+-            aes_set_decrypt_key(&((QCryptoNettleAES *)ctx->ctx)->dec,
+-                                nkey, key);
+-
+-            aes_set_encrypt_key(&((QCryptoNettleAES *)ctx->ctx_tweak)->e=
+nc,
+-                                nkey, key + nkey);
+-            aes_set_decrypt_key(&((QCryptoNettleAES *)ctx->ctx_tweak)->d=
+ec,
+-                                nkey, key + nkey);
++            aes256_set_encrypt_key(&((QCryptoNettleAES256 *)ctx->ctx)->e=
+nc,
++                                   key);
++            aes256_set_decrypt_key(&((QCryptoNettleAES256 *)ctx->ctx)->d=
+ec,
++                                   key);
++
++            aes256_set_encrypt_key(&((QCryptoNettleAES256 *)ctx->ctx_twe=
+ak)->
++                                   enc, key + nkey);
++            aes256_set_decrypt_key(&((QCryptoNettleAES256 *)ctx->ctx_twe=
+ak)->
++                                   dec, key + nkey);
+         } else {
+-            aes_set_encrypt_key(&((QCryptoNettleAES *)ctx->ctx)->enc,
+-                                nkey, key);
+-            aes_set_decrypt_key(&((QCryptoNettleAES *)ctx->ctx)->dec,
+-                                nkey, key);
++            aes256_set_encrypt_key(&((QCryptoNettleAES256 *)ctx->ctx)->e=
+nc,
++                                   key);
++            aes256_set_decrypt_key(&((QCryptoNettleAES256 *)ctx->ctx)->d=
+ec,
++                                   key);
+         }
+=20
+-        ctx->alg_encrypt_native =3D aes_encrypt_native;
+-        ctx->alg_decrypt_native =3D aes_decrypt_native;
+-        ctx->alg_encrypt_wrapper =3D aes_encrypt_wrapper;
+-        ctx->alg_decrypt_wrapper =3D aes_decrypt_wrapper;
++        ctx->alg_encrypt_native =3D aes256_encrypt_native;
++        ctx->alg_decrypt_native =3D aes256_decrypt_native;
++        ctx->alg_encrypt_wrapper =3D aes256_encrypt_wrapper;
++        ctx->alg_decrypt_wrapper =3D aes256_decrypt_wrapper;
+=20
+         ctx->blocksize =3D AES_BLOCK_SIZE;
+         break;
 --=20
 2.21.0
 
