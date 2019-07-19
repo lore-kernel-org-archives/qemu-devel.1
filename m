@@ -2,64 +2,63 @@ Return-Path: <SRS0=mHy3=VQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CC16C7618F
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 16:00:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C7A1C7618F
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 16:02:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6C0E52186A
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 16:00:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C0E52186A
+	by mail.kernel.org (Postfix) with ESMTPS id 62D982186A
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 16:02:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 62D982186A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46604 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46808 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hoVIo-0005Ic-08
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 12:00:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37372)
+	id 1hoVKl-0000QO-Gi
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 12:02:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37730)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <stefanha@redhat.com>) id 1hoVIb-0004tB-9c
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 11:59:58 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1hoVKZ-0008Pk-H6
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 12:02:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1hoVIB-0002WU-W6
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 11:59:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45914)
+ (envelope-from <dgilbert@redhat.com>) id 1hoVKQ-0003pU-Ig
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 12:01:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60626)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>)
- id 1hoVHT-0000Jx-AV; Fri, 19 Jul 2019 11:58:55 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hoVK7-0001Om-QV
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 12:01:35 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id F35DF7574F;
- Fri, 19 Jul 2019 15:54:21 +0000 (UTC)
-Received: from localhost (ovpn-117-223.ams2.redhat.com [10.36.117.223])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 161485D978;
- Fri, 19 Jul 2019 15:54:11 +0000 (UTC)
-Date: Fri, 19 Jul 2019 16:54:11 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Aarushi Mehta <mehta.aaru20@gmail.com>
-Message-ID: <20190719155411.GJ24412@stefanha-x1.localdomain>
-References: <20190719133530.28688-1-mehta.aaru20@gmail.com>
- <20190719133530.28688-15-mehta.aaru20@gmail.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 7347730A5A6F;
+ Fri, 19 Jul 2019 15:56:56 +0000 (UTC)
+Received: from work-vm (ovpn-117-245.ams2.redhat.com [10.36.117.245])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9AC7417F88;
+ Fri, 19 Jul 2019 15:56:55 +0000 (UTC)
+Date: Fri, 19 Jul 2019 16:56:53 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Wei Yang <richardw.yang@linux.intel.com>
+Message-ID: <20190719155653.GE3000@work-vm>
+References: <20190710050814.31344-1-richardw.yang@linux.intel.com>
+ <20190710050814.31344-3-richardw.yang@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="I/5syFLg1Ed7r+1G"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190719133530.28688-15-mehta.aaru20@gmail.com>
+In-Reply-To: <20190710050814.31344-3-richardw.yang@linux.intel.com>
 User-Agent: Mutt/1.12.0 (2019-05-25)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.25]); Fri, 19 Jul 2019 15:54:22 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.47]); Fri, 19 Jul 2019 15:56:56 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v6 14/14] qemu-iotest: enable testing with
- qemu-io aio options
+Subject: Re: [Qemu-devel] [PATCH 2/2] migration/postcopy: do_fixup is true
+ when host_offset is non-zero
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,53 +70,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Maxim Levitsky <mlevitsk@redhat.com>,
- qemu-block@nongnu.org, Sergio Lopez <slp@redhat.com>, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, saket.sinha89@gmail.com,
- Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefan@redhat.com>,
- Julia Suvorova <jusual@mail.ru>
+Cc: qemu-devel@nongnu.org, quintela@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+* Wei Yang (richardw.yang@linux.intel.com) wrote:
+> This means it is not necessary to spare an extra variable to hold this
+> condition. Use host_offset directly is fine.
+> 
+> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
 
---I/5syFLg1Ed7r+1G
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-On Fri, Jul 19, 2019 at 07:05:30PM +0530, Aarushi Mehta wrote:
-> Signed-off-by: Aarushi Mehta <mehta.aaru20@gmail.com>
 > ---
->  tests/qemu-iotests/check     | 14 +++++++++++++-
->  tests/qemu-iotests/common.rc | 10 ++++++++++
->  2 files changed, 23 insertions(+), 1 deletion(-)
-
-So far this patch affects qemu-io only.  That's a good start but more
-can be done.
-
-Taking CACHEMODE as an example, there are other places where the
-parameter can be added.  The main one is qemu -drive options but
-qemu-img could also use AIOMODE.
-
-Please add an aiomode variable to the iotests.py module (see how
-cachemode is set there) so that Python tests can use the the value set
-on the ./check command-line.
-
---I/5syFLg1Ed7r+1G
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl0x56IACgkQnKSrs4Gr
-c8i25ggAtk7fpv+Zu82jYIL2fNiIFK6ruMaRPugetYWBKQ1+y6ij7y+BRr0GPonZ
-60ETWNAGY6jJLKJtgvNdkq4GjAv/oJwRjMsGvOipDR1R9bNcpTPxmUvGMF7awNp4
-yl1tyF1VEecLLyghnomXCR2cUD34ghM3WP7TuNczrrwWhfPu3ysV6t2oRHR2eQvK
-qQKMtAwtvag+0DNtXWKqVlH/8dxxuDZRP+HRyje9NQ8btanm+h/S8DiarmmKD0mX
-3cb9p7/4RAws86ZlTdBeEskckw+4/w4ojaTsPTwjonvZESZNs3T+NxUSE/BUJSgF
-vWFIAibkyRDkhxEoHp0bPzl7KocenQ==
-=FslS
------END PGP SIGNATURE-----
-
---I/5syFLg1Ed7r+1G--
+>  migration/ram.c | 5 +----
+>  1 file changed, 1 insertion(+), 4 deletions(-)
+> 
+> diff --git a/migration/ram.c b/migration/ram.c
+> index c4dc36e525..b0ca0059c4 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -2873,7 +2873,6 @@ static void postcopy_chunk_hostpages_pass(MigrationState *ms, bool unsent_pass,
+>      }
+>  
+>      while (run_start < pages) {
+> -        bool do_fixup = false;
+>          unsigned long fixup_start_addr;
+>          unsigned long host_offset;
+>  
+> @@ -2883,7 +2882,6 @@ static void postcopy_chunk_hostpages_pass(MigrationState *ms, bool unsent_pass,
+>           */
+>          host_offset = run_start % host_ratio;
+>          if (host_offset) {
+> -            do_fixup = true;
+>              fixup_start_addr = run_start - host_offset;
+>              /*
+>               * This host page has gone, the next loop iteration starts
+> @@ -2905,7 +2903,6 @@ static void postcopy_chunk_hostpages_pass(MigrationState *ms, bool unsent_pass,
+>               */
+>              host_offset = run_end % host_ratio;
+>              if (host_offset) {
+> -                do_fixup = true;
+>                  fixup_start_addr = run_end - host_offset;
+>                  /*
+>                   * This host page has gone, the next loop iteration starts
+> @@ -2921,7 +2918,7 @@ static void postcopy_chunk_hostpages_pass(MigrationState *ms, bool unsent_pass,
+>              }
+>          }
+>  
+> -        if (do_fixup) {
+> +        if (host_offset) {
+>              unsigned long page;
+>  
+>              /* Tell the destination to discard this page */
+> -- 
+> 2.17.1
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
