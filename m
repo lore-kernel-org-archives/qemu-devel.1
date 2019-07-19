@@ -2,72 +2,67 @@ Return-Path: <SRS0=mHy3=VQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11338C7618F
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 15:37:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05158C7618F
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 15:38:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 956B32186A
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 15:37:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 956B32186A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id D04A12186A
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jul 2019 15:38:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D04A12186A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46350 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46362 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hoUwg-00058M-ID
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 11:37:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33612)
+	id 1hoUy1-0006oz-3A
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 11:38:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33905)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bounces@canonical.com>) id 1hoUwV-0004jQ-Nz
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 11:37:08 -0400
+ (envelope-from <stefanha@redhat.com>) id 1hoUxq-0006ID-RB
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 11:38:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1hoUwO-0001sh-53
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 11:37:03 -0400
-Received: from indium.canonical.com ([91.189.90.7]:48550)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1hoUwM-00013B-B5
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 11:36:58 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1hoUuy-0001ks-28
- for <qemu-devel@nongnu.org>; Fri, 19 Jul 2019 15:35:32 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 0B04B2E8079
- for <qemu-devel@nongnu.org>; Fri, 19 Jul 2019 15:35:32 +0000 (UTC)
+ (envelope-from <stefanha@redhat.com>) id 1hoUxl-0002Mn-Cr
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 11:38:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38940)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>)
+ id 1hoUxM-0000cc-8u; Fri, 19 Jul 2019 11:38:00 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 0165830BD1CC;
+ Fri, 19 Jul 2019 15:34:47 +0000 (UTC)
+Received: from localhost (ovpn-117-223.ams2.redhat.com [10.36.117.223])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E7E3A26E6B;
+ Fri, 19 Jul 2019 15:34:41 +0000 (UTC)
+Date: Fri, 19 Jul 2019 16:34:40 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Aarushi Mehta <mehta.aaru20@gmail.com>
+Message-ID: <20190719153440.GB24412@stefanha-x1.localdomain>
+References: <20190719133530.28688-1-mehta.aaru20@gmail.com>
+ <20190719133530.28688-5-mehta.aaru20@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 19 Jul 2019 15:28:23 -0000
-From: Alex <1829242@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: dgilbert-h nevilad
-X-Launchpad-Bug-Reporter: Alex (nevilad)
-X-Launchpad-Bug-Modifier: Alex (nevilad)
-References: <155792850856.14868.18260779757728395853.malonedeb@gac.canonical.com>
-Message-Id: <156355010347.30608.1795745222291897418.malone@soybean.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="19010";
- Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: e57bd49970091941fab09b7f7dcb851d756b3c58
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="3lcZGd9BuhuYXNfi"
+Content-Disposition: inline
+In-Reply-To: <20190719133530.28688-5-mehta.aaru20@gmail.com>
+User-Agent: Mutt/1.12.0 (2019-05-25)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.49]); Fri, 19 Jul 2019 15:34:47 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1829242] Re: qemu on windows host exits after
- savevm command
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v6 04/14] block/io_uring: implements
+ interfaces for io_uring
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -76,78 +71,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1829242 <1829242@bugs.launchpad.net>
+Cc: Fam Zheng <fam@euphon.net>, Maxim Levitsky <mlevitsk@redhat.com>,
+ qemu-block@nongnu.org, Sergio Lopez <slp@redhat.com>, qemu-devel@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>, saket.sinha89@gmail.com,
+ Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefan@redhat.com>,
+ Julia Suvorova <jusual@mail.ru>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Running the operation under debugger catches this error:
-Critical error detected c0000374
-(2314.a54): Break instruction exception - code 80000003 (first chance)
-ntdll!RtlIsNonEmptyDirectoryReparsePointAllowed+0x72:
-00007ffe`0780b2d2 cc              int     3
 
-This error means that a heap corruption was detected. To find the place whe=
-re the corruption occured, I've ran qemu under appverifier, which is some k=
-ind of ASAN\MSAN for windows.
-The tool caught an access violation, the callstack seems to be not full, sa=
-ve_snapshot calls qemu_savevm_state_iterate, then a call to ram_save_iterat=
-e, then ram_find_and_save_block. But the address of the exception does not =
-correspond to this function.
-Disassembling qemu and searching for this address, I've found that it proba=
-bly corresponds to this snippet in ram_save_host_page:
-    do {
-        /* Check the pages is dirty and if it is send it */
-        if (!migration_bitmap_clear_dirty(rs, pss->block, pss->page)) {
-            pss->page++;
-            continue;
-        }
+--3lcZGd9BuhuYXNfi
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-The missing callstack part is probably ram_find_and_save_block calling ram_=
-save_host_page at this place:
-        if (found) {
-            pages =3D ram_save_host_page(rs, &pss, last_stage);
-        }
+On Fri, Jul 19, 2019 at 07:05:20PM +0530, Aarushi Mehta wrote:
+> diff --git a/block.c b/block.c
+> index 29e931e217..4aa3500ad8 100644
+> --- a/block.c
+> +++ b/block.c
+> @@ -844,6 +844,28 @@ static BlockdevDetectZeroesOptions bdrv_parse_detect=
+_zeroes(QemuOpts *opts,
+>      return detect_zeroes;
+>  }
+> =20
+> +/**
+> + * Set flags for aio engine
 
-It seems that the compiler inlined several functions to ram_find_and_save_b=
-lock and that is the reason for the partial stack.
-Since I am still unable to see local variable values during debugging, I ca=
-n't give more info now. =
+Other parse_*() functions are more specific about which type of flags
+are produced:
 
-I think the bug can be found when running qemu on linux with ASAN\MSAN. Whe=
-n this does not find the bug, I do more debugging.
-I want mention that the caught access violation is due to reading an invali=
-d address. The bug found without appverifier is due to writing to an invali=
-d address, so there may be several bugs.
+s/flags/open flags/
 
--- =
+> + *
+> + * Return 0 on success, -1 if the engine specifies is invalid
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1829242
+s/specifies/specified/
 
-Title:
-  qemu on windows host exits after savevm command
+> + */
+> +int bdrv_parse_aio(const char *mode, int *flags)
+> +{
+> +    if (!strcmp(mode, "threads")) {
+> +        /* do nothing, default */
+> +    } else if (!strcmp(mode, "native")) {
+> +        *flags |=3D BDRV_O_NATIVE_AIO;
+> +#ifdef CONFIG_LINUX_IO_URING
+> +    } else if (!strcmp(mode, "io_uring")) {
+> +        *flags |=3D BDRV_O_IO_URING;
+> +#endif
+> +    } else {
+> +        return -1;
+> +    }
+> +
+> +    return 0;
+> +}
 
-Status in QEMU:
-  New
+Can you move this change to the patch that uses bdrv_parse_aio()?  I
+don't see any callers in this patch.
 
-Bug description:
-  I'm running qemu-system-i386.exe 3.1.0 with this command line:
-  "C:\Program Files\qemu\qemu-system-i386.exe"  -L C:\user\qemu\pc-bios\ -n=
-ame win7 -m 4G -uuid 564db62e-e031-b5cf-5f34-a75f8cefa98e -rtc base=3Dlocal=
-time -accel hax -hdd C:\VirtualMachines\Dev\Win10x64_VS17\swap.qcow "C:\Vir=
-tualMachines\qemu\qemu_win7.qcow"
-  Host OS Windows 10 x64, guest OS Wondows 7 x86.
+> +        if (ret < 0) {
+> +            if (ret =3D=3D -EINTR) {
+> +                luring_resubmit(s, luringcb);
+> +                continue;
+> +            }
+> +        } else if (!luringcb->qiov) {
+> +            goto end;
+> +        } else if (total_bytes =3D=3D luringcb->qiov->size) {
+> +                ret =3D 0;
 
-  Wait till the OS loads, go to compat_monitor0 tab and enter command:
-  savevm loaded_win
-  After a few seconds qemu exits, running it another time and entering comm=
-and:
-  info snapshots
-  says "There is no snapshot available". I've tried rinning it with -accel =
-tcg, with same results. I've tried less memory (1G), same results.
+Indentation is off here.
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1829242/+subscriptions
+> +static int luring_do_submit(int fd, LuringAIOCB *luringcb, LuringState *=
+s,
+> +                            uint64_t offset, int type)
+> +{
+> +    struct io_uring_sqe *sqes =3D &luringcb->sqeq;
+> +
+> +    switch (type) {
+> +    case QEMU_AIO_WRITE:
+> +        io_uring_prep_writev(sqes, fd, luringcb->qiov->iov,
+> +                             luringcb->qiov->niov, offset);
+> +        break;
+> +    case QEMU_AIO_READ:
+> +        io_uring_prep_readv(sqes, fd, luringcb->qiov->iov,
+> +                            luringcb->qiov->niov, offset);
+> +        break;
+> +    case QEMU_AIO_FLUSH:
+> +        io_uring_prep_fsync(sqes, fd, 0);
+
+In QEMU QEMU_AIO_FLUSH is fdatasync so the IORING_FSYNC_DATASYNC flag
+can be used for a slightly cheaper fsync operation.
+
+> +        break;
+> +    default:
+> +        fprintf(stderr, "%s: invalid AIO request type, aborting 0x%x.\n",
+> +                        __func__, type);
+> +        abort();
+> +    }
+> +    io_uring_sqe_set_data(sqes, luringcb);
+> +
+> +    QSIMPLEQ_INSERT_TAIL(&s->io_q.sq_overflow, luringcb, next);
+
+Now that we use sq_overflow unconditionally it can be renamed to
+submit_queue, making the code easier to understand.
+
+--3lcZGd9BuhuYXNfi
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl0x4xAACgkQnKSrs4Gr
+c8g6wQgAia00NAcMIHGybMrn8RmcEf37QecA3wgxA8Ixawwufy/ViGxJ6cBdshnI
+vfHO5Bh8VAilrX4Urr3LxkPMZ5YpMKAnEMAWdEhU87APboyphDncp0qkf7WxAALp
+0mpOeS+3WKJWLsET89vzVuEiTGcRg9ysCAiSvM3JVl0HbyF1JTCCg8xpuZIkktzY
+W5z4N//YOxb1MOfZwjIwbtubUgL7/Y23TwlFNWWrbyDSaz/ZHM5gv9aTWF2Q1w1q
+KxOwNAIpXQH4XeVLtpR/+aNMt89NEP2tOk3YaMDIbTFmHSZ0+H5P2pB0iKvxC9UK
+gMr76O9ob7CULWZVA4U1fDaUpE9qAQ==
+=v5XU
+-----END PGP SIGNATURE-----
+
+--3lcZGd9BuhuYXNfi--
 
