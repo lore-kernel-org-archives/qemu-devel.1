@@ -8,72 +8,72 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82A3AC76186
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jul 2019 23:48:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CD52C76195
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jul 2019 23:48:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4FCBB20823
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jul 2019 23:48:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CE8DC20823
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jul 2019 23:48:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cYh9rdYJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4FCBB20823
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l8c6EWEb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE8DC20823
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53942 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53950 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hoz5X-0004Wr-F1
-	for qemu-devel@archiver.kernel.org; Sat, 20 Jul 2019 19:48:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35460)
+	id 1hoz5k-0005Yt-35
+	for qemu-devel@archiver.kernel.org; Sat, 20 Jul 2019 19:48:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35498)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <skrtbhtngr@gmail.com>) id 1hoz5H-0003eB-S2
- for qemu-devel@nongnu.org; Sat, 20 Jul 2019 19:48:12 -0400
+ (envelope-from <skrtbhtngr@gmail.com>) id 1hoz5N-00043K-Gv
+ for qemu-devel@nongnu.org; Sat, 20 Jul 2019 19:48:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <skrtbhtngr@gmail.com>) id 1hoz5G-0002we-SB
- for qemu-devel@nongnu.org; Sat, 20 Jul 2019 19:48:11 -0400
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:41243)
+ (envelope-from <skrtbhtngr@gmail.com>) id 1hoz5M-00031m-E1
+ for qemu-devel@nongnu.org; Sat, 20 Jul 2019 19:48:17 -0400
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:44300)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <skrtbhtngr@gmail.com>)
- id 1hoz5G-0002vd-Lw
- for qemu-devel@nongnu.org; Sat, 20 Jul 2019 19:48:10 -0400
-Received: by mail-pl1-x644.google.com with SMTP id m9so17288751pls.8
- for <qemu-devel@nongnu.org>; Sat, 20 Jul 2019 16:48:10 -0700 (PDT)
+ id 1hoz5M-000316-87
+ for qemu-devel@nongnu.org; Sat, 20 Jul 2019 19:48:16 -0400
+Received: by mail-pg1-x541.google.com with SMTP id i18so15985495pgl.11
+ for <qemu-devel@nongnu.org>; Sat, 20 Jul 2019 16:48:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=YfW1aH+Wpw10vSj+L0zxMi7E9GI7IXk5GtJx8ieye+k=;
- b=cYh9rdYJVQF9qlBb+UYRb4LF9xub5bGioGf3vFC4vh4ZzNUTiYGeoHKXOm2jexX5pz
- H3sZOLnVeSI9UVlXZJahQyfNep3BGpTvJuih5YdELTXYKU3z5QBSbrm+l9XMrA+jJZee
- ooCX8dwI6klYkhmZDHEMg4k6erUlddRGrPrdxAHF5mf7OUeVg6nWaTs5Gw22mGBxxmpu
- ZXbDjUgvSmvTHF79VtJqPEut2GFcOHEqL9Q/xRcFDykBTL38yAj9cboLy+AEaU0X5eZc
- ztBtaEPlrLQRfHx1d7etfQl1ou8R4Larrw4tl72/tMhfuCEVx+8c7JN7bN/wccrpeswZ
- VaVA==
+ bh=o3w6rrLptWsFl8HE0mEgf9b9opUynwdbAv9zKRjY76s=;
+ b=l8c6EWEbsxt6dLj6FQIoUHfh7OciM+CGiXzER7SMhKZNukCVHy8wnwSgG7Sr/ABXQT
+ xeeQkwuuADOdqi1ipkqsiOhRPteg0y7Hp95+cflu7ZSGCUAgFBLsiILyLTK/Jh+yWMXa
+ ixQN6aasiTsVnWMToWsPi7lP5kgYwgtLMZvzM1c7Hg3X/9JwsZfr8lCh2i1hgvmv2qsy
+ SUtxb+ZiISEuVVfFmG0q9E9/aS6fl90TpnZiNMIpTMGdPi4n9r+ZwBImJnZK+I5pai4c
+ M5TKTAc20MYBw+vwXT9uzxaUQDw8NUx7YAyJNPPnQx4d6P+3956GWDbPXtqXi7Qi4X7F
+ m3Tw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=YfW1aH+Wpw10vSj+L0zxMi7E9GI7IXk5GtJx8ieye+k=;
- b=mHuXq0/EhOLmvGottslKCbGDbY+GNUULhddp831rGkFf8nM4KyEoR/OgoYHYN1f+jM
- 46Nt0szmLW78MVsWk57zG9n/HALeMpixj46m5um6NzD8X5OCLMkOvc6hyDj0m473HF8p
- 2jjGjmoHYtS3ZV5WXP5U1gEr3VYZ0Jjz0hxRjYE4IoEoAzxy1FlLIEUFjygzhkCnJ3iP
- VmikhfQHoVpwZ0colsk42Z/5T1f0vG0snzhN+g7P8DOJUr/Sx4/USoB5+88+yRYjKe4z
- K82aDljRZdmLXKi5xc6zIZX7PADWQsRuql47Cb6wIHiiC+Gk7LgppLV6kUaJ1BE94QMX
- q3nQ==
-X-Gm-Message-State: APjAAAWen5ULaNe3gdFhzH1FOqKkAeLPcTFedoCf/FMEBMjolZBlX5dT
- c9BHiHbyyhZ/Djh8ZjfkJL4FDO/N
-X-Google-Smtp-Source: APXvYqwOrfgQg8AI3I1OzcLDcPrbV5MoptZ4cy7hbLjQ/JH4+5Qti3dzGvOEgCW+FEseUIXJWCPQGQ==
-X-Received: by 2002:a17:902:7448:: with SMTP id
- e8mr66062080plt.85.1563666489452; 
- Sat, 20 Jul 2019 16:48:09 -0700 (PDT)
+ bh=o3w6rrLptWsFl8HE0mEgf9b9opUynwdbAv9zKRjY76s=;
+ b=TohzYsq08ks7q7Itj5A9+txcM7y3CEGDKEBs2Kyw2weM17wuTbJSbDOqwxKgf+xpZZ
+ epxNJ+ngscc5zmqITtFWxmpPdOKKGIA/WeQc0+aRuTDKiTu1V+QwjcdPnUta8alKo3Ek
+ 4jNzo5DYamGcbdqL9viKf6S+tCZ15bYBiEL6s5F5YyGvNnCh46LSENoSnWgrpDoJbI5k
+ tXs3rJ9fCEeHW6si057OjMnKoJILGv0xjEzHkkhtgBnXhADlvOvSR4+F/GCAf3x6vztq
+ n5nsU8feNfOGeXuIUwcTOyLexVAookZ9/wrlyW/wN9ptMkQNySvrpJcOjr32K6OIEoo5
+ 6NpQ==
+X-Gm-Message-State: APjAAAUe/GI9Enp3PXXnj+QtWU3q88RQG5RoP95LPHHEZzfY+cZleW1M
+ XSkPwG0YhOHS2ubJuOWG3SmWhUzs
+X-Google-Smtp-Source: APXvYqyrOprRWLKEpWfEXg3nT/puwVIHP2ARZx3OjAsv279ytkEXdWzb7pB8I5s2/yuS0ulB7QeBag==
+X-Received: by 2002:a17:90a:a008:: with SMTP id
+ q8mr67993851pjp.114.1563666494919; 
+ Sat, 20 Jul 2019 16:48:14 -0700 (PDT)
 Received: from beta.cse.iitb.ac.in ([2405:204:20e:f16f:2a5b:d596:9ab:8e05])
- by smtp.gmail.com with ESMTPSA id b6sm31229151pgq.26.2019.07.20.16.48.06
+ by smtp.gmail.com with ESMTPSA id b6sm31229151pgq.26.2019.07.20.16.48.12
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Sat, 20 Jul 2019 16:48:08 -0700 (PDT)
+ Sat, 20 Jul 2019 16:48:14 -0700 (PDT)
 From: Sukrit Bhatnagar <skrtbhtngr@gmail.com>
 To: qemu-devel@nongnu.org
-Date: Sun, 21 Jul 2019 05:18:02 +0530
-Message-Id: <20190720234803.18938-2-skrtbhtngr@gmail.com>
+Date: Sun, 21 Jul 2019 05:18:03 +0530
+Message-Id: <20190720234803.18938-3-skrtbhtngr@gmail.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190720234803.18938-1-skrtbhtngr@gmail.com>
 References: <20190720234803.18938-1-skrtbhtngr@gmail.com>
@@ -81,9 +81,8 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::644
-Subject: [Qemu-devel] [RFC v3 1/2] hw/pvrdma: make DSR mapping idempotent in
- load_dsr()
+X-Received-From: 2607:f8b0:4864:20::541
+Subject: [Qemu-devel] [RFC v3 2/2] hw/pvrdma: add live migration support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,59 +99,126 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Map to DSR only when there is no mapping done already i.e., when
-dev->dsr_info.dsr is NULL. This allows the rest of mappings and
-ring inits to be done by calling load_dsr() when DSR has already
-been mapped to, somewhere else.
+vmstate_pvrdma describes the PCI and MSIX states as well as the dma
+address for dsr and the gid table of device.
+vmstate_pvrdma_gids describes each gid in the gid table.
 
-Move free_dsr() out of load_dsr() and call it before the latter
-as and when needed. This aids the case where load_dsr() is called
-having DSR mapping already done, but the rest of map and init
-operations are pending, and prevents an unmap of the DSR.
+pvrdma_post_save() does the job of unregistering gid entries from the
+backend device in the source host.
+
+pvrdma_post_load() maps to dsr using the loaded dma address, registers
+each loaded gid into the backend device, and finally calls load_dsr()
+to perform other mappings and ring init operations.
 
 Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 Cc: Yuval Shaia <yuval.shaia@oracle.com>
 Signed-off-by: Sukrit Bhatnagar <skrtbhtngr@gmail.com>
 ---
- hw/rdma/vmw/pvrdma_main.c | 17 +++++++++--------
- 1 file changed, 9 insertions(+), 8 deletions(-)
+ hw/rdma/vmw/pvrdma_main.c | 77 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 77 insertions(+)
 
 diff --git a/hw/rdma/vmw/pvrdma_main.c b/hw/rdma/vmw/pvrdma_main.c
-index adcf79cd63..6c90db96f9 100644
+index 6c90db96f9..6f8b56dea3 100644
 --- a/hw/rdma/vmw/pvrdma_main.c
 +++ b/hw/rdma/vmw/pvrdma_main.c
-@@ -172,15 +172,15 @@ static int load_dsr(PVRDMADev *dev)
-     DSRInfo *dsr_info;
-     struct pvrdma_device_shared_region *dsr;
+@@ -28,6 +28,7 @@
+ #include "sysemu/sysemu.h"
+ #include "monitor/monitor.h"
+ #include "hw/rdma/rdma.h"
++#include "migration/register.h"
  
--    free_dsr(dev);
--
--    /* Map to DSR */
--    dev->dsr_info.dsr = rdma_pci_dma_map(pci_dev, dev->dsr_info.dma,
--                              sizeof(struct pvrdma_device_shared_region));
-     if (!dev->dsr_info.dsr) {
--        rdma_error_report("Failed to map to DSR");
--        rc = -ENOMEM;
--        goto out;
-+        /* Map to DSR */
-+        dev->dsr_info.dsr = rdma_pci_dma_map(pci_dev, dev->dsr_info.dma,
-+                                  sizeof(struct pvrdma_device_shared_region));
-+        if (!dev->dsr_info.dsr) {
-+            rdma_error_report("Failed to map to DSR");
-+            rc = -ENOMEM;
-+            goto out;
+ #include "../rdma_rm.h"
+ #include "../rdma_backend.h"
+@@ -593,6 +594,81 @@ static void pvrdma_shutdown_notifier(Notifier *n, void *opaque)
+     pvrdma_fini(pci_dev);
+ }
+ 
++static int pvrdma_post_save(void *opaque)
++{
++    int i, rc;
++    PVRDMADev *dev = opaque;
++
++    for (i = 0; i < MAX_GIDS; i++) {
++
++        if (!dev->rdma_dev_res.port.gid_tbl[i].gid.global.interface_id) {
++            continue;
 +        }
-     }
++        rc = rdma_backend_del_gid(&dev->backend_dev,
++                                   dev->backend_eth_device_name,
++                                   &dev->rdma_dev_res.port.gid_tbl[i].gid);
++        if (rc) {
++            return -EINVAL;
++        }
++    }
++
++    return 0;
++}
++
++static int pvrdma_post_load(void *opaque, int version_id)
++{
++    int i, rc;
++    PVRDMADev *dev = opaque;
++    PCIDevice *pci_dev = PCI_DEVICE(dev);
++    DSRInfo *dsr_info = &dev->dsr_info;
++
++    dsr_info->dsr = rdma_pci_dma_map(pci_dev, dsr_info->dma,
++                                sizeof(struct pvrdma_device_shared_region));
++    if (!dsr_info->dsr) {
++        rdma_error_report("Failed to map to DSR");
++        return -ENOMEM;
++    }
++
++    for (i = 0; i < MAX_GIDS; i++) {
++
++        if (!dev->rdma_dev_res.port.gid_tbl[i].gid.global.interface_id) {
++            continue;
++        }
++
++        rc = rdma_backend_add_gid(&dev->backend_dev,
++                                  dev->backend_eth_device_name,
++                                  &dev->rdma_dev_res.port.gid_tbl[i].gid);
++        if (rc) {
++            return -EINVAL;
++        }
++    }
++
++    return load_dsr(dev);
++}
++
++static const VMStateDescription vmstate_pvrdma_gids = {
++    .name = "pvrdma-gids",
++    .fields = (VMStateField[]) {
++            VMSTATE_UINT8_ARRAY_V(gid.raw, RdmaRmGid, 16, 0),
++            VMSTATE_END_OF_LIST()
++    }
++};
++
++static const VMStateDescription vmstate_pvrdma = {
++    .name = PVRDMA_HW_NAME,
++    .post_save = pvrdma_post_save,
++    .post_load = pvrdma_post_load,
++    .fields = (VMStateField[]) {
++            VMSTATE_PCI_DEVICE(parent_obj, PVRDMADev),
++            VMSTATE_MSIX(parent_obj, PVRDMADev),
++            VMSTATE_UINT64(dsr_info.dma, PVRDMADev),
++            VMSTATE_STRUCT_ARRAY(rdma_dev_res.port.gid_tbl, PVRDMADev,
++                                 MAX_PORT_GIDS, 0, vmstate_pvrdma_gids,
++                                 RdmaRmGid),
++            VMSTATE_END_OF_LIST()
++    }
++};
++
+ static void pvrdma_realize(PCIDevice *pdev, Error **errp)
+ {
+     int rc = 0;
+@@ -688,6 +764,7 @@ static void pvrdma_class_init(ObjectClass *klass, void *data)
  
-     /* Shortcuts */
-@@ -402,6 +402,7 @@ static void pvrdma_regs_write(void *opaque, hwaddr addr, uint64_t val,
-     case PVRDMA_REG_DSRHIGH:
-         trace_pvrdma_regs_write(addr, val, "DSRHIGH", "");
-         dev->dsr_info.dma |= val << 32;
-+        free_dsr(dev);
-         load_dsr(dev);
-         init_dsr_dev_caps(dev);
-         break;
+     dc->desc = "RDMA Device";
+     dc->props = pvrdma_dev_properties;
++    dc->vmsd = &vmstate_pvrdma;
+     set_bit(DEVICE_CATEGORY_NETWORK, dc->categories);
+ 
+     ir->print_statistics = pvrdma_print_statistics;
 -- 
 2.21.0
 
