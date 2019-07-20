@@ -2,92 +2,84 @@ Return-Path: <SRS0=lwXe=VR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76614C76188
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jul 2019 04:30:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C31B4C76188
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jul 2019 06:04:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 40CB52084C
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jul 2019 04:30:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8AB1920873
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jul 2019 06:04:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CfeVQUOW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 40CB52084C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T9KjADon"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8AB1920873
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49606 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49740 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hoh0q-0008Hz-66
-	for qemu-devel@archiver.kernel.org; Sat, 20 Jul 2019 00:30:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39463)
+	id 1hoiUE-0004E4-M5
+	for qemu-devel@archiver.kernel.org; Sat, 20 Jul 2019 02:04:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54556)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1hoh0d-0007hu-QK
- for qemu-devel@nongnu.org; Sat, 20 Jul 2019 00:30:12 -0400
+ (envelope-from <hikarupsp@gmail.com>) id 1hoiU4-0003pl-HV
+ for qemu-devel@nongnu.org; Sat, 20 Jul 2019 02:04:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1hoh0c-00086h-En
- for qemu-devel@nongnu.org; Sat, 20 Jul 2019 00:30:11 -0400
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:44090)
+ (envelope-from <hikarupsp@gmail.com>) id 1hoiU3-0006Ek-Id
+ for qemu-devel@nongnu.org; Sat, 20 Jul 2019 02:04:40 -0400
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:44428)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1hoh0b-00085I-Cf
- for qemu-devel@nongnu.org; Sat, 20 Jul 2019 00:30:10 -0400
-Received: by mail-pf1-x443.google.com with SMTP id t16so14984657pfe.11
- for <qemu-devel@nongnu.org>; Fri, 19 Jul 2019 21:30:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=4noTVdIajPcc9XWgg7e/MG+1pTdguJ909Gz7msr7+Yo=;
- b=CfeVQUOWcY0FZvnnqTRQJI0Cl2E0lq2iF2moRMG5DP/IbWxM+BTqMqfNywbhxUsZBu
- qniBpGBvOkwYTjwkjfLqIf5++umE2xLTkTMoJirW19ncnqpHDD/KZxhQ7UhHXRiK5k7b
- yzEyqg/7Jh1HCAql/l/ekl2+ToEBmSME4DH8DuIc+Rci03lldwTmMi7qfiOxVVxTORxV
- utKz5TrZBmJZftQjb/Tds6PBKeeArK4oBsShpzcku8VBySQDvB3/SmJ9cnbrbVioCU/8
- SOq7opn0Gd2pmcuLX35ooGy1iShPAg4Ty6K9V+LKL1jvI8r7vlVgGp+t7dtKHsodWvOq
- qw3g==
+ (Exim 4.71) (envelope-from <hikarupsp@gmail.com>) id 1hoiU3-0006Dx-At
+ for qemu-devel@nongnu.org; Sat, 20 Jul 2019 02:04:39 -0400
+Received: by mail-pg1-x543.google.com with SMTP id i18so15363148pgl.11
+ for <qemu-devel@nongnu.org>; Fri, 19 Jul 2019 23:04:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=ZST8hHeVxn10C+xoTazpqC2/5O7pM7tEsmAgjWWAMP8=;
+ b=T9KjADonGa4aIKC5Hmf18ADohnfA21UvqEQQqrhvKi4f2V7zhKtB/rkkHyj6vV2JyT
+ /qB150P/GOGSlcFq1GaXFfHR/mM+fxl6JZCWe21hhpQFsUnYk/NQ5aaJf2TxwM46oeGc
+ dZiRcUeYt3a38W+NaTkWMb0U3h08Ca/RIC6LROVwHZOPAf+H/P6JTnq8D1Mlt7Vec0BX
+ y7/Hi4Ii4W9eeINGcyPqmdVEKeY/qiv0wXrJWApnIXkC0cqwoaFfghouiaMFQmm/siuO
+ Wy2ZVPeiw/FcL54PV0hPr/HO6+JBNXYn20A2QL1hPL32IHNDw9y/i+3tKmoscxQeEMyR
+ jDXA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
  :content-transfer-encoding;
- bh=4noTVdIajPcc9XWgg7e/MG+1pTdguJ909Gz7msr7+Yo=;
- b=G6aYiLrLf1m03aCg9lKBTkdnKUNnQjxxy/wahJcVqjI7TPioXebWFsVUJDAQWl4Dtp
- NQ2TOQn5WS8qaRwefhAKLrgg5r69WSe12Y2JvHLqfyNKyRsEnnLkgb10uinr83E5kkkU
- bCMqXZ0aI9pIVrB9DyCW7ZEdJ1v+GOZoeuovgxZ+dqbLUg8+hlfWCT2E25oO2yH7LGc5
- z/++G22AxOMGbUoXZqerYs3bmqTAhQZ9rSWy5ORz67LJrxCfe1egCZKcKRLvq0LrxYAT
- zawf51r6uUjwxV0jZwP6CHfdfNyHYISAY3nw3y8TsD1eDwBJBajRoryzGcc0gway6t3A
- m3IQ==
-X-Gm-Message-State: APjAAAWV0HroThu0QFxYP5vve7ocjoKEjijzCunHJiboccB3ZHVP66Z2
- iVFuKoT/cwG6mQZpptFnUh6bow==
-X-Google-Smtp-Source: APXvYqxGrjZKjGF52X3pa6obewgq1VJe/Ks2X1O90C7QwRn5j38NkawB7jNf0fpBWZVYtix8hsQ1ag==
-X-Received: by 2002:a17:90a:8a0b:: with SMTP id
- w11mr61671536pjn.125.1563597007785; 
- Fri, 19 Jul 2019 21:30:07 -0700 (PDT)
-Received: from [192.168.1.11] (97-126-117-207.tukw.qwest.net. [97.126.117.207])
- by smtp.gmail.com with ESMTPSA id a128sm32991022pfb.185.2019.07.19.21.30.05
+ bh=ZST8hHeVxn10C+xoTazpqC2/5O7pM7tEsmAgjWWAMP8=;
+ b=dvTpkHahpdZdS1GjjdL78MzF/xOljD3/muvUF25wRPntZD5s6zB+Z+dyHyV7TofqFH
+ 8GwY632RV3GEhSGhaHB4Bypn0mQN91PyruDQ4oxGmXNofIqfex/vLjSmARdjFmxmRTOz
+ H71R95ZvUiALGVU70rwnclnUqnhzGxStRMXEZKC4TLj0G4VmZ57yWDtTn5WvkcQZjC00
+ ZBW/mEOC7qMawA4MtbzAd1GX6PpBjoswLrV9iNdvLysPUQDUpY21AFZBy8Uz0aoKmP3T
+ q52gzKYX/ev1epeuyJhIVMH9ZH1Q89ZnkxaJ/RXVhEc5/1l+apFCo+nHR8WsToNgj9vy
+ etEw==
+X-Gm-Message-State: APjAAAVFw1C+qsUd+b0dVMAKlfPZ0wWvEm34r3De9dI4l/XV2am3cTbN
+ jrnHXCBF2KaUkyHzE8dn2V3m3L/g
+X-Google-Smtp-Source: APXvYqxCUkCEe65Mvk8nYBOi6PcpP6aW2UbJnmScpa0TLRn0ZD7U/mzRuf8dyO1akR4F4wJMyLmK6Q==
+X-Received: by 2002:a63:455c:: with SMTP id u28mr39078632pgk.416.1563602676627; 
+ Fri, 19 Jul 2019 23:04:36 -0700 (PDT)
+Received: from localhost.localdomain (72.65.214.202.bf.2iij.net.
+ [202.214.65.72])
+ by smtp.gmail.com with ESMTPSA id 64sm33557998pfe.128.2019.07.19.23.04.33
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Fri, 19 Jul 2019 21:30:06 -0700 (PDT)
-To: Jan Bobek <jan.bobek@gmail.com>, qemu-devel@nongnu.org
-References: <20190711223300.6061-1-jan.bobek@gmail.com>
- <20190711223300.6061-11-jan.bobek@gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <6bdee2da-23de-0053-9046-c54be9c533a4@linaro.org>
-Date: Fri, 19 Jul 2019 21:30:03 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+ Fri, 19 Jul 2019 23:04:34 -0700 (PDT)
+From: hikarupsp@gmail.com
+To: qemu-devel@nongnu.org
+Date: Sat, 20 Jul 2019 15:04:27 +0900
+Message-Id: <20190720060427.50457-1-hikarupsp@gmail.com>
+X-Mailer: git-send-email 2.20.1 (Apple Git-117)
 MIME-Version: 1.0
-In-Reply-To: <20190711223300.6061-11-jan.bobek@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::443
-Subject: Re: [Qemu-devel] [RISU PATCH v3 10/18] x86.risu: add MMX
- instructions
+X-Received-From: 2607:f8b0:4864:20::543
+Subject: [Qemu-devel] [PATCH] xhci: Add No Op Command
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,22 +91,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: Hikaru Nishida <hikarupsp@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/11/19 3:32 PM, Jan Bobek wrote:
-> Add an x86 configuration file with all MMX instructions.
-> 
-> Signed-off-by: Jan Bobek <jan.bobek@gmail.com>
-> ---
->  x86.risu | 321 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 321 insertions(+)
->  create mode 100644 x86.risu
+From: Hikaru Nishida <hikarupsp@gmail.com>
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+This commit adds No Op Command (23) to xHC for verifying the operation
+of the Command Ring mechanisms.
+No Op Command is defined in XHCI spec (4.6.2) and just reports Command
+Completion Event with Completion Code == Success.
+Before this commit, No Op Command is not implemented so xHC reports
+Command Completion Event with Completion Code == TRB Error. This commit
+fixes this behaviour to report Completion Code correctly.
 
+Signed-off-by: Hikaru Nishida <hikarupsp@gmail.com>
+---
+ hw/usb/hcd-xhci.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-r~
+diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
+index 5894a18663..5ceff78280 100644
+--- a/hw/usb/hcd-xhci.c
++++ b/hw/usb/hcd-xhci.c
+@@ -2542,6 +2542,9 @@ static void xhci_process_commands(XHCIState *xhci)
+         case CR_GET_PORT_BANDWIDTH:
+             event.ccode = xhci_get_port_bandwidth(xhci, trb.parameter);
+             break;
++        case CR_NOOP:
++            event.ccode = CC_SUCCESS;
++            break;
+         case CR_VENDOR_NEC_FIRMWARE_REVISION:
+             if (xhci->nec_quirks) {
+                 event.type = 48; /* NEC reply */
+-- 
+2.20.1 (Apple Git-117)
+
 
