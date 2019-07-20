@@ -7,71 +7,71 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ECC8CC76188
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jul 2019 15:20:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5573DC76196
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jul 2019 15:20:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B719A21849
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jul 2019 15:20:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 28C142084C
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jul 2019 15:20:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j+mvkvVC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B719A21849
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DlEbn/CH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28C142084C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51620 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51618 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hor9i-0002SU-1d
-	for qemu-devel@archiver.kernel.org; Sat, 20 Jul 2019 11:20:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39847)
+	id 1hor9g-0002Oi-V9
+	for qemu-devel@archiver.kernel.org; Sat, 20 Jul 2019 11:20:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39894)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <paolo.bonzini@gmail.com>) id 1hor8S-0005wR-Vu
- for qemu-devel@nongnu.org; Sat, 20 Jul 2019 11:18:57 -0400
+ (envelope-from <paolo.bonzini@gmail.com>) id 1hor8W-0006Ar-60
+ for qemu-devel@nongnu.org; Sat, 20 Jul 2019 11:19:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1hor8R-00087S-SP
- for qemu-devel@nongnu.org; Sat, 20 Jul 2019 11:18:56 -0400
-Received: from mail-wr1-x431.google.com ([2a00:1450:4864:20::431]:42934)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1hor8V-00089Z-AI
+ for qemu-devel@nongnu.org; Sat, 20 Jul 2019 11:19:00 -0400
+Received: from mail-wr1-x434.google.com ([2a00:1450:4864:20::434]:42937)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1hor8R-00086d-Lh
- for qemu-devel@nongnu.org; Sat, 20 Jul 2019 11:18:55 -0400
-Received: by mail-wr1-x431.google.com with SMTP id x1so20022821wrr.9
- for <qemu-devel@nongnu.org>; Sat, 20 Jul 2019 08:18:55 -0700 (PDT)
+ id 1hor8V-00089A-4C
+ for qemu-devel@nongnu.org; Sat, 20 Jul 2019 11:18:59 -0400
+Received: by mail-wr1-x434.google.com with SMTP id x1so20022969wrr.9
+ for <qemu-devel@nongnu.org>; Sat, 20 Jul 2019 08:18:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=gEyNtMZO6zjfyzbu3zzmhWKRQ42+siiVg/LlDUHOq+c=;
- b=j+mvkvVCSTi0ypnxPSjFFSFtm5hSzfk7JxmV91Q9Dk77VcLQuL6ULdGpyDQdCJWbTQ
- LQLDAJMafu0QbAcmWdUwLkma3fmGPVrRTg5NMoDh8cl5+83TLfxaw7WSG/HoJhAUKWM4
- vu71CwwvbgJiDAINDRsrPfhZ2VK/OwTez+wGON3E3WyDQ7ZiVU9PaidjmtcjYhZwLh4V
- d4G4ccsSG5eN0MplgHgIefjzIEn5lrhSmcDyk2Cj1NVplghxNdqRdkErdT2/Sd66L5DZ
- pU5EYwccDbfqle7OY1KU9hziZiwKERLd476QiSqi1U04FQvUnxLERYj8bmagR4KC8G4R
- 30iw==
+ bh=1o9UgFGkc03JEexjlaP2KvbGOgKiLs/glyHI3+FA/V0=;
+ b=DlEbn/CH51FGSdv1Hj9C3oYJIHxKPqCXEEjvwM0Df7ZQtTxpEqyE+XkKh2axeQaqty
+ si4zvG0e0RPHIdmKNuGAPoqgNjrLRhyb4U/gRQt8kZ0ZFo5T5guIovRFSdl17qBBUI5A
+ /9HBSGwrJA3KqonFhytK1UFnP/o9/75+Giy737veQJs+NCzJMwrVZiz4ojNZSv2Itc01
+ 60zRZi3eP/wJxOPCp9ELCmVhG4+qy+8SNi0AJ7LEt4zCROMOIiv+LZMwSvE4jH0B6UBt
+ z2f/ObiQ2Ylf1oxWtreE6iHf38HSNSfAf/1XvFRpAjuG5GR2voDBWAcGPjKe8xGKTWBU
+ /pWA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=gEyNtMZO6zjfyzbu3zzmhWKRQ42+siiVg/LlDUHOq+c=;
- b=l4TqYU8A9C6t2EJSHVR+m7Bo6P4wdWKSWDm/Qa48VuT1+nXUMIvpZM9bFAQ2VHtGRS
- WA1vzfD7HIyVod0sBqboBdlnc0VN/bQnEpeOdREzRztidW04WYHJVJGU4PncORebmHvd
- 4RI2V0X2fA0YZ5UN98bY7eY4GE5c293ct+Bj4EZudcnP8Hr2/jtQNrhqQlpbk9dAP344
- 3tRjhUdQk6G/ImMLquptSyulZb/FtBZ7Tfq5qre47xlLc6S0b/xDRZgd3hA3azd8s9PY
- z6VkLljqiACVzMAmeXQ4KJwMF/xhCUomGfP9Ma/4CcpuHZl55uj4dni0bAoERZbth4cd
- 93nQ==
-X-Gm-Message-State: APjAAAWRjf3rKKOxepgiY4JtzbCy1EJQ3gG44/Jc2CfR/MUIGAh4J5fi
- PhBmxiNV5WmKn3rlAi4wYKZeOLP+hzw=
-X-Google-Smtp-Source: APXvYqzqY/Uk/1g0Q98sK4OuEgomBt5kEe/JS9CtMdDYUI/esmTanpqv/kYCNSdrhsqADNt+02j9bA==
-X-Received: by 2002:adf:aac8:: with SMTP id i8mr18862560wrc.56.1563635934464; 
- Sat, 20 Jul 2019 08:18:54 -0700 (PDT)
+ bh=1o9UgFGkc03JEexjlaP2KvbGOgKiLs/glyHI3+FA/V0=;
+ b=HKXaooaDGhaJsiAS0+wCIMCMmW5FoLQYIExz8JPTaP4OrSRiPycrald+GQu7lugaes
+ sVqBK+MrYKFiuIr3f3+GwdBE1UWCsbJmBPvkrw97v73TDsSv1oA9Vxrj0x6Wp3g9vWJS
+ 9rGjMMVy5a77+NE8NSM8BbLnNqJdSqV/Sz3lrt9fIZzEIt1asYqpEKR9+eDBVId9b7ZA
+ Y39TjWKycZ++N42JSm88vcDKkmbJz1PNCfDkXDkmWjVPOFZvcc+OybmPmqaTefNwFJgk
+ L9gdLpfVqbvQ+MiGegNqk3sn4lPrOhtIQEXnfs9MKdYhthVy4mbpwafxJe6Hn4hWh5B7
+ Etvg==
+X-Gm-Message-State: APjAAAUeDmi8QG7VOYnUa/EuX3Du+Hf82G3zhb+tyjnhBRUPIh5kaXYT
+ edfKXjbOw8ZqME2mES6/B4rqnYr3cK8=
+X-Google-Smtp-Source: APXvYqwv1hYKhP1/Yi4OeAzStmcxU3DoaIwUbkKWTIfczdTEX9LssZ9EkZAbNl6QVzhy8i9dyNj/+g==
+X-Received: by 2002:adf:eb49:: with SMTP id u9mr59220683wrn.215.1563635937934; 
+ Sat, 20 Jul 2019 08:18:57 -0700 (PDT)
 Received: from localhost.localdomain ([2001:b07:6468:f312:8501:6b03:f18c:74f8])
- by smtp.gmail.com with ESMTPSA id 4sm77517291wro.78.2019.07.20.08.18.53
+ by smtp.gmail.com with ESMTPSA id 4sm77517291wro.78.2019.07.20.08.18.57
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Sat, 20 Jul 2019 08:18:53 -0700 (PDT)
+ Sat, 20 Jul 2019 08:18:57 -0700 (PDT)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Sat, 20 Jul 2019 17:18:39 +0200
-Message-Id: <20190720151846.7450-6-pbonzini@redhat.com>
+Date: Sat, 20 Jul 2019 17:18:43 +0200
+Message-Id: <20190720151846.7450-10-pbonzini@redhat.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190720151846.7450-1-pbonzini@redhat.com>
 References: <20190720151846.7450-1-pbonzini@redhat.com>
@@ -79,9 +79,8 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::431
-Subject: [Qemu-devel] [PULL 05/12] vhost-user-scsi: Call
- virtio_scsi_common_unrealize() when device realize failed
+X-Received-From: 2a00:1450:4864:20::434
+Subject: [Qemu-devel] [PULL 09/12] qmp: don't emit the RESET event on wakeup
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,60 +92,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Xie Yongji <xieyongji@baidu.com>
+Cc: Cornelia Huck <cohuck@redhat.com>, Nicholas Piggin <npiggin@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Xie Yongji <xieyongji@baidu.com>
+From: Nicholas Piggin <npiggin@gmail.com>
 
-This avoids memory leak when device hotplug is failed.
+Commit 1405819637f53 ("qmp: don't emit the RESET event on wakeup from
+S3") changed system wakeup to avoid calling qapi_event_send_reset.
+Commit 76ed4b18debfe ("s390/ipl: fix ipl with -no-reboot") appears to
+have inadvertently broken that logic.
 
-Signed-off-by: Xie Yongji <xieyongji@baidu.com>
-Message-Id: <20190717004606.12444-2-xieyongji@baidu.com>
+Acked-by: Cornelia Huck <cohuck@redhat.com>
+Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+Message-Id: <20190718103951.10027-2-npiggin@gmail.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/scsi/vhost-user-scsi.c | 14 ++++++++++----
- 1 file changed, 10 insertions(+), 4 deletions(-)
+ vl.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/scsi/vhost-user-scsi.c b/hw/scsi/vhost-user-scsi.c
-index a0b69fb..fcee67d 100644
---- a/hw/scsi/vhost-user-scsi.c
-+++ b/hw/scsi/vhost-user-scsi.c
-@@ -87,7 +87,7 @@ static void vhost_user_scsi_realize(DeviceState *dev, Error **errp)
+diff --git a/vl.c b/vl.c
+index a5808f9..cefe5a3 100644
+--- a/vl.c
++++ b/vl.c
+@@ -1550,7 +1550,7 @@ void qemu_system_reset(ShutdownCause reason)
+     } else {
+         qemu_devices_reset();
      }
- 
-     if (!vhost_user_init(&s->vhost_user, &vs->conf.chardev, errp)) {
--        return;
-+        goto free_virtio;
+-    if (reason != SHUTDOWN_CAUSE_SUBSYSTEM_RESET) {
++    if (reason && reason != SHUTDOWN_CAUSE_SUBSYSTEM_RESET) {
+         qapi_event_send_reset(shutdown_caused_by_guest(reason), reason);
      }
- 
-     vsc->dev.nvqs = 2 + vs->conf.num_queues;
-@@ -101,15 +101,21 @@ static void vhost_user_scsi_realize(DeviceState *dev, Error **errp)
-     if (ret < 0) {
-         error_setg(errp, "vhost-user-scsi: vhost initialization failed: %s",
-                    strerror(-ret));
--        vhost_user_cleanup(&s->vhost_user);
--        g_free(vqs);
--        return;
-+        goto free_vhost;
-     }
- 
-     /* Channel and lun both are 0 for bootable vhost-user-scsi disk */
-     vsc->channel = 0;
-     vsc->lun = 0;
-     vsc->target = vs->conf.boot_tpgt;
-+
-+    return;
-+
-+free_vhost:
-+    vhost_user_cleanup(&s->vhost_user);
-+    g_free(vqs);
-+free_virtio:
-+    virtio_scsi_common_unrealize(dev);
- }
- 
- static void vhost_user_scsi_unrealize(DeviceState *dev, Error **errp)
+     cpu_synchronize_all_post_reset();
 -- 
 1.8.3.1
 
