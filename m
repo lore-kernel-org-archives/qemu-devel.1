@@ -2,51 +2,50 @@ Return-Path: <SRS0=lwXe=VR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	URIBL_BLACK,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 429A9C7618F
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jul 2019 01:30:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73EEDC7618F
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jul 2019 01:30:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1B3B220873
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jul 2019 01:30:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B3B220873
+	by mail.kernel.org (Postfix) with ESMTPS id 475C420873
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jul 2019 01:30:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 475C420873
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ozlabs.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49130 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49136 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hoeCO-0003Qw-AW
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 21:30:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43973)
+	id 1hoeCc-0004O5-GA
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 21:30:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44029)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <aik@ozlabs.ru>) id 1hoeBo-00010o-6r
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 21:29:33 -0400
+ (envelope-from <aik@ozlabs.ru>) id 1hoeBv-0001WL-1Z
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 21:29:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aik@ozlabs.ru>) id 1hoeBn-0003Xu-43
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 21:29:32 -0400
-Received: from ozlabs.ru ([107.173.13.209]:59116)
+ (envelope-from <aik@ozlabs.ru>) id 1hoeBt-0003ay-Nv
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 21:29:38 -0400
+Received: from ozlabs.ru ([107.173.13.209]:59146)
  by eggs.gnu.org with esmtp (Exim 4.71)
  (envelope-from <aik@ozlabs.ru>)
- id 1hoeBm-0003XN-TR; Fri, 19 Jul 2019 21:29:31 -0400
+ id 1hoeBt-0003ar-FS; Fri, 19 Jul 2019 21:29:37 -0400
 Received: from fstn1-p1.ozlabs.ibm.com (localhost [IPv6:::1])
- by ozlabs.ru (Postfix) with ESMTP id 7CF3AAE807E6;
- Fri, 19 Jul 2019 21:28:53 -0400 (EDT)
+ by ozlabs.ru (Postfix) with ESMTP id 0A804AE807F4;
+ Fri, 19 Jul 2019 21:28:59 -0400 (EDT)
 From: Alexey Kardashevskiy <aik@ozlabs.ru>
 To: qemu-devel@nongnu.org
-Date: Sat, 20 Jul 2019 11:28:47 +1000
-Message-Id: <20190720012850.14369-2-aik@ozlabs.ru>
+Date: Sat, 20 Jul 2019 11:28:50 +1000
+Message-Id: <20190720012850.14369-5-aik@ozlabs.ru>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190720012850.14369-1-aik@ozlabs.ru>
 References: <20190720012850.14369-1-aik@ozlabs.ru>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 107.173.13.209
-Subject: [Qemu-devel] [PATCH qemu RFC 1/4] spapr: Allow changing kernel
- loading address
+Subject: [Qemu-devel] [PATCH qemu RFC 4/4] spapr: Implement SLOF-less
+ client_architecture_support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,116 +64,161 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Useful for the debugging purposes.
+QEMU already implements H_CAS called by SLOF. The existing handler
+prepares a diff FDT and SLOF applies it on top of its current tree.
+In SLOF-less setup when the user explicitly selected "bios=no",
+this updates the FDT from the OS, updates it and writes back to the OS.
+The new behavior is advertised to the OS via "/chosen/qemu,h_cas".
 
 Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 ---
- include/hw/ppc/spapr.h |  1 +
- hw/ppc/spapr.c         | 33 +++++++++++++++++++++++++++------
- 2 files changed, 28 insertions(+), 6 deletions(-)
+ include/hw/ppc/spapr.h |  5 +++++
+ hw/ppc/spapr.c         | 24 ++++++++++++++++-----
+ hw/ppc/spapr_hcall.c   | 49 +++++++++++++++++++++++++++++++++++++++---
+ 3 files changed, 70 insertions(+), 8 deletions(-)
 
 diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index 74e427b588fc..ff82bb8554e1 100644
+index 7f5d7a70d27e..73cd9cf25b83 100644
 --- a/include/hw/ppc/spapr.h
 +++ b/include/hw/ppc/spapr.h
-@@ -159,6 +159,7 @@ struct SpaprMachineState {
-     void *fdt_blob;
-     long kernel_size;
-     bool kernel_le;
-+    uint64_t kernel_addr;
-     uint32_t initrd_base;
-     long initrd_size;
-     uint64_t rtc_offset; /* Now used only during incoming migration */
+@@ -766,9 +766,14 @@ struct SpaprEventLogEntry {
+ 
+ void spapr_events_init(SpaprMachineState *sm);
+ void spapr_dt_events(SpaprMachineState *sm, void *fdt);
++int spapr_h_cas_do_compose_response(SpaprMachineState *spapr, void *fdt,
++                                    SpaprOptionVector *ov5_updates);
+ int spapr_h_cas_compose_response(SpaprMachineState *sm,
+                                  target_ulong addr, target_ulong size,
+                                  SpaprOptionVector *ov5_updates);
++#define FDT_MAX_SIZE 0x100000
++void *spapr_build_fdt(SpaprMachineState *spapr);
++
+ void close_htab_fd(SpaprMachineState *spapr);
+ void spapr_setup_hpt_and_vrma(SpaprMachineState *spapr);
+ void spapr_free_hpt(SpaprMachineState *spapr);
 diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 7fad42350538..6d13d65d8996 100644
+index b097a99951f1..f84895f4a8b4 100644
 --- a/hw/ppc/spapr.c
 +++ b/hw/ppc/spapr.c
-@@ -1179,7 +1179,7 @@ static void spapr_dt_chosen(SpaprMachineState *spapr, void *fdt)
-                           spapr->initrd_base + spapr->initrd_size));
+@@ -978,6 +978,19 @@ static bool spapr_hotplugged_dev_before_cas(void)
+     return false;
+ }
  
-     if (spapr->kernel_size) {
--        uint64_t kprop[2] = { cpu_to_be64(KERNEL_LOAD_ADDR),
-+        uint64_t kprop[2] = { cpu_to_be64(spapr->kernel_addr),
-                               cpu_to_be64(spapr->kernel_size) };
++int spapr_h_cas_do_compose_response(SpaprMachineState *spapr, void *fdt,
++                                    SpaprOptionVector *ov5_updates)
++{
++    /* Fixup cpu nodes */
++    _FDT((spapr_fixup_cpu_dt(fdt, spapr)));
++
++    if (spapr_dt_cas_updates(spapr, fdt, ov5_updates)) {
++        return -1;
++    }
++
++    return 0;
++}
++
+ int spapr_h_cas_compose_response(SpaprMachineState *spapr,
+                                  target_ulong addr, target_ulong size,
+                                  SpaprOptionVector *ov5_updates)
+@@ -1009,10 +1022,7 @@ int spapr_h_cas_compose_response(SpaprMachineState *spapr,
+     _FDT((fdt_open_into(fdt_skel, fdt, size)));
+     g_free(fdt_skel);
  
-         _FDT(fdt_setprop(fdt, chosen, "qemu,boot-kernel",
-@@ -1365,7 +1365,7 @@ static void *spapr_build_fdt(SpaprMachineState *spapr)
- 
-     /* Build memory reserve map */
-     if (spapr->kernel_size) {
--        _FDT((fdt_add_mem_rsv(fdt, KERNEL_LOAD_ADDR, spapr->kernel_size)));
-+        _FDT((fdt_add_mem_rsv(fdt, spapr->kernel_addr, spapr->kernel_size)));
+-    /* Fixup cpu nodes */
+-    _FDT((spapr_fixup_cpu_dt(fdt, spapr)));
+-
+-    if (spapr_dt_cas_updates(spapr, fdt, ov5_updates)) {
++    if (spapr_h_cas_do_compose_response(spapr, fdt, ov5_updates)) {
+         return -1;
      }
-     if (spapr->initrd_size) {
-         _FDT((fdt_add_mem_rsv(fdt, spapr->initrd_base, spapr->initrd_size)));
-@@ -1391,7 +1391,8 @@ static void *spapr_build_fdt(SpaprMachineState *spapr)
  
- static uint64_t translate_kernel_address(void *opaque, uint64_t addr)
- {
--    return (addr & 0x0fffffff) + KERNEL_LOAD_ADDR;
-+    SpaprMachineState *spapr = opaque;
-+    return (addr & 0x0fffffff) + spapr->kernel_addr;
+@@ -1232,6 +1242,10 @@ static void spapr_dt_chosen(SpaprMachineState *spapr, void *fdt)
+ 
+     /* We always implemented RTAS as hcall, tell guests to call it directly */
+     _FDT(fdt_setprop_cell(fdt, chosen, "qemu,h_rtas", 1));
++    /* Tell the guest that H_CAS will return the entire FDT now, not the diff */
++    if (!spapr->bios_enabled) {
++        _FDT(fdt_setprop_cell(fdt, chosen, "qemu,h_cas", 1));
++    }
+ 
+     spapr_dt_ov5_platform_support(spapr, fdt, chosen);
+ 
+@@ -1262,7 +1276,7 @@ static void spapr_dt_hypervisor(SpaprMachineState *spapr, void *fdt)
+     }
  }
  
- static void emulate_spapr_hypercall(PPCVirtualHypervisor *vhyp,
-@@ -2995,12 +2996,12 @@ static void spapr_machine_init(MachineState *machine)
-         uint64_t lowaddr = 0;
- 
-         spapr->kernel_size = load_elf(kernel_filename, NULL,
--                                      translate_kernel_address, NULL,
-+                                      translate_kernel_address, spapr,
-                                       NULL, &lowaddr, NULL, 1,
-                                       PPC_ELF_MACHINE, 0, 0);
-         if (spapr->kernel_size == ELF_LOAD_WRONG_ENDIAN) {
-             spapr->kernel_size = load_elf(kernel_filename, NULL,
--                                          translate_kernel_address, NULL, NULL,
-+                                          translate_kernel_address, spapr, NULL,
-                                           &lowaddr, NULL, 0, PPC_ELF_MACHINE,
-                                           0, 0);
-             spapr->kernel_le = spapr->kernel_size > 0;
-@@ -3016,7 +3017,7 @@ static void spapr_machine_init(MachineState *machine)
-             /* Try to locate the initrd in the gap between the kernel
-              * and the firmware. Add a bit of space just in case
-              */
--            spapr->initrd_base = (KERNEL_LOAD_ADDR + spapr->kernel_size
-+            spapr->initrd_base = (spapr->kernel_addr + spapr->kernel_size
-                                   + 0x1ffff) & ~0xffff;
-             spapr->initrd_size = load_image_targphys(initrd_filename,
-                                                      spapr->initrd_base,
-@@ -3253,6 +3254,18 @@ static void spapr_set_vsmt(Object *obj, Visitor *v, const char *name,
-     visit_type_uint32(v, name, (uint32_t *)opaque, errp);
- }
- 
-+static void spapr_get_kernel_addr(Object *obj, Visitor *v, const char *name,
-+                                  void *opaque, Error **errp)
-+{
-+    visit_type_uint64(v, name, (uint64_t *)opaque, errp);
-+}
-+
-+static void spapr_set_kernel_addr(Object *obj, Visitor *v, const char *name,
-+                                  void *opaque, Error **errp)
-+{
-+    visit_type_uint64(v, name, (uint64_t *)opaque, errp);
-+}
-+
- static char *spapr_get_ic_mode(Object *obj, Error **errp)
+-static void *spapr_build_fdt(SpaprMachineState *spapr)
++void *spapr_build_fdt(SpaprMachineState *spapr)
  {
-     SpaprMachineState *spapr = SPAPR_MACHINE(obj);
-@@ -3358,6 +3371,14 @@ static void spapr_instance_init(Object *obj)
-     object_property_add_bool(obj, "vfio-no-msix-emulation",
-                              spapr_get_msix_emulation, NULL, NULL);
+     MachineState *machine = MACHINE(spapr);
+     MachineClass *mc = MACHINE_GET_CLASS(machine);
+diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+index b964d94f330b..c5cb06c9d507 100644
+--- a/hw/ppc/spapr_hcall.c
++++ b/hw/ppc/spapr_hcall.c
+@@ -17,6 +17,7 @@
+ #include "hw/ppc/spapr_ovec.h"
+ #include "mmu-book3s-v3.h"
+ #include "hw/mem/memory-device.h"
++#include "sysemu/device_tree.h"
  
-+    object_property_add(obj, "kernel-addr", "uint64", spapr_get_kernel_addr,
-+                        spapr_set_kernel_addr, NULL, &spapr->kernel_addr,
-+                        &error_abort);
-+    object_property_set_description(obj, "kernel-addr",
-+                                    stringify(KERNEL_LOAD_ADDR)
-+                                    " for -kernel is the default",
-+                                    NULL);
-+    spapr->kernel_addr = KERNEL_LOAD_ADDR;
-     /* The machine class defines the default interrupt controller mode */
-     spapr->irq = smc->irq;
-     object_property_add_str(obj, "ic-mode", spapr_get_ic_mode,
+ static bool has_spr(PowerPCCPU *cpu, int spr)
+ {
+@@ -1774,9 +1775,51 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
+             /* legacy hash or new hash: */
+             spapr_setup_hpt_and_vrma(spapr);
+         }
+-        spapr->cas_reboot =
+-            (spapr_h_cas_compose_response(spapr, args[1], args[2],
+-                                          ov5_updates) != 0);
++
++        if (spapr->bios_enabled) {
++            spapr->cas_reboot =
++                (spapr_h_cas_compose_response(spapr, args[1], args[2],
++                                              ov5_updates) != 0);
++        } else {
++            int size;
++            void *fdt, *fdt_skel;
++            struct fdt_header hdr = { 0 };
++
++            cpu_physical_memory_read(args[1], &hdr, sizeof(hdr));
++            size = fdt32_to_cpu(hdr.totalsize);
++            if (size > FDT_MAX_SIZE) {
++                return H_NOT_AVAILABLE;
++            }
++
++            fdt_skel = g_malloc0(size);
++            cpu_physical_memory_read(args[1], fdt_skel, size);
++
++            fdt = g_malloc0(FDT_MAX_SIZE);
++            fdt_open_into(fdt_skel, fdt, FDT_MAX_SIZE);
++            g_free(fdt_skel);
++
++            if (spapr_h_cas_do_compose_response(spapr, fdt, ov5_updates)) {
++                g_free(fdt);
++                return H_NOT_AVAILABLE;
++            }
++            fdt_pack(fdt);
++            if (fdt_totalsize(fdt) > FDT_MAX_SIZE) {
++                error_report("FDT too big ! 0x%x bytes (max is 0x%x)",
++                             fdt_totalsize(fdt), FDT_MAX_SIZE);
++                g_free(fdt);
++                return H_NOT_AVAILABLE;
++            }
++
++            /* Load the fdt */
++            cpu_physical_memory_write(args[1], fdt, fdt_totalsize(fdt));
++
++            g_free(spapr->fdt_blob);
++            spapr->fdt_size = fdt_totalsize(fdt);
++            spapr->fdt_initial_size = spapr->fdt_size;
++            spapr->fdt_blob = fdt;
++
++            qemu_fdt_dumpdtb(fdt, fdt_totalsize(fdt));
++        }
+     }
+ 
+     /*
 -- 
 2.17.1
 
