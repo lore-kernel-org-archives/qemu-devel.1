@@ -2,89 +2,89 @@ Return-Path: <SRS0=lwXe=VR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4ABD3C7618F
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jul 2019 01:36:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5799C7618F
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jul 2019 01:37:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 10E9720873
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jul 2019 01:36:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A0ACB21849
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jul 2019 01:37:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gFRsS1wI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10E9720873
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mFRgD3pD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A0ACB21849
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49152 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49158 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hoeIW-0006FZ-4Z
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 21:36:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45115)
+	id 1hoeJy-0007F1-V9
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jul 2019 21:37:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45266)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.weiyang@gmail.com>) id 1hoeIJ-0005dD-26
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 21:36:15 -0400
+ (envelope-from <richard.weiyang@gmail.com>) id 1hoeJo-0006qB-UG
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 21:37:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.weiyang@gmail.com>) id 1hoeII-0001hL-6C
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 21:36:15 -0400
-Received: from mail-ed1-x541.google.com ([2a00:1450:4864:20::541]:39190)
+ (envelope-from <richard.weiyang@gmail.com>) id 1hoeJo-0002S7-0m
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 21:37:48 -0400
+Received: from mail-ed1-x541.google.com ([2a00:1450:4864:20::541]:45339)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.weiyang@gmail.com>)
- id 1hoeII-0001gW-0K
- for qemu-devel@nongnu.org; Fri, 19 Jul 2019 21:36:14 -0400
-Received: by mail-ed1-x541.google.com with SMTP id m10so35911403edv.6
- for <qemu-devel@nongnu.org>; Fri, 19 Jul 2019 18:36:13 -0700 (PDT)
+ id 1hoeJn-0002RP-Qh
+ for qemu-devel@nongnu.org; Fri, 19 Jul 2019 21:37:47 -0400
+Received: by mail-ed1-x541.google.com with SMTP id x19so30007908eda.12
+ for <qemu-devel@nongnu.org>; Fri, 19 Jul 2019 18:37:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=date:from:to:cc:subject:message-id:reply-to:references:mime-version
  :content-disposition:in-reply-to:user-agent;
- bh=8Hky2HQyR7fCEpjhi8ueqO8K1UmZaOZMsChsLjM1uok=;
- b=gFRsS1wIxFPdtfn7RCpbiFt3p6i0uDmjTJ61iegKG7Is8Xp0fZ8rm2Nb3Tc57AZtWo
- LmvN6W3BjqklImctkZa8mP7Ufd9Ze16ohFFehtNxq2Ox2TOmQndp8Iyr/ZXLJwVufCdz
- fg1jamgtwy2HpTImcMfEh43V3v7W/ryUF37AQPdHmusAKSWB7GJbUPpe1CjWU1nRAse1
- S00wyZWw4k5CEbWScMDvLbvv7A4jl/pMihWsuQG4gJBxHIejxQmww8cRiWKRdcQz5qIU
- 9n7SBYMk8aeIPF6kfxXduOsGl4hKICZC1cn/qXKOXY7xH5mY6j4Je7nn9AnpRrFqznxC
- hZLw==
+ bh=TuO/OqhMJsu0rI8Tqp8qeyMYei2x1mXe/RAZ1qhTFPo=;
+ b=mFRgD3pDqz1idvWAuFk9BKBk1tlpiwGrxV3oNc9jtOm4uC/tstKg8zTWNBvzO7ZxH0
+ TrnHJ/XGIq1QICOamsypyFLE23JJwK04kVOZ8FqY3droSx2CiAg1Bo7W34GIJtM7b73S
+ mJjoP486L8/GnMwYv0fUdRr7pbGUIvIQ/Fz2jHVGksyyrGG+zvMEdm0icJgXXTCZHXHR
+ 8Z42gpsmcOCsT9Tfi5BO8ZFsPPHY1JaumZsrF0SRVjzSN2tOGQH0O/7njnwTI4/VT0Lp
+ bahNxM2xscCznn9xAPkmfYbg4s+bBHGWaRjj92rrmosR2O+1PKLJ6wQ0EdLb4hgppMVo
+ Hcgw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:reply-to
  :references:mime-version:content-disposition:in-reply-to:user-agent;
- bh=8Hky2HQyR7fCEpjhi8ueqO8K1UmZaOZMsChsLjM1uok=;
- b=reyYni+mlrc/ErV48CRsWIedmcmrA6T7IPkKNpZurmgZSExhiqmLfp/YxheE8Wu5rB
- NroVtfhR2pv+zMe/SSKnAlfbBt81QWzjwX7ANLawL/jZdQrE5GHor1BS7TbbSFWVMcbI
- DbqskZgVWMYBX6FhG8EhQHAxEsXDn5J7HH9gHmQQ/q3wvyol6NPEpQ33RIM17UqFY3qy
- FEapnpJWGmnGNt4o2EoGxxCcal9Cxzl8UiSqTjh8tvQOrec9YXYMTxav3r/d7dryyE+2
- N5wMWk6+wSkYTp+YpP4Ik2NyZIH7WmHyMfurtYVRzVa4lmtQnS5sNcHrQ4DJDPMYcqWZ
- 3V7A==
-X-Gm-Message-State: APjAAAW+XIXfuGiIj/e9hUhrTyo864E5p6w6naSiFQk0EeS68omZTlhM
- VBrmk7EwGng8/Kloe2i30IY=
-X-Google-Smtp-Source: APXvYqzud7YYMHWjINJQV8XWfjux5tTTbQqssorgtdeNtUzlwjG+haFKef1L/hMBXMHLmF/JXl3pFg==
-X-Received: by 2002:a17:906:3d69:: with SMTP id
- r9mr42439278ejf.28.1563586572105; 
- Fri, 19 Jul 2019 18:36:12 -0700 (PDT)
+ bh=TuO/OqhMJsu0rI8Tqp8qeyMYei2x1mXe/RAZ1qhTFPo=;
+ b=hK+HHaUaN6Go1mnc7+kQC0GH3eByoZUwIW5G7DPhnRoN1lexqlK6CKlJ0FGRkZKM+G
+ pI8Q5o55eUvjLL1GXnmdsiUxzlrtUpswZ4xgSrzC6GyBpP2oPvykJCb1nFwdSqU+qjoX
+ x5wzdkFsInwaNQKbusrLipTGT2fqXyMelU7Zf0DHUxeYRj97fGGtVhvlKxX2GQFpoFmf
+ 3NPc8qbHs+vqOb87GpnhwZk/0SkLuNLQq1O832Zbqkc88vQ4m1OrBcmB/3S//2dr96EC
+ OcTc7h4jHDIOukGwwBIEYUh/gifDrnuLOyCbiw0Qq5p6nbcukp4I/uBUo+1v/JE9iRTD
+ p/Vw==
+X-Gm-Message-State: APjAAAWNfR8yoOlEKbMEa5YvCTn74gUOF3OfPEFgY1VpEb7rM0RnHETy
+ b0kq1WZRVYvXBeEfjNBu50w4ZCw/
+X-Google-Smtp-Source: APXvYqzDVfuU0LI8Xrq8eg+Zz3+Lt1qzxJHpM3lOJNB64Te/5ne+DAs2vNEJ9gE5ntTwbkhFelGd+g==
+X-Received: by 2002:a17:906:4d89:: with SMTP id
+ s9mr43101854eju.160.1563586666916; 
+ Fri, 19 Jul 2019 18:37:46 -0700 (PDT)
 Received: from localhost ([185.92.221.13])
- by smtp.gmail.com with ESMTPSA id c24sm6458799ejb.33.2019.07.19.18.36.10
+ by smtp.gmail.com with ESMTPSA id h10sm8518410edn.86.2019.07.19.18.37.45
  (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
- Fri, 19 Jul 2019 18:36:11 -0700 (PDT)
-Date: Sat, 20 Jul 2019 01:36:10 +0000
+ Fri, 19 Jul 2019 18:37:46 -0700 (PDT)
+Date: Sat, 20 Jul 2019 01:37:45 +0000
 From: Wei Yang <richard.weiyang@gmail.com>
 To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20190720013610.o6hagbbnuq6nvcoz@master>
-References: <20190402003106.17614-1-richardw.yang@linux.intel.com>
- <20190611082520.GA11125@richard> <87zhmottba.fsf@trasno.org>
- <20190717011459.GB14233@richard> <20190719180544.GL3000@work-vm>
+Message-ID: <20190720013745.orrrhp2iuh2tsatr@master>
+References: <20190626004211.4822-1-richardw.yang@linux.intel.com>
+ <20190719151002.GC3000@work-vm>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190719180544.GL3000@work-vm>
+In-Reply-To: <20190719151002.GC3000@work-vm>
 User-Agent: NeoMutt/20170113 (1.7.2)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
 X-Received-From: 2a00:1450:4864:20::541
-Subject: Re: [Qemu-devel] [PATCH] migration: remove unused field bytes_xfer
+Subject: Re: [Qemu-devel] [PATCH] migration: current_migration is never NULL
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,48 +97,53 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Reply-To: Wei Yang <richard.weiyang@gmail.com>
-Cc: Juan Quintela <quintela@redhat.com>,
- Wei Yang <richardw.yang@linux.intel.com>, qemu-devel@nongnu.org
+Cc: quintela@redhat.com, Wei Yang <richardw.yang@linux.intel.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jul 19, 2019 at 07:05:44PM +0100, Dr. David Alan Gilbert wrote:
+On Fri, Jul 19, 2019 at 04:10:02PM +0100, Dr. David Alan Gilbert wrote:
 >* Wei Yang (richardw.yang@linux.intel.com) wrote:
->> On Tue, Jun 11, 2019 at 10:33:29AM +0200, Juan Quintela wrote:
->> >Wei Yang <richardw.yang@linux.intel.com> wrote:
->> >> On Tue, Apr 02, 2019 at 08:31:06AM +0800, Wei Yang wrote:
->> >>>MigrationState->bytes_xfer is only set to 0 in migrate_init().
->> >>>
->> >>>Remove this unnecessary field.
->> >>>
->> >>>Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
->> >>
->> >> Hi, David
->> >
->> >Hi
->> >
->> >I am on duty this week, will get it.
->> >
+>> migration_object_init() create and assign current_migration, which means
+>> it will never be null until migration_shutdown().
 >> 
->> Hi, Juan
+>> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+>> ---
+>>  migration/migration.c | 4 ----
+>>  1 file changed, 4 deletions(-)
 >> 
->> Sounds we lost this one and the one above this :-)
->> 
+>> diff --git a/migration/migration.c b/migration/migration.c
+>> index 0fd2364961..43fd8297ef 100644
+>> --- a/migration/migration.c
+>> +++ b/migration/migration.c
+>> @@ -1667,10 +1667,6 @@ bool migration_is_idle(void)
+>>  {
+>>      MigrationState *s = current_migration;
+>>  
+>> -    if (!s) {
+>> -        return true;
+>> -    }
+>> -
 >
->We're in freeze at the moment; we'll pick it up as soon
->as it opens up again; I've got quite a list of your clean-up patches!
+>I'd prefer to keep that because it's used by migrate_add_blocker
+>and without this check it means we'd only be able to add a blocker
+>after the migration object init - which is probably fine but we
+>would have to check all the cases and make sure no one breaks it in
+>the future;  where as this check makes it just work and we don't
+>need to worry about the order.
 >
 
-Thanks for your reply.
-
-Have a good weekend. :-)
+Reasonable, Thanks :-)
 
 >Dave
 >
+>>      switch (s->state) {
+>>      case MIGRATION_STATUS_NONE:
+>>      case MIGRATION_STATUS_CANCELLED:
 >> -- 
->> Wei Yang
->> Help you, Help me
+>> 2.19.1
+>> 
 >--
 >Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
