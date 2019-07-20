@@ -2,95 +2,72 @@ Return-Path: <SRS0=lwXe=VR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E65D9C76186
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jul 2019 21:52:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6D03C76186
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jul 2019 22:25:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ACEA42082F
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jul 2019 21:52:42 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AQVpZWme"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACEA42082F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 7311F2082A
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jul 2019 22:25:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7311F2082A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53728 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53798 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hoxHV-0007i1-UB
-	for qemu-devel@archiver.kernel.org; Sat, 20 Jul 2019 17:52:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40228)
+	id 1hoxnb-00067h-Ju
+	for qemu-devel@archiver.kernel.org; Sat, 20 Jul 2019 18:25:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47301)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1hoxHM-0007Ju-AZ
- for qemu-devel@nongnu.org; Sat, 20 Jul 2019 17:52:33 -0400
+ (envelope-from <bounces@canonical.com>) id 1hoxnR-0005jM-GH
+ for qemu-devel@nongnu.org; Sat, 20 Jul 2019 18:25:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1hoxHL-00019o-Gr
- for qemu-devel@nongnu.org; Sat, 20 Jul 2019 17:52:32 -0400
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:44982)
+ (envelope-from <bounces@canonical.com>) id 1hoxnQ-00076Y-8c
+ for qemu-devel@nongnu.org; Sat, 20 Jul 2019 18:25:41 -0400
+Received: from indium.canonical.com ([91.189.90.7]:42956)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1hoxHL-00019D-9w
- for qemu-devel@nongnu.org; Sat, 20 Jul 2019 17:52:31 -0400
-Received: by mail-pf1-x442.google.com with SMTP id t16so15618391pfe.11
- for <qemu-devel@nongnu.org>; Sat, 20 Jul 2019 14:52:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=IPm9Swq8QARMf2ewL/0kA+yoI7ylw97LY4staBmRKgw=;
- b=AQVpZWmeVY934q15e17AfcMlErZ+E6tE0EXrhLlG8iKIdizE3dmYI4nrzeoeHIejMi
- 1/xGZzpKah7nvMfmlDkdnww2p9shyyaQxomjyIrhNuuCOm84NjaGF1UIEqCJQEjdxGet
- QhdUkA0MOQ4Cw3QQ0KhQCpgGW/R0mKbUJLzqC3y1Un7Bkkjqw6NGNdjWLg+agBPySKvE
- k4uKnqyrr/LRGuTSfNNA0wxiVlOES5KX1Awzu6gDl/TNtvtTwiKSMNcuSicMqhGcTRQe
- Z26fDWGg3Ut7odxvMZgXfHHvm4NXcUlRLoHSGHjxwQnRhHOCzqe+BUrEN6mYBWTv/Eij
- KCIg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=IPm9Swq8QARMf2ewL/0kA+yoI7ylw97LY4staBmRKgw=;
- b=bQ/LG8qch3xxxo6khJ4JkjQcNKHtTGnf1k3QFxqxXuEONDPFi0Blzu591VNDR/wfI0
- orB+uAHWhc25BMTaasu0WHNNQrmkq+xnTqB1AjRMrAIVt4A4dIogasUpy1gKK5npsWly
- WQTpbbI6jcZJp8XbRHKSJvWNAEtF9oIgSICCcFIChZHoZf12n6DEJL3YK5lQ9AoCmZ+m
- sBERNdMti2oQHotEStYNRACtK2ERCq3373tHiCtznbcA3BOdoDHWtqysQ4KjOctWAlNR
- zB3jwFCJUXvtlzxs4IZMqfa7EqFvEhbUpHn6Mc8AVwuef3SEVz23kKGUfFjEwP3apz7l
- f8qA==
-X-Gm-Message-State: APjAAAXBjV5aIuIDK7gUZdv7v/kWP5Tijfn6qjhgd7FeMTI4gEfNG/M3
- Gr2FLKD5ZRvPHpnStfvngs1tBg==
-X-Google-Smtp-Source: APXvYqxGCdQMHkpBHigbSOJc6n61koJ1GykVh4lG6a97zJR7XG5BOSJ7g7KO/Hp3s5gZXFsd7B7t1A==
-X-Received: by 2002:a17:90a:ad41:: with SMTP id
- w1mr65882871pjv.52.1563659549760; 
- Sat, 20 Jul 2019 14:52:29 -0700 (PDT)
-Received: from [192.168.1.11] (97-126-117-207.tukw.qwest.net. [97.126.117.207])
- by smtp.gmail.com with ESMTPSA id b36sm57766974pjc.16.2019.07.20.14.52.27
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Sat, 20 Jul 2019 14:52:28 -0700 (PDT)
-To: Jan Bobek <jan.bobek@gmail.com>, qemu-devel@nongnu.org
-References: <20190711223300.6061-1-jan.bobek@gmail.com>
- <20190711223300.6061-15-jan.bobek@gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <ff998de5-034d-ec56-92dc-96c0f81aa1f7@linaro.org>
-Date: Sat, 20 Jul 2019 14:52:26 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1hoxnQ-00075G-2h
+ for qemu-devel@nongnu.org; Sat, 20 Jul 2019 18:25:40 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1hoxnO-0002tT-82
+ for <qemu-devel@nongnu.org>; Sat, 20 Jul 2019 22:25:38 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 357932E80C7
+ for <qemu-devel@nongnu.org>; Sat, 20 Jul 2019 22:25:38 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20190711223300.6061-15-jan.bobek@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::442
-Subject: Re: [Qemu-devel] [RISU PATCH v3 14/18] x86.risu: add SSSE3
- instructions
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 20 Jul 2019 22:15:44 -0000
+From: post-factum <1837218@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: post-factum
+X-Launchpad-Bug-Reporter: post-factum (post-factum)
+X-Launchpad-Bug-Modifier: post-factum (post-factum)
+References: <156354588692.30209.14783168884867057348.malonedeb@soybean.canonical.com>
+Message-Id: <156366094422.8687.7086161697221768697.malone@chaenomeles.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="19010";
+ Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: 756682c82f9b44fa10928f99a73561b6cce50014
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1837218] Re: qemu segfaults after spice update
+ with bochs-display
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -99,21 +76,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Reply-To: Bug 1837218 <1837218@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/11/19 3:32 PM, Jan Bobek wrote:
-> Add SSSE3 instructions to the x86 configuration file.
-> 
-> Signed-off-by: Jan Bobek <jan.bobek@gmail.com>
-> ---
->  x86.risu | 160 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 160 insertions(+)
+I've also built qemu v4.0.0 with debug info, and the issue is not
+reproducible with such a build.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+-- =
 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1837218
 
-r~
+Title:
+  qemu segfaults after spice update with bochs-display
+
+Status in QEMU:
+  New
+
+Bug description:
+  Description:
+
+  qemu segfaults after latest spice update with bochs-display.
+  Downgrading spice solves the issue. Switching to qxl-vga and/or
+  virtio-gpu also works even with new spice.
+
+  Additional info:
+  * package version(s)
+
+  spice 0.14.2-1 (0.14.0 is unaffected)
+  qemu-headless 4.0.0-3
+
+  * config and/or log files etc.
+
+  pf@defiant:~ =C2=BB /mnt/vms/02-archlinux/start.sh
+  /mnt/vms/02-archlinux/start.sh: line 41: 13501 Segmentation fault (core d=
+umped) qemu-system-x86_64 -name "${NAME}" -display none -spice ipv4,addr=3D=
+127.0.0.1,port=3D270${ID},disable-ticketing,disable-copy-paste,disable-agen=
+t-file-xfer,agent-mouse=3Doff -serial mon:telnet:127.0.0.1:280${ID},server,=
+nowait,nodelay -gdb tcp::260${ID} -nodefaults -machine q35,accel=3Dkvm -cpu=
+ max -smp cores=3D${CPU},threads=3D1,sockets=3D1 -m ${MEM} -drive if=3Dpfla=
+sh,format=3Draw,readonly,file=3D"${BIOS}" -drive if=3Dpflash,format=3Draw,f=
+ile=3D"${VARS}" -device virtio-rng -device bochs-display -device virtio-key=
+board -netdev bridge,id=3Dbridge.0,br=3Dvm0 -device virtio-net,mac=3D${_MAC=
+}:01,netdev=3Dbridge.0,mq=3Don,vectors=3D${_VECTORS} -fsdev local,id=3D"${N=
+AME}",path=3D"${SHARED}",security_model=3Dmapped,writeout=3Dimmediate -devi=
+ce virtio-9p-pci,fsdev=3D"${NAME}",mount_tag=3D"shared" -device virtio-scsi=
+,id=3Dscsi,num_queues=3D${CPU},vectors=3D${_VECTORS} -device scsi-hd,drive=
+=3Dhd1 -drive if=3Dnone,media=3Ddisk,id=3Dhd1,file=3D"${DISK1}",format=3Dra=
+w,cache=3Ddirectsync,discard=3Dunmap,detect-zeroes=3Dunmap -device scsi-hd,=
+drive=3Dhd2 -drive if=3Dnone,media=3Ddisk,id=3Dhd2,file=3D"${DISK2}",format=
+=3Draw,cache=3Ddirectsync,discard=3Dunmap,detect-zeroes=3Dunmap -device scs=
+i-cd,drive=3Dcd1 -drive if=3Dnone,media=3Dcdrom,id=3Dcd1,file=3D"${CDROM1}"=
+,format=3Draw,cache=3Ddirectsync
+
+  Steps to reproduce:
+
+  Update spice, launch a VM like the above and observe a segfault.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1837218/+subscriptions
 
