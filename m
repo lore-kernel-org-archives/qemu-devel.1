@@ -2,62 +2,80 @@ Return-Path: <SRS0=lwXe=VR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C07F3C76188
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jul 2019 08:50:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6396C76188
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jul 2019 09:30:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8F1962084C
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jul 2019 08:50:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F1962084C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 15BF020873
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jul 2019 09:30:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 15BF020873
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50114 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50246 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hol4x-0006eC-N6
-	for qemu-devel@archiver.kernel.org; Sat, 20 Jul 2019 04:50:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38715)
+	id 1holhL-0005QB-3c
+	for qemu-devel@archiver.kernel.org; Sat, 20 Jul 2019 05:30:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59302)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <fangying1@huawei.com>) id 1hojk2-00006K-4H
- for qemu-devel@nongnu.org; Sat, 20 Jul 2019 03:25:15 -0400
+ (envelope-from <philmd@redhat.com>) id 1holh7-0004xv-AO
+ for qemu-devel@nongnu.org; Sat, 20 Jul 2019 05:30:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <fangying1@huawei.com>) id 1hojk1-0007C2-0u
- for qemu-devel@nongnu.org; Sat, 20 Jul 2019 03:25:14 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:2240 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <fangying1@huawei.com>)
- id 1hojjy-00072d-Do; Sat, 20 Jul 2019 03:25:10 -0400
-Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id E0DD4AC38A0F95DE4666;
- Sat, 20 Jul 2019 15:25:01 +0800 (CST)
-Received: from [127.0.0.1] (10.133.205.53) by DGGEMS410-HUB.china.huawei.com
- (10.3.19.210) with Microsoft SMTP Server id 14.3.439.0; Sat, 20 Jul 2019
- 15:24:51 +0800
-To: "Michael S. Tsirkin" <mst@redhat.com>, "Zhangbo (Oscar)"
- <oscar.zhangbo@huawei.com>
-References: <0259E1C966E8C54AA93AA2B1240828E672DE0920@DGGEML529-MBS.china.huawei.com>
- <20190719064229-mutt-send-email-mst@kernel.org>
-From: fangying <fangying1@huawei.com>
-Message-ID: <7da3cb6d-daf8-99e3-cfde-f19543538ee1@huawei.com>
-Date: Sat, 20 Jul 2019 15:24:46 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <philmd@redhat.com>) id 1holh6-0006fB-4E
+ for qemu-devel@nongnu.org; Sat, 20 Jul 2019 05:30:21 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:38201)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1holh5-0006eR-Qj
+ for qemu-devel@nongnu.org; Sat, 20 Jul 2019 05:30:19 -0400
+Received: by mail-wr1-f67.google.com with SMTP id g17so34484290wrr.5
+ for <qemu-devel@nongnu.org>; Sat, 20 Jul 2019 02:30:19 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=/PlwPHmHaXWHUpB0JH2FAx8GXcjrJ+3fCU2qOm3ElOM=;
+ b=ZjbIjpWBzp0VYSmZnWL4N+8DLUBm70N0NkgEX3jbNo+tCiwFYu0CEaupdTcH/K6epp
+ AAStjkq8U9UpyX2JzRwRqTeFuAmiaNjsff4I/ZwzzTx/9TZRZUAJVVzN0xO8neWUlnWV
+ IHdFbjyKJqvMhz3B50aURNo6NQVTPwKDRkcl0yShLPCyV2xi88+gby33UOUUdso5I1C6
+ 70krfhJg3ulYlcX7lAnx0gWF63RsYX9RM4vKHYITZC3NX33n+lUjDNneZcwvamK2x53y
+ 75E/cOlpQLN+zekKD2bxmeNHyTGaeUIsjU4M/ybkUCFYjnbP1DGxh3qsWDXPvKPk5ODU
+ p5Nw==
+X-Gm-Message-State: APjAAAW/SB5D9Y8kQVrz5UlLEacDhb2H9uN29bG2v+pPRZfXfZtZ0xt/
+ DlKN2WDFxLd/wrud746fCxSN2Q==
+X-Google-Smtp-Source: APXvYqwlVWaLRbPEVXbSovopTGQrZ8pN9fkX8sDhi+M0Q6kkUvw9sBVvkf5kWBbJSqij8eHBzucFuQ==
+X-Received: by 2002:a5d:4e06:: with SMTP id p6mr18510203wrt.336.1563615018811; 
+ Sat, 20 Jul 2019 02:30:18 -0700 (PDT)
+Received: from [192.168.1.37] (62.red-83-42-61.dynamicip.rima-tde.net.
+ [83.42.61.62])
+ by smtp.gmail.com with ESMTPSA id g11sm32617628wru.24.2019.07.20.02.30.17
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Sat, 20 Jul 2019 02:30:18 -0700 (PDT)
+To: Alistair Francis <alistair.francis@wdc.com>, qemu-devel@nongnu.org,
+ qemu-riscv@nongnu.org
+References: <edd3c94d357207e3862d1f5fec7e7346e70831f4.1563559494.git.alistair.francis@wdc.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <550d4158-d7dd-c38b-3082-302184a20883@redhat.com>
+Date: Sat, 20 Jul 2019 11:30:16 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190719064229-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-X-Originating-IP: [10.133.205.53]
-X-CFilter-Loop: Reflected
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <edd3c94d357207e3862d1f5fec7e7346e70831f4.1563559494.git.alistair.francis@wdc.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 45.249.212.191
-X-Mailman-Approved-At: Sat, 20 Jul 2019 04:50:37 -0400
-Subject: Re: [Qemu-devel] Discussion: redundant process during hotplug and
- missed process during unplug
+ [fuzzy]
+X-Received-From: 209.85.221.67
+Subject: Re: [Qemu-devel] [PATCH v1 1/1] riscv/boot: Fixup the RISC-V
+ firmware warning
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,85 +87,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "limingwang \(A\)" <limingwang@huawei.com>,
- Jiangyifei <jiangyifei@huawei.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "dengkai
- \(A\)" <dengkai1@huawei.com>
+Cc: alistair23@gmail.com, palmer@sifive.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 7/19/19 8:05 PM, Alistair Francis wrote:
+> Fix a typo in the warning message displayed to users, don't print the
+> message when running inside qtest and don't mention a specific QEMU
+> version for the deprecation.
+> 
+> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> ---
+>  hw/riscv/boot.c | 12 ++++++++----
+>  1 file changed, 8 insertions(+), 4 deletions(-)
+> 
+> diff --git a/hw/riscv/boot.c b/hw/riscv/boot.c
+> index 5dee63011b..4b32ab1d26 100644
+> --- a/hw/riscv/boot.c
+> +++ b/hw/riscv/boot.c
+> @@ -26,6 +26,7 @@
+>  #include "hw/riscv/boot.h"
+>  #include "hw/boards.h"
+>  #include "elf.h"
+> +#include "sysemu/qtest.h"
+>  
+>  #if defined(TARGET_RISCV32)
+>  # define KERNEL_BOOT_ADDRESS 0x80400000
+> @@ -46,10 +47,13 @@ void riscv_find_and_load_firmware(MachineState *machine,
+>           * In the future this defaul will change to loading the prebuilt
+>           * OpenSBI firmware. Let's warn the user and then continue.
+>          */
+> -        warn_report("No -bios option specified. Not loading a firmware.");
+> -        warn_report("This default will change in QEMU 4.3. Please use the " \
+> -                    "-bios option to aviod breakages when this happens.");
+> -        warn_report("See QEMU's deprecation documentation for details");
+> +        if (!qtest_enabled()) {
+> +            warn_report("No -bios option specified. Not loading a firmware.");
+> +            warn_report("This default will change in a future QEMU release. " \
+> +                        "Please use the -bios option to avoid breakages when "\
+> +                        "this happens.");
+> +            warn_report("See QEMU's deprecation documentation for details");
 
-Hi Michael,
-> On Fri, Jul 19, 2019 at 02:35:14AM +0000, Zhangbo (Oscar) wrote:
->> Hi All:
->> I have 2 questions about (un)hotplug on pcie-root-port.
->> First Question (hotplug failure because of redundant PCI_EXP_LNKSTA_DL=
-LLA bit set):
->>      during VM boot, qemu sets PCI_EXP_LNKSTA_DLLLA according to this =
-process:
->>          pcie_cap_init() -> pcie_cap_v1_fill(),
->>      even if there's no pcie device added to the VM.
->>      I noticed that during hotplug, qemu also sets PCI_EXP_LNKSTA_DLLL=
-A in pcie_cap_slot_hotplug_cb().
->>      It means that the bit PCI_EXP_LNKSTA_DLLLA is set TWICE.
->>      why set this bit during initializing pcie-root-port? It seems unn=
-ecessary.
->=20
-> Makes sense.
->=20
->>      The bad side of this is it causes HOTPLUG FAILURE if we boot the =
-VM and hotplug a pcie device at the same time:
->> 	In VM kernel=EF=BC=8Caccording to this bit set, it senses a PDC event=
-, the process is:
->>          pciehp_probe -> pcie_init -> pcie_init_slot -> pciehp_queue_p=
-ushbutton_work.
->>      If the 2 PDC events get too close, the VM kernel will wrongly unp=
-lug the device.
->> Suggestion to the 1st problem:
->> 	Can I remove the PCI_EXP_LNKSTA_DLLLA bit set process during pcie_cap=
-_init().
->>
+Maybe a final '.' in the last warning to be consistent with the previous
+lines?
 
-We raise this qeustion here because we find out that if the pcie ext=20
-capability PCI_EXP_LNKSTA_DLLLA is set by default, linux kernel may try=20
-to send PCI_EXP_HP_EV_PDC event after boot-up. When we do virtio device=20
-hotplug during the processing of PCI_EXP_HP_EV_PDC event (pciehp_ist=20
-=3D>pciehp_handle_presence_or_link_change =3D> pciehp_enable_slot)
-the device may be accidently powered down because the power state=20
-detected is ON_STATE.
+Regardless:
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Kernel sends PCI_EXP_HP_EV_PDC event when it tries to probe the
-pcie-root-probe, i.e:
-pciehp_probe =3D> pciehp_check_presence =3D>=20
-pciehp_card_present_or_link_active  =3D> pciehp_check_link_active
-pciehp_check_link_active returns true if PCI_EXP_LNKSTA_DLLLA Cap is=20
-presented.
-
-We are going send a patch to have PCI_EXP_LNKSTA_DLLLA Cap removed to=20
-fix the problem here.
->> Second Question (time cost too much during pcie device unplug):
->>      qemu only send ABP event to VM kernel during unpluging pcie devic=
-es, VM kernel receives the
->>      ABP event then sleep 5s to expect a PDC event, which causes unplu=
-ging devices takes too long.
->> Suggestion to the 2nd problem:
->> 	Can I send ABP and *PDC* events to kernet when unplug devices.
->=20
-> I think we should not only set PDC but also try clearing presence bit,
-> even though the device is actually still there and mapped into guest
-> memory.
-> Maybe we should also not send the ABP event at all.
->=20
-> In both cases it's necessary to test with a non-linux guest
-> (e.g. a couple of versions of windows) to be sure we are not breaking
-> anything.
->=20
->=20
-Thanks to your opinion, we will try to send PCI_EXP_HP_EV_PDC event=20
-instead of the PCI_EXP_HP_EV_PDC event at device unplug and do some=20
-Windows guest compatibility test.
-We will reply later.
-
+> +        }
+>          return;
+>      }
+>  
+> 
 
