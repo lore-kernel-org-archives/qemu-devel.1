@@ -2,93 +2,110 @@ Return-Path: <SRS0=xsRN=VS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB75EC76186
-	for <qemu-devel@archiver.kernel.org>; Sun, 21 Jul 2019 02:11:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6A0AC76188
+	for <qemu-devel@archiver.kernel.org>; Sun, 21 Jul 2019 07:14:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6398C205C9
-	for <qemu-devel@archiver.kernel.org>; Sun, 21 Jul 2019 02:11:06 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oZJaxUrs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6398C205C9
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=acm.org
+	by mail.kernel.org (Postfix) with ESMTPS id 74FD020838
+	for <qemu-devel@archiver.kernel.org>; Sun, 21 Jul 2019 07:14:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 74FD020838
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54254 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54872 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hp1JZ-0005xB-Kp
-	for qemu-devel@archiver.kernel.org; Sat, 20 Jul 2019 22:11:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60483)
+	id 1hp62l-0001hU-Jw
+	for qemu-devel@archiver.kernel.org; Sun, 21 Jul 2019 03:14:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40862)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <tcminyard@gmail.com>) id 1hp1JK-0005Yj-UE
- for qemu-devel@nongnu.org; Sat, 20 Jul 2019 22:10:56 -0400
+ (envelope-from <thuth@redhat.com>) id 1hp62b-0001JJ-9D
+ for qemu-devel@nongnu.org; Sun, 21 Jul 2019 03:13:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tcminyard@gmail.com>) id 1hp1JF-0005uL-7b
- for qemu-devel@nongnu.org; Sat, 20 Jul 2019 22:10:50 -0400
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:41287)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <tcminyard@gmail.com>)
- id 1hp1J5-0005lV-H2; Sat, 20 Jul 2019 22:10:35 -0400
-Received: by mail-ot1-x341.google.com with SMTP id o101so36671336ota.8;
- Sat, 20 Jul 2019 19:10:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:date:from:to:cc:subject:message-id:reply-to:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to:user-agent;
- bh=+bovzgwNIaowu/9If/S9UV/uafetSfX0BxgWeCFHE/c=;
- b=oZJaxUrszvGOLkisheXp6/Ygzlg/jDaxg2mt84g/DZf9+m+dEDcSC47i/CA649Q5Vt
- n3RN5aLSHM2YUL5lggX9EmXczhOo+n6OtAsIdIIP0rxirbk/60CjD9VVTPh4wawSSVYc
- LC+0lAsL9mj4YdnytcXut+rxRz3P+CF+3sE8vmf+/35+bTu3+/69K4daVzWgcrnFV6+/
- lvpRZIgZC8AsX91Jqminkm3Hh+CnAaRF8bev2zlnWEHlm+xk8ZFSAQ5v+xcPyGnZJU4E
- TBRCaM1SHNr1CzjI5gV0BI9EQdjWAG5Yd2KkfeZaguJg94QtQFriEECgrfXkdA6GxTxS
- RIHg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
- :reply-to:references:mime-version:content-disposition
- :content-transfer-encoding:in-reply-to:user-agent;
- bh=+bovzgwNIaowu/9If/S9UV/uafetSfX0BxgWeCFHE/c=;
- b=rtC30dbqadJqrrZuGrtJSnN+jXJhmZ7qOVlO17V7o18eybVJHCIADGJUYwBIqLkCxj
- Z9x3hftVgnfBFlB7y9f5OuSCSM2YtAzOn/Aa+kn4v9Ldg8XSdXAYtekqfv+TudIaVTEb
- kFVPEG2E97ZYDmXt123JQRH+SjHAgDi4vqseUUXVGXi0US+UYWbH87rJmH89ymRDlZto
- vnZugAgs+Uy4OX/i9TyMJT21DPy8UwgNfSf19gyEy3peM13LjCrahHYpz+qpN8Mf5WPO
- FsMxdBjGFIYWWgTE95JqPqb5cbCYZSRG/brRe3XaaufLjhPyuQ6WiWuydAD9EL5bme6S
- QrDg==
-X-Gm-Message-State: APjAAAXNmuY78VlfGTsqnCT/DJNWoPKJ3yfJuVauGyY/NWzSpcKPAddd
- buTbs05YYoXdXdUYbNh/hA==
-X-Google-Smtp-Source: APXvYqwO6q2eHI9DweGOcy6aCzokg194JKLixQMGyNqN4/RPG/2EG7UnVGYOfZUh53VIkpa4Lk6TaA==
-X-Received: by 2002:a9d:27c3:: with SMTP id c61mr43800996otb.291.1563675034351; 
- Sat, 20 Jul 2019 19:10:34 -0700 (PDT)
-Received: from serve.minyard.net ([47.184.134.43])
- by smtp.gmail.com with ESMTPSA id f84sm12359350oig.43.2019.07.20.19.10.33
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Sat, 20 Jul 2019 19:10:33 -0700 (PDT)
-Received: from minyard.net (unknown [IPv6:2001:470:b8f6:1b:dda3:f567:355c:6b0])
- by serve.minyard.net (Postfix) with ESMTPSA id 3C5DF1800CD;
- Sun, 21 Jul 2019 02:10:33 +0000 (UTC)
-Date: Sat, 20 Jul 2019 21:10:16 -0500
-From: Corey Minyard <minyard@acm.org>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Message-ID: <20190721021016.GG3066@minyard.net>
-References: <20190719131425.10835-1-philmd@redhat.com>
- <20190719131425.10835-5-philmd@redhat.com>
+ (envelope-from <thuth@redhat.com>) id 1hp62a-0004s5-AD
+ for qemu-devel@nongnu.org; Sun, 21 Jul 2019 03:13:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50682)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hp62a-0004pg-2X
+ for qemu-devel@nongnu.org; Sun, 21 Jul 2019 03:13:52 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 6108759455;
+ Sun, 21 Jul 2019 07:13:50 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-51.ams2.redhat.com [10.36.116.51])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 419535F7C0;
+ Sun, 21 Jul 2019 07:13:45 +0000 (UTC)
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Michael Rolnik <mrolnik@gmail.com>, qemu-devel@nongnu.org
+References: <20190719082647.18113-1-mrolnik@gmail.com>
+ <20190719082647.18113-9-mrolnik@gmail.com>
+ <da64fd46-c0f0-b6b6-3b8f-d3da9041605d@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; keydata=
+ xsFNBFH7eUwBEACzyOXKU+5Pcs6wNpKzrlJwzRl3VGZt95VCdb+FgoU9g11m7FWcOafrVRwU
+ yYkTm9+7zBUc0sW5AuPGR/dp3pSLX/yFWsA/UB4nJsHqgDvDU7BImSeiTrnpMOTXb7Arw2a2
+ 4CflIyFqjCpfDM4MuTmzTjXq4Uov1giGE9X6viNo1pxyEpd7PanlKNnf4PqEQp06X4IgUacW
+ tSGj6Gcns1bCuHV8OPWLkf4hkRnu8hdL6i60Yxz4E6TqlrpxsfYwLXgEeswPHOA6Mn4Cso9O
+ 0lewVYfFfsmokfAVMKWzOl1Sr0KGI5T9CpmRfAiSHpthhHWnECcJFwl72NTi6kUcUzG4se81
+ O6n9d/kTj7pzTmBdfwuOZ0YUSqcqs0W+l1NcASSYZQaDoD3/SLk+nqVeCBB4OnYOGhgmIHNW
+ 0CwMRO/GK+20alxzk//V9GmIM2ACElbfF8+Uug3pqiHkVnKqM7W9/S1NH2qmxB6zMiJUHlTH
+ gnVeZX0dgH27mzstcF786uPcdEqS0KJuxh2kk5IvUSL3Qn3ZgmgdxBMyCPciD/1cb7/Ahazr
+ 3ThHQXSHXkH/aDXdfLsKVuwDzHLVSkdSnZdt5HHh75/NFHxwaTlydgfHmFFwodK8y/TjyiGZ
+ zg2Kje38xnz8zKn9iesFBCcONXS7txENTzX0z80WKBhK+XSFJwARAQABzRxUaG9tYXMgSHV0
+ aCA8dGguaHV0aEBnbXguZGU+wsF7BBMBAgAlAhsDBgsJCAcDAgYVCAIJCgsEFgIDAQIeAQIX
+ gAUCUfuWKwIZAQAKCRAu2dd0/nAttbe/EACb9hafyOb2FmhUqeAiBORSsUifFacQ7laVjcgR
+ I4um8CSHvxijYftpkM2EdAtmXIKgbNDpQoXcWLXB9lu9mLgTO4DVT00TRR65ikn3FCWcyT74
+ ENTOzRKyKLsDCjhXKPblTPIQbYAUCOWElcyAPm0ERd62fA/rKNxgIiNo/l4UODOMoOJm2/Ox
+ ZoTckW68Eqv7k9L7m7j+Hn3hoDTjAmcCBJt+j7pOhzWvCbqoNOIH8C8qvPaNlrba+R/K6jkO
+ 6jZkTbYQpGIofEQJ/TNn38IsNGpI1ALTHWFtoMxp3j2Imz0REO6dRE2fHRN8sVlHgkoeGhmY
+ NbDsDE1jFQOEObFnu0euk//7BXU7tGOHckVAZ8T1smiRPHfQU7UEH2a/grndxJ+PNeM5w7n2
+ l+FN3cf2KgPotCK2s9MjSdZA7C5e3rFYO8lqiqTJKvc62vqp3e7B0Kjyy5/QtzSOejBij2QL
+ xkKSFNtxIz4MtuxN8e3IDQNxsKry3nF7R4MDvouXlMo6wP9KuyNWb+vFJt9GtbgfDMIFVamp
+ ZfhEWzWRJH4VgksENA4K/BzjEHCcbTUb1TFsiB1VRnBPJ0SqlvifnfKk6HcpkDk6Pg8Q5FOJ
+ gbNHrdgXsm+m/9GF2zUUr+rOlhVbK23TUqKqPfwnD7uxjpakVcJnsVCFqJpZi1F/ga9IN87B
+ TQRR+3lMARAAtp831HniPHb9AuKq3wj83ujZK8lH5RLrfVsB4X1wi47bwo56BqhXpR/zxPTR
+ eOFT0gnbw9UkphVc7uk/alnXMDEmgvnuxv89PwIQX6k3qLABeV7ykJQG/WT5HQ6+2DdGtVw3
+ 2vjYAPiWQeETsgWRRQMDR0/hwp8s8tL/UodwYCScH6Vxx9pdy353L1fK4Bb9G73a+9FPjp9l
+ x+WwKTsltVqSBuSjyZQ3c3EE8qbTidXZxB38JwARH8yN3TX+t65cbBqLl/zRUUUTapHQpUEd
+ yoAsHIml32e4q+3xdLtTdlLi7FgPBItSazcqZPjEcYW73UAuLcmQmfJlQ5PkDiuqcitn+KzH
+ /1pqsTU7QFZjbmSMJyXY0TDErOFuMOjf20b6arcpEqse1V3IKrb+nqqA2azboRm3pEANLAJw
+ iVTwK3qwGRgK5ut6N/Znv20VEHkFUsRAZoOusrIRfR5HFDxlXguAdEz8M/hxXFYYXqOoaCYy
+ 6pJxTjy0Y/tIfmS/g9Bnp8qg9wsrsnk0+XRnDVPak++G3Uq9tJPwpJbyO0vcqEI3vAXkAB7X
+ VXLzvFwi66RrsPUoDkuzj+aCNumtOePDOCpXQGPpKl+l1aYRMN/+lNSk3+1sVuc2C07WnYyE
+ gV/cbEVklPmKrNwu6DeUyD0qI/bVzKMWZAiB1r56hsGeyYcAEQEAAcLBXwQYAQIACQUCUft5
+ TAIbDAAKCRAu2dd0/nAttYTwEACLAS/THRqXRKb17PQmKwZHerUvZm2klo+lwQ3wNQBHUJAT
+ p2R9ULexyXrJPqjUpy7+voz+FcKiuQBTKyieiIxO46oMxsbXGZ70o3gxjxdYdgimUD6U8PPd
+ JH8tfAL4BR5FZNjspcnscN2jgbF4OrpDeOLyBaj6HPmElNPtECHWCaf1xbIFsZxSDGMA6cUh
+ 0uX3Q8VI7JN1AR2cfiIRY7NrIlWYucJxyKjO3ivWm69nCtsHiJ0wcF8KlVo7F2eLaufo0K8A
+ ynL8SHMF3VEyxsXOP2f1UR9T2Ur30MXcTBpjUxml1TX3RWY5uH89Js/jlIugBwuAmacJ7JYh
+ lTg6sF/GNc4nPb4kk2yktNWTade+TzsllYlJPaorD2Qe8qX0iFUhFC6y9+O6mP4ZvWoYapp9
+ ezYNuebMgEr93ob1+4sFg3812wNP01WqsGtWCJHnPv/JoonFdMzD/bIkXGEJMk6ks2kxQQZq
+ g6Ik/s/vxOfao/xCn8nHt7GwvVy41795hzK6tbSl+BuyCRp0vfPRP34OnK7+jR2nvQpJu/pU
+ rCELuGwT9hsYkUPjVd4lfylN3mzEc6iAv/wwjsc0DRTSQCpXT3v2ymTAsRKrVaEZLibTXaf+
+ WslxWek3xNYRiqwwWAJuL652eAlxUgQ5ZS+fXBRTiQpJ+F26I/2lccScRd9G5w==
+Organization: Red Hat
+Message-ID: <aa9f5be1-3451-7f58-a868-bd31bf2af236@redhat.com>
+Date: Sun, 21 Jul 2019 09:13:45 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
+In-Reply-To: <da64fd46-c0f0-b6b6-3b8f-d3da9041605d@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20190719131425.10835-5-philmd@redhat.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::341
-Subject: Re: [Qemu-devel] [PATCH-for-4.1? 4/7] hw/ipmi: Rewrite a fall
- through comment
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.39]); Sun, 21 Jul 2019 07:13:50 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v27 8/8] target/avr: Add tests
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,60 +117,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: minyard@acm.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Laurent Vivier <laurent@vivier.eu>,
- qemu-block@nongnu.org, Peter Maydell <peter.maydell@linaro.org>,
- qemu-trivial@nongnu.org, Stefan Weil <sw@weilnetz.de>,
- Michael Tokarev <mjt@tls.msk.ru>, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: richard.henderson@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jul 19, 2019 at 03:14:22PM +0200, Philippe Mathieu-Daudé wrote:
-> GCC9 is confused by this comment when building with CFLAG
-> -Wimplicit-fallthrough=2:
-> 
->   hw/ipmi/ipmi_bmc_extern.c: In function ‘addchar’:
->   hw/ipmi/ipmi_bmc_extern.c:178:12: error: this statement may fall through [-Werror=implicit-fallthrough=]
->     178 |         ch |= 0x10;
->         |         ~~~^~~~~~~
->   hw/ipmi/ipmi_bmc_extern.c:181:5: note: here
->     181 |     default:
->         |     ^~~~~~~
->   cc1: all warnings being treated as errors
->   make: *** [rules.mak:69: hw/ipmi/ipmi_bmc_extern.o] Error 1
-> 
-> Rewrite the comment using 'fall through' which is recognized by
-> GCC and static analyzers.
-> 
-> Reported-by: Stefan Weil <sw@weilnetz.de>
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> ---
->  hw/ipmi/ipmi_bmc_extern.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
-> 
-> diff --git a/hw/ipmi/ipmi_bmc_extern.c b/hw/ipmi/ipmi_bmc_extern.c
-> index c0a8dac346..d4cbd210c4 100644
-> --- a/hw/ipmi/ipmi_bmc_extern.c
-> +++ b/hw/ipmi/ipmi_bmc_extern.c
-> @@ -176,8 +176,7 @@ static void addchar(IPMIBmcExtern *ibe, unsigned char ch)
->          ibe->outbuf[ibe->outlen] = VM_ESCAPE_CHAR;
->          ibe->outlen++;
->          ch |= 0x10;
-> -        /* No break */
-> -
-> +        /* fall through */
->      default:
->          ibe->outbuf[ibe->outlen] = ch;
->          ibe->outlen++;
-> -- 
-> 2.20.1
-> 
+On 19/07/2019 15.26, Philippe Mathieu-Daud=C3=A9 wrote:
+> On 7/19/19 10:26 AM, Michael Rolnik wrote:
+[...]
+>> diff --git a/tests/boot-serial-test.c b/tests/boot-serial-test.c
+>> index 24852d4c7d..73d273b73f 100644
+>> --- a/tests/boot-serial-test.c
+>> +++ b/tests/boot-serial-test.c
+>> @@ -16,6 +16,17 @@
+>>  #include "qemu/osdep.h"
+>>  #include "libqtest.h"
+>> =20
+>> +static const uint8_t bios_avr[] =3D {
+>> +    0x89, 0xe1,             /* ldi r24, 0x19   */
+>> +    0x80, 0x93, 0xc5, 0x00, /* sts 0x00C5, r24 ; set baud rate to 384=
+00 */
+>=20
+> FWIW we can remove the previous two lines, we don't care about the
+> baudrate in this test.
+>=20
+>> +    0x88, 0xe0,             /* ldi r24, 0x08   */
+>> +    0x80, 0x93, 0xc1, 0x00, /* sts 0x00C1, r24 ; Enable tx */
+>> +    0x86, 0xe0,             /* ldi r24, 0x06   */
+>> +    0x80, 0x93, 0xc2, 0x00, /* sts 0x00C2, r24 ; Set the data bits to=
+ 8 */
+>> +    0x84, 0xe5,             /* ldi r24, 0x54   */
+>> +    0x80, 0x93, 0xc6, 0x00, /* sts 0x00C6, r24 ; Output 'T' */
+>> +};
+>> +
+>>  static const uint8_t kernel_mcf5208[] =3D {
+>>      0x41, 0xf9, 0xfc, 0x06, 0x00, 0x00,     /* lea 0xfc060000,%a0 */
+>>      0x10, 0x3c, 0x00, 0x54,                 /* move.b #'T',%d0 */
+>> @@ -92,6 +103,7 @@ typedef struct testdef {
+>> =20
+>>  static testdef_t tests[] =3D {
+>>      { "alpha", "clipper", "", "PCI:" },
+>> +    { "avr", "sample", "", "T", sizeof(bios_avr), NULL, bios_avr },
+>>      { "ppc", "ppce500", "", "U-Boot" },
+>>      { "ppc", "40p", "-vga none -boot d", "Trying cd:," },
+>>      { "ppc", "g3beige", "", "PowerPC,750" },
+>>
+>=20
+> Testing shows:
+>=20
+>   TEST    check-qtest-avr: tests/boot-serial-test
+> qemu-system-avr: Unable to load /tmp/qtest-boot-serial-cOndewD as ELF,
+> trying again as raw binary
+>=20
+> I wonder if this might fail Peter's testing, so Cc'ing Thomas.
 
-Well, whatever, this is fine.
+Such messages are quite a bit anoying during "make check", indeed. Could
+you please fence the message with qtest_enabled() ?
 
-Acked-by: Corey Minyard <cminyard@mvista.com>
+ Thanks,
+   Thomas
 
