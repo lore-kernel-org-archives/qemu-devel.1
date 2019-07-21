@@ -1,88 +1,93 @@
-Return-Path: <SRS0=lwXe=VR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=xsRN=VS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CD52C76195
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jul 2019 23:48:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21029C76186
+	for <qemu-devel@archiver.kernel.org>; Sun, 21 Jul 2019 00:04:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CE8DC20823
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jul 2019 23:48:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D033320838
+	for <qemu-devel@archiver.kernel.org>; Sun, 21 Jul 2019 00:04:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l8c6EWEb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE8DC20823
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NEy45TjP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D033320838
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53950 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53978 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hoz5k-0005Yt-35
-	for qemu-devel@archiver.kernel.org; Sat, 20 Jul 2019 19:48:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35498)
+	id 1hozLB-0000E9-Lq
+	for qemu-devel@archiver.kernel.org; Sat, 20 Jul 2019 20:04:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39138)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <skrtbhtngr@gmail.com>) id 1hoz5N-00043K-Gv
- for qemu-devel@nongnu.org; Sat, 20 Jul 2019 19:48:18 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1hozL2-0008HN-2P
+ for qemu-devel@nongnu.org; Sat, 20 Jul 2019 20:04:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <skrtbhtngr@gmail.com>) id 1hoz5M-00031m-E1
- for qemu-devel@nongnu.org; Sat, 20 Jul 2019 19:48:17 -0400
-Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:44300)
+ (envelope-from <richard.henderson@linaro.org>) id 1hozL0-0002ku-UH
+ for qemu-devel@nongnu.org; Sat, 20 Jul 2019 20:04:28 -0400
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:44493)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <skrtbhtngr@gmail.com>)
- id 1hoz5M-000316-87
- for qemu-devel@nongnu.org; Sat, 20 Jul 2019 19:48:16 -0400
-Received: by mail-pg1-x541.google.com with SMTP id i18so15985495pgl.11
- for <qemu-devel@nongnu.org>; Sat, 20 Jul 2019 16:48:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=o3w6rrLptWsFl8HE0mEgf9b9opUynwdbAv9zKRjY76s=;
- b=l8c6EWEbsxt6dLj6FQIoUHfh7OciM+CGiXzER7SMhKZNukCVHy8wnwSgG7Sr/ABXQT
- xeeQkwuuADOdqi1ipkqsiOhRPteg0y7Hp95+cflu7ZSGCUAgFBLsiILyLTK/Jh+yWMXa
- ixQN6aasiTsVnWMToWsPi7lP5kgYwgtLMZvzM1c7Hg3X/9JwsZfr8lCh2i1hgvmv2qsy
- SUtxb+ZiISEuVVfFmG0q9E9/aS6fl90TpnZiNMIpTMGdPi4n9r+ZwBImJnZK+I5pai4c
- M5TKTAc20MYBw+vwXT9uzxaUQDw8NUx7YAyJNPPnQx4d6P+3956GWDbPXtqXi7Qi4X7F
- m3Tw==
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1hozL0-0002jQ-Hb
+ for qemu-devel@nongnu.org; Sat, 20 Jul 2019 20:04:26 -0400
+Received: by mail-pl1-x642.google.com with SMTP id t14so17351767plr.11
+ for <qemu-devel@nongnu.org>; Sat, 20 Jul 2019 17:04:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=bbg94PZuJNokk3vTvZW8ztRKzGv0yjmdnNpy106J4dQ=;
+ b=NEy45TjPj1jWKiQnL3xiJvUkv7XWGwAueIcmbtdn1WcsedQXuy2Xl2VEXwzGsSbD/j
+ ea2/tz/cCkG042VpQibf1DlYSOYMmVk0p6EflkxZmP1VU5VXWoc2/6Ml7leY0QrjAaJd
+ eHVx+L3xlgqHs8kJyM5kbbWcdXhR22fKm3omGOQ+plcT1mH0vB1GV2mSHuvvWzFF78VP
+ cS5hZLYD8kZ/Ox+yn980uNA99c8AhiS4QH1Vq1b+lVt1qXZtj2hXDgw0un2cO7/giRBY
+ rSptlESY3H1U5qvV2tflLkzLWYxZ2lhuUy4zNJINDAvAAiQ0chx3Utgd5O2ypmezcfVG
+ anKw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=o3w6rrLptWsFl8HE0mEgf9b9opUynwdbAv9zKRjY76s=;
- b=TohzYsq08ks7q7Itj5A9+txcM7y3CEGDKEBs2Kyw2weM17wuTbJSbDOqwxKgf+xpZZ
- epxNJ+ngscc5zmqITtFWxmpPdOKKGIA/WeQc0+aRuTDKiTu1V+QwjcdPnUta8alKo3Ek
- 4jNzo5DYamGcbdqL9viKf6S+tCZ15bYBiEL6s5F5YyGvNnCh46LSENoSnWgrpDoJbI5k
- tXs3rJ9fCEeHW6si057OjMnKoJILGv0xjEzHkkhtgBnXhADlvOvSR4+F/GCAf3x6vztq
- n5nsU8feNfOGeXuIUwcTOyLexVAookZ9/wrlyW/wN9ptMkQNySvrpJcOjr32K6OIEoo5
- 6NpQ==
-X-Gm-Message-State: APjAAAUe/GI9Enp3PXXnj+QtWU3q88RQG5RoP95LPHHEZzfY+cZleW1M
- XSkPwG0YhOHS2ubJuOWG3SmWhUzs
-X-Google-Smtp-Source: APXvYqyrOprRWLKEpWfEXg3nT/puwVIHP2ARZx3OjAsv279ytkEXdWzb7pB8I5s2/yuS0ulB7QeBag==
-X-Received: by 2002:a17:90a:a008:: with SMTP id
- q8mr67993851pjp.114.1563666494919; 
- Sat, 20 Jul 2019 16:48:14 -0700 (PDT)
-Received: from beta.cse.iitb.ac.in ([2405:204:20e:f16f:2a5b:d596:9ab:8e05])
- by smtp.gmail.com with ESMTPSA id b6sm31229151pgq.26.2019.07.20.16.48.12
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Sat, 20 Jul 2019 16:48:14 -0700 (PDT)
-From: Sukrit Bhatnagar <skrtbhtngr@gmail.com>
-To: qemu-devel@nongnu.org
-Date: Sun, 21 Jul 2019 05:18:03 +0530
-Message-Id: <20190720234803.18938-3-skrtbhtngr@gmail.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190720234803.18938-1-skrtbhtngr@gmail.com>
-References: <20190720234803.18938-1-skrtbhtngr@gmail.com>
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=bbg94PZuJNokk3vTvZW8ztRKzGv0yjmdnNpy106J4dQ=;
+ b=KI1nc3Ja7cZR51oHPFY2ZrpLObq/ah2G0+Ing+xuAp96P/qz0C+OE254eo+l/0kFex
+ iY6Wgd+4dqqtdmgQSdFFKyXAILHH/fnCcvNqg3NT+YiIMU5CUpdy3buBxnX4lENKm2km
+ gJQXPdBW2oMQ/43Re+QADpd/D+1DuzrhB3mV85DsYXI3Br6k+mvuEnp6GmSdj8RLpjFj
+ 1jxfjWoUlRFzxKv7Pt4D9Gsh1P2EfmX7izi8oc71Ec+KcpXt9ta5/ekjLVmb7F0nPAXP
+ /M/AXzfnize6TAAzsnDjmd/wxtF6RKK7eg+s5/TRxCxhR5Tz2JIr8zJGKhybng5h2G9U
+ yV/w==
+X-Gm-Message-State: APjAAAXOqrPD/bKvLgtPcC5ZiNZUsQBbGDAC6Sv+w/gx3XHRnx9xEWJ/
+ he++2dWTPUuS3Q7m6GpQi29k2Q==
+X-Google-Smtp-Source: APXvYqy7RXIz28R2GkM0Gv2x99R3q3CYSk0sP23h13K2uzpwb+Xj1bAZtOW4GoY6OMwV5anDVa2Rnw==
+X-Received: by 2002:a17:902:1566:: with SMTP id
+ b35mr67790096plh.147.1563667464955; 
+ Sat, 20 Jul 2019 17:04:24 -0700 (PDT)
+Received: from [192.168.1.11] (97-126-117-207.tukw.qwest.net. [97.126.117.207])
+ by smtp.gmail.com with ESMTPSA id 3sm37884825pfg.186.2019.07.20.17.04.23
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Sat, 20 Jul 2019 17:04:24 -0700 (PDT)
+To: Jan Bobek <jan.bobek@gmail.com>, qemu-devel@nongnu.org
+References: <20190711223300.6061-1-jan.bobek@gmail.com>
+ <20190711223300.6061-18-jan.bobek@gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <63c92bca-d1f8-6dd7-35c9-9a8e87ba38b0@linaro.org>
+Date: Sat, 20 Jul 2019 17:04:22 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190711223300.6061-18-jan.bobek@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::541
-Subject: [Qemu-devel] [RFC v3 2/2] hw/pvrdma: add live migration support
+X-Received-From: 2607:f8b0:4864:20::642
+Subject: Re: [Qemu-devel] [RISU PATCH v3 17/18] x86.risu: add AVX
+ instructions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,132 +99,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Yuval Shaia <yuval.shaia@oracle.com>
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-vmstate_pvrdma describes the PCI and MSIX states as well as the dma
-address for dsr and the gid table of device.
-vmstate_pvrdma_gids describes each gid in the gid table.
+On 7/11/19 3:32 PM, Jan Bobek wrote:
+> +# VEX.LIG.F3.0F.WIG 10 /r: VMOVSS xmm1, xmm2, xmm3
+> +# VEX.LIG.F3.0F.WIG 10 /r: VMOVSS xmm1, m32
+> +# VEX.LIG.F3.0F.WIG 11 /r: VMOVSS xmm1, xmm2, xmm3
+> +# VEX.LIG.F3.0F.WIG 11 /r: VMOVSS m32, xmm1
+> +VMOVSS AVX 0001000 d \
+> +  !constraints { vex($_, m => 0x0F, l => 0, p => 0xF3); modrm($_); $_->{vex}{v} = 0 unless defined $_->{modrm}{reg2}; 1 } \
+> +  !memory { $d ? store(size => 4) : load(size => 4); }
 
-pvrdma_post_save() does the job of unregistering gid entries from the
-backend device in the source host.
+Why the l => 0?  LIG does mean VEX.L ignored, so why not let it get randomized
+as you do for WIG?
 
-pvrdma_post_load() maps to dsr using the loaded dma address, registers
-each loaded gid into the backend device, and finally calls load_dsr()
-to perform other mappings and ring init operations.
+Not wrong as is... this is the documented value for scalar operands.  But there
+is a different document markup, LZ, for required (E)VEX.L == 0.
 
-Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Cc: Yuval Shaia <yuval.shaia@oracle.com>
-Signed-off-by: Sukrit Bhatnagar <skrtbhtngr@gmail.com>
----
- hw/rdma/vmw/pvrdma_main.c | 77 +++++++++++++++++++++++++++++++++++++++
- 1 file changed, 77 insertions(+)
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-diff --git a/hw/rdma/vmw/pvrdma_main.c b/hw/rdma/vmw/pvrdma_main.c
-index 6c90db96f9..6f8b56dea3 100644
---- a/hw/rdma/vmw/pvrdma_main.c
-+++ b/hw/rdma/vmw/pvrdma_main.c
-@@ -28,6 +28,7 @@
- #include "sysemu/sysemu.h"
- #include "monitor/monitor.h"
- #include "hw/rdma/rdma.h"
-+#include "migration/register.h"
- 
- #include "../rdma_rm.h"
- #include "../rdma_backend.h"
-@@ -593,6 +594,81 @@ static void pvrdma_shutdown_notifier(Notifier *n, void *opaque)
-     pvrdma_fini(pci_dev);
- }
- 
-+static int pvrdma_post_save(void *opaque)
-+{
-+    int i, rc;
-+    PVRDMADev *dev = opaque;
-+
-+    for (i = 0; i < MAX_GIDS; i++) {
-+
-+        if (!dev->rdma_dev_res.port.gid_tbl[i].gid.global.interface_id) {
-+            continue;
-+        }
-+        rc = rdma_backend_del_gid(&dev->backend_dev,
-+                                   dev->backend_eth_device_name,
-+                                   &dev->rdma_dev_res.port.gid_tbl[i].gid);
-+        if (rc) {
-+            return -EINVAL;
-+        }
-+    }
-+
-+    return 0;
-+}
-+
-+static int pvrdma_post_load(void *opaque, int version_id)
-+{
-+    int i, rc;
-+    PVRDMADev *dev = opaque;
-+    PCIDevice *pci_dev = PCI_DEVICE(dev);
-+    DSRInfo *dsr_info = &dev->dsr_info;
-+
-+    dsr_info->dsr = rdma_pci_dma_map(pci_dev, dsr_info->dma,
-+                                sizeof(struct pvrdma_device_shared_region));
-+    if (!dsr_info->dsr) {
-+        rdma_error_report("Failed to map to DSR");
-+        return -ENOMEM;
-+    }
-+
-+    for (i = 0; i < MAX_GIDS; i++) {
-+
-+        if (!dev->rdma_dev_res.port.gid_tbl[i].gid.global.interface_id) {
-+            continue;
-+        }
-+
-+        rc = rdma_backend_add_gid(&dev->backend_dev,
-+                                  dev->backend_eth_device_name,
-+                                  &dev->rdma_dev_res.port.gid_tbl[i].gid);
-+        if (rc) {
-+            return -EINVAL;
-+        }
-+    }
-+
-+    return load_dsr(dev);
-+}
-+
-+static const VMStateDescription vmstate_pvrdma_gids = {
-+    .name = "pvrdma-gids",
-+    .fields = (VMStateField[]) {
-+            VMSTATE_UINT8_ARRAY_V(gid.raw, RdmaRmGid, 16, 0),
-+            VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static const VMStateDescription vmstate_pvrdma = {
-+    .name = PVRDMA_HW_NAME,
-+    .post_save = pvrdma_post_save,
-+    .post_load = pvrdma_post_load,
-+    .fields = (VMStateField[]) {
-+            VMSTATE_PCI_DEVICE(parent_obj, PVRDMADev),
-+            VMSTATE_MSIX(parent_obj, PVRDMADev),
-+            VMSTATE_UINT64(dsr_info.dma, PVRDMADev),
-+            VMSTATE_STRUCT_ARRAY(rdma_dev_res.port.gid_tbl, PVRDMADev,
-+                                 MAX_PORT_GIDS, 0, vmstate_pvrdma_gids,
-+                                 RdmaRmGid),
-+            VMSTATE_END_OF_LIST()
-+    }
-+};
-+
- static void pvrdma_realize(PCIDevice *pdev, Error **errp)
- {
-     int rc = 0;
-@@ -688,6 +764,7 @@ static void pvrdma_class_init(ObjectClass *klass, void *data)
- 
-     dc->desc = "RDMA Device";
-     dc->props = pvrdma_dev_properties;
-+    dc->vmsd = &vmstate_pvrdma;
-     set_bit(DEVICE_CATEGORY_NETWORK, dc->categories);
- 
-     ir->print_statistics = pvrdma_print_statistics;
--- 
-2.21.0
 
+r~
 
