@@ -2,93 +2,72 @@ Return-Path: <SRS0=xsRN=VS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1E93C76191
-	for <qemu-devel@archiver.kernel.org>; Sun, 21 Jul 2019 19:53:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CCABC76191
+	for <qemu-devel@archiver.kernel.org>; Sun, 21 Jul 2019 22:35:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7AE2A2084C
-	for <qemu-devel@archiver.kernel.org>; Sun, 21 Jul 2019 19:53:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7AE2A2084C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
+	by mail.kernel.org (Postfix) with ESMTPS id D5D8320693
+	for <qemu-devel@archiver.kernel.org>; Sun, 21 Jul 2019 22:35:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5D8320693
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57584 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57950 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hpHu8-0000hZ-I0
-	for qemu-devel@archiver.kernel.org; Sun, 21 Jul 2019 15:53:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33636)
+	id 1hpKQe-0005lC-Te
+	for qemu-devel@archiver.kernel.org; Sun, 21 Jul 2019 18:35:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48508)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hpHtr-00088H-7r
- for qemu-devel@nongnu.org; Sun, 21 Jul 2019 15:53:40 -0400
+ (envelope-from <bounces@canonical.com>) id 1hpKQU-0005MC-NZ
+ for qemu-devel@nongnu.org; Sun, 21 Jul 2019 18:35:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hpHtp-00030O-TQ
- for qemu-devel@nongnu.org; Sun, 21 Jul 2019 15:53:39 -0400
-Received: from mail.ilande.co.uk ([46.43.2.167]:35556
- helo=mail.default.ilande.uk0.bigv.io)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1hpHtp-0002FF-NU
- for qemu-devel@nongnu.org; Sun, 21 Jul 2019 15:53:37 -0400
-Received: from host86-130-37-205.range86-130.btcentralplus.com
- ([86.130.37.205] helo=[192.168.1.65])
- by mail.default.ilande.uk0.bigv.io with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
- (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1hpHqX-0007Hw-GW; Sun, 21 Jul 2019 20:50:15 +0100
-To: tony.nguyen@bt.com, qemu-devel@nongnu.org
-References: <a5f7f8854af046c18c6342035662a193@tpw09926dag18e.domain1.systemhost.net>
- <1563343829014.86755@bt.com>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
- mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
- 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
- E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
- PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
- PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
- AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
- OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
- NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
- mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
- z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
- T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
- DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
- y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
- 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
- 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
- YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
- Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
- BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
- opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
- NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
- Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
- KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
- imgcU9TTGC5qd9g=
-Message-ID: <321de4be-d5fd-7ccc-3a37-fd9cd494f564@ilande.co.uk>
-Date: Sun, 21 Jul 2019 20:50:09 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <bounces@canonical.com>) id 1hpKQT-0006dj-F4
+ for qemu-devel@nongnu.org; Sun, 21 Jul 2019 18:35:30 -0400
+Received: from indium.canonical.com ([91.189.90.7]:35816)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1hpKQT-0006cl-7i
+ for qemu-devel@nongnu.org; Sun, 21 Jul 2019 18:35:29 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1hpKQR-0008Cy-EK
+ for <qemu-devel@nongnu.org>; Sun, 21 Jul 2019 22:35:27 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 67E432E804C
+ for <qemu-devel@nongnu.org>; Sun, 21 Jul 2019 22:35:27 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <1563343829014.86755@bt.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 86.130.37.205
-X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
-X-SA-Exim-Scanned: No (on mail.default.ilande.uk0.bigv.io); Unknown failure
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sun, 21 Jul 2019 22:25:46 -0000
+From: Gergely Kis <1818937@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: crash hvf macos
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: bwibking cuser2 kisg roolebo
+X-Launchpad-Bug-Reporter: Chen Zhang (cuser2)
+X-Launchpad-Bug-Modifier: Gergely Kis (kisg)
+References: <155192472106.28960.15645485731508389788.malonedeb@chaenomeles.canonical.com>
+Message-Id: <156374794653.17989.9941695161724116092.malone@gac.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="19010";
+ Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: d6ff35fd92cbd4429148f7782ca224422b1a8407
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.43.2.167
-Subject: Re: [Qemu-devel] [PATCH 4/4] target/sparc: sun4u Invert Endian TTE
- bit
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1818937] Re: Crash with HV_ERROR on macOS host
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -97,178 +76,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, atar4qemu@gmail.com, rth@twiddle.net
+Reply-To: Bug 1818937 <1818937@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 17/07/2019 07:10, tony.nguyen@bt.com wrote:
+We can reproduce this problem with Linux guests as well (running 4.15
+Ubuntu Xenial and 4.14 Android kernels). Mac models with integrated GPU
+seem to be more affected according to our testing, and the crash does
+not always occur, needs multiple tries to be triggered. We would be
+happy to assist in debugging, once you have a patch that can generate
+more detailed logs.
 
-> This bit configures endianness of PCI MMIO devices. It is used by
-> Solaris and OpenBSD sunhme drivers.
-> 
-> Tested working on OpenBSD.
-> 
-> Unfortunately Solaris 10 had a unrelated keyboard issue blocking
-> testing... another inch towards Solaris 10 on SPARC64 =)
-> 
-> Signed-off-by: Tony Nguyen <tony.nguyen@bt.com>
-> ---
->  target/sparc/cpu.h        |  2 ++
->  target/sparc/mmu_helper.c | 41 +++++++++++++++++++++++++++------------
->  2 files changed, 31 insertions(+), 12 deletions(-)
-> 
-> diff --git a/target/sparc/cpu.h b/target/sparc/cpu.h
-> index 8ed2250cd0..77e8e07194 100644
-> --- a/target/sparc/cpu.h
-> +++ b/target/sparc/cpu.h
-> @@ -277,6 +277,7 @@ enum {
->  
->  #define TTE_VALID_BIT       (1ULL << 63)
->  #define TTE_NFO_BIT         (1ULL << 60)
-> +#define TTE_IE_BIT          (1ULL << 59)
->  #define TTE_USED_BIT        (1ULL << 41)
->  #define TTE_LOCKED_BIT      (1ULL <<  6)
->  #define TTE_SIDEEFFECT_BIT  (1ULL <<  3)
-> @@ -293,6 +294,7 @@ enum {
->  
->  #define TTE_IS_VALID(tte)   ((tte) & TTE_VALID_BIT)
->  #define TTE_IS_NFO(tte)     ((tte) & TTE_NFO_BIT)
-> +#define TTE_IS_IE(tte)      ((tte) & TTE_IE_BIT)
->  #define TTE_IS_USED(tte)    ((tte) & TTE_USED_BIT)
->  #define TTE_IS_LOCKED(tte)  ((tte) & TTE_LOCKED_BIT)
->  #define TTE_IS_SIDEEFFECT(tte) ((tte) & TTE_SIDEEFFECT_BIT)
-> diff --git a/target/sparc/mmu_helper.c b/target/sparc/mmu_helper.c
-> index cbd1e91179..f7b97d1e46 100644
-> --- a/target/sparc/mmu_helper.c
-> +++ b/target/sparc/mmu_helper.c
-> @@ -492,7 +492,8 @@ static inline int ultrasparc_tag_match(SparcTLBEntry *tlb,
->  
->  static int get_physical_address_data(CPUSPARCState *env,
->                                       hwaddr *physical, int *prot,
-> -                                     target_ulong address, int rw, int mmu_idx)
-> +                                     MemTxAttrs *attrs, target_ulong address,
-> +                                     int rw, int mmu_idx)
->  {
->      CPUState *cs = env_cpu(env);
->      unsigned int i;
-> @@ -536,6 +537,10 @@ static int get_physical_address_data(CPUSPARCState *env,
->          if (ultrasparc_tag_match(&env->dtlb[i], address, context, physical)) {
->              int do_fault = 0;
->  
-> +            if (TTE_IS_IE(env->dtlb[i].tte)) {
-> +                attrs->byte_swap = true;
-> +            }
-> +
->              /* access ok? */
->              /* multiple bits in SFSR.FT may be set on TT_DFAULT */
->              if (TTE_IS_PRIV(env->dtlb[i].tte) && is_user) {
-> @@ -686,7 +691,7 @@ static int get_physical_address_code(CPUSPARCState *env,
->  }
->  
->  static int get_physical_address(CPUSPARCState *env, hwaddr *physical,
-> -                                int *prot, int *access_index,
-> +                                int *prot, MemTxAttrs *attrs,
->                                  target_ulong address, int rw, int mmu_idx,
->                                  target_ulong *page_size)
->  {
-> @@ -716,11 +721,12 @@ static int get_physical_address(CPUSPARCState *env, hwaddr *physical,
->      }
->  
->      if (rw == 2) {
-> +        *attrs = MEMTXATTRS_UNSPECIFIED;
->          return get_physical_address_code(env, physical, prot, address,
->                                           mmu_idx);
->      } else {
-> -        return get_physical_address_data(env, physical, prot, address, rw,
-> -                                         mmu_idx);
-> +        return get_physical_address_data(env, physical, prot, attrs, address,
-> +                                         rw, mmu_idx);
->      }
->  }
->  
-> @@ -734,10 +740,11 @@ bool sparc_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
->      target_ulong vaddr;
->      hwaddr paddr;
->      target_ulong page_size;
-> -    int error_code = 0, prot, access_index;
-> +    MemTxAttrs attrs = {> +    int error_code = 0, prot;
->  
->      address &= TARGET_PAGE_MASK;
-> -    error_code = get_physical_address(env, &paddr, &prot, &access_index,
-> +    error_code = get_physical_address(env, &paddr, &prot, &attrs,
->                                        address, access_type,
->                                        mmu_idx, &page_size);
->      if (likely(error_code == 0)) {
-> @@ -747,7 +754,8 @@ bool sparc_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
->                                     env->dmmu.mmu_primary_context,
->                                     env->dmmu.mmu_secondary_context);
->  
-> -        tlb_set_page(cs, vaddr, paddr, prot, mmu_idx, page_size);
-> +        tlb_set_page_with_attrs(cs, vaddr, paddr, attrs, prot, mmu_idx,
-> +                                page_size);
->          return true;
->      }
->      if (probe) {
-> @@ -789,7 +797,7 @@ void dump_mmu(CPUSPARCState *env)
->              }
->              if (TTE_IS_VALID(env->dtlb[i].tte)) {
->                  qemu_printf("[%02u] VA: %" PRIx64 ", PA: %llx"
-> -                            ", %s, %s, %s, %s, ctx %" PRId64 " %s\n",
-> +                            ", %s, %s, %s, %s, ie %s, ctx %" PRId64 " %s\n",
->                              i,
->                              env->dtlb[i].tag & (uint64_t)~0x1fffULL,
->                              TTE_PA(env->dtlb[i].tte),
-> @@ -798,6 +806,8 @@ void dump_mmu(CPUSPARCState *env)
->                              TTE_IS_W_OK(env->dtlb[i].tte) ? "RW" : "RO",
->                              TTE_IS_LOCKED(env->dtlb[i].tte) ?
->                              "locked" : "unlocked",
-> +                            TTE_IS_IE(env->dtlb[i].tte) ?
-> +                            "yes" : "no",
->                              env->dtlb[i].tag & (uint64_t)0x1fffULL,
->                              TTE_IS_GLOBAL(env->dtlb[i].tte) ?
->                              "global" : "local");
-> @@ -848,13 +858,20 @@ static int cpu_sparc_get_phys_page(CPUSPARCState *env, hwaddr *phys,
->                                     target_ulong addr, int rw, int mmu_idx)
->  {
->      target_ulong page_size;
-> -    int prot, access_index;
-> +    int prot;
->  
-> -    return get_physical_address(env, phys, &prot, &access_index, addr, rw,
-> -                                mmu_idx, &page_size);
-> +#ifdef TARGET_SPARC64
-> +    MemTxAttrs attrs = {};
-> +    return get_physical_address(env, phys, &prot, &attrs,
-> +                                addr, rw, mmu_idx, &page_size);
-> +#else
-> +    int access_index;
-> +    return get_physical_address(env, phys, &prot, &access_index,
-> +                                addr, rw, mmu_idx, &page_size);
-> +#endif /* TARGET_SPARC64 */
->  }
->  
-> -#if defined(TARGET_SPARC64)
-> +#ifdef TARGET_SPARC64
->  hwaddr cpu_get_phys_page_nofault(CPUSPARCState *env, target_ulong addr,
->                                             int mmu_idx)
->  {
+-- =
 
-This feels like it's making things more complicated: why don't you just set
-MemTxAttrs to {} in sparc_cpu_tlb_fill() and cpu_sparc_get_phys_page() and then push
-the extra parameter all the way down to get_physical_address_code() and
-get_physical_address_data()? AFAICT we are deliberately clearing the attributes by
-default which is why we shouldn't need to use MEMTXATTRS_UNSPECIFIED.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1818937
 
-I wonder if adding the MemTxAddrs parameters and converting tlb_set_page() to
-tlb_set_page_with_attrs() for both 32-bit and 64-bit SPARCs should be a separate
-commit, before the final commit that adds the support for the endian swap?
+Title:
+  Crash with HV_ERROR on macOS host
 
-BTW many thanks for working on this - I have the patchset a quick test and I was able
-to boot my OpenBSD test image and successfully use the network card :)
+Status in QEMU:
+  New
 
+Bug description:
+  On macOS host running Windows 10 guest, qemu crashed with error
+  message: Error: HV_ERROR.
 
-ATB,
+  Host: macOS Mojave 10.14.3 (18D109) Late 2014 Mac mini presumably Core i5=
+ 4278U.
+  QEMU: git commit a3e3b0a7bd5de211a62cdf2d6c12b96d3c403560
+  QEMU parameter: qemu-system-x86_64 -m 3000 -drive file=3Ddisk.img,if=3Dvi=
+rtio,discard=3Dunmap -accel hvf -soundhw hda -smp 3
 
-Mark.
+  thread list
+  Process 56054 stopped
+    thread #1: tid =3D 0x2ffec8, 0x00007fff48d0805a vImage`vLookupTable_Pla=
+nar16 + 970, queue =3D 'com.apple.main-thread'
+    thread #2: tid =3D 0x2ffecc, 0x00007fff79d6d7de libsystem_kernel.dylib`=
+__psynch_cvwait + 10
+    thread #3: tid =3D 0x2ffecd, 0x00007fff79d715aa libsystem_kernel.dylib`=
+__select + 10
+    thread #4: tid =3D 0x2ffece, 0x00007fff79d71d9a libsystem_kernel.dylib`=
+__sigwait + 10
+  * thread #6: tid =3D 0x2ffed0, 0x00007fff79d7023e libsystem_kernel.dylib`=
+__pthread_kill + 10, stop reason =3D signal SIGABRT
+    thread #7: tid =3D 0x2ffed1, 0x00007fff79d6d7de libsystem_kernel.dylib`=
+__psynch_cvwait + 10
+    thread #8: tid =3D 0x2ffed2, 0x00007fff79d6d7de libsystem_kernel.dylib`=
+__psynch_cvwait + 10
+    thread #11: tid =3D 0x2fff34, 0x00007fff79d6a17a libsystem_kernel.dylib=
+`mach_msg_trap + 10, name =3D 'com.apple.NSEventThread'
+    thread #30: tid =3D 0x300c04, 0x00007fff79e233f8 libsystem_pthread.dyli=
+b`start_wqthread
+    thread #31: tid =3D 0x300c16, 0x00007fff79e233f8 libsystem_pthread.dyli=
+b`start_wqthread
+    thread #32: tid =3D 0x300c17, 0x0000000000000000
+    thread #33: tid =3D 0x300c93, 0x00007fff79d6d7de libsystem_kernel.dylib=
+`__psynch_cvwait + 10
+
+  =
+
+  Crashed thread:
+
+  * thread #6, stop reason =3D signal SIGABRT
+    * frame #0: 0x00007fff79d7023e libsystem_kernel.dylib`__pthread_kill + =
+10
+      frame #1: 0x00007fff79e26c1c libsystem_pthread.dylib`pthread_kill + 2=
+85
+      frame #2: 0x00007fff79cd91c9 libsystem_c.dylib`abort + 127
+      frame #3: 0x000000010baa476d qemu-system-x86_64`assert_hvf_ok(ret=3D<=
+unavailable>) at hvf.c:106 [opt]
+      frame #4: 0x000000010baa4c8f qemu-system-x86_64`hvf_vcpu_exec(cpu=3D0=
+x00007f8e5283de00) at hvf.c:681 [opt]
+      frame #5: 0x000000010b988423 qemu-system-x86_64`qemu_hvf_cpu_thread_f=
+n(arg=3D0x00007f8e5283de00) at cpus.c:1636 [opt]
+      frame #6: 0x000000010bd9dfce qemu-system-x86_64`qemu_thread_start(arg=
+s=3D<unavailable>) at qemu-thread-posix.c:502 [opt]
+      frame #7: 0x00007fff79e24305 libsystem_pthread.dylib`_pthread_body + =
+126
+      frame #8: 0x00007fff79e2726f libsystem_pthread.dylib`_pthread_start +=
+ 70
+      frame #9: 0x00007fff79e23415 libsystem_pthread.dylib`thread_start + 13
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1818937/+subscriptions
 
