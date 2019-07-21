@@ -2,56 +2,109 @@ Return-Path: <SRS0=xsRN=VS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4BA4C76188
-	for <qemu-devel@archiver.kernel.org>; Sun, 21 Jul 2019 07:16:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29040C76188
+	for <qemu-devel@archiver.kernel.org>; Sun, 21 Jul 2019 07:23:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9E2D520838
-	for <qemu-devel@archiver.kernel.org>; Sun, 21 Jul 2019 07:16:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E2D520838
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id F3760205F4
+	for <qemu-devel@archiver.kernel.org>; Sun, 21 Jul 2019 07:23:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3760205F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54886 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54898 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hp652-0002yI-QM
-	for qemu-devel@archiver.kernel.org; Sun, 21 Jul 2019 03:16:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41229)
+	id 1hp6BV-0004SS-1i
+	for qemu-devel@archiver.kernel.org; Sun, 21 Jul 2019 03:23:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42865)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <lizhengui@huawei.com>) id 1hp64r-0002Vd-Dt
- for qemu-devel@nongnu.org; Sun, 21 Jul 2019 03:16:14 -0400
+ (envelope-from <thuth@redhat.com>) id 1hp6BK-00043w-Aj
+ for qemu-devel@nongnu.org; Sun, 21 Jul 2019 03:22:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lizhengui@huawei.com>) id 1hp64q-0007ab-AW
- for qemu-devel@nongnu.org; Sun, 21 Jul 2019 03:16:13 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:59770 helo=huawei.com)
+ (envelope-from <thuth@redhat.com>) id 1hp6BJ-00053e-14
+ for qemu-devel@nongnu.org; Sun, 21 Jul 2019 03:22:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54422)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <lizhengui@huawei.com>)
- id 1hp64n-0007Ax-Lj; Sun, 21 Jul 2019 03:16:09 -0400
-Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id 1EFBDB7F0E40565C1B36;
- Sun, 21 Jul 2019 15:15:53 +0800 (CST)
-Received: from HGHY1l002846723.china.huawei.com (10.177.251.193) by
- DGGEMS408-HUB.china.huawei.com (10.3.19.208) with Microsoft SMTP Server id
- 14.3.439.0; Sun, 21 Jul 2019 15:15:46 +0800
-From: l00284672 <lizhengui@huawei.com>
-To: <pbonzini@redhat.com>, <kwolf@redhat.com>
-Date: Sun, 21 Jul 2019 15:12:58 +0800
-Message-ID: <1563693178-23328-1-git-send-email-lizhengui@huawei.com>
-X-Mailer: git-send-email 2.7.2.windows.1
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hp6BI-000534-Oe
+ for qemu-devel@nongnu.org; Sun, 21 Jul 2019 03:22:52 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id D97FA8535C;
+ Sun, 21 Jul 2019 07:22:51 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-51.ams2.redhat.com [10.36.116.51])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 81A0B5D9D3;
+ Sun, 21 Jul 2019 07:22:45 +0000 (UTC)
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+References: <87y30t43cp.fsf@dusky.pond.sub.org>
+ <316ea157-4c44-5d75-e4f4-7977d2e13345@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; keydata=
+ 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
+Organization: Red Hat
+Message-ID: <663f4f5b-bf45-ed0d-1140-e7baa9cc5578@redhat.com>
+Date: Sun, 21 Jul 2019 09:22:44 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-X-Originating-IP: [10.177.251.193]
-X-CFilter-Loop: Reflected
+In-Reply-To: <316ea157-4c44-5d75-e4f4-7977d2e13345@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.25]); Sun, 21 Jul 2019 07:22:52 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 45.249.212.35
-Subject: [Qemu-devel] [PATCH] virtio-scsi: fixed virtio_scsi_ctx_check
- failed when detaching scsi disk
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] Use of TARGET_FMT_plx in hw/tpm/trace-events
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -63,112 +116,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lizhengui@huawei.com, qemu-block@nongnu.org, eric.fangyi@huawei.com,
- qemu-devel@nongnu.org, jiangyiwen@huawei.com, wangjie88@huawei.com
+Cc: qemu-devel@nongnu.org, Stefan Berger <stefanb@linux.vnet.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-commit a6f230c move blockbackend back to main AioContext on unplug. It se=
-t the AioContext of
-SCSIDevice to the main AioContex, but s->ctx is still the iothread AioCon=
-tex=EF=BC=88if the scsi controller
-is configure with iothread=EF=BC=89. So if there are having in-flight req=
-uests during unplug, a failing assertion
-happend. The bt is below:
-(gdb) bt
-#0  0x0000ffff86aacbd0 in raise () from /lib64/libc.so.6
-#1  0x0000ffff86aadf7c in abort () from /lib64/libc.so.6
-#2  0x0000ffff86aa6124 in __assert_fail_base () from /lib64/libc.so.6
-#3  0x0000ffff86aa61a4 in __assert_fail () from /lib64/libc.so.6
-#4  0x0000000000529118 in virtio_scsi_ctx_check (d=3D<optimized out>, s=3D=
-<optimized out>, s=3D<optimized out>) at /home/qemu-4.0.0/hw/scsi/virtio-=
-scsi.c:246
-#5  0x0000000000529ec4 in virtio_scsi_handle_cmd_req_prepare (s=3D0x2779e=
-c00, req=3D0xffff740397d0) at /home/qemu-4.0.0/hw/scsi/virtio-scsi.c:559
-#6  0x000000000052a228 in virtio_scsi_handle_cmd_vq (s=3D0x2779ec00, vq=3D=
-0xffff7c6d7110) at /home/qemu-4.0.0/hw/scsi/virtio-scsi.c:603
-#7  0x000000000052afa8 in virtio_scsi_data_plane_handle_cmd (vdev=3D<opti=
-mized out>, vq=3D0xffff7c6d7110) at /home/qemu-4.0.0/hw/scsi/virtio-scsi-=
-dataplane.c:59
-#8  0x000000000054d94c in virtio_queue_host_notifier_aio_poll (opaque=3D<=
-optimized out>) at /home/qemu-4.0.0/hw/virtio/virtio.c:2452
+On 20/07/2019 11.42, Philippe Mathieu-Daud=C3=A9 wrote:
+> On 7/20/19 8:39 AM, Markus Armbruster wrote:
+>> Consider hw/tpm/trace-events
+>>
+>>     # tpm_crb.c
+>>     tpm_crb_mmio_read(uint64_t addr, unsigned size, uint32_t val) "CRB=
+ read 0x" TARGET_FMT_plx " len:%u val: 0x%" PRIx32
+>>     tpm_crb_mmio_write(uint64_t addr, unsigned size, uint32_t val) "CR=
+B write 0x" TARGET_FMT_plx " len:%u val: 0x%" PRIx32
+>>
+>> Format is TARGET_FMT_plx formats a hwaddr, but the parameter type is
+>> uint64_t.  They happen to be the same.  Is this kosher?
+>>
+>=20
+> Missed when converting from DPRINTF() to trace-events:
+> https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3Dec427498;hp=3D8cb=
+340c613
+>=20
+> PRIx64 certainly makes sense here.
+>=20
+> Since it is the single use, once updated we can remote this hunk from
+> scripts/tracetool/format/log_stap.py:
+>=20
+>     if macro =3D=3D "TARGET_FMT_plx":
+>         return "%016x"
+>=20
+> I guess remember a thread with Thomas talking about TARGET_FMT_plx but =
+I
+> can't find it, maybe I dreamed about it...
 
-assert(blk_get_aio_context(d->conf.blk) =3D=3D s->ctx) failed.
+That was:
 
-To avoid assertion failed,  moving the "if" after qdev_simple_device_unpl=
-ug_cb.
+ https://patchwork.kernel.org/patch/10930327/
 
-In addition, to avoid another qemu crash below, add aio_disable_external =
-before
-qdev_simple_device_unplug_cb, which disable the further processing of ext=
-ernal clients
-when doing qdev_simple_device_unplug_cb.
-(gdb) bt
-#0  scsi_req_unref (req=3D0xffff6802c6f0) at hw/scsi/scsi-bus.c:1283
-#1  0x00000000005294a4 in virtio_scsi_handle_cmd_req_submit (req=3D<optim=
-ized out>,
-    s=3D<optimized out>) at /home/qemu-4.0.0/hw/scsi/virtio-scsi.c:589
-#2  0x000000000052a2a8 in virtio_scsi_handle_cmd_vq (s=3Ds@entry=3D0x9c90=
-e90,
-    vq=3Dvq@entry=3D0xffff7c05f110) at /home/qemu-4.0.0/hw/scsi/virtio-sc=
-si.c:625
-#3  0x000000000052afd8 in virtio_scsi_data_plane_handle_cmd (vdev=3D<opti=
-mized out>,
-    vq=3D0xffff7c05f110) at /home/qemu-4.0.0/hw/scsi/virtio-scsi-dataplan=
-e.c:60
-#4  0x000000000054d97c in virtio_queue_host_notifier_aio_poll (opaque=3D<=
-optimized out>)
-    at /home/qemu-4.0.0/hw/virtio/virtio.c:2447
-#5  0x00000000009b204c in run_poll_handlers_once (ctx=3Dctx@entry=3D0x6ef=
-ea40,
-    timeout=3Dtimeout@entry=3D0xffff7d7f7308) at util/aio-posix.c:521
-#6  0x00000000009b2b64 in run_poll_handlers (ctx=3Dctx@entry=3D0x6efea40,
-    max_ns=3Dmax_ns@entry=3D4000, timeout=3Dtimeout@entry=3D0xffff7d7f730=
-8) at util/aio-posix.c:559
-#7  0x00000000009b2ca0 in try_poll_mode (ctx=3Dctx@entry=3D0x6efea40, tim=
-eout=3D0xffff7d7f7308,
-    timeout@entry=3D0xffff7d7f7348) at util/aio-posix.c:594
-#8  0x00000000009b31b8 in aio_poll (ctx=3D0x6efea40, blocking=3Dblocking@=
-entry=3Dtrue)
-    at util/aio-posix.c:636
-#9  0x00000000006973cc in iothread_run (opaque=3D0x6ebd800) at iothread.c=
-:75
-#10 0x00000000009b592c in qemu_thread_start (args=3D0x6efef60) at util/qe=
-mu-thread-posix.c:502
-#11 0x0000ffff8057f8bc in start_thread () from /lib64/libpthread.so.0
-#12 0x0000ffff804e5f8c in thread_start () from /lib64/libc.so.6
-(gdb) p bus
-$1 =3D (SCSIBus *) 0x0
----
- hw/scsi/virtio-scsi.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+... I think we should rename it to HWADDR_PRI0x or so.
 
-diff --git a/hw/scsi/virtio-scsi.c b/hw/scsi/virtio-scsi.c
-index 839f120..79e555f 100644
---- a/hw/scsi/virtio-scsi.c
-+++ b/hw/scsi/virtio-scsi.c
-@@ -837,13 +837,15 @@ static void virtio_scsi_hotunplug(HotplugHandler *h=
-otplug_dev, DeviceState *dev,
-         virtio_scsi_release(s);
-     }
-=20
-+    aio_disable_external(s->ctx);
-+    qdev_simple_device_unplug_cb(hotplug_dev, dev, errp);
-+    aio_enable_external(s->ctx);
-+
-     if (s->ctx) {
-         virtio_scsi_acquire(s);
-         blk_set_aio_context(sd->conf.blk, qemu_get_aio_context());
-         virtio_scsi_release(s);
-     }
--
--    qdev_simple_device_unplug_cb(hotplug_dev, dev, errp);
- }
-=20
- static struct SCSIBusInfo virtio_scsi_scsi_info =3D {
---=20
-2.7.2.windows.1
-
-
+ Thomas
 
