@@ -2,97 +2,113 @@ Return-Path: <SRS0=xsRN=VS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	FROM_EXCESS_BASE64,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 600A1C76188
-	for <qemu-devel@archiver.kernel.org>; Sun, 21 Jul 2019 15:05:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF587C76191
+	for <qemu-devel@archiver.kernel.org>; Sun, 21 Jul 2019 16:40:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2C04C2085A
-	for <qemu-devel@archiver.kernel.org>; Sun, 21 Jul 2019 15:05:38 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AMenmVVx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C04C2085A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id A6B092083B
+	for <qemu-devel@archiver.kernel.org>; Sun, 21 Jul 2019 16:40:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6B092083B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=weilnetz.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56324 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56860 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hpDP7-0001Ql-2j
-	for qemu-devel@archiver.kernel.org; Sun, 21 Jul 2019 11:05:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42591)
+	id 1hpEsU-0006ZP-LN
+	for qemu-devel@archiver.kernel.org; Sun, 21 Jul 2019 12:40:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37176)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dirty.ice.hu@gmail.com>) id 1hpDOt-0000zu-Ez
- for qemu-devel@nongnu.org; Sun, 21 Jul 2019 11:05:25 -0400
+ (envelope-from <sw@weilnetz.de>) id 1hpEsK-0006BH-6T
+ for qemu-devel@nongnu.org; Sun, 21 Jul 2019 12:39:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dirty.ice.hu@gmail.com>) id 1hpDOr-0007V0-Lu
- for qemu-devel@nongnu.org; Sun, 21 Jul 2019 11:05:23 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:36300)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <dirty.ice.hu@gmail.com>)
- id 1hpDOr-0007UO-FA
- for qemu-devel@nongnu.org; Sun, 21 Jul 2019 11:05:21 -0400
-Received: by mail-wr1-x441.google.com with SMTP id n4so36846449wrs.3
- for <qemu-devel@nongnu.org>; Sun, 21 Jul 2019 08:05:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:subject:to:cc:references:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=o8B7B8RdO2Vqe9yCn8MY/dcfQitQRsm+Oz9t3pMllrc=;
- b=AMenmVVx8F9SEw6hOSbSnSt2F3AAOKzYjs51my0c2UckZtwjmmBSlCKKsm/bOTWJpT
- SRje4qXe/q+hf7gRd1jqAcpe81lQnub50Zxs+UnzO5JXsvioviyh7v80rESHUnIP1zcn
- MIjpTbFKwBri3lL8LfXfsa+rXZ1Oc8pLKUCbX925zvNICQ5qzeZF5OZUTq2XctSvBjuO
- PCBg0jLwi8ELNRy9wEh4165/onjXXBWMjiS4I2UN8P+111hF2tfqZ3VyNk8emQwo+UMc
- UFB5xQHG0SNDP3DD6Wuf6s+7p+6V/bi4uGpXuIn5q3Pp5RqulUgKPZGRfHHkVfVAUrvq
- +Qkw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:subject:to:cc:references:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=o8B7B8RdO2Vqe9yCn8MY/dcfQitQRsm+Oz9t3pMllrc=;
- b=YBgPANXmFPPlNkuUWmmzCvswXSjFiGd7j5pdH9TPIRUZyOizby0ny8mK/oS6AezfLw
- gFceMr1k7/AgbIP96aKxDcHSw9aIa23nl/pB5Lo/9yoUj1Cl7XAu0r5tI7ujX25SeQto
- tduLKTWIqhHja5ty6jwHeD9i8EXpEdC/IszmKLC7rdeYcH+u/KTmSGOcC2SF1yunOoT4
- zKMNKXQl1n06ej76sKISfTsX1xubrsTPk+vYHBRrOIKp1IkdsKK++C8bjdU/QsS9P+Tc
- Tsh8XEXNHW5LsRv471kP0GI1EHJQt7oObbQZIoLMCn4DF2uJG2tOsny66PecHmAfoww7
- kmBQ==
-X-Gm-Message-State: APjAAAUjUJbXyUhTChHHWgvjqY1ssC7LLxJJmqDZIHR2CMlbRJhtsRDD
- IMmPsEEIDAqpYXjmjTtIAQY=
-X-Google-Smtp-Source: APXvYqxB6JDeRoN7aWy4u5M3DHwL/YMdt0oc434Og5jSR2YnVByI9nA+78vYM6MEE+al9NYjAPP1yw==
-X-Received: by 2002:a5d:668e:: with SMTP id l14mr13355348wru.156.1563721520039; 
- Sun, 21 Jul 2019 08:05:20 -0700 (PDT)
-Received: from ?IPv6:fd00:835b:d940:d4fc:1::d3?
- (2a01-036c-0113-08e2-0001-0000-0000-00d3.pool6.digikabel.hu.
- [2a01:36c:113:8e2:1::d3])
- by smtp.gmail.com with ESMTPSA id n14sm65281475wra.75.2019.07.21.08.05.17
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Sun, 21 Jul 2019 08:05:19 -0700 (PDT)
-From: "=?UTF-8?B?Wm9sdMOhbiBLxZF2w6Fnw7M=?=" <dirty.ice.hu@gmail.com>
-X-Google-Original-From: =?UTF-8?B?Wm9sdMOhbiBLxZF2w6Fnw7M=?=
- <DirtY.iCE.hu@gmail.com>
-To: Markus Armbruster <armbru@redhat.com>
-References: <cover.1563224628.git.DirtY.iCE.hu@gmail.com>
- <8245dab2e59b99b55f3f7773fd39dc920ae48951.1563224628.git.DirtY.iCE.hu@gmail.com>
- <878ssyqyyu.fsf@dusky.pond.sub.org>
-Message-ID: <b8009305-9e17-97e5-a57d-f78dd111f55b@gmail.com>
-Date: Sun, 21 Jul 2019 17:05:16 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.9.1
+ (envelope-from <sw@weilnetz.de>) id 1hpEsI-00030C-5o
+ for qemu-devel@nongnu.org; Sun, 21 Jul 2019 12:39:52 -0400
+Received: from smtp.mail.uni-mannheim.de ([2001:7c0:600:60::869b:6050]:52186)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <sw@weilnetz.de>) id 1hpEsH-0002z8-Sb
+ for qemu-devel@nongnu.org; Sun, 21 Jul 2019 12:39:50 -0400
+Received: from localhost (localhost [127.0.0.1])
+ by smtp.mail.uni-mannheim.de (Postfix) with ESMTP id D836B104D4C;
+ Sun, 21 Jul 2019 18:39:45 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at uni-mannheim.de
+Received: from smtp.mail.uni-mannheim.de ([134.155.96.80])
+ by localhost (mail-r83.rz.uni-mannheim.de [127.0.0.1]) (amavisd-new,
+ port 10024)
+ with ESMTP id 3piMob94RrLb; Sun, 21 Jul 2019 18:39:45 +0200 (CEST)
+Received: from [134.155.36.73] (edv13.bib.uni-mannheim.de [134.155.36.73])
+ by smtp.mail.uni-mannheim.de (Postfix) with ESMTPSA id 9BAEF1049B3;
+ Sun, 21 Jul 2019 18:39:45 +0200 (CEST)
+To: Peter Maydell <peter.maydell@linaro.org>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>
+References: <1534182832-554-1-git-send-email-aleksandar.markovic@rt-rk.com>
+ <1534182832-554-5-git-send-email-aleksandar.markovic@rt-rk.com>
+ <4da49ffe-902f-2cf2-8a21-2bbd511b17a4@weilnetz.de>
+ <CAL1e-=jE8X1ODnA0aSXe5OCqJzYA0J47h5b6=H_UivPP11zSQA@mail.gmail.com>
+ <591d71a5-5b10-ab22-4751-01da8613d84c@weilnetz.de>
+ <BN6PR2201MB12519E6C72689FF70B5CA3E4C6F60@BN6PR2201MB1251.namprd22.prod.outlook.com>
+ <CAFEAcA946VCB=uwOe06v1BNdu8FMf_F4CoT8BeZAvSdRxrK6og@mail.gmail.com>
+From: Stefan Weil <sw@weilnetz.de>
+Openpgp: preference=signencrypt
+Autocrypt: addr=sw@weilnetz.de; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <23c9b27f-c3ef-0f14-c522-951d57d4784b@weilnetz.de>
+Date: Sun, 21 Jul 2019 18:39:47 +0200
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <878ssyqyyu.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAFEAcA946VCB=uwOe06v1BNdu8FMf_F4CoT8BeZAvSdRxrK6og@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-GB
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::441
-Subject: Re: [Qemu-devel] [PATCH v2 03/14] audio: add audiodev property to
- vnc and wav_capture
+X-Received-From: 2001:7c0:600:60::869b:6050
+Subject: Re: [Qemu-devel] Handling of fall through code
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,242 +120,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>
+Cc: Paul Burton <pburton@wavecomp.com>,
+ "Daniel P. Berrange" <berrange@redhat.com>,
+ "riku.voipio@iki.fi" <riku.voipio@iki.fi>,
+ "richard.henderson@linaro.org" <richard.henderson@linaro.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "laurent@vivier.eu" <laurent@vivier.eu>,
+ Aleksandar Markovic <aleksandar.markovic@rt-rk.com>,
+ "philippe.mathieu.daude@gmail.com" <philippe.mathieu.daude@gmail.com>,
+ "aurelien@aurel32.net" <aurelien@aurel32.net>,
+ Petar Jovanovic <pjovanovic@wavecomp.com>,
+ Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2019-07-16 08:23, Markus Armbruster wrote:
-> "Kővágó, Zoltán" <dirty.ice.hu@gmail.com> writes:
-> 
->> Signed-off-by: Kővágó, Zoltán <DirtY.iCE.hu@gmail.com>
->> ---
->>   ui/vnc.h        |  2 ++
->>   monitor/misc.c  | 12 +++++++++++-
->>   ui/vnc.c        | 15 ++++++++++++++-
->>   hmp-commands.hx | 13 ++++++++-----
->>   qemu-options.hx |  6 ++++++
->>   5 files changed, 41 insertions(+), 7 deletions(-)
->>
->> diff --git a/ui/vnc.h b/ui/vnc.h
->> index 2f84db3142..6f54653455 100644
->> --- a/ui/vnc.h
->> +++ b/ui/vnc.h
->> @@ -183,6 +183,8 @@ struct VncDisplay
->>   #ifdef CONFIG_VNC_SASL
->>       VncDisplaySASL sasl;
->>   #endif
->> +
->> +    AudioState *audio_state;
->>   };
->>   
->>   typedef struct VncTight {
->> diff --git a/monitor/misc.c b/monitor/misc.c
->> index e393333a0e..f97810d370 100644
->> --- a/monitor/misc.c
->> +++ b/monitor/misc.c
->> @@ -1148,7 +1148,17 @@ static void hmp_wavcapture(Monitor *mon, const QDict *qdict)
->>       int bits = qdict_get_try_int(qdict, "bits", -1);
->>       int has_channels = qdict_haskey(qdict, "nchannels");
->>       int nchannels = qdict_get_try_int(qdict, "nchannels", -1);
->> +    const char *audiodev = qdict_get_try_str(qdict, "audiodev");
->>       CaptureState *s;
->> +    AudioState *as = NULL;
->> +
->> +    if (audiodev) {
->> +        as = audio_state_by_name(audiodev);
->> +        if (!as) {
->> +            monitor_printf(mon, "Invalid audiodev specified\n");
->> +            return;
->> +        }
->> +    }
-> 
-> Note for later: if "audiodev" is specified, it must name an existing
-> AudioState.
-> 
->>   
->>       s = g_malloc0 (sizeof (*s));
->>   
->> @@ -1156,7 +1166,7 @@ static void hmp_wavcapture(Monitor *mon, const QDict *qdict)
->>       bits = has_bits ? bits : 16;
->>       nchannels = has_channels ? nchannels : 2;
->>   
->> -    if (wav_start_capture(NULL, s, path, freq, bits, nchannels)) {
->> +    if (wav_start_capture(as, s, path, freq, bits, nchannels)) {
->>           monitor_printf(mon, "Failed to add wave capture\n");
->>           g_free (s);
->>           return;
-> 
-> Note for later: this is the only other failure mode.
-> 
->> diff --git a/ui/vnc.c b/ui/vnc.c
->> index 140f364dda..24f9be5b5d 100644
->> --- a/ui/vnc.c
->> +++ b/ui/vnc.c
->> @@ -1222,7 +1222,7 @@ static void audio_add(VncState *vs)
->>       ops.destroy = audio_capture_destroy;
->>       ops.capture = audio_capture;
->>   
->> -    vs->audio_cap = AUD_add_capture(NULL, &vs->as, &ops, vs);
->> +    vs->audio_cap = AUD_add_capture(vs->vd->audio_state, &vs->as, &ops, vs);
->>       if (!vs->audio_cap) {
->>           error_report("Failed to add audio capture");
->>       }
->> @@ -3369,6 +3369,9 @@ static QemuOptsList qemu_vnc_opts = {
->>           },{
->>               .name = "non-adaptive",
->>               .type = QEMU_OPT_BOOL,
->> +        },{
->> +            .name = "audiodev",
->> +            .type = QEMU_OPT_STRING,
->>           },
->>           { /* end of list */ }
->>       },
->> @@ -3806,6 +3809,7 @@ void vnc_display_open(const char *id, Error **errp)
->>       const char *saslauthz;
->>       int lock_key_sync = 1;
->>       int key_delay_ms;
->> +    const char *audiodev;
->>   
->>       if (!vd) {
->>           error_setg(errp, "VNC display not active");
->> @@ -3991,6 +3995,15 @@ void vnc_display_open(const char *id, Error **errp)
->>       }
->>       vd->ledstate = 0;
->>   
->> +    audiodev = qemu_opt_get(opts, "audiodev");
->> +    if (audiodev) {
->> +        vd->audio_state = audio_state_by_name(audiodev);
->> +        if (!vd->audio_state) {
->> +            error_setg(errp, "Audiodev '%s' not found", audiodev);
->> +            goto fail;
->> +        }
->> +    }
-> 
-> Note for later: if "audiodev" is specified, it must name an existing
-> AudioState.
-> 
-> I like this error message better than the one in hmp_wavcapture().  Use
-> it there, too?
-> 
-> Move it into audio_state_by_name() by giving it an Error **errp
-> parameter?  Matter of taste, up to you.
-> 
->> +
->>       device_id = qemu_opt_get(opts, "display");
->>       if (device_id) {
->>           int head = qemu_opt_get_number(opts, "head", 0);
->> diff --git a/hmp-commands.hx b/hmp-commands.hx
->> index bfa5681dd2..fa7f009268 100644
->> --- a/hmp-commands.hx
->> +++ b/hmp-commands.hx
->> @@ -819,16 +819,19 @@ ETEXI
->>   
->>       {
->>           .name       = "wavcapture",
->> -        .args_type  = "path:F,freq:i?,bits:i?,nchannels:i?",
->> -        .params     = "path [frequency [bits [channels]]]",
->> +        .args_type  = "path:F,freq:i?,bits:i?,nchannels:i?,audiodev:s?",
->> +        .params     = "path [frequency [bits [channels [audiodev]]]]",
->>           .help       = "capture audio to a wave file (default frequency=44100 bits=16 channels=2)",
->>           .cmd        = hmp_wavcapture,
->>       },
->>   STEXI
->> -@item wavcapture @var{filename} [@var{frequency} [@var{bits} [@var{channels}]]]
->> +@item wavcapture @var{filename} [@var{frequency} [@var{bits} [@var{channels} [@var{audiodev}]]]]
->>   @findex wavcapture
->> -Capture audio into @var{filename}. Using sample rate @var{frequency}
->> -bits per sample @var{bits} and number of channels @var{channels}.
->> +Capture audio into @var{filename} from @var{audiodev}, using sample rate
->> +@var{frequency} bits per sample @var{bits} and number of channels
->> +@var{channels}. When not using an -audiodev argument on command line,
->> +@var{audiodev} must be omitted, otherwise is must specify a valid
->> +audiodev.
-> 
-> I can see the code for "must specify a valid audiodev" in
-> hmp_wavcapture().  Where is "must be omitted" checked?
+Am 09.07.2019 um 10:25 schrieb Peter Maydell:
+> On Mon, 8 Jul 2019 at 20:39, Aleksandar Markovic <amarkovic@wavecomp.com> wrote:
+>> They are all real issues. Two of them are cases of missing
+>> '/* fall through */' (I plan to send fixes for them in 4.2 timeframe)
+>> and five of them are cases of missing 'break' (I plan to send
+>> corresponding fixes for 4.1 in few days).
+> Adding missing /* fall through */ comments would be fine as
+> a patch for 4.1 rc1 if you liked, though you can of course
+> wait til 4.2 if that's better for you.
+>
+> thanks
+> -- PMM
 
-It's not checked right now, but if the user specifies audiodev, it must 
-be a valid audiodev id.  So if the user can guess the id (which is not 
-too hard ATM, it's simply the driver's name), it will work even in this 
-case.
 
-> Preexisting: the list "sample rate @var{frequency} bits per sample
-> @var{bits} and number of channels @var{channels}" lacks a comma after
-> @var{frequency}, please fix that.  I'd put one after @var{bits} as well,
-> but that's a matter of taste[*]
-> 
-> The sentence is of the form "if not COND then A else B".  The
-> less-negated form "if COND then B else A" is commonly easier to read.
-> 
-> Documentation says "from @var{audiodev}".  But when "not using an
-> -audiodev argument on command line, +@var{audiodev} must be omitted".
-> Where does it sample from then?  I figure from some default audio
-> device.  Where is that default audio device explained?  I skimmed the
-> -audiodev documentation in qemu-options.hx, but couldn't see it there.
+Peter, is this fall through for ARM correct?
 
-Currently there are two ways to specify audio options, the legacy ones 
-using the QEMU_AUDIO_* environment variables, and the new one using 
--audiodev arguments.  The two formats cannot be mixed, and eventually we 
-should remove the legacy ones (IIRC my previous patch series already 
-deprecated them), then we can get rid of this madness.  Maybe something 
-like "When using the legacy environment variable based audio config, 
-@var{audiodev} must be omitted." would be better?
+https://github.com/qemu/qemu/blob/master/target/arm/helper.c#L7958
 
-> 
-> Suggest to say "an -audiodev command line option" instead of "an
-> -audiodev argument on command line".
-> 
-> Double-checking:
-> 
-> * -audiodev is the only way to create an audio backend.
-> 
-> * If the user creates no audio backend, QEMU supplies a default audio
->    backend.
-> 
-> Correct?
+It looks rather suspicious and is one of the remaining related compiler
+warnings.
 
-Not exactly a default audio backend, as it can be customized through 
-environment variables, and as I previously said this is deprecated. 
-When we remove the legacy config, there will be no default backend (like 
-with -netdev and -device).
-
-> Other kinds of backends can also be created at run-time with the
-> monitor.  I'm not asking you provide that for audio.  I'm just wondering
-> whether it could conceivably be useful.
-
-Yes, since we can create new soundcard devices run-time, creating 
-backends would make sense too.
-
-> 
-> If yes, you might want to avoid the narrow "if using -audiodev", and
-> instead say "if the default audio device is in use".
-> 
->>   
->>   Defaults:
->>   @itemize @minus
->> diff --git a/qemu-options.hx b/qemu-options.hx
->> index 9621e934c0..a308e5f5aa 100644
->> --- a/qemu-options.hx
->> +++ b/qemu-options.hx
->> @@ -1978,6 +1978,12 @@ can help the device and guest to keep up and not lose events in case
->>   events are arriving in bulk.  Possible causes for the latter are flaky
->>   network connections, or scripts for automated testing.
->>   
->> +@item audiodev=@var{audiodev}
->> +
->> +Use the specified @var{audiodev} when the VNC client requests audio
->> +transmission. When not using an -audiodev argument, this option must
->> +be omitted, otherwise is must be present and specify a valid audiodev.
->> +
->>   @end table
->>   ETEXI
-> 
-> Same as for wavcapture, basically.
-> 
-> 
-> [*] https://en.wikipedia.org/wiki/Serial_comma
-> 
+Regards
+Stefan
 
 
