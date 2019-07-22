@@ -2,56 +2,71 @@ Return-Path: <SRS0=EA86=VT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5ACF0C7618F
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 16:23:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1B17C7618F
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 16:31:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 30E482190F
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 16:23:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30E482190F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
+	by mail.kernel.org (Postfix) with ESMTPS id 826862190F
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 16:31:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 826862190F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=bt.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35750 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35812 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hpb6D-0002co-G8
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jul 2019 12:23:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35417)
+	id 1hpbDx-0005Uj-K3
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jul 2019 12:31:41 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:45703)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hpb5h-0000We-Te
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 12:23:11 -0400
+ (envelope-from <tony.nguyen@bt.com>) id 1hpbDT-0004yS-Tp
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 12:31:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hpb5e-0003r6-Kn
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 12:23:08 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:41835 helo=mail.rt-rk.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1hpb5d-0003pX-00
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 12:23:05 -0400
-Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 853461A2027;
- Mon, 22 Jul 2019 18:23:00 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at rt-rk.com
-Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
- [10.10.13.43])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 650AA1A2066;
- Mon, 22 Jul 2019 18:23:00 +0200 (CEST)
-From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-To: qemu-devel@nongnu.org
-Date: Mon, 22 Jul 2019 18:22:53 +0200
-Message-Id: <1563812573-30309-3-git-send-email-aleksandar.markovic@rt-rk.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1563812573-30309-1-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1563812573-30309-1-git-send-email-aleksandar.markovic@rt-rk.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PATCH for 4.1 v6 2/2] target/mips: Fix emulation of
- MSA pack instructions on big endian hosts
+ (envelope-from <tony.nguyen@bt.com>) id 1hpbDA-0000Ft-9W
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 12:31:11 -0400
+Received: from smtpe1.intersmtp.com ([213.121.35.76]:18659)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <tony.nguyen@bt.com>)
+ id 1hpbAa-0007Ar-TI; Mon, 22 Jul 2019 12:28:13 -0400
+Received: from tpw09926dag18f.domain1.systemhost.net (10.9.212.26) by
+ BWP09926081.bt.com (10.36.82.112) with Microsoft SMTP Server (version=TLS1_2, 
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P256) id 15.1.1713.5; Mon, 22
+ Jul 2019 17:28:09 +0100
+Received: from tpw09926dag18e.domain1.systemhost.net (10.9.212.18) by
+ tpw09926dag18f.domain1.systemhost.net (10.9.212.26) with Microsoft SMTP
+ Server (TLS) id 15.0.1395.4; Mon, 22 Jul 2019 17:28:10 +0100
+Received: from tpw09926dag18e.domain1.systemhost.net
+ ([fe80::a946:6348:ccf4:fa6c]) by tpw09926dag18e.domain1.systemhost.net
+ ([fe80::a946:6348:ccf4:fa6c%12]) with mapi id 15.00.1395.000; Mon, 22 Jul
+ 2019 17:28:10 +0100
+From: <tony.nguyen@bt.com>
+To: <richard.henderson@linaro.org>, <qemu-devel@nongnu.org>
+Thread-Topic: [Qemu-devel] [PATCH v2 00/20] Invert Endian bit in SPARCv9 MMU
+ TTE
+Thread-Index: AQHVQKLzQYdvLYhbLUSW1HY6Ut95kabWuu6AgAAS8LY=
+Date: Mon, 22 Jul 2019 16:28:10 +0000
+Message-ID: <1563812889499.73128@bt.com>
+References: <e9c6e5310b1a4863be45d45bf087fc3d@tpw09926dag18e.domain1.systemhost.net>,
+ <2b6eb033-4b6e-4d64-c57e-a3257088d0dd@linaro.org>
+In-Reply-To: <2b6eb033-4b6e-4d64-c57e-a3257088d0dd@linaro.org>
+Accept-Language: en-AU, en-GB, en-US
+Content-Language: en-AU
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.187.101.37]
+MIME-Version: 1.0
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 213.121.35.76
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] [PATCH v2 00/20] Invert Endian bit in SPARCv9 MMU
+ TTE
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -63,159 +78,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: arikalo@wavecomp.com, sw@weilnetz.de, philmd@redhat.com,
- amarkovic@wavecomp.com
+Cc: peter.maydell@linaro.org, walling@linux.ibm.com, mst@redhat.com,
+ palmer@sifive.com, mark.cave-ayland@ilande.co.uk, Alistair.Francis@wdc.com,
+ arikalo@wavecomp.com, david@redhat.com, pasic@linux.ibm.com,
+ borntraeger@de.ibm.com, rth@twiddle.net, atar4qemu@gmail.com,
+ ehabkost@redhat.com, sw@weilnetz.de, alex.williamson@redhat.com,
+ qemu-arm@nongnu.org, david@gibson.dropbear.id.au, qemu-riscv@nongnu.org,
+ cohuck@redhat.com, claudio.fontana@huawei.com, qemu-s390x@nongnu.org,
+ qemu-ppc@nongnu.org, amarkovic@wavecomp.com, pbonzini@redhat.com,
+ aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
+On 7/22/19 8:59 AM, Richard Henderson wrote:
 
-Fix emulation of MSA pack instructions on big endian hosts.
+>On 7/22/19 8:34 AM, tony.nguyen@bt.com wrote:
+>> Tony Nguyen (20):
+>>   tcg: Replace MO_8 with MO_UB alias
+>>   tcg: Replace MO_16 with MO_UW alias
+>>   tcg: Replace MO_32 with MO_UL alias
+>>   tcg: Replace MO_64 with MO_UQ alias
+>>   tcg: Move size+sign+endian from TCGMemOp to MemOp
+>
+>I don't like any of these first 5 patches.
+>I don't understand your motivation here.  Why?
 
-Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Reviewed-by: Aleksandar Rikalo <arikalo@wavecomp.com>
----
- target/mips/msa_helper.c | 74 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 74 insertions(+)
+The motivation is to only move the attributes required by the memory API
+from TCGMemOp into accelerator independent MemOp.
 
-diff --git a/target/mips/msa_helper.c b/target/mips/msa_helper.c
-index a383c40..a5a8657 100644
---- a/target/mips/msa_helper.c
-+++ b/target/mips/msa_helper.c
-@@ -2113,6 +2113,24 @@ void helper_msa_pckev_df(CPUMIPSState *env, uint32_t df, uint32_t wd,
- 
-     switch (df) {
-     case DF_BYTE:
-+#if defined(HOST_WORDS_BIGENDIAN)
-+        pwd->b[8]  = pws->b[9];
-+        pwd->b[10] = pws->b[13];
-+        pwd->b[12] = pws->b[1];
-+        pwd->b[14] = pws->b[5];
-+        pwd->b[0]  = pwt->b[9];
-+        pwd->b[2]  = pwt->b[13];
-+        pwd->b[4]  = pwt->b[1];
-+        pwd->b[6]  = pwt->b[5];
-+        pwd->b[9]  = pws->b[11];
-+        pwd->b[13] = pws->b[3];
-+        pwd->b[1]  = pwt->b[11];
-+        pwd->b[5]  = pwt->b[3];
-+        pwd->b[11] = pws->b[15];
-+        pwd->b[3]  = pwt->b[15];
-+        pwd->b[15] = pws->b[7];
-+        pwd->b[7]  = pwt->b[7];
-+#else
-         pwd->b[15] = pws->b[14];
-         pwd->b[13] = pws->b[10];
-         pwd->b[11] = pws->b[6];
-@@ -2129,8 +2147,19 @@ void helper_msa_pckev_df(CPUMIPSState *env, uint32_t df, uint32_t wd,
-         pwd->b[4]  = pwt->b[8];
-         pwd->b[8]  = pws->b[0];
-         pwd->b[0]  = pwt->b[0];
-+#endif
-         break;
-     case DF_HALF:
-+#if defined(HOST_WORDS_BIGENDIAN)
-+        pwd->h[4] = pws->h[5];
-+        pwd->h[6] = pws->h[1];
-+        pwd->h[0] = pwt->h[5];
-+        pwd->h[2] = pwt->h[1];
-+        pwd->h[5] = pws->h[7];
-+        pwd->h[1] = pwt->h[7];
-+        pwd->h[7] = pws->h[3];
-+        pwd->h[3] = pwt->h[3];
-+#else
-         pwd->h[7] = pws->h[6];
-         pwd->h[5] = pws->h[2];
-         pwd->h[3] = pwt->h[6];
-@@ -2139,12 +2168,20 @@ void helper_msa_pckev_df(CPUMIPSState *env, uint32_t df, uint32_t wd,
-         pwd->h[2] = pwt->h[4];
-         pwd->h[4] = pws->h[0];
-         pwd->h[0] = pwt->h[0];
-+#endif
-         break;
-     case DF_WORD:
-+#if defined(HOST_WORDS_BIGENDIAN)
-+        pwd->w[2] = pws->w[3];
-+        pwd->w[0] = pwt->w[3];
-+        pwd->w[3] = pws->w[1];
-+        pwd->w[1] = pwt->w[1];
-+#else
-         pwd->w[3] = pws->w[2];
-         pwd->w[1] = pwt->w[2];
-         pwd->w[2] = pws->w[0];
-         pwd->w[0] = pwt->w[0];
-+#endif
-         break;
-     case DF_DOUBLE:
-         pwd->d[1] = pws->d[0];
-@@ -2164,6 +2201,24 @@ void helper_msa_pckod_df(CPUMIPSState *env, uint32_t df, uint32_t wd,
- 
-     switch (df) {
-     case DF_BYTE:
-+#if defined(HOST_WORDS_BIGENDIAN)
-+        pwd->b[7]  = pwt->b[6];
-+        pwd->b[5]  = pwt->b[2];
-+        pwd->b[3]  = pwt->b[14];
-+        pwd->b[1]  = pwt->b[10];
-+        pwd->b[15] = pws->b[6];
-+        pwd->b[13] = pws->b[2];
-+        pwd->b[11] = pws->b[14];
-+        pwd->b[9]  = pws->b[10];
-+        pwd->b[6]  = pwt->b[4];
-+        pwd->b[2]  = pwt->b[12];
-+        pwd->b[14] = pws->b[4];
-+        pwd->b[10] = pws->b[12];
-+        pwd->b[4]  = pwt->b[0];
-+        pwd->b[12] = pws->b[0];
-+        pwd->b[0]  = pwt->b[8];
-+        pwd->b[8]  = pws->b[8];
-+#else
-         pwd->b[0]  = pwt->b[1];
-         pwd->b[2]  = pwt->b[5];
-         pwd->b[4]  = pwt->b[9];
-@@ -2180,8 +2235,19 @@ void helper_msa_pckod_df(CPUMIPSState *env, uint32_t df, uint32_t wd,
-         pwd->b[11] = pws->b[7];
-         pwd->b[7]  = pwt->b[15];
-         pwd->b[15] = pws->b[15];
-+#endif
-         break;
-     case DF_HALF:
-+#if defined(HOST_WORDS_BIGENDIAN)
-+        pwd->h[3] = pwt->h[2];
-+        pwd->h[1] = pwt->h[6];
-+        pwd->h[7] = pws->h[2];
-+        pwd->h[5] = pws->h[6];
-+        pwd->h[2] = pwt->h[0];
-+        pwd->h[6] = pws->h[0];
-+        pwd->h[0] = pwt->h[4];
-+        pwd->h[4] = pws->h[4];
-+#else
-         pwd->h[0] = pwt->h[1];
-         pwd->h[2] = pwt->h[5];
-         pwd->h[4] = pws->h[1];
-@@ -2190,12 +2256,20 @@ void helper_msa_pckod_df(CPUMIPSState *env, uint32_t df, uint32_t wd,
-         pwd->h[5] = pws->h[3];
-         pwd->h[3] = pwt->h[7];
-         pwd->h[7] = pws->h[7];
-+#endif
-         break;
-     case DF_WORD:
-+#if defined(HOST_WORDS_BIGENDIAN)
-+        pwd->w[1] = pwt->w[0];
-+        pwd->w[3] = pws->w[0];
-+        pwd->w[0] = pwt->w[2];
-+        pwd->w[2] = pws->w[2];
-+#else
-         pwd->w[0] = pwt->w[1];
-         pwd->w[2] = pws->w[1];
-         pwd->w[1] = pwt->w[3];
-         pwd->w[3] = pws->w[3];
-+#endif
-         break;
-     case DF_DOUBLE:
-         pwd->d[0] = pwt->d[1];
--- 
-2.7.4
+Once I moved MO_{8|16|32|64} into MemOp, there arose many -Wenum-compare an=
+d
+-Wenum-conversion as a TCGMemOp and a MemOp are being compared and implicit=
+ly
+coerced.
 
+Thus the idea to replace MO_{8|16|32|64} with MO_{UB|UW|UL|UQ} so we remain
+comparing and coercing the same enum type, both TCGMemOps.
 
+Do you prefer the v1 implementation of making TCGMemOp -> MemOp?
+
+Tony.
