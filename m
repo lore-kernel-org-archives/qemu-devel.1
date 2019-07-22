@@ -2,86 +2,56 @@ Return-Path: <SRS0=EA86=VT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37B8CC76188
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 06:18:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A17A4C76188
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 06:25:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 083D021994
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 06:18:32 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N/MCsaZC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 083D021994
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7B4B0219BE
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 06:25:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B4B0219BE
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59050 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59104 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hpReZ-00037L-A9
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jul 2019 02:18:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60109)
+	id 1hpRl4-0004rR-Go
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jul 2019 02:25:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34170)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <npiggin@gmail.com>) id 1hpReH-00021x-TM
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 02:18:15 -0400
+ (envelope-from <richardw.yang@linux.intel.com>) id 1hpRkv-0004Sv-5k
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 02:25:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <npiggin@gmail.com>) id 1hpReG-00064g-Mi
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 02:18:13 -0400
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:42003)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <npiggin@gmail.com>)
- id 1hpReG-000626-Eq; Mon, 22 Jul 2019 02:18:12 -0400
-Received: by mail-pf1-x444.google.com with SMTP id q10so16851947pff.9;
- Sun, 21 Jul 2019 23:18:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=ysITdSttWfCis1fWSqIVFrIzSd7gXyHaum5r30vSHjk=;
- b=N/MCsaZCpFAfAXJIb0uxkS7lLUDWvISqDad7GRjJmWNvY1XkWCgqL06KTNUIhmMOmf
- kj/3z0E+VoW5KkyJBzKJZfbIVfNbgj37sjmX5nO7Ef4grwusYxeeFinHYDCI9DRk4NEe
- 0apl2RDnFA4kVjtZCu1HCvES84s4IIObcvYVUWawE6GjIuwQMlQrRQTiK8jxIJiPZ3Ft
- h+xadY0HuCPeV6rTJ6wQOGtI/D4JPUHMMFKcT5bDKh01jlFVkhP2N3msnxZH3cvNfUKk
- o25FSw0QRvKPxr1v3E+RPZAYrM9VQS4ngYxxfzRm3M2oeC5CdK77MwkTj16uux3APVf6
- orCg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=ysITdSttWfCis1fWSqIVFrIzSd7gXyHaum5r30vSHjk=;
- b=oK3C4jRli2wN1vIIdIrEHNBhHtTSf45IJfIny2sVInfTjFckl3OAbvd8jg14RUEEeh
- W33GpvpuR0J5Ig82e5+x3VIIiZrhBDE5+47GKHBlhBe5/FPPEUR08wvSnnMQqQeebzmr
- Q/OHpoYExAmOaU2OzHb90Ru+rBIXfsVEIbVIwN+Arb9mkY78SN4pVMr9/OdtFomI0rSv
- S5+gJuWy3zySpp+jqFCf7/E0y10u1sJ9rvHXXSmsafvFJ0vJVzIw37NkTW++OyDZLImc
- PTtiOzheJ1HCep80S6dlWTkBq9Grb6TmY3PyfSFMfbU2dMvXwa50qY2ZF5NyvKAMleRp
- MLkw==
-X-Gm-Message-State: APjAAAXYI/ZSfn8GAiPPUa7JYGfXH9OVZip10/3dBde5wPhE4DlbClo9
- wxqlAIVlDfN0cq5agwk5I8t+jEPepOw=
-X-Google-Smtp-Source: APXvYqzderhzSEtkpuoR1vbPETfsKXo0sTrr1Mr7oJyMtbjOevSJloaPk2Vu+kjECLFdLLPryRxJLA==
-X-Received: by 2002:a17:90a:350c:: with SMTP id
- q12mr75506158pjb.46.1563776291336; 
- Sun, 21 Jul 2019 23:18:11 -0700 (PDT)
-Received: from bobo.local0.net (193-116-123-212.tpgi.com.au. [193.116.123.212])
- by smtp.gmail.com with ESMTPSA id 14sm57895983pfj.36.2019.07.21.23.18.06
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Sun, 21 Jul 2019 23:18:10 -0700 (PDT)
-From: Nicholas Piggin <npiggin@gmail.com>
+ (envelope-from <richardw.yang@linux.intel.com>) id 1hpRku-0004fV-48
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 02:25:05 -0400
+Received: from mga03.intel.com ([134.134.136.65]:65115)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
+ id 1hpRkt-0004e7-Sm
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 02:25:04 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+ by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 21 Jul 2019 23:25:01 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,294,1559545200"; d="scan'208";a="176902484"
+Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
+ by FMSMGA003.fm.intel.com with ESMTP; 21 Jul 2019 23:25:00 -0700
+From: Wei Yang <richardw.yang@linux.intel.com>
 To: qemu-devel@nongnu.org
-Date: Mon, 22 Jul 2019 16:17:52 +1000
-Message-Id: <20190722061752.22114-2-npiggin@gmail.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190722061752.22114-1-npiggin@gmail.com>
-References: <20190722061752.22114-1-npiggin@gmail.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Date: Mon, 22 Jul 2019 14:24:35 +0800
+Message-Id: <20190722062435.2518-1-richardw.yang@linux.intel.com>
+X-Mailer: git-send-email 2.17.1
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::444
-Subject: [Qemu-devel] [PATCH v2 3/3] spapr: Implement ibm,suspend-me
+X-Received-From: 134.134.136.65
+Subject: [Qemu-devel] [PATCH] migration/multifd: multifd_load_cleanup()
+ always return 0
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,117 +63,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Liu, Jinsong" <jinsong.liu@intel.com>,
- Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Nicholas Piggin <npiggin@gmail.com>, Luiz Capitulino <lcapitulino@redhat.com>,
- qemu-ppc@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>,
- Richard Henderson <rth@twiddle.net>
+Cc: Wei Yang <richardw.yang@linux.intel.com>, dgilbert@redhat.com,
+ quintela@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This has been useful to modify and test the Linux pseries suspend
-code but it requires modification to the guest to call it (due to
-being gated by other unimplemented features). It is not otherwise
-used by Linux yet, but work is slowly progressing there.
+multifd_load_cleanup() always return 0 and never use the errp, just
+cleanup a little.
 
-This allows a (lightly modified) guest kernel to suspend with
-`echo mem > /sys/power/state` and be resumed with system_wakeup
-monitor command.
-
-Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
 ---
- hw/ppc/spapr.c         |  7 +++++++
- hw/ppc/spapr_rtas.c    | 32 ++++++++++++++++++++++++++++++++
- include/hw/ppc/spapr.h |  3 ++-
- 3 files changed, 41 insertions(+), 1 deletion(-)
+ migration/migration.c | 9 ++-------
+ migration/ram.c       | 7 +++----
+ migration/ram.h       | 2 +-
+ 3 files changed, 6 insertions(+), 12 deletions(-)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 00f7735a31..a580466d01 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -3078,6 +3078,13 @@ static void spapr_machine_init(MachineState *machine)
+diff --git a/migration/migration.c b/migration/migration.c
+index 27ca10122f..38d2fdfa73 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -399,10 +399,7 @@ static void process_incoming_migration_bh(void *opaque)
+      */
+     qemu_announce_self(&mis->announce_timer, migrate_announce_params());
  
-     qemu_register_boot_set(spapr_boot_set, spapr);
- 
-+    /*
-+     * Nothing needs to be done to resume a suspended guest because
-+     * suspending does not change the machine state, so no need for
-+     * a ->wakeup method.
-+     */
-+    qemu_register_wakeup_support();
-+
-     if (kvm_enabled()) {
-         /* to stop and start vmclock */
-         qemu_add_vm_change_state_handler(cpu_ppc_clock_vm_state_change,
-diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
-index a618a2ac0f..87175c1e0a 100644
---- a/hw/ppc/spapr_rtas.c
-+++ b/hw/ppc/spapr_rtas.c
-@@ -216,6 +216,36 @@ static void rtas_stop_self(PowerPCCPU *cpu, SpaprMachineState *spapr,
-     qemu_cpu_kick(cs);
+-    if (multifd_load_cleanup(&local_err) != 0) {
+-        error_report_err(local_err);
+-        autostart = false;
+-    }
++    multifd_load_cleanup();
+     /* If global state section was not received or we are in running
+        state, we need to obey autostart. Any other state is set with
+        runstate_set. */
+@@ -506,9 +503,7 @@ fail:
+     migrate_set_state(&mis->state, MIGRATION_STATUS_ACTIVE,
+                       MIGRATION_STATUS_FAILED);
+     qemu_fclose(mis->from_src_file);
+-    if (multifd_load_cleanup(&local_err) != 0) {
+-        error_report_err(local_err);
+-    }
++    multifd_load_cleanup();
+     exit(EXIT_FAILURE);
  }
  
-+static void rtas_ibm_suspend_me(PowerPCCPU *cpu, SpaprMachineState *spapr,
-+                           uint32_t token, uint32_t nargs,
-+                           target_ulong args,
-+                           uint32_t nret, target_ulong rets)
-+{
-+    CPUState *cs;
-+
-+    if (nargs != 0 || nret != 1) {
-+        rtas_st(rets, 0, RTAS_OUT_PARAM_ERROR);
-+        return;
-+    }
-+
-+    CPU_FOREACH(cs) {
-+        PowerPCCPU *c = POWERPC_CPU(cs);
-+        CPUPPCState *e = &c->env;
-+        if (c == cpu) {
-+            continue;
-+        }
-+
-+        /* See h_join */
-+        if (!cs->halted || (e->msr & (1ULL << MSR_EE))) {
-+            rtas_st(rets, 0, H_MULTI_THREADS_ACTIVE);
-+            return;
-+        }
-+    }
-+
-+    qemu_system_suspend_request();
-+    rtas_st(rets, 0, RTAS_OUT_SUCCESS);
-+}
-+
- static inline int sysparm_st(target_ulong addr, target_ulong len,
-                              const void *val, uint16_t vallen)
+diff --git a/migration/ram.c b/migration/ram.c
+index 66792568e2..7d30f8484c 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -1243,13 +1243,12 @@ static void multifd_recv_terminate_threads(Error *err)
+     }
+ }
+ 
+-int multifd_load_cleanup(Error **errp)
++void multifd_load_cleanup(void)
  {
-@@ -483,6 +513,8 @@ static void core_rtas_register_types(void)
-                         rtas_query_cpu_stopped_state);
-     spapr_rtas_register(RTAS_START_CPU, "start-cpu", rtas_start_cpu);
-     spapr_rtas_register(RTAS_STOP_SELF, "stop-self", rtas_stop_self);
-+    spapr_rtas_register(RTAS_IBM_SUSPEND_ME, "ibm,suspend-me",
-+                        rtas_ibm_suspend_me);
-     spapr_rtas_register(RTAS_IBM_GET_SYSTEM_PARAMETER,
-                         "ibm,get-system-parameter",
-                         rtas_ibm_get_system_parameter);
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index 5d36eec9d0..6e8e18b077 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -631,8 +631,9 @@ target_ulong spapr_hypercall(PowerPCCPU *cpu, target_ulong opcode,
- #define RTAS_IBM_CREATE_PE_DMA_WINDOW           (RTAS_TOKEN_BASE + 0x27)
- #define RTAS_IBM_REMOVE_PE_DMA_WINDOW           (RTAS_TOKEN_BASE + 0x28)
- #define RTAS_IBM_RESET_PE_DMA_WINDOW            (RTAS_TOKEN_BASE + 0x29)
-+#define RTAS_IBM_SUSPEND_ME                     (RTAS_TOKEN_BASE + 0x2A)
+     int i;
+-    int ret = 0;
  
--#define RTAS_TOKEN_MAX                          (RTAS_TOKEN_BASE + 0x2A)
-+#define RTAS_TOKEN_MAX                          (RTAS_TOKEN_BASE + 0x2B)
+     if (!migrate_use_multifd()) {
+-        return 0;
++        return;
+     }
+     multifd_recv_terminate_threads(NULL);
+     for (i = 0; i < migrate_multifd_channels(); i++) {
+@@ -1276,7 +1275,7 @@ int multifd_load_cleanup(Error **errp)
+     g_free(multifd_recv_state);
+     multifd_recv_state = NULL;
  
- /* RTAS ibm,get-system-parameter token values */
- #define RTAS_SYSPARM_SPLPAR_CHARACTERISTICS      20
+-    return ret;
++    return;
+ }
+ 
+ static void multifd_recv_sync_main(void)
+diff --git a/migration/ram.h b/migration/ram.h
+index e0a499b956..6fdd449899 100644
+--- a/migration/ram.h
++++ b/migration/ram.h
+@@ -44,7 +44,7 @@ uint64_t ram_bytes_total(void);
+ int multifd_save_setup(void);
+ void multifd_save_cleanup(void);
+ int multifd_load_setup(void);
+-int multifd_load_cleanup(Error **errp);
++void multifd_load_cleanup(void);
+ bool multifd_recv_all_channels_created(void);
+ bool multifd_recv_new_channel(QIOChannel *ioc, Error **errp);
+ 
 -- 
-2.20.1
+2.17.1
 
 
