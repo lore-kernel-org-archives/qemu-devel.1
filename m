@@ -2,65 +2,69 @@ Return-Path: <SRS0=EA86=VT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BCCFFC76191
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 03:26:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CFD2C76191
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 03:27:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 97E1321921
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 03:26:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 97E1321921
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3105921921
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 03:27:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3105921921
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=bt.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58528 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58542 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hpOyX-0006PG-TM
-	for qemu-devel@archiver.kernel.org; Sun, 21 Jul 2019 23:26:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38543)
+	id 1hpOzD-0007Ns-9T
+	for qemu-devel@archiver.kernel.org; Sun, 21 Jul 2019 23:27:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38773)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <yan.y.zhao@intel.com>) id 1hpOyL-00060m-VZ
- for qemu-devel@nongnu.org; Sun, 21 Jul 2019 23:26:47 -0400
+ (envelope-from <tony.nguyen@bt.com>) id 1hpOyz-0006qK-Kq
+ for qemu-devel@nongnu.org; Sun, 21 Jul 2019 23:27:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yan.y.zhao@intel.com>) id 1hpOyK-0007CR-PI
- for qemu-devel@nongnu.org; Sun, 21 Jul 2019 23:26:45 -0400
-Received: from mga09.intel.com ([134.134.136.24]:10429)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yan.y.zhao@intel.com>)
- id 1hpOyK-000745-FX
- for qemu-devel@nongnu.org; Sun, 21 Jul 2019 23:26:44 -0400
-X-Amp-Result: UNSCANNABLE
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
- by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 21 Jul 2019 20:26:36 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,293,1559545200"; d="scan'208";a="344289424"
-Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
- ([10.239.13.9])
- by orsmga005.jf.intel.com with ESMTP; 21 Jul 2019 20:26:32 -0700
-Date: Sun, 21 Jul 2019 23:20:28 -0400
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: Kirti Wankhede <kwankhede@nvidia.com>
-Message-ID: <20190722032028.GJ8912@joy-OptiPlex-7040>
-References: <1562665760-26158-1-git-send-email-kwankhede@nvidia.com>
- <1562665760-26158-11-git-send-email-kwankhede@nvidia.com>
- <20190712025213.GH9176@joy-OptiPlex-7040>
- <a8f67428-0f42-4b18-0cfd-02a21c3d4343@nvidia.com>
+ (envelope-from <tony.nguyen@bt.com>) id 1hpOyy-0007qI-7m
+ for qemu-devel@nongnu.org; Sun, 21 Jul 2019 23:27:25 -0400
+Received: from smtpe1.intersmtp.com ([62.239.224.236]:41456)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <tony.nguyen@bt.com>) id 1hpOyx-0007nE-VC
+ for qemu-devel@nongnu.org; Sun, 21 Jul 2019 23:27:24 -0400
+Received: from tpw09926dag18f.domain1.systemhost.net (10.9.212.26) by
+ RDW083A009ED65.bt.com (10.187.98.35) with Microsoft SMTP Server (TLS) id
+ 14.3.439.0; Mon, 22 Jul 2019 04:23:43 +0100
+Received: from tpw09926dag18e.domain1.systemhost.net (10.9.212.18) by
+ tpw09926dag18f.domain1.systemhost.net (10.9.212.26) with Microsoft SMTP
+ Server (TLS) id 15.0.1395.4; Mon, 22 Jul 2019 04:27:21 +0100
+Received: from tpw09926dag18e.domain1.systemhost.net
+ ([fe80::a946:6348:ccf4:fa6c]) by tpw09926dag18e.domain1.systemhost.net
+ ([fe80::a946:6348:ccf4:fa6c%12]) with mapi id 15.00.1395.000; Mon, 22 Jul
+ 2019 04:27:21 +0100
+From: <tony.nguyen@bt.com>
+To: <qemu-devel@nongnu.org>
+Thread-Topic: [Qemu-devel] [PATCH v2 1/2] configure: Define target access
+ alignment in configure
+Thread-Index: AQHVQD1fPxYEHSQpNkukvGKERP01mw==
+Date: Mon, 22 Jul 2019 03:27:21 +0000
+Message-ID: <1563766040903.29641@bt.com>
+References: <945056df7ff54ce6b272dce64721d916@tpw09926dag18e.domain1.systemhost.net>
+In-Reply-To: <945056df7ff54ce6b272dce64721d916@tpw09926dag18e.domain1.systemhost.net>
+Accept-Language: en-AU, en-GB, en-US
+Content-Language: en-AU
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.187.101.37]
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a8f67428-0f42-4b18-0cfd-02a21c3d4343@nvidia.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 134.134.136.24
-Subject: Re: [Qemu-devel] [PATCH v7 10/13] vfio: Add load state functions to
- SaveVMHandlers
+X-Received-From: 62.239.224.236
+Subject: [Qemu-devel] [PATCH v2 1/2] configure: Define target access
+ alignment in configure
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,140 +76,212 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: "Tian, Kevin" <kevin.tian@intel.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
- "cjia@nvidia.com" <cjia@nvidia.com>,
- "eskultet@redhat.com" <eskultet@redhat.com>, "Yang,
- Ziye" <ziye.yang@intel.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>,
- "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>,
- "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "dgilbert@redhat.com" <dgilbert@redhat.com>,
- "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>,
- "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
- "eauger@redhat.com" <eauger@redhat.com>,
- "cohuck@redhat.com" <cohuck@redhat.com>,
- "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>,
- "felipe@nutanix.com" <felipe@nutanix.com>,
- "mlevitsk@redhat.com" <mlevitsk@redhat.com>, "Liu,
- Changpeng" <changpeng.liu@intel.com>, "Wang, Zhi A" <zhi.a.wang@intel.com>
+Cc: ehabkost@redhat.com, arikalo@wavecomp.com, mark.cave-ayland@ilande.co.uk,
+ jcmvbkbc@gmail.com, aurelien@aurel32.net, amarkovic@wavecomp.com,
+ atar4qemu@gmail.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jul 19, 2019 at 03:00:13AM +0800, Kirti Wankhede wrote:
-> 
-> 
-> On 7/12/2019 8:22 AM, Yan Zhao wrote:
-> > On Tue, Jul 09, 2019 at 05:49:17PM +0800, Kirti Wankhede wrote:
-> >> Flow during _RESUMING device state:
-> >> - If Vendor driver defines mappable region, mmap migration region.
-> >> - Load config state.
-> >> - For data packet, till VFIO_MIG_FLAG_END_OF_STATE is not reached
-> >>     - read data_size from packet, read buffer of data_size
-> >>     - read data_offset from where QEMU should write data.
-> >>         if region is mmaped, write data of data_size to mmaped region.
-> >>     - write data_size.
-> >>         In case of mmapped region, write to data_size indicates kernel
-> >>         driver that data is written in staging buffer.
-> >>     - if region is trapped, pwrite() data of data_size from data_offset.
-> >> - Repeat above until VFIO_MIG_FLAG_END_OF_STATE.
-> >> - Unmap migration region.
-> >>
-> >> For user, data is opaque. User should write data in the same order as
-> >> received.
-> >>
-> >> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> >> Reviewed-by: Neo Jia <cjia@nvidia.com>
-> >> ---
-> >>  hw/vfio/migration.c  | 162 +++++++++++++++++++++++++++++++++++++++++++++++++++
-> >>  hw/vfio/trace-events |   3 +
-> >>  2 files changed, 165 insertions(+)
-> >>
-> >> diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
-> >> index 4e9b4cce230b..5fb4c5329ede 100644
-> >> --- a/hw/vfio/migration.c
-> >> +++ b/hw/vfio/migration.c
-> >> @@ -249,6 +249,26 @@ static int vfio_save_device_config_state(QEMUFile *f, void *opaque)
-> >>      return qemu_file_get_error(f);
-> >>  }
-> >>  
-> >> +static int vfio_load_device_config_state(QEMUFile *f, void *opaque)
-> >> +{
-> >> +    VFIODevice *vbasedev = opaque;
-> >> +    uint64_t data;
-> >> +
-> >> +    if (vbasedev->ops && vbasedev->ops->vfio_load_config) {
-> >> +        vbasedev->ops->vfio_load_config(vbasedev, f);
-> >> +    }
-> >> +
-> >> +    data = qemu_get_be64(f);
-> >> +    if (data != VFIO_MIG_FLAG_END_OF_STATE) {
-> >> +        error_report("%s: Failed loading device config space, "
-> >> +                     "end flag incorrect 0x%"PRIx64, vbasedev->name, data);
-> >> +        return -EINVAL;
-> >> +    }
-> >> +
-> >> +    trace_vfio_load_device_config_state(vbasedev->name);
-> >> +    return qemu_file_get_error(f);
-> >> +}
-> >> +
-> >>  /* ---------------------------------------------------------------------- */
-> >>  
-> >>  static int vfio_save_setup(QEMUFile *f, void *opaque)
-> >> @@ -421,12 +441,154 @@ static int vfio_save_complete_precopy(QEMUFile *f, void *opaque)
-> >>      return ret;
-> >>  }
-> >>  
-> >> +static int vfio_load_setup(QEMUFile *f, void *opaque)
-> >> +{
-> >> +    VFIODevice *vbasedev = opaque;
-> >> +    VFIOMigration *migration = vbasedev->migration;
-> >> +    int ret = 0;
-> >> +
-> >> +    if (migration->region.buffer.mmaps) {
-> >> +        ret = vfio_region_mmap(&migration->region.buffer);
-> >> +        if (ret) {
-> >> +            error_report("%s: Failed to mmap VFIO migration region %d: %s",
-> >> +                         vbasedev->name, migration->region.index,
-> >> +                         strerror(-ret));
-> >> +            return ret;
-> >> +        }
-> >> +    }
-> >> +
-> >> +    ret = vfio_migration_set_state(vbasedev, VFIO_DEVICE_STATE_RESUMING);
-> >> +    if (ret) {
-> >> +        error_report("%s: Failed to set state RESUMING", vbasedev->name);
-> >> +    }
-> >> +    return ret;
-> >> +}
-> >> +
-> >> +static int vfio_load_cleanup(void *opaque)
-> >> +{
-> >> +    vfio_save_cleanup(opaque);
-> >> +    return 0;
-> >> +}
-> >> +
-> >> +static int vfio_load_state(QEMUFile *f, void *opaque, int version_id)
-> >> +{
-> >> +    VFIODevice *vbasedev = opaque;
-> >> +    VFIOMigration *migration = vbasedev->migration;
-> >> +    int ret = 0;
-> >> +    uint64_t data, data_size;
-> >> +
-> > I think checking of version_id is still needed.
-> > 
-> 
-> Checking version_id with what value?
->
-this version_id passed-in is the source VFIO software interface id.
-need to check it with the value in target side, right?
-
-Though we previously discussed the sysfs node interface to check live
-migration version even before launching live migration, I think we still
-need this runtime software version check in qemu to ensure software
-interfaces in QEMU VFIO are compatible.
-
-Thanks
-Yan
+Move the define of target access alignment earlier from=0A=
+target/foo/cpu.h to configure.=0A=
+=0A=
+Signed-off-by: Tony Nguyen <tony.nguyen@bt.com>=0A=
+---=0A=
+ configure             | 10 +++++++++-=0A=
+ include/exec/poison.h |  1 +=0A=
+ include/qom/cpu.h     |  2 +-=0A=
+ target/alpha/cpu.h    |  2 --=0A=
+ target/hppa/cpu.h     |  1 -=0A=
+ target/mips/cpu.h     |  2 --=0A=
+ target/sh4/cpu.h      |  2 --=0A=
+ target/sparc/cpu.h    |  2 --=0A=
+ target/xtensa/cpu.h   |  2 --=0A=
+ tcg/tcg.c             |  2 +-=0A=
+ tcg/tcg.h             |  8 +++++---=0A=
+ 11 files changed, 17 insertions(+), 17 deletions(-)=0A=
+=0A=
+diff --git a/configure b/configure=0A=
+index eb635c3..8316a16 100755=0A=
+--- a/configure=0A=
++++ b/configure=0A=
+@@ -7424,8 +7424,13 @@ for target in $target_list; do=0A=
+ target_dir=3D"$target"=0A=
+ config_target_mak=3D$target_dir/config-target.mak=0A=
+ target_name=3D$(echo $target | cut -d '-' -f 1)=0A=
++target_aligned_only=3D"no"=0A=
++case "$target_name" in=0A=
++  alpha|hppa|mips64el|mips64|mipsel|mips|mipsn32|mipsn32el|sh4|sh4eb|sparc=
+|sparc64|sparc32plus|xtensa|xtensaeb)=0A=
++  target_aligned_only=3D"yes"=0A=
++  ;;=0A=
++esac=0A=
+ target_bigendian=3D"no"=0A=
+-=0A=
+ case "$target_name" in=0A=
+   armeb|aarch64_be|hppa|lm32|m68k|microblaze|mips|mipsn32|mips64|moxie|or1=
+k|ppc|ppc64|ppc64abi32|s390x|sh4eb|sparc|sparc64|sparc32plus|xtensaeb)=0A=
+   target_bigendian=3Dyes=0A=
+@@ -7710,6 +7715,9 @@ fi=0A=
+ if supported_whpx_target $target; then=0A=
+     echo "CONFIG_WHPX=3Dy" >> $config_target_mak=0A=
+ fi=0A=
++if test "$target_aligned_only" =3D "yes" ; then=0A=
++  echo "TARGET_ALIGNED_ONLY=3Dy" >> $config_target_mak=0A=
++fi=0A=
+ if test "$target_bigendian" =3D "yes" ; then=0A=
+   echo "TARGET_WORDS_BIGENDIAN=3Dy" >> $config_target_mak=0A=
+ fi=0A=
+diff --git a/include/exec/poison.h b/include/exec/poison.h=0A=
+index b862320..955eb86 100644=0A=
+--- a/include/exec/poison.h=0A=
++++ b/include/exec/poison.h=0A=
+@@ -35,6 +35,7 @@=0A=
+ #pragma GCC poison TARGET_UNICORE32=0A=
+ #pragma GCC poison TARGET_XTENSA=0A=
+ =0A=
++#pragma GCC poison TARGET_ALIGNED_ONLY=0A=
+ #pragma GCC poison TARGET_HAS_BFLT=0A=
+ #pragma GCC poison TARGET_NAME=0A=
+ #pragma GCC poison TARGET_SUPPORTS_MTTCG=0A=
+diff --git a/include/qom/cpu.h b/include/qom/cpu.h=0A=
+index 5ee0046..9b50b73 100644=0A=
+--- a/include/qom/cpu.h=0A=
++++ b/include/qom/cpu.h=0A=
+@@ -89,7 +89,7 @@ struct TranslationBlock;=0A=
+  * @do_unassigned_access: Callback for unassigned access handling.=0A=
+  * (this is deprecated: new targets should use do_transaction_failed inste=
+ad)=0A=
+  * @do_unaligned_access: Callback for unaligned access handling, if=0A=
+- * the target defines #ALIGNED_ONLY.=0A=
++ * the target defines #TARGET_ALIGNED_ONLY.=0A=
+  * @do_transaction_failed: Callback for handling failed memory transaction=
+s=0A=
+  * (ie bus faults or external aborts; not MMU faults)=0A=
+  * @virtio_is_big_endian: Callback to return %true if a CPU which supports=
+=0A=
+diff --git a/target/alpha/cpu.h b/target/alpha/cpu.h=0A=
+index b3e8a82..16eb804 100644=0A=
+--- a/target/alpha/cpu.h=0A=
++++ b/target/alpha/cpu.h=0A=
+@@ -23,8 +23,6 @@=0A=
+ #include "cpu-qom.h"=0A=
+ #include "exec/cpu-defs.h"=0A=
+ =0A=
+-#define ALIGNED_ONLY=0A=
+-=0A=
+ /* Alpha processors have a weak memory model */=0A=
+ #define TCG_GUEST_DEFAULT_MO      (0)=0A=
+ =0A=
+diff --git a/target/hppa/cpu.h b/target/hppa/cpu.h=0A=
+index aab251b..2be67c2 100644=0A=
+--- a/target/hppa/cpu.h=0A=
++++ b/target/hppa/cpu.h=0A=
+@@ -30,7 +30,6 @@=0A=
+    basis.  It's probably easier to fall back to a strong memory model.  */=
+=0A=
+ #define TCG_GUEST_DEFAULT_MO        TCG_MO_ALL=0A=
+ =0A=
+-#define ALIGNED_ONLY=0A=
+ #define MMU_KERNEL_IDX   0=0A=
+ #define MMU_USER_IDX     3=0A=
+ #define MMU_PHYS_IDX     4=0A=
+diff --git a/target/mips/cpu.h b/target/mips/cpu.h=0A=
+index 21c0615..c13cd4e 100644=0A=
+--- a/target/mips/cpu.h=0A=
++++ b/target/mips/cpu.h=0A=
+@@ -1,8 +1,6 @@=0A=
+ #ifndef MIPS_CPU_H=0A=
+ #define MIPS_CPU_H=0A=
+ =0A=
+-#define ALIGNED_ONLY=0A=
+-=0A=
+ #include "cpu-qom.h"=0A=
+ #include "exec/cpu-defs.h"=0A=
+ #include "fpu/softfloat.h"=0A=
+diff --git a/target/sh4/cpu.h b/target/sh4/cpu.h=0A=
+index aee733e..ecaa7a1 100644=0A=
+--- a/target/sh4/cpu.h=0A=
++++ b/target/sh4/cpu.h=0A=
+@@ -23,8 +23,6 @@=0A=
+ #include "cpu-qom.h"=0A=
+ #include "exec/cpu-defs.h"=0A=
+ =0A=
+-#define ALIGNED_ONLY=0A=
+-=0A=
+ /* CPU Subtypes */=0A=
+ #define SH_CPU_SH7750  (1 << 0)=0A=
+ #define SH_CPU_SH7750S (1 << 1)=0A=
+diff --git a/target/sparc/cpu.h b/target/sparc/cpu.h=0A=
+index 8ed2250..1406f0b 100644=0A=
+--- a/target/sparc/cpu.h=0A=
++++ b/target/sparc/cpu.h=0A=
+@@ -5,8 +5,6 @@=0A=
+ #include "cpu-qom.h"=0A=
+ #include "exec/cpu-defs.h"=0A=
+ =0A=
+-#define ALIGNED_ONLY=0A=
+-=0A=
+ #if !defined(TARGET_SPARC64)=0A=
+ #define TARGET_DPREGS 16=0A=
+ #else=0A=
+diff --git a/target/xtensa/cpu.h b/target/xtensa/cpu.h=0A=
+index 2c27713..0459243 100644=0A=
+--- a/target/xtensa/cpu.h=0A=
++++ b/target/xtensa/cpu.h=0A=
+@@ -32,8 +32,6 @@=0A=
+ #include "exec/cpu-defs.h"=0A=
+ #include "xtensa-isa.h"=0A=
+ =0A=
+-#define ALIGNED_ONLY=0A=
+-=0A=
+ /* Xtensa processors have a weak memory model */=0A=
+ #define TCG_GUEST_DEFAULT_MO      (0)=0A=
+ =0A=
+diff --git a/tcg/tcg.c b/tcg/tcg.c=0A=
+index be2c33c..8d23fb0 100644=0A=
+--- a/tcg/tcg.c=0A=
++++ b/tcg/tcg.c=0A=
+@@ -1926,7 +1926,7 @@ static const char * const ldst_name[] =3D=0A=
+ };=0A=
+ =0A=
+ static const char * const alignment_name[(MO_AMASK >> MO_ASHIFT) + 1] =3D =
+{=0A=
+-#ifdef ALIGNED_ONLY=0A=
++#ifdef TARGET_ALIGNED_ONLY=0A=
+     [MO_UNALN >> MO_ASHIFT]    =3D "un+",=0A=
+     [MO_ALIGN >> MO_ASHIFT]    =3D "",=0A=
+ #else=0A=
+diff --git a/tcg/tcg.h b/tcg/tcg.h=0A=
+index b411e17..529acb2 100644=0A=
+--- a/tcg/tcg.h=0A=
++++ b/tcg/tcg.h=0A=
+@@ -333,10 +333,12 @@ typedef enum TCGMemOp {=0A=
+     MO_TE    =3D MO_LE,=0A=
+ #endif=0A=
+ =0A=
+-    /* MO_UNALN accesses are never checked for alignment.=0A=
++    /*=0A=
++     * MO_UNALN accesses are never checked for alignment.=0A=
+      * MO_ALIGN accesses will result in a call to the CPU's=0A=
+      * do_unaligned_access hook if the guest address is not aligned.=0A=
+-     * The default depends on whether the target CPU defines ALIGNED_ONLY.=
+=0A=
++     * The default depends on whether the target CPU defines=0A=
++     * TARGET_ALIGNED_ONLY.=0A=
+      *=0A=
+      * Some architectures (e.g. ARMv8) need the address which is aligned=
+=0A=
+      * to a size more than the size of the memory access.=0A=
+@@ -353,7 +355,7 @@ typedef enum TCGMemOp {=0A=
+      */=0A=
+     MO_ASHIFT =3D 4,=0A=
+     MO_AMASK =3D 7 << MO_ASHIFT,=0A=
+-#ifdef ALIGNED_ONLY=0A=
++#ifdef TARGET_ALIGNED_ONLY=0A=
+     MO_ALIGN =3D 0,=0A=
+     MO_UNALN =3D MO_AMASK,=0A=
+ #else=0A=
+-- =0A=
+1.8.3.1=0A=
 
