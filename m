@@ -2,67 +2,64 @@ Return-Path: <SRS0=EA86=VT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E32E5C76191
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 02:59:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AC2AC76191
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 03:05:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B165721951
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 02:59:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B165721951
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id E086021951
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 03:05:24 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="GjfwN4FP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E086021951
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58436 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58476 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hpOXy-0007mw-SK
-	for qemu-devel@archiver.kernel.org; Sun, 21 Jul 2019 22:59:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59668)
+	id 1hpOdf-0001Eg-GP
+	for qemu-devel@archiver.kernel.org; Sun, 21 Jul 2019 23:05:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32925)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jing2.liu@linux.intel.com>) id 1hpOXo-0007OW-N9
- for qemu-devel@nongnu.org; Sun, 21 Jul 2019 22:59:21 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1hpOdJ-0000Jt-50
+ for qemu-devel@nongnu.org; Sun, 21 Jul 2019 23:05:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jing2.liu@linux.intel.com>) id 1hpOXn-0000X1-MK
- for qemu-devel@nongnu.org; Sun, 21 Jul 2019 22:59:20 -0400
-Received: from mga05.intel.com ([192.55.52.43]:14588)
+ (envelope-from <dgibson@ozlabs.org>) id 1hpOdH-0004ir-Sl
+ for qemu-devel@nongnu.org; Sun, 21 Jul 2019 23:05:01 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:40487 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jing2.liu@linux.intel.com>)
- id 1hpOXn-0000V4-Dg
- for qemu-devel@nongnu.org; Sun, 21 Jul 2019 22:59:19 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
- by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 21 Jul 2019 19:59:16 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,293,1559545200"; d="scan'208";a="174103525"
-Received: from liujing-mobl.ccr.corp.intel.com (HELO [10.238.129.14])
- ([10.238.129.14])
- by orsmga006.jf.intel.com with ESMTP; 21 Jul 2019 19:59:14 -0700
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-References: <1562823509-13072-1-git-send-email-jing2.liu@linux.intel.com>
- <c572cdd2-d0f4-2e06-99f8-302b798a04dd@linux.intel.com>
- <0f9763fe-af69-e057-9fb1-00527e636fe4@redhat.com>
- <0ffa32db-3615-16e0-71bf-a8c552c2fcfb@linux.intel.com>
- <757b193f-90c6-0516-9372-74463ec4d117@redhat.com>
-From: Jing Liu <jing2.liu@linux.intel.com>
-Message-ID: <4e381ae0-78d5-afb6-9a4d-b58d0daa60ba@linux.intel.com>
-Date: Mon, 22 Jul 2019 10:59:14 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1hpOdG-0004Y6-RU
+ for qemu-devel@nongnu.org; Sun, 21 Jul 2019 23:04:59 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 45sRKr34hYz9sBZ; Mon, 22 Jul 2019 13:04:48 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1563764688;
+ bh=oCF9R2ImntRrDkERz+fy7zZdZDParXbdqtbTL5wOmqM=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=GjfwN4FPhv4BfYB5fcg/rXtKtC1MmhLAymlTxNzWa9r1u/Rial/7xrHEWCohWpQU/
+ H/TRsHVQxkhosP1qSmM8p7AgXmJnmtNpBjGivcXMx+rKt+m/DXS5BesOp4ezEWlaMF
+ gBXSK988z0IdtBt7X95Yt+cjcP+civ9DYrI8k8NQ=
+Date: Mon, 22 Jul 2019 12:27:39 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: David Hildenbrand <david@redhat.com>
+Message-ID: <20190722022739.GA1426@umbus.fritz.box>
+References: <20190719160120.26581-1-david@redhat.com>
+ <20190719160120.26581-2-david@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <757b193f-90c6-0516-9372-74463ec4d117@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 192.55.52.43
-Subject: Re: [Qemu-devel] [PATCH v1] x86: Intel AVX512_BF16 feature enabling
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="YiEDa0DAkWCtVeE4"
+Content-Disposition: inline
+In-Reply-To: <20190719160120.26581-2-david@redhat.com>
+User-Agent: Mutt/1.12.0 (2019-05-25)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 203.11.71.1
+Subject: Re: [Qemu-devel] [PATCH v1 1/3] virtio-balloon: simplify deflate
+ with pbp
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,91 +71,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org,
+ Stefan Hajnoczi <stefanha@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
+--YiEDa0DAkWCtVeE4
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 7/19/2019 4:10 PM, Paolo Bonzini wrote:
-> On 19/07/19 09:20, Jing Liu wrote:
->>> Then CPUID[7,0].EAX is set automatically to 0 or 1 depending on whether
->>> BF16 is enabled or not.
->>
->> Could I ask why don't we directly check BF16 enabling when
->> cpu_x86_cpuid(env, 7, 0, ...) during kvm_arch_init_vcpu ?
-> 
-> Because the code for setting CPUID is common for all accelerators (there
-> are five supported: KVM, HAX, HVF, TCG, WHPX).
-> 
->> What is the use of the two new properties? Are they used for users
->> setting parameters when boot up guest, and why we need users setting
->> func7 level?
-> 
-> For example to test guests with CPUID[7,0].EAX==1, even if the host does
-> not have BF16.
+On Fri, Jul 19, 2019 at 06:01:18PM +0200, David Hildenbrand wrote:
+> Let's simplify this - the case we are optimizing for is very hard to
+> trigger and not worth the effort. If we're switching from inflation to
+> deflation, let's reset the pbp.
+>=20
+> Signed-off-by: David Hildenbrand <david@redhat.com>
 
-Thanks. :)
-> 
-> 
->> @@ -5075,6 +5101,10 @@ static void x86_cpu_expand_features(X86CPU *cpu,
->> Error **errp)
->>           x86_cpu_adjust_feat_level(cpu, FEAT_SVM);
->>           x86_cpu_adjust_feat_level(cpu, FEAT_XSAVE);
->>
->> +       if ((env->features[FEAT_7_1_EAX] & CPUID_7_1_EAX_AVX512_BF16) &&
->> +            kvm_enabled()) {
-> 
-> No need to check KVM.  You could also do just
-> x86_cpu_adjust_feat_level(cpu, FEAT_7_1_EAX) and set
-> cpu->min_level_func7 in x86_cpu_adjust_feat_level with something like
-> 
->      if (eax == 7) {
->          x86_cpu_adjust_level(cpu, &env->cpu_min_level_func7,
->                               fi->cpuid.ecx);
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
+
+> ---
+>  hw/virtio/virtio-balloon.c | 24 ++++--------------------
+>  1 file changed, 4 insertions(+), 20 deletions(-)
+>=20
+> diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
+> index 9de3c030bf..287d5d4c97 100644
+> --- a/hw/virtio/virtio-balloon.c
+> +++ b/hw/virtio/virtio-balloon.c
+> @@ -121,7 +121,7 @@ static void balloon_deflate_page(VirtIOBalloon *ballo=
+on,
+>      void *addr =3D memory_region_get_ram_ptr(mr) + offset;
+>      RAMBlock *rb;
+>      size_t rb_page_size;
+> -    ram_addr_t ram_offset, host_page_base;
+> +    ram_addr_t ram_offset;
+>      void *host_addr;
+>      int ret;
+> =20
+> @@ -129,26 +129,10 @@ static void balloon_deflate_page(VirtIOBalloon *bal=
+loon,
+>       * host address? */
+>      rb =3D qemu_ram_block_from_host(addr, false, &ram_offset);
+>      rb_page_size =3D qemu_ram_pagesize(rb);
+> -    host_page_base =3D ram_offset & ~(rb_page_size - 1);
+> -
+> -    if (balloon->pbp
+> -        && rb =3D=3D balloon->pbp->rb
+> -        && host_page_base =3D=3D balloon->pbp->base) {
+> -        int subpages =3D rb_page_size / BALLOON_PAGE_SIZE;
+> =20
+> -        /*
+> -         * This means the guest has asked to discard some of the 4kiB
+> -         * subpages of a host page, but then changed its mind and
+> -         * asked to keep them after all.  It's exceedingly unlikely
+> -         * for a guest to do this in practice, but handle it anyway,
+> -         * since getting it wrong could mean discarding memory the
+> -         * guest is still using. */
+> -        clear_bit((ram_offset - balloon->pbp->base) / BALLOON_PAGE_SIZE,
+> -                  balloon->pbp->bitmap);
+> -
+> -        if (bitmap_empty(balloon->pbp->bitmap, subpages)) {
+> -            virtio_balloon_reset_pbp(balloon);
+> -        }
+> +    if (balloon->pbp) {
+> +        /* Let's play safe and always reset the pbp on deflation request=
+s. */
+> +        virtio_balloon_reset_pbp(balloon);
 >      }
-> 
+> =20
+>      host_addr =3D (void *)((uintptr_t)addr & ~(rb_page_size - 1));
 
-Got it. One question I'm wondering is, is it possible for users setting
-an invalid property like level-func7=2? Do we need some protection?
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
->> @@ -5098,6 +5128,9 @@ static void x86_cpu_expand_features(X86CPU *cpu,
->> Error **errp)
->>       }
->>
->>       /* Set cpuid_*level* based on cpuid_min_*level, if not explicitly
->> set */
->> +    if (env->cpuid_level_func7 == UINT32_MAX) {
->> +        env->cpuid_level_func7 = env->cpuid_min_level_func7;
->> +    }
-> 
-> Looks good.
-> 
->>       if (env->cpuid_level == UINT32_MAX) {
->>           env->cpuid_level = env->cpuid_min_level;
->>       }
->> @@ -5869,9 +5902,11 @@ static Property x86_cpu_properties[] = {
->>       DEFINE_PROP_BOOL("host-phys-bits", X86CPU, host_phys_bits, false),
->>       DEFINE_PROP_UINT8("host-phys-bits-limit", X86CPU,
->> host_phys_bits_limit, 0),
->>       DEFINE_PROP_BOOL("fill-mtrr-mask", X86CPU, fill_mtrr_mask, true),
->> +    DEFINE_PROP_UINT32("level-func7", X86CPU, env.cpuid_level_func7,
->> UINT32_MAX),
-> 
-> Looks good.
-> 
->>       DEFINE_PROP_UINT32("level", X86CPU, env.cpuid_level, UINT32_MAX),
->>       DEFINE_PROP_UINT32("xlevel", X86CPU, env.cpuid_xlevel, UINT32_MAX),
->>       DEFINE_PROP_UINT32("xlevel2", X86CPU, env.cpuid_xlevel2, UINT32_MAX),
->> +    DEFINE_PROP_UINT32("min-level-func7", X86CPU,
->> env.cpuid_min_level_func7, 0),
-> 
-> No need for this property, just like there is no min-level property.
-> 
-Would remove it.
+--YiEDa0DAkWCtVeE4
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Thanks,
-Jing
+-----BEGIN PGP SIGNATURE-----
 
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl01HxsACgkQbDjKyiDZ
+s5KEmBAAo1Mv3TUKy5NVizXbTrmFU8zk6drWrakLfP2Or225U9Eu7gypRzBLd1X3
+DlGAORFuGxMMoP4PMDBUSigE2owyGAPqfJcnAbDG2qKfkOjMBNSyHpQYYoHdvFH1
+7asS3TIlkfswkNCSyWKaEdBHWyq8lXF20ycP/iyA7QB0xF16za5khsaTEirmJZDg
+c/S81Byc3jz2MRnpPrkOmchxFAS3p0CChnKwUJ4pAgi8av+7/clQyrJRXTeVTlxq
+8nA15EKhNgMD4l/ECLUjwJTt/EdyptpOxZPe539USChugbYxF1hjIV2HHd3Ui6tO
+3tth0/ZcVBB2PgkeO/V0s5/h0bI3dFwj7GID7/GyS7A6ttNPQs/qqOxKeM2YrxYN
+RJiEr1oPCOJUDPDkNtB03cogmMSPLIrGmvIXMf5d6guav12BjPbXnK+RM+9rYdgh
+2uQHefGlz+sSUFfoHGH/zljtFaGor0Y+BaL5Dk/ebIMXBlsndGz53sbLQCSqt+4j
+RzrLcFO3nfMmkrnpAWolMsrn3jbG/9GYyLjeEdqrkXTeGb+A8mmlZ+WBIFqU3Fc3
+pB5kPOCdyQIUByXqpsCj8r6qiv/HzO4EvlVt5d7aHtjMYT/OUcAY6uOL4d8kyM4F
+R4IkqxDB5YMuoh+hI0WLQV9H/vCJ4CCpJc5fKHRH3h0TQlc6gQ4=
+=69KI
+-----END PGP SIGNATURE-----
 
+--YiEDa0DAkWCtVeE4--
 
