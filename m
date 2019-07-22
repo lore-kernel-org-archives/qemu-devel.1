@@ -2,70 +2,93 @@ Return-Path: <SRS0=EA86=VT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87810C76194
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 15:48:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB3B0C76188
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 15:49:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 643322190F
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 15:48:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 643322190F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=bt.com
+	by mail.kernel.org (Postfix) with ESMTPS id A9638218DA
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 15:49:08 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="A/9uGuUr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9638218DA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34954 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34980 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hpaYF-0003BE-4Z
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jul 2019 11:48:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53579)
+	id 1hpaYl-0004jH-DZ
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jul 2019 11:49:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53693)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <tony.nguyen@bt.com>) id 1hpaXu-0002D1-2J
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 11:48:15 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1hpaY8-00033G-VZ
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 11:48:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tony.nguyen@bt.com>) id 1hpaXs-0007bm-N0
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 11:48:13 -0400
-Received: from smtpe1.intersmtp.com ([62.239.224.234]:43242)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tony.nguyen@bt.com>)
- id 1hpaXl-0007WK-Pe; Mon, 22 Jul 2019 11:48:06 -0400
-Received: from tpw09926dag18g.domain1.systemhost.net (10.9.212.34) by
- RDW083A012ED68.bt.com (10.187.98.38) with Microsoft SMTP Server (TLS) id
- 14.3.439.0; Mon, 22 Jul 2019 16:47:47 +0100
-Received: from tpw09926dag18e.domain1.systemhost.net (10.9.212.18) by
- tpw09926dag18g.domain1.systemhost.net (10.9.212.34) with Microsoft SMTP
- Server (TLS) id 15.0.1395.4; Mon, 22 Jul 2019 16:48:01 +0100
-Received: from tpw09926dag18e.domain1.systemhost.net
- ([fe80::a946:6348:ccf4:fa6c]) by tpw09926dag18e.domain1.systemhost.net
- ([fe80::a946:6348:ccf4:fa6c%12]) with mapi id 15.00.1395.000; Mon, 22 Jul
- 2019 16:48:00 +0100
-From: <tony.nguyen@bt.com>
-To: <qemu-devel@nongnu.org>
-Thread-Topic: [Qemu-devel] [PATCH v2 11/20] hw/virtio: Access MemoryRegion
- with MemOp
-Thread-Index: AQHVQKTX+Ks5rP6+AkSy2PJ+oMCFiQ==
-Date: Mon, 22 Jul 2019 15:48:00 +0000
-Message-ID: <1563810480347.95681@bt.com>
-References: <e9c6e5310b1a4863be45d45bf087fc3d@tpw09926dag18e.domain1.systemhost.net>
-In-Reply-To: <e9c6e5310b1a4863be45d45bf087fc3d@tpw09926dag18e.domain1.systemhost.net>
-Accept-Language: en-AU, en-GB, en-US
-Content-Language: en-AU
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.187.101.37]
+ (envelope-from <richard.henderson@linaro.org>) id 1hpaY8-0007jH-2s
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 11:48:28 -0400
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:37009)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1hpaY7-0007iZ-S2
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 11:48:28 -0400
+Received: by mail-pf1-x443.google.com with SMTP id 19so17568927pfa.4
+ for <qemu-devel@nongnu.org>; Mon, 22 Jul 2019 08:48:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=JjcO/8zCszdHC3wm++FqqIjYQ/ktCSoeJvmZg9Y2m64=;
+ b=A/9uGuUr66vl7SZV+c6D+/FRrwWuVVa7sDlI+ZKo22W5cnhhagVfL1Z3RVX14l+1OE
+ xAZ8fLNKs67buUHx1dCQnIUg9hZlrjzyACjMceEe7htNdjkDnEhyOyFV0rFXunHk0mpc
+ xEg4LLQZD1lOUwIJNU6pPnVnbcvSdJ4abuAtUXw7lGqUKyDmjthEfnSLsnW4iAM/5xRQ
+ GK96YKtramuwUBDheQcZRgotr0KbpEKnbhOs5bLofbDn0Fitah2MKwLT/Mq2MEJBih0P
+ BtGNiyUdquSAajNYwT455TuhrVGgsePNnFPjXGwWcoz8iy2godL6kd6dGnH4rAX5qUyv
+ S+rw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=JjcO/8zCszdHC3wm++FqqIjYQ/ktCSoeJvmZg9Y2m64=;
+ b=bOqBu3km8aIflecdSeSoYCG6VcosQW00y1gc9NRwPdPTWDzOQZ7iua/hTYMhxH3fKB
+ 1lpKTt0WeGpJ+Cwc6ePlMP8V61fUJhqBItkKGSFWpDG6/iK7m+WuRp9D5IO56tjok9Go
+ wV6EYPDta/gq7vLeh2cpbhqCOdeoNs8j57SIs+ddodq9U+7LOHT5Yb7o5d+lSNXluxja
+ 5FS3l2qrA1GJbNze0/DTzl0G3xReFoNlzus4pUiSsfCLpe+M3bkNDIFMNwHwQT00MfU0
+ +1IApk6GT86rJycj4clYUGe+aGVmleCTvr5KEaicLnarRZJrnhEh8q/DYOP+dneaqsel
+ nD0A==
+X-Gm-Message-State: APjAAAX/Ql3rO7plmH/V75uq2VPSVtGBKBC8tt8YbLBkhVHfV7Si2wA7
+ XaR5cYXYSFMvpd3PTX4thTwMJg==
+X-Google-Smtp-Source: APXvYqyeLBJh+wZNolv0YhFRc6Xg1nSw6Lgp/QCVUeKbipLGfq2rQMng/V2UldQO1mw+G/jTErnI/Q==
+X-Received: by 2002:a65:63cd:: with SMTP id n13mr71853629pgv.153.1563810506545; 
+ Mon, 22 Jul 2019 08:48:26 -0700 (PDT)
+Received: from [192.168.1.11] (97-126-117-207.tukw.qwest.net. [97.126.117.207])
+ by smtp.gmail.com with ESMTPSA id a5sm34691156pjv.21.2019.07.22.08.48.25
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Mon, 22 Jul 2019 08:48:25 -0700 (PDT)
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
+References: <20190719210326.15466-1-richard.henderson@linaro.org>
+ <20190719210326.15466-4-richard.henderson@linaro.org>
+ <87o91mjdgp.fsf@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <18852c55-cc57-69b8-a4a4-fd3f63c8123f@linaro.org>
+Date: Mon, 22 Jul 2019 08:48:23 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
+In-Reply-To: <87o91mjdgp.fsf@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 62.239.224.234
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: [Qemu-devel] [PATCH v2 11/20] hw/virtio: Access MemoryRegion with
- MemOp
+X-Received-From: 2607:f8b0:4864:20::443
+Subject: Re: [Qemu-devel] [PATCH for-4.2 03/24] target/arm: Install ASIDs
+ for long-form from EL1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,117 +100,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, walling@linux.ibm.com, mst@redhat.com,
- palmer@sifive.com, mark.cave-ayland@ilande.co.uk, Alistair.Francis@wdc.com,
- arikalo@wavecomp.com, david@redhat.com, pasic@linux.ibm.com,
- borntraeger@de.ibm.com, rth@twiddle.net, atar4qemu@gmail.com,
- ehabkost@redhat.com, sw@weilnetz.de, qemu-s390x@nongnu.org,
- qemu-arm@nongnu.org, david@gibson.dropbear.id.au, qemu-riscv@nongnu.org,
- cohuck@redhat.com, claudio.fontana@huawei.com, alex.williamson@redhat.com,
- qemu-ppc@nongnu.org, amarkovic@wavecomp.com, pbonzini@redhat.com,
- aurelien@aurel32.net
+Cc: peter.maydell@linaro.org, beata.michalska@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 17/07/19 08:06, Paolo Bonzini wrote:
+On 7/22/19 8:28 AM, Alex Bennée wrote:
+>> -static void vmsa_ttbr_write(CPUARMState *env, const ARMCPRegInfo *ri,
+>> -                            uint64_t value)
+>> +static void vmsa_ttbr_el1_write(CPUARMState *env, const ARMCPRegInfo *ri,
+>> +                                uint64_t value)
+> 
+> Why the rename here? It would make sense if it was only EL1 writes but
+> the lpae_cp_reginfo doesn't seem to use that nomclature (unless we
+> should fix .name for those as well?).
 
-> My main concern is that MO_BE/MO_LE/MO_TE do not really apply to the
-> memory.c paths.  MO_BSWAP is never passed into the MemOp, even if target
-> endianness !=3D host endianness.
->
-> Therefore, you could return MO_TE | MO_{8,16,32,64} from this function,
-> and change memory_region_endianness_inverted to test
-> HOST_WORDS_BIGENDIAN instead of TARGET_WORDS_BIGENDIAN.  Then the two
-> MO_BSWAPs (one from MO_TE, one from adjust_endianness because
-> memory_region_endianness_inverted returns true) cancel out if the
-> memory region's endianness is the same as the host's but different
-> from the target's.
->
-> Some care is needed in virtio_address_space_write and zpci_write_bar.  I
-> think the latter is okay, while the former could do something like this:
->
-> diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
-> index ce928f2429..61885f020c 100644
-> --- a/hw/virtio/virtio-pci.c
-> +++ b/hw/virtio/virtio-pci.c
-> @@ -541,16 +541,16 @@ void virtio_address_space_write(VirtIOPCIProxy *pro=
-xy,
-> hwaddr addr,
->          val =3D pci_get_byte(buf);
->          break;
->      case 2:
-> -        val =3D cpu_to_le16(pci_get_word(buf));
-> +        val =3D pci_get_word(buf);
->          break;
->      case 4:
-> -        val =3D cpu_to_le32(pci_get_long(buf));
-> +        val =3D pci_get_long(buf);
->          break;
->      default:
->          /* As length is under guest control, handle illegal values. */
->          return;
->      }
-> -    memory_region_dispatch_write(mr, addr, val, len, MEMTXATTRS_UNSPECIF=
-IED);
-> +    memory_region_dispatch_write(mr, addr, val, size_memop(len) & ~MO_BS=
-WAP,
-> MEMTXATTRS_UNSPECIFIED);
->  }
->
->  static void
+Because in a later patch we'll add vmsa_ttbr_el2_write.
 
-Sorry Paolo, I noted the need to take care in virtio_address_space_write an=
-d
-zpci_write_bar but did not understand.
-
-> Some care is needed in virtio_address_space_write and zpci_write_bar.
-Is this advice for my v1 implementation, or in the case of the
-MO_TE | MO_{8,16,32,64} idead suggested in the paragraph before?
-
-Signed-off-by: Tony Nguyen <tony.nguyen@bt.com>
----
- hw/virtio/virtio-pci.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
-
-diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
-index ce928f2..265f066 100644
---- a/hw/virtio/virtio-pci.c
-+++ b/hw/virtio/virtio-pci.c
-@@ -17,6 +17,7 @@
-
- #include "qemu/osdep.h"
-
-+#include "exec/memop.h"
- #include "standard-headers/linux/virtio_pci.h"
- #include "hw/virtio/virtio.h"
- #include "hw/pci/pci.h"
-@@ -550,7 +551,8 @@ void virtio_address_space_write(VirtIOPCIProxy *proxy, =
-hwaddr addr,
-         /* As length is under guest control, handle illegal values. */
-         return;
-     }
--    memory_region_dispatch_write(mr, addr, val, len, MEMTXATTRS_UNSPECIFIE=
-D);
-+    memory_region_dispatch_write(mr, addr, val, SIZE_MEMOP(len),
-+                                 MEMTXATTRS_UNSPECIFIED);
- }
-
- static void
-@@ -573,7 +575,8 @@ virtio_address_space_read(VirtIOPCIProxy *proxy, hwaddr=
- addr,
-     /* Make sure caller aligned buf properly */
-     assert(!(((uintptr_t)buf) & (len - 1)));
-
--    memory_region_dispatch_read(mr, addr, &val, len, MEMTXATTRS_UNSPECIFIE=
-D);
-+    memory_region_dispatch_read(mr, addr, &val, SIZE_MEMOP(len),
-+                                MEMTXATTRS_UNSPECIFIED);
-     switch (len) {
-     case 1:
-         pci_set_byte(buf, val);
---
-1.8.3.1
+The lpae_cp_reginfo naming is tied to the old aa32 naming,
+which isn't as helpful as it might be for aa64.  But the
+naming affects migration, iirc, so it can't be changed.
 
 
+r~
 
