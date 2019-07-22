@@ -2,63 +2,79 @@ Return-Path: <SRS0=EA86=VT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6A6BC76190
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 17:35:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05D9BC76190
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 17:42:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8BA4221903
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 17:35:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8BA4221903
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id D02AE2190D
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 17:42:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vtTrsa8Y"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D02AE2190D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36368 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36416 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hpcE1-0000BJ-QF
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jul 2019 13:35:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53506)
+	id 1hpcKb-0002qr-VO
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jul 2019 13:42:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55528)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgilbert@redhat.com>) id 1hpcDl-0007y3-9W
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 13:35:34 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hpcKR-0002SM-1f
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 13:42:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1hpcDj-0002OQ-UK
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 13:35:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59134)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hpcDj-0002NN-Lp
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 13:35:31 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id D7D423084248;
- Mon, 22 Jul 2019 17:35:29 +0000 (UTC)
-Received: from work-vm (ovpn-117-221.ams2.redhat.com [10.36.117.221])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id F1AF05D9D3;
- Mon, 22 Jul 2019 17:35:27 +0000 (UTC)
-Date: Mon, 22 Jul 2019 18:35:25 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Yury Kotov <yury-kotov@yandex-team.ru>
-Message-ID: <20190722173525.GF3035@work-vm>
-References: <20190718091726.9874-1-yury-kotov@yandex-team.ru>
- <20190718091726.9874-4-yury-kotov@yandex-team.ru>
+ (envelope-from <peter.maydell@linaro.org>) id 1hpcKP-00084m-0E
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 13:42:26 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:33332)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hpcKM-0007yd-RG
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 13:42:24 -0400
+Received: by mail-ot1-x344.google.com with SMTP id q20so41065736otl.0
+ for <qemu-devel@nongnu.org>; Mon, 22 Jul 2019 10:42:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=XjErLDWBOLV/N9/mgOKIvpOAmC9YNtdbiENNijRAyZg=;
+ b=vtTrsa8YMWab7BzCBdrjrxZ1lAgfY4kv+jWWgDSU1atlITI1F409zDNfeA/PExLhgW
+ +x8Op13CAO23YVHtSo3UrD1av4NaEarrhAUAhc4Hbo45GgURFEzP1XyJ3S01ct5bjYSg
+ 2e4xx9quISyg6jRWI+ybAYSU+rztD9+IyNxSJAOsKpDBQgzQfX6f9F2L2In+bEukjhtK
+ oGlEk1Yt86t5+3FKrdWsJi4f76xdWCDJ5R5G6MBpHH7yI+0sluPokddjrhKHC6+tLFxy
+ Ql9It0RWzW6I4h7NsCU6YmYaWM3fM2IKImfwjpAd8EN9w21pFMOCombMiIWlrJYveyAx
+ wvhQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=XjErLDWBOLV/N9/mgOKIvpOAmC9YNtdbiENNijRAyZg=;
+ b=eFVLyp+H9s/3megHHQUsuA7Q/ceZch7cLlpv6Ti7a1wvYvGipVJEPEKTpLTy5K+U4P
+ JsFrBrZX2CaUYF6DWQuNEhiU8AXWIhFOE4CArRIFenkr8AqvVVD84EHWuig8558tsejw
+ nSC6YKNWi1AdqdgMYbYVZKfDycARdfRmFukTG7szjrJVNYPgWe7r6V2savRda7ivn1Wx
+ wa8FiXqZcO4EZgdVDHYk8YxtHJJ7uqQRqoU0yMcgOpC/1AyycuXY4Lt9x4uX9+P/G0Wo
+ r0BhsvK3ghGU0Sh8UiGZaD3c7bntZuI/B7N/Gno9aKWg/rMNATLceYpQex5TcuLhohen
+ 6GaA==
+X-Gm-Message-State: APjAAAU7YNFMVSZxqlpqlftNp9r7MbuxdHg6iS3/GDSKCCPYFIkXsKck
+ uPUmQONIrcwpTKJSdC3yrgkInFg3n5JtYNdMQmr6mQ==
+X-Google-Smtp-Source: APXvYqzASUnubXKy5bBprutKlhbMqJXvdcUjaGkaHplx+tDaFlEo06IMPEfRLjhq32/65EM3VwL3Lg89EJQMVeDB96I=
+X-Received: by 2002:a9d:6a0f:: with SMTP id g15mr22494766otn.135.1563817332225; 
+ Mon, 22 Jul 2019 10:42:12 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190718091726.9874-4-yury-kotov@yandex-team.ru>
-User-Agent: Mutt/1.12.0 (2019-05-25)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Mon, 22 Jul 2019 17:35:30 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 3/3] tests/migration: Add a test for
- auto converge
+References: <20190722161657.8188-1-pbonzini@redhat.com>
+In-Reply-To: <20190722161657.8188-1-pbonzini@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 22 Jul 2019 18:42:01 +0100
+Message-ID: <CAFEAcA_TMSKqAGk0AZy4v9EA15qz8Vu+gzfHb7ngPt5XzWiLFg@mail.gmail.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::344
+Subject: Re: [Qemu-devel] [PULL 0/2] More fixes for QEMU 4.1.0-rc2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,185 +86,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Juan Quintela <quintela@redhat.com>, Stefan Weil <sw@weilnetz.de>,
- Peter Crosthwaite <crosthwaite.peter@gmail.com>,
- "open list:Overall" <qemu-devel@nongnu.org>, yc-core@yandex-team.ru,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Yury Kotov (yury-kotov@yandex-team.ru) wrote:
-> Signed-off-by: Yury Kotov <yury-kotov@yandex-team.ru>
+On Mon, 22 Jul 2019 at 17:17, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> The following changes since commit 23da9e297b4120ca9702cabec91599a44255fe96:
+>
+>   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20190722' into staging (2019-07-22 15:16:48 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/bonzini/qemu.git tags/for-upstream
+>
+> for you to fetch changes up to 20b25d239ab7a94bb8bff3d0f13a9527ee75cf10:
+>
+>   i386/kvm: Do not sync nested state during runtime (2019-07-22 18:16:05 +0200)
+>
+> ----------------------------------------------------------------
+> Two more bugfix patches that came in over the weekend.
+>
+> ----------------------------------------------------------------
+> Jan Kiszka (1):
+>       i386/kvm: Do not sync nested state during runtime
+>
+> Zhengui li (1):
+>       virtio-scsi: fixed virtio_scsi_ctx_check failed when detaching scsi disk
 
-This looks OK to me, but have you tried it on a really really overloaded
-host?
-I worry that you might skip some of the percentage steps or not hit the
-bandwidth on the small overloaded VMs we get in CI.
+Hi; this fails "make check" (all hosts):
 
-Dave
+MALLOC_PERTURB_=${MALLOC_PERTURB_:-$(( ${RANDOM:-0} % 255 + 1))}
+QTEST_QEMU_BINARY=arm-softmmu/qemu-system-arm QTEST_QEMU_IMG=qemu-img
+tests/qos-test -m=quick -k --tap < /dev/null | ./scripts/tap-driver.pl
+--test-name="qos-test"
+PASS 1 qos-test /arm/imx25-pdk/imx.i2c/i2c-bus/ds1338/ds1338-tests/tx-rx
+PASS 2 qos-test /arm/imx25-pdk/imx.i2c/i2c-bus/pca9552/pca9552-tests/tx-rx
+PASS 3 qos-test /arm/imx25-pdk/imx.i2c/i2c-bus/pca9552/pca9552-tests/rx-autoinc
+[...]
+PASS 35 qos-test
+/arm/virt/virtio-mmio/virtio-bus/virtio-net-device/virtio-net/virtio-net-tests/large_tx/uint_max
+PASS 36 qos-test
+/arm/virt/virtio-mmio/virtio-bus/virtio-net-device/virtio-net/virtio-net-tests/large_tx/net_bufsize
+PASS 37 qos-test
+/arm/virt/virtio-mmio/virtio-bus/virtio-rng-device/virtio/virtio-tests/nop
+Broken pipe
+/home/linux1/qemu/tests/libqtest.c:145: kill_qemu() detected QEMU
+death from signal 11 (Segmentation fault) (core dumped)
+Aborted (core dumped)
+ERROR - too few tests run (expected 44, got 37)
+/home/linux1/qemu/tests/Makefile.include:899: recipe for target
+'check-qtest-arm' failed
 
-> ---
->  tests/migration-test.c | 119 +++++++++++++++++++++++++++++++++++++----
->  1 file changed, 108 insertions(+), 11 deletions(-)
-> 
-> diff --git a/tests/migration-test.c b/tests/migration-test.c
-> index a4feb9545d..bb69517fc8 100644
-> --- a/tests/migration-test.c
-> +++ b/tests/migration-test.c
-> @@ -241,6 +241,17 @@ static int64_t read_ram_property_int(QTestState *who, const char *property)
->      return result;
->  }
->  
-> +static int64_t read_migrate_property_int(QTestState *who, const char *property)
-> +{
-> +    QDict *rsp_return;
-> +    int64_t result;
-> +
-> +    rsp_return = migrate_query(who);
-> +    result = qdict_get_try_int(rsp_return, property, 0);
-> +    qobject_unref(rsp_return);
-> +    return result;
-> +}
-> +
->  static uint64_t get_migration_pass(QTestState *who)
->  {
->      return read_ram_property_int(who, "dirty-sync-count");
-> @@ -255,20 +266,22 @@ static void read_blocktime(QTestState *who)
->      qobject_unref(rsp_return);
->  }
->  
-> +static bool check_migration_status(QTestState *who, const char *status)
-> +{
-> +    bool completed;
-> +    char *current_status;
-> +
-> +    current_status = migrate_query_status(who);
-> +    completed = strcmp(current_status, status) == 0;
-> +    g_assert_cmpstr(current_status, !=, "failed");
-> +    g_free(current_status);
-> +    return completed;
-> +}
-> +
->  static void wait_for_migration_status(QTestState *who,
->                                        const char *goal)
->  {
-> -    while (true) {
-> -        bool completed;
-> -        char *status;
-> -
-> -        status = migrate_query_status(who);
-> -        completed = strcmp(status, goal) == 0;
-> -        g_assert_cmpstr(status, !=,  "failed");
-> -        g_free(status);
-> -        if (completed) {
-> -            return;
-> -        }
-> +    while (!check_migration_status(who, goal)) {
->          usleep(1000);
->      }
->  }
-> @@ -1121,6 +1134,89 @@ static void test_migrate_fd_proto(void)
->      test_migrate_end(from, to, true);
->  }
->  
-> +static void test_migrate_auto_converge(void)
-> +{
-> +    char *uri = g_strdup_printf("unix:%s/migsocket", tmpfs);
-> +    QTestState *from, *to;
-> +    int i;
-> +    int64_t remaining, downtime;
-> +
-> +    /*
-> +     * We want the test to be fast enough, but stable.
-> +     * Throttle percentages are chosen to cover all cases (init, increment, max)
-> +     */
-> +    static const int64_t expected_pcts[] = { 0, 1, 51, 98 };
-> +    const int64_t max_bandwidth = 200000000; /* ~200Mb/s */
-> +    const int64_t downtime_limit = 50; /* 50ms */
-> +    /*
-> +     * We migrate through unix-socket (> 500Mb/s).
-> +     * Thus, expected migration speed ~= bandwidth limit (< 500Mb/s).
-> +     * So, we can predict expected_threshold
-> +     */
-> +    const int64_t expected_threshold = max_bandwidth * downtime_limit / 1000;
-> +
-> +    if (test_migrate_start(&from, &to, uri, false, false)) {
-> +        return;
-> +    }
-> +
-> +    migrate_set_capability(from, "auto-converge", true);
-> +    migrate_set_parameter_int(from, "cpu-throttle-initial", expected_pcts[1]);
-> +    migrate_set_parameter_int(from, "cpu-throttle-increment",
-> +                              expected_pcts[2] - expected_pcts[1]);
-> +    migrate_set_parameter_int(from, "max-cpu-throttle", expected_pcts[3]);
-> +
-> +    migrate_set_parameter_int(from, "max-bandwidth", max_bandwidth);
-> +    migrate_set_parameter_int(from, "downtime-limit", downtime_limit);
-> +
-> +    /* To check remaining size after precopy */
-> +    migrate_set_capability(from, "pause-before-switchover", true);
-> +
-> +    /* Wait for the first serial output from the source */
-> +    wait_for_serial("src_serial");
-> +
-> +    migrate(from, uri, "{}");
-> +
-> +    for (i = 0; i < ARRAY_SIZE(expected_pcts); i++) {
-> +        int64_t pct;
-> +        pct = read_migrate_property_int(from, "cpu-throttle-percentage");
-> +        g_assert_cmpint(pct, ==, expected_pcts[i]);
-> +        while (pct == expected_pcts[i] && !got_stop) {
-> +            usleep(1000);
-> +            pct = read_migrate_property_int(from, "cpu-throttle-percentage");
-> +        }
-> +        /* We break out of this loop only in paused state */
-> +        if (got_stop || i + 1 == ARRAY_SIZE(expected_pcts)) {
-> +            /* Check unexpected throttle percentage change */
-> +            g_assert_true(got_stop);
-> +            /* Check unexpected converge */
-> +            g_assert_cmpint(i + 1, ==, ARRAY_SIZE(expected_pcts));
-> +            g_assert_true(check_migration_status(from, "pre-switchover"));
-> +        }
-> +    }
-> +
-> +    remaining = read_ram_property_int(from, "remaining");
-> +    g_assert_cmpint(remaining, <, expected_threshold);
-> +
-> +    wait_command(from, "{ 'execute': 'migrate-continue' , 'arguments':"
-> +                       "  { 'state': 'pre-switchover' } }");
-> +
-> +    qtest_qmp_eventwait(to, "RESUME");
-> +
-> +    wait_for_serial("dest_serial");
-> +    wait_for_migration_complete(from);
-> +
-> +    downtime = read_migrate_property_int(from, "downtime");
-> +    /*
-> +     * Actual downtime may be greater than downtime limit,
-> +     * but the difference should be small enough (~20ms)
-> +     */
-> +    g_assert_cmpint(downtime, <, downtime_limit + 20);
-> +
-> +    g_free(uri);
-> +
-> +    test_migrate_end(from, to, true);
-> +}
-> +
->  int main(int argc, char **argv)
->  {
->      char template[] = "/tmp/migration-test-XXXXXX";
-> @@ -1176,6 +1272,7 @@ int main(int argc, char **argv)
->      /* qtest_add_func("/migration/ignore_shared", test_ignore_shared); */
->      qtest_add_func("/migration/xbzrle/unix", test_xbzrle_unix);
->      qtest_add_func("/migration/fd_proto", test_migrate_fd_proto);
-> +    qtest_add_func("/migration/auto_converge", test_migrate_auto_converge);
->  
->      ret = g_test_run();
->  
-> -- 
-> 2.22.0
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Segfault seems to be on the test
+/arm/virt/virtio-mmio/virtio-bus/virtio-scsi-device/virtio-scsi/virtio-scsi-tests/hotplug
+
+Here's a backtrace (on an s390 box, which happened to be the
+easiest to investigate on):
+
+Thread 1 "qemu-system-arm" received signal SIGSEGV, Segmentation fault.
+0x000000010043feda in aio_disable_external (ctx=0x0) at
+/home/linux1/qemu/include/block/aio.h:493
+493         atomic_inc(&ctx->external_disable_cnt);
+(gdb) bt
+#0  0x000000010043feda in aio_disable_external (ctx=0x0) at
+/home/linux1/qemu/include/block/aio.h:493
+#1  virtio_scsi_hotunplug (hotplug_dev=0x101b19040, dev=0x101c00c00,
+errp=0x3ffffffe798)
+    at /home/linux1/qemu/hw/scsi/virtio-scsi.c:844
+#2  0x000000010053a874 in qdev_unplug (dev=0x101c00c00,
+errp=0x3ffffffe848) at /home/linux1/qemu/qdev-monitor.c:831
+#3  0x0000000100746c3a in qmp_marshal_device_del (args=<optimized
+out>, ret=<optimized out>, errp=0x3ffffffe918)
+    at qapi/qapi-commands-qdev.c:99
+#4  0x0000000100847f98 in do_qmp_dispatch (errp=0x3ffffffe910,
+allow_oob=false, request=0x3ffdc004b00,
+    cmds=<optimized out>) at /home/linux1/qemu/qapi/qmp-dispatch.c:131
+#5  qmp_dispatch (cmds=<optimized out>, request=0x3ffdc004b00,
+allow_oob=<optimized out>)
+    at /home/linux1/qemu/qapi/qmp-dispatch.c:174
+#6  0x00000001007176a8 in monitor_qmp_dispatch
+(mon=mon@entry=0x10123eef0, req=<optimized out>)
+    at /home/linux1/qemu/monitor/qmp.c:120
+#7  0x0000000100717e92 in monitor_qmp_bh_dispatcher (data=<optimized
+out>) at /home/linux1/qemu/monitor/qmp.c:209
+#8  0x0000000100894a60 in aio_bh_call (bh=0x10115ec20) at
+/home/linux1/qemu/util/async.c:89
+#9  aio_bh_poll (ctx=<optimized out>) at /home/linux1/qemu/util/async.c:117
+#10 0x0000000100898970 in aio_dispatch (ctx=0x10115e090) at
+/home/linux1/qemu/util/aio-posix.c:459
+#11 0x00000001008948f0 in aio_ctx_dispatch (source=<optimized out>,
+callback=<optimized out>, user_data=<optimized out>)
+    at /home/linux1/qemu/util/async.c:260
+#12 0x000003fffcb5051e in g_main_context_dispatch () from
+/lib/s390x-linux-gnu/libglib-2.0.so.0
+#13 0x000000010089778a in glib_pollfds_poll () at
+/home/linux1/qemu/util/main-loop.c:218
+#14 os_host_main_loop_wait (timeout=<optimized out>) at
+/home/linux1/qemu/util/main-loop.c:241
+#15 main_loop_wait (nonblocking=<optimized out>) at
+/home/linux1/qemu/util/main-loop.c:517
+#16 0x000000010053f182 in main_loop () at /home/linux1/qemu/vl.c:1791
+
+
+
+You might as well fix the commit message mojibake Philippe pointed
+out when you do the respin...
+
+thanks
+-- PMM
 
