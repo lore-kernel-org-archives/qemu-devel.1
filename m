@@ -6,73 +6,67 @@ X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9599CC7618F
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 16:47:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF5F1C76190
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 16:52:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6D70721901
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 16:47:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D70721901
+	by mail.kernel.org (Postfix) with ESMTPS id 9BBDB21738
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 16:52:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9BBDB21738
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35960 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35982 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hpbT8-0002A7-JI
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jul 2019 12:47:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39934)
+	id 1hpbXg-0004Cc-Oo
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jul 2019 12:52:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42625)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <pbonzini@redhat.com>) id 1hpbSx-0001e4-QB
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 12:47:13 -0400
+ (envelope-from <lersek@redhat.com>) id 1hpbXW-0003mB-VC
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 12:51:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1hpbSs-0002EB-8V
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 12:47:09 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:38266)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hpbSm-0001e7-AD
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 12:47:04 -0400
-Received: by mail-wr1-f67.google.com with SMTP id g17so40154258wrr.5
- for <qemu-devel@nongnu.org>; Mon, 22 Jul 2019 09:46:31 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=ntc9ImtHLpW3ApJuym0DELI99CgTGOti0SB1um2eOpM=;
- b=IBY54VHEr/fSmPIbs/+1UfdTeYndH+TZtTopb3EGfnzdNyP3XbKzTQRRKsMwbLVKHx
- +yB8WPkrXqOMN/VdHf8RQg0nIbdM+TLMJUbQb5E7c05NiP8SylLWWCs4c+pDCXR5oYfU
- G3u5Z1OZ73UxKQJmZ+yuVJdJng8jsKcE2ewHFxQH5T5q+k3ixgPKJG/bG14/iKvwFno2
- 9xsk4RH7VGGjaleGEg6ZgDc4zxGMNp2cuKdkzopBcuSNAcJwirINHWNUnU3ZWyAa8RcB
- ujTWxi/3/aXvRthuGuozLrR5uusjf5F2QAweV/ZKnpeNmlsmyLsxROGV2nuILpK7yxB5
- mdYQ==
-X-Gm-Message-State: APjAAAXDPCQRuzC9LiHJKvs/Hx0bnERj1mwHXBRFgFiHagWDCdVs005w
- QwHjIxEjceZmvpo3y0qOzhLbrw==
-X-Google-Smtp-Source: APXvYqyWvFMRAGOuVumUhfiY6lSeJcni7DHiUwuW3VJj3Ff/83tB8a2JQbLNoaL59ndCKW5tXCezgA==
-X-Received: by 2002:adf:da4d:: with SMTP id r13mr43853796wrl.281.1563813990031; 
- Mon, 22 Jul 2019 09:46:30 -0700 (PDT)
-Received: from [192.168.10.150] ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id x20sm30607062wmc.1.2019.07.22.09.46.29
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Mon, 22 Jul 2019 09:46:29 -0700 (PDT)
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>,
- qemu-devel@nongnu.org, pavel.dovgaluk@ispras.ru
-References: <20190722150717.10564-1-dgilbert@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <5d28678c-64c5-a3b9-0b2f-150dce1ad17e@redhat.com>
-Date: Mon, 22 Jul 2019 18:46:28 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <lersek@redhat.com>) id 1hpbXV-0006tq-O7
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 12:51:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33614)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <lersek@redhat.com>)
+ id 1hpbXT-0006pY-5j; Mon, 22 Jul 2019 12:51:51 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 2781581F0D;
+ Mon, 22 Jul 2019 16:51:47 +0000 (UTC)
+Received: from lacos-laptop-7.usersys.redhat.com (ovpn-117-23.ams2.redhat.com
+ [10.36.117.23])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2A6FC5B681;
+ Mon, 22 Jul 2019 16:51:35 +0000 (UTC)
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20190718104837.13905-1-philmd@redhat.com>
+ <20190718104837.13905-2-philmd@redhat.com>
+ <5e6b8a67-8f8a-3e3b-4f42-db2a31c03ad1@redhat.com>
+ <d4d20337-b504-0610-8aaf-c8b0b13f0953@redhat.com>
+ <053eeafe-4e93-aa96-f544-ea0606e244b6@redhat.com>
+ <689b75f8-ae47-621f-44a5-f3ad07fe2661@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <63ff0471-aa50-f60d-417b-c42d315e02e3@redhat.com>
+Date: Mon, 22 Jul 2019 18:51:35 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.9.1
 MIME-Version: 1.0
-In-Reply-To: <20190722150717.10564-1-dgilbert@redhat.com>
+In-Reply-To: <689b75f8-ae47-621f-44a5-f3ad07fe2661@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.27]); Mon, 22 Jul 2019 16:51:47 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.221.67
-Subject: Re: [Qemu-devel] [for 4.2 PATCH 0/3] Remove time reset notifications
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH-for-4.1 v7 1/1] hw/block/pflash_cfi01: Add
+ missing DeviceReset() handler
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,36 +78,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Alistair Francis <alistair.francis@wdc.com>, John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 22/07/19 17:07, Dr. David Alan Gilbert (git) wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> 
-> Timers have a mechanism for detecting host clock jumps; this relied
-> on noticing if the time had gone backwards or if it had gone forward
-> more than 60s since we last read it.  This had assumed that we regularly
-> read the time, which isn't true any more - we might not read the host
-> timer until the guest explicitly reads the guest RTC (e.g. hwclock).
-> This falsely triggers the reset mechanism.
-> 
-> The reset mechanism was only used by the mc146818 (i.e. PC) RTC
-> anyway; so lets remove it.
-> 
-> Dr. David Alan Gilbert (3):
->   mc146818rtc: Remove reset notifiers
->   timer: Remove reset notifiers
->   timer: last, remove last bits of last
-> 
->  hw/timer/mc146818rtc.c   | 19 -------------------
->  include/qemu/timer.h     | 35 ----------------------------------
->  replay/replay-snapshot.c |  3 +--
->  util/qemu-timer.c        | 41 +---------------------------------------
->  4 files changed, 2 insertions(+), 96 deletions(-)
-> 
+On 07/19/19 18:19, Philippe Mathieu-Daud=C3=A9 wrote:
+> Hi Laszlo,
+>=20
+> On 7/18/19 9:35 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+>> On 7/18/19 8:38 PM, Laszlo Ersek wrote:
+>>> On 07/18/19 17:03, Laszlo Ersek wrote:
+>>>> On 07/18/19 12:48, Philippe Mathieu-Daud=C3=A9 wrote:
+>>>>> To avoid incoherent states when the machine resets (see but report
+> [...]>>> (3) Using OVMF IA32X64 (including the edk2 SMM stack), I've
+>>>> regression-tested this patch, on top of v4.1.0-rc1, with KVM. As fol=
+lows:
+>>>>
+>>>> (3a) Normal reboot from the UEFI shell ("reset -c" command)
+>>>>
+>>>> (3b) Normal reboot from the Linux guest prompt ("reboot" command)
+>>>>
+>>>> (3c1) Reset as part of ACPI S3 suspend/resume
+>>>> (3c2) then use "efibootmgr -n / -N" to write to pflash (by virtue of
+>>>> setting / deleting the standardized BootNext UEFI variable)
+>>>>
+>>>> (3d1) Boot to setup TUI with SB enabled
+>>>> (3d2) erase Platform Key in setup TUI (disables SB)
+>>>> (3d3) reboot from within setup TUI
+>>>> (3d4) proceed to UEFI shell
+>>>> (3d5) enable SB with EnrollDefaultKeys.efi
+>>>> (3d6) reboot from UEFI shell
+>>>> (3d7) proceeed to Linux guest
+>>>> (3d8) verify SB enablement (dmesg, "mokutil --sb-state")
+>>>>
+>>>> (As an added exercise, step (3d4) triggered an "FTW" (fault tolerant
+>>>> write) "reclaim" (basically a defragmentation of the journaled
+>>>> "filesystem" that the firmware keeps in the flash, as a logical "mid=
+dle
+>>>> layer"), and that worked fine too.)
+>>>>
+>>>> Regression-tested-by: Laszlo Ersek <lersek@redhat.com>
+>>>>
+>>>>
+>>>> (4) I plan to provide R-t-b in the evening from aarch64 KVM too, usi=
+ng
+>>>> the edk2 ArmVirtQemu firmware. Only the first two steps from (3) wil=
+l be
+>>>> covered (no ACPI S3, no SB).
+>>>
+>>> Regression-tested-by: Laszlo Ersek <lersek@redhat.com>
+>=20
+> Patchwork doesn't recognize your R-t-b tag:
+>=20
+> https://patchwork.ozlabs.org/patch/1133671/
+>=20
+> Should I change it for a Tested-by, or add as it?
 
-Queued, thanks.
+Please pick it up manually, as it is, if that's possible.
 
-Paolo
+I prefer to dedicate "Tested-by" to cases where my before-after
+comparison highlights a difference (i.e., bug disappears, or feature
+appears). I dedicate "R-t-b" to cases where nothing observable changes
+(in accordance with my expectation).
+
+Thanks!
+Laszlo
+
+>> Thank you a lot again for all your testing, I also noted your steps an=
+d
+>> will try to automate them.
+>>
+>> Best regards,
+>>
+>> Phil.
+>>
+
 
