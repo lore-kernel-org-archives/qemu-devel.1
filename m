@@ -2,116 +2,67 @@ Return-Path: <SRS0=EA86=VT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DCB87C76195
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 18:58:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9AF1C7618F
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 19:07:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B07B320693
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 18:58:51 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BsDXqixy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B07B320693
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=twiddle.net
+	by mail.kernel.org (Postfix) with ESMTPS id B27E021955
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 19:07:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B27E021955
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36820 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36878 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hpdWM-00062N-Tl
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jul 2019 14:58:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50832)
+	id 1hpdei-0001D5-Ml
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jul 2019 15:07:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53360)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <rth7680@gmail.com>) id 1hpdWD-0005co-4q
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 14:58:41 -0400
+ (envelope-from <alex.williamson@redhat.com>) id 1hpdeY-0000op-MT
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 15:07:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <rth7680@gmail.com>) id 1hpdWC-0000HL-5W
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 14:58:41 -0400
-Received: from mail-pg1-x533.google.com ([2607:f8b0:4864:20::533]:34777)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <rth7680@gmail.com>)
- id 1hpdW4-0000A3-Vt; Mon, 22 Jul 2019 14:58:33 -0400
-Received: by mail-pg1-x533.google.com with SMTP id n9so11877479pgc.1;
- Mon, 22 Jul 2019 11:58:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:openpgp:autocrypt:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=778redPwBop63aanqBNZExbsIMOCHcXFJM54Q15/E4k=;
- b=BsDXqixydvvsC5MKoaFT8ng6kAg/l3wZltQT5aHjY5FT4BpTxlORcjFXsE9DaH4TEn
- jLJPsHNbK6lJCqRwWc1fuS5GT8laMFv3CTBgAPdl7auHJ/J1PUGxzydNP+D03THsLWhY
- +DzyMmtyrLSUYfSa8l8wC/1C7fEbSajyj8iySkqQXzn1ATP9HtGK4vd2tkU9QExdA2lG
- 0iZgn5i4cEWbe0NxwguxVn0H7rcLMXqjkGAoY19B++9EhWhUSffdjiY+ttEigvUviGgG
- kRjVcf7I/+CQGbrJ6djW23/pnljdhILRmC7cQITx0OLp/sYda7BakBry9DdBDUV4+jNm
- 7kZw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:openpgp
- :autocrypt:message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=778redPwBop63aanqBNZExbsIMOCHcXFJM54Q15/E4k=;
- b=lA7OTR0VYTeEE7W/R3iLSkB4tg6AGb/SSZ4hFyXiZZisZSPju4XYq8B1VLI/15AOqL
- x9RJhtxRDYari78bAjrhyEGk5LVkLViCx26HfSfCVx0UrP9cmMruec6ERjKzJoJSbqtQ
- yTFtLa7QEPp27Cz/jNuybUeZJRLMLQOqSDXE+Yh5Bsc2z99LxyzdCLCZPn/t/uGKAKu7
- ygXJ24nqnO4pePHss1gHhcrNTdD0gBIsw7oErmOCAGyOJmdWx/RhaNjR4KzJ47S7E/SA
- Yv3QBXsKPfXGF8hbypVAvFiAhzVJZkfYlY8B45hzd2xmCQhcKpWMaE05Nlz4/hPQ53cW
- b9Aw==
-X-Gm-Message-State: APjAAAV6pHvHr6qA0lbRUE4YF9PwK6zNxMr1+IrmhZ0G9DJYzlrw/fMh
- H67QFByG9891vHYB3a3QTqY=
-X-Google-Smtp-Source: APXvYqygMZtF0TDKR4T2Nj6XsQSkba5WVd5bcXe/HTb6kifQvZ8twT3QAcMGcl6LJpUZM1gv8EiD4A==
-X-Received: by 2002:a63:6eca:: with SMTP id j193mr71432686pgc.74.1563821911378; 
- Mon, 22 Jul 2019 11:58:31 -0700 (PDT)
-Received: from [192.168.1.11] (97-126-117-207.tukw.qwest.net. [97.126.117.207])
- by smtp.googlemail.com with ESMTPSA id u6sm35921093pjx.23.2019.07.22.11.58.29
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 22 Jul 2019 11:58:30 -0700 (PDT)
-To: tony.nguyen@bt.com, richard.henderson@linaro.org, qemu-devel@nongnu.org
-References: <e9c6e5310b1a4863be45d45bf087fc3d@tpw09926dag18e.domain1.systemhost.net>
- <2b6eb033-4b6e-4d64-c57e-a3257088d0dd@linaro.org>
- <1563812889499.73128@bt.com>
-From: Richard Henderson <rth@twiddle.net>
-Openpgp: preference=signencrypt
-Autocrypt: addr=rth@twiddle.net; prefer-encrypt=mutual; keydata=
- mQENBFGuLC8BCADcAoWcnW9lTsDMzbO3MBU+KbiGaj5JPatEUscRDkQYM2fyNjJp2tIWDK5a
- n4yngeXB3eX61WbYR3QraRK8mlYLGxyAdHMEQfPipbqf3TmN043fssT2bc82ApJcs1zvLYgI
- rhMht7Dck7A0wNC1jo+ZjVVFig5gDTN7gOzaAdBtV8tVNUddwkLzzaGpfihhSD6U46NdqKOG
- Wlnn6TrkMy0QGdQ5NaXHkRlUjnnUTSW/nKfoxD+EI+A9V4sYOd8mc/TL4aJh/i/AiU57eLbo
- n17uQI6/VTWDUWl8USiz4x9c8vmqlywLx00tAFxxoRWqk4KVJlj+Sh0up/D/sJ+vPpgBABEB
- AAG0I1JpY2hhcmQgSGVuZGVyc29uIDxydGhAdHdpZGRsZS5uZXQ+iQFBBBMBAgArAhsDBgsJ
- CAcDAgYVCAIJCgsEFgIDAQIeAQIXgAUJC7UHogUCWaDNVgIZAQAKCRCtEnDMTdAnm9N5CADO
- cB8F/SudJ72IupxQf40hbJdBK176+gb3sHMsixyLtrU59lee+lIM1OZmlNjsnCYmiSnbA5ks
- Q7p0HfO7DgdmfLzcK6xsHZukqSZy5LByw348Y913ZyjOrJZFdPP7kDg1MnqRqH4+3ZdzxV4y
- eYBWFU9GYMIF06JbUubossOOO4ArNVZbnIPu8Vn2tDZVVqsCBqkoCSBMj519xrvyOu5z4mHS
- LkCglXmVDOXMbqLuNAC3rfNXSnyM4hYkLUyfALJlAAy1Ro+jUqYhu7XUFV/MiwRuFMh5GbtY
- Urkx7tqsWQXLT3GeDk/LqvpWJQwk4cHHckYjRih+70CHIenm81PVuQENBFGuLC8BCACyEx3x
- 94HIkTX0CHu2sA0w75+h9wuoA8ggJ7+S4ri0y2YsijWad5TTt6z6MMiqxk9kSA5bppaj4HXh
- 86hBF/dWCtMpNr3Rb8FNOKyeA/qkYHVD6HiAiw9c6D8Dr9hWmOk3/HSmGrNURxeUFOckDXsv
- I+yGGKBNshj59j7QZr7ZiuIi2rWlBL8dFN/OWa/o3x7HKsE4k6K8ngwvCKP/QbDLwLLBOWH+
- VEUtpyeyxTr3OJ47ECTxdYvXoAV2iJaKr+6doVQiiR5eVFiMYrUPUECJeolOCwqc/JlWE18L
- +PCAFaW1H+/mpPVfSpN4wnkJ5cQiQVB41IaCM4p20iRzx7ZJABEBAAGJASUEGAECAA8CGwwF
- AlmgzYEFCQu1CEoACgkQrRJwzE3QJ5s7rggAwABzDAGrZ6uWsMxg5PeiiAYPy6LBnCBJSpB5
- Tfy5jH8QTmLfXW+u4Ib4sWXG7PYNR7sIrtqUHjRqXLVXrSnBX9ASGcYw/Xil45khW6LsRpO1
- prHv9gkwQfa6fTiWXVfSfm2Nant6u02q+MaYtQpCVTiz/9ki4FfftUwUHFLU0MhIQogjd11y
- /E08RJsqBwaHQdt14PwU1HphDOzSkhOXRXQLSd3ysyeGUXvL+gqQoXl5XYdvk8IId4PoJRo4
- jcyJ4VbnldvXh5gdGhFA/f9JgkLk9tPW+C3wNtNWyRUq8azR9hF2fg2HJUf4IXQlIu8OOgh1
- VcROBqvtH3ecaIL9iw==
-Message-ID: <87eacdfd-8ad9-c08d-33d1-adb2bd989267@twiddle.net>
-Date: Mon, 22 Jul 2019 11:58:28 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <alex.williamson@redhat.com>) id 1hpdeX-0005K4-8o
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 15:07:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50336)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+ id 1hpdeX-0005Ja-0R
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 15:07:17 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 31B14307D844;
+ Mon, 22 Jul 2019 19:07:15 +0000 (UTC)
+Received: from x1.home (ovpn-116-35.phx2.redhat.com [10.3.116.35])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6C3B619C6A;
+ Mon, 22 Jul 2019 19:07:13 +0000 (UTC)
+Date: Mon, 22 Jul 2019 13:07:13 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Yan Zhao <yan.y.zhao@intel.com>
+Message-ID: <20190722130713.2aaa0446@x1.home>
+In-Reply-To: <20190722032028.GJ8912@joy-OptiPlex-7040>
+References: <1562665760-26158-1-git-send-email-kwankhede@nvidia.com>
+ <1562665760-26158-11-git-send-email-kwankhede@nvidia.com>
+ <20190712025213.GH9176@joy-OptiPlex-7040>
+ <a8f67428-0f42-4b18-0cfd-02a21c3d4343@nvidia.com>
+ <20190722032028.GJ8912@joy-OptiPlex-7040>
+Organization: Red Hat
 MIME-Version: 1.0
-In-Reply-To: <1563812889499.73128@bt.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::533
-Subject: Re: [Qemu-devel] [PATCH v2 00/20] Invert Endian bit in SPARCv9 MMU
- TTE
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.48]); Mon, 22 Jul 2019 19:07:15 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v7 10/13] vfio: Add load state functions to
+ SaveVMHandlers
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -123,26 +74,148 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, walling@linux.ibm.com, mst@redhat.com,
- palmer@sifive.com, mark.cave-ayland@ilande.co.uk, Alistair.Francis@wdc.com,
- arikalo@wavecomp.com, david@redhat.com, pasic@linux.ibm.com,
- borntraeger@de.ibm.com, atar4qemu@gmail.com, ehabkost@redhat.com,
- sw@weilnetz.de, alex.williamson@redhat.com, qemu-arm@nongnu.org,
- david@gibson.dropbear.id.au, qemu-riscv@nongnu.org, cohuck@redhat.com,
- claudio.fontana@huawei.com, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org,
- amarkovic@wavecomp.com, pbonzini@redhat.com, aurelien@aurel32.net
+Cc: "Tian, Kevin" <kevin.tian@intel.com>, "Liu,
+ Yi L" <yi.l.liu@intel.com>, "cjia@nvidia.com" <cjia@nvidia.com>,
+ "eskultet@redhat.com" <eskultet@redhat.com>, "Yang,
+ Ziye" <ziye.yang@intel.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>,
+ "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>,
+ "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "dgilbert@redhat.com" <dgilbert@redhat.com>,
+ "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>,
+ Kirti Wankhede <kwankhede@nvidia.com>, "eauger@redhat.com" <eauger@redhat.com>,
+ "cohuck@redhat.com" <cohuck@redhat.com>,
+ "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>,
+ "felipe@nutanix.com" <felipe@nutanix.com>,
+ "mlevitsk@redhat.com" <mlevitsk@redhat.com>, "Liu, 
+ Changpeng" <changpeng.liu@intel.com>, "Wang, Zhi A" <zhi.a.wang@intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/22/19 9:28 AM, tony.nguyen@bt.com wrote:
-> Do you prefer the v1 implementation of making TCGMemOp -> MemOp?
+On Sun, 21 Jul 2019 23:20:28 -0400
+Yan Zhao <yan.y.zhao@intel.com> wrote:
 
-Yes, I did prefer moving the entire enum.
+> On Fri, Jul 19, 2019 at 03:00:13AM +0800, Kirti Wankhede wrote:
+> > 
+> > 
+> > On 7/12/2019 8:22 AM, Yan Zhao wrote:  
+> > > On Tue, Jul 09, 2019 at 05:49:17PM +0800, Kirti Wankhede wrote:  
+> > >> Flow during _RESUMING device state:
+> > >> - If Vendor driver defines mappable region, mmap migration region.
+> > >> - Load config state.
+> > >> - For data packet, till VFIO_MIG_FLAG_END_OF_STATE is not reached
+> > >>     - read data_size from packet, read buffer of data_size
+> > >>     - read data_offset from where QEMU should write data.
+> > >>         if region is mmaped, write data of data_size to mmaped region.
+> > >>     - write data_size.
+> > >>         In case of mmapped region, write to data_size indicates kernel
+> > >>         driver that data is written in staging buffer.
+> > >>     - if region is trapped, pwrite() data of data_size from data_offset.
+> > >> - Repeat above until VFIO_MIG_FLAG_END_OF_STATE.
+> > >> - Unmap migration region.
+> > >>
+> > >> For user, data is opaque. User should write data in the same order as
+> > >> received.
+> > >>
+> > >> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+> > >> Reviewed-by: Neo Jia <cjia@nvidia.com>
+> > >> ---
+> > >>  hw/vfio/migration.c  | 162 +++++++++++++++++++++++++++++++++++++++++++++++++++
+> > >>  hw/vfio/trace-events |   3 +
+> > >>  2 files changed, 165 insertions(+)
+> > >>
+> > >> diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
+> > >> index 4e9b4cce230b..5fb4c5329ede 100644
+> > >> --- a/hw/vfio/migration.c
+> > >> +++ b/hw/vfio/migration.c
+> > >> @@ -249,6 +249,26 @@ static int vfio_save_device_config_state(QEMUFile *f, void *opaque)
+> > >>      return qemu_file_get_error(f);
+> > >>  }
+> > >>  
+> > >> +static int vfio_load_device_config_state(QEMUFile *f, void *opaque)
+> > >> +{
+> > >> +    VFIODevice *vbasedev = opaque;
+> > >> +    uint64_t data;
+> > >> +
+> > >> +    if (vbasedev->ops && vbasedev->ops->vfio_load_config) {
+> > >> +        vbasedev->ops->vfio_load_config(vbasedev, f);
+> > >> +    }
+> > >> +
+> > >> +    data = qemu_get_be64(f);
+> > >> +    if (data != VFIO_MIG_FLAG_END_OF_STATE) {
+> > >> +        error_report("%s: Failed loading device config space, "
+> > >> +                     "end flag incorrect 0x%"PRIx64, vbasedev->name, data);
+> > >> +        return -EINVAL;
+> > >> +    }
+> > >> +
+> > >> +    trace_vfio_load_device_config_state(vbasedev->name);
+> > >> +    return qemu_file_get_error(f);
+> > >> +}
+> > >> +
+> > >>  /* ---------------------------------------------------------------------- */
+> > >>  
+> > >>  static int vfio_save_setup(QEMUFile *f, void *opaque)
+> > >> @@ -421,12 +441,154 @@ static int vfio_save_complete_precopy(QEMUFile *f, void *opaque)
+> > >>      return ret;
+> > >>  }
+> > >>  
+> > >> +static int vfio_load_setup(QEMUFile *f, void *opaque)
+> > >> +{
+> > >> +    VFIODevice *vbasedev = opaque;
+> > >> +    VFIOMigration *migration = vbasedev->migration;
+> > >> +    int ret = 0;
+> > >> +
+> > >> +    if (migration->region.buffer.mmaps) {
+> > >> +        ret = vfio_region_mmap(&migration->region.buffer);
+> > >> +        if (ret) {
+> > >> +            error_report("%s: Failed to mmap VFIO migration region %d: %s",
+> > >> +                         vbasedev->name, migration->region.index,
+> > >> +                         strerror(-ret));
+> > >> +            return ret;
+> > >> +        }
+> > >> +    }
+> > >> +
+> > >> +    ret = vfio_migration_set_state(vbasedev, VFIO_DEVICE_STATE_RESUMING);
+> > >> +    if (ret) {
+> > >> +        error_report("%s: Failed to set state RESUMING", vbasedev->name);
+> > >> +    }
+> > >> +    return ret;
+> > >> +}
+> > >> +
+> > >> +static int vfio_load_cleanup(void *opaque)
+> > >> +{
+> > >> +    vfio_save_cleanup(opaque);
+> > >> +    return 0;
+> > >> +}
+> > >> +
+> > >> +static int vfio_load_state(QEMUFile *f, void *opaque, int version_id)
+> > >> +{
+> > >> +    VFIODevice *vbasedev = opaque;
+> > >> +    VFIOMigration *migration = vbasedev->migration;
+> > >> +    int ret = 0;
+> > >> +    uint64_t data, data_size;
+> > >> +  
+> > > I think checking of version_id is still needed.
+> > >   
+> > 
+> > Checking version_id with what value?
+> >  
+> this version_id passed-in is the source VFIO software interface id.
+> need to check it with the value in target side, right?
+> 
+> Though we previously discussed the sysfs node interface to check live
+> migration version even before launching live migration, I think we still
+> need this runtime software version check in qemu to ensure software
+> interfaces in QEMU VFIO are compatible.
 
-The use of MO_8 etc instead of MO_UB often emphasized that we were dealing only
-with a size without a sign.
+Do we want QEMU to interact directly with sysfs for that, which would
+require write privileges to sysfs, or do we want to suggest that vendor
+drivers should include equivalent information early in their migration
+data stream to force a migration failure as early as possible for
+incompatible data?  I think we need the latter regardless because the
+vendor driver should never trust userspace like that, but does that
+make any QEMU use of the sysfs version test itself redundant?  Thanks,
 
-
-r~
+Alex
 
