@@ -2,105 +2,88 @@ Return-Path: <SRS0=EA86=VT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A672C76188
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 12:58:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8471DC76188
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 13:15:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 295AE2084D
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 12:58:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 295AE2084D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4EBDA21921
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 13:15:07 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yRijLWEG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4EBDA21921
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33290 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33408 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hpXu2-0003Ub-Bm
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jul 2019 08:58:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43200)
+	id 1hpY9h-0000LY-L7
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jul 2019 09:15:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47603)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <thuth@redhat.com>) id 1hpXtq-00031u-Iq
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 08:58:43 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hpY9B-0007Ny-H3
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 09:14:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1hpXtp-00045P-M8
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 08:58:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54474)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>)
- id 1hpXtl-0003yg-Ax; Mon, 22 Jul 2019 08:58:37 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 60EA28E233;
- Mon, 22 Jul 2019 12:58:36 +0000 (UTC)
-Received: from thuth.remote.csb (dhcp-200-228.str.redhat.com [10.33.200.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 29CB65D72E;
- Mon, 22 Jul 2019 12:58:35 +0000 (UTC)
-To: Qemu-block <qemu-block@nongnu.org>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; keydata=
- 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
-Organization: Red Hat
-Message-ID: <c293e99d-331a-f3aa-eecb-d562554350f9@redhat.com>
-Date: Mon, 22 Jul 2019 14:58:34 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+ (envelope-from <peter.maydell@linaro.org>) id 1hpY9A-00034f-H6
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 09:14:33 -0400
+Received: from mail-wm1-x336.google.com ([2a00:1450:4864:20::336]:54279)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hpY9A-00033z-BA
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 09:14:32 -0400
+Received: by mail-wm1-x336.google.com with SMTP id p74so35118453wme.4
+ for <qemu-devel@nongnu.org>; Mon, 22 Jul 2019 06:14:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+ :content-transfer-encoding;
+ bh=GzeCjbtXLdqWVGSKySjABkNnwqpyaiVuNILnUkbYPsw=;
+ b=yRijLWEG7gpaqi6/bGZUuADYOKXuwlIG5GTnp/YPnmHFlULLz2p6q5oES24a/UiNDo
+ z8wvN79LI8wWOBmstyjFBqDo5YCN5JlJZLJvlE2k4YyoX6e53uR68AMN9AnpWxKTCtnI
+ C2iqwQ+hpw5CD4LTvCJ8uSH+AHDqWdo8QtpLjVNOpLJrnY0WDmd35Z6cygKxsnlKIIII
+ ef08ZWukToD6q+86XyY7W9Fdt6G0/u2LGHkRFrX4H3DORtzUJFMPht3tX7iG+rTfBYsS
+ qXwviHJpuQz59aoWJqhy6rrA24mB0t6KPlVHo8OQt8aH9E7JD2VDY58sFn26T5nhwg8l
+ rhaQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=GzeCjbtXLdqWVGSKySjABkNnwqpyaiVuNILnUkbYPsw=;
+ b=HGYbpkqxe5qS103JRpibgkaQ33+rF3x9akTqQSrHOTiZrmU40LDisKz6N5AQcRQaU3
+ nYKxWMK3XRbJtKV1lS5RpSovcKLjK7/yYL79UautjtYSDoel1w/jCf1JsW/kqZHDlWz3
+ apq2uIFaALBoMpbG8HbzXB/VmMNH1IeVIuIMhGimlHVGPbyynFxbe68vw+Ri1KlZnstl
+ chMfU3si7EhuaDO5LpEEPGKsI9Q0e/sATulrbX2VQP8f1opbDfLYfGrE3Iorw+sjwmZv
+ 89HP5BHsnmlpRRon9Jx8iU80SEDd0Azz1U5AsCPSFz0tZYxQenddDr41FdyG+TlZKxFK
+ fNmw==
+X-Gm-Message-State: APjAAAVefrhva69toxQScj/Nnzz0vxf5Vu7I0FJNxW/AUJp17pbZb1gk
+ HAfwXmEKhVnJri3BwhtRx0yWpHhm7N54yg==
+X-Google-Smtp-Source: APXvYqzFewCPsLWBZ4vxLH6AdAMWX4Ou4foab2QGEXLCZ/xZAdzQ0r8QtUHB2jZ1E6EufzUIv4Cy2Q==
+X-Received: by 2002:a1c:c188:: with SMTP id r130mr60520677wmf.73.1563801270907; 
+ Mon, 22 Jul 2019 06:14:30 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id f12sm42207217wrg.5.2019.07.22.06.14.30
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Mon, 22 Jul 2019 06:14:30 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Date: Mon, 22 Jul 2019 14:14:23 +0100
+Message-Id: <20190722131427.2669-2-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190722131427.2669-1-peter.maydell@linaro.org>
+References: <20190722131427.2669-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.26]); Mon, 22 Jul 2019 12:58:36 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] qemu-iotest 059 fails with vmdk
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::336
+Subject: [Qemu-devel] [PULL 1/5] target/arm: Add missing break statement for
+ Hypervisor Trap Exception
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -112,34 +95,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Sam Eiderman <shmuel.eiderman@oracle.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Not sure if it has been reported before, but test 059 currently fails:
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-059      fail       [14:55:21] [14:55:26]                    output
-mismatch (see 059.out.bad)
---- /home/thuth/devel/qemu/tests/qemu-iotests/059.out	2019-07-19
-10:19:18.000000000 +0200
-+++ /home/thuth/tmp/qemu-build/tests/qemu-iotests/059.out.bad	2019-07-22
-14:55:26.000000000 +0200
-@@ -27,7 +27,7 @@
- image: TEST_DIR/t.vmdk
- file format: vmdk
- virtual size: 0.977 TiB (1073741824000 bytes)
--disk size: 16 KiB
-+disk size: 517 KiB
- Format specific information:
-     cid: XXXXXXXX
-     parent cid: XXXXXXXX
-Failures: 059
-Failed 1 of 1 tests
+Reported by GCC9 when building with  -Wimplicit-fallthrough=2:
 
-... I think this was working fine for me a couple of weeks ago, so I
-assume this is a rather new bug?
+  target/arm/helper.c: In function ‘arm_cpu_do_interrupt_aarch32_hyp’:
+  target/arm/helper.c:7958:14: error: this statement may fall through [-Werror=implicit-fallthrough=]
+   7958 |         addr = 0x14;
+        |         ~~~~~^~~~~~
+  target/arm/helper.c:7959:5: note: here
+   7959 |     default:
+        |     ^~~~~~~
+  cc1: all warnings being treated as errors
 
- Thomas
+Fixes: b9bc21ff9f9
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reported-by: Stefan Weil <sw@weilnetz.de>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Message-id: 20190719111451.12406-1-philmd@redhat.com
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ target/arm/helper.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 20f8728be11..b74c23a9bc0 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -7956,6 +7956,7 @@ static void arm_cpu_do_interrupt_aarch32_hyp(CPUState *cs)
+         break;
+     case EXCP_HYP_TRAP:
+         addr = 0x14;
++        break;
+     default:
+         cpu_abort(cs, "Unhandled exception 0x%x\n", cs->exception_index);
+     }
+-- 
+2.20.1
+
 
