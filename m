@@ -2,55 +2,58 @@ Return-Path: <SRS0=EA86=VT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A762C76188
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 07:54:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6624DC76188
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 07:54:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2AD3721BE6
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 07:54:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2AD3721BE6
+	by mail.kernel.org (Postfix) with ESMTPS id 3EBA821BE6
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 07:54:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3EBA821BE6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59522 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59528 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hpT9S-00026L-Vm
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jul 2019 03:54:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39517)
+	id 1hpT9f-00034B-C9
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jul 2019 03:54:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39576)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richardw.yang@linux.intel.com>) id 1hpT9F-0001X0-Kh
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 03:54:18 -0400
+ (envelope-from <richardw.yang@linux.intel.com>) id 1hpT9K-0001da-0w
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 03:54:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richardw.yang@linux.intel.com>) id 1hpT9E-0000pp-QE
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 03:54:17 -0400
-Received: from mga05.intel.com ([192.55.52.43]:28131)
+ (envelope-from <richardw.yang@linux.intel.com>) id 1hpT9J-0000xE-1E
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 03:54:21 -0400
+Received: from mga03.intel.com ([134.134.136.65]:6620)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
- id 1hpT9E-0000mV-GE
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 03:54:16 -0400
+ id 1hpT9I-0000uj-Oa
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 03:54:20 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
- by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 22 Jul 2019 00:54:14 -0700
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+ by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 22 Jul 2019 00:54:16 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,294,1559545200"; d="scan'208";a="180323436"
+X-IronPort-AV: E=Sophos;i="5.64,294,1559545200"; d="scan'208";a="188554613"
 Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
- by orsmga002.jf.intel.com with ESMTP; 22 Jul 2019 00:54:13 -0700
+ by fmsmga001.fm.intel.com with ESMTP; 22 Jul 2019 00:54:14 -0700
 From: Wei Yang <richardw.yang@linux.intel.com>
 To: qemu-devel@nongnu.org
-Date: Mon, 22 Jul 2019 15:53:37 +0800
-Message-Id: <20190722075339.25121-1-richardw.yang@linux.intel.com>
+Date: Mon, 22 Jul 2019 15:53:38 +0800
+Message-Id: <20190722075339.25121-2-richardw.yang@linux.intel.com>
 X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190722075339.25121-1-richardw.yang@linux.intel.com>
+References: <20190722075339.25121-1-richardw.yang@linux.intel.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 192.55.52.43
-Subject: [Qemu-devel] [PATCH 0/2] migration: cleanup ram_load
+X-Received-From: 134.134.136.65
+Subject: [Qemu-devel] [PATCH 1/2] migration: return -EINVAL directly when
+ version_id mismatch
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,18 +71,26 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Two cleanup for ram_load:
+It is not reasonable to continue when version_id mismatch.
 
-* return -EINVAL for version_id mismatch
-* extract ram_load_precopy for better readability
+Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+---
+ migration/ram.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Wei Yang (2):
-  migration: return -EINVAL directly when version_id mismatch
-  migration: extract ram_load_precopy
-
- migration/ram.c | 73 +++++++++++++++++++++++++++++++------------------
- 1 file changed, 46 insertions(+), 27 deletions(-)
-
+diff --git a/migration/ram.c b/migration/ram.c
+index 7e34c82a72..6bfdfae16e 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -4216,7 +4216,7 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
+     seq_iter++;
+ 
+     if (version_id != 4) {
+-        ret = -EINVAL;
++        return -EINVAL;
+     }
+ 
+     if (!migrate_use_compression()) {
 -- 
 2.17.1
 
