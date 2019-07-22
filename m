@@ -2,60 +2,116 @@ Return-Path: <SRS0=EA86=VT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EB19C76190
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 13:43:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1296FC76188
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 13:43:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 742D421921
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 13:43:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 742D421921
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id D49992166E
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 13:43:40 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=wavesemi.onmicrosoft.com header.i=@wavesemi.onmicrosoft.com header.b="uknd7Onb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D49992166E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=wavecomp.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33792 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33800 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hpYb8-0007dM-Oq
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jul 2019 09:43:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54927)
+	id 1hpYbM-0008SJ-6s
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jul 2019 09:43:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55587)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <david@redhat.com>) id 1hpYZP-00008Q-Qz
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 09:41:41 -0400
+ (envelope-from <arikalo@wavecomp.com>) id 1hpYb5-0007aO-Pi
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 09:43:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1hpYZO-0005VH-IS
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 09:41:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:3559)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>)
- id 1hpYZO-0005St-Ao; Mon, 22 Jul 2019 09:41:38 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 95E1C30C133C;
- Mon, 22 Jul 2019 13:41:37 +0000 (UTC)
-Received: from t460s.redhat.com (ovpn-116-75.ams2.redhat.com [10.36.116.75])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 48DA610021B2;
- Mon, 22 Jul 2019 13:41:31 +0000 (UTC)
-From: David Hildenbrand <david@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Mon, 22 Jul 2019 15:41:08 +0200
-Message-Id: <20190722134108.22151-7-david@redhat.com>
-In-Reply-To: <20190722134108.22151-1-david@redhat.com>
-References: <20190722134108.22151-1-david@redhat.com>
+ (envelope-from <arikalo@wavecomp.com>) id 1hpYb2-0007HR-Me
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 09:43:23 -0400
+Received: from mail-eopbgr690092.outbound.protection.outlook.com
+ ([40.107.69.92]:29269 helo=NAM04-CO1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <arikalo@wavecomp.com>)
+ id 1hpYb2-0007Dg-9A
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 09:43:20 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=nDLH1tf5kmyGIlA7tdOgHRVlpjHm1AuhAoVnt83SBc41nN8NQw8NL/63QHdalXyNyDsgrvtMDXYyoPx4V05eeQt97nHvpTFULBZIFOQwuDxrT5a9auwTYjNFEA2V9QKqkDOlgEAgZYrdGbobPjjeRp4BTqCGX7qvWXw7SoLhsKGEIoY+phrIIz4QSigaQtJQZocugbKb46Srm3AELBLhYOAKYn8UB6spqFoNi4jdqQMegdg7b1gpFbeRYm3tIyCQyzxquo7ZVonvS6hpeukMq2EJgmfbXuNfNlSvxazmQXFXAbYeCYgNXJKFKB9/VuSLWe7T/Be6aiVMevLQTMF2OA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=zuHv8dWK2jwS4I/YFWDj5iwGyMw67Bh+pFgcpLTmS2Q=;
+ b=j/mIFn6udygzQaVHpvst4pglh2PAatBxHbWI0nPPcxAFXJhW/F9bbbxfZFaB3PQGI6xIFutjUm+h4y7ecVRDrX+0ybjslms5a8JJw2q6TD/Pnn3kt26jD3sYsNru0EU6WLz7RFHXvTxuNE5F3omWXI0WYOXeV0ZCERBKXXkweoXrUIpHiN0tS2wlPusuvpXYKAfY+9zo0QCvNXk7S1vbE9OwRYvOtK5K5vhrsSfXLqGbGDHExKbGrTR2dpjQWP0YBIK1yn+CYp/igA/9k950BvdAc/wumg9L0LIgrR3reji99KNowBoZUqWRnbOgVLA/U5XMrxXmQiXUU2BiDVwuJQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1;spf=pass
+ smtp.mailfrom=wavecomp.com;dmarc=pass action=none
+ header.from=wavecomp.com;dkim=pass header.d=wavecomp.com;arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=wavesemi.onmicrosoft.com; s=selector2-wavesemi-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=zuHv8dWK2jwS4I/YFWDj5iwGyMw67Bh+pFgcpLTmS2Q=;
+ b=uknd7OnbetSdP8+gt8BhMW2hLYkaWKqWPckOI59ikTCreoPHuk8vP88jCO63yujAjhw/kIInsFCWpKE0u3z8ikWMWrNRSBVsPDFqUrynT4axGzTBJ296op4yoeozLsDSuqkT+JhBaS+1Q8EngtemFPFuSvDisLGlGTx8hGmHOmY=
+Received: from DM5PR22MB1658.namprd22.prod.outlook.com (10.164.152.163) by
+ DM5PR22MB0316.namprd22.prod.outlook.com (10.173.170.13) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2094.16; Mon, 22 Jul 2019 13:43:15 +0000
+Received: from DM5PR22MB1658.namprd22.prod.outlook.com
+ ([fe80::447b:e0b5:5b86:985b]) by DM5PR22MB1658.namprd22.prod.outlook.com
+ ([fe80::447b:e0b5:5b86:985b%7]) with mapi id 15.20.2073.012; Mon, 22 Jul 2019
+ 13:43:15 +0000
+From: Aleksandar Rikalo <arikalo@wavecomp.com>
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Thread-Topic: [PATCH for 4.1 v4 5/5] target/mips: Fix emulation of MSA pack
+ instructions on big endian hosts
+Thread-Index: AQHVO0gJ09CtK9UB5Uy4T/kGZCD/6qbWr76Q
+Date: Mon, 22 Jul 2019 13:43:14 +0000
+Message-ID: <DM5PR22MB1658727F0297DA356C56EE8CD2C40@DM5PR22MB1658.namprd22.prod.outlook.com>
+References: <1563220847-14630-1-git-send-email-aleksandar.markovic@rt-rk.com>,
+ <1563220847-14630-6-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1563220847-14630-6-git-send-email-aleksandar.markovic@rt-rk.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=arikalo@wavecomp.com; 
+x-originating-ip: [82.117.201.26]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 910b42e9-1cbc-490a-177a-08d70eaa8c01
+x-microsoft-antispam: BCL:0; PCL:0;
+ RULEID:(2390118)(7020095)(4652040)(8989299)(5600148)(711020)(4605104)(1401327)(4534185)(7168020)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7193020);
+ SRVR:DM5PR22MB0316; 
+x-ms-traffictypediagnostic: DM5PR22MB0316:
+x-microsoft-antispam-prvs: <DM5PR22MB0316F845DD24419750D11515D2C40@DM5PR22MB0316.namprd22.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:1850;
+x-forefront-prvs: 01068D0A20
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(136003)(39840400004)(396003)(346002)(376002)(366004)(189003)(199004)(68736007)(52536014)(64756008)(66556008)(66946007)(107886003)(102836004)(66476007)(6246003)(7736002)(14454004)(2906002)(53546011)(6506007)(55236004)(86362001)(3846002)(5660300002)(99286004)(486006)(76116006)(91956017)(66066001)(66446008)(6116002)(256004)(2501003)(110136005)(55016002)(316002)(54896002)(33656002)(478600001)(19627405001)(6436002)(76176011)(53936002)(7696005)(54906003)(11346002)(6606003)(71200400001)(71190400001)(8936002)(74316002)(229853002)(4326008)(476003)(25786009)(9686003)(186003)(81166006)(81156014)(8676002)(26005)(446003);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:DM5PR22MB0316;
+ H:DM5PR22MB1658.namprd22.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: wavecomp.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: 1g4PTlS6zihsI3ZEyD2BsLrC9qwvvsJmdpKMO1oJxKpYSJAocgNNfrb92YgLZQMtZ82Hq58myaWEaExurwbwzhCm77Z/1GYSe/yxeKYtE4qyBWELF7uPx0gzZ9dqQ3aj999KHVvjUU6VuVKYbOu9B2cHVEpjo8iiW1JrJXmu85q7+IIHfRkSu53m05XkSeldj0pcdZXmpBdYQcUgzE3qoC9kidmi/fY1GQQtafVMW/LyzHt5DzwEzJ8b/ggB+WV5qbD3/2DqYg3iguwOC9wlaWdslldr5lz2xPbhVSWgCqoaKVcwYAk0AOvUWlOAmAGiAvlbknhXbvvumSBp8FkDg9d7CYvNiEyM1aOPd0a1DNKpR1M8t+lMv5z5zlifW1Tw89OBKynql5DIlVNl/cbEPvVvY/X7myKztM7oUGuOP0o=
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Mon, 22 Jul 2019 13:41:37 +0000 (UTC)
+X-OriginatorOrg: wavecomp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 910b42e9-1cbc-490a-177a-08d70eaa8c01
+X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Jul 2019 13:43:14.9866 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 463607d3-1db3-40a0-8a29-970c56230104
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: arikalo@wavecomp.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR22MB0316
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.69.92
+Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH-for-4.1 v3 6/6] virtio-balloon: Use temporary
- PBP only
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] [PATCH for 4.1 v4 5/5] target/mips: Fix emulation
+ of MSA pack instructions on big endian hosts
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,151 +123,173 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Michael S . Tsirkin" <mst@redhat.com>,
- David Hildenbrand <david@redhat.com>, qemu-stable@nongnu.org,
- Stefan Hajnoczi <stefanha@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: "sw@weilnetz.de" <sw@weilnetz.de>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We still have multiple issues in the current code
-- The PBP is not freed during unrealize()
-- The PBP is not reset on device resets: After a reset, the PBP is stale.
-- We are not indicating VIRTIO_BALLOON_F_MUST_TELL_HOST, therefore
-  guests (esp. legacy guests) will reuse pages without deflating,
-  turning the PBP stale. Adding that would require compat handling.
+> From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+> Sent: Monday, July 15, 2019 10:00 PM
+> To: qemu-devel@nongnu.org
+> Cc: sw@weilnetz.de; Aleksandar Markovic; Aleksandar Rikalo
+> Subject: [PATCH for 4.1 v4 5/5] target/mips: Fix emulation of MSA pack in=
+structions on big endian hosts
+>
+> From: Aleksandar Markovic <amarkovic@wavecomp.com>
+>
+> Fix emulation of MSA pack instructions on big endian hosts.
+>
+> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> ---
+>  target/mips/msa_helper.c | 74 ++++++++++++++++++++++++++++++++++++++++++=
+++++++
+>  1 file changed, 74 insertions(+)
+>
+> diff --git a/target/mips/msa_helper.c b/target/mips/msa_helper.c
+> index a383c40..27560ac 100644
+> --- a/target/mips/msa_helper.c
+> +++ b/target/mips/msa_helper.c
+> @@ -2113,6 +2113,24 @@ void helper_msa_pckev_df(CPUMIPSState *env, uint32=
+_t df, uint32_t wd,
+>
+>      switch (df) {
+>      case DF_BYTE:
+> +#if defined(HOST_WORDS_BIGENDIAN)
+> +        pwd->b[8]  =3D pws->b[9];
+> +        pwd->b[10] =3D pws->b[13];
+> +        pwd->b[12] =3D pws->b[1];
+> +        pwd->b[14] =3D pws->b[5];
+> +        pwd->b[0]  =3D pwt->b[9];
+> +        pwd->b[2]  =3D pwt->b[13];
+> +        pwd->b[4]  =3D pwt->b[1];
+> +        pwd->b[6]  =3D pwt->b[5];
+> +        pwd->b[9]  =3D pws->b[11];
+> +        pwd->b[13] =3D pws->b[3];
+> +        pwd->b[1]  =3D pwt->b[11];
+> +        pwd->b[5]  =3D pwt->b[3];
+> +        pwd->b[11] =3D pws->b[15];
+> +        pwd->b[3]  =3D pwt->b[15];
+> +        pwd->b[15] =3D pws->b[7];
+> +        pwd->b[7]  =3D pwt->b[7];
+> +#else
+>          pwd->b[15] =3D pws->b[14];
+>          pwd->b[13] =3D pws->b[10];
+>          pwd->b[11] =3D pws->b[6];
+> @@ -2129,8 +2147,19 @@ void helper_msa_pckev_df(CPUMIPSState *env, uint32=
+_t df, uint32_t wd,
+>          pwd->b[4]  =3D pwt->b[8];
+>          pwd->b[8]  =3D pws->b[0];
+>          pwd->b[0]  =3D pwt->b[0];
+> +#endif
+>          break;
+>      case DF_HALF:
+> +#if defined(HOST_WORDS_BIGENDIAN)
+> +        pwd->h[4] =3D pws->h[5];
+> +        pwd->h[6] =3D pws->h[1];
+> +        pwd->h[0] =3D pwt->h[5];
+> +        pwd->h[2] =3D pwt->h[1];
+> +        pwd->h[5] =3D pws->h[7];
+> +        pwd->h[1] =3D pwt->h[7];
+> +        pwd->h[7] =3D pws->h[3];
+> +        pwd->h[3] =3D pwt->h[3];
+> +#else
+>          pwd->h[7] =3D pws->h[6];
+>          pwd->h[5] =3D pws->h[2];
+>          pwd->h[3] =3D pwt->h[6];
+> @@ -2139,12 +2168,20 @@ void helper_msa_pckev_df(CPUMIPSState *env, uint3=
+2_t df, uint32_t wd,
+>          pwd->h[2] =3D pwt->h[4];
+>          pwd->h[4] =3D pws->h[0];
+>          pwd->h[0] =3D pwt->h[0];
+> +#endif
+>          break;
+>      case DF_WORD:
+> +#if defined(HOST_WORDS_BIGENDIAN)
+> +        pwd->w[2] =3D pws->w[3];
+> +        pwd->w[0] =3D pwt->w[3];
+> +        pwd->w[3] =3D pws->w[1];
+> +        pwd->w[1] =3D pwt->w[1];
+> +#else
+>          pwd->w[3] =3D pws->w[2];
+>          pwd->w[1] =3D pwt->w[2];
+>          pwd->w[2] =3D pws->w[0];
+>          pwd->w[0] =3D pwt->w[0];
+> +#endif
+>          break;
+>      case DF_DOUBLE:
+>          pwd->d[1] =3D pws->d[0];
+> @@ -2164,6 +2201,24 @@ void helper_msa_pckod_df(CPUMIPSState *env, uint32=
+_t df, uint32_t wd,
+>
+>      switch (df) {
+>      case DF_BYTE:
+> +#if defined(HOST_WORDS_BIGENDIAN)
+> +        pwd->b[7]  =3D pws->b[6];
+> +        pwd->b[5]  =3D pws->b[2];
+> +        pwd->b[3]  =3D pws->b[14];
+> +        pwd->b[1]  =3D pws->b[10];
+> +        pwd->b[15] =3D pwt->b[6];
+> +        pwd->b[13] =3D pwt->b[2];
+> +        pwd->b[11] =3D pwt->b[14];
+> +        pwd->b[9]  =3D pwt->b[10];
+> +        pwd->b[6]  =3D pws->b[4];
+> +        pwd->b[2]  =3D pws->b[12];
+> +        pwd->b[14] =3D pwt->b[4];
+> +        pwd->b[10] =3D pwt->b[12];
+> +        pwd->b[4]  =3D pws->b[0];
+> +        pwd->b[12] =3D pwt->b[0];
+> +        pwd->b[0]  =3D pws->b[8];
+> +        pwd->b[8]  =3D pwt->b[8];
+> +#else
+>          pwd->b[0]  =3D pwt->b[1];
+>          pwd->b[2]  =3D pwt->b[5];
+>          pwd->b[4]  =3D pwt->b[9];
+> @@ -2180,8 +2235,19 @@ void helper_msa_pckod_df(CPUMIPSState *env, uint32=
+_t df, uint32_t wd,
+>          pwd->b[11] =3D pws->b[7];
+>          pwd->b[7]  =3D pwt->b[15];
+>          pwd->b[15] =3D pws->b[15];
+> +#endif
+>          break;
+>      case DF_HALF:
+> +#if defined(HOST_WORDS_BIGENDIAN)
+> +        pwd->h[3] =3D pws->h[2];
+> +        pwd->h[1] =3D pws->h[6];
+> +        pwd->h[7] =3D pwt->h[2];
+> +        pwd->h[5] =3D pwt->h[6];
+> +        pwd->h[2] =3D pws->h[0];
+> +        pwd->h[6] =3D pwt->h[0];
+> +        pwd->h[0] =3D pws->h[4];
+> +        pwd->h[4] =3D pwt->h[4];
+> +#else
+>          pwd->h[0] =3D pwt->h[1];
+>          pwd->h[2] =3D pwt->h[5];
+>          pwd->h[4] =3D pws->h[1];
+> @@ -2190,12 +2256,20 @@ void helper_msa_pckod_df(CPUMIPSState *env, uint3=
+2_t df, uint32_t wd,
+>          pwd->h[5] =3D pws->h[3];
+>          pwd->h[3] =3D pwt->h[7];
+>          pwd->h[7] =3D pws->h[7];
+> +#endif
+>          break;
+>      case DF_WORD:
+> +#if defined(HOST_WORDS_BIGENDIAN)
+> +        pwd->w[1] =3D pws->w[0];
+> +        pwd->w[3] =3D pwt->w[0];
+> +        pwd->w[0] =3D pws->w[2];
+> +        pwd->w[2] =3D pwt->w[2];
+> +#else
+>          pwd->w[0] =3D pwt->w[1];
+>          pwd->w[2] =3D pws->w[1];
+>          pwd->w[1] =3D pwt->w[3];
+>          pwd->w[3] =3D pws->w[3];
+> +#endif
+>          break;
+>      case DF_DOUBLE:
+>          pwd->d[0] =3D pwt->d[1];
+> --
+> 2.7.4
 
-Instead, let's use the PBP only temporarily, when processing one bulk of
-inflation requests. This will keep guest_page_size > 4k working (with
-Linux guests). There is nothing to do for deflation requests anymore.
-The pbp is only used for a limited amount of time.
-
-Fixes: ed48c59875b6 ("virtio-balloon: Safely handle BALLOON_PAGE_SIZE <
-                     host page size")
-Cc: qemu-stable@nongnu.org #v4.0.0
-Suggested-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- hw/virtio/virtio-balloon.c         | 21 +++++++++------------
- include/hw/virtio/virtio-balloon.h |  3 ---
- 2 files changed, 9 insertions(+), 15 deletions(-)
-
-diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
-index 40d493a31a..a6282d58d4 100644
---- a/hw/virtio/virtio-balloon.c
-+++ b/hw/virtio/virtio-balloon.c
-@@ -34,11 +34,11 @@
-=20
- #define BALLOON_PAGE_SIZE  (1 << VIRTIO_BALLOON_PFN_SHIFT)
-=20
--struct PartiallyBalloonedPage {
-+typedef struct PartiallyBalloonedPage {
-     ram_addr_t base_gpa;
-     long subpages;
-     unsigned long *bitmap;
--};
-+} PartiallyBalloonedPage;
-=20
- static void virtio_balloon_pbp_free(PartiallyBalloonedPage *pbp)
- {
-@@ -68,11 +68,11 @@ static bool virtio_balloon_pbp_matches(PartiallyBallo=
-onedPage *pbp,
- }
-=20
- static void balloon_inflate_page(VirtIOBalloon *balloon,
--                                 MemoryRegion *mr, hwaddr mr_offset)
-+                                 MemoryRegion *mr, hwaddr mr_offset,
-+                                 PartiallyBalloonedPage **pbp)
- {
-     void *addr =3D memory_region_get_ram_ptr(mr) + mr_offset;
-     ram_addr_t rb_offset, rb_aligned_offset, base_gpa;
--    PartiallyBalloonedPage **pbp =3D &balloon->pbp;
-     RAMBlock *rb;
-     size_t rb_page_size;
-     int subpages;
-@@ -149,12 +149,6 @@ static void balloon_deflate_page(VirtIOBalloon *ball=
-oon,
-     rb =3D qemu_ram_block_from_host(addr, false, &rb_offset);
-     rb_page_size =3D qemu_ram_pagesize(rb);
-=20
--    if (balloon->pbp) {
--        /* Let's play safe and always reset the pbp on deflation request=
-s. */
--        virtio_balloon_pbp_free(balloon->pbp);
--        balloon->pbp =3D NULL;
--    }
--
-     host_addr =3D (void *)((uintptr_t)addr & ~(rb_page_size - 1));
-=20
-     /* When a page is deflated, we hint the whole host page it lives
-@@ -336,6 +330,7 @@ static void balloon_stats_set_poll_interval(Object *o=
-bj, Visitor *v,
- static void virtio_balloon_handle_output(VirtIODevice *vdev, VirtQueue *=
-vq)
- {
-     VirtIOBalloon *s =3D VIRTIO_BALLOON(vdev);
-+    PartiallyBalloonedPage *pbp =3D NULL;
-     VirtQueueElement *elem;
-     MemoryRegionSection section;
-=20
-@@ -344,7 +339,7 @@ static void virtio_balloon_handle_output(VirtIODevice=
- *vdev, VirtQueue *vq)
-         uint32_t pfn;
-         elem =3D virtqueue_pop(vq, sizeof(VirtQueueElement));
-         if (!elem) {
--            return;
-+            break;
-         }
-=20
-         while (iov_to_buf(elem->out_sg, elem->out_num, offset, &pfn, 4) =
-=3D=3D 4) {
-@@ -373,7 +368,7 @@ static void virtio_balloon_handle_output(VirtIODevice=
- *vdev, VirtQueue *vq)
-             if (!qemu_balloon_is_inhibited()) {
-                 if (vq =3D=3D s->ivq) {
-                     balloon_inflate_page(s, section.mr,
--                                         section.offset_within_region);
-+                                         section.offset_within_region, &=
-pbp);
-                 } else if (vq =3D=3D s->dvq) {
-                     balloon_deflate_page(s, section.mr, section.offset_w=
-ithin_region);
-                 } else {
-@@ -387,6 +382,8 @@ static void virtio_balloon_handle_output(VirtIODevice=
- *vdev, VirtQueue *vq)
-         virtio_notify(vdev, vq);
-         g_free(elem);
-     }
-+
-+    virtio_balloon_pbp_free(pbp);
- }
-=20
- static void virtio_balloon_receive_stats(VirtIODevice *vdev, VirtQueue *=
-vq)
-diff --git a/include/hw/virtio/virtio-balloon.h b/include/hw/virtio/virti=
-o-balloon.h
-index 5a99293a45..d1c968d237 100644
---- a/include/hw/virtio/virtio-balloon.h
-+++ b/include/hw/virtio/virtio-balloon.h
-@@ -33,8 +33,6 @@ typedef struct virtio_balloon_stat_modern {
-        uint64_t val;
- } VirtIOBalloonStatModern;
-=20
--typedef struct PartiallyBalloonedPage PartiallyBalloonedPage;
--
- enum virtio_balloon_free_page_report_status {
-     FREE_PAGE_REPORT_S_STOP =3D 0,
-     FREE_PAGE_REPORT_S_REQUESTED =3D 1,
-@@ -70,7 +68,6 @@ typedef struct VirtIOBalloon {
-     int64_t stats_last_update;
-     int64_t stats_poll_interval;
-     uint32_t host_features;
--    PartiallyBalloonedPage *pbp;
-=20
-     bool qemu_4_0_config_size;
- } VirtIOBalloon;
---=20
-2.21.0
-
+Reviewed-by: Aleksandar Rikalo <arikalo@wavecomp.com>
 
