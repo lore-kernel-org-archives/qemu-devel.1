@@ -6,49 +6,48 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D013C76188
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 15:39:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19D66C76188
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 15:41:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 20C3B2190F
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 15:39:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20C3B2190F
+	by mail.kernel.org (Postfix) with ESMTPS id B11362190F
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 15:41:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B11362190F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=bt.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34656 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34676 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hpaPj-0000mN-ER
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jul 2019 11:39:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51516)
+	id 1hpaRc-00029i-1k
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jul 2019 11:41:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51887)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <tony.nguyen@bt.com>) id 1hpaPJ-0000I5-Ab
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 11:39:31 -0400
+ (envelope-from <tony.nguyen@bt.com>) id 1hpaRB-0001gG-1W
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 11:41:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tony.nguyen@bt.com>) id 1hpaP7-0000Np-7E
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 11:39:20 -0400
-Received: from smtpe1.intersmtp.com ([213.121.35.72]:50223)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tony.nguyen@bt.com>) id 1hpaP6-0000MY-96
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 11:39:09 -0400
-Received: from tpw09926dag18f.domain1.systemhost.net (10.9.212.26) by
- BWP09926077.bt.com (10.36.82.108) with Microsoft SMTP Server (version=TLS1_2, 
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P256) id 15.1.1713.5; Mon, 22
- Jul 2019 16:39:00 +0100
+ (envelope-from <tony.nguyen@bt.com>) id 1hpaQz-0001fm-V0
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 11:41:16 -0400
+Received: from smtpe1.intersmtp.com ([62.239.224.234]:39577)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <tony.nguyen@bt.com>)
+ id 1hpaQJ-00017n-1w; Mon, 22 Jul 2019 11:40:24 -0400
+Received: from tpw09926dag18g.domain1.systemhost.net (10.9.212.34) by
+ RDW083A012ED68.bt.com (10.187.98.38) with Microsoft SMTP Server (TLS) id
+ 14.3.439.0; Mon, 22 Jul 2019 16:40:04 +0100
 Received: from tpw09926dag18e.domain1.systemhost.net (10.9.212.18) by
- tpw09926dag18f.domain1.systemhost.net (10.9.212.26) with Microsoft SMTP
- Server (TLS) id 15.0.1395.4; Mon, 22 Jul 2019 16:39:04 +0100
+ tpw09926dag18g.domain1.systemhost.net (10.9.212.34) with Microsoft SMTP
+ Server (TLS) id 15.0.1395.4; Mon, 22 Jul 2019 16:40:18 +0100
 Received: from tpw09926dag18e.domain1.systemhost.net
  ([fe80::a946:6348:ccf4:fa6c]) by tpw09926dag18e.domain1.systemhost.net
  ([fe80::a946:6348:ccf4:fa6c%12]) with mapi id 15.00.1395.000; Mon, 22 Jul
- 2019 16:39:04 +0100
+ 2019 16:40:18 +0100
 From: <tony.nguyen@bt.com>
 To: <qemu-devel@nongnu.org>
 Thread-Topic: [Qemu-devel] [PATCH v2 02/20] tcg: Replace MO_16 with MO_UW alias
-Thread-Index: AQHVQKOXy8JsjxHtAEearhhy+6Tk1w==
-Date: Mon, 22 Jul 2019 15:39:04 +0000
-Message-ID: <1563809943304.38271@bt.com>
+Thread-Index: AQHVQKPDyJRtmfK8Wku9MyQfdwKCPw==
+Date: Mon, 22 Jul 2019 15:40:17 +0000
+Message-ID: <1563810016433.48708@bt.com>
 References: <e9c6e5310b1a4863be45d45bf087fc3d@tpw09926dag18e.domain1.systemhost.net>
 In-Reply-To: <e9c6e5310b1a4863be45d45bf087fc3d@tpw09926dag18e.domain1.systemhost.net>
 Accept-Language: en-AU, en-GB, en-US
@@ -58,13 +57,13 @@ X-MS-TNEF-Correlator:
 x-ms-exchange-transport-fromentityheader: Hosted
 x-originating-ip: [10.187.101.37]
 MIME-Version: 1.0
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 213.121.35.72
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 62.239.224.234
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: Re: [Qemu-devel] [PATCH v2 02/20] tcg: Replace MO_16 with MO_UW
- alias
+Subject: [Qemu-devel] [PATCH v2 02/20] tcg: Replace MO_16 with MO_UW alias
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
