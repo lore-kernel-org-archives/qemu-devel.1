@@ -7,71 +7,71 @@ X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6990C76190
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 13:53:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01711C76190
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 13:58:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 87F33217F9
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 13:53:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C06DD21921
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 13:58:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NbLZs9m4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87F33217F9
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZXENZp1C"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C06DD21921
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33882 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33910 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hpYlD-00062B-S6
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jul 2019 09:53:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57298)
+	id 1hpYpO-0007XR-21
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jul 2019 09:58:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58158)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jan.bobek@gmail.com>) id 1hpYl2-0005dn-Ns
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 09:53:41 -0400
+ (envelope-from <jan.bobek@gmail.com>) id 1hpYpD-00078g-F0
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 09:58:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jan.bobek@gmail.com>) id 1hpYl1-0000fe-QZ
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 09:53:40 -0400
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:38307)
+ (envelope-from <jan.bobek@gmail.com>) id 1hpYpC-0006LD-Il
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 09:57:59 -0400
+Received: from mail-yw1-xc42.google.com ([2607:f8b0:4864:20::c42]:36362)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <jan.bobek@gmail.com>) id 1hpYl1-0000et-KD
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 09:53:39 -0400
-Received: by mail-ot1-x344.google.com with SMTP id d17so40309696oth.5
- for <qemu-devel@nongnu.org>; Mon, 22 Jul 2019 06:53:39 -0700 (PDT)
+ (Exim 4.71) (envelope-from <jan.bobek@gmail.com>) id 1hpYpC-0006JU-Bc
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 09:57:58 -0400
+Received: by mail-yw1-xc42.google.com with SMTP id x67so14506855ywd.3
+ for <qemu-devel@nongnu.org>; Mon, 22 Jul 2019 06:57:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=subject:to:cc:references:from:openpgp:autocrypt:message-id:date
  :user-agent:mime-version:in-reply-to;
- bh=Q1tX3qU7i1X6zA0bgXFqF+XaRNoFc7hMz2tCtKtz7Bo=;
- b=NbLZs9m4bSnrXyy8iTzplnF8EyC0wuv7o5ZLXUGvF0uQH5j3254jBgGu2Vgh11AgSs
- SioFKCof99NPxPumwfi6TfSyJMFHvLdLnaICkOlNSj3KCvtr3dvC45EelXcM/y28Oewg
- tWXik5tq6STVHNiBbfxqyc8XaKvYPJNA13F/34HBd1UhMsNRxWKiuQyLwkowGxMQpyu0
- GloYdTi18zeg+aWAr7fI4wO4kQQWQ09VZJ//facqQ49FEr+Bi6FaFCa3hv7GXGqysJsN
- fN15NmLFQ2Ogf2Zqdgcw5bxrqkO572/PmeFTrAkdVL0AyqnXgIMx/RQ+DEOCkQAtxy/p
- uRcw==
+ bh=6E5fBV3BHCKhOLUbm4Y2/ASX1JLmDn5Rwee0KjfE3r8=;
+ b=ZXENZp1CfCD87IB0r8s6JSQoeNS034DaRWuUmgQB5NjKcruAx4JSXoyZmNlY3TwPoj
+ PEatea+pckTXvm/BVcWi4K+mC3PY2TQNA8KNEBwUtAlh/IXtoz+6BWKffv5KEH5wvUy5
+ XxOHDelhjf2pLVy2nnF1nzvNnw4ImMJbsFp3T8NDHdgdYV7NA2sc2sJZ9Ks+feO4jzdW
+ a2vIN1p3P7Uupuaa7Cgz7zDaEeByTOFPtIdPzqpgEWojTwCSSqO0QYmM5X/gwGtTWae1
+ 5ald755bJ40SlwdPUl9KVQcRKCpD5x9ofRfTOP89NA5LnFdQkH1zHGuopILbjgAS621L
+ gQpQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:openpgp:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to;
- bh=Q1tX3qU7i1X6zA0bgXFqF+XaRNoFc7hMz2tCtKtz7Bo=;
- b=LrVoQioFDFVdPdZN7V4RQCfie6HkB0aaK/nO2dMVT7R8lMAQN5V/ulBNiLs6n3ErNU
- JNLvUmn/QMWtxuEQ+uWGsPOsZz+nyHJDwfTundSetsydxYu0GDRXBIA6pETsL8XhQQGJ
- iXOzILC38KNbnmzvDeJtKeVifekrZ44bMmv4o7/i2KMHaOAhygjIEMTLmwtqz9PH6Efb
- jyQAvSEaPxsH2kYqo9M3zsIPd9vMpTwXozVgEegKEz1x1P8H3ZxzycecxYv5czVv82UK
- 2nJ/PlN61w181Zw4zv4XF9NBMnYPVSXrQf/elCNleDQbsN9ISirxHYp+yxDOVysSTh+H
- 4zJg==
-X-Gm-Message-State: APjAAAXJsMVYiBAVNsz2HqhB3SBJym1w44XHnvnzgQw9Npz9ck5Hva+1
- XNkd9PXOaPEfp431hzSaUTs=
-X-Google-Smtp-Source: APXvYqy5bwIDzBJ+ywOXZYxSPEhmPVOB6NXM5F5Vb1czgLTviGs6Ol+9QSp7Cjtl4sysYke9UsYWyg==
-X-Received: by 2002:a9d:744f:: with SMTP id p15mr29711372otk.287.1563803618801; 
- Mon, 22 Jul 2019 06:53:38 -0700 (PDT)
+ bh=6E5fBV3BHCKhOLUbm4Y2/ASX1JLmDn5Rwee0KjfE3r8=;
+ b=mfmi64/ehaKcecVMSMk7v55jGUZFkFSyqlqQ3/FdTgwlnKbPtiNnAe46rzlkdE5G9/
+ 6TJ6r9WInyZUyhY9FJn6fAyvBZiMDyIi8z/wWOHMGiNR5anr7cMvBTJzCcIew8FmT3hJ
+ e7F0LXKgu8VolQSm1+GoUMW2gZehD+cO42JNC7IEk3mZ5Yw8Etj3FWIYjcO+OFL+suGA
+ D+tNkipVI5DP7fj1R72PlZayaiJ8f5KLPGk2zpG1PrzlstnrN3sZihsoPJwEGYC9xXYB
+ UaG3BtbP3wxadCuWSUvZXN18W/DCkNyidTx9srW0uZAx5IRqkjaoArfGM1vFJH+F+/Ix
+ As2g==
+X-Gm-Message-State: APjAAAVSgEzDf+RmEGM79yDlnLuVjii5bZ1/rFf3vx6qkd4ffTJ0miIw
+ 3/C9aLEw/Penu/5h967l4Yc=
+X-Google-Smtp-Source: APXvYqyTn7lYZSBEZCR0pSgujHxD5L3r3SFuL/mv8Yqe1qtN6xsqBJ82Xm0R2/as5yqCPsH+XsVTLg==
+X-Received: by 2002:a81:6d11:: with SMTP id i17mr42761930ywc.336.1563803876726; 
+ Mon, 22 Jul 2019 06:57:56 -0700 (PDT)
 Received: from [192.168.1.96] (69-222-133-165.lightspeed.tukrga.sbcglobal.net.
  [69.222.133.165])
- by smtp.googlemail.com with ESMTPSA id g73sm14364516otg.30.2019.07.22.06.53.38
+ by smtp.googlemail.com with ESMTPSA id u123sm9750942ywu.75.2019.07.22.06.57.55
  (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Mon, 22 Jul 2019 06:53:38 -0700 (PDT)
+ Mon, 22 Jul 2019 06:57:55 -0700 (PDT)
 To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 References: <20190711223300.6061-1-jan.bobek@gmail.com>
- <20190711223300.6061-6-jan.bobek@gmail.com>
- <a5e745d8-fdd6-d3d7-185d-eb75d2623c18@linaro.org>
+ <20190711223300.6061-12-jan.bobek@gmail.com>
+ <39b692ff-5bda-d812-efcd-fa3190909ae2@linaro.org>
 From: Jan Bobek <jan.bobek@gmail.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=jan.bobek@gmail.com; prefer-encrypt=mutual; keydata=
@@ -148,20 +148,20 @@ Autocrypt: addr=jan.bobek@gmail.com; prefer-encrypt=mutual; keydata=
  uD1PmEfcmmfqPmuv037Dzpe5hYj5csGsdNLMLSK1WZqaAhBAtCnh3Rme71Je7f+eObRAHHGZ
  sftsaIi3kpdIyUnKybZhViIlXs8Cde5O2HCI0NhHnaDnxKdmHaIZVlH1hX3koaRrWCeGjts1
  WWOVGHwSUSJ3lpUXEBHBicrX3bH/vUVTNTnwzGLSf/23VC9WYAe69II=
-Message-ID: <531ac82e-de60-e688-40be-2008c3ea75a8@gmail.com>
-Date: Mon, 22 Jul 2019 09:53:36 -0400
+Message-ID: <7bdcb12e-7a04-61ff-a0d9-fddaad8b5759@gmail.com>
+Date: Mon, 22 Jul 2019 09:57:54 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <a5e745d8-fdd6-d3d7-185d-eb75d2623c18@linaro.org>
+In-Reply-To: <39b692ff-5bda-d812-efcd-fa3190909ae2@linaro.org>
 Content-Type: multipart/signed; micalg=pgp-sha512;
  protocol="application/pgp-signature";
- boundary="WU0fIbe5Fd5FMuck6uN5hTRzcJfrCqp5H"
+ boundary="zPZpfd1fJzZibflDsMi8MCZ5Ucu62Nrlh"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::344
-Subject: Re: [Qemu-devel] [RISU PATCH v3 05/18] risugen_x86_memory: add
- module
+X-Received-From: 2607:f8b0:4864:20::c42
+Subject: Re: [Qemu-devel] [RISU PATCH v3 11/18] x86.risu: add SSE
+ instructions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -179,85 +179,64 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---WU0fIbe5Fd5FMuck6uN5hTRzcJfrCqp5H
-Content-Type: multipart/mixed; boundary="5pjUmC1r7XxQ9inHxh5Dg4wloTkH3QTcX";
+--zPZpfd1fJzZibflDsMi8MCZ5Ucu62Nrlh
+Content-Type: multipart/mixed; boundary="7Jq56mXfJl3VK0AoeOzSodquBQWsJRqzz";
  protected-headers="v1"
 From: Jan Bobek <jan.bobek@gmail.com>
 To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Message-ID: <531ac82e-de60-e688-40be-2008c3ea75a8@gmail.com>
-Subject: Re: [RISU PATCH v3 05/18] risugen_x86_memory: add module
+Message-ID: <7bdcb12e-7a04-61ff-a0d9-fddaad8b5759@gmail.com>
+Subject: Re: [RISU PATCH v3 11/18] x86.risu: add SSE instructions
 References: <20190711223300.6061-1-jan.bobek@gmail.com>
- <20190711223300.6061-6-jan.bobek@gmail.com>
- <a5e745d8-fdd6-d3d7-185d-eb75d2623c18@linaro.org>
-In-Reply-To: <a5e745d8-fdd6-d3d7-185d-eb75d2623c18@linaro.org>
+ <20190711223300.6061-12-jan.bobek@gmail.com>
+ <39b692ff-5bda-d812-efcd-fa3190909ae2@linaro.org>
+In-Reply-To: <39b692ff-5bda-d812-efcd-fa3190909ae2@linaro.org>
 
---5pjUmC1r7XxQ9inHxh5Dg4wloTkH3QTcX
+--7Jq56mXfJl3VK0AoeOzSodquBQWsJRqzz
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 7/20/19 9:58 PM, Richard Henderson wrote:
+On 7/20/19 1:50 PM, Richard Henderson wrote:
 > On 7/11/19 3:32 PM, Jan Bobek wrote:
->> +sub load(%)
->> +{
->> +    my (%args) =3D @_;
->> +
->> +    @memory_opts{keys %args} =3D values %args;
->> +    $memory_opts{is_write}   =3D 0;
->> +}
->> +
->> +sub store(%)
->> +{
->> +    my (%args) =3D @_;
->> +
->> +    @memory_opts{keys %args} =3D values %args;
->> +    $memory_opts{is_write}   =3D 1;
->> +}
+>> +# NP 0F F7 /r: MASKMOVQ mm1, mm2
+>> +MASKMOVQ SSE 00001111 11110111 \
+>> +  !constraints { modrm($_); $_->{modrm}{reg} &=3D 0b111; $_->{modrm}{=
+reg2} &=3D 0b111 if defined $_->{modrm}{reg2}; defined $_->{modrm}{reg2} =
+} \
+>> +  !memory { load(size =3D> 8, base =3D> REG_RDI, rollback =3D> 1); }
 >=20
-> I was thinking maybe we should add a mem() that allows a "store =3D> $d=
-", which
-> would simplify the "$d ? store(size =3D> x) : load(size =3D> x)" patter=
-n.
->=20
-> Anyway, that's incremental improvement.
+> This one is a store.
 
-It's possible. I suppose the reason why I did it like I did was that I
-wanted the config file to be more descriptive: if you specify a
-constraint like mem(store =3D> 0, ...), it might not be immediately
-clear that it actually means a load. It's not an issue when you know
-the code, but if somebody were just browsing the x86.risu without
-prior knowledge of anything, they might find it more cryptic.
-
-Anyway, so much for my reasoning; I agree that it would make the
-conditions simpler, so feel free to change it if you like.
+Yes, indeed. I was pretty sure there must be some mistakes left among
+the 900+ instructions. Three cheers for code reviews!
 
 -Jan
 
 
---5pjUmC1r7XxQ9inHxh5Dg4wloTkH3QTcX--
+--7Jq56mXfJl3VK0AoeOzSodquBQWsJRqzz--
 
---WU0fIbe5Fd5FMuck6uN5hTRzcJfrCqp5H
+--zPZpfd1fJzZibflDsMi8MCZ5Ucu62Nrlh
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCgAdFiEESPYOqtMR3qRZrEutZeg2ldrjNs8FAl01v+AACgkQZeg2ldrj
-Ns/5Mw/+LMvEwwkCiSHEZPvq99gueRSgFj/XbZak8TyYbAJ2xkSJZlWUq2MXLP7d
-bRAJZ3igYOikPQQoC4se1e72RoIhUZ1KKSuQRZ4ODZe1VM4AY0zLxQNc7xi9d766
-+5GeFjluOvFU9c+vyGCQ92RmQdm52DcSlTFn/u+U64XtZQ6jGF/aNlUnPFLf2eP2
-Ra+Nomzczsn3x638XHqAxaAddQBImXkfOd5TzmAJ0pVbQfVgzdkeiNG4UnqhPlL3
-Uvip9H9NVVG3FVvC27SUMvEAmChPx67d8MW6cKxQNHVZiAVKGPe+/ZvimTi5ZkJt
-6PicMvuxS3S3+kOkLzUrs3lB9EiXVE/pG6ztP8HtixM5fxpVL75eeMT37fI5O0FT
-aS53LtHM6u2rjDwD4Ge40XAViGL8wEZGujLM9mAT1GagXqqrRR/7vDcaFkc/dJcv
-L3U2K0uXkAzfyvjAwRIdMBb3o7CoWymjdee38ami3C2ppC1UqAwkCKlh/1GnUrKG
-DC6jfFN2zEks9K4UPvLr3GRfn8y+LdfXeMD27mPBurLm5ZmFhKqH5pMUgcN5G589
-jGqbi0gTDa8kcBDUEeu7PfxN7YGbgXizM41FtXYSzv7mA5EQRECGvrDcWGIEcsUM
-9x4HJ/ERFOD9OVDwD2ski8cvNFPVUJ04hqyAE+UfEeaH13V9zKQ=
-=mAQ5
+iQIzBAEBCgAdFiEESPYOqtMR3qRZrEutZeg2ldrjNs8FAl01wOIACgkQZeg2ldrj
+Ns/WxQ/+MDdCzVEx3Z6R2v1t6qIWdNteipANQGZ2jDCo5eS0Kcvx0yQTgkX/OSmT
+J+WnzfDqGiX54JCRxkJTc/2sephF6zCzWJoGvcZiIlLtfa6tvJ7Q/kfoyC8v9Psm
+8wNnrVUGHOVdWJMozjW9Vwuz0dedGUosKaAax8yWL7SEpB/uYw/m7DklPaTciA7U
+JWAM08uOygu9wkBX4G7yqZjHSqnxwyUoxOHfbPpT/V+bY7qKVtqyFTWF9ujbL67s
+LP2s7vGGsN4uqtrRu6B5+ilTTYSIkHBWTFu3y402VC1tZfNiZ7vWmH2EUirR0pYZ
+Hw3impZxxeJ2neXEbL0ZS1poqzAaMo8nIqxXM34kZQ+pRq01wR42BkZAbU5Q5oAZ
+q/c5A1O40lRgQ+Ytj7cXwHRgBykvVcJml9SnFFPAC7DLAj6zjeJ/9zIj9KvIMmmm
+qCAGk6RjXtbooQbqujYBEbQdz+bkI0uXit2Re2h2FhX54QbUFA8sLBs+NNoEgCo/
+pdcs4pDCQyWHgGAZiVQeQg9ExyXG6dktNL4YLMHhM1W5jI1VnVMKYFukgu6A3zs0
+QQ64lZtyphN1yi1t6DWurZ7p32PWhdbAsiopIvw2q340h/SnlBZNUSxp+jsJqqzL
+gVRQaEYdlvHCBdh9eYNMzabNamBSMmcTSmaM4oP/v+se7778Y+0=
+=G4vv
 -----END PGP SIGNATURE-----
 
---WU0fIbe5Fd5FMuck6uN5hTRzcJfrCqp5H--
+--zPZpfd1fJzZibflDsMi8MCZ5Ucu62Nrlh--
 
