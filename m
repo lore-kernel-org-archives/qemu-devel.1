@@ -2,75 +2,88 @@ Return-Path: <SRS0=EA86=VT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AD06C7618F
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 20:33:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 499FCC7618F
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 21:05:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DF7E8218F0
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 20:33:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF7E8218F0
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 0BA3C21901
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 21:05:36 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gCk1Zlu3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0BA3C21901
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37548 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37710 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hpezZ-0007dx-Qw
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jul 2019 16:33:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45597)
+	id 1hpfV2-0001WQ-2t
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jul 2019 17:05:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51707)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bounces@canonical.com>) id 1hpezN-0007En-2n
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 16:32:54 -0400
+ (envelope-from <paolo.bonzini@gmail.com>) id 1hpfUr-000188-KR
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 17:05:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1hpezL-0004xB-Px
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 16:32:52 -0400
-Received: from indium.canonical.com ([91.189.90.7]:38918)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1hpfUq-0001yh-Cb
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 17:05:25 -0400
+Received: from mail-wr1-x430.google.com ([2a00:1450:4864:20::430]:36411)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1hpezL-0004w6-Jf
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 16:32:51 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1hpezK-0005OJ-CT
- for <qemu-devel@nongnu.org>; Mon, 22 Jul 2019 20:32:50 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 570092E80CE
- for <qemu-devel@nongnu.org>; Mon, 22 Jul 2019 20:32:50 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 22 Jul 2019 20:19:32 -0000
-From: Aditya Govardhan <1772165@bugs.launchpad.net>
+ (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+ id 1hpfUq-0001y0-4M
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 17:05:24 -0400
+Received: by mail-wr1-x430.google.com with SMTP id n4so40912597wrs.3
+ for <qemu-devel@nongnu.org>; Mon, 22 Jul 2019 14:05:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=94m98zJwRs1ARbASN6bBc7n1f1hsdvBpDpKlGgoy9QI=;
+ b=gCk1Zlu3cWZfpjhsTB2RbItqptsAao4sPHiWOmQwDlonVAv9/MVLpj0nVLlvoH2R6e
+ 22KWG5CNUWfEOfhbdVrSAihbOtyh1FXfpyrYwy8wOe32j2fLX4bNb2exnR49Tw09istk
+ 6TPKDZnGBTqqhyDbLLJNjQCR/TF19qHoq/3HyAwlofJQNB2AAk7rHXBcUsG4slpzsOCF
+ +pqGRNxmeIwI0IjM/LEIPvtRS7p4/PGem4qmlwLRAyr4PVpRc78MaWFfraLvalJ/EuB9
+ whYIj/7PlFlPaQ+LWemazrtxIJ44gh1ofKyW+wRzpBLfZ8vTh8yi5u5ZHM4pE3P+/VPa
+ CEzA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :mime-version:content-transfer-encoding;
+ bh=94m98zJwRs1ARbASN6bBc7n1f1hsdvBpDpKlGgoy9QI=;
+ b=Mx8zHQYZSTEj4Ha07Vz+DbT1p75jjoMcglgTSyBsBsDjtfeTGVIzbCTP5gnU8TaZS/
+ KLi7MnE575/6PjFc5trVt+p0KwOiVBvrzvqSjKVVAzVFnoCbEElyzUYrDnmL3WY36NCu
+ MDYUzToWpiQy2vKMvdVtfVZQl94ro5Cnsgv2oDJDLT9hCcilqYZ0/cuA7LSsJf3r7kuT
+ 0bDGNj1I+cdGziZf/7f2BcpsDa34uiXnLB2a3hoaMnOcz53HCifTwtP96ZjGQboqNRPC
+ oUFsnBALkP4kQYGqN3PwAXfhORjzjCYiIDaJPZ2+uksyZ/0ez9FXlz+g5g2JHTIWpwjQ
+ /32A==
+X-Gm-Message-State: APjAAAV0zOv6Wwt6VlxzCCylGm82Ikh1CESuSzoWz/oFPB0YqFtlTI/Y
+ 6isAJSV+UqknZqTIFmSneDRcNprdXtQ=
+X-Google-Smtp-Source: APXvYqwMpDtyIsFrz5QpxjeI2CCZBoBNg39yqeqNu6mm/wtm4DIaq/1abdlmMNrC6IxyCF0qUL3BOg==
+X-Received: by 2002:a5d:5452:: with SMTP id w18mr37085372wrv.327.1563829522533; 
+ Mon, 22 Jul 2019 14:05:22 -0700 (PDT)
+Received: from 640k.lan ([93.56.166.5])
+ by smtp.gmail.com with ESMTPSA id n2sm27842565wmi.38.2019.07.22.14.05.21
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Mon, 22 Jul 2019 14:05:21 -0700 (PDT)
+From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Wishlist;
- assignee=None; 
-X-Launchpad-Bug-Tags: arm usb
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: aditya-govardhan andrew-pennebaker kraxel-redhat
- pmaydell vortelf
-X-Launchpad-Bug-Reporter: George (vortelf)
-X-Launchpad-Bug-Modifier: Aditya Govardhan (aditya-govardhan)
-References: <152673688616.9061.7617411809661975686.malonedeb@chaenomeles.canonical.com>
-Message-Id: <156382677264.18580.4665024954209828293.malone@gac.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="19010";
- Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 537bc78831575f4a06dfa7ef48477818e8e9d2e7
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1772165] Re: arm raspi2/raspi3 emulation has no
- USB support
+Date: Mon, 22 Jul 2019 23:05:20 +0200
+Message-Id: <1563829520-17525-1-git-send-email-pbonzini@redhat.com>
+X-Mailer: git-send-email 1.8.3.1
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::430
+Subject: [Qemu-devel] [PATCH v2] virtio-scsi: fixed virtio_scsi_ctx_check
+ failed when detaching scsi disk
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -79,88 +92,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1772165 <1772165@bugs.launchpad.net>
+Cc: Zhengui li <lizhengui@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-After reading change logs, I believe USB support for raspi2/raspi3 is
-not added yet. Which means host internet network can't be accessed by
-emulated machine.
+From: Zhengui li <lizhengui@huawei.com>
 
-I would be glad to help in documentation of differences between real
-Raspberry Pi devices and QEMU emulated raspi2/raspi3 since I have seen a
-lot of tutorials on internet trying to use QEMU for emulating raspberry
-pi. These tutorials most of the times are just hacks, like using
-versatilepb or using custom kernel instead of the Raspbian OS.
+commit a6f230c move blockbackend back to main AioContext on unplug. It set the AioContext of
+SCSIDevice to the main AioContex, but s->ctx is still the iothread AioContexï¼ˆif the scsi controller
+is configure with iothreadï¼‰. So if there are having in-flight requests during unplug, a failing assertion
+happend. The bt is below:
+(gdb) bt
+#0  0x0000ffff86aacbd0 in raise () from /lib64/libc.so.6
+#1  0x0000ffff86aadf7c in abort () from /lib64/libc.so.6
+#2  0x0000ffff86aa6124 in __assert_fail_base () from /lib64/libc.so.6
+#3  0x0000ffff86aa61a4 in __assert_fail () from /lib64/libc.so.6
+#4  0x0000000000529118 in virtio_scsi_ctx_check (d=<optimized out>, s=<optimized out>, s=<optimized out>) at /home/qemu-4.0.0/hw/scsi/virtio-scsi.c:246
+#5  0x0000000000529ec4 in virtio_scsi_handle_cmd_req_prepare (s=0x2779ec00, req=0xffff740397d0) at /home/qemu-4.0.0/hw/scsi/virtio-scsi.c:559
+#6  0x000000000052a228 in virtio_scsi_handle_cmd_vq (s=0x2779ec00, vq=0xffff7c6d7110) at /home/qemu-4.0.0/hw/scsi/virtio-scsi.c:603
+#7  0x000000000052afa8 in virtio_scsi_data_plane_handle_cmd (vdev=<optimized out>, vq=0xffff7c6d7110) at /home/qemu-4.0.0/hw/scsi/virtio-scsi-dataplane.c:59
+#8  0x000000000054d94c in virtio_queue_host_notifier_aio_poll (opaque=<optimized out>) at /home/qemu-4.0.0/hw/virtio/virtio.c:2452
 
-I have gathered as much info as possible over the last week through
-these tutorials, QEMU raspi code and change logs, and believe a good
-documentation of this info could help future users trying to emulate
-raspi.
+assert(blk_get_aio_context(d->conf.blk) == s->ctx) failed.
 
-Finally, I am able to run latest Raspbian OS (2019-07-10) lite version
-on raspi2 using the following command where I have extracted kernel
-image and dtb file from second partition:
+To avoid assertion failed,  moving the "if" after qdev_simple_device_unplug_cb.
 
-qemu-system-arm -M raspi2 -kernel bootpart/kernel7l.img -dtb
-bootpart/bcm2709-rpi-2-b.dtb -drive file=3D2019-07-10-raspbian-buster-
-lite.img,format=3Draw,if=3Dsd -append "rw console=3DttyAMA0 loglevel=3D8
-root=3D/dev/mmcblk0p2 fsck.repair=3Dyes rootwait memtest=3D1" -serial stdio
+In addition, to avoid another qemu crash below, add aio_disable_external before
+qdev_simple_device_unplug_cb, which disable the further processing of external clients
+when doing qdev_simple_device_unplug_cb.
+(gdb) bt
+#0  scsi_req_unref (req=0xffff6802c6f0) at hw/scsi/scsi-bus.c:1283
+#1  0x00000000005294a4 in virtio_scsi_handle_cmd_req_submit (req=<optimized out>,
+    s=<optimized out>) at /home/qemu-4.0.0/hw/scsi/virtio-scsi.c:589
+#2  0x000000000052a2a8 in virtio_scsi_handle_cmd_vq (s=s@entry=0x9c90e90,
+    vq=vq@entry=0xffff7c05f110) at /home/qemu-4.0.0/hw/scsi/virtio-scsi.c:625
+#3  0x000000000052afd8 in virtio_scsi_data_plane_handle_cmd (vdev=<optimized out>,
+    vq=0xffff7c05f110) at /home/qemu-4.0.0/hw/scsi/virtio-scsi-dataplane.c:60
+#4  0x000000000054d97c in virtio_queue_host_notifier_aio_poll (opaque=<optimized out>)
+    at /home/qemu-4.0.0/hw/virtio/virtio.c:2447
+#5  0x00000000009b204c in run_poll_handlers_once (ctx=ctx@entry=0x6efea40,
+    timeout=timeout@entry=0xffff7d7f7308) at util/aio-posix.c:521
+#6  0x00000000009b2b64 in run_poll_handlers (ctx=ctx@entry=0x6efea40,
+    max_ns=max_ns@entry=4000, timeout=timeout@entry=0xffff7d7f7308) at util/aio-posix.c:559
+#7  0x00000000009b2ca0 in try_poll_mode (ctx=ctx@entry=0x6efea40, timeout=0xffff7d7f7308,
+    timeout@entry=0xffff7d7f7348) at util/aio-posix.c:594
+#8  0x00000000009b31b8 in aio_poll (ctx=0x6efea40, blocking=blocking@entry=true)
+    at util/aio-posix.c:636
+#9  0x00000000006973cc in iothread_run (opaque=0x6ebd800) at iothread.c:75
+#10 0x00000000009b592c in qemu_thread_start (args=0x6efef60) at util/qemu-thread-posix.c:502
+#11 0x0000ffff8057f8bc in start_thread () from /lib64/libpthread.so.0
+#12 0x0000ffff804e5f8c in thread_start () from /lib64/libc.so.6
+(gdb) p bus
+$1 = (SCSIBus *) 0x0
 
-I am not able to connect network devices, not able to use images other
-than lite image (https://bugs.launchpad.net/qemu/+bug/1837347) and
-unsure why this command is showing Hardware name as BCM2835 when the
-QEMU raspi code has BCM2836 associated with raspi2
-(https://github.com/qemu/qemu/blob/59c58f96b270f5edd4ad10954c3a96556cb3a728=
-/hw/arm/bcm2836.c#L31).
+Signed-off-by: Zhengui li <lizhengui@huawei.com>
+Message-Id: <1563696502-7972-1-git-send-email-lizhengui@huawei.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ hw/scsi/virtio-scsi.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-I highly appreciate the support provided for raspi2 and raspi3 till now.
+diff --git a/hw/scsi/virtio-scsi.c b/hw/scsi/virtio-scsi.c
+index d0bdbff..8b9e5e2 100644
+--- a/hw/scsi/virtio-scsi.c
++++ b/hw/scsi/virtio-scsi.c
+@@ -832,6 +832,7 @@ static void virtio_scsi_hotunplug(HotplugHandler *hotplug_dev, DeviceState *dev,
+     VirtIODevice *vdev = VIRTIO_DEVICE(hotplug_dev);
+     VirtIOSCSI *s = VIRTIO_SCSI(vdev);
+     SCSIDevice *sd = SCSI_DEVICE(dev);
++    AioContext *ctx = s->ctx ?: qemu_get_aio_context();
+ 
+     if (virtio_vdev_has_feature(vdev, VIRTIO_SCSI_F_HOTPLUG)) {
+         virtio_scsi_acquire(s);
+@@ -841,14 +842,16 @@ static void virtio_scsi_hotunplug(HotplugHandler *hotplug_dev, DeviceState *dev,
+         virtio_scsi_release(s);
+     }
+ 
++    aio_disable_external(ctx);
++    qdev_simple_device_unplug_cb(hotplug_dev, dev, errp);
++    aio_enable_external(ctx);
++
+     if (s->ctx) {
+         virtio_scsi_acquire(s);
+         /* If other users keep the BlockBackend in the iothread, that's ok */
+         blk_set_aio_context(sd->conf.blk, qemu_get_aio_context(), NULL);
+         virtio_scsi_release(s);
+     }
+-
+-    qdev_simple_device_unplug_cb(hotplug_dev, dev, errp);
+ }
+ 
+ static struct SCSIBusInfo virtio_scsi_scsi_info = {
+-- 
+1.8.3.1
 
-Thank you.
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1772165
-
-Title:
-  arm raspi2/raspi3 emulation has no USB support
-
-Status in QEMU:
-  Confirmed
-
-Bug description:
-  Using Qemu 2.12.0 on ArchLinux.
-
-  Trying to emulate arm device with `qemu-system-arm` and attach usb
-  device for unput using
-
-  ` -usb -device usb-host,bus=3D001,vendorid=3D0x1d6b,productid=3D0x0002 `
-
-  # lsusb returns
-
-  Bus 002 Device 001: ID 1d6b:0003 Linux Foundation 3.0 root hub
-  Bus 001 Device 014: ID 13d3:3487 IMC Networks =
-
-  Bus 001 Device 004: ID 0457:11af Silicon Integrated Systems Corp. =
-
-  Bus 001 Device 003: ID 0bda:57e6 Realtek Semiconductor Corp. =
-
-  Bus 001 Device 002: ID 0bda:0129 Realtek Semiconductor Corp. RTS5129 Card=
- Reader Controller
-  Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
-
-  # qemu returns
-  qemu-system-arm: -device usb-host,bus=3D001,vendorid=3D0x1d6b,productid=
-=3D0x0002: Bus '001' not found
-
-  =
-
-  Tried with connecting external usb keyboard but that didn't seem to work =
-either.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1772165/+subscriptions
 
