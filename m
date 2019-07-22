@@ -2,85 +2,88 @@ Return-Path: <SRS0=EA86=VT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32510C76190
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 13:15:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58418C76188
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 13:15:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 047A021921
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 13:15:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1BF4621921
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 13:15:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kSO2Xwhf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 047A021921
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UK2fS7UY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BF4621921
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33410 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33418 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hpY9j-0000Qk-Hx
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jul 2019 09:15:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47600)
+	id 1hpY9n-0000j8-Sj
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jul 2019 09:15:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47632)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hpY9B-0007Nx-6U
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 09:14:34 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hpY9D-0007OC-3N
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 09:14:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hpY9A-00034K-2K
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 09:14:33 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:44516)
+ (envelope-from <peter.maydell@linaro.org>) id 1hpY9B-000362-Qv
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 09:14:35 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:52004)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hpY99-00033H-RQ
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 09:14:32 -0400
-Received: by mail-wr1-x441.google.com with SMTP id p17so39341871wrf.11
- for <qemu-devel@nongnu.org>; Mon, 22 Jul 2019 06:14:31 -0700 (PDT)
+ id 1hpY9B-000358-KA
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 09:14:33 -0400
+Received: by mail-wm1-x342.google.com with SMTP id 207so35145051wma.1
+ for <qemu-devel@nongnu.org>; Mon, 22 Jul 2019 06:14:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:mime-version
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=JFDAqPQkZPRu7uzWO2+Dyf2rR9xqez/uX3of0Oc36D4=;
- b=kSO2Xwhf6bcEwaJ/WUWedgC1YRUnVIwTC49BVYN60DnEeYHZ4iMX92biHgevt71O4m
- 2Xd8wyFnPHWiD/EeM+dn2v3ztblQbjHwsf7ABex6iblFVrkRlh3kJ0Qs7KyAJI7cXjWH
- /WOyl/ALRP0T6W0j3E4X1bpRCnJ0nUtnEbr/QkBpaEYFqYOml2EmiFYJJAWTd+XbYQl2
- mCJne2FAYdVmuwlMaJvU2/YNpcPXWxQJN/zCqA44yEBod0vomOsES8eSrfgfaczIgnGC
- bY5trNVWnptg4Yk42sR6o9RbxQKw+f2CsYkoq6cyCyT7aplg6TPOSGP/Hc9ADfWry3Y0
- eoRA==
+ bh=l5k8gNjzcUVX6OXyFMM4mDjUBLlyPFiurmFGH7h+8m8=;
+ b=UK2fS7UYYw+TzEarLn+wyi1DN4JuoZGYkROeZKGn3ItsmGi6VastmbnbZrusZg8ErG
+ X0PIjrDmtKwl6uqxwWa93AU+z62o2RBeHoC/eRo3CArrMOFPlkcA9IpgqGsaEd5WV4ff
+ Xc6GQOuDUwlLEp9BF9YNXg8WqObqFrhJagMElLq/+G4rxVlG707Qg+OxorYqpBj/OUim
+ w6RJETvBSpn8q/Mw7qnOvGubc3NnSt/fBjqnvousmuGm0O+eIg9RHhCdrou18ZkNQCT2
+ XSDFpsSyugw3Wwwg3QeM4cLnsRxglAbXZ/JDNA2bwy2gdCLg7VaDBCAyVnpEporbtuP2
+ Dfew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=JFDAqPQkZPRu7uzWO2+Dyf2rR9xqez/uX3of0Oc36D4=;
- b=VuP+LEw8hcSQ/esT2G4U4vfzMWmihDWS6uT8famFhk8msimTbjrH/wzkih6u1vu6nN
- 36u/VwgNrdPOqSC3FUVIC/ultzimK0uX/0gA8gxVzbhzFVaDc9zcQ4uJdJMkkWBdwvXi
- QHp5cy4SPBpbpBWzzQpQsEhCOWicRHtUibXrk4G8OuA2e5098K3SLBjq4cgduRIUMc2J
- IScAYUI2vrsAbG8HgRd2ExfHTNQMffQb9R0J81A6RP0Np8I89irn3XeBnl6vaaLPBqI7
- BUaCFk9JxOU2jR0UJ4CrNdeoP14TVphi0SCM9Ee+YuhebXClGvZ+jY1XzErnaRutFJAY
- DT5Q==
-X-Gm-Message-State: APjAAAWMSqaH3hEU6Vkip1rmRZVTavTjjD3sMG6BnctAA6/URuHV/bUY
- DWzjD4H4Vp1MI0BoYRPBaiu7uKnK8VcPhg==
-X-Google-Smtp-Source: APXvYqxAjphPrLvnZEXOV5iFs2ydeGYAu5sgpyubaErFeDU0Xe0ZaIAstBGmprY1DtGz7m8T7JyOXg==
-X-Received: by 2002:adf:de8b:: with SMTP id w11mr75206447wrl.134.1563801269988; 
- Mon, 22 Jul 2019 06:14:29 -0700 (PDT)
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=l5k8gNjzcUVX6OXyFMM4mDjUBLlyPFiurmFGH7h+8m8=;
+ b=J8/ZqZhmFyoZ81WOx0CjEhiUYmNkKVAD3RO/ImPAEhqCIGjkpMARSA0j9YWYCDdpTs
+ pm7U6qLs9kug3DiPDm39rLG9Kz5ZkeYomkQNxhQ1/ISc1CGQahFFDIYPoBIBvLTmDyX5
+ pXCf0V8QdhzpSkrK8tPKG0z9mVEXJuw/zOwPJkErvWmh/XHoU9LKaYG1cvpwi129qiYD
+ 9hhfnY2VGKuzyugJ19cJ0Q0r1ligImiZ/8UVJmMz34xOAv8EMQOti9y/YAQXIW1LKgmT
+ MIYmlAb+XX+zZ1DUlMT3Bgd39ZAQXjzZCvfbvyfu6NcOhaEPUG9l+Yv00hRn26y2jLow
+ RzNQ==
+X-Gm-Message-State: APjAAAV+8c3evraclFYp3+8tw5dcx9uJLODqIiQf0lEruuSGtTzovzBx
+ KunbJMj7bIDNUTBo3pCP8g5LBHfA8oXK5Q==
+X-Google-Smtp-Source: APXvYqy9y+qqTy8W6eZat68QDU0fZ+fI2SiLETlIDe8mchLun6rsMt6ILoKDya+l3jE0FZs7y0DH9w==
+X-Received: by 2002:a7b:ce88:: with SMTP id q8mr64471414wmj.89.1563801272399; 
+ Mon, 22 Jul 2019 06:14:32 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id f12sm42207217wrg.5.2019.07.22.06.14.29
+ by smtp.gmail.com with ESMTPSA id f12sm42207217wrg.5.2019.07.22.06.14.30
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Mon, 22 Jul 2019 06:14:29 -0700 (PDT)
+ Mon, 22 Jul 2019 06:14:31 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Mon, 22 Jul 2019 14:14:22 +0100
-Message-Id: <20190722131427.2669-1-peter.maydell@linaro.org>
+Date: Mon, 22 Jul 2019 14:14:24 +0100
+Message-Id: <20190722131427.2669-3-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190722131427.2669-1-peter.maydell@linaro.org>
+References: <20190722131427.2669-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::441
-Subject: [Qemu-devel] [PULL 0/5] target-arm queue
+X-Received-From: 2a00:1450:4864:20::342
+Subject: [Qemu-devel] [PULL 2/5] hw/arm/fsl-imx6ul.c: Remove dead
+ SMP-related code
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,51 +99,153 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-target-arm queue for rc2. This has 3 Arm related bug fixes,
-and a couple of non-arm patches which don't have an obviously
-better route into the tree.
+The i.MX6UL always has a single Cortex-A7 CPU (we set FSL_IMX6UL_NUM_CPUS
+to 1 in line with this). This means that all the code in fsl-imx6ul.c to
+handle multiple CPUs is dead code, and Coverity is now complaining that
+it is unreachable (CID 1403008, 1403011).
 
-thanks
--- PMM
+Remove the unreachable code and the only-executes-once loops,
+and replace the single-entry cpu[] array in the FSLIMX6ULState
+with a simple cpu member.
 
-The following changes since commit b9e02bb3f98174209dbd5c96858e65a31723221b:
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-id: 20190712115030.26895-1-peter.maydell@linaro.org
+---
+ include/hw/arm/fsl-imx6ul.h |  2 +-
+ hw/arm/fsl-imx6ul.c         | 62 +++++++++++--------------------------
+ hw/arm/mcimx6ul-evk.c       |  2 +-
+ 3 files changed, 20 insertions(+), 46 deletions(-)
 
-  Merge remote-tracking branch 'remotes/ericb/tags/pull-nbd-2019-07-19' into staging (2019-07-22 10:11:28 +0100)
+diff --git a/include/hw/arm/fsl-imx6ul.h b/include/hw/arm/fsl-imx6ul.h
+index 9e94e98f8ee..eda389aec7d 100644
+--- a/include/hw/arm/fsl-imx6ul.h
++++ b/include/hw/arm/fsl-imx6ul.h
+@@ -61,7 +61,7 @@ typedef struct FslIMX6ULState {
+     DeviceState    parent_obj;
+ 
+     /*< public >*/
+-    ARMCPU             cpu[FSL_IMX6UL_NUM_CPUS];
++    ARMCPU             cpu;
+     A15MPPrivState     a7mpcore;
+     IMXGPTState        gpt[FSL_IMX6UL_NUM_GPTS];
+     IMXEPITState       epit[FSL_IMX6UL_NUM_EPITS];
+diff --git a/hw/arm/fsl-imx6ul.c b/hw/arm/fsl-imx6ul.c
+index f8601654388..b074177a71d 100644
+--- a/hw/arm/fsl-imx6ul.c
++++ b/hw/arm/fsl-imx6ul.c
+@@ -29,16 +29,12 @@
+ 
+ static void fsl_imx6ul_init(Object *obj)
+ {
+-    MachineState *ms = MACHINE(qdev_get_machine());
+     FslIMX6ULState *s = FSL_IMX6UL(obj);
+     char name[NAME_SIZE];
+     int i;
+ 
+-    for (i = 0; i < MIN(ms->smp.cpus, FSL_IMX6UL_NUM_CPUS); i++) {
+-        snprintf(name, NAME_SIZE, "cpu%d", i);
+-        object_initialize_child(obj, name, &s->cpu[i], sizeof(s->cpu[i]),
+-                                "cortex-a7-" TYPE_ARM_CPU, &error_abort, NULL);
+-    }
++    object_initialize_child(obj, "cpu0", &s->cpu, sizeof(s->cpu),
++                            "cortex-a7-" TYPE_ARM_CPU, &error_abort, NULL);
+ 
+     /*
+      * A7MPCORE
+@@ -161,42 +157,25 @@ static void fsl_imx6ul_realize(DeviceState *dev, Error **errp)
+     MachineState *ms = MACHINE(qdev_get_machine());
+     FslIMX6ULState *s = FSL_IMX6UL(dev);
+     int i;
+-    qemu_irq irq;
+     char name[NAME_SIZE];
+-    unsigned int smp_cpus = ms->smp.cpus;
++    SysBusDevice *sbd;
++    DeviceState *d;
+ 
+-    if (smp_cpus > FSL_IMX6UL_NUM_CPUS) {
+-        error_setg(errp, "%s: Only %d CPUs are supported (%d requested)",
+-                   TYPE_FSL_IMX6UL, FSL_IMX6UL_NUM_CPUS, smp_cpus);
++    if (ms->smp.cpus > 1) {
++        error_setg(errp, "%s: Only a single CPU is supported (%d requested)",
++                   TYPE_FSL_IMX6UL, ms->smp.cpus);
+         return;
+     }
+ 
+-    for (i = 0; i < smp_cpus; i++) {
+-        Object *o = OBJECT(&s->cpu[i]);
+-
+-        object_property_set_int(o, QEMU_PSCI_CONDUIT_SMC,
+-                                "psci-conduit", &error_abort);
+-
+-        /* On uniprocessor, the CBAR is set to 0 */
+-        if (smp_cpus > 1) {
+-            object_property_set_int(o, FSL_IMX6UL_A7MPCORE_ADDR,
+-                                    "reset-cbar", &error_abort);
+-        }
+-
+-        if (i) {
+-            /* Secondary CPUs start in PSCI powered-down state */
+-            object_property_set_bool(o, true,
+-                                     "start-powered-off", &error_abort);
+-        }
+-
+-        object_property_set_bool(o, true, "realized", &error_abort);
+-    }
++    object_property_set_int(OBJECT(&s->cpu), QEMU_PSCI_CONDUIT_SMC,
++                            "psci-conduit", &error_abort);
++    object_property_set_bool(OBJECT(&s->cpu), true,
++                             "realized", &error_abort);
+ 
+     /*
+      * A7MPCORE
+      */
+-    object_property_set_int(OBJECT(&s->a7mpcore), smp_cpus, "num-cpu",
+-                            &error_abort);
++    object_property_set_int(OBJECT(&s->a7mpcore), 1, "num-cpu", &error_abort);
+     object_property_set_int(OBJECT(&s->a7mpcore),
+                             FSL_IMX6UL_MAX_IRQ + GIC_INTERNAL,
+                             "num-irq", &error_abort);
+@@ -204,18 +183,13 @@ static void fsl_imx6ul_realize(DeviceState *dev, Error **errp)
+                              &error_abort);
+     sysbus_mmio_map(SYS_BUS_DEVICE(&s->a7mpcore), 0, FSL_IMX6UL_A7MPCORE_ADDR);
+ 
+-    for (i = 0; i < smp_cpus; i++) {
+-        SysBusDevice *sbd = SYS_BUS_DEVICE(&s->a7mpcore);
+-        DeviceState  *d   = DEVICE(qemu_get_cpu(i));
++    sbd = SYS_BUS_DEVICE(&s->a7mpcore);
++    d = DEVICE(&s->cpu);
+ 
+-        irq = qdev_get_gpio_in(d, ARM_CPU_IRQ);
+-        sysbus_connect_irq(sbd, i, irq);
+-        sysbus_connect_irq(sbd, i + smp_cpus, qdev_get_gpio_in(d, ARM_CPU_FIQ));
+-        sysbus_connect_irq(sbd, i + 2 * smp_cpus,
+-                           qdev_get_gpio_in(d, ARM_CPU_VIRQ));
+-        sysbus_connect_irq(sbd, i + 3 * smp_cpus,
+-                           qdev_get_gpio_in(d, ARM_CPU_VFIQ));
+-    }
++    sysbus_connect_irq(sbd, 0, qdev_get_gpio_in(d, ARM_CPU_IRQ));
++    sysbus_connect_irq(sbd, 1, qdev_get_gpio_in(d, ARM_CPU_FIQ));
++    sysbus_connect_irq(sbd, 2, qdev_get_gpio_in(d, ARM_CPU_VIRQ));
++    sysbus_connect_irq(sbd, 3, qdev_get_gpio_in(d, ARM_CPU_VFIQ));
+ 
+     /*
+      * A7MPCORE DAP
+diff --git a/hw/arm/mcimx6ul-evk.c b/hw/arm/mcimx6ul-evk.c
+index bbffb11c2a8..1f6f4aed97c 100644
+--- a/hw/arm/mcimx6ul-evk.c
++++ b/hw/arm/mcimx6ul-evk.c
+@@ -71,7 +71,7 @@ static void mcimx6ul_evk_init(MachineState *machine)
+     }
+ 
+     if (!qtest_enabled()) {
+-        arm_load_kernel(&s->soc.cpu[0], &boot_info);
++        arm_load_kernel(&s->soc.cpu, &boot_info);
+     }
+ }
+ 
+-- 
+2.20.1
 
-are available in the Git repository at:
-
-  https://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20190722
-
-for you to fetch changes up to ddb45afbfbc639365d6c934e4e29f6de5e5e2a0e:
-
-  contrib/elf2dmp: Build download.o with CURL_CFLAGS (2019-07-22 14:07:39 +0100)
-
-----------------------------------------------------------------
-target-arm queue:
- * target/arm: Add missing break statement for Hypervisor Trap Exception
-   (fixes handling of SMC insn taken to AArch32 Hyp mode via HCR.TSC)
- * hw/arm/fsl-imx6ul.c: Remove dead SMP-related code
- * target/arm: Limit ID register assertions to TCG
- * configure: Clarify URL to source downloads
- * contrib/elf2dmp: Build download.o with CURL_CFLAGS
-
-----------------------------------------------------------------
-Peter Maydell (4):
-      hw/arm/fsl-imx6ul.c: Remove dead SMP-related code
-      target/arm: Limit ID register assertions to TCG
-      configure: Clarify URL to source downloads
-      contrib/elf2dmp: Build download.o with CURL_CFLAGS
-
-Philippe Mathieu-Daudé (1):
-      target/arm: Add missing break statement for Hypervisor Trap Exception
-
- configure                     |  2 +-
- Makefile                      |  1 -
- contrib/elf2dmp/Makefile.objs |  3 +++
- include/hw/arm/fsl-imx6ul.h   |  2 +-
- hw/arm/fsl-imx6ul.c           | 62 +++++++++++++------------------------------
- hw/arm/mcimx6ul-evk.c         |  2 +-
- target/arm/cpu.c              |  7 +++--
- target/arm/helper.c           |  1 +
- 8 files changed, 30 insertions(+), 50 deletions(-)
 
