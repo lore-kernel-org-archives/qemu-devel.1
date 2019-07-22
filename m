@@ -1,73 +1,96 @@
-Return-Path: <SRS0=xsRN=VS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=EA86=VT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CCABC76191
-	for <qemu-devel@archiver.kernel.org>; Sun, 21 Jul 2019 22:35:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84371C76191
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 00:30:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D5D8320693
-	for <qemu-devel@archiver.kernel.org>; Sun, 21 Jul 2019 22:35:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5D8320693
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 32E3320828
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 00:30:02 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FeEuF9gW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32E3320828
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57950 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58144 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hpKQe-0005lC-Te
-	for qemu-devel@archiver.kernel.org; Sun, 21 Jul 2019 18:35:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48508)
+	id 1hpMDJ-0003qf-CW
+	for qemu-devel@archiver.kernel.org; Sun, 21 Jul 2019 20:30:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50178)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bounces@canonical.com>) id 1hpKQU-0005MC-NZ
- for qemu-devel@nongnu.org; Sun, 21 Jul 2019 18:35:31 -0400
+ (envelope-from <richard.weiyang@gmail.com>) id 1hpMD8-0003SP-N7
+ for qemu-devel@nongnu.org; Sun, 21 Jul 2019 20:29:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1hpKQT-0006dj-F4
- for qemu-devel@nongnu.org; Sun, 21 Jul 2019 18:35:30 -0400
-Received: from indium.canonical.com ([91.189.90.7]:35816)
+ (envelope-from <richard.weiyang@gmail.com>) id 1hpMD7-00019C-Hq
+ for qemu-devel@nongnu.org; Sun, 21 Jul 2019 20:29:50 -0400
+Received: from mail-ed1-x543.google.com ([2a00:1450:4864:20::543]:46368)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1hpKQT-0006cl-7i
- for qemu-devel@nongnu.org; Sun, 21 Jul 2019 18:35:29 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1hpKQR-0008Cy-EK
- for <qemu-devel@nongnu.org>; Sun, 21 Jul 2019 22:35:27 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 67E432E804C
- for <qemu-devel@nongnu.org>; Sun, 21 Jul 2019 22:35:27 +0000 (UTC)
+ (Exim 4.71) (envelope-from <richard.weiyang@gmail.com>)
+ id 1hpMD7-00017l-7H
+ for qemu-devel@nongnu.org; Sun, 21 Jul 2019 20:29:49 -0400
+Received: by mail-ed1-x543.google.com with SMTP id d4so39094789edr.13
+ for <qemu-devel@nongnu.org>; Sun, 21 Jul 2019 17:29:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:reply-to:references:mime-version
+ :content-disposition:in-reply-to:user-agent;
+ bh=jJwRRGQVF6TwpiTpbzehvCNVUV83Eqvra2kDYU4yAPs=;
+ b=FeEuF9gWndSuvnT3+uLTHh57xoQyEptgtLunOsybzpaDb+i8tJypNsE/M2hSGLGxnM
+ VzXeBHyQBi7jV+5CVdA7XsxjxrLuQeN9bR+QjuZHSir4l1upeJF1Vmqh9AkUc6+FHj6o
+ w6jBg+ROAF8mYi7wEvdviHo+LydLtipmSlHN9B/n9iTNrV/k+U+2FDsDp6RZMF2r4aXx
+ dktsdp8uFWoKhrXewPn6n5MMoDtfey0wu7to7upbimUhl4TtLoCojMSxpig/HCIk/jTP
+ VIGmdxz8iwFXqSFsqCzfg4JDmGf8TpYck8cyS8nEBNJVGYoTusyC5ZuAK8AyUqLgSotk
+ MRIQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:reply-to
+ :references:mime-version:content-disposition:in-reply-to:user-agent;
+ bh=jJwRRGQVF6TwpiTpbzehvCNVUV83Eqvra2kDYU4yAPs=;
+ b=VxqK/qh5Y73OlGyT+sqW6nmbXBbCqWOjJp6eXCirzJJgljxh86Xhzz+XrL0MpmnmQR
+ oQMmHoozG7rkh2Vyvs+8h6ttySa/uC2iQr5hZZiXlt1FvD2/dM99LvPEH4YoaiaA1qei
+ 3EbCbDzbTvbcthlPj4bu1DR0W8JQte6dxVtjB+Pgo6avlSvj30XxzN8w/7dMVJ/GsyhC
+ xFD64cGuFzd6C2JrNyWQ91em8/vJiLHSc+GQ58h+Q9m6u4eYsS8BiV5OW3KEqjmQfz6f
+ sf7ADcLGCt5ri++M3W209IE17K1EsB6o4+wygXJiVrWBrkm0MzBmNmswOFGUZL543Tvq
+ RJXw==
+X-Gm-Message-State: APjAAAU7ukv0yX2x+36BHcXJ9ACIqB2J1MNhhyANcKS4XWAxIEou8neM
+ a5y5EB4r/++fdf+Nrk4D+S4=
+X-Google-Smtp-Source: APXvYqyRiuy9K6a9pBZ2wX15ctreEiXgBBNVykyo4rQ3NeVDi7g96eJVSKJmhl1Qk0vXfMUnzrC3mg==
+X-Received: by 2002:a05:6402:6d0:: with SMTP id
+ n16mr57228568edy.168.1563755387934; 
+ Sun, 21 Jul 2019 17:29:47 -0700 (PDT)
+Received: from localhost ([185.92.221.13])
+ by smtp.gmail.com with ESMTPSA id 43sm10605459edz.87.2019.07.21.17.29.46
+ (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+ Sun, 21 Jul 2019 17:29:46 -0700 (PDT)
+Date: Mon, 22 Jul 2019 00:29:45 +0000
+From: Wei Yang <richard.weiyang@gmail.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <20190722002945.iur4iu4nxployiss@master>
+References: <20190718010456.4234-1-richardw.yang@linux.intel.com>
+ <20190718010456.4234-2-richardw.yang@linux.intel.com>
+ <20190721003316.dosnhlbawuezpryb@master>
+ <796ed0ca-ecd7-9f18-71fa-59b94c403cbc@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sun, 21 Jul 2019 22:25:46 -0000
-From: Gergely Kis <1818937@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: crash hvf macos
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: bwibking cuser2 kisg roolebo
-X-Launchpad-Bug-Reporter: Chen Zhang (cuser2)
-X-Launchpad-Bug-Modifier: Gergely Kis (kisg)
-References: <155192472106.28960.15645485731508389788.malonedeb@chaenomeles.canonical.com>
-Message-Id: <156374794653.17989.9941695161724116092.malone@gac.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="19010";
- Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: d6ff35fd92cbd4429148f7782ca224422b1a8407
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1818937] Re: Crash with HV_ERROR on macOS host
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <796ed0ca-ecd7-9f18-71fa-59b94c403cbc@redhat.com>
+User-Agent: NeoMutt/20170113 (1.7.2)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::543
+Subject: Re: [Qemu-devel] [PATCH v3 1/2] bitmap: get last word mask from nr
+ directly
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -76,90 +99,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1818937 <1818937@bugs.launchpad.net>
+Reply-To: Wei Yang <richard.weiyang@gmail.com>
+Cc: quintela@redhat.com, corentincj@iksaif.net, pl@kamp.de,
+ qemu-devel@nongnu.org, peterx@redhat.com, Wei Yang <richard.weiyang@gmail.com>,
+ Wei Yang <richardw.yang@linux.intel.com>, kraxel@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We can reproduce this problem with Linux guests as well (running 4.15
-Ubuntu Xenial and 4.14 Android kernels). Mac models with integrated GPU
-seem to be more affected according to our testing, and the crash does
-not always occur, needs multiple tries to be triggered. We would be
-happy to assist in debugging, once you have a patch that can generate
-more detailed logs.
+On Sun, Jul 21, 2019 at 07:27:14PM +0200, Paolo Bonzini wrote:
+>On 21/07/19 02:33, Wei Yang wrote:
+>> On Thu, Jul 18, 2019 at 09:04:55AM +0800, Wei Yang wrote:
+>>> The value left in nr is the number of bits for the last word, which
+>>> could be calculate the last word mask directly.
+>>>
+>>> Remove the unnecessary size.
+>>>
+>> 
+>> May I ask why Patch 2 is picked up, but this one is not?
+>
+>Tests are always good to have, this cleanup will wait for 4.2 but it's
+>in the queue.
+>
 
--- =
+Thanks :-)
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1818937
+>Paolo
+>
+>>> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+>>>
+>>> ---
+>>> v2: refine bitmap_set_atomic too, suggested from Peter
+>>> ---
+>>> util/bitmap.c | 9 +++------
+>>> 1 file changed, 3 insertions(+), 6 deletions(-)
+>>>
+>>> diff --git a/util/bitmap.c b/util/bitmap.c
+>>> index 1753ff7f5b..5b15249796 100644
+>>> --- a/util/bitmap.c
+>>> +++ b/util/bitmap.c
+>>> @@ -160,7 +160,6 @@ int slow_bitmap_andnot(unsigned long *dst, const unsigned long *bitmap1,
+>>> void bitmap_set(unsigned long *map, long start, long nr)
+>>> {
+>>>     unsigned long *p = map + BIT_WORD(start);
+>>> -    const long size = start + nr;
+>>>     int bits_to_set = BITS_PER_LONG - (start % BITS_PER_LONG);
+>>>     unsigned long mask_to_set = BITMAP_FIRST_WORD_MASK(start);
+>>>
+>>> @@ -174,7 +173,7 @@ void bitmap_set(unsigned long *map, long start, long nr)
+>>>         p++;
+>>>     }
+>>>     if (nr) {
+>>> -        mask_to_set &= BITMAP_LAST_WORD_MASK(size);
+>>> +        mask_to_set &= BITMAP_LAST_WORD_MASK(nr);
+>>>         *p |= mask_to_set;
+>>>     }
+>>> }
+>>> @@ -182,7 +181,6 @@ void bitmap_set(unsigned long *map, long start, long nr)
+>>> void bitmap_set_atomic(unsigned long *map, long start, long nr)
+>>> {
+>>>     unsigned long *p = map + BIT_WORD(start);
+>>> -    const long size = start + nr;
+>>>     int bits_to_set = BITS_PER_LONG - (start % BITS_PER_LONG);
+>>>     unsigned long mask_to_set = BITMAP_FIRST_WORD_MASK(start);
+>>>
+>>> @@ -208,7 +206,7 @@ void bitmap_set_atomic(unsigned long *map, long start, long nr)
+>>>
+>>>     /* Last word */
+>>>     if (nr) {
+>>> -        mask_to_set &= BITMAP_LAST_WORD_MASK(size);
+>>> +        mask_to_set &= BITMAP_LAST_WORD_MASK(nr);
+>>>         atomic_or(p, mask_to_set);
+>>>     } else {
+>>>         /* If we avoided the full barrier in atomic_or(), issue a
+>>> @@ -221,7 +219,6 @@ void bitmap_set_atomic(unsigned long *map, long start, long nr)
+>>> void bitmap_clear(unsigned long *map, long start, long nr)
+>>> {
+>>>     unsigned long *p = map + BIT_WORD(start);
+>>> -    const long size = start + nr;
+>>>     int bits_to_clear = BITS_PER_LONG - (start % BITS_PER_LONG);
+>>>     unsigned long mask_to_clear = BITMAP_FIRST_WORD_MASK(start);
+>>>
+>>> @@ -235,7 +232,7 @@ void bitmap_clear(unsigned long *map, long start, long nr)
+>>>         p++;
+>>>     }
+>>>     if (nr) {
+>>> -        mask_to_clear &= BITMAP_LAST_WORD_MASK(size);
+>>> +        mask_to_clear &= BITMAP_LAST_WORD_MASK(nr);
+>>>         *p &= ~mask_to_clear;
+>>>     }
+>>> }
+>>> -- 
+>>> 2.17.1
+>>>
+>> 
 
-Title:
-  Crash with HV_ERROR on macOS host
-
-Status in QEMU:
-  New
-
-Bug description:
-  On macOS host running Windows 10 guest, qemu crashed with error
-  message: Error: HV_ERROR.
-
-  Host: macOS Mojave 10.14.3 (18D109) Late 2014 Mac mini presumably Core i5=
- 4278U.
-  QEMU: git commit a3e3b0a7bd5de211a62cdf2d6c12b96d3c403560
-  QEMU parameter: qemu-system-x86_64 -m 3000 -drive file=3Ddisk.img,if=3Dvi=
-rtio,discard=3Dunmap -accel hvf -soundhw hda -smp 3
-
-  thread list
-  Process 56054 stopped
-    thread #1: tid =3D 0x2ffec8, 0x00007fff48d0805a vImage`vLookupTable_Pla=
-nar16 + 970, queue =3D 'com.apple.main-thread'
-    thread #2: tid =3D 0x2ffecc, 0x00007fff79d6d7de libsystem_kernel.dylib`=
-__psynch_cvwait + 10
-    thread #3: tid =3D 0x2ffecd, 0x00007fff79d715aa libsystem_kernel.dylib`=
-__select + 10
-    thread #4: tid =3D 0x2ffece, 0x00007fff79d71d9a libsystem_kernel.dylib`=
-__sigwait + 10
-  * thread #6: tid =3D 0x2ffed0, 0x00007fff79d7023e libsystem_kernel.dylib`=
-__pthread_kill + 10, stop reason =3D signal SIGABRT
-    thread #7: tid =3D 0x2ffed1, 0x00007fff79d6d7de libsystem_kernel.dylib`=
-__psynch_cvwait + 10
-    thread #8: tid =3D 0x2ffed2, 0x00007fff79d6d7de libsystem_kernel.dylib`=
-__psynch_cvwait + 10
-    thread #11: tid =3D 0x2fff34, 0x00007fff79d6a17a libsystem_kernel.dylib=
-`mach_msg_trap + 10, name =3D 'com.apple.NSEventThread'
-    thread #30: tid =3D 0x300c04, 0x00007fff79e233f8 libsystem_pthread.dyli=
-b`start_wqthread
-    thread #31: tid =3D 0x300c16, 0x00007fff79e233f8 libsystem_pthread.dyli=
-b`start_wqthread
-    thread #32: tid =3D 0x300c17, 0x0000000000000000
-    thread #33: tid =3D 0x300c93, 0x00007fff79d6d7de libsystem_kernel.dylib=
-`__psynch_cvwait + 10
-
-  =
-
-  Crashed thread:
-
-  * thread #6, stop reason =3D signal SIGABRT
-    * frame #0: 0x00007fff79d7023e libsystem_kernel.dylib`__pthread_kill + =
-10
-      frame #1: 0x00007fff79e26c1c libsystem_pthread.dylib`pthread_kill + 2=
-85
-      frame #2: 0x00007fff79cd91c9 libsystem_c.dylib`abort + 127
-      frame #3: 0x000000010baa476d qemu-system-x86_64`assert_hvf_ok(ret=3D<=
-unavailable>) at hvf.c:106 [opt]
-      frame #4: 0x000000010baa4c8f qemu-system-x86_64`hvf_vcpu_exec(cpu=3D0=
-x00007f8e5283de00) at hvf.c:681 [opt]
-      frame #5: 0x000000010b988423 qemu-system-x86_64`qemu_hvf_cpu_thread_f=
-n(arg=3D0x00007f8e5283de00) at cpus.c:1636 [opt]
-      frame #6: 0x000000010bd9dfce qemu-system-x86_64`qemu_thread_start(arg=
-s=3D<unavailable>) at qemu-thread-posix.c:502 [opt]
-      frame #7: 0x00007fff79e24305 libsystem_pthread.dylib`_pthread_body + =
-126
-      frame #8: 0x00007fff79e2726f libsystem_pthread.dylib`_pthread_start +=
- 70
-      frame #9: 0x00007fff79e23415 libsystem_pthread.dylib`thread_start + 13
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1818937/+subscriptions
+-- 
+Wei Yang
+Help you, Help me
 
