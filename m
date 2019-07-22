@@ -2,91 +2,80 @@ Return-Path: <SRS0=EA86=VT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85FB4C7618F
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 16:00:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4011DC76190
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 16:03:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4C5EC218EA
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 16:00:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 07723218EA
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 16:03:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iPbss/mK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C5EC218EA
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EfY6HGOH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07723218EA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35372 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35620 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hpajP-0003sQ-Pf
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jul 2019 12:00:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56700)
+	id 1hpamp-0000mO-2v
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jul 2019 12:03:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58153)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1hpajA-0003EJ-Gw
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 11:59:53 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hpamb-0000Nf-Mx
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 12:03:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1hpaj9-0007lR-Kg
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 11:59:52 -0400
-Received: from mail-pl1-x633.google.com ([2607:f8b0:4864:20::633]:46315)
+ (envelope-from <peter.maydell@linaro.org>) id 1hpama-0002Dh-KN
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 12:03:25 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:39348)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1hpaj9-0007kR-Bs
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 11:59:51 -0400
-Received: by mail-pl1-x633.google.com with SMTP id c2so19356261plz.13
- for <qemu-devel@nongnu.org>; Mon, 22 Jul 2019 08:59:51 -0700 (PDT)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hpama-0002CV-Dm
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 12:03:24 -0400
+Received: by mail-ot1-x343.google.com with SMTP id r21so34726281otq.6
+ for <qemu-devel@nongnu.org>; Mon, 22 Jul 2019 09:03:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=53qxnmFCQleCgbRBd+QvrrBbXVy7x90TNzmGsFo5nJU=;
- b=iPbss/mK0jszMYof/8qtEi33fitz9HC8eD/BndxwmPj/LtJj21fdl1api2UB53TVJ3
- LiO/y1lhicz2hfPj5jnw3buDx9l0NVfuG8XWs6sgxIxkgeh6ofJg+rI9vKUAUHFyi+c/
- ug5ndyKNnPX6tDf11y2fxK3chMQvVwuXqhlhlvN351ntAyuvxP95hpiQUZdskVFXNm8S
- /+JSbRug7VVg9zxK0h9re0oMGark5HNwNNigLHKEX2GcEoUZzHqsv1alZOVnM1IeNmYK
- eUvzBNFoIl8UsEOqM62/C1mB7Mq4baSo8laFlWCeZ4XMs17DBlLRSW91MabPlGM68JxT
- w6PQ==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=iJn21nEwRWdssE8YQ6E2iuuNCR55/C5oK+w8rhaw/8Q=;
+ b=EfY6HGOH+tvPddQOyy2nC8VxQLpBfZK0ofyAmGSgNGUNw0qWdeh1V+yaQbJD4Bj+4h
+ Kp3KQdiPmXAdITXZKgjJwd0PN1lkZHgM3ABuuYD/pSXGQuy+un40nyNzagMdhKHS+1Iz
+ dgMHSufIuGtLW87kurBxwoM1L6i+kT95b0mytebj5msFee2dPGYtePxMXx3XFezUi8iH
+ vT8Y3OGMvRhlfOrieEx5E5O5SP1fQRlWemJFmRHfLzobHHT9c3irTBLxZAB2GNvdrfmu
+ QuIzUKoxh3hM1OfAihnbPQXUzZiqutmzRMy9duRWk7op+F/kjmQ/mweSmKaVx/vKCrrU
+ jw+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=53qxnmFCQleCgbRBd+QvrrBbXVy7x90TNzmGsFo5nJU=;
- b=VQjmKXze3GOt5bRXo6UJ87hhO3WG2FhthuzvqiPMeni/5y0SVtXCH/0/fDaam2oaQa
- 6EdMe8+AArzKqtEijE29qDA3dykiJTg7UXY54jJGdotHtxttF2iJW/aSajqDq839eD8X
- vQKZOONZLn/xGhUzZUCZzxryfIjKqIXOhjVkSn85ZYVFyb62wy/DVKaliNkF8hFTrHy2
- HuZ2j9ZPmpm/ta/O4XZTCP139fNKFrYju6DCnVZX4adHZP28am1ZLRUCRvCpeoq5YpDi
- 2FOZT7b5dKmqQKulKHAJbt1PhurqGXL91RD56+X49PW5oGy10WbU8qA8wVi96F3OCz4q
- 8Mmg==
-X-Gm-Message-State: APjAAAWBC5xUcBAGA+TWGsNbcFoQk+JQVjLR1OsbmcGHb73Knx7C/M5S
- QmblB+u9gcCwzLCLMDBXEA5tIw==
-X-Google-Smtp-Source: APXvYqy/RcnjVKmOcjR9YkoxmsldkT0VMHLcPieshCXhxmcgxnYEhbB1VLUfu3mSkg1P/Zg2xZBPtw==
-X-Received: by 2002:a17:902:b582:: with SMTP id
- a2mr77224778pls.128.1563811190327; 
- Mon, 22 Jul 2019 08:59:50 -0700 (PDT)
-Received: from [192.168.1.11] (97-126-117-207.tukw.qwest.net. [97.126.117.207])
- by smtp.gmail.com with ESMTPSA id y128sm58626865pgy.41.2019.07.22.08.59.48
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 22 Jul 2019 08:59:49 -0700 (PDT)
-To: tony.nguyen@bt.com, qemu-devel@nongnu.org
-References: <e9c6e5310b1a4863be45d45bf087fc3d@tpw09926dag18e.domain1.systemhost.net>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <2b6eb033-4b6e-4d64-c57e-a3257088d0dd@linaro.org>
-Date: Mon, 22 Jul 2019 08:59:47 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=iJn21nEwRWdssE8YQ6E2iuuNCR55/C5oK+w8rhaw/8Q=;
+ b=fpXyeYgszhSU6Z9/BS9NmL31RWqbC+9iN+2ugV2+6ye7j2kitI73TYa4SMjWWiqDE1
+ D4LD3RUMcxLkgzSIqn3+YL5WXodW73QnH76zZoZGLo0gFn5weQueWzosSweYoE/VO2iM
+ iepvvfoy9XIYEZhlXvI3X50z1uhUAo2+9yZJ7Wj+bqFLD2KAC7YQFYpKAzthURsuMaEf
+ QRU+6bIzhwMp85VxK2YiMhZPV7TD3WJRnY6czEo5EIeh/OXqaGAvE6yTvNWFuVbXf4pt
+ 7z2ggUKDb3eGMzlbhi0wviL5zQ/vKPbvCVHnDC9JBl25p1IgK4oew7Rh8ywTDgvVaBHd
+ nnwg==
+X-Gm-Message-State: APjAAAVxdNHKbgEVW7SgzLMiAr20ZA+1bI/cCnhBybIqavf1WXHEfoNE
+ zoVnhhdy9aq4CLRFEBKRwLb4pEgZdGoi6/XwSbRaTQ==
+X-Google-Smtp-Source: APXvYqxx2sGbBzo6rPxp3Fd4osWCT3RRWIel8Y/olwhLDyO/jYPlKtyQNdOTkEZGJrqHTjN5QNXKZChIIp0QykT7mHc=
+X-Received: by 2002:a9d:5f1a:: with SMTP id f26mr16228965oti.91.1563811402641; 
+ Mon, 22 Jul 2019 09:03:22 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <e9c6e5310b1a4863be45d45bf087fc3d@tpw09926dag18e.domain1.systemhost.net>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20190307170440.3113-1-richard.henderson@linaro.org>
+ <20190307170440.3113-20-richard.henderson@linaro.org>
+In-Reply-To: <20190307170440.3113-20-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 22 Jul 2019 17:03:11 +0100
+Message-ID: <CAFEAcA98kE0VVu6K6AxPNb=YQzSsGunXL_EpwkqaOH=aDZCVTw@mail.gmail.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::633
-Subject: Re: [Qemu-devel] [PATCH v2 00/20] Invert Endian bit in SPARCv9 MMU
- TTE
+X-Received-From: 2607:f8b0:4864:20::343
+Subject: Re: [Qemu-devel] [PATCH v4 19/22] target/arm: Create tagged ram
+ when MTE is enabled
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,30 +87,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, walling@linux.ibm.com, mst@redhat.com,
- palmer@sifive.com, mark.cave-ayland@ilande.co.uk, Alistair.Francis@wdc.com,
- arikalo@wavecomp.com, david@redhat.com, pasic@linux.ibm.com,
- borntraeger@de.ibm.com, rth@twiddle.net, atar4qemu@gmail.com,
- ehabkost@redhat.com, sw@weilnetz.de, qemu-s390x@nongnu.org,
- qemu-arm@nongnu.org, david@gibson.dropbear.id.au, qemu-riscv@nongnu.org,
- cohuck@redhat.com, claudio.fontana@huawei.com, alex.williamson@redhat.com,
- qemu-ppc@nongnu.org, amarkovic@wavecomp.com, pbonzini@redhat.com,
- aurelien@aurel32.net
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/22/19 8:34 AM, tony.nguyen@bt.com wrote:
-> Tony Nguyen (20):
->   tcg: Replace MO_8 with MO_UB alias
->   tcg: Replace MO_16 with MO_UW alias
->   tcg: Replace MO_32 with MO_UL alias
->   tcg: Replace MO_64 with MO_UQ alias
->   tcg: Move size+sign+endian from TCGMemOp to MemOp
+On Thu, 7 Mar 2019 at 17:05, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
 
-I don't like any of these first 5 patches.
-I don't understand your motivation here.  Why?
+> @@ -1182,16 +1194,19 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
+>      init_cpreg_list(cpu);
+>
+>  #ifndef CONFIG_USER_ONLY
+> +    cs->num_ases = 1;
+>      if (cpu->has_el3 || arm_feature(env, ARM_FEATURE_M_SECURITY)) {
+>          cs->num_ases = 2;
+> -
+>          if (!cpu->secure_memory) {
+>              cpu->secure_memory = cs->memory;
+>          }
+>          cpu_address_space_init(cs, ARMASIdx_S, "cpu-secure-memory",
+>                                 cpu->secure_memory);
+> -    } else {
+> -        cs->num_ases = 1;
+> +    }
+> +    if (cpu->tag_memory != NULL) {
+> +        cs->num_ases = 3;
+> +        cpu_address_space_init(cs, ARMASIdx_TAG, "cpu-tag-memory",
+> +                               cpu->tag_memory);
+>      }
+>      cpu_address_space_init(cs, ARMASIdx_NS, "cpu-memory", cs->memory);
+
+This code will result in an array overrun in cpu_address_space_init(),
+because that function allocates the cpu->cpu_ases array the first
+time it is called, using the value of cpu->num_ases at that point.
+So if  we call it for "cpu-secure-memory" when cpu->num_ases is 2,
+the later call for "cpu-tag-memory" won't reallocate the array to
+have size 3, it will just index off the end of it.
+
+You should be able to see this with valgrind for the case of
+the 'virt' board with EL3 enabled:
+
+ valgrind ./build/x86/aarch64-softmmu/qemu-system-aarch64 -cpu max -M
+virt,secure=on
+
+==16861== Invalid write of size 8
+==16861==    at 0x4120FA: cpu_address_space_init (exec.c:906)
+==16861==    by 0x636F80: arm_cpu_realizefn (cpu.c:1617)
+==16861==    by 0x80B920: device_set_realized (qdev.c:834)
+==16861==    by 0xA9A94B: property_set_bool (object.c:2076)
+==16861==    by 0xA98BC7: object_property_set (object.c:1268)
+==16861==    by 0xA9BC8D: object_property_set_qobject (qom-qobject.c:26)
+==16861==    by 0xA98EAC: object_property_set_bool (object.c:1334)
+==16861==    by 0x5A0D0F: machvirt_init (virt.c:1677)
+==16861==    by 0x81544B: machine_run_board_init (machine.c:1148)
+==16861==    by 0x767B7E: main (vl.c:4348)
+==16861==  Address 0x2c257720 is 0 bytes after a block of size 384 alloc'd
+==16861==    at 0x4C31B25: calloc (in
+/usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16861==    by 0x6100B10: g_malloc0 (in
+/usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.5600.4)
+==16861==    by 0x4120BE: cpu_address_space_init (exec.c:902)
+==16861==    by 0x636F30: arm_cpu_realizefn (cpu.c:1612)
+==16861==    by 0x80B920: device_set_realized (qdev.c:834)
+==16861==    by 0xA9A94B: property_set_bool (object.c:2076)
+==16861==    by 0xA98BC7: object_property_set (object.c:1268)
+==16861==    by 0xA9BC8D: object_property_set_qobject (qom-qobject.c:26)
+==16861==    by 0xA98EAC: object_property_set_bool (object.c:1334)
+==16861==    by 0x5A0D0F: machvirt_init (virt.c:1677)
+==16861==    by 0x81544B: machine_run_board_init (machine.c:1148)
+==16861==    by 0x767B7E: main (vl.c:4348)
 
 
-r~
+thanks
+-- PMM
 
