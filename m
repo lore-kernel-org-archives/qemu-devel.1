@@ -6,56 +6,56 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B518C76190
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 13:42:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D441C76188
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 13:42:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 40039216C8
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 13:42:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 40039216C8
+	by mail.kernel.org (Postfix) with ESMTPS id 7409C21921
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 13:42:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7409C21921
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33746 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33768 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hpYa9-0002vq-0Y
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jul 2019 09:42:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54687)
+	id 1hpYaS-0004YX-OI
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jul 2019 09:42:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54664)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <david@redhat.com>) id 1hpYZD-0007kn-R2
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 09:41:28 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1hpYZC-0005Gi-0g
+ (envelope-from <david@redhat.com>) id 1hpYZB-0007bj-UA
  for qemu-devel@nongnu.org; Mon, 22 Jul 2019 09:41:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49994)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <david@redhat.com>) id 1hpYZA-0005FA-2i
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 09:41:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49676)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <david@redhat.com>)
- id 1hpYZB-0005G2-RD; Mon, 22 Jul 2019 09:41:25 -0400
+ id 1hpYZ9-0005EW-Ti; Mon, 22 Jul 2019 09:41:24 -0400
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 0E08785363;
- Mon, 22 Jul 2019 13:41:25 +0000 (UTC)
-Received: from t460s.redhat.com (ovpn-116-75.ams2.redhat.com [10.36.116.75])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8231B1001B12;
+ by mx1.redhat.com (Postfix) with ESMTPS id 3ABC7C18B2D9;
  Mon, 22 Jul 2019 13:41:23 +0000 (UTC)
+Received: from t460s.redhat.com (ovpn-116-75.ams2.redhat.com [10.36.116.75])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B0B1E10114A1;
+ Mon, 22 Jul 2019 13:41:21 +0000 (UTC)
 From: David Hildenbrand <david@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Mon, 22 Jul 2019 15:41:05 +0200
-Message-Id: <20190722134108.22151-4-david@redhat.com>
+Date: Mon, 22 Jul 2019 15:41:04 +0200
+Message-Id: <20190722134108.22151-3-david@redhat.com>
 In-Reply-To: <20190722134108.22151-1-david@redhat.com>
 References: <20190722134108.22151-1-david@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.25]); Mon, 22 Jul 2019 13:41:25 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.31]); Mon, 22 Jul 2019 13:41:23 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH-for-4.1 v3 3/6] virtio-balloon: Simplify
- deflate with pbp
+Subject: [Qemu-devel] [PATCH-for-4.1 v3 2/6] virtio-balloon: Fix QEMU
+ crashes on pagesize > BALLOON_PAGE_SIZE
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,64 +75,63 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Let's simplify this - the case we are optimizing for is very hard to
-trigger and not worth the effort. If we're switching from inflation to
-deflation, let's reset the pbp.
+We are using the wrong functions to set/clear bits, effectively touching
+multiple bits, writing out of range of the bitmap, resulting in memory
+corruptions. We have to use set_bit()/clear_bit() instead.
 
+Can easily be reproduced by starting a qemu guest on hugetlbfs memory,
+inflating the balloon. QEMU crashes. This never could have worked
+properly - especially, also pages would have been discarded when the
+first sub-page would be inflated (the whole bitmap would be set).
+
+While testing I realized, that on hugetlbfs it is pretty much impossible
+to discard a page - the guest just frees the 4k sub-pages in random order
+most of the time. I was only able to discard a hugepage a handful of
+times - so I hope that now works correctly.
+
+Fixes: ed48c59875b6 ("virtio-balloon: Safely handle BALLOON_PAGE_SIZE <
+                     host page size")
+Fixes: b27b32391404 ("virtio-balloon: Fix possible guest memory corruptio=
+n
+                     with inflates & deflates")
+Cc: qemu-stable@nongnu.org #v4.0.0
 Acked-by: David Gibson <david@gibson.dropbear.id.au>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- hw/virtio/virtio-balloon.c | 26 +++++---------------------
- 1 file changed, 5 insertions(+), 21 deletions(-)
+ hw/virtio/virtio-balloon.c | 10 ++++------
+ 1 file changed, 4 insertions(+), 6 deletions(-)
 
 diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
-index a78d2d2184..04a7e6c772 100644
+index 515abf6553..a78d2d2184 100644
 --- a/hw/virtio/virtio-balloon.c
 +++ b/hw/virtio/virtio-balloon.c
-@@ -117,7 +117,7 @@ static void balloon_deflate_page(VirtIOBalloon *ballo=
-on,
-     void *addr =3D memory_region_get_ram_ptr(mr) + offset;
-     RAMBlock *rb;
-     size_t rb_page_size;
--    ram_addr_t ram_offset, host_page_base;
-+    ram_addr_t ram_offset;
-     void *host_addr;
-     int ret;
-=20
-@@ -125,27 +125,11 @@ static void balloon_deflate_page(VirtIOBalloon *bal=
-loon,
-      * host address? */
-     rb =3D qemu_ram_block_from_host(addr, false, &ram_offset);
-     rb_page_size =3D qemu_ram_pagesize(rb);
--    host_page_base =3D ram_offset & ~(rb_page_size - 1);
--
--    if (balloon->pbp
--        && rb =3D=3D balloon->pbp->rb
--        && host_page_base =3D=3D balloon->pbp->base) {
--        int subpages =3D rb_page_size / BALLOON_PAGE_SIZE;
-=20
--        /*
--         * This means the guest has asked to discard some of the 4kiB
--         * subpages of a host page, but then changed its mind and
--         * asked to keep them after all.  It's exceedingly unlikely
--         * for a guest to do this in practice, but handle it anyway,
--         * since getting it wrong could mean discarding memory the
--         * guest is still using. */
--        clear_bit((ram_offset - balloon->pbp->base) / BALLOON_PAGE_SIZE,
--                  balloon->pbp->bitmap);
--
--        if (bitmap_empty(balloon->pbp->bitmap, subpages)) {
--            g_free(balloon->pbp);
--            balloon->pbp =3D NULL;
--        }
-+    if (balloon->pbp) {
-+        /* Let's play safe and always reset the pbp on deflation request=
-s. */
-+        g_free(balloon->pbp);
-+        balloon->pbp =3D NULL;
+@@ -94,9 +94,8 @@ static void balloon_inflate_page(VirtIOBalloon *balloon=
+,
+         balloon->pbp->base =3D host_page_base;
      }
 =20
-     host_addr =3D (void *)((uintptr_t)addr & ~(rb_page_size - 1));
+-    bitmap_set(balloon->pbp->bitmap,
+-               (ram_offset - balloon->pbp->base) / BALLOON_PAGE_SIZE,
+-               subpages);
++    set_bit((ram_offset - balloon->pbp->base) / BALLOON_PAGE_SIZE,
++            balloon->pbp->bitmap);
+=20
+     if (bitmap_full(balloon->pbp->bitmap, subpages)) {
+         /* We've accumulated a full host page, we can actually discard
+@@ -140,9 +139,8 @@ static void balloon_deflate_page(VirtIOBalloon *ballo=
+on,
+          * for a guest to do this in practice, but handle it anyway,
+          * since getting it wrong could mean discarding memory the
+          * guest is still using. */
+-        bitmap_clear(balloon->pbp->bitmap,
+-                     (ram_offset - balloon->pbp->base) / BALLOON_PAGE_SI=
+ZE,
+-                     subpages);
++        clear_bit((ram_offset - balloon->pbp->base) / BALLOON_PAGE_SIZE,
++                  balloon->pbp->bitmap);
+=20
+         if (bitmap_empty(balloon->pbp->bitmap, subpages)) {
+             g_free(balloon->pbp);
 --=20
 2.21.0
 
