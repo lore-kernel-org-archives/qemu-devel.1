@@ -2,88 +2,85 @@ Return-Path: <SRS0=EA86=VT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8471DC76188
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 13:15:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32510C76190
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 13:15:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4EBDA21921
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 13:15:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 047A021921
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 13:15:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yRijLWEG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4EBDA21921
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kSO2Xwhf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 047A021921
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33408 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33410 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hpY9h-0000LY-L7
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jul 2019 09:15:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47603)
+	id 1hpY9j-0000Qk-Hx
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jul 2019 09:15:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47600)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hpY9B-0007Ny-H3
+ (envelope-from <peter.maydell@linaro.org>) id 1hpY9B-0007Nx-6U
  for qemu-devel@nongnu.org; Mon, 22 Jul 2019 09:14:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hpY9A-00034f-H6
+ (envelope-from <peter.maydell@linaro.org>) id 1hpY9A-00034K-2K
  for qemu-devel@nongnu.org; Mon, 22 Jul 2019 09:14:33 -0400
-Received: from mail-wm1-x336.google.com ([2a00:1450:4864:20::336]:54279)
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:44516)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hpY9A-00033z-BA
+ id 1hpY99-00033H-RQ
  for qemu-devel@nongnu.org; Mon, 22 Jul 2019 09:14:32 -0400
-Received: by mail-wm1-x336.google.com with SMTP id p74so35118453wme.4
- for <qemu-devel@nongnu.org>; Mon, 22 Jul 2019 06:14:32 -0700 (PDT)
+Received: by mail-wr1-x441.google.com with SMTP id p17so39341871wrf.11
+ for <qemu-devel@nongnu.org>; Mon, 22 Jul 2019 06:14:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+ h=from:to:subject:date:message-id:mime-version
  :content-transfer-encoding;
- bh=GzeCjbtXLdqWVGSKySjABkNnwqpyaiVuNILnUkbYPsw=;
- b=yRijLWEG7gpaqi6/bGZUuADYOKXuwlIG5GTnp/YPnmHFlULLz2p6q5oES24a/UiNDo
- z8wvN79LI8wWOBmstyjFBqDo5YCN5JlJZLJvlE2k4YyoX6e53uR68AMN9AnpWxKTCtnI
- C2iqwQ+hpw5CD4LTvCJ8uSH+AHDqWdo8QtpLjVNOpLJrnY0WDmd35Z6cygKxsnlKIIII
- ef08ZWukToD6q+86XyY7W9Fdt6G0/u2LGHkRFrX4H3DORtzUJFMPht3tX7iG+rTfBYsS
- qXwviHJpuQz59aoWJqhy6rrA24mB0t6KPlVHo8OQt8aH9E7JD2VDY58sFn26T5nhwg8l
- rhaQ==
+ bh=JFDAqPQkZPRu7uzWO2+Dyf2rR9xqez/uX3of0Oc36D4=;
+ b=kSO2Xwhf6bcEwaJ/WUWedgC1YRUnVIwTC49BVYN60DnEeYHZ4iMX92biHgevt71O4m
+ 2Xd8wyFnPHWiD/EeM+dn2v3ztblQbjHwsf7ABex6iblFVrkRlh3kJ0Qs7KyAJI7cXjWH
+ /WOyl/ALRP0T6W0j3E4X1bpRCnJ0nUtnEbr/QkBpaEYFqYOml2EmiFYJJAWTd+XbYQl2
+ mCJne2FAYdVmuwlMaJvU2/YNpcPXWxQJN/zCqA44yEBod0vomOsES8eSrfgfaczIgnGC
+ bY5trNVWnptg4Yk42sR6o9RbxQKw+f2CsYkoq6cyCyT7aplg6TPOSGP/Hc9ADfWry3Y0
+ eoRA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=GzeCjbtXLdqWVGSKySjABkNnwqpyaiVuNILnUkbYPsw=;
- b=HGYbpkqxe5qS103JRpibgkaQ33+rF3x9akTqQSrHOTiZrmU40LDisKz6N5AQcRQaU3
- nYKxWMK3XRbJtKV1lS5RpSovcKLjK7/yYL79UautjtYSDoel1w/jCf1JsW/kqZHDlWz3
- apq2uIFaALBoMpbG8HbzXB/VmMNH1IeVIuIMhGimlHVGPbyynFxbe68vw+Ri1KlZnstl
- chMfU3si7EhuaDO5LpEEPGKsI9Q0e/sATulrbX2VQP8f1opbDfLYfGrE3Iorw+sjwmZv
- 89HP5BHsnmlpRRon9Jx8iU80SEDd0Azz1U5AsCPSFz0tZYxQenddDr41FdyG+TlZKxFK
- fNmw==
-X-Gm-Message-State: APjAAAVefrhva69toxQScj/Nnzz0vxf5Vu7I0FJNxW/AUJp17pbZb1gk
- HAfwXmEKhVnJri3BwhtRx0yWpHhm7N54yg==
-X-Google-Smtp-Source: APXvYqzFewCPsLWBZ4vxLH6AdAMWX4Ou4foab2QGEXLCZ/xZAdzQ0r8QtUHB2jZ1E6EufzUIv4Cy2Q==
-X-Received: by 2002:a1c:c188:: with SMTP id r130mr60520677wmf.73.1563801270907; 
- Mon, 22 Jul 2019 06:14:30 -0700 (PDT)
+ h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=JFDAqPQkZPRu7uzWO2+Dyf2rR9xqez/uX3of0Oc36D4=;
+ b=VuP+LEw8hcSQ/esT2G4U4vfzMWmihDWS6uT8famFhk8msimTbjrH/wzkih6u1vu6nN
+ 36u/VwgNrdPOqSC3FUVIC/ultzimK0uX/0gA8gxVzbhzFVaDc9zcQ4uJdJMkkWBdwvXi
+ QHp5cy4SPBpbpBWzzQpQsEhCOWicRHtUibXrk4G8OuA2e5098K3SLBjq4cgduRIUMc2J
+ IScAYUI2vrsAbG8HgRd2ExfHTNQMffQb9R0J81A6RP0Np8I89irn3XeBnl6vaaLPBqI7
+ BUaCFk9JxOU2jR0UJ4CrNdeoP14TVphi0SCM9Ee+YuhebXClGvZ+jY1XzErnaRutFJAY
+ DT5Q==
+X-Gm-Message-State: APjAAAWMSqaH3hEU6Vkip1rmRZVTavTjjD3sMG6BnctAA6/URuHV/bUY
+ DWzjD4H4Vp1MI0BoYRPBaiu7uKnK8VcPhg==
+X-Google-Smtp-Source: APXvYqxAjphPrLvnZEXOV5iFs2ydeGYAu5sgpyubaErFeDU0Xe0ZaIAstBGmprY1DtGz7m8T7JyOXg==
+X-Received: by 2002:adf:de8b:: with SMTP id w11mr75206447wrl.134.1563801269988; 
+ Mon, 22 Jul 2019 06:14:29 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id f12sm42207217wrg.5.2019.07.22.06.14.30
+ by smtp.gmail.com with ESMTPSA id f12sm42207217wrg.5.2019.07.22.06.14.29
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Mon, 22 Jul 2019 06:14:30 -0700 (PDT)
+ Mon, 22 Jul 2019 06:14:29 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Mon, 22 Jul 2019 14:14:23 +0100
-Message-Id: <20190722131427.2669-2-peter.maydell@linaro.org>
+Date: Mon, 22 Jul 2019 14:14:22 +0100
+Message-Id: <20190722131427.2669-1-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190722131427.2669-1-peter.maydell@linaro.org>
-References: <20190722131427.2669-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::336
-Subject: [Qemu-devel] [PULL 1/5] target/arm: Add missing break statement for
- Hypervisor Trap Exception
+X-Received-From: 2a00:1450:4864:20::441
+Subject: [Qemu-devel] [PULL 0/5] target-arm queue
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,42 +96,51 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
+target-arm queue for rc2. This has 3 Arm related bug fixes,
+and a couple of non-arm patches which don't have an obviously
+better route into the tree.
 
-Reported by GCC9 when building with  -Wimplicit-fallthrough=2:
+thanks
+-- PMM
 
-  target/arm/helper.c: In function ‘arm_cpu_do_interrupt_aarch32_hyp’:
-  target/arm/helper.c:7958:14: error: this statement may fall through [-Werror=implicit-fallthrough=]
-   7958 |         addr = 0x14;
-        |         ~~~~~^~~~~~
-  target/arm/helper.c:7959:5: note: here
-   7959 |     default:
-        |     ^~~~~~~
-  cc1: all warnings being treated as errors
+The following changes since commit b9e02bb3f98174209dbd5c96858e65a31723221b:
 
-Fixes: b9bc21ff9f9
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reported-by: Stefan Weil <sw@weilnetz.de>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Message-id: 20190719111451.12406-1-philmd@redhat.com
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- target/arm/helper.c | 1 +
- 1 file changed, 1 insertion(+)
+  Merge remote-tracking branch 'remotes/ericb/tags/pull-nbd-2019-07-19' into staging (2019-07-22 10:11:28 +0100)
 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 20f8728be11..b74c23a9bc0 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -7956,6 +7956,7 @@ static void arm_cpu_do_interrupt_aarch32_hyp(CPUState *cs)
-         break;
-     case EXCP_HYP_TRAP:
-         addr = 0x14;
-+        break;
-     default:
-         cpu_abort(cs, "Unhandled exception 0x%x\n", cs->exception_index);
-     }
--- 
-2.20.1
+are available in the Git repository at:
 
+  https://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20190722
+
+for you to fetch changes up to ddb45afbfbc639365d6c934e4e29f6de5e5e2a0e:
+
+  contrib/elf2dmp: Build download.o with CURL_CFLAGS (2019-07-22 14:07:39 +0100)
+
+----------------------------------------------------------------
+target-arm queue:
+ * target/arm: Add missing break statement for Hypervisor Trap Exception
+   (fixes handling of SMC insn taken to AArch32 Hyp mode via HCR.TSC)
+ * hw/arm/fsl-imx6ul.c: Remove dead SMP-related code
+ * target/arm: Limit ID register assertions to TCG
+ * configure: Clarify URL to source downloads
+ * contrib/elf2dmp: Build download.o with CURL_CFLAGS
+
+----------------------------------------------------------------
+Peter Maydell (4):
+      hw/arm/fsl-imx6ul.c: Remove dead SMP-related code
+      target/arm: Limit ID register assertions to TCG
+      configure: Clarify URL to source downloads
+      contrib/elf2dmp: Build download.o with CURL_CFLAGS
+
+Philippe Mathieu-Daudé (1):
+      target/arm: Add missing break statement for Hypervisor Trap Exception
+
+ configure                     |  2 +-
+ Makefile                      |  1 -
+ contrib/elf2dmp/Makefile.objs |  3 +++
+ include/hw/arm/fsl-imx6ul.h   |  2 +-
+ hw/arm/fsl-imx6ul.c           | 62 +++++++++++++------------------------------
+ hw/arm/mcimx6ul-evk.c         |  2 +-
+ target/arm/cpu.c              |  7 +++--
+ target/arm/helper.c           |  1 +
+ 8 files changed, 30 insertions(+), 50 deletions(-)
 
