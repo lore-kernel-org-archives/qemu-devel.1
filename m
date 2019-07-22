@@ -6,50 +6,50 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 059DEC76188
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 15:48:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE072C76188
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 15:48:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D1711218EA
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 15:48:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1711218EA
+	by mail.kernel.org (Postfix) with ESMTPS id C49B820821
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 15:48:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C49B820821
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=bt.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34926 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34952 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hpaXp-0001m2-4A
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jul 2019 11:48:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53420)
+	id 1hpaYA-0002uR-Ny
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jul 2019 11:48:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53560)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <tony.nguyen@bt.com>) id 1hpaXU-0000tP-0u
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 11:47:49 -0400
+ (envelope-from <tony.nguyen@bt.com>) id 1hpaXr-00024B-Hk
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 11:48:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tony.nguyen@bt.com>) id 1hpaXQ-0007D1-1G
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 11:47:46 -0400
-Received: from smtpe1.intersmtp.com ([213.121.35.78]:11937)
+ (envelope-from <tony.nguyen@bt.com>) id 1hpaXq-0007ak-An
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 11:48:11 -0400
+Received: from smtpe1.intersmtp.com ([213.121.35.74]:26775)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <tony.nguyen@bt.com>)
- id 1hpaX5-00071G-16; Mon, 22 Jul 2019 11:47:23 -0400
-Received: from tpw09926dag18e.domain1.systemhost.net (10.9.212.18) by
- BWP09926083.bt.com (10.36.82.114) with Microsoft SMTP Server (version=TLS1_2, 
+ id 1hpaXQ-0007AZ-8o; Mon, 22 Jul 2019 11:47:44 -0400
+Received: from tpw09926dag18f.domain1.systemhost.net (10.9.212.26) by
+ BWP09926079.bt.com (10.36.82.110) with Microsoft SMTP Server (version=TLS1_2, 
  cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P256) id 15.1.1713.5; Mon, 22
- Jul 2019 16:45:56 +0100
+ Jul 2019 16:47:37 +0100
 Received: from tpw09926dag18e.domain1.systemhost.net (10.9.212.18) by
- tpw09926dag18e.domain1.systemhost.net (10.9.212.18) with Microsoft SMTP
- Server (TLS) id 15.0.1395.4; Mon, 22 Jul 2019 16:45:56 +0100
+ tpw09926dag18f.domain1.systemhost.net (10.9.212.26) with Microsoft SMTP
+ Server (TLS) id 15.0.1395.4; Mon, 22 Jul 2019 16:47:15 +0100
 Received: from tpw09926dag18e.domain1.systemhost.net
  ([fe80::a946:6348:ccf4:fa6c]) by tpw09926dag18e.domain1.systemhost.net
  ([fe80::a946:6348:ccf4:fa6c%12]) with mapi id 15.00.1395.000; Mon, 22 Jul
- 2019 16:45:56 +0100
+ 2019 16:47:15 +0100
 From: <tony.nguyen@bt.com>
 To: <qemu-devel@nongnu.org>
-Thread-Topic: [Qemu-devel] [PATCH v2 08/20] target/mips: Access MemoryRegion
- with MemOp
-Thread-Index: AQHVQKSNE9Apjwo+sUuRTOACfuKYCQ==
-Date: Mon, 22 Jul 2019 15:45:56 +0000
-Message-ID: <1563810356505.44472@bt.com>
+Thread-Topic: [Qemu-devel] [PATCH v2 10/20] hw/intc/armv7m_nic: Access
+ MemoryRegion with MemOp
+Thread-Index: AQHVQKS8ru+KIa1tqke/bCiWCh2RRA==
+Date: Mon, 22 Jul 2019 15:47:15 +0000
+Message-ID: <1563810434810.27249@bt.com>
 References: <e9c6e5310b1a4863be45d45bf087fc3d@tpw09926dag18e.domain1.systemhost.net>
 In-Reply-To: <e9c6e5310b1a4863be45d45bf087fc3d@tpw09926dag18e.domain1.systemhost.net>
 Accept-Language: en-AU, en-GB, en-US
@@ -60,12 +60,12 @@ x-ms-exchange-transport-fromentityheader: Hosted
 x-originating-ip: [10.187.101.37]
 MIME-Version: 1.0
 X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 213.121.35.78
+X-Received-From: 213.121.35.74
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: [Qemu-devel] [PATCH v2 08/20] target/mips: Access MemoryRegion with
- MemOp
+Subject: [Qemu-devel] [PATCH v2 10/20] hw/intc/armv7m_nic: Access
+ MemoryRegion with MemOp
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,39 +92,71 @@ Sender: "Qemu-devel"
 
 Signed-off-by: Tony Nguyen <tony.nguyen@bt.com>
 ---
- target/mips/op_helper.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ hw/intc/armv7m_nvic.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
 
-diff --git a/target/mips/op_helper.c b/target/mips/op_helper.c
-index 9e2e02f..dccb8df 100644
---- a/target/mips/op_helper.c
-+++ b/target/mips/op_helper.c
-@@ -24,6 +24,7 @@
- #include "exec/helper-proto.h"
+diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
+index 9f8f0d3..25bb88a 100644
+--- a/hw/intc/armv7m_nvic.c
++++ b/hw/intc/armv7m_nvic.c
+@@ -18,6 +18,7 @@
+ #include "hw/intc/armv7m_nvic.h"
+ #include "target/arm/cpu.h"
  #include "exec/exec-all.h"
- #include "exec/cpu_ldst.h"
 +#include "exec/memop.h"
- #include "sysemu/kvm.h"
+ #include "qemu/log.h"
+ #include "qemu/module.h"
+ #include "trace.h"
+@@ -2345,7 +2346,8 @@ static MemTxResult nvic_sysreg_ns_write(void *opaque,=
+ hwaddr addr,
+     if (attrs.secure) {
+         /* S accesses to the alias act like NS accesses to the real region=
+ */
+         attrs.secure =3D 0;
+-        return memory_region_dispatch_write(mr, addr, value, size, attrs);
++        return memory_region_dispatch_write(mr, addr, value, SIZE_MEMOP(si=
+ze),
++                                            attrs);
+     } else {
+         /* NS attrs are RAZ/WI for privileged, and BusFault for user */
+         if (attrs.user) {
+@@ -2364,7 +2366,8 @@ static MemTxResult nvic_sysreg_ns_read(void *opaque, =
+hwaddr addr,
+     if (attrs.secure) {
+         /* S accesses to the alias act like NS accesses to the real region=
+ */
+         attrs.secure =3D 0;
+-        return memory_region_dispatch_read(mr, addr, data, size, attrs);
++        return memory_region_dispatch_read(mr, addr, data, SIZE_MEMOP(size=
+),
++                                           attrs);
+     } else {
+         /* NS attrs are RAZ/WI for privileged, and BusFault for user */
+         if (attrs.user) {
+@@ -2390,7 +2393,8 @@ static MemTxResult nvic_systick_write(void *opaque, h=
+waddr addr,
 
- /*************************************************************************=
-****/
-@@ -4740,11 +4741,11 @@ void helper_cache(CPUMIPSState *env, target_ulong a=
-ddr, uint32_t op)
-     if (op =3D=3D 9) {
-         /* Index Store Tag */
-         memory_region_dispatch_write(env->itc_tag, index, env->CP0_TagLo,
--                                     8, MEMTXATTRS_UNSPECIFIED);
-+                                     SIZE_MEMOP(8), MEMTXATTRS_UNSPECIFIED=
-);
-     } else if (op =3D=3D 5) {
-         /* Index Load Tag */
-         memory_region_dispatch_read(env->itc_tag, index, &env->CP0_TagLo,
--                                    8, MEMTXATTRS_UNSPECIFIED);
-+                                    SIZE_MEMOP(8), MEMTXATTRS_UNSPECIFIED)=
-;
-     }
- #endif
+     /* Direct the access to the correct systick */
+     mr =3D sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->systick[attrs.secure]=
+), 0);
+-    return memory_region_dispatch_write(mr, addr, value, size, attrs);
++    return memory_region_dispatch_write(mr, addr, value, SIZE_MEMOP(size),
++                                        attrs);
  }
+
+ static MemTxResult nvic_systick_read(void *opaque, hwaddr addr,
+@@ -2402,7 +2406,7 @@ static MemTxResult nvic_systick_read(void *opaque, hw=
+addr addr,
+
+     /* Direct the access to the correct systick */
+     mr =3D sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->systick[attrs.secure]=
+), 0);
+-    return memory_region_dispatch_read(mr, addr, data, size, attrs);
++    return memory_region_dispatch_read(mr, addr, data, SIZE_MEMOP(size), a=
+ttrs);
+ }
+
+ static const MemoryRegionOps nvic_systick_ops =3D {
 --
 1.8.3.1
 
