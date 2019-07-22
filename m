@@ -2,90 +2,83 @@ Return-Path: <SRS0=EA86=VT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DBE27C76188
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 11:57:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F94AC76188
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 11:59:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A9A402184E
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 11:57:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 56CF320449
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 11:59:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MDGT+NyU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9A402184E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ezZQpMQx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56CF320449
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60716 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60738 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hpWwS-0000ve-Ug
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jul 2019 07:57:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55952)
+	id 1hpWyU-0002aU-Jj
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jul 2019 07:59:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56561)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hpWwH-0000RH-0K
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 07:57:09 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hpWyI-000268-GF
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 07:59:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hpWwG-0000wi-1k
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 07:57:08 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:55952)
+ (envelope-from <peter.maydell@linaro.org>) id 1hpWyH-0002MC-4E
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 07:59:14 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:43444)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hpWwF-0000w1-Q4
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 07:57:07 -0400
-Received: by mail-wm1-x341.google.com with SMTP id a15so34855155wmj.5
- for <qemu-devel@nongnu.org>; Mon, 22 Jul 2019 04:57:07 -0700 (PDT)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hpWyG-0002Lo-TO
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 07:59:13 -0400
+Received: by mail-ot1-x341.google.com with SMTP id j11so15636664otp.10
+ for <qemu-devel@nongnu.org>; Mon, 22 Jul 2019 04:59:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=s/KelhptN6ubJpqJZP1G3NB+n0K4Q5g/1q5F+spVmiY=;
- b=MDGT+NyUVUbUwmQwUQ/9zc5Dd+CStoXT95pCjjBrsvzZk/lxpNR6H3mt2o7+fAsx/j
- xwtolVhuhV7tq9bU1qL28h0kKiysBLHw6rTJZLksypoZWeXWP/sEjxVSos/TJaXGZdn/
- PScEHpHNOQo2HKZ7rCqlHosRAb4J69jIJb5Zr3l7CpkgrMFrbzqPGfohsvWZhiOTtBjO
- 0Cv8c/EmbMifLgCL2AHThFkKDWB+cxwy2ab1JOWTpSyXn/CnXyLsTbJZiwgSdQblkTLy
- Wfj1/iGbTpFcPRdgy+PNhBFpUhHZ5Dtddsn9aESKuMZeMn+LkIwC3QpGBqJRGaQDE1XB
- VjpA==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=CqKQ7cXKJ1z7FTKs4TehgVkv9/3MjuQ1pzUNh98uYSc=;
+ b=ezZQpMQxrTtc+6pnxh/RFQAAvu4DbBbNg8hEap23CfdzNJ7R2rD6mcnxlqaPrVnqmW
+ hC66ZF8cDIAmYKYsRaGVHnIyIeipTuWWro6FOGh1OhEqnB2DrFMs4c5wnL4yz0Pt2LaG
+ sBcVpIXgLQr3Fn7AyeCywsYYcCjDePEIjBwX0bHRVu0lqKLNhUMln8OfP1h/BoDAXOvN
+ N7LQQ/j6cLottztJuYwbhiNGkb2KVg4J/wWw9A7jBBm1qeNT449wL7Fgg1GV1ftSDmEM
+ eiTFYdyAC6w9zgDJS9nYH1uO5xBiTtwnt3fxwFnwAqywoq0TlbbYej8SZchD7c+eLsUc
+ kudQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=s/KelhptN6ubJpqJZP1G3NB+n0K4Q5g/1q5F+spVmiY=;
- b=R7Kfp5vg+zTx6CysXeKllHgK5DBacJ8SWS3SSHD8TaLadIFUJfpwYYKsYCdVePXe/H
- 83rgixljxcpq01j+pKuukeBqUjZua/7hce7I/K/Bxbuzo3d556e+MFQB92rWCy5m7gHq
- MQ4uzI4k2VqdieIgvBg33yeG4EgGGTX1vY+do/nS6jncPHqWv49tXwPinw+VHjgBL0ol
- E8t5o3TA2UdtXuk6uD9u5dymKH2uPULgt1E9wdYNpn+7Fk3yAxpQSvgUbG0iY1y/jdwo
- qfJSQW/Jnw0BvjmWNGO2LV9Ej/iS8axp2GBlxGI793enhpVe5+0kDRliVbOyMH4jaaam
- sS5A==
-X-Gm-Message-State: APjAAAXfOjTh63lEKET68je27WAbpojzUyE3EXiMCsfYfLmlpp4JRBjM
- xm0PUubgVcML76P0JKR/RJQaTg==
-X-Google-Smtp-Source: APXvYqx4Tqw38ayJEgPz0ODpkeUbVzR63fSbETcw5envmJhzGIzmXIVH5GghahKJdop2Z357qUaOGA==
-X-Received: by 2002:a7b:c215:: with SMTP id x21mr63806008wmi.38.1563796626205; 
- Mon, 22 Jul 2019 04:57:06 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id e19sm52289067wra.71.2019.07.22.04.57.05
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Mon, 22 Jul 2019 04:57:05 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 4D0321FF87;
- Mon, 22 Jul 2019 12:57:05 +0100 (BST)
-References: <20190722111914.28574-1-alex.bennee@linaro.org>
- <CAFEAcA_uOX9qkrwRASAaxOfTms9SsQMEyhJ0XwYFiFPVtEnqkw@mail.gmail.com>
-User-agent: mu4e 1.3.3; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Peter Maydell <peter.maydell@linaro.org>
-In-reply-to: <CAFEAcA_uOX9qkrwRASAaxOfTms9SsQMEyhJ0XwYFiFPVtEnqkw@mail.gmail.com>
-Date: Mon, 22 Jul 2019 12:57:05 +0100
-Message-ID: <87r26ijn8u.fsf@linaro.org>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=CqKQ7cXKJ1z7FTKs4TehgVkv9/3MjuQ1pzUNh98uYSc=;
+ b=rQXsAX7x+aNGH83Zti0sjolAoK3vr/4dHXAbrqzwM7U4AzLKRMmVoFeiQQD2VEZgPN
+ OHsHI/EEL/QuLJdpGdtecF2jfCnZaFfyQNQYKB+YlxXRVGdMySvvrolR1xxUTb7MEMRT
+ oy4XVvK4ymrUexFEsquIenh3cCrIjdjaBWZxGywd7Qd0rQkZtz7kQIHplFhRJH1QhIhw
+ X5j6dArLzpATDqy6zjaPIEc2aHrVpjRc3shUlh0FEmJLnApDEVzHKi9MfoW2ZjPROPVa
+ EBbWnZAng+JY8P33AuQ81hj9bENBVy3h/9KVeIN/4GUoTUe6JptjOrk1YGzM1V76M0NN
+ Mi7Q==
+X-Gm-Message-State: APjAAAU+05G5I7SrfVTDQdYw5RVqvEuW4SNoikXUJhavL9F2QAm4IDox
+ pEL1MTjMVzq5ZfSTCd7fgOsaobEw/E3IOHezLKKEpw==
+X-Google-Smtp-Source: APXvYqzjvJLaZJo0LQc+f8ttzUY66WbnnehRMD2sc5keOAQrnM55DOyZBk43fcC5Dpr8ILC71b9thZ8Nmqi2/HUtkp0=
+X-Received: by 2002:a05:6830:1653:: with SMTP id
+ h19mr44391642otr.232.1563796752009; 
+ Mon, 22 Jul 2019 04:59:12 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+References: <20190516144733.32399-1-peter.maydell@linaro.org>
+ <20190516144733.32399-4-peter.maydell@linaro.org>
+ <20190719164729.GA22520@lakrids.cambridge.arm.com>
+In-Reply-To: <20190719164729.GA22520@lakrids.cambridge.arm.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 22 Jul 2019 12:59:01 +0100
+Message-ID: <CAFEAcA_i_0=xAp86RJVSpurAdWfT5KDfgoh6Y51-mwBJa=_QTQ@mail.gmail.com>
+To: Mark Rutland <mark.rutland@arm.com>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::341
-Subject: Re: [Qemu-devel] [RFC PATCH for 4.2] target/arm: generate a custom
- MIDR for -cpu max
+X-Received-From: 2607:f8b0:4864:20::341
+Subject: Re: [Qemu-devel] [PATCH v2 3/4] hw/arm/boot: Avoid placing the
+ initrd on top of the kernel
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,55 +90,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-Peter Maydell <peter.maydell@linaro.org> writes:
-
-> On Mon, 22 Jul 2019 at 12:19, Alex Benn=C3=A9e <alex.bennee@linaro.org> w=
-rote:
->>
->> While most features are now detected by probing the ID_* registers
->> kernels can (and do) use MIDR_EL1 for working out of they have to
->> apply errata. This can trip up warnings in the kernel as it tries to
->> work out if it should apply workarounds to features that don't
->> actually exist in the reported CPU type.
->>
->> Avoid this problem by synthesising our own MIDR value using the
->> reserved value of 0 for the implementer and encoding the moving feast
->> that is the QEMU version string into the other fields.
+On Fri, 19 Jul 2019 at 17:47, Mark Rutland <mark.rutland@arm.com> wrote:
 >
-> Exposing the QEMU_VERSION_* information to the guest is
-> usually not a good plan. For instance it means that the
-> MIDR will mysteriously change if you save a VM on one
-> version of QEMU and restore it on another.
-
-Given the mutability of -cpu max that is probably a good thing?
-
-> We went through
-> a while back carefully removing places where we'd exposed
-> the version number to the guest (have a look at the
-> qemu_hw_version() stuff which has to jump through hoops
-> so that old versioned machines like pc-1.5 report the
-> old "1.5" version number, and any QEMU 2.5 and above
-> now reports "2.5+"...)
-
-Well I guess we could do:
-
-  cpu->midr =3D FIELD_DP64(0, MIDR_EL1, ARCHITECTURE, 0xf)
-
-but any kernel that attempts to apply fixups for a 0x0 implementer is
-asking for trouble anyway. I assume it's unlikely ARM would assign QEMU
-an implementer code!
-
+> Hi Peter,
 >
-> thanks
-> -- PMM
+> I've just been testing on QEMU v4.1.0-rc1, and found a case where the
+> DTB overlapped the end of the kernel, and I think there's a bug in this
+> patch -- explanation below.
+>
+> On Thu, May 16, 2019 at 03:47:32PM +0100, Peter Maydell wrote:
+> > We currently put the initrd at the smaller of:
+> >  * 128MB into RAM
+> >  * halfway into the RAM
+> > (with the dtb following it).
+> >
+> > However for large kernels this might mean that the kernel
+> > overlaps the initrd. For some kinds of kernel (self-decompressing
+> > 32-bit kernels, and ELF images with a BSS section at the end)
+> > we don't know the exact size, but even there we have a
+> > minimum size. Put the initrd at least further into RAM than
+> > that. For image formats that can give us an exact kernel size, this
+> > will mean that we definitely avoid overlaying kernel and initrd.
+> >
+> > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> > ---
+> >  hw/arm/boot.c | 34 ++++++++++++++++++++--------------
+> >  1 file changed, 20 insertions(+), 14 deletions(-)
+> >
+> > diff --git a/hw/arm/boot.c b/hw/arm/boot.c
+> > index 935be3b92a5..e441393fdf5 100644
+> > --- a/hw/arm/boot.c
+> > +++ b/hw/arm/boot.c
+> > @@ -999,20 +999,6 @@ static void arm_setup_direct_kernel_boot(ARMCPU *cpu,
+> >      if (info->nb_cpus == 0)
+> >          info->nb_cpus = 1;
+> >
+> > -    /*
+> > -     * We want to put the initrd far enough into RAM that when the
+> > -     * kernel is uncompressed it will not clobber the initrd. However
+> > -     * on boards without much RAM we must ensure that we still leave
+> > -     * enough room for a decent sized initrd, and on boards with large
+> > -     * amounts of RAM we must avoid the initrd being so far up in RAM
+> > -     * that it is outside lowmem and inaccessible to the kernel.
+> > -     * So for boards with less  than 256MB of RAM we put the initrd
+> > -     * halfway into RAM, and for boards with 256MB of RAM or more we put
+> > -     * the initrd at 128MB.
+> > -     */
+> > -    info->initrd_start = info->loader_start +
+> > -        MIN(info->ram_size / 2, 128 * 1024 * 1024);
+> > -
+> >      /* Assume that raw images are linux kernels, and ELF images are not.  */
+> >      kernel_size = arm_load_elf(info, &elf_entry, &elf_low_addr,
+> >                                 &elf_high_addr, elf_machine, as);
+> > @@ -1064,6 +1050,26 @@ static void arm_setup_direct_kernel_boot(ARMCPU *cpu,
+> >      }
+> >
+> >      info->entry = entry;
+>
+> Note: this is the start of the kernel image...
 
+It's the entry point, which isn't quite the same thing as
+the start of the image (if we just loaded an ELF file then
+'entry' is whatever the ELF file said the entrypoint is, which
+could be a long way into the image).
 
---
-Alex Benn=C3=A9e
+> > +
+> > +    /*
+> > +     * We want to put the initrd far enough into RAM that when the
+> > +     * kernel is uncompressed it will not clobber the initrd. However
+> > +     * on boards without much RAM we must ensure that we still leave
+> > +     * enough room for a decent sized initrd, and on boards with large
+> > +     * amounts of RAM we must avoid the initrd being so far up in RAM
+> > +     * that it is outside lowmem and inaccessible to the kernel.
+> > +     * So for boards with less  than 256MB of RAM we put the initrd
+> > +     * halfway into RAM, and for boards with 256MB of RAM or more we put
+> > +     * the initrd at 128MB.
+> > +     * We also refuse to put the initrd somewhere that will definitely
+> > +     * overlay the kernel we just loaded, though for kernel formats which
+> > +     * don't tell us their exact size (eg self-decompressing 32-bit kernels)
+> > +     * we might still make a bad choice here.
+> > +     */
+> > +    info->initrd_start = info->loader_start +
+> > +        MAX(MIN(info->ram_size / 2, 128 * 1024 * 1024), kernel_size);
+>
+> ... but here we add kernel_size to the start of the loader, which is
+> below the kernel. Should that be info->entry?
+
+loader_start here really means "base of RAM". I think what
+we want here is something like
+
+  info->initrd_start = info->loader_start + MIN(info->ram_size / 2,
+128 * 1024 * 1024);
+  info->initrd_start = MAX(info->initrd_start, kernel_end);
+
+where kernel_end is just past whatever the highest addr of the kernel
+is, which is not something that's totally trivial to calculate
+with the variables we have to hand at this point.
+
+thanks
+-- PMM
 
