@@ -2,88 +2,79 @@ Return-Path: <SRS0=EA86=VT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6B73C76190
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 13:16:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8555BC76188
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 13:19:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9452221921
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 13:16:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 539CC217F9
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 13:19:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Q7KSpSyc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9452221921
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="i0ojXGNg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 539CC217F9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33446 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33462 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hpYAb-0003vX-S0
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jul 2019 09:16:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47673)
+	id 1hpYE5-0005Tn-Gj
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jul 2019 09:19:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48805)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hpY9F-0007Us-LB
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 09:14:38 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hpYDv-00055Q-ND
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 09:19:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hpY9E-00038h-Fs
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 09:14:37 -0400
-Received: from mail-wr1-x42a.google.com ([2a00:1450:4864:20::42a]:46984)
+ (envelope-from <peter.maydell@linaro.org>) id 1hpYDu-0007pV-5o
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 09:19:27 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:39192)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hpY9E-00037u-A0
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 09:14:36 -0400
-Received: by mail-wr1-x42a.google.com with SMTP id z1so39347024wru.13
- for <qemu-devel@nongnu.org>; Mon, 22 Jul 2019 06:14:36 -0700 (PDT)
+ id 1hpYDu-0007os-0c
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 09:19:26 -0400
+Received: by mail-ot1-x343.google.com with SMTP id r21so34116622otq.6
+ for <qemu-devel@nongnu.org>; Mon, 22 Jul 2019 06:19:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:in-reply-to:references:mime-version
- :content-transfer-encoding;
- bh=017UTObH7jJptsckGJh0SSq+6RtfkpOFjT0jK0dZ1dQ=;
- b=Q7KSpSycvGW1FzeKrPMcA2A/oQvg2gbdlUzkA3G2uCqAgt+j/316NUze2KJpvwqNNC
- q60WTpcaxvw4Kmlz7rsBSketIwVarjAsMSfi6rWC17GhMSDIXVrp8cNoVOE2D29T8LRA
- 0TC3VyDOS1mSjVAM2s8Cx+0BNamqrJmAU92PXeCednaL2qREsU+p9VnHVwIRquv4d+d7
- mpDiOZevmsuWJYKBazktdWYV184IFF4RtzAYunuBHuMOejcYoFLLlajKzJ8eHpzNGHNH
- qqVLq6SISTG49+CjBrS5JbpDe8UR0VQpzxrA0jn+/Lfbap2aZy9rQSi2KknFIa1VCi3T
- YKTQ==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=obMtpujnZwtyElCeRGeLA3HwD5977WQZloEysmgPmU4=;
+ b=i0ojXGNgE99VQhprGal6b45/wcDgNk5W4XQqWKxNzRoieljT7zaG6pr3LXebrbmI2x
+ MG1IqHK6gCDbkLM/JwPZUcl0QswgmjPy3k5CZXR20nqGkGKJRoxqpZMS6ZFBNTpP0GMy
+ bOGmkW9FY7reBp1EqGM2DtMbj4F1m2QYBazH4qxaLJEgQW2sGq4BZ/hsTszm6GcDMAAz
+ iaPKEq5ckGBnHXcBsypVKVSuCPVRhF9IS3JQ8oeTN7ojMk56KpqVuS3HrnCbaN4Rl7PV
+ ou7n+QOsMkUm3w53P2p65HHy9wJQOdBq8mdEniCllsqLjfWCnYWpelNl8Vaih/PvYIdq
+ 80EA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=017UTObH7jJptsckGJh0SSq+6RtfkpOFjT0jK0dZ1dQ=;
- b=mbNzblwT+9rlQq3YBA8rl5VJnLs0rygXkRVBWqWiErY3E10Ty1Y/HPzUEQtO3gAc0U
- dGxtlUK/ypq4Xtw22yZjsHxAEh5v0K/7iugFJ65dhbAYaZaSsiFbQslLOAunpG3pbNfH
- lkambSmoVqNicf8qXr2fDWKBX9yMRs5g4hwVsnr9WT29J3KJWaG6E+GV6Kfjo1dwJ2pH
- OmcwE+wd6id3WVHj+ZdrL6GgWGuUay4jYtsJdUtmd6D+R1Dlv62svg7xS+qJDXTRNQz+
- yZWKI+YYVN/Ll1K+oRzuxr1bb4hd7oX/Y7qYrSW6UMClj9DLow1MMCcpeep8R360qtbK
- ZFbw==
-X-Gm-Message-State: APjAAAUDjPtqQEoYEvxsiMPt7YFUfXNMMS5Aq5bas1O5rhkwJaTGP0bG
- /4HvJHPhTu6uhox7r4YfPp+3oUQbsTxW1g==
-X-Google-Smtp-Source: APXvYqxy7UsRxuGRjsbE2rM+oFc3LiqFpwZIhg05sg2EfE2NAiEq9b1iWkMjB8fSyi9XmyfzaqLwqw==
-X-Received: by 2002:a5d:5012:: with SMTP id e18mr46752005wrt.166.1563801275126; 
- Mon, 22 Jul 2019 06:14:35 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id f12sm42207217wrg.5.2019.07.22.06.14.34
- for <qemu-devel@nongnu.org>
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Mon, 22 Jul 2019 06:14:34 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-Date: Mon, 22 Jul 2019 14:14:27 +0100
-Message-Id: <20190722131427.2669-6-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190722131427.2669-1-peter.maydell@linaro.org>
-References: <20190722131427.2669-1-peter.maydell@linaro.org>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=obMtpujnZwtyElCeRGeLA3HwD5977WQZloEysmgPmU4=;
+ b=pnp+WmJ+QUZvT7gRTI8l3ACTogVjmFCkkLwd//W1iphZrAmMNkmib9Ly8jdW9vicTA
+ tTCFdpukweBlrIx5KqpGCGpBMChRA4A+EYizUwAc8D9KhUkixmrTkkRAZZl6YohfOG6T
+ 5RCQQG6SxaLHTpbCDx/H7/AFU46BgkPfMSR4ZEjpWbhtvtcHFLQt+L+IfxHRr64m1J+N
+ pBtsy6tDaRDr7eWepqjLOkb40tYhihjbOdagZyrMe8DSiTDUdmwQg0HfLoue/l52EbGq
+ uQvM3inQcIFagVXokPoeK+qLBFOLoSCGnkTTac9a4dvKAUf1Yf/UOnpJj3dO7sXWzOUJ
+ OkGA==
+X-Gm-Message-State: APjAAAWTfZeCQwt39g30a5e6bW+r52M80qlrH3AfNqG2kre48Z6wi72X
+ vC4djbMRmJgvhkXyNegNLFlbuSd1wCPz/SJ4GlBGeA==
+X-Google-Smtp-Source: APXvYqzXPaXulMX9DXfB7Jlu/0KggWL6Vt8q/T54vSdybqCAvtTDWst0S6uqXGgC0aHQzVNF1Upu+hsMTA42vpeX3Q8=
+X-Received: by 2002:a9d:4d81:: with SMTP id u1mr4751190otk.221.1563801564881; 
+ Mon, 22 Jul 2019 06:19:24 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20190721085854.12026-1-chen.zhang@intel.com>
+In-Reply-To: <20190721085854.12026-1-chen.zhang@intel.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 22 Jul 2019 14:19:14 +0100
+Message-ID: <CAFEAcA9UF716KmhsbO+p8TFTiC2+MwCFYK99ZvrNWddkxioqeA@mail.gmail.com>
+To: Zhang Chen <chen.zhang@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::42a
-Subject: [Qemu-devel] [PULL 5/5] contrib/elf2dmp: Build download.o with
- CURL_CFLAGS
+X-Received-From: 2607:f8b0:4864:20::343
+Subject: Re: [Qemu-devel] [PATCH V4] net/colo-compare.c: Fix memory leak and
+ code style issue.
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,52 +86,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Jason Wang <jasowang@redhat.com>, qemu-dev <qemu-devel@nongnu.org>,
+ Li Zhijian <lizhijian@cn.fujitsu.com>, Zhang Chen <zhangckid@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-contrib/elf2dmp has a source file which uses curl/curl.h;
-although we link the final executable with CURL_LIBS, we
-forgot to build this source file with CURL_CFLAGS, so if
-the curl header is in a place that's not already on the
-system include path then it will fail to build.
+On Sun, 21 Jul 2019 at 10:04, Zhang Chen <chen.zhang@intel.com> wrote:
+>
+> From: Zhang Chen <chen.zhang@intel.com>
+>
+> This patch to fix the origin "char *data" memory leak, code style issue
+> and add necessary check here.
+> Reported-by: Coverity (CID 1402785)
+>
+> Signed-off-by: Zhang Chen <chen.zhang@intel.com>
 
-Add a line specifying the cflags needed for download.o;
-while we are here, bring the specification of the libs
-into line with this, since using a per-object variable
-setting is preferred over adding them to the final
-executable link line.
+> @@ -1008,21 +1019,24 @@ static void compare_notify_rs_finalize(SocketReadState *notify_rs)
+>  {
+>      CompareState *s = container_of(notify_rs, CompareState, notify_rs);
+>
+> -    /* Get Xen colo-frame's notify and handle the message */
+> -    char *data = g_memdup(notify_rs->buf, notify_rs->packet_len);
+> -    char msg[] = "COLO_COMPARE_GET_XEN_INIT";
+> +    const char msg[] = "COLO_COMPARE_GET_XEN_INIT";
+>      int ret;
+>
+> -    if (!strcmp(data, "COLO_USERSPACE_PROXY_INIT")) {
+> +    if (packet_matches_str("COLO_USERSPACE_PROXY_INIT",
+> +                           notify_rs->buf,
+> +                           notify_rs->packet_len)) {
+>          ret = compare_chr_send(s, (uint8_t *)msg, strlen(msg), 0, true);
+>          if (ret < 0) {
+>              error_report("Notify Xen COLO-frame INIT failed");
+>          }
+> -    }
+> -
+> -    if (!strcmp(data, "COLO_CHECKPOINT")) {
+> +    } else if (packet_matches_str("COLO_CHECKPOINT",
+> +                                  notify_rs->buf,
+> +                                  notify_rs->packet_len)) {
+>          /* colo-compare do checkpoint, flush pri packet and remove sec packet */
+>          g_queue_foreach(&s->conn_list, colo_flush_packets, s);
+> +    } else {
+> +        error_report("COLO compare got unsupported instruction '%s'",
+> +                     (char *)notify_rs->buf);
+>      }
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-Message-id: 20190719100955.17180-1-peter.maydell@linaro.org
----
- Makefile                      | 1 -
- contrib/elf2dmp/Makefile.objs | 3 +++
- 2 files changed, 3 insertions(+), 1 deletion(-)
+The notify_rs->buf is not NUL-terminated, so you can't use it
+in a %s format string like this. The simplest fix is just
+to not try to print the contents of the incoming packet at all.
 
-diff --git a/Makefile b/Makefile
-index 386e13a6ea0..ecb788b2ce3 100644
---- a/Makefile
-+++ b/Makefile
-@@ -626,7 +626,6 @@ ifneq ($(EXESUF),)
- qemu-ga: qemu-ga$(EXESUF) $(QGA_VSS_PROVIDER) $(QEMU_GA_MSI)
- endif
- 
--elf2dmp$(EXESUF): LIBS += $(CURL_LIBS)
- elf2dmp$(EXESUF): $(elf2dmp-obj-y)
- 	$(call LINK, $^)
- 
-diff --git a/contrib/elf2dmp/Makefile.objs b/contrib/elf2dmp/Makefile.objs
-index e3140f58cf7..15057169160 100644
---- a/contrib/elf2dmp/Makefile.objs
-+++ b/contrib/elf2dmp/Makefile.objs
-@@ -1 +1,4 @@
- elf2dmp-obj-y = main.o addrspace.o download.o pdb.o qemu_elf.o
-+
-+download.o-cflags := $(CURL_CFLAGS)
-+download.o-libs   := $(CURL_LIBS)
--- 
-2.20.1
+The rest of the patch looks good.
 
+thanks
+-- PMM
 
