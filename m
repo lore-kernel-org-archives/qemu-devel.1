@@ -2,72 +2,69 @@ Return-Path: <SRS0=EA86=VT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,URIBL_SBL,URIBL_SBL_A
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C31F4C76188
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 04:31:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8F3FC76188
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 05:01:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9D78A2199C
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 04:31:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D78A2199C
+	by mail.kernel.org (Postfix) with ESMTPS id AC9B721BF6
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 05:01:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC9B721BF6
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58722 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58852 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hpPya-00010Q-Q3
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jul 2019 00:31:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55975)
+	id 1hpQRY-00051I-Se
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jul 2019 01:01:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36357)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bounces@canonical.com>) id 1hpPyQ-0000bj-6n
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 00:30:55 -0400
+ (envelope-from <bounces@canonical.com>) id 1hpQRL-0004cp-Mt
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 01:00:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1hpPyO-0000Kb-WF
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 00:30:54 -0400
-Received: from indium.canonical.com ([91.189.90.7]:46094)
+ (envelope-from <bounces@canonical.com>) id 1hpQRK-000821-Gh
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 01:00:47 -0400
+Received: from indium.canonical.com ([91.189.90.7]:60834)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1hpPyO-0000Jx-PH
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 00:30:52 -0400
+ id 1hpQRK-000814-3C
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 01:00:46 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1hpPyN-0000di-Ez
- for <qemu-devel@nongnu.org>; Mon, 22 Jul 2019 04:30:51 +0000
+ id 1hpQRJ-0007JG-2U
+ for <qemu-devel@nongnu.org>; Mon, 22 Jul 2019 05:00:45 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 5FE4B2E80D3
- for <qemu-devel@nongnu.org>; Mon, 22 Jul 2019 04:30:51 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 0C9332E80CF
+ for <qemu-devel@nongnu.org>; Mon, 22 Jul 2019 05:00:45 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 22 Jul 2019 04:17:18 -0000
-From: Launchpad Bug Tracker <1829964@bugs.launchpad.net>
+Date: Mon, 22 Jul 2019 04:54:50 -0000
+From: Aditya Govardhan <1837347@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Expired; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Tags: android-x86 leak virt-gpu vram
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: raspi2
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: janitor riosnai th-huth
-X-Launchpad-Bug-Reporter: Eunseok Choi (riosnai)
-X-Launchpad-Bug-Modifier: Launchpad Janitor (janitor)
-References: <155849647074.15430.13880026935625975661.malonedeb@wampee.canonical.com>
-Message-Id: <156376903818.732.13715935382743547170.malone@loganberry.canonical.com>
+X-Launchpad-Bug-Commenters: aditya-govardhan
+X-Launchpad-Bug-Reporter: Aditya Govardhan (aditya-govardhan)
+X-Launchpad-Bug-Modifier: Aditya Govardhan (aditya-govardhan)
+Message-Id: <156377129036.14702.8663571503299830535.malonedeb@wampee.canonical.com>
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com); Revision="19010";
  Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: e9dd16f4f8945cd5379c444295bc3019dadca9a1
+X-Launchpad-Hash: 4b1d26efd81c67924158c37cdd32cb91d96bf04d
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1829964] Re: HOST VRAM Leak when performs
- android-x86 window rotation with Virt-GPU
+Subject: [Qemu-devel] [Bug 1837347] [NEW] core dump after raspi2 kernel boot
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 List-Id: <qemu-devel.nongnu.org>
@@ -78,86 +75,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1829964 <1829964@bugs.launchpad.net>
+Reply-To: Bug 1837347 <1837347@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-[Expired for QEMU because there has been no activity for 60 days.]
+Public bug reported:
 
-** Changed in: qemu
-       Status: Incomplete =3D> Expired
+Host info:
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+x86-64, Ubuntu 18.04, QEMU 4.0.0 (downloaded tarball from main site)
+
+Guest info:
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+ARM7l, Raspbian OS off the main raspberry pi site
+
+QEMU command:
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+qemu-system-arm -M raspi2 -kernel bootpart/kernel7.img -dtb bootpart/bcm270=
+9-rpi-2-b.dtb -drive file=3D2019-07-10-raspbian-buster.img,format=3Draw,if=
+=3Dsd -append "rw earlyprintk console=3DttyAMA0,115200 fsck.repair=3Dyes ro=
+otwait memtest=3D1 loglevel=3D8 dwc_otg.lpm_enable=3D0 root=3D/dev/mmcblk0p=
+2" -serial stdio
+
+kernel7.img and bcm2709-rpi-2-b.dtb were obtained by the following
+commands:
+
+guestfish --ro -a 2019-07-10-raspbian-buster.img -m /dev/sda1
+><fs> copy-out / bootpart/
+><fs> quit
+
+Output:
+=3D=3D=3D=3D=3D=3D=3D
+
+https://pastebin.com/fL1eXhV0
+
+References:
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+https://translatedcode.wordpress.com/2016/11/03/installing-debian-on-qemus-=
+32-bit-arm-virt-board/
+https://translatedcode.wordpress.com/2018/04/25/debian-on-qemus-raspberry-p=
+i-3-model/
+
+
+The core dump error can occur at both times, before logging in and after lo=
+gging in, in this case I have given the output after logging in to show the=
+ initial processes running.
+
+Also please let me know if I using any kernel flags incorrectly
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+
+** Tags: raspi2
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1829964
+https://bugs.launchpad.net/bugs/1837347
 
 Title:
-  HOST VRAM Leak when performs android-x86 window rotation with Virt-GPU
+  core dump after raspi2 kernel boot
 
 Status in QEMU:
-  Expired
+  New
 
 Bug description:
-  I will report something strange thing about host VRAM leakage after
-  anroid-x86 window rotation when it runs with virt-gpu(+ virgl-
-  renderer)
+  Host info:
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+  x86-64, Ubuntu 18.04, QEMU 4.0.0 (downloaded tarball from main site)
 
-  Please watching below video link.
+  Guest info:
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+  ARM7l, Raspbian OS off the main raspberry pi site
 
-  https://www.youtube.com/watch?v=3DmJIbGZLWF1s&feature=3Dyoutu.be
+  QEMU command:
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+  qemu-system-arm -M raspi2 -kernel bootpart/kernel7.img -dtb bootpart/bcm2=
+709-rpi-2-b.dtb -drive file=3D2019-07-10-raspbian-buster.img,format=3Draw,i=
+f=3Dsd -append "rw earlyprintk console=3DttyAMA0,115200 fsck.repair=3Dyes r=
+ootwait memtest=3D1 loglevel=3D8 dwc_otg.lpm_enable=3D0 root=3D/dev/mmcblk0=
+p2" -serial stdio
 
-  (orginal video file : https://drive.google.com/file/d
-  /1lkdTx_8yTbSVjKXlnxnnk96fWe-w6Mxb/view?usp=3Dsharing)
+  kernel7.img and bcm2709-rpi-2-b.dtb were obtained by the following
+  commands:
 
-  I don't sure what is the problem...
+  guestfish --ro -a 2019-07-10-raspbian-buster.img -m /dev/sda1
+  ><fs> copy-out / bootpart/
+  ><fs> quit
 
-  Here are my tested history
-  -------------------------------------------------------------------------=
--------------------------
-  Install android-x86 on I7 desktop PCs with intel UHD GPU  - No leak.
-  Install android-x86 on I7 desktop PCs with NVIDIA GTX GPU series - No lea=
-k.
-  Install android-x86 on guest machine emulated skylake cpu with QEMU(+virt=
--gpu, virgl-renderer) - Leak
-  (HOST CPU - I5, INTEL UHD GPU)
-  Install android-x86 on guest machine emulated skylake cpu with QEMU(+virt=
--gpu, virgl-renderer) - Leak
-  (HOST CPU - I7, NVIDIA GTX GPU)
+  Output:
+  =3D=3D=3D=3D=3D=3D=3D
 
-  COMMON:
-  In case of NVIDIA GPU : check vram using nvidia-smi
-  In case of intel UHD GPU : check shared-vram using free cmd
+  https://pastebin.com/fL1eXhV0
 
-  We checked guest android-x86 system down when vram is full after performi=
-ng many rotation
-  -------------------------------------------------------------------------=
-------------------
+  References:
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+  https://translatedcode.wordpress.com/2016/11/03/installing-debian-on-qemu=
+s-32-bit-arm-virt-board/
+  https://translatedcode.wordpress.com/2018/04/25/debian-on-qemus-raspberry=
+-pi-3-model/
 
-  Is it virt-gpu driver's problem?
+  =
 
-  I hope someone can help me...
+  The core dump error can occur at both times, before logging in and after =
+logging in, in this case I have given the output after logging in to show t=
+he initial processes running.
 
-  Thanks in advance!!
-
-
-  PS
-
-
-  Here are qemu options I used...
-
-  -machine type=3Dq35,accel=3Dkvm -cpu host --enable-kvm \
-  -smp cpus=3D4,cores=3D4,threads=3D1 -m 4096 \
-  -drive file=3Dctb0319.qcow2,format=3Dqcow2,if=3Dvirtio,aio=3Dthreads \
-  -device virtio-vga,virgl=3Don \
-  -device qemu-xhci,id=3Dxhci -device usb-mouse,bus=3Dxhci.0 -device usb-kb=
-d,bus=3Dxhci.0 \
-  -soundhw hda -display sdl,gl=3Don -netdev user,id=3Dqemunet0,hostfwd=3Dtc=
-p::4000-:7000,hostfwd=3Dtcp::5555-:5555,hostfwd=3Dtcp::4012-:7012,hostfwd=
-=3Dtcp::4013-:7013 -device virtio-net,netdev=3Dqemunet0 -boot menu=3Don
+  Also please let me know if I using any kernel flags incorrectly
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1829964/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1837347/+subscriptions
 
