@@ -2,60 +2,105 @@ Return-Path: <SRS0=EA86=VT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6A0AC76194
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 12:56:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A672C76188
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 12:58:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A2B6921921
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 12:56:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2B6921921
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 295AE2084D
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 12:58:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 295AE2084D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33282 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33290 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hpXsA-0002Js-Qw
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jul 2019 08:56:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42476)
+	id 1hpXu2-0003Ub-Bm
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jul 2019 08:58:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43200)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mark.rutland@arm.com>) id 1hpXrz-0001oR-Kr
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 08:56:48 -0400
+ (envelope-from <thuth@redhat.com>) id 1hpXtq-00031u-Iq
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 08:58:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mark.rutland@arm.com>) id 1hpXry-0002Zb-9e
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 08:56:47 -0400
-Received: from foss.arm.com ([217.140.110.172]:35738)
- by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <mark.rutland@arm.com>)
- id 1hpXrv-0002WL-9c; Mon, 22 Jul 2019 08:56:43 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7C7B1344;
- Mon, 22 Jul 2019 05:56:41 -0700 (PDT)
-Received: from lakrids.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com
- [10.121.207.14])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CA3133F71A;
- Mon, 22 Jul 2019 05:56:40 -0700 (PDT)
-Date: Mon, 22 Jul 2019 13:56:33 +0100
-From: Mark Rutland <mark.rutland@arm.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Message-ID: <20190722125633.GA35035@lakrids.cambridge.arm.com>
-References: <20190516144733.32399-1-peter.maydell@linaro.org>
- <20190516144733.32399-4-peter.maydell@linaro.org>
- <20190719164729.GA22520@lakrids.cambridge.arm.com>
- <CAFEAcA_i_0=xAp86RJVSpurAdWfT5KDfgoh6Y51-mwBJa=_QTQ@mail.gmail.com>
+ (envelope-from <thuth@redhat.com>) id 1hpXtp-00045P-M8
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 08:58:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54474)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <thuth@redhat.com>)
+ id 1hpXtl-0003yg-Ax; Mon, 22 Jul 2019 08:58:37 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 60EA28E233;
+ Mon, 22 Jul 2019 12:58:36 +0000 (UTC)
+Received: from thuth.remote.csb (dhcp-200-228.str.redhat.com [10.33.200.228])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 29CB65D72E;
+ Mon, 22 Jul 2019 12:58:35 +0000 (UTC)
+To: Qemu-block <qemu-block@nongnu.org>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; keydata=
+ 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
+Organization: Red Hat
+Message-ID: <c293e99d-331a-f3aa-eecb-d562554350f9@redhat.com>
+Date: Mon, 22 Jul 2019 14:58:34 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA_i_0=xAp86RJVSpurAdWfT5KDfgoh6Y51-mwBJa=_QTQ@mail.gmail.com>
-User-Agent: Mutt/1.11.1+11 (2f07cb52) (2018-12-01)
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.26]); Mon, 22 Jul 2019 12:58:36 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 217.140.110.172
-Subject: Re: [Qemu-devel] [PATCH v2 3/4] hw/arm/boot: Avoid placing the
- initrd on top of the kernel
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] qemu-iotest 059 fails with vmdk
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,121 +112,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>,
- Richard Henderson <richard.henderson@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Sam Eiderman <shmuel.eiderman@oracle.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Jul 22, 2019 at 12:59:01PM +0100, Peter Maydell wrote:
-> On Fri, 19 Jul 2019 at 17:47, Mark Rutland <mark.rutland@arm.com> wrote:
-> >
-> > Hi Peter,
-> >
-> > I've just been testing on QEMU v4.1.0-rc1, and found a case where the
-> > DTB overlapped the end of the kernel, and I think there's a bug in this
-> > patch -- explanation below.
-> >
-> > On Thu, May 16, 2019 at 03:47:32PM +0100, Peter Maydell wrote:
-> > > We currently put the initrd at the smaller of:
-> > >  * 128MB into RAM
-> > >  * halfway into the RAM
-> > > (with the dtb following it).
-> > >
-> > > However for large kernels this might mean that the kernel
-> > > overlaps the initrd. For some kinds of kernel (self-decompressing
-> > > 32-bit kernels, and ELF images with a BSS section at the end)
-> > > we don't know the exact size, but even there we have a
-> > > minimum size. Put the initrd at least further into RAM than
-> > > that. For image formats that can give us an exact kernel size, this
-> > > will mean that we definitely avoid overlaying kernel and initrd.
-> > >
-> > > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> > > ---
-> > >  hw/arm/boot.c | 34 ++++++++++++++++++++--------------
-> > >  1 file changed, 20 insertions(+), 14 deletions(-)
-> > >
-> > > diff --git a/hw/arm/boot.c b/hw/arm/boot.c
-> > > index 935be3b92a5..e441393fdf5 100644
-> > > --- a/hw/arm/boot.c
-> > > +++ b/hw/arm/boot.c
-> > > @@ -999,20 +999,6 @@ static void arm_setup_direct_kernel_boot(ARMCPU *cpu,
-> > >      if (info->nb_cpus == 0)
-> > >          info->nb_cpus = 1;
-> > >
-> > > -    /*
-> > > -     * We want to put the initrd far enough into RAM that when the
-> > > -     * kernel is uncompressed it will not clobber the initrd. However
-> > > -     * on boards without much RAM we must ensure that we still leave
-> > > -     * enough room for a decent sized initrd, and on boards with large
-> > > -     * amounts of RAM we must avoid the initrd being so far up in RAM
-> > > -     * that it is outside lowmem and inaccessible to the kernel.
-> > > -     * So for boards with less  than 256MB of RAM we put the initrd
-> > > -     * halfway into RAM, and for boards with 256MB of RAM or more we put
-> > > -     * the initrd at 128MB.
-> > > -     */
-> > > -    info->initrd_start = info->loader_start +
-> > > -        MIN(info->ram_size / 2, 128 * 1024 * 1024);
-> > > -
-> > >      /* Assume that raw images are linux kernels, and ELF images are not.  */
-> > >      kernel_size = arm_load_elf(info, &elf_entry, &elf_low_addr,
-> > >                                 &elf_high_addr, elf_machine, as);
-> > > @@ -1064,6 +1050,26 @@ static void arm_setup_direct_kernel_boot(ARMCPU *cpu,
-> > >      }
-> > >
-> > >      info->entry = entry;
-> >
-> > Note: this is the start of the kernel image...
-> 
-> It's the entry point, which isn't quite the same thing as
-> the start of the image (if we just loaded an ELF file then
-> 'entry' is whatever the ELF file said the entrypoint is, which
-> could be a long way into the image).
+Not sure if it has been reported before, but test 059 currently fails:
 
-Ah, I see; thanks for correcting me!
+059      fail       [14:55:21] [14:55:26]                    output
+mismatch (see 059.out.bad)
+--- /home/thuth/devel/qemu/tests/qemu-iotests/059.out	2019-07-19
+10:19:18.000000000 +0200
++++ /home/thuth/tmp/qemu-build/tests/qemu-iotests/059.out.bad	2019-07-22
+14:55:26.000000000 +0200
+@@ -27,7 +27,7 @@
+ image: TEST_DIR/t.vmdk
+ file format: vmdk
+ virtual size: 0.977 TiB (1073741824000 bytes)
+-disk size: 16 KiB
++disk size: 517 KiB
+ Format specific information:
+     cid: XXXXXXXX
+     parent cid: XXXXXXXX
+Failures: 059
+Failed 1 of 1 tests
 
-> > > +    /*
-> > > +     * We want to put the initrd far enough into RAM that when the
-> > > +     * kernel is uncompressed it will not clobber the initrd. However
-> > > +     * on boards without much RAM we must ensure that we still leave
-> > > +     * enough room for a decent sized initrd, and on boards with large
-> > > +     * amounts of RAM we must avoid the initrd being so far up in RAM
-> > > +     * that it is outside lowmem and inaccessible to the kernel.
-> > > +     * So for boards with less  than 256MB of RAM we put the initrd
-> > > +     * halfway into RAM, and for boards with 256MB of RAM or more we put
-> > > +     * the initrd at 128MB.
-> > > +     * We also refuse to put the initrd somewhere that will definitely
-> > > +     * overlay the kernel we just loaded, though for kernel formats which
-> > > +     * don't tell us their exact size (eg self-decompressing 32-bit kernels)
-> > > +     * we might still make a bad choice here.
-> > > +     */
-> > > +    info->initrd_start = info->loader_start +
-> > > +        MAX(MIN(info->ram_size / 2, 128 * 1024 * 1024), kernel_size);
-> >
-> > ... but here we add kernel_size to the start of the loader, which is
-> > below the kernel. Should that be info->entry?
-> 
-> loader_start here really means "base of RAM". I think what
-> we want here is something like
-> 
->   info->initrd_start = info->loader_start + MIN(info->ram_size / 2,
-> 128 * 1024 * 1024);
->   info->initrd_start = MAX(info->initrd_start, kernel_end);
+... I think this was working fine for me a couple of weeks ago, so I
+assume this is a rather new bug?
 
-From what I understand, I can't see a way of breaking that, so it looks
-good to me.
-
-> where kernel_end is just past whatever the highest addr of the kernel
-> is, which is not something that's totally trivial to calculate
-> with the variables we have to hand at this point.
-
-Sure; I assume you might need to drop that into arm_boot_info.
-
-As previously, I'm happy to test patches for this. At the moment I have
-a local hack relying on info->entry, and I understand this isn't
-correct.
-
-Thanks,
-Mark.
+ Thomas
 
