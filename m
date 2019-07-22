@@ -2,83 +2,86 @@ Return-Path: <SRS0=EA86=VT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F6CEC76188
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 05:32:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DFC2C76195
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 05:32:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E5DF12229A
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 05:32:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6051D2229A
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 05:32:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cB0zrwSt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E5DF12229A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y/fxJDYG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6051D2229A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58938 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58944 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hpQwF-0003an-Lu
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jul 2019 01:32:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46373)
+	id 1hpQwQ-0004Q7-LH
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jul 2019 01:32:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46405)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <npiggin@gmail.com>) id 1hpQw2-00039Q-SP
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 01:32:31 -0400
+ (envelope-from <npiggin@gmail.com>) id 1hpQw9-0003NC-13
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 01:32:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <npiggin@gmail.com>) id 1hpQw1-0007Dl-W9
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 01:32:30 -0400
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:39931)
+ (envelope-from <npiggin@gmail.com>) id 1hpQw7-0007ID-Va
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 01:32:36 -0400
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:46605)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <npiggin@gmail.com>)
- id 1hpQw1-0007Cy-RS; Mon, 22 Jul 2019 01:32:29 -0400
-Received: by mail-pg1-x543.google.com with SMTP id u17so17093152pgi.6;
- Sun, 21 Jul 2019 22:32:29 -0700 (PDT)
+ id 1hpQw7-0007Hh-OG; Mon, 22 Jul 2019 01:32:35 -0400
+Received: by mail-pg1-x544.google.com with SMTP id i8so17078045pgm.13;
+ Sun, 21 Jul 2019 22:32:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=M7FSRcmoYJHaIWDpjU4QKCYnCqNouuFeSRCT2wJ/XcU=;
- b=cB0zrwStabUEaOZi0hR68fUIYlHOUr+0ICvrzYS0YxA0LzhGKhENwOxO1kDRGsooj/
- DWXjq+HbaVx5QRYHFVjvjYKjv1CN/T/OUw3ENBU6ul+2CyS8Iy5JDL+cN7Z1ZAKbDALf
- +hTHTO4jwxGrj5MNEx0LJrWQkObACGPa98T2aEXTqeDhbgtD71psQg+BkepTkQw4flsp
- heJCyCJxuxSSodyfSYtRAZ1huCEKIeWTybFGmlZVWb8Urjn2Pa3+Yu40IK2YHrq/bJxG
- jO0l6IPkthaN+WQpUV+kYjkoFc771KbtvrAMXxiCqPv+wFLl+7VkOoexWSHEjxQ84Ucd
- RkiQ==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=xdbP7WX22fhUZ3ihdslkK8f8fz4KZ3GwbwHPAjoISxk=;
+ b=Y/fxJDYGEMMdN6lJEwwqc+J+p3ZAFqeR75B6ANMHhDkO4mrUgyWOpcvF6huFqzyuke
+ agxC/eUbSTDCCgd1vo0kCJqwS8QES1KqVfuaVmjZ8Zf22yYI5GOXxEyj3tGwIryagXhN
+ Tnz9tj8UXi5AxfA/r/13gRPvhwbwFakwrbAgX+D9eXlxzNm/2r2QlS1YDutO+NKd4ucV
+ vwdQixD9ju842lDTI2dCtGXlYpc8acJJzRc6h2cYgdleDSij6YGzm0HPSQNHO/AMha11
+ 2P76lQPDxSD4EzCzCeWW6J+FNPnVrhNDH8aU2jLh1y+hddldFfc4xTMcOGe73w+wPodf
+ wboQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=M7FSRcmoYJHaIWDpjU4QKCYnCqNouuFeSRCT2wJ/XcU=;
- b=hfYepGVw+Z7ivk78yluD0/A/vnD1krxh4x+JgGY88AAOta48Vi6MIjwGihfQ5HvXal
- nsKPnhB7B+21VKjKGdpHtvz5G2IlUW+ZU7ce3KK7niUOthy/+vjiU6L0/B9mADQi5m12
- zcUc6fJ4BwisFRdGUijsCg8JOXa4gamF3dJxDIyCR9XYyHp4H7JxuCFD89beb0yaMLxw
- wW3rNu2xyZVEPBg847I6YhELMlFQUkxeSyRzQdKCD2UEhsQBXEI//DGXNF5WG+UGhsub
- +3g0gK5wOeOLnSeFaDR+HlpVG7KbBs/pI4V/r9HZd/hz6HB3cNi6jeITKqQc2roeutRQ
- pqDw==
-X-Gm-Message-State: APjAAAUMte4uX6jTN+VfKFAfYYR/RFEt1R2TdQ2VlHvoRs7kophW5Kh0
- b1YBk7C1N+PA4KFOC7D0CrOHQjHnHMk=
-X-Google-Smtp-Source: APXvYqytT2krPlBJKuE8/WQjzDSF3WfdpY5XcEjs3N+9XVEg+mJqoc1TbuutsUPu2N8YPgicauRQgQ==
-X-Received: by 2002:a63:b904:: with SMTP id z4mr68480832pge.388.1563773548610; 
- Sun, 21 Jul 2019 22:32:28 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=xdbP7WX22fhUZ3ihdslkK8f8fz4KZ3GwbwHPAjoISxk=;
+ b=T+xUD2c8A9vYYFZ+9F36srvXjAi6M5C5/eATggQPSRZCbymWriRQB2TCFM+Dbcn6UV
+ NcrARbzqnphSfRe4PHJeTavN3BWME7gO4vgunJqVQMkNX8et8cx3JpXtedu+AeS1kfh6
+ RUVMUg5w2FSze5Zx46EealNkR95gJT/wFr621C9u00cN7VFrAcR9oQ9Ms8fg7wFZ52wy
+ Gofx2/OIYyPnavo2QKxpY0U6k6peXbDrGDifRYJ1kgxztmIqHXB6xZntcL0KaFJK233h
+ YMLGnCqK2F9hMg9DzXzF58FxQ2jQUbdO94EcqVzKApnSZ6KD+pnVZyGcLOrBC0sW22xZ
+ hg2Q==
+X-Gm-Message-State: APjAAAUNf5cRZeL/H47LGPED7OO3sXJgkgtKUSzoREDS2axeAuUNSSbr
+ xjf1zGEDjFhQkgu04RELKfpEQx9hm/A=
+X-Google-Smtp-Source: APXvYqy6oy2ABCgErY04URgakqWHSjk1lC2j48GS8JDx2JsVpyIPhiq2ofA2LSm1c72bnjHFf/Ai9A==
+X-Received: by 2002:a63:dd4e:: with SMTP id g14mr59700698pgj.227.1563773554726; 
+ Sun, 21 Jul 2019 22:32:34 -0700 (PDT)
 Received: from bobo.local0.net (193-116-123-212.tpgi.com.au. [193.116.123.212])
- by smtp.gmail.com with ESMTPSA id p7sm40281670pfp.131.2019.07.21.22.32.22
+ by smtp.gmail.com with ESMTPSA id p7sm40281670pfp.131.2019.07.21.22.32.29
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Sun, 21 Jul 2019 22:32:27 -0700 (PDT)
+ Sun, 21 Jul 2019 22:32:34 -0700 (PDT)
 From: Nicholas Piggin <npiggin@gmail.com>
 To: qemu-devel@nongnu.org
-Date: Mon, 22 Jul 2019 15:32:12 +1000
-Message-Id: <20190722053215.20808-1-npiggin@gmail.com>
+Date: Mon, 22 Jul 2019 15:32:13 +1000
+Message-Id: <20190722053215.20808-2-npiggin@gmail.com>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190722053215.20808-1-npiggin@gmail.com>
+References: <20190722053215.20808-1-npiggin@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::543
-Subject: [Qemu-devel] [PATCH v2 0/3] Series to implement suspend for
- ppc/spapr
+X-Received-From: 2607:f8b0:4864:20::544
+Subject: [Qemu-devel] [PATCH v2 1/3] machine: Add wakeup method to
+ MachineClass
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,29 +103,69 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi, this series is rebased on top of the qmp event fix, and takes
-Paolo's suggestion to implement ->wakeup for i386 before adding
-ppc, which makes it much nicer.
+Waking from suspend is not logically a machine reset on all machines,
+particularly in the paravirtualized case rather than hardware
+emulated. The ppc spapr machine for example just invokes hypervisor
+to suspend, and expects that call to return with the machine in the
+same state (modulo some possible migration and reconfiguration
+details).
 
-If the first two patches can be agreed on initially and merged, I
-can take the third patch through the ppc list after that.
+Implement a machine ->wakeup method and use that if it exists.
 
-Thanks,
-Nick
+Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+---
+ include/hw/boards.h |  1 +
+ vl.c                | 18 +++++++++++++++++-
+ 2 files changed, 18 insertions(+), 1 deletion(-)
 
-Nicholas Piggin (3):
-  machine: Add wakeup method to MachineClass
-  i386: use machine class ->wakeup method
-  spapr: Implement ibm,suspend-me
-
- hw/i386/pc.c           |  8 ++++++++
- hw/ppc/spapr.c         |  7 +++++++
- hw/ppc/spapr_rtas.c    | 32 ++++++++++++++++++++++++++++++++
- include/hw/boards.h    |  1 +
- include/hw/ppc/spapr.h |  3 ++-
- vl.c                   | 16 +++++++++++++++-
- 6 files changed, 65 insertions(+), 2 deletions(-)
-
+diff --git a/include/hw/boards.h b/include/hw/boards.h
+index a71d1a53a5..915ac3352b 100644
+--- a/include/hw/boards.h
++++ b/include/hw/boards.h
+@@ -180,6 +180,7 @@ struct MachineClass {
+ 
+     void (*init)(MachineState *state);
+     void (*reset)(MachineState *state);
++    void (*wakeup)(MachineState *state);
+     void (*hot_add_cpu)(MachineState *state, const int64_t id, Error **errp);
+     int (*kvm_type)(MachineState *machine, const char *arg);
+     void (*smp_parse)(MachineState *ms, QemuOpts *opts);
+diff --git a/vl.c b/vl.c
+index cefe5a3968..45ea034410 100644
+--- a/vl.c
++++ b/vl.c
+@@ -1556,6 +1556,22 @@ void qemu_system_reset(ShutdownCause reason)
+     cpu_synchronize_all_post_reset();
+ }
+ 
++/*
++ * Wake the VM after suspend.
++ */
++static void qemu_system_wakeup(void)
++{
++    MachineClass *mc;
++
++    mc = current_machine ? MACHINE_GET_CLASS(current_machine) : NULL;
++
++    if (mc && mc->wakeup) {
++        mc->wakeup(current_machine);
++    } else {
++        qemu_system_reset(SHUTDOWN_CAUSE_NONE);
++    }
++}
++
+ void qemu_system_guest_panicked(GuestPanicInformation *info)
+ {
+     qemu_log_mask(LOG_GUEST_ERROR, "Guest crashed");
+@@ -1764,7 +1780,7 @@ static bool main_loop_should_exit(void)
+     }
+     if (qemu_wakeup_requested()) {
+         pause_all_vcpus();
+-        qemu_system_reset(SHUTDOWN_CAUSE_NONE);
++        qemu_system_wakeup();
+         notifier_list_notify(&wakeup_notifiers, &wakeup_reason);
+         wakeup_reason = QEMU_WAKEUP_REASON_NONE;
+         resume_all_vcpus();
 -- 
 2.20.1
 
