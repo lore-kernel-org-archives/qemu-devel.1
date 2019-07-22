@@ -2,64 +2,75 @@ Return-Path: <SRS0=EA86=VT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67121C76188
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 09:41:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B6AEC76188
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 09:42:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 38AAD218EA
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 09:41:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38AAD218EA
+	by mail.kernel.org (Postfix) with ESMTPS id 740FF218EA
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 09:42:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 740FF218EA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60026 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60032 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hpUot-0007rQ-Hl
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jul 2019 05:41:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46766)
+	id 1hpUpU-0000Hv-Lb
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jul 2019 05:42:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47015)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <kwolf@redhat.com>) id 1hpUoi-0007I9-FP
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 05:41:13 -0400
+ (envelope-from <sgarzare@redhat.com>) id 1hpUpL-0008Kt-28
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 05:41:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1hpUoh-0004vg-58
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 05:41:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41940)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>)
- id 1hpUod-0004su-NK; Mon, 22 Jul 2019 05:41:07 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 3E9AA8535D;
- Mon, 22 Jul 2019 09:41:06 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-117-81.ams2.redhat.com
- [10.36.117.81])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id AAFF15D71B;
- Mon, 22 Jul 2019 09:41:04 +0000 (UTC)
-Date: Mon, 22 Jul 2019 11:41:03 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Maxim Levitsky <mlevitsk@redhat.com>
-Message-ID: <20190722094103.GA6583@localhost.localdomain>
-References: <20190721181508.28608-1-mlevitsk@redhat.com>
- <20190721181508.28608-3-mlevitsk@redhat.com>
+ (envelope-from <sgarzare@redhat.com>) id 1hpUpK-0005Na-4V
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 05:41:51 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:34934)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1hpUpJ-0005MS-Uz
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 05:41:50 -0400
+Received: by mail-wm1-f65.google.com with SMTP id l2so34604602wmg.0
+ for <qemu-devel@nongnu.org>; Mon, 22 Jul 2019 02:41:49 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to:user-agent;
+ bh=Mr9PkR41k95xu9r+Hc0XIR4t4irdiuIpaHXeSMYyE1s=;
+ b=qITReEQ+fpd/MxxVnMsUYyOBJbSbyKUuOsSqpHy2p0d8FI0/F3RkSAIEkrTb9ofmUg
+ kHxcwr5qKjpw/YWLJWMRfuBf5Z+EpGv23VMX9UlMd9FOTENXtG5AEkMt0HaOYzx7a/3R
+ 7jiNDgaN8qoNt1r+CexvQxrHJqIPYhH7opmsH/i91eZ956KGbd+6M7OLfDtmaLs/ETa5
+ dlPlHdd7blj8TryJJEnhRQ/LdY4Re1UmfJZzZ3fqbwcuy/tBZLV2b+qoEtiSK3Ex3Fr6
+ QJrmHEIF/tZTh1gJcCvw6FD/2gOFJx1k++ilOVlSwh8Ka1E1oVQIDE/2l0Vm0sP7Uip5
+ x9ZA==
+X-Gm-Message-State: APjAAAV+WmhUiuUsHZU7BwkbNNactoNy2UaSJTKyxztl9d2Y6pSIxU+d
+ TTPhglMRRfN96uNMDMCHsR7pNg==
+X-Google-Smtp-Source: APXvYqziwMHH2AdYBX6NEq2bm2arzcW9dRprq/q/PyWZIOJttLBvkTt4KW4eN/M8TekQsCV2udoqog==
+X-Received: by 2002:a1c:1b97:: with SMTP id
+ b145mr59935800wmb.158.1563788508387; 
+ Mon, 22 Jul 2019 02:41:48 -0700 (PDT)
+Received: from steredhat (host122-201-dynamic.13-79-r.retail.telecomitalia.it.
+ [79.13.201.122])
+ by smtp.gmail.com with ESMTPSA id s15sm22155596wrw.21.2019.07.22.02.41.47
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Mon, 22 Jul 2019 02:41:47 -0700 (PDT)
+Date: Mon, 22 Jul 2019 11:41:45 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: "Oleinik, Alexander" <alxndr@bu.edu>
+Message-ID: <20190722094145.yjqqmrbqkm56u7k5@steredhat>
+References: <20190719151920.22586-1-alxndr@bu.edu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190721181508.28608-3-mlevitsk@redhat.com>
-User-Agent: Mutt/1.12.0 (2019-05-25)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.25]); Mon, 22 Jul 2019 09:41:06 +0000 (UTC)
+In-Reply-To: <20190719151920.22586-1-alxndr@bu.edu>
+User-Agent: NeoMutt/20180716
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 2/2] qemu-img: better error message when
- opening a backing file fails
+ [fuzzy]
+X-Received-From: 209.85.128.65
+Subject: Re: [Qemu-devel] [PATCH v2] virtio-net: Always check for guest
+ header length
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,103 +82,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-block@nongnu.org, qemu-trivial@nongnu.org,
- Michael Tokarev <mjt@tls.msk.ru>, Laurent Vivier <laurent@vivier.eu>,
- qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "bsd@redhat.com" <bsd@redhat.com>, "stefanha@redhat.com" <stefanha@redhat.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 21.07.2019 um 20:15 hat Maxim Levitsky geschrieben:
-> Currently we print message like that:
+On Fri, Jul 19, 2019 at 03:21:15PM +0000, Oleinik, Alexander wrote:
+> While fuzzing the virtio-net tx vq, I ran into an assertion failure due
+> to iov_copy offsets larger than the total iov size. Though there is
+> a check to cover this, it does not execute when !n->has_vnet_hdr. This
+> change always copies the guest header into the mhdr buffer and checks its
+> length, even if mhdr is not needed.
 > 
-> "
-> new_file.qcow2 : error message
-> "
+> The call stack for the assertion failure:
 > 
-> However the error could have come from opening the backing file (e.g when it missing encryption keys),
-> thus try to clarify this by using this format:
+>  #8 in __assert_fail (libc.so.6+0x300f1)
+>  #9 in iov_copy iov.c:266:5
+>  #10 in virtio_net_flush_tx virtio-net.c:2073:23
+>  #11 in virtio_net_tx_bh virtio-net.c:2197:11
+>  #12 in aio_bh_poll async.c:118:13
+>  #13 in aio_dispatch aio-posix.c:460:5
+>  #14 in aio_ctx_dispatch async.c:261:5
+>  #15 in g_main_context_dispatch (libglib-2.0.so.0+0x4df2d)
+>  #16 in glib_pollfds_poll main-loop.c:213:9
+>  #17 in os_host_main_loop_wait main-loop.c:236
+>  #18 in main_loop_wait main-loop.c:512
+>  #19 in virtio_net_tx_fuzz virtio-net-fuzz.c:160:3
 > 
-> "
-> qemu-img: error creating new_file.qcow2: base_file.qcow2: error message
-> Could not open backing image to determine size.
-> "
-
-The old error message was just unspecific. Your new error message can be
-actively misleading because you just unconditionally print the filename
-of the direct backing file, even though the error could have occurred
-while opening the backing file of the backing file (or even further down
-the backing chain).
-
-It's a common problem we have with backing files and error messages: We
-either don't print the filename where the error actually happened (like
-in this case), or we print all of the backing files in the chain (such
-as "Could not open top.qcow2: Could not open mid.qcow2: Could not open
-base.qcow2: Invalid something").
-
-Ideally, we'd find a way to print only the backing filename in such
-cases ("Could not open base.qcow2: Invalid something"). I'd gladly
-accept a patch that fixes error messages in this way for both open and
-create, but I'm afraid that your approach in this patch is too
-simplistic and not an improvement.
-
-Kevin
-
-> Test used:
-> 
-> qemu-img create -f qcow2 \
->         --object secret,id=sec0,data=hunter9 \
->         --object secret,id=sec1,data=my_new_secret_password \
->         -b 'json:{ "encrypt.key-secret": "sec1", "driver": "qcow2", "file": { "driver": "file", "filename": "base.qcow2" }}' \
->         -o encrypt.format=luks,encrypt.key-secret=sec1 \
->         sn.qcow2
-> 
-> 
-> Error message before:
-> 
-> qemu-img: sn.qcow2: Invalid password, cannot unlock any keyslot
-> Could not open backing image to determine size.
-> 
-> 
-> Error message after:
-> 
-> qemu-img: error creating sn.qcow2: \
-> 	json:{ "encrypt.key-secret": "sec1", "driver": "qcow2", "file": { "driver": "file", "filename": "base.qcow2" }}: \
-> 	Invalid password, cannot unlock any keyslot
-> Could not open backing image to determine size.
-> 
-> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> Signed-off-by: Alexander Oleinik <alxndr@bu.edu>
 > ---
->  block.c    | 1 +
->  qemu-img.c | 2 +-
->  2 files changed, 2 insertions(+), 1 deletion(-)
+>  hw/net/virtio-net.c | 19 ++++++++++++-------
+>  1 file changed, 12 insertions(+), 7 deletions(-)
 > 
-> diff --git a/block.c b/block.c
-> index 29e931e217..5eb47b2199 100644
-> --- a/block.c
-> +++ b/block.c
-> @@ -5790,6 +5790,7 @@ void bdrv_img_create(const char *filename, const char *fmt,
->                              "This may become an error in future versions.\n");
->              local_err = NULL;
->          } else if (!bs) {
-> +            error_prepend(&local_err, "%s: ", backing_file);
->              /* Couldn't open bs, do not have size */
->              error_append_hint(&local_err,
->                                "Could not open backing image to determine size.\n");
-> diff --git a/qemu-img.c b/qemu-img.c
-> index 79983772de..134bf2fbe0 100644
-> --- a/qemu-img.c
-> +++ b/qemu-img.c
-> @@ -545,7 +545,7 @@ static int img_create(int argc, char **argv)
->      bdrv_img_create(filename, fmt, base_filename, base_fmt,
->                      options, img_size, flags, quiet, &local_err);
->      if (local_err) {
-> -        error_reportf_err(local_err, "%s: ", filename);
-> +        error_reportf_err(local_err, "error creating %s: ", filename);
->          goto fail;
->      }
->  
-> -- 
-> 2.17.2
-> 
+
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 
