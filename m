@@ -2,81 +2,90 @@ Return-Path: <SRS0=EA86=VT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B22A7C7618F
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 20:06:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 048B1C7618F
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 20:25:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8C2CF218C9
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 20:06:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C2CF218C9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id C0D72218BE
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 20:25:02 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="XtP318s6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0D72218BE
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37442 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37512 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hpeZm-0006oM-R0
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jul 2019 16:06:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40242)
+	id 1hperl-0004ZI-IP
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jul 2019 16:25:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44079)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hpeZd-0006Pz-CI
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 16:06:18 -0400
+ (envelope-from <prvs=0991791bd=alistair.francis@wdc.com>)
+ id 1hperV-0003ly-Dp
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 16:24:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hpeZc-0004cK-ES
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 16:06:17 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:34385)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hpeZc-0004bp-8h
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 16:06:16 -0400
-Received: by mail-wr1-f67.google.com with SMTP id 31so40738733wrm.1
- for <qemu-devel@nongnu.org>; Mon, 22 Jul 2019 13:06:16 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=a4VaeWKpELE5k+/Ao6ZK1zYpwMgJAa8dJZJ1qdktwf0=;
- b=UMw3a2UighPsv038HMyGM+gcazvnnM8mDYeWBzcQKiobwP0qGrnUw7Q828HlMbQ61D
- XzaFiAncuu3S7dw99xwHkFIVwLQW4BzmkIPAPptQSWZBCJw1FOFWe4iuaR4AQCL2QNyw
- KRjh99oLTtrp3TDrco+r5Qpj+MPawm9dfQDW6GZHWe2Xa/290XAQ7haH7S2q4nRxaY8K
- xUVnCsiWEmTHlFjQKlVsGgn5JAIwhWWPaqm1dtyIi8dVpgmxmm2fllfAcWolsRlz7GUF
- i/TET9f6hpcLLKaN3Q2DREjKG1rpouvcwLjxMkRM75YALJTga+zucE43TXTUJf/WbGjd
- UlyQ==
-X-Gm-Message-State: APjAAAX3T0eRTsTcIf/bH3EUuaZKItA9vlYFBWIsKUFXhfOIg7+W34VH
- dQeuWk+7jfrBx3yrCUyIfrn7ta2+P6U=
-X-Google-Smtp-Source: APXvYqzcTJ6zYH68//y5l+yVLlw2t+L3oXi2KPxJZTYyNKgK3e9CAoBuaF8JIc2vE/HKTN4fIn5EWQ==
-X-Received: by 2002:a5d:4b11:: with SMTP id v17mr34350278wrq.173.1563825975166; 
- Mon, 22 Jul 2019 13:06:15 -0700 (PDT)
-Received: from [192.168.1.38] (62.red-83-42-61.dynamicip.rima-tde.net.
- [83.42.61.62])
- by smtp.gmail.com with ESMTPSA id g19sm73801109wrb.52.2019.07.22.13.06.14
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Mon, 22 Jul 2019 13:06:14 -0700 (PDT)
-To: Stefan Weil <sw@weilnetz.de>, =?UTF-8?Q?Alex_Benn=c3=a9e?=
- <alex.bennee@linaro.org>, qemu-devel@nongnu.org
-References: <20190717134335.15351-1-alex.bennee@linaro.org>
- <20190717134335.15351-17-alex.bennee@linaro.org>
- <808ea700-759e-b914-f4d8-1ad5df3fcac7@weilnetz.de>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <96b8e1f4-c799-a508-cc33-74f56118b5d0@redhat.com>
-Date: Mon, 22 Jul 2019 22:06:13 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ (envelope-from <prvs=0991791bd=alistair.francis@wdc.com>)
+ id 1hperU-0007yR-Ck
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 16:24:45 -0400
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:21513)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <prvs=0991791bd=alistair.francis@wdc.com>)
+ id 1hperT-0007Q6-P1; Mon, 22 Jul 2019 16:24:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+ t=1563827168; x=1595363168;
+ h=from:to:cc:subject:date:message-id:mime-version:
+ content-transfer-encoding;
+ bh=O8wO7BTwgiGvX0uxfedGyffUbyt916GBNHsKv/cGmU0=;
+ b=XtP318s6XTa1nL2U74Tj1U5FK33ZHvkJdxXmwwaN9SGxADk2VnxMJDdA
+ evtQoqularmG+ZUzC7ACmQP/FbW8nqNufeAsjB5g6Y+GJ0s2KK0lalP+n
+ 6nOsFlQTLIR4M/DylpAfPUrlUgIYpCYAsOHGMvciTyKKo6OtQXTZI0k2L
+ We//vbCESxURU15tRQzfu0Qk5mij7QeHM5fq93vS4HArj7TWTV+d0SsMZ
+ BVlglK7C1OYdjGSeRFM6Luzb6tEkFqbzj8vr1okO+r5g91ArvzlW+FcbG
+ IV9JYE3HAGUhovxFkBWaX2R8l3BCCL6+omTgjImt3Y9hdbekpnPjhSEwL w==;
+IronPort-SDR: p7m/ZcnGr+ods5LIy8RumYqZFF+joVkl6/ysiwHRsbqf0VJtzGwg5BI20UwlZK5LdL69xl95bF
+ MvrizXuA67VmJvPtYKXr6A7XqTtLAohvD0oFKPMgwDsKpXPg2iFfjZ6oUKkhXAyX9G7BZa1qxH
+ +e9VuqOkAa9sUwlgDi/wXkzzzonA2MwR2vN7N97+PG6tOaqASl7iHYHlQj0E5vciCd8swrIDTh
+ WbSp6ThSmo8b9JR2x1Tw98iG7YUYgRxpN2RIIHISpkFwEo2RtFvyn64MhuMvzukCrcmGlGFv+L
+ ELc=
+X-IronPort-AV: E=Sophos;i="5.64,296,1559491200"; d="scan'208";a="213778901"
+Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com)
+ ([199.255.45.15])
+ by ob1.hgst.iphmx.com with ESMTP; 23 Jul 2019 04:24:33 +0800
+IronPort-SDR: 7snGsbc043wwRa3YS0L8r18b5PpY1z6o284shZl7V9PxOrXIOmIjv+BS7x8v7X5zmAAsIxbe40
+ WDrvPcJ5/K/JQaXLgM260CTMgOpb33ORfOgjpMVt9yi+npM8O04N9B9GZNNy0Pl6gZc8XVXV33
+ D+PBAr3fWS6sGQcFc5OLUfFfLqvktP/F5TbCS0jFWbeQJPFw+kGB2i3t6PFZkKTXwa45mG2odS
+ ZOD/Nx1NUo+BsaiBgK9nmcnmMhSbyRyMaH8ouvWkL1Idn5i5RPdPCQdT9B9YOm2XKypfvZpJGc
+ kKkfmhAv3xgkzuR3KNLg5YMM
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+ by uls-op-cesaep02.wdc.com with ESMTP; 22 Jul 2019 13:21:56 -0700
+IronPort-SDR: 47/R1DIroVHv5UJbIw/9TdCX3bXCfg4Zjc4oOb9oEUswuF9xXXS0MCJs2YvWoiBHzRqLWnHUkK
+ GlWA2dKMxf+uml2q7WJytbBI//ZDXLjUh31pSrLwTmlhwCl6//9AHZTgc4lfy/y6hOjuI3a+FE
+ QNPJwAetO8w7TiKz4f/811YYXrg+PRlYzKHxcxLjDfCkNB3cDIzVakTTYiE849+PLTcT3jDEjT
+ W+nDZqXyKMLSo+CE1vrC1o2lh7IaUG+bmRA+vCVARcLSzRSogiGgF/UPfKd3YzCzZ9HsQQ4q/U
+ A4Y=
+Received: from risc6-mainframe.sdcorp.global.sandisk.com (HELO
+ risc6-mainframe.int.fusionio.com) ([10.196.157.140])
+ by uls-op-cesaip01.wdc.com with ESMTP; 22 Jul 2019 13:23:40 -0700
+From: Alistair Francis <alistair.francis@wdc.com>
+To: qemu-devel@nongnu.org,
+	qemu-riscv@nongnu.org
+Date: Mon, 22 Jul 2019 13:20:40 -0700
+Message-Id: <d24741cf9cafe8a7c708ae282c1cc6cbef2faf2a.1563826823.git.alistair.francis@wdc.com>
+X-Mailer: git-send-email 2.22.0
 MIME-Version: 1.0
-In-Reply-To: <808ea700-759e-b914-f4d8-1ad5df3fcac7@weilnetz.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.221.67
-Subject: Re: [Qemu-devel] [PATCH v2 16/23] NSIS: Add missing firmware blobs
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x
+X-Received-From: 68.232.143.124
+Subject: [Qemu-devel] [PATCH v2 1/1] riscv/boot: Fixup the RISC-V firmware
+ warning
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,59 +97,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: alistair23@gmail.com, palmer@sifive.com, alistair.francis@wdc.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/17/19 8:23 PM, Stefan Weil wrote:
-> Am 17.07.2019 um 15:43 schrieb Alex Bennée:
->> From: Philippe Mathieu-Daudé <philmd@redhat.com>
->>
->> Various firmwares has been added in the pc-bios/ directory:
->>
->> - CCW     (since commit 0c1fecdd523)
->> - Skiboot (since commit bcad45de6a0)
->> - EDK2    (since commit f7fa38b74c3)
->>
->> Since we install qemu-system able to run the architectures
->> targetted by these firmware, include them in the NSIS exe.
->>
->> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
->> Message-Id: <20190715174817.18981-10-philmd@redhat.com>
->> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
->> ---
->>  qemu.nsi | 3 +++
->>  1 file changed, 3 insertions(+)
->>
->> diff --git a/qemu.nsi b/qemu.nsi
->> index 75f1608b9e0..89c7c04f957 100644
->> --- a/qemu.nsi
->> +++ b/qemu.nsi
->> @@ -122,6 +122,9 @@ Section "${PRODUCT} (required)"
->>      File "${BINDIR}\*.bmp"
->>      File "${BINDIR}\*.bin"
->>      File "${BINDIR}\*.dtb"
->> +    File "${BINDIR}\*.fd"
->> +    File "${BINDIR}\*.img"
->> +    File "${BINDIR}\*.lid"
->>      File "${BINDIR}\*.rom"
->>      File "${BINDIR}\openbios-*"
->>  
-> 
-> 
-> Hi,
-> 
-> what about qemu_vga.ndrv? And all new file pattern should also be added
-> to the uninstall section.
+Fix a typo in the warning message displayed to users, don't print the
+message when running inside qtest and don't mention a specific QEMU
+version for the deprecation.
 
-Good point.
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+---
+ hw/riscv/boot.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
 
-Alex, so you mind amending:
+diff --git a/hw/riscv/boot.c b/hw/riscv/boot.c
+index 5dee63011b..6b7d322e85 100644
+--- a/hw/riscv/boot.c
++++ b/hw/riscv/boot.c
+@@ -26,6 +26,7 @@
+ #include "hw/riscv/boot.h"
+ #include "hw/boards.h"
+ #include "elf.h"
++#include "sysemu/qtest.h"
+ 
+ #if defined(TARGET_RISCV32)
+ # define KERNEL_BOOT_ADDRESS 0x80400000
+@@ -46,10 +47,13 @@ void riscv_find_and_load_firmware(MachineState *machine,
+          * In the future this defaul will change to loading the prebuilt
+          * OpenSBI firmware. Let's warn the user and then continue.
+         */
+-        warn_report("No -bios option specified. Not loading a firmware.");
+-        warn_report("This default will change in QEMU 4.3. Please use the " \
+-                    "-bios option to aviod breakages when this happens.");
+-        warn_report("See QEMU's deprecation documentation for details");
++        if (!qtest_enabled()) {
++            warn_report("No -bios option specified. Not loading a firmware.");
++            warn_report("This default will change in a future QEMU release. " \
++                        "Please use the -bios option to avoid breakages when "\
++                        "this happens.");
++            warn_report("See QEMU's deprecation documentation for details.");
++        }
+         return;
+     }
+ 
+-- 
+2.22.0
 
-+    File "${BINDIR}\*.ndrv"
-
-Stefan is that OK if we fix the uninstall section for the next rc or
-release?
-
-Else, Alex please drop this patch.
 
