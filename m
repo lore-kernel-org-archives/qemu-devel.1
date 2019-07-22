@@ -6,58 +6,58 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3024C76188
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 15:07:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81E54C76190
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 15:08:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8B914218C9
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 15:07:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8B914218C9
+	by mail.kernel.org (Postfix) with ESMTPS id 5A012218C9
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 15:08:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A012218C9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34414 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34416 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hpZur-0006Ra-9i
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jul 2019 11:07:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44817)
+	id 1hpZuy-0006rv-B8
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jul 2019 11:08:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44829)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgilbert@redhat.com>) id 1hpZuP-0005B7-M0
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 11:07:26 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1hpZuS-0005Mu-To
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 11:07:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1hpZuO-0002ep-N8
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 11:07:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39559)
+ (envelope-from <dgilbert@redhat.com>) id 1hpZuQ-0002gH-Mr
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 11:07:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55256)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hpZuO-0002eC-Hr
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 11:07:24 -0400
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hpZuQ-0002fs-E1
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 11:07:26 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id D925830821A0;
- Mon, 22 Jul 2019 15:07:23 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id B9CCF2C9700;
+ Mon, 22 Jul 2019 15:07:25 +0000 (UTC)
 Received: from dgilbert-t580.localhost (ovpn-117-221.ams2.redhat.com
  [10.36.117.221])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C4345544EE;
- Mon, 22 Jul 2019 15:07:21 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2E264544EE;
+ Mon, 22 Jul 2019 15:07:24 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org,
 	pbonzini@redhat.com,
 	pavel.dovgaluk@ispras.ru
-Date: Mon, 22 Jul 2019 16:07:15 +0100
-Message-Id: <20190722150717.10564-2-dgilbert@redhat.com>
+Date: Mon, 22 Jul 2019 16:07:16 +0100
+Message-Id: <20190722150717.10564-3-dgilbert@redhat.com>
 In-Reply-To: <20190722150717.10564-1-dgilbert@redhat.com>
 References: <20190722150717.10564-1-dgilbert@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Mon, 22 Jul 2019 15:07:23 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.29]); Mon, 22 Jul 2019 15:07:25 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [for 4.2 PATCH 1/3] mc146818rtc: Remove reset notifiers
+Subject: [Qemu-devel] [for 4.2 PATCH 2/3] timer: Remove reset notifiers
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,61 +75,113 @@ Sender: "Qemu-devel"
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-The reset notifiers are unreliable and recalculating the offsets
-after boot causes problems with migration in cases where explicit
-base times are set on the destination.
+Remove the reset notifer from the core qemu-timer code.
+The only user was mc146818 and we've just remove it's use.
 
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- hw/timer/mc146818rtc.c | 19 -------------------
- 1 file changed, 19 deletions(-)
+ include/qemu/timer.h | 22 ----------------------
+ util/qemu-timer.c    | 21 +--------------------
+ 2 files changed, 1 insertion(+), 42 deletions(-)
 
-diff --git a/hw/timer/mc146818rtc.c b/hw/timer/mc146818rtc.c
-index ce4550b6f2..352ff9d395 100644
---- a/hw/timer/mc146818rtc.c
-+++ b/hw/timer/mc146818rtc.c
-@@ -92,7 +92,6 @@ typedef struct RTCState {
-     uint32_t irq_coalesced;
-     uint32_t period;
-     QEMUTimer *coalesced_timer;
--    Notifier clock_reset_notifier;
-     LostTickPolicy lost_tick_policy;
-     Notifier suspend_notifier;
-     QLIST_ENTRY(RTCState) link;
-@@ -885,20 +884,6 @@ static const VMStateDescription vmstate_rtc =3D {
-     }
- };
+diff --git a/include/qemu/timer.h b/include/qemu/timer.h
+index 5d978e1634..6817c78ef4 100644
+--- a/include/qemu/timer.h
++++ b/include/qemu/timer.h
+@@ -227,28 +227,6 @@ void qemu_clock_enable(QEMUClockType type, bool enab=
+led);
+  */
+ void qemu_start_warp_timer(void);
 =20
--static void rtc_notify_clock_reset(Notifier *notifier, void *data)
+-/**
+- * qemu_clock_register_reset_notifier:
+- * @type: the clock type
+- * @notifier: the notifier function
+- *
+- * Register a notifier function to call when the clock
+- * concerned is reset.
+- */
+-void qemu_clock_register_reset_notifier(QEMUClockType type,
+-                                        Notifier *notifier);
+-
+-/**
+- * qemu_clock_unregister_reset_notifier:
+- * @type: the clock type
+- * @notifier: the notifier function
+- *
+- * Unregister a notifier function to call when the clock
+- * concerned is reset.
+- */
+-void qemu_clock_unregister_reset_notifier(QEMUClockType type,
+-                                          Notifier *notifier);
+-
+ /**
+  * qemu_clock_run_timers:
+  * @type: clock on which to operate
+diff --git a/util/qemu-timer.c b/util/qemu-timer.c
+index 1cc1b2f2c3..2faaaf9926 100644
+--- a/util/qemu-timer.c
++++ b/util/qemu-timer.c
+@@ -48,7 +48,6 @@ typedef struct QEMUClock {
+     /* We rely on BQL to protect the timerlists */
+     QLIST_HEAD(, QEMUTimerList) timerlists;
+=20
+-    NotifierList reset_notifiers;
+     int64_t last;
+=20
+     QEMUClockType type;
+@@ -133,7 +132,6 @@ static void qemu_clock_init(QEMUClockType type, QEMUT=
+imerListNotifyCB *notify_cb
+     clock->enabled =3D (type =3D=3D QEMU_CLOCK_VIRTUAL ? false : true);
+     clock->last =3D INT64_MIN;
+     QLIST_INIT(&clock->timerlists);
+-    notifier_list_init(&clock->reset_notifiers);
+     main_loop_tlg.tl[type] =3D timerlist_new(type, notify_cb, NULL);
+ }
+=20
+@@ -630,7 +628,7 @@ int64_t timerlistgroup_deadline_ns(QEMUTimerListGroup=
+ *tlg)
+=20
+ int64_t qemu_clock_get_ns(QEMUClockType type)
+ {
+-    int64_t now, last;
++    int64_t now;
+     QEMUClock *clock =3D qemu_clock_ptr(type);
+=20
+     switch (type) {
+@@ -645,11 +643,7 @@ int64_t qemu_clock_get_ns(QEMUClockType type)
+         }
+     case QEMU_CLOCK_HOST:
+         now =3D REPLAY_CLOCK(REPLAY_CLOCK_HOST, get_clock_realtime());
+-        last =3D clock->last;
+         clock->last =3D now;
+-        if (now < last || now > (last + get_max_clock_jump())) {
+-            notifier_list_notify(&clock->reset_notifiers, &now);
+-        }
+         return now;
+     case QEMU_CLOCK_VIRTUAL_RT:
+         return REPLAY_CLOCK(REPLAY_CLOCK_VIRTUAL_RT, cpu_get_clock());
+@@ -668,19 +662,6 @@ void qemu_clock_set_last(QEMUClockType type, uint64_=
+t last)
+     clock->last =3D last;
+ }
+=20
+-void qemu_clock_register_reset_notifier(QEMUClockType type,
+-                                        Notifier *notifier)
 -{
--    RTCState *s =3D container_of(notifier, RTCState, clock_reset_notifie=
-r);
--    int64_t now =3D *(int64_t *)data;
--
--    rtc_set_date_from_host(ISA_DEVICE(s));
--    periodic_timer_update(s, now, 0);
--    check_update_timer(s);
--
--    if (s->lost_tick_policy =3D=3D LOST_TICK_POLICY_SLEW) {
--        rtc_coalesced_timer_update(s);
--    }
+-    QEMUClock *clock =3D qemu_clock_ptr(type);
+-    notifier_list_add(&clock->reset_notifiers, notifier);
 -}
 -
- /* set CMOS shutdown status register (index 0xF) as S3_resume(0xFE)
-    BIOS will read it and start S3 resume at POST Entry */
- static void rtc_notify_suspend(Notifier *notifier, void *data)
-@@ -984,10 +969,6 @@ static void rtc_realizefn(DeviceState *dev, Error **=
-errp)
-     s->update_timer =3D timer_new_ns(rtc_clock, rtc_update_timer, s);
-     check_update_timer(s);
-=20
--    s->clock_reset_notifier.notify =3D rtc_notify_clock_reset;
--    qemu_clock_register_reset_notifier(rtc_clock,
--                                       &s->clock_reset_notifier);
+-void qemu_clock_unregister_reset_notifier(QEMUClockType type,
+-                                          Notifier *notifier)
+-{
+-    notifier_remove(notifier);
+-}
 -
-     s->suspend_notifier.notify =3D rtc_notify_suspend;
-     qemu_register_suspend_notifier(&s->suspend_notifier);
-=20
+ void init_clocks(QEMUTimerListNotifyCB *notify_cb)
+ {
+     QEMUClockType type;
 --=20
 2.21.0
 
