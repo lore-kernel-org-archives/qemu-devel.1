@@ -2,63 +2,91 @@ Return-Path: <SRS0=EA86=VT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F049C76188
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 09:53:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 196EFC76188
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 09:53:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 28ACE2199C
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 09:53:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28ACE2199C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id DA4502199C
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 09:53:30 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="himsk/4D"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA4502199C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60102 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60108 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hpV0M-0007VA-7s
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jul 2019 05:53:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50891)
+	id 1hpV0c-0008Jy-4k
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jul 2019 05:53:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50973)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgilbert@redhat.com>) id 1hpV0C-00076u-DJ
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 05:53:05 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hpV0R-0007vd-4P
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 05:53:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1hpV0A-0006qq-9d
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 05:53:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45110)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hpV09-0006m6-FJ
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 05:53:02 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A63FA2F8BC3;
- Mon, 22 Jul 2019 09:52:57 +0000 (UTC)
-Received: from work-vm (ovpn-117-221.ams2.redhat.com [10.36.117.221])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A52DA5C221;
- Mon, 22 Jul 2019 09:52:56 +0000 (UTC)
-Date: Mon, 22 Jul 2019 10:52:53 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <20190722095253.GB3035@work-vm>
-References: <20190719123652.GA3000@work-vm>
- <5ee83209-cd46-dded-4d04-0dce1a01fccb@redhat.com>
+ (envelope-from <alex.bennee@linaro.org>) id 1hpV0P-00076h-1y
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 05:53:19 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:37651)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1hpV0O-00075N-I1
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 05:53:16 -0400
+Received: by mail-wr1-x442.google.com with SMTP id n9so13640317wrr.4
+ for <qemu-devel@nongnu.org>; Mon, 22 Jul 2019 02:53:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=qS4bTqzNESz250WDwg0jgHoC+WIUVcB5f7nhGfn1RWo=;
+ b=himsk/4Da1O1nqP+/YfqcpUQoPf6ZTX7YMawWdiB4qd8hoAU15Bachmr/opcCMBe4g
+ Jl1Ihb5KZYIYMgfx3nfoIq/bsYScD/H5k7zdM1e3pQLzlaXBdc+ZBJV0n7kd4ZKDae+t
+ QS91q3ATDmbohzEvYR4TZgrQe8y7BmdjupWci9IMRhcg87T2cNWrwl3zi5IpQ/owmhu1
+ d6rnjPRJ2hjmB0Ej6JiR+YMV5FHcEoD5la7IoQhrwexS+9x6oRjeNk5hAhGQkC+r7KE4
+ ugOGnsLh0ilSQ/GfkFOvYcxxsnC3Nr32rj3uNeDeQUiwe+VqgRm1XkPrDESYWJhc9CdC
+ M2cQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=qS4bTqzNESz250WDwg0jgHoC+WIUVcB5f7nhGfn1RWo=;
+ b=sHEfTvDbydF2KqtBUzBdZWEDxzchd4klsuLxxcmsBXUyUC8mAlQKUXq2JZJR41T4I0
+ 1I89Fv90aO8XdsmPJunk5VClX+peGWVadKECeaSvsi9zyvI5sd3wW9iEoFgssFsgsMXZ
+ X0gRp8Zsglubns1f4ZORBsXn/ZD3cv6EiknzD1XnLDVBnSq7ou/Zde4WNFBL2aI54Zrw
+ owM4N95GDGiOObIOtJdb0ZcEXfrngSOgn8cGVBj2qdFX7Fp9Kz94wMqMdLm5IbZCaRdr
+ M8Cveg0IlraeSBsUVD0yKs+cfO8yeyMx+M2jBAeRV41wO2F63jDUQqSze5uZ+5zQ5XHZ
+ zZZg==
+X-Gm-Message-State: APjAAAUft9eghCH+AIUwjiooEWis+PCBsqinPF65BpIq7L8aUg99miaN
+ +HkpnjVZcXptRHF8GvHQnrg5Kg==
+X-Google-Smtp-Source: APXvYqzywq+VdXGHRAWUPPPXDga4takqEGhFPycHTdvchAuTMzeHKdhXslox6ubUur4FRB5shWYLkA==
+X-Received: by 2002:adf:d4cc:: with SMTP id w12mr75688479wrk.121.1563789194721; 
+ Mon, 22 Jul 2019 02:53:14 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+ by smtp.gmail.com with ESMTPSA id n9sm75984832wrp.54.2019.07.22.02.53.14
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Mon, 22 Jul 2019 02:53:14 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id CB5C21FF87;
+ Mon, 22 Jul 2019 10:53:13 +0100 (BST)
+References: <20190719210326.15466-1-richard.henderson@linaro.org>
+ <20190719210326.15466-2-richard.henderson@linaro.org>
+User-agent: mu4e 1.3.3; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+In-reply-to: <20190719210326.15466-2-richard.henderson@linaro.org>
+Date: Mon, 22 Jul 2019 10:53:13 +0100
+Message-ID: <87o91mv1iu.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <5ee83209-cd46-dded-4d04-0dce1a01fccb@redhat.com>
-User-Agent: Mutt/1.12.0 (2019-05-25)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.38]); Mon, 22 Jul 2019 09:52:57 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] -rtc base=, migration and time jumps
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::442
+Subject: Re: [Qemu-devel] [PATCH for-4.2 01/24] cputlb: Add
+ tlb_set_asid_for_mmuidx
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,86 +98,153 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jan.kiszka@siemens.com, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, beata.michalska@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Paolo Bonzini (pbonzini@redhat.com) wrote:
-> So here's my understanding:  "-rtc base=3D" says what is the RTC value
-> when the guest starts.  This value is only used by qemu_get_timedate,
-> and most RTCs only use it on startup or reset.  However, there are
-> exceptions (the PC RTC's host clock notifier, the ds1338's set time
-> functionality, and all reads of m41t80/m48t59/twl92230) and this causes
-> the bug.
 
-Yes, I think so.
+Richard Henderson <richard.henderson@linaro.org> writes:
 
-> On 19/07/19 14:36, Dr. David Alan Gilbert wrote:
-> > d) The host clock jump detection (b) is broken - it correctly detects
-> > backwards jumps; but it's detection of a forward jump is based
-> > on two readings of the host clock being more than 60s apart - but
-> > often ona q emu running a Linux guest the host clock isn't read at all;
-> > so reading hwclock, waiting a minute and reading it again will trigger
-> > the jump code.
->=20
-> Oops.  Back when the detection was added, there were two QEMU_CLOCK_HOST
-> timers firing every second so the clock jump detection happened promptly.
->=20
-> These timers were then removed as a power-saving optimization, and that
-> broke the jump detection.
+> Although we can't do much with ASIDs except remember them, this
+> will allow cleanups within target/ that should make things clearer.
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+>
+> ---
+> v2: Assert cpu_is_self; only flush idx w/ asid mismatch.
+> ---
+>  include/exec/cpu-all.h  | 11 +++++++++++
+>  include/exec/cpu-defs.h |  2 ++
+>  include/exec/exec-all.h | 19 +++++++++++++++++++
+>  accel/tcg/cputlb.c      | 26 ++++++++++++++++++++++++++
+>  4 files changed, 58 insertions(+)
+>
+> diff --git a/include/exec/cpu-all.h b/include/exec/cpu-all.h
+> index 536ea58f81..40b140cbba 100644
+> --- a/include/exec/cpu-all.h
+> +++ b/include/exec/cpu-all.h
+> @@ -439,4 +439,15 @@ static inline CPUTLB *env_tlb(CPUArchState *env)
+>      return &env_neg(env)->tlb;
+>  }
+>
+> +/**
+> + * cpu_tlb(env)
+> + * @cpu: The generic CPUState
+> + *
+> + * Return the CPUTLB state associated with the cpu.
+> + */
+> +static inline CPUTLB *cpu_tlb(CPUState *cpu)
+> +{
+> +    return &cpu_neg(cpu)->tlb;
+> +}
+> +
+>  #endif /* CPU_ALL_H */
+> diff --git a/include/exec/cpu-defs.h b/include/exec/cpu-defs.h
+> index 9bc713a70b..73584841c0 100644
+> --- a/include/exec/cpu-defs.h
+> +++ b/include/exec/cpu-defs.h
+> @@ -169,6 +169,8 @@ typedef struct CPUTLBDesc {
+>      size_t n_used_entries;
+>      /* The next index to use in the tlb victim table.  */
+>      size_t vindex;
+> +    /* The current ASID for this tlb.  */
+> +    uint32_t asid;
 
-Ah OK; I'm a bit cautious that perhaps we're still getting some benefit
-=66rom them; maybe in snapshots?
+is it worth adding a "if used" to the comment. I assume there are arches
+that will never set and therefore care about ASID.
 
-> > 1) Tell people to do what libvirt does and specify base=3D differently
-> > on the dest.
->=20
-> This is racy; the user does not have a good way to know the exact base
-> on the destination.
+Otherwise:
 
-Right.
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
-> > 2) Migrate the offset value such that the base=3D on the destination
-> > is ignored
->=20
-> At least on some RTCs the offset is already being migrated indirectly.
-> For example on x86 the (base_rtc, last_update) pair might be usable to
-> reconstruct the offset?
+>      /* The tlb victim table, in two parts.  */
+>      CPUTLBEntry vtable[CPU_VTLB_SIZE];
+>      CPUIOTLBEntry viotlb[CPU_VTLB_SIZE];
+> diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
+> index 16034ee651..9c77aa5bf9 100644
+> --- a/include/exec/exec-all.h
+> +++ b/include/exec/exec-all.h
+> @@ -225,6 +225,21 @@ void tlb_flush_by_mmuidx_all_cpus(CPUState *cpu, uin=
+t16_t idxmap);
+>   * depend on when the guests translation ends the TB.
+>   */
+>  void tlb_flush_by_mmuidx_all_cpus_synced(CPUState *cpu, uint16_t idxmap);
+> +/**
+> + * tlb_set_asid_for_mmuidx:
+> + * @cpu: Originating cpu
+> + * @asid: Address Space Identifier
+> + * @idxmap: bitmap of MMU indexes to set to @asid
+> + * @depmap: bitmap of dependent MMU indexes
+> + *
+> + * Set an ASID for all of @idxmap.  If any previous ASID was different,
+> + * then we will flush the mmu idx.  If a flush is required, then also fl=
+ush
+> + * all dependent mmu indicies in @depmap.  This latter is typically used
+> + * for secondary page resolution, for implementing virtualization within
+> + * the guest.
+> + */
+> +void tlb_set_asid_for_mmuidx(CPUState *cpu, uint32_t asid,
+> +                             uint16_t idxmap, uint16_t dep_idxmap);
+>  /**
+>   * tlb_set_page_with_attrs:
+>   * @cpu: CPU to add this TLB entry for
+> @@ -310,6 +325,10 @@ static inline void tlb_flush_by_mmuidx_all_cpus_sync=
+ed(CPUState *cpu,
+>                                                         uint16_t idxmap)
+>  {
+>  }
+> +static inline void tlb_set_asid_for_mmuidx(CPUState *cpu, uint32_t asid,
+> +                                           uint16_t idxmap, uint16_t dep=
+map)
+> +{
+> +}
+>  #endif
+>
+>  #define CODE_GEN_ALIGN           16 /* must be >=3D of the size of a ica=
+che line */
+> diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
+> index bb9897b25a..c68f57755b 100644
+> --- a/accel/tcg/cputlb.c
+> +++ b/accel/tcg/cputlb.c
+> @@ -540,6 +540,32 @@ void tlb_flush_page_all_cpus_synced(CPUState *src, t=
+arget_ulong addr)
+>      tlb_flush_page_by_mmuidx_all_cpus_synced(src, addr, ALL_MMUIDX_BITS);
+>  }
+>
+> +void tlb_set_asid_for_mmuidx(CPUState *cpu, uint32_t asid, uint16_t idxm=
+ap,
+> +                             uint16_t depmap)
+> +{
+> +    CPUTLB *tlb =3D cpu_tlb(cpu);
+> +    uint16_t work, to_flush =3D 0;
+> +
+> +    /* It doesn't make sense to set context across cpus.  */
+> +    assert_cpu_is_self(cpu);
+> +
+> +    /*
+> +     * We don't support ASIDs except for trivially.
+> +     * If there is any change, then we must flush the TLB.
+> +     */
+> +    for (work =3D idxmap; work !=3D 0; work &=3D work - 1) {
+> +        int mmu_idx =3D ctz32(work);
+> +        if (tlb->d[mmu_idx].asid !=3D asid) {
+> +            tlb->d[mmu_idx].asid =3D asid;
+> +            to_flush |=3D 1 << mmu_idx;
+> +        }
+> +    }
+> +    if (to_flush) {
+> +        to_flush |=3D depmap;
+> +        tlb_flush_by_mmuidx_async_work(cpu, RUN_ON_CPU_HOST_INT(to_flush=
+));
+> +    }
+> +}
+> +
+>  /* update the TLBs so that writes to code in the virtual page 'addr'
+>     can be detected */
+>  void tlb_protect_code(ram_addr_t ram_addr)
 
-Yes it probably is.
 
-> > 3) Fix the host clock jump detection
-> >=20
-> > (3) is probably independent - the easiest fix would seem to be just
-> > to set a timer to read the host clock at say 20 second intervals
-> > which is wasteful but would avoid the false trigger.
-> >=20
-> > Is (2) worth it or do we just go with (1) - I'm tempted to just
-> > specify the behaviour.
-> >=20
-> > Mind you, we could kill the host clock jump detection code - only
-> > the mc148618 registers on the notifier for it - so presumably
-> > aarch/ppc/s390 etc dont see it.
->=20
-> I would just remove the host clock jump detection code.  IIUC that
-> should fix your bug so you don't even need to do the above-mentioned
-> reconstruction of the offset (let's call it 2b) in the PC RTC.
-
-OK, I'll do that.
-
-> That still leaves the problem that the base goes out of sync on
-> migration on m41t80/m48t59/twl92230.  For that, I think that the
-> simplest thing to do would be to fix those to store and migrate the
-> offset themselves just like all other RTC implementations.
-
-I'll put those on my TODO - I don't think they're actually used
-by any versioned machine so keeping migration compat shouldn't
-be an issue.
-
-Dave
-
-> Paolo
 --
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Alex Benn=C3=A9e
 
