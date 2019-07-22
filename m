@@ -2,70 +2,91 @@ Return-Path: <SRS0=EA86=VT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14192C76194
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 15:54:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85FB4C7618F
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 16:00:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E4017218EA
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 15:54:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E4017218EA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=bt.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4C5EC218EA
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 16:00:09 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iPbss/mK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C5EC218EA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35324 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35372 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hpadt-00012m-2F
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jul 2019 11:54:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55585)
+	id 1hpajP-0003sQ-Pf
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jul 2019 12:00:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56700)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <tony.nguyen@bt.com>) id 1hpadi-0000dR-Si
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 11:54:16 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1hpajA-0003EJ-Gw
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 11:59:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tony.nguyen@bt.com>) id 1hpadg-0004N9-Rg
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 11:54:14 -0400
-Received: from smtpe1.intersmtp.com ([62.239.224.237]:21209)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tony.nguyen@bt.com>)
- id 1hpadX-0004IC-6E; Mon, 22 Jul 2019 11:54:04 -0400
-Received: from tpw09926dag18g.domain1.systemhost.net (10.9.212.34) by
- RDW083A010ED66.bt.com (10.187.98.36) with Microsoft SMTP Server (TLS) id
- 14.3.439.0; Mon, 22 Jul 2019 16:53:08 +0100
-Received: from tpw09926dag18e.domain1.systemhost.net (10.9.212.18) by
- tpw09926dag18g.domain1.systemhost.net (10.9.212.34) with Microsoft SMTP
- Server (TLS) id 15.0.1395.4; Mon, 22 Jul 2019 16:54:00 +0100
-Received: from tpw09926dag18e.domain1.systemhost.net
- ([fe80::a946:6348:ccf4:fa6c]) by tpw09926dag18e.domain1.systemhost.net
- ([fe80::a946:6348:ccf4:fa6c%12]) with mapi id 15.00.1395.000; Mon, 22 Jul
- 2019 16:54:00 +0100
-From: <tony.nguyen@bt.com>
-To: <qemu-devel@nongnu.org>
-Thread-Topic: [Qemu-devel] [PATCH v2 20/20] target/sparc: sun4u Invert Endian
- TTE bit
-Thread-Index: AQHVQKWtc7DbOsb7Y06HeJbM6CaVHA==
-Date: Mon, 22 Jul 2019 15:54:00 +0000
-Message-ID: <1563810840218.14603@bt.com>
+ (envelope-from <richard.henderson@linaro.org>) id 1hpaj9-0007lR-Kg
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 11:59:52 -0400
+Received: from mail-pl1-x633.google.com ([2607:f8b0:4864:20::633]:46315)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1hpaj9-0007kR-Bs
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 11:59:51 -0400
+Received: by mail-pl1-x633.google.com with SMTP id c2so19356261plz.13
+ for <qemu-devel@nongnu.org>; Mon, 22 Jul 2019 08:59:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=53qxnmFCQleCgbRBd+QvrrBbXVy7x90TNzmGsFo5nJU=;
+ b=iPbss/mK0jszMYof/8qtEi33fitz9HC8eD/BndxwmPj/LtJj21fdl1api2UB53TVJ3
+ LiO/y1lhicz2hfPj5jnw3buDx9l0NVfuG8XWs6sgxIxkgeh6ofJg+rI9vKUAUHFyi+c/
+ ug5ndyKNnPX6tDf11y2fxK3chMQvVwuXqhlhlvN351ntAyuvxP95hpiQUZdskVFXNm8S
+ /+JSbRug7VVg9zxK0h9re0oMGark5HNwNNigLHKEX2GcEoUZzHqsv1alZOVnM1IeNmYK
+ eUvzBNFoIl8UsEOqM62/C1mB7Mq4baSo8laFlWCeZ4XMs17DBlLRSW91MabPlGM68JxT
+ w6PQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=53qxnmFCQleCgbRBd+QvrrBbXVy7x90TNzmGsFo5nJU=;
+ b=VQjmKXze3GOt5bRXo6UJ87hhO3WG2FhthuzvqiPMeni/5y0SVtXCH/0/fDaam2oaQa
+ 6EdMe8+AArzKqtEijE29qDA3dykiJTg7UXY54jJGdotHtxttF2iJW/aSajqDq839eD8X
+ vQKZOONZLn/xGhUzZUCZzxryfIjKqIXOhjVkSn85ZYVFyb62wy/DVKaliNkF8hFTrHy2
+ HuZ2j9ZPmpm/ta/O4XZTCP139fNKFrYju6DCnVZX4adHZP28am1ZLRUCRvCpeoq5YpDi
+ 2FOZT7b5dKmqQKulKHAJbt1PhurqGXL91RD56+X49PW5oGy10WbU8qA8wVi96F3OCz4q
+ 8Mmg==
+X-Gm-Message-State: APjAAAWBC5xUcBAGA+TWGsNbcFoQk+JQVjLR1OsbmcGHb73Knx7C/M5S
+ QmblB+u9gcCwzLCLMDBXEA5tIw==
+X-Google-Smtp-Source: APXvYqy/RcnjVKmOcjR9YkoxmsldkT0VMHLcPieshCXhxmcgxnYEhbB1VLUfu3mSkg1P/Zg2xZBPtw==
+X-Received: by 2002:a17:902:b582:: with SMTP id
+ a2mr77224778pls.128.1563811190327; 
+ Mon, 22 Jul 2019 08:59:50 -0700 (PDT)
+Received: from [192.168.1.11] (97-126-117-207.tukw.qwest.net. [97.126.117.207])
+ by smtp.gmail.com with ESMTPSA id y128sm58626865pgy.41.2019.07.22.08.59.48
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Mon, 22 Jul 2019 08:59:49 -0700 (PDT)
+To: tony.nguyen@bt.com, qemu-devel@nongnu.org
 References: <e9c6e5310b1a4863be45d45bf087fc3d@tpw09926dag18e.domain1.systemhost.net>
-In-Reply-To: <e9c6e5310b1a4863be45d45bf087fc3d@tpw09926dag18e.domain1.systemhost.net>
-Accept-Language: en-AU, en-GB, en-US
-Content-Language: en-AU
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.187.101.37]
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <2b6eb033-4b6e-4d64-c57e-a3257088d0dd@linaro.org>
+Date: Mon, 22 Jul 2019 08:59:47 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
+In-Reply-To: <e9c6e5310b1a4863be45d45bf087fc3d@tpw09926dag18e.domain1.systemhost.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 62.239.224.237
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: [Qemu-devel] [PATCH v2 20/20] target/sparc: sun4u Invert Endian TTE
- bit
+X-Received-From: 2607:f8b0:4864:20::633
+Subject: Re: [Qemu-devel] [PATCH v2 00/20] Invert Endian bit in SPARCv9 MMU
+ TTE
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,78 +111,17 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This bit configures endianness of PCI MMIO devices. It is used by
-Solaris and OpenBSD sunhme drivers.
+On 7/22/19 8:34 AM, tony.nguyen@bt.com wrote:
+> Tony Nguyen (20):
+>   tcg: Replace MO_8 with MO_UB alias
+>   tcg: Replace MO_16 with MO_UW alias
+>   tcg: Replace MO_32 with MO_UL alias
+>   tcg: Replace MO_64 with MO_UQ alias
+>   tcg: Move size+sign+endian from TCGMemOp to MemOp
 
-Tested working on OpenBSD.
-
-Unfortunately Solaris 10 had a unrelated keyboard issue blocking
-testing... another inch towards Solaris 10 on SPARC64 =3D)
-
-Signed-off-by: Tony Nguyen <tony.nguyen@bt.com>
----
- target/sparc/cpu.h        | 2 ++
- target/sparc/mmu_helper.c | 8 +++++++-
- 2 files changed, 9 insertions(+), 1 deletion(-)
-
-diff --git a/target/sparc/cpu.h b/target/sparc/cpu.h
-index 8ed2250..77e8e07 100644
---- a/target/sparc/cpu.h
-+++ b/target/sparc/cpu.h
-@@ -277,6 +277,7 @@ enum {
-
- #define TTE_VALID_BIT       (1ULL << 63)
- #define TTE_NFO_BIT         (1ULL << 60)
-+#define TTE_IE_BIT          (1ULL << 59)
- #define TTE_USED_BIT        (1ULL << 41)
- #define TTE_LOCKED_BIT      (1ULL <<  6)
- #define TTE_SIDEEFFECT_BIT  (1ULL <<  3)
-@@ -293,6 +294,7 @@ enum {
-
- #define TTE_IS_VALID(tte)   ((tte) & TTE_VALID_BIT)
- #define TTE_IS_NFO(tte)     ((tte) & TTE_NFO_BIT)
-+#define TTE_IS_IE(tte)      ((tte) & TTE_IE_BIT)
- #define TTE_IS_USED(tte)    ((tte) & TTE_USED_BIT)
- #define TTE_IS_LOCKED(tte)  ((tte) & TTE_LOCKED_BIT)
- #define TTE_IS_SIDEEFFECT(tte) ((tte) & TTE_SIDEEFFECT_BIT)
-diff --git a/target/sparc/mmu_helper.c b/target/sparc/mmu_helper.c
-index 826e14b..77dc86a 100644
---- a/target/sparc/mmu_helper.c
-+++ b/target/sparc/mmu_helper.c
-@@ -537,6 +537,10 @@ static int get_physical_address_data(CPUSPARCState *en=
-v, hwaddr *physical,
-         if (ultrasparc_tag_match(&env->dtlb[i], address, context, physical=
-)) {
-             int do_fault =3D 0;
-
-+            if (TTE_IS_IE(env->dtlb[i].tte)) {
-+                attrs->byte_swap =3D true;
-+            }
-+
-             /* access ok? */
-             /* multiple bits in SFSR.FT may be set on TT_DFAULT */
-             if (TTE_IS_PRIV(env->dtlb[i].tte) && is_user) {
-@@ -792,7 +796,7 @@ void dump_mmu(CPUSPARCState *env)
-             }
-             if (TTE_IS_VALID(env->dtlb[i].tte)) {
-                 qemu_printf("[%02u] VA: %" PRIx64 ", PA: %llx"
--                            ", %s, %s, %s, %s, ctx %" PRId64 " %s\n",
-+                            ", %s, %s, %s, %s, ie %s, ctx %" PRId64 " %s\n=
-",
-                             i,
-                             env->dtlb[i].tag & (uint64_t)~0x1fffULL,
-                             TTE_PA(env->dtlb[i].tte),
-@@ -801,6 +805,8 @@ void dump_mmu(CPUSPARCState *env)
-                             TTE_IS_W_OK(env->dtlb[i].tte) ? "RW" : "RO",
-                             TTE_IS_LOCKED(env->dtlb[i].tte) ?
-                             "locked" : "unlocked",
-+                            TTE_IS_IE(env->dtlb[i].tte) ?
-+                            "yes" : "no",
-                             env->dtlb[i].tag & (uint64_t)0x1fffULL,
-                             TTE_IS_GLOBAL(env->dtlb[i].tte) ?
-                             "global" : "local");
---
-1.8.3.1
+I don't like any of these first 5 patches.
+I don't understand your motivation here.  Why?
 
 
+r~
 
