@@ -2,64 +2,61 @@ Return-Path: <SRS0=EA86=VT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BBCF0C76188
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 08:48:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5C3DC76188
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 09:00:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 836B521E6B
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 08:48:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 836B521E6B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id C0B6122296
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 09:00:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0B6122296
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59752 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59785 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hpTzq-0000O8-Mz
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jul 2019 04:48:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57413)
+	id 1hpUB0-0003Ha-3r
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jul 2019 05:00:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33341)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <yan.y.zhao@intel.com>) id 1hpTzf-0008R4-Uz
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 04:48:29 -0400
+ (envelope-from <mst@redhat.com>) id 1hpUAp-0002se-C6
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 05:00:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yan.y.zhao@intel.com>) id 1hpTze-0003r2-LX
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 04:48:27 -0400
-Received: from mga03.intel.com ([134.134.136.65]:10142)
+ (envelope-from <mst@redhat.com>) id 1hpUAo-0006KA-CP
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 04:59:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52502)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yan.y.zhao@intel.com>)
- id 1hpTze-0003pr-Az
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 04:48:26 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
- by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 22 Jul 2019 01:43:11 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,294,1559545200"; d="scan'208";a="320622457"
-Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
- ([10.239.13.9])
- by orsmga004.jf.intel.com with ESMTP; 22 Jul 2019 01:43:07 -0700
-Date: Mon, 22 Jul 2019 04:37:03 -0400
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: Kirti Wankhede <kwankhede@nvidia.com>
-Message-ID: <20190722083703.GN8912@joy-OptiPlex-7040>
-References: <1562665760-26158-1-git-send-email-kwankhede@nvidia.com>
- <1562665760-26158-7-git-send-email-kwankhede@nvidia.com>
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1hpUAo-0006Jk-74
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 04:59:58 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 3EE402D1CE;
+ Mon, 22 Jul 2019 08:59:57 +0000 (UTC)
+Received: from redhat.com (ovpn-120-233.rdu2.redhat.com [10.10.120.233])
+ by smtp.corp.redhat.com (Postfix) with SMTP id 285F960C05;
+ Mon, 22 Jul 2019 08:59:49 +0000 (UTC)
+Date: Mon, 22 Jul 2019 04:59:48 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: "Oleinik, Alexander" <alxndr@bu.edu>
+Message-ID: <20190722045944-mutt-send-email-mst@kernel.org>
+References: <20190719151920.22586-1-alxndr@bu.edu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1562665760-26158-7-git-send-email-kwankhede@nvidia.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 134.134.136.65
-Subject: Re: [Qemu-devel] [PATCH v7 06/13] vfio: Add VM state change handler
- to know state of VM
+In-Reply-To: <20190719151920.22586-1-alxndr@bu.edu>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.38]); Mon, 22 Jul 2019 08:59:57 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2] virtio-net: Always check for guest
+ header length
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,172 +68,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>, "Tian,
- Kevin" <kevin.tian@intel.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
- "cjia@nvidia.com" <cjia@nvidia.com>,
- "eskultet@redhat.com" <eskultet@redhat.com>, "Yang,
- Ziye" <ziye.yang@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "cohuck@redhat.com" <cohuck@redhat.com>,
- "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
- "dgilbert@redhat.com" <dgilbert@redhat.com>, "Wang,
- Zhi A" <zhi.a.wang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
- "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>,
- "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
- "eauger@redhat.com" <eauger@redhat.com>,
- "felipe@nutanix.com" <felipe@nutanix.com>,
- "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "Liu,
- Changpeng" <changpeng.liu@intel.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>
+Cc: Jason Wang <jasowang@redhat.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>, "bsd@redhat.com" <bsd@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "stefanha@redhat.com" <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Jul 09, 2019 at 05:49:13PM +0800, Kirti Wankhede wrote:
-> VM state change handler gets called on change in VM's state. This is used to set
-> VFIO device state to _RUNNING.
-> VM state change handler, migration state change handler and log_sync listener
-> are called asynchronously, which sometimes lead to data corruption in migration
-> region. Initialised mutex that is used to serialize operations on migration data
-> region during saving state.
+On Fri, Jul 19, 2019 at 03:21:15PM +0000, Oleinik, Alexander wrote:
+> While fuzzing the virtio-net tx vq, I ran into an assertion failure due
+> to iov_copy offsets larger than the total iov size. Though there is
+> a check to cover this, it does not execute when !n->has_vnet_hdr. This
+> change always copies the guest header into the mhdr buffer and checks its
+> length, even if mhdr is not needed.
 > 
-> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> Reviewed-by: Neo Jia <cjia@nvidia.com>
-> ---
->  hw/vfio/migration.c           | 64 +++++++++++++++++++++++++++++++++++++++++++
->  hw/vfio/trace-events          |  2 ++
->  include/hw/vfio/vfio-common.h |  4 +++
->  3 files changed, 70 insertions(+)
+> The call stack for the assertion failure:
 > 
-> diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
-> index a2cfbd5af2e1..c01f08b659d0 100644
-> --- a/hw/vfio/migration.c
-> +++ b/hw/vfio/migration.c
-> @@ -78,6 +78,60 @@ err:
->      return ret;
->  }
->  
-> +static int vfio_migration_set_state(VFIODevice *vbasedev, uint32_t state)
-> +{
-> +    VFIOMigration *migration = vbasedev->migration;
-> +    VFIORegion *region = &migration->region.buffer;
-> +    uint32_t device_state;
-> +    int ret = 0;
-> +
-> +    device_state = (state & VFIO_DEVICE_STATE_MASK) |
-> +                   (vbasedev->device_state & ~VFIO_DEVICE_STATE_MASK);
-> +
-> +    if ((device_state & VFIO_DEVICE_STATE_MASK) == VFIO_DEVICE_STATE_INVALID) {
-> +        return -EINVAL;
-> +    }
-> +
-> +    ret = pwrite(vbasedev->fd, &device_state, sizeof(device_state),
-> +                 region->fd_offset + offsetof(struct vfio_device_migration_info,
-> +                                              device_state));
-> +    if (ret < 0) {
-> +        error_report("%s: Failed to set device state %d %s",
-> +                     vbasedev->name, ret, strerror(errno));
-> +        return ret;
-> +    }
-> +
-> +    vbasedev->device_state = device_state;
-> +    trace_vfio_migration_set_state(vbasedev->name, device_state);
-> +    return 0;
-> +}
-> +
-> +static void vfio_vmstate_change(void *opaque, int running, RunState state)
-> +{
-> +    VFIODevice *vbasedev = opaque;
-> +
-> +    if ((vbasedev->vm_running != running)) {
-> +        int ret;
-> +        uint32_t dev_state;
-> +
-> +        if (running) {
-> +            dev_state = VFIO_DEVICE_STATE_RUNNING;
-should be
-dev_state |= VFIO_DEVICE_STATE_RUNNING; ?
+>  #8 in __assert_fail (libc.so.6+0x300f1)
+>  #9 in iov_copy iov.c:266:5
+>  #10 in virtio_net_flush_tx virtio-net.c:2073:23
+>  #11 in virtio_net_tx_bh virtio-net.c:2197:11
+>  #12 in aio_bh_poll async.c:118:13
+>  #13 in aio_dispatch aio-posix.c:460:5
+>  #14 in aio_ctx_dispatch async.c:261:5
+>  #15 in g_main_context_dispatch (libglib-2.0.so.0+0x4df2d)
+>  #16 in glib_pollfds_poll main-loop.c:213:9
+>  #17 in os_host_main_loop_wait main-loop.c:236
+>  #18 in main_loop_wait main-loop.c:512
+>  #19 in virtio_net_tx_fuzz virtio-net-fuzz.c:160:3
+> 
+> Signed-off-by: Alexander Oleinik <alxndr@bu.edu>
 
-> +        } else {
-> +            dev_state = (vbasedev->device_state & VFIO_DEVICE_STATE_MASK) &
-> +                     ~VFIO_DEVICE_STATE_RUNNING;
-> +        }
-> +
-> +        ret = vfio_migration_set_state(vbasedev, dev_state);
-> +        if (ret) {
-> +            error_report("%s: Failed to set device state 0x%x",
-> +                         vbasedev->name, dev_state);
-> +        }
-> +        vbasedev->vm_running = running;
-> +        trace_vfio_vmstate_change(vbasedev->name, running, RunState_str(state),
-> +                                  dev_state);
-> +    }
-> +}
-> +
->  static int vfio_migration_init(VFIODevice *vbasedev,
->                                 struct vfio_region_info *info)
->  {
-> @@ -93,6 +147,11 @@ static int vfio_migration_init(VFIODevice *vbasedev,
->          return ret;
->      }
->  
-> +    qemu_mutex_init(&vbasedev->migration->lock);
-> +
-> +    vbasedev->vm_state = qemu_add_vm_change_state_handler(vfio_vmstate_change,
-> +                                                          vbasedev);
-> +
->      return 0;
->  }
->  
-> @@ -135,11 +194,16 @@ void vfio_migration_finalize(VFIODevice *vbasedev)
->          return;
->      }
->  
-> +    if (vbasedev->vm_state) {
-> +        qemu_del_vm_change_state_handler(vbasedev->vm_state);
-> +    }
-> +
->      if (vbasedev->migration_blocker) {
->          migrate_del_blocker(vbasedev->migration_blocker);
->          error_free(vbasedev->migration_blocker);
->      }
->  
-> +    qemu_mutex_destroy(&vbasedev->migration->lock);
->      vfio_migration_region_exit(vbasedev);
->      g_free(vbasedev->migration);
->  }
-> diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
-> index 191a726a1312..3d15bacd031a 100644
-> --- a/hw/vfio/trace-events
-> +++ b/hw/vfio/trace-events
-> @@ -146,3 +146,5 @@ vfio_display_edid_write_error(void) ""
->  
->  # migration.c
->  vfio_migration_probe(char *name, uint32_t index) " (%s) Region %d"
-> +vfio_migration_set_state(char *name, uint32_t state) " (%s) state %d"
-> +vfio_vmstate_change(char *name, int running, const char *reason, uint32_t dev_state) " (%s) running %d reason %s device state %d"
-> diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-> index 152da3f8d6f3..f6c70db3a9c1 100644
-> --- a/include/hw/vfio/vfio-common.h
-> +++ b/include/hw/vfio/vfio-common.h
-> @@ -29,6 +29,7 @@
->  #ifdef CONFIG_LINUX
->  #include <linux/vfio.h>
->  #endif
-> +#include "sysemu/sysemu.h"
->  
->  #define VFIO_MSG_PREFIX "vfio %s: "
->  
-> @@ -124,6 +125,9 @@ typedef struct VFIODevice {
->      unsigned int flags;
->      VFIOMigration *migration;
->      Error *migration_blocker;
-> +    uint32_t device_state;
-> +    VMChangeStateEntry *vm_state;
-> +    int vm_running;
->  } VFIODevice;
->  
->  struct VFIODeviceOps {
-> -- 
-> 2.7.0
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
+
+> ---
+>  hw/net/virtio-net.c | 19 ++++++++++++-------
+>  1 file changed, 12 insertions(+), 7 deletions(-)
 > 
+> diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+> index b9e1cd71cf..003436b53c 100644
+> --- a/hw/net/virtio-net.c
+> +++ b/hw/net/virtio-net.c
+> @@ -2035,14 +2035,19 @@ static int32_t virtio_net_flush_tx(VirtIONetQueue *q)
+>              return -EINVAL;
+>          }
+>  
+> -        if (n->has_vnet_hdr) {
+> -            if (iov_to_buf(out_sg, out_num, 0, &mhdr, n->guest_hdr_len) <
+> +        /*
+> +         * Even if !n->has_vnet_hdr and we dont need mhdr, we still need this
+> +         * to check that out_sg contains at least guest_hdr_len bytes
+> +         */
+> +        if (iov_to_buf(out_sg, out_num, 0, &mhdr, n->guest_hdr_len) <
+>                  n->guest_hdr_len) {
+> -                virtio_error(vdev, "virtio-net header incorrect");
+> -                virtqueue_detach_element(q->tx_vq, elem, 0);
+> -                g_free(elem);
+> -                return -EINVAL;
+> -            }
+> +            virtio_error(vdev, "virtio-net header incorrect");
+> +            virtqueue_detach_element(q->tx_vq, elem, 0);
+> +            g_free(elem);
+> +            return -EINVAL;
+> +        }
+> +
+> +        if (n->has_vnet_hdr) {
+>              if (n->needs_vnet_hdr_swap) {
+>                  virtio_net_hdr_swap(vdev, (void *) &mhdr);
+>                  sg2[0].iov_base = &mhdr;
+> -- 
+> 2.20.1
 
