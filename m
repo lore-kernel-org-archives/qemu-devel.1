@@ -2,65 +2,87 @@ Return-Path: <SRS0=EA86=VT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15410C76188
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 09:06:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F389CC76188
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 09:09:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E24022229B
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 09:06:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E24022229B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id C3ABF20578
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 09:09:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DkkKTTxK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3ABF20578
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59813 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59832 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hpUH5-0004qq-3k
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jul 2019 05:06:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35407)
+	id 1hpUKA-00061x-3C
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jul 2019 05:09:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36796)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <berrange@redhat.com>) id 1hpUGu-0004OX-Q2
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 05:06:18 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hpUK0-0005dB-2O
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 05:09:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1hpUGt-0002F7-J8
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 05:06:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43990)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>)
- id 1hpUGo-00027E-47; Mon, 22 Jul 2019 05:06:12 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id B4DC23086262;
- Mon, 22 Jul 2019 09:06:00 +0000 (UTC)
-Received: from redhat.com (unknown [10.42.16.132])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1287060C05;
- Mon, 22 Jul 2019 09:05:58 +0000 (UTC)
-Date: Mon, 22 Jul 2019 10:05:56 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Maxim Levitsky <mlevitsk@redhat.com>
-Message-ID: <20190722090556.GC23775@redhat.com>
-References: <20190721181508.28608-1-mlevitsk@redhat.com>
- <20190721181508.28608-2-mlevitsk@redhat.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1hpUJx-0004xH-UJ
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 05:09:28 -0400
+Received: from mail-oi1-x230.google.com ([2607:f8b0:4864:20::230]:33491)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hpUJx-0004vr-OP
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 05:09:25 -0400
+Received: by mail-oi1-x230.google.com with SMTP id u15so29071377oiv.0
+ for <qemu-devel@nongnu.org>; Mon, 22 Jul 2019 02:09:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=7tH282havsKLUoJQUzdU/9NNOG96wyfkfW1RtAF6H9w=;
+ b=DkkKTTxKJUT2bu7pzGYes8EeWT3EV9ahbBFntgF8Jzl79NEXL0z0wboNtYGEXfuElT
+ GorUwOygxDi7wAroyXN2gLOkk0tkpnzfRgTFq/1n35AelF6CnRPINUHr599CRnVHfAB6
+ 7KjNADkurPs3yWDlZVSQxbamGDt0X7qJp6a/yPDhEmna3RpO0Jr1ldokIpxGeH6n5tya
+ I9gGpMkE/bml5Tri6Ns3z5DqLwRD7zHdGCilw4Lsb4CsdRWGmdZ5xKh7CCZnInHOkEiT
+ XIwhdQkZ5JarCJL5BsZhInAMUi5Yjwh/gxtrLqphFmxf8k1wi/ES0EEZIl+XzWcIvNrI
+ 6JGg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=7tH282havsKLUoJQUzdU/9NNOG96wyfkfW1RtAF6H9w=;
+ b=CoCowWnsV/xnx1yIIugphtoPW+gF8av5XLoQfnFMnm3HSFPGiC+NNsBQv49KMJ4RXi
+ tUMuvC7sxnHHFZdhREXCuZJ8X5LneZ9G/pVyL1HdVbMyjy0j1Xci83BOd/391kqI0ldH
+ LgkH4XVyLbbDEKnFfZhbJ8mVR0SU8cfTvRIuX/F2m0iWSQPpmIK0Jk2dY3z09hs919cK
+ Sz09cy3wkUcYoUwrSi5QeHuLMDODrv3bWi+Z35/vnwOquF5yntWWUuWCCF2uvKw7Yhyh
+ Z6K0DxqgKwV4zO3kPv6WP4KDq/1EKOvfyjUhapSjk39RojRk3TWA+ux5DIM/d0dK4P9G
+ oBLA==
+X-Gm-Message-State: APjAAAWjIHKZvqweNUNEQsDP15Za8Xv5x1+uVrXvb0c35LLNoExiOkZx
+ RRLu2gtFLEphosom5kREkmxsf4F/bYVx6NR/hp87UA==
+X-Google-Smtp-Source: APXvYqx5v/eLAitafeu3250MeE/Zn2Rach4LwkNrmmF3WV6I9joSQULeCUcZ8Nd14AxZ9kOzy0e7R6ufFnZN0DFRWww=
+X-Received: by 2002:aca:6185:: with SMTP id
+ v127mr34573810oib.163.1563786564165; 
+ Mon, 22 Jul 2019 02:09:24 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190721181508.28608-2-mlevitsk@redhat.com>
-User-Agent: Mutt/1.12.0 (2019-05-25)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Mon, 22 Jul 2019 09:06:00 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 1/2] LUKS: better error message when
- creating too large files
+References: <1534182832-554-1-git-send-email-aleksandar.markovic@rt-rk.com>
+ <1534182832-554-5-git-send-email-aleksandar.markovic@rt-rk.com>
+ <4da49ffe-902f-2cf2-8a21-2bbd511b17a4@weilnetz.de>
+ <CAL1e-=jE8X1ODnA0aSXe5OCqJzYA0J47h5b6=H_UivPP11zSQA@mail.gmail.com>
+ <591d71a5-5b10-ab22-4751-01da8613d84c@weilnetz.de>
+ <BN6PR2201MB12519E6C72689FF70B5CA3E4C6F60@BN6PR2201MB1251.namprd22.prod.outlook.com>
+ <CAFEAcA946VCB=uwOe06v1BNdu8FMf_F4CoT8BeZAvSdRxrK6og@mail.gmail.com>
+ <23c9b27f-c3ef-0f14-c522-951d57d4784b@weilnetz.de>
+In-Reply-To: <23c9b27f-c3ef-0f14-c522-951d57d4784b@weilnetz.de>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 22 Jul 2019 10:09:13 +0100
+Message-ID: <CAFEAcA8A21Ek14pzs_E+z8+X4PnbCNtgozAY61_SZpJC9srGdQ@mail.gmail.com>
+To: Stefan Weil <sw@weilnetz.de>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::230
+Subject: Re: [Qemu-devel] Handling of fall through code
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,57 +94,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
- qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>,
- qemu-devel@nongnu.org, Laurent Vivier <laurent@vivier.eu>,
- Max Reitz <mreitz@redhat.com>
+Cc: Paul Burton <pburton@wavecomp.com>,
+ "Daniel P. Berrange" <berrange@redhat.com>,
+ "riku.voipio@iki.fi" <riku.voipio@iki.fi>,
+ "richard.henderson@linaro.org" <richard.henderson@linaro.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "laurent@vivier.eu" <laurent@vivier.eu>,
+ Aleksandar Markovic <aleksandar.markovic@rt-rk.com>,
+ "philippe.mathieu.daude@gmail.com" <philippe.mathieu.daude@gmail.com>,
+ "aurelien@aurel32.net" <aurelien@aurel32.net>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Petar Jovanovic <pjovanovic@wavecomp.com>,
+ Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, Jul 21, 2019 at 09:15:07PM +0300, Maxim Levitsky wrote:
-> Currently if you attampt to create too large file with luks you
-> get the following error message:
->=20
-> Formatting 'test.luks', fmt=3Dluks size=3D17592186044416 key-secret=3Ds=
-ec0
-> qemu-img: test.luks: Could not resize file: File too large
->=20
-> While for raw format the error message is
-> qemu-img: test.img: The image size is too large for file format 'raw'
->=20
->=20
-> The reason for this is that qemu-img checks for errono of the failure,
-> and presents the later error when it is -EFBIG
->=20
-> However crypto generic code 'swallows' the errno and replaces it
-> with -EIO.
->=20
-> As an attempt to make it better, we can make luks driver,
-> detect -EFBIG and in this case present a better error message,
-> which is what this patch does
->=20
-> The new error message is:
->=20
-> qemu-img: error creating test.luks: The requested file size is too larg=
-e
->=20
-> Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=3D1534898
-> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> ---
->  block/crypto.c | 25 +++++++++++++++++++++----
->  1 file changed, 21 insertions(+), 4 deletions(-)
+On Sun, 21 Jul 2019 at 17:39, Stefan Weil <sw@weilnetz.de> wrote:
+> Peter, is this fall through for ARM correct?
+>
+> https://github.com/qemu/qemu/blob/master/target/arm/helper.c#L7958
+>
+> It looks rather suspicious and is one of the remaining related compiler
+> warnings.
 
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+It's wrong, and Philippe posted a patch for it a day or two ago:
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+https://patchew.org/QEMU/20190719111451.12406-1-philmd@redhat.com/
+
+thanks
+-- PMM
 
