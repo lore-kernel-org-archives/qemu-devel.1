@@ -2,69 +2,91 @@ Return-Path: <SRS0=EA86=VT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A2CEC76188
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 09:30:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DA04C76188
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 09:38:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CF4C221E6B
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 09:30:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF4C221E6B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=adacore.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1AA8820693
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 09:38:04 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Gv17KIVq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1AA8820693
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59954 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60012 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hpUdr-0003tR-TO
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jul 2019 05:29:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42485)
+	id 1hpUlf-0006Ya-A3
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jul 2019 05:38:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46082)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <frederic.konrad@adacore.com>) id 1hpUdh-0003Uo-T6
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 05:29:51 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hpUlV-0006AH-TD
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 05:37:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <frederic.konrad@adacore.com>) id 1hpUdg-0002Wi-Bo
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 05:29:49 -0400
-Received: from mel.act-europe.fr ([2a02:2ab8:224:1::a0a:d2]:48169
- helo=smtp.eu.adacore.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <frederic.konrad@adacore.com>)
- id 1hpUdg-0002Ve-3O; Mon, 22 Jul 2019 05:29:48 -0400
-Received: from localhost (localhost [127.0.0.1])
- by filtered-smtp.eu.adacore.com (Postfix) with ESMTP id 51474822D2;
- Mon, 22 Jul 2019 11:29:44 +0200 (CEST)
-X-Virus-Scanned: Debian amavisd-new at eu.adacore.com
-Received: from smtp.eu.adacore.com ([127.0.0.1])
- by localhost (smtp.eu.adacore.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id unqYwkd3nd0P; Mon, 22 Jul 2019 11:29:44 +0200 (CEST)
-Received: from localhost.localdomain (lfbn-tou-1-447-75.w86-206.abo.wanadoo.fr
- [86.206.4.75])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by smtp.eu.adacore.com (Postfix) with ESMTPSA id 7B88D822B2;
- Mon, 22 Jul 2019 11:29:43 +0200 (CEST)
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org, qemu-riscv@nongnu.org
-References: <1563603512-5914-1-git-send-email-frederic.konrad@adacore.com>
- <70060fbc-b79f-6385-2b1e-0cebb45ca03e@redhat.com>
- <1f427dc9-deb9-f900-470a-84b79ab32a2a@redhat.com>
-From: KONRAD Frederic <frederic.konrad@adacore.com>
-Message-ID: <8d86172a-b37f-5445-928a-46ec7f225b18@adacore.com>
-Date: Mon, 22 Jul 2019 11:29:41 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <alex.bennee@linaro.org>) id 1hpUlU-0002pV-QE
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 05:37:53 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:51335)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1hpUlU-0002o4-Hc
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 05:37:52 -0400
+Received: by mail-wm1-x341.google.com with SMTP id 207so34444692wma.1
+ for <qemu-devel@nongnu.org>; Mon, 22 Jul 2019 02:37:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=8O7SM2Lqdqi6MBheYq2a+PRzweupAXsn8BueWxr52uQ=;
+ b=Gv17KIVqqDe7KpsYTjCxkA7GykB7Uqp/uEq+1Fh+e7/rrej1wALU+TjY/94XOZgZ/x
+ 3Bo7gI3FWNoO0Or2X1lxUc6AaTZpvvz1kvmxd5gkugThuEZNzBAk+CZ0C3hh13Uo1ilP
+ BJ1HryhZ8ScvfaD0a1eB1C4ldhaZh5aD4OYn5Kr7exxzo59Fpizw4hlvlfJNd331PpOX
+ mGz98BNMKA2aFUg+XoYBHNQ5BH0vaA5EK9yx4b2pJWOXQMvHS6wb9CCZySmQycLbKqbX
+ E7BPkqOSlzGfORQrtzXOmFYqKlmEUWkb1qjg5UZ6dv84VyJIbuOU9BqbFS0UzcS6WvNz
+ BdEg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=8O7SM2Lqdqi6MBheYq2a+PRzweupAXsn8BueWxr52uQ=;
+ b=fSQ1xNRgAipaLWlNsLpTGcXdfxRqtQk1lUlNxBJJ0eBiff4oilZWV9ReS+AmlUAraE
+ ZUqwrPO5F50wgZJSEnvZSc4xtfhW3RWbiWLNWp8SI/knzUU4pCEO15/SwIjMFzRoFQl1
+ vvvUQtUZCbwzUsjHKA9Z0YEc5R3WlaL9WjLxwsDcvVuy1eec/XZCrQTJdrMbg4PgpWcD
+ uZrr8fny2nvzUS2WE1O+H+IQb4PpaAmGg/n1qXEYaLXbRnerco1eWLGXXlVYiwGsnoF5
+ GpmR4SfF8GAxMRApJo/fPMaWlEF4y+WQsX+PjFfGBLL0tqaIs84E7u6jTB1m6iw3xbGe
+ 4p1g==
+X-Gm-Message-State: APjAAAXxRwwyIF8Vo0aJTV8m2b4ggfLU2xJtZ9wixEBqeAZ8YxPCC0lC
+ PsI4E0QynewbVNevJ5MNBrdTkA==
+X-Google-Smtp-Source: APXvYqyAfnByr714G3kTEiqrafyrs9jeZl7BTXJOzlp2uI9VkCV69bnOrpS3VV2/ESNkl9RpgqJZyQ==
+X-Received: by 2002:a05:600c:2182:: with SMTP id
+ e2mr19514224wme.104.1563788269405; 
+ Mon, 22 Jul 2019 02:37:49 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+ by smtp.gmail.com with ESMTPSA id g10sm28665983wrw.60.2019.07.22.02.37.48
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Mon, 22 Jul 2019 02:37:48 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 5A22A1FF87;
+ Mon, 22 Jul 2019 10:37:48 +0100 (BST)
+References: <20190719210326.15466-1-richard.henderson@linaro.org>
+ <87k1cajzix.fsf@linaro.org>
+User-agent: mu4e 1.3.3; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+In-reply-to: <87k1cajzix.fsf@linaro.org>
+Date: Mon, 22 Jul 2019 10:37:48 +0100
+Message-ID: <87pnm2v28j.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <1f427dc9-deb9-f900-470a-84b79ab32a2a@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: fr
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 2a02:2ab8:224:1::a0a:d2
-Subject: Re: [Qemu-devel] [PATCH] riscv: htif: use qemu_log_mask instead of
- qemu_log
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::341
+Subject: Re: [Qemu-devel] [PATCH for-4.2 00/24] target/arm: Implement
+ ARMv8.1-VHE
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,146 +98,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kbastian@mail.uni-paderborn.de, palmer@sifive.com, Alistair.Francis@wdc.com,
- Stefan Hajnoczi <stefanha@redhat.com>, sagark@eecs.berkeley.edu
+Cc: peter.maydell@linaro.org, beata.michalska@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Philippe,
 
-Le 7/20/19 =C3=A0 11:50 AM, Philippe Mathieu-Daud=C3=A9 a =C3=A9crit=C2=A0=
-:
-> Cc'ing Stefan
->=20
-> On 7/20/19 11:44 AM, Philippe Mathieu-Daud=C3=A9 wrote:
->> Hi Frederic,
+Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
+
+> Richard Henderson <richard.henderson@linaro.org> writes:
+>
+>> About half of this patch set is cleanup of the qemu tlb handling
+>> leading up to the actual implementation of VHE, and the biggest
+>> piece of that: The EL2&0 translation regime.
 >>
->> On 7/20/19 8:18 AM, KONRAD Frederic wrote:
->>> There are some debug trace appearing when using GDB with the HTIF map=
-ped @0:
->>>   Invalid htif read: address 0000000000000002
->>>   Invalid htif read: address 0000000000000006
->>>   Invalid htif read: address 000000000000000a
->>>   Invalid htif read: address 000000000000000e
->>>
->>> So don't show them unconditionally.
->>>
->>> Signed-off-by: KONRAD Frederic <frederic.konrad@adacore.com>
->>> ---
->>>   hw/riscv/riscv_htif.c | 21 ++++++++++++---------
->>>   1 file changed, 12 insertions(+), 9 deletions(-)
->>>
->>> diff --git a/hw/riscv/riscv_htif.c b/hw/riscv/riscv_htif.c
->>> index 4f7b11d..6a8f0c2 100644
->>> --- a/hw/riscv/riscv_htif.c
->>> +++ b/hw/riscv/riscv_htif.c
->>> @@ -119,7 +119,8 @@ static void htif_handle_tohost_write(HTIFState *h=
-tifstate, uint64_t val_written)
->>>       int resp =3D 0;
->>>  =20
->>>       HTIF_DEBUG("mtohost write: device: %d cmd: %d what: %02" PRIx64
->>> -        " -payload: %016" PRIx64 "\n", device, cmd, payload & 0xFF, =
-payload);
->>> +               " -payload: %016" PRIx64 "\n", device, cmd, payload &=
- 0xFF,
->>> +               payload);
->>>  =20
->>>       /*
->>>        * Currently, there is a fixed mapping of devices:
->>> @@ -137,7 +138,7 @@ static void htif_handle_tohost_write(HTIFState *h=
-tifstate, uint64_t val_written)
->>>                   qemu_log_mask(LOG_UNIMP, "pk syscall proxy not supp=
-orted\n");
->>>               }
->>>           } else {
->>> -            qemu_log("HTIF device %d: unknown command\n", device);
->>> +            HTIF_DEBUG("HTIF device %d: unknown command\n", device);
+>> Testing so far has been limited to booting a debian 9 system with
+>> a 4.9 kernel, and a fedora 30 system with a 5.1 kernel.  Both have
+>> KVM enabled, and both report enabling VHE is successful.
+>
+> check-tcg is throwing up errors for ARM:
+>
+> ERROR:/home/alex/lsrc/qemu.git/target/arm/helper.c:5353:define_arm_vh_e2h=
+_redirects_aliases:assertion
+> failed: (src_reg !=3D NULL)
+
+I'm going to go out on a limb and say this is because the aliases
+registers are SoftMMU only. Do we even want to handle any re-directs for
+linux-user?
+
+>
 >>
->> Generally, please don't go back to using DPRINTF() but use trace-event=
-s
->> instead.
->=20
-> Oh, now I see that HTIF_DEBUG() is just an obscure way to report
-> crippled log trace-events, not portable to all trace backends.
->=20
-> It is only used in 2 files:
->=20
-> - hw/riscv/riscv_htif.c
-> - target/riscv/pmp.c as PMP_DEBUG()
->=20
-> I'd rather remove these macros and use trace-events the same way the
-> rest of the codebase use them, usable by all backends.
->=20
-
-Ok why not.. If the RISC-V maintainers are happy with your suggestion I c=
-an do
-a patch.
-
-Cheers,
-Fred
-
->> However in this calls it seems using qemu_log_mask(LOG_UNIMP) or
->> qemu_log_mask(LOG_GUEST_ERROR) is appropriate.
 >>
->>>           }
->>>       } else if (likely(device =3D=3D 0x1)) {
->>>           /* HTIF Console */
->>> @@ -150,12 +151,13 @@ static void htif_handle_tohost_write(HTIFState =
-*htifstate, uint64_t val_written)
->>>               qemu_chr_fe_write(&htifstate->chr, (uint8_t *)&payload,=
- 1);
->>>               resp =3D 0x100 | (uint8_t)payload;
->>>           } else {
->>> -            qemu_log("HTIF device %d: unknown command\n", device);
->>> +            HTIF_DEBUG("HTIF device %d: unknown command\n", device);
->>>           }
->>>       } else {
->>> -        qemu_log("HTIF unknown device or command\n");
->>> +        HTIF_DEBUG("HTIF unknown device or command\n");
->>>           HTIF_DEBUG("device: %d cmd: %d what: %02" PRIx64
->>> -            " payload: %016" PRIx64, device, cmd, payload & 0xFF, pa=
-yload);
->>> +                   " payload: %016" PRIx64, device, cmd, payload & 0=
-xFF,
->>> +                   payload);
->>>       }
->>>       /*
->>>        * - latest bbl does not set fromhost to 0 if there is a value =
-in tohost
->>> @@ -180,6 +182,7 @@ static void htif_handle_tohost_write(HTIFState *h=
-tifstate, uint64_t val_written)
->>>   static uint64_t htif_mm_read(void *opaque, hwaddr addr, unsigned si=
-ze)
->>>   {
->>>       HTIFState *htifstate =3D opaque;
->>> +
->>>       if (addr =3D=3D TOHOST_OFFSET1) {
->>>           return htifstate->env->mtohost & 0xFFFFFFFF;
->>>       } else if (addr =3D=3D TOHOST_OFFSET2) {
->>> @@ -189,8 +192,8 @@ static uint64_t htif_mm_read(void *opaque, hwaddr=
- addr, unsigned size)
->>>       } else if (addr =3D=3D FROMHOST_OFFSET2) {
->>>           return (htifstate->env->mfromhost >> 32) & 0xFFFFFFFF;
->>>       } else {
->>> -        qemu_log("Invalid htif read: address %016" PRIx64 "\n",
->>> -            (uint64_t)addr);
->>> +        HTIF_DEBUG("Invalid htif read: address %016" PRIx64 "\n",
->>> +                   (uint64_t)addr);
->>>           return 0;
->>>       }
->>>   }
->>> @@ -219,8 +222,8 @@ static void htif_mm_write(void *opaque, hwaddr ad=
-dr,
->>>           htifstate->env->mfromhost |=3D value << 32;
->>>           htifstate->fromhost_inprogress =3D 0;
->>>       } else {
->>> -        qemu_log("Invalid htif write: address %016" PRIx64 "\n",
->>> -            (uint64_t)addr);
->>> +        HTIF_DEBUG("Invalid htif write: address %016" PRIx64 "\n",
->>> +                   (uint64_t)addr);
->>>       }
->>>   }
->>>  =20
->>>
+>> r~
+>>
+>>
+>> Richard Henderson (24):
+>>   cputlb: Add tlb_set_asid_for_mmuidx
+>>   cputlb: Add tlb_flush_asid_by_mmuidx and friends
+>>   target/arm: Install ASIDs for long-form from EL1
+>>   target/arm: Install ASIDs for short-form from EL1
+>>   target/arm: Install ASIDs for EL2
+>>   target/arm: Define isar_feature_aa64_vh
+>>   target/arm: Enable HCR_E2H for VHE
+>>   target/arm: Add CONTEXTIDR_EL2
+>>   target/arm: Add TTBR1_EL2
+>>   target/arm: Update CNTVCT_EL0 for VHE
+>>   target/arm: Add the hypervisor virtual counter
+>>   target/arm: Add VHE system register redirection and aliasing
+>>   target/arm: Split out vae1_tlbmask, vmalle1_tlbmask
+>>   target/arm: Simplify tlb_force_broadcast alternatives
+>>   target/arm: Reorganize ARMMMUIdx
+>>   target/arm: Add regime_has_2_ranges
+>>   target/arm: Update arm_mmu_idx for VHE
+>>   target/arm: Update arm_sctlr for VHE
+>>   target/arm: Install asids for E2&0 translation regime
+>>   target/arm: Flush tlbs for E2&0 translation regime
+>>   target/arm: Update arm_phys_excp_target_el for TGE
+>>   target/arm: Update regime_is_user for EL2&0
+>>   target/arm: Update {fp,sve}_exception_el for VHE
+>>   target/arm: Enable ARMv8.1-VHE in -cpu max
+>>
+>>  include/exec/cpu-all.h     |  11 +
+>>  include/exec/cpu-defs.h    |   2 +
+>>  include/exec/exec-all.h    |  35 ++
+>>  include/qom/cpu.h          |   1 +
+>>  target/arm/cpu-qom.h       |   1 +
+>>  target/arm/cpu.h           | 259 +++++-----
+>>  target/arm/internals.h     |  62 ++-
+>>  target/arm/translate.h     |   2 +-
+>>  accel/tcg/cputlb.c         |  77 +++
+>>  target/arm/arch_dump.c     |   2 +-
+>>  target/arm/cpu.c           |   2 +
+>>  target/arm/cpu64.c         |   1 +
+>>  target/arm/debug_helper.c  |  50 +-
+>>  target/arm/helper-a64.c    |   2 +-
+>>  target/arm/helper.c        | 985 ++++++++++++++++++++++++++-----------
+>>  target/arm/m_helper.c      |   6 +-
+>>  target/arm/pauth_helper.c  |   9 +-
+>>  target/arm/translate-a64.c |  14 +-
+>>  target/arm/translate.c     |  17 +-
+>>  19 files changed, 1058 insertions(+), 480 deletions(-)
+
+
+--
+Alex Benn=C3=A9e
 
