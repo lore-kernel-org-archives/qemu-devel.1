@@ -2,81 +2,81 @@ Return-Path: <SRS0=EA86=VT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9FC0C7618F
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 20:03:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B22A7C7618F
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 20:06:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BD7D2218C9
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 20:03:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD7D2218C9
+	by mail.kernel.org (Postfix) with ESMTPS id 8C2CF218C9
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 20:06:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C2CF218C9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37428 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37442 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hpeWf-0005aZ-U1
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jul 2019 16:03:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39695)
+	id 1hpeZm-0006oM-R0
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jul 2019 16:06:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40242)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hpeWT-0005CA-OW
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 16:03:02 -0400
+ (envelope-from <philmd@redhat.com>) id 1hpeZd-0006Pz-CI
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 16:06:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hpeWS-0001h9-PE
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 16:03:01 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:38595)
+ (envelope-from <philmd@redhat.com>) id 1hpeZc-0004cK-ES
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 16:06:17 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:34385)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hpeWS-0001fi-JY
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 16:03:00 -0400
-Received: by mail-wr1-f66.google.com with SMTP id g17so40700853wrr.5
- for <qemu-devel@nongnu.org>; Mon, 22 Jul 2019 13:03:00 -0700 (PDT)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hpeZc-0004bp-8h
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 16:06:16 -0400
+Received: by mail-wr1-f67.google.com with SMTP id 31so40738733wrm.1
+ for <qemu-devel@nongnu.org>; Mon, 22 Jul 2019 13:06:16 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ h=x-gm-message-state:subject:to:references:from:openpgp:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=SQwVpzeihz3Utyp2gIc0Xh9IEn8t74k0WvHtcZfrHA0=;
- b=jKMk/Zdtr2HvbQpdftkql6kBmSRWVtDYy9L3Enr4+9IBQ0qu+0pUKoqfATMOGnMvfI
- lDfxJSPfCqKU4FCT69qhP/FfMkh92dgXvmFqJDjjyVh+S9EDSsdYOmYOyeM74O6xQd3n
- +pyhZfS7Df/LiO6jXfvtuZ2+kbzh4ZFdAiv6TtOFOKMqZ2XyDtIZn18aS/Qkc5JvQyLu
- nBFV1kSg0q1J7bo412icuGww+lV61NR4lJogfQzD0zXq5/uNyLxkgbjcThXLYX/C2wlI
- sp+0uooFlefJuglpAoA67Oh0b8X4vDA8Fq/FH8LS5tU2fJEJuNZbAiiMqS40po9PUElw
- qmpg==
-X-Gm-Message-State: APjAAAWTyudyzMpNRE3F/LaCMUWsgpdsAKOAHnV60UaqQiZLhcJojIqK
- dcYAdn/lQ6FiYuWjKnY7GeAEMg==
-X-Google-Smtp-Source: APXvYqzbEDKpbWmPi8aTApxF5rKGlx/cWOfVoGZzrvDjU8v88TqsHyhrPBnppfAlBNl7m5ysUTYQfQ==
-X-Received: by 2002:adf:e883:: with SMTP id d3mr79287626wrm.330.1563825779698; 
- Mon, 22 Jul 2019 13:02:59 -0700 (PDT)
+ bh=a4VaeWKpELE5k+/Ao6ZK1zYpwMgJAa8dJZJ1qdktwf0=;
+ b=UMw3a2UighPsv038HMyGM+gcazvnnM8mDYeWBzcQKiobwP0qGrnUw7Q828HlMbQ61D
+ XzaFiAncuu3S7dw99xwHkFIVwLQW4BzmkIPAPptQSWZBCJw1FOFWe4iuaR4AQCL2QNyw
+ KRjh99oLTtrp3TDrco+r5Qpj+MPawm9dfQDW6GZHWe2Xa/290XAQ7haH7S2q4nRxaY8K
+ xUVnCsiWEmTHlFjQKlVsGgn5JAIwhWWPaqm1dtyIi8dVpgmxmm2fllfAcWolsRlz7GUF
+ i/TET9f6hpcLLKaN3Q2DREjKG1rpouvcwLjxMkRM75YALJTga+zucE43TXTUJf/WbGjd
+ UlyQ==
+X-Gm-Message-State: APjAAAX3T0eRTsTcIf/bH3EUuaZKItA9vlYFBWIsKUFXhfOIg7+W34VH
+ dQeuWk+7jfrBx3yrCUyIfrn7ta2+P6U=
+X-Google-Smtp-Source: APXvYqzcTJ6zYH68//y5l+yVLlw2t+L3oXi2KPxJZTYyNKgK3e9CAoBuaF8JIc2vE/HKTN4fIn5EWQ==
+X-Received: by 2002:a5d:4b11:: with SMTP id v17mr34350278wrq.173.1563825975166; 
+ Mon, 22 Jul 2019 13:06:15 -0700 (PDT)
 Received: from [192.168.1.38] (62.red-83-42-61.dynamicip.rima-tde.net.
  [83.42.61.62])
- by smtp.gmail.com with ESMTPSA id v5sm42149915wre.50.2019.07.22.13.02.58
+ by smtp.gmail.com with ESMTPSA id g19sm73801109wrb.52.2019.07.22.13.06.14
  (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Mon, 22 Jul 2019 13:02:59 -0700 (PDT)
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org
+ Mon, 22 Jul 2019 13:06:14 -0700 (PDT)
+To: Stefan Weil <sw@weilnetz.de>, =?UTF-8?Q?Alex_Benn=c3=a9e?=
+ <alex.bennee@linaro.org>, qemu-devel@nongnu.org
 References: <20190717134335.15351-1-alex.bennee@linaro.org>
- <20190717134335.15351-18-alex.bennee@linaro.org>
+ <20190717134335.15351-17-alex.bennee@linaro.org>
+ <808ea700-759e-b914-f4d8-1ad5df3fcac7@weilnetz.de>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
  url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <8a61c6ec-55a8-ab1f-4311-c47929d67233@redhat.com>
-Date: Mon, 22 Jul 2019 22:02:58 +0200
+Message-ID: <96b8e1f4-c799-a508-cc33-74f56118b5d0@redhat.com>
+Date: Mon, 22 Jul 2019 22:06:13 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190717134335.15351-18-alex.bennee@linaro.org>
+In-Reply-To: <808ea700-759e-b914-f4d8-1ad5df3fcac7@weilnetz.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.221.66
-Subject: Re: [Qemu-devel] [PATCH v2 17/23] hw/i386: also turn off VMMOUSE is
- VMPORT is disabled
+X-Received-From: 209.85.221.67
+Subject: Re: [Qemu-devel] [PATCH v2 16/23] NSIS: Add missing firmware blobs
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,59 +88,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
- Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/17/19 3:43 PM, Alex Bennée wrote:
-> Commit 97fd1ea8c1 broke the build for --without-default-devices as
-> VMMOUSE depends on VMPORT.
+On 7/17/19 8:23 PM, Stefan Weil wrote:
+> Am 17.07.2019 um 15:43 schrieb Alex Bennée:
+>> From: Philippe Mathieu-Daudé <philmd@redhat.com>
+>>
+>> Various firmwares has been added in the pc-bios/ directory:
+>>
+>> - CCW     (since commit 0c1fecdd523)
+>> - Skiboot (since commit bcad45de6a0)
+>> - EDK2    (since commit f7fa38b74c3)
+>>
+>> Since we install qemu-system able to run the architectures
+>> targetted by these firmware, include them in the NSIS exe.
+>>
+>> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+>> Message-Id: <20190715174817.18981-10-philmd@redhat.com>
+>> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+>> ---
+>>  qemu.nsi | 3 +++
+>>  1 file changed, 3 insertions(+)
+>>
+>> diff --git a/qemu.nsi b/qemu.nsi
+>> index 75f1608b9e0..89c7c04f957 100644
+>> --- a/qemu.nsi
+>> +++ b/qemu.nsi
+>> @@ -122,6 +122,9 @@ Section "${PRODUCT} (required)"
+>>      File "${BINDIR}\*.bmp"
+>>      File "${BINDIR}\*.bin"
+>>      File "${BINDIR}\*.dtb"
+>> +    File "${BINDIR}\*.fd"
+>> +    File "${BINDIR}\*.img"
+>> +    File "${BINDIR}\*.lid"
+>>      File "${BINDIR}\*.rom"
+>>      File "${BINDIR}\openbios-*"
+>>  
 > 
-> Fixes: 97fd1ea8c1
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> ---
->  hw/i386/Kconfig | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
 > 
-> diff --git a/hw/i386/Kconfig b/hw/i386/Kconfig
-> index b9c96ac361e..6350438036f 100644
-> --- a/hw/i386/Kconfig
-> +++ b/hw/i386/Kconfig
-> @@ -52,6 +52,7 @@ config I440FX
->      bool
->      imply E1000_PCI
->      imply VMPORT
-> +    imply VMMOUSE
->      select PC_PCI
->      select PC_ACPI
->      select ACPI_SMBUS
-> @@ -59,7 +60,6 @@ config I440FX
->      select IDE_PIIX
->      select DIMM
->      select SMBIOS
-> -    select VMMOUSE
->      select FW_CFG_DMA
->  
->  config ISAPC
-> @@ -78,6 +78,7 @@ config Q35
->      imply AMD_IOMMU
->      imply E1000E_PCI_EXPRESS
->      imply VMPORT
-> +    imply VMMOUSE
->      select PC_PCI
->      select PC_ACPI
->      select PCI_EXPRESS_Q35
-> @@ -85,7 +86,6 @@ config Q35
->      select AHCI_ICH9
->      select DIMM
->      select SMBIOS
-> -    select VMMOUSE
->      select FW_CFG_DMA
->  
->  config VTD
+> Hi,
 > 
+> what about qemu_vga.ndrv? And all new file pattern should also be added
+> to the uninstall section.
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Good point.
+
+Alex, so you mind amending:
+
++    File "${BINDIR}\*.ndrv"
+
+Stefan is that OK if we fix the uninstall section for the next rc or
+release?
+
+Else, Alex please drop this patch.
 
