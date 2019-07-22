@@ -2,60 +2,63 @@ Return-Path: <SRS0=EA86=VT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1824AC76190
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 17:27:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6A6BC76190
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 17:35:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EBCF8217D4
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 17:27:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EBCF8217D4
+	by mail.kernel.org (Postfix) with ESMTPS id 8BA4221903
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 17:35:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8BA4221903
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36322 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36368 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hpc6K-0005DE-67
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jul 2019 13:27:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51470)
+	id 1hpcE1-0000BJ-QF
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jul 2019 13:35:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53506)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hpc66-0004LE-AD
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 13:27:39 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1hpcDl-0007y3-9W
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 13:35:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hpc63-0004nf-Gl
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 13:27:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43788)
+ (envelope-from <dgilbert@redhat.com>) id 1hpcDj-0002OQ-UK
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 13:35:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59134)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hpc60-0004mF-Cx; Mon, 22 Jul 2019 13:27:32 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hpcDj-0002NN-Lp
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 13:35:31 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id AE8B63082201;
- Mon, 22 Jul 2019 17:27:31 +0000 (UTC)
-Received: from localhost (unknown [10.40.205.2])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A7A451024802;
- Mon, 22 Jul 2019 17:27:30 +0000 (UTC)
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Date: Mon, 22 Jul 2019 19:26:16 +0200
-Message-Id: <20190722172616.28797-6-mreitz@redhat.com>
-In-Reply-To: <20190722172616.28797-1-mreitz@redhat.com>
-References: <20190722172616.28797-1-mreitz@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id D7D423084248;
+ Mon, 22 Jul 2019 17:35:29 +0000 (UTC)
+Received: from work-vm (ovpn-117-221.ams2.redhat.com [10.36.117.221])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id F1AF05D9D3;
+ Mon, 22 Jul 2019 17:35:27 +0000 (UTC)
+Date: Mon, 22 Jul 2019 18:35:25 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Yury Kotov <yury-kotov@yandex-team.ru>
+Message-ID: <20190722173525.GF3035@work-vm>
+References: <20190718091726.9874-1-yury-kotov@yandex-team.ru>
+ <20190718091726.9874-4-yury-kotov@yandex-team.ru>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190718091726.9874-4-yury-kotov@yandex-team.ru>
+User-Agent: Mutt/1.12.0 (2019-05-25)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Mon, 22 Jul 2019 17:27:31 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ (mx1.redhat.com [10.5.110.40]); Mon, 22 Jul 2019 17:35:30 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 5/5] block: Only the main loop can change
- AioContexts
+Subject: Re: [Qemu-devel] [PATCH v3 3/3] tests/migration: Add a test for
+ auto converge
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,122 +70,185 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: Juan Quintela <quintela@redhat.com>, Stefan Weil <sw@weilnetz.de>,
+ Peter Crosthwaite <crosthwaite.peter@gmail.com>,
+ "open list:Overall" <qemu-devel@nongnu.org>, yc-core@yandex-team.ru,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-bdrv_set_aio_context_ignore() can only work in the main loop:
-bdrv_drained_begin() only works in the main loop and the node's (old)
-AioContext; and bdrv_drained_end() really only works in the main loop
-and the node's (new) AioContext (contrary to its current comment, which
-is just wrong).
+* Yury Kotov (yury-kotov@yandex-team.ru) wrote:
+> Signed-off-by: Yury Kotov <yury-kotov@yandex-team.ru>
 
-Consequentially, bdrv_set_aio_context_ignore() must be called from the
-main loop.  Luckily, assuming that we can make block graph changes only
-from the main loop as well, all its callers do that already.
+This looks OK to me, but have you tried it on a really really overloaded
+host?
+I worry that you might skip some of the percentage steps or not hit the
+bandwidth on the small overloaded VMs we get in CI.
 
-Note that changing a node's context in a sense is an operation that
-changes the block graph, so it actually makes sense to require this
-function to be called from the main loop.
+Dave
 
-Also, fix bdrv_drained_end()'s description.  You can only use it from
-the main loop or the node's AioContext, and in the latter case, the
-whole subtree must be in the same context.
-
-Fixes: e037c09c78520cbdb6da7cfc6ad0256d5870b814
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-Message-id: 20190722133054.21781-3-mreitz@redhat.com
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
- include/block/block.h |  8 +++-----
- block.c               | 13 ++++++++-----
- 2 files changed, 11 insertions(+), 10 deletions(-)
-
-diff --git a/include/block/block.h b/include/block/block.h
-index 60f00479e0..50a07c1c33 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -667,11 +667,9 @@ void bdrv_subtree_drained_begin(BlockDriverState *bs=
-);
-  *
-  * This polls @bs's AioContext until all scheduled sub-drained_ends
-  * have settled.  On one hand, that may result in graph changes.  On
-- * the other, this requires that all involved nodes (@bs and all of
-- * its parents) are in the same AioContext, and that the caller has
-- * acquired it.
-- * If there are any nodes that are in different contexts from @bs,
-- * these contexts must not be acquired.
-+ * the other, this requires that the caller either runs in the main
-+ * loop; or that all involved nodes (@bs and all of its parents) are
-+ * in the caller's AioContext.
-  */
- void bdrv_drained_end(BlockDriverState *bs);
-=20
-diff --git a/block.c b/block.c
-index 9c94f7f28a..cbd8da5f3b 100644
---- a/block.c
-+++ b/block.c
-@@ -5914,6 +5914,8 @@ static void bdrv_attach_aio_context(BlockDriverStat=
-e *bs,
-  * Changes the AioContext used for fd handlers, timers, and BHs by this
-  * BlockDriverState and all its children and parents.
-  *
-+ * Must be called from the main AioContext.
-+ *
-  * The caller must own the AioContext lock for the old AioContext of bs,=
- but it
-  * must not own the AioContext lock for new_context (unless new_context =
-is the
-  * same as the current context of bs).
-@@ -5925,9 +5927,10 @@ void bdrv_set_aio_context_ignore(BlockDriverState =
-*bs,
-                                  AioContext *new_context, GSList **ignor=
-e)
- {
-     AioContext *old_context =3D bdrv_get_aio_context(bs);
--    AioContext *current_context =3D qemu_get_current_aio_context();
-     BdrvChild *child;
-=20
-+    g_assert(qemu_get_current_aio_context() =3D=3D qemu_get_aio_context(=
-));
-+
-     if (old_context =3D=3D new_context) {
-         return;
-     }
-@@ -5953,7 +5956,7 @@ void bdrv_set_aio_context_ignore(BlockDriverState *=
-bs,
-     bdrv_detach_aio_context(bs);
-=20
-     /* Acquire the new context, if necessary */
--    if (current_context !=3D new_context) {
-+    if (qemu_get_aio_context() !=3D new_context) {
-         aio_context_acquire(new_context);
-     }
-=20
-@@ -5965,16 +5968,16 @@ void bdrv_set_aio_context_ignore(BlockDriverState=
- *bs,
-      * subtree that have not yet been moved to the new AioContext.
-      * Release the old one so bdrv_drained_end() can poll them.
-      */
--    if (current_context !=3D old_context) {
-+    if (qemu_get_aio_context() !=3D old_context) {
-         aio_context_release(old_context);
-     }
-=20
-     bdrv_drained_end(bs);
-=20
--    if (current_context !=3D old_context) {
-+    if (qemu_get_aio_context() !=3D old_context) {
-         aio_context_acquire(old_context);
-     }
--    if (current_context !=3D new_context) {
-+    if (qemu_get_aio_context() !=3D new_context) {
-         aio_context_release(new_context);
-     }
- }
---=20
-2.21.0
-
+> ---
+>  tests/migration-test.c | 119 +++++++++++++++++++++++++++++++++++++----
+>  1 file changed, 108 insertions(+), 11 deletions(-)
+> 
+> diff --git a/tests/migration-test.c b/tests/migration-test.c
+> index a4feb9545d..bb69517fc8 100644
+> --- a/tests/migration-test.c
+> +++ b/tests/migration-test.c
+> @@ -241,6 +241,17 @@ static int64_t read_ram_property_int(QTestState *who, const char *property)
+>      return result;
+>  }
+>  
+> +static int64_t read_migrate_property_int(QTestState *who, const char *property)
+> +{
+> +    QDict *rsp_return;
+> +    int64_t result;
+> +
+> +    rsp_return = migrate_query(who);
+> +    result = qdict_get_try_int(rsp_return, property, 0);
+> +    qobject_unref(rsp_return);
+> +    return result;
+> +}
+> +
+>  static uint64_t get_migration_pass(QTestState *who)
+>  {
+>      return read_ram_property_int(who, "dirty-sync-count");
+> @@ -255,20 +266,22 @@ static void read_blocktime(QTestState *who)
+>      qobject_unref(rsp_return);
+>  }
+>  
+> +static bool check_migration_status(QTestState *who, const char *status)
+> +{
+> +    bool completed;
+> +    char *current_status;
+> +
+> +    current_status = migrate_query_status(who);
+> +    completed = strcmp(current_status, status) == 0;
+> +    g_assert_cmpstr(current_status, !=, "failed");
+> +    g_free(current_status);
+> +    return completed;
+> +}
+> +
+>  static void wait_for_migration_status(QTestState *who,
+>                                        const char *goal)
+>  {
+> -    while (true) {
+> -        bool completed;
+> -        char *status;
+> -
+> -        status = migrate_query_status(who);
+> -        completed = strcmp(status, goal) == 0;
+> -        g_assert_cmpstr(status, !=,  "failed");
+> -        g_free(status);
+> -        if (completed) {
+> -            return;
+> -        }
+> +    while (!check_migration_status(who, goal)) {
+>          usleep(1000);
+>      }
+>  }
+> @@ -1121,6 +1134,89 @@ static void test_migrate_fd_proto(void)
+>      test_migrate_end(from, to, true);
+>  }
+>  
+> +static void test_migrate_auto_converge(void)
+> +{
+> +    char *uri = g_strdup_printf("unix:%s/migsocket", tmpfs);
+> +    QTestState *from, *to;
+> +    int i;
+> +    int64_t remaining, downtime;
+> +
+> +    /*
+> +     * We want the test to be fast enough, but stable.
+> +     * Throttle percentages are chosen to cover all cases (init, increment, max)
+> +     */
+> +    static const int64_t expected_pcts[] = { 0, 1, 51, 98 };
+> +    const int64_t max_bandwidth = 200000000; /* ~200Mb/s */
+> +    const int64_t downtime_limit = 50; /* 50ms */
+> +    /*
+> +     * We migrate through unix-socket (> 500Mb/s).
+> +     * Thus, expected migration speed ~= bandwidth limit (< 500Mb/s).
+> +     * So, we can predict expected_threshold
+> +     */
+> +    const int64_t expected_threshold = max_bandwidth * downtime_limit / 1000;
+> +
+> +    if (test_migrate_start(&from, &to, uri, false, false)) {
+> +        return;
+> +    }
+> +
+> +    migrate_set_capability(from, "auto-converge", true);
+> +    migrate_set_parameter_int(from, "cpu-throttle-initial", expected_pcts[1]);
+> +    migrate_set_parameter_int(from, "cpu-throttle-increment",
+> +                              expected_pcts[2] - expected_pcts[1]);
+> +    migrate_set_parameter_int(from, "max-cpu-throttle", expected_pcts[3]);
+> +
+> +    migrate_set_parameter_int(from, "max-bandwidth", max_bandwidth);
+> +    migrate_set_parameter_int(from, "downtime-limit", downtime_limit);
+> +
+> +    /* To check remaining size after precopy */
+> +    migrate_set_capability(from, "pause-before-switchover", true);
+> +
+> +    /* Wait for the first serial output from the source */
+> +    wait_for_serial("src_serial");
+> +
+> +    migrate(from, uri, "{}");
+> +
+> +    for (i = 0; i < ARRAY_SIZE(expected_pcts); i++) {
+> +        int64_t pct;
+> +        pct = read_migrate_property_int(from, "cpu-throttle-percentage");
+> +        g_assert_cmpint(pct, ==, expected_pcts[i]);
+> +        while (pct == expected_pcts[i] && !got_stop) {
+> +            usleep(1000);
+> +            pct = read_migrate_property_int(from, "cpu-throttle-percentage");
+> +        }
+> +        /* We break out of this loop only in paused state */
+> +        if (got_stop || i + 1 == ARRAY_SIZE(expected_pcts)) {
+> +            /* Check unexpected throttle percentage change */
+> +            g_assert_true(got_stop);
+> +            /* Check unexpected converge */
+> +            g_assert_cmpint(i + 1, ==, ARRAY_SIZE(expected_pcts));
+> +            g_assert_true(check_migration_status(from, "pre-switchover"));
+> +        }
+> +    }
+> +
+> +    remaining = read_ram_property_int(from, "remaining");
+> +    g_assert_cmpint(remaining, <, expected_threshold);
+> +
+> +    wait_command(from, "{ 'execute': 'migrate-continue' , 'arguments':"
+> +                       "  { 'state': 'pre-switchover' } }");
+> +
+> +    qtest_qmp_eventwait(to, "RESUME");
+> +
+> +    wait_for_serial("dest_serial");
+> +    wait_for_migration_complete(from);
+> +
+> +    downtime = read_migrate_property_int(from, "downtime");
+> +    /*
+> +     * Actual downtime may be greater than downtime limit,
+> +     * but the difference should be small enough (~20ms)
+> +     */
+> +    g_assert_cmpint(downtime, <, downtime_limit + 20);
+> +
+> +    g_free(uri);
+> +
+> +    test_migrate_end(from, to, true);
+> +}
+> +
+>  int main(int argc, char **argv)
+>  {
+>      char template[] = "/tmp/migration-test-XXXXXX";
+> @@ -1176,6 +1272,7 @@ int main(int argc, char **argv)
+>      /* qtest_add_func("/migration/ignore_shared", test_ignore_shared); */
+>      qtest_add_func("/migration/xbzrle/unix", test_xbzrle_unix);
+>      qtest_add_func("/migration/fd_proto", test_migrate_fd_proto);
+> +    qtest_add_func("/migration/auto_converge", test_migrate_auto_converge);
+>  
+>      ret = g_test_run();
+>  
+> -- 
+> 2.22.0
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
