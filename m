@@ -6,56 +6,56 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC4BBC76190
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 13:42:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96DA3C76190
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 13:42:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AE8F1216C8
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 13:42:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE8F1216C8
+	by mail.kernel.org (Postfix) with ESMTPS id 6C956216C8
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jul 2019 13:42:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C956216C8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33738 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33742 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hpYZw-0001xs-2w
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jul 2019 09:42:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54792)
+	id 1hpYa2-0002L2-5T
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jul 2019 09:42:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54632)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <david@redhat.com>) id 1hpYZJ-00087I-4k
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 09:41:34 -0400
+ (envelope-from <david@redhat.com>) id 1hpYZ9-0007Xl-Dw
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 09:41:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1hpYZH-0005Lx-UG
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 09:41:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48210)
+ (envelope-from <david@redhat.com>) id 1hpYZ8-0005CY-9L
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 09:41:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59772)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <david@redhat.com>)
- id 1hpYZH-0005LT-Mk; Mon, 22 Jul 2019 09:41:31 -0400
+ id 1hpYZ8-0005Br-49; Mon, 22 Jul 2019 09:41:22 -0400
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 026884ACDF;
- Mon, 22 Jul 2019 13:41:31 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 68AE43082131;
+ Mon, 22 Jul 2019 13:41:21 +0000 (UTC)
 Received: from t460s.redhat.com (ovpn-116-75.ams2.redhat.com [10.36.116.75])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 280D9101E240;
- Mon, 22 Jul 2019 13:41:27 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B204E101F97D;
+ Mon, 22 Jul 2019 13:41:19 +0000 (UTC)
 From: David Hildenbrand <david@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Mon, 22 Jul 2019 15:41:07 +0200
-Message-Id: <20190722134108.22151-6-david@redhat.com>
+Date: Mon, 22 Jul 2019 15:41:03 +0200
+Message-Id: <20190722134108.22151-2-david@redhat.com>
 In-Reply-To: <20190722134108.22151-1-david@redhat.com>
 References: <20190722134108.22151-1-david@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.38]); Mon, 22 Jul 2019 13:41:31 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.42]); Mon, 22 Jul 2019 13:41:21 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH-for-4.1 v3 5/6] virtio-balloon: Rework pbp
- tracking data
+Subject: [Qemu-devel] [PATCH-for-4.1 v3 1/6] virtio-balloon: Fix wrong sign
+ extension of PFNs
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,149 +75,36 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Using the address of a RAMBlock to test for a matching pbp is not really
-safe. Instead, let's use the guest physical address of the base page
-along with the page size (via the number of subpages).
+If we directly cast from int to uint64_t, we will first sign-extend to
+an int64_t, which is wrong. We actually want to treat the PFNs like
+unsigned values.
 
-Also, let's allocate the bitmap separately. This makes the code
-easier to read and maintain - we can reuse bitmap_new().
+As far as I can see, this dates back to the initial virtio-balloon
+commit, but wasn't triggered as fairly big guests would be required.
 
-Prepare the code to move the PBP out of the device.
-
-Fixes: ed48c59875b6 ("virtio-balloon: Safely handle BALLOON_PAGE_SIZE <
-                     host page size")
-Fixes: b27b32391404 ("virtio-balloon: Fix possible guest memory corruptio=
-n
-                     with inflates & deflates")
-Cc: qemu-stable@nongnu.org #v4.0.0
+Cc: qemu-stable@nongnu.org
+Reported-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- hw/virtio/virtio-balloon.c | 69 +++++++++++++++++++++++++-------------
- 1 file changed, 46 insertions(+), 23 deletions(-)
+ hw/virtio/virtio-balloon.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
-index f206cc8bf7..40d493a31a 100644
+index e85d1c0d5c..515abf6553 100644
 --- a/hw/virtio/virtio-balloon.c
 +++ b/hw/virtio/virtio-balloon.c
-@@ -35,16 +35,44 @@
- #define BALLOON_PAGE_SIZE  (1 << VIRTIO_BALLOON_PFN_SHIFT)
+@@ -343,8 +343,8 @@ static void virtio_balloon_handle_output(VirtIODevice=
+ *vdev, VirtQueue *vq)
+         }
 =20
- struct PartiallyBalloonedPage {
--    RAMBlock *rb;
--    ram_addr_t base;
--    unsigned long bitmap[];
-+    ram_addr_t base_gpa;
-+    long subpages;
-+    unsigned long *bitmap;
- };
+         while (iov_to_buf(elem->out_sg, elem->out_num, offset, &pfn, 4) =
+=3D=3D 4) {
++            unsigned int p =3D virtio_ldl_p(vdev, &pfn);
+             hwaddr pa;
+-            int p =3D virtio_ldl_p(vdev, &pfn);
 =20
-+static void virtio_balloon_pbp_free(PartiallyBalloonedPage *pbp)
-+{
-+    if (!pbp) {
-+        return;
-+    }
-+    g_free(pbp->bitmap);
-+    g_free(pbp);
-+}
-+
-+static PartiallyBalloonedPage *virtio_balloon_pbp_alloc(ram_addr_t base_=
-gpa,
-+                                                        long subpages)
-+{
-+    PartiallyBalloonedPage *pbp =3D g_new0(PartiallyBalloonedPage, 1);
-+
-+    pbp->base_gpa =3D base_gpa;
-+    pbp->subpages =3D subpages;
-+    pbp->bitmap =3D bitmap_new(subpages);
-+
-+    return pbp;
-+}
-+
-+static bool virtio_balloon_pbp_matches(PartiallyBalloonedPage *pbp,
-+                                       ram_addr_t base_gpa, long subpage=
-s)
-+{
-+    return pbp->subpages =3D=3D subpages && pbp->base_gpa =3D=3D base_gp=
-a;
-+}
-+
- static void balloon_inflate_page(VirtIOBalloon *balloon,
-                                  MemoryRegion *mr, hwaddr mr_offset)
- {
-     void *addr =3D memory_region_get_ram_ptr(mr) + mr_offset;
--    ram_addr_t rb_offset, rb_aligned_offset;
-+    ram_addr_t rb_offset, rb_aligned_offset, base_gpa;
-+    PartiallyBalloonedPage **pbp =3D &balloon->pbp;
-     RAMBlock *rb;
-     size_t rb_page_size;
-     int subpages;
-@@ -75,39 +103,34 @@ static void balloon_inflate_page(VirtIOBalloon *ball=
-oon,
-=20
-     rb_aligned_offset =3D QEMU_ALIGN_DOWN(rb_offset, rb_page_size);
-     subpages =3D rb_page_size / BALLOON_PAGE_SIZE;
-+    base_gpa =3D memory_region_get_ram_addr(mr) + mr_offset -
-+               (rb_offset - rb_aligned_offset);
-=20
--    if (balloon->pbp
--        && (rb !=3D balloon->pbp->rb
--            || rb_aligned_offset !=3D balloon->pbp->base)) {
-+    if (*pbp && !virtio_balloon_pbp_matches(*pbp, base_gpa, subpages)) {
-         /* We've partially ballooned part of a host page, but now
-          * we're trying to balloon part of a different one.  Too hard,
-          * give up on the old partial page */
--        g_free(balloon->pbp);
--        balloon->pbp =3D NULL;
-+        virtio_balloon_pbp_free(*pbp);
-+        *pbp =3D NULL;
-     }
-=20
--    if (!balloon->pbp) {
--        /* Starting on a new host page */
--        size_t bitlen =3D BITS_TO_LONGS(subpages) * sizeof(unsigned long=
-);
--        balloon->pbp =3D g_malloc0(sizeof(PartiallyBalloonedPage) + bitl=
-en);
--        balloon->pbp->rb =3D rb;
--        balloon->pbp->base =3D rb_aligned_offset;
-+    if (!*pbp) {
-+        *pbp =3D virtio_balloon_pbp_alloc(base_gpa, subpages);
-     }
-=20
--    set_bit((rb_offset - balloon->pbp->base) / BALLOON_PAGE_SIZE,
--            balloon->pbp->bitmap);
-+    set_bit((rb_offset - rb_aligned_offset) / BALLOON_PAGE_SIZE,
-+            (*pbp)->bitmap);
-=20
--    if (bitmap_full(balloon->pbp->bitmap, subpages)) {
-+    if (bitmap_full((*pbp)->bitmap, subpages)) {
-         /* We've accumulated a full host page, we can actually discard
-          * it now */
-=20
--        ram_block_discard_range(rb, balloon->pbp->base, rb_page_size);
-+        ram_block_discard_range(rb, rb_aligned_offset, rb_page_size);
-         /* We ignore errors from ram_block_discard_range(), because it
-          * has already reported them, and failing to discard a balloon
-          * page is not fatal */
--
--        g_free(balloon->pbp);
--        balloon->pbp =3D NULL;
-+        virtio_balloon_pbp_free(*pbp);
-+        *pbp =3D NULL;
-     }
- }
-=20
-@@ -128,7 +151,7 @@ static void balloon_deflate_page(VirtIOBalloon *ballo=
-on,
-=20
-     if (balloon->pbp) {
-         /* Let's play safe and always reset the pbp on deflation request=
-s. */
--        g_free(balloon->pbp);
-+        virtio_balloon_pbp_free(balloon->pbp);
-         balloon->pbp =3D NULL;
-     }
-=20
+             pa =3D (hwaddr) p << VIRTIO_BALLOON_PFN_SHIFT;
+             offset +=3D 4;
 --=20
 2.21.0
 
