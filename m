@@ -2,63 +2,78 @@ Return-Path: <SRS0=3Ld+=VU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78760C7618B
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 15:24:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B47CCC7618B
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 15:32:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4EBF4223A0
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 15:24:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4EBF4223A0
+	by mail.kernel.org (Postfix) with ESMTPS id 8FB4622543
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 15:32:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FB4622543
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44974 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45048 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hpweG-0006CN-Ba
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jul 2019 11:24:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45183)
+	id 1hpwmI-0000dF-Q2
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jul 2019 11:32:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47697)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <ehabkost@redhat.com>) id 1hpwe4-0005ZY-K5
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 11:24:05 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1hpwm4-0000Eq-Ec
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 11:32:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1hpwe3-0005QQ-Dx
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 11:24:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34288)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hpwe3-0005Oy-8b
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 11:24:03 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 5E4ADC057F2C;
- Tue, 23 Jul 2019 15:24:02 +0000 (UTC)
-Received: from localhost (ovpn-116-40.gru2.redhat.com [10.97.116.40])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 916AA5D72E;
- Tue, 23 Jul 2019 15:23:59 +0000 (UTC)
-Date: Tue, 23 Jul 2019 12:23:57 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190723152357.GI11469@habkost.net>
-References: <20190716145121.19578-1-tao3.xu@intel.com>
- <20190716145121.19578-3-tao3.xu@intel.com>
- <20190723165641.55930926@redhat.com>
+ (envelope-from <pbonzini@redhat.com>) id 1hpwm3-0003dU-H8
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 11:32:20 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:54188)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hpwm3-0003cx-B6
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 11:32:19 -0400
+Received: by mail-wm1-f68.google.com with SMTP id x15so39014510wmj.3
+ for <qemu-devel@nongnu.org>; Tue, 23 Jul 2019 08:32:19 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=gMCFhfMU8u9LnWxXWsb3D18cXWfw7C1rjtbtZYtks8c=;
+ b=p/OBDSbgsBCsm4fnoNY6wPp5HZS9GuPMSOqa4ewDcBze6xy2hIe7RQmnYA7b6cW0fe
+ 4n/UH+2BQEi24BrMUF+gnXGiAkRLtlnwKEkO+pDaC7ifsTQtArVC7loCQob7YzCZgzJ/
+ E9u/OPdbpoWsmkrzzQxc/y2eZwTw3/Z2YV3PkOkkhiPvqWSxcrE0Wze2RUIQrKl/CUGh
+ rN6OUgXvgOR1tKXJcGIpCh7eeHZ4H7YXgX/90yr+oLPn1YP4a88psoSqNmV9IdbpvIV4
+ qCXt+Y+fYSHb5oE0tXlOUe2+2qrdFtz/x5qPV+dlTDIs3aOoQ0PIzk7O8YDKPjIF5Je2
+ vcbQ==
+X-Gm-Message-State: APjAAAUAxvzqCjKwSQetRB3n9eAqEv4A+RagMameYLjIAa60Kg1jg2J7
+ fiID+aL3MAP5BkGris6OcK+G9A==
+X-Google-Smtp-Source: APXvYqyv0YjuPyPB6nCikrinsxDs7ERoyPMbZkCMAYmLe2vrN10kTiQCH4hL0WfHdNT9zgjMJlcu3Q==
+X-Received: by 2002:a1c:f61a:: with SMTP id w26mr6921139wmc.75.1563895938184; 
+ Tue, 23 Jul 2019 08:32:18 -0700 (PDT)
+Received: from [10.201.49.73] (nat-pool-mxp-u.redhat.com. [149.6.153.187])
+ by smtp.gmail.com with ESMTPSA id d10sm51648173wro.18.2019.07.23.08.32.15
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Tue, 23 Jul 2019 08:32:17 -0700 (PDT)
+To: "Zhong, Yang" <yang.zhong@intel.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+References: <7A85DF989CAE8F42902CF7B31A7D94A1487D6D13@shsmsx102.ccr.corp.intel.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <93e3762a-d906-6d6b-9a5f-7497af188f94@redhat.com>
+Date: Tue, 23 Jul 2019 17:32:12 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190723165641.55930926@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.32]); Tue, 23 Jul 2019 15:24:02 +0000 (UTC)
+In-Reply-To: <7A85DF989CAE8F42902CF7B31A7D94A1487D6D13@shsmsx102.ccr.corp.intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v7 02/11] numa: move numa global variable
- nb_numa_nodes into MachineState
+ [fuzzy]
+X-Received-From: 209.85.128.68
+Subject: Re: [Qemu-devel] The WCE issue in guest when i enable WCE in Qemu
+ side.
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,45 +85,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jingqi.liu@intel.com, Tao Xu <tao3.xu@intel.com>, fan.du@intel.com,
- qemu-devel@nongnu.org, jonathan.cameron@huawei.com, dan.j.williams@intel.com
+Cc: Stefan Hajnoczi <stefanha@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Jul 23, 2019 at 04:56:41PM +0200, Igor Mammedov wrote:
-> On Tue, 16 Jul 2019 22:51:12 +0800
-> Tao Xu <tao3.xu@intel.com> wrote:
-> 
-> > Add struct NumaState in MachineState and move existing numa global
-> > nb_numa_nodes(renamed as "num_nodes") into NumaState. And add variable
-> > numa_support into MachineClass to decide which submachines support NUMA.
-> > 
-> > Suggested-by: Igor Mammedov <imammedo@redhat.com>
-> > Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
-> > Signed-off-by: Tao Xu <tao3.xu@intel.com>
-> > ---
-> > 
-> > No changes in v7.
-> > 
-> > Changes in v6:
-> >     - Rebase to upstream, move globals in arm/sbsa-ref and use
-> >       numa_mem_supported
-> >     - When used once or twice in the function, use
-> >       ms->numa_state->num_nodes directly
-> >     - Correct some mistakes
-> >     - Use once monitor_printf in hmp_info_numa
-> > ---
-[...]
-> >      if (pxb->numa_node != NUMA_NODE_UNASSIGNED &&
-> > -        pxb->numa_node >= nb_numa_nodes) {
-> > +        pxb->numa_node >= ms->numa_state->num_nodes) {
-> this will crash if user tries to use device on machine that doesn't support numa
-> check that numa_state is not NULL before dereferencing 
+On 23/07/19 14:17, Zhong, Yang wrote:
+> When I set config-wce=true or false, the below value never change
+>  root@unicorn ~ # cat /sys/block/vda/cache_type
+> write back
+> root@unicorn ~ # cat /sys/block/vda/device/features
+> 0010 0010 0110 0110 0000 0000 0000 1000 1000 0000 0000 0000 0000 0000 0000 0000 
+> From left to right, bit 11=0, which show there is no WCE feature in vhost-user-blk device.
 
-That's exactly why the machine_num_numa_nodes() was created in
-v5, but then you asked for its removal.
+Does your backend expose the feature in the VHOST_GET_FEATURES message?
 
--- 
-Eduardo
+> I also did one simple patch to add config_wce value into s->blkcfg.wce, but the result is same.
+
+config_wce doesn't tell you if you are in writeback or writethrough
+mode, it tells you if you can *change* the mode.
+
+If your backend did not expose the feature, try changing that and then
+"echo write through > /sys/block/vda/cache_type" should work?
+
+Paolo
 
