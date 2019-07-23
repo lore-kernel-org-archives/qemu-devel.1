@@ -7,74 +7,74 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C02F0C7618B
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 10:38:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4539BC7618B
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 10:38:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9248821655
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 10:38:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 105CF22512
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 10:38:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RVy5HDBx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9248821655
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lKTi7QKY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 105CF22512
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41030 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41038 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hpsBg-00069k-Hw
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jul 2019 06:38:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37801)
+	id 1hpsBu-0007Me-5K
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jul 2019 06:38:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37855)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hps9c-0005nZ-Fk
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 06:36:21 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hps9f-00060X-8Y
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 06:36:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hps9b-0007O2-B7
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 06:36:20 -0400
-Received: from mail-wr1-x433.google.com ([2a00:1450:4864:20::433]:37964)
+ (envelope-from <alex.bennee@linaro.org>) id 1hps9e-0007QG-3r
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 06:36:23 -0400
+Received: from mail-wm1-x329.google.com ([2a00:1450:4864:20::329]:55399)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hps9b-0007N7-4F
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 06:36:19 -0400
-Received: by mail-wr1-x433.google.com with SMTP id g17so42618745wrr.5
- for <qemu-devel@nongnu.org>; Tue, 23 Jul 2019 03:36:19 -0700 (PDT)
+ id 1hps9d-0007PW-S9
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 06:36:22 -0400
+Received: by mail-wm1-x329.google.com with SMTP id a15so37978670wmj.5
+ for <qemu-devel@nongnu.org>; Tue, 23 Jul 2019 03:36:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=1aB6CS66id195EEgwuQ7Hg3FMvOUuzvHx6tDmNmk8yg=;
- b=RVy5HDBx8clvfTk+OSqIJLjBqNHGrHLwDUU/Z68nry9MeCD6iJvyb6iGDi12MKEHk3
- KgfUUIBzM5wlUKXailBbLSjU1cdJ03NsJSCfg1sWoRpagzihYFI4fm3OcBa5zAqRsMcV
- XxcvTrJaLLVZbOegToBSBnY7VYm0aii2Gxvamp8Tb1vhW6JhbhuR+82BfRrLaZ14JbN9
- rVXKAqPCWzcp5dqCFBR9V3EPjKBo2s8kue/1jCuDFsRcejl1KvyNa2sM8fMFE/w/BwDG
- UxrQotFQRMp9fp4JiLv8wMbKNaEP+FJnQmGWDSXvUlf/Rek7/E1O1lmgKgvPkEZ+Wkcs
- sVwQ==
+ bh=GAK5q9zpZRUsFFm1klLu6PZkQTgDPdn9WoHPkYsqZ/k=;
+ b=lKTi7QKYqfEYLPMj6A7gUV0qfYAlm7dhxAEoIjzwhr4LSuP16Q/iZxrlO/rNT2dpYa
+ o7Fa+R6jfo+ZWnQn8SHfrztniLUYcFBFOXkphU09fKfPk7xEDozWYoGrmjG5CQ2PZKoz
+ 0daBvhhkj79WN6VIvUWtiyWbWDB0/mxb1ji+DsiAeoe43EmgsRoyttUaCOQBG5zH81vR
+ Dco3eMMQEsJ09VFu9OYapL6rWsXjYUDMksCM41KQVz+tA7sWkS8G+iFYDnLP9puEYfUe
+ X6W3+LOZBSco8pPV5mEB2t5otIGNjekKmjufu87KQ3j33NOcjNN/3hMW3/VxUokCduoM
+ ltzQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=1aB6CS66id195EEgwuQ7Hg3FMvOUuzvHx6tDmNmk8yg=;
- b=gZxFIWXNFgJbs1bjwib0u9DTAT81Rr89eQc0VD9yabxiMXkwcSByUstcTqfEbITHLr
- 4eliNmN+0rqlcBnARZixXu391ImIIDTmwIMcKduFinhDzbPJdfs8N5YvfhFTWfl52pCw
- E0mIbLio5EH/UFsRva4wobaK72P6vCv4I1VmWthFjt0RcKxwkw7uFmrZsaSZL7YMakpq
- jPudt3il0Iwuk770CMJtNQep4S5oFmNCDKq88NiCk4ZDkLmMkf+kRhXZWPdVv/L8yl8O
- SIyCBJt+C6kwoDGkkq7T2guyTxxVBXW+0+ldgXIiyj3eTeXDeZ0UTHe63QdDcJUA6Bcz
- Z9dA==
-X-Gm-Message-State: APjAAAV3Pazzey6+FJR3bAylAYvAmqyEvrDSo2zXzZL7Jz1p2ZyjyTHL
- 7Eq1XtV2jCDvq0BsJ4K9rdnKIw==
-X-Google-Smtp-Source: APXvYqyNWWVLGgOS6JnGCgT2MBDlwsmt0E5FcuueYkE2IGESKH1xOGxYCwJLWexxq1Mzhxzu+Cx/Yw==
-X-Received: by 2002:a5d:56d0:: with SMTP id m16mr77613211wrw.276.1563878178022; 
- Tue, 23 Jul 2019 03:36:18 -0700 (PDT)
+ bh=GAK5q9zpZRUsFFm1klLu6PZkQTgDPdn9WoHPkYsqZ/k=;
+ b=emdHi4RSsGa93c4VivBgv6zHFuyaOhY6e71ITcxYE7jth85O16oui7YXBRb2NG/fsZ
+ Ol8u95vXEWSSw2QnvebdodBM58KXly0LMLkMAE1k9N0Vu02ql2wXNaIxdZBqfmUZ5GjZ
+ BKidebFEa5Tr1AnzoyCflhhIYFglU33GBEq3T2m6+9hKBFJjNYy0KWKxP+hdYm11Ed8V
+ ank5Z6Lqhdn14t09awGOopbOtSfseUoWUcmmOJ/kxb1pMuuI9hc4yWESONus4SeSnnPX
+ 6NUJkoJVM8wG+Z6QJEtIAQVg7qAEi9pRPlAkTbiyNrt8iwV0VV/ogfbmcY7dWvOOpg7C
+ aj7g==
+X-Gm-Message-State: APjAAAX4tqADSjBoVtXmC3snniIRV7YeQZqe76oFrms/yUEUC51t0CDb
+ qFcOb9Ol7DfGLEEKwoFSqSIXCA==
+X-Google-Smtp-Source: APXvYqwKnVJcHON/qdfiCU4fzmKRjV06g3Y2SCOJOdGg11lwMRn/Cl5bgg3p7+S4vHtJ94Wwa1MLJA==
+X-Received: by 2002:a1c:c78d:: with SMTP id x135mr61406671wmf.82.1563878180703; 
+ Tue, 23 Jul 2019 03:36:20 -0700 (PDT)
 Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id r12sm50472704wrt.95.2019.07.23.03.36.13
+ by smtp.gmail.com with ESMTPSA id w67sm52976031wma.24.2019.07.23.03.36.15
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Tue, 23 Jul 2019 03:36:14 -0700 (PDT)
+ Tue, 23 Jul 2019 03:36:19 -0700 (PDT)
 Received: from zen.linaroharston. (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id C65861FF92;
- Tue, 23 Jul 2019 11:36:12 +0100 (BST)
+ by zen.linaroharston (Postfix) with ESMTP id 2F9F51FF99;
+ Tue, 23 Jul 2019 11:36:13 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: peter.maydell@linaro.org
-Date: Tue, 23 Jul 2019 11:35:54 +0100
-Message-Id: <20190723103612.5600-6-alex.bennee@linaro.org>
+Date: Tue, 23 Jul 2019 11:35:58 +0100
+Message-Id: <20190723103612.5600-10-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190723103612.5600-1-alex.bennee@linaro.org>
 References: <20190723103612.5600-1-alex.bennee@linaro.org>
@@ -83,9 +83,9 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::433
-Subject: [Qemu-devel] [PULL 05/23] tests/docker: Install Ubuntu images
- noninteractively
+X-Received-From: 2a00:1450:4864:20::329
+Subject: [Qemu-devel] [PULL 09/23] tests/docker: Install Sphinx in the
+ Debian images
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,8 +97,8 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Richard Henderson <richard.henderson@linaro.org>, Fam Zheng <fam@euphon.net>,
+Cc: Fam Zheng <fam@euphon.net>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
@@ -107,63 +107,43 @@ Sender: "Qemu-devel"
 
 From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-We correctly use the DEBIAN_FRONTEND environment variable on
-the Debian images, but forgot the Ubuntu ones are based on it.
-
-Since building docker images is not interactive, we need to
-inform the APT tools about it using the DEBIAN_FRONTEND
-environment variable (we already use it on our Debian images).
+Since commit 5f71eac06e the Sphinx tool is required
+to build the rST documentation.
 
 This fixes:
 
-  $ make docker-image-ubuntu V=1
-  [...]
-  Setting up tzdata (2019b-0ubuntu0.19.04) ...
-  debconf: unable to initialize frontend: Dialog
-  debconf: (TERM is not set, so the dialog frontend is not usable.)
-  debconf: falling back to frontend: Readline
-  Configuring tzdata
-  ------------------
+ $ ./configure --enable-docs
 
-  Please select the geographic area in which you live. Subsequent configuration
-  questions will narrow this down by presenting a list of cities, representing
-  the time zones in which they are located.
-
-    1. Africa      4. Australia  7. Atlantic  10. Pacific  13. Etc
-    2. America     5. Arctic     8. Europe    11. SystemV
-    3. Antarctica  6. Asia       9. Indian    12. US
-  Geographic area: 12
-  [HANG]
+ ERROR: User requested feature docs
+        configure was not able to find it.
+        Install texinfo, Perl/perl-podlators and python-sphinx
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20190711124805.26476-1-philmd@redhat.com>
+Message-Id: <20190715174817.18981-3-philmd@redhat.com>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 
-diff --git a/tests/docker/dockerfiles/ubuntu.docker b/tests/docker/dockerfiles/ubuntu.docker
-index 2500ec84b6f..a4f601395c8 100644
---- a/tests/docker/dockerfiles/ubuntu.docker
-+++ b/tests/docker/dockerfiles/ubuntu.docker
-@@ -66,6 +66,6 @@ ENV PACKAGES flex bison \
-     texinfo \
-     xfslibs-dev
- RUN apt-get update && \
--    apt-get -y install $PACKAGES
-+    DEBIAN_FRONTEND=noninteractive apt-get -y install $PACKAGES
- RUN dpkg -l $PACKAGES | sort > /packages.txt
- ENV FEATURES clang pyyaml sdl2
-diff --git a/tests/docker/dockerfiles/ubuntu1804.docker b/tests/docker/dockerfiles/ubuntu1804.docker
-index 0bb8088658d..44bbf0f77ae 100644
---- a/tests/docker/dockerfiles/ubuntu1804.docker
-+++ b/tests/docker/dockerfiles/ubuntu1804.docker
-@@ -53,6 +53,6 @@ ENV PACKAGES flex bison \
-     texinfo \
-     xfslibs-dev
- RUN apt-get update && \
--    apt-get -y install $PACKAGES
-+    DEBIAN_FRONTEND=noninteractive apt-get -y install $PACKAGES
- RUN dpkg -l $PACKAGES | sort > /packages.txt
- ENV FEATURES clang pyyaml sdl2
+diff --git a/tests/docker/dockerfiles/debian10.docker b/tests/docker/dockerfiles/debian10.docker
+index aeeb151b521..cf57d8218f6 100644
+--- a/tests/docker/dockerfiles/debian10.docker
++++ b/tests/docker/dockerfiles/debian10.docker
+@@ -27,5 +27,6 @@ RUN DEBIAN_FRONTEND=noninteractive eatmydata \
+         pkg-config \
+         psmisc \
+         python \
++        python3-sphinx \
+         texinfo \
+         $(apt-get -s build-dep qemu | egrep ^Inst | fgrep '[all]' | cut -d\  -f2)
+diff --git a/tests/docker/dockerfiles/debian9.docker b/tests/docker/dockerfiles/debian9.docker
+index 5f23a35404f..52c589a7d64 100644
+--- a/tests/docker/dockerfiles/debian9.docker
++++ b/tests/docker/dockerfiles/debian9.docker
+@@ -27,5 +27,6 @@ RUN DEBIAN_FRONTEND=noninteractive eatmydata \
+         pkg-config \
+         psmisc \
+         python \
++        python3-sphinx \
+         texinfo \
+         $(apt-get -s build-dep qemu | egrep ^Inst | fgrep '[all]' | cut -d\  -f2)
 -- 
 2.20.1
 
