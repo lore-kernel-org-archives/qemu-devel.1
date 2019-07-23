@@ -2,112 +2,72 @@ Return-Path: <SRS0=3Ld+=VU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5BF4C76188
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 07:21:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7B95C7618B
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 07:38:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7D7F322AEC
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 07:21:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D7F322AEC
+	by mail.kernel.org (Postfix) with ESMTPS id 936B921842
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 07:38:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 936B921842
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39774 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39856 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hpp6f-00047c-Mk
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jul 2019 03:21:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40253)
+	id 1hppNT-00080J-SJ
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jul 2019 03:38:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44865)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <thuth@redhat.com>) id 1hpp6S-0003XA-HQ
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 03:20:53 -0400
+ (envelope-from <lersek@redhat.com>) id 1hppNK-0007a3-5Y
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 03:38:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1hpp6R-0007tT-D7
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 03:20:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51498)
+ (envelope-from <lersek@redhat.com>) id 1hppNI-0002WV-8F
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 03:38:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58938)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hpp6R-0007rT-4f
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 03:20:51 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ (Exim 4.71) (envelope-from <lersek@redhat.com>)
+ id 1hppNF-0002TH-Og; Tue, 23 Jul 2019 03:38:13 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 52FF33082133;
- Tue, 23 Jul 2019 07:20:50 +0000 (UTC)
-Received: from thuth.remote.csb (dhcp-200-228.str.redhat.com [10.33.200.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 55FF3608A5;
- Tue, 23 Jul 2019 07:20:43 +0000 (UTC)
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org, Brad Smith <brad@comstyle.com>
-References: <20190717134335.15351-1-alex.bennee@linaro.org>
- <20190717134335.15351-23-alex.bennee@linaro.org>
- <1e1ae24a-bed3-2acc-7727-16cfb7d877bc@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; keydata=
- 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
-Organization: Red Hat
-Message-ID: <adc633ad-9c58-78ef-c5b0-7044f5053573@redhat.com>
-Date: Tue, 23 Jul 2019 09:20:43 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+ by mx1.redhat.com (Postfix) with ESMTPS id 9C22C308FBB4;
+ Tue, 23 Jul 2019 07:38:11 +0000 (UTC)
+Received: from lacos-laptop-7.usersys.redhat.com (ovpn-117-52.ams2.redhat.com
+ [10.36.117.52])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A92D119C58;
+ Tue, 23 Jul 2019 07:38:04 +0000 (UTC)
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20190718104837.13905-1-philmd@redhat.com>
+ <20190718104837.13905-2-philmd@redhat.com>
+ <5e6b8a67-8f8a-3e3b-4f42-db2a31c03ad1@redhat.com>
+ <d4d20337-b504-0610-8aaf-c8b0b13f0953@redhat.com>
+ <053eeafe-4e93-aa96-f544-ea0606e244b6@redhat.com>
+ <689b75f8-ae47-621f-44a5-f3ad07fe2661@redhat.com>
+ <63ff0471-aa50-f60d-417b-c42d315e02e3@redhat.com>
+ <CAFEAcA-4xUJRJ1BKc5-NBLy+jfY1dShE8GaoVVq_+USzdfxYQg@mail.gmail.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <21191e6c-e0b1-a4bf-5b78-22f95db6e080@redhat.com>
+Date: Tue, 23 Jul 2019 09:38:03 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.9.1
 MIME-Version: 1.0
-In-Reply-To: <1e1ae24a-bed3-2acc-7727-16cfb7d877bc@redhat.com>
+In-Reply-To: <CAFEAcA-4xUJRJ1BKc5-NBLy+jfY1dShE8GaoVVq_+USzdfxYQg@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.42]); Tue, 23 Jul 2019 07:20:50 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.43]); Tue, 23 Jul 2019 07:38:11 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] make vm-build-openbsd (was: Re: [PATCH v2 22/23]
- tests: Run the iotests during "make check" again)
+Subject: Re: [Qemu-devel] [PATCH-for-4.1 v7 1/1] hw/block/pflash_cfi01: Add
+ missing DeviceReset() handler
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -119,71 +79,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ Qemu-block <qemu-block@nongnu.org>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
+ Alistair Francis <alistair.francis@wdc.com>, John Snow <jsnow@redhat.com>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 22/07/2019 21.53, Philippe Mathieu-Daud=C3=A9 wrote:
-[...]
-> Since Gerd updated the OpenBSD image, do you know if we can run vm-test
-> again?
+On 07/22/19 19:12, Peter Maydell wrote:
+> On Mon, 22 Jul 2019 at 17:51, Laszlo Ersek <lersek@redhat.com> wrote:
+>>
+>> On 07/19/19 18:19, Philippe Mathieu-Daud=C3=A9 wrote:
+>>> Hi Laszlo,
+>>>
+>>> On 7/18/19 9:35 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+>>>> On 7/18/19 8:38 PM, Laszlo Ersek wrote:
+>>>>> Regression-tested-by: Laszlo Ersek <lersek@redhat.com>
+>>>
+>>> Patchwork doesn't recognize your R-t-b tag:
+>>>
+>>> https://patchwork.ozlabs.org/patch/1133671/
+>>>
+>>> Should I change it for a Tested-by, or add as it?
+>>
+>> Please pick it up manually, as it is, if that's possible.
+>>
+>> I prefer to dedicate "Tested-by" to cases where my before-after
+>> comparison highlights a difference (i.e., bug disappears, or feature
+>> appears). I dedicate "R-t-b" to cases where nothing observable changes
+>> (in accordance with my expectation).
+>=20
+> The counter-argument to this is that nobody else is using
+> this convention (there are exactly 0 instances of
+> "Regression-tested-by" in the project git log as far as
+> I can see), and so in practice people reading the commits
+> won't really know what you meant by it. Everybody else
+> on the project uses "Tested-by" to mean either of the
+> two cases you describe above, without distinction...
 
-I just tried it, but the OpenBSD build seems to be completely broken righ=
-t now:
+OK. If "Tested-by" carries both meanings in the QEMU git log, then I'm
+fine with either tag (T-b or R-t-b) from me on this patch. (Or I'll try
+to remember this in the future anyway, seeing that Phil has submitted a
+pull request already.)
 
-$ nice make vm-build-openbsd=20
-    VM-IMAGE openbsd=20
-### Downloading install iso ...
---2019-07-23 08:52:46--  https://cdn.openbsd.org/pub/OpenBSD/6.5/amd64/in=
-stall65.iso
-Resolving cdn.openbsd.org (cdn.openbsd.org)... 151.101.38.217
-Connecting to cdn.openbsd.org (cdn.openbsd.org)|151.101.38.217|:443... co=
-nnected.
-HTTP request sent, awaiting response... 200 OK
-Length: 407169024 (388M) [application/octet-stream]
-Saving to: =E2=80=98/home/thuth/.cache/qemu-vm/download/54ac74c2128d6c2d3=
-ede38756576fe89c08476bd.download=E2=80=99
+Thanks
+Laszlo
 
-100%[=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D>] 4=
-07.169.024 8,55MB/s   in 39s   =20
+> (At one point we talked about using checkpatch to enforce
+> that we used a particular set of tags, mostly to avoid
+> people managing to typo the tagname, but also partly to
+> retain some consistency of usage.)
+>=20
+> thanks
+> -- PMM
+>=20
 
-2019-07-23 08:53:25 (9,98 MB/s) - =E2=80=98/home/thuth/.cache/qemu-vm/dow=
-nload/54ac74c2128d6c2d3ede38756576fe89c08476bd.download=E2=80=99 saved [4=
-07169024/407169024]
-
-### Preparing iso and disk image ...
-Formatting '/home/thuth/.cache/qemu-vm/images/openbsd.img.tmp', fmt=3Dqco=
-w2 size=3D21474836480 cluster_size=3D65536 lazy_refcounts=3Doff refcount_=
-bits=3D16
-### Booting installer ...
-console: *** read timeout ***
-console: waiting for: 'timezone'
-console: line buffer:
-
-con recv: Which disk is the root disk? ('?' for details) [sd0]
-
-Failed to prepare guest environment
-Traceback (most recent call last):
-  File "/home/thuth/devel/qemu/tests/vm/basevm.py", line 353, in main
-    return vm.build_image(args.image)
-  File "/home/thuth/devel/qemu/tests/vm/openbsd", line 118, in build_imag=
-e
-    self.console_wait_send("timezone",                "UTC\n")
-  File "/home/thuth/devel/qemu/tests/vm/basevm.py", line 253, in console_=
-wait_send
-    self.console_wait(wait)
-  File "/home/thuth/devel/qemu/tests/vm/basevm.py", line 215, in console_=
-wait
-    chars =3D vm.console_socket.recv(1)
-socket.timeout: timed out
-make: *** [/home/thuth/.cache/qemu-vm/images/openbsd.img] Error 2
-
-I even tried to delete the ~/.cache/qemu-vm folder, but that also did
-not help, I'm always getting that time-out now. Does it still work for
-you?
-
- Thomas
 
