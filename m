@@ -2,60 +2,61 @@ Return-Path: <SRS0=3Ld+=VU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6020C7618B
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 13:42:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9F02C7618B
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 13:43:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 85714227B7
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 13:42:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BBF1B227B7
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 13:43:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="pFvFEQ0h"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85714227B7
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="nVUfoe5s"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BBF1B227B7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42556 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42558 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hpv4E-0000dm-HW
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jul 2019 09:42:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33630)
+	id 1hpv4G-0000mt-L2
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jul 2019 09:43:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33645)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <yury-kotov@yandex-team.ru>) id 1hpv3y-0008Lr-Hm
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 09:42:43 -0400
+ (envelope-from <yury-kotov@yandex-team.ru>) id 1hpv3z-0008Lu-7E
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 09:42:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yury-kotov@yandex-team.ru>) id 1hpv3x-0003vR-Kj
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 09:42:42 -0400
-Received: from forwardcorp1j.mail.yandex.net ([5.45.199.163]:56032)
+ (envelope-from <yury-kotov@yandex-team.ru>) id 1hpv3x-0003vd-MA
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 09:42:43 -0400
+Received: from forwardcorp1j.mail.yandex.net ([5.45.199.163]:56062)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <yury-kotov@yandex-team.ru>)
- id 1hpv3x-0003ur-12
+ id 1hpv3x-0003v2-9E
  for qemu-devel@nongnu.org; Tue, 23 Jul 2019 09:42:41 -0400
-Received: from mxbackcorp2j.mail.yandex.net (mxbackcorp2j.mail.yandex.net
- [IPv6:2a02:6b8:0:1619::119])
- by forwardcorp1j.mail.yandex.net (Yandex) with ESMTP id 5D1F42E14BE;
- Tue, 23 Jul 2019 16:42:38 +0300 (MSK)
+Received: from mxbackcorp1j.mail.yandex.net (mxbackcorp1j.mail.yandex.net
+ [IPv6:2a02:6b8:0:1619::162])
+ by forwardcorp1j.mail.yandex.net (Yandex) with ESMTP id 82EDA2E14C2;
+ Tue, 23 Jul 2019 16:42:39 +0300 (MSK)
 Received: from smtpcorp1j.mail.yandex.net (smtpcorp1j.mail.yandex.net
  [2a02:6b8:0:1619::137])
- by mxbackcorp2j.mail.yandex.net (nwsmtp/Yandex) with ESMTP id
- uUKKBTHJPz-gbNSvIrn; Tue, 23 Jul 2019 16:42:38 +0300
+ by mxbackcorp1j.mail.yandex.net (nwsmtp/Yandex) with ESMTP id
+ 273MrmAwNs-gd5KWRcP; Tue, 23 Jul 2019 16:42:39 +0300
 Precedence: bulk
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
  s=default; 
- t=1563889358; bh=fhxOvU+fKFPyYtrmD4WYuVEm4ToPLKSH4TSxFFwacrk=;
- h=Message-Id:Date:Subject:To:From:Cc;
- b=pFvFEQ0h2J1elTUHwhqoE54XPfiNEAVXbKsD2PpGRXU984UUbDrLNNS0O4jFIgnXu
- D/eDoQ6wXotcdJHT1jmH7uQKaS606BlwhlHHsbFSxSgdZrIpNzNOBsCTjLXrjWPgAc
- IbXxm2g+yx9nbFMi/VGTNjKtoLx0l3V+3vud27AI=
-Authentication-Results: mxbackcorp2j.mail.yandex.net;
+ t=1563889359; bh=6vm/tvcGqZqYrL0pivEHJIBSrkUhSvvB9qfJPKUmrp0=;
+ h=In-Reply-To:Message-Id:References:Date:Subject:To:From:Cc;
+ b=nVUfoe5sd2fbS6Ev6D+MSRKyl3GteHXIMWZSVHYCclI3I7b899k2X+VpvQLZfazns
+ +ro6pIea+g76M6gKH7+AnJpwaaxSYicJw7qAH60NypNrEyNvxDTDt3d9K6NNITSJPh
+ jPzH4FGXj3MCR30PUevC3AgqhBuBtJO/msPzDxRg=
+Authentication-Results: mxbackcorp1j.mail.yandex.net;
  dkim=pass header.i=@yandex-team.ru
 Received: from unknown (unknown [2a02:6b8:b080:8808::1:1a])
  by smtpcorp1j.mail.yandex.net (nwsmtp/Yandex) with ESMTPSA id
- cJSCJL4WEY-gbAm4nSr; Tue, 23 Jul 2019 16:42:37 +0300
+ cJSCJL4WEY-gdAm3S4Y; Tue, 23 Jul 2019 16:42:39 +0300
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
  (Client certificate not present)
 From: Yury Kotov <yury-kotov@yandex-team.ru>
@@ -64,15 +65,17 @@ To: Paolo Bonzini <pbonzini@redhat.com>,
  Richard Henderson <rth@twiddle.net>, Juan Quintela <quintela@redhat.com>,
  "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
  Stefan Weil <sw@weilnetz.de>
-Date: Tue, 23 Jul 2019 16:42:11 +0300
-Message-Id: <20190723134215.25095-1-yury-kotov@yandex-team.ru>
+Date: Tue, 23 Jul 2019 16:42:13 +0300
+Message-Id: <20190723134215.25095-3-yury-kotov@yandex-team.ru>
 X-Mailer: git-send-email 2.22.0
+In-Reply-To: <20190723134215.25095-1-yury-kotov@yandex-team.ru>
+References: <20190723134215.25095-1-yury-kotov@yandex-team.ru>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 5.45.199.163
-Subject: [Qemu-devel] [PATCH v4 0/3] High downtime with 95+ throttle pct
+Subject: [Qemu-devel] [PATCH v4 2/3] cpus: Fix throttling during vm_stop
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 List-Id: <qemu-devel.nongnu.org>
@@ -88,52 +91,81 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
+Throttling thread sleeps in VCPU thread. For high throttle percentage
+this sleep is more than 10ms. E.g. for 60% - 15ms, for 99% - 990ms.
+vm_stop() kicks all VCPUs and waits for them. It's called at the end of
+migration and because of the long sleep the migration downtime might be
+more than 100ms even for downtime-limit 1ms.
+Use qemu_cond_timedwait for high percentage to wake up during vm_stop.
 
-V4:
-* The test was simplified to prevent false fails.
+Signed-off-by: Yury Kotov <yury-kotov@yandex-team.ru>
+---
+ cpus.c | 27 +++++++++++++++++++--------
+ 1 file changed, 19 insertions(+), 8 deletions(-)
 
-V3:
-* Rebase fixes (migrate_set_parameter -> migrate_set_parameter_int)
-
-V2:
-* Added a test
-* Fixed qemu_cond_timedwait for qsp
-
-I wrote a test for migration auto converge and found out a strange thing:
-1. Enable auto converge
-2. Set max-bandwidth 1Gb/s
-3. Set downtime-limit 1ms
-4. Run standard test (just writes a byte per page)
-5. Wait for converge
-6. It's converged with 99% throttle percentage
-7. The result downtime was about 300-600ms   <<<<
-
-It's much higher than expected 1ms. I figured out that cpu_throttle_threa=
-d()
-function sleeps for 100ms+ for high throttle percentage (>=3D95%) in VCPU=
- thread.
-And it sleeps even after a cpu kick.
-
-Fixed it by using timedwait for ms part of sleep.
-E.g timedwait(halt_cond, 1ms) + usleep(500).
-
-Regards,
-Yury
-
-Yury Kotov (3):
-  qemu-thread: Add qemu_cond_timedwait
-  cpus: Fix throttling during vm_stop
-  tests/migration: Add a test for auto converge
-
- cpus.c                   |  27 +++++++---
- include/qemu/thread.h    |  18 +++++++
- tests/migration-test.c   | 103 ++++++++++++++++++++++++++++++++++-----
- util/qemu-thread-posix.c |  40 ++++++++++-----
- util/qemu-thread-win32.c |  16 ++++++
- util/qsp.c               |  18 +++++++
- 6 files changed, 191 insertions(+), 31 deletions(-)
-
+diff --git a/cpus.c b/cpus.c
+index 927a00aa90..3baedd554c 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -74,6 +74,8 @@
+=20
+ #endif /* CONFIG_LINUX */
+=20
++static QemuMutex qemu_global_mutex;
++
+ int64_t max_delay;
+ int64_t max_advance;
+=20
+@@ -777,7 +779,7 @@ static void cpu_throttle_thread(CPUState *cpu, run_on=
+_cpu_data opaque)
+ {
+     double pct;
+     double throttle_ratio;
+-    long sleeptime_ns;
++    int64_t sleeptime_ns;
+=20
+     if (!cpu_throttle_get_percentage()) {
+         return;
+@@ -785,11 +787,22 @@ static void cpu_throttle_thread(CPUState *cpu, run_=
+on_cpu_data opaque)
+=20
+     pct =3D (double)cpu_throttle_get_percentage()/100;
+     throttle_ratio =3D pct / (1 - pct);
+-    sleeptime_ns =3D (long)(throttle_ratio * CPU_THROTTLE_TIMESLICE_NS);
+-
+-    qemu_mutex_unlock_iothread();
+-    g_usleep(sleeptime_ns / 1000); /* Convert ns to us for usleep call *=
+/
+-    qemu_mutex_lock_iothread();
++    /* Add 1ns to fix double's rounding error (like 0.9999999...) */
++    sleeptime_ns =3D (int64_t)(throttle_ratio * CPU_THROTTLE_TIMESLICE_N=
+S + 1);
++
++    while (sleeptime_ns >=3D SCALE_MS && !cpu->stop) {
++        int64_t start, end;
++        start =3D qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
++        qemu_cond_timedwait(cpu->halt_cond, &qemu_global_mutex,
++                            sleeptime_ns / SCALE_MS);
++        end =3D qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
++        sleeptime_ns -=3D end - start;
++    }
++    if (sleeptime_ns >=3D SCALE_US && !cpu->stop) {
++        qemu_mutex_unlock_iothread();
++        g_usleep(sleeptime_ns / SCALE_US);
++        qemu_mutex_lock_iothread();
++    }
+     atomic_set(&cpu->throttle_thread_scheduled, 0);
+ }
+=20
+@@ -1167,8 +1180,6 @@ static void qemu_init_sigbus(void)
+ }
+ #endif /* !CONFIG_LINUX */
+=20
+-static QemuMutex qemu_global_mutex;
+-
+ static QemuThread io_thread;
+=20
+ /* cpu creation */
 --=20
 2.22.0
 
