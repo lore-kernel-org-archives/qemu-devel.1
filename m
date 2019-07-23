@@ -2,87 +2,62 @@ Return-Path: <SRS0=3Ld+=VU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15E22C76186
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 16:24:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94A0FC76186
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 16:47:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6A93020838
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 16:24:11 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mSesdlSF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A93020838
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 65FBD223A0
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 16:47:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 65FBD223A0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45612 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45716 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hpxaE-0006i9-Fo
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jul 2019 12:24:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60876)
+	id 1hpxwj-0006wP-F9
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jul 2019 12:47:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38889)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hpxa4-0006Gp-3v
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 12:24:01 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1hpxwX-0006Y4-NB
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 12:47:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hpxa2-000870-Pc
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 12:24:00 -0400
-Received: from mail-wm1-x335.google.com ([2a00:1450:4864:20::335]:55430)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hpxa2-00086B-GN
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 12:23:58 -0400
-Received: by mail-wm1-x335.google.com with SMTP id a15so39163111wmj.5
- for <qemu-devel@nongnu.org>; Tue, 23 Jul 2019 09:23:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=Wc8oRcpDMbAGOEQ46mGRQtRqJRsqCNlu2mcpybhLias=;
- b=mSesdlSF94HmCZWqqLmUrDqQgdwQ+eaNctsMMms5e9yjvnmnU1lFq/nbajDrPsl4Mu
- OOzOVRe1nLeey/AtmaotNiPo/7BopGmfzKKzfsjT7oKu8s7uqynDid3hMbBnvtTvIDxC
- B3gD02Hram6jJ0QseyjPQKfo1elndkUiLT4dhHwsG06713DcOOQ38DJpe+PcUJBw5k80
- 6y05YLzeBgvSANG5KOnMaCP9ZNxlSzGKweRqhp4iZePs6YTykH/8f5pmQ2U+7UEEYaCs
- IavGy6w7UQ7EElctsEiah4uwNLi243rQQfNh6onL5pDYff9kA9XEcbahyn86OhjfMF1I
- B7Sw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=Wc8oRcpDMbAGOEQ46mGRQtRqJRsqCNlu2mcpybhLias=;
- b=sFIifXZ/BTcJFMdZeY42aqW9XYUN5dXOvar/bNKpGyN8oX8/202axucgnnkxrRTQGR
- Qk/p7PvAT1X115JhajvHF5rYxFl+0r6htz1fTjW2mKCPRujfoa7xdzcwi5ReUtBmoDH4
- SfRC9zAaRQxvSV78WxI90d4w8rAtDUSEHwY4nVmIezXxYcocrafEwYFWltgNk9Ta4UZ2
- VVMa4xGRVI6Thj9T2y5DUJ43zRkupnZrqosR9Y1yPyoNT3MNXAXycsrz/ujz+tSegK9w
- hRaa5iBJjSpQaA+oY7TBS25ByJYi0S4fYZIoTMbIC2p9EYL2FX5k8M2S2XEjq+xMzrCx
- LwgA==
-X-Gm-Message-State: APjAAAUwdcUNJFOy0VgvFnKYnFyTJwQXc53bgLVhI0jwUx7fc3n5b9XY
- 8ILxDtS+8tJWWurL5nQKTvcXYQ==
-X-Google-Smtp-Source: APXvYqxro/tZPwQgL5xR0US06fQ7XRTOOjLQ84JSCsI7OBrHv9RfS8GmzkADJheNgyXia3cMEPseEg==
-X-Received: by 2002:a7b:c202:: with SMTP id x2mr67315718wmi.49.1563899036990; 
- Tue, 23 Jul 2019 09:23:56 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id v4sm40677018wmg.22.2019.07.23.09.23.56
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Tue, 23 Jul 2019 09:23:56 -0700 (PDT)
-Received: from zen.linaroharston. (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 16A661FF87;
- Tue, 23 Jul 2019 17:23:56 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: peter.maydell@linaro.org
-Date: Tue, 23 Jul 2019 17:23:56 +0100
-Message-Id: <20190723162356.3296-1-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
+ (envelope-from <dgilbert@redhat.com>) id 1hpxwV-0002s1-NO
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 12:47:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46520)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hpxwT-0002n5-KM
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 12:47:11 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 048803084242;
+ Tue, 23 Jul 2019 16:47:07 +0000 (UTC)
+Received: from work-vm (ovpn-117-202.ams2.redhat.com [10.36.117.202])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 13B3919C67;
+ Tue, 23 Jul 2019 16:47:05 +0000 (UTC)
+Date: Tue, 23 Jul 2019 17:47:03 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Wei Yang <richardw.yang@linux.intel.com>
+Message-ID: <20190723164703.GN2719@work-vm>
+References: <20190722075339.25121-1-richardw.yang@linux.intel.com>
+ <20190722075339.25121-3-richardw.yang@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::335
-Subject: [Qemu-devel] [PULL v4 00/23 for 4.1-rc2] testing updates
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190722075339.25121-3-richardw.yang@linux.intel.com>
+User-Agent: Mutt/1.12.0 (2019-05-25)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.40]); Tue, 23 Jul 2019 16:47:07 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 2/2] migration: extract ram_load_precopy
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,122 +69,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org, quintela@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit 4da6c0f9ebbdaaf4315c71ccd288d02b9087f8af:
+* Wei Yang (richardw.yang@linux.intel.com) wrote:
+> After cleanup, it would be clear to audience there are two cases
+> ram_load:
+> 
+>   * precopy
+>   * postcopy
+> 
+> And it is not necessary to check postcopy_running on each iteration for
+> precopy.
+> 
+> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+> ---
+>  migration/ram.c | 73 +++++++++++++++++++++++++++++++------------------
+>  1 file changed, 46 insertions(+), 27 deletions(-)
+> 
+> diff --git a/migration/ram.c b/migration/ram.c
+> index 6bfdfae16e..5f6f07b255 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -4200,40 +4200,26 @@ static void colo_flush_ram_cache(void)
+>      trace_colo_flush_ram_cache_end();
+>  }
+>  
+> -static int ram_load(QEMUFile *f, void *opaque, int version_id)
+> +/**
+> + * ram_load_precopy: load a page in precopy case
 
-  Merge remote-tracking branch 'remotes/amarkovic2/tags/mips-queue-jul-23-2019' into staging (2019-07-23 12:49:39 +0100)
+This comment is wrong - although I realise you copied it from the
+postcopy case; they don't just load a single page; they load 'pages'
 
-are available in the Git repository at:
-
-  https://github.com/stsquad/qemu.git tags/pull-testing-230719-4
-
-for you to fetch changes up to 98808c3d0c162aba93fe7840a34b54c4814332d4:
-
-  tests/docker: Refresh APT cache before installing new packages on Debian (2019-07-23 17:19:11 +0100)
-
-----------------------------------------------------------------
-Final testing updates:
-
-  - docker sphinx updates
-  - windows build re-enabled in CI
-  - travis_retry for make check
-  - build fixes
-  - docker cache fixes
-
-----------------------------------------------------------------
-Alex Bennée (7):
-      tests/docker: add test-misc for building tools & docs
-      tests/migration-test: don't spam the logs when we fail
-      tests/dockerfiles: update the win cross builds to stretch
-      shippable: re-enable the windows cross builds
-      hw/i386: also turn off VMMOUSE is VMPORT is disabled
-      travis: enable travis_retry for check phase
-      tests/docker: invoke the DEBUG shell with --noprofile/--norc
-
-Marc-André Lureau (1):
-      archive-source: also create a stash for submodules
-
-Philippe Mathieu-Daudé (12):
-      tests/docker: Install Sphinx in the Ubuntu images
-      tests/docker: Install Sphinx in the Fedora image
-      tests/docker: Install Ubuntu images noninteractively
-      tests/docker: Install Sphinx in the Debian images
-      tests/docker: Install the NSIS tools in the MinGW capable images
-      tests/docker: Set the correct cross-PKG_CONFIG_PATH in the MXE images
-      tests/docker: Install texinfo in the Fedora image
-      buildsys: The NSIS Windows build requires the documentation installed
-      buildsys: The NSIS Windows build requires qemu-nsis.bmp installed
-      tests/docker: Let the test-mingw test generate a NSIS installer
-      NSIS: Add missing firmware blobs
-      tests/docker: Refresh APT cache before installing new packages on Debian
-
-Thomas Huth (3):
-      tests/qemu-iotests/check: Allow tests without groups
-      tests/qemu-iotests/group: Remove some more tests from the "auto" group
-      tests/qemu-iotests: Don't use 'seq' in the iotests
-
- .shippable.yml                                     |   9 +-
- .travis.yml                                        |   2 +-
- Makefile                                           |   3 +-
- hw/i386/Kconfig                                    |   4 +-
- qemu.nsi                                           |  11 ++
- scripts/archive-source.sh                          |  18 ++--
- tests/docker/Makefile.include                      |   6 +-
- tests/docker/dockerfiles/debian-alpha-cross.docker |   5 +-
- tests/docker/dockerfiles/debian-amd64.docker       |  20 ++--
- tests/docker/dockerfiles/debian-arm64-cross.docker |  16 +--
- tests/docker/dockerfiles/debian-armel-cross.docker |  13 +--
- tests/docker/dockerfiles/debian-armhf-cross.docker |  16 +--
- .../dockerfiles/debian-buster-arm64-cross.docker   |   5 +-
- tests/docker/dockerfiles/debian-hppa-cross.docker  |   5 +-
- tests/docker/dockerfiles/debian-m68k-cross.docker  |   5 +-
- tests/docker/dockerfiles/debian-mips-cross.docker  |  16 +--
- .../docker/dockerfiles/debian-mips64-cross.docker  |   5 +-
- .../dockerfiles/debian-mips64el-cross.docker       |  16 +--
- .../docker/dockerfiles/debian-mipsel-cross.docker  |  16 +--
- tests/docker/dockerfiles/debian-ports.docker       |   4 +-
- .../docker/dockerfiles/debian-powerpc-cross.docker |   5 +-
- tests/docker/dockerfiles/debian-ppc64-cross.docker |   5 +-
- .../docker/dockerfiles/debian-ppc64el-cross.docker |  14 +--
- .../docker/dockerfiles/debian-riscv64-cross.docker |   5 +-
- tests/docker/dockerfiles/debian-s390x-cross.docker |  15 +--
- tests/docker/dockerfiles/debian-sh4-cross.docker   |   5 +-
- tests/docker/dockerfiles/debian-sid.docker         |   6 +-
- .../docker/dockerfiles/debian-sparc64-cross.docker |   5 +-
- tests/docker/dockerfiles/debian-win32-cross.docker |  13 ++-
- tests/docker/dockerfiles/debian-win64-cross.docker |  13 ++-
- .../docker/dockerfiles/debian-xtensa-cross.docker  |   4 +-
- tests/docker/dockerfiles/debian10.docker           |   7 +-
- tests/docker/dockerfiles/debian8.docker            |   6 +-
- .../{debian8-mxe.docker => debian9-mxe.docker}     |  15 +--
- tests/docker/dockerfiles/debian9.docker            |   7 +-
- tests/docker/dockerfiles/fedora.docker             |   4 +
- tests/docker/dockerfiles/ubuntu.docker             |   3 +-
- tests/docker/dockerfiles/ubuntu1804.docker         |   3 +-
- tests/docker/run                                   |   4 +-
- tests/docker/test-mingw                            |   4 +-
- tests/docker/test-misc                             |  22 ++++
- tests/migration-test.c                             |  19 ++--
- tests/qemu-iotests/007                             |   2 +-
- tests/qemu-iotests/011                             |   2 +-
- tests/qemu-iotests/032                             |   2 +-
- tests/qemu-iotests/035                             |   2 +-
- tests/qemu-iotests/037                             |   2 +-
- tests/qemu-iotests/046                             |   2 +-
- tests/qemu-iotests/check                           |   4 +-
- tests/qemu-iotests/common.pattern                  |   4 +-
- tests/qemu-iotests/group                           | 120 +++++++++++----------
- 51 files changed, 309 insertions(+), 210 deletions(-)
- rename tests/docker/dockerfiles/{debian8-mxe.docker => debian9-mxe.docker} (54%)
- create mode 100755 tests/docker/test-misc
+Other than that, I think it's OK, so:
 
 
--- 
-2.20.1
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
+> + * Returns 0 for success or -errno in case of error
+> + *
+> + * Called in precopy mode by ram_load().
+> + * rcu_read_lock is taken prior to this being called.
+> + *
+> + * @f: QEMUFile where to send the data
+> + */
+> +static int ram_load_precopy(QEMUFile *f)
+>  {
+> -    int flags = 0, ret = 0, invalid_flags = 0;
+> -    static uint64_t seq_iter;
+> -    int len = 0;
+> -    /*
+> -     * If system is running in postcopy mode, page inserts to host memory must
+> -     * be atomic
+> -     */
+> -    bool postcopy_running = postcopy_is_running();
+> +    int flags = 0, ret = 0, invalid_flags = 0, len = 0;
+>      /* ADVISE is earlier, it shows the source has the postcopy capability on */
+>      bool postcopy_advised = postcopy_is_advised();
+> -
+> -    seq_iter++;
+> -
+> -    if (version_id != 4) {
+> -        return -EINVAL;
+> -    }
+> -
+>      if (!migrate_use_compression()) {
+>          invalid_flags |= RAM_SAVE_FLAG_COMPRESS_PAGE;
+>      }
+> -    /* This RCU critical section can be very long running.
+> -     * When RCU reclaims in the code start to become numerous,
+> -     * it will be necessary to reduce the granularity of this
+> -     * critical section.
+> -     */
+> -    rcu_read_lock();
+> -
+> -    if (postcopy_running) {
+> -        ret = ram_load_postcopy(f);
+> -    }
+>  
+> -    while (!postcopy_running && !ret && !(flags & RAM_SAVE_FLAG_EOS)) {
+> +    while (!ret && !(flags & RAM_SAVE_FLAG_EOS)) {
+>          ram_addr_t addr, total_ram_bytes;
+>          void *host = NULL;
+>          uint8_t ch;
+> @@ -4390,6 +4376,39 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
+>          }
+>      }
+>  
+> +    return ret;
+> +}
+> +
+> +static int ram_load(QEMUFile *f, void *opaque, int version_id)
+> +{
+> +    int ret = 0;
+> +    static uint64_t seq_iter;
+> +    /*
+> +     * If system is running in postcopy mode, page inserts to host memory must
+> +     * be atomic
+> +     */
+> +    bool postcopy_running = postcopy_is_running();
+> +
+> +    seq_iter++;
+> +
+> +    if (version_id != 4) {
+> +        return -EINVAL;
+> +    }
+> +
+> +    /*
+> +     * This RCU critical section can be very long running.
+> +     * When RCU reclaims in the code start to become numerous,
+> +     * it will be necessary to reduce the granularity of this
+> +     * critical section.
+> +     */
+> +    rcu_read_lock();
+> +
+> +    if (postcopy_running) {
+> +        ret = ram_load_postcopy(f);
+> +    } else {
+> +        ret = ram_load_precopy(f);
+> +    }
+> +
+>      ret |= wait_for_decompress_done();
+>      rcu_read_unlock();
+>      trace_ram_load_complete(ret, seq_iter);
+> -- 
+> 2.17.1
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
