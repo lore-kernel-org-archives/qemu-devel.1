@@ -7,75 +7,74 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC2ACC7618E
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 10:43:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 106EBC7618B
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 10:43:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BAD032081B
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 10:43:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D32732081B
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 10:43:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iSbO1Q5+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BAD032081B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vQQcc/RH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D32732081B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41106 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41108 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hpsGE-0007HY-K1
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jul 2019 06:43:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39671)
+	id 1hpsGG-0007Qw-IE
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jul 2019 06:43:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39708)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hpsF4-0002PF-1n
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 06:41:58 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hpsF6-0002YO-7j
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 06:42:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hpsF1-0004CW-Qa
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 06:41:57 -0400
-Received: from mail-wm1-x331.google.com ([2a00:1450:4864:20::331]:36892)
+ (envelope-from <alex.bennee@linaro.org>) id 1hpsF4-0004Eg-1i
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 06:41:59 -0400
+Received: from mail-wr1-x432.google.com ([2a00:1450:4864:20::432]:44023)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hpsEz-00049C-LF
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 06:41:55 -0400
-Received: by mail-wm1-x331.google.com with SMTP id f17so38029614wme.2
- for <qemu-devel@nongnu.org>; Tue, 23 Jul 2019 03:41:52 -0700 (PDT)
+ id 1hpsF2-0004Bf-Tz
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 06:41:57 -0400
+Received: by mail-wr1-x432.google.com with SMTP id p13so42587674wru.10
+ for <qemu-devel@nongnu.org>; Tue, 23 Jul 2019 03:41:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=k0cRgpglCD2PcKK9Njfjp9ahbK4mgT1ZXlX00pGzzsc=;
- b=iSbO1Q5+/Yo9C3K/uq/3MxLeuXxOvA6mG+XkKyUaR0L0mCcTI28nqav4GU7XnW27e1
- MRrVx95yJ1XY3uvUIxagXKzrYTphlj2OfXUd47LvTlgDeIFRX5yqF/nf4IyFnOqX3RrW
- Q9ewxx2pTuD1Hr6c7fqZaDMaxsMhU8rl11YT877zWMoKNp/x8LQ4eT7hRBoIPgX4okd+
- +fbrDZwnTgkaPV20r08uPPApf548SOFASEqcRO9nyYMGR5kuxo+C+u6FkrgcSn5rTS3D
- NX8bQOCvfci5m+/peQDjvTXa2Fpww+1YLokEIV4ieKjVCn9M3oqhkmsCE4MK0ia6mEqi
- twrw==
+ bh=VX71v+EX2x4zItmkCNQGjdxkkRKOaBoiHBHmU5C8mmY=;
+ b=vQQcc/RH9uoNJcNUwJC/l2/wO450WSwrjbpzrwGju6XSPLaxKU0Jg2niKIzhBJ1j+i
+ k9kl9qhv2tYOd9aoQ2z7PbtXL4lSrH5UgwxUAGyYJw/QJ2b6whbLKS7gC0sokML7QIN8
+ LQxIS3VAdIUw71CJRZGaDUzcoAUrItg909WuDWeu6A4qibXuLLivDfMTeW7m54bwyALp
+ FCveFbx5IKDrkc32g8UEIJPMR+Kp+Ksnv/dmCLjxf7y48uZEbVzsKLrOiY0QpxKjM5Al
+ e/qf1TpA+L+nf1oHDCPqFH0/UdqYxri7KKoYhx0f3+hYLnxAcXECsB1U4B2CyJ0fonqO
+ /giw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=k0cRgpglCD2PcKK9Njfjp9ahbK4mgT1ZXlX00pGzzsc=;
- b=YNdgVMUfkVemAuo8xXDXYziNdPOCub1XOp+a9ESSa4DiHbVIyCWJENuRi/Z2NW9x2T
- zdjGdn6jRbTjuz0DhhvbLJ7rpiZJ4jh1FLzxju9R6NKiUi2/J+8aD3lG/GoxGLF0neI9
- gh/h3aeN1OMCgw2t2n7VmemCuewqDWfxi4a2QviiTVhD0xE0Rz64jU3VroCFISRfYGTW
- pZW30sde0eAE6bwTDsTz3wZsCxVvwK962jAW+22iX3JroDrN6v1tBdHjIQQOBZMc3Z+s
- t1ubKV0ZpoIf7jmM+AFK8Lu+OtciEoQXsmEC+cGvILZdl8gk1Mw0oX4T9ZBhI6RGaKJ9
- yg7Q==
-X-Gm-Message-State: APjAAAU3nvxX4+7hBEfxo89pQnHmOxMzngTY8LTV/P9ykEhEBffjzM14
- 4cCMp5y0RLm+pG7FdyOfgv5FPw==
-X-Google-Smtp-Source: APXvYqx62NgTwNNfqzhOHz98GjHxgW3n/2nPl4w2nQS1nS6Qiu9Z2PLlV9rndwAZ6LKK5V1usSn5Lg==
-X-Received: by 2002:a1c:1b97:: with SMTP id
- b145mr65323798wmb.158.1563878511302; 
- Tue, 23 Jul 2019 03:41:51 -0700 (PDT)
+ bh=VX71v+EX2x4zItmkCNQGjdxkkRKOaBoiHBHmU5C8mmY=;
+ b=i3htd9NMsn7KLo1tJuWL4+4gUGVp+8BiZLQS4JFDJjGfWDwwC3DZUy2oAMqw6b3kX/
+ BhoxVXFKEUop7NmyLuudkhBXmsgkXvDm2jGDE0KwR3sG388XdLPTJixu3ntwbPFAaZQB
+ u71jHEnlNj0glsxqNU8q1Fb5/17vHlG9rSr0clOGDkqcUhEz/1vH5Kf4FdLG+vEFobYX
+ +nwAl/tpKoCwT2mvfyusFIs2kcZNGpL6tjChfnc4P+tZxcJMzOAbsKcTwO3WCoGtyfyP
+ tMReETiOS2iILaMymRsNo5q9YVZ40R0hUkl+qvZ5EUAgw8ZC/Ik9tRaHJiZjn2uTBehH
+ YkHA==
+X-Gm-Message-State: APjAAAXeQL0XnxTUTdRObpvTBNiBoe/73AEgnOOLFvcqBpvm+Ex5CB4s
+ omoGHXEGpxst8SxIDhZvQz0MkA==
+X-Google-Smtp-Source: APXvYqxU8cfErnlEv2PdIo7q5mrqH+mVqIPChfEGpJApAVOrxQjlNhZpZzSKcApwzSA+jDnBIbPB3w==
+X-Received: by 2002:a5d:4206:: with SMTP id n6mr13766419wrq.110.1563878514687; 
+ Tue, 23 Jul 2019 03:41:54 -0700 (PDT)
 Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id g12sm59382890wrv.9.2019.07.23.03.41.48
+ by smtp.gmail.com with ESMTPSA id x11sm30365330wmi.26.2019.07.23.03.41.50
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Tue, 23 Jul 2019 03:41:48 -0700 (PDT)
+ Tue, 23 Jul 2019 03:41:52 -0700 (PDT)
 Received: from zen.linaroharston. (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id DB1731FFA3;
+ by zen.linaroharston (Postfix) with ESMTP id 8419C1FF9D;
  Tue, 23 Jul 2019 11:36:13 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: peter.maydell@linaro.org
-Date: Tue, 23 Jul 2019 11:36:06 +0100
-Message-Id: <20190723103612.5600-18-alex.bennee@linaro.org>
+Date: Tue, 23 Jul 2019 11:36:02 +0100
+Message-Id: <20190723103612.5600-14-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190723103612.5600-1-alex.bennee@linaro.org>
 References: <20190723103612.5600-1-alex.bennee@linaro.org>
@@ -84,9 +83,9 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::331
-Subject: [Qemu-devel] [PULL 17/23] hw/i386: also turn off VMMOUSE is VMPORT
- is disabled
+X-Received-From: 2a00:1450:4864:20::432
+Subject: [Qemu-devel] [PULL 13/23] buildsys: The NSIS Windows build requires
+ the documentation installed
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,60 +97,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>,
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Commit 97fd1ea8c1 broke the build for --without-default-devices as
-VMMOUSE depends on VMPORT.
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Fixes: 97fd1ea8c1
+This fixes:
+
+  $ make installer
+  [...]
+  (cd /tmp/qemu-nsis; \
+           for i in qemu-system-*.exe; do \
+             arch=${i%.exe}; \
+             arch=${arch#qemu-system-}; \
+             echo Section \"$arch\" Section_$arch; \
+             echo SetOutPath \"\$INSTDIR\"; \
+             echo File \"\${BINDIR}\\$i\"; \
+             echo SectionEnd; \
+           done \
+          ) >/tmp/qemu-nsis/system-emulations.nsh
+  makensis -V2 -NOCD \
+                   \
+                  -DCONFIG_GTK="y" \
+                  -DBINDIR="/tmp/qemu-nsis" \
+                   \
+                  -DSRCDIR="/source/qemu" \
+                  -DOUTFILE="qemu-setup-4.0.90.exe" \
+                  -DDISPLAYVERSION="4.0.90" \
+                  /source/qemu/qemu.nsi
+  File: "/tmp/qemu-nsis\qemu-doc.html" -> no files found.
+  Usage: File [/nonfatal] [/a] ([/r] [/x filespec [...]] filespec [...] |
+     /oname=outfile one_file_only)
+  Error in script "/source/qemu/qemu.nsi" on line 173 -- aborting creation process
+  make: *** [Makefile:1080: qemu-setup-4.0.90.exe] Error 1
+
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-Id: <20190715174817.18981-7-philmd@redhat.com>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-diff --git a/hw/i386/Kconfig b/hw/i386/Kconfig
-index b9c96ac361e..6350438036f 100644
---- a/hw/i386/Kconfig
-+++ b/hw/i386/Kconfig
-@@ -52,6 +52,7 @@ config I440FX
-     bool
-     imply E1000_PCI
-     imply VMPORT
-+    imply VMMOUSE
-     select PC_PCI
-     select PC_ACPI
-     select ACPI_SMBUS
-@@ -59,7 +60,6 @@ config I440FX
-     select IDE_PIIX
-     select DIMM
-     select SMBIOS
--    select VMMOUSE
-     select FW_CFG_DMA
+diff --git a/Makefile b/Makefile
+index ecb788b2ce3..b3357691cad 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1077,7 +1077,7 @@ installer: $(INSTALLER)
  
- config ISAPC
-@@ -78,6 +78,7 @@ config Q35
-     imply AMD_IOMMU
-     imply E1000E_PCI_EXPRESS
-     imply VMPORT
-+    imply VMMOUSE
-     select PC_PCI
-     select PC_ACPI
-     select PCI_EXPRESS_Q35
-@@ -85,7 +86,6 @@ config Q35
-     select AHCI_ICH9
-     select DIMM
-     select SMBIOS
--    select VMMOUSE
-     select FW_CFG_DMA
+ INSTDIR=/tmp/qemu-nsis
  
- config VTD
+-$(INSTALLER): $(SRC_PATH)/qemu.nsi
++$(INSTALLER): install-doc $(SRC_PATH)/qemu.nsi
+ 	$(MAKE) install prefix=${INSTDIR}
+ ifdef SIGNCODE
+ 	(cd ${INSTDIR}; \
 -- 
 2.20.1
 
