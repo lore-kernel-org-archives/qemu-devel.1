@@ -2,87 +2,79 @@ Return-Path: <SRS0=3Ld+=VU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24C68C7618B
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 13:33:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6020C7618B
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 13:42:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E743122543
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 13:33:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 85714227B7
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 13:42:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ofSA3bkS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E743122543
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="pFvFEQ0h"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85714227B7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42500 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42556 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hpuvF-0006ER-6I
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jul 2019 09:33:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60134)
+	id 1hpv4E-0000dm-HW
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jul 2019 09:42:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33630)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hpuv4-0005pz-Qm
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 09:33:32 -0400
+ (envelope-from <yury-kotov@yandex-team.ru>) id 1hpv3y-0008Lr-Hm
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 09:42:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hpuv3-0008QI-Je
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 09:33:30 -0400
-Received: from mail-oi1-x22c.google.com ([2607:f8b0:4864:20::22c]:44885)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hpuv3-0008Pw-Bw
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 09:33:29 -0400
-Received: by mail-oi1-x22c.google.com with SMTP id e189so32190752oib.11
- for <qemu-devel@nongnu.org>; Tue, 23 Jul 2019 06:33:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=VFrWbq8fmc/xFasas4ctysLBYsXG+Zj6dCnGW376DZ4=;
- b=ofSA3bkShaiaWnSBTZWDa1tcOvMY5Z4Z76kQyJFlukNQswwpyQIp7TCySvl0hUyfcl
- On/X9JtLsl2FuTYQTBeutBl4Th6zPhB9bdj6BzBxGTYSVHnesF180N32moX0QL/it/nc
- u+KvlD0Yc56YiTvz+dJgdr+Pm6Lwy/x84IE5Mkohz7Z4R2/NnOta9+OzlSTnCjYJXTG6
- YKBRixsUKzYDMkoyVPCCov9+1q8MmOvNh6zKFWp90jyFP8ZaOOQtggNcakGYZeDZxPeJ
- 0v114kxIBcyLa+BLa8EYNrQ+NSfxEl3PgQ28Kilh5g1wVz5e0Y+re7oIntIexnSmP6cC
- pPIA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=VFrWbq8fmc/xFasas4ctysLBYsXG+Zj6dCnGW376DZ4=;
- b=hW4eVT7o2UaWssuTA5Pt4V144NUSai9IF94UDBoldTI1elRj2e1LXbDvfGr2iJQtLW
- cxHHzCtSgkFj3hhdoAm+eu+j8eRZUlpGIr/9Nv+9ghKCujjw7gqVonnBWGOQxxj0MCVs
- SoCnOyGZyaAgv2xVUvCJFSEhTL2alyPvRH2J0fzqiLk4q9L1rzLtCYfON8OmTF84Xp9q
- PZzPbp5nDQtaodV92JRwbTmMzO1IexhjyW+vQmRF4dreZahOaWzktGvRstDsdxIN3ktu
- R7P8hAHqhOrjKS6+SE5j7S5wwYcF8GtH4Nim6iXprtnpga10OeSQ21MpseJFeyjvgZlY
- vAgA==
-X-Gm-Message-State: APjAAAWGfDVn3NMzM+NA2NURbT+1sDjnX+iwNhRguAG9R2ElxiWWEIMJ
- gqWkbfMxTR81hMdA6Oe33nTY+PMIJh054lYkliYJb3PvfEY=
-X-Google-Smtp-Source: APXvYqz/dfvKu5pnZh1idNrKcEkKVIECQrIoyXgcyupqOX9t6GB6cZ9V65fXjfcSk7V33A17lgaLr2+ux6do1quGstA=
-X-Received: by 2002:aca:6185:: with SMTP id
- v127mr38397641oib.163.1563888808181; 
- Tue, 23 Jul 2019 06:33:28 -0700 (PDT)
+ (envelope-from <yury-kotov@yandex-team.ru>) id 1hpv3x-0003vR-Kj
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 09:42:42 -0400
+Received: from forwardcorp1j.mail.yandex.net ([5.45.199.163]:56032)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <yury-kotov@yandex-team.ru>)
+ id 1hpv3x-0003ur-12
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 09:42:41 -0400
+Received: from mxbackcorp2j.mail.yandex.net (mxbackcorp2j.mail.yandex.net
+ [IPv6:2a02:6b8:0:1619::119])
+ by forwardcorp1j.mail.yandex.net (Yandex) with ESMTP id 5D1F42E14BE;
+ Tue, 23 Jul 2019 16:42:38 +0300 (MSK)
+Received: from smtpcorp1j.mail.yandex.net (smtpcorp1j.mail.yandex.net
+ [2a02:6b8:0:1619::137])
+ by mxbackcorp2j.mail.yandex.net (nwsmtp/Yandex) with ESMTP id
+ uUKKBTHJPz-gbNSvIrn; Tue, 23 Jul 2019 16:42:38 +0300
+Precedence: bulk
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
+ s=default; 
+ t=1563889358; bh=fhxOvU+fKFPyYtrmD4WYuVEm4ToPLKSH4TSxFFwacrk=;
+ h=Message-Id:Date:Subject:To:From:Cc;
+ b=pFvFEQ0h2J1elTUHwhqoE54XPfiNEAVXbKsD2PpGRXU984UUbDrLNNS0O4jFIgnXu
+ D/eDoQ6wXotcdJHT1jmH7uQKaS606BlwhlHHsbFSxSgdZrIpNzNOBsCTjLXrjWPgAc
+ IbXxm2g+yx9nbFMi/VGTNjKtoLx0l3V+3vud27AI=
+Authentication-Results: mxbackcorp2j.mail.yandex.net;
+ dkim=pass header.i=@yandex-team.ru
+Received: from unknown (unknown [2a02:6b8:b080:8808::1:1a])
+ by smtpcorp1j.mail.yandex.net (nwsmtp/Yandex) with ESMTPSA id
+ cJSCJL4WEY-gbAm4nSr; Tue, 23 Jul 2019 16:42:37 +0300
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
+ (Client certificate not present)
+From: Yury Kotov <yury-kotov@yandex-team.ru>
+To: Paolo Bonzini <pbonzini@redhat.com>,
+ Peter Crosthwaite <crosthwaite.peter@gmail.com>,
+ Richard Henderson <rth@twiddle.net>, Juan Quintela <quintela@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Stefan Weil <sw@weilnetz.de>
+Date: Tue, 23 Jul 2019 16:42:11 +0300
+Message-Id: <20190723134215.25095-1-yury-kotov@yandex-team.ru>
+X-Mailer: git-send-email 2.22.0
 MIME-Version: 1.0
-References: <20190723103612.5600-1-alex.bennee@linaro.org>
- <CAFEAcA_P_Bk0bNGCW+TwhQGCeqM-XZd3OudKZ4tu0fNThFH5ww@mail.gmail.com>
- <87imrt0y9a.fsf@linaro.org>
-In-Reply-To: <87imrt0y9a.fsf@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 23 Jul 2019 14:33:17 +0100
-Message-ID: <CAFEAcA-EyEWotUfDcN6TTGapBpBzwaRNUatZDj2tA4kW1aL=xw@mail.gmail.com>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::22c
-Subject: Re: [Qemu-devel] [PULL for 4.1-rc2 00/23] testing updates (green
- CI!)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 5.45.199.163
+Subject: [Qemu-devel] [PATCH v4 0/3] High downtime with 95+ throttle pct
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -91,84 +83,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: "open list:Overall" <qemu-devel@nongnu.org>, yc-core@yandex-team.ru
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 23 Jul 2019 at 12:46, Alex Benn=C3=A9e <alex.bennee@linaro.org> wro=
-te:
-> Odd. Does:
->
->   make docker-image-debian10 V=3D1
->
-> fail for you?
+Hi,
 
-Yes. The files apt tries to download do not appear to be
-on the mirror:
-e104462:bionic:all-linux-static$ make docker-image-debian10 V=3D1
-/home/petmay01/linaro/qemu-for-merges/tests/docker/docker.py build
-qemu:debian10 /home/petmay01/linaro/qemu-for-merges/tests/docker/dockerfile=
-s/debian10.docker
-  --add-current-user
-Sending build context to Docker daemon  3.072kB
-Step 1/7 : FROM debian:buster-slim
- ---> 7e86f6dc8410
-Step 2/7 : RUN cat /etc/apt/sources.list | sed "s/^deb\ /deb-src /" >>
-/etc/apt/sources.list
- ---> Using cache
- ---> a16e81a24df9
-Step 3/7 : RUN apt update
- ---> Using cache
- ---> 272778d384a0
-Step 4/7 : RUN DEBIAN_FRONTEND=3Dnoninteractive apt install -yy eatmydata
- ---> Using cache
- ---> 0113e60b5abe
-Step 5/7 : RUN DEBIAN_FRONTEND=3Dnoninteractive eatmydata     apt
-install -y --no-install-recommends         bison
-build-essential         ca-certificates         clang         flex
-    gettext         git         pkg-config         psmisc
-python         python3-sphinx         texinfo         $(apt-get -s
-build-dep qemu | egrep ^Inst | fgrep '[all]' | cut -d\  -f2)
- ---> Running in 9f66f5f38684
+V4:
+* The test was simplified to prevent false fails.
 
-WARNING: apt does not have a stable CLI interface. Use with caution in scri=
-pts.
-[...]
-After this operation, 791 MB of additional disk space will be used.
-Err:1 http://cdn-fastly.deb.debian.org/debian buster/main amd64
-perl-base amd64 5.28.1-4
-  404  Not Found [IP: 151.101.16.204 80]
-Err:2 http://cdn-fastly.deb.debian.org/debian buster/main amd64
-libsystemd0 amd64 240-5
-  404  Not Found [IP: 151.101.16.204 80]
-Err:3 http://cdn-fastly.deb.debian.org/debian buster/main amd64
-gcc-8-base amd64 8.2.0-16
-  404  Not Found [IP: 151.101.16.204 80]
-Err:4 http://cdn-fastly.deb.debian.org/debian buster/main amd64
-libgcc1 amd64 1:8.2.0-16
-  404  Not Found [IP: 151.101.16.204 80]
-Err:5 http://cdn-fastly.deb.debian.org/debian buster/main amd64
-libstdc++6 amd64 8.2.0-16
-  404  Not Found [IP: 151.101.16.204 80]
-Err:6 http://cdn-fastly.deb.debian.org/debian buster/main amd64 libc6
-amd64 2.28-6
-  404  Not Found [IP: 151.101.16.204 80]
+V3:
+* Rebase fixes (migrate_set_parameter -> migrate_set_parameter_int)
 
-though some are present, eg
+V2:
+* Added a test
+* Fixed qemu_cond_timedwait for qsp
 
-Get:210 http://cdn-fastly.deb.debian.org/debian buster/main amd64
-libatk1.0-data all 2.30.0-2 [145 kB]
+I wrote a test for migration auto converge and found out a strange thing:
+1. Enable auto converge
+2. Set max-bandwidth 1Gb/s
+3. Set downtime-limit 1ms
+4. Run standard test (just writes a byte per page)
+5. Wait for converge
+6. It's converged with 99% throttle percentage
+7. The result downtime was about 300-600ms   <<<<
 
-> Can you retry with:
->
->   make docker-image-debian10 V=3D1 NOCACHE=3D1
+It's much higher than expected 1ms. I figured out that cpu_throttle_threa=
+d()
+function sleeps for 100ms+ for high throttle percentage (>=3D95%) in VCPU=
+ thread.
+And it sleeps even after a cpu kick.
 
-Yes, this works. It looks like docker is caching the
-result of the "apt update" state, when it really needs
-to rerun this every time because the state on the servers
-may have changed.
+Fixed it by using timedwait for ms part of sleep.
+E.g timedwait(halt_cond, 1ms) + usleep(500).
 
-thanks
--- PMM
+Regards,
+Yury
+
+Yury Kotov (3):
+  qemu-thread: Add qemu_cond_timedwait
+  cpus: Fix throttling during vm_stop
+  tests/migration: Add a test for auto converge
+
+ cpus.c                   |  27 +++++++---
+ include/qemu/thread.h    |  18 +++++++
+ tests/migration-test.c   | 103 ++++++++++++++++++++++++++++++++++-----
+ util/qemu-thread-posix.c |  40 ++++++++++-----
+ util/qemu-thread-win32.c |  16 ++++++
+ util/qsp.c               |  18 +++++++
+ 6 files changed, 191 insertions(+), 31 deletions(-)
+
+--=20
+2.22.0
+
 
