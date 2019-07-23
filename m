@@ -2,104 +2,77 @@ Return-Path: <SRS0=3Ld+=VU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CABCC7618B
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 08:39:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C3AAC76190
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 08:43:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3E8742239E
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 08:39:44 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Pc7pOTJf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E8742239E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	by mail.kernel.org (Postfix) with ESMTPS id 13A8022511
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 08:43:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 13A8022511
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40116 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40136 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hpqKl-00085k-B6
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jul 2019 04:39:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33365)
+	id 1hpqOe-0001cD-Rv
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jul 2019 04:43:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34384)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <liam.merwick@oracle.com>) id 1hpqKZ-0007Wz-Gp
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 04:39:33 -0400
+ (envelope-from <slp@redhat.com>) id 1hpqOU-0001Dq-Tr
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 04:43:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <liam.merwick@oracle.com>) id 1hpqKX-0003vk-Nw
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 04:39:31 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:57834)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <liam.merwick@oracle.com>)
- id 1hpqKX-0003sL-Dy
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 04:39:29 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
- by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6N8cr7L028522;
- Tue, 23 Jul 2019 08:39:24 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2018-07-02;
- bh=IgAEn3cVKYMzN9KCJ1OyBWD7kc0mH6TX6QPB87+/sdk=;
- b=Pc7pOTJf0iZ+Py4akFLtKleKezVCxu6BnbJXM1qwc1FaG/OnfJR07ojuT7SybpwHN0UN
- pyPL0giObEZ4D8RnF3dMwWJZK9tmozaVaii2YrR8doRq/fgcZYVkWAscyhCP2NvhsWgl
- bI19gCccO0VVl1Tabn7LF7iZhjJ5PAtzO/1fSQUU9KCqMyOrprLwg+JEc1o7AJ5p/Mnj
- fXAiFqAijSIkeMr1T/Do2j6AjQUu4NvuxVzv9n8Nk+cEpfYBvITtvFwbWOELAFugIaa5
- 5NVno+dfFfqCkBipJMyHZihYe0/+D6oyFiloF8YLUOWZEVi5l5PCQHfD+s1ZTfMFJ8GZ Mg== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
- by aserp2120.oracle.com with ESMTP id 2tutwpdfxa-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 23 Jul 2019 08:39:24 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
- by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6N8bR6d142449;
- Tue, 23 Jul 2019 08:39:23 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
- by userp3030.oracle.com with ESMTP id 2tur2u962g-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 23 Jul 2019 08:39:23 +0000
-Received: from abhmp0006.oracle.com (abhmp0006.oracle.com [141.146.116.12])
- by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x6N8dMCS003875;
- Tue, 23 Jul 2019 08:39:22 GMT
-Received: from dhcp-10-175-168-17.vpn.oracle.com (/10.175.168.17)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Tue, 23 Jul 2019 01:39:22 -0700
-To: Sergio Lopez <slp@redhat.com>, mst@redhat.com, marcel.apfelbaum@gmail.com, 
- pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com,
- maran.wilson@oracle.com, sgarzare@redhat.com, kraxel@redhat.com
+ (envelope-from <slp@redhat.com>) id 1hpqOT-0002T2-Mc
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 04:43:34 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:50757)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <slp@redhat.com>) id 1hpqOT-0002Qp-FW
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 04:43:33 -0400
+Received: by mail-wm1-f65.google.com with SMTP id v15so37672422wml.0
+ for <qemu-devel@nongnu.org>; Tue, 23 Jul 2019 01:43:32 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version;
+ bh=ZGFKgkG4KP7/1h2z7MRFez0Ci8HWjDrguAXcBtfhbH0=;
+ b=s7hAQ0DlQQdArSBeQ+yin5vA1P5VxT2ZzMWbryH515WNleaNbHFfjXAGEIumt3RciI
+ SwvNYzPghKQGertFNZZQTu1nUrj/VWjtZijY1WXx0X0wiD+/mYExXRFGRczZ3qAZf0V3
+ OWHCZfryUd0yRPJCpDBWBqDvEiiy5l2jXqCs75E0E7otw/S+dGzhW1gi6Vr9hveejGWa
+ 4mwkIOItUmFMEZkx4tz7VSo3JJP/JEZjjIA9eY4Nk/20EALRsI+2pGOn+Rw7iZDo1NzU
+ 15r5KTDBj23mybkTf/nCRTQd/uWoy0X5/kNXqytx2Ie1r3ihlB36/FC6Tw+4PpyniqAj
+ lc3A==
+X-Gm-Message-State: APjAAAUMBncBp86mUSBLARfTsx82vUYN/2PU2MDzN07UUeJvoN+bEqeO
+ OHKpVKct+RPYR2W0mliO8KZ7Ng==
+X-Google-Smtp-Source: APXvYqxz7wWg0FRESge21l9sUul6QaE8sF23er86mJ+a/klA7q6FJRsWQKxbsKOnKXUqkv5I8MEPOQ==
+X-Received: by 2002:a1c:a686:: with SMTP id p128mr4433439wme.130.1563871411673; 
+ Tue, 23 Jul 2019 01:43:31 -0700 (PDT)
+Received: from dritchie.redhat.com (18.red-83-35-20.dynamicip.rima-tde.net.
+ [83.35.20.18])
+ by smtp.gmail.com with ESMTPSA id o11sm38315921wmh.37.2019.07.23.01.43.30
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Tue, 23 Jul 2019 01:43:30 -0700 (PDT)
 References: <20190702121106.28374-1-slp@redhat.com>
- <20190702121106.28374-4-slp@redhat.com>
-From: Liam Merwick <liam.merwick@oracle.com>
-Message-ID: <92aae459-a27f-9d3d-313e-ae99f1bbed92@oracle.com>
-Date: Tue, 23 Jul 2019 09:39:13 +0100
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
- Gecko/20100101 Thunderbird/60.8.0
+ <20190703095825.GE11844@stefanha-x1.localdomain> <87d0i7tlkl.fsf@redhat.com>
+ <20190719102915.GG18585@stefanha-x1.localdomain> <8736j2p22w.fsf@redhat.com>
+ <CAJSP0QXTSwk4eJteC0wTB7LGoHY3=7t4G-eNfgREQ6k+GzV2_w@mail.gmail.com>
+ <904248411098104fcf7db22382172057e50db76c.camel@intel.com>
+User-agent: mu4e 1.2.0; emacs 26.2
+From: Sergio Lopez <slp@redhat.com>
+To: "Montes\, Julio" <julio.montes@intel.com>
+In-reply-to: <904248411098104fcf7db22382172057e50db76c.camel@intel.com>
+Date: Tue, 23 Jul 2019 10:43:28 +0200
+Message-ID: <87tvbdrvin.fsf@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190702121106.28374-4-slp@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9326
- signatures=668684
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=3
- malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1907230080
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9326
- signatures=668684
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
- priorityscore=1501 malwarescore=0
- suspectscore=3 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1907230080
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 141.146.126.78
-Subject: Re: [Qemu-devel] [PATCH v3 3/4] hw/i386: Factorize PVH related
- functions
+Content-Type: multipart/signed; boundary="=-=-=";
+ micalg=pgp-sha256; protocol="application/pgp-signature"
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.85.128.65
+Subject: Re: [Qemu-devel] [PATCH v3 0/4] Introduce the microvm machine type
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -111,339 +84,157 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: "ehabkost@redhat.com" <ehabkost@redhat.com>,
+ "mst@redhat.com" <mst@redhat.com>, "stefanha@gmail.com" <stefanha@gmail.com>,
+ "maran.wilson@oracle.com" <maran.wilson@oracle.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "kraxel@redhat.com" <kraxel@redhat.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "rth@twiddle.net" <rth@twiddle.net>,
+ "sgarzare@redhat.com" <sgarzare@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 02/07/2019 13:11, Sergio Lopez wrote:
-> Extract PVH related functions from pc.c, and put them in pvh.c, so
-> they can be shared with other components.
-> 
-> Signed-off-by: Sergio Lopez <slp@redhat.com>
+--=-=-=
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 
 
-Refactoring LGTM
+Montes, Julio <julio.montes@intel.com> writes:
 
-Reviewed-by: Liam Merwick <liam.merwick@oracle.com>
+> On Fri, 2019-07-19 at 16:09 +0100, Stefan Hajnoczi wrote:
+>> On Fri, Jul 19, 2019 at 2:48 PM Sergio Lopez <slp@redhat.com> wrote:
+>> > Stefan Hajnoczi <stefanha@gmail.com> writes:
+>> > > On Thu, Jul 18, 2019 at 05:21:46PM +0200, Sergio Lopez wrote:
+>> > > > Stefan Hajnoczi <stefanha@gmail.com> writes:
+>> > > >=20
+>> > > > > On Tue, Jul 02, 2019 at 02:11:02PM +0200, Sergio Lopez wrote:
+>> > > >  --------------
+>> > > >  | Conclusion |
+>> > > >  --------------
+>> > > >=20
+>> > > > The average boot time of microvm is a third of Q35's (115ms vs.
+>> > > > 363ms),
+>> > > > and is smaller on all sections (QEMU initialization, firmware
+>> > > > overhead
+>> > > > and kernel start-to-user).
+>> > > >=20
+>> > > > Microvm's memory tree is also visibly simpler, significantly
+>> > > > reducing
+>> > > > the exposed surface to the guest.
+>> > > >=20
+>> > > > While we can certainly work on making Q35 smaller, I definitely
+>> > > > think
+>> > > > it's better (and way safer!) having a specialized machine type
+>> > > > for a
+>> > > > specific use case, than a minimal Q35 whose behavior
+>> > > > significantly
+>> > > > diverges from a conventional Q35.
+>> > >=20
+>> > > Interesting, so not a 10x difference!  This might be amenable to
+>> > > optimization.
+>> > >=20
+>> > > My concern with microvm is that it's so limited that few users
+>> > > will be
+>> > > able to benefit from the reduced attack surface and faster
+>> > > startup time.
+>> > > I think it's worth investigating slimming down Q35 further first.
+>> > >=20
+>> > > In terms of startup time the first step would be profiling Q35
+>> > > kernel
+>> > > startup to find out what's taking so long (firmware
+>> > > initialization, PCI
+>> > > probing, etc)?
+>> >=20
+>> > Some findings:
+>> >=20
+>> >  1. Exposing the TSC_DEADLINE CPU flag (i.e. using "-cpu host")
+>> > saves a
+>> >     whooping 120ms by avoiding the APIC timer calibration at
+>> >     arch/x86/kernel/apic/apic.c:calibrate_APIC_clock
+>> >=20
+>> > Average boot time with "-cpu host"
+>> >  qemu_init_end: 76.408950
+>> >  linux_start_kernel: 116.166142 (+39.757192)
+>> >  linux_start_user: 242.954347 (+126.788205)
+>> >=20
+>> > Average boot time with default "cpu"
+>> >  qemu_init_end: 77.467852
+>> >  linux_start_kernel: 116.688472 (+39.22062)
+>> >  linux_start_user: 363.033365 (+246.344893)
+>>=20
+>> \o/
+>>=20
+>> >  2. The other 130ms are a direct result of PCI and ACPI presence
+>> > (tested
+>> >     with a kernel without support for those elements). I'll publish
+>> > some
+>> >     detailed numbers next week.
+>>=20
+>> Here are the Kata Containers kernel parameters:
+>>=20
+>> var kernelParams =3D []Param{
+>>         {"tsc", "reliable"},
+>>         {"no_timer_check", ""},
+>>         {"rcupdate.rcu_expedited", "1"},
+>>         {"i8042.direct", "1"},
+>>         {"i8042.dumbkbd", "1"},
+>>         {"i8042.nopnp", "1"},
+>>         {"i8042.noaux", "1"},
+>>         {"noreplace-smp", ""},
+>>         {"reboot", "k"},
+>>         {"console", "hvc0"},
+>>         {"console", "hvc1"},
+>>         {"iommu", "off"},
+>>         {"cryptomgr.notests", ""},
+>>         {"net.ifnames", "0"},
+>>         {"pci", "lastbus=3D0"},
+>> }
+>>=20
+>> pci lastbus=3D0 looks interesting and so do some of the others :).
+>>=20
+>
+> yeah, pci=3Dlastbus=3D0 is very helpful to reduce the boot time in q35,
+> kernel won't scan the 255.. buses :)
 
+I can confirm that adding pci=3Dlastbus=3D0 makes a significant
+improvement. In fact, is the only option from Kata's kernel parameter
+list that has an impact, probably because the kernel is already quite
+minimalistic.
 
-> ---
->   hw/i386/Makefile.objs |   1 +
->   hw/i386/pc.c          | 120 +++++-------------------------------------
->   hw/i386/pvh.c         | 113 +++++++++++++++++++++++++++++++++++++++
->   hw/i386/pvh.h         |  10 ++++
->   4 files changed, 136 insertions(+), 108 deletions(-)
->   create mode 100644 hw/i386/pvh.c
->   create mode 100644 hw/i386/pvh.h
-> 
-> diff --git a/hw/i386/Makefile.objs b/hw/i386/Makefile.objs
-> index 5d9c9efd5f..c5f20bbd72 100644
-> --- a/hw/i386/Makefile.objs
-> +++ b/hw/i386/Makefile.objs
-> @@ -1,5 +1,6 @@
->   obj-$(CONFIG_KVM) += kvm/
->   obj-y += multiboot.o
-> +obj-y += pvh.o
->   obj-y += pc.o
->   obj-$(CONFIG_I440FX) += pc_piix.o
->   obj-$(CONFIG_Q35) += pc_q35.o
-> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> index 3983621f1c..325ec2c1c8 100644
-> --- a/hw/i386/pc.c
-> +++ b/hw/i386/pc.c
-> @@ -42,6 +42,7 @@
->   #include "hw/loader.h"
->   #include "elf.h"
->   #include "multiboot.h"
-> +#include "pvh.h"
->   #include "hw/timer/mc146818rtc.h"
->   #include "hw/dma/i8257.h"
->   #include "hw/timer/i8254.h"
-> @@ -108,9 +109,6 @@ static struct e820_entry *e820_table;
->   static unsigned e820_entries;
->   struct hpet_fw_config hpet_cfg = {.count = UINT8_MAX};
->   
-> -/* Physical Address of PVH entry point read from kernel ELF NOTE */
-> -static size_t pvh_start_addr;
-> -
->   GlobalProperty pc_compat_4_0[] = {};
->   const size_t pc_compat_4_0_len = G_N_ELEMENTS(pc_compat_4_0);
->   
-> @@ -1061,109 +1059,6 @@ struct setup_data {
->       uint8_t data[0];
->   } __attribute__((packed));
->   
-> -
-> -/*
-> - * The entry point into the kernel for PVH boot is different from
-> - * the native entry point.  The PVH entry is defined by the x86/HVM
-> - * direct boot ABI and is available in an ELFNOTE in the kernel binary.
-> - *
-> - * This function is passed to load_elf() when it is called from
-> - * load_elfboot() which then additionally checks for an ELF Note of
-> - * type XEN_ELFNOTE_PHYS32_ENTRY and passes it to this function to
-> - * parse the PVH entry address from the ELF Note.
-> - *
-> - * Due to trickery in elf_opts.h, load_elf() is actually available as
-> - * load_elf32() or load_elf64() and this routine needs to be able
-> - * to deal with being called as 32 or 64 bit.
-> - *
-> - * The address of the PVH entry point is saved to the 'pvh_start_addr'
-> - * global variable.  (although the entry point is 32-bit, the kernel
-> - * binary can be either 32-bit or 64-bit).
-> - */
-> -static uint64_t read_pvh_start_addr(void *arg1, void *arg2, bool is64)
-> -{
-> -    size_t *elf_note_data_addr;
-> -
-> -    /* Check if ELF Note header passed in is valid */
-> -    if (arg1 == NULL) {
-> -        return 0;
-> -    }
-> -
-> -    if (is64) {
-> -        struct elf64_note *nhdr64 = (struct elf64_note *)arg1;
-> -        uint64_t nhdr_size64 = sizeof(struct elf64_note);
-> -        uint64_t phdr_align = *(uint64_t *)arg2;
-> -        uint64_t nhdr_namesz = nhdr64->n_namesz;
-> -
-> -        elf_note_data_addr =
-> -            ((void *)nhdr64) + nhdr_size64 +
-> -            QEMU_ALIGN_UP(nhdr_namesz, phdr_align);
-> -    } else {
-> -        struct elf32_note *nhdr32 = (struct elf32_note *)arg1;
-> -        uint32_t nhdr_size32 = sizeof(struct elf32_note);
-> -        uint32_t phdr_align = *(uint32_t *)arg2;
-> -        uint32_t nhdr_namesz = nhdr32->n_namesz;
-> -
-> -        elf_note_data_addr =
-> -            ((void *)nhdr32) + nhdr_size32 +
-> -            QEMU_ALIGN_UP(nhdr_namesz, phdr_align);
-> -    }
-> -
-> -    pvh_start_addr = *elf_note_data_addr;
-> -
-> -    return pvh_start_addr;
-> -}
-> -
-> -static bool load_elfboot(const char *kernel_filename,
-> -                   int kernel_file_size,
-> -                   uint8_t *header,
-> -                   size_t pvh_xen_start_addr,
-> -                   FWCfgState *fw_cfg)
-> -{
-> -    uint32_t flags = 0;
-> -    uint32_t mh_load_addr = 0;
-> -    uint32_t elf_kernel_size = 0;
-> -    uint64_t elf_entry;
-> -    uint64_t elf_low, elf_high;
-> -    int kernel_size;
-> -
-> -    if (ldl_p(header) != 0x464c457f) {
-> -        return false; /* no elfboot */
-> -    }
-> -
-> -    bool elf_is64 = header[EI_CLASS] == ELFCLASS64;
-> -    flags = elf_is64 ?
-> -        ((Elf64_Ehdr *)header)->e_flags : ((Elf32_Ehdr *)header)->e_flags;
-> -
-> -    if (flags & 0x00010004) { /* LOAD_ELF_HEADER_HAS_ADDR */
-> -        error_report("elfboot unsupported flags = %x", flags);
-> -        exit(1);
-> -    }
-> -
-> -    uint64_t elf_note_type = XEN_ELFNOTE_PHYS32_ENTRY;
-> -    kernel_size = load_elf(kernel_filename, read_pvh_start_addr,
-> -                           NULL, &elf_note_type, &elf_entry,
-> -                           &elf_low, &elf_high, 0, I386_ELF_MACHINE,
-> -                           0, 0);
-> -
-> -    if (kernel_size < 0) {
-> -        error_report("Error while loading elf kernel");
-> -        exit(1);
-> -    }
-> -    mh_load_addr = elf_low;
-> -    elf_kernel_size = elf_high - elf_low;
-> -
-> -    if (pvh_start_addr == 0) {
-> -        error_report("Error loading uncompressed kernel without PVH ELF Note");
-> -        exit(1);
-> -    }
-> -    fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_ENTRY, pvh_start_addr);
-> -    fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_ADDR, mh_load_addr);
-> -    fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_SIZE, elf_kernel_size);
-> -
-> -    return true;
-> -}
-> -
->   static void load_linux(PCMachineState *pcms,
->                          FWCfgState *fw_cfg)
->   {
-> @@ -1203,6 +1098,9 @@ static void load_linux(PCMachineState *pcms,
->       if (ldl_p(header+0x202) == 0x53726448) {
->           protocol = lduw_p(header+0x206);
->       } else {
-> +        size_t pvh_start_addr;
-> +        uint32_t mh_load_addr = 0;
-> +        uint32_t elf_kernel_size = 0;
->           /*
->            * This could be a multiboot kernel. If it is, let's stop treating it
->            * like a Linux kernel.
-> @@ -1220,10 +1118,16 @@ static void load_linux(PCMachineState *pcms,
->            * If load_elfboot() is successful, populate the fw_cfg info.
->            */
->           if (pcmc->pvh_enabled &&
-> -            load_elfboot(kernel_filename, kernel_size,
-> -                         header, pvh_start_addr, fw_cfg)) {
-> +            pvh_load_elfboot(kernel_filename,
-> +                             &mh_load_addr, &elf_kernel_size)) {
->               fclose(f);
->   
-> +            pvh_start_addr = pvh_get_start_addr();
-> +
-> +            fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_ENTRY, pvh_start_addr);
-> +            fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_ADDR, mh_load_addr);
-> +            fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_SIZE, elf_kernel_size);
-> +
->               fw_cfg_add_i32(fw_cfg, FW_CFG_CMDLINE_SIZE,
->                   strlen(kernel_cmdline) + 1);
->               fw_cfg_add_string(fw_cfg, FW_CFG_CMDLINE_DATA, kernel_cmdline);
-> diff --git a/hw/i386/pvh.c b/hw/i386/pvh.c
-> new file mode 100644
-> index 0000000000..61623b4533
-> --- /dev/null
-> +++ b/hw/i386/pvh.c
-> @@ -0,0 +1,113 @@
-> +/*
-> + * PVH Boot Helper
-> + *
-> + * Copyright (C) 2019 Oracle
-> + * Copyright (C) 2019 Red Hat, Inc
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
-> + * See the COPYING file in the top-level directory.
-> + *
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "qemu/units.h"
-> +#include "qemu/error-report.h"
-> +#include "hw/loader.h"
-> +#include "cpu.h"
-> +#include "elf.h"
-> +#include "pvh.h"
-> +
-> +static size_t pvh_start_addr = 0;
-> +
-> +size_t pvh_get_start_addr(void)
-> +{
-> +    return pvh_start_addr;
-> +}
-> +
-> +/*
-> + * The entry point into the kernel for PVH boot is different from
-> + * the native entry point.  The PVH entry is defined by the x86/HVM
-> + * direct boot ABI and is available in an ELFNOTE in the kernel binary.
-> + *
-> + * This function is passed to load_elf() when it is called from
-> + * load_elfboot() which then additionally checks for an ELF Note of
-> + * type XEN_ELFNOTE_PHYS32_ENTRY and passes it to this function to
-> + * parse the PVH entry address from the ELF Note.
-> + *
-> + * Due to trickery in elf_opts.h, load_elf() is actually available as
-> + * load_elf32() or load_elf64() and this routine needs to be able
-> + * to deal with being called as 32 or 64 bit.
-> + *
-> + * The address of the PVH entry point is saved to the 'pvh_start_addr'
-> + * global variable.  (although the entry point is 32-bit, the kernel
-> + * binary can be either 32-bit or 64-bit).
-> + */
-> +
-> +static uint64_t read_pvh_start_addr(void *arg1, void *arg2, bool is64)
-> +{
-> +    size_t *elf_note_data_addr;
-> +
-> +    /* Check if ELF Note header passed in is valid */
-> +    if (arg1 == NULL) {
-> +        return 0;
-> +    }
-> +
-> +    if (is64) {
-> +        struct elf64_note *nhdr64 = (struct elf64_note *)arg1;
-> +        uint64_t nhdr_size64 = sizeof(struct elf64_note);
-> +        uint64_t phdr_align = *(uint64_t *)arg2;
-> +        uint64_t nhdr_namesz = nhdr64->n_namesz;
-> +
-> +        elf_note_data_addr =
-> +            ((void *)nhdr64) + nhdr_size64 +
-> +            QEMU_ALIGN_UP(nhdr_namesz, phdr_align);
-> +    } else {
-> +        struct elf32_note *nhdr32 = (struct elf32_note *)arg1;
-> +        uint32_t nhdr_size32 = sizeof(struct elf32_note);
-> +        uint32_t phdr_align = *(uint32_t *)arg2;
-> +        uint32_t nhdr_namesz = nhdr32->n_namesz;
-> +
-> +        elf_note_data_addr =
-> +            ((void *)nhdr32) + nhdr_size32 +
-> +            QEMU_ALIGN_UP(nhdr_namesz, phdr_align);
-> +    }
-> +
-> +    pvh_start_addr = *elf_note_data_addr;
-> +
-> +    return pvh_start_addr;
-> +}
-> +
-> +bool pvh_load_elfboot(const char *kernel_filename,
-> +                      uint32_t *mh_load_addr,
-> +                      uint32_t *elf_kernel_size)
-> +{
-> +    uint64_t elf_entry;
-> +    uint64_t elf_low, elf_high;
-> +    int kernel_size;
-> +    uint64_t elf_note_type = XEN_ELFNOTE_PHYS32_ENTRY;
-> +
-> +    kernel_size = load_elf(kernel_filename, read_pvh_start_addr,
-> +                           NULL, &elf_note_type, &elf_entry,
-> +                           &elf_low, &elf_high, 0, I386_ELF_MACHINE,
-> +                           0, 0);
-> +
-> +    if (kernel_size < 0) {
-> +        error_report("Error while loading elf kernel");
-> +        return false;
-> +    }
-> +
-> +    if (pvh_start_addr == 0) {
-> +        error_report("Error loading uncompressed kernel without PVH ELF Note");
-> +        return false;
-> +    }
-> +
-> +    if (mh_load_addr) {
-> +        *mh_load_addr = elf_low;
-> +    }
-> +
-> +    if (elf_kernel_size) {
-> +        *elf_kernel_size = elf_high - elf_low;
-> +    }
-> +
-> +    return true;
-> +}
-> diff --git a/hw/i386/pvh.h b/hw/i386/pvh.h
-> new file mode 100644
-> index 0000000000..ada67ff6e8
-> --- /dev/null
-> +++ b/hw/i386/pvh.h
-> @@ -0,0 +1,10 @@
-> +#ifndef HW_I386_PVH_H
-> +#define HW_I386_PVH_H
-> +
-> +size_t pvh_get_start_addr(void);
-> +
-> +bool pvh_load_elfboot(const char *kernel_filename,
-> +                      uint32_t *mh_load_addr,
-> +                      uint32_t *elf_kernel_size);
-> +
-> +#endif
-> 
+Average boot time with "-cpu host" and "pci=3Dlastbus=3D0"
+ qemu_init_end: 73.711569
+ linux_start_kernel: 113.414311 (+39.702742)
+ linux_start_user: 190.949939 (+77.535628)
 
+That's still ~40% slower than microvm, and the breach quickly widens
+when adding more PCI devices (each one adds 10-15ms), but it's certainly
+an improvement over the original numbers.
+
+On the other hand, there isn't much we can do here from QEMU's
+perspective, as this is basically Guest OS tuning.
+
+Sergio.
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEvtX891EthoCRQuii9GknjS8MAjUFAl02yLAACgkQ9GknjS8M
+AjV2ABAAncHj9E6b+eLj9mRxTfddDVZHxzdFqpvBOFpOHE0RsGbHiZ5QhkW/kqHJ
+5nmYYdp23v+fhan8GdMCdGyMWkZ9RezU3zIEk/vcw467WwNDy7e7tF0yi7lVMHIX
+FfYwIezQmc5fwEZH8GFHRKtjSJLD+0E1NMR2VVSJCSDgZ5RkqILo9m18tMKAImAv
+e6c5BYYtO+nVK/Fvtzp10oxtKUUtQ/KZIBqDnfdYPQCDhgdvpHLevFBBO5ZsDEtc
+8XdC/Dgw+DaowqoQ6jKXTM37uaQKsXw0JjUtAuFYmU27oMp/slHdl0q+sl+AhCqS
+uX9Y6hCqx4is3fedjHVam5G1L3s4jmq+RUQIKtavpjcKbvhCSwA/HCxM9db7F63Y
+wm+2FAonmW9pQiW/0+zLtwX6/Ky3u6fCe5J/VycC5v82vRUULwgeM0PT3SbJNgwb
+5k9ZQD0FfRjigZkDfeoS0rYanSLYq1A5v3pIdkLhbpPZaepoz3e6qbCDAjKtYp4+
+24b48znWF6NGdzb18fcUCC+MAp8E8XYHnFNYwzJlcj6SvAYlux2V+7nuE4gRGmbo
+GCl5xtY8wZ6StDHAoFq7FnGPlZiOOLorEQwK04nNLjMma1DS9uOr451o1qsqd1fc
+cTsrpAlgSWPrpCLZX8+5SbcREd9P52diNiM6GmMqcJsWkeNb9OE=
+=c1iA
+-----END PGP SIGNATURE-----
+--=-=-=--
 
