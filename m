@@ -2,86 +2,93 @@ Return-Path: <SRS0=3Ld+=VU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9922C7618B
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 12:55:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5042C7618B
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 12:57:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 73F972075E
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 12:55:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 97A112075E
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 12:57:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ok2dtSmw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 73F972075E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="y+VYPQS5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 97A112075E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42188 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42196 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hpuKZ-00039y-Pb
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jul 2019 08:55:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48719)
+	id 1hpuMI-0004AV-R7
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jul 2019 08:57:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49305)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <stefanha@gmail.com>) id 1hpuKP-0002lJ-Pi
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 08:55:38 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hpuM7-0003mA-P5
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 08:57:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@gmail.com>) id 1hpuKO-0002gJ-IR
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 08:55:37 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:50864)
+ (envelope-from <alex.bennee@linaro.org>) id 1hpuM6-0003eZ-8Y
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 08:57:23 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:52567)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1hpuKO-0002fM-BS
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 08:55:36 -0400
-Received: by mail-wm1-x341.google.com with SMTP id v15so38463027wml.0
- for <qemu-devel@nongnu.org>; Tue, 23 Jul 2019 05:55:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to:user-agent;
- bh=TcIOA9nGtrxVq0wmFVORI6Ct3ZOsmSmnIe7al7fJBcM=;
- b=ok2dtSmwRW/7e4d0qUuLjF0iHGdwvo9B3EkyiwAhFWM/sQWV1bqtUNkuwsg9vgEXiw
- HqnsjwVLwtlg0OSuWDm/TIB6G2agmMPeibDyQnENUVjWEgtPybfi+WFNucoKLt3zuQ36
- Fnot/oBlTG0xSd5YoIM27LOV6Zca5iLSHmofzRxlLKnaxx0AXN2sDhDPxLHNLV+VubSU
- 7JkrtQoQYb81zseq/i6cX3OyhCTLNnqFTXnmRBuE8UzyfxzEDu/WeApInUBtLXtFW9Ns
- jNtzCkbLwUnQZqWX1zw8ITCrVFcZK1lKkTHeXXZ64i3p1QZUWwdTRDfwSCVYLPj64j1b
- +KXA==
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1hpuM6-0003dZ-0O
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 08:57:22 -0400
+Received: by mail-wm1-x344.google.com with SMTP id s3so38433210wms.2
+ for <qemu-devel@nongnu.org>; Tue, 23 Jul 2019 05:57:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=p4gZdODy0fyJJQot8SfNiipRdTMCL4eJvCap7EEWZz8=;
+ b=y+VYPQS5Oi2daJLYe3i6c0aM9CDRFUi2zoKWXcX2ekhUbngO6Jp9ol7EWaGRq/pCAo
+ gAJsD8u/L7FgIllqpUC3rxkTAIUHs7QCMwuS73mfaAdSuX2Gbhv02+pBAuAQcv0rJ8fg
+ PK2alHFWDhu4cpucO+tNNEwsoIOxcpi/QsRmuyu7f7kbL5DKsNewG0dLqyBmCnFtFUDq
+ 69z0VI9vh0XT8wMPMQnksd9Fhi+fYqNqBMPNg87DtmkseQSaEvk6/PqLVafHEnXN/lu2
+ pxsxMlBadPiVVe5PDTaSCBGUm4VrS28lA/uTtsxVLFQn/WUcnsHxReIw/iinOB+GcZ63
+ faRQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=TcIOA9nGtrxVq0wmFVORI6Ct3ZOsmSmnIe7al7fJBcM=;
- b=OJy3+Kmfei50Mkn/U8hH0PF9K5wjOERJUV1/XJ7srfoHv2vKDq9smcmpHpnlACjqhE
- CDPN/o4nJHs2j+8OyH58yXy8FTi71wG6PMI7TfUWK+0Y3b1G1IE5aGjsY40IehxO7rOA
- 38wdQMreZFNzxUk0ACGG9iLjRuQrYacUIyjur20fNJtVU9Wr+O3B0qYB2A/nr92oXllT
- 39PGV+CgVPCOTtUlTMYERheme5pUvbpDmKGsPBMcPbqIHEa0zeIA4LjN/91C9/jzxG8Q
- ElY04CAwbsK51rCaBnPiIm356EhZ/xVRcWqcmWprmOyBosalbYoqPn20VB+hKIgjcICa
- TaTg==
-X-Gm-Message-State: APjAAAXIzhOzjBX32kPsSaXvbDiYXnBptJ9Ylnr9KZO94qhUIENCyajV
- lrhF72vV4uADd/Oo37FrLM4=
-X-Google-Smtp-Source: APXvYqzX/JX5+oUj62IRIr5RxXFCRA5deJNU6/iZ4FeYOggvOJTeNJEV5mNFMX9NEE35aMFKLozEXw==
-X-Received: by 2002:a7b:c251:: with SMTP id b17mr70967429wmj.143.1563886535047; 
- Tue, 23 Jul 2019 05:55:35 -0700 (PDT)
-Received: from localhost ([51.15.41.238])
- by smtp.gmail.com with ESMTPSA id x20sm32421732wmc.1.2019.07.23.05.55.33
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=p4gZdODy0fyJJQot8SfNiipRdTMCL4eJvCap7EEWZz8=;
+ b=rPzvg59b7R91hgpHBhAslFsrFHF80O6975kiWgCGh195CuFOc6DVfHRSzDE55AY+Cq
+ CgTwBNIJCTiLL2NiXOu2I8HUu3fBzbHAwwYzPpEVlFylqu32yb26eF6nR90CnPr637y9
+ hHEvJrEl+0DAnlSsw3JnNUAbMFnL5GSf4/dTWUNWrH2TRVeGm8YpXMbskORAMRkcA/dX
+ v81tinsn8pQ0ecRimF5xFoLS5GCmWHwcSkTZvTAog3BvYLnNtqq06oSp0IIUPUJ+Z2IW
+ IJX6e/x0UJVw6AFViqQ/joEQ8AuCl3y4w1hzRshmaH+Mr2IwMyf9whbrEbjxkdw9pZmX
+ Yi7g==
+X-Gm-Message-State: APjAAAVZdWVIhJjNkkYPETJjO9QJgRtv18oT9PT2GRk8JIMWKv/p1kq/
+ uLMmyAqR0wiYKm6WrfMB5nkyAPnXvaU=
+X-Google-Smtp-Source: APXvYqxTekzdRQML5MXgMycZI1EHsMOZ4JJzOyXCbbGwNXoqro9QozZ+oc9JTNQ+kOlUQvRFJ/tsXw==
+X-Received: by 2002:a1c:6643:: with SMTP id a64mr71064822wmc.154.1563886640456; 
+ Tue, 23 Jul 2019 05:57:20 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+ by smtp.gmail.com with ESMTPSA id o126sm39175586wmo.1.2019.07.23.05.57.19
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Tue, 23 Jul 2019 05:55:34 -0700 (PDT)
-Date: Tue, 23 Jul 2019 13:55:32 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: "Oleinik, Alexander" <alxndr@bu.edu>
-Message-ID: <20190723125532.GA5445@stefanha-x1.localdomain>
-References: <20190722132344.30798-1-alxndr@bu.edu>
+ Tue, 23 Jul 2019 05:57:19 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 6D5EB1FF87;
+ Tue, 23 Jul 2019 13:57:19 +0100 (BST)
+References: <20190723103612.5600-1-alex.bennee@linaro.org>
+ <CAFEAcA_P_Bk0bNGCW+TwhQGCeqM-XZd3OudKZ4tu0fNThFH5ww@mail.gmail.com>
+ <87imrt0y9a.fsf@linaro.org>
+ <451b91c6-3a4d-afb4-30f1-595fcc7e5f65@redhat.com>
+User-agent: mu4e 1.3.3; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+In-reply-to: <451b91c6-3a4d-afb4-30f1-595fcc7e5f65@redhat.com>
+Date: Tue, 23 Jul 2019 13:57:19 +0100
+Message-ID: <87h87c29jk.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="9jxsPFA5p3P2qPhR"
-Content-Disposition: inline
-In-Reply-To: <20190722132344.30798-1-alxndr@bu.edu>
-User-Agent: Mutt/1.12.0 (2019-05-25)
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::341
-Subject: Re: [Qemu-devel] [PATCH v2 0/2] Avoid sending zero-size packets
+X-Received-From: 2a00:1450:4864:20::344
+Subject: Re: [Qemu-devel] [PULL for 4.1-rc2 00/23] testing updates (green
+ CI!)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,71 +100,194 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "bsd@redhat.com" <bsd@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "stefanha@redhat.com" <stefanha@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---9jxsPFA5p3P2qPhR
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
 
-On Mon, Jul 22, 2019 at 01:24:44PM +0000, Oleinik, Alexander wrote:
-> While fuzzing the virtio-net tx vq, I ran into an assertion failure due
-> to iov_copy offsets larger than the total iov size. Though there is
-> a check to cover this, it does not execute when !n->has_vnet_hdr. This
-> patch tries to fix this.=20
-> The call stack for the assertion failure:
->=20
-> #8 in __assert_fail (libc.so.6+0x300f1)
-> #9 in iov_copy iov.c:266:5
-> #10 in virtio_net_flush_tx virtio-net.c:2073:23
-> #11 in virtio_net_tx_bh virtio-net.c:2197:11
-> #12 in aio_bh_poll async.c:118:13
-> #13 in aio_dispatch aio-posix.c:460:5
-> #14 in aio_ctx_dispatch async.c:261:5
-> #15 in g_main_context_dispatch (libglib-2.0.so.0+0x4df2d)
-> #16 in glib_pollfds_poll main-loop.c:213:9
-> #17 in os_host_main_loop_wait main-loop.c:236
-> #18 in main_loop_wait main-loop.c:512
-> #19 in virtio_net_tx_fuzz virtio-net-fuzz.c:160:3
->=20
-> v2: add details to  comment for the change to qemu_sendv_packet_async
->=20
-> Alexander Oleinik (2):
->   net: assert that tx packets have nonzero size
->   virtio-net: check that tx packet has positive size
->=20
->  hw/net/virtio-net.c | 15 +++++++++------
->  net/net.c           |  9 +++++++++
->  2 files changed, 18 insertions(+), 6 deletions(-)
->=20
-> --=20
-> 2.20.1
->=20
->=20
+> On 7/23/19 1:46 PM, Alex Benn=C3=A9e wrote:
+>>
+>> Peter Maydell <peter.maydell@linaro.org> writes:
+>>
+>>> On Tue, 23 Jul 2019 at 11:36, Alex Benn=C3=A9e <alex.bennee@linaro.org>=
+ wrote:
+>>>>
+>>>> The following changes since commit 23da9e297b4120ca9702cabec91599a4425=
+5fe96:
+>>>>
+>>>>   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-=
+20190722' into staging (2019-07-22 15:16:48 +0100)
+>>>>
+>>>> are available in the Git repository at:
+>>>>
+>>>>   https://github.com/stsquad/qemu.git tags/pull-testing-230719-1
+>>>>
+>>>> for you to fetch changes up to 2e3b8743cd66f1d0fbc83051b0b6b072a97460c=
+c:
+>>>>
+>>>>   gitlab-ci: Remove qcow2 tests that are handled by "make check" alrea=
+dy (2019-07-23 11:33:15 +0100)
+>>>>
+>>>> ----------------------------------------------------------------
+>>>> Final testing updates:
+>>>>
+>>>>   - docker sphinx updates
+>>>>   - windows build re-enabled in CI
+>>>>   - travis_retry for make check
+>>>>   - quick iotests enabled for make check
+>>>>   - build fixes
+>>>>
+>>>> ----------------------------------------------------------------
+>>>
+>>> 'make check-tcg' fails (x86-64 host):
+>>>
+>>> make: Entering directory
+>>> '/home/petmay01/linaro/qemu-for-merges/build/all-linux-static'
+>>>   BUILD   debian10
+>>> The command '/bin/sh -c DEBIAN_FRONTEND=3Dnoninteractive eatmydata
+>>> apt install -y --no-install-recommends         bison
+>>> build-essential         ca-certificates         clang         flex
+>>>     gettext         git         pkg-config         psmisc
+>>> python         python3-sphinx         texinfo         $(apt-get -s
+>>> build-dep qemu | egrep ^Inst | fgrep '[all]' | cut -d\  -f2)' returned
+>>> a non-zero code: 100
+>>> Traceback (most recent call last):
+>>>   File "/home/petmay01/linaro/qemu-for-merges/tests/docker/docker.py",
+>>> line 615, in <module>
+>>>     sys.exit(main())
+>>>   File "/home/petmay01/linaro/qemu-for-merges/tests/docker/docker.py",
+>>> line 611, in main
+>>>     return args.cmdobj.run(args, argv)
+>>>   File "/home/petmay01/linaro/qemu-for-merges/tests/docker/docker.py",
+>>> line 413, in run
+>>>     extra_files_cksum=3Dcksum)
+>>>   File "/home/petmay01/linaro/qemu-for-merges/tests/docker/docker.py",
+>>> line 280, in build_image
+>>>     quiet=3Dquiet)
+>>>   File "/home/petmay01/linaro/qemu-for-merges/tests/docker/docker.py",
+>>> line 207, in _do_check
+>>>     return subprocess.check_call(self._command + cmd, **kwargs)
+>>>   File "/usr/lib/python2.7/subprocess.py", line 190, in check_call
+>>>     raise CalledProcessError(retcode, cmd)
+>>> subprocess.CalledProcessError: Command '['docker', 'build', '-t',
+>>> 'qemu:debian10', '-f', '/tmp/docker_buildBgZdCD/tmp6MJLiZ.docker',
+>>> '/tmp/docker_buildBgZdCD']' returned non-zero exit status 100
+>>> /home/petmay01/linaro/qemu-for-merges/tests/docker/Makefile.include:53:
+>>> recipe for target 'docker-image-debian10' failed
+>
+> Yes, we should definitively improve this error report.
+>
+>>> make: *** [docker-image-debian10] Error 1
+>>> make: Leaving directory
+>>> '/home/petmay01/linaro/qemu-for-merges/build/all-linux-static'
+>>
+>> Odd. Does:
+>>
+>>   make docker-image-debian10 V=3D1
+>>
+>> fail for you? Can you retry with:
+>>
+>>   make docker-image-debian10 V=3D1 NOCACHE=3D1
+>
+> Should we use a stable tag for the stable release? Such:
+>
+> -- >8 --
+> diff --git a/tests/docker/dockerfiles/debian10.docker
+> b/tests/docker/dockerfiles/debian10.docker
+> index aeeb151b52..0f2800377d 100644
+> --- a/tests/docker/dockerfiles/debian10.docker
+> +++ b/tests/docker/dockerfiles/debian10.docker
+> @@ -7,7 +7,7 @@
+>  # On its own you can't build much but the docker-foo-cross targets
+>  # build on top of the base debian image.
+>  #
+> -FROM debian:buster-slim
+> +FROM debian:buster-20190708-slim
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+I don't think so - Buster is stable now - I think the problem is stale
+cache states from previous interrupted builds. If NOCACHE makes it go
+away then I think we are good.
 
---9jxsPFA5p3P2qPhR
-Content-Type: application/pgp-signature; name="signature.asc"
 
------BEGIN PGP SIGNATURE-----
+>
+>  # Duplicate deb line as deb-src
+> ---
+>
+>>>
+>>> I also got a failure with openbsd which seems to be when
+>>> the tests run check-block.sh:
+>>>
+>>> /home/qemu/qemu-test.Dy1Aj3/src/tests/check-block.sh
+>>>   TEST    iotest-qcow2: 001
+>>>   TEST    iotest-qcow2: 002
+>>>   TEST    iotest-qcow2: 003
+>>>   TEST    iotest-qcow2: 004
+>>>   TEST    iotest-qcow2: 005 [not run]
+>>>   TEST    iotest-qcow2: 007 [fail]
+>>> QEMU          --
+>>> "/home/qemu/qemu-test.Dy1Aj3/build/tests/qemu-iotests/../../aarch64-sof=
+tmmu/qemu-system-aarch64"
+>>> -nodefaults -machine virt,accel=3Dqtest
+>>> QEMU_IMG      --
+>>> "/home/qemu/qemu-test.Dy1Aj3/build/tests/qemu-iotests/../../qemu-img"
+>>> QEMU_IO       --
+>>> "/home/qemu/qemu-test.Dy1Aj3/build/tests/qemu-iotests/../../qemu-io"
+>>> --cache writeback -f qcow2
+>>> QEMU_NBD      --
+>>> "/home/qemu/qemu-test.Dy1Aj3/build/tests/qemu-iotests/../../qemu-nbd"
+>>> IMGFMT        -- qcow2 (compat=3D1.1)
+>>> IMGPROTO      -- file
+>>> PLATFORM      -- OpenBSD/amd64 openbsd 6.5
+>>> TEST_DIR      -- /home/qemu/qemu-test.Dy1Aj3/build/tests/qemu-iotests/s=
+cratch
+>>> SOCKET_SCM_HELPER --
+>>>
+>>> --- /home/qemu/qemu-test.Dy1Aj3/src/tests/qemu-iotests/007.out  Tue
+>>> Jul 23 10:49:15 2019
+>>> +++ /home/qemu/qemu-test.Dy1Aj3/build/tests/qemu-iotests/007.out.bad
+>>>  Tue Jul 23 11:10:21 2019
+>>> @@ -2,16 +2,7 @@
+>>>
+>>>  creating image
+>>>  Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D1048576
+>>> -savevm 1
+>>> -savevm 2
+>>> -savevm 3
+>>> -savevm 4
+>>> -savevm 5
+>>> -savevm 6
+>>> -savevm 7
+>>> -savevm 8
+>>> -savevm 9
+>>> -savevm 10
+>>> +./007: line 51: seq: command not found
+>>>
+>>> [and some other failures]
+>>>
+>>> I see Thomas Huth has a patch on-list for that, but this
+>>> didn't manifest as a problem before this pullreq.
+>>
+>> OK, I'll add it and rebuild the PR.
+>
+> But Thomas got another error later...
+>
+>>
+>> Have you noticed any issues with check-acceptance?
+>>
+>>>
+>>> thanks
+>>> -- PMM
+>>
+>>
+>> --
+>> Alex Benn=C3=A9e
+>>
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl03A8QACgkQnKSrs4Gr
-c8h7eQgAnhrHRu1MMJMo/jS6giCQ9OTL/Xb30Rxqi5YshqSQdTwzEu3Jyqd7uCII
-/PWrY8XTIGnpoWS1EyHWKq3/+UB5Qzi7lHE2yInaUJK83lPSeeb3Dmi2U2v7eDu9
-zfigkxhpZFCXatwKwq6JOVNd6rnRUg7rZW/7ZoN5t6pYXU9wtWZyRPI2oY6ZcRuC
-1gjK4hEXCUQEFK3VQiqkb7KvYC/bn9MKsSCypgcH1nrcsnU10A7nhFxZ/4mVtXKI
-LBYW83LHUjfa/bRiV0hdnPWG++GEqnZ1gqVWnDRRyRlKsV6zLrqO9tY8/3qYOfj4
-tkXX0fAZItv3bKUhOg0bvbxsBolw+w==
-=j9/+
------END PGP SIGNATURE-----
 
---9jxsPFA5p3P2qPhR--
+--
+Alex Benn=C3=A9e
 
