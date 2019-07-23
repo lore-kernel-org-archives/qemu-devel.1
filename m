@@ -2,80 +2,64 @@ Return-Path: <SRS0=3Ld+=VU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48252C7618B
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 09:33:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91D0CC7618B
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 09:34:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 12DDC204FD
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 09:33:03 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XkJrfSX9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 12DDC204FD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 623DD223BA
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 09:34:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 623DD223BA
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40576 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40590 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hprAN-0006WJ-6f
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jul 2019 05:33:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47508)
+	id 1hprBT-0007Um-Kf
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jul 2019 05:34:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47886)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hprAB-000667-E4
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 05:32:52 -0400
+ (envelope-from <oscar.zhangbo@huawei.com>) id 1hprBH-00072D-Ps
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 05:34:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hprA9-0007Wd-2W
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 05:32:51 -0400
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:38452)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hprA8-0007VL-KH
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 05:32:48 -0400
-Received: by mail-ot1-x341.google.com with SMTP id d17so43394656oth.5
- for <qemu-devel@nongnu.org>; Tue, 23 Jul 2019 02:32:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=yRJrSUD0RumOX9wYi7D2ZmU0m14unIw+KBNsXZwmRLA=;
- b=XkJrfSX9dCpHV9j7MyXGIAlUf14+ROYqhjNq3rsnTfPB2Vwa2d3bJultURyPcqMFRE
- nnFoYb1eqZPk4xI7dhHo3L7PqhNQNtcOLN1IIb76R+M/bUbnlWgQQ2lr2bP7SqVSqRB2
- kf5UVMdTjJB8WqrrZHp4MO+43mFdQUxwDUC3txNhFuo1jF9Pkc9gj9kUb5ldgiI+/Dx7
- EAigz5uwx9Ph8NITWBuyd4Af1630zFLdBlwLY8v1wpGYm4hWXF1L1V15pjN3i1Vk00KJ
- 5lbGKKtx4zj7S2uSlisSXVjPntsMEU9tb+hoPCwD9qtD/EetoiXenmnroj+bSLl4QcE+
- P5iw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=yRJrSUD0RumOX9wYi7D2ZmU0m14unIw+KBNsXZwmRLA=;
- b=UG6BHyeex+Xhjb5qIM43Bi5r4yI083aUiSoOkDNH2ElXkbtpaSSngYrIo665WUuXf0
- anFLkVZTubPONRRyo3v5YXSUDkPUJfDMxszT9Gg90dyex4Lj08f6qzw1j80fWUvpAM2Q
- ScvO8DqT+gUFB7f46ykXCVyZSyJ0ZmUTxpdaoqQC3rTCwuehTNIY0u25olz8PNlod53m
- IFI4NDnLQk7kIU6jjOp1xnNFqLg/1DErD+t38nDt+uIcMWjNEG9a0u5yBEqoKLLF30Bm
- p6GdThyGTizJWIPHVfatEr3iom8YiRQaJsToKEOY1QWAcmHo4u0BYF6A3SaJ8s9Pvyyy
- y9OQ==
-X-Gm-Message-State: APjAAAWpt+Y6kivUPYg45W0cNA3oX5W2IJphx9AeB8MJ1DOtMpiMJpb6
- taFdAGGXUFQFLgOfCqG0N/F4qd8BEdn7BLRCP4PHDg==
-X-Google-Smtp-Source: APXvYqybEQcSO5bP4fTH/pqojNjgmXRT0kjU+fgjrcjrhqt2GbixZm7f0NfAyqYfNdpFmIXKwtqfY1B1LaeGsMHrU70=
-X-Received: by 2002:a9d:711e:: with SMTP id n30mr52277028otj.97.1563874365145; 
- Tue, 23 Jul 2019 02:32:45 -0700 (PDT)
+ (envelope-from <oscar.zhangbo@huawei.com>) id 1hprBG-0008CN-8x
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 05:33:59 -0400
+Received: from szxga02-in.huawei.com ([45.249.212.188]:2482 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <oscar.zhangbo@huawei.com>)
+ id 1hprBF-0008BE-SX
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 05:33:58 -0400
+Received: from dggeml406-hub.china.huawei.com (unknown [172.30.72.56])
+ by Forcepoint Email with ESMTP id 2700CFF488D0A16F80FB;
+ Tue, 23 Jul 2019 17:33:54 +0800 (CST)
+Received: from DGGEML423-HUB.china.huawei.com (10.1.199.40) by
+ dggeml406-hub.china.huawei.com (10.3.17.50) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Tue, 23 Jul 2019 17:33:53 +0800
+Received: from DGGEML509-MBX.china.huawei.com ([169.254.1.213]) by
+ dggeml423-hub.china.huawei.com ([10.1.199.40]) with mapi id 14.03.0439.000;
+ Tue, 23 Jul 2019 17:33:44 +0800
+From: "Zhangbo (Oscar)" <oscar.zhangbo@huawei.com>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Thread-Topic: [PATCH v2] pcie: fix device unplug timeout
+Thread-Index: AdVBOa+k2REPW1pPTHWvtO0bYVI0tA==
+Date: Tue, 23 Jul 2019 09:33:43 +0000
+Message-ID: <0259E1C966E8C54AA93AA2B1240828E672DF3D45@dggeml509-mbx.china.huawei.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.177.17.158]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <20190723090718.14590-1-sgarzare@redhat.com>
- <20190723090718.14590-2-sgarzare@redhat.com>
-In-Reply-To: <20190723090718.14590-2-sgarzare@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 23 Jul 2019 10:32:34 +0100
-Message-ID: <CAFEAcA_KspUxk75hR4YV444tj8-bQKOJ_4eq+aPD-idZ12Lzwg@mail.gmail.com>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::341
-Subject: Re: [Qemu-devel] [PATCH 1/2] elf-ops.h: Map into memory the ELF to
- load
+X-CFilter-Loop: Reflected
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 45.249.212.188
+Subject: [Qemu-devel] [PATCH v2] pcie: fix device unplug timeout
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,87 +71,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Sergio Lopez <slp@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Julio Montes <julio.montes@intel.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: fangying <fangying1@huawei.com>, "dengkai \(A\)" <dengkai1@huawei.com>,
+ "philmd@redhat.com" <philmd@redhat.com>,
+ "limingwang \(A\)" <limingwang@huawei.com>, "mst@redhat.com" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 23 Jul 2019 at 10:08, Stefano Garzarella <sgarzare@redhat.com> wrote:
->
-> In order to reduce the memory footprint we map into memory
-> the ELF to load using g_mapped_file_new_from_fd() instead of
-> reading each sections. In this way we can share the ELF pages
-> between multiple instances of QEMU.
->
-> Suggested-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-> ---
->  include/hw/elf_ops.h | 59 ++++++++++++++++++++++----------------------
->  1 file changed, 30 insertions(+), 29 deletions(-)
->
-> diff --git a/include/hw/elf_ops.h b/include/hw/elf_ops.h
-> index 690f9238c8..69ce8dea74 100644
-> --- a/include/hw/elf_ops.h
-> +++ b/include/hw/elf_ops.h
-> @@ -323,8 +323,9 @@ static int glue(load_elf, SZ)(const char *name, int fd,
->      struct elfhdr ehdr;
->      struct elf_phdr *phdr = NULL, *ph;
->      int size, i, total_size;
-> -    elf_word mem_size, file_size;
-> +    elf_word mem_size, file_size, data_offset;
->      uint64_t addr, low = (uint64_t)-1, high = 0;
-> +    GMappedFile *gmf = NULL;
->      uint8_t *data = NULL;
->      char label[128];
->      int ret = ELF_LOAD_FAILED;
-> @@ -409,22 +410,26 @@ static int glue(load_elf, SZ)(const char *name, int fd,
->          }
->      }
->
-> +    gmf = g_mapped_file_new_from_fd(fd, false, NULL);
-
-Hmm. Here we pass 'false' for the writable argument,
-meaning we promise not to modify the mapped buffer...
-
-> +    if (!gmf) {
-> +        goto fail;
-> +    }
-> +
->      total_size = 0;
->      for(i = 0; i < ehdr.e_phnum; i++) {
->          ph = &phdr[i];
->          if (ph->p_type == PT_LOAD) {
->              mem_size = ph->p_memsz; /* Size of the ROM */
->              file_size = ph->p_filesz; /* Size of the allocated data */
-> -            data = g_malloc0(file_size);
-> -            if (ph->p_filesz > 0) {
-> -                if (lseek(fd, ph->p_offset, SEEK_SET) < 0) {
-> -                    goto fail;
-> -                }
-> -                if (read(fd, data, file_size) != file_size) {
-> -                    goto fail;
-> -                }
-> +            data_offset = ph->p_offset; /* Offset where the data is located */
-> +
-> +            if (g_mapped_file_get_length(gmf) < file_size + data_offset) {
-> +                goto fail;
->              }
->
-> +            data = (uint8_t *)g_mapped_file_get_contents(gmf);
-> +            data += data_offset;
-
-...but here we set up the 'data' pointer from the mapped contents,
-and then in following code we will write to it in some situations --
-look at the "if (data_swab)" case or the call to elf_reloc if we
-have a translate_fn, for instance.
-
-(We can't get out of this by just passing writable=true, because
-we definitely don't want to be writing back to the underlying file.)
-
-thanks
--- PMM
+SWYgdGhlIGxpbnV4IGtlcm5lbCBvbmx5IHJlY2VpdmVzIGFuIEFCUCBldmVudCBkdXJpbmcgcGNp
+ZSB1bnBsdWcsIGl0IHdpbGwgc2xlZXAgNXMgDQp0byBleHBlY3QgYSBQREMgZXZlbnQsIHdoaWNo
+IHdpbGwgY2F1c2UgZGV2aWNlIHVucGx1ZyB0aW1lb3V0Lg0KDQpJbiB0aGUgbWVhbndoaWxlLCBp
+ZiB0aGUga2VybmVsIG9ubHkgcmVjZWl2ZXMgYSBQREMgZXZlbnQgZHVyaW5nIHRoZSB1bnBsdWcs
+IGl0DQp3aWxsIHdhaXQgZm9yIGF0IGxlYXN0IDEgc2Vjb25kIGJlZm9yZSBjaGVja2luZyBjYXJk
+IHByZXNlbnQgYXMgZGF0YSBsaW5rIGxheWVyDQpzdGF0ZSBjaGFuZ2VkIChsaW5rIGRvd24pIGV2
+ZW50IHJlcG9ydGVkIHByaW9yIHRvIHByZXNlbmNlIGRldGVjdCBjaGFuZ2VkDQooY2FyZCBpcyBu
+b3QgcHJlc2VudCkuDQoNClRoZXJlZm9yZSB3ZSBjYW4gc2VuZCBib3RoIEFCUCBhbmQgUERDIGV2
+ZW50cyB0byB0aGUga2VybmVsIGluIHVucGx1ZyBwcm9jZXNzDQp0byBhdm9pZCB1bnBsdWcgdGlt
+ZW91dC4NCg0KU2lnbmVkLW9mZi1ieTogTGkgTWluZ3dhbmcgPGxpbWluZ3dhbmdAaHVhd2VpLmNv
+bT4NClNpZ25lZC1vZmYtYnk6IEZhbmcgWWluZyA8ZmFuZ3lpbmcxQGh1YXdlaS5jb20+DQpTaWdu
+ZWQtb2ZmLWJ5OiBaaGFuZyBCbyA8b3NjYXIuemhhbmdib0BodWF3ZWkuY29tPg0KLS0tDQogaHcv
+cGNpL3BjaWUuYyAgICAgICAgIHwgOCArKy0tLS0tLQ0KIGluY2x1ZGUvaHcvcGNpL3BjaWUuaCB8
+IDEgLQ0KIDIgZmlsZXMgY2hhbmdlZCwgMiBpbnNlcnRpb25zKCspLCA3IGRlbGV0aW9ucygtKQ0K
+DQpkaWZmIC0tZ2l0IGEvaHcvcGNpL3BjaWUuYyBiL2h3L3BjaS9wY2llLmMNCmluZGV4IDE3NGYz
+OTIuLmE4MDBmMjMgMTAwNjQ0DQotLS0gYS9ody9wY2kvcGNpZS5jDQorKysgYi9ody9wY2kvcGNp
+ZS5jDQpAQCAtNDg1LDcgKzQ4NSw4IEBAIHZvaWQgcGNpZV9jYXBfc2xvdF91bnBsdWdfcmVxdWVz
+dF9jYihIb3RwbHVnSGFuZGxlciAqaG90cGx1Z19kZXYsDQogICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgIFBDSV9FWFBfTE5LU1RBX0RMTExBKTsNCiAgICAgfQ0KIA0KLSAgICBw
+Y2llX2NhcF9zbG90X3B1c2hfYXR0ZW50aW9uX2J1dHRvbihQQ0lfREVWSUNFKGhvdHBsdWdfZGV2
+KSk7DQorICAgIHBjaWVfY2FwX3Nsb3RfZXZlbnQoUENJX0RFVklDRShob3RwbHVnX2RldiksDQor
+ICAgICAgICAgICAgICAgICAgICAgICAgUENJX0VYUF9IUF9FVl9QREMgfCBQQ0lfRVhQX0hQX0VW
+X0FCUCk7DQogfQ0KIA0KIC8qIHBjaSBleHByZXNzIHNsb3QgZm9yIHBjaSBleHByZXNzIHJvb3Qv
+ZG93bnN0cmVhbSBwb3J0DQpAQCAtNzAxLDExICs3MDIsNiBAQCBpbnQgcGNpZV9jYXBfc2xvdF9w
+b3N0X2xvYWQodm9pZCAqb3BhcXVlLCBpbnQgdmVyc2lvbl9pZCkNCiAgICAgcmV0dXJuIDA7DQog
+fQ0KIA0KLXZvaWQgcGNpZV9jYXBfc2xvdF9wdXNoX2F0dGVudGlvbl9idXR0b24oUENJRGV2aWNl
+ICpkZXYpDQotew0KLSAgICBwY2llX2NhcF9zbG90X2V2ZW50KGRldiwgUENJX0VYUF9IUF9FVl9B
+QlApOw0KLX0NCi0NCiAvKiByb290IGNvbnRyb2wvY2FwYWJpbGl0aWVzL3N0YXR1cy4gUE1FIGlz
+bid0IGVtdWxhdGVkIGZvciBub3cgKi8NCiB2b2lkIHBjaWVfY2FwX3Jvb3RfaW5pdChQQ0lEZXZp
+Y2UgKmRldikNCiB7DQpkaWZmIC0tZ2l0IGEvaW5jbHVkZS9ody9wY2kvcGNpZS5oIGIvaW5jbHVk
+ZS9ody9wY2kvcGNpZS5oDQppbmRleCA4Y2YzMzYxLi4wOTc1YTU0IDEwMDY0NA0KLS0tIGEvaW5j
+bHVkZS9ody9wY2kvcGNpZS5oDQorKysgYi9pbmNsdWRlL2h3L3BjaS9wY2llLmgNCkBAIC0xMTIs
+NyArMTEyLDYgQEAgdm9pZCBwY2llX2NhcF9zbG90X3dyaXRlX2NvbmZpZyhQQ0lEZXZpY2UgKmRl
+diwNCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHVpbnQxNl90IG9sZF9zbHRfY3Rs
+LCB1aW50MTZfdCBvbGRfc2x0X3N0YSwNCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+IHVpbnQzMl90IGFkZHIsIHVpbnQzMl90IHZhbCwgaW50IGxlbik7DQogaW50IHBjaWVfY2FwX3Ns
+b3RfcG9zdF9sb2FkKHZvaWQgKm9wYXF1ZSwgaW50IHZlcnNpb25faWQpOw0KLXZvaWQgcGNpZV9j
+YXBfc2xvdF9wdXNoX2F0dGVudGlvbl9idXR0b24oUENJRGV2aWNlICpkZXYpOw0KIA0KIHZvaWQg
+cGNpZV9jYXBfcm9vdF9pbml0KFBDSURldmljZSAqZGV2KTsNCiB2b2lkIHBjaWVfY2FwX3Jvb3Rf
+cmVzZXQoUENJRGV2aWNlICpkZXYpOw0KLS0gDQoxLjguMy4xDQo=
 
