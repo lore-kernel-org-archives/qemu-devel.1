@@ -6,94 +6,93 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9FF5C76186
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 17:02:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C889C76186
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 17:02:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B0C822239F
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 17:02:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0C822239F
+	by mail.kernel.org (Postfix) with ESMTPS id 28B542239F
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 17:02:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28B542239F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45780 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45782 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hpyAs-0005Z5-CC
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jul 2019 13:02:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42301)
+	id 1hpyAv-0005fi-FN
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jul 2019 13:02:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42339)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mdroth@linux.vnet.ibm.com>) id 1hpyAD-00041H-9G
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 13:01:22 -0400
+ (envelope-from <mdroth@linux.vnet.ibm.com>) id 1hpyAE-00041K-Ag
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 13:01:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mdroth@linux.vnet.ibm.com>) id 1hpyAC-00054m-33
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 13:01:21 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:52914
- helo=mx0a-001b2d01.pphosted.com)
+ (envelope-from <mdroth@linux.vnet.ibm.com>) id 1hpyAC-00055V-U5
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 13:01:22 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:35064)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
- id 1hpyAB-000540-UK
+ id 1hpyAC-00054q-Lx
  for qemu-devel@nongnu.org; Tue, 23 Jul 2019 13:01:20 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x6NGkgNh133352
- for <qemu-devel@nongnu.org>; Tue, 23 Jul 2019 13:01:17 -0400
-Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2tx60rrnek-1
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ x6NGkhp3127141
+ for <qemu-devel@nongnu.org>; Tue, 23 Jul 2019 13:01:19 -0400
+Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2tx60rgmq2-1
  (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Tue, 23 Jul 2019 13:01:17 -0400
+ for <qemu-devel@nongnu.org>; Tue, 23 Jul 2019 13:01:19 -0400
 Received: from localhost
- by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
  Violators will be prosecuted
  for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
- Tue, 23 Jul 2019 18:01:16 +0100
-Received: from b03cxnp08028.gho.boulder.ibm.com (9.17.130.20)
- by e33.co.us.ibm.com (192.168.1.133) with IBM ESMTP SMTP Gateway: Authorized
+ Tue, 23 Jul 2019 18:01:19 +0100
+Received: from b03cxnp07029.gho.boulder.ibm.com (9.17.130.16)
+ by e31.co.us.ibm.com (192.168.1.131) with IBM ESMTP SMTP Gateway: Authorized
  Use Only! Violators will be prosecuted; 
  (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Tue, 23 Jul 2019 18:01:15 +0100
+ Tue, 23 Jul 2019 18:01:17 +0100
 Received: from b03ledav005.gho.boulder.ibm.com
  (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
- by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- x6NH1ElR62390588
+ by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ x6NH1GLi40108418
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 23 Jul 2019 17:01:14 GMT
+ Tue, 23 Jul 2019 17:01:16 GMT
 Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 65992BE051;
- Tue, 23 Jul 2019 17:01:14 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 2BA41BE053;
+ Tue, 23 Jul 2019 17:01:16 +0000 (GMT)
 Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 564C9BE058;
- Tue, 23 Jul 2019 17:01:14 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 2039FBE05D;
+ Tue, 23 Jul 2019 17:01:16 +0000 (GMT)
 Received: from localhost (unknown [9.53.179.212])
  by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTP;
- Tue, 23 Jul 2019 17:01:14 +0000 (GMT)
+ Tue, 23 Jul 2019 17:01:16 +0000 (GMT)
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
 To: qemu-devel@nongnu.org
-Date: Tue, 23 Jul 2019 12:00:37 -0500
+Date: Tue, 23 Jul 2019 12:00:40 -0500
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190723170104.4327-1-mdroth@linux.vnet.ibm.com>
 References: <20190723170104.4327-1-mdroth@linux.vnet.ibm.com>
 X-TM-AS-GCONF: 00
-x-cbid: 19072317-0036-0000-0000-00000ADD79EA
+x-cbid: 19072317-8235-0000-0000-00000EBD2A9D
 X-IBM-SpamModules-Scores: 
 X-IBM-SpamModules-Versions: BY=3.00011482; HX=3.00000242; KW=3.00000007;
  PH=3.00000004; SC=3.00000287; SDB=6.01236375; UDB=6.00651638; IPR=6.01017731; 
- MB=3.00027856; MTD=3.00000008; XFM=3.00000015; UTC=2019-07-23 17:01:16
+ MB=3.00027856; MTD=3.00000008; XFM=3.00000015; UTC=2019-07-23 17:01:18
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19072317-0037-0000-0000-00004CB756D0
-Message-Id: <20190723170104.4327-10-mdroth@linux.vnet.ibm.com>
+x-cbparentid: 19072317-8236-0000-0000-000046842498
+Message-Id: <20190723170104.4327-13-mdroth@linux.vnet.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
  definitions=2019-07-23_07:, , signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
  priorityscore=1501
- malwarescore=0 suspectscore=3 phishscore=0 bulkscore=0 spamscore=0
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
  clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
  mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
  scancount=1 engine=8.0.1-1906280000 definitions=main-1907230169
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
-Subject: [Qemu-devel] [PATCH 09/36] exec.c: Don't reallocate IOMMUNotifiers
- that are in use
+X-Received-From: 148.163.156.1
+Subject: [Qemu-devel] [PATCH 12/36] block: Fix invalidate_cache error path
+ for parent activation
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,79 +104,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-stable@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-stable@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Peter Maydell <peter.maydell@linaro.org>
+From: Kevin Wolf <kwolf@redhat.com>
 
-The tcg_register_iommu_notifier() code has a GArray of
-TCGIOMMUNotifier structs which it has registered by passing
-memory_region_register_iommu_notifier() a pointer to the embedded
-IOMMUNotifier field. Unfortunately, if we need to enlarge the
-array via g_array_set_size() this can cause a realloc(), which
-invalidates the pointer that memory_region_register_iommu_notifier()
-put into the MemoryRegion's iommu_notify list. This can result
-in segfaults.
+bdrv_co_invalidate_cache() clears the BDRV_O_INACTIVE flag before
+actually activating a node so that the correct permissions etc. are
+taken. In case of errors, the flag must be restored so that the next
+call to bdrv_co_invalidate_cache() retries activation.
 
-Switch the GArray to holding pointers to the TCGIOMMUNotifier
-structs, so that we can individually allocate and free them.
+Restoring the flag was missing in the error path for a failed
+parent->role->activate() call. The consequence is that this attempt to
+activate all images correctly fails because we still set errp, however
+on the next attempt BDRV_O_INACTIVE is already clear, so we return
+success without actually retrying the failed action.
+
+An example where this is observable in practice is migration to a QEMU
+instance that has a raw format block node attached to a guest device
+with share-rw=off (the default) while another process holds
+BLK_PERM_WRITE for the same image. In this case, all activation steps
+before parent->role->activate() succeed because raw can tolerate other
+writers to the image. Only the parent callback (in particular
+blk_root_activate()) tries to implement the share-rw=on property and
+requests exclusive write permissions. This fails when the migration
+completes and correctly displays an error. However, a manual 'cont' will
+incorrectly resume the VM without calling blk_root_activate() again.
+
+This case is described in more detail in the following bug report:
+https://bugzilla.redhat.com/show_bug.cgi?id=1531888
+
+Fix this by correctly restoring the BDRV_O_INACTIVE flag in the error
+path.
 
 Cc: qemu-stable@nongnu.org
-Fixes: 1f871c5e6b0f30644a60a ("exec.c: Handle IOMMUs in address_space_translate_for_iotlb()")
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20190128174241.5860-1-peter.maydell@linaro.org
-(cherry picked from commit 5601be3b01d73e21c09331599e2ce62df016ff94)
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Tested-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+(cherry picked from commit 78fc3b3a26c145eebcdee992988644974b243a74)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- exec.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+ block.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/exec.c b/exec.c
-index bb6170dbff..df5571eb3d 100644
---- a/exec.c
-+++ b/exec.c
-@@ -664,7 +664,7 @@ static void tcg_register_iommu_notifier(CPUState *cpu,
-     int i;
- 
-     for (i = 0; i < cpu->iommu_notifiers->len; i++) {
--        notifier = &g_array_index(cpu->iommu_notifiers, TCGIOMMUNotifier, i);
-+        notifier = g_array_index(cpu->iommu_notifiers, TCGIOMMUNotifier *, i);
-         if (notifier->mr == mr && notifier->iommu_idx == iommu_idx) {
-             break;
-         }
-@@ -672,7 +672,8 @@ static void tcg_register_iommu_notifier(CPUState *cpu,
-     if (i == cpu->iommu_notifiers->len) {
-         /* Not found, add a new entry at the end of the array */
-         cpu->iommu_notifiers = g_array_set_size(cpu->iommu_notifiers, i + 1);
--        notifier = &g_array_index(cpu->iommu_notifiers, TCGIOMMUNotifier, i);
-+        notifier = g_new0(TCGIOMMUNotifier, 1);
-+        g_array_index(cpu->iommu_notifiers, TCGIOMMUNotifier *, i) = notifier;
- 
-         notifier->mr = mr;
-         notifier->iommu_idx = iommu_idx;
-@@ -704,8 +705,9 @@ static void tcg_iommu_free_notifier_list(CPUState *cpu)
-     TCGIOMMUNotifier *notifier;
- 
-     for (i = 0; i < cpu->iommu_notifiers->len; i++) {
--        notifier = &g_array_index(cpu->iommu_notifiers, TCGIOMMUNotifier, i);
-+        notifier = g_array_index(cpu->iommu_notifiers, TCGIOMMUNotifier *, i);
-         memory_region_unregister_iommu_notifier(notifier->mr, &notifier->n);
-+        g_free(notifier);
-     }
-     g_array_free(cpu->iommu_notifiers, true);
- }
-@@ -975,7 +977,7 @@ void cpu_exec_realizefn(CPUState *cpu, Error **errp)
-         vmstate_register(NULL, cpu->cpu_index, cc->vmsd, cpu);
-     }
- 
--    cpu->iommu_notifiers = g_array_new(false, true, sizeof(TCGIOMMUNotifier));
-+    cpu->iommu_notifiers = g_array_new(false, true, sizeof(TCGIOMMUNotifier *));
- #endif
- }
- 
+diff --git a/block.c b/block.c
+index 811239ca23..1ec4512d1e 100644
+--- a/block.c
++++ b/block.c
+@@ -4553,6 +4553,7 @@ static void coroutine_fn bdrv_co_invalidate_cache(BlockDriverState *bs,
+         if (parent->role->activate) {
+             parent->role->activate(parent, &local_err);
+             if (local_err) {
++                bs->open_flags |= BDRV_O_INACTIVE;
+                 error_propagate(errp, local_err);
+                 return;
+             }
 -- 
 2.17.1
 
