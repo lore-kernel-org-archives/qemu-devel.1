@@ -2,89 +2,85 @@ Return-Path: <SRS0=3Ld+=VU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,URIBL_SBL,URIBL_SBL_A,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A820C7618E
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 13:01:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21CB9C7618B
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 13:02:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 692D421670
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 13:01:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DF2FE21670
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 13:02:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KJAJGF35"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 692D421670
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JBbRJf7u"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF2FE21670
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42266 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42280 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hpuPq-0008MP-Jg
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jul 2019 09:01:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50502)
+	id 1hpuQr-0000uJ-22
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jul 2019 09:02:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50834)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <stefanha@gmail.com>) id 1hpuPd-0007v3-EK
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 09:01:02 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hpuQe-0000Py-EX
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 09:02:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@gmail.com>) id 1hpuPc-0006UB-92
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 09:01:01 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:44556)
+ (envelope-from <peter.maydell@linaro.org>) id 1hpuQd-0006zc-GY
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 09:02:04 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:45151)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1hpuPb-0006Tp-W1
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 09:01:00 -0400
-Received: by mail-wr1-x441.google.com with SMTP id p17so43056692wrf.11
- for <qemu-devel@nongnu.org>; Tue, 23 Jul 2019 06:00:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to:user-agent;
- bh=95OTb8rTZeEmQuv8TsyVDZnyZ0+X4W/S9AoqgSsNcQI=;
- b=KJAJGF35+Xk22wR5nnsu42qkVWJGql6gZfqkTkDqZaD7XM5yhTYe1njcKxVHHReXas
- PNR7Hu+PRJ5mfOiW64Mbh4FH0CWby4BO/5FMaT6PdRCL56hP/rCSHEtEPdSsoHlgaM+Y
- tupUiapRxdeWEOpSMGF6wri5N1S0AmqsiMRkRe7Oe4o2Ihnj3kcXvU0IO1MBVAJnoflL
- w9gL0NTGe/Cu8vNExd/N5R230Htl3blFIXKPq3BOQK8qn3HObn2G+0uHeW0RJjZyMar1
- f3sw8VwD5DYUIsjlMhFdkkHLOs+7bhVNTd0Q56Tqmvx23HtVtM/IeOBbqDTTKZi2gRg4
- Q1aQ==
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hpuQd-0006y9-2q
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 09:02:03 -0400
+Received: by mail-ot1-x344.google.com with SMTP id x21so5462850otq.12
+ for <qemu-devel@nongnu.org>; Tue, 23 Jul 2019 06:02:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=hHIMmXm2SuvfFImb+GQbXb2CtHrx3LFY99CRFUUEgUA=;
+ b=JBbRJf7u0f3+1VA79hnNgG+KTg22Rc74SdjF0i80VYLaaOJ+cys7uF0VOXIiDdlaO0
+ oeQtOvX3GdM9ZzFinhcmNvXwporGPeM4dS65ym/qFog9lzKOpX+oVY6GzI9k6s0bv/xa
+ 7MiW9Xchiv1A7VOuYOy0cYT7IphQ/rIqYdVCBlo0QXWcBRG/qQMivocpnZLt9ZaZeIFE
+ tLbsiYj7Tdw2D1dI8rSd7dMwI9TS/p5WqogiIcCSyhk3pJ8SsRkXODbNmjLZ8WJb9e3X
+ +dv6bgJ8tivqseLI/UXybmK06rDSW5CJnzmoGHHLF5N1wcEfKXv6QMN6TJNH3awzTqsq
+ XfDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=95OTb8rTZeEmQuv8TsyVDZnyZ0+X4W/S9AoqgSsNcQI=;
- b=NHt2/IPZM5FNozqNqU4LWNp5FtEDLSBIWv5kJTP9UQmCQQgCjqNhH6Kbd1L8LfZGMK
- Sbr5ho5UV38XWuup4YxmrmRjhYXKObQzWCk2mfU2O2QIuQVd10UihQ81BUoaPsMH3MqT
- XXFfkjfk89EdBv4dfR8qQWaWMGkDqdOqnK09jlauQjVC/x7JHFiPICG7EiOGAKNuUQE1
- O7dWy2cSMzQ9FnW+rK4tHlooYEPKWTBB6aVKWHBWarHaYz3zqW63cbFN+Zlf0mO7OAJa
- WaYUyoTpRVMVO1MK8rNEC2EWvvrL4KBW25DGdVwweeiFxCwIuieZCqNbgrbaZYcmyCOJ
- L8DA==
-X-Gm-Message-State: APjAAAWMGyhd9xgfeWyht/mHcFZyIPoyiFCfsrmF6rDmt72XLjqgmAXS
- +TlnZJ9kbA4rc1oXobboQS8=
-X-Google-Smtp-Source: APXvYqwwwdLH8G9gea0UZ+IHlj/IGhQg2BwE/SXXQM4KEdfVKzUeHQwN+lMFe2QQJ7xsz2Uf8FyOTQ==
-X-Received: by 2002:a5d:4e90:: with SMTP id e16mr26465299wru.339.1563886858938; 
- Tue, 23 Jul 2019 06:00:58 -0700 (PDT)
-Received: from localhost ([51.15.41.238])
- by smtp.gmail.com with ESMTPSA id t185sm36342736wma.11.2019.07.23.06.00.57
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Tue, 23 Jul 2019 06:00:58 -0700 (PDT)
-Date: Tue, 23 Jul 2019 14:00:56 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: P J P <ppandit@redhat.com>
-Message-ID: <20190723130056.GB5445@stefanha-x1.localdomain>
-References: <20190723104754.29324-1-ppandit@redhat.com>
- <20190723104754.29324-3-ppandit@redhat.com>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=hHIMmXm2SuvfFImb+GQbXb2CtHrx3LFY99CRFUUEgUA=;
+ b=t9JgP96kAogSFnx/cdh6GJM0727eAJorkrvhkVZMpKgyQWVqppul5hsTLMrdpRxg4E
+ UAGcReRcC9WBKY1cz2ylLDLSy3zTtakuViCU1O2W62xGROHzo9pihWstSlxovidoIz4E
+ 0uJTTKrhFsl4TKohlx8km9bLNad2NyL34XaJzraUFimM+OVogB4tuKVCNjnMUoluvDyu
+ 7xiedgwfvi/csfv98iQ0B/Wi1qcmvsMaD9PDSXTh/M9piIAmKyZPTrCmS86awhxLoKhS
+ IEbB5sn+pFC42NXPU91IB6+F/8BXpREPOoU4TbVyfMo82e9xjwpuVXLH8yeM/Uh48FRK
+ 71KQ==
+X-Gm-Message-State: APjAAAWioOQOZxlSstYfDAZyrXANQjZ75VVCZP4/sfc3wTb+iy+0k2AS
+ sWcDjZWgsDLOZIL6Fi3daIJaEnBcgRQvRlCQzeuvbw==
+X-Google-Smtp-Source: APXvYqzrXHmyB+MaiKuhckVt4Rr0BN03xdjrSogbW2piGb2ONbDwRsacuEeKIdkurSjL8M4nYwy70GgDenInf+ABsjo=
+X-Received: by 2002:a9d:6a0f:: with SMTP id g15mr26001884otn.135.1563886921669; 
+ Tue, 23 Jul 2019 06:02:01 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="SkvwRMAIpAhPCcCJ"
-Content-Disposition: inline
-In-Reply-To: <20190723104754.29324-3-ppandit@redhat.com>
-User-Agent: Mutt/1.12.0 (2019-05-25)
+References: <20190723103612.5600-1-alex.bennee@linaro.org>
+ <CAFEAcA_P_Bk0bNGCW+TwhQGCeqM-XZd3OudKZ4tu0fNThFH5ww@mail.gmail.com>
+ <87imrt0y9a.fsf@linaro.org> <451b91c6-3a4d-afb4-30f1-595fcc7e5f65@redhat.com>
+ <CAFEAcA_O4kegKUsSfzQhBp_AnV_uD1S=F4pm0V0nG6XQ2Dyseg@mail.gmail.com>
+ <87ftmw29i2.fsf@linaro.org>
+In-Reply-To: <87ftmw29i2.fsf@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 23 Jul 2019 14:01:50 +0100
+Message-ID: <CAFEAcA9nmmoHD3Sa2bknbuDW+Qv-mJ8f=YDNFsuMSV0KqY3_Yg@mail.gmail.com>
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::441
-Subject: Re: [Qemu-devel] [PATCH v4 2/3] qemu-bridge-helper: move repeating
- code in parse_acl_file
+X-Received-From: 2607:f8b0:4864:20::344
+Subject: Re: [Qemu-devel] [PULL for 4.1-rc2 00/23] testing updates (green
+ CI!)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,51 +92,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Daniel P =?iso-8859-1?Q?=2E_Berrang=E9?= <berrange@redhat.com>,
- Jason Wang <jasowang@redhat.com>, Li Qiang <liq3ea@gmail.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Prasad J Pandit <pjp@fedoraproject.org>
+Cc: Thomas Huth <thuth@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Tue, 23 Jul 2019 at 13:58, Alex Benn=C3=A9e <alex.bennee@linaro.org> wro=
+te:
+>
+>
+> Peter Maydell <peter.maydell@linaro.org> writes:
+>
+> > On Tue, 23 Jul 2019 at 13:16, Philippe Mathieu-Daud=C3=A9 <philmd@redha=
+t.com> wrote:
+> >>
+> >> On 7/23/19 1:46 PM, Alex Benn=C3=A9e wrote:
+> >> >> I see Thomas Huth has a patch on-list for that, but this
+> >> >> didn't manifest as a problem before this pullreq.
+> >> >
+> >> > OK, I'll add it and rebuild the PR.
+> >>
+> >> But Thomas got another error later...
+> >
+> > If we're not sure what all the needed fixes are we
+> > should probably just drop the change that starts
+> > running the iotests under 'make check'. Otherwise this
+> > pullreq is going to miss rc2, and it's too big to go into rc3.
+>
+> I'm just double checking now - it does seem OpenBSD is very slow even
+> with 18 cores assigned.
 
---SkvwRMAIpAhPCcCJ
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+We should avoid enabling "very slow" tests in make check too...
 
-On Tue, Jul 23, 2019 at 04:17:53PM +0530, P J P wrote:
-> From: Prasad J Pandit <pjp@fedoraproject.org>
->=20
-> Move repeating error handling sequence in parse_acl_file routine
-> to an 'err' label.
->=20
-> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
-> ---
->  qemu-bridge-helper.c | 19 +++++++++----------
->  1 file changed, 9 insertions(+), 10 deletions(-)
->=20
-> Reviewed v3:
->   -> https://lists.nongnu.org/archive/html/qemu-devel/2019-07/msg00247.ht=
-ml
-
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-
---SkvwRMAIpAhPCcCJ
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl03BQgACgkQnKSrs4Gr
-c8giPAf/V3oCaXj4Y+Yqw0zFb3ez6E+WspwQsU+g+5AYg2v+7HLo/p2XfRQ2BNNb
-cHrcr9crwCBD1+xVplFJ2sFpxniKp8qkoma/oGtrozw44R5AP9pWK9Jyt6kIt+XV
-SaWKh/QaFmmJNSMpfq9eqL1nwHSvKnHW/yQIGVuWbvd9V8Tx+g67MCpeJahxzGfx
-1tSVtRWxnupalV6DpbYAkjIQxT+tMjvwhw+V4NvBVVMa04j47CB8pgciw3bxd5H5
-H8apMn9ktJNXh1qcwMzP1hSQd6VbRkpONmrouxVIP04FUCld5NaAQU6MsW5UyF+r
-/TN5+4FiU9RpDAuanvHl6TWwsTXMMA==
-=6Dnw
------END PGP SIGNATURE-----
-
---SkvwRMAIpAhPCcCJ--
+thanks
+-- PMM
 
