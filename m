@@ -6,87 +6,72 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80ADCC7618B
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 09:41:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3021BC7618B
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 09:42:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4E1C82171F
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 09:41:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E1C82171F
+	by mail.kernel.org (Postfix) with ESMTPS id 083132171F
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 09:42:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 083132171F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40640 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40646 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hprIP-0004sI-If
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jul 2019 05:41:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49359)
+	id 1hprJy-0005xH-8w
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jul 2019 05:42:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49728)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hprIF-0004QW-Dt
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 05:41:12 -0400
+ (envelope-from <sgarzare@redhat.com>) id 1hprJn-0005Ym-HU
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 05:42:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hprIE-0003tR-9s
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 05:41:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43470)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hprIB-0003qv-Os; Tue, 23 Jul 2019 05:41:08 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 9DFE4308FBAC;
- Tue, 23 Jul 2019 09:41:06 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.40.205.118])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 220155D9C5;
- Tue, 23 Jul 2019 09:41:04 +0000 (UTC)
-To: Kevin Wolf <kwolf@redhat.com>
-References: <20190722133054.21781-1-mreitz@redhat.com>
- <20190722133054.21781-3-mreitz@redhat.com>
- <20190723085236.GA5296@localhost.localdomain>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <91179292-29aa-4d00-78ac-a8861fd5f308@redhat.com>
-Date: Tue, 23 Jul 2019 11:41:02 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+ (envelope-from <sgarzare@redhat.com>) id 1hprJm-0004zQ-4T
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 05:42:47 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:37151)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1hprJl-0004yc-UB
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 05:42:46 -0400
+Received: by mail-wr1-f66.google.com with SMTP id n9so17350619wrr.4
+ for <qemu-devel@nongnu.org>; Tue, 23 Jul 2019 02:42:45 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to:user-agent;
+ bh=3DlPkvS6tIin8n6njgEuXenZT5Cy4sNWw1kBNt1gLGI=;
+ b=AJuKI/J4iXjZdoURzW6diOZESRJ2RtuGVeiZ15Gmz5Cu6Az3Q21MZDRLYbPB085/7C
+ FfLJk11+PQK9CfmlUeq/XWN8qdOdaVjA8BLsbyRw8HzbQzbBXYHzopd4GkvwK3p2UGOw
+ BNYE3MZXuiL2vBXaq30tKwOe/hmi8DTxuaLLgwQorMfofohyEfitf1MhaGLpPzBGGqvB
+ 77mdpxl0ytVqpGTNRKj7yrsEhv2BHENvOvFvUrUuzby4j9HVgf2KvJ8ZtzgpIiFL2ec6
+ 0RLsEIrmIMP1RhNBxqKc63fgcYlWqmTdFn6+7b2+8qCmRNHqJ78mPXbS+T7+BBPtqDiK
+ edYg==
+X-Gm-Message-State: APjAAAUFYaZ/hG4s+5WW8BNK+mMJ9vfhW5x3kQw/3fJM+bT9qqsGM8CK
+ 8bTXzmc3dqGsqWRwTZAjPf2JoA==
+X-Google-Smtp-Source: APXvYqx8Ga18z6KsfjT2zcpMhGhCRXXdSlSP4MVRI02lPvKfTDcjUPjwVazGSpXASBj//hAEZ9Gvbw==
+X-Received: by 2002:adf:c594:: with SMTP id m20mr52930912wrg.126.1563874964082; 
+ Tue, 23 Jul 2019 02:42:44 -0700 (PDT)
+Received: from steredhat (host122-201-dynamic.13-79-r.retail.telecomitalia.it.
+ [79.13.201.122])
+ by smtp.gmail.com with ESMTPSA id 2sm54621495wrn.29.2019.07.23.02.42.42
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Tue, 23 Jul 2019 02:42:43 -0700 (PDT)
+Date: Tue, 23 Jul 2019 11:42:41 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Message-ID: <20190723094241.7znxmk3wa6gti6tr@steredhat>
+References: <20190723090718.14590-1-sgarzare@redhat.com>
+ <20190723090718.14590-2-sgarzare@redhat.com>
+ <CAFEAcA_KspUxk75hR4YV444tj8-bQKOJ_4eq+aPD-idZ12Lzwg@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20190723085236.GA5296@localhost.localdomain>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="BnBSMALvW9r0LYlFxSwDDOztUX0t09RR7"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.43]); Tue, 23 Jul 2019 09:41:06 +0000 (UTC)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA_KspUxk75hR4YV444tj8-bQKOJ_4eq+aPD-idZ12Lzwg@mail.gmail.com>
+User-Agent: NeoMutt/20180716
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH for-4.1 2/2] block: Only the main loop can
- change AioContexts
+ [fuzzy]
+X-Received-From: 209.85.221.66
+Subject: Re: [Qemu-devel] [PATCH 1/2] elf-ops.h: Map into memory the ELF to
+ load
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,127 +83,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Sergio Lopez <slp@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Julio Montes <julio.montes@intel.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---BnBSMALvW9r0LYlFxSwDDOztUX0t09RR7
-Content-Type: multipart/mixed; boundary="YWea4kFR5mnMn4SVO2s9Wmdcy2MgDnQFM";
- protected-headers="v1"
-From: Max Reitz <mreitz@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org
-Message-ID: <91179292-29aa-4d00-78ac-a8861fd5f308@redhat.com>
-Subject: Re: [PATCH for-4.1 2/2] block: Only the main loop can change
- AioContexts
-References: <20190722133054.21781-1-mreitz@redhat.com>
- <20190722133054.21781-3-mreitz@redhat.com>
- <20190723085236.GA5296@localhost.localdomain>
-In-Reply-To: <20190723085236.GA5296@localhost.localdomain>
+On Tue, Jul 23, 2019 at 10:32:34AM +0100, Peter Maydell wrote:
+> On Tue, 23 Jul 2019 at 10:08, Stefano Garzarella <sgarzare@redhat.com> wrote:
+> >
+> > In order to reduce the memory footprint we map into memory
+> > the ELF to load using g_mapped_file_new_from_fd() instead of
+> > reading each sections. In this way we can share the ELF pages
+> > between multiple instances of QEMU.
+> >
+> > Suggested-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+> > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> > ---
+> >  include/hw/elf_ops.h | 59 ++++++++++++++++++++++----------------------
+> >  1 file changed, 30 insertions(+), 29 deletions(-)
+> >
+> > diff --git a/include/hw/elf_ops.h b/include/hw/elf_ops.h
+> > index 690f9238c8..69ce8dea74 100644
+> > --- a/include/hw/elf_ops.h
+> > +++ b/include/hw/elf_ops.h
+> > @@ -323,8 +323,9 @@ static int glue(load_elf, SZ)(const char *name, int fd,
+> >      struct elfhdr ehdr;
+> >      struct elf_phdr *phdr = NULL, *ph;
+> >      int size, i, total_size;
+> > -    elf_word mem_size, file_size;
+> > +    elf_word mem_size, file_size, data_offset;
+> >      uint64_t addr, low = (uint64_t)-1, high = 0;
+> > +    GMappedFile *gmf = NULL;
+> >      uint8_t *data = NULL;
+> >      char label[128];
+> >      int ret = ELF_LOAD_FAILED;
+> > @@ -409,22 +410,26 @@ static int glue(load_elf, SZ)(const char *name, int fd,
+> >          }
+> >      }
+> >
+> > +    gmf = g_mapped_file_new_from_fd(fd, false, NULL);
+> 
+> Hmm. Here we pass 'false' for the writable argument,
+> meaning we promise not to modify the mapped buffer...
+> 
+> > +    if (!gmf) {
+> > +        goto fail;
+> > +    }
+> > +
+> >      total_size = 0;
+> >      for(i = 0; i < ehdr.e_phnum; i++) {
+> >          ph = &phdr[i];
+> >          if (ph->p_type == PT_LOAD) {
+> >              mem_size = ph->p_memsz; /* Size of the ROM */
+> >              file_size = ph->p_filesz; /* Size of the allocated data */
+> > -            data = g_malloc0(file_size);
+> > -            if (ph->p_filesz > 0) {
+> > -                if (lseek(fd, ph->p_offset, SEEK_SET) < 0) {
+> > -                    goto fail;
+> > -                }
+> > -                if (read(fd, data, file_size) != file_size) {
+> > -                    goto fail;
+> > -                }
+> > +            data_offset = ph->p_offset; /* Offset where the data is located */
+> > +
+> > +            if (g_mapped_file_get_length(gmf) < file_size + data_offset) {
+> > +                goto fail;
+> >              }
+> >
+> > +            data = (uint8_t *)g_mapped_file_get_contents(gmf);
+> > +            data += data_offset;
+> 
+> ...but here we set up the 'data' pointer from the mapped contents,
+> and then in following code we will write to it in some situations --
+> look at the "if (data_swab)" case or the call to elf_reloc if we
+> have a translate_fn, for instance.
+> 
 
---YWea4kFR5mnMn4SVO2s9Wmdcy2MgDnQFM
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Reading the 'g_mapped_file_new_from_fd()' docs [1]:
+"If writable is TRUE, the mapped buffer may be modified, otherwise it is an
+error to modify the mapped buffer. Modifications to the buffer are not visible
+to other processes mapping the same file, and are not written back to the file."
 
-On 23.07.19 10:52, Kevin Wolf wrote:
-> Am 22.07.2019 um 15:30 hat Max Reitz geschrieben:
->> bdrv_set_aio_context_ignore() can only work in the main loop:
->> bdrv_drained_begin() only works in the main loop and the node's (old)
->> AioContext; and bdrv_drained_end() really only works in the main loop
->> and the node's (new) AioContext (contrary to its current comment, whic=
-h
->> is just wrong).
->>
->> Consequentially, bdrv_set_aio_context_ignore() must be called from the=
+I don't know what "error" means, but reading the second part I thought
+the changes in that case were only visible at the current process.
 
->> main loop.  Luckily, assuming that we can make block graph changes onl=
-y
->> from the main loop as well, all its callers do that already.
->>
->> Note that changing a node's context in a sense is an operation that
->> changes the block graph, so it actually makes sense to require this
->> function to be called from the main loop.
->>
->> Also, fix bdrv_drained_end()'s description.  You can only use it from
->> the main loop or the node's AioContext, and in the latter case, the
->> whole subtree must be in the same context.
->>
->> Fixes: e037c09c78520cbdb6da7cfc6ad0256d5870b814
->> Signed-off-by: Max Reitz <mreitz@redhat.com>
->> ---
->>  include/block/block.h |  8 +++-----
->>  block.c               | 13 ++++++++-----
->>  2 files changed, 11 insertions(+), 10 deletions(-)
->>
->> diff --git a/include/block/block.h b/include/block/block.h
->> index 60f00479e0..50a07c1c33 100644
->> --- a/include/block/block.h
->> +++ b/include/block/block.h
->> @@ -667,11 +667,9 @@ void bdrv_subtree_drained_begin(BlockDriverState =
-*bs);
->>   *
->>   * This polls @bs's AioContext until all scheduled sub-drained_ends
->>   * have settled.  On one hand, that may result in graph changes.  On
->> - * the other, this requires that all involved nodes (@bs and all of
->> - * its parents) are in the same AioContext, and that the caller has
->> - * acquired it.
->> - * If there are any nodes that are in different contexts from @bs,
->> - * these contexts must not be acquired.
->> + * the other, this requires that the caller either runs in the main
->> + * loop; or that all involved nodes (@bs and all of its parents) are
->> + * in the caller's AioContext.
->>   */
->>  void bdrv_drained_end(BlockDriverState *bs);
->=20
-> I think you are right about the requirement that bdrv_drained_end() is
-> only called from the main or the BDS AioContext, which is a requirement=
+I'll test it to understand better the behavior. If we can't touch it, then we
+have to make a copy in these cases.
 
-> that directly comes from AIO_WAIT_WHILE().
->=20
-> However, I don't see why we have requirements on the AioContext of the
-> parent nodes (or any other nodes), except possibly not holding their
-> lock.  We don't poll their context, so it shouldn't matter in which
-> context they are?
+> (We can't get out of this by just passing writable=true, because
+> we definitely don't want to be writing back to the underlying file.)
 
-Hm.  I don=E2=80=99t know how I got confused there, you=E2=80=99re right.=
-
-
-I don=E2=80=99t think the (falsely given) restriction hurts, though, beca=
-use a
-subtree should be within a single context anyway (unless you=E2=80=99re i=
-n
-bdrv_set_aio_context_ignore(), which needs to be in the main context).
-
-So, hm, yes, I messed up this comment a bit now.  But now it=E2=80=99s ju=
-st more
-restrictive than it needs to be and I don=E2=80=99t think callers are goi=
-ng to
-care, so...
-
-Max
+Yes, I agree.
 
 
---YWea4kFR5mnMn4SVO2s9Wmdcy2MgDnQFM--
+Thanks,
+Stefano
 
---BnBSMALvW9r0LYlFxSwDDOztUX0t09RR7
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl021i4ACgkQ9AfbAGHV
-z0Dmbgf/eMlcH4ArLrFwVQUdP8wukNCHiBrPJEjUVAQmnysca8TGn5xY4OtZ0gcS
-NJvZhU7fEvXekvJIKAPHV0ZMJH5xSNmES4g6Z66M9i1/tdwcS6nf62RCZJVrDPXW
-S4ljNwpaCArjVO7JHv8NcMtTtDoNpnicL6rZCj+1u/0F5dNfV2dkR/szwMypYeaE
-2BspnO5fnYy2qkTqWuG+FVWUNhPGncuTavoB31b3ZaGThYsdyw+rH6QkgOpoJuMV
-g4oVLsW/3FSpazz3HynzuGyeAa9PiXyBZV3s+QqriM7uLDjlKbL/4GeYaYA9PkPz
-BXsNfrXMHSFLlc6SKvUw9fjuvxpxSw==
-=cQTH
------END PGP SIGNATURE-----
-
---BnBSMALvW9r0LYlFxSwDDOztUX0t09RR7--
+[1] https://developer.gnome.org/glib/stable/glib-File-Utilities.html#g-mapped-file-new-from-fd
 
