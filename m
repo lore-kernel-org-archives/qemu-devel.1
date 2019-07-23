@@ -2,90 +2,81 @@ Return-Path: <SRS0=3Ld+=VU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83785C7618B
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 10:43:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A783C7618B
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 10:49:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 52A712081B
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 10:43:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 08CED2251A
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 10:49:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="k2hVK6Rl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 52A712081B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rmYkLPiN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08CED2251A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41134 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41184 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hpsGu-0002EB-LN
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jul 2019 06:43:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39766)
+	id 1hpsM8-0005Zn-2u
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jul 2019 06:49:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42182)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hpsFA-0002ro-5C
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 06:42:05 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hpsLv-00056a-0X
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 06:49:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hpsF8-0004NQ-4E
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 06:42:04 -0400
-Received: from mail-wr1-x433.google.com ([2a00:1450:4864:20::433]:35989)
+ (envelope-from <peter.maydell@linaro.org>) id 1hpsLt-0001x7-Jx
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 06:49:02 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:41124)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hpsF6-0004Au-A3
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 06:42:02 -0400
-Received: by mail-wr1-x433.google.com with SMTP id n4so42696151wrs.3
- for <qemu-devel@nongnu.org>; Tue, 23 Jul 2019 03:41:54 -0700 (PDT)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hpsLt-0001ql-1d
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 06:49:01 -0400
+Received: by mail-ot1-x342.google.com with SMTP id o101so43537624ota.8
+ for <qemu-devel@nongnu.org>; Tue, 23 Jul 2019 03:48:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=4Y8RTTqYls9hTDUlXAyFNq7X+0z2NbmIykj1cvcDx80=;
- b=k2hVK6Rl6dco9+BS0IJnAVgDy0iPf64Ic9elKBlDGFoBbnXQVUn0sOsIeQpnA9SK76
- uTNLEvl2IQcIqeEnyr5LHx8X1jhpKHK2XnYLLkRdzQtqOsO703zMg92lRvdfS9cQ3Y4B
- 30vaKWF02b6crOyQPXCLn0yXtabohBJlHGYL23DQmyUEZOG9qWSCs8uif/js+ext5+kf
- 83X+sAT0oEnPZUAgVdtW8K++Z0MvMorNqrLWEvFJG7iT58LE2epQ0ifWUScYiZFl4yyN
- AAA1lG7CQSELKNcET3w97uruVH4zzFkeCxG+r1eVT/F7oPcyxDrZiTzj2ak+ahjbs56z
- Ij9w==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=NpCRcb+8mLrZgQ2PoYHtIBJ1d7RcV/5H4CEl+QRBORA=;
+ b=rmYkLPiNyX56WNDWszSTXN/nuIlupl3uSXiQ9Lp9nFNJvFhXEiBBYURUFXVHThiRnJ
+ Eg0/gU4bMB2/mmhw36v/+y8BtsVTM+bTUomQoocPAiKgCnb3FmEw/q/zmZUna/5CgKmY
+ zHDCETFSi3ZvLO69kNd0Q1jewxDjDGSrAQzxigPjg2uZGQU5FNOwuLveyVBqPAMk2DRC
+ zcNX+yDZ9cc333fFp7nqC4m2TRUJppOq+/fAqnXXl/aJX8qVWE2zXHVL6KpLQ22OZao9
+ 8Owts/3Yvh+BbUWerCBnmvN05hROW8dMQz8jCWWePDK3DQeoN1SQ/sywky1CqmhQyTFn
+ Ph2A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=4Y8RTTqYls9hTDUlXAyFNq7X+0z2NbmIykj1cvcDx80=;
- b=i9CtB3OjOaEahhDQc80M8/o5B4kmQU49JifpcF779ajUgZ/JmDKPMktdzVh3GRtELa
- ZOmLp0KC9rMZDpVFQY9Si9/K0l4W7QpTlxB3fQlCtgGJ8HWGJ91+0/wj+3Gd30ZHObe7
- KA5VVDWkKCbqYpTM8wY+u3uwDCno5mtzDCjSfcszinqrjp8yMNtuxbIZmx47zK9iqgYH
- mJztKlSqDpyNC1WKllMX4KSEAaJ9POa5yBw/16uqXy+ln0ZW6WsRyRrA5/afJM+LIncx
- CYJXX/bnBJMXC8/mtwI3ZtxzG/urDebeOR59i8XMdU3wq3SjdW4+jORRxOF/iXp+qmwn
- UYKA==
-X-Gm-Message-State: APjAAAV2pXfKUwpZ4R5/QJWHGl2vlWqt03P9OPexUJ1nLccZZcHMNAZ3
- FEURY/toI/qeqTaonGt17qnLXQ==
-X-Google-Smtp-Source: APXvYqz/pAGdf74Ov3MUjAQn9WG+X/bIZ2DbUsjsvwpIjVcwNAePn6dZQh+BSdFbPJlmyla9WX2VyA==
-X-Received: by 2002:adf:e50c:: with SMTP id j12mr10369413wrm.117.1563878513427; 
- Tue, 23 Jul 2019 03:41:53 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id c30sm73689022wrb.15.2019.07.23.03.41.49
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Tue, 23 Jul 2019 03:41:52 -0700 (PDT)
-Received: from zen.linaroharston. (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id B073E1FF9E;
- Tue, 23 Jul 2019 11:36:13 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: peter.maydell@linaro.org
-Date: Tue, 23 Jul 2019 11:36:04 +0100
-Message-Id: <20190723103612.5600-16-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190723103612.5600-1-alex.bennee@linaro.org>
-References: <20190723103612.5600-1-alex.bennee@linaro.org>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=NpCRcb+8mLrZgQ2PoYHtIBJ1d7RcV/5H4CEl+QRBORA=;
+ b=M6EVYvjGAO6EPDInZrJefSod1jWpIHhvlpNdTfHtq40plHL82g3K/fz4zH4P30ctkG
+ Y/YflwtEVyWtzUwzFy98eYY4SzXKsfsObn8ubmNBFFA0/ggB2clXAYYpWJxlJfAHT0Hu
+ gAPT2yq9gqA7jsYIb3+FmGAwHCLV2R2NwI87rjBCsTBJtvSMlQUCJASU4NxLqgaMnsQ0
+ 7/WLTriy8JIE6wsk1tbnEiZWJRUAZt+oh0jqmSywoXJSj78NDButvwT+PeYS+rJAo761
+ sXxhwAr6ysoVGIO5WD+SfuzigrheUhou71ira3S5NqtHV483NMec/xdXYqw7Fuo4vBL/
+ w//Q==
+X-Gm-Message-State: APjAAAW0wVeDgDKnWDnLIpe3kjBr+W7QwI/ybNvwa9AMH0BX443qerhF
+ oNoklxWIFr/z5FCA7FS3JCK4H8EkrO73vU2aMFkwnw==
+X-Google-Smtp-Source: APXvYqy68Y918nCwnB1U+hGlVcyWW65mNDrpuk5Mz2YZsGf6ZxD9uLEcL8Sj9Ee67ggmlhfOLXD5k+qXNQYXeAKxxDA=
+X-Received: by 2002:a9d:711e:: with SMTP id n30mr52483562otj.97.1563878938725; 
+ Tue, 23 Jul 2019 03:48:58 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20190723093558.13700-1-philmd@redhat.com>
+In-Reply-To: <20190723093558.13700-1-philmd@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 23 Jul 2019 11:48:47 +0100
+Message-ID: <CAFEAcA-6mUaktymqqwC92owK9LSsJ_RdBi-Bp+7XUaEE0HoTiw@mail.gmail.com>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::433
-Subject: [Qemu-devel] [PULL 15/23] tests/docker: Let the test-mingw test
- generate a NSIS installer
+X-Received-From: 2607:f8b0:4864:20::342
+Subject: Re: [Qemu-devel] [PULL v2 0/2] pflash-next patches for v4.1.0-rc2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,42 +88,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Qemu-block <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
+On Tue, 23 Jul 2019 at 10:36, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
+m> wrote:
+>
+> The following changes since commit 23da9e297b4120ca9702cabec91599a44255fe=
+96:
+>
+>   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-201=
+90722' into staging (2019-07-22 15:16:48 +0100)
+>
+> are available in the Git repository at:
+>
+>   https://gitlab.com/philmd/qemu.git tags/pflash-next-20190723
+>
+> for you to fetch changes up to 124e4cfaa42bb5a14eec33ea47d3502b5f46eb33:
+>
+>   hw/block/pflash_cfi02: Rewrite a fall through comment (2019-07-23 11:31=
+:07 +0200)
+>
+> ----------------------------------------------------------------
+> One bugfix and silent a fallthru warning.
+>
+> ----------------------------------------------------------------
+> v2: Replace Laszlo's Regression-tested-by tag
+>
+> Philippe Mathieu-Daud=C3=A9 (2):
+>   hw/block/pflash_cfi01: Add missing DeviceReset() handler
+>   hw/block/pflash_cfi02: Rewrite a fall through comment
+>
+>  hw/block/pflash_cfi01.c | 19 +++++++++++++++++++
+>  hw/block/pflash_cfi02.c |  2 +-
+>  2 files changed, 20 insertions(+), 1 deletion(-)
 
-The NSIS installer generates an executable suitable to install
-QEMU on Windows.
 
-Suggested-by: Alex Bennée <alex.bennee@linaro.org>
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20190715174817.18981-9-philmd@redhat.com>
-[AJB: also --enable-docs in configure step]
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Applied, thanks.
 
-diff --git a/tests/docker/test-mingw b/tests/docker/test-mingw
-index 4b84cfe120a..fdb1c2c879d 100755
---- a/tests/docker/test-mingw
-+++ b/tests/docker/test-mingw
-@@ -27,8 +27,10 @@ for prefix in x86_64-w64-mingw32- i686-w64-mingw32-; do
-         --enable-curl \
-         --enable-vnc \
-         --enable-bzip2 \
--        --enable-guest-agent
-+        --enable-guest-agent \
-+        --enable-docs
-     install_qemu
-+    make installer
-     make clean
- 
- done
--- 
-2.20.1
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.1
+for any user-visible changes.
 
+-- PMM
 
