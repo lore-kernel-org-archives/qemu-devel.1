@@ -6,91 +6,94 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 338DAC76186
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 17:06:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1DA1C76186
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 17:06:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 030D52239F
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 17:06:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 030D52239F
+	by mail.kernel.org (Postfix) with ESMTPS id AE2DB2239F
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 17:06:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE2DB2239F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45912 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45914 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hpyEy-0003Ul-IC
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jul 2019 13:06:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42526)
+	id 1hpyF3-0003q8-Fl
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jul 2019 13:06:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43217)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mdroth@linux.vnet.ibm.com>) id 1hpyAI-00044M-GH
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 13:01:27 -0400
+ (envelope-from <mdroth@linux.vnet.ibm.com>) id 1hpyBE-0007TZ-AS
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 13:02:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mdroth@linux.vnet.ibm.com>) id 1hpyAF-00059V-UV
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 13:01:26 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:40358
+ (envelope-from <mdroth@linux.vnet.ibm.com>) id 1hpyBC-00062R-5s
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 13:02:24 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:16318
  helo=mx0a-001b2d01.pphosted.com)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
- id 1hpyAF-00058m-Nz; Tue, 23 Jul 2019 13:01:23 -0400
+ id 1hpyBA-0005ob-4C
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 13:02:20 -0400
 Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
  by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x6NGkiM9009118; Tue, 23 Jul 2019 13:01:23 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2tx61fgh5b-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 23 Jul 2019 13:01:22 -0400
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.27/8.16.0.27) with SMTP id x6NGl1k1009931;
- Tue, 23 Jul 2019 13:01:22 -0400
-Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com
- [169.63.214.131])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2tx61fgh4g-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 23 Jul 2019 13:01:22 -0400
-Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
- by ppma01dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x6NH0KS7012875;
- Tue, 23 Jul 2019 17:01:20 GMT
-Received: from b03cxnp08027.gho.boulder.ibm.com
- (b03cxnp08027.gho.boulder.ibm.com [9.17.130.19])
- by ppma01dal.us.ibm.com with ESMTP id 2tx61n02fw-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 23 Jul 2019 17:01:20 +0000
+ x6NH25VM048740
+ for <qemu-devel@nongnu.org>; Tue, 23 Jul 2019 13:02:08 -0400
+Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 2tx61fghbd-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Tue, 23 Jul 2019 13:02:06 -0400
+Received: from localhost
+ by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
+ Tue, 23 Jul 2019 18:01:29 +0100
+Received: from b03cxnp08028.gho.boulder.ibm.com (9.17.130.20)
+ by e32.co.us.ibm.com (192.168.1.132) with IBM ESMTP SMTP Gateway: Authorized
+ Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Tue, 23 Jul 2019 18:01:27 +0100
 Received: from b03ledav005.gho.boulder.ibm.com
  (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
- by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- x6NH1J7f45810162
+ by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ x6NH1QuV60555624
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 23 Jul 2019 17:01:19 GMT
+ Tue, 23 Jul 2019 17:01:26 GMT
 Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 1E3FCBE069;
- Tue, 23 Jul 2019 17:01:19 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 0DCECBE062;
+ Tue, 23 Jul 2019 17:01:26 +0000 (GMT)
 Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 0ECEBBE053;
- Tue, 23 Jul 2019 17:01:19 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id E8D50BE058;
+ Tue, 23 Jul 2019 17:01:25 +0000 (GMT)
 Received: from localhost (unknown [9.53.179.212])
  by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTP;
- Tue, 23 Jul 2019 17:01:19 +0000 (GMT)
+ Tue, 23 Jul 2019 17:01:25 +0000 (GMT)
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
 To: qemu-devel@nongnu.org
-Date: Tue, 23 Jul 2019 12:00:47 -0500
-Message-Id: <20190723170104.4327-20-mdroth@linux.vnet.ibm.com>
+Date: Tue, 23 Jul 2019 12:01:02 -0500
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190723170104.4327-1-mdroth@linux.vnet.ibm.com>
 References: <20190723170104.4327-1-mdroth@linux.vnet.ibm.com>
 X-TM-AS-GCONF: 00
+x-cbid: 19072317-0004-0000-0000-0000152DB9B3
+X-IBM-SpamModules-Scores: 
+X-IBM-SpamModules-Versions: BY=3.00011482; HX=3.00000242; KW=3.00000007;
+ PH=3.00000004; SC=3.00000287; SDB=6.01236375; UDB=6.00651638; IPR=6.01017731; 
+ MB=3.00027856; MTD=3.00000008; XFM=3.00000015; UTC=2019-07-23 17:01:29
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19072317-0005-0000-0000-00008C9463C7
+Message-Id: <20190723170104.4327-35-mdroth@linux.vnet.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
  definitions=2019-07-23_07:, , signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
  priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ malwarescore=0 suspectscore=1 phishscore=0 bulkscore=0 spamscore=0
  clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
  mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1906280000 definitions=main-1907230169
+ scancount=1 engine=8.0.1-1906280000 definitions=main-1907230170
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
 X-Received-From: 148.163.158.5
-Subject: [Qemu-devel] [PATCH 19/36] json: Fix % handling when not
- interpolating
+Subject: [Qemu-devel] [PATCH 34/36] block/file-posix: Unaligned O_DIRECT
+ block-status
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,116 +105,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-stable@nongnu.org, Christophe Fergeau <cfergeau@redhat.com>,
- Markus Armbruster <armbru@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-stable@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Christophe Fergeau <cfergeau@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
 
-Commit 8bca4613 added support for %% in json strings when interpolating,
-but in doing so broke handling of % when not interpolating.
+Currently, qemu crashes whenever someone queries the block status of an
+unaligned image tail of an O_DIRECT image:
+$ echo > foo
+$ qemu-img map --image-opts driver=file,filename=foo,cache.direct=on
+Offset          Length          Mapped to       File
+qemu-img: block/io.c:2093: bdrv_co_block_status: Assertion `*pnum &&
+QEMU_IS_ALIGNED(*pnum, align) && align > offset - aligned_offset'
+failed.
 
-When parse_string() is fed a string token containing '%', it skips the
-'%' regardless of ctxt->ap, i.e. even it's not interpolating.  If the
-'%' is the string's last character, it fails an assertion.  Else, it
-"merely" swallows the '%'.
+This is because bdrv_co_block_status() checks that the result returned
+by the driver's implementation is aligned to the request_alignment, but
+file-posix can fail to do so, which is actually mentioned in a comment
+there: "[...] possibly including a partial sector at EOF".
 
-Fix parse_string() to handle '%' specially only when interpolating.
+Fix this by rounding up those partial sectors.
 
-To gauge the bug's impact, let's review non-interpolating users of this
-parser, i.e. code passing NULL context to json_message_parser_init():
+There are two possible alternative fixes:
+(1) We could refuse to open unaligned image files with O_DIRECT
+    altogether.  That sounds reasonable until you realize that qcow2
+    does necessarily not fill up its metadata clusters, and that nobody
+    runs qemu-img create with O_DIRECT.  Therefore, unpreallocated qcow2
+    files usually have an unaligned image tail.
 
-* tests/check-qjson.c, tests/test-qobject-input-visitor.c,
-  tests/test-visitor-serialization.c
+(2) bdrv_co_block_status() could ignore unaligned tails.  It actually
+    throws away everything past the EOF already, so that sounds
+    reasonable.
+    Unfortunately, the block layer knows file lengths only with a
+    granularity of BDRV_SECTOR_SIZE, so bdrv_co_block_status() usually
+    would have to guess whether its file length information is inexact
+    or whether the driver is broken.
 
-  Plenty of tests, but we still failed to cover the buggy case.
+Fixing what raw_co_block_status() returns is the safest thing to do.
 
-* monitor.c: QMP input
+There seems to be no other block driver that sets request_alignment and
+does not make sure that it always returns aligned values.
 
-* qga/main.c: QGA input
-
-* qobject_from_json():
-
-  - qobject-input-visitor.c: JSON command line option arguments of
-    -display and -blockdev
-
-    Reproducer: -blockdev '{"%"}'
-
-  - block.c: JSON pseudo-filenames starting with "json:"
-
-    Reproducer: https://bugzilla.redhat.com/show_bug.cgi?id=1668244#c3
-
-  - block/rbd.c: JSON key pairs
-
-    Pseudo-filenames starting with "rbd:".
-
-Command line, QMP and QGA input are trusted.
-
-Filenames are trusted when they come from command line, QMP or HMP.
-They are untrusted when they come from from image file headers.
-Example: QCOW2 backing file name.  Note that this is *not* the security
-boundary between host and guest.  It's the boundary between host and an
-image file from an untrusted source.
-
-Neither failing an assertion nor skipping a character in a filename of
-your choice looks exploitable.  Note that we don't support compiling
-with NDEBUG.
-
-Fixes: 8bca4613e6cddd948895b8db3def05950463495b
 Cc: qemu-stable@nongnu.org
-Signed-off-by: Christophe Fergeau <cfergeau@redhat.com>
-Message-Id: <20190102140535.11512-1-cfergeau@redhat.com>
+Signed-off-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Tested-by: Richard W.M. Jones <rjones@redhat.com>
-[Commit message extended to discuss impact]
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-(cherry picked from commit bbc0586ced6e9ffdfd29d89fcc917b3d90ac3938)
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+(cherry picked from commit 9c3db310ff0b7473272ae8dce5e04e2f8a825390)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- qobject/json-parser.c | 10 ++++++----
- tests/check-qjson.c   |  5 +++++
- 2 files changed, 11 insertions(+), 4 deletions(-)
+ block/file-posix.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-diff --git a/qobject/json-parser.c b/qobject/json-parser.c
-index 5a840dfd86..53e91cb16b 100644
---- a/qobject/json-parser.c
-+++ b/qobject/json-parser.c
-@@ -208,11 +208,13 @@ static QString *parse_string(JSONParserContext *ctxt, JSONToken *token)
-             }
-             break;
-         case '%':
--            if (ctxt->ap && ptr[1] != '%') {
--                parse_error(ctxt, token, "can't interpolate into string");
--                goto out;
-+            if (ctxt->ap) {
-+                if (ptr[1] != '%') {
-+                    parse_error(ctxt, token, "can't interpolate into string");
-+                    goto out;
-+                }
-+                ptr++;
-             }
--            ptr++;
-             /* fall through */
-         default:
-             cp = mod_utf8_codepoint(ptr, 6, &end);
-diff --git a/tests/check-qjson.c b/tests/check-qjson.c
-index d876a7a96e..fa2afccb0a 100644
---- a/tests/check-qjson.c
-+++ b/tests/check-qjson.c
-@@ -175,6 +175,11 @@ static void utf8_string(void)
-             "\xCE\xBA\xE1\xBD\xB9\xCF\x83\xCE\xBC\xCE\xB5",
-             "\xCE\xBA\xE1\xBD\xB9\xCF\x83\xCE\xBC\xCE\xB5",
-             "\\u03BA\\u1F79\\u03C3\\u03BC\\u03B5",
-+        },
-+            /* '%' character when not interpolating */
-+        {
-+            "100%",
-+            "100%",
-         },
-         /* 2  Boundary condition test cases */
-         /* 2.1  First possible sequence of a certain length */
+diff --git a/block/file-posix.c b/block/file-posix.c
+index 07bbdab953..df467f510b 100644
+--- a/block/file-posix.c
++++ b/block/file-posix.c
+@@ -2461,6 +2461,8 @@ static int coroutine_fn raw_co_block_status(BlockDriverState *bs,
+     off_t data = 0, hole = 0;
+     int ret;
+ 
++    assert(QEMU_IS_ALIGNED(offset | bytes, bs->bl.request_alignment));
++
+     ret = fd_open(bs);
+     if (ret < 0) {
+         return ret;
+@@ -2486,6 +2488,20 @@ static int coroutine_fn raw_co_block_status(BlockDriverState *bs,
+         /* On a data extent, compute bytes to the end of the extent,
+          * possibly including a partial sector at EOF. */
+         *pnum = MIN(bytes, hole - offset);
++
++        /*
++         * We are not allowed to return partial sectors, though, so
++         * round up if necessary.
++         */
++        if (!QEMU_IS_ALIGNED(*pnum, bs->bl.request_alignment)) {
++            int64_t file_length = raw_getlength(bs);
++            if (file_length > 0) {
++                /* Ignore errors, this is just a safeguard */
++                assert(hole == file_length);
++            }
++            *pnum = ROUND_UP(*pnum, bs->bl.request_alignment);
++        }
++
+         ret = BDRV_BLOCK_DATA;
+     } else {
+         /* On a hole, compute bytes to the beginning of the next extent.  */
 -- 
 2.17.1
 
