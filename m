@@ -2,61 +2,114 @@ Return-Path: <SRS0=3Ld+=VU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D10AC7618B
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 15:49:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B806C7618B
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 15:56:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 140C92239F
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 15:49:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 140C92239F
+	by mail.kernel.org (Postfix) with ESMTPS id D7A69206B8
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 15:56:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D7A69206B8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45192 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45224 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hpx31-0004bx-Be
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jul 2019 11:49:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52036)
+	id 1hpx9n-0007tU-0Y
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jul 2019 11:56:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53643)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <berrange@redhat.com>) id 1hpx2J-0001w9-PR
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 11:49:09 -0400
+ (envelope-from <thuth@redhat.com>) id 1hpx9c-0007VH-Ll
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 11:56:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1hpx2H-0000du-4z
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 11:49:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55702)
+ (envelope-from <thuth@redhat.com>) id 1hpx9b-0006qv-Jp
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 11:56:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47648)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hpx2G-0000cT-Rg
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 11:49:05 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hpx9b-0006q4-C2
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 11:56:39 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 33B5430C133E
- for <qemu-devel@nongnu.org>; Tue, 23 Jul 2019 15:49:04 +0000 (UTC)
-Received: from localhost.localdomain.com (unknown [10.36.112.10])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 29F481024809;
- Tue, 23 Jul 2019 15:49:02 +0000 (UTC)
-From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Tue, 23 Jul 2019 16:48:56 +0100
-Message-Id: <20190723154856.17348-4-berrange@redhat.com>
-In-Reply-To: <20190723154856.17348-1-berrange@redhat.com>
-References: <20190723154856.17348-1-berrange@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 03BECC04AC69;
+ Tue, 23 Jul 2019 15:56:38 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-99.ams2.redhat.com [10.36.116.99])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4B58F5D9C5;
+ Tue, 23 Jul 2019 15:56:34 +0000 (UTC)
+To: Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+References: <20190723103612.5600-1-alex.bennee@linaro.org>
+ <CAFEAcA_P_Bk0bNGCW+TwhQGCeqM-XZd3OudKZ4tu0fNThFH5ww@mail.gmail.com>
+ <87imrt0y9a.fsf@linaro.org> <451b91c6-3a4d-afb4-30f1-595fcc7e5f65@redhat.com>
+ <CAFEAcA_O4kegKUsSfzQhBp_AnV_uD1S=F4pm0V0nG6XQ2Dyseg@mail.gmail.com>
+ <87ftmw29i2.fsf@linaro.org>
+ <CAFEAcA9nmmoHD3Sa2bknbuDW+Qv-mJ8f=YDNFsuMSV0KqY3_Yg@mail.gmail.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; keydata=
+ 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
+Organization: Red Hat
+Message-ID: <b5c5b821-0fa0-6abd-966d-3561e0c7f294@redhat.com>
+Date: Tue, 23 Jul 2019 17:56:33 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <CAFEAcA9nmmoHD3Sa2bknbuDW+Qv-mJ8f=YDNFsuMSV0KqY3_Yg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Tue, 23 Jul 2019 15:49:04 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.31]); Tue, 23 Jul 2019 15:56:38 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH for 4.2 3/3] crypto: use auto cleanup for many
- stack variables
+Subject: Re: [Qemu-devel] [PULL for 4.1-rc2 00/23] testing updates (green
+ CI!)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,591 +121,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Simplify cleanup paths by using glib's auto cleanup macros for stack
-variables, allowing several goto jumps / labels to be eliminated.
+On 23/07/2019 15.01, Peter Maydell wrote:
+> On Tue, 23 Jul 2019 at 13:58, Alex Benn=C3=A9e <alex.bennee@linaro.org>=
+ wrote:
+>>
+>>
+>> Peter Maydell <peter.maydell@linaro.org> writes:
+>>
+>>> On Tue, 23 Jul 2019 at 13:16, Philippe Mathieu-Daud=C3=A9 <philmd@red=
+hat.com> wrote:
+>>>>
+>>>> On 7/23/19 1:46 PM, Alex Benn=C3=A9e wrote:
+>>>>>> I see Thomas Huth has a patch on-list for that, but this
+>>>>>> didn't manifest as a problem before this pullreq.
+>>>>>
+>>>>> OK, I'll add it and rebuild the PR.
+>>>>
+>>>> But Thomas got another error later...
+>>>
+>>> If we're not sure what all the needed fixes are we
+>>> should probably just drop the change that starts
+>>> running the iotests under 'make check'. Otherwise this
+>>> pullreq is going to miss rc2, and it's too big to go into rc3.
 
-Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
----
- crypto/afsplit.c      | 28 +++++-----------
- crypto/block-luks.c   | 74 +++++++++++++------------------------------
- crypto/block.c        | 15 +++------
- crypto/pbkdf.c        |  5 +--
- crypto/secret.c       |  9 +++---
- crypto/tlscredsanon.c | 16 ++++------
- crypto/tlscredspsk.c  |  5 ++-
- crypto/tlscredsx509.c | 16 +++-------
- 8 files changed, 53 insertions(+), 115 deletions(-)
+I think OpenBSD was the final thing that is not working. I've checked
+freebsd and macOS and they were working fine for me there. The netbsd
+image does not have "bash", so the tests are skipped there.
 
-diff --git a/crypto/afsplit.c b/crypto/afsplit.c
-index 328d68c96b..b1a5a20899 100644
---- a/crypto/afsplit.c
-+++ b/crypto/afsplit.c
-@@ -58,7 +58,7 @@ static int qcrypto_afsplit_hash(QCryptoHashAlgorithm ha=
-sh,
-     }
-=20
-     for (i =3D 0; i < hashcount; i++) {
--        uint8_t *out =3D NULL;
-+        g_autofree uint8_t *out =3D NULL;
-         size_t outlen =3D 0;
-         uint32_t iv =3D cpu_to_be32(i);
-         struct iovec in[] =3D {
-@@ -79,7 +79,6 @@ static int qcrypto_afsplit_hash(QCryptoHashAlgorithm ha=
-sh,
-         assert(outlen =3D=3D digestlen);
-         memcpy(block + (i * digestlen), out,
-                (i =3D=3D (hashcount - 1)) ? finallen : digestlen);
--        g_free(out);
-     }
-=20
-     return 0;
-@@ -93,13 +92,12 @@ int qcrypto_afsplit_encode(QCryptoHashAlgorithm hash,
-                            uint8_t *out,
-                            Error **errp)
- {
--    uint8_t *block =3D g_new0(uint8_t, blocklen);
-+    g_autofree uint8_t *block =3D g_new0(uint8_t, blocklen);
-     size_t i;
--    int ret =3D -1;
-=20
-     for (i =3D 0; i < (stripes - 1); i++) {
-         if (qcrypto_random_bytes(out + (i * blocklen), blocklen, errp) <=
- 0) {
--            goto cleanup;
-+            return -1;
-         }
-=20
-         qcrypto_afsplit_xor(blocklen,
-@@ -108,18 +106,14 @@ int qcrypto_afsplit_encode(QCryptoHashAlgorithm has=
-h,
-                             block);
-         if (qcrypto_afsplit_hash(hash, blocklen, block,
-                                  errp) < 0) {
--            goto cleanup;
-+            return -1;
-         }
-     }
-     qcrypto_afsplit_xor(blocklen,
-                         in,
-                         block,
-                         out + (i * blocklen));
--    ret =3D 0;
--
-- cleanup:
--    g_free(block);
--    return ret;
-+    return 0;
- }
-=20
-=20
-@@ -130,9 +124,8 @@ int qcrypto_afsplit_decode(QCryptoHashAlgorithm hash,
-                            uint8_t *out,
-                            Error **errp)
- {
--    uint8_t *block =3D g_new0(uint8_t, blocklen);
-+    g_autofree uint8_t *block =3D g_new0(uint8_t, blocklen);
-     size_t i;
--    int ret =3D -1;
-=20
-     for (i =3D 0; i < (stripes - 1); i++) {
-         qcrypto_afsplit_xor(blocklen,
-@@ -141,7 +134,7 @@ int qcrypto_afsplit_decode(QCryptoHashAlgorithm hash,
-                             block);
-         if (qcrypto_afsplit_hash(hash, blocklen, block,
-                                  errp) < 0) {
--            goto cleanup;
-+            return -1;
-         }
-     }
-=20
-@@ -149,10 +142,5 @@ int qcrypto_afsplit_decode(QCryptoHashAlgorithm hash=
-,
-                         in + (i * blocklen),
-                         block,
-                         out);
--
--    ret =3D 0;
--
-- cleanup:
--    g_free(block);
--    return ret;
-+    return 0;
- }
-diff --git a/crypto/block-luks.c b/crypto/block-luks.c
-index 409ab50f20..c8e0a0caa4 100644
---- a/crypto/block-luks.c
-+++ b/crypto/block-luks.c
-@@ -425,14 +425,13 @@ qcrypto_block_luks_load_key(QCryptoBlock *block,
-                             Error **errp)
- {
-     QCryptoBlockLUKS *luks =3D block->opaque;
--    uint8_t *splitkey;
-+    g_autofree uint8_t *splitkey =3D NULL;
-     size_t splitkeylen;
--    uint8_t *possiblekey;
--    int ret =3D -1;
-+    g_autofree uint8_t *possiblekey =3D NULL;
-     ssize_t rv;
--    QCryptoCipher *cipher =3D NULL;
-+    g_autoptr(QCryptoCipher) cipher =3D NULL;
-     uint8_t keydigest[QCRYPTO_BLOCK_LUKS_DIGEST_LEN];
--    QCryptoIVGen *ivgen =3D NULL;
-+    g_autoptr(QCryptoIVGen) ivgen =3D NULL;
-     size_t niv;
-=20
-     if (slot->active !=3D QCRYPTO_BLOCK_LUKS_KEY_SLOT_ENABLED) {
-@@ -456,7 +455,7 @@ qcrypto_block_luks_load_key(QCryptoBlock *block,
-                        slot->iterations,
-                        possiblekey, masterkeylen,
-                        errp) < 0) {
--        goto cleanup;
-+        return -1;
-     }
-=20
-     /*
-@@ -472,7 +471,7 @@ qcrypto_block_luks_load_key(QCryptoBlock *block,
-                   opaque,
-                   errp);
-     if (rv < 0) {
--        goto cleanup;
-+        return -1;
-     }
-=20
-=20
-@@ -482,7 +481,7 @@ qcrypto_block_luks_load_key(QCryptoBlock *block,
-                                 possiblekey, masterkeylen,
-                                 errp);
-     if (!cipher) {
--        goto cleanup;
-+        return -1;
-     }
-=20
-     niv =3D qcrypto_cipher_get_iv_len(cipheralg,
-@@ -493,7 +492,7 @@ qcrypto_block_luks_load_key(QCryptoBlock *block,
-                               possiblekey, masterkeylen,
-                               errp);
-     if (!ivgen) {
--        goto cleanup;
-+        return -1;
-     }
-=20
-=20
-@@ -512,7 +511,7 @@ qcrypto_block_luks_load_key(QCryptoBlock *block,
-                                             splitkey,
-                                             splitkeylen,
-                                             errp) < 0) {
--        goto cleanup;
-+        return -1;
-     }
-=20
-     /*
-@@ -525,7 +524,7 @@ qcrypto_block_luks_load_key(QCryptoBlock *block,
-                                splitkey,
-                                masterkey,
-                                errp) < 0) {
--        goto cleanup;
-+        return -1;
-     }
-=20
-=20
-@@ -544,26 +543,18 @@ qcrypto_block_luks_load_key(QCryptoBlock *block,
-                        luks->header.master_key_iterations,
-                        keydigest, G_N_ELEMENTS(keydigest),
-                        errp) < 0) {
--        goto cleanup;
-+        return -1;
-     }
-=20
-     if (memcmp(keydigest, luks->header.master_key_digest,
-                QCRYPTO_BLOCK_LUKS_DIGEST_LEN) =3D=3D 0) {
-         /* Success, we got the right master key */
--        ret =3D 1;
--        goto cleanup;
-+        return 1;
-     }
-=20
-     /* Fail, user's password was not valid for this key slot,
-      * tell caller to try another slot */
--    ret =3D 0;
--
-- cleanup:
--    qcrypto_ivgen_free(ivgen);
--    qcrypto_cipher_free(cipher);
--    g_free(splitkey);
--    g_free(possiblekey);
--    return ret;
-+    return 0;
- }
-=20
-=20
-@@ -644,7 +635,7 @@ qcrypto_block_luks_open(QCryptoBlock *block,
-     int ret =3D 0;
-     size_t i;
-     ssize_t rv;
--    uint8_t *masterkey =3D NULL;
-+    g_autofree uint8_t *masterkey =3D NULL;
-     size_t masterkeylen;
-     char *ivgen_name, *ivhash_name;
-     QCryptoCipherMode ciphermode;
-@@ -653,7 +644,7 @@ qcrypto_block_luks_open(QCryptoBlock *block,
-     QCryptoCipherAlgorithm ivcipheralg;
-     QCryptoHashAlgorithm hash;
-     QCryptoHashAlgorithm ivhash;
--    char *password =3D NULL;
-+    g_autofree char *password =3D NULL;
-=20
-     if (!(flags & QCRYPTO_BLOCK_OPEN_NO_IO)) {
-         if (!options->u.luks.key_secret) {
-@@ -856,17 +847,12 @@ qcrypto_block_luks_open(QCryptoBlock *block,
-     luks->ivgen_hash_alg =3D ivhash;
-     luks->hash_alg =3D hash;
-=20
--    g_free(masterkey);
--    g_free(password);
--
-     return 0;
-=20
-  fail:
--    g_free(masterkey);
-     qcrypto_block_free_cipher(block);
-     qcrypto_ivgen_free(block->ivgen);
-     g_free(luks);
--    g_free(password);
-     return ret;
- }
-=20
-@@ -891,20 +877,20 @@ qcrypto_block_luks_create(QCryptoBlock *block,
-     QCryptoBlockLUKS *luks;
-     QCryptoBlockCreateOptionsLUKS luks_opts;
-     Error *local_err =3D NULL;
--    uint8_t *masterkey =3D NULL;
--    uint8_t *slotkey =3D NULL;
--    uint8_t *splitkey =3D NULL;
-+    g_autofree uint8_t *masterkey =3D NULL;
-+    g_autofree uint8_t *slotkey =3D NULL;
-+    g_autofree uint8_t *splitkey =3D NULL;
-     size_t splitkeylen =3D 0;
-     size_t i;
--    QCryptoCipher *cipher =3D NULL;
--    QCryptoIVGen *ivgen =3D NULL;
--    char *password;
-+    g_autoptr(QCryptoCipher) cipher =3D NULL;
-+    g_autoptr(QCryptoIVGen) ivgen =3D NULL;
-+    g_autofree char *password;
-     const char *cipher_alg;
-     const char *cipher_mode;
-     const char *ivgen_alg;
-     const char *ivgen_hash_alg =3D NULL;
-     const char *hash_alg;
--    char *cipher_mode_spec =3D NULL;
-+    g_autofree char *cipher_mode_spec =3D NULL;
-     QCryptoCipherAlgorithm ivcipheralg =3D 0;
-     uint64_t iters;
-=20
-@@ -1311,15 +1297,7 @@ qcrypto_block_luks_create(QCryptoBlock *block,
-     luks->hash_alg =3D luks_opts.hash_alg;
-=20
-     memset(masterkey, 0, luks->header.key_bytes);
--    g_free(masterkey);
-     memset(slotkey, 0, luks->header.key_bytes);
--    g_free(slotkey);
--    g_free(splitkey);
--    g_free(password);
--    g_free(cipher_mode_spec);
--
--    qcrypto_ivgen_free(ivgen);
--    qcrypto_cipher_free(cipher);
-=20
-     return 0;
-=20
-@@ -1327,17 +1305,9 @@ qcrypto_block_luks_create(QCryptoBlock *block,
-     if (masterkey) {
-         memset(masterkey, 0, luks->header.key_bytes);
-     }
--    g_free(masterkey);
-     if (slotkey) {
-         memset(slotkey, 0, luks->header.key_bytes);
-     }
--    g_free(slotkey);
--    g_free(splitkey);
--    g_free(password);
--    g_free(cipher_mode_spec);
--
--    qcrypto_ivgen_free(ivgen);
--    qcrypto_cipher_free(cipher);
-=20
-     qcrypto_block_free_cipher(block);
-     qcrypto_ivgen_free(block->ivgen);
-diff --git a/crypto/block.c b/crypto/block.c
-index ee96759f7d..325752871c 100644
---- a/crypto/block.c
-+++ b/crypto/block.c
-@@ -299,15 +299,13 @@ static int do_qcrypto_block_cipher_encdec(QCryptoCi=
-pher *cipher,
-                                           QCryptoCipherEncDecFunc func,
-                                           Error **errp)
- {
--    uint8_t *iv;
-+    g_autofree uint8_t *iv =3D niv ? g_new0(uint8_t, niv) : NULL;
-     int ret =3D -1;
-     uint64_t startsector =3D offset / sectorsize;
-=20
-     assert(QEMU_IS_ALIGNED(offset, sectorsize));
-     assert(QEMU_IS_ALIGNED(len, sectorsize));
-=20
--    iv =3D niv ? g_new0(uint8_t, niv) : NULL;
--
-     while (len > 0) {
-         size_t nbytes;
-         if (niv) {
-@@ -320,19 +318,19 @@ static int do_qcrypto_block_cipher_encdec(QCryptoCi=
-pher *cipher,
-             }
-=20
-             if (ret < 0) {
--                goto cleanup;
-+                return -1;
-             }
-=20
-             if (qcrypto_cipher_setiv(cipher,
-                                      iv, niv,
-                                      errp) < 0) {
--                goto cleanup;
-+                return -1;
-             }
-         }
-=20
-         nbytes =3D len > sectorsize ? sectorsize : len;
-         if (func(cipher, buf, buf, nbytes, errp) < 0) {
--            goto cleanup;
-+            return -1;
-         }
-=20
-         startsector++;
-@@ -340,10 +338,7 @@ static int do_qcrypto_block_cipher_encdec(QCryptoCip=
-her *cipher,
-         len -=3D nbytes;
-     }
-=20
--    ret =3D 0;
-- cleanup:
--    g_free(iv);
--    return ret;
-+    return 0;
- }
-=20
-=20
-diff --git a/crypto/pbkdf.c b/crypto/pbkdf.c
-index b7c7c4a59b..3775ddc6c5 100644
---- a/crypto/pbkdf.c
-+++ b/crypto/pbkdf.c
-@@ -69,12 +69,10 @@ uint64_t qcrypto_pbkdf2_count_iters(QCryptoHashAlgori=
-thm hash,
-                                     Error **errp)
- {
-     uint64_t ret =3D -1;
--    uint8_t *out;
-+    g_autofree uint8_t *out =3D g_new(uint8_t, nout);
-     uint64_t iterations =3D (1 << 15);
-     unsigned long long delta_ms, start_ms, end_ms;
-=20
--    out =3D g_new(uint8_t, nout);
--
-     while (1) {
-         if (qcrypto_pbkdf2_get_thread_cpu(&start_ms, errp) < 0) {
-             goto cleanup;
-@@ -108,6 +106,5 @@ uint64_t qcrypto_pbkdf2_count_iters(QCryptoHashAlgori=
-thm hash,
-=20
-  cleanup:
-     memset(out, 0, nout);
--    g_free(out);
-     return ret;
- }
-diff --git a/crypto/secret.c b/crypto/secret.c
-index a75d50ae0c..aeb506afab 100644
---- a/crypto/secret.c
-+++ b/crypto/secret.c
-@@ -72,9 +72,11 @@ static void qcrypto_secret_decrypt(QCryptoSecret *secr=
-et,
-                                    size_t *outputlen,
-                                    Error **errp)
- {
--    uint8_t *key =3D NULL, *ciphertext =3D NULL, *iv =3D NULL;
-+    g_autofree uint8_t *key =3D NULL;
-+    g_autofree uint8_t *ciphertext =3D NULL;
-+    g_autofree uint8_t *iv =3D NULL;
-     size_t keylen, ciphertextlen, ivlen;
--    QCryptoCipher *aes =3D NULL;
-+    g_autoptr(QCryptoCipher) aes =3D NULL;
-     uint8_t *plaintext =3D NULL;
-=20
-     *output =3D NULL;
-@@ -160,9 +162,6 @@ static void qcrypto_secret_decrypt(QCryptoSecret *sec=
-ret,
-     *outputlen =3D ciphertextlen;
-=20
-  cleanup:
--    g_free(ciphertext);
--    g_free(iv);
--    g_free(key);
-     qcrypto_cipher_free(aes);
- }
-=20
-diff --git a/crypto/tlscredsanon.c b/crypto/tlscredsanon.c
-index d2adc7c131..a235f60146 100644
---- a/crypto/tlscredsanon.c
-+++ b/crypto/tlscredsanon.c
-@@ -34,9 +34,8 @@ static int
- qcrypto_tls_creds_anon_load(QCryptoTLSCredsAnon *creds,
-                             Error **errp)
- {
--    char *dhparams =3D NULL;
-+    g_autofree char *dhparams =3D NULL;
-     int ret;
--    int rv =3D -1;
-=20
-     trace_qcrypto_tls_creds_anon_load(creds,
-             creds->parent_obj.dir ? creds->parent_obj.dir : "<nodir>");
-@@ -45,20 +44,20 @@ qcrypto_tls_creds_anon_load(QCryptoTLSCredsAnon *cred=
-s,
-         if (qcrypto_tls_creds_get_path(&creds->parent_obj,
-                                        QCRYPTO_TLS_CREDS_DH_PARAMS,
-                                        false, &dhparams, errp) < 0) {
--            goto cleanup;
-+            return -1;
-         }
-=20
-         ret =3D gnutls_anon_allocate_server_credentials(&creds->data.ser=
-ver);
-         if (ret < 0) {
-             error_setg(errp, "Cannot allocate credentials: %s",
-                        gnutls_strerror(ret));
--            goto cleanup;
-+            return -1;
-         }
-=20
-         if (qcrypto_tls_creds_get_dh_params_file(&creds->parent_obj, dhp=
-arams,
-                                                  &creds->parent_obj.dh_p=
-arams,
-                                                  errp) < 0) {
--            goto cleanup;
-+            return -1;
-         }
-=20
-         gnutls_anon_set_server_dh_params(creds->data.server,
-@@ -68,14 +67,11 @@ qcrypto_tls_creds_anon_load(QCryptoTLSCredsAnon *cred=
-s,
-         if (ret < 0) {
-             error_setg(errp, "Cannot allocate credentials: %s",
-                        gnutls_strerror(ret));
--            goto cleanup;
-+            return -1;
-         }
-     }
-=20
--    rv =3D 0;
-- cleanup:
--    g_free(dhparams);
--    return rv;
-+    return 0;
- }
-=20
-=20
-diff --git a/crypto/tlscredspsk.c b/crypto/tlscredspsk.c
-index 4b6cf636ce..15d12e2448 100644
---- a/crypto/tlscredspsk.c
-+++ b/crypto/tlscredspsk.c
-@@ -69,7 +69,8 @@ static int
- qcrypto_tls_creds_psk_load(QCryptoTLSCredsPSK *creds,
-                            Error **errp)
- {
--    char *pskfile =3D NULL, *dhparams =3D NULL;
-+    g_autofree char *pskfile =3D NULL;
-+    g_autofree char *dhparams =3D NULL;
-     const char *username;
-     int ret;
-     int rv =3D -1;
-@@ -139,8 +140,6 @@ qcrypto_tls_creds_psk_load(QCryptoTLSCredsPSK *creds,
-     rv =3D 0;
-  cleanup:
-     g_free(key.data);
--    g_free(pskfile);
--    g_free(dhparams);
-     return rv;
- }
-=20
-diff --git a/crypto/tlscredsx509.c b/crypto/tlscredsx509.c
-index 56dcef3673..01fc304e5d 100644
---- a/crypto/tlscredsx509.c
-+++ b/crypto/tlscredsx509.c
-@@ -378,7 +378,7 @@ qcrypto_tls_creds_load_cert(QCryptoTLSCredsX509 *cred=
-s,
- {
-     gnutls_datum_t data;
-     gnutls_x509_crt_t cert =3D NULL;
--    char *buf =3D NULL;
-+    g_autofree char *buf =3D NULL;
-     gsize buflen;
-     GError *gerr;
-     int ret =3D -1;
-@@ -420,7 +420,6 @@ qcrypto_tls_creds_load_cert(QCryptoTLSCredsX509 *cred=
-s,
-         gnutls_x509_crt_deinit(cert);
-         cert =3D NULL;
-     }
--    g_free(buf);
-     return cert;
- }
-=20
-@@ -434,9 +433,8 @@ qcrypto_tls_creds_load_ca_cert_list(QCryptoTLSCredsX5=
-09 *creds,
-                                     Error **errp)
- {
-     gnutls_datum_t data;
--    char *buf =3D NULL;
-+    g_autofree char *buf =3D NULL;
-     gsize buflen;
--    int ret =3D -1;
-     GError *gerr =3D NULL;
-=20
-     *ncerts =3D 0;
-@@ -446,7 +444,7 @@ qcrypto_tls_creds_load_ca_cert_list(QCryptoTLSCredsX5=
-09 *creds,
-         error_setg(errp, "Cannot load CA cert list %s: %s",
-                    certFile, gerr->message);
-         g_error_free(gerr);
--        goto cleanup;
-+        return -1;
-     }
-=20
-     data.data =3D (unsigned char *)buf;
-@@ -457,15 +455,11 @@ qcrypto_tls_creds_load_ca_cert_list(QCryptoTLSCreds=
-X509 *creds,
-         error_setg(errp,
-                    "Unable to import CA certificate list %s",
-                    certFile);
--        goto cleanup;
-+        return -1;
-     }
-     *ncerts =3D certMax;
-=20
--    ret =3D 0;
--
-- cleanup:
--    g_free(buf);
--    return ret;
-+    return 0;
- }
-=20
-=20
---=20
-2.21.0
+>> I'm just double checking now - it does seem OpenBSD is very slow even
+>> with 18 cores assigned.
+>=20
+> We should avoid enabling "very slow" tests in make check too...
 
+It's not the iotests that are slow here, it's the whole openbsd image -
+even compiling is way slower than natively... it feels like it is
+ignoring the multiple cores and only running single-threaded.
+
+ Thomas
 
