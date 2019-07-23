@@ -2,65 +2,63 @@ Return-Path: <SRS0=3Ld+=VU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.5 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,URIBL_SBL,URIBL_SBL_A,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47E41C7618E
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 13:14:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9246AC7618E
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 13:18:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1FDFE218BE
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 13:14:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1FDFE218BE
+	by mail.kernel.org (Postfix) with ESMTPS id 6A0CD218BE
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 13:18:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A0CD218BE
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42384 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42410 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hpucG-0007T2-Be
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jul 2019 09:14:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54001)
+	id 1hpugq-0000qi-Mj
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jul 2019 09:18:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55066)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <berrange@redhat.com>) id 1hpuc6-00073r-6g
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 09:13:55 -0400
+ (envelope-from <cohuck@redhat.com>) id 1hpugf-0000Rg-C8
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 09:18:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1hpuc5-0003ig-5y
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 09:13:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51496)
+ (envelope-from <cohuck@redhat.com>) id 1hpuge-0005rB-Db
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 09:18:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41188)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hpuc5-0003iU-0T
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 09:13:53 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1hpuge-0005qQ-6d
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 09:18:36 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 578208553A;
- Tue, 23 Jul 2019 13:13:52 +0000 (UTC)
-Received: from redhat.com (unknown [10.36.112.10])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7B81160BEC;
- Tue, 23 Jul 2019 13:13:50 +0000 (UTC)
-Date: Tue, 23 Jul 2019 14:13:47 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: P J P <ppandit@redhat.com>
-Message-ID: <20190723131347.GC3778@redhat.com>
-References: <20190723104754.29324-1-ppandit@redhat.com>
- <20190723104754.29324-4-ppandit@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id AD2ED3082B6D;
+ Tue, 23 Jul 2019 13:18:34 +0000 (UTC)
+Received: from gondolin (dhcp-192-181.str.redhat.com [10.33.192.181])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id AA5AD5D72E;
+ Tue, 23 Jul 2019 13:18:25 +0000 (UTC)
+Date: Tue, 23 Jul 2019 15:18:23 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: Kirti Wankhede <kwankhede@nvidia.com>
+Message-ID: <20190723151823.4832278f.cohuck@redhat.com>
+In-Reply-To: <1562665760-26158-13-git-send-email-kwankhede@nvidia.com>
+References: <1562665760-26158-1-git-send-email-kwankhede@nvidia.com>
+ <1562665760-26158-13-git-send-email-kwankhede@nvidia.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190723104754.29324-4-ppandit@redhat.com>
-User-Agent: Mutt/1.12.0 (2019-05-25)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.28]); Tue, 23 Jul 2019 13:13:52 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ (mx1.redhat.com [10.5.110.45]); Tue, 23 Jul 2019 13:18:35 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v4 3/3] net: tap: replace snprintf with
- g_strdup_printf calls
+Subject: Re: [Qemu-devel] [PATCH v7 12/13] vfio: Add vfio_listerner_log_sync
+ to mark dirty pages
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,36 +70,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Jason Wang <jasowang@redhat.com>, Li Qiang <liq3ea@gmail.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Prasad J Pandit <pjp@fedoraproject.org>
+Cc: kevin.tian@intel.com, yi.l.liu@intel.com, cjia@nvidia.com,
+ eskultet@redhat.com, ziye.yang@intel.com, qemu-devel@nongnu.org,
+ Zhengxiao.zx@Alibaba-inc.com, shuangtai.tst@alibaba-inc.com,
+ dgilbert@redhat.com, zhi.a.wang@intel.com, mlevitsk@redhat.com,
+ pasic@linux.ibm.com, aik@ozlabs.ru, alex.williamson@redhat.com,
+ eauger@redhat.com, felipe@nutanix.com, jonathan.davies@nutanix.com,
+ yan.y.zhao@intel.com, changpeng.liu@intel.com, Ken.Xue@amd.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Jul 23, 2019 at 04:17:54PM +0530, P J P wrote:
-> From: Prasad J Pandit <pjp@fedoraproject.org>
->=20
-> When invoking qemu-bridge-helper in 'net_bridge_run_helper',
-> instead of using fixed sized buffers, use dynamically allocated
-> ones initialised and returned by g_strdup_printf().
->=20
-> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+On Tue, 9 Jul 2019 15:19:19 +0530
+Kirti Wankhede <kwankhede@nvidia.com> wrote:
+
+> vfio_listerner_log_sync gets list of dirty pages from vendor driver and mark
+
+s/listerner/listener/ (here and in the code)
+
+> those pages dirty when in _SAVING state.
+> Return early for the RAM block section of mapped MMIO region.
+> 
+> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+> Reviewed-by: Neo Jia <cjia@nvidia.com>
 > ---
->  net/tap.c | 19 +++++++++++--------
->  1 file changed, 11 insertions(+), 8 deletions(-)
-
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+>  hw/vfio/common.c | 35 +++++++++++++++++++++++++++++++++++
+>  1 file changed, 35 insertions(+)
 
