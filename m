@@ -2,72 +2,70 @@ Return-Path: <SRS0=3Ld+=VU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CE6DC7618F
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 01:15:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C7BBC76186
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 03:24:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 74F1521955
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 01:15:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 74F1521955
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id F093021911
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 03:24:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F093021911
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38480 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38836 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hpjPE-0004IY-AV
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jul 2019 21:15:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38080)
+	id 1hplPT-0002Ui-5H
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jul 2019 23:24:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38170)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bounces@canonical.com>) id 1hpjP2-0003uD-To
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 21:15:42 -0400
+ (envelope-from <jasowang@redhat.com>) id 1hplPI-00025x-BV
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 23:24:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1hpjP1-0000uk-Gk
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 21:15:40 -0400
-Received: from indium.canonical.com ([91.189.90.7]:43972)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1hpjP1-0000sc-9x
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 21:15:39 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1hpjP0-0005z7-86
- for <qemu-devel@nongnu.org>; Tue, 23 Jul 2019 01:15:38 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 38FFE2E80C8
- for <qemu-devel@nongnu.org>; Tue, 23 Jul 2019 01:15:38 +0000 (UTC)
+ (envelope-from <jasowang@redhat.com>) id 1hplPH-0002P4-Do
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 23:24:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41674)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1hplPH-0002NV-8S
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 23:24:03 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 9E3D0300C032;
+ Tue, 23 Jul 2019 03:24:01 +0000 (UTC)
+Received: from [10.72.12.57] (ovpn-12-57.pek2.redhat.com [10.72.12.57])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2AC7760BF1;
+ Tue, 23 Jul 2019 03:23:57 +0000 (UTC)
+To: "Zhang, Chen" <chen.zhang@intel.com>,
+ Peter Maydell <peter.maydell@linaro.org>
+References: <20190722171828.11322-1-chen.zhang@intel.com>
+ <CAFEAcA8==zAupCx=3sZt2tNUQH4OKza7FGhkwuCyxHpguTMGTA@mail.gmail.com>
+ <9CFF81C0F6B98A43A459C9EDAD400D78061D67D3@shsmsx102.ccr.corp.intel.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <599f9e75-3d85-c1e7-fe6b-34c95d9d240c@redhat.com>
+Date: Tue, 23 Jul 2019 11:23:56 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <9CFF81C0F6B98A43A459C9EDAD400D78061D67D3@shsmsx102.ccr.corp.intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.46]); Tue, 23 Jul 2019 03:24:01 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 23 Jul 2019 01:03:36 -0000
-From: Roman Bolshakov <1818937@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: crash hvf macos
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: bwibking cuser2 kisg roolebo
-X-Launchpad-Bug-Reporter: Chen Zhang (cuser2)
-X-Launchpad-Bug-Modifier: Roman Bolshakov (roolebo)
-References: <155192472106.28960.15645485731508389788.malonedeb@chaenomeles.canonical.com>
-Message-Id: <156384381634.14663.16199225986669814171.malone@wampee.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="19010";
- Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 4e9a458b8df617f7316109a9793c9a3aeacb2f71
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1818937] Re: Crash with HV_ERROR on macOS host
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH V5] net/colo-compare.c: Fix memory leak and
+ code style issue.
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -76,107 +74,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1818937 <1818937@bugs.launchpad.net>
+Cc: qemu-dev <qemu-devel@nongnu.org>, Li Zhijian <lizhijian@cn.fujitsu.com>,
+ Zhang Chen <zhangckid@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The log line I've got is the following:
-=E2=9E=9C  vms ~/dev/qemu/x86_64-softmmu/qemu-system-x86_64 -accel hvf -m 2=
-G -cdrom ~/Downloads/ubuntu-18.04.2-desktop-amd64.iso -hda ubuntu.qc
-ow2
-qemu-system-x86_64: warning: host doesn't support requested feature: CPUID.=
-80000001H:ECX.svm [bit 2]
-qemu-system-x86_64: hv_vcpu_run failed
-qemu-system-x86_64: instruction error:      0x0000000000000007
-qemu-system-x86_64: exit reason:            0x0000000000000030
-qemu-system-x86_64: exit qualification:     0x0000000000000083
-qemu-system-x86_64: pri proc based ctls:    0x0000000095206dfa
-qemu-system-x86_64: sec proc based ctls:    0x00000000000000a3
-qemu-system-x86_64: eptp:                   0x000000000000003f
-qemu-system-x86_64: gpa:                    0x000000007d9ef000
-qemu-system-x86_64: gla:                    0xfffffe0000000ec0
-qemu-system-x86_64: Error: HV_ERROR
+
+On 2019/7/23 =E4=B8=8A=E5=8D=882:38, Zhang, Chen wrote:
+>
+>
+>> -----Original Message-----
+>> From: Peter Maydell [mailto:peter.maydell@linaro.org]
+>> Sent: Tuesday, July 23, 2019 1:25 AM
+>> To: Zhang, Chen <chen.zhang@intel.com>
+>> Cc: Li Zhijian <lizhijian@cn.fujitsu.com>; Jason Wang <jasowang@redhat=
+.com>;
+>> qemu-dev <qemu-devel@nongnu.org>; Zhang Chen <zhangckid@gmail.com>
+>> Subject: Re: [PATCH V5] net/colo-compare.c: Fix memory leak and code s=
+tyle
+>> issue.
+>>
+>> On Mon, 22 Jul 2019 at 18:23, Zhang Chen <chen.zhang@intel.com> wrote:
+>>> From: Zhang Chen <chen.zhang@intel.com>
+>>>
+>>> This patch to fix the origin "char *data" memory leak, code style
+>>> issue and add necessary check here.
+>>> Reported-by: Coverity (CID 1402785)
+>>>
+>>> Signed-off-by: Zhang Chen <chen.zhang@intel.com>
+>>> ---
+>>>   net/colo-compare.c | 27 ++++++++++++++++++++-------
+>>>   1 file changed, 20 insertions(+), 7 deletions(-)
+>> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+>>
+>> Thanks for your patience in sending out all these versions as we worke=
+d
+>> through the code review process.
+> Thank you too~
+> Maybe you or Jason can pick up this patch?
+>
+> Thanks
+> Zhang Chen
 
 
-Instruction error is 0x7 and Intel SDM 31-4 Vol. 3C states that:
-The processor checks on the VMX controls and host-state area. If any of the=
-se checks fail, the VM-entry instruction fails. RFLAGS.ZF is set to 1 and e=
-ither 7 (VM entry with invalid control field(s)) or 8 (VM entry with invali=
-d host-state field(s)) is saved in the VM-instruction error field.
+Applied.
 
--- =
+Thanks
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1818937
 
-Title:
-  Crash with HV_ERROR on macOS host
-
-Status in QEMU:
-  New
-
-Bug description:
-  On macOS host running Windows 10 guest, qemu crashed with error
-  message: Error: HV_ERROR.
-
-  Host: macOS Mojave 10.14.3 (18D109) Late 2014 Mac mini presumably Core i5=
- 4278U.
-  QEMU: git commit a3e3b0a7bd5de211a62cdf2d6c12b96d3c403560
-  QEMU parameter: qemu-system-x86_64 -m 3000 -drive file=3Ddisk.img,if=3Dvi=
-rtio,discard=3Dunmap -accel hvf -soundhw hda -smp 3
-
-  thread list
-  Process 56054 stopped
-    thread #1: tid =3D 0x2ffec8, 0x00007fff48d0805a vImage`vLookupTable_Pla=
-nar16 + 970, queue =3D 'com.apple.main-thread'
-    thread #2: tid =3D 0x2ffecc, 0x00007fff79d6d7de libsystem_kernel.dylib`=
-__psynch_cvwait + 10
-    thread #3: tid =3D 0x2ffecd, 0x00007fff79d715aa libsystem_kernel.dylib`=
-__select + 10
-    thread #4: tid =3D 0x2ffece, 0x00007fff79d71d9a libsystem_kernel.dylib`=
-__sigwait + 10
-  * thread #6: tid =3D 0x2ffed0, 0x00007fff79d7023e libsystem_kernel.dylib`=
-__pthread_kill + 10, stop reason =3D signal SIGABRT
-    thread #7: tid =3D 0x2ffed1, 0x00007fff79d6d7de libsystem_kernel.dylib`=
-__psynch_cvwait + 10
-    thread #8: tid =3D 0x2ffed2, 0x00007fff79d6d7de libsystem_kernel.dylib`=
-__psynch_cvwait + 10
-    thread #11: tid =3D 0x2fff34, 0x00007fff79d6a17a libsystem_kernel.dylib=
-`mach_msg_trap + 10, name =3D 'com.apple.NSEventThread'
-    thread #30: tid =3D 0x300c04, 0x00007fff79e233f8 libsystem_pthread.dyli=
-b`start_wqthread
-    thread #31: tid =3D 0x300c16, 0x00007fff79e233f8 libsystem_pthread.dyli=
-b`start_wqthread
-    thread #32: tid =3D 0x300c17, 0x0000000000000000
-    thread #33: tid =3D 0x300c93, 0x00007fff79d6d7de libsystem_kernel.dylib=
-`__psynch_cvwait + 10
-
-  =
-
-  Crashed thread:
-
-  * thread #6, stop reason =3D signal SIGABRT
-    * frame #0: 0x00007fff79d7023e libsystem_kernel.dylib`__pthread_kill + =
-10
-      frame #1: 0x00007fff79e26c1c libsystem_pthread.dylib`pthread_kill + 2=
-85
-      frame #2: 0x00007fff79cd91c9 libsystem_c.dylib`abort + 127
-      frame #3: 0x000000010baa476d qemu-system-x86_64`assert_hvf_ok(ret=3D<=
-unavailable>) at hvf.c:106 [opt]
-      frame #4: 0x000000010baa4c8f qemu-system-x86_64`hvf_vcpu_exec(cpu=3D0=
-x00007f8e5283de00) at hvf.c:681 [opt]
-      frame #5: 0x000000010b988423 qemu-system-x86_64`qemu_hvf_cpu_thread_f=
-n(arg=3D0x00007f8e5283de00) at cpus.c:1636 [opt]
-      frame #6: 0x000000010bd9dfce qemu-system-x86_64`qemu_thread_start(arg=
-s=3D<unavailable>) at qemu-thread-posix.c:502 [opt]
-      frame #7: 0x00007fff79e24305 libsystem_pthread.dylib`_pthread_body + =
-126
-      frame #8: 0x00007fff79e2726f libsystem_pthread.dylib`_pthread_start +=
- 70
-      frame #9: 0x00007fff79e23415 libsystem_pthread.dylib`thread_start + 13
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1818937/+subscriptions
+>
+>> thanks
+>> -- PMM
 
