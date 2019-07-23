@@ -7,74 +7,75 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B8AFC7618E
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 10:43:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC2ACC7618E
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 10:43:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ECEE722512
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 10:43:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BAD032081B
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 10:43:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LnzpAX7u"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECEE722512
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iSbO1Q5+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BAD032081B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41104 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41106 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hpsG4-0006TN-GH
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jul 2019 06:43:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39710)
+	id 1hpsGE-0007HY-K1
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jul 2019 06:43:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39671)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hpsF6-0002YT-Ar
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 06:42:01 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hpsF4-0002PF-1n
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 06:41:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hpsF3-0004ED-Vd
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 06:41:59 -0400
-Received: from mail-wr1-x42b.google.com ([2a00:1450:4864:20::42b]:47014)
+ (envelope-from <alex.bennee@linaro.org>) id 1hpsF1-0004CW-Qa
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 06:41:57 -0400
+Received: from mail-wm1-x331.google.com ([2a00:1450:4864:20::331]:36892)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hpsF1-0004B9-OT
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 06:41:57 -0400
-Received: by mail-wr1-x42b.google.com with SMTP id z1so42591982wru.13
- for <qemu-devel@nongnu.org>; Tue, 23 Jul 2019 03:41:54 -0700 (PDT)
+ id 1hpsEz-00049C-LF
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 06:41:55 -0400
+Received: by mail-wm1-x331.google.com with SMTP id f17so38029614wme.2
+ for <qemu-devel@nongnu.org>; Tue, 23 Jul 2019 03:41:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=qyLKSdPX2WPchYG7C+FRJEUvyrp1wUDqLHouafCL0pQ=;
- b=LnzpAX7uTmvpTDwvsUkh7U2Skevlqy17jKtsJTpvbEN4feDkVM0u0tQg5RWTwyowhD
- RcfiFVFUKa65W4cTcl98OKMC0K9NuV3HYrlOfCW65iCaBZ1ObddIh2RWgF31c7gRBD23
- VYXiQXBunVYp58/l0KeILaXwaTO8a8V94gOYyOy4K3xNDAJU0M2GQO81OnErSgMRvzFR
- wpNraVej598AdNlWipkhH59Cb8TDYXIhoZwYAuznWW5Xl0y3+wvzqcg2+sVmfbvz8Kdu
- FwPRNnT4RuJT0COhdKcy2fuXk4pfiPB0xsXcJkUmpm5dJlhMHhLU7ZQMbIt2Qo7JBk4q
- qmbA==
+ bh=k0cRgpglCD2PcKK9Njfjp9ahbK4mgT1ZXlX00pGzzsc=;
+ b=iSbO1Q5+/Yo9C3K/uq/3MxLeuXxOvA6mG+XkKyUaR0L0mCcTI28nqav4GU7XnW27e1
+ MRrVx95yJ1XY3uvUIxagXKzrYTphlj2OfXUd47LvTlgDeIFRX5yqF/nf4IyFnOqX3RrW
+ Q9ewxx2pTuD1Hr6c7fqZaDMaxsMhU8rl11YT877zWMoKNp/x8LQ4eT7hRBoIPgX4okd+
+ +fbrDZwnTgkaPV20r08uPPApf548SOFASEqcRO9nyYMGR5kuxo+C+u6FkrgcSn5rTS3D
+ NX8bQOCvfci5m+/peQDjvTXa2Fpww+1YLokEIV4ieKjVCn9M3oqhkmsCE4MK0ia6mEqi
+ twrw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=qyLKSdPX2WPchYG7C+FRJEUvyrp1wUDqLHouafCL0pQ=;
- b=WoAbE8gWRDSQNUJZ59MV1HHNDYuSEUy7DrhUvOYEqYePW1fKYon0bJTTeuRIuq2Fpr
- fzEjgz4KPBtp0OODey6TkUkH6FQr45Ue4oCUd9gBbm3nvu3f6PujX1lIYvxcsHGNtgHR
- AwY4Ir+5C5Kg/JLn1gSlm2dzBAUbwiceTu+IfcMV8WCjE6X3cSrc+v07NjMyKWH0Envv
- 8e+WCPpTtL9pUjVObJkTgOdVFmsBxKy7NbMX8YDKQk9GSQPU1zPft+TbYzH4ryOLk07R
- B7siIz/FFJ0CtWrBt9qWI9tfRTfltK9d39JWzzo42G6TR/gu7no4OjEXAvIBjX8J+woj
- DXyQ==
-X-Gm-Message-State: APjAAAU7McqC51YRgWk8MKFMXp0jhreVjYG5dX2sM2y0AeHeV754vW8l
- kzTBomObpdJ4KH0XEDez6rFmGQ==
-X-Google-Smtp-Source: APXvYqxnIuFHyDF//HFoO6AevKmrFE3OzFU0nQs9rGKufnSHcOvpWKzvqPMxucPYqaRW1ISWTF4Rbw==
-X-Received: by 2002:adf:91c2:: with SMTP id 60mr23838509wri.334.1563878513884; 
- Tue, 23 Jul 2019 03:41:53 -0700 (PDT)
+ bh=k0cRgpglCD2PcKK9Njfjp9ahbK4mgT1ZXlX00pGzzsc=;
+ b=YNdgVMUfkVemAuo8xXDXYziNdPOCub1XOp+a9ESSa4DiHbVIyCWJENuRi/Z2NW9x2T
+ zdjGdn6jRbTjuz0DhhvbLJ7rpiZJ4jh1FLzxju9R6NKiUi2/J+8aD3lG/GoxGLF0neI9
+ gh/h3aeN1OMCgw2t2n7VmemCuewqDWfxi4a2QviiTVhD0xE0Rz64jU3VroCFISRfYGTW
+ pZW30sde0eAE6bwTDsTz3wZsCxVvwK962jAW+22iX3JroDrN6v1tBdHjIQQOBZMc3Z+s
+ t1ubKV0ZpoIf7jmM+AFK8Lu+OtciEoQXsmEC+cGvILZdl8gk1Mw0oX4T9ZBhI6RGaKJ9
+ yg7Q==
+X-Gm-Message-State: APjAAAU3nvxX4+7hBEfxo89pQnHmOxMzngTY8LTV/P9ykEhEBffjzM14
+ 4cCMp5y0RLm+pG7FdyOfgv5FPw==
+X-Google-Smtp-Source: APXvYqx62NgTwNNfqzhOHz98GjHxgW3n/2nPl4w2nQS1nS6Qiu9Z2PLlV9rndwAZ6LKK5V1usSn5Lg==
+X-Received: by 2002:a1c:1b97:: with SMTP id
+ b145mr65323798wmb.158.1563878511302; 
+ Tue, 23 Jul 2019 03:41:51 -0700 (PDT)
 Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id g2sm37766623wmh.0.2019.07.23.03.41.50
+ by smtp.gmail.com with ESMTPSA id g12sm59382890wrv.9.2019.07.23.03.41.48
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Tue, 23 Jul 2019 03:41:52 -0700 (PDT)
+ Tue, 23 Jul 2019 03:41:48 -0700 (PDT)
 Received: from zen.linaroharston. (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id EFC111FFA5;
+ by zen.linaroharston (Postfix) with ESMTP id DB1731FFA3;
  Tue, 23 Jul 2019 11:36:13 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: peter.maydell@linaro.org
-Date: Tue, 23 Jul 2019 11:36:07 +0100
-Message-Id: <20190723103612.5600-19-alex.bennee@linaro.org>
+Date: Tue, 23 Jul 2019 11:36:06 +0100
+Message-Id: <20190723103612.5600-18-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190723103612.5600-1-alex.bennee@linaro.org>
 References: <20190723103612.5600-1-alex.bennee@linaro.org>
@@ -83,9 +84,9 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::42b
-Subject: [Qemu-devel] [PULL 18/23] travis: enable travis_retry for check
- phase
+X-Received-From: 2a00:1450:4864:20::331
+Subject: [Qemu-devel] [PULL 17/23] hw/i386: also turn off VMMOUSE is VMPORT
+ is disabled
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,33 +98,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>,
+Cc: Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We have some flaky tests and usually the test passes on a retry.
-Enable travis_retry for the test phase and see if that helps keep
-things green.
+Commit 97fd1ea8c1 broke the build for --without-default-devices as
+VMMOUSE depends on VMPORT.
 
+Fixes: 97fd1ea8c1
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-diff --git a/.travis.yml b/.travis.yml
-index 5d3d6ee1d32..caf0a1f8faf 100644
---- a/.travis.yml
-+++ b/.travis.yml
-@@ -75,7 +75,7 @@ before_script:
-   - mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR}
-   - ${SRC_DIR}/configure ${BASE_CONFIG} ${CONFIG} || { cat config.log && exit 1; }
- script:
--  - make -j3 && ${TEST_CMD}
-+  - make -j3 && travis_retry ${TEST_CMD}
+diff --git a/hw/i386/Kconfig b/hw/i386/Kconfig
+index b9c96ac361e..6350438036f 100644
+--- a/hw/i386/Kconfig
++++ b/hw/i386/Kconfig
+@@ -52,6 +52,7 @@ config I440FX
+     bool
+     imply E1000_PCI
+     imply VMPORT
++    imply VMMOUSE
+     select PC_PCI
+     select PC_ACPI
+     select ACPI_SMBUS
+@@ -59,7 +60,6 @@ config I440FX
+     select IDE_PIIX
+     select DIMM
+     select SMBIOS
+-    select VMMOUSE
+     select FW_CFG_DMA
  
+ config ISAPC
+@@ -78,6 +78,7 @@ config Q35
+     imply AMD_IOMMU
+     imply E1000E_PCI_EXPRESS
+     imply VMPORT
++    imply VMMOUSE
+     select PC_PCI
+     select PC_ACPI
+     select PCI_EXPRESS_Q35
+@@ -85,7 +86,6 @@ config Q35
+     select AHCI_ICH9
+     select DIMM
+     select SMBIOS
+-    select VMMOUSE
+     select FW_CFG_DMA
  
- matrix:
+ config VTD
 -- 
 2.20.1
 
