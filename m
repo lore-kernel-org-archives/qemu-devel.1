@@ -2,93 +2,64 @@ Return-Path: <SRS0=3Ld+=VU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39293C7618B
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 12:58:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C88ABC7618B
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 12:58:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 065A121670
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 12:58:28 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RoC7DsLB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 065A121670
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 9C69621670
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 12:58:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C69621670
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42210 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42222 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hpuN9-00063c-BS
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jul 2019 08:58:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49526)
+	id 1hpuNT-0006zf-TB
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jul 2019 08:58:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49712)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hpuMy-0005fC-V6
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 08:58:18 -0400
+ (envelope-from <imammedo@redhat.com>) id 1hpuNJ-0006XZ-Lg
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 08:58:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hpuMx-0004dZ-VO
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 08:58:16 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:55629)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hpuMx-0004cu-PJ
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 08:58:15 -0400
-Received: by mail-wm1-x342.google.com with SMTP id a15so38431844wmj.5
- for <qemu-devel@nongnu.org>; Tue, 23 Jul 2019 05:58:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=KuCZ3j6/LkBN+3wxvLKw9aEKdFta6SJvI9iP+60HM6U=;
- b=RoC7DsLBwnkHmLgqP8d5s7vurY33PibIsMwNVRJYchar9wt+wx7lABY/JzKCWloFv6
- z1t9BsKNQxIB93Mgj4AjRBsGTbZhtxjWb6+0T8gZhpPNjaifBrpkDeb0hzA3rVFpF84f
- N0zUJ1TvXLxr2IUSxulSqotGJt2pegCXNikAioDkV6DqyECwrl2rF3L8WAEEQFYfsWNu
- O1AwK06GIp3Yg6SYgXXtp73eB6xjlzl/jZkGVliEjwdoGyNf7yJOKRTM1eOoCX65yqK8
- qKLyxw0aJ1JNI+cDlF0eILmYFfQiwbuZykKuoVuhBa83lfwN+5aO6YFcHJU8/6RN22CX
- 17Gw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=KuCZ3j6/LkBN+3wxvLKw9aEKdFta6SJvI9iP+60HM6U=;
- b=PreZKP4gBacD3ieyjOCKEnA6mskiUAk4tRLeYtHJyYC4+gKG8ZPGvFcVpWRPfbPg7X
- W8vLyLrrZUUmswfDv9RDHYg+syEeK95ioiNbHl5p5rfHjgLLa1V2Oweo0fvGT8TuP7H5
- qOwXmY2Ze9Jss6tr8aMDGlYSX+RyaKBJaRL963TfuHd/RGFqAAo8Jf4XLeatoKSvVRMA
- hcthb+Rca5/u0F+r+o6IXfvpNd71zBCuiSYzQ58KDrSpulqbKpgyLnNsYnOVD9OFOGWt
- Uobahi08CnEWEPCybDOnqVo+zd3uI40C5ZkZu3ZhTCbAvwUwiZtYgDbkjkkLF1YSW5m/
- A9yQ==
-X-Gm-Message-State: APjAAAXMYmvr1Idw8lpNfSuukM3IEH+ZyfnuzJ/WdZC4rfpHupK0tFYG
- 7RQl4odnCCTKgcosRg6J5TYP4g==
-X-Google-Smtp-Source: APXvYqzAaX/cENq3igCtS3v543rI3KiipsGKou9ejX/npatmsJ67toHCREGwnF5+XAXDTwr/EtG1XA==
-X-Received: by 2002:a1c:b155:: with SMTP id a82mr19160441wmf.35.1563886694526; 
- Tue, 23 Jul 2019 05:58:14 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id t63sm35869287wmt.6.2019.07.23.05.58.13
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Tue, 23 Jul 2019 05:58:14 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id B37DA1FF87;
- Tue, 23 Jul 2019 13:58:13 +0100 (BST)
-References: <20190723103612.5600-1-alex.bennee@linaro.org>
- <CAFEAcA_P_Bk0bNGCW+TwhQGCeqM-XZd3OudKZ4tu0fNThFH5ww@mail.gmail.com>
- <87imrt0y9a.fsf@linaro.org>
- <451b91c6-3a4d-afb4-30f1-595fcc7e5f65@redhat.com>
- <CAFEAcA_O4kegKUsSfzQhBp_AnV_uD1S=F4pm0V0nG6XQ2Dyseg@mail.gmail.com>
-User-agent: mu4e 1.3.3; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Peter Maydell <peter.maydell@linaro.org>
-In-reply-to: <CAFEAcA_O4kegKUsSfzQhBp_AnV_uD1S=F4pm0V0nG6XQ2Dyseg@mail.gmail.com>
-Date: Tue, 23 Jul 2019 13:58:13 +0100
-Message-ID: <87ftmw29i2.fsf@linaro.org>
+ (envelope-from <imammedo@redhat.com>) id 1hpuNI-0004pH-2V
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 08:58:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58830)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>)
+ id 1hpuNE-0004nM-Pe; Tue, 23 Jul 2019 08:58:33 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id A318B8CB48;
+ Tue, 23 Jul 2019 12:58:31 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.182])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D57285D9C5;
+ Tue, 23 Jul 2019 12:58:24 +0000 (UTC)
+Date: Tue, 23 Jul 2019 14:58:22 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+Message-ID: <20190723145822.5fab37c2@redhat.com>
+In-Reply-To: <5FC3163CFD30C246ABAA99954A238FA83F310B0C@lhreml524-mbs.china.huawei.com>
+References: <20190716153816.17676-1-shameerali.kolothum.thodi@huawei.com>
+ <20190716153816.17676-11-shameerali.kolothum.thodi@huawei.com>
+ <20190718151315.2c1d3aff@redhat.com>
+ <5FC3163CFD30C246ABAA99954A238FA83F310B0C@lhreml524-mbs.china.huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::342
-Subject: Re: [Qemu-devel] [PULL for 4.1-rc2 00/23] testing updates (green
- CI!)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.26]); Tue, 23 Jul 2019 12:58:32 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH-for-4.2 v7 10/10] tests: Update DSDT ACPI
+ table for arm/virt board with PCDIMM related changes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,40 +71,217 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+ "sameo@linux.intel.com" <sameo@linux.intel.com>,
+ "ard.biesheuvel@linaro.org" <ard.biesheuvel@linaro.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Linuxarm <linuxarm@huawei.com>,
+ "shannon.zhaosl@gmail.com" <shannon.zhaosl@gmail.com>,
+ "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "xuwei \(O\)" <xuwei5@huawei.com>,
+ "sebastien.boeuf@intel.com" <sebastien.boeuf@intel.com>,
+ "lersek@redhat.com" <lersek@redhat.com>,
+ "eric.auger@redhat.com" <eric.auger@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Mon, 22 Jul 2019 14:51:59 +0000
+Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com> wrote:
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+> Hi Igor,
+> 
+> > -----Original Message-----
+> > From: Qemu-devel
+> > [mailto:qemu-devel-bounces+shameerali.kolothum.thodi=huawei.com@nongn
+> > u.org] On Behalf Of Igor Mammedov
+> > Sent: 18 July 2019 14:13
+> > To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+> > Cc: peter.maydell@linaro.org; sameo@linux.intel.com;
+> > shannon.zhaosl@gmail.com; ard.biesheuvel@linaro.org;
+> > qemu-devel@nongnu.org; xuwei (O) <xuwei5@huawei.com>; Linuxarm
+> > <linuxarm@huawei.com>; eric.auger@redhat.com; qemu-arm@nongnu.org;
+> > sebastien.boeuf@intel.com; lersek@redhat.com
+> > Subject: Re: [Qemu-devel] [PATCH-for-4.2 v7 10/10] tests: Update DSDT ACPI
+> > table for arm/virt board with PCDIMM related changes
+> > 
+> > On Tue, 16 Jul 2019 16:38:16 +0100
+> > Shameer Kolothum <shameerali.kolothum.thodi@huawei.com> wrote:
+> >   
+> > > From: Eric Auger <eric.auger@redhat.com>
+> > >
+> > > PCDIMM hotplug addition updated the DSDT. Update the reference table.  
+> > 
+> > it's not correct process. series should be merged through Michael's pci branch
+> > and see
+> > commit ab50f22309a17c772c51931940596e707c200739 (mst/pci)
+> > Author: Michael S. Tsirkin <mst@redhat.com>
+> > Date:   Tue May 21 17:38:47 2019 -0400
+> > 
+> >     bios-tables-test: add diff allowed list
+> > 
+> > how to request table update.  
+> 
+> Ok. Just to confirm, this means I can probably add the below diff to patch #6 and
+> remove this patch(10/10) from the series. 
 
-> On Tue, 23 Jul 2019 at 13:16, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.=
-com> wrote:
->>
->> On 7/23/19 1:46 PM, Alex Benn=C3=A9e wrote:
->> >> I see Thomas Huth has a patch on-list for that, but this
->> >> didn't manifest as a problem before this pullreq.
->> >
->> > OK, I'll add it and rebuild the PR.
->>
->> But Thomas got another error later...
->
-> If we're not sure what all the needed fixes are we
-> should probably just drop the change that starts
-> running the iotests under 'make check'. Otherwise this
-> pullreq is going to miss rc2, and it's too big to go into rc3.
+you can use commit 4a4418369d6 as an example
 
-I'm just double checking now - it does seem OpenBSD is very slow even
-with 18 cores assigned.
+> 
+> diff --git a/tests/bios-tables-test-allowed-diff.h b/tests/bios-tables-test-allowed-diff.h
+> index dfb8523c8b..7b4adbc822 100644
+> --- a/tests/bios-tables-test-allowed-diff.h
+> +++ b/tests/bios-tables-test-allowed-diff.h
+> @@ -1 +1,2 @@
+>  /* List of comma-separated changed AML files to ignore */
+> +"tests/data/acpi/virt/DSDT",
+> 
+> > 
+> > Another thing:
+> > bios-tables-test has test_acpi_tcg_dimm_pxm() test case,
+> > pls make use of it to test arm/virt variant  
+> 
+> I had a go with this, but has found an issue with this.
+> 
+> This is what I added in order to run the dimm_pxm test.
+> 
+> - - 8- -
+> 
+> diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
+> index a356ac3489..79af4f4874 100644
+> --- a/tests/bios-tables-test.c
+> +++ b/tests/bios-tables-test.c
+> @@ -871,6 +871,36 @@ static void test_acpi_piix4_tcg_dimm_pxm(void)
+>      test_acpi_tcg_dimm_pxm(MACHINE_PC);
+>  }
+>  
+> +static void test_acpi_virt_tcg_dimm_pxm(void)
+> +{
+> +    test_data data = {
+> +        .machine = "virt",
+> +        .accel = "tcg",
+> +        .uefi_fl1 = "pc-bios/edk2-aarch64-code.fd",
+> +        .uefi_fl2 = "pc-bios/edk2-arm-vars.fd",
+> +        .cd = "tests/data/uefi-boot-images/bios-tables-test.aarch64.iso.qcow2",
+> +        .ram_start = 0x40000000ULL,
+> +        .scan_len = 128ULL * 1024 * 1024,
+> +    };
+> +
+> +    data.variant = ".dimmpxm";
+> +    test_acpi_one(" -cpu cortex-a57"
+> +                  " -smp 4"
+> +                  " -m 512M,slots=3,maxmem=2G"
+> +                  " -object memory-backend-ram,id=ram0,size=128M"
+> +                  " -object memory-backend-ram,id=ram1,size=128M"
+> +                  " -object memory-backend-ram,id=ram2,size=128M"
+> +                  " -object memory-backend-ram,id=ram3,size=128M"
+> +                  " -numa node,memdev=ram0,nodeid=0"
+> +                  " -numa node,memdev=ram1,nodeid=1"
+> +                  " -numa node,memdev=ram2,nodeid=2"
+> +                  " -numa node,memdev=ram3,nodeid=3"
+> +                  " -object memory-backend-ram,id=ram4,size=1G"
+> +                  " -device pc-dimm,id=dimm0,memdev=ram4,node=0",
+> +                  &data);
+> +    free_test_data(&data);
+> +}
+> +
+>  static void test_acpi_virt_tcg(void)
+>  {
+>      test_data data = {
+> @@ -917,6 +947,7 @@ int main(int argc, char *argv[])
+>          qtest_add_func("acpi/q35/dimmpxm", test_acpi_q35_tcg_dimm_pxm);
+>      } else if (strcmp(arch, "aarch64") == 0) {
+>          qtest_add_func("acpi/virt", test_acpi_virt_tcg);
+> +        qtest_add_func("acpi/virt/dimmpxm", test_acpi_virt_tcg_dimm_pxm);
+>      }
+>      ret = g_test_run();
+>      boot_sector_cleanup(disk);
+> 
+> - - 8- -
+> 
+> Then used the script to generate the acpi tables and "make check" runs fine.
+> 
+> But when I changed the memory configuration to,
+> 
+> test_acpi_one(" -cpu cortex-a57"
+>             " -smp 4"
+>             " -m 256M,slots=3,maxmem=2G"
+>             " -object memory-backend-ram,id=ram0,size=64M"
+>             " -object memory-backend-ram,id=ram1,size=64M"
+>             " -object memory-backend-ram,id=ram2,size=64M"
+>             " -object memory-backend-ram,id=ram3,size=64M"
+>             " -numa node,memdev=ram0,nodeid=0"
+>             " -numa node,memdev=ram1,nodeid=1"
+>             " -numa node,memdev=ram2,nodeid=2"
+>             " -numa node,memdev=ram3,nodeid=3"
+>             " -object memory-backend-ram,id=ram4,size=1G"
+>             " -device pc-dimm,id=dimm0,memdev=ram4,node=0",
+>             &data);
+> 
+> "make check" gets stuck at,
+> 
+>   CC      tests/bios-tables-test.o
+>   LINK    tests/bios-tables-test
+>   TEST    check-qtest-aarch64: tests/numa-test
+>   TEST    check-qtest-aarch64: tests/boot-serial-test
+>   TEST    check-qtest-aarch64: tests/migration-test
+>   TEST    check-qtest-aarch64: tests/bios-tables-test -->stuck here.
+> 
+> But if I use the same memory configuration and run the qemu guest independently
+> it boots fine.
+> 
+> ./qemu-system-aarch64 -machine virt,accel=tcg \
+> -cpu cortex-a57 \
+> -nographic -smp 4 \
+> -bios QEMU_EFI_Release.fd \
+> -kernel Image_5.2rc2 \
+> -drive if=none,file=ubuntu-est-5.0,id=fs \
+> -device virtio-blk-device,drive=fs \
+> -m 256M,slots=3,maxmem=2G \
+> -object memory-backend-ram,id=ram0,size=64M \
+> -object memory-backend-ram,id=ram1,size=64M \
+> -object memory-backend-ram,id=ram2,size=64M \
+> -object memory-backend-ram,id=ram3,size=64M \
+> -numa node,memdev=ram0,nodeid=0 \
+> -numa node,memdev=ram1,nodeid=1 \
+> -numa node,memdev=ram2,nodeid=2 \
+> -numa node,memdev=ram3,nodeid=3 \
+> -object memory-backend-ram,id=ram4,size=1G \
+> -device pc-dimm,id=dimm1,memdev=ram4,node=0 \
+> -append "console=ttyAMA0 root=/dev/vda rw acpi=force"
+>  
+> root@ubuntu:~# numactl -H
+> available: 4 nodes (0-3)
+> node 0 cpus: 0
+> node 0 size: 1067 MB
+> node 0 free: 1015 MB
+> node 1 cpus: 1
+> node 1 size: 44 MB
+> node 1 free: 5 MB
+> node 2 cpus: 2
+> node 2 size: 63 MB
+> node 2 free: 24 MB
+> node 3 cpus: 3
+> node 3 size: 63 MB
+> node 3 free: 31 MB
+> node distances:
+> node   0   1   2   3 
+>   0:  10  20  20  20 
+>   1:  20  10  20  20 
+>   2:  20  20  10  20 
+>   3:  20  20  20  10 
+> root@ubuntu:~#
+> 
+> I am not sure why "make check" hangs with 64M size!. 
+> Please take a look and let me know if I missed anything obvious here.
 
->
-> thanks
-> -- PMM
+I'd try to see what tests/bios-tables-test does when it's stuck.
+(I'd guess that it can't find ACPI tables)
+
+also pay attention to .scan_len so it would cover all RAM
 
 
---
-Alex Benn=C3=A9e
+> 
+> Thanks,
+> Shameer
+
 
