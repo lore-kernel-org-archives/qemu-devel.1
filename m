@@ -2,92 +2,58 @@ Return-Path: <SRS0=3Ld+=VU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11A8EC76190
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 05:48:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9998BC76190
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 05:54:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D2E472239E
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 05:48:53 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ozlabs-ru.20150623.gappssmtp.com header.i=@ozlabs-ru.20150623.gappssmtp.com header.b="DjiCQUSq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2E472239E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ozlabs.ru
+	by mail.kernel.org (Postfix) with ESMTPS id 710B72238E
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 05:54:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 710B72238E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=ispras.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39332 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39348 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hpnfQ-0008ST-Pr
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jul 2019 01:48:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45696)
+	id 1hpnlD-0001iW-Hv
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jul 2019 01:54:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46970)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <aik@ozlabs.ru>) id 1hpnfF-00082o-KO
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 01:48:42 -0400
+ (envelope-from <dovgaluk@ispras.ru>) id 1hpnl2-0001Ja-Fa
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 01:54:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aik@ozlabs.ru>) id 1hpnfE-0000Yj-Lo
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 01:48:41 -0400
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:43256)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1hpnfE-0000Y4-FY
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 01:48:40 -0400
-Received: by mail-pf1-x443.google.com with SMTP id i189so18542422pfg.10
- for <qemu-devel@nongnu.org>; Mon, 22 Jul 2019 22:48:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=z1FX/1RBevNZKl99oheBgF3rXXm9n3HQibJvvLzsb6c=;
- b=DjiCQUSq8a31O6ejjTUkCt+cGnyHhmLxzky3sptNZ8Rdmw6VXVA3mZWyibkEoaFHY3
- t+TaeE0y1/sMf5FQ5GX6MGiVVaDHadiPUIjjRUIBPJ6+WltMuZYcIye1mUQPT55cjCBR
- Em76Xsa7G0m2RRkEgr1IG4b+9ahL2j5xQLAk00VnV/Cl9XugmyfyJaUnZtF+TBMTccSN
- 7NTw6XG/iVqHMVd6G+WoZTTO067tuMdNMMow5P2lxNmdHo3cLVqdZo+c2std5ZvUgtRR
- x8UTGR2FLlR1bs4f1EeMuMVBuhQMdkRfORAhaWXZgLxrzbX4rTvOC6YtdGjJVWx3WeEg
- r4vA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=z1FX/1RBevNZKl99oheBgF3rXXm9n3HQibJvvLzsb6c=;
- b=fc444FggcKnTPmfpC/cXhJ/h7LN7Tt52pdCEg1tRbHVhCPyPrANOC4u+cdQ1H9+DHB
- alB1+xPJpusNQbmIRh6C5/4Ek/uQP0SNvxIzuquMGY+0h4YZuHMoZuaV9so8uEBFU8z5
- /pic2xAqm3JVOg2C00RwJ5YwahgAx3PhI8YbE/VWF36IQDTGzm3L991bWV/nWfRCYXg9
- CWNmAv+blD2D+ElLEV4K7Sz2hXUnC+aEsV9F/hm9hkQGZIeK1QD/IwO5lTsbiCBzWHWV
- 46lNV99m0W5VuVML287tovreVHYqEMBN/lH0edC3pC8BCtYMHsdpqiDbKvdzjTIhZ6d6
- 5zsA==
-X-Gm-Message-State: APjAAAVUb5kEhOLPvSYDOvmgSy+N4vnAIogL/r6qco3e/k9SYvHQL6Pc
- VGbAH1HI8FyyjWSrXOeWXeM=
-X-Google-Smtp-Source: APXvYqzxp/79JIAMqGFwYShbKqdVjZNT4zMxxaH2PaSmCGfgUMHdv1zK9KuyY6rzHeVXi2rKO3V9cg==
-X-Received: by 2002:a63:e907:: with SMTP id i7mr73832913pgh.84.1563860919288; 
- Mon, 22 Jul 2019 22:48:39 -0700 (PDT)
-Received: from [10.61.2.175] ([122.99.82.10])
- by smtp.gmail.com with ESMTPSA id e124sm65159798pfh.181.2019.07.22.22.48.36
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 22 Jul 2019 22:48:38 -0700 (PDT)
-To: David Gibson <david@gibson.dropbear.id.au>
-References: <20190720012850.14369-1-aik@ozlabs.ru>
- <20190720012850.14369-4-aik@ozlabs.ru>
- <20190723035330.GQ25073@umbus.fritz.box>
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Message-ID: <181b65ae-866f-7e0b-1042-7695e7c2ddda@ozlabs.ru>
-Date: Tue, 23 Jul 2019 15:48:34 +1000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <dovgaluk@ispras.ru>) id 1hpnl0-0002W1-L9
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 01:54:40 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:47916)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <dovgaluk@ispras.ru>) id 1hpnl0-0002R8-89
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 01:54:38 -0400
+Received: from PASHAISP (unknown [85.142.117.226])
+ by mail.ispras.ru (Postfix) with ESMTPSA id 854AA54006A;
+ Tue, 23 Jul 2019 08:54:34 +0300 (MSK)
+From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
+To: "'Dr. David Alan Gilbert \(git\)'" <dgilbert@redhat.com>,
+ <qemu-devel@nongnu.org>, <pbonzini@redhat.com>, <pavel.dovgaluk@ispras.ru>
+References: <20190722150717.10564-1-dgilbert@redhat.com>
+ <20190722150717.10564-4-dgilbert@redhat.com>
+In-Reply-To: <20190722150717.10564-4-dgilbert@redhat.com>
+Date: Tue, 23 Jul 2019 08:54:35 +0300
+Message-ID: <000901d5411b$1b7e1d70$527a5850$@ru>
 MIME-Version: 1.0
-In-Reply-To: <20190723035330.GQ25073@umbus.fritz.box>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain;
+	charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::443
-Subject: Re: [Qemu-devel] [PATCH qemu RFC 3/4] spapr: Advertise H_RTAS to
- the guest
+X-Mailer: Microsoft Office Outlook 12.0
+Content-Language: ru
+Thread-Index: AdVAny3Rgot+9aqYSsGIwCt/0zy39wAepTzw
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 83.149.199.45
+Subject: Re: [Qemu-devel] [for 4.2 PATCH 3/3] timer: last,
+ remove last bits of last
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,56 +65,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paul Mackerras <paulus@ozlabs.org>, Michael Ellerman <mpe@ellerman.id.au>,
- qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Hello!
 
+> From: Dr. David Alan Gilbert (git) [mailto:dgilbert@redhat.com]
+> The reset notifiers kept a 'last' counter to notice jumps;
+> now that we've remove the notifier we don't need to keep 'last'.
+> replay used to save/restore 'last' (presumably to avoid triggering
+> the notifier);  make it store the current time instead which avoids
+> changing it's migration format.
 
-On 23/07/2019 13:53, David Gibson wrote:
-> On Sat, Jul 20, 2019 at 11:28:49AM +1000, Alexey Kardashevskiy wrote:
->> Since day 1 QEMU implemented RTAS as a custom hypercall wrapped into
->> a small 20 bytes blob which guest would call to enter RTAS. Although
->> it works fine, it is still a separate binary image which requires signing
->> at no additional benefit.
->>
->> This adds a flag into /chosen to tell a modified guest that if the flag
->> is there, it can call H_RTAS directly and avoid calling into the RTAS
->> blob.
->>
->> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
->> ---
->>   hw/ppc/spapr.c | 3 +++
->>   1 file changed, 3 insertions(+)
->>
->> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
->> index 81ad6a6f28de..b097a99951f1 100644
->> --- a/hw/ppc/spapr.c
->> +++ b/hw/ppc/spapr.c
->> @@ -1230,6 +1230,9 @@ static void spapr_dt_chosen(SpaprMachineState *spapr, void *fdt)
->>           _FDT(fdt_setprop_cell(fdt, chosen, "linux,pci-probe-only", 0));
->>       }
->>   
->> +    /* We always implemented RTAS as hcall, tell guests to call it directly */
->> +    _FDT(fdt_setprop_cell(fdt, chosen, "qemu,h_rtas", 1));
-> 
-> Rather than creating a new property for this we could use the
-> qemu,hypertas-functions property which is already used to advertise
-> some KVM specific hcalls.
-
-True, this is another way of doing it. We will also need a proper number 
-for it rather that custom 0xf000, Paul suggested we could tell the guest 
-this number via the "qemu,h_rtas" property.
-
+If you are removing 'last' field, you also should drop 'host_clock_last'
+from ReplayState, because it is used only for restoring host clock
+'last' field. And that was useful only in record/replay mode.
 
 > 
->>       spapr_dt_ov5_platform_support(spapr, fdt, chosen);
->>   
->>       g_free(stdout_path);
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> ---
+>  include/qemu/timer.h     | 13 -------------
+>  replay/replay-snapshot.c |  3 +--
+>  util/qemu-timer.c        | 22 +---------------------
+>  3 files changed, 2 insertions(+), 36 deletions(-)
 > 
+> diff --git a/include/qemu/timer.h b/include/qemu/timer.h
+> index 6817c78ef4..5bcab935f6 100644
+> --- a/include/qemu/timer.h
+> +++ b/include/qemu/timer.h
+> @@ -248,19 +248,6 @@ bool qemu_clock_run_timers(QEMUClockType type);
+>   */
+>  bool qemu_clock_run_all_timers(void);
+> 
+> -/**
+> - * qemu_clock_get_last:
+> - *
+> - * Returns last clock query time.
+> - */
+> -uint64_t qemu_clock_get_last(QEMUClockType type);
+> -/**
+> - * qemu_clock_set_last:
+> - *
+> - * Sets last clock query time.
+> - */
+> -void qemu_clock_set_last(QEMUClockType type, uint64_t last);
+> -
+> 
+>  /*
+>   * QEMUTimerList
+> diff --git a/replay/replay-snapshot.c b/replay/replay-snapshot.c
+> index 756f48bc02..ca6d4adcc0 100644
+> --- a/replay/replay-snapshot.c
+> +++ b/replay/replay-snapshot.c
+> @@ -24,7 +24,7 @@ static int replay_pre_save(void *opaque)
+>  {
+>      ReplayState *state = opaque;
+>      state->file_offset = ftell(replay_file);
+> -    state->host_clock_last = qemu_clock_get_last(QEMU_CLOCK_HOST);
+> +    state->host_clock_last = get_clock_realtime();
+> 
+>      return 0;
+>  }
+> @@ -34,7 +34,6 @@ static int replay_post_load(void *opaque, int version_id)
+>      ReplayState *state = opaque;
+>      if (replay_mode == REPLAY_MODE_PLAY) {
+>          fseek(replay_file, state->file_offset, SEEK_SET);
+> -        qemu_clock_set_last(QEMU_CLOCK_HOST, state->host_clock_last);
+>          /* If this was a vmstate, saved in recording mode,
+>             we need to initialize replay data fields. */
+>          replay_fetch_data_kind();
+> diff --git a/util/qemu-timer.c b/util/qemu-timer.c
+> index 2faaaf9926..b73041df4e 100644
+> --- a/util/qemu-timer.c
+> +++ b/util/qemu-timer.c
+> @@ -48,8 +48,6 @@ typedef struct QEMUClock {
+>      /* We rely on BQL to protect the timerlists */
+>      QLIST_HEAD(, QEMUTimerList) timerlists;
+> 
+> -    int64_t last;
+> -
+>      QEMUClockType type;
+>      bool enabled;
+>  } QEMUClock;
+> @@ -130,7 +128,6 @@ static void qemu_clock_init(QEMUClockType type, QEMUTimerListNotifyCB
+> *notify_cb
+> 
+>      clock->type = type;
+>      clock->enabled = (type == QEMU_CLOCK_VIRTUAL ? false : true);
+> -    clock->last = INT64_MIN;
+>      QLIST_INIT(&clock->timerlists);
+>      main_loop_tlg.tl[type] = timerlist_new(type, notify_cb, NULL);
+>  }
+> @@ -628,9 +625,6 @@ int64_t timerlistgroup_deadline_ns(QEMUTimerListGroup *tlg)
+> 
+>  int64_t qemu_clock_get_ns(QEMUClockType type)
+>  {
+> -    int64_t now;
+> -    QEMUClock *clock = qemu_clock_ptr(type);
+> -
+>      switch (type) {
+>      case QEMU_CLOCK_REALTIME:
+>          return get_clock();
+> @@ -642,26 +636,12 @@ int64_t qemu_clock_get_ns(QEMUClockType type)
+>              return cpu_get_clock();
+>          }
+>      case QEMU_CLOCK_HOST:
+> -        now = REPLAY_CLOCK(REPLAY_CLOCK_HOST, get_clock_realtime());
+> -        clock->last = now;
+> -        return now;
+> +        return REPLAY_CLOCK(REPLAY_CLOCK_HOST, get_clock_realtime());
+>      case QEMU_CLOCK_VIRTUAL_RT:
+>          return REPLAY_CLOCK(REPLAY_CLOCK_VIRTUAL_RT, cpu_get_clock());
+>      }
+>  }
+> 
+> -uint64_t qemu_clock_get_last(QEMUClockType type)
+> -{
+> -    QEMUClock *clock = qemu_clock_ptr(type);
+> -    return clock->last;
+> -}
+> -
+> -void qemu_clock_set_last(QEMUClockType type, uint64_t last)
+> -{
+> -    QEMUClock *clock = qemu_clock_ptr(type);
+> -    clock->last = last;
+> -}
+> -
+>  void init_clocks(QEMUTimerListNotifyCB *notify_cb)
+>  {
+>      QEMUClockType type;
+> --
+> 2.21.0
 
--- 
-Alexey
+
+Pavel Dovgalyuk
+
 
