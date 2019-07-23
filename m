@@ -2,89 +2,87 @@ Return-Path: <SRS0=3Ld+=VU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-13.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40742C76186
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 16:22:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15E22C76186
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 16:24:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0C3C920823
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 16:22:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6A93020838
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 16:24:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IKpyhoLb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C3C920823
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mSesdlSF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A93020838
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45592 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45612 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hpxYU-0005ch-89
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jul 2019 12:22:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60193)
+	id 1hpxaE-0006i9-Fo
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jul 2019 12:24:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60876)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hpxYK-0005Ca-PV
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 12:22:13 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hpxa4-0006Gp-3v
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 12:24:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hpxYJ-0005sZ-PX
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 12:22:12 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:44124)
+ (envelope-from <alex.bennee@linaro.org>) id 1hpxa2-000870-Pc
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 12:24:00 -0400
+Received: from mail-wm1-x335.google.com ([2a00:1450:4864:20::335]:55430)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hpxYJ-0005qF-GF
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 12:22:11 -0400
-Received: by mail-wr1-x444.google.com with SMTP id p17so43812003wrf.11
- for <qemu-devel@nongnu.org>; Tue, 23 Jul 2019 09:22:11 -0700 (PDT)
+ id 1hpxa2-00086B-GN
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 12:23:58 -0400
+Received: by mail-wm1-x335.google.com with SMTP id a15so39163111wmj.5
+ for <qemu-devel@nongnu.org>; Tue, 23 Jul 2019 09:23:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=xr6yWqjT8XGH8dPPITKN+aYf96+48XugMiZ1OG+mBJA=;
- b=IKpyhoLb7jhrag2f07YTNujhcSlHPctdODvX2hct1qGNCEi5AOjflNgsbhketGsBq/
- Tzj8em0N/+wnxzzdvssyXfUe0ZDcl0GVKdcJ1mh4b3h8EJeM94Rus8T73PNNF/M9ZbaJ
- 3ywYL4xBYdNEBBQGVgKYORJpCsV7d0Co43qWEH5QeWMlo6TiWEi/AYM1ZnHdaisdjW5H
- uXPgqiFotuNSVJpwDXRfh+nmbdKc35ccX362S1Oax7gMtdJT2tCsREXEQy7DV7Spp+u7
- jwbt4JUDSKVPNnyxa7P6NKxBDGciHm0zYNT9zRkVJ1lRX/AOxy+S8KiIJPxW4tKYf0hV
- 8xhA==
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=Wc8oRcpDMbAGOEQ46mGRQtRqJRsqCNlu2mcpybhLias=;
+ b=mSesdlSF94HmCZWqqLmUrDqQgdwQ+eaNctsMMms5e9yjvnmnU1lFq/nbajDrPsl4Mu
+ OOzOVRe1nLeey/AtmaotNiPo/7BopGmfzKKzfsjT7oKu8s7uqynDid3hMbBnvtTvIDxC
+ B3gD02Hram6jJ0QseyjPQKfo1elndkUiLT4dhHwsG06713DcOOQ38DJpe+PcUJBw5k80
+ 6y05YLzeBgvSANG5KOnMaCP9ZNxlSzGKweRqhp4iZePs6YTykH/8f5pmQ2U+7UEEYaCs
+ IavGy6w7UQ7EElctsEiah4uwNLi243rQQfNh6onL5pDYff9kA9XEcbahyn86OhjfMF1I
+ B7Sw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=xr6yWqjT8XGH8dPPITKN+aYf96+48XugMiZ1OG+mBJA=;
- b=OvtRh1XJzhjFb8rfRPXJlWwcVm6a11ZA9mbSusRC8JyMvWT5NBh0XNbqBF4ZRKNAtv
- s7Gn3Gadiz0pbxxWHsON1tQA2iXBDflUvAiVaGFGRk+1dowkKDBy6fZq689j0wuDXCaQ
- 4A2RE6RGteyMvFiFHpi4U18uZMDDWqJDDHb3oxc7EhEj0a+Osr5qpvQ0maHo/AT/QWDe
- emTFFcQ0Hekj77sMiVSqKMDRnCMOocNXKmEjbphiOgdQXS5VMkW0NxGrX4Oc40CLnle6
- xTJylbJC5EWxokUH+qDhKkfxj2gjrAA0V0ARQXpuK5igyhW7A4LL0p5GmeFCyy11GE4m
- 7xCQ==
-X-Gm-Message-State: APjAAAUxfsMVMGwsI1hbJwhZ1aQ2hHpyt28ep1hQQswtiHDLUbgyEMB2
- XXZWviiJio0ZyCLXx8Q+cc7Zjg==
-X-Google-Smtp-Source: APXvYqxEdCwm9sXLDLzGNiWobI6YOSQGqafozsoHd/AjvV5alWJceg7zi9WsnXJCy06663EjwmJiEQ==
-X-Received: by 2002:adf:e343:: with SMTP id n3mr42148471wrj.103.1563898929932; 
- Tue, 23 Jul 2019 09:22:09 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=Wc8oRcpDMbAGOEQ46mGRQtRqJRsqCNlu2mcpybhLias=;
+ b=sFIifXZ/BTcJFMdZeY42aqW9XYUN5dXOvar/bNKpGyN8oX8/202axucgnnkxrRTQGR
+ Qk/p7PvAT1X115JhajvHF5rYxFl+0r6htz1fTjW2mKCPRujfoa7xdzcwi5ReUtBmoDH4
+ SfRC9zAaRQxvSV78WxI90d4w8rAtDUSEHwY4nVmIezXxYcocrafEwYFWltgNk9Ta4UZ2
+ VVMa4xGRVI6Thj9T2y5DUJ43zRkupnZrqosR9Y1yPyoNT3MNXAXycsrz/ujz+tSegK9w
+ hRaa5iBJjSpQaA+oY7TBS25ByJYi0S4fYZIoTMbIC2p9EYL2FX5k8M2S2XEjq+xMzrCx
+ LwgA==
+X-Gm-Message-State: APjAAAUwdcUNJFOy0VgvFnKYnFyTJwQXc53bgLVhI0jwUx7fc3n5b9XY
+ 8ILxDtS+8tJWWurL5nQKTvcXYQ==
+X-Google-Smtp-Source: APXvYqxro/tZPwQgL5xR0US06fQ7XRTOOjLQ84JSCsI7OBrHv9RfS8GmzkADJheNgyXia3cMEPseEg==
+X-Received: by 2002:a7b:c202:: with SMTP id x2mr67315718wmi.49.1563899036990; 
+ Tue, 23 Jul 2019 09:23:56 -0700 (PDT)
 Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id e19sm58208964wra.71.2019.07.23.09.22.09
+ by smtp.gmail.com with ESMTPSA id v4sm40677018wmg.22.2019.07.23.09.23.56
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Tue, 23 Jul 2019 09:22:09 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 08F521FF87;
- Tue, 23 Jul 2019 17:22:09 +0100 (BST)
-References: <20190723153730.1808-1-alex.bennee@linaro.org>
-User-agent: mu4e 1.3.3; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+ Tue, 23 Jul 2019 09:23:56 -0700 (PDT)
+Received: from zen.linaroharston. (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 16A661FF87;
+ Tue, 23 Jul 2019 17:23:56 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: peter.maydell@linaro.org
-In-reply-to: <20190723153730.1808-1-alex.bennee@linaro.org>
-Date: Tue, 23 Jul 2019 17:22:08 +0100
-Message-ID: <87ef2g2027.fsf@linaro.org>
+Date: Tue, 23 Jul 2019 17:23:56 +0100
+Message-Id: <20190723162356.3296-1-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::444
-Subject: Re: [Qemu-devel] [PULL v3 for 4.1 00/23] testing updates
+X-Received-From: 2a00:1450:4864:20::335
+Subject: [Qemu-devel] [PULL v4 00/23 for 4.1-rc2] testing updates
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,27 +94,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+The following changes since commit 4da6c0f9ebbdaaf4315c71ccd288d02b9087f8af:
 
-Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
+  Merge remote-tracking branch 'remotes/amarkovic2/tags/mips-queue-jul-23-2019' into staging (2019-07-23 12:49:39 +0100)
 
-> The following changes since commit 4da6c0f9ebbdaaf4315c71ccd288d02b9087f8=
-af:
->
->   Merge remote-tracking branch 'remotes/amarkovic2/tags/mips-queue-jul-23=
--2019' into staging (2019-07-23 12:49:39 +0100)
->
-> are available in the Git repository at:
->
->   https://github.com/stsquad/qemu.git tags/pull-testing-230719-3
+are available in the Git repository at:
 
-scratch that, I missed a line continuation when manually applying the
-apt-update patch to the debian windows image, v4 incoming.
+  https://github.com/stsquad/qemu.git tags/pull-testing-230719-4
 
---
-Alex Benn=C3=A9e
+for you to fetch changes up to 98808c3d0c162aba93fe7840a34b54c4814332d4:
+
+  tests/docker: Refresh APT cache before installing new packages on Debian (2019-07-23 17:19:11 +0100)
+
+----------------------------------------------------------------
+Final testing updates:
+
+  - docker sphinx updates
+  - windows build re-enabled in CI
+  - travis_retry for make check
+  - build fixes
+  - docker cache fixes
+
+----------------------------------------------------------------
+Alex Bennée (7):
+      tests/docker: add test-misc for building tools & docs
+      tests/migration-test: don't spam the logs when we fail
+      tests/dockerfiles: update the win cross builds to stretch
+      shippable: re-enable the windows cross builds
+      hw/i386: also turn off VMMOUSE is VMPORT is disabled
+      travis: enable travis_retry for check phase
+      tests/docker: invoke the DEBUG shell with --noprofile/--norc
+
+Marc-André Lureau (1):
+      archive-source: also create a stash for submodules
+
+Philippe Mathieu-Daudé (12):
+      tests/docker: Install Sphinx in the Ubuntu images
+      tests/docker: Install Sphinx in the Fedora image
+      tests/docker: Install Ubuntu images noninteractively
+      tests/docker: Install Sphinx in the Debian images
+      tests/docker: Install the NSIS tools in the MinGW capable images
+      tests/docker: Set the correct cross-PKG_CONFIG_PATH in the MXE images
+      tests/docker: Install texinfo in the Fedora image
+      buildsys: The NSIS Windows build requires the documentation installed
+      buildsys: The NSIS Windows build requires qemu-nsis.bmp installed
+      tests/docker: Let the test-mingw test generate a NSIS installer
+      NSIS: Add missing firmware blobs
+      tests/docker: Refresh APT cache before installing new packages on Debian
+
+Thomas Huth (3):
+      tests/qemu-iotests/check: Allow tests without groups
+      tests/qemu-iotests/group: Remove some more tests from the "auto" group
+      tests/qemu-iotests: Don't use 'seq' in the iotests
+
+ .shippable.yml                                     |   9 +-
+ .travis.yml                                        |   2 +-
+ Makefile                                           |   3 +-
+ hw/i386/Kconfig                                    |   4 +-
+ qemu.nsi                                           |  11 ++
+ scripts/archive-source.sh                          |  18 ++--
+ tests/docker/Makefile.include                      |   6 +-
+ tests/docker/dockerfiles/debian-alpha-cross.docker |   5 +-
+ tests/docker/dockerfiles/debian-amd64.docker       |  20 ++--
+ tests/docker/dockerfiles/debian-arm64-cross.docker |  16 +--
+ tests/docker/dockerfiles/debian-armel-cross.docker |  13 +--
+ tests/docker/dockerfiles/debian-armhf-cross.docker |  16 +--
+ .../dockerfiles/debian-buster-arm64-cross.docker   |   5 +-
+ tests/docker/dockerfiles/debian-hppa-cross.docker  |   5 +-
+ tests/docker/dockerfiles/debian-m68k-cross.docker  |   5 +-
+ tests/docker/dockerfiles/debian-mips-cross.docker  |  16 +--
+ .../docker/dockerfiles/debian-mips64-cross.docker  |   5 +-
+ .../dockerfiles/debian-mips64el-cross.docker       |  16 +--
+ .../docker/dockerfiles/debian-mipsel-cross.docker  |  16 +--
+ tests/docker/dockerfiles/debian-ports.docker       |   4 +-
+ .../docker/dockerfiles/debian-powerpc-cross.docker |   5 +-
+ tests/docker/dockerfiles/debian-ppc64-cross.docker |   5 +-
+ .../docker/dockerfiles/debian-ppc64el-cross.docker |  14 +--
+ .../docker/dockerfiles/debian-riscv64-cross.docker |   5 +-
+ tests/docker/dockerfiles/debian-s390x-cross.docker |  15 +--
+ tests/docker/dockerfiles/debian-sh4-cross.docker   |   5 +-
+ tests/docker/dockerfiles/debian-sid.docker         |   6 +-
+ .../docker/dockerfiles/debian-sparc64-cross.docker |   5 +-
+ tests/docker/dockerfiles/debian-win32-cross.docker |  13 ++-
+ tests/docker/dockerfiles/debian-win64-cross.docker |  13 ++-
+ .../docker/dockerfiles/debian-xtensa-cross.docker  |   4 +-
+ tests/docker/dockerfiles/debian10.docker           |   7 +-
+ tests/docker/dockerfiles/debian8.docker            |   6 +-
+ .../{debian8-mxe.docker => debian9-mxe.docker}     |  15 +--
+ tests/docker/dockerfiles/debian9.docker            |   7 +-
+ tests/docker/dockerfiles/fedora.docker             |   4 +
+ tests/docker/dockerfiles/ubuntu.docker             |   3 +-
+ tests/docker/dockerfiles/ubuntu1804.docker         |   3 +-
+ tests/docker/run                                   |   4 +-
+ tests/docker/test-mingw                            |   4 +-
+ tests/docker/test-misc                             |  22 ++++
+ tests/migration-test.c                             |  19 ++--
+ tests/qemu-iotests/007                             |   2 +-
+ tests/qemu-iotests/011                             |   2 +-
+ tests/qemu-iotests/032                             |   2 +-
+ tests/qemu-iotests/035                             |   2 +-
+ tests/qemu-iotests/037                             |   2 +-
+ tests/qemu-iotests/046                             |   2 +-
+ tests/qemu-iotests/check                           |   4 +-
+ tests/qemu-iotests/common.pattern                  |   4 +-
+ tests/qemu-iotests/group                           | 120 +++++++++++----------
+ 51 files changed, 309 insertions(+), 210 deletions(-)
+ rename tests/docker/dockerfiles/{debian8-mxe.docker => debian9-mxe.docker} (54%)
+ create mode 100755 tests/docker/test-misc
+
+
+-- 
+2.20.1
+
 
