@@ -2,59 +2,98 @@ Return-Path: <SRS0=3Ld+=VU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82A15C76186
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 17:10:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B763BC76186
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 17:10:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 59CE02184E
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 17:10:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 59CE02184E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=windriver.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8D8D22184E
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 17:10:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D8D22184E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46108 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46120 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hpyJ7-000495-5w
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jul 2019 13:10:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46318)
+	id 1hpyJD-0004ql-Fr
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jul 2019 13:10:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43169)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <Chris.Friesen@windriver.com>) id 1hpyIf-0002hD-J5
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 13:10:06 -0400
+ (envelope-from <mdroth@linux.vnet.ibm.com>) id 1hpyBC-0007LG-D0
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 13:02:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <Chris.Friesen@windriver.com>) id 1hpyIQ-0002bv-4w
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 13:10:00 -0400
-Received: from mail5.windriver.com ([192.103.53.11]:32884 helo=mail5.wrs.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <Chris.Friesen@windriver.com>)
- id 1hpyIP-0002Xl-Pa
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 13:09:49 -0400
-Received: from ALA-HCA.corp.ad.wrs.com (ala-hca.corp.ad.wrs.com
- [147.11.189.40])
- by mail5.wrs.com (8.15.2/8.15.2) with ESMTPS id x6NGIEkU025087
- (version=TLSv1 cipher=AES128-SHA bits=128 verify=FAIL)
- for <qemu-devel@nongnu.org>; Tue, 23 Jul 2019 09:18:24 -0700
-Received: from [172.25.39.5] (172.25.39.5) by ALA-HCA.corp.ad.wrs.com
- (147.11.189.50) with Microsoft SMTP Server (TLS) id 14.3.468.0; Tue, 23 Jul
- 2019 09:18:03 -0700
-To: <qemu-devel@nongnu.org>
-From: Chris Friesen <chris.friesen@windriver.com>
-Message-ID: <c6d83f1f-50e2-60e1-38d7-4e622ac71a8c@windriver.com>
-Date: Tue, 23 Jul 2019 10:18:01 -0600
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [172.25.39.5]
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 192.103.53.11
-Subject: [Qemu-devel] high-level view of packet processing for virtio NIC?
+ (envelope-from <mdroth@linux.vnet.ibm.com>) id 1hpyBA-0005zj-2i
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 13:02:22 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:1364
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
+ id 1hpyB8-0005jW-13
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 13:02:18 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ x6NH22ku051745
+ for <qemu-devel@nongnu.org>; Tue, 23 Jul 2019 13:02:04 -0400
+Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2tx60rgmxp-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Tue, 23 Jul 2019 13:02:02 -0400
+Received: from localhost
+ by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
+ Tue, 23 Jul 2019 18:01:29 +0100
+Received: from b03cxnp08027.gho.boulder.ibm.com (9.17.130.19)
+ by e33.co.us.ibm.com (192.168.1.133) with IBM ESMTP SMTP Gateway: Authorized
+ Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Tue, 23 Jul 2019 18:01:26 +0100
+Received: from b03ledav005.gho.boulder.ibm.com
+ (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
+ by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ x6NH1PYD14287310
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 23 Jul 2019 17:01:25 GMT
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 8CE5DBE05F;
+ Tue, 23 Jul 2019 17:01:25 +0000 (GMT)
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 7DEBFBE05A;
+ Tue, 23 Jul 2019 17:01:25 +0000 (GMT)
+Received: from localhost (unknown [9.53.179.212])
+ by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTP;
+ Tue, 23 Jul 2019 17:01:25 +0000 (GMT)
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+To: qemu-devel@nongnu.org
+Date: Tue, 23 Jul 2019 12:01:01 -0500
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190723170104.4327-1-mdroth@linux.vnet.ibm.com>
+References: <20190723170104.4327-1-mdroth@linux.vnet.ibm.com>
+X-TM-AS-GCONF: 00
+x-cbid: 19072317-0036-0000-0000-00000ADD79F6
+X-IBM-SpamModules-Scores: 
+X-IBM-SpamModules-Versions: BY=3.00011482; HX=3.00000242; KW=3.00000007;
+ PH=3.00000004; SC=3.00000287; SDB=6.01236375; UDB=6.00651638; IPR=6.01017731; 
+ MB=3.00027856; MTD=3.00000008; XFM=3.00000015; UTC=2019-07-23 17:01:28
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19072317-0037-0000-0000-00004CB7570D
+Message-Id: <20190723170104.4327-34-mdroth@linux.vnet.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+ definitions=2019-07-23_07:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501
+ malwarescore=0 suspectscore=1 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1906280000 definitions=main-1907230170
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.158.5
+Subject: [Qemu-devel] [PATCH 33/36] iotests: Filter second BLOCK_JOB_ERROR
+ from 229
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,18 +105,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-stable@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
+From: Max Reitz <mreitz@redhat.com>
 
-I'm looking for information on what the qemu architecture looks like for 
-processing virtio network packets in a two-vCPU guest.
+Without this filter, this test sometimes fails.
 
-It looks like there's an IO thread doing a decent fraction of the work, 
-separate from the vCPU threads--is that correct?  There's no disk 
-involved in this case, purely network packet processing.
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+(cherry picked from commit fff2388d5d9caecca6200455d0ab6d5e13f4e9bd)
+Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+---
+ tests/qemu-iotests/229     | 6 +++++-
+ tests/qemu-iotests/229.out | 1 -
+ 2 files changed, 5 insertions(+), 2 deletions(-)
 
-Chris
+diff --git a/tests/qemu-iotests/229 b/tests/qemu-iotests/229
+index 86602437ff..8ce0cd2939 100755
+--- a/tests/qemu-iotests/229
++++ b/tests/qemu-iotests/229
+@@ -82,11 +82,15 @@ echo
+ echo '=== Force cancel job paused in error state  ==='
+ echo
+ 
++# Filter out BLOCK_JOB_ERROR events because they may or may not occur.
++# Cancelling the job means resuming it for a bit before it is actually
++# aborted, and in that time it may or may not re-encounter the error.
+ success_or_failure="y" _send_qemu_cmd $QEMU_HANDLE \
+     "{'execute': 'block-job-cancel',
+                  'arguments': { 'device': 'testdisk',
+                                 'force': true}}" \
+-     "BLOCK_JOB_CANCELLED" "Assertion"
++     "BLOCK_JOB_CANCELLED" "Assertion" \
++    | grep -v '"BLOCK_JOB_ERROR"'
+ 
+ # success, all done
+ echo "*** done"
+diff --git a/tests/qemu-iotests/229.out b/tests/qemu-iotests/229.out
+index 4c4112805f..a3eb33788a 100644
+--- a/tests/qemu-iotests/229.out
++++ b/tests/qemu-iotests/229.out
+@@ -17,7 +17,6 @@ wrote 2097152/2097152 bytes at offset 0
+ 
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "testdisk"}}
+ {"return": {}}
+-{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_ERROR", "data": {"device": "testdisk", "operation": "write", "action": "stop"}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "aborting", "id": "testdisk"}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_CANCELLED", "data": {"device": "testdisk", "len": 2097152, "offset": 1048576, "speed": 0, "type": "mirror"}}
+ *** done
+-- 
+2.17.1
+
 
