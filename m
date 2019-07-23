@@ -4,97 +4,100 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7016C76186
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 17:03:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE9CDC76186
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 17:04:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BD4492239F
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 17:03:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD4492239F
+	by mail.kernel.org (Postfix) with ESMTPS id 96A3B2239F
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 17:04:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96A3B2239F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45824 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45846 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hpyCJ-0002EE-PU
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jul 2019 13:03:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42821)
+	id 1hpyCx-0004Ve-7J
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jul 2019 13:04:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42313)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mdroth@linux.vnet.ibm.com>) id 1hpyAc-0005Hi-PS
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 13:01:47 -0400
+ (envelope-from <mdroth@linux.vnet.ibm.com>) id 1hpyAD-00041I-Od
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 13:01:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mdroth@linux.vnet.ibm.com>) id 1hpyAb-0005Ul-L6
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 13:01:46 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:30074)
+ (envelope-from <mdroth@linux.vnet.ibm.com>) id 1hpyAC-00055B-OO
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 13:01:21 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:32768)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
- id 1hpyAb-00059C-Aw; Tue, 23 Jul 2019 13:01:45 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+ id 1hpyAC-00054Y-Fm
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 13:01:20 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
  by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x6NGkku1053451; Tue, 23 Jul 2019 13:01:20 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2tx60v8msg-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 23 Jul 2019 13:01:20 -0400
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.27/8.16.0.27) with SMTP id x6NGlZ9r055644;
- Tue, 23 Jul 2019 13:01:19 -0400
-Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com
- [169.63.214.131])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2tx60v8mrp-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 23 Jul 2019 13:01:19 -0400
-Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
- by ppma01dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x6NH0LfD012898;
- Tue, 23 Jul 2019 17:01:18 GMT
-Received: from b03cxnp08025.gho.boulder.ibm.com
- (b03cxnp08025.gho.boulder.ibm.com [9.17.130.17])
- by ppma01dal.us.ibm.com with ESMTP id 2tx61n02fm-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 23 Jul 2019 17:01:18 +0000
+ x6NGkhXr032772
+ for <qemu-devel@nongnu.org>; Tue, 23 Jul 2019 13:01:19 -0400
+Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2tx60xgj84-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Tue, 23 Jul 2019 13:01:19 -0400
+Received: from localhost
+ by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
+ Tue, 23 Jul 2019 18:01:18 +0100
+Received: from b03cxnp08028.gho.boulder.ibm.com (9.17.130.20)
+ by e34.co.us.ibm.com (192.168.1.134) with IBM ESMTP SMTP Gateway: Authorized
+ Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Tue, 23 Jul 2019 18:01:16 +0100
 Received: from b03ledav005.gho.boulder.ibm.com
  (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
- by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- x6NH1Hk460162382
+ by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ x6NH1FnI31785320
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 23 Jul 2019 17:01:17 GMT
+ Tue, 23 Jul 2019 17:01:15 GMT
 Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 05E02BE054;
- Tue, 23 Jul 2019 17:01:17 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id D1B54BE06A;
+ Tue, 23 Jul 2019 17:01:14 +0000 (GMT)
 Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id EA695BE05D;
- Tue, 23 Jul 2019 17:01:16 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id C50DCBE054;
+ Tue, 23 Jul 2019 17:01:14 +0000 (GMT)
 Received: from localhost (unknown [9.53.179.212])
  by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTP;
- Tue, 23 Jul 2019 17:01:16 +0000 (GMT)
+ Tue, 23 Jul 2019 17:01:14 +0000 (GMT)
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
 To: qemu-devel@nongnu.org
-Date: Tue, 23 Jul 2019 12:00:42 -0500
-Message-Id: <20190723170104.4327-15-mdroth@linux.vnet.ibm.com>
+Date: Tue, 23 Jul 2019 12:00:38 -0500
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190723170104.4327-1-mdroth@linux.vnet.ibm.com>
 References: <20190723170104.4327-1-mdroth@linux.vnet.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 X-TM-AS-GCONF: 00
+x-cbid: 19072317-0016-0000-0000-000009D376BE
+X-IBM-SpamModules-Scores: 
+X-IBM-SpamModules-Versions: BY=3.00011482; HX=3.00000242; KW=3.00000007;
+ PH=3.00000004; SC=3.00000287; SDB=6.01236375; UDB=6.00651638; IPR=6.01017731; 
+ MB=3.00027856; MTD=3.00000008; XFM=3.00000015; UTC=2019-07-23 17:01:17
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19072317-0017-0000-0000-000044227DF8
+Message-Id: <20190723170104.4327-11-mdroth@linux.vnet.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
  definitions=2019-07-23_07:, , signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
  priorityscore=1501
- malwarescore=0 suspectscore=18 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ malwarescore=0 suspectscore=1 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=810 adultscore=0 classifier=spam adjust=0 reason=mlx
  scancount=1 engine=8.0.1-1906280000 definitions=main-1907230169
 Content-Transfer-Encoding: quoted-printable
 X-MIME-Autoconverted: from 8bit to quoted-printable by
- mx0a-001b2d01.pphosted.com id x6NGkku1053451
+ mx0a-001b2d01.pphosted.com id x6NGkhXr032772
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
 X-Received-From: 148.163.156.1
-Subject: [Qemu-devel] [PATCH 14/36] slirp: check sscanf result when
- emulating ident
+Subject: [Qemu-devel] [PATCH 10/36] tpm: Make sure new locality passed to
+ tpm_tis_prep_abort() is valid
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,55 +109,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>, secalert@redhat.com,
- qemu-stable@nongnu.org, William Bowling <will@wbowling.info>
+Cc: Stefan Berger <stefanb@linux.ibm.com>, qemu-stable@nongnu.org,
+ Stefan Berger <stefanb@linux.vnet.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: William Bowling <will@wbowling.info>
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
 
-When emulating ident in tcp_emu, if the strchr checks passed but the
-sscanf check failed, two uninitialized variables would be copied and
-sent in the reply, so move this code inside the if(sscanf()) clause.
+Make sure that the new locality passed to tpm_tis_prep_abort()
+is valid.
 
-Signed-off-by: William Bowling <will@wbowling.info>
-Cc: qemu-stable@nongnu.org
-Cc: secalert@redhat.com
-Message-Id: <1551476756-25749-1-git-send-email-will@wbowling.info>
-Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-(cherry picked from commit d3222975c7d6cda9e25809dea05241188457b113)
+Add a comment to aborting_locty that it may be any locality, including
+TPM_TIS_NO_LOCALITY.
+
+Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+(cherry picked from commit e92b63ea610201bd743343fc6b11e6c39c8d3515)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- slirp/tcp_subr.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ hw/tpm/tpm_tis.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/slirp/tcp_subr.c b/slirp/tcp_subr.c
-index fa61349cbb..c27e0d158d 100644
---- a/slirp/tcp_subr.c
-+++ b/slirp/tcp_subr.c
-@@ -657,12 +657,12 @@ tcp_emu(struct socket *so, struct mbuf *m)
- 							break;
- 						}
- 					}
-+					so_rcv->sb_cc =3D snprintf(so_rcv->sb_data,
-+								 so_rcv->sb_datalen,
-+								 "%d,%d\r\n", n1, n2);
-+					so_rcv->sb_rptr =3D so_rcv->sb_data;
-+					so_rcv->sb_wptr =3D so_rcv->sb_data + so_rcv->sb_cc;
- 				}
--                                so_rcv->sb_cc =3D snprintf(so_rcv->sb_da=
-ta,
--                                                         so_rcv->sb_data=
-len,
--                                                         "%d,%d\r\n", n1=
-, n2);
--				so_rcv->sb_rptr =3D so_rcv->sb_data;
--				so_rcv->sb_wptr =3D so_rcv->sb_data + so_rcv->sb_cc;
- 			}
- 			m_free(m);
- 			return 0;
+diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
+index d9322692ee..9a795ce96c 100644
+--- a/hw/tpm/tpm_tis.c
++++ b/hw/tpm/tpm_tis.c
+@@ -263,7 +263,9 @@ static void tpm_tis_prep_abort(TPMState *s, uint8_t l=
+octy, uint8_t newlocty)
+ {
+     uint8_t busy_locty;
+=20
+-    s->aborting_locty =3D locty;
++    assert(TPM_TIS_IS_VALID_LOCTY(newlocty));
++
++    s->aborting_locty =3D locty; /* may also be TPM_TIS_NO_LOCALITY */
+     s->next_locty =3D newlocty;  /* locality after successful abort */
+=20
+     /*
 --=20
 2.17.1
 
