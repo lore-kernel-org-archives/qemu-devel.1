@@ -7,74 +7,74 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40627C7618B
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 10:42:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B8AFC7618E
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 10:43:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0F67E21655
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 10:42:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ECEE722512
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 10:43:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wRylIbBK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F67E21655
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LnzpAX7u"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECEE722512
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41088 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41104 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hpsFf-0004ea-GK
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jul 2019 06:42:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39767)
+	id 1hpsG4-0006TN-GH
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jul 2019 06:43:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39710)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hpsFA-0002rp-5q
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 06:42:05 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hpsF6-0002YT-Ar
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 06:42:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hpsF8-0004No-Bq
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 06:42:04 -0400
-Received: from mail-wr1-x42d.google.com ([2a00:1450:4864:20::42d]:35141)
+ (envelope-from <alex.bennee@linaro.org>) id 1hpsF3-0004ED-Vd
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 06:41:59 -0400
+Received: from mail-wr1-x42b.google.com ([2a00:1450:4864:20::42b]:47014)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hpsF8-0004Bs-0C
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 06:42:02 -0400
-Received: by mail-wr1-x42d.google.com with SMTP id y4so42643517wrm.2
- for <qemu-devel@nongnu.org>; Tue, 23 Jul 2019 03:41:56 -0700 (PDT)
+ id 1hpsF1-0004B9-OT
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 06:41:57 -0400
+Received: by mail-wr1-x42b.google.com with SMTP id z1so42591982wru.13
+ for <qemu-devel@nongnu.org>; Tue, 23 Jul 2019 03:41:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=UnzyRxO8LdQ2pkjo8SoYMr5p6k7VTvscFEOudhhqpPw=;
- b=wRylIbBKsXBYTEcXi4fMrOvUpPwGx6YIalHlWc6iBc/xW8q2SrFKtJcs0U11MPhSyR
- QnkgvCAHH8BkSKMeH9fXYquRGPY0BbpI9yIFohNIaLjg80w8H+GeWMy8GBh8HjFX/m1T
- RjXGSbmR4kOxpO9pW2ewGMdVPXymMRU8SlWH+sH+1RnAcEmM8cnvMJ8X8VDYj5Q0Slcy
- jqq67j7ytwD/pMNv2EuKjlJwiW1grV/6GHcp2/kL62sRQuERbS96OkXBGBX3sg7nEmEx
- MBTRINg5aeQstlJpABq3df0RRwfNn7s3NxF13w6YLqsueSfK54KwMLSGdhl/1VukriTG
- bOpg==
+ bh=qyLKSdPX2WPchYG7C+FRJEUvyrp1wUDqLHouafCL0pQ=;
+ b=LnzpAX7uTmvpTDwvsUkh7U2Skevlqy17jKtsJTpvbEN4feDkVM0u0tQg5RWTwyowhD
+ RcfiFVFUKa65W4cTcl98OKMC0K9NuV3HYrlOfCW65iCaBZ1ObddIh2RWgF31c7gRBD23
+ VYXiQXBunVYp58/l0KeILaXwaTO8a8V94gOYyOy4K3xNDAJU0M2GQO81OnErSgMRvzFR
+ wpNraVej598AdNlWipkhH59Cb8TDYXIhoZwYAuznWW5Xl0y3+wvzqcg2+sVmfbvz8Kdu
+ FwPRNnT4RuJT0COhdKcy2fuXk4pfiPB0xsXcJkUmpm5dJlhMHhLU7ZQMbIt2Qo7JBk4q
+ qmbA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=UnzyRxO8LdQ2pkjo8SoYMr5p6k7VTvscFEOudhhqpPw=;
- b=GqZL6pv5IvyYn8N8YVnSxfxCReniOer1pSWGCfO1LRzD7R84lggwDY7kImhbHDRKWu
- Fq7vyyALGNemwf9A/9sjz85n5tY7kuXAm48SP88ejRdcOlKzijLJIa3E5QtK053JuBSs
- nmGrDZE4iBgVfkJmLdTIia/3uKhTi2qtlv8iVUHnbq8mtjn2Ye9s7QzQLUeoT7txMZeO
- kxoIsWNuvJcVQIDAE/ysGUO6IMv0Kh0WYwJseqsZOd4RpvUkiCLDurxv5Gsg36feBYHq
- mK/v8nF0QIey20USvE6WDLzmwcLgHFAACXOq+oWrVz7kf/satxjt5Bj+Ip3FjrErQNsY
- lgAA==
-X-Gm-Message-State: APjAAAX0k5CXkmrKaSu5nqejxTKPrFxKs4B51uKu7PNYMcVtbKwVH2z8
- fdDRwUNrdH4li89CPn6ooOMAYQ==
-X-Google-Smtp-Source: APXvYqzKqMGVeLsUsJdrpxawpOjOzVeFY5koh9k6qL+Wcn/mcZiskMXwLcQTspSzlntpAuHYElSXPg==
-X-Received: by 2002:adf:fe09:: with SMTP id n9mr84665697wrr.41.1563878515157; 
- Tue, 23 Jul 2019 03:41:55 -0700 (PDT)
+ bh=qyLKSdPX2WPchYG7C+FRJEUvyrp1wUDqLHouafCL0pQ=;
+ b=WoAbE8gWRDSQNUJZ59MV1HHNDYuSEUy7DrhUvOYEqYePW1fKYon0bJTTeuRIuq2Fpr
+ fzEjgz4KPBtp0OODey6TkUkH6FQr45Ue4oCUd9gBbm3nvu3f6PujX1lIYvxcsHGNtgHR
+ AwY4Ir+5C5Kg/JLn1gSlm2dzBAUbwiceTu+IfcMV8WCjE6X3cSrc+v07NjMyKWH0Envv
+ 8e+WCPpTtL9pUjVObJkTgOdVFmsBxKy7NbMX8YDKQk9GSQPU1zPft+TbYzH4ryOLk07R
+ B7siIz/FFJ0CtWrBt9qWI9tfRTfltK9d39JWzzo42G6TR/gu7no4OjEXAvIBjX8J+woj
+ DXyQ==
+X-Gm-Message-State: APjAAAU7McqC51YRgWk8MKFMXp0jhreVjYG5dX2sM2y0AeHeV754vW8l
+ kzTBomObpdJ4KH0XEDez6rFmGQ==
+X-Google-Smtp-Source: APXvYqxnIuFHyDF//HFoO6AevKmrFE3OzFU0nQs9rGKufnSHcOvpWKzvqPMxucPYqaRW1ISWTF4Rbw==
+X-Received: by 2002:adf:91c2:: with SMTP id 60mr23838509wri.334.1563878513884; 
+ Tue, 23 Jul 2019 03:41:53 -0700 (PDT)
 Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id o7sm14676591wru.58.2019.07.23.03.41.51
+ by smtp.gmail.com with ESMTPSA id g2sm37766623wmh.0.2019.07.23.03.41.50
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
  Tue, 23 Jul 2019 03:41:52 -0700 (PDT)
 Received: from zen.linaroharston. (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 21E351FF87;
- Tue, 23 Jul 2019 11:36:14 +0100 (BST)
+ by zen.linaroharston (Postfix) with ESMTP id EFC111FFA5;
+ Tue, 23 Jul 2019 11:36:13 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: peter.maydell@linaro.org
-Date: Tue, 23 Jul 2019 11:36:09 +0100
-Message-Id: <20190723103612.5600-21-alex.bennee@linaro.org>
+Date: Tue, 23 Jul 2019 11:36:07 +0100
+Message-Id: <20190723103612.5600-19-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190723103612.5600-1-alex.bennee@linaro.org>
 References: <20190723103612.5600-1-alex.bennee@linaro.org>
@@ -83,9 +83,9 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::42d
-Subject: [Qemu-devel] [PULL 20/23] tests/qemu-iotests/check: Allow tests
- without groups
+X-Received-From: 2a00:1450:4864:20::42b
+Subject: [Qemu-devel] [PULL 18/23] travis: enable travis_retry for check
+ phase
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,53 +97,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>,
- "open list:Block layer core" <qemu-block@nongnu.org>, qemu-devel@nongnu.org,
- Max Reitz <mreitz@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: Fam Zheng <fam@euphon.net>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Thomas Huth <thuth@redhat.com>
+We have some flaky tests and usually the test passes on a retry.
+Enable travis_retry for the test phase and see if that helps keep
+things green.
 
-The regular expressions in the "check" script currently expect that there
-is always a space after the test number in the group file, so you can't
-have a test in there without a group unless the line still ends with a
-space - which is quite error prone since some editors might remove spaces
-at the end of lines automatically.
-Thus let's fix the regular expressions so that it is also possible to
-have lines with one test number only in the group file.
-
-Suggested-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <20190717111947.30356-2-thuth@redhat.com>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
-index f925606cc52..c24874ff4aa 100755
---- a/tests/qemu-iotests/check
-+++ b/tests/qemu-iotests/check
-@@ -488,7 +488,7 @@ testlist options
- BEGIN        { for (t='$start'; t<='$end'; t++) printf "%03d\n",t }' \
-         | while read id
-         do
--            if grep -s "^$id " "$source_iotests/group" >/dev/null
-+            if grep -s "^$id\( \|\$\)" "$source_iotests/group" >/dev/null
-             then
-                 # in group file ... OK
-                 echo $id >>$tmp.list
-@@ -547,7 +547,7 @@ else
-         touch $tmp.list
-     else
-         # no test numbers, do everything from group file
--        sed -n -e '/^[0-9][0-9][0-9]*/s/[         ].*//p' <"$source_iotests/group" >$tmp.list
-+        sed -n -e '/^[0-9][0-9][0-9]*/s/^\([0-9]*\).*/\1/p' <"$source_iotests/group" >$tmp.list
-     fi
- fi
+diff --git a/.travis.yml b/.travis.yml
+index 5d3d6ee1d32..caf0a1f8faf 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -75,7 +75,7 @@ before_script:
+   - mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR}
+   - ${SRC_DIR}/configure ${BASE_CONFIG} ${CONFIG} || { cat config.log && exit 1; }
+ script:
+-  - make -j3 && ${TEST_CMD}
++  - make -j3 && travis_retry ${TEST_CMD}
  
+ 
+ matrix:
 -- 
 2.20.1
 
