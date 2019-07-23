@@ -2,57 +2,59 @@ Return-Path: <SRS0=3Ld+=VU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 960C5C7618B
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 09:07:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 533E1C7618B
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 09:08:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6F7A0227BF
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 09:07:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F7A0227BF
+	by mail.kernel.org (Postfix) with ESMTPS id 2AD91227C0
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 09:08:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2AD91227C0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40450 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40452 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hpqm6-0004Vg-35
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jul 2019 05:07:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41510)
+	id 1hpqmF-00053v-1c
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jul 2019 05:08:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41545)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <sgarzare@redhat.com>) id 1hpqlh-0003Bh-2N
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 05:07:34 -0400
+ (envelope-from <sgarzare@redhat.com>) id 1hpqll-0003Su-3M
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 05:07:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <sgarzare@redhat.com>) id 1hpqld-00020w-9R
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 05:07:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59512)
+ (envelope-from <sgarzare@redhat.com>) id 1hpqlj-00024X-2s
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 05:07:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:28182)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1hpqlb-0001zZ-Ut
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 05:07:29 -0400
+ (Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1hpqlh-00021g-2C
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 05:07:34 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 77BCF3082B4B;
- Tue, 23 Jul 2019 09:07:26 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 918D23084242;
+ Tue, 23 Jul 2019 09:07:30 +0000 (UTC)
 Received: from steredhat.redhat.com (unknown [10.36.118.55])
- by smtp.corp.redhat.com (Postfix) with ESMTP id F29165D9CC;
- Tue, 23 Jul 2019 09:07:19 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D0F2B5D9C5;
+ Tue, 23 Jul 2019 09:07:26 +0000 (UTC)
 From: Stefano Garzarella <sgarzare@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Tue, 23 Jul 2019 11:07:16 +0200
-Message-Id: <20190723090718.14590-1-sgarzare@redhat.com>
+Date: Tue, 23 Jul 2019 11:07:17 +0200
+Message-Id: <20190723090718.14590-2-sgarzare@redhat.com>
+In-Reply-To: <20190723090718.14590-1-sgarzare@redhat.com>
+References: <20190723090718.14590-1-sgarzare@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Tue, 23 Jul 2019 09:07:26 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.40]); Tue, 23 Jul 2019 09:07:30 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH 0/2] pc: mmap kernel (ELF image) and initrd
+Subject: [Qemu-devel] [PATCH 1/2] elf-ops.h: Map into memory the ELF to load
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,48 +73,161 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-In order to reduce the memory footprint when PVH kernel and initrd
-are used, we map them into memory instead of reading them.
-In this way we can share them between multiple instances of QEMU.
+In order to reduce the memory footprint we map into memory
+the ELF to load using g_mapped_file_new_from_fd() instead of
+reading each sections. In this way we can share the ELF pages
+between multiple instances of QEMU.
 
-These are the results using a PVH kernel and initrd (cpio):
-- memory footprint (using smem) [MB]
-        QEMU              before                   now
-    # instances        USS      PSS            USS      PSS
-         1           102.0M   105.8M         102.3M   106.2M
-         2            94.6M   101.2M          72.3M    90.1M
-         4            94.1M    98.0M          72.0M    81.5M
-         8            94.0M    96.2M          71.8M    76.9M
-        16            93.9M    95.1M          71.6M    74.3M
-
-    Initrd size: 3.0M
-    Kernel
-        image size: 28M
-        sections size [size -A -d vmlinux]:  18.9M
-
-- boot time [ms]
-                          before                   now
- qemu_init_end:           63.85                   55.91
- linux_start_kernel:      82.11 (+18.26)          74.51 (+18.60)
- linux_start_user:       169.94 (+87.83)         159.06 (+84.56)
-
-QEMU command used:
-./qemu-system-x86_64 -bios /path/to/seabios/out/bios.bin -no-hpet \
-    -machine q35,accel=3Dkvm,kernel_irqchip,nvdimm,sata=3Doff,smbus=3Doff=
-,vmport=3Doff \
-    -cpu host -m 1G -smp 1 -vga none -display none -no-user-config -nodef=
-aults \
-    -kernel /path/to/vmlinux -initrd /path/to/rootfs.cpio \
-    -append 'root=3D/dev/mem0 ro console=3Dhvc0 pci=3Dlastbus=3D0 nosmap'
-
-Stefano Garzarella (2):
-  elf-ops.h: Map into memory the ELF to load
-  hw/i386/pc: Map into memory the initrd
-
- hw/i386/pc.c         | 15 ++++++++---
+Suggested-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+---
  include/hw/elf_ops.h | 59 ++++++++++++++++++++++----------------------
- 2 files changed, 41 insertions(+), 33 deletions(-)
+ 1 file changed, 30 insertions(+), 29 deletions(-)
 
+diff --git a/include/hw/elf_ops.h b/include/hw/elf_ops.h
+index 690f9238c8..69ce8dea74 100644
+--- a/include/hw/elf_ops.h
++++ b/include/hw/elf_ops.h
+@@ -323,8 +323,9 @@ static int glue(load_elf, SZ)(const char *name, int f=
+d,
+     struct elfhdr ehdr;
+     struct elf_phdr *phdr =3D NULL, *ph;
+     int size, i, total_size;
+-    elf_word mem_size, file_size;
++    elf_word mem_size, file_size, data_offset;
+     uint64_t addr, low =3D (uint64_t)-1, high =3D 0;
++    GMappedFile *gmf =3D NULL;
+     uint8_t *data =3D NULL;
+     char label[128];
+     int ret =3D ELF_LOAD_FAILED;
+@@ -409,22 +410,26 @@ static int glue(load_elf, SZ)(const char *name, int=
+ fd,
+         }
+     }
+=20
++    gmf =3D g_mapped_file_new_from_fd(fd, false, NULL);
++    if (!gmf) {
++        goto fail;
++    }
++
+     total_size =3D 0;
+     for(i =3D 0; i < ehdr.e_phnum; i++) {
+         ph =3D &phdr[i];
+         if (ph->p_type =3D=3D PT_LOAD) {
+             mem_size =3D ph->p_memsz; /* Size of the ROM */
+             file_size =3D ph->p_filesz; /* Size of the allocated data */
+-            data =3D g_malloc0(file_size);
+-            if (ph->p_filesz > 0) {
+-                if (lseek(fd, ph->p_offset, SEEK_SET) < 0) {
+-                    goto fail;
+-                }
+-                if (read(fd, data, file_size) !=3D file_size) {
+-                    goto fail;
+-                }
++            data_offset =3D ph->p_offset; /* Offset where the data is lo=
+cated */
++
++            if (g_mapped_file_get_length(gmf) < file_size + data_offset)=
+ {
++                goto fail;
+             }
+=20
++            data =3D (uint8_t *)g_mapped_file_get_contents(gmf);
++            data +=3D data_offset;
++
+             /* The ELF spec is somewhat vague about the purpose of the
+              * physical address field. One common use in the embedded wo=
+rld
+              * is that physical address field specifies the load address
+@@ -513,17 +518,16 @@ static int glue(load_elf, SZ)(const char *name, int=
+ fd,
+                 *pentry =3D ehdr.e_entry - ph->p_vaddr + ph->p_paddr;
+             }
+=20
+-            if (mem_size =3D=3D 0) {
+-                /* Some ELF files really do have segments of zero size;
+-                 * just ignore them rather than trying to create empty
+-                 * ROM blobs, because the zero-length blob can falsely
+-                 * trigger the overlapping-ROM-blobs check.
+-                 */
+-                g_free(data);
+-            } else {
++            /* Some ELF files really do have segments of zero size;
++             * just ignore them rather than trying to create empty
++             * ROM blobs, because the zero-length blob can falsely
++             * trigger the overlapping-ROM-blobs check.
++             */
++            if (mem_size !=3D 0) {
+                 if (load_rom) {
+                     snprintf(label, sizeof(label), "phdr #%d: %s", i, na=
+me);
+-
++                    /* Increments the reference count to avoid the unmap=
+ */
++                    g_mapped_file_ref(gmf);
+                     /* rom_add_elf_program() seize the ownership of 'dat=
+a' */
+                     rom_add_elf_program(label, data, file_size, mem_size=
+,
+                                         addr, as);
+@@ -531,7 +535,6 @@ static int glue(load_elf, SZ)(const char *name, int f=
+d,
+                     address_space_write(as ? as : &address_space_memory,
+                                         addr, MEMTXATTRS_UNSPECIFIED,
+                                         data, file_size);
+-                    g_free(data);
+                 }
+             }
+=20
+@@ -547,16 +550,15 @@ static int glue(load_elf, SZ)(const char *name, int=
+ fd,
+             struct elf_note *nhdr =3D NULL;
+=20
+             file_size =3D ph->p_filesz; /* Size of the range of ELF note=
+s */
+-            data =3D g_malloc0(file_size);
+-            if (ph->p_filesz > 0) {
+-                if (lseek(fd, ph->p_offset, SEEK_SET) < 0) {
+-                    goto fail;
+-                }
+-                if (read(fd, data, file_size) !=3D file_size) {
+-                    goto fail;
+-                }
++            data_offset =3D ph->p_offset; /* Offset where the notes are =
+located */
++
++            if (g_mapped_file_get_length(gmf) < file_size + data_offset)=
+ {
++                goto fail;
+             }
+=20
++            data =3D (uint8_t *)g_mapped_file_get_contents(gmf);
++            data +=3D data_offset;
++
+             /*
+              * Search the ELF notes to find one with a type matching the
+              * value passed in via 'translate_opaque'
+@@ -570,7 +572,6 @@ static int glue(load_elf, SZ)(const char *name, int f=
+d,
+                     sizeof(struct elf_note) =3D=3D sizeof(struct elf64_n=
+ote);
+                 elf_note_fn((void *)nhdr, (void *)&ph->p_align, is64);
+             }
+-            g_free(data);
+             data =3D NULL;
+         }
+     }
+@@ -582,7 +583,7 @@ static int glue(load_elf, SZ)(const char *name, int f=
+d,
+         *highaddr =3D (uint64_t)(elf_sword)high;
+     return total_size;
+  fail:
+-    g_free(data);
++    g_mapped_file_unref(gmf);
+     g_free(phdr);
+     return ret;
+ }
 --=20
 2.20.1
 
