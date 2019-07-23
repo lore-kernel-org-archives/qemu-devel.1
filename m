@@ -2,65 +2,81 @@ Return-Path: <SRS0=3Ld+=VU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3EE3C76190
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 17:26:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C13D0C76186
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 17:28:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AB185218B0
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 17:26:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB185218B0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 90ED02070B
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 17:28:22 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kk6Hto7M"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90ED02070B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46272 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46286 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hpyYi-0005o8-1c
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jul 2019 13:26:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51735)
+	id 1hpyaL-00074b-RC
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jul 2019 13:28:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52064)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.williamson@redhat.com>) id 1hpyYW-0005PC-Um
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 13:26:30 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hpyaC-0006fg-Ii
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 13:28:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.williamson@redhat.com>) id 1hpyYV-0000UA-FZ
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 13:26:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52726)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
- id 1hpyYV-0000Th-7i
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 13:26:27 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 7A80B3C938;
- Tue, 23 Jul 2019 17:26:26 +0000 (UTC)
-Received: from x1.home (ovpn-116-35.phx2.redhat.com [10.3.116.35])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3055D60A9F;
- Tue, 23 Jul 2019 17:26:19 +0000 (UTC)
-Date: Tue, 23 Jul 2019 11:26:18 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: "Singh, Brijesh" <brijesh.singh@amd.com>
-Message-ID: <20190723112618.0efafa8d@x1.home>
-In-Reply-To: <dbe614f5-47c8-b05d-dd73-2fbcd1579ae3@amd.com>
-References: <155364082689.15803.7062874513041742278.stgit@gimli.home>
- <20190329104904.450fefef@x1.home>
- <dbe614f5-47c8-b05d-dd73-2fbcd1579ae3@amd.com>
-Organization: Red Hat
+ (envelope-from <peter.maydell@linaro.org>) id 1hpyaB-0001Xd-FD
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 13:28:12 -0400
+Received: from mail-ot1-x335.google.com ([2607:f8b0:4864:20::335]:38337)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hpyaB-0001Ur-7p
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 13:28:11 -0400
+Received: by mail-ot1-x335.google.com with SMTP id d17so44893119oth.5
+ for <qemu-devel@nongnu.org>; Tue, 23 Jul 2019 10:28:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=dVi6YVlWRIAW7sm4fkplK8kxgeIcoQm1niGV8H41Zn8=;
+ b=kk6Hto7Mmj+1UsxxYe2DuOoprvsk1pbWHW/dp9IOfjO0mAilDOc2nUTPGL4bP+Q2D1
+ ReSvukCmmN3fn+4F0ExwdW0UOiM2vtd4M5sZsKpNXi0dEz3Z4ydSRPW0pVVZDZrBGNWv
+ LSN04vOqhDrBARAEey+PiYA4Nru4Rcwa8d6SuhEBrM1A/gIaqabmdTiiuu9+sUCcHCON
+ BT1VSMstQ0amiRTWY7CuJkExWIQ+VYj2t92VsNqwWOFO6wywjF7mxwGmUxLWCELrIccK
+ inDRD9oJcfZMuveWEb4ZvxWsOJxEoSsBn99zvISwbMutarQMO+IyqQ2uJNAFbzHaP6hl
+ /tAw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=dVi6YVlWRIAW7sm4fkplK8kxgeIcoQm1niGV8H41Zn8=;
+ b=jtDeM36NBy//JYWGUUOJltYv/V59koSvDMAcpf+3BvUScMl0X4B3qDjqV7giWlqcHf
+ RsquMHXrsg+kpKNegtRomqqcNY+pSLYC5u5Amho/6DWT7Egn4aMfLrm7J8mwGgQjQrJ/
+ TyzLvXkWmZPc08hITwTZ7SPrW6NPotPm/FYm6ewfsTV42DvQqn+bc2UtcZI22k6gcqFa
+ tpNjMSO4zdNryO4yNz4oydX6PntrDLjAkMkl8IbSgdcQV0vzbbd79kAi/sQ/5LAJbz1I
+ qjFcjq4SYvAeMdHphFq5fjqW/PRJqrvnRNw94Jj+xj34n5Zj6vtGPV7QHRY5rJc/6Ed1
+ mNFQ==
+X-Gm-Message-State: APjAAAXDcPEps3uyDsP2USoqeYt6GoUZ0Z3FSqAPtkgam7Pkb8ubpmGU
+ vH6frdR+6tnNgZSItGEp3XbaAcghczbzFrhGqBoThA==
+X-Google-Smtp-Source: APXvYqy+AFHCP51yrWo6ZDf1H3FDge4IP74MzjoqNKVlG8+gTGLaSuxkmjrbTNaWTyZtrUA1a5IloeswL23hazxE4Ek=
+X-Received: by 2002:a9d:711e:: with SMTP id n30mr53876619otj.97.1563902886401; 
+ Tue, 23 Jul 2019 10:28:06 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.39]); Tue, 23 Jul 2019 17:26:26 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [RFC PATCH] pci: Use PCI aliases when determining
- device IOMMU address space
+References: <20190723162356.3296-1-alex.bennee@linaro.org>
+In-Reply-To: <20190723162356.3296-1-alex.bennee@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 23 Jul 2019 18:27:55 +0100
+Message-ID: <CAFEAcA9iJmD9Ch+TwtooXw=PiKY9W9AeiK4LQZwj-8qgWmfFCw@mail.gmail.com>
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::335
+Subject: Re: [Qemu-devel] [PULL v4 00/23 for 4.1-rc2] testing updates
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,166 +88,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "mst@redhat.com" <mst@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "peterx@redhat.com" <peterx@redhat.com>,
- "eric.auger@redhat.com" <eric.auger@redhat.com>, "Suthikulpanit,
- Suravee" <Suravee.Suthikulpanit@amd.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 1 Apr 2019 13:41:39 +0000
-"Singh, Brijesh" <brijesh.singh@amd.com> wrote:
+On Tue, 23 Jul 2019 at 17:23, Alex Benn=C3=A9e <alex.bennee@linaro.org> wro=
+te:
+>
+> The following changes since commit 4da6c0f9ebbdaaf4315c71ccd288d02b9087f8=
+af:
+>
+>   Merge remote-tracking branch 'remotes/amarkovic2/tags/mips-queue-jul-23=
+-2019' into staging (2019-07-23 12:49:39 +0100)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/stsquad/qemu.git tags/pull-testing-230719-4
+>
+> for you to fetch changes up to 98808c3d0c162aba93fe7840a34b54c4814332d4:
+>
+>   tests/docker: Refresh APT cache before installing new packages on Debia=
+n (2019-07-23 17:19:11 +0100)
+>
+> ----------------------------------------------------------------
+> Final testing updates:
+>
+>   - docker sphinx updates
+>   - windows build re-enabled in CI
+>   - travis_retry for make check
+>   - build fixes
+>   - docker cache fixes
+>
+> ----------------------------------------------------------------
 
-> Thanks for adding Alex.
-> 
-> Adding Suravee.
-> 
-> 
-> On 3/29/19 11:49 AM, Alex Williamson wrote:
-> > [Cc +Brijesh]
-> > 
-> > Hi Brijesh, will the change below require the IVRS to be updated to
-> > include aliases for all BDF ranges behind a conventional bridge?  I
-> > think the Linux code handles this regardless of the firmware provided
-> > aliases, but is it required per spec for the ACPI tables to include
-> > bridge aliases?  Thanks,
-> >   
-> 
-> We do need to includes aliases in ACPI table. We need to populate the
-> IVHD type 0x43 and 0x4 for alias range start and end. I believe host
-> IVRS would contain similar information.
-> 
-> Suravee, please correct me if I am missing something?
 
-I finally found some time to investigate this a little further, yes the
-types mentioned are correct for defining start and end of an alias
-range.  The challenge here is that these entries require a DeviceID,
-which is defined as a BDF, AIUI.  The IVRS is created in QEMU, but bus
-numbers are defined by the guest firmware, and potentially redefined by
-the guest OS.  This makes it non-trivial to insert a few IVHDs into the
-IVRS to describe alias ranges.  I'm wondering if the solution here is
-to define a new linker-loader command that would instruct the guest to
-write a bus number byte to a given offset for a described device.
-These commands would be inserted before the checksum command, such that
-these bus number updates are calculated as part of the checksum.
+Applied, thanks.
 
-I'm imagining the command format would need to be able to distinguish
-between the actual bus number of a described device, the secondary bus
-number of the device, and the subordinate bus number of the device.
-For describing the device, I'm envisioning stealing from the DMAR
-definition, which already includes a bus number invariant mechanism to
-describe a device, starting with a segment and root bus, follow a chain
-of devfns to get to the target device.  Therefore the guest firmware
-would follow the path to the described device, pick the desired bus
-number, and write it to the indicated table offset.
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.1
+for any user-visible changes.
 
-Does this seem like a reasonable approach?  Better ideas?  I'm not
-thrilled with the increased scope demanded by IVRS support, but so long
-as we have an AMD IOMMU model, I don't see how to avoid it.  Thanks,
-
-Alex
-
-> > On Tue, 26 Mar 2019 16:55:19 -0600
-> > Alex Williamson <alex.williamson@redhat.com> wrote:
-> >   
-> >> Conventional PCI buses pre-date requester IDs.  An IOMMU cannot
-> >> distinguish by devfn & bus between devices in a conventional PCI
-> >> topology and therefore we cannot assign them separate AddressSpaces.
-> >> By taking this requester ID aliasing into account, QEMU better matches
-> >> the bare metal behavior and restrictions, and enables shared
-> >> AddressSpace configurations that are otherwise not possible with
-> >> guest IOMMU support.
-> >>
-> >> For the latter case, given any example where an IOMMU group on the
-> >> host includes multiple devices:
-> >>
-> >>    $ ls  /sys/kernel/iommu_groups/1/devices/
-> >>    0000:00:01.0  0000:01:00.0  0000:01:00.1
-> >>
-> >> If we incorporate a vIOMMU into the VM configuration, we're restricted
-> >> that we can only assign one of the endpoints to the guest because a
-> >> second endpoint will attempt to use a different AddressSpace.  VFIO
-> >> only supports IOMMU group level granularity at the container level,
-> >> preventing this second endpoint from being assigned:
-> >>
-> >> qemu-system-x86_64 -machine q35... \
-> >>    -device intel-iommu,intremap=on \
-> >>    -device pcie-root-port,addr=1e.0,id=pcie.1 \
-> >>    -device vfio-pci,host=1:00.0,bus=pcie.1,addr=0.0,multifunction=on \
-> >>    -device vfio-pci,host=1:00.1,bus=pcie.1,addr=0.1
-> >>
-> >> qemu-system-x86_64: -device vfio-pci,host=1:00.1,bus=pcie.1,addr=0.1: vfio \
-> >> 0000:01:00.1: group 1 used in multiple address spaces
-> >>
-> >> However, when QEMU incorporates proper aliasing, we can make use of a
-> >> PCIe-to-PCI bridge to mask the requester ID, resulting in a hack that
-> >> provides the downstream devices with the same AddressSpace, ex:
-> >>
-> >> qemu-system-x86_64 -machine q35... \
-> >>    -device intel-iommu,intremap=on \
-> >>    -device pcie-pci-bridge,addr=1e.0,id=pci.1 \
-> >>    -device vfio-pci,host=1:00.0,bus=pci.1,addr=1.0,multifunction=on \
-> >>    -device vfio-pci,host=1:00.1,bus=pci.1,addr=1.1
-> >>
-> >> While the utility of this hack may be limited, this AddressSpace
-> >> aliasing is the correct behavior for QEMU to emulate bare metal.
-> >>
-> >> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
-> >> ---
-> >>   hw/pci/pci.c |   33 +++++++++++++++++++++++++++++++--
-> >>   1 file changed, 31 insertions(+), 2 deletions(-)
-> >>
-> >> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-> >> index 35451c1e9987..38467e676f1f 100644
-> >> --- a/hw/pci/pci.c
-> >> +++ b/hw/pci/pci.c
-> >> @@ -2594,12 +2594,41 @@ AddressSpace *pci_device_iommu_address_space(PCIDevice *dev)
-> >>   {
-> >>       PCIBus *bus = pci_get_bus(dev);
-> >>       PCIBus *iommu_bus = bus;
-> >> +    uint8_t devfn = dev->devfn;
-> >>   
-> >>       while(iommu_bus && !iommu_bus->iommu_fn && iommu_bus->parent_dev) {
-> >> -        iommu_bus = pci_get_bus(iommu_bus->parent_dev);
-> >> +        PCIBus *parent_bus = pci_get_bus(iommu_bus->parent_dev);
-> >> +
-> >> +        /*
-> >> +         * Determine which requester ID alias should be used for the device
-> >> +         * based on the PCI topology.  There are no requester IDs on convetional
-> >> +         * PCI buses, therefore we push the alias up to the parent on each non-
-> >> +         * express bus.  Which alias we use depends on whether this is a legacy
-> >> +         * PCI bridge or PCIe-to-PCI/X bridge as in chapter 2.3 of the PCIe-to-
-> >> +         * PCI bridge spec.  Note that we cannot use pci_requester_id() here
-> >> +         * because the resulting BDF depends on the secondary bridge register
-> >> +         * programming.  We also cannot lookup the PCIBus from the bus number
-> >> +         * at this point for the iommu_fn.  Also, requester_id_cache is the
-> >> +         * alias to the root bus, which is usually, but not necessarily always
-> >> +         * where we'll find our iommu_fn.
-> >> +         */
-> >> +        if (!pci_bus_is_express(iommu_bus)) {
-> >> +            PCIDevice *parent = iommu_bus->parent_dev;
-> >> +
-> >> +            if (pci_is_express(parent) &&
-> >> +                pcie_cap_get_type(parent) == PCI_EXP_TYPE_PCI_BRIDGE) {
-> >> +                devfn = PCI_DEVFN(0, 0);
-> >> +                bus = iommu_bus;
-> >> +            } else {
-> >> +                devfn = parent->devfn;
-> >> +                bus = parent_bus;
-> >> +            }
-> >> +        }
-> >> +
-> >> +        iommu_bus = parent_bus;
-> >>       }
-> >>       if (iommu_bus && iommu_bus->iommu_fn) {
-> >> -        return iommu_bus->iommu_fn(bus, iommu_bus->iommu_opaque, dev->devfn);
-> >> +        return iommu_bus->iommu_fn(bus, iommu_bus->iommu_opaque, devfn);
-> >>       }
-> >>       return &address_space_memory;
-> >>   }
-> >>  
-> >   
-
+-- PMM
 
