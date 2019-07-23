@@ -7,74 +7,74 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70849C7618B
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 10:42:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40627C7618B
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 10:42:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4292621655
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 10:42:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0F67E21655
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 10:42:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MD+YroMo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4292621655
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wRylIbBK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F67E21655
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41082 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41088 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hpsFY-00046N-3L
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jul 2019 06:42:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39673)
+	id 1hpsFf-0004ea-GK
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jul 2019 06:42:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39767)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hpsF4-0002PH-1m
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 06:41:59 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hpsFA-0002rp-5q
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 06:42:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hpsF1-0004CX-R6
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 06:41:57 -0400
-Received: from mail-wr1-x434.google.com ([2a00:1450:4864:20::434]:47022)
+ (envelope-from <alex.bennee@linaro.org>) id 1hpsF8-0004No-Bq
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 06:42:04 -0400
+Received: from mail-wr1-x42d.google.com ([2a00:1450:4864:20::42d]:35141)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hpsEz-00048f-Nw
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 06:41:55 -0400
-Received: by mail-wr1-x434.google.com with SMTP id z1so42591809wru.13
- for <qemu-devel@nongnu.org>; Tue, 23 Jul 2019 03:41:51 -0700 (PDT)
+ id 1hpsF8-0004Bs-0C
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 06:42:02 -0400
+Received: by mail-wr1-x42d.google.com with SMTP id y4so42643517wrm.2
+ for <qemu-devel@nongnu.org>; Tue, 23 Jul 2019 03:41:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=GDOlQg2avM3U9x1HQrrYCutc2wv4Hz+Sy22dYaJ+OrY=;
- b=MD+YroMoTvLg413MMnloRkdiOW2Sh/wBORPDJu3ueOvdzpvgPV10qrp1dhHKYTIgaN
- Wog4FjNH2GFM9jy/y9se/fqQxqaLQldQOJ5jhwZAqX6WkEpl8R3LFbGHShRK+7MNxmel
- pRWNACFV2nVxyhObSjZOKejg7kCrLa0ii+W67iwJ6OFWsJJqExIZNaDj9TKzO4iOXEcf
- zcT38xSDU4ASwrc95sg2Fh4m5M5Wz3zElr/94YEZhiry6Sg+0u/CB/VJW3m58lxXr76j
- 3T704B5su5rZay/fI1M4KoI8BKWRm0/ncZACGo3TB+etrn1XhKenadh5u/VZFTh89jPV
- a5fA==
+ bh=UnzyRxO8LdQ2pkjo8SoYMr5p6k7VTvscFEOudhhqpPw=;
+ b=wRylIbBKsXBYTEcXi4fMrOvUpPwGx6YIalHlWc6iBc/xW8q2SrFKtJcs0U11MPhSyR
+ QnkgvCAHH8BkSKMeH9fXYquRGPY0BbpI9yIFohNIaLjg80w8H+GeWMy8GBh8HjFX/m1T
+ RjXGSbmR4kOxpO9pW2ewGMdVPXymMRU8SlWH+sH+1RnAcEmM8cnvMJ8X8VDYj5Q0Slcy
+ jqq67j7ytwD/pMNv2EuKjlJwiW1grV/6GHcp2/kL62sRQuERbS96OkXBGBX3sg7nEmEx
+ MBTRINg5aeQstlJpABq3df0RRwfNn7s3NxF13w6YLqsueSfK54KwMLSGdhl/1VukriTG
+ bOpg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=GDOlQg2avM3U9x1HQrrYCutc2wv4Hz+Sy22dYaJ+OrY=;
- b=i/strnuMhwI1VtiWdHOar/zcaxqy9GnYx5j6DiSQFR6lGlmWPBUhDFYvLOsp3EeL+m
- QAANNvTIwbt/1Lxd91JDLdjfTfJsddo45T+UvgnId6ulk/pJL8gR1Ik8p06f8BErvVcC
- vFLjB55w+opPNe6MsqcUA0iuTOEfjfDAO/919ENkKR+qJLlh2xUy+UUpIJsqAovC3HGO
- 57Rk/sB1/TCNScPFtM6TKXu/neFzv92/CbNi+8D1xzUzo33A2a8sdC8ezDcgPWaWVT1J
- o/Qi31jPMBJP9Fl5I0YbRT96KKju2g1bwrFVG57Av/884lvpWkuZLlYCH6ya1AtIHwZL
- uwjg==
-X-Gm-Message-State: APjAAAXkwILygRBRAGUAYSexuMZGsRitSqSvTL9JBiEOWAA9THn0RbEB
- GBneAO2JgKe+dAS91Bf+6n1wbw==
-X-Google-Smtp-Source: APXvYqwvi0jeF9N0DD+EKB+s3+9ey2WoKc/wG4cooLerMIcKS0Fvk+A8DAkB5O1uRpIAkcj9beFycA==
-X-Received: by 2002:a5d:4211:: with SMTP id n17mr11293292wrq.137.1563878510848; 
- Tue, 23 Jul 2019 03:41:50 -0700 (PDT)
+ bh=UnzyRxO8LdQ2pkjo8SoYMr5p6k7VTvscFEOudhhqpPw=;
+ b=GqZL6pv5IvyYn8N8YVnSxfxCReniOer1pSWGCfO1LRzD7R84lggwDY7kImhbHDRKWu
+ Fq7vyyALGNemwf9A/9sjz85n5tY7kuXAm48SP88ejRdcOlKzijLJIa3E5QtK053JuBSs
+ nmGrDZE4iBgVfkJmLdTIia/3uKhTi2qtlv8iVUHnbq8mtjn2Ye9s7QzQLUeoT7txMZeO
+ kxoIsWNuvJcVQIDAE/ysGUO6IMv0Kh0WYwJseqsZOd4RpvUkiCLDurxv5Gsg36feBYHq
+ mK/v8nF0QIey20USvE6WDLzmwcLgHFAACXOq+oWrVz7kf/satxjt5Bj+Ip3FjrErQNsY
+ lgAA==
+X-Gm-Message-State: APjAAAX0k5CXkmrKaSu5nqejxTKPrFxKs4B51uKu7PNYMcVtbKwVH2z8
+ fdDRwUNrdH4li89CPn6ooOMAYQ==
+X-Google-Smtp-Source: APXvYqzKqMGVeLsUsJdrpxawpOjOzVeFY5koh9k6qL+Wcn/mcZiskMXwLcQTspSzlntpAuHYElSXPg==
+X-Received: by 2002:adf:fe09:: with SMTP id n9mr84665697wrr.41.1563878515157; 
+ Tue, 23 Jul 2019 03:41:55 -0700 (PDT)
 Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id n5sm34368758wmi.21.2019.07.23.03.41.48
+ by smtp.gmail.com with ESMTPSA id o7sm14676591wru.58.2019.07.23.03.41.51
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Tue, 23 Jul 2019 03:41:48 -0700 (PDT)
+ Tue, 23 Jul 2019 03:41:52 -0700 (PDT)
 Received: from zen.linaroharston. (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 9B2C11FF8C;
- Tue, 23 Jul 2019 11:36:13 +0100 (BST)
+ by zen.linaroharston (Postfix) with ESMTP id 21E351FF87;
+ Tue, 23 Jul 2019 11:36:14 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: peter.maydell@linaro.org
-Date: Tue, 23 Jul 2019 11:36:03 +0100
-Message-Id: <20190723103612.5600-15-alex.bennee@linaro.org>
+Date: Tue, 23 Jul 2019 11:36:09 +0100
+Message-Id: <20190723103612.5600-21-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190723103612.5600-1-alex.bennee@linaro.org>
 References: <20190723103612.5600-1-alex.bennee@linaro.org>
@@ -83,9 +83,9 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::434
-Subject: [Qemu-devel] [PULL 14/23] buildsys: The NSIS Windows build requires
- qemu-nsis.bmp installed
+X-Received-From: 2a00:1450:4864:20::42d
+Subject: [Qemu-devel] [PULL 20/23] tests/qemu-iotests/check: Allow tests
+ without groups
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,65 +97,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ "open list:Block layer core" <qemu-block@nongnu.org>, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
 
-The qemu-nsis.bmp file was not listed with the other blobs, thus
-not installed in the ${BINDIR} location.
+The regular expressions in the "check" script currently expect that there
+is always a space after the test number in the group file, so you can't
+have a test in there without a group unless the line still ends with a
+space - which is quite error prone since some editors might remove spaces
+at the end of lines automatically.
+Thus let's fix the regular expressions so that it is also possible to
+have lines with one test number only in the group file.
 
-This fixes:
-
-  $ make installer
-  [...]
-  (cd /tmp/qemu-nsis; \
-           for i in qemu-system-*.exe; do \
-             arch=${i%.exe}; \
-             arch=${arch#qemu-system-}; \
-             echo Section \"$arch\" Section_$arch; \
-             echo SetOutPath \"\$INSTDIR\"; \
-             echo File \"\${BINDIR}\\$i\"; \
-             echo SectionEnd; \
-           done \
-          ) >/tmp/qemu-nsis/system-emulations.nsh
-  makensis -V2 -NOCD \
-                  -DCONFIG_DOCUMENTATION="y" \
-                   \
-                  -DBINDIR="/tmp/qemu-nsis" \
-                   \
-                  -DSRCDIR="/home/phil/source/qemu" \
-                  -DOUTFILE="qemu-setup-4.0.90.exe" \
-                  -DDISPLAYVERSION="4.0.90" \
-                  /home/phil/source/qemu/qemu.nsi
-  File: "/tmp/qemu-nsis\*.bmp" -> no files found.
-  Usage: File [/nonfatal] [/a] ([/r] [/x filespec [...]] filespec [...] |
-     /oname=outfile one_file_only)
-  Error in script "/home/phil/source/qemu/qemu.nsi" on line 122 -- aborting creation process
-  Makefile:1077: recipe for target 'qemu-setup-4.0.90.exe' failed
-  make: *** [qemu-setup-4.0.90.exe] Error 1
-
-Fixes: https://bugs.launchpad.net/bugs/1836453
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20190715174817.18981-8-philmd@redhat.com>
+Suggested-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <20190717111947.30356-2-thuth@redhat.com>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 
-diff --git a/Makefile b/Makefile
-index b3357691cad..cfab1561b9c 100644
---- a/Makefile
-+++ b/Makefile
-@@ -761,6 +761,7 @@ pxe-pcnet.rom pxe-rtl8139.rom pxe-virtio.rom \
- efi-e1000.rom efi-eepro100.rom efi-ne2k_pci.rom \
- efi-pcnet.rom efi-rtl8139.rom efi-virtio.rom \
- efi-e1000e.rom efi-vmxnet3.rom \
-+qemu-nsis.bmp \
- bamboo.dtb canyonlands.dtb petalogix-s3adsp1800.dtb petalogix-ml605.dtb \
- multiboot.bin linuxboot.bin linuxboot_dma.bin kvmvapic.bin pvh.bin \
- s390-ccw.img s390-netboot.img \
+diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
+index f925606cc52..c24874ff4aa 100755
+--- a/tests/qemu-iotests/check
++++ b/tests/qemu-iotests/check
+@@ -488,7 +488,7 @@ testlist options
+ BEGIN        { for (t='$start'; t<='$end'; t++) printf "%03d\n",t }' \
+         | while read id
+         do
+-            if grep -s "^$id " "$source_iotests/group" >/dev/null
++            if grep -s "^$id\( \|\$\)" "$source_iotests/group" >/dev/null
+             then
+                 # in group file ... OK
+                 echo $id >>$tmp.list
+@@ -547,7 +547,7 @@ else
+         touch $tmp.list
+     else
+         # no test numbers, do everything from group file
+-        sed -n -e '/^[0-9][0-9][0-9]*/s/[         ].*//p' <"$source_iotests/group" >$tmp.list
++        sed -n -e '/^[0-9][0-9][0-9]*/s/^\([0-9]*\).*/\1/p' <"$source_iotests/group" >$tmp.list
+     fi
+ fi
+ 
 -- 
 2.20.1
 
