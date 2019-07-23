@@ -2,82 +2,88 @@ Return-Path: <SRS0=3Ld+=VU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.2 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B91DC7618E
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 11:30:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85EF7C7618E
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 11:33:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 16B2820644
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 11:30:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 16B2820644
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 555FF20644
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 11:33:24 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WRleVK1K"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 555FF20644
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41343 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41363 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hpszz-0004Up-2p
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jul 2019 07:30:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53894)
+	id 1hpt2p-0005uV-HE
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jul 2019 07:33:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54880)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <sgarzare@redhat.com>) id 1hpszn-00043x-MV
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 07:30:17 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hpt2b-0005QB-2b
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 07:33:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <sgarzare@redhat.com>) id 1hpszm-0007LF-1l
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 07:30:15 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:37399)
+ (envelope-from <alex.bennee@linaro.org>) id 1hpt2Z-0000vJ-Td
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 07:33:08 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:47082)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1hpszl-0007Ka-R9
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 07:30:14 -0400
-Received: by mail-wm1-f68.google.com with SMTP id f17so38157474wme.2
- for <qemu-devel@nongnu.org>; Tue, 23 Jul 2019 04:30:13 -0700 (PDT)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1hpt2Z-0000uY-Lp
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 07:33:07 -0400
+Received: by mail-wr1-x441.google.com with SMTP id z1so42761913wru.13
+ for <qemu-devel@nongnu.org>; Tue, 23 Jul 2019 04:33:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=DWbDWaYfcxmkGXUdUBX0lMq0CUBdZuPA0MBGgprVLng=;
+ b=WRleVK1KsOtUXGCyav3mR2h3r66Z4gFEHcejcl+/2OUqs1FPk9J5bfo+829yTQktuf
+ vJfxYnJOwZb3cJ4S7nRuBbXndljS+eoHAjoGY1VehSauOmAiMzv55PxpxMkuTcXlpy0C
+ cnpDUN9wXsQBdX0HLy2Q8mzwPfe1Yl8pGGauSRgRYQDoW8hlnOiBTsGJgIR27ERH8GNq
+ JPfFpTJ3CiaLE0mjxgafi4WfPRnDqIOco+S7XOqERcH6IvAhwBnm3qLZMgVLCP73VOBt
+ YacWIqIZsE+Df/rovuOexV5Xahxx1H7TmOpAJzu8hrMzc6iqNmoHWM1pQvUEPElf27jI
+ tlUQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=gCtfwNo04sQG2dZV5EO3oZ6G7pD+3Gpm/tdtz/l3UCY=;
- b=eIf6gk07DZmC/5fbUmnINC+Vg9ba6/qTD/AN3dtWUMLtMrIXxIQfIkro68FhNLYD5o
- GBt6QWw/kPLHtWs41twy5iH9xdL8sIBzoGSY68elQP5ngLfRRuZ7C6AvV3E/0WPFhuaL
- KPOwJB8KHLunmbbiimKwwqoWJsDZNmnP0yJuEmtL05jsh1LnkvGwopL8bBShMyC+4D2F
- NQcGcQSzWCON6EJMZX+sZt0cy9lUZz4Ky54Cidqy/zIKXUb6vVzVhA2EwneHoeYI/Z6p
- hv+CsHLbdteUW56BbV4t5ZeN5WpINtalDSSYZ5dP+43JifVU9CK0fhbEZ4K4D5FT0xbl
- LjVQ==
-X-Gm-Message-State: APjAAAWqaVBR0tJR6/ZlUcAodK3e9RZExKwd0G4tzZTrD9VSVm5zcKUK
- 1PYB6CUEhmEsOmuPhr3HSyOk6w==
-X-Google-Smtp-Source: APXvYqzQm2mMYAnNhSurDjeFSj8bsOCmPgbL8YuJmAOLlYUQT1kWUg2FsmPpGHaAKEBBuNHINAWVZg==
-X-Received: by 2002:a7b:c776:: with SMTP id x22mr67867137wmk.55.1563881412351; 
- Tue, 23 Jul 2019 04:30:12 -0700 (PDT)
-Received: from steredhat (host122-201-dynamic.13-79-r.retail.telecomitalia.it.
- [79.13.201.122])
- by smtp.gmail.com with ESMTPSA id q10sm42611546wrf.32.2019.07.23.04.30.11
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=DWbDWaYfcxmkGXUdUBX0lMq0CUBdZuPA0MBGgprVLng=;
+ b=auq0Jtbxmlroitp8ip+IOM11gj+Qi7z3h3uBOlAgXHKSfF02v7MQK7JrbvNxKLh3CO
+ zbyxuJaTaPm0EPXbDq9MnwSk3IRj08bqyHlH5mq21FV4jKzgfs2uKq2R0Ob5SKR1LbEH
+ M3Ysx6d0Kgzp634D1zpWwDKzO+42bA+4MeRCp6gLScL47Hkjt7d72ZPe7a6ufJvZpvX9
+ zRXaSJGtl6GmiibEp7ulp8+dTxAXZbClKnqIZ5jtqlsLkiErGJsUWbCDtCAXdbzBSDA+
+ TNO+cc4rSLSu31MNjZnQFkuvoSJpEuy9Mc6Wk88yAkuqxdJ2KKHh6Jypfmg6n3BxF4df
+ 9Kpw==
+X-Gm-Message-State: APjAAAXym/ElJ7Wi9ZzkDi6CaoU3tRvrgdTGA9CgkhL/BvpVPHkz2ZAE
+ 8tpJbbh/DcHb0c+ML2EBj+aUUQ==
+X-Google-Smtp-Source: APXvYqzddgK9tKugmZgAQoJeSHRWFw3WocoNVqCU4voI2N6j60LoeacRcB8VbAYm7qg+05KPghNXXA==
+X-Received: by 2002:adf:ab51:: with SMTP id r17mr54329617wrc.95.1563881586322; 
+ Tue, 23 Jul 2019 04:33:06 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+ by smtp.gmail.com with ESMTPSA id e3sm38553746wrt.93.2019.07.23.04.33.05
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Tue, 23 Jul 2019 04:30:11 -0700 (PDT)
-Date: Tue, 23 Jul 2019 13:30:09 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20190723113009.mqvcliqkc2eqcbc4@steredhat>
-References: <20190702121106.28374-1-slp@redhat.com>
- <20190703095825.GE11844@stefanha-x1.localdomain>
- <87d0i7tlkl.fsf@redhat.com>
- <20190719102915.GG18585@stefanha-x1.localdomain>
- <8736j2p22w.fsf@redhat.com>
- <CAJSP0QXTSwk4eJteC0wTB7LGoHY3=7t4G-eNfgREQ6k+GzV2_w@mail.gmail.com>
- <904248411098104fcf7db22382172057e50db76c.camel@intel.com>
- <87tvbdrvin.fsf@redhat.com>
- <CAJSP0QW1NrYwC6a61jj_vgJOJO7ofJOVUcz6Bf4z720OiN_0rw@mail.gmail.com>
+ Tue, 23 Jul 2019 04:33:05 -0700 (PDT)
+Received: from zen.linaroharston. (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 59BBC1FF87;
+ Tue, 23 Jul 2019 12:33:05 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Date: Tue, 23 Jul 2019 12:33:01 +0100
+Message-Id: <20190723113301.16867-1-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAJSP0QW1NrYwC6a61jj_vgJOJO7ofJOVUcz6Bf4z720OiN_0rw@mail.gmail.com>
-User-Agent: NeoMutt/20180716
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.128.68
-Subject: Re: [Qemu-devel] [PATCH v3 0/4] Introduce the microvm machine type
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::441
+Subject: [Qemu-devel] [PATCH for 4.2] target/arm: generate a custom MIDR for
+ -cpu max
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,176 +95,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "ehabkost@redhat.com" <ehabkost@redhat.com>, Sergio Lopez <slp@redhat.com>,
- "mst@redhat.com" <mst@redhat.com>, "Montes, Julio" <julio.montes@intel.com>,
- "maran.wilson@oracle.com" <maran.wilson@oracle.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "kraxel@redhat.com" <kraxel@redhat.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "rth@twiddle.net" <rth@twiddle.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Jul 23, 2019 at 10:47:39AM +0100, Stefan Hajnoczi wrote:
-> On Tue, Jul 23, 2019 at 9:43 AM Sergio Lopez <slp@redhat.com> wrote:
-> > Montes, Julio <julio.montes@intel.com> writes:
-> >
-> > > On Fri, 2019-07-19 at 16:09 +0100, Stefan Hajnoczi wrote:
-> > >> On Fri, Jul 19, 2019 at 2:48 PM Sergio Lopez <slp@redhat.com> wrote:
-> > >> > Stefan Hajnoczi <stefanha@gmail.com> writes:
-> > >> > > On Thu, Jul 18, 2019 at 05:21:46PM +0200, Sergio Lopez wrote:
-> > >> > > > Stefan Hajnoczi <stefanha@gmail.com> writes:
-> > >> > > >
-> > >> > > > > On Tue, Jul 02, 2019 at 02:11:02PM +0200, Sergio Lopez wrote:
-> > >> > > >  --------------
-> > >> > > >  | Conclusion |
-> > >> > > >  --------------
-> > >> > > >
-> > >> > > > The average boot time of microvm is a third of Q35's (115ms vs.
-> > >> > > > 363ms),
-> > >> > > > and is smaller on all sections (QEMU initialization, firmware
-> > >> > > > overhead
-> > >> > > > and kernel start-to-user).
-> > >> > > >
-> > >> > > > Microvm's memory tree is also visibly simpler, significantly
-> > >> > > > reducing
-> > >> > > > the exposed surface to the guest.
-> > >> > > >
-> > >> > > > While we can certainly work on making Q35 smaller, I definitely
-> > >> > > > think
-> > >> > > > it's better (and way safer!) having a specialized machine type
-> > >> > > > for a
-> > >> > > > specific use case, than a minimal Q35 whose behavior
-> > >> > > > significantly
-> > >> > > > diverges from a conventional Q35.
-> > >> > >
-> > >> > > Interesting, so not a 10x difference!  This might be amenable to
-> > >> > > optimization.
-> > >> > >
-> > >> > > My concern with microvm is that it's so limited that few users
-> > >> > > will be
-> > >> > > able to benefit from the reduced attack surface and faster
-> > >> > > startup time.
-> > >> > > I think it's worth investigating slimming down Q35 further first.
-> > >> > >
-> > >> > > In terms of startup time the first step would be profiling Q35
-> > >> > > kernel
-> > >> > > startup to find out what's taking so long (firmware
-> > >> > > initialization, PCI
-> > >> > > probing, etc)?
-> > >> >
-> > >> > Some findings:
-> > >> >
-> > >> >  1. Exposing the TSC_DEADLINE CPU flag (i.e. using "-cpu host")
-> > >> > saves a
-> > >> >     whooping 120ms by avoiding the APIC timer calibration at
-> > >> >     arch/x86/kernel/apic/apic.c:calibrate_APIC_clock
-> > >> >
-> > >> > Average boot time with "-cpu host"
-> > >> >  qemu_init_end: 76.408950
-> > >> >  linux_start_kernel: 116.166142 (+39.757192)
-> > >> >  linux_start_user: 242.954347 (+126.788205)
-> > >> >
-> > >> > Average boot time with default "cpu"
-> > >> >  qemu_init_end: 77.467852
-> > >> >  linux_start_kernel: 116.688472 (+39.22062)
-> > >> >  linux_start_user: 363.033365 (+246.344893)
-> > >>
-> > >> \o/
-> > >>
-> > >> >  2. The other 130ms are a direct result of PCI and ACPI presence
-> > >> > (tested
-> > >> >     with a kernel without support for those elements). I'll publish
-> > >> > some
-> > >> >     detailed numbers next week.
-> > >>
-> > >> Here are the Kata Containers kernel parameters:
-> > >>
-> > >> var kernelParams = []Param{
-> > >>         {"tsc", "reliable"},
-> > >>         {"no_timer_check", ""},
-> > >>         {"rcupdate.rcu_expedited", "1"},
-> > >>         {"i8042.direct", "1"},
-> > >>         {"i8042.dumbkbd", "1"},
-> > >>         {"i8042.nopnp", "1"},
-> > >>         {"i8042.noaux", "1"},
-> > >>         {"noreplace-smp", ""},
-> > >>         {"reboot", "k"},
-> > >>         {"console", "hvc0"},
-> > >>         {"console", "hvc1"},
-> > >>         {"iommu", "off"},
-> > >>         {"cryptomgr.notests", ""},
-> > >>         {"net.ifnames", "0"},
-> > >>         {"pci", "lastbus=0"},
-> > >> }
-> > >>
-> > >> pci lastbus=0 looks interesting and so do some of the others :).
-> > >>
-> > >
-> > > yeah, pci=lastbus=0 is very helpful to reduce the boot time in q35,
-> > > kernel won't scan the 255.. buses :)
-> >
-> > I can confirm that adding pci=lastbus=0 makes a significant
-> > improvement. In fact, is the only option from Kata's kernel parameter
-> > list that has an impact, probably because the kernel is already quite
-> > minimalistic.
-> >
-> > Average boot time with "-cpu host" and "pci=lastbus=0"
-> >  qemu_init_end: 73.711569
-> >  linux_start_kernel: 113.414311 (+39.702742)
-> >  linux_start_user: 190.949939 (+77.535628)
-> >
-> > That's still ~40% slower than microvm, and the breach quickly widens
-> > when adding more PCI devices (each one adds 10-15ms), but it's certainly
-> > an improvement over the original numbers.
-> >
-> > On the other hand, there isn't much we can do here from QEMU's
-> > perspective, as this is basically Guest OS tuning.
-> 
-> fw_cfg could expose this information so guest kernels know when to
-> stop enumerating the PCI bus.  This would make all PCI guests with new
-> kernels boot ~50 ms faster, regardless of machine type.
-> 
-> The difference between microvm and tuned Q35 is 76 ms now.
-> 
-> microvm:
-> qemu_init_end: 64.043264
-> linux_start_kernel: 65.481782 (+1.438518)
-> linux_start_user: 114.938353 (+49.456571)
-> 
-> Q35 with -cpu host and pci=lasbus=0:
-> qemu_init_end: 73.711569
-> linux_start_kernel: 113.414311 (+39.702742)
-> linux_start_user: 190.949939 (+77.535628)
-> 
-> There is a ~39 ms difference before linux_start_kernel.  SeaBIOS is
-> loading the PVH Option ROM.
-> 
-> Stefano: any recommendations for profiling or tuning SeaBIOS?
+While most features are now detected by probing the ID_* registers
+kernels can (and do) use MIDR_EL1 for working out of they have to
+apply errata. This can trip up warnings in the kernel as it tries to
+work out if it should apply workarounds to features that don't
+actually exist in the reported CPU type.
 
-As I said on IRC, the SeaBIOS image in QEMU is the 1.12.1 and it doesn't
-include this patch (available in the upstream SeaBIOS) that saves ~10ms:
+Avoid this problem by synthesising our own MIDR value using the
+reserved value of 0 for the implementer and telling kernels the ID
+registers should tell them everything they need to know.
 
-    commit 75b42835134553c96f113e5014072c0caf99d092
-    Author: Stefano Garzarella <sgarzare@redhat.com>
-    Date:   Sun Dec 2 14:10:13 2018 +0100
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 
-        qemu: avoid debug prints if debugcon is not enabled
+---
+v2
+  - don't leak QEMU version into ID reg
+---
+ target/arm/cpu.h   | 6 ++++++
+ target/arm/cpu64.c | 6 ++++++
+ 2 files changed, 12 insertions(+)
 
-        In order to speed up the boot phase, we can check the QEMU
-        debugcon device, and disable the writes if it is not recognized.
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 7efbb488d9d..61eaef924e4 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -1605,6 +1605,12 @@ FIELD(V7M_FPCCR, ASPEN, 31, 1)
+ /*
+  * System register ID fields.
+  */
++FIELD(MIDR_EL1, REVISION, 0, 4)
++FIELD(MIDR_EL1, PARTNUM, 4, 12)
++FIELD(MIDR_EL1, ARCHITECTURE, 16, 4)
++FIELD(MIDR_EL1, VARIENT, 20, 4)
++FIELD(MIDR_EL1, IMPLEMENTER, 24, 8)
++
+ FIELD(ID_ISAR0, SWAP, 0, 4)
+ FIELD(ID_ISAR0, BITCOUNT, 4, 4)
+ FIELD(ID_ISAR0, BITFIELD, 8, 4)
+diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
+index b1bb394c6dd..e88aadfd2fd 100644
+--- a/target/arm/cpu64.c
++++ b/target/arm/cpu64.c
+@@ -296,6 +296,12 @@ static void aarch64_max_initfn(Object *obj)
+         uint32_t u;
+         aarch64_a57_initfn(obj);
+ 
++        /* reset MIDR so our franken-max-cpu type isn't mistaken for a real one */
++        t = FIELD_DP64(0, MIDR_EL1, IMPLEMENTER, 0); /* Reserved for SW */
++        t = FIELD_DP64(t, MIDR_EL1, ARCHITECTURE, 0xf); /* See ID_* for details */
++        /* the rest is enigmatically empty lest kernels assume it means something */
++        cpu->midr = t;
++
+         t = cpu->isar.id_aa64isar0;
+         t = FIELD_DP64(t, ID_AA64ISAR0, AES, 2); /* AES + PMULL */
+         t = FIELD_DP64(t, ID_AA64ISAR0, SHA1, 1);
+-- 
+2.20.1
 
-        This patch allow us to save around 10 msec (time measured
-        between SeaBIOS entry point and "linuxboot" entry point)
-        when CONFIG_DEBUG_LEVEL=1 and debugcon is not enabled.
-
-        Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-        Signed-off-by: Kevin O'Connor <kevin@koconnor.net>
-
-As you said, we should update SeaBIOS for the next QEMU release.
-
-For profiling, I have some patches that I used to put trace points in
-the SeaBIOS code. I'll put them in this repository ASAP:
-    https://github.com/stefano-garzarella/qemu-boot-time
 
