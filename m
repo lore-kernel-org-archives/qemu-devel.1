@@ -2,90 +2,90 @@ Return-Path: <SRS0=3Ld+=VU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B859C76186
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 22:20:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FA92C76186
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 23:18:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 08F4121926
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 22:20:56 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="msa0SpA0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08F4121926
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0528E216F4
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 23:18:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0528E216F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47618 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47786 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hq39U-00038L-9M
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jul 2019 18:20:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44426)
+	id 1hq43E-0003Yw-V4
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jul 2019 19:18:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34162)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <prvs=100e7d3fb=dmitry.fomichev@wdc.com>)
- id 1hq38Q-0007PS-EZ
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 18:19:51 -0400
+ (envelope-from <mdroth@linux.vnet.ibm.com>) id 1hq433-00036R-3B
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 19:18:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <prvs=100e7d3fb=dmitry.fomichev@wdc.com>)
- id 1hq38O-0001DS-Pk
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 18:19:50 -0400
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:21394)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <prvs=100e7d3fb=dmitry.fomichev@wdc.com>)
- id 1hq38O-0001AZ-Hm; Tue, 23 Jul 2019 18:19:48 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1563920389; x=1595456389;
- h=from:to:cc:subject:date:message-id:in-reply-to:
- references:mime-version:content-transfer-encoding;
- bh=MhJpWEfDEuC+iblFD4CMKkboTq+c8XmTlRNIMN/AG54=;
- b=msa0SpA0g6WaxJt2gK27zqC84x/WLbjlm1Yvwztt4swmt3CwdxwYWCTT
- 8l9H+2Wr+HkAplFATWwJZztdRlzkOGqA1YtpQ4Bhah4pzECIuyBA3wGyX
- U3GGDyA8I7OFfi3MEunruqRYW+cSG/SUNcfocuQQVgawKACI+Ja2qWIPl
- F1jDtr+QBwzl9rx7p7OM99aC5GOspJ5L6HEbCtk4sytr/oUgxByCKUPz0
- e59qo7JJ91fPYKEBbTVmMkMjI8aHeAtawrC4U4FyDmgHLOCm+sTm394dh
- H0P6b8N+d0erTCmL50Vyzpp45UqGorTEKZUYscuIal2zDSrsluo482zS1 A==;
-IronPort-SDR: t4yLiTT7GJbRz+D0Hqyqg0LVVFD6tZgL6MpuSE9yI9fqG4YqmI4F9A6ykd63ch4RykW8QuXrRU
- SK5V7Hb/mupSPuUSXxQ093xzb41qZEl8kLtW06PXXEOpa3EpeVe8a9uicK8ZhfEJVNTodSG/NM
- le73D1ZvKzjhu3SCRt/OZr1yw+ODlEKWZVJK61F6KTDM+YdEZoQUXeSp4JRGgAf+jhxfJoF3ca
- QBfa2zrclkFJk/YYH7wcVWOawrs6ThhgmKninAqvqdep1MwOjcAW5BhBJZ64aNIni8LiINlvGr
- 8GI=
-X-IronPort-AV: E=Sophos;i="5.64,300,1559491200"; d="scan'208";a="113843262"
-Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com)
- ([199.255.45.15])
- by ob1.hgst.iphmx.com with ESMTP; 24 Jul 2019 06:19:46 +0800
-IronPort-SDR: 5WJivhTvRCs8j4+9ktQuCj8OfOjD6OZTWGtqeSsIWUWUH3V5ROKLlbqbMeWvodkbeRkCoGlnii
- 0cFmtM40CEdLMBvTLVLjvOVevFpb+tqk2no+zr4AJRzI8TO4WCunqLBpFmMB8PJKumqDmMgCv4
- 6zpisBOhLGnlulqzaUteXTnGr2qfOYEBNjhbxP9M5zS/2Gnbq72DUSo4pROBbRWSh8Mt/XQiAx
- XR2YZRXGTo2sSr3HSFwbjW7bGHt6/qzfu1/ajUk1GSYfLDw8dmsEPQZNgDpzcAuNUlWngNuYqY
- +4fvZpOeIOnTpXKk4Ly7eMpY
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
- by uls-op-cesaep02.wdc.com with ESMTP; 23 Jul 2019 15:17:59 -0700
-IronPort-SDR: wVZ3V9paXqvdqPGwaYtaXqdFsLK7KNa33Gjs9HD6Wfo5Cs+PeUtPzmmUYQfEdnfyb24EoLKqbC
- ODMVp1XmjopeGpVQ3sYINLYWj7EYN0zLZeSyWC2qIwCRDAqBFb9QWtH8BhKocMmdlOt56IzU8y
- JGi8jEjLgoJM4A2ITzQLB4uJn7ZL7/+TXTi67wfRpMXpQapZdZdwHISKER0xk3KjpR8PFV3CsF
- LDesmyZW/FhTnlIGAe8oaxbN0dlvlnjPj1NVfp71KL45fgUu7Xl17vOXUcK7LfKtfEesc61SV5
- fVw=
-Received: from dhcp-10-88-173-43.hgst.com ([10.88.173.43])
- by uls-op-cesaip02.wdc.com with ESMTP; 23 Jul 2019 15:19:44 -0700
-From: Dmitry Fomichev <dmitry.fomichev@wdc.com>
-To: qemu-devel@nongnu.org,
-	qemu-block@nongnu.org
-Date: Tue, 23 Jul 2019 18:19:39 -0400
-Message-Id: <20190723221940.25585-4-dmitry.fomichev@wdc.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190723221940.25585-1-dmitry.fomichev@wdc.com>
-References: <20190723221940.25585-1-dmitry.fomichev@wdc.com>
+ (envelope-from <mdroth@linux.vnet.ibm.com>) id 1hq431-0002pq-AU
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 19:18:21 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:10084)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
+ id 1hq431-0002p8-2L
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 19:18:19 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ x6NNHLQL056461; Tue, 23 Jul 2019 19:18:15 -0400
+Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com
+ [169.62.189.11])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2tx97q57pq-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 23 Jul 2019 19:18:15 -0400
+Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
+ by ppma03dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x6NNEYwv022521;
+ Tue, 23 Jul 2019 23:18:14 GMT
+Received: from b03cxnp08025.gho.boulder.ibm.com
+ (b03cxnp08025.gho.boulder.ibm.com [9.17.130.17])
+ by ppma03dal.us.ibm.com with ESMTP id 2tx61n2163-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 23 Jul 2019 23:18:14 +0000
+Received: from b03ledav001.gho.boulder.ibm.com
+ (b03ledav001.gho.boulder.ibm.com [9.17.130.232])
+ by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ x6NNIDZC58261978
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 23 Jul 2019 23:18:13 GMT
+Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id F30186E056;
+ Tue, 23 Jul 2019 23:18:12 +0000 (GMT)
+Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id C4A486E052;
+ Tue, 23 Jul 2019 23:18:12 +0000 (GMT)
+Received: from localhost (unknown [9.53.179.212])
+ by b03ledav001.gho.boulder.ibm.com (Postfix) with ESMTP;
+ Tue, 23 Jul 2019 23:18:12 +0000 (GMT)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x
-X-Received-From: 216.71.154.42
-Subject: [Qemu-devel] [PATCH v3 3/4] block/ide/scsi: Set
- BLK_PERM_SUPPORT_ZONED
+Content-Transfer-Encoding: quoted-printable
+To: qemu-devel@nongnu.org
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+In-Reply-To: <156391995184.11893.17276992491834493758@sif>
+References: <156391995184.11893.17276992491834493758@sif>
+Message-ID: <156392382152.16169.3678189577623009709@sif>
+User-Agent: alot/0.7
+Date: Tue, 23 Jul 2019 18:17:01 -0500
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+ definitions=2019-07-23_10:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1906280000 definitions=main-1907230239
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.156.1
+Subject: Re: [Qemu-devel] [ANNOUNCE] QEMU 4.1.0-rc2 is now available
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,242 +97,169 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- Stefano Stabellini <sstabellini@kernel.org>,
- "Michael S. Tsirkin" <mst@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Keith Busch <keith.busch@intel.com>, Paul Durrant <paul.durrant@citrix.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Anthony Perard <anthony.perard@citrix.com>,
- Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>
+Cc: peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Added a new boolean argument to blkconf_apply_backend_options()
-to let the common block code know whether the chosen block
-backend can handle zoned block devices or not.
+Quoting Michael Roth (2019-07-23 17:12:31)
+> Hello,
+> =
 
-blkconf_apply_backend_options() then sets BLK_PERM_SUPPORT_ZONED
-permission accordingly. The raw code can then use this permission
-to allow or deny opening a zone device by a particular block driver.
+> On behalf of the QEMU Team, I'd like to announce the availability of the
+> third release candidate for the QEMU 4.1 release.  This release is meant
+> for testing purposes and should not be used in a production environment.
+> =
 
-Signed-off-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
-Acked-by: Paul Durrant <paul.durrant@citrix.com>
----
- hw/block/block.c         |  8 ++++++--
- hw/block/fdc.c           |  4 ++--
- hw/block/nvme.c          |  2 +-
- hw/block/virtio-blk.c    |  2 +-
- hw/block/xen-block.c     |  2 +-
- hw/ide/qdev.c            |  2 +-
- hw/scsi/scsi-disk.c      | 13 +++++++------
- hw/scsi/scsi-generic.c   |  2 +-
- hw/usb/dev-storage.c     |  2 +-
- include/hw/block/block.h |  3 ++-
- 10 files changed, 23 insertions(+), 17 deletions(-)
+>   http://download.qemu-project.org/qemu-4.1.0-rc2.tar.xz
+>   http://download.qemu-project.org/qemu-4.1.0-rc2.tar.xz.sig
+> =
 
-diff --git a/hw/block/block.c b/hw/block/block.c
-index bf56c7612b..23fbe4d567 100644
---- a/hw/block/block.c
-+++ b/hw/block/block.c
-@@ -86,7 +86,8 @@ void blkconf_blocksizes(BlockConf *conf)
- }
- 
- bool blkconf_apply_backend_options(BlockConf *conf, bool readonly,
--                                   bool resizable, Error **errp)
-+                                   bool resizable, bool zoned_support,
-+                                   Error **errp)
- {
-     BlockBackend *blk = conf->blk;
-     BlockdevOnError rerror, werror;
-@@ -98,9 +99,12 @@ bool blkconf_apply_backend_options(BlockConf *conf, bool readonly,
-     if (!readonly) {
-         perm |= BLK_PERM_WRITE;
-     }
-+    if (zoned_support) {
-+        perm |= BLK_PERM_SUPPORT_ZONED;
-+    }
- 
-     shared_perm = BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE_UNCHANGED |
--                  BLK_PERM_GRAPH_MOD;
-+                  BLK_PERM_GRAPH_MOD | BLK_PERM_SUPPORT_ZONED;
-     if (resizable) {
-         shared_perm |= BLK_PERM_RESIZE;
-     }
-diff --git a/hw/block/fdc.c b/hw/block/fdc.c
-index 77af9979de..85efc80992 100644
---- a/hw/block/fdc.c
-+++ b/hw/block/fdc.c
-@@ -474,7 +474,7 @@ static void fd_change_cb(void *opaque, bool load, Error **errp)
-     } else {
-         if (!blkconf_apply_backend_options(drive->conf,
-                                            blk_is_read_only(drive->blk), false,
--                                           errp)) {
-+                                           false, errp)) {
-             return;
-         }
-     }
-@@ -561,7 +561,7 @@ static void floppy_drive_realize(DeviceState *qdev, Error **errp)
- 
-     if (!blkconf_apply_backend_options(&dev->conf,
-                                        blk_is_read_only(dev->conf.blk),
--                                       false, errp)) {
-+                                       false, false, errp)) {
-         return;
-     }
- 
-diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index 36d6a8bb3a..71b35bf4e7 100644
---- a/hw/block/nvme.c
-+++ b/hw/block/nvme.c
-@@ -1333,7 +1333,7 @@ static void nvme_realize(PCIDevice *pci_dev, Error **errp)
-     }
-     blkconf_blocksizes(&n->conf);
-     if (!blkconf_apply_backend_options(&n->conf, blk_is_read_only(n->conf.blk),
--                                       false, errp)) {
-+                                       false, false, errp)) {
-         return;
-     }
- 
-diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
-index cbb3729158..8894bdbb0c 100644
---- a/hw/block/virtio-blk.c
-+++ b/hw/block/virtio-blk.c
-@@ -1123,7 +1123,7 @@ static void virtio_blk_device_realize(DeviceState *dev, Error **errp)
- 
-     if (!blkconf_apply_backend_options(&conf->conf,
-                                        blk_is_read_only(conf->conf.blk), true,
--                                       errp)) {
-+                                       false, errp)) {
-         return;
-     }
-     s->original_wce = blk_enable_write_cache(conf->conf.blk);
-diff --git a/hw/block/xen-block.c b/hw/block/xen-block.c
-index 69d73196e2..8ed5e9d832 100644
---- a/hw/block/xen-block.c
-+++ b/hw/block/xen-block.c
-@@ -228,7 +228,7 @@ static void xen_block_realize(XenDevice *xendev, Error **errp)
-     }
- 
-     if (!blkconf_apply_backend_options(conf, blockdev->info & VDISK_READONLY,
--                                       true, errp)) {
-+                                       true, false, errp)) {
-         return;
-     }
- 
-diff --git a/hw/ide/qdev.c b/hw/ide/qdev.c
-index 9d8502785d..c0b4a445e4 100644
---- a/hw/ide/qdev.c
-+++ b/hw/ide/qdev.c
-@@ -197,7 +197,7 @@ static void ide_dev_initfn(IDEDevice *dev, IDEDriveKind kind, Error **errp)
-         }
-     }
-     if (!blkconf_apply_backend_options(&dev->conf, kind == IDE_CD,
--                                       kind != IDE_CD, errp)) {
-+                                       kind != IDE_CD, false, errp)) {
-         return;
-     }
- 
-diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
-index 8e95e3e38d..f20815b1d7 100644
---- a/hw/scsi/scsi-disk.c
-+++ b/hw/scsi/scsi-disk.c
-@@ -2315,7 +2315,7 @@ static void scsi_disk_unit_attention_reported(SCSIDevice *dev)
-     }
- }
- 
--static void scsi_realize(SCSIDevice *dev, Error **errp)
-+static void scsi_realize(SCSIDevice *dev, bool zoned_support, Error **errp)
- {
-     SCSIDiskState *s = DO_UPCAST(SCSIDiskState, qdev, dev);
- 
-@@ -2353,7 +2353,8 @@ static void scsi_realize(SCSIDevice *dev, Error **errp)
-     }
-     if (!blkconf_apply_backend_options(&dev->conf,
-                                        blk_is_read_only(s->qdev.conf.blk),
--                                       dev->type == TYPE_DISK, errp)) {
-+                                       dev->type == TYPE_DISK, zoned_support,
-+                                       errp)) {
-         return;
-     }
- 
-@@ -2412,7 +2413,7 @@ static void scsi_hd_realize(SCSIDevice *dev, Error **errp)
-     if (!s->product) {
-         s->product = g_strdup("QEMU HARDDISK");
-     }
--    scsi_realize(&s->qdev, errp);
-+    scsi_realize(&s->qdev, false, errp);
-     if (ctx) {
-         aio_context_release(ctx);
-     }
-@@ -2440,7 +2441,7 @@ static void scsi_cd_realize(SCSIDevice *dev, Error **errp)
-     if (!s->product) {
-         s->product = g_strdup("QEMU CD-ROM");
-     }
--    scsi_realize(&s->qdev, errp);
-+    scsi_realize(&s->qdev, false, errp);
-     aio_context_release(ctx);
- }
- 
-@@ -2450,7 +2451,7 @@ static void scsi_disk_realize(SCSIDevice *dev, Error **errp)
-     Error *local_err = NULL;
- 
-     if (!dev->conf.blk) {
--        scsi_realize(dev, &local_err);
-+        scsi_realize(dev, false, &local_err);
-         assert(local_err);
-         error_propagate(errp, local_err);
-         return;
-@@ -2643,7 +2644,7 @@ static void scsi_block_realize(SCSIDevice *dev, Error **errp)
-      */
-     s->features |= (1 << SCSI_DISK_F_NO_REMOVABLE_DEVOPS);
- 
--    scsi_realize(&s->qdev, errp);
-+    scsi_realize(&s->qdev, true, errp);
-     scsi_generic_read_device_inquiry(&s->qdev);
- 
- out:
-diff --git a/hw/scsi/scsi-generic.c b/hw/scsi/scsi-generic.c
-index c11a0c9a84..50b30e9541 100644
---- a/hw/scsi/scsi-generic.c
-+++ b/hw/scsi/scsi-generic.c
-@@ -690,7 +690,7 @@ static void scsi_generic_realize(SCSIDevice *s, Error **errp)
-     }
-     if (!blkconf_apply_backend_options(&s->conf,
-                                        blk_is_read_only(s->conf.blk),
--                                       true, errp)) {
-+                                       true, true, errp)) {
-         return;
-     }
- 
-diff --git a/hw/usb/dev-storage.c b/hw/usb/dev-storage.c
-index 9ffb88ea5b..60d6a92ce1 100644
---- a/hw/usb/dev-storage.c
-+++ b/hw/usb/dev-storage.c
-@@ -601,7 +601,7 @@ static void usb_msd_storage_realize(USBDevice *dev, Error **errp)
- 
-     blkconf_blocksizes(&s->conf);
-     if (!blkconf_apply_backend_options(&s->conf, blk_is_read_only(blk), true,
--                                       errp)) {
-+                                       false, errp)) {
-         return;
-     }
- 
-diff --git a/include/hw/block/block.h b/include/hw/block/block.h
-index 607539057a..f988edc87e 100644
---- a/include/hw/block/block.h
-+++ b/include/hw/block/block.h
-@@ -85,7 +85,8 @@ bool blkconf_geometry(BlockConf *conf, int *trans,
-                       Error **errp);
- void blkconf_blocksizes(BlockConf *conf);
- bool blkconf_apply_backend_options(BlockConf *conf, bool readonly,
--                                   bool resizable, Error **errp);
-+                                   bool resizable, bool zoned_support,
-+                                   Error **errp);
- 
- /* Hard disk geometry */
- 
--- 
-2.21.0
+> You can help improve the quality of the QEMU 4.1 release by testing this
+> release and reporting bugs on Launchpad:
+> =
 
+>   https://bugs.launchpad.net/qemu/
+> =
+
+> The release plan, as well a documented known issues for release
+> candidates, are available at:
+> =
+
+>   http://wiki.qemu.org/Planning/4.1
+> =
+
+> Please add entries to the ChangeLog for the 4.1 release below:
+> =
+
+>   http://wiki.qemu.org/ChangeLog/4.1
+> =
+
+> Thank you to everyone involved!
+> =
+
+> Changes since rc1:
+
+Please disregard prior changelog, this is the corrected one:
+
+bf8b024372: Update version for v4.1.0-rc2 release (Peter Maydell)
+98808c3d0c: tests/docker: Refresh APT cache before installing new packages =
+on Debian (Philippe Mathieu-Daud=C3=A9)
+30edd9fa50: tests/qemu-iotests: Don't use 'seq' in the iotests (Thomas Huth)
+4f01046172: tests/qemu-iotests/group: Remove some more tests from the "auto=
+" group (Thomas Huth)
+bf75d75275: tests/qemu-iotests/check: Allow tests without groups (Thomas Hu=
+th)
+2b0c4fa13f: tests/docker: invoke the DEBUG shell with --noprofile/--norc (A=
+lex Benn=C3=A9e)
+3a37c13f8c: travis: enable travis_retry for check phase (Alex Benn=C3=A9e)
+6d314626cc: hw/i386: also turn off VMMOUSE is VMPORT is disabled (Alex Benn=
+=C3=A9e)
+e54ecc70c3: NSIS: Add missing firmware blobs (Philippe Mathieu-Daud=C3=A9)
+5deb2de1d6: tests/docker: Let the test-mingw test generate a NSIS installer=
+ (Philippe Mathieu-Daud=C3=A9)
+b3ce38dcf9: buildsys: The NSIS Windows build requires qemu-nsis.bmp install=
+ed (Philippe Mathieu-Daud=C3=A9)
+f84f9f7584: buildsys: The NSIS Windows build requires the documentation ins=
+talled (Philippe Mathieu-Daud=C3=A9)
+10d7166e42: tests/docker: Install texinfo in the Fedora image (Philippe Mat=
+hieu-Daud=C3=A9)
+a88819edde: tests/docker: Set the correct cross-PKG_CONFIG_PATH in the MXE =
+images (Philippe Mathieu-Daud=C3=A9)
+c054f3f43a: tests/docker: Install the NSIS tools in the MinGW capable image=
+s (Philippe Mathieu-Daud=C3=A9)
+8d16a31028: tests/docker: Install Sphinx in the Debian images (Philippe Mat=
+hieu-Daud=C3=A9)
+7887289441: shippable: re-enable the windows cross builds (Alex Benn=C3=A9e)
+67bd36beda: tests/dockerfiles: update the win cross builds to stretch (Alex=
+ Benn=C3=A9e)
+601b5575e2: tests/migration-test: don't spam the logs when we fail (Alex Be=
+nn=C3=A9e)
+56e89a310b: tests/docker: Install Ubuntu images noninteractively (Philippe =
+Mathieu-Daud=C3=A9)
+8109b7986a: tests/docker: Install Sphinx in the Fedora image (Philippe Math=
+ieu-Daud=C3=A9)
+6d7b9c8c06: tests/docker: Install Sphinx in the Ubuntu images (Philippe Mat=
+hieu-Daud=C3=A9)
+3c237b5c65: tests/docker: add test-misc for building tools & docs (Alex Ben=
+n=C3=A9e)
+84963b5bbf: archive-source: also create a stash for submodules (Marc-Andr=
+=C3=A9 Lureau)
+124e4cfaa4: hw/block/pflash_cfi02: Rewrite a fall through comment (Philippe=
+ Mathieu-Daud=C3=A9)
+3a283507c0: hw/block/pflash_cfi01: Add missing DeviceReset() handler (Phili=
+ppe Mathieu-Daud=C3=A9)
+5122958258: target/mips: Fix emulation of MSA pack instructions on big endi=
+an hosts (Aleksandar Markovic)
+45152d0502: target/mips: Add 'fall through' comments for handling nanoMips'=
+ SHXS, SWXS (Aleksandar Markovic)
+43eaaaef0e: block: Only the main loop can change AioContexts (Max Reitz)
+65181d6381: block: Dec. drained_end_counter before bdrv_wakeup (Max Reitz)
+258867d1dc: block/nvme: don't touch the completion entries (Maxim Levitsky)
+118d1b6a81: block/nvme: support larger that 512 bytes sector devices (Maxim=
+ Levitsky)
+461bba04bf: block/nvme: fix doorbell stride (Maxim Levitsky)
+ddb45afbfb: contrib/elf2dmp: Build download.o with CURL_CFLAGS (Peter Mayde=
+ll)
+a3e3b5217b: configure: Clarify URL to source downloads (Peter Maydell)
+8f4821d77e: target/arm: Limit ID register assertions to TCG (Peter Maydell)
+bc8c2ecfd0: hw/arm/fsl-imx6ul.c: Remove dead SMP-related code (Peter Maydel=
+l)
+9bbb4ef991: target/arm: Add missing break statement for Hypervisor Trap Exc=
+eption (Philippe Mathieu-Daud=C3=A9)
+d4b976c0a8: target/i386: sev: fix failed message typos (Jiri Slaby)
+2924ab02c2: i386: indicate that 'pconfig' feature was removed intentionally=
+ (Denis V. Lunev)
+5cf42b1c1f: nbd: Initialize reply on failure (Eric Blake)
+21e709aa07: build-sys: do no support modules on Windows (Marc-Andr=C3=A9 Lu=
+reau)
+3bf5de5240: qmp: don't emit the RESET event on wakeup (Nicholas Piggin)
+8072aae377: hmp: Print if memory section is registered with an accelerator =
+(Alexey Kardashevskiy)
+2f950b1e44: test-bitmap: add test for bitmap_set (Wei Yang)
+1849f297f5: scsi-generic: Check sense key before request snooping and patch=
+ing (Shin'ichiro Kawasaki)
+68fa7ca015: vhost-user-scsi: Call virtio_scsi_common_unrealize() when devic=
+e realize failed (Xie Yongji)
+934443c37b: vhost-scsi: Call virtio_scsi_common_unrealize() when device rea=
+lize failed (Xie Yongji)
+12e1dc4939: virtio-scsi: remove unused argument to virtio_scsi_common_reali=
+ze (Paolo Bonzini)
+1e44f3ab71: target/i386: skip KVM_GET/SET_NESTED_STATE if VMX disabled, or =
+for SVM (Paolo Bonzini)
+79a197ab18: target/i386: kvm: Demand nested migration kernel capabilities o=
+nly when vCPU may have enabled VMX (Liran Alon)
+b7cbb8741b: crypto: Fix LGPL information in the file headers (Thomas Huth)
+4f24430821: doc: document that the monitor console is a privileged control =
+interface (Daniel P. Berrang=C3=A9)
+49278ec065: iotests: Test quitting with job on throttled node (Max Reitz)
+e6f0ac4d52: vl: Drain before (block) job cancel when quitting (Max Reitz)
+02f9135be6: configure: only link capstone to emulation targets (Daniel P. B=
+errang=C3=A9)
+f887849007: crypto: fix function signatures for nettle 2.7 vs 3 (Daniel P. =
+Berrang=C3=A9)
+e8e67ca4c1: crypto: switch to modern nettle AES APIs (Daniel P. Berrang=C3=
+=A9)
+86472071f4: iotests: Test commit with a filter on the chain (Max Reitz)
+4687133b81: iotests: Add @has_quit to vm.shutdown() (Max Reitz)
+61ad631cee: block: Loop unsafely in bdrv*drained_end() (Max Reitz)
+2afdc790ec: tests: Extend commit by drained_end test (Max Reitz)
+e037c09c78: block: Do not poll in bdrv_do_drained_end() (Max Reitz)
+1b28565768: tests: Lock AioContexts in test-block-iothread (Max Reitz)
+f4c8a43be0: block: Make bdrv_parent_drained_[^_]*() static (Max Reitz)
+8e1da77e6e: block: Add @drained_end_counter (Max Reitz)
+8e4428106a: tests: Add job commit by drained_end test (Max Reitz)
+804db8ea00: block: Introduce BdrvChild.parent_quiesce_counter (Max Reitz)
+a6862418fe: iotests: Set read-zeroes on in null block driver for Valgrind (=
+Andrey Shinkevich)
+6d5d5dde9a: linux-user: fix to handle variably sized SIOCGSTAMP with new ke=
+rnels (Daniel P. Berrang=C3=A9)
+fdd1bda4b4: hw/riscv: Load OpenSBI as the default firmware (Alistair Franci=
+s)
+91f3a2f0ce: roms: Add OpenSBI version 0.4 (Alistair Francis)
+0acd4ab849: linux-user: check valid address in access_ok() (R=C3=A9mi Denis=
+-Courmont)
+efac5ae420: s390x/pci: add some fallthrough annotations (Cornelia Huck)
+4ced996ffe: linux-user: Fix structure target_ucontext for MIPS (Aleksandar =
+Markovic)
 
