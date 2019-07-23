@@ -2,74 +2,56 @@ Return-Path: <SRS0=3Ld+=VU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95F71C7618B
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 09:45:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2995EC7618B
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 09:47:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 64D2E21743
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 09:45:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 64D2E21743
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 028F121743
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 09:47:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 028F121743
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40668 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40692 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hprMQ-00078q-A1
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jul 2019 05:45:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50146)
+	id 1hprOG-000082-7F
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jul 2019 05:47:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50476)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mst@redhat.com>) id 1hprMB-0006aM-KV
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 05:45:16 -0400
+ (envelope-from <f.gruenbichler@proxmox.com>) id 1hprO4-00088L-5b
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 05:47:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1hprMA-0006T5-Hg
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 05:45:15 -0400
-Received: from mail-qk1-f194.google.com ([209.85.222.194]:46997)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1hprMA-0006SK-DU
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 05:45:14 -0400
-Received: by mail-qk1-f194.google.com with SMTP id r4so30548741qkm.13
- for <qemu-devel@nongnu.org>; Tue, 23 Jul 2019 02:45:13 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=gSprAtwiaLQoqrFU9f9MUC1DgUAXFkCecIoomSTxO8Y=;
- b=S5+IqWmneQ18X/D3eGuBL4GP3/PrFv4Vz5R/ysTLro+F/qSYnmzeNReSL+wuyefwFX
- Bs01dFp2yecb65yAD+I6lMWe2ga1J1YALEWcWSVmw2BjdCbUIsUZQlMthIG4A0F9Z/JX
- Il+nPiXn2iqgVMm2w96qQhnD8geOUd9BWKVfxZxccJGFWLbz3BUKt2RKBA0fjBo7Lxv1
- I/vl1u6AfVOh3Ot0M5Lblofyd1KVhHRo2yrrYJoUkQrpbtx3TScNbBesyouBSmBMhjHw
- RlVlD2aT2Ey/ODxsO+MnRkM1kgjl2+7fOSUSWZwGuBGXMV/9rKpyrooQ0s596BkrKaGv
- mGcw==
-X-Gm-Message-State: APjAAAXvV8tsQARILxT2YL8AY3goegIefjxrts1AG0thjakg2l3UP2y4
- UA+9b33gzWsVbdL2hEnNa2uPJQ==
-X-Google-Smtp-Source: APXvYqxVxXH/vIvDvdXMfeJZnxhZU8DrpuesSUL3cx7SOjPxDthEVLUcT+1gVq4U7QMLozmEeZrv7g==
-X-Received: by 2002:a37:49c2:: with SMTP id
- w185mr44160836qka.407.1563875113165; 
- Tue, 23 Jul 2019 02:45:13 -0700 (PDT)
-Received: from redhat.com (bzq-79-181-91-42.red.bezeqint.net. [79.181.91.42])
- by smtp.gmail.com with ESMTPSA id
- o12sm18252832qkg.99.2019.07.23.02.45.10
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Tue, 23 Jul 2019 02:45:12 -0700 (PDT)
-Date: Tue, 23 Jul 2019 05:45:07 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: "Zhangbo (Oscar)" <oscar.zhangbo@huawei.com>
-Message-ID: <20190723053038-mutt-send-email-mst@kernel.org>
-References: <0259E1C966E8C54AA93AA2B1240828E672DF1C92@dggeml509-mbx.china.huawei.com>
+ (envelope-from <f.gruenbichler@proxmox.com>) id 1hprO2-0007kD-ML
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 05:47:12 -0400
+Received: from proxmox-new.maurer-it.com ([212.186.127.180]:16157)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <f.gruenbichler@proxmox.com>)
+ id 1hprNz-0007gV-Iq; Tue, 23 Jul 2019 05:47:07 -0400
+Received: from proxmox-new.maurer-it.com (localhost.localdomain [127.0.0.1])
+ by proxmox-new.maurer-it.com (Proxmox) with ESMTP id C69FB432B2;
+ Tue, 23 Jul 2019 11:47:04 +0200 (CEST)
+Date: Tue, 23 Jul 2019 11:47:02 +0200
+From: Fabian =?utf-8?Q?Gr=C3=BCnbichler?= <f.gruenbichler@proxmox.com>
+To: John Snow <jsnow@redhat.com>
+Message-ID: <20190723094702.glmdyjm6rgelcwte@nora.maurer-it.com>
+References: <20190709232550.10724-1-jsnow@redhat.com>
+ <20190722121755.xpx2qni53e6pha7t@nora.maurer-it.com>
+ <a88974cc-29dc-3e4d-12b4-b2ce2734612b@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <0259E1C966E8C54AA93AA2B1240828E672DF1C92@dggeml509-mbx.china.huawei.com>
+In-Reply-To: <a88974cc-29dc-3e4d-12b4-b2ce2734612b@redhat.com>
+User-Agent: NeoMutt/20180716
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.222.194
-Subject: Re: [Qemu-devel] [PATCH] pcie: fix device hotplug failure at the
- meantime of VM boot
+X-Received-From: 212.186.127.180
+Subject: Re: [Qemu-devel] [PATCH v4 00/18] bitmaps: introduce 'bitmap' sync
+ mode
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -81,95 +63,166 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fangying <fangying1@huawei.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "limingwang \(A\)" <limingwang@huawei.com>,
- "dengkai \(A\)" <dengkai1@huawei.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ vsementsov@virtuozzo.com, qemu-block@nongnu.org,
+ Juan Quintela <quintela@redhat.com>, Wen Congyang <wencongyang2@huawei.com>,
+ Xie Changlong <xiechanglong.d@gmail.com>, qemu-devel@nongnu.org,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Jul 23, 2019 at 07:47:51AM +0000, Zhangbo (Oscar) wrote:
-> If the PCI_EXP_LNKSTA_DLLLA capability is set by default, linux kernel will send 
-> PDC event to detect whether there is a device in pcie slot. If a device is pluged
-> in the pcie-root-port at the same time, hot-plug device will send ABP + PDC
-> events to the kernel. The VM kernel will wrongly unplug the device if two PDC
-> events get too close. Thus we'd better set the PCI_EXP_LNKSTA_DLLLA
-> capability only in hotplug callback.
+On Mon, Jul 22, 2019 at 01:21:02PM -0400, John Snow wrote:
+>=20
+>=20
+> On 7/22/19 8:17 AM, Fabian Gr=FCnbichler wrote:
+> > On Tue, Jul 09, 2019 at 07:25:32PM -0400, John Snow wrote:
+> >> This series adds a new "BITMAP" sync mode that is meant to replace t=
+he
+> >> existing "INCREMENTAL" sync mode.
+> >>
+> >> This mode can have its behavior modified by issuing any of three bit=
+map sync
+> >> modes, passed as arguments to the job.
+> >>
+> >> The three bitmap sync modes are:
+> >> - ON-SUCCESS: This is an alias for the old incremental mode. The bit=
+map is
+> >>               conditionally synchronized based on the return code of=
+ the job
+> >>               upon completion.
+> >> - NEVER: This is, effectively, the differential backup mode. It neve=
+r clears
+> >>          the bitmap, as the name suggests.
+> >> - ALWAYS: Here is the new, exciting thing. The bitmap is always sync=
+hronized,
+> >>           even on failure. On success, this is identical to incremen=
+tal, but
+> >>           on failure it clears only the bits that were copied succes=
+sfully.
+> >>           This can be used to "resume" incremental backups from late=
+r points
+> >>           in times.
+> >>
+> >> I wrote this series by accident on my way to implement incremental m=
+ode
+> >> for mirror, but this happened first -- the problem is that Mirror mo=
+de
+> >> uses its existing modes in a very particular way; and this was the b=
+est
+> >> way to add bitmap support into the mirror job properly.
+> >>
+> >> [...]
+> >>
+> >> Future work:
+> >> [..]
+> >>  - Add these modes to Mirror. (Done*, but needs tests.)
+> >=20
+> > are these mirror patches available somehwere for testing in combinati=
+on
+> > with this series? your bitmaps branch does not seem to contain them ;=
+)
+> >=20
+> > we've been experimenting with Ma Haocong's patch (v4 from February) t=
+o add
+> > "incremental"/differential sync to drive-mirror recently with positiv=
+e
+> > results so far, and this sounds like it is another attempt at getting
+> > this properly integrated into Qemu.
+> >=20
+>=20
+> Not available quite yet; I added it in fairly hastily but haven't done
+> the testing I want to do yet, so I wouldn't feel comfortable sharing it
+> before I do my own due diligence on it. Give me a chance to polish it s=
+o
+> that the testing effort isn't wasted :)
 
-Could you please describe a reproducer in a bit more detail?
+fair enough, and no hurries :)
 
+>=20
+> Can you share some of your use-cases for how you are using the
+> "incremental mirror" so far? It might be useful for the patch
+> justification if I can point to production use cases. (And good for
+> allocating time, too.)
 
-> 
-> By the way, we should clean up the PCI_EXP_LNKSTA_DLLLA capability during
-> unplug to avoid VM restart or migration failure which will enter the same
-> abnormal scenario as above.
-> 
-> Signed-off-by: limingwang@huawei.com
-> Signed-off-by: fangying1@huawei.com
-> Signed-off-by: oscar.zhangbo@huawei.com
+it's basically the same use case that the original "incremental mirror"
+patch (series)[1] from two years ago had (no affiliation with the author
+though) - we have a guest disk replication feature for ZFS/zvols in a
+clustered hypervisor setting, and would like to re-use the already
+replicated disk state when live-migrating a VM. Qemu does not know
+anything about the replication, since it happens on the storage layer
+with zfs send/zfs receive. note that for VMs, we use zvols which are
+block devices backed by ZFS (or rather, ZFS datasets exposed as block
+devices), minus the file system part of regular ZFS datasets. from
+Qemu's PoV these (replicated) disks are just regular block devices (and n=
+ot
+image-backed disks on a filesystem, or accessed via some special
+BlockDriver like Ceph's RBD images).
 
-So looking at linux I see:
+we currently support live migration
+1) with disks on shared/distributed storage (easy enough)
+2) with regular (non-replicated, local) disks (via nbd/drive-mirror)
+3) with unused disks on the storage level (disks are not known to Qemu/th=
+e VM)
 
- * pciehp_card_present_or_link_active() - whether given slot is occupied
- * @ctrl: PCIe hotplug controller
- *
- * Unlike pciehp_card_present(), which determines presence solely from the
- * Presence Detect State bit, this helper also returns true if the Link Active
- * bit is set.  This is a concession to broken hotplug ports which hardwire
- * Presence Detect State to zero, such as Wilocity's [1ae9:0200].
+1-3 can be mixed and matched arbitrarily in one guest, e.g. with one
+disk on a shared Ceph cluster, one disk that is not in use on an NFS
+share, and another disk on a local LVM-thin pool. 2) and 3) also allow
+switching the underlying storage on the fly, since they transfer the
+full disk (content) anyway.
 
-so it looks like linux actually looks at presence detect state,
-but we have a bug just like Wilocity's and keeping
-link active up fixes that. Can't we fix the bug instead?
+we also support offline migration with shared, local, unused and/or
+replicated disks (all on the storage level with no involvement of Qemu).
 
-> ---
->  hw/pci/pcie.c | 9 +++++----
->  1 file changed, 5 insertions(+), 4 deletions(-)
-> 
-> diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
-> index a6beb56..174f392 100644
-> --- a/hw/pci/pcie.c
-> +++ b/hw/pci/pcie.c
-> @@ -75,10 +75,6 @@ pcie_cap_v1_fill(PCIDevice *dev, uint8_t port, uint8_t type, uint8_t version)
->                   QEMU_PCI_EXP_LNKSTA_NLW(QEMU_PCI_EXP_LNK_X1) |
->                   QEMU_PCI_EXP_LNKSTA_CLS(QEMU_PCI_EXP_LNK_2_5GT));
->  
-> -    if (dev->cap_present & QEMU_PCIE_LNKSTA_DLLLA) {
-> -        pci_word_test_and_set_mask(exp_cap + PCI_EXP_LNKSTA,
-> -                                   PCI_EXP_LNKSTA_DLLLA);
-> -    }
->  
->      /* We changed link status bits over time, and changing them across
->       * migrations is generally fine as hardware changes them too.
+as you can see there is a gap in the live-migration feature matrix: when
+replication is used, you either have to poweroff the VM to re-use the
+replication state (storage-only migration), or drop the replication
+state and do a full local-disk live-migration before re-creating the
+replication state from scratch (which is bad, since replication can have
+multiple target hosts, and re-establishing the whole disk can take a
+while if its big).
 
-Does this actually change anything?
+our basic approach is (currently) the following:
 
-I don't know why do we bother setting it here but we do
-set it later in pcie_cap_slot_plug_cb, correct?
+1) get disk info
+2) Qemu: add dirty bitmaps for currently used, replicated disks
+3) storage/ZFS: do a regular replication of all replicated disks (used AN=
+D unused)
+4) storage: do a regular storage migration of all regular unused local di=
+sks
+5a) Qemu: do a regular drive-mirror of all currently used, local disks
+5b) Qemu: do an incremental drive-mirror for all currently used, replicat=
+ed disks
+6) Qemu: wait for convergence of drive-mirror jobs
+7) Qemu: do a regular live-migration of VM
+8) Qemu: once converged and VM is suspended, complete drive-mirror jobs
+9) Qemu: resume now fully migrated VM on target node
+10) Qemu/storage: clean up on source node
 
-I'd like to understand whether this is part of fix or
-just a cleanup.
+5b) with bitmaps from 2) is what is currently missing on the Qemu side,
+but seems easy enough to support (like I said, we are currently using Ma
+Haocong's patch for testing, but want to get this feature upstream one
+way or another instead of carrying our own, possibly incompatible in the
+near-future version).
 
+2) and 3) are obviously not atomic, so the bitmaps will contain some
+writes that have been replicated already on the block/storage layer
+below the VM, and those writes will be done a second time in step 5b).
 
-> @@ -484,6 +480,11 @@ void pcie_cap_slot_unplug_request_cb(HotplugHandler *hotplug_dev,
->          return;
->      }
->  
-> +    if (pci_dev->cap_present & QEMU_PCIE_LNKSTA_DLLLA) {
-> +        pci_word_test_and_clear_mask(exp_cap + PCI_EXP_LNKSTA,
-> +                                     PCI_EXP_LNKSTA_DLLLA);
-> +    }
-> +
->      pcie_cap_slot_push_attention_button(PCI_DEVICE(hotplug_dev));
->  }
+we can work around this by adding another short down time by
+freezing/suspending prior to 2) until after doing the ZFS snapshots at
+the start of 3), in case these duplicate writes turn out to be
+problematic after all. this downtime would be rather short, as the bulk
+of the replication work (actually transfering the latest delta) can
+happen after unfreezing/resuming the VM. so far we haven't encountered
+any problems in our (albeit limited) testing though, so if possible we
+would naturally like to avoid the additional downtime altogether ;)
 
-So this reports data link inactive immediately after
-unplug request. Seems a bit questionable: guest did not
-respond yet. I'd like to see a comment explaining why
-this makes sense.
+looking forward to your patch(es) :)
 
+1: <CAKVPjOZ8Y8U2zHgo_06aozrdd9_Cq6txWrX5F4HnFefAUjimyQ@mail.gmail.com>
+and <20170504105444.8940-1-daniel.kucera@gmail.com>
 
-> -- 
-> 1.8.3.1
 
