@@ -2,48 +2,48 @@ Return-Path: <SRS0=3Ld+=VU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F39BC7618F
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 01:01:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CE6DC7618F
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 01:15:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D3E612199C
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 01:01:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D3E612199C
+	by mail.kernel.org (Postfix) with ESMTPS id 74F1521955
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 01:15:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 74F1521955
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38428 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38480 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hpjB9-0008Id-OZ
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jul 2019 21:01:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35280)
+	id 1hpjPE-0004IY-AV
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jul 2019 21:15:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38080)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bounces@canonical.com>) id 1hpjAx-0007uB-4l
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 21:01:08 -0400
+ (envelope-from <bounces@canonical.com>) id 1hpjP2-0003uD-To
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 21:15:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1hpjAt-0006uO-JL
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 21:01:07 -0400
-Received: from indium.canonical.com ([91.189.90.7]:43572)
+ (envelope-from <bounces@canonical.com>) id 1hpjP1-0000uk-Gk
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 21:15:40 -0400
+Received: from indium.canonical.com ([91.189.90.7]:43972)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1hpjAs-0006nG-CW
- for qemu-devel@nongnu.org; Mon, 22 Jul 2019 21:01:03 -0400
+ id 1hpjP1-0000sc-9x
+ for qemu-devel@nongnu.org; Mon, 22 Jul 2019 21:15:39 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1hpjAi-0005as-CA
- for <qemu-devel@nongnu.org>; Tue, 23 Jul 2019 01:00:52 +0000
+ id 1hpjP0-0005z7-86
+ for <qemu-devel@nongnu.org>; Tue, 23 Jul 2019 01:15:38 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 5844B2E804E
- for <qemu-devel@nongnu.org>; Tue, 23 Jul 2019 01:00:52 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 38FFE2E80C8
+ for <qemu-devel@nongnu.org>; Tue, 23 Jul 2019 01:15:38 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 23 Jul 2019 00:54:45 -0000
+Date: Tue, 23 Jul 2019 01:03:36 -0000
 From: Roman Bolshakov <1818937@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -56,13 +56,13 @@ X-Launchpad-Bug-Commenters: bwibking cuser2 kisg roolebo
 X-Launchpad-Bug-Reporter: Chen Zhang (cuser2)
 X-Launchpad-Bug-Modifier: Roman Bolshakov (roolebo)
 References: <155192472106.28960.15645485731508389788.malonedeb@chaenomeles.canonical.com>
-Message-Id: <156384328558.9027.13656672558476265383.malone@chaenomeles.canonical.com>
+Message-Id: <156384381634.14663.16199225986669814171.malone@wampee.canonical.com>
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com); Revision="19010";
  Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: a8b2dc20ff7ae8bb4acbca51c95630f4be95deab
+X-Launchpad-Hash: 4e9a458b8df617f7316109a9793c9a3aeacb2f71
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
 Subject: [Qemu-devel] [Bug 1818937] Re: Crash with HV_ERROR on macOS host
@@ -81,35 +81,29 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-For the triage of the issue we need the following VMCS fields:
-* instruction error
-* exit reason
-* exit qualification
+The log line I've got is the following:
+=E2=9E=9C  vms ~/dev/qemu/x86_64-softmmu/qemu-system-x86_64 -accel hvf -m 2=
+G -cdrom ~/Downloads/ubuntu-18.04.2-desktop-amd64.iso -hda ubuntu.qc
+ow2
+qemu-system-x86_64: warning: host doesn't support requested feature: CPUID.=
+80000001H:ECX.svm [bit 2]
+qemu-system-x86_64: hv_vcpu_run failed
+qemu-system-x86_64: instruction error:      0x0000000000000007
+qemu-system-x86_64: exit reason:            0x0000000000000030
+qemu-system-x86_64: exit qualification:     0x0000000000000083
+qemu-system-x86_64: pri proc based ctls:    0x0000000095206dfa
+qemu-system-x86_64: sec proc based ctls:    0x00000000000000a3
+qemu-system-x86_64: eptp:                   0x000000000000003f
+qemu-system-x86_64: gpa:                    0x000000007d9ef000
+qemu-system-x86_64: gla:                    0xfffffe0000000ec0
+qemu-system-x86_64: Error: HV_ERROR
 
-On my machine (with macOS 10.14.5) each time QEMU exits with HV_ERROR, Appl=
-eHV spills the following error into system log:
-2019-07-06 10:38:56.148547+0300 0x1e3ee4   Default     0x0                 =
- 0      0    kernel: (AppleHV) AppleHV: /BuildRoot/Library/Caches/com.apple=
-.xbs/Sources/Hypervisor/Hypervisor-31.230.1/kext/x86/vmx/hv_vmx_vcpu.cpp : =
-hv_return_t hv_vmx_vcpu_t::hv_vmx_vcpu_run()
-: 997
 
-Such log lines can be read with the command:
-$ log show -predicate 'senderImagePath CONTAINS "AppleHV"'
-
-The error above can only happen if vmlaunch or vmresume has failed and
-RFLAGS has either CF or ZF (or both) set to 1, according to Intel SDM.
-Unfortunately the exact RFLAGS value is not logged by
-Hypervisor.framework. I have submitted a feedback report (FB6787376) to
-log RFLAGS if it's not zero  immediately after vmlaunch/vmresume.
-
-If you wish to assist in debugging of the issue, please build and use QEMU =
-from the branch:
-https://github.com/roolebo/qemu/tree/debug-hv-error
-
-Or apply the patch to your tree:
-https://github.com/roolebo/qemu/commit/f8098782573a89fc323d8dcae2d5445335e6=
-26f0.diff
+Instruction error is 0x7 and Intel SDM 31-4 Vol. 3C states that:
+The processor checks on the VMX controls and host-state area. If any of the=
+se checks fail, the VM-entry instruction fails. RFLAGS.ZF is set to 1 and e=
+ither 7 (VM entry with invalid control field(s)) or 8 (VM entry with invali=
+d host-state field(s)) is saved in the VM-instruction error field.
 
 -- =
 
