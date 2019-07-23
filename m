@@ -2,59 +2,59 @@ Return-Path: <SRS0=3Ld+=VU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNWANTED_LANGUAGE_BODY autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 533E1C7618B
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 09:08:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8FADC7618E
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 09:08:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2AD91227C0
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 09:08:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2AD91227C0
+	by mail.kernel.org (Postfix) with ESMTPS id 91DFE2251A
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 09:08:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 91DFE2251A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40452 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40454 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hpqmF-00053v-1c
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jul 2019 05:08:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41545)
+	id 1hpqmG-0005Fg-FH
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jul 2019 05:08:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41562)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <sgarzare@redhat.com>) id 1hpqll-0003Su-3M
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 05:07:38 -0400
+ (envelope-from <sgarzare@redhat.com>) id 1hpqln-0003bR-2z
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 05:07:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <sgarzare@redhat.com>) id 1hpqlj-00024X-2s
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 05:07:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:28182)
+ (envelope-from <sgarzare@redhat.com>) id 1hpqll-00026B-2I
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 05:07:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52976)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1hpqlh-00021g-2C
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 05:07:34 -0400
+ (Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1hpqlj-00023S-37
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 05:07:36 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 918D23084242;
- Tue, 23 Jul 2019 09:07:30 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 3913F30821A0;
+ Tue, 23 Jul 2019 09:07:33 +0000 (UTC)
 Received: from steredhat.redhat.com (unknown [10.36.118.55])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D0F2B5D9C5;
- Tue, 23 Jul 2019 09:07:26 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E04B25D9DE;
+ Tue, 23 Jul 2019 09:07:30 +0000 (UTC)
 From: Stefano Garzarella <sgarzare@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Tue, 23 Jul 2019 11:07:17 +0200
-Message-Id: <20190723090718.14590-2-sgarzare@redhat.com>
+Date: Tue, 23 Jul 2019 11:07:18 +0200
+Message-Id: <20190723090718.14590-3-sgarzare@redhat.com>
 In-Reply-To: <20190723090718.14590-1-sgarzare@redhat.com>
 References: <20190723090718.14590-1-sgarzare@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Tue, 23 Jul 2019 09:07:30 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.47]); Tue, 23 Jul 2019 09:07:33 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH 1/2] elf-ops.h: Map into memory the ELF to load
+Subject: [Qemu-devel] [PATCH 2/2] hw/i386/pc: Map into memory the initrd
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,160 +74,73 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 In order to reduce the memory footprint we map into memory
-the ELF to load using g_mapped_file_new_from_fd() instead of
-reading each sections. In this way we can share the ELF pages
-between multiple instances of QEMU.
+the initrd using g_mapped_file_new() instead of reading it.
+In this way we can share the initrd pages between multiple
+instances of QEMU.
 
-Suggested-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
 ---
- include/hw/elf_ops.h | 59 ++++++++++++++++++++++----------------------
- 1 file changed, 30 insertions(+), 29 deletions(-)
+ hw/i386/pc.c | 15 +++++++++++----
+ 1 file changed, 11 insertions(+), 4 deletions(-)
 
-diff --git a/include/hw/elf_ops.h b/include/hw/elf_ops.h
-index 690f9238c8..69ce8dea74 100644
---- a/include/hw/elf_ops.h
-+++ b/include/hw/elf_ops.h
-@@ -323,8 +323,9 @@ static int glue(load_elf, SZ)(const char *name, int f=
-d,
-     struct elfhdr ehdr;
-     struct elf_phdr *phdr =3D NULL, *ph;
-     int size, i, total_size;
--    elf_word mem_size, file_size;
-+    elf_word mem_size, file_size, data_offset;
-     uint64_t addr, low =3D (uint64_t)-1, high =3D 0;
-+    GMappedFile *gmf =3D NULL;
-     uint8_t *data =3D NULL;
-     char label[128];
-     int ret =3D ELF_LOAD_FAILED;
-@@ -409,22 +410,26 @@ static int glue(load_elf, SZ)(const char *name, int=
- fd,
-         }
-     }
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 549c437050..b139589777 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -1241,17 +1241,20 @@ static void load_linux(PCMachineState *pcms,
 =20
-+    gmf =3D g_mapped_file_new_from_fd(fd, false, NULL);
-+    if (!gmf) {
-+        goto fail;
-+    }
-+
-     total_size =3D 0;
-     for(i =3D 0; i < ehdr.e_phnum; i++) {
-         ph =3D &phdr[i];
-         if (ph->p_type =3D=3D PT_LOAD) {
-             mem_size =3D ph->p_memsz; /* Size of the ROM */
-             file_size =3D ph->p_filesz; /* Size of the allocated data */
--            data =3D g_malloc0(file_size);
--            if (ph->p_filesz > 0) {
--                if (lseek(fd, ph->p_offset, SEEK_SET) < 0) {
--                    goto fail;
--                }
--                if (read(fd, data, file_size) !=3D file_size) {
--                    goto fail;
--                }
-+            data_offset =3D ph->p_offset; /* Offset where the data is lo=
-cated */
-+
-+            if (g_mapped_file_get_length(gmf) < file_size + data_offset)=
- {
-+                goto fail;
-             }
+             /* load initrd */
+             if (initrd_filename) {
++                GMappedFile *gmf;
+                 gsize initrd_size;
+                 gchar *initrd_data;
+                 GError *gerr =3D NULL;
 =20
-+            data =3D (uint8_t *)g_mapped_file_get_contents(gmf);
-+            data +=3D data_offset;
-+
-             /* The ELF spec is somewhat vague about the purpose of the
-              * physical address field. One common use in the embedded wo=
-rld
-              * is that physical address field specifies the load address
-@@ -513,17 +518,16 @@ static int glue(load_elf, SZ)(const char *name, int=
- fd,
-                 *pentry =3D ehdr.e_entry - ph->p_vaddr + ph->p_paddr;
-             }
-=20
--            if (mem_size =3D=3D 0) {
--                /* Some ELF files really do have segments of zero size;
--                 * just ignore them rather than trying to create empty
--                 * ROM blobs, because the zero-length blob can falsely
--                 * trigger the overlapping-ROM-blobs check.
--                 */
--                g_free(data);
--            } else {
-+            /* Some ELF files really do have segments of zero size;
-+             * just ignore them rather than trying to create empty
-+             * ROM blobs, because the zero-length blob can falsely
-+             * trigger the overlapping-ROM-blobs check.
-+             */
-+            if (mem_size !=3D 0) {
-                 if (load_rom) {
-                     snprintf(label, sizeof(label), "phdr #%d: %s", i, na=
-me);
--
-+                    /* Increments the reference count to avoid the unmap=
- */
-+                    g_mapped_file_ref(gmf);
-                     /* rom_add_elf_program() seize the ownership of 'dat=
-a' */
-                     rom_add_elf_program(label, data, file_size, mem_size=
-,
-                                         addr, as);
-@@ -531,7 +535,6 @@ static int glue(load_elf, SZ)(const char *name, int f=
-d,
-                     address_space_write(as ? as : &address_space_memory,
-                                         addr, MEMTXATTRS_UNSPECIFIED,
-                                         data, file_size);
--                    g_free(data);
+-                if (!g_file_get_contents(initrd_filename, &initrd_data,
+-                            &initrd_size, &gerr)) {
++                gmf =3D g_mapped_file_new(initrd_filename, false, &gerr)=
+;
++                if (!gmf) {
+                     fprintf(stderr, "qemu: error reading initrd %s: %s\n=
+",
+                             initrd_filename, gerr->message);
+                     exit(1);
                  }
-             }
 =20
-@@ -547,16 +550,15 @@ static int glue(load_elf, SZ)(const char *name, int=
- fd,
-             struct elf_note *nhdr =3D NULL;
++                initrd_data =3D g_mapped_file_get_contents(gmf);
++                initrd_size =3D g_mapped_file_get_length(gmf);
+                 initrd_max =3D pcms->below_4g_mem_size - pcmc->acpi_data=
+_size - 1;
+                 if (initrd_size >=3D initrd_max) {
+                     fprintf(stderr, "qemu: initrd is too large, cannot s=
+upport."
+@@ -1378,6 +1381,7 @@ static void load_linux(PCMachineState *pcms,
 =20
-             file_size =3D ph->p_filesz; /* Size of the range of ELF note=
-s */
--            data =3D g_malloc0(file_size);
--            if (ph->p_filesz > 0) {
--                if (lseek(fd, ph->p_offset, SEEK_SET) < 0) {
--                    goto fail;
--                }
--                if (read(fd, data, file_size) !=3D file_size) {
--                    goto fail;
--                }
-+            data_offset =3D ph->p_offset; /* Offset where the notes are =
-located */
-+
-+            if (g_mapped_file_get_length(gmf) < file_size + data_offset)=
- {
-+                goto fail;
-             }
-=20
-+            data =3D (uint8_t *)g_mapped_file_get_contents(gmf);
-+            data +=3D data_offset;
-+
-             /*
-              * Search the ELF notes to find one with a type matching the
-              * value passed in via 'translate_opaque'
-@@ -570,7 +572,6 @@ static int glue(load_elf, SZ)(const char *name, int f=
-d,
-                     sizeof(struct elf_note) =3D=3D sizeof(struct elf64_n=
-ote);
-                 elf_note_fn((void *)nhdr, (void *)&ph->p_align, is64);
-             }
--            g_free(data);
-             data =3D NULL;
+     /* load initrd */
+     if (initrd_filename) {
++        GMappedFile *gmf;
+         gsize initrd_size;
+         gchar *initrd_data;
+         GError *gerr =3D NULL;
+@@ -1387,12 +1391,15 @@ static void load_linux(PCMachineState *pcms,
+             exit(1);
          }
-     }
-@@ -582,7 +583,7 @@ static int glue(load_elf, SZ)(const char *name, int f=
-d,
-         *highaddr =3D (uint64_t)(elf_sword)high;
-     return total_size;
-  fail:
--    g_free(data);
-+    g_mapped_file_unref(gmf);
-     g_free(phdr);
-     return ret;
- }
+=20
+-        if (!g_file_get_contents(initrd_filename, &initrd_data,
+-                                 &initrd_size, &gerr)) {
++        gmf =3D g_mapped_file_new(initrd_filename, false, &gerr);
++        if (!gmf) {
+             fprintf(stderr, "qemu: error reading initrd %s: %s\n",
+                     initrd_filename, gerr->message);
+             exit(1);
+         }
++
++        initrd_data =3D g_mapped_file_get_contents(gmf);
++        initrd_size =3D g_mapped_file_get_length(gmf);
+         if (initrd_size >=3D initrd_max) {
+             fprintf(stderr, "qemu: initrd is too large, cannot support."
+                     "(max: %"PRIu32", need %"PRId64")\n",
 --=20
 2.20.1
 
