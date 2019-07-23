@@ -2,86 +2,72 @@ Return-Path: <SRS0=3Ld+=VU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.2 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FA6DC7618B
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 12:16:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 920CDC7618B
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 12:17:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 78A56223D1
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 12:16:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 78A56223D1
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 69DC222511
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jul 2019 12:17:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69DC222511
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42020 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42038 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hptim-0007bO-9O
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jul 2019 08:16:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38022)
+	id 1hptjD-0000cc-F4
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jul 2019 08:17:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38182)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hptiM-0006Mi-9m
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 08:16:19 -0400
+ (envelope-from <bounces@canonical.com>) id 1hptit-0008I3-Cz
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 08:16:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hptiK-0000An-RG
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 08:16:18 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:34318)
+ (envelope-from <bounces@canonical.com>) id 1hptir-0000gg-Vs
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 08:16:51 -0400
+Received: from indium.canonical.com ([91.189.90.7]:42036)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hptiK-00009Y-6R
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 08:16:16 -0400
-Received: by mail-wm1-f65.google.com with SMTP id w9so30993247wmd.1
- for <qemu-devel@nongnu.org>; Tue, 23 Jul 2019 05:16:16 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=DlOYqzW0k3BUVnMxhodAYKxDtUvQAseHKHTg4GjOCas=;
- b=GtSVve19Y0w3asheY0NoRAUOVrqCCI2fZMTaMCws0jazUEcKq7zkCuoqmF4WMixXZt
- emAyuYYJuV8VgsxOEMgrQBdUWCQdix5NYSQhHEgvVPBQkgUqYYe6zSLeJ1L1y4js2/+s
- LOC6bQqxdLF5mqhSEwtzJrCjvcCa2+suCK9yDgt2yumvn39xCPiXAk/9zRXqISoxDcyc
- cOrHN5kOz1imovkPUd6Ll3U1ir5Cz4Vy+zJZThfXTYz8sC2QNhjz/5mH9oOOWy7N7GSK
- z9t54d1x0kXL+XqM/K5hXFadvj/ANVw34F2gTEdkgPbUiWWaR34agXQbvPavPKnfdXzO
- Aqrg==
-X-Gm-Message-State: APjAAAVHvKUELkVI9ntDbYPdpcUFnQF9t7HQ9p5gtsvjXqaVF1OQcsDn
- Qcdih3Ld3eNSk7AkynCRi8XG+16R5ZY=
-X-Google-Smtp-Source: APXvYqzejRUleLJqVxl/shySFplGqQs6A/7gxUBT6PLWhPiW7Bydkpu9/r19F+o6oKSACq3/Ej7iUQ==
-X-Received: by 2002:a7b:c40c:: with SMTP id k12mr64007658wmi.122.1563884174929; 
- Tue, 23 Jul 2019 05:16:14 -0700 (PDT)
-Received: from [192.168.1.38] (190.red-81-40-121.staticip.rima-tde.net.
- [81.40.121.190])
- by smtp.gmail.com with ESMTPSA id j6sm62871990wrx.46.2019.07.23.05.16.14
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Tue, 23 Jul 2019 05:16:14 -0700 (PDT)
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Peter Maydell <peter.maydell@linaro.org>
-References: <20190723103612.5600-1-alex.bennee@linaro.org>
- <CAFEAcA_P_Bk0bNGCW+TwhQGCeqM-XZd3OudKZ4tu0fNThFH5ww@mail.gmail.com>
- <87imrt0y9a.fsf@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <451b91c6-3a4d-afb4-30f1-595fcc7e5f65@redhat.com>
-Date: Tue, 23 Jul 2019 14:16:13 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1hptir-0000cI-Pn
+ for qemu-devel@nongnu.org; Tue, 23 Jul 2019 08:16:49 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1hptio-0003PG-Oq
+ for <qemu-devel@nongnu.org>; Tue, 23 Jul 2019 12:16:46 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 688032E80E6
+ for <qemu-devel@nongnu.org>; Tue, 23 Jul 2019 12:16:45 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <87imrt0y9a.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 23 Jul 2019 12:01:06 -0000
+From: Gergely Kis <1818937@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: crash hvf macos
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: bwibking cuser2 kisg roolebo
+X-Launchpad-Bug-Reporter: Chen Zhang (cuser2)
+X-Launchpad-Bug-Modifier: Gergely Kis (kisg)
+References: <155192472106.28960.15645485731508389788.malonedeb@chaenomeles.canonical.com>
+Message-Id: <156388326692.29739.9366226749214462145.malone@soybean.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="19010";
+ Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: 67da89ffe04d3496d0f6ec297766c7c140aa71bf
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.128.65
-Subject: Re: [Qemu-devel] [PULL for 4.1-rc2 00/23] testing updates (green
- CI!)
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1818937] Re: Crash with HV_ERROR on macOS host
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -90,173 +76,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+Reply-To: Bug 1818937 <1818937@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/23/19 1:46 PM, Alex Bennée wrote:
-> 
-> Peter Maydell <peter.maydell@linaro.org> writes:
-> 
->> On Tue, 23 Jul 2019 at 11:36, Alex Bennée <alex.bennee@linaro.org> wrote:
->>>
->>> The following changes since commit 23da9e297b4120ca9702cabec91599a44255fe96:
->>>
->>>   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20190722' into staging (2019-07-22 15:16:48 +0100)
->>>
->>> are available in the Git repository at:
->>>
->>>   https://github.com/stsquad/qemu.git tags/pull-testing-230719-1
->>>
->>> for you to fetch changes up to 2e3b8743cd66f1d0fbc83051b0b6b072a97460cc:
->>>
->>>   gitlab-ci: Remove qcow2 tests that are handled by "make check" already (2019-07-23 11:33:15 +0100)
->>>
->>> ----------------------------------------------------------------
->>> Final testing updates:
->>>
->>>   - docker sphinx updates
->>>   - windows build re-enabled in CI
->>>   - travis_retry for make check
->>>   - quick iotests enabled for make check
->>>   - build fixes
->>>
->>> ----------------------------------------------------------------
->>
->> 'make check-tcg' fails (x86-64 host):
->>
->> make: Entering directory
->> '/home/petmay01/linaro/qemu-for-merges/build/all-linux-static'
->>   BUILD   debian10
->> The command '/bin/sh -c DEBIAN_FRONTEND=noninteractive eatmydata
->> apt install -y --no-install-recommends         bison
->> build-essential         ca-certificates         clang         flex
->>     gettext         git         pkg-config         psmisc
->> python         python3-sphinx         texinfo         $(apt-get -s
->> build-dep qemu | egrep ^Inst | fgrep '[all]' | cut -d\  -f2)' returned
->> a non-zero code: 100
->> Traceback (most recent call last):
->>   File "/home/petmay01/linaro/qemu-for-merges/tests/docker/docker.py",
->> line 615, in <module>
->>     sys.exit(main())
->>   File "/home/petmay01/linaro/qemu-for-merges/tests/docker/docker.py",
->> line 611, in main
->>     return args.cmdobj.run(args, argv)
->>   File "/home/petmay01/linaro/qemu-for-merges/tests/docker/docker.py",
->> line 413, in run
->>     extra_files_cksum=cksum)
->>   File "/home/petmay01/linaro/qemu-for-merges/tests/docker/docker.py",
->> line 280, in build_image
->>     quiet=quiet)
->>   File "/home/petmay01/linaro/qemu-for-merges/tests/docker/docker.py",
->> line 207, in _do_check
->>     return subprocess.check_call(self._command + cmd, **kwargs)
->>   File "/usr/lib/python2.7/subprocess.py", line 190, in check_call
->>     raise CalledProcessError(retcode, cmd)
->> subprocess.CalledProcessError: Command '['docker', 'build', '-t',
->> 'qemu:debian10', '-f', '/tmp/docker_buildBgZdCD/tmp6MJLiZ.docker',
->> '/tmp/docker_buildBgZdCD']' returned non-zero exit status 100
->> /home/petmay01/linaro/qemu-for-merges/tests/docker/Makefile.include:53:
->> recipe for target 'docker-image-debian10' failed
+Hi Roman,
 
-Yes, we should definitively improve this error report.
+thanks for the patch, we were able to reproduce this issue with our
+custom Android Cuttlefish based d VM (running 4.14 kernel):
 
->> make: *** [docker-image-debian10] Error 1
->> make: Leaving directory
->> '/home/petmay01/linaro/qemu-for-merges/build/all-linux-static'
-> 
-> Odd. Does:
-> 
->   make docker-image-debian10 V=1
-> 
-> fail for you? Can you retry with:
-> 
->   make docker-image-debian10 V=1 NOCACHE=1
+2019-07-23T11:36:37.180753Z qemu-system-x86_64: warning: host doesn't suppo=
+rt requested feature: CPUID.80000001H:ECX.svm [bit 2]
+2019-07-23T11:36:37.182517Z qemu-system-x86_64: warning: host doesn't suppo=
+rt requested feature: CPUID.80000001H:ECX.svm [bit 2]
+2019-07-23T11:37:54.647855Z qemu-system-x86_64: hv_vcpu_run failed
+2019-07-23T11:37:54.650737Z qemu-system-x86_64: exit reason:            0x0=
+000000000000030
+2019-07-23T11:37:54.661753Z qemu-system-x86_64: exit qualification:     0x0=
+000000000000981
+2019-07-23T11:37:54.661769Z qemu-system-x86_64: instruction error:      0x0=
+000000000000007
+2019-07-23T11:37:54.661780Z qemu-system-x86_64: pri proc based ctls:    0x0=
+000000095206dfa
+2019-07-23T11:37:54.661790Z qemu-system-x86_64: sec proc based ctls:    0x0=
+0000000000000a3
+2019-07-23T11:37:54.661799Z qemu-system-x86_64: eptp:                   0x0=
+00000000000003f
+2019-07-23T11:37:54.661810Z qemu-system-x86_64: gpa:                    0x0=
+00000007fd05004
+2019-07-23T11:37:54.661820Z qemu-system-x86_64: gla:                    0xf=
+ffffe000002f004
+2019-07-23T11:37:54.661828Z qemu-system-x86_64: Error: HV_ERROR
 
-Should we use a stable tag for the stable release? Such:
+The error happened right at startup, after multiple tries.
 
--- >8 --
-diff --git a/tests/docker/dockerfiles/debian10.docker
-b/tests/docker/dockerfiles/debian10.docker
-index aeeb151b52..0f2800377d 100644
---- a/tests/docker/dockerfiles/debian10.docker
-+++ b/tests/docker/dockerfiles/debian10.docker
-@@ -7,7 +7,7 @@
- # On its own you can't build much but the docker-foo-cross targets
- # build on top of the base debian image.
- #
--FROM debian:buster-slim
-+FROM debian:buster-20190708-slim
+Thank you,
+Gergely
 
- # Duplicate deb line as deb-src
----
+-- =
 
->>
->> I also got a failure with openbsd which seems to be when
->> the tests run check-block.sh:
->>
->> /home/qemu/qemu-test.Dy1Aj3/src/tests/check-block.sh
->>   TEST    iotest-qcow2: 001
->>   TEST    iotest-qcow2: 002
->>   TEST    iotest-qcow2: 003
->>   TEST    iotest-qcow2: 004
->>   TEST    iotest-qcow2: 005 [not run]
->>   TEST    iotest-qcow2: 007 [fail]
->> QEMU          --
->> "/home/qemu/qemu-test.Dy1Aj3/build/tests/qemu-iotests/../../aarch64-softmmu/qemu-system-aarch64"
->> -nodefaults -machine virt,accel=qtest
->> QEMU_IMG      --
->> "/home/qemu/qemu-test.Dy1Aj3/build/tests/qemu-iotests/../../qemu-img"
->> QEMU_IO       --
->> "/home/qemu/qemu-test.Dy1Aj3/build/tests/qemu-iotests/../../qemu-io"
->> --cache writeback -f qcow2
->> QEMU_NBD      --
->> "/home/qemu/qemu-test.Dy1Aj3/build/tests/qemu-iotests/../../qemu-nbd"
->> IMGFMT        -- qcow2 (compat=1.1)
->> IMGPROTO      -- file
->> PLATFORM      -- OpenBSD/amd64 openbsd 6.5
->> TEST_DIR      -- /home/qemu/qemu-test.Dy1Aj3/build/tests/qemu-iotests/scratch
->> SOCKET_SCM_HELPER --
->>
->> --- /home/qemu/qemu-test.Dy1Aj3/src/tests/qemu-iotests/007.out  Tue
->> Jul 23 10:49:15 2019
->> +++ /home/qemu/qemu-test.Dy1Aj3/build/tests/qemu-iotests/007.out.bad
->>  Tue Jul 23 11:10:21 2019
->> @@ -2,16 +2,7 @@
->>
->>  creating image
->>  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576
->> -savevm 1
->> -savevm 2
->> -savevm 3
->> -savevm 4
->> -savevm 5
->> -savevm 6
->> -savevm 7
->> -savevm 8
->> -savevm 9
->> -savevm 10
->> +./007: line 51: seq: command not found
->>
->> [and some other failures]
->>
->> I see Thomas Huth has a patch on-list for that, but this
->> didn't manifest as a problem before this pullreq.
-> 
-> OK, I'll add it and rebuild the PR.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1818937
 
-But Thomas got another error later...
+Title:
+  Crash with HV_ERROR on macOS host
 
-> 
-> Have you noticed any issues with check-acceptance?
-> 
->>
->> thanks
->> -- PMM
-> 
-> 
-> --
-> Alex Bennée
-> 
+Status in QEMU:
+  New
+
+Bug description:
+  On macOS host running Windows 10 guest, qemu crashed with error
+  message: Error: HV_ERROR.
+
+  Host: macOS Mojave 10.14.3 (18D109) Late 2014 Mac mini presumably Core i5=
+ 4278U.
+  QEMU: git commit a3e3b0a7bd5de211a62cdf2d6c12b96d3c403560
+  QEMU parameter: qemu-system-x86_64 -m 3000 -drive file=3Ddisk.img,if=3Dvi=
+rtio,discard=3Dunmap -accel hvf -soundhw hda -smp 3
+
+  thread list
+  Process 56054 stopped
+    thread #1: tid =3D 0x2ffec8, 0x00007fff48d0805a vImage`vLookupTable_Pla=
+nar16 + 970, queue =3D 'com.apple.main-thread'
+    thread #2: tid =3D 0x2ffecc, 0x00007fff79d6d7de libsystem_kernel.dylib`=
+__psynch_cvwait + 10
+    thread #3: tid =3D 0x2ffecd, 0x00007fff79d715aa libsystem_kernel.dylib`=
+__select + 10
+    thread #4: tid =3D 0x2ffece, 0x00007fff79d71d9a libsystem_kernel.dylib`=
+__sigwait + 10
+  * thread #6: tid =3D 0x2ffed0, 0x00007fff79d7023e libsystem_kernel.dylib`=
+__pthread_kill + 10, stop reason =3D signal SIGABRT
+    thread #7: tid =3D 0x2ffed1, 0x00007fff79d6d7de libsystem_kernel.dylib`=
+__psynch_cvwait + 10
+    thread #8: tid =3D 0x2ffed2, 0x00007fff79d6d7de libsystem_kernel.dylib`=
+__psynch_cvwait + 10
+    thread #11: tid =3D 0x2fff34, 0x00007fff79d6a17a libsystem_kernel.dylib=
+`mach_msg_trap + 10, name =3D 'com.apple.NSEventThread'
+    thread #30: tid =3D 0x300c04, 0x00007fff79e233f8 libsystem_pthread.dyli=
+b`start_wqthread
+    thread #31: tid =3D 0x300c16, 0x00007fff79e233f8 libsystem_pthread.dyli=
+b`start_wqthread
+    thread #32: tid =3D 0x300c17, 0x0000000000000000
+    thread #33: tid =3D 0x300c93, 0x00007fff79d6d7de libsystem_kernel.dylib=
+`__psynch_cvwait + 10
+
+  =
+
+  Crashed thread:
+
+  * thread #6, stop reason =3D signal SIGABRT
+    * frame #0: 0x00007fff79d7023e libsystem_kernel.dylib`__pthread_kill + =
+10
+      frame #1: 0x00007fff79e26c1c libsystem_pthread.dylib`pthread_kill + 2=
+85
+      frame #2: 0x00007fff79cd91c9 libsystem_c.dylib`abort + 127
+      frame #3: 0x000000010baa476d qemu-system-x86_64`assert_hvf_ok(ret=3D<=
+unavailable>) at hvf.c:106 [opt]
+      frame #4: 0x000000010baa4c8f qemu-system-x86_64`hvf_vcpu_exec(cpu=3D0=
+x00007f8e5283de00) at hvf.c:681 [opt]
+      frame #5: 0x000000010b988423 qemu-system-x86_64`qemu_hvf_cpu_thread_f=
+n(arg=3D0x00007f8e5283de00) at cpus.c:1636 [opt]
+      frame #6: 0x000000010bd9dfce qemu-system-x86_64`qemu_thread_start(arg=
+s=3D<unavailable>) at qemu-thread-posix.c:502 [opt]
+      frame #7: 0x00007fff79e24305 libsystem_pthread.dylib`_pthread_body + =
+126
+      frame #8: 0x00007fff79e2726f libsystem_pthread.dylib`_pthread_start +=
+ 70
+      frame #9: 0x00007fff79e23415 libsystem_pthread.dylib`thread_start + 13
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1818937/+subscriptions
 
