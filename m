@@ -2,62 +2,68 @@ Return-Path: <SRS0=qU7A=VV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1F66C7618B
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 14:38:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB6ADC7618B
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 14:44:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BB0302147A
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 14:38:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB0302147A
+	by mail.kernel.org (Postfix) with ESMTPS id B9C0721850
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 14:44:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9C0721850
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52268 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52286 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqIPX-0005Nc-Nt
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jul 2019 10:38:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32864)
+	id 1hqIV8-0007LN-UL
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jul 2019 10:44:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34803)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgilbert@redhat.com>) id 1hqIPK-0004yv-JN
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 10:38:19 -0400
+ (envelope-from <alex.williamson@redhat.com>) id 1hqIUx-0006vP-0c
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 10:44:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1hqIPH-0002Md-BC
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 10:38:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36502)
+ (envelope-from <alex.williamson@redhat.com>) id 1hqIUv-0005NT-HR
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 10:44:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38268)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hqIPE-000200-Qt
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 10:38:13 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ (Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+ id 1hqIUv-0005Mx-9I
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 10:44:05 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id B867430833C1;
- Wed, 24 Jul 2019 14:38:09 +0000 (UTC)
-Received: from work-vm (ovpn-117-166.ams2.redhat.com [10.36.117.166])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A84A31001B09;
- Wed, 24 Jul 2019 14:38:02 +0000 (UTC)
-Date: Wed, 24 Jul 2019 15:38:00 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Message-ID: <20190724143800.GI2717@work-vm>
-References: <20190724143105.307042-1-sgarzare@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 03442308421A;
+ Wed, 24 Jul 2019 14:44:04 +0000 (UTC)
+Received: from x1.home (ovpn-116-99.phx2.redhat.com [10.3.116.99])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 002555D71C;
+ Wed, 24 Jul 2019 14:43:58 +0000 (UTC)
+Date: Wed, 24 Jul 2019 08:43:55 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Peter Xu <zhexu@redhat.com>
+Message-ID: <20190724084355.627d44cf@x1.home>
+In-Reply-To: <20190724100331.GA14454@xz-x1>
+References: <155364082689.15803.7062874513041742278.stgit@gimli.home>
+ <20190329104904.450fefef@x1.home>
+ <dbe614f5-47c8-b05d-dd73-2fbcd1579ae3@amd.com>
+ <20190723112618.0efafa8d@x1.home> <20190724071439.GB18771@xz-x1>
+ <20190724040837-mutt-send-email-mst@kernel.org>
+ <20190724100331.GA14454@xz-x1>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190724143105.307042-1-sgarzare@redhat.com>
-User-Agent: Mutt/1.12.0 (2019-05-25)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.44]); Wed, 24 Jul 2019 14:38:09 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.40]); Wed, 24 Jul 2019 14:44:04 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v4 0/3] pc: mmap kernel (ELF image) and
- initrd
+Subject: Re: [Qemu-devel] [RFC PATCH] pci: Use PCI aliases when determining
+ device IOMMU address space
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,84 +75,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>, Sergio Lopez <slp@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Julio Montes <julio.montes@intel.com>,
- qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: "Singh, Brijesh" <brijesh.singh@amd.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "eric.auger@redhat.com" <eric.auger@redhat.com>, "Suthikulpanit,
+ Suravee" <Suravee.Suthikulpanit@amd.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Stefano Garzarella (sgarzare@redhat.com) wrote:
-> In order to reduce the memory footprint when PVH kernel and initrd
-> are used, we map them into memory instead of reading them.
-> In this way we can share them between multiple instances of QEMU.
-> 
-> v4:
->   - Patch 1: fix the rom_add_elf_program() comment [Paolo]
->   - Patch 2:
->     ~ fix the missing of g_mapped_file_unref() in the success case [Paolo]
->     ~ fix the rom_add_elf_program() comment [Paolo]
-> 
-> v3: https://patchew.org/QEMU/20190724112531.232260-1-sgarzare@redhat.com/
-> v2: https://patchew.org/QEMU/20190723140445.12748-1-sgarzare@redhat.com/
+On Wed, 24 Jul 2019 18:03:31 +0800
+Peter Xu <zhexu@redhat.com> wrote:
 
-Two high level questions:
-   a) What happens if someone tries to migrate the VM - I don't think
-it's too unusual for people to run with -kernel/-initrd in situations
-where they migrate.
+> On Wed, Jul 24, 2019 at 05:39:22AM -0400, Michael S. Tsirkin wrote:
+> > On Wed, Jul 24, 2019 at 03:14:39PM +0800, Peter Xu wrote:  
+> > > On Tue, Jul 23, 2019 at 11:26:18AM -0600, Alex Williamson wrote:  
+> > > > > On 3/29/19 11:49 AM, Alex Williamson wrote:  
+> > > > > > [Cc +Brijesh]
+> > > > > > 
+> > > > > > Hi Brijesh, will the change below require the IVRS to be updated to
+> > > > > > include aliases for all BDF ranges behind a conventional bridge?  I
+> > > > > > think the Linux code handles this regardless of the firmware provided
+> > > > > > aliases, but is it required per spec for the ACPI tables to include
+> > > > > > bridge aliases?  Thanks,
+> > > > > >     
+> > > > > 
+> > > > > We do need to includes aliases in ACPI table. We need to populate the
+> > > > > IVHD type 0x43 and 0x4 for alias range start and end. I believe host
+> > > > > IVRS would contain similar information.
+> > > > > 
+> > > > > Suravee, please correct me if I am missing something?  
+> > > > 
+> > > > I finally found some time to investigate this a little further, yes the
+> > > > types mentioned are correct for defining start and end of an alias
+> > > > range.  The challenge here is that these entries require a DeviceID,
+> > > > which is defined as a BDF, AIUI.  The IVRS is created in QEMU, but bus
+> > > > numbers are defined by the guest firmware, and potentially redefined by
+> > > > the guest OS.  This makes it non-trivial to insert a few IVHDs into the
+> > > > IVRS to describe alias ranges.  I'm wondering if the solution here is
+> > > > to define a new linker-loader command that would instruct the guest to
+> > > > write a bus number byte to a given offset for a described device.
+> > > > These commands would be inserted before the checksum command, such that
+> > > > these bus number updates are calculated as part of the checksum.
+> > > > 
+> > > > I'm imagining the command format would need to be able to distinguish
+> > > > between the actual bus number of a described device, the secondary bus
+> > > > number of the device, and the subordinate bus number of the device.
+> > > > For describing the device, I'm envisioning stealing from the DMAR
+> > > > definition, which already includes a bus number invariant mechanism to
+> > > > describe a device, starting with a segment and root bus, follow a chain
+> > > > of devfns to get to the target device.  Therefore the guest firmware
+> > > > would follow the path to the described device, pick the desired bus
+> > > > number, and write it to the indicated table offset.
+> > > > 
+> > > > Does this seem like a reasonable approach?  Better ideas?  I'm not
+> > > > thrilled with the increased scope demanded by IVRS support, but so long
+> > > > as we have an AMD IOMMU model, I don't see how to avoid it.  Thanks,  
+> > > 
+> > > I don't have a better idea yet, but just want to say that accidentally
+> > > I was trying to look into this as well starting from this week and I'd
+> > > say that's mostly what I thought about too (I was still reading a bit
+> > > seabios when I saw this email)... so at least this idea makes sense to
+> > > me.
+> > > 
+> > > Would the guest OS still change the PCI bus number even after the
+> > > firmware (BIOS/UEFI)?  Could I ask in what case would that happen?
+> > > 
+> > > Thanks,  
+> > 
+> > Guest OSes can in theory rebalance resources. Changing bus numbers
+> > would be useful if new bridges are added by hotplug.
+> > In practice at least Linux doesn't do the rebalancing.
+> > I think that if we start reporting PNP OS support in BIOS then windows
+> > might start doing that more aggressively.  
+> 
+> It's surprising me a bit...  IMHO if we allow the bus number to change
+> then at least many scripts can even fail which might work before.
+> E.g. , a very common script can run "lspci-like" program to list each
+> device and then do "lspci-like -vvv" again upon the BDF it fetched
+> from previous commands.  Any kind of BDF caching would be invalid
+> since that from either userspace or kernel.
+> 
+> Also, obviously the data to be stored in IVRS is closely bound to how
+> bus number is defined.  Even if we can add a new linker-loader command
+> to all the open firmwares like seabios or OVMF but still we can't do
+> that to Windows (or, could we?...).
+> 
+> Now one step back, I'm also curious on the reason behind on why AMD
+> spec required the IVRS with BDF information, rather than the scope
+> information like what Intel DMAR spec was asking for.
 
-   b) Are there situations where you can't mmap but you can validly
-read it?  For example, running with an ELF built for 4k page alignment
-on a host with 64k host pages?
+It's a deficiency of the IVRS spec, but it's really out of scope here.
+It's not the responsibility of the hypervisor to resolve this sort of
+design issue, we should simply maintain the bare metal behavior and the
+bare metal limitations of the design.
 
-Dave
+Michael did invoke some interesting ideas regarding QEMU updating the
+IRVS table though.  QEMU does know when bus apertures are programmed on
+devices and the config writes for these updates could trigger IVRS
+updates.  I think we'd want to allow such updates only between machine
+reset and the guest firmware writing the table checksum.  This reduces
+the scope of the necessary changes, though still feels a little messy
+to have these config writes making table updates.
 
-> 
-> These are the results using a PVH kernel and initrd (cpio):
-> - memory footprint (using smem) [MB]
->         QEMU              before                   now
->     # instances        USS      PSS            USS      PSS
->          1           102.0M   105.8M         102.3M   106.2M
->          2            94.6M   101.2M          72.3M    90.1M
->          4            94.1M    98.0M          72.0M    81.5M
->          8            94.0M    96.2M          71.8M    76.9M
->         16            93.9M    95.1M          71.6M    74.3M
-> 
->     Initrd size: 3.0M
->     Kernel
->         image size: 28M
->         sections size [size -A -d vmlinux]:  18.9M
-> 
-> - boot time [ms]
->                           before                   now
->  qemu_init_end:           63.85                   55.91
->  linux_start_kernel:      82.11 (+18.26)          74.51 (+18.60)
->  linux_start_user:       169.94 (+87.83)         159.06 (+84.56)
-> 
-> QEMU command used:
-> ./qemu-system-x86_64 -bios /path/to/seabios/out/bios.bin -no-hpet \
->     -machine q35,accel=kvm,kernel_irqchip,nvdimm,sata=off,smbus=off,vmport=off \
->     -cpu host -m 1G -smp 1 -vga none -display none -no-user-config -nodefaults \
->     -kernel /path/to/vmlinux -initrd /path/to/rootfs.cpio \
->     -append 'root=/dev/mem0 ro console=hvc0 pci=lastbus=0 nosmap'
-> 
-> Stefano Garzarella (3):
->   loader: Handle memory-mapped ELFs
->   elf-ops.h: Map into memory the ELF to load
->   hw/i386/pc: Map into memory the initrd
-> 
->  hw/core/loader.c     | 38 +++++++++++++++++++-----
->  hw/i386/pc.c         | 17 ++++++++---
->  include/hw/elf_ops.h | 71 ++++++++++++++++++++++++++------------------
->  include/hw/i386/pc.h |  1 +
->  include/hw/loader.h  |  5 ++--
->  5 files changed, 89 insertions(+), 43 deletions(-)
-> 
-> -- 
-> 2.20.1
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Another approach, and maybe what Michael was really suggesting, is that
+we essentially create the ACPI tables twice AFAICT.  Once initially,
+then again via a select callback in fw_cfg.  For SeaBIOS, it looks like
+this second generation would be created after the PCI bus has been
+enumerated and initialized.  I've been trying to see if the same is
+likely for OVMF, though it's not clear to me that this is a reasonable
+ordering to rely on.  It would be entirely reasonable that firmware
+could process ACPI tables in advance of enumerating PCI, even
+potentially as a prerequisite to enumerating PCI.  So ultimately I'm not
+sure if there are valid ordering assumptions to use these callbacks
+this way, though I'd appreciate any further discussion.  Thanks,
+
+Alex
 
