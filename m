@@ -2,79 +2,59 @@ Return-Path: <SRS0=qU7A=VV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30123C76186
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 17:14:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5EE1C76186
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 17:14:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 04E5B21911
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 17:14:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 04E5B21911
+	by mail.kernel.org (Postfix) with ESMTPS id C120021911
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 17:14:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C120021911
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53632 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53634 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqKqG-0000aP-SP
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jul 2019 13:14:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39595)
+	id 1hqKqJ-0000ah-ET
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jul 2019 13:14:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49635)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jusual@redhat.com>) id 1hqKLi-0007l9-VT
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 12:42:43 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hqKp7-0004Mr-Sh
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 13:13:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jusual@redhat.com>) id 1hqKLh-0007q2-PA
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 12:42:42 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:35849)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <jusual@redhat.com>) id 1hqKLh-0007li-Ef
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 12:42:41 -0400
-Received: by mail-wm1-f68.google.com with SMTP id g67so38121953wme.1
- for <qemu-devel@nongnu.org>; Wed, 24 Jul 2019 09:42:40 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=0S/GMqkxurNcMey8NUQ5hocK9kUPEYZq+sEaJ1Z2Uu0=;
- b=speBJQDiyLX6VU0mxD/fF39DZY40Y38m15/DXKcMfsWzB8wL2rxhrt3Uhe9iMeCezW
- XkWbt/JvogxaLRxUn/yIVw1wKtSvBoABxTQndWI0Vdbt0dNfkAOoWvqw0bmB+P10vuJP
- yprEcxrc8Biny4njIVmmEp/Kr99Paax5IK+CmupmRxCYZaEfGvq9ChMRcpzlbLG+9/2x
- ps9J4NEllpjy4vhB2rRin4g9c5/yJDzkXjJJj2+0B+4Q7vbrUfSTlt5vEP8I8BsNonYL
- KKml8MH1FzbIYEgWDlSmkRwINZ7xSYScAoSOvHvSpVPN4IOkCdi9TKbj+nKKKFdGKxki
- kspQ==
-X-Gm-Message-State: APjAAAXXV4/HPdsw6l8pgF51oqDSL6Xd4rSjjCUG5eplhHVVxiryOcXQ
- /kNsUUNLseMDrmPk6dM8bmvgNA==
-X-Google-Smtp-Source: APXvYqxg+AGLnyAr8Fd7x6V8pLq91n//Ejif/4yEjyHPn2BNWa9ovl3trWwOW14a3wq9ytnValnuKQ==
-X-Received: by 2002:a7b:cd9a:: with SMTP id y26mr78787696wmj.44.1563986559813; 
- Wed, 24 Jul 2019 09:42:39 -0700 (PDT)
-Received: from localhost.localdomain (nat-pool-brq-t.redhat.com.
- [213.175.37.10])
- by smtp.gmail.com with ESMTPSA id y10sm39124643wmj.2.2019.07.24.09.42.38
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Wed, 24 Jul 2019 09:42:39 -0700 (PDT)
-To: Aarushi Mehta <mehta.aaru20@gmail.com>, qemu-devel@nongnu.org
-References: <20190719133530.28688-1-mehta.aaru20@gmail.com>
- <20190719133530.28688-12-mehta.aaru20@gmail.com>
-From: Julia Suvorova <jusual@redhat.com>
-Message-ID: <f74c5290-a913-95c7-8a37-eb68abc9eb8c@redhat.com>
-Date: Wed, 24 Jul 2019 18:42:38 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <mreitz@redhat.com>) id 1hqKp6-0005Up-N9
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 13:13:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54318)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1hqKp4-0005Hm-8i; Wed, 24 Jul 2019 13:13:02 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 994F9C03D478;
+ Wed, 24 Jul 2019 17:13:01 +0000 (UTC)
+Received: from localhost (ovpn-204-115.brq.redhat.com [10.40.204.115])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 13AD919C70;
+ Wed, 24 Jul 2019 17:13:00 +0000 (UTC)
+From: Max Reitz <mreitz@redhat.com>
+To: qemu-block@nongnu.org
+Date: Wed, 24 Jul 2019 19:12:34 +0200
+Message-Id: <20190724171239.8764-7-mreitz@redhat.com>
+In-Reply-To: <20190724171239.8764-1-mreitz@redhat.com>
+References: <20190724171239.8764-1-mreitz@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190719133530.28688-12-mehta.aaru20@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.31]); Wed, 24 Jul 2019 17:13:01 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.128.68
-X-Mailman-Approved-At: Wed, 24 Jul 2019 13:13:36 -0400
-Subject: Re: [Qemu-devel] [PATCH v6 11/14] qemu-io: adds option to use aio
- engine
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH v2 06/11] qcow2: Fix .bdrv_has_zero_init()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,26 +66,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- qemu-block@nongnu.org, Sergio Lopez <slp@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Maxim Levitsky <mlevitsk@redhat.com>,
- saket.sinha89@gmail.com, Max Reitz <mreitz@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Stefan Hajnoczi <stefan@redhat.com>, Julia Suvorova <jusual@mail.ru>
+Cc: Kevin Wolf <kwolf@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>,
+ qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/19/19 3:35 PM, Aarushi Mehta wrote:
-> @@ -489,7 +493,7 @@ static QemuOptsList file_opts = {
->   int main(int argc, char **argv)
->   {
->       int readonly = 0;
-> -    const char *sopt = "hVc:d:f:rsnCmkt:T:U";
-> +    const char *sopt = "hVc:d:f:rsnCmit:T:U";
+If a qcow2 file is preallocated, it can no longer guarantee that it
+initially appears as filled with zeroes.
 
-Add ':' after 'i' to pass an argument after -i option, as it currently
-works with a long variant.
+So implement .bdrv_has_zero_init() by checking whether the file is
+preallocated; if so, forward the call to the underlying storage node,
+except for when it is encrypted: Encrypted preallocated images always
+return effectively random data, so .bdrv_has_zero_init() must always
+return 0 for them.
 
-Best regards, Julia Suvorova.
+.bdrv_has_zero_init_truncate() can remain bdrv_has_zero_init_1(),
+because it presupposes PREALLOC_MODE_OFF.
+
+Reported-by: Stefano Garzarella <sgarzare@redhat.com>
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+---
+ block/qcow2.c | 29 ++++++++++++++++++++++++++++-
+ 1 file changed, 28 insertions(+), 1 deletion(-)
+
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 5c40f54d64..b4e73aa443 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -4631,6 +4631,33 @@ static ImageInfoSpecific *qcow2_get_specific_info(=
+BlockDriverState *bs,
+     return spec_info;
+ }
+=20
++static int qcow2_has_zero_init(BlockDriverState *bs)
++{
++    BDRVQcow2State *s =3D bs->opaque;
++    bool preallocated;
++
++    if (qemu_in_coroutine()) {
++        qemu_co_mutex_lock(&s->lock);
++    }
++    /*
++     * Check preallocation status: Preallocated images have all L2
++     * tables allocated, nonpreallocated images have none.  It is
++     * therefore enough to check the first one.
++     */
++    preallocated =3D s->l1_size > 0 && s->l1_table[0] !=3D 0;
++    if (qemu_in_coroutine()) {
++        qemu_co_mutex_unlock(&s->lock);
++    }
++
++    if (!preallocated) {
++        return 1;
++    } else if (bs->encrypted) {
++        return 0;
++    } else {
++        return bdrv_has_zero_init(s->data_file->bs);
++    }
++}
++
+ static int qcow2_save_vmstate(BlockDriverState *bs, QEMUIOVector *qiov,
+                               int64_t pos)
+ {
+@@ -5186,7 +5213,7 @@ BlockDriver bdrv_qcow2 =3D {
+     .bdrv_child_perm      =3D bdrv_format_default_perms,
+     .bdrv_co_create_opts  =3D qcow2_co_create_opts,
+     .bdrv_co_create       =3D qcow2_co_create,
+-    .bdrv_has_zero_init =3D bdrv_has_zero_init_1,
++    .bdrv_has_zero_init   =3D qcow2_has_zero_init,
+     .bdrv_has_zero_init_truncate =3D bdrv_has_zero_init_1,
+     .bdrv_co_block_status =3D qcow2_co_block_status,
+=20
+--=20
+2.21.0
+
 
