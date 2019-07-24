@@ -2,81 +2,91 @@ Return-Path: <SRS0=qU7A=VV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34523C7618B
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 11:45:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 318EEC76191
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 11:48:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 08E6522387
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 11:45:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08E6522387
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 02ABE22387
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 11:48:12 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="O9JCl8jk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02ABE22387
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50668 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50684 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqFhx-0000ei-9A
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jul 2019 07:45:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32968)
+	id 1hqFki-0001kl-5c
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jul 2019 07:48:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33829)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <pbonzini@redhat.com>) id 1hqFhl-0000BP-NZ
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 07:45:10 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hqFkW-0001K2-Dw
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 07:48:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1hqFhk-0005pT-Ns
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 07:45:09 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:45962)
+ (envelope-from <alex.bennee@linaro.org>) id 1hqFkV-0007N5-E6
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 07:48:00 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:37397)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hqFhk-0005pA-Gb
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 07:45:08 -0400
-Received: by mail-wr1-f65.google.com with SMTP id f9so46588655wre.12
- for <qemu-devel@nongnu.org>; Wed, 24 Jul 2019 04:45:08 -0700 (PDT)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1hqFkV-0007MP-5z
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 07:47:59 -0400
+Received: by mail-wm1-x344.google.com with SMTP id f17so41323246wme.2
+ for <qemu-devel@nongnu.org>; Wed, 24 Jul 2019 04:47:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=SeKvS4e35e36m2eWkzxcVA5Hxy3yWrVA7IZQtH7AaU0=;
+ b=O9JCl8jkgrY7pVXYdtO06VhBIpw5lsQIKLj+WBZ+cl037lQL4vfEZId0X7fIdQTOHI
+ U8wpxlMFNWv9pSdYTP8MiXzUEUqQ7haeoHYMAmmmOIPGCTaO3zJoelKP5B7LNPw2TWHk
+ DWezswPexEexGr+EDck+05NXw0vqNkYTxlzT3/Fmbhbe0KXmiKXZbQkVQ8/yye7CrA94
+ IdAVrIIAZyEY9uOnZhd6Vqf46wNBMTXh3kDOlrOtSxUXEsb4zt7tphkKAkL46H87oHVp
+ HJfeqy4r/X9WsH7dq5FMA6ah15cTcgRpl67XxM+UXKfYYQ8si3mY2YdBjZCxSQf6HbMZ
+ wUOA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=QSTAylvuTRUhhyqE4NEKUwenv/llqXrHd7y86+rsQbo=;
- b=jzmJdcvLUjoCYQDuFXsRF0JnKPQ9WGq1ZY/xXLuNtm2VHm/+lFmS3bhnGSPBSpbi8q
- ftzZRCtMNrXaLpHSa77p9q+WLVrt2GSdnlCbvTkbRfmsvvSzY1j7UkKwqDbhWAS6GlFP
- HRXjQ9tTXqV7I75qaNiqoux0CH1IJoy2KRYd/BDk+5vxmIBR5IeGrij6WfpHq6o5C6nR
- AZZN/Vikvyo4galR/R4LK+KnpNDT3BcFGasZ13QdDLFnJAe0i6vmjB7NnrRu/3lPDltO
- e1hY5eHgukNV+bLpNBGi+yyIcmSGxZTjWlJm5WRVvaTnskvHctDv5nYy6n4bBtD+JHte
- /wQw==
-X-Gm-Message-State: APjAAAWwD77GzCzumQ4sqOezkVPpACBSUWqmj6CPA4P4VXHTFBasAxLE
- O7x3zPgvhAcyN8BuNrWLx25keg==
-X-Google-Smtp-Source: APXvYqxlvzs4ZZBEWW50zoS3e/EjclIZYXOz6PoGiakoZwaaaDsX/pzlFHV0FDAfggqRtMsJ/DcT4Q==
-X-Received: by 2002:adf:df90:: with SMTP id z16mr40642708wrl.331.1563968707419; 
- Wed, 24 Jul 2019 04:45:07 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:10f7:67c8:abb4:8512?
- ([2001:b07:6468:f312:10f7:67c8:abb4:8512])
- by smtp.gmail.com with ESMTPSA id e7sm42840727wmd.0.2019.07.24.04.45.06
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Wed, 24 Jul 2019 04:45:06 -0700 (PDT)
-To: Thomas Huth <thuth@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
- <philmd@redhat.com>, qemu-devel@nongnu.org
-References: <156390240449.12764.14466682904037881386@c4a48874b076>
- <d4992f3d-489a-644e-093f-dfbff27bdda8@redhat.com>
- <25cbf95c-cf79-0cd8-497f-511a868d588a@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <59190d95-c7c4-a06c-252e-8676ea034c5a@redhat.com>
-Date: Wed, 24 Jul 2019 13:45:05 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=SeKvS4e35e36m2eWkzxcVA5Hxy3yWrVA7IZQtH7AaU0=;
+ b=Pgwn2zk1hA4eNCMIhzCbiBnCvBNv7IwrZiydCeygM5VsRBkKgB2p1stph4Wz4h7dSl
+ h51S+E6MMqkGTj8zh+Y7N6/3jUbdVwrAiKeYSKXHK/aCEXoed6ImkMhF1pr6KMjeVcH0
+ wcIrYkFNG7TZPtb2/mpcb00xzIJSj4Qd9m81gyvqo9tpaQwg44JDqxyUzGWCR7Je8qBw
+ jPpC4D33WRpJQUnOzp5fdoYHRfZvR6+VLlz+Ir76vwrAfV9tt0lvAX1P6lo2kohFfoj1
+ tRI+q6TpIsC5u2XXc8ppj2Zd3jPMFaLwO+LYT6jp/Ono45HXq1WcTqKvimj+XmqVkteH
+ 4E9A==
+X-Gm-Message-State: APjAAAWQnvhJD4ZUyZq79E0BAllqfnFy0JcQayxtS5O/NpJ3IdBgdQN7
+ V0VIXpJ9+u2FL4OCdRALGKgvnfGZnmQ=
+X-Google-Smtp-Source: APXvYqwqTe5ed8T67sM5xJkpTdDKV1OCFGacp51GB/VrYfVtWtWqle0goh9RArkyqdfWZsFBCzF+dg==
+X-Received: by 2002:a1c:4b0b:: with SMTP id y11mr47625976wma.25.1563968877413; 
+ Wed, 24 Jul 2019 04:47:57 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+ by smtp.gmail.com with ESMTPSA id h16sm46226815wrv.88.2019.07.24.04.47.56
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Wed, 24 Jul 2019 04:47:56 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 68C551FF87;
+ Wed, 24 Jul 2019 12:47:56 +0100 (BST)
+References: <20190719210326.15466-1-richard.henderson@linaro.org>
+ <20190719210326.15466-5-richard.henderson@linaro.org>
+User-agent: mu4e 1.3.3; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+In-reply-to: <20190719210326.15466-5-richard.henderson@linaro.org>
+Date: Wed, 24 Jul 2019 12:47:56 +0100
+Message-ID: <87d0hz1wnn.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <25cbf95c-cf79-0cd8-497f-511a868d588a@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.221.65
-Subject: Re: [Qemu-devel] [PATCH] tests/docker: Refresh APT cache before
- installing new packages on Debian
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::344
+Subject: Re: [Qemu-devel] [PATCH for-4.2 04/24] target/arm: Install ASIDs
+ for short-form from EL1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,23 +98,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, Laurent Vivier <lvivier@redhat.com>, alex.bennee@linaro.org,
- Xiao Guangrong <xiaoguangrong@tencent.com>
+Cc: peter.maydell@linaro.org, beata.michalska@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 24/07/19 13:25, Thomas Huth wrote:
-> Was the test running on a machine with heavy load? In that case, the
-> test thread just might have been suspended for too long...
-> We might need to set the "wiggle" parameter there to a higher value
-> (like 5 seconds maybe)?
-> Or maybe we should fence the check_time() related tests with "if
-> (g_test_slow())" to make sure that they are not run on CI systems anymore...
 
-There were 4 stuck FreeBSD test VMs on the patchew machine.  I've fixed
-that, and I will switch the tester to run in a systemd scope so that
-timeouts clean up all processes properly.
+Richard Henderson <richard.henderson@linaro.org> writes:
 
-Paolo
+> This is less complex than the LPAE case, but still we now avoid the
+> flush in case it is only the PROCID field that is changing.
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+> ---
+>  target/arm/helper.c | 34 ++++++++++++++++++++++++----------
+>  1 file changed, 24 insertions(+), 10 deletions(-)
+>
+> diff --git a/target/arm/helper.c b/target/arm/helper.c
+> index 0f21a077de..1ed7c06313 100644
+> --- a/target/arm/helper.c
+> +++ b/target/arm/helper.c
+> @@ -551,17 +551,31 @@ static void fcse_write(CPUARMState *env, const ARMC=
+PRegInfo *ri, uint64_t value)
+>  static void contextidr_write(CPUARMState *env, const ARMCPRegInfo *ri,
+>                               uint64_t value)
+>  {
+> -    ARMCPU *cpu =3D env_archcpu(env);
+> -
+> -    if (raw_read(env, ri) !=3D value && !arm_feature(env, ARM_FEATURE_PM=
+SA)
+> -        && !extended_addresses_enabled(env)) {
+> -        /* For VMSA (when not using the LPAE long descriptor page table
+> -         * format) this register includes the ASID, so do a TLB flush.
+> -         * For PMSA it is purely a process ID and no action is needed.
+> -         */
+> -        tlb_flush(CPU(cpu));
+> -    }
+>      raw_write(env, ri, value);
+> +
+> +    /*
+> +     * For VMSA (when not using the LPAE long descriptor page table form=
+at)
+> +     * this register includes the ASID.  For PMSA it is purely a process=
+ ID
+> +     * and no action is needed.
+> +     */
+> +    if (!arm_feature(env, ARM_FEATURE_PMSA) &&
+> +        !extended_addresses_enabled(env)) {
+> +        CPUState *cs =3D env_cpu(env);
+> +        int asid =3D extract32(value, 0, 8);
+> +        int idxmask;
+> +
+> +        switch (ri->secure) {
+> +        case ARM_CP_SECSTATE_S:
+> +            idxmask =3D ARMMMUIdxBit_S1SE1 | ARMMMUIdxBit_S1SE0;
+> +            break;
+> +        case ARM_CP_SECSTATE_NS:
+> +            idxmask =3D ARMMMUIdxBit_S12NSE1 | ARMMMUIdxBit_S12NSE0;
+> +            break;
+> +        default:
+> +            g_assert_not_reached();
+> +        }
+> +        tlb_set_asid_for_mmuidx(cs, asid, idxmask, 0);
+> +    }
+>  }
+>
+>  /* IS variants of TLB operations must affect all cores */
+
+
+--
+Alex Benn=C3=A9e
 
