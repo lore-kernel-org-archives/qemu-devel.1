@@ -2,79 +2,71 @@ Return-Path: <SRS0=qU7A=VV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 498CAC7618B
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 10:04:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73D5FC7618B
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 10:08:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1D034229ED
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 10:04:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D034229ED
+	by mail.kernel.org (Postfix) with ESMTPS id 49977218B8
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 10:08:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49977218B8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50210 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50232 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqE7z-0001gc-1H
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jul 2019 06:04:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56031)
+	id 1hqECb-0003J1-GP
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jul 2019 06:08:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57768)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <zhexu@redhat.com>) id 1hqE7o-0001Fr-58
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 06:03:57 -0400
+ (envelope-from <pagupta@redhat.com>) id 1hqECR-0002uW-5Q
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 06:08:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <zhexu@redhat.com>) id 1hqE7m-0008F9-TM
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 06:03:56 -0400
-Received: from mail-pl1-f194.google.com ([209.85.214.194]:42616)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <zhexu@redhat.com>) id 1hqE7m-0008Ea-ND
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 06:03:54 -0400
-Received: by mail-pl1-f194.google.com with SMTP id ay6so21838289plb.9
- for <qemu-devel@nongnu.org>; Wed, 24 Jul 2019 03:03:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:date:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=EyYz+DbsQQN3oAVpJpHuHdTuEQaEneK6+IhZDJIzA1A=;
- b=D9Ob6E70h2SK3ZLO5/GmzSWQzGBd/WavSxii5wX3K6qzokW+MonsiaUHEY6JEKZvH1
- khcpf4TrVMjOsK2e09W5cKOtv267APwNO+ay6J+8GfqGUe/tj7tjVyC/x5oBzLMAnna4
- jFE2euBHiXG/PsFX7IC7NI3N1kvNi5/j718fdg6x5WjoTGa+92p5TNWthwvlAjE9TFxM
- 6ZmdnzdmHP+KENfkaOTsGY+vFAMbyoswgNaTwjKTEk/wki0hdiIuizNFZExbQkSaRjey
- Wdr7ZDpRJZzbrRTOdP/1OM7/QhSOzWOFfdwFxLqxsp9Ii/cCBhBtT9abaaM9ndjOQqf1
- f74Q==
-X-Gm-Message-State: APjAAAWvfdjjlGaarC9eOcaBbMla2ylfiRyE/vsDl8QsIF/kdnrMFjki
- oqiKlAQM5k72c9bm6jSUu+EBuw==
-X-Google-Smtp-Source: APXvYqyrtUeWv4bTYCeCg1f/GbT2qC7FxdQ4dVVNaQBboZxKbBtxga3sV9fUHvDs4cj+xdArhiD+4w==
-X-Received: by 2002:a17:902:788f:: with SMTP id
- q15mr86538658pll.236.1563962633500; 
- Wed, 24 Jul 2019 03:03:53 -0700 (PDT)
-Received: from xz-x1 ([2409:8900:1d40:ee00:2db6:3c13:8375:7f91])
- by smtp.gmail.com with ESMTPSA id j128sm39606686pfg.28.2019.07.24.03.03.42
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Wed, 24 Jul 2019 03:03:52 -0700 (PDT)
-From: Peter Xu <zhexu@redhat.com>
-X-Google-Original-From: Peter Xu <peterx@redhat.com>
-Date: Wed, 24 Jul 2019 18:03:31 +0800
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190724100331.GA14454@xz-x1>
-References: <155364082689.15803.7062874513041742278.stgit@gimli.home>
- <20190329104904.450fefef@x1.home>
- <dbe614f5-47c8-b05d-dd73-2fbcd1579ae3@amd.com>
- <20190723112618.0efafa8d@x1.home> <20190724071439.GB18771@xz-x1>
- <20190724040837-mutt-send-email-mst@kernel.org>
+ (envelope-from <pagupta@redhat.com>) id 1hqECP-0003zI-Pa
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 06:08:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55344)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1hqECP-0003yu-HQ
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 06:08:41 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 927DD30C1341;
+ Wed, 24 Jul 2019 10:08:40 +0000 (UTC)
+Received: from colo-mx.corp.redhat.com
+ (colo-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.20])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8807B60BCE;
+ Wed, 24 Jul 2019 10:08:40 +0000 (UTC)
+Received: from zmail21.collab.prod.int.phx2.redhat.com
+ (zmail21.collab.prod.int.phx2.redhat.com [10.5.83.24])
+ by colo-mx.corp.redhat.com (Postfix) with ESMTP id 7D34A1800202;
+ Wed, 24 Jul 2019 10:08:40 +0000 (UTC)
+Date: Wed, 24 Jul 2019 06:08:40 -0400 (EDT)
+From: Pankaj Gupta <pagupta@redhat.com>
+To: Wei Yang <richardw.yang@linux.intel.com>
+Message-ID: <1511439706.4107561.1563962920125.JavaMail.zimbra@redhat.com>
+In-Reply-To: <20190724085308.GA12530@richard>
+References: <20190724070307.12568-1-richardw.yang@linux.intel.com>
+ <1382557614.4041474.1563953302894.JavaMail.zimbra@redhat.com>
+ <20190724085308.GA12530@richard>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190724040837-mutt-send-email-mst@kernel.org>
-User-Agent: Mutt/1.11.4 (2019-03-13)
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.67.116.104, 10.4.195.11]
+Thread-Topic: docs/nvdimm: add example on persistent backend setup
+Thread-Index: An15nxNlCe0YM9Zu30gqn2V2AXsrSw==
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.45]); Wed, 24 Jul 2019 10:08:40 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.214.194
-Subject: Re: [Qemu-devel] [RFC PATCH] pci: Use PCI aliases when determining
- device IOMMU address space
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH] docs/nvdimm: add example on persistent
+ backend setup
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,95 +78,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Singh, Brijesh" <brijesh.singh@amd.com>, "Suthikulpanit,
- Suravee" <Suravee.Suthikulpanit@amd.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Peter Xu <zhexu@redhat.com>,
- "eric.auger@redhat.com" <eric.auger@redhat.com>,
- Alex Williamson <alex.williamson@redhat.com>
+Cc: qemu-devel@nongnu.org, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>,
+ mst@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jul 24, 2019 at 05:39:22AM -0400, Michael S. Tsirkin wrote:
-> On Wed, Jul 24, 2019 at 03:14:39PM +0800, Peter Xu wrote:
-> > On Tue, Jul 23, 2019 at 11:26:18AM -0600, Alex Williamson wrote:
-> > > > On 3/29/19 11:49 AM, Alex Williamson wrote:
-> > > > > [Cc +Brijesh]
-> > > > > 
-> > > > > Hi Brijesh, will the change below require the IVRS to be updated to
-> > > > > include aliases for all BDF ranges behind a conventional bridge?  I
-> > > > > think the Linux code handles this regardless of the firmware provided
-> > > > > aliases, but is it required per spec for the ACPI tables to include
-> > > > > bridge aliases?  Thanks,
-> > > > >   
-> > > > 
-> > > > We do need to includes aliases in ACPI table. We need to populate the
-> > > > IVHD type 0x43 and 0x4 for alias range start and end. I believe host
-> > > > IVRS would contain similar information.
-> > > > 
-> > > > Suravee, please correct me if I am missing something?
-> > > 
-> > > I finally found some time to investigate this a little further, yes the
-> > > types mentioned are correct for defining start and end of an alias
-> > > range.  The challenge here is that these entries require a DeviceID,
-> > > which is defined as a BDF, AIUI.  The IVRS is created in QEMU, but bus
-> > > numbers are defined by the guest firmware, and potentially redefined by
-> > > the guest OS.  This makes it non-trivial to insert a few IVHDs into the
-> > > IVRS to describe alias ranges.  I'm wondering if the solution here is
-> > > to define a new linker-loader command that would instruct the guest to
-> > > write a bus number byte to a given offset for a described device.
-> > > These commands would be inserted before the checksum command, such that
-> > > these bus number updates are calculated as part of the checksum.
-> > > 
-> > > I'm imagining the command format would need to be able to distinguish
-> > > between the actual bus number of a described device, the secondary bus
-> > > number of the device, and the subordinate bus number of the device.
-> > > For describing the device, I'm envisioning stealing from the DMAR
-> > > definition, which already includes a bus number invariant mechanism to
-> > > describe a device, starting with a segment and root bus, follow a chain
-> > > of devfns to get to the target device.  Therefore the guest firmware
-> > > would follow the path to the described device, pick the desired bus
-> > > number, and write it to the indicated table offset.
-> > > 
-> > > Does this seem like a reasonable approach?  Better ideas?  I'm not
-> > > thrilled with the increased scope demanded by IVRS support, but so long
-> > > as we have an AMD IOMMU model, I don't see how to avoid it.  Thanks,
-> > 
-> > I don't have a better idea yet, but just want to say that accidentally
-> > I was trying to look into this as well starting from this week and I'd
-> > say that's mostly what I thought about too (I was still reading a bit
-> > seabios when I saw this email)... so at least this idea makes sense to
-> > me.
-> > 
-> > Would the guest OS still change the PCI bus number even after the
-> > firmware (BIOS/UEFI)?  Could I ask in what case would that happen?
-> > 
-> > Thanks,
+
+> >
+> >> 
+> >> Persistent backend setup requires some knowledge about nvdimm and ndctl
+> >> tool. Some users report they may struggle to gather these knowledge and
+> >> have difficulty to setup it properly.
+> >> 
+> >> Here we provide two examples for persistent backend and gives the link
+> >> to ndctl. By doing so, user could try it directly and do more
+> >> investigation on persistent backend setup with ndctl.
+> >> 
+> >> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+> >> ---
+> >>  docs/nvdimm.txt | 28 ++++++++++++++++++++++++++++
+> >>  1 file changed, 28 insertions(+)
+> >> 
+> >> diff --git a/docs/nvdimm.txt b/docs/nvdimm.txt
+> >> index b531cacd35..baba7a940d 100644
+> >> --- a/docs/nvdimm.txt
+> >> +++ b/docs/nvdimm.txt
+> >> @@ -171,6 +171,32 @@ guest software that this vNVDIMM device contains a
+> >> region that cannot
+> >>  accept persistent writes. In result, for example, the guest Linux
+> >>  NVDIMM driver, marks such vNVDIMM device as read-only.
+> >>  
+> >> +Backend File Setup Example
+> >> +..........................
+> >> +
+> >> +Here is two examples for how to setup these persistent backend on
+> >> +linux, which leverages the tool ndctl [3].
+> >> +
+> >> +It is easy to setup DAX device backend file.
+> >> +
+> >> +A. DAX device
+> >> +
+> >> +    ndctl create-namespace -f -e namespace0.0 -m devdax
+> >> +
+> >> +The /dev/dax0.0 could be used directly in "mem-path" option.
+> >> +
+> >> +For DAX file, it is more than creating the proper namespace. The
+> >> +block device should be partitioned and mounted (with dax option).
+> >> +
+> >> +B. DAX file
+> >> +
+> >> +    ndctl create-namespace -f -e namespace0.0 -m fsdax
+> >> +    (partition /dev/pmem0 with name pmem0p1)
+> >> +    mount -o dax /dev/pmem0p1 /mnt
+> >> +    (dd a file with proper size in /mnt)
+> >
 > 
-> Guest OSes can in theory rebalance resources. Changing bus numbers
-> would be useful if new bridges are added by hotplug.
-> In practice at least Linux doesn't do the rebalancing.
-> I think that if we start reporting PNP OS support in BIOS then windows
-> might start doing that more aggressively.
+> Hi, Pankaj
+> 
+> Thanks for your comment.
+> 
+> >This namespace is for filesystem DAX? What if user wants to create namespace
+> >for
+> >device DAX to be used as persistent backend?
+> >
+> 
+> User could choose the type (devdax/fsdax) in ndctl command line with -m
+> option.
 
-It's surprising me a bit...  IMHO if we allow the bus number to change
-then at least many scripts can even fail which might work before.
-E.g. , a very common script can run "lspci-like" program to list each
-device and then do "lspci-like -vvv" again upon the BDF it fetched
-from previous commands.  Any kind of BDF caching would be invalid
-since that from either userspace or kernel.
+yes.
 
-Also, obviously the data to be stored in IVRS is closely bound to how
-bus number is defined.  Even if we can add a new linker-loader command
-to all the open firmwares like seabios or OVMF but still we can't do
-that to Windows (or, could we?...).
+> 
+> >Does this makes sense to mention about by default namespace created on
+> >persistent
+> >backend?
+> >
+> 
+> I don't get your point. Here is an example to let user know how to create
+> persistent backend. In case they want to get more control about the backend,
+> they can refer to the ndctl link.
 
-Now one step back, I'm also curious on the reason behind on why AMD
-spec required the IVRS with BDF information, rather than the scope
-information like what Intel DMAR spec was asking for.
+I agree this is helpful for users. 
+
+> 
+> You mean it is not proper to mention the backend setup example in the
+> document? We found many users come to us for how to setup it, so we decide to
+> add this section.
+
+Sorry! For some reason I ignored devicedax namespace information in patch.
+The patch looks good to me and I agree its helpful for the users.
+   
 
 Thanks,
+Pankaj
 
--- 
-Peter Xu
+> 
+> Do you have other option?
+> 
+> >Thanks,
+> >Pankaj
+> >
+> >> +
+> >> +Then the new file in /mnt could be used in "mem-path" option.
+> >> +
+> >>  NVDIMM Persistence
+> >>  ------------------
+> >>  
+> >> @@ -212,3 +238,5 @@ References
+> >>      https://www.snia.org/sites/default/files/technical_work/final/NVMProgrammingModel_v1.2.pdf
+> >>  [2] Persistent Memory Development Kit (PMDK), formerly known as NVML
+> >>  project, home page:
+> >>      http://pmem.io/pmdk/
+> >> +[3] ndctl-create-namespace - provision or reconfigure a namespace
+> >> +    http://pmem.io/ndctl/ndctl-create-namespace.html
+> >> --
+> >> 2.17.1
+> >> 
+> >> 
+> >> 
+> 
+> --
+> Wei Yang
+> Help you, Help me
+> 
+> 
 
