@@ -2,93 +2,58 @@ Return-Path: <SRS0=qU7A=VV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83C30C7618F
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 08:28:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 660F1C7618B
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 08:42:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 50B2B229ED
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 08:28:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 50B2B229ED
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 374BE227BF
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 08:42:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 374BE227BF
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49666 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49706 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqCdl-0006Lx-Mk
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jul 2019 04:28:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58117)
+	id 1hqCrC-0000Ow-Ae
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jul 2019 04:42:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33386)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <sbhat@linux.ibm.com>) id 1hqCda-0005xB-J2
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 04:28:39 -0400
+ (envelope-from <f.gruenbichler@proxmox.com>) id 1hqCr2-0008Q6-46
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 04:42:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <sbhat@linux.ibm.com>) id 1hqCdZ-0007Na-2q
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 04:28:38 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:14214
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <sbhat@linux.ibm.com>) id 1hqCdY-0007MO-Kq
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 04:28:36 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x6O8SAuZ063449
- for <qemu-devel@nongnu.org>; Wed, 24 Jul 2019 04:28:34 -0400
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2txhgqpet9-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Wed, 24 Jul 2019 04:28:34 -0400
-Received: from localhost
- by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <sbhat@linux.ibm.com>;
- Wed, 24 Jul 2019 09:28:32 +0100
-Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
- by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Wed, 24 Jul 2019 09:28:30 +0100
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
- [9.149.105.58])
- by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
- id x6O8SThX37421558
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 24 Jul 2019 08:28:29 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 7B9824C044;
- Wed, 24 Jul 2019 08:28:29 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id EB51F4C04E;
- Wed, 24 Jul 2019 08:28:28 +0000 (GMT)
-Received: from lep8c.aus.stglabs.ibm.com (unknown [9.40.192.207])
- by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Wed, 24 Jul 2019 08:28:28 +0000 (GMT)
-From: Shivaprasad G Bhat <sbhat@linux.ibm.com>
-To: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
-Date: Wed, 24 Jul 2019 03:28:28 -0500
-User-Agent: StGit/0.17.1-dirty
+ (envelope-from <f.gruenbichler@proxmox.com>) id 1hqCr0-0000mt-Bf
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 04:42:32 -0400
+Received: from proxmox-new.maurer-it.com ([212.186.127.180]:3353)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <f.gruenbichler@proxmox.com>)
+ id 1hqCqw-0000eJ-Dg; Wed, 24 Jul 2019 04:42:26 -0400
+Received: from proxmox-new.maurer-it.com (localhost.localdomain [127.0.0.1])
+ by proxmox-new.maurer-it.com (Proxmox) with ESMTP id 60D54432D1;
+ Wed, 24 Jul 2019 10:42:15 +0200 (CEST)
+Date: Wed, 24 Jul 2019 10:41:27 +0200
+From: Fabian =?utf-8?Q?Gr=C3=BCnbichler?= <f.gruenbichler@proxmox.com>
+To: John Snow <jsnow@redhat.com>
+Message-ID: <20190724084127.7otnx3bwiyljk6mv@nora.maurer-it.com>
+References: <20190709232550.10724-1-jsnow@redhat.com>
+ <20190722121755.xpx2qni53e6pha7t@nora.maurer-it.com>
+ <a88974cc-29dc-3e4d-12b4-b2ce2734612b@redhat.com>
+ <20190723094702.glmdyjm6rgelcwte@nora.maurer-it.com>
+ <787d6506-d4bb-0904-5e58-521d6fc8313a@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19072408-0012-0000-0000-00000335A926
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19072408-0013-0000-0000-0000216F3C25
-Message-Id: <156395684219.48058.9459603098282979575.stgit@lep8c.aus.stglabs.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
- definitions=2019-07-24_03:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1906280000 definitions=main-1907240095
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
-Subject: [Qemu-devel] [PATCH v5] ppc: remove the idle_timer logic
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <787d6506-d4bb-0904-5e58-521d6fc8313a@redhat.com>
+User-Agent: NeoMutt/20180716
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 212.186.127.180
+Subject: Re: [Qemu-devel] [PATCH v4 00/18] bitmaps: introduce 'bitmap' sync
+ mode
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,149 +65,261 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ vsementsov@virtuozzo.com, qemu-block@nongnu.org,
+ Juan Quintela <quintela@redhat.com>, Wen Congyang <wencongyang2@huawei.com>,
+ Xie Changlong <xiechanglong.d@gmail.com>, qemu-devel@nongnu.org,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The KVM_CAP_PPC_IRQ_LEVEL is part of the kernel now since 2.6.37.
-Drop the redundant logic which is not excercised on new the kernels anymore.
+On Tue, Jul 23, 2019 at 12:58:10PM -0400, John Snow wrote:
+>=20
+>=20
+> On 7/23/19 5:47 AM, Fabian Gr=FCnbichler wrote:
+> > On Mon, Jul 22, 2019 at 01:21:02PM -0400, John Snow wrote:
+> >>
+> >>
+> >> On 7/22/19 8:17 AM, Fabian Gr=FCnbichler wrote:
+> >>> On Tue, Jul 09, 2019 at 07:25:32PM -0400, John Snow wrote:
+> >>>> This series adds a new "BITMAP" sync mode that is meant to replace=
+ the
+> >>>> existing "INCREMENTAL" sync mode.
+> >>>>
+> >>>> This mode can have its behavior modified by issuing any of three b=
+itmap sync
+> >>>> modes, passed as arguments to the job.
+> >>>>
+> >>>> The three bitmap sync modes are:
+> >>>> - ON-SUCCESS: This is an alias for the old incremental mode. The b=
+itmap is
+> >>>>               conditionally synchronized based on the return code =
+of the job
+> >>>>               upon completion.
+> >>>> - NEVER: This is, effectively, the differential backup mode. It ne=
+ver clears
+> >>>>          the bitmap, as the name suggests.
+> >>>> - ALWAYS: Here is the new, exciting thing. The bitmap is always sy=
+nchronized,
+> >>>>           even on failure. On success, this is identical to increm=
+ental, but
+> >>>>           on failure it clears only the bits that were copied succ=
+essfully.
+> >>>>           This can be used to "resume" incremental backups from la=
+ter points
+> >>>>           in times.
+> >>>>
+> >>>> I wrote this series by accident on my way to implement incremental=
+ mode
+> >>>> for mirror, but this happened first -- the problem is that Mirror =
+mode
+> >>>> uses its existing modes in a very particular way; and this was the=
+ best
+> >>>> way to add bitmap support into the mirror job properly.
+> >>>>
+> >>>> [...]
+> >>>>
+> >>>> Future work:
+> >>>> [..]
+> >>>>  - Add these modes to Mirror. (Done*, but needs tests.)
+> >>>
+> >>> are these mirror patches available somehwere for testing in combina=
+tion
+> >>> with this series? your bitmaps branch does not seem to contain them=
+ ;)
+> >>>
+> >>> we've been experimenting with Ma Haocong's patch (v4 from February)=
+ to add
+> >>> "incremental"/differential sync to drive-mirror recently with posit=
+ive
+> >>> results so far, and this sounds like it is another attempt at getti=
+ng
+> >>> this properly integrated into Qemu.
+> >>>
+> >>
+> >> Not available quite yet; I added it in fairly hastily but haven't do=
+ne
+> >> the testing I want to do yet, so I wouldn't feel comfortable sharing=
+ it
+> >> before I do my own due diligence on it. Give me a chance to polish i=
+t so
+> >> that the testing effort isn't wasted :)
+> >=20
+> > fair enough, and no hurries :)
+> >=20
+> >>
+> >> Can you share some of your use-cases for how you are using the
+> >> "incremental mirror" so far? It might be useful for the patch
+> >> justification if I can point to production use cases. (And good for
+> >> allocating time, too.)
+> >=20
+> > it's basically the same use case that the original "incremental mirro=
+r"
+> > patch (series)[1] from two years ago had (no affiliation with the aut=
+hor
+> > though) - we have a guest disk replication feature for ZFS/zvols in a
+> > clustered hypervisor setting, and would like to re-use the already
+> > replicated disk state when live-migrating a VM. Qemu does not know
+> > anything about the replication, since it happens on the storage layer
+> > with zfs send/zfs receive. note that for VMs, we use zvols which are
+> > block devices backed by ZFS (or rather, ZFS datasets exposed as block
+> > devices), minus the file system part of regular ZFS datasets. from
+> > Qemu's PoV these (replicated) disks are just regular block devices (a=
+nd not
+> > image-backed disks on a filesystem, or accessed via some special
+> > BlockDriver like Ceph's RBD images).
+> >=20
+> > we currently support live migration
+> > 1) with disks on shared/distributed storage (easy enough)
+> > 2) with regular (non-replicated, local) disks (via nbd/drive-mirror)
+> > 3) with unused disks on the storage level (disks are not known to Qem=
+u/the VM)
+> >=20
+> > 1-3 can be mixed and matched arbitrarily in one guest, e.g. with one
+> > disk on a shared Ceph cluster, one disk that is not in use on an NFS
+> > share, and another disk on a local LVM-thin pool. 2) and 3) also allo=
+w
+> > switching the underlying storage on the fly, since they transfer the
+> > full disk (content) anyway.
+> >=20
+> > we also support offline migration with shared, local, unused and/or
+> > replicated disks (all on the storage level with no involvement of Qem=
+u).
+> >=20
+> > as you can see there is a gap in the live-migration feature matrix: w=
+hen
+> > replication is used, you either have to poweroff the VM to re-use the
+> > replication state (storage-only migration), or drop the replication
+> > state and do a full local-disk live-migration before re-creating the
+> > replication state from scratch (which is bad, since replication can h=
+ave
+> > multiple target hosts, and re-establishing the whole disk can take a
+> > while if its big).
+> >=20
+> > our basic approach is (currently) the following:
+> >=20
+> > 1) get disk info
+> > 2) Qemu: add dirty bitmaps for currently used, replicated disks
+> > 3) storage/ZFS: do a regular replication of all replicated disks (use=
+d AND unused)
+>=20
+> I take it that the ZFS replication is not an ongoing process but
+> something that terminates, so you need QEMU to pick up the difference
+> that occurred during that time?
 
-Signed-off-by: Shivaprasad G Bhat <sbhat@linux.ibm.com>
----
- v4: https://lists.gnu.org/archive/html/qemu-devel/2019-07/msg04456.html
- Changes from v4:
-   - it was discussed to drop the idle_timer logic instead of fixing the
-     leak and keeping the redundant logic around. So, the patch does that.
+yes exactly. the ZFS replication creates a new snapshot, and transfers
+all intermediate deltas since the last successfully replicated snapshot.
 
- target/ppc/kvm.c |   74 +-----------------------------------------------------
- 1 file changed, 2 insertions(+), 72 deletions(-)
+>=20
+> (Which I imagine the bitmap will pick up some writes that DO get
+> replicated, but copying some extra is safe.)
 
-diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index 8a06d3171e..1c8f2319a0 100644
---- a/target/ppc/kvm.c
-+++ b/target/ppc/kvm.c
-@@ -56,7 +56,6 @@ const KVMCapabilityInfo kvm_arch_required_capabilities[] = {
- };
- 
- static int cap_interrupt_unset;
--static int cap_interrupt_level;
- static int cap_segstate;
- static int cap_booke_sregs;
- static int cap_ppc_smt;
-@@ -87,25 +86,6 @@ static int cap_large_decr;
- 
- static uint32_t debug_inst_opcode;
- 
--/*
-- * XXX We have a race condition where we actually have a level triggered
-- *     interrupt, but the infrastructure can't expose that yet, so the guest
-- *     takes but ignores it, goes to sleep and never gets notified that there's
-- *     still an interrupt pending.
-- *
-- *     As a quick workaround, let's just wake up again 20 ms after we injected
-- *     an interrupt. That way we can assure that we're always reinjecting
-- *     interrupts in case the guest swallowed them.
-- */
--static QEMUTimer *idle_timer;
--
--static void kvm_kick_cpu(void *opaque)
--{
--    PowerPCCPU *cpu = opaque;
--
--    qemu_cpu_kick(CPU(cpu));
--}
--
- /*
-  * Check whether we are running with KVM-PR (instead of KVM-HV).  This
-  * should only be used for fallback tests - generally we should use
-@@ -125,7 +105,6 @@ static int kvmppc_get_dec_bits(void);
- int kvm_arch_init(MachineState *ms, KVMState *s)
- {
-     cap_interrupt_unset = kvm_check_extension(s, KVM_CAP_PPC_UNSET_IRQ);
--    cap_interrupt_level = kvm_check_extension(s, KVM_CAP_PPC_IRQ_LEVEL);
-     cap_segstate = kvm_check_extension(s, KVM_CAP_PPC_SEGSTATE);
-     cap_booke_sregs = kvm_check_extension(s, KVM_CAP_PPC_BOOKE_SREGS);
-     cap_ppc_smt_possible = kvm_vm_check_extension(s, KVM_CAP_PPC_SMT_POSSIBLE);
-@@ -161,11 +140,6 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
-      */
-     cap_ppc_pvr_compat = false;
- 
--    if (!cap_interrupt_level) {
--        fprintf(stderr, "KVM: Couldn't find level irq capability. Expect the "
--                        "VM to stall at times!\n");
--    }
--
-     kvm_ppc_register_host_cpu_type(ms);
- 
-     return 0;
-@@ -491,8 +465,6 @@ int kvm_arch_init_vcpu(CPUState *cs)
-         return ret;
-     }
- 
--    idle_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, kvm_kick_cpu, cpu);
--
-     switch (cenv->mmu_model) {
-     case POWERPC_MMU_BOOKE206:
-         /* This target supports access to KVM's guest TLB */
-@@ -1332,7 +1304,7 @@ int kvmppc_set_interrupt(PowerPCCPU *cpu, int irq, int level)
-         return 0;
-     }
- 
--    if (!kvm_enabled() || !cap_interrupt_unset || !cap_interrupt_level) {
-+    if (!kvm_enabled() || !cap_interrupt_unset) {
-         return 0;
-     }
- 
-@@ -1349,49 +1321,7 @@ int kvmppc_set_interrupt(PowerPCCPU *cpu, int irq, int level)
- 
- void kvm_arch_pre_run(CPUState *cs, struct kvm_run *run)
- {
--    PowerPCCPU *cpu = POWERPC_CPU(cs);
--    CPUPPCState *env = &cpu->env;
--    int r;
--    unsigned irq;
--
--    qemu_mutex_lock_iothread();
--
--    /*
--     * PowerPC QEMU tracks the various core input pins (interrupt,
--     * critical interrupt, reset, etc) in PPC-specific
--     * env->irq_input_state.
--     */
--    if (!cap_interrupt_level &&
--        run->ready_for_interrupt_injection &&
--        (cs->interrupt_request & CPU_INTERRUPT_HARD) &&
--        (env->irq_input_state & (1 << PPC_INPUT_INT)))
--    {
--        /*
--         * For now KVM disregards the 'irq' argument. However, in the
--         * future KVM could cache it in-kernel to avoid a heavyweight
--         * exit when reading the UIC.
--         */
--        irq = KVM_INTERRUPT_SET;
--
--        trace_kvm_injected_interrupt(irq);
--        r = kvm_vcpu_ioctl(cs, KVM_INTERRUPT, &irq);
--        if (r < 0) {
--            printf("cpu %d fail inject %x\n", cs->cpu_index, irq);
--        }
--
--        /* Always wake up soon in case the interrupt was level based */
--        timer_mod(idle_timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
--                       (NANOSECONDS_PER_SECOND / 50));
--    }
--
--    /*
--     * We don't know if there are more interrupts pending after
--     * this. However, the guest will return to userspace in the course
--     * of handling this one anyways, so we will get a chance to
--     * deliver the rest.
--     */
--
--    qemu_mutex_unlock_iothread();
-+    return;
- }
- 
- MemTxAttrs kvm_arch_post_run(CPUState *cs, struct kvm_run *run)
+yep, see the note regarding this in my last mail ;)
+
+>=20
+> > 4) storage: do a regular storage migration of all regular unused loca=
+l disks
+> > 5a) Qemu: do a regular drive-mirror of all currently used, local disk=
+s
+> > 5b) Qemu: do an incremental drive-mirror for all currently used, repl=
+icated disks
+>=20
+> To mirror anything written since the replication started, based on this
+> timeline.
+
+yes. or rather, to mirror anything written since shortly before the
+replication started, which means to mirror anything written since the
+(now) last replication snapshot, plus some extra writes that happened
+right before and are included in that snapshot.
+
+>=20
+> > 6) Qemu: wait for convergence of drive-mirror jobs
+> > 7) Qemu: do a regular live-migration of VM
+> > 8) Qemu: once converged and VM is suspended, complete drive-mirror jo=
+bs
+> > 9) Qemu: resume now fully migrated VM on target node
+> > 10) Qemu/storage: clean up on source node
+> >=20
+> > 5b) with bitmaps from 2) is what is currently missing on the Qemu sid=
+e,
+> > but seems easy enough to support (like I said, we are currently using=
+ Ma
+> > Haocong's patch for testing, but want to get this feature upstream on=
+e
+> > way or another instead of carrying our own, possibly incompatible in =
+the
+> > near-future version).
+> >=20
+>=20
+> It will look VERY similar. Switching should be easy; the only differenc=
+e
+> will be:
+>=20
+> sync=3DBITMAP instead of sync=3DINCREMENTAL, and
+> bitmap_mode=3DNEVER provided explicitly to match Ma Haocong's patch beh=
+avior.
+>=20
+> You can alternatively use the other bitmap policies depending on what
+> you want:
+>=20
+> NEVER leaves the bitmap alone entirely like Ma Haocong's patch does. It
+> reflects a kind of "differential backup" intent; changes accumulate in
+> the bitmap if it was enabled.
+>=20
+> ON-SUCCESS will reset any bits copied out if the job completes
+> successfully (note that this includes mirror cancellation after sync as
+> well as a COMPLETE instruction that includes the pivot.)
+>=20
+> ALWAYS will reset any bits successfully copied out, regardless of the
+> final state of the job. You can use this one to resume the mirror on
+> failures.
+>=20
+> You should be able to get the exact behavior you've already programmed
+> for, and maybe some new toys.
+
+that sounds promising. for this specific use case we don't care what
+happens to the bitmap, since on success we switch to the migration
+target VM and stop the old/source one (and thus the bitmap), and on
+failure we abort the migration (and thus drop the bitmap) and a new
+attempt will start with a new bitmap+replication run.
+
+it might be interesting for other use cases though.
+
+>=20
+> > 2) and 3) are obviously not atomic, so the bitmaps will contain some
+> > writes that have been replicated already on the block/storage layer
+> > below the VM, and those writes will be done a second time in step 5b)=
+.
+> >=20
+> > we can work around this by adding another short down time by
+> > freezing/suspending prior to 2) until after doing the ZFS snapshots a=
+t
+> > the start of 3), in case these duplicate writes turn out to be
+> > problematic after all. this downtime would be rather short, as the bu=
+lk
+> > of the replication work (actually transfering the latest delta) can
+> > happen after unfreezing/resuming the VM. so far we haven't encountere=
+d
+> > any problems in our (albeit limited) testing though, so if possible w=
+e
+> > would naturally like to avoid the additional downtime altogether ;)
+> >=20
+> > looking forward to your patch(es) :)
+> >=20
+> > 1: <CAKVPjOZ8Y8U2zHgo_06aozrdd9_Cq6txWrX5F4HnFefAUjimyQ@mail.gmail.co=
+m>
+> > and <20170504105444.8940-1-daniel.kucera@gmail.com>
+> >=20
+>=20
+> Thanks for the writeup! My goal is to have this in for 4.2 alongside al=
+l
+> of the other bitmap changes I've queued so far.
+
+that sounds great! feel free to CC me on subsequent series if you want
+early testing ;) I do try to keep up with -devel anyways, but sometimes
+stuff slips through.
 
 
