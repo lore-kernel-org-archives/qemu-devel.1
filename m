@@ -2,60 +2,66 @@ Return-Path: <SRS0=qU7A=VV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2593FC7618B
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 13:50:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D49DC7618B
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 13:53:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F0351214C6
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 13:50:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F0351214C6
+	by mail.kernel.org (Postfix) with ESMTPS id 6FFE521926
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 13:53:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6FFE521926
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51864 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51878 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqHfH-00021M-5Q
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jul 2019 09:50:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47050)
+	id 1hqHhb-0003tU-OH
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jul 2019 09:53:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47866)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <ehabkost@redhat.com>) id 1hqHf2-0001Np-Sr
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 09:50:29 -0400
+ (envelope-from <drjones@redhat.com>) id 1hqHhQ-0003Pe-JU
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 09:52:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1hqHf1-0004bu-Rx
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 09:50:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38390)
+ (envelope-from <drjones@redhat.com>) id 1hqHhP-00064H-4T
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 09:52:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35226)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>)
- id 1hqHew-0004Yk-ER; Wed, 24 Jul 2019 09:50:22 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ (Exim 4.71) (envelope-from <drjones@redhat.com>)
+ id 1hqHhH-0005ro-3D; Wed, 24 Jul 2019 09:52:48 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 987AA81DEB;
- Wed, 24 Jul 2019 13:50:20 +0000 (UTC)
-Received: from localhost (ovpn-116-19.gru2.redhat.com [10.97.116.19])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 91B7B5D9DE;
- Wed, 24 Jul 2019 13:50:19 +0000 (UTC)
-Date: Wed, 24 Jul 2019 10:50:17 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190724135017.GK11469@habkost.net>
-References: <20190724103524.20916-1-cohuck@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id B66C44E93D;
+ Wed, 24 Jul 2019 13:52:44 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id EFAE35D71C;
+ Wed, 24 Jul 2019 13:52:39 +0000 (UTC)
+Date: Wed, 24 Jul 2019 15:52:37 +0200
+From: Andrew Jones <drjones@redhat.com>
+To: Auger Eric <eric.auger@redhat.com>
+Message-ID: <20190724135237.z5ufzxutnkpvt6vg@kamzik.brq.redhat.com>
+References: <20190621163422.6127-1-drjones@redhat.com>
+ <20190621163422.6127-2-drjones@redhat.com>
+ <1ed69063-eaae-2c02-1fe1-2650492496d4@redhat.com>
+ <20190625133452.3f4ik4xn7vh5zi2b@kamzik.brq.redhat.com>
+ <8dea18ae-39ed-6f7d-0e91-61abd22eb74e@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190724103524.20916-1-cohuck@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <8dea18ae-39ed-6f7d-0e91-61abd22eb74e@redhat.com>
+User-Agent: NeoMutt/20180716
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.25]); Wed, 24 Jul 2019 13:50:21 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.38]); Wed, 24 Jul 2019 13:52:44 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH for-4.2] hw: add compat machines for 4.2
+Subject: Re: [Qemu-devel] [PATCH v2 01/14] target/arm/cpu64: Ensure kvm
+ really supports aarch64=off
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,33 +73,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- "Michael S . Tsirkin" <mst@redhat.com>, David Hildenbrand <david@redhat.com>,
- qemu-devel@nongnu.org, Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>,
- Richard Henderson <rth@twiddle.net>
+Cc: peter.maydell@linaro.org, richard.henderson@linaro.org,
+ qemu-devel@nongnu.org, armbru@redhat.com, qemu-arm@nongnu.org,
+ imammedo@redhat.com, alex.bennee@linaro.org, Dave.Martin@arm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jul 24, 2019 at 12:35:24PM +0200, Cornelia Huck wrote:
-> Add 4.2 machine types for arm/i440fx/q35/s390x/spapr.
+On Wed, Jul 24, 2019 at 02:51:15PM +0200, Auger Eric wrote:
+> Hi Drew,
 > 
-> For i440fx and q35, unversioned cpu models are still translated
-> to -v1, as 0788a56bd1ae ("i386: Make unversioned CPU models be
-> aliases") states this should only transition to the latest cpu
-> model version in 4.3 (or later).
-> 
-> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> On 6/25/19 3:34 PM, Andrew Jones wrote:
+> > On Tue, Jun 25, 2019 at 11:35:12AM +0200, Auger Eric wrote:
+> >> Hi Drew,
+> >>
+> >> On 6/21/19 6:34 PM, Andrew Jones wrote:
+> >>> If -cpu <cpu>,aarch64=off is used then KVM must also be used, and it
+> >>> and the host must support running the vcpu in 32-bit mode. Also, if
+> s/and it//
 
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+"and it and the host" means "and KVM and the host", as 'it' refers to the
+last subject, which is KVM. I wanted to point out both the host (machine)
+and KVM (version of kernel with KVM) need to support the feature.
 
-I plan to queue it for 4.2, but I think it's OK to queue this in
-parallel through other trees if necessary (so patches that depend
-on the new machine types can be queued too).
+> >>> -cpu <cpu>,aarch64=on is used, then it doesn't matter if kvm is
+> >>> enabled or not.
+> >>>
+> >>> Signed-off-by: Andrew Jones <drjones@redhat.com>
+> >>
+> >>
+> >>> ---
+> >>>  target/arm/cpu64.c   | 12 ++++++------
+> >>>  target/arm/kvm64.c   | 11 +++++++++++
+> >>>  target/arm/kvm_arm.h | 14 ++++++++++++++
+> >>>  3 files changed, 31 insertions(+), 6 deletions(-)
+> >>>
+> >>> diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
+> >>> index 1901997a0645..946994838d8a 100644
+> >>> --- a/target/arm/cpu64.c
+> >>> +++ b/target/arm/cpu64.c
+> >>> @@ -407,13 +407,13 @@ static void aarch64_cpu_set_aarch64(Object *obj, bool value, Error **errp)
+> >>>       * restriction allows us to avoid fixing up functionality that assumes a
+> >>>       * uniform execution state like do_interrupt.
+> >>>       */> -    if (!kvm_enabled()) {
+> >>> -        error_setg(errp, "'aarch64' feature cannot be disabled "
+> >>> -                         "unless KVM is enabled");
+> >>> -        return;
+> >>> -    }
+> >>> -
+> >>>      if (value == false) {
+> >>> +        if (!kvm_enabled() || !kvm_arm_aarch32_supported(CPU(cpu))) {
+> >>> +            error_setg(errp, "'aarch64' feature cannot be disabled "
+> >>> +                             "unless KVM is enabled and 32-bit EL1 "
+> >>> +                             "is supported");
+> >>> +            return;
+> >>> +        }
+> >>>          unset_feature(&cpu->env, ARM_FEATURE_AARCH64);
+> >>>      } else {
+> >>>          set_feature(&cpu->env, ARM_FEATURE_AARCH64);
+> >>> diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
+> >>> index 22d19c9aec6f..45ccda589903 100644
+> >>> --- a/target/arm/kvm64.c
+> >>> +++ b/target/arm/kvm64.c
+> >>> @@ -24,7 +24,9 @@
+> >>>  #include "exec/gdbstub.h"
+> >>>  #include "sysemu/sysemu.h"
+> >>>  #include "sysemu/kvm.h"
+> >>> +#include "sysemu/kvm_int.h"
+> >>>  #include "kvm_arm.h"
+> >>> +#include "hw/boards.h"
+> By the way those two new headers are not needed by this patch
 
--- 
-Eduardo
+Really?
+
+current_machine is defined in hw/boards.h and KVM_STATE is defined
+in sysemu/kvm_int.h.
+
+> >>>  #include "internals.h"
+> >>>  
+> >>>  static bool have_guest_debug;
+> >>> @@ -593,6 +595,15 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
+> >>>      return true;
+> >>>  }
+> >>>  
+> >>> +bool kvm_arm_aarch32_supported(CPUState *cpu)
+> >>> +{
+> >>> +    KVMState *s = KVM_STATE(current_machine->accelerator);
+> >>> +    int ret;
+> >>> +
+> >>> +    ret = kvm_check_extension(s, KVM_CAP_ARM_EL1_32BIT);
+> >>> +    return ret > 0;
+> >> nit: return kvm_check_extension() should be sufficient
+> > 
+> > Ah yes, I forgot kvm_check_extension() already converts negative
+> > error codes to zero. I'll fix that for v3.
+> > 
+> >>> +}
+> >>> +
+> >>>  #define ARM_CPU_ID_MPIDR       3, 0, 0, 0, 5
+> >>>  
+> >>>  int kvm_arch_init_vcpu(CPUState *cs)
+> >>> diff --git a/target/arm/kvm_arm.h b/target/arm/kvm_arm.h
+> >>> index 2a07333c615f..812125f805a1 100644
+> >>> --- a/target/arm/kvm_arm.h
+> >>> +++ b/target/arm/kvm_arm.h
+> >>> @@ -207,6 +207,15 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf);
+> >>>   */
+> >>>  void kvm_arm_set_cpu_features_from_host(ARMCPU *cpu);
+> >>>  
+> >>> +/**
+> >>> + * kvm_arm_aarch32_supported:
+> >>> + * @cs: CPUState
+> >> use kernel-doc comment style?
+> > 
+> > This file (kvm_arm.h) doesn't appear to have a super consistent comment
+> > style. I see some use @var: for the parameters and some have 'Returns:
+> > ...' lines as well. I'm happy to do whatever the maintainers prefer. For
+> > now I was just trying to mimic whatever caught my eye.>
+> >>> + *
+> >>> + * Returns true if the KVM VCPU can enable AArch32 mode and false
+> >>> + * otherwise.
+> >>> + */
+> >>> +bool kvm_arm_aarch32_supported(CPUState *cs);
+> >>> +
+> >>>  /**
+> >>>   * kvm_arm_get_max_vm_ipa_size - Returns the number of bits in the
+> >>>   * IPA address space supported by KVM
+> >>> @@ -247,6 +256,11 @@ static inline void kvm_arm_set_cpu_features_from_host(ARMCPU *cpu)
+> >>>      cpu->host_cpu_probe_failed = true;
+> >>>  }
+> >>>  
+> >>> +static inline bool kvm_arm_aarch32_supported(CPUState *cs)
+> >>> +{
+> >>> +    return false;
+> >>> +}
+> >>> +
+> >>>  static inline int kvm_arm_get_max_vm_ipa_size(MachineState *ms)
+> >>>  {
+> >>>      return -ENOENT;
+> >>>
+> >> Reviewed-by: Eric Auger <eric.auger@redhat.com>
+
+Thanks,
+drew
 
